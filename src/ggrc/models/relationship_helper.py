@@ -234,6 +234,31 @@ class RelationshipHelper(object):
     return id_query
 
   @classmethod
+  def _parent_object_mappings(cls, object_type, related_type, related_ids):
+    """Get Object ids for audit and snapshotted object mappings."""
+
+
+    if object_type in Types.parents and related_type in Types.all:
+      query = db.session.query(Snapshot.parent_id).filter(
+          Snapshot.parent_type == object_type,
+          Snapshot.child_type == related_type,
+          Snapshot.child_id.in_(related_ids)
+      )
+    elif related_type in Types.parents and object_type in Types.all:
+      query = db.session.query(Snapshot.child_id).filter(
+          Snapshot.parent_type == related_type,
+          Snapshot.parent_id.in_(related_ids),
+          Snapshot.child_type == object_type,
+      )
+    else:
+      raise Exception(
+          "Parent relationship called with invalid types.\n"
+          "object types: '{}' - '{}'".format(object_type, related_type)
+      )
+
+    return query
+
+  @classmethod
   def get_ids_related_to(cls, object_type, related_type, related_ids=[]):
     """ get ids of objects
 
@@ -247,6 +272,11 @@ class RelationshipHelper(object):
     if (object_type in Types.scoped and related_type in Types.all or
             related_type in Types.scoped and object_type in Types.all):
       return cls._assessment_object_mappings(
+          object_type, related_type, related_ids)
+
+    if (object_type in Types.parents and related_type in Types.all or
+            related_type in Types.parents and object_type in Types.all):
+      return cls._parent_object_mappings(
           object_type, related_type, related_ids)
 
     if not related_ids:
