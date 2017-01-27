@@ -313,6 +313,27 @@ class TestAuditSnapshotQueries(TestCase):
                      "Invalid related Control count for '{}'."
                      "Expected {}, got {}".format(title, expected, count))
 
+  def test_audit_empty_queries(self):
+    result = self._post([
+        {
+            "object_name": "Audit",
+            "filters": {
+                "expression": {
+                    "object_name": "Control",
+                    "op": {"name": "relevant"},
+                    "ids": [-1]
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    count = len(result.json[0]["Audit"]["values"])
+    expected = 0
+    self.assertEqual(count, expected,
+                     "Invalid related Audit count for Audit."
+                     "Expected {}, got {}".format(expected, count))
+
   def test_audit_parent_relationships(self):
     audit = models.Audit.query.first()
     result = self._post([
