@@ -69,6 +69,8 @@
     }
   }, {
     init: function () {
+      var currentUser;
+
       if (!(this.options instanceof can.Observe)) {
         this.options = new can.Observe(this.options);
       }
@@ -76,9 +78,25 @@
       if (!this.element.find('.modal-body').length) {
         can.view(this.options.preload_view, {}, this.proxy('after_preload'));
       } else {
+        // Make sure that the current user object, if it exists, is fully
+        // loaded before rendering the form, otherwise initial validation can
+        // incorrectly fail for form fields whose values rely on current user's
+        // attributes.
+        if (GGRC.current_user) {
+          currentUser = CMS.Models.Person.cache[GGRC.current_user.id].reify();
+        }
+
+        if (currentUser && !currentUser.email) {
+          // If email - a required attribute - is missing, the user object is
+          // not fully loaded and we need to force-fetch it first.
+          currentUser.refresh().then(function () {
+            this.after_preload();
+          }.bind(this));
+          return;
+        }
+
         this.after_preload();
       }
-      // this.options.attr("mapping", !!this.options.mapping);
     },
 
     after_preload: function (content) {
