@@ -393,8 +393,12 @@
         this.scope.attr('mapper.contact', null);
         this.scope.attr('mapper.contactEmail', null);
         // Edge case for Assessment Generation
+        // and objects that are not in Snapshot scope
         if (!this.scope.attr('mapper.assessmentGenerator')) {
-          this.scope.attr('mapper.relevant').replace([]);
+          if (!GGRC.Utils.Snapshots.isInScopeModel(
+            this.scope.attr('mapper.object'))) {
+            this.scope.attr('mapper.relevant').replace([]);
+          }
         }
         this.setModel();
         this.setBinding();
