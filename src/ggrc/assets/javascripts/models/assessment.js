@@ -30,6 +30,7 @@
     defaults: {
       status: 'Not Started'
     },
+    statuses: ['Not Started', 'In Progress', 'Ready for Review', 'Completed'],
     tree_view_options: {
       add_item_view: GGRC.mustache_path +
       '/base_objects/tree_add_item.mustache',
