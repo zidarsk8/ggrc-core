@@ -269,6 +269,9 @@ class RelationshipHelper(object):
     if isinstance(related_ids, (int, long)):
       related_ids = [related_ids]
 
+    if not related_ids:
+      return db.session.query(Relationship.source_id).filter(sql.false())
+
     if (object_type in Types.scoped and related_type in Types.all or
             related_type in Types.scoped and object_type in Types.all):
       return cls._assessment_object_mappings(
@@ -278,9 +281,6 @@ class RelationshipHelper(object):
             related_type in Types.parents and object_type in Types.all):
       return cls._parent_object_mappings(
           object_type, related_type, related_ids)
-
-    if not related_ids:
-      return db.session.query(Relationship.source_id).filter(sql.false())
 
     destination_ids = db.session.query(Relationship.destination_id).filter(
         and_(
