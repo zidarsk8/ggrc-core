@@ -535,6 +535,8 @@
           value = can.map(item.value, function (id) {
             return CMS.Models.get_instance(model, id);
           });
+        } else if (item.value instanceof Object) {
+          value = CMS.Models.get_instance(model, item.value.id);
         } else {
           value = CMS.Models.get_instance(model, item.value);
         }
