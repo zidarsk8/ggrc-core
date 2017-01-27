@@ -14,7 +14,7 @@ from ggrc.models import Request
 from ggrc.models import Snapshot
 from ggrc.models import all_models
 from ggrc.models.relationship import Relationship
-from ggrc.snapshotter import rules
+from ggrc.snapshotter.rules import Types
 
 
 class RelationshipHelper(object):
@@ -213,13 +213,13 @@ class RelationshipHelper(object):
 
     query = aliased(union(q1, q2))
 
-    if object_type in rules.Types.scoped and related_type in rules.Types.all:
+    if object_type in Types.scoped and related_type in Types.all:
       id_query = db.session.query(query.c.snap_id).filter(
           query.c.snap_type == object_type,
           query.c.scope_type == related_type,
           query.c.scope_id.in_(related_ids),
       )
-    elif object_type in rules.Types.all and related_type in rules.Types.scoped:
+    elif object_type in Types.all and related_type in Types.scoped:
       id_query = db.session.query(query.c.scope_id).filter(
           query.c.snap_type == related_type,
           query.c.snap_id.in_(related_ids),
@@ -244,8 +244,8 @@ class RelationshipHelper(object):
     if isinstance(related_ids, (int, long)):
       related_ids = [related_ids]
 
-    if (object_type == "Assessment" and related_type in rules.Types.all or
-            related_type == "Assessment" and object_type in rules.Types.all):
+    if (object_type in Types.scoped and related_type in Types.all or
+            related_type in Types.scoped and object_type in Types.all):
       return cls._assessment_object_mappings(
           object_type, related_type, related_ids)
 
