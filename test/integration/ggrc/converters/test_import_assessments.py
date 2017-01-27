@@ -189,7 +189,7 @@ class TestAssessmentImport(TestCase):
                     object_type="Audit",
                     slug="not existing"
                 ),
-                errors.WRONG_REQUIRED_VALUE.format(
+                errors.WRONG_VALUE_DEFAULT.format(
                     line=20,
                     column_name="State",
                     value="open",

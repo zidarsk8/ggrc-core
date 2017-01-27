@@ -387,8 +387,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Audit",
             "Creator",
             "Assessor",
-            "Code",
-            "State",
+            "Code"
         },
         "unique": {
             "Code",

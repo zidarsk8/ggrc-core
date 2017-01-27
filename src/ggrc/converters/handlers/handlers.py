@@ -183,18 +183,9 @@ class StatusColumnHandler(ColumnHandler):
     value = self.raw_value.lower()
     status = self.state_mappings.get(value)
     if status is None:
-      if self.mandatory:
-        if len(self.valid_states) > 0:
-          self.add_warning(errors.WRONG_REQUIRED_VALUE,
-                           value=value[:20],
-                           column_name=self.display_name)
-          status = self.valid_states[0]
-        else:
-          self.add_error(errors.MISSING_VALUE_ERROR,
-                         column_name=self.display_name)
-          return
-      elif value != "":
-        self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+      self.add_warning(
+          errors.WRONG_VALUE_DEFAULT, column_name=self.display_name)
+      status = self.row_converter.object_class.default_status()
     return status
 
 
