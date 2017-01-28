@@ -59,10 +59,10 @@ class TestAuditSnapshotQueries(TestCase):
     """Log in before performing queries."""
     self.client.get("/login")
 
-  def _post(self, data):
+  def _post(self, request_data):
     return self.client.post(
         "/query",
-        data=json.dumps(data),
+        data=json.dumps(request_data),
         headers={"Content-Type": "application/json", }
     )
 
@@ -134,6 +134,7 @@ class TestAuditSnapshotQueries(TestCase):
     )
     for i in range(4):
       for factory in assessment_issues:
+        # pylint: disable=protected-access
         obj = factory(
             title="{} {}".format(factory._meta.model.__name__, i + 1),
         )
@@ -264,9 +265,9 @@ class TestAuditSnapshotQueries(TestCase):
     self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 3)
 
   @data(*CONTROL_COUNTS.items())
-  def test_assesessment_relationships(self, data):
+  def test_assesessment_relationships(self, test_data):
     """Test relationships between Assessments and original objects."""
-    title, expected = data
+    title, expected = test_data
     control = models.Control.query.filter_by(title=title).first()
 
     result = self._post([
@@ -289,9 +290,9 @@ class TestAuditSnapshotQueries(TestCase):
                      "Expected {}, got {}".format(title, expected, count))
 
   @data(*ASSESSMENT_COUNTS.items())
-  def test_original_objects(self, data):
+  def test_original_objects(self, test_data):
     """Test relationships between original objects and Assessments."""
-    title, expected = data
+    title, expected = test_data
     assessment = models.Assessment.query.filter_by(title=title).first()
 
     result = self._post([
@@ -314,6 +315,7 @@ class TestAuditSnapshotQueries(TestCase):
                      "Expected {}, got {}".format(title, expected, count))
 
   def test_audit_empty_queries(self):
+    """Test Audit relationship for irrelevant objects."""
     result = self._post([
         {
             "object_name": "Audit",
@@ -335,6 +337,7 @@ class TestAuditSnapshotQueries(TestCase):
                      "Expected {}, got {}".format(expected, count))
 
   def test_audit_parent_relationships(self):
+    """Test snapshotted object relationship to Audits."""
     audit = models.Audit.query.first()
     result = self._post([
         {
@@ -357,8 +360,9 @@ class TestAuditSnapshotQueries(TestCase):
                      "Expected {}, got {}".format(expected, count))
 
   @data(*AUDIT_COUNTS.items())
-  def test_audit_child_relationships(self, data):
-    title, expected = data
+  def test_audit_child_relationships(self, test_data):
+    """Test audit relationships for snapshotted objects."""
+    title, expected = test_data
     control = models.Control.query.filter_by(title=title).first()
 
     result = self._post([

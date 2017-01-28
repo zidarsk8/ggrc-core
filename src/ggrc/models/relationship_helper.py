@@ -1,6 +1,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Helper for getting related objects."""
+
 from sqlalchemy import and_
 from sqlalchemy import sql
 from sqlalchemy import union
@@ -18,6 +20,7 @@ from ggrc.snapshotter.rules import Types
 
 
 class RelationshipHelper(object):
+  """Helpers for related objects with special relationships."""
 
   @classmethod
   def program_audit(cls, object_type, related_type, related_ids):
@@ -185,7 +188,7 @@ class RelationshipHelper(object):
   def _assessment_object_mappings(cls, object_type, related_type, related_ids):
     """Get Object ids for audit scope objects and snapshotted objects."""
 
-    q1 = db.session.query(
+    source_query = db.session.query(
         Relationship.destination_id.label("snap_id"),
         Relationship.destination_type.label("snap_type"),
         Snapshot.child_id.label("scope_id"),
@@ -198,7 +201,7 @@ class RelationshipHelper(object):
         )
     )
 
-    q2 = db.session.query(
+    destination_query = db.session.query(
         Relationship.source_id.label("snap_id"),
         Relationship.source_type.label("snap_type"),
         Snapshot.child_id.label("scope_id"),
@@ -211,7 +214,7 @@ class RelationshipHelper(object):
         )
     )
 
-    query = aliased(union(q1, q2))
+    query = aliased(union(source_query, destination_query))
 
     if object_type in Types.scoped and related_type in Types.all:
       id_query = db.session.query(query.c.snap_id).filter(
@@ -237,7 +240,6 @@ class RelationshipHelper(object):
   def _parent_object_mappings(cls, object_type, related_type, related_ids):
     """Get Object ids for audit and snapshotted object mappings."""
 
-
     if object_type in Types.parents and related_type in Types.all:
       query = db.session.query(Snapshot.parent_id).filter(
           Snapshot.parent_type == object_type,
@@ -259,7 +261,7 @@ class RelationshipHelper(object):
     return query
 
   @classmethod
-  def get_ids_related_to(cls, object_type, related_type, related_ids=[]):
+  def get_ids_related_to(cls, object_type, related_type, related_ids=None):
     """ get ids of objects
 
     Get a list of all ids for object with object_type, that are related to any
