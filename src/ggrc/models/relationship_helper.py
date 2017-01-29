@@ -188,53 +188,82 @@ class RelationshipHelper(object):
   def _assessment_object_mappings(cls, object_type, related_type, related_ids):
     """Get Object ids for audit scope objects and snapshotted objects."""
 
-    source_query = db.session.query(
-        Relationship.destination_id.label("snap_id"),
-        Relationship.destination_type.label("snap_type"),
-        Snapshot.child_id.label("scope_id"),
-        Snapshot.child_type.label("scope_type"),
-    ).join(
-        Snapshot,
-        and_(
-            Relationship.source_id == Snapshot.id,
-            Relationship.source_type == Snapshot.__name__,
-        )
-    )
-
-    destination_query = db.session.query(
-        Relationship.source_id.label("snap_id"),
-        Relationship.source_type.label("snap_type"),
-        Snapshot.child_id.label("scope_id"),
-        Snapshot.child_type.label("scope_type"),
-    ).join(
-        Snapshot,
-        and_(
-            Relationship.destination_id == Snapshot.id,
-            Relationship.destination_type == Snapshot.__name__,
-        )
-    )
-
-    query = aliased(union(source_query, destination_query))
-
     if object_type in Types.scoped and related_type in Types.all:
-      id_query = db.session.query(query.c.snap_id).filter(
-          query.c.snap_type == object_type,
-          query.c.scope_type == related_type,
-          query.c.scope_id.in_(related_ids),
+
+      source_query = db.session.query(
+          Relationship.destination_id.label("result_id"),
+          Relationship.destination_type,
+          Snapshot.child_id,
+          Snapshot.child_type,
+      ).join(
+          Snapshot,
+          and_(
+              Relationship.source_id == Snapshot.id,
+              Relationship.source_type == Snapshot.__name__,
+              Relationship.destination_type == object_type,
+              Snapshot.child_type == related_type,
+              Snapshot.child_id.in_(related_ids),
+          )
       )
+
+      destination_query = db.session.query(
+          Relationship.source_id.label("result_id"),
+          Relationship.source_type,
+          Snapshot.child_id,
+          Snapshot.child_type,
+      ).join(
+          Snapshot,
+          and_(
+              Relationship.destination_id == Snapshot.id,
+              Relationship.destination_type == Snapshot.__name__,
+              Relationship.source_type == object_type,
+              Snapshot.child_type == related_type,
+              Snapshot.child_id.in_(related_ids),
+          )
+      )
+
     elif object_type in Types.all and related_type in Types.scoped:
-      id_query = db.session.query(query.c.scope_id).filter(
-          query.c.snap_type == related_type,
-          query.c.snap_id.in_(related_ids),
-          query.c.scope_type == object_type,
+      source_query = db.session.query(
+          Relationship.destination_id,
+          Relationship.destination_type,
+          Snapshot.child_id.label("result_id"),
+          Snapshot.child_type,
+      ).join(
+          Snapshot,
+          and_(
+              Relationship.source_id == Snapshot.id,
+              Relationship.source_type == Snapshot.__name__,
+              Relationship.destination_type == related_type,
+              Relationship.destination_id.in_(related_ids),
+              Snapshot.child_type == object_type,
+          )
       )
+
+      destination_query = db.session.query(
+          Relationship.source_id,
+          Relationship.source_type,
+          Snapshot.child_id.label("result_id"),
+          Snapshot.child_type,
+      ).join(
+          Snapshot,
+          and_(
+              Relationship.destination_id == Snapshot.id,
+              Relationship.destination_type == Snapshot.__name__,
+              Relationship.source_type == related_type,
+              Relationship.source_id.in_(related_ids),
+              Snapshot.child_type == object_type,
+          )
+      )
+
     else:
       raise Exception(
           "Snapshot relationship called with invalid types.\n"
           "object types: '{}' - '{}'".format(object_type, related_type)
       )
 
-    return id_query
+    query = aliased(union(source_query, destination_query))
+
+    return db.session.query(query.c.result_id)
 
   @classmethod
   def _parent_object_mappings(cls, object_type, related_type, related_ids):
