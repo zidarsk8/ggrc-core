@@ -221,7 +221,7 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
     assessment_mappings = [
         [audit_1, objective_1_program_1, objective_2_program_1],
         [audit_2, objective_1_program_1, objective_2_program_1],
-        [audit_3, objective_1_program_1],
+        [audit_3],
     ]
 
     assessment_1, assessment_2, assessment_3 = self.make_assessments(
@@ -321,12 +321,12 @@ class TestWithSimilarityScore(integration.ggrc.TestCase):
     ]
 
     weights = [
-        [13, 18, 20, 25, 26],
-        [10, 15, 20, 20, 25],
-        [10, 13, 13, 15, 18],
-        [13, 18, 20, 25, 26],
-        [10, 13, 13, 15, 18],
-        [10, 15, 20, 20, 25]
+        [4, 4, 4, 4, 8],
+        [2, 2, 4, 4, 4],
+        [2, 2, 4, 4, 4],
+        [4, 4, 4, 4, 8],
+        [2, 2, 4, 4, 4],
+        [2, 2, 4, 4, 4],
     ]
 
     assessments = self.make_assessments(
