@@ -8,8 +8,13 @@
 
   var tpl = can.view(GGRC.mustache_path +
     '/components/simple-modal/simple-modal.mustache');
-  var baseCls = 'simple-modal';
-
+  /**
+   * Simple Modal Component is a general abstraction to visualize
+   * modal and pop-ups with overlay.
+   * Simple Modal can be initialized in any part of the HTML.
+   * Simple Modal provides only logic less basic markup. All business logic should be placed on the level of inner components.
+   * To simplify styling additional helper CSS classes were created: 'simple-modal__footer', 'simple-modal__body' and 'simple-modal__header'
+   */
   can.Component.extend({
     tag: 'simple-modal',
     template: tpl,
