@@ -28,3 +28,18 @@ describe('Model states test', function () {
     expect(CMS.Models.Assessment.statuses).toEqual(expectedStatuses);
   });
 });
+
+describe('Model review state test', function () {
+  it('checks if object review has os state in attr_list', function () {
+    var reviewObjects = ['AccessGroup', 'Assessment', 'Audit', 'Clause',
+        'Contract', 'Control', 'DataAsset', 'Facility', 'Issue', 'Market',
+        'Objective', 'OrgGroup', 'Policy', 'Process', 'Product', 'Program',
+        'Project', 'Regulation', 'Risk', 'Section', 'Standard', 'System',
+        'Threat', 'Vendor'];
+    reviewObjects.forEach(function (object) {
+      expect(CMS.Models[object].attr_list).toContain(
+          {attr_title: 'Review State', attr_name: 'os_state'},
+          'for object ' + object);
+    });
+  });
+});
