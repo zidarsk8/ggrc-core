@@ -2,16 +2,26 @@
 
 import unittest
 import ggrc.app  # noqa pylint: disable=unused-import
+from ddt import ddt
+from ddt import data
 from ggrc.models import all_models
 
 
+@ddt
 class TestStates(unittest.TestCase):
   """Test Object State main Test Case class"""
 
-  def _assert_states(self, models, expected_states, default):
+  BASIC_STATE_OBJECTS = (
+      'AccessGroup', 'Clause', 'Contract',
+      'Control', 'DataAsset', 'Directive', 'Facility', 'Issue', 'Market',
+      'Objective', 'OrgGroup', 'Policy', 'Process', 'Product', 'Program',
+      'Project', 'Regulation', 'Risk', 'Section', 'Standard', 'System',
+      'SystemOrProcess', 'Threat', 'Vendor')
+
+  def _assert_states(self, objType, expected_states, default):
     # pylint: disable=no-self-use
     for model in all_models.all_models:
-      if model.__name__ not in models:
+      if model.__name__ != objType:
         continue
 
       assert hasattr(model, "valid_statuses"), \
@@ -28,26 +38,22 @@ class TestStates(unittest.TestCase):
               default,
               model.default_status())
 
-  def test_basic_states(self):
+  @data(*BASIC_STATE_OBJECTS)
+  def test_basic_states(self, obj):
     """Test basic object states"""
     basic_states = ('Draft', 'Active', 'Deprecated')
-    basic_state_objects = (
-        'AccessGroup', 'Clause', 'Contract',
-        'Control', 'DataAsset', 'Directive', 'Facility', 'Issue', 'Market',
-        'Objective', 'OrgGroup', 'Policy', 'Process', 'Product', 'Program',
-        'Project', 'Regulation', 'Risk', 'Section', 'Standard', 'System',
-        'SystemOrProcess', 'Threat', 'Vendor')
-    self._assert_states(basic_state_objects, basic_states, 'Draft')
+
+    self._assert_states(obj, basic_states, 'Draft')
 
   def test_audit_states(self):
     """Test states for Audit object"""
     audit_states = ('Planned', 'In Progress', 'Manager Review',
                     'Ready for External Review', 'Completed')
-    self._assert_states(('Audit', ), audit_states, 'Planned')
+    self._assert_states('Audit', audit_states, 'Planned')
 
   def test_assignable_states(self):
     """Test states for Assignable objects (Assessment)"""
     assignable_states = (
         'In Progress', 'Completed', 'Not Started', 'Verified',
         'Ready for Review')
-    self._assert_states(('Assessment', ), assignable_states, 'Not Started')
+    self._assert_states('Assessment', assignable_states, 'Not Started')
