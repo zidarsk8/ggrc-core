@@ -13,7 +13,6 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
 from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
-from ggrc.models.track_object_state import track_state_for_class
 
 
 class Section(HasObjectState, Hierarchical, db.Model, CustomAttributable,
@@ -62,6 +61,3 @@ class Section(HasObjectState, Hierarchical, db.Model, CustomAttributable,
         .filter(predicate(Directive.slug) | predicate(Directive.title)) \
         .exists()
     return dst | src
-
-
-track_state_for_class(Section)

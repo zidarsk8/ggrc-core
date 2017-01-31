@@ -57,7 +57,4 @@ def before_flush_handler(session, flush_context, instances):
     if isinstance(obj, HasObjectState):
       obj.validate_os_state()
 
-def track_state_for_class(object_class):
-  pass
-
 event.listen(Session, 'before_flush', before_flush_handler)

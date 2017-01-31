@@ -13,7 +13,6 @@ from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
-from ggrc.models.track_object_state import track_state_for_class
 
 
 class Clause(HasObjectState, Hierarchical, CustomAttributable, Personable,
@@ -38,5 +37,3 @@ class Clause(HasObjectState, Hierarchical, CustomAttributable, Personable,
   ]
   _sanitize_html = ['notes']
   _include_links = []
-
-track_state_for_class(Clause)

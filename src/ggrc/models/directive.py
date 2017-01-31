@@ -10,7 +10,7 @@ from .relationship import Relatable
 from .utils import validate_option
 
 from sqlalchemy.orm import validates
-from .track_object_state import HasObjectState, track_state_for_class
+from .track_object_state import HasObjectState
 
 
 class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
@@ -180,8 +180,3 @@ class Contract(CustomAttributable, Relatable,
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
     return 'Contract'
-
-track_state_for_class(Policy)
-track_state_for_class(Regulation)
-track_state_for_class(Standard)
-track_state_for_class(Contract)

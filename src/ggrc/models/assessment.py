@@ -33,7 +33,6 @@ from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
-from ggrc.models.track_object_state import track_state_for_class
 from ggrc.utils import similarity_options as similarity_options_module
 
 
@@ -215,6 +214,3 @@ class Assessment(statusable.Statusable, AuditRelationship,
   @classmethod
   def _ignore_filter(cls, _):
     return None
-
-
-track_state_for_class(Assessment)
