@@ -57,6 +57,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "State",
         "My Attribute",
         "Mandatory Attribute",
+        "Review State",
         "Delete",
     }
     expected_names = element_names.union(mapping_names)
@@ -105,6 +106,7 @@ class TestCustomAttributesDefinitions(TestCase):
         "My Attribute",
         "Mandatory Attribute",
         "Choose",
+        "Review State",
         "Delete",
     }
     expected_names = element_names.union(mapping_names)
@@ -267,6 +269,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     expected_fields = {
@@ -379,6 +382,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Conclusion: Operation",
         "Recipients",
         "Send by default",
+        "Review State",
         "Delete",
     }
     expected_fields = {
@@ -415,6 +419,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Issue, names, self.COMMON_EXPECTED)
@@ -434,6 +439,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Regulation, names, self.COMMON_EXPECTED)
@@ -454,6 +460,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Policy, names, self.COMMON_EXPECTED)
@@ -473,6 +480,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Standard, names, self.COMMON_EXPECTED)
@@ -492,6 +500,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Contract, names, self.COMMON_EXPECTED)
@@ -511,6 +520,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Clause, names, self.COMMON_EXPECTED)
@@ -529,6 +539,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Reference URL",
         "Code",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Section, names, self.COMMON_EXPECTED)
@@ -558,6 +569,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Principal Assessor",
         "Secondary Assessor",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Control, names, self.COMMON_EXPECTED)
@@ -575,6 +587,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Reference URL",
         "Code",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Objective, names, self.COMMON_EXPECTED)
@@ -612,6 +625,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.OrgGroup, names, self.COMMON_EXPECTED)
@@ -631,6 +645,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Vendor, names, self.COMMON_EXPECTED)
@@ -651,6 +666,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.System, names, self.COMMON_EXPECTED)
@@ -671,6 +687,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Process, names, self.COMMON_EXPECTED)
@@ -690,6 +707,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.DataAsset, names, self.COMMON_EXPECTED)
@@ -709,6 +727,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.AccessGroup, names, self.COMMON_EXPECTED)
@@ -729,6 +748,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Product, names, self.COMMON_EXPECTED)
@@ -748,6 +768,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Project, names, self.COMMON_EXPECTED)
@@ -767,6 +788,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Facility, names, self.COMMON_EXPECTED)
@@ -786,6 +808,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Effective Date",
         "Stop Date",
         "State",
+        "Review State",
         "Delete",
     }
     self._test_single_object(models.Market, names, self.COMMON_EXPECTED)
@@ -803,6 +826,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Owner",
         "Reference URL",
         "State",
+        "Review State",
         "Stop Date",
         "Title",
         "Url",
