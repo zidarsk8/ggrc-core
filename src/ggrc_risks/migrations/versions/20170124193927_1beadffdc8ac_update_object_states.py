@@ -36,6 +36,11 @@ def upgrade():
                  WHEN 'Not in Scope' THEN 'Draft'
                  WHEN 'Not Launched' THEN 'Draft'
                  ELSE 'Draft'
+               END,
+               os_state =
+               CASE os_state
+                 WHEN 'Approved' THEN 'Reviewed'
+                 ELSE 'Unreviewed'
                END;""".format(table)
     op.execute(sql)
     op.alter_column(
@@ -43,6 +48,12 @@ def upgrade():
         'status',
         nullable=False,
         server_default='Draft',
+        existing_type=mysql.VARCHAR(length=250)
+    )
+    op.alter_column(
+        table,
+        'os_state',
+        server_default='Unreviewed',
         existing_type=mysql.VARCHAR(length=250)
     )
   op.drop_column('risk_objects', 'status')
@@ -53,6 +64,12 @@ def downgrade():
   op.add_column('risk_objects', sa.Column(
       'status', mysql.VARCHAR(length=250), nullable=True))
   for table in tables:
+    op.alter_column(
+        table,
+        'os_state',
+        server_default=None,
+        existing_type=mysql.VARCHAR(length=250)
+    )
     op.alter_column(
         table,
         'status',

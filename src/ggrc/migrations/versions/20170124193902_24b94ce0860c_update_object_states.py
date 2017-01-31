@@ -39,6 +39,11 @@ def upgrade():
                  WHEN 'Not in Scope' THEN 'Draft'
                  WHEN 'Not Launched' THEN 'Draft'
                  ELSE 'Draft'
+               END,
+               os_state =
+               CASE os_state
+                 WHEN 'Approved' THEN 'Reviewed'
+                 ELSE 'Unreviewed'
                END;""".format(table)
 
     op.execute(sql)
@@ -47,6 +52,12 @@ def upgrade():
         'status',
         nullable=False,
         server_default='Draft',
+        existing_type=mysql.VARCHAR(length=250)
+    )
+    op.alter_column(
+        table,
+        'os_state',
+        server_default='Unreviewed',
         existing_type=mysql.VARCHAR(length=250)
     )
   # Handle audits which are a special case
@@ -94,6 +105,12 @@ def downgrade():
       existing_type=mysql.VARCHAR(length=250)
   )
   for table in tables:
+    op.alter_column(
+        table,
+        'os_state',
+        server_default=None,
+        existing_type=mysql.VARCHAR(length=250)
+    )
     op.alter_column(
         table,
         'status',
