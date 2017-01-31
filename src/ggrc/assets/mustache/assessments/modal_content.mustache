@@ -112,6 +112,8 @@
         {{^list.length}}
           <span class="gray"><em>No mapped objects</em></span>
         {{/list.length}}
+        {{#if new_object_form}}
+        {{else}}
           <div class="objective-selector">
             <div style="clear:both">
               <br>
@@ -126,14 +128,15 @@
                  data-join-object-id="{{instance.id}}"
                  data-join-object-type="{{instance.class.model_singular}}"
                  data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6"
-                {{#instance.audit }}
-                   data-snapshot-scope-id="{{instance.audit.id}}"
-                  data-snapshot-scope-type="{{instance.audit.type}}"
-                {{/instance.audit}}>
+                 {{#instance.audit }}
+                 data-snapshot-scope-id="{{instance.audit.id}}"
+                 data-snapshot-scope-type="{{instance.audit.type}}"
+                 {{/instance.audit}}>
                    Map Objects
               </a>
             </div>
           </div>
+       {{/if}}
       </ggrc-modal-connector>
     </div>
     <div data-id="notifications_hidden" class="span6 hidable">
