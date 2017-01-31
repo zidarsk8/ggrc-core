@@ -796,3 +796,21 @@ class RequestTypeColumnHandler(ColumnHandler):
                          value=value[:20],
                          column_name=self.display_name)
     return req_type
+
+
+class ExportOnlyColumnHandler(ColumnHandler):
+
+  def parse_item(self):
+    pass
+
+  def set_obj_attr(self):
+    pass
+
+  def get_value(self):
+    return super(ExportOnlyColumnHandler, self).get_value()
+
+  def insert_object(self):
+    pass
+
+  def set_value(self):
+    pass
