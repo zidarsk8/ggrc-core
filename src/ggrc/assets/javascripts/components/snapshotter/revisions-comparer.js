@@ -43,8 +43,10 @@
                 var fragLeft = can.view(view, revisions[0]);
                 var fragRight = can.view(view, revisions[1]);
                 fragLeft.appendChild(fragRight);
-                target.find('.modal-body').html(fragLeft);
-                that.highlightDifference(target);
+                revisions[1].instance.refresh_all('owners').then(function () {
+                  target.find('.modal-body').html(fragLeft);
+                  that.highlightDifference(target);
+                });
               });
           }
         }, this.updateRevision.bind(this));
