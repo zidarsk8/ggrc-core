@@ -197,9 +197,11 @@ dashboard-js-files:
   - components/assessment_attributes.js
   - components/lazy_open_close.js
   - components/object_history/object_history.js
-  - components/unified_mapper/mapper.js
-  - components/unified_mapper/mapper_results.js
-  - components/unified_mapper/mapper_checkbox.js
+  - components/unified-mapper/mapper.js
+  - components/unified-mapper/mapper-results.js
+  - components/unified-mapper/mapper-results-item.js
+  - components/unified-mapper/mapper-results-item-status.js
+  - components/unified-mapper/mapper-results-item-details.js
   - components/quick_form/quick_add.js
   - components/quick_form/quick_update.js
   - components/assessment_templates/assessment_templates.js
@@ -222,8 +224,6 @@ dashboard-js-files:
   - components/snapshotter/revisions-comparer.js
   - components/snapshotter/scope-update.js
   - components/info-pin-buttons/info-pin-buttons.js
-  - components/snapshot-loader/snapshot-loader.js
-  - components/snapshot-loader/snapshot-loader-item.js
   - components/textarea-array/textarea-array.js
   - components/object-selection/object-selection.js
   - components/object-selection/object-selection-item.js
@@ -236,8 +236,6 @@ app-init-files:
 
 dashboard-js-template-files:
   - components/object-state-toolbar/object-state-toolbar.mustache
-  - components/snapshot-loader/snapshot-loader.mustache
-  - components/snapshot-loader/snapshot-loader-item.mustache
   - components/object-selection/object-selection-item.mustache
   - components/search-toolbar/search-toolbar.mustache
   - components/mapping-controls/mapping-type-selector.mustache
@@ -388,7 +386,10 @@ dashboard-js-template-files:
   - components/inline_edit/person.mustache
   - components/inline_edit/datepicker.mustache
   - components/autocomplete/autocomplete.mustache
-  - components/unified_mapper/mapper_results.mustache
+  - components/unified-mapper/mapper-results.mustache
+  - components/unified-mapper/mapper-results-item.mustache
+  - components/unified-mapper/mapper-results-item-status.mustache
+  - components/unified-mapper/mapper-results-item-details.mustache
   - components/assessment_templates/assessment_templates.mustache
   - components/dropdown/dropdown.mustache
   - components/object_history/object_history.mustache
