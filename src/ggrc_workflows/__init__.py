@@ -537,18 +537,10 @@ def handle_cycle_task_group_object_task_put(
   # to update objects that have been declined. It updates the os_last_updated
   # date and last_updated_by.
   if getattr(obj.task_group_task, 'object_approval', None):
-    os_state = None
-    if obj.status == 'Verified':
-      os_state = "Approved"
-    elif obj.status == 'Declined':
-      os_state = "Declined"
-    elif obj.status == 'InProgress':
-      os_state = "UnderReview"
-
     for tgobj in obj.task_group_task.task_group.objects:
-      tgobj.os_state = os_state
-      tgobj.skip_os_state_update()
-      db.session.add(tgobj)
+      if obj.status == 'Verified':
+        tgobj.set_reviewed_state()
+        db.session.add(tgobj)
     db.session.flush()
 
 

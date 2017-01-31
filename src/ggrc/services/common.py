@@ -146,10 +146,6 @@ def set_ids_for_new_custom_attributes(parent_obj):
     attr = object_attrs[obj.type]
     setattr(obj, attr, parent_obj.id)
 
-    # Disable state updating so that a newly create object doesn't go straight
-    # from Draft to Modified.
-    if hasattr(obj, '_skip_os_state_update'):
-      obj.skip_os_state_update()
     db.session.add(obj)
   db.session.flush()
 
