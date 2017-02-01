@@ -18,6 +18,16 @@ from ggrc import db
 from ggrc.models import all_models
 
 
+DEFAULT_LACK_OF_PERMISSIONS = {
+    "Snapshot": 403,
+    "Audit": 403
+}
+DEFAULT_AUDITOR_PERMISSIONS = {
+    "Snapshot": 403,
+    "Audit": 200
+}
+
+
 class TestAuditRBAC(TestCase):
   """Test audit RBAC"""
   # pylint: disable=too-many-instance-attributes
@@ -73,7 +83,41 @@ class TestAuditRBAC(TestCase):
             "href": "/api/contexts/{}".format(self.program.context_id)
         }
     })
+    self.add_auditors(audit)
     return audit
+
+  def add_auditors(self, audit):
+    """Add auditors to audits via POST user_role call"""
+    auditor_emails = [
+        "readerauditor@test.com",
+        "creatorauditor@test.com",
+        "editorauditor@test.com",
+        "adminauditor@test.com",
+    ]
+    program_reader_emails = [
+        "creatorauditor@test.com",
+    ]
+    auditor_role = db.session.query(all_models.Role).filter(
+        all_models.Role.name == "Auditor"
+    ).one()
+    program_reader_role = db.session.query(all_models.Role).filter(
+        all_models.Role.name == "ProgramReader"
+    ).one()
+
+    program = db.session.query(all_models.Program).filter(
+        all_models.Program.slug == "PMRBACPROGRAM-1"
+    ).one()
+
+    user_roles = [
+        (auditor_emails, auditor_role, audit.context),
+        (program_reader_emails, program_reader_role, program.context)
+    ]
+
+    for emails, role, context in user_roles:
+      for email in emails:
+        auditor = all_models.Person.query.filter(
+            all_models.Person.email == email).one()
+        self.objgen.generate_user_role(auditor, role, context)
 
   def update_audit(self):
     """Update default audit"""
@@ -92,8 +136,8 @@ class TestAuditRBAC(TestCase):
 
   def sanity_check(self):
     """Sanity check if the audit_rbac.csv was imported correctly"""
-    assert len(self.people) == 17, \
-        "Expecting 17 people not {}.".format(len(self.people))
+    assert len(self.people) == 21, \
+        "Expecting 21 people not {}.".format(len(self.people))
     assert len(self.related_objects) == 19, \
         "Expecting 19 objects mapped to program not {}.".format(
             len(self.related_objects))
@@ -123,10 +167,12 @@ class TestAuditRBAC(TestCase):
       status_code = response.status_code
       if response.status_code == 200:
         data = response.json
-        data.update({
-            "update_revision": "latest"
-        })
-        status_code = self.api.put(obj, data).status_code
+        if obj.type == "Snapshot":
+          data.update({
+              "update_revision": "latest"
+          })
+        put_call = self.api.put(obj, data)
+        status_code = put_call.status_code
       responses.append((obj.type, status_code))
     return responses
 
@@ -138,25 +184,40 @@ class TestAuditRBAC(TestCase):
       self.api.set_user(person)
       responses = method(self.snapshots + [self.audit])
       for type_, code in responses:
-        if code != expected_statuses[person.email]:
+        if code != expected_statuses[person.email][type_]:
           all_errors.append("{} does not have {} access to {} ({})".format(
               person.email, method.__name__, type_, code))
     return all_errors
 
   def test_read_access_on_mapped(self):
     """Test READ access to snapshotted objects of default audit"""
-    expected_statuses = defaultdict(lambda: 200)
-    for exception in ("creator@test.com",):
-      expected_statuses[exception] = 403
+    expected_statuses = defaultdict(lambda: defaultdict(lambda: 200))
+    exceptional_users = (
+        ("creator@test.com", DEFAULT_LACK_OF_PERMISSIONS),
+    )
+    for user, exceptions in exceptional_users:
+      for type_, status_code in exceptions.items():
+        expected_statuses[user][type_] = status_code
     errors = self.call_api(self.read, expected_statuses)
     assert not errors, "\n".join(errors)
 
   def test_update_access_on_mapped(self):
     """Test UPDATE access to snapshotted objects of default audit"""
+    expected_statuses = defaultdict(lambda: defaultdict(lambda: 200))
 
-    expected_statuses = defaultdict(lambda: 200)
-    for exception in ("creator@test.com", "reader@test.com",
-                      "creatorpr@test.com", "readerpr@test.com"):
-      expected_statuses[exception] = 403
+    exceptional_users = (
+        ("creator@test.com", DEFAULT_LACK_OF_PERMISSIONS),
+        ("reader@test.com", DEFAULT_LACK_OF_PERMISSIONS),
+        ("creatorpr@test.com", DEFAULT_LACK_OF_PERMISSIONS),
+        ("readerpr@test.com", DEFAULT_LACK_OF_PERMISSIONS),
+        # Auditor roles
+        ("readerauditor@test.com", DEFAULT_AUDITOR_PERMISSIONS),
+        ("creatorauditor@test.com", DEFAULT_AUDITOR_PERMISSIONS)
+    )
+
+    for user, exceptions in exceptional_users:
+      for type_, status_code in exceptions.items():
+        expected_statuses[user][type_] = status_code
+
     errors = self.call_api(self.update, expected_statuses)
     assert not errors, "\n".join(errors)
