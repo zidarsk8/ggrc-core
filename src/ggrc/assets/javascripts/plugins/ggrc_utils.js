@@ -172,7 +172,7 @@
         headers: $.extend({
           'Content-Type': 'application/json',
           'X-export-view': 'blocks',
-          'X-requested-by': 'gGRC'
+          'X-requested-by': 'GGRC'
         }, request.headers || {}),
         url: '/_service/export_csv',
         data: JSON.stringify(request.data || {})
@@ -866,7 +866,7 @@
      * @return {Boolean} True or False
      */
     function isSnapshot(instance) {
-      return instance && instance.snapshot;
+      return instance && (instance.snapshot || instance.isRevision);
     }
 
     /**

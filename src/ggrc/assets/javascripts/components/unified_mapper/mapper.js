@@ -57,6 +57,7 @@
     model: {},
     bindings: {},
     is_loading: false,
+    is_new: false,
     page_loading: false,
     is_saving: false,
     all_selected: false,
@@ -149,7 +150,9 @@
       }.bind(this));
     },
     getBindingName: function (instance, plural) {
-      return (instance.has_binding(plural) ? '' : 'related_') + plural;
+      return (instance && instance.has_binding(plural) ?
+          '' :
+          'related_') + plural;
     },
     modelFromType: function (type) {
       var types = _.reduce(_.values(
@@ -176,6 +179,7 @@
       var id = Number($el.attr('join-object-id'));
       var object = $el.attr('object');
       var type = $el.attr('type');
+      var isNew = parentScope.attr('is_new');
       var treeView = GGRC.tree_view.sub_tree_for[object];
 
       if ($el.attr('search-only')) {
@@ -197,7 +201,9 @@
         data.type = 'Program';
       }
 
-      if (id || GGRC.page_instance()) {
+      if (isNew) {
+        data.join_object_id = null;
+      } else if (id || GGRC.page_instance()) {
         data.join_object_id = id || GGRC.page_instance().id;
       }
 
@@ -213,6 +219,7 @@
           useTemplates: parentScope.attr('useTemplates'),
           assessmentGenerator: parentScope.attr('assessmentGenerator'),
           is_snapshotable: parentScope.attr('is_snapshotable'),
+          is_new: parentScope.attr('is_new'),
           snapshot_scope_id: parentScope.attr('snapshot_scope_id'),
           snapshot_scope_type: parentScope.attr('snapshot_scope_type')
         })),
@@ -238,8 +245,9 @@
       deferredSave: function () {
         var source = this.scope.attr('deferred_to').instance ||
           this.scope.attr('mapper.object');
+        var data = {};
 
-        var data = {
+        data = {
           multi_map: true,
           arr: _.compact(_.map(
             this.scope.attr('mapper.selected'),
@@ -361,6 +369,11 @@
 
         getBindingName = this.scope.attr('mapper').getBindingName;
         selected = this.scope.attr('mapper.parentInstance');
+
+        if (!selected) {
+          return;
+        }
+
         tablePlural = getBindingName(
           selected, this.scope.attr('mapper.model.table_plural'));
 
@@ -386,8 +399,12 @@
         this.scope.attr('mapper.contact', null);
         this.scope.attr('mapper.contactEmail', null);
         // Edge case for Assessment Generation
+        // and objects that are not in Snapshot scope
         if (!this.scope.attr('mapper.assessmentGenerator')) {
-          this.scope.attr('mapper.relevant').replace([]);
+          if (!GGRC.Utils.Snapshots.isInScopeModel(
+            this.scope.attr('mapper.object'))) {
+            this.scope.attr('mapper.relevant').replace([]);
+          }
         }
         this.setModel();
         this.setBinding();

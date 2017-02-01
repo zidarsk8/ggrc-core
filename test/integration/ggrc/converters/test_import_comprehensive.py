@@ -12,7 +12,7 @@ from ggrc.models import Program
 from ggrc.converters import errors
 from ggrc_basic_permissions import Role
 from ggrc_basic_permissions import UserRole
-from integration.ggrc.converters import TestCase
+from integration.ggrc import TestCase
 from integration.ggrc.generator import ObjectGenerator
 
 
@@ -25,7 +25,7 @@ class TestComprehensiveSheets(TestCase):
   """
 
   def setUp(self):
-    TestCase.setUp(self)
+    super(TestComprehensiveSheets, self).setUp()
     self.generator = ObjectGenerator()
     self.client.get("/login")
 
@@ -220,35 +220,35 @@ class TestComprehensiveSheets(TestCase):
     response = self.import_file("import_with_all_warnings_and_errors.csv")
     expected_errors = {
         "Control": {
-            "block_errors": set([
+            "block_errors": {
                 errors.DUPLICATE_COLUMN.format(
                     line=1, duplicates="title, notes, test plan"),
-            ]),
+            },
         },
         "Program": {
-            "row_warnings": set([
+            "row_warnings": {
                 errors.OWNER_MISSING.format(line=7, column_name="Manager"),
-            ]),
-            "row_errors": set([
+            },
+            "row_errors": {
                 errors.UNKNOWN_DATE_FORMAT.format(
                     line=8, column_name="Effective Date"),
                 errors.WRONG_VALUE_ERROR.format(
                     line=9, column_name="Effective Date"),
                 errors.WRONG_VALUE_ERROR.format(
                     line=9, column_name="Stop Date"),
-            ]),
+            },
         },
         "Assessment": {
-            "row_warnings": set([
+            "row_warnings": {
                 errors.UNKNOWN_OBJECT.format(
                     line=14, object_type="Audit", slug="x"),
-            ]),
-            "row_errors": set([
+            },
+            "row_errors": {
                 errors.MISSING_VALUE_ERROR.format(
                     line=14, column_name="Audit"),
                 errors.MISSING_VALUE_ERROR.format(
                     line=15, column_name="Audit"),
-            ]),
+            },
         }
     }
 

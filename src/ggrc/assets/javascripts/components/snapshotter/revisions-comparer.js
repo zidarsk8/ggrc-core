@@ -77,11 +77,10 @@
       prepareInstances: function (data) {
         return data.Revision.values.map(function (value) {
           var content = value.content;
+          var model = CMS.Models[value.resource_type];
           content.isRevision = true;
-          content.class = {
-            is_custom_attributable: false
-          };
-          return {instance: content};
+          content.type = value.resource_type;
+          return {instance: new model(content)};
         });
       },
       updateRevision: function () {
@@ -110,7 +109,8 @@
        * @return {Object} - jQuery object
        */
       getAttributes: function ($infoPanes, index) {
-        return $($infoPanes[index]).find('.row-fluid h6 + *');
+        var selector = '.row-fluid h6 + *, .row-fluid .state-value';
+        return $($infoPanes[index]).find(selector);
       },
 
       /**
@@ -248,6 +248,7 @@
          * @param {Object} caLast - jQuery object
          */
         function compareCA(caFirst, caLast) {
+          var prevIndex = -1;
           caFirst.each(function (i, caOld) {
             var $sameCA = [];
             var $caOld = $(caOld);
@@ -257,6 +258,7 @@
               var caNewScope = $caNew.viewModel();
               if (caNewScope.caId === caOldScope.caId) {
                 $sameCA = $caNew;
+                prevIndex = j;
               }
             });
             if ($sameCA.length) {
@@ -264,7 +266,7 @@
               highlightProperty('value', $sameCA, $caOld, valueSelector);
               equalCAHeight($caOld, $sameCA);
             } else {
-              fillEmptyCA(caLast, $caOld, i);
+              fillEmptyCA(caLast, $caOld, prevIndex);
             }
           });
         }
@@ -308,19 +310,20 @@
          * Fill empty space when CA is not existing
          * @param {Object} caList - List of CA
          * @param {Object} $ca - jQuery object Current attribute
-         * @param {Number} index - Index of current attribute
+         * @param {Number} index - Index of previous the same attribute
          */
         function fillEmptyCA(caList, $ca, index) {
-          var i = 1;
-          var caOldHeight = $ca
-                              .closest(caWrapperSelector)
-                              .outerHeight(true);
-          while (!$(caList[index - i]).length && i < index) {
-            i++;
+          var caOldHeight;
+          caOldHeight = $ca
+                          .closest(caWrapperSelector)
+                          .outerHeight(true);
+          if (index === -1) {
+            $(caList.context).css('padding-top', '+=' + caOldHeight);
+          } else {
+            $(caList[index])
+                    .closest(caWrapperSelector)
+                    .css('margin-bottom', '+=' + caOldHeight);
           }
-          $(caList[index - i])
-                  .closest(caWrapperSelector)
-                  .css('margin-bottom', '+=' + caOldHeight);
           $ca.closest(caSelector).addClass(highlightClass);
         }
       }

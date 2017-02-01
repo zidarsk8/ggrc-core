@@ -30,6 +30,7 @@
     defaults: {
       status: 'Not Started'
     },
+    statuses: ['Not Started', 'In Progress', 'Ready for Review', 'Completed'],
     tree_view_options: {
       add_item_view: GGRC.mustache_path +
       '/base_objects/tree_add_item.mustache',
@@ -340,12 +341,16 @@
         GGRC.current_user.id, GGRC.current_user);
       var auditLead;
 
-      if (!newObjectForm) {
-        return;
+      if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
+        if (pageInstance.type === 'Audit') {
+          this.attr('audit', pageInstance);
+        } else if (this.scopeObject) {
+          this.audit = this.scopeObject;
+        }
       }
 
-      if (pageInstance && pageInstance.type === 'Audit' && !this.audit) {
-        this.attr('audit', pageInstance);
+      if (!newObjectForm) {
+        return;
       }
 
       if (this.audit) {

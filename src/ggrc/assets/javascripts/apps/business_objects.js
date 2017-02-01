@@ -205,7 +205,7 @@
             widget_icon: 'fa fa-link!',
             order: 150
           };
-          all.Person.widget_icon = 'fa fa-person';
+          all.Person.widget_icon = 'person';
           return all;
         })(),
         Contract: {

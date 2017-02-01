@@ -36,7 +36,9 @@
         this.attr('paging.count', count);
       },
       setItems: function () {
-        this.attr('items').replace(this.load());
+        var load = this.load();
+        this.attr('items').replace(load);
+        this.attr('mapper.entries').replace(load);
       },
       setAdditionalScopeFilter: function () {
         var id = this.attr('baseInstance.scopeObject.id');
@@ -87,6 +89,10 @@
           .buildParam(modelName, paging, filters, [], ownedFilter);
       },
       prepareRelatedQuery: function (modelName, ownedFilter) {
+        if (!this.attr('baseInstance')) {
+          return null;
+        }
+
         return GGRC.Utils.QueryAPI
           .buildRelevantIdsQuery(modelName, {
             filter: this.attr('term')
@@ -166,6 +172,11 @@
         // Add Permission check
         query.permissions = 'update';
         query.type = queryType || 'values';
+
+        if (!relatedQuery) {
+          return {data: [query]};
+        }
+
         // Transform Related Query to Snapshot
         relatedQuery = GGRC.Utils.Snapshots.transformQuery(relatedQuery);
         return {data: [query, relatedQuery]};
@@ -178,13 +189,16 @@
           .makeRequest(query)
           .done(function (responseArr) {
             var data = responseArr[0];
-            var filters = responseArr[1].Snapshot.ids;
             var result = data.Snapshot.values;
-            // Do not perform extra mapping validation in case Assessment generation
-            if (!this.attr('mapper.assessmentGenerator')) {
-              result.forEach(function (item) {
-                item.isDisabled = filters.indexOf(item.id) > -1;
-              });
+            var filters;
+            if (responseArr[1]) {
+              filters = responseArr[1].Snapshot.ids;
+              // Do not perform extra mapping validation in case Assessment generation
+              if (!this.attr('mapper.assessmentGenerator')) {
+                result.forEach(function (item) {
+                  item.isDisabled = filters.indexOf(item.id) > -1;
+                });
+              }
             }
             // Update paging object
             this.updatePaging(data.Snapshot.total);

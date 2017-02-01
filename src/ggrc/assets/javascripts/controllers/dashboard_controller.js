@@ -282,7 +282,8 @@
       widget_list: null,
       spinners: {},
       contexts: null,
-      instance: null
+      instance: null,
+      isMenuVisible: true
     }
   }, {
     init: function (options) {
@@ -304,6 +305,14 @@
         can.view(this.options.internav_view, this.options, function (frag) {
           var fn = function () {
             this.element.append(frag);
+            if (this.options.instance.type === 'Audit') {
+              this.element.addClass(this.options.instance.type.toLowerCase());
+              this.element.find('li:lt(5)').wrapAll('<div class="left-menu"/>');
+              this.element.find('li:gt(4)')
+                .wrapAll('<div class="right-menu"/>');
+              this.element.find('.right-menu li.hidden-widgets-list').detach()
+                .insertBefore('.right-menu li:first');
+            }
             this.route(window.location.hash);
             delete this.delayed_display;
           }.bind(this);
@@ -395,9 +404,8 @@
         dashboardCtr.show_widget_area();
         widget.siblings().addClass('hidden').trigger('widget_hidden');
         widget.removeClass('hidden').trigger('widget_shown');
-        $('[href$="' + panel + '"]')
-        .closest('li').addClass('active')
-        .siblings().removeClass('active');
+        this.element.find('li').removeClass('active');
+        $('[href$="' + panel + '"]').closest('li').addClass('active');
       }
     },
 
@@ -546,6 +554,10 @@
         showAllTabs = model.obj_nav_options.show_all_tabs;
       }
 
+      if (!this.options.isMenuVisible) {
+        return;
+      }
+
       // Update has hidden widget attr
       $.map(this.options.widget_list, function (widget) {
         if (widget.has_count && widget.count === 0 &&
@@ -560,10 +572,10 @@
       }
       this.show_hide_titles();
     },
-    '{window} resize': function (el, ev) {
+    '{window} resize': _.debounce(function (el, ev) {
       this.show_hide_titles();
-    },
-    show_hide_titles: _.debounce(function () {
+    }, 100),
+    show_hide_titles: function () {
       var $el = this.element;
       var widgets = this.options.widget_list;
       var widths;
@@ -587,7 +599,7 @@
           widget.attr('show_title', false);
         });
       }
-    }, 100),
+    },
     '.closed click': function (el, ev) {
       var $link = el.closest('a');
       var widget = this.widget_by_selector('#' + $link.attr('href')
@@ -618,6 +630,19 @@
       } else {
         $dropdown.removeClass('one-item');
       }
+    },
+    '.hide-menu click': function (el) {
+      var $menu = this.element.find('.right-menu');
+      if (this.options.isMenuVisible) {
+        this.options.isMenuVisible = false;
+        $menu.find('li:lt(-1)').hide();
+        el.val('Show Audit Scope');
+      } else {
+        this.options.isMenuVisible = true;
+        $menu.find('li:lt(-1)').show();
+        el.val('Hide');
+      }
+      this.show_hide_titles();
     }
   });
 })(this.can, this.can.$);
