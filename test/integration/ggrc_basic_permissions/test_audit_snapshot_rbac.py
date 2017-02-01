@@ -3,11 +3,13 @@
 
 """Test audit RBAC"""
 
+import itertools
+
 from os.path import abspath
 from os.path import dirname
 from os.path import join
 from collections import defaultdict
-from integration.ggrc.converters import TestCase
+from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 
 import integration.ggrc.generator
@@ -18,17 +20,22 @@ from ggrc.models import all_models
 
 class TestAuditRBAC(TestCase):
   """Test audit RBAC"""
+  # pylint: disable=too-many-instance-attributes
 
   CSV_DIR = join(abspath(dirname(__file__)), "test_csvs")
 
   def setUp(self):
     """Imports test_csvs/audit_rbac_snapshot_create.csv needed by the tests"""
-    TestCase.setUp(self)
+    TestCase.clear_data()
     self.api = Api()
     self.objgen = integration.ggrc.generator.ObjectGenerator()
-    self.client.get("/login")
-    filename = "audit_rbac_snapshot_create.csv"
-    self.import_file(filename)
+
+    self.csv_files = itertools.cycle([
+        "audit_rbac_snapshot_create.csv",
+        "audit_rbac_snapshot_update.csv"
+    ])
+
+    self._import_file(next(self.csv_files))
     self.people = all_models.Person.eager_query().all()
 
     self.program = db.session.query(all_models.Program).filter(
@@ -41,6 +48,9 @@ class TestAuditRBAC(TestCase):
     related = [obj for obj in sources.union(destinations)
                if not isinstance(obj, all_models.Person)]
     self.related_objects = related
+
+    self.api = Api()
+    self.client.get("/login")
 
     self.audit = self.create_audit()
 
@@ -67,7 +77,7 @@ class TestAuditRBAC(TestCase):
 
   def update_audit(self):
     """Update default audit"""
-    self._import_file("audit_rbac_snapshot_update.csv")
+    self._import_file(next(self.csv_files))
 
     audit = all_models.Audit.query.filter(
         all_models.Audit.title == "Snapshotable audit"
@@ -103,6 +113,10 @@ class TestAuditRBAC(TestCase):
 
   def update(self, objects):
     """Attempt to do a PUT request for every object in the objects list"""
+    scope_response = self.api.get(self.audit.__class__, self.audit.id)
+    if scope_response.status_code == 200:
+      self.update_audit()
+
     responses = []
     for obj in objects:
       response = self.api.get(obj.__class__, obj.id)
@@ -139,7 +153,6 @@ class TestAuditRBAC(TestCase):
 
   def test_update_access_on_mapped(self):
     """Test UPDATE access to snapshotted objects of default audit"""
-    self.update_audit()
 
     expected_statuses = defaultdict(lambda: 200)
     for exception in ("creator@test.com", "reader@test.com",
