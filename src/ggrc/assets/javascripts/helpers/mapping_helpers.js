@@ -17,8 +17,8 @@
           mapping.unbind('length', resolveDfd);
         };
 
+        // mapping is already ready
         if (mapping.length > 0) {
-          // mapping is already ready
           dfd.resolve();
         } else {
           mapping.bind('length', resolveDfd);
