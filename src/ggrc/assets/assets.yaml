@@ -499,14 +499,8 @@ dashboard-js-template-files:
   - standards/modal_content.mustache
   - systems/info.mustache
   - systems/modal_content.mustache
-  - systems/tree_add_item.mustache
   - base_objects/tree_footer.mustache
   - base_objects/tree_add_item.mustache
-  - controls/tree_add_item.mustache
-  - directives/tree_add_item.mustache
-  - objectives/tree_add_item.mustache
-  - sections/tree_add_item.mustache
-  - documents/tree_add_item.mustache
   - audits/modal_content.mustache
   - audits/tree.mustache
   - audits/info.mustache
@@ -551,6 +545,7 @@ dashboard-js-template-files:
   - mapper/relevant_filter.mustache
   - quick_form/confirm_buttons.mustache
   - snapshots/dropdown_menu.mustache
+  - snapshots/tree_add_item.mustache
 
 dashboard-css-files:
   - dashboard.css
