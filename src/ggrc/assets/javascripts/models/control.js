@@ -69,7 +69,7 @@
         {attr_title: 'Secondary Assignee', attr_name: 'secondary_assessor',
           attr_sort_field: 'secondary_assessor.name|email'}
       ]),
-      add_item_view: GGRC.mustache_path + '/controls/tree_add_item.mustache',
+      add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
       draw_children: true,
       child_options: [{
         model: can.Model.Cacheable,
