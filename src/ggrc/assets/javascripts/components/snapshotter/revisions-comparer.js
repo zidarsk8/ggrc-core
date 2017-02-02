@@ -264,7 +264,7 @@
               }
             });
             if ($sameCA.length) {
-              highlightProperty('title', $sameCA, $caOld, titleSelector);
+              highlightProperty('titleText', $sameCA, $caOld, titleSelector);
               highlightProperty('value', $sameCA, $caOld, valueSelector);
               equalCAHeight($caOld, $sameCA);
             } else {
@@ -283,7 +283,9 @@
         function highlightProperty(name, $caFirst, $caLast, selector) {
           var caFirstScope = $caFirst.viewModel();
           var caLastScope = $caLast.viewModel();
-          if (caFirstScope[name] !== caLastScope[name]) {
+          var firstProp = caFirstScope[name].id || caFirstScope[name];
+          var lastProp = caLastScope[name].id || caLastScope[name];
+          if (firstProp !== lastProp) {
             if (caFirstScope[name]) {
               $caFirst.find(selector).addClass(highlightClass);
             }
