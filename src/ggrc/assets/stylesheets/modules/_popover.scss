@@ -397,3 +397,7 @@
 .popover.fade.in {
   @include transition(opacity 0.35s linear);
 }
+
+.modal-open .popover {
+  z-index: 3001;
+}

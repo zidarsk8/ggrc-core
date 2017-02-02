@@ -3,6 +3,8 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+@import "unified-mapper-toolbar";
+
 mapper-results {
   display: block;
   padding: 0 20px;
@@ -15,6 +17,11 @@ mapper-results {
   .list-toolbar {
     height: 26px;
     margin: 0 0 16px 0;
+    justify-content: flex-end;
+
+    button {
+      margin-left: 10px;
+    }
   }
 
   .list-pagination {

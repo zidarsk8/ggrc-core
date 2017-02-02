@@ -52,7 +52,7 @@
     contactEmail: null,
     deferred: '@',
     deferred_to: '@',
-    term: '',
+    filter: '',
     object: '',
     model: {},
     bindings: {},
@@ -71,6 +71,7 @@
     is_snapshotable: false,
     snapshot_scope_id: '',
     snapshot_scope_type: '',
+    toolbarSubmitCbs: $.Callbacks(),
     allowedToCreate: function () {
       var isSearch = this.attr('search_only');
       // Don't allow to create new instances for "In Scope" Objects
@@ -163,6 +164,9 @@
         return memo;
       }, []);
       return _.findWhere(types, {value: type});
+    },
+    onToolbarSubmit: function () {
+      this.attr('toolbarSubmitCbs').fire();
     }
   });
 
@@ -395,7 +399,7 @@
           'mapper.model', this.scope.mapper.modelFromType(type));
       },
       '{mapper} type': function () {
-        this.scope.attr('mapper.term', '');
+        this.scope.attr('mapper.filter', '');
         this.scope.attr('mapper.contact', null);
         this.scope.attr('mapper.contactEmail', null);
         // Edge case for Assessment Generation
@@ -432,7 +436,7 @@
 
       '#search keyup': function (el, ev) {
         if (ev.keyCode === 13) {
-          this.scope.attr('mapper.term', el.val());
+          this.scope.attr('mapper.filter', el.val());
           this.element.find('mapper-results').scope().setItems();
         }
       },

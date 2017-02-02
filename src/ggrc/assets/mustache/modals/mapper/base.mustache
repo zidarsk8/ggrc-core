@@ -22,67 +22,11 @@
         {{mapper.warningMessage}}
       </div>
   {{/if}}
-  {{#if mapper.useTemplates}}
-      <assessment-templates
-              instance="mapper.parentInstance"
-              type="mapper.type"
-              binding="related_assessment_templates"
-              assessment-template="mapper.assessmentTemplate"
-              mapper="mapper"
-      ></assessment-templates>
-  {{else}}
-    {{#if mapper.allowedToCreate}}
-      {{#is_allowed 'create' mapper.model.singular context='any'}}
-        {{#if_equals mapper.type 'AssessmentTemplate'}}
-            <div class="row-fluid add-button">
-                <div class="pull-right">
-                    <a
-                            class="btn btn-small btn-draft"
-                            href="javascript://"
-                            data-toggle="modal-ajax-form"
-                            data-modal-class="modal-wide"
-                            data-object-singular="{{model_info 'AssessmentTemplate' 'model_singular'}}"
-                            data-object-plural="{{model_info 'AssessmentTemplate' 'root_collection'}}"
-                            data-object-params='{
-                  "audit": {
-                      "id": {{mapper.parentInstance.id}},
-                      "type": "{{mapper.parentInstance.type}}"
-                  },
-                  "context": {
-                      "id": {{mapper.parentInstance.context.id}},
-                      "type": "{{json_escape mapper.parentInstance.context.type}}"
-                  },
-                  "audit_title": "{{json_escape mapper.parentInstance.title}}"
-                }'
-                            data-join-object-id="{{mapper.join_object_id}}">
-                        <i class="fa fa-plus-circle"></i>
-                        Create {{mapper.model.title_singular}}
-                    </a>
-                </div>
-            </div>
-        {{else}}
-          {{^if mapper.showWarning}}
-              <div class="row-fluid add-button">
-                  <div class="pull-right">
-                      <a
-                              class="btn btn-small btn-draft"
-                              href="javascript://"
-                              data-toggle="modal-ajax-form"
-                              data-modal-class="modal-wide"
-                              data-object-singular="{{mapper.model.singular}}"
-                              data-object-plural="{{mapper.model.plural}}"
-                              data-join-object-id="{{mapper.join_object_id}}">
-                          <i class="fa fa-plus-circle"></i>
-                          Create {{mapper.model.title_singular}}
-                      </a>
-                  </div>
-              </div>
-          {{/if}}
-        {{/if_equals}}
-      {{/is_allowed}}
-    {{/if}}
-  {{/if}}
-    <search-toolbar class="flex-box search-toolbar flex-box-multi"></search-toolbar>
+    <mapper-toolbar class="flex-box search-toolbar flex-box-multi"
+                    mapper="mapper"
+                    {(filter)}="mapper.filter"
+                    (submit)="mapper.onToolbarSubmit()">
+    </mapper-toolbar>
 </div>
   <mapper-results
     class="{{#if mapper.useSnapshots}}snapshot-list{{/if}}"
@@ -93,9 +37,10 @@
     type="mapper.type"
     selected="mapper.selected"
     contact="mapper.contact"
-    term="mapper.term"
+    filter="mapper.filter"
     scope-id="{{mapper.snapshot_scope_id}}"
-    scope-type="{{mapper.snapshot_scope_type}}">
+    scope-type="{{mapper.snapshot_scope_type}}"
+    submit-cbs="mapper.toolbarSubmitCbs">
   </mapper-results>
 <div class="modal-footer">
   {{^if mapper.search_only}}

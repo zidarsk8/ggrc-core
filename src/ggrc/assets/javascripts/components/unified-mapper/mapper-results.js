@@ -26,9 +26,16 @@
       baseInstance: null,
       scopeId: '@',
       scopeType: '@',
-      term: '',
+      filter: '',
       selected: [],
       refreshItems: false,
+      submitCbs: null,
+      init: function () {
+        this.attr('submitCbs').add(this.onSearch.bind(this));
+      },
+      destroy: function () {
+        this.attr('submitCbs').remove(this.onSearch.bind(this));
+      },
       searchOnly: function () {
         return this.attr('mapper.search_only');
       },
@@ -57,6 +64,10 @@
       },
       onSearch: function () {
         this.attr('refreshItems', true);
+      },
+      onReset: function () {
+        this.attr('filter', '');
+        this.onSearch();
       },
       prepareRelevantFilters: function () {
         var filters;
@@ -103,7 +114,7 @@
 
         return GGRC.Utils.QueryAPI
           .buildRelevantIdsQuery(modelName, {
-            filter: this.attr('term')
+            filter: this.attr('filter')
           }, {
             type: this.attr('baseInstance.type'),
             id: this.attr('baseInstance.id')
@@ -135,11 +146,11 @@
         var modelName = this.attr('type');
         var useSnapshots = this.attr('mapper.useSnapshots');
         var paging = addPaging ? {
-          filter: this.attr('term'),
+          filter: this.attr('filter'),
           current: this.attr('paging.current'),
-          pageSize: this.attr('paging.pageSize')
+          pageSize: this.attr('paging.pageSize'),
         } : {
-          filter: this.attr('term')
+          filter: this.attr('filter')
         };
         var filters = this.prepareRelevantFilters();
         var ownedFilter = this.prepareOwnedFilter();

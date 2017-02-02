@@ -178,7 +178,6 @@ dashboard-js-files:
   - components/mapping-controls/mapping-type-selector.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
-  - components/search-toolbar/search-toolbar.js
   - components/datepicker/datepicker.js
   - components/person/person.js
   - components/inline_edit/inline.js
@@ -202,6 +201,8 @@ dashboard-js-files:
   - components/lazy_open_close.js
   - components/object_history/object_history.js
   - components/unified-mapper/mapper.js
+  - components/unified-mapper/mapper-toolbar.js
+  - components/unified-mapper/mapper-filter.js
   - components/unified-mapper/mapper-results.js
   - components/unified-mapper/mapper-results-item.js
   - components/unified-mapper/mapper-results-item-status.js
@@ -243,7 +244,6 @@ app-init-files:
 dashboard-js-template-files:
   - components/object-state-toolbar/object-state-toolbar.mustache
   - components/object-selection/object-selection-item.mustache
-  - components/search-toolbar/search-toolbar.mustache
   - components/mapping-controls/mapping-type-selector.mustache
   - components/effective-dates/effective-dates.mustache
   - components/read-more/read-more.mustache
@@ -390,6 +390,8 @@ dashboard-js-template-files:
   - components/inline_edit/person.mustache
   - components/inline_edit/datepicker.mustache
   - components/autocomplete/autocomplete.mustache
+  - components/unified-mapper/mapper-toolbar.mustache
+  - components/unified-mapper/mapper-filter.mustache
   - components/unified-mapper/mapper-results.mustache
   - components/unified-mapper/mapper-results-item.mustache
   - components/unified-mapper/mapper-results-item-status.mustache

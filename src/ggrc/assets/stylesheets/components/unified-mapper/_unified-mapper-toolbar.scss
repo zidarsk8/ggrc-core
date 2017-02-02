@@ -1,0 +1,90 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.search-toolbar {
+  font-size: 13px;
+
+  h6 {
+    margin: 0 0 6px;
+  }
+
+  .filters-row {
+    width: 100%;
+
+    .col-2 {
+      flex-basis: 50%;
+    }
+
+    .col-3 {
+      flex-basis: 33.3333%;
+    }
+
+    [class*="col-"]:not(:last-child) {
+      padding-right: 20px;
+    }
+  }
+
+  .bottom-buffer {
+    margin-bottom: 16px;
+  }
+
+  .create-control {
+    margin-top: 24px;
+  }
+}
+
+mapper-filter {
+  display: block;
+
+  .input-wrapper {
+    position: relative;
+
+    #mapper-filter {
+      box-sizing: border-box;
+      margin: 0;
+      width: 100%;
+      height: 28px;
+    }
+
+    .icon-wrapper {
+      position: absolute;
+      top: 0;
+      right: 0;
+
+      i.green {
+        opacity: 1;
+      }
+    }
+  }
+
+  .help-wrapper {
+    margin-left: 2px;
+
+    a {
+      height: 28px;
+
+      &:hover i {
+        opacity: 1;
+      }
+    }
+  }
+
+  .icon-wrapper {
+    width: 28px;
+    height: 28px;
+    justify-content: center;
+
+    i {
+      line-height: 28px;
+      opacity: .25;
+      transition: opacity .2s ease;
+      color: #000;
+    }
+  }
+}
+
+assessment-templates {
+  display: block;
+}
