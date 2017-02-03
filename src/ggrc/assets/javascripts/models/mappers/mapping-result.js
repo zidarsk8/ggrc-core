@@ -19,7 +19,7 @@
    *  For CrossListLoader, the mappings are (`result`, `binding`), where
    *    `binding` is the "remote binding" which
    */
-  can.Construct('GGRC.ListLoaders.MappingResult', {}, {
+  can.Map.extend('GGRC.ListLoaders.MappingResult', {}, {
     init: function (instance, mappings, binding) {
       if (!mappings) {
         // Assume item was passed in as an object
