@@ -34,6 +34,14 @@
     border-radius: 2px;
     margin-bottom: 16px;
 
+    .assessment-note {
+      text-align: right;
+
+      .fa {
+        color: $icon-color-dark;
+      }
+    }
+
     .assessment-controls__note {
       display: block;
       line-height: 24px;
