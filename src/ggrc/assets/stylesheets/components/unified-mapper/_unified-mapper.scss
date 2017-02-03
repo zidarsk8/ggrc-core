@@ -5,6 +5,26 @@
 
 @import "unified-mapper-toolbar";
 
+$list-item-padding: 16px;
+$item-status-width: 8px;
+$icon-width: 32px;
+$view-object-buttons-width: 55px;
+$object-selection-item-width: 16px;
+$first-column-width: 25%;
+$list-body-padding: 3px;
+$list-body-border-size: 1px;
+$list-object-item-border-size: 1px;
+
+@mixin cell-styles() {
+  flex: 1 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 11px;
+  text-transform: uppercase;
+  padding-right: 5px;
+}
+
 mapper-results {
   display: block;
   padding: 0 20px;
@@ -30,9 +50,16 @@ mapper-results {
     padding: 4px 0 2px;
   }
 
+  .list-header {
+    padding: 0 $list-item-padding +
+               $list-body-padding +
+               $list-body-border-size +
+               $list-object-item-border-size 5px;
+  }
+
   .list-body {
     display: flex;
-    padding: 2px 3px 1px;
+    padding: 2px $list-body-padding 1px;
     background: #fbfbfb;
     max-height: 240px;
     box-sizing: border-box;
@@ -135,33 +162,15 @@ mapper-results {
     cursor: default;
     border-radius: 2px;
     margin: 2px 0;
-    padding: 0 0 0 16px;
+    padding: 0 $list-item-padding;
     line-height: 32px;
     font-size: 12px;
     align-items: center;
+    justify-content: space-between;
 
     &.is-disabled {
       opacity: 0.6;
 
-    }
-    .title {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-
-      .fa {
-        width: 32px;
-        height: 32px;
-        line-height: 32px;
-        text-align: center;
-        font-size: 12px;
-      }
-
-      &:hover, &:active {
-        .fa {
-          text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.35);
-        }
-      }
     }
     reusable-objects-item {
       padding: 0;
@@ -174,7 +183,7 @@ mapper-results {
 
     view-object-buttons {
       position: relative;
-      padding-right: 10px;
+      width: $view-object-buttons-width;
       top: -1px;
     }
 
@@ -203,5 +212,87 @@ mapper-results {
       background: $snapshotBgnd;
       border-color: #D9E6F4;
     }
+  }
+}
+
+mapper-results-item {
+  display: block;
+
+  .item-wrapper {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    flex-grow: 1;
+
+    .fa {
+      width: 32px;
+      height: 32px;
+      line-height: 32px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    &:hover, &:active {
+      .fa {
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.35);
+      }
+    }
+
+    .icon-wrapper {
+      height: 32px;
+      width: $icon-width;
+    }
+  }
+}
+
+mapper-results-item-status {
+  display: block;
+  height: 32px;
+  line-height: 32px;
+  width: $item-status-width;
+
+  .status-label {
+    display: inline-block;
+    float: none;
+  }
+}
+
+mapper-results-item-attrs {
+  display: block;
+  flex: 1 1;
+
+  .attr {
+    @include cell-styles();
+
+    &:first-child {
+      flex: 1 1 $first-column-width;
+    }
+  }
+}
+
+mapper-results-items-header {
+  display: block;
+
+  .columns-wrapper {
+    display: flex;
+
+    .title {
+      @include cell-styles();
+
+      &:first-child {
+        flex: 1 1 $first-column-width;
+      }
+    }
+  }
+
+  margin-left: $item-status-width + 2 * $icon-width;
+  margin-right: $object-selection-item-width;
+
+  &.search-only {
+    margin-right: $view-object-buttons-width;
+  }
+
+  &.is-snapshot {
+    margin-left: 2 * $icon-width;
   }
 }

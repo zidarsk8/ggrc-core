@@ -2,7 +2,7 @@
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
-(function (can, GGRC, CMS) {
+(function (can, GGRC, CMS, $) {
   'use strict';
 
   can.Component.extend('mapperResults', {
@@ -18,6 +18,10 @@
         filter: '',
         pageSizeSelect: [5, 10, 15]
       },
+      columns: {
+        selected: [],
+        available: []
+      },
       mapper: null,
       isLoading: false,
       items: [],
@@ -30,6 +34,8 @@
       selected: [],
       refreshItems: false,
       submitCbs: null,
+      loadCbs: $.Callbacks(),
+      isBeforeLoad: true,
       init: function () {
         this.attr('submitCbs').add(this.onSearch.bind(this));
       },
@@ -38,6 +44,9 @@
       },
       searchOnly: function () {
         return this.attr('mapper.search_only');
+      },
+      useSnapshots: function () {
+        return this.attr('mapper.useSnapshots');
       },
       updatePaging: function (total) {
         var count = Math.ceil(total / this.attr('paging.pageSize'));
@@ -52,6 +61,8 @@
             self.attr('mapper.entries', items.map(function (item) {
               return item.data;
             }));
+            self.attr('loadCbs').fire();
+            self.attr('isBeforeLoad', false);
           });
       },
       setAdditionalScopeFilter: function () {
@@ -72,7 +83,7 @@
       prepareRelevantFilters: function () {
         var filters;
         var relevantList = this.attr('mapper.relevant');
-        var useSnapshots = this.attr('mapper.useSnapshots');
+        var useSnapshots = this.useSnapshots();
 
         filters = relevantList.attr()
           .map(function (relevant) {
@@ -144,7 +155,7 @@
       },
       getQuery: function (queryType, addPaging) {
         var modelName = this.attr('type');
-        var useSnapshots = this.attr('mapper.useSnapshots');
+        var useSnapshots = this.useSnapshots();
         var paging = addPaging ? {
           filter: this.attr('filter'),
           current: this.attr('paging.current'),
@@ -175,9 +186,15 @@
         return {data: [query, relatedQuery]};
       },
       getModelKey: function () {
-        return this.attr('mapper.useSnapshots') ?
+        return this.useSnapshots() ?
           CMS.Models.Snapshot.shortName :
           this.attr('type');
+      },
+      getModel: function () {
+        return CMS.Models[this.getModelKey()];
+      },
+      getDisplayModel: function () {
+        return CMS.Models[this.attr('type')];
       },
       setDisabledItems: function (allItems, relatedIds) {
         // Do not perform extra mapping validation in case Assessment generation
@@ -270,7 +287,10 @@
       },
       '{viewModel.paging} pageSize': function () {
         this.viewModel.setItems();
+      },
+      '{viewModel} type': function () {
+        this.viewModel.attr('isBeforeLoad', true);
       }
     }
   });
-})(window.can, window.GGRC, window.CMS);
+})(window.can, window.GGRC, window.CMS, window.jQuery);

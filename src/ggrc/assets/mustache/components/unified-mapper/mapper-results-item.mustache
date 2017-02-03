@@ -2,17 +2,28 @@
   Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<div class="flex-row flex-box list-object-item {{#isDisabled}}is-disabled{{/isDisabled}}">
-  <div class="title flex-size-6" can-click="toggleDetails">
+<div class="flex-box list-object-item {{#isDisabled}}is-disabled{{/isDisabled}}">
+  <div class="item-wrapper" can-click="toggleDetails">
     {{^isSnapshot}}
-      <mapper-results-item-status item-data="itemData"></mapper-results-item-status>
+      <mapper-results-item-status
+        item-data="itemData">
+      </mapper-results-item-status>
     {{/isSnapshot}}
-    <i class="fa action {{toggleIconCls}}"></i>
-    <i class="fa {{objectTypeIcon}}"></i>
-    {{title}}
+    <div class="icon-wrapper">
+      <i class="fa fa-fw action {{toggleIconCls}}"></i>
+    </div>
+    <div class="icon-wrapper">
+      <i class="fa fa-fw {{objectTypeIcon}}"></i>
+    </div>
+    <mapper-results-item-attrs
+      instance="displayItem"
+      selected-columns="selectedColumns">
+    </mapper-results-item-attrs>
   </div>
   {{#searchOnly}}
-    <view-object-buttons instance="displayItem" view-is-hidden="true"></view-object-buttons>
+    <view-object-buttons instance="displayItem"
+                         view-is-hidden="true">
+    </view-object-buttons>
   {{/searchOnly}}
   {{^searchOnly}}
     <object-selection-item

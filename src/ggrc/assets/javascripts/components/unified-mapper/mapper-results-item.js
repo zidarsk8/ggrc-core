@@ -15,6 +15,7 @@
     viewModel: {
       itemData: {},
       searchOnly: false,
+      selectedColumns: [],
       title: function () {
         var displayItem = this.displayItem();
         return displayItem.title ||
