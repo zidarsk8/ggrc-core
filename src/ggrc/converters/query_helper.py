@@ -109,20 +109,44 @@ class QueryHelper(object):
     for object_query in self.query:
       object_name = object_query["object_name"]
       object_class = self.object_map[object_name]
-      aliases = AttributeInfo.gather_aliases(object_class)
-      self.attr_name_map[object_class] = {}
+      tgt_class = object_class
+      if object_name == "Snapshot":
+        child_type = self._get_snapshot_child_type(object_query)
+        tgt_class = getattr(models.all_models, child_type, object_class)
+      aliases = AttributeInfo.gather_aliases(tgt_class)
+      self.attr_name_map[tgt_class] = {}
       for key, value in aliases.items():
         filter_by = None
         if isinstance(value, dict):
           filter_name = value.get("filter_by", None)
           if filter_name is not None:
-            filter_by = getattr(object_class, filter_name, None)
+            filter_by = getattr(tgt_class, filter_name, None)
           name = value["display_name"]
         else:
           name = value
         if name:
-          self.attr_name_map[object_class][name.lower()] = (key.lower(),
-                                                            filter_by)
+          self.attr_name_map[tgt_class][name.lower()] = (key.lower(),
+                                                         filter_by)
+
+  def _get_snapshot_child_type(self, object_query):
+    """Return child_type for snapshot from a query"""
+    return self._find_child_type(
+        object_query.get("filters", {}).get("expression"), ""
+    )
+
+  def _find_child_type(self, expr, child_type):
+    """Search for child_type recursively down the query expression."""
+    if child_type:
+      return child_type
+    left, oper, right = expr.get("left"), expr.get("op"), expr.get("right")
+    if oper.get("name") == "=":
+      if left == "child_type" and isinstance(right, basestring):
+        child_type = right
+    else:
+      for node in (left, right):
+        if isinstance(node, dict):
+          child_type = self._find_child_type(node, child_type)
+    return child_type
 
   def _clean_query(self, query):
     """ sanitize the query object """
