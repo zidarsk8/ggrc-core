@@ -82,24 +82,7 @@
               </div>
 
               <div class="span{{display_options.action_width}}">
-
-                <div class="show-details">
-                  {{#child_options}}
-                    {{#if add_item_view}}
-                      {{{renderLive add_item_view}}}
-                    {{/if}}
-                  {{/child_options}}
-                  <view-object-buttons instance="instance" open-is-hidden="is_subtree" />
-                </div>
-                <ul class="tree-action-list">
-                  {{#infer_roles instance}}
-                    <li>
-                      <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
-                    </li>
-                  {{/infer_roles}}
-                  <li>
-                    {{> '/static/mustache/base_objects/states.mustache'}}
-                  </li>
+                <tree-node-actions instance="instance" child-options="child_options" draw-roles="true" draw-states="true">
                   {{#if_instance_of instance 'Contract'}}
                     <li>
                       <div class="counter">
@@ -119,8 +102,7 @@
                       </div>
                     </li>
                   {{/if_instance_of}}
-                </ul>
-
+                </tree-node-actions>
               </div>
             </div>
           </div><!-- item-data end -->
