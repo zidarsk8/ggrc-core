@@ -22,6 +22,10 @@
         selected: [],
         available: []
       },
+      sort: {
+        key: '',
+        direction: 'asc'
+      },
       mapper: null,
       isLoading: false,
       items: [],
@@ -156,18 +160,25 @@
       getQuery: function (queryType, addPaging) {
         var modelName = this.attr('type');
         var useSnapshots = this.useSnapshots();
-        var paging = addPaging ? {
-          filter: this.attr('filter'),
-          current: this.attr('paging.current'),
-          pageSize: this.attr('paging.pageSize'),
-        } : {
+        var paging = {
           filter: this.attr('filter')
         };
         var filters = this.prepareRelevantFilters();
         var ownedFilter = this.prepareOwnedFilter();
-        var query =
-          this.prepareBaseQuery(modelName, paging, filters, ownedFilter);
-        var relatedQuery = this.prepareRelatedQuery(modelName, ownedFilter);
+        var query;
+        var relatedQuery;
+
+        if (addPaging) {
+          paging.current = this.attr('paging.current');
+          paging.pageSize = this.attr('paging.pageSize');
+          if (this.attr('sort.key')) {
+            paging.sortBy = this.attr('sort.key');
+            paging.sortDirection = this.attr('sort.direction');
+          }
+        }
+
+        query = this.prepareBaseQuery(modelName, paging, filters, ownedFilter);
+        relatedQuery = this.prepareRelatedQuery(modelName, ownedFilter);
         if (useSnapshots) {
           // Transform Base Query to Snapshot
           query = GGRC.Utils.Snapshots.transformQuery(query);
@@ -268,6 +279,10 @@
             dfd.resolve([]);
           });
         return dfd;
+      },
+      setItemsDebounced() {
+        clearTimeout(this.attr('_setItemsTimeout'));
+        this.attr('_setItemsTimeout', setTimeout(this.setItems.bind(this)));
       }
     },
     events: {
@@ -283,10 +298,16 @@
         }
       },
       '{viewModel.paging} current': function () {
-        this.viewModel.setItems();
+        this.viewModel.setItemsDebounced();
       },
       '{viewModel.paging} pageSize': function () {
-        this.viewModel.setItems();
+        this.viewModel.setItemsDebounced();
+      },
+      '{viewModel.sort} key': function () {
+        this.viewModel.setItemsDebounced();
+      },
+      '{viewModel.sort} direction': function () {
+        this.viewModel.setItemsDebounced();
       },
       '{viewModel} type': function () {
         this.viewModel.attr('isBeforeLoad', true);

@@ -14,6 +14,8 @@
     viewModel: {
       availableColumns: [],
       selectedColumns: [],
+      sortKey: '',
+      sortDirection: 'asc',
       modelType: '',
       refreshCbs: null,
       displayPrefs: null,
@@ -35,6 +37,27 @@
           );
         this.attr('availableColumns', columns.availableColumns);
         this.attr('selectedColumns', columns.selectedColumns);
+      },
+      isSorted: function (attr) {
+        return attr.attr('attr_sort_field') === this.attr('sortKey');
+      },
+      isSortedAsc: function () {
+        return this.attr('sortDirection') === 'asc';
+      },
+      applySort: function (attr) {
+        if (this.isSorted(attr)) {
+          this.toggleSortDirection();
+          return;
+        }
+        this.attr('sortKey', attr.attr('attr_sort_field'));
+        this.attr('sortDirection', 'asc');
+      },
+      toggleSortDirection: function () {
+        if (this.attr('sortDirection') === 'asc') {
+          this.attr('sortDirection', 'desc');
+        } else {
+          this.attr('sortDirection', 'asc');
+        }
       }
     }
   });

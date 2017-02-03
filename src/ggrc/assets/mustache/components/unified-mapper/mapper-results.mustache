@@ -29,7 +29,9 @@
         refresh-items="refreshItems"
         refresh-cbs="loadCbs"
         {(selected-columns)}="columns.selected"
-        {(available-columns)}="columns.available">
+        {(available-columns)}="columns.available"
+        {(sort-key)}="sort.key"
+        {(sort-direction)}="sort.direction">
       </mapper-results-items-header>
     </div>
     <div class="list-body {{#isLoading}}loading{{/isLoading}} well">
