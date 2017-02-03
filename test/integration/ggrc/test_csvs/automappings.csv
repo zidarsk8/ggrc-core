@@ -14,18 +14,18 @@ Regulation,code*,title*,owner,state,Map: program,Map: control
 ,reg-1,reg 1,user@example.com,Draft,"prog-1
 prog-2
 prog-3",control-1
-,reg-2,reg 2,user@example.com,Final,prog-1,control-2
-,reg-3,reg 3,user@example.com,Effective,prog-1,"control-1
+,reg-2,reg 2,user@example.com,Active,prog-1,control-2
+,reg-3,reg 3,user@example.com,Active,prog-1,"control-1
 control-2
 control-3
 control-4
 control-5
 control-6
 control-7"
-,reg-4,reg 4,user@example.com,Effective,prog-1,
-,reg-5,reg 5,user@example.com,Effective,prog-1,
-,reg-6,reg 6,user@example.com,Effective,prog-1,
-,reg-7,reg 7,user@example.com,Effective,prog-1,
+,reg-4,reg 4,user@example.com,Active,prog-1,
+,reg-5,reg 5,user@example.com,Active,prog-1,
+,reg-6,reg 6,user@example.com,Active,prog-1,
+,reg-7,reg 7,user@example.com,Active,prog-1,
 ,,,,,,
 ,,,,,,
 ,,,,,,
