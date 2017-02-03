@@ -157,7 +157,11 @@ dashboard-js-files:
   - components/assessment/add_comment.js
   - components/comment/comment-input.js
   - components/assessment/controls-toolbar/controls-toolbar.js
+  - components/object-list-item/business-object-list-item.js
+  - components/object-list-item/document-object-list-item.js
   - components/mapped-objects/mapped-objects.js
+  - components/related-objects/related-audits.js
+  - components/related-objects/related-controls-objectives.js
   - components/object-state-toolbar/object-state-toolbar.js
   - components/object-list/object-list.js
   - components/object-list/object-list-item.js
@@ -247,10 +251,8 @@ dashboard-js-template-files:
   - components/collapsible-panel/collapsible-panel-header.mustache
   - components/assessment/controls-toolbar/controls-toolbar.mustache
   - components/assessment/mapped-objects/mapped-controls.mustache
-  - components/assessment/mapped-objects/mapped-controls-item.mustache
   - components/assessment/mapped-objects/mapped-controls-popover.mustache
   - components/assessment/mapped-objects/mapped-related-information.mustache
-  - components/assessment/mapped-objects/mapped-related-information-item.mustache
   - components/assessment/urls-list.mustache
   - components/assessment/attachments-list.mustache
   - components/assessment/custom-attributes.mustache
@@ -266,8 +268,9 @@ dashboard-js-template-files:
   - components/assessment/comment/controls.mustache
   - components/comment/comment-input.mustache
   - components/object-list/object-list.mustache
-  - components/object-list/object-list-item.mustache
   - components/object-popover/object-popover.mustache
+  - components/object-list-item/business-object-list-item.mustache
+  - components/object-list-item/document-object-list-item.mustache
   - components/mapped-objects/mapped-objects.mustache
   - components/reusable-objects/reusable-objects-item.mustache
   - components/ca-object/ca-object-validation-icon.mustache

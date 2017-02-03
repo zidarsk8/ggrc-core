@@ -3,6 +3,10 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+$simple-modal-header-height: 42px;
+$grid-data-toolbar-height: 42px;
+$grid-data-header-height: 66px;
+
 .simple-modal__overlay {
   position: fixed;
   background: rgba(255, 255, 255, 0.65);
@@ -29,16 +33,23 @@
 
   /* Specific Styles for Prior Responses Modal Window */
   &.related-assessments {
-    width: 75%;
+    width: 85%;
+    max-width: 85%;
+    height: 85%;
 
     .simple-modal__body {
       overflow: hidden;
       max-height: none;
-      height: 500px;
+      height: calc(100% - #{$simple-modal-header-height});
+    }
+
+    .grid-data-header {
+      box-sizing: border-box;
+      height: $grid-data-header-height;
     }
     .grid-data-body {
       font-size: 13px;
-      max-height: 380px;
+      height: calc(100% - #{$grid-data-toolbar-height} - #{$grid-data-header-height});
       box-sizing: border-box;
       overflow: auto;
     }
@@ -55,10 +66,9 @@
   .simple-modal__header {
     background: $white;
     box-sizing: border-box;
-    min-height: 42px;
+    height: $simple-modal-header-height;
     padding: 8px;
     position: relative;
-    overflow: hidden;
     margin: 0;
     border-bottom: 1px solid $border-color;
     align-items: center;
