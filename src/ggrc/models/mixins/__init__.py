@@ -275,6 +275,11 @@ class Timeboxed(object):
       "end_date": "Stop Date",
   }
 
+  _fulltext_attrs = [
+      'start_date',
+      'end_date'
+  ]
+
 
 class Stateful(object):
 
