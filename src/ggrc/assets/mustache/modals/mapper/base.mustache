@@ -44,43 +44,35 @@
   </mapper-results>
 <div class="modal-footer">
   {{^if mapper.search_only}}
-      <div class="row-fluid">
-          <div class="span5">
-              <div class="deny-buttons"></div>
-          </div>
-          <div class="span7">
-              <div class="confirm-buttons">
-        <span>
-          {{#if mapper.is_loading }}
-            {{^if mapper.useSnapshots}}
-              <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;">
-            {{/if}}
-          </span>
-          {{else}}
-            {{mapper.selected.length}}
-          {{/if}}
+    <div class="row-fluid">
+      <div class="span5">
+        <div class="deny-buttons"></div>
+      </div>
+      <div class="span7">
+        <div class="confirm-buttons">
+          {{mapper.selected.length}}
           {{#if template.count}}
             {{template.count}}
           {{else}}
-              object(s) selected
+            object(s) selected
           {{/if}}
-            </span>
+          </span>
 
-            <button class="btn-map btn btn-small btn-success preventdoubleclick"
-                    {{^if mapper.selected.length}}disabled="disabled"{{/if}}>
-              {{#if mapper.is_saving}}
-                  Saving, please wait...
+          <button class="btn-map btn btn-small btn-success preventdoubleclick"
+                  {{^if mapper.selected.length}}disabled="disabled"{{/if}}>
+            {{#if mapper.is_saving}}
+              Saving, please wait...
+            {{else}}
+              {{#if template.submitButton}}
+                {{template.submitButton}}
               {{else}}
-                {{#if template.submitButton}}
-                  {{template.submitButton}}
-                {{else}}
-                    Map Selected
-                {{/if}}
+                Map Selected
               {{/if}}
-            </button>
-            <spinner toggle="mapper.is_saving"></spinner>
-              </div>
-          </div>
+            {{/if}}
+          </button>
+          <spinner toggle="mapper.is_saving"></spinner>
+        </div>
       </div>
+    </div>
   {{/if}}
 </div>
