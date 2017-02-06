@@ -208,7 +208,8 @@
       savedAttrList = this.display_prefs.getTreeViewHeaders(modelName);
 
       this.loadTreeStates(modelName);
-      this.options.statusFilterVisible = GGRC.Utils.State.hasFilter(modelName);
+      this.options.attr('statusFilterVisible',
+        GGRC.Utils.State.hasFilter(modelName));
 
       if (!savedAttrList.length) {
         // Initialize the display status, Get display_attr_names for model
@@ -384,7 +385,7 @@
               can.bind.call(statusControl.ready(function () {
                 self.element.parent()
                   .find('.attr-status').each(function (i, e) {
-                    if (self.options.attr('select_state_list')
+                    if (self.options.attr('selectStateList')
                       .indexOf(e.value) > -1) {
                       e.checked = true;
                     }
@@ -1144,7 +1145,7 @@
       // Get the status list from local storage
       var savedStateList;
       savedStateList = this.display_prefs.getTreeViewStates(modelName);
-      this.options.attr('select_state_list', savedStateList);
+      this.options.attr('selectStateList', savedStateList);
     },
     saveTreeStates: function () {
       var $checkState = this.element.parent().find('.attr-status');
@@ -1153,7 +1154,7 @@
       $selectedState.each(function () {
         stateToSave.push(this.value);
       });
-      this.options.attr('select_state_list', stateToSave);
+      this.options.attr('selectStateList', stateToSave);
       this.display_prefs.setTreeViewStates(this.options.model.model_singular,
         stateToSave);
     },
@@ -1282,7 +1283,7 @@
       };
       var current = GGRC.page_instance();
       var addFilter;
-      var states = parentCtrl.options.attr('select_state_list');
+      var states = parentCtrl.options.attr('selectStateList');
       var statesFilter = GGRC.Utils.State.statusFilter(states, '');
       var statesQuery = GGRC.query_parser.parse(statesFilter);
       var reqParams;
@@ -1319,7 +1320,7 @@
       var options = this.options;
       var queryAPI = GGRC.Utils.QueryAPI;
       var modelName = options.model.shortName;
-      var states = options.attr('select_state_list');
+      var states = options.attr('selectStateList');
       var statesFilter = GGRC.Utils.State.statusFilter(states, '');
       var isStateQuery = statesFilter !== '';
       var additionalFilter = options.additional_filter ?
