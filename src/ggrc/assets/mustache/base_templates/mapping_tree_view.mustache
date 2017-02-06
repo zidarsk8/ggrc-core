@@ -4,9 +4,15 @@
 }}
 
 <ul class="{{#if treeViewClass}}{{treeViewClass}}{{else}}attachment-list{{/if}}">
-  {{#mappedObjects}}
-    {{#using instance=instance}}
-      {{{render itemTemplate instance=instance baseInstance=baseInstance parentInstance=parentInstance reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping isLoading=isLoading isExpandable=isExpandable}}}
-    {{/using}}
-  {{/mappedObjects}}
+  {{#if mappedObjects.length}}
+    {{#mappedObjects}}
+      {{#using instance=instance}}
+        {{{render itemTemplate instance=instance baseInstance=baseInstance parentInstance=parentInstance reusable=reusable reusedObjects=reusedObjects reuseMethod=reuseMethod mapping=mapping isLoading=isLoading isExpandable=isExpandable}}}
+      {{/using}}
+    {{/mappedObjects}}
+  {{else}}
+    {{#if emptyText}}
+      <li class="empty-message">{{emptyText}}</li>
+    {{/if}}
+  {{/if}}
 </ul>

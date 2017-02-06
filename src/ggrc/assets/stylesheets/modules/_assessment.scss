@@ -69,6 +69,30 @@
       max-width: 50%;
     }
 
+    .attachments-list-alert {
+      float: left;
+      margin: 6px 0 0 -20px;
+    }
+
+    .assesment-attachment-list {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .attachments-list-control {
+      .attachments-list-action {
+        .btn {
+          background: none;
+          padding: 0 0 0 8px;
+
+          .fa {
+            opacity: 1;
+            color: $btnGreen;
+          }
+        }
+      }
+    }
+
     .attach-file-info {
       margin: -10px 0 16px;
       font-size: 0.9em;

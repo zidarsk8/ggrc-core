@@ -4,51 +4,59 @@
 }}
 
 {{#with_mapping 'extended_folders' instance}}
-  <div class="oneline">
-    {{#if_in instance.status "Completed,Verified"}}
-      {{#if extended_folders.length}}
-        <ggrc-gdrive-picker-launcher
-          instance="instance"
-          link_text="Attach evidence"
-          click_event="trigger_upload_parent"
-          verify_event="true"
-          modal_description='You are about to move request from "{{instance.status}}" to "In Progress" - are you sure about that?'
-          modal_title='Confirm moving Request to "In Progress"'
-          modal_button='Confirm'
-          >
-        </ggrc-gdrive-picker-launcher>
+  {{^if extended_folders.length}}
+    <i class="fa fa-exclamation-triangle red attachments-list-alert" rel="tooltip" data-placement="bottom" data-original-title="Audit folder not set. Files will be uploaded to your GDrive root folder."></i>
+  {{/if}}
+  <h6 class="attachments-list-control">
+    <span class="attachments-list-title">
+      {{title}}
+    </span>
+    <span class="attachments-list-action" rel="tooltip" data-original-title="{{tooltip}}">
+      {{#if_in instance.status "Completed,Verified"}}
+        {{#if extended_folders.length}}
+          <ggrc-gdrive-picker-launcher
+            instance="instance"
+            icon="plus-circle"
+            link_text=" "
+            click_event="trigger_upload_parent"
+            verify_event="true"
+            modal_description='You are about to move request from "{{instance.status}}" to "In Progress" - are you sure about that?'
+            modal_title='Confirm moving Request to "In Progress"'
+            modal_button='Confirm'
+            >
+          </ggrc-gdrive-picker-launcher>
+        {{else}}
+          <ggrc-gdrive-picker-launcher
+            instance="instance"
+            icon="plus-circle"
+            link_text=" "
+            click_event="trigger_upload"
+            verify_event="true"
+            modal_description='You are about to move request from "{{instance.status}}" to "In Progress" - are you sure about that?'
+            modal_title='Confirm moving Request to "In Progress"'
+            modal_button='Confirm'
+            >
+          </ggrc-gdrive-picker-launcher>
+        {{/if}}
       {{else}}
-        <ggrc-gdrive-picker-launcher
-          instance="instance"
-          link_text="Attach evidence"
-          click_event="trigger_upload"
-          verify_event="true"
-          modal_description='You are about to move request from "{{instance.status}}" to "In Progress" - are you sure about that?'
-          modal_title='Confirm moving Request to "In Progress"'
-          modal_button='Confirm'
-          >
-        </ggrc-gdrive-picker-launcher>
-        <i class="fa fa-exclamation-triangle red" style="margin-top:4px" rel="tooltip" data-placement="bottom" data-original-title="Audit folder not set. Files will be uploaded to your GDrive root folder."></i>
-      {{/if}}
-    {{else}}
-      {{#if extended_folders.length}}
-        <ggrc-gdrive-picker-launcher
-          icon="paperclip"
-          instance="instance"
-          link_text="Attach evidence"
-          click_event="trigger_upload_parent">
-        </ggrc-gdrive-picker-launcher>
-      {{else}}
-        <ggrc-gdrive-picker-launcher
-          icon="paperclip"
-          instance="instance"
-          link_text="Attach evidence"
-          click_event="trigger_upload">
-        </ggrc-gdrive-picker-launcher>
-        <i class="fa fa-exclamation-triangle red" style="margin-top:4px" rel="tooltip" data-placement="bottom" data-original-title="Audit folder not set. Files will be uploaded to your GDrive root folder."></i>
-      {{/if}}
-    {{/if_in}}
-  </div>
+        {{#if extended_folders.length}}
+          <ggrc-gdrive-picker-launcher
+            icon="plus-circle"
+            instance="instance"
+            link_text=" "
+            click_event="trigger_upload_parent">
+          </ggrc-gdrive-picker-launcher>
+        {{else}}
+          <ggrc-gdrive-picker-launcher
+            icon="plus-circle"
+            instance="instance"
+            link_text=" "
+            click_event="trigger_upload">
+          </ggrc-gdrive-picker-launcher>
+        {{/if}}
+      {{/if_in}}
+    </span>
+  </h6>
 {{else}}
   {{! This is a failure state for with_mapping, if something in the mapping doesn't refresh properly }}
   {{#if error.errors}}

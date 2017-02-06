@@ -3,13 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<h6>Evidence</h6>
-  {{#if_mapping_ready "audits" instance}}
-    {{#is_allowed 'update' instance context='for'}}
-      {{{render_hooks "Request.gdrive_evidence_storage"}}}
-      <div class="attach-file-info">(you can upload up to 10 files in a single batch)</div>
-    {{/is_allowed}}
-  {{/if_mapping_ready}}
+{{#if_mapping_ready "audits" instance}}
+  {{#is_allowed 'update' instance context='for'}}
+    {{{render_hooks "Request.gdrive_evidence_storage"}}}
+  {{/is_allowed}}
+{{/if_mapping_ready}}
 {{^if_null instance._mandatory_attachment_msg}}
   <div class="alert alert-info alert-dismissible" role="alert">
     {{instance._mandatory_attachment_msg}}
@@ -20,5 +18,6 @@
   parent-instance="instance"
   mapping="instance.class.info_pane_options.evidence.mapping"
   item-template="instance.class.info_pane_options.evidence.show_view"
+  empty-text="None"
 >
 </mapping-tree-view>
