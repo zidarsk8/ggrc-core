@@ -31,10 +31,7 @@
       <mapper-results-items-header
         class="{{#useSnapshots}}is-snapshot{{/useSnapshots}} {{#searchOnly}}search-only{{/searchOnly}}"
         model-type="type"
-        refresh-items="refreshItems"
-        refresh-cbs="loadCbs"
-        {(selected-columns)}="columns.selected"
-        {(available-columns)}="columns.available"
+        columns="columns.selected"
         {(sort-key)}="sort.key"
         {(sort-direction)}="sort.direction">
       </mapper-results-items-header>

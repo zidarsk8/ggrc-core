@@ -38,10 +38,14 @@
       selected: [],
       refreshItems: false,
       submitCbs: null,
-      loadCbs: $.Callbacks(),
       isBeforeLoad: true,
+      displayPrefs: null,
       init: function () {
+        var self = this;
         this.attr('submitCbs').add(this.onSearch.bind(this));
+        CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
+          self.attr('displayPrefs', displayPrefs);
+        });
       },
       destroy: function () {
         this.attr('submitCbs').remove(this.onSearch.bind(this));
@@ -65,9 +69,18 @@
             self.attr('mapper.entries', items.map(function (item) {
               return item.data;
             }));
-            self.attr('loadCbs').fire();
+            self.setColumnsConfiguration();
             self.attr('isBeforeLoad', false);
           });
+      },
+      setColumnsConfiguration: function () {
+        var columns =
+          GGRC.Utils.TreeView.getColumnsForModel(
+            this.getDisplayModel().shortName,
+            this.attr('displayPrefs')
+          );
+        this.attr('columns.available', columns.available);
+        this.attr('columns.selected', columns.selected);
       },
       setAdditionalScopeFilter: function () {
         var id = this.attr('baseInstance.scopeObject.id');

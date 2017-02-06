@@ -915,8 +915,8 @@
       });
 
       return {
-        availableColumns: allAttrs,
-        selectedColumns: mandatoryColumns.concat(displayColumns)
+        available: allAttrs,
+        selected: mandatoryColumns.concat(displayColumns)
       };
     }
 

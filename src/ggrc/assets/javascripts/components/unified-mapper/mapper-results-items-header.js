@@ -12,32 +12,10 @@
       '/components/unified-mapper/mapper-results-items-header.mustache'
     ),
     viewModel: {
-      availableColumns: [],
-      selectedColumns: [],
+      columns: [],
       sortKey: '',
       sortDirection: 'asc',
       modelType: '',
-      refreshCbs: null,
-      displayPrefs: null,
-      init: function () {
-        var self = this;
-        this.attr('refreshCbs').add(this.setColumnsConfiguration.bind(this));
-        CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
-          self.attr('displayPrefs', displayPrefs);
-        });
-      },
-      destroy: function () {
-        this.attr('refreshCbs').remove(this.setColumnsConfiguration.bind(this));
-      },
-      setColumnsConfiguration: function () {
-        var columns =
-          GGRC.Utils.TreeView.getColumnsForModel(
-            this.attr('modelType'),
-            this.attr('displayPrefs')
-          );
-        this.attr('availableColumns', columns.availableColumns);
-        this.attr('selectedColumns', columns.selectedColumns);
-      },
       isSorted: function (attr) {
         return attr.attr('attr_sort_field') === this.attr('sortKey');
       },
