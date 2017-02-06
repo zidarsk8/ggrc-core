@@ -16,7 +16,7 @@
       state: {
         open: false
       },
-      modalTitle: 'Prior Audit Responses',
+      modalTitle: 'Related Assessments',
       showRelatedResponses: function () {
         this.attr('state.open', true);
       }
