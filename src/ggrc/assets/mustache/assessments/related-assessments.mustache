@@ -18,13 +18,13 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
         </div>
         <div class="grid-data-header flex-row flex-box">
             <div class="grid-data-item-index">
-                Assessment Create Date
+                Assessment State
             </div>
             <div class="grid-data-item-index">
                 Assessment Finish Date
             </div>
             <div class="grid-data-item-index">
-                State
+                Assessment Create Date
             </div>
             <div class="flex-size-3">
                 Related Controls / Objectives
@@ -43,13 +43,13 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
             <object-list items="relatedObjects" is-loading="isLoading" spinner-css="grid-spinner">
                 <div class="grid-data-row flex-row flex-box">
                     <div class="grid-data-item-index">
-                      {{localize_date created_at}}
+                      {{status}}
                     </div>
                     <div class="grid-data-item-index">
                       {{localize_date finished_date}}
                     </div>
                     <div class="grid-data-item-index">
-                      {{status}}
+                      {{localize_date created_at}}
                     </div>
                     <div class="flex-size-3">
                         <related-controls-objectives parent-instance="instance">
