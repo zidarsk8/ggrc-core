@@ -11,7 +11,12 @@
 <object-selection items="items" selected-items="selected" refresh-selection="refreshItems" all-items="allItems"
                   all-selected="allSelected">
   {{#if items.length}}
-    <div>
+    <div class="settings-row">
+      <mapper-results-columns-configuration
+        model-type="getDisplayModel.shortName"
+        available-columns="columns.available"
+        {(selected-columns)}="columns.selected">
+      </mapper-results-columns-configuration>
       {{^searchOnly}}
         <div class="list-selection-switcher">
           Select:

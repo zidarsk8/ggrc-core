@@ -57,6 +57,12 @@ mapper-results {
                $list-object-item-border-size 5px;
   }
 
+  .settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
   .list-body {
     display: flex;
     padding: 2px $list-body-padding 1px;
@@ -278,6 +284,7 @@ mapper-results-items-header {
 
     .title {
       @include cell-styles();
+      cursor: pointer;
 
       &:first-child {
         flex: 1 1 $first-column-width;
@@ -294,5 +301,49 @@ mapper-results-items-header {
 
   &.is-snapshot {
     margin-left: 2 * $icon-width;
+  }
+}
+
+
+mapper-results-columns-configuration {
+  display: block;
+  position: relative;
+
+  .dropdown-menu {
+    @include border-radius(0);
+    padding: 14px 30px 20px 30px;
+    min-width: 720px;
+    h5 {
+      font-size: 16px;
+      font-weight: normal;
+      line-height: 24px;
+    }
+    label {
+      font-size: 12px;
+    }
+    .attr-list {
+      margin-top: 11px;
+      margin-bottom: 14px;
+      li {
+        margin: 0;
+        text-transform: none;
+        label {
+          @extend %oneline;
+          display: inline-block;
+          cursor: pointer;
+        }
+        &.disabled {
+          color: $gray;
+          label {
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+
+    .close-dropdown {
+      border: none;
+      background: transparent;
+    }
   }
 }

@@ -209,6 +209,7 @@ dashboard-js-files:
   - components/unified-mapper/mapper-results-item-details.js
   - components/unified-mapper/mapper-results-items-header.js
   - components/unified-mapper/mapper-results-item-attrs.js
+  - components/unified-mapper/mapper-results-columns-configuration.js
   - components/quick_form/quick_add.js
   - components/quick_form/quick_update.js
   - components/assessment_templates/assessment_templates.js
@@ -400,6 +401,7 @@ dashboard-js-template-files:
   - components/unified-mapper/mapper-results-item-details.mustache
   - components/unified-mapper/mapper-results-items-header.mustache
   - components/unified-mapper/mapper-results-item-attrs.mustache
+  - components/unified-mapper/mapper-results-columns-configuration.mustache
   - components/assessment_templates/assessment_templates.mustache
   - components/dropdown/dropdown.mustache
   - components/object_history/object_history.mustache
