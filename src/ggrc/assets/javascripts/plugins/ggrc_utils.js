@@ -849,7 +849,7 @@
    */
   GGRC.Utils.TreeView = (function () {
     /**
-     * Refresh current page
+     * Get available and selected columns for Model type
      * @param {String} modelType - Model type.
      * @param {Object} displayPrefs - Display preferences.
      * @return {Object} Table columns configuration.
@@ -920,8 +920,48 @@
       };
     }
 
+    /**
+     * Set selected columns for Model type
+     * @param {String} modelType - Model type.
+     * @param {Array} columnNames - Array of column names.
+     * @param {Object} displayPrefs - Display preferences.
+     * @return {Object} Table columns configuration.
+     */
+    function setColumnsForModel(modelType, columnNames, displayPrefs) {
+      var availableColumns =
+        getColumnsForModel(modelType, displayPrefs).available;
+      var selectedColumns = [];
+      var selectedNames = [];
+
+      availableColumns.forEach(function (attr) {
+        if (columnNames.indexOf(attr.attr_name) !== -1) {
+          attr.display_status = true;
+          selectedColumns.push(attr);
+          if (!attr.mandatory) {
+            selectedNames.push(attr.attr_name);
+          }
+        } else {
+          attr.display_status = false;
+        }
+      });
+
+      if (displayPrefs) {
+        displayPrefs.setTreeViewHeaders(
+          CMS.Models[modelType].model_singular,
+          selectedNames
+        );
+        displayPrefs.save();
+      }
+
+      return {
+        available: availableColumns,
+        selected: selectedColumns
+      };
+    }
+
     return {
-      getColumnsForModel: getColumnsForModel
+      getColumnsForModel: getColumnsForModel,
+      setColumnsForModel: setColumnsForModel
     };
   })();
 

@@ -44,29 +44,23 @@
           });
       },
       setColumns: function () {
-        var availableColumns = can.makeArray(this.attr('availableColumns'));
-        var displayPrefs = this.attr('displayPrefs');
-        var selected = [];
         var selectedNames = [];
-        var current;
+        var columns;
+
         can.each(this.attr('columns'), function (v, k) {
-          current = availableColumns.find(function (attr) {
-            return attr.attr_name === k;
-          });
-          current.display_status = v;
           if (v) {
-            selected.push(current);
-            if (!current.mandatory) {
-              selectedNames.push(k);
-            }
+            selectedNames.push(k);
           }
         });
-        displayPrefs.setTreeViewHeaders(
-          this.getModel().model_singular,
-          selectedNames
-        );
-        displayPrefs.save();
-        this.attr('selectedColumns', selected);
+
+        columns =
+          GGRC.Utils.TreeView.setColumnsForModel(
+            this.getModel().model_singular,
+            selectedNames,
+            this.attr('displayPrefs')
+          );
+
+        this.attr('selectedColumns', columns.selected);
       },
       stopPropagation: function (context, el, ev) {
         ev.stopPropagation();
