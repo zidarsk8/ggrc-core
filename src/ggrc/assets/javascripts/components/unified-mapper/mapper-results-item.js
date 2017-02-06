@@ -40,7 +40,7 @@
         this.attr('showDetails', !this.attr('showDetails'));
       },
       isSnapshot: function () {
-        return this.attr('itemData.type') === CMS.Models.Snapshot.shortName;
+        return this.attr('itemData.type') === CMS.Models.Snapshot.model_singular;
       },
       objectType: function () {
         if (this.isSnapshot()) {

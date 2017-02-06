@@ -76,7 +76,7 @@
       setColumnsConfiguration: function () {
         var columns =
           GGRC.Utils.TreeView.getColumnsForModel(
-            this.getDisplayModel().shortName,
+            this.getDisplayModel().model_singular,
             this.attr('displayPrefs')
           );
         this.attr('columns.available', columns.available);
@@ -211,7 +211,7 @@
       },
       getModelKey: function () {
         return this.useSnapshots() ?
-          CMS.Models.Snapshot.shortName :
+          CMS.Models.Snapshot.model_singular :
           this.attr('type');
       },
       getModel: function () {

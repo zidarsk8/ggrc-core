@@ -95,12 +95,12 @@
       return {
         category: cmsModel.category,
         name: cmsModel.title_plural,
-        value: cmsModel.shortName,
-        singular: cmsModel.shortName,
+        value: cmsModel.model_singular,
+        singular: cmsModel.model_singular,
         plural: cmsModel.title_plural.toLowerCase().replace(/\s+/, '_'),
         table_plural: cmsModel.table_plural,
         title_singular: cmsModel.title_singular,
-        isSelected: cmsModel.shortName === this.attr('type')
+        isSelected: cmsModel.model_singular === this.attr('type')
       };
     },
     addFormattedType: function (modelName, groups) {
