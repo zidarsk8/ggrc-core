@@ -1351,6 +1351,14 @@
             total !== queryAPI.getCounts().attr(countsName)) {
             queryAPI.getCounts().attr(countsName, total);
           }
+          if (isStateQuery) {
+            GGRC.Utils.QueryAPI
+              .initCounts([modelName], {
+                type: options.parent_instance.type,
+                id: options.parent_instance.id
+              });
+          }
+
           return data.values;
         }.bind(this));
     },
