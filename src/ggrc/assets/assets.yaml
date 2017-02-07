@@ -142,6 +142,7 @@ dashboard-js-files:
   - apps/business_objects.js
   - apps/custom_attributes.js
   # Components
+  - components/state-colors-map/state-colors-map.js
   - components/spinner/spinner.js
   - components/modal-connector.js
   - components/collapsible-panel/collapsible-panel.js
