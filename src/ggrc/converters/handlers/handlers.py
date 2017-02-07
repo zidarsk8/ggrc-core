@@ -581,16 +581,6 @@ class SectionDirectiveColumnHandler(MappingColumnHandler):
     return ""
 
 
-class ControlColumnHandler(MappingColumnHandler):
-
-  def insert_object(self):
-    if len(self.value) != 1:
-      self.add_error(errors.WRONG_VALUE_ERROR, column_name="Control")
-      return
-    self.row_converter.obj.control = self.value[0]
-    MappingColumnHandler.insert_object(self)
-
-
 class AuditColumnHandler(MappingColumnHandler):
 
   def __init__(self, row_converter, key, **options):

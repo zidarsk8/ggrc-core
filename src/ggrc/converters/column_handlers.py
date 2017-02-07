@@ -45,6 +45,9 @@ from ggrc.converters.handlers import related_person
 from ggrc.converters.handlers import request
 from ggrc.converters.handlers import template
 from ggrc.converters.handlers import document
+from ggrc.converters.handlers.custom_control_column_handler import (
+    CustomControlSnapshotInstanceColumnHandler
+)
 from ggrc.extensions import get_extension_modules
 
 
@@ -122,6 +125,14 @@ EXTENSION_HANDLERS_ATTR = "contributed_column_handlers"
 
 _COLUMN_HANDLERS = {
     DEFAULT_HANDLERS_KEY: _DEFAULT_COLUMN_HANDLERS_DICT,
+    "Assessment": {
+        "__mapping__:control": CustomControlSnapshotInstanceColumnHandler,
+        "__unmapping__:control": CustomControlSnapshotInstanceColumnHandler,
+    },
+    "Issue": {
+        "__mapping__:control": CustomControlSnapshotInstanceColumnHandler,
+        "__unmapping__:control": CustomControlSnapshotInstanceColumnHandler,
+    }
 }
 
 

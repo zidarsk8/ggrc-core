@@ -114,3 +114,11 @@ INVALID_STATUS_DATE_CORRELATION = (u"Line {line}: Cannot change {date} for "
 ONLY_IMPORTABLE_COLUMNS_WARNING = (u"Line {line}: Only the following "
                                    u"attributes are importable: {columns}. "
                                    u"All other columns will be ignored.")
+
+ILLIGAL_REMOVE_CONTROL_VALUE = ("Line {line}: You don't have permission to "
+                                "delete {column_name} value")
+
+ILLIGAL_APPEND_CONTROL_VALUE = ("Line {line}: You don't have permission to "
+                                "append current {column_name} values")
+
+INVALID_TO_UNMAP = ("Line {line}: It's invalid to unmap {column_name} values")
