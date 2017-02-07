@@ -13,6 +13,18 @@
     margin-right: 30%;
     padding-right: 12px;
     padding-bottom: 28px;
+
+    assessment-mapped-controls,
+    collapsible-panel-header {
+      .fa-plus-circle {
+        opacity: 1;
+        color: $btnGreen;
+
+        &:hover {
+          color: $icon-color-hover;
+        }
+      }
+    }
   }
 
   .section-title {
@@ -71,7 +83,13 @@
 
     .attachments-list-alert {
       float: left;
-      margin: 6px 0 0 -20px;
+      margin: 6px 0 0 -24px;
+
+      & + .attachments-list-control {
+        .attachments-list-title {
+          color: #ce3e3e;
+        }
+      }
     }
 
     .assesment-attachment-list {
@@ -88,6 +106,10 @@
           .fa {
             opacity: 1;
             color: $btnGreen;
+
+            &:hover {
+              color: $icon-color-hover;
+            }
           }
         }
       }
@@ -172,15 +194,17 @@
         }
       }
       .assessment-controls-toolbar {
-        margin: 8px 6px 0;
+        margin: 8px 6px 0 28px;
         display: flex;
-        justify-content: flex-end;
+        justify-content: flex-start;
 
         .btn-extra-gray {
-          background: rgba(0, 0, 0, 0.15);
+          background: $btnPriority;
+          color: $white;
+          font-weight: normal;
 
           &:hover {
-            background: rgba(0, 0, 0, 0.175);
+            background: lighten($btnPriority, 10%);
           }
         }
 
@@ -209,12 +233,24 @@
     flex-direction: column;
     border-left: 1px solid $border-color;
 
+    &:after {
+      content: '';
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      height: 50px;
+      display: block;
+      position: absolute;
+      background: linear-gradient(to bottom, transparent, white 70%);
+    }
+
     .assessment-comments-add {
       display: block;
     }
 
     mapping-tree-view {
       overflow-y: auto;
+      padding-bottom: 45px;
     }
 
     .side-content {
@@ -260,7 +296,7 @@
   left: 57px;
 
   .fa {
-    color: $icon-color-dark;
+    color: $btnGreen;
 
     &:hover {
       color: $icon-color-hover;
