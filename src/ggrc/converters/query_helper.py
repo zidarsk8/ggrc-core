@@ -12,9 +12,11 @@ import operator
 
 import flask
 import sqlalchemy as sa
+from sqlalchemy.orm import load_only
 
 from ggrc import db
 from ggrc import models
+from ggrc.snapshotter import rules
 from ggrc.login import is_creator
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models import inflector
@@ -668,7 +670,7 @@ class QueryHelper(object):
       else:
         return object_name, ids
 
-    def relevant(object_name, ids):
+    def _relevant(object_name, ids):
       """Filter by relevant object.
 
       Args:
@@ -680,12 +682,48 @@ class QueryHelper(object):
         is related (via a Relationship or another m2m) to one the given objects.
       """
       return object_class.id.in_(
-          RelationshipHelper.get_ids_related_to(
-              object_class.__name__,
-              object_name,
-              ids,
-          )
+            RelationshipHelper.get_ids_related_to(
+                object_class.__name__,
+                object_name,
+                ids,
+            )
+        )
+
+    def _relevant_to_snapshot(object_name, ids):
+      """Filter by relevant object over snapshot"""
+      snapshot_qs = models.Snapshot.query.filter(
+          models.Snapshot.parent_type == models.Audit.__name__,
+          models.Snapshot.child_type == object_name,
+          models.Snapshot.child_id.in_(ids),
+      ).options(
+          load_only(models.Snapshot.id),
+      ).distinct(
+      ).subquery(
+          "snapshot"
       )
+      dest_qs = models.Relationship.query.filter(
+          models.Relationship.destination_id == snapshot_qs.c.id,
+          models.Relationship.destination_type == models.Snapshot.__name__,
+          models.Relationship.source_type == object_class.__name__,
+      ).options(
+          load_only("source_id")
+      ).distinct()
+      source_qs = models.Relationship.query.filter(
+          models.Relationship.source_id == snapshot_qs.c.id,
+          models.Relationship.source_type == models.Snapshot.__name__,
+          models.Relationship.destination_type == object_class.__name__,
+      ).options(
+          load_only("destination_id")
+      ).distinct()
+      ids_qs = dest_qs.union(source_qs).distinct().subquery("ids")
+      return object_class.id == ids_qs.c.relationships_source_id
+
+    def relevant(object_name, ids):
+      "Filter by relevant object"
+      if object_class.__name__ in rules.Types.scoped and object_name in rules.Types.all:
+        return _relevant_to_snapshot(object_name, ids)
+      else:
+        return _relevant(object_name, ids)
 
     def similar(object_name, ids):
       """Filter by relationships similarity.
