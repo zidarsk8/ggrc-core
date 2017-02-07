@@ -19,9 +19,11 @@
     line-height: 26px;
     height: 26px;
     background: $white;
-    border-bottom: 3px solid $warmGray;
+    box-shadow: 0 3px 4px 2px $warmGray;
     padding: 7px 16px 6px 10px;
     margin-bottom: 8px;
+    border-radius: 2px;
+
     &--transparent {
       line-height: 26px;
       height: 26px;
@@ -79,14 +81,14 @@
   &__expression-holder {
     position: relative;
     &__is-expression {
-      @include opacity(0.25);
+      opacity: 0.25;
       position: absolute;
       right: 6px;
       top: 1px;
     }
     &--active {
       .tree-filter__expression-holder__is-expression {
-        @include opacity(1);
+        opacity: 1;
         i {
           background-position: -246px -176px;
         }
@@ -138,11 +140,11 @@
       font-weight: normal;
     }
     i {
-      @include opacity(0.25);
-      @include transition(opacity 0.2s ease);
+      opacity: 0.25;
+      transition: opacity 0.2s ease;
       color: $black;
       &:hover {
-        @include opacity(1);
+        opacity: 1;
       }
     }
   }

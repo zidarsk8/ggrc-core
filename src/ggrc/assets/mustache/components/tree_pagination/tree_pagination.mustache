@@ -1,8 +1,8 @@
-<div class="tree-pagination">
+<div class="tree-pagination flex-box">
   <div class="tree-pagination__count">
     <div class="dropdown">
-      <h6 class="dropdown-toggle tree-view-pagination__count__title"
-          data-toggle="dropdown">{{paginationInfo paging.current paging.pageSize paging.total}}</h6>
+      <div class="dropdown-toggle tree-view-pagination__count__title"
+          data-toggle="dropdown">{{paginationInfo paging.current paging.pageSize paging.total}}</div>
       <div class="dropdown-menu">
         <span>Items per page:</span>
         <div class="btn-group">
@@ -14,14 +14,14 @@
       </div>
     </div>
   </div>
-  <ul class="pagination pull-right">
+  <ul class="pagination">
     <li class="{{#if_equals paging.current 1}} disabled{{/if_equals}}">
-      <a href="javascript://" can-click="setFirstPage">
+      <a can-click="setFirstPage">
         <i class="fa fa-angle-double-left" aria-hidden="true"></i>
       </a>
     </li>
     <li class="{{#if_equals paging.current 1}} disabled{{/if_equals}}">
-      <a href="javascript://" can-click="setPrevPage">
+      <a can-click="setPrevPage">
         <i class="fa fa-angle-left" aria-hidden="true"></i>
       </a>
     </li>
@@ -30,15 +30,14 @@
                placeholder="{{paginationPlaceholder paging.current paging.count}}" >
     </li>
     <li class="{{#if_equals paging.current paging.count}} disabled{{/if_equals}}">
-      <a href="javascript://" can-click="setNextPage">
+      <a can-click="setNextPage">
         <i class="fa fa-angle-right" aria-hidden="true"></i>
       </a>
     </li>
     <li class="{{#if_equals paging.current paging.count}} disabled{{/if_equals}}">
-      <a href="javascript://" can-click="setLastPage">
+      <a can-click="setLastPage">
         <i class="fa fa-angle-double-right" aria-hidden="true"></i>
       </a>
     </li>
   </ul>
-  <div class="clearfix"></div>
 </div>
