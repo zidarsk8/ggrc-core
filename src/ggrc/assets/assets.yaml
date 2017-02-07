@@ -44,6 +44,7 @@ dashboard-js-files:
   - ggrc_base.js
   - plugins/ggrc_utils.js
   - plugins/utils/current-page-utils.js
+  - plugins/utils/state-utils.js
   - plugins/datepicker.js
   - plugins/can_control.js
   - plugins/wysiwyg.js
