@@ -16,6 +16,7 @@ from sqlalchemy import and_
 from ggrc import db
 from ggrc.services.common import Resource
 from ggrc import models
+from ggrc.models.mixins.statusable import Statusable
 
 
 def _add_notification(obj, notif_type, when=None):
@@ -74,14 +75,60 @@ def _add_assignable_declined_notif(obj):
     _add_notification(obj, notif_type)
 
 
+def _add_assessment_updated_notif(obj):
+  """Add a notification record on the change of an object.
+
+  If the same notification type for the object already exists and has not been
+  sent yet, do not do anything.
+
+  Args:
+    obj (models.mixins.Assignable): an object for which to add a notification
+  """
+  notif_type = models.NotificationType.query.filter_by(
+      name="assessment_updated").first()
+
+  if not _has_unsent_notifications(notif_type, obj):
+    _add_notification(obj, notif_type)
+
+
 def handle_assignable_modified(obj):
-  history = inspect(obj).attrs["status"].history
+  """A handler for the Assignable object modified event.
+
+  Args:
+    obj (models.mixins.Assignable): an object that has been modified
+  """
+  attrs = inspect(obj).attrs
+
+  status_history = attrs["status"].history
 
   # The transition from "finished" to "in progress" only happens when a task is
   # declined. So this is used as a triger for declined notifications.
-  if (history.deleted == [obj.DONE_STATE] and
-     history.added == [obj.PROGRESS_STATE]):
+  if (status_history.deleted == [obj.DONE_STATE] and
+     status_history.added == [obj.PROGRESS_STATE]):
     _add_assignable_declined_notif(obj)
+
+  # no interest in modifications when an assignable object is not ative yet
+  if obj.status == Statusable.START_STATE:
+    return
+
+  # changes of some of the attributes are not considered as a modification of
+  # the obj itself, e.g. metadata not editable by the end user, or changes
+  # covered by other event types such as "comment created"
+  # pylint: disable=invalid-name
+  IGNORE_ATTRS = frozenset((
+      u'_notifications', u'comments', u'context', u'context_id', u'created_at',
+      u'custom_attribute_definitions', u"finished_date", u'id', u'modified_by',
+      u'modified_by_id', u'object_level_definitions', u'operationally',
+      u'os_state', u'related_destinations', u'related_sources', u'status',
+      u'task_group_objects', u'updated_at', u"verified_date"
+  ))
+
+  for attr_name, val in attrs.items():
+    if attr_name in IGNORE_ATTRS:
+      continue
+    if val.history.has_changes():
+      _add_assessment_updated_notif(obj)
+      break
 
 
 def handle_assignable_created(obj):
