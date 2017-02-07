@@ -5,7 +5,7 @@ import csv
 import chardet
 from StringIO import StringIO
 from ggrc.models.reflection import AttributeInfo
-from ggrc.converters.column_handlers import COLUMN_HANDLERS
+from ggrc.converters.column_handlers import model_column_handlers
 from ggrc.converters.handlers import handlers
 from ggrc.converters.handlers import custom_attribute
 
@@ -26,21 +26,22 @@ def get_object_column_definitions(object_class):
   """
   attributes = AttributeInfo.get_object_attr_definitions(object_class,
                                                          include_oca=True)
+  column_handlers = model_column_handlers(object_class)
   for key, attr in attributes.iteritems():
     handler_key = attr.get("handler_key", key)
-    handler = COLUMN_HANDLERS.get(handler_key, handlers.ColumnHandler)
+    handler = column_handlers.get(handler_key, handlers.ColumnHandler)
     validator = None
     default = None
     if attr["type"] == AttributeInfo.Type.PROPERTY:
       validator = getattr(object_class, "validate_{}".format(key), None)
       default = getattr(object_class, "default_{}".format(key), None)
     elif attr["type"] == AttributeInfo.Type.MAPPING:
-      handler = COLUMN_HANDLERS.get(key, handlers.MappingColumnHandler)
+      handler = column_handlers.get(key, handlers.MappingColumnHandler)
     elif attr["type"] == AttributeInfo.Type.CUSTOM:
-      handler = COLUMN_HANDLERS.get(
+      handler = column_handlers.get(
           key, custom_attribute.CustomAttributeColumHandler)
     elif attr["type"] == AttributeInfo.Type.OBJECT_CUSTOM:
-      handler = COLUMN_HANDLERS.get(
+      handler = column_handlers.get(
           key, custom_attribute.ObjectCaColumnHandler)
     attr["handler"] = attr.get("handler", handler)
     attr["validator"] = attr.get("validator", validator)
