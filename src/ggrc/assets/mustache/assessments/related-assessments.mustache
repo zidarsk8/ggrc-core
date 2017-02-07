@@ -39,7 +39,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 Urls
             </div>
         </div>
-        <div class="grid-data-body {{#if isLoading}}loading{{/if}}">
+          <div class="grid-data-body {{#if isLoading}}loading{{/if}}">
             <object-list items="relatedObjects" is-loading="isLoading" spinner-css="grid-spinner">
                 <div class="grid-data-row flex-row flex-box">
                     <div class="grid-data-item-index">
@@ -66,7 +66,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                             <mapped-objects
                                 parent-instance="parentInstance"
                                 related-types="relatedTypes">
-                                <a href="{{instance.selfLink}}" target="_blank">{{instance.title}}</a>
+                                <a href="{{instance.viewLink}}" target="_blank">{{instance.title}}</a>
                             </mapped-objects>
                         </related-audits>
                     </div>
@@ -100,6 +100,6 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     </div>
                 </div>
             </object-list>
-        </div>
+          </div>
     </reusable-objects-list>
 </related-objects>
