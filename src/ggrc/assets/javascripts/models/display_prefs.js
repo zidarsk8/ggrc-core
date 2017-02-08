@@ -229,7 +229,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     var value = this.getObject(path, TREE_VIEW_STATES);
 
     if (!value || !value[model_name]) {
-      return ['Active'];
+      return [];
     }
 
     return value[model_name].status_list;
