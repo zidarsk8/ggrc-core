@@ -289,6 +289,7 @@ class Stateful(object):
         db.String, default=cls.default_status, nullable=False), cls.__name__)
 
   _publish_attrs = ['status']
+  _fulltext_attrs = ['status']
   _aliases = {
       "status": {
           "display_name": "State",
