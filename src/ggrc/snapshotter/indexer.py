@@ -116,11 +116,9 @@ def get_searchable_attributes(attributes, cad_list, content):
   return searchable_values
 
 
-def reindex(parents=None):
-  """Reindex all snapshots or limit to a subset of certain parents.
+def reindex():
+  """Reindex all snapshots
 
-  Args:
-    parents: An iterable of parents for which to reindex their scopes.
   Returns:
     Pair of parent-child that were reindexed.
   """
@@ -131,14 +129,6 @@ def reindex(parents=None):
       models.Snapshot.child_id,
   )
   query = columns
-  if parents:
-    _parents = {(obj.type, obj.id) for obj in parents}
-    query = query.filter(
-        tuple_(
-            models.Snapshot.parent_type,
-            models.Snapshot.parent_id,
-        ).in_(_parents))
-
   pairs = {Pair.from_4tuple(p) for p in query}
   reindex_pairs(pairs)
   return pairs
