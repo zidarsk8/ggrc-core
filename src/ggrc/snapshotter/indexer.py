@@ -9,6 +9,7 @@ from ggrc import db
 from ggrc import models
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models.reflection import AttributeInfo
+from ggrc.utils import generate_query_chunks
 
 from ggrc.snapshotter.rules import Types
 from ggrc.snapshotter.datastructures import Pair
@@ -124,9 +125,10 @@ def reindex():
       models.Snapshot.child_type,
       models.Snapshot.child_id,
   )
-  query = columns
-  pairs = {Pair.from_4tuple(p) for p in query}
-  reindex_pairs(pairs)
+  for query_chunk in generate_query_chunks(columns):
+    pairs = {Pair.from_4tuple(p) for p in query_chunk}
+    reindex_pairs(pairs)
+    db.session.commit()
 
 
 def delete_records(snapshot_ids):
