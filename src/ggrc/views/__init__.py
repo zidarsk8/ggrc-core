@@ -46,6 +46,7 @@ from ggrc.views import notifications
 from ggrc.views.common import RedirectedPolymorphView
 from ggrc.views.registry import object_view
 from ggrc.utils import benchmark
+from ggrc.utils import generate_query_chunks
 from ggrc.utils import revisions
 
 
@@ -278,14 +279,6 @@ def object_browser():
   """The object Browser page
   """
   return render_template("dashboard/index.haml")
-
-
-def generate_query_chunks(query):
-  """Generate query chunks used by pagination"""
-  chunk_size = 100
-  count = query.count()
-  for offset in range(0, count, chunk_size):
-    yield query.order_by('id').limit(chunk_size).offset(offset).all()
 
 
 @app.route("/admin/reindex", methods=["POST"])
