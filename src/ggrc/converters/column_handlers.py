@@ -66,6 +66,7 @@ GGRC_COLUMN_HANDLERS = {
     "slug": handlers.SlugColumnHandler,
     "start_date": handlers.DateColumnHandler,
     "status": handlers.StatusColumnHandler,
+    "os_state": handlers.ExportOnlyColumnHandler,
     "template_custom_attributes": template.TemplateCaColumnHandler,
     "template_object_type": template.TemplateObjectColumnHandler,
     "test_plan": handlers.TextareaColumnHandler,

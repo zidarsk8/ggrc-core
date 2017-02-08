@@ -5,6 +5,7 @@ Alembic==0.6.7
 apipkg==1.4
 argparse==1.2.1
 blessings==1.6
+ddt==1.1.1
 EasyProcess==0.1.9
 execnet==1.4.1
 factory-boy==2.8.1

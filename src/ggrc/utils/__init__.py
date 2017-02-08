@@ -24,6 +24,8 @@ class GrcEncoder(json.JSONEncoder):
 
   def default(self, obj):
     if isinstance(obj, datetime.datetime):
+      if not obj.time():
+        return obj.date().isoformat()
       return obj.isoformat()
     elif isinstance(obj, datetime.date):
       return obj.isoformat()
@@ -292,3 +294,10 @@ with_nop = benchmarks.WithNop
 def convert_date_format(date, format_from, format_to):
   """Convert string date format from one to another."""
   return datetime.datetime.strptime(date, format_from).strftime(format_to)
+
+
+def generate_query_chunks(query, chunk_size=1000):
+  """Make a generator splitting `query` into chunks of size `chunk_size`."""
+  count = query.count()
+  for offset in range(0, count, chunk_size):
+    yield query.order_by('id').limit(chunk_size).offset(offset).all()

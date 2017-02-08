@@ -19,8 +19,11 @@
       setMinDate: null,
       setMaxDate: null,
       _date: null,  // the internal value of the text input field
-      required: '@',
       define: {
+        required: {
+          type: 'boolean',
+          'default': false
+        },
         label: {
           type: 'string'
         },

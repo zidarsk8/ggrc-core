@@ -81,8 +81,7 @@ can.Model.Cacheable("CMS.Models.Program", {
   defaults: {
     status: 'Draft'
   },
-  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
-      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     this.validateNonBlank("title");
     this._super.apply(this, arguments);
@@ -144,7 +143,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
       {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ])
-    , add_item_view : GGRC.mustache_path + "/objectives/tree_add_item.mustache"
+    , add_item_view : GGRC.mustache_path + "/snapshots/tree_add_item.mustache"
     , create_link : true
     //, draw_children : true
     , start_expanded : false
@@ -160,8 +159,7 @@ can.Model.Cacheable("CMS.Models.Objective", {
   defaults: {
     status: 'Draft'
   },
-  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
-      'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     this.validateNonBlank("title");
     this._super.apply(this, arguments);

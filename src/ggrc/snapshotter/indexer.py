@@ -9,6 +9,7 @@ from ggrc import db
 from ggrc import models
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models.reflection import AttributeInfo
+from ggrc.utils import generate_query_chunks
 
 from ggrc.snapshotter.rules import Types
 from ggrc.snapshotter.datastructures import Pair
@@ -116,32 +117,18 @@ def get_searchable_attributes(attributes, cad_list, content):
   return searchable_values
 
 
-def reindex(parents=None):
-  """Reindex all snapshots or limit to a subset of certain parents.
-
-  Args:
-    parents: An iterable of parents for which to reindex their scopes.
-  Returns:
-    Pair of parent-child that were reindexed.
-  """
+def reindex():
+  """Reindex all snapshots."""
   columns = db.session.query(
       models.Snapshot.parent_type,
       models.Snapshot.parent_id,
       models.Snapshot.child_type,
       models.Snapshot.child_id,
   )
-  query = columns
-  if parents:
-    _parents = {(obj.type, obj.id) for obj in parents}
-    query = query.filter(
-        tuple_(
-            models.Snapshot.parent_type,
-            models.Snapshot.parent_id,
-        ).in_(_parents))
-
-  pairs = {Pair.from_4tuple(p) for p in query}
-  reindex_pairs(pairs)
-  return pairs
+  for query_chunk in generate_query_chunks(columns):
+    pairs = {Pair.from_4tuple(p) for p in query_chunk}
+    reindex_pairs(pairs)
+    db.session.commit()
 
 
 def delete_records(snapshot_ids):

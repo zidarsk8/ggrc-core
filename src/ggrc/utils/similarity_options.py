@@ -5,11 +5,10 @@
 
 ASSESSMENT = {
     "relevant_types": {
-        "Audit": {"weight": 5},
-        "Regulation": {"weight": 3},
-        "Control": {"weight": 10},
+        "Objective": {"weight": 2},
+        "Control": {"weight": 2},
     },
-    "threshold": 5,
+    "threshold": 1,
 }
 
 # similarity_options for assessment and request are the same at the moment

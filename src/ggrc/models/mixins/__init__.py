@@ -275,16 +275,27 @@ class Timeboxed(object):
       "end_date": "Stop Date",
   }
 
+  _fulltext_attrs = [
+      'start_date',
+      'end_date'
+  ]
+
 
 class Stateful(object):
 
   @declared_attr
   def status(cls):
-    return deferred(
-        db.Column(db.String, default=cls.default_status), cls.__name__)
+    return deferred(db.Column(
+        db.String, default=cls.default_status, nullable=False), cls.__name__)
 
   _publish_attrs = ['status']
-  _aliases = {"status": "State"}
+  _fulltext_attrs = ['status']
+  _aliases = {
+      "status": {
+          "display_name": "State",
+          "mandatory": False
+      }
+  }
 
   @classmethod
   def default_status(cls):
@@ -599,13 +610,6 @@ event.listen(
     Session, 'after_flush_postexec', Slugged.ensure_slug_after_flush_postexec)
 
 
-class Mapping(Stateful, Base):
-  VALID_STATES = (
-      'Draft',
-      'Final',
-  )
-
-
 class WithContact(object):
 
   @declared_attr
@@ -675,14 +679,8 @@ class BusinessObject(Stateful, Noted, Described, Hyperlinked, WithContact,
                      Titled, Slugged):
   VALID_STATES = (
       'Draft',
-      'Final',
-      'Effective',
-      'Ineffective',
-      'Launched',
-      'Not Launched',
-      'In Scope',
-      'Not in Scope',
-      'Deprecated',
+      'Active',
+      'Deprecated'
   )
 
 # This class is just a marker interface/mixin to indicate that a model type
@@ -699,7 +697,7 @@ class TestPlanned(object):
   _publish_attrs = ['test_plan']
   _fulltext_attrs = ['test_plan']
   _sanitize_html = ['test_plan']
-  _aliases = {"test_plan": "Test Plan"}
+  _aliases = {"test_plan": "Evidence Collection Guidance"}
 
 
 __all__ = [
@@ -713,7 +711,6 @@ __all__ = [
     "Hierarchical",
     "Hyperlinked",
     "Identifiable",
-    "Mapping",
     "Noted",
     "Notifiable",
     "Slugged",

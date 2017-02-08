@@ -112,8 +112,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
     url: '',
     status: 'Draft'
   },
-  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
-    'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
     this._super && this._super.apply(this, arguments);
@@ -123,7 +122,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
         footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
         add_item_view: GGRC.mustache_path +
         (GGRC.infer_object_type(GGRC.page_object) === CMS.Models.Program ?
-          '/systems/tree_add_item.mustache' :
+          '/snapshots/tree_add_item.mustache' :
           '/base_objects/tree_add_item.mustache')
       });
     this.validateNonBlank('title');
@@ -158,8 +157,7 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
     status: 'Draft'
   },
   mixins: ['ca_update'],
-  statuses: ['Draft', 'Final', 'Effective', 'Ineffective', 'Launched',
-    'Not Launched', 'In Scope', 'Not in Scope', 'Deprecated'],
+  statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
     this._super && this._super.apply(this, arguments);
