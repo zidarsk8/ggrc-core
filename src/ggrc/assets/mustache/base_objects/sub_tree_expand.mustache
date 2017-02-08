@@ -6,8 +6,8 @@
 <li class="tree-item sub-tree-expander">
   <div class="item-main">
     <div class="item-wrap">
-      <sub-tree-expander expanded="expanded" display="display">
-        <a href="javascript://">
+      <sub-tree-expander on-change-state="@onChangeState" expanded="expanded" disabled="disabled" display="display">
+        <a {{#if disabled}}class="disabled"{{/if}} can-click="onExpand" href="javascript://">
           <i class="fa fa-caret-{{#if expanded}}down{{else}}right{{/if}}"></i>
           Show objects not directly related to this {{activeTabType}}
         </a>

@@ -70,6 +70,28 @@
           }
         }
       }
+      &.not-directly-related {
+        color: $gray;
+        .fa {
+          color: $gray;
+        }
+      }
+      &.directly-related {
+        color: $darkText;
+        .fa {
+          color: $darkText;
+        }
+        .not-directly-related {
+          .fa {
+            color: $gray;
+          }
+        }
+      }
+    }
+    &.not-directly-related-hide {
+      > .not-directly-related {
+        display: none;
+      }
     }
   }
   h6 {
