@@ -38,6 +38,9 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
             <div class="flex-size-3">
                 Urls
             </div>
+            <div class="grid-data__action-column">
+                More info
+            </div>
         </div>
           <div class="grid-data-body {{#if isLoading}}loading{{/if}}">
             <object-list items="relatedObjects" is-loading="isLoading" spinner-css="grid-spinner">
@@ -97,6 +100,9 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                                <document-object-list-item instance="instance"></document-object-list-item>
                             </reusable-objects-item>
                         </mapped-objects>
+                    </div>
+                    <div class="grid-data__action-column">
+                      <button class="btn btn-icon btn-icon-lg"><i class="fa fa-ellipsis-h"></i></button>
                     </div>
                 </div>
             </object-list>
