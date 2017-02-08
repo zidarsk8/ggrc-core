@@ -231,6 +231,18 @@
           item.isDisabled = relatedIds.indexOf(item.data.id) !== -1;
         });
       },
+      setSelectedItems: function (allItems) {
+        var selectedItems = can.makeArray(this.attr('selected'));
+        allItems.forEach(function (item) {
+          item.isSelected =
+            selectedItems.some(function (selectedItem) {
+              return selectedItem.id === item.id;
+            });
+          if (item.isSelected) {
+            item.markedSelected = true;
+          }
+        });
+      },
       transformValue: function (value) {
         var Model = this.getDisplayModel();
         var useSnapshots = this.useSnapshots();
@@ -260,6 +272,7 @@
                   data: self.transformValue(value)
                 };
               });
+            this.setSelectedItems(result);
             if (relatedData) {
               this.setDisabledItems(result, relatedData[modelKey].ids);
             }
