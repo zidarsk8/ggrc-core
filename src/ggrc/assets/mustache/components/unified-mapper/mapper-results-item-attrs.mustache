@@ -10,15 +10,15 @@
           {{/get_custom_attr_value}}
         </div>
       {{else}}
-        <div class="owner tree-title-area">
-          {{#instance}}
-            {{#if_equals attr_name 'title'}}
+        {{#instance}}
+          {{#if_equals attr_name 'title'}}
+            <span class="title-attr">
               {{title}}
-            {{else}}
-              {{> attrTemplate}}
-            {{/if_equals}}
-          {{/instance}}
-        </div>
+            </span>
+          {{else}}
+            {{> attrTemplate}}
+          {{/if_equals}}
+        {{/instance}}
       {{/if_equals}}
     </div>
   {{/each}}

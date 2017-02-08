@@ -72,6 +72,7 @@
     snapshot_scope_id: '',
     snapshot_scope_type: '',
     toolbarSubmitCbs: $.Callbacks(),
+    afterSearch: false,
     allowedToCreate: function () {
       var isSearch = this.attr('search_only');
       // Don't allow to create new instances for "In Scope" Objects
@@ -167,6 +168,7 @@
     },
     onToolbarSubmit: function () {
       this.attr('toolbarSubmitCbs').fire();
+      this.attr('afterSearch', true);
     }
   });
 
@@ -400,8 +402,7 @@
       },
       '{mapper} type': function () {
         this.scope.attr('mapper.filter', '');
-        this.scope.attr('mapper.contact', null);
-        this.scope.attr('mapper.contactEmail', null);
+        this.scope.attr('mapper.afterSearch', false);
         // Edge case for Assessment Generation
         // and objects that are not in Snapshot scope
         if (!this.scope.attr('mapper.assessmentGenerator')) {

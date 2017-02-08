@@ -3,7 +3,18 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<h6>Filter by mapping</h6>
+<h6>
+  <span>
+    Filter by mapping
+  </span>
+  <span class="add-rule">
+    {{^readOnly}}
+      <a href="javascript://" can-click="addFilter" class="add-filter-rule">
+        <i class="fa fa-fw fa-plus-circle"></i>
+      </a>
+    {{/readOnly}}
+  </span>
+</h6>
 {{#each relevant}}
   <div class="single-line-filter">
     {{^readOnly}}
@@ -45,8 +56,3 @@
     {{/filter}}
   </div>
 {{/each}}
-<div class="add-rule">
-  {{^readOnly}}
-     <a href="javascript://" can-click="addFilter" class="add-filter-rule">+ Add New Rule</a>
-  {{/readOnly}}
-</div>

@@ -38,9 +38,9 @@
       selected: [],
       refreshItems: false,
       submitCbs: null,
-      isBeforeLoad: true,
       displayPrefs: null,
       disableColumnsConfiguration: false,
+      objectsPlural: false,
       init: function () {
         var self = this;
         this.attr('submitCbs').add(this.onSearch.bind(this));
@@ -94,10 +94,6 @@
       },
       onSearch: function () {
         this.attr('refreshItems', true);
-      },
-      onReset: function () {
-        this.attr('filter', '');
-        this.onSearch();
       },
       prepareRelevantFilters: function () {
         var filters;
@@ -349,7 +345,10 @@
         this.viewModel.setItemsDebounced();
       },
       '{viewModel} type': function () {
-        this.viewModel.attr('isBeforeLoad', true);
+        this.viewModel.attr('items', []);
+      },
+      '{viewModel.paging} total': function (scope, ev, total) {
+        this.viewModel.attr('objectsPlural', total > 1);
       }
     }
   });

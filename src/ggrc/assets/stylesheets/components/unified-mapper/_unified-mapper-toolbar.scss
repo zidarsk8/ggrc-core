@@ -12,17 +12,30 @@
 
   .filters-row {
     width: 100%;
+    display: flex;
+    box-sizing: border-box;
+    list-style: none;
+    justify-content: space-between;
 
-    .col-2 {
-      flex-basis: 50%;
-    }
+    .col {
+      flex: 1 1;
 
-    .col-3 {
-      flex-basis: 33.3333%;
-    }
+      h6 {
+        white-space: nowrap;
+      }
 
-    [class*="col-"]:not(:last-child) {
-      padding-right: 20px;
+      &.filter {
+        flex: 2 1;
+      }
+
+      &.create {
+        flex: 0;
+        white-space: nowrap;
+      }
+
+      &:not(:last-child) {
+        padding-right: 20px;
+      }
     }
   }
 
@@ -32,6 +45,8 @@
 
   .create-control {
     margin-top: 24px;
+    background-color: $green;
+    color: $white;
   }
 }
 
@@ -87,4 +102,107 @@ mapper-filter {
 
 assessment-templates {
   display: block;
+}
+
+
+.list-toolbar {
+  height: 26px;
+  margin: 0 0 16px 0;
+  justify-content: flex-end;
+
+  button {
+    margin-left: 10px;
+  }
+}
+
+.filter-mapping {
+  width: 60%;
+}
+
+.filter-buttons {
+  width: 40%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+
+  button {
+    margin-bottom: 6px;
+
+    &:first-child {
+      margin-right: 10px;
+    }
+
+    &.btn-draft {
+      background-color: white;
+      border: 1px solid $gray;
+
+      &:hover {
+        background-color: $gray;
+      }
+    }
+
+    &.btn-info {
+      border: 1px solid $lightBlue;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+relevant-filter {
+  display: block;
+
+  .add-rule {
+    position: relative;
+    top: 2px;
+
+    i {
+      color: $green;
+    }
+  }
+
+  .single-line-filter {
+    display: flex;
+    align-items: center;
+
+    .filter-type-selector,
+    .modal-search {
+      flex: 1 1;
+      margin-left: 5px;
+    }
+
+    label {
+      flex: 0 95px;
+      font-size: 12px !important;
+      margin-bottom: 0 !important;
+      margin-left: 0;
+    }
+
+    .remove_filter {
+      flex: 0 28px;
+      order: 10;
+      border: 0;
+      background-color: transparent;
+      display: block;
+
+      i {
+        color: $gray;
+      }
+
+      &:hover i {
+        color: $black;
+      }
+
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .ui-autocomplete-input {
+      padding-right: 4px;
+    }
+
+  }
 }

@@ -5,56 +5,57 @@
 
 @import "unified-mapper-toolbar";
 
-$list-item-padding: 16px;
+$list-item-padding: 15px;
 $item-status-width: 8px;
 $icon-width: 32px;
 $view-object-buttons-width: 55px;
-$object-selection-item-width: 16px;
+$object-selection-item-width: 37px;
 $first-column-width: 25%;
-$list-body-padding: 3px;
-$list-body-border-size: 1px;
-$list-object-item-border-size: 1px;
+$items-separator-color: #e0e0e0;
 
 @mixin cell-styles() {
   flex: 1 1;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 11px;
-  text-transform: uppercase;
   padding-right: 5px;
 }
 
 mapper-results {
   display: block;
-  padding: 0 20px;
 
   .well-small {
     font-size: 13px;
     padding: 9px 16px 7px;
   }
 
-  .list-toolbar {
-    height: 26px;
-    margin: 0 0 16px 0;
-    justify-content: flex-end;
+  .list-pagination {
+    display: block;
 
-    button {
-      margin-left: 10px;
+    .tree-pagination {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      .dropdown-toggle,
+      ::-webkit-input-placeholder {
+        color: $gray;
+      }
+    }
+
+    .clearfix {
+      display: none;
+    }
+
+    .pagination {
+      float: none;
+      height: auto;
     }
   }
 
-  .list-pagination {
-    height: 26px;
-    margin: 0 0 16px 0;
-    padding: 4px 0 2px;
-  }
-
   .list-header {
-    padding: 0 $list-item-padding +
-               $list-body-padding +
-               $list-body-border-size +
-               $list-object-item-border-size 5px;
+    position: relative;
+    padding: 0 $list-item-padding 10px;
   }
 
   .settings-row {
@@ -65,12 +66,11 @@ mapper-results {
 
   .list-body {
     display: flex;
-    padding: 2px $list-body-padding 1px;
-    background: #fbfbfb;
     max-height: 240px;
     box-sizing: border-box;
     overflow: auto;
     position: relative;
+    margin-bottom: 25px;
 
     &.loading {
       overflow: hidden;
@@ -109,62 +109,44 @@ mapper-results {
         }
       }
     }
+
+    object-list {
+      object-list-item {
+        color: $black;
+        border-bottom: 1px solid $items-separator-color;
+
+        object-selection-item {
+          justify-content: flex-end;
+          width: $object-selection-item-width;
+        }
+
+        &:first-child {
+          border-top: 1px solid $items-separator-color;
+        }
+      }
+    }
   }
 
   .list-selection-switcher {
-    font-size: 13px;
-    color: $text;
-    display: flex;
-    align-items: center;
+    position: absolute;
+    right: 14px;
+    top: 0;
 
-    .btn {
-      display: inline-block;
-      padding: 2px 6px;
-      margin: 0 4px;
-      line-height: 16px;
-      text-align: center;
-      vertical-align: middle;
+    label {
+      font-size: 11px !important;
+      text-transform: uppercase;
+      margin-bottom: 0 !important;
       cursor: pointer;
-    }
 
-    .btn-link {
-      color: #0088cc;
-      font-size: 12px;
-      font-weight: normal;
-      cursor: pointer;
-      border-color: transparent;
-
-      &[disabled] {
-        opacity: 0.25;
+      input {
+        margin-bottom: 6px !important;
+        margin-left: 2px;
       }
-
-      &:focus {
-        outline: none;
-      }
-
-      &:hover {
-        background: #40c4ff;
-        color: #fff;
-        border-radius: 3px;
-      }
-
-      &.selected {
-        background: #40c4ff;
-        color: #fff;
-        border-radius: 3px;
-      }
-    }
-
-    .btn-link, .btn-link:active {
-      background-color: transparent;
-      background-image: none;
-      box-shadow: none;
     }
   }
 
   .list-object-item {
     overflow: hidden;
-    border: 1px solid #ddd;
     cursor: default;
     border-radius: 2px;
     margin: 2px 0;
@@ -203,7 +185,6 @@ mapper-results {
   mapper-results-item-details {
     padding: 8px 16px 12px;
     font-size: 12px;
-    border: 1px solid #eee;
     border-radius: 2px;
     margin: 2px 0;
     background: #fff;
@@ -214,9 +195,14 @@ mapper-results {
   }
 
   &.snapshot-list {
-    .list-object-item {
-      background: $snapshotBgnd;
-      border-color: #D9E6F4;
+    object-list {
+      object-list-item {
+        background: $snapshotBgnd;
+
+        mapper-results-item-details {
+          background-color: #f4fbfe;
+        }
+      }
     }
   }
 }
@@ -235,7 +221,10 @@ mapper-results-item {
       height: 32px;
       line-height: 32px;
       text-align: center;
-      font-size: 12px;
+    }
+
+    &.object-type .fa {
+      font-size: 14px;
     }
 
     &:hover, &:active {
@@ -254,7 +243,7 @@ mapper-results-item {
 mapper-results-item-status {
   display: block;
   height: 32px;
-  line-height: 32px;
+  line-height: 30px;
   width: $item-status-width;
 
   .status-label {
@@ -270,6 +259,10 @@ mapper-results-item-attrs {
   .attr {
     @include cell-styles();
 
+    .title-attr {
+      font-size: 14px;
+    }
+
     &:first-child {
       flex: 1 1 $first-column-width;
     }
@@ -284,6 +277,8 @@ mapper-results-items-header {
 
     .title {
       @include cell-styles();
+      font-size: 11px;
+      text-transform: uppercase;
       cursor: pointer;
 
       &:first-child {
@@ -304,10 +299,20 @@ mapper-results-items-header {
   }
 }
 
-
 mapper-results-columns-configuration {
+  position: absolute;
   display: block;
-  position: relative;
+  left: 5px;
+
+  .dropdown-toggle {
+    i {
+      color: $gray;
+    }
+
+    &:hover i {
+      color: $black;
+    }
+  }
 
   .dropdown-menu {
     @include border-radius(0);
@@ -319,7 +324,12 @@ mapper-results-columns-configuration {
       line-height: 24px;
     }
     label {
-      font-size: 12px;
+      font-size: 12px !important;
+      margin-bottom: 0 !important;
+
+      input {
+        margin-bottom: 0 !important;
+      }
     }
     .attr-list {
       margin-top: 11px;
@@ -345,5 +355,48 @@ mapper-results-columns-configuration {
       border: none;
       background: transparent;
     }
+  }
+}
+
+.objects-found {
+  margin-bottom: 20px;
+
+  label {
+    text-transform: uppercase;
+    font-size: 12px !important;
+    margin-bottom: 0 !important;
+    font-weight: 500;
+  }
+}
+
+.ggrc_controllers_mapper_modal {
+
+  modal-mapper {
+    .modal-body {
+      padding-bottom: 30px !important;
+    }
+    .modal-footer {
+      padding-top: 10px !important;
+
+      .btn-map {
+        margin-left: 10px;
+        background-color: $blue;
+      }
+    }
+  }
+
+  @media (min-width: 1100px) {
+    width: 1060px !important;
+    margin-left: -530px !important;
+  }
+
+  @media (min-width: 1200px) {
+    width: 1160px !important;
+    margin-left: -580px !important;
+  }
+
+  @media (min-width: 1300px) {
+    width: 1260px !important;
+    margin-left: -630px !important;
   }
 }

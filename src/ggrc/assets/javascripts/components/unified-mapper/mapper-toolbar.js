@@ -14,11 +14,13 @@
     viewModel: {
       filter: '',
       mapper: {},
+      isLoading: false,
       onSubmit: function () {
         this.dispatch('submit');
       },
-      reset: function () {
-        $('mapper-filter').viewModel().reset();
+      onReset: function () {
+        this.attr('filter', '');
+        this.dispatch('submit');
       }
     }
   });

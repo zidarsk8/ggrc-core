@@ -31,7 +31,8 @@
       },
       objectTypeIcon: function () {
         var objectType = this.objectType();
-        return 'fa-' + objectType.toLowerCase();
+        var Model = CMS.Models[objectType];
+        return 'fa-' + Model.table_singular;
       },
       toggleIconCls: function () {
         return this.attr('showDetails') ? 'fa-caret-down' : 'fa-caret-right';
@@ -40,7 +41,8 @@
         this.attr('showDetails', !this.attr('showDetails'));
       },
       isSnapshot: function () {
-        return this.attr('itemData.type') === CMS.Models.Snapshot.model_singular;
+        return this.attr('itemData.type') ===
+          CMS.Models.Snapshot.model_singular;
       },
       objectType: function () {
         if (this.isSnapshot()) {
