@@ -1,0 +1,48 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#switch attr_name}}
+  {{#case 'owner'}}
+    {{#with_mapping 'authorizations' instance}}
+      {{#each authorizations}}
+        <span>
+          {{#using role=instance.role}}
+            {{#if_equals role.name 'ProgramOwner'}}
+              {{#using contact=instance.person}}
+                {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+              {{/using}}
+            {{/if_equals}}
+          {{/using}}
+        </span>
+      {{/each}}
+    {{/with_mapping}}
+  {{/case}}
+  {{#case 'contact'}}
+    <span>
+      {{#using contact=instance.contact}}
+        {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+      {{/using}}
+    </span>
+  {{/case}}
+  {{#case 'secondary_contact'}}
+    <span>
+      {{#using contact=instance.secondary_contact}}
+        {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+      {{/using}}
+    </span>
+  {{/case}}
+
+  {{#default}}
+    {{#if_helpers '\
+    #if_equals' attr_name 'url' '\
+    or #if_equals' attr_name 'reference_url'}}
+      <a class="url" href="{{get_url_value attr_name instance}}" target="_blank">
+        {{get_default_attr_value attr_name instance}}
+      </a>
+    {{else}}
+      {{get_default_attr_value attr_name instance}}
+    {{/if_helpers}}
+  {{/default}}
+{{/switch}}

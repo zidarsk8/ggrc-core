@@ -90,6 +90,7 @@
     },
     tree_view_options: {
       header_view: GGRC.mustache_path + '/audits/tree_header.mustache',
+      attr_view: GGRC.mustache_path + '/audits/tree-item-attr.mustache',
       attr_list: [{
         attr_title: 'Title',
         attr_name: 'title'
@@ -352,6 +353,9 @@
         {value: 'Secondary Contact', title: 'Secondary Contact'},
         {value: 'other', title: 'Others...'}
       ]
+    },
+    tree_view_options: {
+      attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache'
     },
 
     /**

@@ -40,6 +40,7 @@
       submitCbs: null,
       isBeforeLoad: true,
       displayPrefs: null,
+      disableColumnsConfiguration: false,
       init: function () {
         var self = this;
         this.attr('submitCbs').add(this.onSearch.bind(this));
@@ -81,6 +82,7 @@
           );
         this.attr('columns.available', columns.available);
         this.attr('columns.selected', columns.selected);
+        this.attr('disableColumnsConfiguration', columns.disableConfiguration);
       },
       setAdditionalScopeFilter: function () {
         var id = this.attr('baseInstance.scopeObject.id');
@@ -229,7 +231,18 @@
           item.isDisabled = relatedIds.indexOf(item.data.id) !== -1;
         });
       },
+      transformValue: function (value) {
+        var Model = this.getDisplayModel();
+        var useSnapshots = this.useSnapshots();
+        if (useSnapshots) {
+          value.revision.content =
+            Model.model(value.revision.content);
+          return value;
+        }
+        return Model.model(value);
+      },
       load: function () {
+        var self = this;
         var modelKey = this.getModelKey();
         var dfd = can.Deferred();
         var query = this.getQuery('values', true);
@@ -244,7 +257,7 @@
                 return {
                   id: value.id,
                   type: value.type,
-                  data: value
+                  data: self.transformValue(value)
                 };
               });
             if (relatedData) {

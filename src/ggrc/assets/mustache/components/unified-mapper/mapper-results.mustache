@@ -12,11 +12,13 @@
                   all-selected="allSelected">
   {{#if items.length}}
     <div class="settings-row">
+      {{^disableColumnsConfiguration}}
       <mapper-results-columns-configuration
         model-type="getDisplayModel.shortName"
         available-columns="columns.available"
         {(selected-columns)}="columns.selected">
       </mapper-results-columns-configuration>
+      {{/columns.disableConfiguration}}
       {{^searchOnly}}
         <div class="list-selection-switcher">
           Select:

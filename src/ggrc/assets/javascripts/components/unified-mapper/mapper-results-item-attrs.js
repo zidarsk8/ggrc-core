@@ -5,6 +5,9 @@
 (function (can, GGRC) {
   'use strict';
 
+  var DEFAULT_ATTR_TEMPLATE =
+    '/static/mustache/base_objects/tree-item-attr.mustache';
+
   can.Component.extend('mapperResultsItemAttrs', {
     tag: 'mapper-results-item-attrs',
     template: can.view(
@@ -12,8 +15,15 @@
       '/components/unified-mapper/mapper-results-item-attrs.mustache'
     ),
     viewModel: {
+      init: function () {
+        var Model = CMS.Models[this.attr('modelType')];
+        var attrTemplate = Model.tree_view_options.attr_view;
+        this.attr('attrTemplate', attrTemplate || DEFAULT_ATTR_TEMPLATE);
+      },
       instance: null,
-      selectedColumns: []
+      columns: [],
+      modelType: '',
+      attrTemplate: DEFAULT_ATTR_TEMPLATE
     }
   });
 })(window.can, window.GGRC);

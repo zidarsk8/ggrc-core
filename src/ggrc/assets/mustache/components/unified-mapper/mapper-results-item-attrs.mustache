@@ -4,8 +4,6 @@
       {{#if_equals attr_type 'custom'}}
         <div class="custom tree-title-area">
           {{#get_custom_attr_value this instance}}
-          {{! because the object can currently only be a
-              person there is no need to switch }}
             {{#using person=object}}
               {{>'/static/mustache/people/popover.mustache'}}
             {{/using}}
@@ -14,53 +12,11 @@
       {{else}}
         <div class="owner tree-title-area">
           {{#instance}}
-            {{#switch attr_name}}
-              {{#case 'title'}}
-                {{instance.title}}
-              {{/case}}
-              {{#case 'owner'}}
-                {{#if owners.length}}
-                  {{#using contacts=owners}}
-                    {{#contacts}}
-                      {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-                    {{/contacts}}
-                  {{/using}}
-                {{/if}}
-              {{/case}}
-              {{#case 'contact'}}
-                <span>
-                  {{#using contact=instance.contact}}
-                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                  {{/using}}
-                </span>
-              {{/case}}
-              {{#case 'secondary_contact'}}
-                <span>
-                  {{#using contact=instance.secondary_contact}}
-                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                  {{/using}}
-                </span>
-              {{/case}}
-              {{#case 'network_zone'}}
-                {{#using network_zone=instance.network_zone}}
-                  {{network_zone.title}}
-                {{/using}}
-              {{/case}}
-              {{#case 'design'}}
-                {{#using design=instance.design}}
-                  {{design}}
-                {{/using}}
-              {{/case}}
-              {{#case 'operationally'}}
-                {{#using operationally=instance.operationally}}
-                  {{operationally}}
-                {{/using}}
-              {{/case}}
-
-              {{#default}}
-                {{get_default_attr_value attr_name instance}}
-              {{/default}}
-            {{/switch}}
+            {{#if_equals attr_name 'title'}}
+              {{title}}
+            {{else}}
+              {{> attrTemplate}}
+            {{/if_equals}}
           {{/instance}}
         </div>
       {{/if_equals}}

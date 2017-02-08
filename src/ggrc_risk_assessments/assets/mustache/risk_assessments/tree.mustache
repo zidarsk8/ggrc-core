@@ -40,34 +40,7 @@
                       {{else}}
                         <div class="owner tree-title-area">
                           {{#instance}}
-                            {{#switch attr_name}}
-                              {{#case 'ra_manager'}}
-                                <span>
-                                  {{#using contact=instance.ra_manager}}
-                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                                  {{/using}}
-                                </span>
-                              {{/case}}
-                              {{#case 'ra_counsel'}}
-                                <span>
-                                  {{#using contact=instance.ra_counsel}}
-                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                                  {{/using}}
-                                </span>
-                              {{/case}}
-
-                              {{#default}}
-                                {{#if_helpers '\
-                                  #if_equals' attr_name 'url' '\
-                                  or #if_equals' attr_name 'reference_url'}}
-                                    <a class="url" href="{{get_url_value attr_name instance}}" target="_blank">
-                                      {{get_default_attr_value attr_name instance}}
-                                    </a>
-                                {{else}}
-                                  {{get_default_attr_value attr_name instance}}
-                                {{/if_helpers}}
-                              {{/default}}
-                            {{/switch}}
+                            {{>'/static/mustache/ggrc_risk_assessments/risk_assessments/tree-item-attr.mustache'}}
                           {{/instance}}
                         </div>
                       {{/if_equals}}

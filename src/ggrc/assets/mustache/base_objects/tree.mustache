@@ -40,50 +40,7 @@
                       {{else}}
                         <div class="owner tree-title-area">
                           {{#instance}}
-                            {{#switch attr_name}}
-                              {{#case 'owner'}}
-                                {{#if owners.length}}
-                                  {{#using contacts=owners}}
-                                  {{#contacts}}
-                                    {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-                                  {{/contacts}}
-                                  {{/using}}
-                                {{/if}}
-                              {{/case}}
-                              {{#case 'contact'}}
-                                <span>
-                                  {{#using contact=instance.contact}}
-                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                                  {{/using}}
-                                </span>
-                              {{/case}}
-                              {{#case 'secondary_contact'}}
-                                <span>
-                                  {{#using contact=instance.secondary_contact}}
-                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                                  {{/using}}
-                                </span>
-                              {{/case}}
-                              {{#case 'network_zone'}}
-                                {{#using network_zone=instance.network_zone}}
-                                  {{network_zone.title}}
-                                {{/using}}
-                              {{/case}}
-                              {{#case 'design'}}
-                                {{#using design=instance.design}}
-                                  {{design}}
-                                {{/using}}
-                              {{/case}}
-                              {{#case 'operationally'}}
-                                {{#using operationally=instance.operationally}}
-                                  {{operationally}}
-                                {{/using}}
-                              {{/case}}
-
-                              {{#default}}
-                                  {{get_default_attr_value attr_name instance}}
-                              {{/default}}
-                            {{/switch}}
+                            {{> '/static/mustache/base_objects/tree-item-attr.mustache' }}
                           {{/instance}}
                         </div>
                       {{/if_equals}}

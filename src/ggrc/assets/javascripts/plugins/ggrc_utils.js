@@ -868,12 +868,16 @@
         savedAttrList.length ? savedAttrList :
           (Model.tree_view_options.display_attr_names ||
           Cacheable.tree_view_options.display_attr_names);
+      var disableConfiguration =
+        !!Model.tree_view_options.disable_columns_configuration
       var mandatoryColumns;
       var displayColumns;
 
       var attrs =
         can.makeArray(
-          Model.tree_view_options.attr_list || Cacheable.attr_list
+          Model.tree_view_options.mapper_attr_list ||
+          Model.tree_view_options.attr_list ||
+          Cacheable.attr_list
         ).map(function (attr) {
           attr = Object.assign({}, attr);
           if (!attr.attr_sort_field) {
@@ -899,6 +903,14 @@
 
       var allAttrs = attrs.concat(customAttrs);
 
+      if (disableConfiguration) {
+        return {
+          available: allAttrs,
+          selected: allAttrs,
+          disableConfiguration: true
+        };
+      }
+
       displayAttrNames = displayAttrNames.concat(mandatoryAttrNames);
 
       allAttrs.forEach(function (attr) {
@@ -916,7 +928,8 @@
 
       return {
         available: allAttrs,
-        selected: mandatoryColumns.concat(displayColumns)
+        selected: mandatoryColumns.concat(displayColumns),
+        disableConfiguration: false
       };
     }
 
