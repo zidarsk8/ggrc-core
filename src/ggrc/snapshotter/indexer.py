@@ -117,11 +117,7 @@ def get_searchable_attributes(attributes, cad_list, content):
 
 
 def reindex():
-  """Reindex all snapshots
-
-  Returns:
-    Pair of parent-child that were reindexed.
-  """
+  """Reindex all snapshots."""
   columns = db.session.query(
       models.Snapshot.parent_type,
       models.Snapshot.parent_id,
@@ -131,7 +127,6 @@ def reindex():
   query = columns
   pairs = {Pair.from_4tuple(p) for p in query}
   reindex_pairs(pairs)
-  return pairs
 
 
 def delete_records(snapshot_ids):
