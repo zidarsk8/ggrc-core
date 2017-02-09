@@ -1,0 +1,44 @@
+<div class="flex-size-1">
+    <h6>Description</h6>
+    <read-more text="itemData.description"></read-more>
+</div>
+<div class="flex-size-1">
+    <h6>Notes</h6>
+    <read-more text="itemData.notes"></read-more>
+</div>
+<div class="object-popover-attributes flex-box flex-row flex-box-multi">
+    <div class="flex-size-1">
+        <h6>Code</h6>
+        <span>{{itemData.slug}}</span>
+    </div>
+    <div class="flex-size-1">
+        <h6>Owner</h6>
+      {{#if itemData.owners.length}}
+          <ul class="inner-count-list">
+            {{#each itemData.owners}}
+                <li>
+                    <person-info person-id="{{id}}"></person-info>
+                </li>
+            {{/each}}
+          </ul>
+      {{else}}
+          <span class="empty-message">None</span>
+      {{/if}}
+    </div>
+    <div class="flex-size-1">
+        <h6>Primary Contact</h6>
+      {{#if itemData.contact}}
+          <person-info person-obj="itemData.contact"></person-info>
+      {{else}}
+          <span class="empty-message">None</span>
+      {{/if}}
+    </div>
+    <div class="flex-size-1">
+        <h6>Secondary Contact</h6>
+      {{#if itemData.secondary_contact}}
+          <person-info person-obj="itemData.secondary_contact"></person-info>
+      {{else}}
+          <span class="empty-message">None</span>
+      {{/if}}
+    </div>
+</div>
