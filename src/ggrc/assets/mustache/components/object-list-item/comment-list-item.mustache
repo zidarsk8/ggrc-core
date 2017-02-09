@@ -1,0 +1,17 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+<div class="w-status">
+    <span class="entry-author">
+     <person-list-item person="modified_by"></person-list-item>
+      {{assignee_types assignee_type}} added a response - {{localize_date created_at}}
+    </span>
+  {{#if itemData.custom_attribute_revision}}
+      <h6 class="comment-list__ca-description">{{instance.custom_attribute_revision.custom_attribute.title}}
+          : {{itemData.custom_attribute_revision.custom_attribute_stored_value}}</h6>
+  {{/if}}
+    <div class="rtf-block">
+     <read-more text="itemText"></read-more>
+    </div>
+</div>
