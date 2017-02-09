@@ -280,6 +280,7 @@ dashboard-js-template-files:
   - components/add-object-button/add-object-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
   - add_widget_menu.mustache
+  - base_objects/empty.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
   - base_objects/confirm_unmap.mustache
