@@ -1,36 +1,32 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
-"""Models for widgets other than the info widget"""
+"""Models for widgets other than the info widget."""
 
 import re
-
 from selenium.common import exceptions
 
 from lib import base
 from lib.page.widget import info_widget
-from lib.constants import locator
-from lib.constants import regex
+from lib.constants import locator, regex
 from lib.utils import selenium_utils
 
 
 class Widget(base.Widget):
-  """Class representing all widgets with filters that list objects"""
+  """Class representing all widgets with filters that list objects."""
   _info_pane_cls = None
   _locator_widget = None
   _locator_filter = None
   members_listed = None
-  classes_names_with_base_filter = ("AsmtTmpls")
 
   def __init__(self, driver):
-    # wait for the elements to loads
     self.member_count = None
-    self.button_help = base.Button(driver, self._locator_filter.BUTTON_HELP)
+    self.classes_of_objs_with_base_filter = (AsmtTmpls.__name__)
     self.common_filter_locators = dict(
         text_box_locator=self._locator_filter.TEXTFIELD_TO_FILTER,
         bt_submit_locator=self._locator_filter.BUTTON_FILTER,
         bt_clear_locator=self._locator_filter.BUTTON_RESET)
-    if self.__class__.__name__ in self.classes_names_with_base_filter:
+    self.button_help = base.Button(driver, self._locator_filter.BUTTON_HELP)
+    if self.__class__.__name__ in self.classes_of_objs_with_base_filter:
       self.filter = base.FilterCommon(driver, **self.common_filter_locators)
     else:
       self.filter = base.Filter(

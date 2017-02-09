@@ -3,15 +3,11 @@
 """Module for base classes"""
 
 import re
-
 from selenium import webdriver
 from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
 
-from lib import constants
-from lib import exception
-from lib import meta
-from lib import mixin
+from lib import constants, exception, mixin
 from lib.utils import selenium_utils
 # pylint: disable=too-few-public-methods
 
@@ -59,7 +55,6 @@ class TestUtil(InstanceRepresentation):
 
 class Element(InstanceRepresentation):
   """The Element class represents primitives in the models"""
-  __metaclass__ = meta.RequireDocs
 
   def __init__(self, driver, locator):
     super(Element, self).__init__()
@@ -133,7 +128,7 @@ class TextInputField(RichTextInputField):
 
 class TextFilterDropdown(Element):
   """Model for elements which are using autocomplete in a text field with a
-  dropdown list of found results
+  dropdown list of found results and static dropdown list of text elements.
   """
 
   def __init__(self, driver, textbox_locator, dropdown_locator):
@@ -143,18 +138,17 @@ class TextFilterDropdown(Element):
     self.text_to_filter = None
 
   def _filter_results(self, text):
+    """Filter results used text."""
     self.text_to_filter = text
-
     self.element.click()
     self.element.clear()
     self._driver.find_element(*self._locator).send_keys(text)
 
   def _select_first_result(self):
-    # wait that it appears
+    """Wait that it appears and select first result."""
     selenium_utils.get_when_visible(self._driver, self._locator_dropdown)
     dropdown_elements = self._driver.find_elements(
         *self._locator_dropdown)
-
     self.text = dropdown_elements[0].text
     dropdown_elements[0].click()
     selenium_utils.get_when_invisible(self._driver, self._locator_dropdown)
@@ -343,8 +337,6 @@ class DropdownStatic(Element):
 
 class Component(InstanceRepresentation):
   """The Component class is a container for elements"""
-
-  __metaclass__ = meta.RequireDocs
 
   def __init__(self, driver):
     """
