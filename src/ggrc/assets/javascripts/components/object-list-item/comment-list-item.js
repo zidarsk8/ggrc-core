@@ -40,9 +40,21 @@
           }
         },
         hasRevision: {
-
+          get: function () {
+            return this.attr('commentRevision') || false;
+          }
         },
-
+        commentRevision: {
+          get: function () {
+            return this.attr('itemData.custom_attribute_revision');
+          }
+        },
+        customAttributeData: {
+          get: function () {
+            return this.attr('commentRevision.custom_attribute.title') +
+           ':' + this.attr('commentRevision.custom_attribute_stored_value');
+          }
+        }
       }
     }
   });
