@@ -20,20 +20,25 @@ class Widget(base.Widget):
   _locator_widget = None
   _locator_filter = None
   members_listed = None
+  classes_names_with_base_filter = ("AsmtTmpls")
 
   def __init__(self, driver):
-    # wait for the elements to load
+    # wait for the elements to loads
     self.member_count = None
-    self.filter = base.Filter(
-        driver, text_box=self._locator_filter.TEXTFIELD_TO_FILTER,
-        bt_filter=self._locator_filter.BUTTON_FILTER,
-        bt_reset=self._locator_filter.BUTTON_RESET,
-        bt_help=self._locator_filter.BUTTON_HELP,
-        ch_active=self._locator_filter.ACTIVE_CHECKBOX,
-        ch_draft=self._locator_filter.DRAFT_CHECKBOX,
-        ch_deprecated=self._locator_filter.CHECKBOX_DEPRECATED
-    )
-    self.filter.show_all_objs()
+    self.button_help = base.Button(driver, self._locator_filter.BUTTON_HELP)
+    self.common_filter_locators = dict(
+        text_box_locator=self._locator_filter.TEXTFIELD_TO_FILTER,
+        bt_submit_locator=self._locator_filter.BUTTON_FILTER,
+        bt_clear_locator=self._locator_filter.BUTTON_RESET)
+    if self.__class__.__name__ in self.classes_names_with_base_filter:
+      self.filter = base.FilterCommon(driver, **self.common_filter_locators)
+    else:
+      self.filter = base.Filter(
+          driver, ch_active_locator=self._locator_filter.ACTIVE_CHECKBOX,
+          ch_draft_locator=self._locator_filter.DRAFT_CHECKBOX,
+          ch_deprecated_locator=self._locator_filter.CHECKBOX_DEPRECATED,
+          **self.common_filter_locators)
+      self.filter.show_all_objs()
 
     super(Widget, self).__init__(driver)
     self._set_members_listed()
@@ -65,10 +70,6 @@ class Widget(base.Widget):
       selenium_utils.get_when_invisible(
           self._driver,
           locator.ObjectWidget.LOADING)
-      # selenium_utils.get_when_visible(
-      #     self._driver,
-      #     locator.ObjectWidget.MEMBERS_TITLE_LIST)
-
       self.members_listed = self._driver.find_elements(
           *locator.ObjectWidget.MEMBERS_TITLE_LIST)
     else:
@@ -107,7 +108,7 @@ class Widget(base.Widget):
           locator.BaseWidgetGeneric.FILTER_PANE_COUNTER,
           new_count)
     else:
-        self.verify_counter_not_loaded()
+      self.verify_counter_not_loaded()
 
   def select_nth_member(self, member):
     """Selects member from the list. Members start from (including) 0.
