@@ -8,6 +8,10 @@ Revises: 1431e7094e26
 Create Date: 2015-07-07 14:31:27.780564
 
 """
+# Workaround legacy code which blocks Workflow new attribute addition
+
+# flake8: noqa
+# pylint: skip-file
 
 # revision identifiers, used by Alembic.
 revision = '44047daa31a9'
@@ -15,21 +19,23 @@ down_revision = '4840f4760f4b'
 
 from alembic import op
 import sqlalchemy as sa
-from sqlalchemy.dialects import mysql
+# from sqlalchemy.dialects import mysql
 
-from datetime import date
-from ggrc.app import app
-from ggrc import settings, db
-import ggrc_workflows.models as models
-from ggrc_workflows import adjust_next_cycle_start_date
-from ggrc_workflows.services.workflow_cycle_calculator import \
-    get_cycle_calculator
+# from datetime import date
+# from ggrc.app import app
+# from ggrc import settings, db
+# import ggrc_workflows.models as models
+# from ggrc_workflows import adjust_next_cycle_start_date
+# from ggrc_workflows.services.workflow_cycle_calculator import \
+#     get_cycle_calculator
 
 
 def upgrade():
     op.add_column('workflows',
                   sa.Column('non_adjusted_next_cycle_start_date',
                   sa.Date(), nullable=True))
+    # Workaround legacy code which blocks Workflow new attribute addition
+    return
 
     # If somebody deleted all the tasks we must clear the next cycle start
     # date
