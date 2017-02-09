@@ -27,7 +27,7 @@
           <i class="fa fa-question-circle" rel="tooltip" title="Audit for this Issue"></i>
         </label>
         {{#using audit=instance.audit }}
-          <input tabindex="2" class="input-block-level" name="audit.title" data-permission-type="update" data-lookup="Audit" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Audit" type="text" null-if-empty="false" value="{{firstnonempty audit.title ''}}" />
+          <input tabindex="2" class="input-block-level" name="audit.title" data-permission-type="update" data-lookup="Audit" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Audit" type="text" null-if-empty="false" value="{{firstnonempty audit.title ''}}" disabled="disabled" />
         {{/using}}
       </div>
     {{else}}
