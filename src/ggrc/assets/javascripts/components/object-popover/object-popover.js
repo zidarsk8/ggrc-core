@@ -21,9 +21,13 @@
       maxInnerHeight: defaultMaxInnerHeight,
       openStyle: '',
       item: null,
+      popoverTitle: 'No Title is provided',
+      popoverLink: '/dashboard',
       itemData: function () {
         var isSnapshot = this.attr('item.data.type') === 'Snapshot';
-        return isSnapshot ? this.attr('item.data.revision.content') : this.attr('item.data');
+        return isSnapshot ?
+          this.attr('item.data.revision.content') :
+          this.attr('item.data');
       },
       isActive: function () {
         return this.attr('active');
