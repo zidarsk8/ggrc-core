@@ -6,8 +6,8 @@ import re
 from selenium.common import exceptions
 
 from lib import base
-from lib.page.widget import info_widget
 from lib.constants import locator, regex
+from lib.page.widget import info_widget
 from lib.utils import selenium_utils
 
 
@@ -20,13 +20,13 @@ class Widget(base.Widget):
 
   def __init__(self, driver):
     self.member_count = None
-    self.classes_of_objs_with_base_filter = (AsmtTmpls.__name__)
+    self.classes_base_filter = ()
     self.common_filter_locators = dict(
         text_box_locator=self._locator_filter.TEXTFIELD_TO_FILTER,
         bt_submit_locator=self._locator_filter.BUTTON_FILTER,
         bt_clear_locator=self._locator_filter.BUTTON_RESET)
     self.button_help = base.Button(driver, self._locator_filter.BUTTON_HELP)
-    if self.__class__.__name__ in self.classes_of_objs_with_base_filter:
+    if self.__class__.__name__ in self.classes_base_filter:
       self.filter = base.FilterCommon(driver, **self.common_filter_locators)
     else:
       self.filter = base.Filter(
@@ -145,11 +145,11 @@ class Controls(Widget):
 
   def __init__(self, driver,):
     super(Controls, self).__init__(driver)
-    self.label_title = base.Label(
-        driver,
-        locator.ObjectWidget.CONTROL_COLUMN_TITLE)
-    self.label_owner = base.Label(driver, locator.ObjectWidget.CONTROL_OWNER)
-    self.label_state = base.Label(driver, locator.ObjectWidget.COTNROL_STATE)
+    self.label_title = base.Label(driver, locator.ObjectWidget.HEADER_TITLE)
+    self.label_owner = base.Label(driver, locator.ObjectWidget.HEADER_OWNER)
+    self.label_state = base.Label(driver, locator.ObjectWidget.HEADER_STATE)
+    self.label_last_asmt_date = base.Label(
+        driver, locator.ObjectWidget.HEADER_LAST_ASSESSMENT_DATE)
 
 
 class Issues(Widget):
