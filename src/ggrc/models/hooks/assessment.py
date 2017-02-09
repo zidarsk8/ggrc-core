@@ -37,15 +37,8 @@ def init_hook():
     for obj, src in izip(objects, sources):
       src_obj = src.get("object")
       audit = src.get("audit")
-      program = src.get("program")
       map_assessment(obj, src_obj)
       map_assessment(obj, audit)
-      # The program may also be set as the src_obj. If so then it should not be
-      # mapped again.
-      if (src_obj and program and
-          (src_obj["id"] != program["id"] or
-           src_obj["type"] != program["type"])):
-        map_assessment(obj, program)
 
       if not src.get("_generated"):
         continue
