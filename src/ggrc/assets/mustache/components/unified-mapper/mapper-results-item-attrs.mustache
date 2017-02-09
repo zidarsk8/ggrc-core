@@ -2,13 +2,11 @@
   {{#each selectedColumns}}
     <div class="attr">
       {{#if_equals attr_type 'custom'}}
-        <div class="custom tree-title-area">
-          {{#get_custom_attr_value this instance}}
-            {{#using person=object}}
-              {{>'/static/mustache/people/popover.mustache'}}
-            {{/using}}
-          {{/get_custom_attr_value}}
-        </div>
+        {{#get_custom_attr_value this instance}}
+          {{#using person=object}}
+            {{>'/static/mustache/people/popover.mustache'}}
+          {{/using}}
+        {{/get_custom_attr_value}}
       {{else}}
         {{#instance}}
           {{#if_equals attr_name 'title'}}

@@ -219,8 +219,8 @@
         return CMS.Models[this.attr('type')];
       },
       setDisabledItems: function (allItems, relatedIds) {
-        // Do not perform extra mapping validation in case Assessment generation
-        if (this.attr('mapper.assessmentGenerator')) {
+        if (this.searchOnly() ||
+            this.attr('mapper.assessmentGenerator')) {
           return;
         }
         allItems.forEach(function (item) {

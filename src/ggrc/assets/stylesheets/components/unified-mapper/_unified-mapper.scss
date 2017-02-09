@@ -215,6 +215,7 @@ mapper-results-item {
     align-items: center;
     cursor: pointer;
     flex-grow: 1;
+    width: 0;
 
     .fa {
       width: 32px;
@@ -255,6 +256,7 @@ mapper-results-item-status {
 mapper-results-item-attrs {
   display: block;
   flex: 1 1;
+  overflow: hidden;
 
   .attr {
     @include cell-styles();
