@@ -925,7 +925,7 @@
       var type = model.root_collection;
       content.isLatestRevision = instance.is_latest_revision;
       content.originalLink = '/' + type + '/' + content.id;
-      content.snapshot = new CMS.Models.Snapshot(instance);
+      content.snapshot = new can.Map(instance);
       content.related_sources = [];
       content.related_destinations = [];
       content.viewLink = content.snapshot.viewLink;
