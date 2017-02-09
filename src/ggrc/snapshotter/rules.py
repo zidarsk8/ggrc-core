@@ -37,6 +37,11 @@ class Types(object):
       "Audit",
   }
 
+  scoped = {
+      "Assessment",
+      "Issue",
+  }
+
   ignore = {
       "Assessment",
       "AssessmentTemplate",

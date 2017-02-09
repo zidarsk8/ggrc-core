@@ -112,15 +112,13 @@ class ControlFactory(TitledFactory):
   class Meta:
     model = models.Control
 
-  directive = factory.SubFactory(DirectiveFactory)
-  kind_id = None
-  version = None
-  documentation_description = None
-  verify_frequency_id = None
-  fraud_related = None
-  key_control = None
-  active = None
-  notes = None
+  directive = factory.LazyAttribute(lambda m: RegulationFactory())
+
+
+class IssueFactory(TitledFactory):
+
+  class Meta:
+    model = models.Issue
 
 
 class AssessmentFactory(TitledFactory):

@@ -8,6 +8,9 @@
 from sqlalchemy import func
 from flask import json
 
+from ddt import ddt
+from ddt import data
+
 from ggrc import app
 from ggrc import views
 from ggrc import models
@@ -18,17 +21,48 @@ from integration.ggrc.models import factories
 
 
 # pylint: disable=super-on-old-class
+@ddt
 class TestAuditSnapshotQueries(TestCase):
   """Tests for /query api for Audit snapshots"""
+
+  # objects mapped to assessments after set up:
+  # Assessment 1 -- Market 1,
+  # Assessment 2 -- Market 2, Control 1,
+  # Assessment 3 -- Market 3, Control 1, Control 2
+  # Assessment 4 -- Market 4, Control 1, Control 2, Control 3
+
+  # Number of controls mapped to assessments
+  ASSESSMENT_COUNTS = {
+      "Assessment 1": 0,
+      "Assessment 2": 1,
+      "Assessment 3": 2,
+      "Assessment 4": 3,
+  }
+
+  # Number of assessments mapped to controls
+  CONTROL_COUNTS = {
+      "Control 0": 0,  # unmapped control
+      "Control 1": 3,
+      "Control 2": 2,
+      "Control 3": 1,
+      "Control 4": 0,
+      "Control 5": 0,
+  }
+
+  AUDIT_COUNTS = {
+      "Control 0": 0,  # unmapped control
+      "Control 1": 1,
+      "Control 2": 1,
+  }
 
   def setUp(self):
     """Log in before performing queries."""
     self.client.get("/login")
 
-  def _post(self, data):
+  def _post(self, request_data):
     return self.client.post(
         "/query",
-        data=json.dumps(data),
+        data=json.dumps(request_data),
         headers={"Content-Type": "application/json", }
     )
 
@@ -54,8 +88,9 @@ class TestAuditSnapshotQueries(TestCase):
     audit = factories.AuditFactory()
 
     for i in range(5):
+      factories.ControlFactory(title="Control {}".format(i + 1))
       factories.OrgGroupFactory()
-      market = factories.MarketFactory()
+      market = factories.MarketFactory(title="Market {}".format(i + 1))
       factories.CustomAttributeValueFactory(
           custom_attribute=date_cad,
           attributable=market,
@@ -68,7 +103,7 @@ class TestAuditSnapshotQueries(TestCase):
       )
 
     revisions = models.Revision.query.filter(
-        models.Revision.resource_type.in_(["OrgGroup", "Market"]),
+        models.Revision.resource_type.in_(["OrgGroup", "Market", "Control"]),
         models.Revision.id.in_(
             db.session.query(func.max(models.Revision.id)).group_by(
                 models.Revision.resource_type,
@@ -77,13 +112,52 @@ class TestAuditSnapshotQueries(TestCase):
         ),
     )
 
-    for revision in revisions:
-      factories.SnapshotFactory(
-          child_id=revision.resource_id,
-          child_type=revision.resource_type,
-          revision=revision,
-          parent=audit,
-      )
+    snapshots = [
+        factories.SnapshotFactory(
+            child_id=revision.resource_id,
+            child_type=revision.resource_type,
+            revision=revision,
+            parent=audit,
+        )
+        for revision in revisions
+    ]
+
+    snapshot_map = {snapshot.revision.content["title"]: snapshot
+                    for snapshot in snapshots}
+
+    # create Assessments and issues and map some snapshots to them
+    # Markets and Controls represent snapshots of those objects.
+
+    assessment_issues = (
+        factories.AssessmentFactory,
+        factories.IssueFactory,
+    )
+    for i in range(4):
+      for factory in assessment_issues:
+        # pylint: disable=protected-access
+        obj = factory(
+            title="{} {}".format(factory._meta.model.__name__, i + 1),
+        )
+        factories.RelationshipFactory(
+            source=audit if i % 2 == 0 else obj,
+            destination=audit if i % 2 == 1 else obj,
+        )
+
+        market = snapshot_map["Market {}".format(i + 1)]
+        factories.RelationshipFactory(
+            source=market if i % 2 == 0 else obj,
+            destination=market if i % 2 == 1 else obj,
+        )
+        for j in range(i):
+          control = snapshot_map["Control {}".format(j + 1)]
+          factories.RelationshipFactory(
+              source=control if i % 2 == 0 else obj,
+              destination=control if i % 2 == 1 else obj,
+          )
+
+    # Create an unmapped control for base tests
+    factories.ControlFactory(title="Control 0")
+
     views.do_reindex()
 
   def test_basic_snapshot_query(self):
@@ -189,6 +263,126 @@ class TestAuditSnapshotQueries(TestCase):
         }
     ])
     self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 3)
+
+  @data(*CONTROL_COUNTS.items())
+  def test_assesessment_relationships(self, test_data):
+    """Test relationships between Assessments and original objects."""
+    title, expected = test_data
+    control = models.Control.query.filter_by(title=title).first()
+
+    result = self._post([
+        {
+            "object_name": "Assessment",
+            "filters": {
+                "expression": {
+                    "object_name": "Control",
+                    "op": {"name": "relevant"},
+                    "ids": [control.id]
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    count = len(result.json[0]["Assessment"]["values"])
+    self.assertEqual(count, expected,
+                     "Invalid related Assessment count for '{}'."
+                     "Expected {}, got {}".format(title, expected, count))
+
+  @data(*ASSESSMENT_COUNTS.items())
+  def test_original_objects(self, test_data):
+    """Test relationships between original objects and Assessments."""
+    title, expected = test_data
+    assessment = models.Assessment.query.filter_by(title=title).first()
+
+    result = self._post([
+        {
+            "object_name": "Control",
+            "filters": {
+                "expression": {
+                    "object_name": "Assessment",
+                    "op": {"name": "relevant"},
+                    "ids": [assessment.id]
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    count = len(result.json[0]["Control"]["values"])
+    self.assertEqual(count, expected,
+                     "Invalid related Control count for '{}'."
+                     "Expected {}, got {}".format(title, expected, count))
+
+  def test_audit_empty_queries(self):
+    """Test Audit relationship for irrelevant objects."""
+    result = self._post([
+        {
+            "object_name": "Audit",
+            "filters": {
+                "expression": {
+                    "object_name": "Control",
+                    "op": {"name": "relevant"},
+                    "ids": [-1]
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    count = len(result.json[0]["Audit"]["values"])
+    expected = 0
+    self.assertEqual(count, expected,
+                     "Invalid related Audit count for Audit."
+                     "Expected {}, got {}".format(expected, count))
+
+  def test_audit_parent_relationships(self):
+    """Test snapshotted object relationship to Audits."""
+    audit = models.Audit.query.first()
+    result = self._post([
+        {
+            "object_name": "Control",
+            "filters": {
+                "expression": {
+                    "object_name": "Audit",
+                    "op": {"name": "relevant"},
+                    "ids": [audit.id]
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    count = len(result.json[0]["Control"]["values"])
+    expected = 5  # Audit should contain 5 control snapshots
+    self.assertEqual(count, expected,
+                     "Invalid related Control count for Audit."
+                     "Expected {}, got {}".format(expected, count))
+
+  @data(*AUDIT_COUNTS.items())
+  def test_audit_child_relationships(self, test_data):
+    """Test audit relationships for snapshotted objects."""
+    title, expected = test_data
+    control = models.Control.query.filter_by(title=title).first()
+
+    result = self._post([
+        {
+            "object_name": "Audit",
+            "filters": {
+                "expression": {
+                    "object_name": "Control",
+                    "op": {"name": "relevant"},
+                    "ids": [control.id]
+                },
+                "keys": [],
+                "order_by": {"keys": [], "order": "", "compare": None}
+            }
+        }
+    ])
+    count = len(result.json[0]["Audit"]["values"])
+    self.assertEqual(count, expected,
+                     "Invalid related Audit count for '{}'."
+                     "Expected {}, got {}".format(title, expected, count))
 
   @staticmethod
   def _get_model_expression(model_name="Market"):
