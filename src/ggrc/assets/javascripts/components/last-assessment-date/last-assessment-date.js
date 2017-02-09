@@ -20,16 +20,21 @@
     tag: 'last-assessment-date',
     template: '<content/>',
     viewModel: {
-      controlId: null,
+      instanceId: null,
+      instanceType: null,
       lastAssessmentDate: null
     },
     init: function () {
-      this.loadLastAssessment(this.viewModel.controlId);
+      var id = this.viewModel.instanceId;
+      var type = this.viewModel.instanceType;
+      if (id && type) {
+        this.loadLastAssessment(type, id);
+      }
     },
-    loadLastAssessment: function (id) {
+    loadLastAssessment: function (type, id) {
       var viewModel = this.viewModel;
       var params = queryAPI.buildParam(REQUESTED_TYPE, FILTER_OPTIONS, {
-        type: 'Control',
+        type: type,
         id: id
       }, REQUIRED_FIELDS);
 

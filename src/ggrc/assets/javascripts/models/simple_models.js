@@ -140,10 +140,16 @@ can.Model.Cacheable("CMS.Models.Objective", {
       show_view : GGRC.mustache_path + "/objectives/tree.mustache"
     , footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache"
     , attr_list : can.Model.Cacheable.attr_list.concat([
+      {
+        attr_title: 'Last Assessment Date',
+        attr_name: 'last_assessment_date',
+        order: 45 // between State and Primary Contact
+      },
       {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
-    ])
-    , add_item_view : GGRC.mustache_path + "/snapshots/tree_add_item.mustache"
+    ]),
+    display_attr_names: ['title', 'owner', 'status', 'last_assessment_date'],
+    add_item_view : GGRC.mustache_path + "/snapshots/tree_add_item.mustache"
     , create_link : true
     //, draw_children : true
     , start_expanded : false
