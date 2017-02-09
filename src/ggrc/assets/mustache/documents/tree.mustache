@@ -45,21 +45,7 @@
                 </div>
               {{/instance}}
               <div class="span4">
-                <div class="show-details">
-                  {{#child_options}}
-                    {{#if add_item_view}}
-                      {{{renderLive add_item_view}}}
-                    {{/if}}
-                  {{/child_options}}
-                  <view-object-buttons instance="instance" open-is-hidden="is_subtree" />
-                </div>
-                <ul class="tree-action-list">
-                  {{#infer_roles instance}}
-                    <li>
-                      <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
-                    </li>
-                  {{/infer_roles}}
-                </ul>
+                <tree-node-actions instance="instance" child-options="child_options" draw-roles="true"></tree-node-actions>
               </div>
             </div>
           </div><!-- item-data end -->

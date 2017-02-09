@@ -64,14 +64,7 @@
               </div>
 
               <div class="span4">
-
-                <div class="show-details">
-                  {{#child_options}}
-                    {{{renderLive add_item_view}}}
-                  {{/child_options}}
-                  <view-object-buttons instance="instance" open-is-hidden="is_subtree" />
-                </div>
-
+                <tree-node-actions instance="instance" child-options="child_options"></tree-node-actions>
               </div>
             </div>
           </div><!-- item-data end -->

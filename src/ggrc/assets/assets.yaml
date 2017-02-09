@@ -232,6 +232,7 @@ dashboard-js-files:
   - components/object-selection/object-selection.js
   - components/object-selection/object-selection-item.js
   - components/last-assessment-date/last-assessment-date.js
+  - components/tree/tree-node-actions.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -402,6 +403,7 @@ dashboard-js-template-files:
   - components/datepicker/datepicker.mustache
   - components/object_counter/object_counter.mustache
   - components/tree_pagination/tree_pagination.mustache
+  - components/tree/tree-node-actions.mustache
   - components/simple-modal/simple-modal.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
