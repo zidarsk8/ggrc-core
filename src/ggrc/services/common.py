@@ -964,6 +964,9 @@ class Resource(ModelView):
     with benchmark("Send PUT - after commit event"):
       self.model_put_after_commit.send(obj.__class__, obj=obj,
                                        src=src, service=self, event=event)
+      # Note: Some data is created in listeners for model_put_after_commit
+      # (like updates to snapshots), so we need to commit the changes
+      db.session.commit()
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     with benchmark("Make response"):
