@@ -104,6 +104,30 @@
       }
     }
 
+    &.btn-primary {
+      .fa {
+        color: $blue;
+
+        &:hover {
+          background: transparent;
+        }
+      }
+    }
+
+    &.btn-icon-md {
+      line-height: 26px;
+      padding: 0 8px;
+
+      .fa {
+        line-height: 26px;
+        font-size: 20px;
+        height: 26px;
+        width: 26px;
+        border-radius: 2px;
+      }
+
+    }
+
     &.btn-icon-lg {
       line-height: 32px;
       padding: 0 8px;
@@ -113,7 +137,7 @@
         font-size: 28px;
         height: 32px;
         width: 34px;
-        border-radius: 3px;
+        border-radius: 2px;
       }
     }
   }
