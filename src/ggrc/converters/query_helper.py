@@ -514,10 +514,11 @@ class QueryHelper(object):
           raise BadQueryException("Can't order by '__similarity__' when no ",
                                   "'similar' filter was applied.")
       else:
-        key, _ = self.attr_name_map[model].get(key, (key, None))
-        attr = getattr(model, key.encode('utf-8'), None)
-        if attr is None:
-          # non object attributes are treated as custom attributes
+        if model.__name__ != "Snapshot":
+          key, _ = self.attr_name_map[model].get(key, (key, None))
+          attr = getattr(model, key.encode('utf-8'), None)
+        if model.__name__ == "Snapshot" or attr is None:
+          # Snapshot or non object attributes are treated as custom attributes
           self._count += 1
           joins, order = by_ca()
         elif (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
