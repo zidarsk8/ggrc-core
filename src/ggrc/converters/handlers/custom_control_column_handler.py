@@ -20,18 +20,14 @@ class CustomControlSnapshotInstanceColumnHandler(
     pool_ids = {i.child_id for i in self.audit_object_pool_query.all()}
     if to_append_ids - pool_ids:
       self.add_error(errors.ILLIGAL_APPEND_CONTROL_VALUE,
-                     column_name=self.display_name)
+                     object_type=self.row_converter.obj.__class__.__name__)
       return False
     return True
 
   def is_valid_delete(self, to_delete_ids):
     "return True if data valid else False"
-    if self.unmap:
-      self.add_error(errors.INVALID_TO_UNMAP,
-                     column_name=self.display_name)
     if to_delete_ids:
-      self.add_error(errors.ILLIGAL_REMOVE_CONTROL_VALUE,
-                     column_name=self.display_name)
+      self.add_error(errors.ILLIGAL_REMOVE_CONTROL_VALUE)
     return not to_delete_ids
 
   def parse_item(self, *args, **kwargs):
