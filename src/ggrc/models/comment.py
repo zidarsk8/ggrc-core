@@ -80,6 +80,7 @@ class Commentable(object):
       "comment": {
           "display_name": "Comment",
           "filter_by": "_filter_by_comments",
+          "filter_only": True
       },
   }
 
