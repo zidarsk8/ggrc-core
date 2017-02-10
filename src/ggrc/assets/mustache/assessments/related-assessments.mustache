@@ -8,11 +8,10 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
             <tree-pagination paging="paging"></tree-pagination>
             {{#is_allowed 'update' baseInstance context='for'}}
                 <div class="grid-data-toolbar-control">
-                    <button {{^hasSelected}}disabled{{/hasSelected}}
-                            class="btn btn-small btn-full btn-success"
-                            can-click="reuseSelected">
-                      Reuse
-                    </button>
+                    <button class="btn btn-small btn-full btn-success"
+                            can-click="reuseSelected"
+                            {{^hasSelected}}disabled{{/hasSelected}}
+                    >Reuse</button>
                 </div>
             {{/is_allowed}}
         </div>
@@ -43,7 +42,8 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
             </div>
         </div>
           <div class="grid-data-body {{#if isLoading}}loading{{/if}}">
-            <object-list items="relatedObjects" is-loading="isLoading" spinner-css="grid-spinner">
+            <object-list items="relatedObjects" is-loading="isLoading" spinner-css="grid-spinner" selected-item="selectedItem"
+                         object-list-item-selector="objectSelectorEl">
                 <div class="grid-data-row flex-row flex-box">
                     <div class="grid-data-item-index">
                       <state-colors-map state="status"></state-colors-map>
@@ -102,10 +102,11 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                         </mapped-objects>
                     </div>
                     <div class="grid-data__action-column">
-                      <button class="btn btn-icon btn-icon-lg"><i class="fa fa-ellipsis-h"></i></button>
+                        <button can-click="showPopover" class="btn btn-icon btn-icon-md btn-primary" title="Show More Information"><i class="fa fa-comment"></i></button>
                     </div>
                 </div>
             </object-list>
-          </div>
+              <related-assessment-popover class="object-popover" selected-assessment="selectedItem"></related-assessment-popover>
+        </div>
     </reusable-objects-list>
 </related-objects>
