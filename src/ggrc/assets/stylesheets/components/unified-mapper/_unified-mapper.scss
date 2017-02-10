@@ -9,7 +9,7 @@ $list-item-padding: 15px;
 $item-status-width: 8px;
 $icon-width: 32px;
 $view-object-buttons-width: 55px;
-$object-selection-item-width: 37px;
+$object-selection-item-width: 102px;
 $first-column-width: 25%;
 $items-separator-color: #e0e0e0;
 
@@ -129,8 +129,12 @@ mapper-results {
 
   .list-selection-switcher {
     position: absolute;
-    right: 14px;
-    top: 0;
+    right: 8px;
+    top: -3px;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
 
     label {
       font-size: 11px !important;
@@ -142,6 +146,11 @@ mapper-results {
         margin-bottom: 6px !important;
         margin-left: 2px;
       }
+    }
+
+    .btn.btn-link {
+      padding: 0 4px;
+      text-transform: uppercase;
     }
   }
 
@@ -308,10 +317,6 @@ mapper-results-columns-configuration {
 
   .dropdown-toggle {
     i {
-      color: $gray;
-    }
-
-    &:hover i {
       color: $black;
     }
   }
@@ -376,6 +381,11 @@ mapper-results-columns-configuration {
   modal-mapper {
     .modal-body {
       padding-bottom: 30px !important;
+
+      .well.well-small {
+        font-size: 13px;
+        padding: 9px 16px 7px;
+      }
     }
     .modal-footer {
       padding-top: 10px !important;

@@ -28,9 +28,7 @@
                   {(filter)}="mapper.filter"
                   (submit)="mapper.onToolbarSubmit()">
   </mapper-toolbar>
-  {{#mapper.afterSearch}}
-    <hr/>
-  {{/mapper.afterSearch}}
+  <hr/>
   <mapper-results
     class="{{#mapper.useSnapshots}}snapshot-list{{/mapper.useSnapshots}}
       {{^mapper.afterSearch}}hidden{{/mapper.afterSearch}}"
@@ -46,40 +44,42 @@
     scope-type="{{mapper.snapshot_scope_type}}"
     submit-cbs="mapper.toolbarSubmitCbs">
   </mapper-results>
+  <div class="well well-small
+              {{#mapper.afterSearch}}hidden{{/mapper.afterSearch}}">
+    No results
+  </div>
 </div>
-{{#mapper.afterSearch}}
-  {{^if mapper.search_only}}
-    <div class="modal-footer">
-      <div class="row-fluid">
-        <div class="span5">
-          <div class="deny-buttons"></div>
-        </div>
-        <div class="span7">
-          <div class="confirm-buttons">
-            {{mapper.selected.length}}
-            {{#if template.count}}
-              {{template.count}}
-            {{else}}
-              object(s) selected
-            {{/if}}
-            </span>
+{{^if mapper.search_only}}
+  <div class="modal-footer">
+    <div class="row-fluid">
+      <div class="span5">
+        <div class="deny-buttons"></div>
+      </div>
+      <div class="span7">
+        <div class="confirm-buttons">
+          {{mapper.selected.length}}
+          {{#if template.count}}
+            {{template.count}}
+          {{else}}
+            object(s) selected
+          {{/if}}
+          </span>
 
-            <button class="btn-map btn btn-small btn-success preventdoubleclick"
-                    {{^if mapper.selected.length}}disabled="disabled"{{/if}}>
-              {{#if mapper.is_saving}}
-                Saving, please wait...
+          <button class="btn-map btn btn-small btn-success preventdoubleclick"
+                  {{^if mapper.selected.length}}disabled="disabled"{{/if}}>
+            {{#if mapper.is_saving}}
+              Saving, please wait...
+            {{else}}
+              {{#if template.submitButton}}
+                {{template.submitButton}}
               {{else}}
-                {{#if template.submitButton}}
-                  {{template.submitButton}}
-                {{else}}
-                  Map Selected
-                {{/if}}
+                Map Selected
               {{/if}}
-            </button>
-            <spinner toggle="mapper.is_saving"></spinner>
-          </div>
+            {{/if}}
+          </button>
+          <spinner toggle="mapper.is_saving"></spinner>
         </div>
       </div>
     </div>
-  {{/if}}
-{{/mapper.afterSearch}}
+  </div>
+{{/if}}

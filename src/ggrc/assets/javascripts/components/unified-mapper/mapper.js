@@ -85,8 +85,8 @@
       if (GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
         return false;
       }
-      // In case we generate assessments this should be false no matter what objects should be mapped to assessments
-      if (this.attr('assessmentGenerator')) {
+      // In case we generate assessments or in search only mode this should be false no matter what objects should be mapped to assessments
+      if (this.attr('assessmentGenerator') || this.attr('search_only')) {
         return false;
       }
       return GGRC.Utils.Snapshots.isSnapshotParent(this.attr('object')) ||

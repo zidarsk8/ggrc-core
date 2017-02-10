@@ -31,6 +31,10 @@
       &.create {
         flex: 0;
         white-space: nowrap;
+
+        a {
+          width: 130px;
+        }
       }
 
       &:not(:last-child) {
@@ -171,6 +175,14 @@ relevant-filter {
     .modal-search {
       flex: 1 1;
       margin-left: 5px;
+    }
+
+    .modal-search {
+      display: flex;
+
+      input {
+        flex: 1 1;
+      }
     }
 
     label {

@@ -26,11 +26,10 @@
       </mapper-results-items-header>
       {{^searchOnly}}
         <div class="list-selection-switcher">
-          <label>
-            All
-            <input type="checkbox"
-                   can-value="selectAllCheckboxValue">
-          </label>
+          Select:
+          <button can-click="deselectAll" class="btn btn-link" {{#isLoading}}disabled="disabled"{{/isLoading}}>None</button>
+          |
+          <button can-click="selectAll" class="btn btn-link" {{#isLoading}}disabled="disabled"{{/isLoading}}>All</button>
         </div>
       {{/searchOnly}}
     </div>
