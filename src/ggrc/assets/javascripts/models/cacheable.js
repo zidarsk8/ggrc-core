@@ -113,14 +113,49 @@
   can.Model('can.Model.Cacheable', {
     root_object: '',
     attr_list: [
-    {attr_title: 'Title', attr_name: 'title'},
-    {attr_title: 'Owner', attr_name: 'owner', attr_sort_field: 'contact.name|email'},
-    {attr_title: 'Code', attr_name: 'slug'},
-    {attr_title: 'State', attr_name: 'status'},
-    {attr_title: 'Primary Contact', attr_name: 'contact', attr_sort_field: 'contact.name|email'},
-    {attr_title: 'Secondary Contact', attr_name: 'secondary_contact', attr_sort_field: 'secondary_contact.name|email'},
-    {attr_title: 'Last Updated', attr_name: 'updated_at'},
-    {attr_title: 'Review State', attr_name: 'os_state'}
+      {
+        attr_title: 'Title',
+        attr_name: 'title',
+        order: 10
+      },
+      {
+        attr_title: 'Owner',
+        attr_name: 'owner',
+        attr_sort_field: 'contact.name|email',
+        order: 20
+      },
+      {
+        attr_title: 'Code',
+        attr_name: 'slug',
+        order: 30
+      },
+      {
+        attr_title: 'State',
+        attr_name: 'status',
+        order: 40
+      },
+      {
+        attr_title: 'Primary Contact',
+        attr_name: 'contact',
+        attr_sort_field: 'contact.name|email',
+        order: 50
+      },
+      {
+        attr_title: 'Secondary Contact',
+        attr_name: 'secondary_contact',
+        attr_sort_field: 'secondary_contact.name|email',
+        order: 60
+      },
+      {
+        attr_title: 'Last Updated',
+        attr_name: 'updated_at',
+        order: 70
+      },
+      {
+        attr_title: 'Review State',
+        attr_name: 'os_state',
+        order: 80
+      }
     ],
 
     root_collection: '',

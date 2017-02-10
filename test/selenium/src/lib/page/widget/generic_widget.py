@@ -1,39 +1,40 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
-"""Models for widgets other than the info widget"""
+"""Models for widgets other than the info widget."""
 
 import re
-
 from selenium.common import exceptions
 
 from lib import base
+from lib.constants import locator, regex
 from lib.page.widget import info_widget
-from lib.constants import locator
-from lib.constants import regex
 from lib.utils import selenium_utils
 
 
 class Widget(base.Widget):
-  """Class representing all widgets with filters that list objects"""
+  """Class representing all widgets with filters that list objects."""
   _info_pane_cls = None
   _locator_widget = None
   _locator_filter = None
   members_listed = None
 
   def __init__(self, driver):
-    # wait for the elements to load
     self.member_count = None
-    self.filter = base.Filter(
-        driver, text_box=self._locator_filter.TEXTFIELD_TO_FILTER,
-        bt_filter=self._locator_filter.BUTTON_FILTER,
-        bt_reset=self._locator_filter.BUTTON_RESET,
-        bt_help=self._locator_filter.BUTTON_HELP,
-        ch_active=self._locator_filter.ACTIVE_CHECKBOX,
-        ch_draft=self._locator_filter.DRAFT_CHECKBOX,
-        ch_deprecated=self._locator_filter.CHECKBOX_DEPRECATED
-    )
-    self.filter.show_all_objs()
+    self.classes_base_filter = ()
+    self.common_filter_locators = dict(
+        text_box_locator=self._locator_filter.TEXTFIELD_TO_FILTER,
+        bt_submit_locator=self._locator_filter.BUTTON_FILTER,
+        bt_clear_locator=self._locator_filter.BUTTON_RESET)
+    self.button_help = base.Button(driver, self._locator_filter.BUTTON_HELP)
+    if self.__class__.__name__ in self.classes_base_filter:
+      self.filter = base.FilterCommon(driver, **self.common_filter_locators)
+    else:
+      self.filter = base.Filter(
+          driver, ch_active_locator=self._locator_filter.ACTIVE_CHECKBOX,
+          ch_draft_locator=self._locator_filter.DRAFT_CHECKBOX,
+          ch_deprecated_locator=self._locator_filter.CHECKBOX_DEPRECATED,
+          **self.common_filter_locators)
+      self.filter.show_all_objs()
 
     super(Widget, self).__init__(driver)
     self._set_members_listed()
@@ -65,10 +66,6 @@ class Widget(base.Widget):
       selenium_utils.get_when_invisible(
           self._driver,
           locator.ObjectWidget.LOADING)
-      # selenium_utils.get_when_visible(
-      #     self._driver,
-      #     locator.ObjectWidget.MEMBERS_TITLE_LIST)
-
       self.members_listed = self._driver.find_elements(
           *locator.ObjectWidget.MEMBERS_TITLE_LIST)
     else:
@@ -107,7 +104,7 @@ class Widget(base.Widget):
           locator.BaseWidgetGeneric.FILTER_PANE_COUNTER,
           new_count)
     else:
-        self.verify_counter_not_loaded()
+      self.verify_counter_not_loaded()
 
   def select_nth_member(self, member):
     """Selects member from the list. Members start from (including) 0.
@@ -148,11 +145,11 @@ class Controls(Widget):
 
   def __init__(self, driver,):
     super(Controls, self).__init__(driver)
-    self.label_title = base.Label(
-        driver,
-        locator.ObjectWidget.CONTROL_COLUMN_TITLE)
-    self.label_owner = base.Label(driver, locator.ObjectWidget.CONTROL_OWNER)
-    self.label_state = base.Label(driver, locator.ObjectWidget.COTNROL_STATE)
+    self.label_title = base.Label(driver, locator.ObjectWidget.HEADER_TITLE)
+    self.label_owner = base.Label(driver, locator.ObjectWidget.HEADER_OWNER)
+    self.label_state = base.Label(driver, locator.ObjectWidget.HEADER_STATE)
+    self.label_last_asmt_date = base.Label(
+        driver, locator.ObjectWidget.HEADER_LAST_ASSESSMENT_DATE)
 
 
 class Issues(Widget):
