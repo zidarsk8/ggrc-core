@@ -80,7 +80,7 @@
         });
       },
       updateRevision: function () {
-        var instance = this.instance.snapshot;
+        var instance = new CMS.Models.Snapshot(this.instance.snapshot);
         instance.refresh().then(function () {
           instance.attr('update_revision', 'latest');
           return instance.save();
