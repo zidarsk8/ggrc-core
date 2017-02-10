@@ -14,8 +14,11 @@
        'Objective', 'OrgGroup', 'Policy', 'Process', 'Product', 'Program',
        'Project', 'Regulation', 'Risk', 'Section', 'Standard', 'System',
        'Threat', 'Vendor'];
-    var notFilterableModels = ['Person', 'AssessmentTemplate', 'Workflow',
-        'TaskGroup', 'Cycle', 'CycleTaskGroupObjectTask'];
+    var notFilterableModels = [
+      'Person', 'Assessment', 'Issue',
+      'AssessmentTemplate', 'Workflow',
+      'TaskGroup', 'Cycle', 'CycleTaskGroupObjectTask'
+    ];
 
     /**
      * Check if model has state.
