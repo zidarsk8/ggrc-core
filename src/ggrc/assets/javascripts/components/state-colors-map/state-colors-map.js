@@ -5,7 +5,11 @@
 
 (function (can) {
   'use strict';
-
+  /* Default Sate for Assessment should be 'Not Started' */
+  var defaultState = 'Not Started';
+  /**
+   * Simple Component to add color indication for Assessment State Name
+   */
   can.Component.extend('stateColorsMap', {
     tag: 'state-colors-map',
     template: '<span style="color: {{color}};">{{state}}</span>',
@@ -13,11 +17,17 @@
       define: {
         state: {
           type: String,
-          value: 'Not Started'
+          value: defaultState
         },
         color: {
           get: function () {
-            return this.attr('colorsMap')[this.attr('state')];
+            var color = this.attr('colorsMap')[this.attr('state')];
+            if (!color) {
+              console.warn('State of the Object is not defined in Color Map: ',
+                this.attr('state'));
+            }
+            /* Set default 'Not Started' State Color in case incorrect state is provided */
+            return color || this.attr('colorsMap')[defaultState];
           }
         },
         colorsMap: {
