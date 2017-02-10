@@ -214,16 +214,6 @@
         display: flex;
         justify-content: flex-start;
 
-        .btn-extra-gray {
-          background: $btnPriority;
-          color: $white;
-          font-weight: normal;
-
-          &:hover {
-            background: lighten($btnPriority, 10%);
-          }
-        }
-
         .ggrc_controllers_quick_form {
           display: flex;
           box-sizing: border-box;

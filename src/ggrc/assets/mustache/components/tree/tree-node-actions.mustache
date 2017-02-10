@@ -21,7 +21,7 @@
     {{/infer_roles}}
   {{/if}}
   {{#if drawRelatedAssessment}}
-      <button class="btn btn-small btn-draft btn-extra-gray" can-click="showRelatedAssessments"
+      <button class="btn btn-mini action-button btn-draft btn-extra-gray" can-click="showRelatedAssessments"
               title="Show Related Assessments">Assessments
       </button>
   {{/if}}
@@ -30,7 +30,6 @@
         {{> '/static/mustache/base_objects/states.mustache'}}
       </li>
   {{/if}}
-
     <content/>
 </ul>
 {{#if drawRelatedAssessment}}
