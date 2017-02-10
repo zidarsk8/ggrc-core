@@ -373,6 +373,7 @@ dashboard-js-template-files:
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
   - assessments/related-assessments.mustache
+  - assessments/related-assessments-without-reuse.mustache
   - assessments/header.mustache
   - assessments/urls.mustache
   - assessments/dates_list.mustache
