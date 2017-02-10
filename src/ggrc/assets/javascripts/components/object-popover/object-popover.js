@@ -18,21 +18,17 @@
     template: tpl,
     viewModel: {
       expanded: false,
+      direction: 'left',
       maxInnerHeight: defaultMaxInnerHeight,
       openStyle: '',
       item: null,
+      popoverTitleInfo: '',
       popoverTitle: 'No Title is provided',
       popoverLink: '/dashboard',
-      itemData: function () {
-        var isSnapshot = this.attr('item.data.type') === 'Snapshot';
-        return isSnapshot ?
-          this.attr('item.data.revision.content') :
-          this.attr('item.data');
-      },
       isActive: function () {
         return this.attr('active');
       },
-      setPopoverStyle: function (el) {
+      setPopoverStyle: function (el, direction) {
         var pos = el[0].getBoundingClientRect();
         var top = Math.floor(el.position().top);
         var left = Math.floor(pos.width / 2);
@@ -41,12 +37,18 @@
         var topStyle = 'top: ' + top + 'px;';
         var leftStyle = 'left: ' + left + 'px;';
         var widthStyle = 'width: ' + width + 'px;';
+
+        if (direction === 'right') {
+          return topStyle + 'width: 480px; right: 80px;';
+        }
         return topStyle + leftStyle + widthStyle;
       },
       setStyle: function (el) {
-        var style = el ? this.setPopoverStyle(el) : '';
+        var direction = this.attr('direction');
+        var style = el ? this.setPopoverStyle(el, direction) : '';
         this.attr('active', style.length);
         this.attr('openStyle', style);
+        this.attr('expanded', false);
       }
     },
     events: {

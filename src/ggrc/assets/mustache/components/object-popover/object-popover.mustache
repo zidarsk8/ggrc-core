@@ -5,7 +5,7 @@
 <div class="object-popover-wrapper {{#if isActive}}active{{/if}}" style="{{openStyle}}">
     <div class="object-popover-body">
         <div class="object-popover-title">
-          <a href="{{popoverLink}}" target="_blank">{{popoverTitle}}</a>
+          {{popoverTitleInfo}}<a href="{{popoverLink}}" target="_blank" title="{{popoverTitle}}">{{popoverTitle}}</a>
         </div>
         <div class="object-popover-content flex-box flex-col flex-box-single" style="max-height: {{maxInnerHeight}}px;">
           <content>No Component or Template is provided</content>
