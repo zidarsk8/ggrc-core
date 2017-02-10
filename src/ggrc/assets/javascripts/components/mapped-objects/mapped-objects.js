@@ -198,12 +198,15 @@
         return dfd;
       },
       setMappedObjects: function () {
-        this.attr('mappedItems').replace(
-          this.attr('mappedSnapshots') ?
-            this.loadSnapshots() :
-            this.attr('mapping') ?
-              this.load() :
-              this.loadObjects());
+        var useSnapshots = this.attr('mappedSnapshots');
+        var hasMapping = this.attr('mapping');
+        var loadFn;
+        if (useSnapshots) {
+          loadFn = this.loadSnapshots;
+        } else {
+          loadFn = hasMapping ? this.load : this.loadObjects;
+        }
+        this.attr('mappedItems').replace(loadFn.call(this));
       }
     },
     init: function () {
