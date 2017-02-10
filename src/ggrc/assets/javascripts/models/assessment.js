@@ -28,7 +28,9 @@
       verified_date: 'date'
     },
     defaults: {
-      status: 'Not Started'
+      status: 'Not Started',
+      send_by_default: true,  // notifications when a comment is added
+      recipients: 'Assessor,Creator,Verifier'  // user roles to be notified
     },
     statuses: ['Not Started', 'In Progress', 'Ready for Review',
         'Verified', 'Completed'],
