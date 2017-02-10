@@ -88,6 +88,22 @@ EXCLUDE_MAPPINGS = set([
 ])
 
 
+def is_filter_only(alias_properties):
+  """Determine if alias is for filter use only.
+
+  Prevents alias filters from being exportable.
+
+  Args:
+    alias_properties: Alias properties.
+  Returns:
+    Boolean reflecting if it's filter only or not.
+  """
+  if isinstance(alias_properties, dict):
+    if alias_properties.get("filter_only"):
+      return True
+  return False
+
+
 class PublishOnly(object):
   """Attributes wrapped by ``PublishOnly`` instances should not be considered
   to be a part of an inherited list. For example, ``_update_attrs`` can be
@@ -328,7 +344,10 @@ class AttributeInfo(object):
     definitions = {}
 
     aliases = AttributeInfo.gather_aliases(object_class)
-    filtered_aliases = [(k, v) for k, v in aliases.items() if v is not None]
+    filtered_aliases = [
+        (attr, props) for attr, props in aliases.items()
+        if props is not None and not is_filter_only(props)
+    ]
 
     # push the extra delete column at the end to override any custom behavior
     if hasattr(object_class, "slug"):
