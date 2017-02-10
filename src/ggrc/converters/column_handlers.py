@@ -127,11 +127,9 @@ _COLUMN_HANDLERS = {
     DEFAULT_HANDLERS_KEY: _DEFAULT_COLUMN_HANDLERS_DICT,
     "Assessment": {
         "__mapping__:control": CustomControlSnapshotInstanceColumnHandler,
-        "__unmapping__:control": CustomControlSnapshotInstanceColumnHandler,
     },
     "Issue": {
         "__mapping__:control": CustomControlSnapshotInstanceColumnHandler,
-        "__unmapping__:control": CustomControlSnapshotInstanceColumnHandler,
     }
 }
 
