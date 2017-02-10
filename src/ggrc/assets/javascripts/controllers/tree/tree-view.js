@@ -185,6 +185,15 @@
         }
         selectAttrList.push(item);
       });
+
+      selectAttrList.sort(function (a, b) {
+        if (a.order && !b.order) {
+          return -1;
+        } else if (!a.order && b.order) {
+          return 1;
+        }
+        return a.order - b.order;
+      });
       // Get mandatory_attr_names
       mandatoryAttrNames = model.tree_view_options.mandatory_attr_names ?
         model.tree_view_options.mandatory_attr_names :

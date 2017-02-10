@@ -610,17 +610,18 @@ class WidgetBarButtonAddDropdown(object):
 
 
 class ObjectWidget(object):
-  """Locators for a generic widget"""
+  """Locators for a generic widget."""
+  _HEADER = '.header [class^="span"]'
 
-  CONTROL_COLUMN_TITLE = (
-      By.CSS_SELECTOR, '.header .span4 .title-heading .widget-col-title')
-  CONTROL_OWNER = (
-      By.CSS_SELECTOR, '.header .span4 [data-field="contact.name|email"]')
-  COTNROL_STATE = (
-      By.CSS_SELECTOR, '.header .span4 [data-field="status"]')
+  HEADER_TITLE = (By.CSS_SELECTOR, _HEADER + ' [data-field="title"]')
+  HEADER_OWNER = (By.CSS_SELECTOR,
+                  _HEADER + ' [data-field="contact.name|email"]')
+  HEADER_STATE = (By.CSS_SELECTOR, _HEADER + ' [data-field="status"]')
+  HEADER_LAST_ASSESSMENT_DATE = (
+      By.CSS_SELECTOR, _HEADER + ' [data-field="last_assessment_date"]')
   MEMBERS_TITLE_LIST = (
-      By.CSS_SELECTOR,
-      '.object-area .tree-structure .select .span4:nth-child(1) .title')
+      By.CSS_SELECTOR, '.object-area .tree-structure .select '
+                       '[class^="span"]:nth-child(1) .title')
   INFO_PANE = (By.CSS_SELECTOR, '.sticky-info-panel')
   LOADING = (By.CSS_SELECTOR, '.new-tree_loading')
 

@@ -37,9 +37,10 @@ describe('Model review state test', function () {
       'Threat', 'Vendor'];
   reviewObjects.forEach(function (object) {
     it('checks if ' + object + ' has os state in attr_list', function () {
-      expect(CMS.Models[object].attr_list).toContain(
-          {attr_title: 'Review State', attr_name: 'os_state'},
-          'for object ' + object);
+      expect(_.map(CMS.Models[object].attr_list, 'attr_title'))
+        .toContain('Review State', 'for object ' + object);
+      expect(_.map(CMS.Models[object].attr_list, 'attr_name'))
+        .toContain('os_state', 'for object ' + object);
     });
   });
 });

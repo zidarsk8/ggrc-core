@@ -292,11 +292,11 @@ class Controls(Widget):
 
   def __init__(self, driver,):
     super(Controls, self).__init__(driver)
-    self.label_title = base.Label(
-        driver,
-        locator.ObjectWidget.CONTROL_COLUMN_TITLE)
-    self.label_owner = base.Label(driver, locator.ObjectWidget.CONTROL_OWNER)
-    self.label_state = base.Label(driver, locator.ObjectWidget.COTNROL_STATE)
+    self.label_title = base.Label(driver, locator.ObjectWidget.HEADER_TITLE)
+    self.label_owner = base.Label(driver, locator.ObjectWidget.HEADER_OWNER)
+    self.label_state = base.Label(driver, locator.ObjectWidget.HEADER_STATE)
+    self.label_last_asmt_date = base.Label(
+        driver, locator.ObjectWidget.HEADER_LAST_ASSESSMENT_DATE)
 
 
 class Issues(Widget):
