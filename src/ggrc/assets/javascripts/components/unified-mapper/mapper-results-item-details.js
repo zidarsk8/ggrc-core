@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, GGRC) {
+(function (can, GGRC, CMS) {
   'use strict';
 
   GGRC.Components('mapperResultsItemDetails', {
@@ -13,7 +13,17 @@
       '/components/unified-mapper/mapper-results-item-details.mustache'
     ),
     viewModel: {
-      item: {}
+      init: function () {
+        var instance = this.attr('instance');
+        if (instance.snapshotObject) {
+          this.attr('instance', instance.snapshotObject);
+        } else {
+          this.attr('model', CMS.Models[instance.type]);
+        }
+      },
+      item: null,
+      instance: null,
+      model: null
     }
   });
-})(window.can, window.GGRC);
+})(window.can, window.GGRC, window.CMS);

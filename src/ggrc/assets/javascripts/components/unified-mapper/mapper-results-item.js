@@ -16,6 +16,7 @@
       itemData: {},
       searchOnly: false,
       selectedColumns: [],
+      showDetails: false,
       title: function () {
         var displayItem = this.displayItem();
         return displayItem.title ||

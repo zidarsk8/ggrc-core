@@ -243,6 +243,8 @@
         var Model = this.getDisplayModel();
         var useSnapshots = this.useSnapshots();
         if (useSnapshots) {
+          value.snapshotObject =
+            GGRC.Utils.Snapshots.toObject(value);
           value.revision.content =
             Model.model(value.revision.content);
           return value;

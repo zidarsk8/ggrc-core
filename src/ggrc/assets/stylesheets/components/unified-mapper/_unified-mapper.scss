@@ -158,7 +158,7 @@ mapper-results {
     overflow: hidden;
     cursor: default;
     border-radius: 2px;
-    margin: 2px 0;
+    padding: 2px $list-item-padding;
     padding: 0 $list-item-padding;
     line-height: 32px;
     font-size: 12px;
@@ -192,26 +192,98 @@ mapper-results {
   }
 
   mapper-results-item-details {
-    padding: 8px 16px 12px;
+    display: block;
+    padding: 8px 16px 20px;
     font-size: 12px;
-    border-radius: 2px;
-    margin: 2px 0;
-    background: #fff;
+    padding-left: $list-item-padding +
+                  $item-status-width +
+                  2 * $icon-width;
+    cursor: auto;
 
-    h6 {
-      margin: 4px 0;
+    &.is-snapshot {
+      padding-left: $list-item-padding +
+                    2 * $icon-width;
+    }
+
+    .col-container {
+      display: flex;
+      flex: 1 1;
+      flex-direction: column;
+      justify-content: space-between;
+
+      &:first-child {
+        padding-right: 15px;
+      }
+
+      .attr-container {
+        h6 {
+          margin: 4px 0;
+        }
+
+        .attr-value {
+          white-space: normal;
+          word-break: break-all;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+        }
+
+        &.title {
+          .attr-value {
+            -webkit-line-clamp: 1;
+          }
+        }
+
+        &.notes .attr-value {
+          -webkit-line-clamp: 3;
+        }
+
+        &.description .attr-value {
+          -webkit-line-clamp: 6;
+        }
+      }
+    }
+
+    .open-link-container,
+    .menu-button-container{
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .open-link-container {
+      margin-top: 3px;
+
+      a {
+        i {
+          color: $linkColor;
+          font-size: 12px;
+        }
+      }
+    }
+
+    .dropdown-toggle {
+      width: 32px;
+      background-color: transparent;
+      border: 1px solid #e0e4e5;
+    }
+
+    a {
+      cursor: pointer;
     }
   }
 
-  &.snapshot-list {
-    object-list {
-      object-list-item {
-        background: $snapshotBgnd;
 
-        mapper-results-item-details {
-          background-color: #f4fbfe;
-        }
+  &.snapshot-list {
+    .list-object-item {
+      background: $snapshotBgnd;
+
+      &.expanded {
+        background-color: #f4fbfe;
       }
+    }
+
+    mapper-results-item-details {
+      background-color: #f4fbfe;
     }
   }
 }
