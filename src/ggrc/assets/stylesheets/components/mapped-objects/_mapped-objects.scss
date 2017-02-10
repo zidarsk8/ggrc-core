@@ -131,3 +131,34 @@ assessment-mapped-controls, assessment-mapped-related-information {
     }
   }
 }
+.comment-object-item {
+  .comment-list__ca-description {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
+    line-height: 20px;
+    max-height: 20px;
+    margin: 0;
+  }
+  .comment-object-item__author {
+    display: flex;
+    flex-direction: row;
+
+    .comment-object-item__author_info {
+      font-size: 12px;
+      font-style: italic;
+      color: #999;
+    }
+
+    person-list-item {
+      font-size: 13px;
+      font-style: normal;
+      margin: 0 8px 0 0;
+    }
+  }
+  .comment-object-item__text {
+    font-size: 13px;
+  }
+}
+
