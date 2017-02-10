@@ -9,22 +9,34 @@
       {{{renderLive add_item_view}}}
     {{/if}}
   {{/childOptions}}
-  <view-object-buttons instance="instance" open-is-hidden="isSubtree" />
+    <view-object-buttons instance="instance" open-is-hidden="isSubtree"/>
 </div>
 
 <ul class="tree-action-list">
   {{#if drawRoles}}
     {{#infer_roles instance}}
-      <li>
-        <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
-      </li>
+        <li>
+            <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
+        </li>
     {{/infer_roles}}
   {{/if}}
+  {{#if drawRelatedAssessment}}
+      <button class="btn btn-small btn-draft btn-extra-gray" can-click="showRelatedAssessments"
+              title="Show Related Assessments">Assessments
+      </button>
+  {{/if}}
   {{#if drawStates}}
-    <li>
-      {{> '/static/mustache/base_objects/states.mustache'}}
-    </li>
+      <li>
+        {{> '/static/mustache/base_objects/states.mustache'}}
+      </li>
   {{/if}}
 
-  <content/>
+    <content/>
 </ul>
+{{#if drawRelatedAssessment}}
+    <simple-modal instance="instance" modal-title="modalTitle" state="state" extra-css-class="related-assessments">
+        <div class="simple-modal__body">
+          {{> '/static/mustache/assessments/related-assessments-without-reuse.mustache' }}
+        </div>
+    </simple-modal>
+{{/if}}
