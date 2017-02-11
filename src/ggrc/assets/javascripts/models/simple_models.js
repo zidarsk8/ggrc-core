@@ -152,6 +152,7 @@
       display_attr_names: ['title', 'owner', 'status', 'last_assessment_date'],
       add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
       create_link: true,
+      show_related_assessments: true,
       // draw_children: true,
       start_expanded: false,
       child_options: [{

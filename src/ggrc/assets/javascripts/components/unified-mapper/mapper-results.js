@@ -41,6 +41,11 @@
       displayPrefs: null,
       disableColumnsConfiguration: false,
       objectsPlural: false,
+      relatedAssessments: {
+        state: {},
+        instance: null,
+        show: false
+      },
       init: function () {
         var self = this;
         this.attr('submitCbs').add(this.onSearch.bind(this));
@@ -71,6 +76,7 @@
               return item.data;
             }));
             self.setColumnsConfiguration();
+            self.setRelatedAssessments();
             self.attr('isBeforeLoad', false);
           });
       },
@@ -83,6 +89,15 @@
         this.attr('columns.available', columns.available);
         this.attr('columns.selected', columns.selected);
         this.attr('disableColumnsConfiguration', columns.disableConfiguration);
+      },
+      setRelatedAssessments: function () {
+        var Model = this.getDisplayModel();
+        if (this.useSnapshots()) {
+          this.attr('relatedAssessments.show', false);
+          return;
+        }
+        this.attr('relatedAssessments.show',
+          !!Model.tree_view_options.show_related_assessments);
       },
       setAdditionalScopeFilter: function () {
         var id = this.attr('baseInstance.scopeObject.id');
@@ -318,6 +333,10 @@
       setItemsDebounced() {
         clearTimeout(this.attr('_setItemsTimeout'));
         this.attr('_setItemsTimeout', setTimeout(this.setItems.bind(this)));
+      },
+      showRelatedAssessments: function (ev) {
+        this.attr('relatedAssessments.instance', ev.instance);
+        this.attr('relatedAssessments.state.open', true);
       }
     },
     events: {

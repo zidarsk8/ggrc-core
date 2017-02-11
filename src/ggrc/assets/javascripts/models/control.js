@@ -77,6 +77,7 @@
       ]),
       display_attr_names: ['title', 'owner', 'status', 'last_assessment_date'],
       add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
+      show_related_assessments: true,
       draw_children: true,
       child_options: [{
         model: can.Model.Cacheable,
