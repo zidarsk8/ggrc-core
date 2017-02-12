@@ -80,9 +80,6 @@ class TestAssignableNotification(TestCase):
 
     This function tests that each assessment gets an entry in the
     notifications table after it's been created.
-    Second part of the tests is to make sure that assessment status
-    does not add any new notification entries if the assessment
-    does not have a verifier.
     """
 
     with freeze_time("2015-04-01"):
@@ -108,21 +105,6 @@ class TestAssignableNotification(TestCase):
       self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)
 
-      asmt = Assessment.query.get(asmts["A 5"].id)
-
-      self.api_helper.modify_object(asmt, {"status": Assessment.FINAL_STATE})
-      self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(asmt, {"status": Assessment.START_STATE})
-      self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(asmt,
-                                    {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(asmt, {"status": Assessment.FINAL_STATE})
-      self.assertEqual(self._get_notifications().count(), 0)
-      self.api_helper.modify_object(asmt,
-                                    {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 0)
-
   @patch("ggrc.notifications.common.send_email")
   def test_assessment_with_verifiers(self, _):
     """Test notifications entries for declined assessments.
@@ -130,9 +112,7 @@ class TestAssignableNotification(TestCase):
     This tests makes sure there are extra notification entries added when a
     assessment has been declined.
     """
-
     with freeze_time("2015-04-01"):
-
       self.assertEqual(self._get_notifications().count(), 0)
       self.import_file("assessment_with_templates.csv")
       asmts = {asmt.slug: asmt for asmt in Assessment.query}
@@ -154,30 +134,31 @@ class TestAssignableNotification(TestCase):
       self.api_helper.modify_object(asmt1,
                                     {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 0)
+
       self.api_helper.modify_object(asmt1, {"status": Assessment.DONE_STATE})
-      self.assertEqual(self._get_notifications().count(), 0)
+      self.assertEqual(self._get_notifications().count(), 1)
       # decline assessment 1
       self.api_helper.modify_object(asmt1,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 1)
+      self.assertEqual(self._get_notifications().count(), 3)
       self.api_helper.modify_object(asmt1, {"status": Assessment.DONE_STATE})
-      self.assertEqual(self._get_notifications().count(), 1)
+      self.assertEqual(self._get_notifications().count(), 3)
       # decline assessment 1 the second time
       self.api_helper.modify_object(asmt1,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 1)
+      self.assertEqual(self._get_notifications().count(), 3)
 
       asmt6 = Assessment.query.get(asmts["A 6"].id)
       # start and finish assessment 6
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 1)
+      self.assertEqual(self._get_notifications().count(), 3)
       self.api_helper.modify_object(asmt6, {"status": Assessment.DONE_STATE})
-      self.assertEqual(self._get_notifications().count(), 1)
+      self.assertEqual(self._get_notifications().count(), 4)
       # decline assessment 6
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 2)
+      self.assertEqual(self._get_notifications().count(), 6)
 
       # send all notifications
       self.client.get("/_notifications/send_daily_digest")
@@ -190,16 +171,16 @@ class TestAssignableNotification(TestCase):
       self.assertEqual(self._get_notifications().count(), 0)
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.DONE_STATE})
-      self.assertEqual(self._get_notifications().count(), 0)
+      self.assertEqual(self._get_notifications().count(), 1)
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.VERIFIED_STATE})
-      self.assertEqual(self._get_notifications().count(), 0)
+      self.assertEqual(self._get_notifications().count(), 2)
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 0)
+      self.assertEqual(self._get_notifications().count(), 3)
       # decline assessment 6
       self.api_helper.modify_object(asmt6, {"status": Assessment.DONE_STATE})
-      self.assertEqual(self._get_notifications().count(), 0)
+      self.assertEqual(self._get_notifications().count(), 3)
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 1)
+      self.assertEqual(self._get_notifications().count(), 4)
