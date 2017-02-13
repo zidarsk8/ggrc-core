@@ -176,6 +176,7 @@ dashboard-js-files:
   - components/reusable-objects/reusable-objects-list.js
   - components/reusable-objects/reusable-objects-item.js
   - components/simple-modal/simple-modal.js
+  - components/show-related-assessments-button/show-related-assessments-button.js
   - components/mapping-controls/mapping-type-selector.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
@@ -280,6 +281,7 @@ dashboard-js-template-files:
   - components/reusable-objects/reusable-objects-item.mustache
   - components/ca-object/ca-object-validation-icon.mustache
   - components/ca-object/ca-object-modal-content.mustache
+  - components/show-related-assessments-button/show-related-assessments-button.mustache
   - components/view-object-buttons/view-object-buttons.mustache
   - components/add-object-button/add-object-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
