@@ -2,7 +2,7 @@
   <div class="tree-pagination__count">
     <div class="dropdown">
       <div class="dropdown-toggle tree-view-pagination__count__title"
-          data-toggle="dropdown">{{paginationInfo paging.current paging.pageSize paging.total}}</div>
+          data-toggle="dropdown">{{getPaginationInfo}}</div>
       <div class="dropdown-menu">
         <span>Items per page:</span>
         <div class="btn-group">
@@ -27,7 +27,7 @@
     </li>
     <li>
       <input type="text" can-change="setCurrentPage" class="input"
-               placeholder="{{paginationPlaceholder paging.current paging.count}}" >
+               placeholder="{{getPaginationPlaceholder}}" >
     </li>
     <li class="{{#if_equals paging.current paging.count}} disabled{{/if_equals}}">
       <a can-click="setNextPage">
