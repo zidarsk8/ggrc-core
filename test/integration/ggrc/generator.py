@@ -169,11 +169,13 @@ class ObjectGenerator(Generator):
     self.generate_relationship(commentable, comment_, commentable.context)
     return response, comment_
 
-  def generate_user_role(self, person, role):
+  def generate_user_role(self, person, role, context=None):
     """Generate a mapping between `role` and `person`."""
+    if context:
+      context = self.create_stub(context)
     data = {
         "user_role": {
-            "context": None,
+            "context": context,
             "person": self.create_stub(person),
             "role": self.create_stub(role),
         }
