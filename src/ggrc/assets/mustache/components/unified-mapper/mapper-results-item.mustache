@@ -2,7 +2,9 @@
   Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<div class="flex-box list-object-item {{#isDisabled}}is-disabled{{/isDisabled}}">
+<div class="flex-box list-object-item
+            {{#isDisabled}}is-disabled{{/isDisabled}}
+  {{#showDetails}}expanded{{/showDetails}}">
   <div class="item-wrapper" can-click="toggleDetails">
     {{^isSnapshot}}
       <mapper-results-item-status
@@ -39,6 +41,7 @@
 {{#showDetails}}
   <mapper-results-item-details
     item="displayItem"
-    class="flex-box flex-col flex-box-single">
+    instance="itemData"
+    class="{{#isSnapshot}}is-snapshot{{/isSnapshot}}">
   </mapper-results-item-details>
 {{/showDetails}}
