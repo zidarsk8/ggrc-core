@@ -83,21 +83,27 @@ class ColumnHandler(object):
       self.row_converter.set_ignore()
 
   def set_value(self):
+    "set value for current culumn after parsing"
     self.value = self.parse_item()
 
   def get_value(self):
+    "get value for current column from instance"
     return getattr(self.row_converter.obj, self.key, self.value)
 
   def add_error(self, template, **kwargs):
+    "add error to current row"
     self.row_converter.add_error(template, **kwargs)
 
   def add_warning(self, template, **kwargs):
+    "add warning to current row"
     self.row_converter.add_warning(template, **kwargs)
 
   def parse_item(self):
+    "Parse item default handler"
     return self.raw_value
 
   def set_obj_attr(self):
+    "Set attribute value to object"
     if not self.set_empty and not self.value:
       return
     try:
@@ -111,6 +117,7 @@ class ColumnHandler(object):
       )
 
   def get_default(self):
+    "Get default value to column"
     if callable(self.default):
       return self.default()
     return self.default
@@ -130,8 +137,8 @@ class DeleteColumnHandler(ColumnHandler):
   TRUE_VALUES = {"true", "yes", "force"}
 
   def __init__(self, *args, **kwargs):
-      super(DeleteColumnHandler, self).__init__(*args, **kwargs)
-      self._allow_cascade = False
+    super(DeleteColumnHandler, self).__init__(*args, **kwargs)
+    self._allow_cascade = False
 
   def get_value(self):
     return ""
@@ -298,19 +305,20 @@ class DateColumnHandler(ColumnHandler):
     # TODO: change all importable date columns' type from 'DateTime'
     # to 'Date' type. Remove if statement after it.
     try:
-      value = parse(value) if value else None
-      if (type(getattr(self.row_converter.obj, self.key, None)) == date and
-              value):
-        return value.date()
+      if not value:
+        return
+      parsed_value = parse(value)
+      if type(getattr(self.row_converter.obj, self.key, None)) is date:
+        return parsed_value.date()
       else:
-        return value
+        return parsed_value
     except:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
 
   def get_value(self):
-    date = getattr(self.row_converter.obj, self.key)
-    if date:
-      return date.strftime("%m/%d/%Y")
+    value = getattr(self.row_converter.obj, self.key)
+    if value:
+      return value.strftime("%m/%d/%Y")
     return ""
 
 
@@ -338,7 +346,8 @@ class TextColumnHandler(ColumnHandler):
 
     return self.clean_whitespaces(self.raw_value)
 
-  def clean_whitespaces(self, value):
+  @staticmethod
+  def clean_whitespaces(value):
     return re.sub(r'\s+', " ", value)
 
 

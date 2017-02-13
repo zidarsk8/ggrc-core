@@ -71,12 +71,13 @@ def generate_csv_string(csv_data):
 
 def extract_relevant_data(csv_data):
   """ Split csv data into data and metadata """
-  striped_data = [map(unicode.strip, line) for line in csv_data]  # noqa
+  striped_data = [[unicode.strip(c) for c in line]
+                  for line in csv_data]  # noqa
   transpose_data = zip(*striped_data[1:])
-  non_empty = filter(any, transpose_data)
+  non_empty = [d for d in transpose_data if any(d)]
   data = zip(*non_empty[1:])
   column_definitions = list(data.pop(0))
-  data = map(list, data)
+  data = [list(d) for d in data]
   return column_definitions, data
 
 
@@ -84,7 +85,7 @@ def equalize_array(array):
   """ Expand all rows of 2D array to the same length """
   if len(array) == 0:
     return array
-  max_length = max(map(len, array))
+  max_length = max([len(i) for i in array])
   for row in array:
     diff = max_length - len(row)
     row.extend([""] * diff)
@@ -97,7 +98,7 @@ def split_array(csv_data):
   offsets = []
   current_block = None
   for offset, line in enumerate(csv_data):
-    if sum(map(len, line)) > 0:
+    if sum([len(l) for l in line]) > 0:
       if current_block is None:
         offsets.append(offset)
         data_blocks.append([])
