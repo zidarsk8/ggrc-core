@@ -17,14 +17,7 @@
       childOptions: null,
       drawRoles: false,
       drawStates: false,
-      drawRelatedAssessment: false,
-      state: {
-        open: false
-      },
-      modalTitle: 'Related Assessments',
-      showRelatedAssessments: function () {
-        this.attr('state.open', true);
-      }
+      drawRelatedAssessment: false
     }
   });
 })(window.can, window.GGRC);

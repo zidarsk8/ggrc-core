@@ -2,38 +2,31 @@
   Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-
-<div class="show-details">
-  {{#childOptions}}
-    {{#if add_item_view}}
-      {{{renderLive add_item_view}}}
-    {{/if}}
-  {{/childOptions}}
-    <view-object-buttons instance="instance" open-is-hidden="isSubtree"/>
-</div>
-
-<ul class="tree-action-list">
-  {{#if drawRoles}}
-    {{#infer_roles instance}}
-        <li>
-            <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
-        </li>
-    {{/infer_roles}}
-  {{/if}}
+<div class="tree-node-actions flex-box flex-row">
+    <ul class="tree-action-list">
+      {{#if drawRoles}}
+        {{#infer_roles instance}}
+            <li>
+                <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
+            </li>
+        {{/infer_roles}}
+      {{/if}}
+      {{#if drawStates}}
+          <li>
+            {{> '/static/mustache/base_objects/states.mustache'}}
+          </li>
+      {{/if}}
+        <content/>
+    </ul>
   {{#if drawRelatedAssessment}}
-      <button class="btn btn-mini action-button btn-draft btn-extra-gray" can-click="showRelatedAssessments"
-              title="Show Related Assessments">Assessments
-      </button>
-      <simple-modal instance="instance" modal-title="modalTitle" state="state" extra-css-class="related-assessments">
-        <div class="simple-modal__body">
-          {{> '/static/mustache/assessments/related-assessments-without-reuse.mustache' }}
-        </div>
-      </simple-modal>
+      <show-related-assessments-button instance="instance"></show-related-assessments-button>
   {{/if}}
-  {{#if drawStates}}
-      <li>
-        {{> '/static/mustache/base_objects/states.mustache'}}
-      </li>
-  {{/if}}
-    <content/>
-</ul>
+    <div class="show-details">
+      {{#childOptions}}
+        {{#if add_item_view}}
+          {{{renderLive add_item_view}}}
+        {{/if}}
+      {{/childOptions}}
+        <view-object-buttons instance="instance" open-is-hidden="isSubtree"/>
+    </div>
+</div>
