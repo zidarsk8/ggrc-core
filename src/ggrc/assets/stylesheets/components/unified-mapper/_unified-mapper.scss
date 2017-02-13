@@ -9,7 +9,9 @@ $list-item-padding: 15px;
 $item-status-width: 8px;
 $icon-width: 32px;
 $view-object-buttons-width: 55px;
+$related-assessment-button-width: 95px;
 $object-selection-item-width: 102px;
+$object-selection-item-with-related-assessments-width: 16px;
 $first-column-width: 25%;
 $items-separator-color: #e0e0e0;
 
@@ -115,11 +117,6 @@ mapper-results {
         color: $black;
         border-bottom: 1px solid $items-separator-color;
 
-        object-selection-item {
-          justify-content: flex-end;
-          width: $object-selection-item-width;
-        }
-
         &:first-child {
           border-top: 1px solid $items-separator-color;
         }
@@ -178,16 +175,28 @@ mapper-results {
       position: static;
     }
 
-    view-object-buttons {
-      position: relative;
-      width: $view-object-buttons-width;
-      top: -1px;
-    }
-
     mapper-results-item-status {
       .status-label {
         margin: 0;
       }
+    }
+
+    view-object-buttons,
+    .related-assessments-button {
+      display: flex;
+
+      .btn {
+        position: relative;
+        top: -1px;
+      }
+    }
+
+    view-object-buttons {
+      width: $view-object-buttons-width;
+    }
+
+    .related-assessments-button {
+      flex: 0 1 $related-assessment-button-width;
     }
   }
 
@@ -320,6 +329,18 @@ mapper-results-item {
       width: $icon-width;
     }
   }
+
+  object-selection-item {
+    justify-content: flex-end;
+    width: $object-selection-item-width;
+  }
+
+  &.has-related-assessments {
+
+    object-selection-item {
+      width: $object-selection-item-with-related-assessments-width;
+    }
+  }
 }
 
 mapper-results-item-status {
@@ -375,10 +396,20 @@ mapper-results-items-header {
 
   &.search-only {
     margin-right: $view-object-buttons-width;
+
+    &.has-related-assessments {
+      margin-right: $view-object-buttons-width +
+                    $related-assessment-button-width;
+    }
   }
 
   &.is-snapshot {
     margin-left: 2 * $icon-width;
+  }
+
+  &.has-related-assessments {
+    margin-right: $object-selection-item-with-related-assessments-width +
+                  $related-assessment-button-width;
   }
 }
 

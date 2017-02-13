@@ -18,7 +18,9 @@
         </mapper-results-columns-configuration>
       {{/disableColumnsConfiguration}}
       <mapper-results-items-header
-        class="{{#useSnapshots}}is-snapshot{{/useSnapshots}} {{#searchOnly}}search-only{{/searchOnly}}"
+        class="{{#useSnapshots}}is-snapshot{{/useSnapshots}}
+                {{#searchOnly}}search-only{{/searchOnly}}
+                {{#relatedAssessments.show}}has-related-assessments{{/relatedAssessments.show}}"
         model-type="type"
         columns="columns.selected"
         {(sort-key)}="sort.key"
@@ -36,9 +38,12 @@
     <div class="list-body {{#isLoading}}loading{{/isLoading}}">
       <object-list items="items" is-loading="isLoading" spinner-css="grid-spinner">
         <mapper-results-item
+          class="{{#relatedAssessments.show}}has-related-assessments{{/relatedAssessments.show}}"
           item-data="data"
           search-only="searchOnly"
-          selected-columns="columns.selected">
+          selected-columns="columns.selected"
+          draw-related-assessments="relatedAssessments.show"
+          (show-related-assessments)="showRelatedAssessments(%event)">
         </mapper-results-item>
       </object-list>
     </div>
@@ -49,3 +54,13 @@
     {{/isLoading}}
   {{/if}}
 </object-selection>
+{{#relatedAssessments.show}}
+  <simple-modal instance="relatedAssessments.instance"
+                modal-title="'Related Assessments'"
+                state="relatedAssessments.state"
+                extra-css-class="related-assessments">
+    <div class="simple-modal__body">
+      {{> '/static/mustache/assessments/related-assessments-without-reuse.mustache' }}
+    </div>
+  </simple-modal>
+{{/relatedAssessments.show}}

@@ -15,6 +15,7 @@
     viewModel: {
       itemData: {},
       searchOnly: false,
+      drawRelatedAssessments: false,
       selectedColumns: [],
       showDetails: false,
       title: function () {
@@ -50,6 +51,12 @@
           return this.attr('itemData.child_type');
         }
         return this.attr('itemData.type');
+      },
+      showRelatedAssessments: function () {
+        this.dispatch({
+          type: 'showRelatedAssessments',
+          instance: this.displayItem()
+        });
       }
     }
   });

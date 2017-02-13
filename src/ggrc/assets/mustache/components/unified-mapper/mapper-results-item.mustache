@@ -23,6 +23,15 @@
       columns="selectedColumns">
     </mapper-results-item-attrs>
   </div>
+  {{#drawRelatedAssessments}}
+  <div class="related-assessments-button">
+    <button class="btn btn-mini action-button btn-draft btn-extra-gray"
+            can-click="showRelatedAssessments"
+            title="Show Related Assessments">
+      Assessments
+    </button>
+  </div>
+  {{/drawRelatedAssessments}}
   {{#searchOnly}}
     <view-object-buttons instance="displayItem"
                          view-is-hidden="true">
