@@ -14,30 +14,30 @@
       </div>
     </div>
   </div>
-  <ul class="pagination">
-    <li class="{{#if_equals paging.current 1}} disabled{{/if_equals}}">
+  <div class="pagination">
+    <div class="pagination-item {{#if_equals paging.current 1}} disabled{{/if_equals}}">
       <a can-click="setFirstPage">
         <i class="fa fa-angle-double-left" aria-hidden="true"></i>
       </a>
-    </li>
-    <li class="{{#if_equals paging.current 1}} disabled{{/if_equals}}">
+    </div>
+    <div class="pagination-item {{#if_equals paging.current 1}} disabled{{/if_equals}}">
       <a can-click="setPrevPage">
         <i class="fa fa-angle-left" aria-hidden="true"></i>
       </a>
-    </li>
-    <li>
+    </div>
+    <div class="pagination-item">
       <input type="text" can-change="setCurrentPage" class="input"
                placeholder="{{getPaginationPlaceholder}}" >
-    </li>
-    <li class="{{#if_equals paging.current paging.count}} disabled{{/if_equals}}">
+    </div>
+    <div class="pagination-item {{#if_equals paging.current paging.count}} disabled{{/if_equals}}">
       <a can-click="setNextPage">
         <i class="fa fa-angle-right" aria-hidden="true"></i>
       </a>
-    </li>
-    <li class="{{#if_equals paging.current paging.count}} disabled{{/if_equals}}">
+    </div>
+    <div class="pagination-item {{#if_equals paging.current paging.count}} disabled{{/if_equals}}">
       <a can-click="setLastPage">
         <i class="fa fa-angle-double-right" aria-hidden="true"></i>
       </a>
-    </li>
-  </ul>
+    </div>
+  </div>
 </div>

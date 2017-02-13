@@ -2,101 +2,114 @@
  * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+tree-pagination {
+  text-align: left;
 
-.tree-pagination {
-  line-height: 26px;
-  font-size: 12px;
-
-  &__count {
-    width: 130px;
-    margin-right: 16px;
+  .tree-pagination {
     line-height: 26px;
-    cursor: pointer;
+    font-size: 12px;
 
-    button {
+    &__count {
+      width: 130px;
+      margin-right: 16px;
       line-height: 26px;
-      padding-top: 0;
-      padding-bottom: 0;
-    }
-    .tree-view-pagination__count__title {
-      font-weight: normal;
-      text-transform: none;
-      font-size: 11px;
-      line-height: 26px;
-      text-align: right;
-      margin: 0;
-      padding: 0;
-    }
-  }
-  .dropdown-menu {
-    padding: 8px;
-    line-height: 38px;
-    min-width: 140px;
+      cursor: pointer;
 
-    .btn-group {
-      .btn {
-        color: $black;
-        font-size: 14px;
+      button {
+        line-height: 26px;
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+      .tree-view-pagination__count__title {
         font-weight: normal;
-        border: 1px solid $widgetBorder;
-        background: $white;
-        border-radius: 0;
-        &.active {
-          background: $lightGray;
-        }
+        text-transform: none;
+        font-size: 11px;
+        line-height: 26px;
+        text-align: right;
+        margin: 0;
+        padding: 0;
       }
     }
-  }
-  .pagination {
-    margin: 0;
-    height: 26px;
 
-    ul {
-      margin-left: 8px;
-    }
-    li {
-      &:first-child {
-        a {
-          border-left-width: 1px;
-        }
-      }
-      &.disabled {
-        a {
-          i {
-            color: $gray;
-          }
-        }
-      }
-      a {
-        cursor: pointer;
-        border: 1px solid $widgetBorder;
-        border-left-width: 0;
-        line-height: 24px;
-        background: $white;
-        padding: 0 10px;
-        i {
+    .dropdown-menu {
+      padding: 8px;
+      line-height: 38px;
+      min-width: 140px;
+
+      .btn-group {
+        .btn {
           color: $black;
-          &:hover {
-            color: $gray;
+          font-size: 14px;
+          font-weight: normal;
+          border: 1px solid $widgetBorder;
+          background: $white;
+          border-radius: 0;
+          &.active {
+            background: $lightGray;
+          }
+        }
+      }
+    }
+
+    .pagination {
+      display: inline-flex;
+      flex-direction: row;
+      margin: 0;
+      height: 26px;
+      box-shadow: 0 1px 2px 0 rgba(122, 122, 122, 0.15);
+      border-radius: 2px;
+
+      .pagination-item {
+        line-height: 24px;
+        border: 1px solid $widgetBorder;
+        border-left-width: 0;
+        background: $white;
+
+        &:first-child {
+          border-left-width: 1px;
+          border-radius: 2px 0 0 2px;
+        }
+
+         &:last-child {
+          border-radius: 0 2px 2px 0;
+        }
+
+        &.disabled {
+          a {
+            cursor: default;
+            i {
+              color: $gray;
+            }
           }
         }
 
-      }
-      input {
-        vertical-align: top;
-        border-radius: 0;
-        height: 16px;
-        font-size: 12px;
-        margin-bottom: 0;
-        background-color: $white;
-        border-top: 1px solid $widgetBorder;
-        border-bottom: 1px solid $widgetBorder;
-        border-left-width: 0;
-        width: 120px;
-        float: left;
-        text-align: center;
-        &:focus {
-          border-color: $widgetBorder;
+        a {
+          line-height: 24px;
+          cursor: pointer;
+          padding: 0 10px;
+          border: 0;
+
+          i {
+            color: $black;
+            &:hover {
+              color: $gray;
+            }
+          }
+        }
+        input {
+          border: 0;
+          vertical-align: top;
+          border-radius: 0;
+          height: 16px;
+          font-size: 12px;
+          margin-bottom: 0;
+          background-color: $white;
+          width: 120px;
+          float: left;
+          text-align: center;
+          &:focus {
+            border-color: $widgetBorder;
+          }
         }
       }
     }
