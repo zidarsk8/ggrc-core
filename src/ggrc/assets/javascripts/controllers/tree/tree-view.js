@@ -43,8 +43,7 @@
       // { property: "controls", model: CMS.Models.Control, }
       // { parent_find_param: "system_id" ... }
       scroll_page_count: 1, // pages above and below viewport
-      is_subtree: false,
-      showMappedToAllParents: false
+      is_subtree: false
     },
     do_not_propagate: [
       'header_view',
@@ -284,6 +283,7 @@
             this.options.mapping);
         } else if (this.options.attr('is_subtree') &&
           GGRC.page_instance().type !== 'Workflow') {
+          this.options.attr('drawSubTreeExpander', true);
           this.page_loader = new GGRC.ListLoaders.SubTreeLoader(
             this.options.model, this.options.parent_instance,
             this.options.mapping);
@@ -357,7 +357,6 @@
 
       if (this.options.header_view && this.options.show_header) {
         optionsDfd = $.when(this.options).then(function (options) {
-          options.onChildShowStateChange = self.childShowStateChange.bind(self);
           options.onChildModelsChange = self.set_tree_display_list.bind(self);
           return options;
         });
@@ -876,7 +875,7 @@
       res.then(function () {
         _.defer(this.draw_visible.bind(this));
       }.bind(this)).always(function () {
-        if (this.options.is_subtree) {
+        if (this.options.is_subtree && this.options.drawSubTreeExpander) {
           this.addSubTreeExpander(items);
         }
       }.bind(this));
@@ -884,28 +883,25 @@
     },
 
     addSubTreeExpander: function () {
-      var parentCtrl = this.element.closest('section')
-        .find('.cms_controllers_tree_view').control();
-      var showMappedToAllParents = parentCtrl.options
-        .attr('showMappedToAllParents');
       var element;
       var options;
       var expander;
+      var self = this;
 
       if (this.element.find('.sub-tree-expander').length) {
         return;
       }
 
-      element = this.element.find('.parent-related:first');
+      this.element.addClass('not-directly-related-hide');
+
+      element = this.element.find('.not-directly-related:first');
       options = {
-        expanded: !!element.length && showMappedToAllParents
+        expanded: false,
+        disabled: !element.length,
+        onChangeState: self.showNotDirectlyMappedObjects.bind(self)
       };
       expander = can.view(GGRC.mustache_path +
         '/base_objects/sub_tree_expand.mustache', options);
-
-      if (!showMappedToAllParents) {
-        $(expander.firstElementChild).hide();
-      }
 
       if (element.length) {
         $(expander).insertBefore(element);
@@ -1276,53 +1272,32 @@
       this.refreshList();
     },
 
-    loadSubTree: function (allRelatedToParent) {
+    loadSubTree: function () {
       var parent = this.options.parent_instance;
       var queryAPI = GGRC.Utils.QueryAPI;
       var parentCtrl = this.element.closest('section')
         .find('.cms_controllers_tree_view').control();
-      var displayModels = can.makeArray(
-        parentCtrl.options.attr('selected_child_tree_model_list'));
       var originalOrder =
-        GGRC.tree_view.attr('orderedWidgetsByType')[parent.type];
+        can.makeArray(GGRC.tree_view.attr('orderedWidgetsByType')[parent.type]);
       var relevant = {
         type: parent.type,
         id: parent.id,
         operation: 'relevant'
       };
-      var current = GGRC.page_instance();
-      var addFilter;
       var states = parentCtrl.options.attr('selectStateList');
       var statesFilter = GGRC.Utils.State.statusFilter(states, '');
       var statesQuery = GGRC.query_parser.parse(statesFilter);
       var reqParams;
       var filter;
 
-      if (!allRelatedToParent) {
-        addFilter = {
-          expression: {
-            object_name: current.type,
-            op: {
-              name: 'relevant'
-            },
-            ids: [current.id]
-          }
-        };
-      }
-      displayModels = _.map(displayModels, 'model_name');
-      displayModels = _.intersection(originalOrder, displayModels);
-      reqParams = displayModels.map(function (model) {
-        if (!GGRC.Utils.State.hasState(model)) {
-          filter = addFilter;
-        } else {
-          filter = !addFilter ?
-            statesQuery :
-            [addFilter, statesQuery];
+      reqParams = originalOrder.map(function (model) {
+        if (GGRC.Utils.State.hasState(model)) {
+          filter = statesQuery;
         }
         return queryAPI.buildParam(model, {}, relevant, null, filter);
       });
 
-      return this.page_loader.load({data: reqParams}, displayModels);
+      return this.page_loader.load({data: reqParams}, originalOrder);
     },
 
     loadPage: function () {
@@ -1373,7 +1348,7 @@
     },
 
     clearList: function () {
-      this.element.children('.cms_controllers_tree_view_node').remove();
+      this.element.children('.tree-item').remove();
     },
 
     refreshList: function () {
@@ -1400,25 +1375,16 @@
             'Filter format is incorrect, data cannot be filtered.');
         }.bind(this));
     },
+    showNotDirectlyMappedObjects: function (isVisible) {
+      if (_.isBoolean(isVisible)) {
+        this.element.toggleClass('not-directly-related-hide', !isVisible);
+      }
+    },
     '{paging} change': _.debounce(
       function (object, event, type, action, newVal, oldVal) {
         if (oldVal !== newVal && _.contains(['current', 'pageSize'], type)) {
           this.refreshList();
         }
-      }),
-    childShowStateChange: function (childShowState) {
-      var expanderEls = this.element.find('.sub-tree-expander');
-
-      if (!_.isBoolean(childShowState)) {
-        return;
-      }
-      if (childShowState) {
-        expanderEls.show();
-      } else {
-        expanderEls.hide();
-      }
-
-      this.options.attr('showMappedToAllParents', !!childShowState);
-    }
+      })
   });
 })(window.can, window.$);

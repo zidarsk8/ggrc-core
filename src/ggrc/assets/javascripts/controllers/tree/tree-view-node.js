@@ -109,9 +109,9 @@
 
       if (!relatedInstances || relatedInstances &&
         !relatedInstances[instance.id]) {
-        this.element.addClass('parent-related');
+        this.element.addClass('not-directly-related');
       } else {
-        this.element.addClass('current-instance-related');
+        this.element.addClass('directly-related');
       }
     },
 
@@ -273,7 +273,7 @@
       this.element = firstchild.addClass(this.constructor._fullName)
         .data(oldData);
 
-      if (this.options.is_subtree) {
+      if (this.options.is_subtree && GGRC.page_instance().type !== 'Workflow') {
         this.markNotRelatedItem();
       }
       this.on();
@@ -289,13 +289,9 @@
       }.bind(this)));
     },
 
-    display_subtrees: function (refetch) {
+    display_subtrees: function () {
       var childTreeDfds = [];
       var that = this;
-      var parentCtrl = this.element.closest('section')
-        .find('.cms_controllers_tree_view').control();
-
-      refetch = refetch || parentCtrl.options.showMappedToAllParents;
 
       this.element.find('.' + CMS.Controllers.TreeView._fullName)
         .each(function (_, el) {
@@ -307,7 +303,7 @@
             childTreeControl = $el.control();
             if (childTreeControl) {
               that.options.attr('subTreeLoading', true);
-              childTreeDfds.push(childTreeControl.display(refetch)
+              childTreeDfds.push(childTreeControl.display()
                 .then(function () {
                   that.options.attr('subTreeLoading', false);
                 }));
