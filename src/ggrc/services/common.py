@@ -903,6 +903,20 @@ class Resource(ModelView):
   def json_update(self, obj, src):
     ggrc.builder.json.update(obj, src)
 
+  def _check_put_permissions(self, obj, new_context):
+    """Check context and resource permissions for PUT."""
+    if not permissions.is_allowed_update(
+        self.model.__name__, obj.id, obj.context_id)\
+       and not permissions.has_conditions('update', self.model.__name__):
+      raise Forbidden()
+    if not permissions.is_allowed_update_for(obj):
+      raise Forbidden()
+    if new_context != obj.context_id \
+       and not permissions.is_allowed_update(
+            self.model.__name__, obj.id, new_context)\
+       and not permissions.has_conditions('update', self.model.__name__):
+      raise Forbidden()
+
   def put(self, id):
     with benchmark("Query for object"):
       obj = self.get_object(id)
@@ -910,18 +924,8 @@ class Resource(ModelView):
       return self.not_found_response()
     src = self.request.json
     with benchmark("Query update permissions"):
-      if not permissions.is_allowed_update(
-          self.model.__name__, obj.id, obj.context_id)\
-         and not permissions.has_conditions('update', self.model.__name__):
-        raise Forbidden()
-      if not permissions.is_allowed_update_for(obj):
-        raise Forbidden()
       new_context = self.get_context_id_from_json(src)
-      if new_context != obj.context_id \
-         and not permissions.is_allowed_update(
-              self.model.__name__, obj.id, new_context)\
-         and not permissions.has_conditions('update', self.model.__name__):
-        raise Forbidden()
+      self._check_put_permissions(obj, new_context)
     if self.request.mimetype != 'application/json':
       return current_app.make_response(
           ('Content-Type must be application/json', 415, []))
