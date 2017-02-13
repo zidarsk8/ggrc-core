@@ -636,7 +636,7 @@ class ModalDeleteObject(object):
 
 class BaseInfoWidget(object):
   """Locators that are common to all info widgets"""
-  BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
+  BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility .dropdown-toggle')
   TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
