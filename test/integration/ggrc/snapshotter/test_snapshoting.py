@@ -5,6 +5,8 @@
 
 import collections
 
+import sqlalchemy as sa
+
 from ggrc import db
 import ggrc.models as models
 from ggrc.snapshotter.rules import Types
@@ -135,12 +137,15 @@ class TestSnapshoting(SnapshotterBaseTestCase):
 
     # Create a new objective, add it to program and edit control to detect
     # update.
+    # Map the objective to the control to check snapshot-to-snapshot mappings.
 
     objective = self.create_object(models.Objective, {
         "title": "Test Objective Snapshot UNEDITED"
     })
     self.create_mapping(program, objective)
+    self.create_mapping(objective, control)
 
+    control = self.refresh_object(control)
     self.api.modify_object(control, {
         "title": "Test Control Snapshot 1 Edit 2 AFTER initial snapshot"
     })
@@ -153,26 +158,44 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         }
     })
 
-    objective_snapshot = db.session.query(models.Snapshot).filter(
+    objective_snapshot_query = db.session.query(models.Snapshot).filter(
         models.Snapshot.child_type == "Objective",
         models.Snapshot.child_id == objective.id,
         models.Snapshot.parent_type == "Audit",
         models.Snapshot.parent_id == audit.id
     )
-    self.assertEqual(objective_snapshot.count(), 1)
+    self.assertEqual(objective_snapshot_query.count(), 1)
+    objective_snapshot = objective_snapshot_query.first()
     self.assertEqual(
-        objective_snapshot.first().revision.content["title"],
+        objective_snapshot.revision.content["title"],
         "Test Objective Snapshot UNEDITED")
 
-    control_snapshot = db.session.query(models.Snapshot).filter(
+    control_snapshot_query = db.session.query(models.Snapshot).filter(
         models.Snapshot.child_type == "Control",
         models.Snapshot.child_id == control.id,
         models.Snapshot.parent_type == "Audit",
         models.Snapshot.parent_id == audit.id
     )
-    self.assertEqual(control_snapshot.count(), 1)
-    self.assertEqual(control_snapshot.first().revision.content["title"],
+    self.assertEqual(control_snapshot_query.count(), 1)
+    control_snapshot = control_snapshot_query.first()
+    self.assertEqual(control_snapshot.revision.content["title"],
                      "Test Control Snapshot 1 Edit 2 AFTER initial snapshot")
+
+    snapshot_mapping = db.session.query(models.Relationship).filter(
+        models.Relationship.source_type == "Snapshot",
+        models.Relationship.destination_type == "Snapshot",
+        sa.or_(
+            sa.and_(
+                models.Relationship.source_id == control_snapshot.id,
+                models.Relationship.destination_id == objective_snapshot.id,
+            ),
+            sa.and_(
+                models.Relationship.source_id == objective_snapshot.id,
+                models.Relationship.destination_id == control_snapshot.id,
+            ),
+        ),
+    )
+    self.assertEqual(snapshot_mapping.count(), 1)
 
     control_revisions = db.session.query(models.Revision).filter(
         models.Revision.resource_type == control.type,
@@ -182,7 +205,8 @@ class TestSnapshoting(SnapshotterBaseTestCase):
 
     self.assertEqual(
         control_revisions.order_by(models.Revision.id.desc()).first().id,
-        control_snapshot.one().revision_id)
+        control_snapshot.revision_id,
+    )
 
   def test_update_to_specific_version(self):
     """Test global update and selecting a specific revision for one object"""
