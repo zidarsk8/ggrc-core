@@ -35,6 +35,7 @@
       var viewModel = this.viewModel;
       var params = queryAPI.buildParam(REQUESTED_TYPE, FILTER_OPTIONS, {
         type: type,
+        operation: 'relevant',
         id: id
       }, REQUIRED_FIELDS);
 
