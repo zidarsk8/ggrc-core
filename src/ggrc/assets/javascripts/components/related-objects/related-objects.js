@@ -27,6 +27,8 @@
         var relatedType = this.attr('relatedItemsType');
         var page = this.attr('paging');
         var orderBy = this.attr('orderBy') || defaultOrderBy;
+        var isAssessment = this.attr('baseInstance.type') === 'Assessment';
+        var op = isAssessment ? {name: 'similar'} : {name: 'relevant'};
         var params = {};
         var first;
         var last;
@@ -42,7 +44,7 @@
           filters: {
             expression: {
               object_name: type,
-              op: {name: 'similar'},
+              op: op,
               ids: [id]
             }
           }

@@ -7,17 +7,21 @@
   'use strict';
 
   var template = can.view(GGRC.mustache_path +
-    '/components/tree/tree-node-actions.mustache');
+    '/components/show-related-assessments-button' +
+    '/show-related-assessments-button.mustache');
 
   can.Component.extend({
-    tag: 'tree-node-actions',
+    tag: 'show-related-assessments-button',
     template: template,
     viewModel: {
       instance: null,
-      childOptions: null,
-      drawRoles: false,
-      drawStates: false,
-      drawRelatedAssessment: false
+      state: {
+        open: false
+      },
+      modalTitle: 'Related Assessments',
+      showRelatedAssessments: function () {
+        this.attr('state.open', true);
+      }
     }
   });
 })(window.can, window.GGRC);
