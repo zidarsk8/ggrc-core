@@ -30,6 +30,7 @@ permissions = {
         "Request",
         "Comment",
         "Assessment",
+        "AssessmentTemplate",
         "Issue",
         "Meeting",
         "ObjectControl",
