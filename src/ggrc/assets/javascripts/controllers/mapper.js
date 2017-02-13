@@ -21,6 +21,11 @@
       this.newInstance($target[0], $.extend({
         $trigger: $trigger
       }, options));
+
+      $target.on('hidden.bs.modal', function () {
+        $(this).remove();
+      });
+
       return $target;
     }
   }, {

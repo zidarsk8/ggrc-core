@@ -79,9 +79,15 @@
     },
     tree_view_options: {
       show_view: GGRC.mustache_path + '/people/tree.mustache',
+      attr_view: GGRC.mustache_path + '/people/tree-item-attr.mustache',
       header_view: GGRC.mustache_path + '/people/tree_header.mustache',
       footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
-      add_item_view: GGRC.mustache_path + '/people/tree_add_item.mustache'
+      add_item_view: GGRC.mustache_path + '/people/tree_add_item.mustache',
+      mapper_attr_list: [
+        {attr_title: 'Title', attr_name: 'title'},
+        {attr_title: 'Email', attr_name: 'email'}
+      ],
+      disable_columns_configuration: true
     },
     list_view_options: {
       find_params: {__sort: 'name,email'}

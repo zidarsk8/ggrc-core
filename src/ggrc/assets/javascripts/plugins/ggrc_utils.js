@@ -845,6 +845,140 @@
   })();
 
   /**
+   * TreeView-specific utils.
+   */
+  GGRC.Utils.TreeView = (function () {
+    /**
+     * Get available and selected columns for Model type
+     * @param {String} modelType - Model type.
+     * @param {Object} displayPrefs - Display preferences.
+     * @return {Object} Table columns configuration.
+     */
+    function getColumnsForModel(modelType, displayPrefs) {
+      var Cacheable = can.Model.Cacheable;
+      var Model = CMS.Models[modelType];
+      var modelDefinition = Model().class.root_object;
+      var modelName = Model.model_singular;
+      var mandatoryAttrNames =
+        Model.tree_view_options.mandatory_attr_names ||
+        Cacheable.tree_view_options.mandatory_attr_names;
+      var savedAttrList = displayPrefs ?
+        displayPrefs.getTreeViewHeaders(modelName) : [];
+      var displayAttrNames =
+        savedAttrList.length ? savedAttrList :
+          (Model.tree_view_options.display_attr_names ||
+          Cacheable.tree_view_options.display_attr_names);
+      var disableConfiguration =
+        !!Model.tree_view_options.disable_columns_configuration
+      var mandatoryColumns;
+      var displayColumns;
+
+      var attrs =
+        can.makeArray(
+          Model.tree_view_options.mapper_attr_list ||
+          Model.tree_view_options.attr_list ||
+          Cacheable.attr_list
+        ).map(function (attr) {
+          attr = Object.assign({}, attr);
+          if (!attr.attr_sort_field) {
+            attr.attr_sort_field = attr.attr_name;
+          }
+          return attr;
+        });
+
+      var customAttrs =
+        GGRC.custom_attr_defs
+          .filter(function (def) {
+            return def.definition_type === modelDefinition &&
+              def.attribute_type !== 'Rich Text';
+          }).map(function (def) {
+            return {
+              attr_title: def.title,
+              attr_name: def.title,
+              attr_sort_field: def.title,
+              display_status: false,
+              attr_type: 'custom'
+            };
+          });
+
+      var allAttrs = attrs.concat(customAttrs);
+
+      if (disableConfiguration) {
+        return {
+          available: allAttrs,
+          selected: allAttrs,
+          disableConfiguration: true
+        };
+      }
+
+      displayAttrNames = displayAttrNames.concat(mandatoryAttrNames);
+
+      allAttrs.forEach(function (attr) {
+        attr.display_status = displayAttrNames.indexOf(attr.attr_name) !== -1;
+        attr.mandatory = mandatoryAttrNames.indexOf(attr.attr_name) !== -1;
+      });
+
+      mandatoryColumns = allAttrs.filter(function (attr) {
+        return attr.mandatory;
+      });
+
+      displayColumns = allAttrs.filter(function (attr) {
+        return attr.display_status && !attr.mandatory;
+      });
+
+      return {
+        available: allAttrs,
+        selected: mandatoryColumns.concat(displayColumns),
+        disableConfiguration: false
+      };
+    }
+
+    /**
+     * Set selected columns for Model type
+     * @param {String} modelType - Model type.
+     * @param {Array} columnNames - Array of column names.
+     * @param {Object} displayPrefs - Display preferences.
+     * @return {Object} Table columns configuration.
+     */
+    function setColumnsForModel(modelType, columnNames, displayPrefs) {
+      var availableColumns =
+        getColumnsForModel(modelType, displayPrefs).available;
+      var selectedColumns = [];
+      var selectedNames = [];
+
+      availableColumns.forEach(function (attr) {
+        if (columnNames.indexOf(attr.attr_name) !== -1) {
+          attr.display_status = true;
+          selectedColumns.push(attr);
+          if (!attr.mandatory) {
+            selectedNames.push(attr.attr_name);
+          }
+        } else {
+          attr.display_status = false;
+        }
+      });
+
+      if (displayPrefs) {
+        displayPrefs.setTreeViewHeaders(
+          CMS.Models[modelType].model_singular,
+          selectedNames
+        );
+        displayPrefs.save();
+      }
+
+      return {
+        available: availableColumns,
+        selected: selectedColumns
+      };
+    }
+
+    return {
+      getColumnsForModel: getColumnsForModel,
+      setColumnsForModel: setColumnsForModel
+    };
+  })();
+
+  /**
    * Util methods for work with Snapshots.
    */
   GGRC.Utils.Snapshots = (function () {

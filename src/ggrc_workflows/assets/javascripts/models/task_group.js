@@ -35,9 +35,16 @@
 
     tree_view_options: {
       sort_property: 'sort_index',
+      attr_view: GGRC.mustache_path + '/task_groups/tree-item-attr.mustache',
       header_view: GGRC.mustache_path + '/task_groups/tree_header.mustache',
       footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
-      add_item_view: GGRC.mustache_path + '/task_groups/tree_add_item.mustache'
+      add_item_view: GGRC.mustache_path + '/task_groups/tree_add_item.mustache',
+      mapper_attr_list: [
+        {attr_title: 'Title', attr_name: 'title'},
+        {attr_title: 'Assignee', attr_name: 'assignee',
+          attr_sort_field: 'contact.name|email'}
+      ],
+      disable_columns_configuration: true
     },
 
     init: function () {
@@ -94,6 +101,16 @@
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
       task_group: 'CMS.Models.TaskGroup.stub'
+    },
+    tree_view_options: {
+      attr_view: GGRC.mustache_path +
+        '/task_group_tasks/tree-item-attr.mustache',
+      mapper_attr_list: [
+        {attr_title: 'Title', attr_name: 'title'},
+        {attr_title: 'Assignee', attr_name: 'assignee',
+          attr_sort_field: 'contact.name|email'}
+      ],
+      disable_columns_configuration: true
     },
 
     init: function () {

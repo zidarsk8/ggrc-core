@@ -215,6 +215,10 @@ form.import {
 
 .new-relevant-block {
   padding: 30px;
+
+  relevant-filter {
+    max-width: 560px;
+  }
 }
 
 .new-relevant-block:nth-child(odd) {

@@ -1,0 +1,23 @@
+<div class="flex-box flex-box-single">
+  {{#each selectedColumns}}
+    <div class="attr">
+      {{#if_equals attr_type 'custom'}}
+        {{#get_custom_attr_value this instance}}
+          {{#using person=object}}
+            {{>'/static/mustache/people/popover.mustache'}}
+          {{/using}}
+        {{/get_custom_attr_value}}
+      {{else}}
+        {{#instance}}
+          {{#if_equals attr_name 'title'}}
+            <span class="title-attr">
+              {{title}}
+            </span>
+          {{else}}
+            {{> attrTemplate}}
+          {{/if_equals}}
+        {{/instance}}
+      {{/if_equals}}
+    </div>
+  {{/each}}
+</div>

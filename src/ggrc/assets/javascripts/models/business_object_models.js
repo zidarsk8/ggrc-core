@@ -32,6 +32,7 @@ can.Model.Cacheable("CMS.Models.OrgGroup", {
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",
+    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache",
     add_item_view : GGRC.mustache_path + "/base_objects/tree_add_item.mustache",
     attr_list : can.Model.Cacheable.attr_list.concat([
@@ -122,6 +123,7 @@ can.Model.Cacheable("CMS.Models.Project", {
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",
+    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache",
     attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'URL', attr_name: 'url'},
@@ -197,6 +199,7 @@ can.Model.Cacheable("CMS.Models.Facility", {
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",
+    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache",
     attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'URL', attr_name: 'url'},
@@ -291,6 +294,7 @@ can.Model.Cacheable("CMS.Models.Product", {
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",
+    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache",
     attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'Type', attr_name: 'type'},
@@ -381,6 +385,7 @@ can.Model.Cacheable("CMS.Models.DataAsset", {
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",
+    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache",
     attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'URL', attr_name: 'url'},
@@ -471,6 +476,7 @@ can.Model.Cacheable("CMS.Models.AccessGroup", {
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",
+    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache",
     attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'URL', attr_name: 'url'},
@@ -562,6 +568,7 @@ can.Model.Cacheable("CMS.Models.AccessGroup", {
     },
     tree_view_options: {
       show_view: GGRC.mustache_path + '/base_objects/tree.mustache',
+      attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'URL', attr_name: 'url'},
@@ -640,6 +647,7 @@ can.Model.Cacheable("CMS.Models.Vendor", {
   },
   tree_view_options : {
     show_view : GGRC.mustache_path + "/base_objects/tree.mustache",
+    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     footer_view : GGRC.mustache_path + "/base_objects/tree_footer.mustache",
     attr_list : can.Model.Cacheable.attr_list.concat([
       {attr_title: 'URL', attr_name: 'url'},

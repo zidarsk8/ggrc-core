@@ -420,7 +420,10 @@
           return $.inArray('preventdoublesubmit', this.namespace.split('.')) > -1;
         }).length < 1) {
       $el.on('keypress.preventdoublesubmit', function (ev) {
-        if (ev.which === 13 && !$(document.activeElement).hasClass('wysihtml5')) {
+
+        if (ev.which === 13 &&
+          !$(document.activeElement).hasClass('wysihtml5') &&
+          !$(document.activeElement).parents('.pagination').length) {
           ev.preventDefault();
           if (ev.originalEvent) {
             ev.originalEvent.preventDefault();

@@ -48,6 +48,7 @@
     },
     tree_view_options: {
       show_view: GGRC.mustache_path + '/programs/tree.mustache',
+      attr_view: GGRC.mustache_path + '/programs/tree-item-attr.mustache',
       footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: [
         {
@@ -137,6 +138,7 @@
     },
     tree_view_options: {
       show_view: GGRC.mustache_path + '/objectives/tree.mustache',
+      attr_view: GGRC.mustache_path + '/objectives/tree-item-attr.mustache',
       footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {

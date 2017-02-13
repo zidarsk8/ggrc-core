@@ -179,7 +179,6 @@ dashboard-js-files:
   - components/mapping-controls/mapping-type-selector.js
   - components/dropdown/dropdown.js
   - components/autocomplete/autocomplete.js
-  - components/search-toolbar/search-toolbar.js
   - components/datepicker/datepicker.js
   - components/person/person.js
   - components/inline_edit/inline.js
@@ -203,10 +202,15 @@ dashboard-js-files:
   - components/lazy_open_close.js
   - components/object_history/object_history.js
   - components/unified-mapper/mapper.js
+  - components/unified-mapper/mapper-toolbar.js
+  - components/unified-mapper/mapper-filter.js
   - components/unified-mapper/mapper-results.js
   - components/unified-mapper/mapper-results-item.js
   - components/unified-mapper/mapper-results-item-status.js
   - components/unified-mapper/mapper-results-item-details.js
+  - components/unified-mapper/mapper-results-items-header.js
+  - components/unified-mapper/mapper-results-item-attrs.js
+  - components/unified-mapper/mapper-results-columns-configuration.js
   - components/quick_form/quick_add.js
   - components/quick_form/quick_update.js
   - components/assessment_templates/assessment_templates.js
@@ -244,7 +248,6 @@ app-init-files:
 dashboard-js-template-files:
   - components/object-state-toolbar/object-state-toolbar.mustache
   - components/object-selection/object-selection-item.mustache
-  - components/search-toolbar/search-toolbar.mustache
   - components/mapping-controls/mapping-type-selector.mustache
   - components/effective-dates/effective-dates.mustache
   - components/read-more/read-more.mustache
@@ -307,6 +310,7 @@ dashboard-js-template-files:
   - base_objects/search_result.mustache
   - base_objects/title.mustache
   - base_objects/tree.mustache
+  - base_objects/tree-item-attr.mustache
   - base_objects/tree_placeholder.mustache
   - base_objects/tree_footer_no_access.mustache
   - base_objects/tree_footer_zero.mustache
@@ -362,6 +366,7 @@ dashboard-js-template-files:
   - controls/modal_content.mustache
   - controls/object_list.mustache
   - controls/tree.mustache
+  - controls/tree-item-attr.mustache
   - assessments/modal_content.mustache
   - assessments/tree.mustache
   - assessments/tree_header.mustache
@@ -391,10 +396,15 @@ dashboard-js-template-files:
   - components/inline_edit/person.mustache
   - components/inline_edit/datepicker.mustache
   - components/autocomplete/autocomplete.mustache
+  - components/unified-mapper/mapper-toolbar.mustache
+  - components/unified-mapper/mapper-filter.mustache
   - components/unified-mapper/mapper-results.mustache
   - components/unified-mapper/mapper-results-item.mustache
   - components/unified-mapper/mapper-results-item-status.mustache
   - components/unified-mapper/mapper-results-item-details.mustache
+  - components/unified-mapper/mapper-results-items-header.mustache
+  - components/unified-mapper/mapper-results-item-attrs.mustache
+  - components/unified-mapper/mapper-results-columns-configuration.mustache
   - components/assessment_templates/assessment_templates.mustache
   - components/dropdown/dropdown.mustache
   - components/object_history/object_history.mustache
@@ -432,6 +442,7 @@ dashboard-js-template-files:
   - dashboard/recently_viewed_list.mustache
   - directives/autocomplete_result.mustache
   - directives/tree.mustache
+  - directives/tree-item-attr.mustache
   - events/object_list.mustache
   - facilities/modal_content.mustache
   - help/help_modal_content.mustache
@@ -457,6 +468,7 @@ dashboard-js-template-files:
   - objectives/list_popover.mustache
   - objectives/modal_content.mustache
   - objectives/tree.mustache
+  - objectives/tree-item-attr.mustache
   - org_groups/modal_content.mustache
   - vendors/modal_content.mustache
   - pbc/iframe_tooltip.mustache
@@ -475,6 +487,7 @@ dashboard-js-template-files:
   - people/popover.mustache
   - people/tier2_content.mustache
   - people/tree.mustache
+  - people/tree-item-attr.mustache
   - people/tree_add_item.mustache
   - people/tree_header.mustache
   - people/search_result.mustache
@@ -488,11 +501,13 @@ dashboard-js-template-files:
   - programs/info.mustache
   - programs/modal_content.mustache
   - programs/tree.mustache
+  - programs/tree-item-attr.mustache
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
   - roles/object_list.mustache
   - sections/modal_content.mustache
   - sections/tree.mustache
+  - sections/tree-item-attr.mustache
   - sections/dropdown_menu.mustache
   - selectors/active_column.mustache
   - selectors/base_modal.mustache
@@ -511,6 +526,7 @@ dashboard-js-template-files:
   - base_objects/tree_add_item.mustache
   - audits/modal_content.mustache
   - audits/tree.mustache
+  - audits/tree-item-attr.mustache
   - audits/info.mustache
   - audits/summary.mustache
   - audits/tree_add_item.mustache

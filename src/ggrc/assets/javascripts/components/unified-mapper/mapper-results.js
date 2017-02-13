@@ -2,7 +2,7 @@
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
-(function (can, GGRC, CMS) {
+(function (can, GGRC, CMS, $) {
   'use strict';
 
   can.Component.extend('mapperResults', {
@@ -18,6 +18,14 @@
         filter: '',
         pageSizeSelect: [5, 10, 15]
       },
+      columns: {
+        selected: [],
+        available: []
+      },
+      sort: {
+        key: '',
+        direction: 'asc'
+      },
       mapper: null,
       isLoading: false,
       items: [],
@@ -26,11 +34,28 @@
       baseInstance: null,
       scopeId: '@',
       scopeType: '@',
-      term: '',
+      filter: '',
       selected: [],
       refreshItems: false,
+      submitCbs: null,
+      displayPrefs: null,
+      disableColumnsConfiguration: false,
+      objectsPlural: false,
+      init: function () {
+        var self = this;
+        this.attr('submitCbs').add(this.onSearch.bind(this));
+        CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
+          self.attr('displayPrefs', displayPrefs);
+        });
+      },
+      destroy: function () {
+        this.attr('submitCbs').remove(this.onSearch.bind(this));
+      },
       searchOnly: function () {
         return this.attr('mapper.search_only');
+      },
+      useSnapshots: function () {
+        return this.attr('mapper.useSnapshots');
       },
       updatePaging: function (total) {
         var count = Math.ceil(total / this.attr('paging.pageSize'));
@@ -45,7 +70,19 @@
             self.attr('mapper.entries', items.map(function (item) {
               return item.data;
             }));
+            self.setColumnsConfiguration();
+            self.attr('isBeforeLoad', false);
           });
+      },
+      setColumnsConfiguration: function () {
+        var columns =
+          GGRC.Utils.TreeView.getColumnsForModel(
+            this.getDisplayModel().model_singular,
+            this.attr('displayPrefs')
+          );
+        this.attr('columns.available', columns.available);
+        this.attr('columns.selected', columns.selected);
+        this.attr('disableColumnsConfiguration', columns.disableConfiguration);
       },
       setAdditionalScopeFilter: function () {
         var id = this.attr('baseInstance.scopeObject.id');
@@ -61,7 +98,7 @@
       prepareRelevantFilters: function () {
         var filters;
         var relevantList = this.attr('mapper.relevant');
-        var useSnapshots = this.attr('mapper.useSnapshots');
+        var useSnapshots = this.useSnapshots();
 
         filters = relevantList.attr()
           .map(function (relevant) {
@@ -103,7 +140,7 @@
 
         return GGRC.Utils.QueryAPI
           .buildRelevantIdsQuery(modelName, {
-            filter: this.attr('term')
+            filter: this.attr('filter')
           }, {
             type: this.attr('baseInstance.type'),
             id: this.attr('baseInstance.id')
@@ -133,19 +170,26 @@
       },
       getQuery: function (queryType, addPaging) {
         var modelName = this.attr('type');
-        var useSnapshots = this.attr('mapper.useSnapshots');
-        var paging = addPaging ? {
-          filter: this.attr('term'),
-          current: this.attr('paging.current'),
-          pageSize: this.attr('paging.pageSize')
-        } : {
-          filter: this.attr('term')
+        var useSnapshots = this.useSnapshots();
+        var paging = {
+          filter: this.attr('filter')
         };
         var filters = this.prepareRelevantFilters();
         var ownedFilter = this.prepareOwnedFilter();
-        var query =
-          this.prepareBaseQuery(modelName, paging, filters, ownedFilter);
-        var relatedQuery = this.prepareRelatedQuery(modelName, ownedFilter);
+        var query;
+        var relatedQuery;
+
+        if (addPaging) {
+          paging.current = this.attr('paging.current');
+          paging.pageSize = this.attr('paging.pageSize');
+          if (this.attr('sort.key')) {
+            paging.sortBy = this.attr('sort.key');
+            paging.sortDirection = this.attr('sort.direction');
+          }
+        }
+
+        query = this.prepareBaseQuery(modelName, paging, filters, ownedFilter);
+        relatedQuery = this.prepareRelatedQuery(modelName, ownedFilter);
         if (useSnapshots) {
           // Transform Base Query to Snapshot
           query = GGRC.Utils.Snapshots.transformQuery(query);
@@ -164,20 +208,49 @@
         return {data: [query, relatedQuery]};
       },
       getModelKey: function () {
-        return this.attr('mapper.useSnapshots') ?
-          CMS.Models.Snapshot.shortName :
+        return this.useSnapshots() ?
+          CMS.Models.Snapshot.model_singular :
           this.attr('type');
       },
+      getModel: function () {
+        return CMS.Models[this.getModelKey()];
+      },
+      getDisplayModel: function () {
+        return CMS.Models[this.attr('type')];
+      },
       setDisabledItems: function (allItems, relatedIds) {
-        // Do not perform extra mapping validation in case Assessment generation
-        if (this.attr('mapper.assessmentGenerator')) {
+        if (this.searchOnly() ||
+            this.attr('mapper.assessmentGenerator')) {
           return;
         }
         allItems.forEach(function (item) {
           item.isDisabled = relatedIds.indexOf(item.data.id) !== -1;
         });
       },
+      setSelectedItems: function (allItems) {
+        var selectedItems = can.makeArray(this.attr('selected'));
+        allItems.forEach(function (item) {
+          item.isSelected =
+            selectedItems.some(function (selectedItem) {
+              return selectedItem.id === item.id;
+            });
+          if (item.isSelected) {
+            item.markedSelected = true;
+          }
+        });
+      },
+      transformValue: function (value) {
+        var Model = this.getDisplayModel();
+        var useSnapshots = this.useSnapshots();
+        if (useSnapshots) {
+          value.revision.content =
+            Model.model(value.revision.content);
+          return value;
+        }
+        return Model.model(value);
+      },
       load: function () {
+        var self = this;
         var modelKey = this.getModelKey();
         var dfd = can.Deferred();
         var query = this.getQuery('values', true);
@@ -192,9 +265,10 @@
                 return {
                   id: value.id,
                   type: value.type,
-                  data: value
+                  data: self.transformValue(value)
                 };
               });
+            this.setSelectedItems(result);
             if (relatedData) {
               this.setDisabledItems(result, relatedData[modelKey].ids);
             }
@@ -240,6 +314,10 @@
             dfd.resolve([]);
           });
         return dfd;
+      },
+      setItemsDebounced() {
+        clearTimeout(this.attr('_setItemsTimeout'));
+        this.attr('_setItemsTimeout', setTimeout(this.setItems.bind(this)));
       }
     },
     events: {
@@ -255,11 +333,23 @@
         }
       },
       '{viewModel.paging} current': function () {
-        this.viewModel.setItems();
+        this.viewModel.setItemsDebounced();
       },
       '{viewModel.paging} pageSize': function () {
-        this.viewModel.setItems();
+        this.viewModel.setItemsDebounced();
+      },
+      '{viewModel.sort} key': function () {
+        this.viewModel.setItemsDebounced();
+      },
+      '{viewModel.sort} direction': function () {
+        this.viewModel.setItemsDebounced();
+      },
+      '{viewModel} type': function () {
+        this.viewModel.attr('items', []);
+      },
+      '{viewModel.paging} total': function (scope, ev, total) {
+        this.viewModel.attr('objectsPlural', total > 1);
       }
     }
   });
-})(window.can, window.GGRC, window.CMS);
+})(window.can, window.GGRC, window.CMS, window.jQuery);

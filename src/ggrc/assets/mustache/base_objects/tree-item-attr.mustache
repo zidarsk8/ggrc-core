@@ -1,0 +1,49 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#switch attr_name}}
+  {{#case 'owner'}}
+    {{#if owners.length}}
+      {{#using contacts=owners}}
+        {{#contacts}}
+          {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
+        {{/contacts}}
+      {{/using}}
+    {{/if}}
+  {{/case}}
+  {{#case 'contact'}}
+    <span>
+      {{#using contact=instance.contact}}
+        {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+      {{/using}}
+    </span>
+  {{/case}}
+  {{#case 'secondary_contact'}}
+    <span>
+      {{#using contact=instance.secondary_contact}}
+        {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+      {{/using}}
+    </span>
+  {{/case}}
+  {{#case 'network_zone'}}
+    {{#using network_zone=instance.network_zone}}
+      {{network_zone.title}}
+    {{/using}}
+  {{/case}}
+  {{#case 'design'}}
+    {{#using design=instance.design}}
+      {{design}}
+    {{/using}}
+  {{/case}}
+  {{#case 'operationally'}}
+    {{#using operationally=instance.operationally}}
+      {{operationally}}
+    {{/using}}
+  {{/case}}
+
+  {{#default}}
+    {{get_default_attr_value attr_name instance}}
+  {{/default}}
+{{/switch}}

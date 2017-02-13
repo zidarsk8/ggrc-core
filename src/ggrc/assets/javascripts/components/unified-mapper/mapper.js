@@ -52,7 +52,7 @@
     contactEmail: null,
     deferred: '@',
     deferred_to: '@',
-    term: '',
+    filter: '',
     object: '',
     model: {},
     bindings: {},
@@ -71,6 +71,8 @@
     is_snapshotable: false,
     snapshot_scope_id: '',
     snapshot_scope_type: '',
+    toolbarSubmitCbs: $.Callbacks(),
+    afterSearch: false,
     allowedToCreate: function () {
       var isSearch = this.attr('search_only');
       // Don't allow to create new instances for "In Scope" Objects
@@ -83,8 +85,8 @@
       if (GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
         return false;
       }
-      // In case we generate assessments this should be false no matter what objects should be mapped to assessments
-      if (this.attr('assessmentGenerator')) {
+      // In case we generate assessments or in search only mode this should be false no matter what objects should be mapped to assessments
+      if (this.attr('assessmentGenerator') || this.attr('search_only')) {
         return false;
       }
       return GGRC.Utils.Snapshots.isSnapshotParent(this.attr('object')) ||
@@ -94,12 +96,12 @@
       return {
         category: cmsModel.category,
         name: cmsModel.title_plural,
-        value: cmsModel.shortName,
-        singular: cmsModel.shortName,
+        value: cmsModel.model_singular,
+        singular: cmsModel.model_singular,
         plural: cmsModel.title_plural.toLowerCase().replace(/\s+/, '_'),
         table_plural: cmsModel.table_plural,
         title_singular: cmsModel.title_singular,
-        isSelected: cmsModel.shortName === this.attr('type')
+        isSelected: cmsModel.model_singular === this.attr('type')
       };
     },
     addFormattedType: function (modelName, groups) {
@@ -163,6 +165,10 @@
         return memo;
       }, []);
       return _.findWhere(types, {value: type});
+    },
+    onToolbarSubmit: function () {
+      this.attr('toolbarSubmitCbs').fire();
+      this.attr('afterSearch', true);
     }
   });
 
@@ -395,9 +401,8 @@
           'mapper.model', this.scope.mapper.modelFromType(type));
       },
       '{mapper} type': function () {
-        this.scope.attr('mapper.term', '');
-        this.scope.attr('mapper.contact', null);
-        this.scope.attr('mapper.contactEmail', null);
+        this.scope.attr('mapper.filter', '');
+        this.scope.attr('mapper.afterSearch', false);
         // Edge case for Assessment Generation
         // and objects that are not in Snapshot scope
         if (!this.scope.attr('mapper.assessmentGenerator')) {
@@ -432,7 +437,7 @@
 
       '#search keyup': function (el, ev) {
         if (ev.keyCode === 13) {
-          this.scope.attr('mapper.term', el.val());
+          this.scope.attr('mapper.filter', el.val());
           this.element.find('mapper-results').scope().setItems();
         }
       },

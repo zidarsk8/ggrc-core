@@ -19,6 +19,7 @@
       allItems: [],
       refreshSelection: null,
       allSelected: false,
+      selectAllCheckboxValue: false,
       select: function (id, type) {
         if (this.indexOfSelected(id, type) < 0) {
           this.attr('selectedItems').push({
@@ -109,6 +110,13 @@
       },
       'object-selection-item deselectItem': function (el, ev, id, type) {
         this.viewModel.deselect(id, type);
+      },
+      '{viewModel} selectAllCheckboxValue': function (scope, ev, value) {
+        if (value) {
+          this.viewModel.selectAll();
+        } else {
+          this.viewModel.deselectAll();
+        }
       }
     }
   });
