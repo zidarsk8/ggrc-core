@@ -25,7 +25,9 @@ class Widget(base.Widget):
 
   def __init__(self, driver):
     self.member_count = None
-    self.classes_of_objs_with_base_filter = (AsmtTmpls.__name__)
+    self.classes_of_objs_with_base_filter = (
+        AsmtTmpls.__name__,
+        Asmts.__name__)
     self.common_filter_locators = dict(
         text_box_locator=self._locator_filter.TEXTFIELD_TO_FILTER,
         bt_submit_locator=self._locator_filter.BUTTON_FILTER,
