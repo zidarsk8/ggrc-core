@@ -182,6 +182,23 @@ def get_mapping_rules():
   return business_object_rules
 
 
+def get_unmapping_rules():
+  """Get unmapping rules from mapping dict
+
+  Required fro overwrite rules for current model
+  """
+  mapping = get_mapping_rules()
+
+  def delete_mapping_rules_for_model(model, *rules):
+    "Delte rule for current model set"
+    mapping[model] = mapping.get(model, set([])) - set(rules)
+
+  delete_mapping_rules_for_model("Assesment", "Control")
+  delete_mapping_rules_for_model("Issue", "Control")
+
+  return mapping
+
+
 def _prefix_camelcase(name, prefix):
   name = name[:1].lower() + name[1:]
   return re.sub(r'[A-Z]', lambda pat: prefix + pat.group(0).lower(), name)

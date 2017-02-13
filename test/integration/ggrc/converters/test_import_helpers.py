@@ -8,7 +8,7 @@ from ggrc import models
 from ggrc.converters import column_handlers
 from ggrc.converters import import_helper
 from ggrc.converters.import_helper import get_object_column_definitions
-from ggrc.utils import get_mapping_rules
+from ggrc.utils import get_mapping_rules, get_unmapping_rules
 from ggrc.utils import title_from_camelcase
 from ggrc_risks import models as r_models
 from ggrc_risk_assessments import models as ra_models
@@ -21,10 +21,12 @@ CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')
 
 
 def get_mapping_names(class_name):
-  mapping_rules = get_mapping_rules().get(class_name, set())
-  pretty_rules = map(title_from_camelcase, mapping_rules)
-  mapping_names = {"map:{}".format(name) for name in pretty_rules}
-  unmapping_names = {"unmap:{}".format(name) for name in pretty_rules}
+  mapping_rules = get_mapping_rules().get(class_name, set([]))
+  unmapping_rules = get_unmapping_rules().get(class_name, set([]))
+  pretty_mapping_rules = map(title_from_camelcase, mapping_rules)
+  pretty_unmapping_rules = map(title_from_camelcase, unmapping_rules)
+  mapping_names = {"map:{}".format(n) for n in pretty_mapping_rules}
+  unmapping_names = {"unmap:{}".format(n) for n in pretty_unmapping_rules}
   return mapping_names.union(unmapping_names)
 
 

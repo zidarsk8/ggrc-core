@@ -4,6 +4,8 @@
 from ggrc.converters.handlers.handlers import UserColumnHandler
 
 COLUMN_HANDLERS = {
-    "ra_counsel": UserColumnHandler,
-    "ra_manager": UserColumnHandler,
+    "default": {
+        "ra_counsel": UserColumnHandler,
+        "ra_manager": UserColumnHandler,
+    }
 }

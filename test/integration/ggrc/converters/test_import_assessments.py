@@ -4,12 +4,16 @@
 # pylint: disable=maybe-no-member, invalid-name
 
 """Test request import and updates."""
+from collections import OrderedDict
+
+from flask.json import dumps
 
 from ggrc import db
 from ggrc import models
 from ggrc.converters import errors
+
+from integration.ggrc.models import factories
 from integration.ggrc import TestCase
-from flask.json import dumps
 
 
 class TestAssessmentImport(TestCase):
@@ -200,6 +204,77 @@ class TestAssessmentImport(TestCase):
     }
     self._check_csv_response(response, expected_errors)
 
+  def test_mapping_control_through_snapshot(self):
+    "Test for add mapping control on assessment"
+    audit = factories.AuditFactory()
+    assessment = factories.AssessmentFactory()
+    factories.RelationshipFactory(source=audit, destination=assessment)
+    control = factories.ControlFactory()
+    revision = models.Revision.query.filter(
+        models.Revision.resource_id == control.id,
+        models.Revision.resource_type == control.__class__.__name__
+    ).order_by(
+        models.Revision.id.desc()
+    ).first()
+    factories.SnapshotFactory(
+        parent=audit,
+        child_id=control.id,
+        child_type=control.__class__.__name__,
+        revision_id=revision.id
+    )
+    db.session.commit()
+    self.assertFalse(db.session.query(
+        models.Relationship.get_related_query(
+            assessment, models.Snapshot()
+        ).exists()).first()[0])
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment.slug),
+        ("map:control", control.slug),
+    ]))
+    self.assertTrue(db.session.query(
+        models.Relationship.get_related_query(
+            assessment, models.Snapshot()
+        ).exists()).first()[0])
+
+  def test_create_new_assessment_with_mapped_control(self):
+    "Test for creation assessment with mapped controls"
+    audit = factories.AuditFactory()
+    control = factories.ControlFactory()
+    revision = models.Revision.query.filter(
+        models.Revision.resource_id == control.id,
+        models.Revision.resource_type == control.__class__.__name__
+    ).order_by(
+        models.Revision.id.desc()
+    ).first()
+    factories.SnapshotFactory(
+        parent=audit,
+        child_id=control.id,
+        child_type=control.__class__.__name__,
+        revision_id=revision.id
+    )
+    db.session.commit()
+    self.assertFalse(db.session.query(
+        models.Relationship.get_related_query(
+            models.Assessment(), models.Snapshot()
+        ).exists()).first()[0])
+    slug = "TestAssessment"
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", slug),
+        ("Audit*", audit.slug),
+        ("Assessor*", models.Person.query.all()[0].email),
+        ("Creator", models.Person.query.all()[0].email),
+        ("Title", "Strange title"),
+        ("map:control", control.slug),
+    ]))
+    assessment = models.Assessment.query.filter(
+        models.Assessment.slug == slug
+    ).first()
+    self.assertTrue(db.session.query(models.Relationship.get_related_query(
+        assessment, models.Snapshot()).exists()).first()[0]
+    )
+
 
 class TestAssessmentExport(TestCase):
   """Test Assessment object export."""
@@ -228,11 +303,104 @@ class TestAssessmentExport(TestCase):
     self.import_file("assessment_full_no_warnings.csv")
     data = [{
         "object_name": "Assessment",
-        "filters": {"expression": {}},
+        "filters": {
+            "expression": {}
+        },
         "fields": "all",
     }]
     response = self.export_csv(data)
     self.assertIn(u"\u5555", response.data.decode("utf8"))
+
+  def assertColumnExportedValue(self, value, instance, column):
+    "Assertion checks is value equal to exported instance column value."
+    data = [{
+        "object_name": instance.__class__.__name__,
+        "fields": "all",
+        "filters": {
+            "expression": {
+                "text": str(instance.id),
+                "op": {
+                    "name": "text_search",
+                }
+            },
+        },
+    }]
+    response = self.export_csv(data)
+    raw_data = response.data.strip().split("\n")[4:6]
+    keys, vals = raw_data
+    instance_dict = dict(zip(keys.split(","), vals.split(",")))
+    self.assertEqual(value, instance_dict[column])
+
+  def test_export_assesments_without_map_control(self):
+    """Test export assesment without related control instance"""
+    audit = factories.AuditFactory()
+    assessment = factories.AssessmentFactory()
+    factories.RelationshipFactory(source=audit, destination=assessment)
+    control = factories.ControlFactory()
+    revision = models.Revision.query.filter(
+        models.Revision.resource_id == control.id,
+        models.Revision.resource_type == control.__class__.__name__
+    ).order_by(
+        models.Revision.id.desc()
+    ).first()
+    factories.SnapshotFactory(
+        parent=audit,
+        child_id=control.id,
+        child_type=control.__class__.__name__,
+        revision_id=revision.id
+    )
+    db.session.commit()
+    self.assertColumnExportedValue("", assessment, "map:control")
+
+  def test_export_assesments_with_map_control(self):
+    """Test export assesment with related control instance
+
+    relation snapshot -> assessment
+    """
+    audit = factories.AuditFactory()
+    assessment = factories.AssessmentFactory()
+    factories.RelationshipFactory(source=audit, destination=assessment)
+    control = factories.ControlFactory()
+    revision = models.Revision.query.filter(
+        models.Revision.resource_id == control.id,
+        models.Revision.resource_type == control.__class__.__name__
+    ).order_by(
+        models.Revision.id.desc()
+    ).first()
+    snapshot = factories.SnapshotFactory(
+        parent=audit,
+        child_id=control.id,
+        child_type=control.__class__.__name__,
+        revision_id=revision.id
+    )
+    db.session.commit()
+    factories.RelationshipFactory(source=snapshot, destination=assessment)
+    self.assertColumnExportedValue(control.slug, assessment, "map:control")
+
+  def test_export_assesments_with_map_control_mirror_relation(self):
+    """Test export assesment with related control instance
+
+    relation assessment -> snapshot
+    """
+    audit = factories.AuditFactory()
+    assessment = factories.AssessmentFactory()
+    factories.RelationshipFactory(source=audit, destination=assessment)
+    control = factories.ControlFactory()
+    revision = models.Revision.query.filter(
+        models.Revision.resource_id == control.id,
+        models.Revision.resource_type == control.__class__.__name__
+    ).order_by(
+        models.Revision.id.desc()
+    ).first()
+    snapshot = factories.SnapshotFactory(
+        parent=audit,
+        child_id=control.id,
+        child_type=control.__class__.__name__,
+        revision_id=revision.id
+    )
+    db.session.commit()
+    factories.RelationshipFactory(destination=snapshot, source=assessment)
+    self.assertColumnExportedValue(control.slug, assessment, "map:control")
 
   def test_export_assessments_with_filters_and_conflicting_ca_names(self):
     """Test exporting assessments with conflicting custom attribute names."""
