@@ -24,6 +24,11 @@
       <button class="btn btn-mini action-button btn-draft btn-extra-gray" can-click="showRelatedAssessments"
               title="Show Related Assessments">Assessments
       </button>
+      <simple-modal instance="instance" modal-title="modalTitle" state="state" extra-css-class="related-assessments">
+        <div class="simple-modal__body">
+          {{> '/static/mustache/assessments/related-assessments-without-reuse.mustache' }}
+        </div>
+      </simple-modal>
   {{/if}}
   {{#if drawStates}}
       <li>
@@ -32,10 +37,3 @@
   {{/if}}
     <content/>
 </ul>
-{{#if drawRelatedAssessment}}
-    <simple-modal instance="instance" modal-title="modalTitle" state="state" extra-css-class="related-assessments">
-        <div class="simple-modal__body">
-          {{> '/static/mustache/assessments/related-assessments-without-reuse.mustache' }}
-        </div>
-    </simple-modal>
-{{/if}}
