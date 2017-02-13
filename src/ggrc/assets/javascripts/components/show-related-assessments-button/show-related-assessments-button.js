@@ -18,9 +18,17 @@
       state: {
         open: false
       },
+      extraBtnCSS: '@',
       modalTitle: 'Related Assessments',
       showRelatedAssessments: function () {
         this.attr('state.open', true);
+      },
+      // Temporary put this logic on the level of Component itself
+      isAllowedToShow: function () {
+        var type = this.attr('instance.type');
+        var hasCorrectType = type === 'Control' || type === 'Objective';
+        var isSnapshot = !!this.attr('instance.snapshot');
+        return !isSnapshot && hasCorrectType;
       }
     }
   });

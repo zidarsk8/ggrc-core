@@ -3,8 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 {{#if instance}}
-  {{^if instance.snapshot}}
-      <button class="btn btn-mini action-button btn-draft btn-extra-gray" can-click="showRelatedAssessments"
+  {{#if isAllowedToShow}}
+      <button class="btn {{extraBtnCSS}} btn-draft btn-extra-gray" can-click="showRelatedAssessments"
               title="Show Related Assessments">Assessments
       </button>
       <simple-modal instance="instance" modal-title="modalTitle" state="state" extra-css-class="related-assessments">
