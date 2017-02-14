@@ -15,7 +15,8 @@
                  title="{{attr_title}}">
             <input type="checkbox"
                    {{#mandatory}}disabled{{/mandatory}}
-                   can-value="columns.{{attr_name}}"
+                   can-change="onSelect"
+                   {{#isSelected}}checked{{/isSelected}}
                    class="notify-wrap attr-checkbox
                    {{#mandatory}}mandatory{{/mandatory}}">
             {{attr_title}}
