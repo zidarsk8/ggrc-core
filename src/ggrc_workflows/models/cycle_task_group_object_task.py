@@ -36,6 +36,9 @@ class CycleTaskGroupObjectTask(
   """Cycle task model
   """
   __tablename__ = 'cycle_task_group_object_tasks'
+
+  readable_name_alias = 'cycle task'
+
   _title_uniqueness = False
 
   IMPORTABLE_FIELDS = (

@@ -28,7 +28,7 @@ class BaseTestCycleTaskImportUpdate(TestCase):
   @staticmethod
   def generate_expected_warning(*columns):
     return {
-        'Cycle Task Group Object Task': {
+        'Cycle Task': {
             'block_warnings': {
                 errors.ONLY_IMPORTABLE_COLUMNS_WARNING.format(
                     line=2,
@@ -491,7 +491,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     # This is an error message which should be shown during
     # test_cycle_task_create_error test
     self.expected_create_error = {
-        'Cycle Task Group Object Task': {
+        'Cycle Task': {
             'row_errors': {errors.CREATE_INSTANCE_ERROR.format(line=13)}
         }
     }
@@ -499,7 +499,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     # Below is expected date errors for test_cycle_task_date_error. They should
     # be shown during date validator's tests.
     self.expected_date_error = {
-        'Cycle Task Group Object Task': {
+        'Cycle Task': {
             'row_errors': {
                 errors.INVALID_START_END_DATES.format(
                     line=3,
@@ -558,7 +558,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     # Expected error message which should be shown after
     # test_cycle_task_permission_error run
     self.expected_permission_error = {
-        'Cycle Task Group Object Task': {
+        'Cycle Task': {
             'block_errors': {errors.PERMISSION_ERROR.format(line=2)}
         }
     }
