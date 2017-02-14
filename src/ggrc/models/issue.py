@@ -5,13 +5,14 @@ from ggrc import db
 from .mixins import (
     BusinessObject, Timeboxed, CustomAttributable, TestPlanned
 )
+from .object_document import EvidenceURL
 from .object_owner import Ownable
 from .object_person import Personable
 from .relationship import Relatable
 from .track_object_state import HasObjectState
 
 
-class Issue(HasObjectState, TestPlanned, CustomAttributable,
+class Issue(HasObjectState, TestPlanned, CustomAttributable, EvidenceURL,
             Personable, Timeboxed, Ownable, Relatable,
             BusinessObject, db.Model):
 

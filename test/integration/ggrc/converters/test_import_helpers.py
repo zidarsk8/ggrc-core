@@ -422,6 +422,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
         "Review State",
+        "Url",
+        "Evidence",
         "Delete",
     }
     self._test_single_object(models.Issue, names, self.COMMON_EXPECTED)
