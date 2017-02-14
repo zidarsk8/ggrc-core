@@ -56,8 +56,7 @@
       }
     },
 
-    init: function (el, opts) {
-      var parent = opts.parent_instance || {};
+    init: function () {
       var options = this.options;
       if (options.instance && !options.show_view) {
         options.show_view =
@@ -71,11 +70,7 @@
         this.options.child_options.each(function (option) {
           option.attr({
             parent: this,
-            parent_instance: this.options.instance,
-            is_snapshotable:
-              GGRC.Utils.Snapshots.isSnapshotScope(parent),
-            snapshot_scope_id: parent.id,
-            snapshot_scope_type: parent.type
+            parent_instance: this.options.instance
           });
         }.bind(this));
       }

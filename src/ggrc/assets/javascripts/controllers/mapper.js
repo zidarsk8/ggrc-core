@@ -4,11 +4,14 @@
 */
 
 (function (can, $) {
-  var selectors = _.map(['unified-mapper', 'unified-search'], function (val) {
-    return '[data-toggle="' + val + '"]';
-  });
+  var selectors = ['unified-mapper', 'unified-search']
+    .map(function (val) {
+      return '[data-toggle="' + val + '"]';
+    });
+  var dataCorruptionMessage = 'Some Data is corrupted! ' +
+              'Missing Scope Object';
 
-  can.Control('GGRC.Controllers.MapperModal', {
+  can.Control.extend('GGRC.Controllers.MapperModal', {
     defaults: {
       component: GGRC.mustache_path + '/modals/mapper/component.mustache'
     },
@@ -18,7 +21,7 @@
       var $target = $('<div id="' + modalId + '" class="modal modal-selector hide"></div>');
 
       $target.modal_form({}, $trigger);
-      this.newInstance($target[0], $.extend({
+      this.newInstance($target[0], can.extend({
         $trigger: $trigger
       }, options));
 
@@ -39,12 +42,14 @@
     var type;
     var btn = $(ev.currentTarget);
     var data = {};
-    var joinType;
+    var joinType = btn.data('join-option-type');
     var isSearch;
     var snapshots = GGRC.Utils.Snapshots;
-    var scopeObject = GGRC.page_instance().scopeObject || {};
+    var id = btn.data('join-object-id');
+    var objectType = btn.data('join-object-type');
+    var inScopeObject;
 
-    _.each(btn.data(), function (val, key) {
+    can.each(btn.data(), function (val, key) {
       data[can.camelCaseToUnderscore(key)] = val;
     });
 
@@ -55,34 +60,52 @@
       ev.preventDefault();
     }
 
-    joinType = btn.data('join-option-type');
     isSearch = /unified-search/ig.test(data.toggle);
+
     if (!disableMapper) {
-      if (snapshots.isInScopeModel(data.join_object_type)) {
-        relevantTo = [{
-          readOnly: true,
-          type: scopeObject.type || data.snapshot_scope_type,
-          id: scopeObject.id || data.snapshot_scope_id
-        }];
-        if (data.join_object_type === 'Assessment') {
-          type = !joinType || joinType === 'Assessment' ? 'Control' : joinType;
-        } else {
-          type = joinType;
+      if (snapshots.isInScopeModel(objectType) && !isSearch) {
+        /* if no id or object type is provided we shouldn't allow mapping */
+        if (!id || !objectType) {
+          return new Error('Required Data for In Scope Object is missing' +
+            ' - Original Object is mandatory');
         }
+        inScopeObject = CMS.Models[objectType].store[id];
+        inScopeObject.updateScopeObject().then(function () {
+          var scopeObject = inScopeObject.attr('scopeObject');
+          if (!scopeObject.id) {
+            GGRC.Errors.notifier('error', dataCorruptionMessage);
+            setTimeout(function () {
+              window.location.assign(location.origin + '/dashboard');
+            }, 3000);
+            return;
+          }
+          relevantTo = [{
+            readOnly: true,
+            type: scopeObject.type,
+            id: scopeObject.id
+          }];
+          // Default Mapping Type should be Control
+          type = joinType || 'Control';
+          GGRC.Controllers.MapperModal.launch(btn, can.extend({
+            object: objectType,
+            'join-object-id': id,
+            type: type,
+            relevantTo: relevantTo
+          }, data));
+        });
       } else {
         type = joinType;
+        GGRC.Controllers.MapperModal.launch(btn, can.extend({
+          object: objectType,
+          type: type,
+          'join-object-id': id,
+          'search-only': isSearch,
+          template: {
+            title: isSearch ?
+              '/static/mustache/base_objects/modal/search_title.mustache' : ''
+          }
+        }, data));
       }
-      GGRC.Controllers.MapperModal.launch(btn, _.extend({
-        object: btn.data('join-object-type'),
-        type: type,
-        'join-object-id': btn.data('join-object-id'),
-        'search-only': isSearch,
-        relevantTo: relevantTo,
-        template: {
-          title: isSearch ?
-            '/static/mustache/base_objects/modal/search_title.mustache' : ''
-        }
-      }, data));
     }
   });
 })(window.can, window.can.$);
