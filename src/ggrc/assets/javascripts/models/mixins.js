@@ -173,11 +173,15 @@
 
   can.Model.Mixin('inScopeObjects', {}, {
     'after:info_pane_preload': function () {
+      return this.updateScopeObject();
+    },
+    updateScopeObject: function () {
       var objType = 'Audit';
       var queryType = 'ids';
       var query = GGRC.Utils.QueryAPI
         .buildRelevantIdsQuery(objType, {}, {
           type: this.attr('type'),
+          operation: 'relevant',
           id: this.attr('id')
         }, null);
       return GGRC.Utils.QueryAPI
