@@ -123,8 +123,7 @@
       if (this.attr('search_only')) {
         include = ['TaskGroupTask', 'TaskGroup',
           'CycleTaskGroupObjectTask'];
-      }
-      if (this.attr('assessmentGenerator')) {
+      } else {
         exclude = snapshots.inScopeModels;
       }
       return GGRC.Mappings

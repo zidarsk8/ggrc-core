@@ -30,18 +30,27 @@
       initializeColumns: function () {
         var selectedColumns = can.makeArray(this.attr('selectedColumns'));
         var availableColumns = can.makeArray(this.attr('availableColumns'));
-        var self = this;
-        this.attr('columns', {});
+        var columns = new can.Map();
         availableColumns
           .forEach(function (attr) {
-            if (selectedColumns.some(function (selectedAttr) {
-              return selectedAttr.attr_name === attr.attr_name;
-            })) {
-              self.attr('columns.' + attr.attr_name, true);
-            } else {
-              self.attr('columns.' + attr.attr_name, false);
-            }
+            var value = {};
+            value[attr.attr_name] = selectedColumns
+              .some(function (selectedAttr) {
+                return selectedAttr.attr_name === attr.attr_name;
+              });
+            columns.attr(value);
           });
+        this.attr('columns', columns);
+      },
+      onSelect: function (attr) {
+        var columns = this.columns;
+        var value = {};
+        value[attr.attr_name] = !columns[attr.attr_name];
+        this.columns.attr(value);
+      },
+      isSelected: function (attr) {
+        var columns = this.attr('columns');
+        return columns[attr.attr_name];
       },
       setColumns: function () {
         var selectedNames = [];
