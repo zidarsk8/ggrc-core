@@ -3,19 +3,23 @@
 
 from ggrc import db
 from ggrc.fulltext import Indexer
+from ggrc.utils import benchmark
 
 
 class SqlIndexer(Indexer):
   def create_record(self, record, commit=True):
-    for k, v in record.properties.items():
-      db.session.add(self.record_type(
-          key=record.key,
-          type=record.type,
-          context_id=record.context_id,
-          tags=record.tags,
-          property=k,
-          content=v,
-      ))
+    with benchmark("Add fulltext records: create_record -> submit to db"):
+      for prop, value in record.properties.items():
+        for subproperty, content in value.items():
+          db.session.add(self.record_type(
+              key=record.key,
+              type=record.type,
+              context_id=record.context_id,
+              tags=record.tags,
+              property=prop,
+              subproperty=subproperty,
+              content=content,
+          ))
     if commit:
       db.session.commit()
 
