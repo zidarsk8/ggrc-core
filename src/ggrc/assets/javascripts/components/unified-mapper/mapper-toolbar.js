@@ -17,6 +17,8 @@
       statuses: [],
       mapper: {},
       isLoading: false,
+      totalObjects: 0,
+      objectsPlural: false,
       showStatusFilter: false,
       displayPrefs: null,
       init: function () {
@@ -64,6 +66,14 @@
       }
     },
     events: {
+      '{viewModel} totalObjects': function (scope, ev, totalObjects) {
+        this.viewModel.attr('objectsPlural', totalObjects > 1);
+      },
+      '{viewModel.mapper} afterSearch': function (scope, ev, afterSearch) {
+        if (!afterSearch) {
+          this.viewModel.attr('totalObjects', 0);
+        }
+      },
       '{viewModel.mapper} type': function () {
         this.viewModel.setStatusFilter();
       }

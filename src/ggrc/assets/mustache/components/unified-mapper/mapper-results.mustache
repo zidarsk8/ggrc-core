@@ -6,9 +6,6 @@
 <object-selection items="items" selected-items="selected" refresh-selection="refreshItems" all-items="allItems"
                   all-selected="allSelected">
   {{#if items.length}}
-    <div class="objects-found">
-      <label>{{paging.total}} {{#objectsPlural}}Objects{{/objectsPlural}} {{^objectsPlural}}Object{{/objectsPlural}} found</label>
-    </div>
     <div class="list-header">
       {{^disableColumnsConfiguration}}
         <mapper-results-columns-configuration

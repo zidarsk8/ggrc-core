@@ -92,6 +92,14 @@
   ></relevant-filter>
 </div>
 <div class="filter-buttons">
+  {{#mapper.afterSearch}}
+    {{#totalObjects}}
+      <div class="objects-found {{#isLoading}}loading{{/isLoading}}">
+        <label>{{totalObjects}} {{#objectsPlural}}
+          Objects{{/objectsPlural}} {{^objectsPlural}}Object{{/objectsPlural}} found</label>
+      </div>
+    {{/totalObjects}}
+  {{/mapper.afterSearch}}
   <button can-click="onSubmit" class="btn btn-small btn-info" {{#isLoading}}disabled="disabled"{{/isLoading}}>Search
   </button>
 </div>
