@@ -32,8 +32,6 @@
       allItems: [],
       allSelected: false,
       baseInstance: null,
-      scopeId: '@',
-      scopeType: '@',
       filter: '',
       selected: [],
       refreshItems: false,
@@ -99,21 +97,12 @@
         this.attr('relatedAssessments.show',
           !!Model.tree_view_options.show_related_assessments);
       },
-      setAdditionalScopeFilter: function () {
-        var id = this.attr('baseInstance.scopeObject.id');
-        var type = this.attr('baseInstance.scopeObject.type');
-        return {
-          type: type,
-          id: id
-        };
-      },
       onSearch: function () {
         this.attr('refreshItems', true);
       },
       prepareRelevantFilters: function () {
         var filters;
         var relevantList = this.attr('mapper.relevant');
-        var useSnapshots = this.useSnapshots();
 
         filters = relevantList.attr()
           .map(function (relevant) {
@@ -122,26 +111,13 @@
             }
             return {
               type: relevant.filter.type,
+              operation: 'relevant',
               id: Number(relevant.filter.id)
             };
           })
           .filter(function (item) {
             return item;
           });
-        // Filter by scope
-        if (useSnapshots) {
-          if (Number(this.attr('scopeId'))) {
-            filters.push({
-              type: this.attr('scopeType'),
-              id: Number(this.attr('scopeId'))
-            });
-          } else {
-            if (this.attr('baseInstance.scopeObject')) {
-              filters.push(this.setAdditionalScopeFilter());
-            }
-            return filters;
-          }
-        }
         return filters;
       },
       prepareBaseQuery: function (modelName, paging, filters, ownedFilter) {
@@ -158,7 +134,8 @@
             filter: this.attr('filter')
           }, {
             type: this.attr('baseInstance.type'),
-            id: this.attr('baseInstance.id')
+            id: this.attr('baseInstance.id'),
+            operation: 'relevant'
           }, [], ownedFilter);
       },
       prepareOwnedFilter: function () {
@@ -332,7 +309,7 @@
           });
         return dfd;
       },
-      setItemsDebounced() {
+      setItemsDebounced: function () {
         clearTimeout(this.attr('_setItemsTimeout'));
         this.attr('_setItemsTimeout', setTimeout(this.setItems.bind(this)));
       },

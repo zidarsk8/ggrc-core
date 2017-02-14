@@ -68,9 +68,6 @@
     entries: [],
     options: [],
     relevant: [],
-    is_snapshotable: false,
-    snapshot_scope_id: '',
-    snapshot_scope_type: '',
     toolbarSubmitCbs: $.Callbacks(),
     afterSearch: false,
     allowedToCreate: function () {
@@ -224,10 +221,7 @@
           callback: parentScope.attr('callback'),
           useTemplates: parentScope.attr('useTemplates'),
           assessmentGenerator: parentScope.attr('assessmentGenerator'),
-          is_snapshotable: parentScope.attr('is_snapshotable'),
-          is_new: parentScope.attr('is_new'),
-          snapshot_scope_id: parentScope.attr('snapshot_scope_id'),
-          snapshot_scope_type: parentScope.attr('snapshot_scope_type')
+          is_new: parentScope.attr('is_new')
         })),
         template: parentScope.attr('template'),
         draw_children: true
