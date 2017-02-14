@@ -6,21 +6,22 @@
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
   {{#if model.root_object}}
-  <a
-    class="btn btn-mini action-button map-button"
-    href="javascript://"
-    rel="tooltip"
-    data-placement="left"
-    data-toggle="unified-mapper"
-    data-join-mapping="{{mapping}}"
-    data-join-option-type="{{model.shortName}}"
-    data-join-object-id="{{instance.id}}"
-    data-join-object-type="{{parent_instance.class.shortName}}"
-    data-exclude-option-types="{{exclude_option_types}}"
-    data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
->
-    Map
-  </a>
+    {{^if_equals model.shortName 'Assessment'}}
+      <a
+        class="btn btn-mini action-button map-button"
+        href="javascript://"
+        rel="tooltip"
+        data-placement="left"
+        data-toggle="unified-mapper"
+        data-join-mapping="{{mapping}}"
+        data-join-option-type="{{model.shortName}}"
+        data-join-object-id="{{instance.id}}"
+        data-join-object-type="{{parent_instance.class.shortName}}"
+        data-exclude-option-types="{{exclude_option_types}}"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
+        Map
+      </a>
+    {{/if_equals}}
   {{#if null}}
   <span class="section-expander">
     <a href="javascript://"
