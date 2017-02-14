@@ -291,6 +291,16 @@ mapper-results {
     }
   }
 
+  .no-items-spinner-wrapper {
+    display: flex;
+    justify-content: center;
+    height: 58px;
+
+    .spinner .fa {
+      font-size: 32px;
+      color: #444;
+    }
+  }
 
   &.snapshot-list {
     .list-object-item {

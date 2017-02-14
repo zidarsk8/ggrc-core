@@ -46,9 +46,13 @@
     </div>
     <tree-pagination paging="paging" class="list-pagination"></tree-pagination>
   {{else}}
-    {{^isLoading}}
+    {{#if isLoading}}
+      <div class="no-items-spinner-wrapper">
+        <spinner toggle="isLoading" extra-css-class="grid-spinner" class="spinner-wrapper active"></spinner>
+      </div>
+    {{else}}
       <div class="well well-small">No {{getDisplayModel.title_plural}} were found</div>
-    {{/isLoading}}
+    {{/if}}
   {{/if}}
 </object-selection>
 {{#relatedAssessments.show}}
