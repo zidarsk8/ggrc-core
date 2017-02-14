@@ -62,6 +62,39 @@
         this.attr('paging.total', total);
         this.attr('paging.count', count);
       },
+      showNewEntries: function () {
+        var self = this;
+        var newEntries;
+
+        if (this.attr('mapper.newEntries')) {
+          newEntries = this.attr('mapper.newEntries').map(function (value) {
+            return {
+              id: value.id,
+              type: value.type,
+              data: self.transformValue(value),
+              isSelected: true,
+              markedSelected: true
+            };
+          });
+
+          // select new entries
+          this.attr('selected').push.apply(this.attr('selected'), newEntries);
+        }
+
+        // clear filter
+        this.attr('filter', '');
+        this.attr('prevSelected', this.attr('selected').slice());
+
+        // sort by update date
+        this.attr('sort.key', 'updated_at');
+        this.attr('sort.direction', 'desc');
+
+        // set current page
+        this.attr('paging.current', 1);
+
+        // display results
+        this.attr('mapper.afterSearch', true);
+      },
       setItems: function () {
         var self = this;
         return self.load()
@@ -228,7 +261,15 @@
         });
       },
       setSelectedItems: function (allItems) {
-        var selectedItems = can.makeArray(this.attr('selected'));
+        var selectedItems;
+
+        // get items which were selected before adding of new entries
+        if (this.attr('prevSelected') && this.attr('prevSelected').length > 0) {
+          this.attr('selected', this.attr('prevSelected').slice());
+          this.attr('prevSelected', []);
+        }
+
+        selectedItems = can.makeArray(this.attr('selected'));
         allItems.forEach(function (item) {
           item.isSelected =
             selectedItems.some(function (selectedItem) {
