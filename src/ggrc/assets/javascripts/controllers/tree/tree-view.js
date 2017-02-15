@@ -260,6 +260,7 @@
 
     init: function (el, opts) {
       var setAllowMapping;
+      var self = this;
       var states = GGRC.Utils.State
         .getStatesForModel(this.options.model.shortName);
 
@@ -325,6 +326,10 @@
 
         if (!this.options.scroll_element) {
           this.options.attr('scroll_element', $('.object-area'));
+
+          $('.object-area').on('change', function () {
+            self.update_header();
+          });
         }
 
         // Override nested child options for allow_* properties
@@ -426,6 +431,7 @@
       }
 
       this._init_view_deferred = $.when.apply($.when, dfds);
+      this.update_header();
       return this._init_view_deferred;
     },
 
@@ -843,9 +849,33 @@
         }
         this.options.attr('filter_shown', shown);
         this.options.attr('filter_count', count.toString());
-        this.element.parent().find('.sticky').Stickyfill();
+
+        this.update_header();
       }.bind(this)));
       return finalDfd;
+    },
+    update_header: function () {
+      var treeFilter = this.element.parent().find('.tree-filter');
+      var filterHeight = Number(treeFilter.attr('data-height')) +
+        Number(treeFilter.attr('data-margin-bottom'));
+      var headerHeight = this.element.parent().find('.tree-header').height();
+      var elementMarginTop = this.element.parent().offset().top;
+      var parentWidth = this.element.parent().width();
+      var headerContentHeight = filterHeight + headerHeight;
+      var treeHeaderContent = this.element.parent()
+        .find('.tree-header-content');
+
+      if (this.options.attr('filter_is_hidden')) {
+        elementMarginTop -= filterHeight;
+        headerContentHeight -= filterHeight;
+      }
+
+      this.element.css('margin-top', elementMarginTop);
+
+      if (treeHeaderContent) {
+        treeHeaderContent.css('width', parentWidth);
+        treeHeaderContent.height(headerContentHeight);
+      }
     },
     draw_items: function (optionsList) {
       var items;
@@ -975,7 +1005,7 @@
       this.triggerListeners();
 
       $('body').on('treeupdate', this.refreshList.bind(this));
-
+      this.update_header();
       return false;
     },
 
@@ -1106,52 +1136,29 @@
     },
 
     hide_filter: function () {
-      var $filter = this.element.parent().find('.tree-filter');
-      var height = $filter.outerHeight(true);
-      var margin = $filter.css('margin-bottom').replace('px', '');
-
-      $filter
-        .data('height', height)
-        .data('margin-bottom', margin)
-        .css({
-          'margin-bottom': 0,
-          height: 0,
-          overflow: 'hidden'
-        });
+      this.options.attr('filter_is_hidden', true);
 
       this.element.parent().find('.filter-trigger > a')
         .removeClass('active')
         .find('span')
         .text('Show filter');
 
-      this.element.parent().find('.sticky.tree-header').addClass('no-filter');
-      Stickyfill.rebuild();
-
       this.display_prefs.setFilterHidden(true);
       this.display_prefs.save();
+      this.update_header();
     },
 
     show_filter: function () {
-      var $filter = this.element.parent().find('.tree-filter');
-
-      $filter
-        .css({
-          'margin-bottom': $filter.data('margin-bottom'),
-          height: $filter.data('height'),
-          overflow: ''
-        });
+      this.options.attr('filter_is_hidden', false);
 
       this.element.parent().find('.filter-trigger > a')
         .addClass('active')
         .find('span')
         .text('Hide filter');
 
-      this.element.parent().find('.sticky.tree-header')
-        .removeClass('no-filter');
-      Stickyfill.rebuild();
-
       this.display_prefs.setFilterHidden(false);
       this.display_prefs.save();
+      this.update_header();
     },
     loadTreeStates: function (modelName) {
       // Get the status list from local storage

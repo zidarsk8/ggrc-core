@@ -59,6 +59,14 @@
     }
   }
   .header {
+    &.tree-header-content {
+      position: absolute;
+      z-index: 1; 
+      background-color: $contentBgnd;
+      margin-top: -20px;
+      border-top: solid $contentBgnd;
+      border-width: 20px;
+    }
     &.tree-header {
       padding: 0 12px 0 70px;
       font-size: 11px;

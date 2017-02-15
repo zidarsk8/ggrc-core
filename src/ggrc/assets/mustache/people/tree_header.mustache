@@ -3,52 +3,54 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{> '/static/mustache/base_objects/tree_view_filter.mustache'}}
+<div class="header tree-header-content">
+  {{> '/static/mustache/base_objects/tree_view_filter.mustache'}}
 
-<header class="header sticky sticky-header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
-  <div class="row-fluid">
-    <div class="span4">
-      <div class="title-heading oneline">
-        <span class="widget-col-title" data-field="title">
-          Name
-          <i class="fa fa-caret-up"></i>
-        </span>
+  <header class="header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+    <div class="row-fluid">
+      <div class="span4">
+        <div class="title-heading oneline">
+          <span class="widget-col-title" data-field="title">
+            Name
+            <i class="fa fa-caret-up"></i>
+          </span>
+        </div>
+      </div>
+      <div class="span2">
+        <div class="oneline">
+          <span class="widget-col-title" data-field="email">
+            Email
+            <i class="fa fa-caret-up"></i>
+          </span>
+        </div>
+      </div>
+      <div class="span2">
+        <div class="oneline">
+          Authorizations
+        </div>
+      </div>
+      <div class="span4">
+        <ul class="tree-action-list">
+          {{#if add_item_view}}
+          <li>
+            {{{renderLive add_item_view}}}
+          </li>
+          {{/if}}
+          <li>
+            <div class="details-wrap">
+              <a class="btn btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+                <span class="bubble"></span>
+                <span class="bubble"></span>
+                <span class="bubble"></span>
+              </a>
+              <ul class="dropdown-menu tree-action-list-items" role="menu">
+                {{> '/static/mustache/base_objects/filter_trigger.mustache'}}
+              </ul>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
-    <div class="span2">
-      <div class="oneline">
-        <span class="widget-col-title" data-field="email">
-          Email
-          <i class="fa fa-caret-up"></i>
-        </span>
-      </div>
-    </div>
-    <div class="span2">
-      <div class="oneline">
-        Authorizations
-      </div>
-    </div>
-    <div class="span4">
-      <ul class="tree-action-list">
-        {{#if add_item_view}}
-        <li>
-          {{{renderLive add_item_view}}}
-        </li>
-        {{/if}}
-        <li>
-          <div class="details-wrap">
-            <a class="btn btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
-              <span class="bubble"></span>
-              <span class="bubble"></span>
-              <span class="bubble"></span>
-            </a>
-            <ul class="dropdown-menu tree-action-list-items" role="menu">
-              {{> '/static/mustache/base_objects/filter_trigger.mustache'}}
-            </ul>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-</header>
+  </header>
+</div>
 <div class="clearfix"></div>
