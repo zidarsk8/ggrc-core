@@ -193,11 +193,13 @@ class UserRoleColumnHandler(UserColumnHandler):
     self.dry_run = True
 
 COLUMN_HANDLERS = {
-    "program_editor": ProgramEditorColumnHandler,
-    "program_owner": ProgramOwnerColumnHandler,
-    "program_reader": ProgramReaderColumnHandler,
-    "user_role": UserRoleColumnHandler,
-    "user_role:Auditor": AuditAuditorColumnHandler,
-    "workflow_member": WorkflowMemberColumnHandler,
-    "workflow_owner": WorkflowOwnerColumnHandler,
+    "default": {
+        "program_editor": ProgramEditorColumnHandler,
+        "program_owner": ProgramOwnerColumnHandler,
+        "program_reader": ProgramReaderColumnHandler,
+        "user_role": UserRoleColumnHandler,
+        "user_role:Auditor": AuditAuditorColumnHandler,
+        "workflow_member": WorkflowMemberColumnHandler,
+        "workflow_owner": WorkflowOwnerColumnHandler,
+    },
 }

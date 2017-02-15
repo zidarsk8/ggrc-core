@@ -42,12 +42,12 @@
   var snapshotWidgetsConfig = GGRC.config.snapshotable_objects || [];
   // Items allowed for relationship mapping
   var excludeMappingConfig = [
-    'Assessment',
     'AssessmentTemplate',
     'Issue'
   ];
   // Extra Tree View Widgets require to be rendered on Audit View
   var auditInclusion = [
+    'Assessment',
     'Person',
     'Program'
   ];

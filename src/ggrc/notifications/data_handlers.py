@@ -87,6 +87,27 @@ def assignable_open_data(notif):
   return _get_assignable_dict(people, notif)
 
 
+def assignable_updated_data(notif):
+  """Get data for updated assignable object.
+
+  Args:
+    notif (Notification): Notification entry for an open assignable object.
+
+  Returns:
+    A dict containing all notification data for the given notification.
+  """
+  obj = get_notification_object(notif)
+  if not obj:
+    logger.warning(
+        '%s for notification %s not found.',
+        notif.object_type, notif.id,
+    )
+    return {}
+  people = [person for person, _ in obj.assignees]
+
+  return _get_assignable_dict(people, notif)
+
+
 def _get_declined_people(obj):
   """Get a list of people for declined notifications.
 
@@ -205,6 +226,8 @@ def get_assignable_data(notif):
     return {}
   elif notif.notification_type.name.endswith("_open"):
     return assignable_open_data(notif)
+  elif notif.notification_type.name.endswith("_updated"):
+    return assignable_updated_data(notif)
   elif notif.notification_type.name.endswith("_declined"):
     return assignable_declined_data(notif)
   elif notif.notification_type.name.endswith("_reminder"):

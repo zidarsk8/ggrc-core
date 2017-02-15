@@ -1,0 +1,80 @@
+{{!
+Copyright (C) 2017 Google Inc.
+Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+<related-objects base-instance="instance" related-items-type="Assessment" order-by="finished_date">
+    <div class="grid-data-toolbar flex-box">
+        <tree-pagination paging="paging"></tree-pagination>
+    </div>
+    <div class="grid-data-header flex-row flex-box">
+        <div class="grid-data-item-index">
+            Assessment State
+        </div>
+        <div class="grid-data-item-index">
+            Assessment Finish Date
+        </div>
+        <div class="grid-data-item-index">
+            Assessment Create Date
+        </div>
+        <div class="flex-size-3">
+            Related Controls / Objectives
+        </div>
+        <div class="flex-size-3">
+            Audit Title
+        </div>
+        <div class="flex-size-3">
+            Attachments
+        </div>
+        <div class="flex-size-3">
+            Urls
+        </div>
+    </div>
+    <div class="grid-data-body {{#if isLoading}}loading{{/if}}">
+        <object-list items="relatedObjects" is-loading="isLoading" spinner-css="grid-spinner">
+            <div class="grid-data-row flex-row flex-box">
+                <div class="grid-data-item-index">
+                    <state-colors-map state="status"></state-colors-map>
+                </div>
+                <div class="grid-data-item-index">
+                  {{localize_date finished_date}}
+                </div>
+                <div class="grid-data-item-index">
+                  {{localize_date created_at}}
+                </div>
+                <div class="flex-size-3">
+                    <related-controls-objectives parent-instance="instance">
+                        <mapped-objects
+                                mapped-snapshots="mappedSnapshots"
+                                filter="filter"
+                                parent-instance="parentInstance">
+                            <business-object-list-item instance="instance"></business-object-list-item>
+                        </mapped-objects>
+                    </related-controls-objectives>
+                </div>
+                <div class="flex-size-3">
+                    <related-audits parent-instance="instance">
+                        <mapped-objects
+                                parent-instance="parentInstance"
+                                related-types="relatedTypes">
+                            <a href="{{instance.viewLink}}" target="_blank">{{instance.title}}</a>
+                        </mapped-objects>
+                    </related-audits>
+                </div>
+                <div class="flex-size-3">
+                    <mapped-objects
+                            parent-instance="instance"
+                            mapping="{{instance.class.info_pane_options.evidence.mapping}}">
+                        <document-object-list-item instance="instance"></document-object-list-item>
+                    </mapped-objects>
+                </div>
+                <div class="flex-size-3">
+                    <mapped-objects
+                            parent-instance="instance"
+                            mapping="{{instance.class.info_pane_options.urls.mapping}}">
+                        <document-object-list-item instance="instance"></document-object-list-item>
+                    </mapped-objects>
+                </div>
+            </div>
+        </object-list>
+    </div>
+</related-objects>

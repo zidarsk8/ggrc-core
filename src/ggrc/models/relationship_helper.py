@@ -1,8 +1,12 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Helper for getting related objects."""
+
 from sqlalchemy import and_
 from sqlalchemy import sql
+from sqlalchemy import union
+from sqlalchemy.orm import aliased
 
 from ggrc import db
 from ggrc.extensions import get_extension_modules
@@ -10,11 +14,13 @@ from ggrc import models
 from ggrc.models import Audit
 from ggrc.models import Request
 from ggrc.models import Snapshot
-from ggrc.models.relationship import Relationship
 from ggrc.models import all_models
+from ggrc.models.relationship import Relationship
+from ggrc.snapshotter.rules import Types
 
 
 class RelationshipHelper(object):
+  """Helpers for related objects with special relationships."""
 
   @classmethod
   def program_audit(cls, object_type, related_type, related_ids):
@@ -179,7 +185,112 @@ class RelationshipHelper(object):
     return query.union(*clean_queries)
 
   @classmethod
-  def get_ids_related_to(cls, object_type, related_type, related_ids=[]):
+  def _assessment_object_mappings(cls, object_type, related_type, related_ids):
+    """Get Object ids for audit scope objects and snapshotted objects."""
+
+    if object_type in Types.scoped and related_type in Types.all:
+
+      source_query = db.session.query(
+          Relationship.destination_id.label("result_id"),
+          Relationship.destination_type,
+          Snapshot.child_id,
+          Snapshot.child_type,
+      ).join(
+          Snapshot,
+          and_(
+              Relationship.source_id == Snapshot.id,
+              Relationship.source_type == Snapshot.__name__,
+              Relationship.destination_type == object_type,
+              Snapshot.child_type == related_type,
+              Snapshot.child_id.in_(related_ids),
+          )
+      )
+
+      destination_query = db.session.query(
+          Relationship.source_id.label("result_id"),
+          Relationship.source_type,
+          Snapshot.child_id,
+          Snapshot.child_type,
+      ).join(
+          Snapshot,
+          and_(
+              Relationship.destination_id == Snapshot.id,
+              Relationship.destination_type == Snapshot.__name__,
+              Relationship.source_type == object_type,
+              Snapshot.child_type == related_type,
+              Snapshot.child_id.in_(related_ids),
+          )
+      )
+
+    elif object_type in Types.all and related_type in Types.scoped:
+      source_query = db.session.query(
+          Relationship.destination_id,
+          Relationship.destination_type,
+          Snapshot.child_id.label("result_id"),
+          Snapshot.child_type,
+      ).join(
+          Snapshot,
+          and_(
+              Relationship.source_id == Snapshot.id,
+              Relationship.source_type == Snapshot.__name__,
+              Relationship.destination_type == related_type,
+              Relationship.destination_id.in_(related_ids),
+              Snapshot.child_type == object_type,
+          )
+      )
+
+      destination_query = db.session.query(
+          Relationship.source_id,
+          Relationship.source_type,
+          Snapshot.child_id.label("result_id"),
+          Snapshot.child_type,
+      ).join(
+          Snapshot,
+          and_(
+              Relationship.destination_id == Snapshot.id,
+              Relationship.destination_type == Snapshot.__name__,
+              Relationship.source_type == related_type,
+              Relationship.source_id.in_(related_ids),
+              Snapshot.child_type == object_type,
+          )
+      )
+
+    else:
+      raise Exception(
+          "Snapshot relationship called with invalid types.\n"
+          "object types: '{}' - '{}'".format(object_type, related_type)
+      )
+
+    query = aliased(union(source_query, destination_query))
+
+    return db.session.query(query.c.result_id)
+
+  @classmethod
+  def _parent_object_mappings(cls, object_type, related_type, related_ids):
+    """Get Object ids for audit and snapshotted object mappings."""
+
+    if object_type in Types.parents and related_type in Types.all:
+      query = db.session.query(Snapshot.parent_id).filter(
+          Snapshot.parent_type == object_type,
+          Snapshot.child_type == related_type,
+          Snapshot.child_id.in_(related_ids)
+      )
+    elif related_type in Types.parents and object_type in Types.all:
+      query = db.session.query(Snapshot.child_id).filter(
+          Snapshot.parent_type == related_type,
+          Snapshot.parent_id.in_(related_ids),
+          Snapshot.child_type == object_type,
+      )
+    else:
+      raise Exception(
+          "Parent relationship called with invalid types.\n"
+          "object types: '{}' - '{}'".format(object_type, related_type)
+      )
+
+    return query
+
+  @classmethod
+  def get_ids_related_to(cls, object_type, related_type, related_ids=None):
     """ get ids of objects
 
     Get a list of all ids for object with object_type, that are related to any
@@ -191,6 +302,16 @@ class RelationshipHelper(object):
 
     if not related_ids:
       return db.session.query(Relationship.source_id).filter(sql.false())
+
+    if (object_type in Types.scoped and related_type in Types.all or
+            related_type in Types.scoped and object_type in Types.all):
+      return cls._assessment_object_mappings(
+          object_type, related_type, related_ids)
+
+    if (object_type in Types.parents and related_type in Types.all or
+            related_type in Types.parents and object_type in Types.all):
+      return cls._parent_object_mappings(
+          object_type, related_type, related_ids)
 
     destination_ids = db.session.query(Relationship.destination_id).filter(
         and_(

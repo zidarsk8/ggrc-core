@@ -14,6 +14,7 @@
       treeViewClass: '@',
       expandable: '@',
       sortField: '@',
+      emptyText: '@',
       parentInstance: null,
       mappedObjects: [],
       isExpandable: function () {

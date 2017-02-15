@@ -1,15 +1,16 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+"""PyTest fixtures."""
+# pylint: disable=invalid-name
 
-"""PyTest fixtures"""
-
-import pytest   # pylint: disable=import-error
+import pytest
 
 from lib import constants
-from lib.page.widget import info_widget
 from lib.constants.test import batch
-from lib.service.rest_service import (ProgramsService, AuditsService,
-                                      ControlsService)
+from lib.page.widget import info_widget
+from lib.service.rest_service import (
+    ProgramsService, AuditsService, ControlsService, AsmtTmplsService,
+    AssessmentsService, RelationshipsService, ObjectsOwnersService)
 from lib.utils import conftest_utils
 from lib.utils import test_utils
 
@@ -60,6 +61,7 @@ def new_program(selenium, new_control):
   """Creates a new program object and returns the program info page with the
   saved modal"""
   # pylint: disable=redefined-outer-name
+  # pylint: disable=unused-argument
   modal = conftest_utils.get_lhn_accordion(
       selenium, constants.element.Lhn.PROGRAMS)\
       .create_new()
@@ -173,33 +175,87 @@ def battery_of_controls(selenium):
   for _ in xrange(batch.BATTERY):
     controls.append(conftest_utils.create_lhn_object(
         selenium, constants.element.Lhn.CONTROLS))
-
   yield controls
 
 
 @pytest.yield_fixture(scope="function")
 def new_program_rest():
-  """Creates Program via REST API"""
-  service = ProgramsService()
-  yield service.create_programs(1)[0]
+  """Create a new business object Program via REST API.
+  Return the object: Program
+  """
+  yield ProgramsService().create(count=1)[0]
 
 
 @pytest.yield_fixture(scope="function")
 def new_audit_rest(new_program_rest):
-  """Creates Audit via REST API"""
-  service = AuditsService()
-  yield service.create_audits(1, program=new_program_rest)[0]
+  """Create a new business object Audit via REST API.
+  Return the list of objects: [Audit, Program]
+  """
+  yield AuditsService().create(
+      count=1, program=new_program_rest)[0], new_program_rest
+
+
+@pytest.yield_fixture(scope="function")
+def new_asmt_tmpl_rest(new_audit_rest):
+  """Create a new business object Assessment Template via REST API.
+  Return the list of objects: [AssessmentTemplate, Audit, Program]
+  """
+  yield (AsmtTmplsService().create(
+      count=1, audit=new_audit_rest[0])[0],
+      new_audit_rest[0], new_audit_rest[1])
+
+
+@pytest.yield_fixture(scope="function")
+def new_asmt_rest(new_audit_rest):
+  """Create a new business object Assessment via REST API.
+  Return the list of objects: [Assessment, Object, Audit]
+  """
+  yield (AssessmentsService().create(
+      count=1, obj=new_audit_rest[1],
+      audit=new_audit_rest[0])[0], new_audit_rest[1], new_audit_rest[0])
 
 
 @pytest.yield_fixture(scope="function")
 def new_control_rest():
-  """Creates Control via REST API"""
-  service = ControlsService()
-  yield service.create_controls(1)[0]
+  """Create a new business object Control via REST API.
+  Return the object: Control
+  """
+  control = ControlsService().create(count=1)[0]
+  ObjectsOwnersService().create(objs=control)
+  yield control
 
 
 @pytest.yield_fixture(scope="function")
-def battery_of_controls_rest(count=batch.BATTERY):
-  """Creates batch of Controls via REST API"""
-  service = ControlsService()
-  yield service.create_controls(count=count)
+def new_controls_rest():
+  """Create batch of a new business objects Controls via REST API.
+  Return the list of objects: [Control#1, Control#2, Control#3].
+  """
+  controls = ControlsService().create(count=batch.BATTERY)
+  ObjectsOwnersService().create(objs=controls)
+  yield controls
+
+
+@pytest.yield_fixture(scope="function")
+def update_control_rest(new_control_rest):
+  """Update of the existing business object Control via REST API.
+  Return the object: Control
+  """
+  yield ControlsService().update(objs=new_control_rest)[0]
+
+
+@pytest.yield_fixture(scope="function")
+def map_program_to_controls_rest(new_program_rest, new_controls_rest):
+  """Create a new business objects Program and Controls via REST API.
+  Create relationship (map) Controls to Program via REST API.
+  """
+  yield RelationshipsService().create(src_obj=new_program_rest,
+                                      dest_objs=new_controls_rest)
+
+
+@pytest.yield_fixture(scope="function")
+def map_program_to_control_rest(new_program_rest, new_control_rest):
+  """Create a new business objects Program and Control via REST API.
+  Create relationship (map) Control to Program via REST API.
+  """
+  yield RelationshipsService().create(src_obj=new_program_rest,
+                                      dest_objs=new_control_rest)

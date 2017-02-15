@@ -1,14 +1,27 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
-"""Locators for all the elements"""
+"""Locators for all the elements."""
 # pylint: disable=too-few-public-methods
+# pylint: disable=too-many-lines
 
 from selenium.webdriver.common.by import By
 
-from lib.constants import attribute
-from lib.constants import objects
-from lib.constants import url
+from lib.constants import objects, url
+
+
+class Common(object):
+  """Common locators."""
+
+  # modal
+  MODAL_GENEATE = ".modal-selector"
+  MODAL_CREATE = ".modal-wide"
+  # attribute names used amongst classes
+  BUTTON = "BUTTON_"
+  BUTTON_CREATE_NEW = "BUTTON_CREATE_NEW_"
+  COUNT = "COUNT_"
+  SPINNY = "SPINNY_"
+  ACCORDION_MEMBERS = "ACCORDION_MEMBERS_"
+  TOGGLE = "TOGGLE_"
 
 
 class Login(object):
@@ -104,15 +117,15 @@ class LhnMenu(object):
           capitalized_name = capitalized_name.title().replace("_", "")
 
         # set lhn items
-        setattr(cls, attribute.TOGGLE + object_plural,
+        setattr(cls, Common.TOGGLE + object_plural,
                 cls._Locator.get_accordion_button(capitalized_name))
-        setattr(cls, attribute.BUTTON_CREATE_NEW + object_plural,
+        setattr(cls, Common.BUTTON_CREATE_NEW + object_plural,
                 cls._Locator.get_create_new_button(capitalized_name))
-        setattr(cls, attribute.COUNT + object_plural,
+        setattr(cls, Common.COUNT + object_plural,
                 cls._Locator.get_accordion_count(capitalized_name))
-        setattr(cls, attribute.SPINNY + object_plural,
+        setattr(cls, Common.SPINNY + object_plural,
                 cls._Locator.get_spinny(capitalized_name))
-        setattr(cls, attribute.ACCORDION_MEMBERS + object_plural,
+        setattr(cls, Common.ACCORDION_MEMBERS + object_plural,
                 cls._Locator.get_accordion_members(capitalized_name))
 
   LHN_MENU = (By.ID, "lhn")
@@ -163,15 +176,43 @@ class ExtendedInfo(object):
 
 
 class BaseModalCreateNew(object):
-  """Locators shared with create new object modals"""
+  """Locators shared with create new object modals."""
+  MODAL = Common.MODAL_CREATE
   # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, '[id="ajax-modal-javascript:--"]>div>h2')
-  TITLE = (By.CSS_SELECTOR, '.modal-body form>div:nth-child(2) .span6>label')
-
+  MODAL_TITLE = (By.CSS_SELECTOR, "{} .ui-draggable-handle>h2".format(MODAL))
+  TITLE = (By.CSS_SELECTOR,
+           "{} .modal-body form>div:nth-child(2) .span6>label".format(MODAL))
   # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      '.modal-body form>div:nth-child(2) .span6>input')
+  UI_TITLE = (By.CSS_SELECTOR,
+              "{} .modal-body form>div:nth-child(2) .span6>input".
+              format(MODAL))
+
+
+class BaseModalGenerateNew(object):
+  """Locators shared with generate new object modals."""
+  MODAL = Common.MODAL_GENEATE
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, "{} .modal-header>h2".format(MODAL))
+
+
+class ModalSetVisibleFields(object):
+  """Locators for a generic edit object modal."""
+  FIELDS_MODAL = "{} .open .dropdown-menu-form"
+  FIELDS_TITLES = "{} .tree-header .checkbox-inline"
+  FIELDS_CHECKBOXES = "{} .tree-header .attr-checkbox"
+  BUTTON_SAVE_SET_FIELDS = "{} .tree-action-list .set-tree-attrs"
+
+
+class ModalCreateNewObject(BaseModalCreateNew):
+  """Locators for a generic new object modal."""
+  UI_TITLE = (By.CSS_SELECTOR,
+              '{} [data-id="title_txtbx"]'.format(BaseModalCreateNew.MODAL))
+  BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR,
+                           '{} [data-toggle="modal-submit"]'.
+                           format(BaseModalCreateNew.MODAL))
+  BUTTON_SAVE_AND_ADD_ANOTHER = (By.CSS_SELECTOR,
+                                 '{} [data-toggle="modal-submit-addmore"]'.
+                                 format(BaseModalCreateNew.MODAL))
 
 
 class ModalCreateNewProgram(BaseModalCreateNew):
@@ -448,22 +489,42 @@ class ModalCreateNewIssue(BaseModalCreateNew):
   LHN"""
 
 
+class ModalCreateNewAsmt(BaseModalCreateNew):
+  """Locators for a assessments creation modal."""
+
+
+class ModalCreateNewAsmtTmpl(BaseModalCreateNew):
+  """Locators for a assessment templates creation modal."""
+
+
+class ModalGenerateNewObject(BaseModalGenerateNew):
+  """Locators for a generate new object modal."""
+  BUTTON_GENERATE = (By.CSS_SELECTOR,
+                     "{} .btn-map".format(BaseModalGenerateNew.MODAL))
+
+
+class ModalGenerateNewAsmt(ModalGenerateNewObject):
+  """Locators for a assessments generation modal."""
+  MODAL = ModalGenerateNewObject.MODAL
+  SELECT_ASMT_TMPL_DROPDOWN = (By.CSS_SELECTOR,
+                               '{} dropdown[name="assessmentTemplate"] '
+                               '.input-block-level'.format(MODAL))
+  SELECT_ASMT_TMPL_OPTIONS = (By.CSS_SELECTOR,
+                              '{} dropdown[name="assessmentTemplate"] '
+                              '.input-block-level option'.format(MODAL))
+  BUTTON_SEARCH = (By.CSS_SELECTOR, "{} .btn-info".format(MODAL))
+  FOUNDED_OBJECTS_TITLES = (By.CSS_SELECTOR,
+                            "{} .snapshot-list .title".
+                            format(MODAL))
+  FOUNDED_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
+                                '{} .snapshot-list [type="checkbox"]'.
+                                format(MODAL))
+
+
 class ModalEditObject(BaseModalCreateNew):
   """Locators for a generic edit object modal"""
   BUTTON_DELETE = (
       By.CSS_SELECTOR, '.deny-buttons [data-toggle="modal-ajax-deleteform"]')
-
-
-class ModalCreateNewObject(BaseModalCreateNew):
-  """Locators for a generic new object modal"""
-  UI_TITLE = (By.CSS_SELECTOR, '[data-id="title_txtbx"]')
-
-  BUTTON_SAVE_AND_CLOSE = (
-      By.CSS_SELECTOR,
-      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
-  BUTTON_SAVE_AND_ADD_ANOTHER = (
-      By.CSS_SELECTOR,
-      '.confirm-buttons [data-toggle="modal-submit-addmore"]')
 
 
 class ModalCustomAttribute(object):
@@ -549,17 +610,18 @@ class WidgetBarButtonAddDropdown(object):
 
 
 class ObjectWidget(object):
-  """Locators for a generic widget"""
+  """Locators for a generic widget."""
+  _HEADER = '.header [class^="span"]'
 
-  CONTROL_COLUMN_TITLE = (
-      By.CSS_SELECTOR, '.header .span4 .title-heading .widget-col-title')
-  CONTROL_OWNER = (
-      By.CSS_SELECTOR, '.header .span4 [data-field="contact.name|email"]')
-  COTNROL_STATE = (
-      By.CSS_SELECTOR, '.header .span4 [data-field="status"]')
+  HEADER_TITLE = (By.CSS_SELECTOR, _HEADER + ' [data-field="title"]')
+  HEADER_OWNER = (By.CSS_SELECTOR,
+                  _HEADER + ' [data-field="contact.name|email"]')
+  HEADER_STATE = (By.CSS_SELECTOR, _HEADER + ' [data-field="status"]')
+  HEADER_LAST_ASSESSMENT_DATE = (
+      By.CSS_SELECTOR, _HEADER + ' [data-field="last_assessment_date"]')
   MEMBERS_TITLE_LIST = (
-      By.CSS_SELECTOR,
-      '.object-area .tree-structure .select .span4:nth-child(1) .title')
+      By.CSS_SELECTOR, '.object-area .tree-structure .select '
+                       '[class^="span"]:nth-child(1) .title')
   INFO_PANE = (By.CSS_SELECTOR, '.sticky-info-panel')
   LOADING = (By.CSS_SELECTOR, '.new-tree_loading')
 
@@ -574,7 +636,7 @@ class ModalDeleteObject(object):
 
 class BaseInfoWidget(object):
   """Locators that are common to all info widgets"""
-  BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility')
+  BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility .dropdown-toggle')
   TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
 
@@ -682,6 +744,10 @@ class WidgetInfoAssessment(BaseInfoWidget):
   """Locators for the assessment info widget"""
 
 
+class WidgetInfoAssessmentTemplate(BaseInfoWidget):
+  """Locators for the assessment template info widget."""
+
+
 class WidgetInfoPolicy(BaseInfoWidget):
   """Locators for the regulation info widget"""
 
@@ -755,24 +821,23 @@ class WidgetInfoThreat(BaseInfoWidget):
 
 
 class WidgetAdminRoles(object):
-  """Locators for the roles widget on the admin dashboard"""
-  ROLES_TREE_VIEW_ITEMS = (By.CSS_SELECTOR, '#roles_list_widget .tree-item')
+  """Locators for the roles widget on the admin dashboard."""
+  widget_name = url.Widget.ROLES
 
 
 class WidgetAdminEvents(object):
   """Locators for event widget at admin dashboard"""
   _BASE_CSS_SELECTOR = 'section#events_list_widget:not([class~="hidden"])'
-  _TREE_ITEMS_SELECTOR = '.tree-item[data-model]'
+  _TREE_ITEMS_SELECTOR = ".tree-item[data-model]"
 
-  TREE_VIEW_ITEMS = (
-      By.CSS_SELECTOR,
-      '{0} {1}'.format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
-  TREE_VIEW_HEADER = (
-      By.CSS_SELECTOR,
-      '{} header'.format(_BASE_CSS_SELECTOR))
-  FIRST_TREE_VIEW_ITEM = (
-      By.CSS_SELECTOR,
-      '{0} {1}:first-child'.format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
+  TREE_VIEW_ITEMS = (By.CSS_SELECTOR,
+                     "{0} {1}".
+                     format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
+  TREE_VIEW_HEADER = (By.CSS_SELECTOR,
+                      "{} header".format(_BASE_CSS_SELECTOR))
+  FIRST_TREE_VIEW_ITEM = (By.CSS_SELECTOR,
+                          "{0} {1}:first-child".
+                          format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
 
 
 class WidgetInfoSettingsButton(object):
@@ -832,6 +897,12 @@ class BaseWidgetGeneric(object):
                        ".tree-view-pagination__count__title")
 
 
+class WidgetAssessments(BaseWidgetGeneric):
+  """Locators for assessment widget"""
+  _object_name = objects.get_singular(objects.ASSESSMENTS)
+  widget_name = url.Widget.ASSESSMENTS
+
+
 class WidgetControls(BaseWidgetGeneric):
   """Locators for control widget"""
   _object_name = "control"
@@ -867,17 +938,31 @@ class WidgetIssues(BaseWidgetGeneric):
   _object_name = "issue"
 
 
-class TreeViewCommon(object):
-  """Locators for tree-view component."""
+class WidgetAssessmentTemplates(BaseWidgetGeneric):
+  """Locators for assessment widget."""
+  _object_name = objects.get_singular(objects.ASSESSMENT_TEMPLATES)
+  widget_name = url.Widget.ASSESSMENT_TEMPLATES
+
+
+class TreeView(object):
+  """Locators for tree-view components."""
+  # common
   ITEMS = "{} li.tree-item .item-main"
+  HEADER = "{} .tree-header"
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
   ITEM_EXPAND_BUTTON = " .openclose"
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
+  # tree view tool bar of widgets
+  _TREE = " .tree-action-list"
+  BUTTON_3BBS = "{}" + _TREE + " .btn-draft"
+  BUTTON_CREATE = "{}" + _TREE + " .create-button"
+  BUTTON_GENERATE = "{}" + _TREE + " .tree-action-list-items .fa-magic"
+  BUTTON_SET_FIELDS = "{}" + _TREE + " .tree-action-list-items .fa-cog"
 
 
 class AdminCustomAttributes(object):
   """Locators for the widget custom attributes in admin dashboard."""
-  base_locator = url.Widget.CUSTOM_ATTRIBUTES
+  widget_name = url.Widget.CUSTOM_ATTRIBUTES
 
   class _Locator(object):
     """Locators for the widget custom attributes in admin dashboard."""
@@ -908,7 +993,7 @@ class AdminCustomAttributes(object):
 
       for id_, name in enumerate(items, start=1):
         setattr(cls,
-                attribute.TOGGLE + name.upper(),
+                Common.TOGGLE + name.upper(),
                 cls._Locator.get_toggle(id_))
 
   FILTER_INPUT_FIELD = (By.CLASS_NAME, 'tree-filter__expression-holder')

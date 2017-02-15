@@ -4,12 +4,16 @@
 """Tests for functions inside import_helper module.
 """
 
-import unittest
 import copy
 import random
+import unittest
+import collections
+
+import mock
 
 from ggrc import app  # noqa - this is neede for imports to work
 from ggrc.converters import import_helper
+from ggrc.converters.column_handlers import model_column_handlers
 
 
 class TestSplitArry(unittest.TestCase):
@@ -151,3 +155,34 @@ class TestColumnOrder(unittest.TestCase):
       random.shuffle(attr_list)
       column_order = import_helper.get_column_order(attr_list)
       self.assertEqual(original_list, column_order)
+
+
+class TestModelColumntHandler(unittest.TestCase):
+
+  """Tests for get handlers for current model"""
+
+  def test_get_default(self):
+    """test get default model handler"""
+
+    test_handler = collections.namedtuple("TestHandler", [])
+    test_class = collections.namedtuple("TestClass", [])
+    test_custom_handler = collections.namedtuple("TestCustomHandler", [])
+    test_custom_class = collections.namedtuple("TestCustomClass", [])
+
+    tested_handlers_dict = {
+        "default": {
+            "col_a": test_handler,
+            "col_b": test_handler,
+        },
+        test_custom_class.__name__: {
+            "col_a": test_custom_handler,
+        }
+    }
+
+    with mock.patch("ggrc.converters.column_handlers.COLUMN_HANDLERS",
+                    tested_handlers_dict):
+      self.assertEqual({"col_a": test_handler, "col_b": test_handler},
+                       model_column_handlers(test_class))
+      self.assertEqual(
+          {"col_a": test_custom_handler, "col_b": test_handler},
+          model_column_handlers(test_custom_class))

@@ -12,15 +12,24 @@
       GGRC.mustache_path +
       '/components/mapping-controls/mapping-type-selector.mustache'
     ),
-    scope: {
+    viewModel: {
       disabled: false,
       readonly: false,
       types: [],
       selectedType: ''
     },
-    events: {
-      init: function () {
-        // We might need to add some specific logic for disabled/enable DropDown items
+    init: function () {
+      var selectedType = this.viewModel.selectedType;
+      var types = this.viewModel.types;
+      var groups = ['business', 'entities', 'governance'];
+      var values = [];
+
+      groups.forEach(function (name) {
+        var groupItems = types.attr(name + '.items');
+        values = values.concat(_.pluck(groupItems, 'value'));
+      });
+      if (values.indexOf(selectedType) < 0) {
+        this.viewModel.attr('selectedType', values[0]);
       }
     }
   });

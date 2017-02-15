@@ -7,6 +7,7 @@
     {{#if instance.snapshot}}
         {{> '/static/mustache/snapshots/dropdown_menu.mustache'}}
     {{else}}
+        <show-related-assessments-button instance="instance" extra-btn-css="btn-small"></show-related-assessments-button>
         {{> '/static/mustache/base_objects/dropdown_menu.mustache'}}
     {{/if}}
 </div>

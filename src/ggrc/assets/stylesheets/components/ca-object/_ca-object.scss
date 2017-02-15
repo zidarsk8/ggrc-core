@@ -10,9 +10,38 @@
     box-sizing: border-box;
   }
 
+  .validation-title-empty {
+    color: $icon-color-empty;
+  }
+
+  .validation-title-invalid {
+    color: $icon-color-invalid;
+  }
+
+  .validation-icon {
+    text-align: center;
+    color: transparent;
+    width: 24px;
+    min-width: 24px;
+    height: 24px;
+    line-height: 24px;
+    display: block;
+
+    &.validation-icon-empty {
+      color: $icon-color-empty;
+    }
+    &.validation-icon-invalid {
+      color: $icon-color-invalid;
+    }
+    &.validation-icon-valid {
+      color: $icon-color-valid;
+    }
+  }
+
   ca-object-validation-icon {
     display: flex;
     width: 24px;
+    min-width: 24px;
     line-height: 24px;
     height: 24px;
     color: transparent;
@@ -35,6 +64,10 @@
         color: $icon-color-valid;
       }
     }
+  }
+
+  .custom-attribute__body {
+    min-width: 0; /* fixes known issue with flexbox and text-overflow */
   }
 
   .inline-edit {
@@ -142,6 +175,10 @@
 
     &:hover {
       background: #fff;
+    }
+
+    .inline-edit__text {
+      overflow: auto;
     }
 
     input[type="checkbox"] {

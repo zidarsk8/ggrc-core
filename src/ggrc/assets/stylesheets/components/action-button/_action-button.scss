@@ -19,6 +19,7 @@
     opacity: 0.47;
   }
 }
+
 .create-button {
   background: $blue;
   color: $white;
@@ -34,19 +35,22 @@
   }
 
 }
-.map-button {
-   background: $white;
-    font-weight: normal;
-    border: 1px solid $widgetBorder;
-    color: $blue;
 
-    &:hover,
-    &:focus,
-    &:active {
-        border-color: $widgetBorder;
-    }
+.map-button {
+  background: $white;
+  font-weight: normal;
+  border: 1px solid $widgetBorder;
+  color: $blue;
+
+  &:hover,
+  &:focus,
+  &:active {
+    border-color: $widgetBorder;
+  }
 }
-.view-button {}
+
+.view-button {
+}
 
 .btn {
   &.btn-link {
@@ -98,7 +102,15 @@
       outline: none;
     }
   }
+  &.btn-extra-gray {
+    background: $btnPriority;
+    color: $white;
+    font-weight: normal;
 
+    &:hover {
+      background: lighten($btnPriority, 10%);
+    }
+  }
 
   &.btn-link, &.btn-link:active, &.btn-icon, &.btn-icon:active {
     background-color: transparent;

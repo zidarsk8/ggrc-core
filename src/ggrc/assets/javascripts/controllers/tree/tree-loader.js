@@ -114,7 +114,7 @@
         (isSubTree && pageInstance.type === 'Workflow')) {
         loader = this.fetch_list.bind(this);
       } else if (isSubTree) {
-        loader = this.loadSubTree.bind(this, refetch);
+        loader = this.loadSubTree.bind(this);
       } else {
         loader = this.loadPage.bind(this);
       }
@@ -326,7 +326,7 @@
         this.options.list.push.apply(this.options.list, preppedItems);
         dfd = this.add_child_lists(preppedItems);
       } else {
-        if (this.options.is_subtree) {
+        if (this.options.is_subtree && this.options.drawSubTreeExpander) {
           this.addSubTreeExpander(items);
         }
         dfd = can.Deferred().resolve();

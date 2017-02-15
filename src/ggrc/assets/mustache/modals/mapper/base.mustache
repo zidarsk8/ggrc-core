@@ -4,88 +4,34 @@
 }}
 
 <div class="modal-header">
-    <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
-        <i class="fa fa-times black"></i>
-    </a>
-    <h2>
-      {{#if template.title}}
-        {{{render template.title mapper=mapper}}}
-      {{else}}
-          Map {{get_object}} to {{get_title}}
-      {{/if}}
-    </h2>
-</div>
-<div class="modal-filter modal-body choose-object-wrap">
-  {{#if mapper.showWarning}}
-      <div class="alert alert-error">
-          <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-        {{mapper.warningMessage}}
-      </div>
-  {{/if}}
-  {{#if mapper.useTemplates}}
-      <assessment-templates
-              instance="mapper.parentInstance"
-              type="mapper.type"
-              binding="related_assessment_templates"
-              assessment-template="mapper.assessmentTemplate"
-              mapper="mapper"
-      ></assessment-templates>
-  {{else}}
-    {{#if mapper.allowedToCreate}}
-      {{#is_allowed 'create' mapper.model.singular context='any'}}
-        {{#if_equals mapper.type 'AssessmentTemplate'}}
-            <div class="row-fluid add-button">
-                <div class="pull-right">
-                    <a
-                            class="btn btn-small btn-draft"
-                            href="javascript://"
-                            data-toggle="modal-ajax-form"
-                            data-modal-class="modal-wide"
-                            data-object-singular="{{model_info 'AssessmentTemplate' 'model_singular'}}"
-                            data-object-plural="{{model_info 'AssessmentTemplate' 'root_collection'}}"
-                            data-object-params='{
-                  "audit": {
-                      "id": {{mapper.parentInstance.id}},
-                      "type": "{{mapper.parentInstance.type}}"
-                  },
-                  "context": {
-                      "id": {{mapper.parentInstance.context.id}},
-                      "type": "{{json_escape mapper.parentInstance.context.type}}"
-                  },
-                  "audit_title": "{{json_escape mapper.parentInstance.title}}"
-                }'
-                            data-join-object-id="{{mapper.join_object_id}}">
-                        <i class="fa fa-plus-circle"></i>
-                        Create {{mapper.model.title_singular}}
-                    </a>
-                </div>
-            </div>
-        {{else}}
-          {{^if mapper.showWarning}}
-              <div class="row-fluid add-button">
-                  <div class="pull-right">
-                      <a
-                              class="btn btn-small btn-draft"
-                              href="javascript://"
-                              data-toggle="modal-ajax-form"
-                              data-modal-class="modal-wide"
-                              data-object-singular="{{mapper.model.singular}}"
-                              data-object-plural="{{mapper.model.plural}}"
-                              data-join-object-id="{{mapper.join_object_id}}">
-                          <i class="fa fa-plus-circle"></i>
-                          Create {{mapper.model.title_singular}}
-                      </a>
-                  </div>
-              </div>
-          {{/if}}
-        {{/if_equals}}
-      {{/is_allowed}}
+  <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
+    <i class="fa fa-times black"></i>
+  </a>
+  <h2>
+    {{#if template.title}}
+      {{{render template.title mapper=mapper}}}
+    {{else}}
+      Map {{get_object}} to {{get_title}}
     {{/if}}
-  {{/if}}
-    <search-toolbar class="flex-box search-toolbar flex-box-multi"></search-toolbar>
+  </h2>
 </div>
+<div class="modal-filter modal-body">
+  {{#if mapper.showWarning}}
+    <div class="alert alert-error">
+      <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+      {{mapper.warningMessage}}
+    </div>
+  {{/if}}
+  <mapper-toolbar class="flex-box search-toolbar flex-box-multi"
+                  mapper="mapper"
+                  is-loading="mapper.is_loading"
+                  {(filter)}="mapper.filter"
+                  (submit)="mapper.onToolbarSubmit()">
+  </mapper-toolbar>
+  <hr/>
   <mapper-results
-    class="{{#if mapper.useSnapshots}}snapshot-list{{/if}}"
+    class="{{#mapper.useSnapshots}}snapshot-list{{/mapper.useSnapshots}}
+      {{^mapper.afterSearch}}hidden{{/mapper.afterSearch}}"
     base-instance="mapper.parentInstance"
     is-loading="mapper.is_loading"
     object="mapper.object"
@@ -93,49 +39,45 @@
     type="mapper.type"
     selected="mapper.selected"
     contact="mapper.contact"
-    term="mapper.term"
-    scope-id="{{mapper.snapshot_scope_id}}"
-    scope-type="{{mapper.snapshot_scope_type}}">
+    filter="mapper.filter"
+    submit-cbs="mapper.toolbarSubmitCbs">
   </mapper-results>
-<div class="modal-footer">
-  {{^if mapper.search_only}}
-      <div class="row-fluid">
-          <div class="span5">
-              <div class="deny-buttons"></div>
-          </div>
-          <div class="span7">
-              <div class="confirm-buttons">
-        <span>
-          {{#if mapper.is_loading }}
-            {{^if mapper.useSnapshots}}
-              <span {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }'}} style="margin: 20px auto; display: block; width: 40px;">
-            {{/if}}
-          </span>
-          {{else}}
-            {{mapper.selected.length}}
-          {{/if}}
+  <div class="well well-small
+              {{#mapper.afterSearch}}hidden{{/mapper.afterSearch}}">
+    No results
+  </div>
+</div>
+{{^if mapper.search_only}}
+  <div class="modal-footer">
+    <div class="row-fluid">
+      <div class="span5">
+        <div class="deny-buttons"></div>
+      </div>
+      <div class="span7">
+        <div class="confirm-buttons">
+          {{mapper.selected.length}}
           {{#if template.count}}
             {{template.count}}
           {{else}}
-              object(s) selected
+            object(s) selected
           {{/if}}
-            </span>
+          </span>
 
-            <button class="btn-map btn btn-small btn-success preventdoubleclick"
-                    {{^if mapper.selected.length}}disabled="disabled"{{/if}}>
-              {{#if mapper.is_saving}}
-                  Saving, please wait...
+          <button class="btn-map btn btn-small btn-success preventdoubleclick"
+                  {{^if mapper.selected.length}}disabled="disabled"{{/if}}>
+            {{#if mapper.is_saving}}
+              Saving, please wait...
+            {{else}}
+              {{#if template.submitButton}}
+                {{template.submitButton}}
               {{else}}
-                {{#if template.submitButton}}
-                  {{template.submitButton}}
-                {{else}}
-                    Map Selected
-                {{/if}}
+                Map Selected
               {{/if}}
-            </button>
-            <spinner toggle="mapper.is_saving"></spinner>
-              </div>
-          </div>
+            {{/if}}
+          </button>
+          <spinner toggle="mapper.is_saving"></spinner>
+        </div>
       </div>
-  {{/if}}
-</div>
+    </div>
+  </div>
+{{/if}}

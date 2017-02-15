@@ -4,11 +4,11 @@
 }}
 {{#items}}
     <ca-object class="flex-box flex-row" value-id="id" def="def" value="attribute_value"
-               modal="modal" type="attributeType">
-        <ca-object-validation-icon validation="validation"></ca-object-validation-icon>
-        <div class="flex-box flex-col">
+               modal="modal" type="attributeType" validation="validation">
+        <i class="fa validation-icon {{iconCls}}"></i>
+        <div class="flex-box flex-col custom-attribute__body">
             <h6 class="inline-edit__title">
-          <span class="inline-edit__title-body">
+          <span class="inline-edit__title-body {{titleCls}}">
             {{def.title}}
             {{#if def.helptext}}
                 <i class="fa fa-question-circle" rel="tooltip" title="{{def.helptext}}"></i>

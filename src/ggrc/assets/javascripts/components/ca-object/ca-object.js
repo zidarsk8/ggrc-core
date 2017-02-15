@@ -6,9 +6,58 @@
 (function (can) {
   'use strict';
 
+  var icons = {
+    noValidation: 'fa-check-circle',
+    empty: 'fa-times-circle validation-icon-empty',
+    valid: 'fa-check-circle validation-icon-valid',
+    invalid: 'fa-times-circle validation-icon-invalid'
+  };
+
+  var titles = {
+    noValidation: ' ',
+    empty: 'validation-title-empty',
+    valid: 'validation-title-valid',
+    invalid: 'validation-title-invalid'
+  };
+
   can.Component.extend({
     tag: 'ca-object',
     viewModel: {
+      define: {
+        validation: {},
+        iconCls: {
+          value: icons.noValidation,
+          get: function () {
+            var icon = icons.noValidation;
+
+            if (this.attr('validation.mandatory')) {
+              icon = this.attr('validation.empty') ? icons.empty : icons.valid;
+            }
+            /* This validation is required for DropDowns with required attachments */
+            if (!this.attr('validation.valid')) {
+              icon = icons.invalid;
+            }
+            return icon;
+          }
+        },
+        titleCls: {
+          value: titles.noValidation,
+          get: function () {
+            var icon = titles.noValidation;
+
+            if (this.attr('validation.mandatory')) {
+              icon = this.attr('validation.empty') ?
+                                      titles.empty :
+                                      titles.valid;
+            }
+            /* This validation is required for DropDowns with required attachments */
+            if (!this.attr('validation.valid')) {
+              icon = titles.invalid;
+            }
+            return icon;
+          }
+        }
+      },
       valueId: null,
       value: null,
       type: null,

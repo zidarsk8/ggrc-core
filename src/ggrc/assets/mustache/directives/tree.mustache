@@ -36,43 +36,7 @@
                       {{else}}
                         <div class="owner tree-title-area">
                           {{#instance}}
-                            {{#switch attr_name}}
-                              {{#case 'owner'}}
-                                {{#if owners.length}}
-                                  {{#using contacts=owners}}
-                                  {{#contacts}}
-                                    {{{renderLive '/static/mustache/people/popover.mustache' person=this}}}
-                                  {{/contacts}}
-                                  {{/using}}
-                                {{/if}}
-                              {{/case}}
-                              {{#case 'contact'}}
-                                <span>
-                                  {{#using contact=instance.contact}}
-                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                                  {{/using}}
-                                </span>
-                              {{/case}}
-                              {{#case 'secondary_contact'}}
-                                <span>
-                                  {{#using contact=instance.secondary_contact}}
-                                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
-                                  {{/using}}
-                                </span>
-                              {{/case}}
-
-                              {{#default}}
-                                {{#if_helpers '\
-                                  #if_equals' attr_name 'url' '\
-                                  or #if_equals' attr_name 'reference_url'}}
-                                    <a class="url" href="{{get_url_value attr_name instance}}" target="_blank">
-                                      {{get_default_attr_value attr_name instance}}
-                                    </a>
-                                {{else}}
-                                  {{get_default_attr_value attr_name instance}}
-                                {{/if_helpers}}
-                              {{/default}}
-                            {{/switch}}
+                            {{> '/static/mustache/directives/tree-item-attr.mustache'}}
                           {{/instance}}
                         </div>
                       {{/if_equals}}
@@ -82,24 +46,7 @@
               </div>
 
               <div class="span{{display_options.action_width}}">
-
-                <div class="show-details">
-                  {{#child_options}}
-                    {{#if add_item_view}}
-                      {{{renderLive add_item_view}}}
-                    {{/if}}
-                  {{/child_options}}
-                  <view-object-buttons instance="instance" open-is-hidden="is_subtree" />
-                </div>
-                <ul class="tree-action-list">
-                  {{#infer_roles instance}}
-                    <li>
-                      <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
-                    </li>
-                  {{/infer_roles}}
-                  <li>
-                    {{> '/static/mustache/base_objects/states.mustache'}}
-                  </li>
+                <tree-node-actions instance="instance" child-options="child_options" draw-roles="true" draw-states="true">
                   {{#if_instance_of instance 'Contract'}}
                     <li>
                       <div class="counter">
@@ -119,8 +66,7 @@
                       </div>
                     </li>
                   {{/if_instance_of}}
-                </ul>
-
+                </tree-node-actions>
               </div>
             </div>
           </div><!-- item-data end -->

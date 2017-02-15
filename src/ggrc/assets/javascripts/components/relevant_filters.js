@@ -63,7 +63,7 @@
       setRelevant: function () {
         this.scope.attr('relevant').replace([]);
         can.each(this.scope.attr('relevantTo') || [], function (item) {
-          var model = CMS.Models[item.type].cache[item.id];
+          var model = new CMS.Models[item.type](item);
           this.scope.attr('relevant').push({
             readOnly: item.readOnly,
             value: true,

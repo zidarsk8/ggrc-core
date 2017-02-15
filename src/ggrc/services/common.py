@@ -903,6 +903,20 @@ class Resource(ModelView):
   def json_update(self, obj, src):
     ggrc.builder.json.update(obj, src)
 
+  def _check_put_permissions(self, obj, new_context):
+    """Check context and resource permissions for PUT."""
+    if not permissions.is_allowed_update(
+        self.model.__name__, obj.id, obj.context_id)\
+       and not permissions.has_conditions('update', self.model.__name__):
+      raise Forbidden()
+    if not permissions.is_allowed_update_for(obj):
+      raise Forbidden()
+    if new_context != obj.context_id \
+       and not permissions.is_allowed_update(
+            self.model.__name__, obj.id, new_context)\
+       and not permissions.has_conditions('update', self.model.__name__):
+      raise Forbidden()
+
   def put(self, id):
     with benchmark("Query for object"):
       obj = self.get_object(id)
@@ -910,18 +924,8 @@ class Resource(ModelView):
       return self.not_found_response()
     src = self.request.json
     with benchmark("Query update permissions"):
-      if not permissions.is_allowed_update(
-          self.model.__name__, obj.id, obj.context_id)\
-         and not permissions.has_conditions('update', self.model.__name__):
-        raise Forbidden()
-      if not permissions.is_allowed_update_for(obj):
-        raise Forbidden()
       new_context = self.get_context_id_from_json(src)
-      if new_context != obj.context_id \
-         and not permissions.is_allowed_update(
-              self.model.__name__, obj.id, new_context)\
-         and not permissions.has_conditions('update', self.model.__name__):
-        raise Forbidden()
+      self._check_put_permissions(obj, new_context)
     if self.request.mimetype != 'application/json':
       return current_app.make_response(
           ('Content-Type must be application/json', 415, []))
@@ -964,6 +968,9 @@ class Resource(ModelView):
     with benchmark("Send PUT - after commit event"):
       self.model_put_after_commit.send(obj.__class__, obj=obj,
                                        src=src, service=self, event=event)
+      # Note: Some data is created in listeners for model_put_after_commit
+      # (like updates to snapshots), so we need to commit the changes
+      db.session.commit()
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     with benchmark("Make response"):

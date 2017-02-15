@@ -139,10 +139,10 @@ select {
     @include btn-size(12px, 18px, 4px 14px);
   }
   &.btn-mini {
-    @include btn-size(11px, 16px, 2px 12px);
+    @include btn-size(11px, 16px, 2px 10px);
   }
   [class*="fa-"] {
-    @include opacity(0.7);
+    opacity: 0.7;
   }
   &.btn-full {
     text-align: center;

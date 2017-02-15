@@ -114,7 +114,8 @@
       getSnapshotQuery: function () {
         var relevantFilters = [{
           type: this.attr('parentInstance.type'),
-          id: this.attr('parentInstance.id')
+          id: this.attr('parentInstance.id'),
+          operation: 'relevant'
         }];
         var filters = this.getSnapshotQueryFilters();
         var query = GGRC.Utils.QueryAPI
@@ -124,7 +125,8 @@
       getObjectQuery: function () {
         var relevantFilters = [{
           type: this.attr('parentInstance.type'),
-          id: this.attr('parentInstance.id')
+          id: this.attr('parentInstance.id'),
+          operation: 'relevant'
         }];
         var query = this.attr('relatedTypes').map(function (type) {
           return GGRC.Utils.QueryAPI

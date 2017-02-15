@@ -85,11 +85,13 @@
               {{^is_dashboard_or_all}}
               {{#is_mappable_type instance.type model.shortName}}
               {{#is_allowed_to_map instance model.shortName}}
+              {{^if_equals model.shortName 'Assessment'}}
                 data-clickable="true"
                 data-toggle="unified-mapper"
                 data-join-option-type="{{model.shortName}}"
                 data-join-object-id="{{instance.id}}"
                 data-join-object-type="{{instance.class.shortName}}"
+              {{/if_equals}}
               {{/is_allowed_to_map}}
               {{/is_mappable_type}}
               {{/is_dashboard_or_all}}

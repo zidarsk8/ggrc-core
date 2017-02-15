@@ -51,6 +51,7 @@
     },
     tree_view_options: {
       show_view: GGRC.mustache_path + "/workflows/tree.mustache",
+      attr_view: GGRC.mustache_path + '/workflows/tree-item-attr.mustache',
       attr_list : [
         {attr_title: 'Title', attr_name: 'title'},
         {attr_title: 'Manager', attr_name: 'owner', attr_sort_field: ''},

@@ -15,6 +15,9 @@
     viewModel: {
       itemData: {},
       searchOnly: false,
+      drawRelatedAssessments: false,
+      selectedColumns: [],
+      showDetails: false,
       title: function () {
         var displayItem = this.displayItem();
         return displayItem.title ||
@@ -30,7 +33,8 @@
       },
       objectTypeIcon: function () {
         var objectType = this.objectType();
-        return 'fa-' + objectType.toLowerCase();
+        var Model = CMS.Models[objectType];
+        return 'fa-' + Model.table_singular;
       },
       toggleIconCls: function () {
         return this.attr('showDetails') ? 'fa-caret-down' : 'fa-caret-right';
@@ -39,13 +43,20 @@
         this.attr('showDetails', !this.attr('showDetails'));
       },
       isSnapshot: function () {
-        return this.attr('itemData.type') === CMS.Models.Snapshot.shortName;
+        return this.attr('itemData.type') ===
+          CMS.Models.Snapshot.model_singular;
       },
       objectType: function () {
         if (this.isSnapshot()) {
           return this.attr('itemData.child_type');
         }
         return this.attr('itemData.type');
+      },
+      showRelatedAssessments: function () {
+        this.dispatch({
+          type: 'showRelatedAssessments',
+          instance: this.displayItem()
+        });
       }
     }
   });

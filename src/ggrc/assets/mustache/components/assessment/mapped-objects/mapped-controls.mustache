@@ -2,7 +2,8 @@
     Copyright (C) 2017 Google Inc., authors, and contributors
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<collapsible-panel-header title-text="titleText" expanded="expanded">
+<div class="section-title">
+  {{titleText}}
   {{#is_allowed 'update' instance context='for'}}
       <i class="fa fa-plus-circle"
          rel="tooltip"
@@ -14,21 +15,17 @@
          data-join-object-id="{{instance.id}}"
          data-join-object-type="{{instance.class.shortName}}"
          data-original-title="Map {{firstnonempty mappingType 'Object'}} to this {{firstnonempty instance.class.title_singular 'Object'}}"
-         data-is-snapshotable="{{scopeObject.is_snapshotable}}"
-         data-snapshot-scope-id="{{scopeObject.id}}"
-         data-snapshot-scope-type="{{scopeObject.type}}">
+ >
       </i>
   {{/is_allowed}}
-</collapsible-panel-header>
-<collapsible-panel-body expanded="expanded" class="collapsible-panel-body">
-    <mapped-objects selected-item="selectedItem" parent-instance="instance" filter="filter" mapped-snapshots="mappedSnapshots">
-       <business-object-list-item instance="instance">
-          <div class="description">
-            <read-more text="itemData.description" max-text-length="90"></read-more>
-          </div>
-       </business-object-list-item>
-    </mapped-objects>
-    <object-popover class="object-popover" item="selectedItem">
-        <assessment-mapped-controls-popover class="assessment-mapped-controls-popover" item="item" expanded="expanded"></assessment-mapped-controls-popover>
-    </object-popover>
-</collapsible-panel-body>
+</div>
+<mapped-objects selected-item="selectedItem" parent-instance="instance" filter="filter" mapped-snapshots="mappedSnapshots">
+   <business-object-list-item instance="instance">
+      <div class="description">
+        <read-more text="itemData.description" max-text-length="90"></read-more>
+      </div>
+   </business-object-list-item>
+</mapped-objects>
+<object-popover class="object-popover" item="selectedItem">
+    <assessment-mapped-controls-popover class="assessment-mapped-controls-popover" item="item" expanded="expanded"></assessment-mapped-controls-popover>
+</object-popover>

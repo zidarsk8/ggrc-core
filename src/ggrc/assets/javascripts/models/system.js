@@ -44,6 +44,7 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
   },
   tree_view_options: {
     show_view: '/static/mustache/base_objects/tree.mustache',
+    attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
     footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
     attr_list: can.Model.Cacheable.attr_list.concat([
       {

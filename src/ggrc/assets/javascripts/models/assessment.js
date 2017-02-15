@@ -28,13 +28,16 @@
       verified_date: 'date'
     },
     defaults: {
-      status: 'Not Started'
+      status: 'Not Started',
+      send_by_default: true,  // notifications when a comment is added
+      recipients: 'Assessor,Creator,Verifier'  // user roles to be notified
     },
     statuses: ['Not Started', 'In Progress', 'Ready for Review',
         'Verified', 'Completed'],
     tree_view_options: {
       add_item_view: GGRC.mustache_path +
       '/base_objects/tree_add_item.mustache',
+      attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       attr_list: [{
         attr_title: 'Title',
         attr_name: 'title'

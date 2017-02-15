@@ -59,7 +59,7 @@ class Commentable(object):
       # given data - this is intended.
       return ",".join(value)
     elif not value:
-      return ""
+      return None
     else:
       raise ValueError(value,
                        'Value should be either empty ' +
@@ -77,6 +77,11 @@ class Commentable(object):
   _aliases = {
       "recipients": "Recipients",
       "send_by_default": "Send by default",
+      "comment": {
+          "display_name": "Comment",
+          "filter_by": "_filter_by_comments",
+          "filter_only": True
+      },
   }
 
   @declared_attr
@@ -101,6 +106,28 @@ class Commentable(object):
         secondaryjoin=lambda: Comment.id == comment_id,
         viewonly=True,
     )
+
+  @classmethod
+  def _filter_by_comments(cls, predicate):
+    """Add filtering by comments
+
+    Finds any object that is Commentable whose description (main text) fields
+    matches predicate.
+    """
+    from ggrc.models.relationship import Relationship
+    return Relationship.query.filter(
+        Relationship.source_type == cls.__name__,
+        Relationship.source_id == cls.id,
+        Relationship.destination_type == Comment.__name__,
+    ).join(Comment, Relationship.destination_id == Comment.id).filter(
+        predicate(Comment.description)
+    ).exists() | Relationship.query.filter(
+        Relationship.destination_type == cls.__name__,
+        Relationship.destination_id == cls.id,
+        Relationship.source_type == Comment.__name__,
+    ).join(Comment, Relationship.source_id == Comment.id).filter(
+        predicate(Comment.description)
+    ).exists()
 
 
 class Comment(Relatable, Described, Ownable, Notifiable, Base, db.Model):

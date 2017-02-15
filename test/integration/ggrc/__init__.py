@@ -2,9 +2,10 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Base test case for all ggrc integration tests."""
-
+import os
 import json
 import logging
+import tempfile
 from collections import defaultdict
 from os.path import abspath
 from os.path import dirname
@@ -147,6 +148,29 @@ class TestCase(BaseTestCase, object):
                      "Expected response does not match received response:\n\n"
                      "EXPECTED:\n{}\n\nRECEIVED:\n{}".format(
                          expected_str, response_str))
+
+  @classmethod
+  def import_data(cls, *import_data, **kwargs):
+    """generate tmp file in csv directory and import it after that remove file
+
+    import data is dict with required key object_type, other keys are optional
+
+    kwargs:
+        dry_run (optional) default False - is import only for dry run
+        person (optional) default None - who makes the import
+    """
+    dry_run = kwargs.get("dry_run", False)
+    person = kwargs.get("person")
+    with tempfile.NamedTemporaryFile(dir=cls.CSV_DIR, suffix=".csv") as tmp:
+      tmp.write('Object type,\n')
+      for data in import_data:
+        data = data.copy()
+        object_type = data.pop("object_type")
+        keys = data.keys()
+        tmp.write('{0},{1}\n'.format(object_type, ','.join(keys)))
+        tmp.write(',{0}\n'.format(','.join(str(data[k]) for k in keys)))
+        tmp.seek(0)
+      return cls._import_file(os.path.basename(tmp.name), dry_run, person)
 
   @classmethod
   def _import_file(cls, filename, dry_run=False, person=None):

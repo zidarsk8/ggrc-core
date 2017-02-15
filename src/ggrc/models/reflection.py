@@ -6,7 +6,7 @@ and update from resource format representations, such as JSON."""
 
 from sqlalchemy.sql.schema import UniqueConstraint
 
-from ggrc.utils import get_mapping_rules
+from ggrc.utils import get_mapping_rules, get_unmapping_rules
 from ggrc.utils import title_from_camelcase
 from ggrc.utils import underscore_from_camelcase
 
@@ -86,6 +86,22 @@ EXCLUDE_CUSTOM_ATTRIBUTES = set([
 EXCLUDE_MAPPINGS = set([
     "AssessmentTemplate",
 ])
+
+
+def is_filter_only(alias_properties):
+  """Determine if alias is for filter use only.
+
+  Prevents alias filters from being exportable.
+
+  Args:
+    alias_properties: Alias properties.
+  Returns:
+    Boolean reflecting if it's filter only or not.
+  """
+  if isinstance(alias_properties, dict):
+    if alias_properties.get("filter_only"):
+      return True
+  return False
 
 
 class PublishOnly(object):
@@ -220,34 +236,37 @@ class AttributeInfo(object):
     return cls.gather_attrs(tgt_class, ['_include_links'])
 
   @classmethod
+  def _generate_mapping_definition(cls, rules, prefix, display_name_tmpl):
+    "Generate definition from template"
+    definitions = {}
+    for klass in rules:
+      klass_name = title_from_camelcase(klass)
+      key = "{}{}".format(prefix, klass_name)
+      definitions[key.lower()] = {
+          "display_name": display_name_tmpl.format(klass_name),
+          "attr_name": klass.lower(),
+          "mandatory": False,
+          "unique": False,
+          "description": "",
+          "type": cls.Type.MAPPING,
+      }
+    return definitions
+
+  @classmethod
   def get_mapping_definitions(cls, object_class):
     """ Get column definitions for allowed mappings for object_class """
     definitions = {}
     mapping_rules = get_mapping_rules()
     object_mapping_rules = mapping_rules.get(object_class.__name__, [])
+    definitions.update(cls._generate_mapping_definition(
+        object_mapping_rules, cls.MAPPING_PREFIX, "map:{}",
+    ))
 
-    for mapping_class in object_mapping_rules:
-      class_name = title_from_camelcase(mapping_class)
-      mapping_name = "{}{}".format(cls.MAPPING_PREFIX, class_name)
-      definitions[mapping_name.lower()] = {
-          "display_name": "map:{}".format(class_name),
-          "attr_name": mapping_class.lower(),
-          "mandatory": False,
-          "unique": False,
-          "description": "",
-          "type": cls.Type.MAPPING,
-      }
-
-      unmapping_name = "{}{}".format(cls.UNMAPPING_PREFIX, class_name)
-      definitions[unmapping_name.lower()] = {
-          "display_name": "unmap:{}".format(class_name),
-          "attr_name": mapping_class.lower(),
-          "mandatory": False,
-          "unique": False,
-          "description": "",
-          "type": cls.Type.MAPPING,
-      }
-
+    unmapping_rules = get_unmapping_rules()
+    object_unmapping_rules = unmapping_rules.get(object_class.__name__, [])
+    definitions.update(cls._generate_mapping_definition(
+        object_unmapping_rules, cls.UNMAPPING_PREFIX, "unmap:{}",
+    ))
     return definitions
 
   @classmethod
@@ -328,7 +347,10 @@ class AttributeInfo(object):
     definitions = {}
 
     aliases = AttributeInfo.gather_aliases(object_class)
-    filtered_aliases = [(k, v) for k, v in aliases.items() if v is not None]
+    filtered_aliases = [
+        (attr, props) for attr, props in aliases.items()
+        if props is not None and not is_filter_only(props)
+    ]
 
     # push the extra delete column at the end to override any custom behavior
     if hasattr(object_class, "slug"):

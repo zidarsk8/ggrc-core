@@ -1,0 +1,33 @@
+<a href="#" class="dropdown-toggle tview-dropdown-toggle"
+   data-toggle="dropdown">
+  <i class="fa fa-fw fa-bars"></i>
+</a>
+<div class="dropdown-menu dropdown-menu-form" can-click="stopPropagation">
+  <tree-header-selector>
+    <button type="button" class="pull-right close-dropdown">
+      <i class="fa fa-times black"></i>
+    </button>
+    <h5>Set visible fields for {{getModel.title_singular}}</h5>
+    <ul class="attr-list">
+      {{#each availableColumns}}
+        <li class="{{#mandatory}}disabled{{/mandatory}}">
+          <label class="checkbox-inline"
+                 title="{{attr_title}}">
+            <input type="checkbox"
+                   {{#mandatory}}disabled{{/mandatory}}
+                   can-change="onSelect"
+                   {{#isSelected}}checked{{/isSelected}}
+                   class="notify-wrap attr-checkbox
+                   {{#mandatory}}mandatory{{/mandatory}}">
+            {{attr_title}}
+          </label>
+        </li>
+      {{/each}}
+    </ul>
+    <button type="button"
+            class="btn btn-small btn-info set-tree-attrs"
+            can-click="setColumns">
+      Set fields
+    </button>
+  </tree-header-selector>
+</div>

@@ -329,6 +329,7 @@
     tree_view_options: {
       sort_property: 'sort_index',
       show_view: _mustachePath + '/tree.mustache',
+      attr_view: _mustachePath + '/tree-item-attr.mustache',
       attr_list: [
         {
           attr_title: 'Title',

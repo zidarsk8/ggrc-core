@@ -232,6 +232,12 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
       return [];
     }
 
+    // Avoid User bugs:
+    // User may have wrong config in local storage
+    if (!GGRC.Utils.State.hasFilter(model_name)) {
+      return [];
+    }
+
     return value[model_name].status_list;
   },
 

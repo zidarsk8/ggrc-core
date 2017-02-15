@@ -19,12 +19,6 @@
         var rightRevisions = scope.rightRevisions;
         var revisionsLength = rightRevisions.length;
         var newRevisionID;
-        if (!currentRevisionID || !rightRevisions || !revisionsLength) {
-          scope.instance.snapshot = scope.instance.snapshot.reify();
-          currentRevisionID = scope.instance.snapshot.revision_id;
-          rightRevisions = scope.instance.snapshot.revisions;
-          revisionsLength = rightRevisions.length;
-        }
         newRevisionID = rightRevisions[revisionsLength - 1].id;
         GGRC.Controllers.Modals.confirm({
           modal_title: 'Compare with the latest version',
@@ -86,7 +80,7 @@
         });
       },
       updateRevision: function () {
-        var instance = this.instance.snapshot;
+        var instance = new CMS.Models.Snapshot(this.instance.snapshot);
         instance.refresh().then(function () {
           instance.attr('update_revision', 'latest');
           return instance.save();

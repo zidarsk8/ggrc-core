@@ -6,23 +6,22 @@
 {{#is_allowed_to_map parent_instance model.shortName}}
 {{#if allow_mapping_or_creating}}
   {{#if model.root_object}}
-  <a
-    class="btn btn-mini action-button map-button"
-    href="javascript://"
-    rel="tooltip"
-    data-placement="left"
-    data-toggle="unified-mapper"
-    data-join-mapping="{{mapping}}"
-    data-join-option-type="{{model.shortName}}"
-    data-join-object-id="{{instance.id}}"
-    data-join-object-type="{{parent_instance.class.shortName}}"
-    data-exclude-option-types="{{exclude_option_types}}"
-    data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
-    data-is-snapshotable="{{parent_instance.is_snapshotable}}"
-    data-snapshot-scope-id="{{parent_instance.scopeObject.id}}"
-    data-snapshot-scope-type="{{parent_instance.scopeObject.type}}">
-    Map
-  </a>
+    {{^if_equals model.shortName 'Assessment'}}
+      <a
+        class="btn btn-mini action-button map-button"
+        href="javascript://"
+        rel="tooltip"
+        data-placement="left"
+        data-toggle="unified-mapper"
+        data-join-mapping="{{mapping}}"
+        data-join-option-type="{{model.shortName}}"
+        data-join-object-id="{{instance.id}}"
+        data-join-object-type="{{parent_instance.class.shortName}}"
+        data-exclude-option-types="{{exclude_option_types}}"
+        data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
+        Map
+      </a>
+    {{/if_equals}}
   {{#if null}}
   <span class="section-expander">
     <a href="javascript://"
@@ -53,9 +52,7 @@
     data-exclude-option-types="{{exclude_option_types}}"
     data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
     data-object-params='{ "section": { "id": {{parent_instance.id}}, "title": "{{json_escape parent_instance.title}}", "description": "{{json_escape parent_instance.description}}" } }'
-    data-is-snapshotable="{{parent_instance.is_snapshotable}}"
-    data-snapshot-scope-id="{{parent_instance.scopeObject.id}}"
-    data-snapshot-scope-type="{{parent_instance.scopeObject.type}}">
+>
     Map
   </a>
   {{else}}
@@ -70,9 +67,7 @@
     data-join-object-type="{{parent_instance.class.shortName}}"
     data-exclude-option-types="{{exclude_option_types}}"
     data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}"
-    data-is-snapshotable="{{is_snapshotable}}"
-    data-snapshot-scope-id="{{snapshot_scope_id}}"
-    data-snapshot-scope-type="{{snapshot_scope_type}}">
+>
     Map
   </a>
   {{/if_instance_of}}

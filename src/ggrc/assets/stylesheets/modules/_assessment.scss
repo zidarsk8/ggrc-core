@@ -13,6 +13,19 @@
     margin-right: 30%;
     padding-right: 12px;
     padding-bottom: 28px;
+    min-width: 0; /* fixes known issue with flexboxes and text-overflow */
+
+    assessment-mapped-controls,
+    collapsible-panel-header {
+      .fa-plus-circle {
+        opacity: 1;
+        color: $btnGreen;
+
+        &:hover {
+          color: $icon-color-hover;
+        }
+      }
+    }
   }
 
   .section-title {
@@ -21,6 +34,20 @@
     font-weight: bold;
     line-height: 24px;
     margin: 0 0 4px;
+
+    .fa {
+      color: $icon-color-dark;
+      width: 32px;
+      height: 24px;
+      line-height: 24px;
+      text-align: center;
+      cursor: pointer;
+      margin-left: 8px;
+
+      &:hover {
+        color: $icon-color-hover;
+      }
+    }
   }
 
   .assessment-description {
@@ -60,6 +87,7 @@
     display: flex;
     align-items: stretch;
     flex-wrap: wrap;
+    margin-bottom: 10px;
 
     > * {
       position: relative;
@@ -67,6 +95,40 @@
       padding: 0 16px 0 28px;
       flex: 1 1 50%;
       max-width: 50%;
+    }
+
+    .attachments-list-alert {
+      float: left;
+      margin: 1px 0 0 -24px;
+
+      & + .attachments-list-control {
+        .attachments-list-title {
+          color: #ce3e3e;
+        }
+      }
+    }
+
+    .assesment-attachment-list {
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .attachments-list-control {
+      .attachments-list-action {
+        .btn {
+          background: none;
+          padding: 0 0 0 8px;
+
+          .fa {
+            opacity: 1;
+            color: $btnGreen;
+
+            &:hover {
+              color: $icon-color-hover;
+            }
+          }
+        }
+      }
     }
 
     .attach-file-info {
@@ -85,7 +147,7 @@
 
     ggrc-gdrive-picker-launcher {
       display: inline-block;
-      margin: 4px 0;
+      margin: 0;
 
       a.btn {
         background: rgba(0, 0, 0, 0.15);
@@ -148,17 +210,9 @@
         }
       }
       .assessment-controls-toolbar {
-        margin: 8px 6px 0;
+        margin: 8px 6px 0 28px;
         display: flex;
-        justify-content: flex-end;
-
-        .btn-extra-gray {
-          background: rgba(0, 0, 0, 0.15);
-
-          &:hover {
-            background: rgba(0, 0, 0, 0.175);
-          }
-        }
+        justify-content: flex-start;
 
         .ggrc_controllers_quick_form {
           display: flex;
@@ -185,12 +239,24 @@
     flex-direction: column;
     border-left: 1px solid $border-color;
 
+    &:after {
+      content: '';
+      width: 100%;
+      bottom: 0;
+      left: 0;
+      height: 50px;
+      display: block;
+      position: absolute;
+      background: linear-gradient(to bottom, transparent, white 70%);
+    }
+
     .assessment-comments-add {
       display: block;
     }
 
     mapping-tree-view {
       overflow-y: auto;
+      padding-bottom: 45px;
     }
 
     .side-content {
@@ -201,6 +267,21 @@
   .tabs-wrap {
     margin-top: -28px;
     position: relative;
+
+    .atrribute-tab-panel-column {
+      display: inline-block;
+      width: 32%;
+      vertical-align: top;
+    }
+
+    collapsible-panel.details-item {
+
+      .collapsible-panel-body {
+        .body-inner {
+          border-bottom: 0;
+        }
+      }
+    }
   }
 }
 
@@ -221,7 +302,7 @@
   left: 57px;
 
   .fa {
-    color: $icon-color-dark;
+    color: $btnGreen;
 
     &:hover {
       color: $icon-color-hover;

@@ -203,18 +203,6 @@ ul.new-tree {
         color: $black;
       }
     }
-    &.parent-related {
-      color: $gray;
-      .fa {
-        color: $gray;
-      }
-    }
-    &.current-instance-related {
-      color: $darkText;
-      .fa {
-        color: $darkText;
-      }
-    }
     .black-font {
       color: $black;
     }
@@ -450,15 +438,15 @@ ul.new-tree {
 
 .show-details {
   float: right;
-  padding-right: 4px;
-  margin-left: 10px;
+  margin-left: 8px;
   a {
     display: inline-block;
     line-height: 16px;
     i {
-      @include opacity(0.25);
-      @include transition(opacity 0.2s ease);
+      opacity: 0.25;
+      transition: opacity 0.2s ease;
       color: $black;
+
       ul.new-tree & {
         margin-top: 0;
       }
@@ -466,7 +454,7 @@ ul.new-tree {
     &:hover {
       text-decoration: none;
       i {
-        @include opacity(1);
+        opacity: 1;
       }
     }
   }

@@ -1,0 +1,16 @@
+{{!
+  Copyright (C) 2017 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+{{#if instance}}
+  {{#if isAllowedToShow}}
+      <button class="btn {{extraBtnCSS}} btn-draft btn-extra-gray" can-click="showRelatedAssessments"
+              title="Show Related Assessments">Assessments
+      </button>
+      <simple-modal instance="instance" modal-title="modalTitle" state="state" extra-css-class="related-assessments">
+          <div class="simple-modal__body">
+            {{> '/static/mustache/assessments/related-assessments-without-reuse.mustache' }}
+          </div>
+      </simple-modal>
+  {{/if}}
+{{/if}}
