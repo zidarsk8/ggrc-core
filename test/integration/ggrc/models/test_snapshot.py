@@ -5,30 +5,13 @@
 
 from ggrc.app import app
 from ggrc.models import all_models
+from ggrc.snapshotter.rules import Types
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
-TEST_MODELS = [
-    all_models.Facility,
-    all_models.AccessGroup,
-    all_models.Clause,
-    all_models.Contract,
-    all_models.Control,
-    all_models.DataAsset,
-    all_models.Market,
-    all_models.Objective,
-    all_models.OrgGroup,
-    all_models.Policy,
-    all_models.Process,
-    all_models.Product,
-    all_models.Regulation,
-    all_models.Risk,
-    all_models.Section,
-    all_models.Standard,
-    all_models.System,
-    all_models.Threat,
-    all_models.Vendor,
-]
+
+def get_snapshottable_models():
+  return {getattr(all_models, stype) for stype in Types.all}
 
 
 class TestSnapshot(TestCase):
@@ -202,7 +185,8 @@ class TestSnapshot(TestCase):
     created from a snapshot on the fronend, it will have all the needed fields.
     """
     self.client.get("/login")
-    for model in TEST_MODELS:
+    test_models = get_snapshottable_models()
+    for model in test_models:
       obj = model.eager_query().first()
       generated_json = self._clean_json(obj.log_json())
       expected_json = self._clean_json(self._get_object(obj))
