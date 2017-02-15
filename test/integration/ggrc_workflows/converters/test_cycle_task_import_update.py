@@ -5,6 +5,7 @@
 updates via import"""
 
 # pylint: disable=invalid-name
+from collections import OrderedDict
 
 from os.path import join
 from os.path import abspath
@@ -15,13 +16,31 @@ from ggrc import db
 from ggrc.converters import errors
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroupObjectTask
+from integration.ggrc_workflows.models import factories
+from integration.ggrc.models import factories as ggrc_factories
 from integration.ggrc import TestCase
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 
 
+class BaseTestCycleTaskImportUpdate(TestCase):
+
+  @staticmethod
+  def generate_expected_warning(*columns):
+    return {
+        'Cycle Task Group Object Task': {
+            'block_warnings': {
+                errors.ONLY_IMPORTABLE_COLUMNS_WARNING.format(
+                    line=2,
+                    columns=", ".join(columns)
+                )
+            },
+        }
+    }
+
+
 # pylint: disable=too-many-instance-attributes
-class TestCycleTaskImportUpdate(TestCase):
+class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
 
   """ This class contains simple cycle task update tests using import
   functionality
@@ -462,18 +481,12 @@ class TestCycleTaskImportUpdate(TestCase):
       if field_name == 'slug':
         continue
       # pylint: disable=protected-access
-      importable_column_names.append(
-          CycleTaskGroupObjectTask._aliases.get(field_name, field_name))
-    self.expected_warnings = {
-        'Cycle Task Group Object Task': {
-            'block_warnings': {
-                errors.ONLY_IMPORTABLE_COLUMNS_WARNING.format(
-                    line=2,
-                    columns=", ".join(importable_column_names)
-                )
-            },
-        }
-    }
+      name = CycleTaskGroupObjectTask._aliases.get(field_name, field_name)
+      if isinstance(name, dict):
+        name = name['display_name']
+      importable_column_names.append(name)
+    self.expected_warnings = self.generate_expected_warning(
+        *importable_column_names)
 
     # This is an error message which should be shown during
     # test_cycle_task_create_error test
@@ -549,3 +562,38 @@ class TestCycleTaskImportUpdate(TestCase):
             'block_errors': {errors.PERMISSION_ERROR.format(line=2)}
         }
     }
+
+
+class TestCycleTaskImportUpdateAssignee(BaseTestCycleTaskImportUpdate):
+  """Test cases for update assignee column on import cycle tasks"""
+
+  def setUp(self):
+    self.instance = factories.CycleTaskFactory()
+    self.user = ggrc_factories.PersonFactory()
+    self.query = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id == self.instance.id
+    )
+
+  def test_update_assignee(self):
+    """Test update assignee"""
+    self.assertIsNone(self.query.first().contact)
+    response = self.import_data(OrderedDict([
+        ("object_type", "CycleTaskGroupObjectTask"),
+        ("Code*", self.instance.slug),
+        ("Assignee*", self.user.email),
+    ]))
+    self.assertEqual(self.user.email, self.query.first().contact.email)
+    self._check_csv_response(response, {})
+
+  def test_update_assignee_with_non_importable(self):
+    """Test update assignee with non importable field"""
+    self.assertIsNone(self.query.first().contact)
+    response = self.import_data(OrderedDict([
+        ("object_type", "CycleTaskGroupObjectTask"),
+        ("Code*", self.instance.slug),
+        ("Assignee*", self.user.email),
+        ("State", "some data"),
+    ]))
+    self.assertEqual(self.user.email, self.query.first().contact.email)
+    self._check_csv_response(response,
+                             self.generate_expected_warning('Assignee'))
