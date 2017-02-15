@@ -138,8 +138,8 @@ class TestSnapshot(TestCase):
 
   def _get_object(self, obj):
     return self.client.get(
-        "/api/{}/{}".format(obj._inflector.table_plural, obj.id)
-    ).json[obj._inflector.table_singular]
+        "/api/{}/{}".format(obj._inflector.table_plural, obj.id)  # noqa # pylint: disable=protected-access
+    ).json[obj._inflector.table_singular]  # noqa # pylint: disable=protected-access
 
   def _clean_json(self, content):
     """Remove ignored items from JSON content.
