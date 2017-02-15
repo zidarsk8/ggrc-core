@@ -15,7 +15,6 @@ dashboard-js-files:
   - bootstrap/js/bootstrap-tooltip.js
   - bootstrap/js/bootstrap-popover.js
   - clipboard/dist/clipboard.min.js
-  - stickyfill/stickyfill.js
   - mousetrap/mousetrap.min.js
   - quill/dist/quill.min.js
   - canjs/can.jquery.js
