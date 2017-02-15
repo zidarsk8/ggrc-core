@@ -107,7 +107,15 @@ class TestSnapshot(TestCase):
   @staticmethod
   def _create_cas():
     """Create custom attribute definitions."""
-    ca_model_names = ["facility", "control", "market", "section", "threat"]
+    ca_model_names = [
+        "facility",
+        "control",
+        "market",
+        "section",
+        "threat",
+        "access_group",
+        "data_asset"
+    ]
     ca_args = [
         {"title": "CA text", "attribute_type": "Text"},
         {"title": "CA rich text", "attribute_type": "Rich Text"},
