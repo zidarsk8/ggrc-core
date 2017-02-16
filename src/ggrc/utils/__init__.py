@@ -193,7 +193,7 @@ def get_unmapping_rules():
     "Delte rule for current model set"
     mapping[model] = mapping.get(model, set([])) - set(rules)
 
-  delete_mapping_rules_for_model("Assesment", "Control")
+  delete_mapping_rules_for_model("Assessment", "Control")
   delete_mapping_rules_for_model("Issue", "Control")
 
   return mapping
