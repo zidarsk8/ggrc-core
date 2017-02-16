@@ -366,7 +366,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Notes",
         "Audit",
         "Creator",
-        "Assessor",
+        "Assignee",
         "Verifier",
         "Primary Contact",
         "Secondary Contact",
@@ -392,7 +392,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Title",
             "Audit",
             "Creator",
-            "Assessor",
+            "Assignee",
             "Code"
         },
         "unique": {
