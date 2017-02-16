@@ -41,7 +41,7 @@ class PageHeader(object):
   BUTTON_MY_TASKS = (By.CSS_SELECTOR, '.header-content ['
                                       'href="/dashboard#task_widget"]')
   BUTTON_ALL_OBJECTS = (By.CSS_SELECTOR, '.header-content ['
-                                         'href="/objectBrowser"]')
+                                         'href^="/objectBrowser"]')
   TOGGLE_USER_DROPDOWN = (
       By.CSS_SELECTOR, '.header-content .dropdown-toggle')
   BUTTON_HELP = (By.CSS_SELECTOR, '.header-content [id="#page-help"]')
@@ -72,7 +72,7 @@ class Dashboard(object):
   BUTTON_CREATE_NEW_OBJECT = (
       By.CSS_SELECTOR, '.get-started__list [href="#"]')
   BUTTON_ALL_OBJECTS = (By.CSS_SELECTOR, '.get-started__list '
-                                         '[href="/objectBrowser"]')
+                                         '[href^="/objectBrowser"]')
 
 
 class LhnMenu(object):
