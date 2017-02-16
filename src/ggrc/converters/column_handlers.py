@@ -126,6 +126,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "__unmapping__": handlers.MappingColumnHandler,
     "__custom__": custom_attribute.CustomAttributeColumHandler,
     "__object_custom__": custom_attribute.ObjectCaColumnHandler,
+    "__snapshot_mapping__": CustomControlSnapshotInstanceColumnHandler,
 }
 
 
@@ -135,12 +136,6 @@ EXTENSION_HANDLERS_ATTR = "contributed_column_handlers"
 
 _COLUMN_HANDLERS = {
     DEFAULT_HANDLERS_KEY: _DEFAULT_COLUMN_HANDLERS_DICT,
-    "Assessment": {
-        "__mapping__:control": CustomControlSnapshotInstanceColumnHandler,
-    },
-    "Issue": {
-        "__mapping__:control": CustomControlSnapshotInstanceColumnHandler,
-    }
 }
 
 
