@@ -513,12 +513,12 @@ class ModalGenerateNewAsmt(ModalGenerateNewObject):
                               '{} dropdown[name="assessmentTemplate"] '
                               '.input-block-level option'.format(MODAL))
   BUTTON_SEARCH = (By.CSS_SELECTOR, "{} .btn-info".format(MODAL))
-  FOUNDED_OBJECTS_TITLES = (By.CSS_SELECTOR,
-                            "{} .snapshot-list .title".
-                            format(MODAL))
-  FOUNDED_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
-                                '{} .snapshot-list [type="checkbox"]'.
-                                format(MODAL))
+  FOUNDED_OBJECTS_TITLES = (
+      By.CSS_SELECTOR,
+      "{} .snapshot-list .flex-box .title-attr".format(MODAL))
+  FOUNDED_OBJECTS_CHECKBOXES = (
+      By.CSS_SELECTOR,
+      '{} .snapshot-list .flex-box [type="checkbox"]'.format(MODAL))
 
 
 class ModalEditObject(BaseModalCreateNew):
