@@ -30,7 +30,8 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
         </div>
     </div>
     <div class="grid-data-body {{#if isLoading}}loading{{/if}}">
-        <object-list items="relatedObjects" is-loading="isLoading" spinner-css="grid-spinner">
+        <object-list items="relatedObjects" is-loading="isLoading" spinner-css="grid-spinner"
+                     empty-message="No Related Assessments were found">
             <div class="grid-data-row flex-row flex-box">
                 <div class="grid-data-item-index">
                     <state-colors-map state="status"></state-colors-map>

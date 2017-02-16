@@ -4,6 +4,10 @@
 }}
 {{#if isLoading}}
     <spinner toggle="isLoading" extra-css-class="{{spinnerCss}}" class="spinner-wrapper active"></spinner>
+{{else}}
+    {{#unless items.length}}
+        <span class="empty-message">{{emptyMessage}}</span>
+    {{/unless}}
 {{/if}}
 {{#items}}
   <object-list-item instance="instance" is-selected="isSelected" selection-el="objectListItemSelector">

@@ -43,6 +43,12 @@ object-list {
         }
       }
     }
+
+  }
+
+  & > .empty-message{
+    text-align: center;
+    padding-top: 15px;
   }
 
   object-list-item {
