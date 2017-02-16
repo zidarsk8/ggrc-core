@@ -419,7 +419,7 @@ class CustomAttributable(object):
       # fetch definitions form database because `self.custom_attribute`
       # may not be populated
       defs = CustomAttributeDefinition.query.filter(
-          CustomAttributeDefinition.definition_type == self.type,
+          CustomAttributeDefinition.definition_type == self._inflector.table_singular,  # noqa # pylint: disable=protected-access
           CustomAttributeDefinition.id.in_([
               value.custom_attribute_id
               for value in self.custom_attribute_values
