@@ -26,13 +26,13 @@ class CustomControlSnapshotInstanceColumnHandler(
 
   def parse_item(self, *args, **kwargs):
     "parse items and make validation"
-    item = super(
+    items = super(
         CustomControlSnapshotInstanceColumnHandler, self
     ).parse_item(
         *args, **kwargs
     )
     exists_ids = {i for i, in self.snapshoted_instances_query.values("id")}
-    import_ids = {i.id for i in item or []}
+    import_ids = {i.id for i in items or []}
     to_append_ids = import_ids - exists_ids
     valid_append = self.is_valid_creation(to_append_ids)
-    return item
+    return items
