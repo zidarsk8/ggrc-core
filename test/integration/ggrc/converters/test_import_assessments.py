@@ -4,7 +4,12 @@
 # pylint: disable=maybe-no-member, invalid-name
 
 """Test request import and updates."""
+
+import csv
+
 from collections import OrderedDict
+from cStringIO import StringIO
+from itertools import izip
 
 from flask.json import dumps
 
@@ -326,9 +331,12 @@ class TestAssessmentExport(TestCase):
         },
     }]
     response = self.export_csv(data)
-    raw_data = response.data.strip().split("\n")[4:6]
-    keys, vals = raw_data
-    instance_dict = dict(zip(keys.split(","), vals.split(",")))
+
+    keys, vals = response.data.strip().split("\n")[4:6]
+    keys = next(csv.reader(StringIO(keys), delimiter=","), [])
+    vals = next(csv.reader(StringIO(vals), delimiter=","), [])
+    instance_dict = dict(izip(keys, vals))
+
     self.assertEqual(value, instance_dict[column])
 
   def test_export_assesments_without_map_control(self):
