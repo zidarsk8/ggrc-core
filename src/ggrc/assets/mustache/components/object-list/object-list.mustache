@@ -6,10 +6,9 @@
     <spinner toggle="isLoading" extra-css-class="{{spinnerCss}}" class="spinner-wrapper active"></spinner>
 {{/if}}
 {{#items}}
-  <object-list-item instance="instance" is-selected="isSelected">
+  <object-list-item instance="instance" is-selected="isSelected" selection-el="objectListItemSelector">
       <div class="object-list-item {{#if isSelected}}selected{{/if}}">
         <content>No item component or template is provided</content>
       </div>
   </object-list-item>
 {{/items}}
-

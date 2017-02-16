@@ -4,7 +4,7 @@
  */
 
 .object-popover {
-  > .object-popover-wrapper {
+  .object-popover-wrapper {
     position: absolute;
     box-sizing: border-box;
     max-width: 850px;
@@ -32,15 +32,24 @@
   }
 
   .object-popover-title {
+    color: #333;
     flex: 0 0;
     box-sizing: border-box;
     font-size: 14px;
+    font-weight: bold;
     line-height: 22px;
     display: block;
     max-width: 100%;
     overflow: hidden;
+    text-overflow: ellipsis;
     padding: 0 16px 12px;
     border-bottom: 1px solid #eee;
+    white-space: nowrap;
+
+    a {
+      font-size: 14px;
+      font-weight: normal;
+    }
   }
 
   h6 {

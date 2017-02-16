@@ -26,14 +26,31 @@
     tag: tag,
     template: tpl,
     viewModel: {
-      item: null,
-      expanded: false,
+      define: {
+        instanceId: {
+          type: Number,
+          value: 0
+        },
+        queries: {
+          type: '*',
+          value: [
+            {type: 'objectives'},
+            {type: 'regulations'}
+          ]
+        },
+        performLoading: {
+          type: Boolean,
+          value: false,
+          set: function (newValue) {
+            if (newValue) {
+              this.loadItems();
+            }
+            return newValue;
+          }
+        }
+      },
       objectives: [],
       regulations: [],
-      queries: [
-        {type: 'objectives'},
-        {type: 'regulations'}
-      ],
       isLoading: false,
       getParams: function (id) {
         var params = {};
@@ -54,7 +71,7 @@
       },
       setItems: function (responseArr) {
         responseArr.forEach(function (item, i) {
-          var type = this.attr('queries').attr(i).type;
+          var type = this.attr('queries')[i].type;
           this.attr(type).replace(item.Snapshot.values
             .map(function (item) {
               return item.revision.content;
@@ -62,7 +79,7 @@
         }.bind(this));
       },
       loadItems: function () {
-        var id = this.attr('item.data.id');
+        var id = this.attr('instanceId');
         var params;
 
         if (!id) {
@@ -83,13 +100,6 @@
           .always(function () {
             this.attr('isLoading', false);
           }.bind(this));
-      }
-    },
-    events: {
-      '{viewModel} expanded': function (scope, ev, isExpanded) {
-        if (isExpanded) {
-          this.viewModel.loadItems();
-        }
       }
     }
   });
