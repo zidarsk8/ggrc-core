@@ -395,3 +395,40 @@ class TestMixinAutoStatusChangeable(TestCase):
     self.assertEqual(assessment.status,
                      models.Assessment.FINAL_STATE)
     return assessment
+
+  def create_assessment_in_ready_to_review(self):
+    """Create an assessment with some assessors in READY TO REVIEW state."""
+    people = [
+        ("creator@example.com", "Creator"),
+        ("assessor_1@example.com", "Assessor"),
+        ("assessor_2@example.com", "Assessor"),
+    ]
+
+    assessment = self.create_assessment(people)
+    assessment = self.refresh_object(assessment)
+
+    self.api_helper.modify_object(assessment, {
+        "title": assessment.title + " modified, change #1"
+    })
+
+    assessment = self.refresh_object(assessment)
+    assessment = self.change_status(assessment, assessment.DONE_STATE)
+    assessment = self.refresh_object(assessment)
+
+    self.assertEqual(assessment.status,
+                     models.Assessment.DONE_STATE)
+    return assessment
+
+  def test_assessment_with_ready_to_review_add_verifier(self):
+    """
+    Test that adding verifier reverts back assessment status to in progress
+    """
+    assessment = self.create_assessment_in_ready_to_review()
+    self.assertEqual(assessment.status,
+                     models.Assessment.DONE_STATE)
+    self.modify_assignee(assessment,
+                         "creator@example.com",
+                         "Verifier")
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(assessment.status,
+                     models.Assessment.PROGRESS_STATE)

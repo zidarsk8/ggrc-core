@@ -29,7 +29,7 @@ class AutoStatusChangeable(object):
 
   FIRST_CLASS_EDIT = ({statusable.Statusable.START_STATE} |
                       statusable.Statusable.DONE_STATES)
-  ASSIGNABLE_EDIT = statusable.Statusable.END_STATES
+  ASSIGNABLE_EDIT = statusable.Statusable.DONE_STATES
 
   @staticmethod
   def _date_has_changes(attr):
