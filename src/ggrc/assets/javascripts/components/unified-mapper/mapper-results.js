@@ -33,6 +33,7 @@
       allSelected: false,
       baseInstance: null,
       filter: '',
+      statusFilter: '',
       selected: [],
       refreshItems: false,
       submitCbs: null,
@@ -120,11 +121,11 @@
           });
         return filters;
       },
-      prepareBaseQuery: function (modelName, paging, filters, ownedFilter) {
+      prepareBaseQuery: function (modelName, paging, filters, statusFilter) {
         return GGRC.Utils.QueryAPI
-          .buildParam(modelName, paging, filters, [], ownedFilter);
+          .buildParam(modelName, paging, filters, [], statusFilter);
       },
-      prepareRelatedQuery: function (modelName, ownedFilter) {
+      prepareRelatedQuery: function (modelName, statusFilter) {
         if (!this.attr('baseInstance')) {
           return null;
         }
@@ -136,26 +137,14 @@
             type: this.attr('baseInstance.type'),
             id: this.attr('baseInstance.id'),
             operation: 'relevant'
-          }, [], ownedFilter);
+          }, [], statusFilter);
       },
-      prepareOwnedFilter: function () {
-        var contact = this.attr('contact');
-        var contactEmail = this.attr('mapper.contactEmail');
-        var operation = 'owned';
-        // This property is set to false till filters are not working properly
-        var filterIsWorkingProperly = false;
-
-        if (!contact || !contactEmail || !filterIsWorkingProperly) {
+      prepareStatusFilter: function () {
+        var statusFilter = this.attr('statusFilter');
+        if (!statusFilter) {
           return null;
         }
-
-        return {
-          expression: {
-            op: {name: operation},
-            ids: [String(contact.id)],
-            object_name: this.attr('type')
-          }
-        };
+        return GGRC.query_parser.parse(statusFilter);
       },
       loadAllItems: function () {
         this.attr('allItems', this.loadAllItemsIds());
@@ -167,7 +156,7 @@
           filter: this.attr('filter')
         };
         var filters = this.prepareRelevantFilters();
-        var ownedFilter = this.prepareOwnedFilter();
+        var statusFilter = this.prepareStatusFilter();
         var query;
         var relatedQuery;
 
@@ -180,8 +169,8 @@
           }
         }
 
-        query = this.prepareBaseQuery(modelName, paging, filters, ownedFilter);
-        relatedQuery = this.prepareRelatedQuery(modelName, ownedFilter);
+        query = this.prepareBaseQuery(modelName, paging, filters, statusFilter);
+        relatedQuery = this.prepareRelatedQuery(modelName, statusFilter);
         if (useSnapshots) {
           // Transform Base Query to Snapshot
           query = GGRC.Utils.Snapshots.transformQuery(query);

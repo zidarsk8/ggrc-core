@@ -53,6 +53,7 @@
     deferred: '@',
     deferred_to: '@',
     filter: '',
+    statusFilter: '',
     object: '',
     model: {},
     bindings: {},

@@ -73,9 +73,12 @@
     </mapper-filter>
   </div>
   <div class="col">
-    <div>
-      &nbsp;
-    </div>
+    {{#showStatusFilter}}
+      <mapper-status-filter
+        {(statuses)}="statuses"
+        {(status-filter)}="statusFilter">
+      </mapper-status-filter>
+    {{/showStatusFilter}}
   </div>
 </div>
 </div>
