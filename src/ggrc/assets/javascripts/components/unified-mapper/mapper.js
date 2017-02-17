@@ -5,9 +5,18 @@
 
 (function (can, $) {
   'use strict';
-  var warningMessage = 'Selected objects will be mapped ' +
+  var WARNING_MESSAGE = 'Selected objects will be mapped ' +
     'to the corresponding Program, ' +
     'and system will create snapshots of selected objects for this Audit';
+
+  var DEFAULT_OBJECT_MAP = {
+    Objective: 'Control',
+    Section: 'Objective',
+    Regulation: 'Section',
+    Product: 'System',
+    Standard: 'Section',
+    Contract: 'Clause'
+  };
 
   var MapperModel = GGRC.Models.MapperModel = can.Map.extend({
     define: {
@@ -47,7 +56,7 @@
       }
     },
     type: 'Control', // We set default as Control
-    warningMessage: warningMessage,
+    warningMessage: WARNING_MESSAGE,
     contact: null,
     contactEmail: null,
     deferred: '@',
@@ -198,7 +207,10 @@
         if (type) {
           data.type = type;
         } else {
-          data.type = treeView ? treeView.display_list[0] : 'Control';
+          data.type = DEFAULT_OBJECT_MAP[object];
+          if (!data.type) {
+            data.type = treeView ? treeView.display_list[0] : 'Control';
+          }
         }
       } else {
         data.type = 'Program';
