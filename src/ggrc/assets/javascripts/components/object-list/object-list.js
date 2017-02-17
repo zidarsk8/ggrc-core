@@ -26,6 +26,7 @@
           value: ''
         }
       },
+      emptyMessage: '@',
       isLoading: false,
       selectedItem: {},
       items: [],
