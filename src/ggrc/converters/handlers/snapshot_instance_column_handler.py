@@ -56,8 +56,9 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
 
     It should be related to row instance over snapshot relation"""
     if self.row_converter.obj.id is None:
-        # For new object query should be empty
-        return self.mapping_object.query.filter(self.mapping_object.id.in_([]))
+      # For new object query should be empty
+      return self.mapping_object.query.filter(
+          self.mapping_object.id.is_(None))
     rel_snapshots = models.Relationship.get_related_query(
         self.row_converter.obj, models.Snapshot(),
     ).subquery("snapshot_rel")
