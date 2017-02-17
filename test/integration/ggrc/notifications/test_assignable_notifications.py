@@ -184,3 +184,33 @@ class TestAssignableNotification(TestCase):
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 4)
+
+  @patch("ggrc.notifications.common.send_email")
+  def test_directly_completing_assessments(self, _):
+    """Test that immediately finishing an Assessment produces a notification.
+
+    "Immediately" here means directly sending an Assessment to either the
+    "Completed", or the "Ready for Review" state, skipping the "In Progress"
+    state.
+    """
+    self.import_file("assessment_with_templates.csv")
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    # directly sending an Assessment to the "Ready for Review" state
+    asmt4 = Assessment.query.get(asmts["A 4"].id)
+    self.api_helper.modify_object(asmt4,
+                                  {"status": Assessment.DONE_STATE})
+    self.assertEqual(self._get_notifications().count(), 1)
+
+    # clear notifications
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    # directly sending an Assessment to the "Completed" state
+    asmt5 = Assessment.query.get(asmts["A 5"].id)
+    self.api_helper.modify_object(asmt5,
+                                  {"status": Assessment.FINAL_STATE})
+    self.assertEqual(self._get_notifications().count(), 1)

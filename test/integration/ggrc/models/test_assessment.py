@@ -1,7 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from ggrc import db
 from ggrc.models import Assessment
 from integration.ggrc import TestCase
 from integration.ggrc.models.factories import AssessmentFactory
@@ -12,15 +11,12 @@ class TestAssessment(TestCase):
 
   def test_auto_slug_generation(self):
     AssessmentFactory(title="Some title")
-    db.session.commit()
     ca = Assessment.query.first()
     self.assertEqual("ASSESSMENT-{}".format(ca.id), ca.slug)
 
   def test_enabling_comment_notifications_by_default(self):
     """New Assessments should have comment notifications enabled by default."""
     AssessmentFactory()
-    db.session.commit()
-
     asmt = Assessment.query.first()
 
     self.assertTrue(asmt.send_by_default)

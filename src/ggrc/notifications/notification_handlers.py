@@ -140,6 +140,10 @@ def handle_assignable_modified(obj):
     _add_assignable_declined_notif(obj)
 
   transitions_map = {
+      (Statusable.START_STATE, Statusable.FINAL_STATE):
+          Transitions.TO_COMPLETED,
+      (Statusable.START_STATE, Statusable.DONE_STATE):
+          Transitions.TO_REVIEW,
       (Statusable.PROGRESS_STATE, Statusable.FINAL_STATE):
           Transitions.TO_COMPLETED,
       (Statusable.PROGRESS_STATE, Statusable.DONE_STATE):
