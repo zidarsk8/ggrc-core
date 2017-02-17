@@ -39,7 +39,7 @@ class TestAuditRBAC(TestCase):
     """Sanity check if the audit_rbac.csv was imported correctly"""
     assert len(self.people) == 17, \
         "Expecting 17 people not {}.".format(len(self.people))
-    assert len(self.related_objects) == 11, \
+    assert len(self.related_objects) == 9, \
         "Expecting 11 objects mapped to audit not {}."\
         .format(len(self.related_objects))
 
