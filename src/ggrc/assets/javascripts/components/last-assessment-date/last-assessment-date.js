@@ -15,6 +15,7 @@
     sortDirection: 'desc'
   });
   var REQUIRED_FIELDS = Object.freeze(['finished_date']);
+  var ALLOWED_TYPES = Object.freeze(['Control', 'Objective']);
 
   can.Component.extend({
     tag: 'last-assessment-date',
@@ -27,7 +28,7 @@
     init: function () {
       var id = this.viewModel.instanceId;
       var type = this.viewModel.instanceType;
-      if (id && type) {
+      if (id && type && ALLOWED_TYPES.indexOf(type) > -1) {
         this.loadLastAssessment(type, id);
       }
     },
