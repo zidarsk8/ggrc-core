@@ -32,7 +32,7 @@ class BaseModal(base.Modal):
 class SetFieldsModal(base.Modal):
   """Class representing a base set visible fields modal."""
   _locators = locator.ModalSetVisibleFields
-  button_save_set_fields = None
+  button_set_fields = None
   fields_elements = None
 
   def __init__(self, driver, widget_name):
@@ -60,12 +60,11 @@ class SetFieldsModal(base.Modal):
 
   def save_set_visible_fields(self):
     """Save visible fields to display objects on the tree view."""
-    _locator_save_set_fields = (By.CSS_SELECTOR,
-                                self._locators.BUTTON_SAVE_SET_FIELDS.
-                                format(self.widget_name))
-    self.button_save_set_fields = base.Button(self._driver,
-                                              _locator_save_set_fields)
-    self.button_save_set_fields.click()
+    _locator_set_fields = (
+        By.CSS_SELECTOR,
+        self._locators.BUTTON_SET_FIELDS.format(self.widget_name))
+    self.button_set_fields = base.Button(self._driver, _locator_set_fields)
+    self.button_set_fields.click()
 
   def set_and_save_visible_fields(self, fields):
     """Set and save visible fields to display objects on the tree view."""

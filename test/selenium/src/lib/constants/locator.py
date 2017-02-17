@@ -195,12 +195,31 @@ class BaseModalGenerateNew(object):
   MODAL_TITLE = (By.CSS_SELECTOR, "{} .modal-header>h2".format(MODAL))
 
 
+class TreeView(object):
+  """Locators for tree-view components."""
+  TREE_LIST = ".tree-action-list"
+  TREE_HEADER = ".tree-header"
+  # common
+  ITEMS = "{} li.tree-item .item-main"
+  HEADER = "{} " + TREE_HEADER
+  ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
+  ITEM_EXPAND_BUTTON = " .openclose"
+  SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
+
+  BUTTON_SHOW_FIELDS = "{} " + TREE_HEADER + " .fa-bars"
+  BUTTON_CREATE = "{} " + TREE_LIST + " .create-button"
+
+  # 3bbs dropdown toggle
+  BUTTON_3BBS = "{} " + TREE_LIST + " .btn-draft"
+  BUTTON_GENERATE = "{} " + TREE_LIST + " .tree-action-list-items .fa-magic"
+
+
 class ModalSetVisibleFields(object):
   """Locators for a generic edit object modal."""
   FIELDS_MODAL = "{} .open .dropdown-menu-form"
-  FIELDS_TITLES = "{} .tree-header .checkbox-inline"
-  FIELDS_CHECKBOXES = "{} .tree-header .attr-checkbox"
-  BUTTON_SAVE_SET_FIELDS = "{} .tree-action-list .set-tree-attrs"
+  FIELDS_TITLES = "{} " + TreeView.TREE_HEADER + " .checkbox-inline"
+  FIELDS_CHECKBOXES = "{} " + TreeView.TREE_HEADER + " .attr-checkbox"
+  BUTTON_SET_FIELDS = "{} " + TreeView.TREE_HEADER + " .set-tree-attrs"
 
 
 class ModalCreateNewObject(BaseModalCreateNew):
@@ -942,22 +961,6 @@ class WidgetAssessmentTemplates(BaseWidgetGeneric):
   """Locators for assessment widget."""
   _object_name = objects.get_singular(objects.ASSESSMENT_TEMPLATES)
   widget_name = url.Widget.ASSESSMENT_TEMPLATES
-
-
-class TreeView(object):
-  """Locators for tree-view components."""
-  # common
-  ITEMS = "{} li.tree-item .item-main"
-  HEADER = "{} .tree-header"
-  ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
-  ITEM_EXPAND_BUTTON = " .openclose"
-  SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
-  # tree view tool bar of widgets
-  _TREE = " .tree-action-list"
-  BUTTON_3BBS = "{}" + _TREE + " .btn-draft"
-  BUTTON_CREATE = "{}" + _TREE + " .create-button"
-  BUTTON_GENERATE = "{}" + _TREE + " .tree-action-list-items .fa-magic"
-  BUTTON_SET_FIELDS = "{}" + _TREE + " .tree-action-list-items .fa-cog"
 
 
 class AdminCustomAttributes(object):
