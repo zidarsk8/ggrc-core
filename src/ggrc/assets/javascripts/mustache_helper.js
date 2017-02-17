@@ -3412,11 +3412,12 @@ Mustache.registerHelper('with_create_issue_json', function (instance, options) {
   audit = audits[0].instance.reify();
   programs = audit.get_mapping('_program');
   program = programs.length ? programs[0].instance.reify() : {};
-  control = instance.control ? instance.control.reify() : {};
-  relatedControls = instance.get_mapping('related_controls');
+  control = instance.control ? instance.control : {};
+  relatedControls = instance.mappedSnapshots;
 
   if (!control.id && relatedControls.length) {
     control = relatedControls[0].instance;
+    instance.control = control;
   }
   json = {
     audit: {title: audit.title, id: audit.id, type: audit.type},
