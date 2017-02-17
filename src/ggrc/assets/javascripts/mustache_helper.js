@@ -3719,7 +3719,42 @@ Example:
       if (modalType === matchingModal) {
         return options.fn(options.contexts);
       }
+      return options.inverse(options.contexts);
+    }
+  );
 
+  /**
+   * Check if a person is contained in the given authorization list and render
+   * the corresponding Mustache block.
+   *
+   * Example usage:
+   *
+   *   {{#isInAuthList assignee approvedEditors}}
+   *     <Edit button here...>
+   *   {{else}}
+   *     Editing not allowed.
+   *   {{/isInAuthList}}
+   *
+   * @param {CMS.Models.Person} person - the user to check for an authorization
+   * @param {Array} authList - the list of authorization grants
+   * @param {Object} options - a CanJS options argument passed to every helper
+   */
+  Mustache.registerHelper(
+    'isInAuthList',
+    function (person, authList, options) {
+      var emails;
+
+      person = Mustache.resolve(person) || {};
+      authList = Mustache.resolve(authList) || [];
+
+      emails = _.map(authList, function (item) {
+        var person = item.instance.person.reify();
+        return person.email;
+      });
+
+      if (_.includes(emails, person.email)) {
+        return options.fn(options.contexts);
+      }
       return options.inverse(options.contexts);
     }
   );
