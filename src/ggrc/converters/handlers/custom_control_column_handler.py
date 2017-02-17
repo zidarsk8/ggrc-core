@@ -38,5 +38,5 @@ class CustomControlSnapshotInstanceColumnHandler(
     exists_ids = {i for i, in self.snapshoted_instances_query.values("id")}
     import_ids = {i.id for i in items or []}
     to_append_ids = import_ids - exists_ids
-    valid_append = self.is_valid_creation(to_append_ids)
+    self.is_valid_creation(to_append_ids)
     return items

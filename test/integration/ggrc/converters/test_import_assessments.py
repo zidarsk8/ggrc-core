@@ -175,7 +175,7 @@ class TestAssessmentImport(TestCase):
                 ),
                 errors.UNKNOWN_COLUMN.format(
                     line=2,
-                  column_name="map:project"
+                    column_name="map:project"
                 ),
             },
             "row_errors": {

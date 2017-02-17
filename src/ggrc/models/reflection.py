@@ -311,7 +311,8 @@ class AttributeInfo(object):
         )
       if attr.definition_id:
         ca_type = cls.Type.OBJECT_CUSTOM
-        attr_name = u"{}{}".format(cls.OBJECT_CUSTOM_ATTR_PREFIX, attr.title).lower()
+        attr_name = u"{}{}".format(
+            cls.OBJECT_CUSTOM_ATTR_PREFIX, attr.title).lower()
       else:
         ca_type = cls.Type.CUSTOM
         attr_name = u"{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title).lower()

@@ -7,7 +7,6 @@ from StringIO import StringIO
 from ggrc.models.reflection import AttributeInfo
 from ggrc.converters.column_handlers import model_column_handlers
 from ggrc.converters.handlers import handlers
-from ggrc.converters.handlers import custom_attribute
 
 
 def get_object_column_definitions(object_class):
