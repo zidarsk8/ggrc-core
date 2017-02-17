@@ -50,7 +50,6 @@ class TestAuditPage(base.Test):
         messages.ERR_MSG_FORMAT.format([expected_asmt], actual_asmts))
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skipif(True, reason="modal window was changed")
   def test_asmts_generation(self, selenium, map_program_to_controls_rest,
                             new_controls_rest, new_asmt_tmpl_rest):
     """Check if assessments can be generated from Audit page via Assessments

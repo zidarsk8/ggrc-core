@@ -69,7 +69,7 @@ class WithSimilarityScore(object):
     queries_for_union += cls._join_relationships(id_)
 
     # find "similar" objects based on snapshots
-    queries_for_union += cls._join_snapshots(id_)
+    queries_for_union += cls._join_snapshots(id_, types)
 
     # find "similar" objects when Relationship table is not used
     queries_for_union += cls._emulate_relationships(id_, types, relevant_types)
@@ -120,7 +120,7 @@ class WithSimilarityScore(object):
     return result
 
   @classmethod
-  def _join_snapshots(cls, id_):
+  def _join_snapshots(cls, id_, types):
     """Retrieves related objects with snapshots
 
     Performs a query where it first:
@@ -188,7 +188,7 @@ class WithSimilarityScore(object):
                 right_relationship.destination_type == "Snapshot",
                 right_relationship.destination_id ==
                 right_snapshot_join.c.right_snapshot_id,
-                right_relationship.source_type == cls.__name__
+                right_relationship.source_type.in_(types)
             )
         ),
         db.session.query(
@@ -201,7 +201,7 @@ class WithSimilarityScore(object):
                 right_relationship.source_type == "Snapshot",
                 right_relationship.source_id ==
                 right_snapshot_join.c.right_snapshot_id,
-                right_relationship.destination_type == cls.__name__
+                right_relationship.destination_type.in_(types)
             )
         )
     ]

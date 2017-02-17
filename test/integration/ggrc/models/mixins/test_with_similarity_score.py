@@ -437,3 +437,48 @@ class TestWithSimilarityScore(TestCase):
         data=json.dumps(query),
         headers={"Content-Type": "application/json"},
     ))
+
+  def test_asmt_issue_similarity(self):
+    """Test Issues related to assessments."""
+    audit = factories.AuditFactory()
+    assessment1 = factories.AssessmentFactory()
+    assessment2 = factories.AssessmentFactory()
+    issue = factories.IssueFactory()
+    control = factories.ControlFactory()
+
+    snapshot = factories.SnapshotFactory(
+        parent=audit,
+        child_id=control.id,
+        child_type=control.type,
+        revision_id=models.Revision.query.filter_by(
+            resource_type=control.type).one().id
+    )
+    factories.RelationshipFactory(source=audit, destination=assessment1)
+    factories.RelationshipFactory(source=audit, destination=assessment2)
+    factories.RelationshipFactory(source=audit, destination=issue)
+    factories.RelationshipFactory(source=snapshot, destination=assessment1)
+    factories.RelationshipFactory(source=snapshot, destination=issue)
+
+    query = [{
+        "object_name": "Issue",
+        "type": "ids",
+        "filters": {
+            "expression": {
+                "op": {"name": "similar"},
+                "object_name": "Assessment",
+                "ids": [assessment1.id],
+            },
+        },
+    }]
+    expected_ids = [issue.id]
+
+    response = self.client.post(
+        "/query",
+        data=json.dumps(query),
+        headers={"Content-Type": "application/json"},
+    )
+
+    self.assertListEqual(
+        response.json[0]["Issue"]["ids"],
+        expected_ids
+    )

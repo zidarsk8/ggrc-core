@@ -16,6 +16,8 @@
       relatedObjects: [],
       relatedItemsType: '@',
       orderBy: '@',
+      selectedItem: {},
+      objectSelectorEl: '.grid-data__action-column button',
       paging: {
         current: 1,
         pageSize: 5,

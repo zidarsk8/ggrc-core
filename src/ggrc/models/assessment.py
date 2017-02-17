@@ -172,7 +172,7 @@ class Assessment(statusable.Statusable, AuditRelationship,
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
       "related_assessors": {
-          "display_name": "Assessor",
+          "display_name": "Assignee",
           "mandatory": True,
           "filter_by": "_filter_by_related_assessors",
           "type": reflection.AttributeInfo.Type.MAPPING,

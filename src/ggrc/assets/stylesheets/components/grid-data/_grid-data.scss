@@ -45,6 +45,10 @@
     line-height: 16px;
     font-weight: bold;
   }
+
+  .grid-data__action-column {
+    align-items: center;
+  }
 }
 
 .grid-data-sub-header {
@@ -110,7 +114,7 @@
   > object-list {
     > object-list-item {
       &:nth-child(2n) {
-        background: #eee;
+        background: #fafafa;
       }
     }
   }
@@ -133,7 +137,12 @@
     box-sizing: border-box;
   }
 }
-
+.grid-data__action-column {
+  width: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
 .grid-data-simple {
 
   .title-text {

@@ -1,5 +1,5 @@
 Object type,,,,,,,,,,,,
-Assessment,Code*,Audit*,Title*,Description,Notes,State*,Assessor*,Creator*,map:project,map: Market,url,evidence
+Assessment,Code*,Audit*,Title*,Description,Notes,State*,Assignee*,Creator*,map:project,map: Market,url,evidence
 ,Assessment 1,Audit,Assessment title 1,Some desc 1,Edited notes,NOT STARTED,"user1@a.com
 user2@a.com","user2@a.com
 user3@a.com","proj-1

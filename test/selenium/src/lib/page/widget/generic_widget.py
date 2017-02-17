@@ -159,7 +159,7 @@ class TreeView(base.TreeView):
     self.button_create = None
     self.button_3bbs = None
     self.button_generate = None
-    self.button_set_fields = None
+    self.button_show_fields = None
     self.visible_fields = modal_base.SetFieldsModal(
         driver, widget_name=self.widget_name)
 
@@ -188,14 +188,14 @@ class TreeView(base.TreeView):
     self.button_generate.click()
 
   def open_set_fields(self):
-    """Open modal previously clicked to 3bbs button from tree view to set
-    visible fields for represent tree view objects.
+    """Open modal previously clicked to 'Show fields' button from tree view to
+    set visible fields for represent tree view objects.
     """
-    self.open_3bbs()
-    _locator_set_fields = (By.CSS_SELECTOR, self._locators.BUTTON_SET_FIELDS.
-                           format(self.widget_name))
-    self.button_set_fields = base.Button(self._driver, _locator_set_fields)
-    self.button_set_fields.click()
+    _locator_show_fields = (
+        By.CSS_SELECTOR,
+        self._locators.BUTTON_SHOW_FIELDS.format(self.widget_name))
+    self.button_show_fields = base.Button(self._driver, _locator_show_fields)
+    self.button_show_fields.click()
 
   def create_obj(self, new_obj):
     """Create new object from widget used tree view."""

@@ -13,12 +13,26 @@
   can.Component.extend({
     tag: tag,
     viewModel: {
+      define: {
+        selectionEl: {
+          type: String,
+          value: ''
+        }
+      },
       instance: {},
       isSelected: false
     },
     events: {
-      '{this.element} click': function (el) {
-        can.trigger(el, 'selectItem', [this.viewModel.instance]);
+      '{this.element} click': function (cmpEl, ev) {
+        var filter = this.viewModel.attr('selectionEl');
+        var el = filter.length ?
+          can.$(ev.target).closest(filter, cmpEl) :
+          cmpEl;
+        if (el.length) {
+          can.trigger(el, 'selectItem', [this.viewModel.instance]);
+        } else {
+          can.trigger(cmpEl, 'deselectItems');
+        }
       }
     }
   });
