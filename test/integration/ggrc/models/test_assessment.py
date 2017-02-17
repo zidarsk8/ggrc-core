@@ -8,9 +8,21 @@ from integration.ggrc.models.factories import AssessmentFactory
 
 
 class TestAssessment(TestCase):
+  # pylint: disable=invalid-name
 
   def test_auto_slug_generation(self):
     AssessmentFactory(title="Some title")
     db.session.commit()
     ca = Assessment.query.first()
     self.assertEqual("ASSESSMENT-{}".format(ca.id), ca.slug)
+
+  def test_enabling_comment_notifications_by_default(self):
+    """New Assessments should have comment notifications enabled by default."""
+    AssessmentFactory()
+    db.session.commit()
+
+    asmt = Assessment.query.first()
+
+    self.assertTrue(asmt.send_by_default)
+    recipients = asmt.recipients.split(",") if asmt.recipients else []
+    self.assertEqual(sorted(recipients), ["Assessor", "Creator", "Verifier"])

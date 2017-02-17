@@ -175,7 +175,13 @@ def handle_assignable_modified(obj):
   for attr_name, val in attrs.items():
     if attr_name in IGNORE_ATTRS:
       continue
+
     if val.history.has_changes():
+      # the exact order of recipients in the string does not matter, hence the
+      # need for an extra check
+      if attr_name == u"recipients" and not _recipients_changed(val.history):
+        continue
+
       _add_assessment_updated_notif(obj)
       break
   else:
@@ -185,6 +191,30 @@ def handle_assignable_modified(obj):
   # not directly observable via status change history, thus an extra check.
   if obj.status in Statusable.DONE_STATES:
     _add_state_change_notif(obj, Transitions.TO_REOPENED)
+
+
+def _recipients_changed(history):
+  """Check if the recipients attribute has been semantically modified.
+
+  The recipients attribute is a comma-separated string, and the exact order of
+  the items in it does not matter, i.e. it is not considered a change.
+
+  Args:
+    history (sqlalchemy.orm.attributes.History): recipients' value history
+
+  Returns:
+    True if there was a (semantic) change, False otherwise
+  """
+  old_val = history.deleted[0] if history.deleted else ""
+  new_val = history.added[0] if history.added else ""
+
+  if old_val is None:
+    old_val = ""
+
+  if new_val is None:
+    new_val = ""
+
+  return sorted(old_val.split(",")) != sorted(new_val.split(","))
 
 
 def handle_assignable_created(obj):
