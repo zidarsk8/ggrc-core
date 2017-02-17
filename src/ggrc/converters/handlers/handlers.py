@@ -400,6 +400,11 @@ class MappingColumnHandler(ColumnHandler):
       list of objects. During dry_run, the list can contain a slug instead of
       an actual object if that object will be generated in the current import.
     """
+    from ggrc.snapshotter import rules
+    if self.mapping_object.__name__ in rules.Types.scoped:
+      # TODO add a proper warning here!
+      # This is just a hack to prevent wrong mappings to assessments or issues.
+      return []
     class_ = self.mapping_object
     lines = set(self.raw_value.splitlines())
     slugs = set([slug.lower() for slug in lines if slug.strip()])

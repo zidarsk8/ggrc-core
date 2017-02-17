@@ -146,6 +146,8 @@ class AttributeInfo(object):
   MAPPING_PREFIX = "__mapping__:"
   UNMAPPING_PREFIX = "__unmapping__:"
   CUSTOM_ATTR_PREFIX = "__custom__:"
+  OBJECT_CUSTOM_ATTR_PREFIX = "__object_custom__:"
+  SNAPSHOT_MAPPING_PREFIX = "__snapshot_mapping__:"
 
   class Type(object):
     """Types of model attributes."""
@@ -255,6 +257,11 @@ class AttributeInfo(object):
   @classmethod
   def get_mapping_definitions(cls, object_class):
     """ Get column definitions for allowed mappings for object_class """
+    from ggrc.snapshotter import rules
+    if object_class.__name__ in rules.Types.scoped:
+      return cls._generate_mapping_definition(
+          rules.Types.all, cls.SNAPSHOT_MAPPING_PREFIX, "map:{}",
+      )
     definitions = {}
     mapping_rules = get_mapping_rules()
     object_mapping_rules = mapping_rules.get(object_class.__name__, [])
@@ -304,9 +311,11 @@ class AttributeInfo(object):
         )
       if attr.definition_id:
         ca_type = cls.Type.OBJECT_CUSTOM
+        attr_name = u"{}{}".format(
+            cls.OBJECT_CUSTOM_ATTR_PREFIX, attr.title).lower()
       else:
         ca_type = cls.Type.CUSTOM
-      attr_name = u"{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title).lower()
+        attr_name = u"{}{}".format(cls.CUSTOM_ATTR_PREFIX, attr.title).lower()
 
       definition_ids = definitions.get(attr_name, {}).get("definition_ids", [])
       definition_ids.append(attr.id)
