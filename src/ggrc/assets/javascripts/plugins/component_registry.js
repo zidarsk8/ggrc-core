@@ -196,4 +196,19 @@
 
     return Components._registry[name];
   };
+
+  /**
+   * Retrieve a Component's ViewModel from the registry.
+   * If no such Component is defined, an error is thrown.
+   * @param {String} name - the name of component to retrieve
+   * @return {can.Map|Error} - Component's View Model
+   */
+  Components.getViewModel = function (name) {
+    var viewModelConfig = Components.get(name).prototype.viewModel;
+    // if viewModelConfig is already a can.Map constructor no need to create a temporary class
+    if (can.isFunction(viewModelConfig)) {
+      return new viewModelConfig();
+    }
+    return new (can.Map.extend(viewModelConfig));
+  };
 })(window.GGRC = window.GGRC || {}, can, _);
