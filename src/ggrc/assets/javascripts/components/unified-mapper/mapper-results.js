@@ -65,6 +65,8 @@
       showNewEntries: function () {
         var self = this;
         var newEntries;
+        var sortKey = 'updated_at';
+        var sortDirection = 'desc';
 
         if (this.attr('mapper.newEntries')) {
           newEntries = this.attr('mapper.newEntries').map(function (value) {
@@ -85,9 +87,15 @@
         this.attr('filter', '');
         this.attr('prevSelected', this.attr('selected').slice());
 
-        // sort by update date
-        this.attr('sort.key', 'updated_at');
-        this.attr('sort.direction', 'desc');
+        if (this.attr('sort.key') === sortKey &&
+          this.attr('sort.direction') === sortDirection) {
+          this.onSearch();
+        } else {
+          // sort by update date.
+          // this action triggers search
+          this.attr('sort.key', sortKey);
+          this.attr('sort.direction', sortDirection);
+        }
 
         // set current page
         this.attr('paging.current', 1);
