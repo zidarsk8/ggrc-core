@@ -6,7 +6,6 @@
 <object-popover {item}="selectedAssessment" {popover-title}="selectedAssessmentTitle" {direction}="popoverDirection"
                 {popover-link}="selectedAssessmentLink" {popover-title-info}="popoverTitleInfo">
     <h6>Comments</h6>
-  {{#if item.data}}
       <related-comments {parent-instance}="item.data">
           <mapped-objects
                   {parent-instance}="parentInstance"
@@ -14,7 +13,6 @@
               <comment-list-item {instance}="instance"></comment-list-item>
           </mapped-objects>
       </related-comments>
-  {{/if}}
 </object-popover>
-</related-assessment-popover>
+
 
