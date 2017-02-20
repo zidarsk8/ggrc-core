@@ -29,10 +29,10 @@
    * @param {String} name - the name under which to register the component
    * @param {Object} config - the component configuration object as expected
    *   by the underlying can.Component.extend() method
-   *
+   * @param {Boolean} isLegacy - indicated if custom define plugin should be used
    * @return {Function} - the created component constructor
    */
-  function Components(name, config) {
+  function Components(name, config, isLegacy) {
     var constructor;
     var definitions;
 
@@ -44,13 +44,15 @@
       throw new Error('Component already exists: ' + name);
     }
 
-    if (config.scope && _.isObject(config.scope.define)) {
-      definitions = config.scope.define;
-      delete config.scope.define;
-    }
+    if (isLegacy) {
+      if (config.scope && _.isObject(config.scope.define)) {
+        definitions = config.scope.define;
+        delete config.scope.define;
+      }
 
-    if (definitions) {
-      config.scope = Components._extendScope(config.scope, definitions);
+      if (definitions) {
+        config.scope = Components._extendScope(config.scope, definitions);
+      }
     }
 
     constructor = can.Component.extend(config);
