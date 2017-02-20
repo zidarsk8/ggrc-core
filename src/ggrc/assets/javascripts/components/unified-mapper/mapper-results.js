@@ -5,6 +5,9 @@
 (function (can, GGRC, CMS, $) {
   'use strict';
 
+  var DEFAULT_PAGE_SIZE = 5;
+  var DEFAULT_SORT_DIRECTION = 'asc';
+
   can.Component.extend('mapperResults', {
     tag: 'mapper-results',
     template: can.view(
@@ -14,7 +17,7 @@
     viewModel: {
       paging: {
         current: 1,
-        pageSize: 5,
+        pageSize: DEFAULT_PAGE_SIZE,
         filter: '',
         pageSizeSelect: [5, 10, 15]
       },
@@ -24,7 +27,7 @@
       },
       sort: {
         key: '',
-        direction: 'asc'
+        direction: DEFAULT_SORT_DIRECTION
       },
       mapper: null,
       isLoading: false,
@@ -47,7 +50,7 @@
       },
       init: function () {
         var self = this;
-        this.attr('submitCbs').add(this.onSearch.bind(this));
+        this.attr('submitCbs').add(this.onSearch.bind(this, true));
         CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
           self.attr('displayPrefs', displayPrefs);
         });
@@ -98,7 +101,16 @@
         this.attr('relatedAssessments.show',
           !!Model.tree_view_options.show_related_assessments);
       },
-      onSearch: function () {
+      resetSearchParams: function () {
+        this.attr('paging.current', 1);
+        this.attr('paging.pageSize', DEFAULT_PAGE_SIZE);
+        this.attr('sort.key', '');
+        this.attr('sort.direction', DEFAULT_SORT_DIRECTION);
+      },
+      onSearch: function (resetParams) {
+        if (resetParams) {
+          this.resetSearchParams();
+        }
         this.attr('refreshItems', true);
       },
       prepareRelevantFilters: function () {
@@ -315,7 +327,7 @@
       },
       '{viewModel} refreshItems': function (scope, ev, refreshItems) {
         if (refreshItems) {
-          this.viewModel.setItems();
+          this.viewModel.setItemsDebounced();
           this.viewModel.attr('refreshItems', false);
         }
       },
