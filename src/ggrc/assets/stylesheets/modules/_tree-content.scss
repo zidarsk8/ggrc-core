@@ -15,6 +15,8 @@ ul.new-tree {
   @extend %reset-list;
   margin-bottom: 40px;
   .openclose__empty,
+  .openclose__empty__snapshot,
+  .openclose__snapshot,
   .openclose {
     float: left;
     &.active {
@@ -47,6 +49,12 @@ ul.new-tree {
     cursor: pointer;
     &__empty {
       width: 35px;
+      &__snapshot {
+        width: 35px;
+      }
+    }
+    &__snapshot {
+      width: 55px;
     }
   }
   .select {
