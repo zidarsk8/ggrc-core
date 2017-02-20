@@ -16,6 +16,8 @@
         </object-list-item>
     {{/items}}
   {{else}}
-      <span class="empty-message">None</span>
+      <span class="empty-message">
+        {{getEmptyMessage}}
+      </span>
   {{/if}}
 {{/if}}

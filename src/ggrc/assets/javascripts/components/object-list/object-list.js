@@ -27,6 +27,9 @@
       selectedItem: {},
       items: [],
       isLoading: false,
+      getEmptyMessage: function () {
+        return this.attr('emptyMessage') || 'None';
+      },
       selectItem: function (el, selectedItem) {
         var type = selectedItem.type;
         var id = selectedItem.id;

@@ -41,7 +41,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 More info
             </div>
         </div>
-          <div class="grid-data-body {{#if isLoading}}loading{{/if}}">
+          <div class="grid-data-body center-empty-message {{#if isLoading}}loading{{/if}}">
             <object-list {items}="relatedObjects" {is-loading}="isLoading" spinner-css="grid-spinner" {(selected-item)}="selectedItem"
                          {object-list-item-selector}="objectSelectorEl" empty-message="No Related Assessments were found">
                 <div class="grid-data-row flex-row flex-box">
@@ -102,7 +102,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                         </mapped-objects>
                     </div>
                     <div class="grid-data__action-column">
-                        <button ($click)="showPopover" class="btn btn-icon btn-icon-md btn-primary" title="Show More Information"><i class="fa fa-comment"></i></button>
+                        <button class="btn btn-icon btn-icon-sm" title="Show More Information"><i class="fa fa-comment-o"></i></button>
                     </div>
                 </div>
             </object-list>
