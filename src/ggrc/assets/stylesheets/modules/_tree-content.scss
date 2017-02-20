@@ -648,6 +648,7 @@ ul.new-tree {
   }
   &.person-tooltip-trigger {
     @include opacity(1);
+    font-weight: normal;
   }
   &.relevant-action {
     @include opacity(0.5);
