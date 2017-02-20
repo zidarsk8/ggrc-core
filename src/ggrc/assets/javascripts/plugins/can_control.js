@@ -21,8 +21,8 @@
     //make buttons non-clickable when saving
     bindXHRToButton : function(xhr, el, newtext, disable) {
       // binding of an ajax to a click is something we do manually
-      var $el = $(el)
-      , oldtext = $el.text();
+      var $el = $(el);
+      var oldtext = $el.text().trim() || $el[0].innerHTML;
 
       if(newtext) {
         $el[0].innerHTML = newtext;
