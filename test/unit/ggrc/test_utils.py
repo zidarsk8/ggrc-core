@@ -9,7 +9,7 @@ class TestUtilsFunctions(TestCase):
 
   def test_mapping_rules(self):
     """ Test that all mappings go both ways """
-    mappings = utils.get_mapping_rules()
+    mappings = utils.rules.get_mapping_rules()
     verificationErrors = []
 
     for object_name, object_mappings in mappings.items():

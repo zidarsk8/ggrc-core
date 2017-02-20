@@ -6,7 +6,7 @@ import unittest
 
 from ddt import data, ddt, unpack
 
-from ggrc import utils
+import ggrc.utils.rules
 
 
 class BaseTestMappingRules(unittest.TestCase):
@@ -24,7 +24,7 @@ class BaseTestMappingRules(unittest.TestCase):
 class TestMappingRules(BaseTestMappingRules):
   """Test case for mapping rules."""
 
-  rules = utils.get_mapping_rules()
+  rules = ggrc.utils.rules.get_mapping_rules()
 
   all_rules = ['AccessGroup', 'Assessment', 'Audit', 'Clause', 'Contract',
                'Control', 'CycleTaskGroupObjectTask', 'DataAsset',
@@ -144,7 +144,7 @@ class TestMappingRules(BaseTestMappingRules):
 class TestUnMappingRules(BaseTestMappingRules):
   """Test case for unmapping rules."""
 
-  rules = utils.get_unmapping_rules()
+  rules = ggrc.utils.rules.get_unmapping_rules()
 
   all_rules = ['AccessGroup', 'Assessment', 'Audit', 'Clause', 'Contract',
                'Control', 'CycleTaskGroupObjectTask', 'DataAsset',

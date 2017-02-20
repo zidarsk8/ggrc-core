@@ -6,7 +6,7 @@ and update from resource format representations, such as JSON."""
 
 from sqlalchemy.sql.schema import UniqueConstraint
 
-from ggrc.utils import get_mapping_rules, get_unmapping_rules
+from ggrc.utils.rules import get_mapping_rules, get_unmapping_rules
 from ggrc.utils import title_from_camelcase
 from ggrc.utils import underscore_from_camelcase
 

@@ -9,7 +9,7 @@ from ggrc.snapshotter import rules
 from ggrc.converters import column_handlers
 from ggrc.converters import import_helper
 from ggrc.converters.import_helper import get_object_column_definitions
-from ggrc.utils import get_mapping_rules, get_unmapping_rules
+from ggrc.utils.rules import get_mapping_rules, get_unmapping_rules
 from ggrc.utils import title_from_camelcase
 from ggrc_risks import models as r_models
 from ggrc_risk_assessments import models as ra_models
