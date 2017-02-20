@@ -20,7 +20,7 @@
    * can.Map(ViewModel) presenting behavior of State Colors Map Component
    * @type {can.Map}
    */
-  var viewModel = GGRC.Components.ViewModels.StateColorsMap = can.Map.extend({
+  var viewModel = can.Map.extend({
     define: {
       state: {
         type: 'string',
@@ -49,7 +49,7 @@
   /**
    * Simple Component to add color indication for Assessment State Name
    */
-  can.Component.extend('stateColorsMap', {
+  GGRC.Components('stateColorsMap', {
     tag: 'state-colors-map',
     template: tpl,
     viewModel: viewModel

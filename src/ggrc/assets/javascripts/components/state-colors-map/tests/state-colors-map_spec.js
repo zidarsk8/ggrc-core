@@ -14,7 +14,7 @@ describe('GGRC.Components.stateColorsMap', function () {
     var viewModel;
 
     beforeEach(function () {
-      viewModel = new GGRC.Components.ViewModels.StateColorsMap();
+      viewModel = GGRC.Components.getViewModel('stateColorsMap');
     });
 
     it('color property should be "#8bc34a"', function () {
@@ -27,7 +27,7 @@ describe('GGRC.Components.stateColorsMap', function () {
     var viewModel;
 
     beforeEach(function () {
-      viewModel = new GGRC.Components.ViewModels.StateColorsMap();
+      viewModel = GGRC.Components.getViewModel('stateColorsMap');
     });
 
     it('color property should be "#bdbdbd"', function () {
@@ -41,7 +41,7 @@ describe('GGRC.Components.stateColorsMap', function () {
     var viewModel;
 
     beforeEach(function () {
-      viewModel = new GGRC.Components.ViewModels.StateColorsMap();
+      viewModel = GGRC.Components.getViewModel('stateColorsMap');
     });
 
     it('and color property should be "#bdbdbd"', function () {
@@ -55,7 +55,7 @@ describe('GGRC.Components.stateColorsMap', function () {
     var viewModel;
 
     beforeEach(function () {
-      viewModel = new GGRC.Components.ViewModels.StateColorsMap();
+      viewModel = GGRC.Components.getViewModel('stateColorsMap');
     });
 
     it('color property should be "#aaa"', function () {
