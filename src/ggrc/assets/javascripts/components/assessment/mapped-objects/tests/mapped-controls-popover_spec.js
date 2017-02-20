@@ -81,8 +81,8 @@ describe('GGRC.Components.AssessmentMappedControlsPopover', function () {
   };
 
   beforeEach(function () {
-    viewModel = new GGRC.Components.ViewModels
-      .AssessmentMappedControlsPopover();
+    viewModel = new GGRC.Components
+      .getViewModel('assessmentMappedControlsPopover');
   });
 
   describe('By default shouldn\'t load any data', function () {

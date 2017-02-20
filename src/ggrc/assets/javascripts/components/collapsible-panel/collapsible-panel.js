@@ -9,7 +9,7 @@
   var tag = 'collapsible-panel';
   var tpl = can.view(GGRC.mustache_path +
     '/components/collapsible-panel/collapsible-panel.mustache');
-  var viewModel = GGRC.Components.ViewModels.CollapsiblePanel = can.Map.extend({
+  var viewModel = can.Map.extend({
     titleText: '@',
     titleIcon: '@',
     extraCssClass: '@',
@@ -28,7 +28,7 @@
   /**
    * Collapsible Panel component to add expand/collapse behavior
    */
-  can.Component.extend({
+  GGRC.Components('collapsiblePanel', {
     tag: tag,
     template: tpl,
     viewModel: viewModel

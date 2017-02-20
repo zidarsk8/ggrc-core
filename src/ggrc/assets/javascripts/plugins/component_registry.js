@@ -13,8 +13,6 @@
 
   // make the registry publicly available
   GGRC.Components = Components;
-  // add separate namespace for Components viewModels
-  Components.ViewModels = {};
 
   /**
    * An object representing the CanJS component registry.
