@@ -241,6 +241,9 @@ class AttributeInfo(object):
   def _generate_mapping_definition(cls, rules, prefix, display_name_tmpl):
     "Generate definition from template"
     definitions = {}
+    from ggrc.snapshotter.rules import Types
+    read_only = Types.parents | Types.scoped
+    read_only_text = "Read only column and will be ignored on import."
     for klass in rules:
       klass_name = title_from_camelcase(klass)
       key = "{}{}".format(prefix, klass_name)
@@ -249,7 +252,7 @@ class AttributeInfo(object):
           "attr_name": klass.lower(),
           "mandatory": False,
           "unique": False,
-          "description": "",
+          "description": read_only_text if klass in read_only else "",
           "type": cls.Type.MAPPING,
       }
     return definitions
