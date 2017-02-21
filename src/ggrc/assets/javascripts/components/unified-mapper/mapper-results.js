@@ -161,16 +161,17 @@
         filters = relevantList.attr()
           .map(function (relevant) {
             if (!relevant.value || !relevant.filter) {
-              return undefined;
+              return {
+                type: relevant.model_name,
+                operation: 'relevant',
+                id: 0
+              };
             }
             return {
               type: relevant.filter.type,
               operation: 'relevant',
               id: Number(relevant.filter.id)
             };
-          })
-          .filter(function (item) {
-            return item;
           });
         return filters;
       },
