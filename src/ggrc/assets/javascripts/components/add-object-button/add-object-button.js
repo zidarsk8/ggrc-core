@@ -16,7 +16,7 @@
       instance: null,
       linkclass: '@',
       content: '@',
-      title: '@',
+      text: '@',
       singular: '@',
       plural: '@'
     }
