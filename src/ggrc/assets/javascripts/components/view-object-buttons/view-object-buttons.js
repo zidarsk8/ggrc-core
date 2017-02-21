@@ -12,7 +12,7 @@
       GGRC.mustache_path +
       '/components/view-object-buttons/view-object-buttons.mustache'
     ),
-    scope: {
+    viewModel: {
       instance: null,
       openIsHidden: false,
       viewIsHidden: false,
@@ -25,7 +25,7 @@
           node.select(true);
         }
       },
-      openObject(scope, el, ev) {
+      openObject: function (scope, el, ev) {
         ev.stopPropagation();
       }
     }

@@ -288,6 +288,6 @@
           });
         };
       }
-    },
-  });
+    }
+  }, true);
 })(window.can, window.can.$);
