@@ -5,8 +5,6 @@
 import mock
 import unittest
 
-import werkzeug.exceptions
-
 import ggrc
 from ggrc.models.mixins import Base
 from ggrc.models.relationship import Relationship
@@ -50,13 +48,13 @@ class TestRelationshipAttr(unittest.TestCase):
   def test_attrs_validation_invalid_attr(self):
     self.rel.attrs["foo"] = "bar"
 
-    with self.assertRaises(werkzeug.exceptions.BadRequest):
+    with self.assertRaises(ValueError):
       self.rel.validate_attrs(self.mapper_mock, self.connection_mock, self.rel)
 
   def test_attrs_validation_invalid_value(self):
     self.rel.attrs["validated_attr"] = "wrong value"
 
-    with self.assertRaises(werkzeug.exceptions.BadRequest):
+    with self.assertRaises(ValueError):
       self.rel.validate_attrs(self.mapper_mock, self.connection_mock, self.rel)
 
   def test_gather_validators(self):

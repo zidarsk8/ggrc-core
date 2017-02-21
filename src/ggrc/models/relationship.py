@@ -9,7 +9,6 @@ from sqlalchemy import or_, and_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm.collections import attribute_mapped_collection
-from werkzeug.exceptions import BadRequest
 
 from ggrc import db
 from ggrc.models.mixins import Identifiable
@@ -240,7 +239,7 @@ class RelationshipAttr(Identifiable, db.Model):
       if validated_value is not None:
         attr.attr_value = validated_value
         return attr
-    raise BadRequest("Invalid attribute {}: {}".format(attr_name, attr_value))
+    raise ValueError("Invalid attribute {}: {}".format(attr_name, attr_value))
 
   @classmethod
   def _get_validators(cls, obj):
