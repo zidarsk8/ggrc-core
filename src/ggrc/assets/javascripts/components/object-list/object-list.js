@@ -20,13 +20,21 @@
         objectListItemSelector: {
           type: 'string',
           value: ''
+        },
+        isLoading: {
+          type: 'boolean',
+          value: false
+        },
+        showSpinner: {
+          get: function () {
+            return this.attr('isLoading');
+          }
         }
       },
       emptyMessage: '@',
       spinnerCss: '@',
       selectedItem: {},
       items: [],
-      isLoading: false,
       getEmptyMessage: function () {
         return this.attr('emptyMessage') || 'None';
       },
