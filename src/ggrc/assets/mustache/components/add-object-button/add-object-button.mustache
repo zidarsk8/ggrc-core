@@ -15,7 +15,7 @@
         data-modal-class="modal-wide"
         data-object-singular="{{singular}}"
         data-object-plural="{{plural}}"
-        data-object-params='{ "{{instance.class.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.class.model_singular}}" }, "context": { "id" : {{firstnonempty instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}" } }'>
+        {{^if noparams}} data-object-params='{ "{{instance.class.table_singular}}": {"id" : {{instance.id}}, "type" : "{{instance.class.model_singular}}" }, "context": { "id" : {{firstnonempty instance.context.id "null"}}, "href" : "{{instance.context.href}}", "type" : "{{instance.context.type}}" } }'{{/if}}>
             {{content}}
     </a>
 {{/is_allowed}}
