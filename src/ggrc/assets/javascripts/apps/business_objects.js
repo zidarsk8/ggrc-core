@@ -45,6 +45,7 @@
         person: CMS.Models.Person,
         role: CMS.Models.Role,
         threat: CMS.Models.Threat,
+        risk: CMS.Models.Risk,
         vulnerability: CMS.Models.Vulnerability,
         template: CMS.Models.Template
       };
@@ -500,6 +501,16 @@
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
+          Threat: {
+            mapping: 'threat',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          },
+          Risk: {
+            mapping: 'risk',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          },
           Assessment: {
             mapping: 'related_assessments',
             parent_instance: GGRC.page_instance(),
@@ -620,6 +631,22 @@
           },
           Clause: {
             mapping: 'clauses',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          }
+        },
+        Risk: {
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
+          Threat: {
+            mapping: 'threats',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          }
+        },
+        Threat: {
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
+          Risk: {
+            mapping: 'risks',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           }

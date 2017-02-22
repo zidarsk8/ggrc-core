@@ -95,6 +95,8 @@
     Standard: _.difference(filteredTypes,
       ['Contract', 'Policy', 'Regulation', 'Standard']),
     System: filteredTypes,
+    Risk: _.difference(filteredTypes, ['Risk']),
+    Threat: _.difference(filteredTypes, ['Threat']),
     Vendor: filteredTypes
   };
 

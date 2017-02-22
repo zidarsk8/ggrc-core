@@ -92,7 +92,7 @@
           'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
           'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
           'Objective', 'Audit', 'Assessment', 'AssessmentTemplate',
-          'AccessGroup', 'Document'
+          'AccessGroup', 'Document', 'Risk', 'Threat'
         ]
       },
       related_objects_as_source: Proxy(
@@ -126,7 +126,11 @@
       controls: TypeFilter('related_objects', 'Control'),
       sections: TypeFilter('related_objects', 'Section'),
       clauses: TypeFilter('related_objects', 'Clause'),
-      objectives: TypeFilter('related_objects', 'Objective')
+      objectives: TypeFilter('related_objects', 'Objective'),
+      risks: TypeFilter('related_objects', 'Risk'),
+      related_risks: TypeFilter('related_objects', 'Risk'),
+      threats: TypeFilter('related_objects', 'Threat'),
+      related_threats: TypeFilter('related_objects', 'Threat')
     },
     // Program
     Program: {
@@ -241,7 +245,7 @@
           'Program', 'Regulation', 'Contract', 'Policy', 'Standard',
           'AccessGroup', 'Objective', 'Control', 'Section', 'Clause',
           'DataAsset', 'Facility', 'Market', 'OrgGroup', 'Vendor', 'Process',
-          'Product', 'Project', 'System', 'Issue'],
+          'Product', 'Project', 'System', 'Issue', 'Risk', 'Threat'],
         authorizations: 'UserRole'
       },
       owned_programs: Indirect('Program', 'contact'),
@@ -482,6 +486,16 @@
           definition_id: null
         });
       }, 'CustomAttributeDefinition')
+    },
+    Risk: {
+      _mixins: [
+        'related_object', 'ownable'
+      ]
+    },
+    Threat: {
+      _mixins: [
+        'related_object', 'ownable'
+      ]
     }
   });
 })(window.GGRC, window.can);
