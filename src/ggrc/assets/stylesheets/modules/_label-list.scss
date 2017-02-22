@@ -122,7 +122,6 @@ people-list {
   }
   i {
     @include opacity(.6);
-    @include transition(opacity .2s ease);
   }
   a {
     &:hover {
