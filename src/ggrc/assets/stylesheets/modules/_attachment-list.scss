@@ -34,6 +34,8 @@
 
 .attachment-list {
   @extend %reset-list;
+  display: flex;
+  flex-direction: column;
   .fa {
     vertical-align: bottom;
   }
@@ -41,7 +43,6 @@
     color: $gray;
     font-size: 11px;
     font-style: italic;
-    display: inline-block;
     margin-right: 4px;
     line-height: 18px;
     vertical-align: top;
@@ -50,21 +51,26 @@
     margin: 5px 0 10px;
   }
   li {
+    display: flex;
     margin-bottom: 5px;
-    position: relative;
+    a.title {
+      overflow: hidden !important;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 70%;
+      display: inline-block;
+    }
+    .trash-control {
+      padding-left: 16px;
+      display: none;
+    }
+
     &:hover {
-      .file-controls {
-        @include opacity(1);
-        left: -25px;
+      .trash-control {
+        display: inherit;
       }
     }
-    [class*="fa-file-"] {
-      vertical-align: top;
-    }
     a {
-      @extend %oneline;
-      width: 68%;
-      display: inline-block;
       &.more {
         display: inline;
         width: auto;
@@ -76,23 +82,10 @@
       vertical-align: bottom;
     }
     .tree-title-area {
-      margin-top: 0px;
+      margin-top: 0;
     }
   }
-  .past-items-list & {
-    width: 92%;
-    li {
-      margin-bottom: 0;
-    }
-    label {
-      display: inline-block;
-      @extend %oneline;
-      width: 95%;
-    }
-    input[type="checkbox"] {
-      float: right;
-    }
-  }
+
   .entry-list & {
     padding: 4px 0 0 0;
     li {
