@@ -43,6 +43,12 @@
       folders : new GGRC.ListLoaders.CrossListLoader("audits", "folders"),
       extended_folders: new GGRC.ListLoaders.CrossListLoader("audits", "folders")
     },
+    Issue: {
+      audits: GGRC.MapperHelpers.TypeFilter('related_objects', 'Audit'),
+      folders: new GGRC.ListLoaders.CrossListLoader('audits', 'folders'),
+      extended_folders: new GGRC.ListLoaders.CrossListLoader('audits',
+                                                             'folders')
+    },
     Meeting : {
       _canonical : {
         "events" : "GCalEvent"
