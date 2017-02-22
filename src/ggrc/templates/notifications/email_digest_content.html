@@ -191,6 +191,45 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   </ul>
                 {% endif %}
 
+                {% if digest.get('assessment_completed') %}
+                  <h2 {{ style.sub_title() }} >Completed assessments</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for assessment_id, assessment_data in digest['assessment_completed'].iteritems() %}
+                    <li {{ style.list_item() }} >
+                      Assessment:
+                      <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
+                        {{ assessment_data['title'] }}</a>
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {% if digest.get('assessment_ready_for_review') %}
+                  <h2 {{ style.sub_title() }} >Assessments ready for review</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for assessment_id, assessment_data in digest['assessment_ready_for_review'].iteritems() %}
+                    <li {{ style.list_item() }} >
+                      Assessment:
+                      <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
+                        {{ assessment_data['title'] }}</a>
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {% if digest.get('assessment_verified') %}
+                  <h2 {{ style.sub_title() }} >Verified assessments</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for assessment_id, assessment_data in digest['assessment_verified'].iteritems() %}
+                    <li {{ style.list_item() }} >
+                      Assessment:
+                      <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
+                        {{ assessment_data['title'] }}</a>
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
                 {% if digest.get('assessment_declined') %}
                   <h2 {{ style.sub_title() }} >Declined assessments</h2>
                   <ul {{ style.list_wrap() }} >
@@ -200,6 +239,19 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}
                       </a>
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
+                {% if digest.get('assessment_reopened') %}
+                  <h2 {{ style.sub_title() }} >Reopened assessments</h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for assessment_id, assessment_data in digest['assessment_reopened'].iteritems() %}
+                    <li {{ style.list_item() }} >
+                      Assessment:
+                      <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
+                        {{ assessment_data['title'] }}</a>
                     </li>
                   {% endfor %}
                   </ul>

@@ -67,8 +67,12 @@ class Commentable(object):
                        ', '.join(sorted(self.VALID_RECIPIENTS))
                        )
 
-  recipients = db.Column(db.String, nullable=True)
-  send_by_default = db.Column(db.Boolean)
+  recipients = db.Column(
+      db.String,
+      nullable=True,
+      default=u"Assessor,Creator,Verifier")
+
+  send_by_default = db.Column(db.Boolean, nullable=True, default=True)
 
   _publish_attrs = [
       "recipients",

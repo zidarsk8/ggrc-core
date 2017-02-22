@@ -16,13 +16,24 @@
     tag: tag,
     template: tpl,
     viewModel: {
+      define: {
+        objectListItemSelector: {
+          type: 'string',
+          value: ''
+        }
+      },
+      emptyMessage: '@',
       spinnerCss: '@',
-      isLoading: false,
       selectedItem: {},
       items: [],
+      isLoading: false,
+      getEmptyMessage: function () {
+        return this.attr('emptyMessage') || 'None';
+      },
       selectItem: function (el, selectedItem) {
         var type = selectedItem.type;
         var id = selectedItem.id;
+        this.clearSelection();
         this.attr('items').forEach(function (item) {
           var isSelected =
             item.attr('instance.type') === type &&
@@ -47,13 +58,9 @@
         if (!isInnerClick) {
           this.clearSelection();
         }
-        ev.stopPropagation();
       }
     },
     events: {
-      'object-list-item selectItem': function (el, ev, instance) {
-        this.viewModel.selectItem(el, instance);
-      },
       '{window} click': function (el, ev) {
         this.viewModel.onClickHandler(this.element, ev);
       }

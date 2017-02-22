@@ -224,14 +224,26 @@ def get_assignable_data(notif):
   """
   if notif.object_type not in {"Request", "Assessment"}:
     return {}
-  elif notif.notification_type.name.endswith("_open"):
-    return assignable_open_data(notif)
-  elif notif.notification_type.name.endswith("_updated"):
-    return assignable_updated_data(notif)
-  elif notif.notification_type.name.endswith("_declined"):
-    return assignable_declined_data(notif)
-  elif notif.notification_type.name.endswith("_reminder"):
-    return assignable_reminder(notif)
+
+  # a map of notification type suffixes to functions that fetch data for those
+  # notification types
+  data_handlers = {
+      "_open": assignable_open_data,
+      "_updated": assignable_updated_data,
+      "_completed": assignable_updated_data,
+      "_ready_for_review": assignable_updated_data,
+      "_verified": assignable_updated_data,
+      "_reopened": assignable_updated_data,
+      "_declined": assignable_declined_data,
+      "_reminder": assignable_reminder,
+  }
+
+  notif_type = notif.notification_type.name
+
+  for suffix, data_handler in data_handlers.iteritems():
+    if notif_type.endswith(suffix):
+      return data_handler(notif)
+
   return {}
 
 

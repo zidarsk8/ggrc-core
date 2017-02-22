@@ -13,12 +13,29 @@
   can.Component.extend({
     tag: tag,
     viewModel: {
+      define: {
+        selectionEl: {
+          type: String,
+          value: ''
+        }
+      },
       instance: {},
-      isSelected: false
+      isSelected: false,
+      checkSelection: function (el, ev) {
+        var filter = this.attr('selectionEl');
+        return filter.length ?
+          can.$(ev.target).closest(filter, el).length :
+          true;
+      },
+      onSelect: function (el, ev) {
+        var isSelected = this.checkSelection(el, ev);
+        var event = isSelected ? 'selectItem' : 'deselectItem';
+        this.dispatch(event);
+      }
     },
     events: {
-      '{this.element} click': function (el) {
-        can.trigger(el, 'selectItem', [this.viewModel.instance]);
+      '{this.element} click': function (el, ev) {
+        this.viewModel.onSelect(el, ev);
       }
     }
   });

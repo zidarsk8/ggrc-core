@@ -4,7 +4,12 @@
 # pylint: disable=maybe-no-member, invalid-name
 
 """Test request import and updates."""
+
+import csv
+
 from collections import OrderedDict
+from cStringIO import StringIO
+from itertools import izip
 
 from flask.json import dumps
 
@@ -168,6 +173,10 @@ class TestAssessmentImport(TestCase):
                     line=2,
                     column_name="actual error message"
                 ),
+                errors.UNKNOWN_COLUMN.format(
+                    line=2,
+                    column_name="map:project"
+                ),
             },
             "row_errors": {
                 errors.MISSING_VALUE_ERROR.format(
@@ -183,11 +192,6 @@ class TestAssessmentImport(TestCase):
                 ),
             },
             "row_warnings": {
-                errors.UNKNOWN_OBJECT.format(
-                    line=14,
-                    object_type="Project",
-                    slug="proj-55"
-                ),
                 errors.UNKNOWN_OBJECT.format(
                     line=19,
                     object_type="Audit",
@@ -263,7 +267,7 @@ class TestAssessmentImport(TestCase):
         ("object_type", "Assessment"),
         ("Code*", slug),
         ("Audit*", audit.slug),
-        ("Assessor*", models.Person.query.all()[0].email),
+        ("Assignee*", models.Person.query.all()[0].email),
         ("Creator", models.Person.query.all()[0].email),
         ("Title", "Strange title"),
         ("map:control", control.slug),
@@ -326,9 +330,12 @@ class TestAssessmentExport(TestCase):
         },
     }]
     response = self.export_csv(data)
-    raw_data = response.data.strip().split("\n")[4:6]
-    keys, vals = raw_data
-    instance_dict = dict(zip(keys.split(","), vals.split(",")))
+
+    keys, vals = response.data.strip().split("\n")[4:6]
+    keys = next(csv.reader(StringIO(keys), delimiter=","), [])
+    vals = next(csv.reader(StringIO(vals), delimiter=","), [])
+    instance_dict = dict(izip(keys, vals))
+
     self.assertEqual(value, instance_dict[column])
 
   def test_export_assesments_without_map_control(self):

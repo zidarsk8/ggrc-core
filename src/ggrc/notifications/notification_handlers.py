@@ -7,8 +7,12 @@ This module contains all function needed for handling notification objects
 needed by ggrc notifications.
 """
 
+# pylint: disable=too-few-public-methods
+
 from datetime import date
 from itertools import izip
+
+from enum import Enum
 
 from sqlalchemy import inspect
 from sqlalchemy import and_
@@ -17,6 +21,14 @@ from ggrc import db
 from ggrc.services.common import Resource
 from ggrc import models
 from ggrc.models.mixins.statusable import Statusable
+
+
+class Transitions(Enum):
+  """Assesment state transitions names."""
+  TO_COMPLETED = "assessment_completed"
+  TO_REVIEW = "assessment_ready_for_review"
+  TO_VERIFIED = "assessment_verified"
+  TO_REOPENED = "assessment_reopened"
 
 
 def _add_notification(obj, notif_type, when=None):
@@ -91,6 +103,23 @@ def _add_assessment_updated_notif(obj):
     _add_notification(obj, notif_type)
 
 
+def _add_state_change_notif(obj, state_change):
+  """Add a notification record on changing the given object's status.
+
+  If the same notification type for the object already exists and has not been
+  sent yet, do not do anything.
+
+  Args:
+    obj (models.mixins.Assignable): an object for which to add a notification
+    state_change (Transitions): the state transition that has happened
+  """
+  notif_type = models.NotificationType.query.filter_by(
+      name=state_change.value).first()
+
+  if not _has_unsent_notifications(notif_type, obj):
+    _add_notification(obj, notif_type)
+
+
 def handle_assignable_modified(obj):
   """A handler for the Assignable object modified event.
 
@@ -101,11 +130,35 @@ def handle_assignable_modified(obj):
 
   status_history = attrs["status"].history
 
-  # The transition from "finished" to "in progress" only happens when a task is
-  # declined. So this is used as a triger for declined notifications.
-  if (status_history.deleted == [obj.DONE_STATE] and
-     status_history.added == [obj.PROGRESS_STATE]):
+  old_state = status_history.deleted[0] if status_history.deleted else None
+  new_state = status_history.added[0] if status_history.added else None
+
+  # The transition from "ready to review" to "in progress" happens when an
+  # object is declined, so this is used as a triger for declined notifications.
+  if (old_state == Statusable.DONE_STATE and
+     new_state == Statusable.PROGRESS_STATE):
     _add_assignable_declined_notif(obj)
+
+  transitions_map = {
+      (Statusable.START_STATE, Statusable.FINAL_STATE):
+          Transitions.TO_COMPLETED,
+      (Statusable.START_STATE, Statusable.DONE_STATE):
+          Transitions.TO_REVIEW,
+      (Statusable.PROGRESS_STATE, Statusable.FINAL_STATE):
+          Transitions.TO_COMPLETED,
+      (Statusable.PROGRESS_STATE, Statusable.DONE_STATE):
+          Transitions.TO_REVIEW,
+      (Statusable.DONE_STATE, Statusable.FINAL_STATE):
+          Transitions.TO_VERIFIED,
+      (Statusable.FINAL_STATE, Statusable.PROGRESS_STATE):
+          Transitions.TO_REOPENED,
+      (Statusable.DONE_STATE, Statusable.PROGRESS_STATE):
+          Transitions.TO_REOPENED,
+  }
+
+  state_change = transitions_map.get((old_state, new_state))
+  if state_change:
+    _add_state_change_notif(obj, state_change)
 
   # no interest in modifications when an assignable object is not ative yet
   if obj.status == Statusable.START_STATE:
@@ -116,19 +169,57 @@ def handle_assignable_modified(obj):
   # covered by other event types such as "comment created"
   # pylint: disable=invalid-name
   IGNORE_ATTRS = frozenset((
-      u'_notifications', u'comments', u'context', u'context_id', u'created_at',
-      u'custom_attribute_definitions', u"finished_date", u'id', u'modified_by',
-      u'modified_by_id', u'object_level_definitions', u'operationally',
-      u'os_state', u'related_destinations', u'related_sources', u'status',
-      u'task_group_objects', u'updated_at', u"verified_date"
+      u"_notifications", u"comments", u"context", u"context_id", u"created_at",
+      u"custom_attribute_definitions", u"_custom_attribute_values",
+      u"finished_date", u"id", u"modified_by", u"modified_by_id",
+      u"object_level_definitions", u"operationally", u"os_state",
+      u"related_destinations", u"related_sources", u"status",
+      u"task_group_objects", u"updated_at", u"verified_date",
   ))
 
   for attr_name, val in attrs.items():
     if attr_name in IGNORE_ATTRS:
       continue
+
     if val.history.has_changes():
+      # the exact order of recipients in the string does not matter, hence the
+      # need for an extra check
+      if attr_name == u"recipients" and not _recipients_changed(val.history):
+        continue
+
       _add_assessment_updated_notif(obj)
       break
+  else:
+    return  # no changes detected, nothing left to do
+
+  # When modified, a done Assessment gets automatically reopened, but that is
+  # not directly observable via status change history, thus an extra check.
+  if obj.status in Statusable.DONE_STATES:
+    _add_state_change_notif(obj, Transitions.TO_REOPENED)
+
+
+def _recipients_changed(history):
+  """Check if the recipients attribute has been semantically modified.
+
+  The recipients attribute is a comma-separated string, and the exact order of
+  the items in it does not matter, i.e. it is not considered a change.
+
+  Args:
+    history (sqlalchemy.orm.attributes.History): recipients' value history
+
+  Returns:
+    True if there was a (semantic) change, False otherwise
+  """
+  old_val = history.deleted[0] if history.deleted else ""
+  new_val = history.added[0] if history.added else ""
+
+  if old_val is None:
+    old_val = ""
+
+  if new_val is None:
+    new_val = ""
+
+  return sorted(old_val.split(",")) != sorted(new_val.split(","))
 
 
 def handle_assignable_created(obj):

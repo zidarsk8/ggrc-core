@@ -145,6 +145,8 @@ class BlockConverter(object):
       for field_name in self.object_class.IMPORTABLE_FIELDS:
         if field_name == 'slug':
           continue
+        if field_name not in self.headers:
+          continue
         importable_column_names.append(
             self.headers[field_name]["display_name"])
       self.add_warning(errors.ONLY_IMPORTABLE_COLUMNS_WARNING,
