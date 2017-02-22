@@ -171,15 +171,15 @@
       &__paging-wrap {
         display: block;
         position: absolute;
-        width: 400px;
+        width: 350px;
         right: 0;
         top: 0;
       }
       &__status-wrap {
-        right: 400px;
+        right: 350px;
         display: block;
         position: absolute;
-        top: 0;
+        top: -2px;
         font-size: 12px;
         label {
           text-transform: none;

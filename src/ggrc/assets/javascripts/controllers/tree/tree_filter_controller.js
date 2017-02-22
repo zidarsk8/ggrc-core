@@ -59,43 +59,31 @@ can.Control('GGRC.Controllers.TreeFilter', {}, {
     this.element.find('.tree-filter__expression-holder span i')
       .toggleClass('fa-check-circle-o', !isExpression);
   },
-  apply_filter: function (filterString) {
+  apply_filter: function (filterString, selectedStates) {
     var currentFilter = GGRC.query_parser.parse(filterString);
     var parentControl = this.element
       .closest('.cms_controllers_dashboard_widgets')
       .find('.cms_controllers_tree_view').control();
 
     this.toggle_indicator(currentFilter);
-    parentControl.filter(filterString);
+    parentControl.filter(filterString, selectedStates);
   },
   'input[type=reset] click': function (el, ev) {
-    this.element.find('input[type=text]').val('');
+    this.element.find('input[name=filter_query]').val('');
     this.apply_filter('');
   },
   'input[type=submit] click': function (el, ev) {
     this.apply_filter(this.$txtFilter.val());
   },
-  'input[type=checkbox] click': function (el, ev) {
-    this.apply_filter(this.$txtFilter.val());
+  'multiselect-dropdown multiselect:closed': function (el, ev, selectedStates) {
+    this.apply_filter(this.$txtFilter.val(), selectedStates);
+    ev.stopPropagation();
   },
   'input keyup': function (el, ev) {
     this.toggle_indicator(GGRC.query_parser.parse(el.val()));
 
     if (ev.keyCode === 13) {
       this.apply_filter(el.val());
-    }
-    ev.stopPropagation();
-  },
-  'input, select change': function (el, ev) {
-    // this is left from the old filters and should eventually be replaced
-    // Convert '.' to '__' ('.' will cause can.Observe to try to update a path instead of just a key)
-    var name = el.attr('name').replace(/\./g, '__');
-    if (el.is('.hasDatepicker')) {
-      this.options.states.attr(name, moment(el.val(), 'MM/DD/YYYY'));
-    } else if (el.is(':checkbox') && !el.is(':checked')) {
-      this.options.states.removeAttr(name);
-    } else {
-      this.options.states.attr(name, el.val());
     }
     ev.stopPropagation();
   },
