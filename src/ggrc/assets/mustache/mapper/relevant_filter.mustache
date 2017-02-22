@@ -29,7 +29,12 @@
             {{#readOnly}}disabled="disabled"{{/readOnly}}
             can-value="model_name">
       {{#menu}}
-        {{#if model_singular}}<option value="{{model_singular}}" label="{{title_singular}}"></option>{{/if}}
+        {{#if model_singular}}
+          <option value="{{model_singular}}"
+                  label="{{title_singular}}"
+                  {{#optionHidden}}hidden{{/optionHidden}}>
+          </option>
+        {{/if}}
       {{/menu}}
     </select>
     {{#filter}}
