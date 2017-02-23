@@ -855,15 +855,31 @@
       return finalDfd;
     },
     update_header: function () {
-      var treeFilter = this.element.parent().find('.tree-filter');
-      var filterHeight = Number(treeFilter.attr('data-height')) +
+      var treeFilter;
+      var filterHeight;
+      var headerHeight;
+      var elementMarginTop;
+      var parentWidth;
+      var headerContentHeight;
+      var treeHeaderContent;
+
+      if (!this.element || !this.element.parent) {
+        return;
+      }
+
+      treeFilter = this.element.parent().find('.tree-filter');
+
+      if (treeFilter.length === 0) {
+        return;
+      }
+
+      filterHeight = Number(treeFilter.attr('data-height')) +
         Number(treeFilter.attr('data-margin-bottom'));
-      var headerHeight = this.element.parent().find('.tree-header').height();
-      var elementMarginTop = this.element.parent().offset().top;
-      var parentWidth = this.element.parent().width();
-      var headerContentHeight = filterHeight + headerHeight;
-      var treeHeaderContent = this.element.parent()
-        .find('.tree-header-content');
+      headerHeight = this.element.parent().find('.tree-header').height();
+      elementMarginTop = this.element.parent().offset().top;
+      parentWidth = this.element.parent().width();
+      headerContentHeight = filterHeight + headerHeight;
+      treeHeaderContent = this.element.parent().find('.tree-header-content');
 
       if (this.options.attr('filter_is_hidden')) {
         elementMarginTop -= filterHeight;

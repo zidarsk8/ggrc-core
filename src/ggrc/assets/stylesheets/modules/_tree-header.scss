@@ -63,7 +63,9 @@
       position: absolute;
       z-index: 1; 
       background-color: $contentBgnd;
-      margin-top: -20px;
+      margin: -20px -40px 0px -40px;
+      padding-left: 40px;
+      padding-right: 40px;
       border-top: solid $contentBgnd;
       border-width: 20px;
     }
