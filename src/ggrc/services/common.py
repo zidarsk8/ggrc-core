@@ -323,34 +323,39 @@ def update_index(session, cache):
     session.commit()
 
 
+def _revision_generator(user_id, action, objects):
+  for obj in objects:
+    yield Revision(obj, user_id, action, obj.log_json())
+
+
 def _get_log_revisions(current_user_id, obj=None, force_obj=False):
   """Generate and return revisions for all cached objects."""
   revisions = []
   cache = get_cache()
-  if cache:
-    cached_objects = {
-        "modified": cache.dirty,
-        "deleted": cache.deleted,
-        "created": cache.new,
-    }
-    for action, objects in cached_objects.iteritems():
-      for obj_ in objects:
-        revision = Revision(obj_, current_user_id, action, obj_.log_json())
-        revisions.append(revision)
-        if obj_.type == "ObjectOwner" and obj_.ownable:
-          # any change (create/delete/modify) of the owners is an edit on the
-          # original object. That is why the action is always set to modified.
-          revision = Revision(obj_.ownable, current_user_id, "modified",
-                              obj_.ownable.log_json())
-          revisions.append(revision)
-
-    if force_obj and obj is not None and obj not in cache.dirty:
-      # If the ``obj`` has been updated, but only its custom attributes have
-      # been changed, then this object will not be added into
-      # ``cache.dirty set``. So that its revision will not be created.
-      # The ``force_obj`` flag solves the issue, but in a bit dirty way.
-      revision = Revision(obj, current_user_id, 'modified', obj.log_json())
-      revisions.append(revision)
+  if not cache:
+    return revisions
+  all_edited_objects = itertools.chain(cache.new, cache.dirty, cache.deleted)
+  owner_modified_objects = [o.ownable for o in all_edited_objects
+                            if o.type == "ObjectOwner" and o.ownable]
+  revisions.extend(_revision_generator(
+      current_user_id, "created", cache.new
+  ))
+  revisions.extend(_revision_generator(
+      current_user_id, "modified", cache.dirty
+  ))
+  revisions.extend(_revision_generator(
+      current_user_id, "modified", owner_modified_objects
+  ))
+  if force_obj and obj is not None and obj not in cache.dirty:
+    # If the ``obj`` has been updated, but only its custom attributes have
+    # been changed, then this object will not be added into
+    # ``cache.dirty set``. So that its revision will not be created.
+    # The ``force_obj`` flag solves the issue, but in a bit dirty way.
+    revision = Revision(obj, current_user_id, 'modified', obj.log_json())
+    revisions.append(revision)
+  revisions.extend(_revision_generator(
+      current_user_id, "deleted", cache.deleted
+  ))
   return revisions
 
 
