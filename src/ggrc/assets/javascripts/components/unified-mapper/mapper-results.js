@@ -394,9 +394,6 @@
       },
       '{viewModel} type': function () {
         this.viewModel.attr('items', []);
-      },
-      '{viewModel.paging} total': function (scope, ev, total) {
-        this.viewModel.attr('objectsPlural', total > 1);
       }
     }
   });

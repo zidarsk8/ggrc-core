@@ -26,8 +26,9 @@
                   mapper="mapper"
                   is-loading="mapper.is_loading"
                   {(filter)}="mapper.filter"
-                  {(status-filter)}="mapper.statusFilter"
-                  (submit)="mapper.onToolbarSubmit()">
+                  (submit)="mapper.onToolbarSubmit()"
+                  total-objects="totalObjects"
+                  {(status-filter)}="mapper.statusFilter">
   </mapper-toolbar>
   <hr/>
   <mapper-results
@@ -41,8 +42,11 @@
     selected="mapper.selected"
     contact="mapper.contact"
     filter="mapper.filter"
-    status-filter="mapper.statusFilter"
-    submit-cbs="mapper.toolbarSubmitCbs">
+    scope-id="{{mapper.snapshot_scope_id}}"
+    scope-type="{{mapper.snapshot_scope_type}}"
+    submit-cbs="mapper.toolbarSubmitCbs"
+    {^paging.total}="totalObjects"
+    status-filter="mapper.statusFilter">
   </mapper-results>
   <div class="well well-small
               {{#mapper.afterSearch}}hidden{{/mapper.afterSearch}}">
