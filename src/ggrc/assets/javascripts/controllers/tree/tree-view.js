@@ -260,18 +260,14 @@
 
     init: function (el, opts) {
       var setAllowMapping;
+      var states = GGRC.Utils.State
+        .getStatesForModel(this.options.model.shortName);
 
-      this.options.attr('filter_states', [
-        {
-          value: 'Active'
-        },
-        {
-          value: 'Draft'
-        },
-        {
-          value: 'Deprecated'
-        }
-      ]);
+      var filterStates = states.map(function (state) {
+        return {value: state};
+      });
+
+      this.options.attr('filter_states', filterStates);
 
       this.element.closest('.widget')
         .on('widget_hidden', this.widget_hidden.bind(this));
@@ -404,9 +400,13 @@
                 .find('.tree-filter__status-wrap');
               // set state filter (checkboxes)
               can.bind.call(statusControl.ready(function () {
+                var unwrappedStates = self.options.attr('selectStateList')
+                  .map(function (state) {
+                    return state.replace(/"/g, '');
+                  });
+
                 self.options.attr('filter_states').forEach(function (item) {
-                  if (self.options.attr('selectStateList')
-                    .indexOf(item.value) > -1) {
+                  if (unwrappedStates.indexOf(item.value) > -1) {
                     item.attr('checked', true);
                   }
                 });
@@ -1161,8 +1161,13 @@
     },
     saveTreeStates: function (selectedStates) {
       var stateToSave = [];
+
+      selectedStates = selectedStates || [];
+
       selectedStates.forEach(function (state) {
-        stateToSave.push(state.value);
+        // wrap in quotes
+        var value = '"' + state.value + '"';
+        stateToSave.push(value);
       });
 
       this.options.attr('selectStateList', stateToSave);
