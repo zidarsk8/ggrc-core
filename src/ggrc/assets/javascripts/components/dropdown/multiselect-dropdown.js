@@ -86,7 +86,7 @@
         this.attr('_stateWasUpdated', false);
         can.trigger(el, 'multiselect:closed', [this.attr('selected')]);
       },
-      changeOpenCloseState: function (el, ev) {
+      changeOpenCloseState: function () {
         if (!this.attr('isOpen')) {
           if (this.attr('canBeOpen')) {
             this.attr('canBeOpen', false);
@@ -98,7 +98,7 @@
           this.dropdownClosed(this.element);
         }
       },
-      openDropdown: function (el, ev) {
+      openDropdown: function (el) {
         // we should save element of component.
         // it necessary for 'can.trigger'
         if (el && !this.element) {
@@ -124,8 +124,8 @@
 
         this.viewModel.updateSelected(target);
       },
-      '{window} click': function (el, ev) {
-        this.viewModel.changeOpenCloseState('', ev);
+      '{window} click': function () {
+        this.viewModel.changeOpenCloseState();
       }
     }
   });
