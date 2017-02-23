@@ -24,12 +24,12 @@ class Indexer(object):
 
 class Record(object):
 
-  def __init__(self, key, type, context_id, tags="", **kwargs):
+  def __init__(self, key, rec_type, context_id, properties, tags=""):
     self.key = key
-    self.type = type
+    self.type = rec_type
     self.context_id = context_id
     self.tags = tags
-    self.properties = kwargs
+    self.properties = properties
 
 
 def resolve_default_text_indexer():
