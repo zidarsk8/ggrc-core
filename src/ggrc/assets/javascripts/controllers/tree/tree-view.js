@@ -1288,7 +1288,19 @@
         if (GGRC.Utils.State.hasState(model)) {
           filter = statesQuery;
         }
-        return queryAPI.buildParam(model, {}, relevant, null, filter);
+        return queryAPI.buildParam(model, {}, relevant, [
+          'context',
+          'email',
+          'id',
+          'name',
+          'selfLink',
+          'slug',
+          'status',
+          'title',
+          'type',
+          'viewLink',
+          'workflow_state'
+        ], filter);
       });
 
       return this.page_loader.load({data: reqParams}, originalOrder);
