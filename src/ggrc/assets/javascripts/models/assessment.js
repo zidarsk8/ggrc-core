@@ -361,6 +361,9 @@
         return;
       }
 
+      // Make sure before create is called before save
+      this.before_create();
+
       if (this.audit) {
         auditLead = this.audit.contact.reify();
         if (currentUser === auditLead) {
