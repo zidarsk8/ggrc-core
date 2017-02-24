@@ -35,6 +35,7 @@ from ggrc.models.inflector import ModelInflectorDescriptor
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.mixins.customattributable import CustomAttributable
 from ggrc.models.mixins.notifiable import Notifiable
+from ggrc.utils import create_stub
 
 
 # pylint: disable=invalid-name
@@ -447,6 +448,21 @@ class ContextRBAC(object):
   # orm.subqueryload('context'))
 
 
+def is_attr_of_type(object_, attr_name, mapped_class):
+  """Check if relationship property points to mapped_class"""
+  cls = object_.__class__
+
+  if isinstance(attr_name, basestring):
+    if hasattr(cls, attr_name):
+      cls_attr = getattr(cls, attr_name)
+      if (hasattr(cls_attr, "property") and
+          isinstance(cls_attr.property,
+                     orm.properties.RelationshipProperty) and
+         cls_attr.property.mapper.class_ == mapped_class):
+        return True
+  return False
+
+
 class Base(ChangeTracked, ContextRBAC, Identifiable):
 
   """Several of the models use the same mixins. This class covers that common
@@ -472,6 +488,8 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
 
   def log_json(self):
     # to integrate with CustomAttributable without order dependencies
+    from ggrc import models
+
     res = getattr(super(Base, self), "log_json", lambda: {})()
     for column in self.__table__.columns:
       try:
@@ -489,6 +507,11 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
           self._person_stub(owner.id) for owner in self.owners if owner
       ]
 
+    for attr_name in self._publish_attrs:
+      if is_attr_of_type(self, attr_name, models.Option):
+        attr = getattr(self, attr_name)
+        stub = create_stub(attr)
+        res[attr_name] = stub
     return res
 
   @computed_property
