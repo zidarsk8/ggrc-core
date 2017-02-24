@@ -259,23 +259,40 @@ class AttributeInfo(object):
 
   @classmethod
   def get_mapping_definitions(cls, object_class):
-    """ Get column definitions for allowed mappings for object_class """
-    from ggrc.snapshotter import rules
-    if object_class.__name__ in rules.Types.scoped:
-      return cls._generate_mapping_definition(
-          rules.Types.all, cls.SNAPSHOT_MAPPING_PREFIX, "map:{}",
-      )
-    definitions = {}
-    mapping_rules = get_mapping_rules()
-    object_mapping_rules = mapping_rules.get(object_class.__name__, [])
-    definitions.update(cls._generate_mapping_definition(
-        object_mapping_rules, cls.MAPPING_PREFIX, "map:{}",
-    ))
+    """Get column definitions for allowed (un)mappings for object_class.
 
+    For an Audit-scope object, generates snapshot mappings for all allowed
+    mappings with snapshottable objects and direct mappings with all allowed
+    mappings with non-snapshottable objects.
+
+    For a normal object, generates direct mappings with all allowed mappings.
+
+    For every direct mapping column generated it also generates an unmapping
+    column.
+    """
+    from ggrc.snapshotter import rules
+    mapping_rules = get_mapping_rules()
+    all_mappings = mapping_rules.get(object_class.__name__, set())
     unmapping_rules = get_unmapping_rules()
-    object_unmapping_rules = unmapping_rules.get(object_class.__name__, [])
+    all_unmappings = unmapping_rules.get(object_class.__name__, set())
+
+    definitions = {}
+    if object_class.__name__ in rules.Types.scoped | rules.Types.parents:
+      snapshot_mappings = all_mappings & rules.Types.all
+      direct_mappings = all_mappings - rules.Types.all
+      definitions.update(cls._generate_mapping_definition(
+          snapshot_mappings, cls.SNAPSHOT_MAPPING_PREFIX, "map:{}",
+      ))
+    else:
+      direct_mappings = all_mappings
+
+    direct_unmappings = direct_mappings & all_unmappings
+
     definitions.update(cls._generate_mapping_definition(
-        object_unmapping_rules, cls.UNMAPPING_PREFIX, "unmap:{}",
+        direct_mappings, cls.MAPPING_PREFIX, "map:{}",
+    ))
+    definitions.update(cls._generate_mapping_definition(
+        direct_unmappings, cls.UNMAPPING_PREFIX, "unmap:{}",
     ))
     return definitions
 
