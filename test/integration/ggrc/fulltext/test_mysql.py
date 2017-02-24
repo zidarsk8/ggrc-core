@@ -36,6 +36,21 @@ class TestCAD(TestCase):
     ).count()
     self.assertEqual(title1_count, 1)
 
+  def test_type_cad(self):
+    """Test CAD with the name 'type' """
+
+    title1 = "type"
+    cad1 = CAD(title=title1, definition_type="market")
+    factory = factories.MarketFactory()
+    CAV(custom_attribute=cad1, attributable=factory, attribute_value="x")
+
+    views.do_reindex()
+
+    title1_count = mysql.MysqlRecordProperty.query.filter(
+        mysql.MysqlRecordProperty.property == title1
+    ).count()
+    self.assertEqual(title1_count, 1)
+
   def test_unique_key(self):
     """Test object property uniqueness."""
     db.session.add(mysql.MysqlRecordProperty(
