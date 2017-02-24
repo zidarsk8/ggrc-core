@@ -87,5 +87,24 @@ describe('can.Control', function () {
         callBindXHRToButton(done, 'HELLO WORLD', '<i class="fa"></i>', true);
       }
     );
+
+    it('bindXHRToButton() should resolve empty element',
+      function (done) {
+        var element = $('');
+
+        // call bindXHRToButton()
+        Control.bindXHRToButton(dfd, element);
+
+        dfd.then(
+          setTimeout(function () {
+            // button should not have 'disabled' class after dfd.resolve()
+            expect(element.hasClass('disabled')).toEqual(false);
+            done();
+          }, 3)
+        );
+
+        dfd.resolve();
+      }
+    );
   });
 });
