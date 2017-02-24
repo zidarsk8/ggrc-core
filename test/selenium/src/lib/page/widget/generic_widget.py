@@ -25,24 +25,18 @@ class Widget(base.Widget):
 
   def __init__(self, driver):
     self.member_count = None
-    self.classes_of_objs_with_base_filter = (
-        AsmtTmpls.__name__,
-        Asmts.__name__)
+    self.cls_without_state_filtering = (AsmtTmpls,)
+    # Audits, Persons, Workflows, TaskGroups, Cycles, CycleTaskGroupObjectTasks
     self.common_filter_locators = dict(
         text_box_locator=self._locator_filter.TEXTFIELD_TO_FILTER,
         bt_submit_locator=self._locator_filter.BUTTON_FILTER,
         bt_clear_locator=self._locator_filter.BUTTON_RESET)
     self.button_help = base.Button(driver, self._locator_filter.BUTTON_HELP)
-    if self.__class__.__name__ in self.classes_of_objs_with_base_filter:
-      self.filter = base.FilterCommon(driver, **self.common_filter_locators)
-    else:
-      self.filter = base.Filter(
-          driver, ch_active_locator=self._locator_filter.ACTIVE_CHECKBOX,
-          ch_draft_locator=self._locator_filter.DRAFT_CHECKBOX,
-          ch_deprecated_locator=self._locator_filter.CHECKBOX_DEPRECATED,
-          **self.common_filter_locators)
-      self.filter.show_all_objs()
-
+    self.filter = base.FilterCommon(driver, **self.common_filter_locators)
+    if self.__class__ not in self.cls_without_state_filtering:
+      self.dropdown_states = base.DropdownStatic(
+          driver, dropdown_locator=self._locator_filter.DROPDOWN,
+          elements_locator=self._locator_filter.DROPDOWN_STATES)
     super(Widget, self).__init__(driver)
     self._set_members_listed()
 
