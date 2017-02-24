@@ -30,6 +30,7 @@
         disabled: false
       },
       fields: [],
+      filter_states: [],
       sortable: true,
       start_expanded: false, // true
       draw_children: true,
@@ -259,6 +260,14 @@
 
     init: function (el, opts) {
       var setAllowMapping;
+      var states = GGRC.Utils.State
+        .getStatesForModel(this.options.model.shortName);
+
+      var filterStates = states.map(function (state) {
+        return {value: state};
+      });
+
+      this.options.attr('filter_states', filterStates);
 
       this.element.closest('.widget')
         .on('widget_hidden', this.widget_hidden.bind(this));
@@ -391,19 +400,17 @@
                 .find('.tree-filter__status-wrap');
               // set state filter (checkboxes)
               can.bind.call(statusControl.ready(function () {
-                self.element.parent()
-                  .find('.attr-status').each(function (i, e) {
-                    if (self.options.attr('selectStateList')
-                      .indexOf(e.value) > -1) {
-                      e.checked = true;
-                    }
+                var unwrappedStates = self.options.attr('selectStateList')
+                  .map(function (state) {
+                    return state.replace(/"/g, '');
                   });
+
+                self.options.attr('filter_states').forEach(function (item) {
+                  if (unwrappedStates.indexOf(item.value) > -1) {
+                    item.attr('checked', true);
+                  }
+                });
               }));
-              // listen to changes in the state filter
-              can.bind.call(statusControl.find('input[type=checkbox]'),
-                'click',
-                this.saveTreeStates.bind(this)
-              );
             }.bind(this))));
       }
 
@@ -1152,13 +1159,17 @@
       savedStateList = this.display_prefs.getTreeViewStates(modelName);
       this.options.attr('selectStateList', savedStateList);
     },
-    saveTreeStates: function () {
-      var $checkState = this.element.parent().find('.attr-status');
-      var $selectedState = $checkState.filter(':checked');
+    saveTreeStates: function (selectedStates) {
       var stateToSave = [];
-      $selectedState.each(function () {
-        stateToSave.push(this.value);
+
+      selectedStates = selectedStates || [];
+
+      selectedStates.forEach(function (state) {
+        // wrap in quotes
+        var value = '"' + state.value + '"';
+        stateToSave.push(value);
       });
+
       this.options.attr('selectStateList', stateToSave);
       this.display_prefs.setTreeViewStates(this.options.model.model_singular,
         stateToSave);
@@ -1266,7 +1277,8 @@
       this.refreshList();
     },
 
-    filter: function (filterString) {
+    filter: function (filterString, selectedStates) {
+      this.saveTreeStates(selectedStates);
       this.options.attr('paging.filter', filterString);
       this.options.attr('paging.current', 1);
       this.refreshList();

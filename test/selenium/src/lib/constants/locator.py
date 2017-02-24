@@ -646,6 +646,7 @@ class ObjectWidget(object):
 
 
 class ModalDeleteObject(object):
+  """Locators for the modal of deletion object."""
   MODAL_TITLE = (By.CSS_SELECTOR, '.modal-header>h2')
   CONFIRMATION_TEXT = (By.CSS_SELECTOR, '.modal-body>div>p')
   OBJECT_TITLE = (By.CSS_SELECTOR, '.modal-body>div>p>span')
@@ -882,38 +883,33 @@ class BaseWidgetGeneric(object):
     class should look like. Note that the same functionality can be
     implemented using properties though with more code."""
     def __init__(cls, *args):
+      _FILTER = "#{}_widget .sticky-filter"
+      _FILTER_BUTTON = _FILTER + " .tree-filter__button"
+      _FILTER_DROPDOWN = _FILTER + " .multiselect-dropdown"
+      _FILTER_DROPDOWN_ELEMENTS = \
+          _FILTER_DROPDOWN + " .multiselect-dropdown__element"
       cls.TEXTFIELD_TO_FILTER = (
-          By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__expression-holder'
+          By.CSS_SELECTOR, str(_FILTER + " .tree-filter__expression-holder")
             .format(cls._object_name))
       cls.BUTTON_FILTER = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__button [type="submit"]'
-            .format(cls._object_name))
+          str(_FILTER_BUTTON + ' [type="submit"]').format(cls._object_name))
       cls.BUTTON_RESET = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__button [type="reset"]'
-            .format(cls._object_name))
+          str(_FILTER_BUTTON + ' [type="reset"]').format(cls._object_name))
       cls.BUTTON_HELP = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__button  #page-help'
+          str(_FILTER_BUTTON + " #page-help").format(cls._object_name))
+      cls.DROPDOWN = (
+          By.CSS_SELECTOR,
+          str(_FILTER_DROPDOWN + " .multiselect-dropdown__input-container")
             .format(cls._object_name))
-      cls.ACTIVE_CHECKBOX = (
+      cls.DROPDOWN_STATES = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__status-wrap '
-          '[name="active"]'.format(cls._object_name))
-      cls.DRAFT_CHECKBOX = (
-          By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__status-wrap '
-          '[name="draft"]'.format(cls._object_name))
-      cls.CHECKBOX_DEPRECATED = (
-          By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__status-wrap '
-          '[name="deprecated"]'.format(cls._object_name))
-
+          str(_FILTER_DROPDOWN_ELEMENTS).format(cls._object_name))
   FILTER_PANE_COUNTER = (
-      By.CSS_SELECTOR, ".tree-pagination__count "
-                       ".tree-view-pagination__count__title")
+      By.CSS_SELECTOR,
+      ".tree-pagination__count .tree-view-pagination__count__title")
 
 
 class WidgetAssessments(BaseWidgetGeneric):

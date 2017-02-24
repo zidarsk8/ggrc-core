@@ -30,12 +30,11 @@
           </div>
           <div class="tree-filter__status-wrap">
             {{#if statusFilterVisible}}
-            <input type="checkbox" name="active" id="statusActive-{{model.model_singular}}" value="Active" class="attr-status">
-            <label for="statusActive-{{model.model_singular}}">Active</label>
-            <input type="checkbox" name="draft" id="statusDraft-{{model.model_singular}}" value="Draft" class="attr-status">
-            <label for="statusDraft-{{model.model_singular}}">Draft</label>
-            <input type="checkbox" name="deprecated" id="statusDeprecated-{{model.model_singular}}" value="Deprecated" class="attr-status">
-            <label for="statusDeprecated-{{model.model_singular}}">Deprecated</label>
+            <multiselect-dropdown 
+              {options}="filter_states"
+              placeholder="Filter by State",
+              plural="States">
+            </multiselect-dropdown>
             {{/if}}
           </div>
           <div class="tree-filter__paging-wrap">

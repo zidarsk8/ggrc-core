@@ -184,6 +184,7 @@ dashboard-js-files:
   - components/show-related-assessments-button/show-related-assessments-button.js
   - components/mapping-controls/mapping-type-selector.js
   - components/dropdown/dropdown.js
+  - components/dropdown/multiselect-dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
   - components/person/person.js
@@ -420,6 +421,7 @@ dashboard-js-template-files:
   - components/unified-mapper/mapper-results-columns-configuration.mustache
   - components/assessment_templates/assessment_templates.mustache
   - components/dropdown/dropdown.mustache
+  - components/dropdown/multiselect_dropdown.mustache
   - components/object_history/object_history.mustache
   - components/person/person.mustache
   - components/spinner/spinner.mustache
