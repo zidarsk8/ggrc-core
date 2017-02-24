@@ -984,11 +984,13 @@
         return false;
       }
       if (instance.destination &&
-        instance.destination.type === shortName) {
+        (instance.destination.type === shortName ||
+         instance.destination.type === 'Snapshot')) {
         return true;
       }
       if (instance.source &&
-        instance.source.type === shortName) {
+        (instance.source.type === shortName ||
+         instance.source.type === 'Snapshot')) {
         return true;
       }
       return false;

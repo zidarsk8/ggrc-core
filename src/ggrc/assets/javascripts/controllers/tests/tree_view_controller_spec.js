@@ -82,6 +82,17 @@ describe('CMS.Controllers.TreeView', function () {
       expect(result).toBeTruthy();
     });
 
+    it('right relationship for Snapshot', function () {
+      var result;
+
+      relationship.source = {type: 'bar'};
+      relationship.destination = {type: 'Snapshot'};
+
+      result = method(relationship, 'foo');
+
+      expect(result).toBeTruthy();
+    });
+
     it('right relationship without source', function () {
       var result;
 
