@@ -3396,13 +3396,15 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
 Mustache.registerHelper('with_create_issue_json', function (instance, options) {
   var audits;
   var audit;
-  var programs;
-  var program;
-  var control;
   var json;
-  var relatedControls;
+  var relatedSnapshots = [];
   var canMap;
-
+  var isAllowedToMap = function (obj) {
+    if (_.isEmpty(obj)) {
+      return true;
+    }
+    return Permission.is_allowed_for('update', obj);
+  };
   instance = Mustache.resolve(instance);
   audits = instance.get_mapping('related_audits');
   if (!audits.length) {
@@ -3410,19 +3412,16 @@ Mustache.registerHelper('with_create_issue_json', function (instance, options) {
   }
 
   audit = audits[0].instance.reify();
-  programs = audit.get_mapping('_program');
-  program = programs.length ? programs[0].instance.reify() : {};
-  control = instance.control ? instance.control : {};
-  relatedControls = instance.mappedSnapshots;
-
-  if (!control.id && relatedControls.length) {
-    control = relatedControls[0].instance;
-    instance.control = control;
+  if (instance.mappedSnapshots) {
+    relatedSnapshots = instance.mappedSnapshots.map(function (item) {
+      var instance = item.instance;
+      return {title: instance.title, id: instance.id, type: instance.type};
+    });
   }
+
   json = {
     audit: {title: audit.title, id: audit.id, type: audit.type},
-    program: {title: program.title, id: program.id, type: program.type},
-    control: {title: control.title, id: control.id, type: control.type},
+    relatedSnapshots: relatedSnapshots,
     context: {type: audit.context.type, id: audit.context.id},
     assessment: {
       title: instance.title,
@@ -3433,12 +3432,9 @@ Mustache.registerHelper('with_create_issue_json', function (instance, options) {
     }
   };
   // Check permissions
-  canMap = [audit, program, control, instance].every(function (obj) {
-    if (_.isEmpty(obj)) {
-      return true;
-    }
-    return Permission.is_allowed_for('update', obj);
-  });
+  canMap =
+    [audit, instance].every(isAllowedToMap) &&
+    relatedSnapshots.every(isAllowedToMap);
   if (canMap) {
     return options.fn(options.contexts.add(
         {create_issue_json: JSON.stringify(json)}));
@@ -3446,7 +3442,7 @@ Mustache.registerHelper('with_create_issue_json', function (instance, options) {
   return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("pretty_role_name", function (name) {
+Mustache.registerHelper('pretty_role_name', function (name) {
   name = Mustache.resolve(name);
   var ROLE_LIST = {
     "ProgramOwner": "Program Manager",
