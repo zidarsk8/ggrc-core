@@ -3,6 +3,9 @@
 
 """Mapping rules for Relationship validation and map:model import columns."""
 
+import copy
+
+
 def get_mapping_rules():
   """ Get mappings rules as defined in business_object.js
 
@@ -10,33 +13,26 @@ def get_mapping_rules():
     Aduit has direct mapping to Program with program_id
     Section has a direct mapping to Standard/Regulation/Poicy with directive_id
   """
-  # these rules are copy pasted from
-  # src/ggrc/assets/javascripts/apps/base_widgets.js line: 9
-  # WARNING ########################################################
-  # Manually added Risks and threats to the list from base_widgets #
-  ##################################################################
-  # TODO: Read these rules from different modules and combine them here.
-  all_rules = set(['AccessGroup', 'Assessment', 'Audit', 'Clause', 'Contract',
-                   'Control', 'CycleTaskGroupObjectTask', 'DataAsset',
-                   'Facility', 'Issue', 'Market', 'Objective', 'OrgGroup',
-                   'Person', 'Policy', 'Process', 'Product', 'Program',
-                   'Project', 'Regulation', 'Risk', 'Section', 'Standard',
-                   'System', 'Threat', 'Vendor'])
+  from ggrc import snapshotter
+  all_rules = set(['AccessGroup', 'Clause', 'Contract', 'Control',
+                   'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
+                   'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',
+                   'Process', 'Product', 'Program', 'Project', 'Regulation',
+                   'Risk', 'Section', 'Standard', 'System', 'Threat',
+                   'Vendor'])
+
+  snapshots = snapshotter.rules.Types.all
 
   business_object_rules = {
       "AccessGroup": all_rules - set(['AccessGroup']),
-      "Assessment": all_rules - set(['Assessment']),
-      "Audit": all_rules - set(['CycleTaskGroupObjectTask', 'Audit',
-                                'Risk', 'Threat']),
       "Clause": all_rules - set(['Clause']),
       "Contract": all_rules - set(['Policy', 'Regulation',
                                    'Contract', 'Standard']),
       "Control": all_rules,
-      "CycleTaskGroupObjectTask": all_rules - set(['CycleTaskGroupObjectTask',
-                                                   'Audit']),
+      "CycleTaskGroupObjectTask": (all_rules -
+                                   set(['CycleTaskGroupObjectTask'])),
       "DataAsset": all_rules,
       "Facility": all_rules,
-      "Issue": all_rules,
       "Market": all_rules,
       "Objective": all_rules,
       "OrgGroup": all_rules,
@@ -49,21 +45,36 @@ def get_mapping_rules():
       "Project": all_rules,
       "Regulation": all_rules - set(['Policy', 'Regulation',
                                      'Contract', 'Standard']),
-      "Risk": all_rules - set(['Audit', 'Risk']),
+      "Risk": all_rules - set(['Risk']),
       "Section": all_rules,
       "Standard": all_rules - set(['Policy', 'Regulation',
                                    'Contract', 'Standard']),
       "System": all_rules,
-      "Threat": all_rules - set(['Audit', 'Threat']),
+      "Threat": all_rules - set(['Threat']),
       "Vendor": all_rules,
   }
+
+  # Audit and Audit-scope objects
+  # Assessment and Issue have a special Audit field instead of map:audit
+  business_object_rules.update({
+      "Audit": set(),
+      "Assessment": snapshots | {"Issue"},
+      "Issue": snapshots | {"Assessment"},
+  })
 
   return business_object_rules
 
 
 def get_unmapping_rules():
   """Get unmapping rules from mapping dict."""
-  return get_mapping_rules()
+  unmapping_rules = copy.deepcopy(get_mapping_rules())
+
+  # Audit and Audit-scope objects
+  unmapping_rules["Audit"] = set()
+  unmapping_rules["Assessment"] = {"Issue"}
+  unmapping_rules["Issue"] = {"Assessment"}
+
+  return unmapping_rules
 
 
 __all__ = [
