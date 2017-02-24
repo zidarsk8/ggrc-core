@@ -14,23 +14,19 @@
         instance.custom_attribute_definitions.length);
     },
     '{CMS.Models.Issue} created': function (model, ev, instance) {
-      var auditDfd;
-      var controlDfd;
-      var programDfd;
-      var assessmentDfd;
+      var dfd;
 
       if (!(instance instanceof CMS.Models.Issue)) {
         return;
       }
 
       this._after_pending_joins(instance, function () {
-        auditDfd = this._create_relationship(instance, instance.audit);
-        controlDfd = this._create_relationship(instance, instance.control);
-        programDfd = this._create_relationship(instance, instance.program);
-        assessmentDfd = this._create_relationship(
-          instance, instance.assessment);
-        instance.delay_resolving_save_until($.when(auditDfd, controlDfd,
-            programDfd, assessmentDfd));
+        dfd = instance.relatedSnapshots.map(function (item) {
+          return this._create_relationship(instance, item);
+        }.bind(this));
+        dfd.push(this._create_relationship(instance, instance.audit));
+        dfd.push(this._create_relationship(instance, instance.assessment));
+        instance.delay_resolving_save_until($.when.apply($, dfd));
       }.bind(this));
     },
     '{CMS.Models.Section} created': function (model, ev, instance) {
