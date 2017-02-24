@@ -306,3 +306,27 @@ def generate_query_chunks(query, chunk_size=1000):
   count = query.count()
   for offset in range(0, count, chunk_size):
     yield query.order_by('id').limit(chunk_size).offset(offset).all()
+
+
+def create_stub(object_, context_id=None):
+  """Create stub from model attribute
+
+  Args:
+    object_: Object instance
+  Returns:
+    Dict representation of stub
+  """
+  import ggrc.models as models
+
+  if object_:
+    id_ = object_.id
+    type_ = object_.type
+
+    model = getattr(models.all_models, type_)
+    return {
+        'type': type_,
+        'id': id_,
+        'context_id': context_id,
+        'href': u"/api/{}/{}".format(model._inflector.table_plural, id_),  # noqa # pylint: disable=protected-access
+    }
+  return None
