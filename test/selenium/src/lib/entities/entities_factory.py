@@ -1,19 +1,19 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Module for factories that create business entities."""
+"""Module for factories that create entities."""
 # pylint: disable=too-many-arguments
 # pylint: disable=invalid-name
 # pylint: disable=redefined-builtin
 
 
 import random
-import uuid
 
-from lib.constants import element, objects, roles, url
+from lib.constants import element, objects, roles, url as const_url
 from lib.constants.element import AdminWidgetCustomAttrs
 from lib.entities import entity
 from lib.utils import string_utils
-from lib.utils.string_utils import random_list_of_strings, random_string
+from lib.utils.string_utils import (random_list_strings, random_string,
+                                    random_uuid)
 
 
 class EntitiesFactory(object):
@@ -26,7 +26,7 @@ class EntitiesFactory(object):
   _obj_asmt_tmpl = objects.get_singular(objects.ASSESSMENT_TEMPLATES)
   _obj_asmt = objects.get_singular(objects.ASSESSMENTS)
 
-  all_objs_attrs_names = tuple(entity.Entity().attrs_names_of_all_entities())
+  all_objs_attrs_names = tuple(entity.Entity().attrs_names_all_entities())
 
   @classmethod
   def update_obj_attrs_values(cls, obj, attrs_names=all_objs_attrs_names,
@@ -40,23 +40,23 @@ class EntitiesFactory(object):
     return obj
 
   @classmethod
-  def _generate_title(cls, obj_type, split=13):
+  def _generate_title(cls, obj_type):
     """Generate title according object type and random data."""
     special_chars = string_utils.SPECIAL
-    return "{obj_type}_{rand_str}_{uuid}".format(
-        obj_type=obj_type, uuid=str(uuid.uuid4())[:split],
+    return "{obj_type}_{uuid}_{rand_str}".format(
+        obj_type=obj_type, uuid=random_uuid(),
         rand_str=random_string(size=len(special_chars), chars=special_chars))
 
   @classmethod
-  def _generate_code(cls, split=13):
+  def _generate_code(cls):
     """Generate code according str part and random data."""
-    return "{code}".format(code=str(uuid.uuid4())[:split])
+    return "{code}".format(code=random_uuid())
 
   @classmethod
-  def _generate_email(cls, domain=url.DEFAULT_EMAIL_DOMAIN, split=13):
+  def _generate_email(cls, domain=const_url.DEFAULT_EMAIL_DOMAIN):
     """Generate email according domain."""
     return "{mail_name}@{domain}".format(
-        mail_name=str(uuid.uuid4())[:split], domain=domain)
+        mail_name=random_uuid(), domain=domain)
 
 
 class PersonFactory(EntitiesFactory):
@@ -65,13 +65,13 @@ class PersonFactory(EntitiesFactory):
   @classmethod
   def default(cls):
     """Create default system Person object."""
-    return cls.create(title=roles.DEFAULT_USER, id=1,
-                      href=url.DEFAULT_URL_USER_API, email=url.DEFAULT_EMAIL,
-                      authorizations=roles.SUPERUSER)
+    return cls.create(
+        title=roles.DEFAULT_USER, id=1, href=const_url.DEFAULT_USER_HREF,
+        email=const_url.DEFAULT_USER_EMAIL, authorizations=roles.SUPERUSER)
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, type=None, email=None,
-             authorizations=None):
+  def create(cls, title=None, id=None, href=None, url=None, type=None,
+             email=None, authorizations=None):
     """Create Person object.
 
     Random values will be used for title aka name.
@@ -79,7 +79,7 @@ class PersonFactory(EntitiesFactory):
     """
     person_entity = cls._create_random_person()
     person_entity = cls.update_obj_attrs_values(
-        obj=person_entity, title=title, id=id, href=href, type=type,
+        obj=person_entity, title=title, id=id, href=href, url=url, type=type,
         email=email, authorizations=authorizations)
     return person_entity
 
@@ -155,7 +155,7 @@ class CAFactory(EntitiesFactory):
         ca_object.multi_choice_options =\
             ca_object_fields["multi_choice_options"]
       else:
-        ca_object.multi_choice_options = random_list_of_strings(list_len=3)
+        ca_object.multi_choice_options = random_list_strings(list_len=3)
     return ca_object
 
   @classmethod
@@ -176,8 +176,9 @@ class ProgramFactory(EntitiesFactory):
   """Factory class for Program entity."""
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, type=None, manager=None,
-             pr_contact=None, code=None, state=None, last_update=None):
+  def create(cls, title=None, id=None, href=None, url=None, type=None,
+             manager=None, pr_contact=None, code=None, state=None,
+             last_update=None):
     """Create Program object.
 
     Random values will be used for title and code.
@@ -185,7 +186,7 @@ class ProgramFactory(EntitiesFactory):
     """
     program_entity = cls._create_random_program()
     program_entity = cls.update_obj_attrs_values(
-        obj=program_entity, title=title, id=id, href=href, type=type,
+        obj=program_entity, title=title, id=id, href=href, url=url, type=type,
         manager=manager, pr_contact=pr_contact, code=code, state=state,
         last_update=last_update)
     return program_entity
@@ -208,8 +209,9 @@ class ControlFactory(EntitiesFactory):
   """Factory class for Control entity."""
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, type=None, owner=None,
-             pr_contact=None, code=None, state=None, last_update=None):
+  def create(cls, title=None, id=None, href=None, url=None, type=None,
+             owner=None, pr_contact=None, code=None, state=None,
+             last_update=None):
     """Create Control object.
 
     Random values will be used for title and code.
@@ -217,7 +219,7 @@ class ControlFactory(EntitiesFactory):
     """
     control_entity = cls._create_random_control()
     control_entity = cls.update_obj_attrs_values(
-        obj=control_entity, title=title, id=id, href=href, type=type,
+        obj=control_entity, title=title, id=id, href=href, url=url, type=type,
         owner=owner, pr_contact=pr_contact, code=code, state=state,
         last_update=last_update)
     return control_entity
@@ -240,8 +242,9 @@ class AuditFactory(EntitiesFactory):
   """Factory class for Audit entity."""
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, type=None, program=None,
-             audit_lead=None, code=None, status=None, last_update=None):
+  def create(cls, title=None, id=None, href=None, url=None, type=None,
+             program=None, audit_lead=None, code=None, status=None,
+             last_update=None):
     """Create Audit object.
 
     Random values will be used for title and code.
@@ -249,7 +252,7 @@ class AuditFactory(EntitiesFactory):
     """
     audit_entity = cls._create_random_audit()
     audit_entity = cls.update_obj_attrs_values(
-        obj=audit_entity, title=title, id=id, href=href, type=type,
+        obj=audit_entity, title=title, id=id, href=href, url=url, type=type,
         program=program, audit_lead=audit_lead, code=code, status=status,
         last_update=last_update)
     return audit_entity
@@ -271,9 +274,9 @@ class AsmtTmplFactory(EntitiesFactory):
   """Factory class for Assessment Template entity."""
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, type=None, audit=None,
-             asmt_objects=None, def_assessors=None, def_verifiers=None,
-             code=None, last_update=None):
+  def create(cls, title=None, id=None, href=None, url=None, type=None,
+             audit=None, asmt_objects=None, def_assessors=None,
+             def_verifiers=None, code=None, last_update=None):
     """Create Assessment Template object.
 
     Random values will be used for title and code.
@@ -282,9 +285,10 @@ class AsmtTmplFactory(EntitiesFactory):
     """
     asmt_tmpl_entity = cls._create_random_asmt_tmpl()
     asmt_tmpl_entity = cls.update_obj_attrs_values(
-        obj=asmt_tmpl_entity, title=title, id=id, href=href, type=type,
-        audit=audit, asmt_objects=asmt_objects, def_assessors=def_assessors,
-        def_verifiers=def_verifiers, code=code, last_update=last_update)
+        obj=asmt_tmpl_entity, title=title, id=id, href=href, url=url,
+        type=type, audit=audit, asmt_objects=asmt_objects,
+        def_assessors=def_assessors, def_verifiers=def_verifiers, code=code,
+        last_update=last_update)
     return asmt_tmpl_entity
 
   @classmethod
@@ -312,8 +316,9 @@ class AsmtFactory(EntitiesFactory):
     "objs_under_asmt_tmpl", audit's title from "audit", the total number of
     objects under Assessment Template.
     """
+    # pylint: disable=too-many-locals
     from lib.service.rest_service import ObjectsInfoService
-    actual_count_all_asmts = ObjectsInfoService().total_count(
+    actual_count_all_asmts = ObjectsInfoService().get_total_count(
         obj_name=objects.get_normal_form(cls._obj_asmt)
     )
     return [
@@ -324,9 +329,10 @@ class AsmtFactory(EntitiesFactory):
         enumerate(objs_under_asmt_tmpl, start=actual_count_all_asmts + 1)]
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, type=None, object=None,
-             audit=None, creators=None, assignees=None, pr_contact=None,
-             is_verified=None, code=None, state=None, last_update=None):
+  def create(cls, title=None, id=None, href=None, url=None, type=None,
+             object=None, audit=None, creators=None, assignees=None,
+             pr_contact=None, is_verified=None, code=None, state=None,
+             last_update=None):
     """Create Assessment object.
 
     Random values will be used for title and code.
@@ -335,7 +341,7 @@ class AsmtFactory(EntitiesFactory):
     """
     asmt_entity = cls._create_random_asmt()
     asmt_entity = cls.update_obj_attrs_values(
-        obj=asmt_entity, title=title, id=id, href=href, type=type,
+        obj=asmt_entity, title=title, id=id, href=href, url=url, type=type,
         object=object, audit=audit, creators=creators, assignees=assignees,
         pr_contact=pr_contact, is_verified=is_verified, code=code, state=state,
         last_update=last_update)
