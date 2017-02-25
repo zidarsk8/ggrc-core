@@ -18,7 +18,7 @@ class Widget(base.Widget):
     self.button_settings = None
     self.title = base.Label(driver, self._locator.TITLE)
     self.title_entered = base.Label(driver, self._locator.TITLE_ENTERED)
-    self.link_update_obj = None
+    self.link_get_latest_ver = None
 
     super(Widget, self).__init__(driver)
     self.object_id = self.url.split("/")[-1]
@@ -30,12 +30,13 @@ class Widget(base.Widget):
     self.button_settings.click()
     return self._dropdown_settings_cls(self._driver)
 
-  def open_link_update_obj(self):
+  def open_link_get_latest_ver(self):
     """Click to link to open modal for further update object."""
-    self.link_update_obj = base.Button(self._driver,
-                                       locator.BaseInfoWidget.LINK_UPDATE_OBJ)
-    self.link_update_obj.click()
-    return modal.update_object.UpdateObjectModal(self._driver)
+    self.link_get_latest_ver = base.Button(
+        self._driver, locator.BaseInfoWidget.LINK_GET_LAST_VER
+    )
+    self.link_get_latest_ver.click()
+    return modal.update_object.CompareUpdateObjectModal(self._driver)
 
 
 class DashboardInfo(Widget):

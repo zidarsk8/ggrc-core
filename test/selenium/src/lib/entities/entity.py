@@ -41,8 +41,7 @@ class Person(Entity):
     self.authorizations = authorizations
 
   def __repr__(self):
-    return ("object: {type}, name: {name}, id: {id}, href: {href}, "
-    return ("object_type: {type}, name: {title}, id: {id}, href: {href}, "
+    return ("object_type: {type}, name: {name}, id: {id}, href: {href}, "
             "email: {email}, authorizations: {authorizations}").format(
         type=self.type, name=self.title, id=self.id, href=self.href,
         email=self.email, authorizations=self.authorizations)

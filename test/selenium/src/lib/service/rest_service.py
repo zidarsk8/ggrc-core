@@ -1,7 +1,7 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""The module provides API for creating and manipulating GGRC's business
-objects via REST."""
+"""The module provides services for creating and manipulating GGRC's business
+objects via REST API."""
 # pylint: disable=too-few-public-methods
 
 import json
@@ -98,7 +98,7 @@ class BaseService(object):
     list_new_objs = [factory.create() for _ in xrange(len(list_old_objs))]
     list_new_attrs = [
         self.get_obj_attrs(self.client.update_object(
-            old_obj_href=old_obj.href, title=new_obj.title,
+            href=old_obj.href, title=new_obj.title,
             slug=new_obj.code)) for
         old_obj, new_obj in zip(list_old_objs, list_new_objs)]
     return [self.set_obj_attrs(new_attrs, new_obj) for
@@ -112,9 +112,6 @@ class ControlsService(BaseService):
   def create(self, count):
     return self.create_objs(count=count, factory=ControlFactory())
 
-  @staticmethod
-  def update(objs):
-    return [objs.__dict__]
   def update(self, objs):
     return self.update_objs(list_old_objs=[objs], factory=ControlFactory())
 

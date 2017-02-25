@@ -6,9 +6,9 @@
 # pylint: disable=too-few-public-methods
 # pylint: disable=protected-access
 import random
-import re
 
 import pytest
+import re
 
 from lib import base, constants
 from lib.constants import objects
@@ -50,7 +50,7 @@ class TestAdminDashboardPage(base.Test):
                 getattr(item, 'text')))]
     assert items_with_incorrect_format == []
     assert admin_events_tab.widget_header.text == \
-        self._event_el.TREE_VIEW_HEADER
+        self._event_el.WIDGET_HEADER
 
   @pytest.mark.smoke_tests
   def test_check_ca_groups(self, admin_dashboard):

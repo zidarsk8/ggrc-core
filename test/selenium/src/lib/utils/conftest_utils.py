@@ -2,14 +2,10 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """PyTest fixture utils."""
 
-from selenium.common import exceptions
-
-from lib import cache
-from lib import constants
-from lib import factory
+from lib import cache, constants, factory
 from lib.page import dashboard
-from lib.utils import selenium_utils
-from lib.utils import test_utils
+from lib.utils import selenium_utils, test_utils
+from selenium.common import exceptions
 
 
 def navigate_to_page_with_lhn(driver):
@@ -53,7 +49,7 @@ def delete_object_on_info_widget(driver, object_name):
 
 def create_custom_program_attribute(driver):
   """Creates a custom text attribute for a program object"""
-  selenium_utils.open_url(driver, dashboard.AdminDashboard.URL)
+  selenium_utils.get_url_if_not_opened(driver, dashboard.AdminDashboard.URL)
   modal = dashboard.AdminDashboard(driver) \
       .select_custom_attributes() \
       .select_programs() \

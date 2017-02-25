@@ -1,17 +1,16 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Utility function for selenium."""
+# pylint: disable=wrong-import-order
 
 import logging
 import time
 
+from lib import constants, exception
 from selenium.common import exceptions
 from selenium.webdriver.common import action_chains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-
-from lib import constants
-from lib import exception
 
 logger = logging.getLogger(__name__)
 
@@ -21,15 +20,14 @@ def hover_over_element(driver, element):
   action_chains.ActionChains(driver).move_to_element(element).perform()
 
 
-def open_url(driver, full_url):
-  """Loads a web page in the current browser session if
-  it hasn't been opened yet.
+def get_url_if_not_opened(driver, url):
+  """Get URL in the browser if it hasn't been got yet (performed
+  domain independent check) to avoid repetitions and decrease the time
+  of interaction.
   """
-  if (constants.url.get_second_part_url(full_url) ==
-          constants.url.get_second_part_url(driver.current_url)):
-    pass
-  else:
-    driver.get(full_url)
+  if (constants.url.get_second_part_url(driver.current_url) !=
+          constants.url.get_second_part_url(url)):
+    driver.get(url)
 
 
 def wait_until_stops_moving(element):

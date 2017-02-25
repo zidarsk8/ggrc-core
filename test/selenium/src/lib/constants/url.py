@@ -1,13 +1,12 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """The module provides constants GGRC's URLs construction."""
-
 # pylint: disable=wildcard-import
 # pylint: disable=unused-wildcard-import
-from lib.constants.objects import *  # noqa; the names are later exported
+
 import urlparse
 
-from lib.constants import objects
+from lib.constants.objects import *  # noqa; the names are later exported
 
 
 # URL's parts for objects
@@ -45,4 +44,4 @@ def get_second_part_url(full_url):
   """Get the second part of the full URL.
   Example: "http://localhost/api/controls" -> "/api/controls"
   """
-  return urlparse.urlparse(full_url).path
+  return urlparse.urlparse(url=full_url, allow_fragments=False).path

@@ -194,13 +194,6 @@ class TreeView(base.TreeView):
         self._locators.BUTTON_SHOW_FIELDS.format(self.widget_name))
     self.button_show_fields = base.Button(self._driver, _locator_show_fields)
     self.button_show_fields.click()
-    self.open_3bbs()
-    _locator_set_fields = (
-        By.CSS_SELECTOR,
-        self._locators.BUTTON_SET_FIELDS.format(self.widget_name)
-    )
-    self.button_set_fields = base.Button(self._driver, _locator_set_fields)
-    self.button_set_fields.click()
 
   def create_obj(self, new_obj):
     """Create new object from widget used tree view."""
@@ -227,7 +220,7 @@ class TreeView(base.TreeView):
              _item in self.tree_view_items_elements()]
     return [dict(zip(header[0], item)) for item in items]
 
-  def select_obj_in_tw(self, obj_title):
+  def select_obj_in_tree_view(self, obj_title):
     """Select the object in list of objects items which displayed on
     tree view according to object's title.
     """
@@ -236,7 +229,7 @@ class TreeView(base.TreeView):
     selenium_utils.wait_until_stops_moving(item)
     item.click()
 
-  def get_obj_seq_num_in_tw(self, obj_title):
+  def get_obj_seq_num_in_tree_view(self, obj_title):
     """Get the object sequence number in list of objects items which
     displayed on tree view according to object's title.
     """
@@ -252,8 +245,6 @@ class AsmtTmpls(Widget):
   _locator_filter = locator.WidgetAssessmentTemplates
   _asmt_tmpls_fields = (
       element.AsmtTmplModalSetVisibleFields.DEFAULT_SET_FIELDS)
-  _asmt_tmpls_fields = (element.
-                        AsmtTmplModalSetVisibleFields().DEFAULT_SET_FIELDS)
 
   URL = environment.APP_URL + url.AUDIT.format({}) + (
       _locator_filter.widget_name)
@@ -332,12 +323,12 @@ class Controls(Widget):
 
   def update(self, obj_title):
     """Update Control from info widget."""
-    obj_num = self.tree_view.get_obj_seq_num_in_tw(obj_title)
+    obj_num = self.tree_view.get_obj_seq_num_in_tree_view(obj_title)
     self.select_nth_member(obj_num)
     info_panel = self._info_pane_cls(self._driver)
-    info_panel.open_link_update_obj().confirm_update()
+    info_panel.open_link_get_latest_ver().confirm_update()
     selenium_utils.get_when_invisible(self._driver,
-                                      locator.BaseInfoWidget.LINK_UPDATE_OBJ)
+                                      locator.BaseInfoWidget.LINK_GET_LAST_VER)
 
   def set_visible_fields(self):
     """Set visible fields for display Controls on tree view."""

@@ -46,7 +46,7 @@ class Lhn(object):
 
 
 class WidgetBar(object):
-  """Elements' labels and properties for the generic widget bar."""
+  """Elements' labels and properties for the Generic widget bar."""
   INFO = "Info"
 
   class __metaclass__(type):
@@ -57,7 +57,7 @@ class WidgetBar(object):
 
 class AdminWidgetRoles(object):
   """Elements' labels (role scopes) and properties for the Roles widget
-  at Admin dashboard.
+  at Admin Dashboard.
   """
   _ADMIN_SCOPE = roles.ADMIN.upper()
   _SYS_SCOPE = roles.SYSTEM.upper()
@@ -87,19 +87,19 @@ class AdminWidgetRoles(object):
 
 class AdminWidgetEvents(object):
   """Elements' labels and properties (regular expression) for the Event widget
-  at Admin dashboard.
+  at Admin Dashboard.
   """
-  TREE_VIEW_HEADER = "Events"
+  WIDGET_HEADER = "Events"
   TREE_VIEW_ROW_REGEXP = r"^.+\s(by.+)\son\s" + \
       r"(\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\s[A,P]M)"
 
 
 class AdminWidgetCustomAttrs(object):
   """Elements' labels (custom attributes scopes) for the Custom Attributes
-  widget at Admin dashboard.
+  widget at Admin Dashboard.
   """
   # possible types of custom attributes
-  TREE_VIEW_HEADER = "Custom Attributes"
+  WIDGET_HEADER = "Custom Attributes"
   TEXT = "Text"
   RICH_TEXT = "Rich Text"
   DATE = "Date"
@@ -111,7 +111,7 @@ class AdminWidgetCustomAttrs(object):
 
 
 class Common(object):
-  """Common elements' labels and properties for the object."""
+  """Common elements' labels and properties for the objects."""
   TITLE = "Title"
   DESCRIPTION = "Description"
   CODE = "Code"
@@ -119,29 +119,40 @@ class Common(object):
   FALSE = "false"
 
 
+class Base(object):
+  """Base elements' labels and properties for the objects."""
+  WIDGET_INFO_HEADER_FORMAT = "{} Info"
+  TYPE = "Type"
+  STATE = "State"
+  REFERENCE_URL = "Reference URL"
+  EFFECTIVE_DATE = "Effective Date"
+  STOP_DATE = "Stop Date"
+  URL = "URL"
+
+
 class CommonModalCreate(object):
-  """Common elements' labels and properties for the Modal to create the object.
+  """Common elements' labels and properties for the Modal to Create the object.
   """
-  def __init__(self):
-    super(CommonModalCreate, self).__init__()
-    self._HIDE_ALL_OPT_FIELDS = "Hide all optional fields"
-    self._SHOW_ALL_OPT_FIELDS = "Show all optional fields"
-    self.SAVE_AND_CLOSE = "Save & Close"
+  HIDE_ALL_OPT_FIELDS = "Hide all optional fields"
+  SHOW_ALL_OPT_FIELDS = "Show all optional fields"
+  SAVE_AND_CLOSE = "Save & Close"
 
 
 class CommonModalSetVisibleFields(object):
-  """Common labels for modal widow that select visible fields for tree view."""
+  """Common elements' labels and properties for Modal widow that Select visible
+  fields for Tree View.
+  """
   MODAL_HEADER_FORMAT = "Set visible fields for {}"
   TITLE = Common.TITLE
   CODE = Common.CODE
-  STATE = "State"
+  STATE = Base.STATE
   LAST_UPDATED = "Last Updated"
   SET_FIELDS = "Set Fields"
 
 
 class TransformationSetVisibleFields(CommonModalSetVisibleFields):
-  """To transformation elements' labels and properties for the Modal to set
-  visible fields for object as tree view headers.
+  """To transformation elements' labels and properties for the Modal to Set
+  visible fields for object as Tree View headers.
   """
   OWNER = "Owner"
   VERIFIED = "Verified"
@@ -150,21 +161,37 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
 class CommonProgram(object):
   """Common elements' labels and properties for the Program object."""
   # pylint: disable=too-many-instance-attributes
-  def __init__(self):
-    super(CommonProgram, self).__init__()
-    self.MANAGER = "Manager"
-    self.PROGRAM_URL = "Program URL"
-    self.REFERENCE_URL = "Reference URL"
-    self.PRIMARY_CONTACT = "Primary Contact"
-    self.SECONDARY_CONTACT = "Secondary Contact"
-    self.NOTES = "Notes"
-    self.EFFECTIVE_DATE = "Effective Date"
-    self.STOP_DATE = "Stop Date"
-    self.STATE = "State"
+  PROGRAM = objects.get_normal_form(objects.get_singular(objects.PROGRAMS))
+  MANAGER = "Manager"
+  PROGRAM_URL = "Program URL"
+  REFERENCE_URL = Base.REFERENCE_URL
+  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
+  SECONDARY_CONTACT = roles.SECONDARY_CONTACT
+  NOTES = "Notes"
+  EFFECTIVE_DATE = Base.EFFECTIVE_DATE
+  STOP_DATE = Base.STOP_DATE
+  STATE = Base.STATE
+
+
+class CommonControl(object):
+  """Common elements' labels and properties for the Control object."""
+  CONTROL = objects.get_normal_form(objects.get_singular(objects.CONTROLS))
+
+
+class CommonAsmt(object):
+  """Common elements' labels and properties for the Assessment object."""
+  ASMT = objects.get_normal_form(objects.get_singular(objects.ASSESSMENTS))
+
+
+class CommonAsmtTmpl(object):
+  """Common elements' labels and properties for the Assessment Template object.
+  """
+  ASMT_TMPL = objects.get_normal_form(
+      objects.get_singular(objects.ASSESSMENT_TEMPLATES))
 
 
 class ObjectStates(object):
-  """Elements' labels and properties for objects' states."""
+  """States for objects."""
   DRAFT = "Draft"
   FINAL = "Final"
   EFFECTIVE = "Effective"
@@ -177,38 +204,37 @@ class ObjectStates(object):
 
 
 class BaseStates(object):
-  """Common states for Audit and Assessment"""
+  """Common states for Audit and Assessment objects."""
   IN_PROGRESS = "In progress"
   COMPLETED = "Completed"
 
 
 class AuditStates(BaseStates):
-  """Elements' labels and properties for Audit's states."""
+  """States for Audit object."""
   PLANNED = "Planned"
   MANAGER_REVIEW = "Manager Review"
   READY_FOR_EXT_REVIEW = "Ready for External Review"
 
 
 class AsmtStates(BaseStates):
-  """Elements' labels and properties for Assessment's states."""
+  """States for Assessment object."""
   NOT_STARTED = "Not Started"
 
 
 class ProgramWidgetInfo(CommonProgram):
   """Elements' labels and properties for the Program Info Widget."""
-  TREE_VIEW_HEADER = "Program Info"
+  WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonProgram.PROGRAM)
 
 
 class AsmtTmplModalSetVisibleFields(CommonModalSetVisibleFields):
-  """Common elements' labels and properties for the Modal to set visible
+  """Common elements' labels and properties for the Modal to Set visible
   fields for Assessment Template.
   """
-  OWNER = "Owner"
-  PRIMARY_CONTACT = "Primary Contact"
-  SECONDARY_CONTACT = "Secondary Contact"
-
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      "Assessment Template")
+      CommonAsmtTmpl.ASMT_TMPL)
+  OWNER = TransformationSetVisibleFields.OWNER
+  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
+  SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE,
       CommonModalSetVisibleFields.CODE,
@@ -216,19 +242,19 @@ class AsmtTmplModalSetVisibleFields(CommonModalSetVisibleFields):
 
 
 class AsmtModalSetVisibleFields(CommonModalSetVisibleFields):
-  """Common elements' labels and properties for the Modal to set visible
+  """Common elements' labels and properties for the Modal to Set visible
   fields for Assessment.
   """
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      "Assessment")
-  VERIFIED = "Verified"
+      CommonAsmt.ASMT)
+  VERIFIED = TransformationSetVisibleFields.VERIFIED
   CONCLUSION_DESIGN = "Conclusion: Design"
   CONCLUSION_OPERATION = "Conclusion: Operation"
   FINISHED_DATE = "Finished Date"
   VERIFIED_DATE = "Verified Date"
-  URL = "URL"
-  REFERENCE_URL = "Reference URL"
-  TYPE = "Type"
+  URL = Base.URL
+  REFERENCE_URL = Base.REFERENCE_URL
+  TYPE = Base.TYPE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
       CommonModalSetVisibleFields.STATE, VERIFIED,
@@ -236,43 +262,29 @@ class AsmtModalSetVisibleFields(CommonModalSetVisibleFields):
 
 
 class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
-  """Common elements' labels and properties for the Modal to set visible
+  """Common elements' labels and properties for the Modal to Set visible
   fields for Control.
   """
   # pylint: disable=too-many-instance-attributes
-  def __init__(self):
-    super(ControlModalSetVisibleFields, self).__init__()
-    self.MODAL_HEADER = "Set visible fields for Control"
-    self.OWNER = "Owner"
-    self.STATE = "State"
-    self.PRIMARY_CONTACT = "Primary Contact"
-    self.SECONDARY_CONTACT = "Secondary Contact"
-    self.URL = "URL"
-    self.REFERENCE_URL = "Reference URL"
-    self.EFFECTIVE_DATE = "Effective Date"
-    self.STOP_DATE = "Stop Date"
-    self.KIND_NATURE = "Kind/Nature"
-    self.FRAUD_RELATED = "Fraud Related"
-    self.SIGNIFICANCE = "Significance"
-    self.TYPE_MEANS = "Type/Means"
-    self.FREQUENCY = "Frequency"
-    self.ASSERTIONS = "Assertions"
-    self.CATEGORIES = "Categories"
-    self.PRINCIPAL_ASSIGNEE = "Principal Assignee"
-    self.SECONDARY_ASSIGNEE = "Secondary Assignee"
-    self.OPT_SET_FIELDS = {
-        "TITLE": self.TITLE, "OWNER": self.OWNER, "CODE": self.CODE,
-        "STATE": self.STATE, "PRIMARY_CONTACT": self.PRIMARY_CONTACT,
-        "SECONDARY_CONTACT": self.SECONDARY_CONTACT,
-        "LAST_UPDATED": self.LAST_UPDATED, "URL": self.URL,
-        "REFERENCE_URL": self.REFERENCE_URL,
-        "EFFECTIVE_DATE": self.EFFECTIVE_DATE, "STOP_DATE": self.STOP_DATE,
-        "KIND_NATURE": self.KIND_NATURE, "FRAUD_RELATED": self.FRAUD_RELATED,
-        "SIGNIFICANCE": self.SIGNIFICANCE, "TYPE_MEANS": self.TYPE_MEANS,
-        "FREQUENCY": self.FREQUENCY, "ASSERTIONS": self.ASSERTIONS,
-        "CATEGORIES": self.CATEGORIES,
-        "PRINCIPAL_ASSIGNEE": self.PRINCIPAL_ASSIGNEE,
-        "SECONDARY_ASSIGNEE": self.SECONDARY_ASSIGNEE
-    }
-    self.DEFAULT_SET_FIELDS = (self.TITLE, self.OWNER, self.CODE,
-                               self.STATE, self.LAST_UPDATED)
+  MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
+      CommonControl.CONTROL)
+  OWNER = TransformationSetVisibleFields.OWNER
+  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
+  SECONDARY_CONTACT = roles.SECONDARY_CONTACT
+  URL = Base.URL
+  REFERENCE_URL = Base.REFERENCE_URL
+  EFFECTIVE_DATE = Base.EFFECTIVE_DATE
+  STOP_DATE = Base.STOP_DATE
+  KIND_NATURE = "Kind/Nature"
+  FRAUD_RELATED = "Fraud Related"
+  SIGNIFICANCE = "Significance"
+  TYPE_MEANS = "Type/Means"
+  FREQUENCY = "Frequency"
+  ASSERTIONS = "Assertions"
+  CATEGORIES = "Categories"
+  PRINCIPAL_ASSIGNEE = roles.PRINCIPAL_ASSIGNEE
+  SECONDARY_ASSIGNEE = roles.SECONDARY_ASSIGNEE
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, OWNER,
+      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED)

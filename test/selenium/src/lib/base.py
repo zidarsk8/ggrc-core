@@ -153,12 +153,12 @@ class TextFilterDropdown(Element):
     dropdown_elements[0].click()
     selenium_utils.get_when_invisible(self._driver, self._locator_dropdown)
 
-  def filter_and_select_first(self, text):
-    """Filter and select first text element."""
+  def filter_and_select_first_by_text(self, text):
+    """Make filtering and select first element in dropdown."""
     self._filter_results(text)
     self._select_first_result()
 
-  def find_and_select_first(self, text):
+  def find_and_select_first_by_text(self, text):
     """Find and select first text element."""
     self.text_to_filter = text
     self.element.click()
@@ -175,7 +175,7 @@ class Iframe(Element):
     iframe = selenium_utils.get_when_visible(self._driver, self._locator)
     self._driver.switch_to.frame(iframe)
 
-    element = self._driver.find_element_by_tag_name(constants.tag.BODY)
+    element = self._driver.find_element_by_tag_name("body")
     element.clear()
     element.send_keys(text)
 
@@ -425,7 +425,7 @@ class AbstractPage(Component):
   def navigate_to(self, custom_url=None):
     """Navigate to url."""
     url_to_use = self.url if custom_url is None else custom_url
-    selenium_utils.open_url(self._driver, url_to_use)
+    selenium_utils.get_url_if_not_opened(self._driver, url_to_use)
     return self
 
 

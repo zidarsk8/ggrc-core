@@ -13,7 +13,6 @@ from lib.constants import (
   regex,
   url,
   ux,
-  tag,
   test_runner,
   settings,
   messages,

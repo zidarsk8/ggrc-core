@@ -40,25 +40,23 @@ class EntitiesFactory(object):
     return obj
 
   @classmethod
-  def _generate_title(cls, obj_type):
+  def _generate_title(cls, obj_type, split=13):
     """Generate title according object type and random data."""
     special_chars = string_utils.SPECIAL
     return "{obj_type}_{rand_str}_{uuid}".format(
-        obj_type=obj_type, uuid=uuid.uuid4(),
+        obj_type=obj_type, uuid=str(uuid.uuid4())[:split],
         rand_str=random_string(size=len(special_chars), chars=special_chars))
-    return append_random_string(
-        "{}_{}_".format(obj_type, random_string(size=len(special_chars),
-                                                chars=special_chars)))[:-23]
 
   @classmethod
-  def _generate_code(cls, str="code"):
+  def _generate_code(cls, split=13):
     """Generate code according str part and random data."""
-    return append_random_string("{}-".format(str))[:13]
+    return "{code}".format(code=str(uuid.uuid4())[:split])
 
   @classmethod
-  def _generate_email(cls, domain=url.DEFAULT_EMAIL_DOMAIN):
+  def _generate_email(cls, domain=url.DEFAULT_EMAIL_DOMAIN, split=13):
     """Generate email according domain."""
-    return "{uuid}@{domain}".format(uuid=uuid.uuid4(), domain=domain)
+    return "{mail_name}@{domain}".format(
+        mail_name=str(uuid.uuid4())[:split], domain=domain)
 
 
 class PersonFactory(EntitiesFactory):

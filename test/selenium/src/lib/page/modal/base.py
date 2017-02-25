@@ -163,12 +163,12 @@ class ProgramsModal(BaseModal):
   def filter_and_select_primary_contact(self, text):
     """Enters the text into the primary contact element"""
     # pylint: disable=invalid-name
-    self.ui_primary_contact.filter_and_select_first(text)
+    self.ui_primary_contact.filter_and_select_first_by_text(text)
 
   def filter_and_select_secondary_contact(self, text):
     """Enters the text into the secondary contact element"""
     # pylint: disable=invalid-name
-    self.ui_secondary_contact.filter_and_select_first(text)
+    self.ui_secondary_contact.filter_and_select_first_by_text(text)
 
   def enter_program_url(self, url):
     """Enters the program url for this program object
@@ -410,7 +410,7 @@ class AsmtsModalGenerate(base.Modal):
         self._driver,
         self._locators.SELECT_ASMT_TMPL_OPTIONS,
         self._locators.SELECT_ASMT_TMPL_DROPDOWN)
-    self.asmt_tmpl_element.find_and_select_first(asmt_tmpl_title)
+    self.asmt_tmpl_element.find_and_select_first_by_text(asmt_tmpl_title)
 
   def search_objects(self):
     """Click to the button to search objects according set filters."""
@@ -423,8 +423,8 @@ class AsmtsModalGenerate(base.Modal):
     was completed."""
     self.controls_elements = base.Checkboxes(
         self._driver,
-        self._locators.FOUNDED_OBJECTS_TITLES,
-        self._locators.FOUNDED_OBJECTS_CHECKBOXES)
+        self._locators.FOUND_OBJECTS_TITLES,
+        self._locators.FOUND_OBJECTS_CHECKBOXES)
     self.controls_elements.select_by_titles(controls_titles)
 
   def fill_minimal_data(self, asmt_tmpl, controls):

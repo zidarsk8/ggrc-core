@@ -21,7 +21,6 @@ class BaseWebUiService(object):
     'OLD KEY' - UI elements correspond to the 'NEW KEY' - objects attributes.
     """
     fields = element.TransformationSetVisibleFields
-    fields = element.CommonModalSetVisibleFields()
     return {
         fields.TITLE.upper(): "title", fields.OWNER.upper(): "owner",
         fields.CODE.upper(): "code", fields.STATE.upper(): "state",
@@ -61,7 +60,7 @@ class AuditService(BaseWebUiService):
     """Navigate to objects widget, open modal, fill data and create new object.
     """
     widget_url = gen_widget.URL.format(audit.id)
-    selenium_utils.open_url(self.driver, widget_url)
+    selenium_utils.get_url_if_not_opened(self.driver, widget_url)
     objs_widget = gen_widget(self.driver).create()
     objs_widget.fill_minimal_data(obj.title, obj.code)
     objs_widget.save_and_close()
@@ -72,7 +71,7 @@ class AuditService(BaseWebUiService):
     """
     objs_under_titles = [obj_under.title for obj_under in objs_under]
     widget_url = gen_widget.URL.format(audit.id)
-    selenium_utils.open_url(self.driver, widget_url)
+    selenium_utils.get_url_if_not_opened(self.driver, widget_url)
     objs_widget = gen_widget(self.driver).generate()
     objs_widget.fill_minimal_data(obj.title, objs_under_titles)
     objs_widget.generate_and_close()
@@ -81,7 +80,7 @@ class AuditService(BaseWebUiService):
     """Navigate to objects widget, select old (snapshotable) object in tree view
     and update it to the latest version via info panel."""
     widget_url = gen_widget.URL.format(audit.id)
-    selenium_utils.open_url(self.driver, widget_url)
+    selenium_utils.get_url_if_not_opened(self.driver, widget_url)
     objs_widget = gen_widget(self.driver)
     objs_widget.update(old_obj.title)
 
@@ -90,16 +89,16 @@ class AuditService(BaseWebUiService):
     navigation bar.
     """
     widget_url = gen_widget.URL.format(audit.id)
-    selenium_utils.open_url(self.driver, widget_url)
+    selenium_utils.get_url_if_not_opened(self.driver, widget_url)
     return gen_widget(self.driver).member_count
 
-  def get_list_of_objs_scopes(self, audit, gen_widget):
+  def get_list_of_scopes_from_tree_view(self, audit, gen_widget):
     """Navigate to objects widget, set visible fields and get list of objects
     scopes as dicts from header (keys) and items (values) that displayed
     in tree view.
     """
     widget_url = gen_widget.URL.format(audit.id)
-    selenium_utils.open_url(self.driver, widget_url)
+    selenium_utils.get_url_if_not_opened(self.driver, widget_url)
     return gen_widget(self.driver).get_list_of_objs_scopes()
 
 
@@ -119,13 +118,8 @@ class AsmtTmplService(AuditService):
   def get_list_of_objs(self, audit):
     """Get list of Assessment Templates objects from list of scopes
     (list of dicts) which was got from tree view."""
-    list_of_scopes = self.get_list_of_objs_scopes(
-        audit=audit, gen_widget=AsmtTmpls)
-    return self.create_objs(
-        factory=AsmtTmplFactory(), list_of_scopes=list_of_scopes)
     list_of_scopes = self.get_list_of_scopes_from_tree_view(
-        audit=audit, gen_widget=AsmtTmpls
-    )
+        audit=audit, gen_widget=AsmtTmpls)
     return self.create_objs(factory=AsmtTmplFactory(),
                             list_of_scopes=list_of_scopes)
 
@@ -174,10 +168,6 @@ class ControlService(AuditService):
   def get_list_of_objs(self, audit):
     """Get list of Controls from list of scopes (list of dicts)
     which was got from tree view."""
-    list_of_scopes = self.get_list_of_objs_scopes(
-        audit=audit, gen_widget=Asmts)
-    return self.create_objs(
-        factory=AsmtFactory(), list_of_scopes=list_of_scopes)
     list_of_scopes = self.get_list_of_scopes_from_tree_view(
         audit=audit, gen_widget=Controls)
     return self.create_objs(factory=ControlFactory(),
