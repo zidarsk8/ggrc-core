@@ -250,7 +250,7 @@ class Button(Element):
 class Checkbox(Element):
   """A generic checkbox element"""
 
-  def __init__(self, driver, locator, is_checked=False):
+  def __init__(self, driver, locator):
     super(Checkbox, self).__init__(driver, locator)
     self.is_checked = self.element.is_selected()
 
@@ -387,9 +387,7 @@ class Modal(Component):
 
 
 class FilterCommon(Component):
-  """A common filter elements for LHN and tree view
-  (without filter checkboxes).
-  """
+  """A common filter elements for LHN and tree view."""
 
   def __init__(self, driver, text_box_locator, bt_submit_locator,
                bt_clear_locator):
@@ -410,38 +408,6 @@ class FilterCommon(Component):
   def clear_query(self):
     """Clear the query that was entered to field."""
     self.button_clear.click()
-
-
-class Filter(FilterCommon):
-  """A filter elements for tree view with filter checkboxes."""
-
-  def __init__(self, driver, text_box_locator, bt_submit_locator,
-               bt_clear_locator, ch_active_locator, ch_draft_locator,
-               ch_deprecated_locator):
-    super(Filter, self).__init__(driver, text_box_locator, bt_submit_locator,
-                                 bt_clear_locator)
-    self.checkbox_active = Checkbox(driver, ch_active_locator)
-    self.checkbox_draft = Checkbox(driver, ch_draft_locator)
-    self.checkbox_deprecated = Checkbox(driver, ch_deprecated_locator)
-
-  def show_active_objs(self):
-    """Select 'Active' checkbox to show all active objects."""
-    self.checkbox_active.check()
-
-  def show_draft_objs(self):
-    """Select 'Draft' checkbox to show all draft objects."""
-    self.checkbox_draft.check()
-
-  def show_deprecated_objs(self):
-    """Select 'Deprecated' checkbox to show all deprecated objects."""
-    self.checkbox_deprecated.check()
-
-  def show_all_objs(self):
-    """Select 'Active', 'Draft', 'Deprecated' checkboxes to show all objects.
-    """
-    self.show_active_objs()
-    self.show_draft_objs()
-    self.show_deprecated_objs()
 
 
 class AbstractPage(Component):
