@@ -539,7 +539,7 @@ class ModalGenerateNewAsmt(ModalGenerateNewObject):
   SELECT_ASMT_TMPL_OPTIONS = (
       By.CSS_SELECTOR,
       MODAL + ' dropdown[name="assessmentTemplate"] '
-              '.input-block-level option'.format(MODAL))
+              '.input-block-level option')
   BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .btn-info")
   FOUND_OBJECTS_TITLES = (By.CSS_SELECTOR,
                           MODAL + FOUND_OBJECTS + " .title-attr")
@@ -653,7 +653,6 @@ class ObjectWidget(object):
 
 
 class ModalDeleteObject(object):
-  """Locators for the modal of deletion object."""
   """Locators for a generic delete object modal."""
   MODAL_TITLE = (By.CSS_SELECTOR, '.modal-header>h2')
   CONFIRMATION_TEXT = (By.CSS_SELECTOR, '.modal-body>div>p')
@@ -900,7 +899,6 @@ class BaseWidgetGeneric(object):
     """For sharing parametrized class attributes we simply define how a
     class should look like. Note that the same functionality can be
     implemented using properties though with more code."""
-    # pylint: disable=invalid-name
     def __init__(cls, *args):
       _FILTER = "#{}_widget .sticky-filter"
       _FILTER_BUTTON = _FILTER + " .tree-filter__button"

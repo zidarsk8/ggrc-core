@@ -4,8 +4,6 @@
 # pylint: disable=wildcard-import
 # pylint: disable=unused-wildcard-import
 
-import urlparse
-
 from lib.constants.objects import *  # noqa; the names are later exported
 
 
@@ -21,8 +19,8 @@ QUERY = "query"
 
 # url path for user
 DEFAULT_EMAIL_DOMAIN = "example.com"
-DEFAULT_EMAIL = "user@" + DEFAULT_EMAIL_DOMAIN
-DEFAULT_URL_USER_API = "/".join([API, PEOPLE, str(1)])
+DEFAULT_USER_EMAIL = "user@" + DEFAULT_EMAIL_DOMAIN
+DEFAULT_USER_HREF = "/".join([API, PEOPLE, str(1)])
 
 
 class Widget(object):
@@ -38,10 +36,3 @@ class Widget(object):
   ASSESSMENTS = "#assessment_widget"
   ASSESSMENT_TEMPLATES = "#assessment_template_widget"
   CONTROLS = "#control_widget"
-
-
-def get_second_part_url(full_url):
-  """Get the second part of the full URL.
-  Example: "http://localhost/api/controls" -> "/api/controls"
-  """
-  return urlparse.urlparse(url=full_url, allow_fragments=False).path

@@ -9,9 +9,9 @@ from lib.utils import selenium_utils
 
 class CompareUpdateObjectModal(base.Modal):
   """A generic modal for comparing versions of the objects by attributes and
-  updating them to the latest version."""
+  updating them to the latest version.
+  """
   # pylint: disable=too-few-public-methods
-
   _page_model_cls_after_redirect = None
   _locator = locator.ModalCompareUpdateObject
 
@@ -22,7 +22,7 @@ class CompareUpdateObjectModal(base.Modal):
 
   def confirm_update(self):
     """Confirm updating an object."""
+    self.button_update.click()
     selenium_utils.wait_until_not_present(self._driver,
                                           locator.TreeView.ITEM_LOADING)
     selenium_utils.get_when_invisible(self._driver, locator.TreeView.SPINNER)
-    self.button_update.click()

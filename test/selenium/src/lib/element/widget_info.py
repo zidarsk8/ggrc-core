@@ -1,11 +1,10 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
-"""Elements in the object's info widget"""
+"""Elements in the object's info widget."""
 
 from lib import base
-from lib.page import modal
 from lib.constants import locator
+from lib.page.modal import delete_object, edit_object
 
 
 class DropdownSettings(base.Component):
@@ -26,7 +25,7 @@ class DropdownSettings(base.Component):
         lib.page.modal.edit_object.EditModal
     """
     self.edit.click()
-    return getattr(modal.edit_object, self.__class__.__name__)(self._driver)
+    return getattr(edit_object, self.__class__.__name__)(self._driver)
 
   def select_get_permalink(self):
     self.permalink.click()
@@ -37,7 +36,7 @@ class DropdownSettings(base.Component):
         modal.delete_object.DeleteObjectModal
     """
     self.delete.click()
-    return modal.delete_object.DeleteObjectModal(self._driver)
+    return delete_object.DeleteObjectModal(self._driver)
 
 
 class Programs(DropdownSettings):

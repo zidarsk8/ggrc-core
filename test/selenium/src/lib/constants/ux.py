@@ -5,6 +5,6 @@
 Common timeouts used for selenium_utils
 """
 
-MAX_USER_WAIT_SECONDS = 5
+MAX_USER_WAIT_SECONDS = 60
 MAX_ALERT_WAIT = 1
 ELEMENT_MOVING_TIMEOUT = 5

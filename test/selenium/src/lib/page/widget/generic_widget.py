@@ -3,15 +3,15 @@
 """Models for widgets other than the info widget."""
 
 import re
+
 from selenium.common import exceptions
 from selenium.webdriver.common.by import By
 
-from lib import base, environment
-from lib.constants import locator, url, regex, element
+from lib import base
+from lib.constants import locator, regex, element
 from lib.page.modal import base as modal_base
 from lib.page.modal.create_new_object import (
-    AssessmentTemplates as new_asmt_tmpls, Assessments as new_asmts,
-    AssessmentsGenerate as new_asmts_gen)
+    AssessmentTemplates, Assessments, AssessmentsGenerate)
 from lib.page.widget import info_widget
 from lib.utils import selenium_utils
 
@@ -210,7 +210,7 @@ class TreeView(base.TreeView):
     self.open_set_fields()
     self.visible_fields.set_and_save_visible_fields(fields)
 
-  def get_objs_as_list_of_dicts(self, fields):
+  def get_objs_as_list_dicts(self, fields):
     """Get list of dicts from objects (text scopes) which displayed on
     tree view at the widget according set of visible fields.
     """
@@ -220,22 +220,18 @@ class TreeView(base.TreeView):
              _item in self.tree_view_items_elements()]
     return [dict(zip(header[0], item)) for item in items]
 
-  def select_obj_in_tree_view(self, obj_title):
-    """Select the object in list of objects items which displayed on
-    tree view according to object's title.
-    """
+  def select_el_in_tree_view(self, el_title):
+    """Select the element in tree view by element's title."""
     item = [_item for _item in self.tree_view_items_elements() if
-            obj_title in _item.text.splitlines()][0]
+            el_title in _item.text.splitlines()][0]
     selenium_utils.wait_until_stops_moving(item)
     item.click()
 
-  def get_obj_seq_num_in_tree_view(self, obj_title):
-    """Get the object sequence number in list of objects items which
-    displayed on tree view according to object's title.
-    """
+  def get_el_seq_num_in_tree_view(self, el_title):
+    """Get the element's sequence number in tree view by element's title."""
     list_items = [_item.text.splitlines() for
                   _item in self.tree_view_items_elements()]
-    return [num for num, item in enumerate(list_items) if obj_title in item][0]
+    return [num for num, item in enumerate(list_items) if el_title in item][0]
 
 
 class AsmtTmpls(Widget):
@@ -246,8 +242,7 @@ class AsmtTmpls(Widget):
   _asmt_tmpls_fields = (
       element.AsmtTmplModalSetVisibleFields.DEFAULT_SET_FIELDS)
 
-  URL = environment.APP_URL + url.AUDIT.format({}) + (
-      _locator_filter.widget_name)
+  URL = "{source_obj_url}" + _locator_filter.widget_name
 
   def __init__(self, driver):
     super(AsmtTmpls, self).__init__(driver)
@@ -256,16 +251,16 @@ class AsmtTmpls(Widget):
 
   def create(self):
     """Create Assessment Template from widget."""
-    return self.tree_view.create_obj(new_asmt_tmpls)
+    return self.tree_view.create_obj(AssessmentTemplates)
 
   def set_visible_fields(self):
     """Set visible fields for display Assessment Templates on tree view."""
     self.tree_view.set_visible_fields_for_objs(self._asmt_tmpls_fields)
 
-  def get_list_of_objs_scopes(self):
+  def get_list_objs_scopes(self):
     """Get list of Assessment Templates scopes which displayed on tree view."""
     self.set_visible_fields()
-    return self.tree_view.get_objs_as_list_of_dicts(self._asmt_tmpls_fields)
+    return self.tree_view.get_objs_as_list_dicts(self._asmt_tmpls_fields)
 
 
 class Asmts(Widget):
@@ -275,8 +270,7 @@ class Asmts(Widget):
   _locator_filter = locator.WidgetAssessments
   _asmts_fields = element.AsmtModalSetVisibleFields.DEFAULT_SET_FIELDS
 
-  URL = environment.APP_URL + url.AUDIT.format({}) + (
-      _locator_filter.widget_name)
+  URL = "{source_obj_url}" + _locator_filter.widget_name
 
   def __init__(self, driver):
     super(Asmts, self).__init__(driver)
@@ -285,20 +279,20 @@ class Asmts(Widget):
 
   def create(self):
     """Create Assessment from widget."""
-    return self.tree_view.create_obj(new_asmts)
+    return self.tree_view.create_obj(Assessments)
 
   def generate(self):
     """Generate Assessment(s) from widget."""
-    return self.tree_view.generate_objs(new_asmts_gen)
+    return self.tree_view.generate_objs(AssessmentsGenerate)
 
   def set_visible_fields(self):
     """Set visible fields for display Assessments on tree view."""
     self.tree_view.set_visible_fields_for_objs(self._asmts_fields)
 
-  def get_list_of_objs_scopes(self):
+  def get_list_objs_scopes(self):
     """Get list of Assessments scopes which displayed on tree view."""
     self.set_visible_fields()
-    return self.tree_view.get_objs_as_list_of_dicts(self._asmts_fields)
+    return self.tree_view.get_objs_as_list_dicts(self._asmts_fields)
 
 
 class Controls(Widget):
@@ -308,8 +302,7 @@ class Controls(Widget):
   _locator_filter = locator.WidgetControls
   _controls_fields = element.ControlModalSetVisibleFields().DEFAULT_SET_FIELDS
 
-  URL = environment.APP_URL + url.AUDIT.format({}) + (
-      _locator_filter.widget_name)
+  URL = "{source_obj_url}" + _locator_filter.widget_name
 
   def __init__(self, driver,):
     super(Controls, self).__init__(driver)
@@ -321,9 +314,9 @@ class Controls(Widget):
     self.tree_view = TreeView(driver,
                               widget_name=self._locator_filter.widget_name)
 
-  def update(self, obj_title):
-    """Update Control from info widget."""
-    obj_num = self.tree_view.get_obj_seq_num_in_tree_view(obj_title)
+  def update_ver(self, obj_title):
+    """Update version of Control from info widget."""
+    obj_num = self.tree_view.get_el_seq_num_in_tree_view(obj_title)
     self.select_nth_member(obj_num)
     info_panel = self._info_pane_cls(self._driver)
     info_panel.open_link_get_latest_ver().confirm_update()
@@ -334,10 +327,10 @@ class Controls(Widget):
     """Set visible fields for display Controls on tree view."""
     self.tree_view.set_visible_fields_for_objs(self._controls_fields)
 
-  def get_list_of_objs_scopes(self):
+  def get_list_objs_scopes(self):
     """Get list of Controls scopes which displayed on tree view."""
     self.set_visible_fields()
-    return self.tree_view.get_objs_as_list_of_dicts(self._controls_fields)
+    return self.tree_view.get_objs_as_list_dicts(self._controls_fields)
 
 
 class Issues(Widget):

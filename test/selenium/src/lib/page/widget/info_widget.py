@@ -5,7 +5,7 @@
 from lib import base
 from lib.constants import locator
 from lib.element import widget_info
-from lib.page import modal
+from lib.page.modal import update_object
 
 
 class Widget(base.Widget):
@@ -36,7 +36,7 @@ class Widget(base.Widget):
         self._driver, locator.BaseInfoWidget.LINK_GET_LAST_VER
     )
     self.link_get_latest_ver.click()
-    return modal.update_object.CompareUpdateObjectModal(self._driver)
+    return update_object.CompareUpdateObjectModal(self._driver)
 
 
 class DashboardInfo(Widget):

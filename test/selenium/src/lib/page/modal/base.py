@@ -64,8 +64,8 @@ class SetFieldsModal(base.Modal):
         (locator.ModalSetVisibleFields.FIELDS_CHECKBOXES.
          format(self.widget_name)))
     selenium_utils.get_when_visible(self._driver, locator_modal_fields)
-    self.fields_elements = base.Checkboxes(self._driver, locator_fields_titles,
-                                           locator_fields_checkboxes)
+    self.fields_elements = base.ListCheckboxes(
+        self._driver, locator_fields_titles, locator_fields_checkboxes)
     self.fields_elements.select_by_titles(fields)
 
   def save_set_visible_fields(self):
@@ -163,12 +163,12 @@ class ProgramsModal(BaseModal):
   def filter_and_select_primary_contact(self, text):
     """Enters the text into the primary contact element"""
     # pylint: disable=invalid-name
-    self.ui_primary_contact.filter_and_select_first_by_text(text)
+    self.ui_primary_contact.filter_and_select_el_by_text(text)
 
   def filter_and_select_secondary_contact(self, text):
     """Enters the text into the secondary contact element"""
     # pylint: disable=invalid-name
-    self.ui_secondary_contact.filter_and_select_first_by_text(text)
+    self.ui_secondary_contact.filter_and_select_el_by_text(text)
 
   def enter_program_url(self, url):
     """Enters the program url for this program object
@@ -410,7 +410,7 @@ class AsmtsModalGenerate(base.Modal):
         self._driver,
         self._locators.SELECT_ASMT_TMPL_OPTIONS,
         self._locators.SELECT_ASMT_TMPL_DROPDOWN)
-    self.asmt_tmpl_element.find_and_select_first_by_text(asmt_tmpl_title)
+    self.asmt_tmpl_element.find_and_select_el_by_text(asmt_tmpl_title)
 
   def search_objects(self):
     """Click to the button to search objects according set filters."""
@@ -421,7 +421,7 @@ class AsmtsModalGenerate(base.Modal):
   def select_objs_under(self, controls_titles):
     """Click checkboxes (Select objects) which was found after search
     was completed."""
-    self.controls_elements = base.Checkboxes(
+    self.controls_elements = base.ListCheckboxes(
         self._driver,
         self._locators.FOUND_OBJECTS_TITLES,
         self._locators.FOUND_OBJECTS_CHECKBOXES)
