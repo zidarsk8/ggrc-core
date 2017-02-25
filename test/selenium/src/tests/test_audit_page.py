@@ -1,10 +1,9 @@
 # Copyright (C) 2017 Google Inc., authors, and contributors <see AUTHORS file>
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Tests to Audit object."""
+"""Audit smoke tests."""
 # pylint: disable=no-self-use
 # pylint: disable=invalid-name
 # pylint: disable=unused-argument
-# pylint: disable=unused-variable
 # pylint: disable=too-many-arguments
 
 import pytest
@@ -12,8 +11,8 @@ import pytest
 from lib import base
 from lib.constants import messages
 from lib.entities.entities_factory import AsmtTmplFactory, AsmtFactory
-from lib.service.webui_service import (AsmtTmplService, AsmtService,
-                                       ControlService)
+from lib.service.webui_service import (AsmtTmplsService, AsmtsService,
+                                       ControlsService)
 
 
 class TestAuditPage(base.Test):
@@ -28,10 +27,13 @@ class TestAuditPage(base.Test):
     """
     audit = new_audit_rest[0]
     expected_asmt_tmpl = AsmtTmplFactory().create()
-    AsmtTmplService(selenium).create(audit, expected_asmt_tmpl)
-    asmt_tmpls_tab_count = AsmtTmplService(selenium).get_count(audit)
-    assert len([expected_asmt_tmpl]) == asmt_tmpls_tab_count
-    actual_asmt_tmpls = AsmtTmplService(selenium).get_list_of_objs(audit)
+    AsmtTmplsService(selenium).create_via_tree_view(
+        source_obj=audit, asmt_tmpl_obj=expected_asmt_tmpl)
+    actual_asmt_tmpls_tab_count = (
+        AsmtTmplsService(selenium).get_count_from_tab(source_obj=audit))
+    assert len([expected_asmt_tmpl]) == actual_asmt_tmpls_tab_count
+    actual_asmt_tmpls = (
+        AsmtTmplsService(selenium).get_objs_from_tree_view(source_obj=audit))
     assert [expected_asmt_tmpl] == actual_asmt_tmpls, (
         messages.ERR_MSG_FORMAT.format(
             [expected_asmt_tmpl], actual_asmt_tmpls))
@@ -45,10 +47,13 @@ class TestAuditPage(base.Test):
     """
     audit = new_audit_rest[0]
     expected_asmt = AsmtFactory().create()
-    AsmtService(selenium).create(audit, expected_asmt)
-    asmts_tab_count = AsmtService(selenium).get_count(audit)
-    assert len([expected_asmt]) == asmts_tab_count
-    actual_asmts = AsmtService(selenium).get_list_of_objs(audit)
+    AsmtsService(selenium).create_via_tree_view(
+        source_obj=audit, asmt_obj=expected_asmt)
+    actual_asmts_tab_count = (
+        AsmtsService(selenium).get_count_from_tab(source_obj=audit))
+    assert len([expected_asmt]) == actual_asmts_tab_count
+    actual_asmts = (
+        AsmtsService(selenium).get_objs_from_tree_view(source_obj=audit))
     assert [expected_asmt] == actual_asmts, (
         messages.ERR_MSG_FORMAT.format([expected_asmt], actual_asmts))
 
@@ -66,11 +71,14 @@ class TestAuditPage(base.Test):
     asmt_tmpl, audit, _ = new_asmt_tmpl_rest
     expected_asmts = AsmtFactory().generate(
         objs_under_asmt_tmpl=new_controls_rest, audit=audit)
-    AsmtService(selenium).generate(
-        audit, asmt_tmpl, objs_under=new_controls_rest)
-    asmts_tab_count = AsmtService(selenium).get_count(audit)
-    assert len(expected_asmts) == asmts_tab_count
-    actual_asmts = AsmtService(selenium).get_list_of_objs(audit)
+    AsmtsService(selenium).generate_via_tree_view(
+        source_obj=audit, asmt_tmpl_obj=asmt_tmpl,
+        objs_under_asmt=new_controls_rest)
+    actual_asmts_tab_count = (
+        AsmtsService(selenium).get_count_from_tab(source_obj=audit))
+    assert len(expected_asmts) == actual_asmts_tab_count
+    actual_asmts = (
+        AsmtsService(selenium).get_objs_from_tree_view(source_obj=audit))
     assert expected_asmts == actual_asmts, (
         messages.ERR_MSG_FORMAT.format(expected_asmts, actual_asmts))
 
@@ -90,9 +98,11 @@ class TestAuditPage(base.Test):
     """
     audit, _ = new_audit_rest
     expected_control = new_control_rest
-    controls_tab_count = ControlService(selenium).get_count(audit)
-    assert len([expected_control]) == controls_tab_count
-    actual_controls = ControlService(selenium).get_list_of_objs(audit)
+    actual_controls_tab_count = (
+        ControlsService(selenium).get_count_from_tab(source_obj=audit))
+    assert len([expected_control]) == actual_controls_tab_count
+    actual_controls = (
+        ControlsService(selenium).get_objs_from_tree_view(source_obj=audit))
     assert [expected_control] == actual_controls, (
         messages.ERR_MSG_FORMAT.format([expected_control], actual_controls))
 
@@ -111,11 +121,14 @@ class TestAuditPage(base.Test):
     - Original Control updated via REST API.
     """
     audit, _ = new_audit_rest
-    expected_updated_control = update_control_rest
-    ControlService(selenium).update(audit, old_control=new_control_rest)
-    updated_controls_tab_count = ControlService(selenium).get_count(audit)
-    assert len([expected_updated_control]) == updated_controls_tab_count
-    actual_updated_controls = ControlService(selenium).get_list_of_objs(audit)
-    assert [expected_updated_control] == actual_updated_controls, (
+    expected_control = update_control_rest
+    ControlsService(selenium).update_ver_via_info_panel(
+        source_obj=audit, control_obj=new_control_rest)
+    actual_controls_tab_count = (
+        ControlsService(selenium).get_count_from_tab(source_obj=audit))
+    assert len([expected_control]) == actual_controls_tab_count
+    actual_controls = (
+        ControlsService(selenium).get_objs_from_tree_view(source_obj=audit))
+    assert [expected_control] == actual_controls, (
         messages.ERR_MSG_FORMAT.format(
-            [expected_updated_control], actual_updated_controls))
+            [expected_control], actual_controls))
