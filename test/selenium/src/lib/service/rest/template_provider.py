@@ -7,8 +7,8 @@
 
 import copy
 import json
-
 import os
+
 from lib.constants import objects, url
 
 
@@ -22,7 +22,7 @@ class TemplateProvider(object):
   parsed_data = dict()
 
   @classmethod
-  def get_template_as_dict(cls, template, **kwargs):
+  def generate_template_as_dict(cls, template, **kwargs):
     """Get template as dictionary from a predefined JSON file and attributes
     (items (kwargs): key=value).
     Return the dictionary like as {type: {key: value, ...}}.
@@ -41,7 +41,7 @@ class TemplateProvider(object):
     return {template: obj}
 
   @classmethod
-  def update_template_as_list_of_dict(cls, template, **kwargs):
+  def update_template_as_dict(cls, template, **kwargs):
     """Update the template as the list of dictionary according to the
     attributes (items (kwargs): key=value).
     Return the list of dictionary like as [{type: {key: value, ...}}].

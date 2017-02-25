@@ -8,6 +8,7 @@ import json
 import urlparse
 
 import requests
+
 from lib import environment
 from lib.constants import url, objects
 from lib.service.rest.template_provider import TemplateProvider
@@ -86,18 +87,18 @@ class RestClient(object):
     """Generate a body of HTTP request based on JSON representation."""
     if type == self._count:
       return json.dumps(
-          [TemplateProvider.get_template_as_dict(
+          [TemplateProvider.generate_template_as_dict(
               template=type, **kwargs)[self._count]]
       )
     else:
       return json.dumps(
-          [TemplateProvider.get_template_as_dict(template=type, **kwargs)]
+          [TemplateProvider.generate_template_as_dict(template=type, **kwargs)]
       )
 
   @staticmethod
   def update_body(body, **kwargs):
     """Update a body of HTTP request based on JSON representation."""
     return json.dumps(
-        TemplateProvider.update_template_as_list_of_dict(
+        TemplateProvider.update_template_as_dict(
             template=body, **kwargs)
     )
