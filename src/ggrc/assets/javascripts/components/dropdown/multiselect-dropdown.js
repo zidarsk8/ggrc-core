@@ -55,7 +55,19 @@
           value: false
         },
         options: {
-          type: '*'
+          type: '*',
+          set: function (value) {
+            var self = this;
+            if (value) {
+              value.forEach(function (item) {
+                self.updateSelected(item);
+              });
+
+              return value;
+            }
+
+            return [];
+          }
         }
       },
       updateSelected: function (item) {

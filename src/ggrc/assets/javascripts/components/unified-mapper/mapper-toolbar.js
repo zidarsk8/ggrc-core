@@ -14,6 +14,7 @@
     viewModel: {
       filter: '',
       statusFilter: null,
+      dropdown_options: [],
       statuses: [],
       mapper: {},
       isLoading: false,
@@ -31,12 +32,14 @@
       onSubmit: function () {
         this.dispatch('submit');
         if (this.attr('showStatusFilter')) {
+          this.attr('mapper.statusFilter', this.attr('statusFilter'));
           this.saveStatusFilter();
         }
       },
       onReset: function () {
         this.attr('filter', '');
         this.attr('statuses', []);
+        this.attr('statusFilter', '');
         this.dispatch('submit');
       },
       getModelName: function () {
@@ -46,11 +49,29 @@
       setStatusFilter: function () {
         var modelName = this.getModelName();
         var showStatusFilter = GGRC.Utils.State.hasState(modelName);
+        var dropdownOptions;
         var statuses;
+
         this.attr('showStatusFilter', showStatusFilter);
         if (showStatusFilter) {
           statuses =
             this.attr('displayPrefs').getTreeViewStates(modelName);
+
+          dropdownOptions = GGRC.Utils.State.getStatesForModel(modelName);
+          dropdownOptions = dropdownOptions.map(function (option) {
+            if (statuses.indexOf(option) > -1) {
+              return {
+                value: option,
+                checked: true
+              };
+            }
+            return {value: option};
+          });
+
+          this.attr('dropdown_options', dropdownOptions);
+          this.attr('statusFilter',
+            GGRC.Utils.State.statusFilter(statuses, ''));
+
           this.attr('statuses', statuses);
         } else {
           this.attr('statuses', []);
@@ -76,6 +97,16 @@
       },
       '{viewModel.mapper} type': function () {
         this.viewModel.setStatusFilter();
+      },
+      'multiselect-dropdown multiselect:closed': function (el, ev, selected) {
+        var selectedStatuses = selected.map(function (item) {
+          return item.value;
+        });
+        this.viewModel.attr('statuses', selectedStatuses);
+
+        this.viewModel.attr('statusFilter',
+          GGRC.Utils.State.statusFilter(selectedStatuses, ''));
+        ev.stopPropagation();
       }
     }
   });

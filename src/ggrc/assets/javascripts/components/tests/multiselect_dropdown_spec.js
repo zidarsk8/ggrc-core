@@ -164,6 +164,7 @@ describe('GGRC.Components.multiselectDropdown', function () {
       function () {
         spyOn(can, 'trigger');
         viewModel.attr('isOpen', true);
+        viewModel.attr('_stateWasUpdated', false);
 
         // simulate "window.click" event
         viewModel.changeOpenCloseState();
@@ -179,6 +180,7 @@ describe('GGRC.Components.multiselectDropdown', function () {
         var item = viewModel.attr('options')[0];
         spyOn(can, 'trigger');
         viewModel.attr('isOpen', true);
+        viewModel.attr('_stateWasUpdated', false);
 
         // change state of item
         item.checked = true;
