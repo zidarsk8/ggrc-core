@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
+from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.mixins import (
     BusinessObject, Timeboxed, CustomAttributable, TestPlanned
 )
@@ -13,7 +14,7 @@ from ggrc.models.track_object_state import HasObjectState
 
 
 class Issue(HasObjectState, TestPlanned, CustomAttributable, EvidenceURL,
-            Personable, Timeboxed, Ownable, Relatable,
+            Personable, Timeboxed, Ownable, Relatable, AuditRelationship,
             BusinessObject, db.Model):
 
   __tablename__ = 'issues'
