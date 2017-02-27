@@ -862,12 +862,14 @@
       var parentWidth;
       var headerContentHeight;
       var treeHeaderContent;
+      var elementParent;
 
       if (!this.element || !this.element.parent) {
         return;
       }
 
-      treeFilter = this.element.parent().find('.tree-filter');
+      elementParent = this.element.parent();
+      treeFilter = elementParent.find('.tree-filter');
 
       if (treeFilter.length === 0) {
         return;
@@ -875,11 +877,11 @@
 
       filterHeight = Number(treeFilter.attr('data-height')) +
         Number(treeFilter.attr('data-margin-bottom'));
-      headerHeight = this.element.parent().find('.tree-header').height();
-      elementMarginTop = this.element.parent().offset().top;
-      parentWidth = this.element.parent().width();
+      headerHeight = elementParent.find('.tree-header').height();
+      elementMarginTop = elementParent.offset().top;
+      parentWidth = elementParent.width();
       headerContentHeight = filterHeight + headerHeight;
-      treeHeaderContent = this.element.parent().find('.tree-header-content');
+      treeHeaderContent = elementParent.find('.tree-header-content');
 
       if (this.options.attr('filter_is_hidden')) {
         elementMarginTop -= filterHeight;
