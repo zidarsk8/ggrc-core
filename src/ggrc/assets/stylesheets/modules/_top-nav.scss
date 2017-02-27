@@ -7,7 +7,7 @@
   @include box-shadow(inset 1px 4px 9px -6px rgba(0,0,0,0.4));
   width: 100%;
   top: 48px;
-  background: $tabBgnd;
+  background: $white;
 }
 
 ul.internav {
@@ -26,6 +26,7 @@ ul.internav {
       &.pie-chart, &.info-circle, &.assessment, &.issue, &.assessment_template {
         a {
           color: $blue;
+          @include opacity(1);
           &:hover {
             color: $blue;
           }
@@ -37,7 +38,8 @@ ul.internav {
       &.menu-action {
         float: right;
         display: block !important;
-        margin-top: 2px;
+        margin-top: 7px;
+        margin-left: 3px;
         .hide-menu {
           background: $grayLight;
           &:focus {
@@ -50,7 +52,7 @@ ul.internav {
         float: right;
         position: relative;
         padding-left: 5px;
-        height: 29px;
+        height: 40px;
         &:before {
           content: '';
           border-left: 1px dotted $grayLight;
@@ -91,6 +93,7 @@ ul.internav {
         color: $black;
         font-weight: bold;
         background: $contentBgnd;
+        @include opacity(1);
         i {
           @include opacity(1);
         }
@@ -102,19 +105,18 @@ ul.internav {
   }
   a {
     @include transition(color 0.2s ease);
-    padding: 0 14px 0 10px;
+    padding: 6px 14px 5px 10px;
     display: block;
     line-height: 29px;
     font-size: 13px;
-    color: $gray;
+    color: $black;
+    @include opacity(.7);
     position: relative;
     &:hover {
       color: $black;
       background: none;
       text-decoration: none;
-      i {
-        @include opacity(1);
-      }
+      @include opacity(1);
       .closed {
         display: block;
       }
@@ -143,7 +145,6 @@ ul.internav {
     }
   }
   i {
-    @include opacity(0.4);
     margin-top: 6px;
   }
 }
