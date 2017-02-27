@@ -70,6 +70,23 @@ describe('GGRC.Components.multiselectDropdown', function () {
         expect(selected.length).toEqual(options.length - 1);
       }
     );
+
+    it('updateSelected() should not add duplicates in "selected"',
+      function () {
+        var selected;
+        var item = viewModel.attr('options')[1];
+        item.checked = true;
+
+        // double call
+        viewModel.updateSelected(item);
+        viewModel.updateSelected(item);
+
+        selected = viewModel.attr('selected');
+
+        expect(selected.length).toEqual(1);
+        expect(selected[0].value).toEqual(item.value);
+      }
+    );
   });
 
   describe('_displayValue attribute', function () {
@@ -164,6 +181,7 @@ describe('GGRC.Components.multiselectDropdown', function () {
       function () {
         spyOn(can, 'trigger');
         viewModel.attr('isOpen', true);
+        viewModel.attr('_stateWasUpdated', false);
 
         // simulate "window.click" event
         viewModel.changeOpenCloseState();
@@ -179,6 +197,7 @@ describe('GGRC.Components.multiselectDropdown', function () {
         var item = viewModel.attr('options')[0];
         spyOn(can, 'trigger');
         viewModel.attr('isOpen', true);
+        viewModel.attr('_stateWasUpdated', false);
 
         // change state of item
         item.checked = true;

@@ -55,16 +55,37 @@
           value: false
         },
         options: {
-          type: '*'
+          type: '*',
+          set: function (value) {
+            var self = this;
+            if (value) {
+              value.forEach(function (item) {
+                self.updateSelected(item);
+              });
+
+              return value;
+            }
+
+            return [];
+          }
         }
       },
       updateSelected: function (item) {
         var selected = this.attr('selected');
         var index = -1;
+        var duplicates;
 
         this.attr('_stateWasUpdated', true);
 
         if (item.checked) {
+          duplicates = selected.filter(function (selectedItem) {
+            return selectedItem.attr('value') === item.value;
+          });
+
+          if (duplicates.length > 0) {
+            return;
+          }
+
           selected.push(item);
           return;
         }

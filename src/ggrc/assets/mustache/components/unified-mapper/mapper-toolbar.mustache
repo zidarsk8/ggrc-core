@@ -76,10 +76,12 @@
   </div>
   <div class="col">
     {{#showStatusFilter}}
-      <mapper-status-filter
-        {(statuses)}="statuses"
-        {(status-filter)}="statusFilter">
-      </mapper-status-filter>
+      <div class="filter-statuses">
+        <multiselect-dropdown 
+          {options}="dropdown_options"
+          placeholder="Filter by State">
+        </multiselect-dropdown>
+      </div>
     {{/showStatusFilter}}
   </div>
 </div>

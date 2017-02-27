@@ -17,6 +17,18 @@
     text-overflow: ellipsis;
   }
 
+  label.multiselect-dropdown__label {
+    width: 96%;
+    margin: 0px 0px 0px 0px;
+    padding: 2px 0px 2px 5px;
+    font-size: 12px;
+    user-select: none;
+  }
+
+  input[type="checkbox"].multiselect-dropdown__checkbox {
+    margin: 0px 3px 0px 3px;
+  }
+
   .multiselect-dropdown {
     &__body {
       position: relative;
@@ -56,18 +68,6 @@
       cursor: pointer;
       line-height: 28px;
       position: relative;
-    }
-
-    &__label {
-      width: 96%;
-      margin: 0px 0px 0px 0px;
-      padding: 2px 0px 2px 5px;
-      font-size: 12px;
-      user-select: none;
-    }
-
-    &__checkbox {
-      margin: 0px 3px 0px 3px;
     }
   }
 }
