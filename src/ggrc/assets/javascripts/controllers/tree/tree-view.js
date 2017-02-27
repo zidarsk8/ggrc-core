@@ -280,7 +280,6 @@
         var isCustomAttr = /CustomAttr/.test(this.options.model.shortName);
 
         this.display_prefs = displayPrefs;
-        this.options.filter_is_hidden = this.display_prefs.getFilterHidden();
 
         this.element.uniqueId();
 
@@ -345,8 +344,6 @@
             new can.Map(can.extend(options.attr(), allowed)));
         }.bind(this));
 
-        this.options.attr('filter_is_hidden', displayPrefs.getFilterHidden());
-
         this._attached_deferred = can.Deferred();
         if (this.element && this.element.closest('body').length) {
           this._attached_deferred.resolve();
@@ -378,18 +375,6 @@
           can.view(this.options.header_view, optionsDfd).then(
             this._ifNotRemoved(function (frag) {
               this.element.before(frag);
-              // TODO: This is a workaround so we can toggle filter. We should refactor this ASAP.
-              can.bind.call(
-                this.element.parent().find('.filter-trigger > a'),
-                'click',
-                function () {
-                  if (this.display_prefs.getFilterHidden()) {
-                    this.show_filter();
-                  } else {
-                    this.hide_filter();
-                  }
-                }.bind(this)
-              );
 
               can.bind.call(this.element.parent()
                   .find('.widget-col-title[data-field]'),
@@ -883,11 +868,6 @@
       headerContentHeight = filterHeight + headerHeight;
       treeHeaderContent = elementParent.find('.tree-header-content');
 
-      if (this.options.attr('filter_is_hidden')) {
-        elementMarginTop -= filterHeight;
-        headerContentHeight -= filterHeight;
-      }
-
       this.element.css('margin-top', elementMarginTop);
 
       if (treeHeaderContent) {
@@ -1155,31 +1135,6 @@
       }
     },
 
-    hide_filter: function () {
-      this.options.attr('filter_is_hidden', true);
-
-      this.element.parent().find('.filter-trigger > a')
-        .removeClass('active')
-        .find('span')
-        .text('Show filter');
-
-      this.display_prefs.setFilterHidden(true);
-      this.display_prefs.save();
-      this.update_header();
-    },
-
-    show_filter: function () {
-      this.options.attr('filter_is_hidden', false);
-
-      this.element.parent().find('.filter-trigger > a')
-        .addClass('active')
-        .find('span')
-        .text('Hide filter');
-
-      this.display_prefs.setFilterHidden(false);
-      this.display_prefs.save();
-      this.update_header();
-    },
     loadTreeStates: function (modelName) {
       // Get the status list from local storage
       var savedStateList;

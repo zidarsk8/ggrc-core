@@ -6,7 +6,7 @@
 <div class="header tree-header-content">
   {{> '/static/mustache/base_objects/tree_view_filter.mustache'}}
 
-  <header class="header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+  <header class="header tree-header">
     {{> '/static/mustache/base_objects/tree_column_selector.mustache'}}
     <div class="row-fluid">
       <div class="span{{display_options.title_width}}">
@@ -37,7 +37,6 @@
               <ul class="dropdown-menu tree-action-list-items" role="menu">
                 {{> '/static/mustache/import_export/import_export_buttons.mustache'}}
                 <assessment-generator-button audit="parent_instance"></assessment-generator-button>
-                {{> '/static/mustache/base_objects/filter_trigger.mustache'}}
                 {{> '/static/mustache/base_objects/sub_tree_type_selector.mustache'}}
               </ul>
             </div>
