@@ -42,6 +42,9 @@ ALL_CA_OBJECTS = (WORKFLOWS, RISK_ASSESSMENTS, THREATS, RISKS,
                   ORG_GROUPS, PRODUCTS, MARKETS, PROCESSES,
                   FACILITIES, PROJECTS, DATA_ASSETS, SYSTEMS)
 
+# templates
+COUNT = "count"
+
 
 def _get_singular(plurals):
   """

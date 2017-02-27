@@ -1,10 +1,11 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Page object models for the info widget of the object"""
+"""Page object models for the info widget of the object."""
 
 from lib import base
 from lib.constants import locator
 from lib.element import widget_info
+from lib.page.modal import update_object
 
 
 class Widget(base.Widget):
@@ -14,22 +15,28 @@ class Widget(base.Widget):
 
   def __init__(self, driver):
     # wait that the elements load before calling super
-    self.button_settings = base.Button(
-        driver, locator.BaseInfoWidget.BUTTON_SETTINGS)
+    self.button_settings = None
     self.title = base.Label(driver, self._locator.TITLE)
-    self.title_entered = base.Label(
-        driver, self._locator.TITLE_ENTERED)
+    self.title_entered = base.Label(driver, self._locator.TITLE_ENTERED)
+    self.link_get_latest_ver = None
 
     super(Widget, self).__init__(driver)
     self.object_id = self.url.split("/")[-1]
 
   def press_object_settings(self):
-    """
-    Returns:
-        widget_info.DropdownSettings
-    """
+    """Click to 3bbs button to open modal for further selection of actions."""
+    self.button_settings = base.Button(self._driver,
+                                       locator.BaseInfoWidget.BUTTON_SETTINGS)
     self.button_settings.click()
     return self._dropdown_settings_cls(self._driver)
+
+  def open_link_get_latest_ver(self):
+    """Click to link to open modal for further update object."""
+    self.link_get_latest_ver = base.Button(
+        self._driver, locator.BaseInfoWidget.LINK_GET_LAST_VER
+    )
+    self.link_get_latest_ver.click()
+    return update_object.CompareUpdateObjectModal(self._driver)
 
 
 class DashboardInfo(Widget):
@@ -181,7 +188,7 @@ class Sections(Widget):
 
 
 class Controls(Widget):
-  """Model for control object info widget"""
+  """Model for control object info widget."""
   _locator = locator.WidgetInfoControl
   _dropdown_settings_cls = widget_info.Controls
 

@@ -1,10 +1,11 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """The module provides constants GGRC's URLs construction."""
-
 # pylint: disable=wildcard-import
 # pylint: disable=unused-wildcard-import
+
 from lib.constants.objects import *  # noqa; the names are later exported
+
 
 # URL's parts for objects
 API = "api"
@@ -13,11 +14,13 @@ ADMIN_DASHBOARD = "admin"
 AUDIT = AUDITS + "/{0}"
 RELATIONSHIPS = "relationships"
 OBJECT_OWNERS = "object_owners"
+CONTACTS = "contacts"
+QUERY = "query"
 
 # url path for user
 DEFAULT_EMAIL_DOMAIN = "example.com"
-DEFAULT_EMAIL = "user@" + DEFAULT_EMAIL_DOMAIN
-DEFAULT_URL_USER_API = "/".join([API, PEOPLE, str(1)])
+DEFAULT_USER_EMAIL = "user@" + DEFAULT_EMAIL_DOMAIN
+DEFAULT_USER_HREF = "/".join([API, PEOPLE, str(1)])
 
 
 class Widget(object):
@@ -32,3 +35,4 @@ class Widget(object):
   PEOPLE = "#people_list_widget"
   ASSESSMENTS = "#assessment_widget"
   ASSESSMENT_TEMPLATES = "#assessment_template_widget"
+  CONTROLS = "#control_widget"
