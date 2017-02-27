@@ -4,13 +4,6 @@
 }}
 <div class="tree-node-actions flex-box flex-row">
     <ul class="tree-action-list">
-      {{#if drawRoles}}
-        {{#infer_roles instance}}
-            <li>
-                <i class="fa fa-person" rel="tooltip" data-placement="left" data-original-title="{{.}} "></i>
-            </li>
-        {{/infer_roles}}
-      {{/if}}
       {{#if drawStates}}
           <li>
             {{> '/static/mustache/base_objects/states.mustache'}}
