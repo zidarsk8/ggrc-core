@@ -331,7 +331,6 @@ dashboard-js-template-files:
   - base_objects/tree_column_selector.mustache
   - base_objects/tree_column_names.mustache
   - base_objects/sub_tree_expand.mustache
-  - base_objects/filter_trigger.mustache
   - base_objects/generate_assessments_button.mustache
   - base_objects/states.mustache
   - base_objects/form_restore.mustache

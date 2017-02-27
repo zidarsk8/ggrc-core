@@ -6,7 +6,7 @@
 <div class="header tree-header-content">
   {{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
 
-  <header class="header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+  <header class="header tree-header">
     {{{> "/static/mustache/base_objects/tree_column_selector.mustache"}}}
     <div class="row-fluid">
       <div class="span{{display_options.title_width}}">
@@ -35,12 +35,6 @@
                 <span class="bubble"></span>
               </a>
               <ul class="dropdown-menu tree-action-list-items" role="menu">
-                <li class="filter-trigger">
-                  <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
-                    <i class="fa fa-search"></i>
-                    <span>Hide Filter</span>
-                  </a>
-                </li>
                 {{{> "/static/mustache/base_objects/sub_tree_type_selector.mustache"}}}
               </ul>
             </div>

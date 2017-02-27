@@ -318,8 +318,9 @@
               }
 
               a {
+                color: #000;
                 > i {
-                  color: #999;
+                  color: #000;
                 }
                 &.active > i {
                   color: #000;
@@ -335,6 +336,11 @@
                   &:hover {
                     background: none;
                   }
+                }
+
+                .fa {
+                  color: #000;
+                  opacity: 0.7;
                 }
               }
             }

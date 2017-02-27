@@ -139,24 +139,6 @@ describe('CMS.Controllers.TreeView', function () {
       spyOn(Ctrl.prototype, 'update_header');
     });
 
-    it('update_header() should be called after call of show_filter()',
-      function () {
-        var showFilter = Ctrl.prototype.show_filter.bind(Ctrl.prototype);
-
-        showFilter();
-        expect(Ctrl.prototype.update_header.calls.count()).toEqual(1);
-      }
-    );
-
-    it('update_header() should be called after call of hide_filter()',
-      function () {
-        var hideFilter = Ctrl.prototype.hide_filter.bind(Ctrl.prototype);
-
-        hideFilter();
-        expect(Ctrl.prototype.update_header.calls.count()).toEqual(1);
-      }
-    );
-
     it('update_header() should be called after call of init_view()',
       function () {
         var initView = Ctrl.prototype.init_view.bind(Ctrl.prototype);
