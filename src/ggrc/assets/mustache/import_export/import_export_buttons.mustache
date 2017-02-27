@@ -3,10 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if display_options.hideImportExport}}
-{{else}}
-
+{{^if display_options.hideImportExport}}
 {{^if_instance_of parent_instance 'Assessment'}}
+{{#is_allowed 'update' model.shortName context=parent_instance.context}}
 <li>
   <a href="/import"
     target="_blank"
@@ -15,6 +14,7 @@
     Import {{model.model_plural}}
   </a>
 </li>
+{{/is_allowed}}
 {{#if list.length}}
   <li>
     <a href="/export?model_type={{model.model_singular}}&relevant_type={{parent_instance.type}}&relevant_id={{parent_instance.id}}"
@@ -26,5 +26,4 @@
   </li>
 {{/if}}
 {{/if_instance_of}}
-
 {{/if}}
