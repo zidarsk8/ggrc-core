@@ -21,9 +21,11 @@
       }
 
       this._after_pending_joins(instance, function () {
-        dfd = instance.relatedSnapshots.map(function (item) {
-          return this._create_relationship(instance, item);
-        }.bind(this));
+        dfd = instance.relatedSnapshots ?
+          instance.relatedSnapshots.map(function (item) {
+            return this._create_relationship(instance, item);
+          }.bind(this)) :
+          [];
         dfd.push(this._create_relationship(instance, instance.audit));
         dfd.push(this._create_relationship(instance, instance.assessment));
         instance.delay_resolving_save_until($.when.apply($, dfd));
