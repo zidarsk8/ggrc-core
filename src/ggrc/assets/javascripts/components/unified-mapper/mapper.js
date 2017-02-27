@@ -10,6 +10,7 @@
     'and system will create snapshots of selected objects for this Audit';
 
   var DEFAULT_OBJECT_MAP = {
+    Assessment: 'Control',
     Objective: 'Control',
     Section: 'Objective',
     Regulation: 'Section',
