@@ -59,6 +59,16 @@
     }
   }
   .header {
+    &.tree-header-content {
+      position: absolute;
+      z-index: 1; 
+      background-color: $contentBgnd;
+      margin: -20px -40px 0px -40px;
+      padding-left: 40px;
+      padding-right: 40px;
+      border-top: solid $contentBgnd;
+      border-width: 20px;
+    }
     &.tree-header {
       padding: 0 12px 0 70px;
       font-size: 11px;
@@ -77,17 +87,23 @@
       }
 
       .visible-columns-icon {
-        position: absolute;
+        position: relative;
         left: 5px;
         top: 8px;
         display: block;
       }
 
+      .tree-header-selector {
+        margin-left: -70px;
+        float: left;
+        position: relative;
+      }
+
       .visible-columns-list {
         @include border-radius(0);
-        right: -12px;
-        left: 0px;
-        top: 25px;
+        position: absolute;
+        top: 23px;
+        left: 5px;
         padding: 14px 30px 20px 30px;
         min-width: 720px;
         max-width: 860px;

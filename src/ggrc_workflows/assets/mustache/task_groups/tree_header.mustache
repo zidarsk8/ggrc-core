@@ -3,54 +3,56 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
+<div class="header tree-header-content">
+  {{{> "/static/mustache/base_objects/tree_view_filter.mustache"}}}
 
-<header class="header sticky sticky-header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
-  <div class="row-fluid">
-    <div class="span6">
-      <div class="title-heading oneline">
-        <span class="widget-col-title" data-field="title">
-          Task Group
-          <i class="fa fa-caret-down"></i>
-        </span>
+  <header class="header tree-header {{#filter_is_hidden}}no-filter{{/filter_is_hidden}}">
+    <div class="row-fluid">
+      <div class="span6">
+        <div class="title-heading oneline">
+          <span class="widget-col-title" data-field="title">
+            Task Group
+            <i class="fa fa-caret-down"></i>
+          </span>
+        </div>
+      </div>
+      <div class="span2">
+        <div class="oneline">
+          <span class="widget-col-title" data-field="contact.name|email">
+            Assignee
+            <i class="fa fa-caret-down"></i>
+          </span>
+        </div>
+      </div>
+      <div class="span4">
+        <ul class="tree-action-list">
+          {{#if add_item_view}}
+          {{^if_equals parent_instance.kind "Backlog"}}
+          <li>
+            {{{renderLive add_item_view}}}
+          </li>
+          {{/if_equals}}
+          {{/if}}
+          <li>
+            <div class="details-wrap">
+              <a class="btn btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+                <span class="bubble"></span>
+                <span class="bubble"></span>
+                <span class="bubble"></span>
+              </a>
+              <ul class="dropdown-menu tree-action-list-items" role="menu">
+                <li class="filter-trigger">
+                  <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
+                    <i class="fa fa-search"></i>
+                    <span>Hide Filter</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
-    <div class="span2">
-      <div class="oneline">
-        <span class="widget-col-title" data-field="contact.name|email">
-          Assignee
-          <i class="fa fa-caret-down"></i>
-        </span>
-      </div>
-    </div>
-    <div class="span4">
-      <ul class="tree-action-list">
-        {{#if add_item_view}}
-        {{^if_equals parent_instance.kind "Backlog"}}
-        <li>
-          {{{renderLive add_item_view}}}
-        </li>
-        {{/if_equals}}
-        {{/if}}
-        <li>
-          <div class="details-wrap">
-            <a class="btn btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
-              <span class="bubble"></span>
-              <span class="bubble"></span>
-              <span class="bubble"></span>
-            </a>
-            <ul class="dropdown-menu tree-action-list-items" role="menu">
-              <li class="filter-trigger">
-                <a href="javascript://" {{^filter_is_hidden}}class="active"{{/filter_is_hidden}}>
-                  <i class="fa fa-search"></i>
-                  <span>Hide Filter</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul>
-    </div>
-  </div>
-</header>
+  </header>
+</div>
 <div class="clearfix"></div>
