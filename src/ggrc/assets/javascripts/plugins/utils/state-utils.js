@@ -28,8 +28,15 @@
         ]
       },
       {
+        models: ['Audit'],
+        states: [
+          'Planned', 'In Progress', 'Manager Review',
+          'Ready for External Review', 'Completed'
+        ]
+      },
+      {
         models: [
-          'Audit', 'Person', 'CycleTaskGroupObjectTask',
+          'Person', 'CycleTaskGroupObjectTask',
           'AssessmentTemplate', 'Workflow',
           'TaskGroup', 'Cycle'
         ],
