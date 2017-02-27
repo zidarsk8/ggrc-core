@@ -10,9 +10,9 @@ from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.models import reflection
-from ggrc.models.audit import Audit
 from ggrc.models.comment import Commentable
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import FinishedDate
@@ -31,41 +31,8 @@ from ggrc.models.object_document import EvidenceURL
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
-from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.utils import similarity_options as similarity_options_module
-
-
-class AuditRelationship(object):
-
-  """Mixin for mandatory link to an Audit via Relationships."""
-
-  _aliases = {
-      "audit": {
-          "display_name": "Audit",
-          "mandatory": True,
-          "filter_by": "_filter_by_audit",
-          "ignore_on_update": True,
-          "type": reflection.AttributeInfo.Type.MAPPING,
-      },
-  }
-
-  @classmethod
-  def _filter_by_audit(cls, predicate):
-    """Get filter for objects related to an Audit."""
-    return Relationship.query.filter(
-        Relationship.source_type == cls.__name__,
-        Relationship.source_id == cls.id,
-        Relationship.destination_type == Audit.__name__,
-    ).join(Audit, Relationship.destination_id == Audit.id).filter(
-        predicate(Audit.slug)
-    ).exists() | Relationship.query.filter(
-        Relationship.destination_type == cls.__name__,
-        Relationship.destination_id == cls.id,
-        Relationship.source_type == Audit.__name__,
-    ).join(Audit, Relationship.source_id == Audit.id).filter(
-        predicate(Audit.slug)
-    ).exists()
 
 
 class Assessment(statusable.Statusable, AuditRelationship,
