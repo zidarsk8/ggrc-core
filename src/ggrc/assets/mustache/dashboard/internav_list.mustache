@@ -38,7 +38,7 @@
 {{#is_allowed 'update' instance}}
 {{#if widget_list.length}}
 <li data-test-id="button_widget_add_2c925d94" class="hidden-widgets-list">
-  <a href="{{urlPath}}#dropdown-widgets" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="Add Tab"><i class="fa fa-plus-circle"></i> Add Tab</a>
+  <a href="{{urlPath}}#dropdown-widgets" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="{{addTabTitle}}"><i class="fa fa-plus-circle"></i> {{addTabTitle}}</a>
   <div class="dropdown-menu" role="menu">
     {{#widget_list}}
       <div class="inner-nav-item">
@@ -114,7 +114,10 @@
 {{{render_hooks 'ObjectNav.Actions'}}}
 
 {{#if_page_type 'audits'}}
-  <li class="menu-action">
-    <input type="button" class="btn btn-small hide-menu" value="Hide">
+  <li class="hide-menu {{#if isMenuVisible}}visible{{/if}}">
+      <i class="fa fa-angle-{{#if isMenuVisible}}right{{else}}left{{/if}}"></i>
+      {{^if isMenuVisible}}
+      <span>Show Audit Scope</span>
+      {{/if}}
   </li>
 {{/if_page_type}}
