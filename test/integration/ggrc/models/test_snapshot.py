@@ -133,7 +133,7 @@ class TestSnapshot(TestCase):
               **args
           )
 
-  def test_revision_conent(self):
+  def test_revision_content(self):
     """Test that revision contains all content needed."""
 
     facility_revision = all_models.Revision.query.filter(
