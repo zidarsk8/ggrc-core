@@ -816,9 +816,10 @@ class QueryHelper(object):
           well as in custom attribute definitions
       """
       if key in self.attr_name_map.get(object_class, {}):
+        cad = []
         if hasattr(object_class, 'get_custom_attribute_definitions'):
           cad = [obj.title.lower() for obj in object_class.get_custom_attribute_definitions()]
-          return None if key in cad else getattr(object_class, key, None)
+        return None if key in cad else getattr(object_class, key, None)
       return None
 
     def text_search(text):
