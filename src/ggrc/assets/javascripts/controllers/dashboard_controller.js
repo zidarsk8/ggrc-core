@@ -284,7 +284,9 @@
       contexts: null,
       instance: null,
       isMenuVisible: true,
-      addTabTitle: 'Add Tab'
+      addTabTitle: 'Add Tab',
+      dividedTabsMode: false,
+      priorityTabs: null
     }
   }, {
     init: function (options) {
@@ -312,6 +314,8 @@
             if (isAuditScope) {
               this.element.addClass(this.options.instance.type.toLowerCase());
               this.options.attr('addTabTitle', 'Add Scope');
+              this.options.attr('dividedTabsMode', true);
+              this.options.attr('priorityTabs', 4);
             }
             this.route(window.location.hash);
             delete this.delayed_display;
@@ -582,28 +586,44 @@
     }, 100),
     show_hide_titles: function () {
       var $el = this.element;
-      var widgets = this.options.widget_list;
-      var widths;
+      var originalWidgets = this.options.widget_list;
+      var dividedTabsMode = this.options.attr('dividedTabsMode');
+      var priorityTabs = this.options.attr('priorityTabs');
 
-      // first expand all
-      widgets.forEach(function (widget) {
-        widget.attr('show_title', true);
-      });
-
-      // see if too wide
-      widths = _.map($el.children(':visible'),
-        function (el) {
-          return $(el).outerWidth();
-        }).reduce(function (sum, current) {
-          return sum + current;
-        }, 0);
-
-      // adjust
-      if (widths > $el.width()) {
+      function hideTitles(widgets) {
         widgets.forEach(function (widget) {
           widget.attr('show_title', false);
         });
       }
+
+      function adjust(widgets, isPriorityHide) {
+        var widths;
+
+        // see if too wide
+        widths = _.map($el.children(':visible'),
+          function (el) {
+            return $(el).outerWidth();
+          }).reduce(function (sum, current) {
+            return sum + current;
+          }, 0);
+
+        // adjust
+        if (widths > $el.width()) {
+          if (!isPriorityHide && dividedTabsMode && priorityTabs) {
+            hideTitles(widgets.slice(priorityTabs));
+            adjust(widgets.slice(0, priorityTabs), true);
+          } else {
+            hideTitles(widgets);
+          }
+        }
+      }
+
+      // first expand all
+      originalWidgets.forEach(function (widget) {
+        widget.attr('show_title', true);
+      });
+
+      adjust(originalWidgets);
     },
     '.closed click': function (el, ev) {
       var $link = el.closest('a');
