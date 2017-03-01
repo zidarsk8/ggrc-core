@@ -118,9 +118,6 @@ ONLY_IMPORTABLE_COLUMNS_WARNING = (u"Line {line}: Only the following "
 EXPORT_ONLY_WARNING = (u"Line {line}: Field '{column_name}' "
                        u"can not be imported. The value will be ignored.")
 
-ILLEGAL_REMOVE_CONTROL_VALUE = ("Line {line}: "
-                                "System does not allow to unmap control")
-
 ILLEGAL_APPEND_CONTROL_VALUE = ("Line {line}: "
                                 "System does not allow to map control to "
                                 "{object_type}, because this control is not "
