@@ -228,8 +228,6 @@
       }
 
       $element
-        .trigger('sortreceive')
-        .trigger('section_created')
         .trigger('widgets_updated', $element);
 
       return control;
@@ -437,14 +435,8 @@
      * at the end of the list.
      */
     sortWidgets: function () {
-      function sortByOrderAttr(widget, widget2) {
-        var order = _.isNumber(widget.order) ?
-                                widget.order : Number.MAX_SAFE_INTEGER;
-        var order2 = _.isNumber(widget2.order) ?
-                                 widget2.order : Number.MAX_SAFE_INTEGER;
-        return order - order2;
-      }
-      this.options.widget_list.sort(sortByOrderAttr);
+      this.options.attr('widget_list',
+        _.sortByAll(this.options.widget_list, ['order', 'internav_display']));
     },
 
     update_widget_list: function (widgetElements) {
