@@ -1106,6 +1106,48 @@
       return query;
     }
 
+    /**
+     * Check whether object type is snapshot
+     * @param {Object} instance - Object instance
+     * @return {Boolean} True or False
+     */
+    function isSnapshotType(instance) {
+      return instance && instance.type === 'Snapshot';
+    }
+
+    /**
+     * build query for getting a snapshot.
+     * @param {String} instance - Relevant instance
+     * @param {String} childId - Child id of snapshot
+     * @param {String} childType - Child type of snapshot
+     * @return {Object} Query object
+     */
+    function getSnapshotItemQuery(instance, childId, childType) {
+      var relevantFilters = [{
+        type: instance.type,
+        id: instance.id,
+        operation: 'relevant'
+      }];
+      var filters = {
+        expression: {
+          left: {
+            left: 'child_type',
+            op: {name: '='},
+            right: childType
+          },
+          op: {name: 'AND'},
+          right: {
+            left: 'child_id',
+            op: {name: '='},
+            right: childId
+          }
+        }
+      };
+      var query = GGRC.Utils.QueryAPI
+        .buildParam('Snapshot', {}, relevantFilters, [], filters);
+      return {data: [query]};
+    }
+
     return {
       inScopeModels: ['Assessment', 'Issue', 'AssessmentTemplate'],
       outOfScopeModels: ['Person', 'Program'],
@@ -1118,7 +1160,9 @@
       toObject: toObject,
       toObjects: toObjects,
       transformQuery: transformQuery,
-      setAttrs: setAttrs
+      setAttrs: setAttrs,
+      getSnapshotItemQuery: getSnapshotItemQuery,
+      isSnapshotType: isSnapshotType
     };
   })();
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

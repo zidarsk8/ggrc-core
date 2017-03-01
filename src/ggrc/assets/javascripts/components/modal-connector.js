@@ -37,6 +37,8 @@
       init: function () {
         var that = this;
         var key;
+        var sourceMappingSource;
+        var mapperGetter;
         this.scope.attr('controller', this);
         if (!this.scope.instance) {
           this.scope.attr('deferred', true);
@@ -52,7 +54,7 @@
             objectToAdd = model.findInCacheById(defaultMapping.id);
             that.scope.instance
               .mark_for_addition('related_objects_as_source', objectToAdd, {});
-            that.scope.list.push(objectToAdd);
+            that.addListItem(objectToAdd);
           }
         });
 
@@ -62,17 +64,22 @@
         if (!this.scope.source_mapping_source) {
           this.scope.source_mapping_source = 'instance';
         }
-        if (this.scope[this.scope.source_mapping_source]) {
-          this.scope[this.scope.source_mapping_source]
-            .get_binding(this.scope.source_mapping)
-            .refresh_instances()
-            .then(function (list) {
-              var currentList = this.scope.attr('list');
-              this.scope.attr('list', currentList.concat(can.map(list,
-                function (binding) {
-                  return binding.instance;
-                })));
+
+        sourceMappingSource = this.scope[this.scope.source_mapping_source];
+        mapperGetter = this.scope.mapping_getter;
+
+        if (sourceMappingSource) {
+          if (mapperGetter) {
+            mapperGetter.then(function (list) {
+              this.setListItems(list);
             }.bind(this));
+          } else {
+            sourceMappingSource.get_binding(this.scope.source_mapping)
+              .refresh_instances()
+              .then(function (list) {
+                this.setListItems(list);
+              }.bind(this));
+          }
           // this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
         } else {
           key = this.scope.instance_attr + '_' +
@@ -90,6 +97,13 @@
         this.options.instance = this.scope.instance;
         this.on();
       },
+      setListItems: function (list) {
+        var currentList = this.scope.attr('list');
+        this.scope.attr('list', currentList.concat(can.map(list,
+          function (binding) {
+            return binding.instance;
+          })));
+      },
       '{scope} list': function () {
         var person;
         // Workaround so we render pre-defined users.
@@ -98,7 +112,7 @@
           person = CMS.Models.Person.findInCacheById(GGRC.current_user.id);
           this.scope.instance
             .mark_for_addition(this.scope.mapping, person, {});
-          this.scope.list.push(person);
+          this.addListItem(person);
         }
       },
       deferred_update: function () {
@@ -176,7 +190,7 @@
         // If it's owners and user isn't pre-added
         if (!(~['owners'].indexOf(this.scope.mapping) &&
           doesExist(this.scope.list, ui.item))) {
-          this.scope.list.push(ui.item);
+          this.addListItem(ui.item);
         }
         this.scope.attr('show_new_object_form', false);
       },
@@ -258,7 +272,7 @@
               obj.constructor.shortName);
           that.scope.instance.mark_for_addition(mapping, obj, extraAttrs);
         }
-        that.scope.list.push(obj);
+        that.addListItem(obj);
         that.scope.attr('attributes', {});
       },
       'a[data-object-source] modal:success': 'addMapings',
@@ -277,7 +291,7 @@
                 obj.constructor.shortName);
             this.scope.instance.mark_for_addition(mapping, obj);
           }
-          this.scope.list.push(obj);
+          this.addListItem(obj);
         }, this);
       },
       '.ui-autocomplete-input modal:success': function (el, ev, data, options) {
@@ -305,9 +319,22 @@
                 obj.constructor.shortName);
             that.scope.instance.mark_for_addition(mapping, obj, extraAttrs);
           }
-          that.scope.list.push(obj);
+          that.addListItem(obj);
           that.scope.attr('attributes', {});
         });
+      },
+      addListItem: function (item) {
+        var snapshotObject;
+        if (GGRC.Utils.Snapshots.isSnapshotType(item) &&
+          item.snapshotObject) {
+          snapshotObject = item.snapshotObject;
+          item.attr('title', snapshotObject.title);
+          item.attr('class', snapshotObject.class);
+          item.attr('snapshot_object_class', 'snapshot-object');
+          item.attr('viewLink', snapshotObject.originalLink);
+        }
+
+        this.scope.list.push(item);
       }
     },
     helpers: {
