@@ -127,7 +127,7 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
       return True
     pool_ids = {i.child_id for i in self.audit_object_pool_query.all()}
     if to_append_ids - pool_ids:
-      self.add_error(errors.ILLIGAL_APPEND_CONTROL_VALUE,
+      self.add_error(errors.ILLEGAL_APPEND_CONTROL_VALUE,
                      object_type=self.row_converter.obj.__class__.__name__)
       return False
     return True
