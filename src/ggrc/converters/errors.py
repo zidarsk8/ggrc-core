@@ -119,6 +119,6 @@ EXPORT_ONLY_WARNING = (u"Line {line}: Field '{column_name}' "
                        u"can not be imported. The value will be ignored.")
 
 ILLEGAL_APPEND_CONTROL_VALUE = ("Line {line}: "
-                                "System does not allow to map control to "
-                                "{object_type}, because this control is not "
-                                "mapped to related audit.")
+                                "You can not map {mapped_type} to "
+                                "{object_type}, because this {mapped_type} is "
+                                "not mapped to the related audit.")
