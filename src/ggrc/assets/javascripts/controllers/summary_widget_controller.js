@@ -101,12 +101,18 @@
     },
     drawChart: function (elementId, raw) {
       var chart;
+      var that = this;
       var options = this.getChartOptions(raw);
       var data = new google.visualization.DataTable();
+      var statuses = raw.statuses.map(function (item) {
+        return item.map(function (status) {
+          return that.prepareTitle(status);
+        });
+      });
 
       data.addColumn('string', 'Status');
       data.addColumn('number', 'Count');
-      data.addRows(raw.statuses);
+      data.addRows(statuses);
 
       chart = new google.visualization.PieChart(
         document.getElementById(elementId));
@@ -115,8 +121,18 @@
 
       return chart;
     },
+    prepareTitle: function (status) {
+      if (status === 'Verified') {
+        return 'Completed and Verified';
+      }
+      if (status === 'Completed') {
+        return 'Completed (no verification)';
+      }
+      return status;
+    },
     prepareLegend: function (type, chart, data) {
       var legendData = [];
+      var that = this;
       var statuses = CMS.Models[type].statuses;
       var chartOptions = this.options.context.charts[type];
       var colorsMap = this.options.colorsMap;
@@ -132,7 +148,7 @@
         }
         if (statusData) {
           legendData.push({
-            title: statusData[0],
+            title: that.prepareTitle(statusData[0]),
             count: statusData[1],
             percent: (statusData[1] / data.total * 100).toFixed(1),
             rowIndex: rowIndex,
@@ -140,7 +156,7 @@
           });
         } else {
           legendData.push({
-            title: status,
+            title: that.prepareTitle(status),
             count: 0,
             percent: 0,
             color: colorsMap[status]
