@@ -12,6 +12,7 @@
       isLoading: true,
       colorsMap: {
         Completed: '#8bc34a',
+        Verified: '#333',
         'In Progress': '#ffab40',
         'Not Started': '#bdbdbd',
         'Ready for Review': '#1378bb'
@@ -208,7 +209,13 @@
       }
     },
     parseStatuses: function (data) {
-      var groups = _.groupBy(data.values, 'status');
+      var pregroups = data.values.map(function (item) {
+        if (item.verified) {
+          item.status = 'Verified';
+        }
+        return item;
+      });
+      var groups = _.groupBy(pregroups, 'status');
       var pairs = _.pairs(groups);
       var sorted = _.sortBy(pairs, function (e) {
         return e[0];
@@ -228,7 +235,7 @@
         type,
         {},
         {id: auditId, type: 'Audit'},
-        ['status']);
+        ['status', 'verified']);
       return GGRC.Utils.QueryAPI.makeRequest({data: [query]});
     },
     loadChartLibrary: function (callback) {
