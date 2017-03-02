@@ -5,6 +5,7 @@
 
 .multiselect-dropdown {
   input.multiselect-dropdown__input {
+    width: 100%;
     padding: 4px 24px 4px 8px;
     margin: 0;
     box-sizing: border-box;
@@ -31,12 +32,18 @@
 
   .multiselect-dropdown {
     &__body {
-      position: relative;
+      position: absolute;
+      box-sizing: border-box;
+      width: 100%;
       top: -1px !important;
       z-index: 2000;
       float: none;
       display: block;
       border-radius: 0;
+    }
+
+    &__body-wrapper {
+      position: relative;
     }
 
     &__list {

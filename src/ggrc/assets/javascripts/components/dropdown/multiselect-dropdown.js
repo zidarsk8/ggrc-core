@@ -19,10 +19,6 @@
       placeholder: '@',
       element: '',
       define: {
-        elementWidth: {
-          type: 'number',
-          value: 240
-        },
         _displayValue: {
           get: function () {
             return this.attr('selected').map(function (item) {
