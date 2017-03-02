@@ -1330,7 +1330,7 @@
       var queryAPI = GGRC.Utils.QueryAPI;
       var modelName = options.model.shortName;
       var states = options.attr('selectStateList');
-      var statesFilter = GGRC.Utils.State.statusFilter(states, '');
+      var statesFilter = GGRC.Utils.State.statusFilter(states, '', modelName);
       var isStateQuery = statesFilter !== '';
       var additionalFilter = options.additional_filter ?
         [options.additional_filter, statesFilter] :

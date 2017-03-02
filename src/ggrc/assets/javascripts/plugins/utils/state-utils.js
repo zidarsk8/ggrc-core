@@ -24,7 +24,7 @@
         models: ['Assessment'],
         states: [
           'Not Started', 'In Progress', 'Ready for Review',
-          'Verified', 'Completed'
+          'Completed and Verified', 'Completed (no verification)'
         ]
       },
       {
@@ -95,13 +95,13 @@
      * Transform query for objects into query which filter them by state.
      * @param {Array} statuses - array of active statuses
      * @param {String} filterString - original query string
+     * @param {String} modelName - model name
      * @return {String} The transformed query
      */
-    function statusFilter(statuses, filterString) {
-      var filter = statuses
-        .map(function (item) {
-          return 'Status=' + item;
-        }).join(' Or ');
+    function statusFilter(statuses, filterString, modelName) {
+      var filter = modelName === 'Assessment' ?
+        buildAssessmentFilter(statuses) :
+        buildStatusesFilterString(statuses);
 
       filterString = filterString || '';
       if (filter !== '') {
@@ -112,6 +112,61 @@
       }
 
       return filterString;
+    }
+
+    /**
+     * Build statuses filter string
+     * @param {Array} statuses - array of active statuses
+     * @return {String} statuses filter
+     */
+    function buildStatusesFilterString(statuses) {
+      return statuses.map(function (item) {
+        return 'Status=' + item;
+      }).join(' Or ');
+    }
+
+    /**
+     * Build statuses filter for Assessment model
+     * @param {Array} statuses - array of active statuses
+     * @return {String} statuses filter
+     */
+    function buildAssessmentFilter(statuses) {
+      // statuses wrapped in quotes
+      var verifiedIndex = statuses.indexOf('"Completed and Verified"');
+      var completedIndex = statuses.indexOf('"Completed (no verification)"');
+      var isVerified = false;
+      var filter;
+
+      // copy array. Do not change original
+      statuses = statuses.slice();
+
+      // do not update statuses
+      if (verifiedIndex === -1 && completedIndex === -1) {
+        return buildStatusesFilterString(statuses);
+      }
+
+      if (verifiedIndex > -1 && completedIndex > -1) {
+        // server doesn't know about "Completed (no verification)"
+        // we replace it with "Completed"
+        statuses.splice(completedIndex, 1, '"Completed"');
+
+        // database doesn't have "Verified" status
+        // remove it
+        statuses.splice(verifiedIndex, 1);
+
+        return buildStatusesFilterString(statuses);
+      }
+
+      if (completedIndex > -1 && verifiedIndex === -1) {
+        statuses.splice(completedIndex, 1, '"Completed"');
+      } else if (verifiedIndex > -1 && completedIndex === -1) {
+        isVerified = true;
+        statuses.splice(verifiedIndex, 1);
+        statuses.push('"Completed"');
+      }
+
+      filter = buildStatusesFilterString(statuses);
+      return filter + ' AND verified=' + isVerified;
     }
 
     /**
