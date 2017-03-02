@@ -800,7 +800,7 @@ class QueryHelper(object):
       if callable(filter_by):
         return filter_by(predicate)
       else:
-        attr = check_resolve_attributes(object_class, key)
+        attr = getattr(object_class, key, None)
         if attr:
           return predicate(attr)
         else:
@@ -810,17 +810,6 @@ class QueryHelper(object):
                                                   tgt_class),
                            self._build_expression(exp["right"], object_class,
                                                   tgt_class))
-
-    def check_resolve_attributes(object_class, key):
-      """ Resolve conflict when key exists in obj_cls attribute as
-          well as in custom attribute definitions
-      """
-      if key in self.attr_name_map.get(object_class, {}):
-        cad = []
-        if hasattr(object_class, 'get_custom_attribute_definitions'):
-          cad = [obj.title.lower() for obj in object_class.get_custom_attribute_definitions()]
-        return None if key in cad else getattr(object_class, key, None)
-      return None
 
     def text_search(text):
       """Filter by fulltext search.
