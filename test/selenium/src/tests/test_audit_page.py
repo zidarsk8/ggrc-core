@@ -10,13 +10,49 @@ import pytest
 
 from lib import base
 from lib.constants import messages
-from lib.entities.entities_factory import AsmtTmplFactory, AsmtFactory
-from lib.service.webui_service import (AsmtTmplsService, AsmtsService,
-                                       ControlsService)
+from lib.entities.entities_factory import (
+    AuditsFactory, AssessmentTemplatesFactory, AssessmentsFactory)
+from lib.service.webui_service import (
+    AuditsService, AssessmentTemplatesService, AssessmentsService,
+    ControlsService, IssuesService, ProgramsService)
 
 
 class TestAuditPage(base.Test):
-  """Tests for the audit page."""
+  """Tests for audit page."""
+
+  @pytest.fixture(scope="function")
+  def create_and_clone_audit(
+      self, new_program_rest, new_control_rest, map_control_to_program_rest,
+      new_audit_rest, new_asmt_rest, new_asmt_tmpl_rest, new_issue_rest,
+      map_issue_to_audit_rest, selenium
+  ):
+    """Create Audit with clonable and non clonable objects via REST API and
+    clone it with them via UI.
+    Preconditions:
+    - Program, Control created via REST API.
+    - Control mapped to Program via REST API.
+    - Audit created under Program via REST API.
+    - Assessment, Assessment Template, Issue created under Audit via REST API.
+    - Issue mapped to Audit via REST API.
+    """
+    # pylint: disable=too-many-locals
+    audit = new_audit_rest[0]
+    asmt_tmpl = new_asmt_tmpl_rest[0]
+    expected_audit = AuditsFactory().clone(audit=audit)[0]
+    expected_asmt_tmpl = AssessmentTemplatesFactory().clone(
+        asmt_tmpl=asmt_tmpl)[0]
+    expected_control = new_control_rest
+    expected_program = new_program_rest
+    actual_audit = (
+        AuditsService(selenium).clone_via_info_widget_get_obj(
+            audit_obj=audit))
+    return {"audit": audit, "expected_audit": expected_audit,
+            "actual_audit": actual_audit, "asmt": new_asmt_rest[0],
+            "issue": new_issue_rest[0], "asmt_tmpl": asmt_tmpl,
+            "expected_asmt_tmpl": expected_asmt_tmpl,
+            "control": new_control_rest, "expected_control": expected_control,
+            "program": new_program_rest, "expected_program": expected_program
+            }
 
   @pytest.mark.smoke_tests
   def test_asmt_tmpl_creation(self, new_audit_rest, selenium):
@@ -26,14 +62,16 @@ class TestAuditPage(base.Test):
     - Audit created under Program via REST API.
     """
     audit = new_audit_rest[0]
-    expected_asmt_tmpl = AsmtTmplFactory().create()
-    AsmtTmplsService(selenium).create_via_tree_view(
+    expected_asmt_tmpl = AssessmentTemplatesFactory().create()
+    AssessmentTemplatesService(selenium).create_via_tree_view(
         source_obj=audit, asmt_tmpl_obj=expected_asmt_tmpl)
     actual_asmt_tmpls_tab_count = (
-        AsmtTmplsService(selenium).get_count_from_tab(source_obj=audit))
+        AssessmentTemplatesService(selenium).get_count_from_tab(
+            source_obj=audit))
     assert len([expected_asmt_tmpl]) == actual_asmt_tmpls_tab_count
     actual_asmt_tmpls = (
-        AsmtTmplsService(selenium).get_objs_from_tree_view(source_obj=audit))
+        AssessmentTemplatesService(selenium).get_objs_from_tree_view(
+            source_obj=audit))
     assert [expected_asmt_tmpl] == actual_asmt_tmpls, (
         messages.ERR_MSG_FORMAT.format(
             [expected_asmt_tmpl], actual_asmt_tmpls))
@@ -46,19 +84,19 @@ class TestAuditPage(base.Test):
     - Audit created under Program via REST API.
     """
     audit = new_audit_rest[0]
-    expected_asmt = AsmtFactory().create()
-    AsmtsService(selenium).create_via_tree_view(
+    expected_asmt = AssessmentsFactory().create()
+    AssessmentsService(selenium).create_via_tree_view(
         source_obj=audit, asmt_obj=expected_asmt)
     actual_asmts_tab_count = (
-        AsmtsService(selenium).get_count_from_tab(source_obj=audit))
+        AssessmentsService(selenium).get_count_from_tab(source_obj=audit))
     assert len([expected_asmt]) == actual_asmts_tab_count
     actual_asmts = (
-        AsmtsService(selenium).get_objs_from_tree_view(source_obj=audit))
+        AssessmentsService(selenium).get_objs_from_tree_view(source_obj=audit))
     assert [expected_asmt] == actual_asmts, (
         messages.ERR_MSG_FORMAT.format([expected_asmt], actual_asmts))
 
   @pytest.mark.smoke_tests
-  def test_asmts_generation(self, map_program_to_controls_rest,
+  def test_asmts_generation(self, map_controls_to_program_rest,
                             new_controls_rest, new_asmt_tmpl_rest, selenium):
     """Check if assessments can be generated from Audit page via Assessments
     widget using assessment template and controls.
@@ -69,27 +107,27 @@ class TestAuditPage(base.Test):
     - Assessment Template created under Audit via REST API.
     """
     asmt_tmpl, audit, _ = new_asmt_tmpl_rest
-    expected_asmts = AsmtFactory().generate(
+    expected_asmts = AssessmentsFactory().generate(
         objs_under_asmt_tmpl=new_controls_rest, audit=audit)
-    AsmtsService(selenium).generate_via_tree_view(
+    AssessmentsService(selenium).generate_via_tree_view(
         source_obj=audit, asmt_tmpl_obj=asmt_tmpl,
         objs_under_asmt=new_controls_rest)
     actual_asmts_tab_count = (
-        AsmtsService(selenium).get_count_from_tab(source_obj=audit))
+        AssessmentsService(selenium).get_count_from_tab(source_obj=audit))
     assert len(expected_asmts) == actual_asmts_tab_count
     actual_asmts = (
-        AsmtsService(selenium).get_objs_from_tree_view(source_obj=audit))
+        AssessmentsService(selenium).get_objs_from_tree_view(source_obj=audit))
     assert expected_asmts == actual_asmts, (
         messages.ERR_MSG_FORMAT.format(expected_asmts, actual_asmts))
 
   @pytest.mark.smoke_tests
   def test_audit_contains_snapshotable_ver_of_control(
-      self, new_control_rest, new_program_rest, map_program_to_control_rest,
+      self, new_control_rest, new_program_rest, map_control_to_program_rest,
       new_audit_rest, update_control_rest, selenium
   ):
-    """Check via UI that Audit contains the snapshotable Control
+    """Check via UI that Audit contains snapshotable Control
     that equal to original Control under Program
-    after updated the original Control via REST API.
+    after updated original Control via REST API.
     Preconditions:
     - Program, Control created via REST API.
     - Control mapped to Program via REST API.
@@ -109,11 +147,11 @@ class TestAuditPage(base.Test):
   @pytest.mark.smoke_tests
   @pytest.mark.skipif(True, reason="Failed due JS error in app")
   def test_update_snapshotable_ver_of_control(
-      self, new_control_rest, new_program_rest, map_program_to_control_rest,
+      self, new_control_rest, new_program_rest, map_control_to_program_rest,
       new_audit_rest, update_control_rest, selenium
   ):
-    """Check via UI that Audit contains the snapshotable Control that equal to
-    updated Control under Program after updated the original Control
+    """Check via UI that Audit contains snapshotable Control that equal to
+    updated Control under Program after updated original Control
     via REST API and updated snapshotable Control to latest version via UI.
     Preconditions:
     - Program, Control created via REST API.
@@ -133,3 +171,70 @@ class TestAuditPage(base.Test):
     assert [expected_control] == actual_controls, (
         messages.ERR_MSG_FORMAT.format(
             [expected_control], actual_controls))
+
+  @pytest.mark.smoke_tests
+  def test_cloned_audit_contains_new_attrs(self, create_and_clone_audit,
+                                           selenium):
+    """Check via UI that cloned Audit contains new predicted attributes.
+    Preconditions: execution and return of fixture "create_and_clone_audit".
+    """
+    expected_audit = create_and_clone_audit["expected_audit"]
+    actual_audit = create_and_clone_audit["actual_audit"]
+    assert expected_audit == actual_audit, (
+        messages.ERR_MSG_FORMAT.format(expected_audit, actual_audit))
+
+  @pytest.mark.smoke_tests
+  def test_non_clonable_objs_donot_move_to_cloned_audit(
+      self, create_and_clone_audit, selenium
+  ):
+    """Check via UI that non clonable objects
+    Assessment, Issue do not move to cloned Audit.
+    Preconditions: execution and return of fixture "create_and_clone_audit".
+    """
+    actual_audit = create_and_clone_audit["actual_audit"]
+    actual_asmts_tab_count = (
+        AssessmentsService(selenium).get_count_from_tab(
+            source_obj=actual_audit))
+    actual_issues_tab_count = (
+        IssuesService(selenium).get_count_from_tab(source_obj=actual_audit))
+    assert actual_asmts_tab_count == 0
+    assert actual_issues_tab_count == 0
+
+  @pytest.mark.smoke_tests
+  def test_clonable_audit_related_objs_move_to_cloned_audit(
+      self, create_and_clone_audit, selenium
+  ):
+    """Check via UI that clonable audit related object
+    Assessment Template move to cloned Audit.
+    Preconditions: execution and return of fixture "create_and_clone_audit".
+    """
+    actual_audit = create_and_clone_audit["actual_audit"]
+    expected_asmt_tmpl = create_and_clone_audit["expected_asmt_tmpl"]
+    actual_asmt_tmpls = (
+        AssessmentTemplatesService(selenium).get_objs_from_tree_view(
+            source_obj=actual_audit))
+    assert [expected_asmt_tmpl] == actual_asmt_tmpls, (
+        messages.ERR_MSG_FORMAT.format(
+            [expected_asmt_tmpl], actual_asmt_tmpls))
+
+  @pytest.mark.smoke_tests
+  def test_clonable_not_audit_related_objs_move_to_cloned_audit(
+      self, create_and_clone_audit, selenium
+  ):
+    """Check via UI that clonable not audit related objects
+    Control, Program move to cloned Audit.
+    Preconditions: execution and return of fixture "create_and_clone_audit".
+    """
+    actual_audit = create_and_clone_audit["actual_audit"]
+    expected_control = create_and_clone_audit["expected_control"]
+    expected_program = create_and_clone_audit["expected_program"]
+    actual_controls = (
+        ControlsService(selenium).get_objs_from_tree_view(
+            source_obj=actual_audit))
+    actual_programs = (
+        ProgramsService(selenium).get_objs_from_tree_view(
+            source_obj=actual_audit))
+    assert [expected_control] == actual_controls, (
+        messages.ERR_MSG_FORMAT.format([expected_control], actual_controls))
+    assert [expected_program] == actual_programs, (
+        messages.ERR_MSG_FORMAT.format([expected_program], actual_programs))
