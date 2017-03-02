@@ -20,7 +20,7 @@ class TestProgramPage(base.Test):
 
   @pytest.mark.smoke_tests
   def test_object_count_updates(self, selenium, new_program_ui):
-    """Checks if the count updates in LHN after creating a new program
+    """Checks if count updates in LHN after creating new program
     object."""
     _, program_info_page = new_program_ui
     lhn_menu = dashboard.Header(selenium).open_lhn_menu().select_my_objects()
@@ -29,10 +29,10 @@ class TestProgramPage(base.Test):
 
   @pytest.mark.smoke_tests
   def test_modal_redirects(self, new_program_ui):
-    """Tests if after saving and closing the lhn_modal the app redirects to
+    """Tests if after saving and closing lhn_modal app redirects to
     the object page.
-    Generally we start at a random url. Here we verify that after saving
-    and closing the lhn_modal we're redirected to an url that contains an
+    Generally we start at random url. Here we verify that after saving
+    and closing lhn_modal we're redirected to an url that contains an
     object id.
     """
     _, program_info_page = new_program_ui
@@ -41,22 +41,22 @@ class TestProgramPage(base.Test):
 
   @pytest.mark.smoke_tests
   def test_info_tab_is_active_by_default(self, selenium, new_program_ui):
-    """Tests if after the lhn_modal is saved we're redirected and the info
+    """Tests if after lhn_modal is saved we're redirected and info
     tab is activated.
-    Because the app uses url arguments to remember the state of the page
-    (which widget is active), we can simply use the url of the created
+    Because app uses url arguments to remember state of page
+    (which widget is active), we can simply use url of created
     object.
     """
     _, program_info_page = new_program_ui
     program_info_page.navigate_to()
     horizontal_bar = widget_bar.Dashboard(selenium)
     assert (horizontal_bar.get_active_widget_name() ==
-            element.ProgramWidgetInfo.WIDGET_HEADER)
+            element.ProgramsInfoWidget().WIDGET_HEADER)
 
   @pytest.mark.smoke_tests
   def test_info_tab_contains_entered_data(self, new_program_ui):
-    """Verify that the created object contains the data we've entered
-    into the modal."""
+    """Verify that created object contains data we've entered
+    into modal."""
     modal, program_info_page = new_program_ui
     assert (test_utils.HtmlParser.parse_text(modal.ui_title.text) ==
             program_info_page.title_entered.text)
@@ -78,32 +78,32 @@ class TestProgramPage(base.Test):
 
   @pytest.mark.smoke_tests
   def test_permalink(self, selenium, new_program_ui):
-    """Verify the url is copied to clipboard."""
+    """Verify url is copied to clipboard."""
     _, program_info = new_program_ui
     selenium.get(program_info.url)
-    program_info_page = info_widget.Programs(selenium)
-    program_info_page.press_object_settings().select_get_permalink()
+    program_info_page = info_widget.ProgramsInfoWidget(selenium)
+    program_info_page.open_info_3bbs().select_get_permalink()
     # test notification alert
     base.AnimatedComponent(
         selenium, [locator.WidgetInfoProgram.ALERT_LINK_COPIED],
         wait_until_visible=True)
     # test generated link
-    modal = program_info_page.press_object_settings().select_edit()
+    modal = program_info_page.open_info_3bbs().select_edit()
     modal.ui_title.paste_from_clipboard(modal.ui_description)
     assert modal.ui_title.text == program_info_page.url
 
   @pytest.mark.smoke_tests
   def test_edit_modal(self, selenium, new_program_ui):
-    """Tests if data is saved after editing the program info page edit modal.
+    """Tests if data is saved after editing program info page edit modal.
     """
     _, program_info = new_program_ui
     selenium.get(program_info.url)
-    program_info_page = info_widget.Programs(selenium)
-    modal = program_info_page.press_object_settings().select_edit()
+    program_info_page = info_widget.ProgramsInfoWidget(selenium)
+    modal = program_info_page.open_info_3bbs().select_edit()
     test_utils.ModalNewPrograms.enter_test_data(modal)
     test_utils.ModalNewPrograms.set_start_end_dates(modal, 1, -2)
     modal.save_and_close()
-    updated_program_info_page = info_widget.Programs(selenium)
+    updated_program_info_page = info_widget.ProgramsInfoWidget(selenium)
     assert (test_utils.HtmlParser.parse_text(modal.ui_title.text) ==
             updated_program_info_page.title_entered.text)
     assert (modal.ui_description.text ==

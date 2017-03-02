@@ -1,7 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""The module provides settings for test launch
-"""
+"""Settings for tests launch."""
 # pylint: disable=too-few-public-methods
 
 

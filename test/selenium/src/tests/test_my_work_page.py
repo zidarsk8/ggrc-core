@@ -15,23 +15,23 @@ from lib.utils import conftest_utils, selenium_utils
 
 
 class TestMyWorkPage(base.Test):
-  """Tests the My Work page, a part of smoke tests, section 2."""
+  """Tests My Work page, part of smoke tests, section 2."""
 
   @pytest.mark.smoke_tests
   def test_horizontal_nav_bar_tabs(self, selenium, new_controls_rest):
-    """Tests that several objects in a widget can be deleted sequentially."""
+    """Tests that several objects in widget can be deleted sequentially."""
     selenium.get(dashboard.Dashboard.URL)
     controls_widget = dashboard.Dashboard(selenium).select_controls()
     for _ in xrange(controls_widget.member_count):
       counter = controls_widget.get_items_count()
       (controls_widget.select_nth_member(0).
-       press_object_settings().select_delete().confirm_delete())
+       open_info_3bbs().select_delete_obj().confirm_delete())
       controls_widget.wait_member_deleted(counter)
     assert generic_widget.Controls(selenium).members_listed == []
 
   @pytest.mark.smoke_tests
   def test_redirect(self, selenium):
-    """Tests if the user is redirected to the My Work page after clicking on
+    """Tests if user is redirected to My Work page after clicking on
     the my work button in user dropdown."""
     conftest_utils.navigate_to_page_with_lhn(selenium)
     dashboard.Header(selenium).open_user_list().select_my_work()
@@ -39,7 +39,7 @@ class TestMyWorkPage(base.Test):
 
   @pytest.mark.smoke_tests
   def test_lhn_stays_expanded(self, selenium):
-    """Tests if, after opening the LHN, it slides out and stays expanded."""
+    """Tests if, after opening LHN, it slides out and stays expanded."""
     conftest_utils.navigate_to_page_with_lhn(selenium)
     lhn_menu = dashboard.Header(selenium).open_lhn_menu()
     initial_position = lhn_menu.my_objects.element.location
@@ -71,15 +71,15 @@ class TestMyWorkPage(base.Test):
 
   @pytest.mark.smoke_tests
   def test_lhn_pin(self, selenium):
-    """Tests if the pin is present and if it's default state is off."""
+    """Tests if pin is present and if it's default state is off."""
     conftest_utils.navigate_to_page_with_lhn(selenium)
     lhn_menu = dashboard.Header(selenium).open_lhn_menu()
     assert lhn_menu.pin.is_activated is False
 
   @pytest.mark.smoke_tests
   def test_user_menu_checkbox(self, selenium):
-    """Tests the user menu checkbox. With that also the user menu itself is
-    tested since the model initializes all elements (and throws and
+    """Tests user menu checkbox. With that also user menu itself is
+    tested since model initializes all elements (and throws and
     exception if they're not present."""
     conftest_utils.navigate_to_page_with_lhn(selenium)
     user_list = dashboard.Header(selenium).open_user_list()

@@ -1,24 +1,22 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+"""List dashboard."""
 
 from selenium.common import exceptions
 
-from lib import base
-from lib.constants import url
-from lib.constants import locator
-from lib import environment
-from lib import decorator
-from lib.page import widget_bar
-from lib.page import lhn
+from lib import base, environment, decorator
+from lib.constants import url, locator
+from lib.page import widget_bar, lhn
 
 
 class UserList(base.Component):
+  """User list dashboard."""
   locators = locator.PageHeader
 
   def __init__(self, driver):
     super(UserList, self).__init__(driver)
-    self.button_my_work = base.Button(self._driver,
-                                      self.locators.BUTTON_MY_WORK)
+    self.button_my_work = base.Button(
+        self._driver, self.locators.BUTTON_MY_WORK)
     self.button_admin_dashboard = base.Button(
         self._driver, self.locators.BUTTON_ADMIN_DASHBOARD)
     self.button_data_import = base.Button(
@@ -34,16 +32,14 @@ class UserList(base.Component):
 
   def select_my_work(self):
     """
-    Returns:
-        widget.DataAssets
+    Return: widget.DataAssets
     """
     self.button_my_work.click()
     return Dashboard(self._driver)
 
   def select_admin_dashboard(self):
     """
-    Returns:
-        admin_dashboard.AdminDashboard
+    Return: admin_dashboard.AdminDashboard
     """
     self.button_my_work.click()
     return AdminDashboard(self._driver)
@@ -59,16 +55,16 @@ class UserList(base.Component):
     raise NotImplementedError
 
   def check_daily_email_digest(self):
-    """Checks the daily checkbox"""
+    """Checks daily checkbox."""
     self.checkbox_daily_digest.check()
 
   def uncheck_daily_email_digest(self):
-    """Unchecks the daily checkbox"""
+    """Unchecks daily checkbox."""
     self.checkbox_daily_digest.uncheck()
 
 
 class Header(base.Component):
-  """Header of the page"""
+  """Header of page dashboard."""
   locators = locator.PageHeader
 
   def __init__(self, driver):
@@ -82,27 +78,26 @@ class Header(base.Component):
     self._refresh_elements()
 
   def _refresh_elements(self):
-    self.button_dashboard = base.Button(self._driver,
-                                        self.locators.BUTTON_DASHBOARD)
-    self.button_search = base.Button(self._driver,
-                                     self.locators.BUTTON_SEARCH)
-    self.button_my_tasks = base.Button(self._driver,
-                                       self.locators.BUTTON_MY_TASKS)
+    """Refresh dashboard elements."""
+    self.button_dashboard = base.Button(
+        self._driver, self.locators.BUTTON_DASHBOARD)
+    self.button_search = base.Button(
+        self._driver, self.locators.BUTTON_SEARCH)
+    self.button_my_tasks = base.Button(
+        self._driver, self.locators.BUTTON_MY_TASKS)
     self.button_all_objects = base.Button(
         self._driver, self.locators.BUTTON_ALL_OBJECTS)
     self.toggle_user_dropdown = base.Toggle(
         self._driver, self.locators.TOGGLE_USER_DROPDOWN)
-    self.toggle_lhn_menu = base.Toggle(self._driver,
-                                       self.locators.TOGGLE_LHN)
+    self.toggle_lhn_menu = base.Toggle(
+        self._driver, self.locators.TOGGLE_LHN)
 
   def open_lhn_menu(self):
-    """Opens LHN on the Dashboard.
-    For some reason, after creating 2 objects via LHN (and clicking 2x on the
-    LHN button), the third time the toggle_lhn_menu signals it's not a part of
-    the DOM anymore. For this reason we're refreshing the elements.
-
-    Returns:
-        LhnMenu
+    """Opens LHN on Dashboard.
+    For some reason, after creating 2 objects via LHN (and clicking 2x on
+    LHN button), third time toggle_lhn_menu signals it's not part of
+    the DOM anymore. For this reason we're refreshing elements.
+    Return: LHN Menu
     """
     try:
       self.toggle_lhn_menu.toggle()
@@ -112,10 +107,8 @@ class Header(base.Component):
       return self.open_lhn_menu()
 
   def close_lhn_menu(self):
-    """Closes LHN on the Dashboard
-
-    Returns:
-        LhnMenu
+    """Closes LHN on Dashboard.
+    Return: LhnMenu
     """
     try:
       self.toggle_lhn_menu.toggle(on_el=False)
@@ -125,22 +118,21 @@ class Header(base.Component):
 
   def click_on_logo(self):
     """
-    Returns:
-        widget.DataAssets
+    Return: widget.DataAssets
     """
     raise NotImplementedError
 
   def open_user_list(self):
     """
-    Returns:
-        UserList
+    Return: UserList
     """
     self.toggle_user_dropdown.click()
     return UserList(self._driver)
 
 
 class Dashboard(widget_bar.Dashboard, Header):
-  """The main dashboard page"""
+  """Main dashboard page."""
+  # pylint: disable=abstract-method
   URL = environment.APP_URL + url.DASHBOARD
 
   def __init__(self, driver):
@@ -149,7 +141,8 @@ class Dashboard(widget_bar.Dashboard, Header):
 
 
 class AdminDashboard(widget_bar.AdminDashboard, Header):
-  """Admin dashboard page model"""
+  """Admin Dashboard page model."""
+  # pylint: disable=abstract-method
   URL = environment.APP_URL + url.ADMIN_DASHBOARD
 
   def __init__(self, driver):

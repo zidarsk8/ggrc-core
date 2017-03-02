@@ -1,13 +1,12 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Here we import all settings from config files"""
+"""Import all settings from config files."""
 
-import os
-import logging
 import ConfigParser
+import logging
+import os
 
 from lib import constants
-
 
 PROJECT_ROOT_PATH = os.path.dirname(os.path.abspath(__file__)) + "/../../../"
 VIRTENV_PATH = PROJECT_ROOT_PATH + constants.path.VIRTUALENV_DIR
@@ -15,12 +14,14 @@ LOG_PATH = PROJECT_ROOT_PATH + constants.path.LOGS_DIR
 
 
 def _get_settings(path):
+  "Get settings."
   settings = ConfigParser.ConfigParser()
   settings.read(path)
   return settings
 
 
 def _set_loggers(settings):
+  "Set loggers."
   logging_level = int(settings.get(
       constants.settings.Section.LOGGING, constants.settings.Values.LEVEL))
   selenium_logger = logging.getLogger(constants.log.SELENIUM_REMOTE_CONNECTION)
@@ -28,6 +29,7 @@ def _set_loggers(settings):
 
 
 def _get_base_url(settings):
+  "Get base URL."
   base_url = settings.get(
       constants.settings.Section.PYTEST, constants.settings.Values.BASE_URL)
   return base_url if base_url.endswith("/") else base_url + "/"

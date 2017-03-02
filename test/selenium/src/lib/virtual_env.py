@@ -1,16 +1,18 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+"Virtual environment."
 
 import logging
 import subprocess
+
 from lib import constants
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 def activate(project_root_path):
+  "Activate virtual environment."
   logger.info("Activating virtual environment")
-
   activate_this_path = project_root_path \
       + constants.path.VIRTUALENV_DIR \
       + constants.path.BIN_DIR \
@@ -19,13 +21,12 @@ def activate(project_root_path):
 
 
 def update_virtenv(output_option, path_to_requirements):
+  "Update virtual environment."
   logger.info("Updating virtual environment packages")
-
   exit_code = subprocess.call(
       ["pip", "install", "--upgrade", "-r", path_to_requirements],
       stdout=output_option
   )
-
   if exit_code != 0:
-    raise EnvironmentError("There was a problem when installing "
+    raise EnvironmentError("There was problem when installing "
                            "requirements")
