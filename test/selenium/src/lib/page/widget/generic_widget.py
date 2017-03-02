@@ -304,7 +304,7 @@ class Controls(Widget):
   info_widget_cls = info_widget.ControlsInfoWidget
   _locator_widget = locator.WidgetBar.CONTROLS
   _locator_filter = locator.WidgetControls
-  _controls_fields = element.ControlModalSetVisibleFields().DEFAULT_SET_FIELDS
+  _controls_fields = element.ControlsModalSetVisibleFields().DEFAULT_SET_FIELDS
 
   URL = "{source_obj_url}" + _locator_filter.widget_name
 

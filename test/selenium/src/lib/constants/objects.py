@@ -67,6 +67,27 @@ def _get_singular(plurals):
   return singulars
 
 
+def _get_plural(singulars):
+  """
+ Return: list of basestring: Capitalized object names in plural form
+ """
+  plurals = []
+  for name in singulars:
+    name = name.lower()
+    if name == "people":
+      plural = PEOPLE
+    elif name == "policy":
+      plural = POLICIES
+    elif name == "process":
+      plural = PROCESSES
+    elif name == "facility":
+      plural = FACILITIES
+    else:
+      plural = name + "s"
+    plurals.append(plural.upper())
+  return plurals
+
+
 def get_singular(plural):
   """Transform object name to singular and lower form.
  Example: risk_assessments -> risk_assessment

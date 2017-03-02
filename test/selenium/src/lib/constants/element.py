@@ -301,7 +301,7 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
  """
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      CommonControl.CONTROL)
+      CommonControls.CONTROL)
   OWNER = TransformationSetVisibleFields.OWNER
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT

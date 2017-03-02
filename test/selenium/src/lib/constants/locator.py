@@ -871,6 +871,7 @@ class BaseWidgetGeneric(object):
     """For sharing parametrized class attributes we simply define how
     class should look like. Note that same functionality can be
     implemented using properties though with more code."""
+    # pylint: disable=invalid-name
     def __init__(cls, *args):
       _FILTER = "#{}_widget .sticky-filter"
       _FILTER_BUTTON = _FILTER + " .tree-filter__button"
