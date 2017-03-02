@@ -1157,7 +1157,10 @@
     saveTreeStates: function (selectedStates) {
       var stateToSave = [];
 
-      selectedStates = selectedStates || [];
+      // in this case we save previous states
+      if (!selectedStates) {
+        return;
+      }
 
       selectedStates.forEach(function (state) {
         // wrap in quotes
