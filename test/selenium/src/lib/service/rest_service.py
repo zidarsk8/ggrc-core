@@ -1,7 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""The module provides services for creating and manipulating GGRC's objects
-via REST API."""
+"""Create and manipulate objects via REST API."""
 # pylint: disable=too-few-public-methods
 
 import json
@@ -10,8 +9,8 @@ import re
 from lib import environment
 from lib.constants import url, objects
 from lib.entities.entities_factory import (
-    ProgramFactory, AuditFactory, AsmtTmplFactory, AsmtFactory, ControlFactory,
-    PersonFactory)
+  ProgramsFactory, AuditsFactory, AssessmentTemplatesFactory,
+  AssessmentsFactory, ControlsFactory, IssuesFactory, PersonsFactory)
 from lib.service.rest.client import RestClient
 
 
@@ -39,7 +38,7 @@ class BaseService(object):
 
   @staticmethod
   def get_obj_attrs(response):
-    """Form the dictionary of object's attributes (dict's items)
+    """Form dictionary of object's attributes (dict's items)
     from server response.
     """
     def get_items_from_obj_el(obj_el):
@@ -111,13 +110,13 @@ class ControlsService(BaseService):
   ENDPOINT = url.CONTROLS
 
   def create(self, count):
-    """Create a new Controls objects via REST API and return created."""
-    return self.create_list_objs(factory=ControlFactory(), count=count)
+    """Create new Controls objects via REST API and return created."""
+    return self.create_list_objs(factory=ControlsFactory(), count=count)
 
   def update(self, objs):
     """Update an existing Controls objects via REST API and return updated."""
     return self.update_list_objs(
-        list_old_objs=[objs], factory=ControlFactory())
+        list_old_objs=[objs], factory=ControlsFactory())
 
 
 class ProgramsService(BaseService):
@@ -125,8 +124,8 @@ class ProgramsService(BaseService):
   ENDPOINT = url.PROGRAMS
 
   def create(self, count):
-    """Create a new Programs objects via REST API and return created."""
-    return self.create_list_objs(factory=ProgramFactory(), count=count)
+    """Create new Programs objects via REST API and return created."""
+    return self.create_list_objs(factory=ProgramsFactory(), count=count)
 
 
 class AuditsService(BaseService):
@@ -134,22 +133,22 @@ class AuditsService(BaseService):
   ENDPOINT = url.AUDITS
 
   def create(self, count, program):
-    """Create and return a new Audits objects via REST API and return created.
+    """Create and return new Audits objects via REST API and return created.
     """
-    return self.create_list_objs(factory=AuditFactory(), count=count,
+    return self.create_list_objs(factory=AuditsFactory(), count=count,
                                  program=program.__dict__)
 
 
-class AsmtTmplsService(BaseService):
+class AssessmentTemplatesService(BaseService):
   """Service for working with Assessment Templates entities."""
   ENDPOINT = url.ASSESSMENT_TEMPLATES
 
   def create(self, count, audit):
-    """Create a new Assessment Templates objects via REST API and return
+    """Create new Assessment Templates objects via REST API and return
     created.
     """
-    return self.create_list_objs(factory=AsmtTmplFactory(), count=count,
-                                 audit=audit.__dict__)
+    return self.create_list_objs(factory=AssessmentTemplatesFactory(),
+                                 count=count, audit=audit.__dict__)
 
 
 class AssessmentsService(BaseService):
@@ -157,9 +156,19 @@ class AssessmentsService(BaseService):
   ENDPOINT = url.ASSESSMENTS
 
   def create(self, count, obj, audit):
-    """Create a new Assessments objects via REST API and return created."""
-    return self.create_list_objs(factory=AsmtFactory(), count=count,
+    """Create new Assessments objects via REST API and return created."""
+    return self.create_list_objs(factory=AssessmentsFactory(), count=count,
                                  object=obj.__dict__, audit=audit.__dict__)
+
+
+class IssuesService(BaseService):
+  """Service for working with Issues entities."""
+  ENDPOINT = url.ISSUES
+
+  def create(self, count, audit):
+    """Create new Issues objects via REST API and return created."""
+    return self.create_list_objs(factory=IssuesFactory(), count=count,
+                                 audit=audit.__dict__)
 
 
 class RelationshipsService(BaseService):
@@ -167,7 +176,7 @@ class RelationshipsService(BaseService):
   ENDPOINT = url.RELATIONSHIPS
 
   def create(self, src_obj, dest_objs):
-    """Create a relationship from source to destination objects and
+    """Create relationship from source to destination objects and
     return created.
     """
     if isinstance(dest_objs, list):
@@ -185,7 +194,7 @@ class ObjectsOwnersService(BaseService):
   """Service for assigning owners to entities."""
   ENDPOINT = url.OBJECT_OWNERS
 
-  def create(self, objs, owner=PersonFactory().default()):
+  def create(self, objs, owner=PersonsFactory().default()):
     """Assign of an owner to objects."""
     if isinstance(objs, list):
       return [
@@ -203,7 +212,7 @@ class ObjectsInfoService(BaseService):
   ENDPOINT = url.QUERY
 
   def get_total_count(self, obj_name):
-    """Get and return a total count of existing objects in system
+    """Get and return total count of existing objects in system
     according to type of object.
     """
     resp = self.client.create_object(type=self._count, object_name=obj_name)
