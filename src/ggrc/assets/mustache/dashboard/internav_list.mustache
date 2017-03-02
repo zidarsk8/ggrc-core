@@ -113,11 +113,11 @@
 
 {{{render_hooks 'ObjectNav.Actions'}}}
 
-{{#if_page_type 'audits'}}
-  <li class="hide-menu {{#if isMenuVisible}}visible{{/if}}">
+{{#if dividedTabsMode}}
+  <li class="not-priority-hide {{#if isMenuVisible}}visible{{/if}}">
       <i class="fa fa-angle-{{#if isMenuVisible}}right{{else}}left{{/if}}"></i>
       {{^if isMenuVisible}}
-      <span>Show Audit Scope</span>
+      <span>{{hideTabTitle}}</span>
       {{/if}}
   </li>
-{{/if_page_type}}
+{{/if}}

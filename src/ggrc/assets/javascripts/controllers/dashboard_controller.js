@@ -283,6 +283,7 @@
       instance: null,
       isMenuVisible: true,
       addTabTitle: 'Add Tab',
+      hideTabTitle: 'Hide',
       dividedTabsMode: false,
       priorityTabs: null
     }
@@ -312,6 +313,7 @@
             if (isAuditScope) {
               this.element.addClass(this.options.instance.type.toLowerCase());
               this.options.attr('addTabTitle', 'Add Scope');
+              this.options.attr('hideTabTitle', 'Show Audit Scope');
               this.options.attr('dividedTabsMode', true);
               this.options.attr('priorityTabs', 4);
             }
@@ -648,9 +650,11 @@
         $dropdown.removeClass('one-item');
       }
     },
-    '.hide-menu click': function (el) {
-      var $hiddenArea = this.element
-        .find('li:nth-child(n+5):not(:last-child)');
+    '.not-priority-hide click': function (el) {
+      var count = this.options.attr('priorityTabs') + 1;
+      var hiddenAreaSelector = 'li:nth-child(n+' + count + '):not(:last-child)';
+      var $hiddenArea = this.element.find(hiddenAreaSelector);
+
       this.options.attr('isMenuVisible', !this.options.isMenuVisible);
       if (this.options.isMenuVisible) {
         $hiddenArea.show();
