@@ -85,7 +85,7 @@
           object: data.join_object_type,
           type: data.join_option_type,
           relevantTo: [{
-            eadOnly: true,
+            readOnly: true,
             type: data.snapshot_scope_type,
             id: data.snapshot_scope_id
           }]

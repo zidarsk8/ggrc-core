@@ -1,8 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Module for create, description, representation and equal of
-business entities.
-"""
+"""Module for create, description, representation and equal of entities."""
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
 
@@ -12,20 +10,21 @@ class Entity(object):
   # pylint: disable=invalid-name
   # pylint: disable=redefined-builtin
 
-  def __init__(self, title=None, id=None, href=None, type=None):
+  def __init__(self, title=None, id=None, href=None, url=None, type=None):
     self.title = title
     self.id = id
     self.href = href
+    self.url = url
     self.type = type
 
   @staticmethod
-  def attrs_names_of_all_entities():
+  def attrs_names_all_entities():
     """Get list of the all possible unique entities attributes' names."""
-    all_entities_classes = [
+    all_entities_cls = [
         Person, CustomAttribute, Program, Control, Audit, Asmt, AsmtTmpl]
     all_entities_attrs_names = [
         entity_class().__dict__.keys() for
-        entity_class in all_entities_classes]
+        entity_class in all_entities_cls]
     unique_entities_attrs_names = {
         val for sublist in all_entities_attrs_names for val in sublist}
     return unique_entities_attrs_names
@@ -41,10 +40,11 @@ class Person(Entity):
     self.authorizations = authorizations
 
   def __repr__(self):
-    return ("object: {type}, name: {name}, id: {id}, href: {href}, "
-            "email: {email}, authorizations: {authorizations}").format(
+    return ("object_type: {type}, name: {name}, id: {id}, href: {href}, "
+            "url: {url}, email: {email}, "
+            "authorizations: {authorizations}").format(
         type=self.type, name=self.title, id=self.id, href=self.href,
-        email=self.email, authorizations=self.authorizations)
+        url=self.url, email=self.email, authorizations=self.authorizations)
 
 
 class CustomAttribute(object):
@@ -95,17 +95,18 @@ class Program(Entity):
     self.last_update = last_update
 
   def __repr__(self):
-    return ("object: {type}, title: {title}, id: {id}, href: {href}, "
-            "manager: {manager}, primary contact: {pr_contact}, code: {code},"
-            "state: {state}, last update: {last_update}").format(
+    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
+            "url: {url}, manager: {manager}, primary contact: {pr_contact}, "
+            "code: {code}, state: {state}, last update: {last_update}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        manager=self.manager, pr_contact=self.pr_contact, code=self.code,
-        state=self.state, last_update=self.last_update)
+        url=self.url, manager=self.manager, pr_contact=self.pr_contact,
+        code=self.code, state=self.state, last_update=self.last_update)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.manager == other.manager and
-            self.state == other.state and self.pr_contact == other.pr_contact)
+            self.title == other.title and self.code == other.code and
+            self.manager == other.manager and self.state == other.state and
+            self.pr_contact == other.pr_contact)
 
 
 class Control(Entity):
@@ -122,17 +123,18 @@ class Control(Entity):
     self.last_update = last_update
 
   def __repr__(self):
-    return ("object: {type}, title: {title}, id: {id}, href: {href}, "
-            "owner: {owner}, primary contact: {pr_contact}, code: {code},"
-            "state: {state}, last update: {last_update}").format(
+    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
+            "url: {url}, owner: {owner}, primary contact: {pr_contact}, "
+            "code: {code}, state: {state}, last update: {last_update}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        owner=self.owner, pr_contact=self.pr_contact, code=self.code,
-        state=self.state, last_update=self.last_update)
+        url=self.url, owner=self.owner, pr_contact=self.pr_contact,
+        code=self.code, state=self.state, last_update=self.last_update)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.state == other.state and
-            self.owner == other.owner and self.pr_contact == other.pr_contact)
+            self.title == other.title and self.code == other.code and
+            self.state == other.state and self.owner == other.owner and
+            self.pr_contact == other.pr_contact)
 
 
 class Audit(Entity):
@@ -150,16 +152,17 @@ class Audit(Entity):
 
   def __repr__(self):
     return (
-        "object: {type}, title: {title}, id: {id}, href: {href}, "
-        "program: {program}, audit lead: {audit_lead}, code: {code},"
-        "status: {status}, last update: {last_update}").format(
+        "object_type: {type}, title: {title}, id: {id}, href: {href}, "
+        "url: {url}, program: {program}, audit lead: {audit_lead}, "
+        "code: {code}, status: {status}, last update: {last_update}").format(
             type=self.type, title=self.title, id=self.id, href=self.href,
-            program=self.program, audit_lead=self.audit_lead, code=self.code,
-            status=self.status, last_update=self.last_update)
+            url=self.url, program=self.program, audit_lead=self.audit_lead,
+            code=self.code, status=self.status, last_update=self.last_update)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.program == other.program and
+            self.title == other.title and self.code == other.code and
+            self.program == other.program and
             self.audit_lead == other.audit_lead and
             self.status == other.status)
 
@@ -181,24 +184,25 @@ class AsmtTmpl(Entity):
     self.last_update = last_update
 
   def __repr__(self):
-    return ("object: {type}, title: {title}, id: {id}, href: {href}, "
-            "audit: {audit}, assessment objects: {asmt_objects}, "
+    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
+            "url: {url}, audit: {audit}, assessment objects: {asmt_objects}, "
             "default assessors: {def_assessors}, "
             "default verifiers: {def_verifiers}, code: {code}, "
             "last update: {last_update}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        audit=self.audit, asmt_objects=self.asmt_objects,
+        url=self.url, audit=self.audit, asmt_objects=self.asmt_objects,
         def_assessors=self.def_assessors, def_verifiers=self.def_verifiers,
         code=self.code, last_update=self.last_update)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title)
+            self.title == other.title and self.code == other.code)
 
 
 class Asmt(Entity):
   """Class that represent model for Assessment."""
-  # pylint: disable=too-many-instance-attributes
+  # pylint: disable=too-many-instance-attribute
+  # pylint: disable=redefined-builtin
   __hash__ = None
 
   def __init__(self, object=None, audit=None, creators=None, assignees=None,
@@ -217,17 +221,18 @@ class Asmt(Entity):
 
   def __repr__(self):
     return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
-            "object: {object}, audit: {audit}, creators: {creators}, "
-            "assignees: {assignees}, pr_contact: {pr_contact}, "
-            "is_verified: {is_verified}, code: {code}, state: {state}, "
-            "last update: {last_update}").format(
+            "url: {url}, object: {object}, audit: {audit}, "
+            "creators: {creators}, assignees: {assignees}, "
+            "pr_contact: {pr_contact}, is_verified: {is_verified}, "
+            "code: {code}, state: {state}, last update: {last_update}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        object=self.object, audit=self.audit, creators=self.creators,
-        assignees=self.assignees, pr_contact=self.pr_contact,
-        is_verified=self.is_verified, code=self.code, state=self.state,
-        last_update=self.last_update)
+        url=self.url, object=self.object, audit=self.audit,
+        creators=self.creators, assignees=self.assignees,
+        pr_contact=self.pr_contact, is_verified=self.is_verified,
+        code=self.code, state=self.state, last_update=self.last_update)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.state == other.state and
+            self.title == other.title and self.code == other.code and
+            self.state == other.state and
             self.is_verified == other.is_verified)

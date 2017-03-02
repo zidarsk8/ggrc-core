@@ -13,13 +13,14 @@ from lib.utils import selenium_utils
 class BaseModal(base.Modal):
   """Base class for the edit modal."""
   _locator_ui_title = locator.ModalCreateNewObject.UI_TITLE
+  _locator_ui_code = locator.ModalCreateNewObject.UI_CODE
   locator_button_save = locator.ModalCreateNewObject.BUTTON_SAVE_AND_CLOSE
 
   def __init__(self, driver):
     super(BaseModal, self).__init__(driver)
     self.button_save_and_close = base.Button(driver, self.locator_button_save)
-    self.ui_title = base.TextInputField(self._driver,
-                                        self._locator_ui_title)
+    self.ui_title = base.TextInputField(self._driver, self._locator_ui_title)
+    self.ui_code = base.TextInputField(self._driver, self._locator_ui_code)
 
   def enter_title(self, text):
     """
@@ -28,11 +29,18 @@ class BaseModal(base.Modal):
     """
     self.ui_title.enter_text(text)
 
+  def enter_code(self, text):
+    """
+    Args:
+        text (basestring)
+    """
+    self.ui_code.enter_text(text)
+
 
 class SetFieldsModal(base.Modal):
   """Class representing a base set visible fields modal."""
   _locators = locator.ModalSetVisibleFields
-  button_save_set_fields = None
+  button_set_fields = None
   fields_elements = None
 
   def __init__(self, driver, widget_name):
@@ -46,26 +54,27 @@ class SetFieldsModal(base.Modal):
 
   def set_visible_fields(self, fields):
     """Set visible fields to display objects on the tree view."""
-    _locator_modal_fields = (By.CSS_SELECTOR, self._locators.FIELDS_MODAL.
-                             format(self.widget_name))
-    _locator_fields_titles = (By.CSS_SELECTOR, locator.ModalSetVisibleFields.
-                              FIELDS_TITLES.format(self.widget_name))
-    _locator_fields_checkboxes = (By.CSS_SELECTOR,
-                                  locator.ModalSetVisibleFields.
-                                  FIELDS_CHECKBOXES.format(self.widget_name))
-    selenium_utils.get_when_visible(self._driver, _locator_modal_fields)
-    self.fields_elements = base.Checkboxes(
-        self._driver, _locator_fields_titles, _locator_fields_checkboxes)
+    locator_modal_fields = (By.CSS_SELECTOR,
+                            self._locators.MODAL.format(self.widget_name))
+    locator_fields_titles = (
+        By.CSS_SELECTOR,
+        locator.ModalSetVisibleFields.FIELDS_TITLES.format(self.widget_name))
+    locator_fields_checkboxes = (
+        By.CSS_SELECTOR,
+        (locator.ModalSetVisibleFields.FIELDS_CHECKBOXES.
+         format(self.widget_name)))
+    selenium_utils.get_when_visible(self._driver, locator_modal_fields)
+    self.fields_elements = base.ListCheckboxes(
+        self._driver, locator_fields_titles, locator_fields_checkboxes)
     self.fields_elements.select_by_titles(fields)
 
   def save_set_visible_fields(self):
     """Save visible fields to display objects on the tree view."""
-    _locator_save_set_fields = (By.CSS_SELECTOR,
-                                self._locators.BUTTON_SAVE_SET_FIELDS.
-                                format(self.widget_name))
-    self.button_save_set_fields = base.Button(self._driver,
-                                              _locator_save_set_fields)
-    self.button_save_set_fields.click()
+    _locator_set_fields = (
+        By.CSS_SELECTOR,
+        self._locators.BUTTON_SET_FIELDS.format(self.widget_name))
+    self.button_set_fields = base.Button(self._driver, _locator_set_fields)
+    self.button_set_fields.click()
 
   def set_and_save_visible_fields(self, fields):
     """Set and save visible fields to display objects on the tree view."""
@@ -78,7 +87,6 @@ class ProgramsModal(BaseModal):
   # pylint: disable=too-many-instance-attributes
 
   _locators = locator.ModalCreateNewProgram
-  _locator_ui_title = locator.ModalCreateNewProgram.UI_TITLE
 
   def __init__(self, driver):
     super(ProgramsModal, self).__init__(driver)
@@ -155,12 +163,12 @@ class ProgramsModal(BaseModal):
   def filter_and_select_primary_contact(self, text):
     """Enters the text into the primary contact element"""
     # pylint: disable=invalid-name
-    self.ui_primary_contact.filter_and_select_first(text)
+    self.ui_primary_contact.filter_and_select_el_by_text(text)
 
   def filter_and_select_secondary_contact(self, text):
     """Enters the text into the secondary contact element"""
     # pylint: disable=invalid-name
-    self.ui_secondary_contact.filter_and_select_first(text)
+    self.ui_secondary_contact.filter_and_select_el_by_text(text)
 
   def enter_program_url(self, url):
     """Enters the program url for this program object
@@ -367,9 +375,10 @@ class AsmtTmplModal(BaseModal):
   def __init__(self, driver):
     super(AsmtTmplModal, self).__init__(driver)
 
-  def fill_minimal_data(self, title):
+  def fill_minimal_data(self, title, code):
     """Enter minimal data to create assessment template."""
     self.enter_title(title)
+    self.enter_code(code)
 
 
 class AsmtsModal(BaseModal):
@@ -379,9 +388,10 @@ class AsmtsModal(BaseModal):
   def __init__(self, driver):
     super(AsmtsModal, self).__init__(driver)
 
-  def fill_minimal_data(self, title):
+  def fill_minimal_data(self, title, code):
     """Enter minimal data to create assessment."""
     self.enter_title(title)
+    self.enter_code(code)
 
 
 class AsmtsModalGenerate(base.Modal):
@@ -400,7 +410,7 @@ class AsmtsModalGenerate(base.Modal):
         self._driver,
         self._locators.SELECT_ASMT_TMPL_OPTIONS,
         self._locators.SELECT_ASMT_TMPL_DROPDOWN)
-    self.asmt_tmpl_element.find_and_select_first(asmt_tmpl_title)
+    self.asmt_tmpl_element.find_and_select_el_by_text(asmt_tmpl_title)
 
   def search_objects(self):
     """Click to the button to search objects according set filters."""
@@ -411,10 +421,10 @@ class AsmtsModalGenerate(base.Modal):
   def select_objs_under(self, controls_titles):
     """Click checkboxes (Select objects) which was found after search
     was completed."""
-    self.controls_elements = base.Checkboxes(
+    self.controls_elements = base.ListCheckboxes(
         self._driver,
-        self._locators.FOUNDED_OBJECTS_TITLES,
-        self._locators.FOUNDED_OBJECTS_CHECKBOXES)
+        self._locators.FOUND_OBJECTS_TITLES,
+        self._locators.FOUND_OBJECTS_CHECKBOXES)
     self.controls_elements.select_by_titles(controls_titles)
 
   def fill_minimal_data(self, asmt_tmpl, controls):

@@ -131,14 +131,22 @@ class TestBasicCsvImport(TestCase):
 
     Checks for fields being updarted correctly
     """
-    messages = ("block_errors", "block_warnings", "row_errors", "row_warnings")
 
     filename = "pci_program.csv"
     response = self.import_file(filename)
 
-    for response_block in response:
-      for message in messages:
-        self.assertEqual(set(), set(response_block[message]))
+    self._check_csv_response(response, {
+        "Control": {
+            "row_warnings": {
+                errors.EXPORT_ONLY_WARNING.format(
+                    line=9, column_name="map:audit"),
+                errors.EXPORT_ONLY_WARNING.format(
+                    line=10, column_name="map:audit"),
+                errors.EXPORT_ONLY_WARNING.format(
+                    line=11, column_name="map:audit"),
+            }
+        }
+    })
 
     assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
     audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
@@ -150,9 +158,7 @@ class TestBasicCsvImport(TestCase):
     filename = "pci_program_update.csv"
     response = self.import_file(filename)
 
-    for response_block in response:
-      for message in messages:
-        self.assertEqual(set(), set(response_block[message]))
+    self._check_csv_response(response, {})
 
     assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
     audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()

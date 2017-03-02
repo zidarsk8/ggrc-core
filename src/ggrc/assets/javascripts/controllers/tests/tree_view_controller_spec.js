@@ -82,6 +82,17 @@ describe('CMS.Controllers.TreeView', function () {
       expect(result).toBeTruthy();
     });
 
+    it('right relationship for Snapshot', function () {
+      var result;
+
+      relationship.source = {type: 'bar'};
+      relationship.destination = {type: 'Snapshot'};
+
+      result = method(relationship, 'foo');
+
+      expect(result).toBeTruthy();
+    });
+
     it('right relationship without source', function () {
       var result;
 
@@ -109,5 +120,50 @@ describe('CMS.Controllers.TreeView', function () {
 
       expect(result).toBeFalsy();
     });
+  });
+
+  describe('update_header() method', function () {
+    beforeEach(function () {
+      Ctrl.prototype.options = new can.Map({
+        model: {
+          shortName: 'foo'
+        },
+        list: []
+      });
+      Ctrl.prototype.element = $('<div></div>');
+      Ctrl.prototype.display_prefs = {
+        setFilterHidden: function () {},
+        save: function () {}
+      };
+
+      spyOn(Ctrl.prototype, 'update_header');
+    });
+
+    it('update_header() should be called after call of init_view()',
+      function () {
+        var initView = Ctrl.prototype.init_view.bind(Ctrl.prototype);
+
+        initView();
+        expect(Ctrl.prototype.update_header.calls.count()).toEqual(1);
+      }
+    );
+
+    it('update_header() should be called after call of widget_shown()',
+      function () {
+        var widgetShown = Ctrl.prototype.widget_shown.bind(Ctrl.prototype);
+
+        widgetShown();
+        expect(Ctrl.prototype.update_header.calls.count()).toEqual(1);
+      }
+    );
+
+    it('update_header() should be called after call of add_child_lists()',
+      function () {
+        var addChildLists = Ctrl.prototype.add_child_lists.bind(Ctrl.prototype);
+
+        addChildLists([]);
+        expect(Ctrl.prototype.update_header.calls.count()).toEqual(1);
+      }
+    );
   });
 });

@@ -1,6 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Locators for all the elements."""
+"""Locators for all elements."""
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-lines
 
@@ -11,11 +11,16 @@ from lib.constants import objects, url
 
 class Common(object):
   """Common locators."""
-
   # modal
   MODAL_GENEATE = ".modal-selector"
   MODAL_CREATE = ".modal-wide"
-  # attribute names used amongst classes
+  MODAL_CONFIRM = ".modal.hide"
+  # dropdown
+  DROPDOWN_MENU = ".dropdown-menu"
+  # tree
+  TREE_LIST = ".tree-action-list"
+  TREE_HEADER = ".tree-header"
+  # base
   BUTTON = "BUTTON_"
   BUTTON_CREATE_NEW = "BUTTON_CREATE_NEW_"
   COUNT = "COUNT_"
@@ -25,14 +30,12 @@ class Common(object):
 
 
 class Login(object):
-  """All locators for the login page"""
-
+  """Locators for the Login page."""
   BUTTON_LOGIN = (By.CSS_SELECTOR, "a.btn.btn-large.btn-info")
 
 
 class PageHeader(object):
-  """All locators for the dashboard header (has the same name as the element"""
-
+  """Locators for the Dashboard header."""
   TOGGLE_LHN = (By.CSS_SELECTOR, ".lhn-trigger")
   BUTTON_DASHBOARD = (By.CSS_SELECTOR, '.header-content .to-my-work['
                                        'href="/dashboard"]')
@@ -47,32 +50,36 @@ class PageHeader(object):
   BUTTON_HELP = (By.CSS_SELECTOR, '.header-content [id="#page-help"]')
 
   GENERIC_SUCCESS_ALERT = (By.CSS_SELECTOR, ".alert-success")
-
   # dropdown toggle
+  USER_MENU = ".menu " + Common.DROPDOWN_MENU
   BUTTON_ADMIN_DASHBOARD = (
-      By.CSS_SELECTOR, '.dropdown-menu [href="/admin#people_list_widget"]')
-  BUTTON_MY_WORK = (By.CSS_SELECTOR, '.dropdown-menu [href="/dashboard"]')
-  BUTTON_DATA_IMPORT = (By.CSS_SELECTOR, '.dropdown-menu [href="/import"]')
-  BUTTON_DATA_EXPORT = (By.CSS_SELECTOR, '.dropdown-menu [href="/export"]')
-  BUTTON_LOGOUT = (By.CSS_SELECTOR, '.dropdown-menu [href="/logout"]')
-  NOTIFICATIONS = (By.CSS_SELECTOR, '.menu .user-dropdown .notify-wrap')
-  CHECKBOX_DAILY_DIGEST = (By.CSS_SELECTOR, '.menu .user-dropdown input')
-  CHECKBOX_DISABLED = (By.CSS_SELECTOR, '.menu .user-dropdown input.disabled')
+      By.CSS_SELECTOR,
+      Common.DROPDOWN_MENU + ' [href="/admin#people_list_widget"]')
+  BUTTON_MY_WORK = (By.CSS_SELECTOR,
+                    Common.DROPDOWN_MENU + ' [href="/dashboard"]')
+  BUTTON_DATA_IMPORT = (By.CSS_SELECTOR,
+                        Common.DROPDOWN_MENU + ' [href="/import"]')
+  BUTTON_DATA_EXPORT = (By.CSS_SELECTOR,
+                        Common.DROPDOWN_MENU + ' [href="/export"]')
+  BUTTON_LOGOUT = (By.CSS_SELECTOR, Common.DROPDOWN_MENU + ' [href="/logout"]')
+  NOTIFICATIONS = (By.CSS_SELECTOR, USER_MENU + ' .notify-wrap')
+  CHECKBOX_DAILY_DIGEST = (By.CSS_SELECTOR, USER_MENU + ' input')
+  CHECKBOX_DISABLED = (By.CSS_SELECTOR, USER_MENU + ' input.disabled')
 
 
 class Dashboard(object):
-  """Locators for the dashbord page"""
-
-  BUTTON_START_NEW_PROGRAM = (
-      By.CSS_SELECTOR, '.get-started__list [data-object-singular="Program"]')
-  BUTTON_START_NEW_AUDIT = (
-      By.CSS_SELECTOR, '.get-started__list [data-object-singular="Audit"]')
+  """Locators for the Dashboard page."""
+  # get started
+  GET_LIST = ".get-started__list"
+  BUTTON_START_NEW_PROGRAM = (By.CSS_SELECTOR,
+                              GET_LIST + ' [data-object-singular="Program"]')
+  BUTTON_START_NEW_AUDIT = (By.CSS_SELECTOR,
+                            GET_LIST + ' [data-object-singular="Audit"]')
   BUTTON_START_NEW_WORKFLOW = (
-      By.CSS_SELECTOR, '.get-started__list [data-object-singular="Workflow"]')
-  BUTTON_CREATE_NEW_OBJECT = (
-      By.CSS_SELECTOR, '.get-started__list [href="#"]')
-  BUTTON_ALL_OBJECTS = (By.CSS_SELECTOR, '.get-started__list '
-                                         '[href^="/objectBrowser"]')
+      By.CSS_SELECTOR, GET_LIST + ' [data-object-singular="Workflow"]')
+  BUTTON_CREATE_NEW_OBJECT = (By.CSS_SELECTOR, GET_LIST + ' [href="#"]')
+  BUTTON_ALL_OBJECTS = (By.CSS_SELECTOR,
+                        GET_LIST + ' [href^="/objectBrowser"]')
 
 
 class LhnMenu(object):
@@ -111,11 +118,9 @@ class LhnMenu(object):
       for object_singular, object_plural in zip(objects.ALL_SINGULAR,
                                                 objects.ALL_PLURAL):
         capitalized_name = object_singular.title()
-
         # handle underscore in object names
         if "_" in capitalized_name:
           capitalized_name = capitalized_name.title().replace("_", "")
-
         # set lhn items
         setattr(cls, Common.TOGGLE + object_plural,
                 cls._Locator.get_accordion_button(capitalized_name))
@@ -131,7 +136,6 @@ class LhnMenu(object):
   LHN_MENU = (By.ID, "lhn")
   MODAL = (By.CSS_SELECTOR, '[id="ajax-lhn_modal-javascript:--"]')
   EXTENDED_INFO = (By.CSS_SELECTOR, '.extended-info.in .info .fa')
-
   FILTER = (By.CSS_SELECTOR, '.lhs-search')
   FILTER_TEXT_BOX = (By.CSS_SELECTOR, '.lhs-search>.widgetsearch')
   FILTER_SUBMIT_BUTTON = (
@@ -195,31 +199,53 @@ class BaseModalGenerateNew(object):
   MODAL_TITLE = (By.CSS_SELECTOR, "{} .modal-header>h2".format(MODAL))
 
 
+class TreeView(object):
+  """Locators for tree-view components."""
+  # common
+  ITEMS = "{} li.tree-item .item-main"
+  HEADER = "{} " + Common.TREE_HEADER
+  ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
+  ITEM_EXPAND_BUTTON = " .openclose"
+  SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
+  BUTTON_SHOW_FIELDS = "{} " + Common.TREE_HEADER + " .fa-bars"
+  # tree view tool bar of widgets
+  BUTTON_3BBS = "{} " + Common.TREE_LIST + " .btn-draft"
+  BUTTON_CREATE = "{} " + Common.TREE_LIST + " .create-button"
+  BUTTON_GENERATE = (
+      "{} " + Common.TREE_LIST + " .tree-action-list-items .fa-magic")
+
+
 class ModalSetVisibleFields(object):
   """Locators for a generic edit object modal."""
-  FIELDS_MODAL = "{} .open .dropdown-menu-form"
-  FIELDS_TITLES = "{} .tree-header .checkbox-inline"
-  FIELDS_CHECKBOXES = "{} .tree-header .attr-checkbox"
-  BUTTON_SAVE_SET_FIELDS = "{} .tree-action-list .set-tree-attrs"
+  OPEN_MENU = ".open .dropdown-menu-form"
+  MODAL = "{} " + OPEN_MENU
+  # labels
+  MODAL_TITLE = MODAL + " h5"
+  FIELDS_TITLES = "{} " + Common.TREE_HEADER + " .checkbox-inline"
+  # user input elements
+  FIELDS_CHECKBOXES = "{} " + Common.TREE_HEADER + " .attr-checkbox"
+  BUTTON_SET_FIELDS = "{} " + Common.TREE_HEADER + " .set-tree-attrs"
 
 
 class ModalCreateNewObject(BaseModalCreateNew):
   """Locators for a generic new object modal."""
-  UI_TITLE = (By.CSS_SELECTOR,
-              '{} [data-id="title_txtbx"]'.format(BaseModalCreateNew.MODAL))
-  BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR,
-                           '{} [data-toggle="modal-submit"]'.
-                           format(BaseModalCreateNew.MODAL))
-  BUTTON_SAVE_AND_ADD_ANOTHER = (By.CSS_SELECTOR,
-                                 '{} [data-toggle="modal-submit-addmore"]'.
-                                 format(BaseModalCreateNew.MODAL))
+  UI_TITLE = (
+      By.CSS_SELECTOR,
+      '{} [placeholder="Enter Title"]'.format(BaseModalCreateNew.MODAL))
+  UI_CODE = (
+      By.CSS_SELECTOR,
+      '{} [name="slug"]'.format(BaseModalCreateNew.MODAL))
+  BUTTON_SAVE_AND_CLOSE = (
+      By.CSS_SELECTOR, '{} [data-toggle="modal-submit"]'.format(
+          BaseModalCreateNew.MODAL))
+  BUTTON_SAVE_AND_ADD_ANOTHER = (
+      By.CSS_SELECTOR, '{} [data-toggle="modal-submit-addmore"]'.format(
+          BaseModalCreateNew.MODAL))
 
 
 class ModalCreateNewProgram(BaseModalCreateNew):
   """Locators for the program modal visible when creating a new modal from
   LHN"""
-  UI_TITLE = (By.CSS_SELECTOR,
-              '[data-test-id="new_program_field_title_a63ed79d"]')
   UI_DESCRIPTION = (By.CSS_SELECTOR,
                     '[data-test-id="new_program_field_description_1fb8bc06"]'
                     '>iframe.wysihtml5-sandbox')
@@ -506,19 +532,19 @@ class ModalGenerateNewObject(BaseModalGenerateNew):
 class ModalGenerateNewAsmt(ModalGenerateNewObject):
   """Locators for a assessments generation modal."""
   MODAL = ModalGenerateNewObject.MODAL
-  SELECT_ASMT_TMPL_DROPDOWN = (By.CSS_SELECTOR,
-                               '{} dropdown[name="assessmentTemplate"] '
-                               '.input-block-level'.format(MODAL))
-  SELECT_ASMT_TMPL_OPTIONS = (By.CSS_SELECTOR,
-                              '{} dropdown[name="assessmentTemplate"] '
-                              '.input-block-level option'.format(MODAL))
-  BUTTON_SEARCH = (By.CSS_SELECTOR, "{} .btn-info".format(MODAL))
-  FOUNDED_OBJECTS_TITLES = (
+  FOUND_OBJECTS = " .snapshot-list .flex-box"
+  SELECT_ASMT_TMPL_DROPDOWN = (
       By.CSS_SELECTOR,
-      "{} .snapshot-list .flex-box .title-attr".format(MODAL))
-  FOUNDED_OBJECTS_CHECKBOXES = (
+      MODAL + ' dropdown[name="assessmentTemplate"] .input-block-level')
+  SELECT_ASMT_TMPL_OPTIONS = (
       By.CSS_SELECTOR,
-      '{} .snapshot-list .flex-box [type="checkbox"]'.format(MODAL))
+      MODAL + ' dropdown[name="assessmentTemplate"] '
+              '.input-block-level option')
+  BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .btn-info")
+  FOUND_OBJECTS_TITLES = (By.CSS_SELECTOR,
+                          MODAL + FOUND_OBJECTS + " .title-attr")
+  FOUND_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
+                              MODAL + FOUND_OBJECTS + ' [type="checkbox"]')
 
 
 class ModalEditObject(BaseModalCreateNew):
@@ -627,6 +653,7 @@ class ObjectWidget(object):
 
 
 class ModalDeleteObject(object):
+  """Locators for a generic delete object modal."""
   MODAL_TITLE = (By.CSS_SELECTOR, '.modal-header>h2')
   CONFIRMATION_TEXT = (By.CSS_SELECTOR, '.modal-body>div>p')
   OBJECT_TITLE = (By.CSS_SELECTOR, '.modal-body>div>p>span')
@@ -634,11 +661,21 @@ class ModalDeleteObject(object):
       By.CSS_SELECTOR, '.modal-footer .confirm-buttons>[data-toggle="delete"]')
 
 
+class ModalCompareUpdateObject(object):
+  """Locators for a generic compare and update object modal."""
+  MODAL = Common.MODAL_CONFIRM
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, "{} .modal-header".format(MODAL))
+  # user input elements
+  BUTTON_UPDATE = (By.CSS_SELECTOR, "{} .btn-success".format(MODAL))
+
+
 class BaseInfoWidget(object):
   """Locators that are common to all info widgets"""
   BUTTON_SETTINGS = (By.CSS_SELECTOR, '.info-pane-utility .dropdown-toggle')
   TITLE = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h6')
   TITLE_ENTERED = (By.CSS_SELECTOR, '[data-test-id="title_0ad9fbaf"] h3')
+  LINK_GET_LAST_VER = (By.CSS_SELECTOR, '.snapshot [can-click="compareIt"]')
 
 
 class WidgetInfoProgram(BaseInfoWidget):
@@ -863,49 +900,45 @@ class BaseWidgetGeneric(object):
     class should look like. Note that the same functionality can be
     implemented using properties though with more code."""
     def __init__(cls, *args):
+      _FILTER = "#{}_widget .sticky-filter"
+      _FILTER_BUTTON = _FILTER + " .tree-filter__button"
+      _FILTER_DROPDOWN = _FILTER + " .multiselect-dropdown"
+      _FILTER_DROPDOWN_ELEMENTS = \
+          _FILTER_DROPDOWN + " .multiselect-dropdown__element"
       cls.TEXTFIELD_TO_FILTER = (
-          By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__expression-holder'
+          By.CSS_SELECTOR, str(_FILTER + " .tree-filter__expression-holder")
             .format(cls._object_name))
       cls.BUTTON_FILTER = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__button [type="submit"]'
-            .format(cls._object_name))
+          str(_FILTER_BUTTON + ' [type="submit"]').format(cls._object_name))
       cls.BUTTON_RESET = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__button [type="reset"]'
-            .format(cls._object_name))
+          str(_FILTER_BUTTON + ' [type="reset"]').format(cls._object_name))
       cls.BUTTON_HELP = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__button  #page-help'
+          str(_FILTER_BUTTON + " #page-help").format(cls._object_name))
+      cls.DROPDOWN = (
+          By.CSS_SELECTOR,
+          str(_FILTER_DROPDOWN + " .multiselect-dropdown__input-container")
             .format(cls._object_name))
-      cls.ACTIVE_CHECKBOX = (
+      cls.DROPDOWN_STATES = (
           By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__status-wrap '
-          '[name="active"]'.format(cls._object_name))
-      cls.DRAFT_CHECKBOX = (
-          By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__status-wrap '
-          '[name="draft"]'.format(cls._object_name))
-      cls.CHECKBOX_DEPRECATED = (
-          By.CSS_SELECTOR,
-          '#{}_widget .sticky-filter .tree-filter__status-wrap '
-          '[name="deprecated"]'.format(cls._object_name))
-
+          str(_FILTER_DROPDOWN_ELEMENTS).format(cls._object_name))
   FILTER_PANE_COUNTER = (
-      By.CSS_SELECTOR, ".tree-pagination__count "
-                       ".tree-view-pagination__count__title")
+      By.CSS_SELECTOR,
+      ".tree-pagination__count .tree-view-pagination__count__title")
 
 
 class WidgetAssessments(BaseWidgetGeneric):
-  """Locators for assessment widget"""
+  """Locators for Assessments widget."""
   _object_name = objects.get_singular(objects.ASSESSMENTS)
   widget_name = url.Widget.ASSESSMENTS
 
 
 class WidgetControls(BaseWidgetGeneric):
-  """Locators for control widget"""
-  _object_name = "control"
+  """Locators for Controls widget."""
+  _object_name = objects.get_singular(objects.CONTROLS)
+  widget_name = url.Widget.CONTROLS
 
 
 class WidgetProducts(BaseWidgetGeneric):
@@ -939,25 +972,9 @@ class WidgetIssues(BaseWidgetGeneric):
 
 
 class WidgetAssessmentTemplates(BaseWidgetGeneric):
-  """Locators for assessment widget."""
+  """Locators for Assessment Templates widget."""
   _object_name = objects.get_singular(objects.ASSESSMENT_TEMPLATES)
   widget_name = url.Widget.ASSESSMENT_TEMPLATES
-
-
-class TreeView(object):
-  """Locators for tree-view components."""
-  # common
-  ITEMS = "{} li.tree-item .item-main"
-  HEADER = "{} .tree-header"
-  ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
-  ITEM_EXPAND_BUTTON = " .openclose"
-  SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
-  # tree view tool bar of widgets
-  _TREE = " .tree-action-list"
-  BUTTON_3BBS = "{}" + _TREE + " .btn-draft"
-  BUTTON_CREATE = "{}" + _TREE + " .create-button"
-  BUTTON_GENERATE = "{}" + _TREE + " .tree-action-list-items .fa-magic"
-  BUTTON_SET_FIELDS = "{}" + _TREE + " .tree-action-list-items .fa-cog"
 
 
 class AdminCustomAttributes(object):
@@ -1028,6 +1045,7 @@ class CustomAttributesItemContent(AdminCustomAttributes):
   TITLES_ROW = (By.CSS_SELECTOR, "{} thead tr".format(_base_locator))
   ROW = (By.CSS_SELECTOR, _row_locator)
   CELL_IN_ROW = (By.CSS_SELECTOR, "td")
-  EDIT_BTN = (By.CSS_SELECTOR, "{} .tree-action-list a".format(_row_locator))
+  EDIT_BTN = (By.CSS_SELECTOR,
+              "{} " + Common.TREE_LIST + " a".format(_row_locator))
   ADD_BTN = (By.CSS_SELECTOR, "{} .add-item .btn".format(_base_locator))
   TREE_SPINNER = (By.CSS_SELECTOR, ".tree-spinner")

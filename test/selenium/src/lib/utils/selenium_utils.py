@@ -1,7 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
-"""Utility function for selenium"""
+"""Utility function for selenium."""
 
 import logging
 import time
@@ -11,8 +10,7 @@ from selenium.webdriver.common import action_chains
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-from lib import constants
-from lib import exception
+from lib import constants, exception
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +18,12 @@ logger = logging.getLogger(__name__)
 def hover_over_element(driver, element):
   """Moves the mouse pointer to the element and hovers"""
   action_chains.ActionChains(driver).move_to_element(element).perform()
+
+
+def open_url(driver, url):
+  """Open URL in the current browser session if it hasn't been opened yet."""
+  if driver.current_url != url:
+    driver.get(url)
 
 
 def wait_until_stops_moving(element):

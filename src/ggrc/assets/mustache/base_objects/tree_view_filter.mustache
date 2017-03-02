@@ -3,8 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-  <div class="sticky sticky-header tree-filter tree-filter_paging"
-       {{#filter_is_hidden}}style="height: 0; margin-bottom: 0;overflow: hidden"{{/filter_is_hidden}}
+  <div class="tree-filter tree-filter_paging"
        data-height="42"
        data-margin-bottom="25">
     <div class="sticky-filter inner-filter-sticky">
@@ -30,12 +29,11 @@
           </div>
           <div class="tree-filter__status-wrap">
             {{#if statusFilterVisible}}
-            <input type="checkbox" name="active" id="statusActive-{{model.model_singular}}" value="Active" class="attr-status">
-            <label for="statusActive-{{model.model_singular}}">Active</label>
-            <input type="checkbox" name="draft" id="statusDraft-{{model.model_singular}}" value="Draft" class="attr-status">
-            <label for="statusDraft-{{model.model_singular}}">Draft</label>
-            <input type="checkbox" name="deprecated" id="statusDeprecated-{{model.model_singular}}" value="Deprecated" class="attr-status">
-            <label for="statusDeprecated-{{model.model_singular}}">Deprecated</label>
+            <multiselect-dropdown 
+              {options}="filter_states"
+              placeholder="Filter by State",
+              plural="States">
+            </multiselect-dropdown>
             {{/if}}
           </div>
           <div class="tree-filter__paging-wrap">

@@ -58,13 +58,6 @@ class TestComprehensiveSheets(TestCase):
             "row_warnings": 4,
             "rows": 16,
         },
-        "Issue": {
-            "created": 10,
-            "ignored": 4,
-            "row_errors": 4,
-            "row_warnings": 4,
-            "rows": 14,
-        },
         "Policy": {
             "created": 13,
             "ignored": 3,

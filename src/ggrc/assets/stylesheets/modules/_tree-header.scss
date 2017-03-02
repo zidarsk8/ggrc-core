@@ -59,6 +59,16 @@
     }
   }
   .header {
+    &.tree-header-content {
+      position: absolute;
+      z-index: 1; 
+      background-color: $contentBgnd;
+      margin: -20px -40px 0px -40px;
+      padding-left: 40px;
+      padding-right: 40px;
+      border-top: solid $contentBgnd;
+      border-width: 20px;
+    }
     &.tree-header {
       padding: 0 12px 0 70px;
       font-size: 11px;
@@ -75,6 +85,59 @@
       &.no-filter {
         top: 0px;
       }
+
+      .visible-columns-icon {
+        position: relative;
+        left: 5px;
+        top: 8px;
+        display: block;
+      }
+
+      .tree-header-selector {
+        margin-left: -70px;
+        float: left;
+        position: relative;
+      }
+
+      .visible-columns-list {
+        @include border-radius(0);
+        position: absolute;
+        top: 23px;
+        left: 5px;
+        padding: 14px 30px 20px 30px;
+        min-width: 720px;
+        max-width: 860px;
+        text-align: left;
+        h5 {
+          font-size: 16px;
+          font-weight: normal;
+          text-transform: none;
+          line-height: 24px;
+        }
+        label {
+          font-size: 12px;
+        }
+        .attr-list {
+          margin-top: 11px;
+          margin-bottom: 14px;
+          li {
+            margin: 0;
+            text-transform: none;
+            label {
+              @extend %oneline;
+              display: inline-block;
+              cursor: pointer;
+            }
+            &.disabled {
+              color: $gray;
+              label {
+                cursor: not-allowed;
+              }
+            }
+          }
+        }
+      }
+
       .tree-action-list {
         height: 32px;
 
@@ -255,8 +318,9 @@
               }
 
               a {
+                color: #000;
                 > i {
-                  color: #999;
+                  color: #000;
                 }
                 &.active > i {
                   color: #000;
@@ -272,6 +336,11 @@
                   &:hover {
                     background: none;
                   }
+                }
+
+                .fa {
+                  color: #000;
+                  opacity: 0.7;
                 }
               }
             }

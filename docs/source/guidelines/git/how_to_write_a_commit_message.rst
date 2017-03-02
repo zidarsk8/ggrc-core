@@ -199,8 +199,14 @@ For pull request titles we should use the same rules as for the subject
 line of a commit, but we need to prefix the issue id (or QUICK-FIX or
 DOCS if there is no issue id).
 
+A pull request title must also reflect on what changes have been done.
+If the pull request title states that it contains test modifications, it
+must not contain any code changes outside of tests. If there are logic
+changes in the PR, the title must reflect those and the changes in the
+tests are implied with the code changes.
+
 Examples::
 
     CORE-9999 Fix performance issues on bulk operations
-    QUICK-FIX Prevent breaking tasks into multiple lines
+    QUICK-FIX Break test cases into smaller parts
     DOCS Add section that explains client side mappings

@@ -63,7 +63,7 @@ class RecordBuilder(object):
         record_id,
         record_type,
         obj.context_id,
-        **properties
+        properties
     )
 
 

@@ -9,10 +9,6 @@ SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../src"
 
-# Database validation is only needed for Audit snapshots migration.
-# Remove the next line if Raspberry has already been released.
-python /vagrant/bin/validate_database.py
-
 python -c "\
 import ggrc.migrate
 import sys, os

@@ -115,8 +115,12 @@ ONLY_IMPORTABLE_COLUMNS_WARNING = (u"Line {line}: Only the following "
                                    u"attributes are importable: {columns}. "
                                    u"All other columns will be ignored.")
 
+EXPORT_ONLY_WARNING = (u"Line {line}: Field '{column_name}' "
+                       u"can not be imported. The value will be ignored.")
+
 ILLIGAL_REMOVE_CONTROL_VALUE = ("Line {line}: "
                                 "System does not allow to unmap control")
+
 ILLIGAL_APPEND_CONTROL_VALUE = ("Line {line}: "
                                 "System does not allow to map control to "
                                 "{object_type}, because this control is not "

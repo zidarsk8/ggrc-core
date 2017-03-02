@@ -446,8 +446,9 @@
     },
     Issue: {
       _mixins: [
-        'related_object', 'personable', 'ownable'
-      ]
+        'related_object', 'personable', 'ownable', 'documentable', 'assignable'
+      ],
+      audits: TypeFilter('related_objects', 'Audit')
     },
     Comment: {
       _mixins: ['related_object', 'documentable', 'ownable'],

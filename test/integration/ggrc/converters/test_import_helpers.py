@@ -416,6 +416,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Description",
         "Notes",
+        "Audit",
         "Test Plan",
         "Owner",
         "Primary Contact",
@@ -427,9 +428,26 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Stop Date",
         "State",
         "Review State",
+        "Url",
+        "Evidence",
         "Delete",
     }
-    self._test_single_object(models.Issue, names, self.COMMON_EXPECTED)
+    expected_fields = {
+        "mandatory": {
+            "Title",
+            "Owner",
+            "Audit",
+            "Code"
+        },
+        "unique": {
+            "Code",
+            "Title",
+        },
+        "ignore_on_update": {
+            "Audit",
+        }
+    }
+    self._test_single_object(models.Issue, names, expected_fields)
 
   def test_regulation_definitions(self):
     """ test default headers for Regulation """

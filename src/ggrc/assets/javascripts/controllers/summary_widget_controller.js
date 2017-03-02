@@ -41,7 +41,7 @@
     }
   }, {
     init: function () {
-      var that = this;
+      var frag;
       if (this.element.data('widget-view')) {
         this.options.widget_view = GGRC.mustache_path +
           this.element.data('widget-view');
@@ -61,10 +61,9 @@
           }
         }
       });
-      can.view(this.get_widget_view(this.element),
-        this.options.context, function (frag) {
-          that.element.html(frag);
-        });
+      frag = can.view(this.get_widget_view(this.element),
+                      this.options.context);
+      this.element.html(frag);
       return 0;
     },
     get_widget_view: function (el) {

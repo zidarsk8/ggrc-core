@@ -404,6 +404,8 @@ function resize_areas(event, target_info_pin_height) {
     .css('height', internavHeight)
     .css('width', objectWidth);
 
+  $objectArea.trigger('change');
+
   function object_area_height() {
     var height = winHeight - not_main_elements_height();
     var nav_pos = $topNav.css('top') ?

@@ -153,7 +153,7 @@ class TestUnMappingRules(BaseTestMappingRules):
                'Project', 'Regulation', 'Risk', 'Section', 'Standard',
                'System', 'Threat', 'Vendor', ]
   assessment_rules = ['AccessGroup', 'Audit', 'Clause', 'Contract',
-                      'CycleTaskGroupObjectTask', 'DataAsset',
+                      'Control', 'CycleTaskGroupObjectTask', 'DataAsset',
                       'Facility', 'Issue', 'Market', 'Objective', 'OrgGroup',
                       'Person', 'Policy', 'Process', 'Product', 'Program',
                       'Project', 'Regulation', 'Risk', 'Section', 'Standard',
@@ -228,12 +228,6 @@ class TestUnMappingRules(BaseTestMappingRules):
                   'Person', 'Policy', 'Process', 'Product', 'Program',
                   'Project', 'Regulation', 'Risk', 'Section', 'Standard',
                   'System', 'Vendor', ]
-  issue_rules = ['AccessGroup', 'Assessment', 'Audit', 'Clause', 'Contract',
-                 'CycleTaskGroupObjectTask', 'DataAsset',
-                 'Facility', 'Issue', 'Market', 'Objective', 'OrgGroup',
-                 'Person', 'Policy', 'Process', 'Product', 'Program',
-                 'Project', 'Regulation', 'Risk', 'Section', 'Standard',
-                 'System', 'Threat', 'Vendor', ]
 
   @data(("AccessGroup", accessgroup_rules),
         ("Assessment", assessment_rules),
@@ -244,7 +238,7 @@ class TestUnMappingRules(BaseTestMappingRules):
         ("CycleTaskGroupObjectTask", cycletaskgroupobjecttask_rules),
         ("DataAsset", all_rules),
         ("Facility", all_rules),
-        ("Issue", issue_rules),
+        ("Issue", all_rules),
         ("Market", all_rules),
         ("Objective", all_rules),
         ("OrgGroup", all_rules),

@@ -4,11 +4,14 @@
 # pylint: disable=too-few-public-methods
 
 import re
+
 from selenium import webdriver
+from selenium.common import exceptions
 from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
 
 from lib import constants, exception, mixin
+from lib.constants.test import batch
 from lib.utils import selenium_utils
 
 
@@ -138,28 +141,31 @@ class TextFilterDropdown(Element):
     self.text_to_filter = None
 
   def _filter_results(self, text):
-    """Filter results used text."""
+    """Insert text into textbox field."""
     self.text_to_filter = text
     self.element.click()
     self.element.clear()
     self._driver.find_element(*self._locator).send_keys(text)
 
   def _select_first_result(self):
-    """Wait that it appears and select first result."""
-    selenium_utils.get_when_visible(self._driver, self._locator_dropdown)
-    dropdown_elements = self._driver.find_elements(
-        *self._locator_dropdown)
-    self.text = dropdown_elements[0].text
-    dropdown_elements[0].click()
-    selenium_utils.get_when_invisible(self._driver, self._locator_dropdown)
+    """Wait when dropdown elements appear and select first one."""
+    for _ in xrange(batch.TRY_COUNT):
+      try:
+        selenium_utils.get_when_visible(self._driver, self._locator_dropdown)
+        dropdown_elements = self._driver.find_elements(*self._locator_dropdown)
+        self.text = dropdown_elements[0].text
+        dropdown_elements[0].click()
+        break
+      except exceptions.StaleElementReferenceException:
+        pass
 
-  def filter_and_select_first(self, text):
-    """Filter and select first text element."""
+  def filter_and_select_el_by_text(self, text):
+    """Make filtering and select first filtered text element in dropdown."""
     self._filter_results(text)
     self._select_first_result()
 
-  def find_and_select_first(self, text):
-    """Find and select first text element."""
+  def find_and_select_el_by_text(self, text):
+    """Find and select text element in dropdown by text."""
     self.text_to_filter = text
     self.element.click()
 
@@ -175,7 +181,7 @@ class Iframe(Element):
     iframe = selenium_utils.get_when_visible(self._driver, self._locator)
     self._driver.switch_to.frame(iframe)
 
-    element = self._driver.find_element_by_tag_name(constants.tag.BODY)
+    element = self._driver.find_element_by_tag_name("body")
     element.clear()
     element.send_keys(text)
 
@@ -250,7 +256,7 @@ class Button(Element):
 class Checkbox(Element):
   """A generic checkbox element"""
 
-  def __init__(self, driver, locator, is_checked=False):
+  def __init__(self, driver, locator):
     super(Checkbox, self).__init__(driver, locator)
     self.is_checked = self.element.is_selected()
 
@@ -387,9 +393,7 @@ class Modal(Component):
 
 
 class FilterCommon(Component):
-  """A common filter elements for LHN and tree view
-  (without filter checkboxes).
-  """
+  """A common filter elements for LHN and tree view."""
 
   def __init__(self, driver, text_box_locator, bt_submit_locator,
                bt_clear_locator):
@@ -412,38 +416,6 @@ class FilterCommon(Component):
     self.button_clear.click()
 
 
-class Filter(FilterCommon):
-  """A filter elements for tree view with filter checkboxes."""
-
-  def __init__(self, driver, text_box_locator, bt_submit_locator,
-               bt_clear_locator, ch_active_locator, ch_draft_locator,
-               ch_deprecated_locator):
-    super(Filter, self).__init__(driver, text_box_locator, bt_submit_locator,
-                                 bt_clear_locator)
-    self.checkbox_active = Checkbox(driver, ch_active_locator)
-    self.checkbox_draft = Checkbox(driver, ch_draft_locator)
-    self.checkbox_deprecated = Checkbox(driver, ch_deprecated_locator)
-
-  def show_active_objs(self):
-    """Select 'Active' checkbox to show all active objects."""
-    self.checkbox_active.check()
-
-  def show_draft_objs(self):
-    """Select 'Draft' checkbox to show all draft objects."""
-    self.checkbox_draft.check()
-
-  def show_deprecated_objs(self):
-    """Select 'Deprecated' checkbox to show all deprecated objects."""
-    self.checkbox_deprecated.check()
-
-  def show_all_objs(self):
-    """Select 'Active', 'Draft', 'Deprecated' checkboxes to show all objects.
-    """
-    self.show_active_objs()
-    self.show_draft_objs()
-    self.show_deprecated_objs()
-
-
 class AbstractPage(Component):
   """Represents a page that can be navigate to, but we don't necessarily know
   it's url in advance"""
@@ -459,9 +431,7 @@ class AbstractPage(Component):
   def navigate_to(self, custom_url=None):
     """Navigate to url."""
     url_to_use = self.url if custom_url is None else custom_url
-
-    if self._driver.current_url != url_to_use:
-      self._driver.get(url_to_use)
+    selenium_utils.open_url(self._driver, url_to_use)
     return self
 
 
@@ -633,35 +603,35 @@ class TreeViewItem(Component):
     return selenium_utils.is_value_in_attr(self.expand_btn)
 
 
-class Checkboxes(Component):
-  """A generic checkboxes elements."""
+class ListCheckboxes(Component):
+  """A generic list of checkboxes elements."""
 
   def __init__(self, driver, titles_locator, checkboxes_locator):
-    super(Checkboxes, self).__init__(driver)
-    self.locator_of_titles = titles_locator
-    self.locator_of_checkboxes = checkboxes_locator
+    super(ListCheckboxes, self).__init__(driver)
+    self.locator_titles = titles_locator
+    self.locator_checkboxes = checkboxes_locator
 
   @staticmethod
-  def _unselect_unnecessary(objs, list_of_titles):
+  def _unselect_unnecessary(objs, list_titles):
     """Unselect unnecessary elements according objs (titles ans checkboxes
     elements) and list of titles"""
     unselect = [obj[1].click() for obj in objs
-                if obj[0].text not in list_of_titles if obj[1].is_selected()]
+                if obj[0].text not in list_titles if obj[1].is_selected()]
     return unselect
 
   @staticmethod
-  def _select_necessary(objs, list_of_titles):
+  def _select_necessary(objs, list_titles):
     """Select necessary elements according objs (titles ans checkboxes
     elements) and list of titles"""
     select = [obj[1].click() for obj in objs
-              if obj[0].text in list_of_titles if not obj[1].is_selected()]
+              if obj[0].text in list_titles if not obj[1].is_selected()]
     return select
 
-  def select_by_titles(self, list_of_titles):
+  def select_by_titles(self, list_titles):
     """Select checkboxes according titles."""
-    selenium_utils.get_when_all_visible(self._driver, self.locator_of_titles)
-    objs_titles = self._driver.find_elements(*self.locator_of_titles)
-    objs_checkboxes = self._driver.find_elements(*self.locator_of_checkboxes)
+    selenium_utils.get_when_all_visible(self._driver, self.locator_titles)
+    objs_titles = self._driver.find_elements(*self.locator_titles)
+    objs_checkboxes = self._driver.find_elements(*self.locator_checkboxes)
     objs = zip(objs_titles, objs_checkboxes)
-    self._unselect_unnecessary(objs, list_of_titles)
-    self._select_necessary(objs, list_of_titles)
+    self._unselect_unnecessary(objs, list_titles)
+    self._select_necessary(objs, list_titles)

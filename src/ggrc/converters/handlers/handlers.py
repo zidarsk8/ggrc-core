@@ -407,6 +407,9 @@ class MappingColumnHandler(ColumnHandler):
     # This is just a hack to prevent wrong mappings to assessments or issues.
     if self.mapping_object.__name__ in Types.scoped | Types.parents and \
        not self.allow:
+      if self.raw_value:
+        self.add_warning(errors.EXPORT_ONLY_WARNING,
+                         column_name=self.display_name)
       return []
 
     class_ = self.mapping_object

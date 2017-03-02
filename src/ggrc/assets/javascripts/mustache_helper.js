@@ -1216,90 +1216,85 @@ Mustache.registerHelper('date', function (date, hideTime) {
  *  {{#is_allowed ACTION [ACTION2 ACTION3...] RESOURCE_TYPE_STRING context=CONTEXT_ID}} content {{/is_allowed}}
  *  {{#is_allowed ACTION RESOURCE_INSTANCE}} content {{/is_allowed}}
  */
-var allowed_actions = ["create", "read", "update", "delete", "view_object_page", "__GGRC_ADMIN__"];
-Mustache.registerHelper("is_allowed", function () {
-  var args = Array.prototype.slice.call(arguments, 0)
-    , actions = []
-    , resource
-    , resource_type
-    , context_unset = {}
-    , context_id = context_unset
-    , context_override
-    , options = args[args.length-1]
-    , passed = true
-    ;
+  var allowedActions = ['create', 'read', 'update', 'delete',
+    'view_object_page', '__GGRC_ADMIN__'];
+  Mustache.registerHelper('is_allowed', function () {
+    var args = Array.prototype.slice.call(arguments, 0);
+    var actions = [];
+    var resource;
+    var resourceType;
+    var contextUnset = {};
+    var contextId = contextUnset;
+    var contextOverride;
+    var options = args[args.length - 1];
+    var passed = true;
 
-  // Resolve arguments
-  can.each(args, function (arg, i) {
-    while (typeof arg === 'function' && arg.isComputed) {
-      arg = arg();
+    // Resolve arguments
+    can.each(args, function (arg, i) {
+      while (typeof arg === 'function' && arg.isComputed) {
+        arg = arg();
+      }
+
+      if (typeof arg === 'string' && can.inArray(arg, allowedActions) > -1) {
+        actions.push(arg);
+      } else if (typeof arg === 'string') {
+        resourceType = arg;
+      } else if (typeof arg === 'object' && arg instanceof can.Model) {
+        resource = arg;
+      }
+    });
+    if (options.hash && options.hash.hasOwnProperty('context')) {
+      contextId = options.hash.context;
+      if (typeof contextId === 'function' && contextId.isComputed) {
+        contextId = contextId();
+      }
+      if (contextId && typeof contextId === 'object' && contextId.id) {
+        // Passed in the context object instead of the context ID, so use the ID
+        contextId = contextId.id;
+      }
+      //  Using `context=null` in Mustache templates, when `null` is not defined,
+      //  causes `context_id` to be `""`.
+      if (contextId === '' || contextId === undefined) {
+        contextId = null;
+      } else if (contextId === 'for' || contextId === 'any') {
+        contextOverride = contextId;
+        contextId = undefined;
+      }
     }
 
-    if (typeof arg === 'string' && can.inArray(arg, allowed_actions) > -1) {
-      actions.push(arg);
+    if (resourceType && contextId === contextUnset) {
+      throw new Error(
+        'If `resource_type` is a string, `context` must be explicit');
     }
-    else if (typeof arg === 'string') {
-      resource_type = arg;
+    if (actions.length === 0) {
+      throw new Error('Must specify at least one action');
     }
-    else if (typeof arg === 'object' && arg instanceof can.Model) {
-      resource = arg;
+
+    if (resource) {
+      resourceType = resource.constructor.shortName;
+      contextId = resource.context ? resource.context.id : null;
     }
+
+    // Check permissions
+    can.each(actions, function (action) {
+      if (resource && Permission.is_allowed_for(action, resource)) {
+        passed = true;
+        return;
+      }
+      if (contextId !== undefined) {
+        passed = passed && Permission.is_allowed(action, resourceType,
+            contextId);
+      }
+      if (passed && contextOverride === 'for' && resource) {
+        passed = passed && Permission.is_allowed_for(action, resource);
+      } else if (passed && contextOverride === 'any' && resourceType) {
+        passed = passed && Permission.is_allowed_any(action, resourceType);
+      }
+    });
+
+    return passed ? options.fn(options.contexts || this) :
+      options.inverse(options.contexts || this);
   });
-  if (options.hash && options.hash.hasOwnProperty("context")) {
-    context_id = options.hash.context;
-    if (typeof context_id === 'function' && context_id.isComputed) {
-      context_id = context_id();
-    }
-    if (context_id && typeof context_id === "object" && context_id.id) {
-      // Passed in the context object instead of the context ID, so use the ID
-      context_id = context_id.id;
-    }
-    //  Using `context=null` in Mustache templates, when `null` is not defined,
-    //  causes `context_id` to be `""`.
-    if (context_id === "" || context_id === undefined) {
-      context_id = null;
-    } else if (context_id === 'for' || context_id === 'any') {
-      context_override = context_id;
-      context_id = undefined;
-    }
-  }
-
-  if (resource_type && context_id === context_unset) {
-    throw new Error(
-        "If `resource_type` is a string, `context` must be explicit");
-  }
-  if (actions.length === 0) {
-    throw new Error(
-        "Must specify at least one action");
-  }
-
-  if (resource) {
-    resource_type = resource.constructor.shortName;
-    context_id = resource.context ? resource.context.id : null;
-  }
-
-  // Check permissions
-  can.each(actions, function (action) {
-    if (resource && Permission.is_allowed_for(action, resource)) {
-      passed = true;
-      return;
-    }
-    if (context_id !== undefined) {
-      passed = passed && Permission.is_allowed(action, resource_type, context_id);
-    }
-    if (passed && context_override === 'for' && resource) {
-      passed = passed && Permission.is_allowed_for(action, resource);
-    }
-    else if (passed && context_override === 'any' && resource_type) {
-      passed = passed && Permission.is_allowed_any(action, resource_type);
-    }
-  });
-
-  return passed
-    ? options.fn(options.contexts || this)
-    : options.inverse(options.contexts || this)
-    ;
-});
 
 Mustache.registerHelper('any_allowed', function (action, data, options) {
   var passed = [],
@@ -3396,13 +3391,15 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
 Mustache.registerHelper('with_create_issue_json', function (instance, options) {
   var audits;
   var audit;
-  var programs;
-  var program;
-  var control;
   var json;
-  var relatedControls;
+  var relatedSnapshots = [];
   var canMap;
-
+  var isAllowedToMap = function (obj) {
+    if (_.isEmpty(obj)) {
+      return true;
+    }
+    return Permission.is_allowed_for('update', obj);
+  };
   instance = Mustache.resolve(instance);
   audits = instance.get_mapping('related_audits');
   if (!audits.length) {
@@ -3410,19 +3407,16 @@ Mustache.registerHelper('with_create_issue_json', function (instance, options) {
   }
 
   audit = audits[0].instance.reify();
-  programs = audit.get_mapping('_program');
-  program = programs.length ? programs[0].instance.reify() : {};
-  control = instance.control ? instance.control : {};
-  relatedControls = instance.mappedSnapshots;
-
-  if (!control.id && relatedControls.length) {
-    control = relatedControls[0].instance;
-    instance.control = control;
+  if (instance.mappedSnapshots) {
+    relatedSnapshots = instance.mappedSnapshots.map(function (item) {
+      var instance = item.instance;
+      return {title: instance.title, id: instance.id, type: instance.type};
+    });
   }
+
   json = {
     audit: {title: audit.title, id: audit.id, type: audit.type},
-    program: {title: program.title, id: program.id, type: program.type},
-    control: {title: control.title, id: control.id, type: control.type},
+    relatedSnapshots: relatedSnapshots,
     context: {type: audit.context.type, id: audit.context.id},
     assessment: {
       title: instance.title,
@@ -3433,12 +3427,9 @@ Mustache.registerHelper('with_create_issue_json', function (instance, options) {
     }
   };
   // Check permissions
-  canMap = [audit, program, control, instance].every(function (obj) {
-    if (_.isEmpty(obj)) {
-      return true;
-    }
-    return Permission.is_allowed_for('update', obj);
-  });
+  canMap =
+    [audit, instance].every(isAllowedToMap) &&
+    relatedSnapshots.every(isAllowedToMap);
   if (canMap) {
     return options.fn(options.contexts.add(
         {create_issue_json: JSON.stringify(json)}));
@@ -3446,7 +3437,7 @@ Mustache.registerHelper('with_create_issue_json', function (instance, options) {
   return options.inverse(options.contexts);
 });
 
-Mustache.registerHelper("pretty_role_name", function (name) {
+Mustache.registerHelper('pretty_role_name', function (name) {
   name = Mustache.resolve(name);
   var ROLE_LIST = {
     "ProgramOwner": "Program Manager",
