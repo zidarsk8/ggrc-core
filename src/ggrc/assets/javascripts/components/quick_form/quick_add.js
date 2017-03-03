@@ -92,6 +92,7 @@
         var quick_create;
         var created_dfd;
         var verify_dfd = $.Deferred();
+        scope.attr('disabled', true);
 
         if (scope.attr("verify_event")) {
           GGRC.Controllers.Modals.confirm({
@@ -118,7 +119,10 @@
                   })
                   .done(function (data) {
                     this.scope.attr('instance', data);
-                  }.bind(this));
+                  }.bind(this))
+                  .always(function () {
+                    scope.attr('disabled', false);
+                  });
               }
             }
           }
@@ -179,7 +183,10 @@
               }),
               el
               );
-          }.bind(this));
+          }.bind(this))
+          .always(function () {
+            scope.attr('disabled', false);
+          });
         }.bind(this));
       },
       // this works like autocomplete_select on all modal forms and
