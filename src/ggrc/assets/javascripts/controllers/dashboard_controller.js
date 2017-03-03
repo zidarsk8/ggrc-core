@@ -228,8 +228,6 @@
       }
 
       $element
-        .trigger('sortreceive')
-        .trigger('section_created')
         .trigger('widgets_updated', $element);
 
       return control;
@@ -283,19 +281,25 @@
       spinners: {},
       contexts: null,
       instance: null,
-      isMenuVisible: true
+      isMenuVisible: true,
+      addTabTitle: 'Add Tab',
+      hideTabTitle: 'Hide',
+      dividedTabsMode: false,
+      priorityTabs: null
     }
   }, {
     init: function (options) {
       CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
+        var instance = GGRC.page_instance();
         this.display_prefs = prefs;
+        this.options = new can.Map(this.options);
         if (!this.options.widget_list) {
-          this.options.widget_list = new can.Observe.List([]);
+          this.options.attr('widget_list', new can.Observe.List([]));
         }
 
-        this.options.instance = GGRC.page_instance();
+        this.options.attr('instance', instance);
         if (!(this.options.contexts instanceof can.Observe)) {
-          this.options.contexts = new can.Observe(this.options.contexts);
+          this.options.attr('contexts', new can.Observe(this.options.contexts));
         }
 
         // FIXME: Initialize from `*_widget` hash when hash has no `#!`
@@ -303,17 +307,15 @@
           this.route(window.location.hash);
         }.bind(this));
         can.view(this.options.internav_view, this.options, function (frag) {
+          var isAuditScope = instance.type === 'Audit';
           var fn = function () {
             this.element.append(frag);
-            if (this.options.instance.type === 'Audit') {
+            if (isAuditScope) {
               this.element.addClass(this.options.instance.type.toLowerCase());
-              this.element.find('li:lt(5)').wrapAll('<div class="left-menu"/>');
-              this.element.find('li:gt(4)')
-                .wrapAll('<div class="right-menu"/>');
-              this.element.find('.right-menu li.hidden-widgets-list').detach()
-                .insertAfter('.right-menu');
-              this.element.find('.right-menu li.menu-action').detach()
-                .insertBefore('.right-menu');
+              this.options.attr('addTabTitle', 'Add Scope');
+              this.options.attr('hideTabTitle', 'Show Audit Scope');
+              this.options.attr('dividedTabsMode', true);
+              this.options.attr('priorityTabs', 4);
             }
             this.route(window.location.hash);
             delete this.delayed_display;
@@ -435,14 +437,8 @@
      * at the end of the list.
      */
     sortWidgets: function () {
-      function sortByOrderAttr(widget, widget2) {
-        var order = _.isNumber(widget.order) ?
-                                widget.order : Number.MAX_SAFE_INTEGER;
-        var order2 = _.isNumber(widget2.order) ?
-                                 widget2.order : Number.MAX_SAFE_INTEGER;
-        return order - order2;
-      }
-      this.options.widget_list.sort(sortByOrderAttr);
+      this.options.attr('widget_list',
+        _.sortByAll(this.options.widget_list, ['order', 'internav_display']));
     },
 
     update_widget_list: function (widgetElements) {
@@ -584,28 +580,44 @@
     }, 100),
     show_hide_titles: function () {
       var $el = this.element;
-      var widgets = this.options.widget_list;
-      var widths;
+      var originalWidgets = this.options.widget_list;
+      var dividedTabsMode = this.options.attr('dividedTabsMode');
+      var priorityTabs = this.options.attr('priorityTabs');
 
-      // first expand all
-      widgets.forEach(function (widget) {
-        widget.attr('show_title', true);
-      });
-
-      // see if too wide
-      widths = _.map($el.children(':visible'),
-        function (el) {
-          return $(el).outerWidth();
-        }).reduce(function (sum, current) {
-          return sum + current;
-        }, 0);
-
-      // adjust
-      if (widths > $el.width()) {
+      function hideTitles(widgets) {
         widgets.forEach(function (widget) {
           widget.attr('show_title', false);
         });
       }
+
+      function adjust(widgets, isPriorityHide) {
+        var widths;
+
+        // see if too wide
+        widths = _.map($el.children(':visible'),
+          function (el) {
+            return $(el).outerWidth();
+          }).reduce(function (sum, current) {
+            return sum + current;
+          }, 0);
+
+        // adjust
+        if (widths > $el.width()) {
+          if (!isPriorityHide && dividedTabsMode && priorityTabs) {
+            hideTitles(widgets.slice(priorityTabs));
+            adjust(widgets.slice(0, priorityTabs), true);
+          } else {
+            hideTitles(widgets);
+          }
+        }
+      }
+
+      // first expand all
+      originalWidgets.forEach(function (widget) {
+        widget.attr('show_title', true);
+      });
+
+      adjust(originalWidgets);
     },
     '.closed click': function (el, ev) {
       var $link = el.closest('a');
@@ -638,17 +650,16 @@
         $dropdown.removeClass('one-item');
       }
     },
-    '.hide-menu click': function (el) {
-      var $hiddenArea = this.element
-        .find('.right-menu, .hidden-widgets-list, .separator');
+    '.not-priority-hide click': function (el) {
+      var count = this.options.attr('priorityTabs') + 1;
+      var hiddenAreaSelector = 'li:nth-child(n+' + count + '):not(:last-child)';
+      var $hiddenArea = this.element.find(hiddenAreaSelector);
+
+      this.options.attr('isMenuVisible', !this.options.isMenuVisible);
       if (this.options.isMenuVisible) {
-        this.options.isMenuVisible = false;
-        $hiddenArea.hide();
-        el.val('Show Audit Scope');
-      } else {
-        this.options.isMenuVisible = true;
         $hiddenArea.show();
-        el.val('Hide');
+      } else {
+        $hiddenArea.hide();
       }
       this.show_hide_titles();
     }
