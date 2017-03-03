@@ -358,7 +358,7 @@ mapper-results-item {
   &.has-related-assessments {
 
     object-selection-item {
-      width: $object-selection-item-with-related-assessments-width;
+      width: $object-selection-item-with-related-assessments-width !important;
     }
   }
 }
