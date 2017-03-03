@@ -7,7 +7,11 @@
   {{#if instance.snapshot}}
     {{> '/static/mustache/snapshots/dropdown_menu.mustache'}}
   {{else}}
-    {{> '/static/mustache/base_objects/dropdown_menu.mustache'}}
+    {{#if_equals instance.type "Person"}}
+      {{> '/static/mustache/people/dropdown_menu.mustache'}}
+    {{else}}
+      {{> '/static/mustache/base_objects/dropdown_menu.mustache'}}
+    {{/if_equals}}
   {{/if}}
 </div>
 <div class="flex-box">
