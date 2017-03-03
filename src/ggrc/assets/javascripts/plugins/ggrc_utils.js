@@ -869,7 +869,7 @@
           (Model.tree_view_options.display_attr_names ||
           Cacheable.tree_view_options.display_attr_names);
       var disableConfiguration =
-        !!Model.tree_view_options.disable_columns_configuration
+        !!Model.tree_view_options.disable_columns_configuration;
       var mandatoryColumns;
       var displayColumns;
 
