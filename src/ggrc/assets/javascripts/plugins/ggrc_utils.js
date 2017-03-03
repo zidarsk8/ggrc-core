@@ -893,7 +893,8 @@
           return a.order - b.order;
         });
 
-      var customAttrs =
+      var customAttrs = disableConfiguration ?
+        [] :
         GGRC.custom_attr_defs
           .filter(function (def) {
             return def.definition_type === modelDefinition &&
