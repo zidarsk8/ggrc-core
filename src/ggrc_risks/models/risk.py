@@ -47,4 +47,9 @@ class Risk(HasObjectState, mixins.CustomAttributable, mixins.Stateful,
           "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
+      "status": {
+          "display_name": "State",
+          "mandatory": False,
+          "description": "Options are: \n {}".format('\n'.join(VALID_STATES))
+      }
   }
