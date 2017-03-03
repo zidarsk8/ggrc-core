@@ -74,10 +74,6 @@
       padding-top: 3px;
     }
   }
-  &__input-wrap {
-    width: auto;
-    margin-right: 164px;
-  }
   &__expression-holder {
     position: relative;
     &__is-expression {
@@ -98,8 +94,8 @@
   &__input {
     @include box-shadow(none !important);
     @include border-radius(0 !important);
-    line-height: 26px !important;
-    height: 26px !important;
+    line-height: 28px !important;
+    height: 28px !important;
     padding: 2px 4px !important;
     font-size: 12px !important;
     margin: -2px 0 0 0 !important;
@@ -119,10 +115,9 @@
     }
   }
   &__button-wrap {
-    position: absolute;
-    top: 0;
     width: 164px;
-    right: 0;
+    float:left;
+    margin-right: 20px;
   }
   &__button {
     @extend %clearfix;
@@ -140,12 +135,19 @@
       font-weight: normal;
     }
     i {
-      opacity: 0.25;
+      opacity: 0.7;
       transition: opacity 0.2s ease;
       color: $black;
       &:hover {
         opacity: 1;
       }
+    }
+    &__reset {
+      border: solid #ddd !important;
+      border-width: 1px !important;
+      background-color: white !important;
+      line-height: 16px !important;
+      height: 26px;
     }
   }
   &__paging-wrap {
@@ -162,11 +164,13 @@
 
   &.tree-filter_paging {
     .tree-filter {
-      &__input-wrap {
-        margin-right: 760px;
+      &__fluid-wraper {
+        width:100%;
+        margin: 0 auto;
       }
-      &__button-wrap {
-        right: 600px;
+      &__input-wrap {
+        float: left;
+        width: 27%;
       }
       &__paging-wrap {
         display: block;
@@ -176,16 +180,13 @@
         top: 0;
       }
       &__status-wrap {
-        right: 350px;
-        display: block;
-        position: absolute;
+        float:left;
+        width:20%;
+        min-width: 160px;
+        max-width: 350px;
+        position: relative;
         top: -2px;
         font-size: 12px;
-        label {
-          text-transform: none;
-          cursor: pointer;
-          padding-right: 5px;
-        }
       }
     }
   }
