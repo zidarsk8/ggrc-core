@@ -6,10 +6,15 @@
 (function () {
   Mustache.registerHelper('if_mapping_ready',
     function (mappingName, instance, options) {
-      var mappingDeferred = Mustache.resolve(instance)
-        .get_mapping_deferred(mappingName);
-
+      var mappingDeferred;
       var dfd = new $.Deferred();
+
+      if (typeof mappingName !== 'string') {
+        mappingName = Mustache.resolve(mappingName);
+      }
+
+      mappingDeferred = Mustache.resolve(instance)
+        .get_mapping_deferred(mappingName);
 
       mappingDeferred.then(function (mapping) {
         var resolveDfd = function () {
