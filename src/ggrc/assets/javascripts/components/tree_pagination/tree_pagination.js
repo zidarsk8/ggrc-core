@@ -42,7 +42,7 @@
         var _value;
         var _page;
         event.stopPropagation();
-        if (!this.paging.attr('disabled')) {
+        if (!this.paging.attr('disabled') && input.val() !== '') {
           _value = parseInt(input.val(), 10);
           _page = Math.min(Math.max(_value, 1) || 1, this.paging.count);
 
