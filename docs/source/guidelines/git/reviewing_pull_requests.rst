@@ -146,6 +146,18 @@ any other issues.
 Reviewing a PR containing database migration scripts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Note: Before clicking "Merge pull request", a developer must test the 
+migrations once again by running:
+
+.. code-block:: bash
+
+    git pr <pr_number>
+    db_reset
+
+This is needed because migration chain can be out of date if another
+migration PR was merged after the last commit on the current PR has 
+been pushed.
+
 Pull requests that modify the database (marked with the ``migration``
 label) require additional checks to be performed on top of all the
 others regular checks, namely the following:
