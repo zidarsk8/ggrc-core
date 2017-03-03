@@ -17,7 +17,19 @@ class RecordBuilder(object):
         tgt_class, '_fulltext_attrs')
 
   def _get_properties(self, obj):
-    """Get indexable properties and values."""
+    """Get indexable properties and values.
+
+    Properties should be returned in the following format:
+    {
+      property1: {
+        subproperty1: value1,
+        subproperty2: value2,
+        ...
+      },
+      ...
+    }
+    If there is no subproperty - empty string is used as a key
+    """
     if obj.type == "Snapshot":
       # Snapshots do not have any indexable content. The object content for
       # snapshots is stored in the revision. Snapshots can also be made for
@@ -27,14 +39,25 @@ class RecordBuilder(object):
       if not tgt_class:
         return {}
       attrs = AttributeInfo.gather_attrs(tgt_class, '_fulltext_attrs')
-      return {attr: obj.revision.content.get(attr) for attr in attrs}
+      return {attr: {"": obj.revision.content.get(attr)} for attr in attrs}
 
-    return {attr: getattr(obj, attr) for attr in self._fulltext_attrs}
+    return {attr: {"": getattr(obj, attr)} for attr in self._fulltext_attrs}
 
   def as_record(self, obj):
-    """Generate record representation for an object."""
+    """Generate record representation for an object.
+
+    Properties should be returned in the following format:
+    {
+      property1: {
+        subproperty1: value1,
+        subproperty2: value2,
+        ...
+      },
+      ...
+    }
+    If there is no subproperty - empty string is used as a key
+    """
     # Defaults. These work when the record is not a custom attribute
-    properties = self._get_properties(obj)
     record_id = obj.id
     record_type = obj.__class__.__name__
 
@@ -48,13 +71,17 @@ class RecordBuilder(object):
       attribute_name = obj.custom_attribute.title
 
       properties = {}
+      subproperties = {}
       if (obj.custom_attribute.attribute_type == "Map:Person" and
               obj.attribute_object_id):
         # Add both name and email for a Map:Person to the index
-        properties[attribute_name + ".name"] = obj.attribute_object.name
-        properties[attribute_name + ".email"] = obj.attribute_object.email
+        subproperties["name"] = obj.attribute_object.name
+        subproperties["email"] = obj.attribute_object.email
+        properties[attribute_name] = subproperties
       else:
-        properties[attribute_name] = obj.attribute_value
+        properties[attribute_name] = {"": obj.attribute_value}
+    else:
+      properties = self._get_properties(obj)
 
     return Record(
         # This logic saves custom attribute values as attributes of the object

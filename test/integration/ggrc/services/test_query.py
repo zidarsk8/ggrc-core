@@ -595,6 +595,11 @@ class TestQueryWithCA(BaseQueryAPITestCase):
         definition_type="program",
         attribute_type="Date",
     )
+    factories.CustomAttributeDefinitionFactory(
+        title="CA person",
+        definition_type="program",
+        attribute_type="Map:Person",
+    )
     # local CADs for the Assessments
     for title in ["Date or arbitrary text", "Date or text styled as date"]:
       factories.CustomAttributeDefinitionFactory(
@@ -694,6 +699,17 @@ class TestQueryWithCA(BaseQueryAPITestCase):
     titles = [prog["title"] for prog in programs]
     self.assertItemsEqual(titles, ("F", "H", "J", "B", "D"))
     self.assertEqual(len(programs), 5)
+
+  def test_ca_filter_by_person(self):
+    """Test CA person fields filtering by = operator."""
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              expression=["ca person", "=", "three"]),
+        "Program", "values",
+    )
+    titles = [prog["title"] for prog in programs]
+    self.assertItemsEqual(titles, ("F",))
+    self.assertEqual(len(programs), 1)
 
   def test_ca_query_lt(self):
     """Test CA date fields filtering by < operator."""
