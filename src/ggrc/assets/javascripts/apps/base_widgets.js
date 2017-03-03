@@ -34,10 +34,8 @@
     'System',
     'Vendor'
   ];
-    // NOTE: By default, widgets are sorted alphabetically (the value of
-    // the order 100+), but the objects with higher importance that should
-    // be  prioritized use order values below 100. An order value of 0 is
-    // reserved for the "info" widget which always comes first.
+  // NOTE: Widgets that have the order value are sorted by an increase values,
+  // the rest of widgets are sorted alphabetically
   var defaultOrderTypes = {
     Standard: 10,
     Regulation: 20,
