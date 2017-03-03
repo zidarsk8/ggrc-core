@@ -80,8 +80,13 @@
     options: [],
     newEntries: [],
     relevant: [],
-    toolbarSubmitCbs: $.Callbacks(),
+    submitCbs: $.Callbacks(),
     afterSearch: false,
+    init: function () {
+      if (!this.attr('search_only')) {
+        setTimeout(this.onToolbarSubmit.bind(this));
+      }
+    },
     allowedToCreate: function () {
       var isSearch = this.attr('search_only');
       // Don't allow to create new instances for "In Scope" Objects
@@ -175,7 +180,7 @@
       return _.findWhere(types, {value: type});
     },
     onToolbarSubmit: function () {
-      this.attr('toolbarSubmitCbs').fire();
+      this.attr('submitCbs').fire();
       this.attr('afterSearch', true);
     }
   });
