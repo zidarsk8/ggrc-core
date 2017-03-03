@@ -398,6 +398,43 @@
         this.refreshInstance();
         this._pane_preloaded = true;
       }
+    },
+    get_related_objects_as_source: function () {
+      var dfd = can.Deferred();
+      var self = this;
+      this.get_binding('related_objects_as_source')
+        .refresh_instances()
+        .then(function (list) {
+          list.forEach(function (item) {
+            var query;
+            var instance = item.instance;
+            if (GGRC.Utils.Snapshots.isSnapshotType(instance)) {
+              query = GGRC.Utils.Snapshots.getSnapshotItemQuery(
+                self, instance.child_id, instance.child_type);
+
+              GGRC.Utils.QueryAPI
+                .makeRequest(query)
+                .done(function (responseArr) {
+                  var data = responseArr[0];
+                  var value = data.Snapshot.values[0];
+                  var object;
+
+                  if (!value) {
+                    return;
+                  }
+
+                  object = GGRC.Utils.Snapshots.toObject(value);
+                  instance.attr('class', object.class);
+                  instance.attr('snapshot_object_class',
+                    'snapshot-object');
+                  instance.attr('title', object.title);
+                  instance.attr('viewLink', object.originalLink);
+                });
+            }
+          });
+          dfd.resolve(list);
+        });
+      return dfd;
     }
   });
 })(window.can, window.GGRC, window.CMS);
