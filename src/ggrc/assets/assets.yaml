@@ -346,6 +346,7 @@ dashboard-js-template-files:
   - base_objects/open_close.mustache
   - base_objects/sub_tree_type_selector.mustache
   - base_objects/modal/search_title.mustache
+  - base_objects/mapper-item-description.mustache
   - base_templates/add_comment.mustache
   - base_templates/objects_tooltip.mustache
   - base_templates/attachment_list.mustache
@@ -503,6 +504,7 @@ dashboard-js-template-files:
   - people/tree_add_item.mustache
   - people/tree_header.mustache
   - people/search_result.mustache
+  - people/mapper-item-description.mustache
   - policies/info.mustache
   - policies/modal_content.mustache
   - processes/info.mustache
