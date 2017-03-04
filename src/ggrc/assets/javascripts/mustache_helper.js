@@ -3222,7 +3222,12 @@ Mustache.registerHelper('with_create_issue_json', function (instance, options) {
   if (instance.mappedSnapshots) {
     relatedSnapshots = instance.mappedSnapshots.map(function (item) {
       var instance = item.instance;
-      return {title: instance.title, id: instance.id, type: instance.type};
+      return {
+        title: instance.title,
+        id: instance.id,
+        type: instance.type,
+        context: instance.context
+      };
     });
   }
 
