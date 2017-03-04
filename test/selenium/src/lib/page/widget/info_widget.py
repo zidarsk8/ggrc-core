@@ -24,6 +24,8 @@ class CommonInfo(base.Widget):
     self.state = base.Label(driver, self._locator.STATE)
     self.button_3bbs = None
     super(CommonInfo, self).__init__(driver)
+    self.headers_and_values = driver.find_elements(
+        *self._locator.HEADERS_AND_VALUES)
 
   def open_info_3bbs(self):
     """Click to 3bbs button on Info widget or Info panel to open modal for
