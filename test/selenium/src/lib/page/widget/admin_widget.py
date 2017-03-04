@@ -97,7 +97,7 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
     """Collect custom attributes from expanded custom attribute group
     Tree View."""
     ca_item_content = self.expand_collapse_group(ca_group, expand=True)
-    return ca_item_content.get_custom_attributes_list_from_group()
+    return ca_item_content.get_ca_list_from_group()
 
 
 class ModalCustomAttributes(widget_base.CustomAttributeModal,

@@ -67,27 +67,6 @@ def _get_singular(plurals):
   return singulars
 
 
-def _get_plural(singulars):
-  """
- Return: list of basestring: Capitalized object names in plural form
- """
-  plurals = []
-  for name in singulars:
-    name = name.lower()
-    if name == "people":
-      plural = PEOPLE
-    elif name == "policy":
-      plural = POLICIES
-    elif name == "process":
-      plural = PROCESSES
-    elif name == "facility":
-      plural = FACILITIES
-    else:
-      plural = name + "s"
-    plurals.append(plural.upper())
-  return plurals
-
-
 def get_singular(plural):
   """Transform object name to singular and lower form.
  Example: risk_assessments -> risk_assessment
@@ -95,18 +74,11 @@ def get_singular(plural):
   return _get_singular([plural])[0].lower()
 
 
-def get_plural(singular):
-  """Transform object name to plural and lower form.
- Example: risk -> risks
- """
-  return _get_plural([singular])[0].lower()
-
-
 def get_normal_form(obj_name, with_space=True):
   """Transform object name to title form.
  Example:
  if with_space=True then risk_assessments -> Risk Assessments
-  if with_space=False then risk_assessments -> RiskAssessments
+ if with_space=False then risk_assessments -> RiskAssessments
  """
   normal = obj_name.replace("_", " ").title()
   if with_space is True:
@@ -115,6 +87,6 @@ def get_normal_form(obj_name, with_space=True):
     return normal.replace(" ", "")
 
 
-ALL_PLURAL = [k for k in globals().keys()
-              if not k.startswith("_") or k == "ALL"]
+ALL_PLURAL = [
+    k for k in globals().keys() if not k.startswith("_") or k == "ALL"][1:]
 ALL_SINGULAR = _get_singular(ALL_PLURAL)

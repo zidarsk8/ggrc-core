@@ -161,10 +161,11 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   MANAGER = "Manager"
 
 
-class CommonPrograms(Common):
+class CommonProgram(Common):
   """Common elements' labels and properties for Programs objects."""
   # pylint: disable=too-many-instance-attributes
   PROGRAM = objects.get_normal_form(objects.get_singular(objects.PROGRAMS))
+  TITLE = Common.TITLE
   MANAGER = "Manager"
   PROGRAM_URL = "Program URL"
   REFERENCE_URL = Base.REFERENCE_URL
@@ -176,10 +177,11 @@ class CommonPrograms(Common):
   STATE = Base.STATE
 
 
-class CommonAudits(Common):
+class CommonAudit(Common):
   """Common elements' labels and properties for Audits objects."""
   # pylint: disable=too-many-instance-attributes
   AUDIT = objects.get_normal_form(objects.get_singular(objects.AUDITS))
+  TITLE = Common.TITLE
   STATUS = "Status"
   PLANNED_START_DATE = "Planned Start Date"
   PLANNED_END_DATE = "Planned End Date"
@@ -192,29 +194,29 @@ class CommonAudits(Common):
   ASSIGN_FOLDER = "Assign folder"
 
 
-class CommonControls(object):
+class CommonControl(object):
   """Common elements' labels and properties for Controls objects."""
   CONTROL = objects.get_normal_form(objects.get_singular(objects.CONTROLS))
 
 
-class CommonAssessments(object):
+class CommonAssessment(object):
   """Common elements' labels and properties for Assessments objects."""
   ASMT = objects.get_normal_form(objects.get_singular(objects.ASSESSMENTS))
 
 
-class CommonAssessmentTemplates(object):
+class CommonAssessmentTemplate(object):
   """Common elements' labels and properties for Assessment Templates objects.
  """
   ASMT_TMPL = objects.get_normal_form(
       objects.get_singular(objects.ASSESSMENT_TEMPLATES))
 
 
-class CommonIssues(object):
+class CommonIssue(object):
   """Common elements' labels and properties for Issues objects."""
   ISSUE = objects.get_normal_form(objects.get_singular(objects.ISSUES))
 
 
-class ObjectsStates(object):
+class ObjectStates(object):
   """States for objects."""
   DRAFT = "Draft"
   DEPRECATED = "Deprecated"
@@ -227,40 +229,43 @@ class BaseStates(object):
   COMPLETED = "Completed"
 
 
-class AuditsStates(BaseStates):
+class AuditStates(BaseStates):
   """States for Audits objects."""
   PLANNED = "Planned"
   MANAGER_REVIEW = "Manager Review"
   READY_FOR_EXT_REVIEW = "Ready for External Review"
 
 
-class AssessmentsStates(BaseStates):
+class AssessmentStates(BaseStates):
   """States for Assessments objects."""
   NOT_STARTED = "Not Started"
   READY_FOR_REVIEW = "Ready for Review"
   VERIFIED = "Verified"
 
 
-class IssuesStates(ObjectsStates):
+class IssueStates(ObjectStates):
   """States for Issues objects."""
 
 
-class ProgramsInfoWidget(CommonPrograms):
+class ProgramInfoWidget(CommonProgram):
   """Elements' labels and properties for Programs Info widgets."""
-  WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonPrograms.PROGRAM)
+  WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonProgram.PROGRAM)
 
 
-class AuditsInfoWidget(CommonAudits):
+class AuditInfoWidget(CommonAudit):
   """Elements' labels and properties for Audits Info widgets."""
-  WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonAudits.AUDIT)
+  WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonAudit.AUDIT)
+  TITLE_UPPER = CommonAudit.TITLE.upper()
+  AUDIT_LEAD_UPPER = CommonAudit.AUDIT_LEAD.upper()
+  CODE_UPPER = CommonAudit.CODE.upper()
 
 
-class AssessmentTemplatesModalSetVisibleFields(CommonModalSetVisibleFields):
+class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
  fields for Assessment Templates.
  """
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      CommonAssessmentTemplates.ASMT_TMPL)
+      CommonAssessmentTemplate.ASMT_TMPL)
   OWNER = TransformationSetVisibleFields.OWNER
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
@@ -270,12 +275,12 @@ class AssessmentTemplatesModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.LAST_UPDATED)
 
 
-class AssessmentsModalSetVisibleFields(CommonModalSetVisibleFields):
+class AssessmentModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
  fields for Assessments.
  """
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      CommonAssessments.ASMT)
+      CommonAssessment.ASMT)
   VERIFIED = TransformationSetVisibleFields.VERIFIED
   CONCLUSION_DESIGN = "Conclusion: Design"
   CONCLUSION_OPERATION = "Conclusion: Operation"
@@ -290,13 +295,13 @@ class AssessmentsModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.LAST_UPDATED)
 
 
-class ControlsModalSetVisibleFields(CommonModalSetVisibleFields):
+class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
  fields for Controls.
  """
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      CommonControls.CONTROL)
+      CommonControl.CONTROL)
   OWNER = TransformationSetVisibleFields.OWNER
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
@@ -319,13 +324,13 @@ class ControlsModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.LAST_UPDATED)
 
 
-class IssuesModalSetVisibleFields(CommonModalSetVisibleFields):
+class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
  fields for Issues.
  """
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      CommonIssues.ISSUE)
+      CommonIssue.ISSUE)
   OWNER = TransformationSetVisibleFields.OWNER
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
@@ -338,17 +343,17 @@ class IssuesModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.LAST_UPDATED)
 
 
-class ProgramsModalSetVisibleFields(CommonModalSetVisibleFields):
+class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   """Common elements' labels and properties for Modal to Set visible
  fields for Programs.
  """
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      CommonPrograms.PROGRAM)
+      CommonProgram.PROGRAM)
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   REVIEW_STATE = "Review State"
-  MANAGER = CommonPrograms.MANAGER
+  MANAGER = CommonProgram.MANAGER
   URL = Base.URL
   REFERENCE_URL = Base.REFERENCE_URL
   EFFECTIVE_DATE = Base.EFFECTIVE_DATE

@@ -24,7 +24,6 @@ class _EditModal(modal_base.BaseModal):
 
 
 class Programs(modal_base.ProgramsModal, _EditModal):
-  # pylint: disable=abstract-method
   """Programs edit modal."""
 
 

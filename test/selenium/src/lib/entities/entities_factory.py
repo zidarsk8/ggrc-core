@@ -6,9 +6,10 @@
 # pylint: disable=redefined-builtin
 
 
+import copy
 import random
-import re
 
+import re
 from lib.constants import element, objects, roles, url as const_url
 from lib.constants.element import AdminWidgetCustomAttrs
 from lib.entities import entity
@@ -28,7 +29,7 @@ class EntitiesFactory(object):
   _obj_asmt = objects.get_singular(objects.ASSESSMENTS)
   _obj_issue = objects.get_singular(objects.ISSUES)
 
-  all_objs_attrs_names = tuple(entity.Entities().attrs_names_all_entities())
+  all_objs_attrs_names = tuple(entity.Entity().attrs_names_all_entities())
 
   @classmethod
   def update_obj_attrs_values(cls, obj, attrs_names=all_objs_attrs_names,
@@ -40,12 +41,6 @@ class EntitiesFactory(object):
     [setattr(obj, attr_name, arguments[attr_name]) for
         attr_name in attrs_names if arguments.get(attr_name)]
     return obj
-
-  @classmethod
-  def get_obj_copy(cls, obj):
-    """Get copy of object with all attributes."""
-    blank_obj = getattr(entity, obj.__class__.__name__)()
-    return cls.update_obj_attrs_values(obj=blank_obj, **obj.__dict__)
 
   @classmethod
   def _generate_title(cls, obj_type):
@@ -93,7 +88,7 @@ class PersonsFactory(EntitiesFactory):
   @classmethod
   def _create_random_person(cls):
     """Create Person entity with randomly filled fields."""
-    random_person = entity.PersonsEntity()
+    random_person = entity.PersonEntity()
     random_person.title = cls._generate_title(cls._obj_person)
     random_person.type = cls._obj_person
     random_person.email = cls._generate_email()
@@ -124,7 +119,7 @@ class CAFactory(EntitiesFactory):
   @classmethod
   def _create_random_ca(cls):
     """Create CustomAttribute entity with randomly filled fields."""
-    random_ca = entity.CustomAttributesEntity()
+    random_ca = entity.CustomAttributeEntity()
     random_ca.ca_type = random.choice(AdminWidgetCustomAttrs.ALL_ATTRS_TYPES)
     random_ca.title = cls._generate_title(random_ca.ca_type)
     random_ca.definition_type = random.choice(objects.ALL_CA_OBJECTS)
@@ -196,13 +191,13 @@ class ProgramsFactory(EntitiesFactory):
   def _create_random_program(cls):
     """Create Program entity with randomly and predictably filled fields."""
     # pylint: disable=protected-access
-    random_program = entity.ProgramsEntity()
+    random_program = entity.ProgramEntity()
     random_program.title = cls._generate_title(cls._obj_program)
     random_program.type = cls._obj_program
     random_program.code = cls._generate_code()
     random_program.manager = roles.DEFAULT_USER
     random_program.primary_contact = roles.DEFAULT_USER
-    random_program.state = element.ObjectsStates.DRAFT
+    random_program.state = element.ObjectStates.DRAFT
     return random_program
 
 
@@ -228,13 +223,13 @@ class ControlsFactory(EntitiesFactory):
   def _create_random_control(cls):
     """Create Control entity with randomly and predictably filled fields."""
     # pylint: disable=protected-access
-    random_control = entity.ControlsEntity()
+    random_control = entity.ControlEntity()
     random_control.title = cls._generate_title(cls._obj_control)
     random_control.type = cls._obj_control
     random_control.code = cls._generate_code()
     random_control.owner = roles.DEFAULT_USER
     random_control.primary_contact = roles.DEFAULT_USER
-    random_control.state = element.ObjectsStates.DRAFT
+    random_control.state = element.ObjectStates.DRAFT
     return random_control
 
 
@@ -253,7 +248,7 @@ class AuditsFactory(EntitiesFactory):
     if actual_count_all_audits == audit.id:
       return [
           cls.update_obj_attrs_values(
-              obj=cls.get_obj_copy(audit),
+              obj=copy.deepcopy(audit),
               title=audit.title + " - copy " + str(num), id=audit.id + num,
               href=re.sub("\d+$", str(audit.id + num), audit.href),
               url=re.sub("\d+$", str(audit.id + num), audit.url),
@@ -279,12 +274,12 @@ class AuditsFactory(EntitiesFactory):
   def _create_random_audit(cls):
     """Create Audit entity with randomly and predictably filled fields."""
     # pylint: disable=protected-access
-    random_audit = entity.AuditsEntity()
+    random_audit = entity.AuditEntity()
     random_audit.title = cls._generate_title(cls._obj_audit)
     random_audit.type = cls._obj_audit
     random_audit.code = cls._generate_code()
     random_audit.audit_lead = roles.DEFAULT_USER
-    random_audit.status = element.AuditsStates().PLANNED
+    random_audit.status = element.AuditStates().PLANNED
     return random_audit
 
 
@@ -303,7 +298,7 @@ class AssessmentTemplatesFactory(EntitiesFactory):
     if actual_count_all_asmt_tmpls == asmt_tmpl.id:
       return [
           cls.update_obj_attrs_values(
-              obj=cls.get_obj_copy(asmt_tmpl), id=asmt_tmpl.id + num,
+              obj=copy.deepcopy(asmt_tmpl), id=asmt_tmpl.id + num,
               href=re.sub("\d+$", str(asmt_tmpl.id + num), asmt_tmpl.href),
               url=re.sub("\d+$", str(asmt_tmpl.id + num), asmt_tmpl.url),
               code=("TEMPLATE-" + str(asmt_tmpl.id + num))) for
@@ -331,7 +326,7 @@ class AssessmentTemplatesFactory(EntitiesFactory):
     """Create Assessment Template entity with randomly and predictably
     filled fields.
     """
-    random_asmt_tmpl = entity.AssessmentTemplatesEntity()
+    random_asmt_tmpl = entity.AssessmentTemplateEntity()
     random_asmt_tmpl.title = cls._generate_title(cls._obj_asmt_tmpl)
     random_asmt_tmpl.type = cls._obj_asmt_tmpl
     random_asmt_tmpl.code = cls._generate_code()
@@ -382,14 +377,14 @@ class AssessmentsFactory(EntitiesFactory):
   @classmethod
   def _create_random_asmt(cls):
     """Create Assessment entity with randomly and predictably filled fields."""
-    random_asmt = entity.AssessmentsEntity()
+    random_asmt = entity.AssessmentEntity()
     random_asmt.title = cls._generate_title(cls._obj_asmt)
     random_asmt.type = cls._obj_asmt
     random_asmt.code = cls._generate_code()
     random_asmt.object = roles.DEFAULT_USER
     random_asmt.creators = roles.DEFAULT_USER
     random_asmt.assignees = roles.DEFAULT_USER
-    random_asmt.state = element.AssessmentsStates.NOT_STARTED
+    random_asmt.state = element.AssessmentStates.NOT_STARTED
     random_asmt.is_verified = element.Common.FALSE
     return random_asmt
 
@@ -415,11 +410,11 @@ class IssuesFactory(EntitiesFactory):
   @classmethod
   def _create_random_issue(cls):
     """Create Issue entity with randomly and predictably filled fields."""
-    random_issue = entity.IssuesEntity()
+    random_issue = entity.IssueEntity()
     random_issue.title = cls._generate_title(cls._obj_issue)
     random_issue.type = cls._obj_issue
     random_issue.code = cls._generate_code()
     random_issue.owner = roles.DEFAULT_USER
     random_issue.primary_contact = roles.DEFAULT_USER
-    random_issue.state = element.IssuesStates.DRAFT
+    random_issue.state = element.IssueStates.DRAFT
     return random_issue

@@ -97,16 +97,17 @@ class Widget(base.Widget):
     else:
       self.verify_counter_not_loaded()
 
-  def select_nth_member(self, member):
-    """Select member from list. Members start from (including) 0.
-    Args: member (int)
+  def select_member_by_num(self, num):
+    """Select member from list of members by number (start from 0).
+    Args: num (int)
     Return: lib.page.widget.info.Widget
     """
+    # pylint: disable=not-callable
     try:
-      element = self.members_listed[member]
+      member = self.members_listed[num]
       # wait for the listed items animation to stop
-      selenium_utils.wait_until_stops_moving(element)
-      element.click()
+      selenium_utils.wait_until_stops_moving(member)
+      member.click()
       # wait for the info pane animation to stop
       info_pane = selenium_utils.get_when_clickable(
           self._driver, locator.ObjectWidget.INFO_PANE)
@@ -115,10 +116,10 @@ class Widget(base.Widget):
     except exceptions.StaleElementReferenceException:
       self.members_listed = self._driver.find_elements(
           *locator.ObjectWidget.MEMBERS_TITLE_LIST)
-      return self.select_nth_member(member)
+      return self.select_member_by_num(num)
     except exceptions.TimeoutException:
       # sometimes the click to the listed member results in hover
-      return self.select_nth_member(member)
+      return self.select_member_by_num(num)
 
 
 class TreeView(base.TreeView):
@@ -209,18 +210,18 @@ class TreeView(base.TreeView):
                         _item in self.tree_view_items_elements()]
     return [dict(zip(list_headers[0], item)) for item in list_lists_items]
 
-  def select_el_in_tree_view(self, el_title):
-    """Select element in Tree View by element's title."""
+  def select_member_in_by_title(self, title):
+    """Select member in Tree View by member's title."""
     item = [_item for _item in self.tree_view_items_elements() if
-            el_title in _item.text.splitlines()][0]
+            title in _item.text.splitlines()][0]
     selenium_utils.wait_until_stops_moving(item)
     item.click()
 
-  def get_el_seq_num_in_tree_view(self, el_title):
-    """Get element's sequence number in Tree View by element's title."""
+  def get_member_seq_num_by_title(self, title):
+    """Get member's sequence number in Tree View by member's title."""
     list_items = [_item.text.splitlines() for
                   _item in self.tree_view_items_elements()]
-    return [num for num, item in enumerate(list_items) if el_title in item][0]
+    return [num for num, item in enumerate(list_items) if title in item][0]
 
 
 class Audits(Widget):
@@ -243,7 +244,7 @@ class AssessmentTemplates(Widget):
   _locator_widget = locator.WidgetBar.ASSESSMENT_TEMPLATES
   _locator_filter = locator.WidgetAssessmentTemplates
   _asmt_tmpls_fields = (
-      element.AssessmentTemplatesModalSetVisibleFields.DEFAULT_SET_FIELDS)
+      element.AssessmentTemplateModalSetVisibleFields.DEFAULT_SET_FIELDS)
 
   URL = "{source_obj_url}" + _locator_filter.widget_name
 
@@ -271,7 +272,7 @@ class Assessments(Widget):
   info_widget_cls = info_widget.AssessmentsInfoWidget
   _locator_widget = locator.WidgetBar.ASSESSMENTS
   _locator_filter = locator.WidgetAssessments
-  _asmts_fields = element.AssessmentsModalSetVisibleFields.DEFAULT_SET_FIELDS
+  _asmts_fields = element.AssessmentModalSetVisibleFields.DEFAULT_SET_FIELDS
 
   URL = "{source_obj_url}" + _locator_filter.widget_name
 
@@ -303,7 +304,7 @@ class Controls(Widget):
   info_widget_cls = info_widget.ControlsInfoWidget
   _locator_widget = locator.WidgetBar.CONTROLS
   _locator_filter = locator.WidgetControls
-  _controls_fields = element.ControlsModalSetVisibleFields().DEFAULT_SET_FIELDS
+  _controls_fields = element.ControlModalSetVisibleFields().DEFAULT_SET_FIELDS
 
   URL = "{source_obj_url}" + _locator_filter.widget_name
 
@@ -319,8 +320,9 @@ class Controls(Widget):
 
   def update_ver(self, obj_title):
     """Update version of Control from Info widget."""
-    obj_num = self.tree_view.get_el_seq_num_in_tree_view(obj_title)
-    self.select_nth_member(obj_num)
+    obj_num = self.tree_view.get_member_seq_num_by_title(
+        obj_title)
+    self.select_member_by_num(obj_num)
     info_panel = self.info_widget_cls(self._driver)
     info_panel.open_link_get_latest_ver().confirm_update()
     self.tree_view.wait_loading_after_actions(self._driver)
@@ -342,7 +344,7 @@ class Issues(Widget):
   info_widget_cls = info_widget.IssuesInfoWidget
   _locator_widget = locator.WidgetBar.ISSUES
   _locator_filter = locator.WidgetIssues
-  _issues_fields = element.IssuesModalSetVisibleFields.DEFAULT_SET_FIELDS
+  _issues_fields = element.IssueModalSetVisibleFields.DEFAULT_SET_FIELDS
 
   URL = "{source_obj_url}" + _locator_filter.widget_name
 
@@ -366,7 +368,7 @@ class Programs(Widget):
   info_widget_cls = info_widget.ProgramsInfoWidget
   _locator_widget = locator.WidgetBar.PROGRAMS
   _locator_filter = locator.WidgetPrograms
-  _programs_fields = element.ProgramsModalSetVisibleFields.DEFAULT_SET_FIELDS
+  _programs_fields = element.ProgramModalSetVisibleFields.DEFAULT_SET_FIELDS
 
   URL = "{source_obj_url}" + _locator_filter.widget_name
 

@@ -5,8 +5,8 @@
 # pylint: disable=too-few-public-methods
 
 
-class Entities(object):
-  """Class that represent model for base entities."""
+class Entity(object):
+  """Class that represent model for base entity."""
   # pylint: disable=invalid-name
   # pylint: disable=redefined-builtin
 
@@ -21,9 +21,9 @@ class Entities(object):
   def attrs_names_all_entities():
     """Get list of all possible unique entities attributes' names."""
     all_entities_cls = [
-        PersonsEntity, CustomAttributesEntity, ProgramsEntity, ControlsEntity,
-        AuditsEntity, AssessmentsEntity, AssessmentTemplatesEntity,
-        IssuesEntity]
+        PersonEntity, CustomAttributeEntity, ProgramEntity,
+        ControlEntity, AuditEntity, AssessmentEntity,
+        AssessmentTemplateEntity, IssueEntity]
     all_entities_attrs_names = [
         entity_class().__dict__.keys() for
         entity_class in all_entities_cls]
@@ -32,12 +32,12 @@ class Entities(object):
     return unique_entities_attrs_names
 
 
-class PersonsEntity(Entities):
-  """Class that represent model for Persons."""
+class PersonEntity(Entity):
+  """Class that represent model for Person."""
   __hash__ = None
 
   def __init__(self, email=None, authorizations=None):
-    super(PersonsEntity, self).__init__()
+    super(PersonEntity, self).__init__()
     self.email = email
     self.authorizations = authorizations
 
@@ -49,15 +49,15 @@ class PersonsEntity(Entities):
         url=self.url, email=self.email, authorizations=self.authorizations)
 
 
-class CustomAttributesEntity(object):
-  """Class that represent model for Custom Attributes."""
+class CustomAttributeEntity(object):
+  """Class that represent model for Custom Attribute."""
   # pylint: disable=too-many-instance-attributes
   __hash__ = None
 
   def __init__(self, obj_id=None, title=None, ca_type=None,
                definition_type=None, helptext="", placeholder=None,
                multi_choice_options=None, is_mandatory=False, ca_global=True):
-    super(CustomAttributesEntity, self).__init__()
+    super(CustomAttributeEntity, self).__init__()
     self.obj_id = obj_id
     self.title = title
     self.ca_type = ca_type
@@ -83,13 +83,13 @@ class CustomAttributesEntity(object):
             self.definition_type == other.definition_type)
 
 
-class ProgramsEntity(Entities):
-  """Class that represent model for Programs."""
+class ProgramEntity(Entity):
+  """Class that represent model for Program."""
   __hash__ = None
 
   def __init__(self, manager=None, primary_contact=None, code=None, state=None,
                last_update=None):
-    super(ProgramsEntity, self).__init__()
+    super(ProgramEntity, self).__init__()
     self.manager = manager
     self.primary_contact = primary_contact
     self.code = code
@@ -113,13 +113,13 @@ class ProgramsEntity(Entities):
             self.primary_contact == other.primary_contact)
 
 
-class ControlsEntity(Entities):
-  """Class that represent model for Controls."""
+class ControlEntity(Entity):
+  """Class that represent model for Control."""
   __hash__ = None
 
   def __init__(self, owner=None, primary_contact=None, code=None, state=None,
                last_update=None):
-    super(ControlsEntity, self).__init__()
+    super(ControlEntity, self).__init__()
     self.owner = owner
     self.primary_contact = primary_contact
     self.code = code
@@ -141,13 +141,13 @@ class ControlsEntity(Entities):
             self.primary_contact == other.primary_contact)
 
 
-class AuditsEntity(Entities):
-  """Class that represent model for Audits."""
+class AuditEntity(Entity):
+  """Class that represent model for Audit."""
   __hash__ = None
 
   def __init__(self, program=None, audit_lead=None, code=None,
                status=None, last_update=None):
-    super(AuditsEntity, self).__init__()
+    super(AuditEntity, self).__init__()
     self.program = program
     self.audit_lead = audit_lead
     self.code = code
@@ -170,15 +170,15 @@ class AuditsEntity(Entities):
             self.status == other.status)
 
 
-class AssessmentTemplatesEntity(Entities):
-  """Class that represent model for Assessment Templates."""
+class AssessmentTemplateEntity(Entity):
+  """Class that represent model for Assessment Template."""
   # pylint: disable=superfluous-parens
 
   __hash__ = None
 
   def __init__(self, audit=None, asmt_objects=None, def_assessors=None,
                def_verifiers=None, code=None, last_update=None):
-    super(AssessmentTemplatesEntity, self).__init__()
+    super(AssessmentTemplateEntity, self).__init__()
     self.audit = audit
     self.asmt_objects = asmt_objects
     self.def_assessors = def_assessors
@@ -202,8 +202,8 @@ class AssessmentTemplatesEntity(Entities):
             self.title == other.title and self.code == other.code)
 
 
-class AssessmentsEntity(Entities):
-  """Class that represent model for Assessments."""
+class AssessmentEntity(Entity):
+  """Class that represent model for Assessment."""
   # pylint: disable=too-many-instance-attributes
   # pylint: disable=redefined-builtin
   __hash__ = None
@@ -211,7 +211,7 @@ class AssessmentsEntity(Entities):
   def __init__(self, object=None, audit=None, creators=None, assignees=None,
                primary_contact=None, is_verified=None, code=None, state=None,
                last_update=None):
-    super(AssessmentsEntity, self).__init__()
+    super(AssessmentEntity, self).__init__()
     self.object = object
     self.audit = audit
     self.creators = creators
@@ -241,14 +241,14 @@ class AssessmentsEntity(Entities):
             self.is_verified == other.is_verified)
 
 
-class IssuesEntity(Entities):
-  """Class that represent model for Issues."""
+class IssueEntity(Entity):
+  """Class that represent model for Issue."""
   # pylint: disable=too-many-instance-attributes
   __hash__ = None
 
   def __init__(self, audit=None, owner=None, primary_contact=None, code=None,
                state=None, last_update=None):
-    super(IssuesEntity, self).__init__()
+    super(IssueEntity, self).__init__()
     self.audit = audit
     self.owner = owner
     self.primary_contact = primary_contact

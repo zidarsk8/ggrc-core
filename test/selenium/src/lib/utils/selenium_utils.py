@@ -12,7 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from lib import constants, exception
 
-logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+LOGGER = logging.getLogger(__name__)
 
 
 def hover_over_element(driver, element):
@@ -145,7 +145,7 @@ def click_on_staleable_element(driver, el_locator):
       driver.find_element(*el_locator).click()
       break
     except exceptions.StaleElementReferenceException as err:
-      logger.error(err)
+      LOGGER.error(err)
       time.sleep(0.1)
   else:
     raise exception.ElementNotFound(el_locator)

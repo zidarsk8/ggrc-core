@@ -51,7 +51,7 @@ class TestProgramPage(base.Test):
     program_info_page.navigate_to()
     horizontal_bar = widget_bar.Dashboard(selenium)
     assert (horizontal_bar.get_active_widget_name() ==
-            element.ProgramsInfoWidget().WIDGET_HEADER)
+            element.ProgramInfoWidget().WIDGET_HEADER)
 
   @pytest.mark.smoke_tests
   def test_info_tab_contains_entered_data(self, new_program_ui):

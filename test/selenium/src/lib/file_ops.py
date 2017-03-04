@@ -6,7 +6,7 @@ import logging
 import os
 import shutil
 
-logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+LOGGER = logging.getLogger(__name__)
 
 
 def create_directory(path):
@@ -15,11 +15,10 @@ def create_directory(path):
  """
   # Check if path is a file_path or a dir_path. Dir path is a string that
   # ends with os.sep
-  # pylint: disable=unused-variable
   if path[-1] != os.sep:
-    path, file_name = os.path.split(path)
+    path, _ = os.path.split(path)
   if not os.path.exists(path):
-    logger.info("Creating directory: %s", path)
+    LOGGER.info("Creating directory: %s", path)
     os.makedirs(path)
 
 

@@ -24,7 +24,7 @@ class TestMyWorkPage(base.Test):
     controls_widget = dashboard.Dashboard(selenium).select_controls()
     for _ in xrange(controls_widget.member_count):
       counter = controls_widget.get_items_count()
-      (controls_widget.select_nth_member(0).
+      (controls_widget.select_member_by_num(0).
        open_info_3bbs().select_delete_obj().confirm_delete())
       controls_widget.wait_member_deleted(counter)
     assert generic_widget.Controls(selenium).members_listed == []

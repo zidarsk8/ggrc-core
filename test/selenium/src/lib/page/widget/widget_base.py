@@ -7,7 +7,7 @@
 
 from lib import base, decorator, environment
 from lib.constants import locator, url
-from lib.entities.entity import CustomAttributesEntity
+from lib.entities.entity import CustomAttributeEntity
 from lib.utils import selenium_utils
 from lib.utils.string_utils import get_bool_from_string
 
@@ -83,11 +83,11 @@ class CustomAttributesItemContent(base.Component):
                                                     self._locator.ROW):
       attr = [i.text for i in elem.find_elements(*self._locator.CELL_IN_ROW)]
       self.custom_attributes_list.append(
-          CustomAttributesEntity(title=attr[0], ca_type=attr[1],
-                                 is_mandatory=get_bool_from_string(attr[2]),
-                                 definition_type=self._item_name))
+          CustomAttributeEntity(title=attr[0], ca_type=attr[1],
+                                is_mandatory=get_bool_from_string(attr[2]),
+                                definition_type=self._item_name))
 
-  def get_custom_attributes_list_from_group(self):
+  def get_ca_list_from_group(self):
     """Return list of Custom Attribute objects."""
     self._set_custom_attributes_list()
     return self.custom_attributes_list
@@ -101,15 +101,16 @@ class CustomAttributesItemContent(base.Component):
     self.button_add.click()
     return CustomAttributeModal(self._driver)
 
-  def edit_nth_member(self, member):
-    """Selects NTH member from listed members in dropdown. Since selected
-    from list, first member has index 0.
-    Args: member (int)
+  def select_ca_member_by_num(self, num):
+    """Select Custom Attribute member from list of members by number
+    (start from 0).
+    Args: num (int)
+    Return: lib.page.widget.widget_base.CustomAttributeModal
     """
     # check that the buttons are loaded
     selenium_utils.get_when_clickable(self._driver, self._locator.EDIT_BTN)
     elements = self._driver.find_elements(self._locator.EDIT_BTN)
-    selenium_utils.scroll_into_view(self._driver, elements[member]).click()
+    selenium_utils.scroll_into_view(self._driver, elements[num]).click()
     return CustomAttributeModal(self._driver)
 
 

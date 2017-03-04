@@ -6,7 +6,7 @@ from lib.constants import element
 from lib.entities.entities_factory import (
     AssessmentTemplatesFactory, AssessmentsFactory, EntitiesFactory,
     ControlsFactory, AuditsFactory, IssuesFactory, ProgramsFactory)
-from lib.entities.entity import AuditsEntity
+from lib.entities.entity import AuditEntity
 from lib.page.widget.generic_widget import (
     Audits, AssessmentTemplates, Assessments, Controls, Issues, Programs)
 from lib.page.widget.info_widget import AuditsInfoWidget
@@ -118,8 +118,8 @@ class AuditsService(BaseWebUiService):
     selenium_utils.open_url(self.driver, audit_info_widget_url)
     audit_info_page = Audits.info_widget_cls(self.driver)
     (audit_info_page.
-     open_info_3bbs().select_clone().confirm_full_clone_audit())
-    cloned_audit_obj = AuditsEntity()
+     open_info_3bbs().select_clone().confirm_clone(is_full=True))
+    cloned_audit_obj = AuditEntity()
     cloned_audit_obj.url = self.driver.current_url
     actual_cloned_audit_obj = self.get_obj_from_info_widget(
         audit_obj=cloned_audit_obj)

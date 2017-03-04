@@ -16,61 +16,46 @@ class CommonDropdownSettings(base.Component):
 
   def __init__(self, driver):
     super(CommonDropdownSettings, self).__init__(driver)
-    self.edit = None
-    self.permalink = None
-    self.delete = None
 
   def select_edit(self):
     """
     Return: lib.page.modal.edit_object.EditModal
     """
-    self.edit = base.Button(self._driver, self._locator.BUTTON_3BBS_EDIT)
-    self.edit.click()
+    base.Button(self._driver, self._locator.BUTTON_3BBS_EDIT).click()
     return getattr(edit_object, self.__class__.__name__)(self._driver)
 
   def select_get_permalink(self):
     "Select get permalink."
-    self.permalink = base.Button(
-        self._driver, self._locator.BUTTON_3BBS_GET_PERMALINK)
-    self.permalink.click()
+    base.Button(self._driver, self._locator.BUTTON_3BBS_GET_PERMALINK).click()
 
   def select_delete_obj(self):
     """
     Return: modal.delete_object.DeleteObjectModal
     """
-    self.delete = base.Button(self._driver, self._locator.BUTTON_3BBS_DELETE)
-    self.delete.click()
+    base.Button(self._driver, self._locator.BUTTON_3BBS_DELETE).click()
     return delete_object.DeleteObjectModal(self._driver)
 
 
-class AuditDropdownSettings(CommonDropdownSettings):
-  """3BBS button/dropdown Audit settings on Info widgets and Info panels."""
+class Audits(CommonDropdownSettings):
+  """Dropdown settings on Audit Info widgets and Info panels."""
   _locator = locator.AuditDropdown3bbsInfoWidget
 
   def __init__(self, driver):
-    super(CommonDropdownSettings, self).__init__(driver)
-    self.update = None
-    self.clone = None
+    super(Audits, self).__init__(driver)
 
   def select_update_objs(self):
     """
     Return: modal.update_object.CompareUpdateObjectModal
     """
-    self.update = base.Button(self._driver, self._locator.BUTTON_3BBS_UPDATE)
-    self.update.click()
+    base.Button(self._driver, self._locator.BUTTON_3BBS_UPDATE).click()
     return update_object.CompareUpdateObjectModal(self._driver)
 
   def select_clone(self):
     """
     Return: modal.clone_object.CloneAuditModal
     """
-    self.clone = base.Button(self._driver, self._locator.BUTTON_3BBS_CLONE)
-    self.clone.click()
+    base.Button(self._driver, self._locator.BUTTON_3BBS_CLONE).click()
     return clone_object.CloneAuditModal(self._driver)
-
-
-class Audits(AuditDropdownSettings):
-  """Dropdown settings on Audit Info widgets and Info panels."""
 
 
 class Programs(CommonDropdownSettings):

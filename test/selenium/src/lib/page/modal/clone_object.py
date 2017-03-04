@@ -17,13 +17,11 @@ class CloneAuditModal(base.Modal):
         driver, self._locator.CHECKBOX_CLONE_ASMT_TMPLS)
     self.button_clone = base.Button(driver, self._locator.BUTTON_CONFIRM)
 
-  def confirm_clone_audit(self):
-    """Confirm clone Audit."""
-    self.button_clone.click()
-
   @decorator.wait_for_redirect
-  def confirm_full_clone_audit(self):
-    """Confirm clone Audit including Assessment Templates and
-    wait of page redirected."""
-    self.checkbox_clone_asmt_tmpls.click()
+  def confirm_clone(self, is_full=False):
+    """Confirm clone Audit not including Assessment Templates
+    if 'is_full'=False and including if 'is_full'=True.
+    """
+    if is_full is True:
+      self.checkbox_clone_asmt_tmpls.click()
     self.button_clone.click()
