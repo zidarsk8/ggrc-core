@@ -6,14 +6,16 @@ from lib import base
 from lib.constants import locator, objects
 from lib.element import widget_info
 from lib.page.modal import update_object
+from lib.utils import selenium_utils
 
 
 class CommonInfo(base.Widget):
   """Abstract class of common info for Info widgets and Info panels."""
   _locator = locator.CommonWidgetInfo
   _dropdown_settings_cls = widget_info.CommonDropdownSettings
-  list_headers = None
-  list_values = None
+  headers_and_values = None
+  list_headers_text = None
+  list_values_text = None
 
   def __init__(self, driver):
     # wait that the elements load before calling super
@@ -31,11 +33,19 @@ class CommonInfo(base.Widget):
     self.button_3bbs.click()
     return self._dropdown_settings_cls(self._driver)
 
+  def get_value_by_header_text(self, header_text):
+    """Get text of value element by header element text used searching in
+    text scopes of headers and values.
+    """
+    # pylint: disable=not-an-iterable
+    return [scope.text.splitlines()[1] for scope in self.headers_and_values
+            if header_text in scope.text][0]
+
   def get_obj_as_dict(self):
     """Get dict from object (text scope) which displayed on info widget or
-    info panel according to list of headers and list of values.
+    info panel according to list of headers text and list of values text.
     """
-    return dict(zip(self.list_headers, self.list_values))
+    return dict(zip(self.list_headers_text, self.list_values_text))
 
 
 class CommonSnapshotsInfo(base.Component):
@@ -43,13 +53,11 @@ class CommonSnapshotsInfo(base.Component):
   # pylint: disable=too-few-public-methods
   def __init__(self, driver):
     super(CommonSnapshotsInfo, self).__init__(driver)
-    self.link_get_latest_ver = None
 
   def open_link_get_latest_ver(self):
     """Click to link to open modal for further update object."""
-    self.link_get_latest_ver = base.Button(
-        self._driver, locator.CommonWidgetInfoSnapshots.LINK_GET_LAST_VER)
-    self.link_get_latest_ver.click()
+    base.Button(self._driver,
+                locator.CommonWidgetInfoSnapshots.LINK_GET_LAST_VER).click()
     return update_object.CompareUpdateObjectModal(self._driver)
 
 
@@ -121,15 +129,20 @@ class AuditsInfoWidget(CommonInfo):
     self.title_entered = base.Label(driver, self._locator.TITLE_ENTERED)
     self.state = base.Label(driver, self._locator.STATE)
     self.audit_lead = base.Label(driver, self._locator.AUDIT_LEAD)
-    self.audit_lead_entered = base.Label(
-        driver, self._locator.AUDIT_LEAD_ENTERED)
-    self.code_common = base.Label(driver, self._locator.CODE_COMMON)
-    self.list_headers = [
+    self.code = base.Label(driver, self._locator.CODE)
+    # scopes
+    self.headers_and_values = selenium_utils.get_when_all_visible(
+        driver, self._locator.HEADERS_AND_VALUES)
+    self.audit_lead_entered_text = self.get_value_by_header_text(
+        self.audit_lead.text)
+    self.code_entered_text = self.get_value_by_header_text(self.code.text)
+    # scope
+    self.list_headers_text = [
         self.title.text, self._locator.elements.STATUS.upper(),
-        self.audit_lead.text, self.code_common.text.splitlines()[0]]
-    self.list_values = [
+        self.audit_lead.text, self.code.text]
+    self.list_values_text = [
         self.title_entered.text, objects.get_normal_form(self.state.text),
-        self.audit_lead_entered.text, self.code_common.text.splitlines()[1]]
+        self.audit_lead_entered_text, self.code_entered_text]
 
 
 class AssessmentsInfoWidget(CommonInfo):

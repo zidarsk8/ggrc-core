@@ -582,13 +582,20 @@ class ModalCloneAudit(ModalCommonConfirmAction):
 class CommonWidgetInfo(object):
   """Common locators for Info widgets and Info panels."""
   WIDGET = Common.INFO_WIDGET
-  INFO_HEADER = " .pane-header"
-  INFO_UTILITY = " .info-pane-utility"
+  INFO_HEADER = WIDGET + " .pane-header"
+  INFO_UTILITY = WIDGET + " .info-pane-utility"
+  INFO_CONTENT = WIDGET + " .tier-content"
+  HEADERS_VALUES = (
+      '//*[contains(@class, "info")]//div[starts-with(./@class, "span")]')
+  HEADER = HEADERS_VALUES + '//*[contains(text(),"{header}")]'
   ID_TITLE = ' [data-test-id="title_0ad9fbaf"]'
-  TITLE = (By.CSS_SELECTOR, WIDGET + INFO_HEADER + ID_TITLE + " h6")
-  TITLE_ENTERED = (By.CSS_SELECTOR, WIDGET + INFO_HEADER + ID_TITLE + " h3")
-  STATE = (By.CSS_SELECTOR, WIDGET + INFO_HEADER + ID_TITLE + " .state-value")
-  BUTTON_3BBS = (By.CSS_SELECTOR, WIDGET + INFO_UTILITY + " .dropdown-toggle")
+  # labels
+  HEADERS_AND_VALUES = (By.XPATH, HEADERS_VALUES)
+  TITLE = (By.CSS_SELECTOR, INFO_HEADER + ID_TITLE + " h6")
+  TITLE_ENTERED = (By.CSS_SELECTOR, INFO_HEADER + ID_TITLE + " h3")
+  STATE = (By.CSS_SELECTOR, INFO_HEADER + ID_TITLE + " .state-value")
+  # user input elements
+  BUTTON_3BBS = (By.CSS_SELECTOR, INFO_UTILITY + " .dropdown-toggle")
 
 
 class CommonWidgetInfoSnapshots(object):
@@ -701,25 +708,14 @@ class WidgetInfoWorkflow(CommonWidgetInfo):
 
 class WidgetInfoAudit(CommonWidgetInfo):
   """Locators for Audit Info widgets."""
-  _INFO = CommonWidgetInfo
-  elements = element.AuditsInfoWidget
-  _FIELD = ' div[class^="span"]:contains("{}")'
-  _HEADER_AND_VALUE = _INFO.WIDGET + _FIELD
-  _HEADER = _INFO.WIDGET + _FIELD + " h6"
-  _VALUE = _INFO.WIDGET + _FIELD + " [class^=""]"
-  TITLE = (By.CSS_SELECTOR, _INFO.WIDGET + _INFO.INFO_HEADER + " h6")
-  TITLE_ENTERED = (
-      By.CSS_SELECTOR, _INFO.WIDGET + _INFO.INFO_HEADER + " .span9 h3")
-  STATE = (By.CSS_SELECTOR, _INFO.WIDGET + _INFO.INFO_HEADER + " .state-value")
-  AUDIT_LEAD = (
-      By.XPATH,
-      ".//*[@id='info_widget']/section/section/div[2]/div[4]/div[1]/h6")
-  AUDIT_LEAD_ENTERED = (
-      By.XPATH,
-      ".//*[@id='info_widget']"
-      "/section/section/div[2]/div[4]/div[1]/span/a/span")
-  CODE_COMMON = (
-      By.XPATH, ".//*[@id='info_widget']/section/section/div[2]/div[5]/div")
+  _info = CommonWidgetInfo
+  elements = element.AuditInfoWidget
+  # labels
+  TITLE = (By.CSS_SELECTOR, _info.INFO_HEADER + " h6")
+  TITLE_ENTERED = (By.CSS_SELECTOR, _info.INFO_HEADER + " .span9 h3")
+  STATE = (By.CSS_SELECTOR, _info.INFO_HEADER + " .state-value")
+  AUDIT_LEAD = (By.XPATH, _info.HEADER.format(header=elements.AUDIT_LEAD))
+  CODE = (By.XPATH, _info.HEADER.format(header=elements.CODE))
 
 
 class WidgetInfoAssessment(CommonWidgetInfo):
@@ -824,40 +820,33 @@ class WidgetAdminEvents(object):
 class CommonDropdown3bbsInfoWidget(object):
   """Locators for common settings 3BBS dropdown on Info Widget and Info Panel.
  """
-  _INFO_DROPDOWN = Common.INFO_WIDGET + ' .dropdown-menu'
+  INFO_DROPDOWN = Common.INFO_WIDGET + ' .dropdown-menu'
   BUTTON_3BBS_EDIT = (
       By.CSS_SELECTOR,
       '{} [data-test-id="dropdown_settings_edit_f4b27aec"]'.format(
-          _INFO_DROPDOWN))
+          INFO_DROPDOWN))
   BUTTON_3BBS_GET_PERMALINK = (
       By.CSS_SELECTOR,
       '{} [data-test-id="dropdown_settings_get_permalink_75e3bf91"]'.format(
-          _INFO_DROPDOWN))
+          INFO_DROPDOWN))
   BUTTON_3BBS_DELETE = (
       By.CSS_SELECTOR,
       '{} [data-test-id="dropdown_settings_delete_6a62eaaf"]'.format(
-          _INFO_DROPDOWN))
+          INFO_DROPDOWN))
 
 
 class AuditDropdown3bbsInfoWidget(CommonDropdown3bbsInfoWidget):
   """Locators for Audit settings 3BBS dropdown on Info Widget and Info Panel.
   """
-  _INFO_DROPDOWN = Common.INFO_WIDGET + ' .dropdown-menu'
   BUTTON_3BBS_UPDATE = (By.CSS_SELECTOR,
-                        '{} snapshot-scope-update'.format(_INFO_DROPDOWN))
+                        '{} snapshot-scope-update'.format(
+                            CommonDropdown3bbsInfoWidget.INFO_DROPDOWN))
   BUTTON_3BBS_CLONE = (By.CSS_SELECTOR,
-                       '{} object-cloner'.format(_INFO_DROPDOWN))
+                       '{} object-cloner'.format(
+                           CommonDropdown3bbsInfoWidget.INFO_DROPDOWN))
 
 
-class CommonDropdown3bbsTreeView(object):
-  """Locators for common settings 3BBS dropdown on Tree View."""
-  BUTTON_3BBS = "{} " + Common.TREE_LIST + " .btn-draft"
-  BUTTON_3BBS_CREATE = "{} " + Common.TREE_LIST + " .create-button"
-  BUTTON_3BBS_GENERATE = (
-      "{} " + Common.TREE_LIST + " .tree-action-list-items .fa-magic")
-
-
-class TreeView(CommonDropdown3bbsTreeView):
+class TreeView(object):
   """Locators for Tree View components."""
   # common
   ITEMS = "{} li.tree-item .item-main"
@@ -866,6 +855,11 @@ class TreeView(CommonDropdown3bbsTreeView):
   ITEM_EXPAND_BUTTON = " .openclose"
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
   BUTTON_SHOW_FIELDS = "{} " + Common.TREE_HEADER + " .fa-bars"
+  # 3BBS dropdown
+  BUTTON_3BBS = "{} " + Common.TREE_LIST + " .btn-draft"
+  BUTTON_3BBS_CREATE = "{} " + Common.TREE_LIST + " .create-button"
+  BUTTON_3BBS_GENERATE = (
+      "{} " + Common.TREE_LIST + " .tree-action-list-items .fa-magic")
 
 
 class BaseWidgetGeneric(object):
@@ -877,7 +871,6 @@ class BaseWidgetGeneric(object):
     """For sharing parametrized class attributes we simply define how
     class should look like. Note that same functionality can be
     implemented using properties though with more code."""
-    # pylint: disable=invalid-name
     def __init__(cls, *args):
       _FILTER = "#{}_widget .sticky-filter"
       _FILTER_BUTTON = _FILTER + " .tree-filter__button"
