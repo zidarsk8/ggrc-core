@@ -1,6 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Widgets other than Info widget and Info panel."""
+"""Widgets other than Info widget."""
 
 import re
 
@@ -157,7 +157,7 @@ class TreeView(base.TreeView):
     self.button_create.click()
 
   def open_tree_view_3bbs(self):
-    """Click to 3bbs button on Tree View to open modal for further actions.
+    """Click to 3BBS button on Tree View to open modal for further actions.
     """
     _locator_3bbs = (
         By.CSS_SELECTOR, self._locators.BUTTON_3BBS.format(self.widget_name))
@@ -165,7 +165,7 @@ class TreeView(base.TreeView):
     self.button_3bbs.click()
 
   def select_generate_objs(self):
-    """Open modal previously clicked to 3bbs button from Tree View to generate
+    """Open modal previously clicked to 3BBS button from Tree View to generate
     new object(s).
     """
     self.open_tree_view_3bbs()
@@ -319,7 +319,7 @@ class Controls(Widget):
         driver, widget_name=self._locator_filter.widget_name)
 
   def update_ver(self, obj_title):
-    """Update version of Control from Info widget."""
+    """Update version of Control via Info panel from Tree View."""
     obj_num = self.tree_view.get_member_seq_num_by_title(
         obj_title)
     self.select_member_by_num(obj_num)
@@ -328,6 +328,15 @@ class Controls(Widget):
     self.tree_view.wait_loading_after_actions(self._driver)
     selenium_utils.get_when_invisible(
         self._driver, locator.CommonWidgetInfoSnapshots.LINK_GET_LAST_VER)
+
+  def check_is_editable(self, obj_title):
+    """Check Control is editable via Info panel from Tree View."""
+    obj_num = self.tree_view.get_member_seq_num_by_title(
+        obj_title)
+    self.select_member_by_num(obj_num)
+    info_panel = self.info_widget_cls(self._driver)
+    return info_panel.open_info_3bbs(
+        is_under_audit=True).find_edit(is_under_audit=True)
 
   def set_visible_fields(self):
     """Set visible fields for display Controls on Tree View."""

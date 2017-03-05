@@ -12,6 +12,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from lib import constants, exception
 
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -37,6 +38,18 @@ def wait_until_stops_moving(element):
     time.sleep(0.1)
     if time.time() - timer_begin > constants.ux.ELEMENT_MOVING_TIMEOUT:
       raise exception.ElementMovingTimeout
+
+
+def check_element_is_found(driver, locator):
+  """
+  Args: driver (base.CustomDriver), locator (tuple)
+  Return: True if element is found, False if element is not found.
+  """
+  try:
+    driver.find_element(*locator)
+    return True
+  except exceptions.NoSuchElementException:
+    return False
 
 
 def get_when_visible(driver, locator):

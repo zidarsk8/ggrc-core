@@ -6,7 +6,6 @@ from lib.constants import element
 from lib.entities.entities_factory import (
     AssessmentTemplatesFactory, AssessmentsFactory, EntitiesFactory,
     ControlsFactory, AuditsFactory, IssuesFactory, ProgramsFactory)
-from lib.entities.entity import AuditEntity
 from lib.page.widget.generic_widget import (
     Audits, AssessmentTemplates, Assessments, Controls, Issues, Programs)
 from lib.page.widget.info_widget import AuditsInfoWidget
@@ -23,7 +22,8 @@ class BaseWebUiService(object):
     (list of scopes UI text elements {"header": "item", ...} remapped to
     list of dicts {"attr": "value", ...}). Return list of created objects.
     """
-    list_factory_objs = [factory.create() for _ in xrange(len(list_scopes))]
+    list_factory_objs = [
+        factory.create_empty() for _ in xrange(len(list_scopes))]
     list_scopes_remapped = string_utils.remap_keys_for_list_dicts(
         dict_transformation_keys=self.ui_elements_to_obj_attrs(),
         list_dicts=list_scopes)
@@ -46,7 +46,8 @@ class BaseWebUiService(object):
         fields.VERIFIED.upper(): "is_verified",
         fields.LAST_UPDATED.upper(): "last_update",
         fields.AUDIT_LEAD.upper(): "audit_lead",
-        fields.MANAGER.upper(): "manager"
+        fields.MANAGER.upper(): "manager",
+        fields.PRIMARY_CONTACT.upper(): "primary_contact"
     }
 
   def create_obj_via_tree_view(self, widget_url, gen_widget, obj):
@@ -73,13 +74,21 @@ class BaseWebUiService(object):
     selenium_utils.open_url(self.driver, widget_url)
     return gen_widget(self.driver).get_list_objs_scopes()
 
-  def get_scope_from_info_widget(self, info_widget_url, info_widget):
-    """Navigate to Info widget URL and get object scope as dict with
+  def get_scope_from_info_widget(self, info_page_url, info_widget):
+    """Navigate to Info page URL and get object scope as dict with
     titles (keys) and entered_titles (values) that displayed in Info widget.
     """
-    selenium_utils.open_url(self.driver, info_widget_url)
+    selenium_utils.open_url(self.driver, info_page_url)
     obj_info_page = info_widget(self.driver)
     return obj_info_page.get_obj_as_dict()
+
+  def check_obj_is_edit_via_info_panel(self, widget_url, gen_widget, obj):
+    """Navigate to widget URL, select object from Tree View by title and
+    check via Info panel that object is editable.
+    """
+    selenium_utils.open_url(self.driver, widget_url)
+    objs_widget = gen_widget(self.driver)
+    return objs_widget.check_is_editable(obj_title=obj.title)
 
 
 class AuditsService(BaseWebUiService):
@@ -106,7 +115,7 @@ class AuditsService(BaseWebUiService):
     """
     selenium_utils.open_url(self.driver, widget_url)
     objs_widget = gen_widget(self.driver)
-    objs_widget.update_ver(obj.title)
+    objs_widget.update_ver(obj_title=obj.title)
 
   def clone_via_info_widget_get_obj(self, audit_obj):
     """Navigate to Info widget URL of Audit object and clone it including
@@ -119,7 +128,7 @@ class AuditsService(BaseWebUiService):
     audit_info_page = Audits.info_widget_cls(self.driver)
     (audit_info_page.
      open_info_3bbs().select_clone().confirm_clone(is_full=True))
-    cloned_audit_obj = AuditEntity()
+    cloned_audit_obj = AuditsFactory().create_empty()
     cloned_audit_obj.url = self.driver.current_url
     actual_cloned_audit_obj = self.get_obj_from_info_widget(
         audit_obj=cloned_audit_obj)
@@ -129,7 +138,7 @@ class AuditsService(BaseWebUiService):
   def get_obj_from_info_widget(self, audit_obj):
     """Get and return Audit object from Info widget."""
     scope = self.get_scope_from_info_widget(
-        info_widget_url=Audits.URL_INFO.format(obj_url=audit_obj.url),
+        info_page_url=Audits.URL_INFO.format(obj_url=audit_obj.url),
         info_widget=AuditsInfoWidget)
     return self.create_list_objs(
         factory=AuditsFactory(), list_scopes=[scope])[0]
@@ -226,6 +235,13 @@ class ControlsService(BaseWebUiService):
         gen_widget=Controls)
     return self.create_list_objs(
         factory=ControlsFactory(), list_scopes=list_scopes)
+
+  def check_is_edit_via_info_panel(self, source_obj, control_obj):
+    """Check that Control object is editable via Info panel from Tree View.
+    If editable then return 'True' if no editable then return 'False'."""
+    return self.check_obj_is_edit_via_info_panel(
+        widget_url=Controls.URL.format(source_obj_url=source_obj.url),
+        gen_widget=Controls, obj=control_obj)
 
 
 class IssuesService(BaseWebUiService):
