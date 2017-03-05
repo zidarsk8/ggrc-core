@@ -16,6 +16,7 @@ class Common(object):
   MODAL_CREATE = ".modal-wide"
   MODAL_CONFIRM = ".modal.hide"
   # info widget (panel)
+  PIN_CONTENT = ".pin-content "
   INFO_WIDGET = ".info"
   # dropdown
   DROPDOWN_MENU = ".dropdown-menu"
@@ -582,20 +583,23 @@ class ModalCloneAudit(ModalCommonConfirmAction):
 class CommonWidgetInfo(object):
   """Common locators for Info widgets and Info panels."""
   WIDGET = Common.INFO_WIDGET
+  PIN_CONTENT = Common.PIN_CONTENT
   INFO_HEADER = WIDGET + " .pane-header"
   INFO_UTILITY = WIDGET + " .info-pane-utility"
-  INFO_CONTENT = WIDGET + " .tier-content"
   HEADERS_VALUES = (
-      '//*[contains(@class, "info")]//div[starts-with(./@class, "span")]')
+      '//*[contains(@class, "object-area")]//*[contains(@class, "info")]'
+      '//div[starts-with(./@class, "span")]')
   HEADER = HEADERS_VALUES + '//*[contains(text(),"{header}")]'
   ID_TITLE = ' [data-test-id="title_0ad9fbaf"]'
+  TOGGLE = INFO_UTILITY + " .dropdown-toggle"
   # labels
   HEADERS_AND_VALUES = (By.XPATH, HEADERS_VALUES)
   TITLE = (By.CSS_SELECTOR, INFO_HEADER + ID_TITLE + " h6")
   TITLE_ENTERED = (By.CSS_SELECTOR, INFO_HEADER + ID_TITLE + " h3")
   STATE = (By.CSS_SELECTOR, INFO_HEADER + ID_TITLE + " .state-value")
   # user input elements
-  BUTTON_3BBS = (By.CSS_SELECTOR, INFO_UTILITY + " .dropdown-toggle")
+  BUTTON_3BBS = (By.CSS_SELECTOR, TOGGLE)
+  BUTTON_3BBS_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + TOGGLE)
 
 
 class CommonWidgetInfoSnapshots(object):
@@ -817,33 +821,36 @@ class WidgetAdminEvents(object):
       "{0} {1}:first-child".format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
 
 
-class CommonDropdown3bbsInfoWidget(object):
-  """Locators for common settings 3BBS dropdown on Info Widget and Info Panel.
+class Dropdown3bbsInfoWidget(object):
+  """Locators for common settings 3BBS dropdown on Info widget and Info page.
  """
   INFO_DROPDOWN = Common.INFO_WIDGET + ' .dropdown-menu'
-  BUTTON_3BBS_EDIT = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="dropdown_settings_edit_f4b27aec"]'.format(
-          INFO_DROPDOWN))
-  BUTTON_3BBS_GET_PERMALINK = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="dropdown_settings_get_permalink_75e3bf91"]'.format(
-          INFO_DROPDOWN))
-  BUTTON_3BBS_DELETE = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="dropdown_settings_delete_6a62eaaf"]'.format(
-          INFO_DROPDOWN))
+  PIN_CONTENT = CommonWidgetInfo.PIN_CONTENT
+  EDIT = INFO_DROPDOWN + ' [data-test-id="dropdown_settings_edit_f4b27aec"]'
+  GET_PERMALINK = (
+      INFO_DROPDOWN +
+      ' [data-test-id="dropdown_settings_get_permalink_75e3bf91"]')
+  DELETE = (INFO_DROPDOWN +
+            ' [data-test-id="dropdown_settings_delete_6a62eaaf"]')
+  OPEN = (INFO_DROPDOWN + ' .fa-long-arrow-right')
+  # user input elements
+  BUTTON_3BBS_EDIT = (By.CSS_SELECTOR, EDIT)
+  BUTTON_3BBS_EDIT_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + EDIT)
+  BUTTON_3BBS_GET_PERMALINK = (By.CSS_SELECTOR, GET_PERMALINK)
+  BUTTON_3BBS_GET_PERMALINK_UNDER_AUDIT = (
+      By.CSS_SELECTOR, PIN_CONTENT + GET_PERMALINK)
+  BUTTON_3BBS_DELETE = (By.CSS_SELECTOR, DELETE)
+  BUTTON_3BBS_DELETE_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + DELETE)
+  BUTTON_3BBS_OPEN_ORIGINAL = (By.CSS_SELECTOR, OPEN)
 
 
-class AuditDropdown3bbsInfoWidget(CommonDropdown3bbsInfoWidget):
-  """Locators for Audit settings 3BBS dropdown on Info Widget and Info Panel.
+class Dropdown3bbsAuditInfoWidget(Dropdown3bbsInfoWidget):
+  """Locators for Audit settings 3BBS dropdown on Info page and Info panel.
   """
-  BUTTON_3BBS_UPDATE = (By.CSS_SELECTOR,
-                        '{} snapshot-scope-update'.format(
-                            CommonDropdown3bbsInfoWidget.INFO_DROPDOWN))
-  BUTTON_3BBS_CLONE = (By.CSS_SELECTOR,
-                       '{} object-cloner'.format(
-                           CommonDropdown3bbsInfoWidget.INFO_DROPDOWN))
+  INFO_DROPDOWN = Dropdown3bbsInfoWidget.INFO_DROPDOWN
+  BUTTON_3BBS_UPDATE = (
+      By.CSS_SELECTOR, INFO_DROPDOWN + " snapshot-scope-update")
+  BUTTON_3BBS_CLONE = (By.CSS_SELECTOR, INFO_DROPDOWN + " object-cloner")
 
 
 class TreeView(object):
@@ -1019,16 +1026,12 @@ class AdminCustomAttributes(object):
 
 class CustomAttributesItemContent(AdminCustomAttributes):
   """Locators for expanded view of custom attribute group
- in admin dashboard."""
-
-  _base_locator = ".content-open .tier-2-info-content"
-  _row_locator = (
-      "{} .tree-structure .cms_controllers_tree_view_node".format(
-          _base_locator))
-  TITLES_ROW = (By.CSS_SELECTOR, "{} thead tr".format(_base_locator))
+  in admin dashboard."""
+  _BASE = ".content-open .tier-2-info-content"
+  _row_locator = _BASE + " .tree-structure .cms_controllers_tree_view_node"
+  TITLES_ROW = (By.CSS_SELECTOR, _BASE + " thead tr")
   ROW = (By.CSS_SELECTOR, _row_locator)
   CELL_IN_ROW = (By.CSS_SELECTOR, "td")
-  EDIT_BTN = (By.CSS_SELECTOR,
-              "{} " + Common.TREE_LIST + " ".format(_row_locator))
-  ADD_BTN = (By.CSS_SELECTOR, "{} .add-item .btn".format(_base_locator))
+  EDIT_BTN = (By.CSS_SELECTOR, _BASE + " " + Common.TREE_LIST)
+  ADD_BTN = (By.CSS_SELECTOR, _BASE + " .add-item .btn")
   TREE_SPINNER = (By.CSS_SELECTOR, ".tree-spinner")

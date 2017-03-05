@@ -159,6 +159,7 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   STATUS = "Status"
   AUDIT_LEAD = "Audit Lead"
   MANAGER = "Manager"
+  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
 
 
 class CommonProgram(Common):
@@ -321,7 +322,7 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, OWNER,
       CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
-      CommonModalSetVisibleFields.LAST_UPDATED)
+      PRIMARY_CONTACT)
 
 
 class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -360,5 +361,4 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   STOP_DATE = Base.STOP_DATE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.STATE,
-      CommonModalSetVisibleFields.LAST_UPDATED, MANAGER)
+      CommonModalSetVisibleFields.STATE, PRIMARY_CONTACT, MANAGER)
