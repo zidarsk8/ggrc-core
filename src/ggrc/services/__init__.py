@@ -12,6 +12,7 @@ def contributed_services():
   (url, ModelClass) tuples.
   """
   import ggrc.models.all_models as models
+  from ggrc.services.relationship_resource import RelationshipResource
 
   return [
       service('background_tasks', models.BackgroundTask),
@@ -53,7 +54,7 @@ def contributed_services():
       service('products', models.Product),
       service('projects', models.Project),
       service('programs', models.Program),
-      service('relationships', models.Relationship),
+      service('relationships', models.Relationship, RelationshipResource),
       service('requests', models.Request),
       service('revisions', models.Revision, ReadOnlyResource),
       service('sections', models.Section),
