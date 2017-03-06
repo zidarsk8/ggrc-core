@@ -239,41 +239,6 @@ class AutomapperGenerator(object):
     return True
 
 
-def generate_relationship_snapshots(obj):
-  """Generate needed snapshots for a given relationship.
-
-  If we post a relationship for a snapshotable object and an Audit, we will map
-  that object to audits program, make a snapshot for it and map the snapshot to
-  the Audit.
-
-  NOTE: this function will be deprecated soon.
-
-  Args:
-    obj: Relationship object.
-  """
-
-  from ggrc.snapshotter import rules as snapshot_rules
-
-  parent = None
-  child = None
-  if "Audit" in obj.source_type:
-    parent = obj.source
-    child = obj.destination
-  elif "Audit" in obj.destination_type:
-    parent = obj.destination
-    child = obj.source
-
-  if parent and child.type in snapshot_rules.Types.all:
-    db.session.add(models.Snapshot(
-        parent=parent,
-        child_id=child.id,
-        child_type=child.type,
-        update_revision="new",
-        context=parent.context,
-        modified_by=get_current_user()
-    ))
-
-
 def register_automapping_listeners():
   """Register event listeners for auto mapper."""
   # pylint: disable=unused-variable,unused-argument
@@ -293,5 +258,4 @@ def register_automapping_listeners():
       if obj is None:
         logger.warning("Automapping listener: no obj, no mappings created")
         return
-      generate_relationship_snapshots(obj)
       automapper.generate_automappings(obj)
