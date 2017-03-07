@@ -5,17 +5,25 @@
 (function (can, GGRC) {
   'use strict';
 
-  can.Component.extend('mapperFilter', {
+  GGRC.Components('mapperFilter', {
     tag: 'mapper-filter',
     template: can.view(
       GGRC.mustache_path +
       '/components/unified-mapper/mapper-filter.mustache'
     ),
     viewModel: {
-      filter: '',
+      define: {
+        filter: {
+          type: 'string',
+          set: function (newValue) {
+            this.checkExpression(newValue);
+            return newValue;
+          }
+        }
+      },
       isExpression: false,
-      checkExpression: function () {
-        var currentFilter = GGRC.query_parser.parse(this.attr('filter'));
+      checkExpression: function (filter) {
+        var currentFilter = GGRC.query_parser.parse(filter);
         var isExpression =
           !!currentFilter && !!currentFilter.expression.op &&
           currentFilter.expression.op.name !== 'text_search' &&
@@ -32,9 +40,6 @@
     events: {
       '#mapper-filter input': function (el) {
         this.viewModel.attr('filter', el.val());
-      },
-      '{viewModel} filter': function () {
-        this.viewModel.checkExpression();
       }
     }
   });
