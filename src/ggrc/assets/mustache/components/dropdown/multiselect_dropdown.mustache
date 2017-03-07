@@ -3,43 +3,44 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="multiselect-dropdown flex-box flex-col" style="width: {{elementWidth}}px;">
+<div class="multiselect-dropdown flex-box flex-col">
   <div class="multiselect-dropdown__input-container" ($click)="openDropdown($element, %event)"> 
     <input 
-      style="width: {{elementWidth}}px;"
       type="text"
       readonly="readonly" 
       class="multiselect-dropdown__input" 
       placeholder="{{placeholder}}" 
       value="{{_displayValue}}"/>
     <span class="multiselect-dropdown__icon">
-      <i class="fa fa-sort"></i>
+      <i class="fa fa-caret-down"></i>
     </span>
   </div>
   {{#if isOpen}}
-  <div class="dropdown-menu dropdown-menu-form multiselect-dropdown__body" ($click)="dropdownBodyClick(%event)">
-    <ul class="multiselect-dropdown__list">
-      <li class="multiselect-dropdown__element">
-        <label class="multiselect-dropdown__label" >
-          <input type="checkbox" {($checked)}="_selectedAll" class="multiselect-dropdown__checkbox"/>
-          Select all
-        </label>
-      </li>
-      {{#options}}
-      <li class="multiselect-dropdown__element">
-        <label class="multiselect-dropdown__label">
-          <input type="checkbox"
-            {($checked)}="checked"
-            value="{{value}}"
-            name="{{name}}"
-            id="{{id}}"
-            class="multiselect-dropdown__checkbox {{cssClass}}"
-            />
-          {{value}}
-        </label>
-      </li>
-      {{/options}}
-    </ul>
+  <div class="multiselect-dropdown__body-wrapper">
+    <div class="dropdown-menu dropdown-menu-form multiselect-dropdown__body" ($click)="dropdownBodyClick(%event)">
+      <ul class="multiselect-dropdown__list">
+        <li class="multiselect-dropdown__element">
+          <label class="multiselect-dropdown__label" >
+            <input type="checkbox" {($checked)}="_selectedAll" class="multiselect-dropdown__checkbox"/>
+            Select all
+          </label>
+        </li>
+        {{#options}}
+        <li class="multiselect-dropdown__element">
+          <label class="multiselect-dropdown__label">
+            <input type="checkbox"
+              {($checked)}="checked"
+              value="{{value}}"
+              name="{{name}}"
+              id="{{id}}"
+              class="multiselect-dropdown__checkbox {{cssClass}}"
+              />
+            {{value}}
+          </label>
+        </li>
+        {{/options}}
+      </ul>
+    </div>
   </div>
   {{/if}}
 </div>

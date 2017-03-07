@@ -9,8 +9,6 @@
     template: can.view(GGRC.mustache_path +
       '/base_templates/mapping_tree_view.mustache'),
     scope: {
-      reusable: '@',
-      reuseMethod: '@',
       treeViewClass: '@',
       expandable: '@',
       sortField: '@',

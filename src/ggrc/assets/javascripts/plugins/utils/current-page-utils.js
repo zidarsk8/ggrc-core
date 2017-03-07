@@ -18,22 +18,21 @@
       var reqParams = [];
 
       models.forEach(function (model) {
-        reqParams.push(queryAPI.buildParam(
+        reqParams.push(queryAPI.buildRelevantIdsQuery(
           model,
           {},
           {
             type: current.type,
             id: current.id,
             operation: 'relevant'
-          },
-          ['id']));
+          }));
       });
 
       return queryAPI.makeRequest({data: reqParams}).then(function (response) {
         models.forEach(function (model, idx) {
-          var values = can.makeArray(response[idx][model].values);
-          var map = values.reduce(function (mapped, obj) {
-            mapped[obj.id] = true;
+          var ids = response[idx][model].ids;
+          var map = ids.reduce(function (mapped, id) {
+            mapped[id] = true;
             return mapped;
           }, {});
           relatedToCurrentInstance.attr(model, map);

@@ -14,16 +14,14 @@ ul.internav {
   @extend %reset-list;
   @extend %clearfix;
   margin-left: 28px;
+  display: flex;
+  flex-flow: row wrap;
   &.audit {
     margin-right: 40px;
-    .left-menu {
-      float: left;
-    }
-    .right-menu {
-      float: right;
-    }
     li {
-      &.pie-chart, &.info-circle, &.assessment, &.issue, &.assessment_template {
+      &.access_group, &.clause, &.contract, &.control, &.data_asset, &.facility,
+      &.market, &.objective, &.org_group, &.policy, &.process, &.product,
+      &.regulation, &.section, &.standard, &.system, &.vendor {
         a {
           color: $blue;
           @include opacity(1);
@@ -35,41 +33,23 @@ ul.internav {
           }
         }
       }
-      &.menu-action {
-        float: right;
-        display: block !important;
-        margin-top: 7px;
-        margin-left: 3px;
-        .hide-menu {
-          background: $grayLight;
-          &:focus {
-            outline: none;
-          }
-        }
+      &:nth-child(4) {
+        margin-left: 0;
+        margin-right: auto;
       }
-      &.hidden-widgets-list {
-        border-left: 1px dotted $grayLight;
-        float: right;
-        position: relative;
-        padding-left: 5px;
-        height: 40px;
-        &:before {
-          content: '';
-          border-left: 1px dotted $grayLight;
-          position: absolute;
-          left: -3px;
-          height: 100%;
-        }
+      &:nth-child(-n+4) {
+        order: 10;
+      }
+      &:nth-child(n+5) {
+        order: 20;
       }
     }
   }
   li {
-    position: relative;
-    float: left;
     &.inner-nav-button {
-      text-align: center;
-      padding: 1px 40px 0 10px;
-      float: right;
+      margin-left: auto;
+      align-self: center;
+      padding-right: 40px;
       .message {
         color: $green;
       }
@@ -82,9 +62,13 @@ ul.internav {
       }
     }
     &.hidden-widgets-list {
-      a.dropdown-toggle {
-        &:hover {
-          background: none;
+      position: relative;
+      a {
+        white-space:nowrap;
+        &.dropdown-toggle {
+          &:hover {
+            background: none;
+          }
         }
       }
     }
@@ -102,7 +86,26 @@ ul.internav {
         }
       }
     }
+    &.not-priority-hide {
+      order: 15 !important;
+      display: flex;
+      align-items: center;
+      &.visible {
+        border-left: 1px dotted;
+        border-right: 1px dotted;
+      }
+      i {
+        margin: auto 5px;
+      }
+    }
+    .dropdown-menu {
+      a {
+        padding-top: 0;
+        padding-bottom: 0;
+      }
+    }
   }
+
   a {
     @include transition(color 0.2s ease);
     padding: 6px 14px 5px 10px;

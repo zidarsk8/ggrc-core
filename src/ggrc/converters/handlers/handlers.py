@@ -607,11 +607,28 @@ class SectionDirectiveColumnHandler(MappingColumnHandler):
 
 
 class AuditColumnHandler(MappingColumnHandler):
+  """Handler for mandatory Audit mappings on Issues And Assessmnets."""
 
   def __init__(self, row_converter, key, **options):
     key = "{}audit".format(MAPPING_PREFIX)
     super(AuditColumnHandler, self).__init__(row_converter, key, **options)
     self.allow = True
+
+  def set_obj_attr(self):
+    """Set values to be saved.
+
+    This saves the value for creating the relationships, and if the dry_run
+    flag is not set, it will also set the correct context to the parent object.
+    """
+    self.value = self.parse_item()
+    if not self.value:
+      # If there is no mandatory value, the parse item will already mark the
+      # error, so there is no need to do anything here.
+      return
+
+    context = getattr(self.value[0], "context_id", None)
+    if context:  # context is not available on dry_run
+      self.row_converter.obj.context_id = context
 
 
 class RequestAuditColumnHandler(ParentColumnHandler):

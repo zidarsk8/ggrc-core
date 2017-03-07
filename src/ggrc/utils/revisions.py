@@ -10,6 +10,7 @@ from sqlalchemy import func
 from sqlalchemy import literal
 
 from ggrc import db
+from ggrc.utils import benchmark
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.snapshotter.rules import Types
@@ -153,6 +154,7 @@ def _recover_create_revisions(revisions_table, event, object_type,
       revisions_table.insert(),
       [{"resource_id": obj_id,
         "resource_type": object_type,
+        "resource_slug": obj_content.get("slug"),
         "event_id": event.id,
         "action": determine_action(obj_content),
         "content": obj_content,
@@ -167,8 +169,30 @@ def _recover_create_revisions(revisions_table, event, object_type,
   )
 
 
+def set_resource_slugs():
+  with benchmark("set revision resource_slug content"):
+    revisions_table = all_models.Revision.__table__
+    rows = db.session.execute(select([
+        revisions_table.c.id,
+        revisions_table.c.content,
+    ]).where(
+        revisions_table.c.resource_type.in_(Types.all)
+    ).where(
+        revisions_table.c.resource_slug.is_(None)
+    ))
+    for row in rows:
+      if row.content.get("slug"):
+        db.session.execute(
+            revisions_table.update()
+            .where(revisions_table.c.id == row.id)
+            .values(resource_slug=row.content.get("slug"))
+        )
+    db.session.commit()
+
+
 def do_refresh_revisions():
   """Update last revisions of models with fixed data."""
+  set_resource_slugs()
   event = all_models.Event(action="BULK")
   db.session.add(event)
   db.session.flush([event])

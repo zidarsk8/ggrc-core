@@ -7,6 +7,8 @@
   {{#if personObj}}
     {{{renderLive '/static/mustache/people/popover.mustache' person=personObj}}}
 
+    <content/>
+
     {{#if editable}}
     <a href="javascript://" class="unmap" title="Remove">
       <i class="fa fa-trash"></i>

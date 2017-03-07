@@ -51,6 +51,14 @@ class Generator(object):
         ))
     return response, response_obj
 
+  @staticmethod
+  def get_header():
+    return {
+        "Content-Type": "application/json",
+        "X-Requested-By": "GGRC",
+        "X-export-view": "blocks",
+    }
+
   def modify(self, obj, obj_name, data):
     """Make a PUT request to modify `obj` with new fields in `data`."""
     obj_class = obj.__class__
@@ -147,8 +155,7 @@ class ObjectGenerator(Generator):
     created.
 
     Args:
-      commentable (db.Model): Model that is commentable such as Request or
-        Assessment.
+      commentable (db.Model): Model that is commentable such as Assessment.
       assignee_type (string): Assignee type of the person creating the comment.
       description (string): Comment content.
       kwargs (dict): Any additional data added to the comments.

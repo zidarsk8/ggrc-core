@@ -15,7 +15,6 @@
     viewModel: {
       instance: null,
       childOptions: null,
-      drawRoles: false,
       drawStates: false,
       drawRelatedAssessment: false
     }

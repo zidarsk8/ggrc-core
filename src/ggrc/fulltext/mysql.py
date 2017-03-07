@@ -30,6 +30,7 @@ class MysqlRecordProperty(db.Model):
   context_id = db.Column(db.Integer)
   tags = db.Column(db.String)
   property = db.Column(db.String(64), primary_key=True)
+  subproperty = db.Column(db.String(64), primary_key=True)
   content = db.Column(db.Text)
 
   @declared_attr

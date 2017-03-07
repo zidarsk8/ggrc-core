@@ -5,16 +5,17 @@
 
 .multiselect-dropdown {
   input.multiselect-dropdown__input {
+    width: 100%;
     padding: 4px 24px 4px 8px;
     margin: 0;
     box-sizing: border-box;
     height:28px;
     line-height: 28px;
-    border-radius: 0;
     box-shadow: none;
     cursor: pointer;
     user-select: none;
     text-overflow: ellipsis;
+    background-color: white;
   }
 
   label.multiselect-dropdown__label {
@@ -23,6 +24,10 @@
     padding: 2px 0px 2px 5px;
     font-size: 12px;
     user-select: none;
+
+    &:hover {
+      color: white;
+    }
   }
 
   input[type="checkbox"].multiselect-dropdown__checkbox {
@@ -31,12 +36,18 @@
 
   .multiselect-dropdown {
     &__body {
-      position: relative;
+      position: absolute;
+      box-sizing: border-box;
+      width: 100%;
       top: -1px !important;
       z-index: 2000;
       float: none;
       display: block;
       border-radius: 0;
+    }
+
+    &__body-wrapper {
+      position: relative;
     }
 
     &__list {
@@ -47,8 +58,7 @@
 
     &__element {
       &:hover {
-        background-color: $defaultBlue;
-        color: white;
+        background-color: #4599FE;
       }
     }
 
@@ -62,6 +72,7 @@
       align-items: center;
       right: 0;
       top: 0;
+      opacity: 0.7;
     }
 
     &__input-container {

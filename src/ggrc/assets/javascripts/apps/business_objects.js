@@ -233,36 +233,18 @@
         // order among the non-prioritized object types.
         Audit: {
           Assessment: {
-            order: 10
+            order: 6
           },
           Issue: {
-            order: 30
+            order: 7
           },
-          AssessmentTemplate: {
-            order: 40
-          },
-          Contract: {
-            order: 133  // between default Clause (130) and DataAsset (140)
-          },
-          Control: {
-            order: 137  // between default Clause (130) and DataAsset (140)
-          },
-          Objective: {
-            order: 182  // between default Market (180) and OrgGroup (190)
-          },
-          Regulation: {
-            order: 257  // between default Project (250) and Request (260)
+          Program: {
+            order: 8
           },
           program: {
             widget_id: 'program',
             widget_name: 'Program',
             widget_icon: 'program'
-          },
-          Section: {
-            order: 263  // between default Request (260) and System (270)
-          },
-          Standard: {
-            order: 267  // between default Request (260) and System (270)
           },
           Person: {
             widget_id: 'person',

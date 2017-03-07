@@ -163,7 +163,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 {% endif %}
 
                 {% if digest.get('assessment_open') %}
-                  <h2 {{ style.sub_title() }} >New assessments are created</h2>
+                  <h2 {{ style.sub_title() }} >New assessments were created</h2>
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_open'].iteritems() %}
                     <li {{ style.list_item() }} >

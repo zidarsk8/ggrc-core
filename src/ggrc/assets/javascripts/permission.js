@@ -134,9 +134,8 @@
       }.bind(this);
 
       var action_obj = permissions[action] || {};
-      var instance_type = instance.constructor ?
-                          instance.constructor.shortName :
-                          instance.type;
+      var shortName = instance.constructor && instance.constructor.shortName;
+      var instance_type = shortName || instance.type;
       var type_obj = action_obj[instance_type] || {};
       var conditions_by_context = type_obj.conditions || {};
       var resources = type_obj.resources || [];

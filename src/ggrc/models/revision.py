@@ -21,6 +21,7 @@ class Revision(Base, db.Model):
                      nullable=False)
   content = db.Column(LongJsonType, nullable=False)
 
+  resource_slug = db.Column(db.String, nullable=True)
   source_type = db.Column(db.String, nullable=True)
   source_id = db.Column(db.Integer, nullable=True)
   destination_type = db.Column(db.String, nullable=True)
@@ -34,6 +35,7 @@ class Revision(Base, db.Model):
         db.Index("fk_revisions_source", "source_type", "source_id"),
         db.Index("fk_revisions_destination",
                  "destination_type", "destination_id"),
+        db.Index('ix_revisions_resource_slug', 'resource_slug'),
     )
 
   _publish_attrs = [
@@ -60,8 +62,9 @@ class Revision(Base, db.Model):
 
   def __init__(self, obj, modified_by_id, action, content):
     self.resource_id = obj.id
+    self.resource_type = obj.__class__.__name__
+    self.resource_slug = getattr(obj, "slug", None)
     self.modified_by_id = modified_by_id
-    self.resource_type = str(obj.__class__.__name__)
     self.action = action
     self.content = content
 
