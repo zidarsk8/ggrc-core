@@ -349,11 +349,11 @@ def handle_reminder(obj, reminder_type):
 
 
 def handle_comment_created(obj, src):
-  """Add notification etries for new comments.
+  """Add notification entries for new comments.
 
   Args:
     obj (Comment): New comment.
-    src (dict): Dictionary containing the coment post request data.
+    src (dict): Dictionary containing the comment post request data.
   """
   if src.get("send_notification"):
     notif_type = models.NotificationType.query.filter_by(
@@ -361,11 +361,41 @@ def handle_comment_created(obj, src):
     _add_notification(obj, notif_type)
 
 
-def register_handlers():
+def handle_relationship_altered(rel):
+  """Handle creation or deletion of a relationship between two objects.
+
+  Relationships not involving an Assessment are ignored. For others, if a
+  Person or a Document is assigned/attached (or removed from) an Assessment,
+  that is considered an Assessment modification and hence a notification is
+  created (unless the Assessment has not been started yet, of course).
+
+  Args:
+    rel (Relationship): Created (or deleted) relationship instance.
+  """
+  if rel.source.type != u"Assessment" != rel.destination.type:
+    return
+
+  asmt, other = rel.source, rel.destination
+  if asmt.type != u"Assessment":
+    asmt, other = other, asmt
+
+  if other.type not in (u"Document", u"Person"):
+    return
+
+  if asmt.status != Statusable.START_STATE:
+    _add_assessment_updated_notif(asmt)
+
+  # when modified, a done Assessment gets automatically reopened
+  if asmt.status in Statusable.DONE_STATES:
+    _add_state_change_notif(asmt, Transitions.TO_REOPENED)
+
+
+def register_handlers():  # noqa: C901
   """Register listeners for notification handlers."""
 
   # Variables are used as listeners, and arguments are needed for callback
   # functions.
+  #
   # pylint: disable=unused-argument,unused-variable
 
   @Resource.model_deleted.connect_via(models.Request)
@@ -394,3 +424,15 @@ def register_handlers():
   def comment_created_listener(sender, objects=None, sources=None, **kwargs):
     for obj, src in izip(objects, sources):
       handle_comment_created(obj, src)
+
+  @Resource.model_posted.connect_via(models.Relationship)
+  def relationship_created_listener(sender, obj=None, src=None, service=None):
+    handle_relationship_altered(obj)
+
+  @Resource.model_put.connect_via(models.Relationship)
+  def relationship_updated_listener(sender, obj=None, src=None, service=None):
+    handle_relationship_altered(obj)
+
+  @Resource.model_deleted.connect_via(models.Relationship)
+  def relationship_deleted_listener(sender, obj=None, src=None, service=None):
+    handle_relationship_altered(obj)
