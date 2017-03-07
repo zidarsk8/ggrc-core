@@ -12,6 +12,8 @@
   =super()
   GGRC.page_object = { "person": ={ full_user_json()|safe } };
 
+  GGRC.pageType = "MY_WORK";
+
   -# Since it is expensive (issues a DB query), only invoke user_task_count()
   -# once and use the resulting list. An auxiliary property is used to store
   -# the result, because there are no other better ways (?) to do that in HAML

@@ -12,6 +12,7 @@
   GGRC.Utils.CurrentPage = (function () {
     var queryAPI = GGRC.Utils.QueryAPI;
     var relatedToCurrentInstance = new can.Map({});
+    var pageType = GGRC.pageType;
 
     function initMappedInstances(dependentModels, current) {
       var models = can.makeArray(dependentModels);
@@ -83,10 +84,30 @@
       return parts.join(' ');  // model type with spaces between words
     }
 
+    function getPageType() {
+      return pageType ? pageType : GGRC.page_instance().type;
+    }
+
+    function isMyAssessments() {
+      return pageType === 'MY_ASSESSMENTS';
+    }
+
+    function isMyWork() {
+      return pageType === 'MY_WORK';
+    }
+
+    function isAdmin() {
+      return pageType === 'ADMIN';
+    }
+
     return {
       activeTabObject: activeTabObject,
       related: relatedToCurrentInstance,
-      initMappedInstances: initMappedInstances
+      initMappedInstances: initMappedInstances,
+      getPageType: getPageType,
+      isMyAssessments: isMyAssessments,
+      isMyWork: isMyWork,
+      isAdmin: isAdmin
     };
   })();
 })(window.GGRC);
