@@ -361,7 +361,4 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   STOP_DATE = Base.STOP_DATE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.STATE, PRIMARY_CONTACT,
-      CommonModalSetVisibleFields.LAST_UPDATED)
-  # NOTE: Need exclude 'MANAGER' due to unstable work of app when set visible
-  # fields in tree view for represent programs under audit.
+      CommonModalSetVisibleFields.STATE, PRIMARY_CONTACT, MANAGER)
