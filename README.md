@@ -417,7 +417,7 @@ To Manually update the requirements, you can login to vagrant or docker virtual 
 
 ```sh
 pip install -r src/requirements-dev.txt
-pip install --no-deps -r src/requirements-basic.txt
+pip install --no-deps -r src/requirements.txt
 ```
 
 Note that if you're using `launch_gae_ggrc`, then changes to
