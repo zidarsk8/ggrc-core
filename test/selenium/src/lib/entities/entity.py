@@ -109,8 +109,10 @@ class ProgramEntity(Entity):
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
             self.title == other.title and self.code == other.code and
-            self.manager == other.manager and self.state == other.state and
+            self.state == other.state and
             self.primary_contact == other.primary_contact)
+    # NOTE: Need exclude 'manager' due to unstable work of app when set visible
+    # fields in tree view for represent programs under audit
 
 
 class ControlEntity(Entity):

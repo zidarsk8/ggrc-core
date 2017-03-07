@@ -29,8 +29,8 @@ class Widget(base.Widget):
 
   def __init__(self, driver):
     self.member_count = None
-    self.cls_without_state_filtering = (AssessmentTemplates,)
-    # Audits, Persons, Workflows, TaskGroups, Cycles, CycleTaskGroupObjectTasks
+    self.cls_without_state_filtering = (AssessmentTemplates, )
+    # Persons, Workflows, TaskGroups, Cycles, CycleTaskGroupObjectTasks
     self.common_filter_locators = dict(
         text_box_locator=self._locator_filter.TEXTFIELD_TO_FILTER,
         bt_submit_locator=self._locator_filter.BUTTON_FILTER,
@@ -210,18 +210,12 @@ class TreeView(base.TreeView):
                         _item in self.tree_view_items_elements()]
     return [dict(zip(list_headers[0], item)) for item in list_lists_items]
 
-  def select_member_in_by_title(self, title):
+  def select_member_by_title(self, title):
     """Select member in Tree View by member's title."""
     item = [_item for _item in self.tree_view_items_elements() if
             title in _item.text.splitlines()][0]
     selenium_utils.wait_until_stops_moving(item)
     item.click()
-
-  def get_member_seq_num_by_title(self, title):
-    """Get member's sequence number in Tree View by member's title."""
-    list_items = [_item.text.splitlines() for
-                  _item in self.tree_view_items_elements()]
-    return [num for num, item in enumerate(list_items) if title in item][0]
 
 
 class Audits(Widget):
@@ -320,9 +314,7 @@ class Controls(Widget):
 
   def update_ver(self, obj_title):
     """Update version of Control via Info panel from Tree View."""
-    obj_num = self.tree_view.get_member_seq_num_by_title(
-        obj_title)
-    self.select_member_by_num(obj_num)
+    self.tree_view.select_member_by_title(obj_title)
     info_panel = self.info_widget_cls(self._driver)
     info_panel.open_link_get_latest_ver().confirm_update()
     self.tree_view.wait_loading_after_actions(self._driver)
@@ -331,12 +323,10 @@ class Controls(Widget):
 
   def check_is_editable(self, obj_title):
     """Check Control is editable via Info panel from Tree View."""
-    obj_num = self.tree_view.get_member_seq_num_by_title(
-        obj_title)
-    self.select_member_by_num(obj_num)
+    self.tree_view.select_member_by_title(obj_title)
     info_panel = self.info_widget_cls(self._driver)
     return info_panel.open_info_3bbs(
-        is_under_audit=True).find_edit(is_under_audit=True)
+        is_under_audit=True).is_edit_exist(is_under_audit=True)
 
   def set_visible_fields(self):
     """Set visible fields for display Controls on Tree View."""
@@ -345,6 +335,11 @@ class Controls(Widget):
   def get_list_objs_scopes(self):
     """Get list of Controls scopes which displayed on Tree view."""
     self.set_visible_fields()
+    # NOTE: need refresh page and wait until tree view will be loaded due
+    # unstable work of app when set visible fields in tree view for represent
+    # controls under audit
+    selenium_utils.refresh_page(self._driver)
+    self.tree_view.wait_loading_after_actions(self._driver)
     return self.tree_view.get_objs_as_list_dicts(self._controls_fields)
 
 
@@ -393,6 +388,11 @@ class Programs(Widget):
   def get_list_objs_scopes(self):
     """Get list of Programs scopes which displayed on Tree View."""
     self.set_visible_fields()
+    # NOTE: need refresh page and wait until tree view will be loaded due
+    # unstable work of app when set visible fields in tree view for represent
+    # programs under audit
+    selenium_utils.refresh_page(self._driver)
+    self.tree_view.wait_loading_after_actions(self._driver)
     return self.tree_view.get_objs_as_list_dicts(self._programs_fields)
 
 

@@ -31,11 +31,10 @@ class CommonInfo(base.Widget):
     further actions.
     Return: lib.element.widget_info.CommonDropdownSettings
     """
-    if is_under_audit is False:
-      base.Button(self._driver, self._locator.BUTTON_3BBS).click()
-    elif is_under_audit is True:
-      base.Button(
-          self._driver, self._locator.BUTTON_3BBS_UNDER_AUDIT).click()
+    _3bbs_locator = self._locator.BUTTON_3BBS
+    if is_under_audit is True:
+      _3bbs_locator = self._locator.BUTTON_3BBS_UNDER_AUDIT
+    base.Button(self._driver, _3bbs_locator).click()
     return self._dropdown_settings_cls(self._driver)
 
   def get_value_by_header_text(self, header_text):

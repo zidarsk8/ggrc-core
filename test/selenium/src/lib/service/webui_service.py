@@ -20,7 +20,8 @@ class BaseWebUiService(object):
   def create_list_objs(self, factory, list_scopes):
     """Create and return list of objects used entity factory and UI data
     (list of scopes UI text elements {"header": "item", ...} remapped to
-    list of dicts {"attr": "value", ...}). Return list of created objects.
+    list of dicts {"attr": "value", ...}).
+    Return list of created objects.
     """
     list_factory_objs = [
         factory.create_empty() for _ in xrange(len(list_scopes))]
@@ -82,7 +83,7 @@ class BaseWebUiService(object):
     obj_info_page = info_widget(self.driver)
     return obj_info_page.get_obj_as_dict()
 
-  def check_obj_is_edit_via_info_panel(self, widget_url, gen_widget, obj):
+  def check_is_obj_edit_via_info_panel(self, widget_url, gen_widget, obj):
     """Navigate to widget URL, select object from Tree View by title and
     check via Info panel that object is editable.
     """
@@ -239,7 +240,7 @@ class ControlsService(BaseWebUiService):
   def check_is_edit_via_info_panel(self, source_obj, control_obj):
     """Check that Control object is editable via Info panel from Tree View.
     If editable then return 'True' if no editable then return 'False'."""
-    return self.check_obj_is_edit_via_info_panel(
+    return self.check_is_obj_edit_via_info_panel(
         widget_url=Controls.URL.format(source_obj_url=source_obj.url),
         gen_widget=Controls, obj=control_obj)
 

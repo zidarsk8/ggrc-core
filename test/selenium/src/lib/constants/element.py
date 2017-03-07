@@ -63,7 +63,7 @@ class AdminWidgetRoles(object):
   _SYS_SCOPE = roles.SYSTEM.upper()
   _PRG_SCOPE = roles.PRIVATE_PROGRAM.upper()
   _WF_SCOPE = roles.WORKFLOW.upper()
-
+  # role scopes
   ROLE_SCOPE_ADMINISTRATOR = (roles.ADMINISTRATOR, _ADMIN_SCOPE)
   ROLE_SCOPE_CREATOR = (roles.CREATOR, _SYS_SCOPE)
   ROLE_SCOPE_EDITOR = (roles.EDITOR, _SYS_SCOPE)
@@ -361,4 +361,7 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   STOP_DATE = Base.STOP_DATE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.STATE, PRIMARY_CONTACT, MANAGER)
+      CommonModalSetVisibleFields.STATE, PRIMARY_CONTACT,
+      CommonModalSetVisibleFields.LAST_UPDATED)
+  # NOTE: Need exclude 'MANAGER' due to unstable work of app when set visible
+  # fields in tree view for represent programs under audit.
