@@ -21,22 +21,20 @@ class CommonDropdownSettings(base.Component):
     """Select edit button in 3BBS dropdown modal.
     Return: lib.page.modal.edit_object.EditModal
     """
-    if is_under_audit is False:
-      base.Button(self._driver, self._locator.BUTTON_3BBS_EDIT).click()
-    elif is_under_audit is True:
-      base.Button(
-          self._driver, self._locator.BUTTON_3BBS_EDIT_UNDER_AUDIT).click()
+    _edit_locator = self._locator.BUTTON_3BBS_EDIT
+    if is_under_audit is True:
+      _edit_locator = self._locator.BUTTON_3BBS_EDIT_UNDER_AUDIT
+    base.Button(self._driver, _edit_locator).click()
     return getattr(edit_object, self.__class__.__name__)(self._driver)
 
-  def find_edit(self, is_under_audit=False):
+  def is_edit_exist(self, is_under_audit=False):
     """Find edit button in 3BBS dropdown modal.
-    Return: True if edit is found, False if edit is not found.
+    Return: True if edit is exist, False if edit is not exist.
     """
-    if is_under_audit is False:
-      _edit_locator = self._locator.BUTTON_3BBS_EDIT
-    elif is_under_audit is True:
+    _edit_locator = self._locator.BUTTON_3BBS_EDIT
+    if is_under_audit is True:
       _edit_locator = self._locator.BUTTON_3BBS_EDIT_UNDER_AUDIT
-    return selenium_utils.check_element_is_found(self._driver, _edit_locator)
+    return selenium_utils.is_element_exist(self._driver, _edit_locator)
 
   def select_get_permalink(self):
     """Select get permalink in 3BBS dropdown modal."""

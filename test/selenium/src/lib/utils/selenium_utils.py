@@ -27,6 +27,11 @@ def open_url(driver, url):
     driver.get(url)
 
 
+def refresh_page(driver):
+  """Refresh web page in current browser session."""
+  driver.refresh()
+
+
 def wait_until_stops_moving(element):
   """Wait until element stops moving.
  Args: selenium.webdriver.remote.webelement.WebElement
@@ -40,10 +45,10 @@ def wait_until_stops_moving(element):
       raise exception.ElementMovingTimeout
 
 
-def check_element_is_found(driver, locator):
+def is_element_exist(driver, locator):
   """
   Args: driver (base.CustomDriver), locator (tuple)
-  Return: True if element is found, False if element is not found.
+  Return: True if element is exist, False if element is not exist.
   """
   try:
     driver.find_element(*locator)
