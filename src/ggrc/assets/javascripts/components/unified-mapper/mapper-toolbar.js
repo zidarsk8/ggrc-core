@@ -13,7 +13,7 @@
     ),
     viewModel: {
       filter: '',
-      statusFilter: null,
+      statusFilter: '',
       dropdown_options: [],
       statuses: [],
       mapper: {},
@@ -26,13 +26,12 @@
         var self = this;
         CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
           self.attr('displayPrefs', displayPrefs);
-          self.setStatusFilter();
+          setTimeout(self.setStatusFilter.bind(self));
         });
       },
       onSubmit: function () {
         this.dispatch('submit');
         if (this.attr('showStatusFilter')) {
-          this.attr('mapper.statusFilter', this.attr('statusFilter'));
           this.saveStatusFilter();
         }
       },

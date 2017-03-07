@@ -82,9 +82,9 @@
     relevant: [],
     submitCbs: $.Callbacks(),
     afterSearch: false,
-    init: function () {
+    afterShown: function () {
       if (!this.attr('search_only')) {
-        setTimeout(this.onToolbarSubmit.bind(this));
+        this.onToolbarSubmit();
       }
     },
     allowedToCreate: function () {
@@ -271,11 +271,16 @@
         }
       },
       inserted: function () {
+        var self = this;
         this.scope.attr('mapper.selected').replace([]);
         this.scope.attr('mapper.entries').replace([]);
 
         this.setModel();
         this.setBinding();
+
+        setTimeout(function () {
+          self.scope.attr('mapper').afterShown();
+        });
       },
       closeModal: function () {
         this.scope.attr('mapper.is_saving', false);
