@@ -5,13 +5,27 @@
 (function (can, GGRC, CMS) {
   'use strict';
 
-  can.Component.extend('mapperResultsColumnsConfiguration', {
+  GGRC.Components('mapperResultsColumnsConfiguration', {
     tag: 'mapper-results-columns-configuration',
     template: can.view(
       GGRC.mustache_path +
       '/components/unified-mapper/mapper-results-columns-configuration.mustache'
     ),
     viewModel: {
+      define: {
+        selectedColumns: {
+          set: function (newValue, setValue) {
+            setValue(newValue);
+            this.initializeColumns();
+          }
+        },
+        availableColumns: {
+          set: function (newValue, setValue) {
+            setValue(newValue);
+            this.initializeColumns();
+          }
+        }
+      },
       modelType: '',
       selectedColumns: [],
       availableColumns: [],
@@ -73,14 +87,6 @@
       },
       stopPropagation: function (context, el, ev) {
         ev.stopPropagation();
-      }
-    },
-    events: {
-      '{viewModel} availableColumns': function () {
-        this.viewModel.initializeColumns();
-      },
-      '{viewModel} selectedColumns': function () {
-        this.viewModel.initializeColumns();
       }
     }
   });
