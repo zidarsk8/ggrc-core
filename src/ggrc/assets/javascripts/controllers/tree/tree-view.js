@@ -226,6 +226,10 @@
           model.tree_view_options.display_attr_names :
           can.Model.Cacheable.tree_view_options.display_attr_names;
 
+        if (GGRC.Utils.CurrentPage.isMyAssessments()) {
+          displayAttrNames.push('updated_at');
+        }
+
         for (i = 0; i < selectAttrList.length; i++) {
           attr = selectAttrList[i];
 

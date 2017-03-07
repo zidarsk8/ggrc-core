@@ -37,7 +37,7 @@
     init_tree_view_settings: function () {
       var validModels;
       var savedChildTreeDisplayList;
-      if (GGRC.pageType && GGRC.pageType === 'admin') { // Admin dashboard
+      if (GGRC.pageType && GGRC.pageType === 'ADMIN') { // Admin dashboard
         return;
       }
 
@@ -55,7 +55,7 @@
 
     initCurrentRelatedInstanses: function () {
       var instance;
-      if (GGRC.pageType === 'admin') { // Admin dashboard
+      if (GGRC.pageType === 'ADMIN') { // Admin dashboard
         return;
       }
 
