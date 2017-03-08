@@ -135,18 +135,7 @@ class TestBasicCsvImport(TestCase):
     filename = "pci_program.csv"
     response = self.import_file(filename)
 
-    self._check_csv_response(response, {
-        "Control": {
-            "row_warnings": {
-                errors.EXPORT_ONLY_WARNING.format(
-                    line=9, column_name="map:audit"),
-                errors.EXPORT_ONLY_WARNING.format(
-                    line=10, column_name="map:audit"),
-                errors.EXPORT_ONLY_WARNING.format(
-                    line=11, column_name="map:audit"),
-            }
-        }
-    })
+    self._check_csv_response(response, {})
 
     assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
     audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()

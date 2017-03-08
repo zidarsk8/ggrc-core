@@ -46,8 +46,8 @@ from ggrc.converters.handlers import request
 from ggrc.converters.handlers import template
 from ggrc.converters.handlers import document
 from ggrc.converters.handlers import custom_attribute
-from ggrc.converters.handlers.custom_control_column_handler import (
-    CustomControlSnapshotInstanceColumnHandler
+from ggrc.converters.handlers.snapshot_instance_column_handler import (
+    SnapshotInstanceColumnHandler
 )
 from ggrc.extensions import get_extension_modules
 
@@ -126,7 +126,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "__unmapping__": handlers.MappingColumnHandler,
     "__custom__": custom_attribute.CustomAttributeColumHandler,
     "__object_custom__": custom_attribute.ObjectCaColumnHandler,
-    "__snapshot_mapping__": CustomControlSnapshotInstanceColumnHandler,
+    "__snapshot_mapping__": SnapshotInstanceColumnHandler,
 }
 
 

@@ -45,7 +45,9 @@ class TestAuditRBAC(TestCase):
         "audit_rbac_snapshot_update.csv"
     ])
 
-    self._import_file(next(self.csv_files))
+    response = self._import_file(next(self.csv_files))
+    self._check_csv_response(response, {})
+
     self.people = all_models.Person.eager_query().all()
 
     self.program = db.session.query(all_models.Program).filter(
@@ -65,8 +67,6 @@ class TestAuditRBAC(TestCase):
     self.audit = self.create_audit()
 
     self.snapshots = all_models.Snapshot.eager_query().all()
-
-    self.sanity_check()
 
   def create_audit(self):
     """Create default audit for audit snapshot RBAC tests"""
@@ -121,7 +121,8 @@ class TestAuditRBAC(TestCase):
 
   def update_audit(self):
     """Update default audit"""
-    self._import_file(next(self.csv_files))
+    response = self._import_file(next(self.csv_files))
+    self._check_csv_response(response, {})
 
     audit = all_models.Audit.query.filter(
         all_models.Audit.title == "Snapshotable audit"
@@ -133,19 +134,6 @@ class TestAuditRBAC(TestCase):
             "operation": "upsert"
         }
     })
-
-  def sanity_check(self):
-    """Sanity check if the audit_rbac.csv was imported correctly"""
-    assert len(self.people) == 21, \
-        "Expecting 21 people not {}.".format(len(self.people))
-    assert len(self.related_objects) == 19, \
-        "Expecting 19 objects mapped to program not {}.".format(
-            len(self.related_objects))
-    assert len(self.snapshots) == 19, \
-        "Expecting 19 snapshots for default audit not {}.".format(
-            len(self.snapshots))
-    assert all(ss.parent_id == self.audit.id for ss in self.snapshots), \
-        "All snapshots should be in default audit scope!"
 
   def read(self, objects):
     """Attempt to do a GET request for every object in the objects list"""
