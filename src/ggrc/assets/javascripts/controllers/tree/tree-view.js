@@ -1360,7 +1360,7 @@
     },
 
     clearList: function () {
-      this.element.children('.tree-item').remove();
+      this.element.children('.tree-item, .tree-item-placeholder').remove();
     },
 
     refreshList: function () {
