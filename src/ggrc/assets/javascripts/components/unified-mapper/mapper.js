@@ -5,9 +5,6 @@
 
 (function (can, $) {
   'use strict';
-  var WARNING_MESSAGE = 'Selected objects will be mapped ' +
-    'to the corresponding Program, ' +
-    'and system will create snapshots of selected objects for this Audit';
 
   var DEFAULT_OBJECT_MAP = {
     Assessment: 'Control',
@@ -57,7 +54,6 @@
       }
     },
     type: 'Control', // We set default as Control
-    warningMessage: WARNING_MESSAGE,
     contact: null,
     contactEmail: null,
     deferred: '@',
