@@ -209,3 +209,9 @@ def scroll_into_view(driver, element):
   driver.execute_script(
       "window.scrollBy(0, -{});".format(constants.settings.SIZE_HEADER))
   return element
+
+
+def wait_for_js_to_load(driver):
+  """Wait until there all JS are completed."""
+  return wait_until_condition(
+      driver, lambda js: driver.execute_script("return jQuery.active") == 0)
