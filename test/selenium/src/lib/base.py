@@ -356,6 +356,8 @@ class Component(InstanceRepresentation):
         driver (CustomDriver)
     """
     self._driver = driver
+    if driver.title:  # only Login page doesn't have title and jQuery
+      selenium_utils.wait_for_js_to_load(driver)
 
 
 class AnimatedComponent(Component):
