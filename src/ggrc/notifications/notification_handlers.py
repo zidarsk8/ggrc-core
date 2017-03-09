@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
@@ -9,8 +11,12 @@ needed by ggrc notifications.
 
 # pylint: disable=too-few-public-methods
 
+from collections import namedtuple
 from datetime import date
-from itertools import izip
+from functools import partial
+from itertools import chain, izip
+from numbers import Number
+from operator import attrgetter
 
 from enum import Enum
 
@@ -29,6 +35,9 @@ class Transitions(Enum):
   TO_REVIEW = "assessment_ready_for_review"
   TO_VERIFIED = "assessment_verified"
   TO_REOPENED = "assessment_reopened"
+
+
+IdValPair = namedtuple("IdValPair", ["id", "val"])
 
 
 def _add_notification(obj, notif_type, when=None):
@@ -170,12 +179,14 @@ def handle_assignable_modified(obj):
   # pylint: disable=invalid-name
   IGNORE_ATTRS = frozenset((
       u"_notifications", u"comments", u"context", u"context_id", u"created_at",
-      u"custom_attribute_definitions", u"_custom_attribute_values",
-      u"finished_date", u"id", u"modified_by", u"modified_by_id",
-      u"object_level_definitions", u"operationally", u"os_state",
-      u"related_destinations", u"related_sources", u"status",
+      u"custom_attribute_definitions", u"custom_attribute_values",
+      u"_custom_attribute_values", u"finished_date", u"id", u"modified_by",
+      u"modified_by_id", u"object_level_definitions", u"operationally",
+      u"os_state", u"related_destinations", u"related_sources", u"status",
       u"task_group_objects", u"updated_at", u"verified_date",
   ))
+
+  is_changed = False
 
   for attr_name, val in attrs.items():
     if attr_name in IGNORE_ATTRS:
@@ -186,16 +197,104 @@ def handle_assignable_modified(obj):
       # need for an extra check
       if attr_name == u"recipients" and not _recipients_changed(val.history):
         continue
-
-      _add_assessment_updated_notif(obj)
+      is_changed = True
       break
-  else:
+
+  is_changed = is_changed or _ca_values_changed(obj)  # CA check only if needed
+
+  if not is_changed:
     return  # no changes detected, nothing left to do
+
+  _add_assessment_updated_notif(obj)
 
   # When modified, a done Assessment gets automatically reopened, but that is
   # not directly observable via status change history, thus an extra check.
   if obj.status in Statusable.DONE_STATES:
     _add_state_change_notif(obj, Transitions.TO_REOPENED)
+
+
+def _ca_values_changed(obj):
+  """Check if object's custom attribute values have been changed.
+
+  The changes are determined by comparing the current object custom attributes
+  with the CA values from object's last known revision. If the latter does not
+  exist, it is considered that there are no changes - since the object has
+  apparently just been created.
+
+  Args:
+    obj (models.mixins.Assignable): the object to check
+
+  Returns:
+    (bool) True if there is a change to any of the CA values, False otherwise.
+  """
+  def stringify_if_number(val):
+    """Convert a maybe-number to a string so that e.g. u"1" will match 1."""
+    if isinstance(val, bool):
+      return val
+    return str(val) if isinstance(val, Number) else val
+
+  rev = db.session.query(models.Revision) \
+                  .filter_by(resource_id=obj.id, resource_type=obj.type) \
+                  .order_by(models.Revision.id.desc()) \
+                  .first()
+
+  old_cavs = rev.content.get("custom_attribute_values", []) if rev else []
+  new_cavs = getattr(obj, "custom_attribute_values", [])
+
+  # It can happen that CAV objects have no IDs - we ignore those, as those
+  # cannot be considered "changed".
+  old_cavs = (IdValPair(cav["id"], cav["attribute_value"]) for cav in old_cavs
+              if cav["id"] is not None)
+  new_cavs = (IdValPair(cav.id, cav.attribute_value) for cav in new_cavs
+              if cav.id is not None)
+
+  for old, new in _align_by_ids(old_cavs, new_cavs):
+    # one of the items is None only in an (unlikely) scenario when a CA was
+    # added/removed - we do not consider that as a CA value change
+    if old is None or new is None:
+      continue
+
+    old_val = stringify_if_number(old.val)
+    new_val = stringify_if_number(new.val)
+    if old_val != new_val:
+      return True
+
+  return False
+
+
+def _align_by_ids(items, items2):
+  """Generate pairs of items from both iterables, matching them by IDs.
+
+  The items within each iterable must have a unique id attribute (with a value
+  other than None). If an item from one iterable does not have a matching item
+  in the other, None is used for the missing item.
+
+  Args:
+    items: The first iterable.
+    items2: The second iterable.
+
+  Yields:
+    Pairs of items with matching IDs (one of the items can be None).
+  """
+  STOP = Ellipsis  # iteration sentinel alias  # pylint: disable=invalid-name
+
+  sort_by_id = partial(sorted, key=attrgetter("id"))
+  items = chain(sort_by_id(items), [STOP])
+  items2 = chain(sort_by_id(items2), [STOP])
+
+  first, second = next(items), next(items2)
+
+  while first is not STOP or second is not STOP:
+    min_id = min(pair.id for pair in (first, second) if pair is not STOP)
+    id_one, id_two = getattr(first, "id", None), getattr(second, "id", None)
+
+    yield (first if id_one == min_id else None,
+           second if id_two == min_id else None)
+
+    if id_one == min_id:
+      first = next(items)
+    if id_two == min_id:
+      second = next(items2)
 
 
 def _recipients_changed(history):
