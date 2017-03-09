@@ -348,6 +348,7 @@
       var currentUser = CMS.Models.get_instance('Person',
         GGRC.current_user.id, GGRC.current_user);
       var auditLead;
+      var self = this;
 
       if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
         if (pageInstance.type === 'Audit') {
@@ -372,6 +373,12 @@
           markForAddition(this, auditLead, 'Assessor');
           markForAddition(this, currentUser, 'Creator');
         }
+
+        this.audit.findAuditors().then(function (list) {
+          list.forEach(function (item) {
+            markForAddition(self, item.person, 'Verifier');
+          });
+        });
       } else {
         markForAddition(this, currentUser, 'Creator');
       }
