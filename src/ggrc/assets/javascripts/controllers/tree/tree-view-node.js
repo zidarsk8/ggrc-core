@@ -252,6 +252,7 @@
       var oldEl = this.element;
       var oldData;
       var firstchild;
+      var pageUtils = GGRC.Utils.CurrentPage;
 
       if (!this.element) {
         return;
@@ -268,7 +269,9 @@
       this.element = firstchild.addClass(this.constructor._fullName)
         .data(oldData);
 
-      if (this.options.is_subtree && GGRC.page_instance().type !== 'Workflow') {
+      if (this.options.is_subtree &&
+        pageUtils.isObjectContextPage() &&
+        pageUtils.getPageType() !== 'Workflow') {
         this.markNotRelatedItem();
       }
       this.on();

@@ -296,7 +296,9 @@
             this.options.mapping);
         } else if (this.options.attr('is_subtree') &&
           GGRC.page_instance().type !== 'Workflow') {
-          this.options.attr('drawSubTreeExpander', true);
+          if (GGRC.Utils.CurrentPage.isObjectContextPage()) {
+            this.options.attr('drawSubTreeExpander', true);
+          }
           this.page_loader = new GGRC.ListLoaders.SubTreeLoader(
             this.options.model, this.options.parent_instance,
             this.options.mapping);
@@ -1358,7 +1360,7 @@
     },
 
     clearList: function () {
-      this.element.children('.tree-item').remove();
+      this.element.children('.tree-item, .tree-item-placeholder').remove();
     },
 
     refreshList: function () {

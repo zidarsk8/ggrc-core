@@ -100,6 +100,10 @@
       return pageType === 'ADMIN';
     }
 
+    function isObjectContextPage() {
+      return !pageType;
+    }
+
     return {
       activeTabObject: activeTabObject,
       related: relatedToCurrentInstance,
@@ -107,7 +111,8 @@
       getPageType: getPageType,
       isMyAssessments: isMyAssessments,
       isMyWork: isMyWork,
-      isAdmin: isAdmin
+      isAdmin: isAdmin,
+      isObjectContextPage: isObjectContextPage
     };
   })();
 })(window.GGRC);
