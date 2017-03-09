@@ -98,6 +98,11 @@ class QueryHelper(object):
     self.ca_disabled = ca_disabled
     self._set_attr_name_map()
     self._count = 0
+    self.getattr_whitelist = {
+        "child_type",
+        "is_current",
+        "owners"
+    }
 
   def _set_attr_name_map(self):
     """ build a map for attributes names and display names
@@ -441,7 +446,7 @@ class QueryHelper(object):
         order = join_target.c.weight
         return joins, order
 
-      def by_ca():
+      def by_fulltext():
         """Join fulltext index table, order by indexed CA value."""
         alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(self._count))
         joins = [(alias, sa.and_(
@@ -516,22 +521,22 @@ class QueryHelper(object):
           raise BadQueryException("Can't order by '__similarity__' when no ",
                                   "'similar' filter was applied.")
       else:
-        if model.__name__ != "Snapshot":
+        if key in self.getattr_whitelist:
           key, _ = self.attr_name_map[model].get(key, (key, None))
           attr = getattr(model, key.encode('utf-8'), None)
-        if model.__name__ == "Snapshot" or attr is None:
+          if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
+              isinstance(attr.property,
+                             sa.orm.properties.RelationshipProperty)):
+            joins, order = by_foreign_key()
+          elif isinstance(attr, sa.ext.associationproxy.AssociationProxy):
+            joins, order = by_m2m()
+          else:
+            # a simple attribute
+            joins, order = None, attr
+        else:
           # Snapshot or non object attributes are treated as custom attributes
           self._count += 1
-          joins, order = by_ca()
-        elif (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
-                isinstance(attr.property,
-                           sa.orm.properties.RelationshipProperty)):
-          joins, order = by_foreign_key()
-        elif isinstance(attr, sa.ext.associationproxy.AssociationProxy):
-          joins, order = by_m2m()
-        else:
-          # a simple attribute
-          joins, order = None, attr
+          joins, order = by_fulltext()
 
       if clause.get("desc", False):
         order = order.desc()
@@ -797,14 +802,14 @@ class QueryHelper(object):
       key = key.lower()
       key, filter_by = self.attr_name_map[
           tgt_class].get(key, (key, None))
+
       if callable(filter_by):
         return filter_by(predicate)
-      else:
-        attr = getattr(object_class, key, None)
-        if attr:
-          return predicate(attr)
-        else:
-          return default_filter_by(object_class, key, predicate)
+
+      if key in self.getattr_whitelist:
+        return predicate(getattr(object_class, key, None))
+
+      return default_filter_by(object_class, key, predicate)
 
     lift_bin = lambda f: f(self._build_expression(exp["left"], object_class,
                                                   tgt_class),
