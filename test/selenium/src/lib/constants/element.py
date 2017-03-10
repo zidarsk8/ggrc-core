@@ -1,6 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Module containing elements' labels and properties for GGRC's objects."""
+"""Elements' labels and properties for objects."""
 # pylint: disable=too-few-public-methods
 # pylint: disable=invalid-name
 
@@ -8,7 +8,7 @@ from lib.constants import objects, roles
 
 
 class Lhn(object):
-  """Elements' labels and properties for the LHN menu."""
+  """Elements' labels and properties for LHN menu."""
   class __metaclass__(type):
     def __init__(cls, *args):
       for object_ in objects.ALL_PLURAL:
@@ -46,7 +46,7 @@ class Lhn(object):
 
 
 class WidgetBar(object):
-  """Elements' labels and properties for the Generic widget bar."""
+  """Elements' labels and properties for Generic widget bar."""
   INFO = "Info"
 
   class __metaclass__(type):
@@ -56,9 +56,9 @@ class WidgetBar(object):
 
 
 class AdminWidgetRoles(object):
-  """Elements' labels (role scopes) and properties for the Roles widget
-  at Admin Dashboard.
-  """
+  """Elements' labels (role scopes) and properties for Roles widget
+ at Admin Dashboard.
+ """
   _ADMIN_SCOPE = roles.ADMIN.upper()
   _SYS_SCOPE = roles.SYSTEM.upper()
   _PRG_SCOPE = roles.PRIVATE_PROGRAM.upper()
@@ -86,18 +86,18 @@ class AdminWidgetRoles(object):
 
 
 class AdminWidgetEvents(object):
-  """Elements' labels and properties (regular expression) for the Event widget
-  at Admin Dashboard.
-  """
+  """Elements' labels and properties (regular expression) for Event widget
+ at Admin Dashboard.
+ """
   WIDGET_HEADER = "Events"
   TREE_VIEW_ROW_REGEXP = r"^.+\s(by.+)\son\s" + \
       r"(\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\s[A,P]M)"
 
 
 class AdminWidgetCustomAttrs(object):
-  """Elements' labels (custom attributes scopes) for the Custom Attributes
-  widget at Admin Dashboard.
-  """
+  """Elements' labels (custom attributes scopes) for Custom Attributes
+ widget at Admin Dashboard.
+ """
   # possible types of custom attributes
   WIDGET_HEADER = "Custom Attributes"
   TEXT = "Text"
@@ -111,7 +111,7 @@ class AdminWidgetCustomAttrs(object):
 
 
 class Common(object):
-  """Common elements' labels and properties for the objects."""
+  """Common elements' labels and properties for objects."""
   TITLE = "Title"
   DESCRIPTION = "Description"
   CODE = "Code"
@@ -120,7 +120,7 @@ class Common(object):
 
 
 class Base(object):
-  """Base elements' labels and properties for the objects."""
+  """Base elements' labels and properties for objects."""
   WIDGET_INFO_HEADER_FORMAT = "{} Info"
   TYPE = "Type"
   STATE = "State"
@@ -131,8 +131,8 @@ class Base(object):
 
 
 class CommonModalCreate(object):
-  """Common elements' labels and properties for the Modal to Create the object.
-  """
+  """Common elements' labels and properties for Modal to Create object.
+ """
   HIDE_ALL_OPT_FIELDS = "Hide all optional fields"
   SHOW_ALL_OPT_FIELDS = "Show all optional fields"
   SAVE_AND_CLOSE = "Save & Close"
@@ -140,8 +140,8 @@ class CommonModalCreate(object):
 
 class CommonModalSetVisibleFields(object):
   """Common elements' labels and properties for Modal widow that Select visible
-  fields for Tree View.
-  """
+ fields for Tree View.
+ """
   MODAL_HEADER_FORMAT = "Set visible fields for {}"
   TITLE = Common.TITLE
   CODE = Common.CODE
@@ -151,17 +151,21 @@ class CommonModalSetVisibleFields(object):
 
 
 class TransformationSetVisibleFields(CommonModalSetVisibleFields):
-  """To transformation elements' labels and properties for the Modal to Set
-  visible fields for object as Tree View headers.
-  """
+  """To transformation elements' labels and properties for Modal to Set
+ visible fields for object as Tree View headers.
+ """
   OWNER = "Owner"
   VERIFIED = "Verified"
+  STATUS = "Status"
+  AUDIT_LEAD = "Audit Lead"
+  MANAGER = "Manager"
 
 
-class CommonProgram(object):
-  """Common elements' labels and properties for the Program object."""
+class CommonProgram(Common):
+  """Common elements' labels and properties for Programs objects."""
   # pylint: disable=too-many-instance-attributes
   PROGRAM = objects.get_normal_form(objects.get_singular(objects.PROGRAMS))
+  TITLE = Common.TITLE
   MANAGER = "Manager"
   PROGRAM_URL = "Program URL"
   REFERENCE_URL = Base.REFERENCE_URL
@@ -173,34 +177,50 @@ class CommonProgram(object):
   STATE = Base.STATE
 
 
+class CommonAudit(Common):
+  """Common elements' labels and properties for Audits objects."""
+  # pylint: disable=too-many-instance-attributes
+  AUDIT = objects.get_normal_form(objects.get_singular(objects.AUDITS))
+  TITLE = Common.TITLE
+  STATUS = "Status"
+  PLANNED_START_DATE = "Planned Start Date"
+  PLANNED_END_DATE = "Planned End Date"
+  PLANNED_REPORT_PERIOD = "Planned Report Period"
+  AUDIT_LEAD = "Audit Lead"
+  AUDIT_FIRM = " Audit Firm"
+  AUDITORS = "Auditors"
+  ADD_AUDITOR = "+ Add Auditor"
+  AUDIT_FOLDER = "Audit Folder"
+  ASSIGN_FOLDER = "Assign folder"
+
+
 class CommonControl(object):
-  """Common elements' labels and properties for the Control object."""
+  """Common elements' labels and properties for Controls objects."""
   CONTROL = objects.get_normal_form(objects.get_singular(objects.CONTROLS))
 
 
-class CommonAsmt(object):
-  """Common elements' labels and properties for the Assessment object."""
+class CommonAssessment(object):
+  """Common elements' labels and properties for Assessments objects."""
   ASMT = objects.get_normal_form(objects.get_singular(objects.ASSESSMENTS))
 
 
-class CommonAsmtTmpl(object):
-  """Common elements' labels and properties for the Assessment Template object.
-  """
+class CommonAssessmentTemplate(object):
+  """Common elements' labels and properties for Assessment Templates objects.
+ """
   ASMT_TMPL = objects.get_normal_form(
       objects.get_singular(objects.ASSESSMENT_TEMPLATES))
+
+
+class CommonIssue(object):
+  """Common elements' labels and properties for Issues objects."""
+  ISSUE = objects.get_normal_form(objects.get_singular(objects.ISSUES))
 
 
 class ObjectStates(object):
   """States for objects."""
   DRAFT = "Draft"
-  FINAL = "Final"
-  EFFECTIVE = "Effective"
-  INEFFECTIVE = "Ineffective"
-  LAUNCHED = "Launched"
-  NOT_LAUNCHED = "Not Launched"
-  IN_SCOPE = "In Scope"
-  NOT_IN_SCOPE = "Not in Scope"
   DEPRECATED = "Deprecated"
+  ACTIVE = "Active"
 
 
 class BaseStates(object):
@@ -210,28 +230,42 @@ class BaseStates(object):
 
 
 class AuditStates(BaseStates):
-  """States for Audit object."""
+  """States for Audits objects."""
   PLANNED = "Planned"
   MANAGER_REVIEW = "Manager Review"
   READY_FOR_EXT_REVIEW = "Ready for External Review"
 
 
-class AsmtStates(BaseStates):
-  """States for Assessment object."""
+class AssessmentStates(BaseStates):
+  """States for Assessments objects."""
   NOT_STARTED = "Not Started"
+  READY_FOR_REVIEW = "Ready for Review"
+  VERIFIED = "Verified"
 
 
-class ProgramWidgetInfo(CommonProgram):
-  """Elements' labels and properties for the Program Info Widget."""
+class IssueStates(ObjectStates):
+  """States for Issues objects."""
+
+
+class ProgramInfoWidget(CommonProgram):
+  """Elements' labels and properties for Programs Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonProgram.PROGRAM)
 
 
-class AsmtTmplModalSetVisibleFields(CommonModalSetVisibleFields):
-  """Common elements' labels and properties for the Modal to Set visible
-  fields for Assessment Template.
-  """
+class AuditInfoWidget(CommonAudit):
+  """Elements' labels and properties for Audits Info widgets."""
+  WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonAudit.AUDIT)
+  TITLE_UPPER = CommonAudit.TITLE.upper()
+  AUDIT_LEAD_UPPER = CommonAudit.AUDIT_LEAD.upper()
+  CODE_UPPER = CommonAudit.CODE.upper()
+
+
+class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Assessment Templates.
+ """
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      CommonAsmtTmpl.ASMT_TMPL)
+      CommonAssessmentTemplate.ASMT_TMPL)
   OWNER = TransformationSetVisibleFields.OWNER
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
@@ -241,12 +275,12 @@ class AsmtTmplModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.LAST_UPDATED)
 
 
-class AsmtModalSetVisibleFields(CommonModalSetVisibleFields):
-  """Common elements' labels and properties for the Modal to Set visible
-  fields for Assessment.
-  """
+class AssessmentModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Assessments.
+ """
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      CommonAsmt.ASMT)
+      CommonAssessment.ASMT)
   VERIFIED = TransformationSetVisibleFields.VERIFIED
   CONCLUSION_DESIGN = "Conclusion: Design"
   CONCLUSION_OPERATION = "Conclusion: Operation"
@@ -262,9 +296,9 @@ class AsmtModalSetVisibleFields(CommonModalSetVisibleFields):
 
 
 class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
-  """Common elements' labels and properties for the Modal to Set visible
-  fields for Control.
-  """
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Controls.
+ """
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonControl.CONTROL)
@@ -288,3 +322,43 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonModalSetVisibleFields.TITLE, OWNER,
       CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
       CommonModalSetVisibleFields.LAST_UPDATED)
+
+
+class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Issues.
+ """
+  # pylint: disable=too-many-instance-attributes
+  MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
+      CommonIssue.ISSUE)
+  OWNER = TransformationSetVisibleFields.OWNER
+  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
+  SECONDARY_CONTACT = roles.SECONDARY_CONTACT
+  REVIEW_STATE = "Review State"
+  URL = Base.URL
+  REFERENCE_URL = Base.REFERENCE_URL
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, OWNER,
+      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED)
+
+
+class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Programs.
+ """
+  # pylint: disable=too-many-instance-attributes
+  MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
+      CommonProgram.PROGRAM)
+  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
+  SECONDARY_CONTACT = roles.SECONDARY_CONTACT
+  REVIEW_STATE = "Review State"
+  MANAGER = CommonProgram.MANAGER
+  URL = Base.URL
+  REFERENCE_URL = Base.REFERENCE_URL
+  EFFECTIVE_DATE = Base.EFFECTIVE_DATE
+  STOP_DATE = Base.STOP_DATE
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
+      CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED, MANAGER)

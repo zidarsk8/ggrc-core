@@ -1,6 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""The module provides constants for GGRC's roles."""
+"""Constants for roles."""
 
 # global roles
 NO_ROLE = "No role"

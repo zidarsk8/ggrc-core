@@ -11,14 +11,15 @@ from lib.constants import url
 
 
 class TestOrgGroupPage(base.Test):
-  """Tests the org group page, a part of smoke tests, section 7."""
+  """Tests org group page, part of smoke tests, section 7."""
+  # pylint: disable=too-few-public-methods
 
   @pytest.mark.smoke_tests
   def test_app_redirects_to_new_org_group_page(self, new_org_group_ui):
-    """Tests if after saving and closing the lhn_modal the app redirects to
+    """Tests if after saving and closing lhn_modal app redirects to
     the object page.
-    Generally we start at a random url. Here we verify that after saving
-    and closing the lhn_modal we're redirected to an url that contains an
+    Generally we start at random url. Here we verify that after saving
+    and closing lhn_modal we're redirected to an url that contains an
     object id.
     """
     assert (url.ORG_GROUPS + "/" + new_org_group_ui.object_id in

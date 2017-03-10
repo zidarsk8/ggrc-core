@@ -7,11 +7,11 @@ from lib.constants import element
 
 
 def _get_lhn_section_map():
-  """Returns a dictionary with lhn elements that are grouped together
-  into sections
-  Return:
+  """Return dictionary with lhn elements that are grouped together
+ into sections
+ Return:
       dict
-  """
+ """
   members_dct = {}
   member_tpls = (
       (element.Lhn.DIRECTIVES, element.Lhn.DIRECTIVES_MEMBERS),

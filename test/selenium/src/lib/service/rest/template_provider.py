@@ -1,6 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""The module provides functionality for working with JSON templates."""
+"""Functionality for work with JSON templates."""
 # pylint: disable=too-few-public-methods
 # pylint: disable=redefined-builtin
 # pylint: disable=invalid-name
@@ -13,7 +13,7 @@ from lib.constants import objects, url
 
 
 class TemplateProvider(object):
-  """Provider of the methods for work with JSON templates."""
+  """Provider of methods for work with JSON templates."""
   _relationship = objects.get_singular(url.RELATIONSHIPS)
   _object_owner = objects.get_singular(url.OBJECT_OWNERS)
   _count = objects.COUNT
@@ -23,9 +23,9 @@ class TemplateProvider(object):
 
   @classmethod
   def generate_template_as_dict(cls, template, **kwargs):
-    """Get template as dictionary from a predefined JSON file and attributes
+    """Get template as dictionary from predefined JSON file and attributes
     (items (kwargs): key=value).
-    Return the dictionary like as {type: {key: value, ...}}.
+    Return dictionary like as {type: {key: value, ...}}.
     """
     path = os.path.join(os.path.dirname(__file__),
                         cls.relative_path_template.format(template))
@@ -42,9 +42,9 @@ class TemplateProvider(object):
 
   @classmethod
   def update_template_as_dict(cls, template, **kwargs):
-    """Update the template as the list of dictionary according to the
+    """Update template as list of dictionary according to
     attributes (items (kwargs): key=value).
-    Return the list of dictionary like as [{type: {key: value, ...}}].
+    Return list of dictionary like as [{type: {key: value, ...}}].
     """
     data = json.loads(template)
     type = data.iterkeys().next()

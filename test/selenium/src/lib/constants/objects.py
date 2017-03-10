@@ -1,6 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""The module provides service for working with GGRC's objects."""
+"""Constants and methods for work with objects."""
 
 
 # objects
@@ -48,14 +48,11 @@ COUNT = "count"
 
 def _get_singular(plurals):
   """
-  Return:
-     list of basestring: Capitalized object names in singular form
-  """
+ Return: list of basestring: Capitalized object names in singular form
+ """
   singulars = []
-
   for name in plurals:
     name = name.lower()
-
     if name == PEOPLE:
       singular = "person"
     elif name == POLICIES:
@@ -66,30 +63,30 @@ def _get_singular(plurals):
       singular = "facility"
     else:
       singular = name[:-1]
-
     singulars.append(singular.upper())
-
   return singulars
 
 
 def get_singular(plural):
   """Transform object name to singular and lower form.
-
-  Example:
-    risk_assessments -> risk_assessment
-  """
+ Example: risk_assessments -> risk_assessment
+ """
   return _get_singular([plural])[0].lower()
 
 
-ALL_PLURAL = [k for k in globals().keys()
-              if not k.startswith("_") or k == "ALL"]
-ALL_SINGULAR = _get_singular(ALL_PLURAL)
-
-
-def get_normal_form(obj_name):
+def get_normal_form(obj_name, with_space=True):
   """Transform object name to title form.
+ Example:
+ if with_space=True then risk_assessments -> Risk Assessments
+ if with_space=False then risk_assessments -> RiskAssessments
+ """
+  normal = obj_name.replace("_", " ").title()
+  if with_space is True:
+    return normal
+  elif with_space is False:
+    return normal.replace(" ", "")
 
-  Example:
-    risk_assessments -> Risk Assessments
-  """
-  return obj_name.replace("_", " ").title()
+
+ALL_PLURAL = [
+    k for k in globals().keys() if not k.startswith("_") or k == "ALL"][1:]
+ALL_SINGULAR = _get_singular(ALL_PLURAL)

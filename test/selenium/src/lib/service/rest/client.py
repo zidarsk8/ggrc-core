@@ -1,6 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""The module contains classes for working with REST API."""
+"""REST API client."""
 # pylint: disable=redefined-builtin
 
 import Cookie
@@ -27,8 +27,8 @@ class RestClient(object):
     self.session_cookie = None
 
   def get_session_cookie(self):
-    """Send a GET request to the login URL, get a response and return the
-    session cookie from response headers for further usage.
+    """Send GET request to login URL, get response and return session
+    cookie from response headers for further usage.
     """
     resp = requests.get(urlparse.urljoin(environment.APP_URL, "/login"))
     cookies = Cookie.SimpleCookie()
@@ -36,10 +36,10 @@ class RestClient(object):
     self.session_cookie = cookies["session"].value
 
   def generate_req_headers(self, resp_headers=None):
-    """Create a request headers for the further HTTP calls.
-    If 'resp_headers' is 'None' than return a request headers from a predefined
+    """Create request headers for further HTTP calls.
+    If 'resp_headers' is 'None' than return request headers from predefined
     basic headers and session cookie.
-    If 'resp_headers' is not 'None' than return a request headers from a
+    If 'resp_headers' is not 'None' than return request headers from
     predefined basic headers, session cookie and response headers.
     """
     req_headers = self.BASIC_HEADERS
@@ -52,8 +52,8 @@ class RestClient(object):
     return req_headers
 
   def create_object(self, type, **kwargs):
-    """Create an object or make other operations used a POST request and
-    return the raw response.
+    """Create an object or make other operations used POST request and
+    return raw response.
     """
     if type == self._count:
       self.url = urlparse.urljoin(environment.APP_URL, url.QUERY)
@@ -63,7 +63,7 @@ class RestClient(object):
     return resp
 
   def update_object(self, href, **kwargs):
-    """Update an object used a GET, POST requests and return the raw response.
+    """Update an object used GET, POST requests and return raw response.
     """
     obj_url = urlparse.urljoin(environment.APP_URL, href)
     obj_resp_headers = self.get_object(obj_url)["resp_headers"]
@@ -76,7 +76,7 @@ class RestClient(object):
     return new_obj_resp
 
   def get_object(self, obj_url):
-    """Get an object used a GET request and return a dictionary:
+    """Get an object used GET request and return dictionary:
     {"resp_body": resp.text, "resp_headers": resp.headers}.
     """
     req_headers = self.generate_req_headers()
@@ -84,7 +84,7 @@ class RestClient(object):
     return {"resp_body": resp.text, "resp_headers": resp.headers}
 
   def generate_body(self, type, **kwargs):
-    """Generate a body of HTTP request based on JSON representation."""
+    """Generate body of HTTP request based on JSON representation."""
     if type == self._count:
       return json.dumps(
           [TemplateProvider.generate_template_as_dict(
@@ -97,7 +97,7 @@ class RestClient(object):
 
   @staticmethod
   def update_body(body, **kwargs):
-    """Update a body of HTTP request based on JSON representation."""
+    """Update body of HTTP request based on JSON representation."""
     return json.dumps(
         TemplateProvider.update_template_as_dict(
             template=body, **kwargs)
