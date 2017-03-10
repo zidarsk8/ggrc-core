@@ -1306,30 +1306,47 @@
       var statesQuery = GGRC.query_parser.parse(statesFilter);
       var reqParams;
       var filter;
+      var fields = [
+        'child_id',
+        'child_type',
+        'context',
+        'email',
+        'id',
+        'is_latest_revision',
+        'name',
+        'revision',
+        'revisions',
+        'selfLink',
+        'slug',
+        'status',
+        'title',
+        'type',
+        'viewLink',
+        'workflow_state'
+      ];
 
-      reqParams = originalOrder.map(function (model) {
-        if (GGRC.Utils.State.hasState(model)) {
-          filter = statesQuery;
-        }
-        return queryAPI.buildParam(model, {}, relevant, [
-          'child_id',
-          'child_type',
-          'context',
-          'email',
-          'id',
-          'is_latest_revision',
-          'name',
-          'revision',
-          'revisions',
-          'selfLink',
-          'slug',
-          'status',
-          'title',
-          'type',
-          'viewLink',
-          'workflow_state'
-        ], filter);
-      });
+      if (!originalOrder.length) {
+        originalOrder = GGRC.Mappings
+          .getMappingList(parent.type);
+      }
+
+      if (GGRC.Utils.CurrentPage.getPageType() === 'Workflow') {
+        fields = [];
+        reqParams = originalOrder.map(function (model) {
+          var rootFilter = parentCtrl.options.attr('paging.filter');
+          if (rootFilter) {
+            filter = GGRC.query_parser.parse(rootFilter);
+          }
+          return queryAPI.buildParam(model, {}, relevant, fields, filter);
+        });
+      } else {
+        reqParams = originalOrder.map(function (model) {
+          if (GGRC.Utils.State.hasState(model)) {
+            filter = statesQuery;
+          }
+          return queryAPI.buildParam(model, {}, relevant, fields, filter);
+        });
+      }
 
       return this.page_loader.load({data: reqParams}, originalOrder);
     },
