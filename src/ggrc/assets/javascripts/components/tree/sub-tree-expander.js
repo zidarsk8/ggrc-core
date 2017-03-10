@@ -10,6 +10,14 @@
     tag: 'sub-tree-expander',
     template: '<content/>',
     viewModel: {
+      define: {
+        contextName: {
+          type: String,
+          get: function () {
+            return GGRC.Utils.CurrentPage.getPageType();
+          }
+        }
+      },
       expanded: null,
       disabled: false,
       onChangeState: null,
