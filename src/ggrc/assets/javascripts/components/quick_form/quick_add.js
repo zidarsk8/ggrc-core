@@ -93,6 +93,10 @@
         var created_dfd;
         var verify_dfd = $.Deferred();
         scope.attr('disabled', true);
+        scope.attr('modal_description',
+          this.element.context.attributes.modal_description.value);
+        scope.attr('verify_event',
+          !!this.element.context.attributes.verify_event);
 
         if (scope.attr("verify_event")) {
           GGRC.Controllers.Modals.confirm({
@@ -100,7 +104,7 @@
             modal_confirm: scope.attr("modal_button"),
             modal_title: scope.attr("modal_title"),
             button_view: GGRC.mustache_path + "/quick_form/confirm_buttons.mustache"
-          }, verify_dfd.resolve);
+          }, verify_dfd.resolve, verify_dfd.reject);
         } else {
           verify_dfd.resolve();
         }
@@ -187,7 +191,10 @@
           .always(function () {
             scope.attr('disabled', false);
           });
-        }.bind(this));
+        }.bind(this))
+        .fail(function () {
+          scope.attr('disabled', false);
+        });
       },
       // this works like autocomplete_select on all modal forms and
       //  descendant class objects.
