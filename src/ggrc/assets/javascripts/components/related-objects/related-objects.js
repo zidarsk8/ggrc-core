@@ -51,7 +51,9 @@
         params.data = [{
           limit: [first, last],
           object_name: relatedType,
-          order_by: [{name: orderBy, desc: true}],
+          order_by: orderBy.split(',').map(function (field) {
+            return {name: field, desc: true};
+          }),
           filters: {
             expression: {
               object_name: type,
