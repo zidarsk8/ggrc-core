@@ -506,7 +506,7 @@
 
     display_path: function (path, refetch) {
       return this.display(refetch).then(this._ifNotRemoved(function () {
-        return GGRC.Utils._display_tree_subpath(this.element, path);
+        return GGRC.Utils.TreeView.displayTreeSubpath(this.element, path);
       }.bind(this)));
     },
 
