@@ -2635,7 +2635,7 @@ Mustache.registerHelper("is_overdue", function (_date, status, options) {
   var date = moment(resolve_computed(_date));
   var today = moment().startOf('day');
   var startOfDate = moment(date).startOf('day');
-  var isBefore = date && today.diff(startOfDate, 'days') > 0;
+  var isBefore = date && today.diff(startOfDate, 'days') >= 0;
   options = arguments.length === 2 ? arguments[1] : options;
   status = arguments.length === 2 ? "" : resolve_computed(status);
   // TODO: [Overdue] Move this logic to helper.
