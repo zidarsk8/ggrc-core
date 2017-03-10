@@ -46,6 +46,7 @@ dashboard-js-files:
   - plugins/utils/current-page-utils.js
   - plugins/utils/state-utils.js
   - plugins/utils/ggrcq-utils.js
+  - plugins/utils/tree-view-utils.js
   - plugins/datepicker.js
   - plugins/can_control.js
   - plugins/wysiwyg.js
