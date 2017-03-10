@@ -294,9 +294,9 @@
           this.page_loader = new GGRC.ListLoaders.TreePageLoader(
             this.options.model, this.options.parent_instance,
             this.options.mapping);
-        } else if (this.options.attr('is_subtree') &&
-          GGRC.page_instance().type !== 'Workflow') {
-          if (GGRC.Utils.CurrentPage.isObjectContextPage()) {
+        } else if (this.options.attr('is_subtree')) {
+          if (GGRC.Utils.CurrentPage.isObjectContextPage() &&
+            GGRC.page_instance().type !== 'Workflow') {
             this.options.attr('drawSubTreeExpander', true);
           }
           this.page_loader = new GGRC.ListLoaders.SubTreeLoader(
