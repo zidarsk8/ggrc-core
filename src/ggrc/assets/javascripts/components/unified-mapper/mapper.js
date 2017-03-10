@@ -123,7 +123,8 @@
       var type;
       var cmsModel;
       cmsModel = GGRC.Utils.getModelByType(modelName);
-      if (!cmsModel || cmsModel.title_singular === 'Reference') {
+      if (!cmsModel || !cmsModel.title_singular ||
+        cmsModel.title_singular === 'Reference') {
         return;
       }
       type = this.prepareCorrectTypeFormat(cmsModel);
