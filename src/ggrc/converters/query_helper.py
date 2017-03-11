@@ -100,8 +100,9 @@ class QueryHelper(object):
     self._count = 0
     self.getattr_whitelist = {
         "child_type",
+        "contact",
         "is_current",
-        "owners"
+        "secondary_contact",
     }
 
   def _set_attr_name_map(self):
