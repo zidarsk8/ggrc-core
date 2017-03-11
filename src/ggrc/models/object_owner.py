@@ -83,6 +83,9 @@ class Ownable(object):
       PublishOnly('object_owners'),
   ]
   _include_links = []
+  _fulltext_attrs = [
+      'owners',
+  ]
   _aliases = {
       "owners": {
           "display_name": "Owner",

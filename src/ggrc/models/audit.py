@@ -65,6 +65,14 @@ class Audit(Snapshotable, clonable.Clonable,
       PublishOnly('audit_objects')
   ]
 
+  _fulltext_attrs = [
+      'report_start_date',
+      'report_end_date',
+      'audit_firm',
+      'status',
+      'gdrive_evidence_folder',
+  ]
+
   _sanitize_html = [
       'gdrive_evidence_folder',
       'description',

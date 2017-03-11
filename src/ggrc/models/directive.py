@@ -60,6 +60,17 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
       'version',
   ]
 
+  _fulltext_attrs = [
+      'audit_start_date',
+      'audit_frequency',
+      'audit_duration',
+      'controls',
+      'kind',
+      'organization',
+      'scope',
+      'version',
+  ]
+
   _sanitize_html = [
       'organization',
       'scope',

@@ -19,6 +19,8 @@ class Assignable(object):
 
   ASSIGNEE_TYPES = set(["Assignee"])
 
+  _fulltext_attrs = ['assignees']
+
   @property
   def assignees(self):
     """Property that returns assignees
