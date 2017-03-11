@@ -2,10 +2,13 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Tests for basic csv imports."""
 
+from collections import OrderedDict
+
 from ggrc import models
 from ggrc.converters import errors
 from integration.ggrc import TestCase
 from integration.ggrc import generator
+from integration.ggrc.models import factories
 
 
 class TestBasicCsvImport(TestCase):
@@ -186,3 +189,34 @@ class TestBasicCsvImport(TestCase):
 
     self.assertEqual(0, len(response["row_warnings"]))
     self.assertEqual(0, len(response["row_errors"]))
+
+  def test_audit_import_context(self):
+    """Test audit context on edits via import."""
+    factories.ProgramFactory(slug="p")
+    response = self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code*", "audit"),
+        ("title", "audit"),
+        ("Internal Audit Lead", "user@example.com"),
+        ("status", "In Progress"),
+        ("program", "P"),
+    ]))
+    self._check_csv_response(response, {})
+
+    audit = models.Audit.query.first()
+    program = models.Program.query.first()
+    self.assertNotEqual(audit.context_id, program.context_id)
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code*", "audit"),
+        ("title", "audit"),
+        ("Internal Audit Lead", "user@example.com"),
+        ("status", "In Progress"),
+        ("program", "P"),
+    ]))
+    self._check_csv_response(response, {})
+
+    audit = models.Audit.query.first()
+    program = models.Program.query.first()
+    self.assertNotEqual(audit.context_id, program.context_id)
