@@ -90,10 +90,6 @@ class TestOneTimeWorkflowNotification(TestCase):
       cycle_response, cycle = self.wf_generator.generate_cycle(wf)
       self.wf_generator.activate_workflow(wf)
 
-      db.session.add(self.owner1)
-      db.session.add(self.tgassignee1)
-      db.session.add(self.member1)
-
       common.get_daily_notifications()
 
   def create_test_cases(self):
