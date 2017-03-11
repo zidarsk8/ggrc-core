@@ -19,6 +19,7 @@ down_revision = '3f615f3b5192'
 
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
+  # pylint: disable=too-many-statements
 
   # clear bad audit ids, clearing instead of just fixing the bad audit ids will
   # make it easier to propagate this change to all of its related objects that
@@ -95,6 +96,14 @@ def upgrade():
     JOIN assessments AS a ON od.documentable_id = a.id
      SET od.context_id = NULL
    WHERE documentable_type = 'Assessment' AND a.context_id IS NULL;
+  """
+  op.execute(sql)
+
+  sql = """
+  UPDATE object_documents AS od
+    JOIN issues AS i ON od.documentable_id = i.id
+     SET od.context_id = NULL
+   WHERE documentable_type = 'Issue' AND i.context_id IS NULL;
   """
   op.execute(sql)
 
@@ -236,6 +245,14 @@ def upgrade():
     JOIN assessments AS a ON od.documentable_id = a.id
      SET od.context_id = a.context_id
    WHERE documentable_type = 'Assessment' AND od.context_id IS NULL;
+  """
+  op.execute(sql)
+
+  sql = """
+  UPDATE object_documents AS od
+    JOIN issues AS i ON od.documentable_id = i.id
+     SET od.context_id = i.context_id
+   WHERE documentable_type = 'Issue' AND od.context_id IS NULL;
   """
   op.execute(sql)
 
