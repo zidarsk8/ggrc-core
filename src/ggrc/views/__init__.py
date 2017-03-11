@@ -76,6 +76,10 @@ def do_reindex():
 
   indexed_models = get_indexed_model_names()
 
+  people = db.session.query(all_models.Person.id, all_models.Person.name,
+                            all_models.Person.email)
+  g.people_map = {p.id: (p.name, p.email) for p in people}
+
   for model in indexed_models:
     # pylint: disable=protected-access
     model = get_model(model)
@@ -89,6 +93,8 @@ def do_reindex():
       db.session.commit()
 
   reindex_snapshots()
+
+  delattr(g, "people_map")
 
 
 def get_permissions_json():

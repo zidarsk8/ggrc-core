@@ -3,8 +3,13 @@
 
 """Module for full text index record builder."""
 
+import flask
+from sqlalchemy.ext.associationproxy import _AssociationList
+
+from ggrc import db
 import ggrc.models.all_models
 from ggrc.models.reflection import AttributeInfo
+from ggrc.models.person import Person
 from ggrc.fulltext import Record
 
 
@@ -43,6 +48,43 @@ class RecordBuilder(object):
 
     return {attr: {"": getattr(obj, attr)} for attr in self._fulltext_attrs}
 
+  def build_person_subprops(self, person):
+    """Get dict of Person properties for fulltext indexing
+
+    If Person provided by Revision, need to go to DB to get Person data
+    """
+    subproperties = {}
+    if hasattr(flask.g, "people_map"):
+      if isinstance(person, dict):
+        person_id = person["id"]
+      else:
+        person_id = person.id
+      person_name, person_email = flask.g.people_map[person_id]
+    else:
+      if isinstance(person, dict):
+        person = db.session.query(Person).filter_by(id=person["id"]).one()
+      person_id = person.id
+      person_name = person.name
+      person_email = person.email
+    subproperties["{}-name".format(person_id)] = person_name
+    subproperties["{}-email".format(person_id)] = person_email
+    return subproperties
+
+  def get_custom_attribute_properties(self, obj):
+    """Get property value in case of indexing CA
+    """
+    # The name of the attribute property needs to be unique for each object,
+    # the value comes from the custom_attribute_value
+    attribute_name = obj.custom_attribute.title
+    properties = {}
+    if (obj.custom_attribute.attribute_type == "Map:Person" and
+            obj.attribute_object_id):
+      properties[attribute_name] = self.build_person_subprops(
+          obj.attribute_object)
+    else:
+      properties[attribute_name] = {"": obj.attribute_value}
+    return properties
+
   def as_record(self, obj):
     """Generate record representation for an object.
 
@@ -66,22 +108,34 @@ class RecordBuilder(object):
     if record_type == "CustomAttributeValue":
       record_id = obj.attributable_id
       record_type = obj.attributable_type
-      # The name of the attribute property needs to be unique for each object,
-      # the value comes from the custom_attribute_value
-      attribute_name = obj.custom_attribute.title
-
-      properties = {}
-      subproperties = {}
-      if (obj.custom_attribute.attribute_type == "Map:Person" and
-              obj.attribute_object_id):
-        # Add both name and email for a Map:Person to the index
-        subproperties["name"] = obj.attribute_object.name
-        subproperties["email"] = obj.attribute_object.email
-        properties[attribute_name] = subproperties
-      else:
-        properties[attribute_name] = {"": obj.attribute_value}
+      properties = self.get_custom_attribute_properties(obj)
     else:
       properties = self._get_properties(obj)
+
+    # assignees are returned as a list:
+    # [(<person1>, (role1, role2, ...)), (<person2>, (role2, ...)]
+    assignees = properties.pop("assignees", None)
+    if assignees:
+      for _, persons in assignees.items():
+        for person, roles in persons:
+          if person:
+            for role in roles:
+              properties[role] = self.build_person_subprops(person)
+
+    person_properties = {"modified_by", "owners", "principal_assessor",
+                         "secondary_assessor", "contact",
+                         "secondary_contact"}
+    for prop in person_properties & set(properties.keys()):
+      subproperties = {}
+      for _, persons in properties[prop].items():
+        if not (isinstance(persons, list) or
+                isinstance(persons, _AssociationList)):
+          persons = [persons]
+        for person in persons:
+          if person:
+            subproperties.update(self.build_person_subprops(person))
+        if subproperties:
+          properties[prop] = subproperties
 
     return Record(
         # This logic saves custom attribute values as attributes of the object

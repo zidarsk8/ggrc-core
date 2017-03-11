@@ -1,6 +1,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""SQL routines for full-text indexing."""
+
 from ggrc import db
 from ggrc.fulltext import Indexer
 from ggrc.utils import benchmark
@@ -11,15 +13,16 @@ class SqlIndexer(Indexer):
     with benchmark("Add fulltext records: create_record -> submit to db"):
       for prop, value in record.properties.items():
         for subproperty, content in value.items():
-          db.session.add(self.record_type(
-              key=record.key,
-              type=record.type,
-              context_id=record.context_id,
-              tags=record.tags,
-              property=prop,
-              subproperty=subproperty,
-              content=content,
-          ))
+          if content:
+            db.session.add(self.record_type(
+                key=record.key,
+                type=record.type,
+                context_id=record.context_id,
+                tags=record.tags,
+                property=prop,
+                subproperty=subproperty,
+                content=content,
+            ))
     if commit:
       db.session.commit()
 

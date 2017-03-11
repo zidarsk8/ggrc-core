@@ -28,13 +28,16 @@ class Assignable(object):
     Returns:
         A set of assignees.
     """
-
-    assignees = [(r.source, tuple(r.attrs["AssigneeType"].split(",")))
-                 for r in self.related_sources
-                 if "AssigneeType" in r.attrs]
-    assignees += [(r.destination, tuple(r.attrs["AssigneeType"].split(",")))
-                  for r in self.related_destinations
-                  if "AssigneeType" in r.attrs]
+    assignees = [
+        (r.source, tuple(set(r.attrs["AssigneeType"].split(","))))
+        for r in self.related_sources
+        if "AssigneeType" in r.attrs
+    ]
+    assignees += [
+        (r.destination, tuple(set(r.attrs["AssigneeType"].split(","))))
+        for r in self.related_destinations
+        if "AssigneeType" in r.attrs
+    ]
     return assignees
 
   def get_assignees(self, filter_=None):
