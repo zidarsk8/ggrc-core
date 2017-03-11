@@ -6,7 +6,6 @@
 from collections import defaultdict
 
 import flask
-from sqlalchemy.ext.associationproxy import _AssociationList
 
 from ggrc import db
 import ggrc.models.all_models
@@ -111,7 +110,7 @@ class RecordBuilder(object):
       properties[attribute_name] = {"": obj.attribute_value}
     return properties
 
-  def as_record(self, obj):
+  def as_record(self, obj):  # noqa  # pylint:disable=too-many-branches
     """Generate record representation for an object.
 
     Properties should be returned in the following format:

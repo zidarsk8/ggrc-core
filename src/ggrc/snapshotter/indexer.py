@@ -3,7 +3,6 @@
 
 """Manage indexing for snapshotter service"""
 
-from sqlalchemy.ext.associationproxy import _AssociationList
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
@@ -72,7 +71,6 @@ def _get_model_properties():
         attribute definition attributes.
   """
   # pylint: disable=protected-access
-  from ggrc.models import all_models
   class_properties = dict()
   klass_names = Types.all
 
@@ -182,7 +180,7 @@ def get_person_sort_subprop(rec, people):
   return data
 
 
-def reindex_pairs(pairs):
+def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
   """Reindex selected snapshots.
 
   Args:
@@ -201,7 +199,7 @@ def reindex_pairs(pairs):
   snapshot_columns, revision_columns = _get_columns()
 
   snapshot_query = snapshot_columns
-  if pairs:
+  if pairs:  # pylint:disable=too-many-nested-blocks
     pairs_filter = tuple_(
         models.Snapshot.parent_type,
         models.Snapshot.parent_id,
