@@ -3,7 +3,6 @@
 
 """Manage indexing for snapshotter service"""
 
-import flask
 from sqlalchemy.ext.associationproxy import _AssociationList
 from sqlalchemy.sql.expression import tuple_
 
@@ -11,6 +10,7 @@ from ggrc import db
 from ggrc import models
 from ggrc.models import all_models
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
+from ggrc.fulltext.recordbuilder import RecordBuilder
 from ggrc.models.reflection import AttributeInfo
 from ggrc.utils import generate_query_chunks
 
@@ -161,21 +161,19 @@ def insert_records(payload):
 def get_person_data(rec, person):
   """Get list of Person properties for fulltext indexing
   """
-  subprops = {}
-  if hasattr(flask.g, "people_map"):
-    if isinstance(person, dict):
-      person_id = person.get("id")
-    else:
-      person_id = person.id
-    person_name, person_email = flask.g.people_map[person_id]
-  else:
-    if isinstance(person, dict):
-      person_id = person.get("id")
-      person = (db.session.query(all_models.Person).filter_by(id=person_id)
-                .one())
-    person_name, person_email = person.name, person.email
-  subprops["{}-name".format(person_id)] = person_name
-  subprops["{}-email".format(person_id)] = person_email
+  subprops = RecordBuilder.build_person_subprops(person)
+  data = []
+  for key, val in subprops.items():
+    newrec = rec.copy()
+    newrec.update({"subproperty": key, "content": val})
+    data += [newrec]
+  return data
+
+
+def get_person_sort_subprop(rec, people):
+  """Get a special subproperty for sorting
+  """
+  subprops = RecordBuilder.build_list_sort_subprop(people)
   data = []
   for key, val in subprops.items():
     newrec = rec.copy()
@@ -245,9 +243,12 @@ def reindex_pairs(pairs):
             for role in roles:
               properties[role] = [person]
 
-      person_properties = {"modified_by", "owners", "principal_assessor",
-                           "secondary_assessor", "contact",
-                           "secondary_contact"}
+      single_person_properties = {"modified_by", "principal_assessor",
+                                  "secondary_assessor", "contact",
+                                  "secondary_contact"}
+
+      multiple_person_properties = {"owners"}
+
       for prop, val in properties.items():
         if prop and val:
           # record stub
@@ -260,13 +261,14 @@ def reindex_pairs(pairs):
               "subproperty": "",
               "content": val,
           }
-          if prop in person_properties:
-            if not (isinstance(val, list) or
-                    isinstance(val, _AssociationList)):
-              val = [val]
+          if prop in single_person_properties:
+            if val:
+              search_payload += get_person_data(rec, val)
+              search_payload += get_person_sort_subprop(rec, [val])
+          elif prop in multiple_person_properties:
             for person in val:
-              if person:
-                search_payload += get_person_data(rec, person)
+              search_payload += get_person_data(rec, person)
+            search_payload += get_person_sort_subprop(rec, val)
           else:
             search_payload += [rec]
 

@@ -3,6 +3,8 @@
 
 """Module for full text index record builder."""
 
+from collections import defaultdict
+
 import flask
 from sqlalchemy.ext.associationproxy import _AssociationList
 
@@ -48,12 +50,12 @@ class RecordBuilder(object):
 
     return {attr: {"": getattr(obj, attr)} for attr in self._fulltext_attrs}
 
-  def build_person_subprops(self, person):
-    """Get dict of Person properties for fulltext indexing
+  @staticmethod
+  def get_person_id_name_email(person):
+    """Get id, name and email for person (either object or dict).
 
-    If Person provided by Revision, need to go to DB to get Person data
+    If there is a global people map, get the data from it instead of the DB.
     """
-    subproperties = {}
     if hasattr(flask.g, "people_map"):
       if isinstance(person, dict):
         person_id = person["id"]
@@ -66,9 +68,31 @@ class RecordBuilder(object):
       person_id = person.id
       person_name = person.name
       person_email = person.email
+    return person_id, person_name, person_email
+
+  @classmethod
+  def build_person_subprops(cls, person):
+    """Get dict of Person properties for fulltext indexing
+
+    If Person provided by Revision, need to go to DB to get Person data
+    """
+    subproperties = {}
+    person_id, person_name, person_email = cls.get_person_id_name_email(person)
     subproperties["{}-name".format(person_id)] = person_name
     subproperties["{}-email".format(person_id)] = person_email
     return subproperties
+
+  @classmethod
+  def build_list_sort_subprop(cls, people):
+    """Get a special subproperty for sorting.
+
+    Its content is :-separated sorted list of (name or email) of the people in
+    list.
+    """
+    _, names, emails = zip(*(cls.get_person_id_name_email(p) for p in people))
+    sort_values = (name or email for (name, email) in zip(names, emails))
+    content = ":".join(sorted(sort_values))
+    return {"__sort__": content}
 
   def get_custom_attribute_properties(self, obj):
     """Get property value in case of indexing CA
@@ -81,6 +105,8 @@ class RecordBuilder(object):
             obj.attribute_object_id):
       properties[attribute_name] = self.build_person_subprops(
           obj.attribute_object)
+      properties[attribute_name].update(self.build_list_sort_subprop(
+          [obj.attribute_object]))
     else:
       properties[attribute_name] = {"": obj.attribute_value}
     return properties
@@ -116,26 +142,39 @@ class RecordBuilder(object):
     # [(<person1>, (role1, role2, ...)), (<person2>, (role2, ...)]
     assignees = properties.pop("assignees", None)
     if assignees:
-      for _, persons in assignees.items():
-        for person, roles in persons:
+      for assignments in assignees.values():
+        role_to_people = defaultdict(list)
+        for person, roles in assignments:
           if person:
             for role in roles:
+              role_to_people[role].append(person)
               properties[role] = self.build_person_subprops(person)
+        for role, people in role_to_people.items():
+          properties[role].update(self.build_list_sort_subprop(people))
 
-    person_properties = {"modified_by", "owners", "principal_assessor",
-                         "secondary_assessor", "contact",
-                         "secondary_contact"}
-    for prop in person_properties & set(properties.keys()):
+    single_person_properties = {"modified_by", "principal_assessor",
+                                "secondary_assessor", "contact",
+                                "secondary_contact"}
+
+    multiple_person_properties = {"owners"}
+
+    for prop in single_person_properties & set(properties.keys()):
       subproperties = {}
-      for _, persons in properties[prop].items():
-        if not (isinstance(persons, list) or
-                isinstance(persons, _AssociationList)):
-          persons = [persons]
-        for person in persons:
-          if person:
-            subproperties.update(self.build_person_subprops(person))
-        if subproperties:
-          properties[prop] = subproperties
+      for person in properties[prop].values():
+        if person:
+          subproperties.update(self.build_person_subprops(person))
+          subproperties.update(self.build_list_sort_subprop([person]))
+      if subproperties:
+        properties[prop] = subproperties
+
+    for prop in multiple_person_properties & set(properties.keys()):
+      subproperties = {}
+      for people_list in properties[prop].values():
+        for person in people_list:
+          subproperties.update(self.build_person_subprops(person))
+        subproperties.update(self.build_list_sort_subprop(people_list))
+      if subproperties:
+        properties[prop] = subproperties
 
     return Record(
         # This logic saves custom attribute values as attributes of the object

@@ -100,9 +100,7 @@ class QueryHelper(object):
     self._count = 0
     self.getattr_whitelist = {
         "child_type",
-        "contact",
         "is_current",
-        "secondary_contact",
     }
 
   def _set_attr_name_map(self):
@@ -419,13 +417,6 @@ class QueryHelper(object):
     Returns:
       the query with sorting parameters.
     """
-    def sorting_field_for_person(person):
-      """Get right field to sort people by: name if defined or email."""
-      return sa.case([(sa.not_(sa.or_(person.name.is_(None),
-                                      person.name == '')),
-                       person.name)],
-                     else_=person.email)
-
     def joins_and_order(clause):
       """Get join operations and ordering field from item of order_by list.
 
@@ -453,7 +444,8 @@ class QueryHelper(object):
         joins = [(alias, sa.and_(
             alias.key == model.id,
             alias.type == model.__name__,
-            alias.property == key)
+            alias.property == key,
+            alias.subproperty.in_(["", "__sort__"]))
         )]
         order = alias.content
         return joins, order
@@ -464,51 +456,10 @@ class QueryHelper(object):
         if issubclass(related_model, models.mixins.Titled):
           joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
           order = alias.title
-        elif issubclass(related_model, models.Person):
-          joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
-          order = sorting_field_for_person(alias)
         else:
           raise NotImplementedError(u"Sorting by {model.__name__} is "
                                     u"not implemented yet."
                                     .format(model=related_model))
-        return joins, order
-
-      def by_m2m():
-        """Join the Person model, order by name/email.
-
-        Implemented only for ObjectOwner mapping.
-        """
-        if issubclass(attr.target_class, models.object_owner.ObjectOwner):
-          # NOTE: In the current implementation we sort only by the first
-          # assigned owner if multiple owners defined
-          oo_alias_1 = sa.orm.aliased(models.object_owner.ObjectOwner)
-          oo_alias_2 = sa.orm.aliased(models.object_owner.ObjectOwner)
-          oo_subq = db.session.query(
-              oo_alias_1.ownable_id,
-              oo_alias_1.ownable_type,
-              oo_alias_1.person_id,
-          ).filter(
-              oo_alias_1.ownable_type == model.__name__,
-              ~sa.exists().where(sa.and_(
-                  oo_alias_2.ownable_id == oo_alias_1.ownable_id,
-                  oo_alias_2.ownable_type == oo_alias_1.ownable_type,
-                  oo_alias_2.id < oo_alias_1.id,
-              )),
-          ).subquery()
-
-          owner = sa.orm.aliased(models.Person, name="owner")
-
-          joins = [
-              (oo_subq, sa.and_(model.__name__ == oo_subq.c.ownable_type,
-                                model.id == oo_subq.c.ownable_id)),
-              (owner, oo_subq.c.person_id == owner.id),
-          ]
-
-          order = sorting_field_for_person(owner)
-        else:
-          raise NotImplementedError(u"Sorting by m2m-field '{key}' "
-                                    u"is not implemented yet."
-                                    .format(key=key))
         return joins, order
 
       # transform clause["name"] into a model's field name
@@ -529,8 +480,6 @@ class QueryHelper(object):
               isinstance(attr.property,
                              sa.orm.properties.RelationshipProperty)):
             joins, order = by_foreign_key()
-          elif isinstance(attr, sa.ext.associationproxy.AssociationProxy):
-            joins, order = by_m2m()
           else:
             # a simple attribute
             joins, order = None, attr
