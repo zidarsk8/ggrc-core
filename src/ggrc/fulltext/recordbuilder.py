@@ -94,11 +94,6 @@ class RecordBuilder(object):
     )
 
 
-def model_is_indexed(tgt_class):
-  fulltext_attrs = AttributeInfo.gather_attrs(tgt_class, '_fulltext_attrs')
-  return len(fulltext_attrs) > 0
-
-
 def get_record_builder(obj, builders={}):
   # pylint: disable=dangerous-default-value
   # This default value is used for simple memoization and should be refactored
