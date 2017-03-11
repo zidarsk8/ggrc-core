@@ -111,7 +111,7 @@ def upgrade():
   sql = """
   UPDATE documents AS d
     JOIN object_documents AS od ON od.document_id = d.id
-     AND od.documentable_type = 'Assessment'
+     AND od.documentable_type in ("Assessment", "Issue")
      SET d.context_id = NULL
    WHERE od.context_id IS NULL
   """
@@ -260,7 +260,7 @@ def upgrade():
   sql = """
   UPDATE documents AS d
     JOIN object_documents AS od ON od.document_id = d.id
-     AND od.documentable_type = 'Assessment'
+     AND od.documentable_type in ("Assessment", "Issue")
      SET d.context_id = od.context_id
    WHERE d.context_id IS NULL
   """
