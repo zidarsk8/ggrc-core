@@ -3200,65 +3200,65 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
       return value;
     });
 
-Mustache.registerHelper('with_create_issue_json', function (instance, options) {
-  var audits;
-  var audit;
-  var json;
-  var relatedSnapshots = [];
+  Mustache.registerHelper('with_create_issue_json', function (instance, options) {
+    var audits;
+    var audit;
+    var json;
+    var relatedSnapshots = [];
 
-  instance = Mustache.resolve(instance);
-  audits = instance.get_mapping('related_audits');
-  if (!audits.length) {
-    return options.inverse(options.contexts);
-  }
+    instance = Mustache.resolve(instance);
+    audits = instance.get_mapping('related_audits');
+    if (!audits.length) {
+      return options.inverse(options.contexts);
+    }
 
-  audit = audits[0].instance.reify();
-  if (instance.mappedSnapshots) {
-    relatedSnapshots = instance.mappedSnapshots.map(function (item) {
-      var instance = item.instance;
-      return {
+    audit = audits[0].instance.reify();
+    if (instance.mappedSnapshots) {
+      relatedSnapshots = instance.mappedSnapshots.map(function (item) {
+        var instance = item.instance;
+        return {
+          title: instance.title,
+          id: instance.id,
+          type: instance.type,
+          context: instance.context
+        };
+      });
+    }
+
+    json = {
+      audit: {title: audit.title, id: audit.id, type: audit.type},
+      relatedSnapshots: relatedSnapshots,
+      context: {type: audit.context.type, id: audit.context.id},
+      assessment: {
         title: instance.title,
         id: instance.id,
         type: instance.type,
-        context: instance.context
-      };
-    });
-  }
+        title_singular: instance.class.title_singular,
+        table_singular: instance.class.table_singular
+      }
+    };
 
-  json = {
-    audit: {title: audit.title, id: audit.id, type: audit.type},
-    relatedSnapshots: relatedSnapshots,
-    context: {type: audit.context.type, id: audit.context.id},
-    assessment: {
-      title: instance.title,
-      id: instance.id,
-      type: instance.type,
-      title_singular: instance.class.title_singular,
-      table_singular: instance.class.table_singular
+    return options.fn(options.contexts.add({
+        create_issue_json: JSON.stringify(json)
+    }));
+  });
+
+  Mustache.registerHelper('pretty_role_name', function (name) {
+    name = Mustache.resolve(name);
+    var ROLE_LIST = {
+      "ProgramOwner": "Program Manager",
+      "ProgramEditor": "Program Editor",
+      "ProgramReader": "Program Reader",
+      "WorkflowOwner": "Workflow Manager",
+      "WorkflowMember": "Workflow Member",
+      "Mapped": "No Role",
+      "Owner": "Manager",
+    };
+    if (ROLE_LIST[name]) {
+      return ROLE_LIST[name];
     }
-  };
-
-  return options.fn(options.contexts.add({
-      create_issue_json: JSON.stringify(json)
-  }));
-});
-
-Mustache.registerHelper('pretty_role_name', function (name) {
-  name = Mustache.resolve(name);
-  var ROLE_LIST = {
-    "ProgramOwner": "Program Manager",
-    "ProgramEditor": "Program Editor",
-    "ProgramReader": "Program Reader",
-    "WorkflowOwner": "Workflow Manager",
-    "WorkflowMember": "Workflow Member",
-    "Mapped": "No Role",
-    "Owner": "Manager",
-  };
-  if (ROLE_LIST[name]) {
-    return ROLE_LIST[name];
-  }
-  return name;
-});
+    return name;
+  });
 
   Mustache.registerHelper('role_scope', function (scope) {
     scope = Mustache.resolve(scope);
