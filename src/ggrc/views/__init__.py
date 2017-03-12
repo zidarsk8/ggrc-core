@@ -22,15 +22,15 @@ from ggrc.builder.json import publish
 from ggrc.builder.json import publish_representation
 from ggrc.converters import get_importables, get_exportables
 from ggrc.extensions import get_extension_modules
-from ggrc.fulltext import get_indexer
+from ggrc.fulltext import get_indexer, get_indexed_model_names
 from ggrc.fulltext.recordbuilder import fts_record_for
-from ggrc.fulltext.recordbuilder import model_is_indexed
 from ggrc.login import get_current_user
 from ggrc.login import login_required
 from ggrc.models import all_models
 from ggrc.models.background_task import create_task
 from ggrc.models.background_task import make_task_response
 from ggrc.models.background_task import queued_task
+from ggrc.models.inflector import get_model
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 from ggrc.services.common import as_json
@@ -74,20 +74,15 @@ def do_reindex():
   indexer = get_indexer()
   indexer.delete_all_records(False)
 
-  # Remove model base classes and non searchable objects
-  excluded_models = {
-      all_models.Directive,
-      all_models.Option,
-      all_models.SystemOrProcess,
-      all_models.Role,
-  }
-  indexed_models = {model for model in all_models.all_models
-                    if model_is_indexed(model)}
+  indexed_models = get_indexed_model_names()
 
-  indexed_models -= excluded_models
+  people = db.session.query(all_models.Person.id, all_models.Person.name,
+                            all_models.Person.email)
+  g.people_map = {p.id: (p.name, p.email) for p in people}
 
   for model in indexed_models:
     # pylint: disable=protected-access
+    model = get_model(model)
     mapper_class = model._sa_class_manager.mapper.base_mapper.class_
     query = model.query.options(
         db.undefer_group(mapper_class.__name__ + '_complete'),
@@ -98,6 +93,8 @@ def do_reindex():
       db.session.commit()
 
   reindex_snapshots()
+
+  delattr(g, "people_map")
 
 
 def get_permissions_json():

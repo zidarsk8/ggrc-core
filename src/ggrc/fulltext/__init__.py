@@ -41,3 +41,44 @@ def resolve_default_text_indexer():
 def get_indexer(indexer=[]):
   return get_extension_instance(
       'FULLTEXT_INDEXER', resolve_default_text_indexer)
+
+
+def get_indexed_model_names():
+  return {
+      "AccessGroup",
+      "Assessment",
+      "AssessmentTemplate",
+      "Audit",
+      "Clause",
+      "Comment",
+      "Contract",
+      "Control",
+      "Cycle",
+      "CycleTaskEntry",
+      "CycleTaskGroup",
+      "CycleTaskGroupObjectTask",
+      "CustomAttributeValue",  # needed because of indexing logic
+      "DataAsset",
+      "Facility",
+      "Issue",
+      "Market",
+      "Objective",
+      "OrgGroup",
+      "Person",
+      "Policy",
+      "Process",
+      "Product",
+      "Program",
+      "Project",
+      "Regulation",
+      "Risk",
+      "RiskAssessment",
+      "Section",
+      "Standard",
+      "System",
+      "TaskGroup",
+      "TaskGroupTask",
+      "Threat",
+      "Vendor",
+      "Workflow",
+  }

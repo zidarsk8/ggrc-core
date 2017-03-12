@@ -150,6 +150,12 @@ class ChangeTracked(object):
       'created_at',
       'updated_at',
   ]
+  _fulltext_attrs = [
+      'created_at',
+      'updated_at',
+      'modified_by'
+  ]
+
   _update_attrs = []
 
 
@@ -224,6 +230,10 @@ class Hyperlinked(object):
       "url": "Url",
       "reference_url": "Reference URL",
   }
+  _fulltext_index = [
+      'url',
+      'reference_url',
+  ]
 
 
 class Hierarchical(object):
@@ -244,6 +254,10 @@ class Hierarchical(object):
 
   # REST properties
   _publish_attrs = [
+      'children',
+      'parent',
+  ]
+  _fulltext_attrs = [
       'children',
       'parent',
   ]
@@ -346,6 +360,10 @@ class FinishedDate(object):
       "finished_date": "Finished Date"
   }
 
+  _fulltext_attrs = [
+      'finished_date',
+  ]
+
   @validates('status')
   def validate_status(self, key, value):
     """Update finished_date given the right status change."""
@@ -399,6 +417,10 @@ class VerifiedDate(object):
   _aliases = {
       "verified_date": "Verified Date"
   }
+
+  _fulltext_attrs = [
+      "verified_date",
+  ]
 
   @validates('status')
   def validate_status(self, key, value):
@@ -645,6 +667,7 @@ class WithContact(object):
     )
 
   _publish_attrs = ['contact', 'secondary_contact']
+  _fulltext_attrs = ['contact', 'secondary_contact']
   _aliases = {
       "contact": {
           "display_name": "Primary Contact",

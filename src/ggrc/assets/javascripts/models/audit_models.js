@@ -97,7 +97,7 @@
       }, {
         attr_title: 'Audit Lead',
         attr_name: 'audit_lead',
-        attr_sort_field: 'contact.name|email'
+        attr_sort_field: 'contact'
       }, {
         attr_title: 'Code',
         attr_name: 'slug'

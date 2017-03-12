@@ -42,7 +42,7 @@
       mapper_attr_list: [
         {attr_title: 'Title', attr_name: 'title'},
         {attr_title: 'Assignee', attr_name: 'assignee',
-          attr_sort_field: 'contact.name|email'}
+          attr_sort_field: 'contact'}
       ],
       disable_columns_configuration: true
     },
@@ -108,7 +108,7 @@
       mapper_attr_list: [
         {attr_title: 'Title', attr_name: 'title'},
         {attr_title: 'Assignee', attr_name: 'assignee',
-          attr_sort_field: 'contact.name|email'}
+          attr_sort_field: 'contact'}
       ],
       disable_columns_configuration: true
     },

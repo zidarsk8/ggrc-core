@@ -2,13 +2,13 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 import textwrap
-from integration.ggrc import TestCase
-from freezegun import freeze_time
 from datetime import date, datetime
+from freezegun import freeze_time
 
 from ggrc import db
 from ggrc.notifications import common
 from ggrc.models import Notification
+from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
@@ -89,10 +89,6 @@ class TestOneTimeWorkflowNotification(TestCase):
     with freeze_time("2015-04-07 03:21:34"):
       cycle_response, cycle = self.wf_generator.generate_cycle(wf)
       self.wf_generator.activate_workflow(wf)
-
-      db.session.add(self.owner1)
-      db.session.add(self.tgassignee1)
-      db.session.add(self.member1)
 
       common.get_daily_notifications()
 

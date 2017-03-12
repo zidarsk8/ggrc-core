@@ -14,6 +14,9 @@ class Option(Described, Base, db.Model):
   title = deferred(db.Column(db.String), 'Option')
   required = deferred(db.Column(db.Boolean), 'Option')
 
+  def __str__(self):
+    return self.title
+
   @staticmethod
   def _extra_table_args(cls):
     return (
