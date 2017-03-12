@@ -537,7 +537,7 @@ class ObjectWidget(object):
   _HEADER = '.header [class^="span"]'
   HEADER_TITLE = (By.CSS_SELECTOR, _HEADER + ' [data-field="title"]')
   HEADER_OWNER = (
-      By.CSS_SELECTOR, _HEADER + ' [data-field="contact.name|email"]')
+      By.CSS_SELECTOR, _HEADER + ' [data-field="owners"]')
   HEADER_STATE = (By.CSS_SELECTOR, _HEADER + ' [data-field="status"]')
   HEADER_LAST_ASSESSMENT_DATE = (
       By.CSS_SELECTOR, _HEADER + ' [data-field="last_assessment_date"]')
