@@ -88,6 +88,8 @@ class RecordBuilder(object):
     Its content is :-separated sorted list of (name or email) of the people in
     list.
     """
+    if not people:
+      return {"__sort__": ""}
     _, names, emails = zip(*(cls.get_person_id_name_email(p) for p in people))
     sort_values = (name or email for (name, email) in zip(names, emails))
     content = ":".join(sorted(sort_values))
