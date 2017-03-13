@@ -54,8 +54,8 @@
         id: id
       }, REQUIRED_FIELDS);
 
-      queryAPI.makeRequest({data: [params]}).then(function (response) {
-        var assessment = response[0][REQUESTED_TYPE].values[0];
+      queryAPI.batchRequests(params).then(function (response) {
+        var assessment = response[REQUESTED_TYPE].values[0];
         var finishedDate;
         if (assessment) {
           finishedDate = assessment.finished_date;

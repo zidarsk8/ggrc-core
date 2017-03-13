@@ -157,7 +157,7 @@ describe('GGRC.Components.lastAssessmentDate', function () {
 
     beforeAll(function () {
       spyOn(GGRC.Utils.QueryAPI, 'buildParam');
-      spyOn(GGRC.Utils.QueryAPI, 'makeRequest').and.returnValue({
+      spyOn(GGRC.Utils.QueryAPI, 'batchRequests').and.returnValue({
         then: jasmine.createSpy()
       });
     });
@@ -184,7 +184,7 @@ describe('GGRC.Components.lastAssessmentDate', function () {
           },
           REQUIRED_FIELDS);
 
-      expect(GGRC.Utils.QueryAPI.makeRequest).toHaveBeenCalled();
+      expect(GGRC.Utils.QueryAPI.batchRequests).toHaveBeenCalled();
     });
   });
 });
