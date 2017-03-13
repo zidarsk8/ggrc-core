@@ -12,7 +12,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 from lib import constants, exception
 
-
 LOGGER = logging.getLogger(__name__)
 
 
@@ -25,11 +24,6 @@ def open_url(driver, url):
   """Open URL in current browser session if it hasn't been opened yet."""
   if driver.current_url != url:
     driver.get(url)
-
-
-def refresh_page(driver):
-  """Refresh web page in current browser session."""
-  driver.refresh()
 
 
 def wait_until_stops_moving(element):

@@ -302,7 +302,7 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
  """
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
-      CommonControls.CONTROL)
+      CommonControl.CONTROL)
   OWNER = TransformationSetVisibleFields.OWNER
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
@@ -361,7 +361,4 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   STOP_DATE = Base.STOP_DATE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.STATE, PRIMARY_CONTACT,
-      CommonModalSetVisibleFields.LAST_UPDATED)
-  # NOTE: Need exclude 'MANAGER' due to unstable work of app when set visible
-  # fields in tree view for represent programs under audit.
+      CommonModalSetVisibleFields.STATE, PRIMARY_CONTACT, MANAGER)

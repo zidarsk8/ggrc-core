@@ -13,28 +13,26 @@ class CommonDropdownSettings(base.Component):
   """Common for 3BBS button/dropdown settings on Info pages and Info panels.
   """
   _locator = locator.Dropdown3bbsInfoWidget
+  _edit_locator = _locator.BUTTON_3BBS_EDIT
+  _edit_locator_under_audit = _locator.BUTTON_3BBS_EDIT_UNDER_AUDIT
 
-  def __init__(self, driver):
+  def __init__(self, driver, is_under_audit):
     super(CommonDropdownSettings, self).__init__(driver)
+    self.edit_locator = (self._edit_locator_under_audit if is_under_audit
+                         else self._edit_locator)
 
-  def select_edit(self, is_under_audit=False):
+  def select_edit(self):
     """Select edit button in 3BBS dropdown modal.
     Return: lib.page.modal.edit_object.EditModal
     """
-    _edit_locator = self._locator.BUTTON_3BBS_EDIT
-    if is_under_audit is True:
-      _edit_locator = self._locator.BUTTON_3BBS_EDIT_UNDER_AUDIT
-    base.Button(self._driver, _edit_locator).click()
+    base.Button(self._driver, self.edit_locator).click()
     return getattr(edit_object, self.__class__.__name__)(self._driver)
 
-  def is_edit_exist(self, is_under_audit=False):
+  def is_edit_exist(self):
     """Find edit button in 3BBS dropdown modal.
     Return: True if edit is exist, False if edit is not exist.
     """
-    _edit_locator = self._locator.BUTTON_3BBS_EDIT
-    if is_under_audit is True:
-      _edit_locator = self._locator.BUTTON_3BBS_EDIT_UNDER_AUDIT
-    return selenium_utils.is_element_exist(self._driver, _edit_locator)
+    return selenium_utils.is_element_exist(self._driver, self.edit_locator)
 
   def select_get_permalink(self):
     """Select get permalink in 3BBS dropdown modal."""
@@ -51,9 +49,6 @@ class CommonDropdownSettings(base.Component):
 class Audits(CommonDropdownSettings):
   """Dropdown settings on Audit Info pages and Info panels."""
   _locator = locator.Dropdown3bbsAuditInfoWidget
-
-  def __init__(self, driver):
-    super(Audits, self).__init__(driver)
 
   def select_update_objs(self):
     """Select update objects to latest version in 3BBS dropdown modal.

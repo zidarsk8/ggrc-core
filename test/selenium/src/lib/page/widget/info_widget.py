@@ -16,6 +16,8 @@ class CommonInfo(base.Widget):
   headers_and_values = None
   list_headers_text = None
   list_values_text = None
+  _3bbs_locator = _locator.BUTTON_3BBS
+  _3bbs_locator_under_audit = _locator.BUTTON_3BBS_UNDER_AUDIT
 
   def __init__(self, driver):
     # wait that the elements load before calling super
@@ -23,19 +25,16 @@ class CommonInfo(base.Widget):
     self.title_entered = base.Label(driver, self._locator.TITLE_ENTERED)
     self.state = base.Label(driver, self._locator.STATE)
     super(CommonInfo, self).__init__(driver)
-    self.headers_and_values = driver.find_elements(
-        *self._locator.HEADERS_AND_VALUES)
+    self.locator_3bbs = (self._3bbs_locator_under_audit if self.is_under_audit
+                         else self._3bbs_locator)
 
-  def open_info_3bbs(self, is_under_audit=False):
+  def open_info_3bbs(self):
     """Click to 3BBS button on Info page or Info panel to open modal for
     further actions.
     Return: lib.element.widget_info.CommonDropdownSettings
     """
-    _3bbs_locator = self._locator.BUTTON_3BBS
-    if is_under_audit is True:
-      _3bbs_locator = self._locator.BUTTON_3BBS_UNDER_AUDIT
-    base.Button(self._driver, _3bbs_locator).click()
-    return self._dropdown_settings_cls(self._driver)
+    base.Button(self._driver, self.locator_3bbs).click()
+    return self._dropdown_settings_cls(self._driver, self.is_under_audit)
 
   def get_value_by_header_text(self, header_text):
     """Get text of value element by header element text used searching in

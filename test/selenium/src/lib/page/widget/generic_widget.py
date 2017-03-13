@@ -298,7 +298,7 @@ class Controls(Widget):
   info_widget_cls = info_widget.ControlsInfoWidget
   _locator_widget = locator.WidgetBar.CONTROLS
   _locator_filter = locator.WidgetControls
-  _controls_fields = element.ControlsModalSetVisibleFields().DEFAULT_SET_FIELDS
+  _controls_fields = element.ControlModalSetVisibleFields().DEFAULT_SET_FIELDS
 
   URL = "{source_obj_url}" + _locator_filter.widget_name
 
@@ -325,8 +325,7 @@ class Controls(Widget):
     """Check Control is editable via Info panel from Tree View."""
     self.tree_view.select_member_by_title(obj_title)
     info_panel = self.info_widget_cls(self._driver)
-    return info_panel.open_info_3bbs(
-        is_under_audit=True).is_edit_exist(is_under_audit=True)
+    return info_panel.open_info_3bbs().is_edit_exist()
 
   def set_visible_fields(self):
     """Set visible fields for display Controls on Tree View."""
@@ -335,11 +334,6 @@ class Controls(Widget):
   def get_list_objs_scopes(self):
     """Get list of Controls scopes which displayed on Tree view."""
     self.set_visible_fields()
-    # NOTE: need refresh page and wait until tree view will be loaded due
-    # unstable work of app when set visible fields in tree view for represent
-    # controls under audit
-    selenium_utils.refresh_page(self._driver)
-    self.tree_view.wait_loading_after_actions(self._driver)
     return self.tree_view.get_objs_as_list_dicts(self._controls_fields)
 
 
@@ -388,11 +382,6 @@ class Programs(Widget):
   def get_list_objs_scopes(self):
     """Get list of Programs scopes which displayed on Tree View."""
     self.set_visible_fields()
-    # NOTE: need refresh page and wait until tree view will be loaded due
-    # unstable work of app when set visible fields in tree view for represent
-    # programs under audit
-    selenium_utils.refresh_page(self._driver)
-    self.tree_view.wait_loading_after_actions(self._driver)
     return self.tree_view.get_objs_as_list_dicts(self._programs_fields)
 
 
