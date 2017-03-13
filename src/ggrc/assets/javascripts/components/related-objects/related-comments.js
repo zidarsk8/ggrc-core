@@ -18,9 +18,9 @@
         },
         // Load only Comment
         relatedTypes: {
-          type: '*',
+          type: String,
           value: function () {
-            return ['Comment'];
+            return 'Comment';
           }
         }
       }

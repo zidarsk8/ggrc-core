@@ -18,9 +18,9 @@
         },
         // Load only Audits
         relatedTypes: {
-          type: '*',
+          type: String,
           value: function () {
-            return ['Audit'];
+            return 'Audit';
           }
         }
       }
