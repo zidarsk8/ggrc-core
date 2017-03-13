@@ -401,8 +401,9 @@
                     return state.replace(/"/g, '');
                   });
 
+                var checkAll = unwrappedStates.length === 0;
                 self.options.attr('filter_states').forEach(function (item) {
-                  if (unwrappedStates.indexOf(item.value) > -1) {
+                  if (checkAll || unwrappedStates.indexOf(item.value) > -1) {
                     item.attr('checked', true);
                   }
                 });
@@ -1145,7 +1146,15 @@
       // Get the status list from local storage
       var savedStateList;
       savedStateList = this.display_prefs.getTreeViewStates(modelName);
-      this.options.attr('selectStateList', savedStateList);
+
+      if (savedStateList.length === 0 &&
+        this.options.model.model_singular === 'Assessment') {
+        // default states for "Assessment" widget
+        this.options.attr('selectStateList',
+          ['"Not Started"', '"In Progress"']);
+      } else {
+        this.options.attr('selectStateList', savedStateList);
+      }
     },
     saveTreeStates: function (selectedStates) {
       var stateToSave = [];
