@@ -29,9 +29,11 @@
     'Program',
     'Project',
     'Regulation',
+    'Risk',
     'Section',
     'Standard',
     'System',
+    'Threat',
     'Vendor'
   ];
   // NOTE: Widgets that have the order value are sorted by an increase values,
@@ -95,8 +97,8 @@
     Standard: _.difference(filteredTypes,
       ['Contract', 'Policy', 'Regulation', 'Standard']),
     System: filteredTypes,
-    Risk: _.difference(filteredTypes, ['Risk']),
-    Threat: _.difference(filteredTypes, ['Threat']),
+    Risk: filteredTypes,
+    Threat: filteredTypes,
     Vendor: filteredTypes
   };
 
