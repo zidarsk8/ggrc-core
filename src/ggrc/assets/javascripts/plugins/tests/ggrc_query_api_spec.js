@@ -212,4 +212,44 @@ describe('GGRC Utils Query API', function () {
          });
     });
   });
+
+  describe('batchRequests() method', function () {
+    var batchRequests = GGRC.Utils.QueryAPI.batchRequests;
+
+    beforeEach(function () {
+      spyOn(can, 'ajax')
+        .and.returnValues(
+          can.Deferred().resolve([1, 2, 3, 4]), can.Deferred().resolve([1]));
+    });
+
+    afterEach(function () {
+      can.ajax.calls.reset();
+    });
+
+    it('does only one ajax call for a group of consecutive calls',
+      function (done) {
+        $.when(batchRequests(1),
+          batchRequests(2),
+          batchRequests(3),
+          batchRequests(4)).then(function () {
+            expect(can.ajax.calls.count()).toEqual(1);
+            done();
+          });
+      });
+
+    it('does several ajax calls for delays cals', function (done) {
+      batchRequests(1);
+      batchRequests(2);
+      batchRequests(3);
+      batchRequests(4);
+
+      // Make a request with a delay
+      setTimeout(function () {
+        batchRequests(4).then(function () {
+          expect(can.ajax.calls.count()).toEqual(2);
+          done();
+        });
+      }, 150);
+    });
+  });
 });
