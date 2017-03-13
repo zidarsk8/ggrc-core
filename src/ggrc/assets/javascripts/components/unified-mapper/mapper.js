@@ -79,9 +79,7 @@
     submitCbs: $.Callbacks(),
     afterSearch: false,
     afterShown: function () {
-      if (!this.attr('search_only')) {
-        this.onToolbarSubmit();
-      }
+      this.onSubmit();
     },
     allowedToCreate: function () {
       var isSearch = this.attr('search_only');
@@ -176,7 +174,7 @@
       }, []);
       return _.findWhere(types, {value: type});
     },
-    onToolbarSubmit: function () {
+    onSubmit: function () {
       this.attr('submitCbs').fire();
       this.attr('afterSearch', true);
     }
@@ -438,18 +436,21 @@
           'mapper.model', this.scope.mapper.modelFromType(type));
       },
       '{mapper} type': function () {
-        this.scope.attr('mapper.filter', '');
-        this.scope.attr('mapper.afterSearch', false);
+        var mapper = this.scope.attr('mapper');
+        mapper.attr('filter', '');
+        mapper.attr('afterSearch', false);
         // Edge case for Assessment Generation
         // and objects that are not in Snapshot scope
-        if (!this.scope.attr('mapper.assessmentGenerator')) {
+        if (!mapper.attr('assessmentGenerator')) {
           if (!GGRC.Utils.Snapshots.isInScopeModel(
-            this.scope.attr('mapper.object'))) {
-            this.scope.attr('mapper.relevant').replace([]);
+            mapper.attr('object'))) {
+            mapper.attr('relevant').replace([]);
           }
         }
         this.setModel();
         this.setBinding();
+
+        setTimeout(mapper.onSubmit.bind(mapper));
       },
       '{mapper} assessmentTemplate': function (scope, ev, val, oldVal) {
         var type;
