@@ -373,6 +373,16 @@
             mapping: 'programs',
             child_options: relatedObjectsChildOptions,
             draw_children: true
+          },
+          Risk: {
+            mapping: 'risks',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          },
+          Threat: {
+            mapping: 'threats',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
           }
         },
         issues: {
@@ -502,12 +512,12 @@
             draw_children: true
           },
           Threat: {
-            mapping: 'threat',
+            mapping: 'threats',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Risk: {
-            mapping: 'risk',
+            mapping: 'risks',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
@@ -568,7 +578,7 @@
             child_options: relatedObjectsChildOptions,
             draw_children: true
           }
-         },
+        },
         Regulation: {
           _mixins: ['directive', 'issues']
         },
@@ -857,6 +867,16 @@
             add_item_view: null,
             header_view: path + '/assessments/tree_header.mustache',
             footer_view: path + '/base_objects/tree_footer.mustache'
+          },
+          Risk: {
+            mapping: 'extended_related_risks_via_search',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          },
+          Threat: {
+            mapping: 'extended_related_threats_via_search',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
           }
         }
       });

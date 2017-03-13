@@ -118,6 +118,8 @@
       related_audits: TypeFilter('related_objects', 'Audit'),
       related_controls: TypeFilter('related_objects', 'Control'),
       related_assessments: TypeFilter('related_objects', 'Assessment'),
+      related_risks: TypeFilter('related_objects', 'Risk'),
+      related_threats: TypeFilter('related_objects', 'Threat'),
       regulations: TypeFilter('related_objects', 'Regulation'),
       contracts: TypeFilter('related_objects', 'Contract'),
       policies: TypeFilter('related_objects', 'Policy'),
@@ -128,9 +130,7 @@
       clauses: TypeFilter('related_objects', 'Clause'),
       objectives: TypeFilter('related_objects', 'Objective'),
       risks: TypeFilter('related_objects', 'Risk'),
-      related_risks: TypeFilter('related_objects', 'Risk'),
-      threats: TypeFilter('related_objects', 'Threat'),
-      related_threats: TypeFilter('related_objects', 'Threat')
+      threats: TypeFilter('related_objects', 'Threat')
     },
     // Program
     Program: {
@@ -267,6 +267,8 @@
       owned_products: Indirect('Product', 'contact'),
       owned_projects: Indirect('Project', 'contact'),
       owned_systems: Indirect('System', 'contact'),
+      owned_risks: Indirect('Risk', 'contact'),
+      owned_threats: Indirect('Threat', 'contact'),
       related_objects: Proxy(
         null, 'personable', 'ObjectPerson', 'person', 'object_people'),
       related_programs: TypeFilter('related_objects', 'Program'),
@@ -289,6 +291,8 @@
       related_projects: TypeFilter('related_objects', 'Project'),
       related_systems: TypeFilter('related_objects', 'System'),
       related_issues: TypeFilter('related_objects', 'Issue'),
+      related_risks: TypeFilter('related_objects', 'Risk'),
+      related_threats: TypeFilter('related_objects', 'Threat'),
       authorizations: Direct('UserRole', 'person', 'user_roles'),
       programs_via_authorizations:
         Cross('authorizations', 'program_via_context'),
@@ -334,7 +338,8 @@
         });
       }, 'Program,Regulation,Contract,Policy,Standard,Section,Clause,' +
         'Objective,Control,System,Process,DataAsset,AccessGroup,Product,' +
-        'Project,Facility,Market,OrgGroup,Vendor,Audit,Assessment,Issue'),
+        'Project,Facility,Market,OrgGroup,Vendor,' +
+        'Audit,Assessment,Issue,Risk,Threat'),
       extended_related_programs_via_search:
         TypeFilter('related_objects_via_search', 'Program'),
       extended_related_regulations_via_search:
@@ -378,7 +383,11 @@
       extended_related_issues_via_search:
         TypeFilter('related_objects_via_search', 'Issue'),
       extended_related_assessment_via_search:
-        TypeFilter('related_objects_via_search', 'Assessment')
+        TypeFilter('related_objects_via_search', 'Assessment'),
+      extended_related_risks_via_search:
+        TypeFilter('related_objects_via_search', 'Risk'),
+      extended_related_threats_via_search:
+        TypeFilter('related_objects_via_search', 'Threat')
     },
     Context: {
       _canonical: {
@@ -488,14 +497,10 @@
       }, 'CustomAttributeDefinition')
     },
     Risk: {
-      _mixins: [
-        'related_object', 'ownable'
-      ]
+      _mixins: ['directive_object']
     },
     Threat: {
-      _mixins: [
-        'related_object', 'ownable'
-      ]
+      _mixins: ['directive_object']
     }
   });
 })(window.GGRC, window.can);
