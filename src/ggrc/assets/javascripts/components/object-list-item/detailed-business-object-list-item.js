@@ -32,7 +32,8 @@
         },
         objectLink: {
           get: function () {
-            return this.attr('itemData.viewLink');
+            return this.attr('itemData.viewLink') ||
+              this.buildObjectLink(this.attr('instance'));
           }
         },
         objectTitle: {
@@ -43,6 +44,15 @@
               this.attr('itemData.email') || false;
           }
         }
+      },
+      buildObjectLink: function (instance) {
+        var model = instance.child_type ?
+          CMS.Models[instance.child_type] :
+          CMS.Models[instance.type];
+
+        var type = model.root_collection;
+        var link = '/' + type + '/' + instance.child_id || instance.id;
+        return link;
       }
     }
   });
