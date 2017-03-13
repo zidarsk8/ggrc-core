@@ -230,7 +230,7 @@ class Hyperlinked(object):
       "url": "Url",
       "reference_url": "Reference URL",
   }
-  _fulltext_index = [
+  _fulltext_attrs = [
       'url',
       'reference_url',
   ]
