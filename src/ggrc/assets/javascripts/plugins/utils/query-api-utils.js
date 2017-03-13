@@ -26,6 +26,31 @@
      */
 
     var widgetsCounts = new can.Map({});
+    var BATCH_TIMEOUT = 100;
+    var batchQueue = [];
+    var batchTimeout = null;
+
+    /**
+     * Collect requests to Query API.
+     *
+     * @param {Object} params - Params for request
+     * @param {Object} params.headers - Custom headers for request.
+     * @param {Object} params.data - Object with parameters on Query API needed.
+     * @return {Promise} Promise on Query API request.
+     */
+    function batchRequests(params) {
+      var dfd = can.Deferred();
+      batchQueue.push({dfd: dfd, params: params});
+
+      if (_.isNumber(batchTimeout)) {
+        clearTimeout(batchTimeout);
+      }
+
+      batchTimeout = setTimeout(function () {
+        _resolveBatch(batchQueue.splice(0, batchQueue.length));
+      }, BATCH_TIMEOUT);
+      return dfd;
+    }
 
     /**
      * Build params for request on Query API.
@@ -268,6 +293,20 @@
       return operation;
     }
 
+    function _resolveBatch(queue) {
+      makeRequest({
+        data: queue.map(function (el) {
+          return el.params;
+        })
+      }).then(function (result) {
+        result.forEach(function (info, i) {
+          var req = queue[i];
+
+          req.dfd.resolve(info);
+        });
+      });
+    }
+
     return {
       buildParam: buildParam,
       buildParams: buildParams,
@@ -275,7 +314,8 @@
       makeRequest: makeRequest,
       getCounts: getCounts,
       makeExpression: makeExpression,
-      initCounts: initCounts
+      initCounts: initCounts,
+      batchRequests: batchRequests
     };
   })();
 })(jQuery, window.GGRC);
