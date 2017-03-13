@@ -21,10 +21,10 @@ ul.internav {
     li {
       &.access_group, &.clause, &.contract, &.control, &.data_asset, &.facility,
       &.market, &.objective, &.org_group, &.policy, &.process, &.product,
-      &.regulation, &.section, &.standard, &.system, &.vendor {
+      &.regulation, &.section, &.standard, &.system, &.vendor, &.risk, &.threat {
         a {
           color: $blue;
-          @include opacity(1);
+          opacity: 1;
           &:hover {
             color: $blue;
           }
@@ -77,9 +77,9 @@ ul.internav {
         color: $black;
         font-weight: bold;
         background: $contentBgnd;
-        @include opacity(1);
+        opacity: 1;
         i {
-          @include opacity(1);
+          opacity: 1;
         }
         &:hover {
           color: $black;
