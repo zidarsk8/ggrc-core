@@ -42,6 +42,7 @@ dashboard-js-files:
   - plugins/persistent_notifier.js
   - ggrc_base.js
   - plugins/ggrc_utils.js
+  - plugins/utils/query-api-utils.js
   - plugins/utils/current-page-utils.js
   - plugins/utils/state-utils.js
   - plugins/datepicker.js
