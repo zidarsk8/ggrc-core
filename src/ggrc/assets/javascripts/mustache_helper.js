@@ -2635,7 +2635,7 @@ Mustache.registerHelper("is_overdue", function (_date, status, options) {
   var date = moment(resolve_computed(_date));
   var today = moment().startOf('day');
   var startOfDate = moment(date).startOf('day');
-  var isBefore = date && today.diff(startOfDate, 'days') > 0;
+  var isBefore = date && today.diff(startOfDate, 'days') >= 0;
   options = arguments.length === 2 ? arguments[1] : options;
   status = arguments.length === 2 ? "" : resolve_computed(status);
   // TODO: [Overdue] Move this logic to helper.
@@ -3567,18 +3567,4 @@ Example:
       return options.inverse(options.contexts);
     }
   );
-
-  /**
-   * Return a human friendly name of the object type associated with the
-   * currently active HNB tab.
-   *
-   * Essentially just a wrapper around GGRC.Utils.CurrentPage.activeTabObject.
-   *
-   * @param {Object} options - a CanJS options argument
-   *
-   * @return {String|null} - object type, if any, otherwise null
-   */
-  Mustache.registerHelper('activeTabType', function (options) {
-    return GGRC.Utils.CurrentPage.activeTabObject();
-  });
 })(this, jQuery, can);

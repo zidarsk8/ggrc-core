@@ -39,12 +39,12 @@
         {
           attr_title: 'Risk Manager',
           attr_name: 'ra_manager',
-          attr_sort_field: 'ra_manager.name|email'
+          attr_sort_field: 'ra_manager'
         },
         {
           attr_title: 'Risk Counsel',
           attr_name: 'ra_counsel',
-          attr_sort_field: 'ra_counsel.name|email'
+          attr_sort_field: 'ra_counsel'
         }
       ],
       add_item_view: path + '/tree_add_item.mustache',

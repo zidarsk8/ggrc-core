@@ -9,11 +9,16 @@ from cached_property import cached_property
 from ggrc import db
 from ggrc import models
 from ggrc.automapper import AutomapperGenerator
+from ggrc.converters import errors
 from ggrc.converters.handlers.handlers import MappingColumnHandler
 
 
 class SnapshotInstanceColumnHandler(MappingColumnHandler):
-  """Handler for mapping and unmapping instances over snapshot"""
+  """Handler for mapping and unmapping instances over snapshot.
+
+  Is used for Audit-scope objects; maps objects to Snapshots in the
+  corresponding Audit scope.
+  """
 
   @cached_property
   def related_audit(self):
@@ -115,3 +120,30 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     human_readable_ids = [getattr(i, "slug", getattr(i, "email", None))
                           for i in self.snapshoted_instances_query.all()]
     return "\n".join(human_readable_ids)
+
+  def is_valid_creation(self, to_append_ids):
+    "return True if data valid else False"
+    if not to_append_ids:
+      return True
+    pool_ids = {i.child_id for i in self.audit_object_pool_query.all()}
+    if to_append_ids - pool_ids:
+      self.add_error(errors.ILLEGAL_APPEND_CONTROL_VALUE,
+                     object_type=self.row_converter.obj.__class__.__name__,
+                     mapped_type=self.mapping_object.__name__)
+      return False
+    return True
+
+  def parse_item(self, *args, **kwargs):
+    "parse items and make validation"
+    items = super(SnapshotInstanceColumnHandler, self).parse_item(
+        *args, **kwargs
+    )
+    if self.dry_run:
+      # TODO: is_valid_creation should work with codes instead of ids and it
+      # should also be checked on dry runs.
+      return items
+    exists_ids = {i for i, in self.snapshoted_instances_query.values("id")}
+    import_ids = {i.id for i in items or []}
+    to_append_ids = import_ids - exists_ids
+    self.is_valid_creation(to_append_ids)
+    return items

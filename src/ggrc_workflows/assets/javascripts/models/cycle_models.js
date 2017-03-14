@@ -347,7 +347,7 @@
         {
           attr_title: 'Assignee',
           attr_name: 'assignee',
-          attr_sort_field: 'contact.name|email'
+          attr_sort_field: 'contact'
         },
         {
           attr_title: 'Start Date',

@@ -9,8 +9,9 @@ from lib import constants
 from lib.constants.test import batch
 from lib.page.widget import info_widget
 from lib.service.rest_service import (
-    ProgramsService, AuditsService, ControlsService, AsmtTmplsService,
-    AssessmentsService, RelationshipsService, ObjectsOwnersService)
+    ProgramsService, AuditsService, ControlsService, IssuesService,
+    AssessmentTemplatesService, AssessmentsService, RelationshipsService,
+    ObjectsOwnersService)
 from lib.utils import conftest_utils, test_utils
 
 
@@ -23,7 +24,7 @@ pytest_plugins = "selenium", "xdist", "xvfb", "timeout", "flask", \
 def selenium(selenium):
   """Setup test resources for running test in headless mode."""
   # todo: here we should use selenium.maximize_window() and env variables to
-  #  set xvfb resolution in the docker container. Setting the env vars
+  #  set xvfb resolution in docker container. Setting env vars
   # currently doesn't work for selenium-docker
   selenium.set_window_size(1440, 900)
   yield selenium
@@ -31,7 +32,7 @@ def selenium(selenium):
 
 @pytest.yield_fixture(scope="function")
 def new_control_ui(selenium):
-  """Create a new Control object via UI (LHN).
+  """Create new Control object via UI (LHN).
   Return: lib.page.widget.Controls
   """
   control_info_page = conftest_utils.create_obj_via_lhn(
@@ -41,8 +42,8 @@ def new_control_ui(selenium):
 
 @pytest.yield_fixture(scope="function")
 def new_program_ui(selenium, new_control_ui):
-  """Create a new Program object via UI (LHN).
-  Return: Program modal and Program Info widget.
+  """Create new Program object via UI (LHN).
+  Return: (Program modal, Program Info widget).
   """
   # pylint: disable=redefined-outer-name
   # pylint: disable=unused-argument
@@ -50,15 +51,15 @@ def new_program_ui(selenium, new_control_ui):
       selenium, constants.element.Lhn.PROGRAMS).create_new()
   test_utils.ModalNewPrograms.enter_test_data(modal)
   modal.save_and_close()
-  program_info_page = info_widget.Programs(selenium)
+  program_info_page = info_widget.ProgramsInfoWidget(selenium)
   yield modal, program_info_page
 
 
 @pytest.yield_fixture(scope="function")
 def new_org_group_ui(selenium):
-  """Create a new Org Group object via UI (LHN).
-  Return: lib.page.widget.OrgGroupInfo
-  """
+  """Create new Org Group object via UI (LHN).
+ Return: lib.page.widget.OrgGroupInfo
+ """
   org_group_page = conftest_utils.create_obj_via_lhn(
       selenium, constants.element.Lhn.ORG_GROUPS)
   yield org_group_page
@@ -66,7 +67,7 @@ def new_org_group_ui(selenium):
 
 @pytest.yield_fixture(scope="function")
 def new_risk_ui(selenium):
-  """Create a new Risk Group object via UI (LHN).
+  """Create new Risk Group object via UI (LHN).
   Return: lib.page.widget.Risks
   """
   risk_page = conftest_utils.create_obj_via_lhn(
@@ -76,7 +77,7 @@ def new_risk_ui(selenium):
 
 @pytest.yield_fixture(scope="function")
 def new_issue_ui(selenium):
-  """Create a new Issue object via UI (LHN).
+  """Create new Issue object via UI (LHN).
   Return: lib.page.widget.IssueInfo
   """
   issue_info_page = conftest_utils.create_obj_via_lhn(
@@ -86,7 +87,7 @@ def new_issue_ui(selenium):
 
 @pytest.yield_fixture(scope="function")
 def new_process_ui(selenium):
-  """Create a new process object via UI (LHN).
+  """Create new process object via UI (LHN).
   Return: lib.page.widget.Processes
   """
   process_info_page = conftest_utils.create_obj_via_lhn(
@@ -96,7 +97,7 @@ def new_process_ui(selenium):
 
 @pytest.yield_fixture(scope="function")
 def new_data_asset_ui(selenium):
-  """Create a new Data Asset object via UI (LHN).
+  """Create new Data Asset object via UI (LHN).
   Return: lib.page.widget.DataAssetInfo
   """
   data_asset_page = conftest_utils.create_obj_via_lhn(
@@ -106,7 +107,7 @@ def new_data_asset_ui(selenium):
 
 @pytest.yield_fixture(scope="function")
 def new_system_ui(selenium):
-  """Create a new System object via UI (LHN).
+  """Create new System object via UI (LHN).
   Return: lib.page.widget.IssueInfo
   """
   system_page = conftest_utils.create_obj_via_lhn(
@@ -116,7 +117,7 @@ def new_system_ui(selenium):
 
 @pytest.yield_fixture(scope="function")
 def new_product_ui(selenium):
-  """Create a new Product object via UI (LHN).
+  """Create new Product object via UI (LHN).
   Return: lib.page.widget.Product
   """
   product_page = conftest_utils.create_obj_via_lhn(
@@ -126,7 +127,7 @@ def new_product_ui(selenium):
 
 @pytest.yield_fixture(scope="function")
 def new_project_ui(selenium):
-  """Create a new Project object via UI (LHN).
+  """Create new Project object via UI (LHN).
   Return: lib.page.widget.ProjectInfo
   """
   project_page = conftest_utils.create_obj_via_lhn(
@@ -136,9 +137,9 @@ def new_project_ui(selenium):
 
 @pytest.yield_fixture(scope="function")
 def new_controls_ui(selenium):
-  """Create a new Controls objects via UI (LHN).
-  Return: [lib.page.widget.Controls, ...]
-  """
+  """Create new Controls objects via UI (LHN).
+  Return: (lib.page.widget.Controls, ...)
+ """
   controls = []
   for _ in xrange(batch.COUNT):
     controls.append(conftest_utils.create_obj_via_lhn(
@@ -148,7 +149,7 @@ def new_controls_ui(selenium):
 
 @pytest.yield_fixture(scope="function")
 def new_program_rest():
-  """Create a new Program object via REST API.
+  """Create new Program object via REST API.
   Return: lib.entities.entity.Program
   """
   yield ProgramsService().create(count=1)[0]
@@ -156,8 +157,8 @@ def new_program_rest():
 
 @pytest.yield_fixture(scope="function")
 def new_audit_rest(new_program_rest):
-  """Create a new Program, Audit objects via REST API.
-  Return: [lib.entities.entity.Audit, lib.entities.entity.Program]
+  """Create new Program, Audit objects via REST API.
+  Return: (lib.entities.entity.Audit, lib.entities.entity.Program)
   """
   yield AuditsService().create(
       count=1, program=new_program_rest)[0], new_program_rest
@@ -165,31 +166,45 @@ def new_audit_rest(new_program_rest):
 
 @pytest.yield_fixture(scope="function")
 def new_asmt_tmpl_rest(new_audit_rest):
-  """Create a new Program, Audit, Assessment Template objects via REST API.
+  """Create new Program, Audit, Assessment Template objects via REST API.
   Return:
-  [lib.entities.entity.AssessmentTemplate, lib.entities.entity.Audit,
-  lib.entities.entity.Program]
+  (lib.entities.entity.AssessmentTemplate, lib.entities.entity.Audit,
+  lib.entities.entity.Program)
   """
-  yield (AsmtTmplsService().create(
+  yield (AssessmentTemplatesService().create(
       count=1, audit=new_audit_rest[0])[0],
       new_audit_rest[0], new_audit_rest[1])
 
 
 @pytest.yield_fixture(scope="function")
 def new_asmt_rest(new_audit_rest):
-  """Create a new Program, Audit, Assessment objects via REST API.
+  """Create new Program, Audit, Assessment objects via REST API.
   Return:
-  [lib.entities.entity.Assessment, lib.entities.entity.Object,
-  lib.entities.entity.Audit]
+  (lib.entities.entity.Assessment, lib.entities.entity.Audit,
+  lib.entities.entity.Program)
   """
   yield (AssessmentsService().create(
       count=1, obj=new_audit_rest[1],
-      audit=new_audit_rest[0])[0], new_audit_rest[1], new_audit_rest[0])
+      audit=new_audit_rest[0])[0], new_audit_rest[0], new_audit_rest[1])
+
+
+@pytest.yield_fixture(scope="function")
+def new_issue_rest(new_audit_rest):
+  """Create new Program, Audit, Issue objects via REST API.
+  Return:
+  (lib.entities.entity.Issue, lib.entities.entity.Audit,
+  lib.entities.entity.Program)
+  """
+  issue = (IssuesService().create(
+      count=1, audit=new_audit_rest[0])[0],
+      new_audit_rest[0], new_audit_rest[1])
+  ObjectsOwnersService().create(objs=issue[0])
+  yield issue
 
 
 @pytest.yield_fixture(scope="function")
 def new_control_rest():
-  """Create a new Control object via REST API.
+  """Create new Control object via REST API.
   Return: lib.entities.entity.Control
   """
   control = ControlsService().create(count=1)[0]
@@ -199,8 +214,8 @@ def new_control_rest():
 
 @pytest.yield_fixture(scope="function")
 def new_controls_rest():
-  """Create a new Controls objects via REST API.
-  Return: [lib.entities.entity.Control, ...].
+  """Create new Controls objects via REST API.
+  Return: (lib.entities.entity.Control, ...).
   """
   controls = ControlsService().create(count=batch.COUNT)
   ObjectsOwnersService().create(objs=controls)
@@ -209,15 +224,15 @@ def new_controls_rest():
 
 @pytest.yield_fixture(scope="function")
 def update_control_rest(new_control_rest):
-  """Update an existing Control object via REST API.
+  """Update existing Control object via REST API.
   Return: lib.entities.entity.Control
   """
   yield ControlsService().update(objs=new_control_rest)[0]
 
 
 @pytest.yield_fixture(scope="function")
-def map_program_to_controls_rest(new_program_rest, new_controls_rest):
-  """Create a new Program, Controls objects via REST API and map created
+def map_controls_to_program_rest(new_program_rest, new_controls_rest):
+  """Create new Program, Controls objects via REST API and map created
   Controls to Program via REST API.
   """
   yield RelationshipsService().create(src_obj=new_program_rest,
@@ -225,9 +240,18 @@ def map_program_to_controls_rest(new_program_rest, new_controls_rest):
 
 
 @pytest.yield_fixture(scope="function")
-def map_program_to_control_rest(new_program_rest, new_control_rest):
-  """Create a new Program, Control objects via REST API and map created
+def map_control_to_program_rest(new_program_rest, new_control_rest):
+  """Create new Program, Control objects via REST API and map created
   Control to Program via REST API.
   """
   yield RelationshipsService().create(src_obj=new_program_rest,
                                       dest_objs=new_control_rest)
+
+
+@pytest.yield_fixture(scope="function")
+def map_issue_to_audit_rest(new_audit_rest, new_issue_rest):
+  """Create new Audit (Audit, Program) and new Issue (Issue, Audit, Program)
+  objects via REST API and map created Issue to Audit via REST API.
+  """
+  yield RelationshipsService().create(src_obj=new_issue_rest[0],
+                                      dest_objs=new_audit_rest[0])

@@ -12,8 +12,7 @@ Attr = namedtuple('Attr', ['name'])
 
 type_ordering = [['Audit'], ['Program'],
                  ['Regulation', 'Policy', 'Standard', 'Contract'],
-                 ['Section', 'Clause'], ['Objective'], ['Control'],
-                 ['Assessment']]
+                 ['Section', 'Clause'], ['Objective'], ['Control']]
 
 
 # pylint: disable=invalid-name
@@ -133,7 +132,7 @@ class RuleSet(object):
 
 class Types(object):
   all = {'Program', 'Regulation', 'Policy', 'Standard', 'Contract',
-         'Section', 'Clause', 'Objective', 'Control', 'Assessment'}
+         'Section', 'Clause', 'Objective', 'Control'}
   directives = {'Regulation', 'Policy', 'Standard', 'Contract'}
   assets_business = {'System', 'Process', 'DataAsset', 'Product', 'Project',
                      'Facility', 'Market'}

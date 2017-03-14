@@ -33,7 +33,7 @@
       recipients: 'Assessor,Creator,Verifier'  // user roles to be notified
     },
     statuses: ['Not Started', 'In Progress', 'Ready for Review',
-        'Verified', 'Completed'],
+      'Verified', 'Completed'],
     tree_view_options: {
       add_item_view: GGRC.mustache_path +
       '/base_objects/tree_add_item.mustache',
@@ -348,6 +348,7 @@
       var currentUser = CMS.Models.get_instance('Person',
         GGRC.current_user.id, GGRC.current_user);
       var auditLead;
+      var self = this;
 
       if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
         if (pageInstance.type === 'Audit') {
@@ -372,6 +373,12 @@
           markForAddition(this, auditLead, 'Assessor');
           markForAddition(this, currentUser, 'Creator');
         }
+
+        this.audit.findAuditors().then(function (list) {
+          list.forEach(function (item) {
+            markForAddition(self, item.person, 'Verifier');
+          });
+        });
       } else {
         markForAddition(this, currentUser, 'Creator');
       }

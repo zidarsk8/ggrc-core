@@ -1,6 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""The module provides constants GGRC's URLs construction."""
+"""Constants for URLs construction."""
 # pylint: disable=wildcard-import
 # pylint: disable=unused-wildcard-import
 
@@ -26,13 +26,16 @@ DEFAULT_USER_HREF = "/".join([API, PEOPLE, str(1)])
 class Widget(object):
   """URL's parts for widgets."""
   # pylint: disable=too-few-public-methods
-  # common
-  INFO = "#info_widget"
   # admin dashboard page
   CUSTOM_ATTRIBUTES = "#custom_attribute_widget"
   EVENTS = "#events_list_widget"
   ROLES = "#roles_list_widget"
   PEOPLE = "#people_list_widget"
+  # widgets
+  INFO = "#info_widget"
+  AUDITS = "#audit_widget"
   ASSESSMENTS = "#assessment_widget"
   ASSESSMENT_TEMPLATES = "#assessment_template_widget"
   CONTROLS = "#control_widget"
+  ISSUES = "#issue_widget"
+  PROGRAMS = "#program_widget"

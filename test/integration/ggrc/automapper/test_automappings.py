@@ -304,34 +304,3 @@ class TestAutomappings(TestCase):
                  (section, regulation),
                  (control, section)],
     )
-
-  def test_automapping_control_assesment(self):
-    program = self.create_object(models.Program, {
-        'title': make_name('Program')
-    })
-    regulation = self.create_object(models.Regulation, {
-        'title': make_name('Test Regulation')
-    })
-    audit = self.create_object(models.Audit, {
-        'title': make_name('Audit'),
-        'program': {'id': program.id},
-        'status': 'Planned',
-    })
-    control = self.create_object(models.Control, {
-        'title': make_name('Test control')
-    })
-    assessment = self.create_object(models.Assessment, {
-        'title': make_name('Test CA'),
-        'audit': {
-            'id': audit.id,
-            'type': audit.type
-        },
-        'object': {
-            'id': control.id,
-            'type': control.type
-        },
-    })
-    self.assert_mapping_implication(
-        to_create=[(program, regulation), (regulation, assessment)],
-        implied=[(program, assessment)]
-    )

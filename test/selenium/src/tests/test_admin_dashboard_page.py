@@ -19,7 +19,7 @@ from lib.page import dashboard
 
 
 class TestAdminDashboardPage(base.Test):
-  """Tests for the admin dashboard page."""
+  """Tests for admin dashboard page."""
   _role_el = constants.element.AdminWidgetRoles
   _event_el = constants.element.AdminWidgetEvents
 

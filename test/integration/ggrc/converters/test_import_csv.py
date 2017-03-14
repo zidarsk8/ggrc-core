@@ -2,10 +2,13 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Tests for basic csv imports."""
 
+from collections import OrderedDict
+
 from ggrc import models
 from ggrc.converters import errors
 from integration.ggrc import TestCase
 from integration.ggrc import generator
+from integration.ggrc.models import factories
 
 
 class TestBasicCsvImport(TestCase):
@@ -135,18 +138,7 @@ class TestBasicCsvImport(TestCase):
     filename = "pci_program.csv"
     response = self.import_file(filename)
 
-    self._check_csv_response(response, {
-        "Control": {
-            "row_warnings": {
-                errors.EXPORT_ONLY_WARNING.format(
-                    line=9, column_name="map:audit"),
-                errors.EXPORT_ONLY_WARNING.format(
-                    line=10, column_name="map:audit"),
-                errors.EXPORT_ONLY_WARNING.format(
-                    line=11, column_name="map:audit"),
-            }
-        }
-    })
+    self._check_csv_response(response, {})
 
     assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
     audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
@@ -197,3 +189,34 @@ class TestBasicCsvImport(TestCase):
 
     self.assertEqual(0, len(response["row_warnings"]))
     self.assertEqual(0, len(response["row_errors"]))
+
+  def test_audit_import_context(self):
+    """Test audit context on edits via import."""
+    factories.ProgramFactory(slug="p")
+    response = self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code*", "audit"),
+        ("title", "audit"),
+        ("Internal Audit Lead", "user@example.com"),
+        ("status", "In Progress"),
+        ("program", "P"),
+    ]))
+    self._check_csv_response(response, {})
+
+    audit = models.Audit.query.first()
+    program = models.Program.query.first()
+    self.assertNotEqual(audit.context_id, program.context_id)
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Audit"),
+        ("Code*", "audit"),
+        ("title", "audit"),
+        ("Internal Audit Lead", "user@example.com"),
+        ("status", "In Progress"),
+        ("program", "P"),
+    ]))
+    self._check_csv_response(response, {})
+
+    audit = models.Audit.query.first()
+    program = models.Program.query.first()
+    self.assertNotEqual(audit.context_id, program.context_id)

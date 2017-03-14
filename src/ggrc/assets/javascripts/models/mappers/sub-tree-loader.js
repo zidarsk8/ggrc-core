@@ -21,20 +21,27 @@
           return mapped;
         })
         .then(function (list) {
-          var mappedToCurrent = [];
-          var rest = [];
-          var related = GGRC.Utils.CurrentPage.related;
+          var directlyRelated = [];
+          var notRelated = [];
+          var result = [];
+          var pageUtils = GGRC.Utils.CurrentPage;
+          var related = pageUtils.related;
+          var needToSplit = pageUtils.isObjectContextPage();
 
-          list.forEach(function (inst) {
-            var relates = related.attr(inst.type);
-            if (relates && relates[inst.id]) {
-              mappedToCurrent.push(inst);
-            } else {
-              rest.push(inst);
-            }
-          });
-          mappedToCurrent = mappedToCurrent.concat(rest);
-          return this.insertInstancesFromMappings(mappedToCurrent);
+          if (needToSplit) {
+            list.forEach(function (inst) {
+              var relates = related.attr(inst.type);
+              if (relates && relates[inst.id]) {
+                directlyRelated.push(inst);
+              } else {
+                notRelated.push(inst);
+              }
+            });
+            result = directlyRelated.concat(notRelated);
+          } else {
+            result = list;
+          }
+          return this.insertInstancesFromMappings(result);
         }.bind(this));
     }
   });

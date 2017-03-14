@@ -35,5 +35,9 @@ class Clause(HasObjectState, Hierarchical, CustomAttributable, Personable,
       'na',
       'notes',
   ]
+  _fulltext_attrs = [
+      'na',
+      'notes',
+  ]
   _sanitize_html = ['notes']
   _include_links = []

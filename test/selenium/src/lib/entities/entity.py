@@ -1,6 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Module for create, description, representation and equal of entities."""
+"""Create, description, representation and equal of entities."""
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
 
@@ -19,9 +19,11 @@ class Entity(object):
 
   @staticmethod
   def attrs_names_all_entities():
-    """Get list of the all possible unique entities attributes' names."""
+    """Get list of all possible unique entities attributes' names."""
     all_entities_cls = [
-        Person, CustomAttribute, Program, Control, Audit, Asmt, AsmtTmpl]
+        PersonEntity, CustomAttributeEntity, ProgramEntity,
+        ControlEntity, AuditEntity, AssessmentEntity,
+        AssessmentTemplateEntity, IssueEntity]
     all_entities_attrs_names = [
         entity_class().__dict__.keys() for
         entity_class in all_entities_cls]
@@ -30,12 +32,12 @@ class Entity(object):
     return unique_entities_attrs_names
 
 
-class Person(Entity):
+class PersonEntity(Entity):
   """Class that represent model for Person."""
   __hash__ = None
 
   def __init__(self, email=None, authorizations=None):
-    super(Person, self).__init__()
+    super(PersonEntity, self).__init__()
     self.email = email
     self.authorizations = authorizations
 
@@ -47,7 +49,7 @@ class Person(Entity):
         url=self.url, email=self.email, authorizations=self.authorizations)
 
 
-class CustomAttribute(object):
+class CustomAttributeEntity(object):
   """Class that represent model for Custom Attribute."""
   # pylint: disable=too-many-instance-attributes
   __hash__ = None
@@ -55,7 +57,7 @@ class CustomAttribute(object):
   def __init__(self, obj_id=None, title=None, ca_type=None,
                definition_type=None, helptext="", placeholder=None,
                multi_choice_options=None, is_mandatory=False, ca_global=True):
-    super(CustomAttribute, self).__init__()
+    super(CustomAttributeEntity, self).__init__()
     self.obj_id = obj_id
     self.title = title
     self.ca_type = ca_type
@@ -81,69 +83,71 @@ class CustomAttribute(object):
             self.definition_type == other.definition_type)
 
 
-class Program(Entity):
+class ProgramEntity(Entity):
   """Class that represent model for Program."""
   __hash__ = None
 
-  def __init__(self, manager=None, pr_contact=None, code=None, state=None,
+  def __init__(self, manager=None, primary_contact=None, code=None, state=None,
                last_update=None):
-    super(Program, self).__init__()
+    super(ProgramEntity, self).__init__()
     self.manager = manager
-    self.pr_contact = pr_contact
+    self.primary_contact = primary_contact
     self.code = code
     self.state = state
     self.last_update = last_update
 
   def __repr__(self):
     return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
-            "url: {url}, manager: {manager}, primary contact: {pr_contact}, "
-            "code: {code}, state: {state}, last update: {last_update}").format(
+            "url: {url}, manager: {manager}, "
+            "primary contact: {primary_contact}, code: {code}, "
+            "state: {state}, last update: {last_update}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        url=self.url, manager=self.manager, pr_contact=self.pr_contact,
-        code=self.code, state=self.state, last_update=self.last_update)
+        url=self.url, manager=self.manager,
+        primary_contact=self.primary_contact, code=self.code, state=self.state,
+        last_update=self.last_update)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
             self.title == other.title and self.code == other.code and
             self.manager == other.manager and self.state == other.state and
-            self.pr_contact == other.pr_contact)
+            self.primary_contact == other.primary_contact)
 
 
-class Control(Entity):
+class ControlEntity(Entity):
   """Class that represent model for Control."""
   __hash__ = None
 
-  def __init__(self, owner=None, pr_contact=None, code=None, state=None,
+  def __init__(self, owner=None, primary_contact=None, code=None, state=None,
                last_update=None):
-    super(Control, self).__init__()
+    super(ControlEntity, self).__init__()
     self.owner = owner
-    self.pr_contact = pr_contact
+    self.primary_contact = primary_contact
     self.code = code
     self.state = state
     self.last_update = last_update
 
   def __repr__(self):
     return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
-            "url: {url}, owner: {owner}, primary contact: {pr_contact}, "
+            "url: {url}, owner: {owner}, primary contact: {primary_contact}, "
             "code: {code}, state: {state}, last update: {last_update}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        url=self.url, owner=self.owner, pr_contact=self.pr_contact,
+        url=self.url, owner=self.owner, primary_contact=self.primary_contact,
         code=self.code, state=self.state, last_update=self.last_update)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
             self.title == other.title and self.code == other.code and
             self.state == other.state and self.owner == other.owner and
-            self.pr_contact == other.pr_contact)
+            self.primary_contact == other.primary_contact)
 
 
-class Audit(Entity):
+class AuditEntity(Entity):
   """Class that represent model for Audit."""
   __hash__ = None
 
   def __init__(self, program=None, audit_lead=None, code=None,
                status=None, last_update=None):
-    super(Audit, self).__init__()
+    super(AuditEntity, self).__init__()
     self.program = program
     self.audit_lead = audit_lead
     self.code = code
@@ -162,12 +166,11 @@ class Audit(Entity):
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
             self.title == other.title and self.code == other.code and
-            self.program == other.program and
             self.audit_lead == other.audit_lead and
             self.status == other.status)
 
 
-class AsmtTmpl(Entity):
+class AssessmentTemplateEntity(Entity):
   """Class that represent model for Assessment Template."""
   # pylint: disable=superfluous-parens
 
@@ -175,7 +178,7 @@ class AsmtTmpl(Entity):
 
   def __init__(self, audit=None, asmt_objects=None, def_assessors=None,
                def_verifiers=None, code=None, last_update=None):
-    super(AsmtTmpl, self).__init__()
+    super(AssessmentTemplateEntity, self).__init__()
     self.audit = audit
     self.asmt_objects = asmt_objects
     self.def_assessors = def_assessors
@@ -199,21 +202,21 @@ class AsmtTmpl(Entity):
             self.title == other.title and self.code == other.code)
 
 
-class Asmt(Entity):
+class AssessmentEntity(Entity):
   """Class that represent model for Assessment."""
-  # pylint: disable=too-many-instance-attribute
+  # pylint: disable=too-many-instance-attributes
   # pylint: disable=redefined-builtin
   __hash__ = None
 
   def __init__(self, object=None, audit=None, creators=None, assignees=None,
-               pr_contact=None, is_verified=None, code=None, state=None,
+               primary_contact=None, is_verified=None, code=None, state=None,
                last_update=None):
-    super(Asmt, self).__init__()
+    super(AssessmentEntity, self).__init__()
     self.object = object
     self.audit = audit
     self.creators = creators
     self.assignees = assignees
-    self.pr_contact = pr_contact
+    self.primary_contact = primary_contact
     self.is_verified = is_verified
     self.code = code
     self.state = state
@@ -223,12 +226,12 @@ class Asmt(Entity):
     return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
             "url: {url}, object: {object}, audit: {audit}, "
             "creators: {creators}, assignees: {assignees}, "
-            "pr_contact: {pr_contact}, is_verified: {is_verified}, "
+            "primary_contact: {primary_contact}, is_verified: {is_verified}, "
             "code: {code}, state: {state}, last update: {last_update}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
         url=self.url, object=self.object, audit=self.audit,
         creators=self.creators, assignees=self.assignees,
-        pr_contact=self.pr_contact, is_verified=self.is_verified,
+        primary_contact=self.primary_contact, is_verified=self.is_verified,
         code=self.code, state=self.state, last_update=self.last_update)
 
   def __eq__(self, other):
@@ -236,3 +239,34 @@ class Asmt(Entity):
             self.title == other.title and self.code == other.code and
             self.state == other.state and
             self.is_verified == other.is_verified)
+
+
+class IssueEntity(Entity):
+  """Class that represent model for Issue."""
+  # pylint: disable=too-many-instance-attributes
+  __hash__ = None
+
+  def __init__(self, audit=None, owner=None, primary_contact=None, code=None,
+               state=None, last_update=None):
+    super(IssueEntity, self).__init__()
+    self.audit = audit
+    self.owner = owner
+    self.primary_contact = primary_contact
+    self.code = code
+    self.state = state
+    self.last_update = last_update
+
+  def __repr__(self):
+    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
+            "url: {url}, audit: {audit}, owner: {owner}, "
+            "primary_contact: {primary_contact}, code: {code}, "
+            "state: {state}, last update: {last_update}").format(
+        type=self.type, title=self.title, id=self.id, href=self.href,
+        url=self.url, audit=self.audit, owner=self.owner,
+        primary_contact=self.primary_contact, code=self.code, state=self.state,
+        last_update=self.last_update)
+
+  def __eq__(self, other):
+    return (isinstance(other, self.__class__) and self.type == other.type and
+            self.title == other.title and self.owner == other.owner,
+            self.code == other.code and self.state == other.state)

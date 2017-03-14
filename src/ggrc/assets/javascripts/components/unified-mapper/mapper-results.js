@@ -339,7 +339,7 @@
           .makeRequest(query)
           .done(function (responseArr) {
             var data = responseArr[0];
-            var filters = responseArr[1][modelKey].ids;
+            var relatedData = responseArr[1];
             var values = data[modelKey][queryType];
             var result = values.map(function (item) {
               return {
@@ -348,9 +348,9 @@
               };
             });
             // Do not perform extra mapping validation in case Assessment generation
-            if (!this.attr('mapper.assessmentGenerator')) {
+            if (!this.attr('mapper.assessmentGenerator') && relatedData) {
               result = result.filter(function (item) {
-                return filters.indexOf(item.id) < 0;
+                return relatedData[modelKey].ids.indexOf(item.id) < 0;
               });
             }
             dfd.resolve(result);

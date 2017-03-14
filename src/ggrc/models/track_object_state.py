@@ -18,6 +18,7 @@ class HasObjectState(object):
   _publish_attrs = [
       PublishOnly('os_state'),
   ]
+  _fulltext_attrs = ["os_state"]
   _aliases = {
       "os_state": {
           "display_name": "Review State",

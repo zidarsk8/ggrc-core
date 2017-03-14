@@ -97,7 +97,7 @@
       }, {
         attr_title: 'Audit Lead',
         attr_name: 'audit_lead',
-        attr_sort_field: 'contact.name|email'
+        attr_sort_field: 'contact'
       }, {
         attr_title: 'Code',
         attr_name: 'slug'
@@ -336,8 +336,8 @@
       test_plan_procedure: false,
       template_object_type: 'Control',
       default_people: {
-        assessors: 'Object Owners',
-        verifiers: 'Object Owners'
+        assessors: 'Audit Lead',
+        verifiers: 'Auditors'
       },
       // the custom lists of assessor / verifier IDs if "other" is selected for
       // the corresponding default_people setting

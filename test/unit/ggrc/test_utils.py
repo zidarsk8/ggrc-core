@@ -1,15 +1,17 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+import unittest
+
 from ggrc import utils
-from unittest import TestCase
 
 
-class TestUtilsFunctions(TestCase):
+class TestUtilsFunctions(unittest.TestCase):
 
+  @unittest.skip("Audit-scope objects can't be mapped from outside")
   def test_mapping_rules(self):
     """ Test that all mappings go both ways """
-    mappings = utils.get_mapping_rules()
+    mappings = utils.rules.get_mapping_rules()
     verificationErrors = []
 
     for object_name, object_mappings in mappings.items():

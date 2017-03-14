@@ -12,6 +12,7 @@
   GGRC.Utils.CurrentPage = (function () {
     var queryAPI = GGRC.Utils.QueryAPI;
     var relatedToCurrentInstance = new can.Map({});
+    var pageType = GGRC.pageType;
 
     function initMappedInstances(dependentModels, current) {
       var models = can.makeArray(dependentModels);
@@ -41,52 +42,34 @@
       });
     }
 
-    /**
-     * Return a human-friendly name of the object type of the currently
-     * active HNB tab.
-     *
-     * If there is no "active" tab or the tab is not associated with any object
-     * type, null is returned.
-     *
-     * @return {String|null} - a spaced and capizalized object type name
-     */
-    function activeTabObject() {
-      // NOTE: window.CMS might not yed be available when this module is being
-      // defined (in tests at  least), thus we cannot simply pass it in, but
-      // instead reference it only when this function is invoked.
-      var CMS = window.CMS;
-      var PATTERN = /^#(\w+?)_widget.*/gi;
+    function getPageType() {
+      return pageType ? pageType : GGRC.page_instance().type;
+    }
 
-      var modelType;
-      var parts;
-      var tabType;
+    function isMyAssessments() {
+      return pageType === 'MY_ASSESSMENTS';
+    }
 
-      var hash = GGRC.Utils.win.location.hash;
-      var matchInfo = PATTERN.exec(hash);
+    function isMyWork() {
+      return pageType === 'MY_WORK';
+    }
 
-      if (!matchInfo) {
-        return null;
-      }
+    function isAdmin() {
+      return pageType === 'ADMIN';
+    }
 
-      tabType = matchInfo[1];  // the content of the first capturing group
-      parts = _.chain(tabType.split('_'))
-                .map(_.method('toLowerCase'))
-                .map(_.capitalize)
-                .value();
-
-      modelType = parts.join('');
-
-      if (!CMS.Models[modelType]) {
-        return null;
-      }
-
-      return parts.join(' ');  // model type with spaces between words
+    function isObjectContextPage() {
+      return !pageType;
     }
 
     return {
-      activeTabObject: activeTabObject,
       related: relatedToCurrentInstance,
-      initMappedInstances: initMappedInstances
+      initMappedInstances: initMappedInstances,
+      getPageType: getPageType,
+      isMyAssessments: isMyAssessments,
+      isMyWork: isMyWork,
+      isAdmin: isAdmin,
+      isObjectContextPage: isObjectContextPage
     };
   })();
 })(window.GGRC);

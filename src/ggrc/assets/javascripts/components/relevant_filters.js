@@ -54,6 +54,13 @@
         return _.sortBy(_.compact(_.map(_.keys(mappings), function (mapping) {
           return CMS.Models[mapping];
         })), 'model_singular');
+      },
+      optionHidden: function (option) {
+        var type = option.model_singular;
+        return can.makeArray(this.attr('relevantTo'))
+          .some(function (item) {
+            return item.readOnly && item.type === type;
+          });
       }
     },
     events: {

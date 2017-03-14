@@ -20,7 +20,7 @@ class TestAuditRBAC(TestCase):
   @classmethod
   def setUpClass(cls):
     TestCase.clear_data()
-    cls._import_file("audit_rbac.csv")
+    cls.response = cls._import_file("audit_rbac.csv")
     cls.people = all_models.Person.eager_query().all()
     cls.audit = all_models.Audit.eager_query().first()
     sources = set(r.source for r in cls.audit.related_sources)
@@ -31,19 +31,9 @@ class TestAuditRBAC(TestCase):
 
   def setUp(self):
     """Imports test_csvs/audit_rbac.csv needed by the tests"""
+    self._check_csv_response(self.response, {})
     self.api = Api()
     self.client.get("/login")
-    self.sanity_check()
-
-  def sanity_check(self):
-    """Sanity check if the audit_rbac.csv was imported correctly"""
-    expected = 17
-    assert len(self.people) == expected, \
-        "Expecting {} people not {}.".format(expected, len(self.people))
-    expected = 9
-    assert len(self.related_objects) == expected, \
-        "Expecting {} objects mapped to audit not {}."\
-        .format(expected, len(self.related_objects))
 
   def read(self, objects):
     """Attempt to do a GET request for every object in the objects list"""

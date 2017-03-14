@@ -1,16 +1,15 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Models for LHN modals when creating new objects"""
+"""Modals for create objects."""
 
-from lib import base
-from lib import decorator
+from lib import base, decorator
 from lib.constants import locator
 from lib.page.modal import base as modal_base
 from lib.utils import selenium_utils
 
 
 class _CreateNewObjectModal(modal_base.BaseModal):
-  """Base create modal model."""
+  """Modal for create objects."""
   _locator_button_add_another = (
       locator.ModalCreateNewObject.BUTTON_SAVE_AND_ADD_ANOTHER)
 
@@ -19,24 +18,24 @@ class _CreateNewObjectModal(modal_base.BaseModal):
     self.button_save_and_add_another = None
 
   def save_and_add_other(self):
-    """Save this objects and open a new modal."""
+    """Create object and open new Create modal."""
     self.button_save_and_add_another = base.Button(
         self._driver, self._locator_button_add_another)
     self.button_save_and_add_another.click()
-    selenium_utils.get_when_invisible(self._driver,
-                                      self._locator_button_add_another)
+    selenium_utils.get_when_invisible(
+        self._driver, self._locator_button_add_another)
     return self.__class__(self._driver)
 
   @decorator.wait_for_redirect
   @decorator.handle_alert
   def save_and_close(self):
-    """Save this objects and close modal."""
+    """Create object and close Create modal."""
     self.button_save_and_close.click()
     selenium_utils.get_when_invisible(self._driver, self.locator_button_save)
 
 
 class _GenerateNewObjectModal(base.Modal):
-  """Base generate modal model."""
+  """Modal for generate objects."""
   _locator_button_generate = locator.ModalGenerateNewObject.BUTTON_GENERATE
 
   def __init__(self, driver):
@@ -44,62 +43,64 @@ class _GenerateNewObjectModal(base.Modal):
     self.button_generate_and_close = None
 
   def generate_and_close(self):
-    """Save this objects and close modal."""
+    """Generate object and close Generate modal."""
     self.button_generate_and_close = base.Button(
         self._driver, self._locator_button_generate)
     self.button_generate_and_close.click()
-    selenium_utils.get_when_invisible(self._driver,
-                                      self._locator_button_generate)
+    selenium_utils.get_when_invisible(
+        self._driver, self._locator_button_generate)
 
 
-class Programs(modal_base.ProgramsModal, _CreateNewObjectModal):
-  """Class representing a program modal"""
+class ProgramsCreate(modal_base.ProgramsModal, _CreateNewObjectModal):
+  # pylint: disable=abstract-method
+  """Programs create modal."""
 
 
-class Controls(modal_base.ControlsModal, _CreateNewObjectModal):
-  """Class representing a control modal"""
+class ControlsCreate(modal_base.ControlsModal, _CreateNewObjectModal):
+  """Controls create modal."""
 
 
-class OrgGroups(modal_base.OrgGroupsModal, _CreateNewObjectModal):
-  """Class representing an org group modal"""
+class OrgGroupsCreate(modal_base.OrgGroupsModal, _CreateNewObjectModal):
+  """Org Groups create modal."""
 
 
-class Risks(modal_base.RisksModal, _CreateNewObjectModal):
-  """Class representing a risk modal"""
+class RisksCreate(modal_base.RisksModal, _CreateNewObjectModal):
+  """Risks create modal."""
 
 
-class Issues(modal_base.IssuesModal, _CreateNewObjectModal):
-  """Class representing an issue modal"""
+class IssuesCreate(modal_base.IssuesModal, _CreateNewObjectModal):
+  """Issues create modal."""
 
 
-class Processes(modal_base.ProcessesModal, _CreateNewObjectModal):
-  """Class representing a process modal"""
+class ProcessesCreate(modal_base.ProcessesModal, _CreateNewObjectModal):
+  """Processes create modal."""
 
 
-class DataAssets(modal_base.DataAssetsModal, _CreateNewObjectModal):
-  """Class representing a Data Assets modal"""
+class DataAssetsCreate(modal_base.DataAssetsModal, _CreateNewObjectModal):
+  """Data Assets create modal."""
 
 
-class Systems(modal_base.SystemsModal, _CreateNewObjectModal):
-  """Class representing a system modal"""
+class SystemsCreate(modal_base.SystemsModal, _CreateNewObjectModal):
+  """Systems create modal."""
 
 
-class Products(modal_base.ProductsModal, _CreateNewObjectModal):
-  """Class representing a product modal"""
+class ProductsCreate(modal_base.ProductsModal, _CreateNewObjectModal):
+  """Products create modal."""
 
 
-class Projects(modal_base.ProjectsModal, _CreateNewObjectModal):
-  """Class representing a process modal"""
+class ProjectsCreate(modal_base.ProjectsModal, _CreateNewObjectModal):
+  """Projects create modal."""
 
 
-class AssessmentTemplates(modal_base.AsmtTmplModal, _CreateNewObjectModal):
-  """Class representing a assessment template creation modal."""
+class AssessmentTemplatesCreate(modal_base.AsmtTmplModal,
+                                _CreateNewObjectModal):
+  """Assessment Templates create modal."""
 
 
-class Assessments(modal_base.AsmtsModal, _CreateNewObjectModal):
-  """Class representing a assessment creation modal."""
+class AssessmentsCreate(modal_base.AsmtsModal, _CreateNewObjectModal):
+  """Assessments create modal."""
 
 
 class AssessmentsGenerate(modal_base.AsmtsModalGenerate,
                           _GenerateNewObjectModal):
-  """Class representing a assessment generation modal."""
+  """Assessments generate modal."""

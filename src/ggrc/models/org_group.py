@@ -14,3 +14,6 @@ class OrgGroup(HasObjectState, CustomAttributable,
                Ownable, BusinessObject, db.Model):
   __tablename__ = 'org_groups'
   _aliases = {"url": "Org Group URL"}
+
+  def __str__(self):
+    return self.title

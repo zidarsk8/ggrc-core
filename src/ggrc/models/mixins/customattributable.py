@@ -256,6 +256,7 @@ class CustomAttributable(object):
     db.session.query(MysqlRecordProperty)\
         .filter(
             and_(
+                MysqlRecordProperty.key == self.id,
                 MysqlRecordProperty.type == self.__class__.__name__,
                 MysqlRecordProperty.property.in_(ftrp_properties)))\
         .delete(synchronize_session='fetch')

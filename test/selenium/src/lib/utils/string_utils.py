@@ -8,19 +8,22 @@ import uuid
 
 BLANK = ''
 COMMA = ','  # comma is used as delimiter for multi-choice values
-LESS = '<'  # we need exclude this character due to issue GGRC-527
-SPECIAL = string.punctuation.replace(COMMA, BLANK).replace(LESS, BLANK)
+LESS = '<'  # need exclude this character due to issue GGRC-527
+DOUBLE_QUOTES = '"'  # need exclude this character due to issue GGRC-931
+BACKSLASH = '\\'  # need exclude this character due to issue GGRC-931
+EXCLUDE = COMMA + LESS + DOUBLE_QUOTES + BACKSLASH
+SPECIAL = BLANK.join(_ for _ in string.punctuation if _ not in EXCLUDE)
 
 
 def random_string(size=5, chars=string.letters + string.digits + SPECIAL):
   """Return string with corresponding size that filled by values from selected
-  chars.
-  """
+ chars.
+ """
   return BLANK.join(random.choice(chars) for position in range(size))
 
 
 def random_uuid(length=13):
-  """Return string with a predefined length base on UUID."""
+  """Return string with predefined length base on UUID."""
   return str(uuid.uuid4())[:length]
 
 
@@ -41,9 +44,9 @@ def get_bool_from_string(str_to_bool):
 
 
 def remap_keys_for_list_dicts(dict_transformation_keys, list_dicts):
-  """Remap keys names for old list of dictionaries according the
-  transformation dictionary {OLD KEY: NEW KEY} and return the new updated
-  list of dictionaries.
-  """
+  """Remap keys names for old list of dictionaries according
+ transformation dictionary {OLD KEY: NEW KEY} and return new updated
+ list of dictionaries.
+ """
   return [{dict_transformation_keys[key]: value for key, value
            in dic.iteritems()} for dic in list_dicts]

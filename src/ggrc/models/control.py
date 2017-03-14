@@ -173,6 +173,21 @@ class Control(HasObjectState, Relatable, CustomAttributable,
       'secondary_assessor',
   ]
 
+  _fulltext_attrs = [
+      'active',
+      'company_control',
+      'directive',
+      'documentation_description',
+      'fraud_related',
+      'key_control',
+      'kind',
+      'means',
+      'verify_frequency',
+      'version',
+      'principal_assessor',
+      'secondary_assessor',
+  ]
+
   _sanitize_html = [
       'documentation_description',
       'version',

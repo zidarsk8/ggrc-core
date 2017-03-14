@@ -98,6 +98,10 @@ class QueryHelper(object):
     self.ca_disabled = ca_disabled
     self._set_attr_name_map()
     self._count = 0
+    self.getattr_whitelist = {
+        "child_type",
+        "is_current",
+    }
 
   def _set_attr_name_map(self):
     """ build a map for attributes names and display names
@@ -413,13 +417,6 @@ class QueryHelper(object):
     Returns:
       the query with sorting parameters.
     """
-    def sorting_field_for_person(person):
-      """Get right field to sort people by: name if defined or email."""
-      return sa.case([(sa.not_(sa.or_(person.name.is_(None),
-                                      person.name == '')),
-                       person.name)],
-                     else_=person.email)
-
     def joins_and_order(clause):
       """Get join operations and ordering field from item of order_by list.
 
@@ -441,13 +438,14 @@ class QueryHelper(object):
         order = join_target.c.weight
         return joins, order
 
-      def by_ca():
+      def by_fulltext():
         """Join fulltext index table, order by indexed CA value."""
         alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(self._count))
         joins = [(alias, sa.and_(
             alias.key == model.id,
             alias.type == model.__name__,
-            alias.property == key)
+            alias.property == key,
+            alias.subproperty.in_(["", "__sort__"]))
         )]
         order = alias.content
         return joins, order
@@ -458,51 +456,10 @@ class QueryHelper(object):
         if issubclass(related_model, models.mixins.Titled):
           joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
           order = alias.title
-        elif issubclass(related_model, models.Person):
-          joins = [(alias, _)] = [(sa.orm.aliased(attr), attr)]
-          order = sorting_field_for_person(alias)
         else:
           raise NotImplementedError(u"Sorting by {model.__name__} is "
                                     u"not implemented yet."
                                     .format(model=related_model))
-        return joins, order
-
-      def by_m2m():
-        """Join the Person model, order by name/email.
-
-        Implemented only for ObjectOwner mapping.
-        """
-        if issubclass(attr.target_class, models.object_owner.ObjectOwner):
-          # NOTE: In the current implementation we sort only by the first
-          # assigned owner if multiple owners defined
-          oo_alias_1 = sa.orm.aliased(models.object_owner.ObjectOwner)
-          oo_alias_2 = sa.orm.aliased(models.object_owner.ObjectOwner)
-          oo_subq = db.session.query(
-              oo_alias_1.ownable_id,
-              oo_alias_1.ownable_type,
-              oo_alias_1.person_id,
-          ).filter(
-              oo_alias_1.ownable_type == model.__name__,
-              ~sa.exists().where(sa.and_(
-                  oo_alias_2.ownable_id == oo_alias_1.ownable_id,
-                  oo_alias_2.ownable_type == oo_alias_1.ownable_type,
-                  oo_alias_2.id < oo_alias_1.id,
-              )),
-          ).subquery()
-
-          owner = sa.orm.aliased(models.Person, name="owner")
-
-          joins = [
-              (oo_subq, sa.and_(model.__name__ == oo_subq.c.ownable_type,
-                                model.id == oo_subq.c.ownable_id)),
-              (owner, oo_subq.c.person_id == owner.id),
-          ]
-
-          order = sorting_field_for_person(owner)
-        else:
-          raise NotImplementedError(u"Sorting by m2m-field '{key}' "
-                                    u"is not implemented yet."
-                                    .format(key=key))
         return joins, order
 
       # transform clause["name"] into a model's field name
@@ -516,22 +473,20 @@ class QueryHelper(object):
           raise BadQueryException("Can't order by '__similarity__' when no ",
                                   "'similar' filter was applied.")
       else:
-        if model.__name__ != "Snapshot":
+        if key in self.getattr_whitelist:
           key, _ = self.attr_name_map[model].get(key, (key, None))
           attr = getattr(model, key.encode('utf-8'), None)
-        if model.__name__ == "Snapshot" or attr is None:
+          if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
+              isinstance(attr.property,
+                             sa.orm.properties.RelationshipProperty)):
+            joins, order = by_foreign_key()
+          else:
+            # a simple attribute
+            joins, order = None, attr
+        else:
           # Snapshot or non object attributes are treated as custom attributes
           self._count += 1
-          joins, order = by_ca()
-        elif (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
-                isinstance(attr.property,
-                           sa.orm.properties.RelationshipProperty)):
-          joins, order = by_foreign_key()
-        elif isinstance(attr, sa.ext.associationproxy.AssociationProxy):
-          joins, order = by_m2m()
-        else:
-          # a simple attribute
-          joins, order = None, attr
+          joins, order = by_fulltext()
 
       if clause.get("desc", False):
         order = order.desc()
@@ -797,14 +752,14 @@ class QueryHelper(object):
       key = key.lower()
       key, filter_by = self.attr_name_map[
           tgt_class].get(key, (key, None))
+
       if callable(filter_by):
         return filter_by(predicate)
-      else:
-        attr = getattr(object_class, key, None)
-        if attr:
-          return predicate(attr)
-        else:
-          return default_filter_by(object_class, key, predicate)
+
+      if key in self.getattr_whitelist:
+        return predicate(getattr(object_class, key, None))
+
+      return default_filter_by(object_class, key, predicate)
 
     lift_bin = lambda f: f(self._build_expression(exp["left"], object_class,
                                                   tgt_class),

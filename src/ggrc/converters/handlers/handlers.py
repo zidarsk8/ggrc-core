@@ -561,10 +561,10 @@ class ParentColumnHandler(ColumnHandler):
     obj = self.row_converter.obj
     parent = getattr(obj, self.key, None)
     if parent is not None and \
-       hasattr(obj, "context_id") and \
-       hasattr(parent, "context_id") and \
-       parent.context_id is not None:
-      obj.context_id = parent.context_id
+       hasattr(obj, "context") and \
+       hasattr(parent, "context") and \
+       parent.context is not None:
+      obj.context = parent.context
 
   def get_value(self):
     value = getattr(self.row_converter.obj, self.key, self.value)
@@ -574,10 +574,15 @@ class ParentColumnHandler(ColumnHandler):
 
 
 class ProgramColumnHandler(ParentColumnHandler):
+  """Handler for program column on audit imports."""
 
   def __init__(self, row_converter, key, **options):
     self.parent = Program
     super(ProgramColumnHandler, self).__init__(row_converter, key, **options)
+
+  def set_obj_attr(self):
+    if self.row_converter.is_new:
+      super(ProgramColumnHandler, self).set_obj_attr()
 
 
 class SectionDirectiveColumnHandler(MappingColumnHandler):

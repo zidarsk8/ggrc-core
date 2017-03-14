@@ -121,7 +121,7 @@
       {
         attr_title: 'Owner',
         attr_name: 'owner',
-        attr_sort_field: 'contact.name|email',
+        attr_sort_field: 'owners',
         order: 20
       },
       {
@@ -137,13 +137,13 @@
       {
         attr_title: 'Primary Contact',
         attr_name: 'contact',
-        attr_sort_field: 'contact.name|email',
+        attr_sort_field: 'contact',
         order: 50
       },
       {
         attr_title: 'Secondary Contact',
         attr_name: 'secondary_contact',
-        attr_sort_field: 'secondary_contact.name|email',
+        attr_sort_field: 'secondary_contact',
         order: 60
       },
       {
