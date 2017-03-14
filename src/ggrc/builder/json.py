@@ -641,7 +641,10 @@ class Builder(AttributeInfo):
     class_attr = getattr(obj.__class__, attr_name)
     result = None
 
-    if isinstance(class_attr, AssociationProxy):
+    if attr_name in getattr(obj.__class__, "_custom_publish", {}):
+      # The attribute has a custom publish logic
+      result = obj.__class__._custom_publish[attr_name](obj)
+    elif isinstance(class_attr, AssociationProxy):
       if getattr(class_attr, 'publish_raw', False):
         published_attr = getattr(obj, attr_name)
         if hasattr(published_attr, "copy"):

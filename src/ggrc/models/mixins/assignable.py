@@ -20,6 +20,12 @@ class Assignable(object):
   ASSIGNEE_TYPES = set(["Assignee"])
 
   _fulltext_attrs = ['assignees']
+  _publish_attrs = ["assignees"]
+  _update_attrs = []
+
+  _custom_publish = {
+      "assignees": lambda obj: obj.publish_assignees(),
+  }
 
   @property
   def assignees(self):
@@ -42,6 +48,59 @@ class Assignable(object):
         if "AssigneeType" in r.attrs
     ]
     return assignees
+
+  @property
+  def assignees_new(self):
+    """Property that returns assignees.
+
+    Returns:
+      a dict with keys equal to assignee types and values equal to list of
+      Person objects of assignees of this type; for instance:
+      {"Creator": [<Person1>, <Person2>],
+       "Assessor": [<Person2>]}
+    """
+    assignees_map = self._get_assignees_map()
+
+    def get_roles(rel):
+      return set(rel.attrs.get("AssigneeType", "").split(","))
+
+    result = {}
+    result_inverse = {
+        assignees_map[r.source_id]: get_roles(r)
+        for r in self.related_sources
+        if r.source_type == "Person"
+    }
+    result_inverse.update({
+        assignees_map[r.destination_id]: get_roles(r)
+        for r in self.related_sources
+        if r.destination_type == "Person"
+    })
+
+    for assignee, roles in result_inverse.items():
+      for role in roles:
+        result[role] = result.get(role, []) + [assignee]
+
+    return result
+
+  def publish_assignees(self):
+    """Serialize assignees to json.
+
+    Transforms the value of assignees_new property to basic structures (lists
+    and dicts) that are easily represented in json.
+    The people lists are sorted by names or emails.
+
+    Returns:
+      a dict with keys equal to assignee types and values equal to list of
+      serialized assignees of this type; for instance:
+      {"Creator": [{"id": 1, "name": "Aaron", "email": "aaron@example.com"},
+                   {"id": 2, "name": None, "email": "noname@example.com"}],
+       "Assessor": [{"id": 2, "name": None, "email": "noname@example.com"}]}
+    """
+    return {
+        role: [person.log_json() for person in
+               sorted(people, key=lambda p: (p.name or p.email).lower())]
+        for role, people in self.assignees_new.items()
+    }
 
   @classmethod
   def eager_query(cls):
