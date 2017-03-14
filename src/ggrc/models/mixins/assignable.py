@@ -28,17 +28,60 @@ class Assignable(object):
     Returns:
         A set of assignees.
     """
+    assignees_map = self._get_assignees_map()
     assignees = [
-        (r.source, tuple(set(r.attrs["AssigneeType"].split(","))))
+        (assignees_map[r.source_id],
+         tuple(set(r.attrs["AssigneeType"].split(","))))
         for r in self.related_sources
         if "AssigneeType" in r.attrs
     ]
     assignees += [
-        (r.destination, tuple(set(r.attrs["AssigneeType"].split(","))))
+        (assignees_map[r.destination_id],
+         tuple(set(r.attrs["AssigneeType"].split(","))))
         for r in self.related_destinations
         if "AssigneeType" in r.attrs
     ]
     return assignees
+
+  @classmethod
+  def eager_query(cls):
+    query = super(Assignable, cls).eager_query()
+    return query.options(
+        sa.orm.subqueryload("_assignees").undefer_group("Person_complete"),
+    )
+
+  @sa.ext.declarative.declared_attr
+  def _assignees(self):
+    """Attribute that is used to load all assigned People eagerly."""
+    rel = relationship.Relationship
+
+    assignee_id = sa.case(
+        [(rel.destination_type == person.Person.__name__,
+          rel.destination_id)],
+        else_=rel.source_id,
+    )
+    assignable_id = sa.case(
+        [(rel.destination_type == person.Person.__name__,
+          rel.source_id)],
+        else_=rel.destination_id,
+    )
+
+    return db.relationship(
+        person.Person,
+        primaryjoin=lambda: self.id == assignable_id,
+        secondary=rel.__table__,
+        secondaryjoin=lambda: person.Person.id == assignee_id,
+        viewonly=True,
+    )
+
+  def _get_assignees_map(self):
+    """Get a dict from Assignee id to Assignee object.
+
+    This method uses eagerly-loaded _assignees property and does not result in
+    additional DB calls.
+    """
+    # pylint: disable=not-an-iterable
+    return {person.id: person for person in self._assignees}
 
   @staticmethod
   def _validate_relationship_attr(class_, source, dest, existing, name, value):
