@@ -7,10 +7,10 @@ This allows adding various assignee types to the object, like Verifier,
 Requester, etc.
 """
 
-from sqlalchemy import and_
-from sqlalchemy import or_
-from ggrc.models import person
+import sqlalchemy as sa
+
 from ggrc import db
+from ggrc.models import person
 from ggrc.models import relationship
 
 
@@ -106,24 +106,24 @@ class Assignable(object):
     Person = person.Person
     return db.session.query(Rel).join(RelAttr).join(
         Person,
-        or_(and_(
+        sa.or_(sa.and_(
             Rel.source_id == Person.id,
             Rel.source_type == Person.__name__
-        ), and_(
+        ), sa.and_(
             Rel.destination_id == Person.id,
             Rel.destination_type == Person.__name__
         ))
-    ).filter(and_(
+    ).filter(sa.and_(
         RelAttr.attr_value.contains(related_type),
         RelAttr.attr_name == "AssigneeType",
-        or_(and_(
+        sa.or_(sa.and_(
             Rel.source_type == Person.__name__,
             Rel.destination_type == cls.__name__,
             Rel.destination_id == cls.id
-        ), and_(
+        ), sa.and_(
             Rel.destination_type == Person.__name__,
             Rel.source_type == cls.__name__,
             Rel.source_id == cls.id
         )),
-        or_(predicate(Person.name), predicate(Person.email))
+        sa.or_(predicate(Person.name), predicate(Person.email))
     )).exists()
