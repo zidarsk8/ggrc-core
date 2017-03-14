@@ -136,6 +136,16 @@ class AuditsService(BaseWebUiService):
     actual_cloned_audit_obj.url = cloned_audit_obj.url
     return actual_cloned_audit_obj
 
+  def bulk_update_via_info_widget(self, audit_obj):
+    """Navigate to Info widget URL of Audit object and bulk update objects to
+    latest version.
+    """
+    audit_info_widget_url = Audits.URL_INFO.format(obj_url=audit_obj.url)
+    selenium_utils.open_url(self.driver, audit_info_widget_url)
+    audit_info_page = Audits.info_widget_cls(self.driver)
+    (audit_info_page.
+     open_info_3bbs().select_update_objs().confirm_update())
+
   def get_obj_from_info_widget(self, audit_obj):
     """Get and return Audit object from Info widget."""
     scope = self.get_scope_from_info_widget(
