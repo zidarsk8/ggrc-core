@@ -1148,8 +1148,8 @@
       savedStateList = this.display_prefs.getTreeViewStates(modelName);
 
       if (savedStateList.length === 0 &&
-        this.options.model.model_singular === 'Assessment') {
-        // default states for "Assessment" widget
+          GGRC.Utils.CurrentPage.isMyAssessments()) {
+        // default states for "My Assessments" page
         this.options.attr('selectStateList',
           ['"Not Started"', '"In Progress"']);
       } else {
