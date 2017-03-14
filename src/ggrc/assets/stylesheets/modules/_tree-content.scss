@@ -11,6 +11,12 @@
   z-index: zIndex(tree-spinner) !important;
 }
 
+.tree-no-results-message {
+  opacity: 0.7;
+  text-align: center;
+  padding-top: 35px;
+}
+
 ul.new-tree {
   @extend %reset-list;
   margin-bottom: 40px;
