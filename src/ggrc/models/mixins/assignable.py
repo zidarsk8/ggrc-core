@@ -40,28 +40,6 @@ class Assignable(object):
     ]
     return assignees
 
-  def get_assignees(self, filter_=None):
-    """Get assignees by type.
-
-    This is helper for fetching only specific assignee types.
-
-    Args:
-      filter_: String containing assignee type or a list with desired assignee
-        types. If None, all assignees are returned (see self.assignees).
-
-    Returs:
-      Filtered list of assignees.
-    """
-    if filter_ is None:
-      return self.assignees
-    elif isinstance(filter_, basestring):
-      filter_ = [filter_]
-
-    filter_set = set(filter_)
-
-    return [(person_, roles) for person_, roles in self.assignees
-            if filter_set.intersection(roles)]
-
   @staticmethod
   def _validate_relationship_attr(class_, source, dest, existing, name, value):
     """Validator that allows Assignable relationship attributes
