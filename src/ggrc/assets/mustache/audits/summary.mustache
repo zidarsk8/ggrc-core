@@ -9,7 +9,6 @@
     <div class="span12">
         <section class="info audit-summary">
             <div class="info-pane-utility">
-              {{#is_allowed 'update' instance context='for'}}
                 <add-object-button
                     instance="instance"
                     linkclass="btn btn-small btn-draft"
@@ -27,7 +26,8 @@
                     singular="AssessmentTemplate"
                     plural="assessment_templates">
                 </add-object-button>
-                <assessment-generator-button audit="instance" button='true'></assessment-generator-button>
+                {{#is_allowed 'create' 'Assessment' context=instance.context}}
+                  <assessment-generator-button audit="instance" button='true'></assessment-generator-button>
                 {{/is_allowed}}
             </div>
 
