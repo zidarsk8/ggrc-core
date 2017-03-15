@@ -7,7 +7,7 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 
 import collections
 import json
-
+from logging import getLogger
 from flask import flash
 from flask import g
 from flask import render_template
@@ -49,9 +49,11 @@ from ggrc.utils import benchmark
 from ggrc.utils import generate_query_chunks
 from ggrc.utils import revisions
 
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
+
 
 # Needs to be secured as we are removing @login_required
-
 @app.route("/_background_tasks/refresh_revisions", methods=["POST"])
 @queued_task
 def refresh_revisions(_):
@@ -72,7 +74,8 @@ def do_reindex():
   """Update the full text search index."""
 
   indexer = get_indexer()
-  indexer.delete_all_records(False)
+  with benchmark('Delete all records'):
+    indexer.delete_all_records(False)
 
   indexed_models = get_indexed_model_names()
 
@@ -80,17 +83,19 @@ def do_reindex():
                             all_models.Person.email)
   g.people_map = {p.id: (p.name, p.email) for p in people}
 
-  for model in indexed_models:
+  for model in sorted(indexed_models):
     # pylint: disable=protected-access
-    model = get_model(model)
-    mapper_class = model._sa_class_manager.mapper.base_mapper.class_
-    query = model.query.options(
-        db.undefer_group(mapper_class.__name__ + '_complete'),
-    )
-    for query_chunk in generate_query_chunks(query):
-      for instance in query_chunk:
-        indexer.create_record(fts_record_for(instance), False)
-      db.session.commit()
+    logger.info("Updating index for: %s", model)
+    with benchmark("Create records for %s" % model):
+      model = get_model(model)
+      mapper_class = model._sa_class_manager.mapper.base_mapper.class_
+      query = model.query.options(
+          db.undefer_group(mapper_class.__name__ + '_complete'),
+      )
+      for query_chunk in generate_query_chunks(query):
+        for instance in query_chunk:
+          indexer.create_record(fts_record_for(instance), False)
+        db.session.commit()
 
   reindex_snapshots()
 
