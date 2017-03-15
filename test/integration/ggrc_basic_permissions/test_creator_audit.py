@@ -35,7 +35,7 @@ class TestCreatorAudit(TestCase):
             "objects": {
                 "audit": {
                     "get": 200,
-                    "put": 200,
+                    "put": 403,
                     "delete": 403
                 },
                 "mapped_Issue": {
@@ -162,22 +162,23 @@ class TestCreatorAudit(TestCase):
         }
     })
     self.assertEqual(response.status_code, 201)
-    context_id = response.json.get("audit").get("context").get("id")
+    context = response.json.get("audit").get("context")
     audit_id = response.json.get("audit").get("id")
     self.objects["audit"] = all_models.Audit.query.get(audit_id)
 
     for prefix in ("mapped", "unrelated"):
       random_title = factories.random_str()
+      obj_context = context if prefix == "mapped" else None
 
       response = self.api.post(all_models.Issue, {
-          "issue": {"title": random_title, "context": None},
+          "issue": {"title": random_title, "context": obj_context},
       })
       self.assertEqual(response.status_code, 201)
       issue_id = response.json.get("issue").get("id")
       self.objects[prefix + "_Issue"] = all_models.Issue.query.get(issue_id)
 
       response = self.api.post(all_models.Assessment, {
-          "assessment": {"title": random_title, "context": None},
+          "assessment": {"title": random_title, "context": obj_context},
       })
       self.assertEqual(response.status_code, 201)
       assessment_id = response.json.get("assessment").get("id")
@@ -202,8 +203,8 @@ class TestCreatorAudit(TestCase):
               "id": role["id"],
           }, "context": {
               "type": "Context",
-              "id": context_id,
-              "href": "/api/contexts/{}".format(context_id)
+              "id": context.get("id"),
+              "href": "/api/contexts/{}".format(context.get("id"))
           }}})
       self.assertEqual(response.status_code, 201)
 
