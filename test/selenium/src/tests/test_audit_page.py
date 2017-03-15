@@ -138,7 +138,6 @@ class TestAuditPage(base.Test):
         messages.ERR_MSG_FORMAT.format([expected_control], actual_controls))
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skipif(True, reason="Failed due JS error in app")
   def test_update_snapshotable_ver_of_control(
       self, new_control_rest, new_program_rest, map_control_to_program_rest,
       new_audit_rest, update_control_rest, selenium
