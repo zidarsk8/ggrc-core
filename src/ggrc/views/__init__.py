@@ -7,6 +7,7 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 
 import collections
 import json
+import logging
 
 from flask import flash
 from flask import g
@@ -49,6 +50,8 @@ from ggrc.utils import benchmark
 from ggrc.utils import generate_query_chunks
 from ggrc.utils import revisions
 
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
 
 # Needs to be secured as we are removing @login_required
 
@@ -87,10 +90,16 @@ def do_reindex():
     query = model.query.options(
         db.undefer_group(mapper_class.__name__ + '_complete'),
     )
-    for query_chunk in generate_query_chunks(query):
-      for instance in query_chunk:
-        indexer.create_record(fts_record_for(instance), False)
-      db.session.commit()
+    for query_chunk in generate_query_chunks(query, chunk_size=1):
+      try:
+        for instance in query_chunk:
+          indexer.create_record(fts_record_for(instance), False)
+        db.session.commit()
+      except:  # pylint: disable=bare-except
+        logger.warning("Re-index failed for query: %s - %s",
+                       query_chunk[0].type, query_chunk[0].id)
+
+        db.session.rollback()
 
   reindex_snapshots()
 
