@@ -102,6 +102,7 @@ class QueryHelper(object):
         "child_type",
         "id",
         "is_current",
+        "program",
     }
 
   def _set_attr_name_map(self):
