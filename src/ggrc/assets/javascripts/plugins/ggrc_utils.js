@@ -805,6 +805,19 @@
     }
 
     /**
+     * Build url for snapshot's parent
+     * @param {Object} instance - Snapshot instance
+     * @return {String} Url
+     */
+    function getParentUrl(instance) {
+      var model = CMS.Models[instance.child_type];
+      var plural = model.table_plural;
+      var link = '/' + plural + '/' + instance.child_id;
+
+      return link;
+    }
+
+    /**
      * Convert array of snapshots to array of object
      * @param {Object} values - array of snapshots
      * @return {Object} The array of objects
@@ -890,7 +903,8 @@
       transformQuery: transformQuery,
       setAttrs: setAttrs,
       getSnapshotItemQuery: getSnapshotItemQuery,
-      isSnapshotType: isSnapshotType
+      isSnapshotType: isSnapshotType,
+      getParentUrl: getParentUrl
     };
   })();
 })(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);

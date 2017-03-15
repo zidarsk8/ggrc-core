@@ -12,7 +12,7 @@
   /**
    * Assessment specific mapped objects popover view component
    */
-  can.Component.extend({
+  GGRC.Components('detailedBusinessObjectListItem', {
     tag: tag,
     template: tpl,
     viewModel: {
@@ -32,7 +32,9 @@
         },
         objectLink: {
           get: function () {
-            return this.attr('itemData.viewLink');
+            return this.attr('isSnapshot') ?
+              GGRC.Utils.Snapshots.getParentUrl(this.attr('instance')) :
+              this.attr('itemData.viewLink');
           }
         },
         objectTitle: {
