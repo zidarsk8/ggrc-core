@@ -20,8 +20,8 @@ class SqlIndexer(Indexer):
                 context_id=record.context_id,
                 tags=record.tags,
                 property=prop,
-                subproperty=subproperty,
-                content=content,
+                subproperty=unicode(subproperty),
+                content=unicode(content),
             ))
     if commit:
       db.session.commit()
