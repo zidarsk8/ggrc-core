@@ -321,7 +321,7 @@ class Controls(Widget):
     selenium_utils.get_when_invisible(
         self._driver, locator.CommonWidgetInfoSnapshots.LINK_GET_LAST_VER)
 
-  def check_is_editable(self, obj_title):
+  def is_editable(self, obj_title):
     """Check Control is editable via Info panel from Tree View."""
     self.tree_view.select_member_by_title(obj_title)
     info_panel = self.info_widget_cls(self._driver)

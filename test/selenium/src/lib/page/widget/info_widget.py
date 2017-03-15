@@ -16,8 +16,6 @@ class CommonInfo(base.Widget):
   headers_and_values = None
   list_headers_text = None
   list_values_text = None
-  _3bbs_locator = _locator.BUTTON_3BBS
-  _3bbs_locator_under_audit = _locator.BUTTON_3BBS_UNDER_AUDIT
 
   def __init__(self, driver):
     # wait that the elements load before calling super
@@ -25,8 +23,9 @@ class CommonInfo(base.Widget):
     self.title_entered = base.Label(driver, self._locator.TITLE_ENTERED)
     self.state = base.Label(driver, self._locator.STATE)
     super(CommonInfo, self).__init__(driver)
-    self.locator_3bbs = (self._3bbs_locator_under_audit if self.is_under_audit
-                         else self._3bbs_locator)
+    self.locator_3bbs = (
+        self._locator.BUTTON_3BBS_UNDER_AUDIT if self.is_under_audit
+        else self._locator.BUTTON_3BBS)
 
   def open_info_3bbs(self):
     """Click to 3BBS button on Info page or Info panel to open modal for
@@ -59,10 +58,18 @@ class CommonSnapshotsInfo(base.Component):
     super(CommonSnapshotsInfo, self).__init__(driver)
 
   def open_link_get_latest_ver(self):
-    """Click to link to open modal for further update object."""
+    """Click on link get latest version under Info panel."""
     base.Button(self._driver,
                 locator.CommonWidgetInfoSnapshots.LINK_GET_LAST_VER).click()
     return update_object.CompareUpdateObjectModal(self._driver)
+
+  def is_link_get_latest_ver_exist(self):
+    """Find link get latest version under Info panel.
+    Return: True if link get latest version is exist,
+            False if link get latest version is not exist.
+    """
+    return selenium_utils.is_element_exist(
+        self._driver, locator.CommonWidgetInfoSnapshots.LINK_GET_LAST_VER)
 
 
 class ProgramsInfoWidget(CommonInfo):

@@ -13,13 +13,32 @@ class CommonDropdownSettings(base.Component):
   """Common for 3BBS button/dropdown settings on Info pages and Info panels.
   """
   _locator = locator.Dropdown3bbsInfoWidget
-  _edit_locator = _locator.BUTTON_3BBS_EDIT
-  _edit_locator_under_audit = _locator.BUTTON_3BBS_EDIT_UNDER_AUDIT
 
   def __init__(self, driver, is_under_audit):
     super(CommonDropdownSettings, self).__init__(driver)
-    self.edit_locator = (self._edit_locator_under_audit if is_under_audit
-                         else self._edit_locator)
+    self.edit_locator = (
+        self._locator.BUTTON_3BBS_EDIT_UNDER_AUDIT if is_under_audit
+        else self._locator.BUTTON_3BBS_EDIT)
+    self.open_locator = (
+        self._locator.BUTTON_3BBS_OPEN_UNDER_AUDIT if is_under_audit
+        else self._locator.BUTTON_3BBS_OPEN)
+    self.get_permalink_locator = (
+        self._locator.BUTTON_3BBS_GET_PERMALINK_UNDER_AUDIT if is_under_audit
+        else self._locator.BUTTON_3BBS_GET_PERMALINK)
+    self.delete_locator = (
+        self._locator.BUTTON_3BBS_DELETE_UNDER_AUDIT if is_under_audit
+        else self._locator.BUTTON_3BBS_DELETE)
+
+  def select_open(self):
+    """Select open button in 3BBS dropdown modal."""
+    base.Button(self._driver, self.open_locator).click()
+
+  def is_open_exist(self):
+    """Find open button in 3BBS dropdown modal.
+    Return: True if open button is exist,
+            False if open button is not exist.
+    """
+    return selenium_utils.is_element_exist(self._driver, self.open_locator)
 
   def select_edit(self):
     """Select edit button in 3BBS dropdown modal.
@@ -30,19 +49,20 @@ class CommonDropdownSettings(base.Component):
 
   def is_edit_exist(self):
     """Find edit button in 3BBS dropdown modal.
-    Return: True if edit is exist, False if edit is not exist.
+    Return: True if edit button is exist,
+            False if edit button is not exist.
     """
     return selenium_utils.is_element_exist(self._driver, self.edit_locator)
 
   def select_get_permalink(self):
     """Select get permalink in 3BBS dropdown modal."""
-    base.Button(self._driver, self._locator.BUTTON_3BBS_GET_PERMALINK).click()
+    base.Button(self._driver, self.get_permalink_locator).click()
 
   def select_delete(self):
     """Select delete in 3BBS dropdown modal.
     Return: modal.delete_object.DeleteObjectModal
     """
-    base.Button(self._driver, self._locator.BUTTON_3BBS_DELETE).click()
+    base.Button(self._driver, self.delete_locator).click()
     return delete_object.DeleteObjectModal(self._driver)
 
 

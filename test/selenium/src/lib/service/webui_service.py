@@ -83,13 +83,13 @@ class BaseWebUiService(object):
     obj_info_page = info_widget(self.driver)
     return obj_info_page.get_obj_as_dict()
 
-  def check_is_obj_edit_via_info_panel(self, widget_url, gen_widget, obj):
+  def is_obj_editable_via_info_panel(self, widget_url, gen_widget, obj):
     """Navigate to widget URL, select object from Tree View by title and
     check via Info panel that object is editable.
     """
     selenium_utils.open_url(self.driver, widget_url)
     objs_widget = gen_widget(self.driver)
-    return objs_widget.check_is_editable(obj_title=obj.title)
+    return objs_widget.is_editable(obj_title=obj.title)
 
 
 class AuditsService(BaseWebUiService):
@@ -237,10 +237,10 @@ class ControlsService(BaseWebUiService):
     return self.create_list_objs(
         factory=ControlsFactory(), list_scopes=list_scopes)
 
-  def check_is_edit_via_info_panel(self, source_obj, control_obj):
+  def is_editable_via_info_panel(self, source_obj, control_obj):
     """Check that Control object is editable via Info panel from Tree View.
     If editable then return 'True' if no editable then return 'False'."""
-    return self.check_is_obj_edit_via_info_panel(
+    return self.is_obj_editable_via_info_panel(
         widget_url=Controls.URL.format(source_obj_url=source_obj.url),
         gen_widget=Controls, obj=control_obj)
 

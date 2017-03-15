@@ -11,13 +11,16 @@ from lib.constants import objects, url, element
 
 class Common(object):
   """Common locators."""
-  # modals
+  # modal
   MODAL_GENEATE = ".modal-selector"
   MODAL_CREATE = ".modal-wide"
   MODAL_CONFIRM = ".modal.hide"
-  # info widget (panel)
+  # info page (panel)
   PIN_CONTENT = ".pin-content "
   INFO_WIDGET = ".info"
+  INFO_HEADER = INFO_WIDGET + " .pane-header"
+  INFO_UTILITY = INFO_WIDGET + " .info-pane-utility"
+  INFO_TOGGLE = INFO_UTILITY + " .dropdown-toggle"
   # dropdown
   DROPDOWN_MENU = ".dropdown-menu"
   # tree
@@ -582,24 +585,21 @@ class ModalCloneAudit(ModalCommonConfirmAction):
 
 class CommonWidgetInfo(object):
   """Common locators for Info widgets and Info panels."""
-  WIDGET = Common.INFO_WIDGET
   PIN_CONTENT = Common.PIN_CONTENT
-  INFO_HEADER = WIDGET + " .pane-header"
-  INFO_UTILITY = WIDGET + " .info-pane-utility"
+  INFO_HEADER = Common.INFO_HEADER
+  INFO_TOGGLE = Common.INFO_TOGGLE
   HEADERS_VALUES = (
       '//*[contains(@class, "object-area")]//*[contains(@class, "info")]'
       '//div[starts-with(./@class, "span")]')
   HEADER = HEADERS_VALUES + '//*[contains(text(),"{header}")]'
-  ID_TITLE = ' [data-test-id="title_0ad9fbaf"]'
-  TOGGLE = INFO_UTILITY + " .dropdown-toggle"
   # labels
   HEADERS_AND_VALUES = (By.XPATH, HEADERS_VALUES)
-  TITLE = (By.CSS_SELECTOR, INFO_HEADER + ID_TITLE + " h6")
-  TITLE_ENTERED = (By.CSS_SELECTOR, INFO_HEADER + ID_TITLE + " h3")
-  STATE = (By.CSS_SELECTOR, INFO_HEADER + ID_TITLE + " .state-value")
+  TITLE = (By.CSS_SELECTOR, INFO_HEADER + " h6")
+  TITLE_ENTERED = (By.CSS_SELECTOR, INFO_HEADER + " .span9 h3")
+  STATE = (By.CSS_SELECTOR, INFO_HEADER + " .state-value")
   # user input elements
-  BUTTON_3BBS = (By.CSS_SELECTOR, TOGGLE)
-  BUTTON_3BBS_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + TOGGLE)
+  BUTTON_3BBS = (By.CSS_SELECTOR, INFO_TOGGLE)
+  BUTTON_3BBS_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + INFO_TOGGLE)
 
 
 class CommonWidgetInfoSnapshots(object):
@@ -712,14 +712,11 @@ class WidgetInfoWorkflow(CommonWidgetInfo):
 
 class WidgetInfoAudit(CommonWidgetInfo):
   """Locators for Audit Info widgets."""
-  _info = CommonWidgetInfo
+  HEADER = CommonWidgetInfo.HEADER
   elements = element.AuditInfoWidget
   # labels
-  TITLE = (By.CSS_SELECTOR, _info.INFO_HEADER + " h6")
-  TITLE_ENTERED = (By.CSS_SELECTOR, _info.INFO_HEADER + " .span9 h3")
-  STATE = (By.CSS_SELECTOR, _info.INFO_HEADER + " .state-value")
-  AUDIT_LEAD = (By.XPATH, _info.HEADER.format(header=elements.AUDIT_LEAD))
-  CODE = (By.XPATH, _info.HEADER.format(header=elements.CODE))
+  AUDIT_LEAD = (By.XPATH, HEADER.format(header=elements.AUDIT_LEAD))
+  CODE = (By.XPATH, HEADER.format(header=elements.CODE))
 
 
 class WidgetInfoAssessment(CommonWidgetInfo):
@@ -824,24 +821,23 @@ class WidgetAdminEvents(object):
 class Dropdown3bbsInfoWidget(object):
   """Locators for common settings 3BBS dropdown on Info widget and Info page.
  """
-  INFO_DROPDOWN = Common.INFO_WIDGET + ' .dropdown-menu'
+  INFO_DROPDOWN = Common.INFO_WIDGET + " .dropdown-menu"
   PIN_CONTENT = CommonWidgetInfo.PIN_CONTENT
-  EDIT = INFO_DROPDOWN + ' [data-test-id="dropdown_settings_edit_f4b27aec"]'
-  GET_PERMALINK = (
-      INFO_DROPDOWN +
-      ' [data-test-id="dropdown_settings_get_permalink_75e3bf91"]')
-  DELETE = (INFO_DROPDOWN +
-            ' [data-test-id="dropdown_settings_delete_6a62eaaf"]')
-  OPEN = (INFO_DROPDOWN + ' .fa-long-arrow-right')
+  EDIT = INFO_DROPDOWN + " .fa-pencil-square-o"
+  GET_PERMALINK = (INFO_DROPDOWN + " .fa-link")
+  OPEN = (INFO_DROPDOWN + " .fa-long-arrow-right")
+  DELETE = (INFO_DROPDOWN + " .fa-trash")
   # user input elements
   BUTTON_3BBS_EDIT = (By.CSS_SELECTOR, EDIT)
-  BUTTON_3BBS_EDIT_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + EDIT)
   BUTTON_3BBS_GET_PERMALINK = (By.CSS_SELECTOR, GET_PERMALINK)
-  BUTTON_3BBS_GET_PERMALINK_UNDER_AUDIT = (
-      By.CSS_SELECTOR, PIN_CONTENT + GET_PERMALINK)
+  BUTTON_3BBS_OPEN = (By.CSS_SELECTOR, OPEN)
   BUTTON_3BBS_DELETE = (By.CSS_SELECTOR, DELETE)
+  # user input elements under audit
+  BUTTON_3BBS_EDIT_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + EDIT)
+  BUTTON_3BBS_GET_PERMALINK_UNDER_AUDIT = (By.CSS_SELECTOR,
+                                           PIN_CONTENT + GET_PERMALINK)
+  BUTTON_3BBS_OPEN_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + OPEN)
   BUTTON_3BBS_DELETE_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + DELETE)
-  BUTTON_3BBS_OPEN_ORIGINAL = (By.CSS_SELECTOR, OPEN)
 
 
 class Dropdown3bbsAuditInfoWidget(Dropdown3bbsInfoWidget):
@@ -1027,11 +1023,12 @@ class AdminCustomAttributes(object):
 class CustomAttributesItemContent(AdminCustomAttributes):
   """Locators for expanded view of custom attribute group
   in admin dashboard."""
-  _BASE = ".content-open .tier-2-info-content"
-  _row_locator = _BASE + " .tree-structure .cms_controllers_tree_view_node"
-  TITLES_ROW = (By.CSS_SELECTOR, _BASE + " thead tr")
-  ROW = (By.CSS_SELECTOR, _row_locator)
+  CONTENT_OPEN = ".content-open .tier-2-info-content"
+  TREE_STRUCTURE = (
+      CONTENT_OPEN + " .tree-structure .cms_controllers_tree_view_node")
+  TITLES_ROW = (By.CSS_SELECTOR, CONTENT_OPEN + " thead tr")
+  ROW = (By.CSS_SELECTOR, TREE_STRUCTURE)
   CELL_IN_ROW = (By.CSS_SELECTOR, "td")
-  EDIT_BTN = (By.CSS_SELECTOR, _BASE + " " + Common.TREE_LIST)
-  ADD_BTN = (By.CSS_SELECTOR, _BASE + " .add-item .btn")
+  EDIT_BTN = (By.CSS_SELECTOR, CONTENT_OPEN + " " + Common.TREE_LIST)
+  ADD_BTN = (By.CSS_SELECTOR, CONTENT_OPEN + " .add-item .btn")
   TREE_SPINNER = (By.CSS_SELECTOR, ".tree-spinner")
