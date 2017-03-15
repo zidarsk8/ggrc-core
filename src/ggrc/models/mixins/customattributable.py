@@ -411,8 +411,8 @@ class CustomAttributable(object):
     # pylint: disable=not-an-iterable
     from ggrc.models.custom_attribute_definition import \
         CustomAttributeDefinition
-    # to integrate with Base mixin without order dependencies
-    res = getattr(super(CustomAttributable, self), "log_json", lambda: {})()
+
+    res = super(CustomAttributable, self).log_json()
 
     if self.custom_attribute_values:
       res["custom_attribute_values"] = [

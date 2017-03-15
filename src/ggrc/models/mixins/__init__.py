@@ -509,10 +509,10 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
     }
 
   def log_json(self):
-    # to integrate with CustomAttributable without order dependencies
     from ggrc import models
 
-    res = getattr(super(Base, self), "log_json", lambda: {})()
+    res = {}
+
     for column in self.__table__.columns:
       try:
         res[column.name] = getattr(self, column.name)
