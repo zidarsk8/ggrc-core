@@ -97,7 +97,7 @@ class Assignable(object):
        "Assessor": [{"id": 2, "name": None, "email": "noname@example.com"}]}
     """
     return {
-        role: [person.log_json() for person in
+        role: [person.log_json_base() for person in
                sorted(people, key=lambda p: (p.name or p.email).lower())]
         for role, people in self.assignees_new.items()
     }

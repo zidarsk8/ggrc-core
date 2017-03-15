@@ -508,9 +508,11 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
         'href': u"/api/people/{}".format(id_),
     }
 
-  def log_json(self):
-    from ggrc import models
+  def log_json_base(self):
+    """Get a dict with attributes of self that is easy to serialize to json.
 
+    This method lists only first-class attributes.
+    """
     res = {}
 
     for column in self.__table__.columns:
@@ -518,12 +520,26 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
         res[column.name] = getattr(self, column.name)
       except AttributeError:
         pass
-    res['display_name'] = self.display_name
+    res["display_name"] = self.display_name
+
+    return res
+
+  def log_json(self):
+    """Get a dict with attributes and related objects of self.
+
+    This method converts additionally person-mapping attributes and owners
+    to person stubs.
+    """
+    from ggrc import models
+
+    res = self.log_json_base()
 
     for attr in self._people_log_mappings:
       if hasattr(self, attr):
         value = getattr(self, attr)
+        # hardcoded [:-3] is used to strip "_id" suffix
         res[attr[:-3]] = self._person_stub(value) if value else None
+
     if hasattr(self, "owners"):
       res["owners"] = [
           self._person_stub(owner.id) for owner in self.owners if owner
