@@ -64,6 +64,23 @@ class TestAuditPage(base.Test):
         "control": new_control_rest, "updated_control": update_control_rest}
 
   @pytest.fixture(scope="function")
+  def create_audit_and_delete_original_control(
+      self, new_control_rest, new_program_rest, map_control_to_program_rest,
+      new_audit_rest, delete_control_rest
+  ):
+    """Create Audit with snapshotable Control and delete original Control under
+    Program via REST API.
+    Preconditions:
+    - Program, Control created via REST API.
+    - Control mapped to Program via REST API.
+    - Audit created under Program via REST API.
+    - Original Control deleted via REST API.
+    """
+    return {
+        "audit": new_audit_rest[0], "program": new_program_rest,
+        "control": new_control_rest}
+
+  @pytest.fixture(scope="function")
   def create_audit_and_update_first_of_two_original_controls(
       self, create_audit_and_update_original_control
   ):
@@ -249,6 +266,41 @@ class TestAuditPage(base.Test):
                        get_objs_from_tree_view(source_obj=audit))
     assert [expected_control] == actual_controls, (
         messages.ERR_MSG_FORMAT.format([expected_control], actual_controls))
+
+  @pytest.mark.smoke_tests
+  @pytest.mark.skipif(True, reason="Issue in app GGRC-1196")
+  def test_audit_contains_snapshotable_control_after_delete_original_control(
+      self, create_audit_and_delete_original_control, selenium
+  ):
+    """Check via UI that Audit contains snapshotable Control that:
+    - equal to original Control under Program;
+    - is not have links to update version to latest state and
+      to view original Control under Program.
+    Preconditions:
+    - Execution and return of fixture
+      'create_audit_and_delete_original_control'.
+    """
+    audit_with_one_control = create_audit_and_delete_original_control
+    audit = audit_with_one_control["audit"]
+    expected_control = audit_with_one_control["control"]
+    actual_controls_tab_count = (webui_service.ControlsService(selenium).
+                                 get_count_from_tab(source_obj=audit))
+    assert len([expected_control]) == actual_controls_tab_count
+    actual_controls = (webui_service.ControlsService(selenium).
+                       get_objs_from_tree_view(source_obj=audit))
+    assert [expected_control] == actual_controls, (
+        messages.ERR_MSG_FORMAT.format([expected_control], actual_controls))
+
+    control_is_updateable = (
+        webui_service.ControlsService(selenium).
+        is_update_via_info_panel(source_obj=audit,
+                                 control_obj=expected_control))
+    control_is_openable = (
+        webui_service.ControlsService(selenium).
+        is_open_via_info_panel(source_obj=audit,
+                               control_obj=expected_control))
+    assert control_is_updateable is False
+    assert control_is_openable is False
 
   @pytest.mark.smoke_tests
   def test_audit_contains_snapshotable_control_after_change_original_controls(
