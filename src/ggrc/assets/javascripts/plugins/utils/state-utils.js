@@ -114,11 +114,27 @@
       return filterString;
     }
 
+    /**
+     * Get default states for model.
+     * @param {String} model - The model name
+     * @return {Array} List of default states for model
+     */
+    function getDefaultStatesForModel(model) {
+      var states = [];
+
+      if (GGRC.Utils.CurrentPage.isMyAssessments()) {
+        states = ['"Not Started"', '"In Progress"'];
+      }
+
+      return states;
+    }
+
     return {
       hasState: hasState,
       hasFilter: hasFilter,
       statusFilter: statusFilter,
-      getStatesForModel: getStatesForModel
+      getStatesForModel: getStatesForModel,
+      getDefaultStatesForModel: getDefaultStatesForModel
     };
   })();
 })(window.GGRC);

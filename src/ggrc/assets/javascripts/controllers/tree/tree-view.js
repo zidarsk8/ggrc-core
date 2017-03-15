@@ -1147,14 +1147,12 @@
       var savedStateList;
       savedStateList = this.display_prefs.getTreeViewStates(modelName);
 
-      if (savedStateList.length === 0 &&
-          GGRC.Utils.CurrentPage.isMyAssessments()) {
-        // default states for "My Assessments" page
-        this.options.attr('selectStateList',
-          ['"Not Started"', '"In Progress"']);
-      } else {
-        this.options.attr('selectStateList', savedStateList);
+      if (savedStateList.length === 0) {
+        savedStateList = GGRC.Utils
+          .State.getDefaultStatesForModel(this.options.model.shortName);
       }
+
+      this.options.attr('selectStateList', savedStateList);
     },
     saveTreeStates: function (selectedStates) {
       var stateToSave = [];
