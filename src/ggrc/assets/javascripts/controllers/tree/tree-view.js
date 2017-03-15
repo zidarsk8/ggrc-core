@@ -849,7 +849,6 @@
       var treeFilter;
       var filterHeight;
       var headerHeight;
-      var elementMarginTop;
       var parentWidth;
       var headerContentHeight;
       var treeHeaderContent;
@@ -869,12 +868,11 @@
       filterHeight = Number(treeFilter.attr('data-height')) +
         Number(treeFilter.attr('data-margin-bottom'));
       headerHeight = elementParent.find('.tree-header').height();
-      elementMarginTop = elementParent.offset().top;
       parentWidth = elementParent.width();
       headerContentHeight = filterHeight + headerHeight;
       treeHeaderContent = elementParent.find('.tree-header-content');
 
-      this.element.css('margin-top', elementMarginTop);
+      this.element.css('margin-top', headerContentHeight);
 
       if (treeHeaderContent) {
         treeHeaderContent.css('width', parentWidth);
