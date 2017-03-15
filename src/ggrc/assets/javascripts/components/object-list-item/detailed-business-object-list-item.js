@@ -12,7 +12,7 @@
   /**
    * Assessment specific mapped objects popover view component
    */
-  can.Component.extend({
+  GGRC.Components('detailedBusinessObjectListItem', {
     tag: tag,
     template: tpl,
     viewModel: {
@@ -32,8 +32,9 @@
         },
         objectLink: {
           get: function () {
-            return this.attr('itemData.viewLink') ||
-              this.buildObjectLink(this.attr('instance'));
+            return this.attr('isSnapshot') ?
+              GGRC.Utils.Snapshots.getParentUrl(this.attr('instance')) :
+              this.attr('itemData.viewLink');
           }
         },
         objectTitle: {
@@ -44,15 +45,6 @@
               this.attr('itemData.email') || false;
           }
         }
-      },
-      buildObjectLink: function (instance) {
-        var model = instance.child_type ?
-          CMS.Models[instance.child_type] :
-          CMS.Models[instance.type];
-
-        var type = model.root_collection;
-        var link = '/' + type + '/' + instance.child_id || instance.id;
-        return link;
       }
     }
   });
