@@ -28,10 +28,8 @@ class TestSnapshot(TestCase):
       "directive",
       "directive_id",
 
-      "kind",
       "kind_id",
 
-      "means",
       "means_id",
 
       "meta_kind",
@@ -39,7 +37,6 @@ class TestSnapshot(TestCase):
       "network_zone",
       "network_zone_id",
 
-      "verify_frequency",
       "verify_frequency_id",
 
       "assertions",
