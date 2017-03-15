@@ -401,8 +401,9 @@
                     return state.replace(/"/g, '');
                   });
 
+                var checkAll = unwrappedStates.length === 0;
                 self.options.attr('filter_states').forEach(function (item) {
-                  if (unwrappedStates.indexOf(item.value) > -1) {
+                  if (checkAll || unwrappedStates.indexOf(item.value) > -1) {
                     item.attr('checked', true);
                   }
                 });
@@ -1145,6 +1146,12 @@
       // Get the status list from local storage
       var savedStateList;
       savedStateList = this.display_prefs.getTreeViewStates(modelName);
+
+      if (savedStateList.length === 0) {
+        savedStateList = GGRC.Utils
+          .State.getDefaultStatesForModel(this.options.model.shortName);
+      }
+
       this.options.attr('selectStateList', savedStateList);
     },
     saveTreeStates: function (selectedStates) {
