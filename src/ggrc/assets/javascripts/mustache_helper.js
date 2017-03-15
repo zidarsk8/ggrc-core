@@ -2632,7 +2632,11 @@ Mustache.registerHelper("fadeout", function (delay, prop, options) {
     });
 
 Mustache.registerHelper("is_overdue", function (_date, status, options) {
-  var date = moment(resolve_computed(_date));
+  var resolvedDate = resolve_computed(_date);
+  var hashDueDate = resolve_computed(options.hash && options.hash.next_date);
+  var nextDueDate = moment(hashDueDate || resolvedDate);
+  var endDate = moment(resolvedDate);
+  var date = moment.min(nextDueDate, endDate);
   var today = moment().startOf('day');
   var startOfDate = moment(date).startOf('day');
   var isBefore = date && today.diff(startOfDate, 'days') >= 0;
