@@ -908,3 +908,16 @@ p {
     width: 70%;
   }
 }
+
+.three-dots-list {
+  & > li {
+    a {
+      color: #000 !important;
+    }
+
+    .fa {
+      color: #000 !important;
+      opacity: 0.7 !important;
+    }
+  }
+}
