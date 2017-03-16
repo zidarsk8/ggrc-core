@@ -272,6 +272,9 @@ def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
             for person in val:
               search_payload += get_person_data(rec, person)
             search_payload += get_person_sort_subprop(rec, val)
+          elif isinstance(val, dict) and "title" in val:
+            rec["content"] = val["title"]
+            search_payload += [rec]
           else:
             if isinstance(rec["content"], basestring):
               search_payload += [rec]
