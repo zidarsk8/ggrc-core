@@ -7,7 +7,8 @@ Handle non-RESTful views, e.g. routes which return HTML rather than JSON
 
 import collections
 import json
-from logging import getLogger
+import logging
+
 from flask import flash
 from flask import g
 from flask import render_template
@@ -49,8 +50,7 @@ from ggrc.utils import benchmark
 from ggrc.utils import generate_query_chunks
 from ggrc.utils import revisions
 
-# pylint: disable=invalid-name
-logger = getLogger(__name__)
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 # Needs to be secured as we are removing @login_required
