@@ -18,9 +18,9 @@
         *
         * @return {Number} - Number of current page
         */
-      currentPage: function () {
+      currentPage: can.compute(function () {
         return this.attr('current') + 1;
-      },
+      }),
       /**
         * Sets previous page
         *
@@ -76,12 +76,12 @@
         *                     pageNum: `True page number that gets passed to setPage function`
         *                   }
         */
-      totalPages: function () {
+      totalPages: can.compute(function () {
         var list = this.attr('list');
         var perPage = Number(this.attr('perPage'));
 
         return Math.ceil(list.length / perPage);
-      }
+      })
     }
   });
 })(window.can, window.can.$);
