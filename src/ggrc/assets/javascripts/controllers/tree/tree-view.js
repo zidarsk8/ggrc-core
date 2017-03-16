@@ -1282,13 +1282,14 @@
     loadSubTree: function () {
       var parent = this.options.parent_instance;
       var queryAPI = GGRC.Utils.QueryAPI;
+      var snapshots = GGRC.Utils.Snapshots;
       var parentCtrl = this.element.closest('section')
         .find('.cms_controllers_tree_view').control();
       var originalOrder =
         can.makeArray(GGRC.tree_view.attr('orderedWidgetsByType')[parent.type]);
       var relevant = {
         type: parent.type,
-        id: parent.id,
+        id: snapshots.isSnapshot(parent) ? parent.snapshot.child_id : parent.id,
         operation: 'relevant'
       };
       var states = parentCtrl.options.attr('selectStateList');
@@ -1302,10 +1303,15 @@
           filter = statesQuery;
         }
         return queryAPI.buildParam(model, {}, relevant, [
+          'child_id',
+          'child_type',
           'context',
           'email',
           'id',
+          'is_latest_revision',
           'name',
+          'revision',
+          'revisions',
           'selfLink',
           'slug',
           'status',

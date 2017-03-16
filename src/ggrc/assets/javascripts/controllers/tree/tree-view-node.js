@@ -101,9 +101,11 @@
       var instance = this.options.instance;
       var relatedInstances = GGRC.Utils.CurrentPage.related
         .attr(instance.type);
-
+      var instanceId = GGRC.Utils.Snapshots.isSnapshot(instance) ?
+                        instance.snapshot.child_id :
+                        instance.id;
       if (!relatedInstances || relatedInstances &&
-        !relatedInstances[instance.id]) {
+        !relatedInstances[instanceId]) {
         this.element.addClass('not-directly-related');
       } else {
         this.element.addClass('directly-related');
@@ -158,9 +160,14 @@
         GGRC.mustache_path + '/base_objects/tree_placeholder.mustache',
         this.options,
         this._ifNotRemoved(function (frag) {
+          var snapshots = GGRC.Utils.Snapshots;
+          var model = CMS.Models[this.options.instance.type];
           this.replace_element(frag);
           this._draw_node_deferred.resolve();
           this.options.expanded = false;
+          if (snapshots.isSnapshot(this.options.instance)) {
+            model.removeFromCacheById(this.options.instance.id);
+          }
           delete this._expand_deferred;
         }.bind(this))
       );
