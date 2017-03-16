@@ -253,7 +253,7 @@ def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
       multiple_person_properties = {"owners"}
 
       for prop, val in properties.items():
-        if prop and val:
+        if prop and val is not None:
           # record stub
           rec = {
               "key": snapshot_id,
@@ -274,6 +274,9 @@ def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
             search_payload += get_person_sort_subprop(rec, val)
           elif isinstance(val, dict) and "title" in val:
             rec["content"] = val["title"]
+            search_payload += [rec]
+          elif isinstance(val, (bool, int, long)):
+            rec["content"] = unicode(val)
             search_payload += [rec]
           else:
             if isinstance(rec["content"], basestring):
