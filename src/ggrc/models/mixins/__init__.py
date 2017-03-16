@@ -532,7 +532,11 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
     for attr_name in self._publish_attrs:
       if is_attr_of_type(self, attr_name, models.Option):
         attr = getattr(self, attr_name)
-        stub = create_stub(attr)
+        if attr:
+          stub = create_stub(attr)
+          stub["title"] = attr.title
+        else:
+          stub = None
         res[attr_name] = stub
     return res
 
