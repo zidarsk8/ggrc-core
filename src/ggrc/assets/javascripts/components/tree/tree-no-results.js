@@ -9,7 +9,7 @@
   var template = can.view(GGRC.mustache_path +
     '/components/tree/tree-no-results.mustache');
 
-  can.Component.extend({
+  GGRC.Components('treeNoResults', {
     tag: 'tree-no-results',
     template: template,
     viewModel: {
@@ -21,7 +21,6 @@
         },
         show: {
           set: function (value) {
-            console.info(value);
             return value || false;
           }
         }

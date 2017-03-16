@@ -366,10 +366,10 @@
       this._attached_deferred.resolve();
     },
 
-    init_no_results_message: function () {
+    initNoResultsMessage: function () {
       var self = this;
       var context = new can.Map({
-        text: 'No results match your filter criteria'
+        text: 'No results, please check your filter criteria'
       });
       var html = can.mustache('<tree-no-results/>')(context);
 
@@ -395,7 +395,7 @@
           can.view(this.options.header_view, optionsDfd).then(
             this._ifNotRemoved(function (frag) {
               this.element.before(frag);
-              this.init_no_results_message();
+              this.initNoResultsMessage();
               can.bind.call(this.element.parent()
                   .find('.widget-col-title[data-field]'),
                 'click',
