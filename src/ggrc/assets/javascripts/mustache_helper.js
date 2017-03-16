@@ -2631,25 +2631,25 @@ Mustache.registerHelper("fadeout", function (delay, prop, options) {
       );
     });
 
-Mustache.registerHelper("is_overdue", function (_date, status, options) {
-  var resolvedDate = resolve_computed(_date);
-  var hashDueDate = resolve_computed(options.hash && options.hash.next_date);
-  var nextDueDate = moment(hashDueDate || resolvedDate);
-  var endDate = moment(resolvedDate);
-  var date = moment.min(nextDueDate, endDate);
-  var today = moment().startOf('day');
-  var startOfDate = moment(date).startOf('day');
-  var isBefore = date && today.diff(startOfDate, 'days') >= 0;
-  options = arguments.length === 2 ? arguments[1] : options;
-  status = arguments.length === 2 ? "" : resolve_computed(status);
-  // TODO: [Overdue] Move this logic to helper.
-  if (status !== 'Verified' && isBefore) {
-    return options.fn(options.contexts);
-  }
-  else {
-    return options.inverse(options.contexts);
-  }
-});
+  Mustache.registerHelper('is_overdue', function (_date, status, options) {
+    var resolvedDate = resolve_computed(_date);
+    var opts = arguments[arguments.length - 1];
+    var hashDueDate = resolve_computed(opts.hash && opts.hash.next_date);
+    var nextDueDate = moment(hashDueDate || resolvedDate);
+    var endDate = moment(resolvedDate);
+    var date = moment.min(nextDueDate, endDate);
+    var today = moment().startOf('day');
+    var startOfDate = moment(date).startOf('day');
+    var isBefore = date && today.diff(startOfDate, 'days') >= 0;
+    var result;
+    status = arguments.length === 2 ? '' : resolve_computed(status);
+    if (status !== 'Verified' && isBefore) {
+      result = opts.fn(opts.contexts);
+    } else {
+      result = opts.inverse(opts.contexts);
+    }
+    return result;
+  });
 
 Mustache.registerHelper("with_mappable_instances_as", function (name, list, options) {
   var ctx = new can.Observe()
