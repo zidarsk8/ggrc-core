@@ -118,8 +118,8 @@ class TestAuditPage(base.Test):
       self, new_control_rest, new_program_rest, map_control_to_program_rest,
       new_audit_rest, update_control_rest, selenium
   ):
-    """Check via UI that Audit contains snapshotable Control
-    that equal to original Control under Program
+    """Check via UI that Audit contains snapshotable Control that equal to
+    original Control under Program
     after updated original Control via REST API.
     Preconditions:
     - Program, Control created via REST API.
@@ -136,6 +136,26 @@ class TestAuditPage(base.Test):
         source_obj=audit)
     assert [expected_control] == actual_controls, (
         messages.ERR_MSG_FORMAT.format([expected_control], actual_controls))
+
+  @pytest.mark.smoke_tests
+  def test_audit_contains_readonly_ver_of_control(
+      self, new_control_rest, new_program_rest, map_control_to_program_rest,
+      new_audit_rest, selenium
+  ):
+    """Check via UI that Audit contains read only Control.
+    Preconditions:
+    - Program, Control created via REST API.
+    - Control mapped to Program via REST API.
+    - Audit created under Program via REST API.
+    """
+    audit, _ = new_audit_rest
+    actual_controls_tab_count = ControlsService(selenium).get_count_from_tab(
+        source_obj=audit)
+    assert len([new_control_rest]) == actual_controls_tab_count
+    is_control_editable = (
+        ControlsService(selenium).is_editable_via_info_panel(
+            source_obj=audit, control_obj=new_control_rest))
+    assert is_control_editable is False
 
   @pytest.mark.smoke_tests
   def test_update_snapshotable_ver_of_control(
