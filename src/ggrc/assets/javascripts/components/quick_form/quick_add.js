@@ -93,10 +93,14 @@
         var created_dfd;
         var verify_dfd = $.Deferred();
         scope.attr('disabled', true);
-        scope.attr('modal_description',
-          this.element.context.attributes.modal_description.value);
         scope.attr('verify_event',
           !!this.element.context.attributes.verify_event);
+
+        // Update modal description only if verification is needed
+        if (this.element.context.attributes.modal_description) {
+          scope.attr('modal_description',
+            this.element.context.attributes.modal_description.value);
+        }
 
         if (scope.attr("verify_event")) {
           GGRC.Controllers.Modals.confirm({
