@@ -3,6 +3,8 @@
 
 """Manage indexing for snapshotter service"""
 
+import logging
+
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
@@ -15,6 +17,9 @@ from ggrc.utils import generate_query_chunks
 
 from ggrc.snapshotter.rules import Types
 from ggrc.snapshotter.datastructures import Pair
+
+
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 def _get_tag(pair):
@@ -248,7 +253,7 @@ def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
       multiple_person_properties = {"owners"}
 
       for prop, val in properties.items():
-        if prop and val:
+        if prop and val is not None:
           # record stub
           rec = {
               "key": snapshot_id,
@@ -267,8 +272,19 @@ def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
             for person in val:
               search_payload += get_person_data(rec, person)
             search_payload += get_person_sort_subprop(rec, val)
-          else:
+          elif isinstance(val, dict) and "title" in val:
+            rec["content"] = val["title"]
             search_payload += [rec]
+          elif isinstance(val, (bool, int, long)):
+            rec["content"] = unicode(val)
+            search_payload += [rec]
+          else:
+            if isinstance(rec["content"], basestring):
+              search_payload += [rec]
+            else:
+              logger.warning(u"Unsupported value for %s #%s in %s %s: %r",
+                             rec["type"], rec["key"], rec["property"],
+                             rec["subproperty"], rec["content"])
 
     delete_records(snapshot_ids)
     insert_records(search_payload)
