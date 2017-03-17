@@ -27,7 +27,6 @@ permissions = {
         "Request",
         "Assessment",
         "Issue",
-        "Relationship",
         "Comment",
     ],
     "view_object_page": [
