@@ -2,7 +2,7 @@
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-{{#items}}
+{{#each visibleItems}}
     <ca-object class="flex-box flex-row" {value-id}="id" {def}="def" {(value)}="attribute_value"
                {(modal})="modal" {type}="attributeType" {validation}="validation">
         <i class="fa validation-icon {{iconCls}}"></i>
@@ -44,7 +44,12 @@
             </ca-object-value-mapper>
         </div>
     </ca-object>
-{{/items}}
+{{/each}}
+{{#if isOverLimit}}
+  <div class="flex-box flex-row limit-button-container">
+    <button class="btn btn-link" ($click)="toggleShowAll()">{{showAllButtonText}}</button>
+  </div>
+{{/if}}
 <simple-modal {(state)}="modal.state" {modal-title}="modal.modalTitle" {instance}="instance">
     <ca-object-modal-content content="modal.content" state="state" {ca-ids}="modal.caIds"></ca-object-modal-content>
 </simple-modal>
