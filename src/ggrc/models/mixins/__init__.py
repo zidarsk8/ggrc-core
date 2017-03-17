@@ -67,6 +67,7 @@ class Identifiable(object):
 
   @classmethod
   def eager_inclusions(cls, query, include_links):
+    """Load related items listed in include_links eagerly."""
     options = []
     for include_link in include_links:
       inclusion_class = getattr(cls, include_link).property.mapper.class_
@@ -105,10 +106,12 @@ class ChangeTracked(object):
   """
   @declared_attr
   def modified_by_id(cls):
+    """Id of user who did the last modification of the object."""
     return deferred(db.Column(db.Integer), cls.__name__)
 
   @declared_attr
   def created_at(cls):
+    """Date of creation. Set to current time on object creation."""
     column = db.Column(
         db.DateTime,
         nullable=False,
@@ -118,6 +121,7 @@ class ChangeTracked(object):
 
   @declared_attr
   def updated_at(cls):
+    """Date of last update. Set to current time on object creation/update."""
     column = db.Column(
         db.DateTime,
         nullable=False,
@@ -128,6 +132,7 @@ class ChangeTracked(object):
 
   @declared_attr
   def modified_by(cls):
+    """Relationship to user referenced by modified_by_id."""
     return db.relationship(
         'Person',
         primaryjoin='{0}.modified_by_id == Person.id'.format(cls.__name__),
@@ -136,9 +141,10 @@ class ChangeTracked(object):
     )
 
   @staticmethod
-  def _extra_table_args(cls):
+  def _extra_table_args(model):
+    """Apply extra table args (like indexes) to model definition."""
     return (
-        db.Index('ix_{}_updated_at'.format(cls.__tablename__), 'updated_at'),
+        db.Index('ix_{}_updated_at'.format(model.__tablename__), 'updated_at'),
     )
 
   # TODO Add a transaction id, this will be handy for generating etags
@@ -161,6 +167,10 @@ class ChangeTracked(object):
 
 
 class Titled(object):
+  """Mixin that defines `title` field.
+
+  Strips title on update and defines optional UNIQUE constraint on it.
+  """
 
   @validates('title')
   def validate_title(self, key, value):
@@ -173,11 +183,12 @@ class Titled(object):
     return deferred(db.Column(db.String, nullable=False), cls.__name__)
 
   @staticmethod
-  def _extra_table_args(cls):
-    if getattr(cls, '_title_uniqueness', True):
+  def _extra_table_args(model):
+    """If model._title_uniqueness is set, apply UNIQUE constraint to title."""
+    if getattr(model, '_title_uniqueness', True):
       return (
           db.UniqueConstraint(
-              'title', name='uq_t_{}'.format(cls.__tablename__)),
+              'title', name='uq_t_{}'.format(model.__tablename__)),
       )
     return ()
 
@@ -189,6 +200,7 @@ class Titled(object):
 
 
 class Described(object):
+  """Mixin that defines `description` field."""
 
   @declared_attr
   def description(cls):
@@ -202,6 +214,7 @@ class Described(object):
 
 
 class Noted(object):
+  """Mixin that defines `notes` field."""
 
   @declared_attr
   def notes(cls):
@@ -215,6 +228,7 @@ class Noted(object):
 
 
 class Hyperlinked(object):
+  """Mixin that defines `url` and `reference_url` fields."""
 
   @declared_attr
   def url(cls):
@@ -238,6 +252,7 @@ class Hyperlinked(object):
 
 
 class Hierarchical(object):
+  """Mixin that defines `parent` and `child` fields to organize hierarchy."""
 
   @declared_attr
   def parent_id(cls):
@@ -273,6 +288,7 @@ class Hierarchical(object):
 
 
 class Timeboxed(object):
+  """Mixin that defines `start_date` and `end_date` fields."""
 
   @declared_attr
   def start_date(cls):
@@ -297,6 +313,10 @@ class Timeboxed(object):
 
 
 class Stateful(object):
+  """Mixin that defines `status` field and status validation logic.
+
+  TODO: unify with Statusable.
+  """
 
   @declared_attr
   def status(cls):
@@ -322,6 +342,7 @@ class Stateful(object):
 
   @validates('status')
   def validate_status(self, key, value):
+    """Use default status if value is None, check that it is in valid set."""
     # Sqlalchemy only uses one validator per status (not necessarily the
     # first) and ignores others. This enables cooperation between validators
     # since there are other mixins that want to touch 'status'.
@@ -445,6 +466,7 @@ class VerifiedDate(object):
 
 
 class ContextRBAC(object):
+  """Defines `context` relationship for Context-based access control."""
 
   @declared_attr
   def context_id(cls):
@@ -455,9 +477,9 @@ class ContextRBAC(object):
     return db.relationship('Context', uselist=False)
 
   @staticmethod
-  def _extra_table_args(cls):
+  def _extra_table_args(model):
     return (
-        db.Index('fk_{}_contexts'.format(cls.__tablename__), 'context_id'),
+        db.Index('fk_{}_contexts'.format(model.__tablename__), 'context_id'),
     )
 
   _publish_attrs = ['context']
@@ -509,22 +531,38 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
         'href': u"/api/people/{}".format(id_),
     }
 
-  def log_json(self):
-    # to integrate with CustomAttributable without order dependencies
-    from ggrc import models
+  def log_json_base(self):
+    """Get a dict with attributes of self that is easy to serialize to json.
 
-    res = getattr(super(Base, self), "log_json", lambda: {})()
+    This method lists only first-class attributes.
+    """
+    res = {}
+
     for column in self.__table__.columns:
       try:
         res[column.name] = getattr(self, column.name)
       except AttributeError:
         pass
-    res['display_name'] = self.display_name
+    res["display_name"] = self.display_name
+
+    return res
+
+  def log_json(self):
+    """Get a dict with attributes and related objects of self.
+
+    This method converts additionally person-mapping attributes and owners
+    to person stubs.
+    """
+    from ggrc import models
+
+    res = self.log_json_base()
 
     for attr in self._people_log_mappings:
       if hasattr(self, attr):
         value = getattr(self, attr)
+        # hardcoded [:-3] is used to strip "_id" suffix
         res[attr[:-3]] = self._person_stub(value) if value else None
+
     if hasattr(self, "owners"):
       res["owners"] = [
           self._person_stub(owner.id) for owner in self.owners if owner
@@ -590,10 +628,11 @@ class Slugged(Base):
     return deferred(db.Column(db.String, nullable=False), cls.__name__)
 
   @staticmethod
-  def _extra_table_args(cls):
-    if getattr(cls, '_slug_uniqueness', True):
+  def _extra_table_args(model):
+    if getattr(model, '_slug_uniqueness', True):
       return (
-          db.UniqueConstraint('slug', name='uq_{}'.format(cls.__tablename__)),
+          db.UniqueConstraint('slug',
+                              name='uq_{}'.format(model.__tablename__)),
       )
     return ()
 
@@ -635,6 +674,7 @@ class Slugged(Base):
     """Set the slug to a default string so we don't run afoul of the NOT NULL
     constraint.
     """
+    # pylint: disable=unused-argument
     for o in session.new:
       if isinstance(o, Slugged) and (o.slug is None or o.slug == ''):
         o.slug = str(uuid1())
@@ -645,6 +685,7 @@ class Slugged(Base):
     """Replace the placeholder slug with a real slug that will be set on the
     next flush/commit.
     """
+    # pylint: disable=unused-argument
     for o in session.identity_map.values():
       if isinstance(o, Slugged) and hasattr(o, '_replace_slug'):
         o.generate_slug_for(o)
@@ -657,6 +698,7 @@ event.listen(
 
 
 class WithContact(object):
+  """Mixin that defines `contact` and `secondary_contact` fields."""
 
   @declared_attr
   def contact_id(cls):
@@ -683,11 +725,11 @@ class WithContact(object):
         foreign_keys='{}.secondary_contact_id'.format(cls.__name__))
 
   @staticmethod
-  def _extra_table_args(cls):
+  def _extra_table_args(model):
     return (
-        db.Index('fk_{}_contact'.format(cls.__tablename__), 'contact_id'),
+        db.Index('fk_{}_contact'.format(model.__tablename__), 'contact_id'),
         db.Index('fk_{}_secondary_contact'.format(
-            cls.__tablename__), 'secondary_contact_id'),
+            model.__tablename__), 'secondary_contact_id'),
     )
 
   _publish_attrs = ['contact', 'secondary_contact']
@@ -724,6 +766,7 @@ class WithContact(object):
 
 class BusinessObject(Stateful, Noted, Described, Hyperlinked, WithContact,
                      Titled, Slugged):
+  """Mixin that groups most commonly-used mixins into one."""
   VALID_STATES = (
       'Draft',
       'Active',
@@ -744,6 +787,7 @@ class BusinessObject(Stateful, Noted, Described, Hyperlinked, WithContact,
 
 
 class TestPlanned(object):
+  """Mixin that defines `test_plan` field."""
 
   @declared_attr
   def test_plan(cls):
