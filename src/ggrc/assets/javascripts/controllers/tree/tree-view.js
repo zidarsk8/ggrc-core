@@ -366,6 +366,20 @@
       this._attached_deferred.resolve();
     },
 
+    initNoResultsMessage: function () {
+      var self = this;
+      var context = new can.Map({
+        text: 'No results, please check your filter criteria'
+      });
+      var html = can.mustache('<tree-no-results/>')(context);
+
+      this.options.bind('paging.total', function () {
+        context.attr('show', !self.options.attr('paging.total'));
+      });
+
+      this.element.after(html);
+    },
+
     init_view: function () {
       var self = this;
       var dfds = [];
@@ -381,7 +395,7 @@
           can.view(this.options.header_view, optionsDfd).then(
             this._ifNotRemoved(function (frag) {
               this.element.before(frag);
-
+              this.initNoResultsMessage();
               can.bind.call(this.element.parent()
                   .find('.widget-col-title[data-field]'),
                 'click',
