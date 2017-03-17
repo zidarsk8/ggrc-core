@@ -56,6 +56,7 @@
         this.viewModel.setStyle(el);
       },
       '.object-popover-wrapper click': function (el, event) {
+        event.preventDefault();
         event.stopPropagation();
       },
       '{viewModel} expanded': function (scope, ev, isExpanded) {

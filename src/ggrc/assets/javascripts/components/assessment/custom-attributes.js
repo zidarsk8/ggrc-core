@@ -8,11 +8,17 @@
   var tpl = can.view(GGRC.mustache_path +
     '/components/assessment/custom-attributes.mustache');
 
-  can.Component.extend({
+  GGRC.Components('assessmentCustomAttributes', {
     tag: 'assessment-custom-attributes',
     template: tpl,
     viewModel: {
-      instance: null,
+      define: {
+        isLocked: {
+          type: 'htmlbool',
+          value: false
+        }
+      },
+      instance: {},
       modal: {
         open: false
       },
