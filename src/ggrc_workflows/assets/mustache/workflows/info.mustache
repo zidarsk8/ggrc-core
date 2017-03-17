@@ -103,7 +103,7 @@
           <div class="span9">
             <h6>Title</h6>
             <h3>{{title}}</h3>
-            <span class="state-value">{{status}}</span>
+            <span class="state-value {{addclass 'state-' status separator=''}}">{{status}}</span>
             {{#if type}}
             <p>
               {{type.title}}

@@ -27,6 +27,13 @@
       {{/using}}
     </span>
   {{/case}}
+  {{#case 'status'}}
+    {{#using status=instance.status}}
+      <span class="state-value-dot {{addclass 'state-' status separator=''}}">
+        {{status}}
+      </span>
+    {{/using}}
+  {{/case}}
 
   {{#default}}
     {{#if_helpers '\

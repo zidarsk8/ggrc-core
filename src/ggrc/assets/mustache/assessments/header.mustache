@@ -9,7 +9,7 @@ Copyright (C) 2017 Google Inc.
             <h6>title</h6>
             <div class="pane-header__title">
                 <h3>{{title}}</h3>
-                  <span class="state-value">{{status}}</span>
+                  <span class="state-value {{addclass 'state-' status separator=''}}">{{status}}</span>
                   {{#if verified}}
                     <i class="fa fa-check-circle green"
                       rel="tooltip"

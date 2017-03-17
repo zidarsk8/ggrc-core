@@ -13,7 +13,7 @@
         and ^if' instance.verified}}
           {{! don't show status, because it will be replaced soon }}
       {{else}}
-        <span class="state-value">{{status}}</span>
+        <span class="state-value {{addclass 'state-' status separator=''}}">{{status}}</span>
       {{/if_helpers}}
       <span class="gray">
         {{#if request_type}}

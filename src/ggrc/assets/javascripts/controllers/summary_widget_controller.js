@@ -11,11 +11,11 @@
       widget_view: GGRC.mustache_path + '/base_objects/summary.mustache',
       isLoading: true,
       colorsMap: {
-        Completed: '#8bc34a',
-        Verified: '#333',
-        'In Progress': '#ffab40',
-        'Not Started': '#bdbdbd',
-        'Ready for Review': '#1378bb'
+        Completed: '#405f77',
+        Verified: '#009925',
+        'In Progress': '#3369e8',
+        'Not Started': '#9e9e9e',
+        'Ready for Review': '#ff9100'
       },
       chartOptions: {
         pieSliceText: 'value-and-percentage',
