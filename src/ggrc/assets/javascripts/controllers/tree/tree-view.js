@@ -410,14 +410,11 @@
                 .find('.tree-filter__status-wrap');
               // set state filter (checkboxes)
               can.bind.call(statusControl.ready(function () {
-                var unwrappedStates = self.options.attr('selectStateList')
-                  .map(function (state) {
-                    return state.replace(/"/g, '');
-                  });
+                var selectStateList = self.options.attr('selectStateList');
 
-                var checkAll = unwrappedStates.length === 0;
+                var checkAll = selectStateList.length === 0;
                 self.options.attr('filter_states').forEach(function (item) {
-                  if (checkAll || unwrappedStates.indexOf(item.value) > -1) {
+                  if (checkAll || selectStateList.indexOf(item.value) > -1) {
                     item.attr('checked', true);
                   }
                 });
@@ -1174,10 +1171,8 @@
         return;
       }
 
-      selectedStates.forEach(function (state) {
-        // wrap in quotes
-        var value = '"' + state.value + '"';
-        stateToSave.push(value);
+      stateToSave = selectedStates.map(function (state) {
+        return state.value;
       });
 
       this.options.attr('selectStateList', stateToSave);
