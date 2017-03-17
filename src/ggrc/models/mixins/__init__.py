@@ -421,6 +421,7 @@ class VerifiedDate(object):
 
   _fulltext_attrs = [
       "verified_date",
+      "verified",
   ]
 
   @validates('status')

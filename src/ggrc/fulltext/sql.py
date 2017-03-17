@@ -13,7 +13,7 @@ class SqlIndexer(Indexer):
     with benchmark("Add fulltext records: create_record -> submit to db"):
       for prop, value in record.properties.items():
         for subproperty, content in value.items():
-          if content:
+          if content is not None:
             db.session.add(self.record_type(
                 key=record.key,
                 type=record.type,
