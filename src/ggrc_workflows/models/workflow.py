@@ -267,7 +267,6 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
 
     # add fulltext entries
     get_indexer().create_record(fts_record_for(backlog_workflow))
-    get_indexer().create_record(fts_record_for(backlog_cycle))
     return "Backlog workflow created"
 
 
