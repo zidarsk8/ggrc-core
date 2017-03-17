@@ -2,52 +2,58 @@
 -# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 %h1.entities
-
-  %span.title-content
-    -if request.path.startswith('/admin')
-      %i.fa.fa-tachometer
-      Admin Dashboard
+  -if request.path.startswith('/admin')
+    Admin Dashboard
 
 %ul.menu
   %li
-    %a{ 'href': 'javascript://', 'data-toggle': 'unified-search', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
+    %a{ 'href': 'javascript://', 'class': 'btn btn-small btn-info search', 'data-toggle': 'unified-search', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
       %i.fa.fa-search
       %span
-        Search
+        Global Search
   %li
-    %a#page-help{ 'href': "/dashboard#task_widget" }
+    %a{ 'href': "/dashboard#task_widget" }
       %i.fa.fa-calendar-check-o
       %span
         My Tasks
         %span.task-count
   %li
+    %a{ 'href': '/assessments_view' }
+      %i.fa.fa-assessment
+      %span
+        My Assessments
+  %li
     %a{ 'href': '/objectBrowser#regulation_widget' }
       %i.fa.fa-search
       %span
         All Objects
+  %li
+    %a{ 'href': '/import', 'target': '_blank' }
+      %i.fa.fa-sign-in
+      %span
+        Import
+  %li
+    %a{ 'href': '/export', 'target': '_blank' }
+      %i.fa.fa-sign-out
+      %span
+        Export
 
   %li.user.dropdown
     %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
       %i.fa.fa-user
-      %span
-        =current_user.email
       %i.fa.fa-caret-down
     %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
-      %li.full-opacity
-        %a{'href': "/dashboard"}
-          %i.fa.fa-home
-          My Work ({{current_user.system_wide_role}})
+      %li{'class': 'user-email'}
+        %span
+          =current_user.email
 
-      %li
-        %a{'href': "/assessments_view"}
-          %i.fa.fa-assessment
-          My Assessments
-
-      -if permissions.is_allowed_read('/admin', None, 1)
+      -if self.page_help
         %li
-          %a{'href': "/admin#people_list_widget"}
-            %i.fa.fa-tachometer
-            Admin Dashboard
+        %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
+          %i.fa.fa-question-circle
+            %span
+              Help
+
       %li.notify-wrap
         %span
           %i.fa.fa-clock-o
@@ -61,19 +67,6 @@
             }
             Daily email digest
       %li
-        %a{'href': "/import"}
-          Data import
-      %li
-        %a{'href': "/export"}
-          Data export
-      %li
         %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
           %i.fa.fa-power-off
           Logout
-
-  -if self.page_help
-    %li
-      %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
-        %i.fa.fa-question-circle
-          %span
-            Help

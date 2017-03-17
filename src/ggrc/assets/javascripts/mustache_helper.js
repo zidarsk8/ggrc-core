@@ -1709,26 +1709,30 @@ Mustache.registerHelper("global_count", function (model_type, options) {
   }
 });
 
-Mustache.registerHelper("is_dashboard", function (options) {
-  if (/dashboard/.test(window.location))
-    return options.fn(options.contexts);
-  else
-    return options.inverse(options.contexts);
-});
+  Mustache.registerHelper('is_dashboard', function (options) {
+    return /dashboard/.test(window.location) ?
+      options.fn(options.contexts) :
+      options.inverse(options.contexts);
+  });
 
-Mustache.registerHelper("is_allobjectview", function (options) {
-  if (/objectBrowser/.test(window.location))
-    return options.fn(options.contexts);
-  else
-    return options.inverse(options.contexts);
-});
+  Mustache.registerHelper('is_allobjectview', function (options) {
+    return /objectBrowser/.test(window.location) ?
+      options.fn(options.contexts) :
+      options.inverse(options.contexts);
+  });
 
-Mustache.registerHelper("is_dashboard_or_all", function (options) {
-  if (/dashboard/.test(window.location) || /objectBrowser/.test(window.location))
-    return options.fn(options.contexts);
-  else
-    return options.inverse(options.contexts);
-});
+  Mustache.registerHelper('is_dashboard_or_all', function (options) {
+    return (/dashboard/.test(window.location) ||
+    /objectBrowser/.test(window.location)) ?
+      options.fn(options.contexts) :
+      options.inverse(options.contexts);
+  });
+
+  Mustache.registerHelper('isMyAssessments', function (options) {
+    return GGRC.Utils.CurrentPage.isMyAssessments() ?
+      options.fn(options.contexts) :
+      options.inverse(options.contexts);
+  });
 
 Mustache.registerHelper("is_profile", function (parent_instance, options) {
   var instance;
