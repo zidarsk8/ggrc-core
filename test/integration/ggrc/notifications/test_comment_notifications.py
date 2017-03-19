@@ -14,6 +14,7 @@ from ggrc.models import NotificationType
 from ggrc.models import Revision
 from integration.ggrc import TestCase
 from integration.ggrc import generator
+from integration.ggrc.models import factories
 
 
 class TestCommentNotification(TestCase):
@@ -79,6 +80,7 @@ class TestCommentNotification(TestCase):
     posted.
     """
 
+    factories.AuditFactory(slug="Audit")
     self.import_file("assessment_with_templates.csv")
     asmt1 = Assessment.query.filter_by(slug="A 1").first()
     _, comment = self.generator.generate_comment(

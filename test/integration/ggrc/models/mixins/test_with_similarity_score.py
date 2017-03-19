@@ -57,16 +57,17 @@ class TestWithSimilarityScore(TestCase):
     Returns: the six generated assessments and their weights in a dict.
     """
 
-    assessments = [factories.AssessmentFactory()
-                   for _ in range(len(assessment_mappings))]
-    for assessment, all_mappings in zip(assessments, assessment_mappings):
+    assessments = []
+    for all_mappings in assessment_mappings:
       audit = [x for x in all_mappings if x.type == "Audit"][0]
+      assessment = factories.AssessmentFactory(audit=audit)
       mappings = all_mappings[1:]
       ordinary_mappings = [x for x in mappings if x.type not in Types.all]
       snapshot_mappings = [x for x in mappings if x.type in Types.all]
       self.make_relationships(assessment, [audit] + ordinary_mappings)
       self.make_scope_relationships(assessment, audit,
                                     snapshot_mappings)
+      assessments.append(assessment)
 
     return assessments
 
@@ -441,9 +442,9 @@ class TestWithSimilarityScore(TestCase):
   def test_asmt_issue_similarity(self):
     """Test Issues related to assessments."""
     audit = factories.AuditFactory()
-    assessment1 = factories.AssessmentFactory()
-    assessment2 = factories.AssessmentFactory()
-    issue = factories.IssueFactory()
+    assessment1 = factories.AssessmentFactory(audit=audit)
+    assessment2 = factories.AssessmentFactory(audit=audit)
+    issue = factories.IssueFactory(audit=audit)
     control = factories.ControlFactory()
 
     snapshot = factories.SnapshotFactory(

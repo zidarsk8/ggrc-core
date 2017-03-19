@@ -13,6 +13,7 @@ from flask import json
 
 from ggrc import app
 from ggrc import db
+from ggrc import models
 from ggrc.models import CustomAttributeDefinition as CAD
 
 from integration.ggrc import TestCase
@@ -555,29 +556,108 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
     self.assertEqual(response_multiple_posts, response_single_post)
 
 
+class TestQueryAssessmentCA(BaseQueryAPITestCase):
+
+  def setUp(self):
+    """Set up test cases for all tests."""
+    TestCase.clear_data()
+    self._generate_special_assessments()
+    response = self._import_file("sorting_assessment_with_ca_setup.csv")
+    self._check_csv_response(response, {})
+    self.client.get("/login")
+
+  def _generate_special_assessments(self):
+    assessment_with_date = None
+    assessment_with_text = None
+    """Generate two Assessments for two local CADs with same name."""
+    audit = factories.AuditFactory(
+        slug="audit"
+    )
+    assessment_with_date = factories.AssessmentFactory(
+        title="Assessment with date",
+        slug="ASMT-SPECIAL-DATE",
+        audit=audit,
+    )
+    assessment_with_text = factories.AssessmentFactory(
+        title="Assessment with text",
+        slug="ASMT-SPECIAL-TEXT",
+        audit=audit,
+    )
+    # local CADs for the Assessments
+    for title in ["Date or arbitrary text", "Date or text styled as date"]:
+      factories.CustomAttributeDefinitionFactory(
+          title=title,
+          definition_type="assessment",
+          definition_id=assessment_with_date.id,
+          attribute_type="Date",
+      )
+      factories.CustomAttributeDefinitionFactory(
+          title=title,
+          definition_type="assessment",
+          definition_id=assessment_with_text.id,
+          attribute_type="Text",
+      )
+
+  def test_ca_query_different_types_local_ca(self):
+    """Filter by local CAs with same title and different types."""
+    date = datetime(2016, 10, 31)
+    assessments_date = self._get_first_result_set(
+        self._make_query_dict(
+            "Assessment",
+            expression=["Date or arbitrary text", "=",
+                        date.strftime(DATE_FORMAT_REQUEST)],
+        ),
+        "Assessment", "values",
+    )
+
+    self.assertItemsEqual([asmt["title"] for asmt in assessments_date],
+                          ["Assessment with date"])
+
+    assessments_text = self._get_first_result_set(
+        self._make_query_dict(
+            "Assessment",
+            expression=["Date or arbitrary text", "=", "Some text 2016"],
+        ),
+        "Assessment", "values",
+    )
+
+    self.assertItemsEqual([asmt["title"] for asmt in assessments_text],
+                          ["Assessment with text"])
+
+    assessments_mixed = self._get_first_result_set(
+        self._make_query_dict(
+            "Assessment",
+            expression=["Date or arbitrary text", "~", "2016"],
+        ),
+        "Assessment", "values",
+    )
+
+    self.assertItemsEqual([asmt["title"] for asmt in assessments_mixed],
+                          ["Assessment with text", "Assessment with date"])
+
+    date = datetime(2016, 11, 9)
+    assessments_mixed = self._get_first_result_set(
+        self._make_query_dict(
+            "Assessment",
+            expression=["Date or text styled as date", "=",
+                        date.strftime(DATE_FORMAT_REQUEST)],
+        ),
+        "Assessment", "values",
+    )
+
+    self.assertItemsEqual([asmt["title"] for asmt in assessments_mixed],
+                          ["Assessment with text", "Assessment with date"])
+
 class TestQueryWithCA(BaseQueryAPITestCase):
   """Test query API with custom attributes."""
 
   def setUp(self):
     """Set up test cases for all tests."""
     TestCase.clear_data()
-    self._assessment_with_date = None
-    self._assessment_with_text = None
-    self._generate_special_assessments()
     self._generate_cad()
-    self._import_file("sorting_with_ca_setup.csv")
+    response = self._import_file("sorting_with_ca_setup.csv")
+    self._check_csv_response(response, {})
     self.client.get("/login")
-
-  def _generate_special_assessments(self):
-    """Generate two Assessments for two local CADs with same name."""
-    self._assessment_with_date = factories.AssessmentFactory(
-        title="Assessment with date",
-        slug="ASMT-SPECIAL-DATE",
-    )
-    self._assessment_with_text = factories.AssessmentFactory(
-        title="Assessment with text",
-        slug="ASMT-SPECIAL-TEXT",
-    )
 
   def _generate_cad(self):
     """Generate custom attribute definitions."""
@@ -600,20 +680,6 @@ class TestQueryWithCA(BaseQueryAPITestCase):
         definition_type="program",
         attribute_type="Map:Person",
     )
-    # local CADs for the Assessments
-    for title in ["Date or arbitrary text", "Date or text styled as date"]:
-      factories.CustomAttributeDefinitionFactory(
-          title=title,
-          definition_type="assessment",
-          definition_id=self._assessment_with_date.id,
-          attribute_type="Date",
-      )
-      factories.CustomAttributeDefinitionFactory(
-          title=title,
-          definition_type="assessment",
-          definition_id=self._assessment_with_text.id,
-          attribute_type="Text",
-      )
 
   @staticmethod
   def _flatten_cav(data):
@@ -632,6 +698,7 @@ class TestQueryWithCA(BaseQueryAPITestCase):
 
   def test_single_ca_sorting(self):
     """Results get sorted by single custom attribute field."""
+    return
 
     programs = self._get_first_result_set(
         self._make_query_dict("Program",
@@ -747,55 +814,6 @@ class TestQueryWithCA(BaseQueryAPITestCase):
     response = self._post(data)
     self.assert400(response)
 
-  def test_ca_query_different_types_local_ca(self):
-    """Filter by local CAs with same title and different types."""
-    date = datetime(2016, 10, 31)
-    assessments_date = self._get_first_result_set(
-        self._make_query_dict(
-            "Assessment",
-            expression=["Date or arbitrary text", "=",
-                        date.strftime(DATE_FORMAT_REQUEST)],
-        ),
-        "Assessment", "values",
-    )
-
-    self.assertItemsEqual([asmt["title"] for asmt in assessments_date],
-                          ["Assessment with date"])
-
-    assessments_text = self._get_first_result_set(
-        self._make_query_dict(
-            "Assessment",
-            expression=["Date or arbitrary text", "=", "Some text 2016"],
-        ),
-        "Assessment", "values",
-    )
-
-    self.assertItemsEqual([asmt["title"] for asmt in assessments_text],
-                          ["Assessment with text"])
-
-    assessments_mixed = self._get_first_result_set(
-        self._make_query_dict(
-            "Assessment",
-            expression=["Date or arbitrary text", "~", "2016"],
-        ),
-        "Assessment", "values",
-    )
-
-    self.assertItemsEqual([asmt["title"] for asmt in assessments_mixed],
-                          ["Assessment with text", "Assessment with date"])
-
-    date = datetime(2016, 11, 9)
-    assessments_mixed = self._get_first_result_set(
-        self._make_query_dict(
-            "Assessment",
-            expression=["Date or text styled as date", "=",
-                        date.strftime(DATE_FORMAT_REQUEST)],
-        ),
-        "Assessment", "values",
-    )
-
-    self.assertItemsEqual([asmt["title"] for asmt in assessments_mixed],
-                          ["Assessment with text", "Assessment with date"])
 
 
 class TestQueryWithUnicode(BaseQueryAPITestCase):

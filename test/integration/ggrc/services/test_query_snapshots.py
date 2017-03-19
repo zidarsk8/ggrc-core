@@ -156,6 +156,7 @@ class TestAuditSnapshotQueries(TestCase):
         # pylint: disable=protected-access
         obj = factory(
             title="{} {}".format(factory._meta.model.__name__, i + 1),
+            audit=audit,
         )
         factories.RelationshipFactory(
             source=audit if i % 2 == 0 else obj,
