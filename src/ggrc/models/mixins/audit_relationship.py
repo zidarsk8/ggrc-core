@@ -19,7 +19,6 @@ class AuditRelationship(object):
           "mandatory": True,
           "filter_by": "_filter_by_audit",
           "ignore_on_update": True,
-          "type": reflection.AttributeInfo.Type.MAPPING,
       },
   }
 
