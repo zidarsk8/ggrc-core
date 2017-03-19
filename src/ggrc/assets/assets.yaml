@@ -384,7 +384,6 @@ dashboard-js-template-files:
   - controls/tree.mustache
   - controls/tree-item-attr.mustache
   - assessments/modal_content.mustache
-  - assessments/tree.mustache
   - assessments/tree_header.mustache
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
