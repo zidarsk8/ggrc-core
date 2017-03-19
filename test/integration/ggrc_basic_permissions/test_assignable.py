@@ -10,6 +10,7 @@ from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import Generator
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc.models import factories
 
 
 class TestReader(TestCase):
@@ -17,6 +18,7 @@ class TestReader(TestCase):
 
   def setUp(self):
     super(TestReader, self).setUp()
+    self.audit_id = factories.AuditFactory().id
     self.generator = Generator()
     self.api = Api()
     self.object_generator = ObjectGenerator()
@@ -40,6 +42,10 @@ class TestReader(TestCase):
         "assessment": {
             "title": "Assessment",
             "context": None,
+            "audit":{
+                "id": self.audit_id,
+                "type": "Audit"
+            }
         }
     })
     obj_id = response.json.get("assessment").get("id")
