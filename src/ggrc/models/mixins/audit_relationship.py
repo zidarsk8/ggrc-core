@@ -3,7 +3,6 @@
 
 """Module for direct audit relationships mixin."""
 
-from ggrc.models import reflection
 from ggrc.models.audit import Audit
 from ggrc.models.relationship import Relationship
 

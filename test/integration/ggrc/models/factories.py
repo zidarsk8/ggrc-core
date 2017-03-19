@@ -131,7 +131,6 @@ class AssessmentFactory(TitledFactory):
   audit = factory.LazyAttribute(lambda m: AuditFactory())
 
 
-
 class ControlCategoryFactory(ModelFactory):
 
   class Meta:

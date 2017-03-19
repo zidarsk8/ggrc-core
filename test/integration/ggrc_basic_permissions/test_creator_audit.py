@@ -145,9 +145,9 @@ class TestCreatorAudit(TestCase):
     # Create a program
     dummy_audit = factories.AuditFactory()
     unrelated_audit = {
-      "type": "Audit",
-      "context_id": dummy_audit.context.id,
-      "id": dummy_audit.id,
+        "type": "Audit",
+        "context_id": dummy_audit.context.id,
+        "id": dummy_audit.id,
     }
     test_case = self.test_cases[test_case_name]
     editor = self.people.get('editor')

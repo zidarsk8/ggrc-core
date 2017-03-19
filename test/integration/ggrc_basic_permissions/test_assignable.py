@@ -42,7 +42,7 @@ class TestReader(TestCase):
         "assessment": {
             "title": "Assessment",
             "context": None,
-            "audit":{
+            "audit": {
                 "id": self.audit_id,
                 "type": "Audit"
             }
@@ -67,7 +67,7 @@ class TestReader(TestCase):
         }, "context": None},
     })
 
-  def test_basic_operations_with_no_assignee(self):
+  def test_basic_with_no_assignee(self):
     """Editor creates an Assessment, but doesn't assign Reader/Creator as
        assignee. Reader should have Read access, Creator should have no access
     """
@@ -90,7 +90,7 @@ class TestReader(TestCase):
     response = self._post_relationship(self.users["reader"], self.obj.id)
     self.assertEqual(response.status_code, 403)
 
-  def test_basic_operations_with_assignee(self):
+  def test_basic_with_assignee(self):
     """Test if Reader/Creator have CRUD access once they become assignees"""
 
     # Admin adds reader as an assignee
@@ -119,7 +119,7 @@ class TestReader(TestCase):
     response = self._post_relationship(self.users["admin"], self.obj.id)
     self.assertEqual(response.status_code, 201)
 
-  def test_readability_of_mapped_objects(self):
+  def test_read_of_mapped_objects(self):
     """Test if assignees get Read access on all mapped objects"""
 
     # Editor creates a System object and maps it to the assignable object

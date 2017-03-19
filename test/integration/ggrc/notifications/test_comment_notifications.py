@@ -83,7 +83,7 @@ class TestCommentNotification(TestCase):
     factories.AuditFactory(slug="Audit")
     self.import_file("assessment_with_templates.csv")
     asmt1 = Assessment.query.filter_by(slug="A 1").first()
-    _, comment = self.generator.generate_comment(
+    self.generator.generate_comment(
         asmt1, "Verifier", "some comment", send_notification="true")
 
     notifications = self._get_notifications(notif_type="comment_created").all()

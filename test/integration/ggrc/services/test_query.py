@@ -13,7 +13,6 @@ from flask import json
 
 from ggrc import app
 from ggrc import db
-from ggrc import models
 from ggrc.models import CustomAttributeDefinition as CAD
 
 from integration.ggrc import TestCase
@@ -648,6 +647,7 @@ class TestQueryAssessmentCA(BaseQueryAPITestCase):
     self.assertItemsEqual([asmt["title"] for asmt in assessments_mixed],
                           ["Assessment with text", "Assessment with date"])
 
+
 class TestQueryWithCA(BaseQueryAPITestCase):
   """Test query API with custom attributes."""
 
@@ -813,7 +813,6 @@ class TestQueryWithCA(BaseQueryAPITestCase):
     )
     response = self._post(data)
     self.assert400(response)
-
 
 
 class TestQueryWithUnicode(BaseQueryAPITestCase):

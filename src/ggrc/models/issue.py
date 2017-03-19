@@ -1,6 +1,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Issue Model."""
+
 from ggrc import db
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.mixins import (
@@ -17,12 +19,13 @@ from ggrc.models.track_object_state import HasObjectState
 class Issue(HasObjectState, TestPlanned, CustomAttributable, EvidenceURL,
             Personable, Timeboxed, Ownable, Relatable, AuditRelationship,
             BusinessObject, db.Model):
+  """Issue Model."""
 
   __tablename__ = 'issues'
 
   # REST properties
   _publish_attrs = [
-    "audit"
+      "audit"
   ]
 
   _aliases = {"url": "Issue URL"}
