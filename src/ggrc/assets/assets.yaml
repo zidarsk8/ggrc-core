@@ -299,7 +299,6 @@ dashboard-js-template-files:
   - components/add-object-button/add-object-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
   - components/questions-link/questions-link.mustache
-  - add_widget_menu.mustache
   - base_objects/empty.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_delete.mustache
@@ -538,9 +537,6 @@ dashboard-js-template-files:
   - audits/object_cloner.mustache
   - base_templates/subtree.mustache
   - objectives/autocomplete_result.mustache
-  - meetings/modal_content.mustache
-  - meetings/tree_add_item.mustache
-  - meetings/tree.mustache
   - documents/autocomplete_result.mustache
   - documents/pbc_tree.mustache
   - org_groups/autocomplete_result.mustache
