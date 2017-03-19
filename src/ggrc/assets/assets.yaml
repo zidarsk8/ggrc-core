@@ -459,7 +459,6 @@ dashboard-js-template-files:
   - help/help_modal_header.mustache
   - help/filters_helper_content.mustache
   - markets/modal_content.mustache
-  - mapped_objects/dropdown_menu_tier2.mustache
   - modals/close_buttons.mustache
   - modals/confirm.mustache
   - modals/prompt_buttons.mustache
