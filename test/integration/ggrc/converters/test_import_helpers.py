@@ -346,7 +346,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Object Under Assessment",
         "Use Control Test Plan",
         "Default Test Plan",
-        "Default Assessors",
+        "Default Assignee",
         "Default Verifier",
         "Custom Attributes",
         "Code",
@@ -358,7 +358,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Object Under Assessment",
             "Audit",
             "Code",
-            "Default Assessors",
+            "Default Assignee",
         },
         "unique": {
             "Code",
