@@ -5,7 +5,7 @@
 
 <object-popover {item}="selectedAssessment" {popover-title}="selectedAssessmentTitle" {direction}="popoverDirection"
                 {popover-link}="selectedAssessmentLink" {popover-title-info}="popoverTitleInfo">
-    <tab-container>
+    <tab-container class="related-assessments__tab-container">
         <tab-panel {(panels)}="panels" title-text="Attributes">
             <assessment-custom-attributes {instance}="item.data"
                                           {items}="item.data.custom_attribute_values"
@@ -25,5 +25,3 @@
         </tab-panel>
     </tab-container>
 </object-popover>
-
-

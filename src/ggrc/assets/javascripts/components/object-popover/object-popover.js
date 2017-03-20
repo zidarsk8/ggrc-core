@@ -10,6 +10,7 @@
     '/components/object-popover/object-popover.mustache');
   var tag = 'object-popover';
   var defaultMaxInnerHeight = 400;
+  var defaultRightPosition = 60;
   /**
    * Assessment specific mapped objects popover view component
    */
@@ -38,9 +39,10 @@
         var topStyle = 'top: ' + top + 'px;';
         var leftStyle = 'left: ' + left + 'px;';
         var widthStyle = 'width: ' + width + 'px;';
+        var rightStyle = 'right: ' + defaultRightPosition + 'px;';
 
         if (direction === 'right') {
-          return topStyle + widthStyle + 'right: 40px;';
+          return topStyle + rightStyle + widthStyle;
         }
         return topStyle + leftStyle + widthStyle;
       },
