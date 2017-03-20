@@ -84,12 +84,17 @@ class Api(object):
     return self.data_to_json(response)
 
   def put(self, obj, data):
+    name = obj._inflector.table_singular
     response = self.get(obj, obj.id)
     headers = {
         "If-Match": response.headers.get("Etag"),
         "If-Unmodified-Since": response.headers.get("Last-Modified")
     }
-    api_link = self.api_link(obj, obj.id)
+    api_link = response.json[name]["selfLink"]
+    if name not in data:
+      response.json[name].update(data)
+      data = response.json
+
     return self.send_request(
         self.tc.put, obj, data, headers=headers, api_link=api_link)
 
