@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (GGRC) {
+(function (GGRC, Snapshots) {
   'use strict';
 
   /**
@@ -27,7 +27,7 @@
      * @param {String} model - The model name
      * @return {String} Url to questions
      */
-    function getQuestionsUrl(id, model) {
+    function getUrl(id, model) {
       var url = GGRC.GGRC_Q_INTEGRATION_URL;
       if (!url) {
         return '';
@@ -36,12 +36,25 @@
         url += '/';
       }
 
-      return url + '?asset=' + model + '&id=' + id;
+      return url + 'Questionnaire/' + model + '/' + id;
+    }
+
+    /**
+     * Get url to page with questions.
+     * @param {Object} instance - The model instance
+     * @return {String} Url to questions
+     */
+    function getQuestionsUrl(instance) {
+      var id = Snapshots.isSnapshot(instance) && instance.snapshot ?
+          instance.snapshot.child_id :
+          instance.id;
+      return GGRC.Utils.GGRCQ.getUrl(id, instance.class.title_singular);
     }
 
     return {
       hasQuestions: hasQuestions,
+      getUrl: getUrl,
       getQuestionsUrl: getQuestionsUrl
     };
   })();
-})(window.GGRC);
+})(window.GGRC, window.GGRC.Utils.Snapshots);
