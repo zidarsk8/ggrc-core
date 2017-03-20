@@ -8,10 +8,10 @@ describe('GGRC.Components.tabContainer', function () {
 
   var viewModel;
 
-  describe('#setActivePanel ', function () {
+  describe('setActivePanel() method ', function () {
     var scope;
     var secondScope;
-    var selectionIndex = 3;
+    var selectionIndex = Date.now();
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('tabContainer');
@@ -35,7 +35,7 @@ describe('GGRC.Components.tabContainer', function () {
     });
   });
 
-  describe('#setDefaultActivePanel ', function () {
+  describe('setDefaultActivePanel() method ', function () {
     var scope;
     var secondScope;
 

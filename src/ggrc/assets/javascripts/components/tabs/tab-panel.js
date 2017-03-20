@@ -18,6 +18,10 @@
       tabIndex: null,
       addPanel: function () {
         var panels = this.attr('panels');
+        var isAlreadyAdded = panels.indexOf(this) > -1;
+        if (isAlreadyAdded) {
+          return;
+        }
         this.attr('tabIndex', Date.now());
         panels.push(this);
       },

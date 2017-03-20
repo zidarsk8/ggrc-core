@@ -8,29 +8,40 @@ describe('GGRC.Components.tabPanel', function () {
 
   var viewModel;
 
-  describe('#addPanel', function () {
+  describe('.addPanel() method', function () {
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('tabPanel');
-      viewModel.addPanel();
     });
 
     it('should add viewModel reference to the Panels List', function () {
+      viewModel.addPanel();
       expect(viewModel.attr('panels').indexOf(viewModel) > -1).toBe(true);
+    });
+
+    it('should add viewModel reference only once the Panels List', function () {
+      viewModel.addPanel();
+      viewModel.addPanel();
+      expect(viewModel.attr('panels').indexOf(viewModel) > -1).toBe(true);
+      expect(viewModel.attr('panels').length).toBe(1);
     });
   });
 
-  describe('#removePanel', function () {
+  describe('removePanel() method', function () {
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('tabPanel');
-      viewModel.addPanel();
-      viewModel.removePanel();
     });
 
     it('should remove viewModel reference from the Panels List', function () {
+      viewModel.addPanel();
+      viewModel.removePanel();
       expect(viewModel.attr('panels').indexOf(viewModel) < 0).toBe(true);
     });
 
-    it('should not do  if no panel from the Panels List', function () {
+    it('should do nothing ' +
+      'if this is no panel in the Panels List', function () {
+      viewModel.addPanel();
+      viewModel.removePanel();
+      // Call the second remove
       viewModel.removePanel();
       expect(viewModel.attr('panels').indexOf(viewModel) < 0).toBe(true);
     });
