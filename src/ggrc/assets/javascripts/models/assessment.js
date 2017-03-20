@@ -258,11 +258,10 @@
     before_create: function (dfd) {
       if (!this.audit) {
         throw new Error('Cannot save assessment, audit not set.');
-      } else if (!this.audit.program || !this.audit.context) {
+      } else if (!this.audit.context) {
         throw new Error(
-          'Cannot save assessment, audit context or program not set.');
+          'Cannot save assessment, audit context not set.');
       }
-      this.attr('program', this.attr('audit.program'));
       this.attr('context', this.attr('audit.context'));
     },
     after_save: function () {
