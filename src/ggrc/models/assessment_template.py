@@ -29,7 +29,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
   object.
   """
   __tablename__ = "assessment_templates"
-  _mandatory_default_people = ("assessors", "verifiers")
+  _mandatory_default_people = ("assessors",)
 
   PER_OBJECT_CUSTOM_ATTRIBUTABLE = True
 
