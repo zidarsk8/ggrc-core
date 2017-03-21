@@ -42,6 +42,11 @@ class SystemOrProcess(track_object_state.HasObjectState, Timeboxed,
       'version',
       'network_zone',
   ]
+  _fulltext_attrs = [
+      'infrastructure',
+      'version',
+      'network_zone',
+  ]
   _update_attrs = [
       'infrastructure',
       'version',
