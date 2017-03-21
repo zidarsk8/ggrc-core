@@ -17,7 +17,9 @@
     <div class="show-details">
       {{#childOptions}}
         {{#if add_item_view}}
-          {{{renderLive add_item_view}}}
+          {{#unless instance.snapshot}}
+            {{{renderLive add_item_view}}}
+          {{/unless}}
         {{/if}}
       {{/childOptions}}
         <view-object-buttons instance="instance" open-is-hidden="isSubtree"/>

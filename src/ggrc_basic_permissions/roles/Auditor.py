@@ -13,6 +13,7 @@ permissions = {
         "Assessment",
         "Issue",
         "Meeting",
+        "Snapshot",
         "ObjectDocument",
         "ObjectPerson",
         "Relationship",
@@ -26,7 +27,6 @@ permissions = {
         "Request",
         "Assessment",
         "Issue",
-        "Relationship",
         "Comment",
     ],
     "view_object_page": [
@@ -35,8 +35,8 @@ permissions = {
     "update": [
         "Request",
         "Assessment",
+        "Snapshot",  # Needed for mapping snapshots to Assessments/Issues
         "Issue",
-        "Audit",
     ],
     "delete": [
         "Request",

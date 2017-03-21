@@ -12,6 +12,7 @@ from selenium.webdriver.common.by import By
 
 from lib import constants, exception, mixin
 from lib.constants.test import batch
+from lib.constants import objects
 from lib.utils import selenium_utils
 
 
@@ -470,6 +471,8 @@ class Widget(AbstractPage):
     self.name_from_url = widget_name.split("_")[0] or \
         constants.element.WidgetBar.INFO
     self.object_name = object_name
+    self.is_under_audit = (
+        self.object_name == objects.AUDITS and self.name_from_url != "info")
 
 
 class TreeView(Component):

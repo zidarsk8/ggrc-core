@@ -1,6 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-"""Widgets other than Info widget and Info panel."""
+"""Widgets other than Info widget."""
 
 import re
 
@@ -29,8 +29,8 @@ class Widget(base.Widget):
 
   def __init__(self, driver):
     self.member_count = None
-    self.cls_without_state_filtering = (AssessmentTemplates,)
-    # Audits, Persons, Workflows, TaskGroups, Cycles, CycleTaskGroupObjectTasks
+    self.cls_without_state_filtering = (AssessmentTemplates, )
+    # Persons, Workflows, TaskGroups, Cycles, CycleTaskGroupObjectTasks
     self.common_filter_locators = dict(
         text_box_locator=self._locator_filter.TEXTFIELD_TO_FILTER,
         bt_submit_locator=self._locator_filter.BUTTON_FILTER,
@@ -157,7 +157,7 @@ class TreeView(base.TreeView):
     self.button_create.click()
 
   def open_tree_view_3bbs(self):
-    """Click to 3bbs button on Tree View to open modal for further actions.
+    """Click to 3BBS button on Tree View to open modal for further actions.
     """
     _locator_3bbs = (
         By.CSS_SELECTOR, self._locators.BUTTON_3BBS.format(self.widget_name))
@@ -165,7 +165,7 @@ class TreeView(base.TreeView):
     self.button_3bbs.click()
 
   def select_generate_objs(self):
-    """Open modal previously clicked to 3bbs button from Tree View to generate
+    """Open modal previously clicked to 3BBS button from Tree View to generate
     new object(s).
     """
     self.open_tree_view_3bbs()
@@ -210,18 +210,12 @@ class TreeView(base.TreeView):
                         _item in self.tree_view_items_elements()]
     return [dict(zip(list_headers[0], item)) for item in list_lists_items]
 
-  def select_member_in_by_title(self, title):
+  def select_member_by_title(self, title):
     """Select member in Tree View by member's title."""
     item = [_item for _item in self.tree_view_items_elements() if
             title in _item.text.splitlines()][0]
     selenium_utils.wait_until_stops_moving(item)
     item.click()
-
-  def get_member_seq_num_by_title(self, title):
-    """Get member's sequence number in Tree View by member's title."""
-    list_items = [_item.text.splitlines() for
-                  _item in self.tree_view_items_elements()]
-    return [num for num, item in enumerate(list_items) if title in item][0]
 
 
 class Audits(Widget):
@@ -319,15 +313,19 @@ class Controls(Widget):
         driver, widget_name=self._locator_filter.widget_name)
 
   def update_ver(self, obj_title):
-    """Update version of Control from Info widget."""
-    obj_num = self.tree_view.get_member_seq_num_by_title(
-        obj_title)
-    self.select_member_by_num(obj_num)
+    """Update version of Control via Info panel from Tree View."""
+    self.tree_view.select_member_by_title(obj_title)
     info_panel = self.info_widget_cls(self._driver)
     info_panel.open_link_get_latest_ver().confirm_update()
     self.tree_view.wait_loading_after_actions(self._driver)
     selenium_utils.get_when_invisible(
         self._driver, locator.CommonWidgetInfoSnapshots.LINK_GET_LAST_VER)
+
+  def is_editable(self, obj_title):
+    """Check Control is editable via Info panel from Tree View."""
+    self.tree_view.select_member_by_title(obj_title)
+    info_panel = self.info_widget_cls(self._driver)
+    return info_panel.open_info_3bbs().is_edit_exist()
 
   def set_visible_fields(self):
     """Set visible fields for display Controls on Tree View."""

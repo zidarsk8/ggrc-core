@@ -75,11 +75,14 @@ select {
   .entry-list & {
     margin: 5px 10px 0 4px !important;
   }
-  .openclose__empty & {
+  .openclose__empty &,
+  .openclose__snapshot &,
+  .openclose__empty__snapshot &{
     margin: 16px 10px 0 10px;
   }
   .inner-tree &,
-  .inner-tree .openclose__empty & {
+  .inner-tree .openclose__empty &,
+  .inner-tree .openclose__empty__snapshot &{
     margin: 10px 5px 0 10px;
   }
 
@@ -723,16 +726,112 @@ p {
 // State values
 .state-value {
   text-transform: uppercase;
-  font-weight: bold;
+  font-weight: normal;
   background: $stateBgnd;
-  color: $stateText;
+  color: $white;
   padding: 0 4px;
   .tree-title-area & {
     font-weight: normal;
   }
   .pane-header & {
     display: inline-block;
-    margin-top: 4px;
+    margin-top: 2px;
+    padding-top: 2px;
+  }
+  &.state-notstarted,
+  &.state-draft,
+  &.state-assigned,
+  &.state-planned {
+    background: $status-draft;
+  }
+  &.state-inprogress {
+    background: $status-inprogress;
+  }
+  &.state-readyforreview,
+  &.state-managerreview {
+    background: $status-readyforreview;
+  }
+  &.state-active,
+  &.state-verified,
+  &.state-readyforexternalreview {
+    background: $status-verified;
+  }
+  &.state-inactive,
+  &.state-finished,
+  &.state-completed {
+    background: $status-completed;
+  }
+  &.state-declined,
+  &.state-deprecated {
+    background: $status-declined;
+  }
+}
+.state-value-dot {
+  position: relative;
+  padding-left: 10px;
+
+  &:before {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    display: inline-block;
+    left: 0;
+    top: 50%;
+    margin-top: -3px;
+    border-radius: 50%;
+  }
+
+  &.state-notstarted,
+  &.state-draft,
+  &.state-assigned,
+  &.state-planned {
+    color: $status-draft;
+
+    &:before {
+      background: $status-draft;
+    }
+  }
+  &.state-inprogress {
+    color: $status-inprogress;
+
+    &:before {
+      background: $status-inprogress;
+    }
+  }
+  &.state-readyforreview,
+  &.state-managerreview {
+    color: $status-readyforreview;
+
+    &:before {
+      background: $status-readyforreview;
+    }
+  }
+  &.state-active,
+  &.state-verified,
+  &.state-readyforexternalreview {
+    color: $status-verified;
+
+    &:before {
+      background: $status-verified;
+    }
+  }
+  &.state-inactive,
+  &.state-finished,
+  &.state-completed {
+    color: $status-completed;
+
+    &:before {
+      background: $status-completed;
+    }
+  }
+  &.state-declined,
+  &.state-deprecated {
+    color: $status-declined;
+
+    &:before {
+      background: $status-declined;
+    }
   }
 }
 
@@ -903,5 +1002,18 @@ p {
     float: left;
     margin-right: 5px;
     width: 70%;
+  }
+}
+
+.three-dots-list {
+  & > li {
+    a {
+      color: #000 !important;
+    }
+
+    .fa {
+      color: #000 !important;
+      opacity: 0.7 !important;
+    }
   }
 }

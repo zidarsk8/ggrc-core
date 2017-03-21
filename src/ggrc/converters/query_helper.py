@@ -100,7 +100,9 @@ class QueryHelper(object):
     self._count = 0
     self.getattr_whitelist = {
         "child_type",
+        "id",
         "is_current",
+        "program",
     }
 
   def _set_attr_name_map(self):

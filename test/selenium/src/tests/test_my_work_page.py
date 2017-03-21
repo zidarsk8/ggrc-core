@@ -18,14 +18,14 @@ class TestMyWorkPage(base.Test):
   """Tests My Work page, part of smoke tests, section 2."""
 
   @pytest.mark.smoke_tests
-  def test_horizontal_nav_bar_tabs(self, selenium, new_controls_rest):
+  def test_horizontal_nav_bar_tabs(self, new_controls_rest, selenium):
     """Tests that several objects in widget can be deleted sequentially."""
     selenium.get(dashboard.Dashboard.URL)
     controls_widget = dashboard.Dashboard(selenium).select_controls()
     for _ in xrange(controls_widget.member_count):
       counter = controls_widget.get_items_count()
       (controls_widget.select_member_by_num(0).
-       open_info_3bbs().select_delete_obj().confirm_delete())
+       open_info_3bbs().select_delete().confirm_delete())
       controls_widget.wait_member_deleted(counter)
     assert generic_widget.Controls(selenium).members_listed == []
 
@@ -34,7 +34,7 @@ class TestMyWorkPage(base.Test):
     """Tests if user is redirected to My Work page after clicking on
     the my work button in user dropdown."""
     conftest_utils.navigate_to_page_with_lhn(selenium)
-    dashboard.Header(selenium).open_user_list().select_my_work()
+    dashboard.Header(selenium).select_my_work()
     assert selenium.current_url == dashboard.Dashboard.URL
 
   @pytest.mark.smoke_tests

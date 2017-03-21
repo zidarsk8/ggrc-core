@@ -44,9 +44,9 @@ class SnapshotterBaseTestCase(TestCase):
     _, obj = self.objgen.generate_relationship(src, dst)
     return obj
 
-  def create_audit(self, program):
+  def create_audit(self, program, title=None):
     self.create_object(models.Audit, {
-        "title": "Snapshotable audit",
+        "title": "Snapshotable audit" if title is None else title,
         "program": {"id": program.id},
         "status": "Planned",
         "snapshots": {

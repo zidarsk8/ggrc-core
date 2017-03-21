@@ -41,4 +41,4 @@ def create_obj_via_lhn(driver, object_name):
 def delete_obj_via_info_widget(driver, object_name):
   """Delete object via Info Widget."""
   (factory.get_cls_widget(object_name, is_info=True)(driver)
-   .open_tree_view_3bbs().select_delete_obj().confirm_delete())
+   .open_tree_view_3bbs().select_delete().confirm_delete())

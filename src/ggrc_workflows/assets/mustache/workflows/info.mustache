@@ -18,7 +18,7 @@
           <span class="bubble"></span>
           <span class="bubble"></span>
         </a>
-        <ul class="dropdown-menu" aria-labelledby="drop1" role="menu">
+        <ul class="dropdown-menu three-dots-list" aria-labelledby="drop1" role="menu">
           {{^is_info_pin}}
             {{{render_hooks instance.class.shortName 'info_widget_actions'}}}
             {{^if_equals instance.kind "Backlog"}}
@@ -103,7 +103,7 @@
           <div class="span9">
             <h6>Title</h6>
             <h3>{{title}}</h3>
-            <span class="state-value">{{status}}</span>
+            <span class="state-value {{addclass 'state-' status separator=''}}">{{status}}</span>
             {{#if type}}
             <p>
               {{type.title}}

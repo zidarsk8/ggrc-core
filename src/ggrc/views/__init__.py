@@ -54,7 +54,6 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 # Needs to be secured as we are removing @login_required
-
 @app.route("/_background_tasks/refresh_revisions", methods=["POST"])
 @queued_task
 def refresh_revisions(_):
@@ -75,7 +74,8 @@ def do_reindex():
   """Update the full text search index."""
 
   indexer = get_indexer()
-  indexer.delete_all_records(False)
+  with benchmark('Delete all records'):
+    indexer.delete_all_records(False)
 
   indexed_models = get_indexed_model_names()
 
@@ -83,23 +83,19 @@ def do_reindex():
                             all_models.Person.email)
   g.people_map = {p.id: (p.name, p.email) for p in people}
 
-  for model in indexed_models:
+  for model in sorted(indexed_models):
     # pylint: disable=protected-access
-    model = get_model(model)
-    mapper_class = model._sa_class_manager.mapper.base_mapper.class_
-    query = model.query.options(
-        db.undefer_group(mapper_class.__name__ + '_complete'),
-    )
-    for query_chunk in generate_query_chunks(query, chunk_size=1):
-      try:
+    logger.info("Updating index for: %s", model)
+    with benchmark("Create records for %s" % model):
+      model = get_model(model)
+      mapper_class = model._sa_class_manager.mapper.base_mapper.class_
+      query = model.query.options(
+          db.undefer_group(mapper_class.__name__ + '_complete'),
+      )
+      for query_chunk in generate_query_chunks(query):
         for instance in query_chunk:
           indexer.create_record(fts_record_for(instance), False)
         db.session.commit()
-      except:  # pylint: disable=bare-except
-        logger.warning("Re-index failed for query: %s - %s",
-                       query_chunk[0].type, query_chunk[0].id)
-
-        db.session.rollback()
 
   reindex_snapshots()
 

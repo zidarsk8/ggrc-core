@@ -45,6 +45,7 @@
         person: CMS.Models.Person,
         role: CMS.Models.Role,
         threat: CMS.Models.Threat,
+        risk: CMS.Models.Risk,
         vulnerability: CMS.Models.Vulnerability,
         template: CMS.Models.Template
       };
@@ -372,6 +373,16 @@
             mapping: 'programs',
             child_options: relatedObjectsChildOptions,
             draw_children: true
+          },
+          Risk: {
+            mapping: 'risks',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          },
+          Threat: {
+            mapping: 'threats',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
           }
         },
         issues: {
@@ -500,6 +511,16 @@
             child_options: relatedObjectsChildOptions,
             draw_children: true
           },
+          Threat: {
+            mapping: 'threats',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          },
+          Risk: {
+            mapping: 'risks',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          },
           Assessment: {
             mapping: 'related_assessments',
             parent_instance: GGRC.page_instance(),
@@ -557,7 +578,7 @@
             child_options: relatedObjectsChildOptions,
             draw_children: true
           }
-         },
+        },
         Regulation: {
           _mixins: ['directive', 'issues']
         },
@@ -620,6 +641,22 @@
           },
           Clause: {
             mapping: 'clauses',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          }
+        },
+        Risk: {
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
+          Threat: {
+            mapping: 'threats',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          }
+        },
+        Threat: {
+          _mixins: ['governance_objects', 'business_objects', 'issues'],
+          Risk: {
+            mapping: 'risks',
             child_options: relatedObjectsChildOptions,
             draw_children: true
           }
@@ -830,6 +867,16 @@
             add_item_view: null,
             header_view: path + '/assessments/tree_header.mustache',
             footer_view: path + '/base_objects/tree_footer.mustache'
+          },
+          Risk: {
+            mapping: 'extended_related_risks_via_search',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
+          },
+          Threat: {
+            mapping: 'extended_related_threats_via_search',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true
           }
         }
       });

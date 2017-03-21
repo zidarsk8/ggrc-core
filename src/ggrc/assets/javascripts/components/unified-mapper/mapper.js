@@ -5,9 +5,6 @@
 
 (function (can, $) {
   'use strict';
-  var WARNING_MESSAGE = 'Selected objects will be mapped ' +
-    'to the corresponding Program, ' +
-    'and system will create snapshots of selected objects for this Audit';
 
   var DEFAULT_OBJECT_MAP = {
     Assessment: 'Control',
@@ -57,7 +54,6 @@
       }
     },
     type: 'Control', // We set default as Control
-    warningMessage: WARNING_MESSAGE,
     contact: null,
     contactEmail: null,
     deferred: '@',
@@ -82,10 +78,8 @@
     relevant: [],
     submitCbs: $.Callbacks(),
     afterSearch: false,
-    init: function () {
-      if (!this.attr('search_only')) {
-        setTimeout(this.onToolbarSubmit.bind(this));
-      }
+    afterShown: function () {
+      this.onSubmit();
     },
     allowedToCreate: function () {
       var isSearch = this.attr('search_only');
@@ -180,7 +174,7 @@
       }, []);
       return _.findWhere(types, {value: type});
     },
-    onToolbarSubmit: function () {
+    onSubmit: function () {
       this.attr('submitCbs').fire();
       this.attr('afterSearch', true);
     }
@@ -272,11 +266,16 @@
         }
       },
       inserted: function () {
+        var self = this;
         this.scope.attr('mapper.selected').replace([]);
         this.scope.attr('mapper.entries').replace([]);
 
         this.setModel();
         this.setBinding();
+
+        setTimeout(function () {
+          self.scope.attr('mapper').afterShown();
+        });
       },
       closeModal: function () {
         this.scope.attr('mapper.is_saving', false);
@@ -437,18 +436,21 @@
           'mapper.model', this.scope.mapper.modelFromType(type));
       },
       '{mapper} type': function () {
-        this.scope.attr('mapper.filter', '');
-        this.scope.attr('mapper.afterSearch', false);
+        var mapper = this.scope.attr('mapper');
+        mapper.attr('filter', '');
+        mapper.attr('afterSearch', false);
         // Edge case for Assessment Generation
         // and objects that are not in Snapshot scope
-        if (!this.scope.attr('mapper.assessmentGenerator')) {
+        if (!mapper.attr('assessmentGenerator')) {
           if (!GGRC.Utils.Snapshots.isInScopeModel(
-            this.scope.attr('mapper.object'))) {
-            this.scope.attr('mapper.relevant').replace([]);
+            mapper.attr('object'))) {
+            mapper.attr('relevant').replace([]);
           }
         }
         this.setModel();
         this.setBinding();
+
+        setTimeout(mapper.onSubmit.bind(mapper));
       },
       '{mapper} assessmentTemplate': function (scope, ev, val, oldVal) {
         var type;

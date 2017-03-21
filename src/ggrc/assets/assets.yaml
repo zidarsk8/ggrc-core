@@ -42,6 +42,7 @@ dashboard-js-files:
   - plugins/persistent_notifier.js
   - ggrc_base.js
   - plugins/ggrc_utils.js
+  - plugins/utils/query-api-utils.js
   - plugins/utils/current-page-utils.js
   - plugins/utils/state-utils.js
   - plugins/datepicker.js
@@ -243,6 +244,8 @@ dashboard-js-files:
   - components/object-selection/object-selection-item.js
   - components/last-assessment-date/last-assessment-date.js
   - components/tree/tree-node-actions.js
+  - components/tree/tree-no-results.js
+  - components/page-header/page-header.js
   #- d3.v2.js
   #- related_graph.js
 
@@ -427,7 +430,9 @@ dashboard-js-template-files:
   - components/object_counter/object_counter.mustache
   - components/tree_pagination/tree_pagination.mustache
   - components/tree/tree-node-actions.mustache
+  - components/tree/tree-no-results.mustache
   - components/simple-modal/simple-modal.mustache
+  - components/page-header/page-header.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache

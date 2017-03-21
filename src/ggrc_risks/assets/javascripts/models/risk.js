@@ -4,6 +4,8 @@
  */
 
 (function (can) {
+  'use strict';
+
   can.Model.Cacheable('CMS.Models.Risk', {
     root_object: 'risk',
     root_collection: 'risks',
@@ -24,8 +26,8 @@
       risk_objects: 'CMS.Models.RiskObject.stubs'
     },
     tree_view_options: {
-      add_item_view: GGRC.mustache_path +
-      '/base_objects/tree_add_item.mustache',
+      add_item_view:
+        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache'
     },
     defaults: {
@@ -34,14 +36,12 @@
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
       var reqFields = ['title', 'description', 'contact'];
-      var i = 0;
       if (this._super) {
         this._super.apply(this, arguments);
       }
-
-      for (i; i < reqFields.length; i++) {
-        this.validatePresenceOf(reqFields[i]);
-      }
+      reqFields.forEach(function (reqField) {
+        this.validatePresenceOf(reqField);
+      }.bind(this));
     }
   }, {});
 })(window.can);

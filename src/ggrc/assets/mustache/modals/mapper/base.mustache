@@ -19,14 +19,15 @@
   {{#if mapper.showWarning}}
     <div class="alert alert-error">
       <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-      {{mapper.warningMessage}}
+      System will create snapshot of the current object for the selected Audit
+      and current object will be mapped to the corresponding Program
     </div>
   {{/if}}
   <mapper-toolbar class="flex-box search-toolbar flex-box-multi"
                   mapper="mapper"
                   is-loading="mapper.is_loading"
                   {(filter)}="mapper.filter"
-                  (submit)="mapper.onToolbarSubmit()"
+                  (submit)="mapper.onSubmit()"
                   total-objects="totalObjects"
                   {(status-filter)}="mapper.statusFilter">
   </mapper-toolbar>

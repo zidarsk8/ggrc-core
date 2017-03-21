@@ -544,20 +544,27 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     program = self.create_object(models.Program, {
         "title": "Test Program Snapshot 1"
     })
+    program2 = self.create_object(models.Program, {
+        "title": "Test Program Snapshot 2"
+    })
 
     control = self.create_object(models.Control, {
         "title": "Test Control Snapshot 1"
     })
 
-    self.create_audit(program)
+    self.create_audit(program, title="Audit1")
+    self.create_audit(program2, title="Audit2")
 
     objective = self.create_object(models.Objective, {
         "title": "Test Objective Snapshot UNEDITED"
     })
-    self.create_mapping(program, objective)
+    self.create_mapping(objective, program)
+    self.create_mapping(program2, objective)  # different direction than above
 
     audit = db.session.query(models.Audit).filter(
-        models.Audit.title.like("%Snapshotable audit%")).one()
+        models.Audit.program_id == program.id).one()
+    audit2 = db.session.query(models.Audit).filter(
+        models.Audit.program_id == program2.id).one()
 
     self.api.post(models.Snapshot, [
         {
@@ -593,6 +600,40 @@ class TestSnapshoting(SnapshotterBaseTestCase):
                     "href": "/api/contexts/{}".format(audit.context_id)
                 }
             }
+        },
+        {
+            "snapshot": {
+                "parent": {
+                    "id": audit2.id,
+                    "type": "Audit",
+                    "href": "/api/audits/{}".format(audit2.id)
+                },
+                "child_type": "Control",
+                "child_id": control.id,
+                "update_revision": "new",
+                "context": {
+                    "id": audit2.context_id,
+                    "type": "Context",
+                    "href": "/api/contexts/{}".format(audit2.context_id)
+                }
+            }
+        },
+        {
+            "snapshot": {
+                "parent": {
+                    "id": audit2.id,
+                    "type": "Audit",
+                    "href": "/api/audits/{}".format(audit2.id)
+                },
+                "child_type": "Objective",
+                "child_id": objective.id,
+                "update_revision": "new",
+                "context": {
+                    "id": audit2.context_id,
+                    "type": "Context",
+                    "href": "/api/contexts/{}".format(audit2.context_id)
+                }
+            }
         }
     ])
 
@@ -606,12 +647,42 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         models.Revision.resource_id == objective.id
     ).all()[-1]
 
-    self.assertEquals(objective_snapshot.count(), 1)
+    self.assertEquals(objective_snapshot.count(), 2)
     self.assertEquals(objective_snapshot.first().revision_id,
                       objective_revision.id)
 
-    self.assertIsNotNone(models.Relationship.find_related(program, objective))
-    self.assertIsNotNone(models.Relationship.find_related(program, control))
+    control_snapshots = db.session.query(models.Snapshot).filter(
+        models.Snapshot.child_type == "Control",
+        models.Snapshot.child_id == control.id,
+    )
+    control_revision = db.session.query(models.Revision).filter(
+        models.Revision.resource_type == "Control",
+        models.Revision.resource_id == control.id,
+    ).all()[-1]
+
+    self.assertEquals(control_snapshots.count(), 2)
+    self.assertSetEqual({s.revision_id for s in control_snapshots},
+                        {control_revision.id})
+
+    def _assert_exactly_one_relationship(src, dst):
+      """Assert only one of Rel(src, dst) and Rel(dst, src) exists."""
+      rels = db.session.query(models.Relationship).filter(
+          models.Relationship.source_id == src.id,
+          models.Relationship.source_type == src.type,
+          models.Relationship.destination_id == dst.id,
+          models.Relationship.destination_type == dst.type,
+      ).union_all(db.session.query(models.Relationship).filter(
+          models.Relationship.destination_id == src.id,
+          models.Relationship.destination_type == src.type,
+          models.Relationship.source_id == dst.id,
+          models.Relationship.source_type == dst.type,
+      ))
+      self.assertEqual(rels.count(), 1)
+
+    _assert_exactly_one_relationship(program, objective)
+    _assert_exactly_one_relationship(program, control)
+    _assert_exactly_one_relationship(program2, objective)
+    _assert_exactly_one_relationship(program2, control)
 
   def test_relationship_post_api(self):
     """Test snapshot creation when creating relationships to Audit"""
@@ -634,7 +705,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         models.Audit.title.like("%Snapshotable audit%")).one()
 
     self.create_mapping(audit, objective)
-    self.create_mapping(audit, control)
+    self.create_mapping(control, audit)  # different direction than above
 
     objective_snapshot = db.session.query(models.Snapshot).filter(
         models.Snapshot.child_type == "Objective",

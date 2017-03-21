@@ -621,16 +621,10 @@ def load_context_relationships(permissions):
   read_contexts = set(
       permissions.get('read', {}).
       get('Program', {}).
-      get('contexts', []) +
-      permissions.get('read', {}).
-      get('Audit', {}).
       get('contexts', []))
   write_contexts = set(
       permissions.get('update', {}).
       get('Program', {}).
-      get('contexts', []) +
-      permissions.get('update', {}).
-      get('Audit', {}).
       get('contexts', []))
   read_only_contexts = read_contexts - write_contexts
 
@@ -910,15 +904,6 @@ def create_audit_context(audit):
       context=context,
       source_context_scope='Program',
       context_scope='Audit',
-      modified_by=get_current_user(),
-  ))
-
-  # Create the audit -> program implication
-  db.session.add(ContextImplication(
-      source_context=context,
-      context=audit.context,
-      source_context_scope='Audit',
-      context_scope='Program',
       modified_by=get_current_user(),
   ))
 

@@ -14,6 +14,7 @@ from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.models import Assessment
+from ggrc.models import Issue
 from ggrc.models import Person
 from ggrc.models import Relationship
 from ggrc.models import Snapshot
@@ -37,8 +38,8 @@ def init_hook():
     for obj, src in izip(objects, sources):
       src_obj = src.get("object")
       audit = src.get("audit")
-      map_assessment(obj, src_obj)
-      map_assessment(obj, audit)
+      map_objects(obj, src_obj)
+      map_objects(obj, audit)
 
       if not src.get("_generated"):
         continue
@@ -60,25 +61,39 @@ def init_hook():
                                                      parent_title)
 
 
-def map_assessment(assessment, obj):
-  """Creates a relationship between an assessment and an object. This also
-  generates automappings. Fails silently if obj dict does not have id and type
+@Resource.collection_posted.connect_via(Issue)
+def handle_issue_post(sender, objects=None, sources=None):
+  # pylint: disable=unused-argument
+  """Map issue to audit. This makes sure an auditor is able to create
+  an issue on the audit without having permissions to create Relationships
+  in the context"""
+
+  for obj, src in izip(objects, sources):
+    audit = src.get("audit")
+    assessment = src.get("assessment")
+    map_objects(obj, audit)
+    map_objects(obj, assessment)
+
+
+def map_objects(src, dst):
+  """Creates a relationship between an src and dst. This also
+  generates automappings. Fails silently if dst dict does not have id and type
   keys.
 
   Args:
-    assessment (models.Assessment): The assessment model
-    obj (dict): A dict with `id` and `type`.
+    src (model): The src model
+    dst (dict): A dict with `id` and `type`.
   Returns:
     None
   """
-  obj = obj or {}
-  if 'id' not in obj or 'type' not in obj:
+  dst = dst or {}
+  if 'id' not in dst or 'type' not in dst:
     return
   rel = Relationship(**{
-      "source": assessment,
-      "destination_id": obj["id"],
-      "destination_type": obj["type"],
-      "context": assessment.context,
+      "source": src,
+      "destination_id": dst["id"],
+      "destination_type": dst["type"],
+      "context": src.context,
   })
   db.session.add(rel)
 

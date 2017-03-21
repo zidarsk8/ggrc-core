@@ -39,6 +39,18 @@ def wait_until_stops_moving(element):
       raise exception.ElementMovingTimeout
 
 
+def is_element_exist(driver, locator):
+  """
+  Args: driver (base.CustomDriver), locator (tuple)
+  Return: True if element is exist, False if element is not exist.
+  """
+  try:
+    driver.find_element(*locator)
+    return True
+  except exceptions.NoSuchElementException:
+    return False
+
+
 def get_when_visible(driver, locator):
   """
  Args: driver (base.CustomDriver), locator (tuple)

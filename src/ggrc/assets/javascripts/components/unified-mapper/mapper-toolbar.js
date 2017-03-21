@@ -13,7 +13,7 @@
     ),
     viewModel: {
       filter: '',
-      statusFilter: null,
+      statusFilter: '',
       dropdown_options: [],
       statuses: [],
       mapper: {},
@@ -26,13 +26,12 @@
         var self = this;
         CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
           self.attr('displayPrefs', displayPrefs);
-          self.setStatusFilter();
+          setTimeout(self.setStatusFilter.bind(self));
         });
       },
       onSubmit: function () {
         this.dispatch('submit');
         if (this.attr('showStatusFilter')) {
-          this.attr('mapper.statusFilter', this.attr('statusFilter'));
           this.saveStatusFilter();
         }
       },
@@ -69,8 +68,8 @@
           });
 
           this.attr('dropdown_options', dropdownOptions);
-          this.attr('statusFilter',
-            GGRC.Utils.State.statusFilter(statuses, ''));
+          this.attr('statusFilter', GGRC.Utils.State
+            .statusFilter(statuses, '', this.attr('mapper.type')));
 
           this.attr('statuses', statuses);
         } else {
@@ -104,8 +103,8 @@
         });
         this.viewModel.attr('statuses', selectedStatuses);
 
-        this.viewModel.attr('statusFilter',
-          GGRC.Utils.State.statusFilter(selectedStatuses, ''));
+        this.viewModel.attr('statusFilter', GGRC.Utils.State.statusFilter(
+          selectedStatuses, '', this.viewModel.attr('mapper.type')));
         ev.stopPropagation();
       }
     }

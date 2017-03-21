@@ -35,17 +35,15 @@ describe('GGRC.Models.MapperModel', function () {
         'Section',
         'Standard',
         'System',
-        'Vendor'
+        'Vendor',
+        'Risk',
+        'Threat'
       ],
       notMappable: ['Assessment', 'Issue', 'AssessmentTemplate']
     },
     risk_assessments: {
       models: ['RiskAssessment'],
       notMappable: ['RiskAssessment']
-    },
-    risks: {
-      models: ['Risk', 'Threat'],
-      notMappable: []
     },
     workflows: {
       models: [
@@ -98,8 +96,8 @@ describe('GGRC.Models.MapperModel', function () {
     Clause: _.difference(filtered, ['Clause']),
     Contract: _.difference(filtered, directives),
     Control: filtered,
-    CycleTaskGroupObjectTask: _.difference(filtered, ['Person', 'Risk',
-      'TaskGroup', 'Threat', 'Workflow']),
+    CycleTaskGroupObjectTask: _.difference(filtered, ['Person',
+      'TaskGroup', 'Workflow']),
     DataAsset: filtered,
     Facility: filtered,
     Issue: _.difference(filtered, ['Audit', 'Person', 'Program', 'Project',
@@ -116,14 +114,14 @@ describe('GGRC.Models.MapperModel', function () {
       modules.workflows.notMappable)),
     Project: filtered,
     Regulation: _.difference(filtered, directives),
-    Risk: _.difference(filtered, ['Audit', 'Risk']),
+    Risk: filtered,
     RiskAssessment: [],
     Section: filtered,
     Standard: _.difference(filtered, directives),
     System: filtered,
-    TaskGroup: _.difference(filtered, ['Audit', 'Person', 'Risk', 'TaskGroup',
-      'Threat', 'Workflow']),
-    Threat: _.difference(filtered, ['Audit', 'Threat']),
+    TaskGroup: _.difference(filtered, ['Audit', 'Person',
+      'TaskGroup', 'Workflow']),
+    Threat: filtered,
     Vendor: filtered
   };
 

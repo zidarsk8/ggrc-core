@@ -442,6 +442,10 @@
       return can.getObject('cache', this, true)[id];
     },
 
+    removeFromCacheById: function (key) {
+      return delete this.store[key];
+    },
+
     newInstance: function (args) {
       var cache = can.getObject('cache', this, true);
       var isKeyExists = args && args[this.id];

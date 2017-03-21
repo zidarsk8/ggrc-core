@@ -11,11 +11,11 @@
       widget_view: GGRC.mustache_path + '/base_objects/summary.mustache',
       isLoading: true,
       colorsMap: {
-        Completed: '#8bc34a',
-        Verified: '#333',
-        'In Progress': '#ffab40',
-        'Not Started': '#bdbdbd',
-        'Ready for Review': '#1378bb'
+        Completed: '#405f77',
+        Verified: '#009925',
+        'In Progress': '#3369e8',
+        'Not Started': '#9e9e9e',
+        'Ready for Review': '#ff9100'
       },
       chartOptions: {
         pieSliceText: 'value-and-percentage',
@@ -167,8 +167,8 @@
 
       chartOptions.attr('legend', legendData);
 
-      this.element.find('#piechart_audit_assessments_chart-legend')
-        .on('mouseenter', 'li', function () {
+      this.element.find('#piechart_audit_assessments_chart-legend tbody')
+        .on('mouseenter', 'tr', function () {
           var $el = $(this);
           var rowIndex = $el.data('row-index');
 
@@ -176,7 +176,7 @@
             chart.setSelection([{row: rowIndex, column: null}]);
           }
         })
-        .on('mouseleave', 'li', function () {
+        .on('mouseleave', 'tr', function () {
           chart.setSelection(null);
         });
     },

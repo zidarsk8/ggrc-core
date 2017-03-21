@@ -91,9 +91,13 @@ class TestAssessmentDataHandlers(TestCase):
     self.assertEqual(revisions, 1)
 
     declined_data = self._call_notif_handler(notif)
-    requester_emails = {"user1@example.com", }
+    expected_emails = {  # literally everybody assigned to an Assessment
+        "user1@example.com",
+        "user2@example.com",
+        "user3@example.com"
+    }
 
-    self.assertEqual(set(declined_data.keys()), requester_emails)
+    self.assertEqual(set(declined_data.keys()), expected_emails)
 
   def test_assessment_comments(self):
     """Test data handlers for comment to assessment"""

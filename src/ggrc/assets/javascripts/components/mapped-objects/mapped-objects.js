@@ -18,9 +18,9 @@
     viewModel: {
       define: {
         relatedTypes: {
-          type: '*',
+          type: String,
           value: function () {
-            return [];
+            return '';
           }
         },
         mappedSnapshots: {
@@ -118,9 +118,9 @@
           operation: 'relevant'
         }];
         var filters = this.getSnapshotQueryFilters();
-        var query = GGRC.Utils.QueryAPI
+
+        return GGRC.Utils.QueryAPI
           .buildParam('Snapshot', {}, relevantFilters, [], filters);
-        return {data: [query]};
       },
       getObjectQuery: function () {
         var relevantFilters = [{
@@ -128,21 +128,19 @@
           id: this.attr('parentInstance.id'),
           operation: 'relevant'
         }];
-        var query = this.attr('relatedTypes').map(function (type) {
-          return GGRC.Utils.QueryAPI
-            .buildParam(type, {}, relevantFilters, [], []);
-        });
-        return {data: query};
+        var type = this.attr('relatedTypes');
+
+        return GGRC.Utils.QueryAPI
+          .buildParam(type, {}, relevantFilters, [], []);
       },
       loadSnapshots: function () {
         var dfd = can.Deferred();
         var query = this.getSnapshotQuery();
         this.attr('isLoading', true);
         GGRC.Utils.QueryAPI
-          .makeRequest(query)
-          .done(function (responseArr) {
-            var data = responseArr[0];
-            var values = data.Snapshot.values;
+          .batchRequests(query)
+          .done(function (response) {
+            var values = response.Snapshot.values;
             var result = values.map(function (item) {
               return {instance: item, isSelected: false};
             });
@@ -158,15 +156,13 @@
         var query = this.getObjectQuery();
         this.attr('isLoading', true);
         GGRC.Utils.QueryAPI
-          .makeRequest(query)
-          .done(function (responseArr) {
+          .batchRequests(query)
+          .done(function (response) {
             var result = [];
-            responseArr.forEach(function (responseObject) {
-              var type = Object.keys(responseObject)[0];
-              var values = responseObject[type].values;
-              values.forEach(function (item) {
-                result.push({instance: item, isSelected: false});
-              });
+            var type = Object.keys(response)[0];
+            var values = response[type].values;
+            values.forEach(function (item) {
+              result.push({instance: item, isSelected: false});
             });
 
             dfd.resolve(result);

@@ -3,6 +3,7 @@
 
 """Module for Snapshot object"""
 
+import collections
 from datetime import datetime
 
 from sqlalchemy.ext.declarative import declared_attr
@@ -206,38 +207,60 @@ def _ensure_program_relationships(objects):
 
   This function is made to handle multiple snapshots for a single audit.
   Args:
-    objects: list of snapshot objects with child_id and child_type set.
+    objects: list of snapshot objects with child_id, child_type and parent set.
   """
-  pairs = [(o.child_type, o.child_id) for o in objects]
-  assert len({o.parent.id for o in objects}) == 1  # fail on multiple audits
-  program = ("Program", objects[0].parent.program_id)
+  # assert that every parent is an Audit as the code relies on program_id field
+  assert {o.parent_type for o in objects} == {"Audit"}
+
+  relationship_stub = collections.namedtuple(
+      "RelationshipStub",
+      ["source_id", "source_type", "destination_id", "destination_type"],
+  )
+
+  required_relationships = set(
+      relationship_stub(o.parent.program_id, "Program",
+                        o.child_id, o.child_type)
+      for o in objects
+  )
+
+  if not required_relationships:
+    # nothing to create
+    return
+
   rel = relationship.Relationship
   columns = db.session.query(
-      rel.destination_type,
-      rel.destination_id,
-      rel.source_type,
-      rel.source_id,
+      rel.source_id, rel.source_type,
+      rel.destination_id, rel.destination_type,
   )
-  query = columns.filter(
-      tuple_(rel.destination_type, rel.destination_id) == (program),
-      tuple_(rel.source_type, rel.source_id).in_(pairs)
-  ).union(
-      columns.filter(
-          tuple_(rel.source_type, rel.source_id) == (program),
-          tuple_(rel.destination_type, rel.destination_id).in_(pairs)
-      )
+
+  existing_mappings = columns.filter(
+      tuple_(rel.source_id, rel.source_type,
+             rel.destination_id, rel.destination_type)
+      .in_(required_relationships)
   )
-  existing_pairs = set(sum([
-      [(r.destination_type, r.destination_id), (r.source_type, r.source_id)]
-      for r in query
-  ], []))  # build a set of all found type-id pairs
-  missing_pairs = set(pairs).difference(existing_pairs)
-  _insert_program_relationships(program, missing_pairs)
+  existing_mappings_reverse = columns.filter(
+      tuple_(rel.destination_id, rel.destination_type,
+             rel.source_id, rel.source_type)
+      .in_(required_relationships)
+  )
+
+  required_relationships -= set(
+      relationship_stub(row.source_id, row.source_type,
+                        row.destination_id, row.destination_type)
+      for row in existing_mappings
+  )
+  required_relationships -= set(
+      relationship_stub(row.destination_id, row.destination_type,
+                        row.source_id, row.source_type)
+      for row in existing_mappings_reverse
+  )
+
+  _insert_program_relationships(required_relationships)
 
 
-def _insert_program_relationships(program, missing_pairs):
+def _insert_program_relationships(relationship_stubs):
   """Insert missing obj-program relationships."""
-  if not missing_pairs:
+  if not relationship_stubs:
     return
   current_user_id = get_current_user_id()
   now = datetime.now()
@@ -255,15 +278,15 @@ def _insert_program_relationships(program, missing_pairs):
               "modified_by_id": current_user_id,
               "created_at": now,
               "updated_at": now,
-              "source_type": program[0],
-              "source_id": program[1],
-              "destination_type": dst_type,
-              "destination_id": dst_id,
+              "source_type": relationship_stub.source_type,
+              "source_id": relationship_stub.source_id,
+              "destination_type": relationship_stub.destination_type,
+              "destination_id": relationship_stub.destination_id,
               "context_id": None,
               "status": None,
               "automapping_id": None
           }
-          for dst_type, dst_id in missing_pairs
+          for relationship_stub in relationship_stubs
       ])
   )
 

@@ -4,6 +4,8 @@
  */
 
 (function (can) {
+  'use strict';
+
   can.Model.Cacheable('CMS.Models.Threat', {
     root_object: 'threat',
     root_collection: 'threats',
