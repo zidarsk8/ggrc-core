@@ -4,6 +4,7 @@
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
+from ggrc.fulltext.mixin import Indexed
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models import mixins
 from ggrc.models.deferred import deferred
@@ -18,7 +19,7 @@ class Risk(HasObjectState, mixins.CustomAttributable, mixins.Stateful,
            Relatable, mixins.Described, Ownable, Personable,
            mixins.WithContact, mixins.Titled, mixins.Timeboxed,
            mixins.Slugged, mixins.Noted, mixins.Hyperlinked, mixins.Base,
-           db.Model):
+           Indexed, db.Model):
   __tablename__ = 'risks'
 
   VALID_STATES = [

@@ -16,11 +16,12 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.types import JsonType
 from ggrc.services import common
+from ggrc.fulltext.mixin import Indexed
 
 
 class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
                          mixins.Titled, mixins.CustomAttributable,
-                         mixins.Slugged, mixins.Base, db.Model):
+                         mixins.Slugged, mixins.Base, Indexed, db.Model):
   """A class representing the assessment template entity.
 
   An Assessment Template is a template that allows users for easier creation of

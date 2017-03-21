@@ -6,6 +6,7 @@ from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc import settings
+from ggrc.fulltext.mixin import Indexed
 from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
 from ggrc.models.exceptions import ValidationError
@@ -18,7 +19,7 @@ from ggrc.models.utils import validate_option
 
 
 class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
-             Relatable, Base, db.Model):
+             Relatable, Base, Indexed, db.Model):
 
   __tablename__ = 'people'
 

@@ -33,6 +33,7 @@ from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.utils import similarity_options as similarity_options_module
+from ggrc.fulltext.mixin import Indexed
 
 
 class Assessment(statusable.Statusable, AuditRelationship,
@@ -40,7 +41,8 @@ class Assessment(statusable.Statusable, AuditRelationship,
                  CustomAttributable, EvidenceURL, Commentable, Personable,
                  reminderable.Reminderable, Timeboxed, Relatable,
                  WithSimilarityScore, FinishedDate, VerifiedDate,
-                 ValidateOnComplete, Notifiable, BusinessObject, db.Model):
+                 ValidateOnComplete, Notifiable, BusinessObject, Indexed,
+                 db.Model):
   """Class representing Assessment.
 
   Assessment is an object representing an individual assessment performed on

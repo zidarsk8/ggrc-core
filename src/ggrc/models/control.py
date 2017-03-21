@@ -25,6 +25,7 @@ from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.utils import validate_option
+from ggrc.fulltext.mixin import Indexed
 
 
 class ControlCategory(CategoryBase):
@@ -109,7 +110,7 @@ class AssertionCategorized(Categorizable):
 class Control(HasObjectState, Relatable, CustomAttributable,
               Personable, ControlCategorized, AssertionCategorized,
               Hierarchical, Timeboxed, Ownable, Auditable,
-              TestPlanned, BusinessObject, db.Model):
+              TestPlanned, BusinessObject, Indexed, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')

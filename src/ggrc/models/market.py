@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
+from ggrc.fulltext.mixin import Indexed
 from .mixins import BusinessObject, Timeboxed, CustomAttributable
 from .object_person import Personable
 from .object_owner import Ownable
@@ -11,6 +12,6 @@ from .track_object_state import HasObjectState
 
 class Market(HasObjectState, CustomAttributable, Personable,
              Relatable, Timeboxed, Ownable,
-             BusinessObject, db.Model):
+             BusinessObject, Indexed, db.Model):
   __tablename__ = 'markets'
   _aliases = {"url": "Market URL"}

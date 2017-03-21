@@ -19,12 +19,13 @@ from ggrc.models.reflection import PublishOnly
 from ggrc.models.program import Program
 from ggrc.models.person import Person
 from ggrc.models.snapshot import Snapshotable
+from ggrc.fulltext.mixin import Indexed
 
 
 class Audit(Snapshotable, clonable.Clonable,
             CustomAttributable, Personable, HasOwnContext, Relatable,
             Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled,
-            Stateful, Slugged, db.Model):
+            Stateful, Slugged, Indexed, db.Model):
   """Audit model."""
 
   __tablename__ = 'audits'

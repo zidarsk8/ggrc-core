@@ -18,6 +18,7 @@ from ggrc.models.mixins import Described
 from ggrc.models.mixins import Notifiable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.relationship import Relatable
+from ggrc.fulltext.mixin import Indexed
 
 
 class Commentable(object):
@@ -134,7 +135,8 @@ class Commentable(object):
     ).exists()
 
 
-class Comment(Relatable, Described, Ownable, Notifiable, Base, db.Model):
+class Comment(Relatable, Described, Ownable, Notifiable,
+              Base, Indexed, db.Model):
   """Basic comment model."""
   __tablename__ = "comments"
 

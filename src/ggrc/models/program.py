@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
+from ggrc.fulltext.mixin import Indexed
 from ggrc.models.context import HasOwnContext
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
@@ -16,7 +17,7 @@ from ggrc.models.track_object_state import HasObjectState
 
 class Program(HasObjectState, CustomAttributable,
               Personable, Relatable, HasOwnContext, Timeboxed,
-              Ownable, BusinessObject, db.Model):
+              Ownable, BusinessObject, Indexed, db.Model):
   __tablename__ = 'programs'
 
   KINDS = ['Directive']

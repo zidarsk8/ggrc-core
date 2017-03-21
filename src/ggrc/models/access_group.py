@@ -7,11 +7,12 @@ from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
+from ggrc.fulltext.mixin import Indexed
 
 
 class AccessGroup(HasObjectState,
                   CustomAttributable, Personable, Relatable,
-                  Timeboxed, Ownable, BusinessObject, db.Model):
+                  Timeboxed, Ownable, BusinessObject, Indexed, db.Model):
     __tablename__ = 'access_groups'
 
     _aliases = {"url": "Access Group URL"}
