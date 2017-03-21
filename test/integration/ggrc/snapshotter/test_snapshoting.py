@@ -705,7 +705,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         models.Audit.title.like("%Snapshotable audit%")).one()
 
     self.create_mapping(audit, objective)
-    self.create_mapping(audit, control)
+    self.create_mapping(control, audit)  # different direction than above
 
     objective_snapshot = db.session.query(models.Snapshot).filter(
         models.Snapshot.child_type == "Objective",
