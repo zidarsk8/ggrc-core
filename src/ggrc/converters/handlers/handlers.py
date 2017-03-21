@@ -435,7 +435,7 @@ class MappingColumnHandler(ColumnHandler):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=class_._inflector.human_singular.title(),
                          slug=slug)
-    if self.mandatory and not objects:
+    if self.mandatory and not objects and self.row_converter.is_new:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return objects
 
@@ -622,6 +622,11 @@ class AuditColumnHandler(MappingColumnHandler):
     key = "{}audit".format(MAPPING_PREFIX)
     super(AuditColumnHandler, self).__init__(row_converter, key, **options)
     self.allow = True
+
+    # Setting self.audit is not really needed but it's here just so that ORM
+    # marks the audit field as unchanged, which is used in model_put signal for
+    # verification.
+    self.audit = self.row_converter.obj.audit
 
   def set_obj_attr(self):
     """Set values to be saved.
