@@ -636,9 +636,15 @@ class AuditColumnHandler(MappingColumnHandler):
       return
 
     audit = self.value[0]
+
     if isinstance(audit, Audit):
-      self.row_converter.obj.context = audit.context
-      self.row_converter.obj.audit = audit
+      if not self.row_converter.is_new and \
+              audit.slug != self.row_converter.obj.audit.slug:
+        self.add_warning(errors.UNMODIFIABLE_COLUMN,
+                         column_name=self.display_name)
+      else:
+        self.row_converter.obj.context = audit.context
+        self.row_converter.obj.audit = audit
 
 
 class RequestAuditColumnHandler(ParentColumnHandler):
