@@ -100,12 +100,12 @@ class TestAssignableNotification(TestCase):
       self.import_file("assessment_with_templates.csv")
       asmts = {asmt.slug: asmt for asmt in Assessment.query}
 
-      notifications = self._get_notifications().all()
-      self.assertEqual(len(notifications), 6)
+      notifs = self._get_notifications(notif_type="assessment_open").all()
+      self.assertEqual(len(notifs), 6)
 
       revisions = Revision.query.filter(
           Revision.resource_type == 'Notification',
-          Revision.resource_id.in_([notif.id for notif in notifications])
+          Revision.resource_id.in_([notif.id for notif in notifs])
       ).count()
       self.assertEqual(revisions, 6)
 
@@ -116,6 +116,18 @@ class TestAssignableNotification(TestCase):
 
       self.client.get("/_notifications/send_daily_digest")
       self.assertEqual(self._get_notifications().count(), 0)
+
+      # editing an assessment in an active state should result in an
+      # "updated" notification
+      asmt = Assessment.query.get(asmts["A 5"].id)
+      self.api_helper.modify_object(
+          asmt, {"status": Assessment.PROGRESS_STATE})
+
+      asmt = Assessment.query.get(asmts["A 5"].id)
+      self.api_helper.modify_object(asmt, {"description": "new description"})
+
+      query = self._get_notifications(notif_type="assessment_updated")
+      self.assertEqual(query.count(), 1)
 
   @patch("ggrc.notifications.common.send_email")
   def test_assessment_with_verifiers(self, _):
@@ -196,6 +208,48 @@ class TestAssignableNotification(TestCase):
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 4)
+
+  @patch("ggrc.notifications.common.send_email")
+  def test_reverting_assessment_status_changes(self, _):
+    """Test that undoing a stautus change might NOT trigger a notification.
+
+    One use case is when a user verifies an assessment in review, but then
+    clicks the Undo button to revert the change. A status change notification
+    should not be sent in such cases.
+    """
+    self.import_file("assessment_with_templates.csv")
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    # mark Assessment as ready for review, verify it, then revert the change
+    asmt = Assessment.query.get(asmts["A 4"].id)
+    self.api_helper.modify_object(
+        asmt, {"status": Assessment.DONE_STATE})
+    asmt = Assessment.query.get(asmts["A 4"].id)
+
+    self.api_helper.modify_object(
+        asmt,
+        {"status": Assessment.FINAL_STATE, "verified_date": datetime.now()}
+    )
+
+    # clear notifications
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    # changing the status back to the previous one is effectively reopening
+    # an Assessment
+    asmt = Assessment.query.get(asmts["A 4"].id)
+    self.api_helper.modify_object(
+        asmt, {"status": Assessment.DONE_STATE, "verified_date": None})
+
+    query = self._get_notifications(notif_type="assessment_reopened")
+    self.assertEqual(query.count(), 0)
+
+    # there should also be no change notification
+    query = self._get_notifications(notif_type="assessment_updated")
+    self.assertEqual(query.count(), 0)
 
   @patch("ggrc.notifications.common.send_email")
   def test_changing_custom_attributes_triggers_change_notification(self, _):
