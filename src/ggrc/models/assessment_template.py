@@ -76,7 +76,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
       },
       "default_verifier": {
           "display_name": "Default Verifier",
-          "mandatory": True,
+          "mandatory": False,
           "filter_by": "_nop_filter",
       },
       "default_test_plan": {

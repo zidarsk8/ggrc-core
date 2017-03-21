@@ -359,7 +359,6 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Audit",
             "Code",
             "Default Assessors",
-            "Default Verifier",
         },
         "unique": {
             "Code",
