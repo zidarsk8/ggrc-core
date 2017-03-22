@@ -70,7 +70,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
 
   _aliases = {
       "default_assessors": {
-          "display_name": "Default Assessors",
+          "display_name": "Default Assignee",
           "mandatory": True,
           "filter_by": "_nop_filter",
       },
