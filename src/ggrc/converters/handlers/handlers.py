@@ -448,8 +448,10 @@ class MappingColumnHandler(ColumnHandler):
       return
     current_obj = self.row_converter.obj
     relationships = []
+    mapping = None
     for obj in self.value:
-      mapping = Relationship.find_related(current_obj, obj)
+      if current_obj.id:
+        mapping = Relationship.find_related(current_obj, obj)
       if not self.unmap and not mapping:
         mapping = Relationship(source=current_obj, destination=obj)
         relationships.append(mapping)
