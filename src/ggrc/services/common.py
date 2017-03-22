@@ -317,9 +317,12 @@ def update_index(session, cache):
   if cache:
     indexer = get_indexer()
     for obj in cache.new:
+      exists_query = session.query(indexer.record_type.query.filter(
+          indexer.record_type.type == obj.__class__.__name__,
+          indexer.record_type.key == obj.id).exists())
       if obj.type == "Snapshot":
         reindex_snapshots_list.append(obj.id)
-      else:
+      elif not exists_query.all()[0][0]:
         indexer.create_record(fts_record_for(obj), commit=False)
     for obj in cache.dirty:
       if obj.type == "Snapshot":

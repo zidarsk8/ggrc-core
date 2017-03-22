@@ -1,6 +1,5 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
 from collections import defaultdict, Iterable
 
 from sqlalchemy import and_
@@ -16,6 +15,7 @@ from sqlalchemy.schema import DDL
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select
+
 from ggrc import db
 from ggrc.login import is_creator
 from ggrc.models import all_models
@@ -52,6 +52,7 @@ class MysqlRecordProperty(db.Model):
         # Only MyISAM supports fulltext indexes until newer MySQL/MariaDB
         {'mysql_engine': 'myisam'},
     )
+
 
 event.listen(
     MysqlRecordProperty.__table__,
@@ -228,32 +229,44 @@ class MysqlIndexer(SqlIndexer):
       query = query.union(extra_q)
     return query.all()
 
+
 Indexer = MysqlIndexer
 
 
 INDEXER_RULES = defaultdict(list)
 
+ACTIONS = ['after_insert', 'after_delete', 'after_update']
+
+
+def runner(mapper, content, target):  # pylint:disable=unused-argument
+  """Collect all reindex models in session"""
+  db.session.reindex_set = getattr(db.session, "reindex_set", set())
+  getters = INDEXER_RULES.get(target.__class__.__name__) or []
+  for getter in getters:
+    to_index_list = getter(target)
+    if not isinstance(to_index_list, Iterable):
+      to_index_list = [to_index_list]
+    for to_index in to_index_list:
+      db.session.reindex_set.add(to_index)
+
+
 for model in all_models.all_models:
-  if issubclass(model, Indexed):
-    for rule in model.AUTO_REINDEX_RULES:
+  for action in ACTIONS:
+    event.listen(model, action, runner)
+  if not issubclass(model, Indexed):
+    continue
+  for sub_model in model.mro():
+    for rule in getattr(sub_model, "AUTO_REINDEX_RULES", []):
       INDEXER_RULES[rule.model].append(rule.rule)
 
 
 @event.listens_for(db.session.__class__, 'before_commit')
-def update_indexer(session):
+def update_indexer(session):  # pylint:disable=unused-argument
   """General function to update index
 
   for all updated related instance before commit"""
 
-  reindex_dict = {}
-  for instance in session.dirty:
-    getters = INDEXER_RULES.get(instance.__class__.__name__) or []
-    for getter in getters:
-      to_index_list = getter(instance)
-      if not isinstance(to_index_list, Iterable):
-        to_index_list = [to_index_list]
-      for to_index in to_index_list:
-        key = "{}-{}".format(to_index.__class__.__name__, to_index.id)
-        reindex_dict[key] = to_index
-  for for_index in reindex_dict.values():
+  db.session.flush()
+  for for_index in getattr(db.session, 'reindex_set', set()):
     for_index.update_indexer()
+  db.session.reindex_set = set()

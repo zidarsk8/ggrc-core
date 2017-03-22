@@ -9,6 +9,7 @@ from ggrc import db
 from ggrc.models.person import Person
 from ggrc.models.mixins import Base
 from ggrc.models.reflection import PublishOnly
+from ggrc.fulltext.mixin import Indexed, ReindexRule
 
 
 class ObjectOwner(Base, db.Model):
@@ -58,6 +59,13 @@ class ObjectOwner(Base, db.Model):
 
 
 class Ownable(object):
+
+  AUTO_REINDEX_RULES = [
+      ReindexRule(
+          "ObjectOwner",
+          lambda x: [x.ownable] if isinstance(x.ownable, Indexed) else []
+      )
+  ]
 
   @declared_attr
   def object_owners(cls):
