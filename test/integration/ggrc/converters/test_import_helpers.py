@@ -427,7 +427,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Audit",
-        "Test Plan",
+        "Remediation Plan",
         "Owner",
         "Primary Contact",
         "Secondary Contact",

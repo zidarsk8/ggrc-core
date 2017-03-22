@@ -28,7 +28,12 @@ class Issue(HasObjectState, TestPlanned, CustomAttributable, EvidenceURL,
       "audit"
   ]
 
-  _aliases = {"url": "Issue URL"}
+  _aliases = {
+      "url": "Issue URL",
+      "test_plan": {
+          "display_name": "Remediation Plan"
+      }
+  }
 
   audit_id = deferred(
       db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False),
