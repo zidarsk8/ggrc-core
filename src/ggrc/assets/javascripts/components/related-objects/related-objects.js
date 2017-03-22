@@ -11,7 +11,19 @@
   can.Component.extend({
     tag: 'related-objects',
     viewModel: {
-      isLoading: false,
+      define: {
+        noRelatedObjectsMessage: {
+          type: 'string',
+          get: function () {
+            return 'No Related ' + this.attr('relatedItemsType') + 's ' +
+              'were found';
+          }
+        },
+        isLoading: {
+          type: 'boolean',
+          value: false
+        }
+      },
       baseInstance: null,
       relatedObjects: [],
       relatedItemsType: '@',
