@@ -30,15 +30,12 @@ from integration.ggrc.models.factories import \
 
 
 class TestAssignableNotification(TestCase):
-
-  """Test setting notifications for assignable mixin."""
+  """Base class for testing notification creation for assignable mixin."""
 
   def setUp(self):
     super(TestAssignableNotification, self).setUp()
     self.client.get("/login")
     self._fix_notification_init()
-    self.api_helper = api_helper.Api()
-    self.objgen = generator.ObjectGenerator()
     factories.AuditFactory(slug="Audit")
 
   def _fix_notification_init(self):
@@ -85,6 +82,20 @@ class TestAssignableNotification(TestCase):
     return db.session.query(Notification).join(NotificationType).filter(
         notif_filter
     )
+
+
+class TestAssignableNotificationUsingImports(TestAssignableNotification):
+  """Tests for notifications when interacting with objects through imports."""
+  pass
+
+
+class TestAssignableNotificationUsingAPI(TestAssignableNotification):
+  """Tests for notifications when interacting with objects through an API."""
+
+  def setUp(self):
+    super(TestAssignableNotificationUsingAPI, self).setUp()
+    self.api_helper = api_helper.Api()
+    self.objgen = generator.ObjectGenerator()
 
   @patch("ggrc.notifications.common.send_email")
   def test_assessment_without_verifiers(self, _):
