@@ -73,8 +73,21 @@ class TestAuditSnapshotQueries(TestCase):
       cls._setup_objects()
 
   @staticmethod
-  def _setup_objects():
-    """Create and reindex objects needed for tests"""
+  def _create_users():
+    """Create users needed for testing."""
+    users = [
+        "user1@example.com",
+        "user2@example.com",
+        "user3@example.com",
+        "user4@example.com",
+        "user5@example.com"
+    ]
+    for user in users:
+      factories.PersonFactory(email=user)
+
+  @staticmethod
+  def _create_snapshotable_objects():
+    """Create original objects that will be snapshotted."""
     text_cad = factories.CustomAttributeDefinitionFactory(
         title="text cad",
         definition_type="market",
@@ -89,17 +102,6 @@ class TestAuditSnapshotQueries(TestCase):
         definition_type="market",
         attribute_type="Map:Person",
     )
-    users = [
-        "user1@example.com",
-        "user2@example.com",
-        "user3@example.com",
-        "user4@example.com",
-        "user5@example.com"
-    ]
-    for user in users:
-      factories.PersonFactory(email=user)
-
-    audit = factories.AuditFactory()
 
     for i in range(5):
       factories.ControlFactory(title="Control {}".format(i + 1))
@@ -121,6 +123,12 @@ class TestAuditSnapshotQueries(TestCase):
           attribute_value="user{}@example.com".format(i + 1),
       )
 
+  @classmethod
+  def _setup_objects(cls):
+    """Create and reindex objects needed for tests"""
+    cls._create_users()
+    cls._create_snapshotable_objects()
+
     revisions = models.Revision.query.filter(
         models.Revision.resource_type.in_(["OrgGroup", "Market", "Control"]),
         models.Revision.id.in_(
@@ -130,6 +138,8 @@ class TestAuditSnapshotQueries(TestCase):
             )
         ),
     )
+
+    audit = factories.AuditFactory()
 
     snapshots = [
         factories.SnapshotFactory(
@@ -156,6 +166,7 @@ class TestAuditSnapshotQueries(TestCase):
         # pylint: disable=protected-access
         obj = factory(
             title="{} {}".format(factory._meta.model.__name__, i + 1),
+            audit=audit,
         )
         factories.RelationshipFactory(
             source=audit if i % 2 == 0 else obj,

@@ -28,12 +28,8 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     control = self.create_object(models.Control, {
         "title": "Test Control Snapshot 1"
     })
-    assessment = self.create_object(models.Assessment, {
-        "title": "Test Assessment Snapshot 1"
-    })
 
     self.create_mapping(program, control)
-    self.create_mapping(program, assessment)
 
     control = self.refresh_object(control)
 

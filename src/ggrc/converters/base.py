@@ -29,7 +29,8 @@ class Converter(object):
       "Program",
       "Risk Assessment",
       "Audit",
-      "Request",
+      "Issue",
+      "Assessment",
       "Policy",
       "Regulation",
       "Standard",
@@ -48,6 +49,7 @@ class Converter(object):
       "slug",
       "delete",
       "task_type",
+      "audit",
   ]
 
   def __init__(self, **kwargs):

@@ -427,6 +427,8 @@ class MappingColumnHandler(ColumnHandler):
               object_type=class_._inflector.human_singular.title(),
               slug=slug,
           )
+      elif slug in self.new_slugs and not self.dry_run:
+        objects.append(self.new_slugs[slug])
       elif slug in self.new_slugs and self.dry_run:
         objects.append(slug)
       else:
@@ -446,8 +448,10 @@ class MappingColumnHandler(ColumnHandler):
       return
     current_obj = self.row_converter.obj
     relationships = []
+    mapping = None
     for obj in self.value:
-      mapping = Relationship.find_related(current_obj, obj)
+      if current_obj.id:
+        mapping = Relationship.find_related(current_obj, obj)
       if not self.unmap and not mapping:
         mapping = Relationship(source=current_obj, destination=obj)
         relationships.append(mapping)
@@ -631,9 +635,10 @@ class AuditColumnHandler(MappingColumnHandler):
       # error, so there is no need to do anything here.
       return
 
-    context = getattr(self.value[0], "context_id", None)
-    if context:  # context is not available on dry_run
-      self.row_converter.obj.context_id = context
+    audit = self.value[0]
+    if isinstance(audit, Audit):
+      self.row_converter.obj.context = audit.context
+      self.row_converter.obj.audit = audit
 
 
 class RequestAuditColumnHandler(ParentColumnHandler):
