@@ -11,7 +11,7 @@
   var innerTplFolder = GGRC.mustache_path + '/components/assessment/inline';
 
   function getTemplateByType(type) {
-    type = can.isFunction(type) ? type() : type;
+    type = can.Mustache.resolve(type);
     return innerTplFolder + '/' + type + '.mustache';
   }
 

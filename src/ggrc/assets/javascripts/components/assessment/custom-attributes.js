@@ -31,7 +31,7 @@
               this.attr('items').length > this.attr('limit');
           }
         },
-        showAllItems: {
+        shouldShowAllItems: {
           type: 'boolean',
           value: function () {
             return this.attr('isOverLimit');
@@ -41,7 +41,7 @@
           get: function () {
             var limit = this.attr('limit');
             var isOverLimit = this.attr('isOverLimit');
-            var limitVisible = !this.attr('showAllItems') && isOverLimit;
+            var limitVisible = !this.attr('shouldShowAllItems') && isOverLimit;
             return limitVisible ?
               this.attr('items').slice(0, limit) :
               this.attr('items');
@@ -49,7 +49,7 @@
         },
         showAllButtonText: {
           get: function () {
-            return !this.attr('showAllItems') ?
+            return !this.attr('shouldShowAllItems') ?
             'Show more (' + this.attr('items').length + ')' :
               'Show less';
           }
@@ -61,8 +61,8 @@
         open: false
       },
       toggleShowAll: function () {
-        var newValue = !this.attr('showAllItems');
-        this.attr('showAllItems', newValue);
+        var newValue = !this.attr('shouldShowAllItems');
+        this.attr('shouldShowAllItems', newValue);
       },
       saveCustomAttribute: function (scope) {
         var items = this.attr('items');
