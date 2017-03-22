@@ -45,6 +45,7 @@ dashboard-js-files:
   - plugins/utils/query-api-utils.js
   - plugins/utils/current-page-utils.js
   - plugins/utils/state-utils.js
+  - plugins/utils/ggrcq-utils.js
   - plugins/datepicker.js
   - plugins/can_control.js
   - plugins/wysiwyg.js
@@ -239,6 +240,7 @@ dashboard-js-files:
   - components/snapshotter/revisions-comparer.js
   - components/snapshotter/scope-update.js
   - components/info-pin-buttons/info-pin-buttons.js
+  - components/questions-link/questions-link.js
   - components/textarea-array/textarea-array.js
   - components/object-selection/object-selection.js
   - components/object-selection/object-selection-item.js
@@ -296,6 +298,7 @@ dashboard-js-template-files:
   - components/view-object-buttons/view-object-buttons.mustache
   - components/add-object-button/add-object-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
+  - components/questions-link/questions-link.mustache
   - add_widget_menu.mustache
   - base_objects/empty.mustache
   - base_objects/autocomplete_result.mustache
