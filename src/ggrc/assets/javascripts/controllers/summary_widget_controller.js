@@ -168,6 +168,7 @@
       chartOptions.attr('legend', legendData);
 
       this.element.find('#piechart_audit_assessments_chart-legend tbody')
+        .off('mouseenter', 'tr')
         .on('mouseenter', 'tr', function () {
           var $el = $(this);
           var rowIndex = $el.data('row-index');
