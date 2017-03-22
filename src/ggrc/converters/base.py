@@ -49,6 +49,7 @@ class Converter(object):
       "slug",
       "delete",
       "task_type",
+      "audit",
   ]
 
   def __init__(self, **kwargs):
