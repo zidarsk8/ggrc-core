@@ -1,28 +1,39 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Tests for basic Block Converter."""
 
-import mock
 from collections import defaultdict
 
+import mock
 from ddt import data, ddt
 
-from ggrc.converters import base_block
 from ggrc import models
-
+from ggrc.converters import base_block
+from ggrc.utils import QueryCounter
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
 
 @ddt
 class TestBaseBlock(TestCase):
+  """Tests for BlockConverter."""
+  # Protected access check is disable for testing private functions.
+  # pylint: disable=protected-access
+
+  QUERY_LIMIT = 4  # maximum number of queries allowed for building the cache
 
   @staticmethod
   def dd_to_dict(ddict):
-    return {k: dict(v) for k, v in ddict.items()}
+    return {
+        key: {
+            type_: set(ids) for type_, ids in value.items()
+        } for key, value in ddict.items()
+    }
 
-  @data(0, 1, 2, 4)
+  @data(0, 1, 2, 4, 8)
   def test_create_mapping_cache(self, count):
+    """Test creation of mapping cache for export."""
     regulations = [factories.RegulationFactory() for _ in range(count)]
     markets = [factories.MarketFactory() for _ in range(count)]
     controls = [factories.ControlFactory() for _ in range(count)]
@@ -48,8 +59,10 @@ class TestBaseBlock(TestCase):
     block.object_class = models.Regulation
     block.object_ids = [r.id for r in regulations]
 
-    cache = block._create_mapping_cache()
-    self.assertEqual(
-        self.dd_to_dict(cache),
-        self.dd_to_dict(expected_cache),
-    )
+    with QueryCounter() as counter:
+      cache = block._create_mapping_cache()
+      self.assertEqual(
+          self.dd_to_dict(cache),
+          self.dd_to_dict(expected_cache),
+      )
+      self.assertLess(counter.get, self.QUERY_LIMIT)
