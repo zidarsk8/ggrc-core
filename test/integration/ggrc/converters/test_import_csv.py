@@ -150,14 +150,20 @@ class TestBasicCsvImport(TestCase):
     filename = "pci_program_update.csv"
     response = self.import_file(filename)
 
-    self._check_csv_response(response, {})
+    self._check_csv_response(response, {
+        "Assessment": {
+            "row_warnings": {
+                errors.UNMODIFIABLE_COLUMN.format(line=3, column_name="Audit")
+            }
+        }
+    })
 
     assessment = models.Assessment.query.filter_by(slug="CA.PCI 1.1").first()
     audit = models.Audit.query.filter_by(slug="AUDIT-Consolidated").first()
     self.assertEqual(assessment.contact.email, "albert@reciprocitylabs.com")
     self.assertEqual(assessment.design, "Needs improvement")
     self.assertEqual(assessment.operationally, "Ineffective")
-    self.assertIsNotNone(models.Relationship.find_related(assessment, audit))
+    self.assertIsNone(models.Relationship.find_related(assessment, audit))
 
   def test_person_imports(self):
     """Test imports for Person object with user roles."""

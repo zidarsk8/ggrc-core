@@ -46,7 +46,7 @@ class TestAssessment(TestCase):
     asmt = factories.AssessmentFactory()
     correct_audit_id = asmt.audit_id
     response = self.api.put(asmt, {"audit": {
-      "type": "Audit", "id": correct_audit_id
+        "type": "Audit", "id": correct_audit_id
     }})
     self.assert200(response)
     assessment = Assessment.query.first()
@@ -63,11 +63,11 @@ class TestAssessment(TestCase):
         ("audit", audit.slug),
     ]))
     self._check_csv_response(response, {
-      "Assessment": {
-        "row_warnings": {
-        errors.UNMODIFIABLE_COLUMN.format(line=3, column_name="Audit")
+        "Assessment": {
+            "row_warnings": {
+                errors.UNMODIFIABLE_COLUMN.format(line=3, column_name="Audit")
+            }
         }
-      }
     })
     assessment = Assessment.query.first()
     self.assertEqual(assessment.audit_id, correct_audit_id)
