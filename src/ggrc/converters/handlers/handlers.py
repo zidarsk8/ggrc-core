@@ -435,7 +435,7 @@ class MappingColumnHandler(ColumnHandler):
         self.add_warning(errors.UNKNOWN_OBJECT,
                          object_type=class_._inflector.human_singular.title(),
                          slug=slug)
-    if self.mandatory and not objects:
+    if self.mandatory and not objects and self.row_converter.is_new:
       self.add_error(errors.MISSING_VALUE_ERROR, column_name=self.display_name)
     return objects
 
@@ -636,9 +636,16 @@ class AuditColumnHandler(MappingColumnHandler):
       return
 
     audit = self.value[0]
+
     if isinstance(audit, Audit):
-      self.row_converter.obj.context = audit.context
-      self.row_converter.obj.audit = audit
+      if not self.row_converter.is_new and \
+              audit.slug != self.row_converter.obj.audit.slug:
+        self.add_warning(errors.UNMODIFIABLE_COLUMN,
+                         column_name=self.display_name)
+        self.value = []
+      else:
+        self.row_converter.obj.context = audit.context
+        self.row_converter.obj.audit = audit
 
 
 class RequestAuditColumnHandler(ParentColumnHandler):

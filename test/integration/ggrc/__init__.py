@@ -179,7 +179,8 @@ class TestCase(BaseTestCase, object):
     }
     api = Api()
     api.set_user(person)  # Ok if person is None
-    response = api.tc.post("/_service/import_csv", data=data, headers=headers)
+    response = api.client.post("/_service/import_csv",
+                               data=data, headers=headers)
 
     return json.loads(response.data)
 

@@ -10,6 +10,8 @@
 
 from itertools import izip
 
+from sqlalchemy import inspect
+
 from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
@@ -59,6 +61,14 @@ def init_hook():
           child_revision_title = snapshot.revision.content['title']
           obj.title = u'{} assessment for {}'.format(child_revision_title,
                                                      parent_title)
+
+  @Resource.model_put.connect_via(Assessment)
+  @Resource.model_put.connect_via(Issue)
+  def handle_assessment_put(sender, obj=None, src=None, service=None):
+    # pylint: disable=unused-argument
+    if inspect(obj).attrs["audit"].history.added or \
+            inspect(obj).attrs["audit"].history.deleted:
+      raise ValueError("Audit field should not be changed")
 
 
 @Resource.collection_posted.connect_via(Issue)
