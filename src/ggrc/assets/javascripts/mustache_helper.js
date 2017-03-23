@@ -2898,4 +2898,15 @@ Example:
       return options.inverse(options.contexts);
     }
   );
+
+  Mustache.registerHelper('modifyFieldTitle', function (type, field, options) {
+    var titlesMap = {
+      Cycle: 'Cycle ',
+      CycleTaskGroup: 'Group ',
+      CycleTaskGroupObjectTask: 'Task '
+    };
+    type = Mustache.resolve(type);
+
+    return titlesMap[type] ? titlesMap[type] + field : field;
+  });
 })(this, jQuery, can);
