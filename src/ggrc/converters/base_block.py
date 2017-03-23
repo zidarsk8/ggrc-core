@@ -243,9 +243,9 @@ class BlockConverter(object):
     """Create a cache of emails for all object owners."""
     owner_ids = set()
     for row_converter in self.row_converters:
-      owners = getattr(row_converter.obj, "owners", None)
+      owners = getattr(row_converter.obj, "object_owners", None)
       if owners:
-        owner_ids |= {o.id for o in owners}
+        owner_ids |= {o.person_id for o in owners}
     query = db.session.query(
         models.Person.id,
         models.Person.email
