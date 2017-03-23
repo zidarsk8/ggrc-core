@@ -25,19 +25,16 @@ describe('GGRC.Components.objectList', function () {
   });
 
   describe('modifySelection() method ', function () {
-    var scope = new can.Map(
-      {
-        instance: {
-          type: 'a',
-          id: 1
-        },
-        isSelected: false
-      }
-    );
+    var scope = new can.Map({
+      instance: {
+        type: 'a',
+        id: 1
+      },
+      isSelected: false
+    });
 
     var items = new can.List([
-      scope,
-      {
+      scope, {
         instance: {
           type: 'b',
           id: 1
@@ -50,9 +47,14 @@ describe('GGRC.Components.objectList', function () {
       viewModel.attr('items', items);
     });
 
-    it('should select item with correct', function () {
+    it('should select item with correct index', function () {
       viewModel.modifySelection(scope, {}, $('body'));
       expect(viewModel.attr('items')[0].attr('isSelected')).toBe(true);
+    });
+
+    it('should update selected Item', function () {
+      viewModel.modifySelection(scope, {}, $('body'));
+      expect(viewModel.attr('selectedItem.data')).toBe(scope.attr('instance'));
     });
   });
 
@@ -77,11 +79,44 @@ describe('GGRC.Components.objectList', function () {
       }]);
       viewModel = GGRC.Components.getViewModel('objectList');
       viewModel.attr('items', items);
-      viewModel.modifySelection(scope, {}, $('body'));
-      viewModel.clearSelection();
+      // Set some not null default value selectedItem for each test execution
+      viewModel.attr('selectedItem', {
+        el: 'some object',
+        data: new can.Map({
+          field: 'someData'
+        })
+      });
     });
 
-    it('should deselect selected item and empty selection', function () {
+    it('should deselect selected item and empty selection' +
+      'if no item was selected', function () {
+      viewModel.clearSelection();
+      expect(viewModel.attr('items').attr()
+        .every(function (item) {
+          return !item.isSelected;
+        })).toBe(true);
+      expect(viewModel.attr('selectedItem.el')).toBeNull();
+      expect(viewModel.attr('selectedItem.data')).toBeNull();
+    });
+
+    it('should deselect selected item and empty selection' +
+      'if single item was selected', function () {
+      scope.attr('isSelected', true);
+      viewModel.clearSelection();
+      expect(viewModel.attr('items').attr()
+        .every(function (item) {
+          return !item.isSelected;
+        })).toBe(true);
+      expect(viewModel.attr('selectedItem.el')).toBeNull();
+      expect(viewModel.attr('selectedItem.data')).toBeNull();
+    });
+
+    it('should deselect selected item and empty selection' +
+      'if all items were selected', function () {
+      viewModel.attr('items').each(function (item) {
+        item.attr('isSelected', true);
+      });
+      viewModel.clearSelection();
       expect(viewModel.attr('items').attr()
         .every(function (item) {
           return !item.isSelected;
@@ -92,7 +127,6 @@ describe('GGRC.Components.objectList', function () {
   });
 
   describe('onOuterClick() method ', function () {
-
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('objectList');
       spyOn(viewModel, 'clearSelection');

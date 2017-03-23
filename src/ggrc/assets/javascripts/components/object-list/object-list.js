@@ -6,10 +6,6 @@
 (function (can, GGRC) {
   'use strict';
 
-  var defaultSelectedItem = {
-    el: null,
-    data: null
-  };
   var tag = 'object-list';
   var tpl = can.view(GGRC.mustache_path +
     '/components/object-list/object-list.mustache');
@@ -41,7 +37,10 @@
         },
         selectedItem: {
           value: function () {
-            return defaultSelectedItem;
+            return {
+              el: null,
+              data: null
+            };
           }
         },
         isInnerClick: {
@@ -62,7 +61,7 @@
        */
       modifySelection: function (ctx, ev, el) {
         var selectionFilter = this.attr('itemSelector');
-        var isSelected = selectionFilter.length ?
+        var isSelected = selectionFilter ?
           can.$(ev.target).closest(selectionFilter, el).length :
           true;
         this.clearSelection();
