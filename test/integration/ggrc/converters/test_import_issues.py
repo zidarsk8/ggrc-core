@@ -8,6 +8,7 @@
 from collections import OrderedDict
 
 from ggrc import models
+from ggrc.converters import errors
 
 from integration.ggrc.models import factories
 from integration.ggrc import TestCase
@@ -40,3 +41,19 @@ class TestImportIssues(TestCase):
           "Could not find relationship between: {} and {}".format(
               issue.slug, audit.slug)
       )
+
+  def test_audit_change(self):
+    audit = factories.AuditFactory()
+    issue = factories.IssueFactory()
+    response = self.import_data(OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", issue.slug),
+        ("audit", audit.slug),
+    ]))
+    self._check_csv_response(response, {
+        "Issue": {
+            "row_warnings": {
+                errors.UNMODIFIABLE_COLUMN.format(line=3, column_name="Audit")
+            }
+        }
+    })
