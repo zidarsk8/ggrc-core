@@ -248,6 +248,7 @@ dashboard-js-files:
   - components/last-assessment-date/last-assessment-date.js
   - components/tree/tree-node-actions.js
   - components/tree/tree-no-results.js
+  - components/tree/tree-assignee-field.js
   - components/page-header/page-header.js
   #- d3.v2.js
   #- related_graph.js
