@@ -169,28 +169,31 @@ class BlockConverter(object):
       self._ca_definitions_cache = self._create_ca_definitions_cache()
     return self._ca_definitions_cache
 
+  def _get_relationships(self):
+    """Get all relationships for any of the object in the current block."""
+    relationship = models.Relationship
+    with benchmark("Fetch all block relationships"):
+      relationships = []
+      if self.object_ids:
+        relationships = relationship.eager_query().filter(or_(
+            and_(
+                relationship.source_type == self.object_class.__name__,
+                relationship.source_id.in_(self.object_ids),
+            ),
+            and_(
+                relationship.destination_type == self.object_class.__name__,
+                relationship.destination_id.in_(self.object_ids),
+            )
+        )).all()
+      return relationships
+
   def _create_mapping_cache(self):
     """Create mapping cache for object in the current block."""
     def identifier(obj):
       return getattr(obj, "slug", getattr(obj, "email", None))
 
-    relationship = models.Relationship
-
     with benchmark("cache for: {}".format(self.object_class.__name__)):
-      with benchmark("cache query"):
-        if self.object_ids:
-          relationships = relationship.eager_query().filter(or_(
-              and_(
-                  relationship.source_type == self.object_class.__name__,
-                  relationship.source_id.in_(self.object_ids),
-              ),
-              and_(
-                  relationship.destination_type == self.object_class.__name__,
-                  relationship.destination_id.in_(self.object_ids),
-              )
-          )).all()
-        else:
-          relationships = []
+      relationships = self._get_relationships()
       with benchmark("building cache"):
         cache = defaultdict(lambda: defaultdict(list))
         for rel in relationships:
