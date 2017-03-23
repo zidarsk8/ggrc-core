@@ -178,16 +178,19 @@ class BlockConverter(object):
 
     with benchmark("cache for: {}".format(self.object_class.__name__)):
       with benchmark("cache query"):
-        relationships = relationship.eager_query().filter(or_(
-            and_(
-                relationship.source_type == self.object_class.__name__,
-                relationship.source_id.in_(self.object_ids),
-            ),
-            and_(
-                relationship.destination_type == self.object_class.__name__,
-                relationship.destination_id.in_(self.object_ids),
-            )
-        )).all()
+        if self.object_ids:
+          relationships = relationship.eager_query().filter(or_(
+              and_(
+                  relationship.source_type == self.object_class.__name__,
+                  relationship.source_id.in_(self.object_ids),
+              ),
+              and_(
+                  relationship.destination_type == self.object_class.__name__,
+                  relationship.destination_id.in_(self.object_ids),
+              )
+          )).all()
+        else:
+          relationships = []
       with benchmark("building cache"):
         cache = defaultdict(lambda: defaultdict(list))
         for rel in relationships:
