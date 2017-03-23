@@ -294,9 +294,9 @@
           this.page_loader = new GGRC.ListLoaders.TreePageLoader(
             this.options.model, this.options.parent_instance,
             this.options.mapping);
-        } else if (this.options.attr('is_subtree') &&
-          GGRC.page_instance().type !== 'Workflow') {
-          if (GGRC.Utils.CurrentPage.isObjectContextPage()) {
+        } else if (this.options.attr('is_subtree')) {
+          if (GGRC.Utils.CurrentPage.isObjectContextPage() &&
+            GGRC.page_instance().type !== 'Workflow') {
             this.options.attr('drawSubTreeExpander', true);
           }
           this.page_loader = new GGRC.ListLoaders.SubTreeLoader(
@@ -506,7 +506,7 @@
 
     display_path: function (path, refetch) {
       return this.display(refetch).then(this._ifNotRemoved(function () {
-        return GGRC.Utils._display_tree_subpath(this.element, path);
+        return GGRC.Utils.TreeView.displayTreeSubpath(this.element, path);
       }.bind(this)));
     },
 
@@ -1295,8 +1295,7 @@
       var snapshots = GGRC.Utils.Snapshots;
       var parentCtrl = this.element.closest('section')
         .find('.cms_controllers_tree_view').control();
-      var originalOrder =
-        can.makeArray(GGRC.tree_view.attr('orderedWidgetsByType')[parent.type]);
+      var originalOrder = GGRC.Utils.TreeView.getModelsForSubTier(parent.type);
       var relevant = {
         type: parent.type,
         id: snapshots.isSnapshot(parent) ? parent.snapshot.child_id : parent.id,
@@ -1307,30 +1306,47 @@
       var statesQuery = GGRC.query_parser.parse(statesFilter);
       var reqParams;
       var filter;
+      var fields = [
+        'child_id',
+        'child_type',
+        'context',
+        'email',
+        'id',
+        'is_latest_revision',
+        'name',
+        'revision',
+        'revisions',
+        'selfLink',
+        'slug',
+        'status',
+        'title',
+        'type',
+        'viewLink',
+        'workflow_state'
+      ];
 
-      reqParams = originalOrder.map(function (model) {
-        if (GGRC.Utils.State.hasState(model)) {
-          filter = statesQuery;
-        }
-        return queryAPI.buildParam(model, {}, relevant, [
-          'child_id',
-          'child_type',
-          'context',
-          'email',
-          'id',
-          'is_latest_revision',
-          'name',
-          'revision',
-          'revisions',
-          'selfLink',
-          'slug',
-          'status',
-          'title',
-          'type',
-          'viewLink',
-          'workflow_state'
-        ], filter);
-      });
+      if (!originalOrder.length) {
+        originalOrder = GGRC.Mappings
+          .getMappingList(parent.type);
+      }
+
+      if (GGRC.Utils.CurrentPage.getPageType() === 'Workflow') {
+        fields = [];
+        reqParams = originalOrder.map(function (model) {
+          var rootFilter = parentCtrl.options.attr('paging.filter');
+          if (rootFilter) {
+            filter = GGRC.query_parser.parse(rootFilter);
+          }
+          return queryAPI.buildParam(model, {}, relevant, fields, filter);
+        });
+      } else {
+        reqParams = originalOrder.map(function (model) {
+          if (GGRC.Utils.State.hasState(model)) {
+            filter = statesQuery;
+          }
+          return queryAPI.buildParam(model, {}, relevant, fields, filter);
+        });
+      }
 
       return this.page_loader.load({data: reqParams}, originalOrder);
     },
