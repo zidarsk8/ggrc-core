@@ -859,11 +859,7 @@
     },
     update_header: function () {
       var treeFilter;
-      var filterHeight;
-      var headerHeight;
-      var parentWidth;
       var headerContentHeight;
-      var treeHeaderContent;
       var elementParent;
 
       if (!this.element || !this.element.parent) {
@@ -871,25 +867,15 @@
       }
 
       elementParent = this.element.parent();
-      treeFilter = elementParent.find('.tree-filter');
+      treeFilter = elementParent.find('.tree-header-content');
 
       if (treeFilter.length === 0) {
         return;
       }
 
-      filterHeight = Number(treeFilter.attr('data-height')) +
-        Number(treeFilter.attr('data-margin-bottom'));
-      headerHeight = elementParent.find('.tree-header').height();
-      parentWidth = elementParent.width();
-      headerContentHeight = filterHeight + headerHeight;
-      treeHeaderContent = elementParent.find('.tree-header-content');
+      headerContentHeight = treeFilter.height();
 
       this.element.css('margin-top', headerContentHeight);
-
-      if (treeHeaderContent) {
-        treeHeaderContent.css('width', parentWidth);
-        treeHeaderContent.height(headerContentHeight);
-      }
     },
     draw_items: function (optionsList) {
       var items;
