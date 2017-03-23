@@ -205,7 +205,8 @@ dashboard-js-files:
   - components/reusable_objects.js
   - components/assessment_generator.js
   - components/paginate.js
-  - components/tabs.js
+  - components/tabs/tab-container.js
+  - components/tabs/tab-panel.js
   - components/assessment_attributes.js
   - components/lazy_open_close.js
   - components/object_history/object_history.js
@@ -256,6 +257,8 @@ app-init-files:
   - dashboard.js
 
 dashboard-js-template-files:
+  - components/tabs/tab-container.mustache
+  - components/tabs/tab-panel.mustache
   - components/object-state-toolbar/object-state-toolbar.mustache
   - components/object-selection/object-selection-item.mustache
   - components/mapping-controls/mapping-type-selector.mustache
@@ -317,8 +320,6 @@ dashboard-js-template-files:
   - base_objects/view_link.mustache
   - base_objects/unmap.mustache
   - base_objects/mappings_detail.mustache
-  - base_objects/tabs.mustache
-  - base_objects/tab_panel.mustache
   - base_objects/page_header.mustache
   - base_objects/paginate.mustache
   - base_objects/search_actions.mustache

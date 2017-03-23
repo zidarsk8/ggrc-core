@@ -46,13 +46,13 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                          {object-list-item-selector}="objectSelectorEl" empty-message="No Related Assessments were found">
                 <div class="grid-data-row flex-row flex-box">
                     <div class="grid-data-item-index">
-                      <state-colors-map {state}="status"></state-colors-map>
+                      <state-colors-map {state}="instance.status"></state-colors-map>
                     </div>
                     <div class="grid-data-item-index">
-                      {{localize_date finished_date}}
+                      {{localize_date instance.finished_date}}
                     </div>
                     <div class="grid-data-item-index">
-                      {{localize_date created_at}}
+                      {{localize_date instance.created_at}}
                     </div>
                     <div class="flex-size-3">
                         <related-controls-objectives {parent-instance}="instance">
@@ -106,7 +106,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     </div>
                 </div>
             </object-list>
-              <related-assessment-popover class="object-popover" {selected-assessment}="selectedItem"></related-assessment-popover>
+              <related-assessment-popover class="object-popover related-assessments__object-popover" {selected-assessment}="selectedItem"></related-assessment-popover>
         </div>
     </reusable-objects-list>
 </related-objects>
