@@ -37,7 +37,7 @@ class TestCreator(TestCase):
   def test_admin_page_access(self):
     for role, code in (("creator", 403), ("admin", 200)):
       self.api.set_user(self.users[role])
-      self.assertEqual(self.api.tc.get("/admin").status_code, code)
+      self.assertEqual(self.api.client.get("/admin").status_code, code)
 
   def test_creator_can_crud(self):
     """ Test Basic create/read,update/delete operations """
