@@ -66,3 +66,31 @@ class TestBaseBlock(TestCase):
           self.dd_to_dict(expected_cache),
       )
       self.assertLess(counter.get, self.QUERY_LIMIT)
+
+  def test_get_identifier_mappings(self):
+    """Test _get_identifier_mappings function."""
+    count = 3
+    regulation = factories.RegulationFactory()
+    markets = [factories.MarketFactory() for _ in range(count)]
+    controls = [factories.ControlFactory() for _ in range(count)]
+    expected_id_map = {
+        "Market": {o.id: o.slug for o in markets},
+        "Control": {o.id: o.slug for o in controls},
+    }
+
+    relationships = []
+    for i in range(count):
+      relationships.append(factories.RelationshipFactory(
+          source=regulation if i % 2 == 0 else markets[i],
+          destination=regulation if i % 2 == 1 else markets[i],
+      ))
+      relationships.append(factories.RelationshipFactory(
+          source=regulation if i % 2 == 0 else controls[i],
+          destination=regulation if i % 2 == 1 else controls[i],
+      ))
+
+    block = base_block.BlockConverter(mock.MagicMock())
+    block.object_class = models.Regulation
+    block.object_ids = [regulation.id]
+    id_map = block._get_identifier_mappings(relationships)
+    self.assertEqual(expected_id_map, id_map)
