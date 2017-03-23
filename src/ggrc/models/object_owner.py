@@ -10,6 +10,7 @@ from ggrc.models.person import Person
 from ggrc.models.mixins import Base
 from ggrc.models.reflection import PublishOnly
 from ggrc.fulltext.mixin import Indexed, ReindexRule
+from ggrc.fulltext.attributes import MultipleSubpropertyFullTextAttr
 
 
 class ObjectOwner(Base, db.Model):
@@ -92,7 +93,7 @@ class Ownable(object):
   ]
   _include_links = []
   _fulltext_attrs = [
-      'owners',
+      MultipleSubpropertyFullTextAttr('owners', 'owners', ['name', 'email'])
   ]
   _aliases = {
       "owners": {

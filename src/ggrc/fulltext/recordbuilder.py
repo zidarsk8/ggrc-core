@@ -174,23 +174,12 @@ class RecordBuilder(object):
                                 "secondary_assessor", "contact",
                                 "secondary_contact"}
 
-    multiple_person_properties = {"owners"}
-
     for prop in single_person_properties & set(properties.keys()):
       subproperties = {}
       for person in properties[prop].values():
         if person:
           subproperties.update(self.build_person_subprops(person))
           subproperties.update(self.build_list_sort_subprop([person]))
-      if subproperties:
-        properties[prop] = subproperties
-
-    for prop in multiple_person_properties & set(properties.keys()):
-      subproperties = {}
-      for people_list in properties[prop].values():
-        for person in people_list:
-          subproperties.update(self.build_person_subprops(person))
-        subproperties.update(self.build_list_sort_subprop(people_list))
       if subproperties:
         properties[prop] = subproperties
 
