@@ -96,6 +96,7 @@ class BlockConverter(object):
     # it, so it is expected to hold a lot of instance attributes.
     # The protected access is a false warning for inflector access.
     self._mapping_cache = None
+    self._owners_cache = None
     self._ca_definitions_cache = None
     self.converter = converter
     self.offset = options.get("offset", 0)
@@ -238,6 +239,27 @@ class BlockConverter(object):
       self._mapping_cache = self._create_mapping_cache()
     return self._mapping_cache
 
+  def _create_owners_cache(self):
+    """Create a cache of emails for all object owners."""
+    owner_ids = set()
+    for row_converter in self.row_converters:
+      owners = getattr(row_converter.obj, "owners", None)
+      if owners:
+        owner_ids |= {o.id for o in owners}
+    query = db.session.query(
+        models.Person.id,
+        models.Person.email
+    ).filter(
+        models.Person.id.in_(owner_ids)
+    )
+    return dict(query)
+
+  def get_owners_cache(self):
+    """Get object owners email cache."""
+    if self._owners_cache is None:
+      self._owners_cache = self._create_owners_cache()
+    return self._owners_cache
+
   def check_for_duplicate_columns(self, raw_headers):
     """Check for duplicate column names in the current block.
 
@@ -267,7 +289,7 @@ class BlockConverter(object):
       if self.object_headers[field]["mandatory"]:
         display_name += "*"
       headers.append([description, display_name])
-    return map(list, zip(*headers))
+    return [list(header) for header in zip(*headers)]
 
   def generate_csv_body(self):
     """ Generate 2D array populated with object values """
