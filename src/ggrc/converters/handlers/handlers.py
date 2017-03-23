@@ -642,6 +642,7 @@ class AuditColumnHandler(MappingColumnHandler):
               audit.slug != self.row_converter.obj.audit.slug:
         self.add_warning(errors.UNMODIFIABLE_COLUMN,
                          column_name=self.display_name)
+        self.value = []
       else:
         self.row_converter.obj.context = audit.context
         self.row_converter.obj.audit = audit
