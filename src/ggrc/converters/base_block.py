@@ -175,7 +175,12 @@ class BlockConverter(object):
     with benchmark("Fetch all block relationships"):
       relationships = []
       if self.object_ids:
-        relationships = relationship.eager_query().filter(or_(
+        relationships = db.session.query(
+            relationship.source_id,
+            relationship.source_type,
+            relationship.destination_id,
+            relationship.destination_type,
+        ).filter(or_(
             and_(
                 relationship.source_type == self.object_class.__name__,
                 relationship.source_id.in_(self.object_ids),
@@ -187,30 +192,45 @@ class BlockConverter(object):
         )).all()
       return relationships
 
+  def _get_identifier_mappings(self, relationships):
+    """Get object and id mapping to user visible identifier."""
+    object_ids = defaultdict(set)
+    for rel in relationships:
+      if rel.source_type == self.object_class.__name__:
+        object_ids[rel.destination_type].add(rel.destination_id)
+      else:
+        object_ids[rel.source_type].add(rel.source_id)
+
+    id_map = {}
+    for object_type, ids in object_ids.items():
+      model = getattr(models.all_models, object_type, None)
+      id_column = getattr(model, "slug", getattr(model, "email", None))
+      if id_column:
+        query = db.session.query(model.id, id_column).filter(model.id.in_(ids))
+        id_map[object_type] = dict(query)
+      else:
+        # invalid model
+        pass
+    return id_map
+
   def _create_mapping_cache(self):
     """Create mapping cache for object in the current block."""
-    def identifier(obj):
-      return getattr(obj, "slug", getattr(obj, "email", None))
 
     with benchmark("cache for: {}".format(self.object_class.__name__)):
       relationships = self._get_relationships()
+      id_map = self._get_identifier_mappings(relationships)
       with benchmark("building cache"):
         cache = defaultdict(lambda: defaultdict(list))
         for rel in relationships:
-          try:
-            if rel.source_type == self.object_class.__name__:
-              if rel.destination:
-                cache[rel.source_id][rel.destination_type].append(
-                    identifier(rel.destination))
-            elif rel.source:
-              cache[rel.destination_id][rel.source_type].append(
-                  identifier(rel.source))
-          except AttributeError:
-            # Some relationships have an invalid state in the database and make
-            # rel.source or rel.destination fail. These relationships are
-            # ignored everywhere and should eventually be purged from the db
-            logger.error("Failed adding object to relationship cache. "
-                         "Rel id: %s", rel.id)
+          if rel.source_type == self.object_class.__name__:
+            identifier = id_map.get(rel.destination_type, {}).get(
+                rel.destination_id)
+            if identifier:
+              cache[rel.source_id][rel.destination_type].append(identifier)
+          else:
+            identifier = id_map.get(rel.source_type, {}).get(rel.source_id)
+            if identifier:
+              cache[rel.destination_id][rel.source_type].append(identifier)
       return cache
 
   def get_mapping_cache(self):
