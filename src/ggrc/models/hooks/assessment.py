@@ -65,8 +65,15 @@ def init_hook():
   @Resource.model_put.connect_via(Assessment)
   def handle_assessment_put(sender, obj=None, src=None, service=None):
     if inspect(obj).attrs["audit"].history.added or \
-        inspect(obj).attrs["audit"].history.deleted:
+            inspect(obj).attrs["audit"].history.deleted:
       raise ValueError("Audit field should not be changed")
+
+  @Resource.model_put.connect_via(Issue)
+  def handle_issue_put(sender, obj=None, src=None, service=None):
+    if inspect(obj).attrs["audit"].history.added or \
+            inspect(obj).attrs["audit"].history.deleted:
+      raise ValueError("Audit field should not be changed")
+
 
 @Resource.collection_posted.connect_via(Issue)
 def handle_issue_post(sender, objects=None, sources=None):
