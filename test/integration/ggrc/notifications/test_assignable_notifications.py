@@ -7,6 +7,9 @@
 
 """Tests for notifications for models with assignable mixin."""
 
+import unittest
+
+from collections import OrderedDict
 from datetime import datetime
 from freezegun import freeze_time
 from mock import patch
@@ -86,7 +89,159 @@ class TestAssignableNotification(TestCase):
 
 class TestAssignableNotificationUsingImports(TestAssignableNotification):
   """Tests for notifications when interacting with objects through imports."""
-  pass
+
+  def test_assessment_created_notifications(self):
+    """Test if importing new assessments results in notifications for all."""
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    self.import_file("assessment_with_templates.csv")
+
+    query = self._get_notifications(notif_type="assessment_open")
+    self.assertEqual(query.count(), 6)
+
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_updated_notifications(self, _):
+    """Test if updating an assessment results in a notification."""
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id = asmt.id
+
+    asmt.status = Assessment.PROGRESS_STATE
+    db.session.commit()
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+    asmt = Assessment.query.get(asmt_id)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt.slug),
+        (u"Title", u"New Assessment 1 title"),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_updated")
+    self.assertEqual(query.count(), 1)
+
+  @unittest.skip("An issue needs to be fixed.")
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_ca_updated_notifications(self, _):
+    """Test if updating assessment custom attr. results in a notification."""
+    CAD(definition_type="assessment", title="CA_misc_remarks")
+
+    self.import_file("assessment_with_templates.csv")
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt.slug),
+        (u"CA_misc_remarks", u"CA new value"),
+    ]))
+
+    asmt = Assessment.query.get(asmts["A 1"].id)
+
+    query = self._get_notifications(notif_type="assessment_updated")
+    self.assertEqual(query.count(), 1)
+
+  @unittest.skip("An issue needs to be fixed.")
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_url_updated_notifications(self, _):
+    """Test if updating assessment URLs results in a notification."""
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id = asmt.id
+
+    asmt.status = Assessment.PROGRESS_STATE
+    db.session.commit()
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+    asmt = Assessment.query.get(asmt_id)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt.slug),
+        (u"Url", u"www.foo-url.bar"),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_updated")
+    self.assertEqual(query.count(), 1)
+
+  @unittest.skip("An issue needs to be fixed.")
+  @patch("ggrc.notifications.common.send_email")
+  def test_attaching_assessment_evidence_notifications(self, _):
+    """Test if attaching assessment evidence results in a notification."""
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id = asmt.id
+
+    asmt.status = Assessment.PROGRESS_STATE
+    db.session.commit()
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+    asmt = Assessment.query.get(asmt_id)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt.slug),
+        (u"Evidence", u"https://gdrive.com/qwerty1/view evidence.txt"),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_updated")
+    self.assertEqual(query.count(), 1)
+
+  @unittest.skip("An issue needs to be fixed.")
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_person_updated_notifications(self, _):
+    """Test if updating assessment people results in a notification."""
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id = asmt.id
+
+    asmt.status = Assessment.PROGRESS_STATE
+    db.session.commit()
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+    asmt = Assessment.query.get(asmt_id)
+
+    # change assignee
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt.slug),
+        (u"Assignee*", u"john@doe.com"),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_updated")
+    self.assertEqual(query.count(), 1)
+
+    # clear notifications
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+    asmt = Assessment.query.get(asmt_id)
+
+    # change verifier
+    asmt = Assessment.query.get(asmt_id)
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt.slug),
+        (u"Verifier", u"bob@dylan.com"),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_updated")
+    self.assertEqual(query.count(), 1)
 
 
 class TestAssignableNotificationUsingAPI(TestAssignableNotification):
