@@ -623,11 +623,6 @@ class AuditColumnHandler(MappingColumnHandler):
     super(AuditColumnHandler, self).__init__(row_converter, key, **options)
     self.allow = True
 
-    # Setting self.audit is not really needed but it's here just so that ORM
-    # marks the audit field as unchanged, which is used in model_put signal for
-    # verification.
-    self.audit = self.row_converter.obj.audit
-
   def set_obj_attr(self):
     """Set values to be saved.
 
