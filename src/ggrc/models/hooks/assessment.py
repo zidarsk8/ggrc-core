@@ -61,6 +61,14 @@ def init_hook():
           child_revision_title = snapshot.revision.content['title']
           obj.title = u'{} assessment for {}'.format(child_revision_title,
                                                      parent_title)
+          template = related.get('template')
+          if not template:
+            continue
+          if template.test_plan_procedure:
+            test_plan = snapshot.revision.content['test_plan']
+          else:
+            test_plan = template.procedure_description
+          obj.test_plan = test_plan
 
   @Resource.model_put.connect_via(Assessment)
   @Resource.model_put.connect_via(Issue)
