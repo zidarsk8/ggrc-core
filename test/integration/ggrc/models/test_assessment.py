@@ -1,6 +1,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Integration tests for Assessment"""
+
 from collections import OrderedDict
 
 from ggrc.models import Assessment
@@ -12,6 +14,7 @@ from integration.ggrc.models import factories
 
 
 class TestAssessment(TestCase):
+  """Assessment test cases"""
   # pylint: disable=invalid-name
 
   def setUp(self):
@@ -19,6 +22,7 @@ class TestAssessment(TestCase):
     self.api = Api()
 
   def test_auto_slug_generation(self):
+    """Test auto slug generation"""
     factories.AssessmentFactory(title="Some title")
     ca = Assessment.query.first()
     self.assertEqual("ASSESSMENT-{}".format(ca.id), ca.slug)
@@ -43,7 +47,6 @@ class TestAssessment(TestCase):
 
   def test_put_no_audit_change(self):
     """Test that put requests works without audit changes"""
-    factories.AuditFactory().id
     asmt = factories.AssessmentFactory()
     correct_audit_id = asmt.audit_id
     response = self.api.put(asmt, {"audit": {
@@ -88,6 +91,7 @@ class TestAssessment(TestCase):
     self.assertEqual(assessment.audit_id, correct_audit_id)
 
   def test_empty_audit_import(self):
+    """Test empty audit import"""
     factories.AuditFactory()
     asmt = factories.AssessmentFactory()
     correct_audit_id = asmt.audit_id
@@ -128,20 +132,20 @@ class TestAssessmentGeneration(TestCase):
   def assessment_post(self, template=None):
     """Helper function to POST an assessment"""
     assessment_dict = {
-            "_generated": True,
-            "audit": {
-                "id": self.audit.id,
-                "type": "Audit"
-            },
-            "object": {
-                "id": self.snapshot.id,
-                "type": "Snapshot"
-            },
-            "context": {
-                "id": self.audit.context.id,
-                "type": "Context"
-            },
-            "title": "Temp title"
+        "_generated": True,
+        "audit": {
+            "id": self.audit.id,
+            "type": "Audit"
+        },
+        "object": {
+            "id": self.snapshot.id,
+            "type": "Snapshot"
+        },
+        "context": {
+            "id": self.audit.context.id,
+            "type": "Context"
+        },
+        "title": "Temp title"
     }
     if template:
       assessment_dict["template"] = {
