@@ -80,8 +80,9 @@
             var data = responseArr[0];
             var values = data[relatedType].values;
             var result = values.map(function (item) {
-              item.instance = new CMS.Models[relatedType](item);
-              return item;
+              return {
+                instance: CMS.Models[relatedType].model(item)
+              };
             });
             // Update paging object
             this.updatePaging(data[relatedType].total);
