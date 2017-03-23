@@ -10,6 +10,31 @@
    * TreeView-specific utils.
    */
   GGRC.Utils.TreeView = (function () {
+
+    var baseWidgets = GGRC.tree_view.attr('base_widgets_by_type');
+    var defaultOrderTypes = GGRC.tree_view.attr('defaultOrderTypes');
+    var allTypes = Object.keys(baseWidgets.serialize());
+    var orderedModelsForSubTier = {};
+
+    allTypes.forEach(function (type) {
+      var related = baseWidgets[type].slice(0);
+
+      orderedModelsForSubTier[type] = _.chain(related)
+        .map(function (type) {
+          return {
+            name: type,
+            order: defaultOrderTypes[type]
+          };
+        })
+        .sortByAll(['order', 'name'])
+        .map('name')
+        .value();
+    });
+
+    // Define specific rules for Workflow models
+    orderedModelsForSubTier.Cycle = ['CycleTaskGroup'];
+    orderedModelsForSubTier.CycleTaskGroup = ['CycleTaskGroupObjectTask'];
+
     /**
      * Get available and selected columns for Model type
      * @param {String} modelType - Model type.
@@ -187,10 +212,15 @@
       return can.Deferred().resolve();
     }
 
+    function getModelsForSubTier(model) {
+      return orderedModelsForSubTier[model] || [];
+    }
+
     return {
       getColumnsForModel: getColumnsForModel,
       setColumnsForModel: setColumnsForModel,
-      displayTreeSubpath: displayTreeSubpath
+      displayTreeSubpath: displayTreeSubpath,
+      getModelsForSubTier: getModelsForSubTier
     };
   })();
 })(window.GGRC);

@@ -1295,8 +1295,7 @@
       var snapshots = GGRC.Utils.Snapshots;
       var parentCtrl = this.element.closest('section')
         .find('.cms_controllers_tree_view').control();
-      var originalOrder =
-        can.makeArray(GGRC.tree_view.attr('orderedWidgetsByType')[parent.type]);
+      var originalOrder = GGRC.Utils.TreeView.getModelsForSubTier(parent.type);
       var relevant = {
         type: parent.type,
         id: snapshots.isSnapshot(parent) ? parent.snapshot.child_id : parent.id,
