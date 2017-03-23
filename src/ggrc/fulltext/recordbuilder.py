@@ -170,19 +170,6 @@ class RecordBuilder(object):
         for role, people in role_to_people.items():
           properties[role].update(self.build_list_sort_subprop(people))
 
-    single_person_properties = {"modified_by", "principal_assessor",
-                                "secondary_assessor", "contact",
-                                "secondary_contact"}
-
-    for prop in single_person_properties & set(properties.keys()):
-      subproperties = {}
-      for person in properties[prop].values():
-        if person:
-          subproperties.update(self.build_person_subprops(person))
-          subproperties.update(self.build_list_sort_subprop([person]))
-      if subproperties:
-        properties[prop] = subproperties
-
     return Record(
         # This logic saves custom attribute values as attributes of the object
         # that owns the attribute values. When obj is not a

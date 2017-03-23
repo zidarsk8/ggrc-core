@@ -26,6 +26,7 @@ from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.utils import validate_option
 from ggrc.fulltext.mixin import Indexed
+from ggrc.fulltext import attributes
 
 
 class ControlCategory(CategoryBase):
@@ -184,8 +185,15 @@ class Control(HasObjectState, Relatable, CustomAttributable,
       'means',
       'verify_frequency',
       'version',
-      'principal_assessor',
-      'secondary_assessor',
+      attributes.FullTextAttr(
+          "principal_assessor",
+          "principal_assessor",
+          ["name", "email"]
+      ),
+      attributes.FullTextAttr(
+          'secondary_assessor',
+          'secondary_assessor',
+          ["name", "email"]),
   ]
 
   _sanitize_html = [
