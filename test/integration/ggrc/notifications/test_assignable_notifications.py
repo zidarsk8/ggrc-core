@@ -243,6 +243,162 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_updated")
     self.assertEqual(query.count(), 1)
 
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_state_change_notifications(self, _):
+    """Test if updating assessment state results in notifications."""
+    # pylint: disable=too-many-statements
+
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id, asmt_slug = asmt.id, asmt.slug
+
+    asmt.status = Assessment.PROGRESS_STATE
+    db.session.commit()
+
+    # test submitting assessment for review
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"State*", Assessment.DONE_STATE),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_ready_for_review")
+    self.assertEqual(query.count(), 1)
+
+    # test verifying an assessment
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"State*", Assessment.FINAL_STATE),
+        # (will get verified, because there is a verifier assigned)
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_verified")
+    self.assertEqual(query.count(), 1)
+
+    # test reopening a verified assessment
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"State*", Assessment.PROGRESS_STATE),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_reopened")
+    self.assertEqual(query.count(), 1)
+
+    # sending an assessment back to "in review" (i.e. the undo action)
+    asmt = Assessment.query.get(asmt_id)
+    asmt.status = Assessment.VERIFIED_STATE
+    db.session.commit()
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"State*", Assessment.DONE_STATE),
+    ]))
+
+    query = self._get_notifications()
+    self.assertEqual(query.count(), 0)  # there should be no notification!
+
+    # test declining an assessment
+    asmt = Assessment.query.get(asmt_id)
+    asmt.status = Assessment.DONE_STATE
+    db.session.commit()
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"State*", Assessment.PROGRESS_STATE),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_declined")
+    self.assertEqual(query.count(), 1)
+    query = self._get_notifications(notif_type="assessment_reopened")
+    self.assertEqual(query.count(), 1)
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    # directly submitting a not started assessment for review
+    asmt = Assessment.query.get(asmt_id)
+    asmt.status = Assessment.START_STATE
+    db.session.commit()
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"State*", Assessment.DONE_STATE),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_ready_for_review")
+    self.assertEqual(query.count(), 1)
+
+    # directly completing a not started assessment
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"Verifier", None),
+        (u"State*", Assessment.START_STATE),
+    ]))
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"State*", Assessment.FINAL_STATE),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_completed")
+    self.assertEqual(query.count(), 1)
+
+    # test reopening a completed assessment
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"State*", Assessment.PROGRESS_STATE),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_reopened")
+    self.assertEqual(query.count(), 1)
+
+    # completing an assessment in progress
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"State*", Assessment.FINAL_STATE),
+    ]))
+
+    query = self._get_notifications(notif_type="assessment_completed")
+    self.assertEqual(query.count(), 1)
+
 
 class TestAssignableNotificationUsingAPI(TestAssignableNotification):
   """Tests for notifications when interacting with objects through an API."""
