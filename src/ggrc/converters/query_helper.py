@@ -921,6 +921,8 @@ class QueryHelper(object):
       if right != u"empty":
         raise BadQueryException(u"Invalid operator near 'is': {}".format(
             right))
+      left = left.lower()
+      left, _ = self.attr_name_map[tgt_class].get(left, (left, None))
       subquery = db.session.query(Record.key).filter(
           Record.type == object_class.__name__,
           Record.property == left,
