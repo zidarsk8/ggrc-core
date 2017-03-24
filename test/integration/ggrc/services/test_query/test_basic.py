@@ -52,27 +52,42 @@ class BaseQueryAPITestCase(TestCase):
     return result
 
   @staticmethod
-  def _make_query_dict(object_name, type_=None, expression=None, limit=None,
-                       order_by=None):
+  def _make_query_dict_base(object_name, type_=None, filters=None, limit=None,
+                            order_by=None):
     """Make a dict with query for object_name with optional parameters."""
-    def make_filter_expression(expression):
-      """Convert a three-tuple to a simple expression filter."""
-      left, op_name, right = expression
-      return {"left": left, "op": {"name": op_name}, "right": right}
-
     query = {
         "object_name": object_name,
-        "filters": {"expression": {}},
+        "filters": filters if filters else {"expression": {}},
     }
     if type_:
       query["type"] = type_
-    if expression:
-      query["filters"]["expression"] = make_filter_expression(expression)
     if limit:
       query["limit"] = limit
     if order_by:
       query["order_by"] = order_by
     return query
+
+  @staticmethod
+  def make_filter_expression(expression):
+    """Convert a three-tuple to a simple expression filter."""
+    left, op_name, right = expression
+    return {"left": left, "op": {"name": op_name}, "right": right}
+
+  @classmethod
+  def _make_query_dict(cls, object_name, expression=None, *args, **kwargs):
+    """Make a dict with query for object_name with expression shortcut.
+
+    expression should be in format: (left, op_name, right), like
+    ("title", "=", "hello").
+    """
+
+    if expression:
+      filters = {"expression": cls.make_filter_expression(expression)}
+    else:
+      filters = None
+
+    return cls._make_query_dict_base(object_name, filters=filters, *args,
+                                     **kwargs)
 
 
 # pylint: disable=too-many-public-methods
