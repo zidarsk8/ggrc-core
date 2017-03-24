@@ -70,7 +70,7 @@ class ObjectRoleColumnHandler(UserColumnHandler):
 class ProgramOwnerColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self.role = Role.query.filter_by(name="ProgramOwner").one()
+    self.role = row_converter.block_converter.get_role("ProgramOwner")
     super(ProgramOwnerColumnHandler, self).__init__(
         row_converter, key, **options)
 
@@ -78,7 +78,7 @@ class ProgramOwnerColumnHandler(ObjectRoleColumnHandler):
 class ProgramEditorColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self.role = Role.query.filter_by(name="ProgramEditor").one()
+    self.role = row_converter.block_converter.get_role("ProgramEditor")
     super(ProgramEditorColumnHandler, self).__init__(
         row_converter, key, **options)
 
@@ -86,7 +86,7 @@ class ProgramEditorColumnHandler(ObjectRoleColumnHandler):
 class ProgramReaderColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self.role = Role.query.filter_by(name="ProgramReader").one()
+    self.role = row_converter.block_converter.get_role("ProgramReader")
     super(ProgramReaderColumnHandler, self).__init__(
         row_converter, key, **options)
 
@@ -94,7 +94,7 @@ class ProgramReaderColumnHandler(ObjectRoleColumnHandler):
 class WorkflowOwnerColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self.role = Role.query.filter_by(name="WorkflowOwner").one()
+    self.role = row_converter.block_converter.get_role("WorkflowOwner")
     super(WorkflowOwnerColumnHandler, self).__init__(
         row_converter, key, **options)
 
@@ -102,7 +102,7 @@ class WorkflowOwnerColumnHandler(ObjectRoleColumnHandler):
 class WorkflowMemberColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self.role = Role.query.filter_by(name="WorkflowMember").one()
+    self.role = row_converter.block_converter.get_role("WorkflowMember")
     super(WorkflowMemberColumnHandler, self).__init__(
         row_converter, key, **options)
 
@@ -110,8 +110,8 @@ class WorkflowMemberColumnHandler(ObjectRoleColumnHandler):
 class AuditAuditorColumnHandler(ObjectRoleColumnHandler):
 
   def __init__(self, row_converter, key, **options):
-    self.role = Role.query.filter_by(name="Auditor").one()
-    self.reader = Role.query.filter_by(name="ProgramReader").one()
+    self.role = row_converter.block_converter.get_role("Auditor")
+    self.reader = row_converter.block_converter.get_role("ProgramReader")
     super(AuditAuditorColumnHandler, self).__init__(
         row_converter, key, **options)
 
@@ -191,6 +191,7 @@ class UserRoleColumnHandler(UserColumnHandler):
     )
     db.session.add(user_role)
     self.dry_run = True
+
 
 COLUMN_HANDLERS = {
     "default": {

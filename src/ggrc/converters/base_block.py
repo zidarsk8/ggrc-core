@@ -97,6 +97,7 @@ class BlockConverter(object):
     # The protected access is a false warning for inflector access.
     self._mapping_cache = None
     self._owners_cache = None
+    self._roles_cache = None
     self._ca_definitions_cache = None
     self.converter = converter
     self.offset = options.get("offset", 0)
@@ -238,6 +239,13 @@ class BlockConverter(object):
     if self._mapping_cache is None:
       self._mapping_cache = self._create_mapping_cache()
     return self._mapping_cache
+
+  def get_role(self, name):
+    """Get role from local cache for a given name."""
+    if not self._roles_cache:
+      self._roles_cache = {role.name: role for role in
+                           models.all_models.Role.query}
+    return self._roles_cache[name]
 
   def _create_owners_cache(self):
     """Create a cache of emails for all object owners."""
