@@ -1,0 +1,87 @@
+# Copyright (C) 2017 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+"""Tree View dropdown elements."""
+# pylint: disable=too-few-public-methods
+
+from selenium.webdriver.common.by import By
+
+from lib import base
+from lib.constants import locator, url, objects
+from lib.page.modal import create_new_object
+
+
+class CommonDropdownSettings(base.Component):
+  """Common for 3BBS button/dropdown settings on Tree View."""
+  _locators = locator.CommonDropdown3bbsTreeView
+
+  def __init__(self, driver, obj_name, is_under_audit):
+    super(CommonDropdownSettings, self).__init__(driver)
+    self.widget_name = url.get_widget_name_of_mapped_objs(obj_name)
+    # elements
+    self.select_child_tree_locator = (
+        self._locators.BUTTON_3BBS_SELECT_CHILD_TREE.format(self.widget_name))
+    # if object is not shapshotable
+    if not (obj_name in objects.ALL_SNAPSHOTABLE_OBJS and is_under_audit):
+      self.import_locator = (
+          self._locators.BUTTON_3BBS_IMPORT.format(self.widget_name))
+      self.export_locator = (
+          self._locators.BUTTON_3BBS_EXPORT.format(self.widget_name))
+
+
+class Assessments(CommonDropdownSettings):
+  """Assessments 3BBS button/dropdown settings on Tree View."""
+  _locators = locator.AssessmentsDropdown3bbsTreeView
+
+  def select_generate(self):
+    """Select generate Assessments in 3BBS dropdown modal.
+    Return: modal.create_new_object.AssessmentsGenerate
+    """
+    generate_locator = (
+        By.CSS_SELECTOR,
+        self._locators.BUTTON_3BBS_GENERATE.format(self.widget_name))
+    base.Button(self._driver, generate_locator).click()
+    return create_new_object.AssessmentsGenerate(self._driver)
+
+
+class AssessmentTemplates(CommonDropdownSettings):
+  """Assessment Templates 3BBS button/dropdown settings on Tree View."""
+
+
+class Audits(CommonDropdownSettings):
+  """Audits 3BBS button/dropdown settings on Tree View."""
+
+
+class Programs(CommonDropdownSettings):
+  """Programs 3BBS button/dropdown settings on Tree View."""
+
+
+class Controls(CommonDropdownSettings):
+  """Controls 3BBS button/dropdown settings on Tree View."""
+
+
+class Processes(CommonDropdownSettings):
+  """Processes 3BBS button/dropdown settings on Tree View."""
+
+
+class DataAssets(CommonDropdownSettings):
+  """DataAssets 3BBS button/dropdown settings on Tree View."""
+
+
+class Systems(CommonDropdownSettings):
+  """Systems 3BBS button/dropdown settings on Tree View."""
+
+
+class Products(CommonDropdownSettings):
+  """Products 3BBS button/dropdown settings on Tree View."""
+
+
+class Projects(CommonDropdownSettings):
+  """Projects 3BBS button/dropdown settings on Tree View."""
+
+
+class OrgGroups(CommonDropdownSettings):
+  """OrgGroups 3BBS button/dropdown settings on Tree View."""
+
+
+class Issues(CommonDropdownSettings):
+  """Issues 3BBS button/dropdown settings on Tree View."""

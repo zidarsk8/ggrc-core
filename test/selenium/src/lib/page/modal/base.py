@@ -3,79 +3,35 @@
 """Modal base classes."""
 # pylint: disable=too-few-public-methods
 
-from selenium.webdriver.common.by import By
-
 from lib import base
 from lib.constants import locator
-from lib.utils import selenium_utils
 
 
 class BaseModal(base.Modal):
-  """Base class for Edit modal."""
+  """Base class for creation and edition modals."""
   _locator_ui_title = locator.ModalCreateNewObject.UI_TITLE
   _locator_ui_code = locator.ModalCreateNewObject.UI_CODE
-  locator_button_save = locator.ModalCreateNewObject.BUTTON_SAVE_AND_CLOSE
+  _locator_button_save = locator.ModalCreateNewObject.BUTTON_SAVE_AND_CLOSE
 
   def __init__(self, driver):
     super(BaseModal, self).__init__(driver)
-    self.button_save_and_close = base.Button(driver, self.locator_button_save)
+    self.button_save_and_close = base.Button(driver, self._locator_button_save)
     self.ui_title = base.TextInputField(self._driver, self._locator_ui_title)
     self.ui_code = base.TextInputField(self._driver, self._locator_ui_code)
 
   def enter_title(self, text):
-    """
-    Args: text (basestring)
-    """
+    """Enter title to modal."""
     self.ui_title.enter_text(text)
 
   def enter_code(self, text):
-    """
-    Args: text (basestring)
-    """
+    """Enter code to modal."""
     self.ui_code.enter_text(text)
 
-
-class SetFieldsModal(base.Modal):
-  """Base Set visible fields modal."""
-  _locators = locator.ModalSetVisibleFields
-  button_set_fields = None
-  fields_elements = None
-
-  def __init__(self, driver, widget_name):
-    """
-    Args: driver (CustomDriver), widget_name (#widget_name according URL)
-    """
-    super(SetFieldsModal, self).__init__(driver)
-    self.widget_name = widget_name
-
-  def set_visible_fields(self, fields):
-    """Set visible fields to display objects on Tree View."""
-    locator_modal_fields = (
-        By.CSS_SELECTOR, self._locators.MODAL.format(self.widget_name))
-    locator_fields_titles = (
-        By.CSS_SELECTOR,
-        locator.ModalSetVisibleFields.FIELDS_TITLES.format(self.widget_name))
-    locator_fields_checkboxes = (
-        By.CSS_SELECTOR,
-        (locator.ModalSetVisibleFields.FIELDS_CHECKBOXES
-         .format(self.widget_name)))
-    selenium_utils.get_when_visible(self._driver, locator_modal_fields)
-    self.fields_elements = base.ListCheckboxes(
-        self._driver, locator_fields_titles, locator_fields_checkboxes)
-    self.fields_elements.select_by_titles(fields)
-
-  def save_set_visible_fields(self):
-    """Save visible fields to display objects on Tree View."""
-    _locator_set_fields = (
-        By.CSS_SELECTOR,
-        self._locators.BUTTON_SET_FIELDS.format(self.widget_name))
-    self.button_set_fields = base.Button(self._driver, _locator_set_fields)
-    self.button_set_fields.click()
-
-  def set_and_save_visible_fields(self, fields):
-    """Set and save visible fields to display objects on Tree View."""
-    self.set_visible_fields(fields)
-    self.save_set_visible_fields()
+  def fill_minimal_data(self, title, code):
+    """Enter common minimal data to modal."""
+    self.enter_title(title)
+    self.enter_code(code)
+    return self.__class__(self._driver)
 
 
 class ProgramsModal(BaseModal):
@@ -326,11 +282,6 @@ class AsmtTmplModal(BaseModal):
   def __init__(self, driver):
     super(AsmtTmplModal, self).__init__(driver)
 
-  def fill_minimal_data(self, title, code):
-    """Enter minimal data to create Assessment Template."""
-    self.enter_title(title)
-    self.enter_code(code)
-
 
 class AsmtsModal(BaseModal):
   """Modal base for Assessment objects."""
@@ -338,11 +289,6 @@ class AsmtsModal(BaseModal):
 
   def __init__(self, driver):
     super(AsmtsModal, self).__init__(driver)
-
-  def fill_minimal_data(self, title, code):
-    """Enter minimal data to create Assessment."""
-    self.enter_title(title)
-    self.enter_code(code)
 
 
 class AsmtsModalGenerate(base.Modal):
@@ -375,8 +321,9 @@ class AsmtsModalGenerate(base.Modal):
         self._locators.FOUND_OBJECTS_CHECKBOXES)
     self.controls_elements.select_by_titles(controls_titles)
 
-  def fill_minimal_data(self, asmt_tmpl, controls):
+  def fill_minimal_data(self, asmt_tmpl_title, objs_under_asmt_titles):
     """Enter minimal data to generate Assessment(s)."""
-    self.select_asmt_tmpl(asmt_tmpl)
+    self.select_asmt_tmpl(asmt_tmpl_title)
     self.search_objects()
-    self.select_objs_under(controls)
+    self.select_objs_under(objs_under_asmt_titles)
+    return self.__class__(self._driver)

@@ -9,14 +9,14 @@ import copy
 import json
 import os
 
-from lib.constants import objects, url
+from lib.constants import objects, url, templates
 
 
 class TemplateProvider(object):
   """Provider of methods for work with JSON templates."""
   _relationship = objects.get_singular(url.RELATIONSHIPS)
   _object_owner = objects.get_singular(url.OBJECT_OWNERS)
-  _count = objects.COUNT
+  _count = templates.COUNT
   _contact = objects.get_singular(url.CONTACTS)
   relative_path_template = "template/{0}.json"
   parsed_data = dict()

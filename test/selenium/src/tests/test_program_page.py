@@ -81,7 +81,7 @@ class TestProgramPage(base.Test):
     """Verify url is copied to clipboard."""
     _, program_info = new_program_ui
     selenium.get(program_info.url)
-    program_info_page = info_widget.ProgramsInfoWidget(selenium)
+    program_info_page = info_widget.Programs(selenium)
     program_info_page.open_info_3bbs().select_get_permalink()
     # test notification alert
     base.AnimatedComponent(
@@ -98,12 +98,12 @@ class TestProgramPage(base.Test):
     """
     _, program_info = new_program_ui
     selenium.get(program_info.url)
-    program_info_page = info_widget.ProgramsInfoWidget(selenium)
+    program_info_page = info_widget.Programs(selenium)
     modal = program_info_page.open_info_3bbs().select_edit()
     test_utils.ModalNewPrograms.enter_test_data(modal)
     test_utils.ModalNewPrograms.set_start_end_dates(modal, 1, -2)
     modal.save_and_close()
-    updated_program_info_page = info_widget.ProgramsInfoWidget(selenium)
+    updated_program_info_page = info_widget.Programs(selenium)
     assert (test_utils.HtmlParser.parse_text(modal.ui_title.text) ==
             updated_program_info_page.title_entered.text)
     assert (modal.ui_description.text ==

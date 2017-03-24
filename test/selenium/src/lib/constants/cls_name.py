@@ -4,3 +4,7 @@
 
 TEST_MODAL_NEW_PREFIX = "modalnew"
 INFO_POSTFIX = "info"
+FACTORY = "Factory"
+CREATE = "Create"
+GENERATE = "Generate"
+WIDGET = "Widget"

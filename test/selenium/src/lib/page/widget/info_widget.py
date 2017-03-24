@@ -11,36 +11,36 @@ from lib.utils import selenium_utils
 
 class CommonInfo(base.Widget):
   """Abstract class of common info for Info pages and Info panels."""
-  _locator = locator.CommonWidgetInfo
-  _dropdown_settings_cls = widget_info.CommonDropdownSettings
-  headers_and_values = None
+  _locators = locator.CommonWidgetInfo
+  dropdown_settings_cls = widget_info.CommonDropdownSettings
   list_headers_text = None
   list_values_text = None
 
   def __init__(self, driver):
     # wait that the elements load before calling super
-    self.title = base.Label(driver, self._locator.TITLE)
-    self.title_entered = base.Label(driver, self._locator.TITLE_ENTERED)
-    self.state = base.Label(driver, self._locator.STATE)
+    self.title = base.Label(driver, self._locators.TITLE)
+    self.title_entered = base.Label(driver, self._locators.TITLE_ENTERED)
+    self.state = base.Label(driver, self._locators.STATE)
     super(CommonInfo, self).__init__(driver)
     self.locator_3bbs = (
-        self._locator.BUTTON_3BBS_UNDER_AUDIT if self.is_under_audit
-        else self._locator.BUTTON_3BBS)
+        self._locators.BUTTON_3BBS_UNDER_AUDIT if self.is_under_audit
+        else self._locators.BUTTON_3BBS)
 
   def open_info_3bbs(self):
-    """Click to 3BBS button on Info page or Info panel to open modal for
-    further actions.
-    Return: lib.element.widget_info.CommonDropdownSettings
+    """Click to 3BBS button on Info page or Info panel to open info 3BBS modal.
+    Return: lib.element.widget_info."obj_name"DropdownSettings
     """
     base.Button(self._driver, self.locator_3bbs).click()
-    return self._dropdown_settings_cls(self._driver, self.is_under_audit)
+    return self.dropdown_settings_cls(self._driver, self.is_under_audit)
 
   def get_value_by_header_text(self, header_text):
     """Get text of value element by header element text used searching in
     text scopes of headers and values.
     """
     # pylint: disable=not-an-iterable
-    return [scope.text.splitlines()[1] for scope in self.headers_and_values
+    headers_and_values = selenium_utils.get_when_all_visible(
+        self._driver, self._locators.HEADERS_AND_VALUES)
+    return [scope.text.splitlines()[1] for scope in headers_and_values
             if header_text in scope.text][0]
 
   def get_obj_as_dict(self):
@@ -54,13 +54,15 @@ class CommonSnapshotsInfo(base.Component):
   """Class of common info for Info pages and Info Panels of
   snapshotable objects."""
   # pylint: disable=too-few-public-methods
+  _locators = locator.CommonWidgetInfoSnapshots
+  locator_link_get_latest_ver = _locators.LINK_GET_LAST_VER
+
   def __init__(self, driver):
     super(CommonSnapshotsInfo, self).__init__(driver)
 
   def open_link_get_latest_ver(self):
     """Click on link get latest version under Info panel."""
-    base.Button(self._driver,
-                locator.CommonWidgetInfoSnapshots.LINK_GET_LAST_VER).click()
+    base.Button(self._driver, self.locator_link_get_latest_ver).click()
     return update_object.CompareUpdateObjectModal(self._driver)
 
   def is_link_get_latest_ver_exist(self):
@@ -68,304 +70,302 @@ class CommonSnapshotsInfo(base.Component):
     Return: True if link get latest version is exist,
             False if link get latest version is not exist.
     """
-    return selenium_utils.is_element_exist(
-        self._driver, locator.CommonWidgetInfoSnapshots.LINK_GET_LAST_VER)
+    return selenium_utils.is_element_exist(self._driver,
+                                           self.locator_link_get_latest_ver)
 
 
-class ProgramsInfoWidget(CommonInfo):
+class Programs(CommonInfo):
   """Model for program object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
-  _locator = locator.WidgetInfoProgram
-  _dropdown_settings_cls = widget_info.Programs
+  _locators = locator.WidgetInfoProgram
+  dropdown_settings_cls = widget_info.Programs
 
   def __init__(self, driver):
-    super(ProgramsInfoWidget, self).__init__(driver)
+    super(Programs, self).__init__(driver)
     # activate all fields
     self.show_advanced = base.Toggle(
-        self._driver, self._locator.TOGGLE_SHOW_ADVANCED)
+        self._driver, self._locators.TOGGLE_SHOW_ADVANCED)
     self.show_advanced.toggle()
-    self.object_review = base.Label(self._driver, self._locator.OBJECT_REVIEW)
+    self.object_review = base.Label(self._driver, self._locators.OBJECT_REVIEW)
     self.submit_for_review = base.Label(
-        self._driver, self._locator.SUBMIT_FOR_REVIEW)
-    self.description = base.Label(self._driver, self._locator.DESCRIPTION)
+        self._driver, self._locators.SUBMIT_FOR_REVIEW)
+    self.description = base.Label(self._driver, self._locators.DESCRIPTION)
     self.description_entered = base.Label(
-        self._driver, self._locator.DESCRIPTION_ENTERED)
-    self.notes = base.Label(self._driver, self._locator.NOTES)
-    self.notes_entered = base.Label(self._driver, self._locator.NOTES_ENTERED)
-    self.manager = base.Label(self._driver, self._locator.MANAGER)
+        self._driver, self._locators.DESCRIPTION_ENTERED)
+    self.notes = base.Label(self._driver, self._locators.NOTES)
+    self.notes_entered = base.Label(self._driver, self._locators.NOTES_ENTERED)
+    self.manager = base.Label(self._driver, self._locators.MANAGER)
     self.manager_entered = base.Label(
-        self._driver, self._locator.MANAGER_ENTERED)
+        self._driver, self._locators.MANAGER_ENTERED)
     self.primary_contact = base.Label(
-        self._driver, self._locator.PRIMARY_CONTACT)
+        self._driver, self._locators.PRIMARY_CONTACT)
     self.primary_contact_entered = base.Label(
-        self._driver, self._locator.PRIMARY_CONTACT_ENTERED)
+        self._driver, self._locators.PRIMARY_CONTACT_ENTERED)
     self.secondary_contact = base.Label(
-        self._driver, self._locator.SECONDARY_CONTACT)
+        self._driver, self._locators.SECONDARY_CONTACT)
     self.secondary_contact_entered = base.Label(
-        self._driver, self._locator.SECONDARY_CONTACT_ENTERED)
-    self.program_url = base.Label(self._driver, self._locator.PROGRAM_URL)
+        self._driver, self._locators.SECONDARY_CONTACT_ENTERED)
+    self.program_url = base.Label(self._driver, self._locators.PROGRAM_URL)
     self.program_url_entered = base.Label(
-        self._driver, self._locator.PROGRAM_URL_ENTERED)
-    self.reference_url = base.Label(self._driver, self._locator.REFERENCE_URL)
+        self._driver, self._locators.PROGRAM_URL_ENTERED)
+    self.reference_url = base.Label(self._driver, self._locators.REFERENCE_URL)
     self.reference_url_entered = base.Label(
-        self._driver, self._locator.REFERENCE_URL_ENTERED)
-    self.code = base.Label(self._driver, self._locator.CODE)
-    self.code_entered = base.Label(self._driver, self._locator.CODE_ENTERED)
+        self._driver, self._locators.REFERENCE_URL_ENTERED)
+    self.code = base.Label(self._driver, self._locators.CODE)
+    self.code_entered = base.Label(self._driver, self._locators.CODE_ENTERED)
     self.effective_date = base.Label(
-        self._driver, self._locator.EFFECTIVE_DATE)
+        self._driver, self._locators.EFFECTIVE_DATE)
     self.effective_date_entered = base.Label(
-        self._driver, self._locator.EFFECTIVE_DATE_ENTERED)
-    self.stop_date = base.Label(self._driver, self._locator.STOP_DATE)
+        self._driver, self._locators.EFFECTIVE_DATE_ENTERED)
+    self.stop_date = base.Label(self._driver, self._locators.STOP_DATE)
     self.stop_date_entered = base.Label(
-        self._driver, self._locator.STOP_DATE_ENTERED)
+        self._driver, self._locators.STOP_DATE_ENTERED)
 
 
-class WorkflowsInfoWidget(CommonInfo):
+class Workflows(CommonInfo):
   """Model for Workflow object Info pages and Info panels."""
-  _locator = locator.WidgetInfoWorkflow
+  _locators = locator.WidgetInfoWorkflow
 
   def __init__(self, driver):
-    super(WorkflowsInfoWidget, self).__init__(driver)
+    super(Workflows, self).__init__(driver)
 
 
-class AuditsInfoWidget(CommonInfo):
+class Audits(CommonInfo):
   """Model for Audit object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
-  _locator = locator.WidgetInfoAudit
-  _dropdown_settings_cls = widget_info.Audits
+  _locators = locator.WidgetInfoAudit
+  dropdown_settings_cls = widget_info.Audits
 
   def __init__(self, driver):
-    super(AuditsInfoWidget, self).__init__(driver)
-    self.title = base.Label(driver, self._locator.TITLE)
-    self.title_entered = base.Label(driver, self._locator.TITLE_ENTERED)
-    self.state = base.Label(driver, self._locator.STATE)
-    self.audit_lead = base.Label(driver, self._locator.AUDIT_LEAD)
-    self.code = base.Label(driver, self._locator.CODE)
+    super(Audits, self).__init__(driver)
+    self.title = base.Label(driver, self._locators.TITLE)
+    self.title_entered = base.Label(driver, self._locators.TITLE_ENTERED)
+    self.state = base.Label(driver, self._locators.STATE)
+    self.audit_lead = base.Label(driver, self._locators.AUDIT_LEAD)
+    self.code = base.Label(driver, self._locators.CODE)
     # scopes
-    self.headers_and_values = selenium_utils.get_when_all_visible(
-        driver, self._locator.HEADERS_AND_VALUES)
     self.audit_lead_entered_text = self.get_value_by_header_text(
         self.audit_lead.text)
     self.code_entered_text = self.get_value_by_header_text(self.code.text)
     # scope
     self.list_headers_text = [
-        self.title.text, self._locator.elements.STATUS.upper(),
+        self.title.text, self._locators.elements.STATUS.upper(),
         self.audit_lead.text, self.code.text]
     self.list_values_text = [
         self.title_entered.text, objects.get_normal_form(self.state.text),
         self.audit_lead_entered_text, self.code_entered_text]
 
 
-class AssessmentsInfoWidget(CommonInfo):
+class Assessments(CommonInfo):
   """Model for Assessment object Info pages and Info panels."""
-  _locator = locator.WidgetInfoAssessment
+  _locators = locator.WidgetInfoAssessment
 
   def __init__(self, driver):
-    super(AssessmentsInfoWidget, self).__init__(driver)
+    super(Assessments, self).__init__(driver)
 
 
-class AssessmentTemplatesInfoWidget(CommonInfo):
+class AssessmentTemplates(CommonInfo):
   """Model for Assessment Template object Info pages and Info panels."""
-  _locator = locator.WidgetInfoAssessmentTemplate
+  _locators = locator.WidgetInfoAssessmentTemplate
 
   def __init__(self, driver):
-    super(AssessmentTemplatesInfoWidget, self).__init__(driver)
+    super(AssessmentTemplates, self).__init__(driver)
 
 
-class IssuesInfoWidget(CommonInfo):
+class Issues(CommonInfo):
   """Model for Issue object Info pages and Info panels."""
-  _locator = locator.WidgetInfoIssue
+  _locators = locator.WidgetInfoIssue
 
   def __init__(self, driver):
-    super(IssuesInfoWidget, self).__init__(driver)
+    super(Issues, self).__init__(driver)
 
 
-class RegulationsInfoWidget(CommonInfo):
+class Regulations(CommonInfo):
   """Model for Assessment object Info pages and Info panels."""
-  _locator = locator.WidgetInfoRegulations
+  _locators = locator.WidgetInfoRegulations
 
   def __init__(self, driver):
-    super(RegulationsInfoWidget, self).__init__(driver)
+    super(Regulations, self).__init__(driver)
 
 
-class PoliciesInfoWidget(CommonInfo):
+class Policies(CommonInfo):
   """Model for Policy object Info pages and Info panels."""
-  _locator = locator.WidgetInfoPolicy
+  _locators = locator.WidgetInfoPolicy
 
   def __init__(self, driver):
-    super(PoliciesInfoWidget, self).__init__(driver)
+    super(Policies, self).__init__(driver)
 
 
-class StandardsInfoWidget(CommonInfo):
+class Standards(CommonInfo):
   """Model for Standard object Info pages and Info panels."""
-  _locator = locator.WidgetInfoStandard
+  _locators = locator.WidgetInfoStandard
 
   def __init__(self, driver):
-    super(StandardsInfoWidget, self).__init__(driver)
+    super(Standards, self).__init__(driver)
 
 
-class ContractsInfoWidget(CommonInfo):
+class Contracts(CommonInfo):
   """Model for Contract object Info pages and Info panels."""
-  _locator = locator.WidgetInfoContract
+  _locators = locator.WidgetInfoContract
 
   def __init__(self, driver):
-    super(ContractsInfoWidget, self).__init__(driver)
+    super(Contracts, self).__init__(driver)
 
 
-class ClausesInfoWidget(CommonInfo):
+class Clauses(CommonInfo):
   """Model for Clause object Info pages and Info panels."""
-  _locator = locator.WidgetInfoClause
+  _locators = locator.WidgetInfoClause
 
   def __init__(self, driver):
-    super(ClausesInfoWidget, self).__init__(driver)
+    super(Clauses, self).__init__(driver)
 
 
-class SectionsInfoWidget(CommonInfo):
+class Sections(CommonInfo):
   """Model for Section object Info pages and Info panels."""
-  _locator = locator.WidgetInfoSection
+  _locators = locator.WidgetInfoSection
 
   def __init__(self, driver):
-    super(SectionsInfoWidget, self).__init__(driver)
+    super(Sections, self).__init__(driver)
 
 
-class ControlsInfoWidget(CommonInfo, CommonSnapshotsInfo):
+class Controls(CommonInfo, CommonSnapshotsInfo):
   """Model for Control object Info pages and Info panels."""
-  _locator = locator.WidgetInfoControl
-  _dropdown_settings_cls = widget_info.Controls
+  _locators = locator.WidgetInfoControl
+  dropdown_settings_cls = widget_info.Controls
 
   def __init__(self, driver):
-    super(ControlsInfoWidget, self).__init__(driver)
+    super(Controls, self).__init__(driver)
 
 
-class ObjectivesInfoWidget(CommonInfo):
+class Objectives(CommonInfo):
   """Model for Objective object Info pages and Info panels."""
-  _locator = locator.WidgetInfoObjective
+  _locators = locator.WidgetInfoObjective
 
   def __init__(self, driver):
-    super(ObjectivesInfoWidget, self).__init__(driver)
+    super(Objectives, self).__init__(driver)
 
 
-class PeopleInfoWidget(base.Widget):
+class People(base.Widget):
   """Model for People object Info pages and Info panels."""
   # pylint: disable=too-few-public-methods
-  _locator = locator.WidgetInfoPeople
+  _locators = locator.WidgetInfoPeople
 
 
-class OrgGroupsInfoWidget(CommonInfo):
+class OrgGroups(CommonInfo):
   """Model for Org Group object Info pages and Info panels."""
-  _locator = locator.WidgetInfoOrgGroup
-  _dropdown_settings_cls = widget_info.OrgGroups
+  _locators = locator.WidgetInfoOrgGroup
+  dropdown_settings_cls = widget_info.OrgGroups
 
   def __init__(self, driver):
-    super(OrgGroupsInfoWidget, self).__init__(driver)
+    super(OrgGroups, self).__init__(driver)
 
 
-class VendorsInfoWidget(CommonInfo):
+class Vendors(CommonInfo):
   """Model for Vendor object Info pages and Info panels."""
-  _locator = locator.WidgetInfoVendor
+  _locators = locator.WidgetInfoVendor
 
   def __init__(self, driver):
-    super(VendorsInfoWidget, self).__init__(driver)
+    super(Vendors, self).__init__(driver)
 
 
-class AccessGroupInfoWidget(CommonInfo):
+class AccessGroup(CommonInfo):
   """Model for Access Group object Info pages and Info panels."""
-  _locator = locator.WidgetInfoAccessGroup
+  _locators = locator.WidgetInfoAccessGroup
 
   def __init__(self, driver):
-    super(AccessGroupInfoWidget, self).__init__(driver)
+    super(AccessGroup, self).__init__(driver)
 
 
-class SystemsInfoWidget(CommonInfo):
+class Systems(CommonInfo):
   """Model for System object Info pages and Info panels."""
-  _locator = locator.WidgetInfoSystem
-  _dropdown_settings_cls = widget_info.Systems
+  _locators = locator.WidgetInfoSystem
+  dropdown_settings_cls = widget_info.Systems
 
   def __init__(self, driver):
-    super(SystemsInfoWidget, self).__init__(driver)
+    super(Systems, self).__init__(driver)
 
 
-class ProcessesInfoWidget(CommonInfo):
+class Processes(CommonInfo):
   """Model for Process object Info pages and Info panels."""
-  _locator = locator.WidgetInfoProcess
-  _dropdown_settings_cls = widget_info.Processes
+  _locators = locator.WidgetInfoProcess
+  dropdown_settings_cls = widget_info.Processes
 
   def __init__(self, driver):
-    super(ProcessesInfoWidget, self).__init__(driver)
+    super(Processes, self).__init__(driver)
 
 
-class DataAssetsInfoWidget(CommonInfo):
+class DataAssets(CommonInfo):
   """Model for Data Asset object Info pages and Info panels."""
-  _locator = locator.WidgetInfoDataAsset
-  _dropdown_settings_cls = widget_info.DataAssets
+  _locators = locator.WidgetInfoDataAsset
+  dropdown_settings_cls = widget_info.DataAssets
 
   def __init__(self, driver):
-    super(DataAssetsInfoWidget, self).__init__(driver)
+    super(DataAssets, self).__init__(driver)
 
 
-class ProductsInfoWidget(CommonInfo):
+class Products(CommonInfo):
   """Model for Product object Info pages and Info panels."""
-  _locator = locator.WidgetInfoProduct
-  _dropdown_settings_cls = widget_info.Products
+  _locators = locator.WidgetInfoProduct
+  dropdown_settings_cls = widget_info.Products
 
   def __init__(self, driver):
-    super(ProductsInfoWidget, self).__init__(driver)
+    super(Products, self).__init__(driver)
 
 
-class ProjectsInfoWidget(CommonInfo):
+class Projects(CommonInfo):
   """Model for Project object Info pages and Info panels."""
-  _locator = locator.WidgetInfoProject
-  _dropdown_settings_cls = widget_info.Projects
+  _locators = locator.WidgetInfoProject
+  dropdown_settings_cls = widget_info.Projects
 
   def __init__(self, driver):
-    super(ProjectsInfoWidget, self).__init__(driver)
+    super(Projects, self).__init__(driver)
 
 
-class FacilitiesInfoWidget(CommonInfo):
+class Facilities(CommonInfo):
   """Model for Facility object Info pages and Info panels."""
-  _locator = locator.WidgetInfoFacility
+  _locators = locator.WidgetInfoFacility
 
   def __init__(self, driver):
-    super(FacilitiesInfoWidget, self).__init__(driver)
+    super(Facilities, self).__init__(driver)
 
 
-class MarketsInfoWidget(CommonInfo):
+class Markets(CommonInfo):
   """Model for Market object Info pages and Info panels."""
-  _locator = locator.WidgetInfoMarket
+  _locators = locator.WidgetInfoMarket
 
   def __init__(self, driver):
-    super(MarketsInfoWidget, self).__init__(driver)
+    super(Markets, self).__init__(driver)
 
 
-class RisksInfoWidget(CommonInfo):
+class Risks(CommonInfo):
   """Model for Risk object Info pages and Info panels."""
-  _locator = locator.WidgetInfoRisk
+  _locators = locator.WidgetInfoRisk
 
   def __init__(self, driver):
-    super(RisksInfoWidget, self).__init__(driver)
+    super(Risks, self).__init__(driver)
 
 
-class ThreatsInfoWidget(CommonInfo):
+class Threats(CommonInfo):
   """Model for Threat object Info pages and Info panels."""
-  _locator = locator.WidgetInfoThreat
+  _locators = locator.WidgetInfoThreat
 
   def __init__(self, driver):
-    super(ThreatsInfoWidget, self).__init__(driver)
+    super(Threats, self).__init__(driver)
 
 
-class DashboardInfoWidget(CommonInfo):
+class Dashboard(CommonInfo):
   """Model for Dashboard object Info pages and Info panels."""
-  _locator = locator.Dashboard
+  _locators = locator.Dashboard
 
   def __init__(self, driver):
-    super(DashboardInfoWidget, self).__init__(driver)
+    super(Dashboard, self).__init__(driver)
     self.button_start_new_program = base.Button(
-        self._driver, self._locator.BUTTON_START_NEW_PROGRAM)
+        self._driver, self._locators.BUTTON_START_NEW_PROGRAM)
     self.button_start_new_audit = base.Button(
-        self._driver, self._locator.BUTTON_START_NEW_AUDIT)
+        self._driver, self._locators.BUTTON_START_NEW_AUDIT)
     self.button_start_new_workflow = base.Button(
-        self._driver, self._locator.BUTTON_START_NEW_WORKFLOW)
+        self._driver, self._locators.BUTTON_START_NEW_WORKFLOW)
     self.button_create_new_object = base.Button(
-        self._driver, self._locator.BUTTON_CREATE_NEW_OBJECT)
+        self._driver, self._locators.BUTTON_CREATE_NEW_OBJECT)
     self.button_all_objects = base.Button(
-        self._driver, self._locator.BUTTON_ALL_OBJECTS)
+        self._driver, self._locators.BUTTON_ALL_OBJECTS)

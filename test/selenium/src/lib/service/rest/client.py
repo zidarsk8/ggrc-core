@@ -10,7 +10,7 @@ import urlparse
 import requests
 
 from lib import environment
-from lib.constants import url, objects
+from lib.constants import url, templates
 from lib.service.rest.template_provider import TemplateProvider
 
 
@@ -23,7 +23,7 @@ class RestClient(object):
   def __init__(self, endpoint):
     self.url = urlparse.urljoin(environment.APP_URL,
                                 "/".join([url.API, endpoint]))
-    self._count = objects.COUNT
+    self._count = templates.COUNT
     self.session_cookie = None
 
   def get_session_cookie(self):

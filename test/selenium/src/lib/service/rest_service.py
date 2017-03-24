@@ -7,7 +7,7 @@ import json
 import re
 
 from lib import environment
-from lib.constants import url, objects
+from lib.constants import url, objects, templates
 from lib.entities.entities_factory import (
   ProgramsFactory, AuditsFactory, AssessmentTemplatesFactory,
   AssessmentsFactory, ControlsFactory, IssuesFactory, PersonsFactory)
@@ -21,7 +21,7 @@ class BaseService(object):
     self.client = RestClient(self.ENDPOINT)
     self._relationship = objects.get_singular(url.RELATIONSHIPS)
     self._object_owner = objects.get_singular(url.OBJECT_OWNERS)
-    self._count = objects.COUNT
+    self._count = templates.COUNT
 
   def create_list_objs(self, factory, count, **kwargs):
     """Create list of objects used entity factory and REST API data
