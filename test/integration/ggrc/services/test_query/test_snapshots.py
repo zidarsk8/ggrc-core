@@ -17,7 +17,10 @@ from ggrc import models
 from ggrc import db
 
 from integration.ggrc import TestCase
+from integration.ggrc import generator
 from integration.ggrc.models import factories
+from integration.ggrc.services.test_query.test_basic import (
+    BaseQueryAPITestCase)
 
 
 # pylint: disable=super-on-old-class
@@ -459,3 +462,81 @@ class TestAuditSnapshotQueries(TestCase):
             "ids": [models.Audit.query.first().id]
         }
     }
+
+
+class TestSnapshotIndexing(BaseQueryAPITestCase):
+  """Test suite to check indexing of special fields in Snapshots."""
+
+  def setUp(self):
+    super(TestSnapshotIndexing, self).setUp()
+    self.generator = generator.ObjectGenerator()
+
+  @classmethod
+  def _make_snapshot_query_dict(cls, child_type, expression=None, *args,
+                                **kwargs):
+    """Make a dict with query for Snapshots of child_type."""
+    child_type_filter = cls.make_filter_expression(("child_type", "=",
+                                                    child_type))
+    if expression:
+      snapshot_filter = cls.make_filter_expression(expression)
+      filters = {"expression": {"op": {"name": "AND"},
+                                "left": snapshot_filter,
+                                "right": child_type_filter}}
+    else:
+      filters = {"expression": child_type_filter}
+
+    return cls._make_query_dict_base("Snapshot", filters=filters, *args,
+                                     **kwargs)
+
+  def test_process_network_zone(self):
+    """Process Snapshots are filtered and sorted by "network zone"."""
+    program = factories.ProgramFactory()
+    nz_core = db.session.query(models.Option).filter_by(title="Core").one()
+    nz_prod = db.session.query(models.Option).filter_by(title="Prod").one()
+    process_nz_core = factories.ProcessFactory(network_zone=nz_core)
+    process_nz_prod = factories.ProcessFactory(network_zone=nz_prod)
+    factories.RelationshipFactory(source=program, destination=process_nz_core)
+    factories.RelationshipFactory(source=program, destination=process_nz_prod)
+    process_nz_core_id = process_nz_core.id
+    process_nz_prod_id = process_nz_prod.id
+
+    # AuditFactory doesn't trigger Snapshotter
+    self.generator.generate_object(models.Audit, {
+        "title": "test_process_network_zone",
+        "program": {"id": program.id},
+        "status": "Planned",
+        "snapshots": {
+            "operation": "create",
+        }
+    })
+
+    process_nz_core_result = self._get_first_result_set(
+        self._make_snapshot_query_dict("Process",
+                                       expression=["Network Zone", "=",
+                                                   "Core"]),
+        "Snapshot",
+    )
+    self.assertEqual(process_nz_core_result["count"], 1)
+    self.assertTrue(all(snap["revision"]["content"]["network_zone"]
+                        ["title"] == "Core"
+                        for snap in process_nz_core_result["values"]))
+    process_nz_prod_result = self._get_first_result_set(
+        self._make_snapshot_query_dict("Process",
+                                       expression=["Network Zone", "=",
+                                                   "prod"]),
+        "Snapshot",
+    )
+    self.assertEqual(process_nz_prod_result["count"], 1)
+    self.assertTrue(all(snap["revision"]["content"]["network_zone"]
+                        ["title"] == "Prod"
+                        for snap in process_nz_prod_result["values"]))
+
+    order_by_nz_result = self._get_first_result_set(
+        self._make_snapshot_query_dict("Process",
+                                       order_by=[{"name": "Network Zone"}]),
+        "Snapshot",
+    )
+    self.assertEqual(order_by_nz_result["count"], 2)
+    self.assertListEqual([snap["child_id"]
+                          for snap in order_by_nz_result["values"]],
+                         [process_nz_core_id, process_nz_prod_id])
