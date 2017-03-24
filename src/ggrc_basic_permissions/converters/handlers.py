@@ -10,7 +10,6 @@ from ggrc.converters import errors
 from ggrc.converters.handlers.handlers import UserColumnHandler
 from ggrc.login import get_current_user
 from ggrc.models import Context
-from ggrc.models import Person
 from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
 
@@ -41,12 +40,9 @@ class ObjectRoleColumnHandler(UserColumnHandler):
     pass
 
   def get_value(self):
-    user_role_ids = db.session.query(UserRole.person_id).filter_by(
-        role=self.role,
-        context_id=self.row_converter.obj.context_id)
-    users = Person.query.filter(Person.id.in_(user_role_ids))
-    emails = [user.email for user in users]
-    return "\n".join(emails)
+    """Get a list of emails with the given role on this context."""
+    cache = self.row_converter.block_converter.get_user_roles_cache()
+    return "\n".join(cache[self.row_converter.obj.context_id][self.role.id])
 
   def remove_current_roles(self):
     UserRole.query.filter_by(
@@ -119,7 +115,7 @@ class AuditAuditorColumnHandler(ObjectRoleColumnHandler):
     if self.dry_run or not self.value:
       return
     super(AuditAuditorColumnHandler, self).insert_object()
-    user_roles = set(map(lambda ur: ur.person_id, self.get_program_roles()))
+    user_roles = set(o.person_id for o in self.get_program_roles())
     context = self.row_converter.obj.program.context
     for auditor in self.value:
       # Check if the role already exists in the database or in the session:
@@ -142,6 +138,7 @@ class AuditAuditorColumnHandler(ObjectRoleColumnHandler):
 
 
 class UserRoleColumnHandler(UserColumnHandler):
+  """User role column handler."""
 
   _role_map = {
       "admin": "administrator",
@@ -170,6 +167,7 @@ class UserRoleColumnHandler(UserColumnHandler):
     return self.row_converter.obj.system_wide_role
 
   def remove_current_roles(self):
+    """Delete all roles for the current object."""
     allowed_role_ids = db.session.query(Role.id).filter(
         Role.name.in_(self._allowed_roles))
     UserRole.query.filter(and_(
