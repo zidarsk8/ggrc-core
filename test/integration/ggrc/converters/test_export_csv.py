@@ -55,7 +55,7 @@ class TestExportSingleObject(TestCase):
 
   @classmethod
   def setUpClass(cls):
-    TestCase.clear_data()
+    cls.clear_data()
     cls._import_file("data_for_export_testing.csv")
 
   def setUp(self):
@@ -344,7 +344,7 @@ class TestExportMultipleObjects(TestCase):
 
   @classmethod
   def setUpClass(cls):
-    TestCase.clear_data()
+    cls.clear_data()
     cls._import_file("data_for_export_testing.csv")
 
   def setUp(self):
