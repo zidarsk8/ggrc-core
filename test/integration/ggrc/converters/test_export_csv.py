@@ -53,12 +53,9 @@ class TestExportEmptyTemplate(TestCase):
 
 class TestExportSingleObject(TestCase):
 
-  @classmethod
-  def setUpClass(cls):
-    cls.clear_data()
-    cls._import_file("data_for_export_testing.csv")
-
   def setUp(self):
+    self.clear_data()
+    self._import_file("data_for_export_testing.csv")
     self.client.get("/login")
     self.headers = {
         'Content-Type': 'application/json',
@@ -342,12 +339,9 @@ class TestExportSingleObject(TestCase):
 
 class TestExportMultipleObjects(TestCase):
 
-  @classmethod
-  def setUpClass(cls):
-    cls.clear_data()
-    cls._import_file("data_for_export_testing.csv")
-
   def setUp(self):
+    self.clear_data()
+    self._import_file("data_for_export_testing.csv")
     self.client.get("/login")
     self.headers = {
         'Content-Type': 'application/json',
