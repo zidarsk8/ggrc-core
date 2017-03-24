@@ -3,7 +3,7 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,too-many-lines
 
 """Tests for notifications for models with assignable mixin."""
 
@@ -398,6 +398,145 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
 
     query = self._get_notifications(notif_type="assessment_completed")
     self.assertEqual(query.count(), 1)
+
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_reopen_notifications_on_edit(self, _):
+    """Test if updating assessment results in reopen notification."""
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id, asmt_slug = asmt.id, asmt.slug
+
+    for i, new_state in enumerate(Assessment.DONE_STATES):
+      asmt = Assessment.query.get(asmt_id)
+      asmt.status = new_state
+      db.session.commit()
+
+      self.client.get("/_notifications/send_daily_digest")
+      self.assertEqual(self._get_notifications().count(), 0)
+
+      self.import_data(OrderedDict([
+          (u"object_type", u"Assessment"),
+          (u"Code*", asmt_slug),
+          (u"Title", u"New Assessment 1 title - " + unicode(i)),
+      ]))
+
+      query = self._get_notifications(notif_type="assessment_reopened")
+      self.assertEqual(query.count(), 1)
+
+  @unittest.skip("An issue needs to be fixed.")
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_reopen_notifications_on_ca_edit(self, _):
+    """Test if updating assessment's CA value in reopen notification."""
+    CAD(definition_type="assessment", title="CA_misc_remarks")
+
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id, asmt_slug = asmt.id, asmt.slug
+
+    for i, new_state in enumerate(Assessment.DONE_STATES):
+      asmt = Assessment.query.get(asmt_id)
+      asmt.status = new_state
+      db.session.commit()
+
+      self.client.get("/_notifications/send_daily_digest")
+      self.assertEqual(self._get_notifications().count(), 0)
+
+      self.import_data(OrderedDict([
+          (u"object_type", u"Assessment"),
+          (u"Code*", asmt_slug),
+          (u"CA_misc_remarks", u"CA new value" + unicode(i)),
+      ]))
+
+      query = self._get_notifications(notif_type="assessment_reopened")
+      self.assertEqual(query.count(), 1)
+
+  @unittest.skip("An issue needs to be fixed.")
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_reopen_notifications_on_url_edit(self, _):
+    """Test if updating assessment's URLs results in reopen notification."""
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id, asmt_slug = asmt.id, asmt.slug
+
+    for i, new_state in enumerate(Assessment.DONE_STATES):
+      asmt = Assessment.query.get(asmt_id)
+      asmt.status = new_state
+      db.session.commit()
+
+      self.client.get("/_notifications/send_daily_digest")
+      self.assertEqual(self._get_notifications().count(), 0)
+
+      self.import_data(OrderedDict([
+          (u"object_type", u"Assessment"),
+          (u"Code*", asmt_slug),
+          (u"Url", u"www.foo-url-{}.bar".format(i)),
+      ]))
+
+      query = self._get_notifications(notif_type="assessment_reopened")
+      self.assertEqual(query.count(), 1)
+
+  @unittest.skip("An issue needs to be fixed.")
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_reopen_notifications_on_evidence_change(self, _):
+    """Test if assessment evidence change results in reopen notification."""
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id, asmt_slug = asmt.id, asmt.slug
+
+    for i, new_state in enumerate(Assessment.DONE_STATES):
+      asmt = Assessment.query.get(asmt_id)
+      asmt.status = new_state
+      db.session.commit()
+
+      self.client.get("/_notifications/send_daily_digest")
+      self.assertEqual(self._get_notifications().count(), 0)
+
+      self.import_data(OrderedDict([
+          (u"object_type", u"Assessment"),
+          (u"Code*", asmt_slug),
+          (
+              u"Evidence",
+              u"https://gdrive.com/qwerty{0}/view evidence-{0}.txt".format(i)
+          ),
+      ]))
+
+      query = self._get_notifications(notif_type="assessment_reopened")
+      self.assertEqual(query.count(), 1)
+
+  @unittest.skip("An issue needs to be fixed.")
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_reopen_notifications_on_person_change(self, _):
+    """Test if updating assessment people results in a reopen notification."""
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id, asmt_slug = asmt.id, asmt.slug
+
+    for i, new_state in enumerate(Assessment.DONE_STATES):
+      asmt = Assessment.query.get(asmt_id)
+      asmt.status = new_state
+      db.session.commit()
+
+      self.client.get("/_notifications/send_daily_digest")
+      self.assertEqual(self._get_notifications().count(), 0)
+
+      self.import_data(OrderedDict([
+          (u"object_type", u"Assessment"),
+          (u"Code*", asmt_slug),
+          (u"Assignee*", u"john{}@doe.com".format(i)),
+      ]))
+
+      query = self._get_notifications(notif_type="assessment_reopened")
+      self.assertEqual(query.count(), 1)
 
 
 class TestAssignableNotificationUsingAPI(TestAssignableNotification):
