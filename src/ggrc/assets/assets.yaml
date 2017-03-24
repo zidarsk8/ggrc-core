@@ -174,7 +174,6 @@ dashboard-js-files:
   - components/related-objects/related-controls-objectives.js
   - components/object-state-toolbar/object-state-toolbar.js
   - components/object-list/object-list.js
-  - components/object-list/object-list-item.js
   - components/ca-object/ca-object.js
   - components/ca-object/ca-object-validation-icon.js
   - components/ca-object/ca-object-value-mapper.js
