@@ -468,6 +468,7 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
   """Test suite to check indexing of special fields in Snapshots."""
 
   def setUp(self):
+    self.clear_data()
     super(TestSnapshotIndexing, self).setUp()
     self.generator = generator.ObjectGenerator()
 
@@ -488,6 +489,20 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
     return cls._make_query_dict_base("Snapshot", filters=filters, *args,
                                      **kwargs)
 
+  def _create_audit(self, program):
+    """Make a POST to create an Audit.
+
+    AuditFactory doesn't trigger Snapshotter
+    """
+    self.generator.generate_object(models.Audit, {
+        "title": "test_process_network_zone",
+        "program": {"id": program.id},
+        "status": "Planned",
+        "snapshots": {
+            "operation": "create",
+        }
+    })
+
   def test_process_network_zone(self):
     """Process Snapshots are filtered and sorted by "network zone"."""
     program = factories.ProgramFactory()
@@ -500,15 +515,7 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
     process_nz_core_id = process_nz_core.id
     process_nz_prod_id = process_nz_prod.id
 
-    # AuditFactory doesn't trigger Snapshotter
-    self.generator.generate_object(models.Audit, {
-        "title": "test_process_network_zone",
-        "program": {"id": program.id},
-        "status": "Planned",
-        "snapshots": {
-            "operation": "create",
-        }
-    })
+    self._create_audit(program=program)
 
     process_nz_core_result = self._get_first_result_set(
         self._make_snapshot_query_dict("Process",
@@ -540,3 +547,70 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
     self.assertListEqual([snap["child_id"]
                           for snap in order_by_nz_result["values"]],
                          [process_nz_core_id, process_nz_prod_id])
+
+  def _add_owner(self, ownable_type, ownable_id, person_id):
+    """Post ObjectOwner instance for ownable and person."""
+    self.generator.generate_object(
+        models.ObjectOwner,
+        {"ownable": {"type": ownable_type,
+                     "id": ownable_id},
+         "person": {"type": "Person",
+                    "id": person_id}},
+    )
+
+  def test_control_owners(self):
+    """Control Snapshots are filtered and sorted by Owners."""
+    program = factories.ProgramFactory()
+    controls = [factories.ControlFactory(),
+                factories.ControlFactory()]
+    people = [factories.PersonFactory(name="Ann", email="email1@example.com"),
+              factories.PersonFactory(name="Bob", email="email2@example.com"),
+              factories.PersonFactory(name="Carl", email="email3@example.com")]
+    program_id = program.id
+    control_ids = [c.id for c in controls]
+    people_ids = [p.id for p in people]
+
+    factories.RelationshipFactory(source=program, destination=controls[0])
+    factories.RelationshipFactory(source=program, destination=controls[1])
+
+    self._add_owner("Control", control_ids[0], people_ids[0])
+    self._add_owner("Control", control_ids[0], people_ids[2])
+    self._add_owner("Control", control_ids[1], people_ids[0])
+    self._add_owner("Control", control_ids[1], people_ids[1])
+
+    program = models.Program.query.filter_by(id=program_id).one()
+
+    self._create_audit(program=program)
+
+    control_user1_result = self._get_first_result_set(
+        self._make_snapshot_query_dict("Control",
+                                       expression=["owner", "=", "Ann"]),
+        "Snapshot",
+    )
+    self.assertEqual(control_user1_result["count"], 2)
+
+    def owners(snapshot):
+      """Shortcut to get owners list of a snapshotted object."""
+      return snapshot["revision"]["content"]["owners"]
+
+    self.assertTrue(all(people_ids[0] in {o["id"] for o in owners(snap)}
+                        for snap in control_user1_result["values"]))
+
+    control_user2_result = self._get_first_result_set(
+        self._make_snapshot_query_dict("Control",
+                                       expression=["owner", "=", "Bob"]),
+        "Snapshot",
+    )
+    self.assertEqual(control_user2_result["count"], 1)
+    self.assertTrue(all(people_ids[1] in {o["id"] for o in owners(snap)}
+                        for snap in control_user2_result["values"]))
+
+    order_by_owners_result = self._get_first_result_set(
+        self._make_snapshot_query_dict("Control",
+                                       order_by=[{"name": "owner"}]),
+        "Snapshot"
+    )
+    self.assertEqual(order_by_owners_result["count"], 2)
+    self.assertListEqual([snap["child_id"]
+                          for snap in order_by_owners_result["values"]],
+                         [control_ids[1], control_ids[0]])
