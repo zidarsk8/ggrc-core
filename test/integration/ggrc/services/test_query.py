@@ -554,6 +554,18 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
 
     self.assertEqual(response_multiple_posts, response_single_post)
 
+  def test_is_empty_query_by_native_attrs(self):
+    """Filter by navive object attrs with 'is empty' operator."""
+    objectives = self._get_first_result_set(
+        self._make_query_dict("Objective",
+                              expression=["contact", "is", "empty"]),
+        "Objective",
+    )
+    self.assertEqual(objectives["count"], 2)
+    self.assertEqual(set([u'Startupsum 178', u'Startupsum 179']),
+                     set([objective["title"] for objective
+                          in objectives["values"]]))
+
 
 class TestQueryAssessmentCA(BaseQueryAPITestCase):
 
