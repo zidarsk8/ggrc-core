@@ -280,7 +280,10 @@ class OwnerColumnHandler(UserColumnHandler):
       )
 
   def get_value(self):
-    emails = [owner.email for owner in self.row_converter.obj.owners]
+    """Get a list of object owner emails."""
+    cache = self.row_converter.block_converter.get_owners_cache()
+    emails = [cache[owner.person_id]
+              for owner in self.row_converter.obj.object_owners]
     return "\n".join(emails)
 
 
