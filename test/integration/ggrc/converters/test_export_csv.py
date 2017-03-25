@@ -401,7 +401,8 @@ class TestExportMultipleObjects(TestCase):
         self.assertNotIn(regulations[i], response.data)
 
   def test_relevant_to_previous_export(self):
-    self._import_file("data_for_export_testing.csv")
+    res = self._import_file("data_for_export_testing_relevant_previous.csv")
+    self._check_csv_response(res, {})
     data = [{
         "object_name": "Program",  # prog-1, prog-23
         "filters": {
