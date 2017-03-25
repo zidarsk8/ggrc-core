@@ -67,7 +67,8 @@ class TestExportSingleObject(TestCase):
                             headers=self.headers)
 
   def test_simple_export_query(self):
-    self._import_file("data_for_export_testing.csv")
+    response = self._import_file("data_for_export_testing_program.csv")
+    self._check_csv_response(response, {})
     data = [{
         "object_name": "Program",
         "filters": {
@@ -107,7 +108,8 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_and_export_query(self):
-    self._import_file("data_for_export_testing.csv")
+    response = self._import_file("data_for_export_testing_program.csv")
+    self._check_csv_response(response, {})
     data = [{
         "object_name": "Program",
         "filters": {
@@ -137,7 +139,8 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_simple_relevant_query(self):
-    self._import_file("data_for_export_testing.csv")
+    res = self._import_file("data_for_export_testing_program_contract.csv")
+    self._check_csv_response(res, {})
     data = [{
         "object_name": "Program",
         "filters": {
@@ -159,7 +162,8 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_program_audit_relevant_query(self):
-    self._import_file("data_for_export_testing.csv")
+    response = self._import_file("data_for_export_testing_program_audit.csv")
+    self._check_csv_response(response, {})
     data = [{  # should return just program prog-1
         "object_name": "Program",
         "filters": {
@@ -192,7 +196,8 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Audit {},".format(i), response.data)
 
   def test_section_policy_relevant_query(self):
-    self._import_file("data_for_export_testing.csv")
+    response = self._import_file("data_for_export_testing_directives.csv")
+    self._check_csv_response(response, {})
     data = [{  # sec-1
         "object_name": "Section",
         "filters": {
@@ -277,7 +282,9 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(title, response.data, "'{}' was found".format(title))
 
   def test_multiple_relevant_query(self):
-    self._import_file("data_for_export_testing.csv")
+    response = self._import_file(
+        "data_for_export_testing_program_policy_contract.csv")
+    self._check_csv_response(response, {})
     data = [{
         "object_name": "Program",
         "filters": {
@@ -307,7 +314,6 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_query_all_aliases(self):
-    self._import_file("data_for_export_testing.csv")
     def rhs(model, attr):
       attr = getattr(model, attr, None)
       if attr is not None and hasattr(attr, "_query_clause_element"):
