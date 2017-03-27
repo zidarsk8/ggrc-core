@@ -484,6 +484,36 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
                key=lambda p: policy_id_owner[p["id"]]),
     )
 
+  def test_query_order_by_assignee(self):
+    """Results get sorted by name or email assignee."""
+    controls_by_assignee = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "principal_assessor"},
+                                        {"name": "id"}]),
+        "Control", "values",
+    )
+    controls_unsorted = self._get_first_result_set(
+        self._make_query_dict("Control"),
+        "Control", "values",
+    )
+    people = self._get_first_result_set(
+        self._make_query_dict("Person"),
+        "Person", "values",
+    )
+    person_id_name = {person["id"]: (person["name"], person["email"])
+                      for person in people}
+    control_id_assignee = {
+        control["id"]: person_id_name[control["principal_assessor"]["id"]]
+        if control["principal_assessor"] else ""
+        for control in controls_unsorted
+    }
+
+    self.assertListEqual(
+        controls_by_assignee,
+        sorted(sorted(controls_unsorted, key=itemgetter("id")),
+               key=lambda p: control_id_assignee[p["id"]]),
+    )
+
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
     programs_values = self._get_first_result_set(
