@@ -407,6 +407,14 @@
                 this.set_tree_attrs.bind(this)
               );
 
+              can.bind.call(this.element.parent()
+                .find('.tview-dropdown-toggle'),
+                  'click',
+                  function () {
+                    this.init_display_options(this.options);
+                  }.bind(this)
+              );
+
               statusControl = this.element.parent()
                 .find('.tree-filter__status-wrap');
               // set state filter (checkboxes)
@@ -1193,12 +1201,13 @@
     },
     /* Update the tree attributes as selected by the user CORE-1546
      */
-    set_tree_attrs: function () {
+    set_tree_attrs: function (event) {
       // update the display attrbute list and re-draw
       // 1: find checked items
       // 2. update
+      var target = $(event.target);
       var attrToSave = [];
-      var $check = this.element.parent().find('.attr-checkbox');
+      var $check = target.parent().find('.attr-checkbox');
       var $selected = $check.filter(':checked');
       var selectedItems = [];
 

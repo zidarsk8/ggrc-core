@@ -334,6 +334,8 @@ dashboard-js-template-files:
   - base_objects/tree_header.mustache
   - base_objects/tree_view_filter.mustache
   - base_objects/tree_column_selector.mustache
+  - base_objects/tree_column_selector_3bbs.mustache
+  - base_objects/tree_column_selector_body.mustache
   - base_objects/tree_column_names.mustache
   - base_objects/sub_tree_expand.mustache
   - base_objects/sub_tree_all_related_link.mustache
