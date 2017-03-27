@@ -1,13 +1,15 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+from collections import defaultdict
+
 from ggrc.extensions import get_extension_instance
 
 
 class Indexer(object):
 
   def __init__(self, settings):
-    pass
+    self.indexer_rules = defaultdict(list)
 
   def create_record(self, record):
     raise NotImplementedError()

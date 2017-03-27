@@ -1,12 +1,10 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Full text index engine for Mysql DB backend"""
-from collections import defaultdict, Iterable
 
 from sqlalchemy import and_
 from sqlalchemy import case
 from sqlalchemy import distinct
-from sqlalchemy import event
 from sqlalchemy import func
 from sqlalchemy import literal
 from sqlalchemy import or_
@@ -16,6 +14,7 @@ from sqlalchemy.schema import DDL
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select
+from sqlalchemy import event
 
 from ggrc import db
 from ggrc.login import is_creator
@@ -23,7 +22,6 @@ from ggrc.models import all_models
 from ggrc.utils import query_helpers
 from ggrc.rbac import context_query_filter
 from ggrc.fulltext.sql import SqlIndexer
-from ggrc.fulltext.mixin import Indexed
 
 
 class MysqlRecordProperty(db.Model):
@@ -243,33 +241,6 @@ class MysqlIndexer(SqlIndexer):
 
 
 Indexer = MysqlIndexer
-
-
-INDEXER_RULES = defaultdict(list)
-
-ACTIONS = ['after_insert', 'after_delete', 'after_update']
-
-
-def runner(mapper, content, target):  # pylint:disable=unused-argument
-  """Collect all reindex models in session"""
-  db.session.reindex_set = getattr(db.session, "reindex_set", set())
-  getters = INDEXER_RULES.get(target.__class__.__name__) or []
-  for getter in getters:
-    to_index_list = getter(target)
-    if not isinstance(to_index_list, Iterable):
-      to_index_list = [to_index_list]
-    for to_index in to_index_list:
-      db.session.reindex_set.add(to_index)
-
-
-for model in all_models.all_models:
-  for action in ACTIONS:
-    event.listen(model, action, runner)
-  if not issubclass(model, Indexed):
-    continue
-  for sub_model in model.mro():
-    for rule in getattr(sub_model, "AUTO_REINDEX_RULES", []):
-      INDEXER_RULES[rule.model].append(rule.rule)
 
 
 @event.listens_for(db.session.__class__, 'before_commit')
