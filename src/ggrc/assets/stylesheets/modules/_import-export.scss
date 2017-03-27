@@ -249,3 +249,14 @@ form.import {
     margin-bottom: 0;
   }
 }
+
+.export-group__actions-wrap {
+  margin-top: 6px;
+  & > .btn-success {
+    background-color: $btnGreen;
+  }
+
+  & > .btn-info {
+    background-color: $blue;
+  }
+}
