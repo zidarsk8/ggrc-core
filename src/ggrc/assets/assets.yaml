@@ -372,6 +372,8 @@ dashboard-js-template-files:
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache
   - controls/info.mustache
+  - controls/contacts.mustache
+  - controls/urls.mustache
   - controls/list_popover.mustache
   - controls/modal_content.mustache
   - controls/object_list.mustache
