@@ -219,11 +219,11 @@ class Control(HasObjectState, Relatable, CustomAttributable,
       },
       "fraud_related": "Fraud Related",
       "principal_assessor": {
-          "display_name": "Principal Assessor",
+          "display_name": "Principal Assignee",
           "filter_by": "_filter_by_principal_assessor",
       },
       "secondary_assessor": {
-          "display_name": "Secondary Assessor",
+          "display_name": "Secondary Assignee",
           "filter_by": "_filter_by_secondary_assessor",
       },
       "key_control": {
