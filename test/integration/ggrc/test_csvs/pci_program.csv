@@ -18,7 +18,7 @@ Procure an ASV Vendor
 ,Consolidated,SOC program,,,miha@reciprocitylabs.com,,,,,Draft,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,,,,,,
-Control,Code*,Title*,Description,,,Owner*,Effective Date,Stop Date,State,Assertions,Categories,Primary Contact,Fraud Related,Significance,Kind/Nature,Type/Means,Principal Assessor,Secondary Assessor,Secondary Contact,Control URL,Reference URL,Frequency,Test Plan,Notes,map:program
+Control,Code*,Title*,Description,,,Owner*,Effective Date,Stop Date,State,Assertions,Categories,Primary Contact,Fraud Related,Significance,Kind/Nature,Type/Means,Principal Assignee,Secondary Assignee,Secondary Contact,Control URL,Reference URL,Frequency,Test Plan,Notes,map:program
 ,PCI 1.1,PCI 1.1 Firewall and Router Configuration,"1.1 Establish and implement firewall and router configuration standards that include the following:<br><br>
 
 1.1.1 A formal process for approving and testing all network connections and changes to the firewall and router configurations<br><br>
