@@ -83,7 +83,7 @@
     Market: filteredTypes,
     Objective: filteredTypes,
     OrgGroup: filteredTypes,
-    Person: _.difference(filteredTypes, ['Person']),
+    Person: ['Issue'].concat(_.difference(filteredTypes, ['Person'])),
     Policy: _.difference(filteredTypes,
       ['Contract', 'Policy', 'Regulation', 'Standard']),
     Process: filteredTypes,
