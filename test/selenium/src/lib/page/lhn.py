@@ -3,7 +3,7 @@
 """Elements for LHN."""
 
 from lib import base
-from lib.constants import locator
+from lib.constants import locator, element
 from lib.element import lhn
 from lib.page import modal
 
@@ -501,7 +501,9 @@ class Menu(base.AnimatedComponent):
         self._driver, locator.LhnMenu.TOGGLE_RISK_OR_THREATS)
 
   def filter_query(self, query):
-    self.filter.filter_query(query)
+    """Type query in LHN filter and submit."""
+    self.filter.enter_query(query)
+    self.submit_query()
 
   def submit_query(self):
     self.filter.submit_query()
@@ -592,3 +594,15 @@ class Menu(base.AnimatedComponent):
     self.all_objects.click()
     self.my_objects.is_activated = False
     return self.__class__(self._driver)
+
+  def select_tab(self, tab_name):
+    """Select tab in LHN by given name."""
+    if tab_name == element.Lhn.MY_OBJS:
+      self.select_my_objects()
+    elif tab_name == element.Lhn.ALL_OBJS:
+      self.select_all_objects()
+    else:
+      raise ValueError(
+          "Incorrect value: '{}' Possible values are: {}".format(
+              tab_name, (element.Lhn.MY_OBJS, element.Lhn.ALL_OBJS)
+          ))

@@ -43,6 +43,8 @@ class Lhn(object):
   PEOPLE_OR_GROUPS = "people_or_groups"
   ASSETS_OR_BUSINESS = "assets_or_business"
   RISKS_OR_THREATS = "risks_or_threats"
+  MY_OBJS = "My objects"
+  ALL_OBJS = "All objects"
 
 
 class WidgetBar(object):

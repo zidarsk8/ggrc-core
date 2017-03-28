@@ -10,8 +10,10 @@ import pytest
 
 from lib import base
 from lib.constants import messages
+from lib.constants.element import Lhn
 from lib.entities.entities_factory import (
     AuditsFactory, AssessmentTemplatesFactory, AssessmentsFactory)
+from lib.page import dashboard
 from lib.service import webui_service, rest_service
 
 
@@ -386,3 +388,29 @@ class TestAuditPage(base.Test):
     actual_objs = [actual_controls, actual_programs]
     assert expected_objs == actual_objs, (
         messages.ERR_MSG_FORMAT.format(expected_objs, actual_objs))
+
+  @pytest.mark.smoke_tests
+  @pytest.mark.parametrize("tab_name", [Lhn.ALL_OBJS, Lhn.MY_OBJS])
+  @pytest.mark.parametrize(
+      "version_of_ctrl, is_found",
+      [("control", False), ("updated_control", True)],
+      ids=["Snapshoted version is not found",
+           "Actual snapshotable control is presented"])
+  def test_search_snapshots_lhn(
+      self, create_audit_and_update_original_control, selenium,
+          version_of_ctrl, is_found, tab_name):
+    """Check via UI that LHN search not looking for snapshots."""
+    selenium.get(dashboard.Dashboard.URL)
+    lhn_menu = dashboard.Dashboard(selenium).open_lhn_menu()
+    lhn_menu.select_tab(tab_name)
+    control_title = (
+        create_audit_and_update_original_control[version_of_ctrl].title
+    )
+    lhn_menu.filter_query(control_title)
+    list_of_ctrls = (
+        lhn_menu.select_controls_or_objectives()
+        .select_controls().members_visible
+    )
+    assert (control_title in
+            [el.text for el in list_of_ctrls if len(list_of_ctrls) != 0]
+            ) == is_found
