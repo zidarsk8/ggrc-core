@@ -93,14 +93,16 @@
                               </div>
                             </div> <!-- span10 end -->
 
-                            <div class="span2">
-                              <div class="show-details">
-                                <a href="javascript://" class="unmap" data-toggle="unmap">
-                                  <span class="result" {{data 'result'}}></span>
-                                  <i class="fa fa-trash"></i>
-                                </a>
-                              </div>
-                            </div> <!-- span2 end -->
+                            {{^is type 'Audit'}}
+                              <div class="span2">
+                                <div class="show-details">
+                                  <a href="javascript://" class="unmap" data-toggle="unmap">
+                                    <span class="result" {{data 'result'}}></span>
+                                    <i class="fa fa-trash"></i>
+                                  </a>
+                                </div>
+                              </div> <!-- span2 end -->
+                            {{/is}}
                           </div> <!-- row-fluid end -->
                         </div> <!-- item-data end -->
                       </div> <!-- select end -->
