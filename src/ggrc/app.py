@@ -3,6 +3,8 @@
 
 """Sets up Flask app."""
 
+from collections import Iterable
+
 import re
 from logging import getLogger
 from logging.config import dictConfig as setup_logging
@@ -11,6 +13,7 @@ from flask import Flask
 from flask.ext.sqlalchemy import get_debug_queries
 from flask.ext.sqlalchemy import SQLAlchemy
 from tabulate import tabulate
+from sqlalchemy import event
 
 from ggrc import contributions  # noqa: imported so it can be used with getattr  # pylint: disable=unused-import
 from ggrc import db
@@ -90,9 +93,37 @@ def init_extension_blueprints(app_):
       app_.register_blueprint(extension_module.blueprint)
 
 
-def init_indexer():
+ACTIONS = ['after_insert', 'after_delete', 'after_update']
+
+
+def runner(mapper, content, target):  # pylint:disable=unused-argument
+  """Collect all reindex models in session"""
   import ggrc.fulltext
   ggrc.indexer = ggrc.fulltext.get_indexer()
+  db.session.reindex_set = getattr(db.session, "reindex_set", set())
+  getters = ggrc.indexer.indexer_rules.get(target.__class__.__name__) or []
+  for getter in getters:
+    to_index_list = getter(target)
+    if not isinstance(to_index_list, Iterable):
+      to_index_list = [to_index_list]
+    for to_index in to_index_list:
+      db.session.reindex_set.add(to_index)
+
+
+def init_indexer():
+  import ggrc.fulltext
+  from ggrc.fulltext.mixin import Indexed
+  from ggrc.models import all_models
+  ggrc.indexer = ggrc.fulltext.get_indexer()
+
+  for model in all_models.all_models:
+    for action in ACTIONS:
+      event.listen(model, action, runner)
+    if not issubclass(model, Indexed):
+      continue
+    for sub_model in model.mro():
+      for rule in getattr(sub_model, "AUTO_REINDEX_RULES", []):
+        ggrc.indexer.indexer_rules[rule.model].append(rule.rule)
 
 
 def init_permissions_provider():

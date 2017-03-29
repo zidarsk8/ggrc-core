@@ -1,12 +1,10 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
-from collections import defaultdict, Iterable
+"""Full text index engine for Mysql DB backend"""
 
 from sqlalchemy import and_
 from sqlalchemy import case
 from sqlalchemy import distinct
-from sqlalchemy import event
 from sqlalchemy import func
 from sqlalchemy import literal
 from sqlalchemy import or_
@@ -16,16 +14,18 @@ from sqlalchemy.schema import DDL
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select
+from sqlalchemy import event
+
 from ggrc import db
 from ggrc.login import is_creator
 from ggrc.models import all_models
 from ggrc.utils import query_helpers
 from ggrc.rbac import context_query_filter
 from ggrc.fulltext.sql import SqlIndexer
-from ggrc.fulltext.mixin import Indexed
 
 
 class MysqlRecordProperty(db.Model):
+  """ Db model for collect fulltext index records"""
   __tablename__ = 'fulltext_record_properties'
 
   key = db.Column(db.Integer, primary_key=True)
@@ -53,6 +53,7 @@ class MysqlRecordProperty(db.Model):
         {'mysql_engine': 'myisam'},
     )
 
+
 event.listen(
     MysqlRecordProperty.__table__,
     'after_create',
@@ -64,7 +65,8 @@ event.listen(
 class MysqlIndexer(SqlIndexer):
   record_type = MysqlRecordProperty
 
-  def _get_filter_query(self, terms):
+  @staticmethod
+  def _get_filter_query(terms):
     """Get the whitelist of fields to filter in full text table."""
     whitelist = MysqlRecordProperty.property.in_(
         ['title', 'name', 'email', 'notes', 'description', 'slug'])
@@ -74,7 +76,8 @@ class MysqlIndexer(SqlIndexer):
     elif terms:
       return and_(whitelist, MysqlRecordProperty.content.contains(terms))
 
-  def get_permissions_query(self, model_names, permission_type='read',
+  @staticmethod
+  def get_permissions_query(model_names, permission_type='read',
                             permission_model=None):
     """Prepare the query based on the allowed contexts and resources for
      each of the required objects(models).
@@ -106,7 +109,8 @@ class MysqlIndexer(SqlIndexer):
         MysqlRecordProperty.type.in_(model_names),
         or_(*type_queries))
 
-  def search_get_owner_query(self, query, types=None, contact_id=None):
+  @staticmethod
+  def search_get_owner_query(query, types=None, contact_id=None):
     """Prepare the search query based on the contact_id to return my
     objects. This method is used only for dashboard and returns objects
     the user is the owner.
@@ -127,36 +131,43 @@ class MysqlIndexer(SqlIndexer):
             union_query.c.type == MysqlRecordProperty.type),
     )
 
-  def _add_extra_params_query(self, query, type, extra_param):
+  def _add_extra_params_query(self, query, type_name, extra_param):
     """Prepare the query for handling extra params."""
     if not extra_param:
       return query
 
-    models = [m for m in all_models.all_models if m.__name__ == type]
+    models = [m for m in all_models.all_models if m.__name__ == type_name]
 
     if len(models) == 0:
       return query
-    model = models[0]
+    model_klass = models[0]
 
     return query.filter(self.record_type.key.in_(
         db.session.query(
-            model.id.label('id')
+            model_klass.id.label('id')
         ).filter_by(**extra_param)
     ))
 
-  def _get_grouped_types(self, types, extra_params=None):
-    model_names = [model.__name__ for model in all_models.all_models]
-    if types is not None:
-      model_names = [m for m in model_names if m in types]
+  @staticmethod
+  def _get_grouped_types(types=None, extra_params=None):
+    """Return list of model names from all model names
 
-    if extra_params is not None:
-      model_names = [m for m in model_names if m not in extra_params]
+    if they in sended types and extra_params"""
+    model_names = []
+    for model_klass in all_models.all_models:
+      model_name = model_klass.__name__
+      if types and model_name not in types:
+        continue
+      if extra_params and model_name in extra_params:
+        continue
+      model_names.append(model_name)
     return model_names
 
   def search(self, terms, types=None, permission_type='read',
-             permission_model=None, contact_id=None, extra_params={}):
+             permission_model=None, contact_id=None, extra_params=None):
     """Prepare the search query and return the results set based on the
     full text table."""
+    extra_params = extra_params or {}
     model_names = self._get_grouped_types(types, extra_params)
     columns = (
         self.record_type.key.label('key'),
@@ -173,9 +184,7 @@ class MysqlIndexer(SqlIndexer):
     query = query.filter(self._get_filter_query(terms))
     query = self.search_get_owner_query(query, types, contact_id)
 
-    model_names = [model.__name__ for model in all_models.all_models]
-    if types is not None:
-      model_names = [m for m in model_names if m in types]
+    model_names = self._get_grouped_types(types)
 
     unions = [query]
     # Add extra_params and extra_colums:
@@ -196,9 +205,11 @@ class MysqlIndexer(SqlIndexer):
         select([all_queries.c.key, all_queries.c.type]).distinct())
 
   def counts(self, terms, types=None, contact_id=None,
-             extra_params={}, extra_columns={}):
+             extra_params=None, extra_columns=None):
     """Prepare the search query, but return only count for each of
      the requested objects."""
+    extra_params = extra_params or {}
+    extra_columns = extra_columns or {}
     model_names = self._get_grouped_types(types, extra_params)
     query = db.session.query(
         self.record_type.type, func.count(distinct(
@@ -228,32 +239,17 @@ class MysqlIndexer(SqlIndexer):
       query = query.union(extra_q)
     return query.all()
 
+
 Indexer = MysqlIndexer
 
 
-INDEXER_RULES = defaultdict(list)
-
-for model in all_models.all_models:
-  if issubclass(model, Indexed):
-    for rule in model.AUTO_REINDEX_RULES:
-      INDEXER_RULES[rule.model].append(rule.rule)
-
-
 @event.listens_for(db.session.__class__, 'before_commit')
-def update_indexer(session):
+def update_indexer(session):  # pylint:disable=unused-argument
   """General function to update index
 
   for all updated related instance before commit"""
 
-  reindex_dict = {}
-  for instance in session.dirty:
-    getters = INDEXER_RULES.get(instance.__class__.__name__) or []
-    for getter in getters:
-      to_index_list = getter(instance)
-      if not isinstance(to_index_list, Iterable):
-        to_index_list = [to_index_list]
-      for to_index in to_index_list:
-        key = "{}-{}".format(to_index.__class__.__name__, to_index.id)
-        reindex_dict[key] = to_index
-  for for_index in reindex_dict.values():
+  db.session.flush()
+  for for_index in getattr(db.session, 'reindex_set', set()):
     for_index.update_indexer()
+  db.session.reindex_set = set()

@@ -36,6 +36,7 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.mixins.customattributable import CustomAttributable
 from ggrc.models.mixins.notifiable import Notifiable
 from ggrc.utils import create_stub
+from ggrc.fulltext import attributes
 
 
 # pylint: disable=invalid-name
@@ -160,7 +161,7 @@ class ChangeTracked(object):
   _fulltext_attrs = [
       'created_at',
       'updated_at',
-      'modified_by'
+      attributes.FullTextAttr("modified_by", "modified_by", ["name", "email"]),
   ]
 
   _update_attrs = []
@@ -737,7 +738,17 @@ class WithContact(object):
     )
 
   _publish_attrs = ['contact', 'secondary_contact']
-  _fulltext_attrs = ['contact', 'secondary_contact']
+  _fulltext_attrs = [
+      attributes.FullTextAttr(
+          "contact",
+          "contact",
+          ["name", "email"]
+      ),
+      attributes.FullTextAttr(
+          'secondary_contact',
+          'secondary_contact',
+          ["name", "email"]),
+  ]
   _aliases = {
       "contact": {
           "display_name": "Primary Contact",

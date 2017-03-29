@@ -13,10 +13,11 @@ from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
+from ggrc.fulltext.mixin import Indexed
 
 
 class Clause(HasObjectState, Hierarchical, CustomAttributable, Personable,
-             Ownable, Timeboxed, Relatable, BusinessObject, db.Model):
+             Ownable, Timeboxed, Relatable, BusinessObject, Indexed, db.Model):
 
   __tablename__ = 'clauses'
   _table_plural = 'clauses'

@@ -6,7 +6,7 @@
 from os.path import abspath, dirname, join
 from flask.json import dumps
 
-from ggrc.app import app
+from ggrc.app import app  # NOQA
 from ggrc_workflows.models import Workflow
 from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
@@ -64,22 +64,18 @@ class TestExportMultipleObjects(TestCase):
   https://docs.google.com/spreadsheets/d/1Jg8jum2eQfvR3kZNVYbVKizWIGZXvfqv3yQpo2rIiD8/edit#gid=2035742544
   """
 
+  CSV_DIR = join(abspath(dirname(__file__)), "test_csvs/")
+
   @classmethod
   def setUpClass(cls):  # pylint: disable=C0103
-    TestCase.clear_data()
+    cls.clear_data()
     cls.client = app.test_client()
     cls.client.get("/login")
     cls.import_file("workflow_big_sheet.csv")
 
   @classmethod
   def import_file(cls, filename, dry_run=False):
-    data = {"file": (open(join(CSV_DIR, filename)), filename)}
-    headers = {
-        "X-test-only": "true" if dry_run else "false",
-        "X-requested-by": "GGRC",
-    }
-    cls.client.post("/_service/import_csv",
-                    data=data, headers=headers)
+    cls._import_file(filename, dry_run)
 
   def activate(self):
     """ activate workflows just once after the class has been initialized

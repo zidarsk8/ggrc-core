@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
+from ggrc.fulltext.mixin import Indexed
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import Described
@@ -17,7 +18,8 @@ from ggrc.models.relationship import Relatable
 
 
 class RiskAssessment(Documentable, Slugged, Timeboxed, Noted, Described,
-                     CustomAttributable, Titled, Relatable, Base, db.Model):
+                     CustomAttributable, Titled, Relatable, Base, Indexed,
+                     db.Model):
   __tablename__ = 'risk_assessments'
   _title_uniqueness = False
 

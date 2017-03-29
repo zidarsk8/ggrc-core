@@ -310,3 +310,13 @@ class MarketFactory(TitledFactory):
 
   class Meta:
     model = models.Market
+
+
+class OwnerFactory(ModelFactory):
+  """ObjectOwner factory class"""
+
+  class Meta:
+    model = models.ObjectOwner
+
+  person = None
+  ownable = None
