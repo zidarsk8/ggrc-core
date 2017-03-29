@@ -17,6 +17,7 @@ from ggrc.utils import generate_query_chunks
 
 from ggrc.snapshotter.rules import Types
 from ggrc.snapshotter.datastructures import Pair
+from ggrc.fulltext.attributes import FullTextAttr
 
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
@@ -92,8 +93,14 @@ def _get_model_properties():
   )
 
   for klass_name in klass_names:
-    model_attributes = AttributeInfo.gather_attrs(
-        getattr(all_models, klass_name), '_fulltext_attrs')
+    full_text_attrs = AttributeInfo.gather_attrs(
+        getattr(all_models, klass_name), '_fulltext_attrs'
+    )
+    model_attributes = []
+    for attr in full_text_attrs:
+      if isinstance(attr, FullTextAttr):
+        attr = attr.alias
+      model_attributes.append(attr)
     class_properties[klass_name] = model_attributes
 
   return class_properties, cad_query.all()
