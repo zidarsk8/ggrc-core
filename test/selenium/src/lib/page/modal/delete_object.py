@@ -8,15 +8,15 @@ from lib.constants import locator
 
 class DeleteObjectModal(base.Modal):
   """Modal for delete objects."""
-  _locator = locator.ModalDeleteObject
+  _locators = locator.ModalDeleteObject
 
   def __init__(self, driver):
     super(DeleteObjectModal, self).__init__(driver)
-    self.title_modal = base.Label(driver, self._locator.MODAL_TITLE)
+    self.title_modal = base.Label(driver, self._locators.MODAL_TITLE)
     self.confirmation_text = base.Label(
-        driver, self._locator.CONFIRMATION_TEXT)
-    self.title_object = base.Label(driver, self._locator.OBJECT_TITLE)
-    self.button_delete = base.Button(driver, self._locator.BUTTON_DELETE)
+        driver, self._locators.CONFIRMATION_TEXT)
+    self.title_object = base.Label(driver, self._locators.OBJECT_TITLE)
+    self.button_delete = base.Button(driver, self._locators.BUTTON_DELETE)
 
   def confirm_delete(self):
     """Confirm delete object."""

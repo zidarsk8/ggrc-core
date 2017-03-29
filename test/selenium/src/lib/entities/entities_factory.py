@@ -122,7 +122,7 @@ class CAFactory(EntitiesFactory):
     random_ca = entity.CustomAttributeEntity()
     random_ca.ca_type = random.choice(AdminWidgetCustomAttrs.ALL_ATTRS_TYPES)
     random_ca.title = cls.generate_title(random_ca.ca_type)
-    random_ca.definition_type = random.choice(objects.ALL_CA_OBJECTS)
+    random_ca.definition_type = random.choice(objects.ALL_CA_OBJS)
     return random_ca
 
   @classmethod

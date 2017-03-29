@@ -9,14 +9,14 @@ from lib.constants import locator
 class CompareUpdateObjectModal(base.Modal):
   """Modal for compare version of objects and update them to latest version."""
   # pylint: disable=too-few-public-methods
-  _locator = locator.ModalUpdateObject
+  _locators = locator.ModalUpdateObject
 
   def __init__(self, driver):
     super(CompareUpdateObjectModal, self).__init__(driver)
-    self.title_modal = base.Label(driver, self._locator.MODAL_TITLE)
+    self.title_modal = base.Label(driver, self._locators.MODAL_TITLE)
     self.confirmation_text = base.Label(
-        driver, self._locator.CONFIRMATION_TEXT)
-    self.button_update = base.Button(driver, self._locator.BUTTON_CONFIRM)
+        driver, self._locators.CONFIRMATION_TEXT)
+    self.button_update = base.Button(driver, self._locators.BUTTON_CONFIRM)
 
   def confirm_update(self):
     """Confirm update object."""

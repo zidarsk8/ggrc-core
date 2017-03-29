@@ -2,13 +2,12 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 "Factory for modules, classes, methods, functions."
 
-from lib import base
-from lib import cache
-from lib import constants
-from lib import exception
-from lib.page.widget import admin_widget
-from lib.page.widget import generic_widget
-from lib.page.widget import info_widget
+from lib import base, cache, constants, exception
+from lib.constants import objects, element, locator
+from lib.element import tree_view, widget_info
+from lib.entities import entities_factory
+from lib.page.modal import create_new_object
+from lib.page.widget import admin_widget, generic_widget, info_widget
 
 
 def _filter_out_underscore(object_name):
@@ -63,27 +62,70 @@ def get_method_select(object_name):
   return constants.method.SELECT_PREFIX + object_name
 
 
+def get_fields_to_set(object_name):
+  """Get and return of constant DEFAULT_SET_FIELDS (tuple of default visible
+  fields to setup) from lib.constants.element module.
+  """
+  cls_name = objects.get_singular(object_name) + "ModalSetVisibleFields"
+  base_cls = element.CommonModalSetVisibleFields
+  set_fields_modal_cls = _factory(cls_name=cls_name, parent_cls=base_cls)
+  return set_fields_modal_cls().DEFAULT_SET_FIELDS
+
+
 def get_cls_test_utils(object_name):
   """Return test utils class based on object name
  Args:
     object_name (basestring)
  """
   cls_name = constants.cls_name.TEST_MODAL_NEW_PREFIX + object_name
-  return _factory(cls_name, base.TestUtil, search_nested_subclasses=True)
+  return _factory(cls_name=cls_name, parent_cls=base.TestUtil,
+                  search_nested_subclasses=True)
 
 
 def get_cls_widget(object_name, is_info=False, is_admin=False):
-  """Return info widget class
- Args:
-      object_name (basestring)
- """
+  """Get and return class of widget. If is_info is True then class
+  info_widget.'obj_name', if is_admin is True then class
+  admin_widget.'tab_element', else class generic_widget.'obj_name'.
+  """
   if is_info:
     base_cls = info_widget.CommonInfo
   elif is_admin:
     base_cls = admin_widget.Widget
   else:
     base_cls = generic_widget.Widget
-  return _factory(object_name, base_cls)
+  return _factory(cls_name=object_name, parent_cls=base_cls)
+
+
+def get_cls_locators_generic_widget(object_name):
+  """Get and return class of locators for object generic widget."""
+  cls_name = constants.cls_name.WIDGET + object_name
+  base_cls = locator.BaseWidgetGeneric
+  return _factory(cls_name=cls_name, parent_cls=base_cls)
+
+
+def get_cls_entity_factory(object_name):
+  """Get and return class of entity factory."""
+  cls_name = object_name + constants.cls_name.FACTORY
+  base_cls = entities_factory.EntitiesFactory
+  return _factory(cls_name=cls_name, parent_cls=base_cls)
+
+
+def get_cls_create_obj(object_name):
+  """Get and return class of create object."""
+  cls_name = object_name + constants.cls_name.CREATE
+  base_cls = create_new_object.CreateNewObjectModal
+  return _factory(cls_name=cls_name, parent_cls=base_cls)
+
+
+def get_cls_3bbs_dropdown_settings(object_name, is_tree_view_not_info):
+  """Get and return class of 3BBS dropdown settings for Tree View or
+  Info widget (Info page or Info panel). As default for Info widget, if
+  is_tree_view_not_info is True then for Tree View.
+  """
+  base_cls = widget_info.CommonDropdownSettings
+  if is_tree_view_not_info:
+    base_cls = tree_view.CommonDropdownSettings
+  return _factory(cls_name=object_name, parent_cls=base_cls)
 
 
 def get_locator_widget(widget_name):

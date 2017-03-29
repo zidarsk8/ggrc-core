@@ -11,8 +11,8 @@ from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
 
 from lib import constants, exception, mixin
-from lib.constants.test import batch
 from lib.constants import objects
+from lib.constants.test import batch
 from lib.utils import selenium_utils
 
 
@@ -480,12 +480,9 @@ class TreeView(Component):
   """Common class for representing Tree View list with several objects."""
   _locators = constants.locator.TreeView
 
-  def __init__(self, driver, obj_name):
-    """
-    Args: driver (CustomDriver)
-    """
+  def __init__(self, driver, widget_name):
     super(TreeView, self).__init__(driver)
-    self.obj_name = obj_name
+    self.widget_name = widget_name
     self._tree_view_header_elements = []
     self._tree_view_items_elements = []
     self._tree_view_items = []
@@ -493,14 +490,14 @@ class TreeView(Component):
   def get_tree_view_header_elements(self):
     """Get Tree View header as list of elements from current widget."""
     _locator_header = (
-        By.CSS_SELECTOR, self._locators.HEADER.format(self.obj_name))
+        By.CSS_SELECTOR, self._locators.HEADER.format(self.widget_name))
     self._tree_view_header_elements = selenium_utils.get_when_all_visible(
         self._driver, _locator_header)
 
   def get_tree_view_items_elements(self):
     """Get Tree View items as list of elements from current widget."""
     _locator_items = (
-        By.CSS_SELECTOR, self._locators.ITEMS.format(self.obj_name))
+        By.CSS_SELECTOR, self._locators.ITEMS.format(self.widget_name))
     selenium_utils.get_when_invisible(self._driver, self._locators.SPINNER)
     selenium_utils.wait_until_not_present(
         self._driver, self._locators.ITEM_LOADING)
@@ -516,8 +513,8 @@ class TreeView(Component):
         TreeViewItem(
             driver=self._driver, text=el.text,
             expand_btn=el.find_element(
-                By.CSS_SELECTOR, self._locators.ITEM_EXPAND_BUTTON)) for el
-        in self._tree_view_items_elements]
+                By.CSS_SELECTOR, self._locators.ITEM_EXPAND_BUTTON)) for el in
+        self._tree_view_items_elements]
 
   def tree_view_header_elements(self):
     """Return Tree View header as list of elements from current widget."""

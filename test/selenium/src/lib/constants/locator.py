@@ -119,8 +119,8 @@ class LhnMenu(object):
 
   class __metaclass__(type):
     def __init__(cls, *args):
-      for object_singular, object_plural in zip(objects.ALL_SINGULAR,
-                                                objects.ALL_PLURAL):
+      for object_singular, object_plural in (zip(objects.ALL_SINGULAR,
+                                                 objects.ALL_PLURAL)):
         capitalized_name = object_singular.title()
         # handle underscore in object names
         if "_" in capitalized_name:
@@ -494,8 +494,8 @@ class WidgetBar(object):
 
   class __metaclass__(type):
     def __init__(cls, *args):
-      for object_singular, object_plural in zip(objects.ALL_SINGULAR,
-                                                objects.ALL_PLURAL):
+      for object_singular, object_plural in (zip(objects.ALL_SINGULAR,
+                                                 objects.ALL_PLURAL)):
         name = object_singular.lower()
         setattr(cls, object_plural, cls._Locator.get_widget(name))
   BUTTON_ADD = (
@@ -798,7 +798,6 @@ class WidgetInfoThreat(CommonWidgetInfo):
 
 class WidgetAdminRoles(object):
   """Locators for Roles widget on Admin Dashboard."""
-  widget_name = url.Widget.ROLES
 
 
 class WidgetAdminEvents(object):
@@ -815,15 +814,15 @@ class WidgetAdminEvents(object):
       "{0} {1}:first-child".format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
 
 
-class Dropdown3bbsInfoWidget(object):
+class CommonDropdown3bbsInfoWidget(object):
   """Locators for common settings 3BBS dropdown on Info widget and Info page.
  """
-  INFO_DROPDOWN = Common.INFO_WIDGET + " .dropdown-menu"
+  INFO_3BBS_DROPDOWN = Common.INFO_WIDGET + " .dropdown-menu"
   PIN_CONTENT = CommonWidgetInfo.PIN_CONTENT
-  EDIT = INFO_DROPDOWN + " .fa-pencil-square-o"
-  GET_PERMALINK = (INFO_DROPDOWN + " .fa-link")
-  OPEN = (INFO_DROPDOWN + " .fa-long-arrow-right")
-  DELETE = (INFO_DROPDOWN + " .fa-trash")
+  EDIT = INFO_3BBS_DROPDOWN + " .fa-pencil-square-o"
+  GET_PERMALINK = (INFO_3BBS_DROPDOWN + " .fa-link")
+  OPEN = (INFO_3BBS_DROPDOWN + " .fa-long-arrow-right")
+  DELETE = (INFO_3BBS_DROPDOWN + " .fa-trash")
   # user input elements
   BUTTON_3BBS_EDIT = (By.CSS_SELECTOR, EDIT)
   BUTTON_3BBS_GET_PERMALINK = (By.CSS_SELECTOR, GET_PERMALINK)
@@ -837,13 +836,29 @@ class Dropdown3bbsInfoWidget(object):
   BUTTON_3BBS_DELETE_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + DELETE)
 
 
-class Dropdown3bbsAuditInfoWidget(Dropdown3bbsInfoWidget):
+class AuditsDropdown3bbsInfoWidget(CommonDropdown3bbsInfoWidget):
   """Locators for Audit settings 3BBS dropdown on Info page and Info panel.
   """
-  INFO_DROPDOWN = Dropdown3bbsInfoWidget.INFO_DROPDOWN
+  INFO_3BBS_DROPDOWN = CommonDropdown3bbsInfoWidget.INFO_3BBS_DROPDOWN
   BUTTON_3BBS_UPDATE = (
-      By.CSS_SELECTOR, INFO_DROPDOWN + " snapshot-scope-update")
-  BUTTON_3BBS_CLONE = (By.CSS_SELECTOR, INFO_DROPDOWN + " object-cloner")
+      By.CSS_SELECTOR, INFO_3BBS_DROPDOWN + " snapshot-scope-update")
+  BUTTON_3BBS_CLONE = (By.CSS_SELECTOR, INFO_3BBS_DROPDOWN + " object-cloner")
+
+
+class CommonDropdown3bbsTreeView(object):
+  """Locators for common settings 3BBS dropdown on Tree View."""
+  TREE_VIEW_3BBS_DROPDOWN = (
+      "{} " + Common.TREE_LIST + " .tree-action-list-items")
+  # user input elements
+  BUTTON_3BBS_IMPORT = TREE_VIEW_3BBS_DROPDOWN + " .fa-cloud-upload"
+  BUTTON_3BBS_EXPORT = TREE_VIEW_3BBS_DROPDOWN + " .fa-download"
+  BUTTON_3BBS_SELECT_CHILD_TREE = TREE_VIEW_3BBS_DROPDOWN + " .fa-share-alt"
+
+
+class AssessmentsDropdown3bbsTreeView(CommonDropdown3bbsTreeView):
+  """Locators for Assessments settings 3BBS dropdown on Tree View."""
+  TREE_VIEW_3BBS_DROPDOWN = CommonDropdown3bbsTreeView.TREE_VIEW_3BBS_DROPDOWN
+  BUTTON_3BBS_GENERATE = TREE_VIEW_3BBS_DROPDOWN + " .fa-magic"
 
 
 class TreeView(object):
@@ -855,11 +870,9 @@ class TreeView(object):
   ITEM_EXPAND_BUTTON = " .openclose"
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
   BUTTON_SHOW_FIELDS = "{} " + Common.TREE_HEADER + " .fa-bars"
-  # 3BBS dropdown
+  # user input elements
   BUTTON_3BBS = "{} " + Common.TREE_LIST + " .btn-draft"
   BUTTON_3BBS_CREATE = "{} " + Common.TREE_LIST + " .create-button"
-  BUTTON_3BBS_GENERATE = (
-      "{} " + Common.TREE_LIST + " .tree-action-list-items .fa-magic")
 
 
 class BaseWidgetGeneric(object):
@@ -904,67 +917,60 @@ class BaseWidgetGeneric(object):
 class WidgetAudits(BaseWidgetGeneric):
   """Locators for Audits generic widgets."""
   _object_name = objects.get_singular(objects.AUDITS)
-  widget_name = url.Widget.AUDITS
 
 
 class WidgetAssessments(BaseWidgetGeneric):
   """Locators for Assessments generic widgets."""
   _object_name = objects.get_singular(objects.ASSESSMENTS)
-  widget_name = url.Widget.ASSESSMENTS
 
 
 class WidgetControls(BaseWidgetGeneric):
   """Locators for Controls generic widgets."""
   _object_name = objects.get_singular(objects.CONTROLS)
-  widget_name = url.Widget.CONTROLS
 
 
 class WidgetProducts(BaseWidgetGeneric):
   """Locators for Products generic widgets."""
-  _object_name = "product"
+  _object_name = objects.get_singular(objects.PRODUCTS)
 
 
 class WidgetProjects(BaseWidgetGeneric):
   """Locators for Projects generic widgets."""
-  _object_name = "project"
+  _object_name = objects.get_singular(objects.PROJECTS)
 
 
 class WidgetSystems(BaseWidgetGeneric):
   """Locators for Systems generic widgets."""
-  _object_name = "system"
+  _object_name = objects.get_singular(objects.SYSTEMS)
 
 
 class WidgetDataAssets(BaseWidgetGeneric):
   """Locators for DataAssets generic widgets."""
-  _object_name = "data_asset"
+  _object_name = objects.get_singular(objects.PROJECTS)
 
 
 class WidgetProcesses(BaseWidgetGeneric):
   """Locators for Processes generic widgets."""
-  _object_name = "process"
+  _object_name = objects.get_singular(objects.PROCESSES)
 
 
 class WidgetIssues(BaseWidgetGeneric):
   """Locators for Issues generic widgets"""
-  _object_name = "issue"
-  widget_name = url.Widget.ISSUES
+  _object_name = objects.get_singular(objects.ISSUES)
 
 
 class WidgetPrograms(BaseWidgetGeneric):
   """Locators for Programs generic widgets"""
-  _object_name = "program"
-  widget_name = url.Widget.PROGRAMS
+  _object_name = objects.get_singular(objects.PROGRAMS)
 
 
 class WidgetAssessmentTemplates(BaseWidgetGeneric):
   """Locators for Assessment Templates generic widgets."""
   _object_name = objects.get_singular(objects.ASSESSMENT_TEMPLATES)
-  widget_name = url.Widget.ASSESSMENT_TEMPLATES
 
 
 class AdminCustomAttributes(object):
   """Locators for Widget custom attributes on Admin Dashboard."""
-  widget_name = url.Widget.CUSTOM_ATTRIBUTES
 
   class _Locator(object):
     """Locators for Widget custom attributes on Admin Dashboard."""

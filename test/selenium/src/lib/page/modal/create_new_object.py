@@ -8,99 +8,93 @@ from lib.page.modal import base as modal_base
 from lib.utils import selenium_utils
 
 
-class _CreateNewObjectModal(modal_base.BaseModal):
+class CreateNewObjectModal(modal_base.BaseModal):
   """Modal for create objects."""
-  _locator_button_add_another = (
-      locator.ModalCreateNewObject.BUTTON_SAVE_AND_ADD_ANOTHER)
+  _locators = locator.ModalCreateNewObject
 
   def __init__(self, driver):
-    super(_CreateNewObjectModal, self).__init__(driver)
-    self.button_save_and_add_another = None
+    super(CreateNewObjectModal, self).__init__(driver)
 
   def save_and_add_other(self):
     """Create object and open new Create modal."""
-    self.button_save_and_add_another = base.Button(
-        self._driver, self._locator_button_add_another)
-    self.button_save_and_add_another.click()
+    base.Button(self._driver,
+                self._locators.BUTTON_SAVE_AND_ADD_ANOTHER).click()
     selenium_utils.get_when_invisible(
-        self._driver, self._locator_button_add_another)
+        self._driver, self._locators.BUTTON_SAVE_AND_ADD_ANOTHER)
     return self.__class__(self._driver)
 
   @decorator.wait_for_redirect
   @decorator.handle_alert
   def save_and_close(self):
-    """Create object and close Create modal."""
+    """Create object and close Creation modal."""
     self.button_save_and_close.click()
-    selenium_utils.get_when_invisible(self._driver, self.locator_button_save)
+    selenium_utils.get_when_invisible(self._driver, self._locator_button_save)
 
 
-class _GenerateNewObjectModal(base.Modal):
+class GenerateNewObjectModal(base.Modal):
   """Modal for generate objects."""
-  _locator_button_generate = locator.ModalGenerateNewObject.BUTTON_GENERATE
+  _locators = locator.ModalGenerateNewObject
 
   def __init__(self, driver):
-    super(_GenerateNewObjectModal, self).__init__(driver)
-    self.button_generate_and_close = None
+    super(GenerateNewObjectModal, self).__init__(driver)
 
   def generate_and_close(self):
-    """Generate object and close Generate modal."""
-    self.button_generate_and_close = base.Button(
-        self._driver, self._locator_button_generate)
-    self.button_generate_and_close.click()
+    """Generate object(s) and close Generation modal."""
+    base.Button(self._driver, self._locators.BUTTON_GENERATE).click()
     selenium_utils.get_when_invisible(
-        self._driver, self._locator_button_generate)
+        self._driver, self._locators.BUTTON_GENERATE)
 
 
-class ProgramsCreate(modal_base.ProgramsModal, _CreateNewObjectModal):
+class ProgramsCreate(modal_base.ProgramsModal, CreateNewObjectModal):
   # pylint: disable=abstract-method
   """Programs create modal."""
 
 
-class ControlsCreate(modal_base.ControlsModal, _CreateNewObjectModal):
+class ControlsCreate(modal_base.ControlsModal, CreateNewObjectModal):
   """Controls create modal."""
 
 
-class OrgGroupsCreate(modal_base.OrgGroupsModal, _CreateNewObjectModal):
+class OrgGroupsCreate(modal_base.OrgGroupsModal, CreateNewObjectModal):
   """Org Groups create modal."""
 
 
-class RisksCreate(modal_base.RisksModal, _CreateNewObjectModal):
+class RisksCreate(modal_base.RisksModal, CreateNewObjectModal):
   """Risks create modal."""
 
 
-class IssuesCreate(modal_base.IssuesModal, _CreateNewObjectModal):
+class IssuesCreate(modal_base.IssuesModal, CreateNewObjectModal):
   """Issues create modal."""
 
 
-class ProcessesCreate(modal_base.ProcessesModal, _CreateNewObjectModal):
+class ProcessesCreate(modal_base.ProcessesModal, CreateNewObjectModal):
   """Processes create modal."""
 
 
-class DataAssetsCreate(modal_base.DataAssetsModal, _CreateNewObjectModal):
+class DataAssetsCreate(modal_base.DataAssetsModal, CreateNewObjectModal):
   """Data Assets create modal."""
 
 
-class SystemsCreate(modal_base.SystemsModal, _CreateNewObjectModal):
+class SystemsCreate(modal_base.SystemsModal, CreateNewObjectModal):
   """Systems create modal."""
 
 
-class ProductsCreate(modal_base.ProductsModal, _CreateNewObjectModal):
+class ProductsCreate(modal_base.ProductsModal, CreateNewObjectModal):
   """Products create modal."""
 
 
-class ProjectsCreate(modal_base.ProjectsModal, _CreateNewObjectModal):
+class ProjectsCreate(modal_base.ProjectsModal, CreateNewObjectModal):
   """Projects create modal."""
 
 
 class AssessmentTemplatesCreate(modal_base.AsmtTmplModal,
-                                _CreateNewObjectModal):
+                                CreateNewObjectModal):
   """Assessment Templates create modal."""
 
 
-class AssessmentsCreate(modal_base.AsmtsModal, _CreateNewObjectModal):
+class AssessmentsCreate(modal_base.AsmtsModal, CreateNewObjectModal):
   """Assessments create modal."""
 
 
 class AssessmentsGenerate(modal_base.AsmtsModalGenerate,
-                          _GenerateNewObjectModal):
+                          GenerateNewObjectModal):
   """Assessments generate modal."""

@@ -43,7 +43,7 @@ class _ObjectWidgetBar(_WidgetBar):
         self, attr_name,
         widget_bar.Tab(self._driver, factory.get_locator_widget(widget_name)))
     getattr(self, attr_name).click()
-    return factory.get_cls_widget(widget_name)(self._driver)
+    return factory.get_cls_widget(widget_name)(self._driver, widget_name)
 
   def add_widget(self):
     """

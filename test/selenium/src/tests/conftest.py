@@ -51,7 +51,7 @@ def new_program_ui(selenium, new_control_ui):
       selenium, constants.element.Lhn.PROGRAMS).create_new()
   test_utils.ModalNewPrograms.enter_test_data(modal)
   modal.save_and_close()
-  program_info_page = info_widget.ProgramsInfoWidget(selenium)
+  program_info_page = info_widget.Programs(selenium)
   yield modal, program_info_page
 
 
