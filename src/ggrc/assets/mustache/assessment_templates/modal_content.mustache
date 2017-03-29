@@ -37,7 +37,9 @@
     <div class="row-fluid">
       <div class="span6">
         <label>Audit</label>
-        <strong>{{object_params.audit_title}}</strong>
+        {{#using audit=instance.audit }}
+          <input tabindex="2" class="input-block-level" name="audit.title" data-permission-type="update" data-lookup="Audit" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Audit" type="text" null-if-empty="false" value="{{firstnonempty audit.title ''}}" disabled="disabled" />
+        {{/using}}
       </div>
     </div>
 
