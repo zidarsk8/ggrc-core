@@ -151,7 +151,7 @@ class TestPermissionsOnAssessmentTemplate(TestCase):
     self.assessment_template_resp, assessment_template = generated_at
     assessment_template_id = assessment_template.id
     self.api.set_user(self.editor)
-    self.perms_data = self.api.tc.get("/permissions").json
+    self.perms_data = self.api.client.get("/permissions").json
     self.audit = all_models.Audit.query.get(audit_id)
     self.assessment_template = all_models.AssessmentTemplate.query.get(
         assessment_template_id)
