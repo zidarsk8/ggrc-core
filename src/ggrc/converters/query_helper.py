@@ -337,6 +337,7 @@ class QueryHelper(object):
             object_class,
             query,
             object_query["order_by"],
+            tgt_class,
         )
     with benchmark("Apply limit"):
       limit = object_query.get("limit")
@@ -393,7 +394,7 @@ class QueryHelper(object):
 
     return ids, total
 
-  def _apply_order_by(self, model, query, order_by):
+  def _apply_order_by(self, model, query, order_by, tgt_class):
     """Add ordering parameters to a query for objects.
 
     This works only on direct model properties and related objects defined with
@@ -403,7 +404,8 @@ class QueryHelper(object):
       model: the model instances of which are requested in query;
       query: a query to get objects from the db;
       order_by: a list of dicts with keys "name" (the name of the field by which
-                to sort) and "desc" (optional; do reverse sort if True).
+                to sort) and "desc" (optional; do reverse sort if True);
+      tgt_class: the snapshotted model if `model` is Snapshot else `model`.
 
     If order_by["name"] == "__similarity__" (a special non-field value),
     similarity weights returned by get_similar_objects_query are used for
@@ -475,8 +477,8 @@ class QueryHelper(object):
           raise BadQueryException("Can't order by '__similarity__' when no ",
                                   "'similar' filter was applied.")
       else:
+        key, _ = self.attr_name_map[tgt_class].get(key, (key, None))
         if key in self.getattr_whitelist:
-          key, _ = self.attr_name_map[model].get(key, (key, None))
           attr = getattr(model, key.encode('utf-8'), None)
           if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
               isinstance(attr.property,
