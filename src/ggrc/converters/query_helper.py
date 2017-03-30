@@ -4,34 +4,20 @@
 """This module contains a class for handling request queries."""
 
 # flake8: noqa
-
 import collections
 import datetime
-import functools
-import operator
 
 import flask
 import sqlalchemy as sa
-from sqlalchemy.orm import load_only
 
 from ggrc import db
 from ggrc import models
-from ggrc.snapshotter import rules
-from ggrc.login import is_creator
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models import inflector
-from ggrc.models.reflection import AttributeInfo
-from ggrc.models.relationship_helper import RelationshipHelper
-from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
-from ggrc.models.custom_attribute_value import CustomAttributeValue
-from ggrc.converters import get_exportables
 from ggrc.rbac import context_query_filter
-from ggrc.utils import query_helpers, benchmark, convert_date_format
-from ggrc_basic_permissions import UserRole
-
-
-class BadQueryException(Exception):
-  pass
+from ggrc.utils import query_helpers, benchmark
+from ggrc.converters import custom_operators
+from ggrc.converters.exceptions import BadQueryException
 
 
 # pylint: disable=too-few-public-methods
@@ -92,49 +78,9 @@ class QueryHelper(object):
 
   """
 
-  def __init__(self, query, ca_disabled=False):
-    self.object_map = {o.__name__: o for o in models.all_models.all_models}
+  def __init__(self, query):
     self.query = self._clean_query(query)
-    self.ca_disabled = ca_disabled
-    self._set_attr_name_map()
     self._count = 0
-    self.getattr_whitelist = {
-        "child_type",
-        "id",
-        "is_current",
-        "program",
-    }
-
-  def _set_attr_name_map(self):
-    """ build a map for attributes names and display names
-
-    Dict containing all display_name to attr_name mappings
-    for all objects used in the current query
-    Example:
-        { Program: {"Program URL": "url", "Code": "slug", ...} ...}
-    """
-    self.attr_name_map = {}
-    for object_query in self.query:
-      object_name = object_query["object_name"]
-      object_class = self.object_map[object_name]
-      tgt_class = object_class
-      if object_name == "Snapshot":
-        child_type = self._get_snapshot_child_type(object_query)
-        tgt_class = getattr(models.all_models, child_type, object_class)
-      aliases = AttributeInfo.gather_aliases(tgt_class)
-      self.attr_name_map[tgt_class] = {}
-      for key, value in aliases.items():
-        filter_by = None
-        if isinstance(value, dict):
-          filter_name = value.get("filter_by", None)
-          if filter_name is not None:
-            filter_by = getattr(tgt_class, filter_name, None)
-          name = value["display_name"]
-        else:
-          name = value
-        if name:
-          self.attr_name_map[tgt_class][name.lower()] = (key.lower(),
-                                                         filter_by)
 
   def _get_snapshot_child_type(self, object_query):
     """Return child_type for snapshot from a query"""
@@ -290,7 +236,7 @@ class QueryHelper(object):
       return set()
 
     object_name = object_query["object_name"]
-    object_class = self.object_map[object_name]
+    object_class = inflector.get_model(object_name)
     query = object_class.eager_query()
     query = query.filter(object_class.id.in_(ids))
 
@@ -310,7 +256,7 @@ class QueryHelper(object):
 
     if expression is None:
       return set()
-    object_class = self.object_map[object_name]
+    object_class = inflector.get_model(object_name)
     query = db.session.query(object_class.id)
 
     tgt_class = object_class
@@ -324,10 +270,11 @@ class QueryHelper(object):
       if type_query is not None:
         query = query.filter(type_query)
     with benchmark("Parse filter query: _get_ids > _build_expression"):
-      filter_expression = self._build_expression(
+      filter_expression = custom_operators.build_expression(
           expression,
           object_class,
-          tgt_class
+          tgt_class,
+          self.query
       )
       if filter_expression is not None:
         query = query.filter(filter_expression)
@@ -477,8 +424,8 @@ class QueryHelper(object):
           raise BadQueryException("Can't order by '__similarity__' when no ",
                                   "'similar' filter was applied.")
       else:
-        key, _ = self.attr_name_map[tgt_class].get(key, (key, None))
-        if key in self.getattr_whitelist:
+        key, _ = tgt_class.attributes_map().get(key, (key, None))
+        if key in custom_operators.GETATTR_WHITELIST:
           attr = getattr(model, key.encode('utf-8'), None)
           if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
               isinstance(attr.property,
@@ -505,459 +452,10 @@ class QueryHelper(object):
 
     return query.order_by(*orders)
 
-  def _build_expression(self, exp, object_class, tgt_class):
-    """Make an SQLAlchemy filtering expression from exp expression tree."""
-    if "op" not in exp:
-      return None
-
-    def autocast(o_key, operator_name, value):
-      """Try to guess the type of `value` and parse it from the string.
-
-      Args:
-        o_key (basestring): the name of the field being compared; the `value`
-                            is converted to the type of that field.
-        operator_name: the name of the operator being applied.
-        value: the value being compared.
-
-      Returns:
-        a list of one or several possible meanings of `value` type compliant
-        with `getattr(object_class, o_key)`.
-      """
-      def has_date_or_non_date_cad(title, definition_type):
-        """Check if there is a date and a non-date CA named title.
-
-        Returns:
-          (bool, bool) - flags indicating the presence of date and non-date CA.
-        """
-        cad_query = db.session.query(CustomAttributeDefinition).filter(
-          CustomAttributeDefinition.title == title,
-          CustomAttributeDefinition.definition_type == definition_type,
-        )
-        date_cad = bool(cad_query.filter(
-          CustomAttributeDefinition.
-              attribute_type == CustomAttributeDefinition.ValidTypes.DATE,
-        ).count())
-        non_date_cad = bool(cad_query.filter(
-          CustomAttributeDefinition.
-              attribute_type != CustomAttributeDefinition.ValidTypes.DATE,
-        ).count())
-        return date_cad, non_date_cad
-
-      if not isinstance(o_key, basestring):
-        return [value]
-      key, custom_filter = (self.attr_name_map[tgt_class].get(o_key,
-                                                              (o_key, None)))
-
-      date_attr = date_cad = non_date_cad = False
-      try:
-        attr_type = getattr(tgt_class, key).property.columns[0].type
-      except AttributeError:
-        date_cad, non_date_cad = has_date_or_non_date_cad(
-            title=key,
-            definition_type=tgt_class.__name__,
-        )
-        if not (date_cad or non_date_cad) and not custom_filter:
-          # TODO: this logic fails on CA search for Snapshots
-          pass
-          # no CA with this name and no custom filter for the field
-          # raise BadQueryException(u"Model {} has no field or CA {}"
-          #                         .format(object_class.__name__, o_key))
-      else:
-        if isinstance(attr_type, sa.sql.sqltypes.Date):
-          date_attr = True
-
-      converted_date = None
-      if (date_attr or date_cad) and isinstance(value, basestring):
-        try:
-          converted_date = convert_date_format(
-              value,
-              CustomAttributeValue.DATE_FORMAT_US,
-              CustomAttributeValue.DATE_FORMAT_ISO,
-          )
-        except (TypeError, ValueError):
-          # wrong format or not a date
-          if not non_date_cad:
-            # o_key is not a non-date CA
-            raise BadQueryException(u"Field '{}' expects a '{}' date"
-                                    .format(
-                                        o_key,
-                                        CustomAttributeValue.DATE_FORMAT_US,
-                                    ))
-
-
-      if date_attr or (date_cad and not non_date_cad):
-        # Filter by converted date
-        return [converted_date]
-      elif date_cad and non_date_cad and converted_date is None:
-        # Filter by unconverted string as date conversion was unsuccessful
-        return [value]
-      elif date_cad and non_date_cad:
-        if operator_name in ("<", ">"):
-          # "<" and ">" works incorrectly when searching by CA in both formats
-          return [converted_date]
-        else:
-          # Since we can have two local CADs with same name when one is Date
-          # and another is Text, we should handle the case when the user wants
-          # to search by the Text CA that should not be converted
-          return [converted_date, value]
-      else:
-        # Filter by unconverted string
-        return [value]
-
-    def _backlink(object_name, ids):
-      """Convert ("__previous__", [query_id]) into (model_name, ids).
-
-      If `object_name` == "__previous__", return `object_name` and resulting
-      `ids` from a previous query with index `ids[0]`.
-
-      Example:
-        self.query[0] = {object_name: "Assessment",
-                         type: "ids",
-                         expression: {something}}
-        _backlink("__previous__", [0]) will return ("Assessment",
-                                                    ids returned by query[0])
-
-      Returns:
-        (object_name, ids) if object_name != "__previous__",
-        (self.query[ids[0]]["object_name"],
-         self.query[ids[0]]["ids"]) otherwise.
-      """
-
-      if object_name == "__previous__":
-        previous_query = self.query[ids[0]]
-        return (previous_query["object_name"], previous_query["ids"])
-      else:
-        return object_name, ids
-
-    def _relevant(object_name, ids):
-      """Filter by relevant object.
-
-      Args:
-        object_name (basestring): the name of the related model.
-        ids ([int]): the ids of related objects of type `object_name`.
-
-      Returns:
-        sqlalchemy.sql.elements.BinaryExpression if an object of `object_class`
-        is related (via a Relationship or another m2m) to one the given objects.
-      """
-      return object_class.id.in_(
-            RelationshipHelper.get_ids_related_to(
-                object_class.__name__,
-                object_name,
-                ids,
-            )
-        )
-
-    def _relevant_to_snapshot(object_name, ids):
-      """Filter by relevant object over snapshot"""
-      snapshot_qs = models.Snapshot.query.filter(
-          models.Snapshot.parent_type == models.Audit.__name__,
-          models.Snapshot.child_type == object_name,
-          models.Snapshot.child_id.in_(ids),
-      ).options(
-          load_only(models.Snapshot.id),
-      ).distinct(
-      ).subquery(
-          "snapshot"
-      )
-      dest_qs = models.Relationship.query.filter(
-          models.Relationship.destination_id == snapshot_qs.c.id,
-          models.Relationship.destination_type == models.Snapshot.__name__,
-          models.Relationship.source_type == object_class.__name__,
-      ).options(
-          load_only("source_id")
-      ).distinct()
-      source_qs = models.Relationship.query.filter(
-          models.Relationship.source_id == snapshot_qs.c.id,
-          models.Relationship.source_type == models.Snapshot.__name__,
-          models.Relationship.destination_type == object_class.__name__,
-      ).options(
-          load_only("destination_id")
-      ).distinct()
-      ids_qs = dest_qs.union(source_qs).distinct().subquery("ids")
-      return object_class.id == ids_qs.c.relationships_source_id
-
-    def relevant(object_name, ids):
-      "Filter by relevant object"
-      if object_class.__name__ in rules.Types.scoped and object_name in rules.Types.all:
-        return _relevant_to_snapshot(object_name, ids)
-      else:
-        return _relevant(object_name, ids)
-
-    def similar(object_name, ids):
-      """Filter by relationships similarity.
-
-      Note: only the first id from the list of ids is used.
-
-      Args:
-        object_name: the name of the class of the objects to which similarity
-                     will be computed.
-        ids: the ids of similar objects of type `object_name`.
-
-      Returns:
-        sqlalchemy.sql.elements.BinaryExpression if an object of `object_class`
-        is similar to one the given objects.
-      """
-      similar_class = self.object_map[object_name]
-      if not hasattr(similar_class, "get_similar_objects_query"):
-        return BadQueryException(u"{} does not define weights to count "
-                                 u"relationships similarity"
-                                 .format(similar_class.__name__))
-      similar_objects_query = similar_class.get_similar_objects_query(
-          id_=ids[0],
-          types=[object_class.__name__],
-      )
-      flask.g.similar_objects_query = similar_objects_query
-      similar_objects_ids = [obj.id for obj in similar_objects_query]
-      if similar_objects_ids:
-        return object_class.id.in_(similar_objects_ids)
-      return sa.sql.false()
-
-    def unknown():
-      """A fake operator for invalid operator names."""
-      raise BadQueryException(u"Unknown operator \"{}\""
-                              .format(exp["op"]["name"]))
-
-    def default_filter_by(object_class, key, predicate):
-      """Default filter option that tries to mach predicate in fulltext index.
-
-      This function tries to match the predicate for a give key with entries in
-      the full text index table.
-
-      Args:
-        object_class: class of the object we are querying for.
-        key: string containing attribute name on which we are filtering.
-        predicate: function containing the correct comparison predicate for
-          the attribute value.
-
-      Returs:
-        Query predicate if the given predicate matches a value for the correct
-          custom attribute.
-      """
-      return object_class.id.in_(db.session.query(Record.key).filter(
-          Record.type == object_class.__name__,
-          Record.property == key,
-          predicate(Record.content)
-      ))
-
-    def with_key(key, predicate):
-      """Apply keys to the filter expression.
-
-      Args:
-        key: string containing attribute name on which we are filtering.
-        predicate: function containing a comparison for attribute value.
-
-      Returns:
-        sqlalchemy.sql.elements.BinaryExpression with:
-          `filter_by(predicate)` if there is custom filtering logic for `key`,
-          `predicate(getattr(object_class, key))` for own attributes,
-          `predicate(value of corresponding custom attribute)` otherwise.
-      """
-      key = key.lower()
-      key, filter_by = self.attr_name_map[tgt_class].get(key, (key, None))
-
-      if callable(filter_by):
-        return filter_by(predicate)
-
-      if key in self.getattr_whitelist:
-        return predicate(getattr(object_class, key, None))
-
-      return default_filter_by(object_class, key, predicate)
-
-    lift_bin = lambda f: f(self._build_expression(exp["left"], object_class,
-                                                  tgt_class),
-                           self._build_expression(exp["right"], object_class,
-                                                  tgt_class))
-
-    def text_search(text):
-      """Filter by fulltext search.
-
-      The search is done only in fields indexed for fulltext search.
-
-      Args:
-        text: the text we are searching for.
-
-      Returns:
-        sqlalchemy.sql.elements.BinaryExpression if an object of `object_class`
-        has an indexed property that contains `text`.
-      """
-      return object_class.id.in_(
-          db.session.query(Record.key).filter(
-              Record.type == object_class.__name__,
-              Record.content.ilike(u"%{}%".format(text)),
-          ),
-      )
-
-    rhs_variants = lambda: autocast(exp["left"],
-                                    exp["op"]["name"],
-                                    exp["right"])
-
-    def owned(ids):
-      """Get objects for which the user is owner.
-
-      Note: only the first id from the list of ids is used.
-
-      Args:
-        ids: the ids of owners.
-
-      Returns:
-        sqlalchemy.sql.elements.BinaryExpression if an object of `object_class`
-        is owned by one of the given users.
-      """
-      res = db.session.query(
-        query_helpers.get_myobjects_query(
-            types=[object_class.__name__],
-            contact_id=ids[0],
-            is_creator=is_creator(),
-        ).alias().c.id
-      )
-      res = res.all()
-      if res:
-        return object_class.id.in_([obj.id for obj in res])
-      return sa.sql.false()
-
-    def related_people(related_type, related_ids):
-      """Get people related to the specified object.
-
-      Returns the following people:
-        for each object type: the users mapped via PeopleObjects,
-        for Program: the users that have a Program-wide role,
-        for Audit: the users that have a Program-wide or Audit-wide role,
-        for Workflow: the users mapped via WorkflowPeople and
-                      the users that have a Workflow-wide role.
-
-      Args:
-        related_type: the name of the class of the related objects.
-        related_ids: the ids of related objects.
-
-      Returns:
-        sqlalchemy.sql.elements.BinaryExpression if an object of `object_class`
-        is related to the given users.
-      """
-      if "Person" not in [object_class.__name__, related_type]:
-        return sa.sql.false()
-      model = inflector.get_model(related_type)
-      res = []
-      res.extend(RelationshipHelper.person_object(
-          object_class.__name__,
-          related_type,
-          related_ids,
-      ))
-
-      if related_type in ('Program', 'Audit'):
-        res.extend(
-            db.session.query(UserRole.person_id).join(model, sa.and_(
-                UserRole.context_id == model.context_id,
-                model.id.in_(related_ids),
-            ))
-        )
-
-        if related_type == "Audit":
-          res.extend(
-              db.session.query(UserRole.person_id).join(
-                  models.Program,
-                  UserRole.context_id == models.Program.context_id,
-              ).join(model, sa.and_(
-                  models.Program.id == model.program_id,
-                  model.id.in_(related_ids),
-              ))
-          )
-      if "Workflow" in (object_class.__name__, related_type):
-        try:
-          from ggrc_workflows.models import (relationship_helper as
-                                             wf_relationship_handler)
-        except ImportError:
-          # ggrc_workflows module is not enabled
-          return sa.sql.false()
-        else:
-          res.extend(wf_relationship_handler.workflow_person(
-              object_class.__name__,
-              related_type,
-              related_ids,
-          ))
-      if res:
-        return object_class.id.in_([obj[0] for obj in res])
-      return sa.sql.false()
-
-    def build_op(exp_left, predicate, rhs_variants):
-      """Apply predicate to `exp_left` and each `rhs` and join them with SQL OR.
-
-      Args:
-        exp_left: description of left operand from the expression tree.
-        predicate: a comparison function between a field and a value.
-        rhs_variants: a list of possible interpretations of right operand,
-                      typically a list of strings.
-
-      Raises:
-        ValueError if rhs_variants is empty.
-
-      Returns:
-        sqlalchemy.sql.elements.BinaryExpression if predicate matches exp_left
-        and any of rhs variants.
-      """
-
-      if not rhs_variants:
-        raise ValueError("Expected non-empty sequence in 'rhs_variants', got "
-                         "{!r} instead".format(rhs_variants))
-      return with_key(
-          exp_left,
-          lambda lhs: functools.reduce(
-              sa.or_,
-              (predicate(lhs, rhs) for rhs in rhs_variants),
-          ),
-      )
-
-    def build_op_shortcut(predicate):
-      """A shortcut to call build_op with default lhs and rhs."""
-      return build_op(exp["left"], predicate, rhs_variants())
-
-    def like(left, right):
-      """Handle ~ operator with SQL LIKE."""
-      return left.ilike(u"%{}%".format(right))
-
-    def is_filter(left, right):
-      """Handle 'is' operator.
-
-      As in 'CA is empty' expression
-      """
-      if right != u"empty":
-        raise BadQueryException(u"Invalid operator near 'is': {}".format(
-            right))
-      left = left.lower()
-      left, _ = self.attr_name_map[tgt_class].get(left, (left, None))
-      subquery = db.session.query(Record.key).filter(
-          Record.type == object_class.__name__,
-          Record.property == left,
-          sa.not_(sa.or_(Record.content == u"", Record.content.is_(None))),
-      )
-      return object_class.id.notin_(subquery)
-
-    ops = {
-        "AND": lambda: lift_bin(sa.and_),
-        "OR": lambda: lift_bin(sa.or_),
-
-        "is": lambda: is_filter(exp["left"], exp["right"]),
-        "=": lambda: build_op_shortcut(operator.eq),
-        "!=": lambda: sa.not_(build_op_shortcut(operator.eq)),
-        "~": lambda: build_op_shortcut(like),
-        "!~": lambda: sa.not_(build_op_shortcut(like)),
-        "<": lambda: build_op_shortcut(operator.lt),
-        ">": lambda: build_op_shortcut(operator.gt),
-
-        "relevant": lambda: relevant(*_backlink(exp["object_name"],
-                                                exp["ids"])),
-        "text_search": lambda: text_search(exp["text"]),
-        "similar": lambda: similar(exp["object_name"], exp["ids"]),
-        "owned": lambda: owned(exp["ids"]),
-        "related_people": lambda: related_people(exp["object_name"],
-                                                 exp["ids"]),
-    }
-
-    return ops.get(exp["op"]["name"], unknown)()
-
-  def _slugs_to_ids(self, object_name, slugs):
+  @staticmethod
+  def _slugs_to_ids(object_name, slugs):
     """Convert SLUG to proper ids for the given objec."""
-    object_class = self.object_map.get(object_name)
+    object_class = inflector.get_model(object_name)
     if not object_class:
       return []
     ids = [c.id for c in object_class.query.filter(

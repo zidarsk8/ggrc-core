@@ -620,6 +620,28 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
 
     return target
 
+  CACHED_ATTRIBUTE_MAP = None
+
+  @classmethod
+  def attributes_map(cls):
+    if cls.CACHED_ATTRIBUTE_MAP:
+      return cls.CACHED_ATTRIBUTE_MAP
+    aliases = AttributeInfo.gather_aliases(cls)
+    cls.CACHED_ATTRIBUTE_MAP = {}
+    for key, value in aliases.items():
+      if isinstance(value, dict):
+        name = value["display_name"]
+        filter_by = None
+        if value.get("filter_by"):
+          filter_by = getattr(cls, value["filter_by"], None)
+      else:
+        name = value
+        filter_by = None
+      if not name:
+        continue
+      cls.CACHED_ATTRIBUTE_MAP[name.lower()] = (key.lower(), filter_by)
+    return cls.CACHED_ATTRIBUTE_MAP
+
 
 class Slugged(Base):
 
