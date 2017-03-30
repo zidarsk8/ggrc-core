@@ -31,7 +31,7 @@ class FullTextAttr(object):
     self.value = value
     self.subproperties = subproperties or [EMPTY_SUBPROPERTY_KEY]
     self.with_template = with_template
-    self.is_sortable = len(self.subproperties) > 1
+    self.is_sortable = EMPTY_SUBPROPERTY_KEY not in self.subproperties
 
   def get_value_for(self, instance):
     """Get value from sended instance using 'value' rule"""
@@ -51,11 +51,11 @@ class FullTextAttr(object):
         result = getattr(value, subprop)
         results[subprop_key] = result
         if result and subprop == sorting_subprop:
-          sorted_dict[value.id] = result
+          sorted_dict[value.id] = unicode(result)
       else:
         results[subprop] = value
     if self.is_sortable:
-      results['__sort__'] = ':'.join(sorted(sorted_dict.values()))
+      results['__sort__'] = u':'.join(sorted(sorted_dict.values()))
     return results
 
   # pylint: disable=unused-argument
@@ -76,7 +76,8 @@ class MultipleSubpropertyFullTextAttr(FullTextAttr):
 
   def __init__(self, *args, **kwargs):
     super(MultipleSubpropertyFullTextAttr, self).__init__(*args, **kwargs)
-    assert self.subproperties != [EMPTY_SUBPROPERTY_KEY]
+    assert EMPTY_SUBPROPERTY_KEY not in self.subproperties
+    assert self.is_sortable
 
   def get_property_for(self, instance):
     """Collect property for sended instance"""
@@ -91,12 +92,12 @@ class MultipleSubpropertyFullTextAttr(FullTextAttr):
           result = getattr(value, sub)
           results[sub_key] = result
           if result and sub == sorting_subprop:
-            sorted_dict[value.id] = result
+            sorted_dict[value.id] = unicode(result)
         else:
           sub_key = self.SUB_KEY_TMPL.format(id_val='EMPTY', sub=sub)
           results[sub_key] = None
     if self.is_sortable:
-      results['__sort__'] = ':'.join(sorted(sorted_dict.values()))
+      results['__sort__'] = u':'.join(sorted(sorted_dict.values()))
     return results
 
 
