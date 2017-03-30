@@ -482,13 +482,14 @@ class ModalCustomAttribute(object):
 class ModalSetVisibleFields(object):
   """Locators for Set visible fields modals."""
   OPEN_MENU = ".open .dropdown-menu-form"
+  LEFT_SET_FIELDS = Common.TREE_HEADER + " .visible-columns-list"
   MODAL = "{} " + OPEN_MENU
   # labels
   MODAL_TITLE = MODAL + " h5"
-  FIELDS_TITLES = "{} " + Common.TREE_HEADER + " .checkbox-inline"
+  FIELDS_TITLES = "{} " + LEFT_SET_FIELDS + " .checkbox-inline"
   # user input elements
-  FIELDS_CHECKBOXES = "{} " + Common.TREE_HEADER + " .attr-checkbox"
-  BUTTON_SET_FIELDS = "{} " + Common.TREE_HEADER + " .set-tree-attrs"
+  FIELDS_CHECKBOXES = "{} " + LEFT_SET_FIELDS + " .attr-checkbox"
+  BUTTON_SET_FIELDS = "{} " + LEFT_SET_FIELDS + " .set-tree-attrs"
 
 
 class WidgetBar(object):
