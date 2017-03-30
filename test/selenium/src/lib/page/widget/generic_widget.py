@@ -8,7 +8,7 @@ from selenium.webdriver.common.by import By
 
 from lib import base
 from lib.constants import locator, regex, url
-from lib.page.modal import set_fields
+from lib.page.modal import set_fields, unified_mapper
 from lib.utils import selenium_utils
 
 
@@ -154,9 +154,18 @@ class TreeView(base.TreeView):
     """
     _locator_create = (
         By.CSS_SELECTOR,
-        self._locators.BUTTON_3BBS_CREATE.format(self.widget_name))
+        self._locators.BUTTON_CREATE.format(self.widget_name))
     base.Button(self._driver, _locator_create).click()
     return self.create_obj_cls(self._driver)
+
+  def open_map(self):
+    """Click to Map button on Tree View to open unified mapper modal.
+    Return: lib.page.modal.unified_mapper.MapObjectsModal
+    """
+    _locator_map = (By.CSS_SELECTOR,
+                    self._locators.BUTTON_MAP.format(self.widget_name))
+    base.Button(self._driver, _locator_map).click()
+    return unified_mapper.MapObjectsModal(self._driver)
 
   def open_3bbs(self):
     """Click to 3BBS button on Tree View to open tree view 3BBS modal.
