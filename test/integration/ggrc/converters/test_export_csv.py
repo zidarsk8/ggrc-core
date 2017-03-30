@@ -7,6 +7,7 @@ from flask.json import dumps
 from ggrc.converters import get_importables
 from ggrc.models.reflection import AttributeInfo
 from integration.ggrc import TestCase
+from integration.ggrc.models import factories
 
 THIS_ABS_PATH = abspath(dirname(__file__))
 CSV_DIR = join(THIS_ABS_PATH, 'test_csvs/')
@@ -53,12 +54,8 @@ class TestExportEmptyTemplate(TestCase):
 
 class TestExportSingleObject(TestCase):
 
-  @classmethod
-  def setUpClass(cls):
-    cls.clear_data()
-    cls._import_file("data_for_export_testing.csv")
-
   def setUp(self):
+    super(TestExportSingleObject, self).setUp()
     self.client.get("/login")
     self.headers = {
         'Content-Type': 'application/json',
@@ -71,6 +68,8 @@ class TestExportSingleObject(TestCase):
                             headers=self.headers)
 
   def test_simple_export_query(self):
+    response = self._import_file("data_for_export_testing_program.csv")
+    self._check_csv_response(response, {})
     data = [{
         "object_name": "Program",
         "filters": {
@@ -110,6 +109,8 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_and_export_query(self):
+    response = self._import_file("data_for_export_testing_program.csv")
+    self._check_csv_response(response, {})
     data = [{
         "object_name": "Program",
         "filters": {
@@ -139,6 +140,8 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_simple_relevant_query(self):
+    res = self._import_file("data_for_export_testing_program_contract.csv")
+    self._check_csv_response(res, {})
     data = [{
         "object_name": "Program",
         "filters": {
@@ -160,6 +163,8 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Cat ipsum {},".format(i), response.data)
 
   def test_program_audit_relevant_query(self):
+    response = self._import_file("data_for_export_testing_program_audit.csv")
+    self._check_csv_response(response, {})
     data = [{  # should return just program prog-1
         "object_name": "Program",
         "filters": {
@@ -192,6 +197,8 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(",Audit {},".format(i), response.data)
 
   def test_section_policy_relevant_query(self):
+    response = self._import_file("data_for_export_testing_directives.csv")
+    self._check_csv_response(response, {})
     data = [{  # sec-1
         "object_name": "Section",
         "filters": {
@@ -276,6 +283,9 @@ class TestExportSingleObject(TestCase):
         self.assertNotIn(title, response.data, "'{}' was found".format(title))
 
   def test_multiple_relevant_query(self):
+    response = self._import_file(
+        "data_for_export_testing_program_policy_contract.csv")
+    self._check_csv_response(response, {})
     data = [{
         "object_name": "Program",
         "filters": {
@@ -342,12 +352,8 @@ class TestExportSingleObject(TestCase):
 
 class TestExportMultipleObjects(TestCase):
 
-  @classmethod
-  def setUpClass(cls):
-    cls.clear_data()
-    cls._import_file("data_for_export_testing.csv")
-
   def setUp(self):
+    super(TestExportMultipleObjects, self).setUp()
     self.client.get("/login")
     self.headers = {
         'Content-Type': 'application/json',
@@ -360,13 +366,17 @@ class TestExportMultipleObjects(TestCase):
                             headers=self.headers)
 
   def test_simple_multi_export(self):
+    match = 1
+    programs = [factories.ProgramFactory().title for i in range(3)]
+    regulations = [factories.RegulationFactory().title for i in range(3)]
+
     data = [{
         "object_name": "Program",  # prog-1
         "filters": {
             "expression": {
                 "left": "title",
                 "op": {"name": "="},
-                "right": "cat ipsum 1"
+                "right": programs[match]
             },
         },
         "fields": "all",
@@ -376,17 +386,23 @@ class TestExportMultipleObjects(TestCase):
             "expression": {
                 "left": "title",
                 "op": {"name": "="},
-                "right": "Hipster ipsum A 1"
+                "right": regulations[match]
             },
         },
         "fields": "all",
     }]
     response = self.export_csv(data)
-
-    self.assertIn(",Cat ipsum 1,", response.data)
-    self.assertIn(",Hipster ipsum A 1,", response.data)
+    for i in range(3):
+      if i == match:
+        self.assertIn(programs[i], response.data)
+        self.assertIn(regulations[i], response.data)
+      else:
+        self.assertNotIn(programs[i], response.data)
+        self.assertNotIn(regulations[i], response.data)
 
   def test_relevant_to_previous_export(self):
+    res = self._import_file("data_for_export_testing_relevant_previous.csv")
+    self._check_csv_response(res, {})
     data = [{
         "object_name": "Program",  # prog-1, prog-23
         "filters": {

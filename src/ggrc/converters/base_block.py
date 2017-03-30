@@ -263,6 +263,9 @@ class BlockConverter(object):
         models.all_models.UserRole.context_id.in_(context_ids)
     ).all()
 
+    if not user_roles:
+      return cache
+
     people_ids = {role[2] for role in user_roles}
 
     emails_map = dict(db.session.query(
@@ -289,6 +292,8 @@ class BlockConverter(object):
       owners = getattr(row_converter.obj, "object_owners", None)
       if owners:
         owner_ids |= {o.person_id for o in owners}
+    if not owner_ids:
+      return {}
     query = db.session.query(
         models.Person.id,
         models.Person.email

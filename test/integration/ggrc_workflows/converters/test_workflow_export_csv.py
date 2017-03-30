@@ -66,17 +66,6 @@ class TestExportMultipleObjects(TestCase):
 
   CSV_DIR = join(abspath(dirname(__file__)), "test_csvs/")
 
-  @classmethod
-  def setUpClass(cls):  # pylint: disable=C0103
-    cls.clear_data()
-    cls.client = app.test_client()
-    cls.client.get("/login")
-    cls.import_file("workflow_big_sheet.csv")
-
-  @classmethod
-  def import_file(cls, filename, dry_run=False):
-    cls._import_file(filename, dry_run)
-
   def activate(self):
     """ activate workflows just once after the class has been initialized
 
@@ -94,6 +83,8 @@ class TestExportMultipleObjects(TestCase):
       gen.activate_workflow(wf)
 
   def setUp(self):
+    self.clear_data()
+    self.import_file("workflow_big_sheet.csv")
     self.client.get("/login")
     self.headers = {
         'Content-Type': 'application/json',
