@@ -115,4 +115,27 @@ describe('GGRC.Utils.State', function () {
       }
     );
   });
+
+  describe('getDefaultStatesForModel() method', function () {
+    it('get default states for "MyAssessments" page', function () {
+      var defaultStates;
+
+      spyOn(GGRC.Utils.CurrentPage, 'isMyAssessments')
+        .and.returnValue(true);
+
+      defaultStates = GGRC.Utils.State
+        .getDefaultStatesForModel('Assessment');
+
+      expect(defaultStates.length).toEqual(2);
+      expect(defaultStates[0]).toEqual('Not Started');
+    });
+
+    it('get default states for "Control" type', function () {
+      var defaultStates = GGRC.Utils.State
+        .getDefaultStatesForModel('Control');
+
+      expect(defaultStates.length).toEqual(3);
+      expect(defaultStates[0]).toEqual('Active');
+    });
+  });
 });

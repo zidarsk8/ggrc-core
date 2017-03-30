@@ -413,9 +413,8 @@
               can.bind.call(statusControl.ready(function () {
                 var selectStateList = self.options.attr('selectStateList');
 
-                var checkAll = selectStateList.length === 0;
                 self.options.attr('filter_states').forEach(function (item) {
-                  if (checkAll || selectStateList.indexOf(item.value) > -1) {
+                  if (selectStateList.indexOf(item.value) > -1) {
                     item.attr('checked', true);
                   }
                 });
