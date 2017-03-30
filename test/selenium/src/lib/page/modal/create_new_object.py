@@ -31,20 +31,6 @@ class CreateNewObjectModal(modal_base.BaseModal):
     selenium_utils.get_when_invisible(self._driver, self._locator_button_save)
 
 
-class GenerateNewObjectModal(base.Modal):
-  """Modal for generate objects."""
-  _locators = locator.ModalGenerateNewObject
-
-  def __init__(self, driver):
-    super(GenerateNewObjectModal, self).__init__(driver)
-
-  def generate_and_close(self):
-    """Generate object(s) and close Generation modal."""
-    base.Button(self._driver, self._locators.BUTTON_GENERATE).click()
-    selenium_utils.get_when_invisible(
-        self._driver, self._locators.BUTTON_GENERATE)
-
-
 class ProgramsCreate(modal_base.ProgramsModal, CreateNewObjectModal):
   # pylint: disable=abstract-method
   """Programs create modal."""
@@ -93,8 +79,3 @@ class AssessmentTemplatesCreate(modal_base.AsmtTmplModal,
 
 class AssessmentsCreate(modal_base.AsmtsModal, CreateNewObjectModal):
   """Assessments create modal."""
-
-
-class AssessmentsGenerate(modal_base.AsmtsModalGenerate,
-                          GenerateNewObjectModal):
-  """Assessments generate modal."""

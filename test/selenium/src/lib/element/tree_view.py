@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 
 from lib import base
 from lib.constants import locator, url, objects
-from lib.page.modal import create_new_object
+from lib.page.modal import unified_mapper
 
 
 class CommonDropdownSettings(base.Component):
@@ -33,14 +33,15 @@ class Assessments(CommonDropdownSettings):
   _locators = locator.AssessmentsDropdown3bbsTreeView
 
   def select_generate(self):
-    """Select generate Assessments in 3BBS dropdown modal.
-    Return: modal.create_new_object.AssessmentsGenerate
+    """Select generate Assessments in 3BBS dropdown modal to
+    open unified mapper modal.
+    Return: lib.page.modal.unified_mapper.GenerateAssessmentsModal
     """
-    generate_locator = (
+    _locator_generate = (
         By.CSS_SELECTOR,
         self._locators.BUTTON_3BBS_GENERATE.format(self.widget_name))
-    base.Button(self._driver, generate_locator).click()
-    return create_new_object.AssessmentsGenerate(self._driver)
+    base.Button(self._driver, _locator_generate).click()
+    return unified_mapper.GenerateAssessmentsModal(self._driver)
 
 
 class AssessmentTemplates(CommonDropdownSettings):

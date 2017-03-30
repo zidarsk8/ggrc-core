@@ -15,6 +15,7 @@ class Common(object):
   MODAL_GENEATE = ".modal-selector"
   MODAL_CREATE = ".modal-wide"
   MODAL_CONFIRM = ".modal.hide"
+  MODAL_MAP = ".modal-selector"
   # info page (panel)
   PIN_CONTENT = ".pin-content "
   INFO_WIDGET = ".info"
@@ -180,34 +181,66 @@ class ExtendedInfo(object):
       By.CSS_SELECTOR, '[data-test-id="extended_info_object_already_mapped"]')
 
 
+class CommonModalUnifiedMapper(object):
+  """Common locators for unified mapper modals."""
+  MODAL = Common.MODAL_MAP
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, MODAL + " h2")
+  OBJ_TYPE = (By.CSS_SELECTOR, MODAL + " .col:nth-child(1) h6")
+  FILTER_BY_EXPRESSION = (By.CSS_SELECTOR, MODAL + " .col.filter h6")
+  # user input elements
+  OBJ_TYPE_DROPDOWN = (By.CSS_SELECTOR, MODAL + " .input-block-level")
+  OBJ_TYPE_DROPDOWN_OPTIONS = (By.CSS_SELECTOR,
+                               MODAL + " .input-block-level option")
+  FILTER_VIA_EXPRESSION_TEXT_BOX = (By.CSS_SELECTOR, MODAL + " #mapper-filter")
+  FILTER_BY_STATE_DROPDOWN = (By.CSS_SELECTOR,
+                              MODAL + " .multiselect-dropdown__input")
+  FILTER_BY_STATE_DROPDOWN_OPTIONS = (By.CSS_SELECTOR,
+                                      MODAL + " .multiselect-dropdown__label")
+  BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .filter-buttons .btn-info")
+  FOUND_OBJECTS_TITLES = (By.CSS_SELECTOR, MODAL + " .flex-box .title-attr")
+  FOUND_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
+                              MODAL + ' .flex-box [type="checkbox"]')
+  BUTTON_MAP_SELECTED = (By.CSS_SELECTOR, MODAL + " .btn-success")
+
+
+class ModalMapObjects(CommonModalUnifiedMapper):
+  """Locators for map objects modals."""
+  MODAL = Common.MODAL_MAP
+  # user input elements
+  BUTTON_CREATE_OBJ = (By.CSS_SELECTOR, MODAL + " .create-control")
+
+
+class ModalSearchObjects(CommonModalUnifiedMapper):
+  """Locators for search objects modals."""
+  MODAL = Common.MODAL_MAP
+
+
+class ModalGenerateAssessments(CommonModalUnifiedMapper):
+  """Locators for generate Assessments modal."""
+  MODAL = Common.MODAL_GENEATE
+
+
 class BaseModalCreateNew(object):
   """Locators for Create new object modals."""
   MODAL = Common.MODAL_CREATE
   # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, "{} .ui-draggable-handle>h2".format(MODAL))
+  MODAL_TITLE = (By.CSS_SELECTOR, MODAL + " .ui-draggable-handle>h2")
   TITLE = (By.CSS_SELECTOR,
-           "{} .modal-body form>div:nth-child(2) .span6>label".format(MODAL))
+           MODAL + " .modal-body form>div:nth-child(2) .span6>label")
   # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      "{} .modal-body form>div:nth-child(2) .span6>input".format(MODAL))
-
-
-class BaseModalGenerateNew(object):
-  """Locators for Generate new object modals."""
-  # labels
-  MODAL = Common.MODAL_GENEATE
-  MODAL_TITLE = (By.CSS_SELECTOR, "{} .modal-header>h2".format(MODAL))
+  UI_TITLE = (By.CSS_SELECTOR,
+              MODAL + " .modal-body form>div:nth-child(2) .span6>input")
 
 
 class ModalCreateNewObject(BaseModalCreateNew):
   """Locators for Create new object modals."""
   MODAL = Common.MODAL_CREATE
   # user input elements
-  UI_TITLE = (By.CSS_SELECTOR, '{} [placeholder="Enter Title"]'.format(MODAL))
-  UI_CODE = (By.CSS_SELECTOR, '{} [name="slug"]'.format(MODAL))
-  BUTTON_SAVE_AND_CLOSE = (
-      By.CSS_SELECTOR, '{} [data-toggle="modal-submit"]'.format(MODAL))
+  UI_TITLE = (By.CSS_SELECTOR, MODAL + ' [placeholder="Enter Title"]')
+  UI_CODE = (By.CSS_SELECTOR, MODAL + ' [name="slug"]')
+  BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR,
+                           MODAL + ' [data-toggle="modal-submit"]')
   BUTTON_SAVE_AND_ADD_ANOTHER = (
       By.CSS_SELECTOR, '{} [data-toggle="modal-submit-addmore"]'.format(MODAL))
 
@@ -221,10 +254,10 @@ class ModalCreateNewProgram(BaseModalCreateNew):
   UI_NOTES = (By.CSS_SELECTOR,
               '[data-test-id="new_program_field_notes_75b8bc05"]'
               '>iframe.wysihtml5-sandbox')
-  UI_CODE = (
-      By.CSS_SELECTOR, '[data-test-id="new_program_field_code_334276e2"]')
-  UI_STATE = (
-      By.CSS_SELECTOR, '[data-test-id="new_program_dropdown_state_036a1fa6"]')
+  UI_CODE = (By.CSS_SELECTOR,
+             '[data-test-id="new_program_field_code_334276e2"]')
+  UI_STATE = (By.CSS_SELECTOR,
+              '[data-test-id="new_program_dropdown_state_036a1fa6"]')
   BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
   BUTTON_SHOW_ALL_OPTIONAL_FIELDS = (By.ID, "formHide")
   UI_PRIMARY_CONTACT = (
@@ -415,29 +448,6 @@ class ModalCreateNewAsmt(BaseModalCreateNew):
 
 class ModalCreateNewAsmtTmpl(BaseModalCreateNew):
   """Locators for Create new Assessment Template modals."""
-
-
-class ModalGenerateNewObject(BaseModalGenerateNew):
-  """Locators for Generate new object modals."""
-  MODAL = Common.MODAL_GENEATE
-  BUTTON_GENERATE = (By.CSS_SELECTOR, "{} .btn-map".format(MODAL))
-
-
-class ModalGenerateNewAsmt(ModalGenerateNewObject):
-  """Locators for Generate new Assessment modals."""
-  MODAL = Common.MODAL_GENEATE
-  FOUND_OBJECTS = " .snapshot-list .flex-box"
-  SELECT_ASMT_TMPL_DROPDOWN = (
-      By.CSS_SELECTOR,
-      MODAL + ' dropdown[name="assessmentTemplate"] .input-block-level')
-  SELECT_ASMT_TMPL_OPTIONS = (
-      By.CSS_SELECTOR,
-      MODAL + ' dropdown[name="assessmentTemplate"] .input-block-level option')
-  BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .btn-info")
-  FOUND_OBJECTS_TITLES = (
-      By.CSS_SELECTOR, MODAL + FOUND_OBJECTS + " .title-attr")
-  FOUND_OBJECTS_CHECKBOXES = (
-      By.CSS_SELECTOR, MODAL + FOUND_OBJECTS + ' [type="checkbox"]')
 
 
 class ModalEditObject(BaseModalCreateNew):
@@ -869,10 +879,12 @@ class TreeView(object):
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
   ITEM_EXPAND_BUTTON = " .openclose"
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
+  NO_RESULTS_MESSAGE = (By.CSS_SELECTOR, ".tree-no-results-message")
   BUTTON_SHOW_FIELDS = "{} " + Common.TREE_HEADER + " .fa-bars"
   # user input elements
   BUTTON_3BBS = "{} " + Common.TREE_LIST + " .btn-draft"
-  BUTTON_3BBS_CREATE = "{} " + Common.TREE_LIST + " .create-button"
+  BUTTON_CREATE = "{} " + Common.TREE_LIST + " .create-button"
+  BUTTON_MAP = "{} " + Common.TREE_LIST + " .map-button"
 
 
 class BaseWidgetGeneric(object):
