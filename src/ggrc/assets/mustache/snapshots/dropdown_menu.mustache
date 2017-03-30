@@ -39,7 +39,7 @@ TODO: Temporary disabled until snapshot view is added.
             {{! We need to use `using` to ensure that snapshot is actually
                 reified by the time is_allowed helper uses it }}
             {{#using reified_snapshot=snapshot}}
-            {{#is_allowed 'update' reified_snapshot context='for'}}
+            {{#canUpdate}}
             {{^isLatestRevision}}
             <li>
               <revisions-comparer instance="instance"
@@ -51,7 +51,7 @@ TODO: Temporary disabled until snapshot view is added.
               </revisions-comparer>
             </li>
             {{/isLatestRevision}}
-            {{/is_allowed}}
+            {{/canUpdate}}
             {{/using}}
 
             <li>

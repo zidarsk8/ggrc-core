@@ -621,6 +621,10 @@
         type: instance.child_type,
         id: instance.child_id
       });
+      content.canUpdate = Permission.is_allowed_for('update', {
+        type: instance.child_type,
+        id: instance.child_id
+      });
       object = new model(content);
       model.removeFromCacheById(content.id);  /* removes snapshot object from cache */
       return object;
