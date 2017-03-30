@@ -15,7 +15,6 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from tabulate import tabulate
 from sqlalchemy import event
 
-from ggrc import contributions  # noqa: imported so it can be used with getattr  # pylint: disable=unused-import
 from ggrc import db
 from ggrc import extensions
 from ggrc import notifications
@@ -39,6 +38,10 @@ for key in settings.exports:
 # Configure Flask-SQLAlchemy for app
 db.app = app
 db.init_app(app)
+
+# This should be imported after db.init_app id performed.
+# Imported so it can be used with getattr.
+from ggrc import contributions  # noqa  # pylint: disable=unused-import,wrong-import-position
 
 
 @app.before_request
