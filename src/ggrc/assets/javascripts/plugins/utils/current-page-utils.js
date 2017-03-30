@@ -62,6 +62,55 @@
       return !pageType;
     }
 
+    function getWidgetList() {
+      var pageInstance;
+      var modelName;
+      var widgetList;
+      var isAssessmentsView;
+      var location = window.location.pathname;
+
+      pageInstance = GGRC.page_instance();
+      modelName = pageInstance.constructor.shortName;
+      widgetList = GGRC.WidgetList.get_widget_list_for(modelName);
+      isAssessmentsView = /^\/assessments_view/.test(location);
+
+      // the assessments_view only needs the Assessments widget
+      if (isAssessmentsView) {
+        widgetList = {assessment: widgetList.assessment};
+      }
+
+      return widgetList;
+    }
+
+    function getWidgetModels() {
+      var widgetList;
+      var defaults;
+      var widgetModels;
+
+      widgetList = this.getWidgetList();
+      defaults = getDefaultWidgets(widgetList);
+
+      widgetModels = defaults.map(function (widgetName) {
+        return widgetList[widgetName]
+        .content_controller_options.model.shortName;
+      });
+
+      return widgetModels;
+    }
+
+    function getDefaultWidgets(widgetList) {
+      var location = window.location.pathname;
+      var defaults = Object.keys(widgetList);
+      var isObjectBrowser = /^\/objectBrowser\/?$/.test(location);
+
+      // Remove info and task tabs from object-browser list of tabs
+      if (isObjectBrowser) {
+        defaults.splice(defaults.indexOf('info'), 1);
+        defaults.splice(defaults.indexOf('task'), 1);
+      }
+      return defaults;
+    }
+
     return {
       related: relatedToCurrentInstance,
       initMappedInstances: initMappedInstances,
@@ -69,7 +118,10 @@
       isMyAssessments: isMyAssessments,
       isMyWork: isMyWork,
       isAdmin: isAdmin,
-      isObjectContextPage: isObjectContextPage
+      isObjectContextPage: isObjectContextPage,
+      getWidgetList: getWidgetList,
+      getWidgetModels: getWidgetModels,
+      getDefaultWidgets: getDefaultWidgets
     };
   })();
 })(window.GGRC);

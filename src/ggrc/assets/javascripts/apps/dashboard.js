@@ -190,24 +190,9 @@
 
     initWidgets();
 
-    widgetList = GGRC.WidgetList.get_widget_list_for(modelName);
-
-    // the assessments_view only needs the Assessments widget
-    if (isAssessmentsView) {
-      widgetList = {assessment: widgetList.assessment};
-    }
-
-    defaults = Object.keys(widgetList);
-
-    // Remove info and task tabs from object-browser list of tabs
-    if (isObjectBrowser) {
-      defaults.splice(defaults.indexOf('info'), 1);
-      defaults.splice(defaults.indexOf('task'), 1);
-    }
-
-    widgetModels = defaults.map(function (widgetName) {
-      return widgetList[widgetName].content_controller_options.model.shortName;
-    });
+    widgetList = GGRC.Utils.CurrentPage.getWidgetList();
+    defaults = GGRC.Utils.CurrentPage.getDefaultWidgets(widgetList);
+    widgetModels = GGRC.Utils.CurrentPage.getWidgetModels();
 
     if (!isAssessmentsView && GGRC.Utils.CurrentPage.getPageType() !== 'Workflow') {
       GGRC.Utils.QueryAPI.initCounts(widgetModels, {

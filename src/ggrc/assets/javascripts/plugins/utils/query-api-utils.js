@@ -231,6 +231,16 @@
       });
     }
 
+    function refreshCounts() {
+      var widgets;
+      var pageInstance;
+      widgets = GGRC.Utils.CurrentPage.getWidgetModels();
+      pageInstance = GGRC.page_instance();
+
+      return initCounts(widgets,
+        {id: pageInstance.id, type: pageInstance.type});
+    }
+
     /**
      * Params for request on Query API
      * @param {Object} params - Params for request
@@ -348,6 +358,7 @@
       getCounts: getCounts,
       makeExpression: makeExpression,
       initCounts: initCounts,
+      refreshCounts: refreshCounts,
       batchRequests: batchRequests,
       buildCountParams: buildCountParams
     };

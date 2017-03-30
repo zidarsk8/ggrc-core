@@ -26,21 +26,14 @@
     },
     go: function () {
       var instances = this.instanceQueue;
-      var ids = $.map(instances, function (instance) {
-        return instance.id;
-      });
-      var filter = {automapping_id__in: ids.join()};
+      var rq = new RefreshQueue();
       this.lastRefresh = Date.now();
       this.instanceQueue = [];
-
-      CMS.Models.Relationship.findAll(filter).then(function (relationships) {
-        var rq = new RefreshQueue();
-        can.each(relationships.concat(instances), function (relationship) {
-          rq.enqueue(relationship.source);
-          rq.enqueue(relationship.destination);
-        });
-        rq.trigger();
+      can.each(instances, function (refreshInstance) {
+        rq.enqueue(refreshInstance.source);
+        rq.enqueue(refreshInstance.destination);
       });
+      rq.trigger();
     }
   };
 
