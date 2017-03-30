@@ -489,13 +489,13 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
     return cls._make_query_dict_base("Snapshot", filters=filters, *args,
                                      **kwargs)
 
-  def _create_audit(self, program):
+  def _create_audit(self, program, title):
     """Make a POST to create an Audit.
 
     AuditFactory doesn't trigger Snapshotter
     """
     self.generator.generate_object(models.Audit, {
-        "title": "test_process_network_zone",
+        "title": title,
         "program": {"id": program.id},
         "status": "Planned",
         "snapshots": {
@@ -515,7 +515,7 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
     process_nz_core_id = process_nz_core.id
     process_nz_prod_id = process_nz_prod.id
 
-    self._create_audit(program=program)
+    self._create_audit(program=program, title="test_process_network_zone")
 
     process_nz_core_result = self._get_first_result_set(
         self._make_snapshot_query_dict("Process",
@@ -580,7 +580,7 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
 
     program = models.Program.query.filter_by(id=program_id).one()
 
-    self._create_audit(program=program)
+    self._create_audit(program=program, title="some title")
 
     control_user1_result = self._get_first_result_set(
         self._make_snapshot_query_dict("Control",
@@ -614,3 +614,51 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
     self.assertListEqual([snap["child_id"]
                           for snap in order_by_owners_result["values"]],
                          [control_ids[1], control_ids[0]])
+
+  def test_control_assessor(self):
+    """Control Snapshots are filtered and sorted by Owners."""
+    program = factories.ProgramFactory()
+    person1 = factories.PersonFactory(name="Ann", email="email1@example.com")
+    person2 = factories.PersonFactory(name="Bob", email="email2@example.com")
+    control1 = factories.ControlFactory(principal_assessor=person2)
+    control2 = factories.ControlFactory(principal_assessor=person1)
+    program_id = program.id
+    control1_id = control1.id
+    control2_id = control2.id
+
+    factories.RelationshipFactory(source=program, destination=control1)
+    factories.RelationshipFactory(source=program, destination=control2)
+
+    program = models.Program.query.filter_by(id=program_id).one()
+
+    self._create_audit(program=program, title="some title")
+
+    control_user1_result = self._get_first_result_set(
+        self._make_snapshot_query_dict(
+            "Control",
+            expression=["principal_assessor", "=", "Ann"]
+        ),
+        "Snapshot",
+    )
+    self.assertEqual(control_user1_result["count"], 1)
+
+    control_user2_result = self._get_first_result_set(
+        self._make_snapshot_query_dict(
+            "Control",
+            expression=["principal_assessor", "=", "Bob"]
+        ),
+        "Snapshot",
+    )
+    self.assertEqual(control_user2_result["count"], 1)
+
+    order_by_assessor_result = self._get_first_result_set(
+        self._make_snapshot_query_dict(
+            "Control",
+            order_by=[{"name": "principal_assessor"}]
+        ),
+        "Snapshot"
+    )
+    self.assertEqual(order_by_assessor_result["count"], 2)
+    self.assertListEqual([snap["child_id"]
+                          for snap in order_by_assessor_result["values"]],
+                         [control2_id, control1_id])

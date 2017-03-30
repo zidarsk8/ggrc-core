@@ -66,7 +66,7 @@ Contract,Code*,Title*,Description,Notes,Owner*,Effective Date,Stop Date,State,Pr
 ,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required", ,,,,,,,,,,,,,,,,,,,,,
-Control,Code*,Title*,Description,Notes,Test Plan,Owner*,Effective Date,Stop Date,State,Assertions,Categories,Primary Contact,Fraud Related,Significance,Kind/Nature,Type/Means,Principal Assessor,Secondary Assessor,Secondary Contact,Control URL,Reference URL,Frequency,map:program
+Control,Code*,Title*,Description,Notes,Test Plan,Owner*,Effective Date,Stop Date,State,Assertions,Categories,Primary Contact,Fraud Related,Significance,Kind/Nature,Type/Means,Principal Assignee,Secondary Assignee,Secondary Contact,Control URL,Reference URL,Frequency,map:program
 ,PMRBACCONTROL-1,Program Manager Audit RBAC Test,,,,user@example.com,,,Draft,,,user@example.com,--,--,,,,,,,,,PMRBACPROGRAM-1
 ,,,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,
