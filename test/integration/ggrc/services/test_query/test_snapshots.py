@@ -580,7 +580,7 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
 
     program = models.Program.query.filter_by(id=program_id).one()
 
-    self._create_audit(program=program)
+    self._create_audit(program=program, title="some title")
 
     control_user1_result = self._get_first_result_set(
         self._make_snapshot_query_dict("Control",

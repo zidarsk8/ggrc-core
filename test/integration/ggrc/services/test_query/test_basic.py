@@ -879,11 +879,11 @@ class TestQueryWithUnicode(BaseQueryAPITestCase):
   CAD_TITLE2 = u"CA текст" + "X" * 200
 
   @classmethod
-  def setUpClass(self):
+  def setUpClass(cls):
     """Set up test cases for all tests."""
     TestCase.clear_data()
-    self._generate_cad()
-    self._import_file("querying_with_unicode.csv")
+    cls._generate_cad()
+    cls._import_file("querying_with_unicode.csv")
 
   @classmethod
   def _generate_cad(cls):
