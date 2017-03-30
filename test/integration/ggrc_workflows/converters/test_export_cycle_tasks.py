@@ -193,3 +193,54 @@ class TestExportTasks(TestCase):
       ).one()
       self.assertCycles("task assignee", task.contact.email, [slug])
       self.assertCycles("task assignee", task.contact.name, [slug])
+
+  @data(
+      #  (Cycle count, tasks in cycle)
+      (0, 0),
+      (1, 1),
+      (2, 1),
+      (2, 1),
+      (2, 2),
+  )
+  @unpack
+  def test_filter_by_task_due_date_year(self, cycle_count, task_count):
+    """Test filter cycles by task due date year"""
+    task_cycle_filter = self.generate_tasks_for_cycle(cycle_count, task_count)
+    self.assertEqual(bool(cycle_count), bool(task_cycle_filter))
+    due_date_dict = defaultdict(set)
+    for task_id, slug in task_cycle_filter.iteritems():
+      task = CycleTaskGroupObjectTask.query.filter(
+          CycleTaskGroupObjectTask.id == task_id
+      ).one()
+      key = (task.end_date.year, task.end_date.month, task.end_date.day)
+      due_date_dict[key].add(slug)
+
+    for due_date, cycle_slugs in due_date_dict.iteritems():
+      self.assertCycles("task due date",
+                        "{}-{}-{}".format(*due_date),
+                        list(cycle_slugs))
+
+  @data(
+      #  (Cycle count, tasks in cycle)
+      (0, 0),
+      (1, 1),
+      (2, 1),
+      (2, 1),
+      (2, 2),
+  )
+  @unpack
+  def test_filter_by_task_due_date_year_month(self, cycle_count, task_count):
+    """Test filter cycles by task due date year month"""
+    task_cycle_filter = self.generate_tasks_for_cycle(cycle_count, task_count)
+    self.assertEqual(bool(cycle_count), bool(task_cycle_filter))
+    due_date_dict = defaultdict(set)
+    for task_id, slug in task_cycle_filter.iteritems():
+      task = CycleTaskGroupObjectTask.query.filter(
+          CycleTaskGroupObjectTask.id == task_id
+      ).one()
+      due_date_dict[(task.end_date.year, task.end_date.month)].add(slug)
+
+    for due_date, cycle_slugs in due_date_dict.iteritems():
+      self.assertCycles("task due date",
+                        "{}-{}".format(*due_date),
+                        list(cycle_slugs))

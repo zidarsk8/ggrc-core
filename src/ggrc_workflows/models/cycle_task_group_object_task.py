@@ -25,6 +25,7 @@ from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
 from ggrc.fulltext.attributes import (
     FullTextAttr,
     MultipleSubpropertyFullTextAttr,
+    DateFullTextAttr
 )
 from ggrc.fulltext.mixin import Indexed, ReindexRule
 
@@ -57,7 +58,7 @@ class CycleTaskGroupObjectTask(
   PROPERTY_TEMPLATE = u"task {}"
 
   _fulltext_attrs = [
-      FullTextAttr("due date", 'end_date',),
+      DateFullTextAttr("due date", 'end_date',),
       FullTextAttr("assignee", 'contact', ['name', 'email']),
       FullTextAttr("group title", 'cycle_task_group', ['title'], False),
       FullTextAttr("cycle title", 'cycle', ['title'], False),
@@ -67,12 +68,12 @@ class CycleTaskGroupObjectTask(
       FullTextAttr("cycle assignee",
                    lambda x: x.cycle.contact,
                    ['email', 'name'], False),
-      FullTextAttr("group due date",
-                   lambda x: x.cycle_task_group.next_due_date,
-                   with_template=False),
-      FullTextAttr("cycle due date",
-                   lambda x: x.cycle.next_due_date,
-                   with_template=False),
+      DateFullTextAttr("group due date",
+                       lambda x: x.cycle_task_group.next_due_date,
+                       with_template=False),
+      DateFullTextAttr("cycle due date",
+                       lambda x: x.cycle.next_due_date,
+                       with_template=False),
       MultipleSubpropertyFullTextAttr("comment",
                                       "cycle_task_entries",
                                       ["description"]),
