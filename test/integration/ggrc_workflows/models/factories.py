@@ -1,9 +1,12 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-import factory
+# pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+# pylint: disable=no-init
+
 from datetime import date
 
+import factory
 
 from ggrc_workflows import models
 from integration.ggrc.models.factories import ModelFactory
@@ -74,3 +77,12 @@ class CycleTaskFactory(TitledFactory):
   task_type = "text"
   start_date = date(2015, 12, 4)
   end_date = date(2015, 12, 27)
+
+
+class CycleTaskEntryFactory(ModelFactory):
+
+  class Meta:
+    model = models.CycleTaskEntry
+
+  cycle = factory.SubFactory(CycleFactory)
+  cycle_task_group_object_task = factory.SubFactory(CycleTaskFactory)

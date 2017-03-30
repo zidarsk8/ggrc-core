@@ -3,6 +3,10 @@
 
 """Module containing comment model and comment related mixins."""
 
+import itertools
+
+from collections import defaultdict
+
 from sqlalchemy import case
 from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
@@ -17,8 +21,10 @@ from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Notifiable
 from ggrc.models.object_owner import Ownable
-from ggrc.models.relationship import Relatable
-from ggrc.fulltext.mixin import Indexed
+from ggrc.models.relationship import Relatable, Relationship
+from ggrc.fulltext.mixin import Indexed, ReindexRule
+from ggrc.fulltext.attributes import MultipleSubpropertyFullTextAttr
+from ggrc.models import inflector
 
 
 class Commentable(object):
@@ -82,17 +88,14 @@ class Commentable(object):
   _aliases = {
       "recipients": "Recipients",
       "send_by_default": "Send by default",
-      "comment": {
-          "display_name": "Comment",
-          "filter_by": "_filter_by_comments",
-          "filter_only": True
-      },
   }
+  _fulltext_attrs = [
+      MultipleSubpropertyFullTextAttr("comment", "comments", ["description"]),
+  ]
 
   @declared_attr
   def comments(self):
     """Comments related to self via Relationship table."""
-    from ggrc.models.relationship import Relationship
     comment_id = case(
         [(Relationship.destination_type == "Comment",
           Relationship.destination_id)],
@@ -112,27 +115,18 @@ class Commentable(object):
         viewonly=True,
     )
 
-  @classmethod
-  def _filter_by_comments(cls, predicate):
-    """Add filtering by comments
 
-    Finds any object that is Commentable whose description (main text) fields
-    matches predicate.
-    """
-    from ggrc.models.relationship import Relationship
-    return Relationship.query.filter(
-        Relationship.source_type == cls.__name__,
-        Relationship.source_id == cls.id,
-        Relationship.destination_type == Comment.__name__,
-    ).join(Comment, Relationship.destination_id == Comment.id).filter(
-        predicate(Comment.description)
-    ).exists() | Relationship.query.filter(
-        Relationship.destination_type == cls.__name__,
-        Relationship.destination_id == cls.id,
-        Relationship.source_type == Comment.__name__,
-    ).join(Comment, Relationship.source_id == Comment.id).filter(
-        predicate(Comment.description)
-    ).exists()
+def reindex_by_relationship(relationship):
+  """Reindex comment if relationship changed or created or deleted"""
+  if relationship.destination_type == Comment.__name__:
+    instance = relationship.source
+  elif relationship.source_type == Comment.__name__:
+    instance = relationship.destination
+  else:
+    return []
+  if isinstance(instance, (Indexed, Commentable)):
+    return [instance]
+  return []
 
 
 class Comment(Relatable, Described, Ownable, Notifiable,
@@ -173,6 +167,39 @@ class Comment(Relatable, Described, Ownable, Notifiable,
 
   _sanitize_html = [
       "description",
+  ]
+
+  def get_objects_to_reindex(self):
+    """Return list required objects for reindex if comment C.U.D."""
+    source_qs = db.session.query(
+        Relationship.destination_type, Relationship.destination_id
+    ).filter(
+        Relationship.source_type == self.__class__.__name__,
+        Relationship.source_id == self.id
+    )
+    destination_qs = db.session.query(
+        Relationship.source_type, Relationship.source_id
+    ).filter(
+        Relationship.destination_type == self.__class__.__name__,
+        Relationship.destination_id == self.id
+    )
+    result_qs = source_qs.union(destination_qs)
+    klass_dict = defaultdict(set)
+    for klass, object_id in result_qs:
+      klass_dict[klass].add(object_id)
+
+    queries = []
+    for klass, object_ids in klass_dict.iteritems():
+      model = inflector.get_model(klass)
+      if not model:
+        continue
+      if issubclass(model, (Indexed, Commentable)):
+        queries.append(model.query.filter(model.id.in_(list(object_ids))))
+    return list(itertools.chain(*queries))
+
+  AUTO_REINDEX_RULES = [
+      ReindexRule("Comment", lambda x: x.get_objects_to_reindex()),
+      ReindexRule("Relationship", reindex_by_relationship),
   ]
 
   @classmethod
