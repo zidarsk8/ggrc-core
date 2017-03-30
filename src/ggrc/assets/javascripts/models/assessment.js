@@ -434,14 +434,19 @@
     get_related_objects_as_source: function () {
       var dfd = can.Deferred();
       var self = this;
+      var snapshots = GGRC.Utils.Snapshots;
       this.get_binding('related_objects_as_source')
         .refresh_instances()
         .then(function (list) {
-          list.forEach(function (item) {
+          var newList = list.filter(function (item) {
+            return !snapshots.isSnapshotModel(item.instance.type) &&
+                item.instance.type !== 'Comment';
+          });
+          newList.forEach(function (item) {
             var query;
             var instance = item.instance;
-            if (GGRC.Utils.Snapshots.isSnapshotType(instance)) {
-              query = GGRC.Utils.Snapshots.getSnapshotItemQuery(
+            if (snapshots.isSnapshotType(instance)) {
+              query = snapshots.getSnapshotItemQuery(
                 self, instance.child_id, instance.child_type);
 
               GGRC.Utils.QueryAPI
@@ -464,7 +469,7 @@
                 });
             }
           });
-          dfd.resolve(list);
+          dfd.resolve(newList);
         });
       return dfd;
     }
