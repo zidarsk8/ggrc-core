@@ -5,7 +5,7 @@
 
 <csv-export filename="Export Objects">
 <div class="info no-space">
-  <div class="choose-object-wrap bottom-space">
+  <div class="choose-object-wrap">
     <div class="row-fluid">
       <div class="span12">
         <div class="report-title">
@@ -47,23 +47,18 @@
           </div>
         {{/each}}
       </div>
-      <div class="add-rule add-object">
-        <a href="#" id="addAnotherObjectType" class="addFilterRule btn btn-small btn-info">Add another object type</a>
+      <div class="export-group__actions-wrap">
+        <a href="#" id="addAnotherObjectType" class="addFilterRule btn btn-small btn-info">Add Object Type</a>
+        {{^export.loading}}
+          <button type="submit" id="export-csv-button" class="btn btn-success btn-small">
+            Export Objects
+          </button>
+        {{/loading }}
+        {{#export.loading}}
+          <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+        {{/loading }}
       </div>
     </export-group>
-  </div>
-  <div class="save-template-wrap">
-    <div class="btn-group pull-right">
-      {{^export.loading}}
-        <button type="submit" id="export-csv-button" class="btn btn-success btn-small">
-          <i class="fa fa-download white"></i>
-          Export Objects
-        </button>
-      {{/loading }}
-      {{#export.loading}}
-        <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
-      {{/loading }}
-    </div>
   </div>
 </div>
 </csv-export>
