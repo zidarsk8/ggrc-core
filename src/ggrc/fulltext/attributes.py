@@ -1,6 +1,10 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+""" This module collect all custom full text attributes classes"""
+
+from ggrc.utils import date_parsers
+
 EMPTY_SUBPROPERTY_KEY = ''
 
 
@@ -52,6 +56,11 @@ class FullTextAttr(object):
       results['__sort__'] = ':'.join(sorted(sorted_dict.values()))
     return results
 
+  # pylint: disable=unused-argument
+  @staticmethod
+  def get_filter_value(value, operation):
+    return value
+
 
 class MultipleSubpropertyFullTextAttr(FullTextAttr):
   """Custom full text index attribute class for multiple return values
@@ -86,3 +95,53 @@ class MultipleSubpropertyFullTextAttr(FullTextAttr):
     if self.is_sorted:
       results['__sort__'] = ':'.join(sorted(sorted_dict.values()))
     return results
+
+
+class DatetimeValue(object):  # pylint: disable=too-few-public-methods
+  """Mixin setup if expected filter value is datetime"""
+
+  @staticmethod
+  def get_filter_value(value, operation):
+    """returns parsed datetime pairs for selected operation"""
+    converted_pairs = date_parsers.parse_date(unicode(value))
+    if not converted_pairs:
+      return
+    date_dict = {
+        "=": converted_pairs,
+        ">": (converted_pairs[1], None),
+        "<": (None, converted_pairs[0]),
+        ">=": (converted_pairs[0], None),
+        "<=": (None, converted_pairs[1]),
+    }
+    return date_dict.get(operation)
+
+
+class DateValue(DatetimeValue):  # pylint: disable=too-few-public-methods
+  """Mixin setup if expected filter value is date"""
+
+  def get_filter_value(self, value, operation):
+    results = super(DateValue, self).get_filter_value(value, operation)
+    if not results:
+      return
+    return [i.date() if i else i for i in results]
+
+
+DatetimeFullTextAttr = type(
+    "DatetimeFullTextAttr", (DatetimeValue, FullTextAttr), {})
+
+
+DateFullTextAttr = type("DateFullTextAttr", (DateValue, FullTextAttr), {})
+
+
+DatetimeMultipleSubpropertyFullTextAttr = type(
+    "DatetimeMultipleSubpropertyFullTextAttr",
+    (DatetimeValue, MultipleSubpropertyFullTextAttr),
+    {},
+)
+
+
+DateMultipleSubpropertyFullTextAttr = type(
+    "DateMultipleSubpropertyFullTextAttr",
+    (DateValue, MultipleSubpropertyFullTextAttr),
+    {},
+)
