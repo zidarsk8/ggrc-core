@@ -725,7 +725,6 @@ class TestQueryWithCA(BaseQueryAPITestCase):
 
   def test_single_ca_sorting(self):
     """Results get sorted by single custom attribute field."""
-    return
 
     programs = self._get_first_result_set(
         self._make_query_dict("Program",
