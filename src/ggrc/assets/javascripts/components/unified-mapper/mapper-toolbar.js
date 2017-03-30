@@ -56,6 +56,10 @@
           statuses =
             this.attr('displayPrefs').getTreeViewStates(modelName);
 
+          if (!statuses.length) {
+            statuses = GGRC.Utils.State.getDefaultStatesForModel(modelName);
+          }
+
           dropdownOptions = GGRC.Utils.State.getStatesForModel(modelName);
           dropdownOptions = dropdownOptions.map(function (option) {
             if (statuses.indexOf(option) > -1) {
