@@ -159,8 +159,8 @@ class ChangeTracked(object):
       'updated_at',
   ]
   _fulltext_attrs = [
-      'created_at',
-      'updated_at',
+      attributes.DatetimeFullTextAttr('created_at', 'created_at'),
+      attributes.DatetimeFullTextAttr('updated_at', 'updated_at'),
       attributes.FullTextAttr("modified_by", "modified_by", ["name", "email"]),
   ]
 
@@ -308,8 +308,8 @@ class Timeboxed(object):
   }
 
   _fulltext_attrs = [
-      'start_date',
-      'end_date'
+      attributes.DateFullTextAttr('start_date', 'start_date'),
+      attributes.DateFullTextAttr('end_date', 'end_date'),
   ]
 
 
@@ -384,7 +384,7 @@ class FinishedDate(object):
   }
 
   _fulltext_attrs = [
-      'finished_date',
+      attributes.DateFullTextAttr('finished_date', 'finished_date'),
   ]
 
   @validates('status')
@@ -442,7 +442,7 @@ class VerifiedDate(object):
   }
 
   _fulltext_attrs = [
-      "verified_date",
+      attributes.DateFullTextAttr("verified_date", "verified_date"),
       "verified",
   ]
 
