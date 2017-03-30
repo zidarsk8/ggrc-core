@@ -4,6 +4,7 @@
 
 from lib import base
 from lib.constants import locator
+from lib.utils import selenium_utils
 
 
 class DeleteObjectModal(base.Modal):
@@ -21,3 +22,5 @@ class DeleteObjectModal(base.Modal):
   def confirm_delete(self):
     """Confirm delete object."""
     self.button_delete.click()
+    selenium_utils.get_when_invisible(
+        self._driver, self._locators.BUTTON_DELETE)

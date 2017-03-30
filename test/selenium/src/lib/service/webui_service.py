@@ -116,6 +116,17 @@ class BaseWebUiService(object):
     (objs_widget.tree_view.open_create().
      fill_minimal_data(title=obj.title, code=obj.code).save_and_close())
 
+  def map_objs_via_tree_view(self, src_obj, dest_objs):
+    """Open generic widget of mapped objects, open unified mapper modal from
+    Tree View, fill data according to destination objects, search by them
+    titles and then map to source object.
+    """
+    dest_objs_titles = [dest_obj.title for dest_obj in dest_objs]
+    dest_objs_widget = self.open_widget_of_mapped_objs(src_obj)
+    (dest_objs_widget.tree_view.open_map().
+     map_dest_objs(dest_objs_type=dest_objs[0].type.title(),
+                   dest_objs_titles=dest_objs_titles))
+
   def get_count_objs_from_tab(self, src_obj):
     """Open generic widget of mapped objects, get count of objects from Tab
     navigation bar and return got count.
@@ -239,9 +250,8 @@ class AssessmentsService(BaseWebUiService):
                               objs_under_asmt]
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     (objs_widget.tree_view.open_3bbs().select_generate().
-     fill_minimal_data(asmt_tmpl_title=asmt_tmpl_obj.title,
-                       objs_under_asmt_titles=objs_under_asmt_titles).
-     generate_and_close())
+     generate_asmts(asmt_tmpl_title=asmt_tmpl_obj.title,
+                    objs_under_asmt_titles=objs_under_asmt_titles))
 
 
 class ControlsService(SnapshotsWebUiService):
