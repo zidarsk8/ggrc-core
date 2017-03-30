@@ -54,6 +54,7 @@
           type: '*',
           set: function (value) {
             var self = this;
+            this.attr('selected', []);
             if (value) {
               value.forEach(function (item) {
                 self.updateSelected(item);
