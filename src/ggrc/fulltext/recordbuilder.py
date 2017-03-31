@@ -3,8 +3,6 @@
 
 """Module for full text index record builder."""
 
-from collections import defaultdict
-
 import flask
 
 from ggrc import db
@@ -107,8 +105,8 @@ class RecordBuilder(object):
     """
     if not people:
       return {"__sort__": ""}
-    _, names, emails = zip(*(cls.get_person_id_name_email(p) for p in people))
-    sort_values = (name or email for (name, email) in zip(names, emails))
+    _, _, emails = zip(*(cls.get_person_id_name_email(p) for p in people))
+    sort_values = (email.split("@")[0] for email in emails)
     content = ":".join(sorted(sort_values))
     return {"__sort__": content}
 
@@ -155,20 +153,6 @@ class RecordBuilder(object):
       properties = self.get_custom_attribute_properties(obj)
     else:
       properties = self._get_properties(obj)
-
-    # assignees are returned as a list:
-    # [(<person1>, (role1, role2, ...)), (<person2>, (role2, ...)]
-    assignees = properties.pop("assignees", None)
-    if assignees:
-      for assignments in assignees.values():
-        role_to_people = defaultdict(list)
-        for person, roles in assignments:
-          if person:
-            for role in roles:
-              role_to_people[role].append(person)
-              properties[role] = self.build_person_subprops(person)
-        for role, people in role_to_people.items():
-          properties[role].update(self.build_list_sort_subprop(people))
 
     return Record(
         # This logic saves custom attribute values as attributes of the object
