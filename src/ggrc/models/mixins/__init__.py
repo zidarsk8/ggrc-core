@@ -165,6 +165,16 @@ class ChangeTracked(object):
   ]
 
   _update_attrs = []
+  _aliases = {
+      "updated_at": {
+          "display_name": "Last Updated",
+          "filter_only": True,
+      },
+      "created_at": {
+          "display_name": "Created On",
+          "filter_only": True,
+      },
+  }
 
 
 class Titled(object):
