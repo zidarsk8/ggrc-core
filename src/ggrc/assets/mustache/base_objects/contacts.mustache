@@ -26,26 +26,27 @@
           <span class="empty-message">None</span>
         {{/if}}
       {{/with_mapping}}
+    </p>
     {{else}}
     <h6>Owner</h6>
     <p class="oneline">
       {{#if owners.length}}
         {{#using contacts=owners}}
         <ul class="inner-count-list">
-          {{#each contacts}}
+          {{#contacts}}
             <li>
               {{#using person=this}}
                 {{>'/static/mustache/people/popover.mustache'}}
               {{/using}}
             </li>
-          {{/each}}
+          {{/contacts}}
         </ul>
         {{/using}}
       {{else}}
         <span class="empty-message">None</span>
       {{/if}}
-    {{/if}}
     </p>
+    {{/if}}
   </div>
     <div data-test-id="title_contacts_696de7244b84" class="span6">
       {{#using person=contact}}
