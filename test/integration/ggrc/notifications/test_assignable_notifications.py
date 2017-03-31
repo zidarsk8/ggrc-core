@@ -90,17 +90,28 @@ class TestAssignableNotification(TestCase):
 class TestAssignableNotificationUsingImports(TestAssignableNotification):
   """Tests for notifications when interacting with objects through imports."""
 
-  def test_assessment_created_notifications(self):
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_created_notifications(self, send_email):
     """Test if importing new assessments results in notifications for all."""
     self.assertEqual(self._get_notifications().count(), 0)
 
     self.import_file("assessment_with_templates.csv")
+    titles = [asmt.title for asmt in Assessment.query]
 
     query = self._get_notifications(notif_type="assessment_open")
     self.assertEqual(query.count(), 6)
 
+    # check email content
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"New assessments were created", content)
+    for asmt_title in titles:
+      self.assertIn(asmt_title, content)
+
   @patch("ggrc.notifications.common.send_email")
-  def test_assessment_updated_notifications(self, _):
+  def test_assessment_updated_notifications(self, send_email):
     """Test if updating an assessment results in a notification."""
     self.import_file("assessment_with_templates.csv")
 
@@ -124,9 +135,16 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_updated")
     self.assertEqual(query.count(), 1)
 
+    # check email content
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Assessments have been updated", content)
+
   @unittest.skip("An issue needs to be fixed.")
   @patch("ggrc.notifications.common.send_email")
-  def test_assessment_ca_updated_notifications(self, _):
+  def test_assessment_ca_updated_notifications(self, send_email):
     """Test if updating assessment custom attr. results in a notification."""
     CAD(definition_type="assessment", title="CA_misc_remarks")
 
@@ -148,9 +166,16 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_updated")
     self.assertEqual(query.count(), 1)
 
+    # check email content
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Assessments have been updated", content)
+
   @unittest.skip("An issue needs to be fixed.")
   @patch("ggrc.notifications.common.send_email")
-  def test_assessment_url_updated_notifications(self, _):
+  def test_assessment_url_updated_notifications(self, send_email):
     """Test if updating assessment URLs results in a notification."""
     self.import_file("assessment_with_templates.csv")
 
@@ -174,9 +199,16 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_updated")
     self.assertEqual(query.count(), 1)
 
+    # check email content
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Assessments have been updated", content)
+
   @unittest.skip("An issue needs to be fixed.")
   @patch("ggrc.notifications.common.send_email")
-  def test_attaching_assessment_evidence_notifications(self, _):
+  def test_attaching_assessment_evidence_notifications(self, send_email):
     """Test if attaching assessment evidence results in a notification."""
     self.import_file("assessment_with_templates.csv")
 
@@ -200,9 +232,16 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_updated")
     self.assertEqual(query.count(), 1)
 
+    # check email content
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Assessments have been updated", content)
+
   @unittest.skip("An issue needs to be fixed.")
   @patch("ggrc.notifications.common.send_email")
-  def test_assessment_person_updated_notifications(self, _):
+  def test_assessment_person_updated_notifications(self, send_email):
     """Test if updating assessment people results in a notification."""
     self.import_file("assessment_with_templates.csv")
 
@@ -243,8 +282,15 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_updated")
     self.assertEqual(query.count(), 1)
 
+    # check email content
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Assessments have been updated", content)
+
   @patch("ggrc.notifications.common.send_email")
-  def test_assessment_state_change_notifications(self, _):
+  def test_assessment_state_change_notifications(self, send_email):
     """Test if updating assessment state results in notifications."""
     # pylint: disable=too-many-statements
 
@@ -270,8 +316,12 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_ready_for_review")
     self.assertEqual(query.count(), 1)
 
-    # test verifying an assessment
     self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Assessments ready for review", content)
+
+    # test verifying an assessment
     self.assertEqual(self._get_notifications().count(), 0)
 
     self.import_data(OrderedDict([
@@ -284,8 +334,12 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_verified")
     self.assertEqual(query.count(), 1)
 
-    # test reopening a verified assessment
     self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Verified assessments", content)
+
+    # test reopening a verified assessment
     self.assertEqual(self._get_notifications().count(), 0)
 
     self.import_data(OrderedDict([
@@ -297,12 +351,16 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_reopened")
     self.assertEqual(query.count(), 1)
 
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Reopened assessments", content)
+
     # sending an assessment back to "in review" (i.e. the undo action)
     asmt = Assessment.query.get(asmt_id)
     asmt.status = Assessment.VERIFIED_STATE
     db.session.commit()
 
-    self.client.get("/_notifications/send_daily_digest")
     self.assertEqual(self._get_notifications().count(), 0)
 
     self.import_data(OrderedDict([
@@ -334,7 +392,10 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     self.assertEqual(query.count(), 1)
 
     self.client.get("/_notifications/send_daily_digest")
-    self.assertEqual(self._get_notifications().count(), 0)
+    recipient, _, content = send_email.call_args[0]
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Declined assessments", content)
+    self.assertIn(u"Reopened assessments", content)
 
     # directly submitting a not started assessment for review
     asmt = Assessment.query.get(asmt_id)
@@ -352,6 +413,11 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
 
     query = self._get_notifications(notif_type="assessment_ready_for_review")
     self.assertEqual(query.count(), 1)
+
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Assessments ready for review", content)
 
     # directly completing a not started assessment
     self.import_data(OrderedDict([
@@ -373,8 +439,12 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_completed")
     self.assertEqual(query.count(), 1)
 
-    # test reopening a completed assessment
     self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Completed assessments", content)
+
+    # test reopening a completed assessment
     self.assertEqual(self._get_notifications().count(), 0)
 
     self.import_data(OrderedDict([
@@ -386,8 +456,12 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_reopened")
     self.assertEqual(query.count(), 1)
 
-    # completing an assessment in progress
     self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Reopened assessments", content)
+
+    # completing an assessment in progress
     self.assertEqual(self._get_notifications().count(), 0)
 
     self.import_data(OrderedDict([
@@ -399,8 +473,13 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     query = self._get_notifications(notif_type="assessment_completed")
     self.assertEqual(query.count(), 1)
 
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertIn(u"Completed assessments", content)
+
   @patch("ggrc.notifications.common.send_email")
-  def test_assessment_reopen_notifications_on_edit(self, _):
+  def test_assessment_reopen_notifications_on_edit(self, send_email):
     """Test if updating assessment results in reopen notification."""
     self.import_file("assessment_with_templates.csv")
 
@@ -425,9 +504,14 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
       query = self._get_notifications(notif_type="assessment_reopened")
       self.assertEqual(query.count(), 1)
 
+      self.client.get("/_notifications/send_daily_digest")
+      recipient, _, content = send_email.call_args[0]
+      self.assertEqual(recipient, u"user@example.com")
+      self.assertIn(u"Reopened assessments", content)
+
   @unittest.skip("An issue needs to be fixed.")
   @patch("ggrc.notifications.common.send_email")
-  def test_assessment_reopen_notifications_on_ca_edit(self, _):
+  def test_assessment_reopen_notifications_on_ca_edit(self, send_email):
     """Test if updating assessment's CA value in reopen notification."""
     CAD(definition_type="assessment", title="CA_misc_remarks")
 
@@ -454,9 +538,14 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
       query = self._get_notifications(notif_type="assessment_reopened")
       self.assertEqual(query.count(), 1)
 
+      self.client.get("/_notifications/send_daily_digest")
+      recipient, _, content = send_email.call_args[0]
+      self.assertEqual(recipient, u"user@example.com")
+      self.assertIn(u"Reopened assessments", content)
+
   @unittest.skip("An issue needs to be fixed.")
   @patch("ggrc.notifications.common.send_email")
-  def test_assessment_reopen_notifications_on_url_edit(self, _):
+  def test_assessment_reopen_notifications_on_url_edit(self, send_email):
     """Test if updating assessment's URLs results in reopen notification."""
     self.import_file("assessment_with_templates.csv")
 
@@ -481,9 +570,16 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
       query = self._get_notifications(notif_type="assessment_reopened")
       self.assertEqual(query.count(), 1)
 
+      self.client.get("/_notifications/send_daily_digest")
+      recipient, _, content = send_email.call_args[0]
+      self.assertEqual(recipient, u"user@example.com")
+      self.assertIn(u"Reopened assessments", content)
+
   @unittest.skip("An issue needs to be fixed.")
   @patch("ggrc.notifications.common.send_email")
-  def test_assessment_reopen_notifications_on_evidence_change(self, _):
+  def test_assessment_reopen_notifications_on_evidence_change(
+      self, send_email
+  ):
     """Test if assessment evidence change results in reopen notification."""
     self.import_file("assessment_with_templates.csv")
 
@@ -511,9 +607,14 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
       query = self._get_notifications(notif_type="assessment_reopened")
       self.assertEqual(query.count(), 1)
 
+      self.client.get("/_notifications/send_daily_digest")
+      recipient, _, content = send_email.call_args[0]
+      self.assertEqual(recipient, u"user@example.com")
+      self.assertIn(u"Reopened assessments", content)
+
   @unittest.skip("An issue needs to be fixed.")
   @patch("ggrc.notifications.common.send_email")
-  def test_assessment_reopen_notifications_on_person_change(self, _):
+  def test_assessment_reopen_notifications_on_person_change(self, send_email):
     """Test if updating assessment people results in a reopen notification."""
     self.import_file("assessment_with_templates.csv")
 
@@ -537,6 +638,11 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
 
       query = self._get_notifications(notif_type="assessment_reopened")
       self.assertEqual(query.count(), 1)
+
+      self.client.get("/_notifications/send_daily_digest")
+      recipient, _, content = send_email.call_args[0]
+      self.assertEqual(recipient, u"user@example.com")
+      self.assertIn(u"Reopened assessments", content)
 
 
 class TestAssignableNotificationUsingAPI(TestAssignableNotification):
