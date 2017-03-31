@@ -18,7 +18,9 @@ from ggrc_workflows.models.cycle import Cycle
 from ggrc.fulltext.mixin import Indexed, ReindexRule
 from ggrc.fulltext.attributes import (
     MultipleSubpropertyFullTextAttr,
-    FullTextAttr
+    DateMultipleSubpropertyFullTextAttr,
+    FullTextAttr,
+    DateFullTextAttr,
 )
 
 
@@ -80,18 +82,18 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
           ["name", "email"],
           False
       ),
-      MultipleSubpropertyFullTextAttr(
+      DateMultipleSubpropertyFullTextAttr(
           "task due date", "cycle_task_group_tasks", ["end_date"], False
       ),
-      FullTextAttr("due date", 'next_due_date',),
+      DateFullTextAttr("due date", 'next_due_date',),
       FullTextAttr("assignee", "contact", ['name', 'email']),
       FullTextAttr("cycle title", 'cycle', ['title'], False),
       FullTextAttr("cycle assignee",
                    lambda x: x.cycle.contact,
                    ['email', 'name'], False),
-      FullTextAttr("cycle due date",
-                   lambda x: x.cycle.next_due_date,
-                   with_template=False),
+      DateFullTextAttr("cycle due date",
+                       lambda x: x.cycle.next_due_date,
+                       with_template=False),
   ]
 
   AUTO_REINDEX_RULES = [

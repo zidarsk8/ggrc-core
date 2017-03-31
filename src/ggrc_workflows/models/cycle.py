@@ -16,7 +16,8 @@ from ggrc.models.mixins import Titled
 from ggrc.models.mixins import WithContact
 from ggrc.fulltext.attributes import (
     MultipleSubpropertyFullTextAttr,
-    FullTextAttr,
+    DateMultipleSubpropertyFullTextAttr,
+    DateFullTextAttr,
 )
 from ggrc.fulltext.mixin import Indexed, ReindexRule
 
@@ -76,7 +77,7 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
           ["name", "email"],
           False,
       ),
-      MultipleSubpropertyFullTextAttr(
+      DateMultipleSubpropertyFullTextAttr(
           "group due date",
           'cycle_task_groups',
           ["next_due_date"],
@@ -95,13 +96,13 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
           ["name", "email"],
           False
       ),
-      MultipleSubpropertyFullTextAttr(
+      DateMultipleSubpropertyFullTextAttr(
           "task due date",
           "cycle_task_group_object_tasks",
           ["end_date"],
           False
       ),
-      FullTextAttr("due date", "next_due_date"),
+      DateFullTextAttr("due date", "next_due_date"),
   ]
 
   AUTO_REINDEX_RULES = [
