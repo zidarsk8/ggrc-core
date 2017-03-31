@@ -129,11 +129,11 @@ class Assessment(statusable.Statusable, AuditRelationship,
   _fulltext_attrs = [
       'design',
       'operationally',
-      MultipleSubpropertyFullTextAttr('Assignee', 'assessors',
+      MultipleSubpropertyFullTextAttr('related_assessors', 'assessors',
                                       ['name', 'email']),
-      MultipleSubpropertyFullTextAttr('Creator', 'creators',
+      MultipleSubpropertyFullTextAttr('related_creators', 'creators',
                                       ['name', 'email']),
-      MultipleSubpropertyFullTextAttr('Verifier', 'verifiers',
+      MultipleSubpropertyFullTextAttr('related_verifiers', 'verifiers',
                                       ['name', 'email']),
   ]
 
@@ -164,17 +164,17 @@ class Assessment(statusable.Statusable, AuditRelationship,
       "design": "Conclusion: Design",
       "operationally": "Conclusion: Operation",
       "related_creators": {
-          "display_name": "Creator",
+          "display_name": "Creators",
           "mandatory": True,
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
       "related_assessors": {
-          "display_name": "Assignee",
+          "display_name": "Assignees",
           "mandatory": True,
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
       "related_verifiers": {
-          "display_name": "Verifier",
+          "display_name": "Verifiers",
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
   }
@@ -184,6 +184,21 @@ class Assessment(statusable.Statusable, AuditRelationship,
   ]
 
   similarity_options = similarity_options_module.ASSESSMENT
+
+  @property
+  def assessors(self):
+    """Get the list of assessor assignees"""
+    return self.assignees_by_type.get("Assessor", [])
+
+  @property
+  def creators(self):
+    """Get the list of creator assignees"""
+    return self.assignees_by_type.get("Creator", [])
+
+  @property
+  def verifiers(self):
+    """Get the list of verifier assignees"""
+    return self.assignees_by_type.get("Verifier", [])
 
   def validate_conclusion(self, value):
     return value if value in self.VALID_CONCLUSIONS else None
