@@ -380,9 +380,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Test Plan",
         "Notes",
         "Audit",
-        "Creator",
-        "Assignee",
-        "Verifier",
+        "Creators",
+        "Assignees",
+        "Verifiers",
         "Primary Contact",
         "Secondary Contact",
         "Assessment URL",
@@ -406,8 +406,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "mandatory": {
             "Title",
             "Audit",
-            "Creator",
-            "Assignee",
+            "Creators",
+            "Assignees",
             "Code"
         },
         "unique": {

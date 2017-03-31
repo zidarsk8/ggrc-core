@@ -273,8 +273,8 @@ class TestAssessmentImport(TestCase):
         ("object_type", "Assessment"),
         ("Code*", slug),
         ("Audit*", audit.slug),
-        ("Assignee*", models.Person.query.all()[0].email),
-        ("Creator", models.Person.query.all()[0].email),
+        ("Assignees*", models.Person.query.all()[0].email),
+        ("Creators", models.Person.query.all()[0].email),
         ("Title", "Strange title"),
         ("map:control", control.slug),
     ]))
