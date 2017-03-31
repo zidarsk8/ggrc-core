@@ -4,7 +4,7 @@
 */
 
 (function (can, $) {
-  can.Component.extend({
+  GGRC.Components('mappingTreeView', {
     tag: 'mapping-tree-view',
     template: can.view(GGRC.mustache_path +
       '/base_templates/mapping_tree_view.mustache'),
@@ -12,6 +12,7 @@
       treeViewClass: '@',
       expandable: '@',
       sortField: '@',
+      sortOrder: '@',
       emptyText: '@',
       parentInstance: null,
       mappedObjects: [],
@@ -53,6 +54,7 @@
     },
     /**
       * Sort objects list by this.scope.sortField, if defined
+      * in order defined in this.scope.sortOrder (asc or desc)
       *
       * @param {Array} mappedObjects - the list of objects to be sorted
       *
@@ -62,8 +64,10 @@
       *                   mappedObjects.
       */
     _sortObjects: function (mappedObjects) {
-      if (this.scope.attr('sortField')) {
-        return _.sortBy(mappedObjects, this.scope.attr('sortField'));
+      var sortField = this.scope.attr('sortField');
+      var sortOrder = this.scope.attr('sortOrder');
+      if (sortField) {
+        return _.sortByOrder(mappedObjects, sortField, sortOrder);
       }
       return mappedObjects;
     },
