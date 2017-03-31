@@ -32,5 +32,5 @@ class TestProgramPage(base.Test):
     assert len(expected_controls) == actual_controls_tab_count
     actual_controls = (webui_service.ControlsService(selenium).
                        get_list_objs_from_tree_view(src_obj=new_program_rest))
-    assert expected_controls == actual_controls, (
+    assert sorted(expected_controls) == sorted(actual_controls), (
         messages.ERR_MSG_FORMAT.format(expected_controls, actual_controls))
