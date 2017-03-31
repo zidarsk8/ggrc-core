@@ -741,7 +741,8 @@ p {
   &.state-notstarted,
   &.state-draft,
   &.state-assigned,
-  &.state-planned {
+  &.state-planned,
+  &.state-archived {
     background: $status-draft;
   }
   &.state-inprogress {
