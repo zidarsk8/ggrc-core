@@ -106,6 +106,7 @@ def autocast(exp, target_class):
   operation = exp["op"]["name"]
   exp.update(EXP_TMPL)
   key = exp['left']
+  key = key.lower()
   key, _ = target_class.attributes_map().get(key, (key, None))
   extra_parser, any_parser = get_parsers(target_class, key)
   if not extra_parser and not any_parser:
