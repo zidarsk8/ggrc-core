@@ -71,8 +71,8 @@
 
       onCancel: function (ctx, el, ev) {
         ev.preventDefault();
-        this.attr('context.isEdit', false);
         this.attr('context.value', this.attr('_value'));
+        this.attr('context.isEdit', false);
       },
       onSave: function (ctx, el, ev) {
         var caid = this.attr('caId');
