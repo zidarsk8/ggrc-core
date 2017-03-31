@@ -13,6 +13,7 @@ from lib.constants import messages
 from lib.constants.element import Lhn
 from lib.page import dashboard
 from lib.service import webui_service, rest_service
+from lib.utils.filter_utils import FilterUtils
 
 
 class TestSnapshots(base.Test):
@@ -249,3 +250,27 @@ class TestSnapshots(base.Test):
     assert (control_title in
             [el.text for el in list_of_ctrls if len(list_of_ctrls) != 0]
             ) == is_found
+
+  @pytest.mark.smoke_tests
+  @pytest.mark.parametrize(
+      "version_of_ctrl, is_found",
+      [("control", True), ("updated_control", False)],
+      ids=["Snapshoted version is filtered",
+           "Actual snapshotable control is not filtered"])
+  def test_filter_of_snapshotable_control(
+      self, create_audit_and_update_original_control, selenium,
+          version_of_ctrl, is_found,):
+    """Check via UI that filtering work for snapshoted version of Control only,
+    filtering by actual values returns no items in scope of Audit page.
+    """
+    audit_with_one_control = create_audit_and_update_original_control
+    audit = audit_with_one_control["audit"]
+    expected_control = audit_with_one_control[version_of_ctrl]
+    filter_exp = FilterUtils.get_filter_exp_by_title(expected_control.title)
+    actual_controls = (webui_service.ControlsService(selenium).
+                       filter_list_objs_from_tree_view(
+                       src_obj=audit, filter_exp=filter_exp))
+    assert (expected_control in
+            [ctrls for ctrls in actual_controls if len(actual_controls) != 0]
+            ) == is_found, messages.ERR_MSG_FORMAT.format(
+                [expected_control], actual_controls)
