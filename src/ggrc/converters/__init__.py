@@ -28,6 +28,7 @@ from ggrc.models import Section
 from ggrc.models import Standard
 from ggrc.models import System
 from ggrc.models import Vendor
+from ggrc.models import Snapshot
 
 
 def get_shared_unique_rules():
@@ -84,7 +85,9 @@ GGRC_IMPORTABLE = {
     "vendor": Vendor,
 }
 
-GGRC_EXPORTABLE = {}
+GGRC_EXPORTABLE = {
+    "snapshot": Snapshot,
+}
 
 
 def _get_types(attr):
