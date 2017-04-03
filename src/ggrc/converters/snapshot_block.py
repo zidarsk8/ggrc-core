@@ -3,6 +3,8 @@
 
 """Module for snapshot block converter."""
 
+from collections import defaultdict
+
 from cached_property import cached_property
 
 from ggrc import models
@@ -48,6 +50,28 @@ class SnapshotBlockConverter(object):
     child_types = {snapshot.child_type for snapshot in self.snapshots}
     assert len(child_types) <= 1
     return child_types.pop() if child_types else ""
+
+  def _gather_stubs(self):
+    """Gather all possible stubs from snapshot contents.
+
+    Returns:
+      dictionary of object types and their ids.
+    """
+    stubs = defaultdict(set)
+
+    def walk(value, stubs):
+      if isinstance(value, list):
+        for val in value:
+          walk(val, stubs)
+      elif isinstance(value, dict):
+        if "type" in value and "id" in value:
+          stubs[value["type"]].add(value["id"])
+        for val in value.values():
+          walk(val, stubs)
+
+    for snapshot in self.snapshots:
+      walk(snapshot.revision.content, stubs)
+    return stubs
 
   @staticmethod
   def to_array():
