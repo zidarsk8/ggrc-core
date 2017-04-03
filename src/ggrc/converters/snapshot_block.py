@@ -3,6 +3,10 @@
 
 """Module for snapshot block converter."""
 
+from cached_property import cached_property
+
+from ggrc import models
+
 
 class SnapshotBlockConverter(object):
   """Block converter for snapshots of a single object type."""
@@ -18,6 +22,25 @@ class SnapshotBlockConverter(object):
   @property
   def name(self):
     return "Snapshot"
+
+  @cached_property
+  def snapshots(self):
+    """List of all snapshots in the current block.
+
+    The content of the given snapshots also contains the mapped audit field.
+    """
+    if not self.ids:
+      return []
+    snapshots = models.Snapshot.eager_query().filter(
+        models.Snapshot.id.in_(self.ids)
+    ).all()
+
+    for snapshot in snapshots:  # add special snapshot attribute
+      snapshot.revision.content["audit"] = {
+          "type": "Audit",
+          "id": snapshot.parent_id
+      }
+    return snapshots
 
   @staticmethod
   def to_array():
