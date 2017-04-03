@@ -8,7 +8,9 @@ from collections import OrderedDict
 
 from cached_property import cached_property
 
+from ggrc import db
 from ggrc import models
+from ggrc.utils import benchmark
 from ggrc.models.reflection import AttributeInfo
 
 
@@ -99,6 +101,23 @@ class SnapshotBlockConverter(object):
     for snapshot in self.snapshots:
       walk(snapshot.revision.content, stubs)
     return stubs
+
+  @cached_property
+  def _stub_cache(self):
+    """Generate cache for all stubbed values."""
+    stubs = self._gather_stubs()
+    cache = {}
+    for model_name, ids in stubs.iteritems():
+      with benchmark("Generate snapshot cache for: {}".format(model_name)):
+        model = getattr(models.all_models, model_name, None)
+        attr = getattr(model, "slug", getattr(model, "title", None))
+        if not attr:
+          continue
+
+        cache[model_name] = dict(db.session.query(
+            model.id, attr).filter(model.id.in_(ids)))
+
+    return {}
 
   @staticmethod
   def to_array():
