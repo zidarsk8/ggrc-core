@@ -68,3 +68,32 @@ class TestSnapshotBlockConverter(TestCase):
     self.assertEqual(block.snapshots, snapshots)
     for snapshot in snapshots:
       self.assertIn("audit", snapshot.revision.content)
+
+  def test_valid_child_types(self):
+    """Test child_type property with valid snapshots list."""
+    snapshots = self._create_snapshots([
+        factories.ControlFactory(),
+        factories.ControlFactory(),
+    ])
+    converter = mock.MagicMock()
+    ids = [s.id for s in snapshots]
+    block = SnapshotBlockConverter(converter, ids)
+    self.assertEqual(block.child_type, "Control")
+
+  def test_empty_child_type(self):
+    """Test child_type property with empty snapshots list."""
+    converter = mock.MagicMock()
+    block = SnapshotBlockConverter(converter, [])
+    self.assertEqual(block.child_type, "")
+
+  def test_invalid_child_types(self):
+    """Test child_type property with invalid snapshots list."""
+    snapshots = self._create_snapshots([
+        factories.ControlFactory(),
+        factories.PolicyFactory(),
+    ])
+    converter = mock.MagicMock()
+    ids = [s.id for s in snapshots]
+    block = SnapshotBlockConverter(converter, ids)
+    with self.assertRaises(AssertionError):
+      block.child_type = block.child_type

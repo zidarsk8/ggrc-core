@@ -21,7 +21,7 @@ class SnapshotBlockConverter(object):
 
   @property
   def name(self):
-    return "Snapshot"
+    return "{} Snapshot".format(self.child_type)
 
   @cached_property
   def snapshots(self):
@@ -41,6 +41,13 @@ class SnapshotBlockConverter(object):
           "id": snapshot.parent_id
       }
     return snapshots
+
+  @cached_property
+  def child_type(self):
+    """Name of snapshot object types."""
+    child_types = {snapshot.child_type for snapshot in self.snapshots}
+    assert len(child_types) <= 1
+    return child_types.pop() if child_types else ""
 
   @staticmethod
   def to_array():
