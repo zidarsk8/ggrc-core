@@ -130,11 +130,11 @@ class Assessment(statusable.Statusable, AuditRelationship,
       'design',
       'operationally',
       MultipleSubpropertyFullTextAttr('related_assessors', 'assessors',
-                                      ['email', 'name']),
+                                      ['user_name', 'email', 'name']),
       MultipleSubpropertyFullTextAttr('related_creators', 'creators',
-                                      ['email', 'name']),
+                                      ['user_name', 'email', 'name']),
       MultipleSubpropertyFullTextAttr('related_verifiers', 'verifiers',
-                                      ['email', 'name']),
+                                      ['user_name', 'email', 'name']),
   ]
 
   _tracked_attrs = {
