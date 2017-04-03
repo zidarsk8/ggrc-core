@@ -136,3 +136,42 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         self.block._attribute_name_map.items(),
         []
     )
+
+  def test_get_value_string(self):
+    """Test get value string function for all value types."""
+    self.block._stub_cache = {
+        "Dummy": {
+            1: "AAA",
+            2: "BBB",
+            3: "CCC",
+        },
+        "Object": {
+            1: "DDD",
+        }
+    }
+    self.assertEqual(self.block.get_value_string(None), "")
+    self.assertEqual(self.block.get_value_string([]), "")
+    self.assertEqual(self.block.get_value_string({}), "")
+    self.assertEqual(self.block.get_value_string(True), "yes")
+    self.assertEqual(self.block.get_value_string(False), "no")
+    self.assertEqual(self.block.get_value_string("Foo"), "Foo")
+    self.assertEqual(
+        self.block.get_value_string({"type": "Fake", "id": 4}),
+        ""
+    )
+    self.assertEqual(
+        self.block.get_value_string({"type": "Dummy", "id": -3}),
+        ""
+    )
+    self.assertEqual(
+        self.block.get_value_string({"type": "Dummy", "id": 1}),
+        "AAA"
+    )
+    self.assertEqual(
+        self.block.get_value_string([
+            {"type": "Dummy", "id": 1},
+            {"type": "Object", "id": 1},
+            {"type": "Dummy", "id": 3}
+        ]),
+        "AAA\nDDD\nCCC"
+    )
