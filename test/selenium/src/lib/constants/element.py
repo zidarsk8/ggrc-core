@@ -96,20 +96,19 @@ class AdminWidgetEvents(object):
       r"(\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\s[A,P]M)"
 
 
-class AdminWidgetCustomAttrs(object):
+class AdminWidgetCustomAttributes(object):
   """Elements' labels (custom attributes scopes) for Custom Attributes
  widget at Admin Dashboard.
  """
-  # possible types of custom attributes
   WIDGET_HEADER = "Custom Attributes"
+  # possible types of custom attributes
   TEXT = "Text"
   RICH_TEXT = "Rich Text"
   DATE = "Date"
   CHECKBOX = "Checkbox"
   DROPDOWN = "Dropdown"
   PERSON = "Map:Person"
-
-  ALL_ATTRS_TYPES = (TEXT, RICH_TEXT, DATE, CHECKBOX, DROPDOWN, PERSON)
+  ALL_CA_TYPES = (TEXT, RICH_TEXT, DATE, CHECKBOX, DROPDOWN, PERSON)
 
 
 class Common(object):
