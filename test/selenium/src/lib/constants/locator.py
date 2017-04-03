@@ -904,7 +904,7 @@ class BaseWidgetGeneric(object):
       _FILTER_DROPDOWN_ELEMENTS = \
           _FILTER_DROPDOWN + " .multiselect-dropdown__element"
       cls.TEXTFIELD_TO_FILTER = (
-          By.CSS_SELECTOR, str(_FILTER + " .tree-filter__expression-holder")
+          By.CSS_SELECTOR, str(_FILTER + " .tree-filter__input")
             .format(cls._object_name))
       cls.BUTTON_FILTER = (
           By.CSS_SELECTOR,

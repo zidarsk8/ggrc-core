@@ -45,7 +45,7 @@ class CommonUnifiedMapperModal(base.Modal):
     """
     # pylint: disable=invalid-name
     expression = filter_utils.FilterUtils.get_filter_exp_by_title(
-        list_titles=objs_titles)
+        titles=objs_titles)
     self.filter_via_expression_text_box.enter_text(expression)
 
   def _select_search_dest_objs(self):

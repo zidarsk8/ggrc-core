@@ -36,11 +36,17 @@ class FilterUtils(object):
         [(field, operator, value) for value in list_values])
 
   @staticmethod
-  def get_filter_exp_by_title(list_titles):
-    """Get filter expression to search data by title according to list of titles.
+  def get_filter_exp_by_title(titles):
+    """Get filter expression to search data by title according to title(s).
     Example:
-    list_titles = ["title1", "title2"]
+    for single title
+    titles = "title1"
+    :return '"title" = "title1"'
+
+    for list of titles
+    titles = ["title1", "title2"]
     :return '"title" = "title1" OR "title" = "title2"'
     """
+    list_values = [titles] if type(titles) not in [list, tuple] else titles
     return FilterUtils.get_filter_exp(field="title", operator="=",
-                                      list_values=list_titles)
+                                      list_values=list_values)

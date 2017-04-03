@@ -173,6 +173,16 @@ class BaseWebUiService(object):
     obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
     return obj_info_panel.open_info_3bbs().is_open_exist()
 
+  def filter_list_objs_from_tree_view(self, src_obj, filter_exp):
+    """Filter by specified criteria and return list of objects from Tree
+    View."""
+    objs_widget = self.open_widget_of_mapped_objs(src_obj)
+    objs_widget.filter.perform_query(filter_exp)
+    self.set_list_objs_scopes_representation_on_tree_view(src_obj)
+    list_objs_scopes = self.get_list_objs_scopes_from_tree_view(src_obj)
+    return self.create_list_objs(entity_factory=self.entities_factory_cls,
+                                 list_scopes=list_objs_scopes)
+
 
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""
