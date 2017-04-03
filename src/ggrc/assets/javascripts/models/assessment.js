@@ -76,7 +76,7 @@
         attr_name: 'creators'
       }, {
         attr_title: 'Assignees',
-        attr_name: 'assessors'
+        attr_name: 'assignees'
       }, {
         attr_title: 'Verifiers',
         attr_name: 'verifiers'
