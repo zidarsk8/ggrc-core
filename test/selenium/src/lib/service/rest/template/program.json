@@ -1,17 +1,15 @@
 {
-  "custom_attribute_definitions": [],
-  "custom_attributes": {},
+  "title": null,
+  "url": "",
+  "slug": null,
+  "status": null,
   "contact": null,
   "kind": "Directive",
-  "title": null,
   "description": "",
   "secondary_contact": null,
   "notes": "",
-  "url": "",
   "reference_url": "",
-  "slug": "",
-  "start_date": "",
-  "end_date": "",
-  "status": "Draft",
+  "custom_attribute_definitions": [],
+  "custom_attributes": {},
   "context": null
 }
