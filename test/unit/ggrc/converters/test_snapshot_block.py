@@ -63,3 +63,37 @@ class TestSnapshotBlockConverter(unittest.TestCase):
             "cav": {6},
         }
     )
+
+  def test_cad_name_map(self):
+    """Test gathering name map for all custom attribute definitions."""
+    snapshot_mock1 = mock.MagicMock()
+    snapshot_mock1.revision.content = {
+        "id": 44,
+        "custom_attribute_definitions": [
+            {"id": 1, "title": "CCC"},
+            {"id": 2, "title": "BBB"},
+        ],
+    }
+
+    snapshot_mock2 = mock.MagicMock()
+    snapshot_mock2.revision.content = {
+        "id": 45,
+        "custom_attribute_definitions": [
+            {"id": 1, "title": "CCC"},
+            {"id": 3, "title": "AAA"},
+            {"id": 4, "title": "DDD"},
+        ],
+    }
+    self.block.snapshots = [
+        snapshot_mock1,
+        snapshot_mock2,
+    ]
+    self.assertEqual(
+        self.block._cad_name_map.items(),
+        [
+            (3, "AAA"),
+            (2, "BBB"),
+            (1, "CCC"),
+            (4, "DDD"),
+        ]
+    )

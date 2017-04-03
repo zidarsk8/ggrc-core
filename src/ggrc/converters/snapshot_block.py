@@ -4,6 +4,7 @@
 """Module for snapshot block converter."""
 
 from collections import defaultdict
+from collections import OrderedDict
 
 from cached_property import cached_property
 
@@ -50,6 +51,15 @@ class SnapshotBlockConverter(object):
     child_types = {snapshot.child_type for snapshot in self.snapshots}
     assert len(child_types) <= 1
     return child_types.pop() if child_types else ""
+
+  @cached_property
+  def _cad_name_map(self):
+    """Get id to name mapping for all custom attribute definitions."""
+    cad_map = {}
+    for snap in self.snapshots:
+      for cad in snap.revision.content.get("custom_attribute_definitions", []):
+        cad_map[cad["id"]] = cad["title"]
+    return OrderedDict(sorted(cad_map.iteritems(), key=lambda x: x[1]))
 
   def _gather_stubs(self):
     """Gather all possible stubs from snapshot contents.
