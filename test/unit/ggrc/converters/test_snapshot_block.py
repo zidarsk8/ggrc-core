@@ -97,3 +97,42 @@ class TestSnapshotBlockConverter(unittest.TestCase):
             (4, "DDD"),
         ]
     )
+
+  @mock.patch("ggrc.converters.snapshot_block.models")
+  @mock.patch("ggrc.converters.snapshot_block.AttributeInfo")
+  def test_attribute_name_map(self, attribute_info, _):
+    """Test getting attribute name map for a valid model."""
+    self.block.child_type = "Dummy"
+    attribute_info.gather_aliases.return_value = {
+        "key_1": "BBB",
+        "key_2": "DDD",
+        "key_3": {"display_name": "AAA"},
+        "key_4": {"display_name": "CCC"},
+    }
+    attribute_info.get_column_order.return_value = [
+        "key_3",
+        "audit",
+        "key_2",
+        "key_1",
+        "key_4",
+    ]
+    self.assertEqual(
+        self.block._attribute_name_map.items(),
+        [
+            ("key_3", "AAA"),
+            ("audit", "Audit"),  # inserted snapshot attribute
+            ("key_2", "DDD"),
+            ("key_1", "BBB"),
+            ("key_4", "CCC"),
+        ]
+    )
+
+  @mock.patch("ggrc.converters.snapshot_block.models")
+  def test_bad_attribute_name_map(self, models):
+    """Test getting attribute name map for an invalid model."""
+    self.block.child_type = "Dummy"
+    models.all_models.Dummy = None
+    self.assertEqual(
+        self.block._attribute_name_map.items(),
+        []
+    )

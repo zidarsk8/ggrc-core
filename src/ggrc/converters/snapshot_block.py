@@ -9,6 +9,7 @@ from collections import OrderedDict
 from cached_property import cached_property
 
 from ggrc import models
+from ggrc.models.reflection import AttributeInfo
 
 
 class SnapshotBlockConverter(object):
@@ -60,6 +61,22 @@ class SnapshotBlockConverter(object):
       for cad in snap.revision.content.get("custom_attribute_definitions", []):
         cad_map[cad["id"]] = cad["title"]
     return OrderedDict(sorted(cad_map.iteritems(), key=lambda x: x[1]))
+
+  @cached_property
+  def _attribute_name_map(self):
+    """Get property to name mapping for object attributes."""
+    model = getattr(models.all_models, self.child_type, None)
+    if not model:
+      # log warning
+      # Model has been removed from the system and we don't know its attribute
+      # names anymore.
+      return {}
+    aliases = AttributeInfo.gather_aliases(model)
+    aliases["audit"] = "Audit"  # special snapshot attribute
+    map_ = {key: value["display_name"] if isinstance(value, dict) else value
+            for key, value in aliases.iteritems()}
+    orderd_keys = AttributeInfo.get_column_order(map_.keys())
+    return OrderedDict((key, map_[key]) for key in orderd_keys)
 
   def _gather_stubs(self):
     """Gather all possible stubs from snapshot contents.

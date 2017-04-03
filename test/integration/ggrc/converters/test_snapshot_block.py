@@ -17,6 +17,9 @@ from integration.ggrc.models import factories
 
 class TestSnapshotBlockConverter(TestCase):
   """Tests for Snapshot block converter."""
+  # Removing protected access checks because we wish to tests even the
+  # protected functions.
+  # pylint: disable=protected-access
 
   @staticmethod
   def _get_latest_object_revisions(objects):
@@ -97,3 +100,40 @@ class TestSnapshotBlockConverter(TestCase):
     block = SnapshotBlockConverter(converter, ids)
     with self.assertRaises(AssertionError):
       block.child_type = block.child_type
+
+  def test_attribute_name_map(self):
+    """Test Control snapshot name map and order."""
+    converter = mock.MagicMock()
+    block = SnapshotBlockConverter(converter, [])
+    block.child_type = "Control"
+    self.assertEqual(
+        block._attribute_name_map.items(),
+        [
+            ('slug', 'Code'),
+            ('audit', 'Audit'),  # inserted attribute
+            ('title', 'Title'),
+            ('description', 'Description'),
+            ('notes', 'Notes'),
+            ('test_plan', 'Test Plan'),
+            ('owners', 'Admin'),
+            ('start_date', 'Effective Date'),
+            ('end_date', 'Stop Date'),
+            ('status', 'State'),
+            ('os_state', 'Review State'),
+            ('assertions', 'Assertions'),
+            ('categories', 'Categories'),
+            ('contact', 'Primary Contact'),
+            ('fraud_related', 'Fraud Related'),
+            ('key_control', 'Significance'),
+            ('kind', 'Kind/Nature'),
+            ('means', 'Type/Means'),
+            ('principal_assessor', 'Principal Assignee'),
+            ('secondary_assessor', 'Secondary Assignee'),
+            ('secondary_contact', 'Secondary Contact'),
+            ('url', 'Control URL'),
+            ('reference_url', 'Reference URL'),
+            ('verify_frequency', 'Frequency'),
+            ('created_at', 'Created On'),
+            ('updated_at', 'Last Updated')
+        ]
+    )
