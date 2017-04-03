@@ -166,7 +166,7 @@ class Converter(object):
     return self.response_data
 
   def get_object_names(self):
-    return [c.object_class.__name__ for c in self.block_converters]
+    return [c.name for c in self.block_converters]
 
   @classmethod
   def drop_cache(cls):
