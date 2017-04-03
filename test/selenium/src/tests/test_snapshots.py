@@ -67,9 +67,10 @@ class TestSnapshots(base.Test):
     - Second Control mapped to Program via REST API.
     """
     audit_with_one_control = create_audit_and_update_original_control
-    second_control = rest_service.ControlsService().create(count=1)[0]
-    rest_service.ObjectsOwnersService().create(objs=second_control)
-    rest_service.RelationshipsService().create(
+    second_control = rest_service.ControlsService().create_objs(count=1)[0]
+    rest_service.ObjectsOwnersService().assign_owner_to_objs(
+        objs=second_control)
+    rest_service.RelationshipsService().map_objs(
         src_obj=audit_with_one_control["program"], dest_objs=second_control)
     return {
         "audit": create_audit_and_update_original_control["audit"],
