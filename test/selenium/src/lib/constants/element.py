@@ -4,6 +4,7 @@
 # pylint: disable=too-few-public-methods
 # pylint: disable=invalid-name
 
+from collections import namedtuple
 from lib.constants import objects, roles
 
 
@@ -363,3 +364,9 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
       CommonModalSetVisibleFields.STATE, PRIMARY_CONTACT, MANAGER)
+
+
+class MappingStatusAttrs(namedtuple('_MappingStatusAttrs',
+                                    ['title', 'is_checked', 'is_disabled'])):
+  """Class for representation of html attributes for mapping checkboxes
+   on unified mapper"""
