@@ -6,7 +6,7 @@
 
 from collections import defaultdict
 
-from ddt import data, ddt
+from ddt import data, ddt, unpack
 
 from integration.ggrc_workflows.models import factories
 from integration.ggrc.models.factories import PersonFactory
@@ -109,3 +109,28 @@ class TestExportTasks(TestCase):
         description=comment_text,
     )
     self.assertSlugs("task comment", comment_text, [task.slug])
+
+  @data(
+      ("status", "Task State"),
+      ("status", "task state"),
+      ("status", "task status"),
+      ("end_date", "Task Due Date"),
+      ("end_date", "task due date"),
+      ("end_date", "task end_date"),
+      ("start_date", "task Start Date"),
+      ("start_date", "task start_date"),
+      ("updated_at", "task Last updated"),
+      ("updated_at", "task last updated"),
+      ("updated_at", "task updated_at"),
+  )
+  @unpack
+  def test_filter_by_aliases(self, field, alias):
+    """Test filter by alias"""
+    expected_results = defaultdict(list)
+    tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id.in_(self.generate_tasks_for_cycle(4))
+    ).all()
+    for task in tasks:
+      expected_results[str(getattr(task, field))].append(task.slug)
+    for value, slugs in expected_results.iteritems():
+      self.assertSlugs(alias, value, slugs)
