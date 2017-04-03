@@ -19,8 +19,9 @@ class FullTextAttr(object):
   attribute value.
   If value is callable, then the stored value will be the result of
   called value with current instance as attribute.
-  Subproperties may be empty or the list of strings. Each element of that list
-  Should be an attribute of the stored value.
+  Subproperties may be empty or a list of strings. Each element of the list
+  should be an attribute of the stored value.
+  The first subproperty in the list - the one used for sorting.
   """
 
   SUB_KEY_TMPL = "{id_val}-{sub}"
@@ -30,7 +31,7 @@ class FullTextAttr(object):
     self.value = value
     self.subproperties = subproperties or [EMPTY_SUBPROPERTY_KEY]
     self.with_template = with_template
-    self.is_sorted = len(self.subproperties) > 1
+    self.is_sortable = len(self.subproperties) > 1
 
   def get_value_for(self, instance):
     """Get value from sended instance using 'value' rule"""
@@ -43,16 +44,17 @@ class FullTextAttr(object):
     value = self.get_value_for(instance)
     results = {}
     sorted_dict = {}
+    sorting_subprop = self.subproperties[0]
     for subprop in self.subproperties:
       if value is not None and subprop != EMPTY_SUBPROPERTY_KEY:
         subprop_key = self.SUB_KEY_TMPL.format(id_val=value.id, sub=subprop)
         result = getattr(value, subprop)
         results[subprop_key] = result
-        if result and value.id not in sorted_dict:
-           sorted_dict[value.id] = result
+        if result and subprop == sorting_subprop:
+          sorted_dict[value.id] = result
       else:
         results[subprop] = value
-    if self.is_sorted:
+    if self.is_sortable:
       results['__sort__'] = ':'.join(sorted(sorted_dict.values()))
     return results
 
@@ -81,18 +83,19 @@ class MultipleSubpropertyFullTextAttr(FullTextAttr):
     values = self.get_value_for(instance)
     results = {}
     sorted_dict = {}
+    sorting_subprop = self.subproperties[0]
     for sub in self.subproperties:
       for value in values:
         if value is not None:
           sub_key = self.SUB_KEY_TMPL.format(id_val=value.id, sub=sub)
           result = getattr(value, sub)
           results[sub_key] = result
-          if result and value.id not in sorted_dict:
+          if result and sub == sorting_subprop:
             sorted_dict[value.id] = result
         else:
           sub_key = self.SUB_KEY_TMPL.format(id_val='EMPTY', sub=sub)
           results[sub_key] = None
-    if self.is_sorted:
+    if self.is_sortable:
       results['__sort__'] = ':'.join(sorted(sorted_dict.values()))
     return results
 

@@ -116,7 +116,7 @@ PCI 2.5
 PCI 2.6",PCI Program,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,,,,,,
-Assessment,Code*,Audit*,Title*,Description,Notes,Test Plan,Creator,Assignee,Effective Date,Stop Date,State,Primary Contact,Conclusion: Design,Conclusion: Operation,Secondary Contact,Assessment URL,Reference URL,,,,,,,,
+Assessment,Code*,Audit*,Title*,Description,Notes,Test Plan,Creators,Assignees,Effective Date,Stop Date,State,Primary Contact,Conclusion: Design,Conclusion: Operation,Secondary Contact,Assessment URL,Reference URL,,,,,,,,
 ,CA.PCI 1.1,AUDIT-PCI,PCI 1.1 Firewall and Router Configuration assessment for 2015: PCI-DSS 3.0 Security Program (Reference Program) - Audit 1 1,,,,danny@reciprocitylabs.com,danny@reciprocitylabs.com,,,Not Started,danny@reciprocitylabs.com,Effective,Effective,,,,,,,,,,,
 ,CA.PCI 1.2,AUDIT-PCI,PCI 1.2 Firewall and Router Connections Configuration assessment for 2015: PCI-DSS 3.0 Security Program (Reference Program) - Audit 1 1,,,,danny@reciprocitylabs.com,danny@reciprocitylabs.com,,,Not Started,danny@reciprocitylabs.com,Needs improvement,Needs improvement,,,,,,,,,,,
 ,CA.PCI 1.2.1,AUDIT-PCI,PCI 1.2.1 Traffic Restrictions assessment for 2015: PCI-DSS 3.0 Security Program (Reference Program) - Audit 1 1,,,,danny@reciprocitylabs.com,danny@reciprocitylabs.com,,,Not Started,danny@reciprocitylabs.com,Not Applicable,Not Applicable,,,,,,,,,,,

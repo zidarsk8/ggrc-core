@@ -31,9 +31,25 @@ from ggrc.models.object_document import EvidenceURL
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
+from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.utils import similarity_options as similarity_options_module
-from ggrc.fulltext.mixin import Indexed
+from ggrc.fulltext.mixin import Indexed, ReindexRule
+from ggrc.fulltext.attributes import MultipleSubpropertyFullTextAttr
+
+
+def reindex_by_relationship_attr(relationship_attr):
+  """Return a list of assessments which which need to be reindexed"""
+  source_query = db.session.query(Relationship.source_id).filter(
+      Relationship.source_type == "Assessment",
+      Relationship.id == relationship_attr.relationship_id
+  )
+  dest_query = db.session.query(Relationship.destination_id).filter(
+      Relationship.destination_type == "Assessment",
+      Relationship.id == relationship_attr.relationship_id
+  )
+  resulting_subquery = source_query.union(dest_query)
+  return Assessment.query.filter(Assessment.id.in_(resulting_subquery)).all()
 
 
 class Assessment(statusable.Statusable, AuditRelationship,
@@ -113,6 +129,12 @@ class Assessment(statusable.Statusable, AuditRelationship,
   _fulltext_attrs = [
       'design',
       'operationally',
+      MultipleSubpropertyFullTextAttr('related_assessors', 'assessors',
+                                      ['email', 'name']),
+      MultipleSubpropertyFullTextAttr('related_creators', 'creators',
+                                      ['email', 'name']),
+      MultipleSubpropertyFullTextAttr('related_verifiers', 'verifiers',
+                                      ['email', 'name']),
   ]
 
   _tracked_attrs = {
@@ -142,25 +164,41 @@ class Assessment(statusable.Statusable, AuditRelationship,
       "design": "Conclusion: Design",
       "operationally": "Conclusion: Operation",
       "related_creators": {
-          "display_name": "Creator",
+          "display_name": "Creators",
           "mandatory": True,
-          "filter_by": "_filter_by_related_creators",
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
       "related_assessors": {
-          "display_name": "Assignee",
+          "display_name": "Assignees",
           "mandatory": True,
-          "filter_by": "_filter_by_related_assessors",
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
       "related_verifiers": {
-          "display_name": "Verifier",
-          "filter_by": "_filter_by_related_verifiers",
+          "display_name": "Verifiers",
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
   }
 
+  AUTO_REINDEX_RULES = [
+      ReindexRule("RelationshipAttr", reindex_by_relationship_attr)
+  ]
+
   similarity_options = similarity_options_module.ASSESSMENT
+
+  @property
+  def assessors(self):
+    """Get the list of assessor assignees"""
+    return self.assignees_by_type.get("Assessor", [])
+
+  @property
+  def creators(self):
+    """Get the list of creator assignees"""
+    return self.assignees_by_type.get("Creator", [])
+
+  @property
+  def verifiers(self):
+    """Get the list of verifier assignees"""
+    return self.assignees_by_type.get("Verifier", [])
 
   def validate_conclusion(self, value):
     return value if value in self.VALID_CONCLUSIONS else None
@@ -174,18 +212,6 @@ class Assessment(statusable.Statusable, AuditRelationship,
   def validate_design(self, key, value):
     # pylint: disable=unused-argument
     return self.validate_conclusion(value)
-
-  @classmethod
-  def _filter_by_related_creators(cls, predicate):
-    return cls._get_relate_filter(predicate, "Creator")
-
-  @classmethod
-  def _filter_by_related_assessors(cls, predicate):
-    return cls._get_relate_filter(predicate, "Assessor")
-
-  @classmethod
-  def _filter_by_related_verifiers(cls, predicate):
-    return cls._get_relate_filter(predicate, "Verifier")
 
   @classmethod
   def _ignore_filter(cls, _):
