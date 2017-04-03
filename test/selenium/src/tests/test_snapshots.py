@@ -10,7 +10,7 @@ import pytest
 
 from lib import base
 from lib.constants import messages
-from lib.constants.element import Lhn
+from lib.constants.element import Lhn, MappingStatusAttrs
 from lib.page import dashboard
 from lib.service import webui_service, rest_service
 from lib.utils.filter_utils import FilterUtils
@@ -307,3 +307,26 @@ class TestSnapshots(base.Test):
             [ctrls for ctrls in actual_controls if len(actual_controls) != 0]
             ) == is_found, messages.ERR_MSG_FORMAT.format(
                 [expected_control], actual_controls)
+
+  @pytest.mark.smoke_tests
+  @pytest.mark.parametrize(
+      "version_of_ctrl, is_found",
+      [("control", False), ("updated_control", True)],
+      ids=["Snapshoted version is not found",
+           "Actual snapshotable control is found and already mapped to audit"])
+  @pytest.mark.smoke_tests
+  def test_search_unified_mapper(
+      self, create_audit_and_update_original_control, selenium,
+          version_of_ctrl, is_found):
+    """Check on Audit's Unified Mapper modal that Unified Mapper search not
+    looking for snapshots. Search by actual state of snapshotable control
+    showing control that is already mapped to audit.
+    """
+    audit = create_audit_and_update_original_control["audit"]
+    expected_ctrl = create_audit_and_update_original_control[version_of_ctrl]
+    expected_map_status = MappingStatusAttrs(expected_ctrl.title, True, True)
+    ctrl_service = webui_service.ControlsService(selenium)
+    actual_ctrls, actual_map_status = ctrl_service.get_list_objs_from_mapper(
+        src_obj=audit, dest_objs=[expected_ctrl])
+    assert (((expected_ctrl in actual_ctrls) and
+            (expected_map_status in actual_map_status)) is is_found)
