@@ -15,6 +15,7 @@ class Common(object):
   MODAL_GENEATE = ".modal-selector"
   MODAL_CREATE = ".modal-wide"
   MODAL_CONFIRM = ".modal.hide"
+  MODAL_MAP = ".modal-selector"
   # info page (panel)
   PIN_CONTENT = ".pin-content "
   INFO_WIDGET = ".info"
@@ -119,8 +120,8 @@ class LhnMenu(object):
 
   class __metaclass__(type):
     def __init__(cls, *args):
-      for object_singular, object_plural in zip(objects.ALL_SINGULAR,
-                                                objects.ALL_PLURAL):
+      for object_singular, object_plural in (zip(objects.ALL_SINGULAR,
+                                                 objects.ALL_PLURAL)):
         capitalized_name = object_singular.title()
         # handle underscore in object names
         if "_" in capitalized_name:
@@ -180,34 +181,66 @@ class ExtendedInfo(object):
       By.CSS_SELECTOR, '[data-test-id="extended_info_object_already_mapped"]')
 
 
+class CommonModalUnifiedMapper(object):
+  """Common locators for unified mapper modals."""
+  MODAL = Common.MODAL_MAP
+  # labels
+  MODAL_TITLE = (By.CSS_SELECTOR, MODAL + " h2")
+  OBJ_TYPE = (By.CSS_SELECTOR, MODAL + " .col:nth-child(1) h6")
+  FILTER_BY_EXPRESSION = (By.CSS_SELECTOR, MODAL + " .col.filter h6")
+  # user input elements
+  OBJ_TYPE_DROPDOWN = (By.CSS_SELECTOR, MODAL + " .input-block-level")
+  OBJ_TYPE_DROPDOWN_OPTIONS = (By.CSS_SELECTOR,
+                               MODAL + " .input-block-level option")
+  FILTER_VIA_EXPRESSION_TEXT_BOX = (By.CSS_SELECTOR, MODAL + " #mapper-filter")
+  FILTER_BY_STATE_DROPDOWN = (By.CSS_SELECTOR,
+                              MODAL + " .multiselect-dropdown__input")
+  FILTER_BY_STATE_DROPDOWN_OPTIONS = (By.CSS_SELECTOR,
+                                      MODAL + " .multiselect-dropdown__label")
+  BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .filter-buttons .btn-info")
+  FOUND_OBJECTS_TITLES = (By.CSS_SELECTOR, MODAL + " .flex-box .title-attr")
+  FOUND_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
+                              MODAL + ' .flex-box [type="checkbox"]')
+  BUTTON_MAP_SELECTED = (By.CSS_SELECTOR, MODAL + " .btn-success")
+
+
+class ModalMapObjects(CommonModalUnifiedMapper):
+  """Locators for map objects modals."""
+  MODAL = Common.MODAL_MAP
+  # user input elements
+  BUTTON_CREATE_OBJ = (By.CSS_SELECTOR, MODAL + " .create-control")
+
+
+class ModalSearchObjects(CommonModalUnifiedMapper):
+  """Locators for search objects modals."""
+  MODAL = Common.MODAL_MAP
+
+
+class ModalGenerateAssessments(CommonModalUnifiedMapper):
+  """Locators for generate Assessments modal."""
+  MODAL = Common.MODAL_GENEATE
+
+
 class BaseModalCreateNew(object):
   """Locators for Create new object modals."""
   MODAL = Common.MODAL_CREATE
   # labels
-  MODAL_TITLE = (By.CSS_SELECTOR, "{} .ui-draggable-handle>h2".format(MODAL))
+  MODAL_TITLE = (By.CSS_SELECTOR, MODAL + " .ui-draggable-handle>h2")
   TITLE = (By.CSS_SELECTOR,
-           "{} .modal-body form>div:nth-child(2) .span6>label".format(MODAL))
+           MODAL + " .modal-body form>div:nth-child(2) .span6>label")
   # user input elements
-  UI_TITLE = (
-      By.CSS_SELECTOR,
-      "{} .modal-body form>div:nth-child(2) .span6>input".format(MODAL))
-
-
-class BaseModalGenerateNew(object):
-  """Locators for Generate new object modals."""
-  # labels
-  MODAL = Common.MODAL_GENEATE
-  MODAL_TITLE = (By.CSS_SELECTOR, "{} .modal-header>h2".format(MODAL))
+  UI_TITLE = (By.CSS_SELECTOR,
+              MODAL + " .modal-body form>div:nth-child(2) .span6>input")
 
 
 class ModalCreateNewObject(BaseModalCreateNew):
   """Locators for Create new object modals."""
   MODAL = Common.MODAL_CREATE
   # user input elements
-  UI_TITLE = (By.CSS_SELECTOR, '{} [placeholder="Enter Title"]'.format(MODAL))
-  UI_CODE = (By.CSS_SELECTOR, '{} [name="slug"]'.format(MODAL))
-  BUTTON_SAVE_AND_CLOSE = (
-      By.CSS_SELECTOR, '{} [data-toggle="modal-submit"]'.format(MODAL))
+  UI_TITLE = (By.CSS_SELECTOR, MODAL + ' [placeholder="Enter Title"]')
+  UI_CODE = (By.CSS_SELECTOR, MODAL + ' [name="slug"]')
+  BUTTON_SAVE_AND_CLOSE = (By.CSS_SELECTOR,
+                           MODAL + ' [data-toggle="modal-submit"]')
   BUTTON_SAVE_AND_ADD_ANOTHER = (
       By.CSS_SELECTOR, '{} [data-toggle="modal-submit-addmore"]'.format(MODAL))
 
@@ -221,10 +254,10 @@ class ModalCreateNewProgram(BaseModalCreateNew):
   UI_NOTES = (By.CSS_SELECTOR,
               '[data-test-id="new_program_field_notes_75b8bc05"]'
               '>iframe.wysihtml5-sandbox')
-  UI_CODE = (
-      By.CSS_SELECTOR, '[data-test-id="new_program_field_code_334276e2"]')
-  UI_STATE = (
-      By.CSS_SELECTOR, '[data-test-id="new_program_dropdown_state_036a1fa6"]')
+  UI_CODE = (By.CSS_SELECTOR,
+             '[data-test-id="new_program_field_code_334276e2"]')
+  UI_STATE = (By.CSS_SELECTOR,
+              '[data-test-id="new_program_dropdown_state_036a1fa6"]')
   BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
   BUTTON_SHOW_ALL_OPTIONAL_FIELDS = (By.ID, "formHide")
   UI_PRIMARY_CONTACT = (
@@ -417,29 +450,6 @@ class ModalCreateNewAsmtTmpl(BaseModalCreateNew):
   """Locators for Create new Assessment Template modals."""
 
 
-class ModalGenerateNewObject(BaseModalGenerateNew):
-  """Locators for Generate new object modals."""
-  MODAL = Common.MODAL_GENEATE
-  BUTTON_GENERATE = (By.CSS_SELECTOR, "{} .btn-map".format(MODAL))
-
-
-class ModalGenerateNewAsmt(ModalGenerateNewObject):
-  """Locators for Generate new Assessment modals."""
-  MODAL = Common.MODAL_GENEATE
-  FOUND_OBJECTS = " .snapshot-list .flex-box"
-  SELECT_ASMT_TMPL_DROPDOWN = (
-      By.CSS_SELECTOR,
-      MODAL + ' dropdown[name="assessmentTemplate"] .input-block-level')
-  SELECT_ASMT_TMPL_OPTIONS = (
-      By.CSS_SELECTOR,
-      MODAL + ' dropdown[name="assessmentTemplate"] .input-block-level option')
-  BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .btn-info")
-  FOUND_OBJECTS_TITLES = (
-      By.CSS_SELECTOR, MODAL + FOUND_OBJECTS + " .title-attr")
-  FOUND_OBJECTS_CHECKBOXES = (
-      By.CSS_SELECTOR, MODAL + FOUND_OBJECTS + ' [type="checkbox"]')
-
-
 class ModalEditObject(BaseModalCreateNew):
   """Locators for Edit object modals."""
   BUTTON_DELETE = (
@@ -472,13 +482,14 @@ class ModalCustomAttribute(object):
 class ModalSetVisibleFields(object):
   """Locators for Set visible fields modals."""
   OPEN_MENU = ".open .dropdown-menu-form"
+  LEFT_SET_FIELDS = Common.TREE_HEADER + " .visible-columns-list"
   MODAL = "{} " + OPEN_MENU
   # labels
   MODAL_TITLE = MODAL + " h5"
-  FIELDS_TITLES = "{} " + Common.TREE_HEADER + " .checkbox-inline"
+  FIELDS_TITLES = "{} " + LEFT_SET_FIELDS + " .checkbox-inline"
   # user input elements
-  FIELDS_CHECKBOXES = "{} " + Common.TREE_HEADER + " .attr-checkbox"
-  BUTTON_SET_FIELDS = "{} " + Common.TREE_HEADER + " .set-tree-attrs"
+  FIELDS_CHECKBOXES = "{} " + LEFT_SET_FIELDS + " .attr-checkbox"
+  BUTTON_SET_FIELDS = "{} " + LEFT_SET_FIELDS + " .set-tree-attrs"
 
 
 class WidgetBar(object):
@@ -494,8 +505,8 @@ class WidgetBar(object):
 
   class __metaclass__(type):
     def __init__(cls, *args):
-      for object_singular, object_plural in zip(objects.ALL_SINGULAR,
-                                                objects.ALL_PLURAL):
+      for object_singular, object_plural in (zip(objects.ALL_SINGULAR,
+                                                 objects.ALL_PLURAL)):
         name = object_singular.lower()
         setattr(cls, object_plural, cls._Locator.get_widget(name))
   BUTTON_ADD = (
@@ -798,7 +809,6 @@ class WidgetInfoThreat(CommonWidgetInfo):
 
 class WidgetAdminRoles(object):
   """Locators for Roles widget on Admin Dashboard."""
-  widget_name = url.Widget.ROLES
 
 
 class WidgetAdminEvents(object):
@@ -815,15 +825,15 @@ class WidgetAdminEvents(object):
       "{0} {1}:first-child".format(_BASE_CSS_SELECTOR, _TREE_ITEMS_SELECTOR))
 
 
-class Dropdown3bbsInfoWidget(object):
+class CommonDropdown3bbsInfoWidget(object):
   """Locators for common settings 3BBS dropdown on Info widget and Info page.
  """
-  INFO_DROPDOWN = Common.INFO_WIDGET + " .dropdown-menu"
+  INFO_3BBS_DROPDOWN = Common.INFO_WIDGET + " .dropdown-menu"
   PIN_CONTENT = CommonWidgetInfo.PIN_CONTENT
-  EDIT = INFO_DROPDOWN + " .fa-pencil-square-o"
-  GET_PERMALINK = (INFO_DROPDOWN + " .fa-link")
-  OPEN = (INFO_DROPDOWN + " .fa-long-arrow-right")
-  DELETE = (INFO_DROPDOWN + " .fa-trash")
+  EDIT = INFO_3BBS_DROPDOWN + " .fa-pencil-square-o"
+  GET_PERMALINK = (INFO_3BBS_DROPDOWN + " .fa-link")
+  OPEN = (INFO_3BBS_DROPDOWN + " .fa-long-arrow-right")
+  DELETE = (INFO_3BBS_DROPDOWN + " .fa-trash")
   # user input elements
   BUTTON_3BBS_EDIT = (By.CSS_SELECTOR, EDIT)
   BUTTON_3BBS_GET_PERMALINK = (By.CSS_SELECTOR, GET_PERMALINK)
@@ -837,13 +847,29 @@ class Dropdown3bbsInfoWidget(object):
   BUTTON_3BBS_DELETE_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + DELETE)
 
 
-class Dropdown3bbsAuditInfoWidget(Dropdown3bbsInfoWidget):
+class AuditsDropdown3bbsInfoWidget(CommonDropdown3bbsInfoWidget):
   """Locators for Audit settings 3BBS dropdown on Info page and Info panel.
   """
-  INFO_DROPDOWN = Dropdown3bbsInfoWidget.INFO_DROPDOWN
+  INFO_3BBS_DROPDOWN = CommonDropdown3bbsInfoWidget.INFO_3BBS_DROPDOWN
   BUTTON_3BBS_UPDATE = (
-      By.CSS_SELECTOR, INFO_DROPDOWN + " snapshot-scope-update")
-  BUTTON_3BBS_CLONE = (By.CSS_SELECTOR, INFO_DROPDOWN + " object-cloner")
+      By.CSS_SELECTOR, INFO_3BBS_DROPDOWN + " snapshot-scope-update")
+  BUTTON_3BBS_CLONE = (By.CSS_SELECTOR, INFO_3BBS_DROPDOWN + " object-cloner")
+
+
+class CommonDropdown3bbsTreeView(object):
+  """Locators for common settings 3BBS dropdown on Tree View."""
+  TREE_VIEW_3BBS_DROPDOWN = (
+      "{} " + Common.TREE_LIST + " .tree-action-list-items")
+  # user input elements
+  BUTTON_3BBS_IMPORT = TREE_VIEW_3BBS_DROPDOWN + " .fa-cloud-upload"
+  BUTTON_3BBS_EXPORT = TREE_VIEW_3BBS_DROPDOWN + " .fa-download"
+  BUTTON_3BBS_SELECT_CHILD_TREE = TREE_VIEW_3BBS_DROPDOWN + " .fa-share-alt"
+
+
+class AssessmentsDropdown3bbsTreeView(CommonDropdown3bbsTreeView):
+  """Locators for Assessments settings 3BBS dropdown on Tree View."""
+  TREE_VIEW_3BBS_DROPDOWN = CommonDropdown3bbsTreeView.TREE_VIEW_3BBS_DROPDOWN
+  BUTTON_3BBS_GENERATE = TREE_VIEW_3BBS_DROPDOWN + " .fa-magic"
 
 
 class TreeView(object):
@@ -854,12 +880,12 @@ class TreeView(object):
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
   ITEM_EXPAND_BUTTON = " .openclose"
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
+  NO_RESULTS_MESSAGE = (By.CSS_SELECTOR, ".tree-no-results-message")
   BUTTON_SHOW_FIELDS = "{} " + Common.TREE_HEADER + " .fa-bars"
-  # 3BBS dropdown
+  # user input elements
   BUTTON_3BBS = "{} " + Common.TREE_LIST + " .btn-draft"
-  BUTTON_3BBS_CREATE = "{} " + Common.TREE_LIST + " .create-button"
-  BUTTON_3BBS_GENERATE = (
-      "{} " + Common.TREE_LIST + " .tree-action-list-items .fa-magic")
+  BUTTON_CREATE = "{} " + Common.TREE_LIST + " .create-button"
+  BUTTON_MAP = "{} " + Common.TREE_LIST + " .map-button"
 
 
 class BaseWidgetGeneric(object):
@@ -878,7 +904,7 @@ class BaseWidgetGeneric(object):
       _FILTER_DROPDOWN_ELEMENTS = \
           _FILTER_DROPDOWN + " .multiselect-dropdown__element"
       cls.TEXTFIELD_TO_FILTER = (
-          By.CSS_SELECTOR, str(_FILTER + " .tree-filter__expression-holder")
+          By.CSS_SELECTOR, str(_FILTER + " .tree-filter__input")
             .format(cls._object_name))
       cls.BUTTON_FILTER = (
           By.CSS_SELECTOR,
@@ -904,67 +930,60 @@ class BaseWidgetGeneric(object):
 class WidgetAudits(BaseWidgetGeneric):
   """Locators for Audits generic widgets."""
   _object_name = objects.get_singular(objects.AUDITS)
-  widget_name = url.Widget.AUDITS
 
 
 class WidgetAssessments(BaseWidgetGeneric):
   """Locators for Assessments generic widgets."""
   _object_name = objects.get_singular(objects.ASSESSMENTS)
-  widget_name = url.Widget.ASSESSMENTS
 
 
 class WidgetControls(BaseWidgetGeneric):
   """Locators for Controls generic widgets."""
   _object_name = objects.get_singular(objects.CONTROLS)
-  widget_name = url.Widget.CONTROLS
 
 
 class WidgetProducts(BaseWidgetGeneric):
   """Locators for Products generic widgets."""
-  _object_name = "product"
+  _object_name = objects.get_singular(objects.PRODUCTS)
 
 
 class WidgetProjects(BaseWidgetGeneric):
   """Locators for Projects generic widgets."""
-  _object_name = "project"
+  _object_name = objects.get_singular(objects.PROJECTS)
 
 
 class WidgetSystems(BaseWidgetGeneric):
   """Locators for Systems generic widgets."""
-  _object_name = "system"
+  _object_name = objects.get_singular(objects.SYSTEMS)
 
 
 class WidgetDataAssets(BaseWidgetGeneric):
   """Locators for DataAssets generic widgets."""
-  _object_name = "data_asset"
+  _object_name = objects.get_singular(objects.PROJECTS)
 
 
 class WidgetProcesses(BaseWidgetGeneric):
   """Locators for Processes generic widgets."""
-  _object_name = "process"
+  _object_name = objects.get_singular(objects.PROCESSES)
 
 
 class WidgetIssues(BaseWidgetGeneric):
   """Locators for Issues generic widgets"""
-  _object_name = "issue"
-  widget_name = url.Widget.ISSUES
+  _object_name = objects.get_singular(objects.ISSUES)
 
 
 class WidgetPrograms(BaseWidgetGeneric):
   """Locators for Programs generic widgets"""
-  _object_name = "program"
-  widget_name = url.Widget.PROGRAMS
+  _object_name = objects.get_singular(objects.PROGRAMS)
 
 
 class WidgetAssessmentTemplates(BaseWidgetGeneric):
   """Locators for Assessment Templates generic widgets."""
   _object_name = objects.get_singular(objects.ASSESSMENT_TEMPLATES)
-  widget_name = url.Widget.ASSESSMENT_TEMPLATES
 
 
 class AdminCustomAttributes(object):
   """Locators for Widget custom attributes on Admin Dashboard."""
-  widget_name = url.Widget.CUSTOM_ATTRIBUTES
 
   class _Locator(object):
     """Locators for Widget custom attributes on Admin Dashboard."""

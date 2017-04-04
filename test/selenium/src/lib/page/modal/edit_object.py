@@ -9,12 +9,11 @@ from lib.page.modal import base as modal_base, delete_object
 
 class _EditModal(modal_base.BaseModal):
   """Modal for edit objects."""
-  _button_delete_locator = locator.ModalEditObject.BUTTON_DELETE
 
   def delete_object(self):
     """Return: delete_object.DeleteObjectModal
     """
-    self._driver.find_element(*self._button_delete_locator).click()
+    self._driver.find_element(*locator.ModalEditObject.BUTTON_DELETE).click()
     return delete_object.DeleteObjectModal(self._driver)
 
   @decorator.handle_alert

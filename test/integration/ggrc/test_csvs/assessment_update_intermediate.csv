@@ -1,9 +1,9 @@
 Object type,,,,,,,,,,,,
-Assessment,Code*,Audit*,Title*,Description,Notes,State*,Assignee*,Creator*,,map: Market,url,evidence
+Assessment,Code*,Audit*,Title*,Description,Notes,State*,Assignees*,Creators*,,map: Market,url,evidence
 ,Assessment 1,Audit,Assessment title 1,Some desc 1,Edited notes,NOT STARTED,"user1@a.com
 user2@a.com","user2@a.com
 user3@a.com",,,"a.b.com
-c.d.com",http://i.imgur.com/Lppr247.jpg evidence title 1
+c d com",http://i.imgur.com/Lppr247.jpg evidence title 1
 ,Assessment 2,Audit,Assessment title 2,Some desc 2,notes 2,Ready for Review,user1@a.com,user2@a.com,,,,
 ,Assessment 3,Audit,Assessment title 3,Some desc 3,notes 3,Completed,user1@a.com,user2@a.com,,,,
 ,Assessment 4,Audit,Assessment title 4,Some desc 4,notes 4,Verified,user1@a.com,user2@a.com,,,,

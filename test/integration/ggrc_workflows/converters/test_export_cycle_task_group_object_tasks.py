@@ -96,3 +96,16 @@ class TestExportTasks(TestCase):
       ).one()
       self.assertSlugs("task assignee", task.contact.email, [task.slug])
       self.assertSlugs("task assignee", task.contact.name, [task.slug])
+
+  def test_filter_by_task_comment(self):
+    """Test filter by comment"""
+    task_id = self.generate_tasks_for_cycle(4)[0]
+    comment_text = "123"
+    task = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id == task_id
+    ).one()
+    factories.CycleTaskEntryFactory(
+        cycle_task_group_object_task=task,
+        description=comment_text,
+    )
+    self.assertSlugs("task comment", comment_text, [task.slug])

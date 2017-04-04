@@ -13,6 +13,7 @@ from sqlalchemy import orm
 from ggrc import db
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.recordbuilder import fts_record_for
+from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
 from ggrc.models import reflection
@@ -26,7 +27,8 @@ from ggrc_workflows.models import cycle_task_group
 
 class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
                mixins.Described, mixins.Titled, mixins.Slugged,
-               mixins.Notifiable, mixins.Stateful, mixins.Base, db.Model):
+               mixins.Notifiable, mixins.Stateful, mixins.Base, Indexed,
+               db.Model):
   """Basic Workflow first class object.
   """
   __tablename__ = 'workflows'

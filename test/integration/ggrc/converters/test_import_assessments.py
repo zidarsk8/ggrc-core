@@ -156,7 +156,7 @@ class TestAssessmentImport(TestCase):
     # Check that there are only the two new URLs present in asessment 1
     url_titles = set(obj.title for obj in asmt1.related_objects()
                      if isinstance(obj, models.Document))
-    self.assertEqual(url_titles, set(["a.b.com", "c.d.com"]))
+    self.assertEqual(url_titles, set(["a.b.com", "c d com"]))
 
   def test_assessment_warnings_errors(self):
     """ Test full assessment import with warnings and errors
@@ -209,7 +209,6 @@ class TestAssessmentImport(TestCase):
                     column_name="State",
                     value="open",
                 ),
-                errors.WRONG_VALUE.format(line=3, column_name="Url"),
             },
         }
     }
@@ -274,8 +273,8 @@ class TestAssessmentImport(TestCase):
         ("object_type", "Assessment"),
         ("Code*", slug),
         ("Audit*", audit.slug),
-        ("Assignee*", models.Person.query.all()[0].email),
-        ("Creator", models.Person.query.all()[0].email),
+        ("Assignees*", models.Person.query.all()[0].email),
+        ("Creators", models.Person.query.all()[0].email),
         ("Title", "Strange title"),
         ("map:control", control.slug),
     ]))

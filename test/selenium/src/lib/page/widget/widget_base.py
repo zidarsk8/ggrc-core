@@ -14,14 +14,14 @@ from lib.utils.string_utils import get_bool_from_string
 
 class _Modal(base.Modal):
   """Base model for Edit modal."""
-  _locator = locator.ModalCustomAttribute
+  _locators = locator.ModalCustomAttribute
 
   def __init__(self, driver):
     super(_Modal, self).__init__(driver)
     self.ui_attribute_title = base.TextInputField(
-        self._driver, self._locator.UI_ATTRIBUTE_TITLE)
+        self._driver, self._locators.UI_ATTRIBUTE_TITLE)
     self.button_submit = base.Button(
-        self._driver, self._locator.BUTTON_SAVE_AND_CLOSE)
+        self._driver, self._locators.BUTTON_SAVE_AND_CLOSE)
 
   def enter_title(self, title):
     self.ui_attribute_title.enter_text(title)
@@ -36,12 +36,12 @@ class _Modal(base.Modal):
 
 class CreateNewCustomAttributeModal(base.Modal):
   """Create new custom attribute modal."""
-  _locator = locator.ModalCustomAttribute
+  _locators = locator.ModalCustomAttribute
 
   def __init__(self, driver):
     super(CreateNewCustomAttributeModal, self).__init__(driver)
     self.button_add_more = base.Button(
-        self._driver, self._locator.BUTTON_ADD_ANOTHER)
+        self._driver, self._locators.BUTTON_ADD_ANOTHER)
 
   def save_and_add_another(self):
     """
@@ -53,11 +53,11 @@ class CreateNewCustomAttributeModal(base.Modal):
 
 class CustomAttributesItemContent(base.Component):
   """Model for 2-tier of custom attributes Tree View item."""
-  _locator = locator.CustomAttributesItemContent
+  _locators = locator.CustomAttributesItemContent
 
   def __init__(self, driver, item_text):
     super(CustomAttributesItemContent, self).__init__(driver)
-    self.button_add = base.Button(driver, self._locator.ADD_BTN)
+    self.button_add = base.Button(driver, self._locators.ADD_BTN)
     self.custom_attributes_list = []
     self._item_name = item_text
 
@@ -80,8 +80,8 @@ class CustomAttributesItemContent(base.Component):
     current opened content item.
     """
     for elem in selenium_utils.get_when_all_visible(self._driver,
-                                                    self._locator.ROW):
-      attr = [i.text for i in elem.find_elements(*self._locator.CELL_IN_ROW)]
+                                                    self._locators.ROW):
+      attr = [i.text for i in elem.find_elements(*self._locators.CELL_IN_ROW)]
       self.custom_attributes_list.append(
           CustomAttributeEntity(title=attr[0], ca_type=attr[1],
                                 is_mandatory=get_bool_from_string(attr[2]),
@@ -96,8 +96,9 @@ class CustomAttributesItemContent(base.Component):
     """Open Add Attribute modal and return Custom Attribute Modal."""
     selenium_utils.wait_until_stops_moving(self.button_add.element)
     selenium_utils.scroll_into_view(self._driver, self.button_add.element)
-    selenium_utils.get_when_clickable(self._driver, self._locator.ADD_BTN)
-    selenium_utils.get_when_invisible(self._driver, self._locator.TREE_SPINNER)
+    selenium_utils.get_when_clickable(self._driver, self._locators.ADD_BTN)
+    selenium_utils.get_when_invisible(
+        self._driver, self._locators.TREE_SPINNER)
     self.button_add.click()
     return CustomAttributeModal(self._driver)
 
@@ -108,8 +109,8 @@ class CustomAttributesItemContent(base.Component):
     Return: lib.page.widget.widget_base.CustomAttributeModal
     """
     # check that the buttons are loaded
-    selenium_utils.get_when_clickable(self._driver, self._locator.EDIT_BTN)
-    elements = self._driver.find_elements(self._locator.EDIT_BTN)
+    selenium_utils.get_when_clickable(self._driver, self._locators.EDIT_BTN)
+    elements = self._driver.find_elements(self._locators.EDIT_BTN)
     selenium_utils.scroll_into_view(self._driver, elements[num]).click()
     return CustomAttributeModal(self._driver)
 
@@ -120,31 +121,31 @@ class CustomAttributeModal(_Modal):
   def __init__(self, driver):
     super(CustomAttributeModal, self).__init__(driver)
     self.attribute_title = base.Label(
-        self._driver, self._locator.ATTRIBUTE_TITLE)
-    self.inline_help = base.Label(self._driver, self._locator.INLINE_HELP)
+        self._driver, self._locators.ATTRIBUTE_TITLE)
+    self.inline_help = base.Label(self._driver, self._locators.INLINE_HELP)
     self.attribute_type = base.Label(
-        self._driver, self._locator.ATTRIBUTE_TYPE)
-    self.placeholder = base.Label(self._driver, self._locator.PLACEHOLDER)
-    self.mandatory = base.Label(self._driver, self._locator.MANDATORY)
+        self._driver, self._locators.ATTRIBUTE_TYPE)
+    self.placeholder = base.Label(self._driver, self._locators.PLACEHOLDER)
+    self.mandatory = base.Label(self._driver, self._locators.MANDATORY)
     self.ui_inline_help = None
     self.ui_placeholder = None
     self.checkbox_mandatory = base.Checkbox(
-        self._driver, self._locator.CHECKBOX_MANDATORY)
+        self._driver, self._locators.CHECKBOX_MANDATORY)
     self.attribute_type_selector = base.DropdownStatic(
-        self._driver, self._locator.ATTRIBUTE_TYPE_SELECTOR,
-        self._locator.ATTRIBUTE_TYPE_OPTIONS)
+        self._driver, self._locators.ATTRIBUTE_TYPE_SELECTOR,
+        self._locators.ATTRIBUTE_TYPE_OPTIONS)
     self.ui_possible_values = None
 
   def enter_inline_help(self, inline_help):
     """Fill 'Inline help' field."""
     self.ui_inline_help = base.TextInputField(
-        self._driver, self._locator.UI_INLINE_HELP)
+        self._driver, self._locators.UI_INLINE_HELP)
     self.ui_inline_help.enter_text(inline_help)
 
   def enter_placeholder(self, placeholder):
     """Fill 'Placeholder' field."""
     self.ui_placeholder = base.TextInputField(
-        self._driver, self._locator.UI_PLACEHOLDER)
+        self._driver, self._locators.UI_PLACEHOLDER)
     self.ui_placeholder.enter_text(placeholder)
 
   def set_mandatory(self):
@@ -158,7 +159,7 @@ class CustomAttributeModal(_Modal):
   def enter_possible_values(self, values_string):
     """Fill 'Possible values' field for 'Dropdown' type of CustomAttribute."""
     self.ui_possible_values = base.TextInputField(
-        self._driver, self._locator.UI_POSSIBLE_VALUES)
+        self._driver, self._locators.UI_POSSIBLE_VALUES)
     self.ui_possible_values.enter_text(values_string)
 
 
@@ -172,6 +173,6 @@ class DynamicTreeToggle(base.Toggle):
 
 class WidgetAdminCustomAttributes(base.Widget):
   """Base model for custom attributes on Admin Dashboard page."""
-  _locator = locator.AdminCustomAttributes
+  _locators = locator.AdminCustomAttributes
   URL = (environment.APP_URL + url.ADMIN_DASHBOARD +
          url.Widget.CUSTOM_ATTRIBUTES)

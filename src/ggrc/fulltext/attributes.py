@@ -1,6 +1,10 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+""" This module collect all custom full text attributes classes"""
+
+from ggrc.utils import date_parsers
+
 EMPTY_SUBPROPERTY_KEY = ''
 
 
@@ -15,8 +19,9 @@ class FullTextAttr(object):
   attribute value.
   If value is callable, then the stored value will be the result of
   called value with current instance as attribute.
-  Subproperties may be empty or the list of strings. Each element of that list
-  Should be an attribute of the stored value.
+  Subproperties may be empty or a list of strings. Each element of the list
+  should be an attribute of the stored value.
+  The first subproperty in the list - the one used for sorting.
   """
 
   SUB_KEY_TMPL = "{id_val}-{sub}"
@@ -26,6 +31,7 @@ class FullTextAttr(object):
     self.value = value
     self.subproperties = subproperties or [EMPTY_SUBPROPERTY_KEY]
     self.with_template = with_template
+    self.is_sortable = len(self.subproperties) > 1
 
   def get_value_for(self, instance):
     """Get value from sended instance using 'value' rule"""
@@ -37,13 +43,25 @@ class FullTextAttr(object):
     """Collect property dict for sended instance"""
     value = self.get_value_for(instance)
     results = {}
+    sorted_dict = {}
+    sorting_subprop = self.subproperties[0]
     for subprop in self.subproperties:
       if value is not None and subprop != EMPTY_SUBPROPERTY_KEY:
         subprop_key = self.SUB_KEY_TMPL.format(id_val=value.id, sub=subprop)
-        results[subprop_key] = getattr(value, subprop)
+        result = getattr(value, subprop)
+        results[subprop_key] = result
+        if result and subprop == sorting_subprop:
+          sorted_dict[value.id] = result
       else:
         results[subprop] = value
+    if self.is_sortable:
+      results['__sort__'] = ':'.join(sorted(sorted_dict.values()))
     return results
+
+  # pylint: disable=unused-argument
+  @staticmethod
+  def get_filter_value(value, operation):
+    return value
 
 
 class MultipleSubpropertyFullTextAttr(FullTextAttr):
@@ -64,12 +82,69 @@ class MultipleSubpropertyFullTextAttr(FullTextAttr):
     """Collect property for sended instance"""
     values = self.get_value_for(instance)
     results = {}
+    sorted_dict = {}
+    sorting_subprop = self.subproperties[0]
     for sub in self.subproperties:
       for value in values:
         if value is not None:
           sub_key = self.SUB_KEY_TMPL.format(id_val=value.id, sub=sub)
-          results[sub_key] = getattr(value, sub)
+          result = getattr(value, sub)
+          results[sub_key] = result
+          if result and sub == sorting_subprop:
+            sorted_dict[value.id] = result
         else:
           sub_key = self.SUB_KEY_TMPL.format(id_val='EMPTY', sub=sub)
           results[sub_key] = None
+    if self.is_sortable:
+      results['__sort__'] = ':'.join(sorted(sorted_dict.values()))
     return results
+
+
+class DatetimeValue(object):  # pylint: disable=too-few-public-methods
+  """Mixin setup if expected filter value is datetime"""
+
+  @staticmethod
+  def get_filter_value(value, operation):
+    """returns parsed datetime pairs for selected operation"""
+    converted_pairs = date_parsers.parse_date(unicode(value))
+    if not converted_pairs:
+      return
+    date_dict = {
+        "=": converted_pairs,
+        ">": (converted_pairs[1], None),
+        "<": (None, converted_pairs[0]),
+        ">=": (converted_pairs[0], None),
+        "<=": (None, converted_pairs[1]),
+    }
+    return date_dict.get(operation)
+
+
+class DateValue(DatetimeValue):  # pylint: disable=too-few-public-methods
+  """Mixin setup if expected filter value is date"""
+
+  def get_filter_value(self, value, operation):
+    results = super(DateValue, self).get_filter_value(value, operation)
+    if not results:
+      return
+    return [i.date() if i else i for i in results]
+
+
+DatetimeFullTextAttr = type(
+    "DatetimeFullTextAttr", (DatetimeValue, FullTextAttr), {})
+
+
+DateFullTextAttr = type("DateFullTextAttr", (DateValue, FullTextAttr), {})
+
+
+DatetimeMultipleSubpropertyFullTextAttr = type(
+    "DatetimeMultipleSubpropertyFullTextAttr",
+    (DatetimeValue, MultipleSubpropertyFullTextAttr),
+    {},
+)
+
+
+DateMultipleSubpropertyFullTextAttr = type(
+    "DateMultipleSubpropertyFullTextAttr",
+    (DateValue, MultipleSubpropertyFullTextAttr),
+    {},
+)

@@ -36,6 +36,7 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.mixins.customattributable import CustomAttributable
 from ggrc.models.mixins.notifiable import Notifiable
 from ggrc.utils import create_stub
+from ggrc.fulltext import attributes
 
 
 # pylint: disable=invalid-name
@@ -158,12 +159,22 @@ class ChangeTracked(object):
       'updated_at',
   ]
   _fulltext_attrs = [
-      'created_at',
-      'updated_at',
-      'modified_by'
+      attributes.DatetimeFullTextAttr('created_at', 'created_at'),
+      attributes.DatetimeFullTextAttr('updated_at', 'updated_at'),
+      attributes.FullTextAttr("modified_by", "modified_by", ["name", "email"]),
   ]
 
   _update_attrs = []
+  _aliases = {
+      "updated_at": {
+          "display_name": "Last Updated",
+          "filter_only": True,
+      },
+      "created_at": {
+          "display_name": "Created On",
+          "filter_only": True,
+      },
+  }
 
 
 class Titled(object):
@@ -307,8 +318,8 @@ class Timeboxed(object):
   }
 
   _fulltext_attrs = [
-      'start_date',
-      'end_date'
+      attributes.DateFullTextAttr('start_date', 'start_date'),
+      attributes.DateFullTextAttr('end_date', 'end_date'),
   ]
 
 
@@ -383,7 +394,7 @@ class FinishedDate(object):
   }
 
   _fulltext_attrs = [
-      'finished_date',
+      attributes.DateFullTextAttr('finished_date', 'finished_date'),
   ]
 
   @validates('status')
@@ -441,7 +452,7 @@ class VerifiedDate(object):
   }
 
   _fulltext_attrs = [
-      "verified_date",
+      attributes.DateFullTextAttr("verified_date", "verified_date"),
       "verified",
   ]
 
@@ -619,6 +630,28 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
 
     return target
 
+  CACHED_ATTRIBUTE_MAP = None
+
+  @classmethod
+  def attributes_map(cls):
+    if cls.CACHED_ATTRIBUTE_MAP:
+      return cls.CACHED_ATTRIBUTE_MAP
+    aliases = AttributeInfo.gather_aliases(cls)
+    cls.CACHED_ATTRIBUTE_MAP = {}
+    for key, value in aliases.items():
+      if isinstance(value, dict):
+        name = value["display_name"]
+        filter_by = None
+        if value.get("filter_by"):
+          filter_by = getattr(cls, value["filter_by"], None)
+      else:
+        name = value
+        filter_by = None
+      if not name:
+        continue
+      cls.CACHED_ATTRIBUTE_MAP[name.lower()] = (key.lower(), filter_by)
+    return cls.CACHED_ATTRIBUTE_MAP
+
 
 class Slugged(Base):
 
@@ -737,7 +770,17 @@ class WithContact(object):
     )
 
   _publish_attrs = ['contact', 'secondary_contact']
-  _fulltext_attrs = ['contact', 'secondary_contact']
+  _fulltext_attrs = [
+      attributes.FullTextAttr(
+          "contact",
+          "contact",
+          ["name", "email"]
+      ),
+      attributes.FullTextAttr(
+          'secondary_contact',
+          'secondary_contact',
+          ["name", "email"]),
+  ]
   _aliases = {
       "contact": {
           "display_name": "Primary Contact",

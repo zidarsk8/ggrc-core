@@ -9,6 +9,7 @@
 import pytest    # pylint: disable=import-error
 
 from lib import base
+from lib.constants import objects
 from lib.page import dashboard, lhn
 from lib.page.widget import generic_widget
 from lib.utils import conftest_utils, selenium_utils
@@ -27,7 +28,8 @@ class TestMyWorkPage(base.Test):
       (controls_widget.select_member_by_num(0).
        open_info_3bbs().select_delete().confirm_delete())
       controls_widget.wait_member_deleted(counter)
-    assert generic_widget.Controls(selenium).members_listed == []
+    assert generic_widget.Controls(
+        selenium, objects.CONTROLS).members_listed == []
 
   @pytest.mark.smoke_tests
   def test_redirect(self, selenium):

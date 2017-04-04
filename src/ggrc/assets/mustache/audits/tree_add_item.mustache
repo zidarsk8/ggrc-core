@@ -21,6 +21,7 @@
     {{/is_allowed}}
     {{/if}}
 {{else}}
+    {{^if_instance_of parent_instance 'Assessment'}}
     {{#is_allowed_to_map parent_instance model.shortName}}
     {{#if allow_mapping_or_creating}}
       <a
@@ -39,5 +40,6 @@
       </a>
     {{/if}}
     {{/is_allowed_to_map}}
+    {{/if}}
 {{/if_instance_of}}
 {{/if}}

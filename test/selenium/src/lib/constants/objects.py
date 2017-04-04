@@ -34,16 +34,15 @@ RISKS = "risks"
 THREATS = "threats"
 RISK_ASSESSMENTS = "risk_assessments"
 
-ALL_CA_OBJECTS = (WORKFLOWS, RISK_ASSESSMENTS, THREATS, RISKS,
-                  PROGRAMS, AUDITS, OBJECTIVES, SECTIONS,
-                  CONTROLS, ISSUES, ASSESSMENTS, STANDARDS,
-                  REGULATIONS, POLICIES, CONTRACTS, CLAUSES,
-                  VENDORS, PEOPLE, ACCESS_GROUPS,
-                  ORG_GROUPS, PRODUCTS, MARKETS, PROCESSES,
-                  FACILITIES, PROJECTS, DATA_ASSETS, SYSTEMS)
+ALL_SNAPSHOTABLE_OBJS = (
+    ACCESS_GROUPS, CLAUSES, CONTRACTS, CONTROLS, DATA_ASSETS, FACILITIES,
+    MARKETS, OBJECTIVES, ORG_GROUPS, POLICIES, PROCESSES, PRODUCTS,
+    REGULATIONS, SECTIONS, STANDARDS, SYSTEMS, VENDORS, RISKS, THREATS,
+    RISK_ASSESSMENTS, PROJECTS
+)
 
-# templates
-COUNT = "count"
+ALL_CA_OBJS = ALL_SNAPSHOTABLE_OBJS + (
+    WORKFLOWS, PROGRAMS, AUDITS, ISSUES, ASSESSMENTS, PEOPLE)
 
 
 def _get_singular(plurals):
@@ -87,6 +86,7 @@ def get_normal_form(obj_name, with_space=True):
     return normal.replace(" ", "")
 
 
-ALL_PLURAL = [
-    k for k in globals().keys() if not k.startswith("_") or k == "ALL"][1:]
+ALL_PLURAL = [k for k in globals().keys() if
+              not k.startswith("_") and "ALL" not in k and k.isupper()]
+
 ALL_SINGULAR = _get_singular(ALL_PLURAL)

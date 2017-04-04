@@ -15,19 +15,19 @@ class Widget(base.Widget):
 
 class Events(Widget):
   """Event widget on Admin Dashboard."""
-  _locator = locator.WidgetAdminEvents
+  _locators = locator.WidgetAdminEvents
 
   URL = environment.APP_URL + url.ADMIN_DASHBOARD + url.Widget.EVENTS
 
   def __init__(self, driver):
     super(Events, self).__init__(driver)
-    self.widget_header = base.Label(driver, self._locator.TREE_VIEW_HEADER)
+    self.widget_header = base.Label(driver, self._locators.TREE_VIEW_HEADER)
 
   def get_events(self):
     """Get list of elements that displayed in Tree View on Event widget."""
     selenium_utils.get_when_clickable(
-        self._driver, self._locator.FIRST_TREE_VIEW_ITEM)
-    return self._driver.find_elements(*self._locator.TREE_VIEW_ITEMS)
+        self._driver, self._locators.FIRST_TREE_VIEW_ITEM)
+    return self._driver.find_elements(*self._locators.TREE_VIEW_ITEMS)
 
 
 class People(Widget):
@@ -37,14 +37,13 @@ class People(Widget):
 
 class Roles(Widget):
   """Admin roles widget on Admin Dashboard."""
-  _locator = locator.WidgetAdminRoles
 
   URL = environment.APP_URL + url.ADMIN_DASHBOARD + url.Widget.ROLES
 
   def __init__(self, driver):
     super(Roles, self).__init__(driver)
     self.roles_tree_view = base.TreeView(
-        self._driver, obj_name=self._locator.widget_name)
+        self._driver, widget_name=url.Widget.ROLES)
 
   def get_role_scopes_text_as_dict(self):
     """Get dictionary of labels that displayed in Tree View on Event widget."""
@@ -54,14 +53,14 @@ class Roles(Widget):
 
 class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
   """Custom attributes widget on Admin Dashboard page."""
-  _locator = locator.AdminCustomAttributes
+
   URL = (environment.APP_URL + url.ADMIN_DASHBOARD +
          url.Widget.CUSTOM_ATTRIBUTES)
 
   def __init__(self, driver):
     super(CustomAttributes, self).__init__(driver)
     self.ca_tree_view = base.TreeView(
-        self._driver, obj_name=self._locator.widget_name)
+        self._driver, widget_name=url.Widget.CUSTOM_ATTRIBUTES)
 
   def expand_collapse_group(self, item_title, expand=True):
     """Expand/collapse 2-nd tier of Tree View item."""
@@ -91,7 +90,7 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
     text = ("New Custom Attribute Definition {} added successfully"
             .format(ca_title))
     selenium_utils.wait_for_element_text(
-        self._driver, self._locator.CA_ADDED_SUCCESS_ALERT, text)
+        self._driver, self._locators.CA_ADDED_SUCCESS_ALERT, text)
 
   def get_custom_attributes_list(self, ca_group):
     """Collect custom attributes from expanded custom attribute group

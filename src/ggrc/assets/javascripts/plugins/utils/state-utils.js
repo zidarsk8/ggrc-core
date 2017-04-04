@@ -175,13 +175,9 @@
      * @return {Array} List of default states for model
      */
     function getDefaultStatesForModel(model) {
-      var states = [];
-
-      if (GGRC.Utils.CurrentPage.isMyAssessments()) {
-        states = ['Not Started', 'In Progress'];
-      }
-
-      return states;
+      return GGRC.Utils.CurrentPage.isMyAssessments() ?
+        ['Not Started', 'In Progress'] :
+        getStatesForModel(model);
     }
 
     return {

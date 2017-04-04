@@ -7,7 +7,6 @@ from logging import getLogger
 
 from ggrc import db
 from ggrc import models
-from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user_id
 
@@ -43,7 +42,7 @@ class DocumentLinkHandler(handlers.ColumnHandler):
     for line in self.raw_value.splitlines():
       link, title = self._parse_line(line)
       if not (link and title):
-        return []
+        continue
       documents.append(models.Document(
           link=link,
           title=title,
@@ -125,9 +124,6 @@ class DocumentUrlHandler(DocumentLinkHandler):
       tuple containing a link and a title.
     """
     line = line.strip()
-    if len(line.split()) > 1:
-      self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
-      return None, None
     return line, line
 
   def get_value(self):

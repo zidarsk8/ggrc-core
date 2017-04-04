@@ -5,6 +5,7 @@
 
 from ggrc.builder import json
 from ggrc.converters.query_helper import QueryHelper
+from ggrc.models import inflector
 from ggrc.utils import benchmark
 
 
@@ -47,7 +48,7 @@ class QueryAPIQueryHelper(QueryHelper):
       if query_type not in {"values", "ids", "count"}:
         raise NotImplementedError("Only 'values', 'ids' and 'count' queries "
                                   "are supported now")
-      model = self.object_map[object_query["object_name"]]
+      model = inflector.get_model(object_query["object_name"])
       if query_type == "values":
         with benchmark("Get result set: get_results > _get_objects"):
           objects = self._get_objects(object_query)

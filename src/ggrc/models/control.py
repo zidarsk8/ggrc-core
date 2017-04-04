@@ -20,11 +20,12 @@ from ggrc.models.deferred import deferred
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.option import Option
-from ggrc.models.person import Person
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.models.utils import validate_option
+from ggrc.fulltext.mixin import Indexed
+from ggrc.fulltext import attributes
 
 
 class ControlCategory(CategoryBase):
@@ -109,7 +110,7 @@ class AssertionCategorized(Categorizable):
 class Control(HasObjectState, Relatable, CustomAttributable,
               Personable, ControlCategorized, AssertionCategorized,
               Hierarchical, Timeboxed, Ownable, Auditable,
-              TestPlanned, BusinessObject, db.Model):
+              TestPlanned, BusinessObject, Indexed, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
@@ -183,8 +184,15 @@ class Control(HasObjectState, Relatable, CustomAttributable,
       'means',
       'verify_frequency',
       'version',
-      'principal_assessor',
-      'secondary_assessor',
+      attributes.FullTextAttr(
+          "principal_assessor",
+          "principal_assessor",
+          ["name", "email"]
+      ),
+      attributes.FullTextAttr(
+          'secondary_assessor',
+          'secondary_assessor',
+          ["name", "email"]),
   ]
 
   _sanitize_html = [
@@ -210,12 +218,10 @@ class Control(HasObjectState, Relatable, CustomAttributable,
       },
       "fraud_related": "Fraud Related",
       "principal_assessor": {
-          "display_name": "Principal Assessor",
-          "filter_by": "_filter_by_principal_assessor",
+          "display_name": "Principal Assignee",
       },
       "secondary_assessor": {
-          "display_name": "Secondary Assessor",
-          "filter_by": "_filter_by_secondary_assessor",
+          "display_name": "Secondary Assignee",
       },
       "key_control": {
           "display_name": "Significance",
@@ -238,20 +244,6 @@ class Control(HasObjectState, Relatable, CustomAttributable,
   def _filter_by_means(cls, predicate):
     return Option.query.filter(
         (Option.id == cls.means_id) & predicate(Option.title)
-    ).exists()
-
-  @classmethod
-  def _filter_by_principal_assessor(cls, predicate):
-    return Person.query.filter(
-        (Person.id == cls.principal_assessor_id) &
-        (predicate(Person.name) | predicate(Person.email))
-    ).exists()
-
-  @classmethod
-  def _filter_by_secondary_assessor(cls, predicate):
-    return Person.query.filter(
-        (Person.id == cls.secondary_assessor_id) &
-        (predicate(Person.name) | predicate(Person.email))
     ).exists()
 
   @classmethod

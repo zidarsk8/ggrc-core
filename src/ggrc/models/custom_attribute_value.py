@@ -17,9 +17,10 @@ from ggrc.models.mixins import Base
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.revision import Revision
 from ggrc import utils
+from ggrc.fulltext.mixin import Indexed
 
 
-class CustomAttributeValue(Base, db.Model):
+class CustomAttributeValue(Base, Indexed, db.Model):
   """Custom attribute value model"""
 
   __tablename__ = 'custom_attribute_values'

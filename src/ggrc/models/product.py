@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
+from ggrc.fulltext.mixin import Indexed
 from sqlalchemy.orm import validates
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
@@ -14,7 +15,8 @@ from ggrc.models.track_object_state import HasObjectState
 
 
 class Product(HasObjectState, CustomAttributable, Personable,
-              Relatable, Timeboxed, Ownable, BusinessObject, db.Model):
+              Relatable, Timeboxed, Ownable, BusinessObject, Indexed,
+              db.Model):
   __tablename__ = 'products'
 
   kind_id = deferred(db.Column(db.Integer), 'Product')

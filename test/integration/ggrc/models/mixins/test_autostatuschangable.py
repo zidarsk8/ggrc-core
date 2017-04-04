@@ -160,6 +160,26 @@ class TestMixinAutoStatusChangeable(TestCase):
     self.assertEqual(assessment.status,
                      models.Assessment.PROGRESS_STATE)
 
+    # test reverting an Assessment in review
+    assessment = self.change_status(assessment, assessment.DONE_STATE)
+    assessment = self.refresh_object(assessment)
+
+    self.modify_assignee(
+        assessment, "creator@example.com", "Creator,Assessor,Verifier")
+
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(assessment.status, models.Assessment.PROGRESS_STATE)
+
+    # test reverting a completed Assessment
+    assessment = self.change_status(assessment, assessment.FINAL_STATE)
+    assessment = self.refresh_object(assessment)
+
+    self.modify_assignee(
+        assessment, "creator@example.com", "Creator,Verifier")
+
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(assessment.status, models.Assessment.PROGRESS_STATE)
+
   def test_modifying_person_custom_attribute_changes_status(self):
     """Test that changing a Person CA changes the status to in progress."""
     person_id = models.Person.query.first().id
@@ -190,6 +210,21 @@ class TestMixinAutoStatusChangeable(TestCase):
     custom_attribute_values = [{
         "custom_attribute_id": ca_def.id,
         "attribute_value": "Person:" + str(another_person.id),  # make a change
+    }]
+    self.api_helper.modify_object(assessment, {
+        "custom_attribute_values": custom_attribute_values
+    })
+
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(assessment.status, models.Assessment.PROGRESS_STATE)
+
+    # perform the same test for the "ready for review" state
+    assessment = self.change_status(assessment, assessment.DONE_STATE)
+    assessment = self.refresh_object(assessment)
+
+    custom_attribute_values = [{
+        "custom_attribute_id": ca_def.id,
+        "attribute_value": "Person:" + str(person_id),  # make a change
     }]
     self.api_helper.modify_object(assessment, {
         "custom_attribute_values": custom_attribute_values

@@ -168,7 +168,7 @@ CMS.Models.Directive("CMS.Models.Policy", {
       {
         attr_title: 'Kind/Type',
         attr_name: 'kind',
-        attr_sort_field: 'kind.title'
+        attr_sort_field: 'kind'
       },
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Stop Date', attr_name: 'end_date'},

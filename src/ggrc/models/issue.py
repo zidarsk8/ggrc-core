@@ -14,11 +14,12 @@ from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
+from ggrc.fulltext.mixin import Indexed
 
 
 class Issue(HasObjectState, TestPlanned, CustomAttributable, EvidenceURL,
             Personable, Timeboxed, Ownable, Relatable, AuditRelationship,
-            BusinessObject, db.Model):
+            BusinessObject, Indexed, db.Model):
   """Issue Model."""
 
   __tablename__ = 'issues'

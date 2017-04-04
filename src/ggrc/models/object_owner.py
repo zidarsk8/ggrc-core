@@ -1,14 +1,14 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from sqlalchemy import and_, or_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
-from ggrc.models.person import Person
 from ggrc.models.mixins import Base
 from ggrc.models.reflection import PublishOnly
+from ggrc.fulltext.mixin import Indexed, ReindexRule
+from ggrc.fulltext.attributes import MultipleSubpropertyFullTextAttr
 
 
 class ObjectOwner(Base, db.Model):
@@ -59,6 +59,13 @@ class ObjectOwner(Base, db.Model):
 
 class Ownable(object):
 
+  AUTO_REINDEX_RULES = [
+      ReindexRule(
+          "ObjectOwner",
+          lambda x: [x.ownable] if isinstance(x.ownable, Indexed) else []
+      )
+  ]
+
   @declared_attr
   def object_owners(cls):
     cls.owners = association_proxy(
@@ -84,13 +91,12 @@ class Ownable(object):
   ]
   _include_links = []
   _fulltext_attrs = [
-      'owners',
+      MultipleSubpropertyFullTextAttr('owners', 'owners', ['name', 'email'])
   ]
   _aliases = {
       "owners": {
           "display_name": "Owner",
           "mandatory": True,
-          "filter_by": "_filter_by_owners",
       }
   }
 
@@ -101,11 +107,3 @@ class Ownable(object):
     query = super(Ownable, cls).eager_query()
     return cls.eager_inclusions(query, Ownable._include_links).options(
         orm.subqueryload('object_owners'))
-
-  @classmethod
-  def _filter_by_owners(cls, predicate):
-    return ObjectOwner.query.join(Person).filter(and_(
-        (ObjectOwner.ownable_id == cls.id),
-        (ObjectOwner.ownable_type == cls.__name__),
-        or_(predicate(Person.name), predicate(Person.email))
-    )).exists()

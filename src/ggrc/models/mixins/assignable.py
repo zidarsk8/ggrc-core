@@ -19,7 +19,6 @@ class Assignable(object):
 
   ASSIGNEE_TYPES = set(["Assignee"])
 
-  _fulltext_attrs = ['assignees']
   _publish_attrs = ["assignees"]
   _update_attrs = []
 
@@ -50,7 +49,7 @@ class Assignable(object):
     return assignees
 
   @property
-  def assignees_new(self):
+  def assignees_by_type(self):
     """Property that returns assignees.
 
     Returns:
@@ -85,8 +84,8 @@ class Assignable(object):
   def publish_assignees(self):
     """Serialize assignees to json.
 
-    Transforms the value of assignees_new property to basic structures (lists
-    and dicts) that are easily represented in json.
+    Transforms the value of assignees_by_type property to basic structures
+    (lists and dicts) that are easily represented in json.
     The people lists are sorted by names or emails.
 
     Returns:
@@ -99,7 +98,7 @@ class Assignable(object):
     return {
         role: [person.log_json_base() for person in
                sorted(people, key=lambda p: (p.name or p.email).lower())]
-        for role, people in self.assignees_new.items()
+        for role, people in self.assignees_by_type.items()
     }
 
   @classmethod

@@ -39,3 +39,9 @@ class Widget(object):
   CONTROLS = "#control_widget"
   ISSUES = "#issue_widget"
   PROGRAMS = "#program_widget"
+
+
+def get_widget_name_of_mapped_objs(obj_name):
+  """Get and return widget name for mapped objects (URL's parts for widgets)
+  based on object name."""
+  return "#" + get_singular(obj_name) + "_widget"
