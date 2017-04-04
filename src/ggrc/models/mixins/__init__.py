@@ -381,7 +381,7 @@ class FinishedDate(object):
   @declared_attr
   def finished_date(cls):
     return deferred(
-        db.Column(db.Date, nullable=True),
+        db.Column(db.DateTime, nullable=True),
         cls.__name__
     )
 
@@ -394,7 +394,7 @@ class FinishedDate(object):
   }
 
   _fulltext_attrs = [
-      attributes.DateFullTextAttr('finished_date', 'finished_date'),
+      attributes.DatetimeFullTextAttr('finished_date', 'finished_date'),
   ]
 
   @validates('status')
@@ -434,7 +434,7 @@ class VerifiedDate(object):
   @declared_attr
   def verified_date(cls):
     return deferred(
-        db.Column(db.Date, nullable=True),
+        db.Column(db.DateTime, nullable=True),
         cls.__name__
     )
 
@@ -452,7 +452,7 @@ class VerifiedDate(object):
   }
 
   _fulltext_attrs = [
-      attributes.DateFullTextAttr("verified_date", "verified_date"),
+      attributes.DatetimeFullTextAttr("verified_date", "verified_date"),
       "verified",
   ]
 
