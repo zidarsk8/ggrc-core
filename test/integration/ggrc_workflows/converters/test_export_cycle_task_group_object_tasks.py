@@ -92,20 +92,15 @@ class TestExportTasks(TestCase):
     self.assertSlugs("task comment", comment_text, [task.slug])
 
   @data(
-      ("status", "Task State"),
-      ("status", "task state"),
-      ("status", "task status"),
-      ("end_date", "Task Due Date"),
-      ("end_date", "task due date"),
-      ("end_date", "task end_date"),
-      ("start_date", "task Start Date"),
-      ("start_date", "task start_date"),
-      ("updated_at", "task Last updated"),
-      ("updated_at", "task last updated"),
-      ("updated_at", "task updated_at"),
+      ("status", ["Task State", "task state", "task status"]),
+      ("end_date", ["Task Due Date", "task due date", "task end_date"]),
+      (
+          "start_date",
+          ["task Start Date", "task start date", "task start_date"],
+      ),
   )
   @unpack
-  def test_filter_by_aliases(self, field, alias):
+  def test_filter_by_aliases(self, field, aliases):
     """Test filter by alias"""
     expected_results = defaultdict(list)
     tasks = CycleTaskGroupObjectTask.query.filter(
@@ -114,4 +109,29 @@ class TestExportTasks(TestCase):
     for task in tasks:
       expected_results[str(getattr(task, field))].append(task.slug)
     for value, slugs in expected_results.iteritems():
-      self.assertSlugs(alias, value, slugs)
+      for alias in aliases:
+        self.assertSlugs(alias, value, slugs)
+
+  @data(
+      (
+          "updated_at",
+          ["task Last updated", "task last updated", "task updated_at"],
+      ),
+      (
+          "created_at",
+          ["task Created On", "task created on", "task created_at"],
+      ),
+  )
+  @unpack
+  def test_filter_by_datetime_aliases(self, field, aliases):
+    """Test filter by datetime field and it's aliases"""
+    expected_results = defaultdict(list)
+    tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id.in_(self.generate_tasks_for_cycle(4))
+    ).all()
+    for task in tasks:
+      for value in self.generate_date_strings(getattr(task, field)):
+        expected_results[value].append(task.slug)
+    for value, slugs in expected_results.iteritems():
+      for alias in aliases:
+        self.assertSlugs(alias, value, slugs)
