@@ -276,11 +276,20 @@ class TestCase(BaseTestCase, object):
     self.assertEqual(sorted(slugs),
                      sorted([i["Code*"] for i in parsed_data]))
 
-  # pylint: disable=invalid-name
-  def assertFilterByDatetime(self, alias, datetime_value, slugs, formats=None):
-    """Assert slugs for each date format ent datetime"""
+  def generate_date_strings(self, datetime_value, formats=None):
+    """Generator datestrings
+
+    returns datestrings for sent formats
+    if it's empty returns datestrings for DEFAULT_DATETIME_FORMATS"""
+
     parts = ["year", "month", "day", "hour", "minute", "second"]
     kwargs = {i: getattr(datetime_value, i) for i in parts}
     formats = formats if formats is not None else self.DEFAULT_DATETIME_FORMATS
-    for f_str in formats:
-      self.assertSlugs(alias, f_str.format(**kwargs), slugs)
+    for f_string in formats:
+      yield f_string.format(**kwargs)
+
+  # pylint: disable=invalid-name
+  def assertFilterByDatetime(self, alias, datetime_value, slugs, formats=None):
+    """Assert slugs for each date format ent datetime"""
+    for date_string in self.generate_date_strings(datetime_value, formats):
+      self.assertSlugs(alias, date_string, slugs)

@@ -8,8 +8,9 @@
 from sqlalchemy import func
 from flask import json
 
-from ddt import ddt
 from ddt import data
+from ddt import ddt
+from ddt import unpack
 
 from ggrc import app
 from ggrc import views
@@ -464,6 +465,7 @@ class TestAuditSnapshotQueries(TestCase):
     }
 
 
+@ddt
 class TestSnapshotIndexing(BaseQueryAPITestCase):
   """Test suite to check indexing of special fields in Snapshots."""
 
@@ -662,3 +664,30 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
     self.assertListEqual([snap["child_id"]
                           for snap in order_by_assessor_result["values"]],
                          [control2_id, control1_id])
+
+  @data(
+      ("updated_at", ("updated_at", "Last Updated", "last updated")),
+      ("created_at", ("updated_at", "Created On", "Created On")),
+  )
+  @unpack
+  def test_filter_by_dt_field(self, field, aliases):
+    """Control Snapshots are filtered by datetime fields"""
+    program = factories.ProgramFactory()
+    control = factories.ControlFactory()
+    datetime_value = getattr(control, field)
+    factories.RelationshipFactory(source=program, destination=control)
+    self._create_audit(program=program, title="some title")
+    for date_string in self.generate_date_strings(datetime_value):
+      for alias in aliases:
+        query_dict = self._make_snapshot_query_dict(
+            "Control",
+            expression=[alias, "=", date_string]
+        )
+        filtered_controls = self._get_first_result_set(query_dict, "Snapshot")
+        self.assertEqual(
+            filtered_controls["count"],
+            1,
+            "empty results for alias {} and value {}".format(
+                alias, date_string
+            )
+        )
