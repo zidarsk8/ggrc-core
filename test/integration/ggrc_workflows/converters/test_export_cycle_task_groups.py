@@ -12,12 +12,14 @@ from integration.ggrc_workflows.models import factories
 from integration.ggrc.models.factories import PersonFactory
 from integration.ggrc import TestCase
 
-from ggrc.models.all_models import CycleTaskGroupObjectTask
+from ggrc.models.all_models import CycleTaskGroupObjectTask, CycleTaskGroup
 
 
 @ddt
 class TestExportTasks(TestCase):
   """Test imports for basic workflow objects."""
+
+  model = CycleTaskGroup
 
   def setUp(self):
     super(TestExportTasks, self).setUp()
@@ -48,25 +50,6 @@ class TestExportTasks(TestCase):
                                           task_group_task=task_group_task)
         results[task.id] = cycle_task_group.slug
     return results
-
-  # pylint: disable=invalid-name
-  def assertSlugs(self, field, value, slugs):
-    """assertion for search cycles for selected fields and values"""
-    search_request = [{
-        "object_name": "CycleTaskGroup",
-        "filters": {
-            "expression": {
-                "left": field,
-                "op": {"name": "="},
-                "right": value,
-            },
-        },
-        "fields": ["slug"],
-    }]
-    parsed_data = self.export_parsed_csv(search_request)["Cycle Task Group"]
-    self.assertEqual(sorted(slugs),
-                     sorted([i["Code*"] for i in parsed_data]))
-    self.assertEqual(len(slugs), len(parsed_data))
 
   @data(
       #  (Cycle count, tasks in cycle)

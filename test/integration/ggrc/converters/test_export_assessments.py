@@ -7,6 +7,7 @@ import datetime
 from ddt import data, ddt
 
 from ggrc import db
+from ggrc.models import all_models
 from integration.ggrc.models import factories
 from integration.ggrc import TestCase
 
@@ -14,6 +15,8 @@ from integration.ggrc import TestCase
 @ddt
 class TestExport(TestCase):
   """Test imports for assessment objects."""
+
+  model = all_models.Assessment
 
   def setUp(self):
     super(TestExport, self).setUp()
@@ -39,25 +42,6 @@ class TestExport(TestCase):
     )
     self.rel = factories.RelationshipFactory(source=self.comment,
                                              destination=self.assessment)
-
-  # pylint: disable=invalid-name
-  def assertSlugs(self, field, value, slugs):
-    """Assert slugs for selected search"""
-    search_request = [{
-        "object_name": "Assessment",
-        "filters": {
-            "expression": {
-                "left": field,
-                "op": {"name": "="},
-                "right": value,
-            },
-        },
-        "fields": ["slug"],
-    }]
-
-    parsed_data = self.export_parsed_csv(search_request)["Assessment"]
-    self.assertEqual(sorted(slugs),
-                     sorted([i["Code*"] for i in parsed_data]))
 
   def test_search_by_comment(self):
     self.assertSlugs("comment",
@@ -86,50 +70,30 @@ class TestExport(TestCase):
     db.session.commit()
     self.assertSlugs("comment", self.comment.description, [])
 
-  def filter_by_datetime(self, alias, value, slugs):
-    """Util function, check date for all valid formats"""
-    parts = ["year", "month", "day", "hour", "minute", "second"]
-    kwargs = {i: getattr(value, i) for i in parts}
-    formats = [
-        "{year}",
-        "{year}-{month}",
-        "{year}-{month}-{day}",
-        "{year}-{month}-{day} {hour}",
-        "{year}-{month}-{day} {hour}:{minute}",
-        "{year}-{month}-{day} {hour}:{minute}:{second}",
-        "{month}/{year}",
-        "{month}/{day}/{year}",
-        "{month}/{day}/{year} {hour}",
-        "{month}/{day}/{year} {hour}:{minute}",
-        "{month}/{day}/{year} {hour}:{minute}:{second}",
-    ]
-    for f_str in formats:
-      self.assertSlugs(alias, f_str.format(**kwargs), slugs)
-
   @data("created_at", "Created On", "created on")
   def test_filter_by_created_at(self, alias):
     """Test filter by created at"""
-    self.filter_by_datetime(alias,
-                            self.assessment.created_at,
-                            [self.assessment.slug])
+    self.assertFilterByDatetime(alias,
+                                self.assessment.created_at,
+                                [self.assessment.slug])
 
   @data("updated_at", "Last Updated", "Last Updated")
   def test_filter_by_updated_at(self, alias):
     """Test filter by updated at"""
-    self.filter_by_datetime(alias,
-                            self.assessment.updated_at,
-                            [self.assessment.slug])
+    self.assertFilterByDatetime(alias,
+                                self.assessment.updated_at,
+                                [self.assessment.slug])
 
   @data("finished_date", "Finished Date", "finished date")
   def test_filter_by_finished_date(self, alias):
     """Test filter by finished date"""
-    self.filter_by_datetime(alias,
-                            self.assessment.finished_date,
-                            [self.assessment.slug])
+    self.assertFilterByDatetime(alias,
+                                self.assessment.finished_date,
+                                [self.assessment.slug])
 
   @data("verified_date", "Verified Date", "verified date")
   def test_filter_by_verified_date(self, alias):
     """Test filter by verified date"""
-    self.filter_by_datetime(alias,
-                            self.assessment.verified_date,
-                            [self.assessment.slug])
+    self.assertFilterByDatetime(alias,
+                                self.assessment.verified_date,
+                                [self.assessment.slug])

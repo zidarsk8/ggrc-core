@@ -4,12 +4,15 @@
 
 """Tests for task group task specific export."""
 from ggrc import db
+from ggrc.models import all_models
 from integration.ggrc.models import factories
 from integration.ggrc import TestCase
 
 
 class TestExportControls(TestCase):
   """Test imports for basic control objects."""
+
+  model = all_models.Control
 
   def setUp(self):
     super(TestExportControls, self).setUp()
@@ -23,25 +26,6 @@ class TestExportControls(TestCase):
     self.control = factories.ControlFactory()
     self.owner_object = factories.OwnerFactory(person=self.basic_owner,
                                                ownable=self.control)
-
-  # pylint: disable=invalid-name
-  def assertSlugs(self, field, value, slugs):
-    """Assert slugs for selected search"""
-    search_request = [{
-        "object_name": "Control",
-        "filters": {
-            "expression": {
-                "left": field,
-                "op": {"name": "="},
-                "right": value,
-            },
-        },
-        "fields": ["slug"],
-    }]
-
-    parsed_data = self.export_parsed_csv(search_request)["Control"]
-    self.assertEqual(sorted(slugs),
-                     sorted([i["Code*"] for i in parsed_data]))
 
   def test_search_by_owner_email(self):
     self.assertSlugs("owners",
