@@ -18,7 +18,6 @@
     "jasmine-fixture": "1.3.4",
     "spinjs": "1.3.3",
     "fontawesome": "~4.7.0",
-    "quill": "~0.20.1",
     "clipboard": "~1.5.16"
   }
 }

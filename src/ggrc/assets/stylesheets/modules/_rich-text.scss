@@ -3,25 +3,37 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-.rich-text {
-  &__wrapper {
-    @include border-radius(2px);
+rich-text {
+  display: block;
+
+  .rich-text__wrapper {
     border: 1px solid $warmGray;
-    .inline-edit--active & {
-      @include border-radius(0);
+    border-radius: 2px;
+
+    .rich-text__toolbar {
       border: none;
-      margin: -2px -2px -2px -4px;
+      background: $itemBgnd;
+      border-top: 1px solid $warmGray;
+      padding: 3px;
+    }
+
+    .rich-text__content {
+      border: none;
+      padding: 8px 10px;
+
+      .ql-editor {
+        padding: 0;
+        min-height: 44px;
+      }
     }
   }
-  &__toolbar {
-    background: $itemBgnd;
-    border-top: 1px solid $warmGray;
-    padding: 3px !important;
-  }
-  &__content {
-    padding: 8px 10px !important;
-    .ql-editor {
-      min-height: 44px;
+
+  .inline-edit--active & {
+
+    .rich-text__wrapper {
+      border-radius: 0;
+      border: none;
+      margin: -2px -2px -2px -4px;
     }
   }
 }
