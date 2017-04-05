@@ -91,7 +91,7 @@ def _get_columns():
   return snapshot_columns, revision_columns
 
 
-def _get_custom_attribute_definitions():
+def _get_custom_attribute_dict():
   """Get fulltext indexable properties for all snapshottable objects
 
   Args:
@@ -231,7 +231,7 @@ def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
   snap_to_sid_cache = dict()
   search_payload = list()
 
-  cad_dict = _get_custom_attribute_definitions()
+  cad_dict = _get_custom_attribute_dict()
 
   snapshot_columns, revision_columns = _get_columns()
 
