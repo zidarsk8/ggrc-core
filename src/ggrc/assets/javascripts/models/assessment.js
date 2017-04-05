@@ -40,50 +40,65 @@
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       attr_list: [{
         attr_title: 'Title',
-        attr_name: 'title'
+        attr_name: 'title',
+        order: 1
       }, {
         attr_title: 'Code',
-        attr_name: 'slug'
+        attr_name: 'slug',
+        order: 4
       }, {
         attr_title: 'State',
-        attr_name: 'status'
+        attr_name: 'status',
+        order: 2
       }, {
         attr_title: 'Verified',
-        attr_name: 'verified'
+        attr_name: 'verified',
+        order: 3
       }, {
         attr_title: 'Last Updated',
-        attr_name: 'updated_at'
+        attr_name: 'updated_at',
+        order: 9
       }, {
         attr_title: 'Conclusion: Design',
-        attr_name: 'design'
+        attr_name: 'design',
+        order: 14
       }, {
         attr_title: 'Conclusion: Operation',
-        attr_name: 'operationally'
+        attr_name: 'operationally',
+        order: 15
       }, {
         attr_title: 'Finished Date',
-        attr_name: 'finished_date'
+        attr_name: 'finished_date',
+        order: 11
       }, {
         attr_title: 'Verified Date',
-        attr_name: 'verified_date'
+        attr_name: 'verified_date',
+        order: 10
       }, {
         attr_title: 'Assessment URL',
         attr_name: 'url',
-        attr_sort_field: 'assessment url'
+        attr_sort_field: 'assessment url',
+        order: 12
       }, {
         attr_title: 'Reference URL',
-        attr_name: 'reference_url'
+        attr_name: 'reference_url',
+        order: 13
       }, {
         attr_title: 'Creators',
-        attr_name: 'creators'
+        attr_name: 'creators',
+        order: 5
       }, {
         attr_title: 'Assignees',
-        attr_name: 'assignees'
+        attr_name: 'assignees',
+        order: 6
       }, {
         attr_title: 'Verifiers',
-        attr_name: 'verifiers'
+        attr_name: 'verifiers',
+        order: 7
       }, {
         attr_title: 'Create Date',
-        attr_name: 'created_at'
+        attr_name: 'created_at',
+        order: 8
       }]
     },
     info_pane_options: {
