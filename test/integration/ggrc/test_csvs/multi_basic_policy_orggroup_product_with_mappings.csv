@@ -1,5 +1,5 @@
 Object type,,,,,
-Policy,code,title,Map: Org group,,owner
+Policy,code,title,Map: Org group,,admin
 ,p-1,Bacon,,,user@example.com
 ,p-2,ipsum,org-1,,user@example.com
 ,p-3,dolor,org-1,,user@example.com
@@ -8,7 +8,7 @@ Policy,code,title,Map: Org group,,owner
 ,,,,,
 ,,,,,
 Object type,,,,,
-Org group,code,title,Map:Policy,map:product,owner
+Org group,code,title,Map:Policy,map:product,admin
 ,org-1,boudin,"p-1
 p-2
 p-3",pro 4,user@example.com
@@ -21,7 +21,7 @@ pro 4
 pro 3",user@example.com
 ,,,,,
 Object type,,,,,
-product,code,title,map:org group,map:policy,owner
+product,code,title,map:org group,map:policy,admin
 ,pro 1,meatloaf,,,user@example.com
 ,pro 2,pastrami,,,user@example.com
 ,pro 3,landjaeger,,,user@example.com

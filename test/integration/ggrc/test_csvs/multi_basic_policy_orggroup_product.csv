@@ -1,6 +1,6 @@
 Object type,,
 "Policy
-",code,title,owner
+",code,title,admin
 ,p-1,Bacon,user@example.com
 ,p-2,ipsum,user@example.com
 ,p-3,dolor,user@example.com
@@ -9,14 +9,14 @@ Object type,,
 ,,
 ,,
 Object type,,
-Org group,code,title,owner
+Org group,code,title,admin
 ,org-1,boudin,user@example.com
 ,org-2,tail,user@example.com
 ,org-3,filet,user@example.com
 ,org-4,mignon,user@example.com
 ,,
 Object type,,
-product,code,title,owner
+product,code,title,admin
 ,pro 1,meatloaf,user@example.com
 ,pro 2,pastrami,user@example.com
 ,pro 3,landjaeger,user@example.com

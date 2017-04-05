@@ -20,7 +20,7 @@ Task,code*,Summary*,task group,task description,assignee*,task type,start,end
 ,t-4,dropdown task,tg-1,"option 1, another option ,   o3",user1@ggrc.com,Dropdown,7/10/17,12/30/18
 ,,,,,,,,
 Object type,,,,,,,,
-objective,code*,title*,description,owner,state,notes,,
+objective,code*,title*,description,admin,state,notes,,
 ,obj-1,obj-1,test,user1@ggrc.com,Draft,this is a note,,
 ,obj-2,obj-2,test,user1@ggrc.com,Active,this is a note,,
 ,obj-3,obj-3,test,user1@ggrc.com,Active,this is a note,,
