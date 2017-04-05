@@ -171,7 +171,7 @@ class BaseWebUiService(object):
     """
     # pylint: disable=invalid-name
     obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
-    return obj_info_panel.open_info_3bbs().is_open_exist()
+    return obj_info_panel.open_info_3bbs().is_open_enabled()
 
   def filter_list_objs_from_tree_view(self, src_obj, filter_exp):
     """Filter by specified criteria and return list of objects from Tree

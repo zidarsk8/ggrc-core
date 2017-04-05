@@ -34,6 +34,8 @@ class Common(object):
   SPINNY = "SPINNY_"
   ACCORDION_MEMBERS = "ACCORDION_MEMBERS_"
   TOGGLE = "TOGGLE_"
+  # attrs values
+  DISABLED_VALUE = "disabled-original disabled"
 
 
 class Login(object):
