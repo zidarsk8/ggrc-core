@@ -1,5 +1,5 @@
 Object type,,,,,
-facility,code,title,owner,map:facility,
+facility,code,title,admin,map:facility,
 ,HOUSE-1,House of cards,user@example.com,HOUSE-2,
 ,HOUSE-2,House of the rising sun,user@example.com,HOUSE-3,
 ,HOUSE-3,Yellow house,user@example.com,HOUSE-4,
@@ -7,7 +7,7 @@ facility,code,title,owner,map:facility,
 ,,,,,
 ,,,,,
 Object type,,,,,
-Objective,code,title,owner,map:facility,map:objective
+Objective,code,title,admin,map:facility,map:objective
 ,O1,House of cards,user@example.com,HOUSE-2,
 ,O2,House of the rising sun,user@example.com,HOUSE-3,"O1
 O2

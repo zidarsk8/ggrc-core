@@ -10,7 +10,7 @@ program,code*,title*,Manager,state,Privacy*,
 ,,,,,,
 ,,,,,,
 Object type,,,,,,
-Regulation,code*,title*,owner,state,Map: program,Map: control
+Regulation,code*,title*,admin,state,Map: program,Map: control
 ,reg-1,reg 1,user@example.com,Draft,"prog-1
 prog-2
 prog-3",control-1
@@ -30,7 +30,7 @@ control-7"
 ,,,,,,
 ,,,,,,
 Object type,,,,,,
-control,code*,title*,description,owner,,
+control,code*,title*,description,admin,,
 ,control-1,control-1,test,user@example.com,,
 ,control-2,control-2,test,user@example.com,,
 ,control-3,control-3,test,user@example.com,,

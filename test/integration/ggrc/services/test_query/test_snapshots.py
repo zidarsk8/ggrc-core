@@ -584,7 +584,7 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
 
     control_user1_result = self._get_first_result_set(
         self._make_snapshot_query_dict("Control",
-                                       expression=["owner", "=", "Ann"]),
+                                       expression=["admin", "=", "Ann"]),
         "Snapshot",
     )
     self.assertEqual(control_user1_result["count"], 2)
@@ -598,7 +598,7 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
 
     control_user2_result = self._get_first_result_set(
         self._make_snapshot_query_dict("Control",
-                                       expression=["owner", "=", "Bob"]),
+                                       expression=["admin", "=", "Bob"]),
         "Snapshot",
     )
     self.assertEqual(control_user2_result["count"], 1)
@@ -607,7 +607,7 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
 
     order_by_owners_result = self._get_first_result_set(
         self._make_snapshot_query_dict("Control",
-                                       order_by=[{"name": "owner"}]),
+                                       order_by=[{"name": "admin"}]),
         "Snapshot"
     )
     self.assertEqual(order_by_owners_result["count"], 2)

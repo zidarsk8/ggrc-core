@@ -30,7 +30,7 @@ class TestImportIssues(TestCase):
           ("object_type", "Issue"),
           ("Code*", ""),
           ("Title*", "Test issue {}".format(i)),
-          ("Owner*", "user@example.com"),
+          ("Admin*", "user@example.com"),
           ("audit", audit.slug),
       ]))
       self._check_csv_response(response, {})
