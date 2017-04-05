@@ -332,34 +332,39 @@
       attr_view: _mustachePath + '/tree-item-attr.mustache',
       attr_list: [
         {
-          attr_title: 'Title',
-          attr_name: 'title'
+          attr_title: 'Task title',
+          attr_name: 'title',
+          attr_sort_field: 'task title'
         },
         {
-          attr_title: 'Workflow',
+          attr_title: 'Cycle title',
           attr_name: 'workflow',
-          attr_sort_field: 'cycle.workflow.title'
+          attr_sort_field: 'cycle title'
         },
         {
-          attr_title: 'State',
-          attr_name: 'status'
+          attr_title: 'Task state',
+          attr_name: 'status',
+          attr_sort_field: 'task state'
         },
         {
-          attr_title: 'Assignee',
+          attr_title: 'Task assignee',
           attr_name: 'assignee',
-          attr_sort_field: 'contact'
+          attr_sort_field: 'task assignee'
         },
         {
-          attr_title: 'Start Date',
-          attr_name: 'start_date'
+          attr_title: 'Task start date',
+          attr_name: 'start_date',
+          attr_sort_field: 'task start date'
         },
         {
-          attr_title: 'End Date',
-          attr_name: 'end_date'
+          attr_title: 'Task due date',
+          attr_name: 'end_date',
+          attr_sort_field: 'task due date'
         },
         {
-          attr_title: 'Last Updated',
-          attr_name: 'updated_at'
+          attr_title: 'Task last updated',
+          attr_name: 'updated_at',
+          attr_sort_field: 'task last updated'
         }
       ],
       display_attr_names: ['title', 'assignee', 'start_date'],
