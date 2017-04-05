@@ -3,6 +3,7 @@
 
 
 """Tests for task group task specific export."""
+import datetime
 from ddt import data, ddt
 
 from ggrc import db
@@ -32,7 +33,10 @@ class TestExport(TestCase):
     factories.RelationshipFactory(source=extr_assessment,
                                   destination=extr_comment)
     self.comment = factories.CommentFactory(description="123")
-    self.assessment = factories.AssessmentFactory()
+    self.assessment = factories.AssessmentFactory(
+        verified_date=datetime.datetime.now(),
+        finished_date=datetime.datetime.now(),
+    )
     self.rel = factories.RelationshipFactory(source=self.comment,
                                              destination=self.assessment)
 
@@ -114,4 +118,18 @@ class TestExport(TestCase):
     """Test filter by updated at"""
     self.filter_by_datetime(alias,
                             self.assessment.updated_at,
+                            [self.assessment.slug])
+
+  @data("finished_date", "Finished Date", "finished date")
+  def test_filter_by_finished_date(self, alias):
+    """Test filter by finished date"""
+    self.filter_by_datetime(alias,
+                            self.assessment.finished_date,
+                            [self.assessment.slug])
+
+  @data("verified_date", "Verified Date", "verified date")
+  def test_filter_by_verified_date(self, alias):
+    """Test filter by verified date"""
+    self.filter_by_datetime(alias,
+                            self.assessment.verified_date,
                             [self.assessment.slug])
