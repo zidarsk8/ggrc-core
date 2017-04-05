@@ -602,6 +602,7 @@ class ListCheckboxes(Component):
 
   def select_by_titles(self, list_titles):
     """Select checkboxes according titles."""
+    selenium_utils.wait_for_js_to_load(self._driver)
     selenium_utils.get_when_all_visible(self._driver, self.locator_titles)
     objs_titles = self._driver.find_elements(*self.locator_titles)
     objs_checkboxes = self._driver.find_elements(*self.locator_checkboxes)

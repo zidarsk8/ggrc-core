@@ -140,6 +140,9 @@ class ControlEntity(Entity):
             self.state == other.state and self.owner == other.owner and
             self.primary_contact == other.primary_contact)
 
+  def __lt__(self, other):
+    return self.code < other.code
+
 
 class AuditEntity(Entity):
   """Class that represent model for Audit."""
