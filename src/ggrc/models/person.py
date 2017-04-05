@@ -92,6 +92,10 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
   def is_authenticated(self):
     return self.system_wide_role != 'No Access'
 
+  @property
+  def user_name(self):
+    return self.email.split("@")[0]
+
   def is_active(self):
     # pylint: disable=no-self-use
     return True  # self.active

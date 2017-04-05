@@ -91,7 +91,8 @@ class Ownable(object):
   ]
   _include_links = []
   _fulltext_attrs = [
-      MultipleSubpropertyFullTextAttr('owners', 'owners', ['name', 'email'])
+      MultipleSubpropertyFullTextAttr('owners', 'owners',
+                                      ['user_name', 'email', 'name'])
   ]
   _aliases = {
       "owners": {
