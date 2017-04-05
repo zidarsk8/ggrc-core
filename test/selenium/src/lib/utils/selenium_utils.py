@@ -172,6 +172,11 @@ def scroll_into_view(driver, element):
   return element
 
 
+def get_parent_element(driver, element):
+  """Get parent element of current element using JS."""
+  return driver.execute_script("return arguments[0].parentNode;", element)
+
+
 def wait_for_js_to_load(driver):
   """Wait until there all JS are completed."""
   return wait_until_condition(
