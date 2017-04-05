@@ -141,19 +141,21 @@ class EvidenceURL(Documentable):
   }
 
   def documents_by_type(self, doc_type):
+    """Returns a list of document objects of requested type"""
     if doc_type == "document_evidence":
-      return [object.document for object in self.object_documents]
+      # pylint: disable=not-an-iterable
+      return [instance.document for instance in self.object_documents]
     if doc_type == "document_url":
-      temp = db.session.query(Document).filter(
+      documents = db.session.query(Document).filter(
           Document.id == Relationship.destination_id,
           Relationship.source_type == "Assessment",
           Relationship.source_id == self.id,
           Relationship.destination_type == "Document"
       ).all()
-      temp += db.session.query(Document).filter(
+      documents += db.session.query(Document).filter(
           Document.id == Relationship.source_id,
           Relationship.destination_type == "Assessment",
           Relationship.destination_id == self.id,
           Relationship.source_type == "Document"
       ).all()
-      return temp
+      return documents
