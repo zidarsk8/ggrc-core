@@ -1,0 +1,105 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#instance}}
+<div class="row-fluid wrap-row">
+  <div data-test-id="title_manager_7a906d2e" class="span4">
+    {{#if is_program}}
+    <h6>Manager</h6>
+    <p class="oneline">
+      {{#with_mapping 'authorizations' instance}}
+        {{#if authorizations.length}}
+          {{#each authorizations}}
+            <span>
+              {{#using role=instance.role}}
+                {{#if_equals role.name 'ProgramOwner'}}
+                  {{#using contact=instance.person}}
+                    {{{renderLive '/static/mustache/people/popover.mustache' person=contact}}}
+                  {{/using}}
+                {{/if_equals}}
+              {{/using}}
+            </span>
+          {{/each}}
+        {{else}}
+          <span class="empty-message">None</span>
+        {{/if}}
+      {{/with_mapping}}
+    {{else}}
+    <h6>Owner</h6>
+    <p class="oneline">
+      {{#if owners.length}}
+        {{#using contacts=owners}}
+        <ul class="inner-count-list">
+          {{#each contacts}}
+            <li>
+              {{#using person=this}}
+                {{>'/static/mustache/people/popover.mustache'}}
+              {{/using}}
+            </li>
+          {{/each}}
+        </ul>
+        {{/using}}
+      {{else}}
+        <span class="empty-message">None</span>
+      {{/if}}
+    {{/if}}
+    </p>
+  </div>
+  <div class="span4">
+    {{#using person=contact}}
+      <div class="bottom-space">
+        <h6>Primary Contact</h6>
+        <p data-test-id="text_primary_contact_696de7244b84" class="oneline">
+          {{#if person}}
+            {{>'/static/mustache/people/popover.mustache'}}
+          {{else}}
+            <span data-test-id="text_primary_contact_696de7244b84" class="empty-message">None</span>
+          {{/if}}
+        </p>
+      </div>
+    {{/using}}
+    {{#using assessor=instance.principal_assessor}}
+      <div class="bottom-space">
+        <h6>Principal Assignee</h6>
+        {{#if instance.principal_assessor}}
+          <p class="oneline">
+            {{{render '/static/mustache/people/popover.mustache' person=assessor}}}
+          </p>
+        {{else}}
+          <span class="empty-message">None</span>
+        {{/if}}
+      </div>
+    {{/using}}
+    {{#using person=secondary_contact}}
+      <div class="bottom-space">
+        <h6>Secondary Contact</h6>
+        <p data-test-id="text_secondary_contact_696de7244b84" class="oneline">
+          {{#if person}}
+            {{>'/static/mustache/people/popover.mustache'}}
+          {{else}}
+            <span data-test-id="text_secondary_contact_696de7244b84" class="empty-message">None</span>
+          {{/if}}
+        </p>
+      </div>
+    {{/using}}
+    {{#using assessor=instance.secondary_assessor}}
+      <!--<div class="bottom-space">-->
+      <div>
+        <h6>Secondary Assignee</h6>
+        {{#if instance.secondary_assessor}}
+          <p class="oneline">
+            {{{render '/static/mustache/people/popover.mustache' person=assessor}}}
+          </p>
+        {{else}}
+          <span class="empty-message">None</span>
+        {{/if}}
+      </div>
+    {{/using}}
+  </div>
+  <div class="span4">
+    {{>'/static/mustache/controls/urls.mustache'}}
+  </div>
+</div>
+{{/instance}}

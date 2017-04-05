@@ -17,8 +17,7 @@
       {{>'/static/mustache/base_objects/description.mustache'}}
       {{>'/static/mustache/base_objects/test_plan.mustache'}}
       {{>'/static/mustache/base_objects/notes.mustache'}}
-      {{>'/static/mustache/base_objects/contacts.mustache'}}
-      {{>'/static/mustache/base_objects/urls.mustache'}}
+      {{>'/static/mustache/controls/contacts.mustache'}}
 
       <div class="custom-attr-wrap">
         <div class="row-fluid">
@@ -40,39 +39,13 @@
         </div>
         <div class="hidden-fields-area">
           <div class="row-fluid wrap-row">
-            <div class="span3">
+            <div class="span4">
               <h6>Code</h6>
               <p>
                 {{slug}}
               </p>
             </div>
-            <div class="span3">
-              <h6>Principal Assignee</h6>
-              {{#using assessor=instance.principal_assessor}}
-              {{#if instance.principal_assessor}}
-                <p>
-                  {{{render '/static/mustache/people/popover.mustache' person=assessor}}}
-                </p>
-              {{else}}
-                <span class="empty-message">None</span>
-              {{/if}}
-              {{/using}}
-            </div>
-            <div class="span3">
-              <h6>Secondary Assignee</h6>
-              {{#using assessor=instance.secondary_assessor}}
-              {{#if instance.secondary_assessor}}
-                <p>
-                  {{{render '/static/mustache/people/popover.mustache' person=assessor}}}
-                </p>
-              {{else}}
-                <span class="empty-message">None</span>
-              {{/if}}
-              {{/using}}
-            </div>
-          </div>
-          <div class="row-fluid wrap-row">
-            <div class="span3">
+            <div class="span4">
               <h6>Kind/Nature</h6>
               {{#if kind}}
                 <p>
@@ -84,7 +57,7 @@
                 <span class="empty-message">None</span>
               {{/if}}
             </div>
-            <div class="span3">
+            <div class="span4">
               <h6>Fraud Related</h6>
               <p>
                 {{#if_equals fraud_related "0"}}
@@ -100,7 +73,9 @@
                 {{/if}}
               </p>
             </div>
-            <div class="span3">
+          </div>
+          <div class="row-fluid wrap-row">
+            <div class="span8">
               <h6>Significance</h6>
               <p>
                 {{#if_equals key_control "1"}}
@@ -116,7 +91,7 @@
                 {{/if}}
               </p>
             </div>
-            <div class="span3">
+            <div class="span4">
               <h6>Type/Means</h6>
               {{#if means}}
                 <p>
@@ -130,7 +105,7 @@
             </div>
           </div>
           <div class="row-fluid wrap-row">
-            <div class="span3">
+            <div class="span4">
               <h6>Effective Date</h6>
               {{#if start_date}}
                 <p>
@@ -140,7 +115,7 @@
                 <span class="empty-message">None</span>
               {{/if}}
             </div>
-            <div class="span3">
+            <div class="span4">
               <h6>Stop Date</h6>
               {{#if end_date}}
                 <p>
@@ -150,7 +125,7 @@
                 <span class="empty-message">None</span>
               {{/if}}
             </div>
-            <div class="span3">
+            <div class="span4">
               <h6>Frequency</h6>
               {{#if verify_frequency}}
                 <p>
@@ -164,7 +139,7 @@
             </div>
           </div>
           <div class="row-fluid wrap-row">
-            <div class="span6">
+            <div class="span8">
               <h6>Assertions</h6>
               {{#using items=assertions}}
               {{#if assertions}}
@@ -178,7 +153,7 @@
               {{/if}}
               {{/using}}
             </div>
-            <div class="span6">
+            <div class="span4">
               <h6>Categories</h6>
               {{#using items=categories}}
               {{#if categories}}
