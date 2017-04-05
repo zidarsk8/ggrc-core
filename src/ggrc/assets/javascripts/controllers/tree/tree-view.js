@@ -1367,9 +1367,6 @@
       };
       var originalOrder = GGRC.Utils.TreeView.getModelsForSubTier(parent.type);
       var limit = this.options.subTreeElementsLimit;
-      var states = parentCtrl.options.attr('selectStateList');
-      var statesFilter = GGRC.Utils.State.statusFilter(states, '');
-      var statesQuery = GGRC.query_parser.parse(statesFilter);
       var typeModels;
       var fields = [
         'child_id',
@@ -1417,10 +1414,6 @@
           countMap.forEach(function (item) {
             item.fields = fields;
             item.page = {current: 1, pageSize: item.count};
-
-            if (GGRC.Utils.State.hasState(item.type)) {
-              item.filter = statesQuery;
-            }
           });
 
           return this.loadSubTreeData(countMap, relevant);
