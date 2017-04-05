@@ -55,10 +55,9 @@ TODO: Temporary disabled until snapshot view is added.
             {{/using}}
 
             <li>
-                <a href="{{instance.originalLink}}">
-                    <i class="fa fa-long-arrow-right"></i>
-                    View original {{instance.class.title_singular}}
-                </a>
+                <open-original-link
+                    revisions="instance.snapshot.revisions">
+                </open-original-link>
             </li>
         </ul>
     </div>

@@ -33,12 +33,16 @@ class CommonDropdownSettings(base.Component):
     """Select open button in 3BBS dropdown modal."""
     base.Button(self._driver, self.open_locator).click()
 
-  def is_open_exist(self):
-    """Find open button in 3BBS dropdown modal.
-    Return: True if open button is exist,
-            False if open button is not exist.
+  def is_open_enabled(self):
+    """Find open button in 3BBS dropdown modal and check if it enabled.
+    Return:
+    True if disabled attribute value does not exist for parent element of open,
+    False if disabled attribute value exist for parent element of open.
     """
-    return selenium_utils.is_element_exist(self._driver, self.open_locator)
+    parent_element_of_open = selenium_utils.get_parent_element(
+        self._driver, self._driver.find_element(*self.open_locator))
+    return selenium_utils.is_value_in_attr(
+        parent_element_of_open, value=locator.Common.DISABLED_VALUE)
 
   def select_edit(self):
     """Select edit button in 3BBS dropdown modal.

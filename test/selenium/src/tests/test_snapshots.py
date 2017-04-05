@@ -145,14 +145,13 @@ class TestSnapshots(base.Test):
         messages.ERR_MSG_FORMAT.format([expected_control], actual_controls))
 
   @pytest.mark.smoke_tests
-  @pytest.mark.skipif(True, reason="Issue in app GGRC-1196")
-  def test_audit_contains_snapshotable_control_after_deleting_original_control(
+  def test_audit_contains_snapshotable_control_after_deleting_control(
       self, create_audit_and_delete_original_control, selenium
   ):
-    """Check via UI that Audit contains snapshotable Control even after
-    deleting original control.
-    Snapshot does not have links to update version to latest state
-    and to view original Control under Program.
+    """Check via UI that Audit contains snapshotable Control after
+    deleting original Control but without updating to latest version.
+    Check of snapshotable Control has link to update version to latest state
+    and link to view original Control is disabled.
     Preconditions:
     - Execution and return of fixture
       'create_audit_and_delete_original_control'.
@@ -160,6 +159,39 @@ class TestSnapshots(base.Test):
     audit_with_one_control = create_audit_and_delete_original_control
     audit = audit_with_one_control["audit"]
     expected_control = audit_with_one_control["control"]
+    actual_controls_tab_count = (webui_service.ControlsService(selenium).
+                                 get_count_objs_from_tab(src_obj=audit))
+    assert len([expected_control]) == actual_controls_tab_count
+    actual_controls = (webui_service.ControlsService(selenium).
+                       get_list_objs_from_tree_view(src_obj=audit))
+    assert [expected_control] == actual_controls, (
+        messages.ERR_MSG_FORMAT.format([expected_control], actual_controls))
+    is_control_updateable = (webui_service.ControlsService(selenium).
+                             is_obj_updateble_via_info_panel(
+        src_obj=audit, obj=expected_control))
+    is_control_openable = (webui_service.ControlsService(selenium).
+                           is_obj_page_exist_via_info_panel(
+        src_obj=audit, obj=expected_control))
+    assert is_control_updateable is True
+    assert is_control_openable is False
+
+  @pytest.mark.smoke_tests
+  def test_update_snapshotable_ver_after_deleting_original_control(
+      self, create_audit_and_delete_original_control, selenium
+  ):
+    """Check via UI that Audit contains snapshotable Control after
+    deleting original Control and updating to latest version.
+    Check of snapshotable Control does not has link to update version to latest
+    state and link to view original Control is disabled.
+    Preconditions:
+    - Execution and return of fixture
+      'create_audit_and_delete_original_control'.
+    """
+    audit_with_one_control = create_audit_and_delete_original_control
+    audit = audit_with_one_control["audit"]
+    expected_control = audit_with_one_control["control"]
+    (webui_service.ControlsService(selenium).
+     update_obj_ver_via_info_panel(src_obj=audit, obj=expected_control))
     actual_controls_tab_count = (webui_service.ControlsService(selenium).
                                  get_count_objs_from_tab(src_obj=audit))
     assert len([expected_control]) == actual_controls_tab_count
