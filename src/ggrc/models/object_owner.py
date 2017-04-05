@@ -96,7 +96,7 @@ class Ownable(object):
   ]
   _aliases = {
       "owners": {
-          "display_name": "Owner",
+          "display_name": "Admin",
           "mandatory": True,
       }
   }
