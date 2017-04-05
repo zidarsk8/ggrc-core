@@ -14,7 +14,7 @@ flask-debugtoolbar==0.10.0
 Flask-Jasmine==1.4
 Flask-Testing==0.4.2
 Flask==0.10.1
-freezegun==0.3.5
+freezegun==0.3.8
 ipdb==0.8.1
 ipython==3.2.0
 itsdangerous==0.24
