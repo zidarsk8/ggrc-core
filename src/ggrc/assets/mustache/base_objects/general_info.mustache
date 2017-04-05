@@ -26,7 +26,7 @@
         {{! We need to use `using` to ensure that snapshot is actually
             reified by the time is_allowed helper uses it }}
       {{#using reified_snapshot=snapshot}}
-      {{#is_allowed 'update' reified_snapshot context='for'}}
+      {{#canUpdate}}
         {{^isLatestRevision}}
           <div class="span12 snapshot">
             <hr class="snapshot">
@@ -39,7 +39,7 @@
             </p>
           </div>
         {{/isLatestRevision}}
-      {{/is_allowed}}
+      {{/canUpdate}}
       {{/using}}
       {{/if}}
     </div>

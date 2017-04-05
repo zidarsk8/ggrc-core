@@ -4,13 +4,7 @@
 }}
 
 {{#instance}}
-{{#if_helpers '\
-#if' is_info_pin '\
-and #is_allowed_to_map' page_instance instance '\
-or #if' is_info_pin '\
-and #if' instance.viewLink '\
-or #is_allowed' 'update' instance '\
-' _4_context='for'}}
+{{#canRead}}
     <div class="details-wrap">
         <a class="btn btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
             <span class="bubble"></span>
@@ -45,7 +39,7 @@ TODO: Temporary disabled until snapshot view is added.
             {{! We need to use `using` to ensure that snapshot is actually
                 reified by the time is_allowed helper uses it }}
             {{#using reified_snapshot=snapshot}}
-            {{#is_allowed 'update' reified_snapshot context='for'}}
+            {{#canUpdate}}
             {{^isLatestRevision}}
             <li>
               <revisions-comparer instance="instance"
@@ -57,7 +51,7 @@ TODO: Temporary disabled until snapshot view is added.
               </revisions-comparer>
             </li>
             {{/isLatestRevision}}
-            {{/is_allowed}}
+            {{/canUpdate}}
             {{/using}}
 
             <li>
@@ -68,5 +62,5 @@ TODO: Temporary disabled until snapshot view is added.
             </li>
         </ul>
     </div>
-{{/if_helpers}}
+{{/canRead}}
 {{/instance}}
