@@ -90,9 +90,14 @@ class TestExport(TestCase):
         "{year}",
         "{year}-{month}",
         "{year}-{month}-{day}",
-        "{year}-{month}-{day}:{hour}",
-        "{year}-{month}-{day}:{hour}:{minute}",
-        "{year}-{month}-{day}:{hour}:{minute}:{second}",
+        "{year}-{month}-{day} {hour}",
+        "{year}-{month}-{day} {hour}:{minute}",
+        "{year}-{month}-{day} {hour}:{minute}:{second}",
+        "{month}/{year}",
+        "{month}/{day}/{year}",
+        "{month}/{day}/{year} {hour}",
+        "{month}/{day}/{year} {hour}:{minute}",
+        "{month}/{day}/{year} {hour}:{minute}:{second}",
     ]
     for f_str in formats:
       self.assertSlugs(alias, f_str.format(**kwargs), slugs)

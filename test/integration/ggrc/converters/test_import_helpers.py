@@ -972,7 +972,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Assignee",
         "Task Details",
         "Start Date",
-        "End Date",
+        "Due Date",
         "Actual Verified Date",
         "Actual Finish Date",
         "Task Group",

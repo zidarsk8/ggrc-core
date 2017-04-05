@@ -58,7 +58,7 @@ class CycleTaskGroupObjectTask(
   PROPERTY_TEMPLATE = u"task {}"
 
   _fulltext_attrs = [
-      DateFullTextAttr("due date", 'end_date',),
+      DateFullTextAttr("end_date", 'end_date',),
       FullTextAttr("assignee", 'contact', ['name', 'email']),
       FullTextAttr("group title", 'cycle_task_group', ['title'], False),
       FullTextAttr("cycle title", 'cycle', ['title'], False),
@@ -153,8 +153,6 @@ class CycleTaskGroupObjectTask(
           "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
-      "start_date": "Start Date",
-      "end_date": "End Date",
       "finished_date": "Actual Finish Date",
       "verified_date": "Actual Verified Date",
       "cycle": {
@@ -176,7 +174,9 @@ class CycleTaskGroupObjectTask(
           "description": "Options are:\n{}".
                           format('\n'.join((item for item in VALID_STATES
                                             if item)))
-      }
+      },
+      "end_date": "Due Date",
+      "start_date": "Start Date",
   }
 
   @computed_property

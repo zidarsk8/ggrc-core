@@ -649,6 +649,9 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
         filter_by = None
       if not name:
         continue
+      tmp = getattr(cls, "PROPERTY_TEMPLATE", "{}")
+      name = tmp.format(name)
+      key = tmp.format(key)
       cls.CACHED_ATTRIBUTE_MAP[name.lower()] = (key.lower(), filter_by)
     return cls.CACHED_ATTRIBUTE_MAP
 
