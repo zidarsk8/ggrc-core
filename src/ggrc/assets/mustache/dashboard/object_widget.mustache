@@ -21,38 +21,43 @@
     </header>
   {{/if_equals}}
 
-  {{#if_equals widget_id "custom_attribute"}}
   {{^is_dashboard}}
-    <header class="header">
-      <h2>
-        <i class="fa fa-workflow color"></i>
-        {{{widget_name}}}
-      </h2>
-    </header>
-  {{/is_dashboard}}
-  {{/if_equals}}
+    {{#if_equals widget_id "custom_attribute"}}
+      <header class="header">
+        <h2>
+          <i class="fa fa-workflow color"></i>
+          {{{widget_name}}}
+        </h2>
+      </header>
+    {{/if_equals}}
 
-  {{#if_equals widget_id "events_list"}}
-  {{^is_dashboard}}
-    <header class="header">
-      <h2>
-        <i class="fa-history"></i>
-        {{{widget_name}}}
-      </h2>
-    </header>
-  {{/is_dashboard}}
-  {{/if_equals}}
+    {{#if_equals widget_id "events_list"}}
+      <header class="header">
+        <h2>
+          <i class="fa-history"></i>
+          {{{widget_name}}}
+        </h2>
+      </header>
+    {{/if_equals}}
 
-  {{#if_equals widget_id "info"}}
-  {{^is_dashboard}}
-    <header class="header">
-      <h2>
-        <i class="{{widget_icon}}"></i>
-        {{{widget_name}}}
-      </h2>
-    </header>
+    {{#if_equals widget_id "info"}}
+      <header class="header">
+        <h2>
+          <i class="{{widget_icon}}"></i>
+          {{{widget_name}}}
+        </h2>
+      </header>
+    {{/if_equals}}
+
+    {{#if_equals widget_id "Summary"}}
+      <header class="header">
+        <h2>
+          <i class="{{widget_icon}}"></i>
+          {{{widget_name}}}
+        </h2>
+      </header>
+    {{/if_equals}}
   {{/is_dashboard}}
-  {{/if_equals}}
 
   <section class="content">
     {{{widget_initial_content}}}
