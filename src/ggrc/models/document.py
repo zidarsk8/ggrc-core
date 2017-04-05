@@ -4,6 +4,7 @@
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc.fulltext.mixin import Indexed
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Base
 from ggrc.models.relationship import Relatable
@@ -11,7 +12,7 @@ from ggrc.models.object_owner import Ownable
 from ggrc.models.utils import validate_option
 
 
-class Document(Ownable, Relatable, Base, db.Model):
+class Document(Ownable, Relatable, Indexed, Base, db.Model):
   __tablename__ = 'documents'
 
   # TODO: inherit from Titled mixin (note: title is nullable here)
