@@ -66,8 +66,9 @@
         attr_title: 'Verified Date',
         attr_name: 'verified_date'
       }, {
-        attr_title: 'URL',
-        attr_name: 'url'
+        attr_title: 'Assessment URL',
+        attr_name: 'url',
+        attr_sort_field: 'assessment url'
       }, {
         attr_title: 'Reference URL',
         attr_name: 'reference_url'
