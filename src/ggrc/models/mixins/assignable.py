@@ -71,7 +71,7 @@ class Assignable(object):
     }
     result_inverse.update({
         assignees_map[r.destination_id]: get_roles(r)
-        for r in self.related_sources
+        for r in self.related_destinations
         if r.destination_type == "Person"
     })
 
