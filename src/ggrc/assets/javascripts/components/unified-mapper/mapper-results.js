@@ -8,7 +8,7 @@
   var DEFAULT_PAGE_SIZE = 5;
   var DEFAULT_SORT_DIRECTION = 'asc';
 
-  can.Component.extend('mapperResults', {
+  GGRC.Components('mapperResults', {
     tag: 'mapper-results',
     template: can.view(
       GGRC.mustache_path +
