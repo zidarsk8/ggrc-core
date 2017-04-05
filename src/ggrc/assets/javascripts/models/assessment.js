@@ -81,6 +81,9 @@
       }, {
         attr_title: 'Verifiers',
         attr_name: 'verifiers'
+      }, {
+        attr_title: 'Create Date',
+        attr_name: 'created_at'
       }]
     },
     info_pane_options: {
