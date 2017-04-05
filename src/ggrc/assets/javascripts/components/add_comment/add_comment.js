@@ -45,7 +45,7 @@
       get_assignee_type: function () {
         var types = new Map([
           ['related_verifiers', 'verifier'],
-          ['related_assessors', 'assessor'],
+          ['related_assessors', 'assignee'],
           ['related_assignees', 'assignee'],
           ['related_requesters', 'requester'],
           ['related_creators', 'creator']
