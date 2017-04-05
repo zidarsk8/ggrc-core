@@ -7,12 +7,12 @@
   <a data-id="hide_effective_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
   <datepicker
       tabindex="20"
-      label="configStartDate.label"
+      {label}="configStartDate.label"
       date="instance.start_date"
       set-max-date="instance.end_date"
-      helptext="configStartDate.helpText"
+      {helptext}="configStartDate.helpText"
       test-id="startTestId"
-      {{#configStartDate.required}}required="required"{{/configStartDate.required}}
+      {{#configStartDate.required}}required="true"{{/configStartDate.required}}
   />
 </div>
 
@@ -20,11 +20,11 @@
   <a data-id="hide_stop_date_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
   <datepicker
       tabindex="21"
-      label="configEndDate.label"
+      {label}="configEndDate.label"
       date="instance.end_date"
       set-min-date="instance.start_date"
-      helptext="configEndDate.helpText"
+      {helptext}="configEndDate.helpText"
       test-id="endTestId"
-      {{#configEndDate.required}}required="required"{{/configEndDate.required}}
+      {{#configEndDate.required}}required="true"{{/configEndDate.required}}
   />
 </div>

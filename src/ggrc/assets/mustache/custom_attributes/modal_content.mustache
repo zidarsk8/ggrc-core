@@ -19,7 +19,7 @@
               {{cad.title}}
               {{#cad.mandatory}}<span class="required">*</span>{{/cad.mandatory}}
               {{#cad.helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{cad.helptext}}"></i>{{/cad.helptext}}
-              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              {{#unless cad.mandatory}}<a href="javascript://" class="field-hide" tabindex="-1">hide</a>{{/unless}}
             </label>
             <input tabindex="{{add_index 20 @index}}" data-ram="{{@index}}" class="input-block-level" value="{{cav.attribute_value}}" placeholder="{{cad.placeholder}}" name="custom_attributes.{{cad.id}}" type="text">
           {{/case}}
@@ -28,7 +28,7 @@
               {{cad.title}}
               {{#cad.mandatory}}<span class="required">*</span>{{/cad.mandatory}}
               {{#cad.helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{cad.helptext}}"></i>{{/cad.helptext}}
-              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              {{#unless cad.mandatory}}<a href="javascript://" class="field-hide" tabindex="-1">hide</a>{{/unless}}
             </label>
             <div class="wysiwyg-area">
               <textarea tabindex="{{add_index 20 @index}}" id="{{cad.title}}" class="span12 double wysihtml5" name="custom_attributes.{{cad.id}}" placeholder="{{cad.placeholder}}">{{{cav.attribute_value}}}</textarea>
@@ -39,7 +39,7 @@
               {{cad.title}}
               {{#cad.mandatory}}<span class="required">*</span>{{/cad.mandatory}}
               {{#cad.helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{cad.helptext}}"></i>{{/cad.helptext}}
-              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+              {{#unless cad.mandatory}}<a href="javascript://" class="field-hide" tabindex="-1">hide</a>{{/unless}}
             </label>
             <select class="input-block-level" name="custom_attributes.{{cad.id}}" null-if-empty="null-if-empty" tabindex="20">
               <option value="" {{#if_equals "" cav.attribute_value}}selected="true"{{/if_equals}}>---</option>
@@ -56,17 +56,19 @@
                 {{cad.title}}
                 {{#cad.mandatory}}<span class="required">*</span>{{/cad.mandatory}}
                 {{#cad.helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{cad.helptext}}"></i>{{/cad.helptext}}
-                <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+                {{#unless cad.mandatory}}<a href="javascript://" class="field-hide" tabindex="-1">hide</a>{{/unless}}
               </label>
             </div>
           {{/case}}
           {{#case 'Date'}}
-          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-          <datepicker
-            label="cad.title"
-            date="instance.custom_attributes.{{cad.id}}"
-            required="cad.mandatory"
-            helptext="cad.helptext"
+            {{#unless cad.mandatory}}
+              <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+            {{/unless}}
+            <datepicker
+              {label}="cad.title"
+              date="instance.custom_attributes.{{cad.id}}"
+              required="{{cad.mandatory}}"
+              {helptext}="cad.helptext"
             />
           {{/case}}
           {{#case 'Map:Person'}}
@@ -74,7 +76,7 @@
             {{cad.title}}
             {{#cad.mandatory}}<span class="required">*</span>{{/cad.mandatory}}
             {{#cad.helptext}}<i class="fa fa-question-circle" rel="tooltip" title="{{cad.helptext}}"></i>{{/cad.helptext}}
-            <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
+            {{#unless cad.mandatory}}<a href="javascript://" class="field-hide" tabindex="-1">hide</a>{{/unless}}
           </label>
             {{#using person=cav.attribute_object}}
             <input class="input-block-level"
