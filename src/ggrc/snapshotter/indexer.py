@@ -4,6 +4,7 @@
 """Manage indexing for snapshotter service"""
 
 import logging
+from collections import defaultdict
 
 from sqlalchemy.sql.expression import tuple_
 
@@ -17,10 +18,35 @@ from ggrc.utils import generate_query_chunks
 
 from ggrc.snapshotter.rules import Types
 from ggrc.snapshotter.datastructures import Pair
-from ggrc.fulltext.attributes import FullTextAttr
+from ggrc.fulltext.attributes import FullTextAttr, DatetimeFullTextAttr
 
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+
+def _get_class_properties():
+  """Get indexable properties for all models
+
+  Args:
+    None
+  Returns:
+    class_properties dict - representing a list of searchable attributes
+                            for every model
+  """
+  class_properties = defaultdict(list)
+  for klass_name in Types.all:
+    full_text_attrs = AttributeInfo.gather_attrs(
+        getattr(all_models, klass_name), '_fulltext_attrs'
+    )
+    for attr in full_text_attrs:
+      is_dt_field = isinstance(attr, DatetimeFullTextAttr)
+      if isinstance(attr, FullTextAttr):
+        attr = attr.alias
+      class_properties[klass_name].append((attr, is_dt_field))
+  return class_properties
+
+
+CLASS_PROPERTIES = _get_class_properties()
 
 
 def _get_tag(pair):
@@ -65,48 +91,28 @@ def _get_columns():
   return snapshot_columns, revision_columns
 
 
-def _get_model_properties():
-  """Get indexable properties for all snapshottable objects
+def _get_custom_attribute_dict():
+  """Get fulltext indexable properties for all snapshottable objects
 
   Args:
     None
   Returns:
-    tuple(class_properties dict, custom_attribute_definitions dict) - Tuple of
-        dictionaries, first one representing a list of searchable attributes
-        for every model and second one representing dictionary of custom
-        attribute definition attributes.
+    custom_attribute_definitions dict - representing dictionary of custom
+                                        attribute definition attributes.
   """
   # pylint: disable=protected-access
-  class_properties = dict()
-  klass_names = Types.all
+  cadef_klass_names = {getattr(all_models, klass)._inflector.table_singular
+                       for klass in Types.all}
 
-  cadef_klass_names = {
-      getattr(all_models, klass)._inflector.table_singular
-      for klass in klass_names
-  }
-
-  cad_query = db.session.query(
+  return dict(db.session.query(
       models.CustomAttributeDefinition.id,
       models.CustomAttributeDefinition.title,
   ).filter(
       models.CustomAttributeDefinition.definition_type.in_(cadef_klass_names)
-  )
-
-  for klass_name in klass_names:
-    full_text_attrs = AttributeInfo.gather_attrs(
-        getattr(all_models, klass_name), '_fulltext_attrs'
-    )
-    model_attributes = []
-    for attr in full_text_attrs:
-      if isinstance(attr, FullTextAttr):
-        attr = attr.alias
-      model_attributes.append(attr)
-    class_properties[klass_name] = model_attributes
-
-  return class_properties, cad_query.all()
+  ).all())
 
 
-def get_searchable_attributes(attributes, cad_list, content):
+def get_searchable_attributes(attributes, cad_dict, content):
   """Get all searchable attributes for a given object that should be indexed
 
   Args:
@@ -117,16 +123,19 @@ def get_searchable_attributes(attributes, cad_list, content):
   Return:
     Dict of "key": "value" from objects revision
   """
-  searchable_values = {attr: content.get(attr) for attr in attributes}
-
-  cad_map = {cad.id: cad for cad in cad_list}
+  searchable_values = {}
+  for attr, is_datetime_field in attributes:
+    value = content.get(attr)
+    if value and is_datetime_field:
+      value = value.replace("T", " ")
+    searchable_values[attr] = value
 
   cav_list = content.get("custom_attributes", [])
 
   for cav in cav_list:
-    cad = cad_map.get(cav["custom_attribute_id"])
+    cad = cad_dict.get(cav["custom_attribute_id"])
     if cad:
-      searchable_values[cad.title] = cav["attribute_value"]
+      searchable_values[cad] = cav["attribute_value"]
   return searchable_values
 
 
@@ -222,7 +231,7 @@ def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
   snap_to_sid_cache = dict()
   search_payload = list()
 
-  object_properties, cad_list = _get_model_properties()
+  cad_dict = _get_custom_attribute_dict()
 
   snapshot_columns, revision_columns = _get_columns()
 
@@ -247,7 +256,7 @@ def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
     )
     for _id, _type, content in revision_query:
       revisions[_id] = get_searchable_attributes(
-          object_properties[_type], cad_list, content)
+          CLASS_PROPERTIES[_type], cad_dict, content)
 
     snapshot_ids = set()
     for pair in snapshots:
@@ -301,13 +310,12 @@ def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
           elif isinstance(val, (bool, int, long)):
             rec["content"] = unicode(val)
             search_payload += [rec]
+          elif isinstance(rec["content"], basestring):
+            search_payload += [rec]
           else:
-            if isinstance(rec["content"], basestring):
-              search_payload += [rec]
-            else:
-              logger.warning(u"Unsupported value for %s #%s in %s %s: %r",
-                             rec["type"], rec["key"], rec["property"],
-                             rec["subproperty"], rec["content"])
+            logger.warning(u"Unsupported value for %s #%s in %s %s: %r",
+                           rec["type"], rec["key"], rec["property"],
+                           rec["subproperty"], rec["content"])
 
     delete_records(snapshot_ids)
     insert_records(search_payload)
