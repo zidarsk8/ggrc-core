@@ -266,6 +266,10 @@
         });
       }
 
+      if (!model.attr('assignees')) {
+        model.attr('assignees', new can.Map());
+      }
+
       model.assignees.attr(type, unique);
     },
     /**
