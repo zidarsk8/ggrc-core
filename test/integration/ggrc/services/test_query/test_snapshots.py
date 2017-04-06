@@ -77,19 +77,6 @@ class TestAuditSnapshotQueries(TestCase):
       cls._setup_objects()
 
   @staticmethod
-  def _create_users():
-    """Create users needed for testing."""
-    users = [
-        "user1@example.com",
-        "user2@example.com",
-        "user3@example.com",
-        "user4@example.com",
-        "user5@example.com"
-    ]
-    for user in users:
-      factories.PersonFactory(email=user)
-
-  @staticmethod
   def _create_snapshotable_objects():
     """Create original objects that will be snapshotted."""
     text_cad = factories.CustomAttributeDefinitionFactory(
@@ -100,11 +87,6 @@ class TestAuditSnapshotQueries(TestCase):
         title="date cad",
         definition_type="market",
         attribute_type="Date",
-    )
-    person_cad = factories.CustomAttributeDefinitionFactory(
-        title="CA person",
-        definition_type="market",
-        attribute_type="Map:Person",
     )
 
     for i in range(5):
@@ -121,16 +103,10 @@ class TestAuditSnapshotQueries(TestCase):
           attributable=market,
           attribute_value="2016-11-0{}".format(i + 1),
       )
-      factories.CustomAttributeValueFactory(
-          custom_attribute=person_cad,
-          attributable=market,
-          attribute_value="user{}@example.com".format(i + 1),
-      )
 
   @classmethod
   def _setup_objects(cls):
     """Create and reindex objects needed for tests"""
-    cls._create_users()
     cls._create_snapshotable_objects()
 
     revisions = models.Revision.query.filter(
@@ -297,36 +273,6 @@ class TestAuditSnapshotQueries(TestCase):
         }
     ])
     self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 3)
-
-  def test_snapshot_person_ca_filter(self):
-    """Test filtering snapshots by person custom attribute."""
-    result = self._post([
-        {
-            "object_name": "Snapshot",
-            "filters": {
-                "expression": {
-                    "left": self._get_model_expression(),
-                    "op": {"name": "AND"},
-                    "right": {
-                        "left": {
-                            "left": "text cad",
-                            "op": {"name": "="},
-                            "right": "2016-11-01",  # 1 match
-                        },
-                        "op": {"name": "OR"},
-                        "right": {
-                            "left": "CA person",
-                            "op": {"name": "="},
-                            "right": "user2@example.com",  # 1 match
-                        },
-                    },
-                },
-                "keys": [],
-                "order_by": {"keys": [], "order": "", "compare": None}
-            }
-        }
-    ])
-    self.assertEqual(len(result.json[0]["Snapshot"]["values"]), 2)
 
   @data(*CONTROL_COUNTS.items())
   def test_assesessment_relationships(self, test_data):
