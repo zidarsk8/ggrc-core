@@ -413,7 +413,7 @@ describe('GGRC.Components.modalMapper', function () {
     helpers = Component.prototype.helpers;
   });
   beforeEach(function () {
-    scope = new can.Map({});
+    scope = GGRC.Components.getViewModel('modalMapper');
   });
 
   describe('".create-control modal:success" event', function () {
@@ -687,7 +687,7 @@ describe('GGRC.Components.modalMapper', function () {
       };
       spyOn(window, 'RefreshQueue')
         .and.returnValue({
-          enqueue: function (instance) {
+          enqueue: function () {
             return {
               trigger: jasmine.createSpy()
                 .and.returnValue(can.Deferred().resolve())
@@ -1017,7 +1017,7 @@ describe('GGRC.Components.modalMapper', function () {
       });
   });
 
-  describe('get_object() hepler', function () {
+  describe('get_object() helper', function () {
     var helper;
 
     beforeEach(function () {
@@ -1040,7 +1040,7 @@ describe('GGRC.Components.modalMapper', function () {
     });
   });
 
-  describe('loading_or_saving() hepler', function () {
+  describe('loading_or_saving() helper', function () {
     var helper;
     var options = {
       fn: function () {
