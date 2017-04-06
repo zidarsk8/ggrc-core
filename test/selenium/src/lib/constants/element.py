@@ -155,7 +155,7 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   """To transformation elements' labels and properties for Modal to Set
  visible fields for object as Tree View headers.
  """
-  OWNER = "Owner"
+  ADMIN = "Admin"
   VERIFIED = "Verified"
   STATUS = "Status"
   AUDIT_LEAD = "Internal Audit Lead"
@@ -268,7 +268,7 @@ class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):
  """
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonAssessmentTemplate.ASMT_TMPL)
-  OWNER = TransformationSetVisibleFields.OWNER
+  ADMIN = TransformationSetVisibleFields.ADMIN
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   DEFAULT_SET_FIELDS = (
@@ -304,7 +304,7 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonControl.CONTROL)
-  OWNER = TransformationSetVisibleFields.OWNER
+  ADMIN = TransformationSetVisibleFields.ADMIN
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   URL = Base.URL
@@ -321,7 +321,7 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   PRINCIPAL_ASSIGNEE = roles.PRINCIPAL_ASSIGNEE
   SECONDARY_ASSIGNEE = roles.SECONDARY_ASSIGNEE
   DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE, OWNER,
+      CommonModalSetVisibleFields.TITLE, ADMIN,
       CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
       PRIMARY_CONTACT)
 
@@ -333,14 +333,14 @@ class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonIssue.ISSUE)
-  OWNER = TransformationSetVisibleFields.OWNER
+  ADMIN = TransformationSetVisibleFields.ADMIN
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   REVIEW_STATE = "Review State"
   URL = Base.URL
   REFERENCE_URL = Base.REFERENCE_URL
   DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE, OWNER,
+      CommonModalSetVisibleFields.TITLE, ADMIN,
       CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
       CommonModalSetVisibleFields.LAST_UPDATED)
 
