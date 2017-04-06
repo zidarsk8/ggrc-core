@@ -56,13 +56,21 @@ class SnapshotBlockConverter(object):
     return child_types.pop() if child_types else ""
 
   @cached_property
-  def _cad_name_map(self):
-    """Get id to name mapping for all custom attribute definitions."""
-    cad_map = {}
+  def _cad_map(self):
+    """Get id to cad mapping for all cad ordered by title."""
+    map_ = {}
     for snap in self.snapshots:
       for cad in snap.revision.content.get("custom_attribute_definitions", []):
-        cad_map[cad["id"]] = cad["title"]
-    return OrderedDict(sorted(cad_map.iteritems(), key=lambda x: x[1]))
+        map_[cad["id"]] = cad
+    return OrderedDict(sorted(map_.iteritems(), key=lambda x: x[1]["title"]))
+
+  @cached_property
+  def _cad_name_map(self):
+    """Get id to name mapping for all cad ordered by title."""
+    return OrderedDict([
+        (key, value["title"])
+        for key, value in self._cad_map.items()
+    ])
 
   @cached_property
   def _attribute_name_map(self):
@@ -140,6 +148,7 @@ class SnapshotBlockConverter(object):
 
   def _content_line_list(self, snapshot):
     """Get a CSV content line for a single snapshot."""
+    # pylint: disable=no-self-use,unused-argument
     return []
 
   @property
