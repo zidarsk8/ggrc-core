@@ -14,6 +14,7 @@
   var modelName;
   var widgetList;
   var widgetModels;
+  var pageUtils = GGRC.Utils.CurrentPage;
 
   var sortByNameEmail = function (list) {
     return new list.constructor(can.makeArray(list).sort(function (a, b) {
@@ -190,11 +191,11 @@
 
     initWidgets();
 
-    widgetList = GGRC.Utils.CurrentPage.getWidgetList();
-    defaults = GGRC.Utils.CurrentPage.getDefaultWidgets(widgetList);
-    widgetModels = GGRC.Utils.CurrentPage.getWidgetModels();
+    widgetList = pageUtils.getWidgetList(modelName, location);
+    defaults = pageUtils.getDefaultWidgets(widgetList, location);
+    widgetModels = pageUtils.getWidgetModels(modelName, location);
 
-    if (!isAssessmentsView && GGRC.Utils.CurrentPage.getPageType() !== 'Workflow') {
+    if (!isAssessmentsView && pageUtils.getPageType() !== 'Workflow') {
       GGRC.Utils.QueryAPI.initCounts(widgetModels, {
         type: instance.type,
         id: instance.id
