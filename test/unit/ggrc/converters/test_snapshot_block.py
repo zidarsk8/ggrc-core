@@ -201,3 +201,9 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         self.block._header_list,
         [[], ["AAA", "Audit", "DDD", "BBB", "CCC", "A", "B", "C", "D"]]
     )
+
+  def test_body_list(self):
+    self.block.snapshots = []
+    self.assertEqual(self.block._body_list, [[]])
+    self.block.snapshots = [1, 2, 3]
+    self.assertEqual(self.block._body_list, [[], [], []])

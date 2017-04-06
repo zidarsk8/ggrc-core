@@ -138,6 +138,18 @@ class SnapshotBlockConverter(object):
         self._attribute_name_map.values() + self._cad_name_map.values()
     ]
 
+  def _content_line_list(self, snapshot):
+    """Get a CSV content line for a single snapshot."""
+    return []
+
+  @property
+  def _body_list(self):
+    """Get 2D representation of CSV content."""
+    return [
+        self._content_line_list(snapshot)
+        for snapshot in self.snapshots
+    ] or [[]]
+
   def to_array(self):
     """Get 2D list representing the CSV file."""
-    return self._header_list, [[]]
+    return self._header_list, self._body_list
