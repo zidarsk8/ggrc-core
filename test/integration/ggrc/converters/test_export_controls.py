@@ -15,17 +15,18 @@ class TestExportControls(TestCase):
   model = all_models.Control
 
   def setUp(self):
-    super(TestExportControls, self).setUp()
-    self.client.get("/login")
-    self.headers = {
-        'Content-Type': 'application/json',
-        "X-Requested-By": "GGRC",
-        "X-export-view": "blocks",
-    }
-    self.basic_owner = factories.PersonFactory(name="basic owner")
-    self.control = factories.ControlFactory()
-    self.owner_object = factories.OwnerFactory(person=self.basic_owner,
-                                               ownable=self.control)
+    with factories.single_commit():
+      super(TestExportControls, self).setUp()
+      self.client.get("/login")
+      self.headers = {
+          'Content-Type': 'application/json',
+          "X-Requested-By": "GGRC",
+          "X-export-view": "blocks",
+      }
+      self.basic_owner = factories.PersonFactory(name="basic owner")
+      self.control = factories.ControlFactory()
+      self.owner_object = factories.OwnerFactory(person=self.basic_owner,
+                                                 ownable=self.control)
 
   def test_search_by_owner_email(self):
     self.assertSlugs("owners",

@@ -9,7 +9,7 @@ from collections import defaultdict
 from ddt import data, unpack, ddt
 
 from integration.ggrc_workflows.models import factories
-from integration.ggrc.models.factories import PersonFactory
+from integration.ggrc.models.factories import PersonFactory, single_commit
 from integration.ggrc import TestCase
 
 from ggrc.models.all_models import CycleTaskGroupObjectTask, CycleTaskGroup
@@ -34,21 +34,22 @@ class TestExportTasks(TestCase):
   def generate_tasks_for_cycle(group_count, task_count):
     """generate number of task groups and task for current task group"""
     results = {}
-    workflow = factories.WorkflowFactory()
-    cycle = factories.CycleFactory(workflow=workflow)
-    task_group = factories.TaskGroupFactory(workflow=workflow)
-    for idx in range(group_count):
-      person = PersonFactory(name="user for group {}".format(idx))
-      cycle_task_group = factories.CycleTaskGroupFactory(cycle=cycle,
-                                                         contact=person)
-      for _ in range(task_count):
-        task_group_task = factories.TaskGroupTaskFactory(
-            task_group=task_group, contact=person)
-        task = factories.CycleTaskFactory(cycle=cycle,
-                                          cycle_task_group=cycle_task_group,
-                                          contact=person,
-                                          task_group_task=task_group_task)
-        results[task.id] = cycle_task_group.slug
+    with single_commit():
+      workflow = factories.WorkflowFactory()
+      cycle = factories.CycleFactory(workflow=workflow)
+      task_group = factories.TaskGroupFactory(workflow=workflow)
+      for idx in range(group_count):
+        person = PersonFactory(name="user for group {}".format(idx))
+        cycle_task_group = factories.CycleTaskGroupFactory(cycle=cycle,
+                                                           contact=person)
+        for _ in range(task_count):
+          task_group_task = factories.TaskGroupTaskFactory(
+              task_group=task_group, contact=person)
+          task = factories.CycleTaskFactory(cycle=cycle,
+                                            cycle_task_group=cycle_task_group,
+                                            contact=person,
+                                            task_group_task=task_group_task)
+          results[task.id] = cycle_task_group.slug
     return results
 
   @data(
