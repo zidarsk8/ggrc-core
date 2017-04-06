@@ -271,6 +271,30 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         ""
     )
 
+  def test_obj_attr_line(self):
+    """Test get object attribute CSV values."""
+    self.block.get_value_string = lambda x: x or ""
+    self.block._attribute_name_map = OrderedDict([
+        ("name", "display name"),
+        ("other", "other display name"),
+        ("third", "third display name"),
+    ])
+    self.assertEqual(
+        self.block._obj_attr_line({
+            "name": "1",
+            "third": "2",
+            "other": "3",
+        }),
+        ["1", "3", "2"]
+    )
+    self.assertEqual(
+        self.block._obj_attr_line({
+            "name": "1",
+            "third": "2",
+        }),
+        ["1", "", "2"]
+    )
+
   def test_header_list(self):
     """Test snapshot export header data."""
     self.block._attribute_name_map = OrderedDict(

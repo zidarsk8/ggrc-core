@@ -159,6 +159,13 @@ class SnapshotBlockConverter(object):
         self._attribute_name_map.values() + self._cad_name_map.values()
     ]
 
+  def _obj_attr_line(self, content):
+    """Get object attribute CSV values."""
+    return [
+        self.get_value_string(content.get(name))
+        for name in self._attribute_name_map
+    ]
+
   def _content_line_list(self, snapshot):
     """Get a CSV content line for a single snapshot."""
     # pylint: disable=no-self-use,unused-argument
