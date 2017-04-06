@@ -9,55 +9,35 @@ import copy
 import json
 import os
 
-from lib.constants import objects, url, templates
-
 
 class TemplateProvider(object):
   """Provider of methods for work with JSON templates."""
-  _relationship = objects.get_singular(url.RELATIONSHIPS)
-  _object_owner = objects.get_singular(url.OBJECT_OWNERS)
-  _count = templates.COUNT
-  _contact = objects.get_singular(url.CONTACTS)
-  relative_path_template = "template/{0}.json"
-  parsed_data = dict()
 
-  @classmethod
-  def generate_template_as_dict(cls, template, **kwargs):
+  @staticmethod
+  def generate_template_as_dict(json_tmpl_name, **kwargs):
     """Get template as dictionary from predefined JSON file and attributes
     (items (kwargs): key=value).
     Return dictionary like as {type: {key: value, ...}}.
     """
-    path = os.path.join(os.path.dirname(__file__),
-                        cls.relative_path_template.format(template))
+    path = os.path.join(
+        os.path.dirname(__file__), "template/{0}.json".format(json_tmpl_name))
     with open(path) as json_file:
       json_data = json_file.read()
-    data = json.loads(json_data)
-    cls.parsed_data[template] = data
-    obj = copy.deepcopy(data)
-    obj.update(kwargs)
-    if template not in {cls._relationship, cls._object_owner, cls._count}:
-      contact = ({cls._contact: cls.generate_object(1, objects.PEOPLE)})
-      obj.update(contact)
-    return {template: obj}
+    json_tmpl = json.loads(json_data)
+    dict()[json_tmpl_name] = json_tmpl
+    json_tmpl_copy = copy.deepcopy(json_tmpl)
+    json_tmpl_copy.update({k: v for k, v in kwargs.iteritems() if v})
+    return {json_tmpl_name: json_tmpl_copy}
 
-  @classmethod
-  def update_template_as_dict(cls, template, **kwargs):
+  @staticmethod
+  def update_template_as_dict(json_tmpl_name, **kwargs):
     """Update template as list of dictionary according to
     attributes (items (kwargs): key=value).
     Return list of dictionary like as [{type: {key: value, ...}}].
     """
-    data = json.loads(template)
-    type = data.iterkeys().next()
-    value = data.itervalues().next()
-    obj = copy.deepcopy(value)
-    obj.update(kwargs)
-    return {type: obj}
-
-  @staticmethod
-  def generate_object(obj_id, obj_type):
-    """Return minimal object representation by id and type."""
-    result = {}
-    result["id"] = obj_id
-    result["href"] = "/".join([url.API, obj_type, str(obj_id)])
-    result["type"] = objects.get_singular(obj_type)
-    return result
+    json_tmpl = json.loads(json_tmpl_name)
+    type = json_tmpl.iterkeys().next()
+    value = json_tmpl.itervalues().next()
+    json_tmpl_copy = copy.deepcopy(value)
+    json_tmpl_copy.update(kwargs)
+    return {type: json_tmpl_copy}

@@ -4,7 +4,7 @@
 # pylint: disable=too-few-public-methods
 
 from lib import base, environment, exception
-from lib.constants import locator, url
+from lib.constants import locator, url, objects
 from lib.page.widget import widget_base
 from lib.utils import selenium_utils
 
@@ -77,13 +77,14 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
     """Return Tree View item objects from current widget."""
     return self.ca_tree_view.tree_view_items()
 
-  def add_custom_attribute(self, ca_object):
+  def add_custom_attribute(self, ca_obj):
     """Add custom attribute from custom attribute object given."""
     ca_item_content = self.expand_collapse_group(
-        ca_object.definition_type, expand=True)
-    ca_item_content.add_new_custom_attribute(ca_object)
-    self.check_success_ca_created_msg(ca_object.title)
-    self.expand_collapse_group(ca_object.definition_type, expand=False)
+        objects.get_normal_form(ca_obj.definition_type), expand=True)
+    ca_item_content.add_new_custom_attribute(ca_obj)
+    self.check_success_ca_created_msg(ca_obj.title)
+    self.expand_collapse_group(
+        objects.get_normal_form(ca_obj.definition_type), expand=False)
 
   def check_success_ca_created_msg(self, ca_title):
     """Await for success message with given custom attribute title."""
@@ -95,7 +96,8 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
   def get_custom_attributes_list(self, ca_group):
     """Collect custom attributes from expanded custom attribute group
     Tree View."""
-    ca_item_content = self.expand_collapse_group(ca_group, expand=True)
+    ca_item_content = self.expand_collapse_group(
+        objects.get_normal_form(ca_group.definition_type), expand=True)
     return ca_item_content.get_ca_list_from_group()
 
 

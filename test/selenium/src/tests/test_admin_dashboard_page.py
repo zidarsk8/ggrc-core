@@ -13,8 +13,8 @@ import pytest
 
 from lib import base, constants
 from lib.constants import objects, messages
-from lib.constants.element import AdminWidgetCustomAttrs
-from lib.entities.entities_factory import CAFactory
+from lib.constants.element import AdminWidgetCustomAttributes
+from lib.entities.entities_factory import CustomAttributeDefinitionsFactory
 from lib.page import dashboard
 
 
@@ -57,24 +57,26 @@ class TestAdminDashboardPage(base.Test):
     on Admin Dashboard panel.
     """
     ca_widget = admin_dashboard.select_custom_attributes()
-    act_ca_groups_set = set([item.text for item in ca_widget.get_items_list()])
-    exp_ca_groups_set = set([objects.get_normal_form(item) for item in
-                             objects.ALL_CA_OBJS])
-    assert exp_ca_groups_set == act_ca_groups_set, (
+    expected_ca_groups_set = set(
+        [objects.get_normal_form(item) for item in objects.ALL_CA_OBJS])
+    actual_ca_groups_set = set(
+        [item.text for item in ca_widget.get_items_list()])
+    assert expected_ca_groups_set == actual_ca_groups_set, (
         messages.ERR_MSG_FORMAT.format(
-            exp_ca_groups_set, act_ca_groups_set))
+            expected_ca_groups_set, actual_ca_groups_set))
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "ca_type, def_type",
-      [(type_item, random.choice(objects.ALL_CA_OBJS)) for type_item in
-       AdminWidgetCustomAttrs.ALL_ATTRS_TYPES])
+      [(ca_type_item,
+        objects.get_normal_form(random.choice(objects.ALL_CA_OBJS))) for
+       ca_type_item in AdminWidgetCustomAttributes.ALL_CA_TYPES]
+  )
   def test_add_global_ca(self, admin_dashboard, ca_type, def_type):
     """Create different types of Custom Attribute on Admin Dashboard."""
-    exp_custom_attribute = CAFactory().create(
-        ca_type=ca_type, definition_type=def_type)
+    expected_ca = CustomAttributeDefinitionsFactory().create(
+        attribute_type=ca_type, definition_type=def_type)
     ca_widget = admin_dashboard.select_custom_attributes()
-    ca_widget.add_custom_attribute(exp_custom_attribute)
-    act_ca_list = ca_widget.get_custom_attributes_list(
-        exp_custom_attribute.definition_type)
-    assert exp_custom_attribute in act_ca_list
+    ca_widget.add_custom_attribute(ca_obj=expected_ca)
+    list_actual_ca = ca_widget.get_custom_attributes_list(ca_group=expected_ca)
+    assert expected_ca in list_actual_ca

@@ -6,7 +6,7 @@
 # pylint: disable=too-few-public-methods
 
 from lib import base, decorator, environment
-from lib.constants import locator, url
+from lib.constants import locator, url, objects
 from lib.entities.entity import CustomAttributeEntity
 from lib.utils import selenium_utils
 from lib.utils.string_utils import get_bool_from_string
@@ -61,31 +61,35 @@ class CustomAttributesItemContent(base.Component):
     self.custom_attributes_list = []
     self._item_name = item_text
 
-  def add_new_custom_attribute(self, ca_object):
+  def add_new_custom_attribute(self, ca_obj):
     """Create Custom Attribute entry based on given Custom Attribute object."""
     ca_modal = self.open_add_new_ca_modal()
-    ca_modal.select_type(ca_object.ca_type)
-    ca_modal.enter_title(ca_object.title)
-    if ca_object.is_mandatory:
+    ca_modal.select_type(ca_obj.attribute_type)
+    ca_modal.enter_title(ca_obj.title)
+    if ca_obj.mandatory:
       ca_modal.set_mandatory()
-    if ca_object.placeholder is not None:
-      ca_modal.enter_placeholder(ca_object.placeholder)
-    ca_modal.enter_inline_help(ca_object.helptext)
-    if ca_object.multi_choice_options is not None:
-      ca_modal.enter_possible_values(ca_object.multi_choice_options)
+    if ca_obj.placeholder:
+      ca_modal.enter_placeholder(ca_obj.placeholder)
+    if ca_obj.helptext:
+      ca_modal.enter_inline_help(ca_obj.helptext)
+    if ca_obj.multi_choice_options:
+      ca_modal.enter_possible_values(ca_obj.multi_choice_options)
     ca_modal.save_and_close()
 
   def _set_custom_attributes_list(self):
     """Set custom attributes list with Custom Attribute objects from
     current opened content item.
     """
-    for elem in selenium_utils.get_when_all_visible(self._driver,
-                                                    self._locators.ROW):
-      attr = [i.text for i in elem.find_elements(*self._locators.CELL_IN_ROW)]
+    for row in selenium_utils.get_when_all_visible(self._driver,
+                                                   self._locators.ROW):
+      attrs = [i.text for i in row.find_elements(*self._locators.CELL_IN_ROW)]
       self.custom_attributes_list.append(
-          CustomAttributeEntity(title=attr[0], ca_type=attr[1],
-                                is_mandatory=get_bool_from_string(attr[2]),
-                                definition_type=self._item_name))
+          CustomAttributeEntity(
+              title=attrs[0],
+              type=objects.get_singular(objects.CUSTOM_ATTRIBUTES),
+              attribute_type=attrs[1],
+              mandatory=get_bool_from_string(attrs[2]),
+              definition_type=self._item_name))
 
   def get_ca_list_from_group(self):
     """Return list of Custom Attribute objects."""
