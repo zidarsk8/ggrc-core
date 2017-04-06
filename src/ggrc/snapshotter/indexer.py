@@ -104,12 +104,15 @@ def _get_custom_attribute_dict():
   cadef_klass_names = {getattr(all_models, klass)._inflector.table_singular
                        for klass in Types.all}
 
-  return dict(db.session.query(
+  cads = db.session.query(
       models.CustomAttributeDefinition.id,
       models.CustomAttributeDefinition.title,
+      models.CustomAttributeDefinition.attribute_type,
   ).filter(
       models.CustomAttributeDefinition.definition_type.in_(cadef_klass_names)
-  ).all())
+  )
+
+  return {cad.id: cad for cad in cads}
 
 
 def get_searchable_attributes(attributes, cad_dict, content):
@@ -117,8 +120,7 @@ def get_searchable_attributes(attributes, cad_dict, content):
 
   Args:
     attributes: Attributes that should be extracted from some model
-    cad_keys: IDs of custom attribute definitions
-    ca_definitions: Dictionary of "CAD ID" -> "CAD title"
+    cad_dict: dict from CAD id to CAD object with title and type defined
     content: dictionary (JSON) representation of an object
   Return:
     Dict of "key": "value" from objects revision
@@ -135,7 +137,10 @@ def get_searchable_attributes(attributes, cad_dict, content):
   for cav in cav_list:
     cad = cad_dict.get(cav["custom_attribute_id"])
     if cad:
-      searchable_values[cad] = cav["attribute_value"]
+      if cad.attribute_type == "Map:Person":
+        searchable_values[cad.title] = cav.get("attribute_object")
+      else:
+        searchable_values[cad.title] = cav["attribute_value"]
   return searchable_values
 
 
@@ -278,12 +283,6 @@ def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
             for role in roles:
               properties[role] = [person]
 
-      single_person_properties = {"modified_by", "principal_assessor",
-                                  "secondary_assessor", "contact",
-                                  "secondary_contact"}
-
-      multiple_person_properties = {"owners"}
-
       for prop, val in properties.items():
         if prop and val is not None:
           # record stub
@@ -296,17 +295,18 @@ def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
               "subproperty": "",
               "content": val,
           }
-          if prop in single_person_properties:
-            if val:
-              search_payload += get_person_data(rec, val)
-              search_payload += get_person_sort_subprop(rec, [val])
-          elif prop in multiple_person_properties:
+          if isinstance(val, dict) and "title" in val:
+            # Option
+            rec["content"] = val["title"]
+            search_payload += [rec]
+          elif isinstance(val, dict) and val.get("type") == "Person":
+            search_payload += get_person_data(rec, val)
+            search_payload += get_person_sort_subprop(rec, [val])
+          elif isinstance(val, list) and all([p.get("type") == "Person"
+                                              for p in val]):
             for person in val:
               search_payload += get_person_data(rec, person)
             search_payload += get_person_sort_subprop(rec, val)
-          elif isinstance(val, dict) and "title" in val:
-            rec["content"] = val["title"]
-            search_payload += [rec]
           elif isinstance(val, (bool, int, long)):
             rec["content"] = unicode(val)
             search_payload += [rec]
