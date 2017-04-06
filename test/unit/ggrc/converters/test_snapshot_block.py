@@ -366,6 +366,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
 
   def test_body_list(self):
     """Test basic CSV body format."""
+    self.block._content_line_list = lambda x: []
     self.block.snapshots = []
     self.assertEqual(self.block._body_list, [[]])
     self.block.snapshots = [1, 2, 3]

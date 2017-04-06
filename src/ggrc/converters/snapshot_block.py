@@ -179,8 +179,8 @@ class SnapshotBlockConverter(object):
 
   def _content_line_list(self, snapshot):
     """Get a CSV content line for a single snapshot."""
-    # pylint: disable=no-self-use,unused-argument
-    return []
+    content = snapshot.revision.content
+    return self._obj_attr_line(content) + self._cav_attr_line(content)
 
   @property
   def _body_list(self):
