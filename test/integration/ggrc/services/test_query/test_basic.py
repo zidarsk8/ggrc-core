@@ -3,6 +3,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+# pylint: disable=too-many-lines
+
 """Tests for /query api endpoint."""
 
 import unittest
@@ -835,6 +837,44 @@ class TestSortingQuery(BaseQueryAPITestCase):
     )
     self.assertListEqual([ass["title"] for ass in assessments_by_assessors],
                          ["Assessment_2", "Assessment_1"])
+
+
+class TestQueryAssessmentByEvidenceURL(BaseQueryAPITestCase):
+  """Test assessments filtering by Evidence and/or URL"""
+  def setUp(self):
+    """Set up test cases for all tests."""
+    TestCase.clear_data()
+    response = self._import_file("assessment_full_no_warnings.csv")
+    self._check_csv_response(response, {})
+    self.client.get("/login")
+
+  def test_query_evidence_url(self):
+    """Test assessments query filtered by Evidence"""
+    assessments_by_evidence = self._get_first_result_set(
+        self._make_query_dict(
+            "Assessment",
+            expression=["Evidence", "~", "i.imgur.com"],
+        ),
+        "Assessment", "values",
+    )
+
+    self.assertEqual(len(assessments_by_evidence), 2)
+    self.assertItemsEqual([asmt["title"] for asmt in assessments_by_evidence],
+                          ["Assessment title 1", "Assessment title 3"])
+
+    assessments_by_evidence = self._get_first_result_set(
+        self._make_query_dict(
+            "Assessment",
+            expression=["url", "~", "i.imgur.com"],
+        ),
+        "Assessment", "values",
+    )
+
+    self.assertEqual(len(assessments_by_evidence), 3)
+    self.assertItemsEqual([asmt["title"] for asmt in assessments_by_evidence],
+                          ["Assessment title 1",
+                           "Assessment title 3",
+                           "Assessment title 4"])
 
 
 class TestQueryWithCA(BaseQueryAPITestCase):

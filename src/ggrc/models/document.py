@@ -1,9 +1,12 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Module containing Document model."""
+
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc.fulltext.mixin import Indexed
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Base
 from ggrc.models.relationship import Relatable
@@ -11,7 +14,8 @@ from ggrc.models.object_owner import Ownable
 from ggrc.models.utils import validate_option
 
 
-class Document(Ownable, Relatable, Base, db.Model):
+class Document(Ownable, Relatable, Indexed, Base, db.Model):
+  """Audit model."""
   __tablename__ = 'documents'
 
   # TODO: inherit from Titled mixin (note: title is nullable here)
@@ -72,6 +76,7 @@ class Document(Ownable, Relatable, Base, db.Model):
 
   @validates('kind', 'year', 'language')
   def validate_document_options(self, key, option):
+    """Returns correct option, otherwise rises an error"""
     if key == 'year':
       desired_role = 'document_year'
     elif key == 'kind':
