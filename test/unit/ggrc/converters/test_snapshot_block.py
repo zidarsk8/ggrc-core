@@ -3,6 +3,8 @@
 
 """Unit tests for Snapshot block converter class."""
 
+from collections import OrderedDict
+
 import unittest
 import mock
 
@@ -174,4 +176,28 @@ class TestSnapshotBlockConverter(unittest.TestCase):
             {"type": "Dummy", "id": 3}
         ]),
         "AAA\nDDD\nCCC"
+    )
+
+  def test_header_list(self):
+    """Test snapshot export header data."""
+    self.block._attribute_name_map = OrderedDict(
+        [
+            ("key_3", "AAA"),
+            ("audit", "Audit"),  # inserted snapshot attribute
+            ("key_2", "DDD"),
+            ("key_1", "BBB"),
+            ("key_4", "CCC"),
+        ]
+    )
+    self.block._cad_name_map = OrderedDict(
+        [
+            (3, "A"),
+            (2, "B"),
+            (1, "C"),
+            (4, "D"),
+        ]
+    )
+    self.assertEquals(
+        self.block._header_list,
+        [[], ["AAA", "Audit", "DDD", "BBB", "CCC", "A", "B", "C", "D"]]
     )

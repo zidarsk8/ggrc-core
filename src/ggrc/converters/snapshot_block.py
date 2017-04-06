@@ -131,6 +131,13 @@ class SnapshotBlockConverter(object):
       return value
     return u""
 
-  @staticmethod
-  def to_array():
-    return [[]], [[]]  # header and body
+  @property
+  def _header_list(self):
+    return [
+        [],  # empty line reserved for column descriptions
+        self._attribute_name_map.values() + self._cad_name_map.values()
+    ]
+
+  def to_array(self):
+    """Get 2D list representing the CSV file."""
+    return self._header_list, [[]]
