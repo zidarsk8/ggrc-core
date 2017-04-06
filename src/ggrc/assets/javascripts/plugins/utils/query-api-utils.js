@@ -232,9 +232,12 @@
     }
 
     function refreshCounts() {
-      var widgets;
+      var widgets = GGRC.Utils.CurrentPage.getWidgetModels();
       var pageInstance;
-      widgets = GGRC.Utils.CurrentPage.getWidgetModels();
+
+      if (!widgets) {
+        return null;
+      }
       pageInstance = GGRC.page_instance();
 
       return initCounts(widgets,

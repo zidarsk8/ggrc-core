@@ -70,6 +70,10 @@
       var location = window.location.pathname;
 
       pageInstance = GGRC.page_instance();
+
+      if (!pageInstance) {
+        return null;
+      }
       modelName = pageInstance.constructor.shortName;
       widgetList = GGRC.WidgetList.get_widget_list_for(modelName);
       isAssessmentsView = /^\/assessments_view/.test(location);
@@ -88,6 +92,10 @@
       var widgetModels;
 
       widgetList = this.getWidgetList();
+
+      if (!widgetList) {
+        return null;
+      }
       defaults = getDefaultWidgets(widgetList);
 
       widgetModels = defaults.map(function (widgetName) {
