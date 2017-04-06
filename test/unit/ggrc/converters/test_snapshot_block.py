@@ -212,6 +212,65 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         "AAA\nDDD\nCCC"
     )
 
+  def test_get_cav_value_string(self):
+    """Test get value string function for custom attributes."""
+    self.block._cad_map = OrderedDict(
+        [
+            (3, {"id": 3, "title": "AAA", "attribute_type": "Map:Person"}),
+            (2, {"id": 2, "title": "BBB", "attribute_type": "Date"}),
+            (1, {"id": 1, "title": "CCC", "attribute_type": "Checkbox"}),
+            (4, {"id": 4, "title": "DDD", "attribute_type": "Map:Person"}),
+            (5, {"id": 5, "title": "DDD", "attribute_type": "Text"}),
+        ]
+    )
+    self.block._stub_cache = {
+        "Person": {
+            4: "user@example.com"
+        }
+    }
+
+    # invalid custom attribute representations should throw errors
+    with self.assertRaises(TypeError):
+      self.block.get_cav_value_string("XX")
+    with self.assertRaises(KeyError):
+      self.block.get_cav_value_string({})
+
+    self.assertEqual(self.block.get_cav_value_string(None), "")
+    self.assertEqual(
+        self.block.get_cav_value_string({
+            "custom_attribute_id": 2,
+            "attribute_value": "22/44/88",
+        }),
+        "22/44/88"
+    )
+    self.assertEqual(
+        self.block.get_cav_value_string({
+            "custom_attribute_id": 1,
+            "attribute_value": True,
+        }),
+        "yes"
+    )
+    self.assertEqual(
+        self.block.get_cav_value_string({
+            "custom_attribute_id": 3,
+            "attribute_value": "Person",
+            "attribute_object_id": 4,
+        }),
+        "user@example.com"
+    )
+    # If the original object was deleted from the system we do not store all of
+    # its values in he revision. Proper thing would be to go through revisions
+    # of this object and use those static values. But we do not currently
+    # support that.
+    self.assertEqual(
+        self.block.get_cav_value_string({
+            "custom_attribute_id": 3,
+            "attribute_value": "Bad Option",
+            "attribute_object_id": 4,
+        }),
+        ""
+    )
+
   def test_header_list(self):
     """Test snapshot export header data."""
     self.block._attribute_name_map = OrderedDict(

@@ -139,6 +139,19 @@ class SnapshotBlockConverter(object):
       return value
     return u""
 
+  def get_cav_value_string(self, value):
+    """Get string representation of a custom attribute value."""
+    if value is None:
+      return u""
+    cad = self._cad_map[value["custom_attribute_id"]]
+    if cad["attribute_type"] == "Map:Person":
+      return self._stub_cache.get(value.get("attribute_value"), {}).get(
+          value.get("attribute_object_id"), u"")
+    val = value.get("attribute_value", u"")
+    if isinstance(val, bool):
+      return u"yes" if val else u"no"
+    return val
+
   @property
   def _header_list(self):
     return [
