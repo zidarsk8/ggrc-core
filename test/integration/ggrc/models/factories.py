@@ -14,6 +14,7 @@ use the object generator in the ggrc.generator module.
 
 import random
 import string
+from contextlib import contextmanager
 
 import factory
 
@@ -29,6 +30,20 @@ def random_str(length=8, prefix="", chars=None):
   return prefix + "".join(random.choice(chars) for _ in range(length))
 
 
+@contextmanager
+def single_commit():
+  """Run all factory create calls in single commit."""
+  db.session.single_commit = False
+  try:
+    yield
+  except:
+    raise
+  else:
+    db.session.commit()
+  finally:
+    db.session.single_commit = True
+
+
 class ModelFactory(factory.Factory):
 
   @classmethod
@@ -39,7 +54,8 @@ class ModelFactory(factory.Factory):
       cls._log_event(instance.attributable)
     if hasattr(instance, "log_json"):
       cls._log_event(instance)
-    db.session.commit()
+    if getattr(db.session, "single_commit", True):
+      db.session.commit()
     return instance
 
   @classmethod

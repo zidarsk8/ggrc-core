@@ -9,6 +9,7 @@ from collections import defaultdict
 from ddt import data, ddt, unpack
 
 from integration.ggrc_workflows.models import factories
+from integration.ggrc.models.factories import single_commit
 from integration.ggrc.models.factories import PersonFactory
 from integration.ggrc import TestCase
 
@@ -34,10 +35,11 @@ class TestExportTasks(TestCase):
   def generate_tasks_for_cycle(task_count):
     """generate number of task groups and task for current task group"""
     results = []
-    for idx in range(task_count):
-      person = PersonFactory(name="user for group {}".format(idx))
-      task = factories.CycleTaskFactory(contact=person)
-      results.append(task.id)
+    with single_commit():
+      for idx in range(task_count):
+        person = PersonFactory(name="user for group {}".format(idx))
+        task = factories.CycleTaskFactory(contact=person)
+        results.append(task.id)
     return results
 
   @data(0, 1, 2)
