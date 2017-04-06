@@ -295,6 +295,51 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         ["1", "", "2"]
     )
 
+  def test_cav_attr_line(self):
+    """Test get custom attribute CSV values."""
+    self.block.get_cav_value_string = lambda x: (
+        x.get("attribute_value") if x else ""
+    )
+    self.block._cad_map = OrderedDict(
+        [
+            (3, {"id": 3, "title": "AAA"}),
+            (2, {"id": 2, "title": "BBB"}),
+            (5, {"id": 5, "title": "DDD"}),
+        ]
+    )
+    self.assertEqual(
+        self.block._cav_attr_line({}),
+        ["", "", ""]
+    )
+    self.assertEqual(
+        self.block._cav_attr_line({"custom_attribute_values": []}),
+        ["", "", ""]
+    )
+    self.assertEqual(
+        self.block._cav_attr_line({
+            "custom_attribute_values": [{
+                "custom_attribute_id": 5,
+                "attribute_value": "five",
+            }, {
+                "custom_attribute_id": 3,
+                "attribute_value": "three",
+            }]
+        }),
+        ["three", "", "five"]
+    )
+    self.assertEqual(
+        self.block._cav_attr_line({
+            "custom_attribute_values": [{
+                "custom_attribute_id": 5,
+                "attribute_value": "five",
+            }, {
+                "custom_attribute_id": 8,
+                "attribute_value": "eight",
+            }]
+        }),
+        ["", "", "five"]
+    )
+
   def test_header_list(self):
     """Test snapshot export header data."""
     self.block._attribute_name_map = OrderedDict(
