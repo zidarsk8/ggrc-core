@@ -55,9 +55,17 @@ TODO: Temporary disabled until snapshot view is added.
             {{/using}}
 
             <li>
-                <open-original-link
-                    revisions="instance.snapshot.revisions">
-                </open-original-link>
+                {{#if instance.originalObjectDeleted}}
+                    <a href="#" class="disabled-original disabled">
+                        <i class="fa fa-long-arrow-right"></i>
+                        Original {{instance.class.title_singular}} is deleted
+                    </a>
+                {{else}}
+                    <a href="{{instance.originalLink}}">
+                        <i class="fa fa-long-arrow-right"></i>
+                        View original {{instance.class.title_singular}}
+                    </a>
+                {{/if}}
             </li>
         </ul>
     </div>
