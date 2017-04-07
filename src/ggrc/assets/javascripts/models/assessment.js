@@ -96,7 +96,7 @@
         attr_name: 'verifiers',
         order: 7
       }, {
-        attr_title: 'Create Date',
+        attr_title: 'Created Date',
         attr_name: 'created_at',
         order: 8
       }]
