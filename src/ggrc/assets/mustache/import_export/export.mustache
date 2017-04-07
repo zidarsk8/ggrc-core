@@ -39,6 +39,21 @@
                 </div>
               </div>
 
+              {{#if_equals type "Snapshot"}}
+                <div class="row-fluid">
+                  <div class="span4">
+                    <h6>Select snapshot object type</h6>
+                    <div class="single-line-filter">
+                      <select can-value="item.snapshot_type" class="input-block-level option-type-selector">
+                        {{#snapshotable_objects}}
+                          <option value="{{.}}" label="{{.}}" ></option>
+                        {{/snapshotable_objects}}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              {{/if}}
+
               {{> /static/mustache/import_export/export/attribute_selector.mustache}}
               {{> /static/mustache/import_export/export/filter_query.mustache}}
 

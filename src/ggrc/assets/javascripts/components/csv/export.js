@@ -137,6 +137,11 @@
               index - 1 : el.filter.id;
             return id ? '#' + el.model_name + ',' + id + '#' : null;
           });
+          if (panel.attr('snapshot_type')) {
+            predicates.push(
+              ' child_type = ' + panel.attr('snapshot_type') + ' '
+            );
+          }
           relevantFilter = _.reduce(predicates, function (p1, p2) {
             return p1 + ' AND ' + p2;
           });
@@ -228,6 +233,7 @@
     template: '<content></content>',
     scope: {
       exportable: GGRC.Bootstrap.exportable,
+      snapshotable_objects: GGRC.config.snapshotable_objects,
       panel_number: '@',
       has_parent: false,
       fetch_relevant_data: function (id, type) {
@@ -276,6 +282,7 @@
         this.scope.attr('item.selected', {});
         this.scope.attr('item.relevant', []);
         this.scope.attr('item.filter', '');
+        this.scope.attr('item.snapshot_type', '');
         this.scope.attr('item.has_parent', false);
 
         this.setSelected();
