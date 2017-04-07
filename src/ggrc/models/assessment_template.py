@@ -49,7 +49,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
 
   # labels to show to the user in the UI for various default people values
   DEFAULT_PEOPLE_LABELS = {
-      "Object Owners": "Object Owners",
+      "Object Owners": "Object Admins",
       "Audit Lead": "Audit Lead",
       "Auditors": "Auditors",
       "Primary Assessor": "Principal Assessor",

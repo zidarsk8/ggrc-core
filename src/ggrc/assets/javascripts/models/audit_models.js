@@ -344,7 +344,7 @@
       assessorsList: {},
       verifiersList: {},
       people_values: [
-        {value: 'Object Owners', title: 'Object Owners'},
+        {value: 'Object Owners', title: 'Object Admins'},
         {value: 'Audit Lead', title: 'Audit Lead'},
         {value: 'Auditors', title: 'Auditors'},
         {value: 'Primary Assessor', title: 'Principal Assignee'},

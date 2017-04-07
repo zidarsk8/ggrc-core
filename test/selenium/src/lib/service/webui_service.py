@@ -48,7 +48,7 @@ class BaseWebUiService(object):
     """
     fields = element.TransformationSetVisibleFields
     return {
-        fields.TITLE.upper(): "title", fields.OWNER.upper(): "owners",
+        fields.TITLE.upper(): "title", fields.ADMIN.upper(): "owners",
         fields.CODE.upper(): "slug",
         fields.STATE.upper(): "status", fields.STATUS.upper(): "status",
         fields.VERIFIED.upper(): "verified",
