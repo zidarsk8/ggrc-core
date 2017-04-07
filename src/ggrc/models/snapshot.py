@@ -46,6 +46,7 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
       "revision_id",
       reflection.PublishOnly("revisions"),
       reflection.PublishOnly("is_latest_revision"),
+      reflection.PublishOnly("original_object_deleted"),
   ]
 
   _update_attrs = [
@@ -90,6 +91,11 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
   def is_latest_revision(self):
     """Flag if the snapshot has the latest revision."""
     return self.revisions and self.revision == self.revisions[-1]
+
+  @computed_property
+  def original_object_deleted(self):
+    """Flag if the snapshot has the latest revision."""
+    return self.revisions and self.revisions[-1].action == "deleted"
 
   @classmethod
   def eager_query(cls):
