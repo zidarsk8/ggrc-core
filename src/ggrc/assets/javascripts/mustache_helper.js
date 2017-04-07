@@ -1351,7 +1351,13 @@ Mustache.registerHelper("lowercase", function (value, options) {
     }
     value = resolve_computed(value) || '';
     value = _.first(_.map(value.split(','), function (type) {
-      return _.trim(type).toLowerCase();
+      var lowercaseType = _.trim(type).toLowerCase();
+
+      if (lowercaseType === 'assessor') {
+        lowercaseType = 'assignee';
+      }
+
+      return lowercaseType;
     }));
     return _.isEmpty(value) ? '' : '(' + capitalizeFirst(value) + ')';
   });
