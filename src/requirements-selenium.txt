@@ -9,7 +9,7 @@ pytest-pep8==1.0.6
 pytest-selenium==1.9.1
 pytest-variables==1.5.1
 pytest-xdist==1.15.0
-pytest==3.0.7
+pytest==3.0.6
 requests==2.8.1
 selenium==3.3.0
 sniffer==0.3.5
