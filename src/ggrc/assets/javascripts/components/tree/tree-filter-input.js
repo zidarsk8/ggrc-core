@@ -37,8 +37,8 @@
       options.attr('operation', operation);
       options.attr('depth', depth);
 
-      if (this.filters) {
-        this.attr('filters').push(options);
+      if (this.registerFilter) {
+        this.registerFilter(options);
       }
     },
     submit: function () {

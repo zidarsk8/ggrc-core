@@ -57,8 +57,8 @@
       options.attr('operation', operation);
       options.attr('depth', depth);
 
-      if (this.filters) {
-        this.attr('filters').push(options);
+      if (this.registerFilter) {
+        this.registerFilter(options);
       }
 
       this.attr('filterStates', filterStates);
@@ -103,6 +103,9 @@
     }
   });
 
+  /**
+   *
+   */
   GGRC.Components('treeStatusFilter', {
     tag: 'tree-status-filter',
     template: '<content/>',

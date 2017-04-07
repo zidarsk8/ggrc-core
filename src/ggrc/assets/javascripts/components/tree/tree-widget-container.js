@@ -8,7 +8,6 @@
 
   var template = can.view(GGRC.mustache_path +
     '/components/tree/tree-widget-container.mustache');
-  var QueryAPI = GGRC.Utils.QueryAPI;
   var TreeViewUtils = GGRC.Utils.TreeView;
 
   var viewModel = can.Map.extend({
@@ -268,6 +267,9 @@
       counts.on(countsName, function (ev, newVal, oldVal) {
         can.trigger($el, 'updateCount', [newVal]);
       });
+    },
+    registerFilter: function (option) {
+      this.attr('filters').push(option);
     },
     /**
      * Concatenation active filters.
