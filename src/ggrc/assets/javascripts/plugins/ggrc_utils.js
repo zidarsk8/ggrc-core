@@ -669,6 +669,7 @@
       content.selfLink = content.snapshot.selfLink;
       content.type = instance.child_type;
       content.id = instance.id;
+      content.originalObjectDeleted = instance.original_object_deleted;
       content.canRead = Permission.is_allowed_for('read', {
         type: instance.child_type,
         id: instance.child_id
