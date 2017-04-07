@@ -9,10 +9,12 @@ from .object_person import Personable
 from .audit_object import Auditable
 from .track_object_state import HasObjectState
 from .relationship import Relatable
+from .mixins.with_last_assessment_date import WithLastAssessmentDate
 
 
-class Objective(HasObjectState, CustomAttributable, Auditable, Relatable,
-                Personable, Ownable, BusinessObject, Indexed, db.Model):
+class Objective(WithLastAssessmentDate, HasObjectState, CustomAttributable,
+                Auditable, Relatable, Personable, Ownable, BusinessObject,
+                Indexed, db.Model):
   __tablename__ = 'objectives'
   _publish_attrs = []
   _include_links = []
