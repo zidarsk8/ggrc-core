@@ -145,6 +145,9 @@ class SnapshotBlockConverter(object):
       return value
     return u""
 
+  def get_content_string(self, content, name):
+    return self.get_value_string(content.get(name))
+
   def get_cav_value_string(self, value):
     """Get string representation of a custom attribute value."""
     if value is None:
@@ -168,7 +171,7 @@ class SnapshotBlockConverter(object):
   def _obj_attr_line(self, content):
     """Get object attribute CSV values."""
     return [
-        self.get_value_string(content.get(name))
+        self.get_content_string(content, name)
         for name in self._attribute_name_map
     ]
 

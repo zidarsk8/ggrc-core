@@ -287,7 +287,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
 
   def test_obj_attr_line(self):
     """Test get object attribute CSV values."""
-    self.block.get_value_string = lambda x: x or ""
+    self.block.get_content_string = lambda x, name: x.get(name, "")
     self.block._attribute_name_map = OrderedDict([
         ("name", "display name"),
         ("other", "other display name"),
