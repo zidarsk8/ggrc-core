@@ -5,11 +5,6 @@
 
 import mock
 
-from sqlalchemy import func
-from sqlalchemy.sql.expression import tuple_
-
-from ggrc import db
-from ggrc import models
 from ggrc.converters.snapshot_block import SnapshotBlockConverter
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -21,40 +16,6 @@ class TestSnapshotBlockConverter(TestCase):
   # protected functions.
   # pylint: disable=protected-access
 
-  @staticmethod
-  def _get_latest_object_revisions(objects):
-    """Get latest revisions of given objects."""
-    object_tuples = [(o.id, o.type) for o in objects]
-    revisions = models.Revision.query.filter(
-        models.Revision.id.in_(
-            db.session.query(func.max(models.Revision.id)).filter(
-                tuple_(
-                    models.Revision.resource_id,
-                    models.Revision.resource_type,
-                ).in_(object_tuples)
-            ).group_by(
-                models.Revision.resource_type,
-                models.Revision.resource_id,
-            )
-        )
-    )
-    return revisions
-
-  def _create_snapshots(self, objects):
-    """Create snapshots of latest object revisions for given objects."""
-    revisions = self._get_latest_object_revisions(objects)
-    audit = factories.AuditFactory()
-    snapshots = [
-        factories.SnapshotFactory(
-            child_id=revision.resource_id,
-            child_type=revision.resource_type,
-            revision=revision,
-            parent=audit,
-        )
-        for revision in revisions
-    ]
-    return snapshots
-
   def test_empty_snapshots(self):
     """Test snapshots property for empty ids list."""
     converter = mock.MagicMock()
@@ -63,7 +24,10 @@ class TestSnapshotBlockConverter(TestCase):
 
   def test_snapshots_property(self):
     """Test snapshots property and snapshot content."""
-    snapshots = self._create_snapshots([factories.ControlFactory()])
+    snapshots = self._create_snapshots(
+        factories.AuditFactory(),
+        [factories.ControlFactory()],
+    )
 
     converter = mock.MagicMock()
     ids = [s.id for s in snapshots]
@@ -74,10 +38,10 @@ class TestSnapshotBlockConverter(TestCase):
 
   def test_valid_child_types(self):
     """Test child_type property with valid snapshots list."""
-    snapshots = self._create_snapshots([
-        factories.ControlFactory(),
-        factories.ControlFactory(),
-    ])
+    snapshots = self._create_snapshots(
+        factories.AuditFactory(),
+        [factories.ControlFactory(), factories.ControlFactory()],
+    )
     converter = mock.MagicMock()
     ids = [s.id for s in snapshots]
     block = SnapshotBlockConverter(converter, ids)
@@ -91,10 +55,10 @@ class TestSnapshotBlockConverter(TestCase):
 
   def test_invalid_child_types(self):
     """Test child_type property with invalid snapshots list."""
-    snapshots = self._create_snapshots([
-        factories.ControlFactory(),
-        factories.PolicyFactory(),
-    ])
+    snapshots = self._create_snapshots(
+        factories.AuditFactory(),
+        [factories.ControlFactory(), factories.PolicyFactory()],
+    )
     converter = mock.MagicMock()
     ids = [s.id for s in snapshots]
     block = SnapshotBlockConverter(converter, ids)

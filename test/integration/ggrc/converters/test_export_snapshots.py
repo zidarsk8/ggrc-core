@@ -3,10 +3,8 @@
 
 """Tests for snapshot export."""
 
-from sqlalchemy import func
-from sqlalchemy.sql.expression import tuple_
 
-from ggrc import db, models
+from ggrc import models
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
@@ -22,37 +20,6 @@ class TestExportSnapshots(TestCase):
         "X-Requested-By": "GGRC",
         "X-export-view": "blocks",
     }
-
-  @staticmethod
-  def _get_latest_revisions(objects):
-    object_tuples = [(obj.type, obj.id) for obj in objects]
-    return models.Revision.query.filter(
-        models.Revision.id.in_(
-            db.session.query(
-                func.max(models.Revision.id)
-            ).filter(
-                tuple_(
-                    models.Revision.resource_type,
-                    models.Revision.resource_id,
-                ).in_(object_tuples)
-            ).group_by(
-                models.Revision.resource_type,
-                models.Revision.resource_id,
-            )
-        )
-    )
-
-  @staticmethod
-  def _create_snapshots(audit, revisions):
-    return [
-        factories.SnapshotFactory(
-            child_id=revision.resource_id,
-            child_type=revision.resource_type,
-            revision=revision,
-            parent=audit,
-        )
-        for revision in revisions
-    ]
 
   def test_simple_export(self):
     """Test simple empty snapshot export."""
@@ -100,9 +67,8 @@ class TestExportSnapshots(TestCase):
     self.import_file("control_snapshot_data_single.csv")
 
     controls = models.Control.query.all()
-    revisions = self._get_latest_revisions(controls)
     audit = factories.AuditFactory()
-    self._create_snapshots(audit, revisions)
+    self._create_snapshots(audit, controls)
 
     control_dicts = {
         control.slug: {
