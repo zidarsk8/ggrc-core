@@ -52,15 +52,23 @@ class TestExportSnapshots(TestCase):
           return cav.attribute_value
     return u""
 
-  def test_full_export(self):
-    """Test exporting of a single full control snapshot."""
+  @staticmethod
+  def _create_cads(type_):
     cad = factories.CustomAttributeDefinitionFactory
-    cad(title="date", definition_type="control", attribute_type="Date")
-    cad(title="checkbox", definition_type="control", attribute_type="Checkbox")
-    cad(title="person", definition_type="control", attribute_type="Map:Person")
-    cad(title="RT", definition_type="control", attribute_type="Rich Text")
-    cad(title="dropdown", definition_type="control", attribute_type="Dropdown",
-        multi_choice_options="one,two,three,four,five")
+    return [
+        cad(title="date", definition_type=type_, attribute_type="Date"),
+        cad(title="checkbox", definition_type=type_,
+            attribute_type="Checkbox"),
+        cad(title="person", definition_type=type_,
+            attribute_type="Map:Person"),
+        cad(title="RT", definition_type=type_, attribute_type="Rich Text"),
+        cad(title="dropdown", definition_type=type_, attribute_type="Dropdown",
+            multi_choice_options="one,two,three,four,five"),
+    ]
+
+  def test_full_control_export(self):
+    """Test exporting of a single full control snapshot."""
+    self._create_cads("control")
     self.import_file("control_snapshot_data_single.csv")
     # Duplicate import because we have a bug in logging revisions and this
     # makes sure that the fixture created properly.
@@ -107,6 +115,78 @@ class TestExportSnapshots(TestCase):
             # Fields that are not included in snapshots - Known bugs.
             "Assertions": u"",  # "\n".join(c.name for c in control.assertions)
             "Categories": u"",  # "\n".join(c.name for c in control.categories)
+        }
+        for snapshot, control in zip(snapshots, controls)
+    }
+
+    search_request = [{
+        "object_name": "Snapshot",
+        "filters": {
+            "expression": {
+                "left": "child_type",
+                "op": {"name": "="},
+                "right": "Control",
+            },
+        },
+    }]
+    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"]
+    parsed_dict = {line["Code"]: line for line in parsed_data}
+
+    self.assertEqual(
+        parsed_dict["*Control 1"],
+        control_dicts["Control 1"],
+    )
+
+  def test_empty_control_export(self):
+    """Test exporting of a single full control snapshot."""
+    cads = self._create_cads("control")
+    controls = [factories.ControlFactory(slug="Control 1")]
+    for cad in cads:
+      factories.CustomAttributeValueFactory(
+          attributable=controls[0],
+          custom_attribute=cad,
+      )
+    audit = factories.AuditFactory()
+    snapshots = self._create_snapshots(audit, controls)
+
+    control_dicts = {
+        control.slug: {
+            # normal fields
+            "Admin": u"",
+            "Code": "*" + control.slug,
+            "Revision Date": unicode(snapshot.revision.created_at),
+            "Control URL": u"",
+            "Description": u"",
+            "Effective Date": u"",
+            "Fraud Related": u"",
+            "Frequency": u"",
+            "Kind/Nature": u"",
+            "Notes": u"",
+            "Primary Contact": u"",
+            "Principal Assignee": u"",
+            "Reference URL": u"",
+            "Review State": u"Unreviewed",
+            "Secondary Assignee": u"",
+            "Secondary Contact": u"",
+            "Significance": u"",
+            "State": u"Draft",
+            "Stop Date": u"",
+            "Test Plan": u"",
+            "Title": control.title,
+            "Type/Means": u"",
+            # Special snapshot export fields
+            "Audit": audit.slug,
+
+            # Custom attributes
+            "RT": u"",
+            "checkbox": u"no",
+            "date": u"",
+            "dropdown": u"",
+            "person": u"",
+
+            # Fields that are not included in snapshots - Known bugs.
+            "Assertions": u"",
+            "Categories": u"",
         }
         for snapshot, control in zip(snapshots, controls)
     }
