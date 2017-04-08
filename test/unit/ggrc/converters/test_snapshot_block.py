@@ -203,6 +203,12 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         }, "dummy_item"),
         "Stored boolean value"
     )
+    self.assertEqual(
+        self.block.get_content_string({
+            "dummy_item": None,
+        }, "dummy_item"),
+        ""
+    )
 
   def test_get_content_string_date(self):
     """Test getting content for date values."""

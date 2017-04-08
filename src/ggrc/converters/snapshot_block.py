@@ -182,7 +182,7 @@ class SnapshotBlockConverter(object):
     """
     value_map = self._content_value_map.get(self.child_type, {}).get(name)
     if value_map:
-      return value_map.get(content.get(name))
+      return value_map.get(content.get(name), u"")
     if name in self.DATE_FIELDS:
       val = content.get(name)
       if not val:
