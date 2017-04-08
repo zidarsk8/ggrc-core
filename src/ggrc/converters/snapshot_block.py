@@ -125,8 +125,12 @@ class SnapshotBlockConverter(object):
         attr = getattr(model, id_map.get(model_name, "slug"), None)
         if not attr:
           continue
-        cache[model_name] = dict(db.session.query(
-            model.id, attr).filter(model.id.in_(ids)))
+        model_count = model.query.count()
+        if len(ids) > model_count/2 or len(ids) < 500:
+          cache[model_name] = dict(db.session.query(model.id, attr))
+        else:
+          cache[model_name] = dict(db.session.query(
+              model.id, attr).filter(model.id.in_(ids)))
     return cache
 
   def get_value_string(self, value):
