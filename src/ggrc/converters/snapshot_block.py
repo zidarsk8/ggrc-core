@@ -56,19 +56,21 @@ class SnapshotBlockConverter(object):
 
     The content of the given snapshots also contains the mapped audit field.
     """
-    if not self.ids:
-      return []
-    snapshots = models.Snapshot.eager_query().filter(
-        models.Snapshot.id.in_(self.ids)
-    ).all()
+    with benchmark("Gather selected snapshots"):
+      if not self.ids:
+        return []
+      snapshots = models.Snapshot.eager_query().filter(
+          models.Snapshot.id.in_(self.ids)
+      ).all()
 
-    for snapshot in snapshots:  # add special snapshot attribute
-      snapshot.content = {}
-      snapshot.content.update(snapshot.revision.content)
-      snapshot.content["audit"] = {"type": "Audit", "id": snapshot.parent_id}
-      snapshot.content["revision_date"] = unicode(snapshot.revision.created_at)
-      snapshot.content["slug"] = u"*{}".format(snapshot.content["slug"])
-    return snapshots
+      for snapshot in snapshots:  # add special snapshot attribute
+        snapshot.content = {}
+        snapshot.content.update(snapshot.revision.content)
+        snapshot.content["audit"] = {"type": "Audit", "id": snapshot.parent_id}
+        snapshot.content["slug"] = u"*{}".format(snapshot.content["slug"])
+        snapshot.content["revision_date"] = unicode(
+            snapshot.revision.created_at)
+      return snapshots
 
   @cached_property
   def child_type(self):
