@@ -69,6 +69,8 @@ class SnapshotBlockConverter(object):
           "type": "Audit",
           "id": snapshot.parent_id
       }
+      snapshot.revision.content["slug"] = u"*{}".format(
+          snapshot.revision.content["slug"])
     return snapshots
 
   @cached_property

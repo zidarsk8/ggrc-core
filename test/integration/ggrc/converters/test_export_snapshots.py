@@ -74,7 +74,7 @@ class TestExportSnapshots(TestCase):
         control.slug: {
             # normal fields
             "Admin": "\n".join(owner.email for owner in control.owners),
-            "Code": control.slug,
+            "Code": "*" + control.slug,
             "Control URL": control.url,
             "Description": control.description,
             "Effective Date": control.start_date.strftime("%m/%d/%Y"),
@@ -124,6 +124,6 @@ class TestExportSnapshots(TestCase):
     parsed_dict = {line["Code"]: line for line in parsed_data}
 
     self.assertEqual(
-        parsed_dict["Control 1"],
+        parsed_dict["*Control 1"],
         control_dicts["Control 1"],
     )
