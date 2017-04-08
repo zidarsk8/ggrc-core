@@ -20,8 +20,6 @@ class SnapshotBlockConverter(object):
   DATE_FIELDS = {
       "start_date",
       "end_date",
-      "updated_at",
-      "created_at",
   }
 
   def __init__(self, converter, ids):
@@ -69,6 +67,8 @@ class SnapshotBlockConverter(object):
           "type": "Audit",
           "id": snapshot.parent_id
       }
+      snapshot.revision.content["revision_date"] = unicode(
+          snapshot.revision.created_at)
       snapshot.revision.content["slug"] = u"*{}".format(
           snapshot.revision.content["slug"])
     return snapshots
@@ -108,6 +108,7 @@ class SnapshotBlockConverter(object):
       return {}
     aliases = AttributeInfo.gather_visible_aliases(model)
     aliases["audit"] = "Audit"  # special snapshot attribute
+    aliases["revision_date"] = "Revision Date"  # special snapshot attribute
     map_ = {key: value["display_name"] if isinstance(value, dict) else value
             for key, value in aliases.iteritems()}
     orderd_keys = AttributeInfo.get_column_order(map_.keys())

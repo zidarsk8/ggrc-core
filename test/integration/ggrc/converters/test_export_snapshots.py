@@ -68,13 +68,14 @@ class TestExportSnapshots(TestCase):
 
     controls = models.Control.query.all()
     audit = factories.AuditFactory()
-    self._create_snapshots(audit, controls)
+    snapshots = self._create_snapshots(audit, controls)
 
     control_dicts = {
         control.slug: {
             # normal fields
             "Admin": "\n".join(owner.email for owner in control.owners),
             "Code": "*" + control.slug,
+            "Revision Date": unicode(snapshot.revision.created_at),
             "Control URL": control.url,
             "Description": control.description,
             "Effective Date": control.start_date.strftime("%m/%d/%Y"),
@@ -107,7 +108,7 @@ class TestExportSnapshots(TestCase):
             "Assertions": u"",  # "\n".join(c.name for c in control.assertions)
             "Categories": u"",  # "\n".join(c.name for c in control.categories)
         }
-        for control in controls
+        for snapshot, control in zip(snapshots, controls)
     }
 
     search_request = [{

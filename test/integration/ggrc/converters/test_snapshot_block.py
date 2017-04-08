@@ -75,6 +75,7 @@ class TestSnapshotBlockConverter(TestCase):
         [
             ('slug', 'Code'),
             ('audit', 'Audit'),  # inserted attribute
+            ('revision_date', 'Revision Date'),  # inserted attribute
             ('title', 'Title'),
             ('description', 'Description'),
             ('notes', 'Notes'),
@@ -97,7 +98,5 @@ class TestSnapshotBlockConverter(TestCase):
             ('url', 'Control URL'),
             ('reference_url', 'Reference URL'),
             ('verify_frequency', 'Frequency'),
-            ('created_at', 'Created On'),
-            ('updated_at', 'Last Updated')
         ]
     )
