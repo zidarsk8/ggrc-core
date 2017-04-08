@@ -171,12 +171,18 @@ class SnapshotBlockConverter(object):
     if value is None:
       return u""
     cad = self._cad_map[value["custom_attribute_id"]]
-    if cad["attribute_type"] == "Map:Person":
-      return self._stub_cache.get(value.get("attribute_value"), {}).get(
-          value.get("attribute_object_id"), u"")
     val = value.get("attribute_value", u"")
+    if cad["attribute_type"] == "Map:Person":
+      return self._stub_cache.get(val, {}).get(
+          value.get("attribute_object_id"), u"")
     if cad["attribute_type"] == "Checkbox":
       return u"yes" if val in {"1", True} else u"no"
+    if cad["attribute_type"] == "Date":
+      parts = val.split("-")
+      if len(parts) == 3:
+        return "{}/{}/{}".format(parts[1], parts[2], parts[0])
+      else:
+        return u""
     return val
 
   @property

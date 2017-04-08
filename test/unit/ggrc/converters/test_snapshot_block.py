@@ -270,9 +270,16 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     self.assertEqual(
         self.block.get_cav_value_string({
             "custom_attribute_id": 2,
-            "attribute_value": "22/44/88",
+            "attribute_value": "2012-05-22",
         }),
-        "22/44/88"
+        "05/22/2012"
+    )
+    self.assertEqual(
+        self.block.get_cav_value_string({
+            "custom_attribute_id": 2,
+            "attribute_value": "",
+        }),
+        ""
     )
     self.assertEqual(
         self.block.get_cav_value_string({
