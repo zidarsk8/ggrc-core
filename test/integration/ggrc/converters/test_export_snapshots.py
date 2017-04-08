@@ -208,3 +208,33 @@ class TestExportSnapshots(TestCase):
         parsed_dict["*Control 1"],
         control_dicts["Control 1"],
     )
+
+  def test_same_revison_export(self):
+    """Exporting the same revision multiple times."""
+    controls = [factories.ControlFactory(slug="Control 1")]
+    audit1 = factories.AuditFactory()
+    self._create_snapshots(audit1, controls)
+    audit2 = factories.AuditFactory()
+    self._create_snapshots(audit2, controls)
+    audit_codes = {audit1.slug, audit2.slug}
+
+    search_request = [{
+        "object_name": "Snapshot",
+        "filters": {
+            "expression": {
+                "left": "child_type",
+                "op": {"name": "="},
+                "right": "Control",
+            },
+        },
+    }]
+    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"]
+
+    self.assertEqual(
+        [line["Code"] for line in parsed_data],
+        ["*Control 1", "*Control 1"],
+    )
+    self.assertEqual(
+        {line["Audit"] for line in parsed_data},
+        audit_codes,
+    )
