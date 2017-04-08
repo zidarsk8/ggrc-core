@@ -78,6 +78,9 @@ class TestExportSnapshots(TestCase):
           return u"yes" if int(cav.attribute_value) else u"no"
         elif cav.custom_attribute.attribute_type == "Map:Person":
           return cav.attribute_object.email if cav.attribute_object else u""
+        elif cav.custom_attribute.attribute_type == "Date":
+          parts = cav.attribute_value.split("-")
+          return u"{}/{}/{}".format(parts[1], parts[2], parts[0])
         else:
           return cav.attribute_value
     return u""
@@ -116,7 +119,7 @@ class TestExportSnapshots(TestCase):
             "Last Updated": unicode(control.updated_at),
             "Notes": control.notes,
             "Primary Contact": control.contact.email,
-            "Principal Assignee": control.principal_assessor,
+            "Principal Assignee": control.principal_assessor.email,
             "Reference URL": control.reference_url,
             "Review State": control.os_state,
             "Secondary Assignee": control.secondary_assessor.email,
