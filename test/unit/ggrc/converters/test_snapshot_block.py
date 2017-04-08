@@ -252,6 +252,20 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     )
     self.assertEqual(
         self.block.get_cav_value_string({
+            "custom_attribute_id": 1,
+            "attribute_value": "1",
+        }),
+        "yes"
+    )
+    self.assertEqual(
+        self.block.get_cav_value_string({
+            "custom_attribute_id": 1,
+            "attribute_value": "0",
+        }),
+        "no"
+    )
+    self.assertEqual(
+        self.block.get_cav_value_string({
             "custom_attribute_id": 3,
             "attribute_value": "Person",
             "attribute_object_id": 4,

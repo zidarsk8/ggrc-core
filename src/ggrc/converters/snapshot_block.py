@@ -150,8 +150,8 @@ class SnapshotBlockConverter(object):
       return self._stub_cache.get(value.get("attribute_value"), {}).get(
           value.get("attribute_object_id"), u"")
     val = value.get("attribute_value", u"")
-    if isinstance(val, bool):
-      return u"yes" if val else u"no"
+    if cad["attribute_type"] == "Checkbox":
+      return u"yes" if val in {"1", True} else u"no"
     return val
 
   @property
