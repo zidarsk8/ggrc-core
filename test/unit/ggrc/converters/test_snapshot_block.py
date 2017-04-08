@@ -309,6 +309,13 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     self.assertEqual(
         self.block.get_cav_value_string({
             "custom_attribute_id": 2,
+            "attribute_value": None,
+        }),
+        ""
+    )
+    self.assertEqual(
+        self.block.get_cav_value_string({
+            "custom_attribute_id": 2,
             "attribute_value": "2012-05-22",
         }),
         "05/22/2012"

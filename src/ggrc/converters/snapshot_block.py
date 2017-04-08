@@ -199,7 +199,7 @@ class SnapshotBlockConverter(object):
     if value is None:
       return u""
     cad = self._cad_map[value["custom_attribute_id"]]
-    val = value.get("attribute_value", u"")
+    val = value.get("attribute_value") or u""
     if cad["attribute_type"] == "Map:Person":
       return self._stub_cache.get(val, {}).get(
           value.get("attribute_object_id"), u"")
