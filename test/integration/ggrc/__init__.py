@@ -7,6 +7,8 @@ import json
 import logging
 import os
 import tempfile
+import csv
+from StringIO import StringIO
 
 from sqlalchemy import exc
 from flask.ext.testing import TestCase as BaseTestCase
@@ -236,12 +238,12 @@ class TestCase(BaseTestCase, object):
     """
     resp = self.export_csv(data)
     self.assert200(resp)
-    rows = resp.data.split("\r\n")
+    rows = csv.reader(StringIO(resp.data))
+
     object_type = None
     keys = []
     results = defaultdict(list)
-    for row in rows:
-      columns = row.split(',')
+    for columns in rows:
       if not any(columns):
         continue
       if columns[0] == "Object type":
@@ -253,6 +255,7 @@ class TestCase(BaseTestCase, object):
         keys = columns[1:]
         object_type = columns[0]
         continue
+      columns = [unicode(val) for val in columns]
       results[object_type].append(dict(zip(keys, columns[1:])))
     return results
 
