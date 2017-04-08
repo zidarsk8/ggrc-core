@@ -139,7 +139,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
   def test_attribute_name_map(self, attribute_info, _):
     """Test getting attribute name map for a valid model."""
     self.block.child_type = "Dummy"
-    attribute_info.gather_aliases.return_value = {
+    attribute_info.gather_visible_aliases.return_value = {
         "key_1": "BBB",
         "key_2": "DDD",
         "key_3": {"display_name": "AAA"},

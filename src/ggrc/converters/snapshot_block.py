@@ -104,7 +104,7 @@ class SnapshotBlockConverter(object):
       # Model has been removed from the system and we don't know its attribute
       # names anymore.
       return {}
-    aliases = AttributeInfo.gather_aliases(model)
+    aliases = AttributeInfo.gather_visible_aliases(model)
     aliases["audit"] = "Audit"  # special snapshot attribute
     map_ = {key: value["display_name"] if isinstance(value, dict) else value
             for key, value in aliases.iteritems()}
