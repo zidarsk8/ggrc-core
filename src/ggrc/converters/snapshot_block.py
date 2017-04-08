@@ -17,6 +17,13 @@ from ggrc.models.reflection import AttributeInfo
 class SnapshotBlockConverter(object):
   """Block converter for snapshots of a single object type."""
 
+  DATE_FIELDS = {
+      "start_date",
+      "end_date",
+      "updated_at",
+      "created_at",
+  }
+
   def __init__(self, converter, ids):
     self.converter = converter
     self.ids = ids
@@ -35,6 +42,7 @@ class SnapshotBlockConverter(object):
 
     In the future these should be pulled from individual objects.
     """
+    # pylint: disable=no-self-use
     return {
         "Control": {
             "key_control": {
@@ -161,9 +169,24 @@ class SnapshotBlockConverter(object):
     return u""
 
   def get_content_string(self, content, name):
+    """Get user visible string of the content value.
+
+    Args:
+      content: dict with keys and values.
+      name: dict key that we want to read.
+    Returns:
+      User visible string representation of a content value.
+    """
     value_map = self._content_value_map.get(self.child_type, {}).get(name)
     if value_map:
       return value_map.get(content.get(name))
+    if name in self.DATE_FIELDS:
+      val = content.get(name)
+      parts = val.split("-")
+      if "T" in val:
+        return val.replace("T", " ")
+      elif parts:
+        return u"{}/{}/{}".format(parts[1], parts[2], parts[0])
     return self.get_value_string(content.get(name))
 
   def get_cav_value_string(self, value):

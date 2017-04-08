@@ -204,6 +204,31 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         "Stored boolean value"
     )
 
+  def test_get_content_string_date(self):
+    """Test getting content for date values."""
+    self.block.get_value_string = lambda x: x or ""
+    self.block.DATE_FIELDS = {
+        "dummy_date"
+    }
+    self.assertEqual(
+        self.block.get_content_string({
+            "random_item": "Random value",
+        }, "random_item"),
+        "Random value"
+    )
+    self.assertEqual(
+        self.block.get_content_string({
+            "dummy_date": "2022-02-22",
+        }, "dummy_date"),
+        "02/22/2022"
+    )
+    self.assertEqual(
+        self.block.get_content_string({
+            "dummy_date": "2017-04-08T17:57:09",
+        }, "dummy_date"),
+        "2017-04-08 17:57:09"
+    )
+
   def test_get_value_string(self):
     """Test get value string function for all value types."""
     self.block._stub_cache = {
