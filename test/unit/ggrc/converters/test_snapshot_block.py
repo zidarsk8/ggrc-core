@@ -217,6 +217,14 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         "Random value"
     )
     self.assertEqual(
+        self.block.get_content_string({"dummy_date": None}, "dummy_date"),
+        ""
+    )
+    self.assertEqual(
+        self.block.get_content_string({"dummy_date": "", }, "dummy_date"),
+        ""
+    )
+    self.assertEqual(
         self.block.get_content_string({
             "dummy_date": "2022-02-22",
         }, "dummy_date"),

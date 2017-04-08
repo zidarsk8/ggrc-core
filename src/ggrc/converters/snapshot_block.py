@@ -185,10 +185,12 @@ class SnapshotBlockConverter(object):
       return value_map.get(content.get(name))
     if name in self.DATE_FIELDS:
       val = content.get(name)
+      if not val:
+        return u""
       parts = val.split("-")
       if "T" in val:
         return val.replace("T", " ")
-      elif parts:
+      elif len(parts) == 3:
         return u"{}/{}/{}".format(parts[1], parts[2], parts[0])
     return self.get_value_string(content.get(name))
 
