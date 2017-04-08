@@ -162,6 +162,7 @@ class AttributeInfo(object):
     self._create_attrs = AttributeInfo.gather_create_attrs(tgt_class)
     self._include_links = AttributeInfo.gather_include_links(tgt_class)
     self._aliases = AttributeInfo.gather_aliases(tgt_class)
+    self._visible_aliases = AttributeInfo.gather_visible_aliases(tgt_class)
 
   @classmethod
   def gather_attr_dicts(cls, tgt_class, src_attr):
@@ -218,6 +219,14 @@ class AttributeInfo(object):
   @classmethod
   def gather_aliases(cls, tgt_class):
     return cls.gather_attr_dicts(tgt_class, '_aliases')
+
+  @classmethod
+  def gather_visible_aliases(cls, tgt_class):
+    aliases = AttributeInfo.gather_aliases(tgt_class)
+    return {
+        attr: props for attr, props in aliases.items()
+        if props is not None and not is_filter_only(props)
+    }
 
   @classmethod
   def gather_update_attrs(cls, tgt_class):
@@ -371,22 +380,18 @@ class AttributeInfo(object):
     """
     definitions = {}
 
-    aliases = AttributeInfo.gather_aliases(object_class)
-    filtered_aliases = [
-        (attr, props) for attr, props in aliases.items()
-        if props is not None and not is_filter_only(props)
-    ]
+    aliases = AttributeInfo.gather_visible_aliases(object_class).items()
 
     # push the extra delete column at the end to override any custom behavior
     if hasattr(object_class, "slug"):
-      filtered_aliases.append(("delete", {
+      aliases.append(("delete", {
           "display_name": "Delete",
           "description": "",
       }))
 
     unique_columns = cls.get_unique_constraints(object_class)
 
-    for key, value in filtered_aliases:
+    for key, value in aliases:
       column = object_class.__table__.columns.get(key)
       definition = {
           "display_name": value,
