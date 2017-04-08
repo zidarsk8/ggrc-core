@@ -113,19 +113,21 @@ class SnapshotBlockConverter(object):
   @cached_property
   def _stub_cache(self):
     """Generate cache for all stubbed values."""
+    id_map = {
+        "Person": "email",
+        "Option": "title",
+    }
     stubs = self._gather_stubs()
     cache = {}
     for model_name, ids in stubs.iteritems():
       with benchmark("Generate snapshot cache for: {}".format(model_name)):
         model = getattr(models.all_models, model_name, None)
-        attr = getattr(model, "slug", getattr(model, "title", None))
+        attr = getattr(model, id_map.get(model_name, "slug"), None)
         if not attr:
           continue
-
         cache[model_name] = dict(db.session.query(
             model.id, attr).filter(model.id.in_(ids)))
-
-    return {}
+    return cache
 
   def get_value_string(self, value):
     """Get string representation of a given value."""
