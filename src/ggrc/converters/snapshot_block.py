@@ -30,6 +30,21 @@ class SnapshotBlockConverter(object):
     return "{} Snapshot".format(self.child_type)
 
   @cached_property
+  def _content_value_map(self):
+    """Mappings for all special value names.
+
+    In the future these should be pulled from individual objects.
+    """
+    return {
+        "Control": {
+            "key_control": {
+                True: "key",
+                False: "non-key",
+            }
+        }
+    }
+
+  @cached_property
   def snapshots(self):
     """List of all snapshots in the current block.
 
@@ -126,7 +141,7 @@ class SnapshotBlockConverter(object):
         if not attr:
           continue
         model_count = model.query.count()
-        if len(ids) > model_count/2 or len(ids) < 500:
+        if len(ids) > model_count / 2 or len(ids) < 500:
           cache[model_name] = dict(db.session.query(model.id, attr))
         else:
           cache[model_name] = dict(db.session.query(
@@ -146,6 +161,9 @@ class SnapshotBlockConverter(object):
     return u""
 
   def get_content_string(self, content, name):
+    value_map = self._content_value_map.get(self.child_type, {}).get(name)
+    if value_map:
+      return value_map.get(content.get(name))
     return self.get_value_string(content.get(name))
 
   def get_cav_value_string(self, value):

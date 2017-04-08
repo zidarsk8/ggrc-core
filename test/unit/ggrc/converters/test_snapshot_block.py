@@ -173,6 +173,37 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         []
     )
 
+  def test_get_content_string(self):
+    """Test getting content for special mapped values."""
+    self.block.get_value_string = lambda x: x or ""
+    self.block.child_type = "Dummy Object"
+    self.block._content_value_map = {
+        "Dummy Object": {
+            "dummy_item": {
+                "stored_value_1": "User visible value 1",
+                True: "Stored boolean value",
+            }
+        }
+    }
+    self.assertEqual(
+        self.block.get_content_string({
+            "random_item": "Random value",
+        }, "random_item"),
+        "Random value"
+    )
+    self.assertEqual(
+        self.block.get_content_string({
+            "dummy_item": "stored_value_1",
+        }, "dummy_item"),
+        "User visible value 1"
+    )
+    self.assertEqual(
+        self.block.get_content_string({
+            "dummy_item": True,
+        }, "dummy_item"),
+        "Stored boolean value"
+    )
+
   def test_get_value_string(self):
     """Test get value string function for all value types."""
     self.block._stub_cache = {
