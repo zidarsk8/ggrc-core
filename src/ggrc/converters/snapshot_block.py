@@ -149,7 +149,7 @@ class SnapshotBlockConverter(object):
         if not attr:
           continue
         model_count = model.query.count()
-        if len(ids) > model_count / 2 or len(ids) < 500:
+        if len(ids) > model_count / 2 or model_count < 500:
           cache[model_name] = dict(db.session.query(model.id, attr))
         else:
           cache[model_name] = dict(db.session.query(
