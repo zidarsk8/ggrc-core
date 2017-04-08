@@ -26,7 +26,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
   def test_gather_stubs(self):
     """Test _gather_stubs method."""
     snapshot_mock1 = mock.MagicMock()
-    snapshot_mock1.revision.content = {
+    snapshot_mock1.content = {
         "id": 44,
         "owners": [
             {"type": "person", "id": 1},
@@ -45,7 +45,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     }
 
     snapshot_mock2 = mock.MagicMock()
-    snapshot_mock2.revision.content = {
+    snapshot_mock2.content = {
         "id": 44,
         "type": "other",
         "options": [{"type": "option", "id": 4}],
@@ -69,7 +69,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
   def test_cad_map(self):
     """Test gathering name map for all custom attribute definitions."""
     snapshot_mock1 = mock.MagicMock()
-    snapshot_mock1.revision.content = {
+    snapshot_mock1.content = {
         "id": 44,
         "custom_attribute_definitions": [
             {"id": 1, "title": "CCC"},
@@ -78,7 +78,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     }
 
     snapshot_mock2 = mock.MagicMock()
-    snapshot_mock2.revision.content = {
+    snapshot_mock2.content = {
         "id": 45,
         "custom_attribute_definitions": [
             {"id": 1, "title": "CCC"},
@@ -103,7 +103,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
   def test_cad_name_map(self):
     """Test gathering name map for all custom attribute definitions."""
     snapshot_mock1 = mock.MagicMock()
-    snapshot_mock1.revision.content = {
+    snapshot_mock1.content = {
         "id": 44,
         "custom_attribute_definitions": [
             {"id": 1, "title": "CCC"},
@@ -112,7 +112,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     }
 
     snapshot_mock2 = mock.MagicMock()
-    snapshot_mock2.revision.content = {
+    snapshot_mock2.content = {
         "id": 45,
         "custom_attribute_definitions": [
             {"id": 1, "title": "CCC"},

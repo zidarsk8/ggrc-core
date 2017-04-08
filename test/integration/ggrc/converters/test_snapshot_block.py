@@ -34,7 +34,7 @@ class TestSnapshotBlockConverter(TestCase):
     block = SnapshotBlockConverter(converter, ids)
     self.assertEqual(block.snapshots, snapshots)
     for snapshot in snapshots:
-      self.assertIn("audit", snapshot.revision.content)
+      self.assertIn("audit", snapshot.content)
 
   def test_valid_child_types(self):
     """Test child_type property with valid snapshots list."""

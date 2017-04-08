@@ -63,14 +63,11 @@ class SnapshotBlockConverter(object):
     ).all()
 
     for snapshot in snapshots:  # add special snapshot attribute
-      snapshot.revision.content["audit"] = {
-          "type": "Audit",
-          "id": snapshot.parent_id
-      }
-      snapshot.revision.content["revision_date"] = unicode(
-          snapshot.revision.created_at)
-      snapshot.revision.content["slug"] = u"*{}".format(
-          snapshot.revision.content["slug"])
+      snapshot.content = {}
+      snapshot.content.update(snapshot.revision.content)
+      snapshot.content["audit"] = {"type": "Audit", "id": snapshot.parent_id}
+      snapshot.content["revision_date"] = unicode(snapshot.revision.created_at)
+      snapshot.content["slug"] = u"*{}".format(snapshot.content["slug"])
     return snapshots
 
   @cached_property
@@ -85,7 +82,7 @@ class SnapshotBlockConverter(object):
     """Get id to cad mapping for all cad ordered by title."""
     map_ = {}
     for snap in self.snapshots:
-      for cad in snap.revision.content.get("custom_attribute_definitions", []):
+      for cad in snap.content.get("custom_attribute_definitions", []):
         map_[cad["id"]] = cad
     return OrderedDict(sorted(map_.iteritems(), key=lambda x: x[1]["title"]))
 
@@ -133,7 +130,7 @@ class SnapshotBlockConverter(object):
           walk(val, stubs)
 
     for snapshot in self.snapshots:
-      walk(snapshot.revision.content, stubs)
+      walk(snapshot.content, stubs)
     return stubs
 
   @cached_property
@@ -240,7 +237,7 @@ class SnapshotBlockConverter(object):
 
   def _content_line_list(self, snapshot):
     """Get a CSV content line for a single snapshot."""
-    content = snapshot.revision.content
+    content = snapshot.content
     return self._obj_attr_line(content) + self._cav_attr_line(content)
 
   @property
