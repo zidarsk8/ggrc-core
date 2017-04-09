@@ -5,6 +5,7 @@
 
 
 from ggrc import models
+from ggrc.utils import QueryCounter
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 
@@ -238,3 +239,63 @@ class TestExportSnapshots(TestCase):
         {line["Audit"] for line in parsed_data},
         audit_codes,
     )
+
+  def test_export_query_count(self):
+    """Test for a constant number of queries for snapshot export
+
+    The number of database queries should not be linked to the amount of data
+    that is being exported.
+    """
+    self._create_cads("control")
+    self.import_file("control_snapshot_data_multiple.csv")
+    # Duplicate import because we have a bug in logging revisions and this
+    # makes sure that the fixture created properly.
+    self.import_file("control_snapshot_data_multiple.csv")
+
+    controls = models.Control.query.all()
+    audit = factories.AuditFactory()
+    self._create_snapshots(audit, controls)
+
+    with QueryCounter() as counter:
+      search_request = [{
+          "object_name": "Snapshot",
+          "filters": {
+              "expression": {
+                  "left": {
+                      "left": "child_type",
+                      "op": {"name": "="},
+                      "right": "Control",
+                  },
+                  "op": {"name": "AND"},
+                  "right": {
+                      "left": "Code",
+                      "op": {"name": "="},
+                      "right": "Control 1",
+                  },
+              },
+          },
+      }]
+      self.assertEqual(
+          len(self.export_parsed_csv(search_request)["Control Snapshot"]),
+          1,
+      )
+      single_query_count = counter.get
+
+    with QueryCounter() as counter:
+      search_request = [{
+          "object_name": "Snapshot",
+          "filters": {
+              "expression": {
+                  "left": "child_type",
+                  "op": {"name": "="},
+                  "right": "Control",
+              },
+          },
+      }]
+      self.assertEqual(
+          len(self.export_parsed_csv(search_request)["Control Snapshot"]),
+          5,
+      )
+      multiple_query_count = counter.get
+
+    self.assertEqual(multiple_query_count, single_query_count)
