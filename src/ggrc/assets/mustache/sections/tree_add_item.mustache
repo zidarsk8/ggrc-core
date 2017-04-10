@@ -20,7 +20,7 @@
         data-object-params='{
           "directive": {
               "id": {{parent_instance.id}},
-              "title": "{{parent_instance.title}}"
+              "title": "{{json_escape parent_instance.title}}"
           },
           "context": {
               "id": {{firstnonempty parent_instance.context.id "null"}},

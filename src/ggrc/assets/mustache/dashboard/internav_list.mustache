@@ -65,7 +65,7 @@
               data-object-params='{
                   "{{instance.class.table_singular}}": {
                       "id": {{instance.id}},
-                      "title": "{{instance.title}}"
+                      "title": "{{json_escape instance.title}}"
                   },
                   "context": {
                       "id": {{firstnonempty instance.context.id "null"}},
