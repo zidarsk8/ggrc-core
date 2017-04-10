@@ -46,8 +46,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
 
   def test_gather_stubs(self):
     """Test _gather_stubs method."""
-    snapshot_mock1 = mock.MagicMock()
-    snapshot_mock1.content = {
+    self.block.snapshots = self._mock_snapshot_factory([{
         "id": 44,
         "owners": [
             {"type": "person", "id": 1},
@@ -63,19 +62,11 @@ class TestSnapshotBlockConverter(unittest.TestCase):
             },
         ],
         "options": [{"type": "option", "id": 1}],
-    }
-
-    snapshot_mock2 = mock.MagicMock()
-    snapshot_mock2.content = {
+    }, {
         "id": 44,
         "type": "other",
         "options": [{"type": "option", "id": 4}],
-    }
-
-    self.block.snapshots = [
-        snapshot_mock1,
-        snapshot_mock2,
-    ]
+    }])
     stubs = self.block._gather_stubs()
     self.assertEqual(
         stubs,
