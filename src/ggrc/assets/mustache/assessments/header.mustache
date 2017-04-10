@@ -10,12 +10,14 @@ Copyright (C) 2017 Google Inc.
             <div class="pane-header__title">
                 <h3>{{instance.title}}</h3>
                   <span class="state-value {{addclass 'state-' instance.status separator=''}}">{{instance.status}}</span>
-                  {{#if instance.verified}}
-                    <i class="fa fa-check-circle green"
+                  {{#eq instance.status 'Completed'}}
+                    {{#if instance.verified}}
+                      <i class="fa fa-check-circle green"
                       rel="tooltip"
                       title="Verified on {{localize_date instance.verified_date}}">
                     </i>
-                  {{/if}}
+                    {{/if}}
+                  {{/eq}}
             </div>
         </div>
         <div class="span3">
@@ -52,29 +54,29 @@ Copyright (C) 2017 Google Inc.
                         {{#is_allowed 'update' instance context='for'}}
                             <li>
                               {{#unless instance._disabled}}
-                                {{#if_verifiers_defined instance}}
+                                {{#if instance.assignees.Verifier.length}}
                                     <reminder
-                                            instance="instance"
-                                            type="statusToPerson"
+                                            {instance}="instance"
+                                            {type}="statusToPerson"
                                             modal_title="Reminder for Assignees set"
                                             modal_description="Tomorrow all Assignees will receive a notification to look at this Assessment if they didn't move it to 'Finished' in between."
                                     >
-                                        <a href="javascript://" can-click="reminder">
+                                        <a href="javascript://" ($click)="reminder">
                                             <i class="fa fa-bell-o"></i>
                                             Send reminder to assignees</a>
                                     </reminder>
                                 {{else}}
                                     <reminder
-                                            instance="instance"
-                                            type="statusToPerson"
+                                            {instance}="instance"
+                                            {type}="statusToPerson"
                                             modal_title="Reminder for Assignees set"
                                             modal_description="Tomorrow all Assignees will receive a notification to look at this Assessment if they didn't move it to 'Final' in between."
                                     >
-                                        <a href="javascript://" can-click="reminder">
+                                        <a href="javascript://" ($click)="reminder">
                                             <i class="fa fa-bell-o"></i>
                                             Send reminder to assignees</a>
                                     </reminder>
-                                {{/if_verifiers_defined}}
+                                {{/if}}
                               {{/unless}}
                             </li>
                         {{/is_allowed}}
@@ -94,7 +96,7 @@ Copyright (C) 2017 Google Inc.
                 </div>
             </div>
           {{#is_allowed 'update' instance context='for'}}
-            <object-state-toolbar instance="instance"></object-state-toolbar>
+            <object-state-toolbar {verifiers}="instance.assignees.Verifier" {instance}="instance"></object-state-toolbar>
           {{/is_allowed}}
         </div>
     </div>

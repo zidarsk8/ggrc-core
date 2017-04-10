@@ -5,6 +5,11 @@
 (function (can, GGRC, CMS) {
   'use strict';
 
+  function validateCustomAttribute(value) {
+    value.errors = value.preconditions_failed || [];
+    return value;
+  }
+
   can.Model.Cacheable('CMS.Models.Assessment', {
     root_object: 'assessment',
     root_collection: 'assessments',
@@ -222,7 +227,8 @@
       }
 
       attributes.custom_attribute_values =
-        this.prepareCustomAttributes(definitions, values);
+        this.prepareCustomAttributes(definitions, values)
+          .map(validateCustomAttribute);
       return attributes;
     },
     model: function (attributes, oldModel) {
@@ -294,82 +300,9 @@
       this.attr('context', this.attr('audit.context'));
     },
     after_save: function () {
-      this.updateValidation();
       if (this.audit && this.audit.selfLink) {
         this.audit.refresh();
       }
-    },
-    updateValidation: function () {
-      var values = this.attr('custom_attribute_values');
-      var definitions = this.attr('custom_attribute_definitions');
-      var errorsList = {
-        attachment: [],
-        comment: [],
-        value: []
-      };
-      this.validateValues(definitions, values, errorsList);
-      this.setErrorMessages(errorsList);
-      this.setAggregatedErrorMessage();
-    },
-    validateValues: function (definitions, values, errorsList) {
-      can.each(definitions, function (cad) {
-        var cav;
-        var value;
-
-        can.each(values, function (item) {
-          if (item.custom_attribute_id === cad.id) {
-            cav = item;
-            value = cav.attribute_value;
-          }
-        });
-        if (cad.mandatory &&
-          GGRC.Utils.isEmptyCA(value, cad.attribute_type, cav)) {
-          // If Custom Attribute is mandatory and empty
-          errorsList.value.push(cad.title);
-        } else if (cav) {
-          // If Custom Attribute Value is presented - do all required checks
-          cav.preconditions_failed = cav.preconditions_failed || [];
-          if (cav.preconditions_failed.indexOf('comment') > -1) {
-            errorsList.comment.push(cad.title + ': ' + value);
-          }
-          if (cav.preconditions_failed.indexOf('evidence') > -1) {
-            errorsList.attachment.push(cad.title + ': ' + value);
-          }
-        }
-      });
-    },
-    setErrorMessages: function (needed) {
-      if (needed.comment.length) {
-        this.attr('_mandatory_comment_msg',
-          'Comment required by: ' + needed.comment.join(', '));
-      } else {
-        this.removeAttr('_mandatory_comment_msg');
-      }
-
-      if (needed.attachment.length) {
-        this.attr('_mandatory_attachment_msg',
-          'Evidence required by: ' + needed.attachment.join(', '));
-      } else {
-        this.removeAttr('_mandatory_attachment_msg');
-      }
-
-      if (needed.value.length) {
-        this.attr(
-          '_mandatory_value_msg',
-          'Values required for: ' + needed.value.join(', ')
-        );
-      } else {
-        this.removeAttr('_mandatory_value_msg');
-      }
-    },
-    setAggregatedErrorMessage: function () {
-      this.attr('_mandatory_msg',
-        _.filter([
-          this.attr('_mandatory_value_msg'),
-          this.attr('_mandatory_attachment_msg'),
-          this.attr('_mandatory_comment_msg')
-        ]).join('; <br />') || false
-      );
     },
     form_preload: function (newObjectForm) {
       var pageInstance = GGRC.page_instance();
@@ -460,10 +393,7 @@
       return dfd;
     },
     refreshInstance: function () {
-      return this.refresh()
-        .then(function () {
-          this.updateValidation();
-        }.bind(this));
+      return this.refresh();
     },
     info_pane_preload: function () {
       if (!this._pane_preloaded) {
