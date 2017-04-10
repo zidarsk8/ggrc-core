@@ -41,10 +41,12 @@
           return relatedToCurrentInstance;
         });
     }
-    // Needs refactoring: should be modified to some solid solution
+
+    // To identify pages like My Work, My Assessments and Admin Dashboard on the Server-side
+    // was defined variable GGRC.pageType, because for all of them GGRC.page_instance().type = 'Person'.
+    // For other pages using GGRC.page_instance() object.
     function getPageType() {
-      return GGRC.pageType ||
-      GGRC.page_instance() ? GGRC.page_instance().type : '';
+      return GGRC.pageType ? GGRC.pageType : GGRC.page_instance().type;
     }
 
     function isMyAssessments() {
@@ -59,8 +61,12 @@
       return getPageType() === 'ADMIN';
     }
 
+    /**
+     *
+     * @return {boolean} False for My Work, All Objects and My Assessments pages and True for the rest.
+     */
     function isObjectContextPage() {
-      return !getPageType();
+      return !GGRC.pageType;
     }
 
     /**
