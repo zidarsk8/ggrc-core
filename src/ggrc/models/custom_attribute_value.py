@@ -62,10 +62,6 @@ class CustomAttributeValue(Base, Indexed, db.Model):
       "Map:Person": lambda self: self._validate_map_person(),
   }
 
-  # formats to represent Date-type values
-  DATE_FORMAT_ISO = "%Y-%m-%d"
-  DATE_FORMAT_US = "%m/%d/%Y"
-
   @property
   def latest_revision(self):
     """Latest revision of CAV (used for comment precondition check)."""
@@ -260,8 +256,8 @@ class CustomAttributeValue(Base, Indexed, db.Model):
       # Validate the date format by trying to parse it
       self.attribute_value = utils.convert_date_format(
           self.attribute_value,
-          CustomAttributeValue.DATE_FORMAT_ISO,
-          CustomAttributeValue.DATE_FORMAT_ISO,
+          utils.DATE_FORMAT_ISO,
+          utils.DATE_FORMAT_ISO,
       )
 
   def validate(self):
