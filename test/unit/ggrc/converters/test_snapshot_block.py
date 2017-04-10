@@ -223,6 +223,13 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     }
     self.assertEqual(self.block.get_value_string(value), expected_value)
 
+  def test_invalid_cav_dict(self, invalid_cav):
+    """Test getting ca value from invalid cav representation."""
+    with self.assertRaises(TypeError):
+      self.block.get_cav_value_string("XX")
+    with self.assertRaises(KeyError):
+      self.block.get_cav_value_string({})
+
   def test_get_cav_value_string(self):
     """Test get value string function for custom attributes."""
     self.block._cad_map = OrderedDict(
@@ -240,11 +247,6 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         }
     }
 
-    # invalid custom attribute representations should throw errors
-    with self.assertRaises(TypeError):
-      self.block.get_cav_value_string("XX")
-    with self.assertRaises(KeyError):
-      self.block.get_cav_value_string({})
 
     self.assertEqual(self.block.get_cav_value_string(None), "")
     self.assertEqual(
