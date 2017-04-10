@@ -7,10 +7,12 @@ from collections import OrderedDict
 
 import unittest
 import mock
+import ddt
 
 from ggrc.converters.snapshot_block import SnapshotBlockConverter
 
 
+@ddt.ddt
 class TestSnapshotBlockConverter(unittest.TestCase):
   """Unit tests for Snapshot block converter."""
   # Removing protected access checks because we wish to tests even the
@@ -143,77 +145,71 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         []
     )
 
-  def test_get_content_string(self):
+  @ddt.data(
+      ({"random_item": "Random value"}, "random_item", "Random value"),
+      ({"dummy_item": "stored_value_1"}, "dummy_item", "User Text"),
+      ({"dummy_item": True}, "dummy_item", "Stored boolean value"),
+      ({"dummy_item": None}, "dummy_item", ""),
+  )
+  @ddt.unpack
+  def test_get_content_string(self, content, attr_name, expected_value):
     """Test getting content for special mapped values."""
     self.block.get_value_string = lambda x: x or ""
     self.block.child_type = "Dummy Object"
     self.block._content_value_map = {
         "Dummy Object": {
             "dummy_item": {
-                "stored_value_1": "User visible value 1",
+                "stored_value_1": "User Text",
                 True: "Stored boolean value",
             }
         }
     }
     self.assertEqual(
-        self.block.get_content_string({
-            "random_item": "Random value",
-        }, "random_item"),
-        "Random value"
-    )
-    self.assertEqual(
-        self.block.get_content_string({
-            "dummy_item": "stored_value_1",
-        }, "dummy_item"),
-        "User visible value 1"
-    )
-    self.assertEqual(
-        self.block.get_content_string({
-            "dummy_item": True,
-        }, "dummy_item"),
-        "Stored boolean value"
-    )
-    self.assertEqual(
-        self.block.get_content_string({
-            "dummy_item": None,
-        }, "dummy_item"),
-        ""
+        self.block.get_content_string(content, attr_name),
+        expected_value
     )
 
-  def test_get_content_string_date(self):
+  @ddt.data(
+      ({"dummy_date": None}, "dummy_date", ""),
+      ({"dummy_date": ""}, "dummy_date", ""),
+      ({"random_item": "Random value", }, "random_item", "Random value"),
+      ({"dummy_date": "2022-02-22", }, "dummy_date", "02/22/2022"),
+      ({"dummy_date": "2017-04-08T17:57:09", }, "dummy_date",
+          "2017-04-08 17:57:09"),
+  )
+  @ddt.unpack
+  def test_get_content_string_date(self, content, attr_name, expected_value):
     """Test getting content for date values."""
     self.block.get_value_string = lambda x: x or ""
     self.block.DATE_FIELDS = {
         "dummy_date"
     }
     self.assertEqual(
-        self.block.get_content_string({
-            "random_item": "Random value",
-        }, "random_item"),
-        "Random value"
-    )
-    self.assertEqual(
-        self.block.get_content_string({"dummy_date": None}, "dummy_date"),
-        ""
-    )
-    self.assertEqual(
-        self.block.get_content_string({"dummy_date": "", }, "dummy_date"),
-        ""
-    )
-    self.assertEqual(
-        self.block.get_content_string({
-            "dummy_date": "2022-02-22",
-        }, "dummy_date"),
-        "02/22/2022"
-    )
-    self.assertEqual(
-        self.block.get_content_string({
-            "dummy_date": "2017-04-08T17:57:09",
-        }, "dummy_date"),
-        "2017-04-08 17:57:09"
+        self.block.get_content_string(content, attr_name),
+        expected_value
     )
 
-  def test_get_value_string(self):
+  @ddt.data(
+      (None, ""),
+      ([], ""),
+      ({}, ""),
+      (True, "yes"),
+      (False, "no"),
+      ("Foo", "Foo"),
+      ({"type": "Fake", "id": 4}, ""),
+      ({"type": "Dummy", "id": -3}, ""),
+      ({"type": "Dummy", "id": 1}, "AAA"),
+      (
+          [
+              {"type": "Dummy", "id": 1},
+              {"type": "Object", "id": 1},
+              {"type": "Dummy", "id": 3},
+          ],
+          "AAA\nDDD\nCCC"
+      ),
+  )
+  @ddt.unpack
+  def test_get_value_string(self, value, expected_value):
     """Test get value string function for all value types."""
     self.block._stub_cache = {
         "Dummy": {
@@ -225,32 +221,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
             1: "DDD",
         }
     }
-    self.assertEqual(self.block.get_value_string(None), "")
-    self.assertEqual(self.block.get_value_string([]), "")
-    self.assertEqual(self.block.get_value_string({}), "")
-    self.assertEqual(self.block.get_value_string(True), "yes")
-    self.assertEqual(self.block.get_value_string(False), "no")
-    self.assertEqual(self.block.get_value_string("Foo"), "Foo")
-    self.assertEqual(
-        self.block.get_value_string({"type": "Fake", "id": 4}),
-        ""
-    )
-    self.assertEqual(
-        self.block.get_value_string({"type": "Dummy", "id": -3}),
-        ""
-    )
-    self.assertEqual(
-        self.block.get_value_string({"type": "Dummy", "id": 1}),
-        "AAA"
-    )
-    self.assertEqual(
-        self.block.get_value_string([
-            {"type": "Dummy", "id": 1},
-            {"type": "Object", "id": 1},
-            {"type": "Dummy", "id": 3}
-        ]),
-        "AAA\nDDD\nCCC"
-    )
+    self.assertEqual(self.block.get_value_string(value), expected_value)
 
   def test_get_cav_value_string(self):
     """Test get value string function for custom attributes."""
