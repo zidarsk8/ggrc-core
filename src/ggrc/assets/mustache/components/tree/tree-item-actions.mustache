@@ -57,6 +57,7 @@
                                        {reset-styles}="true"
                                        {show-title}="false"
                                        {show-icon}="true"
+                                       (force-show)="onForceShow(%event)"
                                        text="Show related assessments"
       ></show-related-assessments-button>
     </li>
@@ -65,12 +66,11 @@
 
     {{#unless instance.snapshot}}
       {{#if canExpand}}
-        <!--<li>-->
-          <!--<a href="javascript://" ($click)="subTreeTypes()">-->
-            <!--<i class="fa fa-filter"></i>-->
-            <!--Filter sub tree-->
-          <!--</a>-->
-        <!--</li>-->
+        <li>
+          <sub-tree-models {models-list}="childModelsList"
+                           {title}="instance.title"
+          ></sub-tree-models>
+        </li>
       <li>
         <a href="javascript://" ($click)="expand">
           <i class="fa fa-{{expandIcon}}"></i>

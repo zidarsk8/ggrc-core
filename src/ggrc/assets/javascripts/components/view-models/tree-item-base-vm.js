@@ -6,6 +6,8 @@
 (function (can, GGRC) {
   'use strict';
 
+  var TreeViewUtils = GGRC.Utils.TreeView;
+
   if (!GGRC.VM) {
     GGRC.VM = {};
   }
@@ -25,21 +27,43 @@
     resultDfd: null,
     limitDepthTree: 0,
     itemSelector: '',
+    childModelsList: [],
+    /**
+     * List of models for show in sub-level for current item.
+     */
+    selectedChildModels: [],
+    initChildTreeDisplay: function () {
+      var modelName = this.attr('instance').type;
+      var modelsList = TreeViewUtils.getModelsForSubTier(modelName);
+      var displayList = modelsList.map(function (model) {
+        return {
+          name: model,
+          display: true
+        }
+      });
+
+      this.attr('childModelsList', displayList);
+      this.attr('selectedChildModels', modelsList);
+    },
+    setChildModels: function (selected) {
+      this.attr('selectedChildModels', selected);
+    },
     onExpand: function () {
       var isExpanded = this.attr('expanded');
 
       this.attr('expanded', !isExpanded);
     },
     onPreview: function (event) {
-      var itemSelector = this.attr('itemSelector');
-      var selected = event.element.closest(itemSelector);
-
-      this.select(selected);
+      this.select(event.element);
     },
     select: function ($element) {
       var instance = this.attr('instance');
+      var itemSelector = this.attr('itemSelector');
+
+      $element = $element.closest(itemSelector);
 
       if (instance instanceof CMS.Models.Person && !this.attr('result')) {
+        // for Person instances we need to build ResultMapping object before open the info panel
         this.attr('resultDfd').then(function () {
           can.trigger($element, 'selectTreeItem', [$element, instance]);
         });

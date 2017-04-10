@@ -309,13 +309,13 @@
 
     /**
      *
+     * @param {Array} models - Array of models for load in sub tree
      * @param type - Type of parent object.
      * @param id - ID of parent object.
      * @param {String} filter - Filter.
      * @return {Promise} - Items for sub tier.
      */
-    function loadItemsForSubTier(type, id, filter) {
-      var allModels = getModelsForSubTier(type);
+    function loadItemsForSubTier(models, type, id, filter) {
       var loadedModels = [];
       var relevant = {
         type: type,
@@ -324,7 +324,7 @@
       };
       var showMore = false;
 
-      return _buildSubTreeCountMap(allModels, relevant, filter)
+      return _buildSubTreeCountMap(models, relevant, filter)
         .then(function (result) {
           var countMap = result.countsMap;
           var reqParams;
@@ -419,7 +419,7 @@
 
     /**
      *
-     * @param {String} models - Type of model.
+     * @param {Array} models - Type of model.
      * @param {Object} relevant - Relevant description
      * @param {String} filter - Filter string.
      * @return {Promise} - Counts for limitation load items for sub tier

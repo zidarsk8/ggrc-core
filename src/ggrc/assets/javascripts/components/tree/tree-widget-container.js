@@ -454,6 +454,8 @@
           instance: instance,
           parent_instance: parent
         });
+
+        ev.stopPropagation();
         el.find('.item-active').removeClass('item-active');
         selectedEl.addClass('item-active');
 

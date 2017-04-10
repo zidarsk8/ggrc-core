@@ -3,9 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if loading}}
-  <spinner toggle="loading"></spinner>
-{{else}}
+<div class="{{cssClasses}}">
   {{#if isOpen}}
     {{#directlyItems}}
       <sub-tree-item class="tree-item-element"
@@ -50,4 +48,8 @@
       <tree-no-results/>
     {{/if}}
   {{/if}}
-{{/if}}
+
+  <div class="tree-spinner">
+    <spinner toggle="loading" size="large"></spinner>
+  </div>
+</div>

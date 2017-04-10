@@ -63,6 +63,9 @@
     itemSelector: '.tree-item-content'
   });
 
+  /**
+   *
+   */
   GGRC.Components('treeItem', {
     tag: 'tree-item',
     template: template,
@@ -80,6 +83,12 @@
 
           viewModel.attr('resultDfd', resultDfd);
         }
+
+        viewModel.initChildTreeDisplay();
+      },
+      ' childModelsChange': function (el, ev, selectedModels) {
+        ev.stopPropagation();
+        this.viewModel.setChildModels(selectedModels);
       }
     }
   });

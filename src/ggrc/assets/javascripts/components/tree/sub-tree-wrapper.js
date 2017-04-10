@@ -73,6 +73,33 @@
             setValue(newValue);
           }
         }
+      },
+      childModels: {
+        type: '*',
+        set: function (models, setResult) {
+          if (!this.attr('dataIsReady')) {
+            setResult(models);
+          } else if (this.attr('dataIsReady') && !this.attr('isOpen')) {
+            this.attr('dataIsReady', false);
+            setResult(models);
+          } else {
+            this.loadItems(models).then(function () {
+              setResult(models);
+            })
+          }
+        }
+      },
+      cssClasses: {
+        type: String,
+        get: function () {
+          var classes = [];
+
+          if (this.attr('loading')) {
+            classes.push('loading');
+          }
+
+          return classes.join(' ');
+        }
       }
     },
     dataIsReady: false,
@@ -86,14 +113,21 @@
       var isExpanded = this.attr('notDirectlyExpanded');
       this.attr('notDirectlyExpanded', !isExpanded);
     },
-    loadItems: function () {
+    loadItems: function (models) {
       var parentType = this.attr('parentModel');
       var parentId = this.attr('parentId');
       var filter = this.getDepthFilter();
 
+      models = models || this.attr('childModels') || [];
+
+      if (!models.length) {
+        return can.Deferred().resolve();
+      }
+
       this.attr('loading', true);
 
-      return TreeViewUtils.loadItemsForSubTier(parentType, parentId, filter)
+      return TreeViewUtils
+        .loadItemsForSubTier(can.makeArray(models), parentType, parentId,filter)
         .then(function (result) {
           this.attr('loading', false);
           this.attr('directlyItems', result.directlyItems);
@@ -111,6 +145,9 @@
     }
   });
 
+  /**
+   *
+   */
   GGRC.Components('subTreeWrapper', {
     tag: 'sub-tree-wrapper',
     template: template,

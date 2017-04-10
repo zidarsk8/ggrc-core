@@ -6,15 +6,20 @@ sub-tree-wrapper {
   display: flex;
   flex-direction: column;
 
-  >spinner {
-    padding: 5px 0 5px 60px;
-    border-bottom: 1px solid $itemBorder;
-  }
-
   .sub-tree-link {
     margin-left: 48px;
     line-height: 30px;
     border-bottom: 1px solid $itemBorder;
+  }
+
+  .loading {
+    min-height: 30px;
+    position: relative;
+    opacity: .5;
+
+    .tree-spinner {
+      display: flex;
+    }
   }
 }
 
@@ -28,6 +33,7 @@ sub-tree-item {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    line-height: 30px;
   }
 
   >.sub-item-content {

@@ -56,6 +56,14 @@
         var type = this.attr('instance.type');
         return type === 'Control' || type === 'Objective';
       }
+    },
+    events: {
+      '{viewModel.state} open': function (state) {
+        this.viewModel.dispatch({
+          type: 'forceShow',
+          state: state.attr('open')
+        })
+      }
     }
   });
 })(window.can, window.GGRC);

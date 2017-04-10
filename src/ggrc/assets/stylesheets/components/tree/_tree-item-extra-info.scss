@@ -28,6 +28,14 @@ tree-item-actions {
   visibility: hidden;
   position: relative;
 
+  &.show-force {
+    visibility: visible;
+
+    ul {
+      display: block;
+    }
+  }
+
   &:hover {
     ul {
       display: block;
@@ -76,10 +84,8 @@ tree-item-actions {
       transition: all linear 0.1s;
 
       &:hover {
-        a {
-          color: $black;
-          background-color: $lightGray !important;
-        }
+        color: $black !important;
+        background-color: $lightGray !important;
       }
       a {
         line-height: 30px;
