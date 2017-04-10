@@ -239,3 +239,57 @@ tree-header {
     }
   }
 }
+
+sub-tree-models {
+  .sub-tree-models {
+    display: none;
+    position: absolute;
+    background-color: $white;
+    top: 0;
+    width: 700px;
+    border: 1px solid #f1f1f1;
+    padding: 15px;
+
+    &.active {
+      display: flex;
+    }
+
+    h5 {
+      font-size: 16px;
+      font-weight: 400;
+      text-transform: none;
+      line-height: 24px;
+      margin-bottom: 5px;
+    }
+
+    .sub-tree-models_select {
+      margin-bottom: 10px;
+
+      span {
+        margin-left: 15px;
+        cursor: pointer;
+        border-bottom: 1px solid $black;
+        font-size: 12px;
+      }
+    }
+
+    .sub-models_item {
+      width: 120px;
+      margin-bottom: 15px;
+
+      input {
+        margin-right: 5px;
+      }
+    }
+
+    .sub-tree-models_footer {
+      justify-content: flex-end;
+
+      a {
+        background-color: $lightBlue !important;
+        color: $white;
+        font-weight: normal;
+      }
+    }
+  }
+}

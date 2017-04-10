@@ -238,6 +238,7 @@ dashboard-js-files:
   - components/tree/sub-tree-expander.js
   - components/tree/sub-tree-wrapper.js
   - components/tree/sub-tree-item.js
+  - components/tree/sub-tree-models.js
   - components/tree/tree-item-extra-info.js
   - components/tree/tree-item-actions.js
   - components/tree/tree-item-map.js
@@ -440,6 +441,7 @@ dashboard-js-template-files:
   - components/tree/tree-no-results.mustache
   - components/tree/sub-tree-wrapper.mustache
   - components/tree/sub-tree-item.mustache
+  - components/tree/sub-tree-models.mustache
   - components/tree/tree-item-extra-info.mustache
   - components/tree/tree-item-actions.mustache
   - components/tree/tree-item-map.mustache
