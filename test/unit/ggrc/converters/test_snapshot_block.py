@@ -223,14 +223,33 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     }
     self.assertEqual(self.block.get_value_string(value), expected_value)
 
-  def test_invalid_cav_dict(self, invalid_cav):
+  def test_invalid_cav_dict(self):
     """Test getting ca value from invalid cav representation."""
     with self.assertRaises(TypeError):
       self.block.get_cav_value_string("XX")
     with self.assertRaises(KeyError):
       self.block.get_cav_value_string({})
 
-  def test_get_cav_value_string(self):
+  @ddt.data(
+      (None, ""),
+      ({"custom_attribute_id": 2, "attribute_value": None}, ""),
+      ({"custom_attribute_id": 2, "attribute_value": "2012-05-22"},
+       "05/22/2012"),
+      ({"custom_attribute_id": 2, "attribute_value": ""}, ""),
+      ({"custom_attribute_id": 1, "attribute_value": True}, "yes"),
+      ({"custom_attribute_id": 1, "attribute_value": "1"}, "yes"),
+      ({"custom_attribute_id": 1, "attribute_value": "0"}, "no"),
+      ({"custom_attribute_id": 3, "attribute_value":
+        "Person", "attribute_object_id": 4}, "user@example.com"),
+      # If the original object was deleted from the system we do not store all
+      # of its values in he revision. Proper thing would be to go through
+      # revisions of this object and use those static values. But we do not
+      # currently support that.
+      ({"custom_attribute_id": 3, "attribute_value": "Bad Option",
+        "attribute_object_id": 4}, ""),
+  )
+  @ddt.unpack
+  def test_get_cav_value_string(self, value, expected_value):
     """Test get value string function for custom attributes."""
     self.block._cad_map = OrderedDict(
         [
@@ -246,73 +265,14 @@ class TestSnapshotBlockConverter(unittest.TestCase):
             4: "user@example.com"
         }
     }
+    self.assertEqual(self.block.get_cav_value_string(value), expected_value)
 
-
-    self.assertEqual(self.block.get_cav_value_string(None), "")
-    self.assertEqual(
-        self.block.get_cav_value_string({
-            "custom_attribute_id": 2,
-            "attribute_value": None,
-        }),
-        ""
-    )
-    self.assertEqual(
-        self.block.get_cav_value_string({
-            "custom_attribute_id": 2,
-            "attribute_value": "2012-05-22",
-        }),
-        "05/22/2012"
-    )
-    self.assertEqual(
-        self.block.get_cav_value_string({
-            "custom_attribute_id": 2,
-            "attribute_value": "",
-        }),
-        ""
-    )
-    self.assertEqual(
-        self.block.get_cav_value_string({
-            "custom_attribute_id": 1,
-            "attribute_value": True,
-        }),
-        "yes"
-    )
-    self.assertEqual(
-        self.block.get_cav_value_string({
-            "custom_attribute_id": 1,
-            "attribute_value": "1",
-        }),
-        "yes"
-    )
-    self.assertEqual(
-        self.block.get_cav_value_string({
-            "custom_attribute_id": 1,
-            "attribute_value": "0",
-        }),
-        "no"
-    )
-    self.assertEqual(
-        self.block.get_cav_value_string({
-            "custom_attribute_id": 3,
-            "attribute_value": "Person",
-            "attribute_object_id": 4,
-        }),
-        "user@example.com"
-    )
-    # If the original object was deleted from the system we do not store all of
-    # its values in he revision. Proper thing would be to go through revisions
-    # of this object and use those static values. But we do not currently
-    # support that.
-    self.assertEqual(
-        self.block.get_cav_value_string({
-            "custom_attribute_id": 3,
-            "attribute_value": "Bad Option",
-            "attribute_object_id": 4,
-        }),
-        ""
-    )
-
-  def test_obj_attr_line(self):
+  @ddt.data(
+      ({"name": "1", "third": "2", "other": "3", }, ["1", "3", "2"]),
+      ({"name": "1", "third": "2", }, ["1", "", "2"]),
+  )
+  @ddt.unpack
+  def test_obj_attr_line(self, content, expected_line):
     """Test get object attribute CSV values."""
     self.block.get_content_string = lambda x, name: x.get(name, "")
     self.block._attribute_name_map = OrderedDict([
@@ -320,23 +280,38 @@ class TestSnapshotBlockConverter(unittest.TestCase):
         ("other", "other display name"),
         ("third", "third display name"),
     ])
-    self.assertEqual(
-        self.block._obj_attr_line({
-            "name": "1",
-            "third": "2",
-            "other": "3",
-        }),
-        ["1", "3", "2"]
-    )
-    self.assertEqual(
-        self.block._obj_attr_line({
-            "name": "1",
-            "third": "2",
-        }),
-        ["1", "", "2"]
-    )
+    self.assertEqual(self.block._obj_attr_line(content), expected_line)
 
-  def test_cav_attr_line(self):
+  @ddt.data(
+      ({}, ["", "", ""]),
+      ({"custom_attribute_values": []}, ["", "", ""]),
+      (
+          {
+              "custom_attribute_values": [{
+                  "custom_attribute_id": 5,
+                  "attribute_value": "five",
+              }, {
+                  "custom_attribute_id": 3,
+                  "attribute_value": "three",
+              }]
+          },
+          ["three", "", "five"]
+      ),
+      (
+          {
+              "custom_attribute_values": [{
+                  "custom_attribute_id": 5,
+                  "attribute_value": "five",
+              }, {
+                  "custom_attribute_id": 8,
+                  "attribute_value": "eight",
+              }]
+          },
+          ["", "", "five"]
+      ),
+  )
+  @ddt.unpack
+  def test_cav_attr_line(self, content, expected_line):
     """Test get custom attribute CSV values."""
     self.block.get_cav_value_string = lambda x: (
         x.get("attribute_value") if x else ""
@@ -348,67 +323,35 @@ class TestSnapshotBlockConverter(unittest.TestCase):
             (5, {"id": 5, "title": "DDD"}),
         ]
     )
-    self.assertEqual(
-        self.block._cav_attr_line({}),
-        ["", "", ""]
-    )
-    self.assertEqual(
-        self.block._cav_attr_line({"custom_attribute_values": []}),
-        ["", "", ""]
-    )
-    self.assertEqual(
-        self.block._cav_attr_line({
-            "custom_attribute_values": [{
-                "custom_attribute_id": 5,
-                "attribute_value": "five",
-            }, {
-                "custom_attribute_id": 3,
-                "attribute_value": "three",
-            }]
-        }),
-        ["three", "", "five"]
-    )
-    self.assertEqual(
-        self.block._cav_attr_line({
-            "custom_attribute_values": [{
-                "custom_attribute_id": 5,
-                "attribute_value": "five",
-            }, {
-                "custom_attribute_id": 8,
-                "attribute_value": "eight",
-            }]
-        }),
-        ["", "", "five"]
-    )
+    self.assertEqual(self.block._cav_attr_line(content), expected_line)
 
   def test_header_list(self):
     """Test snapshot export header data."""
-    self.block._attribute_name_map = OrderedDict(
-        [
-            ("key_3", "AAA"),
-            ("audit", "Audit"),  # inserted snapshot attribute
-            ("key_2", "DDD"),
-            ("key_1", "BBB"),
-            ("key_4", "CCC"),
-        ]
-    )
-    self.block._cad_name_map = OrderedDict(
-        [
-            (3, "A"),
-            (2, "B"),
-            (1, "C"),
-            (4, "D"),
-        ]
-    )
+    self.block._attribute_name_map = OrderedDict([
+        ("key_3", "AAA"),
+        ("audit", "Audit"),  # inserted snapshot attribute
+        ("key_2", "DDD"),
+        ("key_1", "BBB"),
+        ("key_4", "CCC"),
+    ])
+    self.block._cad_name_map = OrderedDict([
+        (3, "A"),
+        (2, "B"),
+        (1, "C"),
+        (4, "D"),
+    ])
     self.assertEquals(
         self.block._header_list,
         [[], ["AAA", "Audit", "DDD", "BBB", "CCC", "A", "B", "C", "D"]]
     )
 
-  def test_body_list(self):
+  @ddt.data(
+      ([], [[]]),
+      ([1, 2, 3], [[], [], []]),
+  )
+  @ddt.unpack
+  def test_body_list(self, snapshots, block_list):
     """Test basic CSV body format."""
     self.block._content_line_list = lambda x: []
-    self.block.snapshots = []
-    self.assertEqual(self.block._body_list, [[]])
-    self.block.snapshots = [1, 2, 3]
-    self.assertEqual(self.block._body_list, [[], [], []])
+    self.block.snapshots = snapshots
+    self.assertEqual(self.block._body_list, block_list)
