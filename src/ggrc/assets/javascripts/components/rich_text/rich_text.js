@@ -71,37 +71,45 @@
         return (ch === ' ') || (ch === '\t') || (ch === '\n');
       },
       onChange: function (delta) {
-        var editor = this.getEditor();
-        var endRetain;
-        var text;
         var match;
         var url;
         var ops;
+        var text;
+        var startIdx;
+        var endIdx;
+        var editor;
         if (!this.getTextLength()) {
           // Should null text value if this is no content
           return this.attr('text', null);
         }
 
         if (delta.ops.length === 2 &&
-            delta.ops[0].retain &&
-            this.isWhitespace(delta.ops[1].insert)) {
-          endRetain = delta.ops[0].retain;
-          text = editor.getText().substr(0, endRetain);
-          match = text.match(URL_TYPE_REGEX);
+          delta.ops[0].retain &&
+          !delta.ops[1].delete &&
+          !this.isWhitespace(delta.ops[1].insert)) {
+          editor = this.getEditor();
+          text = editor.getText();
+          startIdx = delta.ops[0].retain;
+          while (!this.isWhitespace(text[startIdx - 1]) && startIdx > 0) {
+            startIdx--;
+          }
+          endIdx = delta.ops[0].retain + 1;
+          while (!this.isWhitespace(text[endIdx]) && endIdx < text.length) {
+            endIdx++;
+          }
 
+          match = text.substring(startIdx, endIdx).match(URL_TYPE_REGEX);
           if (match !== null) {
             url = match[0];
 
             ops = [];
-            if (endRetain > url.length) {
-              ops.push({retain: endRetain - url.length});
+            if (startIdx !== 0) {
+              ops.push({retain: startIdx});
             }
-
             ops = ops.concat([
               {'delete': url.length},
               {insert: url, attributes: {link: url}}
             ]);
-
             editor.updateContents({
               ops: ops
             });
