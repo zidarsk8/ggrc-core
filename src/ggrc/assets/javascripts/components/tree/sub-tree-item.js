@@ -8,12 +8,9 @@
 
   var template = can.view(GGRC.mustache_path +
     '/components/tree/sub-tree-item.mustache');
-  var viewModel = can.Map.extend({
+  var BaseTreeItemVM = GGRC.VM.BaseTreeItemVM;
+  var viewModel = BaseTreeItemVM.extend({
     define: {
-      expanded: {
-        type: Boolean,
-        value: false
-      },
       cssClasses: {
         type: String,
         get: function () {
@@ -40,34 +37,7 @@
         }
       }
     },
-    onExpand: function () {
-      var isExpanded = this.attr('expanded');
-
-      this.attr('expanded', !isExpanded);
-    },
-    onPreview: function (event) {
-      var selected = event.element.closest('.sub-item-content');
-
-      this.select(selected);
-    },
-    select: function ($element) {
-      var instance = this.attr('instance');
-
-      if (instance instanceof CMS.Models.Person && !this.attr('result')) {
-        this.attr('resultDfd').then(function () {
-          can.trigger($element, 'selectTreeItem', [$element, instance]);
-        });
-      } else {
-        can.trigger($element, 'selectTreeItem', [$element, instance]);
-      }
-    },
-    limitDepthTree: 0,
-    instance: null,
-    /**
-     * Result from mapping
-     */
-    result: null,
-    resultDfd: null,
+    itemSelector: '.sub-item-content',
     extraCss: '@'
   });
 

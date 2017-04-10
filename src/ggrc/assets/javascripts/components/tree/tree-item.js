@@ -8,7 +8,8 @@
 
   var template = can.view(GGRC.mustache_path +
     '/components/tree/tree-item.mustache');
-  var viewModel = can.Map.extend({
+  var BaseTreeItemVM = GGRC.VM.BaseTreeItemVM;
+  var viewModel = BaseTreeItemVM.extend({
     define: {
       extraClasses: {
         type: String,
@@ -30,10 +31,6 @@
 
           return classes.join(' ');
         }
-      },
-      expanded: {
-        type: Boolean,
-        value: false
       },
       selectableSize: {
         type: Number,
@@ -63,34 +60,7 @@
     },
     selectedColumns: [],
     mandatory: [],
-    instance: null,
-    /**
-     * Result from mapping
-     */
-    result: null,
-    resultDfd: null,
-    limitDepthTree: 0,
-    onExpand: function () {
-      var isExpanded = this.attr('expanded');
-
-      this.attr('expanded', !isExpanded);
-    },
-    onPreview: function (event) {
-      var selected = event.element.closest('.tree-item-content');
-
-      this.select(selected);
-    },
-    select: function ($element) {
-      var instance = this.attr('instance');
-
-      if (instance instanceof CMS.Models.Person && !this.attr('result')) {
-        this.attr('resultDfd').then(function () {
-          can.trigger($element, 'selectTreeItem', [$element, instance]);
-        });
-      } else {
-        can.trigger($element, 'selectTreeItem', [$element, instance]);
-      }
-    }
+    itemSelector: '.tree-item-content'
   });
 
   GGRC.Components('treeItem', {
