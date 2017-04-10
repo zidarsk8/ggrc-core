@@ -22,6 +22,11 @@ class SnapshotBlockConverter(object):
       "end_date",
   }
 
+  CUSTOM_SNAPSHOT_ALIASES = {
+      "audit": "Audit",
+      "revision_date": "Revision Date",
+  }
+
   def __init__(self, converter, ids):
     self.converter = converter
     self.ids = ids
@@ -106,8 +111,7 @@ class SnapshotBlockConverter(object):
       # names anymore.
       return {}
     aliases = AttributeInfo.gather_visible_aliases(model)
-    aliases["audit"] = "Audit"  # special snapshot attribute
-    aliases["revision_date"] = "Revision Date"  # special snapshot attribute
+    aliases.update(self.CUSTOM_SNAPSHOT_ALIASES)
     map_ = {key: value["display_name"] if isinstance(value, dict) else value
             for key, value in aliases.iteritems()}
     orderd_keys = AttributeInfo.get_column_order(map_.keys())
