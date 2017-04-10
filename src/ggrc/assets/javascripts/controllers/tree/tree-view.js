@@ -1398,7 +1398,9 @@
           var typeModels = {
             type: item,
             fields: [],
-            page: {}
+            page: parent.type === 'CycleTaskGroup' ?
+              {sortBy: 'task due date'} :
+              {}
           };
           var rootFilter = parentCtrl.options.attr('paging.filter');
           if (rootFilter) {
