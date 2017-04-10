@@ -87,11 +87,13 @@ class SnapshotBlockConverter(object):
   @cached_property
   def _cad_map(self):
     """Get id to cad mapping for all cad ordered by title."""
-    map_ = {}
+    cad_map = {}
     for snap in self.snapshots:
       for cad in snap.content.get("custom_attribute_definitions", []):
-        map_[cad["id"]] = cad
-    return OrderedDict(sorted(map_.iteritems(), key=lambda x: x[1]["title"]))
+        cad_map[cad["id"]] = cad
+    return OrderedDict(
+        sorted(cad_map.iteritems(), key=lambda x: x[1]["title"])
+    )
 
   @cached_property
   def _cad_name_map(self):
@@ -112,10 +114,12 @@ class SnapshotBlockConverter(object):
       return {}
     aliases = AttributeInfo.gather_visible_aliases(model)
     aliases.update(self.CUSTOM_SNAPSHOT_ALIASES)
-    map_ = {key: value["display_name"] if isinstance(value, dict) else value
-            for key, value in aliases.iteritems()}
-    orderd_keys = AttributeInfo.get_column_order(map_.keys())
-    return OrderedDict((key, map_[key]) for key in orderd_keys)
+    name_map = {
+        key: value["display_name"] if isinstance(value, dict) else value
+        for key, value in aliases.iteritems()
+    }
+    orderd_keys = AttributeInfo.get_column_order(name_map.keys())
+    return OrderedDict((key, name_map[key]) for key in orderd_keys)
 
   def _gather_stubs(self):
     """Gather all possible stubs from snapshot contents.
