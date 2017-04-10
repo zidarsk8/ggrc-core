@@ -34,6 +34,7 @@ class TestUtilsFunctions(unittest.TestCase):
     self.assertEqual(verificationErrors, [])
 
   def test_merge_dict(self):
+    """Test merging two dictionaries."""
     dict1 = {
         "a": {
             "b": {
@@ -77,6 +78,7 @@ class TestUtilsFunctions(unittest.TestCase):
     self.assertEqual(result, expected_result)
 
   def test_merge_dicts(self):
+    """Test merging more than two dictionaries."""
     dict1 = {
         "a": {
             "b": {
@@ -137,6 +139,7 @@ class TestUtilsFunctions(unittest.TestCase):
     self.assertEqual(result, expected_result)
 
   def test_html_cleaner(self):
+    """Test html tag cleaner."""
     def clean(value):
       return utils.html_cleaner.cleaner(None, value, None, None)
 
@@ -146,3 +149,9 @@ class TestUtilsFunctions(unittest.TestCase):
               "<script>>alert(2)<<script>/<script>s<script>c<script>r<script>"
               "i<script>p<script>t<script>>")
     self.assertEqual(clean(nested), "alert(2)")
+
+  def test_iso_to_us_date(self):
+    """Test ISO to US date format conversion."""
+    self.assertEqual(utils.iso_to_us_date("2002-07-11"), "07/11/2002")
+    with self.assertRaises(ValueError):
+      utils.iso_to_us_date("1002-07-11")
