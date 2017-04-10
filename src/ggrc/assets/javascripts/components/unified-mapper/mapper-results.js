@@ -15,11 +15,12 @@
       '/components/unified-mapper/mapper-results.mustache'
     ),
     viewModel: {
-      paging: {
-        current: 1,
-        pageSize: DEFAULT_PAGE_SIZE,
-        filter: '',
-        pageSizeSelect: [5, 10, 15]
+      define: {
+        paging: {
+          value: function () {
+            return new GGRC.VM.Pagination({pageSizeSelect: [5, 10, 15]});
+          }
+        }
       },
       columns: {
         selected: [],
@@ -63,11 +64,6 @@
       },
       useSnapshots: function () {
         return this.attr('mapper.useSnapshots');
-      },
-      updatePaging: function (total) {
-        var count = Math.ceil(total / this.attr('paging.pageSize'));
-        this.attr('paging.total', total);
-        this.attr('paging.count', count);
       },
       showNewEntries: function () {
         var self = this;
@@ -323,7 +319,7 @@
               this.setDisabledItems(result, relatedData[modelKey].ids);
             }
             // Update paging object
-            this.updatePaging(data[modelKey].total);
+            this.paging.attr('total', data[modelKey].total);
             dfd.resolve(result);
           }.bind(this))
           .fail(function () {

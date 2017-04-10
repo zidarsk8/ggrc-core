@@ -52,32 +52,19 @@
         input.blur();
       },
       changePageSize: function (size) {
-        if (!this.paging.attr('disabled')) {
-          this.paging.attr('pageSize', size);
-          this.paging.attr('current', 1);
-        }
+        this.paging.attr('pageSize', size);
       },
       setLastPage: function () {
-        if (this.paging.current < this.paging.count &&
-          !this.paging.attr('disabled')) {
-          this.paging.attr('current', this.paging.count);
-        }
+        this.paging.attr('current', this.paging.count);
       },
       setFirstPage: function () {
-        if (this.paging.current > 1 && !this.paging.attr('disabled')) {
-          this.paging.attr('current', 1);
-        }
+        this.paging.attr('current', 1);
       },
       setPrevPage: function () {
-        if (this.paging.current > 1 && !this.paging.attr('disabled')) {
-          this.paging.attr('current', this.paging.current - 1);
-        }
+        this.paging.attr('current', this.paging.current - 1);
       },
       setNextPage: function () {
-        if (this.paging.current < this.paging.count &&
-          !this.paging.attr('disabled')) {
-          this.paging.attr('current', this.paging.current + 1);
-        }
+        this.paging.attr('current', this.paging.current + 1);
       },
       getPaginationInfo: function () {
         var _current = this.attr('paging.current');

@@ -22,6 +22,11 @@
         isLoading: {
           type: 'boolean',
           value: false
+        },
+        paging: {
+          value: function () {
+            return new GGRC.VM.Pagination({pageSizeSelect: [5, 10, 15]});
+          }
         }
       },
       baseInstance: null,
@@ -30,23 +35,15 @@
       orderBy: '@',
       selectedItem: {},
       objectSelectorEl: '.grid-data__action-column button',
-      paging: {
-        current: 1,
-        pageSize: 5,
-        pageSizeSelect: [5, 10, 15]
-      },
       getParams: function () {
         var id;
         var type;
         var relatedType = this.attr('relatedItemsType');
-        var page = this.attr('paging');
         var orderBy = this.attr('orderBy') || defaultOrderBy;
         var isAssessment = this.attr('baseInstance.type') === 'Assessment';
         var isSnapshot = !!this.attr('baseInstance.snapshot');
         var op = isAssessment ? {name: 'similar'} : {name: 'relevant'};
         var params = {};
-        var first;
-        var last;
 
         if (isSnapshot) {
           id = this.attr('baseInstance.snapshot.child_id');
@@ -56,12 +53,8 @@
           type = this.attr('baseInstance.type');
         }
 
-        if (page.current && page.pageSize) {
-          first = (page.current - 1) * page.pageSize;
-          last = page.current * page.pageSize;
-        }
         params.data = [{
-          limit: [first, last],
+          limit: this.attr('paging.limits'),
           object_name: relatedType,
           order_by: orderBy.split(',').map(function (field) {
             return {name: field, desc: true};
@@ -75,11 +68,6 @@
           }
         }];
         return params;
-      },
-      updatePaging: function (total) {
-        var count = Math.ceil(total / this.attr('paging.pageSize'));
-        this.attr('paging.total', total);
-        this.attr('paging.count', count);
       },
       loadRelatedItems: function () {
         var dfd = can.Deferred();
@@ -97,7 +85,7 @@
               };
             });
             // Update paging object
-            this.updatePaging(data[relatedType].total);
+            this.attr('paging.total', data[relatedType].total);
             dfd.resolve(result);
           }.bind(this))
           .fail(function () {

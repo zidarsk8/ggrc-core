@@ -127,29 +127,19 @@
           return this.attr('hideImportExport') ||
             this.attr('showGenerateAssessments');
         }
+      },
+      pageInfo: {
+        value: function () {
+          return new GGRC.VM.Pagination({
+            pageSizeSelect: [10, 25, 50],
+            pageSize: 10});
+        }
       }
     },
     /**
      *
      */
     allow_mapping_or_creating: null,
-    /**
-     * Information about current page of tree
-     * @param current {Number} - Number of page
-     * @param total {Number} - Number of items on the Server-side which satisfy current filter
-     * @param pageSize {Number} - Number of items per page
-     * @param count {Number} - Number of pages
-     * @param pageSizeSelect {Array} -
-     * @param disabled {Boolean} -
-     */
-    pageInfo: {
-      current: 1,
-      total: null,
-      pageSize: 10,
-      count: null,
-      pageSizeSelect: [10, 25, 50],
-      disabled: false
-    },
     sortingInfo: {
       sortDirection: null,
       sortBy: null
@@ -205,8 +195,6 @@
 
           this.attr('showedItems', data.values);
           this.attr('pageInfo.total', total);
-          this.attr('pageInfo.count',
-            Math.ceil(total / this.attr('pageInfo.pageSize')));
           this.attr('pageInfo.disabled', false);
           this.attr('loading', false);
 
