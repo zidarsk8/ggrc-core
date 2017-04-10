@@ -23,6 +23,27 @@ class TestSnapshotBlockConverter(unittest.TestCase):
     ids = []
     self.block = SnapshotBlockConverter(converter, ids)
 
+  @staticmethod
+  def _mock_snapshot_factory(content_list):
+    return [mock.MagicMock(content=content) for content in content_list]
+
+  @classmethod
+  def _dummy_cad_snapshots(cls):
+    return cls._mock_snapshot_factory([{
+        "id": 44,
+        "custom_attribute_definitions": [
+            {"id": 1, "title": "CCC"},
+            {"id": 2, "title": "BBB"},
+        ],
+    }, {
+        "id": 45,
+        "custom_attribute_definitions": [
+            {"id": 1, "title": "CCC"},
+            {"id": 3, "title": "AAA"},
+            {"id": 4, "title": "DDD"},
+        ],
+    }])
+
   def test_gather_stubs(self):
     """Test _gather_stubs method."""
     snapshot_mock1 = mock.MagicMock()
@@ -68,28 +89,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
 
   def test_cad_map(self):
     """Test gathering name map for all custom attribute definitions."""
-    snapshot_mock1 = mock.MagicMock()
-    snapshot_mock1.content = {
-        "id": 44,
-        "custom_attribute_definitions": [
-            {"id": 1, "title": "CCC"},
-            {"id": 2, "title": "BBB"},
-        ],
-    }
-
-    snapshot_mock2 = mock.MagicMock()
-    snapshot_mock2.content = {
-        "id": 45,
-        "custom_attribute_definitions": [
-            {"id": 1, "title": "CCC"},
-            {"id": 3, "title": "AAA"},
-            {"id": 4, "title": "DDD"},
-        ],
-    }
-    self.block.snapshots = [
-        snapshot_mock1,
-        snapshot_mock2,
-    ]
+    self.block.snapshots = self._dummy_cad_snapshots()
     self.assertEqual(
         self.block._cad_map.items(),
         [
@@ -102,28 +102,7 @@ class TestSnapshotBlockConverter(unittest.TestCase):
 
   def test_cad_name_map(self):
     """Test gathering name map for all custom attribute definitions."""
-    snapshot_mock1 = mock.MagicMock()
-    snapshot_mock1.content = {
-        "id": 44,
-        "custom_attribute_definitions": [
-            {"id": 1, "title": "CCC"},
-            {"id": 2, "title": "BBB"},
-        ],
-    }
-
-    snapshot_mock2 = mock.MagicMock()
-    snapshot_mock2.content = {
-        "id": 45,
-        "custom_attribute_definitions": [
-            {"id": 1, "title": "CCC"},
-            {"id": 3, "title": "AAA"},
-            {"id": 4, "title": "DDD"},
-        ],
-    }
-    self.block.snapshots = [
-        snapshot_mock1,
-        snapshot_mock2,
-    ]
+    self.block.snapshots = self._dummy_cad_snapshots()
     self.assertEqual(
         self.block._cad_name_map.items(),
         [
