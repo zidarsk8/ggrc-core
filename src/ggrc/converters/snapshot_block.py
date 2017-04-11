@@ -18,6 +18,10 @@ from ggrc.models.reflection import AttributeInfo
 class SnapshotBlockConverter(object):
   """Block converter for snapshots of a single object type."""
 
+  # Name of the field that indicates if mappings should be included in the
+  # export or not
+  MAPPINGS_KEY = "mappings"
+
   DATE_FIELDS = {
       "start_date",
       "end_date",
@@ -26,6 +30,11 @@ class SnapshotBlockConverter(object):
   CUSTOM_SNAPSHOT_ALIASES = {
       "audit": "Audit",
       "revision_date": "Revision Date",
+  }
+
+  SNAPSHOT_MAPPING_ALIASES = {
+      "__mapping__:Assessment": "Map: Assessment",
+      "__mapping__:Issue": "Map: Issue",
   }
 
   BOOLEAN_ALIASES = {
@@ -40,7 +49,7 @@ class SnapshotBlockConverter(object):
   def __init__(self, converter, ids, fields=None):
     self.converter = converter
     self.ids = ids
-    self.fields = fields
+    self.fields = fields or []
 
   @staticmethod
   def handle_row_data():
@@ -125,6 +134,8 @@ class SnapshotBlockConverter(object):
       return {}
     aliases = AttributeInfo.gather_visible_aliases(model)
     aliases.update(self.CUSTOM_SNAPSHOT_ALIASES)
+    if self.MAPPINGS_KEY in self.fields:
+      aliases.update(self.SNAPSHOT_MAPPING_ALIASES)
     name_map = {
         key: value["display_name"] if isinstance(value, dict) else value
         for key, value in aliases.iteritems()
