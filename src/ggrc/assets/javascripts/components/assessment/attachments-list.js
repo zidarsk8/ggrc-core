@@ -16,12 +16,9 @@
   GGRC.Components('assessmentAttachmentsList', {
     tag: tag,
     template: template,
-    scope: {
+    viewModel: {
       title: '@',
       tooltip: '@'
-    },
-    events: {
-      init: function () {}
     }
   });
 })(window.GGRC, window.can);
