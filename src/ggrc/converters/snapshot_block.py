@@ -81,6 +81,11 @@ class SnapshotBlockConverter(object):
     content["audit"] = {"type": "Audit", "id": snapshot.parent_id}
     content["slug"] = u"*{}".format(content["slug"])
     content["revision_date"] = unicode(snapshot.revision.created_at)
+    if self.MAPPINGS_KEY in self.fields:
+      for key in self.SNAPSHOT_MAPPING_ALIASES:
+        model_name = key.split(":")[1]
+        related_objects = snapshot.related_objects(_types={model_name})
+        content[key] = [utils.create_stub(obj) for obj in related_objects]
     return content
 
   @cached_property
