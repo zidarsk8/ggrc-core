@@ -75,24 +75,36 @@ class SnapshotBlockConverter(object):
         }
     }
 
+  def _generate_mapping_content(self, snapshot):
+    """Generate mapping stub lists for snapshot mappings."""
+    content = {}
+    for key in self.SNAPSHOT_MAPPING_ALIASES:
+      model_name = key.split(":")[1]
+      content[key] = [
+          {"type": rel.destination_type, "id": rel.destination_id}
+          for rel in snapshot.related_destinations
+          if rel.destination_type == model_name
+      ] + [
+          {"type": rel.source_type, "id": rel.source_id}
+          for rel in snapshot.related_sources
+          if rel.source_type == model_name
+      ]
+    return content
+
   def _extend_revision_content(self, snapshot):
+    """Extend normal object content with attributes needed for export.
+
+    When exporting snapshots we must add additional information to the original
+    object content to show the version and what audit the snapshot of the
+    object belongs to.
+    """
     content = {}
     content.update(snapshot.revision.content)
     content["audit"] = {"type": "Audit", "id": snapshot.parent_id}
     content["slug"] = u"*{}".format(content["slug"])
     content["revision_date"] = unicode(snapshot.revision.created_at)
     if self.MAPPINGS_KEY in self.fields:
-      for key in self.SNAPSHOT_MAPPING_ALIASES:
-        model_name = key.split(":")[1]
-        content[key] = [
-            {"type": rel.destination_type, "id": rel.destination_id}
-            for rel in snapshot.related_destinations
-            if rel.destination_type == model_name
-        ] + [
-            {"type": rel.source_type, "id": rel.source_id}
-            for rel in snapshot.related_sources
-            if rel.source_type == model_name
-        ]
+      content.update(self._generate_mapping_content(snapshot))
     return content
 
   @cached_property
