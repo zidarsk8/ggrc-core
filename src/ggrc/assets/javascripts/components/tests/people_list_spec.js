@@ -214,6 +214,13 @@ describe('GGRC.Components.peopleGroup', function () {
         deferred_remove_role: jasmine.createSpy(),
         get_roles: function () {
           return can.Deferred().resolve(result);
+        },
+        enabledEdit: true,
+        confirmEdit: function () {
+          if (scope.attr('enabledEdit')) {
+            return can.Deferred().resolve();
+          }
+          return can.Deferred().reject();
         }
       });
       instance = scope.attr('instance');
@@ -280,6 +287,12 @@ describe('GGRC.Components.peopleGroup', function () {
       removeRole({}, el, {});
       expect(instance.refresh)
         .toHaveBeenCalled();
+    });
+    it('relationship was not saved if editing was not confirmed', function () {
+      scope.attr('enabledEdit', false);
+      removeRole({}, el, {});
+      expect(result.relationship.save)
+        .not.toHaveBeenCalled();
     });
   });
 
@@ -545,5 +558,57 @@ describe('GGRC.Components.peopleGroup', function () {
            }
          );
        });
+  });
+  describe('enableEdit() method', function () {
+    var enableEdit;
+    var scope;
+    var event;
+
+    beforeEach(function () {
+      scope = new can.Map({
+        confirmEdit: function () {
+          if (scope.attr('enabledEdit')) {
+            return can.Deferred().resolve();
+          }
+          return can.Deferred().reject();
+        }
+      });
+      enableEdit = Component.prototype.scope.enableEdit.bind(scope);
+      event = $.Event('click');
+    });
+
+    it('isEdit should be truthy when editing was confirmed', function () {
+      var result;
+      scope.attr('enabledEdit', true);
+      enableEdit(scope, {}, event);
+      result = scope.attr('isEdit');
+      expect(result).toBeTruthy();
+    });
+
+    it('isEdit should be falsy when editing was confirmed', function () {
+      var result;
+      scope.attr('enabledEdit', false);
+      enableEdit(scope, {}, event);
+      result = scope.attr('isEdit');
+      expect(result).toBeFalsy();
+    });
+  });
+  describe('disableEdit() method', function () {
+    var disableEdit;
+    var scope;
+
+    beforeEach(function () {
+      scope = new can.Map({
+        isEdit: false
+      });
+      disableEdit = Component.prototype.scope.disableEdit.bind(scope);
+    });
+
+    it('isEdit should be falsy', function () {
+      var result;
+      disableEdit();
+      result = scope.attr('isEdit');
+      expect(result).toBeFalsy();
+    });
   });
 });
