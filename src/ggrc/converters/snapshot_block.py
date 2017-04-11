@@ -10,6 +10,7 @@ from cached_property import cached_property
 
 from ggrc import db
 from ggrc import models
+from ggrc import utils
 from ggrc.utils import benchmark
 from ggrc.models.reflection import AttributeInfo
 
@@ -194,11 +195,10 @@ class SnapshotBlockConverter(object):
       val = content.get(name)
       if not val:
         return u""
-      parts = val.split("-")
-      if "T" in val:
+      if "T" in val or " " in val:
+        # values in format of "YYYY-MM-DDThh:mm:ss" and "YYYY-MM-DD hh:mm:ss"
         return val.replace("T", " ")
-      elif len(parts) == 3:
-        return u"{}/{}/{}".format(parts[1], parts[2], parts[0])
+      return utils.iso_to_us_date(val)
     return self.get_value_string(content.get(name))
 
   def get_cav_value_string(self, value):
@@ -212,12 +212,8 @@ class SnapshotBlockConverter(object):
           value.get("attribute_object_id"), u"")
     if cad["attribute_type"] == "Checkbox":
       return u"yes" if val in {"1", True} else u"no"
-    if cad["attribute_type"] == "Date":
-      parts = val.split("-")
-      if len(parts) == 3:
-        return "{}/{}/{}".format(parts[1], parts[2], parts[0])
-      else:
-        return u""
+    if cad["attribute_type"] == "Date" and val:
+      return utils.iso_to_us_date(val)
     return val
 
   @property
