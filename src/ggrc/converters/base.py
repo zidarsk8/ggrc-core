@@ -124,7 +124,8 @@ class Converter(object):
       object_ids = object_data.get("ids", [])
       fields = object_data.get("fields")
       if class_name == "Snapshot":
-        self.block_converters.append(SnapshotBlockConverter(self, object_ids))
+        self.block_converters.append(
+            SnapshotBlockConverter(self, object_ids, fields=fields))
       else:
         block_converter = BlockConverter(self, object_class=object_class,
                                          fields=fields, object_ids=object_ids,

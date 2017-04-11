@@ -37,9 +37,10 @@ class SnapshotBlockConverter(object):
       "": "no",
   }
 
-  def __init__(self, converter, ids):
+  def __init__(self, converter, ids, fields=None):
     self.converter = converter
     self.ids = ids
+    self.fields = fields
 
   @staticmethod
   def handle_row_data():
