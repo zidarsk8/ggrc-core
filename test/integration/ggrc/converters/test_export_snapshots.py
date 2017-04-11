@@ -138,6 +138,43 @@ class TestExportSnapshots(TestCase):
         control_dicts["Control 1"],
     )
 
+  def test_snapshot_mappings_export(self):
+    """Test exporting snapshots with object mappings."""
+    control = factories.ControlFactory(slug="Control 1")
+    audit = factories.AuditFactory()
+    snapshot = self._create_snapshots(audit, [control])[0]
+    assessments = [factories.AssessmentFactory() for _ in range(3)]
+    issues = [factories.IssueFactory() for _ in range(3)]
+    assessment_slugs = {assessment.slug for assessment in assessments}
+    issue_slugs = {issue.slug for issue in issues}
+
+    for assessment, issue in zip(assessments, issues):
+      factories.RelationshipFactory(source=snapshot, destination=assessment)
+      factories.RelationshipFactory(source=issue, destination=snapshot)
+
+    search_request = [{
+        "object_name": "Snapshot",
+        "filters": {
+            "expression": {
+                "left": "child_type",
+                "op": {"name": "="},
+                "right": "Control",
+            },
+        },
+        "fields": ["mappings"]
+    }]
+    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"]
+    exported_control_dict = parsed_data[0]
+
+    self.assertEqual(
+        set(exported_control_dict["Map: Assessment"].splitlines()),
+        assessment_slugs,
+    )
+    self.assertEqual(
+        set(exported_control_dict["Map: Issue"].splitlines()),
+        issue_slugs,
+    )
+
   def test_empty_control_export(self):
     """Test exporting of a single full control snapshot."""
     cads = self._create_cads("control")
