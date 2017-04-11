@@ -291,7 +291,14 @@ class TestExportSnapshots(TestCase):
 
     controls = models.Control.query.all()
     audit = factories.AuditFactory()
-    self._create_snapshots(audit, controls)
+    snapshots = self._create_snapshots(audit, controls)
+    count = len(snapshots)
+    assessments = [factories.AssessmentFactory() for _ in range(count)]
+    issues = [factories.IssueFactory() for _ in range(count)]
+
+    for snapshot, assessment, issue in zip(snapshots, assessments, issues):
+      factories.RelationshipFactory(source=snapshot, destination=assessment)
+      factories.RelationshipFactory(source=issue, destination=snapshot)
 
     with QueryCounter() as counter:
       search_request = [{
@@ -311,6 +318,7 @@ class TestExportSnapshots(TestCase):
                   },
               },
           },
+          "fields": ["mappings"],
       }]
       self.assertEqual(
           len(self.export_parsed_csv(search_request)["Control Snapshot"]),
@@ -328,6 +336,7 @@ class TestExportSnapshots(TestCase):
                   "right": "Control",
               },
           },
+          "fields": ["mappings"],
       }]
       self.assertEqual(
           len(self.export_parsed_csv(search_request)["Control Snapshot"]),
