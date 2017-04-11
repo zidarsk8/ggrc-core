@@ -179,16 +179,19 @@
       var objType = 'Audit';
       var queryType = 'ids';
       var query = GGRC.Utils.QueryAPI
-        .buildRelevantIdsQuery(objType, {}, {
+        .buildRelevantIdsQuery(objType, {
+          current: 1,
+          pageSize: 1
+        }, {
           type: this.attr('type'),
           operation: 'relevant',
           id: this.attr('id')
         }, null);
       return GGRC.Utils.QueryAPI
-        .makeRequest({data: [query]})
+        .batchRequests(query)
         .done(function (idsArr) {
           var audit = {
-            id: idsArr[0][objType][queryType][0],
+            id: idsArr[objType][queryType][0],
             type: 'Audit'
           };
           this.attr('scopeObject', audit);
