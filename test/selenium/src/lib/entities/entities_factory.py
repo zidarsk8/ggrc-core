@@ -11,7 +11,7 @@ import random
 
 import re
 from lib.constants import element, objects, roles, url as const_url
-from lib.constants.element import AdminWidgetCustomAttrs
+from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities import entity
 from lib.utils import string_utils
 from lib.utils.string_utils import (random_list_strings, random_string,
@@ -28,6 +28,7 @@ class EntitiesFactory(object):
   obj_asmt_tmpl = objects.get_singular(objects.ASSESSMENT_TEMPLATES)
   obj_asmt = objects.get_singular(objects.ASSESSMENTS)
   obj_issue = objects.get_singular(objects.ISSUES)
+  obj_ca = objects.get_singular(objects.CUSTOM_ATTRIBUTES)
 
   all_objs_attrs_names = tuple(entity.Entity().attrs_names_all_entities())
 
@@ -43,17 +44,17 @@ class EntitiesFactory(object):
     return obj
 
   @classmethod
-  def generate_title(cls, obj_type):
-    """Generate title according object type and random data."""
+  def generate_string(cls, first_part):
+    """Generate string according object type and random data."""
     special_chars = string_utils.SPECIAL
-    return "{obj_type}_{uuid}_{rand_str}".format(
-        obj_type=obj_type, uuid=random_uuid(),
+    return "{first_part}_{uuid}_{rand_str}".format(
+        first_part=first_part, uuid=random_uuid(),
         rand_str=random_string(size=len(special_chars), chars=special_chars))
 
   @classmethod
-  def generate_code(cls):
-    """Generate code according str part and random data."""
-    return "{code}".format(code=random_uuid())
+  def generate_slug(cls):
+    """Generate slug according str part and random data."""
+    return "{slug}".format(slug=random_uuid())
 
   @classmethod
   def generate_email(cls, domain=const_url.DEFAULT_EMAIL_DOMAIN):
@@ -62,111 +63,113 @@ class EntitiesFactory(object):
         mail_name=random_uuid(), domain=domain)
 
 
-class PersonsFactory(EntitiesFactory):
+class ObjectOwnersFactory(EntitiesFactory):
   """Factory class for Persons entities."""
 
   @classmethod
   def default(cls):
     """Create default system Person object."""
     return cls.create(
-        title=roles.DEFAULT_USER, id=1, href=const_url.DEFAULT_USER_HREF,
-        email=const_url.DEFAULT_USER_EMAIL, authorizations=roles.SUPERUSER)
+        name=roles.DEFAULT_USER, id=1, href=const_url.DEFAULT_USER_HREF,
+        email=const_url.DEFAULT_USER_EMAIL, system_wide_role=roles.SUPERUSER)
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, url=None, type=None,
-             email=None, authorizations=None):
+  def create(cls, type=None, id=None, name=None, href=None, url=None,
+             email=None, company=None, system_wide_role=None, updated_at=None,
+             custom_attribute_definitions=None,
+             custom_attribute_values=None):
     """Create Person object.
-    Random values will be used for title aka name.
-    Predictable values will be used for mail and system_wide_role.
+    Random values will be used for name.
+    Predictable values will be used for type, email and system_wide_role.
     """
     person_entity = cls._create_random_person()
     person_entity = cls.update_obj_attrs_values(
-        obj=person_entity, title=title, id=id, href=href, url=url, type=type,
-        email=email, authorizations=authorizations)
+        obj=person_entity, type=type, id=id, name=name, href=href, url=url,
+        email=email, company=company, system_wide_role=system_wide_role,
+        updated_at=updated_at,
+        custom_attribute_definitions=custom_attribute_definitions,
+        custom_attribute_values=custom_attribute_values)
     return person_entity
 
   @classmethod
   def _create_random_person(cls):
     """Create Person entity with randomly filled fields."""
     random_person = entity.PersonEntity()
-    random_person.title = cls.generate_title(cls.obj_person)
     random_person.type = cls.obj_person
+    random_person.name = cls.generate_string(cls.obj_person)
     random_person.email = cls.generate_email()
-    random_person.authorizations = roles.NO_ROLE
+    random_person.system_wide_role = roles.SUPERUSER
     return random_person
 
 
-class CAFactory(EntitiesFactory):
-  """Factory class for Custom Attributes entities."""
+class CustomAttributeDefinitionsFactory(EntitiesFactory):
+  """Factory class for  entities."""
 
   @classmethod
-  def create(cls, title=None, ca_type=None, definition_type=None, helptext="",
-             placeholder=None, multi_choice_options=None, is_mandatory=False,
-             ca_global=True):
-    """Create CustomAttribute object.
-    Random values will be used for title, ca_type, definition_type and
-    multi_choice_options if they are None.
+  def create(cls, title=None, id=None, href=None, type=None,
+             definition_type=None, attribute_type=None, helptext=None,
+             placeholder=None, mandatory=None, multi_choice_options=None):
+    """Create Custom Attribute object. CA object attribute 'definition_type'
+    is used as default for REST operations e.g. 'risk_assessment', for UI
+    operations need convert to normal form used method objects.get_normal_form
+    e.q. 'Risk Assessments'.
+    Random values will be used for title, attribute_type, definition_type and
+    multi_choice_options if randomly generated attribute_type is 'Dropdown'.
     """
     ca_entity = cls._create_random_ca()
-    ca_entity = cls._fill_ca_entity_fields(
-        ca_entity, title=title,
-        ca_type=ca_type, definition_type=definition_type, helptext=helptext,
-        placeholder=placeholder, multi_choice_options=multi_choice_options,
-        is_mandatory=is_mandatory, ca_global=ca_global)
-    ca_entity = cls._normalize_ca_definition_type(ca_entity)
+    ca_entity = cls._update_ca_attrs_values(
+        obj=ca_entity, title=title, id=id, href=href, type=type,
+        definition_type=definition_type, attribute_type=attribute_type,
+        helptext=helptext, placeholder=placeholder, mandatory=mandatory,
+        multi_choice_options=multi_choice_options)
     return ca_entity
 
   @classmethod
   def _create_random_ca(cls):
     """Create CustomAttribute entity with randomly filled fields."""
     random_ca = entity.CustomAttributeEntity()
-    random_ca.ca_type = random.choice(AdminWidgetCustomAttrs.ALL_ATTRS_TYPES)
-    random_ca.title = cls.generate_title(random_ca.ca_type)
-    random_ca.definition_type = random.choice(objects.ALL_CA_OBJS)
+    random_ca.type = cls.obj_ca
+    random_ca.attribute_type = random.choice(
+        AdminWidgetCustomAttributes.ALL_CA_TYPES)
+    random_ca.title = cls.generate_string(random_ca.attribute_type)
+    if random_ca.attribute_type == AdminWidgetCustomAttributes.DROPDOWN:
+      random_ca.multi_choice_options = random_list_strings()
+    random_ca.definition_type = objects.get_singular(
+        random.choice(objects.ALL_CA_OBJS))
+    random_ca.mandatory = False
     return random_ca
 
   @classmethod
-  def _fill_ca_entity_fields(cls, ca_object, **ca_object_fields):
-    """Set CustomAttributes object's attributes."""
-    if ca_object_fields.get("ca_type"):
-      ca_object.ca_type = ca_object_fields["ca_type"]
-      ca_object.title = cls.generate_title(ca_object.ca_type)
-    if ca_object_fields.get("definition_type"):
-      ca_object.definition_type = ca_object_fields["definition_type"]
-    if ca_object_fields.get("title"):
-      ca_object.title = ca_object_fields["definition_type"]
-    # "Placeholder" field exists only for Text and Rich Text.
-    if (ca_object_fields.get("placeholder") and
-        ca_object.ca_type in (AdminWidgetCustomAttrs.TEXT,
-                              AdminWidgetCustomAttrs.RICH_TEXT)):
-      ca_object.placeholder = ca_object_fields["placeholder"]
-    if ca_object_fields.get("helptext"):
-      ca_object.helptext = ca_object_fields["helptext"]
-    if ca_object_fields.get("is_mandatory"):
-      ca_object.is_mandatory = ca_object_fields["is_mandatory"]
-    if ca_object_fields.get("ca_global"):
-      ca_object.ca_global = ca_object_fields["ca_global"]
-    # "Possible Values" - is a mandatory field for dropdown CustomAttribute.
-    if ca_object.ca_type == AdminWidgetCustomAttrs.DROPDOWN:
-      if (ca_object_fields.get("multi_choice_options") and
-              ca_object_fields["multi_choice_options"] is not None):
-        ca_object.multi_choice_options =\
-            ca_object_fields["multi_choice_options"]
-      else:
-        ca_object.multi_choice_options = random_list_strings(list_len=3)
-    return ca_object
-
-  @classmethod
-  def _normalize_ca_definition_type(cls, ca_object):
-    """Transform definition type to title form.
-    Title from used for UI operations.
-    For REST operations definition type should be interpreted as
-    objects.get_singular().get_object_name_form().
+  def _update_ca_attrs_values(cls, obj, **arguments):
+    """Update CA's (obj) attributes values according to dictionary of
+    arguments (key = value). Restrictions: 'multi_choice_options' is a
+    mandatory attribute for Dropdown CA and 'placeholder' is a attribute that
+    exists only for Text and Rich Text CA.
+    Generated data - 'obj', entered data - '**arguments'.
     """
-    ca_object.definition_type = objects.get_normal_form(
-        ca_object.definition_type
-    )
-    return ca_object
+    # fix generated data
+    if arguments.get("attribute_type"):
+      obj.title = cls.generate_string(arguments["attribute_type"])
+    if (obj.multi_choice_options and
+            obj.attribute_type == AdminWidgetCustomAttributes.DROPDOWN and
+            arguments.get("attribute_type") !=
+            AdminWidgetCustomAttributes.DROPDOWN):
+      obj.multi_choice_options = None
+    # fix entered data
+    if (arguments.get("multi_choice_options") and
+            arguments.get("attribute_type") !=
+            AdminWidgetCustomAttributes.DROPDOWN):
+      arguments["multi_choice_options"] = None
+    if (arguments.get("placeholder") and arguments.get("attribute_type") not in
+        (AdminWidgetCustomAttributes.TEXT,
+         AdminWidgetCustomAttributes.RICH_TEXT)):
+      arguments["placeholder"] = None
+    # extend entered data
+    if (arguments.get("attribute_type") ==
+            AdminWidgetCustomAttributes.DROPDOWN and not
+            obj.multi_choice_options):
+      obj.multi_choice_options = random_list_strings()
+    return cls.update_obj_attrs_values(obj=obj, **arguments)
 
 
 class ProgramsFactory(EntitiesFactory):
@@ -180,30 +183,33 @@ class ProgramsFactory(EntitiesFactory):
     return empty_program
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, url=None, type=None,
-             manager=None, primary_contact=None, code=None, state=None,
-             last_update=None):
+  def create(cls, type=None, id=None, title=None, href=None, url=None,
+             slug=None, status=None, manager=None, contact=None,
+             secondary_contact=None, updated_at=None,
+             custom_attribute_definitions=None, custom_attribute_values=None):
     """Create Program object.
-    Random values will be used for title and code.
-    Predictable values will be used for type, manager, primary_contact, state.
+    Random values will be used for title and slug.
+    Predictable values will be used for type, status, manager, contact.
     """
     program_entity = cls._create_random_program()
     program_entity = cls.update_obj_attrs_values(
-        obj=program_entity, title=title, id=id, href=href, url=url, type=type,
-        manager=manager, primary_contact=primary_contact, code=code,
-        state=state, last_update=last_update)
+        obj=program_entity, type=type, id=id, title=title, href=href, url=url,
+        slug=slug, status=status, manager=manager, contact=contact,
+        secondary_contact=secondary_contact, updated_at=updated_at,
+        custom_attribute_definitions=custom_attribute_definitions,
+        custom_attribute_values=custom_attribute_values)
     return program_entity
 
   @classmethod
   def _create_random_program(cls):
     """Create Program entity with randomly and predictably filled fields."""
     random_program = entity.ProgramEntity()
-    random_program.title = cls.generate_title(cls.obj_program)
     random_program.type = cls.obj_program
-    random_program.code = cls.generate_code()
-    random_program.manager = roles.DEFAULT_USER
-    random_program.primary_contact = roles.DEFAULT_USER
-    random_program.state = element.ObjectStates.DRAFT
+    random_program.title = cls.generate_string(cls.obj_program)
+    random_program.slug = cls.generate_slug()
+    random_program.status = element.ObjectStates.DRAFT
+    random_program.manager = ObjectOwnersFactory().default().__dict__
+    random_program.contact = ObjectOwnersFactory().default().__dict__
     return random_program
 
 
@@ -218,30 +224,33 @@ class ControlsFactory(EntitiesFactory):
     return empty_control
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, url=None, type=None,
-             owner=None, primary_contact=None, code=None, state=None,
-             last_update=None):
+  def create(cls, type=None, id=None, title=None, href=None, url=None,
+             slug=None, status=None, owners=None, contact=None,
+             secondary_contact=None, updated_at=None,
+             custom_attribute_definitions=None, custom_attribute_values=None):
     """Create Control object.
-    Random values will be used for title and code.
-    Predictable values will be used for type, owner, primary_contact, state.
+    Random values will be used for title and slug.
+    Predictable values will be used for type, status, owners and contact.
     """
     control_entity = cls._create_random_control()
     control_entity = cls.update_obj_attrs_values(
-        obj=control_entity, title=title, id=id, href=href, url=url, type=type,
-        owner=owner, primary_contact=primary_contact, code=code, state=state,
-        last_update=last_update)
+        obj=control_entity, type=type, id=id, title=title, href=href, url=url,
+        slug=slug, status=status, owners=owners, contact=contact,
+        secondary_contact=secondary_contact, updated_at=updated_at,
+        custom_attribute_definitions=custom_attribute_definitions,
+        custom_attribute_values=custom_attribute_values)
     return control_entity
 
   @classmethod
   def _create_random_control(cls):
     """Create Control entity with randomly and predictably filled fields."""
     random_control = entity.ControlEntity()
-    random_control.title = cls.generate_title(cls.obj_control)
     random_control.type = cls.obj_control
-    random_control.code = cls.generate_code()
-    random_control.owner = roles.DEFAULT_USER
-    random_control.primary_contact = roles.DEFAULT_USER
-    random_control.state = element.ObjectStates.DRAFT
+    random_control.title = cls.generate_string(cls.obj_control)
+    random_control.slug = cls.generate_slug()
+    random_control.status = element.ObjectStates.DRAFT
+    random_control.contact = ObjectOwnersFactory().default().__dict__
+    random_control.owners = [ObjectOwnersFactory().default().__dict__]
     return random_control
 
 
@@ -251,20 +260,20 @@ class AuditsFactory(EntitiesFactory):
   @classmethod
   def clone(cls, audit, count_to_clone=1):
     """Clone Audit object.
-    Predictable values will be used for title, id, href, url, code.
+    Predictable values will be used for type, title, id, href, url, slug.
     """
     # pylint: disable=anomalous-backslash-in-string
     from lib.service.rest_service import ObjectsInfoService
-    actual_count_all_audits = ObjectsInfoService().get_total_count(
+    actual_count_all_audits = ObjectsInfoService().get_total_count_objs(
         obj_name=objects.get_normal_form(cls.obj_audit, with_space=False))
     if actual_count_all_audits == audit.id:
       return [
           cls.update_obj_attrs_values(
-              obj=copy.deepcopy(audit),
-              title=audit.title + " - copy " + str(num), id=audit.id + num,
+              obj=copy.deepcopy(audit), id=audit.id + num,
+              title=audit.title + " - copy " + str(num),
               href=re.sub("\d+$", str(audit.id + num), audit.href),
               url=re.sub("\d+$", str(audit.id + num), audit.url),
-              code=(cls.obj_audit.upper() + "-" + str(audit.id + num))) for
+              slug=(cls.obj_audit.upper() + "-" + str(audit.id + num))) for
           num in xrange(1, count_to_clone + 1)]
 
   @classmethod
@@ -275,29 +284,32 @@ class AuditsFactory(EntitiesFactory):
     return empty_audit
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, url=None, type=None,
-             program=None, audit_lead=None, code=None, status=None,
-             last_update=None):
+  def create(cls, type=None, id=None, title=None, href=None, url=None,
+             slug=None, status=None, program=None, contact=None,
+             updated_at=None, custom_attribute_definitions=None,
+             custom_attribute_values=None):
     """Create Audit object.
-    Random values will be used for title and code.
-    Predictable values will be used for type, audit_lead, status.
+    Random values will be used for title and slug.
+    Predictable values will be used for type, status, contact.
     """
     audit_entity = cls._create_random_audit()
     audit_entity = cls.update_obj_attrs_values(
-        obj=audit_entity, title=title, id=id, href=href, url=url, type=type,
-        program=program, audit_lead=audit_lead, code=code, status=status,
-        last_update=last_update)
+        obj=audit_entity, type=type, id=id, title=title, href=href, url=url,
+        slug=slug, status=status, program=program, contact=contact,
+        updated_at=updated_at,
+        custom_attribute_definitions=custom_attribute_definitions,
+        custom_attribute_values=custom_attribute_values)
     return audit_entity
 
   @classmethod
   def _create_random_audit(cls):
     """Create Audit entity with randomly and predictably filled fields."""
     random_audit = entity.AuditEntity()
-    random_audit.title = cls.generate_title(cls.obj_audit)
     random_audit.type = cls.obj_audit
-    random_audit.code = cls.generate_code()
-    random_audit.audit_lead = roles.DEFAULT_USER
+    random_audit.title = cls.generate_string(cls.obj_audit)
+    random_audit.slug = cls.generate_slug()
     random_audit.status = element.AuditStates().PLANNED
+    random_audit.contact = ObjectOwnersFactory().default().__dict__
     return random_audit
 
 
@@ -307,11 +319,11 @@ class AssessmentTemplatesFactory(EntitiesFactory):
   @classmethod
   def clone(cls, asmt_tmpl, count_to_clone=1):
     """Clone Assessment Template object.
-    Predictable values will be used for title, id, href, url, code.
+    Predictable values will be used for type, title, id, href, url, slug.
     """
     # pylint: disable=anomalous-backslash-in-string
     from lib.service.rest_service import ObjectsInfoService
-    actual_count_all_asmt_tmpls = ObjectsInfoService().get_total_count(
+    actual_count_all_asmt_tmpls = ObjectsInfoService().get_total_count_objs(
         obj_name=objects.get_normal_form(cls.obj_asmt_tmpl, with_space=False))
     if actual_count_all_asmt_tmpls == asmt_tmpl.id:
       return [
@@ -319,7 +331,7 @@ class AssessmentTemplatesFactory(EntitiesFactory):
               obj=copy.deepcopy(asmt_tmpl), id=asmt_tmpl.id + num,
               href=re.sub("\d+$", str(asmt_tmpl.id + num), asmt_tmpl.href),
               url=re.sub("\d+$", str(asmt_tmpl.id + num), asmt_tmpl.url),
-              code=("TEMPLATE-" + str(asmt_tmpl.id + num))) for
+              slug=("TEMPLATE-" + str(asmt_tmpl.id + num))) for
           num in xrange(1, count_to_clone + 1)]
 
   @classmethod
@@ -330,20 +342,25 @@ class AssessmentTemplatesFactory(EntitiesFactory):
     return empty_asmt_tmpl
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, url=None, type=None,
-             audit=None, asmt_objects=None, def_assessors=None,
-             def_verifiers=None, code=None, last_update=None):
+  def create(cls, type=None, id=None, title=None, href=None, url=None,
+             slug=None, audit=None, default_people=None, verifiers=None,
+             assessors=None, template_object_type=None, updated_at=None,
+             custom_attribute_definitions=None,
+             custom_attribute_values=None):
     """Create Assessment Template object.
-    Random values will be used for title and code.
-    Predictable values will be used for type, asmt_objects, def_assessors,
-    def_verifiers.
+    Random values will be used for title and slug.
+    Predictable values will be used for type, template_object_type and
+    default_people {"verifiers": *, "assessors": *}.
     """
+    # pylint: disable=too-many-locals
     asmt_tmpl_entity = cls._create_random_asmt_tmpl()
     asmt_tmpl_entity = cls.update_obj_attrs_values(
-        obj=asmt_tmpl_entity, title=title, id=id, href=href, url=url,
-        type=type, audit=audit, asmt_objects=asmt_objects,
-        def_assessors=def_assessors, def_verifiers=def_verifiers, code=code,
-        last_update=last_update)
+        obj=asmt_tmpl_entity, type=type, id=id, title=title, href=href,
+        url=url, slug=slug, audit=audit, default_people=default_people,
+        verifiers=verifiers, assessors=assessors,
+        template_object_type=template_object_type, updated_at=updated_at,
+        custom_attribute_definitions=custom_attribute_definitions,
+        custom_attribute_values=custom_attribute_values)
     return asmt_tmpl_entity
 
   @classmethod
@@ -352,12 +369,12 @@ class AssessmentTemplatesFactory(EntitiesFactory):
     filled fields.
     """
     random_asmt_tmpl = entity.AssessmentTemplateEntity()
-    random_asmt_tmpl.title = cls.generate_title(cls.obj_asmt_tmpl)
     random_asmt_tmpl.type = cls.obj_asmt_tmpl
-    random_asmt_tmpl.code = cls.generate_code()
-    random_asmt_tmpl.asmt_objects = objects.CONTROLS
-    random_asmt_tmpl.def_assessors = roles.OBJECT_OWNERS
-    random_asmt_tmpl.def_verifiers = roles.OBJECT_OWNERS
+    random_asmt_tmpl.title = cls.generate_string(cls.obj_asmt_tmpl)
+    random_asmt_tmpl.slug = cls.generate_slug()
+    random_asmt_tmpl.template_object_type = cls.obj_control.title()
+    random_asmt_tmpl.default_people = {"verifiers": roles.AUDITORS,
+                                       "assessors": roles.AUDIT_LEAD}
     return random_asmt_tmpl
 
 
@@ -367,16 +384,16 @@ class AssessmentsFactory(EntitiesFactory):
   @classmethod
   def generate(cls, objs_under_asmt_tmpl, audit):
     """Generate Assessment object.
-    Predictable values will be used for title, code, audit.
+    Predictable values will be used for type, title, slug, audit.
     """
     # pylint: disable=too-many-locals
     from lib.service.rest_service import ObjectsInfoService
-    actual_count_all_asmts = ObjectsInfoService().get_total_count(
+    actual_count_all_asmts = ObjectsInfoService().get_total_count_objs(
         obj_name=objects.get_normal_form(cls.obj_asmt, with_space=False))
     return [
         cls.create(
             title=obj_under_asmt_tmpl.title + " assessment for " + audit.title,
-            code=(cls.obj_asmt.upper() + "-" + str(asmt_number)),
+            slug=(cls.obj_asmt.upper() + "-" + str(asmt_number)),
             audit=audit.title) for asmt_number, obj_under_asmt_tmpl in
         enumerate(objs_under_asmt_tmpl, start=actual_count_all_asmts + 1)]
 
@@ -388,36 +405,36 @@ class AssessmentsFactory(EntitiesFactory):
     return empty_asmt
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, url=None, type=None,
-             object=None, audit=None, creators=None, assignees=None,
-             primary_contact=None, is_verified=None, code=None, state=None,
-             last_update=None):
+  def create(cls, type=None, id=None, title=None, href=None, url=None,
+             slug=None, status=None, object=None, audit=None,
+             recipients=None, verified=None, updated_at=None,
+             custom_attribute_definitions=None,
+             custom_attribute_values=None):
     """Create Assessment object.
-    Random values will be used for title and code.
-    Predictable values will be used for type, object, creators, assignees,
-    state, is_verified.
+    Random values will be used for title and slug.
+    Predictable values will be used for type, status, recipients, verified.
     """
     # pylint: disable=too-many-locals
     asmt_entity = cls._create_random_asmt()
     asmt_entity = cls.update_obj_attrs_values(
-        obj=asmt_entity, title=title, id=id, href=href, url=url, type=type,
-        object=object, audit=audit, creators=creators, assignees=assignees,
-        primary_contact=primary_contact, is_verified=is_verified, code=code,
-        state=state, last_update=last_update)
+        obj=asmt_entity, type=type, id=id, title=title, href=href, url=url,
+        slug=slug, status=status, object=object, audit=audit,
+        recipients=recipients, verified=verified, updated_at=updated_at,
+        custom_attribute_definitions=custom_attribute_definitions,
+        custom_attribute_values=custom_attribute_values)
     return asmt_entity
 
   @classmethod
   def _create_random_asmt(cls):
     """Create Assessment entity with randomly and predictably filled fields."""
     random_asmt = entity.AssessmentEntity()
-    random_asmt.title = cls.generate_title(cls.obj_asmt)
     random_asmt.type = cls.obj_asmt
-    random_asmt.code = cls.generate_code()
-    random_asmt.object = roles.DEFAULT_USER
-    random_asmt.creators = roles.DEFAULT_USER
-    random_asmt.assignees = roles.DEFAULT_USER
-    random_asmt.state = element.AssessmentStates.NOT_STARTED
-    random_asmt.is_verified = element.Common.FALSE
+    random_asmt.title = cls.generate_string(cls.obj_asmt)
+    random_asmt.slug = cls.generate_slug()
+    random_asmt.status = element.AssessmentStates.NOT_STARTED
+    random_asmt.recipients = ",".join((roles.ASSESSOR, roles.CREATOR,
+                                       roles.VERIFIER))
+    random_asmt.verified = element.Common.FALSE
     return random_asmt
 
 
@@ -432,28 +449,32 @@ class IssuesFactory(EntitiesFactory):
     return empty_issue
 
   @classmethod
-  def create(cls, title=None, id=None, href=None, url=None, type=None,
-             audit=None, owner=None, primary_contact=None, code=None,
-             state=None, last_update=None):
+  def create(cls, type=None, id=None, title=None, href=None, url=None,
+             slug=None, status=None, audit=None, owners=None, contact=None,
+             secondary_contact=None, updated_at=None,
+             custom_attribute_definitions=None, custom_attribute_values=None):
     """Create Issue object.
-    Random values will be used for title and code.
-    Predictable values will be used for type, owner, primary_contact, state.
+    Random values will be used for title and slug.
+    Predictable values will be used for type, status, owners and contact.
     """
+    # pylint: disable=too-many-locals
     issue_entity = cls._create_random_issue()
     issue_entity = cls.update_obj_attrs_values(
-        obj=issue_entity, title=title, id=id, href=href, url=url, type=type,
-        audit=audit, owner=owner, primary_contact=primary_contact, code=code,
-        state=state, last_update=last_update)
+        obj=issue_entity, type=type, id=id, title=title, href=href, url=url,
+        slug=slug, status=status, audit=audit, owners=owners, contact=contact,
+        secondary_contact=secondary_contact, updated_at=updated_at,
+        custom_attribute_definitions=custom_attribute_definitions,
+        custom_attribute_values=custom_attribute_values)
     return issue_entity
 
   @classmethod
   def _create_random_issue(cls):
     """Create Issue entity with randomly and predictably filled fields."""
     random_issue = entity.IssueEntity()
-    random_issue.title = cls.generate_title(cls.obj_issue)
     random_issue.type = cls.obj_issue
-    random_issue.code = cls.generate_code()
-    random_issue.owner = roles.DEFAULT_USER
-    random_issue.primary_contact = roles.DEFAULT_USER
-    random_issue.state = element.IssueStates.DRAFT
+    random_issue.title = cls.generate_string(cls.obj_issue)
+    random_issue.slug = cls.generate_slug()
+    random_issue.status = element.IssueStates.DRAFT
+    random_issue.owners = [ObjectOwnersFactory().default().__dict__]
+    random_issue.contact = ObjectOwnersFactory().default().__dict__
     return random_issue

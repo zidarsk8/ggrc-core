@@ -48,14 +48,14 @@ class BaseWebUiService(object):
     """
     fields = element.TransformationSetVisibleFields
     return {
-        fields.TITLE.upper(): "title", fields.OWNER.upper(): "owner",
-        fields.CODE.upper(): "code", fields.STATE.upper(): "state",
-        fields.STATUS.upper(): "status",
-        fields.VERIFIED.upper(): "is_verified",
-        fields.LAST_UPDATED.upper(): "last_update",
-        fields.AUDIT_LEAD.upper(): "audit_lead",
-        fields.MANAGER.upper(): "manager",
-        fields.PRIMARY_CONTACT.upper(): "primary_contact"
+        fields.TITLE.upper(): "title", fields.ADMIN.upper(): "owners",
+        fields.CODE.upper(): "slug",
+        fields.STATE.upper(): "status", fields.STATUS.upper(): "status",
+        fields.VERIFIED.upper(): "verified",
+        fields.LAST_UPDATED.upper(): "updated_at",
+        fields.AUDIT_LEAD.upper(): "contact",
+        fields.PRIMARY_CONTACT.upper(): "contact",
+        fields.MANAGER.upper(): "manager"
     }
 
   def open_widget_of_mapped_objs(self, src_obj):
@@ -114,7 +114,7 @@ class BaseWebUiService(object):
     """
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     (objs_widget.tree_view.open_create().
-     fill_minimal_data(title=obj.title, code=obj.code).save_and_close())
+     fill_minimal_data(title=obj.title, code=obj.slug).save_and_close())
 
   def map_objs_via_tree_view(self, src_obj, dest_objs):
     """Open generic widget of mapped objects, open unified mapper modal from
@@ -171,7 +171,7 @@ class BaseWebUiService(object):
     """
     # pylint: disable=invalid-name
     obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
-    return obj_info_panel.open_info_3bbs().is_open_exist()
+    return obj_info_panel.open_info_3bbs().is_open_enabled()
 
   def filter_list_objs_from_tree_view(self, src_obj, filter_exp):
     """Filter by specified criteria and return list of objects from Tree

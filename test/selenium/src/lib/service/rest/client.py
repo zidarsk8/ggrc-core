@@ -94,19 +94,14 @@ class RestClient(object):
   def generate_body(self, type, **kwargs):
     """Generate body of HTTP request based on JSON representation."""
     if type == self._count:
-      return json.dumps(
-          [TemplateProvider.generate_template_as_dict(
-              template=type, **kwargs)[self._count]]
-      )
+      return json.dumps([TemplateProvider.generate_template_as_dict(
+          json_tmpl_name=type, **kwargs)[self._count]])
     else:
-      return json.dumps(
-          [TemplateProvider.generate_template_as_dict(template=type, **kwargs)]
-      )
+      return json.dumps([TemplateProvider.generate_template_as_dict(
+          json_tmpl_name=type, **kwargs)])
 
   @staticmethod
   def update_body(body, **kwargs):
     """Update body of HTTP request based on JSON representation."""
-    return json.dumps(
-        TemplateProvider.update_template_as_dict(
-            template=body, **kwargs)
-    )
+    return json.dumps(TemplateProvider.update_template_as_dict(
+        json_tmpl_name=body, **kwargs))

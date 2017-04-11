@@ -10,12 +10,12 @@ class Entity(object):
   # pylint: disable=invalid-name
   # pylint: disable=redefined-builtin
 
-  def __init__(self, title=None, id=None, href=None, url=None, type=None):
-    self.title = title
+  def __init__(self, type=None, id=None, title=None, href=None, url=None):
+    self.type = type
     self.id = id
+    self.title = title
     self.href = href
     self.url = url
-    self.type = type
 
   @staticmethod
   def attrs_names_all_entities():
@@ -32,174 +32,251 @@ class Entity(object):
     return unique_entities_attrs_names
 
 
-class PersonEntity(Entity):
+class PersonEntity(object):
   """Class that represent model for Person."""
+  # pylint: disable=invalid-name
+  # pylint: disable=redefined-builtin
+  # pylint: disable=too-many-instance-attributes
   __hash__ = None
 
-  def __init__(self, email=None, authorizations=None):
+  def __init__(self, type=None, id=None, name=None, href=None, url=None,
+               email=None, company=None, system_wide_role=None,
+               updated_at=None, custom_attribute_definitions=None,
+               custom_attribute_values=None):
     super(PersonEntity, self).__init__()
+    self.name = name
+    self.id = id
+    self.href = href
+    self.url = url
+    self.type = type
     self.email = email
-    self.authorizations = authorizations
+    self.company = company
+    self.system_wide_role = system_wide_role  # authorizations
+    self.updated_at = updated_at  # last updated
+    self.custom_attribute_definitions = custom_attribute_definitions
+    self.custom_attribute_values = custom_attribute_values
 
   def __repr__(self):
-    return ("object_type: {type}, name: {name}, id: {id}, href: {href}, "
-            "url: {url}, email: {email}, "
-            "authorizations: {authorizations}").format(
-        type=self.type, name=self.title, id=self.id, href=self.href,
-        url=self.url, email=self.email, authorizations=self.authorizations)
+    return ("type: {type}, id: {id}, name: {name}, href: {href}, url: {url}, "
+            "email: {email}, company: {company}, "
+            "system_wide_role: {system_wide_role}, updated_at: {updated_at}, "
+            "custom_attribute_definitions: {custom_attribute_definitions}, "
+            "custom_attribute_values: {custom_attribute_values}").format(
+        type=self.type, id=self.id, name=self.name, href=self.href,
+        url=self.url, email=self.email, company=self.company,
+        system_wide_role=self.system_wide_role, updated_at=self.updated_at,
+        custom_attribute_definitions=self.custom_attribute_definitions,
+        custom_attribute_values=self.custom_attribute_values)
 
 
 class CustomAttributeEntity(object):
   """Class that represent model for Custom Attribute."""
+  # pylint: disable=invalid-name
+  # pylint: disable=redefined-builtin
   # pylint: disable=too-many-instance-attributes
   __hash__ = None
 
-  def __init__(self, obj_id=None, title=None, ca_type=None,
-               definition_type=None, helptext="", placeholder=None,
-               multi_choice_options=None, is_mandatory=False, ca_global=True):
+  def __init__(self, title=None, id=None, href=None, type=None,
+               definition_type=None, attribute_type=None, helptext=None,
+               placeholder=None, mandatory=None, multi_choice_options=None):
     super(CustomAttributeEntity, self).__init__()
-    self.obj_id = obj_id
     self.title = title
-    self.ca_type = ca_type
+    self.id = id
+    self.href = href
+    self.type = type
     self.definition_type = definition_type
+    self.attribute_type = attribute_type
     self.helptext = helptext
     self.placeholder = placeholder
+    self.mandatory = mandatory
     self.multi_choice_options = multi_choice_options
-    self.is_mandatory = is_mandatory
-    self.ca_global = ca_global
 
   def __repr__(self):
-    return "{def_type}:{ca_type} {title};Mandatory:{mandatory}".format(
-        ca_type=self.ca_type,
-        title=self.title,
-        mandatory=self.is_mandatory,
-        def_type=self.definition_type)
+    return ("type: {type}, title: {title}, id: {id}, href: {href}, "
+            "definition_type: {definition_type}, "
+            "attribute_type: {attribute_type}, helptext: {helptext}, "
+            "placeholder: {placeholder}, mandatory: {mandatory}, "
+            "multi_choice_options: {multi_choice_options}").format(
+        type=self.type, title=self.title, id=self.id, href=self.href,
+        definition_type=self.definition_type,
+        attribute_type=self.attribute_type, helptext=self.helptext,
+        placeholder=self.placeholder, mandatory=self.mandatory,
+        multi_choice_options=self.multi_choice_options)
 
   def __eq__(self, other):
-    return (isinstance(other, self.__class__) and
+    return (isinstance(other, self.__class__) and self.type == other.type and
             self.title == other.title and
-            self.ca_type == other.ca_type and
-            self.is_mandatory == other.is_mandatory and
-            self.definition_type == other.definition_type)
+            self.definition_type == other.definition_type and
+            self.attribute_type == other.attribute_type and
+            self.mandatory == other.mandatory)
 
 
 class ProgramEntity(Entity):
   """Class that represent model for Program."""
+  # pylint: disable=too-many-instance-attributes
   __hash__ = None
 
-  def __init__(self, manager=None, primary_contact=None, code=None, state=None,
-               last_update=None):
+  def __init__(self, slug=None, status=None, manager=None, contact=None,
+               secondary_contact=None, updated_at=None,
+               custom_attribute_definitions=None,
+               custom_attribute_values=None):
     super(ProgramEntity, self).__init__()
-    self.manager = manager
-    self.primary_contact = primary_contact
-    self.code = code
-    self.state = state
-    self.last_update = last_update
+    self.slug = slug  # code
+    self.status = status  # state
+    self.manager = manager  # predefined and same as primary contact
+    self.contact = contact  # primary contact
+    self.secondary_contact = secondary_contact
+    self.updated_at = updated_at  # last updated
+    self.custom_attribute_definitions = custom_attribute_definitions
+    self.custom_attribute_values = custom_attribute_values
 
   def __repr__(self):
-    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
-            "url: {url}, manager: {manager}, "
-            "primary contact: {primary_contact}, code: {code}, "
-            "state: {state}, last update: {last_update}").format(
+    return ("type: {type}, id: {id}, title: {title}, href: {href}, "
+            "url: {url}, slug: {slug}, status: {status}, manager: {manager}, "
+            "contact: {contact}, secondary_contact: {secondary_contact}, "
+            "updated_at: {updated_at}, "
+            "custom_attribute_definitions: {custom_attribute_definitions}, "
+            "custom_attribute_values: {custom_attribute_values}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        url=self.url, manager=self.manager,
-        primary_contact=self.primary_contact, code=self.code, state=self.state,
-        last_update=self.last_update)
+        url=self.url, slug=self.slug, status=self.status, manager=self.manager,
+        contact=self.contact, secondary_contact=self.secondary_contact,
+        updated_at=self.updated_at,
+        custom_attribute_definitions=self.custom_attribute_definitions,
+        custom_attribute_values=self.custom_attribute_values)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.code == other.code and
-            self.manager == other.manager and self.state == other.state and
-            self.primary_contact == other.primary_contact)
+            self.title == other.title and self.slug == other.slug and
+            self.status == other.status and
+            (self.manager == other.manager or
+             other.manager in self.manager.values()) and
+            (self.contact == other.contact or
+             other.contact in self.contact.values()))
 
 
 class ControlEntity(Entity):
   """Class that represent model for Control."""
+  # pylint: disable=too-many-instance-attributes
   __hash__ = None
 
-  def __init__(self, owner=None, primary_contact=None, code=None, state=None,
-               last_update=None):
+  def __init__(self, slug=None, status=None, owners=None, contact=None,
+               secondary_contact=None, updated_at=None,
+               custom_attribute_definitions=None,
+               custom_attribute_values=None):
     super(ControlEntity, self).__init__()
-    self.owner = owner
-    self.primary_contact = primary_contact
-    self.code = code
-    self.state = state
-    self.last_update = last_update
+    self.slug = slug  # code
+    self.status = status  # state
+    self.owners = owners
+    self.contact = contact  # primary contact
+    self.secondary_contact = secondary_contact
+    self.updated_at = updated_at  # last updated
+    self.custom_attribute_definitions = custom_attribute_definitions
+    self.custom_attribute_values = custom_attribute_values
 
   def __repr__(self):
-    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
-            "url: {url}, owner: {owner}, primary contact: {primary_contact}, "
-            "code: {code}, state: {state}, last update: {last_update}").format(
+    return ("type: {type}, id: {id}, title: {title}, href: {href}, "
+            "url: {url}, slug: {slug}, status: {status}, owners: {owners}, "
+            "contact: {contact}, secondary_contact: {secondary_contact}, "
+            "updated_at: {updated_at}, "
+            "custom_attribute_definitions: {custom_attribute_definitions}, "
+            "custom_attribute_values: {custom_attribute_values}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        url=self.url, owner=self.owner, primary_contact=self.primary_contact,
-        code=self.code, state=self.state, last_update=self.last_update)
+        url=self.url, slug=self.slug, status=self.status, owners=self.owners,
+        contact=self.contact, secondary_contact=self.secondary_contact,
+        updated_at=self.updated_at,
+        custom_attribute_definitions=self.custom_attribute_definitions,
+        custom_attribute_values=self.custom_attribute_values)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.code == other.code and
-            self.state == other.state and self.owner == other.owner and
-            self.primary_contact == other.primary_contact)
+            self.title == other.title and self.slug == other.slug and
+            self.status == other.status and
+            (self.owners == other.owners or
+             other.owners in [owner.values() for owner in self.owners][0]) and
+            (self.contact == other.contact or other.contact in
+             self.contact.values()))
+
+  def __lt__(self, other):
+    return self.slug < other.slug
 
 
 class AuditEntity(Entity):
   """Class that represent model for Audit."""
   __hash__ = None
 
-  def __init__(self, program=None, audit_lead=None, code=None,
-               status=None, last_update=None):
+  def __init__(self, slug=None, status=None, program=None, contact=None,
+               updated_at=None, custom_attribute_definitions=None,
+               custom_attribute_values=None):
     super(AuditEntity, self).__init__()
+    self.slug = slug  # code
+    self.status = status  # status
     self.program = program
-    self.audit_lead = audit_lead
-    self.code = code
-    self.status = status
-    self.last_update = last_update
+    self.contact = contact  # internal audit lead
+    self.updated_at = updated_at  # last updated
+    self.custom_attribute_definitions = custom_attribute_definitions
+    self.custom_attribute_values = custom_attribute_values
 
   def __repr__(self):
-    return (
-        "object_type: {type}, title: {title}, id: {id}, href: {href}, "
-        "url: {url}, program: {program}, audit lead: {audit_lead}, "
-        "code: {code}, status: {status}, last update: {last_update}").format(
-            type=self.type, title=self.title, id=self.id, href=self.href,
-            url=self.url, program=self.program, audit_lead=self.audit_lead,
-            code=self.code, status=self.status, last_update=self.last_update)
+    return ("type: {type}, id: {id}, title: {title}, href: {href}, "
+            "url: {url}, slug: {slug}, status: {status}, program: {program}, "
+            "contact: {contact}, updated_at: {updated_at}, "
+            "custom_attribute_definitions: {custom_attribute_definitions}, "
+            "custom_attribute_values: {custom_attribute_values}").format(
+        type=self.type, title=self.title, id=self.id, href=self.href,
+        url=self.url, slug=self.slug, status=self.status, program=self.program,
+        contact=self.contact, updated_at=self.updated_at,
+        custom_attribute_definitions=self.custom_attribute_definitions,
+        custom_attribute_values=self.custom_attribute_values)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.code == other.code and
-            self.audit_lead == other.audit_lead and
-            self.status == other.status)
+            self.title == other.title and self.slug == other.slug and
+            self.status == other.status and
+            (self.contact == other.contact or
+             other.contact in self.contact.values()))
 
 
 class AssessmentTemplateEntity(Entity):
   """Class that represent model for Assessment Template."""
   # pylint: disable=superfluous-parens
-
+  # pylint: disable=too-many-instance-attributes
   __hash__ = None
 
-  def __init__(self, audit=None, asmt_objects=None, def_assessors=None,
-               def_verifiers=None, code=None, last_update=None):
+  def __init__(self, slug=None, audit=None, default_people=None,
+               verifiers=None, assessors=None,
+               template_object_type=None, updated_at=None,
+               custom_attribute_definitions=None,
+               custom_attribute_values=None):
     super(AssessmentTemplateEntity, self).__init__()
+    self.slug = slug  # code
     self.audit = audit
-    self.asmt_objects = asmt_objects
-    self.def_assessors = def_assessors
-    self.def_verifiers = def_verifiers
-    self.code = code
-    self.last_update = last_update
+    self.default_people = default_people  # {"verifiers": *, "assessors": *}
+    self.verifiers = verifiers  # item of default_people
+    self.assessors = assessors  # item of default_people
+    self.template_object_type = template_object_type
+    self.updated_at = updated_at  # last updated
+    self.custom_attribute_definitions = custom_attribute_definitions
+    self.custom_attribute_values = custom_attribute_values
 
   def __repr__(self):
-    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
-            "url: {url}, audit: {audit}, assessment objects: {asmt_objects}, "
-            "default assessors: {def_assessors}, "
-            "default verifiers: {def_verifiers}, code: {code}, "
-            "last update: {last_update}").format(
+    return ("type: {type}, id: {id}, title: {title}, href: {href}, "
+            "url: {url}, slug: {slug}, audit: {audit}, "
+            "verifiers: {verifiers}, assessors: {assessors}, "
+            "template_object_type: {template_object_type}, "
+            "updated_at: {updated_at}, "
+            "custom_attribute_definitions: {custom_attribute_definitions}, "
+            "custom_attribute_values: {custom_attribute_values}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        url=self.url, audit=self.audit, asmt_objects=self.asmt_objects,
-        def_assessors=self.def_assessors, def_verifiers=self.def_verifiers,
-        code=self.code, last_update=self.last_update)
+        url=self.url, slug=self.slug, audit=self.audit,
+        verifiers=self.verifiers, assessors=self.assessors,
+        template_object_type=self.template_object_type,
+        updated_at=self.updated_at,
+        custom_attribute_definitions=self.custom_attribute_definitions,
+        custom_attribute_values=self.custom_attribute_values)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.code == other.code)
+            self.title == other.title and self.slug == other.slug)
 
 
 class AssessmentEntity(Entity):
@@ -208,37 +285,40 @@ class AssessmentEntity(Entity):
   # pylint: disable=redefined-builtin
   __hash__ = None
 
-  def __init__(self, object=None, audit=None, creators=None, assignees=None,
-               primary_contact=None, is_verified=None, code=None, state=None,
-               last_update=None):
+  def __init__(self, slug=None, status=None, object=None, audit=None,
+               recipients=None, verified=None, updated_at=None,
+               custom_attribute_definitions=None,
+               custom_attribute_values=None):
     super(AssessmentEntity, self).__init__()
+    self.slug = slug  # code
+    self.status = status  # state
     self.object = object
     self.audit = audit
-    self.creators = creators
-    self.assignees = assignees
-    self.primary_contact = primary_contact
-    self.is_verified = is_verified
-    self.code = code
-    self.state = state
-    self.last_update = last_update
+    self.recipients = recipients  # "Assessor,Creator,Verifier"
+    self.verified = verified
+    self.updated_at = updated_at  # last updated
+    self.custom_attribute_definitions = custom_attribute_definitions
+    self.custom_attribute_values = custom_attribute_values
 
   def __repr__(self):
-    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
-            "url: {url}, object: {object}, audit: {audit}, "
-            "creators: {creators}, assignees: {assignees}, "
-            "primary_contact: {primary_contact}, is_verified: {is_verified}, "
-            "code: {code}, state: {state}, last update: {last_update}").format(
+    return ("type: {type}, id: {id}, title: {title}, href: {href}, "
+            "url: {url}, slug: {slug}, status: {status}, object: {object}, "
+            "audit: {audit}, recipients: {recipients}, verified: {verified}, "
+            "updated_at: {updated_at}, "
+            "custom_attribute_definitions: {custom_attribute_definitions}, "
+            "custom_attribute_values: {custom_attribute_values}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        url=self.url, object=self.object, audit=self.audit,
-        creators=self.creators, assignees=self.assignees,
-        primary_contact=self.primary_contact, is_verified=self.is_verified,
-        code=self.code, state=self.state, last_update=self.last_update)
+        url=self.url, slug=self.slug, status=self.status, object=self.object,
+        audit=self.audit, recipients=self.recipients, verified=self.verified,
+        updated_at=self.updated_at,
+        custom_attribute_definitions=self.custom_attribute_definitions,
+        custom_attribute_values=self.custom_attribute_values)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.code == other.code and
-            self.state == other.state and
-            self.is_verified == other.is_verified)
+            self.title == other.title and self.slug == other.slug and
+            self.status == other.status and
+            self.verified == other.verified)
 
 
 class IssueEntity(Entity):
@@ -246,27 +326,39 @@ class IssueEntity(Entity):
   # pylint: disable=too-many-instance-attributes
   __hash__ = None
 
-  def __init__(self, audit=None, owner=None, primary_contact=None, code=None,
-               state=None, last_update=None):
+  def __init__(self, slug=None, status=None, audit=None, owners=None,
+               contact=None, secondary_contact=None, updated_at=None,
+               custom_attribute_definitions=None,
+               custom_attribute_values=None):
     super(IssueEntity, self).__init__()
+    self.slug = slug  # code
+    self.status = status  # state
     self.audit = audit
-    self.owner = owner
-    self.primary_contact = primary_contact
-    self.code = code
-    self.state = state
-    self.last_update = last_update
+    self.owners = owners
+    self.contact = contact  # primary contact
+    self.secondary_contact = secondary_contact
+    self.updated_at = updated_at  # last updated
+    self.custom_attribute_definitions = custom_attribute_definitions
+    self.custom_attribute_values = custom_attribute_values
 
   def __repr__(self):
-    return ("object_type: {type}, title: {title}, id: {id}, href: {href}, "
-            "url: {url}, audit: {audit}, owner: {owner}, "
-            "primary_contact: {primary_contact}, code: {code}, "
-            "state: {state}, last update: {last_update}").format(
+    return ("type: {type}, id: {id}, title: {title}, href: {href}, "
+            "url: {url}, slug: {slug}, status: {status}, audit: {audit}, "
+            "owners: {owners}, contact: {contact}, "
+            "secondary_contact: {secondary_contact}, "
+            "updated_at: {updated_at}, "
+            "custom_attribute_definitions: {custom_attribute_definitions}, "
+            "custom_attribute_values: {custom_attribute_values}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        url=self.url, audit=self.audit, owner=self.owner,
-        primary_contact=self.primary_contact, code=self.code, state=self.state,
-        last_update=self.last_update)
+        url=self.url, slug=self.slug, status=self.status, audit=self.audit,
+        owners=self.owners, contact=self.contact,
+        secondary_contact=self.secondary_contact, updated_at=self.updated_at,
+        custom_attribute_definitions=self.custom_attribute_definitions,
+        custom_attribute_values=self.custom_attribute_values)
 
   def __eq__(self, other):
     return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.owner == other.owner,
-            self.code == other.code and self.state == other.state)
+            self.title == other.title and self.slug == other.slug and
+            self.status == other.status and
+            (self.owners == other.owners or
+            other.owners in [owner.values() for owner in self.owners][0]))

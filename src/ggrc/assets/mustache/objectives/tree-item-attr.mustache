@@ -28,7 +28,11 @@
     </span>
   {{/case}}
   {{#case 'last_assessment_date'}}
-    <last-assessment-date instance="instance"/>
+    {{#if instance.snapshot}}
+      <last-assessment-date instance="instance"/>
+    {{else}}
+      {{localize_date instance.last_assessment_date}}
+    {{/if}}
   {{/case}}
   {{#case 'status'}}
     {{#using status=instance.status}}

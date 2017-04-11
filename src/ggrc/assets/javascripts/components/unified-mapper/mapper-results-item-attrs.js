@@ -8,7 +8,7 @@
   var DEFAULT_ATTR_TEMPLATE =
     '/static/mustache/base_objects/tree-item-attr.mustache';
 
-  can.Component.extend('mapperResultsItemAttrs', {
+  GGRC.Components('mapperResultsItemAttrs', {
     tag: 'mapper-results-item-attrs',
     template: can.view(
       GGRC.mustache_path +

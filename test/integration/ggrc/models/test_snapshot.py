@@ -49,6 +49,7 @@ class TestSnapshot(TestCase):
 
       # special fields not needed for snapshots.
       "display_name",
+      "last_assessment_date",
       "preconditions_failed",
       "type",
       "workflow_state",

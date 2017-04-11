@@ -539,6 +539,7 @@ def handle_cycle_task_group_object_task_put(
   if getattr(obj.task_group_task, 'object_approval', None):
     for tgobj in obj.task_group_task.task_group.objects:
       if obj.status == 'Verified':
+        tgobj.modified_by = get_current_user()
         tgobj.set_reviewed_state()
         db.session.add(tgobj)
     db.session.flush()

@@ -4,213 +4,207 @@
 # pylint: disable=too-few-public-methods
 
 import json
-import re
 
-from lib import environment
+from requests import exceptions
+
+from lib import environment, factory
 from lib.constants import url, objects, templates
-from lib.entities.entities_factory import (
-  ProgramsFactory, AuditsFactory, AssessmentTemplatesFactory,
-  AssessmentsFactory, ControlsFactory, IssuesFactory, PersonsFactory)
+from lib.entities.entities_factory import ObjectOwnersFactory
 from lib.service.rest.client import RestClient
 from lib.utils import string_utils
 
 
-class BaseService(object):
+class BaseRestService(object):
   """Base class for business layer's services objects."""
-  def __init__(self):
-    self.client = RestClient(self.ENDPOINT)
-    self._relationship = objects.get_singular(url.RELATIONSHIPS)
-    self._object_owner = objects.get_singular(url.OBJECT_OWNERS)
-    self._count = templates.COUNT
+  def __init__(self, endpoint):
+    self.endpoint = endpoint
+    self.client = RestClient(self.endpoint)
+    self.entities_factory_cls = factory.get_cls_entity_factory(
+        object_name=self.endpoint)
 
-  def create_list_objs(self, factory, count, **kwargs):
-    """Create list of objects used entity factory and REST API data
-    (raw responses after REST API objects creation converted to list of dicts
-    {"attr": "value", ...}). Return list of created objects.
+  def create_list_objs(self, entity_factory, count, attrs_to_factory=None,
+                       **attrs_for_template):
+    """Create and return list of objects used entities factories,
+    REST API service and attributes to make JSON template to request.
+    As default entity factory is generating random objects,
+    if 'attrs_for_factory' is not None then factory is generating objects
+    according to 'attrs_for_factory' (dictionary of attributes).
     """
-    list_factory_objs = [factory.create() for _ in xrange(count)]
-    list_attrs = [
-        self.get_obj_attrs(self.client.create_object(
-            type=factory_obj.type, title=factory_obj.title,
-            slug=factory_obj.code, **kwargs)) for
-        factory_obj in list_factory_objs]
-    return [self.set_obj_attrs(attrs, factory_obj, **kwargs) for
-            attrs, factory_obj in zip(list_attrs, list_factory_objs)]
+    list_factory_objs = [entity_factory.create() for _ in xrange(count)]
+    if attrs_to_factory:
+      list_factory_objs = [
+        entity_factory.create(**attrs_to_factory) for _ in xrange(count)]
+    list_attrs = [self.get_items_from_resp(self.client.create_object(
+        **dict(factory_obj.__dict__.items() + attrs_for_template.items())))
+                  for factory_obj in list_factory_objs]
+    return [self.set_obj_attrs(
+        attrs=attrs, obj=factory_obj, **attrs_for_template)
+            for attrs, factory_obj in zip(list_attrs, list_factory_objs)]
 
-  @staticmethod
-  def get_obj_attrs(response):
-    """Form dictionary of object's attributes (dict's items)
-    from server response.
+  def update_list_objs(self, entity_factory, list_objs_to_update,
+                       attrs_to_factory=None):
+    """Update and return list of objects used entities factories,
+    REST API service and attributes to make JSON template to request.
+    As default entity factory is generating random objects,
+    if 'attrs_for_factory' is not None then factory is generating objects
+    according to 'attrs_for_factory' (dictionary of attributes).
     """
-    def get_items_from_obj_el(obj_el):
-      """Get values from dict object element (obj_el) and create new dict of
-      items.
-      """
-      return {"id": obj_el.get("id"), "href": obj_el.get("selfLink"),
-              "type": obj_el.get("type"), "title": obj_el.get("title"),
-              "code": obj_el.get("slug"),
-              "url": environment.APP_URL + obj_el.get("viewLink")[1:],
-              "name": re.search(r"\/([a-z_]*)\/",
-                                obj_el.get("viewLink")).group(1),
-              "last_update": obj_el.get("updated_at")}
-    resp = json.loads(response.text)
-    if isinstance(resp, list) and len(resp[0]) == 2:
-      return get_items_from_obj_el(resp[0][1].itervalues().next())
-    elif isinstance(resp, dict) and len(resp) == 1:
-      return get_items_from_obj_el(resp.itervalues().next())
-    else:
-      pass
-
-  @staticmethod
-  def set_obj_attrs(attrs, obj, **kwargs): # flake8: noqa
-    """Update object's attributes according type of object and
-    list of dicts with object's attributes (dict's items).
-    """
-    if attrs.get("id"):
-      obj.id = attrs["id"]
-    if attrs.get("href"):
-      obj.href = attrs["href"]
-    if attrs.get("url"):
-      obj.url = attrs["url"]
-    if attrs.get("last_update"):
-      obj.last_update = attrs["last_update"]
-    if attrs.get("code") == obj.code:
-      obj.code = attrs["code"]
-    if attrs.get("title") == obj.title:
-      obj.title = attrs["title"]
-    if kwargs:
-      # for Audit objects
-      if kwargs.get("program") and kwargs.get("program").get("title"):
-        obj.program = kwargs["program"]["title"]
-      # for Assessment Template objects
-      if kwargs.get("audit") and kwargs.get("audit").get("title"):
-        obj.audit = kwargs["audit"]["title"]
-      # for Assessment objects
-      if kwargs.get("object") and kwargs.get("object").get("title"):
-        obj.object = kwargs["object"]["title"]
-    return obj
-
-  def update_list_objs(self, list_old_objs, factory):
-    """Update objects used old objects (list_old_objs) as target,
-    entities factories as new attributes data generator,
-    REST API as service for provide that.
-    Return list of updated objects.
-    """
-    list_new_objs = [factory.create() for _ in xrange(len(list_old_objs))]
+    list_new_objs = [entity_factory.create() for _ in
+                     xrange(len(list_objs_to_update))]
+    if attrs_to_factory:
+      list_new_objs = [entity_factory.create(**attrs_to_factory) for _ in
+                       xrange(len(list_objs_to_update))]
     list_new_attrs = [
-        self.get_obj_attrs(self.client.update_object(
-            href=old_obj.href, url=old_obj.url, title=new_obj.title,
-            slug=new_obj.code)) for
-        old_obj, new_obj in zip(list_old_objs, list_new_objs)]
+      self.get_items_from_resp(self.client.update_object(
+          href=old_obj.href,
+          **{k: v for k, v in new_obj.__dict__.iteritems() if k != "href"}))
+      for old_obj, new_obj in zip(list_objs_to_update, list_new_objs)]
     return [self.set_obj_attrs(new_attrs, new_obj) for
             new_attrs, new_obj in zip(list_new_attrs, list_new_objs)]
 
+  @staticmethod
+  def get_items_from_resp(response):
+    """Check response from server and get items {key: value} from it."""
+    def get_extra_items(response):
+      """Get extra items {key: value} that used in entities."""
+      if response.get("selfLink") and response.get("viewLink"):
+        return {"href": response.get("selfLink"),
+                "url": environment.APP_URL + response.get("viewLink")[1:]}
+    resp = json.loads(response.text)
+    if response.status_code == 200: # check response from server
+      if (isinstance(resp, list) and len(resp[0]) == 2 and
+              isinstance(resp[0][1], dict)):
+        resp = resp[0][1]  # [[201, {"k": "v"}]] to {"k": "v"}
+      resp = resp.itervalues().next()  # {"obj": {"k": "v"}} to {"k": "v"}
+      return dict(resp.items() + get_extra_items(resp).items())
+    else:
+      resp_code, resp_message = resp[0]
+      print "Response_code: {code}, Response_message: {message}".format(
+          code=resp_code, message=resp_message)
+      raise exceptions.ContentDecodingError
 
-class ControlsService(BaseService):
-  """Service for working with Controls entities."""
-  ENDPOINT = url.CONTROLS
+  @staticmethod
+  def set_obj_attrs(attrs, obj, **kwargs): # flake8: noqa
+    """Update object according to new attributes exclude "type", "contact",
+    "owners" due of objects assertion specific, and keyword arguments -
+    attributes witch used to make JSON template to request and witch contain
+    fully objects descriptions as dictionary.
+    """
+    obj.__dict__.update({k: v for k, v in attrs.iteritems()
+                         if v and k not in ("type", "contact", "owners")})
+    if kwargs:
+      # for Audit objects
+      if kwargs.get("program"):
+        obj.program = kwargs["program"]
+      # for Assessment, Assessment Template, Issues objects
+      if kwargs.get("audit"):
+        obj.audit = kwargs["audit"]
+    return obj
 
-  def create(self, count):
-    """Create new Controls objects via REST API and return created."""
-    return self.create_list_objs(factory=ControlsFactory(), count=count)
+  def create_objs(self, count, factory_params=None, **attrs_for_template):
+    """Create new objects via REST API and return created."""
+    return self.create_list_objs(
+        entity_factory=self.entities_factory_cls(), count=count,
+        attrs_to_factory=factory_params, **attrs_for_template)
 
-  def update(self, objs):
-    """Update existing Controls objects via REST API and return updated."""
+  def update_objs(self, objs):
+    """Update existing objects via REST API and return updated."""
     return self.update_list_objs(
-        list_old_objs=string_utils.convert_to_list(objs),
-        factory=ControlsFactory())
+        list_objs_to_update=string_utils.convert_to_list(objs),
+        entity_factory=self.entities_factory_cls())
 
-  def delete(self, objs):
-    """Delete existing Controls objects via REST API."""
-    return [self.client.delete_object(href=obj.href) for obj
-            in string_utils.convert_to_list(objs)]
+  def delete_objs(self, objs):
+    """Delete existing objects via REST API."""
+    return [self.client.delete_object(href=obj.href) for
+            obj in string_utils.convert_to_list(objs)]
 
 
-class ProgramsService(BaseService):
+class HelpRestService(object):
+  """Help class for interaction with business layer's services objects."""
+  def __init__(self, endpoint):
+    self.endpoint = endpoint
+    self.client = RestClient(self.endpoint)
+
+
+class ControlsService(BaseRestService):
+  """Service for working with Controls entities."""
+  def __init__(self):
+    super(ControlsService, self).__init__(url.CONTROLS)
+
+
+class ProgramsService(BaseRestService):
   """Service for working with Programs entities."""
-  ENDPOINT = url.PROGRAMS
-
-  def create(self, count):
-    """Create new Programs objects via REST API and return created."""
-    return self.create_list_objs(factory=ProgramsFactory(), count=count)
+  def __init__(self):
+    super(ProgramsService, self).__init__(url.PROGRAMS)
 
 
-class AuditsService(BaseService):
+class AuditsService(BaseRestService):
   """Service for working with Audits entities."""
-  ENDPOINT = url.AUDITS
-
-  def create(self, count, program):
-    """Create and return new Audits objects via REST API and return created.
-    """
-    return self.create_list_objs(factory=AuditsFactory(), count=count,
-                                 program=program.__dict__)
+  def __init__(self):
+    super(AuditsService, self).__init__(url.AUDITS)
 
 
-class AssessmentTemplatesService(BaseService):
+class AssessmentTemplatesService(BaseRestService):
   """Service for working with Assessment Templates entities."""
-  ENDPOINT = url.ASSESSMENT_TEMPLATES
-
-  def create(self, count, audit):
-    """Create new Assessment Templates objects via REST API and return
-    created.
-    """
-    return self.create_list_objs(factory=AssessmentTemplatesFactory(),
-                                 count=count, audit=audit.__dict__)
+  def __init__(self):
+    super(AssessmentTemplatesService, self).__init__(url.ASSESSMENT_TEMPLATES)
 
 
-class AssessmentsService(BaseService):
+class AssessmentsService(BaseRestService):
   """Service for working with Assessments entities."""
-  ENDPOINT = url.ASSESSMENTS
-
-  def create(self, count, obj, audit):
-    """Create new Assessments objects via REST API and return created."""
-    return self.create_list_objs(factory=AssessmentsFactory(), count=count,
-                                 object=obj.__dict__, audit=audit.__dict__)
+  def __init__(self):
+    super(AssessmentsService, self).__init__(url.ASSESSMENTS)
 
 
-class IssuesService(BaseService):
+class IssuesService(BaseRestService):
   """Service for working with Issues entities."""
-  ENDPOINT = url.ISSUES
-
-  def create(self, count, audit):
-    """Create new Issues objects via REST API and return created."""
-    return self.create_list_objs(factory=IssuesFactory(), count=count,
-                                 audit=audit.__dict__)
+  def __init__(self):
+    super(IssuesService, self).__init__(url.ISSUES)
 
 
-class RelationshipsService(BaseService):
+class CustomAttributesService(BaseRestService):
+  """Service for working with Custom Attributes entities."""
+  def __init__(self):
+    super(CustomAttributesService, self).__init__(url.CUSTOM_ATTRIBUTES)
+
+
+class RelationshipsService(HelpRestService):
   """Service for creating relationships between entities."""
-  ENDPOINT = url.RELATIONSHIPS
+  def __init__(self):
+    super(RelationshipsService, self).__init__(url.RELATIONSHIPS)
 
-  def create(self, src_obj, dest_objs):
+  def map_objs(self, src_obj, dest_objs):
     """Create relationship from source to destination objects and
     return created.
     """
     return [self.client.create_object(
-        type=self._relationship, source=src_obj.__dict__,
+        type=objects.get_singular(self.endpoint), source=src_obj.__dict__,
         destination=dest_obj.__dict__) for dest_obj in
             string_utils.convert_to_list(dest_objs)]
 
 
-class ObjectsOwnersService(BaseService):
+class ObjectsOwnersService(HelpRestService):
   """Service for assigning owners to entities."""
-  ENDPOINT = url.OBJECT_OWNERS
+  def __init__(self):
+    super(ObjectsOwnersService, self).__init__(url.OBJECT_OWNERS)
 
-  def create(self, objs, owner=PersonsFactory().default()):
+  def assign_owner_to_objs(self, objs, owner=ObjectOwnersFactory().default()):
     """Assign of an owner to objects."""
     return [self.client.create_object(
-        type=self._object_owner, ownable=obj.__dict__,
+        type=objects.get_singular(self.endpoint), ownable=obj.__dict__,
         person=owner.__dict__) for obj in string_utils.convert_to_list(objs)]
 
 
-class ObjectsInfoService(BaseService):
+class ObjectsInfoService(HelpRestService):
   """Service for getting information about entities."""
-  ENDPOINT = url.QUERY
+  def __init__(self):
+    super(ObjectsInfoService, self).__init__(url.QUERY)
 
-  def get_total_count(self, obj_name):
+  def get_total_count_objs(self, obj_name):
     """Get and return total count of existing objects in system
     according to type of object.
     """
-    resp = self.client.create_object(type=self._count, object_name=obj_name)
+    resp = self.client.create_object(type=templates.COUNT,
+                                     object_name=obj_name)
     dict_resp = json.loads(resp.text)[0]
     return dict_resp.get(obj_name).get("total")

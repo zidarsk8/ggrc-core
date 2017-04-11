@@ -4,7 +4,7 @@
 pytest-base-url==1.3.0
 pytest-cache==1.0
 pytest-flask==0.10.0
-pytest-html==1.14.1
+pytest-html==1.14.2
 pytest-pep8==1.0.6
 pytest-selenium==1.9.1
 pytest-variables==1.5.1

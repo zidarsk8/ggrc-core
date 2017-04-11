@@ -5,7 +5,7 @@
 (function (can, GGRC, CMS) {
   'use strict';
 
-  can.Component.extend('mapperResultsItemsHeader', {
+  GGRC.Components('mapperResultsItemsHeader', {
     tag: 'mapper-results-items-header',
     template: can.view(
       GGRC.mustache_path +

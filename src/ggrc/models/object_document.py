@@ -9,8 +9,10 @@ from sqlalchemy.ext.declarative import declared_attr
 from ggrc import db
 from ggrc.models import reflection
 from ggrc.models.deferred import deferred
+from ggrc.models.document import Document
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Timeboxed
+from ggrc.models.relationship import Relationship
 
 
 class ObjectDocument(Timeboxed, Base, db.Model):
@@ -126,13 +128,11 @@ class EvidenceURL(Documentable):
   _aliases = {
       "document_url": {
           "display_name": "Url",
-          "filter_by": "_filter_by_url",
           "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
           "description": "New line separated list of URLs.",
       },
       "document_evidence": {
           "display_name": "Evidence",
-          "filter_by": "_filter_by_evidence",
           "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
           "description": ("New line separated list of evidence links and "
                           "titles.\nExample:\n\nhttp://my.gdrive.link/file "
@@ -140,10 +140,22 @@ class EvidenceURL(Documentable):
       },
   }
 
-  @classmethod
-  def _filter_by_url(cls, _):
-    return None
-
-  @classmethod
-  def _filter_by_evidence(cls, _):
-    return None
+  def documents_by_type(self, doc_type):
+    """Returns a list of document objects of requested type"""
+    if doc_type == "document_evidence":
+      # pylint: disable=not-an-iterable
+      return [instance.document for instance in self.object_documents]
+    if doc_type == "document_url":
+      documents = db.session.query(Document).filter(
+          Document.id == Relationship.destination_id,
+          Relationship.source_type == "Assessment",
+          Relationship.source_id == self.id,
+          Relationship.destination_type == "Document"
+      ).all()
+      documents += db.session.query(Document).filter(
+          Document.id == Relationship.source_id,
+          Relationship.destination_type == "Assessment",
+          Relationship.destination_id == self.id,
+          Relationship.source_type == "Document"
+      ).all()
+      return documents

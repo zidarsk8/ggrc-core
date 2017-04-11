@@ -131,7 +131,12 @@ describe('GGRC.Utils.State', function () {
     });
 
     it('get default states for "Control" type', function () {
-      var defaultStates = GGRC.Utils.State
+      var defaultStates;
+
+      spyOn(GGRC.Utils.CurrentPage, 'isMyAssessments')
+        .and.returnValue(false);
+
+      defaultStates = GGRC.Utils.State
         .getDefaultStatesForModel('Control');
 
       expect(defaultStates.length).toEqual(3);

@@ -11,6 +11,7 @@ from ddt import data, unpack, ddt
 from integration.ggrc_workflows.models import factories
 from integration.ggrc.models.factories import PersonFactory
 from integration.ggrc import TestCase
+from integration.ggrc.models.factories import single_commit
 
 from ggrc.models.all_models import CycleTaskGroupObjectTask
 
@@ -32,21 +33,22 @@ class TestExportTasks(TestCase):
   def generate_tasks_for_cycle(cycle_count, task_count):
     """generate seceted number of cycles and tasks"""
     results = {}
-    for _ in range(cycle_count):
-      workflow = factories.WorkflowFactory()
-      cycle = factories.CycleFactory(workflow=workflow)
-      person = PersonFactory(name="user for cycle {}".format(cycle.id))
-      task_group = factories.TaskGroupFactory(workflow=workflow)
-      for _ in range(task_count):
-        task_group_task = factories.TaskGroupTaskFactory(
-            task_group=task_group, contact=person)
-        cycle_task_group = factories.CycleTaskGroupFactory(
-            cycle=cycle, contact=person)
-        task = factories.CycleTaskFactory(cycle=cycle,
-                                          cycle_task_group=cycle_task_group,
-                                          contact=person,
-                                          task_group_task=task_group_task)
-        results[task.id] = cycle.slug
+    with single_commit():
+      for _ in range(cycle_count):
+        workflow = factories.WorkflowFactory()
+        cycle = factories.CycleFactory(workflow=workflow)
+        person = PersonFactory(name="user for cycle {}".format(cycle.id))
+        task_group = factories.TaskGroupFactory(workflow=workflow)
+        for _ in range(task_count):
+          task_group_task = factories.TaskGroupTaskFactory(
+              task_group=task_group, contact=person)
+          cycle_task_group = factories.CycleTaskGroupFactory(
+              cycle=cycle, contact=person)
+          task = factories.CycleTaskFactory(cycle=cycle,
+                                            cycle_task_group=cycle_task_group,
+                                            contact=person,
+                                            task_group_task=task_group_task)
+          results[task.id] = cycle.slug
     return results
 
   # pylint: disable=invalid-name

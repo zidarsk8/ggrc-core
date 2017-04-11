@@ -394,7 +394,11 @@
             .always(function () {
               this.scope.attr('mapper.is_saving', false);
               this.closeModal();
-            }.bind(this));
+            }.bind(this))
+            .done(function () {
+              // This Method should be modified to event
+              GGRC.Utils.QueryAPI.refreshCounts();
+            });
         }.bind(this));
       },
 

@@ -95,13 +95,13 @@ class TestCustomAttributeImportExport(TestCase):
         errors.WRONG_VALUE.format(line=12, column_name="man CH"),
         errors.WRONG_VALUE.format(line=14, column_name="normal Date"),
         errors.WRONG_VALUE.format(line=16, column_name="man Date"),
-        errors.OWNER_MISSING.format(line=21, column_name="Owner"),
+        errors.OWNER_MISSING.format(line=21, column_name="Admin"),
         errors.UNKNOWN_USER_WARNING.format(line=22, email="kr@en.com"),
-        errors.OWNER_MISSING.format(line=22, column_name="Owner"),
-        errors.OWNER_MISSING.format(line=26, column_name="Owner"),
+        errors.OWNER_MISSING.format(line=22, column_name="Admin"),
+        errors.OWNER_MISSING.format(line=26, column_name="Admin"),
         errors.UNKNOWN_USER_WARNING.format(
             line=27, email="user@exameuple.com"),
-        errors.OWNER_MISSING.format(line=27, column_name="Owner"),
+        errors.OWNER_MISSING.format(line=27, column_name="Admin"),
     }
 
     expected_errors = {
@@ -121,6 +121,13 @@ class TestCustomAttributeImportExport(TestCase):
     self.assertEqual(17, response["created"])
     self.assertEqual(9, response["ignored"])
     self.assertEqual(17, Product.query.count())
+
+    product10 = Product.query.filter_by(slug="prod10").first()
+    people_emails = {cav.attribute_object.email
+                     for cav in product10.custom_attribute_values
+                     if cav.custom_attribute.attribute_type == "Map:Person"}
+
+    self.assertEqual(people_emails, {"user1@ggrc.com", "user@example.com"})
 
   def test_product_ca_import_update(self):
     """Test updating of product with all custom attributes.
@@ -147,6 +154,12 @@ class TestCustomAttributeImportExport(TestCase):
     prod_0_new = {c.custom_attribute.title: c.attribute_value
                   for c in prod_0.custom_attribute_values}
     self.assertEqual(prod_0_expected, prod_0_new)
+
+    people_emails = {cav.attribute_object.email
+                     for cav in prod_0.custom_attribute_values
+                     if cav.custom_attribute.attribute_type == "Map:Person"}
+
+    self.assertEqual(people_emails, {"user@example.com", "user@example.com"})
 
   def tests_ca_export(self):
     """Test exporting products with custom attributes

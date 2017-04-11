@@ -5,7 +5,7 @@
 (function (can, GGRC, CMS) {
   'use strict';
 
-  can.Component.extend('mapperToolbar', {
+  GGRC.Components('mapperToolbar', {
     tag: 'mapper-toolbar',
     template: can.view(
       GGRC.mustache_path +

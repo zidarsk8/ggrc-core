@@ -6,9 +6,10 @@
 
 from collections import defaultdict
 
-from ddt import data, ddt
+from ddt import data, ddt, unpack
 
 from integration.ggrc_workflows.models import factories
+from integration.ggrc.models.factories import single_commit
 from integration.ggrc.models.factories import PersonFactory
 from integration.ggrc import TestCase
 
@@ -18,6 +19,8 @@ from ggrc.models.all_models import CycleTaskGroupObjectTask
 @ddt
 class TestExportTasks(TestCase):
   """Test imports for basic workflow objects."""
+
+  model = CycleTaskGroupObjectTask
 
   def setUp(self):
     super(TestExportTasks, self).setUp()
@@ -32,32 +35,12 @@ class TestExportTasks(TestCase):
   def generate_tasks_for_cycle(task_count):
     """generate number of task groups and task for current task group"""
     results = []
-    for idx in range(task_count):
-      person = PersonFactory(name="user for group {}".format(idx))
-      task = factories.CycleTaskFactory(contact=person)
-      results.append(task.id)
+    with single_commit():
+      for idx in range(task_count):
+        person = PersonFactory(name="user for group {}".format(idx))
+        task = factories.CycleTaskFactory(contact=person)
+        results.append(task.id)
     return results
-
-  # pylint: disable=invalid-name
-  def assertSlugs(self, field, value, slugs):
-    """assertion for search cycles for selected fields and values"""
-    search_request = [{
-        "object_name": "CycleTaskGroupObjectTask",
-        "filters": {
-            "expression": {
-                "left": field,
-                "op": {"name": "="},
-                "right": value,
-            },
-        },
-        "fields": ["slug"],
-    }]
-    parsed_data = self.export_parsed_csv(
-        search_request
-    )["Cycle Task Group Object Task"]
-    self.assertEqual(sorted(slugs),
-                     sorted([i["Code*"] for i in parsed_data]))
-    self.assertEqual(len(slugs), len(parsed_data))
 
   @data(0, 1, 2)
   def test_filter_by_task_title(self, task_count):
@@ -109,3 +92,48 @@ class TestExportTasks(TestCase):
         description=comment_text,
     )
     self.assertSlugs("task comment", comment_text, [task.slug])
+
+  @data(
+      ("status", ["Task State", "task state", "task status"]),
+      ("end_date", ["Task Due Date", "task due date", "task end_date"]),
+      (
+          "start_date",
+          ["task Start Date", "task start date", "task start_date"],
+      ),
+  )
+  @unpack
+  def test_filter_by_aliases(self, field, aliases):
+    """Test filter by alias"""
+    expected_results = defaultdict(list)
+    tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id.in_(self.generate_tasks_for_cycle(4))
+    ).all()
+    for task in tasks:
+      expected_results[str(getattr(task, field))].append(task.slug)
+    for value, slugs in expected_results.iteritems():
+      for alias in aliases:
+        self.assertSlugs(alias, value, slugs)
+
+  @data(
+      (
+          "updated_at",
+          ["task Last updated", "task last updated", "task updated_at"],
+      ),
+      (
+          "created_at",
+          ["task Created On", "task created on", "task created_at"],
+      ),
+  )
+  @unpack
+  def test_filter_by_datetime_aliases(self, field, aliases):
+    """Test filter by datetime field and it's aliases"""
+    expected_results = defaultdict(list)
+    tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id.in_(self.generate_tasks_for_cycle(4))
+    ).all()
+    for task in tasks:
+      for value in self.generate_date_strings(getattr(task, field)):
+        expected_results[value].append(task.slug)
+    for value, slugs in expected_results.iteritems():
+      for alias in aliases:
+        self.assertSlugs(alias, value, slugs)

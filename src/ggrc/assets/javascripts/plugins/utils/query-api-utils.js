@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function ($, GGRC) {
+(function (can, $, GGRC) {
   'use strict';
 
   /**
@@ -195,10 +195,16 @@
       return widgetsCounts;
     }
 
+    /**
+     * Update Page Counts
+     * @param {Array|Object} widgets - list of widgets
+     * @param {Object} relevant - relevant filter
+     * @return {can.Deferred} - resolved deferred object
+     */
     function initCounts(widgets, relevant) {
       var params = can.makeArray(widgets)
         .map(function (widget) {
-          var param;
+          var param = {};
           if (GGRC.Utils.Snapshots.isSnapshotRelated(relevant.type, widget)) {
             param = buildParam('Snapshot', {},
               makeExpression(widget, relevant.type, relevant.id), null,
@@ -214,6 +220,10 @@
           param.type = 'count';
           return param;
         });
+      // Perform requests only if params are defined
+      if (!params.length) {
+        return can.Deferred().resolve();
+      }
 
       return makeRequest({
         data: params
@@ -226,9 +236,25 @@
           if (GGRC.Utils.Snapshots.isSnapshotRelated(relevant.type, name)) {
             name = 'Snapshot';
           }
-          widgetsCounts.attr(countsName, info[name].total);
+          getCounts().attr(countsName, info[name].total);
         });
       });
+    }
+
+    function refreshCounts() {
+      var pageInstance = GGRC.page_instance();
+      var widgets;
+      var location = window.location.pathname;
+
+      if (!pageInstance) {
+        return can.Deferred().resolve();
+      }
+
+      widgets = GGRC.Utils.CurrentPage
+        .getWidgetModels(pageInstance.constructor.shortName, location);
+
+      return initCounts(widgets,
+        {id: pageInstance.id, type: pageInstance.type});
     }
 
     /**
@@ -348,8 +374,9 @@
       getCounts: getCounts,
       makeExpression: makeExpression,
       initCounts: initCounts,
+      refreshCounts: refreshCounts,
       batchRequests: batchRequests,
       buildCountParams: buildCountParams
     };
   })();
-})(jQuery, window.GGRC);
+})(window.can, window.can.$, window.GGRC);

@@ -9,6 +9,7 @@ import unittest
 
 from mock import MagicMock, patch
 
+from ggrc import app  # noqa  # pylint: disable=unused-import
 from ggrc.converters.handlers.custom_attribute import (
     CustomAttributeColumHandler
 )

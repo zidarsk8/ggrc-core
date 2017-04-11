@@ -34,7 +34,7 @@ class YearParser(Parser):
 
 class IsoMonthParser(Parser):
   """Class Parser for Iso format date time year-month"""
-  GENERAL_PATTERN = r'^\d{4}(-\d{1,2})$'
+  GENERAL_PATTERN = r'^\d{4}-\d{1,2}$'
 
   @staticmethod
   def parse(date):
@@ -59,7 +59,7 @@ class IsoDayParser(Parser):
 
 class IsoHourParser(Parser):
   """Class Parser for Iso format date time year-month-day hour"""
-  GENERAL_PATTERN = r'^\d{4}((-\d{1,2}){0,2}:\d{1,2})$'
+  GENERAL_PATTERN = r'^\d{4}(-\d{1,2}){2} \d{1,2}$'
 
   @staticmethod
   def parse(date):
@@ -71,7 +71,7 @@ class IsoHourParser(Parser):
 
 class IsoMinuteParser(Parser):
   """Class Parser for Iso format date time year-month-day hour:minute"""
-  GENERAL_PATTERN = r'^\d{4}((-\d{1,2}){0,2}(:\d{1,2}){2})$'
+  GENERAL_PATTERN = r'^\d{4}(-\d{1,2}){2} \d{1,2}:\d{1,2}$'
 
   @staticmethod
   def parse(date):
@@ -83,7 +83,7 @@ class IsoMinuteParser(Parser):
 
 class IsoSecondParser(Parser):
   """Class Parser for Iso format date time year-month-day hour:minute:second"""
-  GENERAL_PATTERN = r'^\d{4}((-\d{1,2}){0,2}(:\d{1,2}){3})$'
+  GENERAL_PATTERN = r'^\d{4}(-\d{1,2}){2} \d{1,2}(:\d{1,2}){2}$'
 
   @staticmethod
   def parse(date):
@@ -186,7 +186,7 @@ USCombiner = combiner_factory(  # pylint: disable=invalid-name
 
 IsoCombiner = combiner_factory(  # pylint: disable=invalid-name
     "IsoCombiner",
-    r'^\d{4}((-\d{1,2}){0,2}(:\d{1,2}){0,3})$',
+    r'^\d{4}(-\d{1,2}){0,2}(( \d{1,2})(:\d{1,2}){0,2})?$',
     [
         IsoSecondParser,
         IsoMinuteParser,

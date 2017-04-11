@@ -12,7 +12,6 @@
   GGRC.Utils.CurrentPage = (function () {
     var queryAPI = GGRC.Utils.QueryAPI;
     var relatedToCurrentInstance = new can.Map({});
-    var pageType = GGRC.pageType;
 
     function initMappedInstances(dependentModels, current) {
       var models = can.makeArray(dependentModels);
@@ -29,37 +28,93 @@
           }));
       });
 
-      return queryAPI.makeRequest({data: reqParams}).then(function (response) {
-        models.forEach(function (model, idx) {
-          var ids = response[idx][model].ids;
-          var map = ids.reduce(function (mapped, id) {
-            mapped[id] = true;
-            return mapped;
-          }, {});
-          relatedToCurrentInstance.attr(model, map);
+      return queryAPI.makeRequest({data: reqParams})
+        .then(function (response) {
+          models.forEach(function (model, idx) {
+            var ids = response[idx][model].ids;
+            var map = ids.reduce(function (mapped, id) {
+              mapped[id] = true;
+              return mapped;
+            }, {});
+            relatedToCurrentInstance.attr(model, map);
+          });
+          return relatedToCurrentInstance;
         });
-        return relatedToCurrentInstance;
-      });
     }
 
+    // To identify pages like My Work, My Assessments and Admin Dashboard on the Server-side
+    // was defined variable GGRC.pageType, because for all of them GGRC.page_instance().type = 'Person'.
+    // For other pages using GGRC.page_instance() object.
     function getPageType() {
-      return pageType ? pageType : GGRC.page_instance().type;
+      return GGRC.pageType ? GGRC.pageType : GGRC.page_instance().type;
     }
 
     function isMyAssessments() {
-      return pageType === 'MY_ASSESSMENTS';
+      return getPageType() === 'MY_ASSESSMENTS';
     }
 
     function isMyWork() {
-      return pageType === 'MY_WORK';
+      return getPageType() === 'MY_WORK';
     }
 
     function isAdmin() {
-      return pageType === 'ADMIN';
+      return getPageType() === 'ADMIN';
     }
 
+    /**
+     *
+     * @return {boolean} False for My Work, All Objects and My Assessments pages and True for the rest.
+     */
     function isObjectContextPage() {
-      return !pageType;
+      return !GGRC.pageType;
+    }
+
+    /**
+     * Should return list of widgets required for rendering
+     * @param {String} modelName - Page Object Model Name
+     * @param {String} path - Application location path
+     * @return {Object} - widget list object
+     */
+    function getWidgetList(modelName, path) {
+      var widgetList = {};
+      var isAssessmentsView;
+
+      if (!modelName) {
+        return widgetList;
+      }
+      widgetList = GGRC.WidgetList.get_widget_list_for(modelName);
+      // Needs refactoring: Should be removed and replaced with Routing!!!
+      isAssessmentsView = /^\/assessments_view/.test(path);
+
+      // the assessments_view only needs the Assessments widget
+      if (isAssessmentsView) {
+        widgetList = {assessment: widgetList.assessment};
+      }
+
+      return widgetList;
+    }
+
+    function getWidgetModels(modelName, path) {
+      var widgetList = getWidgetList(modelName, path);
+      var defaults = getDefaultWidgets(widgetList, path);
+
+      return defaults.map(function (widgetName) {
+        return widgetList[widgetName]
+          .content_controller_options.model.shortName;
+      });
+    }
+
+    function getDefaultWidgets(widgetList, path) {
+      var defaults = Object.keys(widgetList);
+      // Needs refactoring: Should be removed and replaced with Routing!!!
+      var isObjectBrowser = /^\/objectBrowser\/?$/.test(path);
+
+      // Remove info and task tabs from object-browser list of tabs
+      if (isObjectBrowser) {
+        defaults.splice(defaults.indexOf('info'), 1);
+        defaults.splice(defaults.indexOf('task'), 1);
+      }
+      return defaults;
     }
 
     return {
@@ -69,7 +124,10 @@
       isMyAssessments: isMyAssessments,
       isMyWork: isMyWork,
       isAdmin: isAdmin,
-      isObjectContextPage: isObjectContextPage
+      isObjectContextPage: isObjectContextPage,
+      getWidgetList: getWidgetList,
+      getWidgetModels: getWidgetModels,
+      getDefaultWidgets: getDefaultWidgets
     };
   })();
 })(window.GGRC);

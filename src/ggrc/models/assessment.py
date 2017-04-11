@@ -39,7 +39,10 @@ from ggrc.fulltext.attributes import MultipleSubpropertyFullTextAttr
 
 
 def reindex_by_relationship_attr(relationship_attr):
-  """Return a list of assessments which which need to be reindexed"""
+  """Return a list of assessments which which need to be reindexed
+
+  In case RelationshipAttr changed
+  """
   source_query = db.session.query(Relationship.source_id).filter(
       Relationship.source_type == "Assessment",
       Relationship.id == relationship_attr.relationship_id
@@ -50,6 +53,24 @@ def reindex_by_relationship_attr(relationship_attr):
   )
   resulting_subquery = source_query.union(dest_query)
   return Assessment.query.filter(Assessment.id.in_(resulting_subquery)).all()
+
+
+def reindex_by_relationship(relationship):
+  """Return a list of assessments which which need to be reindexed
+
+  In case Relationship changed or created or deleted
+  """
+  source_type = relationship.source_type
+  destination_type = relationship.destination_type
+  if destination_type == "Assessment" and source_type == "Document":
+    instance = relationship.destination
+  elif source_type == "Assessment" and destination_type == "Document":
+    instance = relationship.source
+  else:
+    return []
+  if isinstance(instance, (Indexed, Commentable)):
+    return [instance]
+  return []
 
 
 class Assessment(statusable.Statusable, AuditRelationship,
@@ -130,11 +151,15 @@ class Assessment(statusable.Statusable, AuditRelationship,
       'design',
       'operationally',
       MultipleSubpropertyFullTextAttr('related_assessors', 'assessors',
-                                      ['email', 'name']),
+                                      ['user_name', 'email', 'name']),
       MultipleSubpropertyFullTextAttr('related_creators', 'creators',
-                                      ['email', 'name']),
+                                      ['user_name', 'email', 'name']),
       MultipleSubpropertyFullTextAttr('related_verifiers', 'verifiers',
-                                      ['email', 'name']),
+                                      ['user_name', 'email', 'name']),
+      MultipleSubpropertyFullTextAttr('document_evidence', 'document_evidence',
+                                      ['title', 'link']),
+      MultipleSubpropertyFullTextAttr('document_url', 'document_url',
+                                      ['link']),
   ]
 
   _tracked_attrs = {
@@ -180,7 +205,8 @@ class Assessment(statusable.Statusable, AuditRelationship,
   }
 
   AUTO_REINDEX_RULES = [
-      ReindexRule("RelationshipAttr", reindex_by_relationship_attr)
+      ReindexRule("RelationshipAttr", reindex_by_relationship_attr),
+      ReindexRule("Relationship", reindex_by_relationship)
   ]
 
   similarity_options = similarity_options_module.ASSESSMENT
@@ -199,6 +225,14 @@ class Assessment(statusable.Statusable, AuditRelationship,
   def verifiers(self):
     """Get the list of verifier assignees"""
     return self.assignees_by_type.get("Verifier", [])
+
+  @property
+  def document_evidence(self):
+    return self.documents_by_type("document_evidence")
+
+  @property
+  def document_url(self):
+    return self.documents_by_type("document_url")
 
   def validate_conclusion(self, value):
     return value if value in self.VALID_CONCLUSIONS else None

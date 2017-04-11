@@ -68,6 +68,9 @@
         {{assigneeStr}}
       </tree-assignee-field>
   {{/case}}
+  {{#case 'created_at'}}
+      {{localize_date instance.created_at}}
+  {{/case}}
 
   {{#default}}
     {{get_default_attr_value attr_name instance}}

@@ -16,6 +16,7 @@ from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import Hierarchical
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
+from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
 from ggrc.models.deferred import deferred
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
@@ -107,10 +108,10 @@ class AssertionCategorized(Categorizable):
     )
 
 
-class Control(HasObjectState, Relatable, CustomAttributable,
-              Personable, ControlCategorized, AssertionCategorized,
-              Hierarchical, Timeboxed, Ownable, Auditable,
-              TestPlanned, BusinessObject, Indexed, db.Model):
+class Control(WithLastAssessmentDate, HasObjectState, Relatable,
+              CustomAttributable, Personable, ControlCategorized,
+              AssertionCategorized, Hierarchical, Timeboxed, Ownable,
+              Auditable, TestPlanned, BusinessObject, Indexed, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')

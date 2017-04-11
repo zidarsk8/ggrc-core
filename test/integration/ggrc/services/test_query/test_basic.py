@@ -3,6 +3,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+# pylint: disable=too-many-lines
+
 """Tests for /query api endpoint."""
 
 import unittest
@@ -613,6 +615,7 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
 
 
 class TestQueryAssessmentCA(BaseQueryAPITestCase):
+  """Test filtering assessments by CAs"""
 
   def setUp(self):
     """Set up test cases for all tests."""
@@ -654,6 +657,7 @@ class TestQueryAssessmentCA(BaseQueryAPITestCase):
           attribute_type="Text",
       )
 
+  # pylint: disable=invalid-name
   def test_ca_query_different_types_local_ca(self):
     """Filter by local CAs with same title and different types."""
     date = datetime(2016, 10, 31)
@@ -703,6 +707,174 @@ class TestQueryAssessmentCA(BaseQueryAPITestCase):
 
     self.assertItemsEqual([asmt["title"] for asmt in assessments_mixed],
                           ["Assessment with text", "Assessment with date"])
+
+
+class TestSortingQuery(BaseQueryAPITestCase):
+  """Test sorting is correct requested with query API"""
+  def setUp(self):
+    TestCase.clear_data()
+    super(TestSortingQuery, self).setUp()
+    self.client.get("/login")
+
+  @classmethod
+  def create_assignees(cls, obj, persons):
+    """Create assignees for object.
+
+    This is used only during object creation because we cannot create
+    assignees at that point yet.
+
+    Args:
+      obj: Assignable object.
+      persons: [("(string) email", "Assignee roles"), ...] A list of people
+        and their roles
+    Returns:
+      [(person, object-person relationship,
+        object-person relationship attributes), ...] A list of persons with
+      their relationships and relationship attributes.
+    """
+    assignees = []
+    for person, roles in persons:
+      person = factories.PersonFactory(email=person)
+
+      object_person_rel = factories.RelationshipFactory(
+          source=obj,
+          destination=person
+      )
+
+      object_person_rel_attrs = factories.RelationshipAttrFactory(
+          relationship_id=object_person_rel.id,
+          attr_name="AssigneeType",
+          attr_value=roles
+      )
+      assignees += [(person, object_person_rel, object_person_rel_attrs)]
+    return assignees
+
+  def create_assessment(self, title=None, people=None):
+    """Create default assessment with some default assignees in all roles.
+    Args:
+      people: List of tuples with email address and their assignee roles for
+              Assessments.
+    Returns:
+      Assessment object.
+    """
+    assessment = factories.AssessmentFactory(title=title)
+    context = factories.ContextFactory(related_object=assessment)
+    assessment.context = context
+
+    if not people:
+      people = [
+          ("creator@example.com", "Creator"),
+          ("assessor_1@example.com", "Assessor"),
+          ("assessor_2@example.com", "Assessor"),
+          ("verifier_1@example.com", "Verifier"),
+          ("verifier_2@example.com", "Verifier"),
+      ]
+
+    defined_assessors = len([1 for _, role in people
+                             if "Assessor" in role])
+    defined_creators = len([1 for _, role in people
+                            if "Creator" in role])
+    defined_verifiers = len([1 for _, role in people
+                             if "Verifier" in role])
+
+    self.create_assignees(assessment, people)
+
+    creators = [assignee for assignee, roles in assessment.assignees
+                if "Creator" in roles]
+    assignees = [assignee for assignee, roles in assessment.assignees
+                 if "Assessor" in roles]
+    verifiers = [assignee for assignee, roles in assessment.assignees
+                 if "Verifier" in roles]
+
+    self.assertEqual(len(creators), defined_creators)
+    self.assertEqual(len(assignees), defined_assessors)
+    self.assertEqual(len(verifiers), defined_verifiers)
+    return assessment
+
+  # pylint: disable=invalid-name
+  def test_sorting_assessments_by_assignees(self):
+    """Test assessments are sorted by multiple assignees correctly"""
+    people_set_1 = [
+        ("2creator@example.com", "Creator"),
+        ("assessor_2@example.com", "Assessor"),
+        ("assessor_1@example.com", "Assessor"),
+        ("1verifier_1@example.com", "Verifier"),
+        ("2verifier_2@example.com", "Verifier"),
+    ]
+    self.create_assessment("Assessment_1", people_set_1)
+    people_set_2 = [
+        ("1creator@example.com", "Creator"),
+        ("1assessor@example.com", "Assessor"),
+        ("2assessor@example.com", "Assessor"),
+        ("verifier_1@example.com", "Verifier"),
+        ("verifier_2@example.com", "Verifier"),
+    ]
+    self.create_assessment("Assessment_2", people_set_2)
+
+    assessments_by_creators = self._get_first_result_set(
+        self._make_query_dict("Assessment",
+                              order_by=[{"name": "creators",
+                                         "desc": False}]),
+        "Assessment", "values",
+    )
+    self.assertListEqual([ass["title"] for ass in assessments_by_creators],
+                         ["Assessment_2", "Assessment_1"])
+
+    assessments_by_verifiers = self._get_first_result_set(
+        self._make_query_dict("Assessment",
+                              order_by=[{"name": "verifiers",
+                                         "desc": False}]),
+        "Assessment", "values",
+    )
+    self.assertListEqual([ass["title"] for ass in assessments_by_verifiers],
+                         ["Assessment_1", "Assessment_2"])
+
+    assessments_by_assessors = self._get_first_result_set(
+        self._make_query_dict("Assessment",
+                              order_by=[{"name": "assignees",
+                                         "desc": False}]),
+        "Assessment", "values",
+    )
+    self.assertListEqual([ass["title"] for ass in assessments_by_assessors],
+                         ["Assessment_2", "Assessment_1"])
+
+
+class TestQueryAssessmentByEvidenceURL(BaseQueryAPITestCase):
+  """Test assessments filtering by Evidence and/or URL"""
+  def setUp(self):
+    """Set up test cases for all tests."""
+    TestCase.clear_data()
+    response = self._import_file("assessment_full_no_warnings.csv")
+    self._check_csv_response(response, {})
+    self.client.get("/login")
+
+  def test_query_evidence_url(self):
+    """Test assessments query filtered by Evidence"""
+    assessments_by_evidence = self._get_first_result_set(
+        self._make_query_dict(
+            "Assessment",
+            expression=["Evidence", "~", "i.imgur.com"],
+        ),
+        "Assessment", "values",
+    )
+
+    self.assertEqual(len(assessments_by_evidence), 2)
+    self.assertItemsEqual([asmt["title"] for asmt in assessments_by_evidence],
+                          ["Assessment title 1", "Assessment title 3"])
+
+    assessments_by_evidence = self._get_first_result_set(
+        self._make_query_dict(
+            "Assessment",
+            expression=["url", "~", "i.imgur.com"],
+        ),
+        "Assessment", "values",
+    )
+
+    self.assertEqual(len(assessments_by_evidence), 3)
+    self.assertItemsEqual([asmt["title"] for asmt in assessments_by_evidence],
+                          ["Assessment title 1",
+                           "Assessment title 3",
+                           "Assessment title 4"])
 
 
 class TestQueryWithCA(BaseQueryAPITestCase):

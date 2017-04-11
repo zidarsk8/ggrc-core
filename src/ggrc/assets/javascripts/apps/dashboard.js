@@ -14,6 +14,7 @@
   var modelName;
   var widgetList;
   var widgetModels;
+  var pageUtils = GGRC.Utils.CurrentPage;
 
   var sortByNameEmail = function (list) {
     return new list.constructor(can.makeArray(list).sort(function (a, b) {
@@ -190,26 +191,11 @@
 
     initWidgets();
 
-    widgetList = GGRC.WidgetList.get_widget_list_for(modelName);
+    widgetList = pageUtils.getWidgetList(modelName, location);
+    defaults = pageUtils.getDefaultWidgets(widgetList, location);
+    widgetModels = pageUtils.getWidgetModels(modelName, location);
 
-    // the assessments_view only needs the Assessments widget
-    if (isAssessmentsView) {
-      widgetList = {assessment: widgetList.assessment};
-    }
-
-    defaults = Object.keys(widgetList);
-
-    // Remove info and task tabs from object-browser list of tabs
-    if (isObjectBrowser) {
-      defaults.splice(defaults.indexOf('info'), 1);
-      defaults.splice(defaults.indexOf('task'), 1);
-    }
-
-    widgetModels = defaults.map(function (widgetName) {
-      return widgetList[widgetName].content_controller_options.model.shortName;
-    });
-
-    if (!isAssessmentsView && GGRC.Utils.CurrentPage.getPageType() !== 'Workflow') {
+    if (!isAssessmentsView && pageUtils.getPageType() !== 'Workflow') {
       GGRC.Utils.QueryAPI.initCounts(widgetModels, {
         type: instance.type,
         id: instance.id

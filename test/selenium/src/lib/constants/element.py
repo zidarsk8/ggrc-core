@@ -96,20 +96,19 @@ class AdminWidgetEvents(object):
       r"(\d{2}/\d{2}/\d{4}\s\d{2}:\d{2}:\d{2}\s[A,P]M)"
 
 
-class AdminWidgetCustomAttrs(object):
+class AdminWidgetCustomAttributes(object):
   """Elements' labels (custom attributes scopes) for Custom Attributes
  widget at Admin Dashboard.
  """
-  # possible types of custom attributes
   WIDGET_HEADER = "Custom Attributes"
+  # possible types of custom attributes
   TEXT = "Text"
   RICH_TEXT = "Rich Text"
   DATE = "Date"
   CHECKBOX = "Checkbox"
   DROPDOWN = "Dropdown"
   PERSON = "Map:Person"
-
-  ALL_ATTRS_TYPES = (TEXT, RICH_TEXT, DATE, CHECKBOX, DROPDOWN, PERSON)
+  ALL_CA_TYPES = (TEXT, RICH_TEXT, DATE, CHECKBOX, DROPDOWN, PERSON)
 
 
 class Common(object):
@@ -156,7 +155,7 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   """To transformation elements' labels and properties for Modal to Set
  visible fields for object as Tree View headers.
  """
-  OWNER = "Owner"
+  ADMIN = "Admin"
   VERIFIED = "Verified"
   STATUS = "Status"
   AUDIT_LEAD = "Internal Audit Lead"
@@ -269,7 +268,7 @@ class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):
  """
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonAssessmentTemplate.ASMT_TMPL)
-  OWNER = TransformationSetVisibleFields.OWNER
+  ADMIN = TransformationSetVisibleFields.ADMIN
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   DEFAULT_SET_FIELDS = (
@@ -305,7 +304,7 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonControl.CONTROL)
-  OWNER = TransformationSetVisibleFields.OWNER
+  ADMIN = TransformationSetVisibleFields.ADMIN
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   URL = Base.URL
@@ -322,7 +321,7 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   PRINCIPAL_ASSIGNEE = roles.PRINCIPAL_ASSIGNEE
   SECONDARY_ASSIGNEE = roles.SECONDARY_ASSIGNEE
   DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE, OWNER,
+      CommonModalSetVisibleFields.TITLE, ADMIN,
       CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
       PRIMARY_CONTACT)
 
@@ -334,14 +333,14 @@ class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonIssue.ISSUE)
-  OWNER = TransformationSetVisibleFields.OWNER
+  ADMIN = TransformationSetVisibleFields.ADMIN
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   REVIEW_STATE = "Review State"
   URL = Base.URL
   REFERENCE_URL = Base.REFERENCE_URL
   DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE, OWNER,
+      CommonModalSetVisibleFields.TITLE, ADMIN,
       CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
       CommonModalSetVisibleFields.LAST_UPDATED)
 

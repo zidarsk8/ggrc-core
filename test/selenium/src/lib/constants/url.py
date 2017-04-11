@@ -7,7 +7,7 @@
 from lib.constants.objects import *  # noqa; the names are later exported
 
 
-# URL's parts for objects
+# URL's parts for work with objects and REST API queries
 API = "api"
 DASHBOARD = "dashboard"
 ADMIN_DASHBOARD = "admin"

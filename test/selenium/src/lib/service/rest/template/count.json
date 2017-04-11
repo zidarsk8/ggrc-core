@@ -1,7 +1,7 @@
 {
-  "object_name":null,
-  "filters":{
-    "expression":{}
+  "object_name": null,
+  "filters": {
+    "expression": {}
   },
-  "type":"count"
+  "type": "count"
 }

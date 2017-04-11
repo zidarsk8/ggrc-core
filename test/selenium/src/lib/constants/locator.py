@@ -34,6 +34,8 @@ class Common(object):
   SPINNY = "SPINNY_"
   ACCORDION_MEMBERS = "ACCORDION_MEMBERS_"
   TOGGLE = "TOGGLE_"
+  # attrs values
+  DISABLED_VALUE = "disabled-original disabled"
 
 
 class Login(object):
@@ -379,7 +381,7 @@ class ModalCreateNewControl(BaseModalCreateNew):
   SECONDARY_ASSESSOR = (
       By.CSS_SELECTOR,
       '[data-test-id="control_secondary_assessor_b9439af6"] label')
-  OWNER = (
+  ADMIN = (
       By.CSS_SELECTOR, '[data-test-id="control_owner_587d12d6"] label')
   BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
   PRIMARY_CONTACT = (

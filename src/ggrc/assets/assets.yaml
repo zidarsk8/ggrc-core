@@ -374,6 +374,8 @@ dashboard-js-template-files:
   - contracts/modal_content.mustache
   - controls/categories_tree.mustache
   - controls/info.mustache
+  - controls/contacts.mustache
+  - controls/urls.mustache
   - controls/list_popover.mustache
   - controls/modal_content.mustache
   - controls/object_list.mustache
@@ -567,6 +569,8 @@ dashboard-css-files:
   - dashboard.css
   - wysihtml5/bootstrap-wysihtml5-0.0.2.css
   - jquery/jquery-ui.css
+  - quill/dist/quill.core.css
+  - quill/dist/quill.snow.css
 
 dashboard-js-spec-files:
   - spec_setup.js
