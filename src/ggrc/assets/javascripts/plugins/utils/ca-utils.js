@@ -3,13 +3,62 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (GGRC, can) {
+(function (GGRC, can, _) {
   'use strict';
 
+  var customAttributesType = {
+    Text: 'input',
+    'Rich Text': 'text',
+    'Map:Person': 'person',
+    Date: 'date',
+    Input: 'input',
+    Checkbox: 'checkbox',
+    Dropdown: 'dropdown'
+  };
   /**
-   * Util methods for custom attibutes.
+   * Util methods for custom attributes.
    */
   GGRC.Utils.CustomAttributes = (function () {
+    /**
+     * Return normalized Custom Attribute Type from Custom Attribute Definition
+     * @param {String} type - String Custom Attribute Value from JSON
+     * @return {String} - Normalized Custom Attribute Type
+     */
+    function getCustomAttributeType(type) {
+      return customAttributesType[type] || 'input';
+    }
+
+    function isEmptyCustomAttribute(value, type, cav) {
+      var result = false;
+      var types = ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
+        'Map:Person'];
+      var options = {
+        Checkbox: function (value) {
+          return !value || value === '0';
+        },
+        'Rich Text': function (value) {
+          value = GGRC.Utils.getPlainText(value);
+          return _.isEmpty(value);
+        },
+        'Map:Person': function (value, cav) {
+          // Special case, Map:Person has 'Person' value by default
+          if (cav) {
+            return !cav.attribute_object;
+          }
+          return _.isEmpty(value);
+        }
+      };
+      if (value === undefined) {
+        return true;
+      }
+      if (types.indexOf(type) > -1 && options[type]) {
+        result = options[type](value, cav);
+      } else if (types.indexOf(type) > -1) {
+        result = _.isEmpty(value);
+      }
+      return result;
+    }
+
     /**
      * Converts custom attribute value for UI controls.
      * @param {String} type - Custom attribute type
@@ -42,6 +91,53 @@
         }
       }
       return value;
+    }
+
+    /**
+     * Custom Attributes specific parsing logic to simplify business logic of Custom Attributes
+     * @param {Array} definitions - original list of Custom Attributes Definition
+     * @param {Array} values - original list of Custom Attributes Values
+     * @return {Array} Updated Custom attributes
+     */
+    function prepareCustomAttributes(definitions, values) {
+      return definitions.map(function (def) {
+        var valueData = false;
+        var id = def.id;
+        var type = getCustomAttributeType(def.attribute_type);
+        var stub = {
+          id: null,
+          custom_attribute_id: id,
+          attribute_value: null,
+          attribute_object: null,
+          validation: {
+            empty: true,
+            mandatory: def.mandatory,
+            valid: true
+          },
+          def: def,
+          attributeType: type,
+          preconditions_failed: []
+        };
+
+        values.forEach(function (value) {
+          var errors = [];
+          if (value.custom_attribute_id === id) {
+            errors = value.preconditions_failed || [];
+            value.def = def;
+            value.attributeType = type;
+            value.validation = {
+              empty: errors.indexOf('value') > -1,
+              mandatory: def.mandatory,
+              valid: errors.indexOf('comment') < 0 &&
+              errors.indexOf('evidence') < 0
+            };
+
+            valueData = value;
+          }
+        });
+
+        return valueData || stub;
+      });
     }
 
     /**
@@ -88,7 +184,9 @@
             typeof options === 'string' ?
               options.split(',') : [],
             helptext: attr.def.helptext,
-            validation: attr.validation
+            validation: attr.validation,
+            errors: attr.preconditions_failed,
+            valueId: attr.id
           };
         });
     }
@@ -96,7 +194,10 @@
     return {
       convertFromCaValue: convertFromCaValue,
       convertToCaValue: convertToCaValue,
-      convertValuesToFormFields: convertValuesToFormFields
+      convertValuesToFormFields: convertValuesToFormFields,
+      prepareCustomAttributes: prepareCustomAttributes,
+      isEmptyCustomAttribute: isEmptyCustomAttribute,
+      getCustomAttributeType: getCustomAttributeType
     };
   })();
-})(window.GGRC, window.can);
+})(window.GGRC, window.can, window._);

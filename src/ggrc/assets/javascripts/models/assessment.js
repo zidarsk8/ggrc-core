@@ -5,11 +5,6 @@
 (function (can, GGRC, CMS) {
   'use strict';
 
-  function validateCustomAttribute(value) {
-    value.errors = value.preconditions_failed || [];
-    return value;
-  }
-
   can.Model.Cacheable('CMS.Models.Assessment', {
     root_object: 'assessment',
     root_collection: 'assessments',
@@ -112,8 +107,8 @@
       }
     },
     confirmEditModal: {
-      title: 'Confirm moving Request to "In Progress"',
-      description: 'You are about to move request from ' +
+      title: 'Confirm moving Assessment to "In Progress"',
+      description: 'You are about to move Assessment from ' +
       '"{{status}}" to "In Progress" - are you sure about that?',
       button: 'Confirm'
     },
@@ -166,51 +161,6 @@
       return attrs[this.root_object] ? attrs[this.root_object] : attrs;
     },
     /**
-     * Assessment specific parsing logic to simplify business logic of Custom Attributes
-     * @param {Array} definitions - original list of Custom Attributes Definition
-     * @param {Array} values - original list of Custom Attributes Values
-     * @return {Array} Updated Custom attributes
-     */
-    prepareCustomAttributes: function (definitions, values) {
-      return definitions.map(function (def) {
-        var valueData = false;
-        var id = def.id;
-        var type = GGRC.Utils.mapCAType(def.attribute_type);
-        var stub = {
-          id: null,
-          custom_attribute_id: id,
-          attribute_value: null,
-          attribute_object: null,
-          validation: {
-            empty: true,
-            mandatory: def.mandatory,
-            valid: true
-          },
-          def: def,
-          attributeType: type
-        };
-
-        values.forEach(function (value) {
-          var errors = [];
-          if (value.custom_attribute_id === id) {
-            errors = value.preconditions_failed || [];
-            value.def = def;
-            value.attributeType = type;
-            value.validation = {
-              empty: errors.indexOf('value') > -1,
-              mandatory: def.mandatory,
-              valid: errors.indexOf('comment') < 0 &&
-              errors.indexOf('evidence') < 0
-            };
-
-            valueData = value;
-          }
-        });
-
-        return valueData || stub;
-      });
-    },
-    /**
      * Assessment specific AJAX data parsing logic
      * @param {Object} attributes - hash of Model key->values
      * @return {Object} - parsed object with normalized data
@@ -227,8 +177,8 @@
       }
 
       attributes.custom_attribute_values =
-        this.prepareCustomAttributes(definitions, values)
-          .map(validateCustomAttribute);
+        GGRC.Utils.CustomAttributes
+          .prepareCustomAttributes(definitions, values);
       return attributes;
     },
     model: function (attributes, oldModel) {
@@ -289,6 +239,7 @@
       if (this._super) {
         this._super.apply(this, arguments);
       }
+      this.bind('refreshInstance', this.refresh.bind(this));
     },
     before_create: function () {
       if (!this.audit) {
@@ -300,6 +251,7 @@
       this.attr('context', this.attr('audit.context'));
     },
     after_save: function () {
+      this.dispatch('refreshInstance');
       if (this.audit && this.audit.selfLink) {
         this.audit.refresh();
       }
@@ -352,7 +304,7 @@
         });
       }
     },
-    refresh: function (params) {
+    refresh: function () {
       var dfd;
       var href = this.selfLink || this.href;
       var that = this;
@@ -367,7 +319,6 @@
             var dfd = that._pending_refresh.dfd;
             can.ajax({
               url: href,
-              params: params,
               type: 'get',
               dataType: 'json'
             })
@@ -392,15 +343,8 @@
       this._pending_refresh.fn();
       return dfd;
     },
-    refreshInstance: function () {
-      return this.refresh();
-    },
     info_pane_preload: function () {
-      if (!this._pane_preloaded) {
-        this.bind('refreshInstance', this.refreshInstance.bind(this));
-        this.refreshInstance();
-        this._pane_preloaded = true;
-      }
+      this.dispatch('refreshInstance');
     },
     get_related_objects_as_source: function () {
       var dfd = can.Deferred();

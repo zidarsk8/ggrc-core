@@ -5,16 +5,6 @@
 
 (function ($, GGRC, moment, Permission) {
   'use strict';
-
-  var customAttributesType = {
-    Text: 'input',
-    'Rich Text': 'text',
-    'Map:Person': 'person',
-    Date: 'date',
-    Input: 'input',
-    Checkbox: 'checkbox',
-    Dropdown: 'dropdown'
-  };
   /**
    * A module containing various utility functions.
    */
@@ -449,44 +439,6 @@
         return null;
       }
       return CMS.Models[type] || GGRC.Models[type];
-    },
-    /**
-     * Return normalized Custom Attribute Type from Custom Attribute Definition
-     * @param {String} type - String Custom Attribute Value from JSON
-     * @return {String} - Normalized Custom Attribute Type
-     */
-    mapCAType: function (type) {
-      return customAttributesType[type] || 'input';
-    },
-    isEmptyCA: function (value, type, cav) {
-      var result = false;
-      var types = ['Text', 'Rich Text', 'Date', 'Checkbox', 'Dropdown',
-        'Map:Person'];
-      var options = {
-        Checkbox: function (value) {
-          return !value || value === '0';
-        },
-        'Rich Text': function (value) {
-          value = GGRC.Utils.getPlainText(value);
-          return _.isEmpty(value);
-        },
-        'Map:Person': function (value, cav) {
-          // Special case, Map:Person has 'Person' value by default
-          if (cav) {
-            return !cav.attribute_object;
-          }
-          return _.isEmpty(value);
-        }
-      };
-      if (value === undefined) {
-        return true;
-      }
-      if (types.indexOf(type) > -1 && options[type]) {
-        result = options[type](value, cav);
-      } else if (types.indexOf(type) > -1) {
-        result = _.isEmpty(value);
-      }
-      return result;
     },
     /**
      * Remove all HTML tags from the string
