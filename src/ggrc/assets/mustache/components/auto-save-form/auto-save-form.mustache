@@ -28,6 +28,11 @@
           {value}="value"
         ></auto-save-form-field-view>
       {{/if}}
+      {{#unless validation.valid}}
+        <div class="form-field__validation-hint-placeholder">
+            <button class="btn btn-link" ($click)="showRequiredInfoModal(%context)">Add required info</button>
+        </div>
+      {{/unless}}
     </div>
   {{/each}}
 </div>

@@ -49,7 +49,20 @@
         documents: {
           Value: can.List
         },
+        editMode: {
+          type: 'boolean',
+          get: function () {
+            return this.attr('instance.status') !== 'Completed';
+          },
+          set: function () {
+            this.attr('instance.status', 'In Progress');
+            this.attr('instance').save();
+          }
+        },
         instance: {}
+      },
+      modal: {
+        open: false
       },
       formState: {},
       triggerFormSaveCbs: $.Callbacks(),
@@ -116,13 +129,6 @@
           )
         );
       },
-      triggerFormEditMode: function () {
-        if (this.attr('instance.status') === 'In Progress') {
-          this.attr('formState.editMode', true);
-        } else {
-          this.attr('formState.editMode', false);
-        }
-      },
       onFormSave: function () {
         this.attr('triggerFormSaveCbs').fire();
       },
@@ -145,19 +151,37 @@
         });
 
         return this.attr('instance').save();
+      },
+      showRequiredInfoModal: function (scope) {
+        var data = {
+          fields: scope.attr('errors') || [],
+          value: scope.attr('value'),
+          title: scope.attr('title'),
+          type: scope.attr('type')
+        };
+        var title = 'Required ' +
+          data.fields.map(function (field) {
+            return can.capitalize(field);
+          }).join(' and ');
+
+        can.batch.start();
+        this.attr('modal', {
+          content: data,
+          caIds: {
+            defId: scope.attr('id'),
+            valueId: scope.attr('valueId')
+          },
+          modalTitle: title,
+          state: {}
+        });
+        can.batch.stop();
+        this.attr('modal.state.open', true);
       }
-    },
-    init: function () {
-      this.viewModel.updateRelatedItems();
-      this.viewModel.initializeFormFields();
-      this.viewModel.triggerFormEditMode();
     },
     events: {
       '{viewModel.instance} refreshInstance': function () {
+        this.viewModel.initializeFormFields();
         this.viewModel.updateRelatedItems();
-      },
-      '{viewModel.instance} status': function () {
-        this.viewModel.triggerFormEditMode();
       }
     }
   });

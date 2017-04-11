@@ -5,7 +5,8 @@
 
 <section class="assessment-module info{{#is_info_pin}} sticky-info-panel assignable{{/is_info_pin}}">
   {{#is_info_pin}}
-      <info-pin-buttons class="details-wrap" maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
+      <info-pin-buttons class="details-wrap" maximized="maximized" on-change-maximized-state="@onChangeMaximizedState"
+                        on-close="@onClose"></info-pin-buttons>
   {{/is_info_pin}}
     <div class="tier-content">
       {{> '/static/mustache/assessments/header.mustache' }}
@@ -23,8 +24,8 @@
                 <div class="assessment-controls">
                     <div class="assessment-note">
                         <auto-save-form-status
-                          {form-saving}="formState.saving"
-                          {form-all-saved}="formState.allSaved"
+                                {form-saving}="formState.saving"
+                                {form-all-saved}="formState.allSaved"
                         ></auto-save-form-status>
                         <i class="fa fa-question-circle" rel="tooltip"
                            data-original-title="Respond to assessment here. Use comments on the right for free text responses."></i>
@@ -36,18 +37,20 @@
                         </assessment-attachments-list>
                         <assessment-urls-list></assessment-urls-list>
                     </div>
-                    <!--<assessment-custom-attributes {(instance)}="instance"-->
-                                                  <!--{(items)}="instance.custom_attribute_values"-->
-                                                  <!--class="assessment-custom-attributes flex-box flex-box-multi">-->
-                    <!--</assessment-custom-attributes>-->
                     <auto-save-form {fields}="formFields"
-                                    {edit-mode}="formState.editMode"
+                                    {edit-mode}="editMode"
                                     {save-callback}="@saveFormFields"
                                     {trigger-save-cbs}="triggerFormSaveCbs"
                                     {^fields-to-save-available}="formState.fieldsToSaveAvailable"
                                     {^saving}="formState.saving"
                                     {^all-saved}="formState.allSaved"
                     ></auto-save-form>
+                  <!-- Modal Window to fix validation issues of CA fields -->
+                    <simple-modal {(state)}="modal.state" {modal-title}="modal.modalTitle" {instance}="instance">
+                        <ca-object-modal-content {(content)}="modal.content" {(state)}="state"
+                                                 {ca-ids}="modal.caIds"></ca-object-modal-content>
+                    </simple-modal>
+                  <!-- End of Modal Window -->
                     <assessment-controls-toolbar class="assessment-controls-toolbar"
                                                  {instance}="instance"
                                                  {form-state}="formState"
@@ -69,7 +72,7 @@
                                             {instance}="instance"></assessment-add-comment>
                 {{/is_allowed}}
               {{/if_in}}
-            <assessment-mapped-comments {mapped-items}="comments"></assessment-mapped-comments>
+                <assessment-mapped-comments {mapped-items}="comments"></assessment-mapped-comments>
             </div>
         </div>
         <div class="tabs-wrap">
