@@ -28,6 +28,15 @@ class SnapshotBlockConverter(object):
       "revision_date": "Revision Date",
   }
 
+  BOOLEAN_ALIASES = {
+      True: "yes",
+      "1": "yes",
+      False: "no",
+      None: "no",
+      "0": "no",
+      "": "no",
+  }
+
   def __init__(self, converter, ids):
     self.converter = converter
     self.ids = ids
@@ -174,7 +183,7 @@ class SnapshotBlockConverter(object):
     elif isinstance(value, list):
       return u"\n".join(self.get_value_string(val) for val in value)
     elif isinstance(value, bool):
-      return u"yes" if value else u"no"
+      return self.BOOLEAN_ALIASES.get(value, u"")
     elif isinstance(value, basestring):
       return value
     return u""
@@ -211,7 +220,7 @@ class SnapshotBlockConverter(object):
       return self._stub_cache.get(val, {}).get(
           value.get("attribute_object_id"), u"")
     if cad["attribute_type"] == "Checkbox":
-      return u"yes" if val in {"1", True} else u"no"
+      return self.BOOLEAN_ALIASES.get(val, u"")
     if cad["attribute_type"] == "Date" and val:
       return utils.iso_to_us_date(val)
     return val
