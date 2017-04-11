@@ -84,8 +84,15 @@ class SnapshotBlockConverter(object):
     if self.MAPPINGS_KEY in self.fields:
       for key in self.SNAPSHOT_MAPPING_ALIASES:
         model_name = key.split(":")[1]
-        related_objects = snapshot.related_objects(_types={model_name})
-        content[key] = [utils.create_stub(obj) for obj in related_objects]
+        content[key] = [
+            {"type": rel.destination_type, "id": rel.destination_id}
+            for rel in snapshot.related_destinations
+            if rel.destination_type == model_name
+        ] + [
+            {"type": rel.source_type, "id": rel.source_id}
+            for rel in snapshot.related_sources
+            if rel.source_type == model_name
+        ]
     return content
 
   @cached_property
