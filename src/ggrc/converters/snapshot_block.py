@@ -75,6 +75,14 @@ class SnapshotBlockConverter(object):
         }
     }
 
+  def _extend_revision_content(self, snapshot):
+    content = {}
+    content.update(snapshot.revision.content)
+    content["audit"] = {"type": "Audit", "id": snapshot.parent_id}
+    content["slug"] = u"*{}".format(content["slug"])
+    content["revision_date"] = unicode(snapshot.revision.created_at)
+    return content
+
   @cached_property
   def snapshots(self):
     """List of all snapshots in the current block.
@@ -89,12 +97,7 @@ class SnapshotBlockConverter(object):
       ).all()
 
       for snapshot in snapshots:  # add special snapshot attribute
-        snapshot.content = {}
-        snapshot.content.update(snapshot.revision.content)
-        snapshot.content["audit"] = {"type": "Audit", "id": snapshot.parent_id}
-        snapshot.content["slug"] = u"*{}".format(snapshot.content["slug"])
-        snapshot.content["revision_date"] = unicode(
-            snapshot.revision.created_at)
+        snapshot.content = self._extend_revision_content(snapshot)
       return snapshots
 
   @cached_property
