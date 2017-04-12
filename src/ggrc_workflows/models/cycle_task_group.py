@@ -152,7 +152,12 @@ class CycleTaskGroup(WithContact, Stateful, Timeboxed, Described,
             "email",
             "name",
             "id"
-        )
+        ),
+        orm.Load(cls).joinedload("contact").load_only(
+            "email",
+            "name",
+            "id"
+        ),
     )
 
   @classmethod
