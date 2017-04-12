@@ -778,9 +778,16 @@ p {
     height: 8px;
     display: inline-block;
     left: 0;
-    top: 50%;
-    margin-top: -5px;
+    top: 3px;
     border-radius: 50%;
+  }
+
+  .grid-data-row & {
+    display: inline-block;
+
+    &:before {
+      top: 7px;
+    }
   }
 
   &.state-notstarted,
