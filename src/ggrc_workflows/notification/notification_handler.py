@@ -112,7 +112,7 @@ def add_cycle_task_reassigned_notification(obj):
                        NotificationType.name == "manual_cycle_created",
                        )))
 
-  if result.count() == 0:
+  if not db.session.query(result.exists()).one()[0]:
     return
 
   notif_type = get_notification_type("cycle_task_reassigned")
