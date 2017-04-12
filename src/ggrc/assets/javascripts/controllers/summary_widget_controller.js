@@ -80,7 +80,6 @@
       return false;
     },
     widget_hidden: function (event) {
-      this.setState('Assessment', {total: 0, statuses: { }}, true);
       return false;
     },
     reloadSummary: function () {
@@ -91,6 +90,17 @@
     },
     reloadChart: function (type, elementId) {
       var that = this;
+      var query = GGRC.Utils.QueryAPI;
+      var chartOptions = this.options.context.charts[type];
+      // Note that chart will be refreshed only if counts were changed.
+      // State changes are not checked.
+      var countsChanged = query.getCounts().attr(type) !==
+                          chartOptions.attr('total');
+      if (chartOptions.attr('isInitialized') && !countsChanged) {
+        return;
+      }
+      chartOptions.attr('isInitialized', true);
+
       that.setState(type, {total: 0, statuses: { }}, true);
       that.getStatuses(type, that.options.instance.id).then(function (raw) {
         var data = that.parseStatuses(raw[0][type]);
@@ -210,22 +220,19 @@
       }
     },
     parseStatuses: function (data) {
-      var pregroups = data.values.map(function (item) {
+      var groups = {};
+      var result;
+      data.values.forEach(function (item) {
         if (item.verified) {
           item.status = 'Verified';
         }
-        return item;
+        if (!groups[item.status]) {
+          groups[item.status] = 1;
+        } else {
+          groups[item.status]++;
+        }
       });
-      var groups = _.groupBy(pregroups, 'status');
-      var pairs = _.pairs(groups);
-      var sorted = _.sortBy(pairs, function (e) {
-        return e[0];
-      });
-      var result = sorted.map(function (e) {
-        var name = e[0];
-        var count = e[1].length;
-        return [name, count];
-      });
+      result = _.pairs(groups);
       return {
         total: data.total,
         statuses: result
