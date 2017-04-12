@@ -59,6 +59,19 @@
     outline: none;
   }
 
+  &.btn-gray {
+    text-align: center;
+    background: $white;
+    font-weight: normal;
+    border: 1px solid $dropPlaceholder;
+
+    &:hover {
+      background: darken($white, 3%);
+      border-color: darken($dropPlaceholder, 5%);
+      transition: background 0.2s linear;
+    }
+  }
+
   &.btn-link {
     color: $blue;
     font-size: 12px;
@@ -80,8 +93,13 @@
 
     &.selected {
       background: #40c4ff;
-      color: #fff;
+      color: $white;
       border-radius: 3px;
+    }
+
+    &.btn-link-nopadding {
+      padding-left: 3px;
+      padding-right: 3px;
     }
   }
 
