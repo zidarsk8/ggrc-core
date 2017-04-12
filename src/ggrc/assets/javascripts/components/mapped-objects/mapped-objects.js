@@ -203,10 +203,7 @@
       this.viewModel.setMappedObjects();
     },
     events: {
-      '{viewModel.parentInstance} related_sources': function () {
-        this.viewModel.setMappedObjects();
-      },
-      '{viewModel.parentInstance} related_destinations': function () {
+      '{viewModel.parentInstance} refreshInstance': function () {
         this.viewModel.setMappedObjects();
       }
     }
