@@ -21,9 +21,7 @@
     ],
     is_custom_attributable: true,
     attributes: {
-      context: 'CMS.Models.Context.stub',
-      modified_by: 'CMS.Models.Person.stub',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
+      context: 'CMS.Models.Context.stub'
     },
     tree_view_options: {
       attr_list: can.Model.Cacheable.attr_list.concat([
