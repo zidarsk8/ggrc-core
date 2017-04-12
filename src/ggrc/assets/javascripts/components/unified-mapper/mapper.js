@@ -396,7 +396,9 @@
               this.closeModal();
             }.bind(this))
             .done(function () {
-              instance.dispatch('refreshInstance');
+              if (instance && instance.dispatch) {
+                instance.dispatch('refreshInstance');
+              }
               // This Method should be modified to event
               GGRC.Utils.CurrentPage.refreshCounts();
             });

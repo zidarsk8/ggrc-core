@@ -5,11 +5,11 @@
 
 'use strict';
 
-describe('GGRC utils isEmptyCA() method', function () {
+describe('GGRC utils isEmptyCustomAttribute() method', function () {
   var isEmptyCA;
 
   beforeAll(function () {
-    isEmptyCA = GGRC.Utils.isEmptyCustomAttribute;
+    isEmptyCA = GGRC.Utils.CustomAttributes.isEmptyCustomAttribute;
   });
 
   describe('check undefined value', function () {

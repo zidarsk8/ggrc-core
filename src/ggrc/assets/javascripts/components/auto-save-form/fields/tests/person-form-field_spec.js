@@ -33,13 +33,13 @@ describe('GGRC.Components.personFormField', function () {
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
-      value: 'newValue'
+      value: viewModel.attr('_value')
     });
     viewModel.attr('_value', {id: 2});
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
       fieldId: 'id',
-      value: 'newValue2'
+      value: viewModel.attr('_value')
     });
   });
 
