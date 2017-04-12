@@ -15,13 +15,13 @@
     {{/if}}
     {{#editable}}
       {{#has_permissions}}
-        {{^toggle toggle_add}}
+        {{^isEdit}}
           <span class="person-add">
-            <a href="javascript://" {{toggle_button}}>
+            <a href="javascript://" ($click)="enableEdit">
               <i class="fa fa-plus-circle"></i>
             </a>
           </span>
-        {{/toggle}}
+        {{/isEdit}}
       {{/has_permissions}}
     {{/editable}}
 </label>
@@ -48,15 +48,15 @@
   <li class="person-add">
     {{#show_add}}
       {{#has_permissions}}
-        {{#toggle toggle_add}}
+        {{#isEdit}}
           <i class="fa fa-user green pull-left icon-field"></i>
           <div class="person-selector">
             <input tabindex="7" type="text" name="" class="search-icon" data-lookup="Person" placeholder="Search for {{type}}" null-if-empty="false" value="" {{autocomplete_select}} />
-            <a href="javascript://" {{toggle_button}}>
+            <a href="javascript://" ($click)="disableEdit">
               <i class="fa fa-trash"></i>
             </a>
           </div>
-        {{/toggle}}
+        {{/isEdit}}
       {{/has_permissions}}
     {{/show_add}}
   </li>
