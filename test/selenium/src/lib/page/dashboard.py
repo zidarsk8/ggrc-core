@@ -23,6 +23,8 @@ class UserList(base.Component):
         self._driver, self.locators.CHECKBOX_DAILY_DIGEST)
     self.button_help = base.Button(
         self._driver, self.locators.BUTTON_HELP)
+    self.button_data_export = base.Button(
+        self._driver, self.locators.BUTTON_DATA_EXPORT)
 
   @decorator.wait_for_redirect
   def select_logout(self):
@@ -70,8 +72,6 @@ class GenericHeader(base.Component):
         self._driver, self.locators.TOGGLE_LHN)
     self.button_data_import = base.Button(
         self._driver, self.locators.BUTTON_DATA_IMPORT)
-    self.button_data_export = base.Button(
-        self._driver, self.locators.BUTTON_DATA_EXPORT)
 
   def open_lhn_menu(self):
     """Opens LHN on Dashboard.

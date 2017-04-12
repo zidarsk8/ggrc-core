@@ -32,11 +32,6 @@
       %i.fa.fa-sign-in
       %span
         Import
-  %li
-    %a{ 'href': '/export', 'target': '_blank' }
-      %i.fa.fa-sign-out
-      %span
-        Export
 
   %li.user.dropdown
     %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
@@ -46,6 +41,12 @@
       %li{'class': 'user-email'}
         %span
           =current_user.email
+
+      %li
+        %a{ 'href': '/export', 'class': 'export-btn', 'target': '_blank' }
+          %i.fa.fa-sign-out
+          %span
+            Export
 
       -if self.page_help
         %li
