@@ -4,7 +4,7 @@
 }}
 
 {{#if formEditMode}}
-  <button class="btn btn-small save-button"
+  <button class="btn btn-small btn-gray"
           ($click)="save()"
           {{#saveDisabled}}disabled{{/saveDisabled}}>
     {{#if formSaving}}
@@ -14,8 +14,5 @@
     {{/if}}
   </button>
 {{else}}
-  <button class="btn btn-small edit-button"
-          ($click)="edit()">
-    Edit Answers
-  </button>
+  <button class="btn btn-small btn-gray" ($click)="edit()">Edit Answers</button>
 {{/if}}

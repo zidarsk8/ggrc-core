@@ -6,6 +6,6 @@
     {{#if iconCls}}<i class="fa {{iconCls}}"></i>{{/if}}
     <div class="document-object-item__body">
         <a class="link" href="{{itemData.link}}" target="_blank">{{itemTitle}}</a>
-        <span class="date">{{date itemData.created_at true}}</span>
+        <span class="date">{{localize_date itemCreationDate}}</span>
     </div>
 </div>
