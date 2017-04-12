@@ -52,7 +52,8 @@
         editMode: {
           type: 'boolean',
           get: function () {
-            return this.attr('instance.status') !== 'Completed';
+            return this.attr('instance.status') !== 'Completed' &&
+              this.attr('instance.status') !== 'Ready for Review';
           },
           set: function () {
             this.attr('instance.status', 'In Progress');
