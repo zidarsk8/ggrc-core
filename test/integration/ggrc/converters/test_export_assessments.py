@@ -70,7 +70,7 @@ class TestExport(TestCase):
     db.session.commit()
     self.assertSlugs("comment", self.comment.description, [])
 
-  @data("created_at", "Created On", "created on")
+  @data("created_at", "Created Date", "created Date")
   def test_filter_by_created_at(self, alias):
     """Test filter by created at"""
     self.assertFilterByDatetime(alias,

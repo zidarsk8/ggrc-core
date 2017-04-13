@@ -171,7 +171,7 @@ class ChangeTracked(object):
           "filter_only": True,
       },
       "created_at": {
-          "display_name": "Created On",
+          "display_name": "Created Date",
           "filter_only": True,
       },
   }
