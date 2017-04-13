@@ -110,6 +110,23 @@
           return Snapshots.isSnapshotScope(parentInstance) &&
             Snapshots.isSnapshotModel(model.model_singular);
         }
+      },
+      showGenerateAssessments: {
+        type: Boolean,
+        get: function () {
+          var parentInstance = this.attr('parent_instance');
+          var model = this.attr('model');
+
+          return parentInstance.type === 'Audit' &&
+            model.shortName === 'Assessment';
+        }
+      },
+      show3bbs: {
+        type: Boolean,
+        get: function () {
+          return this.attr('hideImportExport') ||
+            this.attr('showGenerateAssessments');
+        }
       }
     },
     /**

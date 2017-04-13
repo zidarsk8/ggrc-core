@@ -10,8 +10,14 @@
     '/components/tree/tree-view.mustache');
   var viewModel = can.Map.extend({
     define: {
+      notResult: {
+        type: Boolean,
+        get: function () {
+          return !this.attr('loading') && !this.attr('items').length;
+        }
+      }
     },
-    items: null,
+    items: [],
     parentInstance: null,
     model: null,
     selectedColumns: [],
