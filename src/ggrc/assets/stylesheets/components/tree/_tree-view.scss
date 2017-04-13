@@ -176,6 +176,20 @@ tree-filter-input {
   display: flex;
   padding-right: 10px;
 
+  .tree-filter_is-expression {
+    opacity: .25;
+    position: absolute;
+    right: 6px;
+    top: 1px;
+
+    &.valid {
+      opacity: 1;
+      i {
+        color: $green;
+      }
+    }
+  }
+
   .tree-filter__actions {
     margin: 0 10px;
 

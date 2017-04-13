@@ -56,6 +56,7 @@
       options.attr('filter', filter);
       options.attr('operation', operation);
       options.attr('depth', depth);
+      options.attr('name', 'status');
 
       if (this.registerFilter) {
         this.registerFilter(options);

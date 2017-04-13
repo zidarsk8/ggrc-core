@@ -4,10 +4,10 @@
 }}
 
 <div class="tree-filter__expression-holder width-100">
-  <input type="text" class="tree-filter__input width-100" {($value)}="filter">
-  <span class="tree-filter__expression-holder__is-expression">
-        <i class="fa fa-check-circle-o"></i>
-      </span>
+  <input type="text" class="tree-filter__input width-100" {($value)}="filter" ($change)="onChange($element)">
+  <span class="tree-filter_is-expression {{#if isExpression}}valid{{/if}}">
+    <i class="fa fa-check-circle{{^if isExpression}}-o{{/if}}"></i>
+  </span>
 </div>
 
 <div class="flex-box tree-filter__actions">

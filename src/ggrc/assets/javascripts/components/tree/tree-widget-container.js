@@ -28,6 +28,10 @@
           var filters = can.makeArray(this.attr('filters'));
           var additionalFilter = this.attr('additionalFilter');
 
+          if (additionalFilter) {
+            additionalFilter = GGRC.query_parser.parse(additionalFilter);
+          }
+
           return filters.filter(function (options) {
             return options.filter;
           }).reduce(this._concatFilters, additionalFilter);
@@ -175,14 +179,13 @@
         current: pageInfo.current,
         pageSize: pageInfo.pageSize,
         sortBy: sortingInfo.sortBy,
-        sortDirection: sortingInfo.sortDirection,
-        filter: filter
+        sortDirection: sortingInfo.sortDirection
       };
 
       pageInfo.attr('disabled', true);
       this.attr('loading', true);
 
-      return TreeViewUtils.loadFirstTierItems(modelName, parent, page)
+      return TreeViewUtils.loadFirstTierItems(modelName, parent, page, filter)
         .then(function (data) {
           var total = data.total;
           var modelName = this.attr('modelName');
@@ -194,9 +197,14 @@
           this.attr('pageInfo.disabled', false);
           this.attr('loading', false);
 
-          if (!this.attr('currentFilter') &&
+          if (!this._getFilterByName('custom') &&
             total !== GGRC.Utils.CurrentPage.getCounts().attr(modelName)) {
             GGRC.Utils.CurrentPage.getCounts().attr(modelName, total);
+          }
+
+          if (this._getFilterByName('status')) {
+            GGRC.Utils.CurrentPage
+              .initCounts([modelName], parent.type, parent.id);
           }
 
         }.bind(this));
@@ -282,13 +290,21 @@
     _concatFilters: function (filter, options) {
       var operation = options.operation || 'AND';
 
-      if (filter.length) {
-        filter += ' ' + operation + ' ' + options.filter;
-      } else {
-        filter = options.filter;
+      if (filter) {
+        filter = GGRC.query_parser.join_queries(
+          filter,
+          GGRC.query_parser.parse(options.filter),
+          operation);
+      } else if (options.filter) {
+        filter = GGRC.query_parser.parse(options.filter);
       }
 
       return filter;
+    },
+    _getFilterByName: function (name) {
+      var filter = _.findWhere(this.attr('filters'), {name: name});
+
+      return filter && filter.filter ? filter.filter : null;
     },
     _widgetHidden: function () {
       this._triggerListeners(true);

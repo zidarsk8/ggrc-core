@@ -84,8 +84,10 @@ tree-item-actions {
       transition: all linear 0.1s;
 
       &:hover {
-        color: $black !important;
         background-color: $lightGray !important;
+        a {
+          color: $black !important;
+        }
       }
       a {
         line-height: 30px;

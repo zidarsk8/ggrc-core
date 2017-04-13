@@ -23,6 +23,10 @@
       depth: {
         type: Boolean,
         value: false
+      },
+      isExpression: {
+        type: Boolean,
+        value: false
       }
     },
     options: {},
@@ -36,6 +40,7 @@
       options.attr('filter', filter);
       options.attr('operation', operation);
       options.attr('depth', depth);
+      options.attr('depth', 'custom');
 
       if (this.registerFilter) {
         this.registerFilter(options);
@@ -47,6 +52,14 @@
     reset: function ($element) {
       $element.closest('tree-filter-input').find('.tree-filter__input').val('');
       this.submit();
+    },
+    onChange: function ($element) {
+      var filter = GGRC.query_parser.parse($element.val());
+      var isExpression =
+        !!filter && !!filter.expression.op &&
+        filter.expression.op.name !== 'text_search' &&
+        filter.expression.op.name !== 'exclude_text_search';
+      this.attr('isExpression', isExpression);
     }
   });
 

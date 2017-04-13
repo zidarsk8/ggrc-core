@@ -281,11 +281,13 @@
      * @param {Number} filterInfo.filter -
      * @return {Promise}
      */
-    function loadFirstTierItems(modelName, parent, filterInfo) {
+    function loadFirstTierItems(modelName, parent, filterInfo, filter) {
       var params = QueryAPI.buildParam(
         modelName,
         filterInfo,
-        makeRelevantExpression(modelName, parent.type, parent.id)
+        makeRelevantExpression(modelName, parent.type, parent.id),
+        null,
+        filter
       );
       var requestedType;
 
