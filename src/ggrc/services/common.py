@@ -349,9 +349,14 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
   cache = get_cache()
   if not cache:
     return revisions
+  owner_modified_objects = []
+  folder_modified_objects = []
   all_edited_objects = itertools.chain(cache.new, cache.dirty, cache.deleted)
-  owner_modified_objects = [o.ownable for o in all_edited_objects
-                            if o.type == "ObjectOwner" and o.ownable]
+  for o in all_edited_objects:
+    if o.type == "ObjectOwner" and o.ownable:
+      owner_modified_objects.append(o.ownable)
+    if o.type == "ObjectFolder" and o.folderable:
+      folder_modified_objects.append(o.folderable)
   revisions.extend(_revision_generator(
       current_user_id, "created", cache.new
   ))
@@ -360,6 +365,9 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
   ))
   revisions.extend(_revision_generator(
       current_user_id, "modified", owner_modified_objects
+  ))
+  revisions.extend(_revision_generator(
+      current_user_id, "modified", folder_modified_objects
   ))
   if force_obj and obj is not None and obj not in cache.dirty:
     # If the ``obj`` has been updated, but only its custom attributes have

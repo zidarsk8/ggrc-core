@@ -5,6 +5,7 @@ from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.models.mixins import Base
+from ggrc.utils import create_stub
 
 
 class ObjectFile(Base, db.Model):
@@ -59,6 +60,7 @@ class Fileable(object):
           backref='{0}_fileable'.format(cls.__name__),
           cascade='all, delete-orphan',
       )
+
     cls.object_files = make_object_files(cls)
 
   _publish_attrs = [
@@ -70,3 +72,13 @@ class Fileable(object):
     query = super(Fileable, cls).eager_query()
     return query.options(
         orm.subqueryload('object_files'))
+
+  def log_json(self):
+    """Serialize to JSON"""
+    out_json = super(Fileable, self).log_json()
+    if hasattr(self, "object_files"):
+      out_json["object_files"] = [
+          # pylint: disable=not-an-iterable
+          create_stub(file) for file in self.object_files if file
+      ]
+    return out_json

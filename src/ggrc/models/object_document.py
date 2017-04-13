@@ -13,6 +13,7 @@ from ggrc.models.document import Document
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.relationship import Relationship
+from ggrc.utils import create_stub
 
 
 class ObjectDocument(Timeboxed, Base, db.Model):
@@ -87,8 +88,10 @@ class ObjectDocument(Timeboxed, Base, db.Model):
 
 
 class Documentable(object):
+  """Base class for EvidenceURL mixin"""
   @declared_attr
   def object_documents(cls):
+    """Returns all the associated documents"""
     cls.documents = association_proxy(
         'object_documents', 'document',
         creator=lambda document: ObjectDocument(
@@ -120,6 +123,21 @@ class Documentable(object):
     query = super(Documentable, cls).eager_query()
     return cls.eager_inclusions(query, Documentable._include_links).options(
         orm.subqueryload('object_documents'))
+
+  def log_json(self):
+    """Serialize to JSON"""
+    out_json = super(Documentable, self).log_json()
+    if hasattr(self, "documents"):
+      out_json["documents"] = [
+          # pylint: disable=not-an-iterable
+          create_stub(doc) for doc in self.documents if doc
+      ]
+    if hasattr(self, "object_documents"):
+      out_json["object_documents"] = [
+          # pylint: disable=not-an-iterable
+          create_stub(doc) for doc in self.object_documents if doc
+      ]
+    return out_json
 
 
 class EvidenceURL(Documentable):
