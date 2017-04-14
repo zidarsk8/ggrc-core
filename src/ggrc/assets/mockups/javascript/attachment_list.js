@@ -46,7 +46,7 @@
         file.attr('deleted', true);
         this.updateFiles();
       },
-      '.btn-draft click': function (el, ev) {
+      '.btn-white click': function (el, ev) {
         var attachments = Generator.get(this.scope.attr('types') === 'url' ? 'url' : 'file');
         return this.scope.attr('data').unshift({
           author: Generator.current.u,

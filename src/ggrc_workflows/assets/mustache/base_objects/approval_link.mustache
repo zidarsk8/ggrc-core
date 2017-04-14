@@ -38,9 +38,9 @@
               {{/with_most_recent_declining_task_entry}}
             {{/if_equals}}
             <div {{#review_task}}{{data 'model'}}{{/review_task}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data("model") }) }}>
-              <button class="btn btn-mini btn-success change-task-status {{instance._disabled}} {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}" data-name="status" data-value="Verified">Approve</button>
+              <button class="btn btn-mini btn-green change-task-status {{instance._disabled}} {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}" data-name="status" data-value="Verified">Approve</button>
               <a href="javascript://"
-                class="undoable btn btn-mini btn-danger change-task-status {{instance._disabled}} {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}"
+                class="undoable btn btn-mini btn-red change-task-status {{instance._disabled}} {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}"
                 data-toggle="modal-ajax-form"
                 data-object-singular="CycleTaskEntry"
                 data-object-params='{\

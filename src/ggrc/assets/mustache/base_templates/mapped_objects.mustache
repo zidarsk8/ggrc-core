@@ -16,7 +16,7 @@
   {{^if_in instance.status "Finished,Verified"}}
     {{#is_allowed 'update' instance context='for'}}
       <a
-        class="btn btn-draft btn-small"
+        class="btn btn-white btn-small"
         href="javascript://"
         rel="tooltip"
         data-type="Program"
@@ -34,7 +34,7 @@
 {{else}}
   {{#is_allowed 'update' instance context='for'}}
   <a
-    class="btn btn-draft btn-small"
+    class="btn btn-white btn-small"
     href="javascript://"
     rel="tooltip"
     data-type="Program"

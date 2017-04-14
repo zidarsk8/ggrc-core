@@ -25,7 +25,7 @@
         {{#if_equals mapper.type 'AssessmentTemplate'}}
           <div class="col create">
             <a
-              class="btn btn-small btn-draft create-control"
+              class="btn btn-small btn-white create-control"
               href="javascript://"
               data-toggle="modal-ajax-form"
               data-unique-id="{{mapper.join_object_id}}"
@@ -51,7 +51,7 @@
           {{^if mapper.showWarning}}
             <div class="col create">
               <a
-                class="btn btn-small btn-draft create-control"
+                class="btn btn-small btn-white create-control"
                 href="javascript://"
                 data-toggle="modal-ajax-form"
                 data-unique-id="{{mapper.join_object_id}}"
@@ -102,6 +102,6 @@
       </div>
     {{/totalObjects}}
   {{/mapper.afterSearch}}
-  <button can-click="onSubmit" class="btn btn-small btn-info" {{#isLoading}}disabled="disabled"{{/isLoading}}>Search
+  <button can-click="onSubmit" class="btn btn-small btn-lightBlue" {{#isLoading}}disabled="disabled"{{/isLoading}}>Search
   </button>
 </div>

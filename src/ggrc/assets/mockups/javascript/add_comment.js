@@ -23,7 +23,7 @@
         }
         this.scope.attachments.push(typeFn());
       },
-      '.btn-success click': function (el, ev) {
+      '.btn-green click': function (el, ev) {
         var $textarea = this.element.find('.add-comment textarea');
         var text = $.trim($textarea.val());
         var attachments = this.scope.attachments;

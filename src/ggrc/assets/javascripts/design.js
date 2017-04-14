@@ -232,7 +232,7 @@ $('body').on('click', '.fa fa-caret-right', function(e) {
     } else if ($this.closest(".modal-body").find("#currentList").hasClass('people-list')) {
       //We gave relationships
       //Pending approval, start-stop
-      var $item2add = '<div class="btn-group inline"> <a class="span7 btn btn-danger btn-mini dropdown-toggle nominheight fltrt" data-toggle="dropdown"> Select Relationship <span class="caret"></span> </a> <ul class="dropdown-menu"> <li> <a href="#" id="makeAccountable"> is Accountable for </a> </li> <li> <a href="#" id="makeResponsible"> is Responsible for </a> </li> </ul> </div>';
+      var $item2add = '<div class="btn-group inline"> <a class="span7 btn btn-red btn-mini dropdown-toggle nominheight fltrt" data-toggle="dropdown"> Select Relationship <span class="caret"></span> </a> <ul class="dropdown-menu"> <li> <a href="#" id="makeAccountable"> is Accountable for </a> </li> <li> <a href="#" id="makeResponsible"> is Responsible for </a> </li> </ul> </div>';
       var $additionalinfo = '<div class="row-fluid additional"> <div class="span4"></div> <div class="span4"> <label>Start Date (Optional)</label> <input class="span12 date" id="datepicker-stopdate-rd" placeholder="MM/DD/YYYY" type="text"> </div> <div class="span4"> <label>Stop Date (Optional)</label> <input class="span12 date" id="datepicker-stopdate-rd" placeholder="MM/DD/YYYY" type="text"> </div>';
     } else if ($this.closest(".modal-body").find("#currentList").hasClass('reference-list')) {
       //Will have assignment items, nothing now.
@@ -265,10 +265,10 @@ $('body').on('click', '.fa fa-caret-right', function(e) {
     e.preventDefault();
     $(this).closest(".btn-group").find(".dropdown-toggle").html("is Accountable");
     $(this).closest(".btn-group").find(".dropdown-toggle").removeClass('btn-warning');
-    $(this).closest(".btn-group").find(".dropdown-toggle").addClass('btn-success');
+    $(this).closest(".btn-group").find(".dropdown-toggle").addClass('btn-green');
 
     $(this).closest(".btn-group").find(".dropdown-toggle").addClass('halfopacity');
-    $(this).closest(".btn-group").find(".dropdown-toggle").removeClass('btn-info');
+    $(this).closest(".btn-group").find(".dropdown-toggle").removeClass('btn-lightBlue');
 
   });
 
@@ -276,10 +276,10 @@ $('body').on('click', '.fa fa-caret-right', function(e) {
     e.preventDefault();
     $(this).closest(".btn-group").find(".dropdown-toggle").html("is Responsible");
     $(this).closest(".btn-group").find(".dropdown-toggle").removeClass('btn-warning');
-    $(this).closest(".btn-group").find(".dropdown-toggle").addClass('btn-success');
+    $(this).closest(".btn-group").find(".dropdown-toggle").addClass('btn-green');
 
     $(this).closest(".btn-group").find(".dropdown-toggle").addClass('halfopacity');
-    $(this).closest(".btn-group").find(".dropdown-toggle").addClass('btn-info');
+    $(this).closest(".btn-group").find(".dropdown-toggle").addClass('btn-lightBlue');
 
   });
 
