@@ -133,7 +133,6 @@ dashboard-js-files:
   - controllers/automapper_controller.js
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
-  - controllers/comment_controller.js
   - controllers/mapper.js
   # Helpers
   - helpers/mapping_helpers.js
@@ -226,7 +225,6 @@ dashboard-js-files:
   - components/modal_wrappers/checkboxes_to_list.js
   - components/reminder.js
   - components/rich_text/rich_text.js
-  - components/add_comment/add_comment.js
   - components/object_cloner/object_cloner.js
   - components/object_counter/object_counter.js
   - components/sort_by_sort_index/sort_by_sort_index.js
@@ -318,7 +316,6 @@ dashboard-js-template-files:
   - components/assessment/inline/person.mustache
   - components/assessment/inline/checkbox.mustache
   - components/assessment/add_comment.mustache
-  - components/assessment/comment/input.mustache
   - components/assessment/comment/controls.mustache
   - components/comment/comment-input.mustache
   - components/object-list/object-list.mustache
@@ -384,7 +381,6 @@ dashboard-js-template-files:
   - base_objects/sub_tree_type_selector.mustache
   - base_objects/modal/search_title.mustache
   - base_objects/mapper-item-description.mustache
-  - base_templates/add_comment.mustache
   - base_templates/objects_tooltip.mustache
   - base_templates/attachment_list.mustache
   - base_templates/url_list.mustache
