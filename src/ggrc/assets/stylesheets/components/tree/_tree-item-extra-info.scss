@@ -20,7 +20,7 @@ tree-item-extra-info {
       color: $darkOrange;
     }
     &.state-overdue {
-      color: $error;
+      color: $status-declined;
       visibility: visible;
     }
   }
@@ -76,7 +76,7 @@ tree-item-actions {
     background-color: $white;
     list-style-type: none;
     z-index: 1000;
-    border: 1px solid $lightGray;
+    border: 1px solid $warmGray;
     margin: 0;
     box-shadow: 0 3px 1px rgba(0,0,0,.05);
 
