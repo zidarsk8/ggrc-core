@@ -1,0 +1,140 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#if isActive}}
+  <div class="person-holder">
+    <i class="fa {{cssClasses}} person-tooltip-trigger" data-placement="left"></i>
+
+    <div class="custom-popover-content">
+      <div class="preview-container tree-extra-info-preview">
+        <div class="profile-info">
+        {{#if isDirective}}
+          <section>
+            <h3 class="task-list-title">Number of mapped objects</h3>
+            {{#if_instance_of instance 'Contract'}}
+              <div class="mapping-info">
+                <i class="fa fa-paragraph"></i> Clauses:
+                {{#with_mapping_count instance 'clauses'}}
+                  {{count}}
+                {{/with_mapping_count}}
+              </div>
+            {{else}}
+              <div class="mapping-info">
+                <i class="fa fa-paragraph"></i> Sections:
+                {{#with_mapping_count instance 'sections'}}
+                  {{count}}
+                {{/with_mapping_count}}
+              </div>
+            {{/if_instance_of}}
+          </section>
+        {{/if}}
+        {{#if isSection}}
+          <section>
+          <h3 class="task-list-title">Number of mapped objects</h3>
+          {{#with_mapping_count instance 'related_objects'}}
+            {{#prune_context}}
+              <div class="mapping-info">
+                <i class="fa fa-list-alt"></i> Total:
+                {{#if count}}
+                  <span class="counter">{{count}}</span>
+                {{else}}
+                  <strong class="counter">0</strong>
+                {{/if}}
+              </div>
+            {{/prune_context}}
+          {{/with_mapping_count}}
+
+          {{#with_mapping_count instance 'objectives'}}
+            <div class="mapping-info">
+              <i class="fa fa-dot-circle-o"></i> Objectives:
+              {{#if count}}
+                <span class="counter">{{count}}</span>
+              {{else}}
+                <strong class="counter">0</strong>
+              {{/if}}
+            </div>
+          {{/with_mapping_count}}
+
+          {{#with_mapping_count instance 'controls'}}
+            <div class="mapping-info">
+              <i class="fa fa-video-camera"></i> Controls:
+              {{#if count}}
+                <span class="counter">{{count}}</span>
+              {{else}}
+                <strong class="counter">0</strong>
+              {{/if}}
+            </div>
+          {{/with_mapping_count}}
+        </section>
+        {{/if}}
+        {{#if isCycleTaskGroupObjectTask}}
+          <section>
+            <h3 class="task-list-title">Number of mapped objects</h3>
+            {{#with_mapping_count instance 'related_objects'}}
+              <div class="mapping-info">
+                <i class="fa fa-list-alt"></i> Total:
+                {{#if count}}
+                  <span class="counter">{{count}}</span>
+                {{else}}
+                  <strong class="counter">0</strong>
+                {{/if}}
+              </div>
+            {{/with_mapping_count}}
+            {{#with_mapping_count instance 'cycle_task_entries'}}
+            <div class="mapping-info"> <!-- number of comment count -->
+              <i class="fa fa-comment-o"></i> Comments:
+              {{#if count}}
+                <span class="counter">{{count}}</span>
+              {{else}}
+                <strong class="counter">0</strong>
+              {{/if}}
+            </div>
+            {{/with_mapping_count}}
+            <div class="date">
+              <i class="fa fa-clock-o {{#is_overdue instance.end_date instance.status}}red{{else}}color{{/is_overdue}}"></i> Due On:
+              <span {{#is_overdue instance.end_date instance.status}}class="error"{{/is_overdue}}>
+                {{localize_date_today instance.end_date}}
+              </span>
+            </div>
+          </section>
+        {{/if}}
+        {{#if drawStatuses}}
+          <h3 class="task-list-title">Current Tasks</h3>
+          {{#with_mapping 'object_tasks' instance}}
+          {{#object_tasks}}
+            <div class="task-item">
+              <i class="fa fa-cycle_task_group_object_task"></i>
+              <div class="task-title">
+                {{instance.title}}
+              </div>
+              {{#switch instance.status}}
+                {{#case 'Verified'}}
+                  {{#is_overdue instance.end_date}}
+                    <span class="error"><em>Overdue</em></span>
+                  {{/is_overdue}}
+                  <span class="green"><em>Verified</em></span>
+                {{/case}}
+                {{#case 'Assigned'}}
+                  <span class="gray"><em>Assigned</em></span>
+                {{/case}}
+                {{#case 'Finished'}}
+                  <span class="blue"><em>Finished</em></span>
+                {{/case}}
+                {{#case 'InProgress'}}
+                  <span class="orange"><em>In progress</em></span>
+                {{/case}}
+              {{/switch}}
+            </div>
+          {{/object_tasks}}
+          {{/with_mapping}}
+          <a class="btn btn-small btn-draft" href="{{instance.viewLink}}#task_widget">
+            Open tasks
+          </a>
+        {{/if}}
+      </div>
+      </div>
+    </div>
+  </div>
+{{/if}}

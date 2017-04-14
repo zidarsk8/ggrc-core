@@ -144,6 +144,7 @@ dashboard-js-files:
   - apps/business_objects.js
   - apps/custom_attributes.js
   # Components
+  - components/view-models/tree-item-base-vm.js
   - components/state-colors-map/state-colors-map.js
   - components/spinner/spinner.js
   - components/modal-connector.js
@@ -235,6 +236,18 @@ dashboard-js-files:
   - components/tree/tree-header-selector.js
   - components/tree/tree-type-selector.js
   - components/tree/sub-tree-expander.js
+  - components/tree/sub-tree-wrapper.js
+  - components/tree/sub-tree-item.js
+  - components/tree/sub-tree-models.js
+  - components/tree/tree-item-extra-info.js
+  - components/tree/tree-item-actions.js
+  - components/tree/tree-item-map.js
+  - components/tree/tree-widget-container.js
+  - components/tree/tree-view.js
+  - components/tree/tree-item.js
+  - components/tree/tree-header.js
+  - components/tree/tree-filter-input.js
+  - components/tree/tree-status-filter.js
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
   - components/effective-dates/effective-dates.js
@@ -246,7 +259,6 @@ dashboard-js-files:
   - components/object-selection/object-selection.js
   - components/object-selection/object-selection-item.js
   - components/last-assessment-date/last-assessment-date.js
-  - components/tree/tree-node-actions.js
   - components/tree/tree-no-results.js
   - components/tree/tree-assignee-field.js
   - components/page-header/page-header.js
@@ -379,10 +391,8 @@ dashboard-js-template-files:
   - controls/list_popover.mustache
   - controls/modal_content.mustache
   - controls/object_list.mustache
-  - controls/tree.mustache
   - controls/tree-item-attr.mustache
   - assessments/modal_content.mustache
-  - assessments/tree_header.mustache
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
   - assessments/related-assessments.mustache
@@ -428,8 +438,18 @@ dashboard-js-template-files:
   - components/datepicker/datepicker.mustache
   - components/object_counter/object_counter.mustache
   - components/tree_pagination/tree_pagination.mustache
-  - components/tree/tree-node-actions.mustache
   - components/tree/tree-no-results.mustache
+  - components/tree/sub-tree-wrapper.mustache
+  - components/tree/sub-tree-item.mustache
+  - components/tree/sub-tree-models.mustache
+  - components/tree/tree-item-extra-info.mustache
+  - components/tree/tree-item-actions.mustache
+  - components/tree/tree-item-map.mustache
+  - components/tree/tree-widget-container.mustache
+  - components/tree/tree-view.mustache
+  - components/tree/tree-item.mustache
+  - components/tree/tree-header.mustache
+  - components/tree/tree-filter-input.mustache
   - components/simple-modal/simple-modal.mustache
   - components/page-header/page-header.mustache
   - custom_attributes/modal_content.mustache
@@ -457,7 +477,6 @@ dashboard-js-template-files:
   - dashboard/object_widget.mustache
   - dashboard/recently_viewed_list.mustache
   - directives/autocomplete_result.mustache
-  - directives/tree.mustache
   - directives/tree-item-attr.mustache
   - events/object_list.mustache
   - facilities/modal_content.mustache
@@ -482,7 +501,6 @@ dashboard-js-template-files:
   - objectives/info.mustache
   - objectives/list_popover.mustache
   - objectives/modal_content.mustache
-  - objectives/tree.mustache
   - objectives/tree-item-attr.mustache
   - org_groups/modal_content.mustache
   - vendors/modal_content.mustache
@@ -514,13 +532,11 @@ dashboard-js-template-files:
   - programs/extended_info.mustache
   - programs/info.mustache
   - programs/modal_content.mustache
-  - programs/tree.mustache
   - programs/tree-item-attr.mustache
   - projects/modal_content.mustache
   - regulations/modal_content.mustache
   - roles/object_list.mustache
   - sections/modal_content.mustache
-  - sections/tree.mustache
   - sections/tree-item-attr.mustache
   - sections/dropdown_menu.mustache
   - selectors/active_column.mustache
@@ -533,12 +549,10 @@ dashboard-js-template-files:
   - base_objects/tree_footer.mustache
   - base_objects/tree_add_item.mustache
   - audits/modal_content.mustache
-  - audits/tree.mustache
   - audits/tree-item-attr.mustache
   - audits/info.mustache
   - audits/summary.mustache
   - audits/tree_add_item.mustache
-  - audits/tree_header.mustache
   - audits/search_result.mustache
   - audits/extended_info.mustache
   - audits/object_cloner.mustache

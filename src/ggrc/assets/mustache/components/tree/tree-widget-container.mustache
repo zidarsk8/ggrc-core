@@ -1,0 +1,95 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="flex-box flex-col {{cssClasses}}">
+  <div class="flex-box flex-col header tree-header-content">
+    <div class="flex-box tree-filter">
+      <tree-filter-input class="flex-size-1"
+                         {register-filter}="@registerFilter"
+                         (filter)="onFilter"
+      ></tree-filter-input>
+      {{#if statusFilterVisible}}
+        <tree-status-filter {model-name}="modelName"
+                            {register-filter}="@registerFilter"
+                            (filter)="onFilter"
+        >
+          <multiselect-dropdown
+            {options}="filterStates"
+            placeholder="Filter by State"
+            plural="States">
+          </multiselect-dropdown>
+        </tree-status-filter>
+      {{/if}}
+      <tree-pagination {(paging)}="pageInfo"></tree-pagination>
+    </div>
+
+    <div class="tree-action" style="display: flex; justify-content: flex-end;">
+      {{#if addItem}}
+        {{{renderLive addItem}}}
+      {{/if}}
+      {{!#if show3bbs}}
+      <div class="details-wrap">
+        <a class="btn btn-draft dropdown-toggle" href="#" data-toggle="dropdown">
+          <span class="bubble"></span>
+          <span class="bubble"></span>
+          <span class="bubble"></span>
+        </a>
+        <ul class="dropdown-menu tree-action-list-items" role="menu">
+          {{^if hideImportExport}}
+            {{^if_instance_of parent_instance 'Assessment'}}
+              {{#is_allowed 'update' model.shortName context=parent_instance.context}}
+                <li>
+                  <a href="/import"
+                     target="_blank"
+                     class="section-import">
+                    <i class="fa fa-fw fa-cloud-upload"></i>
+                    Import {{model.model_plural}}
+                  </a>
+                </li>
+              {{/is_allowed}}
+              {{#if showedItems.length}}
+                <li>
+                  <a href="/export?model_type={{model.model_singular}}&relevant_type={{parent_instance.type}}&relevant_id={{parent_instance.id}}"
+                     target="_blank"
+                     class="section-import">
+                    <i class="fa fa-fw fa-download"></i>
+                    Export {{model.model_plural}}
+                  </a>
+                </li>
+              {{/if}}
+            {{/if_instance_of}}
+          {{/if}}
+          {{#if showGenerateAssessments}}
+            <assessment-generator-button audit="parent_instance"></assessment-generator-button>
+          {{/if}}
+        </ul>
+      </div>
+      {{!/if}}
+    </div>
+
+    <tree-header {selected-columns}="columns.selected"
+                 {available-columns}="columns.available"
+                 {mandatory}="columns.mandatory"
+                 {sorting-info}="sortingInfo"
+                 {model}="model"
+                 (sort)="onSort(%event)"
+                 (update-columns)="onUpdateColumns(%event)"
+    ></tree-header>
+  </div>
+
+  <tree-view {items}="showedItems"
+             {limit-depth-tree}="limitDepthTree"
+             {selected-columns}="columns.selected"
+             {mandatory}="columns.mandatory"
+             {loading}="loading"
+             {parent-instance}="parent_instance"
+             {model}="model"
+             {get-depth-filter}="@getDepthFilter"
+  ></tree-view>
+
+  <div class="tree-footer flex-box">
+    <tree-pagination {(paging)}="pageInfo"></tree-pagination>
+  </div>
+</div>

@@ -1,0 +1,93 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+sub-tree-wrapper {
+  display: flex;
+  flex-direction: column;
+
+  .sub-tree-link {
+    margin-left: 48px;
+    line-height: 30px;
+    border-bottom: 1px solid $itemBorder;
+  }
+
+  .loading {
+    min-height: 30px;
+    position: relative;
+    opacity: .5;
+
+    .tree-spinner {
+      display: flex;
+    }
+  }
+}
+
+
+sub-tree-item {
+  display: flex;
+  flex-direction: column;
+
+  .title {
+    width: 30%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 30px;
+
+    i.fa {
+      font-size: 13px;
+    }
+  }
+
+  >.sub-item-content {
+    &:hover {
+      background-color: $light-grey-background;
+
+      tree-item-extra-info {
+        i {
+          visibility: visible;
+        }
+      }
+
+      tree-item-actions {
+        visibility: visible;
+      }
+    }
+
+    &.not-directly-related {
+      .title {
+        color: rgba(153, 153, 153, .7);
+      }
+
+      &:hover {
+        .title {
+          color: rgba(153, 153, 153, 1);
+        }
+      }
+    }
+    &.directly-related {
+      .title {
+        color: rgba(0, 0, 0, .7);
+      }
+
+
+      &:hover {
+        .title {
+          color: rgba(0, 0, 0, 1);
+        }
+      }
+    }
+  }
+
+  .sub-item-content {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    border-bottom: 1px solid $itemBorder;
+
+    &.snapshot {
+      background-color: $snapshotBgnd;
+    }
+  }
+}

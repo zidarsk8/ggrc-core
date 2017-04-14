@@ -15,6 +15,7 @@
     viewModel: {
       define: {
         text: {
+          value: 'No results, please check your filter criteria',
           set: function (value) {
             return value || 'No results...';
           }

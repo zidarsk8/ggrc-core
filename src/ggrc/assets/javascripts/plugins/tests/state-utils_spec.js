@@ -16,11 +16,11 @@ describe('GGRC.Utils.State', function () {
         var statesFilter = GGRC.Utils.State
           .statusFilter(statuses, '');
 
-        expect(statesFilter.indexOf('Status="Active"') > -1)
+        expect(statesFilter.indexOf('"Status"="Active"') > -1)
           .toBe(true);
-        expect(statesFilter.indexOf('Status="Draft"') > -1)
+        expect(statesFilter.indexOf('"Status"="Draft"') > -1)
           .toBe(true);
-        expect(statesFilter.indexOf('Status="Deprecated"') > -1)
+        expect(statesFilter.indexOf('"Status"="Deprecated"') > -1)
           .toBe(true);
       }
     );
@@ -34,13 +34,13 @@ describe('GGRC.Utils.State', function () {
         var statesFilter = GGRC.Utils.State
           .statusFilter(statuses, '', 'Assessment');
 
-        expect(statesFilter.indexOf('Status="Not Started"') > -1)
+        expect(statesFilter.indexOf('"Status"="Not Started"') > -1)
           .toBe(true);
-        expect(statesFilter.indexOf('Status="In Progress"') > -1)
+        expect(statesFilter.indexOf('"Status"="In Progress"') > -1)
           .toBe(true);
-        expect(statesFilter.indexOf('Status="Ready for Review"') > -1)
+        expect(statesFilter.indexOf('"Status"="Ready for Review"') > -1)
           .toBe(true);
-        expect(statesFilter.indexOf('Status="verified="') > -1)
+        expect(statesFilter.indexOf('"Status"="verified="') > -1)
           .toBe(false);
       }
     );
@@ -54,11 +54,11 @@ describe('GGRC.Utils.State', function () {
         var statesFilter = GGRC.Utils.State
           .statusFilter(statuses, '', 'Assessment');
 
-        expect(statesFilter.indexOf('Status="Ready for Review"') > -1)
+        expect(statesFilter.indexOf('"Status"="Ready for Review"') > -1)
           .toBe(true);
-        expect(statesFilter.indexOf('Status="Completed"') > -1)
+        expect(statesFilter.indexOf('"Status"="Completed"') > -1)
           .toBe(true);
-        expect(statesFilter.indexOf('Status="Completed and Verified"') > -1)
+        expect(statesFilter.indexOf('"Status"="Completed and Verified"') > -1)
           .toBe(false);
 
         expect(statesFilter.indexOf('verified=true') > -1)
@@ -75,12 +75,12 @@ describe('GGRC.Utils.State', function () {
         var statesFilter = GGRC.Utils.State
           .statusFilter(statuses, '', 'Assessment');
 
-        expect(statesFilter.indexOf('Status="Ready for Review"') > -1)
+        expect(statesFilter.indexOf('"Status"="Ready for Review"') > -1)
           .toBe(true);
-        expect(statesFilter.indexOf('Status="Completed"') > -1)
+        expect(statesFilter.indexOf('"Status"="Completed"') > -1)
           .toBe(true);
         expect(statesFilter
-          .indexOf('Status="Completed (no verification)"') > -1)
+          .indexOf('"Status"="Completed (no verification)"') > -1)
           .toBe(false);
 
         expect(statesFilter.indexOf('verified=false') > -1)
@@ -98,16 +98,16 @@ describe('GGRC.Utils.State', function () {
         var statesFilter = GGRC.Utils.State
           .statusFilter(statuses, '', 'Assessment');
 
-        expect(statesFilter.indexOf('Status="In Progress"') > -1)
+        expect(statesFilter.indexOf('"Status"="In Progress"') > -1)
           .toBe(true);
-        expect(statesFilter.indexOf('Status="Completed"') > -1)
+        expect(statesFilter.indexOf('"Status"="Completed"') > -1)
           .toBe(true);
 
         expect(statesFilter
-          .indexOf('Status="Completed (no verification)"') > -1)
+          .indexOf('"Status"="Completed (no verification)"') > -1)
           .toBe(false);
         expect(statesFilter
-          .indexOf('Status="Completed and Verified"') > -1)
+          .indexOf('"Status"="Completed and Verified"') > -1)
           .toBe(false);
 
         expect(statesFilter.indexOf('verified=') > -1)
