@@ -67,17 +67,18 @@
       },
       formState: {},
       triggerFormSaveCbs: $.Callbacks(),
-      getQuery: function (type) {
+      getQuery: function (type, sortObj) {
         var relevantFilters = [{
           type: this.attr('instance.type'),
           id: this.attr('instance.id'),
           operation: 'relevant'
         }];
         return GGRC.Utils.QueryAPI
-          .buildParam(type, {}, relevantFilters, [], []);
+          .buildParam(type, sortObj || {}, relevantFilters, [], []);
       },
       getCommentQuery: function () {
-        return this.getQuery('Comment');
+        return this.getQuery('Comment',
+          {sortBy: 'created_at', sortDirection: 'desc'});
       },
       getSnapshotQuery: function () {
         return this.getQuery('Snapshot');
