@@ -483,15 +483,26 @@ class ModalCustomAttribute(object):
 
 class ModalSetVisibleFields(object):
   """Locators for Set visible fields modals."""
-  OPEN_MENU = ".open .dropdown-menu-form"
-  LEFT_SET_FIELDS = Common.TREE_HEADER + " .visible-columns-list"
-  MODAL = "{} " + OPEN_MENU
+  MODAL = ".open .visible-columns-list"
   # labels
   MODAL_TITLE = MODAL + " h5"
-  FIELDS_TITLES = "{} " + LEFT_SET_FIELDS + " .checkbox-inline"
+  ATTR_LIST = " .attr-list"
+  FIELDS_TITLES = MODAL + ATTR_LIST + " .checkbox-inline"
   # user input elements
-  FIELDS_CHECKBOXES = "{} " + LEFT_SET_FIELDS + " .attr-checkbox"
-  BUTTON_SET_FIELDS = "{} " + LEFT_SET_FIELDS + " .set-tree-attrs"
+  FIELDS_CHECKBOXES = MODAL + ATTR_LIST + " .attr-checkbox"
+  BUTTON_SET_FIELDS = MODAL + " .set-tree-attrs"
+
+
+class ModalSetVisibleFieldsMapper(ModalSetVisibleFields):
+  """Locators for Set visible fields modals."""
+  MODAL = ".modal-body"
+  # labels
+  MODAL_TITLE = MODAL + " h5"
+  ATTR_LIST = ModalSetVisibleFields.ATTR_LIST
+  FIELDS_TITLES = MODAL + ATTR_LIST + " .checkbox-inline"
+  # user input elements
+  FIELDS_CHECKBOXES = MODAL + ATTR_LIST + " .attr-checkbox"
+  BUTTON_SET_FIELDS = MODAL + " .set-tree-attrs"
 
 
 class WidgetBar(object):
@@ -876,8 +887,8 @@ class AssessmentsDropdown3bbsTreeView(CommonDropdown3bbsTreeView):
 class TreeView(object):
   """Locators for Tree View components."""
   # common
-  ITEMS = "{} .tree-item-element"
-  HEADER = "{} " + Common.TREE_HEADER
+  ITEMS = ".tree-item-element"
+  HEADER = Common.TREE_HEADER
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
   ITEM_EXPAND_BUTTON = "tree-item-actions"
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
@@ -893,8 +904,8 @@ class TreeView(object):
 class AdminTreeView(object):
   """Locators for Tree View components in Admin dashboard."""
   # common
-  ITEMS = "{} li.tree-item .item-main"
-  HEADER = "{} " + Common.TREE_HEADER
+  ITEMS = "li.tree-item .item-main"
+  HEADER = Common.TREE_HEADER
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
   ITEM_EXPAND_BUTTON = " .openclose"
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
@@ -904,6 +915,14 @@ class AdminTreeView(object):
   BUTTON_3BBS = "{} " + Common.TREE_LIST + " .btn-draft"
   BUTTON_CREATE = "{} " + Common.TREE_LIST + " .create-button"
   BUTTON_MAP = "{} " + Common.TREE_LIST + " .map-button"
+
+
+class UnifiedMapperTreeView(TreeView):
+  MODAL = ".ggrc_controllers_mapper_modal"
+  HEADER = MODAL + " .list-header"
+  ITEMS = MODAL + " .object-list-item"
+  BUTTON_SHOW_FIELDS = HEADER + " .fa-bars"
+  NO_RESULTS_MESSAGE = ".well-small:not(.hidden)"
 
 
 class BaseWidgetGeneric(object):

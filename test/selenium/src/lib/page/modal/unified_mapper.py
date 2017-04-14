@@ -11,7 +11,7 @@ class CommonUnifiedMapperModal(base.Modal):
   """Common unified mapper modal."""
   _locators = locator.ModalMapObjects
 
-  def __init__(self, driver):
+  def __init__(self, driver, obj_name):
     super(CommonUnifiedMapperModal, self).__init__(driver)
     # labels
     self.title_modal = base.Label(driver, self._locators.MODAL_TITLE)
@@ -24,6 +24,7 @@ class CommonUnifiedMapperModal(base.Modal):
     self.filter_by_state_text_box = base.DropdownStatic(
         driver, self._locators.FILTER_BY_STATE_DROPDOWN,
         self._locators.FILTER_BY_STATE_DROPDOWN_OPTIONS)
+    self.tree_view = base.UnifiedMapperTreeView(driver, obj_name=obj_name)
 
   def _select_dest_obj_type(self, obj_name, is_asmts_generation=False):
     """Open dropdown and select element according to destination object name.
@@ -61,6 +62,17 @@ class CommonUnifiedMapperModal(base.Modal):
         self._locators.FOUND_OBJECTS_CHECKBOXES)
     dest_objs.select_by_titles(objs_titles)
 
+  def get_mapping_statuses(self):
+    """Get mapping status from checkboxes on Unified Mapper
+       (selected and disabled or not).
+    """
+    dest_objs = base.ListCheckboxes(
+        self._driver, self._locators.FOUND_OBJECTS_TITLES,
+        self._locators.FOUND_OBJECTS_CHECKBOXES)
+    return (
+        dest_objs.get_mapping_statuses() if
+        self.tree_view.get_tree_view_items_elements() else [])
+
   def _confirm_map_selected(self):
     """Select Map Selected button to confirm map selected objects to
     source object.
@@ -81,6 +93,7 @@ class CommonUnifiedMapperModal(base.Modal):
     self._filter_dest_objs_via_expression_by_titles(
         objs_titles=dest_objs_titles)
     self._select_search_dest_objs()
+    return self.tree_view.get_list_members_as_list_scopes()
 
   def map_dest_objs(self, dest_objs_type, dest_objs_titles,
                     is_asmts_generation=False):
@@ -98,16 +111,16 @@ class MapObjectsModal(CommonUnifiedMapperModal):
   """Modal for map objects."""
   _locators = locator.ModalMapObjects
 
-  def __init__(self, driver):
-    super(MapObjectsModal, self).__init__(driver)
-    # user input elements
-    self.button_create_obj = base.Button(
-        driver, self._locators.BUTTON_CREATE_OBJ)
+  def __init__(self, driver, obj_name):
+    super(MapObjectsModal, self).__init__(driver, obj_name)
 
 
 class SearchObjectsModal(CommonUnifiedMapperModal):
   """Modal for search objects."""
   _locators = locator.ModalMapObjects
+
+  def __init__(self, driver, obj_name):
+    super(SearchObjectsModal, self).__init__(driver, obj_name)
 
 
 class GenerateAssessmentsModal(CommonUnifiedMapperModal):
