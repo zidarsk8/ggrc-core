@@ -112,18 +112,18 @@
               {{#switch instance.status}}
                 {{#case 'Verified'}}
                   {{#is_overdue instance.end_date}}
-                    <span class="error"><em>Overdue</em></span>
+                    <span class="error">Overdue</span>
                   {{/is_overdue}}
-                  <span class="green"><em>Verified</em></span>
+                  <span class="green">Verified</span>
                 {{/case}}
                 {{#case 'Assigned'}}
-                  <span class="gray"><em>Assigned</em></span>
+                  <span class="gray">Assigned</span>
                 {{/case}}
                 {{#case 'Finished'}}
-                  <span class="blue"><em>Finished</em></span>
+                  <span class="blue">Finished</span>
                 {{/case}}
                 {{#case 'InProgress'}}
-                  <span class="orange"><em>In progress</em></span>
+                  <span class="orange">In progress</span>
                 {{/case}}
               {{/switch}}
             </div>
