@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, $, Quill) {
+(function (can, GGRC, Quill) {
   'use strict';
 
   var URL_CLIPBOARD_REGEX = /https?:\/\/[^\s]+/g;
@@ -15,11 +15,30 @@
       GGRC.mustache_path +
       '/components/rich_text/rich_text.mustache'
     ),
-    scope: {
-      text: null,
-      editor: null,
-      placeholder: null,
-      disabled: null,
+    viewModel: {
+      define: {
+        placeholder: {
+          type: 'string',
+          value: ''
+        },
+        disabled: {
+          type: 'boolean',
+          set: function (newValue) {
+            this.toggle(!newValue);
+            return newValue;
+          }
+        },
+        text: {
+          type: 'string',
+          value: '',
+          set: function (text) {
+            text = text || '';
+            this.setText(text);
+            return text;
+          }
+        }
+      },
+      editor: false,
       initEditor: function (container, toolbarContainer, text) {
         var editor = new Quill(container, {
           theme: 'snow',
@@ -40,7 +59,7 @@
           editor.clipboard.dangerouslyPasteHTML(0, text);
         }
         editor.on('text-change', this.onChange.bind(this));
-        this.setEditor(editor);
+        this.attr('editor', editor);
       },
       urlMatcher: function (node, delta) {
         var matches;
@@ -80,7 +99,7 @@
         var editor;
         if (!this.getTextLength()) {
           // Should null text value if this is no content
-          return this.attr('text', null);
+          return this.attr('text', '');
         }
 
         if (delta.ops.length === 2 &&
@@ -119,12 +138,10 @@
         return this.attr('text', this.getContent());
       },
       toggle: function (isDisabled) {
-        var editor = this.getEditor().editor;
-        var action = isDisabled ? 'disable' : 'enable';
-        editor[action]();
-      },
-      setEditor: function (editor) {
-        this.attr('editor', editor);
+        var editor = this.getEditor();
+        if (editor) {
+          editor.enable(isDisabled);
+        }
       },
       getEditor: function () {
         return this.attr('editor');
@@ -139,6 +156,12 @@
       getText: function () {
         return this.getEditor().getText();
       },
+      setText: function (text) {
+        var editor = this.getEditor();
+        if (editor && !text.length) {
+          editor.setText('');
+        }
+      },
       /**
        * Returns the whole content of the Rich Text field with HTML content
        * @return {String} - current HTML String
@@ -149,20 +172,11 @@
     },
     events: {
       inserted: function () {
-        var wysiwyg = this.element.find('.rich-text__content');
-        var toolbar = this.element.find('.rich-text__toolbar');
-        this.scope.initEditor(wysiwyg[0], toolbar[0], this.scope.attr('text'));
-      },
-      toogle: function (scope, ev, isDisabled) {
-        scope.toggle(isDisabled);
-      },
-      '{scope} disabled': 'toggle',
-      // if text had been changed to nothing then clear
-      '{scope} text': function (scope, ev, text) {
-        if (!text) {
-          scope.getEditor().clipboard.dangerouslyPasteHTML(0, '');
-        }
+        var wysiwyg = this.element.find('.rich-text__content')[0];
+        var toolbar = this.element.find('.rich-text__toolbar')[0];
+        var text = this.viewModel.attr('text');
+        this.viewModel.initEditor(wysiwyg, toolbar, text);
       }
     }
   });
-})(window.can, window.can.$, window.Quill);
+})(window.can, window.GGRC, window.Quill);
