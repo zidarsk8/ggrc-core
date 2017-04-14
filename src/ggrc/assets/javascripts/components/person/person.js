@@ -57,7 +57,8 @@
 
       if (noPerson ||
         (person && !person.email)) {
-        personModel = CMS.Models.Person.cache[personId || person.id];
+        personModel = CMS.Models.Person
+          .findInCacheById(personId || person.id);
         if (personModel) {
           personModel = personModel.reify();
         }

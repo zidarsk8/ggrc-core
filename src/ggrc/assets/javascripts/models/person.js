@@ -66,12 +66,15 @@
         return ((val && val.trim) ? val.trim() : val).toLowerCase();
       }
     },
+    findInCacheById: function (id) {
+      return this.store[id] || this.cache ? this.cache[id] : null;
+    },
     findInCacheByEmail: function (email) {
       var result = null;
-      var that = this;
-      can.each(Object.keys(this.cache || {}), function (k) {
-        if (that.cache[k].email === email) {
-          result = that.cache[k];
+      var cache = this.store || this.cache || {};
+      can.each(Object.keys(cache), function (k) {
+        if (cache[k].email === email) {
+          result = cache[k];
           return false;
         }
       });
