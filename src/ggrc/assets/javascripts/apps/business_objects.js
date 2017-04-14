@@ -610,6 +610,17 @@
             draw_children: true
           }
         },
+        AssessmentTemplate: {
+          Audit: {
+            mapping: 'related_audits',
+            child_options: relatedObjectsChildOptions,
+            draw_children: true,
+            allow_creating: false,
+            allow_mapping: true,
+            show_view: path + '/audits/tree.mustache',
+            add_item_view: path + '/audits/tree_add_item.mustache'
+          }
+        },
         Risk: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Threat: {
