@@ -8,18 +8,11 @@
     {{{render_hooks "Request.gdrive_evidence_storage"}}}
   {{/is_allowed}}
 {{/if_mapping_ready}}
-{{^if_null instance._mandatory_attachment_msg}}
-  <div class="alert alert-info alert-dismissible" role="alert">
-    {{instance._mandatory_attachment_msg}}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
-  </div>
-{{/if_null}}
-
 {{#if_mapping_ready instance.class.info_pane_options.evidence.mapping instance}}
   <mapping-tree-view
-    parent-instance="instance"
-    mapping="instance.class.info_pane_options.evidence.mapping"
-    item-template="instance.class.info_pane_options.evidence.show_view"
+    {parent-instance}="instance"
+    mapping="all_documents"
+    {item-template}="instance.class.info_pane_options.evidence.show_view"
     empty-text="None"
   >
   </mapping-tree-view>

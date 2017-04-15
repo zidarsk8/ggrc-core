@@ -14,7 +14,6 @@
     save: false,
     controls: true
   });
-  var defaultPlaceHolderText = 'Enter comment (optional)';
   var types = {
     related_creators: 'creator',
     related_verifiers: 'verifier',
@@ -52,10 +51,9 @@
   GGRC.Components('assessmentAddComment', {
     tag: tag,
     template: template,
-    scope: {
+    viewModel: {
       caIds: null,
       instance: null,
-      commentPlaceHolder: '@',
       isSaving: false,
       isEmpty: true,
       clean: false,
@@ -93,25 +91,26 @@
         var comment = new CMS.Models.Comment();
         comment._source_mapping = this.attr('instance');
         comment.attr('context', this.attr('instance.context'));
+        comment.mark_for_addition('related_objects_as_destination',
+          this.attr('instance'));
         return comment;
       },
       saveComment: function () {
-        var comment = null;
+        var comment;
 
         this.attr('isSaving', true);
         this.attr('clean', false);
 
         comment = this.createComment();
 
-        comment.attr(this.getCommentData()).save()
-          .then(function () {
-            return comment.constructor
-              .resolve_deferred_bindings(comment);
-          }).always(function () {
+        comment.attr(this.getCommentData())
+          .save()
+          .always(function () {
             this.attr('clean', true);
             this.attr('isSaving', false);
             this.attr('state.open', false);
             this.attr('state.save', false);
+            this.attr('instance').dispatch('refreshInstance');
           }.bind(this));
       }
     },
@@ -120,10 +119,8 @@
         var scope = this.scope;
         scope.attr('instance', scope.attr('instance') || GGRC.page_instance());
         scope.attr('state', scope.attr('state') || defaultState);
-        scope.attr('commentPlaceHolder',
-          scope.attr('commentPlaceHolder') || defaultPlaceHolderText);
       },
-      '{scope.state} save': function (scope, ev, val) {
+      '{viewModel.state} save': function (scope, ev, val) {
         if (val) {
           this.scope.saveComment();
         }

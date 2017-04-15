@@ -7,28 +7,33 @@
         <h6 class="attachment-modal__field-title">{{content.title}}</h6>
         <div class="attachment-modal__field-value">
           {{#if isPerson}}
-              <person-info person-obj="content.value"></person-info>
+              <person-info {person-obj}="content.value"></person-info>
           {{else}}
-              <read-more text="content.value"></read-more>
+              <read-more {text}="content.value"></read-more>
           {{/if}}
         </div>
     </div>
     <div class="attachment-modal__controls">
       {{#if comment}}
-          <assessment-add-comment instance="instance" is-empty="isEmpty" state="state" ca-ids="caIds"
+          <assessment-add-comment {instance}="instance" {(is-empty)}="isEmpty" {(state)}="state" {ca-ids}="caIds"
                                   comment-place-holder="Enter comment"></assessment-add-comment>
       {{/if}}
       {{#if evidence}}
-          <assessment-attachments-list class="attachment-list" source_mapping="instance"
-                                       parent_instance="instance"></assessment-attachments-list>
+        <assessment-attachments-list
+              rel="tooltip"
+              class="assesment-attachment-list attachments-list-control"
+              title="Evidence"
+              tooltip="You can upload up to 10 files in a single batch"
+              {parent-instance}="instance">
+        </assessment-attachments-list>
       {{/if}}
     </div>
 </form>
 <div class="simple-modal__footer">
     <div class="flex-box flex-row-reverse">
       {{#if comment}}
-        <button class="btn btn-small btn-success" {{#if isEmpty}}disabled{{/if}} can-click="saveAttachments">Save</button>
+          <button class="btn btn-small btn-success" {{#if isEmpty}}disabled{{/if}} ($click)="saveAttachments">Save</button>
       {{/if}}
-        <button class="btn btn-link btn-small" can-click="hide">Close</button>
+        <button class="btn btn-link btn-small" ($click)="hide">Close</button>
     </div>
 </div>

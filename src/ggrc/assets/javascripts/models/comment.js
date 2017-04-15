@@ -17,27 +17,10 @@
     destroy: 'DELETE /api/comments/{id}',
     create: 'POST /api/comments',
     mixins: [],
-    attributes: {
-      context: 'CMS.Models.Context.stub',
-      modified_by: 'CMS.Models.Person.stub'
-    },
     init: function () {
+      this.validatePresenceOf('description');
       if (this._super) {
         this._super.apply(this, arguments);
-      }
-      this.validatePresenceOf('description');
-    },
-    info_pane_options: {
-      documents: {
-        model: CMS.Models.Document,
-        mapping: 'documents_and_urls',
-        show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
-        sort_function: GGRC.Utils.sortingHelpers.commentSort
-      },
-      urls: {
-        model: CMS.Models.Document,
-        mapping: 'urls',
-        show_view: GGRC.mustache_path + '/base_templates/urls.mustache'
       }
     }
   }, {

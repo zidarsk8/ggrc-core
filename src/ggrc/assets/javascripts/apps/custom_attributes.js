@@ -47,7 +47,7 @@
                 helptext: cad.helptext,
                 multi_choice_options: cad.multi_choice_options
               },
-              type: GGRC.Utils.mapCAType(type)
+              type: GGRC.Utils.CustomAttributes.getCustomAttributeType(type)
             });
           }.bind(this));
         return result;

@@ -90,18 +90,9 @@
      * @return {Object} Object of QueryAPIRequest
      */
     function buildRelevantIdsQuery(objName, page, relevant, additionalFilter) {
-      var params = {};
-
-      if (!objName) {
-        return {};
-      }
-
-      params.object_name = objName;
-      params.filters =
-        _makeFilter(page.filter, relevant, additionalFilter);
-      params.type = 'ids';
-
-      return params;
+      var param = buildParam(objName, page, relevant, null, additionalFilter);
+      param.type = 'ids';
+      return param;
     }
 
     /**

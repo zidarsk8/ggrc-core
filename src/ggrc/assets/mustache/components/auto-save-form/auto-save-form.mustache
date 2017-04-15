@@ -1,0 +1,38 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="fields-wrapper flex-box flex-row">
+  {{#each fields}}
+    <div class="field-wrapper flex-size-1">
+        <ca-object-validation-icon {validation}="validation"></ca-object-validation-icon>
+      <div class="field-title">
+        <label class="field-title__text" for="form-field-{{id}}">{{title}}</label>
+        {{#if helptext}}
+          <i class="fa fa-question-circle helper-text" rel="tooltip" title="{{helptext}}"></i>
+        {{/if}}
+      </div>
+      {{#if editMode}}
+        <auto-save-form-field
+          {type}="type"
+          {value}="value"
+          {field-id}="id"
+          {placeholder}="placeholder"
+          {options}="options"
+          (value-changed)="fieldValueChanged(%event)"
+        ></auto-save-form-field>
+      {{else}}
+        <auto-save-form-field-view
+          {type}="type"
+          {value}="value"
+        ></auto-save-form-field-view>
+      {{/if}}
+      {{#unless validation.valid}}
+        <div class="form-field__validation-hint-placeholder">
+            <button class="btn btn-link btn-link-nopadding" ($click)="showRequiredInfoModal(%context)">Add required info</button>
+        </div>
+      {{/unless}}
+    </div>
+  {{/each}}
+</div>
