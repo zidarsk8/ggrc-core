@@ -145,6 +145,7 @@ class AttributeInfo(object):
   CUSTOM_ATTR_PREFIX = "__custom__:"
   OBJECT_CUSTOM_ATTR_PREFIX = "__object_custom__:"
   SNAPSHOT_MAPPING_PREFIX = "__snapshot_mapping__:"
+  ALIASES_PREFIX = "__acl__"
 
   class Type(object):
     """Types of model attributes."""
@@ -152,6 +153,7 @@ class AttributeInfo(object):
     # pylint: disable=too-few-public-methods
     PROPERTY = "property"
     MAPPING = "mapping"
+    AC_ROLE = "mapping"
     SPECIAL_MAPPING = "special_mapping"
     CUSTOM = "custom"  # normal custom attribute
     OBJECT_CUSTOM = "object_custom"  # object level custom attribute
@@ -247,6 +249,27 @@ class AttributeInfo(object):
   @classmethod
   def gather_update_raw(cls, tgt_class):
     return cls.gather_attrs(tgt_class, ['_update_raw'])
+
+  @classmethod
+  def get_acl_definitions(cls, object_class):
+    from ggrc.access_control.role import AccessControlRole
+    from ggrc import db
+    role_names = db.session.query(
+        AccessControlRole.name
+    ).filter(
+        AccessControlRole.object_type == object_class.__name__
+    )
+    return {
+        "{}:{}".format(cls.ALIASES_PREFIX, name): {
+            "display_name": name,
+            "attr_name": name,
+            "mandatory": False,
+            "unique": False,
+            "description": "List of people with '{}' role".format(name),
+            "type": cls.Type.AC_ROLE,
+        }
+        for (name,) in role_names
+    }
 
   @classmethod
   def _generate_mapping_definition(cls, rules, prefix, display_name_tmpl):
@@ -411,6 +434,8 @@ class AttributeInfo(object):
       if isinstance(value, dict):
         definition.update(value)
       definitions[key] = definition
+
+    definitions.update(cls.get_acl_definitions(object_class))
 
     if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
       definitions.update(
