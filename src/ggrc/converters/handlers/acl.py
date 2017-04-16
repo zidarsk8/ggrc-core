@@ -35,6 +35,8 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
       self.row_converter.obj.access_control_list.remove(acl)
 
   def set_obj_attr(self):
+    if not self.value:
+      return
     list_old = {i.person for i in self.row_converter.obj.access_control_list}
     list_new = set(self.value)
 

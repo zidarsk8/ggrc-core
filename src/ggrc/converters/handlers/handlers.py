@@ -246,22 +246,22 @@ class UsersColumnHandler(UserColumnHandler):
   """Handler for multi user fields."""
 
   def parse_item(self):
-    owners = set()
+    people = set()
     email_lines = self.raw_value.splitlines()
     owner_emails = filter(unicode.strip, email_lines)  # noqa
     for raw_line in owner_emails:
       email = raw_line.strip().lower()
       person = self.get_person(email)
       if person:
-        owners.add(person)
+        people.add(person)
       else:
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
-    if not owners:
+    if not people and self.mandatory:
       self.add_warning(errors.OWNER_MISSING, column_name=self.display_name)
-      owners.add(get_current_user())
+      people.add(get_current_user())
 
-    return list(owners)
+    return list(people)
 
 
 class OwnerColumnHandler(UsersColumnHandler):
