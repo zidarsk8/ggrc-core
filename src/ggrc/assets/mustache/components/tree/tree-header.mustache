@@ -3,7 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<header class="header tree-header flex-box">
+<header class="header tree-header flex-box {{cssClasses}}">
+  {{^if disableConfiguration}}
   <tree-header-selector class="tree-header-selector">
     <a href="#" class="dropdown-toggle tview-dropdown-toggle visible-columns-icon"
        data-toggle="dropdown">
@@ -41,6 +42,7 @@
           </span>
       </div>
     </div>
+  {{/if}}
 
   <div class="flex-box flex-size-{{selectableSize}}">
         {{#selectableColumns}}

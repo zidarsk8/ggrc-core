@@ -139,24 +139,21 @@ tree-item {
       }
     }
 
-    .title-area {
+    .selectable-attrs {
+      padding: 0 10px;
+    }
+
+    .attr-cell {
       height: 60px;
       align-items: center;
-      span {
+
+      .attr-content {
         overflow: hidden;
         text-overflow: ellipsis;
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
       }
-    }
-
-    .selectable-attrs {
-      padding: 0 10px;
-    }
-
-    .attr-cell {
-      align-items: center;
     }
   }
 
@@ -237,6 +234,10 @@ tree-header {
     padding-right: 28px !important;
     padding-left: 0 !important;
 
+    &.disable-conf {
+      margin-left: 70px;
+    }
+
     .tree-header-selector {
       margin-left: 0 !important;
       float: none !important;
@@ -257,11 +258,11 @@ tree-header {
   }
 
   .widget-col-title {
+    overflow: hidden;
     span {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      max-width: 250px;
     }
     i {
       font-size: 12px;

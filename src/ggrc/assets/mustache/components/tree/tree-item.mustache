@@ -13,15 +13,19 @@
                        {deep-limit}="limitDepthTree"
     ></tree-item-actions>
     <div class="flex-box width-100" ($click)="select($element)">
-      <div class="title-area flex-box flex-size-1">
-        <span>{{instance.title}}</span>
+      {{^if disableConfiguration}}
+      <div class="attr-cell flex-box flex-size-1">
+        <div class="title-area attr-content">
+          {{instance.title}}
+        </div>
       </div>
+      {{/if}}
 
       <div class="flex-box selectable-attrs flex-size-{{selectableSize}}">
         {{#selectableColumns}}
           <div class="flex-box flex-size-1 attr-cell">
             {{#if_equals attr_type 'custom'}}
-              <div class="custom tree-title-area">
+              <div class="custom attr-content">
                 {{#get_custom_attr_value this instance}}
                 {{! because the object can currently only be a
                     person there is no need to switch }}
@@ -31,7 +35,7 @@
                 {{/get_custom_attr_value}}
               </div>
             {{else}}
-              <div class="owner tree-title-area">
+              <div class="owner attr-content">
                 {{#instance}}
                   {{#switch type}}
                     {{#case 'Audit'}}

@@ -23,6 +23,7 @@
     selectedColumns: [],
     mandatory: [],
     mapping: null,
+    disableConfiguration: null,
     loading: false,
     limitDepthTree: 0,
     depthFilter: '',

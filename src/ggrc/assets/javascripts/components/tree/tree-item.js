@@ -60,6 +60,7 @@
     },
     selectedColumns: [],
     mandatory: [],
+    disableConfiguration: null,
     itemSelector: '.tree-item-content'
   });
 
