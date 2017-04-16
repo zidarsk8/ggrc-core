@@ -106,3 +106,37 @@ class TestACLImportExport(TestCase):
         {acl.person.email for acl in market.access_control_list},
         emails,
     )
+
+  def test_acl_export(self):
+    """Test ACL field export."""
+    role_name = factories.AccessControlRoleFactory(object_type="Market").name
+    empty_name = factories.AccessControlRoleFactory(object_type="Market").name
+    emails = {factories.PersonFactory().email for _ in range(3)}
+    response = self.import_data(OrderedDict([
+        ("object_type", "Market"),
+        ("code", "market-1"),
+        ("title", "Title"),
+        ("Admin", "user@example.com"),
+        (role_name, "\n".join(emails)),
+    ]))
+
+    search_request = [{
+        "object_name": "Market",
+        "filters": {
+            "expression": {}
+        },
+        "fields": [
+          "slug",
+         "__acl__:{}".format(role_name),
+         "__acl__:{}".format(empty_name),
+        ],
+    }]
+    self.client.get("/login")
+    parsed_data = self.export_parsed_csv(
+        search_request
+    )["Market"]
+    self.assertEqual(
+        set(parsed_data[0][role_name].splitlines()),
+        emails
+    )
+    self.assertEqual(parsed_data[0][empty_name], "")

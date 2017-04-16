@@ -42,3 +42,12 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
 
     self._add_people(list_new - list_old)
     self._remove_people(list_old - list_new)
+
+  def get_value(self):
+    people = sorted(
+        acl.person.email
+        for acl in self.row_converter.obj.access_control_list
+        if acl.ac_role_id == self.role.id
+    )
+    return "\n".join(people)
+
