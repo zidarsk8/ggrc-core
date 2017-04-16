@@ -134,10 +134,6 @@
      */
     allow_mapping_or_creating: null,
     /**
-     *
-     */
-    pageLoader: null,
-    /**
      * Information about current page of tree
      * @param current {Number} - Number of page
      * @param total {Number} - Number of items on the Server-side which satisfy current filter
@@ -468,9 +464,6 @@
 
         viewModel.setColumnsConfiguration();
       });
-
-      viewModel.attr('pageLoader',
-        new GGRC.ListLoaders.TreePageLoader(model, parentInstance));
     },
     events: {
       '{viewModel.pageInfo} current': function () {

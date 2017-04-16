@@ -22,6 +22,7 @@
     model: null,
     selectedColumns: [],
     mandatory: [],
+    mapping: null,
     loading: false,
     limitDepthTree: 0,
     depthFilter: '',
@@ -38,10 +39,11 @@
     events: {
       inserted: function () {
         var model = this.viewModel.attr('model');
+        var mapping = this.viewModel.attr('mapping');
         var parentInstance = this.viewModel.attr('parentInstance');
 
         this.viewModel.attr('_loader',
-          new GGRC.ListLoaders.TreeBaseLoader(model, parentInstance));
+          new GGRC.ListLoaders.TreeBaseLoader(model, parentInstance, mapping));
       }
     }
   });
