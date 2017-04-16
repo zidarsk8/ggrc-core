@@ -259,8 +259,7 @@ class TestCase(BaseTestCase, object):
       results[object_type].append(dict(zip(keys, columns[1:])))
     return results
 
-  # pylint: disable=invalid-name
-  def assertSlugs(self, field, value, slugs):
+  def assert_slugs(self, field, value, slugs):
     """Assert slugs for selected search"""
     assert self.model
     search_request = [{
@@ -292,8 +291,8 @@ class TestCase(BaseTestCase, object):
     for f_string in formats:
       yield f_string.format(**kwargs)
 
-  # pylint: disable=invalid-name
-  def assertFilterByDatetime(self, alias, datetime_value, slugs, formats=None):
+  def assert_filter_by_datetime(self, alias, datetime_value, slugs,
+                                formats=None):
     """Assert slugs for each date format ent datetime"""
     for date_string in self.generate_date_strings(datetime_value, formats):
-      self.assertSlugs(alias, date_string, slugs)
+      self.assert_slugs(alias, date_string, slugs)

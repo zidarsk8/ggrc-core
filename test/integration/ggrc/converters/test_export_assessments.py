@@ -44,9 +44,9 @@ class TestExport(TestCase):
                                              destination=self.assessment)
 
   def test_search_by_comment(self):
-    self.assertSlugs("comment",
-                     self.comment.description,
-                     [self.assessment.slug])
+    self.assert_slugs("comment",
+                      self.comment.description,
+                      [self.assessment.slug])
 
   def test_search_by_new_comment(self):
     """Filter by added new comment and old comment exists"""
@@ -55,45 +55,45 @@ class TestExport(TestCase):
     new_comment = factories.CommentFactory(description=desc)
     factories.RelationshipFactory(source=new_comment,
                                   destination=self.assessment)
-    self.assertSlugs("comment", self.comment.description, slugs)
-    self.assertSlugs("comment", desc, slugs)
+    self.assert_slugs("comment", self.comment.description, slugs)
+    self.assert_slugs("comment", desc, slugs)
 
   def test_search_by_deleted_relation(self):
     """Filter by deleted relation to commment"""
     db.session.delete(self.rel)
     db.session.commit()
-    self.assertSlugs("comment", self.comment.description, [])
+    self.assert_slugs("comment", self.comment.description, [])
 
   def test_search_by_deleted_comment(self):
     """Filter by deleted comment"""
     db.session.delete(self.comment)
     db.session.commit()
-    self.assertSlugs("comment", self.comment.description, [])
+    self.assert_slugs("comment", self.comment.description, [])
 
   @data("created_at", "Created Date", "created Date")
   def test_filter_by_created_at(self, alias):
     """Test filter by created at"""
-    self.assertFilterByDatetime(alias,
-                                self.assessment.created_at,
-                                [self.assessment.slug])
+    self.assert_filter_by_datetime(alias,
+                                   self.assessment.created_at,
+                                   [self.assessment.slug])
 
   @data("updated_at", "Last Updated", "Last Updated")
   def test_filter_by_updated_at(self, alias):
     """Test filter by updated at"""
-    self.assertFilterByDatetime(alias,
-                                self.assessment.updated_at,
-                                [self.assessment.slug])
+    self.assert_filter_by_datetime(alias,
+                                   self.assessment.updated_at,
+                                   [self.assessment.slug])
 
   @data("finished_date", "Finished Date", "finished date")
   def test_filter_by_finished_date(self, alias):
     """Test filter by finished date"""
-    self.assertFilterByDatetime(alias,
-                                self.assessment.finished_date,
-                                [self.assessment.slug])
+    self.assert_filter_by_datetime(alias,
+                                   self.assessment.finished_date,
+                                   [self.assessment.slug])
 
   @data("verified_date", "Verified Date", "verified date")
   def test_filter_by_verified_date(self, alias):
     """Test filter by verified date"""
-    self.assertFilterByDatetime(alias,
-                                self.assessment.verified_date,
-                                [self.assessment.slug])
+    self.assert_filter_by_datetime(alias,
+                                   self.assessment.verified_date,
+                                   [self.assessment.slug])
