@@ -112,7 +112,7 @@ class TestACLImportExport(TestCase):
     role_name = factories.AccessControlRoleFactory(object_type="Market").name
     empty_name = factories.AccessControlRoleFactory(object_type="Market").name
     emails = {factories.PersonFactory().email for _ in range(3)}
-    response = self.import_data(OrderedDict([
+    self.import_data(OrderedDict([
         ("object_type", "Market"),
         ("code", "market-1"),
         ("title", "Title"),
@@ -126,9 +126,9 @@ class TestACLImportExport(TestCase):
             "expression": {}
         },
         "fields": [
-          "slug",
-         "__acl__:{}".format(role_name),
-         "__acl__:{}".format(empty_name),
+            "slug",
+            "__acl__:{}".format(role_name),
+            "__acl__:{}".format(empty_name),
         ],
     }]
     self.client.get("/login")

@@ -57,7 +57,7 @@ class TestACLAttributeDefinitions(TestCase):
       expected_names = role_names
 
     definitions = get_object_column_definitions(model)
-    definition_names = {d["display_name"]:d for d in definitions.values()}
+    definition_names = {d["display_name"]: d for d in definitions.values()}
     self.assertLessEqual(expected_names, set(definition_names.keys()))
 
 

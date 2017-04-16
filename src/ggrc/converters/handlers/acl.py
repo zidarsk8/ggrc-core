@@ -50,4 +50,3 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
         if acl.ac_role_id == self.role.id
     )
     return "\n".join(people)
-
