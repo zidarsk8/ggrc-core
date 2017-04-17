@@ -10,6 +10,18 @@
     '/components/tree/tree-header.mustache');
   var viewModel = can.Map.extend({
     define: {
+      cssClasses: {
+        type: String,
+        get: function () {
+          var classes = [];
+
+          if (this.attr('disableConfiguration')) {
+            classes.push('disable-conf');
+          }
+
+          return classes.join(' ');
+        }
+      },
       selectableSize: {
         type: Number,
         get: function () {
@@ -39,6 +51,7 @@
     columns: {},
     selectedColumns: [],
     availableColumns: [],
+    disableConfiguration: null,
     mandatory: [],
     sortingInfo: null,
     /**

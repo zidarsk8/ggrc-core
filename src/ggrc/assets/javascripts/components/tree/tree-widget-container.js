@@ -134,10 +134,6 @@
      */
     allow_mapping_or_creating: null,
     /**
-     *
-     */
-    pageLoader: null,
-    /**
      * Information about current page of tree
      * @param current {Number} - Number of page
      * @param total {Number} - Number of items on the Server-side which satisfy current filter
@@ -223,7 +219,6 @@
             GGRC.Utils.CurrentPage
               .initCounts([modelName], parent.type, parent.id);
           }
-
         }.bind(this));
     },
     display: function () {
@@ -242,6 +237,7 @@
       this.attr('columns.available', columns.available);
       this.attr('columns.selected', columns.selected);
       this.attr('columns.mandatory', columns.mandatory);
+      this.attr('columns.disableConfiguration', columns.disableConfiguration);
     },
     onUpdateColumns: function (event) {
       var selectedColumns = event.columns;
@@ -385,7 +381,6 @@
           if (!self.attr('$el').closest('.cms_controllers_info_pin').length) {
             $('.cms_controllers_info_pin').control().unsetInstance();
           }
-          //self.show_info_pin();
         }
       }
 
@@ -441,8 +436,6 @@
     viewModel: viewModel,
     init: function () {
       var viewModel = this.viewModel;
-      var model = viewModel.attr('model');
-      var options = viewModel.attr('options');
       var parentInstance = viewModel.attr('parent_instance');
       var allowMapping = viewModel.attr('allow_mapping');
       var allowCreating = viewModel.attr('allow_creating');
@@ -468,9 +461,6 @@
 
         viewModel.setColumnsConfiguration();
       });
-
-      viewModel.attr('pageLoader',
-        new GGRC.ListLoaders.TreePageLoader(model, parentInstance));
     },
     events: {
       '{viewModel.pageInfo} current': function () {
