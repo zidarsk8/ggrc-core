@@ -344,7 +344,7 @@
       return dfd;
     },
     info_pane_preload: function () {
-      this.dispatch('refreshInstance');
+      this.refresh();
     },
     get_related_objects_as_source: function () {
       var dfd = can.Deferred();
