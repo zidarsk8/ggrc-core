@@ -9,13 +9,10 @@
       {{#entries}}
         <li>
           <span class="person-label {{lowercase role }}"></span>
-
           <div class="w-status">
-            <span class="entry-author">
-              {{{render '/static/mustache/people/popover.mustache' person=madeBy}}
-              made changes &mdash; {{date updatedAt}}
-            </span>
-            <div class="clearfix">
+            <div class="entry-author">
+              <person-info {person-obj}="madeBy"></person-info>made changes &mdash; {{date updatedAt}}
+            </div>
               <div class="third-col">
                 <p class="instruction">Field</p>
               </div>
@@ -25,10 +22,7 @@
               <div class="third-col">
                 <p class="instruction">New value</p>
               </div>
-            </div>
-
             {{#changes}}
-              <div class="clearfix">
                 <div class="third-col">
                   {{fieldName}}
                 </div>
@@ -38,9 +32,7 @@
                 <div class="third-col">
                   {{{newVal}}}
                 </div>
-              </div>
             {{/changes}}
-
           </div>
         </li>
       {{/entries}}
@@ -53,7 +45,6 @@
         {{else}}
           <li>The history of changes is currently empty.</li>
         {{/isLoading}}
-
       {{/list}}
     </ul>
   </paginate>

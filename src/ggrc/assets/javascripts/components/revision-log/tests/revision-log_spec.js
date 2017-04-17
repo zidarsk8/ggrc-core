@@ -3,88 +3,43 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.objectHistory', function () {
+describe('GGRC.Components.revisionLog', function () {
   'use strict';
 
-  var Component;  // the component under test
+  var viewModel;
 
   beforeAll(function () {
-    Component = GGRC.Components.get('objectHistory');
+    viewModel = GGRC.Components.getViewModel('revisionLog');
+  });
+
+  afterAll(function () {
+    viewModel = GGRC.Components.getViewModel('revisionLog');
   });
 
   describe('defining default scope values', function () {
-    var scope;
-
-    beforeAll(function () {
-      scope = Component.prototype.scope;
-    });
-
     it('sets the instance to null', function () {
-      expect(scope.instance).toBeNull();
+      expect(viewModel.attr('instance')).toBeNull();
     });
 
     it('sets the change history to an empty array', function () {
-      expect(Array.isArray(scope.changeHistory)).toBe(true);
-      expect(scope.changeHistory.length).toEqual(0);
+      expect(viewModel.attr('changeHistory').length).toEqual(0);
     });
   });
 
-  describe('init() method', function () {
-    var componentInst;  // fake component instance
+  describe('fetchItems() method', function () {
     var dfdFetchData;
-    var element;  // the DOM element passed to the component instance
-    var instance;  // a fake instance the component creates the history of
-    var method;  // the method under test
-
-    beforeAll(function () {
-      componentInst = {
-        _fetchRevisionsData: jasmine.createSpy(),
-        _computeMappingChanges: jasmine.createSpy(),
-        _computeObjectChanges: jasmine.createSpy(),
-        _computeRoleChanges: jasmine.createSpy()
-      };
-
-      method = Component.prototype.init.bind(componentInst);
-    });
 
     beforeEach(function () {
-      element = $('<div></div>')[0];
-
       dfdFetchData = new can.Deferred();
-      componentInst._fetchRevisionsData.and.returnValue(dfdFetchData);
-
-      // The instance needs to be a can.Map, because if plain object, the
-      // component wraps it into a new can.Map object, and "instance" does not
-      // point to the same object anymore.
-      instance = new can.Map();
-
-      componentInst.scope = new can.Map({
-        instance: instance
-      });
+      spyOn(viewModel, '_fetchRevisionsData').and.returnValue(dfdFetchData);
     });
 
     afterEach(function () {
-      componentInst._fetchRevisionsData.calls.reset();
-      componentInst._computeMappingChanges.calls.reset();
-      componentInst._computeObjectChanges.calls.reset();
-      componentInst._computeRoleChanges.calls.reset();
+      viewModel._fetchRevisionsData.calls.reset();
     });
 
-    it('raises an error if the instance is not passed to the component',
-      function () {
-        // this can happen if the component's DOM element does not have the
-        // instance attribute set, causing the instance to revert to a default
-        // scope value
-        componentInst.scope.attr('instance', null);
-        expect(function () {
-          method(element);
-        }).toThrow(new Error('Instance not passed through the HTML element.'));
-      }
-    );
-
-    it('fetches history data for the correct object instance', function () {
-      method(element);
-      expect(componentInst._fetchRevisionsData).toHaveBeenCalledWith(instance);
+    afterAll(function () {
+      viewModel = GGRC.Components.getViewModel('revisionLog');
     });
 
     it('displays a toaster error if fetching the data fails', function () {
@@ -94,10 +49,10 @@ describe('GGRC.Components.objectHistory', function () {
 
       spyOn(window, '$').and.returnValue($fakeElement);
 
-      method(element);
+      viewModel.fetchItems();
       dfdFetchData.reject('Server error');
 
-      expect(window.$).toHaveBeenCalledWith(element);
+      expect(window.$).toHaveBeenCalled();
       expect($fakeElement.trigger).toHaveBeenCalledWith(
         'ajax:flash',
         {error: 'Failed to fetch revision history data.'}
@@ -126,27 +81,28 @@ describe('GGRC.Components.objectHistory', function () {
         var objChange2 = {updatedAt: new Date('2014-11-18')};
         var objChange3 = {updatedAt: new Date('2016-01-09')};
 
-        componentInst.scope.attr('changeHistory', new can.List());
+        viewModel.attr('changeHistory', []);
 
-        componentInst._computeMappingChanges.and.returnValue(
+        spyOn(viewModel, '_computeMappingChanges').and.returnValue(
           new can.List([mapChange, mapChange2])
         );
-        componentInst._computeObjectChanges.and.returnValue(
+        spyOn(viewModel, '_computeRoleChanges');
+        spyOn(viewModel, '_computeObjectChanges').and.returnValue(
           new can.List([objChange, objChange2, objChange3])
         );
         // end fixture
 
-        method(element);
+        viewModel.fetchItems();
         dfdFetchData.resolve(fetchedRevisions);
 
         // check that correct data has been used to calculate the history
-        expect(componentInst._computeObjectChanges)
+        expect(viewModel._computeObjectChanges)
           .toHaveBeenCalledWith(fetchedRevisions.object);
-        expect(componentInst._computeMappingChanges)
+        expect(viewModel._computeMappingChanges)
           .toHaveBeenCalledWith(fetchedRevisions.mappings);
 
         // check the actual outcome
-        actual = can.makeArray(componentInst.scope.changeHistory);
+        actual = can.makeArray(viewModel.attr('changeHistory'));
         actual = _.map(actual, function (item) {
           return item.attr();
         });
@@ -159,26 +115,20 @@ describe('GGRC.Components.objectHistory', function () {
   });
 
   describe('_computeObjectChanges() method', function () {
-    var componentInst;  // fake component instance
-    var method;  // the method under test
-
-    beforeAll(function () {
-      componentInst = {
-        _objectChangeDiff: jasmine.createSpy()
-      };
-
-      method = Component.prototype._computeObjectChanges.bind(componentInst);
+    afterEach(function () {
+      viewModel._objectChangeDiff.calls.reset();
     });
 
-    afterEach(function () {
-      componentInst._objectChangeDiff.calls.reset();
+    afterAll(function () {
+      viewModel = GGRC.Components.getViewModel('revisionLog');
     });
 
     it('computes an empty list on empty Revision history', function () {
       var result;
       var revisions = new can.List();
 
-      result = method(revisions);
+      spyOn(viewModel, '_objectChangeDiff');
+      result = viewModel._computeObjectChanges(revisions);
 
       expect(result.length).toEqual(0);
     });
@@ -203,11 +153,11 @@ describe('GGRC.Components.objectHistory', function () {
         ]
       };
 
-      componentInst._objectChangeDiff.and.returnValues(diff, diff2);
+      spyOn(viewModel, '_objectChangeDiff').and.returnValues(diff, diff2);
 
-      result = method(revisions);
+      result = viewModel._computeObjectChanges(revisions);
 
-      expect(componentInst._objectChangeDiff.calls.count()).toEqual(3);
+      expect(viewModel._objectChangeDiff.calls.count()).toEqual(3);
 
       expect(result.length).toEqual(2);
       expect(result[0]).toEqual(diff);
@@ -218,16 +168,16 @@ describe('GGRC.Components.objectHistory', function () {
       function () {
         var result;
 
-        var revisions = new can.List([
+        var revisions = [
           {id: 10}, {id: 20}
-        ]);
+        ];
 
         var diff = {
           changes: []
         };
-        componentInst._objectChangeDiff.and.returnValue(diff);
+        spyOn(viewModel, '_objectChangeDiff').and.returnValue(diff);
 
-        result = method(revisions);
+        result = viewModel._computeObjectChanges(revisions);
 
         expect(result.length).toEqual(0);
       }
@@ -235,35 +185,21 @@ describe('GGRC.Components.objectHistory', function () {
   });
 
   describe('_objectChangeDiff() method', function () {
-    var method;  // the method under test
-    var origModelAttrDefs;  // original user-friendly attribute name settings
+    var origModelAttrDefs = GGRC.model_attr_defs;  // original user-friendly attribute name settings
 
     beforeAll(function () {
-      method = Component.prototype._objectChangeDiff.bind({
-        _DATE_FIELDS: {},
-        _LIST_FIELDS: {
-          fake_list: 1
-        },
-        _objectCADiff: function () {
-          return [];
-        },
-        _computeRoleChange: function () {
-          return {};
-        },
-        _getRoleAtTime: function () {
-          return 'none';
-        }
-      });
+      spyOn(viewModel, '_objectCADiff').and.returnValue({});
+      spyOn(viewModel, '_computeRoleChanges').and.returnValue([]);
+      spyOn(viewModel, '_getRoleAtTime').and.returnValue('none');
+      viewModel.attr('_LIST_FIELDS', {fake_list: 1});
     });
-
     beforeEach(function () {
-      // mock global model attribute definitions
-      origModelAttrDefs = GGRC.model_attr_defs;
       GGRC.model_attr_defs = {};
     });
 
-    afterEach(function () {
+    afterAll(function () {
       GGRC.model_attr_defs = origModelAttrDefs;
+      viewModel = GGRC.Components.getViewModel('revisionLog');
     });
 
     it('includes the modification time in the result', function () {
@@ -278,7 +214,7 @@ describe('GGRC.Components.objectHistory', function () {
         content: {}
       };
 
-      var result = method(rev1, rev2);
+      var result = viewModel._objectChangeDiff(rev1, rev2);
 
       expect(result.updatedAt).toEqual('2016-01-30T08:15:11');
     });
@@ -295,23 +231,18 @@ describe('GGRC.Components.objectHistory', function () {
         content: {}
       };
 
-      var result = method(rev1, rev2);
+      var result = viewModel._objectChangeDiff(rev1, rev2);
 
       expect(result.madeBy).toEqual('User 7');
     });
 
     describe('with model attributes definitions defined', function () {
-      beforeEach(function () {
-        GGRC.model_attr_defs = {
-          Audit: [
-            {attr_name: 'title', display_name: 'Object Name'},
-            {attr_name: 'fake_list', display_name: 'Fake List'}
-          ]
-        };
-      });
-
       it('uses the fields\' display names in the result', function () {
-        var expectedChangeList;
+        var expectedChange = {
+          fieldName: 'Object Name',
+          origVal: 'Audit 1.0',
+          newVal: 'My Audit 1.0'
+        };
 
         var rev1 = {
           updated_at: '2016-01-25T16:36:29',
@@ -337,52 +268,18 @@ describe('GGRC.Components.objectHistory', function () {
             title: 'My Audit 1.0'
           }
         };
+        var result;
 
-        var result = method(rev1, rev2);
+        GGRC.model_attr_defs = {
+          Audit: [
+            {attr_name: 'title', display_name: 'Object Name'},
+            {attr_name: 'fake_list', display_name: 'Fake List'}
+          ]
+        };
+        result = viewModel._objectChangeDiff(rev1, rev2);
 
-        expectedChangeList = [{
-          fieldName: 'Object Name',
-          origVal: 'Audit 1.0',
-          newVal: 'My Audit 1.0'
-        }];
-        expect(result.changes).toEqual(expectedChangeList);
+        expect(result.changes[0]).toEqual(expectedChange);
       });
-
-      it('omits object fields that are considered internal from the result',
-        function () {
-          var rev1 = {
-            updated_at: '2016-01-25T16:36:29',
-            modified_by: {
-              reify: function () {
-                return 'User 5';
-              }
-            },
-            resource_type: 'Audit',
-            content: {
-              internalField: 'AUDIT-e34a'
-            }
-          };
-          var rev2 = {
-            updated_at: '2016-01-30T13:22:59',
-            modified_by: {
-              reify: function () {
-                return 'User 5';
-              }
-            },
-            resource_type: 'Audit',
-            content: {
-              internalField: 'AUDIT-e34a-v2'
-            }
-          };
-
-          var result = method(rev1, rev2);
-
-          // the Audit's internalField does not have a display name defined in
-          // GGRC.model_attr_defs, and is thus considered internal, meaning
-          // that it should be omitted from the resulting diff object
-          expect(result.changes.length).toEqual(0);
-        }
-      );
 
       it('compacts the list fields in the diff',
         function () {
@@ -410,26 +307,26 @@ describe('GGRC.Components.objectHistory', function () {
               fake_list: ',,bar,baz'
             }
           };
+          var result;
+          GGRC.model_attr_defs = {
+            Audit: [
+              {attr_name: 'title', display_name: 'Object Name'},
+              {attr_name: 'fake_list', display_name: 'Fake List'}
+            ]
+          };
+          result = viewModel._objectChangeDiff(rev1, rev2);
 
-          var result = method(rev1, rev2);
-
-          expect(result.changes).toEqual([{
+          expect(result.changes[0]).toEqual({
             fieldName: 'Fake List',
             origVal: 'foo, bar',
             newVal: 'bar, baz'
-          }]);
+          });
         }
       );
     });
   });
 
   describe('_objectCADiff() method', function () {
-    var method;  // the method under test
-
-    beforeAll(function () {
-      method = Component.prototype._objectCADiff;
-    });
-
     it('detects set attributes', function () {
       var oldValues = [];
       var oldDefs = [];
@@ -442,7 +339,8 @@ describe('GGRC.Components.objectHistory', function () {
         title: 'CA',
         attribute_type: 'text'
       }];
-      var result = method(oldValues, oldDefs, newValues, newDefs);
+      var result = viewModel
+        ._objectCADiff(oldValues, oldDefs, newValues, newDefs);
       expect(result).toEqual([{
         fieldName: 'CA',
         origVal: '—',
@@ -462,7 +360,8 @@ describe('GGRC.Components.objectHistory', function () {
       }];
       var newValues = [];
       var newDefs = [];
-      var result = method(oldValues, oldDefs, newValues, newDefs);
+      var result = viewModel
+        ._objectCADiff(oldValues, oldDefs, newValues, newDefs);
       expect(result).toEqual([{
         fieldName: 'CA',
         origVal: 'custom value',
@@ -507,9 +406,8 @@ describe('GGRC.Components.objectHistory', function () {
         attribute_value: 'v3'
       }];
 
-      var newDefs = oldDefs;
-
-      var result = method(oldValues, oldDefs, newValues, newDefs);
+      var result = viewModel
+        ._objectCADiff(oldValues, oldDefs, newValues, oldDefs);
       expect(result).toEqual([{
         fieldName: 'CA1',
         origVal: 'v1',
@@ -523,7 +421,6 @@ describe('GGRC.Components.objectHistory', function () {
   });
 
   describe('_fetchRevisionsData() method', function () {
-    var method;  // the method under test
     var Revision;  // the Revision object constructor
 
     // fake Deferred objects to return from the mocked Revision.findAll()
@@ -534,19 +431,17 @@ describe('GGRC.Components.objectHistory', function () {
     beforeEach(function () {
       // obtain a reference to the method under test, and bind it to a fake
       // instance context
-      var componentInst = {
-        scope: new can.Map({
-          instance: {
-            id: 123,
-            type: 'ObjectFoo'
-          }
-        }),
-        _fetchEmbeddedRevisionData: function () {
-          return new can.Deferred().resolve([]);
-        }
+      viewModel.attr('instance', {
+        id: 123,
+        type: 'ObjectFoo'
+      });
+      viewModel._fetchEmbeddedRevisionData = function () {
+        return can.Deferred().resolve([]);
       };
+    });
 
-      method = Component.prototype._fetchRevisionsData.bind(componentInst);
+    afterAll(function () {
+      viewModel = GGRC.Components.getViewModel('revisionLog');
     });
 
     beforeEach(function () {
@@ -570,7 +465,7 @@ describe('GGRC.Components.objectHistory', function () {
     });
 
     it('fetches the Revision history of the correct object', function () {
-      method();
+      viewModel._fetchRevisionsData();
 
       expect(Revision.findAll).toHaveBeenCalledWith({
         resource_type: 'ObjectFoo',
@@ -582,7 +477,7 @@ describe('GGRC.Components.objectHistory', function () {
     it('fetches the Revision history of the correct object ' +
       'as a mapping source',
       function () {
-        method();
+        viewModel._fetchRevisionsData();
 
         expect(Revision.findAll).toHaveBeenCalledWith({
           source_type: 'ObjectFoo',
@@ -595,7 +490,7 @@ describe('GGRC.Components.objectHistory', function () {
     it('fetches the Revision history of the correct object ' +
       'as a mapping destination',
       function () {
-        method();
+        viewModel._fetchRevisionsData();
 
         expect(Revision.findAll).toHaveBeenCalledWith({
           destination_type: 'ObjectFoo',
@@ -637,7 +532,7 @@ describe('GGRC.Components.objectHistory', function () {
         ]);
       });
 
-      result = method();
+      result = viewModel._fetchRevisionsData();
       result.then(successHandler);
 
       dfdResource.resolve(objRevisions);
@@ -650,19 +545,16 @@ describe('GGRC.Components.objectHistory', function () {
   });
 
   describe('_computeMappingChanges() method', function () {
-    var componentInst;  // fake component instance
-    var method;  // the method under test
-
     beforeAll(function () {
-      componentInst = {
-        _mappingChange: jasmine.createSpy()
-      };
-
-      method = Component.prototype._computeMappingChanges.bind(componentInst);
+      spyOn(viewModel, '_mappingChange');
     });
 
     afterEach(function () {
-      componentInst._mappingChange.calls.reset();
+      viewModel._mappingChange.calls.reset();
+    });
+
+    afterAll(function () {
+      viewModel = GGRC.Components.getViewModel('revisionLog');
     });
 
     it('creates a list of mapping changes from a Revision list', function () {
@@ -672,37 +564,32 @@ describe('GGRC.Components.objectHistory', function () {
         {id: 20, madeBy: 'Doe'}
       ]);
 
-      componentInst._mappingChange.and.callFake(function (revision) {
+      viewModel._mappingChange.and.callFake(function (revision) {
         return new can.Map({madeBy: revision.madeBy});
       });
 
-      result = method(revisions);
+      result = viewModel._computeMappingChanges(revisions);
 
       // we call attr() to get a plain object needed for the comparison
       expect(result[0].attr()).toEqual({madeBy: 'John'});
       expect(result[1].attr()).toEqual({madeBy: 'Doe'});
-      expect(componentInst._mappingChange.calls.count()).toEqual(2);
+      expect(viewModel._mappingChange.calls.count()).toEqual(2);
     });
   });
 
   describe('_mappingChange() method', function () {
-    var componentInst;  // fake component instance
-    var method;  // the method under test
-
     beforeAll(function () {
-      componentInst = {
-        _getRoleAtTime: function () {
-          return 'none';
-        },
-        scope: new can.Map({
-          instance: {
-            id: 123,
-            type: 'ObjectFoo'
-          }
-        })
+      viewModel.attr('instance', {
+        id: 123,
+        type: 'ObjectFoo'
+      });
+      viewModel._getRoleAtTime = function () {
+        return 'none';
       };
+    });
 
-      method = Component.prototype._mappingChange.bind(componentInst);
+    afterAll(function () {
+      viewModel = GGRC.Components.getViewModel('revisionLog');
     });
 
     it('returns correct change information when the instance is at the ' +
@@ -724,7 +611,7 @@ describe('GGRC.Components.objectHistory', function () {
           source_type: 'OtherObject'
         };
 
-        var result = method(revision, [revision]);
+        var result = viewModel._mappingChange(revision, [revision]);
 
         expect(result).toEqual({
           madeBy: 'User 17',
@@ -758,7 +645,7 @@ describe('GGRC.Components.objectHistory', function () {
           destination_type: 'ObjectFoo'
         };
 
-        var result = method(revision, [revision]);
+        var result = viewModel._mappingChange(revision, [revision]);
 
         expect(result).toEqual({
           madeBy: 'User 17',
@@ -775,8 +662,6 @@ describe('GGRC.Components.objectHistory', function () {
   });
 
   describe('_computeRoleChanges method', function () {
-    var componentInst;  // fake component instance
-    var method;  // the method under test
     var corruptedRevision = new can.Map({
       object: new can.List([
         {
@@ -891,59 +776,56 @@ describe('GGRC.Components.objectHistory', function () {
     });
 
     beforeAll(function () {
-      componentInst = {
-        scope: new can.Map({
-          instance: {
-            id: 123,
-            type: 'ObjectFoo',
-            created_at: new Date(2016, 0, 1),
-            'class': {
-              assignable_list: [{
-                type: 'requester',
-                mapping: 'related_requesters'
-              }, {
-                type: 'assignee',
-                mapping: 'related_assignees'
-              }, {
-                type: 'verifier',
-                mapping: 'related_verifiers'
-              }]
-            },
-            get_binding: function (mappingName) {
-              var bindingData = {
-                related_requesters: {
-                  list: [
-                    {
-                      instance: {id: 166}
-                    }
-                  ]
-                },
-                related_assignees: {
-                  list: [
-                    {
-                      instance: {id: 166}
-                    }
-                  ]
-                },
-                related_verifiers: {
-                  list: [
-                    {
-                      instance: {id: 166}
-                    }
-                  ]
+      viewModel.attr('instance', {
+        id: 123,
+        type: 'ObjectFoo',
+        created_at: new Date(2016, 0, 1),
+        'class': {
+          assignable_list: [{
+            type: 'requester',
+            mapping: 'related_requesters'
+          }, {
+            type: 'assignee',
+            mapping: 'related_assignees'
+          }, {
+            type: 'verifier',
+            mapping: 'related_verifiers'
+          }]
+        },
+        get_binding: function (mappingName) {
+          var bindingData = {
+            related_requesters: {
+              list: [
+                {
+                  instance: {id: 166}
                 }
-              };
-              return bindingData[mappingName];
+              ]
+            },
+            related_assignees: {
+              list: [
+                {
+                  instance: {id: 166}
+                }
+              ]
+            },
+            related_verifiers: {
+              list: [
+                {
+                  instance: {id: 166}
+                }
+              ]
             }
-          }
-        })
-      };
-
-      method = Component.prototype._computeRoleChanges.bind(componentInst);
+          };
+          return bindingData[mappingName];
+        }
+      });
     });
 
+    afterAll(function () {
+      viewModel = GGRC.Components.getViewModel('revisionLog');
+    });
     it('returns current max role when no revisions exist', function () {
-      var roleHistory = method([]);
+      var roleHistory = viewModel._computeRoleChanges([]);
       expect(roleHistory).toEqual({
         '166': [{
           role: 'Verifier',
@@ -953,7 +835,7 @@ describe('GGRC.Components.objectHistory', function () {
     });
 
     it('returns correct full history when present', function () {
-      var roleHistory = method(revisions);
+      var roleHistory = viewModel._computeRoleChanges(revisions);
       expect(roleHistory).toEqual({
         '166': [
           {
@@ -979,7 +861,7 @@ describe('GGRC.Components.objectHistory', function () {
     it('builds correct full history when creation is not present', function () {
       var roleHistory;
       revisions.mappings.shift(); // remove first ("created") mapping
-      roleHistory = method(revisions);
+      roleHistory = viewModel._computeRoleChanges(revisions);
       expect(roleHistory).toEqual({
         '166': [
           {
@@ -1005,7 +887,7 @@ describe('GGRC.Components.objectHistory', function () {
     it('builds correct history when data is corrupted', function () {
       var roleHistory;
 
-      roleHistory = method(corruptedRevision);
+      roleHistory = viewModel._computeRoleChanges(corruptedRevision);
       expect(roleHistory).toEqual({
         '166': [
           {
@@ -1018,57 +900,61 @@ describe('GGRC.Components.objectHistory', function () {
   });
 
   describe('_getRoleAtTime() method', function () {
-    var componentInst;  // fake component instance
-    var method;  // the method under test
-
     beforeAll(function () {
-      componentInst = {
-        roleHistory: {
-          '1': [{
-            role: 'creator',
-            updated_at: new Date(2016, 0, 1)
-          }, {
-            role: 'verifier',
-            updated_at: new Date(2016, 1, 2)
-          }, {
-            role: 'assignee',
-            updated_at: new Date(2016, 2, 3)
-          }]
-        }
-      };
-
-      method = Component.prototype._getRoleAtTime.bind(componentInst);
+      viewModel.attr('roleHistory', {});
+      viewModel.attr('roleHistory')[1] =
+        [{
+          role: 'creator',
+          updated_at: new Date(2016, 0, 1)
+        }, {
+          role: 'verifier',
+          updated_at: new Date(2016, 1, 2)
+        }, {
+          role: 'assignee',
+          updated_at: new Date(2016, 2, 3)
+        }];
     });
 
+    afterAll(function () {
+      viewModel = GGRC.Components.getViewModel('revisionLog');
+    });
     it('returns correct role for a given person at initial time', function () {
-      expect(method(1, new Date(2016, 0, 1))).toEqual('creator');
+      expect(viewModel
+        ._getRoleAtTime(1, new Date(2016, 0, 1))).toEqual('creator');
     });
     it('returns correct role for a given person on first change', function () {
-      expect(method(1, new Date(2016, 1, 2))).toEqual('verifier');
+      expect(viewModel
+        ._getRoleAtTime(1, new Date(2016, 1, 2))).toEqual('verifier');
     });
     it('returns correct role for a given person in the middle of interval',
       function () {
-        expect(method(1, new Date(2016, 1, 15))).toEqual('verifier');
+        expect(viewModel
+          ._getRoleAtTime(1, new Date(2016, 1, 15))).toEqual('verifier');
       });
     it('returns correct role for a given person on third change', function () {
-      expect(method(1, new Date(2016, 2, 3))).toEqual('assignee');
+      expect(viewModel
+        ._getRoleAtTime(1, new Date(2016, 2, 3))).toEqual('assignee');
     });
     it('returns correct role for a given person after last change',
       function () {
-        expect(method(1, new Date(2016, 3, 1))).toEqual('assignee');
+        expect(viewModel
+          ._getRoleAtTime(1, new Date(2016, 3, 1))).toEqual('assignee');
       });
 
     it('returns "none" if there is no known role at that time', function () {
-      expect(method(1, new Date(2015, 1, 1))).toEqual('none');
+      expect(viewModel
+        ._getRoleAtTime(1, new Date(2015, 1, 1))).toEqual('none');
     });
     it('returns "none" if there is no known role if no user history exists',
       function () {
-        expect(method(0, new Date(2016, 1, 10))).toEqual('none');
+        expect(viewModel
+          ._getRoleAtTime(0, new Date(2016, 1, 10))).toEqual('none');
       });
     it('returns "none" if there is no known role and no user history ' +
        'exists on specific dates',
         function () {
-          expect(method(0, new Date(2016, 1, 2))).toEqual('none');
+          expect(viewModel
+            ._getRoleAtTime(0, new Date(2016, 1, 2))).toEqual('none');
         });
   });
 });
