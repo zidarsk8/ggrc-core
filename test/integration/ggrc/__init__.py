@@ -17,6 +17,7 @@ from flask.ext.testing import TestCase as BaseTestCase
 
 from ggrc import db
 from ggrc.app import app
+from ggrc.models import Revision
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
 
@@ -305,7 +306,6 @@ class TestCase(BaseTestCase, object):
   def _get_latest_object_revisions(objects):
     """Get latest revisions of given objects."""
     object_tuples = [(o.id, o.type) for o in objects]
-    from ggrc.models import Revision
     revisions = Revision.query.filter(
         Revision.id.in_(
             db.session.query(func.max(Revision.id)).filter(
@@ -323,6 +323,9 @@ class TestCase(BaseTestCase, object):
 
   def _create_snapshots(self, audit, objects):
     """Create snapshots of latest object revisions for given objects."""
+    # This commit is needed if we're using factories with single_commit, so
+    # that the latest revisions will be fetched properly.
+    db.session.commit()
     revisions = self._get_latest_object_revisions(objects)
     snapshots = [
         factories.SnapshotFactory(

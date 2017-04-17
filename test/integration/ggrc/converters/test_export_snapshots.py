@@ -55,17 +55,20 @@ class TestExportSnapshots(TestCase):
 
   @staticmethod
   def _create_cads(type_):
-    cad = factories.CustomAttributeDefinitionFactory
-    return [
-        cad(title="date", definition_type=type_, attribute_type="Date"),
-        cad(title="checkbox", definition_type=type_,
-            attribute_type="Checkbox"),
-        cad(title="person", definition_type=type_,
-            attribute_type="Map:Person"),
-        cad(title="RT", definition_type=type_, attribute_type="Rich Text"),
-        cad(title="dropdown", definition_type=type_, attribute_type="Dropdown",
-            multi_choice_options="one,two,three,four,five"),
-    ]
+    with factories.single_commit():
+      cad = factories.CustomAttributeDefinitionFactory
+      return [
+          cad(title="date", definition_type=type_, attribute_type="Date"),
+          cad(title="checkbox", definition_type=type_,
+              attribute_type="Checkbox"),
+          cad(title="person", definition_type=type_,
+              attribute_type="Map:Person"),
+          cad(title="RT", definition_type=type_, attribute_type="Rich Text"),
+          cad(title="dropdown",
+              definition_type=type_,
+              attribute_type="Dropdown",
+              multi_choice_options="one,two,three,four,five"),
+      ]
 
   def test_full_control_export(self):
     """Test exporting of a single full control snapshot."""
@@ -76,8 +79,9 @@ class TestExportSnapshots(TestCase):
     self.import_file("control_snapshot_data_single.csv")
 
     controls = models.Control.query.all()
-    audit = factories.AuditFactory()
-    snapshots = self._create_snapshots(audit, controls)
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      snapshots = self._create_snapshots(audit, controls)
 
     control_dicts = {
         control.slug: {
@@ -140,17 +144,18 @@ class TestExportSnapshots(TestCase):
 
   def test_snapshot_mappings_export(self):
     """Test exporting snapshots with object mappings."""
-    control = factories.ControlFactory(slug="Control 1")
-    audit = factories.AuditFactory()
-    snapshot = self._create_snapshots(audit, [control])[0]
-    assessments = [factories.AssessmentFactory() for _ in range(3)]
-    issues = [factories.IssueFactory() for _ in range(3)]
-    assessment_slugs = {assessment.slug for assessment in assessments}
-    issue_slugs = {issue.slug for issue in issues}
+    with factories.single_commit():
+      control = factories.ControlFactory(slug="Control 1")
+      audit = factories.AuditFactory()
+      snapshot = self._create_snapshots(audit, [control])[0]
+      assessments = [factories.AssessmentFactory() for _ in range(3)]
+      issues = [factories.IssueFactory() for _ in range(3)]
+      assessment_slugs = {assessment.slug for assessment in assessments}
+      issue_slugs = {issue.slug for issue in issues}
 
-    for assessment, issue in zip(assessments, issues):
-      factories.RelationshipFactory(source=snapshot, destination=assessment)
-      factories.RelationshipFactory(source=issue, destination=snapshot)
+      for assessment, issue in zip(assessments, issues):
+        factories.RelationshipFactory(source=snapshot, destination=assessment)
+        factories.RelationshipFactory(source=issue, destination=snapshot)
 
     search_request = [{
         "object_name": "Snapshot",
@@ -178,14 +183,15 @@ class TestExportSnapshots(TestCase):
   def test_empty_control_export(self):
     """Test exporting of a single full control snapshot."""
     cads = self._create_cads("control")
-    controls = [factories.ControlFactory(slug="Control 1")]
-    for cad in cads:
-      factories.CustomAttributeValueFactory(
-          attributable=controls[0],
-          custom_attribute=cad,
-      )
-    audit = factories.AuditFactory()
-    snapshots = self._create_snapshots(audit, controls)
+    with factories.single_commit():
+      controls = [factories.ControlFactory(slug="Control 1")]
+      for cad in cads:
+        factories.CustomAttributeValueFactory(
+            attributable=controls[0],
+            custom_attribute=cad,
+        )
+      audit = factories.AuditFactory()
+      snapshots = self._create_snapshots(audit, controls)
 
     control_dicts = {
         control.slug: {
@@ -249,12 +255,13 @@ class TestExportSnapshots(TestCase):
 
   def test_same_revison_export(self):
     """Exporting the same revision multiple times."""
-    controls = [factories.ControlFactory(slug="Control 1")]
-    audit1 = factories.AuditFactory()
-    self._create_snapshots(audit1, controls)
-    audit2 = factories.AuditFactory()
-    self._create_snapshots(audit2, controls)
-    audit_codes = {audit1.slug, audit2.slug}
+    with factories.single_commit():
+      controls = [factories.ControlFactory(slug="Control 1")]
+      audit1 = factories.AuditFactory()
+      self._create_snapshots(audit1, controls)
+      audit2 = factories.AuditFactory()
+      self._create_snapshots(audit2, controls)
+      audit_codes = {audit1.slug, audit2.slug}
 
     search_request = [{
         "object_name": "Snapshot",
@@ -290,15 +297,16 @@ class TestExportSnapshots(TestCase):
     self.import_file("control_snapshot_data_multiple.csv")
 
     controls = models.Control.query.all()
-    audit = factories.AuditFactory()
-    snapshots = self._create_snapshots(audit, controls)
-    count = len(snapshots)
-    assessments = [factories.AssessmentFactory() for _ in range(count)]
-    issues = [factories.IssueFactory() for _ in range(count)]
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      snapshots = self._create_snapshots(audit, controls)
+      count = len(snapshots)
+      assessments = [factories.AssessmentFactory() for _ in range(count)]
+      issues = [factories.IssueFactory() for _ in range(count)]
 
-    for snapshot, assessment, issue in zip(snapshots, assessments, issues):
-      factories.RelationshipFactory(source=snapshot, destination=assessment)
-      factories.RelationshipFactory(source=issue, destination=snapshot)
+      for snapshot, assessment, issue in zip(snapshots, assessments, issues):
+        factories.RelationshipFactory(source=snapshot, destination=assessment)
+        factories.RelationshipFactory(source=issue, destination=snapshot)
 
     with QueryCounter() as counter:
       search_request = [{

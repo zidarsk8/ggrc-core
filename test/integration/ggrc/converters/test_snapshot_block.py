@@ -24,10 +24,11 @@ class TestSnapshotBlockConverter(TestCase):
 
   def test_snapshots_property(self):
     """Test snapshots property and snapshot content."""
-    snapshots = self._create_snapshots(
-        factories.AuditFactory(),
-        [factories.ControlFactory()],
-    )
+    with factories.single_commit():
+      snapshots = self._create_snapshots(
+          factories.AuditFactory(),
+          [factories.ControlFactory()],
+      )
 
     converter = mock.MagicMock()
     ids = [s.id for s in snapshots]
@@ -38,10 +39,11 @@ class TestSnapshotBlockConverter(TestCase):
 
   def test_valid_child_types(self):
     """Test child_type property with valid snapshots list."""
-    snapshots = self._create_snapshots(
-        factories.AuditFactory(),
-        [factories.ControlFactory(), factories.ControlFactory()],
-    )
+    with factories.single_commit():
+      snapshots = self._create_snapshots(
+          factories.AuditFactory(),
+          [factories.ControlFactory(), factories.ControlFactory()],
+      )
     converter = mock.MagicMock()
     ids = [s.id for s in snapshots]
     block = SnapshotBlockConverter(converter, ids)
@@ -55,10 +57,11 @@ class TestSnapshotBlockConverter(TestCase):
 
   def test_invalid_child_types(self):
     """Test child_type property with invalid snapshots list."""
-    snapshots = self._create_snapshots(
-        factories.AuditFactory(),
-        [factories.ControlFactory(), factories.PolicyFactory()],
-    )
+    with factories.single_commit():
+      snapshots = self._create_snapshots(
+          factories.AuditFactory(),
+          [factories.ControlFactory(), factories.PolicyFactory()],
+      )
     converter = mock.MagicMock()
     ids = [s.id for s in snapshots]
     block = SnapshotBlockConverter(converter, ids)
