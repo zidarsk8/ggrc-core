@@ -286,8 +286,13 @@
         }
         this.scope.attr('pickerActive', false);
       },
-      '{scope} modal:success': function (_scope, _event) {
-        var instance = this.scope.instance.reify();
+      '{scope} modal:success': function () {
+        var instance = this.scope.instance;
+        if (instance instanceof CMS.Models.Assessment) {
+          instance.dispatch('refreshInstance');
+          return;
+        }
+        instance.reify();
         instance.refresh();
       }
     }
