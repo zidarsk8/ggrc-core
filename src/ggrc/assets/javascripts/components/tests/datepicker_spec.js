@@ -154,7 +154,7 @@ describe('GGRC.Components.datepicker', function () {
       });
 
       it('returns formatted date if it is Date object', function () {
-        expect(method(new Date('2011-11-11 00:00:00'))).toEqual('2011-11-11');
+        expect(method(new Date('2011-11-11T00:00:00'))).toEqual('2011-11-11');
       });
       it('returns date if it is valid date', function () {
         expect(method('2012-12-12')).toEqual('2012-12-12');

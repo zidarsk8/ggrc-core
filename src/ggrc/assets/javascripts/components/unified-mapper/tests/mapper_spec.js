@@ -194,7 +194,7 @@ describe('GGRC.Models.MapperModel', function () {
 
     it('converts models plural title to a snake_case', function () {
       var result;
-      var cmsModel1 = Object.assign({}, cmsModel, {
+      var cmsModel1 = _.assign({}, cmsModel, {
         title_plural: 'Title Plural'
       });
       mapper.attr('type', 'model_singular');
