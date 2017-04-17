@@ -3,17 +3,14 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
+<h6>Evidence</h6>
+<mapped-objects {visible-items}="limit" {parent-instance}="instance" mapping="all_documents">
+    <document-object-list-item {instance}="instance"></document-object-list-item>
+</mapped-objects>
+<div>
 {{#if_mapping_ready "audits" instance}}
   {{#is_allowed 'update' instance context='for'}}
     {{{render_hooks "Request.gdrive_evidence_storage"}}}
   {{/is_allowed}}
 {{/if_mapping_ready}}
-{{#if_mapping_ready instance.class.info_pane_options.evidence.mapping instance}}
-  <mapping-tree-view
-    {parent-instance}="instance"
-    mapping="all_documents"
-    {item-template}="instance.class.info_pane_options.evidence.show_view"
-    empty-text="None"
-  >
-  </mapping-tree-view>
-{{/if_mapping_ready}}
+</div>

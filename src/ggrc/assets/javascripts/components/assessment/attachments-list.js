@@ -18,7 +18,8 @@
     template: template,
     viewModel: {
       title: '@',
-      tooltip: '@'
+      tooltip: '@',
+      limit: 5
     }
   });
 })(window.GGRC, window.can);
