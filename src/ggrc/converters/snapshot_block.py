@@ -3,6 +3,8 @@
 
 """Module for snapshot block converter."""
 
+import logging
+
 from collections import defaultdict
 from collections import OrderedDict
 
@@ -13,6 +15,8 @@ from ggrc import models
 from ggrc import utils
 from ggrc.utils import benchmark
 from ggrc.models.reflection import AttributeInfo
+
+logger = logging.getLogger(__name__)
 
 
 class SnapshotBlockConverter(object):
@@ -155,9 +159,7 @@ class SnapshotBlockConverter(object):
     """Get property to name mapping for object attributes."""
     model = getattr(models.all_models, self.child_type, None)
     if not model:
-      # log warning
-      # Model has been removed from the system and we don't know its attribute
-      # names anymore.
+      logger.warning("Exporting invalid snapshot model: %s", self.child_type)
       return {}
     aliases = AttributeInfo.gather_visible_aliases(model)
     aliases.update(self.CUSTOM_SNAPSHOT_ALIASES)
