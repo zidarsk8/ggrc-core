@@ -57,23 +57,6 @@ def validate_assessment_relationships(connection):  # noqa # pylint: disable=inv
   return connection.execute(sql).fetchall()
 
 
-def validate_request_relationships(connection):
-  """Check that requests are not mapped to any non-snapshottable object"""
-  valid_types = format_types(Types.all | {"Document", "Person", "Comment"})
-  sql = """
-  SELECT DISTINCT obj.id
-  FROM requests AS obj
-  JOIN relationships AS rel ON (
-    (rel.source_type="Request" AND rel.source_id=obj.id AND
-     rel.destination_type NOT IN ({valid_types})) OR
-    (rel.destination_type="Request" AND
-     rel.destination_id=obj.id AND
-     rel.source_type NOT IN ({valid_types})))
-  ORDER BY obj.id;
-  """.format(valid_types=",".join(valid_types))
-  return connection.execute(sql).fetchall()
-
-
 def validate_issue_relationships(connection):
   """Check that issues are not mapped to any non-snapshottable object"""
   valid_types = format_types(

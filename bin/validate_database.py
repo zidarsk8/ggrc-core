@@ -64,9 +64,6 @@ def validate():
   assessment_relationships_validation = (
       validation.validate_assessment_relationships(db.session))
 
-  request_relationships_validation = (
-      validation.validate_request_relationships(db.session))
-
   issue_relationships_validation = (
       validation.validate_issue_relationships(db.session))
 
@@ -78,7 +75,6 @@ def validate():
       multiple_mappings,
       zero_mappings,
       assessment_template_validation,
-      request_relationships_validation,
       issue_relationships_validation
   ]
   if any(validations):
@@ -104,7 +100,6 @@ def validate():
           ))
     object_validations = [
         ("Assessment", assessment_relationships_validation),
-        ("Request", request_relationships_validation),
         ("Issue", issue_relationships_validation),
     ]
     for type_, obj_type_validation in object_validations:
