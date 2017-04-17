@@ -46,32 +46,13 @@
         }, this.updateRevision.bind(this));
       },
       getRevisions: function (currentRevisionID, newRevisionID) {
-        var additionalFilter = {
-          expression: {
-            op: {name: 'OR'},
-            left: {
-              op: {name: '='},
-              left: 'id',
-              right: currentRevisionID
-            },
-            right: {
-              op: {name: '='},
-              left: 'id',
-              right: newRevisionID
-            }
-          }
-        };
-        var params = GGRC.Utils.QueryAPI.buildParam(
-          'Revision',
-          {},
-          undefined,
-          undefined,
-          additionalFilter
-        );
-        return can.Model.Cacheable.query({data: [params]});
+        return CMS.Models.Revision.findAll({
+          id__in: currentRevisionID + ',' + newRevisionID,
+          __sort: 'id'
+        });
       },
       prepareInstances: function (data) {
-        return data.Revision.values.map(function (value) {
+        return data.map(function (value) {
           var content = value.content;
           var model = CMS.Models[value.resource_type];
           content.isRevision = true;

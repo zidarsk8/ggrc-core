@@ -18,19 +18,17 @@ describe('GGRC.Components.revisionsComparer', function () {
 
     beforeEach(function () {
       method = Component.prototype.scope.prepareInstances;
-      fakeData = {
-        Revision: {
-          values: [{
-            id: 1,
-            content: {id: 1},
-            resource_type: 'Control'
-          }, {
-            id: 2,
-            content: {id: 1},
-            resource_type: 'Control'
-          }]
+      fakeData = [
+        {
+          id: 1,
+          content: {id: 1},
+          resource_type: 'Control'
+        }, {
+          id: 2,
+          content: {id: 1},
+          resource_type: 'Control'
         }
-      };
+      ];
     });
 
     it('returns instances of necessary type and with isRevision', function () {
@@ -44,12 +42,12 @@ describe('GGRC.Components.revisionsComparer', function () {
 
     it('returns the same length of instances as passed', function () {
       var result = method(fakeData);
-      expect(result.length).toBe(fakeData.Revision.values.length);
+      expect(result.length).toBe(fakeData.length);
     });
 
     it('returns the same data as passed with extra properties', function () {
       var result = method(fakeData);
-      var data = fakeData.Revision.values;
+      var data = fakeData;
       result.forEach(function (item, index) {
         expect(item.instance.id).toEqual(data[index].content.id);
       });
