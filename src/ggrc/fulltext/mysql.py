@@ -10,7 +10,6 @@ from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy import union
 from sqlalchemy.sql import false
-from sqlalchemy.schema import DDL
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select

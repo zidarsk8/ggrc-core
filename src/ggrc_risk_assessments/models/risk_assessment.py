@@ -1,6 +1,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Risk Assessment model."""
+
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.mixins import CustomAttributable
@@ -17,8 +19,9 @@ from ggrc.models.relationship import Relatable
 
 
 class RiskAssessment(Documentable, Timeboxed, Noted, Described,
-                     CustomAttributable, Titled, Relatable, Slugged, 
+                     CustomAttributable, Titled, Relatable, Slugged,
                      Indexed, db.Model):
+  """Risk Assessment model."""
   __tablename__ = 'risk_assessments'
   _title_uniqueness = False
 
