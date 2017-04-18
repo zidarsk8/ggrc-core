@@ -16,7 +16,7 @@ from sqlalchemy import orm
 from .track_object_state import HasObjectState
 
 
-class Directive(Roleable, HasObjectState, Timeboxed, BusinessObject, db.Model):
+class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
   __tablename__ = 'directives'
 
   version = deferred(db.Column(db.String), 'Directive')
@@ -129,7 +129,7 @@ class Directive(Roleable, HasObjectState, Timeboxed, BusinessObject, db.Model):
 
 
 # FIXME: For subclasses, restrict kind
-class Policy(CustomAttributable, Relatable,
+class Policy(Roleable, CustomAttributable, Relatable,
              Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
@@ -149,7 +149,7 @@ class Policy(CustomAttributable, Relatable,
     return 'Policy'
 
 
-class Regulation(CustomAttributable, Relatable,
+class Regulation(Roleable, CustomAttributable, Relatable,
                  Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
@@ -169,7 +169,7 @@ class Regulation(CustomAttributable, Relatable,
     return 'Regulation'
 
 
-class Standard(CustomAttributable, Relatable,
+class Standard(Roleable, CustomAttributable, Relatable,
                Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Standard'
@@ -189,7 +189,7 @@ class Standard(CustomAttributable, Relatable,
     return 'Standard'
 
 
-class Contract(CustomAttributable, Relatable,
+class Contract(Roleable, CustomAttributable, Relatable,
                Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'
