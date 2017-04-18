@@ -37,7 +37,9 @@
       'title',
       'type',
       'viewLink',
-      'workflow_state'
+      'workflow_state',
+      // labels for assessment templates
+      'DEFAULT_PEOPLE_LABELS'
     ]);
 
     allTypes.forEach(function (type) {
