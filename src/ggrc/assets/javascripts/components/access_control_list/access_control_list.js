@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, _, GGRC) {
+(function (can, _, GGRC, Permission) {
   'use strict';
 
   /**
@@ -24,6 +24,13 @@
       instance: null,
 
       define: {
+        // whether or not the instance is a new object that is yet to be
+        // created on the backend
+        isNewInstance: {
+          type: 'boolean',
+          value: false
+        },
+
         // whether or not to automatically save instance on person role changes
         autosave: {
           type: 'boolean',
@@ -180,8 +187,19 @@
        * @param {Object} options - the component instantiation options
        */
       init: function ($element, options) {
+        var canEdit;
         var vm = this.viewModel;
+        var instance = vm.instance;
 
+        if (!instance) {
+          console.error('accessControlList component: instance not given.');
+          return;
+        }
+
+        canEdit = vm.isNewInstance ||
+                  Permission.is_allowed_for('update', instance);
+
+        vm.attr('canEdit', canEdit);
         vm.attr('grantingRoleId', 0);
         vm.attr('_rolesInfoFixed', false);
         vm._rebuildRolesInfo();
@@ -233,4 +251,4 @@
       }
     }
   });
-})(window.can, window._, window.GGRC);
+})(window.can, window._, window.GGRC, window.Permission);
