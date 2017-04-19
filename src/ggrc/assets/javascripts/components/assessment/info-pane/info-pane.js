@@ -144,6 +144,10 @@
               .find(function (item) {
                 return item.def.id === Number(fieldId);
               });
+          if (!caValue) {
+            console.error('Corrupted Date: ', caValues);
+            return;
+          }
           caValue.attr('attribute_value',
             GGRC.Utils.CustomAttributes.convertToCaValue(
               caValue.attr('attributeType'),
@@ -155,8 +159,16 @@
         return this.attr('instance').save();
       },
       showRequiredInfoModal: function (scope) {
+        var errors = scope.attr('errorsMap');
+        var errorsList = can.Map.keys(errors)
+          .map(function (error) {
+            return errors[error] ? error : null;
+          })
+          .filter(function (errorCode) {
+            return !!errorCode;
+          });
         var data = {
-          fields: scope.attr('errors') || [],
+          fields: errorsList,
           value: scope.attr('value'),
           title: scope.attr('title'),
           type: scope.attr('type')
@@ -180,9 +192,12 @@
         this.attr('modal.state.open', true);
       }
     },
+    init: function () {
+      this.viewModel.initializeFormFields();
+      this.viewModel.updateRelatedItems();
+    },
     events: {
       '{viewModel.instance} refreshInstance': function () {
-        this.viewModel.initializeFormFields();
         this.viewModel.updateRelatedItems();
       }
     }

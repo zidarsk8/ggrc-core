@@ -116,7 +116,11 @@
           },
           def: def,
           attributeType: type,
-          preconditions_failed: []
+          preconditions_failed: [],
+          errorsMap: {
+            comment: false,
+            evidence: false
+          }
         };
 
         values.forEach(function (value) {
@@ -131,7 +135,10 @@
               valid: errors.indexOf('comment') < 0 &&
               errors.indexOf('evidence') < 0
             };
-
+            value.errorsMap = {
+              comment: errors.indexOf('comment') > -1,
+              evidence: errors.indexOf('evidence') > -1
+            };
             valueData = value;
           }
         });
@@ -185,7 +192,7 @@
               options.split(',') : [],
             helptext: attr.def.helptext,
             validation: attr.validation,
-            errors: attr.preconditions_failed,
+            errorsMap: attr.errorsMap,
             valueId: attr.id
           };
         });
