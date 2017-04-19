@@ -18,6 +18,7 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
     ).first()
 
   def _add_people(self, people_list):
+    """Add people to AC list with the current role."""
     for person in people_list:
       models.AccessControlList(
           object=self.row_converter.obj,
@@ -26,24 +27,32 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
       )
 
   def _remove_people(self, people_list):
+    """Remove people from AC list with the current role."""
     acl_email_map = {
         acl.person.email: acl
         for acl in self.row_converter.obj.access_control_list
+        if acl.ac_role == self.role
     }
     for person in people_list:
       acl = acl_email_map[person.email]
       self.row_converter.obj.access_control_list.remove(acl)
 
   def set_obj_attr(self):
+    """Update current AC list with correct people values."""
     if not self.value:
       return
-    list_old = {i.person for i in self.row_converter.obj.access_control_list}
+    list_old = {
+        acl.person
+        for acl in self.row_converter.obj.access_control_list
+        if acl.ac_role == self.role
+    }
     list_new = set(self.value)
 
     self._add_people(list_new - list_old)
     self._remove_people(list_old - list_new)
 
   def get_value(self):
+    """Get list of emails for people with the current AC role."""
     people = sorted(
         acl.person.email
         for acl in self.row_converter.obj.access_control_list
