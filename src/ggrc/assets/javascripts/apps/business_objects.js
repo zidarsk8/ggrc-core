@@ -59,6 +59,7 @@
       var path = GGRC.mustache_path;
       var infoWidgetViews;
       var summaryWidgetViews;
+      var dashboardWidgetViews;
       var modelNames;
       var possibleModelType;
       var farModels;
@@ -75,6 +76,9 @@
       summaryWidgetViews = {
         audits: path + '/audits/summary.mustache'
       };
+      dashboardWidgetViews = {
+        audits: path + '/audits/dashboard.mustache'
+      };
       if (summaryWidgetViews[objectTable]) {
         widgetList.add_widget(object.constructor.shortName, 'summary', {
           widget_id: 'summary',
@@ -82,6 +86,17 @@
           instance: object,
           widget_view: summaryWidgetViews[objectTable],
           order: 3
+        });
+      }
+      if (dashboardWidgetViews[objectTable] &&
+          GGRC.Utils.Dashboards.isDashboardEnabled(
+            objectClass && objectClass.table_singular)) {
+        widgetList.add_widget(object.constructor.shortName, 'dashboard', {
+          widget_id: 'dashboard',
+          content_controller: GGRC.Controllers.DashboardWidget,
+          instance: object,
+          widget_view: dashboardWidgetViews[objectTable],
+          order: 2
         });
       }
       infoWidgetViews = {

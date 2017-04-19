@@ -50,6 +50,7 @@ dashboard-js-files:
   - plugins/utils/state-utils.js
   - plugins/utils/ggrcq-utils.js
   - plugins/utils/tree-view-utils.js
+  - plugins/utils/dashboards-utils.js
   - plugins/datepicker.js
   - plugins/can_control.js
   - plugins/wysiwyg.js
@@ -122,6 +123,7 @@ dashboard-js-files:
   - controllers/dashboard_widgets_controller.js
   - controllers/info_widget_controller.js
   - controllers/summary_widget_controller.js
+  - controllers/dashboard_widget_controller.js
   - controllers/modals_controller.js
   - controllers/delete_modal_controller.js
   - controllers/help_controller.js
@@ -602,6 +604,7 @@ dashboard-js-template-files:
   - audits/tree-item-attr.mustache
   - audits/info.mustache
   - audits/summary.mustache
+  - audits/dashboard.mustache
   - audits/tree_add_item.mustache
   - audits/search_result.mustache
   - audits/extended_info.mustache
