@@ -152,6 +152,19 @@ class TestACLImportExport(TestCase):
     )
     self.assertEqual(parsed_data[0][empty_name], "")
 
+  @staticmethod
+  def _generate_role_import_dict(roles):
+    """Generate simple import dict with all roles and emails."""
+    import_dict = OrderedDict([
+        ("object_type", "Market"),
+        ("code", "market-1"),
+        ("title", "Title"),
+        ("Admin", "user@example.com"),
+    ])
+    for role_name, emails in roles.items():
+      import_dict[role_name] = "\n".join(emails)
+    return import_dict
+
   @ddt.data({
       "role_name_1": set(),
       "role_name_2": set(_random_emails[2:]),
@@ -161,23 +174,17 @@ class TestACLImportExport(TestCase):
       "role_name_3": set(_random_emails),
   })
   def test_multiple_acl_roles_add(self, roles):
+    """Test importing new object with multiple ACL roles."""
     for email in self._random_emails:
       factories.PersonFactory(email=email)
 
-    import_dict = OrderedDict([
-        ("object_type", "Market"),
-        ("code", "market-1"),
-        ("title", "Title"),
-        ("Admin", "user@example.com"),
-    ])
-
-    for role_name, emails, in roles.items():
+    for role_name in roles.keys():
       factories.AccessControlRoleFactory(
           object_type="Market",
           name=role_name,
       )
-      import_dict[role_name] = "\n".join(emails)
 
+    import_dict = self._generate_role_import_dict(roles)
     self.import_data(import_dict)
     market = models.Market.query.first()
 
@@ -209,23 +216,17 @@ class TestACLImportExport(TestCase):
   }], 2)))
   @ddt.unpack
   def test_multiple_acl_roles_update(self, first_roles, edited_roles):
+    """Test updating objects via import with multiple ACL roles."""
     for email in self._random_emails:
       factories.PersonFactory(email=email)
 
-    import_dict = OrderedDict([
-        ("object_type", "Market"),
-        ("code", "market-1"),
-        ("title", "Title"),
-        ("Admin", "user@example.com"),
-    ])
-
-    for role_name, emails, in first_roles.items():
+    for role_name in first_roles.keys():
       factories.AccessControlRoleFactory(
           object_type="Market",
           name=role_name,
       )
-      import_dict[role_name] = "\n".join(emails)
 
+    import_dict = self._generate_role_import_dict(first_roles)
     self.import_data(import_dict)
     market = models.Market.query.first()
 
@@ -238,16 +239,7 @@ class TestACLImportExport(TestCase):
 
     self.assertEqual(stored_roles, first_roles)
 
-    import_dict = OrderedDict([
-        ("object_type", "Market"),
-        ("code", "market-1"),
-        ("title", "Title"),
-        ("Admin", "user@example.com"),
-    ])
-
-    for role_name, emails, in edited_roles.items():
-      import_dict[role_name] = "\n".join(emails)
-
+    import_dict = self._generate_role_import_dict(edited_roles)
     self.import_data(import_dict)
     market = models.Market.query.first()
 
