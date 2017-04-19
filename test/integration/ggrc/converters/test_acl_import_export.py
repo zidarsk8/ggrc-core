@@ -56,7 +56,8 @@ class TestACLImportExport(TestCase):
   def test_acl_update(self):
     """Test ACL column import with multiple emails."""
     role_name = factories.AccessControlRoleFactory(object_type="Market").name
-    emails = {factories.PersonFactory().email for _ in range(3)}
+    emails = {factories.PersonFactory().email for _ in range(4)}
+    update_emails = set(list(emails)[:2]) | {"user@example.com"}
 
     response = self.import_data(OrderedDict([
         ("object_type", "Market"),
@@ -71,13 +72,13 @@ class TestACLImportExport(TestCase):
         ("code", "market-1"),
         ("title", "Title"),
         ("Admin", "user@example.com"),
-        (role_name, "user@example.com"),
+        (role_name, "\n".join(update_emails)),
     ]))
     self._check_csv_response(response, {})
     market = models.Market.query.first()
     self.assertEqual(
         {acl.person.email for acl in market.access_control_list},
-        {"user@example.com"},
+        update_emails,
     )
 
   def test_acl_empty_update(self):
