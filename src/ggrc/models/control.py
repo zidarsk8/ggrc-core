@@ -8,6 +8,8 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc.models import reflection
+from ggrc.models.object_document import EvidenceURL
 from ggrc.models.audit_object import Auditable
 from ggrc.models.categorization import Categorizable
 from ggrc.models.category import CategoryBase
@@ -109,7 +111,7 @@ class AssertionCategorized(Categorizable):
 
 
 class Control(WithLastAssessmentDate, HasObjectState, Relatable,
-              CustomAttributable, Personable, ControlCategorized,
+              CustomAttributable, Personable, ControlCategorized, EvidenceURL,
               AssertionCategorized, Hierarchical, Timeboxed, Ownable,
               Auditable, TestPlanned, BusinessObject, Indexed, db.Model):
   __tablename__ = 'controls'
@@ -227,8 +229,21 @@ class Control(WithLastAssessmentDate, HasObjectState, Relatable,
       "key_control": {
           "display_name": "Significance",
           "description": "Allowed values are:\nkey\nnon-key\n---",
-      }
+      },
+      # overrides values from EvidenceURL mixin
+      "document_url": None,
+      "document_evidence": {
+          "display_name": "Evidence",
+          "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
+          "description": ("New line separated list of evidence links and "
+                          "titles.\nExample:\n\nhttp://my.gdrive.link/file "
+                          "Title of the evidence link"),
+      },
   }
+
+  @property
+  def document_evidence(self):
+    return self.documents_by_type("document_evidence")
 
   @validates('kind', 'means', 'verify_frequency')
   def validate_control_options(self, key, option):

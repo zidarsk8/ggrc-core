@@ -1,0 +1,19 @@
+Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",Mandatory field,,"options:
+yearly
+monthly
+daily","options:
+reactive
+preventive
+detective
+administrative
+",,
+control,code*,title*,description ,frequency,kind/nature,admin,evidence
+,control-2,control-2,desc 2,monthly,detective,user1@ggrc.com,
+,control-3,control 3,desc 3,,,user1@ggrc.com,http://i.imgur.com/Lppr547.jpg Some title 3
+,,,,,,,
+,,,,,,,
+,,,,,,,
+,,,,,,,
+Object type,,,,,,,
+Person,name,email,company,role,,,
+,User1,user1@ggrc.com,,Administrator,,,

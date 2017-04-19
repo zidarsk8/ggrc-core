@@ -605,6 +605,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Secondary Assignee",
         "State",
         "Review State",
+        "Evidence",
         "Delete",
     }
     self._test_single_object(models.Control, names, self.COMMON_EXPECTED)
