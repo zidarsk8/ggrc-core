@@ -22,7 +22,7 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
       models.AccessControlList(
           object=self.row_converter.obj,
           person=person,
-          ac_role_id=self.role.id
+          ac_role=self.role
       )
 
   def _remove_people(self, people_list):
@@ -47,6 +47,6 @@ class AccessControlRoleColumnHandler(handlers.UsersColumnHandler):
     people = sorted(
         acl.person.email
         for acl in self.row_converter.obj.access_control_list
-        if acl.ac_role_id == self.role.id
+        if acl.ac_role == self.role
     )
     return "\n".join(people)
