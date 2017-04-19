@@ -34,10 +34,10 @@ def random_list_strings(list_len=3, item_size=5,
 
 
 def get_bool_from_string(str_to_bool):
-  """Return True for 'Yes' and False for 'No'."""
-  if str_to_bool.title() == 'Yes':
+  """Return True for 'Yes' or 'True' and False for 'No' or 'False'."""
+  if str_to_bool.title() in ['Yes', "True"]:
     return True
-  elif str_to_bool.title() == 'No':
+  elif str_to_bool.title() in ['No', "False"]:
     return False
   else:
     raise ValueError("'{}' can't be converted to boolean".format(str_to_bool))

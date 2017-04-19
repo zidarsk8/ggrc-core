@@ -79,8 +79,7 @@ _per_module_load_suffixes = [
     'assets/vendor/remoteipart/vendor/assets/javascripts',
     'assets/stylesheets',
     'assets/vendor/stylesheets',
-    'assets/js_specs',
-    'assets/mockups',
+    'assets/js_specs'
 ]
 
 for module_load_base in module_load_paths:
@@ -141,21 +140,9 @@ environment.register("dashboard-js-templates", webassets.Bundle(
     # Always keep `debug` False here, since raw mustache is not valid JS
     debug=False))
 
-environment.register("mockup-js-templates", webassets.Bundle(
-    *asset_paths['mockup-js-template-files'],
-    filters=MustacheFilter,
-    output='mockup-templates' + version_suffix + '.js',
-    # Always keep `debug` False here, since raw mustache is not valid JS
-    debug=False))
-
 environment.register("dashboard-css", webassets.Bundle(
     *asset_paths['dashboard-css-files'],
     output='dashboard' + version_suffix + '.css'))
-
-environment.register("mockup-js", webassets.Bundle(
-    *asset_paths['mockup-js-files'],
-    # filters='jsmin',
-    output='mockup.js'))
 
 if settings.ENABLE_JASMINE:
   environment.register("dashboard-js-specs", webassets.Bundle(

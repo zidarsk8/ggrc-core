@@ -4,6 +4,7 @@
 */
 
 (function (can, $) {
+  'use strict';
   /*
     Below this line we're defining a few can.Components, which are in this file
     because they work similarly to the quick form controller (in fact, you should
@@ -68,7 +69,7 @@
           context: this.scope.parent_instance.context || new CMS.Models.Context({
             id: null
           }),
-          owners: [{type: "Person", id: GGRC.current_user.id}],
+          owners: [{type: 'Person', id: GGRC.current_user.id}]
         });
         return dfd.save();
       }
@@ -170,7 +171,7 @@
                 join_object,
                 {
                   context: this.scope.parent_instance.context
-                              || new CMS.Models.Context({id : null}),
+                              || new CMS.Models.Context({id : null})
                 },
                 this.scope.attributes.serialize()
               ));
@@ -179,18 +180,20 @@
                 this.scope.parent_instance,
                 this.scope.instance || this.scope.attributes.instance,
                 $.extend({
-                  context : this.scope.parent_instance.context
+                  context: this.scope.parent_instance.context
                             || new CMS.Models.Context({id : null})
                           },
                           this.scope.attributes.serialize())
               );
             }
             this.bindXHRToButton(
-              join_object.save().done(function() {
-                el.trigger("modal:success", join_object);
-              }),
-              el
-              );
+              join_object.save()
+                .done(function () {
+                  el.trigger("modal:success", join_object);
+                  this.viewModel
+                    .attr('parent_instance')
+                    .dispatch('refreshInstance');
+                }.bind(this)), el);
           }.bind(this))
           .always(function () {
             scope.attr('disabled', false);

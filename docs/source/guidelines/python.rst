@@ -81,3 +81,17 @@ For a class:
 
 See `Google Code Style <https://google.github.io/styleguide/pyguide.html>`_
 for explanations and more examples.
+
+Misleading pylint's complaints
+------------------------------
+
+Next pylint errors can mean something more than pylint explains in its' error messages.
+
+duplicate-code (R0801): \*Similar lines in %s files*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you see such error about lines with import statements, it means that maybe you've missed next Code Style rule:
+
+**Use imports for packages and modules only.** (`Google Code Style Import section, revision 2.59 <https://google.github.io/styleguide/pyguide.html?showone=Imports#Imports>`_)
+
+Probably you have >= 4 duplicate lines in 2 source files import statements' section.

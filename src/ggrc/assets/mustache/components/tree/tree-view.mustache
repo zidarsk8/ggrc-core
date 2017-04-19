@@ -1,0 +1,22 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#items}}
+  <tree-item class="tree-item-element"
+             {instance}="."
+             {limit-depth-tree}="limitDepthTree"
+             {get-depth-filter}="@getDepthFilter"
+             {selected-columns}="selectedColumns"
+             {disable-configuration}="disableConfiguration"
+             {mandatory}="mandatory"
+             {make-result}="@makeResult"
+  ></tree-item>
+{{/items}}
+
+<tree-no-results {show}="notResult"></tree-no-results>
+
+<div class="tree-spinner">
+  <spinner toggle="loading" size="large"></spinner>
+</div>

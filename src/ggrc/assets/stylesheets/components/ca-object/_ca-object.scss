@@ -3,6 +3,27 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+.validation-icon {
+  text-align: center;
+  color: transparent;
+  width: 24px;
+  min-width: 24px;
+  height: 24px;
+  line-height: 24px;
+  display: block;
+  font-size: 11px;
+
+  &.validation-icon-empty {
+    color: $icon-color-empty;
+  }
+  &.validation-icon-invalid {
+    color: $icon-color-invalid;
+  }
+  &.validation-icon-valid {
+    color: $icon-color-valid;
+  }
+}
+// Should be removed as part of the next refactoring
 .assessment-custom-attributes {
   ca-object {
     max-width: 50%;
@@ -11,37 +32,9 @@
     margin: 0 0 8px 0;
   }
 
-  .validation-title-empty {
-    color: $icon-color-empty;
-  }
-
-  .validation-title-invalid {
-    color: $icon-color-invalid;
-  }
-
-  .validation-icon {
-    text-align: center;
-    color: transparent;
-    width: 24px;
-    min-width: 24px;
-    height: 24px;
-    line-height: 24px;
-    display: block;
-
-    &.validation-icon-empty {
-      color: $icon-color-empty;
-    }
-    &.validation-icon-invalid {
-      color: $icon-color-invalid;
-    }
-    &.validation-icon-valid {
-      color: $icon-color-valid;
-    }
-  }
-
   .limit-button-container {
     width: 100%;
-    padding:0 0 0 12px;
+    padding: 0 0 0 12px;
   }
 
   ca-object-validation-icon {
@@ -174,7 +167,7 @@
     box-sizing: border-box;
     width: auto;
     line-height: 28px;
-    height: 34px;
+    min-height: 34px;
     margin-left: 0;
     padding: 2px 34px 2px 4px;
 
@@ -199,19 +192,19 @@
       margin: 0;
 
       li {
-          box-sizing: border-box;
-          float: left;
-          width: 32px;
-          line-height: 31px;
+        box-sizing: border-box;
+        float: left;
+        width: 32px;
+        line-height: 31px;
 
-          a {
-            box-sizing: border-box;
-            display: inline-block;
-            line-height: 31px;
-            width: 32px;
-            cursor: pointer;
-          }
+        a {
+          box-sizing: border-box;
+          display: inline-block;
+          line-height: 31px;
+          width: 32px;
+          cursor: pointer;
         }
+      }
 
       &.inline-edit__controls--edit-mode {
         background: $white;

@@ -12,14 +12,14 @@
   /**
    * Simple component to show Document-like Objects
    */
-  can.Component.extend({
+  GGRC.Components('documentObjectListItem', {
     tag: tag,
     template: tpl,
     viewModel: {
       instance: {},
       define: {
         showIcon: {
-          type: Boolean,
+          type: 'boolean',
           value: false
         },
         iconCls: {
@@ -37,6 +37,12 @@
         itemTitle: {
           get: function () {
             return this.attr('itemData.title') || this.attr('itemData.link');
+          }
+        },
+        itemCreationDate: {
+          type: 'date',
+          get: function () {
+            return new Date(this.attr('itemData.created_at'));
           }
         }
       }

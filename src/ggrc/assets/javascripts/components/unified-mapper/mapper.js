@@ -396,8 +396,11 @@
               this.closeModal();
             }.bind(this))
             .done(function () {
+              if (instance && instance.dispatch) {
+                instance.dispatch('refreshInstance');
+              }
               // This Method should be modified to event
-              GGRC.Utils.QueryAPI.refreshCounts();
+              GGRC.Utils.CurrentPage.refreshCounts();
             });
         }.bind(this));
       },

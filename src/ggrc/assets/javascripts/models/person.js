@@ -66,12 +66,15 @@
         return ((val && val.trim) ? val.trim() : val).toLowerCase();
       }
     },
+    findInCacheById: function (id) {
+      return this.store[id] || this.cache ? this.cache[id] : null;
+    },
     findInCacheByEmail: function (email) {
       var result = null;
-      var that = this;
-      can.each(Object.keys(this.cache || {}), function (k) {
-        if (that.cache[k].email === email) {
-          result = that.cache[k];
+      var cache = this.store || this.cache || {};
+      can.each(Object.keys(cache), function (k) {
+        if (cache[k].email === email) {
+          result = cache[k];
           return false;
         }
       });
@@ -83,10 +86,17 @@
       header_view: GGRC.mustache_path + '/people/tree_header.mustache',
       footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       add_item_view: GGRC.mustache_path + '/people/tree_add_item.mustache',
-      mapper_attr_list: [
-        {attr_title: 'Title', attr_name: 'title'},
-        {attr_title: 'Email', attr_name: 'email'}
-      ],
+      attr_list: [{
+        attr_title: 'Name',
+        attr_name: 'title'
+      }, {
+        attr_title: 'Email',
+        attr_name: 'email'
+      }, {
+        attr_title: 'Authorizations',
+        attr_name: 'authorizations'
+      }],
+      display_attr_names: ['title', 'email', 'authorizations'],
       disable_columns_configuration: true
     },
     list_view_options: {

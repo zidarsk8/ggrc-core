@@ -7,8 +7,8 @@ from selenium.common import exceptions
 from selenium.webdriver.common.by import By
 
 from lib import base
-from lib.constants import locator, regex, url
-from lib.page.modal import set_fields, unified_mapper
+from lib.constants import locator, regex
+from lib.page.modal import unified_mapper
 from lib.utils import selenium_utils
 
 
@@ -84,14 +84,16 @@ class Widget(base.Widget):
 
   def get_items_count(self):
     """Get elements' count from counter on filter panel."""
+    selenium_utils.wait_for_js_to_load(self._driver)
     return self.wait_for_counter_loaded().text.split()[2]
 
   def wait_member_deleted(self, count):
     """Wait until elements' counter on filter panel refreshed with new value.
     Args: count (str)
     """
+    selenium_utils.wait_for_js_to_load(self._driver)
     if count != '1':
-      new_count = ' {} '.format(int(count) - 1)
+      new_count = ' {}'.format(int(count) - 1)
       selenium_utils.wait_for_element_text(
           self._driver, locator.BaseWidgetGeneric.FILTER_PANE_COUNTER,
           new_count)
@@ -125,11 +127,11 @@ class Widget(base.Widget):
 
 class TreeView(base.TreeView):
   """Genetic Tree Views."""
+  # pylint: disable=too-many-instance-attributes
   _locators = locator.TreeView
 
   def __init__(self, driver, info_widget_cls, obj_name, is_under_audit):
-    self.widget_name = url.get_widget_name_of_mapped_objs(obj_name)
-    super(TreeView, self).__init__(driver, self.widget_name)
+    super(TreeView, self).__init__(driver, obj_name=obj_name)
     self.info_widget_cls = info_widget_cls
     self.obj_name = obj_name
     self.is_under_audit = is_under_audit
@@ -138,15 +140,9 @@ class TreeView(base.TreeView):
     self.dropdown_settings_cls = factory.get_cls_3bbs_dropdown_settings(
         object_name=obj_name, is_tree_view_not_info=True)
     self.fields_to_set = factory.get_fields_to_set(object_name=obj_name)
-
-  @staticmethod
-  def wait_loading_after_actions(driver):
-    """Wait loading elements of Tree View after made some action with
-    object(s) under Tree View.
-    """
-    selenium_utils.wait_until_not_present(
-        driver, locator.TreeView.ITEM_LOADING)
-    selenium_utils.get_when_invisible(driver, locator.TreeView.SPINNER)
+    self.locator_set_visible_fields = (
+        By.CSS_SELECTOR,
+        self._locators.BUTTON_SHOW_FIELDS.format(self.widget_name))
 
   def open_create(self):
     """Click to Create button on Tree View to open new object creation modal.
@@ -165,7 +161,7 @@ class TreeView(base.TreeView):
     _locator_map = (By.CSS_SELECTOR,
                     self._locators.BUTTON_MAP.format(self.widget_name))
     base.Button(self._driver, _locator_map).click()
-    return unified_mapper.MapObjectsModal(self._driver)
+    return unified_mapper.MapObjectsModal(self._driver, self.obj_name)
 
   def open_3bbs(self):
     """Click to 3BBS button on Tree View to open tree view 3BBS modal.
@@ -177,18 +173,6 @@ class TreeView(base.TreeView):
     return self.dropdown_settings_cls(
         self._driver, self.obj_name, self.is_under_audit)
 
-  def open_set_visible_fields(self):
-    """Click to Set Visible Fields button on Tree View to open
-    Set Visible Fields modal.
-    Return: lib.page.modal.set_fields.SetVisibleFieldsModal
-    """
-    _locator_set_visible_fields = (
-        By.CSS_SELECTOR,
-        self._locators.BUTTON_SHOW_FIELDS.format(self.widget_name))
-    base.Button(self._driver, _locator_set_visible_fields).click()
-    return set_fields.SetVisibleFieldsModal(self._driver, self.widget_name,
-                                            self.fields_to_set)
-
   def select_member_by_title(self, title):
     """Select member on Tree View by title.
     Return: lib.page.widget.info_widget."obj_name"
@@ -198,16 +182,6 @@ class TreeView(base.TreeView):
     selenium_utils.wait_until_stops_moving(item)
     item.click()
     return self.info_widget_cls(self._driver)
-
-  def get_list_members_as_list_scopes(self):
-    """Get list of scopes (dicts) from members (text scopes) which displayed on
-    Tree View according to current set of visible fields.
-    """
-    list_headers = [_item.text.splitlines()[:len(self.fields_to_set)] for
-                    _item in self.tree_view_header_elements()]
-    list_lists_items = [_item.text.splitlines()[:len(self.fields_to_set)] for
-                        _item in self.tree_view_items_elements()]
-    return [dict(zip(list_headers[0], item)) for item in list_lists_items]
 
 
 class Audits(Widget):

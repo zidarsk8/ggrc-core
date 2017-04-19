@@ -73,7 +73,7 @@
       height: auto;
     }
     &.tree-header {
-      padding: 0 12px 0 70px;
+      padding: 0 12px 0 5px;
       font-size: 11px;
       text-transform: uppercase;
       height: 32px;
@@ -419,11 +419,9 @@ ul.new-tree {
 }
 
 .widget-col-title {
-  display: inline-block;
   cursor: pointer;
   i {
     margin-top: 1px;
-    display: none;
   }
   &.asc,
   &.desc {

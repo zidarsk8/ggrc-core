@@ -23,14 +23,17 @@
       },
       toggleSize: function (scope, el, ev) {
         var maximized = !this.attr('maximized');
-        var onChangeMaximizedState = Mustache.resolve(this.onChangeMaximizedState);
+        var onChangeMaximizedState =
+          Mustache.resolve(this.onChangeMaximizedState);
         ev.preventDefault();
         this.attr('maximized', maximized);
         onChangeMaximizedState(maximized);
       },
       close: function (scope, el, ev) {
         var onClose = Mustache.resolve(this.onClose);
-        el.find('[rel=tooltip]').data('tooltip').hide();
+        if (el) {
+          el.find('[rel=tooltip]').data('tooltip').hide();
+        }
         ev.preventDefault();
         onClose();
       }

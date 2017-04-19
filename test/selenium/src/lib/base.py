@@ -11,9 +11,10 @@ from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
 
 from lib import constants, exception, mixin
-from lib.constants import objects
+from lib.constants import objects, url
+from lib.constants.element import MappingStatusAttrs
 from lib.constants.test import batch
-from lib.utils import selenium_utils
+from lib.utils import selenium_utils, string_utils
 
 
 class InstanceRepresentation(object):
@@ -485,19 +486,34 @@ class Widget(AbstractPage):
 
 class TreeView(Component):
   """Common class for representing Tree View list with several objects."""
+  # pylint: disable=too-many-instance-attributes
   _locators = constants.locator.TreeView
 
-  def __init__(self, driver, widget_name):
+  def __init__(self, driver, obj_name=None):
     super(TreeView, self).__init__(driver)
-    self.widget_name = widget_name
     self._tree_view_header_elements = []
     self._tree_view_items_elements = []
     self._tree_view_items = []
+    self.locator_set_visible_fields = None
+    self.locator_no_results_message = self._locators.NO_RESULTS_MESSAGE
+    self.obj_name = obj_name
+    if self.obj_name is not None:
+      self.widget_name = url.get_widget_name_of_mapped_objs(obj_name)
+      from lib import factory
+      self.fields_to_set = factory.get_fields_to_set(object_name=self.obj_name)
+
+  def wait_loading_after_actions(self):
+    """Wait loading elements of Tree View after made some action with
+    object(s) under Tree View.
+    """
+    selenium_utils.wait_until_not_present(
+        self._driver, self._locators.ITEM_LOADING)
+    selenium_utils.get_when_invisible(self._driver, self._locators.SPINNER)
+    selenium_utils.wait_for_js_to_load(self._driver)
 
   def get_tree_view_header_elements(self):
     """Get Tree View header as list of elements from current widget."""
-    _locator_header = (
-        By.CSS_SELECTOR, self._locators.HEADER.format(self.widget_name))
+    _locator_header = (By.CSS_SELECTOR, self._locators.HEADER)
     self._tree_view_header_elements = selenium_utils.get_when_all_visible(
         self._driver, _locator_header)
 
@@ -506,16 +522,14 @@ class TreeView(Component):
     If no items in tree view return empty list.
     """
     _locator_items = (
-        By.CSS_SELECTOR, self._locators.ITEMS.format(self.widget_name))
-    selenium_utils.get_when_invisible(self._driver, self._locators.SPINNER)
-    selenium_utils.wait_until_not_present(
-        self._driver, self._locators.ITEM_LOADING)
-    selenium_utils.wait_for_js_to_load(self._driver)
+        By.CSS_SELECTOR, self._locators.ITEMS)
+    self.wait_loading_after_actions()
     has_no_record_found = selenium_utils.is_element_exist(
-        self._driver, self._locators.NO_RESULTS_MESSAGE)
+        self._driver, self.locator_no_results_message)
     self._tree_view_items_elements = (
         [] if has_no_record_found else
         selenium_utils.get_when_all_visible(self._driver, _locator_items))
+    return self._tree_view_items_elements
 
   def set_tree_view_items(self):
     """Set Tree View items as list of Tree View item objects from current
@@ -548,6 +562,106 @@ class TreeView(Component):
     if not self._tree_view_items:
       self.set_tree_view_items()
     return self._tree_view_items
+
+  def open_set_visible_fields(self):
+    """Click to Set Visible Fields button on Tree View to open
+    Set Visible Fields modal.
+    Return: lib.page.modal.set_fields.SetVisibleFieldsModal
+    """
+    _locator_set_visible_fields = self.locator_set_visible_fields
+    Button(self._driver, _locator_set_visible_fields).click()
+    return SetVisibleFieldsModal(self._driver, self.fields_to_set)
+
+  def get_list_members_as_list_scopes(self):
+    """Get list of scopes (dicts) from members (text scopes) which displayed on
+    Tree View according to current set of visible fields.
+    """
+    if self.get_tree_view_items_elements():
+      list_headers = [_item.text.splitlines()[:len(self.fields_to_set)] for
+                      _item in self.tree_view_header_elements()]
+      list_lists_items = [_item.text.splitlines()[:len(self.fields_to_set)] for
+                          _item in self.tree_view_items_elements()]
+      return [dict(zip(list_headers[0], item)) for item in list_lists_items]
+    else:
+      return self._tree_view_items_elements
+
+
+class UnifiedMapperTreeView(TreeView):
+  """Tree-View class for Unified Mapper"""
+  _locators = constants.locator.UnifiedMapperTreeView
+
+  def __init__(self, driver, obj_name):
+    super(UnifiedMapperTreeView, self).__init__(driver, obj_name=obj_name)
+    self.locator_set_visible_fields = (By.CSS_SELECTOR,
+                                       self._locators.BUTTON_SHOW_FIELDS)
+    self.locator_no_results_message = (By.CSS_SELECTOR,
+                                       self._locators.NO_RESULTS_MESSAGE)
+
+  def open_set_visible_fields(self):
+    """Click to Set Visible Fields button on Tree View to open
+    Set Visible Fields modal.
+    Return: lib.page.modal.set_fields.SetVisibleFieldsModal
+    """
+    _locator_set_visible_fields = self.locator_set_visible_fields
+    Button(self._driver, _locator_set_visible_fields).click()
+    return MapperSetVisibleFieldsModal(self._driver, self.fields_to_set)
+
+
+class AdminTreeView(TreeView):
+  """Class for representing Tree View list in Admin dashboard."""
+  _locators = constants.locator.AdminTreeView
+
+  def __init__(self, driver, widget_name):
+    super(AdminTreeView, self).__init__(driver)
+    self.widget_name = widget_name
+
+
+class SetVisibleFieldsModal(Modal):
+  """Modal to select and set visible fields for objects to represent them on
+  Tree View."""
+  _locators = constants.locator.ModalSetVisibleFields
+
+  def __init__(self, driver, fields_to_set):
+    super(SetVisibleFieldsModal, self).__init__(driver)
+    self.fields_to_set = fields_to_set
+    self.visible_fields_elements = None
+
+  def select_visible_fields(self):
+    """Select visible fields checkboxes on Select Visible Fields modal
+    according to titles of fields to set."""
+    # pylint: disable=attribute-defined-outside-init
+    _locator_modal_fields = (By.CSS_SELECTOR,
+                             self._locators.MODAL)
+    _locator_fields_titles = (
+        By.CSS_SELECTOR,
+        self._locators.FIELDS_TITLES)
+    _locator_fields_checkboxes = (
+        By.CSS_SELECTOR,
+        self._locators.FIELDS_CHECKBOXES)
+    selenium_utils.get_when_visible(self._driver, _locator_modal_fields)
+    self.visible_fields_elements = ListCheckboxes(
+        self._driver, titles_locator=_locator_fields_titles,
+        checkboxes_locator=_locator_fields_checkboxes)
+    self.visible_fields_elements.select_by_titles(self.fields_to_set)
+
+  def confirm_set_visible_fields(self):
+    """Confirm set visible fields."""
+    _locator_set_fields = (
+        By.CSS_SELECTOR,
+        self._locators.BUTTON_SET_FIELDS)
+    Button(self._driver, _locator_set_fields).click()
+    selenium_utils.get_when_invisible(self._driver, _locator_set_fields)
+
+  def select_and_set_visible_fields(self):
+    """Select checkboxes to set objects visible fields and confirm set."""
+    self.select_visible_fields()
+    self.confirm_set_visible_fields()
+
+
+class MapperSetVisibleFieldsModal(SetVisibleFieldsModal):
+  """Modal to select and set visible fields for objects to represent them on
+  Tree View."""
+  _locators = constants.locator.ModalSetVisibleFieldsMapper
 
 
 class TreeViewItem(Component):
@@ -609,3 +723,16 @@ class ListCheckboxes(Component):
     objs = zip(objs_titles, objs_checkboxes)
     self._unselect_unnecessary(objs, list_titles)
     self._select_necessary(objs, list_titles)
+
+  def get_mapping_statuses(self):
+    """Get list of mapping statuses by given titles"""
+    selenium_utils.get_when_all_visible(self._driver, self.locator_titles)
+    objs_titles = self._driver.find_elements(*self.locator_titles)
+    objs_checkboxes = self._driver.find_elements(*self.locator_checkboxes)
+    objs = [
+        MappingStatusAttrs(obj[0], obj[1][0], obj[1][1]) for obj in zip(
+            [obj.text for obj in objs_titles],
+            [[string_utils.get_bool_from_string(obj.get_attribute("checked")),
+              string_utils.get_bool_from_string(obj.get_attribute("disabled"))]
+                for obj in objs_checkboxes])]
+    return objs

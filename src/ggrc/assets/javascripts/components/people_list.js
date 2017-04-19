@@ -85,6 +85,7 @@
       list_mapped: [],
       computed_mapping: false,
       forbiddenForUnmap: [],
+      _EV_BEFORE_EDIT: 'before-edit',
       /**
         * Get pending joins for current instance
         *
@@ -340,36 +341,39 @@
         * @param {Object} ev - click event handler
         */
       remove_role: function (parentScope, el, ev) {
-        var person = CMS.Models.Person.findInCacheById(el.data('person'));
-        var instance = this.instance;
-        var roleToRemove = can.capitalize(this.attr('type'));
-        var deferred = this.attr('deferred');
+        this.confirmEdit()
+          .done(function () {
+            var person = CMS.Models.Person.findInCacheById(el.data('person'));
+            var instance = this.instance;
+            var roleToRemove = can.capitalize(this.attr('type'));
+            var deferred = this.attr('deferred');
 
-        // Turn off popover for the removed person
-        $(el).closest('li').find('.person-tooltip-trigger')
-          .removeClass('person-tooltip-trigger');
+            // Turn off popover for the removed person
+            $(el).closest('li').find('.person-tooltip-trigger')
+              .removeClass('person-tooltip-trigger');
 
-        if (deferred) {
-          this.deferred_remove_role(person, roleToRemove);
-        } else {
-          this.get_roles(person, instance).then(function (result) {
-            var roles = result.roles;
-            var relationship = result.relationship;
-            var resultPromise;
-
-            roles = _.without(roles, roleToRemove);
-
-            if (roles.length) {
-              relationship.attrs.attr('AssigneeType', roles.join(','));
-              resultPromise = relationship.save();
+            if (deferred) {
+              this.deferred_remove_role(person, roleToRemove);
             } else {
-              resultPromise = relationship.destroy();
+              this.get_roles(person, instance).then(function (result) {
+                var roles = result.roles;
+                var relationship = result.relationship;
+                var resultPromise;
+
+                roles = _.without(roles, roleToRemove);
+
+                if (roles.length) {
+                  relationship.attrs.attr('AssigneeType', roles.join(','));
+                  resultPromise = relationship.save();
+                } else {
+                  resultPromise = relationship.destroy();
+                }
+                resultPromise.then(function () {
+                  instance.refresh();
+                });
+              });
             }
-            resultPromise.then(function () {
-              instance.refresh();
-            });
-          });
-        }
+          }.bind(this));
       },
       /**
         * Get saved roles list for a person
@@ -406,10 +410,49 @@
           });
 
         return rolesDfd;
+      },
+      /**
+        * Trigger Assessment state changing confirmation modal display
+        *
+        * @return {can.Deferred} - a promise with the state changing confirmation
+        */
+      confirmEdit: function () {
+        var confirmation;
+
+        confirmation = this.$rootEl.triggerHandler({
+          type: this._EV_BEFORE_EDIT
+        });
+        return confirmation;
+      },
+      /**
+        * Enable editing People in Assessment Attributes
+        *
+        * Called with a person adding button
+        *
+        * @param {Object} scope - current page context
+        * @param {jQuery.Object} $el - clicked element
+        * @param {Object} event - click event handler
+        */
+      enableEdit: function (scope, $el, event) {
+        event.preventDefault();
+
+        this.confirmEdit()
+          .done(function () {
+            this.attr('isEdit', true);
+          }.bind(this));
+      },
+      /**
+        * Hides controls for editing People in Assessment Attributes
+        *
+        * Called with a person-add hiding button
+        */
+      disableEdit: function () {
+        this.attr('isEdit', false);
       }
     },
     events: {
-      inserted: function () {
+      inserted: function (el) {
+        this.scope.attr('$rootEl', $(el));
         this.scope.get_mapped_deferred().then(function (data) {
           this.scope.attr('list_pending', this.scope.get_pending());
           this.scope.attr('list_mapped', data);

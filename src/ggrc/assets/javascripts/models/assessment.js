@@ -19,14 +19,6 @@
       'inScopeObjects'
     ],
     is_custom_attributable: true,
-    attributes: {
-      related_sources: 'CMS.Models.Relationship.stubs',
-      related_destinations: 'CMS.Models.Relationship.stubs',
-      context: 'CMS.Models.Context.stub',
-      modified_by: 'CMS.Models.Person.stub',
-      finished_date: 'date',
-      verified_date: 'date'
-    },
     defaults: {
       status: 'Not Started',
       send_by_default: true,  // notifications when a comment is added
@@ -102,22 +94,10 @@
       }]
     },
     info_pane_options: {
-      mapped_objects: {
-        model: can.Model.Cacheable,
-        mapping: 'info_related_objects',
-        show_view: GGRC.mustache_path + '/base_templates/subtree.mustache'
-      },
       evidence: {
         model: CMS.Models.Document,
         mapping: 'all_documents',
         show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
-        sort_function: GGRC.Utils.sortingHelpers.commentSort
-      },
-      comments: {
-        model: can.Model.Cacheable,
-        mapping: 'comments',
-        show_view: GGRC.mustache_path +
-        '/base_templates/comment_subtree.mustache',
         sort_function: GGRC.Utils.sortingHelpers.commentSort
       },
       urls: {
@@ -127,8 +107,8 @@
       }
     },
     confirmEditModal: {
-      title: 'Confirm moving Request to "In Progress"',
-      description: 'You are about to move request from ' +
+      title: 'Confirm moving Assessment to "In Progress"',
+      description: 'You are about to move Assessment from ' +
       '"{{status}}" to "In Progress" - are you sure about that?',
       button: 'Confirm'
     },
@@ -181,51 +161,6 @@
       return attrs[this.root_object] ? attrs[this.root_object] : attrs;
     },
     /**
-     * Assessment specific parsing logic to simplify business logic of Custom Attributes
-     * @param {Array} definitions - original list of Custom Attributes Definition
-     * @param {Array} values - original list of Custom Attributes Values
-     * @return {Array} Updated Custom attributes
-     */
-    prepareCustomAttributes: function (definitions, values) {
-      return definitions.map(function (def) {
-        var valueData = false;
-        var id = def.id;
-        var type = GGRC.Utils.mapCAType(def.attribute_type);
-        var stub = {
-          id: null,
-          custom_attribute_id: id,
-          attribute_value: null,
-          attribute_object: null,
-          validation: {
-            empty: true,
-            mandatory: def.mandatory,
-            valid: true
-          },
-          def: def,
-          attributeType: type
-        };
-
-        values.forEach(function (value) {
-          var errors = [];
-          if (value.custom_attribute_id === id) {
-            errors = value.preconditions_failed || [];
-            value.def = def;
-            value.attributeType = type;
-            value.validation = {
-              empty: errors.indexOf('value') > -1,
-              mandatory: def.mandatory,
-              valid: errors.indexOf('comment') < 0 &&
-              errors.indexOf('evidence') < 0
-            };
-
-            valueData = value;
-          }
-        });
-
-        return valueData || stub;
-      });
-    },
-    /**
      * Assessment specific AJAX data parsing logic
      * @param {Object} attributes - hash of Model key->values
      * @return {Object} - parsed object with normalized data
@@ -242,7 +177,8 @@
       }
 
       attributes.custom_attribute_values =
-        this.prepareCustomAttributes(definitions, values);
+        GGRC.Utils.CustomAttributes
+          .prepareCustomAttributes(definitions, values);
       return attributes;
     },
     model: function (attributes, oldModel) {
@@ -303,8 +239,9 @@
       if (this._super) {
         this._super.apply(this, arguments);
       }
+      this.bind('refreshInstance', this.refresh.bind(this));
     },
-    before_create: function (dfd) {
+    before_create: function () {
       if (!this.audit) {
         throw new Error('Cannot save assessment, audit not set.');
       } else if (!this.audit.context) {
@@ -314,82 +251,10 @@
       this.attr('context', this.attr('audit.context'));
     },
     after_save: function () {
-      this.updateValidation();
+      this.dispatch('refreshInstance');
       if (this.audit && this.audit.selfLink) {
         this.audit.refresh();
       }
-    },
-    updateValidation: function () {
-      var values = this.attr('custom_attribute_values');
-      var definitions = this.attr('custom_attribute_definitions');
-      var errorsList = {
-        attachment: [],
-        comment: [],
-        value: []
-      };
-      this.validateValues(definitions, values, errorsList);
-      this.setErrorMessages(errorsList);
-      this.setAggregatedErrorMessage();
-    },
-    validateValues: function (definitions, values, errorsList) {
-      can.each(definitions, function (cad) {
-        var cav;
-        var value;
-
-        can.each(values, function (item) {
-          if (item.custom_attribute_id === cad.id) {
-            cav = item;
-            value = cav.attribute_value;
-          }
-        });
-        if (cad.mandatory &&
-          GGRC.Utils.isEmptyCA(value, cad.attribute_type, cav)) {
-          // If Custom Attribute is mandatory and empty
-          errorsList.value.push(cad.title);
-        } else if (cav) {
-          // If Custom Attribute Value is presented - do all required checks
-          cav.preconditions_failed = cav.preconditions_failed || [];
-          if (cav.preconditions_failed.indexOf('comment') > -1) {
-            errorsList.comment.push(cad.title + ': ' + value);
-          }
-          if (cav.preconditions_failed.indexOf('evidence') > -1) {
-            errorsList.attachment.push(cad.title + ': ' + value);
-          }
-        }
-      });
-    },
-    setErrorMessages: function (needed) {
-      if (needed.comment.length) {
-        this.attr('_mandatory_comment_msg',
-          'Comment required by: ' + needed.comment.join(', '));
-      } else {
-        this.removeAttr('_mandatory_comment_msg');
-      }
-
-      if (needed.attachment.length) {
-        this.attr('_mandatory_attachment_msg',
-          'Evidence required by: ' + needed.attachment.join(', '));
-      } else {
-        this.removeAttr('_mandatory_attachment_msg');
-      }
-
-      if (needed.value.length) {
-        this.attr(
-          '_mandatory_value_msg',
-          'Values required for: ' + needed.value.join(', ')
-        );
-      } else {
-        this.removeAttr('_mandatory_value_msg');
-      }
-    },
-    setAggregatedErrorMessage: function () {
-      this.attr('_mandatory_msg',
-        _.filter([
-          this.attr('_mandatory_value_msg'),
-          this.attr('_mandatory_attachment_msg'),
-          this.attr('_mandatory_comment_msg')
-        ]).join('; <br />') || false
-      );
     },
     form_preload: function (newObjectForm) {
       var pageInstance = GGRC.page_instance();
@@ -439,20 +304,47 @@
         });
       }
     },
-    refreshInstance: function () {
-      return this.refresh().then(function () {
-        this.updateValidation();
-      }.bind(this));
+    refresh: function () {
+      var dfd;
+      var href = this.selfLink || this.href;
+      var that = this;
+
+      if (!href) {
+        return can.Deferred().reject();
+      }
+      if (!this._pending_refresh) {
+        this._pending_refresh = {
+          dfd: can.Deferred(),
+          fn: _.throttle(function () {
+            var dfd = that._pending_refresh.dfd;
+            can.ajax({
+              url: href,
+              type: 'get',
+              dataType: 'json'
+            })
+          .then(function (model) {
+            delete that._pending_refresh;
+            if (model) {
+              model = CMS.Models.Assessment.model(model, that);
+              model.backup();
+              return model;
+            }
+          })
+          .done(function () {
+            dfd.resolve.apply(dfd, arguments);
+          })
+          .fail(function () {
+            dfd.reject.apply(dfd, arguments);
+          });
+          }, 300, {trailing: false})
+        };
+      }
+      dfd = this._pending_refresh.dfd;
+      this._pending_refresh.fn();
+      return dfd;
     },
     info_pane_preload: function () {
-      if (!this._pane_preloaded) {
-        this.get_mapping('comments').bind('length',
-          this.refreshInstance.bind(this));
-        this.get_mapping('all_documents').bind('length',
-          this.refreshInstance.bind(this));
-        this.refreshInstance();
-        this._pane_preloaded = true;
-      }
+      this.refresh();
     },
     get_related_objects_as_source: function () {
       var dfd = can.Deferred();

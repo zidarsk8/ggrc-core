@@ -31,9 +31,9 @@
     }
   };
 
-  can.Component.extend({
+  GGRC.Components('reusableObjectsList', {
     tag: 'reusable-objects-list',
-    scope: {
+    viewModel: {
       baseInstance: null,
       checkReusedStatus: false,
       evidenceList: [],
@@ -89,13 +89,14 @@
         this.attr('urlList').replace([]);
         this.attr('isSaving', false);
         this.attr('checkReusedStatus', true);
+        this.attr('baseInstance').dispatch('refreshInstance');
       }
     },
     events: {
-      '{scope.evidenceList} length': function () {
+      '{viewModel.evidenceList} length': function () {
         this.scope.setHasSelected();
       },
-      '{scope.urlList} length': function () {
+      '{viewModel.urlList} length': function () {
         this.scope.setHasSelected();
       }
     }

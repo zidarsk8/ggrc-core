@@ -5,6 +5,7 @@
 
 @import "components/comment/comment-input";
 @import "components/comment/comment-control";
+@import "components/comment/comment-list";
 @import "components/tree_pagination/tree_pagination";
 @import "components/simple-modal/simple-modal";
 @import "components/read-more/read-more";
@@ -23,8 +24,11 @@
 @import "components/unified-mapper/unified-mapper";
 @import "components/object-selection/object-selection";
 @import "components/sub-tree-expander/sub-tree-expander";
-@import "components/tree-node-actions/tree-node-actions";
 @import "components/multiselect-dropdown/multiselect-dropdown";
 @import "components/page-header/page-header";
 @import "components/tabs/tab-container";
 @import "components/tabs/tab-panel";
+@import "components/tree/tree-item-extra-info";
+@import "components/tree/sub-tree-wrapper";
+@import "components/tree/tree-view";
+@import "components/auto-save-form/auto-save-form";

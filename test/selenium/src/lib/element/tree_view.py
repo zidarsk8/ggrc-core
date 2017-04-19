@@ -17,6 +17,7 @@ class CommonDropdownSettings(base.Component):
   def __init__(self, driver, obj_name, is_under_audit):
     super(CommonDropdownSettings, self).__init__(driver)
     self.widget_name = url.get_widget_name_of_mapped_objs(obj_name)
+    self.obj_name = obj_name
     # elements
     self.select_child_tree_locator = (
         self._locators.BUTTON_3BBS_SELECT_CHILD_TREE.format(self.widget_name))
@@ -41,7 +42,7 @@ class Assessments(CommonDropdownSettings):
         By.CSS_SELECTOR,
         self._locators.BUTTON_3BBS_GENERATE.format(self.widget_name))
     base.Button(self._driver, _locator_generate).click()
-    return unified_mapper.GenerateAssessmentsModal(self._driver)
+    return unified_mapper.GenerateAssessmentsModal(self._driver, self.obj_name)
 
 
 class AssessmentTemplates(CommonDropdownSettings):

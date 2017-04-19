@@ -16,6 +16,30 @@
     var allTypes = Object.keys(baseWidgets.serialize());
     var orderedModelsForSubTier = {};
 
+    var QueryAPI = GGRC.Utils.QueryAPI;
+    var CurrentPage = GGRC.Utils.CurrentPage;
+    var SnapshotUtils = GGRC.Utils.Snapshots;
+
+    var SUB_TREE_ELEMENTS_LIMIT = 20;
+    var SUB_TREE_FIELDS = Object.freeze([
+      'child_id',
+      'child_type',
+      'context',
+      'email',
+      'id',
+      'is_latest_revision',
+      'name',
+      'revision',
+      'revisions',
+      'selfLink',
+      'slug',
+      'status',
+      'title',
+      'type',
+      'viewLink',
+      'workflow_state'
+    ]);
+
     allTypes.forEach(function (type) {
       var related = baseWidgets[type].slice(0);
 
@@ -124,6 +148,7 @@
       return {
         available: allAttrs,
         selected: mandatoryColumns.concat(displayColumns),
+        mandatory: mandatoryAttrNames,
         disableConfiguration: false
       };
     }
@@ -165,6 +190,32 @@
         available: availableColumns,
         selected: selectedColumns
       };
+    }
+
+    /**
+     * Returns map where key is name of field
+     * and value True if column selected and False or not.
+     * @param {Array} available - Full list of available columns.
+     * @param {Array} selected - List of selected columns.
+     * @return Map with selected columns.
+     */
+    function createSelectedColumnsMap(available, selected) {
+      var selectedColumns = can.makeArray(selected);
+      var availableColumns = can.makeArray(available);
+      var columns = new can.Map();
+
+      availableColumns
+        .forEach(function (attr) {
+          var value = {};
+          value[attr.attr_name] = selectedColumns
+            .some(function (selectedAttr) {
+              return !selectedAttr.mandatory &&
+                selectedAttr.attr_name === attr.attr_name;
+            });
+          columns.attr(value);
+        });
+
+      return columns;
     }
 
     function displayTreeSubpath(el, path, attemptCounter) {
@@ -216,11 +267,255 @@
       return orderedModelsForSubTier[model] || [];
     }
 
+    /**
+     *
+     * @param {String} modelName - Name of requested objects.
+     * @param {Object} parent - Information about parent object.
+     * @param {String} parent.type - Type of parent object.
+     * @param {Number} parent.id - ID of parent object.
+     * @param {Object} filterInfo - Information about pagination, sorting and filtering
+     * @param {Number} filterInfo.current -
+     * @param {Number} filterInfo.pageSize -
+     * @param {Number} filterInfo.sortBy -
+     * @param {Number} filterInfo.sortDirection -
+     * @param {Number} filterInfo.filter -
+     * @return {Promise}
+     */
+    function loadFirstTierItems(modelName, parent, filterInfo, filter) {
+      var params = QueryAPI.buildParam(
+        modelName,
+        filterInfo,
+        makeRelevantExpression(modelName, parent.type, parent.id),
+        null,
+        filter
+      );
+      var requestedType;
+
+      if (SnapshotUtils.isSnapshotScope(parent) &&
+        SnapshotUtils.isSnapshotModel(modelName)) {
+        params = SnapshotUtils.transformQuery(params);
+      }
+
+      requestedType = params.object_name;
+      return QueryAPI.makeRequest({data: [params]})
+        .then(function (response) {
+          response = response[0][requestedType];
+
+          response.values = response.values.map(function (source) {
+            return _createInstance(source, modelName);
+          });
+
+          return response;
+        });
+    }
+
+    /**
+     *
+     * @param {Array} models - Array of models for load in sub tree
+     * @param type - Type of parent object.
+     * @param id - ID of parent object.
+     * @param {String} filter - Filter.
+     * @return {Promise} - Items for sub tier.
+     */
+    function loadItemsForSubTier(models, type, id, filter) {
+      var loadedModels = [];
+      var relevant = {
+        type: type,
+        id: id,
+        operation: 'relevant'
+      };
+      var showMore = false;
+
+      return _buildSubTreeCountMap(models, relevant, filter)
+        .then(function (result) {
+          var countMap = result.countsMap;
+          var reqParams;
+
+          loadedModels = Object.keys(countMap);
+          showMore = result.showMore;
+
+          reqParams = loadedModels.map(function (model) {
+            return QueryAPI.buildParam(
+              model,
+              {
+                current: 1,
+                pageSize: countMap[model],
+                filter: filter
+              },
+              relevant,
+              SUB_TREE_FIELDS);
+          });
+
+          if (SnapshotUtils.isSnapshotParent(relevant.type) ||
+            SnapshotUtils.isInScopeModel(relevant.type)) {
+            reqParams = reqParams.map(function (item) {
+              if (SnapshotUtils.isSnapshotModel(item.object_name)) {
+                item = SnapshotUtils.transformQuery(item);
+              }
+              return item;
+            });
+          }
+
+          return QueryAPI.makeRequest({data: reqParams});
+        })
+        .then(function (response) {
+          var directlyRelated = [];
+          var notRelated = [];
+
+          loadedModels.forEach(function (modelName, index) {
+            var values;
+
+            if (SnapshotUtils.isSnapshotModel(modelName) &&
+              response[index].Snapshot) {
+              values = response[index].Snapshot.values;
+            } else {
+              values = response[index][modelName].values;
+            }
+
+            values.forEach(function (source) {
+              var instance = _createInstance(source, modelName);
+
+              if (_isDirectlyRelated(instance)) {
+                directlyRelated.push(instance);
+              } else {
+                notRelated.push(instance);
+              }
+            });
+          });
+
+          return {
+            directlyItems: directlyRelated,
+            notDirectlyItems: notRelated,
+            showMore: showMore
+          };
+        });
+    }
+
+    /**
+     *
+     * @param {String} requestedType - Type of requested object.
+     * @param {String} relevantToType - Type of parent object.
+     * @param {Number} relevantToId - ID of parent object.
+     * @param {String} [operation] - Type of operation
+     * @return {object} Returns expression for load items for 1st level of tree view.
+     */
+    function makeRelevantExpression(requestedType,
+                                    relevantToType,
+                                    relevantToId,
+                                    operation) {
+      var isObjectBrowser = /^\/objectBrowser\/?$/
+        .test(window.location.pathname);
+      var expression;
+
+      if (!isObjectBrowser) {
+        expression = {
+          type: relevantToType,
+          id: relevantToId
+        };
+
+        expression.operation = operation ? operation :
+          _getTreeViewOperation(requestedType);
+      }
+      return expression;
+    }
+
+    /**
+     *
+     * @param {Array} models - Type of model.
+     * @param {Object} relevant - Relevant description
+     * @param {String} filter - Filter string.
+     * @return {Promise} - Counts for limitation load items for sub tier
+     * @private
+     */
+    function _buildSubTreeCountMap(models, relevant, filter) {
+      var countQuery = QueryAPI.buildCountParams(models, relevant, filter);
+
+      return QueryAPI.makeRequest({data: countQuery}).then(function (response) {
+        var countMap = {};
+        var total = 0;
+        var showMore = models.some(function (model, index) {
+          var count = response[index][model].total;
+
+          if (!count) {
+            return;
+          }
+
+          if (total + count < SUB_TREE_ELEMENTS_LIMIT) {
+            countMap[model] = count;
+          } else {
+            countMap[model] = SUB_TREE_ELEMENTS_LIMIT - total;
+          }
+
+          total += count;
+
+          return total >= SUB_TREE_ELEMENTS_LIMIT;
+        });
+
+        return {
+          countsMap: countMap,
+          showMore: showMore
+        };
+      });
+    }
+
+    /**
+     * @param {Object} source - Instance object.
+     * @param {String} modelName - Name of model.
+     * @return {CMS.Models} - Instance of model.
+     * @private
+     */
+    function _createInstance(source, modelName) {
+      var instance;
+
+      if (source.type === 'Snapshot') {
+        instance = SnapshotUtils.toObject(source);
+      } else {
+        instance = CMS.Models[modelName].model(source);
+      }
+      return instance;
+    }
+
+    /**
+     * Check if object directly mapped to the current context.
+     * @param {Object} instance - Instance of model.
+     * @private
+     * @return {Boolean} Is associated with the current context.
+     */
+    function _isDirectlyRelated(instance) {
+      var needToSplit = CurrentPage.isObjectContextPage();
+      var relates = CurrentPage.related.attr(instance.type);
+      var result = true;
+      var instanceId = SnapshotUtils.isSnapshot(instance) ?
+        instance.snapshot.child_id :
+        instance.id;
+
+      if (needToSplit) {
+        result = !!(relates && relates[instanceId]);
+      }
+
+      return result;
+    }
+
+    function _getTreeViewOperation(objectName) {
+      var isDashboard = /dashboard/.test(window.location);
+      var operation;
+      if (isDashboard) {
+        operation = 'owned';
+      } else if (!isDashboard && objectName === 'Person') {
+        operation = 'related_people';
+      }
+      return operation;
+    }
+
     return {
       getColumnsForModel: getColumnsForModel,
       setColumnsForModel: setColumnsForModel,
       displayTreeSubpath: displayTreeSubpath,
-      getModelsForSubTier: getModelsForSubTier
+      getModelsForSubTier: getModelsForSubTier,
+      loadFirstTierItems: loadFirstTierItems,
+      loadItemsForSubTier: loadItemsForSubTier,
+      makeRelevantExpression: makeRelevantExpression,
+      createSelectedColumnsMap: createSelectedColumnsMap
     };
   })();
 })(window.GGRC);

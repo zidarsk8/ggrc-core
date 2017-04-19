@@ -40,8 +40,9 @@
           }
         },
         commentCreationDate: {
+          type: 'date',
           get: function () {
-            return this.attr('itemData.created_at');
+            return new Date(this.attr('itemData.created_at'));
           }
         },
         commentAuthor: {

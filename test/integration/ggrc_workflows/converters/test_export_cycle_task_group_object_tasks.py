@@ -121,7 +121,7 @@ class TestExportTasks(TestCase):
       ),
       (
           "created_at",
-          ["task Created On", "task created on", "task created_at"],
+          ["task Created Date", "task created Date", "task created_at"],
       ),
   )
   @unpack

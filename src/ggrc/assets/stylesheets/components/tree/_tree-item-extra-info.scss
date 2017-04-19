@@ -1,0 +1,123 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+tree-item-extra-info {
+  margin-left: auto;
+  margin-right: 10px;
+  width: 16px;
+  line-height: 19px;
+  i {
+    visibility: hidden;
+    color: $gray;
+    &.person-tooltip-trigger {
+      font-size: 19px;
+    }
+    &.state-verified {
+      color: $green;
+    }
+    &.state-inprogress {
+      color: $darkOrange;
+    }
+    &.state-overdue {
+      color: $status-declined;
+      visibility: visible;
+    }
+  }
+}
+
+tree-item-actions {
+  display: flex;
+  border: 1px solid $warmGray;
+  border-radius: 5px;
+  margin: auto 0;
+  visibility: hidden;
+  position: relative;
+
+  &.show-force {
+    visibility: visible;
+
+    ul {
+      display: block;
+    }
+  }
+
+  &:hover {
+    ul {
+      display: block;
+    }
+  }
+
+  a {
+    text-decoration: none;
+    line-height: 18px;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  > a {
+    display: flex;
+    margin: 3px 5px;
+    i {
+      font-size: 13px !important;
+
+      &:first-child {
+        margin-right: 5px;
+      }
+    }
+  }
+  > ul {
+    display: none;
+    position: absolute;
+    top: 20px;
+    width: 220px;
+    background-color: $white;
+    list-style-type: none;
+    z-index: 1000;
+    border: 1px solid $warmGray;
+    margin: 0;
+    box-shadow: 0 3px 1px rgba(0,0,0,.05);
+
+    &:hover {
+      display: block;
+    }
+
+    li {
+      margin: 0;
+      padding: 0;
+      transition: all linear 0.1s;
+
+      &:hover {
+        background-color: $lightGray !important;
+        a {
+          color: $black !important;
+        }
+      }
+      a {
+        line-height: 30px;
+        color: $black;
+        display: block;
+        font-size: 13px;
+        padding: 5px 15px;
+        text-decoration: none;
+
+        i.fa {
+          margin-right: 3px;
+          width: 16px;
+          font-size: 13px;
+        }
+      }
+
+      .openclose {
+        float: none !important;
+        padding: 0;
+      }
+
+      &.splitter {
+        border-bottom: 1px solid $lightGray;
+      }
+    }
+  }
+}

@@ -76,7 +76,7 @@
       ['Contract', 'Policy', 'Regulation', 'Standard']),
     Control: filteredTypes,
     Assessment: snapshotWidgetsConfig.concat('Audit').sort(),
-    AssessmentTemplate: [],
+    AssessmentTemplate: ['Audit'],
     DataAsset: filteredTypes,
     Facility: filteredTypes,
     Issue: snapshotWidgetsConfig.concat('Audit').sort(),

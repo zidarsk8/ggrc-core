@@ -66,6 +66,7 @@
       //  generally for these.
       "input:not([data-mapping]), select change" : function(el) {
         var isCheckbox = el.is("[type=checkbox][multiple]");
+        var isDropdown = el.is('select');
         if (isCheckbox) {
           if(!this.scope.instance[el.attr("name")]) {
             this.scope.instance.attr(el.attr("name"), new can.List());
@@ -83,10 +84,15 @@
           this.element.find("input:checkbox").prop("disabled", true);
         } else {
           this.scope.instance.attr(el.attr("name"), el.val());
+          if (isDropdown) {
+            el.closest('dropdown').attr('is-disabled', true);
+          }
         }
         this.scope.instance.save().then(function () {
           if (isCheckbox) {
             this.element.find("input:checkbox").prop("disabled", false);
+          } else if (isDropdown) {
+            el.closest('dropdown').attr('is-disabled', false);
           }
         }.bind(this));
       },

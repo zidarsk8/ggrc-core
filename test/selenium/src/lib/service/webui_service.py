@@ -11,6 +11,8 @@ from lib.utils import selenium_utils, string_utils
 
 class BaseWebUiService(object):
   """Base class for business layer's services objects."""
+  # pylint: disable=too-many-instance-attributes
+  # pylint: disable=too-many-public-methods
   def __init__(self, driver, obj_name):
     self.driver = driver
     self.obj_name = obj_name
@@ -23,6 +25,7 @@ class BaseWebUiService(object):
     self.url_mapped_objs = (
         "{src_obj_url}" + url.get_widget_name_of_mapped_objs(obj_name))
     self.url_obj_info_page = "{obj_url}" + url.Widget.INFO
+    self._unified_mapper = None
 
   def create_list_objs(self, entity_factory, list_scopes):
     """Create and return list of objects used entity factory and UI data
@@ -102,6 +105,16 @@ class BaseWebUiService(object):
     return self.create_list_objs(entity_factory=self.entities_factory_cls,
                                  list_scopes=list_objs_scopes)
 
+  def get_list_objs_from_mapper(self, src_obj, dest_objs):
+    """Get and return list of objects from Unified Mapper Tree View and
+     list of MappingStatusAttrs - namedtuples for mapping representation."""
+    self._set_list_objs_scopes_repr_on_mapper_tree_view(src_obj)
+    list_objs_scopes, mapping_statuses = (
+        self._search_objs_via_tree_view(src_obj, dest_objs))
+    return self.create_list_objs(
+        entity_factory=self.entities_factory_cls,
+        list_scopes=list_objs_scopes), mapping_statuses
+
   def get_obj_from_info_page(self, obj):
     """Get and return object from Info page."""
     scope = self.get_scope_from_info_page(obj)
@@ -116,6 +129,15 @@ class BaseWebUiService(object):
     (objs_widget.tree_view.open_create().
      fill_minimal_data(title=obj.title, code=obj.slug).save_and_close())
 
+  def _get_unified_mapper(self, src_obj):
+    """Open generic widget of mapped objects, open unified mapper modal from
+    Tree View.
+    Return unified_mapper.MapObjectsModal"""
+    if self._unified_mapper is None:
+      self._unified_mapper = (self.open_widget_of_mapped_objs(src_obj)
+                              .tree_view.open_map())
+    return self._unified_mapper
+
   def map_objs_via_tree_view(self, src_obj, dest_objs):
     """Open generic widget of mapped objects, open unified mapper modal from
     Tree View, fill data according to destination objects, search by them
@@ -126,6 +148,19 @@ class BaseWebUiService(object):
     (dest_objs_widget.tree_view.open_map().
      map_dest_objs(dest_objs_type=dest_objs[0].type.title(),
                    dest_objs_titles=dest_objs_titles))
+
+  def _search_objs_via_tree_view(self, src_obj, dest_objs):
+    """Open generic widget of mapped objects, open unified mapper modal from
+    Tree View, fill data according to destination objects and search them.
+    Return list of scopes (dicts) from members (text scopes) which displayed on
+    Tree View according to current set of visible fields
+    And list of MappingStatusAttrs namedtuples for mapping representation.
+    """
+    dest_objs_titles = [dest_obj.title for dest_obj in dest_objs]
+    mapper = self._get_unified_mapper(src_obj)
+    return mapper.search_dest_objs(
+        dest_objs_type=dest_objs[0].type.title(),
+        dest_objs_titles=dest_objs_titles), mapper.get_mapping_statuses()
 
   def get_count_objs_from_tab(self, src_obj):
     """Open generic widget of mapped objects, get count of objects from Tab
@@ -142,6 +177,14 @@ class BaseWebUiService(object):
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     (objs_widget.tree_view.open_set_visible_fields().
      select_and_set_visible_fields())
+
+  def _set_list_objs_scopes_repr_on_mapper_tree_view(self, src_obj):
+    """Open generic widget of mapped objects, set visible fields for objects
+    scopes representation on Unified Mapper Tree View.
+    """
+    # pylint: disable=invalid-name
+    mapper = self._get_unified_mapper(src_obj)
+    mapper.tree_view.open_set_visible_fields().select_and_set_visible_fields()
 
   def get_list_objs_scopes_from_tree_view(self, src_obj):
     """Open generic widget of mapped objects and get list of objects scopes as
@@ -198,7 +241,7 @@ class SnapshotsWebUiService(BaseWebUiService):
     obj_info_panel = (objs_widget.tree_view.
                       select_member_by_title(title=obj.title))
     obj_info_panel.open_link_get_latest_ver().confirm_update()
-    objs_widget.tree_view.wait_loading_after_actions(self.driver)
+    objs_widget.tree_view.wait_loading_after_actions()
     selenium_utils.get_when_invisible(
         self.driver, CommonSnapshotsInfo.locator_link_get_latest_ver)
 

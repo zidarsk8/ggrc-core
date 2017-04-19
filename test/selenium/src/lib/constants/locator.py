@@ -25,7 +25,7 @@ class Common(object):
   # dropdown
   DROPDOWN_MENU = ".dropdown-menu"
   # tree
-  TREE_LIST = ".tree-action-list"
+  TREE_LIST = ".tree-action"
   TREE_HEADER = ".tree-header"
   # base
   BUTTON = "BUTTON_"
@@ -483,15 +483,26 @@ class ModalCustomAttribute(object):
 
 class ModalSetVisibleFields(object):
   """Locators for Set visible fields modals."""
-  OPEN_MENU = ".open .dropdown-menu-form"
-  LEFT_SET_FIELDS = Common.TREE_HEADER + " .visible-columns-list"
-  MODAL = "{} " + OPEN_MENU
+  MODAL = ".open .visible-columns-list"
   # labels
   MODAL_TITLE = MODAL + " h5"
-  FIELDS_TITLES = "{} " + LEFT_SET_FIELDS + " .checkbox-inline"
+  ATTR_LIST = " .attr-list"
+  FIELDS_TITLES = MODAL + ATTR_LIST + " .checkbox-inline"
   # user input elements
-  FIELDS_CHECKBOXES = "{} " + LEFT_SET_FIELDS + " .attr-checkbox"
-  BUTTON_SET_FIELDS = "{} " + LEFT_SET_FIELDS + " .set-tree-attrs"
+  FIELDS_CHECKBOXES = MODAL + ATTR_LIST + " .attr-checkbox"
+  BUTTON_SET_FIELDS = MODAL + " .set-tree-attrs"
+
+
+class ModalSetVisibleFieldsMapper(ModalSetVisibleFields):
+  """Locators for Set visible fields modals."""
+  MODAL = ".modal-body"
+  # labels
+  MODAL_TITLE = MODAL + " h5"
+  ATTR_LIST = ModalSetVisibleFields.ATTR_LIST
+  FIELDS_TITLES = MODAL + ATTR_LIST + " .checkbox-inline"
+  # user input elements
+  FIELDS_CHECKBOXES = MODAL + ATTR_LIST + " .attr-checkbox"
+  BUTTON_SET_FIELDS = MODAL + " .set-tree-attrs"
 
 
 class WidgetBar(object):
@@ -556,8 +567,7 @@ class ObjectWidget(object):
   HEADER_LAST_ASSESSMENT_DATE = (
       By.CSS_SELECTOR, _HEADER + ' [data-field="last_assessment_date"]')
   MEMBERS_TITLE_LIST = (
-      By.CSS_SELECTOR, '.object-area .tree-structure .select '
-                       '[class^="span"]:nth-child(1) .title')
+      By.CSS_SELECTOR, '.object-area .tree-item-element .title-area')
   INFO_PANE = (By.CSS_SELECTOR, '.sticky-info-panel')
   LOADING = (By.CSS_SELECTOR, '.new-tree_loading')
 
@@ -877,8 +887,25 @@ class AssessmentsDropdown3bbsTreeView(CommonDropdown3bbsTreeView):
 class TreeView(object):
   """Locators for Tree View components."""
   # common
-  ITEMS = "{} li.tree-item .item-main"
-  HEADER = "{} " + Common.TREE_HEADER
+  ITEMS = ".tree-item-element"
+  HEADER = Common.TREE_HEADER
+  ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
+  ITEM_EXPAND_BUTTON = "tree-item-actions"
+  SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
+  NO_RESULTS_MESSAGE = (
+      By.CSS_SELECTOR, ".widget:not(.hidden) .tree-no-results-message")
+  BUTTON_SHOW_FIELDS = "{} " + Common.TREE_HEADER + " .fa-bars"
+  # user input elements
+  BUTTON_3BBS = "{} " + Common.TREE_LIST + " .btn-draft"
+  BUTTON_CREATE = "{} " + Common.TREE_LIST + " .create-button"
+  BUTTON_MAP = "{} " + Common.TREE_LIST + " .map-button"
+
+
+class AdminTreeView(object):
+  """Locators for Tree View components in Admin dashboard."""
+  # common
+  ITEMS = "li.tree-item .item-main"
+  HEADER = Common.TREE_HEADER
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
   ITEM_EXPAND_BUTTON = " .openclose"
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
@@ -888,6 +915,14 @@ class TreeView(object):
   BUTTON_3BBS = "{} " + Common.TREE_LIST + " .btn-draft"
   BUTTON_CREATE = "{} " + Common.TREE_LIST + " .create-button"
   BUTTON_MAP = "{} " + Common.TREE_LIST + " .map-button"
+
+
+class UnifiedMapperTreeView(TreeView):
+  MODAL = ".ggrc_controllers_mapper_modal"
+  HEADER = MODAL + " .list-header"
+  ITEMS = MODAL + " .object-list-item"
+  BUTTON_SHOW_FIELDS = HEADER + " .fa-bars"
+  NO_RESULTS_MESSAGE = ".well-small:not(.hidden)"
 
 
 class BaseWidgetGeneric(object):
@@ -900,13 +935,13 @@ class BaseWidgetGeneric(object):
     class should look like. Note that same functionality can be
     implemented using properties though with more code."""
     def __init__(cls, *args):
-      _FILTER = "#{}_widget .sticky-filter"
-      _FILTER_BUTTON = _FILTER + " .tree-filter__button"
-      _FILTER_DROPDOWN = _FILTER + " .multiselect-dropdown"
-      _FILTER_DROPDOWN_ELEMENTS = \
-          _FILTER_DROPDOWN + " .multiselect-dropdown__element"
+      _WIDJET = "#{}_widget"
+      _FILTER_BUTTON = _WIDJET + " tree-filter-input .tree-filter__actions"
+      _FILTER_DROPDOWN = _WIDJET + " tree-status-filter"
+      _FILTER_DROPDOWN_ELEMENTS = (
+          _FILTER_DROPDOWN + " .multiselect-dropdown__element")
       cls.TEXTFIELD_TO_FILTER = (
-          By.CSS_SELECTOR, str(_FILTER + " .tree-filter__input")
+          By.CSS_SELECTOR, str(_WIDJET + " .tree-filter__input")
             .format(cls._object_name))
       cls.BUTTON_FILTER = (
           By.CSS_SELECTOR,
@@ -926,7 +961,7 @@ class BaseWidgetGeneric(object):
           str(_FILTER_DROPDOWN_ELEMENTS).format(cls._object_name))
   FILTER_PANE_COUNTER = (
       By.CSS_SELECTOR,
-      ".tree-pagination__count .tree-view-pagination__count__title")
+      "section.widget:not(.hidden) .tree-view-pagination__count__title")
 
 
 class WidgetAudits(BaseWidgetGeneric):
