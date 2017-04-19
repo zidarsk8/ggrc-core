@@ -8,7 +8,6 @@ dashboard-js-files:
   - apps/gdrive.js
   - components/gdrive_picker_launcher.js
   - components/gdrive_folder_picker.js
-  - mustache_helpers.js
 
 dashboard-js-spec-files:
   - models/gdrive_models_spec.js
@@ -17,8 +16,6 @@ dashboard-js-template-files:
   - responses/gdrive_upload_evidence.mustache
   - responses/gdrive_evidence_tree.mustache
   - meetings/gcal_info.mustache
-  - people/gplus_actions.mustache
-  - people/gplus_photo.mustache
   - gdrive/auth_button.mustache
   - gdrive/gapi_errors.mustache
   - gdrive/gdrive_folder.mustache
@@ -28,4 +25,3 @@ dashboard-js-template-files:
   - audits/gdrive_folder_picker.mustache
   - workflows/gdrive_folder_picker.mustache
   - requests/gdrive_evidence_storage.mustache
-  - requests/gdrive_comment_attachment.mustache

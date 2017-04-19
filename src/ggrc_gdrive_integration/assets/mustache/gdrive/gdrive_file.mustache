@@ -3,9 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<button class="{{link_class}} btn btn-small btn-white {{#if pickerActive}}disabled{{/if}}"
+<button class="{{link_class}} btn btn-small btn-white"
+        {{#if pickerActive}}disabled{{/if}}
     data-object-source="true"
     data-toggle="evidence-gdrive-picker"
-    ($click)="{{click_event}}">Attach
-    <spinner toggle="pending"></spinner>
+    ($click)="onClickHandler">
+    <content></content>
 </button>
