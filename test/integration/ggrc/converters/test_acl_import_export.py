@@ -3,6 +3,7 @@
 
 """Test import and export of objects with custom attributes."""
 
+import itertools
 from collections import OrderedDict
 
 import ddt
@@ -188,3 +189,73 @@ class TestACLImportExport(TestCase):
       }
 
     self.assertEqual(stored_roles, roles)
+
+  @ddt.data(*list(itertools.combinations([{
+      "role_name_1": set(),
+      "role_name_2": set(),
+      "role_name_3": set(),
+  }, {
+      "role_name_1": set(),
+      "role_name_2": set(_random_emails[2:]),
+      "role_name_3": set(_random_emails),
+  }, {
+      "role_name_1": set(_random_emails[:3]),
+      "role_name_2": set(_random_emails[2:]),
+      "role_name_3": set(_random_emails),
+  }, {
+      "role_name_1": set(_random_emails),
+      "role_name_2": set(_random_emails),
+      "role_name_3": set(_random_emails),
+  }], 2)))
+  @ddt.unpack
+  def test_multiple_acl_roles_update(self, first_roles, edited_roles):
+    for email in self._random_emails:
+      factories.PersonFactory(email=email)
+
+    import_dict = OrderedDict([
+        ("object_type", "Market"),
+        ("code", "market-1"),
+        ("title", "Title"),
+        ("Admin", "user@example.com"),
+    ])
+
+    for role_name, emails, in first_roles.items():
+      factories.AccessControlRoleFactory(
+          object_type="Market",
+          name=role_name,
+      )
+      import_dict[role_name] = "\n".join(emails)
+
+    self.import_data(import_dict)
+    market = models.Market.query.first()
+
+    stored_roles = {}
+    for role_name in first_roles.keys():
+      stored_roles[role_name] = {
+          acl.person.email for acl in market.access_control_list
+          if acl.ac_role.name == role_name
+      }
+
+    self.assertEqual(stored_roles, first_roles)
+
+    import_dict = OrderedDict([
+        ("object_type", "Market"),
+        ("code", "market-1"),
+        ("title", "Title"),
+        ("Admin", "user@example.com"),
+    ])
+
+    for role_name, emails, in edited_roles.items():
+      import_dict[role_name] = "\n".join(emails)
+
+    self.import_data(import_dict)
+    market = models.Market.query.first()
+
+    stored_roles = {}
+    for role_name in edited_roles.keys():
+      stored_roles[role_name] = {
+          acl.person.email for acl in market.access_control_list
+          if acl.ac_role.name == role_name
+      }
+
+    self.assertEqual(stored_roles, edited_roles)
