@@ -29,36 +29,36 @@ class TestExportControls(TestCase):
                                                  ownable=self.control)
 
   def test_search_by_owner_email(self):
-    self.assertSlugs("owners",
-                     self.basic_owner.email,
-                     [self.control.slug])
+    self.assert_slugs("owners",
+                      self.basic_owner.email,
+                      [self.control.slug])
 
   def test_search_by_owner_name(self):
-    self.assertSlugs("owners",
-                     self.basic_owner.name,
-                     [self.control.slug])
+    self.assert_slugs("owners",
+                      self.basic_owner.name,
+                      [self.control.slug])
 
   def test_search_by_new_owner(self):
     """Filter by added new owner and old owner"""
     basic_email, basic_name = self.basic_owner.email, self.basic_owner.name
     new_owner = factories.PersonFactory(name="new owner")
     factories.OwnerFactory(person=new_owner, ownable=self.control)
-    self.assertSlugs("owners",
-                     new_owner.email,
-                     [self.control.slug])
-    self.assertSlugs("owners",
-                     new_owner.name,
-                     [self.control.slug])
-    self.assertSlugs("owners",
-                     basic_email,
-                     [self.control.slug])
-    self.assertSlugs("owners",
-                     basic_name,
-                     [self.control.slug])
+    self.assert_slugs("owners",
+                      new_owner.email,
+                      [self.control.slug])
+    self.assert_slugs("owners",
+                      new_owner.name,
+                      [self.control.slug])
+    self.assert_slugs("owners",
+                      basic_email,
+                      [self.control.slug])
+    self.assert_slugs("owners",
+                      basic_name,
+                      [self.control.slug])
 
   def test_search_by_deleted_owner(self):
     """Filter by deleted owner"""
     db.session.delete(self.owner_object)
     db.session.commit()
-    self.assertSlugs("owners", self.basic_owner.email, [])
-    self.assertSlugs("owners", self.basic_owner.name, [])
+    self.assert_slugs("owners", self.basic_owner.email, [])
+    self.assert_slugs("owners", self.basic_owner.name, [])
