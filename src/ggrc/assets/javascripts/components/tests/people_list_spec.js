@@ -244,6 +244,13 @@ describe('GGRC.Components.peopleGroup', function () {
         .toEqual(0);
       $('body').html('');
     });
+    it('adds class "hidden" to event element', function () {
+      $('body').append(el);
+      scope.attr('deferred', true);
+      removeRole({}, el, {});
+      expect($(el).hasClass('hidden')).toEqual(true);
+      $('body').html('');
+    });
     it('calls deferred_remove_role if deferred is true', function () {
       scope.attr('deferred', true);
       removeRole({}, el, {});
@@ -293,6 +300,14 @@ describe('GGRC.Components.peopleGroup', function () {
       removeRole({}, el, {});
       expect(result.relationship.save)
         .not.toHaveBeenCalled();
+    });
+    it('does nothing if relationship is undefined', function () {
+      function foo() {
+        result = {};
+        scope.attr('deferred', false);
+        removeRole({}, el, {});
+      }
+      expect(foo).not.toThrowError(TypeError);
     });
   });
 
