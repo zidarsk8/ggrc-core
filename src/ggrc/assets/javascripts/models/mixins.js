@@ -177,23 +177,21 @@
     },
     updateScopeObject: function () {
       var objType = 'Audit';
-      var queryType = 'ids';
+      var queryType = 'values';
+      var queryFields = ['id', 'type', 'title', 'context'];
       var query = GGRC.Utils.QueryAPI
-        .buildRelevantIdsQuery(objType, {
+        .buildParam(objType, {
           current: 1,
           pageSize: 1
         }, {
           type: this.attr('type'),
           operation: 'relevant',
           id: this.attr('id')
-        }, null);
+        }, queryFields);
       return GGRC.Utils.QueryAPI
         .batchRequests(query)
-        .done(function (idsArr) {
-          var audit = {
-            id: idsArr[objType][queryType][0],
-            type: 'Audit'
-          };
+        .done(function (valueArr) {
+          var audit = valueArr[objType][queryType][0];
           this.attr('scopeObject', audit);
           this.attr('audit', audit);
         }.bind(this));

@@ -43,7 +43,7 @@
         var orderBy = this.attr('orderBy') || defaultOrderBy;
         var isAssessment = this.attr('baseInstance.type') === 'Assessment';
         var isSnapshot = !!this.attr('baseInstance.snapshot');
-        var op = isAssessment ? {name: 'similar'} : {name: 'relevant'};
+        var filters;
         var params = {};
         var first;
         var last;
@@ -60,19 +60,34 @@
           first = (page.current - 1) * page.pageSize;
           last = page.current * page.pageSize;
         }
+        filters = isAssessment ? {
+          expression: {
+            object_name: type,
+            op: {name: 'relevant'},
+            ids: [id]
+          }
+        } : {
+          expression: {
+            left: {
+              object_name: type,
+              op: {name: 'relevant'},
+              ids: [id]
+            },
+            right: {
+              object_name: type,
+              op: {name: 'similar'},
+              ids: [id]
+            },
+            op: {name: 'OR'}
+          }
+        };
         params.data = [{
           limit: [first, last],
           object_name: relatedType,
           order_by: orderBy.split(',').map(function (field) {
             return {name: field, desc: true};
           }),
-          filters: {
-            expression: {
-              object_name: type,
-              op: op,
-              ids: [id]
-            }
-          }
+          filters: filters
         }];
         return params;
       },
@@ -122,15 +137,8 @@
       '{viewModel.paging} pageSize': function () {
         this.viewModel.setRelatedItems();
       },
-      '{viewModel.baseInstance} related_destinations': function () {
-        if (!this.viewModel.attr('isLoading')) {
-          this.viewModel.setRelatedItems();
-        }
-      },
-      '{viewModel.baseInstance} related_sources': function () {
-        if (!this.viewModel.attr('isLoading')) {
-          this.viewModel.setRelatedItems();
-        }
+      '{viewModel.baseInstance} refreshInstance': function () {
+        this.viewModel.setRelatedItems();
       }
     }
   });

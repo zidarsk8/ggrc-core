@@ -2532,49 +2532,6 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
       return value;
     });
 
-  Mustache.registerHelper('with_create_issue_json', function (instance, options) {
-    var audits;
-    var audit;
-    var json;
-    var relatedSnapshots = [];
-
-    instance = Mustache.resolve(instance);
-    audits = instance.get_mapping('related_audits');
-    if (!audits.length) {
-      return options.inverse(options.contexts);
-    }
-
-    audit = audits[0].instance.reify();
-    if (instance.mappedSnapshots) {
-      relatedSnapshots = instance.mappedSnapshots.map(function (item) {
-        var instance = item.instance;
-        return {
-          title: instance.title,
-          id: instance.id,
-          type: instance.type,
-          context: instance.context
-        };
-      });
-    }
-
-    json = {
-      audit: {title: audit.title, id: audit.id, type: audit.type},
-      relatedSnapshots: relatedSnapshots,
-      context: {type: audit.context.type, id: audit.context.id},
-      assessment: {
-        title: instance.title,
-        id: instance.id,
-        type: instance.type,
-        title_singular: instance.class.title_singular,
-        table_singular: instance.class.table_singular
-      }
-    };
-
-    return options.fn(options.contexts.add({
-        create_issue_json: JSON.stringify(json)
-    }));
-  });
-
   Mustache.registerHelper('pretty_role_name', function (name) {
     name = Mustache.resolve(name);
     var ROLE_LIST = {
