@@ -120,6 +120,7 @@ class TestExportSnapshots(TestCase):
             # Fields that are not included in snapshots - Known bugs.
             "Assertions": u"",  # "\n".join(c.name for c in control.assertions)
             "Categories": u"",  # "\n".join(c.name for c in control.categories)
+            "Evidence": u"",  # "\n".join(c.name for c in control.categories)
         }
         for snapshot, control in zip(snapshots, controls)
     }
@@ -231,6 +232,7 @@ class TestExportSnapshots(TestCase):
             # Fields that are not included in snapshots - Known bugs.
             "Assertions": u"",
             "Categories": u"",
+            "Evidence": u"",
         }
         for snapshot, control in zip(snapshots, controls)
     }

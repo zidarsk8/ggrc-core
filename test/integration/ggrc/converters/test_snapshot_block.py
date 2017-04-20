@@ -101,5 +101,6 @@ class TestSnapshotBlockConverter(TestCase):
             ('url', 'Control URL'),
             ('reference_url', 'Reference URL'),
             ('verify_frequency', 'Frequency'),
+            ('document_evidence', 'Evidence'),
         ]
     )
