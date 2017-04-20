@@ -84,6 +84,14 @@
       show_related_assessments: true,
       draw_children: true
     },
+    info_pane_options: {
+      evidence: {
+        model: CMS.Models.Document,
+        mapping: 'all_documents',
+        show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
+        sort_function: GGRC.Utils.sortingHelpers.commentSort
+      }
+    },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
       this.validateNonBlank('title');

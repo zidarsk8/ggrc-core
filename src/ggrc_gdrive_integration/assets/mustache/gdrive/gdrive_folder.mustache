@@ -5,18 +5,23 @@
 
 <div class="row-fluid wrap-row">
   <div class="span12 small-info">
-    <label class="multi-type-label">
-      {{instance.class.title_singular}} Folder
-      <label class="inline">
-        <i class="fa fa-question-circle" rel="tooltip" data-original-title="If selected, all {{instance.class.title_singular}} attachments go here."></i>
+    {{#unless hideLabel}}
+      <label class="multi-type-label">
+        {{instance.class.title_singular}} Folder
+        <label class="inline">
+          <i class="fa fa-question-circle" rel="tooltip" data-original-title="If selected, all {{instance.class.title_singular}} attachments go here."></i>
+        </label>
+        <a data-id="hide_folder_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
-      <a data-id="hide_folder_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-    </label>
+    {{/unless}}
 
     <spinner toggle="_folder_change_pending"></spinner>
 
     {{#if current_folder}}
       <div class="oneline">
+        {{#if subLabel}}
+          <span>{{subLabel}}:</span>
+        {{/if}}
         <a href="{{current_folder.alternateLink}}" target="_blank">
           <i class="fa fa-paperclip attach-blue"></i> {{current_folder.title}}
         </a>

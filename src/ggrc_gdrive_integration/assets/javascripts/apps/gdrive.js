@@ -51,6 +51,15 @@
     Meeting: {
       _canonical: {
         "events": "GCalEvent"
+    Control: {
+      _mixins: ['folderable'],
+      extended_folders: new GGRC.ListLoaders.MultiListLoader(['folders']),
+      folders: new GGRC.ListLoaders.ProxyListLoader('ObjectFolder', 'folderable',
+        'folder', 'object_folders', 'GDriveFolder')
+    },
+    Meeting : {
+      _canonical : {
+        "events" : "GCalEvent"
       },
       events: new GGRC.ListLoaders.ProxyListLoader("ObjectEvent", "eventable", "event", "object_events", "GCalEvent")
     },
