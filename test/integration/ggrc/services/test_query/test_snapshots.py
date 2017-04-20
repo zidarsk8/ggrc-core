@@ -506,6 +506,49 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
                     "id": person_id}},
     )
 
+  def assert_rows_number_in_search(self, field, value, expected_num):
+    """Assert expected_num of rows found by that value search"""
+    control_user1_result = self._get_first_result_set(
+        self._make_snapshot_query_dict(
+            "Control", expression=[field, "=", value]
+        ),
+        "Snapshot",
+    )
+    self.assertEqual(control_user1_result["count"], expected_num)
+
+  def _test_contact_field(self, contact_name_field, search_field):
+    """Util function for test for filtering by contact fields"""
+    person_name = "name"
+    person_email = "email@addr.com"
+    program = factories.ProgramFactory()
+    program_id = program.id
+    control_kwargs = {
+        contact_name_field: factories.PersonFactory(name=person_name,
+                                                    email=person_email),
+    }
+    control = factories.ControlFactory(**control_kwargs)
+    factories.RelationshipFactory(source=program, destination=control)
+    program = models.Program.query.filter_by(id=program_id).one()
+    self._create_audit(program=program, title="some title")
+    self.assert_rows_number_in_search(search_field, person_name, 1)
+    self.assert_rows_number_in_search(search_field, person_email, 1)
+    self.assert_rows_number_in_search(search_field,
+                                      "negative_" + person_name,
+                                      0)
+    self.assert_rows_number_in_search(search_field,
+                                      "negative_" + person_email,
+                                      0)
+
+  @data("contact", "PRIMARY CONTACT", "primary contact")
+  def test_control_primary_contact(self, field):
+    """Control Snapshots are filtered by contact and aliases."""
+    self._test_contact_field("contact", field)
+
+  @data("secondary_contact", "SECONDARY CONTACT", "secondary contact")
+  def test_control_secondary_contact(self, field):
+    """Control Snapshots are filtered by secondary_contact and aliases."""
+    self._test_contact_field("secondary_contact", field)
+
   def test_control_owners(self):
     """Control Snapshots are filtered and sorted by Owners."""
     program = factories.ProgramFactory()

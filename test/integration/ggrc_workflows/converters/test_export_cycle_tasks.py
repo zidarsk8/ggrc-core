@@ -36,8 +36,13 @@ class TestExportTasks(TestCase):
     with single_commit():
       for _ in range(cycle_count):
         workflow = factories.WorkflowFactory()
-        cycle = factories.CycleFactory(workflow=workflow)
-        person = PersonFactory(name="user for cycle {}".format(cycle.id))
+        cycle = factories.CycleFactory(
+            workflow=workflow,
+        )
+        cycle.contact = PersonFactory(
+            name="user for cycle {}".format(cycle.id)
+        )
+        person = PersonFactory(name="user for cycle tasks {}".format(cycle.id))
         task_group = factories.TaskGroupFactory(workflow=workflow)
         for _ in range(task_count):
           task_group_task = factories.TaskGroupTaskFactory(
@@ -246,3 +251,23 @@ class TestExportTasks(TestCase):
       self.assertCycles("task due date",
                         "{}-{}".format(*due_date),
                         list(cycle_slugs))
+
+  @data(
+      #  (Cycle count, tasks in cycle)
+      (0, 0),
+      (1, 1),
+      (2, 1),
+      (2, 1),
+      (2, 2),
+  )
+  @unpack
+  def test_filter_by_cycle_assignee(self, cycle_count, task_count):
+    """Test filter cycles by cycle assignee name and email"""
+    task_cycle_filter = self.generate_tasks_for_cycle(cycle_count, task_count)
+    self.assertEqual(bool(cycle_count), bool(task_cycle_filter))
+    for task_id, slug in task_cycle_filter.iteritems():
+      task = CycleTaskGroupObjectTask.query.filter(
+          CycleTaskGroupObjectTask.id == task_id
+      ).one()
+      self.assertCycles("cycle assignee", task.cycle.contact.email, [slug])
+      self.assertCycles("cycle assignee", task.cycle.contact.name, [slug])

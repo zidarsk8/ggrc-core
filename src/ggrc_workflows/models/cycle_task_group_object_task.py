@@ -149,7 +149,6 @@ class CycleTaskGroupObjectTask(
       "contact": {
           "display_name": "Assignee",
           "mandatory": True,
-          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
       "finished_date": "Actual Finish Date",

@@ -16,10 +16,5 @@ class Threat(
   __tablename__ = 'threats'
 
   _aliases = {
-      "contact": {
-          "display_name": "Contact",
-          "filter_by": "_filter_by_contact",
-      },
-      "secondary_contact": None,
       "url": "Threat URL",
   }
