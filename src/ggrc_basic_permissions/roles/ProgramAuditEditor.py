@@ -8,7 +8,6 @@ description = """
   """
 permissions = {
     "read": [
-        "Request",
         "Comment",
         "Assessment",
         "AssessmentTemplate",
@@ -28,7 +27,6 @@ permissions = {
     ],
     "create": [
         "Snapshot",
-        "Request",
         "Comment",
         "Assessment",
         "AssessmentTemplate",
@@ -50,7 +48,6 @@ permissions = {
         "AssessmentTemplate",
         "Issue",
         "Snapshot",
-        "Request",
         "Audit",
         "AuditObject",
         "Meeting",

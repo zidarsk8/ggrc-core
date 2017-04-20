@@ -4,7 +4,7 @@
 """Contains the Assignable mixin.
 
 This allows adding various assignee types to the object, like Verifier,
-Requester, etc.
+Creator, etc.
 """
 
 import sqlalchemy as sa
