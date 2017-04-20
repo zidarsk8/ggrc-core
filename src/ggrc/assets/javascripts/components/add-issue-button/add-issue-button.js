@@ -45,6 +45,11 @@
 
         return JSON.stringify(json);
       }
+    },
+    events: {
+      '{window} modal:success': function () {
+        this.viewModel.attr('relatedInstance').dispatch('refreshInstance');
+      }
     }
   });
 })(window.can);
