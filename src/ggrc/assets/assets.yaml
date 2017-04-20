@@ -250,6 +250,7 @@ dashboard-js-files:
   - components/tree/tree-status-filter.js
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
+  - components/add-issue-button/add-issue-button.js
   - components/effective-dates/effective-dates.js
   - components/snapshotter/revisions-comparer.js
   - components/snapshotter/scope-update.js
@@ -337,6 +338,7 @@ dashboard-js-template-files:
   - components/show-related-assessments-button/show-related-assessments-button.mustache
   - components/view-object-buttons/view-object-buttons.mustache
   - components/add-object-button/add-object-button.mustache
+  - components/add-issue-button/add-issue-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
   - components/questions-link/questions-link.mustache
   - base_objects/empty.mustache
