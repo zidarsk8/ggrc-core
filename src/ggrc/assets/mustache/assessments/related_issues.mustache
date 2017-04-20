@@ -3,34 +3,12 @@ Copyright (C) 2017 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 `}}
 
-<related-objects base-instance="instance" related-items-type="Issue">
+<related-objects {base-instance}="instance" related-items-type="Issue">
     <div class="grid-data-toolbar flex-box">
-        <tree-pagination paging="paging" class="flex-size-1"></tree-pagination>
-      {{#is_allowed 'create' 'Issue' context=baseInstance.context}}
+        <tree-pagination {(paging)}="paging" class="flex-size-1"></tree-pagination>
           <div class="grid-data-toolbar-control">
-            {{#with_mapping 'related_audits' baseInstance}}
-              {{#with_mapping 'related_controls' baseInstance}}
-                {{#using control=control}}
-                  {{#with_create_issue_json baseInstance}}
-                    <a class="btn btn-small btn-danger"
-                        {{#if baseInstance.mappedSnapshots.length}}
-                            href="javascript://"
-                            data-toggle="modal-ajax-form"
-                            data-modal-class="modal-wide"
-                            data-object-singular="Issue"
-                            data-object-plural="issues"
-                            data-object-params='{{create_issue_json}}'
-                        {{else}}
-                            disabled
-                        {{/if}}>
-                        Raise an Issue
-                    </a>
-                  {{/with_create_issue_json}}
-                {{/using}}
-              {{/with_mapping}}
-            {{/with_mapping}}
+              <add-issue-button {snapshots}="mappedSnapshots" {related-instance}="baseInstance"></add-issue-button>
           </div>
-      {{/is_allowed}}
     </div>
     <div class="grid-data-header flex-row flex-box">
         <div class="flex-size-2">
