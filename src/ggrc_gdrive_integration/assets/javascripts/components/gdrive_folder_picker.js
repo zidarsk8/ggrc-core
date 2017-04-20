@@ -51,13 +51,23 @@
   GGRC.Components('gDriveFolderPicker', {
     tag: 'ggrc-gdrive-folder-picker',
     template: can.view(GGRC.mustache_path + '/gdrive/gdrive_folder.mustache'),
-    scope: {
+    viewModel: {
+      define: {
+        readonly: {
+          type: 'boolean',
+          value: false
+        },
+        hideLabel: {
+          type: 'boolean',
+          value: false
+        }
+      },
       _folder_change_pending: false,
       no_detach: '@',
       deferred: '@',
       tabindex: '@',
       placeholder: '@',
-      readonly: '@',
+      subLabel: '@',
       folder_list: [],
       instance: null,
       /**

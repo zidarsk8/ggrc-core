@@ -17,12 +17,16 @@
 
     {{#is_allowed 'update' parentInstance context='for'}}
       {{#instance}}
-        <span class="trash-control">
-          <a href="javascript://" class="info-action unmap" data-toggle="unmap">
-            <span class="result" {{data 'result'}}></span>
-            <i class="fa fa-trash"></i>
-          </a>
-        </span>
+        {{#if_helpers '\
+          #unless' instance.snapshot '\
+          and #unless' instance.isRevision}}
+          <span class="trash-control">
+            <a href="javascript://" class="info-action unmap" data-toggle="unmap">
+              <span class="result" {{data 'result'}}></span>
+              <i class="fa fa-trash"></i>
+            </a>
+          </span>
+        {{/if_helpers}}
       {{/instance}}
     {{/is_allowed}}
   </li>

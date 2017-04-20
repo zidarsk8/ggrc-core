@@ -310,6 +310,7 @@ dashboard-js-files:
   - components/auto-save-form/field-views/checkbox-form-field-view.js
   - components/auto-save-form/field-views/date-form-field-view.js
   - components/auto-save-form/field-views/person-form-field-view.js
+  - components/folder-attachments-list/folder-attachments-list.js
   - components/action-toolbar/action-toolbar.js
   - components/action-toolbar-control/action-toolbar-control.js
   - components/unmap-button/unmap-button.js
@@ -373,6 +374,7 @@ dashboard-js-template-files:
   - components/add-mapping-button/add-mapping-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
   - components/questions-link/questions-link.mustache
+  - components/folder-attachments-list/folder-attachments-list.mustache
   - base_objects/empty.mustache
   - base_objects/autocomplete_result.mustache
   - base_objects/confirm_archive.mustache
