@@ -309,20 +309,21 @@
     //  This leads to conflicts not actually rejecting because on the second go-round
     //  the local and remote objects look the same.  --BM 2015-02-06
       this.update = function (id, params) {
-        var self = this;
         var ret = _update
         .call(this, id, this.process_args(params))
         .then(
           this.resolve_deferred_bindings.bind(this),
           function (xhr) {
             if (xhr.status === 409) {
-              $(document.body).trigger('ajax:flash', {
-                warning: 'There was a conflict while saving.' +
-                'Your changes have not yet been saved.' +
-                ' Please check any fields you were editing and try saving again'
+              xhr.warningId = setTimeout(function () {
+                $(document.body).trigger('ajax:flash', {
+                  warning: 'There was a conflict while saving.' +
+                  ' Your changes have not yet been saved.' +
+                  ' Please check any fields you were editing' +
+                  ' and try saving again'
+                });
               });
               // TODO: we should show modal window here
-              return self.findInCacheById(id).refresh();
             }
             return xhr;
           }
