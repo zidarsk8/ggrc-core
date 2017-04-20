@@ -55,7 +55,7 @@
         filters = isAssessment ? {
           expression: {
             object_name: type,
-            op: {name: 'relevant'},
+            op: {name: 'similar'},
             ids: [id]
           }
         } : {
