@@ -110,15 +110,8 @@
       '{viewModel.paging} pageSize': function () {
         this.viewModel.setRelatedItems();
       },
-      '{viewModel.baseInstance} related_destinations': function () {
-        if (!this.viewModel.attr('isLoading')) {
-          this.viewModel.setRelatedItems();
-        }
-      },
-      '{viewModel.baseInstance} related_sources': function () {
-        if (!this.viewModel.attr('isLoading')) {
-          this.viewModel.setRelatedItems();
-        }
+      '{viewModel.baseInstance} refreshInstance': function () {
+        this.viewModel.setRelatedItems();
       }
     }
   });
