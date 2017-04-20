@@ -24,6 +24,10 @@
           (item-selected)="grantRole(%event.selectedItem, %context.role.id)"
           placeholder="Select person"
         ></autocomplete>
+
+        <i class="fa fa-trash hide-input"
+           title="Hide"
+           ($click)="grantRoleMode(0)"></i>
         {{/if}}
       {{/if}}
 
