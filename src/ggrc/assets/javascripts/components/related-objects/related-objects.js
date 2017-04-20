@@ -60,10 +60,11 @@
           first = (page.current - 1) * page.pageSize;
           last = page.current * page.pageSize;
         }
+        // Use only "similar" filter for Assessments
         filters = isAssessment ? {
           expression: {
             object_name: type,
-            op: {name: 'relevant'},
+            op: {name: 'similar'},
             ids: [id]
           }
         } : {
