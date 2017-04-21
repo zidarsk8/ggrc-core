@@ -3,6 +3,7 @@
 
 """Test Access Control List"""
 
+from ggrc.fulltext import mysql
 from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -42,7 +43,7 @@ class TestAccessControlList(TestCase):
   def setUp(self):
     super(TestAccessControlList, self).setUp()
     self.api = Api()
-    self.person = factories.PersonFactory()
+    self.person = factories.PersonFactory(name="My Person")
     self.control = factories.ControlFactory()
     self.acr = factories.AccessControlRoleFactory(
         object_type="Control",
@@ -58,10 +59,10 @@ class TestAccessControlList(TestCase):
         person=self.person
     )
 
-  def _post_control(self, id_, person_id):
+  def _post_control(self, id_, person_id, collection=False):
     """Helper function for posting a control"""
     title = random_str(prefix="Control - ")
-    response = self.api.post(all_models.Control, {
+    control = {
         "control": {
             "title": title,
             "type": "Control",
@@ -70,10 +71,15 @@ class TestAccessControlList(TestCase):
                 _acl_json(id_, person_id)
             ]
         },
-    })
-    assert response.status_code == 201, \
+    }
+    response = self.api.post(
+        all_models.Control, [control] if collection else control)
+    assert response.status_code == 200 or response.status_code == 201, \
         "Control with acl not created successfully {}".format(response.status)
-    return response
+
+    if collection:
+      return response.json[0][1]
+    return response.json
 
   def test_object_roles(self):
     """Test if roles are fetched with the object"""
@@ -99,14 +105,14 @@ class TestAccessControlList(TestCase):
     id_, person_id = self.acr.id, self.person.id
     response = self._post_control(id_, person_id)
 
-    acl = response.json["control"]["access_control_list"]
+    acl = response["control"]["access_control_list"]
     _acl_asserts(acl, id_, person_id)
 
   def test_acl_revision_content(self):
     """Test if the access control list is added to revisions"""
     id_, person_id = self.acr.id, self.person.id
     response = self._post_control(id_, person_id)
-    control_id = response.json["control"]["id"]
+    control_id = response["control"]["id"]
     rev = all_models.Revision.query.filter(
         all_models.Revision.resource_id == control_id,
         all_models.Revision.resource_type == "Control"
@@ -144,3 +150,20 @@ class TestAccessControlList(TestCase):
     acl = response.json['control']['access_control_list']
     assert len(acl) == 0, \
         "Access control list not empty {}".format(acl)
+
+  def test_acl_indexing_on_post(self):
+    """Test if roles are stored correctly when POSTed with the object"""
+    id_, person_id = self.acr.id, self.person.id
+    response = self._post_control(id_, person_id, True)
+    control = response["control"]
+    res = mysql.MysqlRecordProperty.query.filter(
+        mysql.MysqlRecordProperty.type == "Control",
+        mysql.MysqlRecordProperty.key == control["id"],
+        mysql.MysqlRecordProperty.property == self.acr.name
+    ).all()
+    assert len(res) > 0, \
+        "Full text record index not created for {}".format(self.acr.name)
+    assert len([r for r in res if r.content == self.person.email]) == 1, \
+        "Person email not indexed {}".format(self.person.email)
+    assert len([r for r in res if r.content == self.person.name]) == 1, \
+        "Person name not indexed {}".format(self.person.name)
