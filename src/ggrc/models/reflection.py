@@ -4,6 +4,9 @@
 """Utilties to deal with introspecting GGRC models for publishing, creation,
 and update from resource format representations, such as JSON."""
 
+from collections import defaultdict
+
+import flask
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc.utils.rules import get_mapping_rules, get_unmapping_rules
@@ -254,11 +257,15 @@ class AttributeInfo(object):
   def get_acl_definitions(cls, object_class):
     from ggrc.access_control.role import AccessControlRole
     from ggrc import db
-    role_names = db.session.query(
-        AccessControlRole.name
-    ).filter(
-        AccessControlRole.object_type == object_class.__name__
-    )
+    if not hasattr(flask.g, "acl_role_names"):
+      flask.g.acl_role_names = defaultdict(set)
+      names_query = db.session.query(
+          AccessControlRole.object_type,
+          AccessControlRole.name,
+      )
+      for object_type, name in names_query:
+        flask.g.acl_role_names[object_type].add(name)
+
     return {
         "{}:{}".format(cls.ALIASES_PREFIX, name): {
             "display_name": name,
@@ -268,7 +275,7 @@ class AttributeInfo(object):
             "description": "List of people with '{}' role".format(name),
             "type": cls.Type.AC_ROLE,
         }
-        for (name,) in role_names
+        for name in flask.g.acl_role_names[object_class.__name__]
     }
 
   @classmethod
