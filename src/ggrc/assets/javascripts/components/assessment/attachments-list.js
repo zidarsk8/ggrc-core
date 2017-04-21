@@ -17,6 +17,12 @@
     tag: tag,
     template: template,
     viewModel: {
+      define: {
+        noItemsText: {
+          type: 'string',
+          value: ''
+        }
+      },
       title: '@',
       tooltip: '@',
       limit: 5

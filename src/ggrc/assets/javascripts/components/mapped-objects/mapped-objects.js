@@ -12,7 +12,7 @@
   /**
    * Mapped objects view component
    */
-  can.Component.extend({
+  GGRC.Components('mappedObjects', {
     tag: tag,
     template: tpl,
     viewModel: {
@@ -22,6 +22,9 @@
           value: function () {
             return '';
           }
+        },
+        mappedItems: {
+          Value: can.List
         },
         mappedSnapshots: {
           type: Boolean,
@@ -53,14 +56,13 @@
         },
         visibleItems: {
           type: Number,
-          value: 3
+          value: 5
         }
       },
       isLoading: false,
       mapping: '@',
       parentInstance: null,
       selectedItem: {},
-      mappedItems: [],
       filter: {
         only: [],
         exclude: []

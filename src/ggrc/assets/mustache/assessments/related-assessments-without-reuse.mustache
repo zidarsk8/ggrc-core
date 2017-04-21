@@ -38,7 +38,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 <spinner toggle="itemsLoading" class="spinner-wrapper active" extra-css-class="grid-spinner"></spinner>
             {{/if}}
             <object-list {(items)}="assessments" {is-loading}="isLoading" spinner-css="grid-spinner" {(selected-item)}="selectedItem"
-                                      {item-selector}="objectSelectorEl" {empty-message}="noRelatedObjectsMessage">
+                                      {item-selector}="objectSelectorEl" {empty-message}="noRelatedObjectsMessage" class="object-list__limited-height">
                 <related-assessment-item {^sub-items-loading}="itemLoading" class="{{#itemsLoading}}hidden{{/itemsLoading}}">
                     <div class="grid-data-row flex-row flex-box">
                         <div class="grid-data-item-index">
