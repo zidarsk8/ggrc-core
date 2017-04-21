@@ -3,7 +3,7 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, $, GGRC, CMS, google) {
+(function (can, $, GGRC, CMS) {
   'use strict';
 
   GGRC.Components('gDrivePickerLauncher', {
@@ -260,4 +260,4 @@
       }
     }
   });
-})(window.can, window.can.$, window.GGRC, window.CMS, window.google);
+})(window.can, window.can.$, window.GGRC, window.CMS);
