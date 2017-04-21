@@ -53,7 +53,7 @@
     this.popover[this._isShown ? 'hide' : 'show']();
 
     if (!this._isShown) {
-      this.popover.tip().on('click', '.btn-success', $.proxy(this.close, this));
+      this.popover.tip().on('click', '.btn-green', $.proxy(this.close, this));
     }
     this._isShown = !this._isShown;
   };

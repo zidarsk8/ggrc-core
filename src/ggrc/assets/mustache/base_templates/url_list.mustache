@@ -31,13 +31,13 @@
     <div class="objective-selector field-wrap">
       <input tabindex="3" type="text" name="instance" placeholder="Add URL">
       <a href="javascript://" {{toggle_button}}><i class="fa fa-trash"></i></a>
-      <a href="javascript://" class="btn btn-small btn-success no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add</a>
+      <a href="javascript://" class="btn btn-small btn-green no-float" data-toggle="submit" {{toggle_button "modal:success"}}>Add</a>
     </div>
     <input type="hidden" name="role_name" value="Auditor" />
     {{/prune_context}}
   </ggrc-quick-add>
 {{else}}
-  <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+ Add URL</a>
+  <a href="javascript://" class="btn btn-small btn-white" {{toggle_button}}>+ Add URL</a>
 {{/toggle}}
 {{/is_allowed}}
 </ul>

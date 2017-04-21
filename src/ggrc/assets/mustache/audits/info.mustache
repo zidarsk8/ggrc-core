@@ -128,7 +128,7 @@
                 {{#with_mapping 'auditor_authorizations' parent_instance}}
                   <a
                     href="javascript://"
-                    class="btn btn-small btn-success {{^instance}}disabled{{/instance}} no-float"
+                    class="btn btn-small btn-green {{^instance}}disabled{{/instance}} no-float"
                     data-toggle="submit" {{toggle_button "modal:success"}}
                     {{#isInAuthList instance auditor_authorizations}}
                       disabled
@@ -143,7 +143,7 @@
             {{/with_page_object_as}}
           {{else}}
             <br>
-              <a href="javascript://" class="btn btn-small btn-draft" {{toggle_button}}>+ Add Auditor</a>
+              <a href="javascript://" class="btn btn-small btn-white" {{toggle_button}}>+ Add Auditor</a>
           {{/toggle}}
           {{/is_allowed}}
         </div>

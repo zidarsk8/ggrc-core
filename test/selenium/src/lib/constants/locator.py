@@ -199,11 +199,11 @@ class CommonModalUnifiedMapper(object):
                               MODAL + " .multiselect-dropdown__input")
   FILTER_BY_STATE_DROPDOWN_OPTIONS = (By.CSS_SELECTOR,
                                       MODAL + " .multiselect-dropdown__label")
-  BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .filter-buttons .btn-info")
+  BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .filter-buttons .btn-small")
   FOUND_OBJECTS_TITLES = (By.CSS_SELECTOR, MODAL + " .flex-box .title-attr")
   FOUND_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
                               MODAL + ' .flex-box [type="checkbox"]')
-  BUTTON_MAP_SELECTED = (By.CSS_SELECTOR, MODAL + " .btn-success")
+  BUTTON_MAP_SELECTED = (By.CSS_SELECTOR, MODAL + " .modal-footer .btn-map")
 
 
 class ModalMapObjects(CommonModalUnifiedMapper):
@@ -579,14 +579,15 @@ class ModalCommonConfirmAction(object):
   MODAL_TITLE = (By.CSS_SELECTOR, "{} .modal-header h2".format(MODAL))
   CONFIRMATION_TEXT = (By.CSS_SELECTOR, "{} .modal-body p".format(MODAL))
   # user input elements
-  BUTTON_CONFIRM = (By.CSS_SELECTOR, "{} .btn-success".format(MODAL))
+  BUTTON_CONFIRM = (By.CSS_SELECTOR,
+                    "{} .modal-footer .btn-small".format(MODAL))
 
 
 class ModalDeleteObject(ModalCommonConfirmAction):
   """Locators for Delete object modals."""
   MODAL = Common.MODAL_CONFIRM
   OBJECT_TITLE = (By.CSS_SELECTOR, "{} .modal-body span".format(MODAL))
-  BUTTON_DELETE = (By.CSS_SELECTOR, "{} .btn-danger".format(MODAL))
+  BUTTON_DELETE = ModalCommonConfirmAction.BUTTON_CONFIRM
 
 
 class ModalUpdateObject(ModalCommonConfirmAction):
@@ -896,7 +897,7 @@ class TreeView(object):
       By.CSS_SELECTOR, ".widget:not(.hidden) .tree-no-results-message")
   BUTTON_SHOW_FIELDS = "{} " + Common.TREE_HEADER + " .fa-bars"
   # user input elements
-  BUTTON_3BBS = "{} " + Common.TREE_LIST + " .btn-draft"
+  BUTTON_3BBS = "{} " + Common.TREE_LIST + " .details-wrap"
   BUTTON_CREATE = "{} " + Common.TREE_LIST + " .create-button"
   BUTTON_MAP = "{} " + Common.TREE_LIST + " .map-button"
 

@@ -19,17 +19,17 @@
         var state = this.attr("state") || "select",
             states = {
               select: {
-                class: "btn-success",
+                'class': "btn-green",
                 text: "Choose CSV file to import"
               },
               analyzing: {
-                class: "btn-draft",
+                'class': "btn-white",
                 showSpinner: true,
                 isDisabled: true,
                 text: "Analyzing"
               },
               import: {
-                class: "btn-primary",
+                'class': "btn-darkBlue",
                 text: "Import data",
                 isDisabled: function () {
                   var toImport = this.import;  // info on blocks to import
@@ -49,13 +49,13 @@
                 }.bind(this)  // bind the scope object as context
               },
               importing: {
-                class: "btn-draft",
+                'class': "btn-white",
                 showSpinner: true,
                 isDisabled: true,
                 text: "Importing"
               },
               success: {
-                class: "btn-success",
+                'class': "btn-green",
                 isDisabled: true,
                 text: "<i class=\"fa fa-check-square-o white\">"+
                   "</i> Import successful"

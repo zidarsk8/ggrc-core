@@ -12,7 +12,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
               {{#with_mapping 'related_controls' baseInstance}}
                 {{#using control=control}}
                   {{#with_create_issue_json baseInstance}}
-                    <a class="btn btn-small btn-danger"
+                    <a class="btn btn-small btn-red"
                         {{#if baseInstance.mappedSnapshots.length}}
                             href="javascript://"
                             data-toggle="modal-ajax-form"

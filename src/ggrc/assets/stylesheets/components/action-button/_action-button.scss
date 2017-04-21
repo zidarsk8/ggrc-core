@@ -2,6 +2,7 @@
  * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
 .action-button {
   box-sizing: border-box;
   cursor: pointer;
@@ -21,8 +22,9 @@
 }
 
 .create-button {
-  background: $blue;
+  background: $createBtn;
   color: $white;
+  border-radius: 2px;
 
   &:hover {
     background: $link;
@@ -30,7 +32,7 @@
     text-decoration: none;
 
     &[disabled] {
-      background: $blue;
+      background: $createBtn;
     }
   }
 
@@ -40,7 +42,8 @@
   background: $white;
   font-weight: normal;
   border: 1px solid $widgetBorder;
-  color: $blue;
+  color: $black;
+  border-radius: 2px;
 
   &:hover,
   &:focus,
@@ -49,11 +52,10 @@
   }
 }
 
-.view-button {
-}
-
 .btn {
   outline: none;
+  border-radius: 2px;
+  font-weight: normal;
 
   &:focus {
     outline: none;
@@ -62,7 +64,6 @@
   &.btn-gray {
     text-align: center;
     background: $white;
-    font-weight: normal;
     border: 1px solid $dropPlaceholder;
 
     &:hover {
@@ -72,8 +73,92 @@
     }
   }
 
+  &.btn-red {
+    background: $redBtn;
+    color: white;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: darken($redBtn, 10%);
+    }
+  }
+
+  &.btn-white {
+    background: $white;
+    color: $black;
+    border: 1px solid $widgetBorder;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: darken($white, 10%);
+    }
+  }
+
+  &.btn-lightBlue {
+    background: $lightBlueBtn;
+    color: $white;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: lighten($lightBlueBtn, 10%);
+    }
+  }
+
+  &.btn-green {
+    background: $btnGreen;
+    color: $white;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: darken($btnGreen, 10%);
+    }
+  }
+
+  &.btn-darkBlue {
+    background: $createBtn;
+    color: $white;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: lighten($createBtn, 10%);
+    }
+  }
+
+  &.btn-3bbps {
+    background: transparent;
+    color: $black;
+    border: 1px solid $widgetBorder;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background: $widgetBorder;
+    }
+
+    &.dropdown-toggle {
+      height: 6px;
+      padding-top: 9px;
+      padding-bottom: 9px;
+    }
+
+    >.bubble {
+      width: 7px;
+      height: 7px;
+      display: inline-flex;
+      float: none;
+    }
+  }
+
   &.btn-link {
-    color: $blue;
+    color: $link;
     font-size: 12px;
     font-weight: normal;
     cursor: pointer;
