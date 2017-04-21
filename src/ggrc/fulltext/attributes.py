@@ -64,6 +64,25 @@ class FullTextAttr(object):
     return value
 
 
+class CustomRoleAttr(object):
+  """Custom index attribute class for custom roles"""
+  # pylint: disable=too-few-public-methods
+  def __init__(self, alias):
+    self.alias = alias
+    self.with_template = False
+
+  def get_properties(self, instance):
+    """Returns index properties of all custom roles for a given instance"""
+    results = {}
+    for acl in getattr(instance, self.alias, []):
+      ac_role = acl.ac_role.name
+      if not results.get(acl.ac_role.name, None):
+        results[acl.ac_role.name] = {}
+      results[ac_role]["{}-email".format(acl.person.id)] = acl.person.email
+      results[ac_role]["{}-name".format(acl.person.id)] = acl.person.name
+    return results
+
+
 class MultipleSubpropertyFullTextAttr(FullTextAttr):
   """Custom full text index attribute class for multiple return values
 

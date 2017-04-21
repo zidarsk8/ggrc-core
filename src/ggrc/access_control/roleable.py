@@ -7,6 +7,7 @@ from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from ggrc.access_control.list import AccessControlList
+from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc import db
 
 
@@ -19,6 +20,9 @@ class Roleable(object):
 
   _update_raw = _include_links = _publish_attrs = [
       'access_control_list'
+  ]
+  _fulltext_attrs = [
+      CustomRoleAttr('access_control_list')
   ]
 
   @declared_attr
