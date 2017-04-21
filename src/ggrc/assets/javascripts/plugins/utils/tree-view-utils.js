@@ -90,7 +90,7 @@
           Model.tree_view_options.attr_list ||
           Cacheable.attr_list
         ).map(function (attr) {
-          attr = Object.assign({}, attr);
+          attr = _.assign({}, attr);
           if (!attr.attr_sort_field) {
             attr.attr_sort_field = attr.attr_name;
           }

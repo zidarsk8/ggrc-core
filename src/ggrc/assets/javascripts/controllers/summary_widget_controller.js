@@ -182,7 +182,7 @@
         });
     },
     getChartOptions: function (raw) {
-      var options = Object.assign({}, this.options.chartOptions);
+      var options = _.assign({}, this.options.chartOptions);
       var colorMaps = this.options.colorsMap;
       options.colors = raw.statuses.map(function (e) {
         return colorMaps[e[0]];
