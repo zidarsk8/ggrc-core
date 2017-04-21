@@ -40,7 +40,7 @@
       options.attr('filter', filter);
       options.attr('operation', operation);
       options.attr('depth', depth);
-      options.attr('depth', 'custom');
+      options.attr('name', 'custom');
 
       if (this.registerFilter) {
         this.registerFilter(options);
