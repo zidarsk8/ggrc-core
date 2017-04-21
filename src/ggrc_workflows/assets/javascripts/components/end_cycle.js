@@ -52,14 +52,15 @@
                 return extension.name === 'workflows';
               });
 
-            $('body').trigger('treeupdate');
+            can.trigger(el, 'refreshTree');
+
             return GGRC.Utils.CurrentPage
               .initCounts([
                 WorkflowExtension.countsMap.history
               ],
                 pageInstance.type,
                 pageInstance.id);
-          });
+          }.bind(this));
       }
     }
   });

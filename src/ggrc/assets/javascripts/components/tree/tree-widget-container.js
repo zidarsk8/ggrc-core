@@ -479,6 +479,11 @@
         $('.pin-content').control()
           .setInstance(infoPaneOptions, selectedEl);
       },
+      ' refreshTree': function (el, ev) {
+        ev.stopPropagation();
+
+        this.viewModel.loadItems();
+      },
       inserted: function () {
         var viewModel = this.viewModel;
         viewModel.attr('$el', this.element);
