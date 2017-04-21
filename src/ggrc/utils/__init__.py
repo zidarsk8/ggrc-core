@@ -12,6 +12,10 @@ from ggrc.settings import CUSTOM_URL_ROOT
 from ggrc.utils import benchmarks
 
 
+DATE_FORMAT_ISO = "%Y-%m-%d"
+DATE_FORMAT_US = "%m/%d/%Y"
+
+
 class GrcEncoder(json.JSONEncoder):
 
   """Custom JSON Encoder to handle datetime objects and sets
@@ -238,6 +242,11 @@ def convert_date_format(date, format_from, format_to):
   return datetime.datetime.strptime(date, format_from).strftime(format_to)
 
 
+def iso_to_us_date(date_string):
+  """Convert date string from ISO format to US format."""
+  return convert_date_format(date_string, DATE_FORMAT_ISO, DATE_FORMAT_US)
+
+
 def generate_query_chunks(query, chunk_size=1000):
   """Make a generator splitting `query` into chunks of size `chunk_size`."""
   count = query.count()
@@ -264,6 +273,6 @@ def create_stub(object_, context_id=None):
         'type': type_,
         'id': id_,
         'context_id': context_id,
-        'href': u"/api/{}/{}".format(model._inflector.table_plural, id_),  # noqa # pylint: disable=protected-access
+        'href': u"/api/{}/{}".format(model._inflector.table_plural, id_),
     }
   return None
