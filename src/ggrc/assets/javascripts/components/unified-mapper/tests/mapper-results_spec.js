@@ -17,6 +17,8 @@ describe('GGRC.Components.mapperResults', function () {
       type: 'Control'
     });
     viewModel.attr('submitCbs', $.Callbacks());
+    viewModel.attr('paging',
+      new GGRC.VM.Pagination({pageSizeSelect: [5, 10, 15]}));
     Component.prototype.viewModel.init = init;
     viewModel.init = init;
   });
@@ -87,24 +89,6 @@ describe('GGRC.Components.mapperResults', function () {
     });
   });
 
-  describe('updatePaging() method', function () {
-    beforeEach(function () {
-      viewModel.attr('paging.pageSize', 5);
-    });
-
-    it('updates total number of items', function () {
-      viewModel.attr('paging.total', 21);
-      viewModel.updatePaging(32);
-      expect(viewModel.attr('paging.total')).toEqual(32);
-    });
-
-    it('calculates and updates count of pages', function () {
-      viewModel.attr('paging.count', 11);
-      viewModel.updatePaging(32);
-      expect(viewModel.attr('paging.count')).toEqual(7);
-    });
-  });
-
   describe('showNewEntries() method', function () {
     beforeEach(function () {
       viewModel.attr('mapper', {});
@@ -172,6 +156,7 @@ describe('GGRC.Components.mapperResults', function () {
     });
 
     it('sets current page to 1', function () {
+      viewModel.attr('paging.count', 10);
       viewModel.attr('paging.current', 9);
       viewModel.showNewEntries();
       expect(viewModel.attr('paging.current')).toEqual(1);
@@ -702,7 +687,7 @@ describe('GGRC.Components.mapperResults', function () {
           id: 123,
           type: 'mockType'
         }],
-        total: 'mockTotal'
+        total: 4
       }
     };
     var expectedResult = [{
@@ -723,7 +708,6 @@ describe('GGRC.Components.mapperResults', function () {
         .and.returnValue('transformedValue');
       spyOn(viewModel, 'setSelectedItems');
       spyOn(viewModel, 'setDisabledItems');
-      spyOn(viewModel, 'updatePaging');
       dfdRequest = $.Deferred();
       spyOn(GGRC.Utils.QueryAPI, 'makeRequest')
         .and.returnValue(dfdRequest.promise());
@@ -756,8 +740,7 @@ describe('GGRC.Components.mapperResults', function () {
       var responseArr = [data, relatedData];
       dfdRequest.resolve(responseArr);
       viewModel.load();
-      expect(viewModel.updatePaging)
-        .toHaveBeenCalledWith('mockTotal');
+      expect(viewModel.attr('paging.total')).toEqual(4);
     });
 
     it('sets isLoading to false', function () {

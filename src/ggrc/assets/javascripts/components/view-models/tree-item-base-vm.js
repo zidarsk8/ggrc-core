@@ -8,11 +8,7 @@
 
   var TreeViewUtils = GGRC.Utils.TreeView;
 
-  if (!GGRC.VM) {
-    GGRC.VM = {};
-  }
-
-  GGRC.VM.BaseTreeItemVM = can.Map.extend({
+  can.Map.extend('GGRC.VM.BaseTreeItemVM', {
     define: {
       expanded: {
         type: Boolean,
