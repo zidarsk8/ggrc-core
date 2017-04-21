@@ -8,6 +8,8 @@ This is in converters because it depends on import to provide data
 
 import collections
 
+import ddt
+
 from ggrc.models import all_models
 from ggrc.utils import QueryCounter
 from ggrc.views import all_object_views
@@ -18,6 +20,7 @@ from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
 
 
+@ddt.ddt
 class TestComprehensiveSheets(TestCase):
 
   """
@@ -58,53 +61,43 @@ class TestComprehensiveSheets(TestCase):
   def tearDown(self):
     pass
 
-  def test_queries_per_api_call(self):
+  @ddt.data(*MODELS)
+  def test_queries_per_api_call(self, model):
     """Import comprehensive_sheet1 and count db requests per collection get.
 
     Query count should be <LIMIT for all model types.
     """
-    errors = set()
     with QueryCounter() as counter:
-      for model in self.MODELS:
-        try:
-          counter.queries = []
-          self.generator.api.get_query(model, "")
-          if counter.get > self.LIMIT:
-            print collections.Counter(counter.queries).most_common(1)
-          self.assertLess(counter.get, self.LIMIT,
-                          "Query count for object {} exceeded: {}/{}".format(
-                              model.__name__, counter.get, self.LIMIT)
-                          )
-        except AssertionError as error:
-          errors.add(error.message)
-    self.assertEqual(errors, set())
+      counter.queries = []
+      self.generator.api.get_query(model, "")
+      if counter.get > self.LIMIT:
+        print collections.Counter(counter.queries).most_common(1)
+      self.assertLess(counter.get, self.LIMIT,
+                      "Query count for object {} exceeded: {}/{}".format(
+                          model.__name__, counter.get, self.LIMIT)
+                      )
 
-  def test_queries_per_object_page(self):
+  @ddt.data(*all_object_views())
+  def test_queries_per_object_page(self, view):
     """Import comprehensive_sheet1 and count db requests per collection get.
 
     Query count should be <LIMIT for all model types.
     """
-    errors = set()
     with QueryCounter() as counter:
-      for view in all_object_views():
-        try:
-          model = view.model_class
-          if model not in self.MODELS:
-            continue
-          instance = model.query.first()
-          if instance is None or getattr(instance, "id", None) is None:
-            continue
-          counter.queries = []
-          res = self.client.get("/{}/{}".format(view.url, instance.id))
-          self.assertEqual(res.status_code, 200)
-          self.assertLessEqual(
-              counter.get, self.LIMIT,
-              "Query count for object {} exceeded: {}/{}".format(
-                  model.__name__, counter.get, self.LIMIT)
-          )
-        except AssertionError as e:
-          errors.add(e.message)
-    self.assertEqual(errors, set())
+      model = view.model_class
+      if model not in self.MODELS:
+        return
+      instance = model.query.first()
+      if instance is None or getattr(instance, "id", None) is None:
+        return
+      counter.queries = []
+      res = self.client.get("/{}/{}".format(view.url, instance.id))
+      self.assertEqual(res.status_code, 200)
+      self.assertLessEqual(
+          counter.get, self.LIMIT,
+          "Query count for object {} exceeded: {}/{}".format(
+              model.__name__, counter.get, self.LIMIT)
+      )
 
   def test_queries_for_dashboard(self):
     with QueryCounter() as counter:
