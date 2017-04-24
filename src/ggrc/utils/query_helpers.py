@@ -239,6 +239,26 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
 
     return context_query
 
+  def _get_custom_roles():
+    """Objects for which the user is an 'owner'."""
+    custom_roles_query = db.session.query(
+        all_models.AccessControlList.object_id.label('id'),
+        all_models.AccessControlList.object_type.label('type'),
+        literal(None).label('context_id')
+    ).join(
+        all_models.AccessControlRole,
+        all_models.AccessControlList.ac_role_id ==
+        all_models.AccessControlRole.id
+    ).filter(
+        and_(
+            all_models.AccessControlList.person_id == contact_id,
+            all_models.AccessControlList.object_type.in_(model_names),
+            all_models.AccessControlRole.my_work == true(),
+            all_models.AccessControlRole.read == true()
+        )
+    )
+    return custom_roles_query
+
   # Note: We don't return mapped objects for the Creator because being mapped
   # does not give the Creator necessary permissions to view the object.
   if not is_creator:
@@ -247,7 +267,8 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
   type_union_queries.extend((_get_object_owners(),
                             _get_object_mapped_ca(),
                             _get_objects_user_assigned(),
-                            _get_context_relationships(),))
+                            _get_context_relationships(),
+                            _get_custom_roles(),))
 
   for model in type_models:
     query = _get_model_specific_query(model)
