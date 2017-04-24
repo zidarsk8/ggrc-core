@@ -46,9 +46,9 @@ class TestAccessControlRole(TestCase):
     role = AccessControlRole.query.filter(AccessControlRole.id == id_).first()
     assert role.read == 1, \
         "Read permission not correctly saved {}".format(role.read)
-    assert role.update == 0, \
+    assert role.update == 1, \
         "Update permission not correctly saved {}".format(role.update)
-    assert role.delete == 0, \
+    assert role.delete == 1, \
         "Update permission not correctly saved {}".format(role.delete)
 
   def test_only_admin_can_post(self):
