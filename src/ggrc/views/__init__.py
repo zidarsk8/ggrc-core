@@ -89,7 +89,10 @@ def do_reindex():
           model.bulk_record_update_for([i.id for i in query_chunk])
           db.session.commit()
       else:
-        logger.warning("Try to index non indexed model: %s", model.__name__)
+        logger.warning(
+            "Try to index model that not inherited from Indexed mixin: %s",
+            model.__name__
+        )
         indexer.delete_records_by_type(model.__name__)
         query = model.query.options(
             db.undefer_group(mapper_class.__name__ + '_complete'),
