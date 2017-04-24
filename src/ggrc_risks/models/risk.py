@@ -18,8 +18,8 @@ from ggrc.models.track_object_state import HasObjectState
 class Risk(HasObjectState, mixins.CustomAttributable, mixins.Stateful,
            Relatable, mixins.Described, Ownable, Personable,
            mixins.WithContact, mixins.Titled, mixins.Timeboxed,
-           mixins.Slugged, mixins.Noted, mixins.Hyperlinked, mixins.Base,
-           Indexed, db.Model):
+           mixins.Noted, mixins.Hyperlinked, mixins.Slugged, Indexed,
+           db.Model):
   __tablename__ = 'risks'
 
   VALID_STATES = [

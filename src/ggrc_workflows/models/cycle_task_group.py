@@ -7,7 +7,6 @@
 from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Slugged
 from ggrc.models.mixins import Stateful
@@ -24,8 +23,8 @@ from ggrc.fulltext.attributes import (
 )
 
 
-class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
-                     Titled, Indexed, Base, db.Model):
+class CycleTaskGroup(WithContact, Stateful, Timeboxed, Described,
+                     Titled, Indexed, Slugged, db.Model):
   """Cycle Task Group model.
   """
   __tablename__ = 'cycle_task_groups'

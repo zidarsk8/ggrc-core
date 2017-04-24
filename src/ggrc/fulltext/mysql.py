@@ -10,7 +10,6 @@ from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy import union
 from sqlalchemy.sql import false
-from sqlalchemy.schema import DDL
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select
@@ -32,34 +31,18 @@ class MysqlRecordProperty(db.Model):
   type = db.Column(db.String(64), primary_key=True)
   context_id = db.Column(db.Integer)
   tags = db.Column(db.String)
-  property = db.Column(db.String(64), primary_key=True)
+  property = db.Column(db.String(250), primary_key=True)
   subproperty = db.Column(db.String(64), primary_key=True)
   content = db.Column(db.Text)
 
   @declared_attr
   def __table_args__(self):
     return (
-        # NOTE
-        # This is here to prevent Alembic from wanting to drop the index, but
-        # the DDL below or a similar Alembic migration should be used to create
-        # the index.
-        db.Index('{}_text_idx'.format(self.__tablename__), 'content'),
-        # These are real indexes
+        db.Index('ix_{}_tags'.format(self.__tablename__), 'tags'),
         db.Index('ix_{}_key'.format(self.__tablename__), 'key'),
         db.Index('ix_{}_type'.format(self.__tablename__), 'type'),
-        db.Index('ix_{}_tags'.format(self.__tablename__), 'tags'),
         db.Index('ix_{}_context_id'.format(self.__tablename__), 'context_id'),
-        # Only MyISAM supports fulltext indexes until newer MySQL/MariaDB
-        {'mysql_engine': 'myisam'},
     )
-
-
-event.listen(
-    MysqlRecordProperty.__table__,
-    'after_create',
-    DDL('ALTER TABLE {tablename} ADD FULLTEXT INDEX {tablename}_text_idx '
-        '(content)'.format(tablename=MysqlRecordProperty.__tablename__))
-)
 
 
 class MysqlIndexer(SqlIndexer):

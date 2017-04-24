@@ -21,7 +21,7 @@ from ggrc.fulltext.mixin import Indexed
 
 class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
                          mixins.Titled, mixins.CustomAttributable,
-                         mixins.Slugged, mixins.Base, Indexed, db.Model):
+                         mixins.Slugged, Indexed, db.Model):
   """A class representing the assessment template entity.
 
   An Assessment Template is a template that allows users for easier creation of
