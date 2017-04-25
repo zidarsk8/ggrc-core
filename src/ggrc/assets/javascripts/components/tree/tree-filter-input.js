@@ -11,21 +11,23 @@
   var viewModel = can.Map.extend({
     define: {
       filter: {
-        type: String,
-        set: function (value) {
-          this.attr('options.filter', value);
+        type: 'string',
+        set: function (newValue) {
+          this.attr('options.filter', newValue || '');
+          this.onFilterChange(newValue);
+          return newValue;
         }
       },
       operation: {
-        type: String,
+        type: 'string',
         value: 'AND'
       },
       depth: {
-        type: Boolean,
+        type: 'boolean',
         value: false
       },
       isExpression: {
-        type: Boolean,
+        type: 'boolean',
         value: false
       }
     },
@@ -49,12 +51,12 @@
     submit: function () {
       this.dispatch('filter');
     },
-    reset: function ($element) {
-      $element.closest('tree-filter-input').find('.tree-filter__input').val('');
+    reset: function () {
+      this.attr('filter', '');
       this.submit();
     },
-    onChange: function ($element) {
-      var filter = GGRC.query_parser.parse($element.val());
+    onFilterChange: function (newValue) {
+      var filter = GGRC.query_parser.parse(newValue);
       var isExpression =
         !!filter && !!filter.expression.op &&
         filter.expression.op.name !== 'text_search' &&
