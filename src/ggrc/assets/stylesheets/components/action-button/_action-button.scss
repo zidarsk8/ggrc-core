@@ -53,29 +53,32 @@
 }
 
 .btn {
+  background: $white;
+  color: $black;
   outline: none;
   border-radius: 2px;
   font-weight: normal;
+  border: 1px solid transparent;
+  transition: background 0.2s linear;
+  text-shadow: none;
+  box-shadow: none;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 28px;
+
+  &[disabled], &.disabled {
+    opacity: 0.25;
+  }
 
   &:focus {
     outline: none;
   }
 
-  &.btn-gray {
-    text-align: center;
-    background: $white;
-    border: 1px solid $dropPlaceholder;
-
-    &:hover {
-      background: darken($white, 3%);
-      border-color: darken($dropPlaceholder, 5%);
-      transition: background 0.2s linear;
-    }
-  }
-
   &.btn-red {
     background: $redBtn;
-    color: white;
+    color: $white;
 
     &:hover,
     &:focus,
@@ -84,20 +87,23 @@
     }
   }
 
-  &.btn-white {
-    background: $white;
-    color: $black;
-    border: 1px solid $widgetBorder;
+  &.btn-white, &.btn-gray {
+    border-color: $widgetBorder;
 
     &:hover,
     &:focus,
     &:active {
       background: darken($white, 10%);
     }
+
+    &:focus {
+     box-shadow: 0 1px 3px 1px rgba(125, 125, 125, 0.2);
+    }
   }
 
   &.btn-lightBlue {
     background: $lightBlueBtn;
+    border-color: $lightBlueBtn;
     color: $white;
 
     &:hover,
@@ -109,6 +115,7 @@
 
   &.btn-green {
     background: $btnGreen;
+    border-color: $btnGreen;
     color: $white;
 
     &:hover,
@@ -120,6 +127,7 @@
 
   &.btn-darkBlue {
     background: $createBtn;
+    border-color: $createBtn;
     color: $white;
 
     &:hover,
@@ -130,8 +138,6 @@
   }
 
   &.btn-3bbps {
-    background: transparent;
-    color: $black;
     border: 1px solid $widgetBorder;
     align-items: center;
     display: flex;
@@ -144,7 +150,7 @@
     }
 
     &.dropdown-toggle {
-      height: 6px;
+      height: 8px;
       padding-top: 9px;
       padding-bottom: 9px;
     }

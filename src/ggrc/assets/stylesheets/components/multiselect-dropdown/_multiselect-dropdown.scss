@@ -11,7 +11,7 @@
     outline-color: rgb(59, 153, 252);
     outline-offset: -2px;
     outline-style: auto;
-    outline-width: 5px;
+    outline-width: 3px;
   }
 
   input.multiselect-dropdown__input {
@@ -26,7 +26,7 @@
     user-select: none;
     text-overflow: ellipsis;
     background-color: white;
-    border-radius: 5px;
+    border-radius: 2px;
     color: rgb(85, 85, 85);
     font-size: 12px;
 
@@ -41,8 +41,8 @@
 
   label.multiselect-dropdown__label {
     width: 96%;
-    margin: 0px 0px 0px 0px;
-    padding: 2px 0px 2px 5px;
+    margin: 0;
+    padding: 2px 0 2px 5px;
     font-size: 12px;
     user-select: none;
 
@@ -52,7 +52,7 @@
   }
 
   input[type="checkbox"].multiselect-dropdown__checkbox {
-    margin: 0px 3px 0px 3px;
+    margin: 0 3px;
   }
 
   .multiselect-dropdown {
@@ -64,7 +64,7 @@
       z-index: 2000;
       float: none;
       display: block;
-      border-radius: 5px;
+      border-radius: 0 0 2px 2px;
     }
 
     &__body-wrapper {
@@ -73,8 +73,8 @@
 
     &__list {
       list-style-type: none;
-      margin-left: 0px;
-      margin-bottom: 0px;
+      margin-left: 0;
+      margin-bottom: 0;
     }
 
     &__element {
