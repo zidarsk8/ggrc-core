@@ -1,0 +1,34 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+access-control-list {
+  & > div:first-child {
+    margin-left: 0
+  }
+  .role-block {
+    .modal-body & {
+      margin-left: 0;
+      display: inline-block;
+      float: none;
+      vertical-align: top;
+    }
+    .add-role {
+      cursor: pointer;
+      margin-left: 0.3em;
+      color: $defaultGreen;
+    }
+    .autocomplete--wrapper {
+      .modal-body & {
+        max-width: 92%;
+      }
+    }
+    .person {
+      margin-bottom: 0.3em;
+      a.unmap {
+        cursor: pointer;
+      }
+    }
+  }
+}

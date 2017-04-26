@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
+from ggrc.access_control.roleable import Roleable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
 from ggrc.fulltext.mixin import Indexed
@@ -128,7 +129,7 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
 
 
 # FIXME: For subclasses, restrict kind
-class Policy(CustomAttributable, Relatable,
+class Policy(Roleable, CustomAttributable, Relatable,
              Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
@@ -148,7 +149,7 @@ class Policy(CustomAttributable, Relatable,
     return 'Policy'
 
 
-class Regulation(CustomAttributable, Relatable,
+class Regulation(Roleable, CustomAttributable, Relatable,
                  Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
@@ -168,7 +169,7 @@ class Regulation(CustomAttributable, Relatable,
     return 'Regulation'
 
 
-class Standard(CustomAttributable, Relatable,
+class Standard(Roleable, CustomAttributable, Relatable,
                Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Standard'
@@ -188,7 +189,7 @@ class Standard(CustomAttributable, Relatable,
     return 'Standard'
 
 
-class Contract(CustomAttributable, Relatable,
+class Contract(Roleable, CustomAttributable, Relatable,
                Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'

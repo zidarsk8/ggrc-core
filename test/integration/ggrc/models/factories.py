@@ -23,6 +23,9 @@ from ggrc import models
 from ggrc.login import noop
 from ggrc.fulltext import get_indexer
 
+from ggrc.access_control.role import AccessControlRole
+from ggrc.access_control.list import AccessControlList
+
 
 def random_str(length=8, prefix="", chars=None):
   chars = chars or string.ascii_uppercase + string.digits + "  _.-"
@@ -327,3 +330,21 @@ class OwnerFactory(ModelFactory):
 
   person = None
   ownable = None
+
+
+class AccessControlListFactory(ModelFactory):
+  """Access Control List factory class"""
+
+  class Meta:
+    model = AccessControlList
+
+
+class AccessControlRoleFactory(ModelFactory):
+  """Access Control Role factory class"""
+
+  class Meta:
+    model = AccessControlRole
+
+  name = factory.LazyAttribute(
+      lambda _: random_str(prefix="Access Control Role - ")
+  )

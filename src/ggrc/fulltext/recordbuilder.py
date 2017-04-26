@@ -9,6 +9,7 @@ from ggrc.models.reflection import AttributeInfo
 from ggrc.models.person import Person
 from ggrc.models.mixins import CustomAttributable
 from ggrc.fulltext.attributes import FullTextAttr
+from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.fulltext.mixin import Indexed
 
 
@@ -65,6 +66,8 @@ class RecordBuilder(object):
     for attr in self._fulltext_attrs:
       if isinstance(attr, basestring):
         properties[property_tmpl.format(attr)] = {"": getattr(obj, attr)}
+      elif isinstance(attr, CustomRoleAttr):
+        properties.update(attr.get_properties(obj))
       elif isinstance(attr, FullTextAttr):
         if attr.with_template:
           property_name = property_tmpl.format(attr.alias)

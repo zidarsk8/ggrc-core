@@ -1,0 +1,73 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#instance}}
+<form action="javascript://">
+
+  <input type="hidden" name="object_type" value="{{parent_type}}">
+
+  <div class="row-fluid">
+    <div class="span6 {{#instance.computed_errors.name}}field-failure{{/instance.computed_errors.name}}">
+      <label>Role name
+        <span class="required">*</span>
+        <i
+          class="fa fa-question-circle"
+          rel="tooltip"
+          title="Set a name for the {{class.title_singular}}."></i>
+      </label>
+      <input
+        type="text"
+        name="name"
+        value="{{name}}"
+        placeholder="Enter Name"
+        class="input-block-level"
+        tabindex="1"
+        autofocus>
+    </div>
+
+    <div class="span2">
+      <label>
+        Read
+        <i class="fa fa-question-circle" rel="tooltip"
+          title="Check if this role allows Read permission on an object type."></i>
+      </label>
+      <input
+        type="checkbox"
+        name="read"
+        {{#if read}}checked="checked"{{/if}}
+        class="input-block-level"
+        tabindex="2">
+    </div>
+
+    <div class="span2">
+      <label>
+        Edit
+        <i class="fa fa-question-circle" rel="tooltip"
+          title="Check if this role allows Edit permission on an object type."></i>
+      </label>
+      <input
+        type="checkbox"
+        name="update"
+        {{#if update}}checked="checked"{{/if}}
+        class="input-block-level"
+        tabindex="3">
+    </div>
+
+    <div class="span2">
+      <label>
+        Delete
+        <i class="fa fa-question-circle" rel="tooltip"
+          title="Check if this role allows Delete permission on an object type."></i>
+      </label>
+      <input
+        type="checkbox"
+        name="delete"
+        {{#if delete}}checked="checked"{{/if}}
+        class="input-block-level"
+        tabindex="4">
+    </div>
+  </div>
+</form>
+{{/instance}}

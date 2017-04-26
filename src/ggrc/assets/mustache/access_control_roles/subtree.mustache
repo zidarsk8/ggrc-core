@@ -1,0 +1,35 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<tr
+  data-object-id="{{instance.id}}"
+  data-object-type="{{instance.constructor.table_singular}}"
+>
+  {{#instance}}
+  <td>{{name}}</td>
+  <td>{{#if read}}Yes{{else}}No{{/if}}</td>
+  <td>{{#if update}}Yes{{else}}No{{/if}}</td>
+  <td>{{#if delete}}Yes{{else}}No{{/if}}</td>
+  <td>
+    <ul class="tree-action-list">
+      <li>
+        <a
+          href="javascript://"
+          data-toggle="modal-ajax-form"
+          data-modal-reset="reset"
+          data-object-singular="{{class.model_singular}}"
+          data-object-plural="{{class.table_plural}}"
+          data-object-id="{{id}}"
+          data-object-params='{
+            "parent_type": "{{parent_instance.model_singular}}"
+          }'>
+          <i class="fa fa-pencil-square-o"></i>
+          Edit
+        </a>
+      </li>
+    </ul>
+  </td>
+  {{/instance}}
+</tr>

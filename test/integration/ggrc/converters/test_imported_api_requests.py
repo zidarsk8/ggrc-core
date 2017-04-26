@@ -33,7 +33,7 @@ class TestComprehensiveSheets(TestCase):
             if model_name not in WHITELIST]
 
   # limit found by trial and error, may need tweaking if models change
-  LIMIT = 33
+  LIMIT = 36
 
   @classmethod
   def setUpClass(cls):
@@ -97,10 +97,11 @@ class TestComprehensiveSheets(TestCase):
           counter.queries = []
           res = self.client.get("/{}/{}".format(view.url, instance.id))
           self.assertEqual(res.status_code, 200)
-          self.assertLess(counter.get, self.LIMIT,
-                          "Query count for object {} exceeded: {}/{}".format(
-                              model.__name__, counter.get, self.LIMIT)
-                          )
+          self.assertLessEqual(
+              counter.get, self.LIMIT,
+              "Query count for object {} exceeded: {}/{}".format(
+                  model.__name__, counter.get, self.LIMIT)
+          )
         except AssertionError as e:
           errors.add(e.message)
     self.assertEqual(errors, set())
