@@ -1,6 +1,7 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Full text index engine for Mysql DB backend"""
+from collections import defaultdict
 
 from sqlalchemy import and_
 from sqlalchemy import case
@@ -18,6 +19,7 @@ from sqlalchemy import event
 from ggrc import db
 from ggrc.login import is_creator
 from ggrc.models import all_models
+from ggrc.models.inflector import get_model
 from ggrc.utils import query_helpers
 from ggrc.rbac import context_query_filter
 from ggrc.fulltext.sql import SqlIndexer
@@ -231,10 +233,14 @@ def update_indexer(session):  # pylint:disable=unused-argument
   """General function to update index
 
   for all updated related instance before commit"""
-
+  models_ids_to_reindex = defaultdict(set)
   db.session.flush()
   for for_index in getattr(db.session, 'reindex_set', set()):
     if for_index not in db.session:
       continue
-    for_index.update_indexer()
+    type_name, id_value = for_index.get_reindex_pair()
+    if type_name:
+      models_ids_to_reindex[type_name].add(id_value)
   db.session.reindex_set = set()
+  for model_name, ids in models_ids_to_reindex.iteritems():
+    get_model(model_name).bulk_record_update_for(ids)

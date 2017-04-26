@@ -23,8 +23,7 @@ from ggrc.builder.json import publish
 from ggrc.builder.json import publish_representation
 from ggrc.converters import get_importables, get_exportables
 from ggrc.extensions import get_extension_modules
-from ggrc.fulltext import get_indexer, get_indexed_model_names
-from ggrc.fulltext.recordbuilder import fts_record_for
+from ggrc.fulltext import get_indexer, get_indexed_model_names, mixin
 from ggrc.login import get_current_user
 from ggrc.login import login_required
 from ggrc.models import all_models
@@ -74,32 +73,37 @@ def do_reindex():
   """Update the full text search index."""
 
   indexer = get_indexer()
-  with benchmark('Delete all records'):
-    indexer.delete_all_records(False)
-
   indexed_models = get_indexed_model_names()
 
   people = db.session.query(all_models.Person.id, all_models.Person.name,
                             all_models.Person.email)
-  g.people_map = {p.id: (p.name, p.email) for p in people}
-
+  indexer.cache["people_map"] = {p.id: (p.name, p.email) for p in people}
   for model in sorted(indexed_models):
     # pylint: disable=protected-access
     logger.info("Updating index for: %s", model)
     with benchmark("Create records for %s" % model):
       model = get_model(model)
       mapper_class = model._sa_class_manager.mapper.base_mapper.class_
-      query = model.query.options(
-          db.undefer_group(mapper_class.__name__ + '_complete'),
-      )
-      for query_chunk in generate_query_chunks(query):
-        for instance in query_chunk:
-          indexer.create_record(fts_record_for(instance), False)
-        db.session.commit()
+      if issubclass(model, mixin.Indexed):
+        for query_chunk in generate_query_chunks(db.session.query(model.id)):
+          model.bulk_record_update_for([i.id for i in query_chunk])
+          db.session.commit()
+      else:
+        logger.warning(
+            "Try to index model that not inherited from Indexed mixin: %s",
+            model.__name__
+        )
+        indexer.delete_records_by_type(model.__name__)
+        query = model.query.options(
+            db.undefer_group(mapper_class.__name__ + '_complete'),
+        )
+        for query_chunk in generate_query_chunks(query):
+          for instance in query_chunk:
+            indexer.create_record(indexer.fts_record_for(instance), False)
+          db.session.commit()
 
   reindex_snapshots()
-
-  delattr(g, "people_map")
+  indexer.invalidate_cache()
 
 
 def get_permissions_json():

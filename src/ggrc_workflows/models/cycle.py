@@ -136,3 +136,39 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
     return query.options(
         orm.joinedload('cycle_task_groups'),
     )
+
+  @classmethod
+  def indexed_query(cls):
+    return super(Cycle, cls).indexed_query().options(
+        orm.Load(cls).load_only("next_due_date"),
+        orm.Load(cls).subqueryload("cycle_task_group_object_tasks").load_only(
+            "id",
+            "title",
+            "end_date"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_groups").load_only(
+            "id",
+            "title",
+            "end_date",
+            "next_due_date",
+        ),
+        orm.Load(cls).subqueryload("cycle_task_group_object_tasks").joinedload(
+            "contact"
+        ).load_only(
+            "email",
+            "name",
+            "id"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_groups").joinedload(
+            "contact"
+        ).load_only(
+            "email",
+            "name",
+            "id"
+        ),
+        orm.Load(cls).joinedload("contact").load_only(
+            "email",
+            "name",
+            "id"
+        ),
+    )

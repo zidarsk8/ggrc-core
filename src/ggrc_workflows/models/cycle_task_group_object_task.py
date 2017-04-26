@@ -9,6 +9,7 @@ from sqlalchemy.ext.associationproxy import association_proxy
 
 from ggrc import db
 from ggrc.models.computed_property import computed_property
+from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Notifiable
 from ggrc.models.mixins import Slugged
@@ -31,7 +32,7 @@ from ggrc.fulltext.mixin import Indexed, ReindexRule
 
 class CycleTaskGroupObjectTask(
         WithContact, Stateful, Timeboxed, Relatable, Notifiable,
-        Described, Titled, Indexed, Slugged, db.Model):
+        Described, Titled, Slugged, Base, Indexed, db.Model):
   """Cycle task model
   """
   __tablename__ = 'cycle_task_group_object_tasks'
@@ -244,6 +245,51 @@ class CycleTaskGroupObjectTask(
            .joinedload('workflow')
            .undefer_group('Workflow_complete'),
         orm.joinedload('cycle_task_entries'),
+    )
+
+  @classmethod
+  def indexed_query(cls):
+    return super(CycleTaskGroupObjectTask, cls).indexed_query().options(
+        orm.Load(cls).load_only(
+            "end_date",
+            "start_date",
+            "created_at",
+            "updated_at"
+        ),
+        orm.Load(cls).joinedload("cycle_task_group").load_only(
+            "id",
+            "title",
+            "end_date",
+            "next_due_date",
+        ),
+        orm.Load(cls).joinedload("cycle").load_only(
+            "id",
+            "title",
+            "next_due_date"
+        ),
+        orm.Load(cls).joinedload("cycle_task_group").joinedload(
+            "contact"
+        ).load_only(
+            "email",
+            "name",
+            "id"
+        ),
+        orm.Load(cls).joinedload("cycle").joinedload(
+            "contact"
+        ).load_only(
+            "email",
+            "name",
+            "id"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_entries").load_only(
+            "description",
+            "id"
+        ),
+        orm.Load(cls).joinedload("contact").load_only(
+            "email",
+            "name",
+            "id"
+        ),
     )
 
 

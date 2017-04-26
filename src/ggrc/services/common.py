@@ -32,7 +32,6 @@ import ggrc.models
 from ggrc import db, utils
 from ggrc.utils import as_json, benchmark
 from ggrc.fulltext import get_indexer
-from ggrc.fulltext.recordbuilder import fts_record_for
 from ggrc.login import get_current_user_id, get_current_user
 from ggrc.models.cache import Cache
 from ggrc.models.event import Event
@@ -313,25 +312,19 @@ def get_modified_objects(session):
 def update_index(session, cache):
   """Update fulltext index records for cached objects."""
   from ggrc.snapshotter.indexer import reindex_snapshots
+  from ggrc.fulltext.mixin import Indexed
+  if cache is None:
+    return
+  indexer = get_indexer()
   reindex_snapshots_list = []
-  if cache:
-    indexer = get_indexer()
-    for obj in cache.new:
-      exists_query = session.query(indexer.record_type.query.filter(
-          indexer.record_type.type == obj.__class__.__name__,
-          indexer.record_type.key == obj.id).exists())
-      if obj.type == "Snapshot":
-        reindex_snapshots_list.append(obj.id)
-      elif not exists_query.all()[0][0]:
-        indexer.create_record(fts_record_for(obj), commit=False)
-    for obj in cache.dirty:
-      if obj.type == "Snapshot":
-        reindex_snapshots_list.append(obj.id)
-      else:
-        indexer.update_record(fts_record_for(obj), commit=False)
-    for obj in cache.deleted:
-      indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
-    session.commit()
+  for obj in itertools.chain(cache.new, cache.dirty):
+    if obj.type == "Snapshot":
+      reindex_snapshots_list.append(obj.id)
+    elif not isinstance(obj, Indexed):
+      indexer.update_record(indexer.fts_record_for(obj), commit=False)
+  for obj in cache.deleted:
+    indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
+  session.commit()
   if reindex_snapshots_list:
     for snapshot_id in reindex_snapshots_list:
       indexer.delete_record(snapshot_id, "Snapshot", commit=False)

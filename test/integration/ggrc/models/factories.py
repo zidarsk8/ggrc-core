@@ -22,7 +22,6 @@ from ggrc import db
 from ggrc import models
 from ggrc.login import noop
 from ggrc.fulltext import get_indexer
-from ggrc.fulltext.recordbuilder import fts_record_for
 
 
 def random_str(length=8, prefix="", chars=None):
@@ -75,7 +74,7 @@ class ModelFactory(factory.Factory):
     )
     db.session.add(revision)
     db.session.add(event)
-    indexer.update_record(fts_record_for(instance), commit=False)
+    indexer.update_record(indexer.fts_record_for(instance), commit=False)
 
   @staticmethod
   def _get_user():
@@ -225,7 +224,7 @@ class AssessmentTemplateFactory(TitledFactory):
                     "verifiers": "Object Owners"}
 
 
-class ContractFactory(ModelFactory):
+class ContractFactory(TitledFactory):
 
   class Meta:
     model = models.Contract
