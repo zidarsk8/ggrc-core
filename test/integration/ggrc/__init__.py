@@ -3,6 +3,7 @@
 
 """Base test case for all ggrc integration tests."""
 from collections import defaultdict
+import contextlib
 import json
 import logging
 import os
@@ -65,6 +66,16 @@ class TestCase(BaseTestCase, object):
 
   maxDiff = None
 
+  @contextlib.contextmanager
+  def custom_headers(self, headers=None):
+    """Context manager that allowed to add some custom headers in request."""
+    tmp_headers = self._custom_headers.copy()
+    self._custom_headers.update(headers or {})
+    try:
+      yield
+    finally:
+      self._custom_headers = tmp_headers
+
   @classmethod
   def clear_data(cls):
     """Remove data from ggrc tables.
@@ -114,6 +125,7 @@ class TestCase(BaseTestCase, object):
 
   def setUp(self):
     self.clear_data()
+    self._custom_headers = {}
 
   def tearDown(self):  # pylint: disable=no-self-use
     db.session.remove()
@@ -229,6 +241,7 @@ class TestCase(BaseTestCase, object):
         "X-requested-by": "GGRC",
         "X-export-view": "blocks",
     }
+    headers.update(self._custom_headers)
     return self.client.post("/_service/export_csv", data=json.dumps(data),
                             headers=headers)
 

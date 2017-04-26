@@ -4,6 +4,16 @@
 */
 (function(root, $, can) {
 
+  $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+    // setup timezone offset header in each ajax request
+    // it should be setup in minutes
+
+    jqXHR.setRequestHeader(
+      'X-UserTimezoneOffset',
+      String(-1 * new Date().getTimezoneOffset())
+    );
+  });
+
   // Set up all PUT requests to the server to respect ETags, to ensure that
   // we are not overwriting more recent data than was viewed by the user.
   var etags = {},

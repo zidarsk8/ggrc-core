@@ -5,6 +5,10 @@
 
 from collections import defaultdict
 
+import datetime
+
+from flask import g
+
 from ggrc.utils import date_parsers
 
 EMPTY_SUBPROPERTY_KEY = ''
@@ -128,8 +132,12 @@ class MultipleSubpropertyFullTextAttr(FullTextAttr):
     return results
 
 
-class DatetimeValue(object):  # pylint: disable=too-few-public-methods
-  """Mixin setup if expected filter value is datetime"""
+# pylint: disable=too-few-public-methods
+class DatetimeValue(object):
+  """Mixin setup if expected filter value is datetime.
+
+  This mixin should be used for filtering datetime fields values only.
+  """
 
   @staticmethod
   def get_filter_value(value, operation):
@@ -150,8 +158,11 @@ class DatetimeValue(object):  # pylint: disable=too-few-public-methods
     return date_dict.get(operation)
 
 
-class DateValue(DatetimeValue):  # pylint: disable=too-few-public-methods
-  """Mixin setup if expected filter value is date"""
+class DateValue(DatetimeValue):
+  """Mixin setup if expected filter value is date
+
+  This mixin should be used for filtering date fields values only.
+  """
 
   def get_filter_value(self, value, operation):
     results = super(DateValue, self).get_filter_value(value, operation)
@@ -160,8 +171,29 @@ class DateValue(DatetimeValue):  # pylint: disable=too-few-public-methods
     return [i.date() if i else i for i in results]
 
 
+class TimezonedDatetimeValue(DatetimeValue):
+  """Mixin setup if expected filter value is datetime depended from timezone.
+
+  This mixin should be used for filtering datetime fields values only.
+  """
+
+  def get_filter_value(self, value, operation):
+    """returns parsed datetime pairs for selected operation"""
+    if getattr(g, "user_timezone_offset", None):
+      minutes_offset = int(g.user_timezone_offset)
+    else:
+      minutes_offset = 0
+    offset = datetime.timedelta(minutes=minutes_offset)
+    converted_pairs = super(TimezonedDatetimeValue, self).get_filter_value(
+        value, operation
+    )
+    if not converted_pairs:
+      return converted_pairs
+    return [(p - offset) if p else p for p in converted_pairs]
+
+
 DatetimeFullTextAttr = type(
-    "DatetimeFullTextAttr", (DatetimeValue, FullTextAttr), {})
+    "DatetimeFullTextAttr", (TimezonedDatetimeValue, FullTextAttr), {})
 
 
 DateFullTextAttr = type("DateFullTextAttr", (DateValue, FullTextAttr), {})
@@ -169,7 +201,7 @@ DateFullTextAttr = type("DateFullTextAttr", (DateValue, FullTextAttr), {})
 
 DatetimeMultipleSubpropertyFullTextAttr = type(
     "DatetimeMultipleSubpropertyFullTextAttr",
-    (DatetimeValue, MultipleSubpropertyFullTextAttr),
+    (TimezonedDatetimeValue, MultipleSubpropertyFullTextAttr),
     {},
 )
 

@@ -4,7 +4,7 @@
 
 """Tests for task group task specific export."""
 import datetime
-from ddt import data, ddt
+from ddt import data, ddt, unpack
 
 from ggrc import db
 from ggrc.models import all_models
@@ -208,3 +208,22 @@ class TestExport(TestCase):
         self.assessment.verified_date + datetime.timedelta(1),
         [self.assessment.slug],
     )
+
+  @data(
+      # (offset, verified_date, filter_date)
+      (180, datetime.datetime(2017, 1, 1, 22, 30), "2017-01-02"),
+      (-180, datetime.datetime(2017, 1, 2, 1, 30), "2017-01-01"),
+      (0, datetime.datetime(2017, 1, 1, 1, 30), "2017-01-01"),
+      (None, datetime.datetime(2017, 1, 1, 1, 30), "2017-01-01"),
+  )
+  @unpack
+  def test_filter_by_tz_depend(self, offset, verified_date, filter_value):
+    """Test filter by verified date with timezone info"""
+    user_headers = {}
+    if offset is not None:
+      user_headers["X-UserTimezoneOffset"] = str(offset)
+    self.assessment.verified_date = verified_date
+    db.session.add(self.assessment)
+    db.session.commit()
+    with self.custom_headers(user_headers):
+      self.assert_slugs("verified_date", filter_value, [self.assessment.slug])

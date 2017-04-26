@@ -55,6 +55,18 @@ def _ensure_session_teardown():
     db.session.remove()
 
 
+@app.before_request
+def setup_user_timezone_offset():
+  """Setup user timezon for current request
+
+  It will setup from request header `X-UserTimezoneOffset`
+  offset will be sent in minutes.
+  """
+  from flask import request
+  from flask import g
+  g.user_timezone_offset = request.headers.get("X-UserTimezoneOffset")
+
+
 def init_models(app_):
   import ggrc.models
   ggrc.models.init_app(app_)
