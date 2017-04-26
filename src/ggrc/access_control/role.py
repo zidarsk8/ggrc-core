@@ -23,8 +23,6 @@ class AccessControlRole(Indexed, mixins.Base, db.Model):
   read = db.Column(db.Boolean, nullable=False, default=True)
   update = db.Column(db.Boolean, nullable=False, default=True)
   delete = db.Column(db.Boolean, nullable=False, default=True)
-  map = db.Column(db.Boolean, nullable=False, default=False)
-  view_object_page = db.Column(db.Boolean, nullable=False, default=False)
   my_work = db.Column(db.Boolean, nullable=False, default=True)
 
   access_control_list = db.relationship(
@@ -46,5 +44,6 @@ class AccessControlRole(Indexed, mixins.Base, db.Model):
       "tooltip",
       "read",
       "update",
-      "delete"
+      "delete",
+      "my_work",
   ]
