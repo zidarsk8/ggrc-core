@@ -3,9 +3,12 @@
 
 """Roleable model"""
 
+from sqlalchemy import and_
 from sqlalchemy import orm
+from sqlalchemy.orm import remote
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
+
 from ggrc.access_control.list import AccessControlList
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc import db
@@ -28,12 +31,11 @@ class Roleable(object):
   @declared_attr
   def _access_control_list(self):
     """access_control_list"""
-    joinstr = 'and_(remote(AccessControlList.object_id) == {type}.id, '\
-        'remote(AccessControlList.object_type) == "{type}")'
-    joinstr = joinstr.format(type=self.__name__)
     return db.relationship(
         'AccessControlList',
-        primaryjoin=joinstr,
+        primaryjoin=lambda: and_(
+            remote(AccessControlList.object_id) == self.id,
+            remote(AccessControlList.object_type) == self.__name__),
         foreign_keys='AccessControlList.object_id',
         backref='{0}_object'.format(self.__name__),
         cascade='all, delete-orphan')
