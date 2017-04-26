@@ -113,7 +113,6 @@ class Audit(Snapshotable, clonable.Clonable,
       "contact": {
           "display_name": "Internal Audit Lead",
           "mandatory": True,
-          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
       "notes": None,

@@ -44,11 +44,6 @@ class Risk(Roleable, HasObjectState, mixins.CustomAttributable,
   ]
 
   _aliases = {
-      "contact": {
-          "display_name": "Contact",
-          "filter_by": "_filter_by_contact",
-      },
-      "secondary_contact": None,
       "status": {
           "display_name": "State",
           "mandatory": False,

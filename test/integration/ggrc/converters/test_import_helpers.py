@@ -854,7 +854,8 @@ class TestGetObjectColumnDefinitions(TestCase):
 
     names = {
         "Code",
-        "Contact",
+        "Primary Contact",
+        "Secondary Contact",
         "Delete",
         "Description",
         "Effective Date",
