@@ -4,7 +4,7 @@
 }}
 
 <h6>Evidence</h6>
-<mapped-objects {visible-items}="limit" {parent-instance}="instance" mapping="all_documents">
+<mapped-objects {visible-items}="limit" {parent-instance}="instance" mapping="all_documents" {empty-message}="noItemsText">
     <action-toolbar {document}="instance" class="action-toolbar">
         <document-object-list-item {instance}="document"></document-object-list-item>
       {{#if showAction}}

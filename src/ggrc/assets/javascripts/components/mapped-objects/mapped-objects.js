@@ -17,8 +17,12 @@
     template: tpl,
     viewModel: {
       define: {
+        emptyMessage: {
+          type: 'string',
+          value: 'None'
+        },
         relatedTypes: {
-          type: String,
+          type: 'string',
           value: function () {
             return '';
           }
@@ -27,7 +31,7 @@
           Value: can.List
         },
         mappedSnapshots: {
-          type: Boolean,
+          type: 'boolean',
           value: false
         },
         requireLimit: {
