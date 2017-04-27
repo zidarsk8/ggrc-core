@@ -228,7 +228,10 @@
         isLoadingOrSaving: function () {
           return (this.attr('mapper.page_loading') ||
           this.attr('mapper.is_saving') ||
-          this.attr('mapper.block_type_change'));
+          this.attr('mapper.block_type_change')) ||
+          //  disable changing of object type while loading
+          //  to prevent errors while speedily selecting different types
+          this.attr('mapper.is_loading');
         },
         mapper: new MapperModel(can.extend(data, {
           relevantTo: parentScope.attr('relevantTo'),
