@@ -36,7 +36,7 @@
     class="{{#mapper.useSnapshots}}snapshot-list{{/mapper.useSnapshots}}
       {{^mapper.afterSearch}}hidden{{/mapper.afterSearch}}"
     base-instance="mapper.parentInstance"
-    is-loading="mapper.is_loading"
+    {(is-loading)}="mapper.is_loading"
     object="mapper.object"
     mapper="mapper"
     type="mapper.type"
