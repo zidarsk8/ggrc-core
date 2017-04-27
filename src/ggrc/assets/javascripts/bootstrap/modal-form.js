@@ -177,8 +177,13 @@
           return;
         }
         if (instance) {
+          instance._backupStore()['-1'] = instance['-1'];
           changedInstance = instance.isDirty(true);
-          hasPending = GGRC.Utils.hasPending(instance);
+          if (!instance.id) {
+            hasPending = false;
+          } else {
+            hasPending = GGRC.Utils.hasPending(instance);
+          }
         }
         if (this.is_form_dirty() || changedInstance || hasPending) {
             // Confirm that the user wants to lose the data prior to hiding

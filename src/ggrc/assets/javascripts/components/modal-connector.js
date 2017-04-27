@@ -12,14 +12,14 @@
    objects while the modal is visible.  On save, the actual pending actions will
    be resolved and we won't worry about the transient state we use anymore.
    */
-  can.Component.extend({
+  GGRC.Components('modalConnector', {
     tag: 'ggrc-modal-connector',
     // <content> in a component template will be replaced with whatever is contained
     //  within the component tag.  Since the views for the original uses of these components
     //  were already created with content, we just used <content> instead of making
     //  new view template files.
     template: '<isolate-form><content/></isolate-form>',
-    scope: {
+    viewModel: {
       parent_instance: null,
       instance: null,
       instance_attr: '@',
@@ -39,34 +39,35 @@
         var key;
         var sourceMappingSource;
         var mapperGetter;
-        this.scope.attr('controller', this);
-        if (!this.scope.instance) {
-          this.scope.attr('deferred', true);
-        } else if (this.scope.instance.reify) {
-          this.scope.attr('instance', this.scope.instance.reify());
+        this.viewModel.attr('controller', this);
+        if (!this.viewModel.instance) {
+          this.viewModel.attr('deferred', true);
+        } else if (this.viewModel.instance.reify) {
+          this.viewModel.attr('instance', this.viewModel.instance.reify());
         }
 
-        this.scope.default_mappings.forEach(function (defaultMapping) {
+        this.viewModel.default_mappings.forEach(function (defaultMapping) {
           var model;
           var objectToAdd;
           if (defaultMapping.id && defaultMapping.type) {
             model = CMS.Models[defaultMapping.type];
             objectToAdd = model.findInCacheById(defaultMapping.id);
-            that.scope.instance
+            that.viewModel.instance
               .mark_for_addition('related_objects_as_source', objectToAdd, {});
             that.addListItem(objectToAdd);
           }
         });
 
-        if (!this.scope.source_mapping) {
-          this.scope.attr('source_mapping', this.scope.mapping);
+        if (!this.viewModel.source_mapping) {
+          this.viewModel.attr('source_mapping', this.viewModel.mapping);
         }
-        if (!this.scope.source_mapping_source) {
-          this.scope.source_mapping_source = 'instance';
+        if (!this.viewModel.source_mapping_source) {
+          this.viewModel.source_mapping_source = 'instance';
         }
 
-        sourceMappingSource = this.scope[this.scope.source_mapping_source];
-        mapperGetter = this.scope.mapping_getter;
+        sourceMappingSource =
+          this.viewModel[this.viewModel.source_mapping_source];
+        mapperGetter = this.viewModel.mapping_getter;
 
         if (sourceMappingSource) {
           if (mapperGetter) {
@@ -74,50 +75,54 @@
               this.setListItems(list);
             }.bind(this));
           } else {
-            sourceMappingSource.get_binding(this.scope.source_mapping)
+            sourceMappingSource.get_binding(this.viewModel.source_mapping)
               .refresh_instances()
               .then(function (list) {
                 this.setListItems(list);
               }.bind(this));
           }
-          // this.scope.instance.attr("_transient." + this.scope.mapping, this.scope.list);
+          // this.viewModel.instance.attr("_transient." + this.viewModel.mapping, this.viewModel.list);
         } else {
-          key = this.scope.instance_attr + '_' +
-            (this.scope.mapping || this.scope.source_mapping);
-          if (!this.scope.parent_instance._transient[key]) {
-            this.scope.attr('list', []);
-            this.scope.parent_instance.attr('_transient.' + key,
-              this.scope.list);
+          key = this.viewModel.instance_attr + '_' +
+            (this.viewModel.mapping || this.viewModel.source_mapping);
+          if (!this.viewModel.parent_instance._transient[key]) {
+            this.viewModel.attr('list', []);
+            this.viewModel.parent_instance.attr('_transient.' + key,
+              this.viewModel.list);
           } else {
-            this.scope.attr('list', this.scope.parent_instance._transient[key]);
+            this.viewModel.attr('list',
+              this.viewModel.parent_instance._transient[key]);
           }
         }
 
-        this.options.parent_instance = this.scope.parent_instance;
-        this.options.instance = this.scope.instance;
+        this.options.parent_instance = this.viewModel.parent_instance;
+        this.options.instance = this.viewModel.instance;
         this.on();
       },
+      destroy: function () {
+        this.viewModel.parent_instance.removeAttr('changes');
+      },
       setListItems: function (list) {
-        var currentList = this.scope.attr('list');
-        this.scope.attr('list', currentList.concat(can.map(list,
+        var currentList = this.viewModel.attr('list');
+        this.viewModel.attr('list', currentList.concat(can.map(list,
           function (binding) {
             return binding.instance;
           })));
       },
-      '{scope} list': function () {
+      '{viewModel} list': function () {
         var person;
         // Workaround so we render pre-defined users.
-        if (~['owners'].indexOf(this.scope.mapping) &&
-          this.scope.list && !this.scope.list.length) {
+        if (~['owners'].indexOf(this.viewModel.mapping) &&
+          this.viewModel.list && !this.viewModel.list.length) {
           person = CMS.Models.Person.findInCacheById(GGRC.current_user.id);
-          this.scope.instance
-            .mark_for_addition(this.scope.mapping, person, {});
+          this.viewModel.instance
+            .mark_for_addition(this.viewModel.mapping, person, {});
           this.addListItem(person);
         }
       },
       deferred_update: function () {
-        var changes = this.scope.changes;
-        var instance = this.scope.instance;
+        var changes = this.viewModel.changes;
+        var instance = this.viewModel.instance;
 
         if (!changes.length) {
           if (instance && instance._pending_joins &&
@@ -127,26 +132,26 @@
           }
           return;
         }
-        this.scope.attr('instance', this.scope.attr('parent_instance')
-          .attr(this.scope.instance_attr).reify());
+        this.viewModel.attr('instance', this.viewModel.attr('parent_instance')
+          .attr(this.viewModel.instance_attr).reify());
         // Add pending operations
         can.each(changes, function (item) {
-          var mapping = this.scope.mapping ||
+          var mapping = this.viewModel.mapping ||
               GGRC.Mappings.get_canonical_mapping_name(
-                this.scope.instance.constructor.shortName,
+                this.viewModel.instance.constructor.shortName,
                 item.what.constructor.shortName);
           if (item.how === 'add') {
-            this.scope.instance
+            this.viewModel.instance
               .mark_for_addition(mapping, item.what, item.extra);
           } else {
-            this.scope.instance.mark_for_deletion(mapping, item.what);
+            this.viewModel.instance.mark_for_deletion(mapping, item.what);
           }
         }.bind(this)
         );
-        this.scope.instance
+        this.viewModel.instance
           .delay_resolving_save_until(
-            this.scope.instance.constructor
-              .resolve_deferred_bindings(this.scope.instance));
+            this.viewModel.instance.constructor
+              .resolve_deferred_bindings(this.viewModel.instance));
       },
       '{parent_instance} updated': 'deferred_update',
       '{parent_instance} created': 'deferred_update',
@@ -165,18 +170,21 @@
             attrs[$(el).attr('name')] = $(el).val();
             return attrs;
           }, {});
-        if (this.scope.attr('deferred')) {
-          this.scope.changes.push({
+        if (this.viewModel.attr('deferred')) {
+          this.viewModel.changes.push({
             what: ui.item,
             how: 'add',
             extra: extraAttrs
           });
+          this.viewModel.parent_instance.attr('changes',
+            this.viewModel.changes);
         } else {
-          mapping = this.scope.mapping ||
+          mapping = this.viewModel.mapping ||
             GGRC.Mappings.get_canonical_mapping_name(
-              this.scope.instance.constructor.shortName,
+              this.viewModel.instance.constructor.shortName,
               ui.item.constructor.shortName);
-          this.scope.instance.mark_for_addition(mapping, ui.item, extraAttrs);
+          this.viewModel.instance
+            .mark_for_addition(mapping, ui.item, extraAttrs);
         }
         function doesExist(arr, owner) {
           if (!arr || !arr.length) {
@@ -188,45 +196,47 @@
         }
 
         // If it's owners and user isn't pre-added
-        if (!(~['owners'].indexOf(this.scope.mapping) &&
-          doesExist(this.scope.list, ui.item))) {
+        if (!(~['owners'].indexOf(this.viewModel.mapping) &&
+          doesExist(this.viewModel.list, ui.item))) {
           this.addListItem(ui.item);
         }
-        this.scope.attr('show_new_object_form', false);
+        this.viewModel.attr('show_new_object_form', false);
       },
       '[data-toggle=unmap] click': function (el, ev) {
         ev.stopPropagation();
         can.map(el.find('.result'), function (resultEl) {
           var obj = $(resultEl).data('result');
-          var len = this.scope.list.length;
+          var len = this.viewModel.list.length;
           var mapping;
 
-          if (this.scope.attr('deferred')) {
-            this.scope.changes.push({what: obj, how: 'remove'});
+          if (this.viewModel.attr('deferred')) {
+            this.viewModel.changes.push({what: obj, how: 'remove'});
+            this.viewModel.parent_instance.attr('changes',
+              this.viewModel.changes);
           } else {
-            mapping = this.scope.mapping ||
+            mapping = this.viewModel.mapping ||
               GGRC.Mappings.get_canonical_mapping_name(
-                this.scope.instance.constructor.shortName,
+                this.viewModel.instance.constructor.shortName,
                 obj.constructor.shortName);
-            this.scope.instance.mark_for_deletion(mapping, obj);
+            this.viewModel.instance.mark_for_deletion(mapping, obj);
           }
           for (; len >= 0; len--) {
-            if (this.scope.list[len] === obj) {
-              this.scope.list.splice(len, 1);
+            if (this.viewModel.list[len] === obj) {
+              this.viewModel.list.splice(len, 1);
             }
           }
         }.bind(this));
       },
       'input[null-if-empty] change': function (el) {
         if (!el.val()) {
-          this.scope.attributes.attr(el.attr('name'), null);
+          this.viewModel.attributes.attr(el.attr('name'), null);
         }
       },
       'input keyup': function (el, ev) {
         ev.stopPropagation();
       },
       'input, textarea, select change': function (el, ev) {
-        this.scope.attributes.attr(el.attr('name'), el.val());
+        this.viewModel.attributes.attr(el.attr('name'), el.val());
       },
 
       'input:not([data-lookup], [data-mapping]), textarea keyup':
@@ -234,14 +244,15 @@
           if (el.prop('value').length === 0 ||
             (typeof el.attr('value') !== 'undefined' &&
             el.attr('value').length === 0)) {
-            this.scope.attributes.attr(el.attr('name'), el.val());
+            this.viewModel.attributes.attr(el.attr('name'), el.val());
           }
         },
       'a[data-toggle=submit]:not(.disabled) click': function (el, ev) {
         var obj;
         var mapping;
         var that = this;
-        var binding = this.scope.instance.get_binding(this.scope.mapping);
+        var binding = this.viewModel.instance
+          .get_binding(this.viewModel.mapping);
         var extraAttrs = can.reduce(
           this.element.find('input:not([data-mapping], [data-lookup])').get(),
           function (attrs, el) {
@@ -256,24 +267,25 @@
 
         ev.stopPropagation();
 
-        extraAttrs[binding.loader.object_attr] = this.scope.instance;
+        extraAttrs[binding.loader.object_attr] = this.viewModel.instance;
         if (binding.loader instanceof GGRC.ListLoaders.DirectListLoader) {
           obj = new CMS.Models[binding.loader.model_name](extraAttrs);
         } else {
           obj = new CMS.Models[binding.loader.option_model_name](extraAttrs);
         }
 
-        if (that.scope.attr('deferred')) {
-          that.scope.changes.push({what: obj, how: 'add', extra: extraAttrs});
+        if (that.viewModel.attr('deferred')) {
+          that.viewModel.changes
+            .push({what: obj, how: 'add', extra: extraAttrs});
         } else {
-          mapping = that.scope.mapping ||
+          mapping = that.viewModel.mapping ||
             GGRC.Mappings.get_canonical_mapping_name(
-              that.scope.instance.constructor.shortName,
+              that.viewModel.instance.constructor.shortName,
               obj.constructor.shortName);
-          that.scope.instance.mark_for_addition(mapping, obj, extraAttrs);
+          that.viewModel.instance.mark_for_addition(mapping, obj, extraAttrs);
         }
         that.addListItem(obj);
-        that.scope.attr('attributes', {});
+        that.viewModel.attr('attributes', {});
       },
       'a[data-object-source] modal:success': 'addMapings',
       'defer:add': 'addMapings',
@@ -282,14 +294,16 @@
         ev.stopPropagation();
 
         can.each(data.arr || [data], function (obj) {
-          if (this.scope.attr('deferred')) {
-            this.scope.changes.push({what: obj, how: 'add'});
+          if (this.viewModel.attr('deferred')) {
+            this.viewModel.changes.push({what: obj, how: 'add'});
+            this.viewModel.parent_instance.attr('changes',
+              this.viewModel.changes);
           } else {
-            mapping = this.scope.mapping ||
+            mapping = this.viewModel.mapping ||
               GGRC.Mappings.get_canonical_mapping_name(
-                this.scope.instance.constructor.shortName,
+                this.viewModel.instance.constructor.shortName,
                 obj.constructor.shortName);
-            this.scope.instance.mark_for_addition(mapping, obj);
+            this.viewModel.instance.mark_for_addition(mapping, obj);
           }
           this.addListItem(obj);
         }, this);
@@ -310,17 +324,18 @@
 
         can.each(data.arr || [data], function (obj) {
           var mapping;
-          if (that.scope.attr('deferred')) {
-            that.scope.changes.push({what: obj, how: 'add', extra: extraAttrs});
+          if (that.viewModel.attr('deferred')) {
+            that.viewModel.changes
+              .push({what: obj, how: 'add', extra: extraAttrs});
           } else {
-            mapping = that.scope.mapping ||
+            mapping = that.viewModel.mapping ||
               GGRC.Mappings.get_canonical_mapping_name(
-                that.scope.instance.constructor.shortName,
+                that.viewModel.instance.constructor.shortName,
                 obj.constructor.shortName);
-            that.scope.instance.mark_for_addition(mapping, obj, extraAttrs);
+            that.viewModel.instance.mark_for_addition(mapping, obj, extraAttrs);
           }
           that.addListItem(obj);
-          that.scope.attr('attributes', {});
+          that.viewModel.attr('attributes', {});
         });
       },
       addListItem: function (item) {
@@ -334,7 +349,7 @@
           item.attr('viewLink', snapshotObject.originalLink);
         }
 
-        this.scope.list.push(item);
+        this.viewModel.list.push(item);
       }
     },
     helpers: {

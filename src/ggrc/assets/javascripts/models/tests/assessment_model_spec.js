@@ -40,6 +40,87 @@ describe('CMS.Models.Assessment', function () {
       }).toThrow(new Error(
         'Cannot save assessment, audit context not set.'));
     });
+    it('sets empty string to design property', function () {
+      assessment.attr('audit', audit);
+      assessment.attr('design', undefined);
+      assessment.before_create();
+      expect(assessment.attr('design')).toEqual('');
+    });
+    it('sets empty string to operationally property', function () {
+      assessment.attr('audit', audit);
+      assessment.attr('operationally', undefined);
+      assessment.before_create();
+      expect(assessment.attr('operationally')).toEqual('');
+    });
+  });
+
+  describe('_transformBackupProperty() method', function () {
+    var assessment;
+
+    beforeEach(function () {
+      assessment = new CMS.Models.Assessment();
+    });
+    it('does nothing if no backup of instance', function () {
+      assessment.attr('name', '');
+      assessment._transformBackupProperty(['name']);
+      expect(assessment.attr('name')).toEqual('');
+    });
+    it('transforms backups property if it is falsy in instance and in backup' +
+    'but not equal', function () {
+      assessment.attr('name', '');
+      assessment.backup();
+      assessment._backupStore().name = null;
+      assessment._transformBackupProperty(['name']);
+      expect(assessment._backupStore().name).toEqual('');
+    });
+    it('updates validate_assessor in backup if it is define in instance',
+      function () {
+        assessment.backup();
+        assessment.attr('validate_assessor', true);
+        assessment._backupStore().validate_assessor = undefined;
+        assessment._transformBackupProperty(['name']);
+        expect(assessment._backupStore().validate_assessor).toEqual(true);
+      });
+    it('updates validate_creator in backup if it is define in instance',
+      function () {
+        assessment.backup();
+        assessment.attr('validate_creator', true);
+        assessment._backupStore().validate_creator = undefined;
+        assessment._transformBackupProperty(['name']);
+        expect(assessment._backupStore().validate_creator).toEqual(true);
+      });
+  });
+  describe('isDirty() method', function () {
+    var assessment;
+
+    beforeEach(function () {
+      assessment = new CMS.Models.Assessment();
+      spyOn(assessment, '_transformBackupProperty')
+        .and.callThrough();
+    });
+    it('calls _transformBackupProperty() with specified arguments',
+      function () {
+        assessment.isDirty();
+        expect(assessment._transformBackupProperty)
+          .toHaveBeenCalledWith(['design', 'operationally', '_disabled']);
+      });
+    it('returns result of inherited function, true if instance is dirty',
+      function () {
+        var result;
+        assessment.attr('name', 'assessment1');
+        assessment.backup();
+        assessment.attr('name', 'assessment1.1');
+        result = assessment.isDirty();
+        expect(result).toEqual(true);
+      });
+    it('returns result of inherited function, false if instance is not dirty',
+      function () {
+        var result;
+        assessment.attr('name', 'assessment1');
+        assessment.backup();
+        result = assessment.isDirty();
+        expect(result).toEqual(false);
+      });
   });
 
   describe('get_related_objects_as_source() method', function () {

@@ -249,6 +249,31 @@
           'Cannot save assessment, audit context not set.');
       }
       this.attr('context', this.attr('audit.context'));
+      this.attr('design', '');
+      this.attr('operationally', '');
+    },
+    _transformBackupProperty: function (badProperties) {
+      var backupInstance = this._backupStore();
+      if (!backupInstance) {
+        return;
+      }
+      badProperties.forEach(function (property) {
+        if (!this[property] && !backupInstance[property] &&
+        (this[property] !== backupInstance[property])) {
+          backupInstance[property] = this[property];
+        }
+      }.bind(this));
+
+      if (this.validate_assessor !== undefined) {
+        backupInstance.validate_assessor = this.validate_assessor;
+      }
+      if (this.validate_creator !== undefined) {
+        backupInstance.validate_creator = this.validate_creator;
+      }
+    },
+    isDirty: function (checkAssociations) {
+      this._transformBackupProperty(['design', 'operationally', '_disabled']);
+      return this._super(checkAssociations);
     },
     after_save: function () {
       this.dispatch('refreshInstance');
