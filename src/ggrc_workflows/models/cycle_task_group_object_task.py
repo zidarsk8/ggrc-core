@@ -74,7 +74,7 @@ class CycleTaskGroupObjectTask(
       DateFullTextAttr("cycle due date",
                        lambda x: x.cycle.next_due_date,
                        with_template=False),
-      MultipleSubpropertyFullTextAttr("comment",
+      MultipleSubpropertyFullTextAttr("comments",
                                       "cycle_task_entries",
                                       ["description"]),
   ]

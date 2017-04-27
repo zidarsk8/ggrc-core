@@ -81,7 +81,7 @@ class TestExportTasks(TestCase):
       self.assert_slugs("task assignee", task.contact.name, [task.slug])
 
   def test_filter_by_task_comment(self):
-    """Test filter by comment"""
+    """Test filter by comments"""
     task_id = self.generate_tasks_for_cycle(4)[0]
     comment_text = "123"
     task = CycleTaskGroupObjectTask.query.filter(
@@ -91,7 +91,7 @@ class TestExportTasks(TestCase):
         cycle_task_group_object_task=task,
         description=comment_text,
     )
-    self.assert_slugs("task comment", comment_text, [task.slug])
+    self.assert_slugs("task comments", comment_text, [task.slug])
 
   @data(
       ("status", ["Task State", "task state", "task status"]),

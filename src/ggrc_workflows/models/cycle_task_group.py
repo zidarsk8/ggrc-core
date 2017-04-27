@@ -4,6 +4,8 @@
 """Module for cycle task group model.
 """
 
+import itertools
+
 from sqlalchemy import orm
 
 from ggrc import db
@@ -94,6 +96,14 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
       DateFullTextAttr("cycle due date",
                        lambda x: x.cycle.next_due_date,
                        with_template=False),
+      MultipleSubpropertyFullTextAttr(
+          "task comments",
+          lambda instance: itertools.chain(*[
+              t.cycle_task_entries for t in instance.cycle_task_group_tasks
+          ]),
+          ["description"],
+          False
+      ),
   ]
 
   AUTO_REINDEX_RULES = [
@@ -148,6 +158,12 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
         ).load_only(
             "email",
             "name",
+            "id"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_group_tasks").joinedload(
+            "cycle_task_entries"
+        ).load_only(
+            "description",
             "id"
         ),
         orm.Load(cls).joinedload("cycle").joinedload(

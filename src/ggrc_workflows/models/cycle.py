@@ -4,6 +4,7 @@
 """Module contains a workflow Cycle model
 """
 
+import itertools
 from sqlalchemy import orm
 
 from ggrc import db
@@ -105,6 +106,15 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
           False
       ),
       DateFullTextAttr("due date", "next_due_date"),
+      MultipleSubpropertyFullTextAttr(
+          "task comments",
+          lambda instance: list(itertools.chain(*[
+              t.cycle_task_entries
+              for t in instance.cycle_task_group_object_tasks
+          ])),
+          ["description"],
+          False
+      ),
   ]
 
   AUTO_REINDEX_RULES = [
@@ -159,6 +169,12 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
         ).load_only(
             "email",
             "name",
+            "id"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_group_object_tasks").joinedload(
+            "cycle_task_entries"
+        ).load_only(
+            "description",
             "id"
         ),
         orm.Load(cls).subqueryload("cycle_task_groups").joinedload(
