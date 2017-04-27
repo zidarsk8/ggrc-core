@@ -5,7 +5,18 @@
 
 <h6>Evidence</h6>
 <mapped-objects {visible-items}="limit" {parent-instance}="instance" mapping="all_documents">
-    <document-object-list-item {instance}="instance"></document-object-list-item>
+    <action-toolbar {document}="instance" class="action-toolbar">
+        <document-object-list-item {instance}="document"></document-object-list-item>
+      {{#if showAction}}
+        <div class="action-toolbar__controls">
+        {{#is_allowed 'update' parentInstance context='for'}}
+          <action-toolbar-control>
+              <unmap-button {destination}="parentInstance" {source}="document" object-prop="object_documents" mapping-type="ObjectDocument"></unmap-button>
+          </action-toolbar-control>
+        {{/is_allowed}}
+        </div>
+        {{/if}}
+     </action-toolbar>
 </mapped-objects>
 <div>
 {{#if_mapping_ready "audits" instance}}

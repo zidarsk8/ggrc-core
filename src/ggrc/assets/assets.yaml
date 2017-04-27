@@ -292,14 +292,16 @@ dashboard-js-files:
   - components/auto-save-form/field-views/checkbox-form-field-view.js
   - components/auto-save-form/field-views/date-form-field-view.js
   - components/auto-save-form/field-views/person-form-field-view.js
-  #- d3.v2.js
-  #- related_graph.js
+  - components/action-toolbar/action-toolbar.js
+  - components/action-toolbar-control/action-toolbar-control.js
+  - components/unmap-button/unmap-button.js
 
 app-init-files:
   - apps/dashboard.js
   - dashboard.js
 
 dashboard-js-template-files:
+  - components/unmap-button/unmap-button.mustache
   - components/info-pane/info-pane-footer.mustache
   - components/tabs/tab-container.mustache
   - components/tabs/tab-panel.mustache
