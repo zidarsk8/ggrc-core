@@ -37,7 +37,9 @@
       'title',
       'type',
       'viewLink',
-      'workflow_state'
+      'workflow_state',
+      // labels for assessment templates
+      'DEFAULT_PEOPLE_LABELS'
     ]);
 
     var FULL_SUB_LEVEL_LIST = Object.freeze(['Cycle', 'CycleTaskGroup']);
