@@ -285,6 +285,82 @@ class TestAssessmentImport(TestCase):
         assessment, models.Snapshot()).exists()).first()[0]
     )
 
+  def test_create_import_assignee(self):
+    "Test for creation assessment with mapped assignees"
+    audit = factories.AuditFactory()
+    name = "test_name"
+    email = "test@email.com"
+    assignee_id = factories.PersonFactory(name=name, email=email).id
+    slug = "TestAssessment"
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", slug),
+        ("Audit*", audit.slug),
+        ("Assignees*", email),
+        ("Creators", models.Person.query.all()[0].email),
+        ("Title", "Strange title"),
+    ]))
+    assessment = models.Assessment.query.filter(
+        models.Assessment.slug == slug
+    ).first()
+    self.assertEqual([assignee_id], [i.id for i in assessment.assessors])
+
+  def test_create_import_creators(self):
+    "Test for creation assessment with mapped creator"
+    audit = factories.AuditFactory()
+    name = "test_name"
+    email = "test@email.com"
+    creator_id = factories.PersonFactory(name=name, email=email).id
+    slug = "TestAssessment"
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", slug),
+        ("Audit*", audit.slug),
+        ("Assignees*", models.Person.query.all()[0].email),
+        ("Creators", email),
+        ("Title", "Strange title"),
+    ]))
+    assessment = models.Assessment.query.filter(
+        models.Assessment.slug == slug
+    ).first()
+    self.assertEqual([creator_id], [i.id for i in assessment.creators])
+
+  def test_update_import_creators(self):
+    "Test for creation assessment with mapped creator"
+    slug = "TestAssessment"
+    assessment = factories.AssessmentFactory(slug=slug)
+    name = "test_name"
+    email = "test@email.com"
+    creator_id = factories.PersonFactory(name=name, email=email).id
+    self.assertNotEqual([creator_id], [i.id for i in assessment.creators])
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", slug),
+        ("Creators", email),
+    ]))
+    assessment = models.Assessment.query.filter(
+        models.Assessment.slug == slug
+    ).first()
+    self.assertEqual([creator_id], [i.id for i in assessment.creators])
+
+  def test_update_import_assignee(self):
+    "Test for creation assessment with mapped creator"
+    slug = "TestAssessment"
+    assessment = factories.AssessmentFactory(slug=slug)
+    name = "test_name"
+    email = "test@email.com"
+    assignee_id = factories.PersonFactory(name=name, email=email).id
+    self.assertNotEqual([assignee_id], [i.id for i in assessment.assessors])
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", slug),
+        ("Assignees", email),
+    ]))
+    assessment = models.Assessment.query.filter(
+        models.Assessment.slug == slug
+    ).first()
+    self.assertEqual([assignee_id], [i.id for i in assessment.assessors])
+
 
 class TestAssessmentExport(TestCase):
   """Test Assessment object export."""
