@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, _, GGRC, Permission) {
+(function (can, _, GGRC, Permission, Mustache) {
   'use strict';
 
   /**
@@ -73,8 +73,11 @@
        */
       grantRole: function (person, roleId) {
         var inst = this.instance;
+        var roleEntry;
 
-        var roleEntry = _.find(
+        this.attr('isPendingGrant', true);
+
+        roleEntry = _.find(
           inst.attr('access_control_list'),
           {person: {id: person.id}, ac_role_id: roleId}
         );
@@ -82,6 +85,7 @@
         if (roleEntry) {
           console.warn(
             'User ', person.id, 'already has role', roleId, 'assigned');
+          this.attr('isPendingGrant', false);
           return;
         }
 
@@ -89,25 +93,30 @@
           inst.attr('access_control_list', []);
         }
 
+        can.batch.start();
         roleEntry = {person: person, ac_role_id: roleId};
         inst.attr('access_control_list').push(roleEntry);
 
         if (!this.autosave) {
           this.attr('grantingRoleId', 0);
+          this.attr('isPendingGrant', false);
           this._rebuildRolesInfo();
+          can.batch.stop();
           return;
         }
 
         inst.save()
           .done(function () {
             GGRC.Errors.notifier('success', 'User role added.');
-            this._rebuildRolesInfo();
-          }.bind(this))
+          })
           .fail(function () {
             GGRC.Errors.notifier('error', 'Adding user role failed.');
           })
           .always(function () {
             this.attr('grantingRoleId', 0);
+            this.attr('isPendingGrant', false);
+            this._rebuildRolesInfo();
+            can.batch.stop();
           }.bind(this));
       },
 
@@ -121,33 +130,44 @@
        * @param {Number} roleId - ID if the role to grant
        */
       revokeRole: function (person, roleId) {
+        var idx;
         var inst = this.instance;
 
-        var idx = _.findIndex(
+        this.attr('pendingRevoke', [person.id, roleId]);
+
+        idx = _.findIndex(
           inst.attr('access_control_list'),
           {person: {id: person.id}, ac_role_id: roleId}
         );
 
         if (idx < 0) {
           console.warn('Role ', roleId, 'not found for user', person.id);
+          this.attr('pendingRevoke', null);
           return;
         }
 
+        can.batch.start();
         inst.access_control_list.splice(idx, 1);
 
         if (!this.autosave) {
+          this.attr('pendingRevoke', null);
           this._rebuildRolesInfo();
+          can.batch.stop();
           return;
         }
 
         inst.save()
           .done(function () {
             GGRC.Errors.notifier('success', 'User role removed.');
-            this._rebuildRolesInfo();
-          }.bind(this))
+          })
           .fail(function () {
             GGRC.Errors.notifier('error', 'Removing user role failed.');
-          });
+          })
+          .always(function () {
+            this.attr('pendingRevoke', null);
+            this._rebuildRolesInfo();
+            can.batch.stop();
+          }.bind(this));
       },
 
       /**
@@ -200,7 +220,12 @@
                   Permission.is_allowed_for('update', instance);
 
         vm.attr('canEdit', canEdit);
-        vm.attr('grantingRoleId', 0);
+        vm.attr('grantingRoleId', 0);  // which "add role" autocomplete to show
+        vm.attr('isPendingGrant', false);
+
+         // which [personId, roleId] combination is currently being revoked
+        vm.attr('pendingRevoke', null);
+
         vm.attr('_rolesInfoFixed', false);
         vm._rebuildRolesInfo();
       },
@@ -249,6 +274,33 @@
           vm._rebuildRolesInfo();
         }
       }
+    },
+    helpers: {
+      /**
+       * Check if the role is currently being revoked from the person and render
+       * the corresponding template block.
+       *
+       * @param {Number} personId - the ID of the person
+       * @param {Number} roleId - the ID of the role to check
+       * @param {Object} options - the Mustache options object
+       *
+       * @return {String} - the rendered template block
+       */
+      ifRevokingRole: function (personId, roleId, options) {
+        var pendingRevoke = this.attr('pendingRevoke');
+
+        if (pendingRevoke === null) {
+          return options.inverse();
+        }
+
+        personId = Mustache.resolve(personId);
+        roleId = Mustache.resolve(roleId);
+
+        if (pendingRevoke[0] === personId && pendingRevoke[1] === roleId) {
+          return options.fn();
+        }
+        return options.inverse();
+      }
     }
   });
-})(window.can, window._, window.GGRC, window.Permission);
+})(window.can, window._, window.GGRC, window.Permission, can.Mustache);
