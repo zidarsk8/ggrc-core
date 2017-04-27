@@ -23,6 +23,10 @@ from ggrc.fulltext.attributes import (
 from ggrc.fulltext.mixin import Indexed, ReindexRule
 
 
+def _query_filtered_by_contact(person):
+  return Cycle.query.filter(Cycle.contact_id == person.id)
+
+
 class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
             Notifiable, Indexed, db.Model):
   """Workflow Cycle model
@@ -121,8 +125,7 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
       ReindexRule("CycleTaskGroup", lambda x: x.cycle),
       ReindexRule("CycleTaskGroupObjectTask",
                   lambda x: x.cycle_task_group.cycle),
-      ReindexRule("Person",
-                  lambda x: Cycle.query.filter(Cycle.contact_id == x.id))
+      ReindexRule("Person", _query_filtered_by_contact)
   ]
 
   @classmethod
