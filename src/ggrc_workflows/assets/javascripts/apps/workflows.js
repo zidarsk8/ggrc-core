@@ -35,21 +35,8 @@
   var historyWidgetCountsName = 'cycles:history';
   var currentWidgetCountsName = 'cycles:active';
 
-  var historyWidgetFilter = {
-    expression: {
-      op: {name: '='},
-      left: 'is_current',
-      right: 0
-    }
-  };
-
-  var currentWidgetFilter = {
-    expression: {
-      op: {name: '='},
-      left: 'is_current',
-      right: 1
-    }
-  };
+  var historyWidgetFilter = 'is_current = 0';
+  var currentWidgetFilter = 'is_current = 1';
 
   // Register `workflows` extension with GGRC
   GGRC.extensions.push(WorkflowExtension);
@@ -430,32 +417,23 @@
         workflow: {
           widget_id: 'workflow',
           widget_name: 'Workflows',
-          content_controller: GGRC.Controllers.TreeView,
+          widgetType: 'treeview',
+          treeViewDepth: 0,
           content_controller_options: {
             mapping: 'workflows',
             parent_instance: pageInstance,
-            model: CMS.Models.Workflow,
-            show_view: GGRC.mustache_path + '/workflows/tree.mustache',
-            footer_view: GGRC.mustache_path + '/workflows/tree_footer.mustache'
+            model: CMS.Models.Workflow
           }
         },
         task: {
           widget_id: 'task',
           widget_name: 'Workflow Tasks',
-          content_controller: GGRC.Controllers.TreeView,
+          widgetType: 'treeview',
+          treeViewDepth: 1,
           content_controller_options: {
             mapping: 'object_tasks',
             parent_instance: pageInstance,
             model: CMS.Models.CycleTaskGroupObjectTask,
-            show_view:
-              GGRC.mustache_path +
-              '/cycle_task_group_object_tasks/tree.mustache',
-            header_view:
-              GGRC.mustache_path +
-              '/cycle_task_group_object_tasks/tree_header.mustache',
-            footer_view:
-              GGRC.mustache_path +
-              '/cycle_task_group_object_tasks/tree_footer.mustache',
             add_item_view:
               GGRC.mustache_path +
               '/cycle_task_group_object_tasks/tree_add_item.mustache',
@@ -467,20 +445,7 @@
                 this.options.attr('mapping', el.attr('mapping'));
                 this.reload_list();
               }
-            },
-            child_options: [
-              {
-                model: CMS.Models.CycleTaskEntry,
-                mapping: 'cycle_task_entries',
-                show_view:
-                  GGRC.mustache_path + '/cycle_task_entries/tree.mustache',
-                footer_view:
-                  GGRC.mustache_path +
-                  '/cycle_task_entries/tree_footer.mustache',
-                draw_children: true,
-                allow_creating: true
-              }
-            ]
+            }
           }
         }
       };
@@ -532,17 +497,13 @@
           widget_id: 'person',
           widget_name: 'People',
           widget_icon: 'person',
-          content_controller: GGRC.Controllers.TreeView,
+          widgetType: 'treeview',
+          treeViewDepth: 3,
+          model: CMS.Models.Person,
           content_controller_options: {
             parent_instance: object,
             model: CMS.Models.Person,
             mapping: 'mapped_and_or_authorized_people',
-            show_view:
-              GGRC.mustache_path +
-              '/ggrc_basic_permissions/people_roles/' +
-              'authorizations_by_person_tree.mustache',
-            footer_view:
-              GGRC.mustache_path + '/base_objects/tree_footer.mustache',
             add_item_view:
               GGRC.mustache_path + '/wf_people/tree_add_item.mustache'
           }
@@ -551,85 +512,50 @@
           widget_id: 'task_group',
           widget_name: 'Setup',
           widget_icon: 'task_group',
-          content_controller: CMS.Controllers.TreeView,
-          content_controller_selector: 'ul',
-          widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
+          widgetType: 'treeview',
+          treeViewDepth: 0,
+          model: CMS.Models.TaskGroup,
           content_controller_options: {
             parent_instance: object,
             model: CMS.Models.TaskGroup,
-            show_view: GGRC.mustache_path + '/task_groups/tree.mustache',
             sortable: true,
             sort_property: 'sort_index',
             mapping: 'task_groups',
-            draw_children: true,
-
-            // Note that we are using special naming for the tree views here.
-            // Also, tasks for a task group aren't directly mapping to the
-            // tasks themselves but to the join object.  This is important
-            // since the join objects themselves have important attributes.
-            child_options: [
-              {
-                model: can.Model.Cacheable,
-                mapping: 'objects',
-                show_view:
-                  GGRC.mustache_path +
-                  '/base_objects/task_group_subtree.mustache',
-                footer_view:
-                  GGRC.mustache_path +
-                  '/base_objects/task_group_subtree_footer.mustache',
-                add_item_view:
-                  GGRC.mustache_path +
-                  '/base_objects/task_group_subtree_add_item.mustache'
-              }, {
-                model: CMS.Models.TaskGroupTask,
-                mapping: 'task_group_tasks',
-                show_view:
-                  GGRC.mustache_path +
-                  '/task_group_tasks/task_group_subtree.mustache',
-                footer_view:
-                  GGRC.mustache_path +
-                  '/task_group_tasks/task_group_subtree_footer.mustache',
-                add_item_view:
-                  GGRC.mustache_path +
-                  '/task_group_tasks/task_group_subtree_add_item.mustache',
-                sort_property: 'sort_index',
-                allow_creating: true
-              }
-            ]
+            draw_children: true
           }
         }
       }
     );
 
     historyWidgetDescriptor = {
-      content_controller: CMS.Controllers.TreeView,
-      content_controller_selector: 'ul',
-      widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
+      widgetType: 'treeview',
+      treeViewDepth: 3,
       widget_id: 'history',
       widget_name: 'History',
       widget_icon: 'history',
+      model: CMS.Models.Cycle,
       content_controller_options: {
         draw_children: true,
         parent_instance: object,
-        model: 'Cycle',
-        counts_name: historyWidgetCountsName,
+        model: CMS.Models.Cycle,
+        countsName: historyWidgetCountsName,
         mapping: 'previous_cycles',
         additional_filter: historyWidgetFilter
       }
     };
 
     currentWidgetDescriptor = {
-      content_controller: CMS.Controllers.TreeView,
-      content_controller_selector: 'ul',
-      widget_initial_content: '<ul class="tree-structure new-tree"></ul>',
+      widgetType: 'treeview',
+      treeViewDepth: 3,
       widget_id: 'current',
       widget_name: 'Active Cycles',
       widget_icon: 'cycle',
+      model: CMS.Models.Cycle,
       content_controller_options: {
         draw_children: true,
         parent_instance: object,
-        model: 'Cycle',
-        counts_name: currentWidgetCountsName,
+        model: CMS.Models.Cycle,
+        countsName: currentWidgetCountsName,
         mapping: 'current_cycle',
         additional_filter: currentWidgetFilter,
         header_view: GGRC.mustache_path + '/cycles/tree_header.mustache',
@@ -675,21 +601,13 @@
     descriptor[pageInstance.constructor.shortName] = {
       task: {
         widget_id: 'task',
+        widgetType: 'treeview',
+        treeViewDepth: 1,
         widget_name: 'My Tasks',
-        content_controller: GGRC.Controllers.TreeView,
-
+        model: CMS.Models.CycleTaskGroupObjectTask,
         content_controller_options: {
           parent_instance: GGRC.page_instance(),
           model: CMS.Models.CycleTaskGroupObjectTask,
-          show_view:
-            GGRC.mustache_path +
-            '/cycle_task_group_object_tasks/tree.mustache',
-          header_view:
-            GGRC.mustache_path +
-            '/cycle_task_group_object_tasks/tree_header.mustache',
-          footer_view:
-            GGRC.mustache_path +
-            '/cycle_task_group_object_tasks/tree_footer.mustache',
           add_item_view:
             GGRC.mustache_path +
             '/cycle_task_group_object_tasks/tree_add_item.mustache',

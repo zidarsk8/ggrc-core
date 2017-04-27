@@ -31,44 +31,16 @@
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     tree_view_options: {
-      show_view: GGRC.mustache_path + '/base_objects/tree.mustache',
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
+      GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Org Group URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Stop Date', attr_name: 'end_date'}
-      ]),
-      child_options: [{
-        model: null,
-        find_params: {
-          destination_type: 'Process',
-          source_type: 'OrgGroup',
-          relationship_type_id: 'org_group_has_process'
-        },
-        parent_find_param: 'source_id',
-        draw_children: true,
-        find_function: 'findRelated',
-        related_side: 'source',
-        create_link: true
-      }, {
-        model: null,
-        find_params: {
-          destination_type: 'OrgGroup',
-          source_type: 'OrgGroup',
-          relationship_type_id: 'org_group_relies_upon_org_group'
-        },
-        parent_find_param: 'destination_id',
-        draw_children: true,
-        start_expanded: false,
-        find_function: 'findRelatedSource',
-        related_side: 'destination',
-        single_object: false,
-        create_link: true
-      }]},
+      ])
+    },
     links_to: {
       System: {},
       Process: {},
@@ -87,14 +59,9 @@
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
-      var that = this;
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      $(function () {
-        that.tree_view_options.child_options[0].model = CMS.Models.Process;
-      });
-      this.tree_view_options.child_options[1].model = this;
 
       this.validateNonBlank('title');
     }
@@ -127,30 +94,15 @@
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     tree_view_options: {
-      show_view: GGRC.mustache_path + '/base_objects/tree.mustache',
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Project URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Stop Date', attr_name: 'end_date'}
       ]),
-      add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-      child_options: [{
-        model: null,
-        find_params: {
-          destination_type: 'Process',
-          source_type: 'Project',
-          relationship_type_id: 'project_has_process'
-        },
-        parent_find_param: 'source_id',
-        draw_children: true,
-        find_function: 'findRelated',
-        related_side: 'source',
-        create_link: true
-      }]},
+      add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+    },
     links_to: {
       System: {},
       Process: {},
@@ -169,17 +121,13 @@
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
-      var that = this;
-      if (this._super) {
-        this._super.apply(this, arguments);
-      }
-      $(function () {
-        that.tree_view_options.child_options[0].model = CMS.Models.Process;
-      });
+        if (this._super) {
+          this._super.apply(this, arguments);
+        }
 
-      this.validateNonBlank('title');
-    }
-  }, {});
+        this.validateNonBlank('title');
+      }
+    }, {});
 
   can.Model.Cacheable('CMS.Models.Facility', {
     root_object: 'facility',
@@ -208,9 +156,7 @@
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     tree_view_options: {
-      show_view: GGRC.mustache_path + '/base_objects/tree.mustache',
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Facility URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
@@ -218,34 +164,8 @@
         {attr_title: 'Stop Date', attr_name: 'end_date'}
       ]),
       add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-      child_options: [{
-        model: null,
-        find_params: {
-          destination_type: 'Process',
-          source_type: 'Facility',
-          relationship_type_id: 'facility_has_process'
-        },
-        parent_find_param: 'source_id',
-        draw_children: true,
-        find_function: 'findRelated',
-        related_side: 'source',
-        create_link: true
-      }, {
-        model: null,
-        find_params: {
-          destination_type: 'Facility',
-          source_type: 'Facility',
-          relationship_type_id: 'facility_relies_upon_facility'
-        },
-        parent_find_param: 'destination_id',
-        draw_children: true,
-        start_expanded: false,
-        find_function: 'findRelatedSource',
-        related_side: 'destination',
-        single_object: false,
-        create_link: true
-      }]},
+        GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+    },
     links_to: {
       System: {},
       Process: {},
@@ -264,14 +184,9 @@
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
-      var that = this;
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      $(function () {
-        that.tree_view_options.child_options[0].model = CMS.Models.Process;
-      });
-      this.tree_view_options.child_options[1].model = this;
 
       this.validateNonBlank('title');
     }
@@ -305,43 +220,15 @@
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     tree_view_options: {
-      show_view: GGRC.mustache_path + '/base_objects/tree.mustache',
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Kind/Type', attr_name: 'type'},
         {attr_title: 'Product URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'}
       ]),
       add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-      child_options: [{
-        model: null,
-        find_params: {
-          destination_type: 'Process',
-          source_type: 'Product',
-          relationship_type_id: 'product_has_process'
-        },
-        parent_find_param: 'source_id',
-        draw_children: true,
-        find_function: 'findRelated',
-        related_side: 'source',
-        create_link: true
-      }, {
-        model: null,
-        find_params: {
-          destination_type: 'Product',
-          source_type: 'Product',
-          relationship_type_id: 'product_relies_upon_product'
-        },
-        parent_find_param: 'destination_id',
-        draw_children: true,
-        start_expanded: false,
-        find_function: 'findRelatedSource',
-        related_side: 'destination',
-        single_object: false,
-        create_link: true
-      }]},
+        GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+    },
     links_to: {
       System: {},
       Process: {},
@@ -361,19 +248,13 @@
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
-      var that = this;
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      $(function () {
-        that.tree_view_options.child_options[0].model = CMS.Models.Process;
-      });
-      this.tree_view_options.child_options[1].model = this;
 
       this.validateNonBlank('title');
     }
-  }, {
-  });
+  }, {});
 
   can.Model.Cacheable('CMS.Models.DataAsset', {
     root_object: 'data_asset',
@@ -402,9 +283,7 @@
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     tree_view_options: {
-      show_view: GGRC.mustache_path + '/base_objects/tree.mustache',
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Data Asset URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
@@ -412,34 +291,8 @@
         {attr_title: 'Stop Date', attr_name: 'end_date'}
       ]),
       add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-      child_options: [{
-        model: null,
-        find_params: {
-          destination_type: 'Process',
-          source_type: 'DataAsset',
-          relationship_type_id: 'data_asset_has_process'
-        },
-        parent_find_param: 'source_id',
-        draw_children: true,
-        find_function: 'findRelated',
-        related_side: 'source',
-        create_link: true
-      }, {
-        model: null,
-        find_params: {
-          destination_type: 'DataAsset',
-          source_type: 'DataAsset',
-          relationship_type_id: 'data_asset_relies_upon_data_asset'
-        },
-        parent_find_param: 'destination_id',
-        draw_children: true,
-        start_expanded: false,
-        find_function: 'findRelatedSource',
-        related_side: 'destination',
-        single_object: false,
-        create_link: true
-      }]},
+        GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+    },
     links_to: {
       System: {},
       Process: {},
@@ -458,14 +311,9 @@
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
-      var that = this;
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      $(function () {
-        that.tree_view_options.child_options[0].model = CMS.Models.Process;
-      });
-      this.tree_view_options.child_options[1].model = this;
 
       this.validateNonBlank('title');
     }
@@ -497,9 +345,7 @@
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     tree_view_options: {
-      show_view: GGRC.mustache_path + '/base_objects/tree.mustache',
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Access Group URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
@@ -507,34 +353,8 @@
         {attr_title: 'Stop Date', attr_name: 'end_date'}
       ]),
       add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-      child_options: [{
-        model: null,
-        find_params: {
-          destination_type: 'Process',
-          source_type: 'AccessGroup',
-          relationship_type_id: 'access_group_has_process'
-        },
-        parent_find_param: 'source_id',
-        draw_children: true,
-        find_function: 'findRelated',
-        related_side: 'source',
-        create_link: true
-      }, {
-        model: null,
-        find_params: {
-          destination_type: 'AccessGroup',
-          source_type: 'AccessGroup',
-          relationship_type_id: 'access_group_relies_upon_access_group'
-        },
-        parent_find_param: 'destination_id',
-        draw_children: true,
-        start_expanded: false,
-        find_function: 'findRelatedSource',
-        related_side: 'destination',
-        single_object: false,
-        create_link: true
-      }]},
+        GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+    },
     links_to: {
       System: {},
       Process: {},
@@ -553,14 +373,9 @@
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
-      var that = this;
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      $(function () {
-        that.tree_view_options.child_options[0].model = CMS.Models.Process;
-      });
-      this.tree_view_options.child_options[1].model = this;
 
       this.validateNonBlank('title');
     }
@@ -593,30 +408,14 @@
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     tree_view_options: {
-      show_view: GGRC.mustache_path + '/base_objects/tree.mustache',
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Market URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Effective Date', attr_name: 'start_date'},
         {attr_title: 'Stop Date', attr_name: 'end_date'}
       ]),
-      add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-      child_options: [{
-        model: null,
-        find_params: {
-          destination_type: 'Process',
-          source_type: 'Market',
-          relationship_type_id: 'market_has_process'
-        },
-        parent_find_param: 'source_id',
-        draw_children: true,
-        find_function: 'findRelated',
-        related_side: 'source',
-        create_link: true
-      }]
+      add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
     },
     links_to: {
       System: {},
@@ -636,13 +435,9 @@
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
-      var that = this;
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      $(function () {
-        that.tree_view_options.child_options[0].model = CMS.Models.Process;
-      });
 
       this.validateNonBlank('title');
     }
@@ -675,9 +470,7 @@
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     tree_view_options: {
-      show_view: GGRC.mustache_path + '/base_objects/tree.mustache',
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-      footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
         {attr_title: 'Vendor URL', attr_name: 'url'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
@@ -685,34 +478,8 @@
         {attr_title: 'Stop Date', attr_name: 'end_date'}
       ]),
       add_item_view:
-        GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
-      child_options: [{
-        model: null,
-        find_params: {
-          destination_type: 'Process',
-          source_type: 'Vendor',
-          relationship_type_id: 'vendor_has_process'
-        },
-        parent_find_param: 'source_id',
-        draw_children: true,
-        find_function: 'findRelated',
-        related_side: 'source',
-        create_link: true
-      }, {
-        model: null,
-        find_params: {
-          destination_type: 'Vendor',
-          source_type: 'Vendor',
-          relationship_type_id: 'vendor_relies_upon_vendor'
-        },
-        parent_find_param: 'destination_id',
-        draw_children: true,
-        start_expanded: false,
-        find_function: 'findRelatedSource',
-        related_side: 'destination',
-        single_object: false,
-        create_link: true
-      }]},
+        GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+    },
     links_to: {
       System: {},
       Process: {},
@@ -731,14 +498,9 @@
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
-      var that = this;
       if (this._super) {
         this._super.apply(this, arguments);
       }
-      $(function () {
-        that.tree_view_options.child_options[0].model = CMS.Models.Process;
-      });
-      this.tree_view_options.child_options[1].model = this;
 
       this.validateNonBlank('title');
     }
