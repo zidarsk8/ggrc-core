@@ -19,15 +19,19 @@
 
       {{#if_equals role.id grantingRoleId}}
         {{#if canEdit}}
-        <autocomplete
-          search-items-type="Person"
-          (item-selected)="grantRole(%event.selectedItem, %context.role.id)"
-          placeholder="Select person"
-        ></autocomplete>
+          {{#if isPendingGrant}}
+            <spinner toggle="isPendingGrant"></spinner>
+          {{else}}
+            <autocomplete
+              search-items-type="Person"
+              (item-selected)="grantRole(%event.selectedItem, %context.role.id)"
+              placeholder="Select person"
+            ></autocomplete>
 
-        <i class="fa fa-trash hide-input"
-           title="Hide"
-           ($click)="grantRoleMode(0)"></i>
+            <i class="fa fa-trash hide-input"
+               title="Hide"
+               ($click)="grantRoleMode(0)"></i>
+          {{/if}}
         {{/if}}
       {{/if}}
 
@@ -38,11 +42,19 @@
       {{/roleAssignments}}
 
       {{#roleAssignments}}
-        <person-info
-          person-id="person.id"
-          editable="{{canEdit}}"
-          (person-remove)="revokeRole(%event.person, %context.ac_role_id)"
-          ></person-info>
+        <div class="row-fluid person-row">
+          <person-info person-id="person.id"></person-info>
+
+          {{#if canEdit}}
+            {{#ifRevokingRole person.id ac_role_id}}
+              <spinner toggle="pendingRevoke"></spinner>
+            {{else}}
+              <i class="fa fa-trash revoke-role"
+                 title="Remove"
+                 ($click)="revokeRole(person, ac_role_id)"></i>
+            {{/ifRevokingRole}}
+          {{/canEdit}}
+        </div>
       {{/roleAssignments}}
     </div>
   {{/rolesInfo}}

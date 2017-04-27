@@ -36,10 +36,18 @@ access-control-list {
     .hide-input {
       cursor: pointer;
     }
-    .person {
-      margin-bottom: 0.3em;
-      a.unmap {
+    .person-row {
+      .person {
+        display: inline-flex;
+        margin-bottom: 0.3em;
+      }
+      .revoke-role {
         cursor: pointer;
+        margin-left: 0.2em;
+        visibility: hidden;
+      }
+      &:hover .revoke-role {
+        visibility: visible;
       }
     }
   }
