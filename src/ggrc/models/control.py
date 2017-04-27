@@ -266,12 +266,6 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
           "filter_by": "_filter_by_verify_frequency",
       },
       "fraud_related": "Fraud Related",
-      "principal_assessor": {
-          "display_name": "Principal Assignee",
-      },
-      "secondary_assessor": {
-          "display_name": "Secondary Assignee",
-      },
       "key_control": {
           "display_name": "Significance",
           "description": "Allowed values are:\nkey\nnon-key\n---",

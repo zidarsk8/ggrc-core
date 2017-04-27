@@ -22,6 +22,7 @@ from ggrc.models.mixins import Notifiable
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import VerifiedDate
+from ggrc.models.mixins import WithContact
 from ggrc.models.mixins import reminderable
 from ggrc.models.mixins import statusable
 from ggrc.models.mixins.assignable import Assignable
@@ -75,7 +76,7 @@ def reindex_by_relationship(relationship):
 
 
 class Assessment(Roleable, statusable.Statusable, AuditRelationship,
-                 AutoStatusChangeable,
+                 AutoStatusChangeable, WithContact,
                  Assignable, HasObjectState, TestPlanned,
                  CustomAttributable, EvidenceURL, Commentable,
                  Personable, reminderable.Reminderable, Timeboxed, Relatable,
