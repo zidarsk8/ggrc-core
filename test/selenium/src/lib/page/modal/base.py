@@ -155,9 +155,6 @@ class ControlsModal(BaseModal):
     self.secondary_assessor = base.Label(
         driver, self._locators.SECONDARY_ASSESSOR)
     self.admin = base.Label(driver, self._locators.ADMIN)
-    self.primary_contact = base.Label(driver, self._locators.PRIMARY_CONTACT)
-    self.secondary_contact = base.Label(
-        driver, self._locators.SECONDARY_CONTACT)
     self.control_url = base.Label(driver, self._locators.CONTROL_URL)
     self.reference_url = base.Label(driver, self._locators.REFERENCE_URL)
     self.significance = base.Label(driver, self._locators.SIGNIFICANCE)
@@ -168,10 +165,6 @@ class ControlsModal(BaseModal):
     self.ui_test_plan = base.Iframe(driver, self._locators.UI_TEST_PLAN)
     self.ui_notes = base.Iframe(driver, self._locators.UI_NOTES)
     self.ui_code = base.TextInputField(driver, self._locators.UI_CODE)
-    self.ui_primary_contact = base.TextInputField(
-        driver, self._locators.UI_PRIMARY_CONTACT)
-    self.ui_secondary_contact = base.TextInputField(
-        driver, self._locators.UI_SECONDARY_CONTACT)
     self.ui_control_url = base.TextInputField(
         driver, self._locators.UI_CONTROL_URL)
     self.ui_reference_url = base.TextInputField(

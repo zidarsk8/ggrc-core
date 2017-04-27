@@ -385,18 +385,6 @@ class ModalCreateNewControl(BaseModalCreateNew):
   ADMIN = (
       By.CSS_SELECTOR, '[data-test-id="control_owner_587d12d6"] label')
   BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
-  PRIMARY_CONTACT = (
-      By.CSS_SELECTOR, '[data-test-id="control_contacts_8bd3d8c7"] '
-                       '.row-fluid:nth-child(1) label')
-  UI_PRIMARY_CONTACT = (
-      By.CSS_SELECTOR, '[data-test-id='
-                       '"new_program_field_primary_contact_86160053"]')
-  SECONDARY_CONTACT = (
-      By.CSS_SELECTOR, '[data-test-id="control_contacts_8bd3d8c7"] '
-                       '.row-fluid:nth-child(2) label')
-  UI_SECONDARY_CONTACT = (
-      By.CSS_SELECTOR,
-      '[data-test-id="new_program_field_secondary_contact_86160053"]')
   CONTROL_URL = (
       By.CSS_SELECTOR, '[data-test-id="control_control_url-label_c4038873"]')
   UI_CONTROL_URL = (

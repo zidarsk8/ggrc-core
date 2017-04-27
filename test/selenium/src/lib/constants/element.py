@@ -161,7 +161,6 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   STATUS = "Status"
   AUDIT_LEAD = "Internal Audit Lead"
   MANAGER = "Manager"
-  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
 
 
 class CommonProgram(Common):
@@ -172,8 +171,6 @@ class CommonProgram(Common):
   MANAGER = "Manager"
   PROGRAM_URL = "Program URL"
   REFERENCE_URL = Base.REFERENCE_URL
-  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
-  SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   NOTES = "Notes"
   EFFECTIVE_DATE = Base.EFFECTIVE_DATE
   STOP_DATE = Base.STOP_DATE
@@ -270,8 +267,6 @@ class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonAssessmentTemplate.ASMT_TMPL)
   ADMIN = TransformationSetVisibleFields.ADMIN
-  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
-  SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE,
       CommonModalSetVisibleFields.CODE,
@@ -306,8 +301,6 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonControl.CONTROL)
   ADMIN = TransformationSetVisibleFields.ADMIN
-  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
-  SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   URL = Base.URL
   REFERENCE_URL = Base.REFERENCE_URL
   EFFECTIVE_DATE = Base.EFFECTIVE_DATE
@@ -323,8 +316,7 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   SECONDARY_ASSIGNEE = roles.SECONDARY_ASSIGNEE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, ADMIN,
-      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
-      PRIMARY_CONTACT)
+      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE)
 
 
 class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -335,8 +327,6 @@ class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonIssue.ISSUE)
   ADMIN = TransformationSetVisibleFields.ADMIN
-  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
-  SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   REVIEW_STATE = "Review State"
   URL = Base.URL
   REFERENCE_URL = Base.REFERENCE_URL
