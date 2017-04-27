@@ -77,17 +77,7 @@
           attr_sort_field: 'verify_frequency'
         },
         {attr_title: 'Assertions', attr_name: 'assertions'},
-        {attr_title: 'Categories', attr_name: 'categories'},
-        {
-          attr_title: 'Principal Assignee',
-          attr_name: 'principal_assessor',
-          attr_sort_field: 'principal_assessor'
-        },
-        {
-          attr_title: 'Secondary Assignee',
-          attr_name: 'secondary_assessor',
-          attr_sort_field: 'secondary_assessor'
-        }
+        {attr_title: 'Categories', attr_name: 'categories'}
       ]),
       display_attr_names: ['title', 'owner', 'status', 'last_assessment_date'],
       add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',

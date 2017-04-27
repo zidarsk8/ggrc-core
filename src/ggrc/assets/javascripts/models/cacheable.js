@@ -135,18 +135,6 @@
         order: 40
       },
       {
-        attr_title: 'Primary Contact',
-        attr_name: 'contact',
-        attr_sort_field: 'contact',
-        order: 50
-      },
-      {
-        attr_title: 'Secondary Contact',
-        attr_name: 'secondary_contact',
-        attr_sort_field: 'secondary_contact',
-        order: 60
-      },
-      {
         attr_title: 'Last Updated',
         attr_name: 'updated_at',
         order: 70
