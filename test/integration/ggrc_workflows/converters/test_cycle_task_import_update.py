@@ -12,6 +12,8 @@ from os.path import abspath
 from os.path import dirname
 from freezegun import freeze_time
 
+import ddt
+
 from ggrc import db
 from ggrc.converters import errors
 from ggrc_workflows.models import Cycle
@@ -564,6 +566,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     }
 
 
+@ddt.ddt
 class TestCycleTaskImportUpdateAssignee(BaseTestCycleTaskImportUpdate):
   """Test cases for update assignee column on import cycle tasks"""
 
@@ -574,22 +577,38 @@ class TestCycleTaskImportUpdateAssignee(BaseTestCycleTaskImportUpdate):
         CycleTaskGroupObjectTask.id == self.instance.id
     )
 
-  def test_update_assignee(self):
+  @ddt.data(
+      "CycleTask",
+      "Cycle Task",
+      "Cycle_Task",
+      "Cycle Task Group Object Task",
+      "cycle_task_group_object_task",
+      "cycletaskgroupobjecttask",
+  )
+  def test_update_assignee(self, alias):
     """Test update assignee"""
     self.assertIsNone(self.query.first().contact)
     response = self.import_data(OrderedDict([
-        ("object_type", "CycleTaskGroupObjectTask"),
+        ("object_type", alias),
         ("Code*", self.instance.slug),
         ("Assignee*", self.user.email),
     ]))
     self.assertEqual(self.user.email, self.query.first().contact.email)
     self._check_csv_response(response, {})
 
-  def test_update_assignee_with_non_importable(self):
+  @ddt.data(
+      "CycleTask",
+      "Cycle Task",
+      "Cycle_Task",
+      "Cycle Task Group Object Task",
+      "cycle_task_group_object_task",
+      "cycletaskgroupobjecttask",
+  )
+  def test_update_assignee_with_non_importable(self, alias):
     """Test update assignee with non importable field"""
     self.assertIsNone(self.query.first().contact)
     response = self.import_data(OrderedDict([
-        ("object_type", "CycleTaskGroupObjectTask"),
+        ("object_type", alias),
         ("Code*", self.instance.slug),
         ("Assignee*", self.user.email),
         ("State", "some data"),
