@@ -51,4 +51,12 @@ access-control-list {
       }
     }
   }
+
+  // special control styles while they should be disabled
+  & > div.updating {
+    .add-role, .revoke-role {
+      cursor: default !important;
+      opacity: 0.4;
+    }
+  }
 }
