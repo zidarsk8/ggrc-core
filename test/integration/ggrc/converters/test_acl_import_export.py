@@ -181,7 +181,7 @@ class TestACLImportExport(TestCase):
     for role_name in roles.keys():
       factories.AccessControlRoleFactory(
           object_type="Market",
-          name=role_name,
+          name=role_name + "  ",
       )
 
     import_dict = self._generate_role_import_dict(roles)
