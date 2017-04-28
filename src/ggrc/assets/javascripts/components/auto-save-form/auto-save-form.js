@@ -14,10 +14,25 @@
       '/components/auto-save-form/auto-save-form.mustache'
     ),
     viewModel: {
+      define: {
+        fieldsToSave: {
+          Value: can.Map
+        },
+        isDirty: {
+          type: 'boolean',
+          value: false,
+          get: function () {
+            var modifiedFields = this.attr('fieldsToSave');
+            if (!modifiedFields) {
+              return false;
+            }
+            return Object.keys(modifiedFields.attr()).length;
+          }
+        }
+      },
       editMode: false,
       saving: false,
       allSaved: false,
-      fieldsToSave: new can.Map(),
       fieldsToSaveAvailable: false,
       autoSaveScheduled: false,
       autoSaveAfterSave: false,
@@ -46,7 +61,7 @@
           toSave[k] = v;
         });
 
-        this.attr('fieldsToSave', new can.Map());
+        this.attr('fieldsToSave', {}, true);
         this.attr('fieldsToSaveAvailable', false);
 
         clearTimeout(this.attr('autoSaveTimeoutHandler'));
