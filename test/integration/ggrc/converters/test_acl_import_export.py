@@ -153,11 +153,11 @@ class TestACLImportExport(TestCase):
     self.assertEqual(parsed_data[0][empty_name], "")
 
   @staticmethod
-  def _generate_role_import_dict(roles):
+  def _generate_role_import_dict(roles, object_type="Market"):
     """Generate simple import dict with all roles and emails."""
     import_dict = OrderedDict([
-        ("object_type", "Market"),
-        ("code", "market-1"),
+        ("object_type", object_type),
+        ("code", "{}-1".format(object_type.lower())),
         ("title", "Title"),
         ("Admin", "user@example.com"),
     ])
