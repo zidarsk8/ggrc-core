@@ -37,6 +37,12 @@ tree-widget-container {
     }
   }
 
+  .my-assessments {
+    tree-view {
+      margin-top: 82px;
+    }
+  }
+
   .tree-action {
     .map-button {
       line-height: 22px;
@@ -120,7 +126,7 @@ tree-item {
   }
 
   .tree-item-content {
-    line-height: 28px;
+    line-height: 16px;
     border-bottom: 1px solid $items-separator-color;
     align-items: center;
 
@@ -158,6 +164,13 @@ tree-item {
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
+
+        &.custom {
+          max-height: 32px;
+          p, ul, ol {
+            margin-bottom: 0;
+          }
+        }
       }
     }
   }
@@ -277,6 +290,10 @@ tree-header {
     i {
       font-size: 12px;
       margin-left: 10px;
+
+      &.fa-sort {
+        opacity: .5;
+      }
     }
   }
 }
@@ -309,7 +326,7 @@ sub-tree-models {
       span {
         margin-left: 15px;
         cursor: pointer;
-        border-bottom: 1px solid $black;
+        text-decoration: underline;
         font-size: 12px;
       }
     }
@@ -328,7 +345,7 @@ sub-tree-models {
 
       a {
         background-color: $lightBlue !important;
-        color: $white;
+        color: $white !important;
         font-weight: normal;
       }
     }
