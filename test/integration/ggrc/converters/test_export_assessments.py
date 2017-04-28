@@ -97,3 +97,114 @@ class TestExport(TestCase):
     self.assert_filter_by_datetime(alias,
                                    self.assessment.verified_date,
                                    [self.assessment.slug])
+
+  def assert_only_date_for(self, alias, operator, date, slugs):
+    self.assert_filter_by_datetime(
+        alias,
+        date,
+        slugs,
+        formats=["{year}-{month}-{day}"],
+        operator=operator
+    )
+
+  def test_filter_not_equal_operators(self):
+    """Test filter by != operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        "!=",
+        self.assessment.verified_date + datetime.timedelta(1),
+        [self.assessment.slug],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        "!=",
+        self.assessment.verified_date,
+        [],
+    )
+
+  def test_filter_not_like_operators(self):
+    """Test filter by !~ operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        "!~",
+        self.assessment.verified_date + datetime.timedelta(1),
+        [self.assessment.slug],
+    )
+    self.assert_only_date_for(
+        "verified_date", "!~", self.assessment.verified_date, [],
+    )
+
+  def test_filter_like_operators(self):
+    """Test filter by ~ operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        "~",
+        self.assessment.verified_date,
+        [self.assessment.slug],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        "~",
+        self.assessment.verified_date + datetime.timedelta(1),
+        [],
+    )
+
+  def test_filter_gte_operators(self):
+    """Test filter by >= operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        ">=",
+        self.assessment.verified_date,
+        [self.assessment.slug],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        ">=",
+        self.assessment.verified_date + datetime.timedelta(1),
+        [],
+    )
+
+  def test_filter_gt_operators(self):
+    """Test filter by > operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        ">",
+        self.assessment.verified_date,
+        [],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        ">",
+        self.assessment.verified_date - datetime.timedelta(1),
+        [self.assessment.slug],
+    )
+
+  def test_filter_lte_operators(self):
+    """Test filter by <= operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        "<=",
+        self.assessment.verified_date,
+        [self.assessment.slug],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        "<=",
+        self.assessment.verified_date - datetime.timedelta(1),
+        [],
+    )
+
+  def test_filter_lt_operators(self):
+    """Test filter by < operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        "<",
+        self.assessment.verified_date,
+        [],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        "<",
+        self.assessment.verified_date + datetime.timedelta(1),
+        [self.assessment.slug],
+    )

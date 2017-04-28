@@ -117,13 +117,20 @@ def autocast(exp, target_class):
   if extra_parser:
     left_date, right_date = extra_parser.get_filter_value(
         unicode(exp['right']), operation) or [None, None]
-    left_exp = build_exp(key,
-                         left_date,
-                         ">=" if operation == "=" else operation)
-    right_exp = build_exp(key,
-                          right_date,
-                          "<=" if operation == "=" else operation)
-    extra_exp = build_exp(left_exp, right_exp, "AND") or left_exp or right_exp
+    if any(o in operation for o in ["~", "="]):
+      operator_suffix = "="
+    else:
+      operator_suffix = ""
+    if "!" in operation:
+      operator_suffix = ""
+      connect_operator = "OR"
+    else:
+      connect_operator = "AND"
+    left_exp = build_exp(key, left_date, ">" + operator_suffix)
+    right_exp = build_exp(key, right_date, "<" + operator_suffix)
+    extra_exp = (build_exp(left_exp, right_exp, connect_operator) or
+                 left_exp or
+                 right_exp)
   if any_parser:
     current_exp = exp
   return build_exp(extra_exp, current_exp, "OR") or current_exp or extra_exp

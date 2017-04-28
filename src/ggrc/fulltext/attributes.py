@@ -139,6 +139,9 @@ class DatetimeValue(object):  # pylint: disable=too-few-public-methods
       return
     date_dict = {
         "=": converted_pairs,
+        "~": converted_pairs,
+        "!~": (converted_pairs[1], converted_pairs[0]),
+        "!=": (converted_pairs[1], converted_pairs[0]),
         ">": (converted_pairs[1], None),
         "<": (None, converted_pairs[0]),
         ">=": (converted_pairs[0], None),

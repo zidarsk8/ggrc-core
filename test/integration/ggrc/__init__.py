@@ -264,7 +264,7 @@ class TestCase(BaseTestCase, object):
       results[object_type].append(dict(zip(keys, columns[1:])))
     return results
 
-  def assert_slugs(self, field, value, slugs):
+  def assert_slugs(self, field, value, slugs, operator=None):
     """Assert slugs for selected search"""
     assert self.model
     search_request = [{
@@ -272,7 +272,7 @@ class TestCase(BaseTestCase, object):
         "filters": {
             "expression": {
                 "left": field,
-                "op": {"name": "="},
+                "op": {"name": operator or "="},
                 "right": value,
             },
         },
@@ -296,11 +296,12 @@ class TestCase(BaseTestCase, object):
     for f_string in formats:
       yield f_string.format(**kwargs)
 
+  # pylint: disable=too-many-arguments
   def assert_filter_by_datetime(self, alias, datetime_value, slugs,
-                                formats=None):
+                                formats=None, operator=None):
     """Assert slugs for each date format ent datetime"""
     for date_string in self.generate_date_strings(datetime_value, formats):
-      self.assert_slugs(alias, date_string, slugs)
+      self.assert_slugs(alias, date_string, slugs, operator)
 
   @staticmethod
   def _get_latest_object_revisions(objects):
