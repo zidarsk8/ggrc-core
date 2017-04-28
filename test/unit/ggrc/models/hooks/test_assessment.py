@@ -52,7 +52,7 @@ class GetValueTestCase(unittest.TestCase):
     get_current_user_id.return_value = 42
 
     people = assessment.get_value(
-        "assessors", self.audit, self.related_object, template=None)
+        "assessors", [], self.audit, self.related_object, template=None)
 
     self.assertEqual(people, [self.person_1, self.person_3])
 
@@ -71,6 +71,7 @@ class GetValueTestCase(unittest.TestCase):
 
     people = assessment.get_value(
         "verifiers",
+        [],
         self.audit,
         self.related_object,
         template=assessment_template

@@ -52,10 +52,10 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
       "Object Owners": "Object Admins",
       "Audit Lead": "Audit Lead",
       "Auditors": "Auditors",
-      "Primary Assessor": "Principal Assessor",
-      "Secondary Assessors": "Secondary Assessors",
-      "Primary Contact": "Primary Contact",
-      "Secondary Contact": "Secondary Contact",
+      "Principal Assignees": "Principal Assignees",
+      "Secondary Assignees": "Secondary Assignees",
+      "Primary Contacts": "Primary Contacts",
+      "Secondary Contacts": "Secondary Contacts",
   }
 
   _title_uniqueness = False

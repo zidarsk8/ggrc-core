@@ -346,10 +346,10 @@
         {value: 'Object Owners', title: 'Object Admins'},
         {value: 'Audit Lead', title: 'Audit Lead'},
         {value: 'Auditors', title: 'Auditors'},
-        {value: 'Primary Assessor', title: 'Principal Assignee'},
-        {value: 'Secondary Assessors', title: 'Secondary Assignee'},
-        {value: 'Primary Contact', title: 'Primary Contact'},
-        {value: 'Secondary Contact', title: 'Secondary Contact'},
+        {value: 'Principal Assignees', title: 'Principal Assignees'},
+        {value: 'Secondary Assignees', title: 'Secondary Assignees'},
+        {value: 'Primary Contacts', title: 'Primary Contacts'},
+        {value: 'Secondary Contacts', title: 'Secondary Contacts'},
         {value: 'other', title: 'Others...'}
       ]
     },
