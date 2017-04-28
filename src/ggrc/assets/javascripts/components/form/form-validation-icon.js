@@ -5,26 +5,23 @@
 
 (function (can, GGRC) {
   'use strict';
-
-  var tpl = can.view(GGRC.mustache_path +
-    '/components/ca-object/ca-object-validation-icon.mustache');
-  var tag = 'ca-object-validation-icon';
+  var tag = 'form-validation-icon';
   /**
    * State object to present possible icons for validation
    */
   var icons = {
     noValidation: 'fa-check-circle',
-    empty: 'fa-asterisk validation-icon-empty',
-    valid: 'fa-check validation-icon-valid',
-    invalid: 'fa-times validation-icon-invalid'
+    empty: 'fa-asterisk form-validation-icon__color-empty',
+    valid: 'fa-check form-validation-icon__color-valid',
+    invalid: 'fa-times form-validation-icon__color-invalid'
   };
 
   /**
-   * Assessment specific validation icon component
+   * Form validation icon component
    */
-  can.Component.extend({
+  GGRC.Components('formValidationIcon', {
     tag: tag,
-    template: tpl,
+    template: '<i class="fa form-validation-icon__body {{iconCls}}"></i>',
     viewModel: {
       define: {
         validation: {},

@@ -179,7 +179,7 @@ dashboard-js-files:
   - components/object-state-toolbar/object-state-toolbar.js
   - components/object-list/object-list.js
   - components/ca-object/ca-object.js
-  - components/ca-object/ca-object-validation-icon.js
+  - components/form/form-validation-icon.js
   - components/ca-object/ca-object-value-mapper.js
   - components/ca-object/ca-object-modal-content.js
   - components/related-objects/related-objects.js
@@ -339,7 +339,6 @@ dashboard-js-template-files:
   - components/mapped-objects/mapped-objects.mustache
   - components/related-objects/related-issues.mustache
   - components/reusable-objects/reusable-objects-item.mustache
-  - components/ca-object/ca-object-validation-icon.mustache
   - components/ca-object/ca-object-modal-content.mustache
   - components/show-more/show-more.mustache
   - components/show-related-assessments-button/show-related-assessments-button.mustache
