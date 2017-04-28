@@ -21,11 +21,11 @@ describe('GGRC.Components.revisionsComparer', function () {
       fakeData = [
         {
           id: 1,
-          content: {id: 1},
+          content: new can.Map({id: 1}),
           resource_type: 'Control'
         }, {
           id: 2,
-          content: {id: 1},
+          content: new can.Map({id: 1}),
           resource_type: 'Control'
         }
       ];
@@ -50,6 +50,30 @@ describe('GGRC.Components.revisionsComparer', function () {
       var data = fakeData;
       result.forEach(function (item, index) {
         expect(item.instance.id).toEqual(data[index].content.id);
+      });
+    });
+
+    it('adds person stubs to access control list items', function () {
+      var result;
+
+      fakeData.forEach(function (item, i) {
+        var acl = new can.List([
+          {ac_role_id: i * 10, person_id: i * 10},
+          {ac_role_id: i * 10, person_id: i * 10}
+        ]);
+        item.content.attr('access_control_list', acl);
+      });
+
+      result = method(fakeData);
+
+      function checkAclItem(item) {
+        expect(item.person).toBeDefined();
+        expect(item.person.type).toEqual('Person');
+        expect(item.person.id).toEqual(item.person_id);
+      }
+
+      result.forEach(function (item) {
+        item.instance.access_control_list.forEach(checkAclItem);
       });
     });
   });
