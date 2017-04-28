@@ -111,14 +111,15 @@ class TestComprehensiveSheets(TestCase):
       self.assertEqual(res.status_code, 200)
       self.assertLess(counter.get, self.LIMIT, "Query count for permissions")
 
-  def create_custom_attributes(self):
+  @staticmethod
+  def create_custom_attributes():
     """Generate custom attributes needed by comprehensive_sheet1.csv."""
-    CAD = factories.CustomAttributeDefinitionFactory
-    CAD(definition_type="control", title="my custom text", mandatory=True)
-    CAD(definition_type="program", title="my_text", mandatory=True)
-    CAD(definition_type="program", title="my_date", attribute_type="Date")
-    CAD(definition_type="program", title="my_checkbox",
+    cad = factories.CustomAttributeDefinitionFactory
+    cad(definition_type="control", title="my custom text", mandatory=True)
+    cad(definition_type="program", title="my_text", mandatory=True)
+    cad(definition_type="program", title="my_date", attribute_type="Date")
+    cad(definition_type="program", title="my_checkbox",
         attribute_type="Checkbox")
-    CAD(definition_type="program", title="my_dropdown",
+    cad(definition_type="program", title="my_dropdown",
         attribute_type="Dropdown",
         multi_choice_options="a,b,c,d")

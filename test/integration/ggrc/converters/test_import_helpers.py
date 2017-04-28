@@ -47,7 +47,7 @@ class TestACLAttributeDefinitions(TestCase):
   def test_acl_definitions(self, model):
     """Test ACL column definitions."""
     factory = factories.AccessControlRoleFactory
-    self.acr = factories.AccessControlRoleFactory(
+    factories.AccessControlRoleFactory(
         object_type="Control",
         read=True
     )
