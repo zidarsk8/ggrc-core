@@ -251,3 +251,44 @@ class TestACLImportExport(TestCase):
       }
 
     self.assertEqual(stored_roles, edited_roles)
+
+  @ddt.data({
+      "Market": {"role name": set(_random_emails[:2])},
+      "Facility": {"role name": set(_random_emails[2:])},
+  }, {
+      "Control": {"role name": set(_random_emails[:3])},
+      "Market": {"role name": set(_random_emails[2:])},
+      "System": {"role name": set(_random_emails)},
+      "Objective": {"role name": set()},
+      "Product": {"role name": set(_random_emails[:1])},
+      "Policy": {"other role name": set(_random_emails[:1])},
+  })
+  def test_same_name_roles(self, model_dict):
+    """Test role with the same names on different objects."""
+    for email in self._random_emails:
+      factories.PersonFactory(email=email)
+
+    import_dicts = []
+    for object_type, roles in model_dict.items():
+      for role_name in roles.keys():
+        factories.AccessControlRoleFactory(
+            object_type=object_type,
+            name=role_name,
+        )
+
+      import_dicts.append(self._generate_role_import_dict(roles, object_type))
+
+    response = self.import_data(*import_dicts)
+    self._check_csv_response(response, {})
+    stored_roles = {}
+    for object_type, roles in model_dict.items():
+      model = getattr(models, object_type)
+      obj = model.query.first()
+      stored_roles[object_type] = {}
+      for role_name in roles.keys():
+        stored_roles[object_type][role_name] = {
+            acl.person.email for acl in obj.access_control_list
+            if acl.ac_role.name == role_name and
+            acl.ac_role.object_type == object_type
+        }
+    self.assertEqual(stored_roles, model_dict)
