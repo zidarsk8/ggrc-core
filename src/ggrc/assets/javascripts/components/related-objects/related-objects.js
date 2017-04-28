@@ -8,7 +8,7 @@
 
   var defaultOrderBy = 'created_at';
 
-  can.Component.extend({
+  GGRC.Components('relatedObjects', {
     tag: 'related-objects',
     viewModel: {
       define: {
@@ -27,14 +27,36 @@
           value: function () {
             return new GGRC.VM.Pagination({pageSizeSelect: [5, 10, 15]});
           }
+        },
+        relatedObjects: {
+          Value: can.List
+        },
+        predefinedFilter: {
+          type: '*'
         }
       },
       baseInstance: null,
-      relatedObjects: [],
       relatedItemsType: '@',
       orderBy: '@',
       selectedItem: {},
       objectSelectorEl: '.grid-data__action-column button',
+      getFilters: function (id, type, isAssessment) {
+        var predefinedFilter = this.attr('predefinedFilter');
+        var filters;
+
+        if (predefinedFilter) {
+          filters = predefinedFilter;
+        } else {
+          filters = {
+            expression: {
+              object_name: type,
+              op: isAssessment ? {name: 'similar'} : {name: 'relevant'},
+              ids: [id]
+            }
+          };
+        }
+        return filters;
+      },
       getParams: function () {
         var id;
         var type;
@@ -52,27 +74,7 @@
           id = this.attr('baseInstance.id');
           type = this.attr('baseInstance.type');
         }
-        filters = isAssessment ? {
-          expression: {
-            object_name: type,
-            op: {name: 'similar'},
-            ids: [id]
-          }
-        } : {
-          expression: {
-            left: {
-              object_name: type,
-              op: {name: 'relevant'},
-              ids: [id]
-            },
-            right: {
-              object_name: type,
-              op: {name: 'similar'},
-              ids: [id]
-            },
-            op: {name: 'OR'}
-          }
-        };
+        filters = this.getFilters(id, type, isAssessment);
         params.data = [{
           limit: this.attr('paging.limits'),
           object_name: relatedType,

@@ -3,12 +3,10 @@ Copyright (C) 2017 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 `}}
 
-<related-objects {base-instance}="instance" related-items-type="Issue">
-    <div class="grid-data-toolbar flex-box">
-        <tree-pagination {(paging)}="paging" class="flex-size-1"></tree-pagination>
-          <div class="grid-data-toolbar-control">
-              <add-issue-button {snapshots}="mappedSnapshots" {related-instance}="baseInstance"></add-issue-button>
-          </div>
+<related-objects {base-instance}="baseInstance" {predefined-filter}="relatedIssuesFilter" related-items-type="Issue">
+    <div class="grid-data__toolbar flex-box">
+        <tree-pagination {(paging)}="paging" class="grid-data__toolbar-item"></tree-pagination>
+        <add-issue-button {snapshots}="allRelatedSnapshots" {related-instance}="baseInstance" class="grid-data__toolbar-item"></add-issue-button>
     </div>
     <div class="grid-data-header flex-row flex-box">
         <div class="flex-size-2">

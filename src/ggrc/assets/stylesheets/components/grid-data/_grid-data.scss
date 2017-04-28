@@ -2,28 +2,16 @@
  * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
-.grid-data-toolbar {
-  height: 26px;
-  margin: 0 0 16px 0;
-  justify-content: flex-end;
-
-  .grid-data-toolbar-control {
-    display: flex;
-    height: 26px;
-    line-height: 26px;
-    padding: 0 0 0 16px;
-
-    .btn.btn-small {
-      height: 26px;
-      line-height: 26px;
-      box-sizing: border-box;
-      padding: 0 16px;
-    }
-
-    > * {
-      min-width: 86px;
-      margin: 0 0 0 12px;
-    }
+.grid-data {
+  &__toolbar {
+    height: 28px;
+    margin: 0 0 16px 0;
+    align-items: center;
+    justify-content: flex-end;
+  }
+  &__toolbar-item {
+    display: inline-flex;
+    margin: 0 0 0 16px;
   }
 }
 

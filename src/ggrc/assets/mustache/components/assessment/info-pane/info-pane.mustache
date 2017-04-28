@@ -152,7 +152,7 @@
                   {{> '/static/mustache/assessments/related-assessments.mustache' }}
                 </tab-panel>
                 <tab-panel {(panels)}="panels" title-text="Related Issues">
-                  {{> '/static/mustache/assessments/related_issues.mustache' }}
+                  <related-issues {base-instance}="instance" {all-related-snapshots}="mappedSnapshots"></related-issues>
                 </tab-panel>
             </tab-container>
         </div>
