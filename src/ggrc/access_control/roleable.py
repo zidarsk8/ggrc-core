@@ -44,28 +44,6 @@ class Roleable(object):
   def access_control_list(self):
     return self._access_control_list
 
-  def _remove_existing(self, existing, values):
-    """Helper function for removing existing items in acl"""
-    for value in values:
-      acr_id = value['ac_role_id']
-      person_id = value['person']['id']
-      if existing.ac_role_id == acr_id and existing.person_id == person_id:
-        return
-    self.access_control_list.remove(existing)
-
-  def _set_value(self, value):
-    """Helper function for setting value of acl"""
-    for itm in self.access_control_list:
-      acr_id = value['ac_role_id']
-      person_id = value['person']['id']
-      if itm.ac_role_id == acr_id and itm.person_id == person_id:
-        return
-    AccessControlList(
-        object=self,
-        person_id=value.get('person').get('id'),
-        ac_role_id=value.get('ac_role_id')
-    )
-
   @access_control_list.setter
   def access_control_list(self, values):
     """Setter function for access control list.
@@ -76,10 +54,36 @@ class Roleable(object):
     """
     if values is None:
       return
-    for existing in self.access_control_list:
-      self._remove_existing(existing, values)
+
+    new_values = {
+        (value['ac_role_id'], value['person']['id'])
+        for value in values
+    }
+    old_values = {
+        (acl.ac_role_id, acl.person_id)
+        for acl in self.access_control_list
+    }
+
+    self._remove_values(old_values - new_values)
+    self._add_values(new_values - old_values)
+
+  def _add_values(self, values):
+    """Attach new custom role values to current object."""
+    for ac_role_id, person_id in values:
+      AccessControlList(
+          object=self,
+          person_id=person_id,
+          ac_role_id=ac_role_id
+      )
+
+  def _remove_values(self, values):
+    """Remove custom role values from current object."""
+    values_map = {
+        (acl.ac_role_id, acl.person_id): acl
+        for acl in self.access_control_list
+    }
     for value in values:
-      self._set_value(value)
+      self._access_control_list.remove(values_map[value])
 
   @classmethod
   def eager_query(cls):
