@@ -90,7 +90,7 @@
     },
     reloadChart: function (type, elementId) {
       var that = this;
-      var query = GGRC.Utils.QueryAPI;
+      var query = GGRC.Utils.CurrentPage;
       var chartOptions = this.options.context.charts[type];
       // Note that chart will be refreshed only if counts were changed.
       // State changes are not checked.
