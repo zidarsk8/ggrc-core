@@ -539,16 +539,6 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
                                       "negative_" + person_email,
                                       0)
 
-  @data("contact", "PRIMARY CONTACT", "primary contact")
-  def test_control_primary_contact(self, field):
-    """Control Snapshots are filtered by contact and aliases."""
-    self._test_contact_field("contact", field)
-
-  @data("secondary_contact", "SECONDARY CONTACT", "secondary contact")
-  def test_control_secondary_contact(self, field):
-    """Control Snapshots are filtered by secondary_contact and aliases."""
-    self._test_contact_field("secondary_contact", field)
-
   def test_control_owners(self):
     """Control Snapshots are filtered and sorted by Owners."""
     program = factories.ProgramFactory()
