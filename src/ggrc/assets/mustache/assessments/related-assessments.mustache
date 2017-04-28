@@ -4,12 +4,10 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <related-objects {base-instance}="instance" related-items-type="Assessment" order-by="finished_date,created_at">
     <reusable-objects-list {base-instance}="instance">
-        <div class="grid-data-toolbar flex-box">
-            <tree-pagination {(paging)}="paging"></tree-pagination>
+        <div class="grid-data__toolbar flex-box">
+            <tree-pagination {(paging)}="paging" class="grid-data__toolbar-item"></tree-pagination>
             {{#is_allowed 'update' baseInstance context='for'}}
-                <div class="grid-data-toolbar-control">
-                    <button class="btn btn-small btn-full btn-green" ($click)="reuseSelected" {{^hasSelected}}disabled{{/hasSelected}}>Reuse</button>
-                </div>
+                <button class="btn btn-small btn-green grid-data__toolbar-item" ($click)="reuseSelected" {{^hasSelected}}disabled{{/hasSelected}}>Reuse</button>
             {{/is_allowed}}
         </div>
         <div class="grid-data-header flex-row flex-box">
