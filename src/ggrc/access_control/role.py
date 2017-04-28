@@ -3,6 +3,8 @@
 
 """Access Control Role model"""
 
+from sqlalchemy.orm import validates
+
 from ggrc import db
 from ggrc.models import mixins
 from ggrc.fulltext.mixin import Indexed
@@ -47,3 +49,7 @@ class AccessControlRole(Indexed, mixins.Base, db.Model):
       "delete",
       "my_work",
   ]
+
+  @validates("name")
+  def validates_name(self, _, value):  # pylint: disable=no-self-use
+    return value.strip()
