@@ -47,6 +47,14 @@
         roleBlockClass: {
           type: 'string',
           value: 'row-fluid'
+        },
+
+        // a flag indicating whether a user role modification is in progress
+        isUpdating: {
+          get: function () {
+            return Boolean(this.attr('isPendingGrant') ||
+                           this.attr('pendingRevoke') !== null);
+          }
         }
       },
 
@@ -59,6 +67,10 @@
        *   role" mode
        */
       grantRoleMode: function (roleId) {
+        if (this.attr('isUpdating')) {
+          return;
+        }
+
         this.attr('grantingRoleId', roleId);
       },
 
@@ -74,6 +86,10 @@
       grantRole: function (person, roleId) {
         var inst = this.instance;
         var roleEntry;
+
+        if (this.attr('isUpdating')) {
+          return;
+        }
 
         this.attr('isPendingGrant', true);
 
@@ -132,6 +148,10 @@
       revokeRole: function (person, roleId) {
         var idx;
         var inst = this.instance;
+
+        if (this.attr('isUpdating')) {
+          return;
+        }
 
         this.attr('pendingRevoke', [person.id, roleId]);
 
@@ -219,6 +239,7 @@
         canEdit = vm.isNewInstance ||
                   Permission.is_allowed_for('update', instance);
 
+        can.batch.start();
         vm.attr('canEdit', canEdit);
         vm.attr('grantingRoleId', 0);  // which "add role" autocomplete to show
         vm.attr('isPendingGrant', false);
@@ -228,6 +249,7 @@
 
         vm.attr('_rolesInfoFixed', false);
         vm._rebuildRolesInfo();
+        can.batch.stop();
       },
 
       '{viewModel.instance.access_control_list} change':
