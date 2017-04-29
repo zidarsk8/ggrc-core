@@ -271,3 +271,26 @@ class TestExportTasks(TestCase):
       ).one()
       self.assertCycles("cycle assignee", task.cycle.contact.email, [slug])
       self.assertCycles("cycle assignee", task.cycle.contact.name, [slug])
+
+  @data(
+      #  (Cycle count, tasks in cycle)
+      (2, 2),
+  )
+  @unpack
+  def test_filter_by_task_comment(self, cycle_count, task_count):
+    """Test filter cycles by task comments."""
+    task_cycle_filter = self.generate_tasks_for_cycle(cycle_count, task_count)
+    filter_params = {}
+    for task_id, slug in task_cycle_filter.iteritems():
+      task = CycleTaskGroupObjectTask.query.filter(
+          CycleTaskGroupObjectTask.id == task_id
+      ).one()
+      comment = "comment for task # {}".format(task_id)
+      factories.CycleTaskEntryFactory(
+          cycle_task_group_object_task=task,
+          description=comment,
+      )
+      filter_params[comment] = slug
+
+    for comment, slug in filter_params.iteritems():
+      self.assertCycles("task comments", comment, [slug])
