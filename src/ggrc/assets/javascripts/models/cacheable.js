@@ -637,6 +637,10 @@
       params = this.object_from_resource(params);
       if (!params)
         return params;
+      if (GGRC.Utils.Snapshots.isSnapshot(params)) {
+        this.removeFromCacheById(params[this.id]);
+        delete this.cache[params[this.id]];
+      }
       model = this.findInCacheById(params[this.id]) ||
         (params.provisional_id &&
         can.getObject('provisional_cache', can.Model.Cacheable, true)[params.provisional_id]);

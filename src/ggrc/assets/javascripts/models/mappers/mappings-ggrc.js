@@ -20,7 +20,7 @@
     // Governance
     Control: {
       _mixins: [
-        'related_object', 'personable', 'ownable', 'documentable', 'assignable'
+        'related_object', 'personable', 'ownable', 'assignable'
       ],
       related_business_objects: Multi([
         'related_data_assets', 'related_facilities', 'related_markets',
