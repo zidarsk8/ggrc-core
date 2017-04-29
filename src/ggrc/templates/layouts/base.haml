@@ -50,6 +50,10 @@
 
     -block extra_assets
 
+    -if config.get("AUDIT_DASHBOARD_INTEGRATION_URL")
+      :javascript
+        GGRC.AUDIT_DASHBOARD_INTEGRATION_URL='{{config.get("AUDIT_DASHBOARD_INTEGRATION_URL")}}';
+
     -assets "app-init-js"
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets

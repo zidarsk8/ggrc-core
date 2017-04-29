@@ -1,0 +1,19 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+
+.dashboard-widget {
+  height: 100%;
+
+  &.info {
+    padding: 0;
+    margin-top: -5px;
+  }
+
+  iframe {
+    width: 100%;
+    height: 100%;
+  }
+}

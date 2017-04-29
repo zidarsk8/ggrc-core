@@ -59,6 +59,15 @@
             options.widget_view ||
             widget.widget_view
           );
+        } else if (ctrl && ctrl === GGRC.Controllers.DashboardWidget) {
+          descriptors[widgetId] = GGRC.WidgetDescriptor.make_dashboard_widget(
+            options &&
+            options.instance ||
+            widget.instance,
+            options &&
+            options.widget_view ||
+            widget.widget_view
+          );
         } else if (ctrl && ctrl === GGRC.Controllers.TreeView) {
           descriptors[widgetId] = GGRC.WidgetDescriptor.make_tree_view(
             options && (options.instance || options.parent_instance) || widget.instance,
