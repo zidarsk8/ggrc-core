@@ -171,6 +171,7 @@ dashboard-js-files:
   - components/object-list-item/detailed-business-object-list-item.js
   - components/object-popover/related-assessment-popover.js
   - components/object-popover/object-popover.js
+  - components/mapped-objects/directly-mapped-objects.js
   - components/mapped-objects/mapped-objects.js
   - components/related-objects/related-audits.js
   - components/related-objects/related-attachments-and-urls.js
@@ -345,6 +346,7 @@ dashboard-js-template-files:
   - components/object-list-item/comment-list-item.mustache
   - components/object-list-item/person-list-item.mustache
   - components/object-list-item/document-object-list-item.mustache
+  - components/mapped-objects/directly-mapped-objects.mustache
   - components/mapped-objects/mapped-objects.mustache
   - components/related-objects/related-issues.mustache
   - components/reusable-objects/reusable-objects-item.mustache
