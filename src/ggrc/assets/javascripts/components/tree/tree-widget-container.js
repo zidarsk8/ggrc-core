@@ -111,12 +111,8 @@
       hideImportExport: {
         type: Boolean,
         get: function () {
-          var Snapshots = GGRC.Utils.Snapshots;
-          var parentInstance = this.attr('parent_instance');
-          var model = this.attr('model');
-
-          return Snapshots.isSnapshotScope(parentInstance) &&
-            Snapshots.isSnapshotModel(model.model_singular);
+          //  Here need logic that determines whether the export/import button is hidden
+          return false;
         }
       },
       showGenerateAssessments: {
