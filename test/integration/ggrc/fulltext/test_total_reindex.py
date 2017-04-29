@@ -33,6 +33,7 @@ class TestTotalTeindex(TestCase):
       ggrc_factories.ProcessFactory,
       ggrc_factories.ProgramFactory,
       ggrc_factories.RegulationFactory,
+      ggrc_factories.DocumentFactory,
       wf_factories.CycleFactory,
       wf_factories.CycleTaskGroupFactory,
       wf_factories.CycleTaskEntryFactory,
