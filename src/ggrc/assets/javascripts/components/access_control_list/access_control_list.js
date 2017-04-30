@@ -230,14 +230,17 @@
         var canEdit;
         var vm = this.viewModel;
         var instance = vm.instance;
+        var isSnapshot;
 
         if (!instance) {
           console.error('accessControlList component: instance not given.');
           return;
         }
 
-        canEdit = vm.isNewInstance ||
-                  Permission.is_allowed_for('update', instance);
+        isSnapshot = GGRC.Utils.Snapshots.isSnapshot(instance);
+        canEdit = !isSnapshot &&  // snapshots are not editable
+                  (vm.isNewInstance ||
+                   Permission.is_allowed_for('update', instance));
 
         can.batch.start();
         vm.attr('canEdit', canEdit);

@@ -578,6 +578,7 @@
       var model = CMS.Models[instance.child_type];
       var content = instance.revision.content;
       var type = model.root_collection;
+
       content.isLatestRevision = instance.is_latest_revision;
       content.originalLink = '/' + type + '/' + content.id;
       content.snapshot = new can.Map(instance);
@@ -596,6 +597,13 @@
         type: instance.child_type,
         id: instance.child_id
       });
+
+      if (content.access_control_list) {
+        content.access_control_list.forEach(function (item) {
+          item.person = new CMS.Models.Person({id: item.person_id}).stub();
+        });
+      }
+
       object = new model(content);
       model.removeFromCacheById(content.id);  /* removes snapshot object from cache */
       return object;

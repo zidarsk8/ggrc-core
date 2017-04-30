@@ -55,8 +55,16 @@
         return data.map(function (value) {
           var content = value.content;
           var model = CMS.Models[value.resource_type];
-          content.isRevision = true;
-          content.type = value.resource_type;
+          content.attr('isRevision', true);
+          content.attr('type', value.resource_type);
+
+          if (content.access_control_list) {
+            content.access_control_list.forEach(function (item) {
+              var stub = new CMS.Models.Person({id: item.person_id}).stub();
+              item.attr('person', stub);
+            });
+          }
+
           return {instance: new model(content)};
         });
       },
@@ -116,11 +124,14 @@
       highlightDifference: function ($target) {
         this.highlightAttributes($target);
         this.highlightCustomAttributes($target);
+        this.highlightCustomRoles($target);
       },
 
       /**
        * Highlight difference in attributes
-       * @param {Object} $target - jQuery object
+       *
+       * @param {jQuery} $target - the root DOM element containing the
+       *   revision diff comparison
        */
       highlightAttributes: function ($target) {
         var emptySelector = '.empty-message';
@@ -205,7 +216,9 @@
 
       /**
        * Highlight difference in custom attributes
-       * @param {Object} $target - jQuery object
+       *
+       * @param {jQuery} $target - the root DOM element containing the
+       *   revision diff comparison
        */
       highlightCustomAttributes: function ($target) {
         var titleSelector = '.inline-edit__title';
@@ -304,6 +317,108 @@
                     .css('margin-bottom', '+=' + caOldHeight);
           }
           $ca.closest(caSelector).addClass(highlightClass);
+        }
+      },
+
+      /**
+       * Highlight the differences in custom roles assignments between the
+       * old and the new revision of an object.
+       *
+       * @param {jQuery} $target - the root DOM element containing the
+       *   revision diff comparison pane
+       */
+      highlightCustomRoles: function ($target) {
+        var HIGHLIGHT_CLASS = 'diff-highlighted';
+
+        var $rolesPanes = $target.find('access-control-list > div');
+        var $roleBlocksOld = $rolesPanes.eq(0).find('.role-block');
+        var $roleBlocksNew = $rolesPanes.eq(1).find('.role-block');
+
+        $roleBlocksOld.each(function (i) {
+          var $blockOld = $roleBlocksOld.eq(i);
+          var $blockNew = $roleBlocksNew.eq(i);  // the block count is the same
+          compareRoleBlocks($blockOld, $blockNew);
+          equalizeHeights($blockOld, $blockNew);
+        });
+
+        /**
+         * Compare two blocks of grants of a particular custom role and mark
+         * the differences between them.
+         *
+         * @param {jQuery} $blockOld - a DOM element containing a list of
+         *   people that had a particular custom role granted at a particular
+         *   moment in the past
+         * @param {jQuery} $blockNew - a DOM element containing a list of
+         *   people that have a particular custom role granted at a newer point
+         *   in time
+         */
+        function compareRoleBlocks($blockOld, $blockNew) {
+          var oldUserIds = {};
+          var newUserIds = {};
+
+          var $oldGrantees = $blockOld.find('.person-row > person-info');
+          var $newGrantees = $blockNew.find('.person-row > person-info');
+
+          oldUserIds = extractPeopleIds($oldGrantees);
+          newUserIds = extractPeopleIds($newGrantees);
+
+          // now we have a list of old and new person IDs
+          highlightChanges($oldGrantees, newUserIds);
+          highlightChanges($newGrantees, oldUserIds);
+        }
+
+        /**
+         * Extract the IDs of the people that have a particular custom role
+         * granted to them.
+         *
+         * @param {jQuery} $grantees - a list of DOM elements representing the
+         *   grants of a particular custom role to people
+         * @return {Object} - the list of people IDs as object keys
+         */
+        function extractPeopleIds($grantees) {
+          var peopleIds = {};
+          $grantees.each(function (i, personInfo) {
+            var personId = $(personInfo).viewModel().personId;
+            peopleIds[personId] = true;
+          });
+          return peopleIds;
+        }
+
+        /**
+         * Highlight the changes in role assignments.
+         *
+         * @param {jQuery} $grantees - a list of DOM elements representing the
+         *   grants of a particular custom role to people
+         * @param {Object} comparisonIds - a set of people IDs representing a
+         *   referential list of grants of a particular custom role. The changes
+         *   in role assignments are calculated against this list.
+         */
+        function highlightChanges($grantees, comparisonIds) {
+          $grantees.each(function (i, grantee) {
+            var $grantee = $(grantee);
+            var personId = $grantee.viewModel().personId;
+
+            if (!(personId in comparisonIds)) {
+              $grantee.parent().addClass(HIGHLIGHT_CLASS);
+            }
+          });
+        }
+
+        /**
+         * Adjust the heights of two DOM elements to the higher one's height.
+         *
+         * @param {jQuery} $block - the first block element
+         * @param {jQuery} $block2 - the second block element
+         */
+        function equalizeHeights($block, $block2) {
+          var height = $block.outerHeight();
+          var height2 = $block2.outerHeight();
+
+          if (height > height2) {
+            $block2.outerHeight(height);
+          } else if (height < height2) {
+            $block.outerHeight(height2);
+          }
         }
       }
     }
