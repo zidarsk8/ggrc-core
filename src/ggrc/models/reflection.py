@@ -4,6 +4,9 @@
 """Utilties to deal with introspecting GGRC models for publishing, creation,
 and update from resource format representations, such as JSON."""
 
+from collections import defaultdict
+
+import flask
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc.utils.rules import get_mapping_rules, get_unmapping_rules
@@ -145,6 +148,7 @@ class AttributeInfo(object):
   CUSTOM_ATTR_PREFIX = "__custom__:"
   OBJECT_CUSTOM_ATTR_PREFIX = "__object_custom__:"
   SNAPSHOT_MAPPING_PREFIX = "__snapshot_mapping__:"
+  ALIASES_PREFIX = "__acl__"
 
   class Type(object):
     """Types of model attributes."""
@@ -152,6 +156,7 @@ class AttributeInfo(object):
     # pylint: disable=too-few-public-methods
     PROPERTY = "property"
     MAPPING = "mapping"
+    AC_ROLE = "mapping"
     SPECIAL_MAPPING = "special_mapping"
     CUSTOM = "custom"  # normal custom attribute
     OBJECT_CUSTOM = "object_custom"  # object level custom attribute
@@ -247,6 +252,31 @@ class AttributeInfo(object):
   @classmethod
   def gather_update_raw(cls, tgt_class):
     return cls.gather_attrs(tgt_class, ['_update_raw'])
+
+  @classmethod
+  def get_acl_definitions(cls, object_class):
+    from ggrc.access_control.role import AccessControlRole
+    from ggrc import db
+    if not hasattr(flask.g, "acl_role_names"):
+      flask.g.acl_role_names = defaultdict(set)
+      names_query = db.session.query(
+          AccessControlRole.object_type,
+          AccessControlRole.name,
+      )
+      for object_type, name in names_query:
+        flask.g.acl_role_names[object_type].add(name)
+
+    return {
+        "{}:{}".format(cls.ALIASES_PREFIX, name): {
+            "display_name": name,
+            "attr_name": name,
+            "mandatory": False,
+            "unique": False,
+            "description": "List of people with '{}' role".format(name),
+            "type": cls.Type.AC_ROLE,
+        }
+        for name in flask.g.acl_role_names[object_class.__name__]
+    }
 
   @classmethod
   def _generate_mapping_definition(cls, rules, prefix, display_name_tmpl):
@@ -411,6 +441,8 @@ class AttributeInfo(object):
       if isinstance(value, dict):
         definition.update(value)
       definitions[key] = definition
+
+    definitions.update(cls.get_acl_definitions(object_class))
 
     if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
       definitions.update(

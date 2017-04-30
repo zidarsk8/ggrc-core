@@ -195,15 +195,16 @@ class TestCase(BaseTestCase, object):
     dry_run = kwargs.get("dry_run", False)
     person = kwargs.get("person")
     with tempfile.NamedTemporaryFile(dir=cls.CSV_DIR, suffix=".csv") as tmp:
-      tmp.write('Object type,\n')
       for data in import_data:
+        tmp.write('Object type,\n')
         data = data.copy()
         object_type = data.pop("object_type")
         keys = data.keys()
         tmp.write('{0},{1}\n'.format(object_type, ','.join(keys)))
         line = ','.join(u"\"{}\"".format(data[k]) for k in keys)
         tmp.write(',{0}\n'.format(line))
-        tmp.seek(0)
+        tmp.write(',\n')
+      tmp.seek(0)
       return cls._import_file(os.path.basename(tmp.name), dry_run, person)
 
   @classmethod

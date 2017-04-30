@@ -1,10 +1,11 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from os.path import abspath, dirname, join
+import ddt
 
 from ggrc import converters
 from ggrc import models
+from ggrc.access_control import roleable
 from ggrc.converters import column_handlers
 from ggrc.converters import import_helper
 from ggrc.converters.import_helper import get_object_column_definitions
@@ -14,10 +15,8 @@ from ggrc_risks import models as r_models
 from ggrc_risk_assessments import models as ra_models
 from ggrc_workflows import models as wf_models
 from integration.ggrc import TestCase
+from integration.ggrc.models import factories
 from integration.ggrc.generator import ObjectGenerator
-
-THIS_ABS_PATH = abspath(dirname(__file__))
-CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')
 
 
 def get_mapping_names(class_name):
@@ -38,6 +37,28 @@ def get_unmapping_names(class_name):
   else:
     unmapping_names = None
   return unmapping_names
+
+
+@ddt.ddt
+class TestACLAttributeDefinitions(TestCase):
+  """Tests for ACL column definitions on all models."""
+
+  @ddt.data(*models.all_models.all_models)
+  def test_acl_definitions(self, model):
+    """Test ACL column definitions."""
+    factory = factories.AccessControlRoleFactory
+    factories.AccessControlRoleFactory(
+        object_type="Control",
+        read=True
+    )
+    role_names = {factory(object_type=model.__name__).name for _ in range(2)}
+    expected_names = set()
+    if issubclass(model, roleable.Roleable):
+      expected_names = role_names
+
+    definitions = get_object_column_definitions(model)
+    definition_names = {d["display_name"]: d for d in definitions.values()}
+    self.assertLessEqual(expected_names, set(definition_names.keys()))
 
 
 class TestCustomAttributesDefinitions(TestCase):

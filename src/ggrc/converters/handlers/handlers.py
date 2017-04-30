@@ -200,7 +200,10 @@ class StatusColumnHandler(ColumnHandler):
 
 
 class UserColumnHandler(ColumnHandler):
-  """ Handler for primary and secondary contacts """
+  """Handler for a single user fields.
+
+  Used for primary and secondary contacts.
+  """
 
   def get_users_list(self):
     users = set()
@@ -239,29 +242,33 @@ class UserColumnHandler(ColumnHandler):
     return self.value
 
 
-class OwnerColumnHandler(UserColumnHandler):
-  """Handler for object owners.
-
-  This handler can accept a new line separated list of owner emails.
-  """
+class UsersColumnHandler(UserColumnHandler):
+  """Handler for multi user fields."""
 
   def parse_item(self):
-    owners = set()
+    people = set()
     email_lines = self.raw_value.splitlines()
     owner_emails = filter(unicode.strip, email_lines)  # noqa
     for raw_line in owner_emails:
       email = raw_line.strip().lower()
       person = self.get_person(email)
       if person:
-        owners.add(person)
+        people.add(person)
       else:
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
-    if not owners:
+    if not people and self.mandatory:
       self.add_warning(errors.OWNER_MISSING, column_name=self.display_name)
-      owners.add(get_current_user())
+      people.add(get_current_user())
 
-    return list(owners)
+    return list(people)
+
+
+class OwnerColumnHandler(UsersColumnHandler):
+  """Handler for object owners.
+
+  This handler can accept a new line separated list of owner emails.
+  """
 
   def set_obj_attr(self):
     try:
