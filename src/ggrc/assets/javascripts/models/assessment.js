@@ -19,6 +19,7 @@
       'inScopeObjects'
     ],
     is_custom_attributable: true,
+    isRoleable: true,
     defaults: {
       status: 'Not Started',
       send_by_default: true,  // notifications when a comment is added
