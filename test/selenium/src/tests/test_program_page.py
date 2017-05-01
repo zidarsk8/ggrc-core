@@ -64,10 +64,6 @@ class TestProgramPage(base.Test):
             program_info_page.description_entered.text)
     assert modal.ui_notes.text == program_info_page.notes_entered.text
     assert modal.ui_code.text == program_info_page.code_entered.text
-    assert (program_info_page.primary_contact_entered.text in
-            modal.ui_primary_contact.text)
-    assert (program_info_page.secondary_contact_entered.text in
-            modal.ui_secondary_contact.text)
     assert (modal.ui_program_url.text ==
             program_info_page.program_url_entered.text)
     assert (modal.ui_reference_url.text ==
@@ -109,10 +105,6 @@ class TestProgramPage(base.Test):
     assert (modal.ui_description.text ==
             updated_program_info_page.description_entered.text)
     assert modal.ui_notes.text == updated_program_info_page.notes_entered.text
-    assert (updated_program_info_page.primary_contact_entered.text in
-            modal.ui_primary_contact.text)
-    assert (updated_program_info_page.secondary_contact_entered.text in
-            modal.ui_secondary_contact.text)
     assert (modal.ui_program_url.text ==
             updated_program_info_page.program_url_entered.text)
     assert (modal.ui_reference_url.text ==

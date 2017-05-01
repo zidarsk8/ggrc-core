@@ -49,12 +49,6 @@ class ProgramsModal(BaseModal):
     self.ui_state = base.Dropdown(self._driver, self._locators.UI_STATE)
     self.ui_show_optional_fields = base.Toggle(
         self._driver, self._locators.BUTTON_SHOW_ALL_OPTIONAL_FIELDS)
-    self.ui_primary_contact = base.TextFilterDropdown(
-        self._driver, self._locators.UI_PRIMARY_CONTACT,
-        self._locators.DROPDOWN_CONTACT)
-    self.ui_secondary_contact = base.TextFilterDropdown(
-        self._driver, self._locators.UI_SECONDARY_CONTACT,
-        self._locators.DROPDOWN_CONTACT)
     self.ui_program_url = base.TextInputField(
         self._driver, self._locators.UI_PROGRAM_URL)
     self.ui_reference_url = base.TextInputField(
@@ -95,16 +89,6 @@ class ProgramsModal(BaseModal):
   def toggle_optional_fields(self):
     """Show or hide optional fields."""
     raise NotImplementedError
-
-  def filter_and_select_primary_contact(self, text):
-    """Enter text into primary contact element."""
-    # pylint: disable=invalid-name
-    self.ui_primary_contact.filter_and_select_el_by_text(text)
-
-  def filter_and_select_secondary_contact(self, text):
-    """Enter text into secondary contact element."""
-    # pylint: disable=invalid-name
-    self.ui_secondary_contact.filter_and_select_el_by_text(text)
 
   def enter_program_url(self, url):
     """Enter program url for this program object.
@@ -150,10 +134,6 @@ class ControlsModal(BaseModal):
     self.fraud_related = base.Label(driver, self._locators.FRAUD_RELATED)
     self.frequency = base.Label(driver, self._locators.FREQUENCY)
     self.assertions = base.Label(driver, self._locators.ASSERTIONS)
-    self.principal_assessor = base.Label(
-        driver, self._locators.PRINCIPAL_ASSESSOR)
-    self.secondary_assessor = base.Label(
-        driver, self._locators.SECONDARY_ASSESSOR)
     self.admin = base.Label(driver, self._locators.ADMIN)
     self.control_url = base.Label(driver, self._locators.CONTROL_URL)
     self.reference_url = base.Label(driver, self._locators.REFERENCE_URL)

@@ -312,8 +312,6 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   FREQUENCY = "Frequency"
   ASSERTIONS = "Assertions"
   CATEGORIES = "Categories"
-  PRINCIPAL_ASSIGNEE = roles.PRINCIPAL_ASSIGNEE
-  SECONDARY_ASSIGNEE = roles.SECONDARY_ASSIGNEE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, ADMIN,
       CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE)
@@ -343,8 +341,6 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonProgram.PROGRAM)
-  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
-  SECONDARY_CONTACT = roles.SECONDARY_CONTACT
   REVIEW_STATE = "Review State"
   MANAGER = CommonProgram.MANAGER
   URL = Base.URL
@@ -353,7 +349,7 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   STOP_DATE = Base.STOP_DATE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.STATE, PRIMARY_CONTACT, MANAGER)
+      CommonModalSetVisibleFields.STATE, MANAGER)
 
 
 class MappingStatusAttrs(namedtuple('_MappingStatusAttrs',
