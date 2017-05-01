@@ -1,23 +1,41 @@
 <div class="flex-box flex-box-single">
   {{#each selectedColumns}}
     <div class="attr">
-      {{#if_equals attr_type 'custom'}}
-        {{#get_custom_attr_value this instance}}
-          {{#using person=object}}
-            {{>'/static/mustache/people/popover.mustache'}}
-          {{/using}}
-        {{/get_custom_attr_value}}
-      {{else}}
-        {{#instance}}
-          {{#if_equals attr_name 'title'}}
-            <span class="title-attr">
-              {{title}}
-            </span>
-          {{else}}
-            {{> attrTemplate}}
-          {{/if_equals}}
-        {{/instance}}
-      {{/if_equals}}
+      {{#switch attr_type}}
+        {{#case 'custom'}}
+          {{#get_custom_attr_value this instance}}
+            {{#using person=object}}
+              {{>'/static/mustache/people/popover.mustache'}}
+            {{/using}}
+          {{/get_custom_attr_value}}
+        {{/case}}
+
+        {{#case 'role'}}
+          <div class="roles">
+            {{#peopleWithRole instance attr_name}}
+              {{#each peopleIds}}
+                {{^if_less @index 1}},{{/if}}
+                <person-info
+                  person-id="{{.}}"
+                  editable="'false'"
+                ></person-info>
+              {{/each}}
+            {{/peopleWithRole}}
+          </div>
+        {{/case}}
+
+        {{#case 'default'}}
+          {{#instance}}
+            {{#if_equals attr_name 'title'}}
+              <span class="title-attr">
+                {{title}}
+              </span>
+            {{else}}
+              {{> attrTemplate}}
+            {{/if_equals}}
+          {{/instance}}
+        {{/case}}
+      {{/switch}}
     </div>
   {{/each}}
 </div>

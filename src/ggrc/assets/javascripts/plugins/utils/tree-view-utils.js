@@ -109,6 +109,7 @@
           return a.order - b.order;
         });
 
+      // add custom attributes information
       var customAttrs = disableConfiguration ?
         [] :
         GGRC.custom_attr_defs
@@ -129,8 +130,22 @@
               attr_type: 'custom'
             };
           });
-
       var allAttrs = attrs.concat(customAttrs);
+
+      // add custom roles information
+      var modelRoles = _.filter(GGRC.access_control_roles, {
+        object_type: modelType
+      });
+      var roleAttrs = modelRoles.map(function (role) {
+        return {
+          attr_title: role.name,
+          attr_name: role.name,
+          attr_sort_field: role.name,
+          display_status: false,
+          attr_type: 'role'
+        };
+      });
+      allAttrs = allAttrs.concat(roleAttrs);
 
       if (disableConfiguration) {
         return {

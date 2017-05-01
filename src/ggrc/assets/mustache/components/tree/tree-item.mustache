@@ -15,62 +15,96 @@
     <tree-item-status-for-workflow {instance}="instance"></tree-item-status-for-workflow>
     <div class="flex-box selectable-attrs width-100" ($click)="select($element)">
         {{#selectedColumns}}
+          {{! add alias because "this" is changed inside the switch-case block}}
+          {{#add_to_current_scope thisColumn=this}}
           <div class="flex-box attr-cell">
-            {{#if_equals attr_type 'custom'}}
-              <div class="custom attr-content">
-                {{#get_custom_attr_value this instance}}
-                {{! because the object can currently only be a
-                    person there is no need to switch }}
-                  {{#using person=object}}
-                    {{>'/static/mustache/people/popover.mustache'}}
-                  {{/using}}
-                {{/get_custom_attr_value}}
-              </div>
-            {{else}}
-              <div class="owner attr-content">
-                {{#instance}}
-                  {{#switch type}}
-                    {{#case 'Audit'}}
-                      {{> '/static/mustache/audits/tree-item-attr.mustache'}}
-                    {{/case}}
-                    {{#case 'Control'}}
-                      {{> '/static/mustache/controls/tree-item-attr.mustache'}}
-                    {{/case}}
-                    {{#case 'Directive'}}
-                      {{> '/static/mustache/directives/tree-item-attr.mustache'}}
-                    {{/case}}
-                    {{#case 'Objective'}}
-                      {{> '/static/mustache/objectives/tree-item-attr.mustache'}}
-                    {{/case}}
-                    {{#case 'Person'}}
-                      {{> '/static/mustache/people/tree-item-attr.mustache'}}
-                    {{/case}}
-                    {{#case 'Program'}}
-                      {{> '/static/mustache/programs/tree-item-attr.mustache'}}
-                    {{/case}}
-                    {{#case 'Section'}}
-                      {{> '/static/mustache/sections/tree-item-attr.mustache'}}
-                    {{/case}}
-                    {{#case 'RiskAssessment'}}
-                      {{> '/static/mustache/risk_assessments/tree-item-attr.mustache'}}
-                    {{/case}}
-                    {{#case 'Workflow'}}
-                      {{> '/static/mustache/workflows/tree-item-attr.mustache'}}
-                    {{/case}}
-                    {{#case 'CycleTaskGroupObjectTask'}}
-                      {{> '/static/mustache/cycle_task_group_object_tasks/tree-item-attr.mustache'}}
-                    {{/case}}
-                    {{#case 'TaskGroup'}}
-                      {{> '/static/mustache/task_groups/tree-item-attr.mustache'}}
-                    {{/case}}
-                    {{#default}}
-                      {{> '/static/mustache/base_objects/tree-item-attr.mustache'}}
-                    {{/default}}
-                  {{/switch}}
-                {{/instance}}
-              </div>
-            {{/if_equals}}
+            {{#switch attr_type}}
+              {{#case 'custom'}}
+                <div class="custom attr-content">
+                  {{#get_custom_attr_value this instance}}
+                  {{! because the object can currently only be a
+                      person there is no need to switch }}
+                    {{#using person=object}}
+                      {{>'/static/mustache/people/popover.mustache'}}
+                    {{/using}}
+                  {{/get_custom_attr_value}}
+                </div>
+              {{/case}}
+
+              {{#case 'role'}}
+                <div class="roles attr-content">
+                  {{#peopleWithRole instance attr_name}}
+                    {{! For the time being, until the UI is clarified, we show
+                        only the first two people with a particular role, and
+                        an ellipsis if truncating was needed.
+                    }}
+                    {{#each peopleIds}}
+                      {{#if_less @index 2}}
+                        <person-info
+                          person-id="{{.}}"
+                          editable="'false'"
+                        ></person-info>
+                      {{/if_less}}
+                    {{/each}}
+
+                    {{#if_less 2 peopleIds.length}}
+                      <span
+                        class="list-truncated"
+                        title="People with this role: {{peopleIds.length}}"
+                        >&hellip;</span>
+                    {{/if_less}}
+
+                  {{/peopleWithRole}}
+                </div>
+              {{/case}}
+
+              {{#case 'default'}}
+                <div class="owner attr-content">
+                  {{#instance}}
+                    {{#switch type}}
+                      {{#case 'Audit'}}
+                        {{> '/static/mustache/audits/tree-item-attr.mustache'}}
+                      {{/case}}
+                      {{#case 'Control'}}
+                        {{> '/static/mustache/controls/tree-item-attr.mustache'}}
+                      {{/case}}
+                      {{#case 'Directive'}}
+                        {{> '/static/mustache/directives/tree-item-attr.mustache'}}
+                      {{/case}}
+                      {{#case 'Objective'}}
+                        {{> '/static/mustache/objectives/tree-item-attr.mustache'}}
+                      {{/case}}
+                      {{#case 'Person'}}
+                        {{> '/static/mustache/people/tree-item-attr.mustache'}}
+                      {{/case}}
+                      {{#case 'Program'}}
+                        {{> '/static/mustache/programs/tree-item-attr.mustache'}}
+                      {{/case}}
+                      {{#case 'Section'}}
+                        {{> '/static/mustache/sections/tree-item-attr.mustache'}}
+                      {{/case}}
+                      {{#case 'RiskAssessment'}}
+                        {{> '/static/mustache/risk_assessments/tree-item-attr.mustache'}}
+                      {{/case}}
+                      {{#case 'Workflow'}}
+                        {{> '/static/mustache/workflows/tree-item-attr.mustache'}}
+                      {{/case}}
+                      {{#case 'CycleTaskGroupObjectTask'}}
+                        {{> '/static/mustache/cycle_task_group_object_tasks/tree-item-attr.mustache'}}
+                      {{/case}}
+                      {{#case 'TaskGroup'}}
+                        {{> '/static/mustache/task_groups/tree-item-attr.mustache'}}
+                      {{/case}}
+                      {{#default}}
+                        {{> '/static/mustache/base_objects/tree-item-attr.mustache'}}
+                      {{/default}}
+                    {{/switch}}
+                  {{/instance}}
+                </div>
+              {{/case}}
+           {{/switch}}
           </div>
+          {{/add_to_current_scope}}
         {{/selectedColumns}}
     </div>
 

@@ -188,6 +188,24 @@ tree-item {
             margin-bottom: 0;
           }
         }
+
+        &.roles {
+          display: block;
+          max-height: 100%;
+          width: 100%;
+          padding: 0 10px;
+          .person {
+            height: 20px;
+            max-width: 1px;  // FIXME: dirty fix for flex box overstretching
+            overflow: visible;
+            white-space: nowrap;
+          }
+          .list-truncated {
+            display: inline-block;
+            width: 100%;
+            cursor: default;
+          }
+        }
       }
     }
   }
