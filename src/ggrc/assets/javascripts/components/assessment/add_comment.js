@@ -9,11 +9,11 @@
   var tag = 'assessment-add-comment';
   var template = can.view(GGRC.mustache_path +
     '/components/assessment/add_comment.mustache');
-  var defaultState = new can.Map({
+  var defaultState = {
     open: false,
     save: false,
     controls: true
-  });
+  };
   var types = {
     related_creators: 'creator',
     related_verifiers: 'verifier',
@@ -52,8 +52,19 @@
     tag: tag,
     template: template,
     viewModel: {
+      define: {
+        instance: {
+          value: function () {
+            return GGRC.page_instance();
+          }
+        },
+        state: {
+          value: function () {
+            return defaultState;
+          }
+        }
+      },
       caIds: null,
-      instance: null,
       isSaving: false,
       isEmpty: true,
       clean: false,
@@ -115,14 +126,9 @@
       }
     },
     events: {
-      init: function () {
-        var scope = this.scope;
-        scope.attr('instance', scope.attr('instance') || GGRC.page_instance());
-        scope.attr('state', scope.attr('state') || defaultState);
-      },
       '{viewModel.state} save': function (scope, ev, val) {
         if (val) {
-          this.scope.saveComment();
+          this.viewModel.saveComment();
         }
       }
     }

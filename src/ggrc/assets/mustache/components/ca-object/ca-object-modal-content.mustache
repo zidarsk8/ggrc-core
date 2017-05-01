@@ -2,7 +2,7 @@
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<form class="simple-modal__body attachment-modal__body">
+<form class="simple-modal__body">
     <div class="attachment-modal__field">
         <h6 class="attachment-modal__field-title">{{content.title}}</h6>
         <div class="attachment-modal__field-value">
@@ -13,7 +13,7 @@
           {{/if}}
         </div>
     </div>
-    <div class="attachment-modal__controls">
+    <div class="simple-modal__controls">
       {{#if comment}}
           <assessment-add-comment {instance}="instance" {(is-empty)}="isEmpty" {(state)}="state" {ca-ids}="caIds"
                                   comment-place-holder="Enter comment"></assessment-add-comment>

@@ -17,8 +17,15 @@
     tag: tag,
     template: template,
     viewModel: {
+      define: {
+        noItemsText: {
+          type: 'string',
+          value: ''
+        }
+      },
       title: '@',
-      tooltip: '@'
+      tooltip: '@',
+      limit: 5
     }
   });
 })(window.GGRC, window.can);

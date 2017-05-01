@@ -4,15 +4,14 @@
 }}
 
 <div class="tree-filter__expression-holder width-100">
-  <input type="text" class="tree-filter__input width-100" {($value)}="filter" ($change)="onChange($element)">
+  <input type="text" class="tree-filter__input width-100" {($value)}="filter">
   <span class="tree-filter_is-expression {{#if isExpression}}valid{{/if}}">
-    <i class="fa fa-check-circle{{^if isExpression}}-o{{/if}}"></i>
+    <i class="fa fa-check-circle{{#unless isExpression}}-o{{/unless}}"></i>
   </span>
 </div>
-
 <div class="flex-box tree-filter__actions">
-  <input type="submit" class="btn btn-small btn-info" value="Filter" ($click)="submit">
-  <input type="reset" class="btn btn-small btn-white tree-filter__button__reset" value="Reset" ($click)="reset($element)">
+  <button type="submit" class="btn btn-small btn-lightBlue" ($click)="submit()">Filter</button>
+  <button type="reset" class="btn btn-small btn-white" ($click)="reset()">Reset</button>
 
   <a id="page-help" class="popover-template" data-get-template="help/filters_helper_content" href="javascript://">
     <i class="fa fa-question-circle"></i>

@@ -105,11 +105,13 @@ class Widget(base.Widget):
     Return: lib.page.widget.info.Widget
     """
     # pylint: disable=not-callable
+    selenium_utils.wait_for_js_to_load(self._driver)
+    self._set_members_listed()
     try:
       member = self.members_listed[num]
       # wait for the listed items animation to stop
       selenium_utils.wait_until_stops_moving(member)
-      member.click()
+      selenium_utils.click_via_js(self._driver, member)
       # wait for the info pane animation to stop
       info_pane = selenium_utils.get_when_clickable(
           self._driver, locator.ObjectWidget.INFO_PANE)

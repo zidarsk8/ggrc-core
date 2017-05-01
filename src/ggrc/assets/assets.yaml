@@ -216,7 +216,7 @@ dashboard-js-files:
   - components/tabs/tab-panel.js
   - components/assessment_attributes.js
   - components/lazy_open_close.js
-  - components/object_history/object_history.js
+  - components/revision-log/revision-log.js
   - components/unified-mapper/mapper.js
   - components/unified-mapper/mapper-toolbar.js
   - components/unified-mapper/mapper-filter.js
@@ -292,14 +292,16 @@ dashboard-js-files:
   - components/auto-save-form/field-views/checkbox-form-field-view.js
   - components/auto-save-form/field-views/date-form-field-view.js
   - components/auto-save-form/field-views/person-form-field-view.js
-  #- d3.v2.js
-  #- related_graph.js
+  - components/action-toolbar/action-toolbar.js
+  - components/action-toolbar-control/action-toolbar-control.js
+  - components/unmap-button/unmap-button.js
 
 app-init-files:
   - apps/dashboard.js
   - dashboard.js
 
 dashboard-js-template-files:
+  - components/unmap-button/unmap-button.mustache
   - components/info-pane/info-pane-footer.mustache
   - components/tabs/tab-container.mustache
   - components/tabs/tab-panel.mustache
@@ -465,7 +467,7 @@ dashboard-js-template-files:
   - components/assessment_templates/assessment_templates.mustache
   - components/dropdown/dropdown.mustache
   - components/dropdown/multiselect_dropdown.mustache
-  - components/object_history/object_history.mustache
+  - components/revision-log/revision-log.mustache
   - components/person/person.mustache
   - components/spinner/spinner.mustache
   - components/rich_text/rich_text.mustache

@@ -31,11 +31,9 @@
                            data-original-title="Respond to assessment here. Use comments on the right for free text responses."></i>
                     </div>
                     <div class="assessment-controls__extra-controls">
-                        <assessment-attachments-list class="assesment-attachment-list attachments-list-control"
-                                                     title="Evidence"
-                                                     tooltip="You can upload up to 10 files in a single batch">
+                        <assessment-attachments-list tooltip="You can upload up to 10 files in a single batch">
                         </assessment-attachments-list>
-                        <assessment-urls-list></assessment-urls-list>
+                        <assessment-urls-list {mapped-items}="documents"></assessment-urls-list>
                     </div>
                     <auto-save-form {fields}="formFields"
                                     {edit-mode}="editMode"
