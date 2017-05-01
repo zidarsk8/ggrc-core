@@ -75,8 +75,7 @@ def reindex_by_relationship(relationship):
 
 
 class Assessment(Roleable, statusable.Statusable, AuditRelationship,
-                 AutoStatusChangeable,
-                 Assignable, HasObjectState, TestPlanned,
+                 AutoStatusChangeable, Assignable, HasObjectState, TestPlanned,
                  CustomAttributable, EvidenceURL, Commentable,
                  Personable, reminderable.Reminderable, Timeboxed, Relatable,
                  WithSimilarityScore, FinishedDate, VerifiedDate,
@@ -175,13 +174,11 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
     )
 
   _tracked_attrs = {
-      'contact_id',
       'description',
       'design',
       'notes',
       'operationally',
       'reference_url',
-      'secondary_contact_id',
       'test_plan',
       'title',
       'url',

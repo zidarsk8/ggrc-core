@@ -99,9 +99,6 @@ people-list {
   > li {
     margin-bottom: 10px;
     @extend %clearfix;
-    &:last-child {
-      margin-bottom: 0;
-    }
   }
   &.dates {
     > li {
@@ -119,6 +116,10 @@ people-list {
         }
       }
     }
+  }
+  i.fa {
+    color: #4caf50;
+    opacity: 1;
   }
   i {
     @include opacity(.6);

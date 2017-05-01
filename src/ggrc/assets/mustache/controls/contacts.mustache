@@ -46,71 +46,14 @@
       {{/if}}
     {{/if}}
     </p>
-
-    {{^if is_program}}
-      <access-control-list
-          instance="."
-          autosave="true"
-          top-wrapper-class="'span12'">
-      </access-control-list>
-    {{/if}}
+    <access-control-list
+        instance="."
+        autosave="true"
+        top-wrapper-class="'span12'">
+    </access-control-list>
   </div>
-
-  <div class="span6">
-    {{#using person=contact}}
-      <div class="bottom-space">
-        <h6>Primary Contact</h6>
-        <p data-test-id="text_primary_contact_696de7244b84" class="oneline">
-          {{#if person}}
-            {{>'/static/mustache/people/popover.mustache'}}
-          {{else}}
-            <span data-test-id="text_primary_contact_696de7244b84" class="empty-message">None</span>
-          {{/if}}
-        </p>
-      </div>
-    {{/using}}
-    {{#using assessor=instance.principal_assessor}}
-      <div class="bottom-space">
-        <h6>Principal Assignee</h6>
-        {{#if instance.principal_assessor}}
-          <p class="oneline">
-            {{{render '/static/mustache/people/popover.mustache' person=assessor}}}
-          </p>
-        {{else}}
-          <span class="empty-message">None</span>
-        {{/if}}
-      </div>
-    {{/using}}
-    {{#using person=secondary_contact}}
-      <div class="bottom-space">
-        <h6>Secondary Contact</h6>
-        <p data-test-id="text_secondary_contact_696de7244b84" class="oneline">
-          {{#if person}}
-            {{>'/static/mustache/people/popover.mustache'}}
-          {{else}}
-            <span data-test-id="text_secondary_contact_696de7244b84" class="empty-message">None</span>
-          {{/if}}
-        </p>
-      </div>
-    {{/using}}
-    {{#using assessor=instance.secondary_assessor}}
-      <!--<div class="bottom-space">-->
-      <div class="bottom-space">
-        <h6>Secondary Assignee</h6>
-        {{#if instance.secondary_assessor}}
-          <p class="oneline">
-            {{{render '/static/mustache/people/popover.mustache' person=assessor}}}
-          </p>
-        {{else}}
-          <span class="empty-message">None</span>
-        {{/if}}
-      </div>
-    {{/using}}
-
-    <div>
-      {{>'/static/mustache/controls/urls.mustache'}}
-    </div>
-
+  <div>
+    {{>'/static/mustache/controls/urls.mustache'}}
   </div>
 </div>
 

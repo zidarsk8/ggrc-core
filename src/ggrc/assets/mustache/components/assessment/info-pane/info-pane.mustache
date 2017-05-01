@@ -84,6 +84,12 @@
                         </collapsible-panel>
                         <collapsible-panel title-text="People" title-icon="fa-users" class="details-item">
                             <people-list {instance}="instance" editable="true" disable-title="true"></people-list>
+                            <access-control-list
+                                instance="instance"
+                                autosave="true"
+                                top-wrapper-class="'body-inner'"
+                                role-block-class="'span3'">
+                            </access-control-list>
                         </collapsible-panel>
                         <collapsible-panel title-text="Dates" title-icon="fa-calendar" class="details-item">
                           {{> '/static/mustache/assessments/dates_list.mustache'}}

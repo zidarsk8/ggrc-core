@@ -23,10 +23,6 @@ WORKFLOW_MANAGER = "Workflow Manager"
 OBJECT_OWNERS = "Object Owners"
 AUDIT_LEAD = "Audit Lead"
 AUDITORS = "Auditors"
-PRINCIPAL_ASSIGNEE = "Principal Assignee"
-SECONDARY_ASSIGNEE = "Secondary Assignee"
-PRIMARY_CONTACT = "Primary Contact"
-SECONDARY_CONTACT = "Secondary Contact"
 
 # user names
 DEFAULT_USER = "Example User"

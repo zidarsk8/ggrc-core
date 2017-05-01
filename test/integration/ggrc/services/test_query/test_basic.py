@@ -432,33 +432,6 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
                key=lambda a: program_id_title[a["program"]["id"]]),
     )
 
-  def test_order_by_related_person(self):
-    """Results get sorted by name or email of related Person object."""
-    clauses_person = self._get_first_result_set(
-        self._make_query_dict("Clause",
-                              order_by=[{"name": "contact"}, {"name": "id"}]),
-        "Clause", "values",
-    )
-
-    clauses_unsorted = self._get_first_result_set(
-        self._make_query_dict("Clause"),
-        "Clause", "values",
-    )
-
-    # get names and emails from people to check ordering
-    people = self._get_first_result_set(
-        self._make_query_dict("Person"),
-        "Person", "values",
-    )
-    person_id_name = {person["id"]: (person["name"], person["email"])
-                      for person in people}
-
-    self.assertListEqual(
-        clauses_person,
-        sorted(sorted(clauses_unsorted, key=itemgetter("id")),
-               key=lambda c: person_id_name[c["contact"]["id"]]),
-    )
-
   def test_query_order_by_owners(self):
     """Results get sorted by name or email of the (first) owner."""
     # TODO: the test data set lacks objects with several owners
@@ -603,15 +576,15 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
 
   def test_is_empty_query_by_native_attrs(self):
     """Filter by navive object attrs with 'is empty' operator."""
-    objectives = self._get_first_result_set(
-        self._make_query_dict("Objective",
-                              expression=["contact", "is", "empty"]),
-        "Objective",
+    programs = self._get_first_result_set(
+        self._make_query_dict("Program",
+                              expression=["program url", "is", "empty"]),
+        "Program",
     )
-    self.assertEqual(objectives["count"], 2)
-    self.assertEqual(set([u'Startupsum 178', u'Startupsum 179']),
-                     set([objective["title"] for objective
-                          in objectives["values"]]))
+    self.assertEqual(programs["count"], 1)
+    self.assertEqual(set([u'Cat ipsum 1']),
+                     set([program["title"] for program
+                          in programs["values"]]))
 
 
 class TestQueryAssessmentCA(BaseQueryAPITestCase):

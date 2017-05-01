@@ -57,7 +57,6 @@ class BaseWebUiService(object):
         fields.VERIFIED.upper(): "verified",
         fields.LAST_UPDATED.upper(): "updated_at",
         fields.AUDIT_LEAD.upper(): "contact",
-        fields.PRIMARY_CONTACT.upper(): "contact",
         fields.MANAGER.upper(): "manager"
     }
 

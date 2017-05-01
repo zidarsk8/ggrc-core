@@ -3,6 +3,7 @@
 
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
+from ggrc.access_control.roleable import Roleable
 from ggrc.models.context import HasOwnContext
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
@@ -16,7 +17,7 @@ from ggrc.models.track_object_state import HasObjectState
 
 
 class Program(HasObjectState, CustomAttributable,
-              Personable, Relatable, HasOwnContext, Timeboxed,
+              Roleable, Personable, Relatable, HasOwnContext, Timeboxed,
               Ownable, BusinessObject, Indexed, db.Model):
   __tablename__ = 'programs'
 

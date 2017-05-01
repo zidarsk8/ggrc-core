@@ -263,13 +263,6 @@ class ModalCreateNewProgram(BaseModalCreateNew):
               '[data-test-id="new_program_dropdown_state_036a1fa6"]')
   BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
   BUTTON_SHOW_ALL_OPTIONAL_FIELDS = (By.ID, "formHide")
-  UI_PRIMARY_CONTACT = (
-      By.CSS_SELECTOR,
-      '[data-test-id="new_program_field_primary_contact_86160053"]')
-  DROPDOWN_CONTACT = (By.CSS_SELECTOR, '.ui-menu-item')
-  UI_SECONDARY_CONTACT = (
-      By.CSS_SELECTOR,
-      '[data-test-id="new_program_field_secondary_contact_86160053"]')
   UI_PROGRAM_URL = (
       By.CSS_SELECTOR,
       '[data-test-id="new_program_field_program_url_86160053"]')
@@ -376,27 +369,9 @@ class ModalCreateNewControl(BaseModalCreateNew):
       By.CSS_SELECTOR, '[data-test-id="control_assertions_5d8b7f7a"] label')
   SELECTABLE_ASSERTIONS = (
       By.CSS_SELECTOR, '[data-test-id="control_assertions_5d8b7f7a"] select')
-  PRINCIPAL_ASSESSOR = (
-      By.CSS_SELECTOR,
-      '[data-test-id="control_primary_assessor_f7379330"] label')
-  SECONDARY_ASSESSOR = (
-      By.CSS_SELECTOR,
-      '[data-test-id="control_secondary_assessor_b9439af6"] label')
   ADMIN = (
       By.CSS_SELECTOR, '[data-test-id="control_owner_587d12d6"] label')
   BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
-  PRIMARY_CONTACT = (
-      By.CSS_SELECTOR, '[data-test-id="control_contacts_8bd3d8c7"] '
-                       '.row-fluid:nth-child(1) label')
-  UI_PRIMARY_CONTACT = (
-      By.CSS_SELECTOR, '[data-test-id='
-                       '"new_program_field_primary_contact_86160053"]')
-  SECONDARY_CONTACT = (
-      By.CSS_SELECTOR, '[data-test-id="control_contacts_8bd3d8c7"] '
-                       '.row-fluid:nth-child(2) label')
-  UI_SECONDARY_CONTACT = (
-      By.CSS_SELECTOR,
-      '[data-test-id="new_program_field_secondary_contact_86160053"]')
   CONTROL_URL = (
       By.CSS_SELECTOR, '[data-test-id="control_control_url-label_c4038873"]')
   UI_CONTROL_URL = (
@@ -662,21 +637,6 @@ class WidgetInfoProgram(CommonWidgetInfo):
   MANAGER_ENTERED = (By.CSS_SELECTOR,
                      '{} [data-test-id="title_manager_7a906d2e"] '
                      '[data-test-id="text_manager_7a906d2e"]'.format(WIDGET))
-  PRIMARY_CONTACT = (By.CSS_SELECTOR,
-                     '{} [data-test-id="title_primary_contact_696de7244b84"] '
-                     'h6'.format(WIDGET))
-  PRIMARY_CONTACT_ENTERED = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="text_primary_contact_696de7244b84"] '
-      '[data-test-id="text_manager_7a906d2e"]'.format(WIDGET))
-  SECONDARY_CONTACT = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_contacts_696de7244b84"] '
-      'h6:nth-child(2)'.format(WIDGET))
-  SECONDARY_CONTACT_ENTERED = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="text_secondary_contact_696de7244b84"] '
-      '[data-test-id="text_manager_7a906d2e"]'.format(WIDGET))
   PROGRAM_URL = (
       By.CSS_SELECTOR,
       '{} [data-test-id="title_program_url_aa7d1a65"] h6'.format(WIDGET))

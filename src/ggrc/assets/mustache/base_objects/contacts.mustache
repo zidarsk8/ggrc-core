@@ -47,38 +47,11 @@
       {{/if}}
     </p>
     {{/if}}
-
     <access-control-list
         instance="."
         autosave="true"
         top-wrapper-class="'span12'">
     </access-control-list>
   </div>
-
-    <div data-test-id="title_contacts_696de7244b84" class="span6">
-      {{#using person=contact}}
-      <div data-test-id="title_primary_contact_696de7244b84"
-           class="bottom-space">
-        <h6>Primary Contact</h6>
-        <p data-test-id="text_primary_contact_696de7244b84" class="oneline">
-          {{#if person}}
-            {{>'/static/mustache/people/popover.mustache'}}
-          {{else}}
-            <span data-test-id="text_primary_contact_696de7244b84" class="empty-message">None</span>
-          {{/if}}
-        </p>
-      </div>
-      {{/using}}
-      {{#using person=secondary_contact}}
-      <h6>Secondary Contact</h6>
-      <p data-test-id="text_secondary_contact_696de7244b84" class="oneline">
-        {{#if person}}
-          {{>'/static/mustache/people/popover.mustache'}}
-        {{else}}
-          <span data-test-id="text_secondary_contact_696de7244b84" class="empty-message">None</span>
-        {{/if}}
-      </p>
-      {{/using}}
-    </div>
 </div>
 {{/instance}}

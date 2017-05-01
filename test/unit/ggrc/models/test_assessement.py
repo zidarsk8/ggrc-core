@@ -42,9 +42,6 @@ class TestAssessmentMixins(test_mixins_base.TestMixinsBase):
         ('object', dict),
         ('status', attributes.InstrumentedAttribute),                    # Stateful       # noqa
         ('assignees', property),                                         # Assignable     # noqa
-        ('contact_id', attributes.InstrumentedAttribute),                # WithContact    # noqa
-        ('contact', attributes.InstrumentedAttribute),                   # WithContact    # noqa
-        ('secondary_contact', attributes.InstrumentedAttribute),         # WithContact    # noqa
         ('custom_attribute_values', attributes.InstrumentedAttribute),   # CustomAttrib.  # noqa
         ('description', attributes.InstrumentedAttribute),               # Described      # noqa
         ('end_date', attributes.InstrumentedAttribute),                  # Timeboxed      # noqa

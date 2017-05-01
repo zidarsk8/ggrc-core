@@ -84,8 +84,6 @@ class ModalNewPrograms(ModalInput):
         modal_create_new.SHORT_TITLE))
     modal.enter_notes(append_random_string(modal_create_new.SHORT_TITLE))
     modal.enter_code(append_random_string(modal_create_new.SHORT_TITLE))
-    modal.filter_and_select_primary_contact("example")
-    modal.filter_and_select_secondary_contact("example")
     modal.enter_program_url(prepend_random_string(
         modal_create_new.Programs.PROGRAM_URL))
     modal.enter_reference_url(prepend_random_string(
