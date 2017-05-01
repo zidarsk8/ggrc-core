@@ -109,6 +109,14 @@ tree-view {
   }
 }
 
+
+.tree-item__icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 8px;
+}
+
 tree-item {
   >.tree-item-wrapper {
     background-color: $white;
@@ -123,6 +131,15 @@ tree-item {
       box-shadow: 0 0 6px rgba(0,0,0,.16), 0 6px 12px rgba(0,0,0,.32);
       margin: 25px -20px;
     }
+  }
+
+  .tree-item__icon-status {
+    padding: 0;
+    margin: 0;
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    float: none;
   }
 
   .tree-item-content {

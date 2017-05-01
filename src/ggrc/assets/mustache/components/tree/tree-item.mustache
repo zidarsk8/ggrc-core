@@ -12,6 +12,7 @@
                        {child-models-list}="childModelsList"
                        {deep-limit}="limitDepthTree"
     ></tree-item-actions>
+    <tree-item-status-for-workflow {instance}="instance"></tree-item-status-for-workflow>
     <div class="flex-box selectable-attrs width-100" ($click)="select($element)">
         {{#selectedColumns}}
           <div class="flex-box attr-cell">
