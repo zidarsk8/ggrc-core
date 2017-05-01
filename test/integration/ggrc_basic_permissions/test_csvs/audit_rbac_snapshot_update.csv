@@ -1,5 +1,5 @@
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,
-Program,Code*,Title*,Description,Notes,Manager*,Editor,Reader,Effective Date,Stop Date,State,Primary Contact,Secondary Contact,Program URL,Reference URL,map:control,map:person
+Program,Code*,Title*,Description,Notes,Manager*,Editor,Reader,Effective Date,Stop Date,State,,,Program URL,Reference URL,map:control,map:person
 ,PMRBACPROGRAM-1,Program Manager Audit RBAC Test,,,"user@example.com
 creatorpm@test.com
 readerpm@test.com
@@ -10,7 +10,7 @@ Editorpe@test.com
 adminpe@test.com","creatorpr@test.com
 readerpr@test.com
 editorpr@test.com
-Adminpr@test.com",,,Draft,user@example.com,,,,PMRBACCONTROL-1,"creatorpm@test.com
+Adminpr@test.com",,,Draft,,,,,PMRBACCONTROL-1,"creatorpm@test.com
 readerpm@test.com
 editorpm@test.com
 adminpm@test.com

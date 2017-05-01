@@ -22,7 +22,6 @@ from ggrc.models.mixins import Notifiable
 from ggrc.models.mixins import TestPlanned
 from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import VerifiedDate
-from ggrc.models.mixins import WithContact
 from ggrc.models.mixins import reminderable
 from ggrc.models.mixins import statusable
 from ggrc.models.mixins.assignable import Assignable
@@ -76,8 +75,7 @@ def reindex_by_relationship(relationship):
 
 
 class Assessment(Roleable, statusable.Statusable, AuditRelationship,
-                 AutoStatusChangeable, WithContact,
-                 Assignable, HasObjectState, TestPlanned,
+                 AutoStatusChangeable, Assignable, HasObjectState, TestPlanned,
                  CustomAttributable, EvidenceURL, Commentable,
                  Personable, reminderable.Reminderable, Timeboxed, Relatable,
                  WithSimilarityScore, FinishedDate, VerifiedDate,
@@ -176,13 +174,11 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
     )
 
   _tracked_attrs = {
-      'contact_id',
       'description',
       'design',
       'notes',
       'operationally',
       'reference_url',
-      'secondary_contact_id',
       'test_plan',
       'title',
       'url',

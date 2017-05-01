@@ -42,12 +42,6 @@ class TestCAD(TestCase):
           definition_type="program",
       )
 
-    with self.assertRaises(ValueError):
-      models.CustomAttributeDefinition(
-          title="Secondary CONTACT",
-          definition_type="program",
-      )
-
     cad = models.CustomAttributeDefinition(
         title="non existing title",
         definition_type="program",

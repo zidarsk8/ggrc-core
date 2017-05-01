@@ -432,34 +432,6 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
                key=lambda a: program_id_title[a["program"]["id"]]),
     )
 
-  def test_order_by_related_person(self):
-    """Results get sorted by name or email of related Person object."""
-    programs_person = self._get_first_result_set(
-        self._make_query_dict("Program",
-                              order_by=[{"name": "contact"}, {"name": "id"}]),
-        "Program", "values",
-    )
-
-    programs_unsorted = self._get_first_result_set(
-        self._make_query_dict("Program"),
-        "Program", "values",
-    )
-
-    # get names and emails from people to check ordering
-    people = self._get_first_result_set(
-        self._make_query_dict("Person"),
-        "Person", "values",
-    )
-    person_id_name = {person["id"]: (person["name"], person["email"])
-                      for person in people}
-
-    self.assertListEqual(
-        programs_person,
-        sorted(sorted(programs_unsorted, key=itemgetter("id")), key=lambda c:
-               "" if not c or not c["contact"] else
-               person_id_name[c["contact"]["id"]]),
-    )
-
   def test_query_order_by_owners(self):
     """Results get sorted by name or email of the (first) owner."""
     # TODO: the test data set lacks objects with several owners
@@ -606,11 +578,11 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
     """Filter by navive object attrs with 'is empty' operator."""
     programs = self._get_first_result_set(
         self._make_query_dict("Program",
-                              expression=["contact", "is", "empty"]),
+                              expression=["program url", "is", "empty"]),
         "Program",
     )
-    self.assertEqual(programs["count"], 2)
-    self.assertEqual(set([u'Cat ipsum 1', u'Cat ipsum 2']),
+    self.assertEqual(programs["count"], 1)
+    self.assertEqual(set([u'Cat ipsum 1']),
                      set([program["title"] for program
                           in programs["values"]]))
 
