@@ -31,6 +31,7 @@
     destroy: 'DELETE /api/programs/{id}',
     mixins: ['contactable', 'unique_title', 'ca_update', 'timeboxed'],
     is_custom_attributable: true,
+    isRoleable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
       owners: 'CMS.Models.Person.stubs',

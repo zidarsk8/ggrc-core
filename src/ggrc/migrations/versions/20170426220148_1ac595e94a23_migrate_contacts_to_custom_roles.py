@@ -34,6 +34,7 @@ def upgrade():
       ('Process', 'systems'),
       ('Product', 'products'),
       ('Project', 'projects'),
+      ('Program', 'programs'),
       ('Regulation', 'directives'),
       ('Section', 'sections'),
       ('Standard', 'directives'),
