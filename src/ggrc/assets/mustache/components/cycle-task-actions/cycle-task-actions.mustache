@@ -11,7 +11,7 @@
         {{#is_allowed 'update' instance}}
           <div class="request-control">
             {{#if_equals instance.status 'Assigned'}}
-              <button class="btn btn-mini btn-info change-task-status {{cssClasses}}"
+              <button class="btn btn-mini btn-lightBlue change-task-status {{cssClasses}}"
                       ($click)="changeStatus"
                       data-openclose="open"
                       data-value="InProgress">Start</button>

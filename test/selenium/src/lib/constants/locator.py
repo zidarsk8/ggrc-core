@@ -40,7 +40,7 @@ class Common(object):
 
 class Login(object):
   """Locators for Login page."""
-  BUTTON_LOGIN = (By.CSS_SELECTOR, "a.btn.btn-large.btn-info")
+  BUTTON_LOGIN = (By.CSS_SELECTOR, "a.btn.btn-large.btn-lightBlue")
 
 
 class PageHeader(object):
