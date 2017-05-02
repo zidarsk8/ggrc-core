@@ -10,16 +10,11 @@
 
   GGRC.Components('unmapButton', {
     tag: 'unmap-button',
-    template: can.view(GGRC.mustache_path +
-      '/components/unmap-button/unmap-button.mustache'),
     viewModel: {
       mappingType: '@',
       objectProp: '@',
       destination: {},
       source: {},
-      onClick: function () {
-        this.unmapInstance();
-      },
       unmapInstance: function () {
         this.getMapping()
           .refresh()
@@ -27,6 +22,9 @@
             item.destroy()
               .then(function () {
                 this.attr('destination').dispatch('refreshInstance');
+                can.trigger('unmap', {params: [
+                  this.attr('source'),
+                  this.attr('destination')]});
               }.bind(this));
           }.bind(this));
       },
@@ -60,6 +58,11 @@
           })[0];
         mapping = mapping ? {id: mapping} : {};
         return new CMS.Models[type](mapping);
+      }
+    },
+    events: {
+      click: function () {
+        this.viewModel.unmapInstance();
       }
     }
   });

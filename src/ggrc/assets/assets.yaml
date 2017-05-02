@@ -302,7 +302,6 @@ app-init-files:
   - dashboard.js
 
 dashboard-js-template-files:
-  - components/unmap-button/unmap-button.mustache
   - components/info-pane/info-pane-footer.mustache
   - components/tabs/tab-container.mustache
   - components/tabs/tab-panel.mustache

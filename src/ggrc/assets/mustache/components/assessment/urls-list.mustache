@@ -10,7 +10,9 @@
         <div class="action-toolbar__controls">
         {{#is_allowed 'update' instance context='for'}}
           <action-toolbar-control>
-              <unmap-button {destination}="instance" {source}="document"></unmap-button>
+              <unmap-button {destination}="instance" {source}="document">
+                  <i class="fa fa-trash"></i>
+              </unmap-button>
           </action-toolbar-control>
         {{/is_allowed}}
         </div>

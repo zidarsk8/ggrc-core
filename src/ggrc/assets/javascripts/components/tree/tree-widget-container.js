@@ -480,7 +480,8 @@
         var parent = this.viewModel.attr('parent_instance');
         var infoPaneOptions = new can.Map({
           instance: instance,
-          parent_instance: parent
+          parent_instance: parent,
+          options: this.viewModel
         });
 
         ev.stopPropagation();
