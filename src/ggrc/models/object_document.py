@@ -23,6 +23,8 @@ class Documentable(object):
                                       ['title', 'link']),
       MultipleSubpropertyFullTextAttr('document_url', 'document_url',
                                       ['link']),
+      MultipleSubpropertyFullTextAttr('reference_url', 'reference_url',
+                                      ['link']),
   ]
 
   @declared_attr
@@ -54,6 +56,18 @@ class Documentable(object):
         ],
         else_=literal(False)
     )
+    documentable_type = case(
+        [
+            (
+                Relationship.destination_type == "Document",
+                Relationship.source_type
+            ),
+            (
+                Relationship.source_type == "Document",
+                Relationship.destination_type,
+            ),
+        ],
+    )
     return db.relationship(
         Document,
         # at first we check is documentable_id not False (it return id in fact)
@@ -66,7 +80,8 @@ class Documentable(object):
         # after that we can compare values.
         # this is required for saving logic consistancy
         # case return 2 types of values BOOL(false) and INT(id) not Null
-        secondaryjoin=lambda: and_(document_id, Document.id == document_id),
+        secondaryjoin=lambda: and_(document_id, Document.id == document_id,
+                                   documentable_type == cls.__name__),
         viewonly=True,
     )
 
@@ -79,6 +94,11 @@ class Documentable(object):
   def document_evidence(self):  # pylint: disable=no-self-argument
     return [d for d in self.documents
             if Document.ATTACHMENT == d.document_type]
+
+  @property
+  def reference_url(self):  # pylint: disable=no-self-argument
+    return [d for d in self.documents
+            if Document.REFERENCE_URL == d.document_type]
 
   @classmethod
   def eager_query(cls):
@@ -107,6 +127,7 @@ class Documentable(object):
     out_json = super(Documentable, self).log_json()
     out_json["document_url"] = self._log_docs(self.document_url)
     out_json["document_evidence"] = self._log_docs(self.document_evidence)
+    out_json["reference_url"] = self._log_docs(self.reference_url)
     return out_json
 
   @classmethod
@@ -134,6 +155,11 @@ PublicDocumentable = type(
                     "titles.\nExample:\n\nhttp://my.gdrive.link/file "
                     "Title of the evidence link"
                 ),
+            },
+            "reference_url": {
+                "display_name": "Reference URL",
+                "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
+                "description": "New line separated list of Reference URLs.",
             },
         }
     })

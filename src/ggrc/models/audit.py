@@ -8,7 +8,7 @@ from sqlalchemy import orm
 from ggrc import db
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (
-    Timeboxed, Noted, Described, Hyperlinked, WithContact,
+    Timeboxed, Noted, Described, WithContact,
     Titled, Slugged, CustomAttributable, Stateful
 )
 
@@ -27,7 +27,7 @@ from ggrc.fulltext.mixin import Indexed
 
 class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
             CustomAttributable, Personable, HasOwnContext, Relatable,
-            Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled,
+            Timeboxed, Noted, Described, WithContact, Titled,
             Stateful, Slugged, Indexed, db.Model):
   """Audit model."""
 
@@ -117,7 +117,6 @@ class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
       },
       "secondary_contact": None,
       "notes": None,
-      "url": None,
       "reference_url": None,
       "archived": {
           "display_name": "Archived",
