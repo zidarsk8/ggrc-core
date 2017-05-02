@@ -85,12 +85,17 @@ can.Control('CMS.Controllers.InfoPin', {
     var instance = opts.attr('instance');
     var parentInstance = opts.attr('parent_instance');
     var options = this.findOptions(el);
+    var populatedOpts = opts.attr('options');
     var view = this.findView(instance);
     var panelHeight = this.getPinHeight(maximizedState);
     var confirmEdit = instance.class.confirmEditModal ?
       instance.class.confirmEditModal : {};
     var currentPanelHeight;
     instance.attr('view', view);
+
+    if (populatedOpts && !options.attr('result')) {
+      options = populatedOpts;
+    }
 
     if (!_.isEmpty(confirmEdit)) {
       confirmEdit.confirm = this.confirmEdit;

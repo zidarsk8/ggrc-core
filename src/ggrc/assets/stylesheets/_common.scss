@@ -1004,7 +1004,8 @@ p {
 
 .three-dots-list {
   & > li {
-    a {
+    a,
+    .unmap-link {
       color: #000 !important;
     }
 

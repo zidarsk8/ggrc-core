@@ -130,7 +130,8 @@
       float:none;
       clear: both;
       text-transform: none;
-      a {
+      a,
+      .unmap-link {
         @include transition(background 0.2s ease, color 0.2s ease);
         display: block;
         line-height: 30px;
@@ -147,6 +148,7 @@
         &.clipboard-is-hover {
           background: $headerBgnd;
           color: $black;
+          cursor: pointer;
           i {
             @include opacity(1);
           }
