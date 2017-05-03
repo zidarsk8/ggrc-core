@@ -606,6 +606,34 @@
       return GGRC.Utils.Snapshots.inScopeModels.indexOf(model) > -1;
     }
 
+    function _buildACL(content) {
+      /**
+      * Build acl from deprecated contact fields. This is needed when
+      * displaying old revisions that do not have the access_control_list
+      * property.
+      * @param {Object} content - revision contant dict
+      * @return {Array} Access Control List created from old contact fields
+      */
+      var mapper = {
+        contact_id: 'Primary Contacts',
+        secondary_contact_id: 'Secondary Contacts',
+        principal_assessor_id: 'Principal Assignees',
+        secondary_assessor_id: 'Secondary Assignees'
+      };
+      return _.filter(_.map(mapper, function (v, k) {
+        var role = _.find(GGRC.access_control_roles, function (acr) {
+          return acr.name === v && acr.object_type === content.type;
+        });
+        if (!role || !content[k]) {
+          return;
+        }
+        return {
+          ac_role_id: role.id,
+          person_id: content[k]
+        };
+      }), Boolean);
+    }
+
     /**
      * Convert snapshot to object
      * @param {Object} instance - Snapshot instance
@@ -635,6 +663,10 @@
         type: instance.child_type,
         id: instance.child_id
       });
+
+      if (content.access_control_list === undefined) {
+        content.access_control_list = _buildACL(content);
+      }
 
       if (content.access_control_list) {
         content.access_control_list.forEach(function (item) {
