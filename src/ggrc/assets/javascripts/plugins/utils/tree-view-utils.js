@@ -10,10 +10,9 @@
    * TreeView-specific utils.
    */
   GGRC.Utils.TreeView = (function () {
-
     var baseWidgets = GGRC.tree_view.attr('base_widgets_by_type');
     var defaultOrderTypes = GGRC.tree_view.attr('defaultOrderTypes');
-    var allTypes = Object.keys(baseWidgets.serialize());
+    var allTypes = Object.keys(baseWidgets.attr());
     var orderedModelsForSubTier = {};
 
     var QueryAPI = GGRC.Utils.QueryAPI;
@@ -42,7 +41,14 @@
       'DEFAULT_PEOPLE_LABELS'
     ]);
 
-    var FULL_SUB_LEVEL_LIST = Object.freeze(['Cycle', 'CycleTaskGroup']);
+    var FULL_SUB_LEVEL_LIST = Object.freeze([
+      'Cycle',
+      'CycleTaskGroup'
+    ]);
+
+    var NO_FIELDS_LIMIT_LIST = Object.freeze([
+      'Assessment'
+    ]);
 
     allTypes.forEach(function (type) {
       var related = baseWidgets[type].slice(0);
@@ -63,6 +69,17 @@
     orderedModelsForSubTier.Cycle = ['CycleTaskGroup'];
     orderedModelsForSubTier.CycleTaskGroup = ['CycleTaskGroupObjectTask'];
 
+    function getSubTreeFields(parent, child) {
+      var noFieldsLimitOnChild = hasNoFieldsLimit(child);
+      var noFieldsLimitOnParent = _isFullSubTree(parent);
+      return noFieldsLimitOnChild || noFieldsLimitOnParent ?
+        [] :
+        SUB_TREE_FIELDS;
+    }
+
+    function hasNoFieldsLimit(type) {
+      return NO_FIELDS_LIMIT_LIST.indexOf(type) > -1;
+    }
     /**
      * Get available and selected columns for Model type
      * @param {String} modelType - Model type.
@@ -226,7 +243,7 @@
      * and value True if column selected and False or not.
      * @param {Array} available - Full list of available columns.
      * @param {Array} selected - List of selected columns.
-     * @return Map with selected columns.
+     * @return {Array} Map with selected columns.
      */
     function createSelectedColumnsMap(available, selected) {
       var selectedColumns = can.makeArray(selected);
@@ -307,7 +324,8 @@
      * @param {Number} filterInfo.sortBy -
      * @param {Number} filterInfo.sortDirection -
      * @param {Number} filterInfo.filter -
-     * @return {Promise}
+     * @param {Object} filter -
+     * @return {Promise} Deferred Object
      */
     function loadFirstTierItems(modelName, parent, filterInfo, filter) {
       var params = QueryAPI.buildParam(
@@ -340,8 +358,8 @@
     /**
      *
      * @param {Array} models - Array of models for load in sub tree
-     * @param type - Type of parent object.
-     * @param id - ID of parent object.
+     * @param {String} type - Type of parent object.
+     * @param {Number} id - ID of parent object.
      * @param {String} filter - Filter.
      * @return {Promise} - Items for sub tier.
      */
@@ -363,6 +381,7 @@
           showMore = result.showMore;
 
           reqParams = loadedModels.map(function (model) {
+            var subTreeFields = getSubTreeFields(type, model);
             var pageInfo = {
               filter: filter
             };
@@ -375,7 +394,7 @@
               model,
               pageInfo,
               relevant,
-              !_isFullSubTree(type) ? SUB_TREE_FIELDS : null);
+              subTreeFields);
           });
 
           if (SnapshotUtils.isSnapshotParent(relevant.type) ||
@@ -482,7 +501,7 @@
               var count = response[index][model].total;
 
               if (!count) {
-                return;
+                return false;
               }
 
               if (total + count < SUB_TREE_ELEMENTS_LIMIT) {
