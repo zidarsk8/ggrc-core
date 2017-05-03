@@ -177,7 +177,7 @@
     }
   });
 
-  can.Component.extend({
+  GGRC.Components('exportGroup', {
     tag: 'export-group',
     template: '<content></content>',
     scope: {
@@ -186,7 +186,8 @@
     events: {
       inserted: function () {
         this.addPanel({
-          type: url.model_type || 'Program'
+          type: url.model_type || 'Program',
+          isSnapshots: url.isSnapshots
         });
       },
       addPanel: function (data) {
@@ -196,6 +197,9 @@
         data = data || {};
         if (!data.type) {
           data.type = 'Program';
+        } else if (data.isSnapshots === 'true') {
+          data.snapshot_type = data.type;
+          data.type = 'Snapshot';
         }
 
         this.scope.attr('_index', index);
@@ -284,6 +288,10 @@
         this.scope.attr('item.filter', '');
         this.scope.attr('item.snapshot_type', '');
         this.scope.attr('item.has_parent', false);
+
+        if (this.scope.attr('item.type') === 'Snapshot') {
+          this.scope.attr('item.snapshot_type', 'Control');
+        }
 
         this.setSelected();
       }
