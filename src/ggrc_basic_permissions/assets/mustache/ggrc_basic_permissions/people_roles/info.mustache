@@ -17,21 +17,23 @@
         <span class="bubble"></span>
       </a>
       <ul class="dropdown-menu three-dots-list" aria-labelledby="drop1" role="menu">
-        {{#is_allowed 'create' 'delete' 'UserRole' context=options.parent_instance.context.id}}
-          {{#is_info_pin}}
-            <li>
-              <a data-modal-class="modal-wide"
-                 data-modal-selector-options="user_roles"
-                 data-person_id="{{instance.id}}"
-                 data-placement="left"
-                 data-toggle="user-roles-modal-selector"
-                 href="javascript://">
-                <i class="fa fa-role color"></i>
-                Edit Authorizations
-              </a>
-            </li>
-          {{/is_info_pin}}
-        {{/is_allowed}}
+        {{#if_instance_of parentInstance 'Program|Audit'}}
+          {{#is_allowed 'create' 'delete' 'UserRole' context=options.parent_instance.context.id}}
+            {{#is_info_pin}}
+              <li>
+                <a data-modal-class="modal-wide"
+                   data-modal-selector-options="user_roles"
+                   data-person_id="{{instance.id}}"
+                   data-placement="left"
+                   data-toggle="user-roles-modal-selector"
+                   href="javascript://">
+                  <i class="fa fa-role color"></i>
+                  Edit Authorizations
+                </a>
+              </li>
+            {{/is_info_pin}}
+          {{/is_allowed}}
+        {{/if_instance_of}}
         <li class="border-bottom">
           <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_for_object instance}}" />
         </li>
