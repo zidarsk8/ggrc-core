@@ -1,17 +1,13 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Gdrive Models"""
 
-import ggrc.models.all_models #import all_models,  __all__
-from .object_folder import ObjectFolder
-from .object_file import ObjectFile
-from .object_event import ObjectEvent
+from ggrc.models.all_models import register_model
+from ggrc_gdrive_integration.models.object_event import ObjectEvent
+from ggrc_gdrive_integration.models.object_file import ObjectFile
+from ggrc_gdrive_integration.models.object_folder import ObjectFolder
 
-ggrc.models.all_models.ObjectFolder = ObjectFolder
-ggrc.models.all_models.ObjectFile = ObjectFile
-ggrc.models.all_models.ObjectEvent = ObjectEvent
-ggrc.models.all_models.ObjectFolder._inflector
-ggrc.models.all_models.ObjectFile._inflector
-ggrc.models.all_models.ObjectEvent._inflector
-ggrc.models.all_models.all_models += [ObjectFolder, ObjectFile, ObjectEvent]
-ggrc.models.all_models.__all__ += [ObjectFolder.__name__, ObjectFile.__name__, ObjectEvent.__name__]
+register_model(ObjectEvent)
+register_model(ObjectFile)
+register_model(ObjectFolder)
