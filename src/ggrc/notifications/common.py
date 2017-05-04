@@ -13,8 +13,8 @@ from datetime import date
 from datetime import datetime
 from logging import getLogger
 
-from sqlalchemy import and_
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.expression import true
 from werkzeug.exceptions import Forbidden
 from google.appengine.api import mail
 
@@ -143,7 +143,8 @@ def get_pending_notifications():
       and corresponding data for those notifications.
   """
   notifications = db.session.query(Notification).filter(
-      Notification.sent_at.is_(None)).all()
+      (Notification.sent_at.is_(None)) | (Notification.repeating == true())
+  ).all()
 
   notif_by_day = defaultdict(list)
   for notification in notifications:
@@ -167,9 +168,10 @@ def get_daily_notifications():
       and corresponding data for those notifications.
   """
   notifications = db.session.query(Notification).filter(
-      and_(Notification.send_on <= datetime.today(),
-           Notification.sent_at.is_(None)
-           )).all()
+      (Notification.send_on <= datetime.today()) &
+      ((Notification.sent_at.is_(None)) | (Notification.repeating == true()))
+  ).all()
+
   return notifications, get_notification_data(notifications)
 
 

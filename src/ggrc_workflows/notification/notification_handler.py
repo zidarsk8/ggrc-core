@@ -22,6 +22,7 @@ from datetime import date
 from sqlalchemy import and_
 from sqlalchemy import or_
 from sqlalchemy import inspect
+from sqlalchemy.sql.expression import true
 
 from ggrc import db
 from ggrc.models.notification import Notification
@@ -124,7 +125,10 @@ def modify_cycle_task_notification(obj, notification_name):
       .join(NotificationType)\
       .filter(and_(Notification.object_id == obj.id,
                    Notification.object_type == obj.type,
-                   Notification.sent_at == None,  # noqa
+                   or_(
+                       Notification.sent_at.is_(None),
+                       Notification.repeating == true()
+                   ),
                    NotificationType.name == notification_name,
                    ))
   notif_type = get_notification_type(notification_name)
@@ -217,7 +221,11 @@ def get_notification(obj):
   result = Notification.query.filter(
       and_(Notification.object_id == obj.id,
            Notification.object_type == obj.type,
-           Notification.sent_at == None))  # noqa
+           or_(
+               Notification.sent_at.is_(None),
+               Notification.repeating == true())
+           )
+  )
   return result.all()
 
 

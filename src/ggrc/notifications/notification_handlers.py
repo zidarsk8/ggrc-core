@@ -22,6 +22,7 @@ from enum import Enum
 
 from sqlalchemy import inspect
 from sqlalchemy import and_
+from sqlalchemy.sql.expression import true
 
 from ggrc import db
 from ggrc.services import signals
@@ -72,12 +73,14 @@ def _has_unsent_notifications(notif_type, obj):
     True if there are any unsent notifications of notif_type for the given
     object, and False otherwise.
   """
+  Notification = models.Notification  # pylint: disable=invalid-name
+
   return db.session.query(models.Notification).join(
       models.NotificationType).filter(and_(
           models.NotificationType.id == notif_type.id,
-          models.Notification.object_id == obj.id,
-          models.Notification.object_type == obj.type,
-          models.Notification.sent_at.is_(None),
+          Notification.object_id == obj.id,
+          Notification.object_type == obj.type,
+          (Notification.sent_at.is_(None) | (Notification.repeating == true()))
       )).count() > 0
 
 
