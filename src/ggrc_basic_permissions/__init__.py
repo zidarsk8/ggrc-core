@@ -116,10 +116,23 @@ def objects_via_assignable_query(user_id):
       all_models.Relationship.destination_type == assignable_relations.c.type,
       all_models.Relationship.destination_id == assignable_relations.c.id
   )
+  documents = db.session.query(
+      all_models.ObjectDocument.documentable_type,
+      all_models.ObjectDocument.document_id,
+      literal("Document").label("type"),
+      literal("R").label("context_id"),
+  ).filter(
+      all_models.ObjectDocument.documentable_type ==
+      assignable_relations.c.type,
+      all_models.ObjectDocument.documentable_id ==
+      assignable_relations.c.id
+  )
   return source_query.union(
       destination_query
   ).union(
       db.session.query(assignable_relations)
+  ).union(
+      documents
   )
 
 
@@ -634,7 +647,7 @@ def load_assignee_relationships(user, permissions):
       None
   """
   query = objects_via_assignable_query(user.id)
-  for access_model, id_, type_, role_name in query:
+  for access_model, id_, type_, role_name in set(query.all()):
     if type_ in RUD_MAP.get(access_model, []):
       role_name = "RUD"
     actions = ["read", "view_object_page"]

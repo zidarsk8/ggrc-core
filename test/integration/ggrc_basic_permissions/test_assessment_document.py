@@ -18,6 +18,12 @@ class BaseTestDocumentPermissions(ggrc.TestCase):
 
   ROLE = None
 
+  def genarate_relation(self):
+    self.generator.generate_relationship(
+        all_models.Document.query.get(self.url_id),
+        self.assessment,
+    )
+
   def setUp(self):
     super(BaseTestDocumentPermissions, self).setUp()
     self.api = ggrc.api_helper.Api()
@@ -55,10 +61,7 @@ class BaseTestDocumentPermissions(ggrc.TestCase):
           attr_value=self.ROLE
       )
     self.url_id = factories.DocumentFactory(link="test.com").id
-    self.generator.generate_relationship(
-        all_models.Document.query.get(self.url_id),
-        self.assessment,
-    )
+    self.genarate_relation()
     self.editor = all_models.Person.query.get(self.editor_id)
     self.url_get = self.api.get(all_models.Document, self.url_id)
     self.api.set_user(self.editor)
@@ -94,6 +97,25 @@ class BaseTestDocumentPermissions(ggrc.TestCase):
       self.assert403(resp)
 
 
+class BaseTestPermissionsOverObjectDock(BaseTestDocumentPermissions):
+
+  def genarate_relation(self):
+    url = all_models.Document.query.get(self.url_id)
+    self.generator.generate_object(
+        all_models.ObjectDocument,
+        data={
+            "document": {
+                "type": url.type,
+                "id": url.id
+            },
+            "documentable": {
+                "type": self.assessment.type,
+                "id": self.assessment.id,
+            }
+        }
+    )
+
+
 class TestCreatorPermissions(BaseTestDocumentPermissions):
   ROLE = "Creator"
 
@@ -103,4 +125,16 @@ class TestVerifierPermissions(BaseTestDocumentPermissions):
 
 
 class TestAssessorPermissions(BaseTestDocumentPermissions):
+  ROLE = "Assessor"
+
+
+class TestCreatorPermissionsOverDock(BaseTestPermissionsOverObjectDock):
+  ROLE = "Creator"
+
+
+class TestVerifierPermissionsOverDock(BaseTestPermissionsOverObjectDock):
+  ROLE = "Verifier"
+
+
+class TestAssessorPermissionsOverDock(BaseTestPermissionsOverObjectDock):
   ROLE = "Assessor"
