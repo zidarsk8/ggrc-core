@@ -70,6 +70,14 @@
     template: template,
     viewModel: viewModel,
     events: {
+      'input keyup': function (el, ev) {
+        this.viewModel.onFilterChange(el.val());
+
+        if (ev.keyCode === 13) {
+          this.viewModel.submit();
+        }
+        ev.stopPropagation();
+      }
     }
   });
 })(window.can, window.GGRC);
