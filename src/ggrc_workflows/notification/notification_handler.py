@@ -70,28 +70,32 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
       handle_task_group_task(task_group_task, notif_type)
 
 
-def add_cycle_task_due_notifications(obj):
+def add_cycle_task_due_notifications(task):
   """Add notifications entries for cycle task due dates.
 
-  Create two notification entries, one for X days before the due date and one
-  on the due date.
+  Create notification entries: one for X days before the due date, one on the
+  due date, and one for the days after ta task has become overdue.
 
   Args:
-    obj: Cycle object for notification generation.
+    task: CycleTaskGroupObjectTask instance to generate the notifications for.
   """
-  if obj.status == "Verified":
+  if task.status == "Verified":
     return
-  if not obj.cycle_task_group.cycle.is_current:
+  if not task.cycle_task_group.cycle.is_current:
     return
 
   notif_type = get_notification_type("{}_cycle_task_due_in".format(
-      obj.cycle_task_group.cycle.workflow.frequency))
-  send_on = obj.end_date - timedelta(notif_type.advance_notice)
-  add_notif(obj, notif_type, send_on)
+      task.cycle_task_group.cycle.workflow.frequency))
+  send_on = task.end_date - timedelta(notif_type.advance_notice)
+  add_notif(task, notif_type, send_on)
 
   notif_type = get_notification_type("cycle_task_due_today")
-  send_on = obj.end_date - timedelta(notif_type.advance_notice)
-  add_notif(obj, notif_type, send_on)
+  send_on = task.end_date - timedelta(notif_type.advance_notice)
+  add_notif(task, notif_type, send_on)
+
+  notif_type = get_notification_type("cycle_task_overdue")
+  send_on = task.end_date + timedelta(1)
+  add_notif(task, notif_type, send_on, repeating=True)
 
 
 def add_cycle_task_notifications(obj, start_notif_type=None):
@@ -234,7 +238,7 @@ def get_notification_type(name):
       NotificationType.name == name).first()
 
 
-def add_notif(obj, notif_type, send_on=None):
+def add_notif(obj, notif_type, send_on=None, repeating=False):
   if not send_on:
     send_on = date.today()
   notif = Notification(
@@ -242,5 +246,6 @@ def add_notif(obj, notif_type, send_on=None):
       object_type=obj.type,
       notification_type=notif_type,
       send_on=send_on,
+      repeating=repeating,
   )
   db.session.add(notif)
