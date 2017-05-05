@@ -19,7 +19,7 @@
   var viewModel = can.Map.extend({
     define: {
       isActive: {
-        type: Boolean,
+        type: 'boolean',
         get: function () {
           return this.attr('drawStatuses') ||
             this.attr('isDirective') ||
@@ -28,32 +28,32 @@
         }
       },
       isDirective: {
-        type: Boolean,
+        type: 'boolean',
         get: function () {
           return this.attr('instance') instanceof CMS.Models.Directive;
         }
       },
       isSection: {
-        type: Boolean,
+        type: 'boolean',
         get: function () {
           return this.attr('instance') instanceof CMS.Models.Section;
         }
       },
       isCycleTaskGroupObjectTask: {
-        type: Boolean,
+        type: 'boolean',
         get: function () {
           return this.attr('instance') instanceof
             CMS.Models.CycleTaskGroupObjectTask;
         }
       },
       isCycleTaskGroup: {
-        type: Boolean,
+        type: 'boolean',
         get: function () {
           return this.attr('instance') instanceof CMS.Models.CycleTaskGroup;
         }
       },
       isCycleTasks: {
-        type: Boolean,
+        type: 'boolean',
         get: function () {
           return this.attr('isCycleTaskGroup') ||
             this.attr('isCycleTaskGroupObjectTask') ||
@@ -61,19 +61,19 @@
         }
       },
       disablePopover: {
-        type: Boolean,
+        type: 'boolean',
         get: function () {
           return this.attr('instance') instanceof CMS.Models.Cycle;
         }
       },
       drawStatuses: {
-        type: Boolean,
+        type: 'boolean',
         get: function () {
           return !!this.attr('instance.workflow_state');
         }
       },
       cssClasses: {
-        type: String,
+        type: 'string',
         get: function () {
           var classes = [];
           var instance = this.attr('instance');
@@ -81,7 +81,7 @@
             classes.push(statusClasses[instance.workflow_state]);
           }
 
-          if (this.attr('isCycleTasks') && this.isOverdue()) {
+          if (this.attr('isCycleTasks') && this.attr('instance.isOverdue')) {
             classes.push(statusClasses.Overdue);
           }
 
@@ -101,17 +101,6 @@
     onLeave: function () {
       this.attr('spin', false);
     },
-    isOverdue: function () {
-      var task = this.attr('instance');
-      var endDate = new Date(task.end_date || null);
-      var status = task.status;
-      var today = new Date();
-
-      if (status === "Finished" || status === "Verified")
-        return false;
-      else if (endDate.getTime() < today.getTime())
-        return true;
-    },
     classes: [],
     instance: null
   });
@@ -119,7 +108,6 @@
   GGRC.Components('treeItemExtraInfo', {
     tag: 'tree-item-extra-info',
     template: template,
-    viewModel: viewModel,
-    events: {}
+    viewModel: viewModel
   });
 })(window.can, window.GGRC);
