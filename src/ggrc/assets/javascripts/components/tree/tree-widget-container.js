@@ -108,7 +108,7 @@
             this.attr('model').tree_view_options.add_item_view;
         }
       },
-      hideImportExport: {
+      isSnapshots: {
         type: Boolean,
         get: function () {
           var Snapshots = GGRC.Utils.Snapshots;
