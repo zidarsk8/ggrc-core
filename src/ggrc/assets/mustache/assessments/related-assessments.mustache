@@ -11,6 +11,9 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
             {{/is_allowed}}
         </div>
         <div class="grid-data-header flex-row flex-box">
+            <div class="flex-size-3">
+                Assessment Title
+            </div>
             <div class="grid-data-item-index">
                 Assessment State
             </div>
@@ -27,10 +30,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 Audit Title
             </div>
             <div class="flex-size-3">
-                Attachments
-            </div>
-            <div class="flex-size-3">
-                Urls
+                Attachments / Urls
             </div>
             <div class="grid-data__action-column">
                 More info
@@ -48,6 +48,9 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     <related-assessment-item {^sub-items-loading}="itemLoading"
                                              class="{{#itemsLoading}}hidden{{/itemsLoading}}">
                         <div class="grid-data-row flex-row flex-box">
+                            <div class="flex-size-3">
+                                <a href="{{instance.viewLink}}" target="_blank" title="{{instance.title}}">{{instance.title}}</a>
+                            </div>
                             <div class="grid-data-item-index">
                                 <state-colors-map {state}="instance.status"></state-colors-map>
                             </div>
@@ -79,45 +82,52 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                                 </related-audits>
                             </div>
                             <div class="flex-size-3">
-                                <mapped-objects
-                                        {parent-instance}="instance"
-                                        mapping="all_documents"
-                                        {^is-loading}="loadingState.attachmentsLoading">
-                                    <reusable-objects-item {instance}="instance"
-                                                           {is-saving}="isSaving"
-                                                           {base-instance}="baseInstance"
-                                                           {mapping}="mapping"
-                                                           {check-reused-status}="checkReusedStatus"
-                                                           {(selected-list)}="evidenceList">
-                                        <document-object-list-item {instance}="instance"></document-object-list-item>
-                                    </reusable-objects-item>
-                                </mapped-objects>
-                            </div>
-                            <div class="flex-size-3">
-                                <mapped-objects
-                                        {parent-instance}="instance"
-                                        mapping="all_urls"
-                                        {^is-loading}="loadingState.urlsLoading">
-                                    <reusable-objects-item {instance}="instance"
-                                                           {is-saving}="isSaving"
-                                                           {base-instance}="baseInstance"
-                                                           {mapping}="mapping"
-                                                           check-reused-status="checkReusedStatus"
-                                                           {(selected-list)}="urlList">
-                                        <document-object-list-item {instance}="instance"></document-object-list-item>
-                                    </reusable-objects-item>
-                                </mapped-objects>
+                                <related-attachments-and-urls>
+                                    <mapped-objects
+                                            {parent-instance}="instance"
+                                            mapping="all_documents"
+                                            {^is-loading}="loadingState.attachmentsLoading"
+                                            {empty-message}="noRelatedItemMessage"
+                                            {^show-items}="attachments">
+                                        <reusable-objects-item {instance}="instance"
+                                                               {is-saving}="isSaving"
+                                                               {base-instance}="baseInstance"
+                                                               {mapping}="mapping"
+                                                               {check-reused-status}="checkReusedStatus"
+                                                               {(selected-list)}="evidenceList">
+                                            <document-object-list-item {instance}="instance"></document-object-list-item>
+                                        </reusable-objects-item>
+                                    </mapped-objects>
+                                    <mapped-objects
+                                            {parent-instance}="instance"
+                                            mapping="all_urls"
+                                            {^is-loading}="loadingState.urlsLoading"
+                                            {empty-message}="noRelatedItemMessage"
+                                            {^show-items}="urls">
+                                        <reusable-objects-item {instance}="instance"
+                                                               {is-saving}="isSaving"
+                                                               {base-instance}="baseInstance"
+                                                               {mapping}="mapping"
+                                                               check-reused-status="checkReusedStatus"
+                                                               {(selected-list)}="urlList">
+                                            <document-object-list-item {instance}="instance"></document-object-list-item>
+                                        </reusable-objects-item>
+                                    </mapped-objects>
+                                    {{#if showEmptyMessage}}
+                                        <span class="empty-message">{{emptyMessage}}</span>
+                                    {{/if}}
+                                </related-attachments-and-urls>
                             </div>
                             <div class="grid-data__action-column">
                                 <button class="btn btn-icon btn-icon-sm" title="Show More Information"><i
-                                        class="fa fa-comment-o"></i></button>
+                                        class="fa fa-info-circle"></i></button>
                             </div>
                         </div>
                     </related-assessment-item>
                 </object-list>
             </related-assessment-list>
             <related-assessment-popover class="object-popover related-assessments__object-popover"
-                                        {selected-assessment}="selectedItem"></related-assessment-popover>
+                                        {selected-assessment}="selectedItem" hide-title="true"></related-assessment-popover>
         </div>
     </reusable-objects-list>
 </related-objects>
