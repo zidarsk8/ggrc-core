@@ -390,6 +390,14 @@ mapper-results-item-attrs {
     &:first-child {
       flex: 1 1 $first-column-width;
     }
+
+    .roles {
+      overflow: hidden;
+      text-overflow: ellipsis;;
+      .person {
+        display: inline;
+      }
+    }
   }
 }
 

@@ -35,7 +35,7 @@ try:
 except (ImportError):
   pass
 
-VERSION = "0.10.13-Raspberry" + BUILD_NUMBER
+VERSION = "0.10.14-Raspberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -121,3 +121,9 @@ DEBUG_BENCHMARK = os.environ.get("GGRC_BENCHMARK")
 
 # GGRCQ integration
 GGRC_Q_INTEGRATION_URL = os.environ.get('GGRC_Q_INTEGRATION_URL', '')
+
+# Dashboard integration
+AUDIT_DASHBOARD_INTEGRATION_URL = os.environ.get(
+    'AUDIT_DASHBOARD_INTEGRATION_URL',
+    '',
+)

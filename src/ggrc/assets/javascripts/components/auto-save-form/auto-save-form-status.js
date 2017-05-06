@@ -6,6 +6,7 @@
   'use strict';
 
   var ALL_SAVED_TEXT = 'All changes saved';
+  var UNSAVED_TEXT = 'Unsaved changes';
   var IS_SAVING_TEXT = 'Saving...';
 
   GGRC.Components('autoSaveFormStatus', {
@@ -13,6 +14,10 @@
     template: '{{formStatusText}}<content></content>',
     viewModel: {
       define: {
+        isDirty: {
+          type: 'boolean',
+          value: false
+        },
         formSaving: {
           type: 'boolean',
           value: false
@@ -20,7 +25,10 @@
         formStatusText: {
           type: 'string',
           get: function () {
-            return this.attr('formSaving') ? IS_SAVING_TEXT : ALL_SAVED_TEXT;
+            if (this.attr('formSaving')) {
+              return IS_SAVING_TEXT;
+            }
+            return !this.attr('isDirty') ? ALL_SAVED_TEXT : UNSAVED_TEXT;
           }
         }
       }

@@ -3,7 +3,7 @@
 
 """Module containing Document model."""
 
-from sqlalchemy.orm import validates
+from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
@@ -14,7 +14,7 @@ from ggrc.models.object_owner import Ownable
 from ggrc.models.utils import validate_option
 
 
-class Document(Ownable, Relatable, Indexed, Base, db.Model):
+class Document(Ownable, Relatable, Base, Indexed, db.Model):
   """Audit model."""
   __tablename__ = 'documents'
 
@@ -74,7 +74,7 @@ class Document(Ownable, Relatable, Indexed, Base, db.Model):
       'description': "description",
   }
 
-  @validates('kind', 'year', 'language')
+  @orm.validates('kind', 'year', 'language')
   def validate_document_options(self, key, option):
     """Returns correct option, otherwise rises an error"""
     if key == 'year':
@@ -86,11 +86,16 @@ class Document(Ownable, Relatable, Indexed, Base, db.Model):
     return validate_option(self.__class__.__name__, key, option, desired_role)
 
   @classmethod
-  def eager_query(cls):
-    from sqlalchemy import orm
+  def indexed_query(cls):
+    return super(Document, cls).indexed_query().options(
+        orm.Load(cls).load_only("title"),
+        orm.Load(cls).load_only("link"),
+        orm.Load(cls).load_only("description"),
+    )
 
-    query = super(Document, cls).eager_query()
-    return query.options(
+  @classmethod
+  def eager_query(cls):
+    return super(Document, cls).eager_query().options(
         orm.joinedload('kind'),
         orm.joinedload('year'),
         orm.joinedload('language'),

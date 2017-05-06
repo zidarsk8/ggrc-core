@@ -4,7 +4,7 @@
 
 """Tests for task group task specific export."""
 import datetime
-from ddt import data, ddt
+from ddt import data, ddt, unpack
 
 from ggrc import db
 from ggrc.models import all_models
@@ -44,9 +44,9 @@ class TestExport(TestCase):
                                              destination=self.assessment)
 
   def test_search_by_comment(self):
-    self.assertSlugs("comment",
-                     self.comment.description,
-                     [self.assessment.slug])
+    self.assert_slugs("comment",
+                      self.comment.description,
+                      [self.assessment.slug])
 
   def test_search_by_new_comment(self):
     """Filter by added new comment and old comment exists"""
@@ -55,45 +55,175 @@ class TestExport(TestCase):
     new_comment = factories.CommentFactory(description=desc)
     factories.RelationshipFactory(source=new_comment,
                                   destination=self.assessment)
-    self.assertSlugs("comment", self.comment.description, slugs)
-    self.assertSlugs("comment", desc, slugs)
+    self.assert_slugs("comment", self.comment.description, slugs)
+    self.assert_slugs("comment", desc, slugs)
 
   def test_search_by_deleted_relation(self):
     """Filter by deleted relation to commment"""
     db.session.delete(self.rel)
     db.session.commit()
-    self.assertSlugs("comment", self.comment.description, [])
+    self.assert_slugs("comment", self.comment.description, [])
 
   def test_search_by_deleted_comment(self):
     """Filter by deleted comment"""
     db.session.delete(self.comment)
     db.session.commit()
-    self.assertSlugs("comment", self.comment.description, [])
+    self.assert_slugs("comment", self.comment.description, [])
 
   @data("created_at", "Created Date", "created Date")
   def test_filter_by_created_at(self, alias):
     """Test filter by created at"""
-    self.assertFilterByDatetime(alias,
-                                self.assessment.created_at,
-                                [self.assessment.slug])
+    self.assert_filter_by_datetime(alias,
+                                   self.assessment.created_at,
+                                   [self.assessment.slug])
 
   @data("updated_at", "Last Updated", "Last Updated")
   def test_filter_by_updated_at(self, alias):
     """Test filter by updated at"""
-    self.assertFilterByDatetime(alias,
-                                self.assessment.updated_at,
-                                [self.assessment.slug])
+    self.assert_filter_by_datetime(alias,
+                                   self.assessment.updated_at,
+                                   [self.assessment.slug])
 
   @data("finished_date", "Finished Date", "finished date")
   def test_filter_by_finished_date(self, alias):
     """Test filter by finished date"""
-    self.assertFilterByDatetime(alias,
-                                self.assessment.finished_date,
-                                [self.assessment.slug])
+    self.assert_filter_by_datetime(alias,
+                                   self.assessment.finished_date,
+                                   [self.assessment.slug])
 
   @data("verified_date", "Verified Date", "verified date")
   def test_filter_by_verified_date(self, alias):
     """Test filter by verified date"""
-    self.assertFilterByDatetime(alias,
-                                self.assessment.verified_date,
-                                [self.assessment.slug])
+    self.assert_filter_by_datetime(alias,
+                                   self.assessment.verified_date,
+                                   [self.assessment.slug])
+
+  def assert_only_date_for(self, alias, operator, date, slugs):
+    self.assert_filter_by_datetime(
+        alias,
+        date,
+        slugs,
+        formats=["{year}-{month}-{day}"],
+        operator=operator
+    )
+
+  def test_filter_not_equal_operators(self):
+    """Test filter by != operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        "!=",
+        self.assessment.verified_date + datetime.timedelta(1),
+        [self.assessment.slug],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        "!=",
+        self.assessment.verified_date,
+        [],
+    )
+
+  def test_filter_not_like_operators(self):
+    """Test filter by !~ operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        "!~",
+        self.assessment.verified_date + datetime.timedelta(1),
+        [self.assessment.slug],
+    )
+    self.assert_only_date_for(
+        "verified_date", "!~", self.assessment.verified_date, [],
+    )
+
+  def test_filter_like_operators(self):
+    """Test filter by ~ operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        "~",
+        self.assessment.verified_date,
+        [self.assessment.slug],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        "~",
+        self.assessment.verified_date + datetime.timedelta(1),
+        [],
+    )
+
+  def test_filter_gte_operators(self):
+    """Test filter by >= operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        ">=",
+        self.assessment.verified_date,
+        [self.assessment.slug],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        ">=",
+        self.assessment.verified_date + datetime.timedelta(1),
+        [],
+    )
+
+  def test_filter_gt_operators(self):
+    """Test filter by > operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        ">",
+        self.assessment.verified_date,
+        [],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        ">",
+        self.assessment.verified_date - datetime.timedelta(1),
+        [self.assessment.slug],
+    )
+
+  def test_filter_lte_operators(self):
+    """Test filter by <= operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        "<=",
+        self.assessment.verified_date,
+        [self.assessment.slug],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        "<=",
+        self.assessment.verified_date - datetime.timedelta(1),
+        [],
+    )
+
+  def test_filter_lt_operators(self):
+    """Test filter by < operator."""
+    self.assert_only_date_for(
+        "verified_date",
+        "<",
+        self.assessment.verified_date,
+        [],
+    )
+    self.assert_only_date_for(
+        "verified_date",
+        "<",
+        self.assessment.verified_date + datetime.timedelta(1),
+        [self.assessment.slug],
+    )
+
+  @data(
+      # (offset, verified_date, filter_date)
+      (180, datetime.datetime(2017, 1, 1, 22, 30), "2017-01-02"),
+      (-180, datetime.datetime(2017, 1, 2, 1, 30), "2017-01-01"),
+      (0, datetime.datetime(2017, 1, 1, 1, 30), "2017-01-01"),
+      (None, datetime.datetime(2017, 1, 1, 1, 30), "2017-01-01"),
+  )
+  @unpack
+  def test_filter_by_tz_depend(self, offset, verified_date, filter_value):
+    """Test filter by verified date with timezone info"""
+    user_headers = {}
+    if offset is not None:
+      user_headers["X-UserTimezoneOffset"] = str(offset)
+    self.assessment.verified_date = verified_date
+    db.session.add(self.assessment)
+    db.session.commit()
+    with self.custom_headers(user_headers):
+      self.assert_slugs("verified_date", filter_value, [self.assessment.slug])

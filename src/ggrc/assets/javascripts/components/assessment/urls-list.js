@@ -13,10 +13,17 @@
   /**
    * Wrapper Component for rendering and managing of url lists
    */
-  GGRC.Components('assessmentUrlsList', {
+  GGRC.Components('assessmentUrlsListComponent', {
     tag: tag,
     template: template,
-    scope: {},
-    events: {}
+    viewModel: {
+      define: {
+        noItemsText: {
+          type: 'string',
+          value: ''
+        }
+      },
+      mappedItems: []
+    }
   });
 })(window.GGRC, window.can);

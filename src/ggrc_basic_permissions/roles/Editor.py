@@ -7,6 +7,7 @@ description = """
   """
 permissions = {
     "read": [
+        "AccessControlList",
         "Audit",
         "Snapshot",
         "Categorization",
@@ -51,7 +52,6 @@ permissions = {
         "Program",
         "Revision",
         "Role",
-        "Request",
         "Context",
         "UserRole",
         {
@@ -108,7 +108,6 @@ permissions = {
         "Program",
         "Role",
         "UserRole",
-        "Request",
         "Context",
         {
             "type": "BackgroundTask",
@@ -167,7 +166,6 @@ permissions = {
         "Program",
         "Role",
         "UserRole",
-        "Request",
         "Context",
         {
             "type": "BackgroundTask",
@@ -221,7 +219,6 @@ permissions = {
         "Program",
         "Role",
         "UserRole",
-        "Request",
         "Context",
         {
             "type": "BackgroundTask",

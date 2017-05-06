@@ -23,8 +23,7 @@ from ggrc.builder.json import publish
 from ggrc.builder.json import publish_representation
 from ggrc.converters import get_importables, get_exportables
 from ggrc.extensions import get_extension_modules
-from ggrc.fulltext import get_indexer, get_indexed_model_names
-from ggrc.fulltext.recordbuilder import fts_record_for
+from ggrc.fulltext import get_indexer, get_indexed_model_names, mixin
 from ggrc.login import get_current_user
 from ggrc.login import login_required
 from ggrc.models import all_models
@@ -74,32 +73,37 @@ def do_reindex():
   """Update the full text search index."""
 
   indexer = get_indexer()
-  with benchmark('Delete all records'):
-    indexer.delete_all_records(False)
-
   indexed_models = get_indexed_model_names()
 
   people = db.session.query(all_models.Person.id, all_models.Person.name,
                             all_models.Person.email)
-  g.people_map = {p.id: (p.name, p.email) for p in people}
-
+  indexer.cache["people_map"] = {p.id: (p.name, p.email) for p in people}
   for model in sorted(indexed_models):
     # pylint: disable=protected-access
     logger.info("Updating index for: %s", model)
     with benchmark("Create records for %s" % model):
       model = get_model(model)
       mapper_class = model._sa_class_manager.mapper.base_mapper.class_
-      query = model.query.options(
-          db.undefer_group(mapper_class.__name__ + '_complete'),
-      )
-      for query_chunk in generate_query_chunks(query):
-        for instance in query_chunk:
-          indexer.create_record(fts_record_for(instance), False)
-        db.session.commit()
+      if issubclass(model, mixin.Indexed):
+        for query_chunk in generate_query_chunks(db.session.query(model.id)):
+          model.bulk_record_update_for([i.id for i in query_chunk])
+          db.session.commit()
+      else:
+        logger.warning(
+            "Try to index model that not inherited from Indexed mixin: %s",
+            model.__name__
+        )
+        indexer.delete_records_by_type(model.__name__)
+        query = model.query.options(
+            db.undefer_group(mapper_class.__name__ + '_complete'),
+        )
+        for query_chunk in generate_query_chunks(query):
+          for instance in query_chunk:
+            indexer.create_record(indexer.fts_record_for(instance), False)
+          db.session.commit()
 
   reindex_snapshots()
-
-  delattr(g, "people_map")
+  indexer.invalidate_cache()
 
 
 def get_permissions_json():
@@ -157,6 +161,17 @@ def get_current_user_json():
     })
 
 
+def get_access_control_roles_json():
+  """Get a list of all access control roles"""
+  with benchmark("Get access roles JSON"):
+    attrs = all_models.AccessControlRole.query.all()
+    published = []
+    for attr in attrs:
+      published.append(publish(attr))
+    published = publish_representation(published)
+    return as_json(published)
+
+
 def get_attributes_json():
   """Get a list of all custom attribute definitions"""
   with benchmark("Get attributes JSON"):
@@ -183,9 +198,6 @@ def get_import_types(export_only=False):
   types = get_exportables if export_only else get_importables
   data = []
   for model in set(types().values()):
-    # TODO: remove Requests from GGRC_IMPORTABLE during requests cleanup
-    if model.__name__ == "Request":
-      continue
     data.append({
         "model_singular": model.__name__,
         "title_plural": model._inflector.title_plural
@@ -237,6 +249,7 @@ def base_context():
       current_user_json=get_current_user_json,
       full_user_json=get_full_user_json,
       attributes_json=get_attributes_json,
+      access_control_roles_json=get_access_control_roles_json,
       all_attributes_json=get_all_attributes_json,
       import_definitions=get_import_definitions,
       export_definitions=get_export_definitions,
@@ -355,7 +368,6 @@ def contributed_object_views():
       object_view(models.System),
       object_view(models.Process),
       object_view(models.Product),
-      object_view(models.Request),
       object_view(models.OrgGroup),
       object_view(models.Facility),
       object_view(models.Market),

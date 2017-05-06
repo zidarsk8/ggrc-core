@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc import db
+from ggrc.access_control.roleable import Roleable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
 from ggrc.fulltext.mixin import Indexed
@@ -11,6 +12,7 @@ from .relationship import Relatable
 from .utils import validate_option
 
 from sqlalchemy.orm import validates
+from sqlalchemy import orm
 from .track_object_state import HasObjectState
 
 
@@ -72,6 +74,21 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
       'version',
   ]
 
+  @classmethod
+  def indexed_query(cls):
+    return super(Directive, cls).indexed_query().options(
+        orm.Load(cls).joinedload('audit_frequency'),
+        orm.Load(cls).joinedload('audit_duration'),
+        orm.Load(cls).subqueryload('controls'),
+        orm.Load(cls).load_only(
+            'audit_start_date',
+            'kind',
+            'organization',
+            'scope',
+            'version',
+        ),
+    )
+
   _sanitize_html = [
       'organization',
       'scope',
@@ -98,8 +115,6 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(Directive, cls).eager_query()
     return cls.eager_inclusions(query, Directive._include_links).options(
         orm.joinedload('audit_frequency'),
@@ -114,7 +129,7 @@ class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
 
 
 # FIXME: For subclasses, restrict kind
-class Policy(CustomAttributable, Relatable,
+class Policy(Roleable, CustomAttributable, Relatable,
              Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
@@ -134,7 +149,7 @@ class Policy(CustomAttributable, Relatable,
     return 'Policy'
 
 
-class Regulation(CustomAttributable, Relatable,
+class Regulation(Roleable, CustomAttributable, Relatable,
                  Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
@@ -154,7 +169,7 @@ class Regulation(CustomAttributable, Relatable,
     return 'Regulation'
 
 
-class Standard(CustomAttributable, Relatable,
+class Standard(Roleable, CustomAttributable, Relatable,
                Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Standard'
@@ -174,7 +189,7 @@ class Standard(CustomAttributable, Relatable,
     return 'Standard'
 
 
-class Contract(CustomAttributable, Relatable,
+class Contract(Roleable, CustomAttributable, Relatable,
                Personable, Ownable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'

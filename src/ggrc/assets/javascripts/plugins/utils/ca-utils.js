@@ -170,11 +170,11 @@
 
     /**
      * Converts CA values array to form fields.
-     * @param {Array} customAttributeValues - Custom attributes values
+     * @param {Object|undefined} customAttributeValues - Custom attributes values
      * @return {Array} From fields array
      */
     function convertValuesToFormFields(customAttributeValues) {
-      return customAttributeValues
+      return can.makeArray(customAttributeValues)
         .map(function (attr) {
           var options = attr.def.multi_choice_options;
           return {

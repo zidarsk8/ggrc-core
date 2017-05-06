@@ -1136,14 +1136,19 @@
     },
 
     save_error: function (_, error) {
+      if (error) {
+        if (error.status !== 409) {
+          GGRC.Errors.notifier('error', error.responseText);
+        } else {
+          clearTimeout(error.warningId);
+          GGRC.Errors.notifierXHR('warning')(error);
+        }
+      }
       $('html, body').animate({
         scrollTop: '0px'
       }, {
         duration: 200,
         complete: function () {
-          if (error) {
-            GGRC.Errors.notifier('error', error.responseText);
-          }
           delete this.disable_hide;
         }.bind(this)
       });

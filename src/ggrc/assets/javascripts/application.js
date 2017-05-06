@@ -56,14 +56,17 @@
   $doc.ready(function () {
     // monitor target, where flash messages are added
     var AUTOHIDE_TIMEOUT = 10000;
+    var timeoutId;
     var target = $('section.content div.flash')[0];
     var observer = new MutationObserver(function (mutations) {
       mutations.forEach(function (mutation) {
         // check for new nodes
-        if (mutation.addedNodes !== null) {
+        if (mutation.addedNodes && mutation.addedNodes.length > 0) {
           // remove the success message from non-expandable
           // flash success messages after timeout
-          setTimeout(function () {
+          clearTimeout(timeoutId);
+
+          timeoutId = setTimeout(function () {
             $('.flash .alert-autohide').remove();
           }, AUTOHIDE_TIMEOUT);
         }

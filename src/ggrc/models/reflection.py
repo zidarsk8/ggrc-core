@@ -4,6 +4,9 @@
 """Utilties to deal with introspecting GGRC models for publishing, creation,
 and update from resource format representations, such as JSON."""
 
+from collections import defaultdict
+
+import flask
 from sqlalchemy.sql.schema import UniqueConstraint
 
 from ggrc.utils.rules import get_mapping_rules, get_unmapping_rules
@@ -15,7 +18,7 @@ ATTRIBUTE_ORDER = (
     "slug",
     "assessment_template",
     "audit",
-    "request_audit",
+    "revision_date",
     "control",
     "program",
     "task_group",
@@ -25,10 +28,8 @@ ATTRIBUTE_ORDER = (
     "notes",
     "test_plan",
     "owners",
-    "request_type",
     "related_assessors",
     "related_creators",
-    "related_requesters",
     "related_assignees",
     "related_verifiers",
     "program_owner",
@@ -71,7 +72,6 @@ ATTRIBUTE_ORDER = (
     "is_enabled",
     "company",
     "user_role",
-    "test",
     "recipients",
     "send_by_default",
     "document_url",
@@ -148,6 +148,7 @@ class AttributeInfo(object):
   CUSTOM_ATTR_PREFIX = "__custom__:"
   OBJECT_CUSTOM_ATTR_PREFIX = "__object_custom__:"
   SNAPSHOT_MAPPING_PREFIX = "__snapshot_mapping__:"
+  ALIASES_PREFIX = "__acl__"
 
   class Type(object):
     """Types of model attributes."""
@@ -155,6 +156,7 @@ class AttributeInfo(object):
     # pylint: disable=too-few-public-methods
     PROPERTY = "property"
     MAPPING = "mapping"
+    AC_ROLE = "mapping"
     SPECIAL_MAPPING = "special_mapping"
     CUSTOM = "custom"  # normal custom attribute
     OBJECT_CUSTOM = "object_custom"  # object level custom attribute
@@ -165,7 +167,9 @@ class AttributeInfo(object):
     self._update_attrs = AttributeInfo.gather_update_attrs(tgt_class)
     self._create_attrs = AttributeInfo.gather_create_attrs(tgt_class)
     self._include_links = AttributeInfo.gather_include_links(tgt_class)
+    self._update_raw = AttributeInfo.gather_update_raw(tgt_class)
     self._aliases = AttributeInfo.gather_aliases(tgt_class)
+    self._visible_aliases = AttributeInfo.gather_visible_aliases(tgt_class)
 
   @classmethod
   def gather_attr_dicts(cls, tgt_class, src_attr):
@@ -224,6 +228,14 @@ class AttributeInfo(object):
     return cls.gather_attr_dicts(tgt_class, '_aliases')
 
   @classmethod
+  def gather_visible_aliases(cls, tgt_class):
+    aliases = AttributeInfo.gather_aliases(tgt_class)
+    return {
+        attr: props for attr, props in aliases.items()
+        if props is not None and not is_filter_only(props)
+    }
+
+  @classmethod
   def gather_update_attrs(cls, tgt_class):
     attrs = cls.gather_attrs(tgt_class, ['_update_attrs', '_publish_attrs'])
     return attrs
@@ -236,6 +248,35 @@ class AttributeInfo(object):
   @classmethod
   def gather_include_links(cls, tgt_class):
     return cls.gather_attrs(tgt_class, ['_include_links'])
+
+  @classmethod
+  def gather_update_raw(cls, tgt_class):
+    return cls.gather_attrs(tgt_class, ['_update_raw'])
+
+  @classmethod
+  def get_acl_definitions(cls, object_class):
+    from ggrc.access_control.role import AccessControlRole
+    from ggrc import db
+    if not hasattr(flask.g, "acl_role_names"):
+      flask.g.acl_role_names = defaultdict(set)
+      names_query = db.session.query(
+          AccessControlRole.object_type,
+          AccessControlRole.name,
+      )
+      for object_type, name in names_query:
+        flask.g.acl_role_names[object_type].add(name)
+
+    return {
+        "{}:{}".format(cls.ALIASES_PREFIX, name): {
+            "display_name": name,
+            "attr_name": name,
+            "mandatory": False,
+            "unique": False,
+            "description": "List of people with '{}' role".format(name),
+            "type": cls.Type.AC_ROLE,
+        }
+        for name in flask.g.acl_role_names[object_class.__name__]
+    }
 
   @classmethod
   def _generate_mapping_definition(cls, rules, prefix, display_name_tmpl):
@@ -375,22 +416,18 @@ class AttributeInfo(object):
     """
     definitions = {}
 
-    aliases = AttributeInfo.gather_aliases(object_class)
-    filtered_aliases = [
-        (attr, props) for attr, props in aliases.items()
-        if props is not None and not is_filter_only(props)
-    ]
+    aliases = AttributeInfo.gather_visible_aliases(object_class).items()
 
     # push the extra delete column at the end to override any custom behavior
     if hasattr(object_class, "slug"):
-      filtered_aliases.append(("delete", {
+      aliases.append(("delete", {
           "display_name": "Delete",
           "description": "",
       }))
 
     unique_columns = cls.get_unique_constraints(object_class)
 
-    for key, value in filtered_aliases:
+    for key, value in aliases:
       column = object_class.__table__.columns.get(key)
       definition = {
           "display_name": value,
@@ -404,6 +441,8 @@ class AttributeInfo(object):
       if isinstance(value, dict):
         definition.update(value)
       definitions[key] = definition
+
+    definitions.update(cls.get_acl_definitions(object_class))
 
     if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
       definitions.update(

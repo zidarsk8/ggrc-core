@@ -70,6 +70,7 @@
       // If it is, we can be certain that we can use the object from the cache.
       if (personModel && personModel.email) {
         scope.attr('personObj', personModel);
+        scope.attr('personId', personModel.id);
         return;
       }
       if (isNaN(personId) || personId <= 0) {
@@ -82,6 +83,7 @@
         .then(function (person) {
           person = Array.isArray(person) ? person[0] : person;
           scope.attr('personObj', person);
+          scope.attr('personId', person.id);
         }, function () {
           $(document.body).trigger(
             'ajax:flash',
@@ -101,6 +103,13 @@
         // thus it needs to be triggered on it (and not on the $el)
         this.element.triggerHandler({
           type: component._EV_REMOVE_CLICK,
+          person: this.scope.personObj
+        });
+
+        // keep the legacy event emitting mechanism above, but emit the event
+        // using the more modern dispatch mechanism, too
+        this.viewModel.dispatch({
+          type: 'personRemove',
           person: this.scope.personObj
         });
       }

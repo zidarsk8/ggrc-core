@@ -450,40 +450,6 @@
       return originalText.replace(/<[^>]*>?/g, '').trim();
     },
     /**
-     * Add subtree for object tree view
-     * @param {Number} depth - for subtree
-     * @return {Object} - mapping of related objects
-     */
-    getRelatedObjects: function (depth) {
-      var basedRelatedObjects;
-      var relatedObject;
-      var mustachePath = GGRC.mustache_path;
-      if (!depth) {
-        return {};
-      }
-
-      basedRelatedObjects = {
-        model: can.Model.Cacheable,
-        mapping: 'related_objects',
-        show_view: mustachePath + '/base_objects/tree.mustache',
-        footer_view: mustachePath + '/base_objects/tree_footer.mustache',
-        add_item_view: mustachePath + '/base_objects/tree_add_item.mustache',
-        draw_children: false
-      };
-
-      relatedObject = $.extend(basedRelatedObjects, {
-        child_options: [this.getRelatedObjects(depth - 1)]
-      });
-
-      if (depth === 1) {
-        return relatedObject;
-      }
-
-      relatedObject.draw_children = true;
-
-      return relatedObject;
-    },
-    /**
      * A function that returns the highest role in an array of strings of roles
      * or a comma-separated string of roles.
      *
@@ -509,6 +475,44 @@
 
       roles.unshift('none');
       return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
+    },
+
+    /**
+     * Compute a list of people IDs that have `roleName` granted on `instance`.
+
+     * @param {CMS.Models.Cacheable} instance - a model instance
+     * @param {String} roleName - the name of the custom role
+     *
+     * @return {Array} - list of people IDs
+     */
+    peopleWithRoleName: function (instance, roleName) {
+      var modelRoles;
+      var peopleIds;
+      var roleId;
+
+      // get role ID by roleName
+      modelRoles = _.filter(
+        GGRC.access_control_roles,
+        {object_type: instance.class.model_singular, name: roleName});
+
+      if (modelRoles.length === 0) {
+        console.warn('peopleWithRole: role not found for instance type');
+        return [];
+      } else if (modelRoles.length > 1) {
+        console.warn('peopleWithRole: found more than a single role');
+        // We do not exit, as we have a reasonable fallback - picking
+        // the first match.
+      }
+
+      roleId = modelRoles[0].id;
+
+      peopleIds = _
+          .chain(instance.access_control_list)
+          .filter({ac_role_id: roleId})
+          .map('person.id')
+          .value();
+
+      return peopleIds;
     }
   };
 
@@ -602,6 +606,34 @@
       return GGRC.Utils.Snapshots.inScopeModels.indexOf(model) > -1;
     }
 
+    function _buildACL(content) {
+      /**
+      * Build acl from deprecated contact fields. This is needed when
+      * displaying old revisions that do not have the access_control_list
+      * property.
+      * @param {Object} content - revision contant dict
+      * @return {Array} Access Control List created from old contact fields
+      */
+      var mapper = {
+        contact_id: 'Primary Contacts',
+        secondary_contact_id: 'Secondary Contacts',
+        principal_assessor_id: 'Principal Assignees',
+        secondary_assessor_id: 'Secondary Assignees'
+      };
+      return _.filter(_.map(mapper, function (v, k) {
+        var role = _.find(GGRC.access_control_roles, function (acr) {
+          return acr.name === v && acr.object_type === content.type;
+        });
+        if (!role || !content[k]) {
+          return;
+        }
+        return {
+          ac_role_id: role.id,
+          person_id: content[k]
+        };
+      }), Boolean);
+    }
+
     /**
      * Convert snapshot to object
      * @param {Object} instance - Snapshot instance
@@ -612,6 +644,7 @@
       var model = CMS.Models[instance.child_type];
       var content = instance.revision.content;
       var type = model.root_collection;
+
       content.isLatestRevision = instance.is_latest_revision;
       content.originalLink = '/' + type + '/' + content.id;
       content.snapshot = new can.Map(instance);
@@ -630,6 +663,17 @@
         type: instance.child_type,
         id: instance.child_id
       });
+
+      if (content.access_control_list === undefined) {
+        content.access_control_list = _buildACL(content);
+      }
+
+      if (content.access_control_list) {
+        content.access_control_list.forEach(function (item) {
+          item.person = new CMS.Models.Person({id: item.person_id}).stub();
+        });
+      }
+
       object = new model(content);
       model.removeFromCacheById(content.id);  /* removes snapshot object from cache */
       return object;

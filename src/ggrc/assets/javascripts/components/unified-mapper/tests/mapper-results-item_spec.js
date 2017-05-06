@@ -54,7 +54,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
 
     it('returns item description if no title', function () {
       var result;
-      viewModel.attr('itemData', Object.assign(itemData, {
+      viewModel.attr('itemData', _.assign(itemData, {
         title: undefined
       }));
       result = viewModel.title();
@@ -63,7 +63,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
 
     it('returns item name if no title and description', function () {
       var result;
-      viewModel.attr('itemData', Object.assign(itemData, {
+      viewModel.attr('itemData', _.assign(itemData, {
         title: undefined,
         description_inline: undefined
       }));
@@ -74,7 +74,7 @@ describe('GGRC.Components.mapperResultsItem', function () {
     it('returns item email if no title, description, name',
       function () {
         var result;
-        viewModel.attr('itemData', Object.assign(itemData, {
+        viewModel.attr('itemData', _.assign(itemData, {
           title: undefined,
           description_inline: undefined,
           name: undefined

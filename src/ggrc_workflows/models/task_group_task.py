@@ -12,14 +12,14 @@ from sqlalchemy import schema
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
-from ggrc.models.mixins import Base, Slugged, Titled, Described, WithContact
+from ggrc.models.mixins import Slugged, Titled, Described, WithContact
 from ggrc.models.types import JsonType
 from ggrc_workflows.models.mixins import RelativeTimeboxed
 from ggrc_workflows.models.task_group import TaskGroup
 
 
-class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
-                    Base, Indexed, db.Model):
+class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
+                    Slugged, Indexed, db.Model):
   """Workflow TaskGroupTask model."""
 
   __tablename__ = 'task_group_tasks'
@@ -105,7 +105,6 @@ class TaskGroupTask(WithContact, Slugged, Titled, Described, RelativeTimeboxed,
       "contact": {
           "display_name": "Assignee",
           "mandatory": True,
-          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
       "start_date": None,

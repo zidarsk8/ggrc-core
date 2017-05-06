@@ -17,6 +17,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
     beforeEach(function () {
       onSort = vm.onSort.bind(vm);
+      vm.attr('pageInfo.count', 3);
 
       spyOn(vm, 'loadItems');
     });
@@ -88,6 +89,6 @@ describe('GGRC.Components.treeWidgetContainer', function () {
         expect(can.makeArray(vm.attr('showedItems'))).toEqual([]);
         done();
       });
-    })
+    });
   });
 });

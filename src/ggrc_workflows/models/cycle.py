@@ -4,6 +4,7 @@
 """Module contains a workflow Cycle model
 """
 
+import itertools
 from sqlalchemy import orm
 
 from ggrc import db
@@ -20,6 +21,10 @@ from ggrc.fulltext.attributes import (
     DateFullTextAttr,
 )
 from ggrc.fulltext.mixin import Indexed, ReindexRule
+
+
+def _query_filtered_by_contact(person):
+  return Cycle.query.filter(Cycle.contact_id == person.id)
 
 
 class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
@@ -62,7 +67,9 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
           "display_name": "State",
           "mandatory": False,
           "description": "Options are: \n{} ".format('\n'.join(VALID_STATES))
-      }
+      },
+      "contact": "Assignee",
+      "secondary_contact": None,
   }
 
   PROPERTY_TEMPLATE = u"cycle {}"
@@ -103,14 +110,22 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
           False
       ),
       DateFullTextAttr("due date", "next_due_date"),
+      MultipleSubpropertyFullTextAttr(
+          "task comments",
+          lambda instance: list(itertools.chain(*[
+              t.cycle_task_entries
+              for t in instance.cycle_task_group_object_tasks
+          ])),
+          ["description"],
+          False
+      ),
   ]
 
   AUTO_REINDEX_RULES = [
       ReindexRule("CycleTaskGroup", lambda x: x.cycle),
       ReindexRule("CycleTaskGroupObjectTask",
                   lambda x: x.cycle_task_group.cycle),
-      ReindexRule("Person",
-                  lambda x: Cycle.query.filter(Cycle.contact_id == x.id))
+      ReindexRule("Person", _query_filtered_by_contact)
   ]
 
   @classmethod
@@ -135,4 +150,46 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
     query = super(Cycle, cls).eager_query()
     return query.options(
         orm.joinedload('cycle_task_groups'),
+    )
+
+  @classmethod
+  def indexed_query(cls):
+    return super(Cycle, cls).indexed_query().options(
+        orm.Load(cls).load_only("next_due_date"),
+        orm.Load(cls).subqueryload("cycle_task_group_object_tasks").load_only(
+            "id",
+            "title",
+            "end_date"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_groups").load_only(
+            "id",
+            "title",
+            "end_date",
+            "next_due_date",
+        ),
+        orm.Load(cls).subqueryload("cycle_task_group_object_tasks").joinedload(
+            "contact"
+        ).load_only(
+            "email",
+            "name",
+            "id"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_group_object_tasks").joinedload(
+            "cycle_task_entries"
+        ).load_only(
+            "description",
+            "id"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_groups").joinedload(
+            "contact"
+        ).load_only(
+            "email",
+            "name",
+            "id"
+        ),
+        orm.Load(cls).joinedload("contact").load_only(
+            "email",
+            "name",
+            "id"
+        ),
     )

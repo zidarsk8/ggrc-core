@@ -260,7 +260,7 @@ can.Control("CMS.Controllers.LHN", {
 
       checked = target.data('value') === 'my_work';
       this.obs.attr("my_work", checked);
-        //target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
+      // target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-green');
       this.options.display_prefs.setLHNState("my_work", checked);
       this.set_active_tab(checked);
     }
@@ -372,7 +372,8 @@ can.Control("CMS.Controllers.LHN", {
               target = this.element.find('#lhs input.my-work[value='+value+']');
 
           target.prop('checked', true);
-          target.closest('.btn')[checked ? 'addClass' : 'removeClass']('btn-success');
+          target.closest('.btn')
+            [checked ? 'addClass' : 'removeClass']('btn-green');
 
           // When first loading up, wait for the list in the open section to be loaded (if there is an open section), then
           //  scroll the LHN panel down to the saved scroll-Y position.  Scrolling the

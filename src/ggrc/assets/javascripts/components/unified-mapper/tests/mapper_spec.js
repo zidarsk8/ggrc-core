@@ -194,7 +194,7 @@ describe('GGRC.Models.MapperModel', function () {
 
     it('converts models plural title to a snake_case', function () {
       var result;
-      var cmsModel1 = Object.assign({}, cmsModel, {
+      var cmsModel1 = _.assign({}, cmsModel, {
         title_plural: 'Title Plural'
       });
       mapper.attr('type', 'model_singular');
@@ -414,6 +414,50 @@ describe('GGRC.Components.modalMapper', function () {
   });
   beforeEach(function () {
     scope = GGRC.Components.getViewModel('modalMapper');
+  });
+
+  describe('scope() method', function () {
+    var el;
+    var parentScope;
+
+    beforeEach(function () {
+      el = new can.Map();
+      parentScope = new can.Map();
+    });
+    it('returns object with function "isLoadingOrSaving"', function () {
+      var result = Component.prototype.scope({}, parentScope, el);
+      expect(result.isLoadingOrSaving).toEqual(jasmine.any(Function));
+    });
+
+    describe('isLoadingOrSaving() method', function () {
+      beforeEach(function () {
+        scope = new can.Map(Component.prototype.scope({}, parentScope, el));
+      });
+      it('returns true if page is loading', function () {
+        scope.attr('mapper.page_loading', true);
+        expect(scope.isLoadingOrSaving()).toEqual(true);
+      });
+      it('returns true if it is saving', function () {
+        scope.attr('mapper.is_saving', true);
+        expect(scope.isLoadingOrSaving()).toEqual(true);
+      });
+      it('returns true if type change is blocked', function () {
+        scope.attr('mapper.block_type_change', true);
+        expect(scope.isLoadingOrSaving()).toEqual(true);
+      });
+      it('returns true if mapper is loading', function () {
+        scope.attr('mapper.is_loading', true);
+        expect(scope.isLoadingOrSaving()).toEqual(true);
+      });
+      it('returns false if page is not loading, it is not saving,' +
+      ' type change is not blocked and mapper is not loading', function () {
+        scope.attr('mapper.page_loading', false);
+        scope.attr('mapper.is_saving', false);
+        scope.attr('mapper.block_type_change', false);
+        scope.attr('mapper.is_loading', false);
+        expect(scope.isLoadingOrSaving()).toEqual(false);
+      });
+    });
   });
 
   describe('".create-control modal:success" event', function () {

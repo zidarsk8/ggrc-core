@@ -4,35 +4,38 @@
 """Module for cycle task group model.
 """
 
+import itertools
+
 from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.models.mixins import Base
-from ggrc.models.mixins import Described
-from ggrc.models.mixins import Slugged
-from ggrc.models.mixins import Stateful
-from ggrc.models.mixins import Timeboxed
-from ggrc.models.mixins import Titled
-from ggrc.models.mixins import WithContact
+from ggrc.models import mixins
+from ggrc.fulltext import mixin as index_mixin
+from ggrc.fulltext import attributes
+
 from ggrc_workflows.models.cycle import Cycle
-from ggrc.fulltext.mixin import Indexed, ReindexRule
-from ggrc.fulltext.attributes import (
-    MultipleSubpropertyFullTextAttr,
-    DateMultipleSubpropertyFullTextAttr,
-    FullTextAttr,
-    DateFullTextAttr,
-)
 
 
-class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
-                     Titled, Indexed, Base, db.Model):
+def _query_filtered_by_contact(person):
+  return CycleTaskGroup.query.filter(CycleTaskGroup.contact_id == person.id)
+
+
+class CycleTaskGroup(mixins.WithContact,
+                     mixins.Stateful,
+                     mixins.Slugged,
+                     mixins.Timeboxed,
+                     mixins.Described,
+                     mixins.Titled,
+                     mixins.Base,
+                     index_mixin.Indexed,
+                     db.Model):
   """Cycle Task Group model.
   """
   __tablename__ = 'cycle_task_groups'
   _title_uniqueness = False
 
   @classmethod
-  def generate_slug_prefix_for(cls, obj):
+  def generate_slug_prefix_for(cls, obj):  # pylint: disable=unused-argument
     return "CYCLEGROUP"
 
   VALID_STATES = (
@@ -72,41 +75,49 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
   PROPERTY_TEMPLATE = u"group {}"
 
   _fulltext_attrs = [
-      MultipleSubpropertyFullTextAttr(
+      attributes.MultipleSubpropertyFullTextAttr(
           "task title", 'cycle_task_group_tasks', ["title"], False
       ),
-      MultipleSubpropertyFullTextAttr(
+      attributes.MultipleSubpropertyFullTextAttr(
           "task assignee",
           lambda instance: [t.contact for t in
                             instance.cycle_task_group_tasks],
           ["name", "email"],
           False
       ),
-      DateMultipleSubpropertyFullTextAttr(
+      attributes.DateMultipleSubpropertyFullTextAttr(
           "task due date", "cycle_task_group_tasks", ["end_date"], False
       ),
-      DateFullTextAttr("due date", 'next_due_date',),
-      FullTextAttr("assignee", "contact", ['name', 'email']),
-      FullTextAttr("cycle title", 'cycle', ['title'], False),
-      FullTextAttr("cycle assignee",
-                   lambda x: x.cycle.contact,
-                   ['email', 'name'], False),
-      DateFullTextAttr("cycle due date",
-                       lambda x: x.cycle.next_due_date,
-                       with_template=False),
+      attributes.DateFullTextAttr("due date", 'next_due_date',),
+      attributes.FullTextAttr("assignee", "contact", ['name', 'email']),
+      attributes.FullTextAttr("cycle title", 'cycle', ['title'], False),
+      attributes.FullTextAttr("cycle assignee",
+                              lambda x: x.cycle.contact,
+                              ['email', 'name'],
+                              False),
+      attributes.DateFullTextAttr("cycle due date",
+                                  lambda x: x.cycle.next_due_date,
+                                  with_template=False),
+      attributes.MultipleSubpropertyFullTextAttr(
+          "task comments",
+          lambda instance: itertools.chain(*[
+              t.cycle_task_entries for t in instance.cycle_task_group_tasks
+          ]),
+          ["description"],
+          False
+      ),
   ]
 
   AUTO_REINDEX_RULES = [
-      ReindexRule("CycleTaskGroupObjectTask", lambda x: x.cycle_task_group),
-      ReindexRule(
-          "Person",
-          lambda x: CycleTaskGroup.query.filter(
-              CycleTaskGroup.contact_id == x.id)
+      index_mixin.ReindexRule(
+          "CycleTaskGroupObjectTask", lambda x: x.cycle_task_group
       ),
-      ReindexRule(
+      index_mixin.ReindexRule(
+          "Person", _query_filtered_by_contact
+      ),
+      index_mixin.ReindexRule(
           "Person",
-          lambda x: [i.cycle for i in CycleTaskGroup.query.filter(
-              CycleTaskGroup.contact_id == x.id)]
+          lambda x: [i.cycle for i in _query_filtered_by_contact(x)]
       ),
   ]
 
@@ -126,6 +137,49 @@ class CycleTaskGroup(WithContact, Stateful, Slugged, Timeboxed, Described,
         (Cycle.id == cls.cycle_id) &
         (predicate(Cycle.slug) | predicate(Cycle.title))
     ).exists()
+
+  @classmethod
+  def indexed_query(cls):
+    return super(CycleTaskGroup, cls).indexed_query().options(
+        orm.Load(cls).load_only(
+            "next_due_date",
+        ),
+        orm.Load(cls).subqueryload("cycle_task_group_tasks").load_only(
+            "id",
+            "title",
+            "end_date"
+        ),
+        orm.Load(cls).joinedload("cycle").load_only(
+            "id",
+            "title",
+            "next_due_date"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_group_tasks").joinedload(
+            "contact"
+        ).load_only(
+            "email",
+            "name",
+            "id"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_group_tasks").joinedload(
+            "cycle_task_entries"
+        ).load_only(
+            "description",
+            "id"
+        ),
+        orm.Load(cls).joinedload("cycle").joinedload(
+            "contact"
+        ).load_only(
+            "email",
+            "name",
+            "id"
+        ),
+        orm.Load(cls).joinedload("contact").load_only(
+            "email",
+            "name",
+            "id"
+        ),
+    )
 
   @classmethod
   def eager_query(cls):

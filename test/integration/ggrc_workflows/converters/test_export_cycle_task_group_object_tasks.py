@@ -51,7 +51,7 @@ class TestExportTasks(TestCase):
       task = CycleTaskGroupObjectTask.query.filter(
           CycleTaskGroupObjectTask.id == task_id
       ).one()
-      self.assertSlugs("task title", task.title, [task.slug])
+      self.assert_slugs("task title", task.title, [task.slug])
 
   @data(0, 1, 2)
   def test_filter_by_task_due_date(self, task_count):
@@ -66,7 +66,7 @@ class TestExportTasks(TestCase):
       due_date_dict[str(task.end_date)].add(task.slug)
 
     for due_date, slugs in due_date_dict.iteritems():
-      self.assertSlugs("task due date", due_date, list(slugs))
+      self.assert_slugs("task due date", due_date, list(slugs))
 
   @data(0, 1, 2,)
   def test_filter_by_task_assignee(self, task_count):
@@ -77,11 +77,11 @@ class TestExportTasks(TestCase):
       task = CycleTaskGroupObjectTask.query.filter(
           CycleTaskGroupObjectTask.id == task_id
       ).one()
-      self.assertSlugs("task assignee", task.contact.email, [task.slug])
-      self.assertSlugs("task assignee", task.contact.name, [task.slug])
+      self.assert_slugs("task assignee", task.contact.email, [task.slug])
+      self.assert_slugs("task assignee", task.contact.name, [task.slug])
 
   def test_filter_by_task_comment(self):
-    """Test filter by comment"""
+    """Test filter by comments"""
     task_id = self.generate_tasks_for_cycle(4)[0]
     comment_text = "123"
     task = CycleTaskGroupObjectTask.query.filter(
@@ -91,7 +91,7 @@ class TestExportTasks(TestCase):
         cycle_task_group_object_task=task,
         description=comment_text,
     )
-    self.assertSlugs("task comment", comment_text, [task.slug])
+    self.assert_slugs("task comments", comment_text, [task.slug])
 
   @data(
       ("status", ["Task State", "task state", "task status"]),
@@ -112,7 +112,7 @@ class TestExportTasks(TestCase):
       expected_results[str(getattr(task, field))].append(task.slug)
     for value, slugs in expected_results.iteritems():
       for alias in aliases:
-        self.assertSlugs(alias, value, slugs)
+        self.assert_slugs(alias, value, slugs)
 
   @data(
       (
@@ -136,4 +136,4 @@ class TestExportTasks(TestCase):
         expected_results[value].append(task.slug)
     for value, slugs in expected_results.iteritems():
       for alias in aliases:
-        self.assertSlugs(alias, value, slugs)
+        self.assert_slugs(alias, value, slugs)

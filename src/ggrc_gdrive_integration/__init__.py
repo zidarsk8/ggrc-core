@@ -7,10 +7,10 @@ from ggrc import db             # noqa
 from ggrc import settings       # noqa
 from ggrc.app import app        # noqa
 from ggrc.models import Audit
+from ggrc.models import Control
 from ggrc.models import Document
 from ggrc.models import Meeting
 from ggrc.models import Program
-from ggrc.models import Request
 from ggrc.services.registry import service
 from ggrc_basic_permissions.contributed_roles import RoleContributions
 from ggrc_workflows.models import Workflow
@@ -34,8 +34,8 @@ Program.__bases__ = (Folderable,) + Program.__bases__
 Program.late_init_folderable()
 Audit.__bases__ = (Folderable,) + Audit.__bases__
 Audit.late_init_folderable()
-Request.__bases__ = (Folderable,) + Request.__bases__
-Request.late_init_folderable()
+Control.__bases__ = (Folderable,) + Control.__bases__
+Control.late_init_folderable()
 Document.__bases__ = (Fileable,) + Document.__bases__
 Document.late_init_fileable()
 Meeting.__bases__ = (Eventable,) + Meeting.__bases__

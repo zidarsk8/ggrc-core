@@ -143,11 +143,22 @@ def update_cycle_dates(cycle):
   """
   if cycle.id:
     # If `cycle` is already in the database, then eager load required objects
-    cycle = models.Cycle.query.filter_by(id=cycle.id).\
-        options(orm
-                .joinedload('cycle_task_groups')
-                .joinedload('cycle_task_group_tasks')
-                ).one()
+    cycle = models.Cycle.query.filter_by(
+        id=cycle.id
+    ).options(
+        orm.Load(models.Cycle).joinedload(
+            'cycle_task_groups'
+        ).joinedload(
+            'cycle_task_group_tasks'
+        ).load_only(
+            "id", "status", "start_date", "end_date"
+        ),
+        orm.Load(models.Cycle).joinedload(
+            'cycle_task_groups'
+        ).load_only(
+            "id", "status", "start_date", "end_date", "next_due_date",
+        ),
+    ).one()
 
   if not cycle.cycle_task_group_object_tasks and \
      cycle.workflow.kind != "Backlog":
@@ -308,11 +319,6 @@ def build_cycle(cycle, current_user=None, base_date=None):
       old_status=None
   )
 
-# 'InProgress' states propagate via these links
-_cycle_task_parent_attr = {
-    models.CycleTaskGroupObjectTask: ['cycle_task_group'],
-    models.CycleTaskGroup: ['cycle']
-}
 
 # 'Finished' and 'Verified' states are determined via these links
 _cycle_task_children_attr = {
@@ -347,59 +353,66 @@ def update_cycle_task_child_state(obj):
           update_cycle_task_child_state(child)
 
 
-def update_cycle_task_parent_state(obj):  # noqa
-  """Propagate changes to obj's parents"""
+def _update_parent_state(obj, parent, child_statuses):
+  """Util function, update status of sent parent, if it's allowed.
 
-  if not is_allowed_update(obj.__class__.__name__,
-                           obj.id, obj.context.id):
+  New status based on sent object status and sent child_statuses"""
+  if not is_allowed_update(obj.__class__.__name__, obj.id, obj.context.id):
     return
+  old_status = parent.status
+  if obj.status in {"InProgress", "Declined"}:
+    new_status = "InProgress"
+  elif obj.status in {"Finished", "Verified", "Assigned"}:
+    in_same_status = len(child_statuses) == 1
+    new_status = child_statuses.pop() if in_same_status else old_status
+  if old_status == new_status:
+    return
+  parent.status = new_status
+  db.session.add(parent)
+  Signals.status_change.send(
+      parent.__class__,
+      obj=parent,
+      old_status=old_status,
+      new_status=new_status,
+  )
 
-  def update_parent(parent, old_status, new_status):
-    """Update a parent element and emit a signal about the change"""
-    parent.status = new_status
-    db.session.add(parent)
-    Signals.status_change.send(
-        parent.__class__,
-        obj=parent,
-        old_status=old_status,
-        new_status=new_status,
-    )
-    update_cycle_task_parent_state(parent)
 
-  parent_attrs = _cycle_task_parent_attr.get(type(obj), [])
-  for parent_attr in parent_attrs:
-    if not parent_attr:
-      continue
+def update_cycle_task_object_task_parent_state(obj):
+  """Update cycle task group status for sent cycle task"""
+  if obj.cycle.workflow.kind == "Backlog":
+    return
+  child_statuses = set(i[0] for i in db.session.query(
+      models.CycleTaskGroupObjectTask.status
+  ).filter(
+      models.CycleTaskGroupObjectTask.cycle_task_group_id ==
+      obj.cycle_task_group_id,
+      models.CycleTaskGroupObjectTask.id != obj.id
+  ).distinct(
+  )) | {obj.status}
+  _update_parent_state(
+      obj,
+      obj.cycle_task_group,
+      child_statuses
+  )
+  update_cycle_task_group_parent_state(obj.cycle_task_group)
 
-    parent = getattr(obj, parent_attr, None)
-    old_status = parent.status
-    if not parent:
-      continue
 
-    # Don't propagate changes to CycleTaskGroup if it's a part of backlog wf
-    if isinstance(parent, models.CycleTaskGroup) \
-       and parent.cycle.workflow.kind == "Backlog":
-      continue
-
-    # If any child is `InProgress`, then parent should be `InProgress`
-    if obj.status in {"InProgress", "Declined"} and old_status != "InProgress":
-      new_status = "InProgress"
-      update_parent(parent, old_status, new_status)
-    # If all children are `Finished` or `Verified`, then parent should be same
-    elif obj.status in {"Finished", "Verified", "Assigned"}:
-      children_attrs = _cycle_task_children_attr.get(type(parent), [])
-      for children_attr in children_attrs:
-        children = getattr(parent, children_attr, None)
-        if not children:
-          continue
-
-        children_statues = [c.status for c in children]
-        unique_statuses = set(children_statues)
-        for status in ["Verified", "Finished", "Assigned"]:
-          # Check if all elements match a certain state
-          if children_statues[0] == status and len(unique_statuses) == 1:
-            new_status = status
-            update_parent(parent, old_status, new_status)
+def update_cycle_task_group_parent_state(obj):
+  """Update cycle status for sent cycle task group"""
+  if obj.cycle.workflow.kind == "Backlog":
+    return
+  child_statuses = set(i[0] for i in db.session.query(
+      models.CycleTaskGroup.status
+  ).filter(
+      models.CycleTaskGroup.cycle_id == obj.cycle_id,
+      models.CycleTaskGroup.id != obj.id
+  ).distinct(
+  )) | {obj.status}
+  _update_parent_state(
+      obj,
+      obj.cycle,
+      child_statuses
+  )
 
 
 def ensure_assignee_is_workflow_member(workflow, assignee):
@@ -424,7 +437,6 @@ def ensure_assignee_is_workflow_member(workflow, assignee):
     db.session.add(workflow_person)
 
   # Check if assignee has a role assignment
-  from ggrc_basic_permissions.models import UserRole
   user_roles = UserRole.query.filter(
       UserRole.context_id == workflow.context_id,
       UserRole.person_id == assignee.id).count()
@@ -517,8 +529,8 @@ def handle_cycle_task_group_object_task_put(
   if inspect(obj).attrs.contact.history.has_changes():
     ensure_assignee_is_workflow_member(obj.cycle.workflow, obj.contact)
 
-  if inspect(obj).attrs.start_date.history.has_changes() \
-          or inspect(obj).attrs.end_date.history.has_changes():
+  if any([inspect(obj).attrs.start_date.history.has_changes(),
+          inspect(obj).attrs.end_date.history.has_changes()]):
     update_cycle_dates(obj.cycle)
 
   if inspect(obj).attrs.status.history.has_changes():
@@ -531,7 +543,7 @@ def handle_cycle_task_group_object_task_put(
         new_status=obj.status,
         old_status=inspect(obj).attrs.status.history.deleted.pop(),
     )
-    update_cycle_task_parent_state(obj)
+    update_cycle_task_object_task_parent_state(obj)
 
   # Doing this regardless of status.history.has_changes() is important in order
   # to update objects that have been declined. It updates the os_last_updated
@@ -559,7 +571,7 @@ def handle_cycle_task_group_object_task_post(
       new_status=obj.status,
       old_status=None,
   )
-  update_cycle_task_parent_state(obj)
+  update_cycle_task_object_task_parent_state(obj)
   db.session.flush()
 
 
@@ -567,7 +579,7 @@ def handle_cycle_task_group_object_task_post(
 def handle_cycle_task_group_put(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.status.history.has_changes():
-    update_cycle_task_parent_state(obj)
+    update_cycle_task_group_parent_state(obj)
     update_cycle_task_child_state(obj)
 
 
@@ -1006,6 +1018,7 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
           'WorkflowMember': ['WorkflowBasicReader'],
       },
   }
+
 
 ROLE_CONTRIBUTIONS = WorkflowRoleContributions()
 ROLE_DECLARATIONS = WorkflowRoleDeclarations()

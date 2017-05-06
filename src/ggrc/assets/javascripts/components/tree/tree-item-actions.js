@@ -6,29 +6,46 @@
 (function (can, GGRC) {
   'use strict';
 
+  var forbiddenList = ['Cycle', 'CycleTaskGroup'];
+
   var template = can.view(GGRC.mustache_path +
     '/components/tree/tree-item-actions.mustache');
 
   var viewModel = can.Map.extend({
     define: {
       deepLimit: {
-        type: Number,
+        type: 'number',
         value: 0
       },
       canExpand: {
-        type: Boolean,
+        type: 'boolean',
         value: false
       },
       expandIcon: {
-        type: String,
+        type: 'string',
         get: function () {
           return this.attr('expanded') ? 'compress' : 'expand';
         }
       },
       expanderTitle: {
-        type: String,
+        type: 'string',
         get: function () {
           return this.attr('expanded') ? 'Collapse tree' : 'Expand tree';
+        }
+      },
+      isSnapshot: {
+        type: 'boolean',
+        get: function () {
+          return GGRC.Utils.Snapshots.isSnapshot(this.attr('instance'));
+        }
+      },
+      isAllowedToEdit: {
+        type: 'boolean',
+        get: function () {
+          var type = this.attr('instance.type');
+          var isSnapshot = this.attr('isSnapshot');
+          var isInForbiddenList = forbiddenList.indexOf(type) > -1;
+          return !(isSnapshot || isInForbiddenList);
         }
       }
     },

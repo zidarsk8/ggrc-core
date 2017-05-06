@@ -284,6 +284,8 @@
         var allowed;
         // TODO: Currently Query API doesn't support CustomAttributable.
         var isCustomAttr = /CustomAttr/.test(this.options.model.shortName);
+        var isRoleable = /Roleable|AccessControlRole/.test(
+                            this.options.model.shortName);
 
         this.display_prefs = displayPrefs;
 
@@ -292,7 +294,9 @@
         this.options.attr('is_subtree',
           this.element && this.element.closest('.inner-tree').length > 0);
 
-        if (!this.options.attr('is_subtree') && !isCustomAttr) {
+        if (
+          !this.options.attr('is_subtree') && !isCustomAttr && !isRoleable
+        ) {
           this.page_loader = new GGRC.ListLoaders.TreePageLoader(
             this.options.model, this.options.parent_instance,
             this.options.mapping);
@@ -451,7 +455,7 @@
       var self = this;
       var options = this.options;
       var counts;
-      var countsName = options.counts_name || options.model.shortName;
+      var countsName = options.countsName || options.model.shortName;
 
       if (this.options.parent_instance && this.options.mapping) {
         counts = GGRC.Utils.CurrentPage.getCounts();
@@ -1464,7 +1468,7 @@
       return this.page_loader.load({data: [params]})
         .then(function (data) {
           var total = data.total;
-          var countsName = this.options.counts_name || modelName;
+          var countsName = this.options.countsName || modelName;
           var currentPageUtils = GGRC.Utils.CurrentPage;
 
           this.options.attr('paging.total', total);

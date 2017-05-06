@@ -1,0 +1,62 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+.action-toolbar {
+  display: block;
+  position: relative;
+
+  &__controls {
+    top: 0;
+    right: 16px;
+    position: absolute;
+  }
+
+  &__controls-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
+    width: 28px;
+    border-radius: 14px;
+    background: #333;
+    cursor: pointer;
+
+    &:hover {
+      background: darken(#333, 10%);
+      box-shadow: 0 1px 10px -1px rgba(0, 0, 0, 0.4);
+    }
+
+    &-disabled {
+      opacity: 0.25;
+
+      &:hover {
+        background: #333;
+        box-shadow: none;
+      }
+    }
+
+    .fa {
+      color: $white;
+      font-size: 18px;
+    }
+  }
+}
+
+.unmap-button {
+  box-shadow: none;
+  border-color: transparent;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  width: 28px;
+  border-radius: 14px;
+  background: transparent;
+
+  &:focus {
+    outline: none;
+  }
+}

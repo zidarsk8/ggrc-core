@@ -59,6 +59,13 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
   _include_links = [
       "revision"
   ]
+  _aliases = {
+      "attributes": "Attributes",
+      "mappings": {
+          "display_name": "Mappings",
+          "type": "mapping",
+      }
+  }
 
   parent_id = deferred(db.Column(db.Integer, nullable=False), "Snapshot")
   parent_type = deferred(db.Column(db.String, nullable=False), "Snapshot")

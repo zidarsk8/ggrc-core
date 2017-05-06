@@ -26,16 +26,15 @@
                         <auto-save-form-status
                                 {form-saving}="formState.saving"
                                 {form-all-saved}="formState.allSaved"
+                                {is-dirty}="formState.isDirty"
                         ></auto-save-form-status>
                         <i class="fa fa-question-circle" rel="tooltip"
                            data-original-title="Respond to assessment here. Use comments on the right for free text responses."></i>
                     </div>
                     <div class="assessment-controls__extra-controls">
-                        <assessment-attachments-list class="assesment-attachment-list attachments-list-control"
-                                                     title="Evidence"
-                                                     tooltip="You can upload up to 10 files in a single batch">
+                        <assessment-attachments-list tooltip="You can upload up to 10 files in a single batch">
                         </assessment-attachments-list>
-                        <assessment-urls-list></assessment-urls-list>
+                        <assessment-urls-list {mapped-items}="documents"></assessment-urls-list>
                     </div>
                     <auto-save-form {fields}="formFields"
                                     {edit-mode}="editMode"
@@ -44,6 +43,7 @@
                                     {^fields-to-save-available}="formState.fieldsToSaveAvailable"
                                     {^saving}="formState.saving"
                                     {^all-saved}="formState.allSaved"
+                                    {^is-dirty}="formState.isDirty"
                     ></auto-save-form>
                   <!-- Modal Window to fix validation issues of CA fields -->
                     <simple-modal {(state)}="modal.state" {modal-title}="modal.modalTitle" {instance}="instance">
@@ -84,6 +84,12 @@
                         </collapsible-panel>
                         <collapsible-panel title-text="People" title-icon="fa-users" class="details-item">
                             <people-list {instance}="instance" editable="true" disable-title="true"></people-list>
+                            <access-control-list
+                                instance="instance"
+                                autosave="true"
+                                top-wrapper-class="'body-inner'"
+                                role-block-class="'span3'">
+                            </access-control-list>
                         </collapsible-panel>
                         <collapsible-panel title-text="Dates" title-icon="fa-calendar" class="details-item">
                           {{> '/static/mustache/assessments/dates_list.mustache'}}
@@ -152,7 +158,7 @@
                   {{> '/static/mustache/assessments/related-assessments.mustache' }}
                 </tab-panel>
                 <tab-panel {(panels)}="panels" title-text="Related Issues">
-                  {{> '/static/mustache/assessments/related_issues.mustache' }}
+                  <related-issues {base-instance}="instance" {all-related-snapshots}="mappedSnapshots"></related-issues>
                 </tab-panel>
             </tab-container>
         </div>

@@ -351,6 +351,7 @@
             // Turn off popover for the removed person
             $(el).closest('li').find('.person-tooltip-trigger')
               .removeClass('person-tooltip-trigger');
+            $(el).addClass('hidden');
 
             if (deferred) {
               this.deferred_remove_role(person, roleToRemove);
@@ -359,6 +360,10 @@
                 var roles = result.roles;
                 var relationship = result.relationship;
                 var resultPromise;
+
+                if (!relationship) {
+                  return;
+                }
 
                 roles = _.without(roles, roleToRemove);
 

@@ -8,31 +8,31 @@
     <tab-container class="related-assessments__tab-container">
         <tab-panel {(panels)}="panels" title-text="Attributes">
             <div class="fields-wrapper flex-box flex-row">
-              {{#each selectedAssessmentFields}}
-                <div class="field-wrapper flex-size-1">
-                  <ca-object-validation-icon {validation}="validation"></ca-object-validation-icon>
-                  <div class="field-title">
-                    <label class="field-title__text" for="form-field-{{id}}">{{title}}</label>
-                    {{#if helptext}}
-                      <i class="fa fa-question-circle helper-text" rel="tooltip" title="{{helptext}}"></i>
-                    {{/if}}
-                  </div>
-                    <auto-save-form-field-view
-                      {type}="type"
-                      {value}="value"
-                    ></auto-save-form-field-view>
-                </div>
-              {{/each}}
+                <show-more items="selectedAssessmentFields">
+                    <div class="field-wrapper flex-size-1">
+                        <ca-object-validation-icon {validation}="validation"></ca-object-validation-icon>
+                        <div class="field-title">
+                            <label class="field-title__text" for="form-field-{{id}}">{{title}}</label>
+                            {{#if helptext}}
+                                <i class="fa fa-question-circle helper-text" rel="tooltip" title="{{helptext}}"></i>
+                            {{/if}}
+                        </div>
+                        <auto-save-form-field-view
+                                {type}="type"
+                                {value}="value"
+                        ></auto-save-form-field-view>
+                    </div>
+                </show-more>
             </div>
         </tab-panel>
         <tab-panel {(panels)}="panels" title-text="Comments">
-          <related-comments {parent-instance}="item.data">
-              <mapped-objects
-                  {parent-instance}="parentInstance"
-                  {related-types}="relatedTypes">
-                <comment-list-item {instance}="instance"></comment-list-item>
-              </mapped-objects>
-          </related-comments>
+            <related-comments {parent-instance}="item.data">
+                <mapped-objects
+                        {parent-instance}="parentInstance"
+                        {related-types}="relatedTypes">
+                    <comment-list-item {instance}="instance"></comment-list-item>
+                </mapped-objects>
+            </related-comments>
         </tab-panel>
     </tab-container>
 </object-popover>

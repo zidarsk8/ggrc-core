@@ -16,6 +16,7 @@ description = """
   """
 permissions = {
     "read": [
+        "AccessControlList",
         "Audit",
         "Snapshot",
         "Categorization",
@@ -65,7 +66,6 @@ permissions = {
         "ObjectOwner",
         "Person",
         "Program",
-        "Request",
         "Revision",
         "Role",
         "UserRole",

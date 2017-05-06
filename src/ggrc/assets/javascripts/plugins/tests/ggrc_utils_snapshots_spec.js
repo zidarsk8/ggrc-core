@@ -58,4 +58,43 @@ describe('GGRC Utils Snapshots', function () {
       }
     );
   });
+
+  describe('toObject() method', function () {
+    var snapshot;
+    var toObject;
+
+    beforeAll(function () {
+      toObject = GGRC.Utils.Snapshots.toObject;
+    });
+
+    beforeEach(function () {
+      snapshot = {
+        id: 12345,
+        type: 'Snapshot',
+        child_id: 42,
+        child_type: 'Control',
+        revision: {
+          content: {
+            access_control_list: [
+              {ac_role_id: 10, person_id: 4},
+              {ac_role_id: 17, person_id: 2},
+              {ac_role_id: 12, person_id: 4}
+            ]
+          }
+        }
+      };
+    });
+
+    it('adds person stubs to access control list items', function () {
+      var result = toObject(snapshot);
+
+      expect(result.access_control_list).toBeDefined();
+
+      result.access_control_list.forEach(function (item) {
+        expect(item.person).toBeDefined();
+        expect(item.person.type).toEqual('Person');
+        expect(item.person.id).toEqual(item.person_id);
+      });
+    });
+  });
 });

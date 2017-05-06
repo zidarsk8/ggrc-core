@@ -3,17 +3,24 @@
 
 """Base test case for all ggrc integration tests."""
 from collections import defaultdict
+import contextlib
 import json
 import logging
 import os
 import tempfile
+import csv
+from StringIO import StringIO
 
 from sqlalchemy import exc
+from sqlalchemy import func
+from sqlalchemy.sql.expression import tuple_
 from flask.ext.testing import TestCase as BaseTestCase
 
 from ggrc import db
 from ggrc.app import app
+from ggrc.models import Revision
 from integration.ggrc.api_helper import Api
+from integration.ggrc.models import factories
 
 # Hide errors during testing. Errors are still displayed after all tests are
 # done. This is for the bad request error messages while testing the api calls.
@@ -58,6 +65,16 @@ class TestCase(BaseTestCase, object):
   ]
 
   maxDiff = None
+
+  @contextlib.contextmanager
+  def custom_headers(self, headers=None):
+    """Context manager that allowed to add some custom headers in request."""
+    tmp_headers = self._custom_headers.copy()
+    self._custom_headers.update(headers or {})
+    try:
+      yield
+    finally:
+      self._custom_headers = tmp_headers
 
   @classmethod
   def clear_data(cls):
@@ -108,6 +125,7 @@ class TestCase(BaseTestCase, object):
 
   def setUp(self):
     self.clear_data()
+    self._custom_headers = {}
 
   def tearDown(self):  # pylint: disable=no-self-use
     db.session.remove()
@@ -177,14 +195,16 @@ class TestCase(BaseTestCase, object):
     dry_run = kwargs.get("dry_run", False)
     person = kwargs.get("person")
     with tempfile.NamedTemporaryFile(dir=cls.CSV_DIR, suffix=".csv") as tmp:
-      tmp.write('Object type,\n')
       for data in import_data:
+        tmp.write('Object type,\n')
         data = data.copy()
         object_type = data.pop("object_type")
         keys = data.keys()
         tmp.write('{0},{1}\n'.format(object_type, ','.join(keys)))
-        tmp.write(',{0}\n'.format(','.join(str(data[k]) for k in keys)))
-        tmp.seek(0)
+        line = ','.join(u"\"{}\"".format(data[k]) for k in keys)
+        tmp.write(',{0}\n'.format(line))
+        tmp.write(',\n')
+      tmp.seek(0)
       return cls._import_file(os.path.basename(tmp.name), dry_run, person)
 
   @classmethod
@@ -222,6 +242,7 @@ class TestCase(BaseTestCase, object):
         "X-requested-by": "GGRC",
         "X-export-view": "blocks",
     }
+    headers.update(self._custom_headers)
     return self.client.post("/_service/export_csv", data=json.dumps(data),
                             headers=headers)
 
@@ -236,12 +257,12 @@ class TestCase(BaseTestCase, object):
     """
     resp = self.export_csv(data)
     self.assert200(resp)
-    rows = resp.data.split("\r\n")
+    rows = csv.reader(StringIO(resp.data))
+
     object_type = None
     keys = []
     results = defaultdict(list)
-    for row in rows:
-      columns = row.split(',')
+    for columns in rows:
       if not any(columns):
         continue
       if columns[0] == "Object type":
@@ -253,11 +274,11 @@ class TestCase(BaseTestCase, object):
         keys = columns[1:]
         object_type = columns[0]
         continue
+      columns = [unicode(val) for val in columns]
       results[object_type].append(dict(zip(keys, columns[1:])))
     return results
 
-  # pylint: disable=invalid-name
-  def assertSlugs(self, field, value, slugs):
+  def assert_slugs(self, field, value, slugs, operator=None):
     """Assert slugs for selected search"""
     assert self.model
     search_request = [{
@@ -265,7 +286,7 @@ class TestCase(BaseTestCase, object):
         "filters": {
             "expression": {
                 "left": field,
-                "op": {"name": "="},
+                "op": {"name": operator or "="},
                 "right": value,
             },
         },
@@ -289,8 +310,45 @@ class TestCase(BaseTestCase, object):
     for f_string in formats:
       yield f_string.format(**kwargs)
 
-  # pylint: disable=invalid-name
-  def assertFilterByDatetime(self, alias, datetime_value, slugs, formats=None):
+  # pylint: disable=too-many-arguments
+  def assert_filter_by_datetime(self, alias, datetime_value, slugs,
+                                formats=None, operator=None):
     """Assert slugs for each date format ent datetime"""
     for date_string in self.generate_date_strings(datetime_value, formats):
-      self.assertSlugs(alias, date_string, slugs)
+      self.assert_slugs(alias, date_string, slugs, operator)
+
+  @staticmethod
+  def _get_latest_object_revisions(objects):
+    """Get latest revisions of given objects."""
+    object_tuples = [(o.id, o.type) for o in objects]
+    revisions = Revision.query.filter(
+        Revision.id.in_(
+            db.session.query(func.max(Revision.id)).filter(
+                tuple_(
+                    Revision.resource_id,
+                    Revision.resource_type,
+                ).in_(object_tuples)
+            ).group_by(
+                Revision.resource_type,
+                Revision.resource_id,
+            )
+        )
+    )
+    return revisions
+
+  def _create_snapshots(self, audit, objects):
+    """Create snapshots of latest object revisions for given objects."""
+    # This commit is needed if we're using factories with single_commit, so
+    # that the latest revisions will be fetched properly.
+    db.session.commit()
+    revisions = self._get_latest_object_revisions(objects)
+    snapshots = [
+        factories.SnapshotFactory(
+            child_id=revision.resource_id,
+            child_type=revision.resource_type,
+            revision=revision,
+            parent=audit,
+        )
+        for revision in revisions
+    ]
+    return snapshots

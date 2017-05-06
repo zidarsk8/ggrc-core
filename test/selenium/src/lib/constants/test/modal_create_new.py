@@ -52,8 +52,6 @@ LONG_DESCRIPTION = u"""Governance, Risk Management, and Compliance (GRC)
 
 class Programs(object):
   """Constants to fill of Program create modals."""
-  PRIMARY_CONTACT = "selenium@test.com"
-  SECONDARY_CONTACT = "selenium@test.com"
   PROGRAM_URL = "www.program_url.com"
   REFERENCE_URL = "www.reference_url.com"
   EFFECTIVE_DATE = "12/01/2014"

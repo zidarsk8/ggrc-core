@@ -19,7 +19,7 @@
           type: String,
           get: function () {
             return !this.attr('resetStyles') ?
-              'btn btn-draft btn-extra-gray ' + this.attr('extraBtnCSS') : '';
+              'btn btn-lightBlue ' + this.attr('extraBtnCSS') : '';
           }
         },
         resetStyles: {

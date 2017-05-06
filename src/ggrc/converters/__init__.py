@@ -24,11 +24,11 @@ from ggrc.models import Product
 from ggrc.models import Program
 from ggrc.models import Project
 from ggrc.models import Regulation
-from ggrc.models import Request
 from ggrc.models import Section
 from ggrc.models import Standard
 from ggrc.models import System
 from ggrc.models import Vendor
+from ggrc.models import Snapshot
 
 
 def get_shared_unique_rules():
@@ -79,14 +79,15 @@ GGRC_IMPORTABLE = {
     "program": Program,
     "project": Project,
     "regulation": Regulation,
-    "request": Request,
     "section": Section,
     "standard": Standard,
     "system": System,
     "vendor": Vendor,
 }
 
-GGRC_EXPORTABLE = {}
+GGRC_EXPORTABLE = {
+    "snapshot": Snapshot,
+}
 
 
 def _get_types(attr):

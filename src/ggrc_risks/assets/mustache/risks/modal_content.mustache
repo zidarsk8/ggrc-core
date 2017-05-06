@@ -54,7 +54,17 @@
             {{> /static/mustache/people/owners_modal_connector.mustache}}
         </div>
       </div>
-      {{> /static/mustache/base_objects/modal_contact_fields.mustache}}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="span12 hide-wrap hidable">
+      <access-control-list
+          instance="."
+          {is-new-instance}="new_object_form"
+          top-wrapper-class="'span12'"
+          role-block-class="'span6'">
+      </access-control-list>
     </div>
   </div>
 

@@ -17,6 +17,7 @@
     mixins: ['ownable', 'contactable', 'unique_title', 'ca_update',
              'timeboxed'],
     is_custom_attributable: true,
+    isRoleable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
       owners: 'CMS.Models.Person.stubs',
@@ -76,31 +77,12 @@
           attr_sort_field: 'verify_frequency'
         },
         {attr_title: 'Assertions', attr_name: 'assertions'},
-        {attr_title: 'Categories', attr_name: 'categories'},
-        {
-          attr_title: 'Principal Assignee',
-          attr_name: 'principal_assessor',
-          attr_sort_field: 'principal_assessor'
-        },
-        {
-          attr_title: 'Secondary Assignee',
-          attr_name: 'secondary_assessor',
-          attr_sort_field: 'secondary_assessor'
-        }
+        {attr_title: 'Categories', attr_name: 'categories'}
       ]),
       display_attr_names: ['title', 'owner', 'status', 'last_assessment_date'],
       add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
       show_related_assessments: true,
-      draw_children: true,
-      child_options: [{
-        model: can.Model.Cacheable,
-        mapping: 'related_objects', // 'related_and_able_objects'
-        footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
-        add_item_view: GGRC.mustache_path +
-        '/base_objects/tree_add_item.mustache',
-        title_plural: 'Business Objects',
-        draw_children: false
-      }]
+      draw_children: true
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {

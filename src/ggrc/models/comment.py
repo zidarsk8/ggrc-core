@@ -44,7 +44,6 @@ class Commentable(object):
       "Assessor",
       "Assignee",
       "Creator",
-      "Requester",
       "Verifier",
   ])
 
@@ -92,6 +91,12 @@ class Commentable(object):
   _fulltext_attrs = [
       MultipleSubpropertyFullTextAttr("comment", "comments", ["description"]),
   ]
+
+  @classmethod
+  def indexed_query(cls):
+    return super(Commentable, cls).indexed_query().options(
+        orm.Load(cls).subqueryload("comments").load_only("id", "description")
+    )
 
   @declared_attr
   def comments(self):

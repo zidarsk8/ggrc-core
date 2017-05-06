@@ -8,6 +8,7 @@ from dateutil.parser import parse
 from sqlalchemy import and_
 
 from ggrc import models
+from ggrc import utils
 from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 
@@ -121,7 +122,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     value = None
     try:
       value = parse(self.raw_value).strftime(
-          models.CustomAttributeValue.DATE_FORMAT_ISO,
+          utils.DATE_FORMAT_ISO,
       )
     except (TypeError, ValueError):
       self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)

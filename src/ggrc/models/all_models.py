@@ -5,6 +5,8 @@
 
 import sys
 
+from ggrc.access_control.role import AccessControlRole
+from ggrc.access_control.list import AccessControlList
 from ggrc.models import inflector
 from ggrc.models.access_group import AccessGroup
 from ggrc.models.assessment import Assessment
@@ -50,7 +52,6 @@ from ggrc.models.program import Program
 from ggrc.models.project import Project
 from ggrc.models.relationship import Relationship
 from ggrc.models.relationship import RelationshipAttr
-from ggrc.models.request import Request
 from ggrc.models.revision import Revision
 from ggrc.models.section import Section
 from ggrc.models.snapshot import Snapshot
@@ -60,6 +61,8 @@ from ggrc.models.system import SystemOrProcess
 from ggrc.models.vendor import Vendor
 
 all_models = [
+    AccessControlRole,
+    AccessControlList,
     AccessGroup,
     Assessment,
     AssessmentTemplate,
@@ -98,7 +101,6 @@ all_models = [
     Project,
     Relationship,
     RelationshipAttr,
-    Request,
     Section,
     Clause,
     SystemOrProcess,
@@ -128,7 +130,7 @@ def register_model(model):
   """
   current_module = sys.modules[__name__]
   setattr(current_module, model.__name__, model)
-  model._inflector
+  inflector.register_inflections(model._inflector)
   all_models.append(model)
   __all__.append(model.__name__)
 

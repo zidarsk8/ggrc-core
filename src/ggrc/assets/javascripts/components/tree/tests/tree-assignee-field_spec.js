@@ -13,7 +13,7 @@ describe('GGRC.Components.treeAssigneeField', function () {
     viewModel = GGRC.Components.get('treeAssigneeField').prototype
       .viewModel.prototype;
     //  avoiding of calling init() in creation of viewModel object
-    newViewModel = Object.assign({}, viewModel);
+    newViewModel = _.assign({}, viewModel);
     newViewModel.init = function () {};
     newViewModel.oldInit = viewModel.init;
     viewModel = can.Map.extend(newViewModel)();

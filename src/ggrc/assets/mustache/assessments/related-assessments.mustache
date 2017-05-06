@@ -4,12 +4,10 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <related-objects {base-instance}="instance" related-items-type="Assessment" order-by="finished_date,created_at">
     <reusable-objects-list {base-instance}="instance">
-        <div class="grid-data-toolbar flex-box">
-            <tree-pagination {(paging)}="paging"></tree-pagination>
+        <div class="grid-data__toolbar flex-box">
+            <tree-pagination {(paging)}="paging" class="grid-data__toolbar-item"></tree-pagination>
             {{#is_allowed 'update' baseInstance context='for'}}
-                <div class="grid-data-toolbar-control">
-                    <button class="btn btn-small btn-full btn-success" ($click)="reuseSelected" {{^hasSelected}}disabled{{/hasSelected}}>Reuse</button>
-                </div>
+                <button class="btn btn-small btn-green grid-data__toolbar-item" ($click)="reuseSelected" {{^hasSelected}}disabled{{/hasSelected}}>Reuse</button>
             {{/is_allowed}}
         </div>
         <div class="grid-data-header flex-row flex-box">
@@ -38,72 +36,88 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 More info
             </div>
         </div>
-          <div class="grid-data-body center-empty-message {{#if isLoading}}loading{{/if}}">
-            <object-list {items}="relatedObjects" {is-loading}="isLoading" spinner-css="grid-spinner" {(selected-item)}="selectedItem"
-                         {item-selector}="objectSelectorEl" {empty-message}="noRelatedObjectsMessage">
-                <div class="grid-data-row flex-row flex-box">
-                    <div class="grid-data-item-index">
-                      <state-colors-map {state}="instance.status"></state-colors-map>
-                    </div>
-                    <div class="grid-data-item-index">
-                      {{localize_date instance.finished_date}}
-                    </div>
-                    <div class="grid-data-item-index">
-                      {{localize_date instance.created_at}}
-                    </div>
-                    <div class="flex-size-3">
-                        <related-controls-objectives {parent-instance}="instance">
-                          <mapped-objects
-                                {mapped-snapshots}="mappedSnapshots"
-                                {filter}="filter"
-                                {parent-instance}="parentInstance">
-                            <business-object-list-item {instance}="instance"></business-object-list-item>
-                          </mapped-objects>
-                        </related-controls-objectives>
-                    </div>
-                    <div class="flex-size-3">
-                        <related-audits {parent-instance}="instance">
-                            <mapped-objects
-                                {parent-instance}="parentInstance"
-                                {related-types}="relatedTypes">
-                                <a href="{{instance.viewLink}}" target="_blank">{{instance.title}}</a>
-                            </mapped-objects>
-                        </related-audits>
-                    </div>
-                    <div class="flex-size-3">
-                        <mapped-objects
-                                {parent-instance}="instance"
-                                mapping="all_documents">
-                            <reusable-objects-item {instance}="instance"
-                                                   {is-saving}="isSaving"
-                                                   {base-instance}="baseInstance"
-                                                   {mapping}="mapping"
-                                                   {check-reused-status}="checkReusedStatus"
-                                                   {(selected-list)}="evidenceList">
-                                <document-object-list-item {instance}="instance"></document-object-list-item>
-                            </reusable-objects-item>
-                        </mapped-objects>
-                    </div>
-                    <div class="flex-size-3">
-                        <mapped-objects
-                                {parent-instance}="instance"
-                                mapping="all_urls">
-                            <reusable-objects-item {instance}="instance"
-                                                   {is-saving}="isSaving"
-                                                   {base-instance}="baseInstance"
-                                                   {mapping}="mapping"
-                                                   check-reused-status="checkReusedStatus"
-                                                   {(selected-list)}="urlList">
-                               <document-object-list-item {instance}="instance"></document-object-list-item>
-                            </reusable-objects-item>
-                        </mapped-objects>
-                    </div>
-                    <div class="grid-data__action-column">
-                        <button class="btn btn-icon btn-icon-sm" title="Show More Information"><i class="fa fa-comment-o"></i></button>
-                    </div>
-                </div>
-            </object-list>
-              <related-assessment-popover class="object-popover related-assessments__object-popover" {selected-assessment}="selectedItem"></related-assessment-popover>
+        <div class="grid-data-body center-empty-message {{#if isLoading}}loading{{/if}}">
+            <related-assessment-list {assessments}="relatedObjects">
+                {{#if assessments.length}}
+                    <spinner {toggle}="itemsLoading" class="spinner-wrapper active"
+                             extra-css-class="grid-spinner"></spinner>
+                {{/if}}
+                <object-list {(items)}="assessments" {is-loading}="isLoading" spinner-css="grid-spinner"
+                             {(selected-item)}="selectedItem"
+                             {item-selector}="objectSelectorEl" {empty-message}="noRelatedObjectsMessage" class="object-list__limited-height">
+                    <related-assessment-item {^sub-items-loading}="itemLoading"
+                                             class="{{#itemsLoading}}hidden{{/itemsLoading}}">
+                        <div class="grid-data-row flex-row flex-box">
+                            <div class="grid-data-item-index">
+                                <state-colors-map {state}="instance.status"></state-colors-map>
+                            </div>
+                            <div class="grid-data-item-index">
+                                {{localize_date instance.finished_date}}
+                            </div>
+                            <div class="grid-data-item-index">
+                                {{localize_date instance.created_at}}
+                            </div>
+                            <div class="flex-size-3">
+                                <related-controls-objectives {parent-instance}="instance">
+                                    <mapped-objects
+                                            {mapped-snapshots}="mappedSnapshots"
+                                            {filter}="filter"
+                                            {parent-instance}="parentInstance"
+                                            {^is-loading}="loadingState.controlsLoading">
+                                        <business-object-list-item {instance}="instance"></business-object-list-item>
+                                    </mapped-objects>
+                                </related-controls-objectives>
+                            </div>
+                            <div class="flex-size-3">
+                                <related-audits {parent-instance}="instance">
+                                    <mapped-objects
+                                            {parent-instance}="parentInstance"
+                                            {related-types}="relatedTypes"
+                                            {^is-loading}="loadingState.auditLoading">
+                                        <a href="{{instance.viewLink}}" target="_blank">{{instance.title}}</a>
+                                    </mapped-objects>
+                                </related-audits>
+                            </div>
+                            <div class="flex-size-3">
+                                <mapped-objects
+                                        {parent-instance}="instance"
+                                        mapping="all_documents"
+                                        {^is-loading}="loadingState.attachmentsLoading">
+                                    <reusable-objects-item {instance}="instance"
+                                                           {is-saving}="isSaving"
+                                                           {base-instance}="baseInstance"
+                                                           {mapping}="mapping"
+                                                           {check-reused-status}="checkReusedStatus"
+                                                           {(selected-list)}="evidenceList">
+                                        <document-object-list-item {instance}="instance"></document-object-list-item>
+                                    </reusable-objects-item>
+                                </mapped-objects>
+                            </div>
+                            <div class="flex-size-3">
+                                <mapped-objects
+                                        {parent-instance}="instance"
+                                        mapping="all_urls"
+                                        {^is-loading}="loadingState.urlsLoading">
+                                    <reusable-objects-item {instance}="instance"
+                                                           {is-saving}="isSaving"
+                                                           {base-instance}="baseInstance"
+                                                           {mapping}="mapping"
+                                                           check-reused-status="checkReusedStatus"
+                                                           {(selected-list)}="urlList">
+                                        <document-object-list-item {instance}="instance"></document-object-list-item>
+                                    </reusable-objects-item>
+                                </mapped-objects>
+                            </div>
+                            <div class="grid-data__action-column">
+                                <button class="btn btn-icon btn-icon-sm" title="Show More Information"><i
+                                        class="fa fa-comment-o"></i></button>
+                            </div>
+                        </div>
+                    </related-assessment-item>
+                </object-list>
+            </related-assessment-list>
+            <related-assessment-popover class="object-popover related-assessments__object-popover"
+                                        {selected-assessment}="selectedItem"></related-assessment-popover>
         </div>
     </reusable-objects-list>
 </related-objects>

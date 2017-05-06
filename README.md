@@ -143,10 +143,15 @@ Tests are your friend! Keep them running, keep them updated.
 #### For JavaScript tests:
 
 ```sh
-run_karma
+run_karma # To run karma with PhantomJS
+run_karma_chrome # To run karma in host browser (open http://localhost:9876)
 ```
 
-Then open Chrome at URL: <http://localhost:9876>
+`run_karma` is the default way of running tests as it automatically
+builds the javascript assets on file changes. Use `run_karma_chrome` if you
+need to debug an issue in the chrome browser. For performance reasons
+`run_karma_chrome` does not automatically build assets, so make sure you do it
+manually by running `build_assets`.
 
 #### For Python tests:
 
@@ -161,6 +166,12 @@ This will run the tests on each file update.
 
 ```sh
 cd test/unit; sniffer
+```
+
+You can drop into ipdb debugger on failures by running:
+
+```sh
+run_pytests --ipdb-failures
 ```
 
 #### For Selenium tests:
@@ -449,7 +460,7 @@ build_assets
 
 # Copyright Notice
 
-Copyright (C) 2013-2016 Google Inc., authors, and contributors (see the AUTHORS
+Copyright (C) 2013-2017 Google Inc., authors, and contributors (see the AUTHORS
 file).
 Licensed under the [Apache 2.0](http://www.apache.org/licenses/LICENSE-2.0)
 license (see the LICENSE file).

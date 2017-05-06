@@ -50,6 +50,7 @@ dashboard-js-files:
   - plugins/utils/state-utils.js
   - plugins/utils/ggrcq-utils.js
   - plugins/utils/tree-view-utils.js
+  - plugins/utils/dashboards-utils.js
   - plugins/datepicker.js
   - plugins/can_control.js
   - plugins/wysiwyg.js
@@ -108,16 +109,21 @@ dashboard-js-files:
   - models/revision.js
   - models/save_queue.js
   - models/custom_attributes.js
+  - models/custom_roles.js
   - models/assessment.js
   - models/control.js
   - models/section.js
   - models/system.js
   - models/join_models.js
+  # ViewModels
+  - components/view-models/tree-item-base-vm.js
+  - components/base-objects/pagination.js
   # Controllers
   - controllers/filterable_controller.js
   - controllers/dashboard_widgets_controller.js
   - controllers/info_widget_controller.js
   - controllers/summary_widget_controller.js
+  - controllers/dashboard_widget_controller.js
   - controllers/modals_controller.js
   - controllers/delete_modal_controller.js
   - controllers/help_controller.js
@@ -144,7 +150,6 @@ dashboard-js-files:
   - apps/business_objects.js
   - apps/custom_attributes.js
   # Components
-  - components/view-models/tree-item-base-vm.js
   - components/state-colors-map/state-colors-map.js
   - components/spinner/spinner.js
   - components/modal-connector.js
@@ -168,18 +173,22 @@ dashboard-js-files:
   - components/object-popover/object-popover.js
   - components/mapped-objects/mapped-objects.js
   - components/related-objects/related-audits.js
+  - components/related-objects/related-assessment-item.js
+  - components/related-objects/related-assessment-list.js
   - components/related-objects/related-comments.js
   - components/related-objects/related-controls-objectives.js
+  - components/related-objects/related-issues.js
   - components/object-state-toolbar/object-state-toolbar.js
   - components/object-list/object-list.js
   - components/ca-object/ca-object.js
-  - components/ca-object/ca-object-validation-icon.js
+  - components/form/form-validation-icon.js
   - components/ca-object/ca-object-value-mapper.js
   - components/ca-object/ca-object-modal-content.js
   - components/related-objects/related-objects.js
   - components/reusable-objects/reusable-objects-list.js
   - components/reusable-objects/reusable-objects-item.js
   - components/simple-modal/simple-modal.js
+  - components/show-more/show-more.js
   - components/show-related-assessments-button/show-related-assessments-button.js
   - components/mapping-controls/mapping-type-selector.js
   - components/dropdown/dropdown.js
@@ -207,7 +216,7 @@ dashboard-js-files:
   - components/tabs/tab-panel.js
   - components/assessment_attributes.js
   - components/lazy_open_close.js
-  - components/object_history/object_history.js
+  - components/revision-log/revision-log.js
   - components/unified-mapper/mapper.js
   - components/unified-mapper/mapper-toolbar.js
   - components/unified-mapper/mapper-filter.js
@@ -220,6 +229,7 @@ dashboard-js-files:
   - components/unified-mapper/mapper-results-columns-configuration.js
   - components/quick_form/quick_add.js
   - components/quick_form/quick_update.js
+  - components/access_control_list/access_control_list.js
   - components/assessment_templates/assessment_templates.js
   - components/modal_wrappers/assessment_template_form.js
   - components/modal_wrappers/checkboxes_to_list.js
@@ -244,6 +254,8 @@ dashboard-js-files:
   - components/tree/tree-header.js
   - components/tree/tree-filter-input.js
   - components/tree/tree-status-filter.js
+  - components/tree/tree-item-status-for-workflow.js
+  - components/cycle-task-actions/cycle-task-actions.js
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
   - components/add-issue-button/add-issue-button.js
@@ -281,8 +293,9 @@ dashboard-js-files:
   - components/auto-save-form/field-views/checkbox-form-field-view.js
   - components/auto-save-form/field-views/date-form-field-view.js
   - components/auto-save-form/field-views/person-form-field-view.js
-  #- d3.v2.js
-  #- related_graph.js
+  - components/action-toolbar/action-toolbar.js
+  - components/action-toolbar-control/action-toolbar-control.js
+  - components/unmap-button/unmap-button.js
 
 app-init-files:
   - apps/dashboard.js
@@ -328,9 +341,10 @@ dashboard-js-template-files:
   - components/object-list-item/person-list-item.mustache
   - components/object-list-item/document-object-list-item.mustache
   - components/mapped-objects/mapped-objects.mustache
+  - components/related-objects/related-issues.mustache
   - components/reusable-objects/reusable-objects-item.mustache
-  - components/ca-object/ca-object-validation-icon.mustache
   - components/ca-object/ca-object-modal-content.mustache
+  - components/show-more/show-more.mustache
   - components/show-related-assessments-button/show-related-assessments-button.mustache
   - components/view-object-buttons/view-object-buttons.mustache
   - components/add-object-button/add-object-button.mustache
@@ -427,7 +441,6 @@ dashboard-js-template-files:
   - assessment_templates/modal_content.mustache
   - assessment_templates/info.mustache
   - assessment_templates/tree_add_item.mustache
-  - assessments/related_issues.mustache
   - issues/modal_content.mustache
   - issues/info.mustache
   - issues/remediation_plan.mustache
@@ -449,10 +462,11 @@ dashboard-js-template-files:
   - components/unified-mapper/mapper-results-items-header.mustache
   - components/unified-mapper/mapper-results-item-attrs.mustache
   - components/unified-mapper/mapper-results-columns-configuration.mustache
+  - components/access_control_list/access_control_list.mustache
   - components/assessment_templates/assessment_templates.mustache
   - components/dropdown/dropdown.mustache
   - components/dropdown/multiselect_dropdown.mustache
-  - components/object_history/object_history.mustache
+  - components/revision-log/revision-log.mustache
   - components/person/person.mustache
   - components/spinner/spinner.mustache
   - components/rich_text/rich_text.mustache
@@ -471,6 +485,8 @@ dashboard-js-template-files:
   - components/tree/tree-item.mustache
   - components/tree/tree-header.mustache
   - components/tree/tree-filter-input.mustache
+  - components/tree/tree-item-status-for-workflow.mustache
+  - components/cycle-task-actions/cycle-task-actions.mustache
   - components/simple-modal/simple-modal.mustache
   - components/page-header/page-header.mustache
   - components/auto-save-form/auto-save-form.mustache
@@ -494,6 +510,10 @@ dashboard-js-template-files:
   - custom_attribute_definitions/tree.mustache
   - custom_attribute_definitions/subtree.mustache
   - custom_attribute_definitions/tree_header.mustache
+  - access_control_roles/modal_content.mustache
+  - access_control_roles/tree.mustache
+  - access_control_roles/subtree.mustache
+  - access_control_roles/tree_header.mustache
   - dashboard/internav_list.mustache
   - dashboard/info/info.mustache
   - dashboard/info/get_started.mustache
@@ -553,7 +573,6 @@ dashboard-js-template-files:
   - people/option_detail.mustache
   - people/owners_modal_connector.mustache
   - people/popover.mustache
-  - people/tree.mustache
   - people/tree-item-attr.mustache
   - people/tree_add_item.mustache
   - people/tree_header.mustache
@@ -588,6 +607,7 @@ dashboard-js-template-files:
   - audits/tree-item-attr.mustache
   - audits/info.mustache
   - audits/summary.mustache
+  - audits/dashboard.mustache
   - audits/tree_add_item.mustache
   - audits/search_result.mustache
   - audits/extended_info.mustache

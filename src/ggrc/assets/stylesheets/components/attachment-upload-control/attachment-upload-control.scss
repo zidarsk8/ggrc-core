@@ -1,0 +1,31 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+.attachment-upload-control {
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-height: 28px;
+
+  &__button {
+    margin: 0;
+    padding: 0;
+    display: block;
+  }
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    left: -28px;
+    height: 28px;
+    position: absolute;
+    top: 0;
+  }
+  &__icon__error {
+     i {
+       font-size: 12px;
+     }
+  }
+}

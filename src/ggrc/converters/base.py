@@ -11,6 +11,7 @@ from ggrc.utils import structures
 from ggrc.cache.memcache import MemCache
 from ggrc.converters import get_exportables
 from ggrc.converters.base_block import BlockConverter
+from ggrc.converters.snapshot_block import SnapshotBlockConverter
 from ggrc.converters.import_helper import extract_relevant_data
 from ggrc.converters.import_helper import split_array
 from ggrc.fulltext import get_indexer
@@ -122,12 +123,16 @@ class Converter(object):
       object_class = object_map[class_name]
       object_ids = object_data.get("ids", [])
       fields = object_data.get("fields")
-      block_converter = BlockConverter(self, object_class=object_class,
-                                       fields=fields, object_ids=object_ids,
-                                       class_name=class_name)
-      block_converter.check_block_restrictions()
-      block_converter.row_converters_from_ids()
-      self.block_converters.append(block_converter)
+      if class_name == "Snapshot":
+        self.block_converters.append(
+            SnapshotBlockConverter(self, object_ids, fields=fields))
+      else:
+        block_converter = BlockConverter(self, object_class=object_class,
+                                         fields=fields, object_ids=object_ids,
+                                         class_name=class_name)
+        block_converter.check_block_restrictions()
+        block_converter.row_converters_from_ids()
+        self.block_converters.append(block_converter)
 
   def block_converters_from_csv(self):
     """Prepare BlockConverters and order them like specified in
@@ -166,7 +171,7 @@ class Converter(object):
     return self.response_data
 
   def get_object_names(self):
-    return [c.object_class.__name__ for c in self.block_converters]
+    return [c.name for c in self.block_converters]
 
   @classmethod
   def drop_cache(cls):

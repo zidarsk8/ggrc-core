@@ -68,26 +68,6 @@ describe('GGRC utils allowed_to_map() method', function () {
   });
 });
 
-describe('GGRC utils getRelatedObjects() method', function () {
-  it('returns related object only for second tier', function () {
-    var result = GGRC.Utils.getRelatedObjects(1);
-    expect(result).toEqual(jasmine.any(Object));
-    expect(result.mapping).toEqual('related_objects');
-    expect(result.draw_children).toBeFalsy();
-    expect(result.child_options).toEqual([{}]);
-  });
-
-  it('returns related objects for second and third tier', function () {
-    var result = GGRC.Utils.getRelatedObjects(2);
-    expect(result).toEqual(jasmine.any(Object));
-    expect(result.mapping).toEqual('related_objects');
-    expect(result.draw_children).toBeTruthy();
-    expect(result.child_options).toEqual(jasmine.any(Object));
-    expect(result.child_options[0].draw_children).toBeFalsy();
-    expect(result.child_options[0].mapping).toEqual('related_objects');
-  });
-});
-
 describe('GGRC utils getMappableTypes() method', function () {
   var mapper;
 
@@ -163,4 +143,72 @@ describe('GGRC utils isMappableType() method', function () {
     var result = GGRC.Utils.isMappableType('Program', 'Control');
     expect(result).toBe(true);
   });
+});
+
+describe('GGRC utils peopleWithRoleName() method', function () {
+  var instance;
+  var method;  // the method under test
+  var origRoleList;
+
+  beforeAll(function () {
+    method = GGRC.Utils.peopleWithRoleName;
+
+    origRoleList = GGRC.access_control_roles;
+    GGRC.access_control_roles = [
+      {id: 5, name: 'Role A', object_type: 'Market'},
+      {id: 9, name: 'Role A', object_type: 'Audit'},
+      {id: 1, name: 'Role B', object_type: 'Market'},
+      {id: 7, name: 'Role A', object_type: 'Policy'},
+      {id: 3, name: 'Role B', object_type: 'Audit'},
+      {id: 2, name: 'Role B', object_type: 'Policy'}
+    ];
+  });
+
+  afterAll(function () {
+    GGRC.access_control_roles = origRoleList;
+  });
+
+  beforeEach(function () {
+    var acl = [
+      {person: {id: 3}, ac_role_id: 1},
+      {person: {id: 5}, ac_role_id: 3},
+      {person: {id: 6}, ac_role_id: 9},
+      {person: {id: 2}, ac_role_id: 3},
+      {person: {id: 7}, ac_role_id: 9},
+      {person: {id: 5}, ac_role_id: 2},
+      {person: {id: 9}, ac_role_id: 9}
+    ];
+
+    instance = new can.Map({
+      id: 42,
+      type: 'Audit',
+      'class': {model_singular: 'Audit'},
+      access_control_list: acl
+    });
+  });
+
+  it('returns user IDs that have a role granted on a particular instance',
+    function () {
+      var result = method(instance, 'Role B');
+      expect(result.sort()).toEqual([2, 5]);
+    }
+  );
+
+  it('returns empty array if role name not found', function () {
+    var result = method(instance, 'Role X');
+    expect(result).toEqual([]);
+  });
+
+  it('returns empty array if no users are granted a particular role',
+    function () {
+      var result;
+
+      instance.attr('type', 'Policy');
+      instance.attr('class.model_singular', 'Policy');
+
+      result = method(instance, 'Role A');
+
+      expect(result).toEqual([]);
+    }
+  );
 });

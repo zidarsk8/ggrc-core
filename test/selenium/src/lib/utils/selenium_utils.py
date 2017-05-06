@@ -181,3 +181,8 @@ def wait_for_js_to_load(driver):
   """Wait until there all JS are completed."""
   return wait_until_condition(
       driver, lambda js: driver.execute_script("return jQuery.active") == 0)
+
+
+def click_via_js(driver, element):
+  """Click on element using JS."""
+  driver.execute_script("arguments[0].click();", element)

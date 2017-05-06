@@ -14,6 +14,10 @@ select {
   padding: 0;
 }
 
+a {
+  color: $link;
+}
+
 .bottom-space {
   padding-bottom: 25px;
   p {
@@ -66,12 +70,13 @@ select {
 
 // status
 .status-label {
-  @include border-radius($default-border-radius);
+  border-radius: 50%;
   width: 8px;
   height: 8px;
   float: left;
   margin: 9px 10px 0 10px;
   background: $status-draft;
+
   .entry-list & {
     margin: 5px 10px 0 4px !important;
   }
@@ -129,19 +134,14 @@ select {
 }
 .btn {
   @include btn-size();
-  font-weight: bold;
-  border: none;
-  @include box-shadow(none);
-  text-shadow: none;
+
   &.btn-small {
     @include btn-size(12px, 18px, 4px 14px);
   }
   &.btn-mini {
     @include btn-size(11px, 16px, 2px 10px);
   }
-  [class*="fa-"] {
-    opacity: 0.7;
-  }
+
   &.btn-full {
     text-align: center;
     width: 100%;
@@ -152,23 +152,18 @@ select {
     text-align: center;
   }
   &:active {
-    @include box-shadow(inset 0 0 4px rgba(0,0,0,0.4));
-    [class*="fa-"] {
-      @include opacity(1);
-    }
-  }
-  &.btn-footer {
-    margin-top: 4px;
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.4);
   }
   &.pending-ajax {
-    @include box-shadow(none);
+    box-shadow: none;
     cursor: default;
     background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 6px;
     border: 1px solid $ajaxBtnDisabled;
     text-shadow: none;
     padding-left: 28px;
+
     &:active {
-      @include box-shadow(none);
+      box-shadow: none;
       background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 5px;
       border: 1px solid $ajaxBtnDisabled;
     }
@@ -180,12 +175,6 @@ select {
     @extend %btn-#{$btn_color};
   }
 }
-
-// Disabled state
-.btn.disabled, .btn[disabled] {
-  @include opacity(0.25);
-}
-
 // removing outline on anchor element
 .nav-tabs,
 .menu,
@@ -383,11 +372,11 @@ input.disabled.pending-ajax{
   }
   // smaller buttons in wysiwyg editor
   .btn {
-    @include opacity(0.5);
-    padding:0px 5px 2px 5px;
-    font-size:$f-small;
+    opacity: 0.5;
+    padding: 0 5px 2px 5px;
+    font-size: $f-small;
     &:hover {
-      @include opacity(1);
+      opacity: 1;
     }
   }
   .help-inline {
@@ -697,7 +686,7 @@ p {
     display: inline-block;
     text-transform: none;
     color: $white;
-    font-weight: bold;
+    font-weight: normal;
   }
   .close-dropdown {
     padding: 0;
@@ -778,9 +767,16 @@ p {
     height: 8px;
     display: inline-block;
     left: 0;
-    top: 50%;
-    margin-top: -5px;
+    top: 3px;
     border-radius: 50%;
+  }
+
+  .grid-data-row & {
+    display: inline-block;
+
+    &:before {
+      top: 7px;
+    }
   }
 
   &.state-notstarted,
@@ -1008,7 +1004,8 @@ p {
 
 .three-dots-list {
   & > li {
-    a {
+    a,
+    .unmap-link {
       color: #000 !important;
     }
 

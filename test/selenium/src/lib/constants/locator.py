@@ -40,7 +40,7 @@ class Common(object):
 
 class Login(object):
   """Locators for Login page."""
-  BUTTON_LOGIN = (By.CSS_SELECTOR, "a.btn.btn-large.btn-info")
+  BUTTON_LOGIN = (By.CSS_SELECTOR, "a.btn.btn-large.btn-lightBlue")
 
 
 class PageHeader(object):
@@ -57,8 +57,6 @@ class PageHeader(object):
       By.CSS_SELECTOR, _CONTENT + ' [href^="/objectBrowser"]')
   TOGGLE_USER_DROPDOWN = (By.CSS_SELECTOR, _CONTENT + " .dropdown-toggle")
   GENERIC_SUCCESS_ALERT = (By.CSS_SELECTOR, ".alert-success")
-  BUTTON_ADMIN_DASHBOARD = (
-      By.CSS_SELECTOR, _CONTENT + ' [href="/admin#people_list_widget"]')
   BUTTON_DATA_IMPORT = (
       By.CSS_SELECTOR, _CONTENT + ' [href="/import"]')
   BUTTON_DATA_EXPORT = (
@@ -68,6 +66,9 @@ class PageHeader(object):
   BUTTON_HELP = (By.CSS_SELECTOR, Common.DROPDOWN_MENU + ' #page-help')
   BUTTON_LOGOUT = (By.CSS_SELECTOR, Common.DROPDOWN_MENU + ' [href="/logout"]')
   NOTIFICATIONS = (By.CSS_SELECTOR, USER_MENU + ' .notify-wrap')
+  BUTTON_ADMIN_DASHBOARD = (
+      By.CSS_SELECTOR,
+      Common.DROPDOWN_MENU + ' [href="/admin#people_list_widget"]')
   CHECKBOX_DAILY_DIGEST = (By.CSS_SELECTOR, USER_MENU + ' input')
   CHECKBOX_DISABLED = (By.CSS_SELECTOR, USER_MENU + ' input.disabled')
 
@@ -199,11 +200,11 @@ class CommonModalUnifiedMapper(object):
                               MODAL + " .multiselect-dropdown__input")
   FILTER_BY_STATE_DROPDOWN_OPTIONS = (By.CSS_SELECTOR,
                                       MODAL + " .multiselect-dropdown__label")
-  BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .filter-buttons .btn-info")
+  BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .filter-buttons .btn-small")
   FOUND_OBJECTS_TITLES = (By.CSS_SELECTOR, MODAL + " .flex-box .title-attr")
   FOUND_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
                               MODAL + ' .flex-box [type="checkbox"]')
-  BUTTON_MAP_SELECTED = (By.CSS_SELECTOR, MODAL + " .btn-success")
+  BUTTON_MAP_SELECTED = (By.CSS_SELECTOR, MODAL + " .modal-footer .btn-map")
 
 
 class ModalMapObjects(CommonModalUnifiedMapper):
@@ -262,13 +263,6 @@ class ModalCreateNewProgram(BaseModalCreateNew):
               '[data-test-id="new_program_dropdown_state_036a1fa6"]')
   BUTTON_HIDE_OPTIONAL_FIELDS = (By.ID, "formHide")
   BUTTON_SHOW_ALL_OPTIONAL_FIELDS = (By.ID, "formHide")
-  UI_PRIMARY_CONTACT = (
-      By.CSS_SELECTOR,
-      '[data-test-id="new_program_field_primary_contact_86160053"]')
-  DROPDOWN_CONTACT = (By.CSS_SELECTOR, '.ui-menu-item')
-  UI_SECONDARY_CONTACT = (
-      By.CSS_SELECTOR,
-      '[data-test-id="new_program_field_secondary_contact_86160053"]')
   UI_PROGRAM_URL = (
       By.CSS_SELECTOR,
       '[data-test-id="new_program_field_program_url_86160053"]')
@@ -375,27 +369,9 @@ class ModalCreateNewControl(BaseModalCreateNew):
       By.CSS_SELECTOR, '[data-test-id="control_assertions_5d8b7f7a"] label')
   SELECTABLE_ASSERTIONS = (
       By.CSS_SELECTOR, '[data-test-id="control_assertions_5d8b7f7a"] select')
-  PRINCIPAL_ASSESSOR = (
-      By.CSS_SELECTOR,
-      '[data-test-id="control_primary_assessor_f7379330"] label')
-  SECONDARY_ASSESSOR = (
-      By.CSS_SELECTOR,
-      '[data-test-id="control_secondary_assessor_b9439af6"] label')
   ADMIN = (
       By.CSS_SELECTOR, '[data-test-id="control_owner_587d12d6"] label')
   BUTTON_ADD_OWNER = (By.CSS_SELECTOR, 'isolate-form .btn')
-  PRIMARY_CONTACT = (
-      By.CSS_SELECTOR, '[data-test-id="control_contacts_8bd3d8c7"] '
-                       '.row-fluid:nth-child(1) label')
-  UI_PRIMARY_CONTACT = (
-      By.CSS_SELECTOR, '[data-test-id='
-                       '"new_program_field_primary_contact_86160053"]')
-  SECONDARY_CONTACT = (
-      By.CSS_SELECTOR, '[data-test-id="control_contacts_8bd3d8c7"] '
-                       '.row-fluid:nth-child(2) label')
-  UI_SECONDARY_CONTACT = (
-      By.CSS_SELECTOR,
-      '[data-test-id="new_program_field_secondary_contact_86160053"]')
   CONTROL_URL = (
       By.CSS_SELECTOR, '[data-test-id="control_control_url-label_c4038873"]')
   UI_CONTROL_URL = (
@@ -567,7 +543,9 @@ class ObjectWidget(object):
   HEADER_LAST_ASSESSMENT_DATE = (
       By.CSS_SELECTOR, _HEADER + ' [data-field="last_assessment_date"]')
   MEMBERS_TITLE_LIST = (
-      By.CSS_SELECTOR, '.object-area .tree-item-element .title-area')
+      By.CSS_SELECTOR,
+      '.object-area .tree-item-element .selectable-attrs '
+      '.attr-cell:first-child .attr-content')
   INFO_PANE = (By.CSS_SELECTOR, '.sticky-info-panel')
   LOADING = (By.CSS_SELECTOR, '.new-tree_loading')
 
@@ -579,14 +557,15 @@ class ModalCommonConfirmAction(object):
   MODAL_TITLE = (By.CSS_SELECTOR, "{} .modal-header h2".format(MODAL))
   CONFIRMATION_TEXT = (By.CSS_SELECTOR, "{} .modal-body p".format(MODAL))
   # user input elements
-  BUTTON_CONFIRM = (By.CSS_SELECTOR, "{} .btn-success".format(MODAL))
+  BUTTON_CONFIRM = (By.CSS_SELECTOR,
+                    "{} .modal-footer .btn-small".format(MODAL))
 
 
 class ModalDeleteObject(ModalCommonConfirmAction):
   """Locators for Delete object modals."""
   MODAL = Common.MODAL_CONFIRM
   OBJECT_TITLE = (By.CSS_SELECTOR, "{} .modal-body span".format(MODAL))
-  BUTTON_DELETE = (By.CSS_SELECTOR, "{} .btn-danger".format(MODAL))
+  BUTTON_DELETE = ModalCommonConfirmAction.BUTTON_CONFIRM
 
 
 class ModalUpdateObject(ModalCommonConfirmAction):
@@ -658,21 +637,6 @@ class WidgetInfoProgram(CommonWidgetInfo):
   MANAGER_ENTERED = (By.CSS_SELECTOR,
                      '{} [data-test-id="title_manager_7a906d2e"] '
                      '[data-test-id="text_manager_7a906d2e"]'.format(WIDGET))
-  PRIMARY_CONTACT = (By.CSS_SELECTOR,
-                     '{} [data-test-id="title_primary_contact_696de7244b84"] '
-                     'h6'.format(WIDGET))
-  PRIMARY_CONTACT_ENTERED = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="text_primary_contact_696de7244b84"] '
-      '[data-test-id="text_manager_7a906d2e"]'.format(WIDGET))
-  SECONDARY_CONTACT = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_contacts_696de7244b84"] '
-      'h6:nth-child(2)'.format(WIDGET))
-  SECONDARY_CONTACT_ENTERED = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="text_secondary_contact_696de7244b84"] '
-      '[data-test-id="text_manager_7a906d2e"]'.format(WIDGET))
   PROGRAM_URL = (
       By.CSS_SELECTOR,
       '{} [data-test-id="title_program_url_aa7d1a65"] h6'.format(WIDGET))
@@ -896,7 +860,7 @@ class TreeView(object):
       By.CSS_SELECTOR, ".widget:not(.hidden) .tree-no-results-message")
   BUTTON_SHOW_FIELDS = "{} " + Common.TREE_HEADER + " .fa-bars"
   # user input elements
-  BUTTON_3BBS = "{} " + Common.TREE_LIST + " .btn-draft"
+  BUTTON_3BBS = "{} " + Common.TREE_LIST + " .details-wrap"
   BUTTON_CREATE = "{} " + Common.TREE_LIST + " .create-button"
   BUTTON_MAP = "{} " + Common.TREE_LIST + " .map-button"
 

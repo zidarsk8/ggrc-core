@@ -8,11 +8,7 @@
 
   var TreeViewUtils = GGRC.Utils.TreeView;
 
-  if (!GGRC.VM) {
-    GGRC.VM = {};
-  }
-
-  GGRC.VM.BaseTreeItemVM = can.Map.extend({
+  can.Map.extend('GGRC.VM.BaseTreeItemVM', {
     define: {
       expanded: {
         type: Boolean,
@@ -48,10 +44,16 @@
     setChildModels: function (selected) {
       this.attr('selectedChildModels', selected);
     },
-    onExpand: function () {
+    onExpand: function (event) {
       var isExpanded = this.attr('expanded');
 
-      this.attr('expanded', !isExpanded);
+      if (event && isExpanded !== event.state) {
+        if (isExpanded !== event.state) {
+          this.attr('expanded', event.state);
+        }
+      } else {
+        this.attr('expanded', !isExpanded);
+      }
     },
     onPreview: function (event) {
       this.select(event.element);

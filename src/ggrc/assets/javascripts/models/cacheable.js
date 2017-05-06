@@ -135,18 +135,6 @@
         order: 40
       },
       {
-        attr_title: 'Primary Contact',
-        attr_name: 'contact',
-        attr_sort_field: 'contact',
-        order: 50
-      },
-      {
-        attr_title: 'Secondary Contact',
-        attr_name: 'secondary_contact',
-        attr_sort_field: 'secondary_contact',
-        order: 60
-      },
-      {
         attr_title: 'Last Updated',
         attr_name: 'updated_at',
         order: 70
@@ -309,20 +297,21 @@
     //  This leads to conflicts not actually rejecting because on the second go-round
     //  the local and remote objects look the same.  --BM 2015-02-06
       this.update = function (id, params) {
-        var self = this;
         var ret = _update
         .call(this, id, this.process_args(params))
         .then(
           this.resolve_deferred_bindings.bind(this),
           function (xhr) {
             if (xhr.status === 409) {
-              $(document.body).trigger('ajax:flash', {
-                warning: 'There was a conflict while saving.' +
-                'Your changes have not yet been saved.' +
-                ' Please check any fields you were editing and try saving again'
+              xhr.warningId = setTimeout(function () {
+                $(document.body).trigger('ajax:flash', {
+                  warning: 'There was a conflict while saving.' +
+                  ' Your changes have not yet been saved.' +
+                  ' Please check any fields you were editing' +
+                  ' and try saving again'
+                });
               });
               // TODO: we should show modal window here
-              return self.findInCacheById(id).refresh();
             }
             return xhr;
           }
@@ -344,6 +333,14 @@
           GGRC.custom_attributable_types = [];
         }
         GGRC.custom_attributable_types.push(can.extend({}, this));
+      }
+
+      // register this type as Roleable if applicable
+      if (this.isRoleable) {
+        if (!GGRC.roleableTypes) {
+          GGRC.roleableTypes = [];
+        }
+        GGRC.roleableTypes.push(can.extend({}, this));
       }
     },
 

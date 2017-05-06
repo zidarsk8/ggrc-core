@@ -31,8 +31,8 @@ from ggrc.fulltext.mixin import Indexed, ReindexRule
 
 
 class CycleTaskGroupObjectTask(
-        WithContact, Stateful, Slugged, Timeboxed, Relatable, Notifiable,
-        Described, Titled, Indexed, Base, db.Model):
+        WithContact, Stateful, Timeboxed, Relatable, Notifiable,
+        Described, Titled, Slugged, Base, Indexed, db.Model):
   """Cycle task model
   """
   __tablename__ = 'cycle_task_group_object_tasks'
@@ -74,7 +74,7 @@ class CycleTaskGroupObjectTask(
       DateFullTextAttr("cycle due date",
                        lambda x: x.cycle.next_due_date,
                        with_template=False),
-      MultipleSubpropertyFullTextAttr("comment",
+      MultipleSubpropertyFullTextAttr("comments",
                                       "cycle_task_entries",
                                       ["description"]),
   ]
@@ -150,7 +150,6 @@ class CycleTaskGroupObjectTask(
       "contact": {
           "display_name": "Assignee",
           "mandatory": True,
-          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
       "finished_date": "Actual Finish Date",
@@ -245,6 +244,51 @@ class CycleTaskGroupObjectTask(
            .joinedload('workflow')
            .undefer_group('Workflow_complete'),
         orm.joinedload('cycle_task_entries'),
+    )
+
+  @classmethod
+  def indexed_query(cls):
+    return super(CycleTaskGroupObjectTask, cls).indexed_query().options(
+        orm.Load(cls).load_only(
+            "end_date",
+            "start_date",
+            "created_at",
+            "updated_at"
+        ),
+        orm.Load(cls).joinedload("cycle_task_group").load_only(
+            "id",
+            "title",
+            "end_date",
+            "next_due_date",
+        ),
+        orm.Load(cls).joinedload("cycle").load_only(
+            "id",
+            "title",
+            "next_due_date"
+        ),
+        orm.Load(cls).joinedload("cycle_task_group").joinedload(
+            "contact"
+        ).load_only(
+            "email",
+            "name",
+            "id"
+        ),
+        orm.Load(cls).joinedload("cycle").joinedload(
+            "contact"
+        ).load_only(
+            "email",
+            "name",
+            "id"
+        ),
+        orm.Load(cls).subqueryload("cycle_task_entries").load_only(
+            "description",
+            "id"
+        ),
+        orm.Load(cls).joinedload("contact").load_only(
+            "email",
+            "name",
+            "id"
+        ),
     )
 
 

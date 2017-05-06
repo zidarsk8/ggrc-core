@@ -18,7 +18,7 @@
               View Info
             </a>
           </li>
-          {{^instance.snapshot}}
+          {{#unless isSnapshot}}
             <!-- Link for open instance on new Browser tab -->
             <li>
               <a href="{{instance.viewLink}}" target="_blank" ($click)="openObject">
@@ -26,31 +26,30 @@
                 Open in a new tab
               </a>
             </li>
-          {{/instance.snapshot}}
+          {{/unless}}
       {{/is_allowed}}
     {{/if}}
 
-    {{#unless instance.snapshot}}
+    {{#if isAllowedToEdit}}
       <li>
         <tree-item-map {instance}="instance"></tree-item-map>
       </li>
-
       {{#is_allowed 'update' instance context='for'}}
-      <li>
-        <a href="javascript://"
-           data-link-purpose="open-edit-modal"
-           data-toggle="modal-ajax-form"
-           data-modal-reset="reset"
-           data-modal-class="modal-wide"
-           data-object-singular="{{instance.class.model_singular}}"
-           data-object-plural="{{instance.class.table_plural}}"
-           data-object-id="{{instance.id}}">
-          <i class="fa fa-pencil-square-o"></i>
-          Edit object
-        </a>
-      </li>
+        <li>
+          <a href="javascript://"
+             data-link-purpose="open-edit-modal"
+             data-toggle="modal-ajax-form"
+             data-modal-reset="reset"
+             data-modal-class="modal-wide"
+             data-object-singular="{{instance.class.model_singular}}"
+             data-object-plural="{{instance.class.table_plural}}"
+             data-object-id="{{instance.id}}">
+            <i class="fa fa-pencil-square-o"></i>
+            Edit object
+          </a>
+        </li>
       {{/is_allowed}}
-    {{/unless}}
+    {{/if}}
 
     <li>
       <show-related-assessments-button {instance}="instance"
@@ -64,7 +63,7 @@
 
     <li class="splitter"></li>
 
-    {{#unless instance.snapshot}}
+    {{#unless isSnapshot}}
       {{#if canExpand}}
         <li>
           <sub-tree-models {models-list}="childModelsList"

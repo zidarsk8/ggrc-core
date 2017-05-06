@@ -26,7 +26,6 @@ from ggrc.models import Policy
 from ggrc.models import Program
 from ggrc.models import Regulation
 from ggrc.models import Relationship
-from ggrc.models import Request
 from ggrc.models import Standard
 from ggrc.models import all_models
 from ggrc.models.reflection import AttributeInfo
@@ -201,7 +200,10 @@ class StatusColumnHandler(ColumnHandler):
 
 
 class UserColumnHandler(ColumnHandler):
-  """ Handler for primary and secondary contacts """
+  """Handler for a single user fields.
+
+  Used for primary and secondary contacts.
+  """
 
   def get_users_list(self):
     users = set()
@@ -240,29 +242,33 @@ class UserColumnHandler(ColumnHandler):
     return self.value
 
 
-class OwnerColumnHandler(UserColumnHandler):
-  """Handler for object owners.
-
-  This handler can accept a new line separated list of owner emails.
-  """
+class UsersColumnHandler(UserColumnHandler):
+  """Handler for multi user fields."""
 
   def parse_item(self):
-    owners = set()
+    people = set()
     email_lines = self.raw_value.splitlines()
     owner_emails = filter(unicode.strip, email_lines)  # noqa
     for raw_line in owner_emails:
       email = raw_line.strip().lower()
       person = self.get_person(email)
       if person:
-        owners.add(person)
+        people.add(person)
       else:
         self.add_warning(errors.UNKNOWN_USER_WARNING, email=email)
 
-    if not owners:
+    if not people and self.mandatory:
       self.add_warning(errors.OWNER_MISSING, column_name=self.display_name)
-      owners.add(get_current_user())
+      people.add(get_current_user())
 
-    return list(owners)
+    return list(people)
+
+
+class OwnerColumnHandler(UsersColumnHandler):
+  """Handler for object owners.
+
+  This handler can accept a new line separated list of owner emails.
+  """
 
   def set_obj_attr(self):
     try:
@@ -651,14 +657,6 @@ class AuditColumnHandler(MappingColumnHandler):
         self.row_converter.obj.audit = audit
 
 
-class RequestAuditColumnHandler(ParentColumnHandler):
-
-  def __init__(self, row_converter, key, **options):
-    self.parent = Audit
-    super(RequestAuditColumnHandler, self) \
-        .__init__(row_converter, "audit", **options)
-
-
 class ObjectPersonColumnHandler(UserColumnHandler):
 
   """
@@ -791,13 +789,6 @@ class ControlAssertionColumnHandler(CategoryColumnHandler):
         row_converter, key, **options)
 
 
-class RequestColumnHandler(ParentColumnHandler):
-
-  def __init__(self, row_converter, key, **options):
-    self.parent = Request
-    super(RequestColumnHandler, self).__init__(row_converter, key, **options)
-
-
 class DocumentsColumnHandler(ColumnHandler):
 
   def get_value(self):
@@ -825,30 +816,6 @@ class DocumentsColumnHandler(ColumnHandler):
       return
     self.row_converter.obj.documents = self.value
     self.dry_run = True
-
-
-class RequestTypeColumnHandler(ColumnHandler):
-
-  def __init__(self, row_converter, key, **options):
-    self.key = key
-    valid_types = row_converter.object_class.VALID_TYPES
-    self.type_mappings = {str(s).lower(): s for s in valid_types}
-    super(RequestTypeColumnHandler, self).__init__(
-        row_converter, key, **options)
-
-  def parse_item(self):
-    value = self.raw_value.lower()
-    req_type = self.type_mappings.get(value)
-
-    if req_type is None:
-      req_type = self.get_default()
-      if not self.row_converter.is_new:
-        req_type = self.get_value()
-      if value:
-        self.add_warning(errors.WRONG_VALUE,
-                         value=value[:20],
-                         column_name=self.display_name)
-    return req_type
 
 
 class ExportOnlyColumnHandler(ColumnHandler):

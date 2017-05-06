@@ -56,12 +56,23 @@ $grid-data-header-height: 66px;
     }
   }
 
-  .simple-modal__body {
+  &__body {
     box-sizing: border-box;
     padding: 16px;
     overflow: auto;
     background: $white;
     margin: 0;
+  }
+
+  &__controls {
+    > * {
+      display: block;
+      margin: 16px 0 0;
+
+      &:first-child {
+        margin: 0;
+      }
+    }
   }
 
   .simple-modal__header {

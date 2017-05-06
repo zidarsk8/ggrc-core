@@ -1122,6 +1122,12 @@ Mustache.registerHelper('date', function (date, hideTime) {
         // Passed in the context object instead of the context ID, so use the ID
         contextId = contextId.id;
       }
+      //  When checking permission for changing person role,
+      //  context_id is in parentInstance
+      if (contextId === undefined && options.context &&
+      options.context.parentInstance) {
+        contextId = options.context.parentInstance.context_id;
+      }
       //  Using `context=null` in Mustache templates, when `null` is not defined,
       //  causes `context_id` to be `""`.
       if (contextId === '' || contextId === undefined) {
@@ -2458,6 +2464,7 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
       // attribute names considered "default" and not representing a date
       var NON_DATE_ATTRS = Object.freeze({
         kind: 1,
+        title: 1,
         reference_url: 1,
         request_type: 1,
         slug: 1,
@@ -2806,6 +2813,54 @@ Example:
         return options.fn(options.contexts);
       }
       return options.inverse(options.contexts);
+    }
+  );
+
+  /**
+   * Determine the list of people IDs that have `roleName` granted on
+   * `instance` and render the corresponding Mustache block.
+   *
+   * The list of people IDs is exposed to the helper's block context via
+   * the 'peopleIds' Array.
+   *
+   * Example usage:
+   *
+   *   {{#peopleWithRole modelInstance customRoleName}}
+   *     {{#peopleIds}}
+   *       <p>User ID {{.}} has role {{customRoleName}} granted
+   *          on {{modelInstance.type}} with ID {{modelInstance.id}}</p>
+   *     {{/peopleIds}}
+   *   {{/peopleWithRole}}
+   *
+   * @param {CMS.Models.Cacheable} instance - a model instance
+   * @param {String} roleName - the name of the custom role
+   * @param {Object} options - a CanJS options object passed to every helper
+   *
+   * @return {String} - a rendered template block from inside the helper
+   */
+  Mustache.registerHelper(
+    'peopleWithRole',
+    function (instance, roleName, options) {
+      var peopleIds;
+
+      if (arguments.length < 3) {
+        console.warn('Arguments missing for peopleWithRole helper.');
+        return options.fn({peopleIds: []});
+      }
+
+      instance = Mustache.resolve(instance);
+      roleName = Mustache.resolve(roleName);
+
+      if (!instance || !roleName) {
+        return options.fn({peopleIds: []});
+      }
+
+      peopleIds = GGRC.Utils.peopleWithRoleName(instance, roleName);
+
+      if (peopleIds.length > 0) {
+        return options.fn({peopleIds: peopleIds});
+      }
+      return options.inverse({peopleIds: []});
     }
   );
 

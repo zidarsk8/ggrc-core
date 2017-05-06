@@ -2,8 +2,10 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for Clause model."""
+from sqlalchemy import orm
 
 from ggrc import db
+from ggrc.access_control.roleable import Roleable
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Hierarchical
@@ -16,8 +18,9 @@ from ggrc.models.track_object_state import HasObjectState
 from ggrc.fulltext.mixin import Indexed
 
 
-class Clause(HasObjectState, Hierarchical, CustomAttributable, Personable,
-             Ownable, Timeboxed, Relatable, BusinessObject, Indexed, db.Model):
+class Clause(Roleable, HasObjectState, Hierarchical, CustomAttributable,
+             Personable, Ownable, Timeboxed, Relatable, BusinessObject,
+             Indexed, db.Model):
 
   __tablename__ = 'clauses'
   _table_plural = 'clauses'
@@ -40,5 +43,16 @@ class Clause(HasObjectState, Hierarchical, CustomAttributable, Personable,
       'na',
       'notes',
   ]
+
+  @classmethod
+  def indexed_query(cls):
+    query = super(Clause, cls).indexed_query()
+    return query.options(
+        orm.Load(cls).load_only(
+            "na",
+            "notes",
+        )
+    )
+
   _sanitize_html = ['notes']
   _include_links = []

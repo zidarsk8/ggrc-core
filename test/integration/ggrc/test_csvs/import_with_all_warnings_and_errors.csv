@@ -3,10 +3,10 @@ Control,Code*,Title*,Description,Notes,Test Plan,Admin*,Effective Date,Notes,Tes
 ,,A,B,C,D,user@example.com,,E,,,,,,,,,
 ,,,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,,,
-program,code*,title*,description ,Manager,state,,primary contact,effective date,stop date,notes,program url,reference url,,,,,
-,prog-1,program 1,no manager,,Draft,,user@example.com,7/1/2015,2015-7-15,this is a note,http://i.imgur.com/es3M3hL.jpg,http://i.imgur.com/vrTtJOp.jpg,,,,,
-,prog-2,program 2,bad date format,user@example.com,Draft,,user@example.com,7_1_2015,7/15/2015,this is a note,http://i.imgur.com/es3M3hL.jpg,http://i.imgur.com/vrTtJOp.jpg,,,,,
-,prog-3,program 3,bad date value,user@example.com,Draft,,user@example.com,55/55/2015,2015-22-66,this is a note,http://i.imgur.com/es3M3hL.jpg,http://i.imgur.com/vrTtJOp.jpg,,,,,
+program,code*,title*,description,Manager,state,,,effective date,stop date,notes,program url,reference url,,,,,
+,prog-1,program 1,no manager,,Draft,,,7/1/2015,2015-7-15,this is a note,http://i.imgur.com/es3M3hL.jpg,http://i.imgur.com/vrTtJOp.jpg,,,,,
+,prog-2,program 2,bad date format,user@example.com,Draft,,,7_1_2015,7/15/2015,this is a note,http://i.imgur.com/es3M3hL.jpg,http://i.imgur.com/vrTtJOp.jpg,,,,,
+,prog-3,program 3,bad date value,user@example.com,Draft,,,55/55/2015,2015-22-66,this is a note,http://i.imgur.com/es3M3hL.jpg,http://i.imgur.com/vrTtJOp.jpg,,,,,
 ,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,,,
@@ -60,7 +60,7 @@ Assessment,Code*,Template,Audit*,,Title*,Description,State*,Assignees*,Creators*
 ,,,,,,,,,,,,,,,,,
 Object type,"These imports and the ones below are good and should be used if we need valid objects for generating anything (mappings, assessments ...)",,,,,,,,,,,,,,,,
 Person,name,email,company,role,,,,,,,,,,,,,
-,user 1,user1@a.com,google,Administrator ,,,,,,,,,,,,,
+,user 1,user1@a.com,google,Administrator,,,,,,,,,,,,,
 ,user 2,user2@a.com,google,Administrator,,,,,,,,,,,,,
 ,user 3,user3@a.com,google,creator,,,,,,,,,,,,,
 ,user 4,user4@a.com,google,reader,,,,,,,,,,,,,
@@ -88,8 +88,8 @@ Market,code*,title*,description,admin,state,,,,,,,,,,,,
 ,mkt-3,mkt-3,Market for Request testing 3,user5@a.com,Active,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,
 Object type,,,,,,,,,,,,,,,,,
-control,code*,title*,description,admin,state,notes,primary contact,secondary contact,effective date,stop date,control url,reference url,test plan,principal assignee,,Assertions,Categories
-,control-1,control-1,test,user@example.com,Draft,this is a note,user@example.com,user@example.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan for control 1,user@example.com,,Privacy,Data Centers
-,control-2,control-2,test,user@example.com,Active,this is a note,user@example.com,user@example.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan for control 2,user@example.com,,Security,Disaster Recovery
-,control-3,control 3,test,user@example.com,Active,this is a note,user@example.com,user@example.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan for control 3,user@example.com,,Availability,Logical Access/ Access Control
-,control-4,control-4,test,user@example.com,Active,this is a note,user@example.com,user@example.com,7/1/2015,7/15/2015,google.com,ggrc.com,plan for control 4,user@example.com,,Integrity,Sites
+control,code*,title*,description,admin,state,notes,,,effective date,stop date,control url,reference url,test plan,,,Assertions,Categories
+,control-1,control-1,test,user@example.com,Draft,this is a note,,,7/1/2015,7/15/2015,google.com,ggrc.com,plan for control 1,,,Privacy,Data Centers
+,control-2,control-2,test,user@example.com,Active,this is a note,,,7/1/2015,7/15/2015,google.com,ggrc.com,plan for control 2,,,Security,Disaster Recovery
+,control-3,control 3,test,user@example.com,Active,this is a note,,,7/1/2015,7/15/2015,google.com,ggrc.com,plan for control 3,,,Availability,Logical Access/ Access Control
+,control-4,control-4,test,user@example.com,Active,this is a note,,,7/1/2015,7/15/2015,google.com,ggrc.com,plan for control 4,,,Integrity,Sites

@@ -17,7 +17,7 @@
               {{^if_equals modal_title 'Edit Person'}}
                 <a
                   tabindex="37"
-                  class="btn btn-small btn-danger"
+                  class="btn btn-small btn-red"
                   data-toggle="modal-ajax-deleteform"
                   data-object-plural="{{model.table_plural}}"
                   data-object-singular="{{model.model_singular}}"
@@ -42,7 +42,7 @@
           >&nbsp;<label style="display:inline" for="map-and-save"> Map and save</label>
         <a
           tabindex="25"
-          class="btn btn-small btn-success preventdoubleclick {{disable_if_errors instance}}"
+          class="btn btn-small btn-green preventdoubleclick {{disable_if_errors instance}}"
           data-toggle="modal-submit"
           href="javascript://"
           >Save &amp; Close</a>
@@ -51,7 +51,7 @@
           {{^new_object_form}}
             <a
               tabindex="25"
-              class="btn btn-small btn-success preventdoubleclick {{disable_if_errors instance}}"
+              class="btn btn-small btn-green preventdoubleclick {{disable_if_errors instance}}"
               data-toggle="modal-submit"
               href="javascript://"
               >Save &amp; Close</a>
@@ -60,14 +60,14 @@
             {{^if_equals model.shortName "AssessmentTemplate"}}
             <a
               tabindex="24"
-              class="btn btn-small btn-info preventdoubleclick {{disable_if_errors instance}}"
+              class="btn btn-small btn-lightBlue preventdoubleclick {{disable_if_errors instance}}"
               data-toggle="modal-submit-addmore"
               href="javascript://"
               >Save &amp; Add Another</a>
             {{/if_equals}}
             <a
               tabindex="25"
-              class="btn btn-small btn-success preventdoubleclick {{disable_if_errors instance}}"
+              class="btn btn-small btn-green preventdoubleclick {{disable_if_errors instance}}"
               data-toggle="modal-submit"
               href="javascript://"
               >Save &amp; Close</a>

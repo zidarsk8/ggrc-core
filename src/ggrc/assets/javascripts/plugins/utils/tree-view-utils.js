@@ -10,10 +10,9 @@
    * TreeView-specific utils.
    */
   GGRC.Utils.TreeView = (function () {
-
     var baseWidgets = GGRC.tree_view.attr('base_widgets_by_type');
     var defaultOrderTypes = GGRC.tree_view.attr('defaultOrderTypes');
-    var allTypes = Object.keys(baseWidgets.serialize());
+    var allTypes = Object.keys(baseWidgets.attr());
     var orderedModelsForSubTier = {};
 
     var QueryAPI = GGRC.Utils.QueryAPI;
@@ -37,7 +36,18 @@
       'title',
       'type',
       'viewLink',
-      'workflow_state'
+      'workflow_state',
+      // labels for assessment templates
+      'DEFAULT_PEOPLE_LABELS'
+    ]);
+
+    var FULL_SUB_LEVEL_LIST = Object.freeze([
+      'Cycle',
+      'CycleTaskGroup'
+    ]);
+
+    var NO_FIELDS_LIMIT_LIST = Object.freeze([
+      'Assessment'
     ]);
 
     allTypes.forEach(function (type) {
@@ -59,13 +69,25 @@
     orderedModelsForSubTier.Cycle = ['CycleTaskGroup'];
     orderedModelsForSubTier.CycleTaskGroup = ['CycleTaskGroupObjectTask'];
 
+    function getSubTreeFields(parent, child) {
+      var noFieldsLimitOnChild = hasNoFieldsLimit(child);
+      var noFieldsLimitOnParent = _isFullSubTree(parent);
+      return noFieldsLimitOnChild || noFieldsLimitOnParent ?
+        [] :
+        SUB_TREE_FIELDS;
+    }
+
+    function hasNoFieldsLimit(type) {
+      return NO_FIELDS_LIMIT_LIST.indexOf(type) > -1;
+    }
     /**
      * Get available and selected columns for Model type
      * @param {String} modelType - Model type.
      * @param {Object} displayPrefs - Display preferences.
+     * @param {Boolean} [includeRichText] - Need to include Rich Text in the configuration
      * @return {Object} Table columns configuration.
      */
-    function getColumnsForModel(modelType, displayPrefs) {
+    function getColumnsForModel(modelType, displayPrefs, includeRichText) {
       var Cacheable = can.Model.Cacheable;
       var Model = CMS.Models[modelType];
       var modelDefinition = Model().class.root_object;
@@ -90,7 +112,7 @@
           Model.tree_view_options.attr_list ||
           Cacheable.attr_list
         ).map(function (attr) {
-          attr = Object.assign({}, attr);
+          attr = _.assign({}, attr);
           if (!attr.attr_sort_field) {
             attr.attr_sort_field = attr.attr_name;
           }
@@ -104,12 +126,18 @@
           return a.order - b.order;
         });
 
+      // add custom attributes information
       var customAttrs = disableConfiguration ?
         [] :
         GGRC.custom_attr_defs
           .filter(function (def) {
-            return def.definition_type === modelDefinition &&
-              def.attribute_type !== 'Rich Text';
+            var include = def.definition_type === modelDefinition;
+
+            if (!includeRichText) {
+              include = include && def.attribute_type !== 'Rich Text';
+            }
+
+            return include;
           }).map(function (def) {
             return {
               attr_title: def.title,
@@ -119,8 +147,22 @@
               attr_type: 'custom'
             };
           });
-
       var allAttrs = attrs.concat(customAttrs);
+
+      // add custom roles information
+      var modelRoles = _.filter(GGRC.access_control_roles, {
+        object_type: modelType
+      });
+      var roleAttrs = modelRoles.map(function (role) {
+        return {
+          attr_title: role.name,
+          attr_name: role.name,
+          attr_sort_field: role.name,
+          display_status: false,
+          attr_type: 'role'
+        };
+      });
+      allAttrs = allAttrs.concat(roleAttrs);
 
       if (disableConfiguration) {
         return {
@@ -128,6 +170,10 @@
           selected: allAttrs,
           disableConfiguration: true
         };
+      }
+
+      if (!savedAttrList.length && CurrentPage.isMyAssessments()) {
+        displayAttrNames.push('assignees', 'verifiers', 'updated_at');
       }
 
       displayAttrNames = displayAttrNames.concat(mandatoryAttrNames);
@@ -197,7 +243,7 @@
      * and value True if column selected and False or not.
      * @param {Array} available - Full list of available columns.
      * @param {Array} selected - List of selected columns.
-     * @return Map with selected columns.
+     * @return {Array} Map with selected columns.
      */
     function createSelectedColumnsMap(available, selected) {
       var selectedColumns = can.makeArray(selected);
@@ -209,8 +255,7 @@
           var value = {};
           value[attr.attr_name] = selectedColumns
             .some(function (selectedAttr) {
-              return !selectedAttr.mandatory &&
-                selectedAttr.attr_name === attr.attr_name;
+              return selectedAttr.attr_name === attr.attr_name;
             });
           columns.attr(value);
         });
@@ -279,7 +324,8 @@
      * @param {Number} filterInfo.sortBy -
      * @param {Number} filterInfo.sortDirection -
      * @param {Number} filterInfo.filter -
-     * @return {Promise}
+     * @param {Object} filter -
+     * @return {Promise} Deferred Object
      */
     function loadFirstTierItems(modelName, parent, filterInfo, filter) {
       var params = QueryAPI.buildParam(
@@ -312,8 +358,8 @@
     /**
      *
      * @param {Array} models - Array of models for load in sub tree
-     * @param type - Type of parent object.
-     * @param id - ID of parent object.
+     * @param {String} type - Type of parent object.
+     * @param {Number} id - ID of parent object.
      * @param {String} filter - Filter.
      * @return {Promise} - Items for sub tier.
      */
@@ -335,15 +381,20 @@
           showMore = result.showMore;
 
           reqParams = loadedModels.map(function (model) {
+            var subTreeFields = getSubTreeFields(type, model);
+            var pageInfo = {
+              filter: filter
+            };
+
+            if (countMap[model]) {
+              pageInfo.current = 1;
+              pageInfo.pageSize = countMap[model];
+            }
             return QueryAPI.buildParam(
               model,
-              {
-                current: 1,
-                pageSize: countMap[model],
-                filter: filter
-              },
+              pageInfo,
               relevant,
-              SUB_TREE_FIELDS);
+              subTreeFields);
           });
 
           if (SnapshotUtils.isSnapshotParent(relevant.type) ||
@@ -428,34 +479,54 @@
      * @private
      */
     function _buildSubTreeCountMap(models, relevant, filter) {
-      var countQuery = QueryAPI.buildCountParams(models, relevant, filter);
+      var countQuery;
+      var result;
+      var countMap = {};
 
-      return QueryAPI.makeRequest({data: countQuery}).then(function (response) {
-        var countMap = {};
-        var total = 0;
-        var showMore = models.some(function (model, index) {
-          var count = response[index][model].total;
-
-          if (!count) {
-            return;
-          }
-
-          if (total + count < SUB_TREE_ELEMENTS_LIMIT) {
-            countMap[model] = count;
-          } else {
-            countMap[model] = SUB_TREE_ELEMENTS_LIMIT - total;
-          }
-
-          total += count;
-
-          return total >= SUB_TREE_ELEMENTS_LIMIT;
+      if (_isFullSubTree(relevant.type)) {
+        models.forEach(function (model) {
+          countMap[model] = false;
         });
-
-        return {
+        result = can.Deferred().resolve({
           countsMap: countMap,
-          showMore: showMore
-        };
-      });
+          showMore: false
+        });
+      } else {
+        countQuery = QueryAPI.buildCountParams(models, relevant, filter);
+
+        result = QueryAPI.makeRequest({data: countQuery})
+          .then(function (response) {
+            var total = 0;
+            var showMore = models.some(function (model, index) {
+              var count = response[index][model].total;
+
+              if (!count) {
+                return false;
+              }
+
+              if (total + count < SUB_TREE_ELEMENTS_LIMIT) {
+                countMap[model] = count;
+              } else {
+                countMap[model] = SUB_TREE_ELEMENTS_LIMIT - total;
+              }
+
+              total += count;
+
+              return total >= SUB_TREE_ELEMENTS_LIMIT;
+            });
+
+            return {
+              countsMap: countMap,
+              showMore: showMore
+            };
+          });
+      }
+
+      return result;
+    }
+
+    function _isFullSubTree(type) {
+      return FULL_SUB_LEVEL_LIST.indexOf(type) >= 0;
     }
 
     /**
@@ -482,7 +553,8 @@
      * @return {Boolean} Is associated with the current context.
      */
     function _isDirectlyRelated(instance) {
-      var needToSplit = CurrentPage.isObjectContextPage();
+      var needToSplit = CurrentPage.isObjectContextPage() &&
+        CurrentPage.getPageType() !== 'Workflow';
       var relates = CurrentPage.related.attr(instance.type);
       var result = true;
       var instanceId = SnapshotUtils.isSnapshot(instance) ?

@@ -9,6 +9,7 @@
   var template = can.view(GGRC.mustache_path +
     '/components/tree/tree-widget-container.mustache');
   var TreeViewUtils = GGRC.Utils.TreeView;
+  var CurrentPageUtils = GGRC.Utils.CurrentPage;
 
   var viewModel = can.Map.extend({
     define: {
@@ -17,7 +18,10 @@
        */
       additionalFilter: {
         type: String,
-        value: ''
+        value: '',
+        get: function () {
+          return this.attr('options').additional_filter;
+        }
       },
       /**
        *
@@ -56,6 +60,10 @@
 
           if (this.attr('loading')) {
             classes.push('loading');
+          }
+
+          if (CurrentPageUtils.isMyAssessments()) {
+            classes.push('my-assessments');
           }
 
           return classes.join(' ');
@@ -100,7 +108,7 @@
             this.attr('model').tree_view_options.add_item_view;
         }
       },
-      hideImportExport: {
+      isSnapshots: {
         type: Boolean,
         get: function () {
           var Snapshots = GGRC.Utils.Snapshots;
@@ -124,8 +132,20 @@
       show3bbs: {
         type: Boolean,
         get: function () {
-          return this.attr('hideImportExport') ||
-            this.attr('showGenerateAssessments');
+          return !CurrentPageUtils.isMyAssessments();
+        }
+      },
+      noResults: {
+        type: Boolean,
+        get: function () {
+          return !this.attr('loading') && !this.attr('showedItems').length;
+        }
+      },
+      pageInfo: {
+        value: function () {
+          return new GGRC.VM.Pagination({
+            pageSizeSelect: [10, 25, 50],
+            pageSize: 10});
         }
       }
     },
@@ -133,23 +153,6 @@
      *
      */
     allow_mapping_or_creating: null,
-    /**
-     * Information about current page of tree
-     * @param current {Number} - Number of page
-     * @param total {Number} - Number of items on the Server-side which satisfy current filter
-     * @param pageSize {Number} - Number of items per page
-     * @param count {Number} - Number of pages
-     * @param pageSizeSelect {Array} -
-     * @param disabled {Boolean} -
-     */
-    pageInfo: {
-      current: 1,
-      total: null,
-      pageSize: 10,
-      count: null,
-      pageSizeSelect: [10, 25, 50],
-      disabled: false
-    },
     sortingInfo: {
       sortDirection: null,
       sortBy: null
@@ -169,7 +172,7 @@
     /**
      * Legacy options which were built for a previous implementation of TreeView based on CMS.Controllers.TreeView
      */
-    options: null,
+    options: {},
     $el: null,
     loading: false,
     /**
@@ -202,21 +205,21 @@
         .then(function (data) {
           var total = data.total;
           var modelName = this.attr('modelName');
+          var countsName = this.attr('options').countsName || modelName;
 
           this.attr('showedItems', data.values);
           this.attr('pageInfo.total', total);
-          this.attr('pageInfo.count',
-            Math.ceil(total / this.attr('pageInfo.pageSize')));
           this.attr('pageInfo.disabled', false);
           this.attr('loading', false);
 
           if (!this._getFilterByName('custom') &&
-            total !== GGRC.Utils.CurrentPage.getCounts().attr(modelName)) {
-            GGRC.Utils.CurrentPage.getCounts().attr(modelName, total);
+            !this._getFilterByName('status') &&
+            total !== CurrentPageUtils.getCounts().attr(countsName)) {
+            CurrentPageUtils.getCounts().attr(countsName, total);
           }
 
           if (this._getFilterByName('status')) {
-            GGRC.Utils.CurrentPage
+            CurrentPageUtils
               .initCounts([modelName], parent.type, parent.id);
           }
         }.bind(this));
@@ -231,7 +234,8 @@
     setColumnsConfiguration: function () {
       var columns = TreeViewUtils.getColumnsForModel(
         this.attr('model').model_singular,
-        this.attr('displayPrefs')
+        this.attr('displayPrefs'),
+        true
       );
 
       this.attr('columns.available', columns.available);
@@ -278,8 +282,9 @@
     },
     initCount: function () {
       var $el = this.attr('$el');
-      var counts = GGRC.Utils.CurrentPage.getCounts();
-      var countsName = this.attr('model').shortName;
+      var counts = CurrentPageUtils.getCounts();
+      var countsName = this.attr('options').countsName ||
+        this.attr('model').shortName;
 
       if ($el) {
         can.trigger($el, 'updateCount', [counts.attr(countsName)]);
@@ -475,7 +480,8 @@
         var parent = this.viewModel.attr('parent_instance');
         var infoPaneOptions = new can.Map({
           instance: instance,
-          parent_instance: parent
+          parent_instance: parent,
+          options: this.viewModel
         });
 
         ev.stopPropagation();
@@ -484,6 +490,11 @@
 
         $('.pin-content').control()
           .setInstance(infoPaneOptions, selectedEl);
+      },
+      ' refreshTree': function (el, ev) {
+        ev.stopPropagation();
+
+        this.viewModel.loadItems();
       },
       inserted: function () {
         var viewModel = this.viewModel;

@@ -42,4 +42,9 @@
       }
     }
   }
+  &.widget-area,
+  &.widget-area .widget,
+  &.widget-area .widget .content {
+    height: 100%;
+  }
 }

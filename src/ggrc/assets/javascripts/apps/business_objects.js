@@ -59,11 +59,9 @@
       var path = GGRC.mustache_path;
       var infoWidgetViews;
       var summaryWidgetViews;
+      var dashboardWidgetViews;
       var modelNames;
       var possibleModelType;
-      var treeViewDepth = 2;
-      var relatedObjectsChildOptions =
-        [GGRC.Utils.getRelatedObjects(treeViewDepth)];
       var farModels;
       var extraDescriptorOptions;
       var overriddenModels;
@@ -78,6 +76,9 @@
       summaryWidgetViews = {
         audits: path + '/audits/summary.mustache'
       };
+      dashboardWidgetViews = {
+        audits: path + '/audits/dashboard.mustache'
+      };
       if (summaryWidgetViews[objectTable]) {
         widgetList.add_widget(object.constructor.shortName, 'summary', {
           widget_id: 'summary',
@@ -85,6 +86,17 @@
           instance: object,
           widget_view: summaryWidgetViews[objectTable],
           order: 3
+        });
+      }
+      if (dashboardWidgetViews[objectTable] &&
+          GGRC.Utils.Dashboards.isDashboardEnabled(
+            objectClass && objectClass.table_singular)) {
+        widgetList.add_widget(object.constructor.shortName, 'dashboard', {
+          widget_id: 'dashboard',
+          content_controller: GGRC.Controllers.DashboardWidget,
+          instance: object,
+          widget_view: dashboardWidgetViews[objectTable],
+          order: 2
         });
       }
       infoWidgetViews = {
@@ -222,8 +234,7 @@
           Person: {
             widget_id: 'person',
             widget_name: 'People',
-            widget_icon: 'person',
-            content_controller: GGRC.Controllers.TreeView
+            widget_icon: 'person'
           }
         },
 
@@ -252,7 +263,6 @@
             widget_name: 'People',
             widget_icon: 'person',
             // NOTE: "order" not overridden
-            content_controller: GGRC.Controllers.TreeView,
             content_controller_options: {
               mapping: 'authorized_people',
               allow_mapping: false,
@@ -291,108 +301,80 @@
           Audit: {
             mapping: 'related_audits',
             draw_children: true,
-            child_options: relatedObjectsChildOptions,
             allow_mapping: true,
             add_item_view: path + '/audits/tree_add_item.mustache'
           },
           AccessGroup: {
             mapping: 'related_access_groups',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           DataAsset: {
             mapping: 'related_data_assets',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Facility: {
             mapping: 'related_facilities',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Market: {
             mapping: 'related_markets',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           OrgGroup: {
             mapping: 'related_org_groups',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Vendor: {
             mapping: 'related_vendors',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Process: {
             mapping: 'related_processes',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Product: {
             mapping: 'related_products',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Project: {
             mapping: 'related_projects',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           System: {
             mapping: 'related_systems',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Assessment: {
             mapping: 'related_assessments',
-            child_options: relatedObjectsChildOptions,
             draw_children: true,
             footer_view: path + '/base_objects/tree_footer.mustache'
           },
           Document: {
             mapping: 'documents',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Person: {
             mapping: 'people',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Program: {
             mapping: 'programs',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Risk: {
             mapping: 'risks',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Threat: {
             mapping: 'threats',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
         issues: {
           Issue: {
             mapping: 'related_issues',
-            footer_view: GGRC.mustache_path +
-              '/base_objects/tree_footer.mustache',
             add_item_view: GGRC.mustache_path +
               '/issues/tree_add_item.mustache',
-            child_options: relatedObjectsChildOptions.concat({
-              model: CMS.Models.Person,
-              mapping: 'people',
-              show_view: GGRC.mustache_path +
-                '/base_objects/tree.mustache',
-              footer_view: GGRC.mustache_path +
-                '/base_objects/tree_footer.mustache',
-              draw_children: false
-            }),
             draw_children: true
           }
         },
@@ -418,22 +400,18 @@
           },
           Control: {
             mapping: 'controls',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Objective: {
             mapping: 'objectives',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Section: {
             mapping: 'sections',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Clause: {
             mapping: 'clauses',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
@@ -448,15 +426,12 @@
             add_item_view: path + '/audits/tree_add_item.mustache'
           },
           Person: {
-            show_view: path + '/ggrc_basic_permissions/people_roles/authorizations_by_person_tree.mustache',
-            footer_view: path + '/base_objects/tree_footer.mustache',
             parent_instance: GGRC.page_instance(),
             allow_reading: true,
             allow_mapping: true,
             allow_creating: true,
             model: CMS.Models.Person,
             mapping: 'mapped_and_or_authorized_people',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
@@ -471,45 +446,32 @@
           },
           Section: {
             mapping: 'sections',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Clause: {
             mapping: 'clauses',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Threat: {
             mapping: 'threats',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Risk: {
             mapping: 'risks',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Assessment: {
             mapping: 'related_assessments',
             parent_instance: GGRC.page_instance(),
             allow_mapping: true,
-            child_options: relatedObjectsChildOptions,
             draw_children: true,
             model: CMS.Models.Assessment,
-            show_view: path + '/base_objects/tree.mustache',
-            header_view: path + '/base_objects/tree_header.mustache',
-            footer_view: path + '/base_objects/tree_footer.mustache',
             add_item_view: path + '/assessments/tree_add_item.mustache'
           },
           AssessmentTemplate: {
             mapping: 'related_assessment_templates',
-            child_options: relatedObjectsChildOptions,
             draw_children: false,
             allow_mapping: false,
-            show_view: GGRC.mustache_path +
-              '/base_objects/tree.mustache',
-            footer_view: GGRC.mustache_path +
-              '/base_objects/tree_footer.mustache',
             add_item_view: GGRC.mustache_path +
               '/assessment_templates/tree_add_item.mustache'
           },
@@ -517,9 +479,7 @@
             widget_id: 'person',
             widget_name: 'People',
             widget_icon: 'person',
-            child_options: relatedObjectsChildOptions,
             draw_children: true,
-            content_controller: GGRC.Controllers.TreeView,
             content_controller_options: {
               mapping: 'authorized_people',
               allow_mapping: false,
@@ -533,17 +493,14 @@
           ],
           Section: {
             mapping: 'sections',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Clause: {
             mapping: 'clauses',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Audit: {
             mapping: 'related_audits',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
@@ -563,7 +520,6 @@
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
             mapping: 'related_audits',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
@@ -571,7 +527,6 @@
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
             mapping: 'related_audits',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
@@ -579,7 +534,6 @@
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
             mapping: 'related_audits',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
@@ -587,7 +541,6 @@
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Audit: {
             mapping: 'related_audits',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
@@ -601,31 +554,25 @@
           },
           Section: {
             mapping: 'sections',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Clause: {
             mapping: 'clauses',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
         AssessmentTemplate: {
           Audit: {
             mapping: 'related_audits',
-            child_options: relatedObjectsChildOptions,
             draw_children: true,
             allow_creating: false,
-            allow_mapping: true,
-            show_view: path + '/audits/tree.mustache',
-            add_item_view: path + '/audits/tree_add_item.mustache'
+            allow_mapping: true
           }
         },
         Risk: {
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Threat: {
             mapping: 'threats',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
@@ -633,7 +580,6 @@
           _mixins: ['governance_objects', 'business_objects', 'issues'],
           Risk: {
             mapping: 'risks',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         },
@@ -691,7 +637,6 @@
           _mixins: ['issues'],
           Program: {
             mapping: 'extended_related_programs_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true,
             fetch_post_process: sort_sections
           },
@@ -715,13 +660,11 @@
             draw_children: true
           },
           Section: {
-            model: CMS.Models.Section,
             add_item_view:
               GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
             draw_children: true
           },
           Clause: {
-            model: CMS.Models.Clause,
             add_item_view:
               GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
             draw_children: true
@@ -736,58 +679,47 @@
           },
           Issue: {
             mapping: 'extended_related_issues_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true,
             footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache'
           },
           AccessGroup: {
             mapping: 'extended_related_access_groups_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           DataAsset: {
             mapping: 'extended_related_data_assets_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Facility: {
             mapping: 'extended_related_facilities_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Market: {
             mapping: 'extended_related_markets_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           OrgGroup: {
             mapping: 'extended_related_org_groups_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Vendor: {
             mapping: 'extended_related_vendors_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Process: {
             mapping: 'extended_related_processes_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Product: {
             mapping: 'extended_related_products_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Project: {
             mapping: 'extended_related_projects_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           System: {
             mapping: 'extended_related_systems_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Document: {
@@ -795,7 +727,6 @@
           },
           Assessment: {
             mapping: 'extended_related_assessment_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true,
             add_item_view: null,
             header_view: path + '/base_objects/tree_header.mustache',
@@ -803,12 +734,10 @@
           },
           Risk: {
             mapping: 'extended_related_risks_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           },
           Threat: {
             mapping: 'extended_related_threats_via_search',
-            child_options: relatedObjectsChildOptions,
             draw_children: true
           }
         }
@@ -866,6 +795,7 @@
             content_controller_options: extraContentControllerOptions[object.constructor.shortName][model_name]
           });
         }
+        descriptor.widgetType = 'treeview';
         widgetList.add_widget(object.constructor.shortName, widget_id, descriptor);
       });
     }

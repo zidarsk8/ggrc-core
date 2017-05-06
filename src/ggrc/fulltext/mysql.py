@@ -1,6 +1,7 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Full text index engine for Mysql DB backend"""
+from collections import defaultdict
 
 from sqlalchemy import and_
 from sqlalchemy import case
@@ -10,7 +11,6 @@ from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy import union
 from sqlalchemy.sql import false
-from sqlalchemy.schema import DDL
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select
@@ -19,6 +19,7 @@ from sqlalchemy import event
 from ggrc import db
 from ggrc.login import is_creator
 from ggrc.models import all_models
+from ggrc.models.inflector import get_model
 from ggrc.utils import query_helpers
 from ggrc.rbac import context_query_filter
 from ggrc.fulltext.sql import SqlIndexer
@@ -32,34 +33,18 @@ class MysqlRecordProperty(db.Model):
   type = db.Column(db.String(64), primary_key=True)
   context_id = db.Column(db.Integer)
   tags = db.Column(db.String)
-  property = db.Column(db.String(64), primary_key=True)
+  property = db.Column(db.String(250), primary_key=True)
   subproperty = db.Column(db.String(64), primary_key=True)
   content = db.Column(db.Text)
 
   @declared_attr
   def __table_args__(self):
     return (
-        # NOTE
-        # This is here to prevent Alembic from wanting to drop the index, but
-        # the DDL below or a similar Alembic migration should be used to create
-        # the index.
-        db.Index('{}_text_idx'.format(self.__tablename__), 'content'),
-        # These are real indexes
+        db.Index('ix_{}_tags'.format(self.__tablename__), 'tags'),
         db.Index('ix_{}_key'.format(self.__tablename__), 'key'),
         db.Index('ix_{}_type'.format(self.__tablename__), 'type'),
-        db.Index('ix_{}_tags'.format(self.__tablename__), 'tags'),
         db.Index('ix_{}_context_id'.format(self.__tablename__), 'context_id'),
-        # Only MyISAM supports fulltext indexes until newer MySQL/MariaDB
-        {'mysql_engine': 'myisam'},
     )
-
-
-event.listen(
-    MysqlRecordProperty.__table__,
-    'after_create',
-    DDL('ALTER TABLE {tablename} ADD FULLTEXT INDEX {tablename}_text_idx '
-        '(content)'.format(tablename=MysqlRecordProperty.__tablename__))
-)
 
 
 class MysqlIndexer(SqlIndexer):
@@ -248,10 +233,14 @@ def update_indexer(session):  # pylint:disable=unused-argument
   """General function to update index
 
   for all updated related instance before commit"""
-
+  models_ids_to_reindex = defaultdict(set)
   db.session.flush()
   for for_index in getattr(db.session, 'reindex_set', set()):
     if for_index not in db.session:
       continue
-    for_index.update_indexer()
+    type_name, id_value = for_index.get_reindex_pair()
+    if type_name:
+      models_ids_to_reindex[type_name].add(id_value)
   db.session.reindex_set = set()
+  for model_name, ids in models_ids_to_reindex.iteritems():
+    get_model(model_name).bulk_record_update_for(ids)

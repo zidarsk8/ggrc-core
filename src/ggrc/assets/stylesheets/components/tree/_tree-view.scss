@@ -8,9 +8,9 @@ $itemActionsWidth: 200px;
 tree-widget-container {
   .tree-filter {
     background-color: $white;
-    line-height: 26px;
-    box-shadow: 0 3px 4px 2px $warmGray;
-    padding: 7px 16px 6px 10px;
+    line-height: 28px;
+    box-shadow: 0 1px 3px 1px $warmGray;
+    padding: 8px;
     margin-bottom: 8px;
     border-radius: 2px;
 
@@ -34,6 +34,12 @@ tree-widget-container {
       .tree-spinner {
         display: flex;
       }
+    }
+  }
+
+  .my-assessments {
+    tree-view {
+      margin-top: 82px;
     }
   }
 
@@ -103,6 +109,14 @@ tree-view {
   }
 }
 
+
+.tree-item__icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 8px;
+}
+
 tree-item {
   >.tree-item-wrapper {
     background-color: $white;
@@ -119,8 +133,17 @@ tree-item {
     }
   }
 
+  .tree-item__icon-status {
+    padding: 0;
+    margin: 0;
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    float: none;
+  }
+
   .tree-item-content {
-    line-height: 28px;
+    line-height: 16px;
     border-bottom: 1px solid $items-separator-color;
     align-items: center;
 
@@ -146,6 +169,11 @@ tree-item {
     .attr-cell {
       height: 60px;
       align-items: center;
+      flex: 1 1;
+
+      &:first-child {
+        flex: 2 2;
+      }
 
       .attr-content {
         overflow: hidden;
@@ -153,6 +181,31 @@ tree-item {
         display: -webkit-box;
         -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
+
+        &.custom {
+          max-height: 32px;
+          p, ul, ol {
+            margin-bottom: 0;
+          }
+        }
+
+        &.roles {
+          display: block;
+          max-height: 100%;
+          width: 100%;
+          padding: 0 10px;
+          .person {
+            height: 20px;
+            max-width: 1px;  // FIXME: dirty fix for flex box overstretching
+            overflow: visible;
+            white-space: nowrap;
+          }
+          .list-truncated {
+            display: inline-block;
+            width: 100%;
+            cursor: default;
+          }
+        }
       }
     }
   }
@@ -177,7 +230,8 @@ tree-item {
 
 tree-filter-input {
   display: flex;
-  padding-right: 10px;
+  align-items: center;
+  padding-right: 16px;
 
   .tree-filter_is-expression {
     opacity: .25;
@@ -194,24 +248,10 @@ tree-filter-input {
   }
 
   .tree-filter__actions {
-    margin: 0 10px;
-
-    a {
-      margin-top: 1px;
-      margin-left: 10px;
+    > * {
+      margin: 0 0 0 8px;
     }
 
-    input {
-      font-weight: normal;
-      font-size: 12px !important;
-      line-height: 16px !important;
-      height: 26px;
-    }
-
-    input[type="reset"] {
-      @extend input[type="submit"];
-      margin-left: 10px;
-    }
     i {
       opacity: 0.7;
       transition: opacity 0.2s ease;
@@ -219,11 +259,6 @@ tree-filter-input {
       &:hover {
         opacity: 1;
       }
-    }
-    &__reset {
-      border: solid #ddd !important;
-      border-width: 1px !important;
-      background-color: white !important;
     }
   }
 }
@@ -259,6 +294,11 @@ tree-header {
 
   .widget-col-title {
     overflow: hidden;
+    flex: 1 1;
+
+    &:first-child {
+      flex: 2 2;
+    }
     span {
       overflow: hidden;
       white-space: nowrap;
@@ -267,6 +307,10 @@ tree-header {
     i {
       font-size: 12px;
       margin-left: 10px;
+
+      &.fa-sort {
+        opacity: .5;
+      }
     }
   }
 }
@@ -299,7 +343,7 @@ sub-tree-models {
       span {
         margin-left: 15px;
         cursor: pointer;
-        border-bottom: 1px solid $black;
+        text-decoration: underline;
         font-size: 12px;
       }
     }
@@ -318,7 +362,7 @@ sub-tree-models {
 
       a {
         background-color: $lightBlue !important;
-        color: $white;
+        color: $white !important;
         font-weight: normal;
       }
     }

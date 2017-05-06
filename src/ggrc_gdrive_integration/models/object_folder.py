@@ -3,6 +3,7 @@
 
 from ggrc import db
 from ggrc.models.mixins import Base
+from ggrc.utils import create_stub
 
 
 class ObjectFolder(Base, db.Model):
@@ -63,6 +64,7 @@ class Folderable(object):
           backref='{0}_folderable'.format(cls.__name__),
           cascade='all, delete-orphan',
       )
+
     cls.object_folders = make_object_folders(cls)
 
   _publish_attrs = [
@@ -76,3 +78,13 @@ class Folderable(object):
     query = super(Folderable, cls).eager_query()
     return query.options(
         orm.subqueryload('object_folders'))
+
+  def log_json(self):
+    """Serialize to JSON"""
+    out_json = super(Folderable, self).log_json()
+    if hasattr(self, "object_folders"):
+      out_json["object_folders"] = [
+          # pylint: disable=not-an-iterable
+          create_stub(fold) for fold in self.object_folders if fold
+      ]
+    return out_json

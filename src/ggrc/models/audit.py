@@ -3,6 +3,8 @@
 
 """Audit model."""
 
+from sqlalchemy import orm
+
 from ggrc import db
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (
@@ -47,8 +49,6 @@ class Audit(Snapshotable, clonable.Clonable,
   program_id = deferred(
       db.Column(db.Integer, db.ForeignKey('programs.id'), nullable=False),
       'Audit')
-  requests = db.relationship(
-      'Request', backref='audit', cascade='all, delete-orphan')
   audit_objects = db.relationship(
       'AuditObject', backref='audit', cascade='all, delete-orphan')
   object_type = db.Column(
@@ -64,7 +64,6 @@ class Audit(Snapshotable, clonable.Clonable,
       'status',
       'gdrive_evidence_folder',
       'program',
-      'requests',
       'object_type',
       PublishOnly('audit_objects')
   ]
@@ -76,6 +75,18 @@ class Audit(Snapshotable, clonable.Clonable,
       'status',
       'gdrive_evidence_folder',
   ]
+
+  @classmethod
+  def indexed_query(cls):
+    return super(Audit, cls).indexed_query().options(
+        orm.Load(cls).joinedload("audit_firm"),
+        orm.Load(cls).load_only(
+            'report_start_date',
+            'report_end_date',
+            'status',
+            'gdrive_evidence_folder',
+        ),
+    )
 
   _sanitize_html = [
       'gdrive_evidence_folder',
@@ -102,7 +113,6 @@ class Audit(Snapshotable, clonable.Clonable,
       "contact": {
           "display_name": "Internal Audit Lead",
           "mandatory": True,
-          "filter_by": "_filter_by_contact",
       },
       "secondary_contact": None,
       "notes": None,
@@ -204,12 +214,9 @@ class Audit(Snapshotable, clonable.Clonable,
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     query = super(Audit, cls).eager_query()
     return query.options(
         orm.joinedload('program'),
-        orm.subqueryload('requests'),
         orm.subqueryload('object_people').joinedload('person'),
         orm.subqueryload('audit_objects'),
     )

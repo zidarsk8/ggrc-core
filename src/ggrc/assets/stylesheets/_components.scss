@@ -3,6 +3,7 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+@import "components/access-control-list/access-control-list";
 @import "components/comment/comment-input";
 @import "components/comment/comment-control";
 @import "components/comment/comment-list";
@@ -11,7 +12,7 @@
 @import "components/read-more/read-more";
 @import "components/flexbox-layout/flexbox-layout";
 @import "components/collapsible-panel/collapsible-panel";
-@import "components/ca-object/ca-object";
+@import "components/form/form-validation-icon";
 @import "components/ca-object/ca-object-modal";
 @import "components/object-list/object-list";
 @import "components/object-popover/object-popover";
@@ -32,3 +33,5 @@
 @import "components/tree/sub-tree-wrapper";
 @import "components/tree/tree-view";
 @import "components/auto-save-form/auto-save-form";
+@import "components/attachment-upload-control/attachment-upload-control";
+@import "components/action-toolbar/action-toolbar";

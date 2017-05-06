@@ -137,6 +137,11 @@
               index - 1 : el.filter.id;
             return id ? '#' + el.model_name + ',' + id + '#' : null;
           });
+          if (panel.attr('snapshot_type')) {
+            predicates.push(
+              ' child_type = ' + panel.attr('snapshot_type') + ' '
+            );
+          }
           relevantFilter = _.reduce(predicates, function (p1, p2) {
             return p1 + ' AND ' + p2;
           });
@@ -172,7 +177,7 @@
     }
   });
 
-  can.Component.extend({
+  GGRC.Components('exportGroup', {
     tag: 'export-group',
     template: '<content></content>',
     scope: {
@@ -181,7 +186,8 @@
     events: {
       inserted: function () {
         this.addPanel({
-          type: url.model_type || 'Program'
+          type: url.model_type || 'Program',
+          isSnapshots: url.isSnapshots
         });
       },
       addPanel: function (data) {
@@ -191,6 +197,9 @@
         data = data || {};
         if (!data.type) {
           data.type = 'Program';
+        } else if (data.isSnapshots === 'true') {
+          data.snapshot_type = data.type;
+          data.type = 'Snapshot';
         }
 
         this.scope.attr('_index', index);
@@ -228,6 +237,7 @@
     template: '<content></content>',
     scope: {
       exportable: GGRC.Bootstrap.exportable,
+      snapshotable_objects: GGRC.config.snapshotable_objects,
       panel_number: '@',
       has_parent: false,
       fetch_relevant_data: function (id, type) {
@@ -276,7 +286,12 @@
         this.scope.attr('item.selected', {});
         this.scope.attr('item.relevant', []);
         this.scope.attr('item.filter', '');
+        this.scope.attr('item.snapshot_type', '');
         this.scope.attr('item.has_parent', false);
+
+        if (this.scope.attr('item.type') === 'Snapshot') {
+          this.scope.attr('item.snapshot_type', 'Control');
+        }
 
         this.setSelected();
       }

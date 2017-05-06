@@ -7,7 +7,7 @@
   We are applying assessment template properties and make
   new relationships and custom attributes
 """
-
+import logging
 from itertools import izip
 
 from sqlalchemy import inspect
@@ -21,6 +21,24 @@ from ggrc.models import Person
 from ggrc.models import Relationship
 from ggrc.models import Snapshot
 from ggrc.services.common import Resource
+
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+
+def _preload_roles(related, roles=None):
+  """Preload user roles needed for setting assignees"""
+  if roles is not None:
+    return roles
+  object_type = getattr(related.get('template'), 'template_object_type', None)
+  return all_models.AccessControlRole.query.filter(
+      all_models.AccessControlRole.name.in_((
+          "Primary Contacts",
+          "Secondary Contacts",
+          "Principal Assignees",
+          "Secondary Assignees"
+      )),
+      all_models.AccessControlRole.object_type == object_type
+  ).all()
 
 
 def init_hook():
@@ -36,7 +54,7 @@ def init_hook():
     snapshot_ids = [src.get('object', {}).get('id') for src in sources]
     snapshots = Snapshot.eager_query().filter(Snapshot.id.in_(snapshot_ids))
     snapshots = {snapshot.id: snapshot for snapshot in snapshots}
-
+    roles = None
     for obj, src in izip(objects, sources):
       src_obj = src.get("object")
       audit = src.get("audit")
@@ -48,19 +66,20 @@ def init_hook():
 
       related = {
           "template": get_by_id(src.get("template")),
-          "obj": get_by_id(src.get("object")),
-          "audit": get_by_id(src.get("audit")),
+          "obj": get_by_id(src_obj),
+          "audit": get_by_id(audit),
       }
-      relate_assignees(obj, related)
+
+      roles = _preload_roles(related, roles)
+
+      relate_assignees(obj, related, roles)
       relate_ca(obj, related)
 
       if src_obj:
         snapshot = snapshots.get(src_obj.get('id'))
         if snapshot:
-          parent_title = snapshot.parent.title
-          child_revision_title = snapshot.revision.content['title']
-          obj.title = u'{} assessment for {}'.format(child_revision_title,
-                                                     parent_title)
+          obj.title = u'{} assessment for {}'.format(
+              snapshot.revision.content['title'], snapshot.parent.title)
           template = related.get('template')
           if not template:
             continue
@@ -131,12 +150,28 @@ def get_model_query(model_type):
   return db.session.query(model)
 
 
-def get_value(people_group, audit, obj, template=None):
+def get_user_roles(obj, people, roles):
+  """Gets people with the given role on the object"""
+  people_roles = [r.id for r in roles if r.name == people]
+  if not people_roles:
+    logger.warn("%s custom role does not exist for %s",
+                people, obj['title'])
+    return
+  role_id = people_roles[0]
+  return [get_by_id({
+      'type': 'Person',
+      'id': acl.get('person_id')
+  }) for acl in obj.get('access_control_list', [])
+      if acl.get('ac_role_id') == role_id]
+
+
+def get_value(people_group, roles, audit, obj, template=None):
   """Return the people related to an Audit belonging to the given role group.
 
   Args:
     people_group: (string) the name of the group of people to return,
       e.g. "assessors"
+    roles: (AccessControlRoles list) list of access control roles
     template: (ggrc.models.AssessmentTemplate) a template to take into
       consideration
     audit: (ggrc.models.Audit) an audit instance
@@ -160,35 +195,33 @@ def get_value(people_group, audit, obj, template=None):
 
     return None
 
-  types = {
-      "Object Owners": [
-          get_by_id(owner)
-          for owner in obj.revision.content.get("owners", [])
-      ],
-      "Audit Lead": getattr(audit, "contact", None),
-      "Primary Contact": get_by_id(obj.revision.content.get("contact")),
-      "Secondary Contact": get_by_id(
-          obj.revision.content.get("secondary_contact")),
-      "Primary Assessor": get_by_id(
-          obj.revision.content.get("principal_assessor")),
-      "Secondary Assessor": get_by_id(
-          obj.revision.content.get("secondary_assessor")),
-  }
   people = template.default_people.get(people_group)
   if not people:
     return None
-
-  if isinstance(people, list):
+  elif isinstance(people, list):
     return [get_by_id({
         'type': 'Person',
         'id': person_id
     }) for person_id in people]
 
-  # only consume the generator if it will be used in the return value
-  if people == u"Auditors":
-    types[u"Auditors"] = list(auditors)
+  types = {
+      "Object Owners": lambda: [
+          get_by_id(owner)
+          for owner in obj.revision.content.get("owners", [])
+      ],
+      "Audit Lead": lambda: getattr(audit, "contact", None),
+      "Auditors": lambda: list(auditors),
+      "Primary Contacts": lambda: get_user_roles(
+          obj.revision.content, people, roles),
+      "Secondary Contacts": lambda: get_user_roles(
+          obj.revision.content, people, roles),
+      "Principal Assignees": lambda: get_user_roles(
+          obj.revision.content, people, roles),
+      "Secondary Assignees": lambda: get_user_roles(
+          obj.revision.content, people, roles),
+  }
 
-  return types.get(people)
+  return types.get(people)()
 
 
 def assign_people(assignees, assignee_role, assessment, relationships):
@@ -231,7 +264,7 @@ def get_relationship_dict(source, destination, role):
   }
 
 
-def relate_assignees(assessment, related):
+def relate_assignees(assessment, related, roles):
   """Generates assignee list and relates them to Assessment objects
 
     Args:
@@ -240,6 +273,7 @@ def relate_assignees(assessment, related):
                         - obj
                         - audit
                         - template (an AssessmentTemplate, can be None)
+        roles (list of ACR instances): List of all roles
   """
   people_types = {
       "assessors": "Assessor",
@@ -250,7 +284,7 @@ def relate_assignees(assessment, related):
 
   for person_key, person_type in people_types.iteritems():
     assign_people(
-        get_value(person_key, **related),
+        get_value(person_key, roles, **related),
         person_type, assessment, people_list)
 
   for person in people_list:

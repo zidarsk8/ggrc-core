@@ -42,10 +42,10 @@ from ggrc.converters.handlers import default_people
 from ggrc.converters.handlers import handlers
 from ggrc.converters.handlers import list_handlers
 from ggrc.converters.handlers import related_person
-from ggrc.converters.handlers import request
 from ggrc.converters.handlers import template
 from ggrc.converters.handlers import document
 from ggrc.converters.handlers import custom_attribute
+from ggrc.converters.handlers import acl
 from ggrc.converters.handlers.snapshot_instance_column_handler import (
     SnapshotInstanceColumnHandler
 )
@@ -89,15 +89,9 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "related_assessors": related_person.RelatedAssessorsColumnHandler,
     "related_assignees": related_person.RelatedAssigneesColumnHandler,
     "related_creators": related_person.RelatedCreatorsColumnHandler,
-    "related_requesters": related_person.RelatedRequestersColumnHandler,
     "related_verifiers": related_person.RelatedVerifiersColumnHandler,
     "report_end_date": handlers.DateColumnHandler,
     "report_start_date": handlers.DateColumnHandler,
-    "request": handlers.RequestColumnHandler,
-    "request_audit": handlers.RequestAuditColumnHandler,
-    "request_status": request.RequestStatusColumnHandler,
-    "request_type": handlers.RequestTypeColumnHandler,
-    "requested_on": handlers.DateColumnHandler,
     "secondary_assessor": handlers.UserColumnHandler,
     "secondary_contact": handlers.UserColumnHandler,
     "send_by_default": boolean.CheckboxColumnHandler,
@@ -127,6 +121,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "__custom__": custom_attribute.CustomAttributeColumHandler,
     "__object_custom__": custom_attribute.ObjectCaColumnHandler,
     "__snapshot_mapping__": SnapshotInstanceColumnHandler,
+    "__acl__": acl.AccessControlRoleColumnHandler,
 }
 
 

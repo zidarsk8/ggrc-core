@@ -55,6 +55,18 @@ def _ensure_session_teardown():
     db.session.remove()
 
 
+@app.before_request
+def setup_user_timezone_offset():
+  """Setup user timezon for current request
+
+  It will setup from request header `X-UserTimezoneOffset`
+  offset will be sent in minutes.
+  """
+  from flask import request
+  from flask import g
+  g.user_timezone_offset = request.headers.get("X-UserTimezoneOffset")
+
+
 def init_models(app_):
   import ggrc.models
   ggrc.models.init_app(app_)
@@ -102,6 +114,7 @@ ACTIONS = ['after_insert', 'after_delete', 'after_update']
 def runner(mapper, content, target):  # pylint:disable=unused-argument
   """Collect all reindex models in session"""
   import ggrc.fulltext
+  from ggrc.fulltext.mixin import Indexed
   ggrc.indexer = ggrc.fulltext.get_indexer()
   db.session.reindex_set = getattr(db.session, "reindex_set", set())
   getters = ggrc.indexer.indexer_rules.get(target.__class__.__name__) or []
@@ -111,9 +124,12 @@ def runner(mapper, content, target):  # pylint:disable=unused-argument
       to_index_list = [to_index_list]
     for to_index in to_index_list:
       db.session.reindex_set.add(to_index)
+  if isinstance(target, Indexed):
+    db.session.reindex_set.add(target)
 
 
 def init_indexer():
+  """Indexing initialization procedure"""
   import ggrc.fulltext
   from ggrc.fulltext.mixin import Indexed
   from ggrc.models import all_models
@@ -218,6 +234,7 @@ def _display_sql_queries():
           except:  # pylint: disable=bare-except
             logger.warning("Statement failed: %s", statement, exc_info=True)
       return response
+
 
 init_models(app)
 configure_flask_login(app)

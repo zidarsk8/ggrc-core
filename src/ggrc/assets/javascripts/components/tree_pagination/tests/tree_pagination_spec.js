@@ -13,20 +13,20 @@ describe('GGRC.Components.treePagination', function () {
   });
 
   beforeEach(function () {
-    viewModel.attr('paging', {
-      current: 1,
+    viewModel.attr('paging', new GGRC.VM.Pagination({
       pageSize: 10,
-      count: 3,
       disabled: false
-    }, true);
+    }));
+    viewModel.paging.attr('count', 3);
+    viewModel.paging.attr('current', 1);
   });
 
   describe('paginationInfo() method in helpers', function () {
     it('returns info about visible items on page', function () {
       var result;
-      viewModel.attr('paging.current', 15);
       viewModel.attr('paging.pageSize', 10);
       viewModel.attr('paging.total', 3000);
+      viewModel.attr('paging.current', 15);
       result = viewModel.getPaginationInfo();
       expect(result).toEqual('141-150 of 3000');
     });
@@ -42,8 +42,8 @@ describe('GGRC.Components.treePagination', function () {
   describe('paginationPlaceholder() method in helpers', function () {
     it('returns placeholder into page input', function () {
       var result;
-      viewModel.attr('paging.current', 3);
       viewModel.attr('paging.pageSize', 10);
+      viewModel.attr('paging.current', 3);
       viewModel.attr('paging.total', 30);
       viewModel.attr('paging.count', 10);
       result = viewModel.getPaginationPlaceholder();
@@ -55,14 +55,14 @@ describe('GGRC.Components.treePagination', function () {
       result = viewModel.getPaginationPlaceholder();
       expect(result).toEqual('');
     });
-    it('returns "Wrong value" if current page bigger than amount of pages',
+    it('returns empty string if current page bigger than amount of pages',
       function () {
         var result;
-        viewModel.paging.attr('current', 10);
         viewModel.paging.attr('pageSize', 2);
         viewModel.paging.attr('total', 0);
+        viewModel.paging.attr('current', 10);
         result = viewModel.getPaginationPlaceholder();
-        expect(result).toEqual('Wrong value');
+        expect(result).toEqual('');
       });
   });
   describe('setNextPage() method ', function () {
@@ -78,8 +78,8 @@ describe('GGRC.Components.treePagination', function () {
       });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        viewModel.paging.attr('disabled', true);
         viewModel.paging.attr('current', 3);
+        viewModel.paging.attr('disabled', true);
         viewModel.setNextPage();
         expect(viewModel.paging.current).toEqual(3);
       });
@@ -98,8 +98,8 @@ describe('GGRC.Components.treePagination', function () {
       });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        viewModel.paging.attr('disabled', true);
         viewModel.paging.attr('current', 2);
+        viewModel.paging.attr('disabled', true);
         viewModel.setPrevPage();
         expect(viewModel.paging.current).toEqual(2);
       });
@@ -112,8 +112,8 @@ describe('GGRC.Components.treePagination', function () {
     });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        viewModel.paging.attr('disabled', true);
         viewModel.paging.attr('current', 3);
+        viewModel.paging.attr('disabled', true);
         viewModel.setFirstPage();
         expect(viewModel.paging.current).toEqual(3);
       });
@@ -126,8 +126,8 @@ describe('GGRC.Components.treePagination', function () {
     });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        viewModel.paging.attr('disabled', true);
         viewModel.paging.attr('current', 2);
+        viewModel.paging.attr('disabled', true);
         viewModel.setLastPage();
         expect(viewModel.paging.current).toEqual(2);
       });
@@ -142,8 +142,8 @@ describe('GGRC.Components.treePagination', function () {
     });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        viewModel.paging.attr('disabled', true);
         viewModel.paging.attr('current', 2);
+        viewModel.paging.attr('disabled', true);
         expect(viewModel.paging.pageSize).toEqual(10);
         viewModel.changePageSize(25);
         expect(viewModel.paging.pageSize).toEqual(10);
@@ -189,8 +189,8 @@ describe('GGRC.Components.treePagination', function () {
     });
     it('doesn\'t change current value if inProgress equal true',
       function () {
-        viewModel.paging.attr('disabled', true);
         viewModel.paging.attr('current', 2);
+        viewModel.paging.attr('disabled', true);
         input.value = 5;
         viewModel.setCurrentPage({}, input, event);
         expect(viewModel.paging.current).toEqual(2);

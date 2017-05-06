@@ -31,6 +31,7 @@
     destroy: 'DELETE /api/programs/{id}',
     mixins: ['contactable', 'unique_title', 'ca_update', 'timeboxed'],
     is_custom_attributable: true,
+    isRoleable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
       owners: 'CMS.Models.Person.stubs',
@@ -122,6 +123,7 @@
     destroy: 'DELETE /api/objectives/{id}',
     mixins: ['ownable', 'contactable', 'unique_title', 'ca_update'],
     is_custom_attributable: true,
+    isRoleable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
       owners: 'CMS.Models.Person.stubs',
@@ -150,16 +152,7 @@
       create_link: true,
       show_related_assessments: true,
       // draw_children: true,
-      start_expanded: false,
-      child_options: [{
-        model: can.Model.Cacheable,
-        mapping: 'related_objects', // 'related_and_able_objects'
-        footer_view: GGRC.mustache_path + '/base_objects/tree_footer.mustache',
-        add_item_view: GGRC.mustache_path +
-        '/base_objects/tree_add_item.mustache',
-        title_plural: 'Business Objects',
-        draw_children: false
-      }]
+      start_expanded: false
     },
     defaults: {
       status: 'Draft'

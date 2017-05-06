@@ -7,8 +7,10 @@ from sqlalchemy import and_
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import remote
 from sqlalchemy.orm import validates
+from sqlalchemy import orm
 
 from ggrc import db
+from ggrc.access_control.roleable import Roleable
 from ggrc.models import reflection
 from ggrc.models.comment import Commentable
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
@@ -33,7 +35,6 @@ from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
-from ggrc.utils import similarity_options as similarity_options_module
 from ggrc.fulltext.mixin import Indexed, ReindexRule
 from ggrc.fulltext.attributes import MultipleSubpropertyFullTextAttr
 
@@ -73,10 +74,10 @@ def reindex_by_relationship(relationship):
   return []
 
 
-class Assessment(statusable.Statusable, AuditRelationship,
+class Assessment(Roleable, statusable.Statusable, AuditRelationship,
                  AutoStatusChangeable, Assignable, HasObjectState, TestPlanned,
-                 CustomAttributable, EvidenceURL, Commentable, Personable,
-                 reminderable.Reminderable, Timeboxed, Relatable,
+                 CustomAttributable, EvidenceURL, Commentable,
+                 Personable, reminderable.Reminderable, Timeboxed, Relatable,
                  WithSimilarityScore, FinishedDate, VerifiedDate,
                  ValidateOnComplete, Notifiable, BusinessObject, Indexed,
                  db.Model):
@@ -91,6 +92,8 @@ class Assessment(statusable.Statusable, AuditRelationship,
   _title_uniqueness = False
 
   ASSIGNEE_TYPES = (u"Creator", u"Assessor", u"Verifier")
+
+  MAPPED_WITH_RUD_PERMISSIONS = ["Document"]
 
   REMINDERABLE_HANDLERS = {
       "statusToPerson": {
@@ -162,14 +165,22 @@ class Assessment(statusable.Statusable, AuditRelationship,
                                       ['link']),
   ]
 
+  @classmethod
+  def indexed_query(cls):
+    query = super(Assessment, cls).indexed_query()
+    return query.options(
+        orm.Load(cls).load_only(
+            "design",
+            "operationally",
+        )
+    )
+
   _tracked_attrs = {
-      'contact_id',
       'description',
       'design',
       'notes',
       'operationally',
       'reference_url',
-      'secondary_contact_id',
       'test_plan',
       'title',
       'url',
@@ -209,7 +220,13 @@ class Assessment(statusable.Statusable, AuditRelationship,
       ReindexRule("Relationship", reindex_by_relationship)
   ]
 
-  similarity_options = similarity_options_module.ASSESSMENT
+  similarity_options = {
+      "relevant_types": {
+          "Objective": {"weight": 2},
+          "Control": {"weight": 2},
+      },
+      "threshold": 1,
+  }
 
   @property
   def assessors(self):

@@ -70,6 +70,10 @@ class Element(InstanceRepresentation):
     """Click on element."""
     self.element.click()
 
+  def click_via_js(self):
+    """Click on element using JS."""
+    selenium_utils.click_via_js(self._driver, self.element)
+
   def click_when_visible(self):
     """Wait for element to be visible and only then performs click."""
     selenium_utils.get_when_visible(self._driver, self._locator).click()

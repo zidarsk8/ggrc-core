@@ -97,14 +97,6 @@ class Programs(CommonInfo):
     self.manager = base.Label(self._driver, self._locators.MANAGER)
     self.manager_entered = base.Label(
         self._driver, self._locators.MANAGER_ENTERED)
-    self.primary_contact = base.Label(
-        self._driver, self._locators.PRIMARY_CONTACT)
-    self.primary_contact_entered = base.Label(
-        self._driver, self._locators.PRIMARY_CONTACT_ENTERED)
-    self.secondary_contact = base.Label(
-        self._driver, self._locators.SECONDARY_CONTACT)
-    self.secondary_contact_entered = base.Label(
-        self._driver, self._locators.SECONDARY_CONTACT_ENTERED)
     self.program_url = base.Label(self._driver, self._locators.PROGRAM_URL)
     self.program_url_entered = base.Label(
         self._driver, self._locators.PROGRAM_URL_ENTERED)

@@ -3,6 +3,12 @@
 
 """ This module collect all custom full text attributes classes"""
 
+from collections import defaultdict
+
+import datetime
+
+from flask import g
+
 from ggrc.utils import date_parsers
 
 EMPTY_SUBPROPERTY_KEY = ''
@@ -64,6 +70,31 @@ class FullTextAttr(object):
     return value
 
 
+class CustomRoleAttr(object):
+  """Custom index attribute class for custom roles"""
+  # pylint: disable=too-few-public-methods
+  def __init__(self, alias):
+    self.alias = alias
+    self.with_template = False
+
+  def get_properties(self, instance):
+    """Returns index properties of all custom roles for a given instance"""
+    results = {}
+    sorted_roles = defaultdict(list)
+    for acl in getattr(instance, self.alias, []):
+      ac_role = acl.ac_role.name
+      person_id = acl.person.id
+      if not results.get(acl.ac_role.name, None):
+        results[acl.ac_role.name] = {}
+      sorted_roles[ac_role].append(acl.person.user_name)
+      results[ac_role]["{}-email".format(person_id)] = acl.person.email
+      results[ac_role]["{}-name".format(person_id)] = acl.person.name
+      results[ac_role]["{}-user_name".format(person_id)] = acl.person.user_name
+    for role in sorted_roles:
+      results[role]["__sort__"] = u':'.join(sorted(sorted_roles[ac_role]))
+    return results
+
+
 class MultipleSubpropertyFullTextAttr(FullTextAttr):
   """Custom full text index attribute class for multiple return values
 
@@ -101,8 +132,12 @@ class MultipleSubpropertyFullTextAttr(FullTextAttr):
     return results
 
 
-class DatetimeValue(object):  # pylint: disable=too-few-public-methods
-  """Mixin setup if expected filter value is datetime"""
+# pylint: disable=too-few-public-methods
+class DatetimeValue(object):
+  """Mixin setup if expected filter value is datetime.
+
+  This mixin should be used for filtering datetime fields values only.
+  """
 
   @staticmethod
   def get_filter_value(value, operation):
@@ -112,6 +147,9 @@ class DatetimeValue(object):  # pylint: disable=too-few-public-methods
       return
     date_dict = {
         "=": converted_pairs,
+        "~": converted_pairs,
+        "!~": (converted_pairs[1], converted_pairs[0]),
+        "!=": (converted_pairs[1], converted_pairs[0]),
         ">": (converted_pairs[1], None),
         "<": (None, converted_pairs[0]),
         ">=": (converted_pairs[0], None),
@@ -120,8 +158,11 @@ class DatetimeValue(object):  # pylint: disable=too-few-public-methods
     return date_dict.get(operation)
 
 
-class DateValue(DatetimeValue):  # pylint: disable=too-few-public-methods
-  """Mixin setup if expected filter value is date"""
+class DateValue(DatetimeValue):
+  """Mixin setup if expected filter value is date
+
+  This mixin should be used for filtering date fields values only.
+  """
 
   def get_filter_value(self, value, operation):
     results = super(DateValue, self).get_filter_value(value, operation)
@@ -130,8 +171,29 @@ class DateValue(DatetimeValue):  # pylint: disable=too-few-public-methods
     return [i.date() if i else i for i in results]
 
 
+class TimezonedDatetimeValue(DatetimeValue):
+  """Mixin setup if expected filter value is datetime depended from timezone.
+
+  This mixin should be used for filtering datetime fields values only.
+  """
+
+  def get_filter_value(self, value, operation):
+    """returns parsed datetime pairs for selected operation"""
+    if getattr(g, "user_timezone_offset", None):
+      minutes_offset = int(g.user_timezone_offset)
+    else:
+      minutes_offset = 0
+    offset = datetime.timedelta(minutes=minutes_offset)
+    converted_pairs = super(TimezonedDatetimeValue, self).get_filter_value(
+        value, operation
+    )
+    if not converted_pairs:
+      return converted_pairs
+    return [(p - offset) if p else p for p in converted_pairs]
+
+
 DatetimeFullTextAttr = type(
-    "DatetimeFullTextAttr", (DatetimeValue, FullTextAttr), {})
+    "DatetimeFullTextAttr", (TimezonedDatetimeValue, FullTextAttr), {})
 
 
 DateFullTextAttr = type("DateFullTextAttr", (DateValue, FullTextAttr), {})
@@ -139,7 +201,7 @@ DateFullTextAttr = type("DateFullTextAttr", (DateValue, FullTextAttr), {})
 
 DatetimeMultipleSubpropertyFullTextAttr = type(
     "DatetimeMultipleSubpropertyFullTextAttr",
-    (DatetimeValue, MultipleSubpropertyFullTextAttr),
+    (TimezonedDatetimeValue, MultipleSubpropertyFullTextAttr),
     {},
 )
 

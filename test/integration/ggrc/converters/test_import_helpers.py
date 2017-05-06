@@ -1,10 +1,11 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from os.path import abspath, dirname, join
+import ddt
 
 from ggrc import converters
 from ggrc import models
+from ggrc.access_control import roleable
 from ggrc.converters import column_handlers
 from ggrc.converters import import_helper
 from ggrc.converters.import_helper import get_object_column_definitions
@@ -14,10 +15,8 @@ from ggrc_risks import models as r_models
 from ggrc_risk_assessments import models as ra_models
 from ggrc_workflows import models as wf_models
 from integration.ggrc import TestCase
+from integration.ggrc.models import factories
 from integration.ggrc.generator import ObjectGenerator
-
-THIS_ABS_PATH = abspath(dirname(__file__))
-CSV_DIR = join(THIS_ABS_PATH, 'example_csvs/')
 
 
 def get_mapping_names(class_name):
@@ -40,6 +39,28 @@ def get_unmapping_names(class_name):
   return unmapping_names
 
 
+@ddt.ddt
+class TestACLAttributeDefinitions(TestCase):
+  """Tests for ACL column definitions on all models."""
+
+  @ddt.data(*models.all_models.all_models)
+  def test_acl_definitions(self, model):
+    """Test ACL column definitions."""
+    factory = factories.AccessControlRoleFactory
+    factories.AccessControlRoleFactory(
+        object_type="Control",
+        read=True
+    )
+    role_names = {factory(object_type=model.__name__).name for _ in range(2)}
+    expected_names = set()
+    if issubclass(model, roleable.Roleable):
+      expected_names = role_names
+
+    definitions = get_object_column_definitions(model)
+    definition_names = {d["display_name"]: d for d in definitions.values()}
+    self.assertLessEqual(expected_names, set(definition_names.keys()))
+
+
 class TestCustomAttributesDefinitions(TestCase):
 
   def setUp(self):
@@ -60,8 +81,6 @@ class TestCustomAttributesDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Policy URL",
         "Reference URL",
         "Kind/Type",
@@ -109,8 +128,6 @@ class TestCustomAttributesDefinitions(TestCase):
         "Manager",
         "Reader",
         "Editor",
-        "Primary Contact",
-        "Secondary Contact",
         "Program URL",
         "Reference URL",
         "Code",
@@ -279,8 +296,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Manager",
         "Reader",
         "Editor",
-        "Primary Contact",
-        "Secondary Contact",
         "Program URL",
         "Reference URL",
         "Code",
@@ -383,8 +398,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Creators",
         "Assignees",
         "Verifiers",
-        "Primary Contact",
-        "Secondary Contact",
         "Assessment URL",
         "Reference URL",
         "Evidence",
@@ -429,8 +442,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Audit",
         "Remediation Plan",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Issue URL",
         "Reference URL",
         "Code",
@@ -466,8 +477,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Regulation URL",
         "Reference URL",
         "Code",
@@ -486,8 +495,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Policy URL",
         "Reference URL",
         "Kind/Type",
@@ -507,8 +514,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Standard URL",
         "Reference URL",
         "Code",
@@ -527,8 +532,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Contract URL",
         "Reference URL",
         "Code",
@@ -547,8 +550,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Text of Clause",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Clause URL",
         "Reference URL",
         "Code",
@@ -568,8 +569,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Notes",
         "Policy / Regulation / Standard / Contract",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Section URL",
         "Reference URL",
         "Code",
@@ -587,8 +586,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Test Plan",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Control URL",
         "Reference URL",
         "Code",
@@ -601,10 +598,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Frequency",
         "Assertions",
         "Categories",
-        "Principal Assignee",
-        "Secondary Assignee",
         "State",
         "Review State",
+        "Evidence",
         "Delete",
     }
     self._test_single_object(models.Control, names, self.COMMON_EXPECTED)
@@ -616,8 +612,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Objective URL",
         "Reference URL",
         "Code",
@@ -652,8 +646,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Org Group URL",
         "Reference URL",
         "Code",
@@ -672,8 +664,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Vendor URL",
         "Reference URL",
         "Code",
@@ -692,8 +682,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "System URL",
         "Reference URL",
         "Code",
@@ -713,8 +701,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Process URL",
         "Reference URL",
         "Code",
@@ -734,8 +720,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Data Asset URL",
         "Reference URL",
         "Code",
@@ -754,8 +738,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Access Group URL",
         "Reference URL",
         "Code",
@@ -774,8 +756,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Product URL",
         "Reference URL",
         "Code",
@@ -795,8 +775,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Project URL",
         "Reference URL",
         "Code",
@@ -815,8 +793,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Facility URL",
         "Reference URL",
         "Code",
@@ -835,8 +811,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Description",
         "Notes",
         "Admin",
-        "Primary Contact",
-        "Secondary Contact",
         "Market URL",
         "Reference URL",
         "Code",
@@ -853,7 +827,6 @@ class TestGetObjectColumnDefinitions(TestCase):
 
     names = {
         "Code",
-        "Contact",
         "Delete",
         "Description",
         "Effective Date",

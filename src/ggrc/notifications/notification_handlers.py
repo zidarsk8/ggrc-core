@@ -419,17 +419,14 @@ def register_handlers():  # noqa: C901
   #
   # pylint: disable=unused-argument,unused-variable
 
-  @Resource.model_deleted.connect_via(models.Request)
   @Resource.model_deleted.connect_via(models.Assessment)
   def assignable_deleted_listener(sender, obj=None, src=None, service=None):
     handle_assignable_deleted(obj)
 
-  @Resource.model_put.connect_via(models.Request)
   @Resource.model_put.connect_via(models.Assessment)
   def assignable_modified_listener(sender, obj=None, src=None, service=None):
     handle_assignable_modified(obj)
 
-  @Resource.collection_posted.connect_via(models.Request)
   @Resource.collection_posted.connect_via(models.Assessment)
   def assignable_created_listener(sender, objects=None, **kwargs):
     for obj in objects:

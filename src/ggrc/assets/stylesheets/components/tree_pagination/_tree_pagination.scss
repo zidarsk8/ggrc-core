@@ -6,16 +6,16 @@ tree-pagination {
   text-align: left;
 
   .tree-pagination {
-    line-height: 26px;
+    line-height: 28px;
     font-size: 12px;
 
     &__count {
       margin: 0 16px;
-      line-height: 26px;
+      line-height: 28px;
       cursor: pointer;
 
       button {
-        line-height: 26px;
+        line-height: 28px;
         padding-top: 0;
         padding-bottom: 0;
       }
@@ -24,7 +24,7 @@ tree-pagination {
         text-transform: none;
         font-size: 12px;
         color: #969696;
-        line-height: 26px;
+        line-height: 28px;
         text-align: right;
         margin: 0;
         padding: 0;
@@ -55,12 +55,12 @@ tree-pagination {
       display: inline-flex;
       flex-direction: row;
       margin: 0;
-      height: 26px;
+      height: 28px;
       box-shadow: 0 1px 2px 0 rgba(122, 122, 122, 0.15);
       border-radius: 2px;
 
       .pagination-item {
-        line-height: 24px;
+        line-height: 26px;
         border: 1px solid $widgetBorder;
         border-left-width: 0;
         background: $white;
@@ -84,7 +84,7 @@ tree-pagination {
         }
 
         a {
-          line-height: 24px;
+          line-height: 26px;
           cursor: pointer;
           padding: 0 10px;
           border: 0;
@@ -104,7 +104,7 @@ tree-pagination {
           font-size: 12px;
           margin-bottom: 0;
           background-color: $white;
-          width: 120px;
+          width: 110px;
           float: left;
           text-align: center;
           &:focus {
