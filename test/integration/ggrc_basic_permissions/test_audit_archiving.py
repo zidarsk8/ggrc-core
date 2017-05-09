@@ -8,6 +8,7 @@ from os.path import dirname
 from os.path import join
 from ddt import data, ddt, unpack
 from ggrc.app import app  # NOQA pylint: disable=unused-import
+from ggrc.app import db
 from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
@@ -43,6 +44,18 @@ class TestAuditArchiving(TestCase):
     self._check_csv_response(self.response, {})
     self.api = Api()
     self.client.get("/login")
+    db.engine.execute("""
+      UPDATE audits
+         SET archived = 0,
+             description = ""
+      WHERE title = '2016: Program Manager Audit RBAC Test - Audit 1'
+    """)
+    db.engine.execute("""
+      UPDATE audits
+         SET archived = 1,
+             description = ""
+       WHERE title = '2016: Program Manager Audit RBAC Test - Audit 2'
+    """)
 
   @data(
       ('Admin', 200),
