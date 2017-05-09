@@ -336,6 +336,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Planned Report Period from",
         "Planned Report Period to",
         "Auditors",
+        "Archived",
         "Delete",
         "Url",
         "Evidence",
