@@ -111,7 +111,8 @@ class TestAuditArchiving(TestCase):
       return
 
     assert response.json["audit"].get("archived", None) is False, \
-        "Audit has not been archived correctly {}".format(
+        "Audit has not been unarchived correctly {}".format(
+        response.json["audit"])
 
   @data(
       ('Admin', 200),
