@@ -859,9 +859,6 @@ class Resource(ModelView):
     if obj is None:
       return self.not_found_response()
     src = self.request.json
-    with benchmark("Query update permissions"):
-      new_context = self.get_context_id_from_json(src)
-      self._check_put_permissions(obj, new_context)
     if self.request.mimetype != 'application/json':
       return current_app.make_response(
           ('Content-Type must be application/json', 415, []))
@@ -878,6 +875,9 @@ class Resource(ModelView):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
     db.session.add(obj)
+    with benchmark("Query update permissions"):
+      new_context = self.get_context_id_from_json(src)
+      self._check_put_permissions(obj, new_context)
     with benchmark("Validate custom attributes"):
       if hasattr(obj, "validate_custom_attributes"):
         obj.validate_custom_attributes()
