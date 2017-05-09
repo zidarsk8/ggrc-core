@@ -99,6 +99,8 @@ class Api(object):
     """Simple put request."""
     name = obj._inflector.table_singular
     response = self.get(obj, obj.id)
+    if response.status_code == 403:
+      return response
     headers = {
         "If-Match": response.headers.get("Etag"),
         "If-Unmodified-Since": response.headers.get("Last-Modified")
