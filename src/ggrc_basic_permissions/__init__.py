@@ -847,9 +847,6 @@ def _get_or_create_personal_context(user):
       context=1,
       name='Personal Context for {0}'.format(user.id),
       description='')
-  personal_context.modified_by = get_current_user()
-  db.session.add(personal_context)
-  db.session.flush()
   return personal_context
 
 
