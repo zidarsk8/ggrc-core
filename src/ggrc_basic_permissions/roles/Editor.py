@@ -120,7 +120,13 @@ permissions = {
         "__GGRC_ALL__"
     ],
     "update": [
-        "Audit",
+        {
+            "type": "Audit",
+            "terms": {
+                "property_name": "archived"
+            },
+            "condition": "has_not_changed"
+        },
         "Snapshot",
         "Workflow",
         "Categorization",
