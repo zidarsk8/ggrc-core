@@ -58,7 +58,7 @@ class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
   assessments = db.relationship('Assessment', backref='audit')
   issues = db.relationship('Issue', backref='audit')
   archived = deferred(db.Column(db.Boolean,
-                      nullable=False, default=True), 'Audit')
+                      nullable=False, default=False), 'Audit')
 
   _publish_attrs = [
       'report_start_date',
