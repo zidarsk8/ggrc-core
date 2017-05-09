@@ -99,6 +99,38 @@ class TestAuditArchiving(TestCase):
 
     assert response.json["audit"].get("archived", None) is False, \
         "Audit has not been archived correctly {}".format(
+
+  @data(
+      ('Admin', 200),
+      ('Editor', 200),
+      ('Reader', 403),
+      ('Creator', 403),
+      ('Creator PM', 200),
+      ('Creator PE', 200),
+      ('Creator PR', 403)
+  )
+  @unpack
+  def test_audit_editing(self, person, status):
+    """Test if users can edit an audit
+
+       This is just a sanity check to make sure Editors can still edit all the
+       fields except the archived column.
+    """
+
+    self.api.set_user(self.people[person])
+    audit_json = {
+        "description": "New"
+    }
+    response = self.api.put(self.archived_audit, audit_json)
+    assert response.status_code == status, \
+        "{} put returned {} instead of {}".format(
+            person, response.status, status)
+    if status != 200:
+      # if editing is allowed check if edit was correctly saved
+      return
+
+    assert response.json["audit"].get("description", None) == "New", \
+        "Audit has not been updated correctly {}".format(
         response.json["audit"])
 
 
