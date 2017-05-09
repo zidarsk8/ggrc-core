@@ -5,6 +5,7 @@ from collections import namedtuple
 from flask import g
 from flask.ext.login import current_user
 from .user_permissions import UserPermissions
+from ggrc.app import db
 from ggrc.rbac.permissions import permissions_for as find_permissions
 from ggrc.rbac.permissions import is_allowed_create
 from ggrc.models import get_model
@@ -126,6 +127,19 @@ def forbid_condition(instance, blacklist, _current_action, **_):
   return instance.type not in blacklist.get(_current_action, ())
 
 
+def has_not_changed_condition(instance, property_name, **_):
+  """Check if instance attribute has changed
+     Example:
+      "terms": {
+         "property_name": "person",
+       },
+       "condition": "has_not_changed"
+
+  """
+  return not db.inspect(instance).get_history(
+      property_name, False).has_changes()
+
+
 """
 All functions with a signature
 
@@ -138,7 +152,8 @@ _CONDITIONS_MAP = {
     'is': is_condition,
     'in': in_condition,
     'relationship': relationship_condition,
-    'forbid': forbid_condition
+    'forbid': forbid_condition,
+    'has_not_changed': has_not_changed_condition
 }
 
 
