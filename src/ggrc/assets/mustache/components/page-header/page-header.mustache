@@ -12,12 +12,12 @@
         All Objects
       {{/is_dashboard}}
     {{else}}
-        <span class="entity-type">{{model.table_singular}}:</span>
+        <span class="entity-type">{{model.title_singular}}:</span>
         <span class="entity-name">{{firstnonempty instance.name instance.email}}</span>
     {{/is_dashboard_or_all}}
   {{/if_equals}}
   {{^if_equals model.table_singular 'person'}}
-    <span class="entity-type">{{model.table_singular}}:</span>
+    <span class="entity-type">{{model.title_singular}}:</span>
     <span class="entity-name">{{instance.title}}</span>
   {{/if_equals}}
 </h1>
