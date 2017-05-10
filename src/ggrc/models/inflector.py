@@ -52,7 +52,8 @@ class ModelInflector(object):
 
   @property
   def model_plural(self):
-    return self.title_plural.replace(' ', '')
+    return self.table_plural.replace('_', ' ')\
+        .replace(' ', '').title()
 
   @property
   def table_singular(self):
@@ -73,11 +74,14 @@ class ModelInflector(object):
 
   @property
   def title_singular(self):
-    return utils.title_from_camelcase(self.model.__name__)
+    return getattr(self.model, 'readable_name_alias',
+                   utils.title_from_camelcase(self.model.__name__))
 
   @property
   def title_plural(self):
-    return self.table_plural.replace('_', ' ').title()
+    return str(self.model.readable_name_alias + 's').title() \
+        if hasattr(self.model, 'readable_name_alias') \
+        else self.table_plural.replace('_', ' ').title()
 
   def __repr__(self):
     return (
