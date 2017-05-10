@@ -21,7 +21,7 @@
       opacity: 1;
     }
 
-    > .object-popover-body {
+    > .object-popover-title + .object-popover-body {
       padding: 16px 0 0;
       box-sizing: border-box;
       display: flex;

@@ -18,6 +18,12 @@
     tag: tag,
     template: tpl,
     viewModel: {
+      define: {
+        hideTitle: {
+          type: Boolean,
+          value: false
+        }
+      },
       expanded: false,
       direction: 'left',
       maxInnerHeight: defaultMaxInnerHeight,
