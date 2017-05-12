@@ -1029,4 +1029,67 @@ describe('GGRC.Components.mapperResults', function () {
       });
     });
   });
+
+  describe('buildRelatedData() method', function () {
+    var viewModel;
+
+    beforeEach(function () {
+      var Component = GGRC.Components.get('mapperResults');
+      Component.prototype.viewModel.init = undefined;
+      viewModel = GGRC.Components.getViewModel('mapperResults');
+      viewModel.attr('mapper', {});
+    });
+
+    it('method should return data from "relatedData" array',
+      function () {
+        var relatedData = {
+          Snapshot: {
+            ids: [1, 2, 3]
+          }
+        };
+
+        var result = viewModel
+          .buildRelatedData(relatedData, 'Snapshot');
+        expect(result.Snapshot.ids.length).toEqual(3);
+        expect(result.Snapshot.ids[0]).toEqual(1);
+      }
+    );
+
+    it('method should return data from "deferred_list" array',
+      function () {
+        var relatedData = {
+          Snapshot: {
+            ids: [1, 2, 3]
+          }
+        };
+        var result;
+
+        viewModel.attr('mapper.deferred_list', [
+          {id: 5, type: 'Snapshot'},
+          {id: 25, type: 'Snapshot'}
+        ]);
+
+        result = viewModel
+          .buildRelatedData(relatedData, 'Snapshot');
+        expect(result.Snapshot.ids.length).toEqual(2);
+        expect(result.Snapshot.ids[0]).toEqual(5);
+      }
+    );
+
+    it('return data from "deferred_list" array. RelatedData is undefined',
+      function () {
+        var result;
+
+        viewModel.attr('mapper.deferred_list', [
+          {id: 5, type: 'Snapshot'},
+          {id: 25, type: 'Snapshot'}
+        ]);
+
+        result = viewModel
+          .buildRelatedData(undefined, 'Snapshot');
+        expect(result.Snapshot.ids.length).toEqual(2);
+        expect(result.Snapshot.ids[0]).toEqual(5);
+      }
+    );
+  });
 });
