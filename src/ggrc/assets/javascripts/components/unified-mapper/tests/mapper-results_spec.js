@@ -503,6 +503,21 @@ describe('GGRC.Components.mapperResults', function () {
       }));
     });
 
+    it('sets "read" to permissions if model is person', function () {
+      var result;
+      viewModel.attr('type', 'Person');
+      spyOn(viewModel, 'useSnapshots')
+        .and.returnValue(false);
+      spyOn(viewModel, 'prepareBaseQuery')
+        .and.returnValue({mockData: 'basePagingSort'});
+      result = viewModel.getQuery('Person', true);
+      expect(result.data[0]).toEqual(jasmine.objectContaining({
+        mockData: 'basePagingSort',
+        permissions: 'read',
+        type: 'Person'
+      }));
+    });
+
     it('transform query to snapshot if useSnapshots is true', function () {
       var result;
       spyOn(viewModel, 'useSnapshots')
