@@ -157,10 +157,48 @@ def modify_cycle_task_notification(obj, notification_name):
       db.session.delete(notif)
 
 
+def modify_cycle_task_overdue_notification(task):
+  """Add or update the task's overdue notification.
+
+  If an overdue notification already exists for the task, its date of sending
+  is adjusted as needed. If such notification does not exist yet, it gets
+  created.
+
+  Args:
+    task: The CycleTaskGroupObjectTask instance for which to update the overdue
+          notifications.
+  """
+  notif = db.session.query(Notification)\
+      .join(NotificationType)\
+      .filter(
+          (Notification.object_id == task.id) &
+          (Notification.object_type == task.type) &
+          (
+              Notification.sent_at.is_(None) |
+              (Notification.repeating == true())
+          ) &
+          (NotificationType.name == u"cycle_task_overdue"))
+
+  notif_type = get_notification_type(u"cycle_task_overdue")
+  send_on = datetime.combine(task.end_date, datetime.min.time()) + \
+      timedelta(1)
+
+  if notif.count() > 0:
+    notif = notif.one()
+
+    if notif.send_on == send_on:
+      return  # nothing to do here...
+    notif.send_on = send_on
+    db.session.add(notif)
+  else:
+    add_notif(task, notif_type, send_on, repeating=True)
+
+
 def modify_cycle_task_end_date(obj):
   modify_cycle_task_notification(obj, "{}_cycle_task_due_in".format(
       obj.cycle_task_group.cycle.workflow.frequency))
   modify_cycle_task_notification(obj, "cycle_task_due_today")
+  modify_cycle_task_overdue_notification(obj)
 
 
 def check_all_cycle_tasks_finished(cycle):
@@ -188,8 +226,34 @@ def handle_cycle_task_status_change(obj, new_status, old_status):
 def handle_cycle_task_group_object_task_put(obj):
   if inspect(obj).attrs.contact.history.has_changes():
     add_cycle_task_reassigned_notification(obj)
-  if inspect(obj).attrs.end_date.history.has_changes():
-    modify_cycle_task_end_date(obj)
+
+  history = inspect(obj).attrs.end_date.history
+  if not history.has_changes():
+    return
+
+  # NOTE: A history might "detect" a change even if end_date was not changed
+  # due to different data types, i.e.  date vs. datetime with the time part set
+  # to zero. Example:
+  #
+  #   >>> datetime(2017, 5, 15, 0, 0) == date(2017, 5, 15)
+  #   False
+  #
+  # We thus need to manually check both date values without the time part
+  # in order to avoid unnecessary work and DB updates.
+  old_date = history.deleted[0] if history.deleted else None
+  new_date = history.added[0] if history.added else None
+
+  if old_date is not None and new_date is not None:
+    if isinstance(old_date, datetime):
+      old_date = old_date.date()
+    if isinstance(new_date, datetime):
+      new_date = new_date.date()
+
+    if old_date == new_date:
+      return  # we have a false positive, no change actually occurred
+
+  # the end date has actually changed, respond accordingly
+  modify_cycle_task_end_date(obj)
 
 
 def remove_all_cycle_task_notifications(obj):

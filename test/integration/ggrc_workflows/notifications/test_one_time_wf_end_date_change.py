@@ -186,7 +186,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
-      # one email to owner and one to assigne
+      # one email to owner and one to assignee
       self.assertEqual(mock_mail.call_count, 2)
 
     with freeze_time("2015-05-03 03:21:34"):
@@ -201,17 +201,18 @@ class TestOneTimeWfEndDateChange(TestCase):
       self.wf_generator.modify_object(
           task2, data={"end_date": date(2015, 5, 1)})
 
-    with freeze_time("2015-05-03 03:21:34"):  # one day befor due date
+    with freeze_time("2015-05-03 03:21:34"):  # two days after due date
+      user = get_person(self.user.id)
       _, notif_data = common.get_daily_notifications()
-      self.assertEqual(notif_data, {})
+      self.assertNotEqual(notif_data, {})
+      self.assertIn(user.email, notif_data)
 
-    with freeze_time("2015-05-04 03:21:34"):  # due date
-      _, notif_data = common.get_daily_notifications()
-      self.assertEqual(notif_data, {})
+      user_notifs = notif_data[user.email]
+      self.assertNotIn("due_today", user_notifs)
+      self.assertNotIn("due_in", user_notifs)
 
-    with freeze_time("2015-05-05 03:21:34"):  # due date
-      _, notif_data = common.get_daily_notifications()
-      self.assertEqual(notif_data, {})
+      self.assertIn("task_overdue", user_notifs)
+      self.assertEqual(len(user_notifs["task_overdue"]), 2)
 
   @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_today(self, mock_mail):
@@ -245,11 +246,11 @@ class TestOneTimeWfEndDateChange(TestCase):
       self.wf_generator.modify_object(
           task2, data={"end_date": date(2015, 5, 4)})
 
-    with freeze_time("2015-05-03 03:21:34"):  # one day befor due date
+    with freeze_time("2015-05-03 03:21:34"):  # one day before due date
       user = get_person(self.user.id)
       _, notif_data = common.get_daily_notifications()
 
-      self.assertNotEquals(notif_data, {})
+      self.assertNotEqual(notif_data, {})
       self.assertIn(user.email, notif_data)
       self.assertIn("due_today", notif_data[user.email])
       self.assertIn("due_in", notif_data[user.email])
@@ -257,7 +258,7 @@ class TestOneTimeWfEndDateChange(TestCase):
 
       common.send_daily_digest_notifications()
 
-    with freeze_time("2015-05-04 03:21:34"):  # due date
+    with freeze_time("2015-05-04 03:21:34"):  # due date (of task2)
       user = get_person(self.user.id)
       _, notif_data = common.get_daily_notifications()
       self.assertIn(user.email, notif_data)
@@ -265,9 +266,19 @@ class TestOneTimeWfEndDateChange(TestCase):
       self.assertNotIn("due_in", notif_data[user.email])
       common.send_daily_digest_notifications()
 
-    with freeze_time("2015-05-05 03:21:34"):  # due date
+    # check that overdue notifications are sent even on days after the day a
+    # task has become due, unlike the "due_today" and "due_in" notifications
+    with freeze_time("2015-05-05 03:21:34"):  # 1+ days after due date(s)
       _, notif_data = common.get_daily_notifications()
-      self.assertEqual(notif_data, {})
+      self.assertNotEqual(notif_data, {})
+      self.assertIn(user.email, notif_data)
+
+      user_notifs = notif_data[user.email]
+      self.assertNotIn("due_today", user_notifs)
+      self.assertNotIn("due_in", user_notifs)
+
+      self.assertIn("task_overdue", user_notifs)
+      self.assertEqual(len(user_notifs["task_overdue"]), 2)
 
   def create_test_cases(self):
     def person_dict(person_id):
