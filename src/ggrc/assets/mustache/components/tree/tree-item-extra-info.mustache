@@ -4,6 +4,7 @@
 }}
 
 {{#if isActive}}
+  {{#if showingOverdueDate}}<span class="tree-item__due-date {{dueDateCssClass}}">{{localize_date dueDate}}</span>{{/if}}
   <div class="person-holder">
     <i class="fa {{cssClasses}} person-tooltip-trigger" data-placement="left"></i>
 

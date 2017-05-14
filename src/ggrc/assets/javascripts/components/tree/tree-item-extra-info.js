@@ -18,6 +18,33 @@
 
   var viewModel = can.Map.extend({
     define: {
+      dueDate: {
+        type: 'date',
+        get: function () {
+          return this.attr('instance.next_due_date') ||
+            this.attr('instance.end_date');
+        }
+      },
+      dueDateCssClass: {
+        type: 'string',
+        get: function () {
+          var isOverdue = this.attr('isCycleTasks') &&
+            this.attr('instance.isOverdue');
+          return isOverdue ? 'state-overdue' : '';
+        }
+      },
+      isSubTreeItem: {
+        type: 'htmlbool',
+        value: false
+      },
+      showingOverdueDate: {
+        type: 'boolean',
+        value: false,
+        get: function () {
+          return this.attr('isSubTreeItem') &&
+              this.attr('isCycleTaskGroupObjectTask');
+        }
+      },
       isActive: {
         type: 'boolean',
         get: function () {
