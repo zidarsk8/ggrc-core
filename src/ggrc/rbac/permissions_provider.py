@@ -97,12 +97,6 @@ def is_condition(instance, value, property_name, **_):
   return value == property_value
 
 
-def in_condition(instance, value, property_name, **_):
-  value = resolve_permission_variable(value)
-  property_value = get_deep_attr(instance, property_name)
-  return property_value in value
-
-
 def relationship_condition(instance, action, property_name, **_):
   if getattr(instance, 'context') is not None:
     context_id = getattr(instance.context, 'id')
@@ -150,7 +144,6 @@ All functions with a signature
 _CONDITIONS_MAP = {
     'contains': contains_condition,
     'is': is_condition,
-    'in': in_condition,
     'relationship': relationship_condition,
     'forbid': forbid_condition,
     'has_not_changed': has_not_changed_condition
