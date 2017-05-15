@@ -28,6 +28,9 @@ from ggrc import db
 from ggrc.models.notification import Notification
 from ggrc.models.notification import NotificationType
 
+from ggrc_workflows.models.cycle_task_group_object_task import \
+    CycleTaskGroupObjectTask
+
 
 def handle_task_group_task(obj, notif_type=None):
   """Add notification entry for task group tasks.
@@ -191,7 +194,14 @@ def modify_cycle_task_overdue_notification(task):
     notif.send_on = send_on
     db.session.add(notif)
   else:
-    add_notif(task, notif_type, send_on, repeating=True)
+    # NOTE: The "task.id" check is to assure a notification is created for
+    # existing task instances only, avoiding DB errors. Overdue notifications
+    # for new tasks are handled and added elsewhere.
+    if (
+        task.id and task.status in CycleTaskGroupObjectTask.ACTIVE_STATES and
+        task.cycle.is_current
+    ):
+      add_notif(task, notif_type, send_on, repeating=True)
 
 
 def modify_cycle_task_end_date(obj):
@@ -221,6 +231,11 @@ def handle_cycle_task_status_change(obj, new_status, old_status):
       notif_type = get_notification_type("all_cycle_tasks_completed")
       add_notif(cycle, notif_type)
     db.session.flush()
+
+  # NOTE: The only inactive state is "Verified", which is sufficiently handled
+  # by the code above, thus we only need to handle active states
+  if new_status in CycleTaskGroupObjectTask.ACTIVE_STATES:
+    modify_cycle_task_overdue_notification(obj)
 
 
 def handle_cycle_task_group_object_task_put(obj):
