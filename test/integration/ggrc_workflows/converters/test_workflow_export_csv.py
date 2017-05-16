@@ -55,7 +55,7 @@ class TestExportEmptyTemplate(TestCase):
     self.assertIn("Task,", response.data)
     self.assertIn("Cycle,", response.data)
     self.assertIn("Cycle Task Group,", response.data)
-    self.assertIn("Cycle Task Group Object Task,", response.data)
+    self.assertIn("Cycle Task,", response.data)
 
 
 class TestExportMultipleObjects(TestCase):
