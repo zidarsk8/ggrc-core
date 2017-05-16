@@ -14,16 +14,8 @@ from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 
 
-@ddt
-class TestAuditArchiving(TestCase):
-  """Tests Archived Audits
-
-  Tests the following cases:
-
-  1. Audit can only be archived by Global Admin or Program Manager
-  2. Audit can only be unarchived by Global Admin or Program Manager
-  """
-
+class TestAuditArchivingBase(TestCase):
+  """Base class for testing archived audits"""
   CSV_DIR = join(abspath(dirname(__file__)), "test_csvs")
 
   @classmethod
@@ -56,6 +48,17 @@ class TestAuditArchiving(TestCase):
              description = ""
        WHERE title = '2016: Program Manager Audit RBAC Test - Audit 2'
     """)
+
+
+@ddt
+class TestAuditArchiving(TestAuditArchivingBase):
+  """Tests Archived Audits
+
+  Tests the following cases:
+
+  1. Audit can only be archived by Global Admin or Program Manager
+  2. Audit can only be unarchived by Global Admin or Program Manager
+  """
 
   @data(
       ('Admin', 200),
@@ -114,41 +117,9 @@ class TestAuditArchiving(TestCase):
         "Audit has not been unarchived correctly {}".format(
         response.json["audit"])
 
-  @data(
-      ('Admin', 200),
-      ('Editor', 200),
-      ('Reader', 403),
-      ('Creator', 403),
-      ('Creator PM', 200),
-      ('Creator PE', 200),
-      ('Creator PR', 403)
-  )
-  @unpack
-  def test_audit_editing(self, person, status):
-    """Test if users can edit an audit
 
-       This is just a sanity check to make sure Editors can still edit all the
-       fields except the archived column.
-    """
-
-    self.api.set_user(self.people[person])
-    audit_json = {
-        "description": "New"
-    }
-    response = self.api.put(self.archived_audit, audit_json)
-    assert response.status_code == status, \
-        "{} put returned {} instead of {}".format(
-            person, response.status, status)
-    if status != 200:
-      # if editing is allowed check if edit was correctly saved
-      return
-
-    assert response.json["audit"].get("description", None) == "New", \
-        "Audit has not been updated correctly {}".format(
-        response.json["audit"])
-
-
-class TestArchivedAudit(TestCase):
+@ddt
+class TestArchivedAudit(TestAuditArchivingBase):
   """Tests Archived Audits
 
   Tests the following cases:
@@ -159,4 +130,44 @@ class TestArchivedAudit(TestCase):
   3. Once archived no new objects can be created in the audit context
   4. Once archived no mappings can be created in the audit context
   """
-  pass
+
+  @data(
+      ('Admin', 200, 'audit'),
+      ('Editor', 200, 'audit'),
+      ('Reader', 403, 'audit'),
+      ('Creator', 403, 'audit'),
+      ('Creator PM', 200, 'audit'),
+      ('Creator PE', 200, 'audit'),
+      ('Creator PR', 403, 'audit'),
+      ('Admin', 403, 'archived_audit'),
+      ('Editor', 403, 'archived_audit'),
+      ('Reader', 403, 'archived_audit'),
+      ('Creator', 403, 'archived_audit'),
+      ('Creator PM', 403, 'archived_audit'),
+      ('Creator PE', 403, 'archived_audit'),
+      ('Creator PR', 403, 'archived_audit')
+  )
+  @unpack
+  def test_audit_editing(self, person, status, audit_type):
+    """Test if users can edit an audit
+
+       This is just a sanity check to make sure Editors can still edit all the
+       fields except the archived column.
+    """
+    audit = getattr(self, audit_type)
+
+    self.api.set_user(self.people[person])
+    audit_json = {
+        "description": "New"
+    }
+    response = self.api.put(audit, audit_json)
+    assert response.status_code == status, \
+        "{} put returned {} instead of {} for {}".format(
+            person, response.status, status, audit_type)
+    if status != 200:
+      # if editing is allowed check if edit was correctly saved
+      return
+
+    assert response.json["audit"].get("description", None) == "New", \
+        "Audit has not been updated correctly {}".format(
+        response.json["audit"])
