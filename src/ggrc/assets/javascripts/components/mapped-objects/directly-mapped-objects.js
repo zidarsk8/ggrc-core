@@ -23,6 +23,7 @@
         }
       },
       isLoading: false,
+      isAttachmentsLoaded: false,
       items: null,
       mappedItems: [],
       modelName: '@',
@@ -32,12 +33,24 @@
       },
       getMappedObjects: function () {
         var items = this.attr('items');
-        var modelName = this.attr('modelName');
-        var ids = items.map(function (item) { return item.id; });
         var objects = [];
+        var modelName;
+        var ids;
+
+        if (!items) {
+          this.attr('isAttachmentsLoaded', true);
+          return;
+        }
+
+        this.attr('isAttachmentsLoaded', false);
+        modelName = this.attr('modelName');
+        ids = items.map(function (item) {
+          return item.id;
+        });
 
         CMS.Models[modelName].findAll({
-          id__in: ids.join(',')
+          id__in: ids.join(','),
+          __sort: 'id'
         })
         .then(function (data) {
           objects = data.map(function (item) {
@@ -47,7 +60,8 @@
         }.bind(this))
         .always(function () {
           this.attr('isLoading', false);
-        }.bind(this))
+          this.attr('isAttachmentsLoaded', true);
+        }.bind(this));
       }
     }),
     events: {

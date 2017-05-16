@@ -57,6 +57,14 @@
           type: 'boolean',
           value: false
         },
+        hasRevisionFolder: {
+          type: 'boolean',
+          get: function () {
+            return this.attr('readonly') &&
+              this.instance.folders &&
+              this.instance.folders.length;
+          }
+        },
         hideLabel: {
           type: 'boolean',
           value: false
@@ -70,6 +78,7 @@
       subLabel: '@',
       folder_list: [],
       instance: null,
+      isRevisionFolderLoaded: false,
       /**
        * Helper method for unlinking all object folders currently linked to the
        * given instance.
@@ -112,12 +121,44 @@
         }
 
         this.attr('current_folder', item ? item.instance : null);
+      },
+      _setRevisionFolder: function () {
+        var that = this;
+        var folderId;
+        var gdriveFolder;
+
+        if (!this.attr('hasRevisionFolder')) {
+          this.attr('isRevisionFolderLoaded', true);
+          return;
+        }
+
+        folderId = this.instance.folders[0].id;
+        if (folderId) {
+          this.attr('isRevisionFolderLoaded', false);
+          this.attr('_folder_change_pending', true);
+
+          gdriveFolder = new CMS.Models.GDriveFolder({
+            id: folderId,
+            href: '/drive/v2/files/' + folderId
+          });
+
+          gdriveFolder.refresh().then(function () {
+            that.attr('current_folder', gdriveFolder);
+            that.attr('_folder_change_pending', false);
+            that.attr('isRevisionFolderLoaded', true);
+          });
+        }
       }
     },
     events: {
       setCurrent: function (unsetPending) {
         return function (folders) {
-          var folder = folders[0] ? folders[0].instance : null;
+          var folder;
+          if (this.scope.attr('hasRevisionFolder')) {
+            return;
+          }
+
+          folder = folders[0] ? folders[0].instance : null;
           if (unsetPending) {
             this.scope.attr('_folder_change_pending', false);
           }
@@ -147,14 +188,19 @@
           .fail(this.setCurrentFail.bind(this));
       },
       inserted: function () {
-        var foldersBinding = this.scope.instance.get_binding('folders');
+        var foldersBinding;
+        if (this.scope.attr('hasRevisionFolder')) {
+          this.scope._setRevisionFolder();
+        } else {
+          foldersBinding = this.scope.instance.get_binding('folders');
 
-        this.element.removeAttr('tabindex');
-        this.scope.attr('_folder_change_pending', true);
+          this.element.removeAttr('tabindex');
+          this.scope.attr('_folder_change_pending', true);
 
-        foldersBinding.refresh_instances()
-          .then(this.setCurrent(), this.setCurrentFail.bind(this))
-          .then(this.setExtendedFolder.bind(this));
+          foldersBinding.refresh_instances()
+            .then(this.setCurrent(), this.setCurrentFail.bind(this))
+            .then(this.setExtendedFolder.bind(this));
+        }
       },
       '{scope.instance} change': function (inst, ev, attr) {
         // Error recovery from previous refresh_instances error when we couldn't set up the binding.

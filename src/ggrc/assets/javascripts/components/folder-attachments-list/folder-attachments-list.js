@@ -22,15 +22,21 @@
         denyNoFolder: {
           type: 'boolean',
           value: false
+        },
+        readonly: {
+          type: 'boolean',
+          value: false
         }
       },
       title: '@',
       tooltip: '@',
       subLabel: '@',
       instance: null,
-      readonlyFolder: function () {
-        return this.attr('instance.isRevision') ||
-               this.attr('instance.snapshot');
+      isFilesLoaded: false,
+      itemsUploadedCallback: function () {
+        if (this.instance instanceof CMS.Models.Control) {
+          this.instance.dispatch('refreshInstance');
+        }
       }
     },
     events: {

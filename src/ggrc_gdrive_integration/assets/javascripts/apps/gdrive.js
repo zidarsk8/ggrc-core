@@ -51,8 +51,8 @@
     Control: {
       _mixins: ['folderable'],
       extended_folders: new GGRC.ListLoaders.MultiListLoader(['folders']),
-      folders: new GGRC.ListLoaders.ProxyListLoader('ObjectFolder', 'folderable',
-        'folder', 'object_folders', 'GDriveFolder')
+      folders: new GGRC.ListLoaders.ProxyListLoader('ObjectFolder',
+        'folderable', 'folder', 'object_folders', 'GDriveFolder')
     },
     Meeting: {
       _canonical: {

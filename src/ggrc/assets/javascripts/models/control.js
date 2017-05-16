@@ -116,43 +116,43 @@
       this.bind('refreshInstance', this.refresh.bind(this));
     },
     refresh: function () {
-          var dfd;
-          var href = this.selfLink || this.href;
-          var that = this;
+      var dfd;
+      var href = this.selfLink || this.href;
+      var that = this;
 
-          if (!href) {
-            return can.Deferred().reject();
-          }
-          if (!this._pending_refresh) {
-            this._pending_refresh = {
-              dfd: can.Deferred(),
-              fn: _.throttle(function () {
-                var dfd = that._pending_refresh.dfd;
-                can.ajax({
-                  url: href,
-                  type: 'get',
-                  dataType: 'json'
-                })
-              .then(function (model) {
-                delete that._pending_refresh;
-                if (model) {
-                  model = CMS.Models.Control.model(model, that);
-                  model.backup();
-                  return model;
-                }
-              })
-              .done(function () {
-                dfd.resolve.apply(dfd, arguments);
-              })
-              .fail(function () {
-                dfd.reject.apply(dfd, arguments);
-              });
-              }, 300, {trailing: false})
-            };
-          }
-          dfd = this._pending_refresh.dfd;
-          this._pending_refresh.fn();
-          return dfd;
-        },
+      if (!href) {
+        return can.Deferred().reject();
+      }
+      if (!this._pending_refresh) {
+        this._pending_refresh = {
+          dfd: can.Deferred(),
+          fn: _.throttle(function () {
+            var dfd = that._pending_refresh.dfd;
+            can.ajax({
+              url: href,
+              type: 'get',
+              dataType: 'json'
+            })
+          .then(function (model) {
+            delete that._pending_refresh;
+            if (model) {
+              model = CMS.Models.Control.model(model, that);
+              model.backup();
+              return model;
+            }
+          })
+          .done(function () {
+            dfd.resolve.apply(dfd, arguments);
+          })
+          .fail(function () {
+            dfd.reject.apply(dfd, arguments);
+          });
+          }, 300, {trailing: false})
+        };
+      }
+      dfd = this._pending_refresh.dfd;
+      this._pending_refresh.fn();
+      return dfd;
+    }
   });
 })(this, can.$);
