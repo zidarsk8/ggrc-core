@@ -11,8 +11,9 @@
 {{#is_allowed 'update' instance context='for'}}
   <ggrc-gdrive-folder-picker hide-label="true"
                              sub-label="Folder"
-                             readonly="readonlyFolder"
+                             readonly="readonly"
                              instance="instance"
+                             {(is-revision-folder-loaded)}="isRevisionFolderLoaded"
   ></ggrc-gdrive-folder-picker>
 {{/is_allowed}}
 {{^if_null instance._mandatory_attachment_msg}}
@@ -28,12 +29,16 @@
     </span>
   {{/if}}
 
-  <directly-mapped-objects items="documents" model-name="Document" parent-instance="instance">
+  <directly-mapped-objects
+    {(is-attachments-loaded)}="isAttachmentsLoaded"
+    items="documents"
+    model-name="Document"
+    parent-instance="instance">
       <action-toolbar {document}="{.}" class="action-toolbar">
           <document-object-list-item {instance}="document"></document-object-list-item>
           {{#if showAction}}
               <div class="action-toolbar__controls">
-                  {{#if_helpers '\#unless' instance.snapshot '\and #unless' instance.isRevision}}
+                  {{#unless readonly}}
                     {{#is_allowed 'update' instance context='for'}}
                       <action-toolbar-control>
                           <unmap-button {destination}="instance" {source}="document"
@@ -42,20 +47,21 @@
                           </unmap-button>
                       </action-toolbar-control>
                     {{/is_allowed}}
-                  {{/if_helpers}}
+                  {{/unless}}
               </div>
           {{/if}}
       </action-toolbar>
   </directly-mapped-objects>
 
 
-{{#if_helpers '\#unless' instance.snapshot '\and #unless' instance.isRevision}}
+{{#unless readonly}}
     {{#is_allowed 'update' instance context='for'}}
         <span class="attachments-list-action" rel="tooltip" data-original-title="{{tooltip}}">
             {{#with_mapping 'extended_folders' instance}}
                 {{#if extended_folders.length}}
                     <ggrc-gdrive-picker-launcher
                             instance="instance"
+                            {items-uploaded-callback}="@itemsUploadedCallback"
                             click_event="trigger_upload_parent">
                         Attach
                     </ggrc-gdrive-picker-launcher>
@@ -63,7 +69,9 @@
                     {{#unless denyNoFolder}}
                         <ggrc-gdrive-picker-launcher
                                 instance="instance"
+                                {items-uploaded-callback}="@itemsUploadedCallback"
                                 click_event="trigger_upload">
+                                Attach
                         </ggrc-gdrive-picker-launcher>
                     {{/unless}}
                 {{/if}}
@@ -83,4 +91,4 @@
             {{/with_mapping}}
         </span>
     {{/is_allowed}}
-{{/if_helpers}}
+{{/unless}}

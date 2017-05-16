@@ -36,15 +36,63 @@
                 var revisions = that.prepareInstances(data);
                 var fragLeft = can.view(view, revisions[0]);
                 var fragRight = can.view(view, revisions[1]);
+                var attachmentsDfds =
+                  that.isContainsAttachments(that.instance) ?
+                  that.getAttachmentsDfds(revisions) :
+                  [];
                 fragLeft.appendChild(fragRight);
                 revisions[1].instance.refresh_all('owners')
                   .then(function () {
                     target.find('.modal-body').html(fragLeft);
                     that.highlightDifference(target);
+
+                    if (attachmentsDfds.length) {
+                      $.when.apply($, attachmentsDfds).then(function () {
+                        that.highlightDifference(target);
+                      });
+                    }
                   });
               });
           }
         }, this.updateRevision.bind(this));
+      },
+      buildAttachmentsDfd: function (instance, bindingName) {
+        var dfd = new can.Deferred();
+        instance.bind(bindingName, function (target, isLoaded) {
+          if (isLoaded) {
+            dfd.resolve();
+          } else {
+            dfd.reject();
+          }
+
+          instance.unbind(bindingName);
+        });
+
+        return dfd;
+      },
+      getAttachmentsDfds: function (revisions) {
+        var dfds = [];
+        var that = this;
+
+        if (!revisions) {
+          return [];
+        }
+
+        revisions.forEach(function (revision) {
+          var instance = revision.attr('instance');
+          dfds.push(that.buildAttachmentsDfd(instance, 'isAttachmentsLoaded'));
+
+          if (instance.folders && instance.folders.length) {
+            dfds.push(
+              that.buildAttachmentsDfd(instance, 'isRevisionFolderLoaded'));
+          }
+        });
+
+        return dfds;
+      },
+      isContainsAttachments: function (instance) {
+        return instance.type === 'Control' ||
+          instance.type === 'Issue';
       },
       getRevisions: function (currentRevisionID, newRevisionID) {
         return CMS.Models.Revision.findAll({
@@ -58,6 +106,8 @@
           var model = CMS.Models[value.resource_type];
           content.attr('isRevision', true);
           content.attr('type', value.resource_type);
+          content.attr('isAttachmentsLoaded', false);
+          content.attr('isRevisionFolderLoaded', false);
 
           if (content.access_control_list) {
             content.access_control_list.forEach(function (item) {
@@ -66,7 +116,7 @@
             });
           }
 
-          return {instance: new model(content)};
+          return {instance: new model(content), isSnapshot: true};
         });
       },
       updateRevision: function () {
@@ -95,7 +145,8 @@
        * @return {Object} - jQuery object
        */
       getAttributes: function ($infoPanes, index) {
-        var selector = '.row-fluid h6 + *, .row-fluid .state-value';
+        var selector = '.row-fluid h6 + *, .row-fluid .state-value' +
+          ', directly-mapped-objects';
         return $($infoPanes[index]).find(selector);
       },
 
@@ -137,7 +188,7 @@
       highlightAttributes: function ($target) {
         var emptySelector = '.empty-message';
         var highlightClass = 'diff-highlighted';
-        var listSelector = 'ul li';
+        var listSelector = 'ul li, .object-list-item';
         var infoPanes = this.getInfopanes($target);
         var valuesOld = this.getAttributes(infoPanes, 0);
         var valuesNew = this.getAttributes(infoPanes, 1);

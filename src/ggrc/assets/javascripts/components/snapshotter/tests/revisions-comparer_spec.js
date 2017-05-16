@@ -121,4 +121,53 @@ describe('GGRC.Components.revisionsComparer', function () {
       expect(result.length).toBe(2);
     });
   });
+
+  describe('getAttachmentsDfds() method', function () {
+    var method;
+    var revisions;
+
+    beforeEach(function () {
+      var prepareInstancesMethod = Component.prototype.scope.prepareInstances;
+      var fakeData = [
+        {
+          id: 1,
+          content: new can.Map({id: 1}),
+          resource_type: 'Control'
+        }, {
+          id: 2,
+          content: new can.Map({id: 1}),
+          resource_type: 'Control'
+        }
+      ];
+
+      method = Component.prototype.scope.getAttachmentsDfds
+        .bind(Component.prototype.scope);
+      revisions = new can.List(prepareInstancesMethod(fakeData));
+    });
+
+    it('getAttachmentsDfds() should return 2 dfds', function () {
+      var dfds = method(revisions);
+      expect(dfds.length).toEqual(2);
+    });
+
+    it('getAttachmentsDfds() should return 3 dfds', function () {
+      var dfds;
+      revisions[0].attr('instance').folders = [{id: 'EWheNKvwjhrcwWer'}];
+      dfds = method(revisions);
+      expect(dfds.length).toEqual(3);
+    });
+
+    it('getAttachmentsDfds() should return 4 dfds', function () {
+      var dfds;
+      revisions[0].attr('instance').folders = [{id: 'EWheNKvwjhrcwWer'}];
+      revisions[1].attr('instance').folders = [{id: 'vewbetWhercwWer'}];
+      dfds = method(revisions);
+      expect(dfds.length).toEqual(4);
+    });
+
+    it('getAttachmentsDfds() should return empty array', function () {
+      var dfds = method();
+      expect(dfds.length).toEqual(0);
+    });
+  });
 });
