@@ -121,16 +121,34 @@ def forbid_condition(instance, blacklist, _current_action, **_):
   return instance.type not in blacklist.get(_current_action, ())
 
 
-def has_not_changed_condition(instance, property_name, **_):
-  """Check if instance attribute has changed
+def has_not_changed_condition(instance, property_name, prevent_if=None, **_):
+  """Check if instance attribute has not changed
      Example:
       "terms": {
-         "property_name": "person",
+         "property_name": "archived",
+         "prevent_if": True
        },
        "condition": "has_not_changed"
 
   """
+  if prevent_if and getattr(instance, property_name, False) == prevent_if:
+    return False
   return not db.inspect(instance).get_history(
+      property_name, False).has_changes()
+
+
+def has_changed_condition(instance, property_name, prevent_if=None, **_):
+  """Check if instance attribute has changed
+     Example:
+      "terms": {
+         "property_name": "archived"
+       },
+       "condition": "has_changed"
+
+  """
+  if getattr(instance, property_name, False) == prevent_if:
+    return True
+  return db.inspect(instance).get_history(
       property_name, False).has_changes()
 
 
@@ -146,7 +164,8 @@ _CONDITIONS_MAP = {
     'is': is_condition,
     'relationship': relationship_condition,
     'forbid': forbid_condition,
-    'has_not_changed': has_not_changed_condition
+    'has_not_changed': has_not_changed_condition,
+    'has_changed': has_changed_condition
 }
 
 
