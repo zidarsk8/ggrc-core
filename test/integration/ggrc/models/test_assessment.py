@@ -4,19 +4,25 @@
 """Integration tests for Assessment"""
 
 from collections import OrderedDict
+from datetime import datetime
+from freezegun import freeze_time
 
 from ggrc import db
+from ggrc.models import all_models
+
 from ggrc.models import Assessment
 from ggrc.models import Revision
 from ggrc.converters import errors
+from ggrc_basic_permissions.models import Role
+from ggrc_basic_permissions.models import UserRole
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models \
     import factories as rbac_factories
+from integration.ggrc.generator import ObjectGenerator
 
-from ggrc_basic_permissions.models import Role
-from ggrc_basic_permissions.models import UserRole
+from appengine import base
 
 
 class TestAssessment(TestCase):
@@ -109,6 +115,59 @@ class TestAssessment(TestCase):
     self._check_csv_response(response, {})
     assessment = Assessment.query.first()
     self.assertEqual(assessment.audit_id, correct_audit_id)
+
+
+@base.with_memcache
+class TestAssessmentUpdates(TestCase):
+  """ Test various actions on Assessment updates """
+
+  def setUp(self):
+    super(TestAssessmentUpdates, self).setUp()
+    self.api = Api()
+    self.generator = ObjectGenerator()
+    _, program = self.generator.generate_object(all_models.Program)
+    program_id = program.id
+    _, audit = self.generator.generate_object(
+        all_models.Audit,
+        {
+            "title": "Audit",
+            "program": {"id": program_id},
+            "status": "Planned"
+        },
+    )
+
+    with freeze_time("2015-04-01 17:13:15"):
+      _, assessment = self.generator.generate_object(
+          all_models.Assessment,
+          {
+              "title": "Assessment-Comment",
+              "audit": {"id": audit.id},
+              "audit_title": audit.title,
+              "people_value": [],
+              "default_people": {
+                  "assessors": "Object Owners",
+                  "verifiers": "Object Owners",
+              },
+              "context": {"id": audit.context.id},
+          }
+      )
+
+    assessment_id = assessment.id
+    self.assessment = all_models.Assessment.query.get(assessment_id)
+
+  # pylint: disable=invalid-name
+  def test_updated_at_changes_after_comment(self):
+    """Test updated_at date is changed after adding a comment to assessment"""
+    with freeze_time("2016-04-01 18:22:09"):
+      self.generator.generate_comment(
+          self.assessment,
+          "Verifier",
+          "some comment",
+          send_notification="true"
+      )
+
+      asmt = all_models.Assessment.query.get(self.assessment.id)
+      self.assertEqual(asmt.updated_at, datetime(2016, 4, 1, 18, 22, 9))
 
 
 class TestAssessmentGeneration(TestCase):
