@@ -14,6 +14,7 @@ from ggrc.services import signals
 
 
 def init_hook():
+  """Init audit permission hooks"""
   # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(all_models.Audit)
   @signals.Restful.model_deleted.connect_via(all_models.Audit)
@@ -22,4 +23,15 @@ def init_hook():
     # pylint: disable=unused-argument
     if obj.archived and not db.inspect(
        obj).get_history('archived', False).has_changes():
+      raise Forbidden()
+
+  # pylint: disable=unused-variable
+  @signals.Restful.model_put.connect_via(all_models.Issue)
+  @signals.Restful.model_deleted.connect_via(all_models.Issue)
+  @signals.Restful.model_put.connect_via(all_models.Assessment)
+  @signals.Restful.model_deleted.connect_via(all_models.Assessment)
+  def handle_archived_issue(sender, obj=None, src=None, service=None):
+    """Make sure admins cannot delete/update archived audits"""
+    # pylint: disable=unused-argument
+    if obj.archived:
       raise Forbidden()
