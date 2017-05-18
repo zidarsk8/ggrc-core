@@ -26,10 +26,21 @@ class TestAuditArchivingBase(TestCase):
     cls.people = {
         person.name: person for person in all_models.Person.eager_query().all()
     }
+
     cls.audit = all_models.Audit.eager_query().filter(
         all_models.Audit.archived == 0).first()
     cls.archived_audit = all_models.Audit.eager_query().filter(
         all_models.Audit.archived == 1).first()
+
+    cls.issue = all_models.Issue.eager_query().filter(
+        all_models.Issue.slug == 'PMRBACISSUE-1').first()
+    cls.archived_issue = all_models.Issue.eager_query().filter(
+        all_models.Issue.slug == 'PMRBACISSUE-2').first()
+
+    cls.assessment = all_models.Assessment.eager_query().filter(
+        all_models.Assessment.slug == 'PMRBACASSESSMENT-1').first()
+    cls.archived_assessment = all_models.Assessment.eager_query().filter(
+        all_models.Assessment.slug == 'PMRBACASSESSMENT-2').first()
 
   def setUp(self):
     """Imports test_csvs/audit_rbac.csv needed by the tests"""
@@ -47,6 +58,14 @@ class TestAuditArchivingBase(TestCase):
          SET archived = 1,
              description = ""
        WHERE title = '2016: Program Manager Audit RBAC Test - Audit 2'
+    """)
+    db.engine.execute("""
+      UPDATE issues
+         SET description = ""
+    """)
+    db.engine.execute("""
+      UPDATE assessments
+         SET description = ""
     """)
 
 
@@ -149,11 +168,7 @@ class TestArchivedAudit(TestAuditArchivingBase):
   )
   @unpack
   def test_audit_editing(self, person, status, audit_type):
-    """Test if users can edit an audit
-
-       This is just a sanity check to make sure Editors can still edit all the
-       fields except the archived column.
-    """
+    """Test if users can edit an audit"""
     audit = getattr(self, audit_type)
 
     self.api.set_user(self.people[person])
@@ -171,3 +186,40 @@ class TestArchivedAudit(TestAuditArchivingBase):
     assert response.json["audit"].get("description", None) == "New", \
         "Audit has not been updated correctly {}".format(
         response.json["audit"])
+
+  @data(
+      ('Admin', 200, ['issue', 'assessment']),
+      ('Editor', 200, ['issue', 'assessment']),
+      ('Reader', 403, ['issue', 'assessment']),
+      ('Creator', 403, ['issue', 'assessment']),
+      ('Creator PM', 200, ['issue', 'assessment']),
+      ('Creator PE', 200, ['issue', 'assessment']),
+      ('Creator PR', 403, ['issue', 'assessment']),
+      ('Admin', 403, ['archived_issue', 'archived_assessment']),
+      ('Editor', 403, ['archived_issue', 'archived_assessment']),
+      ('Reader', 403, ['archived_issue', 'archived_assessment']),
+      ('Creator', 403, ['archived_issue', 'archived_assessment']),
+      ('Creator PM', 403, ['archived_issue', 'archived_assessment']),
+      ('Creator PE', 403, ['archived_issue', 'archived_assessment']),
+      ('Creator PR', 403, ['archived_issue', 'archived_assessment'])
+  )
+  @unpack
+  def test_audit_context_editing(self, person, status, objects):
+    """Test if users can edit objects in the audit context"""
+    self.api.set_user(self.people[person])
+    for obj in objects:
+      obj_instance = getattr(self, obj)
+      json = {
+          "description": "New"
+      }
+      response = self.api.put(obj_instance, json)
+      assert response.status_code == status, \
+          "{} put returned {} instead of {} for {}".format(
+              person, response.status, status, obj)
+      if status != 200:
+        # if editing is allowed check if edit was correctly saved
+        continue
+      assert response.json[obj].get("description", None) == "New", \
+          "{} has not been updated correctly {}".format(
+          obj,
+          response.json[obj])
