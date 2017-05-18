@@ -407,19 +407,20 @@ class AssessmentsFactory(EntitiesFactory):
 
   @classmethod
   def create(cls, type=None, id=None, title=None, href=None, url=None,
-             slug=None, status=None, object=None, audit=None,
+             slug=None, status=None, owners=None, audit=None,
              recipients=None, verified=None, updated_at=None,
              custom_attribute_definitions=None,
              custom_attribute_values=None):
     """Create Assessment object.
     Random values will be used for title and slug.
-    Predictable values will be used for type, status, recipients, verified.
+    Predictable values will be used for type, status, recipients,
+    verified, owners.
     """
     # pylint: disable=too-many-locals
     asmt_entity = cls._create_random_asmt()
     asmt_entity = cls.update_obj_attrs_values(
         obj=asmt_entity, type=type, id=id, title=title, href=href, url=url,
-        slug=slug, status=status, object=object, audit=audit,
+        slug=slug, status=status, owners=owners, audit=audit,
         recipients=recipients, verified=verified, updated_at=updated_at,
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values)
@@ -436,6 +437,7 @@ class AssessmentsFactory(EntitiesFactory):
     random_asmt.recipients = ",".join((roles.ASSESSOR, roles.CREATOR,
                                        roles.VERIFIER))
     random_asmt.verified = element.Common.FALSE
+    random_asmt.owners = [ObjectOwnersFactory().default().__dict__]
     return random_asmt
 
 

@@ -67,9 +67,13 @@ class BaseRestService(object):
     """Check response from server and get items {key: value} from it."""
     def get_extra_items(response):
       """Get extra items {key: value} that used in entities."""
-      if response.get("selfLink") and response.get("viewLink"):
-        return {"href": response.get("selfLink"),
-                "url": environment.APP_URL + response.get("viewLink")[1:]}
+      extra = {}
+      if response.get("selfLink"):
+        extra.update({"href": response.get("selfLink")})
+      if response.get("viewLink"):
+        extra.update(
+            {"url": environment.APP_URL + response.get("viewLink")[1:]})
+      return extra
     resp = json.loads(response.text)
     if response.status_code == 200: # check response from server
       if (isinstance(resp, list) and len(resp[0]) == 2 and

@@ -285,14 +285,14 @@ class AssessmentEntity(Entity):
   # pylint: disable=redefined-builtin
   __hash__ = None
 
-  def __init__(self, slug=None, status=None, object=None, audit=None,
+  def __init__(self, slug=None, status=None, owners=None, audit=None,
                recipients=None, verified=None, updated_at=None,
                custom_attribute_definitions=None,
                custom_attribute_values=None):
     super(AssessmentEntity, self).__init__()
     self.slug = slug  # code
     self.status = status  # state
-    self.object = object
+    self.owners = owners
     self.audit = audit
     self.recipients = recipients  # "Assessor,Creator,Verifier"
     self.verified = verified
@@ -302,13 +302,13 @@ class AssessmentEntity(Entity):
 
   def __repr__(self):
     return ("type: {type}, id: {id}, title: {title}, href: {href}, "
-            "url: {url}, slug: {slug}, status: {status}, object: {object}, "
+            "url: {url}, slug: {slug}, status: {status}, owners: {owners}, "
             "audit: {audit}, recipients: {recipients}, verified: {verified}, "
             "updated_at: {updated_at}, "
             "custom_attribute_definitions: {custom_attribute_definitions}, "
             "custom_attribute_values: {custom_attribute_values}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
-        url=self.url, slug=self.slug, status=self.status, object=self.object,
+        url=self.url, slug=self.slug, status=self.status, owners=self.owners,
         audit=self.audit, recipients=self.recipients, verified=self.verified,
         updated_at=self.updated_at,
         custom_attribute_definitions=self.custom_attribute_definitions,
