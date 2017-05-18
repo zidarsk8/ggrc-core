@@ -22,5 +22,6 @@ class TestRiskThreatPage(base.Test):
     and closing lhn_modal we're redirected to an url that contains an
     object id.
     """
+    # pylint: disable=unused-argument
     assert (url.RISKS + "/" + new_risk_ui.source_obj_id_from_url in
             new_risk_ui.url)

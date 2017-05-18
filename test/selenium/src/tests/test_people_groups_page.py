@@ -22,5 +22,6 @@ class TestOrgGroupPage(base.Test):
     and closing lhn_modal we're redirected to an url that contains an
     object id.
     """
+    # pylint: disable=unused-argument
     assert (url.ORG_GROUPS + "/" + new_org_group_ui.source_obj_id_from_url in
             new_org_group_ui.url)
