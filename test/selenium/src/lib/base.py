@@ -74,6 +74,10 @@ class Element(InstanceRepresentation):
     """Click on element using JS."""
     selenium_utils.click_via_js(self._driver, self.element)
 
+  def click_used_js(self):
+    """Click on element used JS."""
+    self._driver.execute_script("arguments[0].click();", self.element)
+
   def click_when_visible(self):
     """Wait for element to be visible and only then performs click."""
     selenium_utils.get_when_visible(self._driver, self._locator).click()
@@ -478,14 +482,22 @@ class Widget(AbstractPage):
     """
     super(Widget, self).__init__(driver)
     matched_url_parts = re.search(
-        constants.regex.URL_WIDGET_INFO, self.url).groups()
-    source_obj_plural, source_obj_id, widget = matched_url_parts
+        constants.regex.URL_WIDGET_INFO, self.url + "/").groups()
+    (source_obj_plural, source_obj_id, widget_name,
+     mapped_obj_singular, mapped_obj_id) = matched_url_parts
     self.source_obj_from_url = source_obj_plural
+
     self.source_obj_id_from_url = source_obj_id
-    self.widget_name_from_url = (widget.split("_")[0] or
+    self.widget_name_from_url = (widget_name.split("_")[0] or
                                  constants.element.WidgetBar.INFO)
+    self.mapped_obj_from_url = mapped_obj_singular
+    self.mapped_obj_id_from_url = mapped_obj_id
     self.is_under_audit = (self.source_obj_from_url == objects.AUDITS and
                            self.widget_name_from_url != "info")
+    self.is_info_page = self.widget_name_from_url == "info"
+    self.is_info_panel = (
+        self.widget_name_from_url != "" and self.mapped_obj_from_url != "" and
+        self.mapped_obj_id_from_url != "")
 
 
 class TreeView(Component):
