@@ -36,6 +36,8 @@ Audit.__bases__ = (Folderable,) + Audit.__bases__
 Audit.late_init_folderable()
 Control.__bases__ = (Folderable,) + Control.__bases__
 Control.late_init_folderable()
+Control.__bases__ = (Fileable,) + Control.__bases__
+Control.late_init_fileable()
 Document.__bases__ = (Fileable,) + Document.__bases__
 Document.late_init_fileable()
 Meeting.__bases__ = (Eventable,) + Meeting.__bases__
