@@ -135,6 +135,15 @@ def _snapshots_fixtures(request):
 
 
 @pytest.yield_fixture(scope="function")
+def create_audit_with_control_and_manipulate_on_control(request):
+  """Create Program and Control, map Control to Program, create Audit
+  under Program, manipulate on Control (update, delete, ...) via REST API and
+  return dictionary of executed fixtures.
+  """
+  yield dynamic_fixtures.generate_snapshots_fixtures(request.param)
+
+
+@pytest.yield_fixture(scope="function")
 def create_audit_with_control(request):
   """Create Program and Control, map Control to Program, create Audit
   under Program via REST API and return dictionary of executed fixtures.

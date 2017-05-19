@@ -3,6 +3,7 @@
 """Module for testing constant regex expressions."""
 
 import re
+
 from lib.constants import regex
 
 

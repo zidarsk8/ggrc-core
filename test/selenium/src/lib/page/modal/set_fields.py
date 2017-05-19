@@ -43,7 +43,8 @@ class SetVisibleFieldsModal(base.Modal):
     _locator_set_fields = (
         By.CSS_SELECTOR,
         self._locators.BUTTON_SET_FIELDS.format(self.widget_name))
-    base.Button(self._driver, _locator_set_fields).click()
+    base.Button(
+        self._driver, _locator_set_fields).click_via_js()  # issue GGRC-1854
     selenium_utils.get_when_invisible(self._driver, _locator_set_fields)
 
   def select_and_set_visible_fields(self):

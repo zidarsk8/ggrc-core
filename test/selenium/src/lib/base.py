@@ -51,13 +51,18 @@ class TestUtil(InstanceRepresentation):
 
 
 class Element(InstanceRepresentation):
-  """Element class represents primitives in models."""
+  """Element class represents primitives in models. Initializing by web driver
+  and locator (CSS selector (tuple) or webelement element (instance
+  of webdriver.Chrome).
+  """
 
   def __init__(self, driver, locator):
     super(Element, self).__init__()
     self._driver = driver
     self._locator = locator
-    self.element = self.get_element()
+    self.element = (
+        locator if isinstance(locator, webdriver.remote.webelement.WebElement)
+        else self.get_element())
     self.text = self.element.text
 
   def get_element(self):
@@ -73,10 +78,6 @@ class Element(InstanceRepresentation):
   def click_via_js(self):
     """Click on element using JS."""
     selenium_utils.click_via_js(self._driver, self.element)
-
-  def click_used_js(self):
-    """Click on element used JS."""
-    self._driver.execute_script("arguments[0].click();", self.element)
 
   def click_when_visible(self):
     """Wait for element to be visible and only then performs click."""
@@ -247,15 +248,26 @@ class Checkbox(Element):
     self.is_checked = self.element.is_selected()
 
   def get_element(self):
+    """Get checkbox when web element clickable."""
     return selenium_utils.get_when_clickable(self._driver, self._locator)
 
   def check(self):
+    """Select checkbox."""
     if not self.is_checked:
       self.element.click()
 
   def uncheck(self):
+    """Unselect checkbox."""
     if self.is_checked:
       self.element.click()
+
+  def is_element_checked(self):
+    """Check DOM input element checked property using JS.
+    Args: driver (base.CustomDriver), locator (tuple)
+    Return: True if element is checked, False if element is not checked.
+    """
+    return self._driver.execute_script("return arguments[0].checked",
+                                       self.element)
 
 
 class Toggle(Element):
@@ -665,7 +677,7 @@ class SetVisibleFieldsModal(Modal):
     _locator_set_fields = (
         By.CSS_SELECTOR,
         self._locators.BUTTON_SET_FIELDS)
-    Button(self._driver, _locator_set_fields).click()
+    Button(self._driver, _locator_set_fields).click_via_js()  # issue GGRC-1854
     selenium_utils.get_when_invisible(self._driver, _locator_set_fields)
 
   def select_and_set_visible_fields(self):

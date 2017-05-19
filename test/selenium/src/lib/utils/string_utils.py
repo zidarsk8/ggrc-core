@@ -58,3 +58,16 @@ def convert_to_list(items):
   - if are not list items then convert to list items."""
   list_items = items if isinstance(items, list) else [items, ]
   return list_items
+
+
+def convert_list_elements_to_list(list_to_convert):
+  """Converts list elements in list to sequence of elements:
+  Example: [1, 2, 3, [4, 5], 6, [7]] = [1, 2, 3, 4, 5, 6, 7]
+  """
+  converted_list = []
+  for element in list_to_convert:
+    if isinstance(element, list):
+      converted_list.extend(element)
+    else:
+      converted_list.append(element)
+  return converted_list

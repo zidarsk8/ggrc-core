@@ -119,6 +119,9 @@ class Common(object):
   CODE = "Code"
   TRUE = "true"
   FALSE = "false"
+  # fictional elements (need to convert UI attrs to Entities attrs)
+  CAS_HEADERS = "CAs Headers"
+  CAS_VALUES = "CAs Values"
 
 
 class Base(object):
@@ -140,7 +143,7 @@ class CommonModalCreate(object):
   SAVE_AND_CLOSE = "Save & Close"
 
 
-class CommonModalSetVisibleFields(object):
+class CommonModalSetVisibleFields(Common):
   """Common elements' labels and properties for Modal widow that Select visible
  fields for Tree View.
  """
@@ -156,7 +159,7 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   """To transformation elements' labels and properties for Modal to Set
  visible fields for object as Tree View headers.
  """
-  ADMIN = "Admin"
+  ADMIN = roles.ADMIN
   VERIFIED = "Verified"
   STATUS = "Status"
   AUDIT_LEAD = "Internal Audit Lead"
@@ -181,7 +184,6 @@ class CommonAudit(Common):
   """Common elements' labels and properties for Audits objects."""
   # pylint: disable=too-many-instance-attributes
   AUDIT = objects.get_normal_form(objects.get_singular(objects.AUDITS))
-  TITLE = Common.TITLE
   STATUS = "Status"
   PLANNED_START_DATE = "Planned Start Date"
   PLANNED_END_DATE = "Planned End Date"
@@ -194,9 +196,12 @@ class CommonAudit(Common):
   ASSIGN_FOLDER = "Assign folder"
 
 
-class CommonControl(object):
+class CommonControl(Common):
   """Common elements' labels and properties for Controls objects."""
   CONTROL = objects.get_normal_form(objects.get_singular(objects.CONTROLS))
+  STATE = Base.STATE
+  ADMIN = roles.ADMIN
+  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
 
 
 class CommonAssessment(object):
@@ -258,6 +263,13 @@ class AuditInfoWidget(CommonAudit):
   TITLE_UPPER = CommonAudit.TITLE.upper()
   AUDIT_LEAD_UPPER = CommonAudit.AUDIT_LEAD.upper()
   CODE_UPPER = CommonAudit.CODE.upper()
+
+
+class ControlInfoWidget(CommonControl):
+  """Elements' labels and properties for Controls Info widgets."""
+  WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonControl.CONTROL)
+  TITLE_UPPER = CommonControl.TITLE.upper()
+  CODE_UPPER = CommonControl.CODE.upper()
 
 
 class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):

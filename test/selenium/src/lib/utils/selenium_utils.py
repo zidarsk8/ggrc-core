@@ -122,7 +122,7 @@ def is_value_in_attr(element, attr="class", value="active"):
  Return: bool
  """
   attributes = element.get_attribute(attr)
-  return value in attributes.split()
+  return value in attributes.split() if attributes != "" else False
 
 
 def wait_until_alert_is_present(driver):
