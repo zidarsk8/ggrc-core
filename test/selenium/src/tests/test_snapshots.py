@@ -14,6 +14,7 @@ from lib.constants.element import Lhn, MappingStatusAttrs
 from lib.page import dashboard
 from lib.service import webui_service
 from lib.utils.filter_utils import FilterUtils
+from lib.utils import selenium_utils
 
 
 class TestSnapshots(base.Test):
@@ -64,21 +65,54 @@ class TestSnapshots(base.Test):
     assert is_control_editable is False
 
   @pytest.mark.smoke_tests
-  def test_audit_contains_snapshotable_control_after_updating_control(
-      self, create_audit_with_control_and_update_control, selenium
+  @pytest.mark.parametrize(
+      ("create_audit_with_control_and_manipulate_on_control",
+       "is_update_to_latest_ver", "is_updateable", "is_openable"),
+      [("create_audit_with_control_and_update_control", False, True, True),
+       ("create_audit_with_control_and_update_control", True, False, True),
+       ("create_audit_with_control_and_delete_control", False, True, False),
+       ("create_audit_with_control_and_delete_control", True, False, False)],
+      ids=["Audit contains snapshotable Control after updating Control",
+           "Update snapshotable control after updating Control",
+           "Audit contains snapshotable Control after deleting Control",
+           "Update snapshotable control after deleting Control"])
+  def test_snapshotable_control_without_cas(
+      self, create_audit_with_control_and_manipulate_on_control, action,
+      is_update_to_latest_ver, is_updateable, is_openable, selenium
   ):
-    """Check via UI that Audit contains snapshotable Control that does not
-    equal updated version Control without version updating Control.
+    """Test snapshotable Control and check via UI that:
+    - Audit contains snapshotable Control after updating Control.
+    - Update snapshotable control after updating original Control.
+    - Audit contains snapshotable Control after deleting Control.
+    - Update snapshotable control after deleting Control.
     Preconditions:
-    - Execution and return of fixture
-      'create_audit_and_update_original_control'.
+      Execution and return of dynamic fixtures used REST API:
+    - 'create_audit_with_control_and_update_control'.
+    - 'create_audit_with_control_and_delete_control'.
     """
-    audit_with_one_control = create_audit_with_control_and_update_control
+    # preconditions = generate_snapshots_fixtures(
+    #     "create_audit_with_control_and_update_control")
+    #     "create_audit_with_control_and_" + action)
+    audit_with_one_control = (
+        create_audit_with_control_and_manipulate_on_control)
     audit = audit_with_one_control["new_audit_rest"][0]
     expected_control = audit_with_one_control["new_control_rest"][0]
+    if is_update_to_latest_ver:
+      (webui_service.ControlsService(selenium).
+       update_obj_ver_via_info_panel(src_obj=audit, obj=expected_control))
+      if action == "update_control":
+        expected_control = audit_with_one_control["update_control_rest"][0]
     actual_controls_tab_count = (webui_service.ControlsService(selenium).
                                  get_count_objs_from_tab(src_obj=audit))
     assert len([expected_control]) == actual_controls_tab_count
+    is_control_updateable = (webui_service.ControlsService(selenium).
+                             is_obj_updateble_via_info_panel(
+        src_obj=audit, obj=expected_control))
+    is_control_openable = (webui_service.ControlsService(selenium).
+                           is_obj_page_exist_via_info_panel(
+        src_obj=audit, obj=expected_control))
+    assert is_control_updateable is is_updateable
+    assert is_control_openable is is_openable
     actual_controls = (webui_service.ControlsService(selenium).
                        get_list_objs_from_tree_view(src_obj=audit))
     assert [expected_control] == actual_controls, (
@@ -235,7 +269,7 @@ class TestSnapshots(base.Test):
   ):
     """Check via UI that LHN search not looking for snapshots."""
     audit_with_one_control = create_audit_with_control_and_update_control
-    selenium.get(dashboard.Dashboard.URL)
+    selenium_utils.open_url(selenium, dashboard.Dashboard.URL)
     lhn_menu = dashboard.Dashboard(selenium).open_lhn_menu()
     lhn_menu.select_tab(tab_name)
     control_title = audit_with_one_control[version_of_ctrl][0].title
