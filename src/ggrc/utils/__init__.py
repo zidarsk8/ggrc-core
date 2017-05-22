@@ -238,11 +238,13 @@ with_nop = benchmarks.WithNop
 
 
 def convert_date_format(date, format_from, format_to):
+  # type: (str, str, str) -> str
   """Convert string date format from one to another."""
   return datetime.datetime.strptime(date, format_from).strftime(format_to)
 
 
 def iso_to_us_date(date_string):
+  # type: (str) -> str
   """Convert date string from ISO format to US format."""
   return convert_date_format(date_string, DATE_FORMAT_ISO, DATE_FORMAT_US)
 

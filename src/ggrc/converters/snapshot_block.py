@@ -3,6 +3,8 @@
 
 """Module for snapshot block converter."""
 
+from typing import Dict, List, Any
+
 import logging
 
 from collections import defaultdict
@@ -80,6 +82,7 @@ class SnapshotBlockConverter(object):
     }
 
   def _generate_mapping_content(self, snapshot):
+    # type: (Any) -> Dict[str, List[Dict[str, Any]]]
     """Generate mapping stub lists for snapshot mappings."""
     content = {}
     for key in self.SNAPSHOT_MAPPING_ALIASES:
@@ -96,6 +99,7 @@ class SnapshotBlockConverter(object):
     return content
 
   def _extend_revision_content(self, snapshot):
+    # type: Any -> Dict[str, Any]
     """Extend normal object content with attributes needed for export.
 
     When exporting snapshots we must add additional information to the original
