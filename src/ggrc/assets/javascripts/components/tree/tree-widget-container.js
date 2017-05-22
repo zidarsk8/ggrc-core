@@ -356,7 +356,9 @@
         } else if (activeTabModel === instance.type) {
           _refresh(true);
         } else if (isPerson(instance)) {
-          _refresh();
+          parentInstance.refresh().then(function () {
+            _refresh();
+          });
         }
       }
 
