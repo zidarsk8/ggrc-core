@@ -32,7 +32,6 @@
       titleText: '@',
       mapping: '@',
       mappingType: '@',
-      expanded: true,
       selectedItem: {}
     }
   });
