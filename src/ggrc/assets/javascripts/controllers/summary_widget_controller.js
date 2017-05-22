@@ -10,6 +10,7 @@
       instance: null,
       widget_view: GGRC.mustache_path + '/base_objects/summary.mustache',
       isLoading: true,
+      isShown: false,
       colorsMap: {
         Completed: '#405f77',
         Verified: '#009925',
@@ -76,10 +77,14 @@
           this.options.widget_view;
     },
     widget_shown: function (event) {
+      this.options.isShown = true;
       setTimeout(this.reloadSummary.bind(this), 0);
+
+      $(window).trigger('resize');
       return false;
     },
     widget_hidden: function (event) {
+      this.options.isShown = false;
       return false;
     },
     reloadSummary: function () {
@@ -120,6 +125,8 @@
           return that.prepareTitle(status);
         });
       });
+      this.options.chartOptions = options;
+      this.options.data = data;
 
       data.addColumn('string', 'Status');
       data.addColumn('number', 'Count');
@@ -127,8 +134,12 @@
 
       chart = new google.visualization.PieChart(
         document.getElementById(elementId));
+      this.options.chart = chart;
+
       chart.draw(data, options);
-      this.resizeChart(chart, data, options);
+      setTimeout(function () {
+        $(window).trigger('resize');
+      }, 0);
 
       return chart;
     },
@@ -200,13 +211,15 @@
 
       return options;
     },
-    resizeChart: function (chart, data, options) {
-      $(window).resize(function () {
+    '{window} resize': function (ev) {
+      var chart = this.options.chart;
+      var data = this.options.data;
+      var options = this.options.chartOptions;
+      var isSummaryWidgetShown = this.options.isShown;
+
+      if (isSummaryWidgetShown && chart && options && data) {
         chart.draw(data, options);
-      });
-      setTimeout(function () {
-        $(window).trigger('resize');
-      }, 0);
+      }
     },
     setState: function (type, data, isLoading) {
       var chartOptions = this.options.context.charts[type];
