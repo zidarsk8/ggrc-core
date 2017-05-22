@@ -345,7 +345,7 @@
           attr_sort_field: 'task last updated'
         }
       ],
-      display_attr_names: ['title', 'assignee', 'start_date'],
+      display_attr_names: ['title', 'assignee', 'start_date', 'end_date'],
       mandatory_attr_name: ['title'],
       draw_children: true
     },
