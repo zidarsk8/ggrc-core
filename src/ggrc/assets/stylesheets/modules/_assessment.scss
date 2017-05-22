@@ -16,7 +16,7 @@
     min-width: 0; /* fixes known issue with flexboxes and text-overflow */
 
     assessment-mapped-controls,
-    collapsible-panel-header {
+    assessment-mapped-related-information {
       .fa-plus-circle {
         opacity: 1;
         color: $btnGreen;
