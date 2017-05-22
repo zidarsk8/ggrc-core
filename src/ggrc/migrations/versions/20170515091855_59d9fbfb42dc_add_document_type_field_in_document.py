@@ -14,11 +14,15 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '59d9fbfb42dc'
-down_revision = '1ac595e94a23'
+down_revision = '59a7bd61e36a'
 
 
 INSERT_REL_SQL = """
-INSERT INTO relationships (source_type, source_id, destination_type, destination_id)
+INSERT INTO relationships (
+     source_type,
+     source_id,
+     destination_type,
+     destination_id)
 (
     SELECT documentable_type AS source_type,
            documentable_id AS source_id,
@@ -34,13 +38,13 @@ INSERT INTO relationships (source_type, source_id, destination_type, destination
 ));
 """
 
+
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   op.execute("ALTER TABLE documents ADD COLUMN document_type INT DEFAULT 1;")
   op.execute("Update documents set document_type = 2 where id in "
              "(select document_id from object_documents);")
   op.execute(INSERT_REL_SQL)
-
 
 
 def downgrade():
