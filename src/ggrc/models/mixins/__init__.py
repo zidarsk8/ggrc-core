@@ -27,9 +27,9 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import validates
 from sqlalchemy.orm.session import Session
 
+from ggrc import builder
 from ggrc import db
 from ggrc.models import reflection
-from ggrc.models.computed_property import computed_property
 from ggrc.models.deferred import deferred
 from ggrc.models.inflector import ModelInflectorDescriptor
 from ggrc.models.reflection import AttributeInfo
@@ -54,7 +54,7 @@ class Identifiable(object):
 
   _inflector = ModelInflectorDescriptor()
 
-  @computed_property
+  @builder.simple_property
   def type(self):
     return self.__class__.__name__
 
@@ -662,7 +662,7 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
         res[attr_name] = stub
     return res
 
-  @computed_property
+  @builder.simple_property
   def display_name(self):
     try:
       return self._display_name()

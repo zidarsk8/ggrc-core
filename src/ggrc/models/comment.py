@@ -13,8 +13,8 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 from werkzeug.exceptions import BadRequest
 
+from ggrc import builder
 from ggrc import db
-from ggrc.models.computed_property import computed_property
 from ggrc.models.deferred import deferred
 from ggrc.models.revision import Revision
 from ggrc.models.mixins import Base
@@ -216,7 +216,7 @@ class Comment(Relatable, Described, Ownable, Notifiable,
            .undefer_group('CustomAttributeDefinition_complete'),
     )
 
-  @computed_property
+  @builder.simple_property
   def custom_attribute_revision(self):
     """Get the historical value of the relevant CA value."""
     if not self.revision:

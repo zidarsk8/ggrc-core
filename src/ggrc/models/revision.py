@@ -3,8 +3,8 @@
 
 """Defines a Revision model for storing snapshots."""
 
+from ggrc import builder
 from ggrc import db
-from ggrc.models.computed_property import computed_property
 from ggrc.models.mixins import Base
 from ggrc.models.types import LongJsonType
 
@@ -87,7 +87,7 @@ class Revision(Base, db.Model):
       result = u"{0} {1}".format(display_name, self.action)
     return result
 
-  @computed_property
+  @builder.simple_property
   def description(self):
     """Compute a human readable description from action and content."""
     link_objects = ['ObjectDocument']
