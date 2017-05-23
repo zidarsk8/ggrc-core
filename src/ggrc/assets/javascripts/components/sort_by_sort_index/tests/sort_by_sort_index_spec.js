@@ -131,6 +131,14 @@ describe('GGRC.Components.tasksSortList', function () {
       method = Component.prototype.getTaskDate;
     });
 
+    beforeEach(function () {
+      jasmine.clock().install();
+    });
+
+    afterEach(function () {
+      jasmine.clock().uninstall();  //  resets custom date settings
+    });
+
     it('returns task\'s start date if requested and date exists', function () {
       var task = new can.Map({
         start_date: '2016-01-25',
