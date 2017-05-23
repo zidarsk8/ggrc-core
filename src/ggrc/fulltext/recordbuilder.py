@@ -14,6 +14,13 @@ from ggrc.fulltext.mixin import Indexed
 
 
 class Record(object):
+  __slots__ = (
+      "key",
+      "type",
+      "context_id",
+      "tags",
+      "properties",
+  )
 
   def __init__(self, key, rec_type, context_id, properties, tags=""):
     self.key = key
