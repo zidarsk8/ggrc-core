@@ -10,6 +10,7 @@ import datetime
 from flask import g
 
 from ggrc.utils import date_parsers
+from ggrc.fulltext.mixin import Indexed
 
 EMPTY_SUBPROPERTY_KEY = ''
 
@@ -39,6 +40,20 @@ class FullTextAttr(object):
     self.with_template = with_template
     self.is_sortable = EMPTY_SUBPROPERTY_KEY not in self.subproperties
 
+  def get_attribute_name(self, instance):
+    """Get attribute's name from it's alias
+
+    If template exists for the property, it's being applied
+    """
+    if isinstance(instance, Indexed):
+      property_tmpl = instance.PROPERTY_TEMPLATE
+    else:
+      property_tmpl = u"{}"
+
+    if self.with_template:
+      return property_tmpl.format(self.alias)
+    return self.alias
+
   def get_value_for(self, instance):
     """Get value from sended instance using 'value' rule"""
     if callable(self.value):
@@ -62,7 +77,7 @@ class FullTextAttr(object):
         results[subprop] = value
     if self.is_sortable:
       results['__sort__'] = u':'.join(sorted(sorted_dict.values()))
-    return results
+    return {self.get_attribute_name(instance): results}
 
   # pylint: disable=unused-argument
   @staticmethod
@@ -70,14 +85,14 @@ class FullTextAttr(object):
     return value
 
 
-class CustomRoleAttr(object):
+class CustomRoleAttr(FullTextAttr):
   """Custom index attribute class for custom roles"""
   # pylint: disable=too-few-public-methods
   def __init__(self, alias):
-    self.alias = alias
+    super(CustomRoleAttr, self).__init__(alias, alias)
     self.with_template = False
 
-  def get_properties(self, instance):
+  def get_property_for(self, instance):
     """Returns index properties of all custom roles for a given instance"""
     results = {}
     sorted_roles = defaultdict(list)
@@ -91,7 +106,7 @@ class CustomRoleAttr(object):
       results[ac_role]["{}-name".format(person_id)] = acl.person.name
       results[ac_role]["{}-user_name".format(person_id)] = acl.person.user_name
     for role in sorted_roles:
-      results[role]["__sort__"] = u':'.join(sorted(sorted_roles[ac_role]))
+      results[role]["__sort__"] = u':'.join(sorted(sorted_roles[role]))
     return results
 
 
@@ -129,7 +144,7 @@ class MultipleSubpropertyFullTextAttr(FullTextAttr):
           results[sub_key] = None
     if self.is_sortable:
       results['__sort__'] = u':'.join(sorted(sorted_dict.values()))
-    return results
+    return {self.get_attribute_name(instance): results}
 
 
 # pylint: disable=too-few-public-methods
