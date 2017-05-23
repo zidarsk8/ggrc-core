@@ -3,7 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if_instance_of instance 'CycleTaskGroup|CycleTaskGroupObjectTask'}}
+{{#if_instance_of instance 'CycleTaskGroup'}}
+<div class="flex-box item-actions">
+</div>
+{{/if_instance_of}}
+
+{{#if_instance_of instance 'CycleTaskGroupObjectTask'}}
 <div class="flex-box item-actions">
   {{#with_review_task}}
     {{^if isBacklog}}
