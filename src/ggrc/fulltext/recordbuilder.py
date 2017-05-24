@@ -13,7 +13,9 @@ from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.fulltext.mixin import Indexed
 
 
-class Record(object):
+class Record(object):  # pylint: disable=too-few-public-methods
+  """"Class required to collection index properties on build procedure."""
+
   __slots__ = (
       "key",
       "type",
@@ -22,7 +24,12 @@ class Record(object):
       "properties",
   )
 
-  def __init__(self, key, rec_type, context_id, properties, tags=""):
+  def __init__(self,  # pylint: disable=too-many-arguments
+               key,
+               rec_type,
+               context_id,
+               properties,
+               tags=""):
     self.key = key
     self.type = rec_type
     self.context_id = context_id
