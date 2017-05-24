@@ -27,23 +27,38 @@
           }.bind(this));
       },
       getObjectMapping: function () {
-        var sources = this.attr('source.object_people');
-        var destinations = this.attr('destination.object_people');
+        var destinationType = this.attr('destination.type');
+        var mappingType;
+        var sources;
+        var destinations;
         var mapping;
-        destinations = destinations
-          .map(function (item) {
-            return item.id;
+        var isWorkflow = destinationType === 'Workflow';
+
+        if (isWorkflow) {
+          sources = [this.attr('source')];
+          destinations = this.attr('destination.workflow_people');
+          destinations = destinations.map(function (workflowPerson) {
+            return workflowPerson.reify();
           });
+          mappingType = 'WorkflowPerson';
+        } else {
+          sources = this.attr('source.object_people');
+          destinations = this.attr('destination.object_people');
+          mappingType = 'ObjectPerson';
+        }
+
         sources = sources
           .map(function (item) {
             return item.id;
           });
         mapping = destinations
           .filter(function (dest) {
-            return sources.indexOf(dest) > -1;
+            return isWorkflow ?
+              sources.indexOf(dest.person.id) > -1 :
+              sources.indexOf(dest.id) > -1;
           })[0];
-        mapping = mapping ? {id: mapping} : {};
-        return new CMS.Models.ObjectPerson(mapping);
+
+        return new CMS.Models[mappingType](mapping || {});
       },
       getRoleMapping: function () {
         var contextId = this.attr('destination.context.id');
