@@ -4,6 +4,7 @@
  */
 
 $itemActionsWidth: 200px;
+$treeHeaderSelectorWidth: 56px;
 
 tree-widget-container {
   .tree-filter {
@@ -265,11 +266,15 @@ tree-header {
       margin-left: 0 !important;
       float: none !important;
       position: inherit !important;
-      width: 56px;
+      min-width: $treeHeaderSelectorWidth;
 
       .visible-columns-icon {
         position: inherit !important;
       }
+    }
+
+    .tree-header-titles {
+      width: calc(100% - #{$treeHeaderSelectorWidth});
     }
 
     .item-actions {
