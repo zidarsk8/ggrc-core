@@ -83,7 +83,6 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
     else:
       return value.strip()
 
-    name = value.strip()
     if name in self._get_reserved_names(object_type):
       raise ValueError(u"Attribute name '{}' is reserved for this object type."
                        .format(name))
