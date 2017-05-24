@@ -380,6 +380,20 @@
           margin-right: 10px;
         }
       }
+      .task-state {
+        &.state-verified {
+          color: $status-verified;
+        }
+        &.state-assigned{
+          color: $status-draft;
+        }
+        &.state-finished {
+          color: $status-completed;
+        }
+        &.state-inprogress{
+          color: $status-inprogress;
+        }
+      }
     }
     a {
       margin: 10px 0 10px 15px;

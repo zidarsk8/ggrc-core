@@ -136,16 +136,16 @@
               {{/if}}
               {{#switch instance.status}}
                 {{#case 'Verified'}}
-                  <span class="green">Verified</span>
+                  <span class="task-state state-verified">Verified</span>
                 {{/case}}
                 {{#case 'Assigned'}}
-                  <span class="gray">Assigned</span>
+                  <span class="task-state state-assigned">Assigned</span>
                 {{/case}}
                 {{#case 'Finished'}}
-                  <span class="blue">Finished</span>
+                  <span class="task-state state-finished">Finished</span>
                 {{/case}}
                 {{#case 'InProgress'}}
-                  <span class="orange">In progress</span>
+                  <span class="task-state state-inprogress">In progress</span>
                 {{/case}}
               {{/switch}}
             </div>

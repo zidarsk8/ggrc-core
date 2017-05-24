@@ -8,13 +8,6 @@
 
   var template = can.view(GGRC.mustache_path +
     '/components/tree/tree-item-extra-info.mustache');
-  var statusClasses = {
-    Verified: 'state-verified',
-    Assigned: 'state-assigned',
-    Finished: 'state-finished',
-    InProgress: 'state-inprogress',
-    Overdue: 'state-overdue'
-  };
 
   var viewModel = can.Map.extend({
     define: {
@@ -99,17 +92,27 @@
           return !!this.attr('instance.workflow_state');
         }
       },
+      isOverdue: {
+        type: 'boolean',
+        get: function () {
+          var isWorkflowOverdue =
+            this.attr('drawStatuses') &&
+            this.attr('instance.workflow_state') === 'Overdue';
+
+          var isCycleTasksOverdue =
+            this.attr('isCycleTasks') &&
+            this.attr('instance.isOverdue');
+
+          return isWorkflowOverdue || isCycleTasksOverdue;
+        }
+      },
       cssClasses: {
         type: 'string',
         get: function () {
           var classes = [];
-          var instance = this.attr('instance');
-          if (this.attr('drawStatuses')) {
-            classes.push(statusClasses[instance.workflow_state]);
-          }
 
-          if (this.attr('isCycleTasks') && this.attr('instance.isOverdue')) {
-            classes.push(statusClasses.Overdue);
+          if (this.attr('isOverdue')) {
+            classes.push('state-overdue');
           }
 
           if (this.attr('spin')) {

@@ -28,12 +28,6 @@ tree-item-extra-info {
     &.person-tooltip-trigger {
       font-size: 19px;
     }
-    &.state-verified {
-      color: $green;
-    }
-    &.state-inprogress {
-      color: $darkOrange;
-    }
     &.state-overdue {
       color: $status-declined;
       visibility: visible;

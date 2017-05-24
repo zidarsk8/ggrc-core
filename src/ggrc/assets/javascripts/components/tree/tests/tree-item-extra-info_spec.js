@@ -45,4 +45,51 @@ describe('GGRC.Components.treeItemExtraInfo', function () {
       }
     });
   });
+
+  describe('isOverdue property', function () {
+    it('returns true if workflow_status is "Overdue"', function () {
+      var result;
+      viewModel.attr('instance', {
+        workflow_state: 'Overdue'
+      });
+
+      result = viewModel.attr('isOverdue');
+
+      expect(result).toBe(true);
+    });
+
+    it('returns false if workflow_status is not "Overdue"', function () {
+      var result;
+      viewModel.attr('instance', {
+        workflow_state: 'AnyState'
+      });
+
+      result = viewModel.attr('isOverdue');
+
+      expect(result).toBe(false);
+    });
+
+    it('returns true if instance is "CycleTasks" and overdue', function () {
+      var result;
+      var instance = new CMS.Models.CycleTaskGroupObjectTask();
+      instance.attr('end_date', moment().subtract(5, 'd'));
+      viewModel.attr('instance', instance);
+
+      result = viewModel.attr('isOverdue');
+
+      expect(result).toBe(true);
+    });
+
+    it('returns false if instance is "CycleTasks" and not overdue',
+    function () {
+      var result;
+      var instance = new CMS.Models.CycleTaskGroupObjectTask();
+      instance.attr('end_date', moment().add(5, 'd'));
+      viewModel.attr('instance', instance);
+
+      result = viewModel.attr('isOverdue');
+
+      expect(result).toBe(false);
+    });
+  });
 });
