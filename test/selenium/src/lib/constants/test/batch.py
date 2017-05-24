@@ -3,7 +3,7 @@
 """Constants for batch tests (tests with multiple actions)."""
 
 # number of objects in a batch
-COUNT = 3
+COUNT = 2
 
 # number of try operations
 TRY_COUNT = 2

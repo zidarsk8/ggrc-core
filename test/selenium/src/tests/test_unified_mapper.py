@@ -1,6 +1,7 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Unified mapper tests."""
+# pylint: disable=no-self-use
 # pylint: disable=invalid-name
 # pylint: disable=too-few-public-methods
 
@@ -16,7 +17,7 @@ class TestProgramPage(base.Test):
 
   @pytest.mark.smoke_tests
   def test_mapping_controls_to_program_via_unified_mapper(
-      self, selenium, new_program_rest, new_controls_rest
+      self, new_program_rest, new_controls_rest, selenium
   ):
     """Check if Controls can be mapped to Program from Controls widget under
     Program page via unified mapper.

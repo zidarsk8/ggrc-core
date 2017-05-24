@@ -5,9 +5,6 @@
 from lib import base, cache, constants, exception
 from lib.constants import objects, element, locator
 from lib.element import tree_view, widget_info
-from lib.entities import entities_factory
-from lib.page.modal import create_new_object
-from lib.page.widget import admin_widget, generic_widget, info_widget
 
 
 def _filter_out_underscore(object_name):
@@ -32,6 +29,7 @@ def _factory(cls_name, parent_cls, search_nested_subclasses=False):
  Return:
     cls
  """
+  member_cls = None
   subcls_name = _filter_out_underscore(cls_name.lower())
   members = _all_subclasses(parent_cls) \
       if search_nested_subclasses \
@@ -87,6 +85,7 @@ def get_cls_widget(object_name, is_info=False, is_admin=False):
   info_widget.'obj_name', if is_admin is True then class
   admin_widget.'tab_element', else class generic_widget.'obj_name'.
   """
+  from lib.page.widget import admin_widget, generic_widget, info_widget
   if is_info:
     base_cls = info_widget.CommonInfo
   elif is_admin:
@@ -105,13 +104,23 @@ def get_cls_locators_generic_widget(object_name):
 
 def get_cls_entity_factory(object_name):
   """Get and return class of entity factory."""
+  from lib.entities import entities_factory
   cls_name = object_name + constants.cls_name.FACTORY
   base_cls = entities_factory.EntitiesFactory
   return _factory(cls_name=cls_name, parent_cls=base_cls)
 
 
+def get_cls_rest_service(object_name):
+  """Get and return class of rest service."""
+  from lib.service import rest_service
+  cls_name = object_name + constants.cls_name.SERVICE
+  base_cls = rest_service.BaseRestService
+  return _factory(cls_name=cls_name, parent_cls=base_cls)
+
+
 def get_cls_create_obj(object_name):
   """Get and return class of create object."""
+  from lib.page.modal import create_new_object
   cls_name = object_name + constants.cls_name.CREATE
   base_cls = create_new_object.CreateNewObjectModal
   return _factory(cls_name=cls_name, parent_cls=base_cls)

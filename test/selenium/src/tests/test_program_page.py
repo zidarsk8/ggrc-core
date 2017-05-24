@@ -75,8 +75,8 @@ class TestProgramPage(base.Test):
   @pytest.mark.smoke_tests
   def test_permalink(self, selenium, new_program_ui):
     """Verify url is copied to clipboard."""
-    _, program_info = new_program_ui
-    selenium.get(program_info.url)
+    _, program_info_page = new_program_ui
+    selenium.get(program_info_page.url)
     program_info_page = info_widget.Programs(selenium)
     program_info_page.open_info_3bbs().select_get_permalink()
     # test notification alert
@@ -92,8 +92,8 @@ class TestProgramPage(base.Test):
   def test_edit_modal(self, selenium, new_program_ui):
     """Tests if data is saved after editing program info page edit modal.
     """
-    _, program_info = new_program_ui
-    selenium.get(program_info.url)
+    _, program_info_page = new_program_ui
+    selenium.get(program_info_page.url)
     program_info_page = info_widget.Programs(selenium)
     modal = program_info_page.open_info_3bbs().select_edit()
     test_utils.ModalNewPrograms.enter_test_data(modal)
