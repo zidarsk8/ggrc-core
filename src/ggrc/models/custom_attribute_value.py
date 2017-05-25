@@ -11,8 +11,8 @@ from sqlalchemy import or_
 from sqlalchemy import orm
 from sqlalchemy.orm import foreign
 
+from ggrc import builder
 from ggrc import db
-from ggrc.models.computed_property import computed_property
 from ggrc.models.mixins import Base
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.revision import Revision
@@ -282,7 +282,7 @@ class CustomAttributeValue(Base, Indexed, db.Model):
     if validator:
       validator(self)
 
-  @computed_property
+  @builder.simple_property
   def is_empty(self):
     """Return True if the CAV is empty or holds a logically empty value."""
     # The CAV is considered empty when:
@@ -301,7 +301,7 @@ class CustomAttributeValue(Base, Indexed, db.Model):
     # Otherwise it the CAV is not empty
     return False
 
-  @computed_property
+  @builder.simple_property
   def preconditions_failed(self):
     """A list of requirements self introduces that are unsatisfied.
 

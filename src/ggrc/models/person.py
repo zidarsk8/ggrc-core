@@ -4,10 +4,10 @@
 import re
 from sqlalchemy.orm import validates
 
+from ggrc import builder
 from ggrc import db
 from ggrc import settings
 from ggrc.fulltext.mixin import Indexed
-from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
 from ggrc.models.exceptions import ValidationError
 from ggrc.models.deferred import deferred
@@ -145,7 +145,7 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
   def _display_name(self):
     return self.email
 
-  @computed_property
+  @builder.simple_property
   def system_wide_role(self):
     """For choosing the role string to show to the user; of all the roles in
     the system-wide context, it shows the highest ranked one (if there are

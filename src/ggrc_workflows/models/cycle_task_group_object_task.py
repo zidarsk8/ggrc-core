@@ -7,8 +7,8 @@
 from sqlalchemy import orm
 from sqlalchemy.ext.associationproxy import association_proxy
 
+from ggrc import builder
 from ggrc import db
-from ggrc.models.computed_property import computed_property
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Notifiable
@@ -181,7 +181,7 @@ class CycleTaskGroupObjectTask(
       "start_date": "Start Date",
   }
 
-  @computed_property
+  @builder.simple_property
   def related_objects(self):
     """Compute and return a list of all the objects related to this cycle task.
 
@@ -299,7 +299,7 @@ class CycleTaskable(object):
   """ Requires the Relatable mixin, otherwise cycle_task_group_object_tasks
   fails to fetch related objects
   """
-  @computed_property
+  @builder.simple_property
   def cycle_task_group_object_tasks(self):
     """ Lists all the cycle tasks related to a certain object
     """
