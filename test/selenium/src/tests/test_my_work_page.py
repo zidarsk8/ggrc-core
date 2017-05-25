@@ -24,7 +24,7 @@ class TestMyWorkPage(base.Test):
     Preconditions:
     - Controls created via REST API.
     """
-    selenium.get(dashboard.Dashboard.URL)
+    selenium_utils.open_url(selenium, dashboard.Dashboard.URL)
     controls_widget = dashboard.Dashboard(selenium).select_controls()
     for _ in xrange(controls_widget.member_count):
       counter = controls_widget.get_items_count()

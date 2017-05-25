@@ -41,7 +41,7 @@ class CommonDropdownSettings(base.Component):
     """
     parent_element_of_open = selenium_utils.get_parent_element(
         self._driver, self._driver.find_element(*self.open_locator))
-    return selenium_utils.is_value_in_attr(
+    return not selenium_utils.is_value_in_attr(
         parent_element_of_open, value=locator.Common.DISABLED_VALUE)
 
   def select_edit(self):

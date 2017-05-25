@@ -42,7 +42,7 @@ class BaseRestService(object):
             for attrs, factory_obj in zip(list_attrs, list_factory_objs)]
 
   def update_list_objs(self, entity_factory, list_objs_to_update,
-                       attrs_to_factory=None):
+                       attrs_to_factory=None, **attrs_for_template):
     """Update and return list of objects used entities factories,
     REST API service and attributes to make JSON template to request.
     As default entity factory is generating random objects,
@@ -57,7 +57,8 @@ class BaseRestService(object):
     list_new_attrs = [
       self.get_items_from_resp(self.client.update_object(
           href=old_obj.href,
-          **{k: v for k, v in new_obj.__dict__.iteritems() if k != "href"}))
+          **dict({k: v for k, v in new_obj.__dict__.iteritems()
+                  if k != "href"}.items() + attrs_for_template.items())))
       for old_obj, new_obj in zip(list_objs_to_update, list_new_objs)]
     return [self.set_obj_attrs(new_attrs, new_obj) for
             new_attrs, new_obj in zip(list_new_attrs, list_new_objs)]
@@ -111,11 +112,12 @@ class BaseRestService(object):
         entity_factory=self.entities_factory_cls(), count=count,
         attrs_to_factory=factory_params, **attrs_for_template)
 
-  def update_objs(self, objs):
+  def update_objs(self, objs, factory_params=None, **attrs_for_template):
     """Update existing objects via REST API and return updated."""
     return self.update_list_objs(
+        entity_factory=self.entities_factory_cls(),
         list_objs_to_update=string_utils.convert_to_list(objs),
-        entity_factory=self.entities_factory_cls())
+        attrs_to_factory=factory_params, **attrs_for_template)
 
   def delete_objs(self, objs):
     """Delete existing objects via REST API."""
@@ -166,10 +168,11 @@ class IssuesService(BaseRestService):
     super(IssuesService, self).__init__(url.ISSUES)
 
 
-class CustomAttributesService(BaseRestService):
+class CustomAttributeDefinitionsService(BaseRestService):
   """Service for working with Custom Attributes entities."""
   def __init__(self):
-    super(CustomAttributesService, self).__init__(url.CUSTOM_ATTRIBUTES)
+    super(CustomAttributeDefinitionsService, self).__init__(
+        url.CUSTOM_ATTRIBUTES)
 
 
 class RelationshipsService(HelpRestService):

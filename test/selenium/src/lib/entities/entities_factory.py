@@ -107,6 +107,39 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
   """Factory class for  entities."""
 
   @classmethod
+  def generate_ca_values(cls, list_ca_objs):
+    """Generate dictionary of CA random values from exist list CA objects
+    according to CA 'id', 'attribute_type' and 'multi_choice_options' for
+    Dropdown. Return dictionary of CA items that ready to use via REST API:
+    Example:
+    list_ca_objs = [{'attribute_type': 'Text', 'id': 1},
+    {'attribute_type': 'Dropdown', 'id': 2, 'multi_choice_options': 'a,b,c'}]
+    :return {"1": "text_example", "2": "b"}
+    """
+    def generate_ca_value(ca):
+      """Generate CA value according to CA 'id', 'attribute_type' and
+      'multi_choice_options' for Dropdown.
+      """
+      val = {}
+      ca = ca.__dict__
+      if ca.get("attribute_type") in (AdminWidgetCustomAttributes.TEXT,
+                                      AdminWidgetCustomAttributes.RICH_TEXT):
+        val = {ca["id"]: cls.generate_string(ca["attribute_type"])}
+      if ca.get("attribute_type") == AdminWidgetCustomAttributes.DATE:
+        val = {ca["id"]: str(ca["created_at"][:10])}
+      if ca.get("attribute_type") == "Checkbox":
+        val = {ca["id"]: random.choice((True, False))}
+      if ca.get("attribute_type") == "Dropdown":
+        val = {ca["id"]: str(
+            random.choice(ca["multi_choice_options"].split(",")))}
+      if ca.get("attribute_type") == "Map:Person":
+        val = {ca["id"]: ":".join([str(ca["modified_by"]["type"]),
+                                   str(ca["modified_by"]["id"])])}
+      return val
+    return {k: v for _ in [generate_ca_value(ca) for ca in list_ca_objs]
+            for k, v in _.items()}
+
+  @classmethod
   def create(cls, title=None, id=None, href=None, type=None,
              definition_type=None, attribute_type=None, helptext=None,
              placeholder=None, mandatory=None, multi_choice_options=None):

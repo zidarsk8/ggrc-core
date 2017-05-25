@@ -188,13 +188,21 @@ class ControlEntity(Entity):
         custom_attribute_values=self.custom_attribute_values)
 
   def __eq__(self, other):
-    return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.slug == other.slug and
-            self.status == other.status and
-            (self.owners == other.owners or
-             other.owners in [owner.values() for owner in self.owners][0]) and
-            (self.contact == other.contact or other.contact in
-             self.contact.values()))
+    return (
+        isinstance(other, self.__class__) and self.type == other.type and
+        self.title == other.title and self.slug == other.slug and
+        self.status == other.status and
+        (self.owners == other.owners or other.owners
+         in [owner.values() for owner in self.owners][0]) and
+        (self.contact == other.contact or other.contact
+         in self.contact.values()) and
+        (set(other.custom_attribute_definitions).issubset(
+            [ca_def.values()[1].upper()
+             for ca_def in self.custom_attribute_definitions]) if
+         other.custom_attribute_definitions else True) and
+        (set(other.custom_attribute_values).issubset(
+            [ca_val.values()[8] for ca_val in self.custom_attribute_values]) if
+         other.custom_attribute_values else True))
 
   def __lt__(self, other):
     return self.slug < other.slug

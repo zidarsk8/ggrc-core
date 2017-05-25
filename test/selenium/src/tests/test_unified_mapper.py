@@ -24,6 +24,7 @@ class TestProgramPage(base.Test):
     Preconditions:
     - Program, Controls created via REST API.
     """
+    # pylint: disable=no-self-use
     expected_controls = new_controls_rest
     (webui_service.ControlsService(selenium).map_objs_via_tree_view(
         src_obj=new_program_rest, dest_objs=expected_controls))

@@ -51,13 +51,18 @@ class TestUtil(InstanceRepresentation):
 
 
 class Element(InstanceRepresentation):
-  """Element class represents primitives in models."""
+  """Element class represents primitives in models. Initializing by web driver
+  and locator (CSS selector (tuple) or webelement element (instance
+  of webdriver.Chrome).
+  """
 
   def __init__(self, driver, locator):
     super(Element, self).__init__()
     self._driver = driver
     self._locator = locator
-    self.element = self.get_element()
+    self.element = (
+        locator if isinstance(locator, webdriver.remote.webelement.WebElement)
+        else self.get_element())
     self.text = self.element.text
 
   def get_element(self):
@@ -243,15 +248,26 @@ class Checkbox(Element):
     self.is_checked = self.element.is_selected()
 
   def get_element(self):
+    """Get checkbox when web element clickable."""
     return selenium_utils.get_when_clickable(self._driver, self._locator)
 
   def check(self):
+    """Select checkbox."""
     if not self.is_checked:
       self.element.click()
 
   def uncheck(self):
+    """Unselect checkbox."""
     if self.is_checked:
       self.element.click()
+
+  def is_element_checked(self):
+    """Check DOM input element checked property using JS.
+    Args: driver (base.CustomDriver), locator (tuple)
+    Return: True if element is checked, False if element is not checked.
+    """
+    return self._driver.execute_script("return arguments[0].checked",
+                                       self.element)
 
 
 class Toggle(Element):
@@ -478,14 +494,22 @@ class Widget(AbstractPage):
     """
     super(Widget, self).__init__(driver)
     matched_url_parts = re.search(
-        constants.regex.URL_WIDGET_INFO, self.url).groups()
-    source_obj_plural, source_obj_id, widget = matched_url_parts
+        constants.regex.URL_WIDGET_INFO, self.url + "/").groups()
+    (source_obj_plural, source_obj_id, widget_name,
+     mapped_obj_singular, mapped_obj_id) = matched_url_parts
     self.source_obj_from_url = source_obj_plural
+
     self.source_obj_id_from_url = source_obj_id
-    self.widget_name_from_url = (widget.split("_")[0] or
+    self.widget_name_from_url = (widget_name.split("_")[0] or
                                  constants.element.WidgetBar.INFO)
+    self.mapped_obj_from_url = mapped_obj_singular
+    self.mapped_obj_id_from_url = mapped_obj_id
     self.is_under_audit = (self.source_obj_from_url == objects.AUDITS and
                            self.widget_name_from_url != "info")
+    self.is_info_page = self.widget_name_from_url == "info"
+    self.is_info_panel = (
+        self.widget_name_from_url != "" and self.mapped_obj_from_url != "" and
+        self.mapped_obj_id_from_url != "")
 
 
 class TreeView(Component):
@@ -653,7 +677,7 @@ class SetVisibleFieldsModal(Modal):
     _locator_set_fields = (
         By.CSS_SELECTOR,
         self._locators.BUTTON_SET_FIELDS)
-    Button(self._driver, _locator_set_fields).click()
+    Button(self._driver, _locator_set_fields).click_via_js()  # issue GGRC-1854
     selenium_utils.get_when_invisible(self._driver, _locator_set_fields)
 
   def select_and_set_visible_fields(self):

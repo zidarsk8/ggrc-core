@@ -86,8 +86,14 @@ def get_cls_widget(object_name, is_info=False, is_admin=False):
   admin_widget.'tab_element', else class generic_widget.'obj_name'.
   """
   from lib.page.widget import admin_widget, generic_widget, info_widget
+  base_cls = None
   if is_info:
-    base_cls = info_widget.CommonInfo
+    if object_name not in objects.ALL_SNAPSHOTABLE_OBJS:
+      base_cls = info_widget.InfoPanel
+    elif object_name in objects.ALL_SNAPSHOTABLE_OBJS:
+      base_cls = info_widget.SnapshotableInfoPanel
+    elif object_name == objects.PEOPLE:
+      base_cls = info_widget.base.Widget
   elif is_admin:
     base_cls = admin_widget.Widget
   else:
