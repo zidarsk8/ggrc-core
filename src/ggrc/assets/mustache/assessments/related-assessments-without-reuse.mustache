@@ -75,26 +75,10 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                             </related-audits>
                         </div>
                         <div class="flex-size-3">
-                            <related-attachments-and-urls>
-                                <mapped-objects
-                                        {parent-instance}="instance"
-                                        mapping="all_documents"
-                                        {^is-loading}="loadingState.attachmentsLoading"
-                                        {empty-message}="noRelatedItemMessage"
-                                        {^show-items}="attachments">
-                                    <document-object-list-item {instance}="instance"></document-object-list-item>
-                                </mapped-objects>
-                                <mapped-objects
-                                        {parent-instance}="instance"
-                                        mapping="all_urls"
-                                        {^is-loading}="loadingState.urlsLoading"
-                                        {empty-message}="noRelatedItemMessage"
-                                        {^show-items}="urls">
-                                    <document-object-list-item {instance}="instance"></document-object-list-item>
-                                </mapped-objects>
-                                {{#if showEmptyMessage}}
-                                    <span class="empty-message">{{emptyMessage}}</span>
-                                {{/if}}
+                            <related-attachments-and-urls {instance}="instance">
+                                <object-list {items}="documents">
+                                    <document-object-list-item {instance}="{.}"></document-object-list-item>
+                                </object-list>
                             </related-attachments-and-urls>
                         </div>
                         <div class="grid-data__action-column">

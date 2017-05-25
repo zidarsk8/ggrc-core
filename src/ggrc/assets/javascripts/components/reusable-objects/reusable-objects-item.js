@@ -18,17 +18,18 @@
       checkReusedStatus: false,
       selectedList: [],
       disabled: false,
-      mapping: null,
       isChecked: false,
       isDisabled: function () {
         return this.attr('disabled');
       },
       setDisabled: function () {
+        var baseInstanceObjects = this.attr('baseInstanceDocuments');
+        var isMapped = baseInstanceObjects.map(function (document) {
+          return document.id;
+        }).indexOf(this.attr('instance.id')) > -1;
+
         var isDisabled = this.attr('instance.isMapped') ||
-          GGRC.Utils.is_mapped(
-            this.attr('baseInstance'),
-            this.attr('instance'),
-            this.attr('mapping'));
+          isMapped;
         this.attr('disabled', isDisabled);
       },
       isSelected: function () {
@@ -76,6 +77,9 @@
         if (performCheck) {
           this.scope.setDisabled();
         }
+      },
+      '{viewModel.baseInstanceDocuments} length': function () {
+        this.scope.setDisabled();
       }
     }
   });

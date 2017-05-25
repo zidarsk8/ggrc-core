@@ -46,7 +46,10 @@
         comments: {
           Value: can.List
         },
-        documents: {
+        urls: {
+          Value: can.List
+        },
+        evidences: {
           Value: can.List
         },
         editMode: {
@@ -117,12 +120,19 @@
         return this.requestQuery(query);
       },
       updateRelatedItems: function () {
+        var self = this;
         this.attr('mappedSnapshots')
           .replace(this.loadSnapshots());
         this.attr('comments')
           .replace(this.loadComments());
-        this.attr('documents')
-          .replace(this.loadDocuments());
+
+        this.loadDocuments().then(function (documents) {
+          var grouped = _.groupBy(documents, 'document_type');
+
+          // TODO: Update when the backend changes this to bool/enum
+          self.attr('urls').replace(grouped['1']);
+          self.attr('evidences').replace(grouped['2']);
+        });
       },
       initializeFormFields: function () {
         this.attr('formFields',

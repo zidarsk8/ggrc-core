@@ -25,16 +25,28 @@
             return 'None';
           }
         },
-        loadingState: {},
-        showEmptyMessage: {
-          get: function () {
-            return !this.attr('loadingState.urlsLoading') &&
-              !this.attr('loadingState.attachmentsLoading') &&
-              !this.attr('urls.length') &&
-              !this.attr('attachments.length');
-          }
-        }
+        loadingState: {}
+      },
+      documents: [],
+      loadDocuments: function () {
+        var self = this;
+        var queryApi = GGRC.Utils.QueryAPI;
+        var relevantFilters = [{
+          type: this.attr('instance.type'),
+          id: this.attr('instance.id'),
+          operation: 'relevant'
+        }];
+        var query = queryApi
+          .buildParam('Document', {}, relevantFilters, [], []);
+
+        queryApi.batchRequests(query).then(function (response) {
+          var documents = response.Document.values;
+          self.attr('documents').replace(documents);
+        });
       }
+    },
+    init: function () {
+      this.viewModel.loadDocuments();
     }
   });
 })(window.can);

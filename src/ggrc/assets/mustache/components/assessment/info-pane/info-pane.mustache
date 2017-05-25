@@ -34,9 +34,10 @@
                     <div class="assessment-controls__extra-controls">
                         <assessment-attachments-list
                             tooltip="You can upload up to 10 files in a single batch"
+                            {mapped-items}="evidences"
                             {instance}="instance">
                         </assessment-attachments-list>
-                        <assessment-urls-list {mapped-items}="documents"></assessment-urls-list>
+                        <assessment-urls-list {mapped-items}="urls"></assessment-urls-list>
                     </div>
                     <auto-save-form {fields}="formFields"
                                     {edit-mode}="editMode"

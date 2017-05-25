@@ -3,7 +3,7 @@ Copyright (C) 2017 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <related-objects {base-instance}="instance" related-items-type="Assessment" order-by="finished_date,created_at">
-    <reusable-objects-list {base-instance}="instance">
+    <reusable-objects-list {base-instance}="instance" {evidences}="evidences" {urls}="urls">
         <div class="grid-data__toolbar flex-box">
             <tree-pagination {(paging)}="paging" class="grid-data__toolbar-item"></tree-pagination>
             {{#is_allowed 'update' baseInstance context='for'}}
@@ -82,40 +82,16 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                                 </related-audits>
                             </div>
                             <div class="flex-size-3">
-                                <related-attachments-and-urls>
-                                    <mapped-objects
-                                            {parent-instance}="instance"
-                                            mapping="all_documents"
-                                            {^is-loading}="loadingState.attachmentsLoading"
-                                            {empty-message}="noRelatedItemMessage"
-                                            {^show-items}="attachments">
-                                        <reusable-objects-item {instance}="instance"
-                                                               {is-saving}="isSaving"
-                                                               {base-instance}="baseInstance"
-                                                               {mapping}="mapping"
-                                                               {check-reused-status}="checkReusedStatus"
-                                                               {(selected-list)}="evidenceList">
+                                <related-attachments-and-urls {instance}="instance">
+                                    <object-list {items}="documents">
+                                        <reusable-objects-item {instance}="{.}"
+                                                            {is-saving}="isSaving"
+                                                            {base-instance-documents}="baseInstanceDocuments"
+                                                            {check-reused-status}="checkReusedStatus"
+                                                            {(selected-list)}="documentList">
                                             <document-object-list-item {instance}="instance"></document-object-list-item>
                                         </reusable-objects-item>
-                                    </mapped-objects>
-                                    <mapped-objects
-                                            {parent-instance}="instance"
-                                            mapping="all_urls"
-                                            {^is-loading}="loadingState.urlsLoading"
-                                            {empty-message}="noRelatedItemMessage"
-                                            {^show-items}="urls">
-                                        <reusable-objects-item {instance}="instance"
-                                                               {is-saving}="isSaving"
-                                                               {base-instance}="baseInstance"
-                                                               {mapping}="mapping"
-                                                               check-reused-status="checkReusedStatus"
-                                                               {(selected-list)}="urlList">
-                                            <document-object-list-item {instance}="instance"></document-object-list-item>
-                                        </reusable-objects-item>
-                                    </mapped-objects>
-                                    {{#if showEmptyMessage}}
-                                        <span class="empty-message">{{emptyMessage}}</span>
-                                    {{/if}}
+                                    </object-list>
                                 </related-attachments-and-urls>
                             </div>
                             <div class="grid-data__action-column">

@@ -36,12 +36,12 @@
     viewModel: {
       baseInstance: null,
       checkReusedStatus: false,
-      evidenceList: [],
-      urlList: [],
+      documentList: [],
       isSaving: false,
+      baseInstanceDocuments: [],
       setHasSelected: function () {
         var hasSelected =
-          this.attr('evidenceList.length') || this.attr('urlList.length');
+          this.attr('documentList.length');
         this.attr('hasSelected', hasSelected);
       },
       getMapObjects: function (source, list, mapperType) {
@@ -59,11 +59,9 @@
       },
       getReusedObjectList: function () {
         var source = this.attr('baseInstance');
-        var evidences =
-          this.getMapObjects(source, this.attr('evidenceList'), 'evidence');
-        var urls =
-          this.getMapObjects(source, this.attr('urlList'));
-        return [].concat(evidences, urls);
+        var documentList =
+          this.getMapObjects(source, this.attr('documentList'), 'documents');
+        return documentList;
       },
       reuseSelected: function () {
         var reusedObjectList = this.getReusedObjectList();
@@ -85,19 +83,30 @@
           .always(this.restoreDefaults.bind(this));
       },
       restoreDefaults: function () {
-        this.attr('evidenceList').replace([]);
-        this.attr('urlList').replace([]);
+        this.attr('documentList').replace([]);
         this.attr('isSaving', false);
         this.attr('checkReusedStatus', true);
         this.attr('baseInstance').dispatch('refreshInstance');
+        this.updateBaseInstanceDocuments();
+      },
+      updateBaseInstanceDocuments: function() {
+        var documents = this.attr('urls')
+          .concat(this.attr('evidences'));
+        this.attr('baseInstanceDocuments').replace(documents);
       }
     },
+    init: function () {
+      this.viewModel.updateBaseInstanceDocuments();
+    },
     events: {
-      '{viewModel.evidenceList} length': function () {
+      '{viewModel.documentList} length': function () {
         this.scope.setHasSelected();
       },
-      '{viewModel.urlList} length': function () {
-        this.scope.setHasSelected();
+      '{viewModel.urls} length': function () {
+        this.viewModel.updateBaseInstanceDocuments();
+      },
+      '{viewModel.evidences} length': function () {
+        this.viewModel.updateBaseInstanceDocuments();
       }
     }
   });

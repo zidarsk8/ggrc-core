@@ -3,21 +3,23 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<h6>Evidence &amp; URLs</h6>
-<mapped-objects {visible-items}="limit" {parent-instance}="instance" mapping="all_documents" {empty-message}="noItemsText">
-    <action-toolbar {document}="instance" class="action-toolbar">
-        <document-object-list-item class="action-toolbar__content-item" {instance}="document"></document-object-list-item>
-      {{#if showAction}}
-        <div class="action-toolbar__controls">
-        {{#is_allowed 'update' parentInstance context='for'}}
-              <unmap-button {destination}="parentInstance" {source}="document" object-prop="relationsips" mapping-type="ObjectDocument">
-                 <action-toolbar-control><i class="fa fa-trash"></i></action-toolbar-control>
-              </unmap-button>
+<h6>Evidence</h6>
+<object-list {items}="mappedItems" {empty-message}="noItemsText">
+  <action-toolbar {document}="{.}" class="action-toolbar">
+    <document-object-list-item {instance}="document"></document-object-list-item>
+    {{#if showAction}}
+      <div class="action-toolbar__controls">
+        {{#is_allowed 'update' instance context='for'}}
+          <action-toolbar-control>
+            <unmap-button {destination}="instance" {source}="document">
+              <i class="fa fa-trash"></i>
+            </unmap-button>
+          </action-toolbar-control>
         {{/is_allowed}}
-        </div>
-        {{/if}}
-     </action-toolbar>
-</mapped-objects>
+      </div>
+    {{/if}}
+  </action-toolbar>
+</object-list>
 <div>
 {{#if_mapping_ready "audits" instance}}
   {{#is_allowed 'update' instance context='for'}}
