@@ -4,12 +4,11 @@
 """Module for full text index record builder."""
 
 from ggrc import db
-import ggrc.models.all_models
+from ggrc.models import all_models
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.person import Person
 from ggrc.models.mixins import CustomAttributable
 from ggrc.fulltext.attributes import FullTextAttr
-from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.fulltext.mixin import Indexed
 
 
@@ -65,7 +64,7 @@ class RecordBuilder(object):
       # snapshots is stored in the revision. Snapshots can also be made for
       # different models so we have to get fulltext attrs for the actual child
       # that was snapshotted and get data for those from the revision content.
-      tgt_class = getattr(ggrc.models.all_models, obj.child_type, None)
+      tgt_class = getattr(all_models, obj.child_type, None)
       if not tgt_class:
         return {}
       attrs = AttributeInfo.gather_attrs(tgt_class, '_fulltext_attrs')
@@ -80,14 +79,8 @@ class RecordBuilder(object):
     for attr in self._fulltext_attrs:
       if isinstance(attr, basestring):
         properties[property_tmpl.format(attr)] = {"": getattr(obj, attr)}
-      elif isinstance(attr, CustomRoleAttr):
-        properties.update(attr.get_properties(obj))
       elif isinstance(attr, FullTextAttr):
-        if attr.with_template:
-          property_name = property_tmpl.format(attr.alias)
-        else:
-          property_name = attr.alias
-        properties[property_name] = attr.get_property_for(obj)
+        properties.update(attr.get_property_for(obj))
     return properties
 
   def get_person_id_name_email(self, person):
@@ -103,12 +96,31 @@ class RecordBuilder(object):
       person_name, person_email = self.indexer.cache['people_map'][person_id]
     else:
       if isinstance(person, dict):
-        person = db.session.query(Person).filter_by(id=person["id"]).one()
+        person = db.session.query(Person).filter_by(
+            id=person["id"]
+        ).one()
       person_id = person.id
       person_name = person.name
       person_email = person.email
       self.indexer.cache['people_map'][person_id] = (person_name, person_email)
     return person_id, person_name, person_email
+
+  def get_ac_role_person_id(self, ac_list):
+    """Get ac_role name and person name for ac_role (either object or dict).
+
+    If there is a global ac_role map, get the data from it instead of the DB.
+    """
+    if isinstance(ac_list, dict):
+      ac_role_id = ac_list["ac_role_id"]
+      ac_person_id = ac_list["person_id"]
+    else:
+      ac_role_id = ac_list.role_id
+      ac_person_id = ac_list.person_id
+    if ac_role_id not in self.indexer.cache['ac_role_map']:
+      ac_role = db.session.query(all_models.AccessControlRole).get(ac_role_id)
+      self.indexer.cache['ac_role_map'][ac_role.id] = ac_role.name
+    ac_role_name = self.indexer.cache['ac_role_map'][ac_role_id]
+    return ac_role_name.lower(), ac_person_id
 
   def build_person_subprops(self, person):
     """Get dict of Person properties for fulltext indexing
@@ -120,6 +132,8 @@ class RecordBuilder(object):
         person
     )
     subproperties["{}-name".format(person_id)] = person_name
+    subproperties["{}-user_name".format(person_id)] = \
+        person_email.split("@")[0]
     subproperties["{}-email".format(person_id)] = person_email
     return subproperties
 

@@ -15,6 +15,7 @@ from ddt import unpack
 from ggrc import app
 from ggrc import views
 from ggrc import models
+from ggrc.models import all_models
 from ggrc import db
 
 from integration.ggrc import TestCase
@@ -735,3 +736,54 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
     self.assertListEqual([snap["child_id"]
                           for snap in order_by_person_ca_result["values"]],
                          [control2_id, control1_id])
+
+  @data(
+      "Test Role Name",
+      "TEST ROLE NAME",
+      "test role name",
+  )
+  def test_acl_filter(self, test_role_name):
+    """Control Snapshots are filtered and sorted by ACL Role."""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      person1 = factories.PersonFactory(name="Ann", email="email1@example.com")
+      person2 = factories.PersonFactory(name="Bob", email="email2@example.com")
+      control1 = factories.ControlFactory(principal_assessor=person2)
+      control2 = factories.ControlFactory(principal_assessor=person1)
+      program_id = program.id
+      control1_id = control1.id
+      control2_id = control2.id
+      factories.RelationshipFactory(source=program, destination=control1)
+      factories.RelationshipFactory(source=program, destination=control2)
+      factories.AccessControlListFactory(
+          ac_role=factories.AccessControlRoleFactory(name=test_role_name),
+          person=person1,
+          object_id=control1_id,
+          object_type="Control",
+      )
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_type == "Control",
+        all_models.Revision.resource_id == control1_id
+    ).order_by(all_models.Revision.updated_at.desc()).first()
+    revision.content = control1.log_json()
+    db.session.add(revision)
+    db.session.commit()
+    program = models.Program.query.filter_by(id=program_id).one()
+    self._create_audit(program=program, title="some title")
+    control_user1_result = self._get_first_result_set(
+        self._make_snapshot_query_dict(
+            "Control",
+            expression=['{}'.format(test_role_name), "=", "Ann"]
+        ),
+        "Snapshot",
+    )
+    self.assertEqual(control_user1_result["count"], 1)
+    snaps_dict = dict(
+        all_models.Snapshot.query.filter(
+            all_models.Snapshot.child_type == "Control"
+        ).values("child_id", "id")
+    )
+    self.assertIn(snaps_dict[control1_id],
+                  [i["id"] for i in control_user1_result["values"]])
+    self.assertNotIn(snaps_dict[control2_id],
+                     [i["id"] for i in control_user1_result["values"]])
