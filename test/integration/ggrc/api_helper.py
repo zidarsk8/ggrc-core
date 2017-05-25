@@ -22,6 +22,7 @@ from ggrc.services.common import Resource
 
 
 class Api(object):
+  """Test api class."""
 
   def __init__(self):
     self.client = app.test_client()
@@ -35,6 +36,10 @@ class Api(object):
     self.person_email = None
 
   def set_user(self, person=None):
+    """Set user for current api instance.
+
+    All api calls will run as login user.
+    If user is empty, they will run as superuser."""
     # Refresh the person instance from the db:
     if person:
       person = person.__class__.query.get(person.id)
@@ -55,11 +60,13 @@ class Api(object):
     db.session.commit()
     db.session.flush()
 
-  def api_link(self, obj, obj_id=None):
+  @staticmethod
+  def api_link(obj, obj_id=None):
     obj_id = "" if obj_id is None else "/" + str(obj_id)
     return "/api/%s%s" % (obj._inflector.table_plural, obj_id)
 
-  def data_to_json(self, response):
+  @staticmethod
+  def data_to_json(response):
     """ add docoded json to response object """
     try:
       response.json = flask.json.loads(response.data)
@@ -67,13 +74,15 @@ class Api(object):
       response.json = None
     return response
 
+  # pylint: disable=too-many-arguments
   def send_request(self, request,
                    obj=None, data=None, headers=None, api_link=None):
     """Send an API request."""
     headers = headers or {}
     data = data or {}
     if api_link is None:
-      api_link = self.api_link(obj)
+      if obj is not None:
+        api_link = self.api_link(obj)
 
     headers.update(self.headers)
     headers.update(self.user_headers)
@@ -87,6 +96,7 @@ class Api(object):
     return self.data_to_json(response)
 
   def put(self, obj, data):
+    """Simple put request."""
     name = obj._inflector.table_singular
     response = self.get(obj, obj.id)
     headers = {
@@ -157,8 +167,9 @@ class Api(object):
     api_link = self.api_link(obj, obj.id)
     return self.client.delete(api_link, headers=headers)
 
-  def search(self, types, q="", counts=False, relevant_objects=None):
-    query = '/search?q={}&types={}&counts_only={}'.format(q, types, counts)
+  def search(self, types, query="", counts=False, relevant_objects=None):
+    """Api search call."""
+    link = '/search?q={}&types={}&counts_only={}'.format(query, types, counts)
     if relevant_objects is not None:
-      query += '&relevant_objects=' + relevant_objects
-    return (self.client.get(query), self.headers)
+      link += '&relevant_objects=' + relevant_objects
+    return (self.client.get(link), self.headers)

@@ -53,7 +53,7 @@ class TestResource(TestCase):
 
   def test_search_query(self):
     """Test search with query by title."""
-    entries = self.search("Control", q=self.objects[0].title)
+    entries = self.search("Control", query=self.objects[0].title)
     self.assertEqual({entry["id"] for entry in entries},
                      {self.objects[0].id})
 
