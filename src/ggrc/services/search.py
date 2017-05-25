@@ -4,6 +4,7 @@
 import json
 
 from flask import request, current_app
+from werkzeug.exceptions import BadRequest
 
 import ggrc.models.relationship
 
@@ -17,11 +18,8 @@ def search():
   permission_type = request.args.get('__permission_type', 'read')
   permission_model = request.args.get('__permission_model', None)
   if terms is None:
-    return current_app.make_response((
-        'Query parameter "q" specifying search terms must be provided.',
-        400,
-        [('Content-Type', 'text/plain')],
-    ))
+    raise BadRequest('Query parameter "q" specifying search '
+                     'terms must be provided.')
 
   should_group_by_type = request.args.get('group_by_type', '')
   should_group_by_type = should_group_by_type.lower() == 'true'
