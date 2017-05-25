@@ -227,6 +227,15 @@ A pull request can be merged only if **all** of the following is true:
    completed their review (seek information on why, if necessary), or if at
    least one of the reviewers has requested changes.
 
+NOTE: After merging a PR that contains a database migration step, the reviewer
+must mark all other currently open migration PRs with the ``needs work`` label,
+and add a note containing the new ``down_revision`` value in the database
+migration chain, so that the authors of those PRs can update their migration
+scripts accordingly.
+Mind that this only applies to the PRs containing migration scripts in the same
+application module as the just merged PR.
+
+
 
 Setting up (and tearing down) the environment - step by step guide
 ------------------------------------------------------------------
