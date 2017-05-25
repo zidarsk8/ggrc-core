@@ -15,14 +15,16 @@ from ggrc.fulltext.attributes import FullTextAttr, DatetimeValue, DateValue
 EXP_TMPL = {'is_autocasted': True}
 
 
-NOT_AUTOCASTED_OPERATIONS = ["AND",
-                             "OR",
-                             "is",
-                             "similar",
-                             "owned",
-                             "relevant",
-                             "related_people",
-                             "text_search"]
+AUTOCASTED_OPERATIONS = [
+    "=",
+    "~",
+    "!~",
+    "!=",
+    ">",
+    "<",
+    ">=",
+    "<=",
+]
 
 
 def build_exp(left, right, operation):
@@ -40,12 +42,8 @@ def build_exp(left, right, operation):
 
 def is_autocast_required_for(exp):
   """Check if autocast is really needed"""
-  operation = exp["op"]["name"]
-  return not (
-      not isinstance(operation, basestring) or
-      exp.get("is_autocasted") or
-      operation in NOT_AUTOCASTED_OPERATIONS
-  )
+  return (not exp.get("is_autocasted") and
+          exp.get("op", {}).get("name") in AUTOCASTED_OPERATIONS)
 
 
 def get_fulltext_parsed_value(klass, key):
@@ -101,8 +99,6 @@ def autocast(exp, target_class):
     operator_name: the name of the operator being applied.
     value: the value being compared.
   """
-  if not is_autocast_required_for(exp):
-    return exp
   operation = exp["op"]["name"]
   exp.update(EXP_TMPL)
   key = exp['left']
