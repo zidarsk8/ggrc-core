@@ -119,3 +119,8 @@ class Projects(CommonDropdownSettings):
 
 class OrgGroups(CommonDropdownSettings):
   """OrgGroups 3BBS button/dropdown settings on Info pages and Info panels."""
+
+
+class Assessments(CommonDropdownSettings):
+  """Assessments 3BBS button/dropdown settings on Info pages and Info panels.
+  """

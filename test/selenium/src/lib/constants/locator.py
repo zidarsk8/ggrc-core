@@ -38,6 +38,7 @@ class Common(object):
   DISABLED_VALUE = "disabled-original"
   MAX = "max"
   NORMAL = "normal"
+  DOWN = "down"
 
 
 class Login(object):
@@ -591,11 +592,9 @@ class CommonWidgetInfo(object):
   INFO_HEADER = Common.INFO_HEADER
   _INFO_HEADER = Common.INFO_HEADER + " .span9 "
   INFO_TOGGLE = Common.INFO_TOGGLE
-  _PAGE_HEADERS_AND_VALUES = (
-      '//*[contains(@class, "object-area")]//*[contains(@class, "info")]'
-      '//div[starts-with(./@class, "span")]')
-  PAGE_HEADER = _PAGE_HEADERS_AND_VALUES + '//*[contains(text(),"{header}")]'
-  PAGE_HEADERS_AND_VALUES = (By.XPATH, _PAGE_HEADERS_AND_VALUES)
+  HEADERS_AND_VALUES = WIDGET + ' div [class*="span"]'
+  PAGE_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
+                             HEADERS_AND_VALUES)
   CAS_HEADERS_AND_VALUES = (
       By.XPATH, '//*[contains(@class, "inline-edit ") and '
                 'not(ancestor::*[contains(@class, "hidden")])]')
@@ -618,11 +617,9 @@ class CommonWidgetInfo(object):
 class WidgetInfoPanel(CommonWidgetInfo):
   """Locators specific for Info panels."""
   INFO_ACTION = Common.INFO_ACTION
-  _PAGE_HEADERS_AND_VALUES = (
-      '//*[contains(@class, "pin-content")]'
-      '//div[starts-with(./@class, "span")]')
-  PANEL_HEADER = _PAGE_HEADERS_AND_VALUES + '//*[contains(text(),"{header}")]'
-  PANEL_HEADERS_AND_VALUES = (By.XPATH, _PAGE_HEADERS_AND_VALUES)
+  PIN_CONTENT = Common.PIN_CONTENT
+  PANEL_HEADERS_AND_VALUES = (
+      By.CSS_SELECTOR, PIN_CONTENT + CommonWidgetInfo.HEADERS_AND_VALUES)
   # user input elements
   BUTTON_MAXIMIZE_MINIMIZE = (By.CSS_SELECTOR,
                               INFO_ACTION + ' [can-click="toggleSize"]')
@@ -732,6 +729,23 @@ class WidgetInfoAudit(WidgetInfoPanel):
 
 class WidgetInfoAssessment(WidgetInfoPanel):
   """Locators for Assessment Info widgets."""
+  WIDGET = Common.INFO_WIDGET
+  TOGGLE = ' [class*="fa-caret"]'
+  # Base
+  CAS_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
+                            WIDGET + " auto-save-form .flex-size-1")
+  CAS_CHECKBOXES = (By.CSS_SELECTOR, '[class*="wrapper"] [type="checkbox"]')
+  MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS = (By.CSS_SELECTOR,
+                                            WIDGET + ' .object-list-item')
+  # Assessment Attributes tab
+  # People section
+  _PEOPLE = WIDGET + ' [title-text="People"]'
+  BUTTON_PEOPLE_TOGGLE = (By.CSS_SELECTOR, _PEOPLE + TOGGLE)
+  PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR, _PEOPLE + " .label-list>li")
+  # Code section
+  _CODE = WIDGET + ' [title-text="Code"]'
+  BUTTON_CODE_TOGGLE = (By.CSS_SELECTOR, _CODE + TOGGLE)
+  CODE_HEADER_AND_VALUE = (By.CSS_SELECTOR, _CODE + " .label-list>li")
 
 
 class WidgetInfoAssessmentTemplate(WidgetInfoPanel):

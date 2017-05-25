@@ -30,15 +30,16 @@ class CommonUnifiedMapperModal(base.Modal):
     """Open dropdown and select element according to destination object name.
     If is_asmts_generation then TextFilterDropdown, else DropdownStatic.
     """
-    obj_type_dropdown = base.DropdownStatic(
-        self._driver, self._locators.OBJ_TYPE_DROPDOWN,
-        self._locators.OBJ_TYPE_DROPDOWN_OPTIONS)
-    obj_type_dropdown.select(obj_name)
-    if is_asmts_generation:
-      asmt_tmpl_dropdown = base.TextFilterDropdown(
+    if obj_name:
+      obj_type_dropdown = base.DropdownStatic(
           self._driver, self._locators.OBJ_TYPE_DROPDOWN,
           self._locators.OBJ_TYPE_DROPDOWN_OPTIONS)
-      asmt_tmpl_dropdown.find_and_select_el_by_text(obj_name)
+      obj_type_dropdown.select(obj_name)
+      if is_asmts_generation:
+        asmt_tmpl_dropdown = base.TextFilterDropdown(
+            self._driver, self._locators.OBJ_TYPE_DROPDOWN,
+            self._locators.OBJ_TYPE_DROPDOWN_OPTIONS)
+        asmt_tmpl_dropdown.find_and_select_el_by_text(obj_name)
 
   def _filter_dest_objs_via_expression_by_titles(self, objs_titles):
     """Enter expression is like 'title=obj1_title or title=obj2_title' into
@@ -127,9 +128,10 @@ class GenerateAssessmentsModal(CommonUnifiedMapperModal):
   """Modal for map objects."""
   _locators = locator.ModalGenerateAssessments
 
-  def generate_asmts(self, asmt_tmpl_title,
-                     objs_under_asmt_titles):
-    """Filter, search objects under Assessment according to them titles.
+  def generate_asmts(self, objs_under_asmt_titles, asmt_tmpl_title=None):
+    """Filter, search objects under Assessment according to them titles:
+    objects under assessments titles, if 'asmt_tmpl_title'
+    then Assessment Template title.
     Generate Assessments based on found objects under Assessment.
     """
     # pylint: disable=invalid-name
