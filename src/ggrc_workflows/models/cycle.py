@@ -5,7 +5,7 @@
 """
 
 import itertools
-from sqlalchemy import orm
+from sqlalchemy import orm, inspect
 
 from ggrc import db
 from ggrc.models.mixins import Described
@@ -24,7 +24,13 @@ from ggrc.fulltext.mixin import Indexed, ReindexRule
 
 
 def _query_filtered_by_contact(person):
-  return Cycle.query.filter(Cycle.contact_id == person.id)
+  """Returns cycle required to reindex for sent persons."""
+  attrs = inspect(person).attrs
+  if any([attrs["email"].history.has_changes(),
+          attrs["name"].history.has_changes()]):
+    return Cycle.query.filter(Cycle.contact_id == person.id)
+  else:
+    return []
 
 
 class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
