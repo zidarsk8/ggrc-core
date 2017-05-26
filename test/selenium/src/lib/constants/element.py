@@ -164,6 +164,9 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   STATUS = "Status"
   AUDIT_LEAD = "Internal Audit Lead"
   MANAGER = "Manager"
+  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
+  CREATORS = "Creators"
+  MAPPED_OBJECTS = "Mapped Objects"
 
 
 class CommonProgram(Common):
@@ -202,21 +205,28 @@ class CommonControl(Common):
   STATE = Base.STATE
   ADMIN = roles.ADMIN
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
+  CREATORS = "Creators"
+  MAPPED_OBJECTS = "Mapped Objects"
 
 
-class CommonAssessment(object):
+class CommonAssessment(Common):
   """Common elements' labels and properties for Assessments objects."""
   ASMT = objects.get_normal_form(objects.get_singular(objects.ASSESSMENTS))
+  STATE = Base.STATE
+  CREATORS_ = "Creator(s) *"
+  CREATORS = TransformationSetVisibleFields.CREATORS
+  MAPPED_OBJECTS = TransformationSetVisibleFields.MAPPED_OBJECTS
+  VERIFIED = TransformationSetVisibleFields.VERIFIED
 
 
-class CommonAssessmentTemplate(object):
+class CommonAssessmentTemplate(Common):
   """Common elements' labels and properties for Assessment Templates objects.
  """
   ASMT_TMPL = objects.get_normal_form(
       objects.get_singular(objects.ASSESSMENT_TEMPLATES))
 
 
-class CommonIssue(object):
+class CommonIssue(Common):
   """Common elements' labels and properties for Issues objects."""
   ISSUE = objects.get_normal_form(objects.get_singular(objects.ISSUES))
 
@@ -270,6 +280,13 @@ class ControlInfoWidget(CommonControl):
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonControl.CONTROL)
   TITLE_UPPER = CommonControl.TITLE.upper()
   CODE_UPPER = CommonControl.CODE.upper()
+
+
+class AssessmentInfoWidget(CommonAssessment):
+  """Elements' labels and properties for Assessments Info widgets."""
+  WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonAssessment.ASMT)
+  TITLE_UPPER = CommonAssessment.TITLE.upper()
+  CODE_UPPER = CommonAssessment.CODE.upper()
 
 
 class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):

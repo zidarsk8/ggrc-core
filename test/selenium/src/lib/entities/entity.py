@@ -4,6 +4,8 @@
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
 
+from lib.utils import string_utils
+
 
 class Entity(object):
   """Class that represent model for base entity."""
@@ -201,7 +203,8 @@ class ControlEntity(Entity):
              for ca_def in self.custom_attribute_definitions]) if
          other.custom_attribute_definitions else True) and
         (set(other.custom_attribute_values).issubset(
-            [ca_val.values()[8] for ca_val in self.custom_attribute_values]) if
+            [ca_val.get("attribute_value")
+             for ca_val in self.custom_attribute_values]) if
          other.custom_attribute_values else True))
 
   def __lt__(self, other):
@@ -261,7 +264,7 @@ class AssessmentTemplateEntity(Entity):
     self.default_people = default_people  # {"verifiers": *, "assessors": *}
     self.verifiers = verifiers  # item of default_people
     self.assessors = assessors  # item of default_people
-    self.template_object_type = template_object_type
+    self.template_object_type = template_object_type  # objs under asmt
     self.updated_at = updated_at  # last updated
     self.custom_attribute_definitions = custom_attribute_definitions
     self.custom_attribute_values = custom_attribute_values
@@ -295,6 +298,7 @@ class AssessmentEntity(Entity):
 
   def __init__(self, slug=None, status=None, owners=None, audit=None,
                recipients=None, verified=None, updated_at=None,
+               objects_under_assessment=None,
                custom_attribute_definitions=None,
                custom_attribute_values=None):
     super(AssessmentEntity, self).__init__()
@@ -305,6 +309,7 @@ class AssessmentEntity(Entity):
     self.recipients = recipients  # "Assessor,Creator,Verifier"
     self.verified = verified
     self.updated_at = updated_at  # last updated
+    self.objects_under_assessment = objects_under_assessment  # mapped objs
     self.custom_attribute_definitions = custom_attribute_definitions
     self.custom_attribute_values = custom_attribute_values
 
@@ -313,20 +318,38 @@ class AssessmentEntity(Entity):
             "url: {url}, slug: {slug}, status: {status}, owners: {owners}, "
             "audit: {audit}, recipients: {recipients}, verified: {verified}, "
             "updated_at: {updated_at}, "
+            "objects_under_assessment: {objects_under_assessment}, "
             "custom_attribute_definitions: {custom_attribute_definitions}, "
             "custom_attribute_values: {custom_attribute_values}").format(
         type=self.type, title=self.title, id=self.id, href=self.href,
         url=self.url, slug=self.slug, status=self.status, owners=self.owners,
         audit=self.audit, recipients=self.recipients, verified=self.verified,
         updated_at=self.updated_at,
+        objects_under_assessment=self.objects_under_assessment,
         custom_attribute_definitions=self.custom_attribute_definitions,
         custom_attribute_values=self.custom_attribute_values)
 
   def __eq__(self, other):
-    return (isinstance(other, self.__class__) and self.type == other.type and
-            self.title == other.title and self.slug == other.slug and
-            self.status == other.status and
-            self.verified == other.verified)
+    return (
+        isinstance(other, self.__class__) and self.type == other.type and
+        self.title == other.title and self.slug == other.slug and
+        self.status == other.status and
+        (self.verified == other.verified or self.verified ==
+         string_utils.get_bool_from_string(str(other.verified))) and
+        (self.owners == other.owners or other.owners
+         in [owner.values() for owner in self.owners][0]) and
+        ([obj_under_amt.title for obj_under_amt in
+            self.objects_under_assessment] == other.objects_under_assessment if
+         isinstance(self.objects_under_assessment, list) else True) and
+        (set(other.custom_attribute_definitions).issubset(
+            [ca_def.values()[1].upper()
+             for ca_def in self.custom_attribute_definitions]) if
+         other.custom_attribute_definitions else True) and
+        (set(other.custom_attribute_values).issubset(
+            [ca_val.get("attribute_value")
+             for ca_val in self.custom_attribute_values]) if
+         other.custom_attribute_values and
+         isinstance(self.custom_attribute_values, list) else True))
 
 
 class IssueEntity(Entity):

@@ -66,7 +66,7 @@ class TestSnapshots(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      ("create_audit_with_control_and_manipulate_on_control",
+      ("dynamic_create_audit_with_control",
        "expected_control", "is_updateable", "is_openable"),
       [("create_audit_with_control_and_update_control",
         "new_control_rest", True, True),
@@ -82,11 +82,11 @@ class TestSnapshots(base.Test):
            "Audit contains snapshotable Control "
            "after updating Control with CAs",
            "Audit contains snapshotable Control "
-           "after deleting CAs of Control"],
-      indirect=["create_audit_with_control_and_manipulate_on_control"])
+           "after deleting CAs for Controls"],
+      indirect=["dynamic_create_audit_with_control"])
   def test_audit_contains_snapshotable_control(
-      self, create_audit_with_control_and_manipulate_on_control,
-      expected_control, is_updateable, is_openable, selenium
+      self, dynamic_create_audit_with_control, expected_control, is_updateable,
+      is_openable, selenium
   ):
     """Test snapshotable Control and check via UI that:
     - Audit contains snapshotable Control after updating Control.
@@ -100,8 +100,7 @@ class TestSnapshots(base.Test):
     - 'create_audit_with_control_with_cas_and_update_control_with_cas'.
     - 'create_audit_with_control_with_cas_and_delete_cas_for_controls'.
     """
-    audit_with_one_control = (
-        create_audit_with_control_and_manipulate_on_control)
+    audit_with_one_control = dynamic_create_audit_with_control
     audit = audit_with_one_control["new_audit_rest"][0]
     expected_control = audit_with_one_control[expected_control][0]
     actual_controls_tab_count = (webui_service.ControlsService(selenium).
@@ -115,14 +114,15 @@ class TestSnapshots(base.Test):
         src_obj=audit, obj=expected_control))
     assert is_control_updateable is is_updateable
     assert is_control_openable is is_openable
-    actual_controls = (webui_service.ControlsService(selenium).
-                       get_list_objs_from_tree_view(src_obj=audit))
-    assert [expected_control] == actual_controls, (
-        messages.ERR_MSG_FORMAT.format([expected_control], actual_controls))
+    actual_control = (
+        webui_service.ControlsService(selenium).get_obj_from_info_panel(
+            src_obj=audit, obj=expected_control))
+    assert expected_control == actual_control, (
+        messages.ERR_MSG_FORMAT.format(expected_control, actual_control))
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      ("create_audit_with_control_and_manipulate_on_control",
+      ("dynamic_create_audit_with_control",
        "control", "expected_control", "is_updateable", "is_openable"),
       [("create_audit_with_control_and_update_control",
         "new_control_rest", "update_control_rest", False, True),
@@ -140,11 +140,11 @@ class TestSnapshots(base.Test):
            "Update snapshotable Control to latest ver "
            "after updating Control with CAs",
            "Update snapshotable Control to latest ver "
-           "after deleting CAs of Control"],
-      indirect=["create_audit_with_control_and_manipulate_on_control"])
+           "after deleting CAs for Controls"],
+      indirect=["dynamic_create_audit_with_control"])
   def test_update_snapshotable_control_to_latest_ver(
-      self, create_audit_with_control_and_manipulate_on_control,
-      control, expected_control, is_updateable, is_openable, selenium
+      self, dynamic_create_audit_with_control, control, expected_control,
+      is_updateable, is_openable, selenium
   ):
     """Test snapshotable Control and check via UI that:
     - Update snapshotable Control to latest ver after updating Control.
@@ -160,8 +160,7 @@ class TestSnapshots(base.Test):
     - 'create_audit_with_control_with_cas_and_update_control_with_cas'.
     - 'create_audit_with_control_with_cas_and_delete_cas_for_controls'.
     """
-    audit_with_one_control = (
-        create_audit_with_control_and_manipulate_on_control)
+    audit_with_one_control = dynamic_create_audit_with_control
     audit = audit_with_one_control["new_audit_rest"][0]
     control = audit_with_one_control[control][0]
     expected_control = audit_with_one_control[expected_control][0]
@@ -178,10 +177,11 @@ class TestSnapshots(base.Test):
         src_obj=audit, obj=expected_control))
     assert is_control_updateable is is_updateable
     assert is_control_openable is is_openable
-    actual_controls = (webui_service.ControlsService(selenium).
-                       get_list_objs_from_tree_view(src_obj=audit))
-    assert [expected_control] == actual_controls, (
-        messages.ERR_MSG_FORMAT.format([expected_control], actual_controls))
+    actual_control = (
+        webui_service.ControlsService(selenium).get_obj_from_info_panel(
+            src_obj=audit, obj=expected_control))
+    assert expected_control == actual_control, (
+        messages.ERR_MSG_FORMAT.format(expected_control, actual_control))
 
   @pytest.mark.smoke_tests
   def test_mapped_to_program_controls_does_not_added_to_existing_audit(

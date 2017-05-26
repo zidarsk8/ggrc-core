@@ -33,6 +33,7 @@ def _new_objs_rest(obj_name, obj_count, has_cas=False, factory_params=None):
   """
   # pylint: disable=unused-argument
   global dict_executed_fixtures
+  _list_cas_types = element.AdminWidgetCustomAttributes.ALL_CA_TYPES
 
   def create_objs_rest(name, count, factory_params):
     """Create new objects via REST API according to object name (plural form)
@@ -49,15 +50,24 @@ def _new_objs_rest(obj_name, obj_count, has_cas=False, factory_params=None):
     Return: [lib.entities.entity.*Entity, ...]
     """
     if extra_attrs[0].type == objects.get_singular(objects.CUSTOM_ATTRIBUTES):
-      return factory.get_cls_rest_service(object_name=name)().create_objs(
-          count=1, factory_params=factory_params,
-          custom_attributes=CustomAttributeDefinitionsFactory().
-          generate_ca_values(list_ca_objs=extra_attrs))
+      if name == objects.ASSESSMENT_TEMPLATES:
+        return factory.get_cls_rest_service(object_name=name)().create_objs(
+            count=1, factory_params=factory_params,
+            custom_attribute_definitions=CustomAttributeDefinitionsFactory().
+            generate_ca_defenitions_for_asmt_tmpls(
+                list_ca_definitions=extra_attrs[:len(_list_cas_types)]),
+            audit=extra_attrs[len(_list_cas_types):][0].__dict__)
+      else:
+        return factory.get_cls_rest_service(object_name=name)().create_objs(
+            count=1, factory_params=factory_params,
+            custom_attributes=CustomAttributeDefinitionsFactory().
+            generate_ca_values(list_ca_objs=extra_attrs))
     else:
       return ([factory.get_cls_rest_service(object_name=name)().
               create_objs(count=1, factory_params=factory_params,
                           **{parent_obj.type.lower(): parent_obj.__dict__})[0]
                for parent_obj in extra_attrs])
+
   parent_obj_name = None
   if obj_name == objects.AUDITS:
     parent_obj_name = (objects.get_singular(objects.PROGRAMS) if obj_count == 1
@@ -66,11 +76,16 @@ def _new_objs_rest(obj_name, obj_count, has_cas=False, factory_params=None):
                   objects.ISSUES):
     parent_obj_name = (objects.get_singular(objects.AUDITS) if obj_count == 1
                        else objects.AUDITS)
-  if has_cas and obj_name in objects.ALL_OBJS:
+  if (has_cas and obj_name in objects.ALL_OBJS
+      and obj_name not in objects.ASSESSMENT_TEMPLATES):
     parent_obj_name = "cas_for_" + obj_name
   if parent_obj_name:
     parent_objs = _get_fixture_from_dict_fixtures(
         fixture="new_{}_rest".format(parent_obj_name))
+    if has_cas and obj_name in objects.ASSESSMENT_TEMPLATES:
+      parent_objs = ([CustomAttributeDefinitionsFactory().create(
+          attribute_type=ca_type, definition_type="") for
+                         ca_type in _list_cas_types] + parent_objs)
     objs = create_objs_rest_used_exta_arrts(
         name=obj_name, factory_params=factory_params, extra_attrs=parent_objs)
   else:
@@ -87,6 +102,7 @@ def generate_common_fixtures(*fixtures):  # flake8: noqa
   'new_cas_for_controls').
   """
   global dict_executed_fixtures
+  _list_cas_types = element.AdminWidgetCustomAttributes.ALL_CA_TYPES
 
   def new_rest_fixture(fixture):
     """Extract arguments of 'new_rest_fixture' fixture from fixture name,
@@ -97,8 +113,8 @@ def generate_common_fixtures(*fixtures):  # flake8: noqa
       obj_name = objects.CUSTOM_ATTRIBUTES
       factory_cas_for_objs = [CustomAttributeDefinitionsFactory().create(
           attribute_type=ca_type,
-          definition_type=objects.get_singular(fixture_params)) for ca_type in
-                              element.AdminWidgetCustomAttributes.ALL_CA_TYPES]
+          definition_type=objects.get_singular(fixture_params))
+          for ca_type in _list_cas_types]
       new_objs = [_new_objs_rest(obj_name=obj_name, obj_count=1,
                                  factory_params=dict(
           attribute_type=ca.attribute_type, definition_type=ca.definition_type,
@@ -215,24 +231,25 @@ def generate_common_fixtures(*fixtures):  # flake8: noqa
       return deleted_objs
 
   for fixture in fixtures:
-    if (fixture.startswith("new_") and fixture.endswith("_ui") and
-            dict_executed_fixtures.get("selenium")):
-      new_objs = new_ui_fixture(web_driver=dict_executed_fixtures["selenium"],
-                                fixture=fixture)
-      dict_executed_fixtures.update({fixture: new_objs})
-    elif fixture.startswith("new_") and fixture.endswith("_rest"):
-      new_objs = new_rest_fixture(fixture=fixture)
-      dict_executed_fixtures.update({fixture: new_objs})
-    elif (fixture.startswith("map_") and
-            fixture.endswith("_rest") and "_to_" in fixture):
-      mapped_objs = map_rest_fixture(fixture=fixture)
-      dict_executed_fixtures.update({fixture: mapped_objs})
-    elif fixture.startswith("update_") and fixture.endswith("_rest"):
-      updated_objs = update_rest_fixture(fixture=fixture)
-      dict_executed_fixtures.update({fixture: updated_objs})
-    elif fixture.startswith("delete_") and fixture.endswith("_rest"):
-      deleted_objs = delete_rest_fixture(fixture=fixture)
-      dict_executed_fixtures.update({fixture: deleted_objs})
+    if isinstance(fixture, str):
+      if (fixture.startswith("new_") and fixture.endswith("_ui") and
+              dict_executed_fixtures.get("selenium")):
+        new_objs = new_ui_fixture(
+            web_driver=dict_executed_fixtures["selenium"], fixture=fixture)
+        dict_executed_fixtures.update({fixture: new_objs})
+      elif fixture.endswith("_rest"):
+        if fixture.startswith("new_"):
+          new_objs = new_rest_fixture(fixture=fixture)
+          dict_executed_fixtures.update({fixture: new_objs})
+        elif (fixture.startswith("map_") and "_to_" in fixture):
+          mapped_objs = map_rest_fixture(fixture=fixture)
+          dict_executed_fixtures.update({fixture: mapped_objs})
+        elif fixture.startswith("update_"):
+          updated_objs = update_rest_fixture(fixture=fixture)
+          dict_executed_fixtures.update({fixture: updated_objs})
+        elif fixture.startswith("delete_"):
+          deleted_objs = delete_rest_fixture(fixture=fixture)
+          dict_executed_fixtures.update({fixture: deleted_objs})
   executed_fixtures_copy = copy.deepcopy(dict_executed_fixtures)
   return executed_fixtures_copy
 
@@ -246,7 +263,7 @@ def generate_snapshots_fixtures(fixture):
            'create_audit_with_control__risk_and_update_control__risk
   """
   global dict_executed_fixtures
-  if fixture.startswith("create_audit_with_"):
+  if isinstance(fixture, str) and fixture.startswith("create_audit_with_"):
     _creation_params = None
     _action_params = None
     updating_params = []

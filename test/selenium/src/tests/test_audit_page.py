@@ -91,10 +91,18 @@ class TestAuditPage(base.Test):
         messages.ERR_MSG_FORMAT.format([expected_asmt], actual_asmts))
 
   @pytest.mark.smoke_tests
+  @pytest.mark.parametrize(
+      "dynamic_new_assessment_template",
+      [None, "new_assessment_template_rest",
+       "new_assessment_template_with_cas_rest"],
+      ids=["Assessments generation without Assessment Template",
+           "Assessments generation based on Assessment Template without LCAs",
+           "Assessments generation based on Assessment Template with LCAs"],
+      indirect=["dynamic_new_assessment_template"])
   def test_asmts_generation(
       self, new_program_rest, new_controls_rest,
       map_new_program_rest_to_new_controls_rest, new_audit_rest,
-      new_assessment_template_rest, selenium
+      dynamic_new_assessment_template, selenium
   ):
     """Check if Assessments can be generated from Audit page via Assessments
     widget using Assessment template and Controls.
@@ -102,26 +110,27 @@ class TestAuditPage(base.Test):
     - Program, Controls created via REST API.
     - Controls mapped to Program via REST API.
     - Audit created under Program via REST API.
-    - Assessment Template created under Audit via REST API.
+    - Assessment Template with CAs created under Audit via REST API.
     """
     expected_asmts = (AssessmentsFactory().generate(
-        objs_under_asmt_tmpl=new_controls_rest, audit=new_audit_rest))
+        objs_under_asmt=new_controls_rest, audit=new_audit_rest,
+        asmt_tmpl=dynamic_new_assessment_template))
     (webui_service.AssessmentsService(selenium).generate_objs_via_tree_view(
-        src_obj=new_audit_rest, asmt_tmpl_obj=new_assessment_template_rest,
-        objs_under_asmt=new_controls_rest))
+        src_obj=new_audit_rest, objs_under_asmt=new_controls_rest,
+        asmt_tmpl_obj=dynamic_new_assessment_template))
     actual_asmts_tab_count = (webui_service.AssessmentsService(selenium).
                               get_count_objs_from_tab(src_obj=new_audit_rest))
     assert len(expected_asmts) == actual_asmts_tab_count
-    actual_asmts = (webui_service.AssessmentsService(selenium).
-                    get_list_objs_from_tree_view(src_obj=new_audit_rest))
+    actual_asmts = [
+        webui_service.AssessmentsService(selenium).get_obj_from_info_panel(
+            src_obj=new_audit_rest, obj=expected_asmt)
+        for expected_asmt in expected_asmts]
     assert expected_asmts == actual_asmts, (
         messages.ERR_MSG_FORMAT.format(expected_asmts, actual_asmts))
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
-  def test_cloned_audit_contains_new_attrs(
-      self, create_and_clone_audit, selenium
-  ):
+  def test_cloned_audit_contains_new_attrs(self, create_and_clone_audit):
     """Check via UI that cloned Audit contains new predicted attributes.
     Preconditions:
     - Execution and return of fixture 'create_and_clone_audit'.

@@ -51,14 +51,15 @@ class BaseWebUiService(object):
     """
     fields = element.TransformationSetVisibleFields
     return {
-        fields.TITLE.upper(): "title", fields.ADMIN.upper(): "owners",
+        fields.TITLE.upper(): "title", fields.MANAGER.upper(): "manager",
         fields.CODE.upper(): "slug", fields.VERIFIED.upper(): "verified",
         fields.STATE.upper(): "status", fields.STATUS.upper(): "status",
         fields.LAST_UPDATED.upper(): "updated_at",
         fields.AUDIT_LEAD.upper(): "contact",
-        fields.MANAGER.upper(): "manager",
+        fields.ADMIN.upper(): "owners", fields.CREATORS.upper(): "owners",
         fields.CAS_HEADERS.upper(): "custom_attribute_definitions",
-        fields.CAS_VALUES.upper(): "custom_attribute_values"
+        fields.CAS_VALUES.upper(): "custom_attribute_values",
+        fields.MAPPED_OBJECTS.upper(): "objects_under_assessment"
     }
 
   def open_widget_of_mapped_objs(self, src_obj):
@@ -309,17 +310,19 @@ class AssessmentsService(BaseWebUiService):
     super(AssessmentsService, self).__init__(
         driver, objects.ASSESSMENTS)
 
-  def generate_objs_via_tree_view(self, src_obj, asmt_tmpl_obj,
-                                  objs_under_asmt):
+  def generate_objs_via_tree_view(self, src_obj, objs_under_asmt,
+                                  asmt_tmpl_obj=None):
     """Open generic widget of mapped objects, open Generation modal from
-    Tree View, fill data according to Assessment Template title and objects
-    under Assessment, generate new Assessment(s).
+    Tree View, fill data according to objects under Assessment
+    and if 'asmt_tmpl_obj' then to Assessment Template title, generate
+    new Assessment(s).
     """
     objs_under_asmt_titles = [obj_under.title for obj_under in
                               objs_under_asmt]
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
+    asmt_tmpl_title = asmt_tmpl_obj.title if asmt_tmpl_obj else None
     (objs_widget.tree_view.open_3bbs().select_generate().
-     generate_asmts(asmt_tmpl_title=asmt_tmpl_obj.title,
+     generate_asmts(asmt_tmpl_title=asmt_tmpl_title,
                     objs_under_asmt_titles=objs_under_asmt_titles))
 
 
