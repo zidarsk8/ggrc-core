@@ -182,6 +182,11 @@
       color: $darkBlue;
     }
 
+    .related-assessments &:hover {
+      text-decoration: underline;
+      color: $blue;
+    }
+
     &.selected {
       background: #40c4ff;
       color: $white;
