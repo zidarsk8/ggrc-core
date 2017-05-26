@@ -171,10 +171,6 @@
           disableConfiguration: true
         };
       }
-      //  it should be like optional parameter on higher-level logic
-      if (modelType === 'CycleTaskGroupObjectTask' && CurrentPage.isMyWork()) {
-        displayAttrNames.push('end_date');
-      }
 
       displayAttrNames = displayAttrNames.concat(mandatoryAttrNames);
 
