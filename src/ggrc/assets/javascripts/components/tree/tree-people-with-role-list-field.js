@@ -58,12 +58,16 @@
       getSourceList: function () {
         var roleName = this.attr('role');
         var instance = this.attr('source');
-        var peopleIds = GGRC.Utils.peopleWithRoleName(instance, roleName);
-
-        return peopleIds;
+        return GGRC.Utils.peopleWithRoleName(instance, roleName);
       },
-      loadItems: function (ids) {
-        return CMS.Models.Person.findAll({id__in: ids.join(',')});
+      loadItems: function (items) {
+        var rq = new RefreshQueue();
+
+        can.each(items, function (item) {
+          rq.enqueue(CMS.Models.Person.model(item));
+        });
+
+        return rq.trigger();
       }
     }),
     events: {

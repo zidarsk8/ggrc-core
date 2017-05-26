@@ -483,7 +483,7 @@
      * @param {CMS.Models.Cacheable} instance - a model instance
      * @param {String} roleName - the name of the custom role
      *
-     * @return {Array} - list of people IDs
+     * @return {Array} - list of people
      */
     peopleWithRoleName: function (instance, roleName) {
       var modelRoles;
@@ -509,7 +509,7 @@
       peopleIds = _
           .chain(instance.access_control_list)
           .filter({ac_role_id: roleId})
-          .map('person.id')
+          .map('person')
           .value();
 
       return peopleIds;
