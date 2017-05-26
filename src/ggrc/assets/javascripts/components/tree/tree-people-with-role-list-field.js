@@ -6,70 +6,19 @@
 (function (can, GGRC) {
   'use strict';
 
+  var viewModel = GGRC.VM.BaseTreePeopleField.extend({
+    role: null,
+    getSourceList: function () {
+      var roleName = this.attr('role');
+      var instance = this.attr('source');
+      return GGRC.Utils.peopleWithRoleName(instance, roleName);
+    }
+  });
+
   GGRC.Components('treePeopleWithRoleListField', {
     tag: 'tree-people-with-role-list-field',
     template: '<content />',
-    viewModel: can.Map.extend({
-      source: null,
-      role: null,
-      people: [],
-      peopleStr: '',
-      init: function () {
-        this.refreshPeople();
-      },
-      refreshPeople: function () {
-        this.getPeopleList()
-          .then(function (data) {
-            this.attr('people', data);
-            this.attr('peopleStr', data.map(function (item) {
-              return item.displayName;
-            }).join(', '));
-          }.bind(this));
-      },
-      getPeopleList: function () {
-        var sourceList = this.getSourceList();
-        var result;
-        var deferred = can.Deferred();
-
-        if (!sourceList.length) {
-          return deferred.resolve([]);
-        }
-
-        this.loadItems(sourceList)
-          .then(function (data) {
-            result = data.map(function (item) {
-              var shortEmail = item.email.replace(/@.*$/, '');
-              var displayName = item.name || shortEmail;
-              return {
-                name: item.name,
-                email: item.email,
-                shortEmail: shortEmail,
-                displayName: displayName
-              };
-            });
-            deferred.resolve(result);
-          })
-          .fail(function () {
-            deferred.resolve([]);
-          });
-
-        return deferred;
-      },
-      getSourceList: function () {
-        var roleName = this.attr('role');
-        var instance = this.attr('source');
-        return GGRC.Utils.peopleWithRoleName(instance, roleName);
-      },
-      loadItems: function (items) {
-        var rq = new RefreshQueue();
-
-        can.each(items, function (item) {
-          rq.enqueue(CMS.Models.Person.model(item));
-        });
-
-        return rq.trigger();
-      }
-    }),
+    viewModel: viewModel,
     events: {
       '{viewModel} source': function () {
         this.viewModel.refreshPeople();
