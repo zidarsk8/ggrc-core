@@ -48,6 +48,8 @@ class TaskGroupTaskFactory(TitledFactory):
 
   task_group = factory.SubFactory(TaskGroupFactory)
   task_type = "text"
+  start_date = date.today()
+  end_date = date.today()
 
 
 class CycleFactory(TitledFactory):
