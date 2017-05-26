@@ -11,37 +11,31 @@
   <span class="status-label status-"></span>
   <div class="w-status">
     {{{instance.description}}}
-
-    <mapping-tree-view
-      parent-instance="instance"
-      mapping="instance.class.info_pane_options.attachments.mapping"
-      item-template="instance.class.info_pane_options.attachments.show_view"
-    />
-    {{^if_equals parent_instance.status 'Verified'}}
-    {{#with_mapping 'folders' instance}} {{! dummy to ensure the child content always updates}}
-    {{#defer 'workflowFolder' instance.workflowFolder allow_fail=true}}
-      {{#if workflowFolder.errors}}
-        <small class="error-inline">
-          <strong>Warning:</strong> You need permission to upload files to workflow folder. <a href="https://drive.google.com/folderview?id={{grdive_msg_to_id workflowFolder.message}}&usp=sharing#">Request access</a>.
-        </small>
-      {{else}}
-        <div class="oneline">
-          {{#if workflowFolder}}
-            <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach supporting file" link_class="entry-attachment tree-item-add" click_event="trigger_upload_parent">
-              Attach
-            </ggrc-gdrive-picker-launcher>
-          {{else}}
-            <small class="error-inline">
-              <strong>Warning:</strong> Workflow folder is not set. Please select a folder before uploading files.
-            </small>
-          {{/if}}
-        </div>
-      {{/need_permission}}
-    {{else}}
-      <div {{attach_spinner '{ "radius": 3, "length": 3, "width": 2 }' 'display:inline-block; top: -5px; margin-left: 5px;' }}></div>
-    {{/defer}}
-    {{/with_mapping}}
-    {{/if_equals}}
+    <div class="evidence-list">
+      <related-documents {instance}="instance" {document-type}="2">
+        <document-object-list
+            {documents}="documents"
+            {instance}="instance">
+          <editable-document-object-list-item {document}="{.}">
+            {{^if_equals parentInstance.status 'Verified'}}
+              <unmap-button
+                {unmaped-callback}="@loadDocuments" 
+                {destination}="instance"
+                {source}="document">
+                <action-toolbar-control>
+                  <i class="fa fa-trash"></i>
+                </action-toolbar-control>
+              </unmap-button>
+            {{/if}}
+          </editable-document-object-list-item>
+        </document-object-list>
+        <cycle-task-entry-attach-button
+          {updated-callback}="@loadDocuments"
+          {parent-instance}="parentInstance"
+          {instance}="instance">
+        </cycle-task-entry-attach-button>
+      </related-documents>
+    </div>
     <span class="entry-author">
       Modified by
       {{#using person=instance.modified_by}}{{>'/static/mustache/people/popover.mustache'}}{{/using}}
