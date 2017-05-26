@@ -301,6 +301,10 @@ dashboard-js-files:
   - components/action-toolbar-control/action-toolbar-control.js
   - components/unmap-button/unmap-button.js
   - components/unmap-button/unmap-person-button.js
+  - components/object-list/document-object-list.js
+  - components/object-list-item/editable-document-object-list-item.js
+  - components/related-objects/related-documents.js
+  - components/assessment/attach-button.js
 
 app-init-files:
   - apps/dashboard.js
@@ -639,6 +643,9 @@ dashboard-js-template-files:
   - quick_form/confirm_buttons.mustache
   - snapshots/dropdown_menu.mustache
   - snapshots/tree_add_item.mustache
+  - components/object-list/document-object-list.mustache
+  - components/object-list-item/editable-document-object-list-item.mustache
+  - components/assessment/attach-button.mustache
 
 dashboard-css-files:
   - dashboard.css

@@ -23,12 +23,27 @@
       <div class="row-fluid wrap-row">
         <div class="span6"></div>
         <div class="span6">
-          <assessment-attachments-list class="attachments-list-control oneline"
-                                       title="Evidence"
-                                       tooltip="You can upload up to 10 files in a single batch"
-                                       {instance}="instance"
-          >
-          </assessment-attachments-list>
+          <related-documents {instance}="instance" {document-type}="2">
+            <document-object-list
+                tooltip="You can upload up to 10 files in a single batch"
+                header="Evidence"
+                mapping-ready="audits"
+                {documents}="documents"
+                {instance}="instance">
+              <editable-document-object-list-item {document}="{.}">
+                <unmap-button
+                  {unmaped-callback}="@loadDocuments" 
+                  {destination}="instance"
+                  {source}="document">
+                  <action-toolbar-control>
+                    <i class="fa fa-trash"></i>
+                  </action-toolbar-control>
+                </unmap-button>
+              </editable-document-object-list-item>
+            </document-object-list>
+            <attach-button {updated-callback}="@loadDocuments" {instance}="instance">
+            </attach-button>
+          </related-documents>
         </div>
       </div>
 

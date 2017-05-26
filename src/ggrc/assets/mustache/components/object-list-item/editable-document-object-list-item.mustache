@@ -1,0 +1,15 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<action-toolbar {document}="document" class="action-toolbar">
+    <document-object-list-item {instance}="document"></document-object-list-item>
+    {{#if showAction}}
+      <div class="action-toolbar__controls">
+        {{#is_allowed 'update' instance context='for'}}
+          <content></content>
+        {{/is_allowed}}
+      </div>
+    {{/if}}
+</action-toolbar>
