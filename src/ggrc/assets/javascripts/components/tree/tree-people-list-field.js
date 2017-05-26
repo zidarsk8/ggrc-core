@@ -66,10 +66,13 @@
         return can.makeArray(this.attr(sourceString));
       },
       loadItems: function (items) {
-        var ids = items.map(function (item) {
-          return item.id;
+        var rq = new RefreshQueue();
+
+        can.each(items, function (item) {
+          rq.enqueue(CMS.Models.Person.model(item));
         });
-        return CMS.Models.Person.findAll({id__in: ids.join(',')});
+
+        return rq.trigger();
       }
     }),
     events: {
