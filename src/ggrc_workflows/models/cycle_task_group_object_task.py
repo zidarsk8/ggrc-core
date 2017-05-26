@@ -11,6 +11,12 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import builder
 from ggrc import db
+from ggrc.fulltext.attributes import (
+    FullTextAttr,
+    MultipleSubpropertyFullTextAttr,
+    DateFullTextAttr
+)
+from ggrc.fulltext.mixin import Indexed, ReindexRule
 from ggrc import login
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
@@ -25,12 +31,6 @@ from ggrc.models import relationship
 from ggrc.models.types import JsonType
 from ggrc_workflows.models.cycle import Cycle
 from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
-from ggrc.fulltext.attributes import (
-    FullTextAttr,
-    MultipleSubpropertyFullTextAttr,
-    DateFullTextAttr
-)
-from ggrc.fulltext.mixin import Indexed, ReindexRule
 
 
 class CycleTaskGroupObjectTask(
