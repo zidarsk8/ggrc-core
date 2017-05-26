@@ -43,7 +43,7 @@ describe('can.Model.Mixin.isOverdue', function () {
       ' and Next Due Date or' +
       ' End Date has already passed today\'s date', function () {
       instance.attr('next_due_date', '2015-01-01');
-      expect(method.apply(instance)).toEqual(false);
+      expect(method.apply(instance)).toEqual(true);
     });
   });
 });
