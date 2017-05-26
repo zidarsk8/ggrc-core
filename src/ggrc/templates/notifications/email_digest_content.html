@@ -97,6 +97,35 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   </ul>
                 {% endif %}
 
+                {% if digest['task_overdue'] %}
+                  <h2 {{ style.sub_title() }} >
+                    The following tasks are overdue, please finish ASAP:
+                  </h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for task in digest['task_overdue'].itervalues() %}
+                    <li {{ style.list_item() }} >
+                      <a
+                        href="{{ task['cycle_task_url'] }}"
+                        {{ style.link_text() }}>{{ task['title'] }}</a>
+                        under
+                      <a
+                        href="{{ task['task_group_url'] }}"
+                        {{ style.link_text() }}>{{ task['task_group'].title }}</a>
+                        of
+                      <a
+                        href="{{ task['workflow_cycle_url'] }}"
+                        {{ style.link_text() }}>{{ task['workflow'].title }}</a>
+                      ({{ task['due_date_statement'] }})
+                      <ul>
+                      {% for related_object_title in task['related_objects'] %}
+                        <li>{{ "%s" % related_object_title if related_object_title }}</li>
+                      {% endfor %}
+                      </ul>
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
                 {% if digest['cycle_started'] %}
                   <h2 {{ style.sub_title() }} >New workflow
                     {{ "cycles" if digest['cycle_started']|length > 1 else "cycle" }}
