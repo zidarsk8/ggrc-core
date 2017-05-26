@@ -596,7 +596,9 @@ class CommonWidgetInfo(object):
       '//div[starts-with(./@class, "span")]')
   PAGE_HEADER = _PAGE_HEADERS_AND_VALUES + '//*[contains(text(),"{header}")]'
   PAGE_HEADERS_AND_VALUES = (By.XPATH, _PAGE_HEADERS_AND_VALUES)
-  CAS_HEADERS_AND_VALUES = (By.CSS_SELECTOR, WIDGET + " .inline-edit")
+  CAS_HEADERS_AND_VALUES = (
+      By.XPATH, '//*[contains(@class, "inline-edit ") and '
+                'not(ancestor::*[contains(@class, "hidden")])]')
   CAS_CHECKBOXES = (By.CSS_SELECTOR, " .inline-edit__checkbox input")
   # labels
   TITLE = (By.CSS_SELECTOR, _INFO_HEADER + "h6")
