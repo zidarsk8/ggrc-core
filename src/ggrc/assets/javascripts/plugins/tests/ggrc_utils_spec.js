@@ -187,10 +187,12 @@ describe('GGRC utils peopleWithRoleName() method', function () {
     });
   });
 
-  it('returns user IDs that have a role granted on a particular instance',
+  it('returns users that have a role granted on a particular instance',
     function () {
       var result = method(instance, 'Role B');
-      expect(result.sort()).toEqual([2, 5]);
+      expect(result.map(function (person) {
+        return person.id;
+      }).sort()).toEqual([2, 5]);
     }
   );
 
