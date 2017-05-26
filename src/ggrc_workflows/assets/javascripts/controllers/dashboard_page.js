@@ -126,8 +126,7 @@
             if (data.status === 'Verified')
               verified++;
             else {
-              // TODO: [Overdue] Move this logic to helper.
-              if (end_date.getTime() < today.getTime()) {
+              if (data.isOverdue) {
                 over_due++;
                 $('dashboard-errors').control().scope.attr('error_msg', 'Some tasks are overdue!');
               }

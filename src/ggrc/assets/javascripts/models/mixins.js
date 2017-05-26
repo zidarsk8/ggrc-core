@@ -323,7 +323,7 @@
         this.attr('next_due_date') || this.attr('end_date'));
       var today = moment().startOf('day');
       var startOfDate = moment(endDate).startOf('day');
-      var isOverdue = endDate && today.diff(startOfDate, 'days') >= 0;
+      var isOverdue = endDate && today.diff(startOfDate, 'days') > 0;
       if (this.attr('status') === 'Verified') {
         return false;
       }
