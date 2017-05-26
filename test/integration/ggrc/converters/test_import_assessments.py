@@ -153,6 +153,8 @@ class TestAssessmentImport(TestCase):
     asmt1 = assessments["Assessment 1"]
     self.assertEqual({"a.b.com", "c d com"},
                      {i.title for i in asmt1.document_url})
+    self.assertEqual({u'evidence title 1'},
+                     {i.title for i in asmt1.document_evidence})
 
   def test_assessment_warnings_errors(self):
     """ Test full assessment import with warnings and errors

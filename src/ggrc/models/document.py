@@ -12,6 +12,7 @@ from ggrc.models.mixins import Base
 from ggrc.models.relationship import Relatable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.utils import validate_option
+from ggrc.models import exceptions
 
 
 class Document(Ownable, Relatable, Base, Indexed, db.Model):
@@ -88,6 +89,22 @@ class Document(Ownable, Relatable, Base, Indexed, db.Model):
     else:
       desired_role = key
     return validate_option(self.__class__.__name__, key, option, desired_role)
+
+  @orm.validates('document_type')
+  def validate_document_type(self, key, document_type):
+    """Returns correct option, otherwise rises an error"""
+    if document_type is None:
+       document_type = self.URL
+    if document_type not in [self.URL, self.ATTACHMENT]:
+        raise exceptions.ValidationError(
+            "Invalid value for attribute {attr}. "
+            "Expected options are {url}, {attachment}.".format(
+                attr=key,
+                url=self.URL,
+                attachment=self.ATTACHMENT,
+            )
+        )
+    return document_type
 
   @classmethod
   def indexed_query(cls):
