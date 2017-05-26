@@ -170,14 +170,7 @@
 
     tree_view_options: {
       show_view: _mustachePath + '/tree.mustache',
-      footer_view: _mustachePath + '/tree_footer.mustache',
-      child_options: [{
-        // 0: Documents
-        model: 'Document',
-        mapping: 'documents',
-        show_view: _mustachePath + '/documents.mustache',
-        footer_view: _mustachePath + '/documents_footer.mustache'
-      }]
+      footer_view: _mustachePath + '/tree_footer.mustache'
     },
     init: function () {
       this._super.apply(this, arguments);
