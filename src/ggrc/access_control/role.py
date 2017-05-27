@@ -91,5 +91,6 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
       raise ValueError(u"Global custom attribute '{}' "
                        u"already exists for this object type"
                        .format(name))
-
-    return name
+    if key == "name":
+      return name
+    return object_type
