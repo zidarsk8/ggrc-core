@@ -212,10 +212,6 @@
       control = new descriptor
         .controller($element, descriptor.controller_options);
 
-      // FIXME: This should be elsewhere -- currently required so TreeView can
-      //   initialize ObjectNav with counts
-      control.prepare();
-
       // FIXME: Abstraction violation: Sortable/DashboardWidget/ResizableWidget
       //   controllers should maybe handle this?
       $container = this.get_active_widget_containers().eq(0);

@@ -41,9 +41,19 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
     this.element
       .addClass('widget')
       .addClass(this.options.object_category)
-      .attr('id', this.options.widget_id + '_widget')
-      //  This is used only by ResizeWidgets controller
-      .trigger('section_created');
+      .attr('id', this.options.widget_id + '_widget');
+
+    if (this.options.widgetType && this.options.widgetType === 'treeview') {
+      var counts = GGRC.Utils.CurrentPage.getCounts();
+      var countsName = this.options.countsName ||
+        this.options.model.shortName;
+
+      this.options.widget_count.attr('count', '' + counts.attr(countsName));
+
+      counts.on(countsName, function (ev, newVal, oldVal) {
+        can.trigger(this.element, 'updateCount', [newVal]);
+      }.bind(this));
+    }
   },
   prepare: function () {
     if (this._prepare_deferred)
@@ -121,8 +131,14 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
         }
       }).done(tracker_stop);
     } else {
-      this._display_deferred =
-        this.element.find('tree-widget-container').viewModel().display();
+      this._display_deferred = this.prepare().then(function() {
+        if (that.options.widgetType === 'treeview') {
+          return that.element.find('tree-widget-container')
+            .viewModel().display();
+        } else {
+          return new $.Deferred().resolve();
+        }
+      }).done(tracker_stop);
     }
 
     return this._display_deferred;

@@ -280,20 +280,6 @@
         return options.filter && options.depth;
       }).reduce(this._concatFilters, '');
     },
-    initCount: function () {
-      var $el = this.attr('$el');
-      var counts = CurrentPageUtils.getCounts();
-      var countsName = this.attr('options').countsName ||
-        this.attr('model').shortName;
-
-      if ($el) {
-        can.trigger($el, 'updateCount', [counts.attr(countsName)]);
-      }
-
-      counts.on(countsName, function (ev, newVal, oldVal) {
-        can.trigger($el, 'updateCount', [newVal]);
-      });
-    },
     registerFilter: function (option) {
       this.attr('filters').push(option);
     },
@@ -523,8 +509,6 @@
       inserted: function () {
         var viewModel = this.viewModel;
         viewModel.attr('$el', this.element);
-
-        viewModel.initCount();
 
         this.element.closest('.widget')
           .on('widget_hidden', viewModel._widgetHidden.bind(viewModel));
