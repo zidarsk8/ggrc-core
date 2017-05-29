@@ -28,8 +28,12 @@
           }
         } :
         [];
-        return GGRC.Utils.QueryAPI
+
+        var query = GGRC.Utils.QueryAPI
           .buildParam('Document', {}, relevantFilters, [], additionalFilter);
+        query.order_by = [{name: 'created_at', desc: false}];
+
+        return query;
       },
       loadDocuments: function () {
         var self = this;
