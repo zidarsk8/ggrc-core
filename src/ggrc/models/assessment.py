@@ -11,9 +11,9 @@ from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
+from ggrc.builder import simple_property
 from ggrc.models import reflection
 from ggrc.models.comment import Commentable
-from ggrc.models.computed_property import computed_property
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.mixins import BusinessObject
@@ -224,7 +224,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       "threshold": 1,
   }
 
-  @computed_property
+  @simple_property
   def archived(self):
     return self.audit.archived
 

@@ -5,7 +5,7 @@
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
-from ggrc.models.computed_property import computed_property
+from ggrc.builder import simple_property
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (
     BusinessObject, Timeboxed, CustomAttributable, TestPlanned
@@ -44,6 +44,6 @@ class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
       db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False),
       'Assessment')
 
-  @computed_property
+  @simple_property
   def archived(self):
     return self.audit.archived
