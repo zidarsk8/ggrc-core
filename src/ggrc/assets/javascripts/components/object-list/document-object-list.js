@@ -19,8 +19,7 @@
           value: ''
         }
       },
-      limit: 5,
-      instance: null,
+      instance: {},
       documents: []
     }
   });

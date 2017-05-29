@@ -14,7 +14,7 @@
     tag: tag,
     template: template,
     viewModel: {
-      instance: null,
+      instance: {},
       updatedCallback: '@',
       confirmationCallback: function () {
         var confirmation = null;

@@ -14,7 +14,7 @@
     tag: tag,
     template: tpl,
     viewModel: {
-      document: null
+      document: {}
     }
   });
 })(window.can, window.GGRC);

@@ -9,10 +9,10 @@
   GGRC.Components('relatedDocuments', {
     tag: 'related-documents',
     viewModel: {
-      instance: null,
+      instance: {},
       documentType: '@',
       documents: [],
-      isLoading: {},
+      isLoading: false,
       getDocumentsQuery: function () {
         var relevantFilters = [{
           type: this.attr('instance.type'),
