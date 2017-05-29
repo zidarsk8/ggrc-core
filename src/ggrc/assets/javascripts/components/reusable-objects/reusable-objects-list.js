@@ -10,30 +10,27 @@
     createRelationship: function (source, destination) {
       return new CMS.Models.Relationship({
         context: source.context,
-        source: source.stub(),
-        destination: destination
-      });
-    },
-    createObjectRelationship: function (source, destination) {
-      return new CMS.Models.Relationship({
-        context: source.context,
         source: source,
         destination: destination
       });
     },
-    isEvidence: function (type) {
-      return type === 'evidence';
-    },
     mapObjects: function (source, destination, type) {
-      return this.isEvidence(type) ?
-        this.createObjectRelationship(source, destination) :
-        this.createRelationship(source, destination);
+      return this.createRelationship(source, destination);
     }
   };
 
   GGRC.Components('reusableObjectsList', {
     tag: 'reusable-objects-list',
     viewModel: {
+      define: {
+        baseInstanceDocuments: {
+          get: function (value) {
+            return this.attr('urls').concat(this.attr('evidences'));
+          }
+        }
+      },
+      evidences: [],
+      urls: [],
       baseInstance: null,
       checkReusedStatus: false,
       documentList: [],
@@ -87,26 +84,11 @@
         this.attr('isSaving', false);
         this.attr('checkReusedStatus', true);
         this.attr('baseInstance').dispatch('refreshInstance');
-        this.updateBaseInstanceDocuments();
-      },
-      updateBaseInstanceDocuments: function() {
-        var documents = this.attr('urls')
-          .concat(this.attr('evidences'));
-        this.attr('baseInstanceDocuments').replace(documents);
       }
-    },
-    init: function () {
-      this.viewModel.updateBaseInstanceDocuments();
     },
     events: {
       '{viewModel.documentList} length': function () {
         this.scope.setHasSelected();
-      },
-      '{viewModel.urls} length': function () {
-        this.viewModel.updateBaseInstanceDocuments();
-      },
-      '{viewModel.evidences} length': function () {
-        this.viewModel.updateBaseInstanceDocuments();
       }
     }
   });
