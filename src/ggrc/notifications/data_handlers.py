@@ -11,8 +11,12 @@ import datetime
 import urlparse
 from logging import getLogger
 
+import pytz
+from pytz import timezone
+
 from ggrc import models
 from ggrc import utils
+from ggrc.utils import DATE_FORMAT_US
 
 
 # pylint: disable=invalid-name
@@ -241,6 +245,15 @@ def get_assignable_data(notif):
 
 
 def generate_comment_notification(obj, comment, person):
+  datetime_format = DATE_FORMAT_US + " %H:%M:%S %Z"
+
+  # NOTE: For the time being, the majority of users are located in US/Pacific
+  # time zone, thus the latter is used to convert UTC times read from database.
+  pacific_tz = timezone("US/Pacific")
+  created_at = comment.created_at.replace(
+      tzinfo=pytz.utc
+  ).astimezone(pacific_tz)
+
   return {
       "user": get_person_dict(person),
       "comment_created": {
@@ -250,7 +263,8 @@ def generate_comment_notification(obj, comment, person):
               "parent_type": obj._inflector.title_singular.title(),
               "parent_id": obj.id,
               "parent_url": get_object_url(obj),
-              "parent_title": obj.title
+              "parent_title": obj.title,
+              "created_at": created_at.strftime(datetime_format)
           }
       }
   }
