@@ -174,7 +174,6 @@ dashboard-js-files:
   - components/object-popover/object-popover.js
   - components/mapped-objects/mapped-objects.js
   - components/related-objects/related-audits.js
-  - components/related-objects/related-attachments-and-urls.js
   - components/related-objects/related-assessment-item.js
   - components/related-objects/related-assessment-list.js
   - components/related-objects/related-comments.js

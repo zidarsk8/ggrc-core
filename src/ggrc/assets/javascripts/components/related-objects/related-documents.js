@@ -12,6 +12,7 @@
       instance: null,
       documentType: '@',
       documents: [],
+      isLoading: {},
       loadDocuments: function () {
         var self = this;
         var queryApi = GGRC.Utils.QueryAPI;
@@ -20,19 +21,23 @@
           id: this.attr('instance.id'),
           operation: 'relevant'
         }];
-        var additionalFilter = {
+        var additionalFilter = this.attr('documentType') ?
+        {
           expression: {
             left: 'document_type',
             op: {name: '='},
             right: this.attr('documentType')
           }
-        };
+        } :
+        [];
         var query = queryApi
           .buildParam('Document', {}, relevantFilters, [], additionalFilter);
 
+        this.attr('isLoading', true);
         queryApi.batchRequests(query).then(function (response) {
           var documents = response.Document.values;
           self.attr('documents').replace(documents);
+          self.attr('isLoading', false);
         });
       }
     },

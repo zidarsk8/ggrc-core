@@ -14,6 +14,7 @@
     tag: tag,
     template: template,
     viewModel: {
+      instance: null,
       updatedCallback: '@',
       confirmationCallback: function () {
         var confirmation = null;
@@ -34,7 +35,7 @@
         return confirmation;
       },
       itemsUploadedCallback: function () {
-        if (_.isFunction(this.attr('updatedCallback'))) {
+        if (can.isFunction(this.attr('updatedCallback'))) {
           this.attr('updatedCallback')();
         }
 

@@ -75,11 +75,13 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                             </related-audits>
                         </div>
                         <div class="flex-size-3">
-                            <related-attachments-and-urls {instance}="instance">
+                            <related-documents
+                                {^is-loading}="loadingState.attachmentsLoading"
+                                {instance}="instance">
                                 <object-list {items}="documents">
                                     <document-object-list-item {instance}="{.}"></document-object-list-item>
                                 </object-list>
-                            </related-attachments-and-urls>
+                            </related-documents>
                         </div>
                         <div class="grid-data__action-column">
                             <button class="btn btn-icon btn-icon-sm" title="Show More Information"><i class="fa fa-info-circle"></i></button>
