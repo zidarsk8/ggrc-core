@@ -13,9 +13,7 @@
       documentType: '@',
       documents: [],
       isLoading: {},
-      loadDocuments: function () {
-        var self = this;
-        var queryApi = GGRC.Utils.QueryAPI;
+      getDocumentsQuery: function () {
         var relevantFilters = [{
           type: this.attr('instance.type'),
           id: this.attr('instance.id'),
@@ -30,11 +28,15 @@
           }
         } :
         [];
-        var query = queryApi
+        return GGRC.Utils.QueryAPI
           .buildParam('Document', {}, relevantFilters, [], additionalFilter);
+      },
+      loadDocuments: function () {
+        var self = this;
+        var query = this.getDocumentsQuery();
 
         this.attr('isLoading', true);
-        queryApi.batchRequests(query).then(function (response) {
+        GGRC.Utils.QueryAPI.batchRequests(query).then(function (response) {
           var documents = response.Document.values;
           self.attr('documents').replace(documents);
           self.attr('isLoading', false);
