@@ -107,7 +107,7 @@
       this.validateNonBlank('email');
       this.validateFormatOf('email', rEmail);
     },
-    getUserRoles: function (instance, person) {
+    getUserRoles: function (instance, person, specificOject) {
       var result = $.Deferred();
       var refreshQueue = new RefreshQueue();
       var userRoles;
@@ -117,10 +117,25 @@
       });
 
       refreshQueue.trigger().then(function (roles) {
+        var object;
+        var objectInstance;
+        var objectContextId;
+
         userRoles = _.filter(roles, function (role) {
           return instance.context && role.context &&
             role.context.id === instance.context.id;
         });
+
+        if (_.isEmpty(userRoles) && !_.isEmpty(specificOject)) {
+          object = _.get(instance, specificOject);
+          objectInstance = _.result(object, 'getInstance');
+          objectContextId = _.get(objectInstance, 'context_id');
+
+          userRoles = _.filter(roles, function (role) {
+            return role.context && role.context.id === objectContextId;
+          });
+        }
+
         result.resolve(userRoles);
       });
       return result.promise();

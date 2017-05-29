@@ -37,6 +37,9 @@
           binding.instance.object_people.length) {
           result = CMS.Models.Person
             .getPersonMappings(binding.instance, instance, 'object_people');
+        } else if (binding.instance instanceof CMS.Models.Audit) {
+          result = CMS.Models.Person
+            .getUserRoles(binding.instance, instance, 'program');
         } else {
           result = CMS.Models.Person
             .getUserRoles(binding.instance, instance);
