@@ -34,19 +34,17 @@
                     <div class="assessment-controls__extra-controls">
                         <div>
                             <h6>Evidence</h6>
-                            <document-object-list
-                                {documents}="evidences"
-                                {instance}="instance">
-                                    <editable-document-object-list-item {document}="{.}">
-                                        <unmap-button 
-                                            {destination}="instance"
-                                            {source}="document">
-                                            <action-toolbar-control>
-                                                <i class="fa fa-trash"></i>
-                                            </action-toolbar-control>
-                                        </unmap-button>
-                                    </editable-document-object-list-item>
-                            </document-object-list>
+                            <object-list {items}="evidences" {empty-message}="noItemsText">
+                                <editable-document-object-list-item {document}="{.}">
+                                    <unmap-button 
+                                        {destination}="instance"
+                                        {source}="document">
+                                        <action-toolbar-control>
+                                            <i class="fa fa-trash"></i>
+                                        </action-toolbar-control>
+                                    </unmap-button>
+                                </editable-document-object-list-item>
+                            </object-list>
                             <attach-button {instance}="instance">
                             </attach-button>
                         </div>

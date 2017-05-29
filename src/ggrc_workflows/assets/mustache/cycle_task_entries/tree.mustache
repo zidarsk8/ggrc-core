@@ -13,9 +13,7 @@
     {{{instance.description}}}
     <div class="evidence-list">
       <related-documents {instance}="instance" {document-type}="2">
-        <document-object-list
-            {documents}="documents"
-            {instance}="instance">
+        <object-list {items}="documents">
           <editable-document-object-list-item {document}="{.}">
             {{^if_equals parentInstance.status 'Verified'}}
               <unmap-button
@@ -28,7 +26,7 @@
               </unmap-button>
             {{/if}}
           </editable-document-object-list-item>
-        </document-object-list>
+        </object-list>
       </related-documents>
     </div>
     <span class="entry-author">

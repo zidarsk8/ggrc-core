@@ -28,9 +28,7 @@
       <div class="span4">
         <related-documents {instance}="instance" {document-type}="2">
           <h6>Supporting files</h6>
-          <document-object-list
-              {documents}="documents"
-              {instance}="instance">
+          <object-list {items}="documents" {empty-message}="noItemsText">
             <editable-document-object-list-item {document}="{.}">
               <unmap-button
                 {unmaped-callback}="@loadDocuments" 
@@ -41,7 +39,7 @@
                 </action-toolbar-control>
               </unmap-button>
             </editable-document-object-list-item>
-          </document-object-list>
+          </object-list>
 
           {{#is_allowed 'update'}}
             <ggrc-gdrive-picker-launcher

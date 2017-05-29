@@ -21,12 +21,10 @@
       {{#if evidence}}
         <related-documents {instance}="instance" {document-type}="2">
             <h6>Evidence</h6>
-            <document-object-list
-                {documents}="documents"
-                {instance}="instance">
+            <object-list {items}="documents" {empty-message}="noItemsText">
                 <editable-document-object-list-item {document}="{.}">
                 </editable-document-object-list-item>
-            </document-object-list>
+            </object-list>
             <attach-button {updated-callback}="@loadDocuments" {instance}="instance">
             </attach-button>
         </related-documents>
