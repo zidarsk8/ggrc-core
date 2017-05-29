@@ -90,8 +90,17 @@
       getSnapshotQuery: function () {
         return this.getQuery('Snapshot');
       },
-      getDocumentQuery: function (additionalFilter) {
-        return this.getQuery('Document', undefined, additionalFilter);
+      getEvidenceQuery: function () {
+        return this.getQuery(
+          'Document',
+          undefined,
+          this.getDocumentAdditionFilter(2));
+      },
+      getUrlQuery: function () {
+        return this.getQuery(
+          'Document',
+          undefined,
+          this.getDocumentAdditionFilter(1));
       },
       requestQuery: function (query) {
         var dfd = can.Deferred();
@@ -119,9 +128,12 @@
         var query = this.getCommentQuery();
         return this.requestQuery(query);
       },
-      loadDocuments: function (documentType) {
-        var additionalFilter = this.getDocumentAdditionFilter(documentType);
-        var query = this.getDocumentQuery(additionalFilter);
+      loadEvidences: function () {
+        var query = this.getEvidenceQuery();
+        return this.requestQuery(query);
+      },
+      loadUrls: function () {
+        var query = this.getUrlQuery();
         return this.requestQuery(query);
       },
       getDocumentAdditionFilter: function (documentType) {
@@ -141,9 +153,9 @@
         this.attr('comments')
           .replace(this.loadComments());
         this.attr('evidences')
-          .replace(this.loadDocuments(2));
+          .replace(this.loadEvidences());
         this.attr('urls')
-          .replace(this.loadDocuments(1));
+          .replace(this.loadUrls());
       },
       initializeFormFields: function () {
         this.attr('formFields',
