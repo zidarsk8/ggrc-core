@@ -24,23 +24,22 @@
     viewModel: {
       define: {
         baseInstanceDocuments: {
-          get: function (value) {
+          get: function () {
             return this.attr('urls').concat(this.attr('evidences'));
+          }
+        },
+        hasSelected: {
+          get: function () {
+            return !!this.attr('documentList.length');
           }
         }
       },
       evidences: [],
       urls: [],
-      baseInstance: null,
-      checkReusedStatus: false,
+      baseInstance: {},
       documentList: [],
       isSaving: false,
       baseInstanceDocuments: [],
-      setHasSelected: function () {
-        var hasSelected =
-          this.attr('documentList.length');
-        this.attr('hasSelected', hasSelected);
-      },
       getMapObjects: function (source, list, mapperType) {
         return Array.prototype.filter
         // Get Array of unique items
@@ -64,7 +63,6 @@
         var reusedObjectList = this.getReusedObjectList();
 
         this.attr('isSaving', true);
-        this.attr('checkReusedStatus', false);
 
         can.when.apply(can, reusedObjectList)
           .done(function () {
@@ -82,13 +80,7 @@
       restoreDefaults: function () {
         this.attr('documentList').replace([]);
         this.attr('isSaving', false);
-        this.attr('checkReusedStatus', true);
         this.attr('baseInstance').dispatch('refreshInstance');
-      }
-    },
-    events: {
-      '{viewModel.documentList} length': function () {
-        this.scope.setHasSelected();
       }
     }
   });
