@@ -9,6 +9,8 @@ Main contributed functions are:
 
 import datetime
 import urlparse
+
+from collections import namedtuple
 from logging import getLogger
 
 import pytz
@@ -17,6 +19,11 @@ from pytz import timezone
 from ggrc import models
 from ggrc import utils
 from ggrc.utils import DATE_FORMAT_US
+
+
+# a helper type for storing comments' parent object information
+ParentObjInfo = namedtuple(
+    "ParentObjInfo", ["id", "object_type", "title", "url"])
 
 
 # pylint: disable=invalid-name
@@ -245,6 +252,16 @@ def get_assignable_data(notif):
 
 
 def generate_comment_notification(obj, comment, person):
+  """Prepare notification data for a comment that was posted on an object.
+
+  Args:
+    obj: the object the comment was posted on
+    comment: a Comment instance
+    person: the person to be notified about the comment
+
+  Returns:
+    Dictionary with data needed for the comment notification email.
+  """
   datetime_format = DATE_FORMAT_US + " %H:%M:%S %Z"
 
   # NOTE: For the time being, the majority of users are located in US/Pacific
@@ -254,17 +271,26 @@ def generate_comment_notification(obj, comment, person):
       tzinfo=pytz.utc
   ).astimezone(pacific_tz)
 
+  parent_info = ParentObjInfo(
+      obj.id,
+      obj._inflector.title_singular.title(),
+      obj.title,
+      get_object_url(obj)
+  )
+
   return {
       "user": get_person_dict(person),
       "comment_created": {
-          comment.id: {
-              "description": comment.description,
-              "commentator": get_person_dict(comment.modified_by),
-              "parent_type": obj._inflector.title_singular.title(),
-              "parent_id": obj.id,
-              "parent_url": get_object_url(obj),
-              "parent_title": obj.title,
-              "created_at": created_at.strftime(datetime_format)
+          parent_info: {
+              comment.id: {
+                  "description": comment.description,
+                  "commentator": get_person_dict(comment.modified_by),
+                  "parent_type": parent_info.object_type,
+                  "parent_id": parent_info.id,
+                  "parent_url": get_object_url(obj),
+                  "parent_title": obj.title,
+                  "created_at": created_at.strftime(datetime_format)
+              }
           }
       }
   }
