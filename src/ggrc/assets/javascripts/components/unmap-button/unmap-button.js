@@ -22,7 +22,7 @@
           .done(function (item) {
             item.destroy()
               .then(function () {
-                if (_.isFunction(this.attr('unmapedCallback'))) {
+                if (can.isFunction(this.attr('unmapedCallback'))) {
                   this.attr('unmapedCallback')();
                 }
 
