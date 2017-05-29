@@ -484,8 +484,6 @@
       '{viewModel.pageInfo} pageSize': function () {
         this.viewModel.loadItems();
       },
-      ' childTreeTypes': function () {
-      },
       ' selectTreeItem': function (el, ev, selectedEl, instance) {
         var parent = this.viewModel.attr('parent_instance');
         var infoPaneOptions = new can.Map({
@@ -514,6 +512,7 @@
           .on('widget_hidden', viewModel._widgetHidden.bind(viewModel));
         this.element.closest('.widget')
           .on('widget_shown', viewModel._widgetShown.bind(viewModel));
+        viewModel._widgetShown();
       }
     }
   });
