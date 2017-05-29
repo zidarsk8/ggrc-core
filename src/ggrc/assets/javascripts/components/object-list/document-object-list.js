@@ -19,12 +19,9 @@
           value: ''
         }
       },
-      title: '@',
-      tooltip: '@',
       limit: 5,
       instance: null,
-      documents: [],
-      header: '@'
+      documents: []
     }
   });
 })(window.GGRC, window.can, window.can.$);
