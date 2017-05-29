@@ -15,17 +15,13 @@
       objectProp: '@',
       destination: {},
       source: {},
-      unmapedCallback: '@',
       unmapInstance: function () {
         this.getMapping()
           .refresh()
           .done(function (item) {
             item.destroy()
               .then(function () {
-                if (can.isFunction(this.attr('unmapedCallback'))) {
-                  this.attr('unmapedCallback')();
-                }
-
+                this.dispatch('unmapped');
                 this.attr('destination').dispatch('refreshInstance');
                 can.trigger('unmap', {params: [
                   this.attr('source'),

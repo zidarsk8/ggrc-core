@@ -15,7 +15,6 @@
     template: template,
     viewModel: {
       instance: {},
-      updatedCallback: '@',
       confirmationCallback: function () {
         var confirmation = null;
 
@@ -35,9 +34,7 @@
         return confirmation;
       },
       itemsUploadedCallback: function () {
-        if (can.isFunction(this.attr('updatedCallback'))) {
-          this.attr('updatedCallback')();
-        }
+        this.dispatch('refreshEvidences');
 
         if (this.attr('instance')) {
           this.attr('instance').dispatch('refreshInstance');

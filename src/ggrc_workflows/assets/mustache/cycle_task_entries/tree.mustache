@@ -17,7 +17,7 @@
           <editable-document-object-list-item {document}="{.}">
             {{^if_equals parentInstance.status 'Verified'}}
               <unmap-button
-                {unmaped-callback}="@loadDocuments" 
+                (unmapped)="loadDocuments()"
                 {destination}="instance"
                 {source}="document">
                 <action-toolbar-control>

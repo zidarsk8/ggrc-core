@@ -28,7 +28,7 @@
             <object-list {items}="documents" {empty-message}="noItemsText">
               <editable-document-object-list-item {document}="{.}">
                 <unmap-button
-                  {unmaped-callback}="@loadDocuments" 
+                  (unmapped)="loadDocuments()"
                   {destination}="instance"
                   {source}="document">
                   <action-toolbar-control>
@@ -37,7 +37,7 @@
                 </unmap-button>
               </editable-document-object-list-item>
             </object-list>
-            <attach-button {updated-callback}="@loadDocuments" {instance}="instance">
+            <attach-button (refresh-evidences)="loadDocuments()" {instance}="instance">
             </attach-button>
           </related-documents>
         </div>

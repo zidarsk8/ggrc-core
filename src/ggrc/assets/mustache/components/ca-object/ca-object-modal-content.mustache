@@ -25,7 +25,7 @@
                 <editable-document-object-list-item {document}="{.}">
                 </editable-document-object-list-item>
             </object-list>
-            <attach-button {updated-callback}="@loadDocuments" {instance}="instance">
+            <attach-button (refresh-evidences)="loadDocuments()" {instance}="instance">
             </attach-button>
         </related-documents>
       {{/if}}
