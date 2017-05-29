@@ -70,14 +70,18 @@
       },
       formState: {},
       triggerFormSaveCbs: $.Callbacks(),
-      getQuery: function (type, sortObj) {
+      getQuery: function (type, sortObj, additionalFilter) {
         var relevantFilters = [{
           type: this.attr('instance.type'),
           id: this.attr('instance.id'),
           operation: 'relevant'
         }];
         return GGRC.Utils.QueryAPI
-          .buildParam(type, sortObj || {}, relevantFilters, [], []);
+          .buildParam(type,
+            sortObj || {},
+            relevantFilters,
+            [],
+            additionalFilter || []);
       },
       getCommentQuery: function () {
         return this.getQuery('Comment',
@@ -86,8 +90,8 @@
       getSnapshotQuery: function () {
         return this.getQuery('Snapshot');
       },
-      getDocumentQuery: function () {
-        return this.getQuery('Document');
+      getDocumentQuery: function (additionalFilter) {
+        return this.getQuery('Document', undefined, additionalFilter);
       },
       requestQuery: function (query) {
         var dfd = can.Deferred();
@@ -115,24 +119,31 @@
         var query = this.getCommentQuery();
         return this.requestQuery(query);
       },
-      loadDocuments: function () {
-        var query = this.getDocumentQuery();
+      loadDocuments: function (documentType) {
+        var additionalFilter = this.getDocumentAdditionFilter(documentType);
+        var query = this.getDocumentQuery(additionalFilter);
         return this.requestQuery(query);
       },
+      getDocumentAdditionFilter: function (documentType) {
+        return documentType ?
+          {
+            expression: {
+              left: 'document_type',
+              op: {name: '='},
+              right: documentType
+            }
+          } :
+          [];
+      },
       updateRelatedItems: function () {
-        var self = this;
         this.attr('mappedSnapshots')
           .replace(this.loadSnapshots());
         this.attr('comments')
           .replace(this.loadComments());
-
-        this.loadDocuments().then(function (documents) {
-          var grouped = _.groupBy(documents, 'document_type');
-
-          // TODO: Update when the backend changes this to bool/enum
-          self.attr('urls').replace(grouped['1']);
-          self.attr('evidences').replace(grouped['2']);
-        });
+        this.attr('evidences')
+          .replace(this.loadDocuments(2));
+        this.attr('urls')
+          .replace(this.loadDocuments(1));
       },
       initializeFormFields: function () {
         this.attr('formFields',
