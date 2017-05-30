@@ -91,16 +91,18 @@
         return this.getQuery('Snapshot');
       },
       getEvidenceQuery: function () {
+        var evidenceType = CMS.Models.Document.EVIDENCE;
         return this.getQuery(
           'Document',
           undefined,
-          this.getDocumentAdditionFilter(2));
+          this.getDocumentAdditionFilter(evidenceType));
       },
       getUrlQuery: function () {
+        var urlType = CMS.Models.Document.URL;
         return this.getQuery(
           'Document',
           undefined,
-          this.getDocumentAdditionFilter(1));
+          this.getDocumentAdditionFilter(urlType));
       },
       requestQuery: function (query) {
         var dfd = can.Deferred();

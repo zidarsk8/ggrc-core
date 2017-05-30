@@ -20,7 +20,7 @@ describe('GGRC.Components.relatedDocuments', function () {
   });
 
   describe('"getDocumentsQuery" method', function () {
-    function checkAdditionFilter (documentType) {
+    function checkAdditionFilter(documentType) {
       var query;
       var additionFilter;
       viewModel.attr('documentType', documentType);
@@ -33,18 +33,19 @@ describe('GGRC.Components.relatedDocuments', function () {
     }
 
     it('should get query for urls', function () {
-      checkAdditionFilter('1');
+      checkAdditionFilter(CMS.Models.Document.URL);
     });
 
     it('should get query for evidences', function () {
-      checkAdditionFilter('2');
+      checkAdditionFilter(CMS.Models.Document.EVIDENCE);
     });
 
     it('should get query for all documents', function () {
       var query;
+      var expression;
       viewModel.attr('documentType', undefined);
       query = viewModel.getDocumentsQuery();
-      var expression = query.filters.expression;
+      expression = query.filters.expression;
       expect(expression).toBeDefined();
       expect(expression.object_name).toEqual(instance.type);
       expect(expression.ids[0]).toEqual(instance.id);

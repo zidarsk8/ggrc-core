@@ -15,6 +15,8 @@
     create: 'POST /api/documents',
     update: 'PUT /api/documents/{id}',
     destroy: 'DELETE /api/documents/{id}',
+    EVIDENCE: 'EVIDENCE',
+    URL: 'URL',
     search: function (request, response) {
       return $.ajax({
         type: 'get',
@@ -42,8 +44,7 @@
       year: 'CMS.Models.Option.stub'
     },
     defaults: {
-      // TODO: Update when the backend changes this to bool/enum
-      document_type: 2
+      document_type: 'EVIDENCE'
     },
     tree_view_options: {
       show_view: GGRC.mustache_path + '/documents/tree.mustache',

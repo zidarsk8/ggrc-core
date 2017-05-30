@@ -69,8 +69,7 @@
           context: this.scope.parent_instance.context || new CMS.Models.Context({
             id: null
           }),
-          // TODO: Update when the backend changes this to bool/enum
-          document_type: 1,
+          document_type: CMS.Models.Document.URL,
           owners: [{type: 'Person', id: GGRC.current_user.id}]
         });
         return dfd.save();
