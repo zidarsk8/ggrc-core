@@ -57,7 +57,8 @@ def publish_base_properties(obj):
   return ret
 
 
-def publish(obj, inclusions=(), inclusion_filter=None):
+def publish(obj, inclusions=(), inclusion_filter=None,
+            attribute_whitelist=None):
   """Translate ``obj`` into a valid JSON value. Objects with properties are
   translated into a ``dict`` object representing a JSON object while simple
   values are returned unchanged or specially formatted if needed.
@@ -70,7 +71,7 @@ def publish(obj, inclusions=(), inclusion_filter=None):
   if publisher and getattr(publisher, '_publish_attrs', []):
     ret = publish_base_properties(obj)
     ret.update(publisher.publish_contribution(
-        obj, inclusions, inclusion_filter))
+        obj, inclusions, inclusion_filter, attribute_whitelist))
     return ret
   # Otherwise, just return the value itself by default
   return obj
@@ -673,7 +674,8 @@ class Builder(AttributeInfo):
     return result
 
   def _publish_attrs_for(
-          self, obj, attrs, json_obj, inclusions=None, inclusion_filter=None):
+          self, obj, attrs, json_obj, inclusions=None, inclusion_filter=None,
+          attribute_whitelist=None):
     if inclusions is None:
       inclusions = []
     for attr in attrs:
@@ -686,11 +688,14 @@ class Builder(AttributeInfo):
         if inclusion[0] == attr_name:
           local_inclusion = inclusion
           break
+      if attribute_whitelist and attr_name not in attribute_whitelist:
+        continue
       json_obj[attr_name] = self.publish_attr(
           obj, attr_name, local_inclusion[1:], len(local_inclusion) > 0,
           inclusion_filter)
 
-  def publish_attrs(self, obj, json_obj, extra_inclusions, inclusion_filter):
+  def publish_attrs(self, obj, json_obj, extra_inclusions, inclusion_filter,
+                    attribute_whitelist):
     """Translate the state represented by ``obj`` into the JSON dictionary
     ``json_obj``.
 
@@ -709,7 +714,8 @@ class Builder(AttributeInfo):
     inclusions = tuple((attr,) for attr in self._include_links)
     inclusions = tuple(set(inclusions).union(set(extra_inclusions)))
     return self._publish_attrs_for(
-        obj, self._publish_attrs, json_obj, inclusions, inclusion_filter)
+        obj, self._publish_attrs, json_obj, inclusions, inclusion_filter,
+        attribute_whitelist)
 
   @classmethod
   def do_update_attrs(cls, obj, json_obj, attrs):
@@ -720,10 +726,12 @@ class Builder(AttributeInfo):
     for attr_name in attrs:
       UpdateAttrHandler.do_update_attr(obj, json_obj, attr_name)
 
-  def publish_contribution(self, obj, inclusions, inclusion_filter):
+  def publish_contribution(self, obj, inclusions, inclusion_filter,
+                           attribute_whitelist):
     """Translate the state represented by ``obj`` into a JSON dictionary"""
     json_obj = {}
-    self.publish_attrs(obj, json_obj, inclusions, inclusion_filter)
+    self.publish_attrs(obj, json_obj, inclusions, inclusion_filter,
+                       attribute_whitelist)
     return json_obj
 
   def update(self, obj, json_obj):
