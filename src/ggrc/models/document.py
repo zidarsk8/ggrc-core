@@ -27,9 +27,11 @@ class Document(Ownable, Relatable, Base, Indexed, db.Model):
   year_id = deferred(db.Column(db.Integer), 'Document')
   language_id = deferred(db.Column(db.Integer), 'Document')
 
-  URL = 1
-  ATTACHMENT = 2
-  document_type = deferred(db.Column(db.Integer, default=URL, nullable=False),
+  URL = "URL"
+  ATTACHMENT = "EVIDENCE"
+  document_type = deferred(db.Column(db.Enum(URL, ATTACHMENT),
+                                     default=URL,
+                                     nullable=False),
                            'Document')
 
   kind = db.relationship(
@@ -98,7 +100,7 @@ class Document(Ownable, Relatable, Base, Indexed, db.Model):
     if document_type not in [self.URL, self.ATTACHMENT]:
         raise exceptions.ValidationError(
             "Invalid value for attribute {attr}. "
-            "Expected options are {url}, {attachment}.".format(
+            "Expected options are `{url}`, `{attachment}`.".format(
                 attr=key,
                 url=self.URL,
                 attachment=self.ATTACHMENT,

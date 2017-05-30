@@ -77,5 +77,5 @@ class TestDocument(TestCase):
     resp = self.api.post(all_models.Document, obj_dict)
     self.assert400(resp)
     self.assertEqual('"Invalid value for attribute document_type. '
-                     'Expected options are 1, 2."',
+                     'Expected options are `URL`, `EVIDENCE`."',
                      resp.data)
