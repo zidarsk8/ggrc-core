@@ -26,6 +26,10 @@ from ggrc.models import Notification
 from ggrc.rbac import permissions
 from ggrc.utils import merge_dict
 
+from ggrc_workflows.notification.data_handler import (
+    cycle_tasks_cache, deleted_task_rels_cache, get_cycle_task_data
+)
+
 
 # pylint: disable=invalid-name
 logger = getLogger(__name__)
@@ -64,7 +68,7 @@ class Services(object):
     return cls.services[name]
 
   @classmethod
-  def call_service(cls, notif):
+  def call_service(cls, notif, **kwargs):
     """Call data handler service for the object in the notification.
 
     Args:
@@ -75,10 +79,20 @@ class Services(object):
       dict: Result of the data handler for the object in the notification.
     """
     service = cls.get_service_function(notif.object_type)
+
+    if service is get_cycle_task_data:
+      return service(
+          notif,
+          tasks_cache=kwargs.get("tasks_cache"),
+          del_rels_cache=kwargs.get('del_rels_cache')
+      )
+
     return service(notif)
 
 
-def get_filter_data(notification, people_cache):
+def get_filter_data(
+    notification, people_cache, tasks_cache=None, del_rels_cache=None
+):
   """Get filtered notification data.
 
   This function gets notification data for all users who should receive it. A
@@ -89,13 +103,18 @@ def get_filter_data(notification, people_cache):
   Args:
     notification (Notification): Notification object for which we want to get
       data.
+    tasks_cache (dict): prefetched CycleTaskGroupObjectTask instances
+      accessible by their ID as a key
+    del_rels_cache (dict): prefetched Revision instances representing the
+      relationships to Tasks that were deleted grouped by task ID as a key
 
   Returns:
     dict: dictionary containing notification data for all users who should
       receive it, according to their notification settings.
   """
   result = {}
-  data = Services.call_service(notification)
+  data = Services.call_service(
+      notification, tasks_cache=tasks_cache, del_rels_cache=del_rels_cache)
 
   for user, user_data in data.iteritems():
     if should_receive(notification, user_data, people_cache):
@@ -122,8 +141,13 @@ def get_notification_data(notifications):
   aggregate_data = {}
   people_cache = {}
 
+  tasks_cache = cycle_tasks_cache(notifications)
+  deleted_rels_cache = deleted_task_rels_cache(tasks_cache.keys())
+
   for notification in notifications:
-    filtered_data = get_filter_data(notification, people_cache)
+    filtered_data = get_filter_data(
+        notification, people_cache, tasks_cache=tasks_cache,
+        del_rels_cache=deleted_rels_cache)
     aggregate_data = merge_dict(aggregate_data, filtered_data)
 
   # Remove notifications for objects without a contact (such as task groups)
