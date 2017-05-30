@@ -6,7 +6,7 @@
 
 import itertools
 
-from sqlalchemy import orm
+from sqlalchemy import orm, inspect
 
 from ggrc import db
 from ggrc.models import mixins
@@ -17,7 +17,13 @@ from ggrc_workflows.models.cycle import Cycle
 
 
 def _query_filtered_by_contact(person):
-  return CycleTaskGroup.query.filter(CycleTaskGroup.contact_id == person.id)
+  """Returns cycle task groups required to reindex for sent persons."""
+  attrs = inspect(person).attrs
+  if any([attrs["email"].history.has_changes(),
+          attrs["name"].history.has_changes()]):
+    return CycleTaskGroup.query.filter(CycleTaskGroup.contact_id == person.id)
+  else:
+    return []
 
 
 class CycleTaskGroup(mixins.WithContact,

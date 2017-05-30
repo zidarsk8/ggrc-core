@@ -133,7 +133,7 @@ a {
   }
 }
 .btn {
-  @include btn-size();
+  @include btn-size(12px);
 
   &.btn-small {
     @include btn-size(12px, 18px, 4px 14px);
@@ -775,7 +775,7 @@ p {
     display: inline-block;
 
     &:before {
-      top: 7px;
+      top: 4px;
     }
   }
 

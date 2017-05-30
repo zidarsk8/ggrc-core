@@ -5,8 +5,7 @@
 # pylint: disable=too-many-lines
 
 from selenium.webdriver.common.by import By
-
-from lib.constants import objects, url, element
+from lib.constants import objects, url
 
 
 class Common(object):
@@ -21,6 +20,7 @@ class Common(object):
   INFO_WIDGET = ".info"
   INFO_HEADER = INFO_WIDGET + " .pane-header"
   INFO_UTILITY = INFO_WIDGET + " .info-pane-utility"
+  INFO_ACTION = INFO_WIDGET + " .pin-action"
   INFO_TOGGLE = INFO_UTILITY + " .dropdown-toggle"
   # dropdown
   DROPDOWN_MENU = ".dropdown-menu"
@@ -35,7 +35,10 @@ class Common(object):
   ACCORDION_MEMBERS = "ACCORDION_MEMBERS_"
   TOGGLE = "TOGGLE_"
   # attrs values
-  DISABLED_VALUE = "disabled-original disabled"
+  DISABLED_VALUE = "disabled-original"
+  MAX = "max"
+  NORMAL = "normal"
+  DOWN = "down"
 
 
 class Login(object):
@@ -584,32 +587,58 @@ class ModalCloneAudit(ModalCommonConfirmAction):
 
 class CommonWidgetInfo(object):
   """Common locators for Info widgets and Info panels."""
+  WIDGET = Common.INFO_WIDGET
   PIN_CONTENT = Common.PIN_CONTENT
   INFO_HEADER = Common.INFO_HEADER
+  _INFO_HEADER = Common.INFO_HEADER + " .span9 "
   INFO_TOGGLE = Common.INFO_TOGGLE
-  HEADERS_VALUES = (
-      '//*[contains(@class, "object-area")]//*[contains(@class, "info")]'
-      '//div[starts-with(./@class, "span")]')
-  HEADER = HEADERS_VALUES + '//*[contains(text(),"{header}")]'
+  HEADERS_AND_VALUES = WIDGET + ' div [class*="span"]'
+  PAGE_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
+                             HEADERS_AND_VALUES)
+  CAS_HEADERS_AND_VALUES = (
+      By.XPATH, '//*[contains(@class, "inline-edit ") and '
+                'not(ancestor::*[contains(@class, "hidden")])]')
+  CAS_CHECKBOXES = (By.CSS_SELECTOR, " .inline-edit__checkbox input")
   # labels
-  HEADERS_AND_VALUES = (By.XPATH, HEADERS_VALUES)
-  TITLE = (By.CSS_SELECTOR, INFO_HEADER + " h6")
-  TITLE_ENTERED = (By.CSS_SELECTOR, INFO_HEADER + " .span9 h3")
-  STATE = (By.CSS_SELECTOR, INFO_HEADER + " .state-value")
+  TITLE = (By.CSS_SELECTOR, _INFO_HEADER + "h6")
+  TITLE_UNDER_AUDIT = (By.CSS_SELECTOR,
+                       PIN_CONTENT + _INFO_HEADER + "h6")
+  TITLE_ENTERED = (By.CSS_SELECTOR, _INFO_HEADER + "h3")
+  TITLE_ENTERED_UNDER_AUDIT = (By.CSS_SELECTOR,
+                               PIN_CONTENT + _INFO_HEADER + "h3")
+  STATE = (By.CSS_SELECTOR, _INFO_HEADER + ".state-value")
+  STATE_UNDER_AUDIT = (By.CSS_SELECTOR,
+                       PIN_CONTENT + _INFO_HEADER + "span:last-of-type")
   # user input elements
   BUTTON_3BBS = (By.CSS_SELECTOR, INFO_TOGGLE)
   BUTTON_3BBS_UNDER_AUDIT = (By.CSS_SELECTOR, PIN_CONTENT + INFO_TOGGLE)
 
 
-class CommonWidgetInfoSnapshots(object):
-  """Common locators for Info widgets and Info panels of snapshotable objects.
- """
+class WidgetInfoPanel(CommonWidgetInfo):
+  """Locators specific for Info panels."""
+  INFO_ACTION = Common.INFO_ACTION
+  PIN_CONTENT = Common.PIN_CONTENT
+  PANEL_HEADERS_AND_VALUES = (
+      By.CSS_SELECTOR, PIN_CONTENT + CommonWidgetInfo.HEADERS_AND_VALUES)
+  # user input elements
+  BUTTON_MAXIMIZE_MINIMIZE = (By.CSS_SELECTOR,
+                              INFO_ACTION + ' [can-click="toggleSize"]')
+  BUTTON_CLOSE = (By.CSS_SELECTOR,
+                  INFO_ACTION + ' [can-click="close"]')
+
+
+class WidgetSnapshotsInfoPanel(WidgetInfoPanel):
+  """Locators specific for Info panels of snapshotable objects."""
   WIDGET = Common.INFO_WIDGET
-  LINK_GET_LAST_VER = (
-      By.CSS_SELECTOR, WIDGET + ' .snapshot [can-click="compareIt"]')
+  PIN_CONTENT = Common.PIN_CONTENT
+  INFO_HEADER = Common.INFO_HEADER
+  LINK_GET_LAST_VER = (By.CSS_SELECTOR,
+                       WIDGET + ' .snapshot [can-click="compareIt"]')
+  SNAPSHOT_OBJ_VER = (By.CSS_SELECTOR,
+                      PIN_CONTENT + INFO_HEADER + " .span9 span:first-of-type")
 
 
-class WidgetInfoProgram(CommonWidgetInfo):
+class WidgetInfoProgram(WidgetInfoPanel):
   """Locators for Program Info widgets."""
   # pylint: disable=too-many-format-args
   WIDGET = Common.INFO_WIDGET
@@ -674,68 +703,80 @@ class WidgetInfoProgram(CommonWidgetInfo):
   MODAL_DELETE_CLOSE = (By.CSS_SELECTOR, ".lhn_modal .grcicon-x-grey")
 
 
-class WidgetInfoRisk(CommonWidgetInfo):
+class WidgetInfoRisk(WidgetSnapshotsInfoPanel):
   """Locators for Risk Info widgets."""
 
 
-class WidgetInfoOrgGroup(CommonWidgetInfo):
+class WidgetInfoOrgGroup(WidgetSnapshotsInfoPanel):
   """Locators for Org Group Info widgets."""
 
 
-class WidgetInfoIssue(CommonWidgetInfo):
+class WidgetInfoIssue(WidgetInfoPanel):
   """Locators for Issue Info widgets."""
 
 
-class WidgetInfoRegulations(CommonWidgetInfo):
+class WidgetInfoRegulations(WidgetSnapshotsInfoPanel):
   """Locators for Regulation Info widgets."""
 
 
-class WidgetInfoWorkflow(CommonWidgetInfo):
+class WidgetInfoWorkflow(WidgetInfoPanel):
   """Locators for Workflow Info widgets."""
 
 
-class WidgetInfoAudit(CommonWidgetInfo):
+class WidgetInfoAudit(WidgetInfoPanel):
   """Locators for Audit Info widgets."""
-  HEADER = CommonWidgetInfo.HEADER
-  elements = element.AuditInfoWidget
-  # labels
-  AUDIT_LEAD = (By.XPATH, HEADER.format(header=elements.AUDIT_LEAD))
-  CODE = (By.XPATH, HEADER.format(header=elements.CODE))
 
 
-class WidgetInfoAssessment(CommonWidgetInfo):
+class WidgetInfoAssessment(WidgetInfoPanel):
   """Locators for Assessment Info widgets."""
+  WIDGET = Common.INFO_WIDGET
+  TOGGLE = ' [class*="fa-caret"]'
+  # Base
+  CAS_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
+                            WIDGET + " auto-save-form .flex-size-1")
+  CAS_CHECKBOXES = (By.CSS_SELECTOR, '[class*="wrapper"] [type="checkbox"]')
+  MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS = (By.CSS_SELECTOR,
+                                            WIDGET + ' .object-list-item')
+  # Assessment Attributes tab
+  # People section
+  _PEOPLE = WIDGET + ' [title-text="People"]'
+  BUTTON_PEOPLE_TOGGLE = (By.CSS_SELECTOR, _PEOPLE + TOGGLE)
+  PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR, _PEOPLE + " .label-list>li")
+  # Code section
+  _CODE = WIDGET + ' [title-text="Code"]'
+  BUTTON_CODE_TOGGLE = (By.CSS_SELECTOR, _CODE + TOGGLE)
+  CODE_HEADER_AND_VALUE = (By.CSS_SELECTOR, _CODE + " .label-list>li")
 
 
-class WidgetInfoAssessmentTemplate(CommonWidgetInfo):
+class WidgetInfoAssessmentTemplate(WidgetInfoPanel):
   """Locators for assessment template info widget."""
 
 
-class WidgetInfoPolicy(CommonWidgetInfo):
+class WidgetInfoPolicy(WidgetSnapshotsInfoPanel):
   """Locators for Policy Info widgets."""
 
 
-class WidgetInfoStandard(CommonWidgetInfo):
+class WidgetInfoStandard(WidgetSnapshotsInfoPanel):
   """Locators for Standard Info widgets."""
 
 
-class WidgetInfoContract(CommonWidgetInfo):
+class WidgetInfoContract(WidgetSnapshotsInfoPanel):
   """Locators for Contract Info widgets."""
 
 
-class WidgetInfoClause(CommonWidgetInfo):
+class WidgetInfoClause(WidgetSnapshotsInfoPanel):
   """Locators for Clause Info widgets."""
 
 
-class WidgetInfoSection(CommonWidgetInfo):
+class WidgetInfoSection(WidgetSnapshotsInfoPanel):
   """Locators for Section Info widgets."""
 
 
-class WidgetInfoControl(CommonWidgetInfo, CommonWidgetInfoSnapshots):
+class WidgetInfoControl(WidgetSnapshotsInfoPanel):
   """Locators for Control Info widgets."""
 
 
-class WidgetInfoObjective(CommonWidgetInfo):
+class WidgetInfoObjective(WidgetSnapshotsInfoPanel):
   """Locators for Objective Info widgets."""
 
 
@@ -743,43 +784,43 @@ class WidgetInfoPeople(CommonWidgetInfo):
   """Locators for People Info widgets."""
 
 
-class WidgetInfoVendor(CommonWidgetInfo):
+class WidgetInfoVendor(WidgetSnapshotsInfoPanel):
   """Locators for Vendor Info widgets."""
 
 
-class WidgetInfoAccessGroup(CommonWidgetInfo):
+class WidgetInfoAccessGroup(WidgetSnapshotsInfoPanel):
   """Locators for Access Group Info widgets."""
 
 
-class WidgetInfoSystem(CommonWidgetInfo):
+class WidgetInfoSystem(WidgetSnapshotsInfoPanel):
   """Locators for System Info widgets."""
 
 
-class WidgetInfoProcess(CommonWidgetInfo):
+class WidgetInfoProcess(WidgetSnapshotsInfoPanel):
   """Locators for Process Info widgets."""
 
 
-class WidgetInfoProduct(CommonWidgetInfo):
+class WidgetInfoProduct(WidgetSnapshotsInfoPanel):
   """Locators for Product Info widgets."""
 
 
-class WidgetInfoFacility(CommonWidgetInfo):
+class WidgetInfoFacility(WidgetSnapshotsInfoPanel):
   """Locators for Facility Info widgets."""
 
 
-class WidgetInfoProject(CommonWidgetInfo):
+class WidgetInfoProject(WidgetSnapshotsInfoPanel):
   """Locators for Project Info widgets."""
 
 
-class WidgetInfoMarket(CommonWidgetInfo):
+class WidgetInfoMarket(WidgetSnapshotsInfoPanel):
   """Locators for Market Info widgets."""
 
 
-class WidgetInfoDataAsset(CommonWidgetInfo):
+class WidgetInfoDataAsset(WidgetSnapshotsInfoPanel):
   """Locators for Data Asset Info widgets."""
 
 
-class WidgetInfoThreat(CommonWidgetInfo):
+class WidgetInfoThreat(WidgetSnapshotsInfoPanel):
   """Locators for Threat Info widgets."""
 
 

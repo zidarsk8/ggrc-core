@@ -23,7 +23,8 @@
       },
       item: null,
       instance: null,
-      model: null
+      model: null,
+      isMapperDetails: true
     }
   });
 })(window.can, window.GGRC, window.CMS);

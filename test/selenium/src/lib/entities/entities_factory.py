@@ -107,6 +107,54 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
   """Factory class for  entities."""
 
   @classmethod
+  def generate_ca_values(cls, list_ca_objs):
+    """Generate dictionary of CA random values from exist list CA objects
+    according to CA 'id', 'attribute_type' and 'multi_choice_options' for
+    Dropdown. Return dictionary of CA items that ready to use via REST API:
+    Example:
+    list_ca_objs = [{'attribute_type': 'Text', 'id': 1},
+    {'attribute_type': 'Dropdown', 'id': 2, 'multi_choice_options': 'a,b,c'}]
+    :return {"1": "text_example", "2": "b"}
+    """
+    def generate_ca_value(ca):
+      """Generate CA value according to CA 'id', 'attribute_type' and
+      'multi_choice_options' for Dropdown.
+      """
+      val = {}
+      ca = ca.__dict__
+      if ca.get("attribute_type") in (AdminWidgetCustomAttributes.TEXT,
+                                      AdminWidgetCustomAttributes.RICH_TEXT):
+        val = {ca["id"]: cls.generate_string(ca["attribute_type"])}
+      if ca.get("attribute_type") == AdminWidgetCustomAttributes.DATE:
+        val = {ca["id"]: str(ca["created_at"][:10])}
+      if ca.get("attribute_type") == "Checkbox":
+        val = {ca["id"]: random.choice((True, False))}
+      if ca.get("attribute_type") == "Dropdown":
+        val = {ca["id"]: str(
+            random.choice(ca["multi_choice_options"].split(",")))}
+      if ca.get("attribute_type") == "Map:Person":
+        val = {ca["id"]: ":".join([str(ca["modified_by"]["type"]),
+                                   str(ca["modified_by"]["id"])])}
+      return val
+    return {k: v for _ in [generate_ca_value(ca) for ca in list_ca_objs]
+            for k, v in _.items()}
+
+  @classmethod
+  def generate_ca_defenitions_for_asmt_tmpls(cls, list_ca_definitions):
+    """Generate list of dictionaries of CA random values from exist list CA
+    definitions according to CA 'title', 'attribute_type' and
+    'multi_choice_options' for Dropdown. Return list of dictionaries of CA
+    definitions that ready to use via REST API:
+    Example:
+    :return
+    [{"title": "t1", "attribute_type": "Text", "multi_choice_options": ""},
+     {"title":"t2", "attribute_type":"Rich Text", "multi_choice_options":""}]
+    """
+    return [{k: (v if v else "") for k, v in ca_def.__dict__.items()
+             if k in ("title", "attribute_type", "multi_choice_options")}
+            for ca_def in list_ca_definitions]
+
+  @classmethod
   def create(cls, title=None, id=None, href=None, type=None,
              definition_type=None, attribute_type=None, helptext=None,
              placeholder=None, mandatory=None, multi_choice_options=None):
@@ -383,44 +431,50 @@ class AssessmentsFactory(EntitiesFactory):
   """Factory class for Assessments entities."""
 
   @classmethod
-  def generate(cls, objs_under_asmt_tmpl, audit):
-    """Generate Assessment object.
-    Predictable values will be used for type, title, slug, audit.
+  def generate(cls, objs_under_asmt, audit, asmt_tmpl=None):
+    """Generate Assessment objects, if 'asmt_tmpl' then with
+    Assessment Template, if not 'asmt_tmpl' then without Assessment Template.
+    Predictable values will be used for type, title, slug, audit,
+    objects_under_assessment and custom_attribute_definitions.
     """
     # pylint: disable=too-many-locals
     from lib.service.rest_service import ObjectsInfoService
     actual_count_all_asmts = ObjectsInfoService().get_total_count_objs(
         obj_name=objects.get_normal_form(cls.obj_asmt, with_space=False))
-    return [
-        cls.create(
-            title=obj_under_asmt_tmpl.title + " assessment for " + audit.title,
-            slug=(cls.obj_asmt.upper() + "-" + str(asmt_number)),
-            audit=audit.title) for asmt_number, obj_under_asmt_tmpl in
-        enumerate(objs_under_asmt_tmpl, start=actual_count_all_asmts + 1)]
+    ca_def = asmt_tmpl.custom_attribute_definitions if asmt_tmpl else None
+    return [cls.create(
+        title=obj_under_asmt.title + " assessment for " + audit.title,
+        slug=(cls.obj_asmt.upper() + "-" + str(asmt_number)),
+        audit=audit.title, objects_under_assessment=[obj_under_asmt],
+        custom_attribute_definitions=ca_def) for asmt_number, obj_under_asmt in
+        enumerate(objs_under_asmt, start=actual_count_all_asmts + 1)]
 
   @classmethod
   def create_empty(cls):
     """Create blank Assessment object."""
     empty_asmt = entity.AssessmentEntity()
     empty_asmt.type = cls.obj_asmt
+    empty_asmt.verified = False
     return empty_asmt
 
   @classmethod
   def create(cls, type=None, id=None, title=None, href=None, url=None,
-             slug=None, status=None, object=None, audit=None,
+             slug=None, status=None, owners=None, audit=None,
              recipients=None, verified=None, updated_at=None,
-             custom_attribute_definitions=None,
+             objects_under_assessment=None, custom_attribute_definitions=None,
              custom_attribute_values=None):
     """Create Assessment object.
     Random values will be used for title and slug.
-    Predictable values will be used for type, status, recipients, verified.
+    Predictable values will be used for type, status, recipients,
+    verified, owners.
     """
     # pylint: disable=too-many-locals
     asmt_entity = cls._create_random_asmt()
     asmt_entity = cls.update_obj_attrs_values(
         obj=asmt_entity, type=type, id=id, title=title, href=href, url=url,
-        slug=slug, status=status, object=object, audit=audit,
+        slug=slug, status=status, owners=owners, audit=audit,
         recipients=recipients, verified=verified, updated_at=updated_at,
+        objects_under_assessment=objects_under_assessment,
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values)
     return asmt_entity
@@ -435,7 +489,8 @@ class AssessmentsFactory(EntitiesFactory):
     random_asmt.status = element.AssessmentStates.NOT_STARTED
     random_asmt.recipients = ",".join((roles.ASSESSOR, roles.CREATOR,
                                        roles.VERIFIER))
-    random_asmt.verified = element.Common.FALSE
+    random_asmt.verified = False
+    random_asmt.owners = [ObjectOwnersFactory().default().__dict__]
     return random_asmt
 
 

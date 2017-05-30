@@ -34,7 +34,7 @@
     </div>
   </tree-header-selector>
   {{/if}}
-  <div class="flex-box width-100">
+  <div class="flex-box tree-header-titles">
     {{#selectedColumns}}
       <div class="flex-box widget-col-title {{attr_sort_field}}" ($click)="onOrderChange($element)" data-field="{{attr_sort_field}}">
           <span>{{attr_title}}</span>

@@ -25,6 +25,7 @@
   background: $createBtn;
   color: $white;
   border-radius: 2px;
+  line-height: 24px;
 
   &:hover {
     background: $link;
@@ -66,7 +67,6 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  max-height: 28px;
 
   &[disabled], &.disabled {
     opacity: 0.25;
@@ -180,6 +180,11 @@
 
     &:hover {
       color: $darkBlue;
+    }
+
+    .related-assessments &:hover {
+      text-decoration: underline;
+      color: $blue;
     }
 
     &.selected {

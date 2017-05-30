@@ -10,6 +10,7 @@ from datetime import date
 from sqlalchemy import and_
 from sqlalchemy import orm
 
+from ggrc import builder
 from ggrc import db
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.mixin import Indexed
@@ -17,7 +18,6 @@ from ggrc.login import get_current_user
 from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.models.associationproxy import association_proxy
-from ggrc.models.computed_property import computed_property
 from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
 from ggrc_workflows.models import cycle
@@ -109,7 +109,7 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   kind = deferred(
       db.Column(db.String, default=None, nullable=True), 'Workflow')
 
-  @computed_property
+  @builder.simple_property
   def workflow_state(self):
     return WorkflowState.get_workflow_state(self.cycles)
 
@@ -380,6 +380,6 @@ class WorkflowState(object):
 
     return cls._get_state(current_cycles)
 
-  @computed_property
+  @builder.simple_property
   def workflow_state(self):
     return WorkflowState.get_object_state(self.cycle_task_group_object_tasks)

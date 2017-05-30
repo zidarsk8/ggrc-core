@@ -351,12 +351,14 @@
           _refresh(true);
         }
 
-        if (_verifyRelationship(instance, activeTabModel)) {
+        if (_verifyRelationship(instance, activeTabModel, parentInstance)) {
           parentInstance.on('change', callback);
         } else if (activeTabModel === instance.type) {
           _refresh(true);
         } else if (isPerson(instance)) {
-          _refresh();
+          parentInstance.refresh().then(function () {
+            _refresh();
+          });
         }
       }
 
@@ -406,8 +408,17 @@
         self.loadItems();
       }
 
-      function _verifyRelationship(instance, shortName) {
+      function _verifyRelationship(instance, shortName, parentInstance) {
         if (!(instance instanceof CMS.Models.Relationship)) {
+          return false;
+        }
+
+        if (parentInstance && instance.destination && instance.source) {
+          if (instance.source.type === parentInstance.type &&
+            (instance.destination.type === shortName ||
+            instance.destination.type === 'Snapshot')) {
+            return true;
+          }
           return false;
         }
         if (instance.destination &&

@@ -20,8 +20,11 @@ class TestMyWorkPage(base.Test):
 
   @pytest.mark.smoke_tests
   def test_horizontal_nav_bar_tabs(self, new_controls_rest, selenium):
-    """Tests that several objects in widget can be deleted sequentially."""
-    selenium.get(dashboard.Dashboard.URL)
+    """Tests that several objects in widget can be deleted sequentially.
+    Preconditions:
+    - Controls created via REST API.
+    """
+    selenium_utils.open_url(selenium, dashboard.Dashboard.URL)
     controls_widget = dashboard.Dashboard(selenium).select_controls()
     for _ in xrange(controls_widget.member_count):
       counter = controls_widget.get_items_count()

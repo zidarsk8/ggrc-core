@@ -38,6 +38,7 @@ TODO: Temporary disabled until snapshot view is added.
 -->
             {{! We need to use `using` to ensure that snapshot is actually
                 reified by the time is_allowed helper uses it }}
+            {{^if isMapperDetails}}
             {{#using reified_snapshot=snapshot}}
             {{#canUpdate}}
             {{^isLatestRevision}}
@@ -53,6 +54,7 @@ TODO: Temporary disabled until snapshot view is added.
             {{/isLatestRevision}}
             {{/canUpdate}}
             {{/using}}
+            {{/if}}
 
             <li>
                 {{#if instance.originalObjectDeleted}}

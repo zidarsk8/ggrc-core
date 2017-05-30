@@ -5,7 +5,7 @@
 from lib import factory
 from lib.constants import element, objects, url
 from lib.entities.entities_factory import EntitiesFactory
-from lib.page.widget.info_widget import CommonSnapshotsInfo
+from lib.page.widget.info_widget import SnapshotableInfoPanel
 from lib.utils import selenium_utils, string_utils
 
 
@@ -16,14 +16,14 @@ class BaseWebUiService(object):
   def __init__(self, driver, obj_name):
     self.driver = driver
     self.obj_name = obj_name
+    self.generic_widget_cls = factory.get_cls_widget(object_name=self.obj_name)
     self.info_widget_cls = factory.get_cls_widget(
-        object_name=obj_name, is_info=True)
-    self.generic_widget_cls = factory.get_cls_widget(object_name=obj_name)
+        object_name=self.obj_name, is_info=True)
     self.entities_factory_cls = factory.get_cls_entity_factory(
-        object_name=obj_name)
+        object_name=self.obj_name)
     # URLs
     self.url_mapped_objs = (
-        "{src_obj_url}" + url.get_widget_name_of_mapped_objs(obj_name))
+        "{src_obj_url}" + url.get_widget_name_of_mapped_objs(self.obj_name))
     self.url_obj_info_page = "{obj_url}" + url.Widget.INFO
     self._unified_mapper = None
 
@@ -51,13 +51,15 @@ class BaseWebUiService(object):
     """
     fields = element.TransformationSetVisibleFields
     return {
-        fields.TITLE.upper(): "title", fields.ADMIN.upper(): "owners",
-        fields.CODE.upper(): "slug",
+        fields.TITLE.upper(): "title", fields.MANAGER.upper(): "manager",
+        fields.CODE.upper(): "slug", fields.VERIFIED.upper(): "verified",
         fields.STATE.upper(): "status", fields.STATUS.upper(): "status",
-        fields.VERIFIED.upper(): "verified",
         fields.LAST_UPDATED.upper(): "updated_at",
         fields.AUDIT_LEAD.upper(): "contact",
-        fields.MANAGER.upper(): "manager"
+        fields.ADMIN.upper(): "owners", fields.CREATORS.upper(): "owners",
+        fields.CAS_HEADERS.upper(): "custom_attribute_definitions",
+        fields.CAS_VALUES.upper(): "custom_attribute_values",
+        fields.MAPPED_OBJECTS.upper(): "objects_under_assessment"
     }
 
   def open_widget_of_mapped_objs(self, src_obj):
@@ -117,6 +119,14 @@ class BaseWebUiService(object):
   def get_obj_from_info_page(self, obj):
     """Get and return object from Info page."""
     scope = self.get_scope_from_info_page(obj)
+    return self.create_list_objs(
+        entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
+
+  def get_obj_from_info_panel(self, src_obj, obj, navigate_by_title=True):
+    """Get and return object from Info panel navigate by object title
+    as default or by object id if navigate_by_title is False.
+    """
+    scope = self.get_scope_from_info_panel(src_obj, obj, navigate_by_title)
     return self.create_list_objs(
         entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
 
@@ -198,7 +208,18 @@ class BaseWebUiService(object):
     and entered_titles (values) that displayed on Info widget.
     """
     obj_info_page = self.open_info_page_of_obj(obj)
-    return obj_info_page.get_obj_as_dict()
+    return obj_info_page.get_info_widget_obj_scope()
+
+  def get_scope_from_info_panel(self, src_obj, obj, navigate_by_title=True):
+    """Open Info panel of obj navigate by object title as default or by
+    object id if navigate_by_title is False, maximize it and get object scope
+    as dict with titles (keys) and entered_titles (values) that displayed on
+    Info panel.
+    """
+    obj_info_panel = (
+        self.open_info_panel_of_obj_by_title(src_obj, obj) if navigate_by_title
+        else self.open_info_panel_of_obj_by_id(src_obj, obj))
+    return obj_info_panel.get_info_widget_obj_scope()
 
   def is_obj_editable_via_info_panel(self, src_obj, obj):
     """Open generic widget of mapped objects, select object from Tree View
@@ -229,9 +250,6 @@ class BaseWebUiService(object):
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""
 
-  def __init__(self, driver, obj_name):
-    super(SnapshotsWebUiService, self).__init__(driver, obj_name)
-
   def update_obj_ver_via_info_panel(self, src_obj, obj):
     """Open generic widget of mapped objects, select snapshotable object from
     Tree View by title and update object to latest version via Info panel.
@@ -242,7 +260,7 @@ class SnapshotsWebUiService(BaseWebUiService):
     obj_info_panel.open_link_get_latest_ver().confirm_update()
     objs_widget.tree_view.wait_loading_after_actions()
     selenium_utils.get_when_invisible(
-        self.driver, CommonSnapshotsInfo.locator_link_get_latest_ver)
+        self.driver, SnapshotableInfoPanel.locator_link_get_latest_ver)
 
   def is_obj_updateble_via_info_panel(self, src_obj, obj):
     """Open generic widget of mapped objects, select snapshotable object from
@@ -292,17 +310,19 @@ class AssessmentsService(BaseWebUiService):
     super(AssessmentsService, self).__init__(
         driver, objects.ASSESSMENTS)
 
-  def generate_objs_via_tree_view(self, src_obj, asmt_tmpl_obj,
-                                  objs_under_asmt):
+  def generate_objs_via_tree_view(self, src_obj, objs_under_asmt,
+                                  asmt_tmpl_obj=None):
     """Open generic widget of mapped objects, open Generation modal from
-    Tree View, fill data according to Assessment Template title and objects
-    under Assessment, generate new Assessment(s).
+    Tree View, fill data according to objects under Assessment
+    and if 'asmt_tmpl_obj' then to Assessment Template title, generate
+    new Assessment(s).
     """
     objs_under_asmt_titles = [obj_under.title for obj_under in
                               objs_under_asmt]
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
+    asmt_tmpl_title = asmt_tmpl_obj.title if asmt_tmpl_obj else None
     (objs_widget.tree_view.open_3bbs().select_generate().
-     generate_asmts(asmt_tmpl_title=asmt_tmpl_obj.title,
+     generate_asmts(asmt_tmpl_title=asmt_tmpl_title,
                     objs_under_asmt_titles=objs_under_asmt_titles))
 
 

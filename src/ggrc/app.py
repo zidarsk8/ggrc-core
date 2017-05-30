@@ -67,6 +67,11 @@ def setup_user_timezone_offset():
   g.user_timezone_offset = request.headers.get("X-UserTimezoneOffset")
 
 
+def setup_error_handlers(app_):
+  from ggrc.utils import error_handlers
+  error_handlers.register_handlers(app_)
+
+
 def init_models(app_):
   import ggrc.models
   ggrc.models.init_app(app_)
@@ -236,6 +241,7 @@ def _display_sql_queries():
       return response
 
 
+setup_error_handlers(app)
 init_models(app)
 configure_flask_login(app)
 configure_webassets(app)

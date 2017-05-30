@@ -6,7 +6,7 @@ import re
 from selenium.common import exceptions
 from selenium.webdriver.common.by import By
 
-from lib import base
+from lib import base, factory
 from lib.constants import locator, regex
 from lib.page.modal import unified_mapper
 from lib.utils import selenium_utils
@@ -17,7 +17,6 @@ class Widget(base.Widget):
   # pylint: disable=too-many-instance-attributes
   def __init__(self, driver, obj_name):
     self.obj_name = obj_name
-    from lib import factory
     self._locators_filter = factory.get_cls_locators_generic_widget(
         object_name=obj_name)
     self._locator_widget = factory.get_locator_widget(self.obj_name.upper())
@@ -113,9 +112,9 @@ class Widget(base.Widget):
       selenium_utils.wait_until_stops_moving(member)
       selenium_utils.click_via_js(self._driver, member)
       # wait for the info pane animation to stop
-      info_pane = selenium_utils.get_when_clickable(
+      info_panel = selenium_utils.get_when_clickable(
           self._driver, locator.ObjectWidget.INFO_PANE)
-      selenium_utils.wait_until_stops_moving(info_pane)
+      selenium_utils.wait_until_stops_moving(info_panel)
       return self.info_widget_cls(self._driver)
     except exceptions.StaleElementReferenceException:
       self.members_listed = self._driver.find_elements(
@@ -136,7 +135,6 @@ class TreeView(base.TreeView):
     self.info_widget_cls = info_widget_cls
     self.obj_name = obj_name
     self.is_under_audit = is_under_audit
-    from lib import factory
     self.create_obj_cls = factory.get_cls_create_obj(object_name=obj_name)
     self.dropdown_settings_cls = factory.get_cls_3bbs_dropdown_settings(
         object_name=obj_name, is_tree_view_not_info=True)
@@ -178,11 +176,10 @@ class TreeView(base.TreeView):
     """Select member on Tree View by title.
     Return: lib.page.widget.info_widget."obj_name"
     """
-    item = [_item for _item in self.tree_view_items_elements() if
-            title in _item.text.splitlines()][0]
-    selenium_utils.wait_until_stops_moving(item)
-    item.click()
-    return self.info_widget_cls(self._driver)
+    list_items = [
+        item.text.splitlines() for item in self.tree_view_items_elements()]
+    item_num = [num for num, item in enumerate(list_items) if title in item][0]
+    return Widget(self._driver, self.obj_name).select_member_by_num(item_num)
 
 
 class Audits(Widget):

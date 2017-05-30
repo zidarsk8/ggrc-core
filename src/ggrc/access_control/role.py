@@ -74,16 +74,16 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
     Returns:
       value if the name passes all uniqueness checks.
     """
+    value = value.strip()
     if key == "name" and self.object_type:
-      name = value.strip()
+      name = value
       object_type = self.object_type
     elif key == "object_type" and self.name:
       name = self.name.strip()
-      object_type = value.strip()
+      object_type = value
     else:
-      return value.strip()
+      return value
 
-    name = value.strip()
     if name in self._get_reserved_names(object_type):
       raise ValueError(u"Attribute name '{}' is reserved for this object type."
                        .format(name))
@@ -92,5 +92,4 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
       raise ValueError(u"Global custom attribute '{}' "
                        u"already exists for this object type"
                        .format(name))
-
-    return name
+    return value

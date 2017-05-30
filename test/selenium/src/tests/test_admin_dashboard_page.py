@@ -16,6 +16,7 @@ from lib.constants import objects, messages
 from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities.entities_factory import CustomAttributeDefinitionsFactory
 from lib.page import dashboard
+from lib.utils import selenium_utils
 
 
 class TestAdminDashboardPage(base.Test):
@@ -25,7 +26,7 @@ class TestAdminDashboardPage(base.Test):
 
   @pytest.fixture(scope="function")
   def admin_dashboard(self, selenium):
-    selenium.get(dashboard.AdminDashboard.URL)
+    selenium_utils.open_url(selenium, dashboard.AdminDashboard.URL)
     return dashboard.AdminDashboard(selenium)
 
   @pytest.mark.smoke_tests

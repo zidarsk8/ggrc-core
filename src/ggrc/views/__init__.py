@@ -78,6 +78,10 @@ def do_reindex():
   people = db.session.query(all_models.Person.id, all_models.Person.name,
                             all_models.Person.email)
   indexer.cache["people_map"] = {p.id: (p.name, p.email) for p in people}
+  indexer.cache["ac_role_map"] = dict(db.session.query(
+      all_models.AccessControlRole.id,
+      all_models.AccessControlRole.name,
+  ))
   for model in sorted(indexed_models):
     # pylint: disable=protected-access
     logger.info("Updating index for: %s", model)

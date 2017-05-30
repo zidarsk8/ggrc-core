@@ -1,5 +1,10 @@
+# -*- coding: utf-8 -*-
+
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+"""A module with functions for retrieving workflow objects data used in emails.
+"""
 
 import urllib
 
@@ -130,6 +135,55 @@ def get_cycle_task_due(notification):
   }
 
 
+def get_cycle_task_overdue_data(notification):
+  """Compile and return all relevant email data for task overdue notification.
+
+  Args:
+    notification: Notification instance for which to compile email data.
+  Returns:
+    Dictionary containing the compiled data under the key that equals the
+    overdue task assignee's email address.
+  """
+  cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  if not cycle_task:
+    logger.warning(
+        '%s for notification %s not found.',
+        notification.object_type, notification.id)
+    return {}
+  if not cycle_task.contact:
+    logger.warning(
+        'Contact for cycle task %s not found.',
+        notification.object_id)
+    return {}
+
+  force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change
+
+  # the filter expression to be included in the cycle task's URL and
+  # automatically applied when user visits it
+  url_filter_exp = u"id=" + unicode(cycle_task.cycle_id)
+  task_info = get_cycle_task_dict(cycle_task)
+
+  task_info['task_group'] = cycle_task.cycle_task_group
+  task_info['task_group_url'] = cycle_task_group_url(
+      cycle_task, filter_exp=url_filter_exp)
+
+  task_info['workflow'] = cycle_task.cycle.workflow
+  task_info['workflow_cycle_url'] = cycle_task_workflow_cycle_url(
+      cycle_task, filter_exp=url_filter_exp)
+
+  return {
+      cycle_task.contact.email: {
+          "user": data_handlers.get_person_dict(cycle_task.contact),
+          "force_notifications": {
+              notification.id: force
+          },
+          "task_overdue": {
+              cycle_task.id: task_info
+          }
+      }
+  }
+
+
 def get_all_cycle_tasks_completed_data(notification, cycle):
   workflow_owners = get_workflow_owners_dict(cycle.context_id)
   force = cycle.workflow.notify_on_change
@@ -227,6 +281,8 @@ def get_cycle_task_data(notification):
                              "annually_cycle_task_due_in",
                              "cycle_task_due_today"]:
     return get_cycle_task_due(notification)
+  elif notification_name == "cycle_task_overdue":
+    return get_cycle_task_overdue_data(notification)
 
   return {}
 
@@ -422,6 +478,56 @@ def get_cycle_task_url(cycle_task, filter_exp=u""):
       cycle_id=cycle_task.cycle_task_group.cycle.id,
       cycle_task_group_id=cycle_task.cycle_task_group.id,
       cycle_task_id=cycle_task.id,
+  )
+  return urljoin(get_url_root(), url)
+
+
+def cycle_task_group_url(cycle_task, filter_exp=u""):
+  """Build the URL to a particular cycle task.
+
+  Args:
+    cycle_task: The cycle task instance to build the URL for.
+    filter_exp:
+        An optional query filter expression to be included in the URL.
+        Defaults to an empty string.
+  Returns:
+    Full cycle task URL (as a string).
+  """
+  if filter_exp:
+    filter_exp = u"?filter=" + urllib.quote(filter_exp)
+
+  url = (u"/workflows/{workflow_id}"
+         u"{filter_exp}"
+         u"#current_widget/cycle/{cycle_id}"
+         u"/cycle_task_group/{cycle_task_group_id}").format(
+      workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
+      filter_exp=filter_exp,
+      cycle_id=cycle_task.cycle_task_group.cycle.id,
+      cycle_task_group_id=cycle_task.cycle_task_group.id,
+  )
+  return urljoin(get_url_root(), url)
+
+
+def cycle_task_workflow_cycle_url(cycle_task, filter_exp=u""):
+  """Build the URL to the given task's workflow cycle.
+
+  Args:
+    cycle_task: The cycle task instance to build the URL for.
+    filter_exp:
+        An optional query filter expression to be included in the URL.
+        Defaults to an empty string.
+  Returns:
+    Full workflow cycle URL (as a string).
+  """
+  if filter_exp:
+    filter_exp = u"?filter=" + urllib.quote(filter_exp)
+
+  url = (u"/workflows/{workflow_id}"
+         u"{filter_exp}"
+         u"#current_widget/cycle/{cycle_id}").format(
+      workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
+      filter_exp=filter_exp,
+      cycle_id=cycle_task.cycle_task_group.cycle.id,
   )
   return urljoin(get_url_root(), url)
 

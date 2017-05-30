@@ -2829,7 +2829,10 @@ Example:
         return options.fn({peopleIds: []});
       }
 
-      peopleIds = GGRC.Utils.peopleWithRoleName(instance, roleName);
+      peopleIds = GGRC.Utils.peopleWithRoleName(instance, roleName)
+        .map(function (person) {
+          return person.id;
+        });
 
       if (peopleIds.length > 0) {
         return options.fn({peopleIds: peopleIds});

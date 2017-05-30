@@ -10,8 +10,8 @@ Create Date: 2015-11-12 16:10:29.579969
 """
 
 from alembic import op
-from ggrc.migrations.utils.resolve_duplicates import resolve_duplicates
-from ggrc_risks.models import Threat
+# from ggrc.migrations.utils.resolve_duplicates import resolve_duplicates
+# from ggrc_risks.models import Threat
 
 # revision identifiers, used by Alembic.
 revision = '62f26762d0a'
@@ -19,7 +19,7 @@ down_revision = '2837682ad516'
 
 
 def upgrade():
-  resolve_duplicates(Threat, 'slug')
+  # resolve_duplicates(Threat, 'slug')
   op.create_unique_constraint('uq_threats', 'threats', ['slug'])
 
 

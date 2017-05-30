@@ -5,8 +5,10 @@
 
 import logging
 from collections import defaultdict
+import itertools
 
 from sqlalchemy.sql.expression import tuple_
+from sqlalchemy import orm
 
 from ggrc import db
 from ggrc import models
@@ -21,7 +23,7 @@ from ggrc.snapshotter.datastructures import Pair
 from ggrc.fulltext.attributes import FullTextAttr, DatetimeFullTextAttr
 
 
-logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+LOGGER = logging.getLogger(__name__)
 
 
 def _get_class_properties():
@@ -49,46 +51,9 @@ def _get_class_properties():
 CLASS_PROPERTIES = _get_class_properties()
 
 
-def _get_tag(pair):
-  return u"{parent_type}-{parent_id}-{child_type}".format(
-      parent_type=pair.parent.type,
-      parent_id=pair.parent.id,
-      child_type=pair.child.type
-  )
-
-
-def _get_parent_property(pair):
-  return u"{parent_type}-{parent_id}".format(
-      parent_type=pair.parent.type,
-      parent_id=pair.parent.id
-  )
-
-
-def _get_child_property(pair):
-  return u"{child_type}-{child_id}".format(
-      child_type=pair.child.type,
-      child_id=pair.child.id
-  )
-
-
-def _get_columns():
-  """Get common columns for snapshots and revisions tables."""
-
-  snapshot_columns = db.session.query(
-      models.Snapshot.id,
-      models.Snapshot.context_id,
-      models.Snapshot.parent_type,
-      models.Snapshot.parent_id,
-      models.Snapshot.child_type,
-      models.Snapshot.child_id,
-      models.Snapshot.revision_id
-  )
-  revision_columns = db.session.query(
-      models.Revision.id,
-      models.Revision.resource_type,
-      models.Revision.content
-  )
-  return snapshot_columns, revision_columns
+TAG_TMPL = u"{parent_type}-{parent_id}-{child_type}"
+PARENT_PROPERTY_TMPL = u"{parent_type}-{parent_id}"
+CHILD_PROPERTY_TMPL = u"{child_type}-{child_id}"
 
 
 def _get_custom_attribute_dict():
@@ -180,9 +145,9 @@ def delete_records(snapshot_ids):
     snapshot_ids: An iterable with snapshot IDs whose full text records should
         be deleted.
   """
-  to_delete = {("Snapshot", _id) for _id in snapshot_ids}
   db.session.query(Record).filter(
-      tuple_(Record.type, Record.key).in_(to_delete)
+      Record.type == "Snapshot",
+      Record.key.in_(snapshot_ids)
   ).delete(synchronize_session=False)
   db.session.commit()
 
@@ -204,12 +169,10 @@ def get_person_data(rec, person):
   indexer = get_indexer()
   builder = indexer.get_builder(models.Person)
   subprops = builder.build_person_subprops(person)
-  data = []
   for key, val in subprops.items():
     newrec = rec.copy()
     newrec.update({"subproperty": key, "content": val})
-    data += [newrec]
-  return data
+    yield newrec
 
 
 def get_person_sort_subprop(rec, people):
@@ -218,108 +181,153 @@ def get_person_sort_subprop(rec, people):
   indexer = get_indexer()
   builder = indexer.get_builder(models.Person)
   subprops = builder.build_list_sort_subprop(people)
-  data = []
   for key, val in subprops.items():
     newrec = rec.copy()
     newrec.update({"subproperty": key, "content": val})
-    data += [newrec]
-  return data
+    yield newrec
 
 
-def reindex_pairs(pairs):  # noqa  # pylint:disable=too-many-branches
+def get_access_control_role_data(rec, ac_list_item):
+  """Get list of access control data for fulltext indexing
+  """
+  indexer = get_indexer()
+  builder = indexer.get_builder(models.Person)
+  ac_role_name, person_id = (builder.get_ac_role_person_id(ac_list_item))
+  for key, val in builder.build_person_subprops({"id": person_id}).items():
+    newrec = rec.copy()
+    newrec.update({"property": ac_role_name,
+                   "subproperty": key,
+                   "content": val})
+    yield newrec
+
+
+def get_access_control_sort_subprop(rec, access_control_list):
+  """Get a special access_control_list subproperty for sorting
+  """
+  builder = get_indexer().get_builder(models.Person)
+  collection = defaultdict(list)
+  for ac_list_item in access_control_list:
+    ac_role_name, person_id = builder.get_ac_role_person_id(ac_list_item)
+    collection[ac_role_name].append({"id": person_id})
+  for ac_role_name, people in collection.iteritems():
+    for prop in get_person_sort_subprop({"property": ac_role_name}, people):
+      newrec = rec.copy()
+      newrec.update(prop)
+      yield newrec
+
+
+def get_properties(snapshot):
+  """Return properties for sent revision dict and pair object."""
+  properties = snapshot["revision"].copy()
+  properties.update({
+      "parent": PARENT_PROPERTY_TMPL.format(**snapshot),
+      "child": CHILD_PROPERTY_TMPL.format(**snapshot),
+      "child_type": snapshot["child_type"],
+      "child_id": snapshot["child_id"]
+  })
+  assignees = properties.pop("assignees", None) or []
+  for person, roles in assignees:
+    if person:
+      for role in roles:
+        properties[role] = [person]
+  return properties
+
+
+def get_record_value(prop, val, rec):
+  """Return itearble object with record as element of that object."""
+  if not prop or val is None:
+    return []
+  rec["property"] = prop
+  rec["content"] = val
+  # check custom values at first
+  if isinstance(val, dict) and val.get("type") == "Person":
+    return itertools.chain(get_person_data(rec, val),
+                           get_person_sort_subprop(rec, [val]))
+  if isinstance(val, list):
+    if all([p.get("type") == "Person" for p in val]):
+      sort_getter = get_person_sort_subprop
+      item_getter = get_person_data
+    elif prop == "access_control_list":
+      sort_getter = get_access_control_sort_subprop
+      item_getter = get_access_control_role_data
+    else:
+      return []
+    results = [item_getter(rec, i) for i in val]
+    results.append(sort_getter(rec, val))
+    return itertools.chain(*results)
+  if isinstance(val, dict) and "title" in val:
+    rec["content"] = val["title"]
+  if isinstance(val, (bool, int, long)):
+    rec["content"] = unicode(val)
+  if isinstance(rec["content"], basestring):
+    return [rec]
+  LOGGER.warning(u"Unsupported value for %s #%s in %s %s: %r",
+                 rec["type"], rec["key"], rec["property"],
+                 rec["subproperty"], rec["content"])
+  return []
+
+
+def reindex_pairs(pairs):
   """Reindex selected snapshots.
 
   Args:
     pairs: A list of parent-child pairs that uniquely represent snapshot
     object whose properties should be reindexed.
   """
-
-  # pylint: disable=too-many-locals
+  if not pairs:
+    return
   snapshots = dict()
-  revisions = dict()
-  snap_to_sid_cache = dict()
-  search_payload = list()
-
+  snapshot_query = models.Snapshot.query.filter(
+      tuple_(
+          models.Snapshot.parent_type,
+          models.Snapshot.parent_id,
+          models.Snapshot.child_type,
+          models.Snapshot.child_id,
+      ).in_(
+          {pair.to_4tuple() for pair in pairs}
+      )
+  ).options(
+      orm.subqueryload("revision").load_only("id", "resource_type", "content"),
+      orm.load_only(
+          "id",
+          "context_id",
+          "parent_type",
+          "parent_id",
+          "child_type",
+          "child_id",
+          "revision_id",
+      )
+  )
   cad_dict = _get_custom_attribute_dict()
-
-  snapshot_columns, revision_columns = _get_columns()
-
-  snapshot_query = snapshot_columns
-  if pairs:  # pylint:disable=too-many-nested-blocks
-    pairs_filter = tuple_(
-        models.Snapshot.parent_type,
-        models.Snapshot.parent_id,
-        models.Snapshot.child_type,
-        models.Snapshot.child_id,
-    ).in_({pair.to_4tuple() for pair in pairs})
-    snapshot_query = snapshot_columns.filter(pairs_filter)
-
-    for _id, ctx_id, ptype, pid, ctype, cid, revid in snapshot_query:
-      pair = Pair.from_4tuple((ptype, pid, ctype, cid))
-      snapshots[pair] = [_id, ctx_id, revid]
-      snap_to_sid_cache[pair] = _id
-
-    revision_ids = {revid for _, _, revid in snapshots.values()}
-    revision_query = revision_columns.filter(
-        models.Revision.id.in_(revision_ids)
-    )
-    for _id, _type, content in revision_query:
-      revisions[_id] = get_searchable_attributes(
-          CLASS_PROPERTIES[_type], cad_dict, content)
-
-    snapshot_ids = set()
-    for pair in snapshots:
-      snapshot_id, ctx_id, revision_id = snapshots[pair]
-      snapshot_ids.add(snapshot_id)
-
-      properties = revisions[revision_id]
-      properties.update({
-          "parent": _get_parent_property(pair),
-          "child": _get_child_property(pair),
-          "child_type": pair.child.type,
-          "child_id": pair.child.id
-      })
-
-      assignees = properties.pop("assignees", None)
-      if assignees:
-        for person, roles in assignees:
-          if person:
-            for role in roles:
-              properties[role] = [person]
-
-      for prop, val in properties.items():
-        if prop and val is not None:
-          # record stub
-          rec = {
-              "key": snapshot_id,
-              "type": "Snapshot",
-              "context_id": ctx_id,
-              "tags": _get_tag(pair),
-              "property": prop,
-              "subproperty": "",
-              "content": val,
-          }
-          if isinstance(val, dict) and "title" in val:
-            # Option
-            rec["content"] = val["title"]
-            search_payload += [rec]
-          elif isinstance(val, dict) and val.get("type") == "Person":
-            search_payload += get_person_data(rec, val)
-            search_payload += get_person_sort_subprop(rec, [val])
-          elif isinstance(val, list) and all([p.get("type") == "Person"
-                                              for p in val]):
-            for person in val:
-              search_payload += get_person_data(rec, person)
-            search_payload += get_person_sort_subprop(rec, val)
-          elif isinstance(val, (bool, int, long)):
-            rec["content"] = unicode(val)
-            search_payload += [rec]
-          elif isinstance(rec["content"], basestring):
-            search_payload += [rec]
-          else:
-            logger.warning(u"Unsupported value for %s #%s in %s %s: %r",
-                           rec["type"], rec["key"], rec["property"],
-                           rec["subproperty"], rec["content"])
-
-    delete_records(snapshot_ids)
-    insert_records(search_payload)
+  for snapshot in snapshot_query:
+    revision = snapshot.revision
+    snapshots[snapshot.id] = {
+        "id": snapshot.id,
+        "context_id": snapshot.context_id,
+        "parent_type": snapshot.parent_type,
+        "parent_id": snapshot.parent_id,
+        "child_type": snapshot.child_type,
+        "child_id": snapshot.child_id,
+        "revision": get_searchable_attributes(
+            CLASS_PROPERTIES[revision.resource_type],
+            cad_dict,
+            revision.content)
+    }
+  search_payload = []
+  for snapshot in snapshots.values():
+    for prop, val in get_properties(snapshot).items():
+      search_payload.extend(
+          get_record_value(
+              prop,
+              val,
+              {
+                  "key": snapshot["id"],
+                  "type": "Snapshot",
+                  "context_id": snapshot["context_id"],
+                  "tags": TAG_TMPL.format(**snapshot),
+                  "subproperty": "",
+              }
+          )
+      )
+  delete_records(snapshots.keys())
+  insert_records(search_payload)

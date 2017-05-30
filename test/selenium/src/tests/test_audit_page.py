@@ -20,9 +20,10 @@ class TestAuditPage(base.Test):
 
   @pytest.fixture(scope="function")
   def create_and_clone_audit(
-      self, new_program_rest, new_control_rest, map_control_to_program_rest,
-      new_audit_rest, new_asmt_rest, new_asmt_tmpl_rest, new_issue_rest,
-      map_issue_to_audit_rest, selenium
+      self, new_program_rest, new_control_rest,
+      map_new_program_rest_to_new_control_rest, new_audit_rest,
+      new_assessment_rest, new_assessment_template_rest, new_issue_rest,
+      selenium
   ):
     """Create Audit with clonable and non clonable objects via REST API and
     clone it with them via UI.
@@ -34,89 +35,102 @@ class TestAuditPage(base.Test):
     - Issue mapped to Audit via REST API.
     """
     # pylint: disable=too-many-locals
-    expected_audit = AuditsFactory().clone(audit=new_audit_rest[0])[0]
+    expected_audit = AuditsFactory().clone(audit=new_audit_rest)[0]
     expected_asmt_tmpl = AssessmentTemplatesFactory().clone(
-        asmt_tmpl=new_asmt_tmpl_rest[0])[0]
+        asmt_tmpl=new_assessment_template_rest)[0]
     actual_audit = (
         webui_service.AuditsService(selenium).
-        clone_via_info_page_and_get_obj(audit_obj=new_audit_rest[0])
+        clone_via_info_page_and_get_obj(audit_obj=new_audit_rest)
     )
     return {
-        "audit": new_audit_rest[0], "expected_audit": expected_audit,
-        "actual_audit": actual_audit, "asmt": new_asmt_rest[0],
-        "issue": new_issue_rest[0], "asmt_tmpl": new_asmt_tmpl_rest[0],
-        "expected_asmt_tmpl": expected_asmt_tmpl,
-        "control": new_control_rest, "program": new_program_rest}
+        "audit": new_audit_rest, "expected_audit": expected_audit,
+        "actual_audit": actual_audit, "assessment": new_assessment_rest,
+        "issue": new_issue_rest,
+        "assessment_template": new_assessment_template_rest,
+        "expected_assessment_template": expected_asmt_tmpl,
+        "control": new_control_rest, "program": new_program_rest
+    }
 
   @pytest.mark.smoke_tests
-  def test_asmt_tmpl_creation(self, new_audit_rest, selenium):
+  def test_asmt_tmpl_creation(self, new_program_rest, new_audit_rest,
+                              selenium):
     """Check if Assessment Template can be created from Audit page via
     Assessment Templates widget.
     Preconditions:
     - Audit created under Program via REST API.
     """
-    audit = new_audit_rest[0]
     expected_asmt_tmpl = AssessmentTemplatesFactory().create()
     (webui_service.AssessmentTemplatesService(selenium).
-     create_obj_via_tree_view(src_obj=audit, obj=expected_asmt_tmpl))
+     create_obj_via_tree_view(src_obj=new_audit_rest, obj=expected_asmt_tmpl))
     actual_asmt_tmpls_tab_count = (
         webui_service.AssessmentTemplatesService(selenium).
-        get_count_objs_from_tab(src_obj=audit))
+        get_count_objs_from_tab(src_obj=new_audit_rest))
     assert len([expected_asmt_tmpl]) == actual_asmt_tmpls_tab_count
     actual_asmt_tmpls = (webui_service.AssessmentTemplatesService(selenium).
-                         get_list_objs_from_tree_view(src_obj=audit))
+                         get_list_objs_from_tree_view(src_obj=new_audit_rest))
     assert [expected_asmt_tmpl] == actual_asmt_tmpls, (
         messages.ERR_MSG_FORMAT.format(
             [expected_asmt_tmpl], actual_asmt_tmpls))
 
   @pytest.mark.smoke_tests
-  def test_asmt_creation(self, new_audit_rest, selenium):
+  def test_asmt_creation(self, new_program_rest, new_audit_rest, selenium):
     """Check if Assessment can be created from Audit page via
     Assessments widget.
     Preconditions:
     - Audit created under Program via REST API.
     """
-    audit = new_audit_rest[0]
     expected_asmt = AssessmentsFactory().create()
     (webui_service.AssessmentsService(selenium).
-     create_obj_via_tree_view(src_obj=audit, obj=expected_asmt))
+     create_obj_via_tree_view(src_obj=new_audit_rest, obj=expected_asmt))
     actual_asmts_tab_count = (webui_service.AssessmentsService(selenium).
-                              get_count_objs_from_tab(src_obj=audit))
+                              get_count_objs_from_tab(src_obj=new_audit_rest))
     assert len([expected_asmt]) == actual_asmts_tab_count
     actual_asmts = (webui_service.AssessmentsService(selenium).
-                    get_list_objs_from_tree_view(src_obj=audit))
+                    get_list_objs_from_tree_view(src_obj=new_audit_rest))
     assert [expected_asmt] == actual_asmts, (
         messages.ERR_MSG_FORMAT.format([expected_asmt], actual_asmts))
 
   @pytest.mark.smoke_tests
-  def test_asmts_generation(self, map_controls_to_program_rest,
-                            new_controls_rest, new_asmt_tmpl_rest, selenium):
+  @pytest.mark.parametrize(
+      "dynamic_new_assessment_template",
+      [None, "new_assessment_template_rest",
+       "new_assessment_template_with_cas_rest"],
+      ids=["Assessments generation without Assessment Template",
+           "Assessments generation based on Assessment Template without LCAs",
+           "Assessments generation based on Assessment Template with LCAs"],
+      indirect=["dynamic_new_assessment_template"])
+  def test_asmts_generation(
+      self, new_program_rest, new_controls_rest,
+      map_new_program_rest_to_new_controls_rest, new_audit_rest,
+      dynamic_new_assessment_template, selenium
+  ):
     """Check if Assessments can be generated from Audit page via Assessments
     widget using Assessment template and Controls.
     Preconditions:
     - Program, Controls created via REST API.
     - Controls mapped to Program via REST API.
     - Audit created under Program via REST API.
-    - Assessment Template created under Audit via REST API.
+    - Assessment Template with CAs created under Audit via REST API.
     """
-    asmt_tmpl, audit, _ = new_asmt_tmpl_rest
     expected_asmts = (AssessmentsFactory().generate(
-        objs_under_asmt_tmpl=new_controls_rest, audit=audit))
-    (webui_service.AssessmentsService(selenium).
-     generate_objs_via_tree_view(src_obj=audit, asmt_tmpl_obj=asmt_tmpl,
-                                 objs_under_asmt=new_controls_rest))
+        objs_under_asmt=new_controls_rest, audit=new_audit_rest,
+        asmt_tmpl=dynamic_new_assessment_template))
+    (webui_service.AssessmentsService(selenium).generate_objs_via_tree_view(
+        src_obj=new_audit_rest, objs_under_asmt=new_controls_rest,
+        asmt_tmpl_obj=dynamic_new_assessment_template))
     actual_asmts_tab_count = (webui_service.AssessmentsService(selenium).
-                              get_count_objs_from_tab(src_obj=audit))
+                              get_count_objs_from_tab(src_obj=new_audit_rest))
     assert len(expected_asmts) == actual_asmts_tab_count
-    actual_asmts = (webui_service.AssessmentsService(selenium).
-                    get_list_objs_from_tree_view(src_obj=audit))
+    actual_asmts = [
+        webui_service.AssessmentsService(selenium).get_obj_from_info_panel(
+            src_obj=new_audit_rest, obj=expected_asmt)
+        for expected_asmt in expected_asmts]
     assert expected_asmts == actual_asmts, (
         messages.ERR_MSG_FORMAT.format(expected_asmts, actual_asmts))
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
-  def test_cloned_audit_contains_new_attrs(self, create_and_clone_audit,
-                                           selenium):
+  def test_cloned_audit_contains_new_attrs(self, create_and_clone_audit):
     """Check via UI that cloned Audit contains new predicted attributes.
     Preconditions:
     - Execution and return of fixture 'create_and_clone_audit'.
@@ -154,7 +168,7 @@ class TestAuditPage(base.Test):
     -Execution and return of fixture 'create_and_clone_audit'.
     """
     actual_audit = create_and_clone_audit["actual_audit"]
-    expected_asmt_tmpl = create_and_clone_audit["expected_asmt_tmpl"]
+    expected_asmt_tmpl = create_and_clone_audit["expected_assessment_template"]
     actual_asmt_tmpls = (webui_service.AssessmentTemplatesService(selenium).
                          get_list_objs_from_tree_view(src_obj=actual_audit))
     assert [expected_asmt_tmpl] == actual_asmt_tmpls, (

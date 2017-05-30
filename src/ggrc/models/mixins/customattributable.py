@@ -15,9 +15,9 @@ from sqlalchemy.orm import foreign
 from sqlalchemy.orm import relationship
 from werkzeug.exceptions import BadRequest
 
+from ggrc import builder
 from ggrc import db
 from ggrc import utils
-from ggrc.models.computed_property import computed_property
 from ggrc.models.reflection import AttributeInfo
 
 
@@ -469,7 +469,7 @@ class CustomAttributable(object):
         value.custom_attribute = map_.get(int(value.custom_attribute_id))
       value.validate()
 
-  @computed_property
+  @builder.simple_property
   def preconditions_failed(self):
     """Returns True if any mandatory CAV, comment or evidence is missing."""
     values_map = {

@@ -15,6 +15,7 @@ from sqlalchemy.orm.session import Session
 from sqlalchemy import func
 from sqlalchemy.sql.expression import tuple_
 
+from ggrc import builder
 from ggrc import db
 from ggrc.utils import benchmark
 from ggrc.login import get_current_user_id
@@ -23,7 +24,6 @@ from ggrc.models import reflection
 from ggrc.models import relationship
 from ggrc.models import revision
 from ggrc.models.deferred import deferred
-from ggrc.models.computed_property import computed_property
 
 
 class Snapshot(relationship.Relatable, mixins.Base, db.Model):
@@ -94,12 +94,12 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
       uselist=True,
   )
 
-  @computed_property
+  @builder.simple_property
   def is_latest_revision(self):
     """Flag if the snapshot has the latest revision."""
     return self.revisions and self.revision == self.revisions[-1]
 
-  @computed_property
+  @builder.simple_property
   def original_object_deleted(self):
     """Flag if the snapshot has the latest revision."""
     return self.revisions and self.revisions[-1].action == "deleted"

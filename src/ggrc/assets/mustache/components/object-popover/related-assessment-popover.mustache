@@ -11,11 +11,11 @@
             <div class="fields-wrapper flex-box flex-row">
                 <show-more items="selectedAssessmentFields">
                     <div class="field-wrapper flex-size-1">
-                        <ca-object-validation-icon {validation}="validation"></ca-object-validation-icon>
-                        <div class="field-title">
-                            <label class="field-title__text" for="form-field-{{id}}">{{title}}</label>
+                        <form-validation-icon {validation}="validation"></form-validation-icon>
+                        <div class="field__title form-field__title">
+                            <label class="field__title-text" for="form-field-{{id}}">{{title}}</label>
                             {{#if helptext}}
-                                <i class="fa fa-question-circle helper-text" rel="tooltip" title="{{helptext}}"></i>
+                                <i class="fa fa-question-circle field__title-helper-text" rel="tooltip" title="{{helptext}}"></i>
                             {{/if}}
                         </div>
                         <auto-save-form-field-view

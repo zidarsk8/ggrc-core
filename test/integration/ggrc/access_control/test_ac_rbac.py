@@ -35,7 +35,7 @@ class TestAccessControlRBAC(TestCase):
     """Set up a control with an access control role that grants RUD"""
     self.control = factories.ControlFactory()
     self.all_acr = factories.AccessControlRoleFactory(
-        type="Control",
+        object_type="Control",
         read=True,
         update=True,
         delete=True

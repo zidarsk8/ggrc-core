@@ -127,6 +127,14 @@
   padding: 8px 0;
   border-bottom: 1px solid #ccc;
   cursor: default;
+  line-height: 16px;
+  a {
+    line-height: 16px;
+    display: inline-block;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
   // Extra style for columns
   > * {
     overflow: hidden;
