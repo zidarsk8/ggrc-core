@@ -7,6 +7,7 @@
 # false positive for RelationshipProperty
 
 from datetime import datetime
+from logging import getLogger
 
 from flask import g
 import iso8601
@@ -26,6 +27,8 @@ from ggrc.models.types import JsonType
 from ggrc.models.utils import PolymorphicRelationship
 from ggrc.utils import url_for
 from ggrc.utils import view_url_for
+
+logger = getLogger(__name__)
 
 
 def get_json_builder(obj):
@@ -85,8 +88,8 @@ def update(obj, json_obj):
   updater = get_json_builder(obj)
   if updater:
     updater.update(obj, json_obj)
-  # FIXME what to do if no updater??
-  # Nothing, perhaps log, assume omitted by design
+  else:
+    logger.warning("No updater available. Obj might not be updated correctly.")
 
 
 def create(obj, json_obj):
@@ -277,11 +280,6 @@ class UpdateAttrHandler(object):
     """Translate the JSON value for an object method decorated as a
     ``property``.
     """
-    # FIXME need a way to decide this. Require link? Use URNs?
-    #  reflective approaches won't work as this is used for polymorphic
-    #  properties
-    # rel_class = None
-    # return cls.query_for(rel_class, json_obj, attr_name, True)
     attr_value = json_obj.get(attr_name, None)
     if attr_value:
       rel_class_name = json_obj[attr_name]['type']
@@ -486,7 +484,7 @@ def walk_representation(obj):  # noqa
 
 def gather_queries(resource):
   queries = []
-  for val, key, obj in walk_representation(resource):
+  for val, _, _ in walk_representation(resource):
     if isinstance(val, LazyStubRepresentation):
       queries.append((val.type, val.conditions))
   return queries
