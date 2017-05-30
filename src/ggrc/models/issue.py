@@ -46,4 +46,4 @@ class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
 
   @simple_property
   def archived(self):
-    return self.audit.archived
+    return self.audit.archived if self.audit else False

@@ -226,7 +226,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
 
   @simple_property
   def archived(self):
-    return self.audit.archived
+    return self.audit.archived if self.audit else False
 
   @property
   def assessors(self):
