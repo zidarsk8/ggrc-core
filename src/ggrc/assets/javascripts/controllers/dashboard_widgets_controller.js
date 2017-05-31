@@ -28,9 +28,6 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
     if (!this.options.widget_icon && this.options.model) {
       this.options.widget_icon = this.options.model.table_singular;
     }
-    if (this.options.widget_icon && !/^fa/.test(this.options.widget_icon)) {
-      this.options.widget_icon = this.options.widget_icon;
-    }
 
     if (!this.options.object_category && this.options.model) {
       this.options.object_category = this.options.model.category;
@@ -121,25 +118,19 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
       return this._display_deferred;
     }
 
-    if (that.content_controller) {
-      this._display_deferred = this.prepare().then(function () {
-        if (that.content_controller && that.content_controller.display) {
-          return that.content_controller.display();
-        }
-        else {
-          return new $.Deferred().resolve();
-        }
-      }).done(tracker_stop);
-    } else {
-      this._display_deferred = this.prepare().then(function() {
-        if (that.options.widgetType === 'treeview') {
-          return that.element.find('tree-widget-container')
-            .viewModel().display();
-        } else {
-          return new $.Deferred().resolve();
-        }
-      }).done(tracker_stop);
-    }
+    this._display_deferred = this.prepare().then(function () {
+      var dfd;
+
+      if (that.options.widgetType === 'treeview') {
+        dfd = that.element.find('tree-widget-container').viewModel().display();
+      } else if (that.content_controller && that.content_controller.display) {
+        dfd = that.content_controller.display();
+      } else {
+        dfd = new $.Deferred().resolve();
+      }
+
+      return dfd;
+    }).done(tracker_stop);
 
     return this._display_deferred;
   },

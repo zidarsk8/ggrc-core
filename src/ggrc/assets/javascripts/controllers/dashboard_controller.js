@@ -212,6 +212,10 @@
       control = new descriptor
         .controller($element, descriptor.controller_options);
 
+      if (GGRC.Utils.CurrentPage.isAdmin()) {
+        control.prepare();
+      }
+
       // FIXME: Abstraction violation: Sortable/DashboardWidget/ResizableWidget
       //   controllers should maybe handle this?
       $container = this.get_active_widget_containers().eq(0);
