@@ -337,10 +337,6 @@
 
         if (!this.options.scroll_element) {
           this.options.attr('scroll_element', $('.object-area'));
-
-          $('.object-area').on('change', function () {
-            self.update_header();
-          });
         }
 
         // Override nested child options for allow_* properties
@@ -393,24 +389,12 @@
       var statusControl;
 
       if (this.options.header_view && this.options.show_header) {
-        optionsDfd = $.when(this.options).then(function (options) {
-          options.onChildModelsChange = self.set_tree_display_list.bind(self);
-          return options;
-        });
+        optionsDfd = $.when(this.options);
         dfds.push(
           can.view(this.options.header_view, optionsDfd).then(
             this._ifNotRemoved(function (frag) {
               this.element.before(frag);
               this.initNoResultsMessage();
-              can.bind.call(this.element.parent()
-                  .find('.widget-col-title[data-field]'),
-                'click',
-                this.sort.bind(this)
-              );
-              can.bind.call(this.element.parent().find('.set-tree-attrs'),
-                'click',
-                this.set_tree_attrs.bind(this)
-              );
 
               can.bind.call(this.element.parent()
                 .find('.tview-dropdown-toggle'),
@@ -447,7 +431,6 @@
       }
 
       this._init_view_deferred = $.when.apply($.when, dfds);
-      this.update_header();
       return this._init_view_deferred;
     },
 
@@ -734,62 +717,6 @@
       this.enqueue_items(realAdd);
     },
 
-    '{original_list} remove': function (list, ev, oldVals, index) {
-      var removeMarker = {}; // Empty object used as unique marker
-      var removedObjectType;
-      var skipInfoPinRefresh = false;
-
-      //  FIXME: This assumes we're replacing the entire list, and corrects for
-      //    instances being removed and immediately re-added.  This should be
-      //    changed to support exact mirroring of the order of
-      //    `this.options.list`.
-      if (!this.oldList) {
-        this.oldList = [];
-      }
-      this.oldList.push.apply(
-        this.oldList,
-        can.map(oldVals, function (v) {
-          return v.instance ? v.instance : v;
-        }));
-
-      // If a removed object is a Document or a Person, it is likely that it
-      // was removed from the info pin, thus refreshing the latter is not needed.
-      // The check will fail, though, if the info pane was displaying a person
-      // located in a subtree, and we unmapped that person from the object
-      // displayed in the parent tree view node.
-      if (oldVals.length === 1 && oldVals[0].instance) {
-        removedObjectType = oldVals[0].instance.type;
-        if (removedObjectType === 'Person' ||
-          removedObjectType === 'Document') {
-          skipInfoPinRefresh = true;
-        }
-      }
-
-      // `remove_marker` is to ensure that removals are not attempted until 20ms
-      //   after the *last* removal (e.g. for a series of removals)
-      this._remove_marker = removeMarker;
-      setTimeout(this._ifNotRemoved(function () {
-        if (this._remove_marker === removeMarker) {
-          can.each(this.oldList, function (v) {
-            this.element.trigger('removeChildNode', v);
-          }.bind(this));
-          this.oldList = null;
-          this._remove_marker = null;
-
-          if (skipInfoPinRefresh) {
-            return;
-          }
-
-          // TODO: This is a workaround. We need to update communication between
-          //       info-pin and tree views through Observer
-          if (!this.element.closest('.cms_controllers_info_pin').length) {
-            $('.cms_controllers_info_pin').control().unsetInstance();
-          }
-          this.show_info_pin();
-        }
-      }.bind(this)), 200);
-    },
-
     '.tree-structure subtree_loaded': function (el, ev) {
       var instanceId;
       var parent;
@@ -865,30 +792,8 @@
         }
         this.options.attr('filter_shown', shown);
         this.options.attr('filter_count', count.toString());
-
-        this.update_header();
       }.bind(this)));
       return finalDfd;
-    },
-    update_header: function () {
-      var treeFilter;
-      var headerContentHeight;
-      var elementParent;
-
-      if (!this.element || !this.element.parent) {
-        return;
-      }
-
-      elementParent = this.element.parent();
-      treeFilter = elementParent.find('.tree-header-content');
-
-      if (treeFilter.length === 0) {
-        return;
-      }
-
-      headerContentHeight = treeFilter.height();
-
-      this.element.css('margin-top', headerContentHeight);
     },
     draw_items: function (optionsList) {
       var items;
@@ -924,102 +829,8 @@
 
       res.then(function () {
         _.defer(this.draw_visible.bind(this));
-      }.bind(this)).always(function () {
-        if (this.options.is_subtree) {
-          if (this.options.attr('showAllRelated')) {
-            this.addSubTreeShowRelated();
-          }
-
-          if (this.options.drawSubTreeExpander) {
-            this.addSubTreeExpander(items);
-          }
-        }
       }.bind(this));
       return res;
-    },
-
-    insertSubTreeLink: function (view, element) {
-      if (element.length) {
-        $(view).insertBefore(element);
-      } else {
-        this.element.append(view);
-      }
-    },
-
-    addSubTreeShowRelated: function () {
-      var treeOptions = this.options;
-      var options = {
-        showAllRelated: treeOptions.attr('showAllRelated'),
-        showAllRelatedLink: treeOptions.parent_instance ?
-          treeOptions.parent_instance.viewLink :
-          ''
-      };
-      var relatedLink = can.view(GGRC.mustache_path +
-       '/base_objects/sub_tree_all_related_link.mustache', options);
-      var element = this.element.find('.not-directly-related:first');
-
-      this.insertSubTreeLink(relatedLink, element);
-    },
-
-    addSubTreeExpander: function () {
-      var element;
-      var options;
-      var expander;
-      var self = this;
-
-      if (this.element.find('.sub-tree-expander').length) {
-        return;
-      }
-
-      this.element.addClass('not-directly-related-hide');
-
-      element = this.element.find('.not-directly-related:first');
-      options = {
-        expanded: false,
-        disabled: !element.length,
-        onChangeState: self.showNotDirectlyMappedObjects.bind(self)
-      };
-      expander = can.view(GGRC.mustache_path +
-        '/base_objects/sub_tree_expand.mustache', options);
-
-      this.insertSubTreeLink(expander, element);
-    },
-
-    ' removeChildNode': function (el, ev, data) { // eslint-disable-line quote-props
-      var that = this;
-      var instance;
-
-      if (data.instance && data.instance instanceof this.options.model) {
-        instance = data.instance;
-      } else {
-        instance = data;
-      }
-
-      //  FIXME: This should be done using indices, when the order of elements
-      //    is guaranteed to mirror the order of `this.options.list`.
-
-      //  Replace the list with the list sans the removed instance
-      that.options.list.replace(
-        can.map(this.options.list, function (options, i) {
-          if (options.instance !== instance) {
-            return options;
-          }
-        }));
-
-      //  Remove items by data attributes
-      that.element.children([
-        '[data-object-id=' + instance.id + ']',
-        '[data-object-type=' + instance.constructor.table_singular + ']'
-      ].join('')).remove();
-      ev.stopPropagation();
-    },
-
-    ' updateCount': function (el, ev) { // eslint-disable-line quote-props
-      // Suppress events from sub-trees
-      if (!($(ev.target)
-          .closest('.' + this.constructor._fullName).is(this.element))) {
-        ev.stopPropagation();
-      }
     },
 
     widget_hidden: function (event) {
@@ -1030,8 +841,6 @@
         this._add_child_lists_id += 1;
       }
 
-      this.triggerListeners(true);
-
       return false;
     },
 
@@ -1039,115 +848,8 @@
       if (this.options.original_list) {
         setTimeout(this.reload_list.bind(this), 0);
       }
-
-      this.triggerListeners();
-
-      $('body').on('treeupdate', this.refreshList.bind(this));
-      this.update_header();
       return false;
     },
-
-    _verifyRelationship: function (instance, shortName) {
-      if (!(instance instanceof CMS.Models.Relationship)) {
-        return false;
-      }
-      if (instance.destination &&
-        (instance.destination.type === shortName ||
-         instance.destination.type === 'Snapshot')) {
-        return true;
-      }
-      if (instance.source &&
-        (instance.source.type === shortName ||
-         instance.source.type === 'Snapshot')) {
-        return true;
-      }
-      return false;
-    },
-
-    triggerListeners: (function () {
-      var activeTabModel;
-      var self;
-
-      function onCreated(ev, instance) {
-        var parentInstance = self.options.parent_instance;
-
-        function callback() {
-          parentInstance.unbind('change', callback);
-          _refresh(true);
-        }
-
-        if (self._verifyRelationship(instance, activeTabModel)) {
-          parentInstance.on('change', callback);
-        } else if (activeTabModel === instance.type) {
-          _refresh(true);
-        } else if (activeTabModel === 'Person' &&
-          _.includes(['ObjectPerson', 'WorkflowPerson', 'UserRole'],
-            instance.type)) {
-          _refresh();
-        }
-      }
-
-      function onDestroyed(ev, instance) {
-        var current;
-        var destType;
-        var srcType;
-
-        if (self._verifyRelationship(instance, activeTabModel) ||
-          instance instanceof CMS.Models[activeTabModel]) {
-          if (self.options.attr('original_list').length === 1) {
-            current = self.options.attr('paging.current');
-            self.options.attr('paging.current',
-              current > 1 ? current - 1 : 1);
-          }
-
-          // if unmapping e.g. an URL (a "Document") or an assignee from
-          // the info pin, refreshing the latter is not needed
-          if (instance instanceof CMS.Models.Relationship) {
-            srcType = instance.source ?
-              instance.source.type : null;
-            destType = instance.destination ?
-              instance.destination.type : null;
-            if (srcType === 'Person' || destType === 'Person' ||
-              srcType === 'Document' || destType === 'Document') {
-              return;
-            }
-          }
-
-          _refresh();
-
-          // TODO: This is a workaround.We need to update communication between
-          //       info-pin and tree views through Observer
-          if (!self.element.closest('.cms_controllers_info_pin').length) {
-            $('.cms_controllers_info_pin').control().unsetInstance();
-          }
-          self.show_info_pin();
-        }
-      }
-
-      function _refresh(sortByUpdatedAt) {
-        if (sortByUpdatedAt) {
-          self.options.attr('paging.sortDirection', 'desc');
-          self.options.attr('paging.sortBy', 'updated_at');
-          self.options.attr('paging.current', 1);
-        }
-        self.refreshList();
-      }
-
-      return function (needDestroy) {
-        activeTabModel = this.options.model.shortName;
-        self = this;
-        if (needDestroy) {
-          // Remove listeners for inactive tabs
-          can.Model.Cacheable.unbind('created', onCreated);
-          can.Model.Cacheable.unbind('destroyed', onDestroyed);
-        } else {
-          // Add listeners on creations instance or mappings objects for current tab
-          // and refresh page after that.
-          can.Model.Cacheable.bind('created', onCreated);
-          can.Model.Cacheable.bind('destroyed', onDestroyed);
-        }
-      };
-    })(),
 
     '.edit-object modal:success': function (el, ev, data) {
       var model = el.closest('[data-model]').data('model');
@@ -1175,357 +877,8 @@
       }
     },
 
-    loadTreeStates: function (modelName) {
-      // Get the status list from local storage
-      var savedStateList;
-      savedStateList = this.display_prefs.getTreeViewStates(modelName);
-
-      if (savedStateList.length === 0) {
-        savedStateList = GGRC.Utils
-          .State.getDefaultStatesForModel(this.options.model.shortName);
-      }
-
-      this.options.attr('selectStateList', savedStateList);
-    },
-    saveTreeStates: function (selectedStates) {
-      var stateToSave = [];
-
-      // in this case we save previous states
-      if (!selectedStates) {
-        return;
-      }
-
-      stateToSave = selectedStates.map(function (state) {
-        return state.value;
-      });
-
-      this.options.attr('selectStateList', stateToSave);
-      this.display_prefs.setTreeViewStates(this.options.model.model_singular,
-        stateToSave);
-    },
-    /* Update the tree attributes as selected by the user CORE-1546
-     */
-    set_tree_attrs: function (event) {
-      // update the display attrbute list and re-draw
-      // 1: find checked items
-      // 2. update
-      var target = $(event.target);
-      var attrToSave = [];
-      var $check = target.parent().find('.attr-checkbox');
-      var $selected = $check.filter(':checked');
-      var selectedItems = [];
-
-      $selected.each(function (index) {
-        selectedItems.push(this.value);
-      });
-
-      can.each(this.options.select_attr_list, function (item) {
-        item.display_status = selectedItems.indexOf(item.attr_name) !== -1;
-      });
-
-      this.options.attr('select_attr_list', this.options.select_attr_list);
-      this.options.display_attr_list = [];
-
-      can.each(this.options.select_attr_list, function (item) {
-        if (!item.mandatory && item.display_status) {
-          this.options.display_attr_list.push(item);
-        }
-      }, this);
-      this.options.attr('display_attr_list', this.options.display_attr_list);
-      this.setup_column_width();
-
-      this.reload_list(true);
-      // set user preferences for next time
-      can.each(this.options.display_attr_list, function (item) {
-        attrToSave.push(item.attr_name);
-      });
-      this.display_prefs.setTreeViewHeaders(this.options.model.model_singular,
-        attrToSave);
-      this.display_prefs.save();
-
-      can.bind.call(this.element.parent().find('.widget-col-title[data-field]'),
-        'click', this.sort.bind(this));
-    },
-
-    set_tree_display_list: function (modelName, selectedItems) {
-      var i;
-      var el;
-      var openItems;
-      var control;
-      var tviewEl;
-
-      if (!modelName) {
-        return;
-      }
-
-      // update GGRC.tree_view
-      GGRC.tree_view.sub_tree_for.attr(modelName + '.display_list',
-        selectedItems);
-
-      // save in local storage
-      this.display_prefs.setChildTreeDisplayList(modelName, selectedItems);
-
-      // check if any inner tree is open
-      el = this.element;
-      if (el.hasClass('tree-open')) {
-        // find the inner tree and reload it
-        openItems = el.find('.item-open .cms_controllers_tree_view');
-
-        for (i = 0; i < openItems.length; i++) {
-          tviewEl = $(openItems[i]);
-          control = tviewEl.control();
-          if (control) {
-            control.reload_list();
-          }
-        }
-      }
-    },
-
-    sort: function (event) {
-      var $el = $(event.currentTarget);
-      var key = $el.data('field');
-      var order;
-
-      if (key !== this.options.attr('paging.sortBy')) {
-        this.options.attr('paging.sortDirection', null);
-      }
-
-      order =
-        this.options.attr('paging.sortDirection') === 'asc' ? 'desc' : 'asc';
-
-      this.options.attr('paging.sortDirection', order);
-      this.options.attr('paging.sortBy', key);
-
-      $el.closest('.tree-header')
-        .find('.widget-col-title')
-        .removeClass('asc')
-        .removeClass('desc');
-
-      $el.addClass(order);
-
-      this.options.attr('paging.current', 1);
-      this.refreshList();
-    },
-
-    filter: function (filterString, selectedStates) {
-      this.saveTreeStates(selectedStates);
-      this.options.attr('paging.filter', filterString);
-      this.options.attr('paging.current', 1);
-      this.refreshList();
-    },
-
-    buildSubTreeCountMap: function (originalOrder, relevant, elementsLimit) {
-      var self = this;
-      var queryAPI = GGRC.Utils.QueryAPI;
-      var currentElementsCount = 0;
-      var countQuery = queryAPI.buildCountParams(originalOrder, relevant);
-
-      return queryAPI.makeRequest({data: countQuery}).then(function (response) {
-        var countMap = [];
-
-        response.forEach(function (item) {
-          var count;
-          var propertyName = originalOrder.find(function (type) {
-            return item[type];
-          });
-
-          var obj = {
-            type: propertyName,
-            count: item[propertyName].total
-          };
-
-          self.options.attr('showAllRelated',
-            currentElementsCount >= elementsLimit);
-
-          if (self.options.attr('showAllRelated') || obj.count === 0) {
-            return;
-          }
-
-          if (elementsLimit - currentElementsCount >= obj.count) {
-            count = obj.count;
-          } else {
-            count = elementsLimit - currentElementsCount;
-            self.options.attr('showAllRelated', true);
-          }
-
-          currentElementsCount += count;
-
-          countMap.push({
-            type: obj.type,
-            count: count
-          });
-        });
-
-        return countMap;
-      });
-    },
-
-    loadSubTree: function () {
-      var parent = this.options.parent_instance;
-      var parentCtrl = this.element.closest('section')
-        .find('.cms_controllers_tree_view').control();
-      var snapshots = GGRC.Utils.Snapshots;
-      var relevant = {
-        type: parent.type,
-        id: snapshots.isSnapshot(parent) ? parent.snapshot.child_id : parent.id,
-        operation: 'relevant'
-      };
-      var originalOrder = GGRC.Utils.TreeView.getModelsForSubTier(parent.type);
-      var limit = this.options.subTreeElementsLimit;
-      var typeModels;
-      var fields = [
-        'child_id',
-        'child_type',
-        'context',
-        'email',
-        'id',
-        'is_latest_revision',
-        'name',
-        'revision',
-        'revisions',
-        'selfLink',
-        'slug',
-        'status',
-        'title',
-        'type',
-        'viewLink',
-        'workflow_state',
-        // labels for assessment templates
-        'DEFAULT_PEOPLE_LABELS'
-      ];
-
-      if (!originalOrder.length) {
-        originalOrder = GGRC.Mappings.getMappingList(parent.type);
-      }
-
-      if (GGRC.Utils.CurrentPage.getPageType() === 'Workflow') {
-        typeModels = originalOrder.map(function (item) {
-          var typeModels = {
-            type: item,
-            fields: [],
-            page: parent.type === 'CycleTaskGroup' ?
-              {sortBy: 'task due date'} :
-              {}
-          };
-          var rootFilter = parentCtrl.options.attr('paging.filter');
-          if (rootFilter) {
-            typeModels.filter = GGRC.query_parser.parse(rootFilter);
-          }
-
-          return typeModels;
-        });
-
-        return this.loadSubTreeData(typeModels, relevant);
-      }
-
-      return this.buildSubTreeCountMap(originalOrder, relevant, limit)
-        .then(function (countMap) {
-          countMap.forEach(function (item) {
-            item.fields = fields;
-            item.page = {current: 1, pageSize: item.count};
-          });
-
-          return this.loadSubTreeData(countMap, relevant);
-        }.bind(this));
-    },
-
-    loadSubTreeData: function (typeModels, relevant) {
-      var queryAPI = GGRC.Utils.QueryAPI;
-      var reqParams = typeModels.map(function (model) {
-        return queryAPI.buildParam(
-          model.type, model.page, relevant, model.fields, model.filter);
-      });
-
-      return this.page_loader.load({data: reqParams},
-        typeModels.map(function (item) {
-          return item.type;
-        }));
-    },
-
-    loadPage: function () {
-      var options = this.options;
-      var queryAPI = GGRC.Utils.QueryAPI;
-      var modelName = options.model.shortName;
-      var states = options.attr('selectStateList');
-      var statesFilter = GGRC.Utils.State.statusFilter(states, '', modelName);
-      var isStateQuery = statesFilter !== '';
-      var additionalFilter = options.additional_filter ?
-        [options.additional_filter, statesFilter] :
-        statesFilter;
-      var filter = !GGRC.Utils.State.hasState(modelName) ?
-        options.additional_filter :
-        GGRC.query_parser.parse(additionalFilter);
-      var params = queryAPI.buildParam(
-        modelName,
-        options.paging,
-        GGRC.Utils.TreeView.makeRelevantExpression(modelName,
-          options.parent_instance.type, options.parent_instance.id),
-        undefined,
-        filter
-      );
-
-      this._draw_list_deferred = false;
-      return this.page_loader.load({data: [params]})
-        .then(function (data) {
-          var total = data.total;
-          var countsName = this.options.countsName || modelName;
-          var currentPageUtils = GGRC.Utils.CurrentPage;
-
-          this.options.attr('paging.total', total);
-          this.options.attr('paging.count',
-            Math.ceil(data.total / this.options.paging.pageSize));
-
-          if (!this.options.paging.filter && !isStateQuery &&
-            total !== currentPageUtils.getCounts().attr(countsName)) {
-            currentPageUtils.getCounts().attr(countsName, total);
-          }
-          if (isStateQuery) {
-            currentPageUtils.initCounts([modelName],
-                options.parent_instance.type, options.parent_instance.id);
-          }
-
-          return data.values;
-        }.bind(this));
-    },
-
     clearList: function () {
       this.element.children('.tree-item, .tree-item-placeholder').remove();
-    },
-
-    refreshList: function () {
-      if (this.options.attr('paging.disabled')) {
-        return;
-      }
-      this.options.attr('paging.disabled', true);
-      this._loading_started();
-      this.loadPage()
-        .then(function (data) {
-          this.clearList();
-          return data;
-        }.bind(this))
-        .then(this._ifNotRemoved(this.proxy('draw_list')))
-        .then(function () {
-          this.options.attr('paging.disabled', false);
-        }.bind(this))
-        .fail(function () {
-          this.options.attr('paging.disabled', false);
-          this.options.attr('original_list', []);
-          this.clearList();
-          this._loading_finished();
-          GGRC.Errors.notifier('warning',
-            'Filter format is incorrect, data cannot be filtered.');
-        }.bind(this));
-    },
-    showNotDirectlyMappedObjects: function (isVisible) {
-      if (_.isBoolean(isVisible)) {
-        this.element.toggleClass('not-directly-related-hide', !isVisible);
-      }
-    },
-    '{paging} change': _.debounce(
-      function (object, event, type, action, newVal, oldVal) {
-        if (oldVal !== newVal && _.contains(['current', 'pageSize'], type)) {
-          this.refreshList();
-        }
-      })
+    }
   });
 })(window.can, window.$);

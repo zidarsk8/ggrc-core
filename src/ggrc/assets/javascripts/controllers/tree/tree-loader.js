@@ -104,20 +104,7 @@
       var that = this;
       var trackerStop = GGRC.Tracker.start(
         'TreeView', 'display', this.options.model.shortName);
-      // TODO: Currently Query API doesn't support CustomAttributable.
-      var isCustomAttr = /CustomAttr/.test(this.options.model.shortName);
-      var isRoleable = /Roleable|AccessControlRole/.test(
-                          this.options.model.shortName);
-      var isTreeView = this instanceof CMS.Controllers.TreeView;
-      var isSubTree = this.options.is_subtree;
-      var loader;
-      if (!isTreeView || isCustomAttr || isRoleable) {
-        loader = this.fetch_list.bind(this);
-      } else if (isSubTree) {
-        loader = this.loadSubTree.bind(this);
-      } else {
-        loader = this.loadPage.bind(this);
-      }
+      var loader = this.fetch_list.bind(this);
 
       if (refetch) {
         this._draw_list_deferred = null;
@@ -326,9 +313,6 @@
         this.options.list.push.apply(this.options.list, preppedItems);
         dfd = this.add_child_lists(preppedItems);
       } else {
-        if (this.options.is_subtree && this.options.drawSubTreeExpander) {
-          this.addSubTreeExpander(items);
-        }
         dfd = can.Deferred().resolve();
       }
 
