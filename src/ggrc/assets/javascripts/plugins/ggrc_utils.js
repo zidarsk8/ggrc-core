@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function ($, GGRC, moment, Permission) {
+(function ($, GGRC, moment, Permission, CMS) {
   'use strict';
   /**
    * A module containing various utility functions.
@@ -513,6 +513,41 @@
           .value();
 
       return peopleIds;
+    },
+    hasRoleForContext: function (userId, contextId, roleName) {
+      var deferred = $.Deferred();
+      var contextRoles;
+      var filteredRoles;
+      var hasRole;
+      var userDfd =
+        CMS.Models.Person.findInCacheById(userId) ||
+        CMS.Models.Person.findOne({id: userId});
+
+      $.when([userDfd])
+        .then(function (user) {
+          return user[0].get_mapping_deferred('authorizations');
+        })
+        .then(function (uRoles) {
+          contextRoles = _.filter(uRoles, function (role) {
+            return role.context_id === contextId;
+          }).map(function (role) {
+            return role.reify();
+          });
+
+          filteredRoles = GGRC.roles.filter(function (role) {
+            return contextRoles.some(function (cr) {
+              return cr.role.id === role.id;
+            });
+          });
+
+          hasRole = filteredRoles.some(function (cr) {
+            return cr.name === roleName;
+          });
+
+          deferred.resolve(hasRole);
+        });
+
+      return deferred;
     }
   };
 
@@ -782,4 +817,5 @@
       getParentUrl: getParentUrl
     };
   })();
-})(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);
+})(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission,
+  window.CMS = window.CMS || {});

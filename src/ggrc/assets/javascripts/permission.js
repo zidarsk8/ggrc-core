@@ -36,7 +36,8 @@
     forbid: function (instance, args, action) {
       var blacklist = args.blacklist[action] || [];
       return blacklist.indexOf(instance.type) < 0;
-    }
+    },
+    has_changed: can.noop
   };
   var permissions_compute = can.compute(GGRC.permissions);
 

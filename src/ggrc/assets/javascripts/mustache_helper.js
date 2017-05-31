@@ -2851,4 +2851,28 @@ Example:
 
     return titlesMap[type] ? titlesMap[type] + field : field;
   });
+
+  Mustache.registerHelper(
+    'withRoleForInstance',
+    function (instance, roleName, options) {
+      var userId = GGRC.current_user.id;
+      var hasRoleForContextDfd;
+      instance = resolve_computed(instance);
+
+      if (!instance.contextId) {
+        instance = CMS.Models[instance.type].findInCacheById(instance.id);
+      }
+
+      hasRoleForContextDfd =
+        GGRC.Utils.hasRoleForContext(userId, instance.context_id, roleName);
+
+      return Mustache.defer_render('span',
+        function (hasRole) {
+          if (hasRole) {
+            return options.fn(options.contexts.add({hasRole: hasRole}));
+          }
+
+          return options.inverse(options.contexts.add({hasRole: hasRole}));
+        }, hasRoleForContextDfd);
+    });
 })(this, jQuery, can);
