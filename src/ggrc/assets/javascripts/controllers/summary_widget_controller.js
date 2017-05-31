@@ -65,6 +65,7 @@
       });
       frag = can.view(this.get_widget_view(this.element),
                       this.options.context);
+      this.widget_shown();
       this.element.html(frag);
       return 0;
     },

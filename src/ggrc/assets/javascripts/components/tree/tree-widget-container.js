@@ -280,20 +280,6 @@
         return options.filter && options.depth;
       }).reduce(this._concatFilters, '');
     },
-    initCount: function () {
-      var $el = this.attr('$el');
-      var counts = CurrentPageUtils.getCounts();
-      var countsName = this.attr('options').countsName ||
-        this.attr('model').shortName;
-
-      if ($el) {
-        can.trigger($el, 'updateCount', [counts.attr(countsName)]);
-      }
-
-      counts.on(countsName, function (ev, newVal, oldVal) {
-        can.trigger($el, 'updateCount', [newVal]);
-      });
-    },
     registerFilter: function (option) {
       this.attr('filters').push(option);
     },
@@ -498,8 +484,6 @@
       '{viewModel.pageInfo} pageSize': function () {
         this.viewModel.loadItems();
       },
-      ' childTreeTypes': function () {
-      },
       ' selectTreeItem': function (el, ev, selectedEl, instance) {
         var parent = this.viewModel.attr('parent_instance');
         var infoPaneOptions = new can.Map({
@@ -524,12 +508,11 @@
         var viewModel = this.viewModel;
         viewModel.attr('$el', this.element);
 
-        viewModel.initCount();
-
         this.element.closest('.widget')
           .on('widget_hidden', viewModel._widgetHidden.bind(viewModel));
         this.element.closest('.widget')
           .on('widget_shown', viewModel._widgetShown.bind(viewModel));
+        viewModel._widgetShown();
       }
     }
   });
