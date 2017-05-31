@@ -33,10 +33,18 @@ INSERT INTO relationships (
         SELECT 1
         FROM relationships
         WHERE source_type=documentable_type AND
-              source_id=documentable_id AND
-              destination_type="Document" AND
-              destination_id=document_id
-));
+            source_id=documentable_id AND
+            destination_type="Document" AND
+            destination_id=document_id
+        union
+        SELECT 1
+        FROM relationships
+        WHERE destination_type=documentable_type AND
+              destination_id=documentable_id AND
+              source_type="Document" AND
+              source_id=document_id
+    )
+);
 """
 
 
