@@ -23,6 +23,7 @@ from ggrc.models import Issue
 from ggrc.models import Relationship
 from ggrc.models import Snapshot
 from ggrc.services import signals
+from ggrc.access_control import role
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
@@ -205,16 +206,12 @@ def generate_role_object_dict(snapshot, audit):
 
   returns dict of roles with key as role name and list of people ids as values.
   """
-  acr_dict = dict(
-      all_models.AccessControlRole.query.filter(
-          all_models.AccessControlRole.object_type == snapshot.child_type
-      ).values(
-          "id", "name"
-      )
-  )
+
+  acr_dict = role.get_custom_roles_for(snapshot.child_type)
   acl_dict = defaultdict(list)
   for acl in snapshot.revision.content.get("access_control_list") or []:
     acl_dict[acr_dict[acl["ac_role_id"]]].append(acl["person_id"])
+  # populate Access Control List by generated role from the related Audit
   acl_dict["Audit Lead"].append(audit.contact_id)
   acl_dict["Auditors"].extend([user_role.person_id
                                for user_role in audit.context.user_roles
@@ -241,11 +238,11 @@ def relate_assignees(assessment, snapshot, template, audit):
                          "verifiers": "Auditors"}
   acl_dict = generate_role_object_dict(snapshot, audit)
   assignee_ids = get_people_ids_based_on_role("assessors",
-                                              "Audit Lead",
+                                              "Audit Lead",  # default assessor
                                               template_settings,
                                               acl_dict)
   verifier_ids = get_people_ids_based_on_role("verifiers",
-                                              "Auditors",
+                                              "Auditors",  # default verifier
                                               template_settings,
                                               acl_dict)
   generate_assignee_relations(assessment,

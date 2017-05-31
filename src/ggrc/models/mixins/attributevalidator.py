@@ -59,16 +59,3 @@ class AttributeValidator(object):
       )
       flask.g.global_cad_names = {name.lower(): id_ for name, id_ in query}
     return flask.g.global_cad_names
-
-  @classmethod
-  def _get_custom_roles(cls, definition_type):
-    """Get all access control role names for the given object type"""
-    if not getattr(flask.g, "global_role_names", set()):
-      role = ggrc.access_control.role
-      query = db.session.query(
-          role.AccessControlRole.name,
-          role.AccessControlRole.id).filter(
-          role.AccessControlRole.object_type == definition_type
-      )
-      flask.g.global_role_names = {name.lower(): id_ for name, id_ in query}
-    return flask.g.global_role_names
