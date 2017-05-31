@@ -23,12 +23,21 @@ INSERT INTO relationships (
      source_type,
      source_id,
      destination_type,
-     destination_id)
+     destination_id,
+     context_id,
+     updated_at,
+     created_at,
+     modified_by_id
+)
 (
     SELECT documentable_type AS source_type,
            documentable_id AS source_id,
            "Document" AS destination_type,
-           document_id AS destination_id
+           document_id AS destination_id,
+           context_id,
+           updated_at,
+           created_at,
+           modified_by_id
     FROM object_documents WHERE not exists (
         SELECT 1
         FROM relationships
