@@ -3,7 +3,7 @@
 
 """ Module for docuumentable mixins."""
 
-from sqlalchemy import orm, case, and_
+from sqlalchemy import orm, case, and_, literal
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
@@ -30,22 +30,37 @@ class Documentable(object):
   def documents(cls, document_type):
     """Return documents releated for that instance and sent docuemtn type."""
     document_id = case(
-        [(
-            Relationship.destination_type == "Document",
-            Relationship.destination_id,
-        )],
-        else_=Relationship.source_id
+        [
+            (
+                Relationship.destination_type == "Document",
+                Relationship.destination_id,
+            ),
+            (
+                Relationship.source_type == "Document",
+                Relationship.source_id,
+            ),
+        ],
+        else_=literal(False)
     )
     documentable_id = case(
-        [(Relationship.destination_type == "Document",
-          Relationship.source_id)],
-        else_=Relationship.destination_id,
+        [
+            (
+                Relationship.destination_type == "Document",
+                Relationship.source_id
+            ),
+            (
+                Relationship.source_type == "Document",
+                Relationship.destination_id,
+            ),
+        ],
+        else_=literal(False)
     )
     return db.relationship(
         Document,
-        primaryjoin=lambda: cls.id == documentable_id,
+        primaryjoin=lambda: and_(documentable_id, cls.id == documentable_id),
         secondary=Relationship.__table__,
-        secondaryjoin=lambda: and_(Document.id == document_id,
+        secondaryjoin=lambda: and_(document_id,
+                                   Document.id == document_id,
                                    Document.document_type == document_type),
         viewonly=True,
     )
