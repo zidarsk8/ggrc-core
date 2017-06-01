@@ -12,6 +12,7 @@ from ggrc.app import db
 from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
+from integration.ggrc.models import factories
 
 
 class TestAuditArchivingBase(TestCase):
@@ -26,21 +27,36 @@ class TestAuditArchivingBase(TestCase):
     cls.people = {
         person.name: person for person in all_models.Person.eager_query().all()
     }
+    created_objects = (
+        (all_models.Audit, all_models.Audit.archived == 0, 'audit'),
+        (all_models.Audit, all_models.Audit.archived == 1, 'archived_audit'),
+        (all_models.Issue, all_models.Issue.slug == 'PMRBACISSUE-1', 'issue'),
+        (all_models.Issue, all_models.Issue.slug == 'PMRBACISSUE-2',
+         'archived_issue'),
+        (all_models.Assessment,
+         all_models.Assessment.slug == 'PMRBACASSESSMENT-1', 'assessment'),
+        (all_models.Assessment,
+         all_models.Assessment.slug == 'PMRBACASSESSMENT-2',
+         'archived_assessment')
+    )
+    for obj, cond, name in created_objects:
+      setattr(cls, name, obj.eager_query().filter(cond).first())
 
-    cls.audit = all_models.Audit.eager_query().filter(
-        all_models.Audit.archived == 0).first()
-    cls.archived_audit = all_models.Audit.eager_query().filter(
-        all_models.Audit.archived == 1).first()
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_type == 'Objective').first()
 
-    cls.issue = all_models.Issue.eager_query().filter(
-        all_models.Issue.slug == 'PMRBACISSUE-1').first()
-    cls.archived_issue = all_models.Issue.eager_query().filter(
-        all_models.Issue.slug == 'PMRBACISSUE-2').first()
-
-    cls.assessment = all_models.Assessment.eager_query().filter(
-        all_models.Assessment.slug == 'PMRBACASSESSMENT-1').first()
-    cls.archived_assessment = all_models.Assessment.eager_query().filter(
-        all_models.Assessment.slug == 'PMRBACASSESSMENT-2').first()
+    # Create snapshot objects:
+    for audit, name in ((cls.audit, 'snapshot'),
+                        (cls.archived_audit, 'archived_snapshot')):
+      setattr(cls, name, factories.SnapshotFactory(
+          child_id=revision.resource_id,
+          child_type=revision.resource_type,
+          revision=revision,
+          parent=audit,
+      ))
+    # Refresh objects in the session
+    for obj in db.session:
+      db.session.refresh(obj)
 
   def setUp(self):
     """Imports test_csvs/audit_rbac.csv needed by the tests"""
@@ -188,20 +204,27 @@ class TestArchivedAudit(TestAuditArchivingBase):
         response.json["audit"])
 
   @data(
-      ('Admin', 200, ['issue', 'assessment']),
-      ('Editor', 200, ['issue', 'assessment']),
-      ('Reader', 403, ['issue', 'assessment']),
-      ('Creator', 403, ['issue', 'assessment']),
-      ('Creator PM', 200, ['issue', 'assessment']),
-      ('Creator PE', 200, ['issue', 'assessment']),
-      ('Creator PR', 403, ['issue', 'assessment']),
-      ('Admin', 403, ['archived_issue', 'archived_assessment']),
-      ('Editor', 403, ['archived_issue', 'archived_assessment']),
-      ('Reader', 403, ['archived_issue', 'archived_assessment']),
-      ('Creator', 403, ['archived_issue', 'archived_assessment']),
-      ('Creator PM', 403, ['archived_issue', 'archived_assessment']),
-      ('Creator PE', 403, ['archived_issue', 'archived_assessment']),
-      ('Creator PR', 403, ['archived_issue', 'archived_assessment'])
+      ('Admin', 200, ('issue', 'assessment', 'snapshot')),
+      ('Editor', 200, ('issue', 'assessment', 'snapshot')),
+      ('Reader', 403, ('issue', 'assessment', 'snapshot')),
+      ('Creator', 403, ('issue', 'assessment', 'snapshot')),
+      ('Creator PM', 200, ('issue', 'assessment', 'snapshot')),
+      ('Creator PE', 200, ('issue', 'assessment', 'snapshot')),
+      ('Creator PR', 403, ('issue', 'assessment', 'snapshot')),
+      ('Admin', 403, ('archived_issue', 'archived_assessment',
+                      'archived_snapshot')),
+      ('Editor', 403, ('archived_issue', 'archived_assessment',
+                       'archived_snapshot')),
+      ('Reader', 403, ('archived_issue', 'archived_assessment',
+                       'archived_snapshot')),
+      ('Creator', 403, ('archived_issue', 'archived_assessment',
+                        'archived_snapshot')),
+      ('Creator PM', 403, ('archived_issue', 'archived_assessment',
+                           'archived_snapshot')),
+      ('Creator PE', 403, ('archived_issue', 'archived_assessment',
+                           'archived_snapshot')),
+      ('Creator PR', 403, ('archived_issue', 'archived_assessment',
+                           'archived_snapshot'))
   )
   @unpack
   def test_audit_context_editing(self, person, status, objects):
