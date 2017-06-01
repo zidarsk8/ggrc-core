@@ -17,8 +17,16 @@ logger = getLogger(__name__)
 class DocumentLinkHandler(handlers.ColumnHandler):
   """Base class for document documents handlers."""
 
+  DOCUMENT_TYPE = None
+
   @staticmethod
   def _parse_line(line):
+    raise NotImplemented()
+
+  def _get_old_map(self):
+    raise NotImplemented()
+
+  def get_value(self):
     raise NotImplemented()
 
   def parse_item(self, has_title=False):
@@ -38,6 +46,7 @@ class DocumentLinkHandler(handlers.ColumnHandler):
           title=title,
           modified_by_id=user_id,
           context=self.row_converter.obj.context,
+          document_type=self.DOCUMENT_TYPE,
       ))
 
     return documents
@@ -48,9 +57,38 @@ class DocumentLinkHandler(handlers.ColumnHandler):
   def set_value(self):
     """This should be ignored with second class attributes."""
 
+  def insert_object(self):
+    """Update document URL values
+
+    This function adds missing URLs and remove existing ones from Documents.
+    The existing URLs with new titles just change the title.
+    """
+    if self.row_converter.ignore:
+      return
+    new_link_map = {d.link: d for d in self.value}
+    old_link_map = self._get_old_map()
+
+    for new_link, new_doc in new_link_map.iteritems():
+      if new_link in old_link_map:
+        old_link_map[new_link].title = new_doc.title
+      else:
+        models.Relationship(source=self.row_converter.obj, destination=new_doc)
+
+    for old_link, old_doc in old_link_map.iteritems():
+      if old_link in new_link_map:
+        continue
+      if old_doc.related_destinations:
+        old_doc.related_destinations.pop()
+      elif old_doc.related_sources:
+        old_doc.related_sources.pop()
+      else:
+        logger.warning("Invalid relationship state for document URLs.")
+
 
 class DocumentEvidenceHandler(DocumentLinkHandler):
   """Handler for evidence field on document imports."""
+
+  DOCUMENT_TYPE = models.Document.ATTACHMENT
 
   @staticmethod
   def _parse_line(line):
@@ -74,28 +112,14 @@ class DocumentEvidenceHandler(DocumentLinkHandler):
     return u"\n".join(u"{} {}".format(d.link, d.title) for d in
                       self.row_converter.obj.document_evidence)
 
-  def insert_object(self):
-    """Update document evidence values.
-
-    This function adds missing evidence and remove existing ones from
-    Documents. The existing evidence with new titles just change the title.
-    """
-    if not self.value or self.row_converter.ignore:
-      return
-    new_link_map = {doc.link: doc for doc in self.value}
-    old_link_map = {d.link: d
-                    for d in self.row_converter.obj.document_evidence}
-    for new_link, new_doc in new_link_map.iteritems():
-      if new_link in old_link_map:
-        old_link_map[new_link].title = new_doc.title
-      else:
-        new_doc.document_type = new_doc.ATTACHMENT
-        models.Relationship(source=self.row_converter.obj,
-                            destination=new_doc)
+  def _get_old_map(self):
+    return {d.link: d for d in self.row_converter.obj.document_evidence}
 
 
 class DocumentUrlHandler(DocumentLinkHandler):
   """Handler for URL field on document imports."""
+
+  DOCUMENT_TYPE = models.Document.URL
 
   @staticmethod
   def _parse_line(line):
@@ -109,6 +133,9 @@ class DocumentUrlHandler(DocumentLinkHandler):
     """
     return [line.strip()] * 2
 
+  def _get_old_map(self):
+    return {d.link: d for d in self.row_converter.obj.document_url}
+
   def get_value(self):
     """Generate a new line separated string for all document links.
 
@@ -116,31 +143,3 @@ class DocumentUrlHandler(DocumentLinkHandler):
       string containing all URLs
     """
     return "\n".join(doc.link for doc in self.row_converter.obj.document_url)
-
-  def insert_object(self):
-    """Update document URL values
-
-    This function adds missing URLs and remove existing ones from Documents.
-    The existing URLs with new titles just change the title.
-    """
-    if not self.value or self.row_converter.ignore:
-      return
-    new_link_map = {d.link: d for d in self.value}
-    old_link_map = {d.link: d for d in self.row_converter.obj.document_url}
-
-    for new_link, new_doc in new_link_map.iteritems():
-      if new_link in old_link_map:
-        old_link_map[new_link].title = new_doc.title
-      else:
-        new_doc.document_type == new_doc.URL
-        models.Relationship(source=self.row_converter.obj,
-                            destination=new_doc)
-
-    for old_link, old_doc in old_link_map.iteritems():
-      if old_link not in new_link_map:
-        if old_doc.related_destinations:
-          old_doc.related_destinations.pop()
-        elif old_doc.related_sources:
-          old_doc.related_sources.pop()
-        else:
-          logger.warning("Invalid relationship state for document URLs.")
