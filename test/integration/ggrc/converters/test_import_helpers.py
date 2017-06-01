@@ -337,6 +337,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Planned Report Period to",
         "Auditors",
         "Delete",
+        "Url",
+        "Evidence",
     }
     expected_fields = {
         "mandatory": {
