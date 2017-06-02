@@ -32,11 +32,23 @@
                            data-original-title="Respond to assessment here. Use comments on the right for free text responses."></i>
                     </div>
                     <div class="assessment-controls__extra-controls">
-                        <assessment-attachments-list
-                            tooltip="You can upload up to 10 files in a single batch"
-                            {instance}="instance">
-                        </assessment-attachments-list>
-                        <assessment-urls-list {mapped-items}="documents"></assessment-urls-list>
+                        <div>
+                            <h6>Evidence</h6>
+                            <object-list {items}="evidences" {empty-message}="noItemsText">
+                                <editable-document-object-list-item {document}="{.}">
+                                    <unmap-button 
+                                        {destination}="instance"
+                                        {source}="document">
+                                        <action-toolbar-control>
+                                            <i class="fa fa-trash"></i>
+                                        </action-toolbar-control>
+                                    </unmap-button>
+                                </editable-document-object-list-item>
+                            </object-list>
+                            <attach-button {instance}="instance">
+                            </attach-button>
+                        </div>
+                        <assessment-urls-list {mapped-items}="urls"></assessment-urls-list>
                     </div>
                     <auto-save-form {fields}="formFields"
                                     {edit-mode}="editMode"

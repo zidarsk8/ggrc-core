@@ -24,10 +24,8 @@
       ra_manager: "CMS.Models.Person.stub",
       ra_counsel: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
-      documents: "CMS.Models.Document.stubs",
       program: "CMS.Models.Program.stub",
       modified_by: "CMS.Models.Person.stub",
-      object_documents: "CMS.Models.ObjectDocument.stubs",
       custom_attribute_values : "CMS.Models.CustomAttributeValue.stubs"
     },
     tree_view_options: {

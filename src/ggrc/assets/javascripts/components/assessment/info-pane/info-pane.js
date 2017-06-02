@@ -46,7 +46,10 @@
         comments: {
           Value: can.List
         },
-        documents: {
+        urls: {
+          Value: can.List
+        },
+        evidences: {
           Value: can.List
         },
         editMode: {
@@ -67,14 +70,18 @@
       },
       formState: {},
       triggerFormSaveCbs: $.Callbacks(),
-      getQuery: function (type, sortObj) {
+      getQuery: function (type, sortObj, additionalFilter) {
         var relevantFilters = [{
           type: this.attr('instance.type'),
           id: this.attr('instance.id'),
           operation: 'relevant'
         }];
         return GGRC.Utils.QueryAPI
-          .buildParam(type, sortObj || {}, relevantFilters, [], []);
+          .buildParam(type,
+            sortObj || {},
+            relevantFilters,
+            [],
+            additionalFilter || []);
       },
       getCommentQuery: function () {
         return this.getQuery('Comment',
@@ -83,8 +90,19 @@
       getSnapshotQuery: function () {
         return this.getQuery('Snapshot');
       },
-      getDocumentQuery: function () {
-        return this.getQuery('Document');
+      getEvidenceQuery: function () {
+        var evidenceType = CMS.Models.Document.EVIDENCE;
+        return this.getQuery(
+          'Document',
+          undefined,
+          this.getDocumentAdditionFilter(evidenceType));
+      },
+      getUrlQuery: function () {
+        var urlType = CMS.Models.Document.URL;
+        return this.getQuery(
+          'Document',
+          undefined,
+          this.getDocumentAdditionFilter(urlType));
       },
       requestQuery: function (query) {
         var dfd = can.Deferred();
@@ -112,17 +130,34 @@
         var query = this.getCommentQuery();
         return this.requestQuery(query);
       },
-      loadDocuments: function () {
-        var query = this.getDocumentQuery();
+      loadEvidences: function () {
+        var query = this.getEvidenceQuery();
         return this.requestQuery(query);
+      },
+      loadUrls: function () {
+        var query = this.getUrlQuery();
+        return this.requestQuery(query);
+      },
+      getDocumentAdditionFilter: function (documentType) {
+        return documentType ?
+          {
+            expression: {
+              left: 'document_type',
+              op: {name: '='},
+              right: documentType
+            }
+          } :
+          [];
       },
       updateRelatedItems: function () {
         this.attr('mappedSnapshots')
           .replace(this.loadSnapshots());
         this.attr('comments')
           .replace(this.loadComments());
-        this.attr('documents')
-          .replace(this.loadDocuments());
+        this.attr('evidences')
+          .replace(this.loadEvidences());
+        this.attr('urls')
+          .replace(this.loadUrls());
       },
       initializeFormFields: function () {
         this.attr('formFields',

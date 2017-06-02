@@ -160,30 +160,17 @@
     update: 'PUT /api/cycle_task_entries/{id}',
     destroy: 'DELETE /api/cycle_task_entries/{id}',
     info_pane_options: {
-      attachments: {
-        mapping: 'documents',
-        show_view: GGRC.mustache_path + '/base_templates/attachment.mustache'
-      }
     },
     attributes: {
       cycle_task_group_object_task: 'CMS.Models.CycleTaskGroupObjectTask.stub',
       modified_by: 'CMS.Models.Person.stub',
       context: 'CMS.Models.Context.stub',
-      object_documents: 'CMS.Models.ObjectDocument.stubs',
-      documents: 'CMS.Models.Document.stubs',
       cycle: 'CMS.Models.Cycle.stub'
     },
 
     tree_view_options: {
       show_view: _mustachePath + '/tree.mustache',
-      footer_view: _mustachePath + '/tree_footer.mustache',
-      child_options: [{
-        // 0: Documents
-        model: 'Document',
-        mapping: 'documents',
-        show_view: _mustachePath + '/documents.mustache',
-        footer_view: _mustachePath + '/documents_footer.mustache'
-      }]
+      footer_view: _mustachePath + '/tree_footer.mustache'
     },
     init: function () {
       this._super.apply(this, arguments);

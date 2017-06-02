@@ -97,17 +97,6 @@
         'updated_at']
     },
     info_pane_options: {
-      evidence: {
-        model: CMS.Models.Document,
-        mapping: 'all_documents',
-        show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
-        sort_function: GGRC.Utils.sortingHelpers.commentSort
-      },
-      urls: {
-        model: CMS.Models.Document,
-        mapping: 'all_urls',
-        show_view: GGRC.mustache_path + '/base_templates/urls.mustache'
-      }
     },
     confirmEditModal: {
       title: 'Confirm moving Assessment to "In Progress"',
