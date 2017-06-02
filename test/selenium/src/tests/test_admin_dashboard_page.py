@@ -70,9 +70,9 @@ class TestAdminDashboardPage(base.Test):
   @pytest.mark.parametrize(
       "ca_type, def_type",
       [(ca_type_item,
-        objects.get_normal_form(random.choice(objects.ALL_CA_OBJS))) for
-       ca_type_item in AdminWidgetCustomAttributes.ALL_CA_TYPES]
-  )
+        objects.get_normal_form(random.choice(
+            [obj for obj in objects.ALL_CA_OBJS if obj != objects.ASSESSMENTS])
+        )) for ca_type_item in AdminWidgetCustomAttributes.ALL_CA_TYPES])
   def test_add_global_ca(self, admin_dashboard, ca_type, def_type):
     """Create different types of Custom Attribute on Admin Dashboard."""
     expected_ca = CustomAttributeDefinitionsFactory().create(
