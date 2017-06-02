@@ -57,8 +57,16 @@ class Documentable(object):
     )
     return db.relationship(
         Document,
+        # at first we check is documentable_id not False (it return id in fact)
+        # after that we can compare values.
+        # this is required for saving logic consistancy
+        # case return 2 types of values BOOL(false) and INT(id) not Null
         primaryjoin=lambda: and_(documentable_id, cls.id == documentable_id),
         secondary=Relationship.__table__,
+        # at first we check is document_id not False (it return id in fact)
+        # after that we can compare values.
+        # this is required for saving logic consistancy
+        # case return 2 types of values BOOL(false) and INT(id) not Null
         secondaryjoin=lambda: and_(document_id,
                                    Document.id == document_id,
                                    Document.document_type == document_type),
