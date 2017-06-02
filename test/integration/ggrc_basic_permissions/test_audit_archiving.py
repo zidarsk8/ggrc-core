@@ -44,6 +44,7 @@ class TestAuditArchivingBase(TestCase):
 
     revision = all_models.Revision.query.filter(
         all_models.Revision.resource_type == 'Objective').first()
+    cls.rev_id = revision.id
 
     # Create snapshot objects:
     for audit, name in ((cls.audit, 'snapshot'),
@@ -53,6 +54,7 @@ class TestAuditArchivingBase(TestCase):
           child_type=revision.resource_type,
           revision=revision,
           parent=audit,
+          context=audit.context,
       ))
     # Refresh objects in the session
     for obj in db.session:
@@ -83,6 +85,10 @@ class TestAuditArchivingBase(TestCase):
       UPDATE assessments
          SET description = ""
     """)
+    db.engine.execute("""
+      UPDATE snapshots
+         SET revision_id = {}
+    """.format(self.rev_id))
 
 
 @ddt
@@ -204,27 +210,20 @@ class TestArchivedAudit(TestAuditArchivingBase):
         response.json["audit"])
 
   @data(
-      ('Admin', 200, ('issue', 'assessment', 'snapshot')),
-      ('Editor', 200, ('issue', 'assessment', 'snapshot')),
-      ('Reader', 403, ('issue', 'assessment', 'snapshot')),
-      ('Creator', 403, ('issue', 'assessment', 'snapshot')),
-      ('Creator PM', 200, ('issue', 'assessment', 'snapshot')),
-      ('Creator PE', 200, ('issue', 'assessment', 'snapshot')),
-      ('Creator PR', 403, ('issue', 'assessment', 'snapshot')),
-      ('Admin', 403, ('archived_issue', 'archived_assessment',
-                      'archived_snapshot')),
-      ('Editor', 403, ('archived_issue', 'archived_assessment',
-                       'archived_snapshot')),
-      ('Reader', 403, ('archived_issue', 'archived_assessment',
-                       'archived_snapshot')),
-      ('Creator', 403, ('archived_issue', 'archived_assessment',
-                        'archived_snapshot')),
-      ('Creator PM', 403, ('archived_issue', 'archived_assessment',
-                           'archived_snapshot')),
-      ('Creator PE', 403, ('archived_issue', 'archived_assessment',
-                           'archived_snapshot')),
-      ('Creator PR', 403, ('archived_issue', 'archived_assessment',
-                           'archived_snapshot'))
+      ('Admin', 200, ('issue', 'assessment')),
+      ('Editor', 200, ('issue', 'assessment')),
+      ('Reader', 403, ('issue', 'assessment')),
+      ('Creator', 403, ('issue', 'assessment')),
+      ('Creator PM', 200, ('issue', 'assessment')),
+      ('Creator PE', 200, ('issue', 'assessment')),
+      ('Creator PR', 403, ('issue', 'assessment')),
+      ('Admin', 403, ('archived_issue', 'archived_assessment')),
+      ('Editor', 403, ('archived_issue', 'archived_assessment')),
+      ('Reader', 403, ('archived_issue', 'archived_assessment')),
+      ('Creator', 403, ('archived_issue', 'archived_assessment')),
+      ('Creator PM', 403, ('archived_issue', 'archived_assessment')),
+      ('Creator PE', 403, ('archived_issue', 'archived_assessment')),
+      ('Creator PR', 403, ('archived_issue', 'archived_assessment'))
   )
   @unpack
   def test_audit_context_editing(self, person, status, objects):
@@ -246,3 +245,40 @@ class TestArchivedAudit(TestAuditArchivingBase):
           "{} has not been updated correctly {}".format(
           obj,
           response.json[obj])
+
+  @data(
+      ('Admin', 200, 'snapshot'),
+      ('Editor', 200, 'snapshot'),
+      ('Reader', 403, 'snapshot'),
+      ('Creator', 403, 'snapshot'),
+      ('Creator PM', 200, 'snapshot'),
+      ('Creator PE', 200, 'snapshot'),
+      ('Creator PR', 403, 'snapshot'),
+      ('Admin', 403, 'archived_snapshot'),
+      ('Editor', 403, 'archived_snapshot'),
+      ('Reader', 403, 'archived_snapshot'),
+      ('Creator', 403, 'archived_snapshot'),
+      ('Creator PM', 403, 'archived_snapshot'),
+      ('Creator PE', 403, 'archived_snapshot'),
+      ('Creator PR', 403, 'archived_snapshot')
+  )
+  @unpack
+  def test_audit_snapshot_editing(self, person, status, obj):
+    """Test if users can edit objects in the audit context"""
+    self.api.set_user(self.people[person])
+    obj_instance = getattr(self, obj)
+    json = {
+        "update_revision": "latest"
+    }
+
+    response = self.api.put(obj_instance, json)
+    assert response.status_code == status, \
+        "{} put returned {} instead of {} for {}".format(
+            person, response.status, status, obj)
+    if status != 200:
+      # if editing is allowed check if edit was correctly saved
+      return
+    assert response.json[obj].get("revision_id", None) > self.rev_id, \
+        "{} has not been updated to the latest revision {}".format(
+        obj,
+        response.json[obj])
