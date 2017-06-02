@@ -123,7 +123,7 @@ def merge_dicts(*args):
 
 
 def get_url_root():
-  if CUSTOM_URL_ROOT is not None:
+  if CUSTOM_URL_ROOT:
     return CUSTOM_URL_ROOT
   return request.url_root
 
