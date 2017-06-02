@@ -16,15 +16,15 @@ from integration.ggrc.models import factories
 
 @ddt.ddt
 class TestDocumentQueries(TestCase):
-  """Tests for /query api for Audit snapshots"""
+  """Tests for /query api for Document instance filtering."""
 
   def setUp(self):
     super(TestDocumentQueries, self).setUp()
     self.api = Api()
 
   @ddt.data(all_models.Document.ATTACHMENT, all_models.Document.URL)
-  def test_query_(self, document_type):
-    """test get audit as query get"""
+  def test_filter_document_by_type(self, document_type):
+    """Test filter documents by document type."""
     data = {
         all_models.Document.ATTACHMENT: factories.EvidenceFactory().id,
         all_models.Document.URL: factories.UrlFactory().id,
