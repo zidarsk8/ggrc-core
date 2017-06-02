@@ -92,7 +92,7 @@ class QueryHelper(object):
     """Search for child_type recursively down the query expression."""
     if child_type:
       return child_type
-    left, oper, right = expr.get("left"), expr.get("op"), expr.get("right")
+    left, oper, right = expr.get("left"), expr.get("op", {}), expr.get("right")
     if oper.get("name") == "=":
       if left == "child_type" and isinstance(right, basestring):
         child_type = right
@@ -105,6 +105,8 @@ class QueryHelper(object):
   def _clean_query(self, query):
     """ sanitize the query object """
     for object_query in query:
+      if "object_name" not in object_query:
+        raise BadQueryException("`object_name` required for each object block")
       filters = object_query.get("filters", {}).get("expression")
       self._clean_filters(filters)
       self._macro_expand_object_query(object_query)
