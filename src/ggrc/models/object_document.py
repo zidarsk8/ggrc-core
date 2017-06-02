@@ -108,10 +108,6 @@ PublicDocumentable = type(
     "PublicDocumentable",
     (Documentable, ),
     {
-        "_publish_attrs": [
-            "document_url",
-            "document_evidence",
-        ],
         "_aliases": {
             "document_url": {
                 "display_name": "Url",
