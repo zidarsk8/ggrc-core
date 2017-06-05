@@ -235,7 +235,6 @@ def update_indexer(session):  # pylint:disable=unused-argument
   for all updated related instance before commit"""
   models_ids_to_reindex = defaultdict(set)
   db.session.flush()
-  db.session.expire_all()  # expire required to fix declared_attr cached value
   for for_index in getattr(db.session, 'reindex_set', set()):
     if for_index not in db.session:
       continue
@@ -245,3 +244,19 @@ def update_indexer(session):  # pylint:disable=unused-argument
   db.session.reindex_set = set()
   for model_name, ids in models_ids_to_reindex.iteritems():
     get_model(model_name).bulk_record_update_for(ids)
+
+
+# pylint:disable=unused-argument
+@event.listens_for(all_models.Relationship, "after_insert")
+@event.listens_for(all_models.Relationship, "after_delete")
+def refresh_documents(mapper, connection, target):
+  """Refreshes related Documents to Documentable"""
+  if target.source_type == 'Document':
+    for_refresh = target.destination
+  elif target.destination_type == 'Document':
+    for_refresh = target.source
+  else:
+    for_refresh = None
+
+  if for_refresh:
+    db.session.expire(for_refresh, ['document_url', 'document_evidence'])
