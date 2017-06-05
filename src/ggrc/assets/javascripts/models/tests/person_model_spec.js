@@ -55,7 +55,7 @@ describe('CMS.Models.Person', function () {
 
     it('should apply a filter to user roles based on ' +
       'the instance and role contexts after refresh',
-      function () {
+      function (done) {
         var dfd;
         refreshedUserRoles = [{
           context: {
@@ -71,6 +71,7 @@ describe('CMS.Models.Person', function () {
         spyOn(RefreshQueue.prototype, 'trigger').and.returnValue(dfd);
         method(instance, person).then(function (roles) {
           expect(roles).toEqual([refreshedUserRoles[0]]);
+          done();
         });
       }
     );
@@ -94,10 +95,11 @@ describe('CMS.Models.Person', function () {
       it('should apply a filter to user roles based on ' +
         'the specificObject and role contexts after refresh' +
         'if all user roles were rejected for the instance context',
-        function () {
+        function (done) {
           var dfd = $.when(refreshedUserRoles);
           var validateExpectation = function (roles) {
             expect(roles).toEqual([refreshedUserRoles[1]]);
+            done();
           };
           spyOn(RefreshQueue.prototype, 'enqueue');
           spyOn(RefreshQueue.prototype, 'trigger').and.returnValue(dfd);
