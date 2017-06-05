@@ -313,22 +313,39 @@ def update_index(session, cache):
   """Update fulltext index records for cached objects."""
   from ggrc.snapshotter.indexer import reindex_snapshots
   from ggrc.fulltext.mixin import Indexed
+  from ggrc.fulltext import get_indexed_model_names
   if cache is None:
     return
+  indexed_model_names = get_indexed_model_names()
   indexer = get_indexer()
   reindex_snapshots_list = []
   for obj in itertools.chain(cache.new, cache.dirty):
     if obj.type == "Snapshot":
+      # index snapshot has custom logic
       reindex_snapshots_list.append(obj.id)
-    elif not isinstance(obj, Indexed):
-      indexer.update_record(indexer.fts_record_for(obj), commit=False)
+      continue
+    if obj.type not in indexed_model_names:
+      # index only required models
+      continue
+    if isinstance(obj, Indexed):
+      # all indexed models autoindex on before_commit signal
+      continue
+    logger.warning("Indexing in depricated way: `%s` "
+                   "should be inherited from Indexed",
+                   obj.type)
+    indexer.update_record(indexer.fts_record_for(obj), commit=False)
+
+  to_delete_dict = defaultdict(list)
   for obj in cache.deleted:
-    indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
+    if obj.type in indexed_model_names:
+      to_delete_dict[obj.type].append(obj.id)
+  for model_name, ids in to_delete_dict.iteritems():
+    indexer.delete_records_by_ids(model_name, ids, commit=False)
   session.commit()
-  if reindex_snapshots_list:
-    for snapshot_id in reindex_snapshots_list:
-      indexer.delete_record(snapshot_id, "Snapshot", commit=False)
-    reindex_snapshots(reindex_snapshots_list)
+  indexer.delete_records_by_ids("Snapshot",
+                                reindex_snapshots_list,
+                                commit=False)
+  reindex_snapshots(reindex_snapshots_list)
 
 
 def _revision_generator(user_id, action, objects):
