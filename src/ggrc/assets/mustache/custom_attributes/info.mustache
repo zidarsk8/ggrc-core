@@ -10,31 +10,33 @@
       {{#list}}
         <div class="span6">
           <div data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
-            <inline-edit
-              instance="instance"
-              ca-id="cad.id"
-              {{#if cav.attribute_object}}
-              value="cav.attribute_object"
-              {{else}}
-              value="cav.attribute_value"
-              {{/if}}
-              values="cad.multi_choice_options"
-              title-text="cad.title"
-              label="cad.label"
-              type="{{type}}"
-              mandatory="cad.mandatory"
-              placeholder="cad.placeholder"
-              helptext="cad.helptext"
-              {{#if_helpers '\
+            {{#if_helpers '\
                 #if' instance.snapshot '\
-                or #if' instance.isRevision }}
-                readonly="true"
-              {{else}}
-                {{^is_allowed 'update' instance context='for'}}
-                  readonly="true"
-                {{/is_allowed}}
-              {{/if_helpers}}
-            ></inline-edit>
+                or #if' instance.isRevision '\
+                or #if' instance.archived '\
+                or ^is_allowed' 'update' instance context='for'}}
+                <inline-edit instance="instance" ca-id="cad.id"
+                        {{#if cav.attribute_object}}
+                            value="cav.attribute_object"
+                        {{else}}
+                            value="cav.attribute_value"
+                        {{/if}}
+                        values="cad.multi_choice_options" title-text="cad.title"
+                        label="cad.label" type="{{type}}" mandatory="cad.mandatory"
+                        placeholder="cad.placeholder" helptext="cad.helptext" readonly="true">
+                </inline-edit>
+            {{else}}
+                <inline-edit instance="instance" ca-id="cad.id"
+                    {{#if cav.attribute_object}}
+                             value="cav.attribute_object"
+                    {{else}}
+                             value="cav.attribute_value"
+                    {{/if}}
+                             values="cad.multi_choice_options" title-text="cad.title"
+                             label="cad.label" type="{{type}}" mandatory="cad.mandatory"
+                             placeholder="cad.placeholder" helptext="cad.helptext">
+                </inline-edit>
+            {{/if_helpers}}
           </div>
         </div>
       {{/list}}

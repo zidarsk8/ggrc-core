@@ -336,9 +336,9 @@
       $target.modal_form(option, $trigger).ggrc_controllers_help({slug: $trigger.attr('data-help-slug')});
     },
 
-    'archiveform': function ($target, $trigger, option) {
-      var model = CMS.Models[$trigger.attr('data-object-singular')]
-        , instance;
+    archiveform: function ($target, $trigger, option) {
+      var model = CMS.Models[$trigger.attr('data-object-singular')];
+      var instance;
 
       if ($trigger.attr('data-object-id') === 'page') {
         instance = GGRC.page_instance();
@@ -349,13 +349,15 @@
       $target
         .modal_form(option, $trigger)
         .ggrc_controllers_toggle_archive({
-          $trigger: $trigger
-          , new_object_form: false
-          , button_view: GGRC.mustache_path + '/modals/archive_cancel_buttons.mustache'
-          , model: model
-          , instance: instance
-          , modal_title: 'Archive ' + $trigger.attr('data-object-singular')
-          , content_view: GGRC.mustache_path + '/base_objects/confirm_archive.mustache'
+          $trigger: $trigger,
+          new_object_form: false,
+          button_view: GGRC.mustache_path +
+            '/modals/archive_cancel_buttons.mustache',
+          model: model,
+          instance: instance,
+          modal_title: 'Archive ' + $trigger.attr('data-object-singular'),
+          content_view: GGRC.mustache_path +
+            '/base_objects/confirm_archive.mustache'
         });
 
       $target.on('modal:success', function (e, data) {
@@ -364,7 +366,6 @@
       });
     }
   };
-
 
   var arrangeBackgroundModals = function (modals, referenceModal) {
     modals = $(modals).not(referenceModal);
@@ -621,7 +622,7 @@
       'listeditform': handlers['listeditform'],
       'deleteform': handlers['deleteform'],
       'unmapform': handlers['unmapform'],
-      'archiveform': handlers['archiveform']
+      archiveform: handlers.archiveform
     },
       function (launch_fn, toggle) {
         GGRC.register_modal_hook(toggle, launch_fn);

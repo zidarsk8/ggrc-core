@@ -83,8 +83,10 @@
                 <div class="section-title">Responses/Comments</div>
               {{^if_in instance.status 'Completed,Final'}}
                 {{#is_allowed 'update' instance context='for'}}
-                    <assessment-add-comment class="assessment-comments-add"
+                    {{^if instance.archived}}
+                        <assessment-add-comment class="assessment-comments-add"
                                             {instance}="instance"></assessment-add-comment>
+                    {{/if}}
                 {{/is_allowed}}
               {{/if_in}}
                 <assessment-mapped-comments {mapped-items}="comments"></assessment-mapped-comments>
@@ -137,22 +139,27 @@
                                     <p>
                                         <small><em>Is this control design effective?</em></small>
                                     </p>
-                                  {{#is_allowed 'update' instance context='for'}}
+                                  {{#if_helpers '\
+                                    #is_allowed' 'update' instance context='for' '\
+                                    and ^if' instance.archived}}
                                       <dropdown options-list="model.conclusions"
                                                 no-value="true"
                                                 no-value-label="---"
                                                 name="instance.design">
                                       </dropdown>
+
                                   {{else}}
                                     {{firstnonempty design '--'}}
-                                  {{/is_allowed}}
+                                  {{/if_helpers}}
                                 </div>
                                 <div class="flex-size-1 flex-gutter-2">
                                     <label class="title-text">Conclusion: Operation</label>
                                     <p>
                                         <small><em>Is this control operationally effective?</em></small>
                                     </p>
-                                  {{#is_allowed 'update' instance context='for'}}
+                                  {{#if_helpers '\
+                                    #is_allowed' 'update' instance context='for' '\
+                                    and ^if' instance.archived}}
                                       <dropdown options-list="model.conclusions"
                                                 no-value="true"
                                                 no-value-label="---"
@@ -160,7 +167,7 @@
                                       </dropdown>
                                   {{else}}
                                     {{firstnonempty operationally '--'}}
-                                  {{/is_allowed}}
+                                  {{/if_helpers}}
                                 </div>
                             </div>
                         </collapsible-panel>

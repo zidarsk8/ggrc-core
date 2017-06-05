@@ -42,6 +42,7 @@ TODO: Temporary disabled until snapshot view is added.
             {{#using reified_snapshot=snapshot}}
             {{#canUpdate}}
             {{^isLatestRevision}}
+            {{^if instance.snapshot.archived}}
             <li>
               <revisions-comparer instance="instance"
                                   left-revision-id="instance.snapshot.revision_id"
@@ -51,6 +52,7 @@ TODO: Temporary disabled until snapshot view is added.
                   Get the latest version</a>
               </revisions-comparer>
             </li>
+            {{/if}}
             {{/isLatestRevision}}
             {{/canUpdate}}
             {{/using}}

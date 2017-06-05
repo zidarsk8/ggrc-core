@@ -98,6 +98,9 @@
 
   can.view.mustache('picker-tag-default',
     '<ggrc-gdrive-folder-picker ' +
+    '{{#if instance.archived}}' +
+    'readonly=true' +
+    '{{/if}}' +
     '{{^is_allowed "update" instance context="for"}}' +
     'readonly=true{{/is_allowed}}' +
     ' instance="instance"/>');

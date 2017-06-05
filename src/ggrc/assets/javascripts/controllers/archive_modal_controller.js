@@ -13,32 +13,41 @@
       this._super();
     },
     'a.btn[data-toggle=archive]:not(:disabled) click': function (el, ev) {
-      var that = this;
       // Disable the cancel button.
       var cancelButton = this.element.find('a.btn[data-dismiss=modal]');
       var modalBackdrop = this.element.data('modal_form').$backdrop;
 
       this.bindXHRToButton(this.options.instance.refresh()
-        .then(function (instance) {
-          instance.archived = true;
-          return instance.save();
-        })
-        .then(function (instance) {
+        .then(function () {
+          var instance = this.options.instance;
+          instance.attr('archived', true);
+
+          // Need to be fixed via new API:
+          // saving with filled custom_attributes
+          // will cause 403 error
+          instance.removeAttr('custom_attributes');
+          return this.options.instance.save();
+        }.bind(this))
+        .then(function () {
+          var instance = this.options.instance;
           var parentController =
-            $(that.options.$trigger).closest('.modal').control();
+            $(this.options.$trigger).closest('.modal').control();
           var msg;
+
+          instance.setup_custom_attributes();
+
           if (parentController) {
             parentController.options.skip_refresh = true;
           }
 
           msg = instance.display_name() + ' archived successfully';
           $(document.body).trigger('ajax:flash', {success: msg});
-          if (that.element) {
-            that.element.trigger('modal:success', that.options.instance);
+          if (this.element) {
+            this.element.trigger('modal:success', instance);
           }
 
           return new $.Deferred();
-        })
+        }.bind(this))
         .fail(function (xhr, status) {
           $(document.body).trigger('ajax:flash', {error: xhr.responseText});
         }), el.add(cancelButton).add(modalBackdrop));

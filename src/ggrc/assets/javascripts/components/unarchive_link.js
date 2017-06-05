@@ -19,15 +19,22 @@
     events: {
       'a click': function (el, event) {
         var instance = this.scope.attr('instance');
-        var notifyText = this.scope.attr('instance.title') + ' ' +
+        var notifyText = instance.display_name() + ' ' +
           this.scope.attr('notifyText');
 
         event.preventDefault();
 
         if (instance && instance.archived) {
-          instance.archived = false;
+          instance.attr('archived', false);
+
+          // Need to be fixed via new API:
+          // saving with filled custom_attributes
+          // will cause 403 error
+          instance.removeAttr('custom_attributes');
           instance.save()
             .then(function () {
+              var instance = this.scope.attr('instance');
+              instance.setup_custom_attributes();
               if (this.scope.attr('notify')) {
                 $('body').trigger('ajax:flash', {success: notifyText});
               }

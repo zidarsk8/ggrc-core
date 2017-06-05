@@ -523,9 +523,9 @@
         CMS.Models.Person.findInCacheById(userId) ||
         CMS.Models.Person.findOne({id: userId});
 
-      $.when([userDfd])
+      $.when(userDfd)
         .then(function (user) {
-          return user[0].get_mapping_deferred('authorizations');
+          return user.get_mapping_deferred('authorizations');
         })
         .then(function (uRoles) {
           contextRoles = _.filter(uRoles, function (role) {

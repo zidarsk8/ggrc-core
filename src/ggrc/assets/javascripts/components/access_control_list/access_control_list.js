@@ -240,7 +240,8 @@
         isSnapshot = GGRC.Utils.Snapshots.isSnapshot(instance);
         canEdit = !isSnapshot &&  // snapshots are not editable
                   (vm.isNewInstance ||
-                   Permission.is_allowed_for('update', instance));
+                   Permission.is_allowed_for('update', instance)) &&
+                  !instance.archived;
 
         can.batch.start();
         vm.attr('canEdit', canEdit);
