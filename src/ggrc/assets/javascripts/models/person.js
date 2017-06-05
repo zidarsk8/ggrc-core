@@ -107,7 +107,7 @@
       this.validateNonBlank('email');
       this.validateFormatOf('email', rEmail);
     },
-    getUserRoles: function (instance, person, specificOject) {
+    getUserRoles: function (instance, person, specificObject) {
       var result = $.Deferred();
       var refreshQueue = new RefreshQueue();
       var userRoles;
@@ -126,8 +126,8 @@
             role.context.id === instance.context.id;
         });
 
-        if (_.isEmpty(userRoles) && !_.isEmpty(specificOject)) {
-          object = _.get(instance, specificOject);
+        if (_.isEmpty(userRoles) && !_.isEmpty(specificObject)) {
+          object = _.get(instance, specificObject);
           objectInstance = _.result(object, 'getInstance');
           objectContextId = _.get(objectInstance, 'context_id');
 
@@ -140,9 +140,9 @@
       });
       return result.promise();
     },
-    getPersonMappings: function (instance, person, specificOject) {
+    getPersonMappings: function (instance, person, specificObject) {
       var result = $.Deferred();
-      var mappingObject = instance[specificOject];
+      var mappingObject = instance[specificObject];
       var mappingsRQ = new RefreshQueue();
       var userRolesRQ = new RefreshQueue();
 
