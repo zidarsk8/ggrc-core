@@ -107,6 +107,18 @@
       this.validateNonBlank('email');
       this.validateFormatOf('email', rEmail);
     },
+
+    /**
+     * @description
+     * Retrieves user roles for the person according to
+     * instance or/and specific object contexts
+     *
+     * @param  {Object} instance - Instance object
+     * @param  {CMS.Models.Person} person - Person object
+     * @param  {String} specificObject - Property of instance object
+     * @return {Promise.<Object[]>} - Returns promise with person's user roles
+     */
+
     getUserRoles: function (instance, person, specificObject) {
       var result = $.Deferred();
       var refreshQueue = new RefreshQueue();
