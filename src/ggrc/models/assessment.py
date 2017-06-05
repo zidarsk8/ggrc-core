@@ -151,6 +151,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   ]
 
   _fulltext_attrs = [
+      'archived',
       'design',
       'operationally',
       MultipleSubpropertyFullTextAttr('related_assessors', 'assessors',

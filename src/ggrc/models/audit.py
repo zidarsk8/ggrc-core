@@ -73,6 +73,7 @@ class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
   ]
 
   _fulltext_attrs = [
+      'archived',
       'report_start_date',
       'report_end_date',
       'audit_firm',

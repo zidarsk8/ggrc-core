@@ -71,6 +71,10 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
       PublishOnly("DEFAULT_PEOPLE_LABELS")
   ]
 
+  _fulltext_attrs = [
+      "archived"
+  ]
+
   _aliases = {
       "default_assessors": {
           "display_name": "Default Assignee",
