@@ -6,7 +6,7 @@
 describe('CMS.Models.Person', function () {
   'use strict';
 
-  describe('when requesting person\'s user roles', function () {
+  describe('getUserRoles() method', function () {
     var method;
     var person;
     var fakeUserRole1;
@@ -75,7 +75,7 @@ describe('CMS.Models.Person', function () {
       }
     );
 
-    describe('and specificOject is defined', function () {
+    describe('when specificObject is passed', function () {
       var specificObject;
 
       beforeEach(function () {
