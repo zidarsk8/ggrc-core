@@ -57,3 +57,62 @@ class TestImportIssues(TestCase):
             }
         }
     })
+
+  def test_import_with_mandatory(self):
+    """Test import of data with mandatory role"""
+    # Import of data should be allowed if mandatory role provided
+    # and can process situation when nonmandatory roles are absent
+    # without any errors and warnings
+    mandatory_role = factories.AccessControlRoleFactory(
+      object_type="Market",
+      mandatory=True
+    ).name
+    factories.AccessControlRoleFactory(
+      object_type="Market",
+      mandatory=False
+    ).name
+
+    email = factories.PersonFactory().email
+    response_json = self.import_data(OrderedDict([
+      ("object_type", "Market"),
+      ("code", "market-1"),
+      ("title", "Title"),
+      ("Admin", "user@example.com"),
+      (mandatory_role, email),
+    ]))
+    self._check_csv_response(response_json, {})
+    self.assertEqual(1, response_json[0]["created"])
+    self.assertEqual(1, len(models.Market.query.all()))
+
+  def test_import_without_mandatory(self):
+    """Test import of data without mandatory role"""
+    # Data can't be imported if mandatory role is not provided
+    mandatory_role = factories.AccessControlRoleFactory(
+      object_type="Market",
+      mandatory=True
+    ).name
+    not_mandatory_role = factories.AccessControlRoleFactory(
+      object_type="Market",
+      mandatory=False
+    ).name
+
+    email = factories.PersonFactory().email
+    response_json = self.import_data(OrderedDict([
+      ("object_type", "Market"),
+      ("code", "market-1"),
+      ("title", "Title"),
+      ("Admin", "user@example.com"),
+      (not_mandatory_role, email),
+    ]))
+
+    expected_errors = {
+        errors.MISSING_COLUMN.format(line=3, column_names=mandatory_role, s=""),
+    }
+    response_errors = response_json[0]["row_errors"]
+    self.assertEqual(expected_errors, set(response_errors))
+    response_warnings = response_json[0]["row_warnings"]
+    self.assertEqual(set(), set(response_warnings))
+    self.assertEqual(0, response_json[0]["created"])
+
+    markets = models.Market.query.all()
+    self.assertEqual(len(markets), 0)
