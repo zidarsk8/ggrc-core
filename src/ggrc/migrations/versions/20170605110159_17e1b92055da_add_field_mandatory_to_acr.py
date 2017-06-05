@@ -25,9 +25,6 @@ def upgrade():
       'access_control_roles',
       sa.Column('mandatory', sa.Boolean(), nullable=False, server_default="0")
     )
-    op.execute('UPDATE access_control_roles '
-               'SET mandatory = true '
-               'WHERE name = "Admin"')
 
 
 def downgrade():
