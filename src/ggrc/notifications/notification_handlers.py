@@ -115,7 +115,7 @@ def _add_assessment_updated_notif(obj):
     _add_notification(obj, notif_type)
 
 
-def _add_state_change_notif(obj, state_change):
+def _add_state_change_notif(obj, state_change, remove_existing=False):
   """Add a notification record on changing the given object's status.
 
   If the same notification type for the object already exists and has not been
@@ -124,7 +124,25 @@ def _add_state_change_notif(obj, state_change):
   Args:
     obj (models.mixins.Assignable): an object for which to add a notification
     state_change (Transitions): the state transition that has happened
+    remove_existing (bool): whether or not to remove all exisiting state change
+      notifications for `obj`
   """
+  if remove_existing:
+    notif_type_names = (
+        [item.value for item in Transitions] + ["assessment_declined"]
+    )
+
+    notif_types = models.NotificationType.query.filter(
+        models.NotificationType.name.in_(notif_type_names)
+    )
+    notif_type_ids = [ntype.id for ntype in notif_types]
+
+    models.Notification.query.filter(
+        models.Notification.object_id == obj.id,
+        models.Notification.object_type == obj.type,
+        models.Notification.notification_type_id.in_(notif_type_ids)
+    ).delete(synchronize_session=False)
+
   notif_type = models.NotificationType.query.filter_by(
       name=state_change.value).first()
 
@@ -170,7 +188,7 @@ def handle_assignable_modified(obj):
 
   state_change = transitions_map.get((old_state, new_state))
   if state_change:
-    _add_state_change_notif(obj, state_change)
+    _add_state_change_notif(obj, state_change, remove_existing=True)
 
   # no interest in modifications when an assignable object is not ative yet
   if obj.status == Statusable.START_STATE:
@@ -213,7 +231,7 @@ def handle_assignable_modified(obj):
   # When modified, a done Assessment gets automatically reopened, but that is
   # not directly observable via status change history, thus an extra check.
   if obj.status in Statusable.DONE_STATES:
-    _add_state_change_notif(obj, Transitions.TO_REOPENED)
+    _add_state_change_notif(obj, Transitions.TO_REOPENED, remove_existing=True)
 
 
 def _ca_values_changed(obj):
@@ -390,7 +408,8 @@ def handle_relationship_altered(rel):
 
   # when modified, a done Assessment gets automatically reopened
   if asmt.status in Statusable.DONE_STATES:
-    _add_state_change_notif(asmt, Transitions.TO_REOPENED)
+    _add_state_change_notif(
+        asmt, Transitions.TO_REOPENED, remove_existing=True)
 
 
 def register_handlers():  # noqa: C901
