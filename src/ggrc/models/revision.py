@@ -6,6 +6,7 @@
 from ggrc import builder
 from ggrc import db
 from ggrc.models.mixins import Base
+from ggrc.access_control import role
 from ggrc.models.types import LongJsonType
 
 
@@ -115,3 +116,43 @@ class Revision(Base, db.Model):
     if self.event.action == "BULK":
       result += ", via bulk action"
     return result
+
+  @property
+  def populated_content(self):
+    """Property. Contains the revision content dict.
+
+    Updated by required values, generated from saved content dict."""
+    roles_dict = role.get_custom_roles_for(self.resource_type)
+    reverted_roles_dict = {n: i for i, n in roles_dict.iteritems()}
+    access_control_list = self.content.get("access_control_list") or []
+    map_field_to_role = {
+        "principal_assessor": reverted_roles_dict.get("Principal Assignees"),
+        "secondary_assessor": reverted_roles_dict.get("Secondary Assignees"),
+        "primary_contact": reverted_roles_dict.get("Primary Contacts"),
+        "secondary_contact": reverted_roles_dict.get("Secondary Contacts"),
+    }
+    exists_roles = {i["ac_role_id"] for i in access_control_list}
+    for field, role_id in map_field_to_role.items():
+      if field not in self.content:
+        continue
+      if role_id in exists_roles or role_id is None:
+        continue
+      person_id = (self.content.get(field) or {}).get("id")
+      if not person_id:
+        continue
+      access_control_list.append({
+          "display_name": roles_dict[role_id],
+          "ac_role_id": role_id,
+          "context_id": None,
+          "created_at": None,
+          "object_type": self.resource_type,
+          "updated_at": None,
+          "object_id": self.resource_id,
+          "modified_by_id": None,
+          "person_id": person_id,
+          "modified_by": None,
+          "id": None,
+      })
+    content = self.content.copy()
+    content["access_control_list"] = access_control_list
+    return content
