@@ -20,13 +20,13 @@ down_revision = '59d9fbfb42dc'
 
 
 def upgrade():
-    """Upgrade database schema and/or data, creating a new revision."""
-    op.add_column(
+  """Upgrade database schema and/or data, creating a new revision."""
+  op.add_column(
       'access_control_roles',
       sa.Column('mandatory', sa.Boolean(), nullable=False, server_default="0")
-    )
+  )
 
 
 def downgrade():
-    """Downgrade database schema and/or data back to the previous revision."""
-    op.drop_column('access_control_roles', 'mandatory')
+  """Downgrade database schema and/or data back to the previous revision."""
+  op.drop_column('access_control_roles', 'mandatory')
