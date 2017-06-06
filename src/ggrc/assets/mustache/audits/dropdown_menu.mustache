@@ -12,6 +12,7 @@
        or #if' hasRole '\
        and ^if' instance.archived '\
        or #system_role' 'Administrator' '\
+       or #system_role' 'Superuser' '\
        or #is_allowed' 'update' instance '\
        ' _4_context='for'}}
     <div class="details-wrap">
@@ -135,6 +136,7 @@
         {{^if instance.archived}}
             {{#if_helpers '\
                #system_role' 'Administrator' '\
+               or #system_role' 'Superuser' '\
                or #if' hasRole}}
                <li>
                   <a data-toggle="modal-ajax-archiveform"
@@ -161,14 +163,16 @@
                 </li>
             {{/is_allowed}}
         {{else}}
-            {{#system_role 'Administrator'}}
-               <li>
+            {{#if_helpers '\
+              #system_role' 'Administrator' '\
+              or #system_role' 'Superuser'}}
+                <li>
                    <unarchive-link instance="instance" notify="true">
                        <i class="fa fa-archive"></i>
                        Unarchive Audit
                    </unarchive-link>
-               </li>
-            {{/system_role}}
+                </li>
+            {{/if_helpers}}
         {{/if}}
 
       </ul>

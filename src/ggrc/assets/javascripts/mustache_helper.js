@@ -2868,11 +2868,7 @@ Example:
 
       return Mustache.defer_render('span',
         function (hasRole) {
-          if (hasRole) {
-            return options.fn(options.contexts.add({hasRole: hasRole}));
-          }
-
-          return options.inverse(options.contexts.add({hasRole: hasRole}));
+          return options.fn(options.contexts.add({hasRole: hasRole}));
         }, hasRoleForContextDfd);
     });
 })(this, jQuery, can);

@@ -30,15 +30,9 @@
         }.bind(this))
         .then(function () {
           var instance = this.options.instance;
-          var parentController =
-            $(this.options.$trigger).closest('.modal').control();
           var msg;
 
           instance.setup_custom_attributes();
-
-          if (parentController) {
-            parentController.options.skip_refresh = true;
-          }
 
           msg = instance.display_name() + ' archived successfully';
           $(document.body).trigger('ajax:flash', {success: msg});

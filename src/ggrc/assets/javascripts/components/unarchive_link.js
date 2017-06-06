@@ -3,10 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, $) {
+(function (GGRC, $) {
   'use strict';
 
-  can.Component.extend({
+  GGRC.Components('unarchiveLink', {
     tag: 'unarchive-link',
     scope: {
       notify: '@',
@@ -24,7 +24,7 @@
 
         event.preventDefault();
 
-        if (instance && instance.archived) {
+        if (instance && instance.attr('archived')) {
           instance.attr('archived', false);
 
           // Need to be fixed via new API:
@@ -43,4 +43,4 @@
       }
     }
   });
-})(window.can, window.can.$);
+})(window.GGRC, window.can.$);
