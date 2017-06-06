@@ -209,7 +209,8 @@ def generate_role_object_dict(snapshot, audit):
 
   acr_dict = role.get_custom_roles_for(snapshot.child_type)
   acl_dict = defaultdict(list)
-  for acl in snapshot.revision.content.get("access_control_list") or []:
+  # populated content should have access_control_list
+  for acl in snapshot.revision.populated_content["access_control_list"]:
     acl_dict[acr_dict[acl["ac_role_id"]]].append(acl["person_id"])
   # populate Access Control List by generated role from the related Audit
   acl_dict["Audit Lead"].append(audit.contact_id)
