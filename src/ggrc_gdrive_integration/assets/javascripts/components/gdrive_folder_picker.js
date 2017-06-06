@@ -31,7 +31,8 @@
             new CMS.Models.Document({
               context: object.context || {id: null},
               title: file.title,
-              link: file.alternateLink
+              link: file.alternateLink,
+              owners: [{type: 'Person', id: GGRC.current_user.id}]
             }).save().then(function (doc) {
               return $.when([
                 new CMS.Models.Relationship({
