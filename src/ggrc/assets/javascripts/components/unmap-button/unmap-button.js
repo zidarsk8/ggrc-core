@@ -21,6 +21,7 @@
           .done(function (item) {
             item.destroy()
               .then(function () {
+                this.dispatch('unmapped');
                 this.attr('destination').dispatch('refreshInstance');
                 can.trigger('unmap', {params: [
                   this.attr('source'),
@@ -44,20 +45,15 @@
           sources = this.attr('source')
               .attr(this.attr('objectProp')) || [];
         }
-        destinations = destinations
-          .map(function (item) {
-            return item.id;
-          });
         sources = sources
           .map(function (item) {
             return item.id;
           });
         mapping = destinations
           .filter(function (dest) {
-            return sources.indexOf(dest) > -1;
+            return sources.indexOf(dest.id) > -1;
           })[0];
-        mapping = mapping ? {id: mapping} : {};
-        return new CMS.Models[type](mapping);
+        return new CMS.Models[type](mapping || {});
       }
     },
     events: {

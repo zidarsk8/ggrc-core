@@ -13,10 +13,10 @@
         var link = {link: file.alternateLink};
         CMS.Models.Document.findAll(link).done(function (d) {
           if (d.length) {
-            new CMS.Models.ObjectDocument({
+            new CMS.Models.Relationship({
               context: object.context || {id: null},
-              documentable: object,
-              document: d[0]
+              source: object,
+              destination: d[0]
             }).save();
           } else {
             if (type === 'folders') {
@@ -31,13 +31,14 @@
             new CMS.Models.Document({
               context: object.context || {id: null},
               title: file.title,
-              link: file.alternateLink
+              link: file.alternateLink,
+              owners: [{type: 'Person', id: GGRC.current_user.id}]
             }).save().then(function (doc) {
               return $.when([
-                new CMS.Models.ObjectDocument({
+                new CMS.Models.Relationship({
                   context: object.context || {id: null},
-                  documentable: object,
-                  document: doc
+                  source: object,
+                  destination: doc
                 }).save()
               ]);
             });

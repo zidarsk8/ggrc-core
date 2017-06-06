@@ -19,13 +19,15 @@
                                   comment-place-holder="Enter comment"></assessment-add-comment>
       {{/if}}
       {{#if evidence}}
-        <assessment-attachments-list
-              rel="tooltip"
-              class="assesment-attachment-list attachments-list-control"
-              title="Evidence"
-              tooltip="You can upload up to 10 files in a single batch"
-              {instance}="instance">
-        </assessment-attachments-list>
+        <related-documents {instance}="instance" document-type="EVIDENCE">
+            <h6>Evidence</h6>
+            <object-list {items}="documents" {empty-message}="noItemsText">
+                <editable-document-object-list-item {document}="{.}">
+                </editable-document-object-list-item>
+            </object-list>
+            <attach-button (refresh-evidences)="loadDocuments()" {instance}="instance">
+            </attach-button>
+        </related-documents>
       {{/if}}
     </div>
 </form>

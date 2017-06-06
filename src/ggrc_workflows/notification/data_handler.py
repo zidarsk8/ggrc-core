@@ -8,12 +8,13 @@
 
 import urllib
 
+from collections import defaultdict
 from copy import deepcopy
 from datetime import date
 from logging import getLogger
 from urlparse import urljoin
 
-from sqlalchemy import and_
+from sqlalchemy import and_, orm
 
 from ggrc import db
 from ggrc import utils
@@ -135,16 +136,28 @@ def get_cycle_task_due(notification):
   }
 
 
-def get_cycle_task_overdue_data(notification):
+def get_cycle_task_overdue_data(
+    notification, tasks_cache=None, del_rels_cache=None
+):
   """Compile and return all relevant email data for task overdue notification.
 
   Args:
     notification: Notification instance for which to compile email data.
+    tasks_cache (dict): prefetched CycleTaskGroupObjectTask instances
+      accessible by their ID as a key
+    del_rels_cache (dict): prefetched Revision instances representing the
+      relationships to Tasks that were deleted grouped by task ID as a key
   Returns:
     Dictionary containing the compiled data under the key that equals the
     overdue task assignee's email address.
   """
-  cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  if tasks_cache is None:
+    tasks_cache = {}
+
+  cycle_task = tasks_cache.get(notification.object_id)
+  if not cycle_task:
+    cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+
   if not cycle_task:
     logger.warning(
         '%s for notification %s not found.',
@@ -161,7 +174,7 @@ def get_cycle_task_overdue_data(notification):
   # the filter expression to be included in the cycle task's URL and
   # automatically applied when user visits it
   url_filter_exp = u"id=" + unicode(cycle_task.cycle_id)
-  task_info = get_cycle_task_dict(cycle_task)
+  task_info = get_cycle_task_dict(cycle_task, del_rels_cache=del_rels_cache)
 
   task_info['task_group'] = cycle_task.cycle_task_group
   task_info['task_group_url'] = cycle_task_group_url(
@@ -262,9 +275,75 @@ def get_cycle_task_declined_data(notification):
   }
 
 
-def get_cycle_task_data(notification):
+def cycle_tasks_cache(notifications):
+  """Compile and return Task instances related to given notification records.
 
-  cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+  Args:
+    notifications: a list of Notification instances for which to fetch the
+      corresponding CycleTaskGroupObjectTask instances
+      accessible by their ID as a key
+  Returns:
+    Dictionary containing task instances with their IDs used as keys.
+  """
+  task_ids = [n.object_id for n in notifications
+              if n.object_type == "CycleTaskGroupObjectTask"]
+
+  results = db.session\
+      .query(CycleTaskGroupObjectTask)\
+      .options(
+          orm.joinedload("related_sources"),
+          orm.joinedload("related_destinations")
+      )\
+      .filter(CycleTaskGroupObjectTask.id.in_(task_ids))
+
+  return {task.id: task for task in results}
+
+
+def deleted_task_rels_cache(task_ids):
+  """Compile and return deleted Relationships information for given Tasks.
+
+  Args:
+    task_ids: a list of CycleTaskGroupObjectTask IDs for which to fetch
+      revisions of deleted Relationships
+  Returns:
+      Dictionary containing Revision instances grouped by Task IDs as keys.
+  """
+  rels_cache = defaultdict(list)
+
+  deleted_relationships_sources = db.session.query(Revision).filter(
+      Revision.resource_type == "Relationship",
+      Revision.action == "deleted",
+      Revision.source_type == "CycleTaskGroupObjectTask",
+      Revision.source_id.in_(task_ids)
+  )
+  deleted_relationships_destinations = db.session.query(Revision).filter(
+      Revision.resource_type == "Relationship",
+      Revision.action == "deleted",
+      Revision.destination_type == "CycleTaskGroupObjectTask",
+      Revision.destination_id.in_(task_ids)
+  )
+  deleted_relationships = deleted_relationships_sources.union(
+      deleted_relationships_destinations).all()
+
+  # group relationships by their corresponding Task ID
+  for rel in deleted_relationships:
+    if rel.source_type == "CycleTaskGroupObjectTask":
+      task_id = rel.source_id
+    else:
+      task_id = rel.destination_id
+    rels_cache[task_id].append(rel)
+
+  return rels_cache
+
+
+def get_cycle_task_data(notification, tasks_cache=None, del_rels_cache=None):
+  if tasks_cache is None:
+    tasks_cache = {}
+
+  cycle_task = tasks_cache.get(notification.object_id)
+  if not cycle_task:
+    cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
+
   if not cycle_task or not cycle_task.cycle_task_group.cycle.is_current:
     return {}
 
@@ -282,7 +361,8 @@ def get_cycle_task_data(notification):
                              "cycle_task_due_today"]:
     return get_cycle_task_due(notification)
   elif notification_name == "cycle_task_overdue":
-    return get_cycle_task_overdue_data(notification)
+    return get_cycle_task_overdue_data(
+        notification, tasks_cache=tasks_cache, del_rels_cache=del_rels_cache)
 
   return {}
 
@@ -398,7 +478,7 @@ def _get_object_info_from_revision(revision, known_type):
   return object_type, object_id
 
 
-def get_cycle_task_dict(cycle_task):
+def get_cycle_task_dict(cycle_task, del_rels_cache=None):
 
   object_titles = []
   # every object should have a title or at least a name like person object
@@ -406,22 +486,27 @@ def get_cycle_task_dict(cycle_task):
     object_titles.append(getattr(related_object, "title", "") or
                          getattr(related_object, "name", "") or
                          u"Untitled object")
+
   # related objects might have been deleted or unmapped,
   # check the revision history
-  deleted_relationships_sources = db.session.query(Revision).filter(
-      Revision.resource_type == "Relationship",
-      Revision.action == "deleted",
-      Revision.source_type == "CycleTaskGroupObjectTask",
-      Revision.source_id == cycle_task.id
-  )
-  deleted_relationships_destinations = db.session.query(Revision).filter(
-      Revision.resource_type == "Relationship",
-      Revision.action == "deleted",
-      Revision.destination_type == "CycleTaskGroupObjectTask",
-      Revision.destination_id == cycle_task.id
-  )
-  deleted_relationships = deleted_relationships_sources.union(
-      deleted_relationships_destinations).all()
+  if del_rels_cache is not None:
+    deleted_relationships = del_rels_cache.get(cycle_task.id, [])
+  else:
+    deleted_relationships_sources = db.session.query(Revision).filter(
+        Revision.resource_type == "Relationship",
+        Revision.action == "deleted",
+        Revision.source_type == "CycleTaskGroupObjectTask",
+        Revision.source_id == cycle_task.id
+    )
+    deleted_relationships_destinations = db.session.query(Revision).filter(
+        Revision.resource_type == "Relationship",
+        Revision.action == "deleted",
+        Revision.destination_type == "CycleTaskGroupObjectTask",
+        Revision.destination_id == cycle_task.id
+    )
+    deleted_relationships = deleted_relationships_sources.union(
+        deleted_relationships_destinations).all()
+
   for deleted_relationship in deleted_relationships:
     removed_object_type, removed_object_id = _get_object_info_from_revision(
         deleted_relationship, "CycleTaskGroupObjectTask")

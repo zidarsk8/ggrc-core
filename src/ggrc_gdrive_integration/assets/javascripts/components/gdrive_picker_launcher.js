@@ -227,7 +227,8 @@
                 docs.push(new CMS.Models.Document({
                   context: that.instance.context || {id: null},
                   title: file.title,
-                  link: file.alternateLink
+                  link: file.alternateLink,
+                  owners: [{type: 'Person', id: GGRC.current_user.id}]
                 }));
               }
               if (that.deferred || !docs[0].isNew()) {
@@ -242,10 +243,10 @@
                     context: that.instance.context || {id: null}
                   });
                 } else {
-                  objectDoc = new CMS.Models.ObjectDocument({
+                  objectDoc = new CMS.Models.Relationship({
                     context: that.instance.context || {id: null},
-                    documentable: that.instance,
-                    document: doc
+                    source: that.instance,
+                    destination: doc
                   }).save();
                 }
 

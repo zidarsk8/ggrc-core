@@ -6,27 +6,15 @@
 (function (GGRC, can) {
   'use strict';
 
-  var tag = 'assessment-attachments-list';
+  var tag = 'attach-button';
   var template = can.view(GGRC.mustache_path +
-    '/components/assessment/attachments-list.mustache');
+    '/components/assessment/attach-button.mustache');
 
-  /**
-   * Wrapper Component for rendering and managing of attachments lists
-   */
-  GGRC.Components('assessmentAttachmentsList', {
+  GGRC.Components('attachButton', {
     tag: tag,
     template: template,
     viewModel: {
-      define: {
-        noItemsText: {
-          type: 'string',
-          value: ''
-        }
-      },
-      title: '@',
-      tooltip: '@',
-      limit: 5,
-      instance: null,
+      instance: {},
       confirmationCallback: function () {
         var confirmation = null;
 
@@ -46,8 +34,10 @@
         return confirmation;
       },
       itemsUploadedCallback: function () {
-        if (this.instance instanceof CMS.Models.Assessment) {
-          this.instance.dispatch('refreshInstance');
+        this.dispatch('refreshEvidences');
+
+        if (this.attr('instance')) {
+          this.attr('instance').dispatch('refreshInstance');
         }
       }
     }

@@ -169,6 +169,7 @@
       return QueryAPI.makeRequest({
         data: params
       }).then(function (data) {
+        var countsMap = {};
         data.forEach(function (info, i) {
           var widget = widgets[i];
           var name = typeof widget === 'string' ? widget : widget.name;
@@ -177,8 +178,9 @@
           if (SnapshotUtils.isSnapshotRelated(type, name)) {
             name = 'Snapshot';
           }
-          getCounts().attr(countsName, info[name].total);
+          countsMap[countsName] = info[name].total;
         });
+        getCounts().attr(countsMap);
       });
     }
 

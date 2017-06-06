@@ -159,7 +159,6 @@ dashboard-js-files:
   - components/collapsible-panel/collapsible-panel-body.js
   - components/read-more/read-more.js
   - components/assessment/urls-list.js
-  - components/assessment/attachments-list.js
   - components/assessment/custom-attributes.js
   - components/assessment/inline.js
   - components/assessment/add_comment.js
@@ -174,7 +173,6 @@ dashboard-js-files:
   - components/object-popover/object-popover.js
   - components/mapped-objects/mapped-objects.js
   - components/related-objects/related-audits.js
-  - components/related-objects/related-attachments-and-urls.js
   - components/related-objects/related-assessment-item.js
   - components/related-objects/related-assessment-list.js
   - components/related-objects/related-comments.js
@@ -301,6 +299,9 @@ dashboard-js-files:
   - components/action-toolbar-control/action-toolbar-control.js
   - components/unmap-button/unmap-button.js
   - components/unmap-button/unmap-person-button.js
+  - components/object-list-item/editable-document-object-list-item.js
+  - components/related-objects/related-documents.js
+  - components/assessment/attach-button.js
 
 app-init-files:
   - apps/dashboard.js
@@ -325,7 +326,6 @@ dashboard-js-template-files:
   - components/assessment/mapped-objects/mapped-related-information.mustache
   - components/assessment/mapped-objects/mapped-comments.mustache
   - components/assessment/urls-list.mustache
-  - components/assessment/attachments-list.mustache
   - components/assessment/custom-attributes.mustache
   - components/assessment/inline/inline.mustache
   - components/assessment/inline/text.mustache
@@ -639,6 +639,8 @@ dashboard-js-template-files:
   - quick_form/confirm_buttons.mustache
   - snapshots/dropdown_menu.mustache
   - snapshots/tree_add_item.mustache
+  - components/object-list-item/editable-document-object-list-item.mustache
+  - components/assessment/attach-button.mustache
 
 dashboard-css-files:
   - dashboard.css

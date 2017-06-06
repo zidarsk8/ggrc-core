@@ -3,13 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Components.assessmentAttachmentsList', function () {
+describe('GGRC.Components.attachButton', function () {
   'use strict';
 
   var viewModel;
 
   beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('assessmentAttachmentsList');
+    viewModel = GGRC.Components.getViewModel('attachButton');
     viewModel.attr('instance', new CMS.Models.Assessment());
   });
 

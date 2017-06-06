@@ -4,7 +4,8 @@
 """This module contains custom operators for query helper"""
 
 # pylint: disable=unused-argument
-from operator import eq, lt, gt, le, ge
+import operator
+import functools
 
 import flask
 import sqlalchemy
@@ -12,7 +13,7 @@ from sqlalchemy.orm import load_only
 
 from ggrc import db
 from ggrc import models
-from ggrc.converters.autocast import autocast
+from ggrc.converters import autocast
 from ggrc.converters.exceptions import BadQueryException
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.login import is_creator
@@ -29,6 +30,32 @@ GETATTR_WHITELIST = {
     "is_current",
     "program",
 }
+
+
+def validate(*required_fields):
+  """Validate decorator.
+
+  Checks if all of required fields are in exp dict.
+  If there are some of required fields are not found then raise the
+  BadQueryException.
+  """
+  required_fields_set = set(required_fields)
+  required_tmpl = "`{field}` required for operation `{operation}`"
+
+  def decorator(operation):
+    """Decorator for operator."""
+    @functools.wraps(operation)
+    def decorated_operator(exp, *args, **kwargs):
+      """Decorated operator """
+      operation_name = exp["op"]["name"]
+      error_fields = required_fields_set - set(exp.keys())
+      if error_fields:
+        raise BadQueryException("\n".join([
+            required_tmpl.format(field=field, operation=operation_name)
+            for field in error_fields]))
+      return operation(exp, *args, **kwargs)
+    return decorated_operator
+  return decorator
 
 
 def build_op_shortcut(predicate):
@@ -51,6 +78,7 @@ def build_op_shortcut(predicate):
   return decorated
 
 
+@validate("left", "right")
 @build_op_shortcut
 def like(left, right):
   """Handle ~ operator with SQL LIKE."""
@@ -64,6 +92,7 @@ def reverse(operation):
   return decorated
 
 
+@validate("left", "right")
 def is_filter(exp, object_class, target_class, query):
   """Handle 'is' operator.
 
@@ -86,10 +115,15 @@ def is_filter(exp, object_class, target_class, query):
 
 def unknown(exp, object_class, target_class, query):
   """A fake operator for invalid operator names."""
-  raise BadQueryException(
-      u"Unknown operator \"{}\"".format(exp["op"]["name"]))
+  name = exp.get("op", {}).get("name")
+  if name is None:
+    msg = u"No operator name sent"
+  else:
+    msg = u"Unknown operator \"{}\"".format(name)
+  raise BadQueryException(msg)
 
 
+@validate("object_name", "ids")
 def related_people(exp, object_class, target_class, query):
   """Get people related to the specified object.
 
@@ -154,6 +188,7 @@ def related_people(exp, object_class, target_class, query):
   return sqlalchemy.sql.false()
 
 
+@validate("ids")
 def owned(exp, object_class, target_class, query):
   """Get objects for which the user is owner.
 
@@ -179,6 +214,7 @@ def owned(exp, object_class, target_class, query):
   return sqlalchemy.sql.false()
 
 
+@validate("text")
 def text_search(exp, object_class, target_class, query):
   """Filter by fulltext search.
 
@@ -199,6 +235,7 @@ def text_search(exp, object_class, target_class, query):
   )
 
 
+@validate("object_name", "ids")
 def similar(exp, object_class, target_class, query):
   """Filter by relationships similarity.
 
@@ -229,6 +266,7 @@ def similar(exp, object_class, target_class, query):
   return sqlalchemy.sql.false()
 
 
+@validate("object_name", "ids")
 def relevant(exp, object_class, target_class, query):
   "Filter by relevant object"
   if exp['object_name'] == "__previous__":
@@ -275,15 +313,19 @@ def relevant(exp, object_class, target_class, query):
 
 def build_expression(exp, object_class, target_class, query):
   """Make an SQLAlchemy filtering expression from exp expression tree."""
-  if OPS.get(exp.get("op", {}).get("name")) is None:
-    return
-  exp = autocast(exp, target_class)
   if not exp:
+    # empty expression doesn't required filter
+    return
+  if autocast.is_autocast_required_for(exp):
+    exp = validate("left", "right")(autocast.autocast)(exp, target_class)
+  if not exp:
+    # empty expression after autocast is invalid and should raise an exception
     raise BadQueryException("Invalid filter data")
   operation = OPS.get(exp.get("op", {}).get("name")) or unknown
   return operation(exp, object_class, target_class, query)
 
 
+@validate("left", "right")
 def and_operation(exp, object_class, target_class, query):
   """Operator generate sqlalchemy for and operation"""
   return sqlalchemy.and_(
@@ -291,6 +333,7 @@ def and_operation(exp, object_class, target_class, query):
       build_expression(exp["right"], object_class, target_class, query))
 
 
+@validate("left", "right")
 def or_operation(exp, object_class, target_class, query):
   """Operator generate sqlalchemy for or operation"""
   return sqlalchemy.or_(
@@ -298,17 +341,23 @@ def or_operation(exp, object_class, target_class, query):
       build_expression(exp["right"], object_class, target_class, query))
 
 
+EQ_OPERATOR = validate("left", "right")(build_op_shortcut(operator.eq))
+LT_OPERATOR = validate("left", "right")(build_op_shortcut(operator.lt))
+GT_OPERATOR = validate("left", "right")(build_op_shortcut(operator.gt))
+LE_OPERATOR = validate("left", "right")(build_op_shortcut(operator.le))
+GE_OPERATOR = validate("left", "right")(build_op_shortcut(operator.ge))
+
 OPS = {
     "AND": and_operation,
     "OR": or_operation,
-    "=": build_op_shortcut(eq),
-    "!=": reverse(build_op_shortcut(eq)),
+    "=": EQ_OPERATOR,
+    "!=": reverse(EQ_OPERATOR),
     "~": like,
     "!~": reverse(like),
-    "<": build_op_shortcut(lt),
-    ">": build_op_shortcut(gt),
-    "<=": build_op_shortcut(le),
-    ">=": build_op_shortcut(ge),
+    "<": LT_OPERATOR,
+    ">": GT_OPERATOR,
+    "<=": LE_OPERATOR,
+    ">=": GE_OPERATOR,
     "relevant": relevant,
     "similar": similar,
     "owned": owned,

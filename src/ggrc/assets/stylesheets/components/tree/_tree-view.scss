@@ -171,7 +171,7 @@ tree-item {
       height: 60px;
       align-items: center;
       flex: 1 1;
-      margin: 0 5px;
+      padding: 0 5px 0 0;
       overflow: hidden;
       text-overflow: ellipsis;
       word-wrap: break-word;
@@ -255,7 +255,7 @@ tree-filter-input {
 tree-header {
   .tree-header {
     align-items: center;
-    padding-right: 28px !important;
+    padding-right: 40px !important;
     padding-left: 0 !important;
 
     &.disable-conf {
@@ -288,6 +288,7 @@ tree-header {
   .widget-col-title {
     overflow: hidden;
     flex: 1 1;
+    padding: 0 5px 0 0;
 
     &:first-child {
       flex: 2 2;

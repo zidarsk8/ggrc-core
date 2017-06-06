@@ -26,17 +26,31 @@
 
     <div class="row-fluid wrap-row">
       <div class="span4">
-        <h6>Supporting files</h6>
-        <mapping-tree-view
-          parent-instance="instance"
-          mapping="documents"
-          item-template="/static/mustache/risk_assessments/documents.mustache"
-          >
-        </mapping-tree-view>
-        {{#is_allowed 'update'}}
-          <ggrc-gdrive-picker-launcher instance="instance" link_text="Attach supporting file" click_event="trigger_upload">
-          </ggrc-gdrive-picker-launcher>
-        {{/is_allowed}}
+        <related-documents {instance}="instance" document-type="EVIDENCE">
+          <h6>Supporting files</h6>
+          <object-list {items}="documents" {empty-message}="noItemsText">
+            <editable-document-object-list-item {document}="{.}">
+              <unmap-button
+                (unmapped)="loadDocuments()"
+                {destination}="instance"
+                {source}="document">
+                <action-toolbar-control>
+                  <i class="fa fa-trash"></i>
+                </action-toolbar-control>
+              </unmap-button>
+            </editable-document-object-list-item>
+          </object-list>
+
+          {{#is_allowed 'update'}}
+            <ggrc-gdrive-picker-launcher
+              instance="instance"
+              link_text="Attach supporting file"
+              {items-uploaded-callback}="@loadDocuments"
+              click_event="trigger_upload">
+              Attach
+            </ggrc-gdrive-picker-launcher>
+          {{/is_allowed}}
+        </related-documents>
       </div>
       <div class="span4">
         <h6>Risk Manager</h6>

@@ -212,9 +212,9 @@
       control = new descriptor
         .controller($element, descriptor.controller_options);
 
-      // FIXME: This should be elsewhere -- currently required so TreeView can
-      //   initialize ObjectNav with counts
-      control.prepare();
+      if (GGRC.Utils.CurrentPage.isAdmin()) {
+        control.prepare();
+      }
 
       // FIXME: Abstraction violation: Sortable/DashboardWidget/ResizableWidget
       //   controllers should maybe handle this?

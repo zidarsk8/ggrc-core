@@ -5,7 +5,6 @@
 
 from logging import getLogger
 
-from ggrc import db
 from ggrc import models
 from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user_id
@@ -18,18 +17,17 @@ logger = getLogger(__name__)
 class DocumentLinkHandler(handlers.ColumnHandler):
   """Base class for document documents handlers."""
 
-  def _parse_line(self, line):
-    """Parse a single line and return link and title.
+  DOCUMENT_TYPE = None
 
-    Args:
-      line: string containing a single line from a cell.
+  @staticmethod
+  def _parse_line(line):
+    raise NotImplemented()
 
-    Returns:
-      tuple containing a link and a title.
-    """
-    # pylint: disable=no-self-use
-    line = line.strip()
-    return line, line
+  def _get_old_map(self):
+    raise NotImplemented()
+
+  def get_value(self):
+    raise NotImplemented()
 
   def parse_item(self, has_title=False):
     """Parse document link lines.
@@ -48,6 +46,7 @@ class DocumentLinkHandler(handlers.ColumnHandler):
           title=title,
           modified_by_id=user_id,
           context=self.row_converter.obj.context,
+          document_type=self.DOCUMENT_TYPE,
       ))
 
     return documents
@@ -55,88 +54,8 @@ class DocumentLinkHandler(handlers.ColumnHandler):
   def set_obj_attr(self):
     self.value = self.parse_item()
 
-
-class DocumentEvidenceHandler(DocumentLinkHandler):
-  """Handler for evidence field on document imports."""
-
-  def _parse_line(self, line):
-    """Parse a single line and return link and title.
-
-    Args:
-      line: string containing a single line from a cell.
-
-    Returns:
-      tuple containing a link and a title.
-    """
-    # pylint: disable=no-self-use
-    parts = line.strip().split()
-    if len(parts) == 1:
-      return parts[0], parts[0]
-
-    return parts[0], " ".join(parts[1:])
-
-  def get_value(self):
-    """Generate a new line separated string for all document links.
-
-    Returns:
-      string containing all evidence URLs and titles.
-    """
-    return u"\n".join(
-        u"{} {}".format(document.link, document.title)
-        for document in self.row_converter.obj.documents
-    )
-
-  def insert_object(self):
-    """Update document evidence values.
-
-    This function adds missing evidence and remove existing ones from
-    Documents. The existing evidence with new titles just change the title.
-    """
-    if not self.value or self.row_converter.ignore:
-      return
-
-    new_link_map = {doc.link: doc for doc in self.value}
-    old_link_map = {doc.link: doc for doc in self.row_converter.obj.documents}
-    for new_link, new_doc in new_link_map.iteritems():
-      if new_link in old_link_map:
-        old_link_map[new_link].title = new_doc.title
-      else:
-        self.row_converter.obj.documents.append(new_doc)
-
-    for old_link, old_doc in old_link_map.iteritems():
-      if old_link not in new_link_map:
-        db.session.delete(old_doc.object_documents[0])
-
   def set_value(self):
     """This should be ignored with second class attributes."""
-
-
-class DocumentUrlHandler(DocumentLinkHandler):
-  """Handler for URL field on document imports."""
-
-  def _parse_line(self, line):
-    """Parse a single line and return link and title.
-
-    Args:
-      line: string containing a single line from a cell.
-
-    Returns:
-      tuple containing a link and a title.
-    """
-    line = line.strip()
-    return line, line
-
-  def get_value(self):
-    """Generate a new line separated string for all document links.
-
-    Returns:
-      string containing all URLs
-    """
-    return "\n".join(
-        doc.link
-        for doc in self.row_converter.obj.related_objects()
-        if isinstance(doc, models.Document)
-    )
 
   def insert_object(self):
     """Update document URL values
@@ -144,31 +63,83 @@ class DocumentUrlHandler(DocumentLinkHandler):
     This function adds missing URLs and remove existing ones from Documents.
     The existing URLs with new titles just change the title.
     """
-    if not self.value or self.row_converter.ignore:
+    if self.row_converter.ignore:
       return
-
-    new_link_map = {doc.link: doc for doc in self.value}
-    old_link_map = {doc.link: doc
-                    for doc in self.row_converter.obj.related_objects()
-                    if isinstance(doc, models.Document)}
+    new_link_map = {d.link: d for d in self.value}
+    old_link_map = self._get_old_map()
 
     for new_link, new_doc in new_link_map.iteritems():
       if new_link in old_link_map:
         old_link_map[new_link].title = new_doc.title
       else:
-        models.Relationship(
-            source=self.row_converter.obj,
-            destination=new_doc,
-        )
+        models.Relationship(source=self.row_converter.obj, destination=new_doc)
 
     for old_link, old_doc in old_link_map.iteritems():
-      if old_link not in new_link_map:
-        if old_doc.related_destinations:
-          old_doc.related_destinations.pop()
-        elif old_doc.related_sources:
-          old_doc.related_sources.pop()
-        else:
-          logger.warning("Invalid relationship state for document URLs.")
+      if old_link in new_link_map:
+        continue
+      if old_doc.related_destinations:
+        old_doc.related_destinations.pop()
+      elif old_doc.related_sources:
+        old_doc.related_sources.pop()
+      else:
+        logger.warning("Invalid relationship state for document URLs.")
 
-  def set_value(self):
-    """This should be ignored with second class attributes."""
+
+class DocumentEvidenceHandler(DocumentLinkHandler):
+  """Handler for evidence field on document imports."""
+
+  DOCUMENT_TYPE = models.Document.ATTACHMENT
+
+  @staticmethod
+  def _parse_line(line):
+    """Parse a single line and return link and title.
+
+    Args:
+      line: string containing a single line from a cell.
+
+    Returns:
+      tuple containing a link and a title.
+    """
+    parts = line.strip().split()
+    return parts[0], parts[0] if len(parts) == 1 else " ".join(parts[1:])
+
+  def get_value(self):
+    """Generate a new line separated string for all document links.
+
+    Returns:
+      string containing all evidence URLs and titles.
+    """
+    return u"\n".join(u"{} {}".format(d.link, d.title) for d in
+                      self.row_converter.obj.document_evidence)
+
+  def _get_old_map(self):
+    return {d.link: d for d in self.row_converter.obj.document_evidence}
+
+
+class DocumentUrlHandler(DocumentLinkHandler):
+  """Handler for URL field on document imports."""
+
+  DOCUMENT_TYPE = models.Document.URL
+
+  @staticmethod
+  def _parse_line(line):
+    """Parse a single line and return link and title.
+
+    Args:
+      line: string containing a single line from a cell.
+
+    Returns:
+      tuple containing a link and a title.
+    """
+    return [line.strip()] * 2
+
+  def _get_old_map(self):
+    return {d.link: d for d in self.row_converter.obj.document_url}
+
+  def get_value(self):
+    """Generate a new line separated string for all document links.
+
+    Returns:
+      string containing all URLs
+    """
+    return "\n".join(doc.link for doc in self.row_converter.obj.document_url)

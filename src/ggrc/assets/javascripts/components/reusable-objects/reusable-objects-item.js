@@ -12,24 +12,34 @@
   can.Component.extend({
     tag: 'reusable-objects-item',
     template: tpl,
-    scope: {
+    viewModel: {
+      define: {
+        disabled: {
+          get: function () {
+            var isMapped;
+            var baseInstanceObjects = this.attr('baseInstanceDocuments');
+
+            if (!baseInstanceObjects) {
+              return false;
+            }
+
+            isMapped = baseInstanceObjects.map(function (document) {
+              return document.id;
+            }).indexOf(this.attr('instance.id')) > -1;
+
+            return this.attr('instance.isMapped') ||
+              isMapped;
+          }
+        }
+      },
       isSaving: false,
-      instance: null,
-      checkReusedStatus: false,
+      instance: {},
       selectedList: [],
       disabled: false,
-      mapping: null,
       isChecked: false,
+      baseInstanceDocuments: [],
       isDisabled: function () {
         return this.attr('disabled');
-      },
-      setDisabled: function () {
-        var isDisabled = this.attr('instance.isMapped') ||
-          GGRC.Utils.is_mapped(
-            this.attr('baseInstance'),
-            this.attr('instance'),
-            this.attr('mapping'));
-        this.attr('disabled', isDisabled);
       },
       isSelected: function () {
         var instanceId = this.attr('instance.id');
@@ -63,19 +73,13 @@
       }
     },
     init: function () {
-      this.scope.setDisabled();
       if (this.scope.isSelected()) {
         this.scope.attr('isChecked', true);
       }
     },
     events: {
-      '{scope} isChecked': function (scope, ev, isChecked) {
+      '{viewModel} isChecked': function (scope, ev, isChecked) {
         this.scope.toggleSelection(isChecked);
-      },
-      '{scope} checkReusedStatus': function (scope, ev, performCheck) {
-        if (performCheck) {
-          this.scope.setDisabled();
-        }
       }
     }
   });

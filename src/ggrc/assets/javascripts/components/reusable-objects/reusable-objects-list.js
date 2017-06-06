@@ -10,40 +10,36 @@
     createRelationship: function (source, destination) {
       return new CMS.Models.Relationship({
         context: source.context,
-        source: source.stub(),
+        source: source,
         destination: destination
       });
     },
-    createObjectRelationship: function (source, destination) {
-      return new CMS.Models.ObjectDocument({
-        context: source.context,
-        documentable: source,
-        document: destination
-      });
-    },
-    isEvidence: function (type) {
-      return type === 'evidence';
-    },
     mapObjects: function (source, destination, type) {
-      return this.isEvidence(type) ?
-        this.createObjectRelationship(source, destination) :
-        this.createRelationship(source, destination);
+      return this.createRelationship(source, destination);
     }
   };
 
   GGRC.Components('reusableObjectsList', {
     tag: 'reusable-objects-list',
     viewModel: {
-      baseInstance: null,
-      checkReusedStatus: false,
-      evidenceList: [],
-      urlList: [],
-      isSaving: false,
-      setHasSelected: function () {
-        var hasSelected =
-          this.attr('evidenceList.length') || this.attr('urlList.length');
-        this.attr('hasSelected', hasSelected);
+      define: {
+        baseInstanceDocuments: {
+          get: function () {
+            return this.attr('urls').concat(this.attr('evidences'));
+          }
+        },
+        hasSelected: {
+          get: function () {
+            return !!this.attr('documentList.length');
+          }
+        }
       },
+      evidences: [],
+      urls: [],
+      baseInstance: {},
+      documentList: [],
+      isSaving: false,
+      baseInstanceDocuments: [],
       getMapObjects: function (source, list, mapperType) {
         return Array.prototype.filter
         // Get Array of unique items
@@ -59,17 +55,14 @@
       },
       getReusedObjectList: function () {
         var source = this.attr('baseInstance');
-        var evidences =
-          this.getMapObjects(source, this.attr('evidenceList'), 'evidence');
-        var urls =
-          this.getMapObjects(source, this.attr('urlList'));
-        return [].concat(evidences, urls);
+        var documentList =
+          this.getMapObjects(source, this.attr('documentList'), 'documents');
+        return documentList;
       },
       reuseSelected: function () {
         var reusedObjectList = this.getReusedObjectList();
 
         this.attr('isSaving', true);
-        this.attr('checkReusedStatus', false);
 
         can.when.apply(can, reusedObjectList)
           .done(function () {
@@ -85,19 +78,9 @@
           .always(this.restoreDefaults.bind(this));
       },
       restoreDefaults: function () {
-        this.attr('evidenceList').replace([]);
-        this.attr('urlList').replace([]);
+        this.attr('documentList').replace([]);
         this.attr('isSaving', false);
-        this.attr('checkReusedStatus', true);
         this.attr('baseInstance').dispatch('refreshInstance');
-      }
-    },
-    events: {
-      '{viewModel.evidenceList} length': function () {
-        this.scope.setHasSelected();
-      },
-      '{viewModel.urlList} length': function () {
-        this.scope.setHasSelected();
       }
     }
   });

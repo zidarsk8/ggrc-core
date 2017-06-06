@@ -69,6 +69,7 @@
           context: this.scope.parent_instance.context || new CMS.Models.Context({
             id: null
           }),
+          document_type: CMS.Models.Document.URL,
           owners: [{type: 'Person', id: GGRC.current_user.id}]
         });
         return dfd.save();
