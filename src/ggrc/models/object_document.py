@@ -107,8 +107,10 @@ class Documentable(object):
   @classmethod
   def indexed_query(cls):
     return super(Documentable, cls).indexed_query().options(
-        orm.subqueryload("document_url").load_only("id", "title", "link"),
-        orm.subqueryload("document_evidence").load_only("id", "link"),
+        orm.subqueryload("document_url").undefer_group("Document_complete"),
+        orm.subqueryload("document_evidence").undefer_group(
+            "Document_complete"
+        ),
     )
 
 

@@ -12,6 +12,7 @@ from ggrc.models.mixins import (
     Titled, Slugged, CustomAttributable, Stateful
 )
 
+from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.mixins import clonable
 from ggrc.models.relationship import Relatable
 from ggrc.models.object_person import Personable
@@ -24,7 +25,7 @@ from ggrc.models.snapshot import Snapshotable
 from ggrc.fulltext.mixin import Indexed
 
 
-class Audit(Snapshotable, clonable.Clonable,
+class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
             CustomAttributable, Personable, HasOwnContext, Relatable,
             Timeboxed, Noted, Described, Hyperlinked, WithContact, Titled,
             Stateful, Slugged, Indexed, db.Model):
