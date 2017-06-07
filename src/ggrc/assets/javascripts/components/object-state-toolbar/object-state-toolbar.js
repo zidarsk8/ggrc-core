@@ -59,6 +59,13 @@
       },
       hasErrors: function () {
         return this.attr('instance.preconditions_failed');
+      },
+      changeState: function (newState, undo) {
+        this.dispatch({
+          type: 'onStateChange',
+          state: newState,
+          undo: undo
+        });
       }
     }
   });

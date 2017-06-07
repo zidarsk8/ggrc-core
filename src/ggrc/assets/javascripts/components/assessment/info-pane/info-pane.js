@@ -169,6 +169,30 @@
       onFormSave: function () {
         this.attr('triggerFormSaveCbs').fire();
       },
+      onStateChange: function (event) {
+        var undo = event.undo;
+        var state = event.state;
+        var instance = this.attr('instance');
+
+        if (!instance.attr('_undo')) {
+          instance.attr('_undo', []);
+        }
+
+        if (undo) {
+          instance.attr('_undo').shift();
+        } else {
+          instance.attr('_undo').unshift(state);
+        }
+
+        instance.refresh()
+          .then(function () {
+            instance.attr('status', state);
+            return instance.save();
+          })
+          .then(function () {
+            this.initializeFormFields();
+          }.bind(this));
+      },
       saveFormFields: function (formFields) {
         var caValues = can.makeArray(
           this.attr('instance.custom_attribute_values')

@@ -10,7 +10,10 @@
   (on-save)="onFormSave()"
 ></auto-save-form-actions>
 {{#is_allowed 'update' instance context='for'}}
-    <object-state-toolbar {verifiers}="instance.assignees.Verifier" {instance}="instance"></object-state-toolbar>
+    <object-state-toolbar {verifiers}="instance.assignees.Verifier"
+                          {instance}="instance"
+                          (on-state-change)="onStateChange(%event)">
+    </object-state-toolbar>
 {{/is_allowed}}
 <simple-modal {instance}="instance" modal-title="modalTitle" {(state)}="state" extra-css-class="related-assessments">
     <div class="simple-modal__body">
