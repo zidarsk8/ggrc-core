@@ -206,22 +206,22 @@ class CycleTaskGroupObjectTask(
 
     Relies on self.context_id = parent_workflow.context_id.
     """
-    from ggrc.models import all_models
+    from ggrc_basic_permissions import models as bp_models
 
     def primaryjoin():
       """Join UserRoles by context_id = self.context_id and role_id = WFO."""
       workflow_owner_role_id = db.session.query(
-          all_models.Role.id,
+          bp_models.Role.id,
       ).filter(
-          all_models.Role.name == "WorkflowOwner",
+          bp_models.Role.name == "WorkflowOwner",
       ).subquery()
-      ur_context_id = sa.orm.foreign(all_models.UserRole.context_id)
-      ur_role_id = sa.orm.foreign(all_models.UserRole.role_id)
+      ur_context_id = sa.orm.foreign(bp_models.UserRole.context_id)
+      ur_role_id = sa.orm.foreign(bp_models.UserRole.role_id)
       return sa.and_(self.context_id == ur_context_id,
                      workflow_owner_role_id == ur_role_id)
 
     return db.relationship(
-        all_models.UserRole,
+        bp_models.UserRole,
         primaryjoin=primaryjoin,
     )
 
