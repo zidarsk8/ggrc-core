@@ -70,6 +70,7 @@
         open: false
       },
       formState: {},
+      noItemsText: '',
       triggerFormSaveCbs: $.Callbacks(),
       getQuery: function (type, sortObj, additionalFilter) {
         var relevantFilters = [{
