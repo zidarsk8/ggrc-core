@@ -11,6 +11,78 @@ describe('GGRC.Controllers.SummaryWidget', function () {
     Ctrl = GGRC.Controllers.SummaryWidget;
   });
 
+  describe('"{CMS.Models.Assessment} updated" handler', function () {
+    var method;
+    var ctrlInst;
+
+    beforeEach(function () {
+      ctrlInst = {
+        options: {
+          forceRefresh: false
+        }
+      };
+      method = Ctrl.prototype['{CMS.Models.Assessment} updated'].bind(ctrlInst);
+    });
+
+    it('sets true to options.forceRefresh', function () {
+      var assessment = new CMS.Models.Assessment();
+      method({}, {}, assessment);
+      expect(ctrlInst.options.forceRefresh).toBe(true);
+    });
+  });
+
+  describe('reloadChart() method', function () {
+    var method;
+    var ctrlInst;
+    var raw;
+
+    beforeEach(function () {
+      raw = [{type: 'Assessment'}];
+      ctrlInst = {
+        options: {
+          instance: {
+            id: 123
+          },
+          forceRefresh: false,
+          context: {
+            charts: {
+              Assessment: new can.Map({total: 3, isInitialized: true})
+            }
+          }
+        },
+        setState: jasmine.createSpy(),
+        getStatuses: jasmine.createSpy().and
+          .returnValue(new can.Deferred().resolve(raw)),
+        parseStatuses: jasmine.createSpy(),
+        drawChart: jasmine.createSpy(),
+        prepareLegend: jasmine.createSpy()
+      };
+      method = Ctrl.prototype.reloadChart.bind(ctrlInst);
+      spyOn(GGRC.Utils.CurrentPage, 'getCounts')
+        .and.returnValue(new can.Map({Assessment: 3}));
+    });
+
+    it('does nothing if chart options is initialized,' +
+    'counts is not changed and it was not force refresh', function () {
+      method('Assessment');
+      expect(ctrlInst.setState).not.toHaveBeenCalled();
+      expect(ctrlInst.drawChart).not.toHaveBeenCalled();
+    });
+    describe('if it was force refresh then', function () {
+      beforeEach(function () {
+        ctrlInst.options.forceRefresh = true;
+      });
+      it('sets false to options.forceRefresh ', function () {
+        method('Assessment');
+        expect(ctrlInst.options.forceRefresh).toBe(false);
+      });
+      it('calls drawChart() method', function () {
+        method('Assessment');
+        expect(ctrlInst.drawChart).toHaveBeenCalled();
+      });
+    });
+  });
+
   describe('widget_shown(event) method', function () {
     var method;
     var ctrlInst;
