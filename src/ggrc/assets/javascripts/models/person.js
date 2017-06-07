@@ -107,7 +107,19 @@
       this.validateNonBlank('email');
       this.validateFormatOf('email', rEmail);
     },
-    getUserRoles: function (instance, person) {
+
+    /**
+     * @description
+     * Retrieves user roles for the person according to
+     * instance or/and specific object contexts
+     *
+     * @param  {Object} instance - Instance object
+     * @param  {CMS.Models.Person} person - Person object
+     * @param  {String} specificObject - Property of instance object
+     * @return {Promise.<Object[]>} - Returns promise with person's user roles
+     */
+
+    getUserRoles: function (instance, person, specificObject) {
       var result = $.Deferred();
       var refreshQueue = new RefreshQueue();
       var userRoles;
@@ -117,17 +129,32 @@
       });
 
       refreshQueue.trigger().then(function (roles) {
+        var object;
+        var objectInstance;
+        var objectContextId;
+
         userRoles = _.filter(roles, function (role) {
           return instance.context && role.context &&
             role.context.id === instance.context.id;
         });
+
+        if (_.isEmpty(userRoles) && !_.isEmpty(specificObject)) {
+          object = _.get(instance, specificObject);
+          objectInstance = _.result(object, 'getInstance');
+          objectContextId = _.get(objectInstance, 'context_id');
+
+          userRoles = _.filter(roles, function (role) {
+            return role.context && role.context.id === objectContextId;
+          });
+        }
+
         result.resolve(userRoles);
       });
       return result.promise();
     },
-    getPersonMappings: function (instance, person, specificOject) {
+    getPersonMappings: function (instance, person, specificObject) {
       var result = $.Deferred();
-      var mappingObject = instance[specificOject];
+      var mappingObject = instance[specificObject];
       var mappingsRQ = new RefreshQueue();
       var userRolesRQ = new RefreshQueue();
 
