@@ -145,24 +145,19 @@ describe('GGRC.Components.revisionsComparer', function () {
       revisions = new can.List(prepareInstancesMethod(fakeData));
     });
 
-    it('getAttachmentsDfds() should return 2 dfds', function () {
-      var dfds = method(revisions);
-      expect(dfds.length).toEqual(2);
-    });
-
-    it('getAttachmentsDfds() should return 3 dfds', function () {
+    it('getAttachmentsDfds() should return 1 dfd', function () {
       var dfds;
       revisions[0].attr('instance').folders = [{id: 'EWheNKvwjhrcwWer'}];
       dfds = method(revisions);
-      expect(dfds.length).toEqual(3);
+      expect(dfds.length).toEqual(1);
     });
 
-    it('getAttachmentsDfds() should return 4 dfds', function () {
+    it('getAttachmentsDfds() should return 2 dfds', function () {
       var dfds;
       revisions[0].attr('instance').folders = [{id: 'EWheNKvwjhrcwWer'}];
       revisions[1].attr('instance').folders = [{id: 'vewbetWhercwWer'}];
       dfds = method(revisions);
-      expect(dfds.length).toEqual(4);
+      expect(dfds.length).toEqual(2);
     });
 
     it('getAttachmentsDfds() should return empty array', function () {

@@ -80,7 +80,6 @@
 
         revisions.forEach(function (revision) {
           var instance = revision.attr('instance');
-          dfds.push(that.buildAttachmentsDfd(instance, 'isAttachmentsLoaded'));
 
           if (instance.folders && instance.folders.length) {
             dfds.push(
@@ -91,8 +90,7 @@
         return dfds;
       },
       isContainsAttachments: function (instance) {
-        return instance.type === 'Control' ||
-          instance.type === 'Issue';
+        return instance.type === 'Control';
       },
       getRevisions: function (currentRevisionID, newRevisionID) {
         return CMS.Models.Revision.findAll({
@@ -106,7 +104,6 @@
           var model = CMS.Models[value.resource_type];
           content.attr('isRevision', true);
           content.attr('type', value.resource_type);
-          content.attr('isAttachmentsLoaded', false);
           content.attr('isRevisionFolderLoaded', false);
 
           if (content.access_control_list) {
@@ -146,7 +143,7 @@
        */
       getAttributes: function ($infoPanes, index) {
         var selector = '.row-fluid h6 + *, .row-fluid .state-value' +
-          ', directly-mapped-objects';
+          ', related-documents';
         return $($infoPanes[index]).find(selector);
       },
 
