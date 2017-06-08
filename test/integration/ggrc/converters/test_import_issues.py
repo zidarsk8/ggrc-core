@@ -107,15 +107,51 @@ class TestImportIssues(TestCase):
     ]))
 
     expected_errors = {
-        errors.MISSING_COLUMN.format(
-            line=3, column_names=mandatory_role, s=""
-        ),
+        "Market": {
+            "row_errors": {
+                errors.MISSING_COLUMN.format(
+                    line = 3, column_names = mandatory_role, s = ""
+                ),
+            }
+        }
     }
-    response_errors = response_json[0]["row_errors"]
-    self.assertEqual(expected_errors, set(response_errors))
-    response_warnings = response_json[0]["row_warnings"]
-    self.assertEqual(set(), set(response_warnings))
-    self.assertEqual(0, response_json[0]["created"])
+    self._check_csv_response(response_json, expected_errors)
 
-    markets = models.Market.query.all()
-    self.assertEqual(len(markets), 0)
+    markets_count = models.Market.query.count()
+    self.assertEqual(markets_count, 0)
+
+  def test_import_empty_mandatory(self):
+    """Test import of data with empty mandatory role"""
+    mandatory_role = factories.AccessControlRoleFactory(
+        object_type = "Market",
+        mandatory = True
+    ).name
+    not_mandatory_role = factories.AccessControlRoleFactory(
+        object_type = "Market",
+        mandatory = False
+    ).name
+
+    email = factories.PersonFactory().email
+    response_json = self.import_data(OrderedDict([
+        ("object_type", "Market"),
+        ("code", "market-1"),
+        ("title", "Title"),
+        ("Admin", "user@example.com"),
+        (not_mandatory_role, email),
+        (mandatory_role, ""),
+    ]))
+
+    expected_errors = {
+        "Market": {
+            "row_warnings": {
+                errors.OWNER_MISSING.format(
+                    line = 3, column_name = mandatory_role
+                ),
+            }
+        }
+    }
+
+    self._check_csv_response(response_json, expected_errors)
+
+    market_counts = models.Market.query.count()
+    self.assertEqual(market_counts, 1)
