@@ -4,8 +4,8 @@
 }}
 
 <header class="header tree-header flex-box {{cssClasses}}">
-  {{^if disableConfiguration}}
   <tree-header-selector class="tree-header-selector">
+    {{^if disableConfiguration}}
     <a href="#" class="dropdown-toggle tview-dropdown-toggle visible-columns-icon"
        data-toggle="dropdown">
       <i class="fa fa-fw fa-bars"></i>
@@ -32,8 +32,8 @@
       </ul>
       <a class="btn btn-small btn-lightBlue set-tree-attrs" href="javascript://" ($click)="setColumns">Set fields</a>
     </div>
+    {{/if}}
   </tree-header-selector>
-  {{/if}}
   <div class="flex-box tree-header-titles">
     {{#selectedColumns}}
       <div class="flex-box widget-col-title {{attr_sort_field}}" ($click)="onOrderChange($element)" data-field="{{attr_sort_field}}">
@@ -42,7 +42,4 @@
       </div>
     {{/selectedColumns}}
     </div>
-  {{#if isActiveActioinArea}}
-    <div class="item-actions"></div>
-  {{/if}}
 </header>

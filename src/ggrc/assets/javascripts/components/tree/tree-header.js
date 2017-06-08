@@ -15,8 +15,8 @@
         get: function () {
           var classes = [];
 
-          if (this.attr('disableConfiguration')) {
-            classes.push('disable-conf');
+          if (this.isActiveActionArea()) {
+            classes.push('active-action-area');
           }
 
           return classes.join(' ');
@@ -89,7 +89,7 @@
         this.attr('columns', columns);
       }
     },
-    isActiveActioinArea: function () {
+    isActiveActionArea: function () {
       var modelName = this.attr('model').shortName;
 
       return modelName === 'CycleTaskGroupObjectTask' || modelName === 'Cycle';
