@@ -55,9 +55,10 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 {% endif %}
 
                 {% if digest['task_declined'] %}
-                  <h2 {{ style.sub_title() }} > Following
+                  <h2 {{ style.sub_title() }} >
+                    The following
                     {{ "tasks" if digest['task_declined']|length > 1 else "task" }}
-                    you did, got declined </h2>
+                     assigned to you, got declined</h2>
                   <ul {{ style.list_wrap() }} >
                   {% for task in digest['task_declined'].values() %}
                     <li {{ style.list_item() }} >
