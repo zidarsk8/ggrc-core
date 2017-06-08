@@ -15,6 +15,12 @@ from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
 
 
+CONTEXT_OBJECTS = ('issue', 'assessment', 'template')
+ARCHIVED_CONTEXT_OBJECTS = (
+    'archived_issue',
+    'archived_assessment',
+    'archived_template')
+
 class TestAuditArchivingBase(TestCase):
   """Base class for testing archived audits"""
   CSV_DIR = join(abspath(dirname(__file__)), "test_csvs")
@@ -56,6 +62,19 @@ class TestAuditArchivingBase(TestCase):
           parent=audit,
           context=audit.context,
       ))
+
+    # Create asessment template objects:
+    for audit, name in ((cls.audit, 'template'),
+                        (cls.archived_audit, 'archived_template')):
+      template = factories.AssessmentTemplateFactory(
+          context=audit.context,
+      )
+      factories.RelationshipFactory(
+          source=audit,
+          destination=template,
+          context=audit.context
+      )
+      setattr(cls, name, template)
     # Refresh objects in the session
     for obj in db.session:
       db.session.refresh(obj)
@@ -79,11 +98,15 @@ class TestAuditArchivingBase(TestCase):
     """)
     db.engine.execute("""
       UPDATE issues
-         SET description = ""
+         SET title = slug
     """)
     db.engine.execute("""
       UPDATE assessments
-         SET description = ""
+         SET title = slug
+    """)
+    db.engine.execute("""
+      UPDATE assessment_templates
+         SET title = slug
     """)
     db.engine.execute("""
       UPDATE snapshots
@@ -210,20 +233,20 @@ class TestArchivedAudit(TestAuditArchivingBase):
         response.json["audit"])
 
   @data(
-      ('Admin', 200, ('issue', 'assessment')),
-      ('Editor', 200, ('issue', 'assessment')),
-      ('Reader', 403, ('issue', 'assessment')),
-      ('Creator', 403, ('issue', 'assessment')),
-      ('Creator PM', 200, ('issue', 'assessment')),
-      ('Creator PE', 200, ('issue', 'assessment')),
-      ('Creator PR', 403, ('issue', 'assessment')),
-      ('Admin', 403, ('archived_issue', 'archived_assessment')),
-      ('Editor', 403, ('archived_issue', 'archived_assessment')),
-      ('Reader', 403, ('archived_issue', 'archived_assessment')),
-      ('Creator', 403, ('archived_issue', 'archived_assessment')),
-      ('Creator PM', 403, ('archived_issue', 'archived_assessment')),
-      ('Creator PE', 403, ('archived_issue', 'archived_assessment')),
-      ('Creator PR', 403, ('archived_issue', 'archived_assessment'))
+      ('Admin', 200, CONTEXT_OBJECTS),
+      ('Editor', 200, CONTEXT_OBJECTS),
+      ('Reader', 403, CONTEXT_OBJECTS),
+      ('Creator', 403, CONTEXT_OBJECTS),
+      ('Creator PM', 200, CONTEXT_OBJECTS),
+      ('Creator PE', 200, CONTEXT_OBJECTS),
+      ('Creator PR', 403, CONTEXT_OBJECTS),
+      ('Admin', 403, ARCHIVED_CONTEXT_OBJECTS),
+      ('Editor', 403, ARCHIVED_CONTEXT_OBJECTS),
+      ('Reader', 403, ARCHIVED_CONTEXT_OBJECTS),
+      ('Creator', 403, ARCHIVED_CONTEXT_OBJECTS),
+      ('Creator PM', 403, ARCHIVED_CONTEXT_OBJECTS),
+      ('Creator PE', 403, ARCHIVED_CONTEXT_OBJECTS),
+      ('Creator PR', 403, ARCHIVED_CONTEXT_OBJECTS)
   )
   @unpack
   def test_audit_context_editing(self, person, status, objects):
@@ -232,7 +255,7 @@ class TestArchivedAudit(TestAuditArchivingBase):
     for obj in objects:
       obj_instance = getattr(self, obj)
       json = {
-          "description": "New"
+          "title": "New"
       }
       response = self.api.put(obj_instance, json)
       assert response.status_code == status, \
@@ -241,7 +264,8 @@ class TestArchivedAudit(TestAuditArchivingBase):
       if status != 200:
         # if editing is allowed check if edit was correctly saved
         continue
-      assert response.json[obj].get("description", None) == "New", \
+      table_singular = obj_instance._inflector.table_singular
+      assert response.json[table_singular].get("title", None) == "New", \
           "{} has not been updated correctly {}".format(
           obj,
           response.json[obj])
