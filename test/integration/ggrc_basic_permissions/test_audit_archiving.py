@@ -51,8 +51,9 @@ class TestAuditArchivingBase(TestCase):
         person.name: person for person in all_models.Person.eager_query().all()
     }
     created_objects = (
-        (all_models.Audit, all_models.Audit.archived == 0, 'audit'),
-        (all_models.Audit, all_models.Audit.archived == 1, 'archived_audit'),
+        (all_models.Audit, all_models.Audit.slug == 'AUDIT-1', 'audit'),
+        (all_models.Audit,
+         all_models.Audit.slug == 'AUDIT-2', 'archived_audit'),
         (all_models.Issue, all_models.Issue.slug == 'PMRBACISSUE-1', 'issue'),
         (all_models.Issue, all_models.Issue.slug == 'PMRBACISSUE-2',
          'archived_issue'),
