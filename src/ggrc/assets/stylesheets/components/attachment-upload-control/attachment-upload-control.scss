@@ -3,10 +3,16 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 .attachment-upload-control {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   position: relative;
   min-height: 28px;
+
+  &:hover {
+    .attachment-upload-control__icon__error {
+      display: flex;
+    }
+  }
 
   &__button {
     margin: 0;
@@ -24,8 +30,9 @@
     top: 0;
   }
   &__icon__error {
-     i {
-       font-size: 12px;
-     }
+    display: none;
+    i {
+      font-size: 12px;
+    }
   }
 }
