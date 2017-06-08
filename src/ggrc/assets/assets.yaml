@@ -302,6 +302,8 @@ dashboard-js-files:
   - components/object-list-item/editable-document-object-list-item.js
   - components/related-objects/related-documents.js
   - components/assessment/attach-button.js
+  - components/object-tasks/object-tasks.js
+  - components/mapped-counter/mapped-counter.js
 
 app-init-files:
   - apps/dashboard.js
@@ -509,6 +511,7 @@ dashboard-js-template-files:
   - components/auto-save-form/field-views/checkbox-form-field-view.mustache
   - components/auto-save-form/field-views/date-form-field-view.mustache
   - components/auto-save-form/field-views/person-form-field-view.mustache
+  - components/object-tasks/object-tasks.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache
