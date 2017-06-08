@@ -2,112 +2,88 @@
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
-(function($) {
-  // Fix positioning of bootstrap tooltips when on left/right edge of screen
-  // Possibly remove this when upgrade to Bootstrap 2.3.0 (which has edge detection)
-  var _tooltip_show = $.fn.tooltip.Constructor.prototype.show;
-  $.fn.tooltip.Constructor.prototype.show = function() {
-    var margin = 10,
-      container_width = document.width,
-      tip_pos, $arrow, offset, return_value;
 
+(function ($) {
+  var delegate = '[data-toggle="tooltip"], [rel=tooltip]';
+  var tooltipPrototype = $.fn.tooltip.Constructor.prototype;
+  var bootstrapTooltipShow = tooltipPrototype.show;
+  var bootstrapTooltipHide = tooltipPrototype.hide;
+  var actions;
+
+  tooltipPrototype.show = function () {
     if (!this.hasContent() || !this.enabled) {
-      return; // because _tooltip_show will do this too
+      return;
     }
 
-    _tooltip_show.apply(this);
-
-    return_value = this.$tip.css({
-      'white-space': 'normal'
-    });
-
-    tip_pos = this.$tip.position();
-    tip_pos.width = this.$tip.width();
-    tip_pos.height = this.$tip.height();
-    $arrow = this.$tip.find('.tooltip-arrow');
-
-    offset = tip_pos.left + tip_pos.width - container_width + margin;
-    if (offset > 0) {
-      this.$tip.css({
-        left: tip_pos.left - offset
-      });
-      $arrow.css({
-        left: parseInt($arrow.css('left')) + offset
-      });
-    } else if (tip_pos.left < margin) {
-      this.$tip.css({
-        left: margin
-      });
-      $arrow.css({
-        left: parseInt($arrow.css('left')) + tip_pos.left - margin
-      });
-    }
-
-    return return_value;
+    bootstrapTooltipShow.apply(this);
+    actions.isShown = true;
   };
 
-  // Monitor Bootstrap Tooltips to remove the tooltip if the triggering element
-  // becomes hidden or removed.
-  //
-  // * $currentTip needed because tooltips don't fire events until Bootstrap
-  //   2.3.0 and $currentTarget.tooltip('hide') doesn't seem to work when it's
-  //   not in the DOM
-  // * $currentTarget.data('tooltip-monitor') is a flag to ensure only one
-  //   monitor per element
-  function monitorTooltip($currentTarget) {
-    var monitorFn,
-      monitorPeriod = 500,
-      monitorTimeoutId = null,
-      $currentTip,
-      dataTooltip;
+  tooltipPrototype.hide = function () {
+    bootstrapTooltipHide.apply(this);
+    actions.isShown = false;
+  };
 
-    if (!$currentTarget.data('tooltip-monitor')) {
-      dataTooltip = $currentTarget.data('tooltip');
-      $currentTip = dataTooltip && dataTooltip.$tip;
+  function monitorTooltip(monitorPeriod) {
+    /**
+     * There is a situation when an user can click a control for which there is
+     * two event handlers - click and mouseenter handlers.
+     * Click handler is defined by developer, but mouseenter handler is set by Bootstrap
+     * 2.3.0.
+     *
+     * What will happen?
+     * 1) User mouse pointer enters within the button ->
+     *    Actions:
+     *      Bootstrap waits for
+     *      defined DELAY after which will should show tooltip.
+     * 2) User clicks the button ->
+     *    Actions:
+     *      Click handler switches mustache template to new button(maximize/minimize, for example).
+     *      P.S. Old button is destroyed.
+     * 3) After DELAY in (1) Bootstrap uses data for the tooltip which was destroyed in (2).
+     */
+    var intervalId = setInterval(function () {
+      if (actions.isShown && actions.isClicked) {
+        clearAllShowedTooltips();
+        actions.isClicked = false;
+        window.clearInterval(intervalId);
+      }
+    }, monitorPeriod);
+  }
 
-      monitorFn = function() {
-        dataTooltip = dataTooltip || $currentTarget.data('tooltip');
-        $currentTip = $currentTip || (dataTooltip && dataTooltip.$tip);
+  function tooltipInit(e) {
+    var $currentTarget = $(e.currentTarget);
+    var delay = {
+      show: 500,
+      hide: 0
+    };
 
-        if (!$currentTarget.is(':visible')) {
-          $currentTip && $currentTip.remove();
-          $currentTarget.data('tooltip-monitor', false);
-        } else if ($currentTip && $currentTip.is(':visible')) {
-          monitorTimeoutId = setTimeout(monitorFn, monitorPeriod);
-        } else {
-          $currentTarget.data('tooltip-monitor', false);
-        }
-      };
+    actions = {
+      isShown: false,
+      isClicked: false
+    };
 
-      monitorTimeoutId = setTimeout(monitorFn, monitorPeriod);
-      $currentTarget.data('tooltip-monitor', true);
-      // Hide tooltip when target clicked
-      $currentTarget.on('click', function () {
-        $('.tooltip').hide();
-      });
+    $currentTarget
+      .tooltip({delay: delay})
+      .triggerHandler(e);
+
+    monitorTooltip(delay.show);
+    $currentTarget.off('click', delegate, tooltipClick);
+  }
+
+  function tooltipClick(e) {
+    var $currentTarget = $(e.currentTarget);
+    actions.isClicked = true;
+    if ($currentTarget.data('tooltip')) {
+      $currentTarget.tooltip('hide');
     }
   }
-  ;
 
-  $('body').on('shown', '.modal', function() {
-    $('.tooltip').hide();
-  });
+  function clearAllShowedTooltips() {
+    $('.tooltip').remove();
+  }
 
-  // Listeners for initial tooltip mouseovers
-  $('body').on('mouseover', '[data-toggle="tooltip"], [rel=tooltip]', function(e) {
-    var $currentTarget = $(e.currentTarget);
-
-    if (!$currentTarget.data('tooltip')) {
-      $currentTarget
-        .tooltip({
-          delay: {
-            show: 500,
-            hide: 0
-          }
-        })
-        .triggerHandler(e);
-    }
-
-    monitorTooltip($currentTarget);
-  });
+  $('body').on('mouseenter', delegate, tooltipInit);
+  $('body').on('click', delegate, tooltipClick);
+  $('body').on('shown', '.modal', clearAllShowedTooltips);
 })(jQuery);

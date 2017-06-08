@@ -4,21 +4,17 @@
 }}
 
 <ul class="pin-action">
-  {{#if maximized}}
   <li>
-    <a href="#" class="normal" can-click="toggleSize">
-      <i class="fa fa-fw fa-compress" rel="tooltip" data-placement="left" title="Minimize height"></i>
+    <a href="#" class="normal" ($click)="toggleSize(%element, %event)">
+      {{#if maximized}}
+        <i class="fa fa-fw fa-compress" rel="tooltip" data-placement="left" title="Minimize height"></i>
+      {{else}}
+        <i class="fa fa-fw fa-expand" rel="tooltip" data-placement="left" title="Maximize height"></i>
+      {{/if}}
     </a>
   </li>
-  {{else}}
   <li>
-    <a href="#" class="max" can-click="toggleSize">
-      <i class="fa fa-fw fa-expand" rel="tooltip" data-placement="left" title="Maximize height"></i>
-    </a>
-  </li>
-  {{/if}}
-  <li>
-    <a href="#" class="close-pane" can-click="close">
+    <a href="#" class="close-pane" ($click)="close(%element, %event)">
       <i class="fa fa-fw fa-times" rel="tooltip" data-placement="left" title="Close info pane"></i>
     </a>
   </li>
