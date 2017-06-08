@@ -4,6 +4,8 @@
 """Module containing Document model."""
 
 from sqlalchemy import orm
+from sqlalchemy import func
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
@@ -96,16 +98,16 @@ class Document(Ownable, Relatable, Base, Indexed, db.Model):
   def validate_document_type(self, key, document_type):
     """Returns correct option, otherwise rises an error"""
     if document_type is None:
-       document_type = self.URL
+      document_type = self.URL
     if document_type not in [self.URL, self.ATTACHMENT]:
-        raise exceptions.ValidationError(
-            "Invalid value for attribute {attr}. "
-            "Expected options are `{url}`, `{attachment}`.".format(
-                attr=key,
-                url=self.URL,
-                attachment=self.ATTACHMENT,
-            )
-        )
+      raise exceptions.ValidationError(
+          "Invalid value for attribute {attr}. "
+          "Expected options are `{url}`, `{attachment}`.".format(
+              attr=key,
+              url=self.URL,
+              attachment=self.ATTACHMENT,
+          )
+      )
     return document_type
 
   @classmethod
@@ -123,3 +125,19 @@ class Document(Ownable, Relatable, Base, Indexed, db.Model):
         orm.joinedload('year'),
         orm.joinedload('language'),
     )
+
+  @hybrid_property
+  def slug(self):
+    if self.document_type == self.URL:
+      return self.link
+    return u"{} {}".format(self.link, self.title)
+
+  # pylint: disable=no-self-argument
+  @slug.expression
+  def slug(cls):
+    return func.concat(cls.link, ' ', cls.title)
+
+  def log_json(self):
+    tmp = super(Document, self).log_json()
+    tmp['type'] = "Document"
+    return tmp
