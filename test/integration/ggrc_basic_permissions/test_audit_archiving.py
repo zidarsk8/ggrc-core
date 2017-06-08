@@ -21,6 +21,23 @@ ARCHIVED_CONTEXT_OBJECTS = (
     'archived_assessment',
     'archived_template')
 
+
+def _create_obj_dict(obj, audit_id, context_id):
+  return {
+      obj._inflector.table_singular: {
+          "title": "Title",
+          "context": {
+              "id": context_id,
+              "type": "Context"
+          },
+          "audit": {
+              "id": audit_id,
+              "type": "Audit"
+          }
+      }
+  }
+
+
 class TestAuditArchivingBase(TestCase):
   """Base class for testing archived audits"""
   CSV_DIR = join(abspath(dirname(__file__)), "test_csvs")
@@ -306,3 +323,38 @@ class TestArchivedAudit(TestAuditArchivingBase):
         "{} has not been updated to the latest revision {}".format(
         obj,
         response.json[obj])
+
+
+@ddt
+class TestArchivedAuditObjectCreation(TestCase):
+  """Test creation permissions in audit"""
+
+  def setUp(self):
+    """Prepare data needed to run the tests"""
+    TestCase.clear_data()
+    self.api = Api()
+    self.client.get("/login")
+    self.archived_audit = factories.AuditFactory(
+        archived=True
+    )
+    self.audit = factories.AuditFactory()
+
+  @data(
+      all_models.Assessment,
+      all_models.Issue,
+  )
+  def test_object_creation(self, obj):
+    """Test object creation in audit and archived audit"""
+    audit = self.audit.id, self.audit.context.id
+    archived_audit = self.archived_audit.id, self.archived_audit.context.id
+    response = self.api.post(
+        obj, _create_obj_dict(obj, audit[0], audit[1]))
+    assert response.status_code == 201, \
+        "201 not returned for {} on audit with, received {} instead".format(
+            obj._inflector.model_singular, response.status_code)
+
+    response = self.api.post(
+        obj, _create_obj_dict(obj, archived_audit[0], archived_audit[1]))
+    assert response.status_code == 403, \
+        "403 not raised for {} on archived audit, received {} instead".format(
+            obj._inflector.model_singular, response.status_code)
