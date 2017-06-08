@@ -288,6 +288,9 @@ def cycle_tasks_cache(notifications):
   task_ids = [n.object_id for n in notifications
               if n.object_type == "CycleTaskGroupObjectTask"]
 
+  if not task_ids:
+    return {}
+
   results = db.session\
       .query(CycleTaskGroupObjectTask)\
       .options(
@@ -310,20 +313,23 @@ def deleted_task_rels_cache(task_ids):
   """
   rels_cache = defaultdict(list)
 
-  deleted_relationships_sources = db.session.query(Revision).filter(
-      Revision.resource_type == "Relationship",
-      Revision.action == "deleted",
-      Revision.source_type == "CycleTaskGroupObjectTask",
-      Revision.source_id.in_(task_ids)
-  )
-  deleted_relationships_destinations = db.session.query(Revision).filter(
-      Revision.resource_type == "Relationship",
-      Revision.action == "deleted",
-      Revision.destination_type == "CycleTaskGroupObjectTask",
-      Revision.destination_id.in_(task_ids)
-  )
-  deleted_relationships = deleted_relationships_sources.union(
-      deleted_relationships_destinations).all()
+  if not task_ids:
+    deleted_relationships = []
+  else:
+    deleted_relationships_sources = db.session.query(Revision).filter(
+        Revision.resource_type == "Relationship",
+        Revision.action == "deleted",
+        Revision.source_type == "CycleTaskGroupObjectTask",
+        Revision.source_id.in_(task_ids)
+    )
+    deleted_relationships_destinations = db.session.query(Revision).filter(
+        Revision.resource_type == "Relationship",
+        Revision.action == "deleted",
+        Revision.destination_type == "CycleTaskGroupObjectTask",
+        Revision.destination_id.in_(task_ids)
+    )
+    deleted_relationships = deleted_relationships_sources.union(
+        deleted_relationships_destinations).all()
 
   # group relationships by their corresponding Task ID
   for rel in deleted_relationships:
