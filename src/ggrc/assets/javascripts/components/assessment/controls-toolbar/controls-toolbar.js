@@ -23,6 +23,13 @@
       },
       onFormSave: function () {
         this.dispatch('onFormSave');
+      },
+      onStateChange: function (event) {
+        this.dispatch({
+          type: 'onStateChange',
+          state: event.state,
+          undo: event.undo
+        });
       }
     }
   });
