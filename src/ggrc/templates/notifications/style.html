@@ -121,6 +121,25 @@ style=" margin-left: 5px;
 "
 {%- endmacro %}
 
+{% macro list_item_no_bullet() -%}
+style=" margin-left: 5px;
+        list-style-position: inside;
+        list-style: none;
+"
+{%- endmacro %}
+
+{% macro list_item_sublist() -%}
+style=" margin-left: 35px;
+        list-style: none;
+"
+{%- endmacro %}
+
+{% macro comment_content() -%}
+style=" margin-left: 2em;
+        display: block;
+"
+{%- endmacro %}
+
 {% macro btn_wrap() -%}
 style=" background-color: #40c4ff;
         margin-bottom: 40px;
