@@ -110,7 +110,7 @@ class TestImportIssues(TestCase):
         "Market": {
             "row_errors": {
                 errors.MISSING_COLUMN.format(
-                    line = 3, column_names = mandatory_role, s = ""
+                    line=3, column_names=mandatory_role, s=""
                 ),
             }
         }
@@ -123,12 +123,12 @@ class TestImportIssues(TestCase):
   def test_import_empty_mandatory(self):
     """Test import of data with empty mandatory role"""
     mandatory_role = factories.AccessControlRoleFactory(
-        object_type = "Market",
-        mandatory = True
+        object_type="Market",
+        mandatory=True
     ).name
     not_mandatory_role = factories.AccessControlRoleFactory(
-        object_type = "Market",
-        mandatory = False
+        object_type="Market",
+        mandatory=False
     ).name
 
     email = factories.PersonFactory().email
@@ -145,7 +145,7 @@ class TestImportIssues(TestCase):
         "Market": {
             "row_warnings": {
                 errors.OWNER_MISSING.format(
-                    line = 3, column_name = mandatory_role
+                    line=3, column_name=mandatory_role
                 ),
             }
         }
