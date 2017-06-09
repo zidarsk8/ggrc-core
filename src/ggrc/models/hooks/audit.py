@@ -41,3 +41,20 @@ def init_hook():
     # pylint: disable=unused-argument
     if obj.archived:
       raise Forbidden()
+
+  @signals.Restful.model_deleted.connect_via(all_models.Comment)
+  @signals.Restful.model_deleted.connect_via(all_models.Document)
+  @signals.Restful.model_deleted.connect_via(all_models.Relationship)
+  @signals.Restful.model_deleted.connect_via(all_models.UserRole)
+  @signals.Restful.model_posted.connect_via(all_models.Comment)
+  @signals.Restful.model_posted.connect_via(all_models.Document)
+  @signals.Restful.model_posted.connect_via(all_models.Relationship)
+  @signals.Restful.model_posted.connect_via(all_models.Snapshot)
+  @signals.Restful.model_posted.connect_via(all_models.UserRole)
+  def handle_archived_context(sender, obj=None, src=None, service=None):
+    """Make sure admins cannot delete/update archived audits"""
+    # pylint: disable=unused-argument
+    if (hasattr(obj, 'context') and
+        hasattr(obj.context, 'related_object') and getattr(
+            obj.context.related_object, 'archived', False)):
+      raise Forbidden()
