@@ -55,15 +55,15 @@ def person_withcontact(object_type, related_type, related_ids):
 def acl_obj_id(object_type, related_type, related_ids, role=None):
   if object_type == "Person":
     return db.session.query(models.AccessControlList.person_id).filter(
-      (models.AccessControlList.object_type == related_type) &
-      (models.AccessControlList.object_id.in_(related_ids)) &
-      (models.AccessControlRole.name == role if role else True)
+        (models.AccessControlList.object_type == related_type) &
+        (models.AccessControlList.object_id.in_(related_ids)) &
+        (models.AccessControlRole.name == role if role else True)
     )
   elif related_type == "Person":
     return db.session.query(models.AccessControlList.object_id).filter(
-      (models.AccessControlList.object_type == object_type) &
-      (models.AccessControlList.person_id.in_(related_ids)) &
-      (models.AccessControlRole.name == role if role else True)
+        (models.AccessControlList.object_type == object_type) &
+        (models.AccessControlList.person_id.in_(related_ids)) &
+        (models.AccessControlRole.name == role if role else True)
     )
   else:
     return None
