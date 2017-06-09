@@ -23,9 +23,11 @@ ARCHIVED_CONTEXT_OBJECTS = (
 
 
 def _create_obj_dict(obj, audit_id, context_id):
-  return {
-      obj._inflector.table_singular: {
-          "title": "Title",
+  """Create POST dicts for various object types"""
+  table_singular = obj._inflector.table_singular
+  dicts = {
+      "issue": {
+          "title": "Issue Title",
           "context": {
               "id": context_id,
               "type": "Context"
@@ -34,7 +36,33 @@ def _create_obj_dict(obj, audit_id, context_id):
               "id": audit_id,
               "type": "Audit"
           }
+      },
+      "assessment": {
+          "title": "Assessment Title",
+          "context": {
+              "id": context_id,
+              "type": "Context"
+          },
+          "audit": {
+              "id": audit_id,
+              "type": "Audit"
+          }
+      },
+      "assessment_template": {
+          "title": "Assessment Template Title",
+          "template_object_type": "Control",
+          "default_people": {
+              "verifiers": "Auditors",
+              "assessors": "Audit Lead"
+          },
+          "context": {
+              "id": context_id,
+              "type": "Context"
+          },
       }
+  }
+  return {
+      table_singular: dicts[table_singular]
   }
 
 
@@ -338,10 +366,15 @@ class TestArchivedAuditObjectCreation(TestCase):
     self.archived_audit = factories.AuditFactory(
         archived=True
     )
+    self.archived_audit.context = factories.ContextFactory(
+        name="Audit context",
+        related_object=self.archived_audit,
+    )
     self.audit = factories.AuditFactory()
 
   @data(
       all_models.Assessment,
+      all_models.AssessmentTemplate,
       all_models.Issue,
   )
   def test_object_creation(self, obj):
@@ -351,7 +384,7 @@ class TestArchivedAuditObjectCreation(TestCase):
     response = self.api.post(
         obj, _create_obj_dict(obj, audit[0], audit[1]))
     assert response.status_code == 201, \
-        "201 not returned for {} on audit with, received {} instead".format(
+        "201 not returned for {} on audit, received {} instead".format(
             obj._inflector.model_singular, response.status_code)
 
     response = self.api.post(
