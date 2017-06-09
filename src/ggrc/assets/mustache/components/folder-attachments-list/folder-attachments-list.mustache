@@ -4,11 +4,10 @@
 }}
 
 <related-documents {instance}="instance" document-type="EVIDENCE">
-    <h6>Evidence</h6>
+    <h6>{{title}}</h6>
 
     {{#is_allowed 'update' instance context='for'}}
         <ggrc-gdrive-folder-picker hide-label="true"
-                                    sub-label="Folder"
                                     readonly="readonly"
                                     instance="instance"
                                     {(is-revision-folder-loaded)}="isRevisionFolderLoaded"

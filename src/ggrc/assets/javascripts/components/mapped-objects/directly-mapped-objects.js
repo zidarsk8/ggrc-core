@@ -23,7 +23,6 @@
         }
       },
       isLoading: false,
-      isAttachmentsLoaded: false,
       items: null,
       mappedItems: [],
       modelName: '@',
@@ -38,11 +37,9 @@
         var ids;
 
         if (!items) {
-          this.attr('isAttachmentsLoaded', true);
           return;
         }
 
-        this.attr('isAttachmentsLoaded', false);
         modelName = this.attr('modelName');
         ids = items.map(function (item) {
           return item.id;
@@ -60,7 +57,6 @@
         }.bind(this))
         .always(function () {
           this.attr('isLoading', false);
-          this.attr('isAttachmentsLoaded', true);
         }.bind(this));
       }
     }),

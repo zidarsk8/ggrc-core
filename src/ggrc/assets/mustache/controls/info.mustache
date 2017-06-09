@@ -22,12 +22,11 @@
 
       <div class="row-fluid wrap-row">
         <div class="span6">
-           <folder-attachments-list title="Evidence"
+           <folder-attachments-list title="Attachment"
                                    {readonly}="isSnapshot"
-                                   {(is-attachments-loaded)}="instance.isAttachmentsLoaded"
-                                   {(is--revision-folder-loaded)}="instance.isRevisionFolderLoaded"
-                                   sub-label="Evidences"
+                                   {(is-revision-folder-loaded)}="instance.isRevisionFolderLoaded"
                                    instance="instance"
+                                   deny-no-folder="true"
                                    tooltip="You can upload up to 10 files in a single batch">
             </folder-attachments-list>
         </div>

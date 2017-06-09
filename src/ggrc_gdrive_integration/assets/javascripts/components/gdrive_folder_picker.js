@@ -75,7 +75,6 @@
       deferred: '@',
       tabindex: '@',
       placeholder: '@',
-      subLabel: '@',
       folder_list: [],
       instance: null,
       isRevisionFolderLoaded: false,
