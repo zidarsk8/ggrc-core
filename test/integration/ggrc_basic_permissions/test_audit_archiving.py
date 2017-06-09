@@ -22,7 +22,7 @@ ARCHIVED_CONTEXT_OBJECTS = (
     'archived_template')
 
 
-def _create_obj_dict(obj, audit_id, context_id):
+def _create_obj_dict(obj, audit_id, context_id, assessment_id=None):
   """Create POST dicts for various object types"""
   table_singular = obj._inflector.table_singular
   dicts = {
@@ -59,6 +59,20 @@ def _create_obj_dict(obj, audit_id, context_id):
               "id": context_id,
               "type": "Context"
           },
+      },
+      "relationship": {
+          "context": {
+              "id": context_id,
+              "type": "Context"
+          },
+          "source": {
+              "id": assessment_id,
+              "type": "Assessment"
+          },
+          "destination": {
+              "id": audit_id,
+              "type": "Audit"
+          }
       }
   }
   return {
@@ -371,24 +385,27 @@ class TestArchivedAuditObjectCreation(TestCase):
         related_object=self.archived_audit,
     )
     self.audit = factories.AuditFactory()
+    self.assessment = factories.AssessmentFactory()
 
   @data(
       all_models.Assessment,
       all_models.AssessmentTemplate,
       all_models.Issue,
+      all_models.Relationship,
   )
   def test_object_creation(self, obj):
     """Test object creation in audit and archived audit"""
     audit = self.audit.id, self.audit.context.id
     archived_audit = self.archived_audit.id, self.archived_audit.context.id
+    assessment_id = self.assessment.id
     response = self.api.post(
-        obj, _create_obj_dict(obj, audit[0], audit[1]))
+        obj, _create_obj_dict(obj, audit[0], audit[1], assessment_id))
     assert response.status_code == 201, \
         "201 not returned for {} on audit, received {} instead".format(
             obj._inflector.model_singular, response.status_code)
 
-    response = self.api.post(
-        obj, _create_obj_dict(obj, archived_audit[0], archived_audit[1]))
+    response = self.api.post(obj, _create_obj_dict(
+        obj, archived_audit[0], archived_audit[1], assessment_id))
     assert response.status_code == 403, \
         "403 not raised for {} on archived audit, received {} instead".format(
             obj._inflector.model_singular, response.status_code)
