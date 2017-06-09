@@ -32,8 +32,6 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
 
   object_people = db.relationship(
       'ObjectPerson', backref='person', cascade='all, delete-orphan')
-  object_owners = db.relationship(
-      'ObjectOwner', backref='person', cascade='all, delete-orphan')
   access_control_list = db.relationship(
       'AccessControlList', backref='person', cascade='all, delete-orphan')
   language = db.relationship(

@@ -325,8 +325,6 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
   folder_modified_objects = []
   all_edited_objects = itertools.chain(cache.new, cache.dirty, cache.deleted)
   for o in all_edited_objects:
-    if o.type == "ObjectOwner" and o.ownable:
-      owner_modified_objects.append(o.ownable)
     if o.type == "ObjectFolder" and o.folderable:
       folder_modified_objects.append(o.folderable)
   revisions.extend(_revision_generator(
