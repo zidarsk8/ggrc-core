@@ -132,7 +132,7 @@ class DeleteColumnHandler(ColumnHandler):
 
   # this is a white list of objects that can be deleted in a cascade
   # e.g. deleting a Market can delete the associated Relationship object too
-  DELETE_WHITELIST = {"Relationship", "ObjectPerson"}
+  DELETE_WHITELIST = {"Relationship", "AccessControlList", "ObjectPerson"}
   ALLOWED_VALUES = {"", "no", "false", "true", "yes", "force"}
   TRUE_VALUES = {"true", "yes", "force"}
 
