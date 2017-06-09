@@ -38,18 +38,22 @@ class TestBasicCsvImport(TestCase):
     revisions = models.Revision.query.filter(
         models.Revision.resource_type == "Policy"
     ).count()
-    self.assertEqual(revisions, 6)
+    # Count of revisions is the same now as we don't create new
+    # revisions for ownable classes
+    self.assertEqual(revisions, 3)
     policy = models.Policy.eager_query().first()
     self.assertEqual(policy.modified_by.email, "user@example.com")
 
   def test_policy_import_working_with_warnings(self):
     """Test Policy import with warnings."""
     def test_owners(policy):
-      self.assertNotEqual([], policy.owners)
-      self.assertEqual("user@example.com", policy.owners[0].email)
+      self.assertNotEqual([], policy.access_control_list)
+      self.assertEqual(
+          "user@example.com",
+          policy.access_control_list[0].person.email
+      )
     filename = "policy_import_working_with_warnings.csv"
     response_json = self.import_file(filename)
-
     expected_warnings = {
         errors.UNKNOWN_USER_WARNING.format(line=3, email="miha@policy.com"),
         errors.UNKNOWN_OBJECT.format(
@@ -66,14 +70,16 @@ class TestBasicCsvImport(TestCase):
 
     policies = models.Policy.query.all()
     self.assertEqual(len(policies), 4)
-    for policy in policies:
-      test_owners(policy)
+    # Only 1 and 3 policies should have owners
+    test_owners(policies[0])
+    test_owners(policies[2])
 
   def test_policy_same_titles(self):
     """Test Policy imports with title collisions."""
     def test_owners(policy):
-      self.assertNotEqual([], policy.owners)
-      self.assertEqual("user@example.com", policy.owners[0].email)
+      self.assertNotEqual([], policy.access_control_list)
+      self.assertEqual("user@example.com",
+                       policy.access_control_list[0].person.email)
 
     filename = "policy_same_titles.csv"
     response_json = self.import_file(filename)
@@ -138,7 +144,6 @@ class TestBasicCsvImport(TestCase):
 
     Checks for fields being updarted correctly
     """
-
     filename = "pci_program.csv"
     response = self.import_file(filename)
 

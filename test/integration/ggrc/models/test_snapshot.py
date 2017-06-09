@@ -104,6 +104,8 @@ class TestSnapshot(TestCase):
       # computed attributes are not stored in revisions and should be ignored.
       "attributes",
       "last_assessment_date",
+
+      "access_control_list",  # TODO: remove this line (GGRC-2402)
   }
 
   def setUp(self):

@@ -25,7 +25,6 @@ class TestControlsImport(TestCase):
 
   def test_import_controls_with_evidence(self):
     """Test importing of assessments with templates."""
-
     response = self.import_file("controls_no_warnings.csv")
     self._check_csv_response(response, {})
 

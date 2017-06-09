@@ -18,7 +18,6 @@ class TestImportUpdates(TestCase):
 
   def test_policy_basic_update(self):
     """ Test simple policy title update """
-
     filename = "policy_basic_import.csv"
     response = self.import_file(filename)
 
