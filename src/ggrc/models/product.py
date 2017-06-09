@@ -8,7 +8,6 @@ from sqlalchemy.orm import validates
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
                                 CustomAttributable)
-from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.option import Option
 from ggrc.models.relationship import Relatable
@@ -17,7 +16,7 @@ from ggrc.models.track_object_state import HasObjectState
 
 
 class Product(Roleable, HasObjectState, CustomAttributable, Personable,
-              Relatable, LastDeprecatedTimeboxed, Ownable, BusinessObject,
+              Relatable, LastDeprecatedTimeboxed, BusinessObject,
               Indexed, db.Model):
   __tablename__ = 'products'
 

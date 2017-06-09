@@ -9,7 +9,6 @@ from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import LastDeprecatedTimeboxed
 from ggrc.models.deferred import deferred
-from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
@@ -17,7 +16,7 @@ from ggrc.models.track_object_state import HasObjectState
 
 
 class Program(HasObjectState, CustomAttributable, Roleable, Personable,
-              Relatable, HasOwnContext, LastDeprecatedTimeboxed, Ownable,
+              Relatable, HasOwnContext, LastDeprecatedTimeboxed,
               BusinessObject, Indexed, db.Model):
   __tablename__ = 'programs'
 
