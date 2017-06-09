@@ -653,11 +653,6 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
         # hardcoded [:-3] is used to strip "_id" suffix
         res[attr[:-3]] = self._person_stub(value) if value else None
 
-    if hasattr(self, "owners"):
-      res["owners"] = [
-          self._person_stub(owner.id) for owner in self.owners if owner
-      ]
-
     for attr_name in AttributeInfo.gather_publish_attrs(self.__class__):
       if is_attr_of_type(self, attr_name, models.Option):
         attr = getattr(self, attr_name)
