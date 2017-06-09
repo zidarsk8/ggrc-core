@@ -325,8 +325,18 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     asmt = Assessment.query.get(asmts["A 1"].id)
     asmt_id, asmt_slug = asmt.id, asmt.slug
 
-    asmt.status = Assessment.PROGRESS_STATE
-    db.session.commit()
+    # test starting an assessment
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"State*", Assessment.PROGRESS_STATE),
+    ]))
+
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertRegexpMatches(content, ur"Assessment\s+has\s+been\s+started")
 
     # test submitting assessment for review
     self.client.get("/_notifications/send_daily_digest")
@@ -860,6 +870,27 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
       self.assertEqual(self._get_notifications().count(), 2)
+
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_started_notification(self, send_email):
+    """Test that starting an Assessment results in a notification."""
+
+    with freeze_time("2015-04-01"):
+      self.import_file("assessment_with_templates.csv")
+      asmts = {asmt.slug: asmt for asmt in Assessment.query}
+      self.client.get("/_notifications/send_daily_digest")
+      self.assertEqual(self._get_notifications().count(), 0)
+
+      asmt1 = Assessment.query.get(asmts["A 5"].id)
+
+      self.api_helper.modify_object(asmt1,
+                                    {"status": Assessment.PROGRESS_STATE})
+
+      self.client.get("/_notifications/send_daily_digest")
+      recipient, _, content = send_email.call_args[0]
+
+      self.assertEqual(recipient, u"user@example.com")
+      self.assertRegexpMatches(content, ur"Assessment\s+has\s+been\s+started")
 
   @patch("ggrc.notifications.common.send_email")
   def test_reverting_assessment_status_changes(self, _):
