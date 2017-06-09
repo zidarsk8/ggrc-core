@@ -756,6 +756,8 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
       asmt = Assessment.query.get(asmts["A 5"].id)
       self.api_helper.modify_object(
           asmt, {"status": Assessment.PROGRESS_STATE})
+      self.client.get("/_notifications/send_daily_digest")
+      self.assertEqual(self._get_notifications().count(), 0)
 
       asmt = Assessment.query.get(asmts["A 5"].id)
       self.api_helper.modify_object(asmt, {"description": "new description"})
@@ -805,7 +807,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
       # start and finish assessment 1
       self.api_helper.modify_object(asmt1,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 0)
+      self.assertEqual(self._get_notifications().count(), 1)
 
       self.api_helper.modify_object(asmt1, {"status": Assessment.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
@@ -826,7 +828,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
       # start and finish assessment 6
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 2)
+      self.assertEqual(self._get_notifications().count(), 3)
       self.api_helper.modify_object(asmt6, {"status": Assessment.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 3)
       # decline assessment 6

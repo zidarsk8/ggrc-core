@@ -208,6 +208,22 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   </ul>
                 {% endif %}
 
+                {% if digest.get('assessment_started') %}
+                  <h2 {{ style.sub_title() }} >
+                    {{ "Assessments have" if digest['assessment_started']|length > 1 else "Assessment has" }}
+                    been started
+                  </h2>
+                  <ul {{ style.list_wrap() }} >
+                  {% for assessment_id, assessment_data in digest['assessment_started'].iteritems() %}
+                    <li {{ style.list_item() }} >
+                      Assessment:
+                      <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
+                        {{ assessment_data['title'] }}</a>
+                    </li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+
                 {% if digest.get('assessment_updated') %}
                   <h2 {{ style.sub_title() }} >Assessments have been updated</h2>
                   <ul {{ style.list_wrap() }} >

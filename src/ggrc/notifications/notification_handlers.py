@@ -32,6 +32,7 @@ from ggrc.models.mixins.statusable import Statusable
 
 class Transitions(Enum):
   """Assesment state transitions names."""
+  TO_STARTED = "assessment_started"
   TO_COMPLETED = "assessment_completed"
   TO_REVIEW = "assessment_ready_for_review"
   TO_VERIFIED = "assessment_verified"
@@ -197,6 +198,8 @@ def handle_assignable_modified(obj):
     _add_assignable_declined_notif(obj)
 
   transitions_map = {
+      (Statusable.START_STATE, Statusable.PROGRESS_STATE):
+          Transitions.TO_STARTED,
       (Statusable.START_STATE, Statusable.FINAL_STATE):
           Transitions.TO_COMPLETED,
       (Statusable.START_STATE, Statusable.DONE_STATE):
@@ -216,10 +219,6 @@ def handle_assignable_modified(obj):
   state_change = transitions_map.get((old_state, new_state))
   if state_change:
     _add_state_change_notif(obj, state_change, remove_existing=True)
-
-  # no interest in modifications when an assignable object is not ative yet
-  if obj.status == Statusable.START_STATE:
-    return
 
   # changes of some of the attributes are not considered as a modification of
   # the obj itself, e.g. metadata not editable by the end user, or changes
@@ -259,6 +258,8 @@ def handle_assignable_modified(obj):
   # not directly observable via status change history, thus an extra check.
   if obj.status in Statusable.DONE_STATES:
     _add_state_change_notif(obj, Transitions.TO_REOPENED, remove_existing=True)
+  elif obj.status == Statusable.START_STATE:
+    _add_state_change_notif(obj, Transitions.TO_STARTED, remove_existing=True)
 
 
 def _ca_values_changed(obj):
