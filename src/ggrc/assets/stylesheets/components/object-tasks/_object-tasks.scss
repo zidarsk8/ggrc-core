@@ -1,0 +1,67 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+object-tasks {
+  .object-tasks {
+    &__item {
+      margin-bottom: 5px;
+
+      .task-title {
+        margin-left: 3px;
+        width: 250px;
+      }
+
+      .error {
+        margin-right: 10px;
+      }
+
+      span {
+        margin-left: auto;
+
+        &:last-child {
+          margin-right: 10px;
+        }
+      }
+
+      &:last-child {
+        margin-bottom: 15px;
+      }
+
+      .task-state {
+        white-space: nowrap;
+        &.state-verified {
+          color: $status-verified;
+        }
+        &.state-assigned{
+          color: $status-draft;
+        }
+        &.state-finished {
+          color: $status-completed;
+        }
+        &.state-inprogress{
+          color: $status-inprogress;
+        }
+        &.state-deprecated {
+          color: $status-declined;
+        }
+      }
+    }
+
+    &__title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+
+      h3 {
+        margin-bottom: 0;
+      }
+
+      a {
+        margin-right: 10px;
+      }
+    }
+  }
+}
