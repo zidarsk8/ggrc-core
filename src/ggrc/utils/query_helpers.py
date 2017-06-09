@@ -13,7 +13,6 @@ from sqlalchemy.orm import aliased
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.models.object_person import ObjectPerson
-from ggrc.models.object_owner import ObjectOwner
 from ggrc.models.relationship import Relationship
 from ggrc.models.custom_attribute_value import CustomAttributeValue
 from ggrc.rbac import permissions as pr
@@ -84,13 +83,14 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
   def _get_object_owners():
     """Objects for which the user is an 'owner'."""
     object_owners_query = db.session.query(
-        ObjectOwner.ownable_id.label('id'),
-        ObjectOwner.ownable_type.label('type'),
+        all_models.AccessControlList.object_id.label('id'),
+        all_models.AccessControlList.object_type.label('type'),
         literal(None).label('context_id')
     ).filter(
         and_(
-            ObjectOwner.person_id == contact_id,
-            ObjectOwner.ownable_type.in_(model_names),
+            all_models.AccessControlList.person_id == contact_id,
+            all_models.AccessControlList.object_type.in_(model_names),
+            all_models.AccessControlRole.name == "Admin"
         )
     )
     return object_owners_query
