@@ -31,6 +31,66 @@ describe('GGRC.Controllers.SummaryWidget', function () {
     });
   });
 
+  describe('onRelationshipChange() method', function () {
+    var method;
+    var ctrlInst;
+
+    beforeEach(function () {
+      ctrlInst = {
+        options: {
+          forceRefresh: false
+        }
+      };
+      method = Ctrl.prototype.onRelationshipChange.bind(ctrlInst);
+    });
+
+    it('sets true to options.forceRefresh if destination type is Document' +
+    'and source type is Assessment',
+      function () {
+        var relationship = new CMS.Models.Relationship({
+          destination: {
+            type: 'Document',
+            id: 1
+          }, source: {
+            type: 'Assessment',
+            id: 1
+          }
+        });
+        method({}, {}, relationship);
+        expect(ctrlInst.options.forceRefresh).toBe(true);
+      });
+
+    it('does not set true to options.forceRefresh' +
+    ' if destination type is not Document', function () {
+      var relationship = new CMS.Models.Relationship({
+        destination: {
+          type: 'Control',
+          id: 1
+        }, source: {
+          type: 'Assessment',
+          id: 1
+        }
+      });
+      method({}, {}, relationship);
+      expect(ctrlInst.options.forceRefresh).toBe(false);
+    });
+
+    it('does not set true to options.forceRefresh' +
+    ' if source type is not Assessment', function () {
+      var relationship = new CMS.Models.Relationship({
+        destination: {
+          type: 'Document',
+          id: 1
+        }, source: {
+          type: 'Issue',
+          id: 1
+        }
+      });
+      method({}, {}, relationship);
+      expect(ctrlInst.options.forceRefresh).toBe(false);
+    });
+  });
+
   describe('reloadChart() method', function () {
     var method;
     var ctrlInst;
