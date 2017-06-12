@@ -109,15 +109,14 @@
       }
     },
     events: {
-      '{CMS.Models.CycleTaskGroupObjectTask} updated': function () {
-        this.viewModel.loadTasks();
+      onModelChange: function (model, event, instance) {
+        if (instance instanceof CMS.Models.CycleTaskGroupObjectTask) {
+          this.viewModel.loadTasks();
+        }
       },
-      '{CMS.Models.CycleTaskGroupObjectTask} destroyed': function () {
-        this.viewModel.loadTasks();
-      },
-      '{CMS.Models.CycleTaskGroupObjectTask} created': function () {
-        this.viewModel.loadTasks();
-      }
+      '{CMS.Models.CycleTaskGroupObjectTask} updated': 'onModelChange',
+      '{CMS.Models.CycleTaskGroupObjectTask} destroyed': 'onModelChange',
+      '{CMS.Models.CycleTaskGroupObjectTask} created': 'onModelChange'
     }
   });
 })(window.can, window.GGRC, window.moment);
