@@ -55,6 +55,15 @@ def _get_assignable_dict(people, notif):
     dict: dictionary containing notification data for all people in the given
       list.
   """
+  datetime_format = DATE_FORMAT_US + " %H:%M:%S %Z"
+
+  # NOTE: For the time being, the majority of users are located in US/Pacific
+  # time zone, thus the latter is used to convert UTC times read from database.
+  pacific_tz = timezone("US/Pacific")
+  notif_created_at = notif.created_at.replace(
+      tzinfo=pytz.utc
+  ).astimezone(pacific_tz)
+
   obj = get_notification_object(notif)
   data = {}
   for person in people:
@@ -68,6 +77,7 @@ def _get_assignable_dict(people, notif):
                 "start_date_statement": utils.get_digest_date_statement(
                     start_date, "start", True),
                 "url": get_object_url(obj),
+                "notif_created_at": notif_created_at.strftime(datetime_format)
             }
         }
     }
