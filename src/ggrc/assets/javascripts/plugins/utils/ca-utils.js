@@ -186,30 +186,51 @@
      */
     function convertValuesToFormFields(customAttributeValues) {
       return (customAttributeValues || new can.List([]))
-        .map(function (attr) {
-          var options = attr.def.multi_choice_options;
-          return {
-            type: attr.attributeType,
-            id: attr.def.id,
-            value: convertFromCaValue(
-              attr.attributeType,
-              attr.attribute_value,
-              attr.attribute_object
-            ),
-            title: attr.def.title,
-            placeholder: attr.def.placeholder,
-            options: options &&
-            typeof options === 'string' ?
-              options.split(',') : [],
-            helptext: attr.def.helptext,
-            validation: attr.validation.attr(),
-            validationConfig: attr.validationConfig,
-            errorsMap: attr.errorsMap.attr(),
-            valueId: can.compute(function () {
-              return attr.attr('id');
-            })
-          };
-        });
+        .map(convertToEditableField);
+    }
+
+    function convertToFormViewField(attr) {
+      var options = attr.def.multi_choice_options;
+      return {
+        type: attr.attributeType,
+        id: attr.def.id,
+        value: convertFromCaValue(
+          attr.attributeType,
+          attr.attribute_value,
+          attr.attribute_object
+        ),
+        title: attr.def.title,
+        placeholder: attr.def.placeholder,
+        options: options &&
+        typeof options === 'string' ?
+          options.split(',') : [],
+        helptext: attr.def.helptext
+      };
+    }
+
+    function convertToEditableField(attr) {
+      var options = attr.def.multi_choice_options;
+      return {
+        type: attr.attributeType,
+        id: attr.def.id,
+        value: convertFromCaValue(
+          attr.attributeType,
+          attr.attribute_value,
+          attr.attribute_object
+        ),
+        title: attr.def.title,
+        placeholder: attr.def.placeholder,
+        options: options &&
+        typeof options === 'string' ?
+          options.split(',') : [],
+        helptext: attr.def.helptext,
+        validation: attr.validation.attr(),
+        validationConfig: attr.validationConfig,
+        errorsMap: attr.errorsMap.attr(),
+        valueId: can.compute(function () {
+          return attr.attr('id');
+        })
+      };
     }
 
     return {
@@ -218,7 +239,8 @@
       convertValuesToFormFields: convertValuesToFormFields,
       prepareCustomAttributes: prepareCustomAttributes,
       isEmptyCustomAttribute: isEmptyCustomAttribute,
-      getCustomAttributeType: getCustomAttributeType
+      getCustomAttributeType: getCustomAttributeType,
+      convertToFormViewField: convertToFormViewField
     };
   })();
 })(window.GGRC, window.can, window._);

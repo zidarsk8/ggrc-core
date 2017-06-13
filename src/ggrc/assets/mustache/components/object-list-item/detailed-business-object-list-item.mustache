@@ -25,20 +25,15 @@
           <span class="empty-message">None</span>
       {{/if}}
     </div>
-    <div class="flex-size-1">
-        <h6>Primary Contact</h6>
-      {{#if itemData.contact}}
-          <person-info person-obj="itemData.contact"></person-info>
-      {{else}}
-          <span class="empty-message">None</span>
-      {{/if}}
-    </div>
-    <div class="flex-size-1">
-        <h6>Secondary Contact</h6>
-      {{#if itemData.secondary_contact}}
-          <person-info person-obj="itemData.secondary_contact"></person-info>
-      {{else}}
-          <span class="empty-message">None</span>
-      {{/if}}
-    </div>
+    {{#if customAttributes.length}}
+        {{#each customAttributes}}
+            <div class="flex-size-1">
+                <h6>{{title}}</h6>
+                <auto-save-form-field-view
+                        {type}="type"
+                        {value}="value"
+                ></auto-save-form-field-view>
+            </div>
+        {{/each}}
+    {{/if}}
 </div>

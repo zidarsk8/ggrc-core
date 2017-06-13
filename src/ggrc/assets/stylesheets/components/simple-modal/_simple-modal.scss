@@ -48,6 +48,44 @@ $grid-data-header-height: 66px;
     overflow: auto;
     background: $white;
     margin: 0;
+
+    &.loading {
+      overflow: hidden;
+      opacity: 0.5;
+
+      // Should affect only direct children
+      > .spinner-wrapper {
+        padding: 0;
+        margin: 0;
+        display: flex;
+        opacity: 0;
+
+        &.active {
+          z-index: 9999;
+          opacity: 1;
+        }
+
+        .spinner {
+          position: absolute;
+          right: 0;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          display: flex;
+          align-items: center;
+          font-size: 18px;
+
+          &.grid-spinner {
+            justify-content: center;
+
+            .fa {
+              color: $defaultWidget;
+              font-size: 32px;
+            }
+          }
+        }
+      }
+    }
   }
 
   &__section {
@@ -107,11 +145,14 @@ $grid-data-header-height: 66px;
   }
 
   /* Specific Styles for Prior Responses Modal Window */
+  &.mapped-controls-info,
   &.related-assessments {
     width: 85%;
     max-width: 85%;
     height: 85%;
+  }
 
+  &.related-assessments {
     .simple-modal__body {
       overflow: hidden;
       max-height: none;
@@ -130,4 +171,17 @@ $grid-data-header-height: 66px;
     }
   }
 
+  &.mapped-controls-info {
+    max-width: 850px;
+
+    .simple-modal__body {
+      overflow: scroll;
+      max-height: calc(100% - #{$simple-modal-header-height});
+
+      .assessment-mapped-controls__info,
+      assessment-mapped-control-related-objects:not(:last-child) > collapsible-panel {
+        border-bottom: 1px solid #e0e0e0;
+      }
+    }
+  }
 }
