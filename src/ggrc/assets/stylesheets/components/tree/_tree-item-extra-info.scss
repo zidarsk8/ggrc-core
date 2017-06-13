@@ -2,6 +2,9 @@
  * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+$popoverArrowSize: 10px;
+
 tree-item-extra-info {
   display: flex;
   flex-direction: row;
@@ -16,16 +19,96 @@ tree-item-extra-info {
     font-weight: 500;
   }
 
+  .popover-target {
+    &.active {
+      & + .tree-item__popover {
+        visibility: visible;
+        opacity: 1;
+      }
+    }
+  }
+
+  h3 {
+    font-weight: normal;
+    font-size: 150%;
+    margin-bottom: 10px;
+    white-space: nowrap;
+  }
+
+  .tree-item__popover {
+    visibility: hidden;
+    position: absolute;
+    background-color: $white;
+    border: 1px solid $warmGray;
+    box-shadow: 0 3px 1px rgba(0,0,0,.05);
+    min-width: 220px;
+    z-index: 1000;
+    padding: 10px;
+    right: calc(100% + 5px);
+    top: -22px;
+    transition: opacity 300ms, visibility 300ms;
+    opacity: 0;
+
+
+    &:hover {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    &:after, &:before {
+      left: 100%;
+      top: 30px;
+      border: solid transparent;
+      content: " ";
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    &:after {
+      border-color: rgba(255, 255, 255, 0);
+      border-left-color: #fff;
+      border-width: $popoverArrowSize;
+      margin-top: -$popoverArrowSize;
+    }
+    &:before {
+      border-color: rgba(204, 204, 204, 0);
+      border-left-color: #ccc;
+      border-width: 11px;
+      margin-top: -11px;
+    }
+
+    &-content {
+      overflow-y: auto;
+      max-height: 450px;
+    }
+
+    i {
+      margin-left: 15px;
+      margin-right: 5px;
+    }
+
+    section {
+      display: flex;
+      flex-direction: column;
+
+      mapped-counter {
+        margin-bottom: 5px;
+      }
+    }
+  }
+
   * {
     &.state-overdue {
     color: $status-declined;
     }
   }
 
-  i {
+  & > i {
     visibility: hidden;
     color: $gray;
-    &.person-tooltip-trigger {
+    &.popover-target {
       font-size: 19px;
     }
     &.state-overdue {

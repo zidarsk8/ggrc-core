@@ -262,20 +262,21 @@ class AttributeInfo(object):
       names_query = db.session.query(
           AccessControlRole.object_type,
           AccessControlRole.name,
+          AccessControlRole.mandatory,
       )
-      for object_type, name in names_query:
-        flask.g.acl_role_names[object_type].add(name)
+      for object_type, name, mandatory in names_query:
+        flask.g.acl_role_names[object_type].add((name, mandatory))
 
     return {
         "{}:{}".format(cls.ALIASES_PREFIX, name): {
             "display_name": name,
             "attr_name": name,
-            "mandatory": False,
+            "mandatory": mandatory,
             "unique": False,
             "description": "List of people with '{}' role".format(name),
             "type": cls.Type.AC_ROLE,
         }
-        for name in flask.g.acl_role_names[object_class.__name__]
+        for name, mandatory in flask.g.acl_role_names[object_class.__name__]
     }
 
   @classmethod

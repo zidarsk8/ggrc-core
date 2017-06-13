@@ -32,7 +32,7 @@ sub-tree-item {
   .columns {
     justify-content: flex-start;
     align-items: center;
-    width: 100%;
+    width: calc(100% - 296px);
 
     .title {
       width: 50%;
@@ -50,6 +50,10 @@ sub-tree-item {
       align-items: center;
       width: 80px;
     }
+  }
+
+  cycle-task-actions {
+    width: 200px;
   }
 
   >.sub-item-content {

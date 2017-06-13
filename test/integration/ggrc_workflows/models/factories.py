@@ -9,6 +9,7 @@ from datetime import date
 import factory
 
 from ggrc_workflows import models
+from integration.ggrc.models.factories import ContextFactory
 from integration.ggrc.models.factories import ModelFactory
 from integration.ggrc.models.factories import TitledFactory
 
@@ -18,6 +19,7 @@ class WorkflowFactory(TitledFactory):
   class Meta:
     model = models.Workflow
 
+  context = factory.SubFactory(ContextFactory)
   frequency = "one_time"
 
 
@@ -46,6 +48,8 @@ class TaskGroupTaskFactory(TitledFactory):
 
   task_group = factory.SubFactory(TaskGroupFactory)
   task_type = "text"
+  start_date = date.today()
+  end_date = date.today()
 
 
 class CycleFactory(TitledFactory):

@@ -4,11 +4,20 @@
 """Module containing Cycle tasks.
 """
 
+import sqlalchemy as sa
 from sqlalchemy import orm
 from sqlalchemy.ext.associationproxy import association_proxy
+from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import builder
 from ggrc import db
+from ggrc.fulltext.attributes import (
+    FullTextAttr,
+    MultipleSubpropertyFullTextAttr,
+    DateFullTextAttr
+)
+from ggrc.fulltext.mixin import Indexed, ReindexRule
+from ggrc import login
 from ggrc.models.mixins import Base
 from ggrc.models.mixins import Described
 from ggrc.models.mixins import Notifiable
@@ -18,20 +27,14 @@ from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import Titled
 from ggrc.models.mixins import WithContact
 from ggrc.models.reflection import PublishOnly
-from ggrc.models.relationship import Relatable
+from ggrc.models import relationship
 from ggrc.models.types import JsonType
 from ggrc_workflows.models.cycle import Cycle
 from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
-from ggrc.fulltext.attributes import (
-    FullTextAttr,
-    MultipleSubpropertyFullTextAttr,
-    DateFullTextAttr
-)
-from ggrc.fulltext.mixin import Indexed, ReindexRule
 
 
 class CycleTaskGroupObjectTask(
-        WithContact, Stateful, Timeboxed, Relatable, Notifiable,
+        WithContact, Stateful, Timeboxed, relationship.Relatable, Notifiable,
         Described, Titled, Slugged, Base, Indexed, db.Model):
   """Cycle task model
   """
@@ -136,7 +139,8 @@ class CycleTaskGroupObjectTask(
       'selected_response_options',
       PublishOnly('object_approval'),
       PublishOnly('finished_date'),
-      PublishOnly('verified_date')
+      PublishOnly('verified_date'),
+      PublishOnly('allow_change_state'),
   ]
 
   default_description = "<ol>"\
@@ -196,6 +200,43 @@ class CycleTaskGroupObjectTask(
     destinations = [r.destination for r in self.related_destinations]
     return sources + destinations
 
+  @declared_attr
+  def wfo_roles(self):
+    """WorkflowOwner UserRoles in parent Workflow.
+
+    Relies on self.context_id = parent_workflow.context_id.
+    """
+    from ggrc_basic_permissions import models as bp_models
+
+    def primaryjoin():
+      """Join UserRoles by context_id = self.context_id and role_id = WFO."""
+      workflow_owner_role_id = db.session.query(
+          bp_models.Role.id,
+      ).filter(
+          bp_models.Role.name == "WorkflowOwner",
+      ).subquery()
+      ur_context_id = sa.orm.foreign(bp_models.UserRole.context_id)
+      ur_role_id = sa.orm.foreign(bp_models.UserRole.role_id)
+      return sa.and_(self.context_id == ur_context_id,
+                     workflow_owner_role_id == ur_role_id)
+
+    return db.relationship(
+        bp_models.UserRole,
+        primaryjoin=primaryjoin,
+    )
+
+  @builder.simple_property
+  def allow_change_state(self):
+    return self.current_user_wfo_or_assignee()
+
+  def current_user_wfo_or_assignee(self):
+    """Current user is Workflow owner or Assignee for self."""
+    current_user_id = login.get_current_user_id()
+
+    # pylint: disable=not-an-iterable
+    return (current_user_id == self.contact_id or
+            current_user_id in [ur.person_id for ur in self.wfo_roles])
+
   @classmethod
   def _filter_by_cycle(cls, predicate):
     """Get query that filters cycle tasks by related cycles.
@@ -247,6 +288,7 @@ class CycleTaskGroupObjectTask(
            .joinedload('workflow')
            .undefer_group('Workflow_complete'),
         orm.joinedload('cycle_task_entries'),
+        orm.subqueryload('wfo_roles'),
     )
 
   @classmethod

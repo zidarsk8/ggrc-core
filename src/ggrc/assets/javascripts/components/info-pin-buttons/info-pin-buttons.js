@@ -12,7 +12,7 @@
       GGRC.mustache_path +
       '/components/info-pin-buttons/info-pin-buttons.mustache'
     ),
-    scope: {
+    viewModel: {
       onChangeMaximizedState: null,
       onClose: null,
       define: {
@@ -21,19 +21,24 @@
           'default': false
         }
       },
-      toggleSize: function (scope, el, ev) {
+      toggleSize: function (el, ev) {
         var maximized = !this.attr('maximized');
         var onChangeMaximizedState =
-          Mustache.resolve(this.onChangeMaximizedState);
+           Mustache.resolve(this.onChangeMaximizedState);
         ev.preventDefault();
-        this.attr('maximized', maximized);
+
         onChangeMaximizedState(maximized);
+
+        // Add in a callback queue
+        // for executing other
+        // handlers in the first place.
+        // Without it CanJS will ignore them
+        setTimeout(function () {
+          this.attr('maximized', maximized);
+        }.bind(this), 0);
       },
-      close: function (scope, el, ev) {
+      close: function (el, ev) {
         var onClose = Mustache.resolve(this.onClose);
-        if (el) {
-          el.find('[rel=tooltip]').data('tooltip').hide();
-        }
         ev.preventDefault();
         onClose();
       }

@@ -4,99 +4,61 @@
 }}
 
 {{#if isActive}}
-  {{#if showingOverdueDate}}<span class="tree-item__due-date {{dueDateCssClass}}">{{localize_date dueDate}}</span>{{/if}}
-  <div class="person-holder">
-    <i class="fa {{cssClasses}} person-tooltip-trigger" data-placement="left"></i>
+  {{#if showingOverdueDate}}
+    <span class="tree-item__due-date {{dueDateCssClass}}">{{localize_date dueDate}}</span>
+  {{/if}}
+  <i class="fa {{cssClasses}} popover-target"
+     ($mouseenter)="onEnter()"
+     ($mouseleave)="onLeave()"></i>
 
-    {{^if disablePopover}}
-    <div class="custom-popover-content">
-      <div class="preview-container tree-extra-info-preview">
-        <div class="profile-info">
-
+  {{^if disablePopover}}
+  <div class="tree-item__popover">
+    <div class="tree-item__popover-content">
+      {{#if triggered}}
         {{#if isDirective}}
           <section>
             <h3 class="task-list-title">Number of mapped objects</h3>
             {{#if_instance_of instance 'Contract'}}
-              <div class="mapping-info">
-                <i class="fa fa-paragraph"></i> Clauses:
-                {{#with_mapping_count instance 'clauses'}}
-                  {{count}}
-                {{/with_mapping_count}}
-              </div>
+              <mapped-counter {instance}="instance"
+                              type="Clause"
+                              {add-content}="@addContent"
+              ></mapped-counter>
             {{else}}
-              <div class="mapping-info">
-                <i class="fa fa-paragraph"></i> Sections:
-                {{#with_mapping_count instance 'sections'}}
-                  {{count}}
-                {{/with_mapping_count}}
-              </div>
+              <mapped-counter {instance}="instance"
+                              type="Section"
+                              {add-content}="@addContent"
+              ></mapped-counter>
             {{/if_instance_of}}
           </section>
         {{/if}}
 
         {{#if isSection}}
           <section>
-          <h3 class="task-list-title">Number of mapped objects</h3>
-          {{#with_mapping_count instance 'related_objects'}}
-            {{#prune_context}}
-              <div class="mapping-info">
-                <i class="fa fa-list-alt"></i> Total:
-                {{#if count}}
-                  <span class="counter">{{count}}</span>
-                {{else}}
-                  <strong class="counter">0</strong>
-                {{/if}}
-              </div>
-            {{/prune_context}}
-          {{/with_mapping_count}}
-
-          {{#with_mapping_count instance 'objectives'}}
-            <div class="mapping-info">
-              <i class="fa fa-dot-circle-o"></i> Objectives:
-              {{#if count}}
-                <span class="counter">{{count}}</span>
-              {{else}}
-                <strong class="counter">0</strong>
-              {{/if}}
-            </div>
-          {{/with_mapping_count}}
-
-          {{#with_mapping_count instance 'controls'}}
-            <div class="mapping-info">
-              <i class="fa fa-video-camera"></i> Controls:
-              {{#if count}}
-                <span class="counter">{{count}}</span>
-              {{else}}
-                <strong class="counter">0</strong>
-              {{/if}}
-            </div>
-          {{/with_mapping_count}}
-        </section>
+            <h3 class="task-list-title">Number of mapped objects</h3>
+            <mapped-counter {instance}="instance"
+                            {add-content}="@addContent"
+            ></mapped-counter>
+            <mapped-counter {instance}="instance"
+                            type="Objective"
+                            {add-content}="@addContent"
+            ></mapped-counter>
+            <mapped-counter {instance}="instance"
+                            type="Control"
+                            {add-content}="@addContent"
+            ></mapped-counter>
+          </section>
         {{/if}}
 
         {{#if isCycleTaskGroupObjectTask}}
           <section>
             <h3 class="task-list-title">Number of mapped objects</h3>
-            {{#with_mapping_count instance 'related_objects'}}
-              <div class="mapping-info">
-                <i class="fa fa-list-alt"></i> Total:
-                {{#if count}}
-                  <span class="counter">{{count}}</span>
-                {{else}}
-                  <strong class="counter">0</strong>
-                {{/if}}
-              </div>
-            {{/with_mapping_count}}
-            {{#with_mapping_count instance 'cycle_task_entries'}}
-            <div class="mapping-info"> <!-- number of comment count -->
-              <i class="fa fa-comment-o"></i> Comments:
-              {{#if count}}
-                <span class="counter">{{count}}</span>
-              {{else}}
-                <strong class="counter">0</strong>
-              {{/if}}
-            </div>
-            {{/with_mapping_count}}
+            <mapped-counter {instance}="instance"
+                            {add-content}="@addContent"
+            ></mapped-counter>
+            <mapped-counter {instance}="instance"
+                            type="CycleTaskEntry"
+                            {add-content}="@addContent"
+            ></mapped-counter>
             <div class="date">
               <i class="fa fa-clock-o {{#if instance.isOverdue}}red{{else}}color{{/if}}"></i> Due On:
               <span {{#if instance.isOverdue}}class="error"{{/if}}>
@@ -109,55 +71,21 @@
         {{#if isCycleTaskGroup}}
           <section>
             <h3 class="task-list-title">Number of mapped tasks</h3>
-            {{#with_mapping_count instance 'cycle_task_group_tasks'}}
-              <div class="mapping-info">
-                <i class="fa fa-calendar-check-o"></i> Total:
-                {{#if count}}
-                  <span class="counter">{{count}}</span>
-                {{else}}
-                  <strong class="counter">0</strong>
-                {{/if}}
-              </div>
-            {{/with_mapping_count}}
+            <mapped-counter {instance}="instance"
+                            type="CycleTaskGroupTask"
+                            {add-content}="@addContent"
+            ></mapped-counter>
           </section>
         {{/if}}
 
         {{#if drawStatuses}}
-          <h3 class="task-list-title">Current Tasks</h3>
-          {{#with_mapping 'object_tasks' instance}}
-          {{#object_tasks}}
-            <div class="task-item">
-              <i class="fa fa-cycle_task_group_object_task"></i>
-              <div class="task-title">
-                {{instance.title}}
-              </div>
-              {{#if instance.isOverdue}}
-                  <span class="error">Overdue</span>
-              {{/if}}
-              {{#switch instance.status}}
-                {{#case 'Verified'}}
-                  <span class="task-state state-verified">Verified</span>
-                {{/case}}
-                {{#case 'Assigned'}}
-                  <span class="task-state state-assigned">Assigned</span>
-                {{/case}}
-                {{#case 'Finished'}}
-                  <span class="task-state state-finished">Finished</span>
-                {{/case}}
-                {{#case 'InProgress'}}
-                  <span class="task-state state-inprogress">In progress</span>
-                {{/case}}
-              {{/switch}}
-            </div>
-          {{/object_tasks}}
-          {{/with_mapping}}
-          <a class="btn btn-small btn-white" href="{{instance.viewLink}}#task_widget">
-            Open Tasks
-          </a>
+          <object-tasks {instance-id}="instance.id"
+                        {instance-type}="instance.type"
+                        {add-content}="@addContent"
+          ></object-tasks>
         {{/if}}
-      </div>
-      </div>
+      {{/if}}
     </div>
-    {{/if}}
   </div>
+  {{/if}}
 {{/if}}

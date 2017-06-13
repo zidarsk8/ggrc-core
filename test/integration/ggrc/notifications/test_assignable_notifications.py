@@ -116,7 +116,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
 
     asmts = {asmt.slug: asmt for asmt in Assessment.query}
     asmt = Assessment.query.get(asmts["A 1"].id)
-    asmt_id = asmt.id
+    asmt_id, asmt_slug = asmt.id, asmt.slug
 
     asmt.status = Assessment.PROGRESS_STATE
     db.session.commit()
@@ -140,6 +140,32 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
 
     self.assertEqual(recipient, u"user@example.com")
     self.assertIn(u"Assessments have been updated", content)
+
+    # the assessment updated notification should not be sent if there exists a
+    # status change notification , regardless of the order of actions
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"Title", u"New Assessment 1 title 2"),
+    ]))
+    query = self._get_notifications(notif_type="assessment_updated")
+    self.assertEqual(query.count(), 1)
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"State*", Assessment.DONE_STATE),
+    ]))
+
+    self.import_data(OrderedDict([
+        (u"object_type", u"Assessment"),
+        (u"Code*", asmt_slug),
+        (u"Title", u"New Assessment 1 title 3"),
+    ]))
+
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+    self.assertNotIn(u"Assessments have been updated", content)
 
   @unittest.skip("An issue needs to be fixed.")
   @patch("ggrc.notifications.common.send_email")
@@ -478,6 +504,49 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     self.assertIn(u"Completed assessments", content)
 
   @patch("ggrc.notifications.common.send_email")
+  def test_multiple_assessment_state_changes_notification(self, send_email):
+    """Test if several assessment state changes result in a single notification.
+
+    Users should only be notificed about the last state change, and not about
+    every state change that happened.
+    """
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_slug = asmt.slug
+
+    asmt.status = Assessment.START_STATE
+    db.session.commit()
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    # make multiple state transitions and check that only the last one is
+    # actually retained
+    states = (
+        Assessment.PROGRESS_STATE,
+        Assessment.DONE_STATE,
+        Assessment.PROGRESS_STATE,
+        Assessment.FINAL_STATE,
+    )
+
+    for new_state in states:
+      self.import_data(OrderedDict([
+          (u"object_type", u"Assessment"),
+          (u"Code*", asmt_slug),
+          (u"State*", new_state),
+      ]))
+
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertNotIn(u"Assessments ready for review", content)
+    self.assertNotIn(u"Declined assessments", content)
+    self.assertNotIn(u"Reopened assessments", content)
+    self.assertIn(u"Completed assessments", content)
+
+  @patch("ggrc.notifications.common.send_email")
   def test_assessment_reopen_notifications_on_edit(self, send_email):
     """Test if updating assessment results in reopen notification."""
     self.import_file("assessment_with_templates.csv")
@@ -653,13 +722,12 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     self.objgen = generator.ObjectGenerator()
 
   @patch("ggrc.notifications.common.send_email")
-  def test_assessment_without_verifiers(self, _):
+  def test_assessment_without_verifiers(self, send_email):
     """Test setting notification entries for simple assessments.
 
     This function tests that each assessment gets an entry in the
     notifications table after it's been created.
     """
-
     with freeze_time("2015-04-01"):
 
       self.assertEqual(self._get_notifications().count(), 0)
@@ -695,12 +763,26 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
       query = self._get_notifications(notif_type="assessment_updated")
       self.assertEqual(query.count(), 1)
 
+      # the assessment updated notification should not be sent if there exists
+      # a status change notification, regardless of the order of actions
+      asmt = Assessment.query.get(asmts["A 5"].id)
+      self.api_helper.modify_object(
+          asmt, {"status": Assessment.DONE_STATE})
+
+      asmt = Assessment.query.get(asmts["A 5"].id)
+      self.api_helper.modify_object(asmt, {"description": "new description 2"})
+
+      self.client.get("/_notifications/send_daily_digest")
+      _, _, content = send_email.call_args[0]
+
+      self.assertNotIn(u"Assessments have been updated", content)
+
   @patch("ggrc.notifications.common.send_email")
   def test_assessment_with_verifiers(self, _):
     """Test notifications entries for declined assessments.
 
-    This tests makes sure there are extra notification entries added when a
-    assessment has been declined.
+    This tests makes sure that there are extra notification entries added when
+    an assessment has been declined.
     """
     with freeze_time("2015-04-01"):
       self.assertEqual(self._get_notifications().count(), 0)
@@ -727,28 +809,30 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
 
       self.api_helper.modify_object(asmt1, {"status": Assessment.DONE_STATE})
       self.assertEqual(self._get_notifications().count(), 1)
+
       # decline assessment 1
       self.api_helper.modify_object(asmt1,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 3)
+      self.assertEqual(self._get_notifications().count(), 2)
       self.api_helper.modify_object(asmt1, {"status": Assessment.DONE_STATE})
-      self.assertEqual(self._get_notifications().count(), 3)
+      self.assertEqual(self._get_notifications().count(), 1)
       # decline assessment 1 the second time
       self.api_helper.modify_object(asmt1,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 3)
+      self.assertEqual(self._get_notifications().count(), 2)
 
       asmt6 = Assessment.query.get(asmts["A 6"].id)
+
       # start and finish assessment 6
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 3)
+      self.assertEqual(self._get_notifications().count(), 2)
       self.api_helper.modify_object(asmt6, {"status": Assessment.DONE_STATE})
-      self.assertEqual(self._get_notifications().count(), 4)
+      self.assertEqual(self._get_notifications().count(), 3)
       # decline assessment 6
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 6)
+      self.assertEqual(self._get_notifications().count(), 4)
 
       # send all notifications
       self.client.get("/_notifications/send_daily_digest")
@@ -764,16 +848,16 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
       self.assertEqual(self._get_notifications().count(), 1)
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.VERIFIED_STATE})
-      self.assertEqual(self._get_notifications().count(), 2)
+      self.assertEqual(self._get_notifications().count(), 1)
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 3)
+      self.assertEqual(self._get_notifications().count(), 1)
       # decline assessment 6
       self.api_helper.modify_object(asmt6, {"status": Assessment.DONE_STATE})
-      self.assertEqual(self._get_notifications().count(), 3)
+      self.assertEqual(self._get_notifications().count(), 1)
       self.api_helper.modify_object(asmt6,
                                     {"status": Assessment.PROGRESS_STATE})
-      self.assertEqual(self._get_notifications().count(), 4)
+      self.assertEqual(self._get_notifications().count(), 2)
 
   @patch("ggrc.notifications.common.send_email")
   def test_reverting_assessment_status_changes(self, _):
@@ -816,6 +900,77 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     # there should also be no change notification
     query = self._get_notifications(notif_type="assessment_updated")
     self.assertEqual(query.count(), 0)
+
+  @patch("ggrc.notifications.common.send_email")
+  def test_multiple_assessment_state_changes_notification(self, send_email):
+    """Test if several assessment state changes result in a single notification.
+
+    Users should only be notificed about the last state change, and not about
+    every state change that happened.
+    """
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id = asmt.id
+
+    asmt.status = Assessment.START_STATE
+    db.session.commit()
+
+    self.client.get("/_notifications/send_daily_digest")
+    self.assertEqual(self._get_notifications().count(), 0)
+
+    # make multiple state transitions and check that only the last one is
+    # actually retained
+    states = (
+        Assessment.PROGRESS_STATE,
+        Assessment.DONE_STATE,
+        Assessment.PROGRESS_STATE,
+        Assessment.FINAL_STATE,
+    )
+
+    for new_state in states:
+      asmt = Assessment.query.get(asmt_id)
+      self.api_helper.modify_object(asmt, {"status": new_state})
+
+    self.client.get("/_notifications/send_daily_digest")
+    recipient, _, content = send_email.call_args[0]
+    self.assertEqual(recipient, u"user@example.com")
+    self.assertNotIn(u"Assessments ready for review", content)
+    self.assertNotIn(u"Declined assessments", content)
+    self.assertNotIn(u"Reopened assessments", content)
+    self.assertIn(u"Completed assessments", content)
+
+  @patch("ggrc.notifications.common.send_email")
+  def test_assessment_reopen_notifications_on_edit(self, send_email):
+    """Test if updating assessment results in reopen notification."""
+    self.import_file("assessment_with_templates.csv")
+
+    asmts = {asmt.slug: asmt for asmt in Assessment.query}
+    asmt = Assessment.query.get(asmts["A 1"].id)
+    asmt_id, asmt_slug = asmt.id, asmt.slug
+
+    for i, new_state in enumerate(Assessment.DONE_STATES):
+      asmt = Assessment.query.get(asmt_id)
+      asmt.status = new_state
+      db.session.commit()
+
+      self.client.get("/_notifications/send_daily_digest")
+      self.assertEqual(self._get_notifications().count(), 0)
+
+      self.import_data(OrderedDict([
+          (u"object_type", u"Assessment"),
+          (u"Code*", asmt_slug),
+          (u"Title", u"New Assessment 1 title - " + unicode(i)),
+      ]))
+
+      query = self._get_notifications(notif_type="assessment_reopened")
+      self.assertEqual(query.count(), 1)
+
+      self.client.get("/_notifications/send_daily_digest")
+      recipient, _, content = send_email.call_args[0]
+      self.assertEqual(recipient, u"user@example.com")
+      self.assertIn(u"Reopened assessments", content)
 
   @patch("ggrc.notifications.common.send_email")
   def test_changing_custom_attributes_triggers_change_notification(self, _):

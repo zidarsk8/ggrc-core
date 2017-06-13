@@ -258,10 +258,6 @@ tree-header {
     padding-right: 40px !important;
     padding-left: 0 !important;
 
-    &.disable-conf {
-      margin-left: 70px;
-    }
-
     .tree-header-selector {
       margin-left: 0 !important;
       float: none !important;
@@ -280,7 +276,12 @@ tree-header {
     .item-actions {
       width: $itemActionsWidth;
     }
+
+    &.active-action-area .tree-header-titles {
+      width: calc(100% - #{$treeHeaderSelectorWidth + $itemActionsWidth});
+    }
   }
+
   .tree-action {
     margin-left: auto;
   }

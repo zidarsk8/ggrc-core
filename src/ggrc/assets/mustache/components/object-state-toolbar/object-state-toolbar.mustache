@@ -9,13 +9,14 @@
       {{^if hasErrors}}
         {{#if hasVerifiers}}
             <button class="btn btn-small btn-darkBlue pull-right btn-info-pin-header"
-                    data-name="status"
-                    data-value="Ready for Review">
-                Complete</button>
+                    ($click)="changeState('Ready for Review')">
+                Complete
+            </button>
         {{else}}
             <button class="btn btn-small btn-darkBlue pull-right btn-info-pin-header"
-                    data-name="status"
-                    data-value="Completed">Complete</button>
+                    ($click)="changeState('Completed')">
+                Complete
+            </button>
         {{/if}}
       {{else}}
           <button class="btn btn-small btn-darkBlue pull-right btn-info-pin-header disabled" {{#if errorMsg }}title="{{errorMsg}}"{{/if}}>Complete</button>
@@ -25,31 +26,31 @@
       {{#if isCurrentUserVerifier}}
         {{#unless hasErrors}}
             <button class="btn btn-small btn-green pull-right btn-info-pin-header"
-                    data-name="status"
-                    data-value="Verified">Verify
+                    ($click)="changeState('Verified')">
+                    Verify
             </button>
             <button class="btn btn-small btn-red pull-right btn-info-pin-header"
-                    data-name="status"
-                    data-value="In Progress">Reject
+                    ($click)="changeState('In Progress')">
+                Reject
             </button>
         {{else}}
             <button class="btn btn-small btn-green pull-right btn-info-pin-header disabled"
-                    data-name="status"
-                    data-value="Verified"
-                    title="{{errorMsg}}">Verify
+                    ($click)="changeState('Verified')"
+                    title="{{errorMsg}}">
+                Verify
             </button>
             <button class="btn btn-small btn-red pull-right btn-info-pin-header disabled"
-                    data-name="status"
-                    data-value="In Progress"
-                    title="{{errorMsg}}">Reject
+                    ($click)="changeState('In Progress')"
+                    title="{{errorMsg}}">
+                Reject
             </button>
         {{/unless}}
       {{/if}}
     {{/if}}
     {{#unless isInProgress}}
       {{#instance._undo.0}}
-          <a data-name="status" data-value="{{instance._undo.0}}" data-undo="true"
-             class="undo btn btn-small btn-link btn-info-pin-header pull-right {{#if isDisabled}}disabled{{/if}}">Undo</a>
+          <a data-name="status" ($click)="changeState(instance._undo.0, true)"
+             class="btn btn-small btn-link btn-info-pin-header pull-right {{#if isDisabled}}disabled{{/if}}">Undo</a>
       {{/instance._undo.0}}
     {{/unless}}
   {{/unless}}

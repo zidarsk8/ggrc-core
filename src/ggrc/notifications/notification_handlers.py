@@ -103,11 +103,35 @@ def _add_assessment_updated_notif(obj):
   """Add a notification record on the change of an object.
 
   If the same notification type for the object already exists and has not been
-  sent yet, do not do anything.
+  sent yet, do not do anything. The same if there already exist unsent status
+  change notifications for the object.
 
   Args:
     obj (models.mixins.Assignable): an object for which to add a notification
   """
+  # If there already exists a status change notification, an assessment updated
+  # notification should not be sent, and is thus not added.
+  notif_type_names = ["assessment_declined"]
+  notif_type_names.extend(item.value for item in Transitions)
+
+  notif_types = models.NotificationType.query.filter(
+      models.NotificationType.name.in_(notif_type_names)
+  )
+  notif_type_ids = [ntype.id for ntype in notif_types]
+
+  has_status_change = models.Notification.query.filter(
+      models.Notification.object_id == obj.id,
+      models.Notification.object_type == obj.type,
+      models.Notification.notification_type_id.in_(notif_type_ids),
+      (
+          models.Notification.sent_at.is_(None) |
+          (models.Notification.repeating == true())
+      )
+  ).exists()
+
+  if db.session.query(has_status_change).scalar():
+    return
+
   notif_type = models.NotificationType.query.filter_by(
       name="assessment_updated").first()
 
@@ -115,7 +139,7 @@ def _add_assessment_updated_notif(obj):
     _add_notification(obj, notif_type)
 
 
-def _add_state_change_notif(obj, state_change):
+def _add_state_change_notif(obj, state_change, remove_existing=False):
   """Add a notification record on changing the given object's status.
 
   If the same notification type for the object already exists and has not been
@@ -124,7 +148,28 @@ def _add_state_change_notif(obj, state_change):
   Args:
     obj (models.mixins.Assignable): an object for which to add a notification
     state_change (Transitions): the state transition that has happened
+    remove_existing (bool): whether or not to remove all exisiting state change
+      notifications for `obj`
   """
+  # Assessment updated notifications should not be sent if there is a state
+  # change notification - we must thus delete the former.
+  notif_type_names = ["assessment_updated"]
+
+  if remove_existing:
+    notif_type_names.extend(item.value for item in Transitions)
+    notif_type_names.append("assessment_declined")
+
+  notif_types = models.NotificationType.query.filter(
+      models.NotificationType.name.in_(notif_type_names)
+  )
+  notif_type_ids = [ntype.id for ntype in notif_types]
+
+  models.Notification.query.filter(
+      models.Notification.object_id == obj.id,
+      models.Notification.object_type == obj.type,
+      models.Notification.notification_type_id.in_(notif_type_ids)
+  ).delete(synchronize_session=False)
+
   notif_type = models.NotificationType.query.filter_by(
       name=state_change.value).first()
 
@@ -170,7 +215,7 @@ def handle_assignable_modified(obj):
 
   state_change = transitions_map.get((old_state, new_state))
   if state_change:
-    _add_state_change_notif(obj, state_change)
+    _add_state_change_notif(obj, state_change, remove_existing=True)
 
   # no interest in modifications when an assignable object is not ative yet
   if obj.status == Statusable.START_STATE:
@@ -213,7 +258,7 @@ def handle_assignable_modified(obj):
   # When modified, a done Assessment gets automatically reopened, but that is
   # not directly observable via status change history, thus an extra check.
   if obj.status in Statusable.DONE_STATES:
-    _add_state_change_notif(obj, Transitions.TO_REOPENED)
+    _add_state_change_notif(obj, Transitions.TO_REOPENED, remove_existing=True)
 
 
 def _ca_values_changed(obj):
@@ -390,7 +435,8 @@ def handle_relationship_altered(rel):
 
   # when modified, a done Assessment gets automatically reopened
   if asmt.status in Statusable.DONE_STATES:
-    _add_state_change_notif(asmt, Transitions.TO_REOPENED)
+    _add_state_change_notif(
+        asmt, Transitions.TO_REOPENED, remove_existing=True)
 
 
 def register_handlers():  # noqa: C901

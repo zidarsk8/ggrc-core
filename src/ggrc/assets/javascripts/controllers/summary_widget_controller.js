@@ -11,6 +11,7 @@
       widget_view: GGRC.mustache_path + '/base_objects/summary.mustache',
       isLoading: true,
       isShown: false,
+      forceRefresh: false,
       colorsMap: {
         Completed: '#405f77',
         Verified: '#009925',
@@ -69,6 +70,11 @@
       this.element.html(frag);
       return 0;
     },
+    '{CMS.Models.Assessment} updated': function (model, ev, instance) {
+      if (instance instanceof CMS.Models.Assessment) {
+        this.options.forceRefresh = true;
+      }
+    },
     get_widget_view: function (el) {
       var widgetView = $(el)
         .closest('[data-widget-view]')
@@ -102,9 +108,11 @@
       // State changes are not checked.
       var countsChanged = query.getCounts().attr(type) !==
                           chartOptions.attr('total');
-      if (chartOptions.attr('isInitialized') && !countsChanged) {
+      if (chartOptions.attr('isInitialized') && !countsChanged &&
+      !this.options.forceRefresh) {
         return;
       }
+      this.options.forceRefresh = false;
       chartOptions.attr('isInitialized', true);
 
       that.setState(type, {total: 0, statuses: { }}, true);

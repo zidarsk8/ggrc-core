@@ -28,6 +28,7 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
   update = db.Column(db.Boolean, nullable=False, default=True)
   delete = db.Column(db.Boolean, nullable=False, default=True)
   my_work = db.Column(db.Boolean, nullable=False, default=True)
+  mandatory = db.Column(db.Boolean, nullable=False, default=False)
 
   access_control_list = db.relationship(
       'AccessControlList', backref='ac_role', cascade='all, delete-orphan')
