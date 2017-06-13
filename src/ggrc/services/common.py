@@ -309,43 +309,17 @@ def get_modified_objects(session):
     return None
 
 
-def update_index(session, cache):
-  """Update fulltext index records for cached objects."""
+def update_snapshot_index(session, cache):
+  """Update fulltext index records for cached snapshtos."""
   from ggrc.snapshotter.indexer import reindex_snapshots
-  from ggrc.fulltext.mixin import Indexed
-  from ggrc.fulltext import get_indexed_model_names
   if cache is None:
     return
-  indexed_model_names = get_indexed_model_names()
-  indexer = get_indexer()
-  reindex_snapshots_list = []
-  for obj in itertools.chain(cache.new, cache.dirty):
-    if obj.type == "Snapshot":
-      # index snapshot has custom logic
-      reindex_snapshots_list.append(obj.id)
-      continue
-    if obj.type not in indexed_model_names:
-      # index only required models
-      continue
-    if isinstance(obj, Indexed):
-      # all indexed models autoindex on before_commit signal
-      continue
-    logger.warning("Indexing in depricated way: `%s` "
-                   "should be inherited from Indexed",
-                   obj.type)
-    indexer.update_record(indexer.fts_record_for(obj), commit=False)
-
-  to_delete_dict = defaultdict(list)
-  for obj in cache.deleted:
-    if obj.type in indexed_model_names:
-      to_delete_dict[obj.type].append(obj.id)
-  for model_name, ids in to_delete_dict.iteritems():
-    indexer.delete_records_by_ids(model_name, ids, commit=False)
-  session.commit()
-  indexer.delete_records_by_ids("Snapshot",
-                                reindex_snapshots_list,
-                                commit=False)
-  reindex_snapshots(reindex_snapshots_list)
+  objs = itertools.chain(cache.new, cache.dirty, cache.deleted)
+  reindex_snapshots_ids = [o.id for o in objs if o.type == "Snapshot"]
+  get_indexer().delete_records_by_ids("Snapshot",
+                                      reindex_snapshots_ids,
+                                      commit=False)
+  reindex_snapshots(reindex_snapshots_ids)
 
 
 def _revision_generator(user_id, action, objects):
@@ -915,7 +889,7 @@ class Resource(ModelView):
     with benchmark("Query for object"):
       obj = self.get_object(id)
     with benchmark("Update index"):
-      update_index(db.session, modified_objects)
+      update_snapshot_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for collection PUT"):
       update_memcache_after_commit(self.request)
     with benchmark("Send PUT - after commit event"):
@@ -972,7 +946,7 @@ class Resource(ModelView):
       with benchmark("Commit"):
         db.session.commit()
       with benchmark("Update index"):
-        update_index(db.session, modified_objects)
+        update_snapshot_index(db.session, modified_objects)
       with benchmark("Update memcache after commit for collection DELETE"):
         update_memcache_after_commit(self.request)
       with benchmark("Send DELETEd - after commit event"):
@@ -1330,7 +1304,7 @@ class Resource(ModelView):
     with benchmark("Commit collection"):
       db.session.commit()
     with benchmark("Update index"):
-      update_index(db.session, modified_objects)
+      update_snapshot_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for collection POST"):
       update_memcache_after_commit(self.request)
 

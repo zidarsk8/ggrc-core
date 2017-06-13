@@ -29,7 +29,7 @@ from ggrc.converters.base_row import RowConverter
 from ggrc.converters.import_helper import get_column_order
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.services.common import get_modified_objects
-from ggrc.services.common import update_index
+from ggrc.services.common import update_snapshot_index
 from ggrc.services.common import update_memcache_after_commit
 from ggrc.services.common import update_memcache_before_commit
 from ggrc.services.common import log_event
@@ -565,7 +565,7 @@ class BlockConverter(object):
           self, modified_objects, CACHE_EXPIRY_IMPORT)
       db.session.commit()
       update_memcache_after_commit(self)
-      update_index(db.session, modified_objects)
+      update_snapshot_index(db.session, modified_objects)
       return import_event
     except exc.SQLAlchemyError as err:
       db.session.rollback()

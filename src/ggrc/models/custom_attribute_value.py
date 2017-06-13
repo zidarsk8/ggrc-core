@@ -36,6 +36,7 @@ class CustomAttributeValue(Base, Indexed, db.Model):
       PublishOnly('preconditions_failed'),
   ]
   _fulltext_attrs = ["attribute_value"]
+  REQUIRED_GLOBAL_REINDEX = False
 
   _sanitize_html = [
       "attribute_value",
