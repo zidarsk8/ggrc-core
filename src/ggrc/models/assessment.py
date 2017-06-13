@@ -210,6 +210,11 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
           "display_name": "Verifiers",
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
+      "archived": {
+          "display_name": "Archived",
+          "mandatory": False,
+          "ignore_on_update": True,
+      },
   }
 
   AUTO_REINDEX_RULES = [
