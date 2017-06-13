@@ -32,7 +32,9 @@
 
     {{#if isAllowedToEdit}}
       <li>
-        <tree-item-map {instance}="instance"></tree-item-map>
+        <click-filter>
+          <tree-item-map {instance}="instance"></tree-item-map>
+        </click-filter>
       </li>
       {{#is_allowed 'update' instance context='for'}}
         <li>
