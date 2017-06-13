@@ -28,13 +28,10 @@ def init_hook():
   # pylint: disable=unused-variable
   @signals.Restful.model_deleted.connect_via(all_models.Assessment)
   @signals.Restful.model_deleted.connect_via(all_models.AssessmentTemplate)
-  @signals.Restful.model_deleted.connect_via(all_models.Issue)
   @signals.Restful.model_posted.connect_via(all_models.Assessment)
   @signals.Restful.model_posted.connect_via(all_models.AssessmentTemplate)
-  @signals.Restful.model_posted.connect_via(all_models.Issue)
   @signals.Restful.model_put.connect_via(all_models.Assessment)
   @signals.Restful.model_put.connect_via(all_models.AssessmentTemplate)
-  @signals.Restful.model_put.connect_via(all_models.Issue)
   @signals.Restful.model_put.connect_via(all_models.Snapshot)
   def handle_archived_object(sender, obj=None, src=None, service=None):
     """Make sure admins cannot delete/update archived audits"""
