@@ -44,6 +44,24 @@ def get_object_url(obj):
   return urlparse.urljoin(utils.get_url_root(), url)
 
 
+def as_user_time(utc_datetime):
+  """Convert a UTC time stamp to a localized user-facing string.
+
+  Args:
+    utc_datetime: naive datetime.datetime, intepreted as being in UTC
+
+  Returns:
+    A user-facing string representing the given time in a localized format.
+  """
+  # NOTE: For the time being, the majority of users are located in US/Pacific
+  # time zone, thus the latter is used to convert UTC times read from database.
+  pacific_tz = timezone("US/Pacific")
+  datetime_format = DATE_FORMAT_US + " %H:%M:%S %Z"
+
+  local_time = utc_datetime.replace(tzinfo=pytz.utc).astimezone(pacific_tz)
+  return local_time.strftime(datetime_format)
+
+
 def _get_assignable_dict(people, notif):
   """Get dict data for assignable object in notification.
 
@@ -55,17 +73,9 @@ def _get_assignable_dict(people, notif):
     dict: dictionary containing notification data for all people in the given
       list.
   """
-  datetime_format = DATE_FORMAT_US + " %H:%M:%S %Z"
-
-  # NOTE: For the time being, the majority of users are located in US/Pacific
-  # time zone, thus the latter is used to convert UTC times read from database.
-  pacific_tz = timezone("US/Pacific")
-  notif_created_at = notif.created_at.replace(
-      tzinfo=pytz.utc
-  ).astimezone(pacific_tz)
-
   obj = get_notification_object(notif)
   data = {}
+
   for person in people:
     # We should default to today() if no start date is found on the object.
     start_date = getattr(obj, "start_date", datetime.date.today())
@@ -77,7 +87,7 @@ def _get_assignable_dict(people, notif):
                 "start_date_statement": utils.get_digest_date_statement(
                     start_date, "start", True),
                 "url": get_object_url(obj),
-                "notif_created_at": notif_created_at.strftime(datetime_format)
+                "notif_created_at": as_user_time(notif.created_at)
             }
         }
     }
@@ -272,15 +282,6 @@ def generate_comment_notification(obj, comment, person):
   Returns:
     Dictionary with data needed for the comment notification email.
   """
-  datetime_format = DATE_FORMAT_US + " %H:%M:%S %Z"
-
-  # NOTE: For the time being, the majority of users are located in US/Pacific
-  # time zone, thus the latter is used to convert UTC times read from database.
-  pacific_tz = timezone("US/Pacific")
-  created_at = comment.created_at.replace(
-      tzinfo=pytz.utc
-  ).astimezone(pacific_tz)
-
   parent_info = ParentObjInfo(
       obj.id,
       obj._inflector.title_singular.title(),
@@ -299,7 +300,7 @@ def generate_comment_notification(obj, comment, person):
                   "parent_id": parent_info.id,
                   "parent_url": get_object_url(obj),
                   "parent_title": obj.title,
-                  "created_at": created_at.strftime(datetime_format)
+                  "created_at": as_user_time(comment.created_at)
               }
           }
       }
