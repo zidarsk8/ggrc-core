@@ -15,9 +15,8 @@ from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
 
 
-CONTEXT_OBJECTS = ('issue', 'assessment', 'template')
+CONTEXT_OBJECTS = ('issue', 'assessment', 'template', 'archived_issue')
 ARCHIVED_CONTEXT_OBJECTS = (
-    'archived_issue',
     'archived_assessment',
     'archived_template')
 
@@ -27,7 +26,7 @@ def _create_obj_dict(obj, audit_id, context_id, assessment_id=None):
   table_singular = obj._inflector.table_singular
   dicts = {
       "issue": {
-          "title": "Issue Title",
+          "title": "Issue Title " + factories.random_str(),
           "context": {
               "id": context_id,
               "type": "Context"
@@ -314,8 +313,9 @@ class TestArchivedAudit(TestAuditArchivingBase):
     self.api.set_user(self.people[person])
     for obj in objects:
       obj_instance = getattr(self, obj)
+      title = factories.random_str().strip()
       json = {
-          "title": "New"
+          "title": title
       }
       response = self.api.put(obj_instance, json)
       assert response.status_code == status, \
@@ -325,10 +325,11 @@ class TestArchivedAudit(TestAuditArchivingBase):
         # if editing is allowed check if edit was correctly saved
         continue
       table_singular = obj_instance._inflector.table_singular
-      assert response.json[table_singular].get("title", None) == "New", \
-          "{} has not been updated correctly {}".format(
+      assert response.json[table_singular].get("title", None) == title, \
+          "{} has not been updated correctly {} != {}".format(
           obj,
-          response.json[obj])
+          response.json[obj]['title'],
+          title)
 
   @data(
       ('Admin', 200, 'snapshot'),
@@ -388,12 +389,13 @@ class TestArchivedAuditObjectCreation(TestCase):
     self.assessment = factories.AssessmentFactory()
 
   @data(
-      all_models.Assessment,
-      all_models.AssessmentTemplate,
-      all_models.Issue,
-      all_models.Relationship,
+      (all_models.Assessment, 403),
+      (all_models.AssessmentTemplate, 403),
+      (all_models.Issue, 201),
+      (all_models.Relationship, 403),
   )
-  def test_object_creation(self, obj):
+  @unpack
+  def test_object_creation(self, obj, archived_status):
     """Test object creation in audit and archived audit"""
     audit = self.audit.id, self.audit.context.id
     archived_audit = self.archived_audit.id, self.archived_audit.context.id
@@ -406,6 +408,6 @@ class TestArchivedAuditObjectCreation(TestCase):
 
     response = self.api.post(obj, _create_obj_dict(
         obj, archived_audit[0], archived_audit[1], assessment_id))
-    assert response.status_code == 403, \
+    assert response.status_code == archived_status, \
         "403 not raised for {} on archived audit, received {} instead".format(
             obj._inflector.model_singular, response.status_code)
