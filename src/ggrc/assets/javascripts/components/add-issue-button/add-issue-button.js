@@ -48,7 +48,7 @@
       }
     },
     events: {
-      '{window} modal:success': function (window, event, instance) {
+      refreshIssueList: function (window, event, instance) {
         var pageInstance;
 
         if (instance instanceof CMS.Models.Issue) {
@@ -61,7 +61,9 @@
         }
 
         this.viewModel.attr('relatedInstance').dispatch('refreshInstance');
-      }
+      },
+      '{window} modal:added': 'refreshIssueList',
+      '{window} modal:success': 'refreshIssueList'
     }
   });
 })(window.can, window.GGRC, window.CMS);
