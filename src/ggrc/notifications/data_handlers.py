@@ -301,7 +301,8 @@ def generate_comment_notification(obj, comment, person):
                   "parent_id": parent_info.id,
                   "parent_url": get_object_url(obj),
                   "parent_title": obj.title,
-                  "created_at": as_user_time(comment.created_at)
+                  "created_at": comment.created_at,
+                  "created_at_str": as_user_time(comment.created_at)
               }
           }
       }
