@@ -3,6 +3,7 @@
 
 """Custom attribute definition module"""
 
+from cached_property import cached_property
 import flask
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
@@ -12,6 +13,7 @@ from ggrc import db
 from ggrc.models.mixins import attributevalidator
 from ggrc.models import mixins
 from ggrc.models.custom_attribute_value import CustomAttributeValue
+from ggrc.access_control import role as acr
 from ggrc.models.exceptions import ValidationError
 
 
@@ -38,6 +40,12 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
   attribute_values = db.relationship('CustomAttributeValue',
                                      backref='custom_attribute',
                                      cascade='all, delete-orphan')
+
+  @cached_property
+  def inflector_model_name_dict(self):  # pylint: disable=no-self-use
+    from ggrc.models import all_models
+    return {m._inflector.table_singular: m.__name__
+            for m in all_models.all_models}
 
   @property
   def definition_attr(self):
@@ -244,9 +252,11 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
       raise ValueError(u"Global custom attribute '{}' "
                        u"already exists for this object type"
                        .format(name))
-
-    if name in self._get_custom_roles(definition_type):
+    model_name = self.inflector_model_name_dict[definition_type]
+    acrs = {i.lower() for i in acr.get_custom_roles_for(model_name).values()}
+    if name in acrs:
       raise ValueError(u"Custom Role with a name of '{}' "
+
                        u"already existsfor this object type".format(name))
 
     if definition_type == "assessment":
