@@ -287,7 +287,12 @@ def reindex_pairs(pairs):
           {pair.to_4tuple() for pair in pairs}
       )
   ).options(
-      orm.subqueryload("revision").load_only("id", "resource_type", "content"),
+      orm.subqueryload("revision").load_only(
+          "id",
+          "resource_type",
+          "resource_id",
+          "content",
+      ),
       orm.load_only(
           "id",
           "context_id",
@@ -311,7 +316,7 @@ def reindex_pairs(pairs):
         "revision": get_searchable_attributes(
             CLASS_PROPERTIES[revision.resource_type],
             cad_dict,
-            revision.content)
+            revision.populated_content)
     }
   search_payload = []
   for snapshot in snapshots.values():

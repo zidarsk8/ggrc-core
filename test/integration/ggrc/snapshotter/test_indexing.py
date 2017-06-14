@@ -3,10 +3,13 @@
 
 """Test for indexing of snapshotted objects"""
 
+import ddt
+
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
 from ggrc import models
+from ggrc.models import all_models
 from ggrc.views import do_reindex
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.snapshotter.indexer import delete_records
@@ -28,6 +31,7 @@ def get_records(_audit, _snapshots):
       ))
 
 
+@ddt.ddt
 class TestSnapshotIndexing(SnapshotterBaseTestCase):
   """Test cases for Snapshoter module"""
 
@@ -339,3 +343,49 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     records = get_records(audit, snapshots)
 
     self.assertEqual(records.count(), 57)
+
+  @ddt.data(
+      ("principal_assessor", "Principal Assignees"),
+      ("secondary_assessor", "Secondary Assignees"),
+      ("primary_contact", "Primary Contacts"),
+      ("secondary_contact", "Secondary Contacts"),
+  )
+  @ddt.unpack
+  def test_search_no_acl_in_content(self, field, role_name):
+    """Test search older revisions without access_control_list."""
+    with factories.single_commit():
+      factories.AccessControlRoleFactory(name=role_name,
+                                         object_type="Control")
+      person = factories.PersonFactory(email="{}@example.com".format(field),
+                                       name=field)
+      control = factories.ControlFactory()
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.type,
+    ).one()
+    with factories.single_commit():
+      snapshot = factories.SnapshotFactory(
+          child_id=control.id,
+          child_type=control.type,
+          revision=revision)
+      revision.content = revision.content.copy()
+      revision.content.pop("access_control_list")
+      revision.content[field] = {"id": person.id}
+      db.session.add(revision)
+    do_reindex()
+    all_found_records = dict(Record.query.filter(
+        Record.key == snapshot.id,
+        Record.type == snapshot.type,
+        Record.property == role_name.lower()
+    ).values("subproperty", "content"))
+    self.assertTrue(all_found_records)
+    self.assertIn("{}-email".format(person.id), all_found_records)
+    self.assertIn("{}-name".format(person.id), all_found_records)
+    self.assertIn("{}-user_name".format(person.id), all_found_records)
+    self.assertIn("__sort__", all_found_records)
+    self.assertEqual(person.email,
+                     all_found_records["{}-email".format(person.id)])
+    self.assertEqual(person.name,
+                     all_found_records["{}-name".format(person.id)])
+    self.assertEqual(person.user_name,
+                     all_found_records["{}-user_name".format(person.id)])
