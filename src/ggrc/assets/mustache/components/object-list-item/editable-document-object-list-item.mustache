@@ -8,7 +8,9 @@
     {{#if showAction}}
       <div class="action-toolbar__controls">
         {{#is_allowed 'update' instance context='for'}}
-          <content></content>
+            {{^if instance.archived}}
+                <content></content>
+            {{/if}}
         {{/is_allowed}}
       </div>
     {{/if}}

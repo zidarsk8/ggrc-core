@@ -5,6 +5,7 @@
 <div class="section-title">
   {{titleText}}
   {{#is_allowed 'update' instance context='for'}}
+      {{^if instance.archived}}
     <click-filter>
       <i class="fa fa-plus-circle"
          rel="tooltip"
@@ -19,6 +20,7 @@
  >
       </i>
     </click-filter>
+      {{/if}}
   {{/is_allowed}}
 </div>
 <object-list {(selected-item)}="selectedItem" {items}="mappedItems">

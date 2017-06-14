@@ -9,26 +9,29 @@
     <div class="span12">
         <section class="info audit-summary">
             <div class="info-pane-utility">
-                <add-object-button
-                    instance="instance"
-                    linkclass="btn btn-small btn-white"
-                    content="Create assessment"
-                    text="Create Assessment"
-                    singular="Assessment"
-                    plural="assessments"
-                    noparams="true">
-                </add-object-button>
-                <add-object-button
-                    instance="instance"
-                    linkclass="btn btn-small btn-darkBlue"
-                    content="Create Template"
-                    text="Define Assessment Template"
-                    singular="AssessmentTemplate"
-                    plural="assessment_templates">
-                </add-object-button>
-                {{#is_allowed 'create' 'Assessment' context=instance.context}}
-                  <assessment-generator-button audit="instance" button='true'></assessment-generator-button>
-                {{/is_allowed}}
+                {{^if instance.archived}}
+                    <add-object-button
+                        instance="instance"
+                        linkclass="btn btn-small btn-white"
+                        content="Create assessment"
+                        text="Create Assessment"
+                        singular="Assessment"
+                        plural="assessments"
+                        noparams="true">
+                    </add-object-button>
+
+                    <add-object-button
+                        instance="instance"
+                        linkclass="btn btn-small btn-darkBlue"
+                        content="Create Template"
+                        text="Define Assessment Template"
+                        singular="AssessmentTemplate"
+                        plural="assessment_templates">
+                    </add-object-button>
+                    {{#is_allowed 'create' 'Assessment' context=instance.context}}
+                        <assessment-generator-button audit="instance" button='true'></assessment-generator-button>
+                    {{/is_allowed}}
+                {{/if}}
             </div>
 
             <div class="tier-content">

@@ -548,6 +548,19 @@ describe('GGRC.Components.mapperResults', function () {
         permissions: 'read'
       }));
     });
+
+    it('prepare request for unlocked items for Audits', function () {
+      var filter = viewModel.attr('filter');
+      viewModel.attr('type', 'Audit');
+      spyOn(viewModel, 'prepareBaseQuery')
+        .and.returnValue({mockData: 'base'});
+      spyOn(viewModel, 'joinQueries')
+        .and.returnValue(filter);
+
+      viewModel.getQuery();
+
+      expect(viewModel.joinQueries).toHaveBeenCalled();
+    });
   });
 
   describe('getModelKey() method', function () {

@@ -5,20 +5,22 @@
 <div class="section-title">
   {{titleText}}
   {{#is_allowed 'update' instance context='for'}}
-    <click-filter>
-      <i class="fa fa-plus-circle"
-         rel="tooltip"
-         data-type="{{mappingType}}"
-         data-placement="right"
-         data-toggle="unified-mapper"
-         data-join-mapping="related_objects"
-         data-join-option-type="{{model.shortName}}"
-         data-join-object-id="{{instance.id}}"
-         data-join-object-type="{{instance.class.shortName}}"
-         data-original-title="Map {{firstnonempty mappingType 'Object'}} to this {{firstnonempty instance.class.title_singular 'Object'}}"
+      {{^if instance.archived}}
+      <click-filter>
+        <i class="fa fa-plus-circle"
+           rel="tooltip"
+           data-type="{{mappingType}}"
+           data-placement="right"
+           data-toggle="unified-mapper"
+           data-join-mapping="related_objects"
+           data-join-option-type="{{model.shortName}}"
+           data-join-object-id="{{instance.id}}"
+           data-join-object-type="{{instance.class.shortName}}"
+           data-original-title="Map {{firstnonempty mappingType 'Object'}} to this {{firstnonempty instance.class.title_singular 'Object'}}"
  >
-      </i>
-    </click-filter>
+        </i>
+      </click-filter>
+      {{/if}}
   {{/is_allowed}}
 </div>
 <object-list {(selected-item)}="selectedItem" {items}="mappedItems">

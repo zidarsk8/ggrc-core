@@ -56,7 +56,8 @@
           type: 'boolean',
           get: function () {
             return this.attr('instance.status') !== 'Completed' &&
-              this.attr('instance.status') !== 'Ready for Review';
+              this.attr('instance.status') !== 'Ready for Review' &&
+              !this.attr('instance.archived');
           },
           set: function () {
             this.attr('instance.status', 'In Progress');

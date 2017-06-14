@@ -180,6 +180,10 @@
         return GGRC.Utils.QueryAPI
           .buildParam(modelName, paging, filters, [], statusFilter);
       },
+      joinQueries: function (left, right, operation) {
+        return GGRC.query_parser
+          .join_queries(left, right, operation);
+      },
       prepareRelatedQuery: function (modelName, statusFilter) {
         if (!this.attr('baseInstance')) {
           return null;
@@ -201,6 +205,14 @@
         }
         return GGRC.query_parser.parse(statusFilter);
       },
+      prepareUnlockedFilter: function () {
+        var filterString = GGRC.Utils.State.unlockedFilter();
+        return GGRC.query_parser.parse(filterString);
+      },
+      shouldApplyUnlockedFilter: function (modelName) {
+        return modelName === 'Audit' &&
+          !this.searchOnly();
+      },
       loadAllItems: function () {
         this.attr('allItems', this.loadAllItemsIds());
       },
@@ -212,8 +224,13 @@
         };
         var filters = this.prepareRelevantFilters();
         var statusFilter = this.prepareStatusFilter();
+        var unlockedFilter = this.prepareUnlockedFilter();
         var query;
         var relatedQuery;
+
+        if (this.shouldApplyUnlockedFilter(modelName)) {
+          statusFilter = this.joinQueries(statusFilter, unlockedFilter, 'AND');
+        }
 
         if (addPaging) {
           paging.current = this.attr('paging.current');
@@ -230,6 +247,7 @@
           // Transform Base Query to Snapshot
           query = GGRC.Utils.Snapshots.transformQuery(query);
         }
+
         // Add Permission check
         query.permissions = (modelName === 'Person') || this.searchOnly() ?
           'read' : 'update';

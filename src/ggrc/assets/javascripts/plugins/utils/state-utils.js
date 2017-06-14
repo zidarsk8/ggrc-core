@@ -115,6 +115,14 @@
     }
 
     /**
+     * Return query for unlocked objects
+     * @return {String} The unlocked query
+     */
+    function unlockedFilter() {
+      return '"Archived"="False"';
+    }
+
+    /**
      * Build statuses filter string
      * @param {Array} statuses - array of active statuses
      * @return {String} statuses filter
@@ -184,6 +192,7 @@
       hasState: hasState,
       hasFilter: hasFilter,
       statusFilter: statusFilter,
+      unlockedFilter: unlockedFilter,
       getStatesForModel: getStatesForModel,
       getDefaultStatesForModel: getDefaultStatesForModel
     };
