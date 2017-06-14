@@ -70,6 +70,15 @@
       this.element.html(frag);
       return 0;
     },
+    onRelationshipChange: function (model, ev, instance) {
+      if (instance instanceof CMS.Models.Relationship &&
+      instance.attr('destination.type') === 'Document' &&
+      instance.attr('source.type') === 'Assessment') {
+        this.options.forceRefresh = true;
+      }
+    },
+    '{CMS.Models.Relationship} destroyed': 'onRelationshipChange',
+    '{CMS.Models.Relationship} created': 'onRelationshipChange',
     '{CMS.Models.Assessment} updated': function (model, ev, instance) {
       if (instance instanceof CMS.Models.Assessment) {
         this.options.forceRefresh = true;
