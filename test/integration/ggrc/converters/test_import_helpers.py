@@ -336,6 +336,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Planned Report Period from",
         "Planned Report Period to",
         "Auditors",
+        "Archived",
         "Delete",
         "Url",
         "Evidence",
@@ -367,6 +368,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Default Verifier",
         "Custom Attributes",
         "Code",
+        "Archived",
         "Delete",
     }
     expected_fields = {
@@ -382,6 +384,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         },
         "ignore_on_update": {
             "Audit",
+            "Archived",
         }
     }
     self._test_single_object(models.AssessmentTemplate, names, expected_fields,
@@ -397,6 +400,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Test Plan",
         "Notes",
         "Audit",
+        "Archived",
         "Creators",
         "Assignees",
         "Verifiers",
@@ -431,6 +435,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "ignore_on_update": {
             "Template",
             "Audit",
+            "Archived",
         }
     }
     self._test_single_object(models.Assessment, names, expected_fields)

@@ -161,25 +161,7 @@ audit_read_objects = list(audit_create_objects)
 audit_read_objects.append('Audit')
 
 auditor_read_objects = [
-    'Audit', 'Request',
-    {'type': 'DocumentationResponse',
-     'condition': 'in',
-     'terms': {
-         'value': ['Accepted', 'Completed'],
-         'property_name': 'status',
-     }},
-    {'type': 'InterviewResponse',
-     'condition': 'in',
-     'terms': {
-         'value': ['Accepted', 'Completed'],
-         'property_name': 'status',
-     }},
-    {'type': 'PopulationSampleResponse',
-     'condition': 'in',
-     'terms': {
-         'value': ['Accepted', 'Completed'],
-         'property_name': 'status',
-     }},
+    'Audit', 'Request'
 ]
 
 audit_update_objects = list(audit_read_objects)

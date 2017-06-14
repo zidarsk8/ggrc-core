@@ -7,6 +7,7 @@
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc.builder import simple_property
 from ggrc.models import assessment
 from ggrc.models import audit
 from ggrc.models import mixins
@@ -66,7 +67,12 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
       "test_plan_procedure",
       "procedure_description",
       "default_people",
+      PublishOnly("archived"),
       PublishOnly("DEFAULT_PEOPLE_LABELS")
+  ]
+
+  _fulltext_attrs = [
+      "archived"
   ]
 
   _aliases = {
@@ -91,6 +97,11 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
       "template_object_type": {
           "display_name": "Object Under Assessment",
           "mandatory": True,
+      },
+      "archived": {
+          "display_name": "Archived",
+          "mandatory": False,
+          "ignore_on_update": True,
       },
       "template_custom_attributes": {
           "display_name": "Custom Attributes",
@@ -189,6 +200,13 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
         )
 
     return value
+
+  @simple_property
+  def archived(self):
+    """Fetch the archived boolean from Audit"""
+    if hasattr(self, 'context') and hasattr(self.context, 'related_object'):
+      return getattr(self.context.related_object, 'archived', False)
+    return False
 
 
 def create_audit_relationship(audit_stub, obj):

@@ -120,7 +120,14 @@ permissions = {
         "__GGRC_ALL__"
     ],
     "update": [
-        "Audit",
+        {
+            "type": "Audit",
+            "terms": {
+                "property_name": "archived",
+                "prevent_if": True
+            },
+            "condition": "has_not_changed"
+        },
         "Snapshot",
         "Workflow",
         "Categorization",
@@ -174,7 +181,14 @@ permissions = {
         },
     ],
     "delete": [
-        "Audit",
+        {
+            "type": "Audit",
+            "terms": {
+                "property_name": "archived",
+                "prevent_if": False
+            },
+            "condition": "has_changed"
+        },
         "Workflow",
         "Categorization",
         "Category",

@@ -42,11 +42,18 @@ permissions = {
         "__GGRC_ALL__"
     ],
     "update": [
+        {
+            "type": "Audit",
+            "terms": {
+                "property_name": "archived",
+                "prevent_if": True
+            },
+            "condition": "has_not_changed"
+        },
         "Assessment",
         "AssessmentTemplate",
         "Issue",
         "Snapshot",
-        "Audit",
         "AuditObject",
         "Meeting",
         "ObjectControl",
@@ -62,7 +69,14 @@ permissions = {
         "Relationship",
         "Document",
         "Meeting",
-        "Audit",
+        {
+            "type": "Audit",
+            "terms": {
+                "property_name": "archived",
+                "prevent_if": False
+            },
+            "condition": "has_changed"
+        },
         "AuditObject"
     ]
 }

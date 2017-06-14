@@ -5,6 +5,7 @@ from collections import namedtuple
 from flask import g
 from flask.ext.login import current_user
 from .user_permissions import UserPermissions
+from ggrc.app import db
 from ggrc.rbac.permissions import permissions_for as find_permissions
 from ggrc.rbac.permissions import is_allowed_create
 from ggrc.models import get_model
@@ -96,12 +97,6 @@ def is_condition(instance, value, property_name, **_):
   return value == property_value
 
 
-def in_condition(instance, value, property_name, **_):
-  value = resolve_permission_variable(value)
-  property_value = get_deep_attr(instance, property_name)
-  return property_value in value
-
-
 def relationship_condition(instance, action, property_name, **_):
   if getattr(instance, 'context') is not None:
     context_id = getattr(instance.context, 'id')
@@ -126,6 +121,37 @@ def forbid_condition(instance, blacklist, _current_action, **_):
   return instance.type not in blacklist.get(_current_action, ())
 
 
+def has_not_changed_condition(instance, property_name, prevent_if=None, **_):
+  """Check if instance attribute has not changed
+     Example:
+      "terms": {
+         "property_name": "archived",
+         "prevent_if": True
+       },
+       "condition": "has_not_changed"
+
+  """
+  if prevent_if and getattr(instance, property_name, False) == prevent_if:
+    return False
+  return not db.inspect(instance).get_history(
+      property_name, False).has_changes()
+
+
+def has_changed_condition(instance, property_name, prevent_if=None, **_):
+  """Check if instance attribute has changed
+     Example:
+      "terms": {
+         "property_name": "archived"
+       },
+       "condition": "has_changed"
+
+  """
+  if getattr(instance, property_name, False) == prevent_if:
+    return True
+  return db.inspect(instance).get_history(
+      property_name, False).has_changes()
+
+
 """
 All functions with a signature
 
@@ -136,9 +162,10 @@ All functions with a signature
 _CONDITIONS_MAP = {
     'contains': contains_condition,
     'is': is_condition,
-    'in': in_condition,
     'relationship': relationship_condition,
-    'forbid': forbid_condition
+    'forbid': forbid_condition,
+    'has_not_changed': has_not_changed_condition,
+    'has_changed': has_changed_condition
 }
 
 

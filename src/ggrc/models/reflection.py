@@ -41,6 +41,7 @@ ATTRIBUTE_ORDER = (
     "due_on",
     "start_date",
     "end_date",
+    "archived",
     "report_start_date",
     "report_end_date",
     "relative_start_date",
