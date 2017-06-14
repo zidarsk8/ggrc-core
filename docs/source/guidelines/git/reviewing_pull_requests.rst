@@ -69,6 +69,8 @@ them.
 The meaning of the labels and their intended usage is as follows (sorted
 alphabetically):
 
+- ``code freeze`` - the PR should not be merged due to the ongoing QA testing.
+  Used at the end of the sprint, when extensive QA testing is started,
 - ``critical`` - the PR has the highest possible priority and should thus be
   reviewed *immediately*. Cases when applying this label is justifiable are,
   among others, when a PR fixes a blocking issue or a severe issue that needs
@@ -220,9 +222,9 @@ A pull request can be merged only if **all** of the following is true:
    not allowed to merge your own work, including the pull requests that
    you have at least partially contributed to,
 -  The pull request is **not** labeled with any of the "blocking" labels
-   (``needs work``, ``next release``, ``on hold``, ``question``,
-   ``wrong branch``), meaning that not all open questions and issues have been
-   resolved yet,
+   (``code freeze``, ``needs work``, ``next release``, ``on hold``,
+   ``question``, ``wrong branch``), meaning that not all open questions and
+   issues have been resolved yet,
 -  The pull request does **not** have any Reviewers assigned that have not yet
    completed their review (seek information on why, if necessary), or if at
    least one of the reviewers has requested changes.
