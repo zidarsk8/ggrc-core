@@ -21,6 +21,10 @@
       setMaxDate: null,
       _date: null,  // the internal value of the text input field
       define: {
+        readonly: {
+          type: 'boolean',
+          value: false
+        },
         disabled: {
           type: 'boolean',
           value: false
