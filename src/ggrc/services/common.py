@@ -130,23 +130,11 @@ def set_ids_for_new_custom_attributes(parent_obj):
   """
   if not hasattr(parent_obj, "PER_OBJECT_CUSTOM_ATTRIBUTABLE"):
     return
-
-  modified_objects = get_modified_objects(db.session).new
-
-  object_attrs = {
-      "CustomAttributeValue": "attributable_id",
-      "CustomAttributeDefinition": "definition_id"
-  }
-
-  for obj in modified_objects:
-    if obj.type not in object_attrs:
-      continue
-
-    attr = object_attrs[obj.type]
-    setattr(obj, attr, parent_obj.id)
-
-    db.session.add(obj)
-  db.session.flush()
+  for obj in get_modified_objects(db.session).new:
+    if obj.type == "CustomAttributeValue":
+      obj.attributable = parent_obj
+    elif obj.type == "CustomAttributeDefinition":
+      obj.definition = parent_obj
 
 
 def memcache_mark_for_deletion(context, objects_to_mark):
