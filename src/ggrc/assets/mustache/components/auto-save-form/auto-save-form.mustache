@@ -21,11 +21,13 @@
           {placeholder}="placeholder"
           {options}="options"
           (value-changed)="fieldValueChanged(%event, %context)"
+          class="form-field__content"
         ></auto-save-form-field>
       {{else}}
         <auto-save-form-field-view
           {type}="type"
           {value}="value"
+          class="form-field__content"
         ></auto-save-form-field-view>
       {{/if}}
       {{#unless validation.valid}}
