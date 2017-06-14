@@ -8,8 +8,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import validates
 
 from ggrc import db
-from ggrc.models import reflection
-from ggrc.models.object_document import Documentable
+from ggrc.models.object_document import PublicDocumentable
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.audit_object import Auditable
 from ggrc.models.categorization import Categorizable
@@ -112,9 +111,10 @@ class AssertionCategorized(Categorizable):
 
 
 class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
-              CustomAttributable, Personable, ControlCategorized, Documentable,
-              AssertionCategorized, Hierarchical, Timeboxed, Ownable,
-              Auditable, TestPlanned, BusinessObject, Indexed, db.Model):
+              CustomAttributable, Personable, ControlCategorized,
+              PublicDocumentable, AssertionCategorized, Hierarchical,
+              Timeboxed, Ownable, Auditable, TestPlanned, BusinessObject,
+              Indexed, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
@@ -175,6 +175,7 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
       'version',
       'principal_assessor',
       'secondary_assessor',
+      # 'document_evidence',
   ]
 
   _fulltext_attrs = [
@@ -270,15 +271,8 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
           "display_name": "Significance",
           "description": "Allowed values are:\nkey\nnon-key\n---",
       },
-      # overrides values from Documentable mixin
+      # overrides values from PublicDocumentable mixin
       "document_url": None,
-      "document_evidence": {
-          "display_name": "Evidence",
-          "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
-          "description": ("New line separated list of evidence links and "
-                          "titles.\nExample:\n\nhttp://my.gdrive.link/file "
-                          "Title of the evidence link"),
-      },
   }
 
   @validates('kind', 'means', 'verify_frequency')

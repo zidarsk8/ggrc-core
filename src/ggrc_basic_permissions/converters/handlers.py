@@ -47,7 +47,8 @@ class ObjectRoleColumnHandler(UserColumnHandler):
   def remove_current_roles(self):
     UserRole.query.filter_by(
         role=self.role,
-        context_id=self.row_converter.obj.context_id).delete()
+        context_id=self.row_converter.obj.context_id)\
+        .delete(synchronize_session='fetch')
 
   def insert_object(self):
     if self.dry_run or not self.value:
