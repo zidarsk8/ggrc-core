@@ -1,0 +1,30 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+.tasks-counter {
+  display: inline-flex;
+  justify-content: center;
+  text-align: center;
+  align-items: center;
+  font-size: 12px;
+  background: #666;
+  color: $white;
+  height: 16px;
+  border-radius: 8px;
+  line-height: 16px;
+  min-width: 16px;
+  box-sizing: border-box;
+  padding: 0 5px;
+  // Should be removed as soon as menu component will be created
+  margin: 0 3px;
+
+  &__overdue-state {
+    background: #d50f25;
+    color: $white;
+  }
+
+  &__empty-state {
+    display: none;
+  }
+}

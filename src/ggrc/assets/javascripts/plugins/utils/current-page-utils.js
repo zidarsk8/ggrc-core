@@ -149,7 +149,7 @@
           var param = {};
 
           if (SnapshotUtils.isSnapshotRelated(type, widgetType)) {
-            param = QueryAPI.buildParam('Snapshot', {}, expression , null,
+            param = QueryAPI.buildParam('Snapshot', {}, expression, null,
               GGRC.query_parser.parse('child_type = ' + widgetType));
           } else if (typeof widgetType === 'string') {
             param = QueryAPI.buildParam(widgetType, {}, expression);
