@@ -6,7 +6,6 @@
   {{titleText}}
   {{#is_allowed 'update' instance context='for'}}
       {{^if instance.archived}}
-    <click-filter>
       <i class="fa fa-plus-circle"
          rel="tooltip"
          data-type="{{mappingType}}"
@@ -19,7 +18,6 @@
          data-original-title="Map {{firstnonempty mappingType 'Object'}} to this {{firstnonempty instance.class.title_singular 'Object'}}"
  >
       </i>
-    </click-filter>
       {{/if}}
   {{/is_allowed}}
 </div>
