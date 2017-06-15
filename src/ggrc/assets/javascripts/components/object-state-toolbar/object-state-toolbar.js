@@ -24,27 +24,37 @@
     template: tpl,
     viewModel: {
       define: {
+        updateState: {
+          get: function () {
+            return this.attr('hasVerifiers') ? 'Ready for Review' : 'Completed';
+          }
+        },
         isCurrentUserVerifier: {
-          type: 'boolean',
           get: function () {
             return checkIsCurrentUserVerifier(this.attr('verifiers'));
           }
         },
         hasVerifiers: {
-          type: 'boolean',
           get: function () {
             return this.attr('verifiers').length;
+          }
+        },
+        hasErrors: {
+          get: function () {
+            return this.attr('instance.preconditions_failed') ||
+              this.attr('instance.hasValidationErrors');
+          }
+        },
+        isDisabled: {
+          get: function () {
+            return !!this.attr('instance._disabled') ||
+              this.attr('hasErrors') ||
+              this.attr('instance.isPending');
           }
         }
       },
       verifiers: [],
       instance: {},
-      isDisabled: function () {
-        return !!this.attr('instance._disabled');
-      },
-      errorMsg: function () {
-        return 'Assessment has validation errors';
-      },
       isInProgressOrNotStarted: function () {
         return this.attr('instance.status') === 'In Progress' ||
           this.attr('instance.status') === 'Not Started';
@@ -55,11 +65,8 @@
       isInReview: function () {
         return this.attr('instance.status') === 'Ready for Review';
       },
-      hasErrors: function () {
-        return this.attr('instance.preconditions_failed') ||
-          this.attr('instance.hasValidationErrors');
-      },
       changeState: function (newState, undo) {
+        newState = newState || this.attr('updateState');
         this.dispatch({
           type: 'onStateChange',
           state: newState,
