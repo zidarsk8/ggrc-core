@@ -5,7 +5,7 @@
 (function (can, GGRC, $) {
   'use strict';
 
-  var AUTO_SAVE_DELAY = 5000;
+  var AUTO_SAVE_DELAY = 1000;
 
   GGRC.Components('autoSaveForm', {
     tag: 'auto-save-form',
@@ -49,7 +49,7 @@
           }
         }
       },
-      formSavedDeferred: can.Deferred(),
+      formSavedDeferred: can.Deferred().resolve(),
       editMode: false,
       saving: false,
       allSaved: true,

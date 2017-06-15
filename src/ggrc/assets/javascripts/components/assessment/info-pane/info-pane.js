@@ -61,6 +61,7 @@
           },
           set: function () {
             this.attr('instance.status', 'In Progress');
+            this.initializeFormFields();
             this.attr('instance').save();
           }
         },
@@ -175,6 +176,7 @@
         var undo = event.undo;
         var state = event.state;
         var instance = this.attr('instance');
+        var self = this;
 
         if (!instance.attr('_undo')) {
           instance.attr('_undo', []);
@@ -186,14 +188,17 @@
           instance.attr('_undo').unshift(state);
         }
 
-        instance.refresh()
+        this.attr('formState.formSavedDeferred')
           .then(function () {
-            instance.attr('status', state);
-            return instance.save();
-          })
-          .then(function () {
-            this.initializeFormFields();
-          }.bind(this));
+            instance.refresh()
+              .then(function () {
+                instance.attr('status', state);
+                return instance.save();
+              })
+              .then(function () {
+                self.initializeFormFields();
+              });
+          });
       },
       saveFormFields: function (formFields) {
         var caValues = can.makeArray(
