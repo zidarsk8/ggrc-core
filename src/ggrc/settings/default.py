@@ -127,3 +127,9 @@ AUDIT_DASHBOARD_INTEGRATION_URL = os.environ.get(
     'AUDIT_DASHBOARD_INTEGRATION_URL',
     '',
 )
+
+# App2app QueryAPI endpoints
+ALLOWED_QUERYAPI_APP_IDS = os.environ.get(
+    "ALLOWED_QUERYAPI_APP_IDS",
+    "",
+).split()
