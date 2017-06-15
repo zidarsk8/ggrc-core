@@ -44,36 +44,30 @@
         value: null,
         options: []
       },
-      caIds: {},
       onCommentCreated: function (e) {
         var comment = e.comment;
         var instance = this.attr('instance');
         var context = instance.attr('context');
         var commentUpdate = {
           context: context,
-          assignee_type: GGRC.Utils.getAssigneeType(this.attr('instance'))
+          assignee_type: GGRC.Utils.getAssigneeType(instance)
         };
         var relation = new CMS.Models.Relationship({
           context: context,
           destination: instance
         });
-
-        var addComment = function () {
-          return comment.attr(commentUpdate)
+        var addComment = function (data) {
+          return comment.attr(data)
             .save()
             .done(function (comment) {
               relation.attr({source: comment.serialize()})
                 .save()
                 .then(function () {
-                  this.attr('instance').dispatch('refreshInstance');
-                }.bind(this));
-            }.bind(this));
-        }.bind(this);
-
-        commentUpdate.custom_attribute_revision_upd = {
-          custom_attribute_value: {id: this.attr('caIds.valueId')},
-          custom_attribute_definition: {id: this.attr('caIds.defId')}
+                  instance.dispatch('refreshInstance');
+                });
+            });
         };
+        var self = this;
 
         this.attr('content.contextScope.errorsMap.comment', false);
         this.attr('content.contextScope.validation.valid',
@@ -82,7 +76,13 @@
         this.attr('state.save', false);
 
         this.attr('formSavedDeferred').then(function () {
-          addComment();
+          commentUpdate.custom_attribute_revision_upd = {
+            custom_attribute_value:
+            {id: self.attr('content.contextScope.valueId')()},
+            custom_attribute_definition:
+            {id: self.attr('content.contextScope.id')}
+          };
+          addComment(commentUpdate);
         });
       }
     }

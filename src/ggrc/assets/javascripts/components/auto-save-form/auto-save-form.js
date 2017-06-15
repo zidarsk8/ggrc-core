@@ -144,6 +144,7 @@
         this.fieldsToSave.attr(e.fieldId, e.value);
         this.attr('fieldsToSaveAvailable', true);
         this.performValidation(field, e.value);
+        this.attr('formSavedDeferred', can.Deferred());
         this.triggerAutoSave();
       },
       save: function () {

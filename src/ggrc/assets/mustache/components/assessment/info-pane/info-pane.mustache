@@ -122,13 +122,12 @@
                                     (validation-changed)="showRequiredInfoModal(%event)"
                     ></auto-save-form>
                     <!-- Modal Window to fix validation issues of CA fields -->
-                    <simple-modal {(state)}="modal.state" {modal-title}="modal.modalTitle" {instance}="instance"
-                                  {formState}="formState">
+                    <simple-modal {(state)}="modal.state" {modal-title}="modal.modalTitle" {instance}="instance">
                         <ca-object-modal-content {instance}="instance"
                                                  {(content)}="modal.content"
                                                  {(state)}="state"
-                                                 {ca-ids}="modal.caIds"
                                                  {form-saved-deferred}="formState.formSavedDeferred"
+                                                 {all-saved}="formState.allSaved"
                         ></ca-object-modal-content>
                     </simple-modal>
                     <!-- End of Modal Window -->
