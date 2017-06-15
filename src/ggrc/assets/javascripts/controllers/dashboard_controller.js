@@ -93,11 +93,10 @@
     },
 
     init_page_header: function () {
-      var that = this;
-      if (this.options.header_view) {
-        can.view(this.options.header_view, this.options, function (frag) {
-          that.element.find('#page-header').html(frag);
-        });
+      var $pageHeader = this.element.find('#page-header');
+
+      if (this.options.header_view && $pageHeader.length) {
+        $pageHeader.html(can.view(this.options.header_view));
       }
     },
 
