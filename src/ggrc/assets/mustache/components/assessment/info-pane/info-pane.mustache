@@ -20,11 +20,13 @@
                     <div class="info-pane__section-title">
                         <action-toolbar class="action-toolbar">
                             <div class="action-toolbar__content-item">Controls</div>
+                          {{#unless instance.archived}}
                             <div class="action-toolbar__controls">
                                 <action-toolbar-control>
                                   <add-mapping-button {parent-instance}="instance"></add-mapping-button>
                                 </action-toolbar-control>
                             </div>
+                          {{/unless}}
                         </action-toolbar>
                     </div>
                     <assessment-mapped-controls
@@ -70,7 +72,8 @@
                                     </action-toolbar-control>
                                 </editable-document-object-list-item>
                             </object-list>
-                          {{#is_allowed 'update' instance context='for'}}
+                          {{#unless instance.archived}}
+                            {{#is_allowed 'update' instance context='for'}}
                             {{#toggle show_new_object_form}}
                                 <ggrc-quick-add
                                         {parent_instance}="instance"
@@ -102,6 +105,7 @@
                                 <button class="btn btn-small btn-gray" {{toggle_button}}>Add</button>
                             {{/toggle}}
                           {{/is_allowed}}
+                          {{/unless}}
                         </div>
                     </div>
                     <auto-save-form {fields}="formFields"
@@ -139,11 +143,13 @@
                     <div class="info-pane__section-title">
                        <action-toolbar class="action-toolbar">
                           <div class="action-toolbar__content-item">Related Information</div>
+                         {{#unless instance.archived}}
                           <div class="action-toolbar__controls">
                             <action-toolbar-control>
                                 <add-mapping-button {parent-instance}="instance"></add-mapping-button>
                             </action-toolbar-control>
                           </div>
+                         {{/unless}}
                         </action-toolbar>
                     </div>
                     <assessment-mapped-related-information
