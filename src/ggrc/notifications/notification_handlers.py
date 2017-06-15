@@ -178,14 +178,15 @@ def _add_state_change_notif(obj, state_change, remove_existing=False):
     _add_notification(obj, notif_type)
 
 
-def handle_assignable_modified(obj):
+def handle_assignable_modified(obj):  # noqa: ignore=C901
   """A handler for the Assignable object modified event.
 
   Args:
     obj (models.mixins.Assignable): an object that has been modified
   """
-  attrs = inspect(obj).attrs
+  state_change_occurred = False
 
+  attrs = inspect(obj).attrs
   status_history = attrs["status"].history
 
   old_state = status_history.deleted[0] if status_history.deleted else None
@@ -219,6 +220,7 @@ def handle_assignable_modified(obj):
   state_change = transitions_map.get((old_state, new_state))
   if state_change:
     _add_state_change_notif(obj, state_change, remove_existing=True)
+    state_change_occurred = True
 
   # changes of some of the attributes are not considered as a modification of
   # the obj itself, e.g. metadata not editable by the end user, or changes
@@ -252,14 +254,19 @@ def handle_assignable_modified(obj):
   if not is_changed:
     return  # no changes detected, nothing left to do
 
-  _add_assessment_updated_notif(obj)
-
   # When modified, a done Assessment gets automatically reopened, but that is
   # not directly observable via status change history, thus an extra check.
   if obj.status in Statusable.DONE_STATES:
     _add_state_change_notif(obj, Transitions.TO_REOPENED, remove_existing=True)
+    state_change_occurred = True
   elif obj.status == Statusable.START_STATE:
     _add_state_change_notif(obj, Transitions.TO_STARTED, remove_existing=True)
+    state_change_occurred = True
+
+  if not state_change_occurred:
+    # explicit check needed, because state change notifications might not yet
+    # be visible within the current transaction
+    _add_assessment_updated_notif(obj)
 
 
 def _ca_values_changed(obj):

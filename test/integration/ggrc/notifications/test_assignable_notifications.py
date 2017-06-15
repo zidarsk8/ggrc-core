@@ -893,6 +893,28 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
       self.assertRegexpMatches(content, ur"Assessment\s+has\s+been\s+started")
 
   @patch("ggrc.notifications.common.send_email")
+  def test_editing_not_started_assessment(self, send_email):
+    """Test that Assessment started notification masks updated notification.
+    """
+    with freeze_time("2015-04-01"):
+      self.import_file("assessment_with_templates.csv")
+      asmts = {asmt.slug: asmt for asmt in Assessment.query}
+      self.client.get("/_notifications/send_daily_digest")
+      self.assertEqual(self._get_notifications().count(), 0)
+
+      asmt1 = Assessment.query.get(asmts["A 5"].id)
+
+      self.api_helper.modify_object(
+          asmt1, {"description": "new asmt5 description"})
+
+      self.client.get("/_notifications/send_daily_digest")
+      recipient, _, content = send_email.call_args[0]
+
+      self.assertEqual(recipient, u"user@example.com")
+      self.assertRegexpMatches(content, ur"Assessment\s+has\s+been\s+started")
+      self.assertNotIn(u"Assessments have been updated", content)
+
+  @patch("ggrc.notifications.common.send_email")
   def test_reverting_assessment_status_changes(self, _):
     """Test that undoing a stautus change might NOT trigger a notification.
 
