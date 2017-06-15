@@ -160,13 +160,13 @@
             <div class="assessment-comments info-pane__sidebar">
                 <div class="info-pane__section-title">Responses/Comments</div>
                 {{#unless instance.archived}}
-                  {{^if_in instance.status 'Completed,Final'}}
+                  {{#unless isInstanceCompleted}}
                     {{#is_allowed 'update' instance context='for'}}
                       <comment-add-form class="comment-add-form"
                                       {instance}="instance"
                       ></comment-add-form>
                     {{/is_allowed}}
-                  {{/if_in}}
+                  {{/unless}}
                 {{/unless}}
                 <assessment-mapped-comments {mapped-items}="comments"></assessment-mapped-comments>
             </div>

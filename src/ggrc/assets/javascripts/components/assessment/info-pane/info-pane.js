@@ -16,6 +16,12 @@
     template: tpl,
     viewModel: {
       define: {
+        isInstanceCompleted: {
+          get: function () {
+            return this.attr('instance.status') === 'Completed' ||
+              this.attr('instance.status') === 'Ready for Review';
+          }
+        },
         isSaving: {
           type: 'boolean',
           value: false
@@ -60,9 +66,7 @@
               !this.attr('instance.archived');
           },
           set: function () {
-            this.attr('instance.status', 'In Progress');
-            this.initializeFormFields();
-            this.attr('instance').save();
+            this.onStateChange({state: 'In Progress', undo: true});
           }
         },
         instance: {}
@@ -187,17 +191,18 @@
         } else {
           instance.attr('_undo').unshift(state);
         }
+        instance.attr('isPending', true);
 
         this.attr('formState.formSavedDeferred')
           .then(function () {
-            instance.refresh()
+            instance.refresh().then(function () {
+              instance.attr('status', state);
+              return instance.save()
               .then(function () {
-                instance.attr('status', state);
-                return instance.save();
-              })
-              .then(function () {
+                instance.attr('isPending', false);
                 self.initializeFormFields();
               });
+            });
           });
       },
       saveFormFields: function (formFields) {
