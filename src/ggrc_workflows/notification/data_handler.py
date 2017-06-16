@@ -201,10 +201,12 @@ def get_all_cycle_tasks_completed_data(notification, cycle):
   workflow_owners = get_workflow_owners_dict(cycle.context_id)
   force = cycle.workflow.notify_on_change
   result = {}
+
   for workflow_owner in workflow_owners.itervalues():
     wf_data = {
         workflow_owner['email']: {
             "user": workflow_owner,
+            "today": date.today(),
             "force_notifications": {
                 notification.id: force
             },
@@ -544,9 +546,11 @@ def get_cycle_dict(cycle, manual=False):
   return {
       "manually": manual,
       "custom_message": cycle.workflow.notify_custom_message,
+      "cycle_slug": cycle.slug,
       "cycle_title": cycle.title,
       "workflow_owners": workflow_owners,
       "cycle_url": get_cycle_url(cycle),
+      "cycle_inactive_url": get_cycle_url(cycle, active=False),
   }
 
 
@@ -623,9 +627,22 @@ def cycle_task_workflow_cycle_url(cycle_task, filter_exp=u""):
   return urljoin(get_url_root(), url)
 
 
-def get_cycle_url(cycle):
-  url = "workflows/{workflow_id}#current_widget/cycle/{cycle_id}".format(
+def get_cycle_url(cycle, active=True):
+  """Build the URL to the given workflow cycle.
+
+  Args:
+    cycle: The cycle instance to build the URL for.
+    active:
+        If True (default), the URL is generated for when a cycle is active,
+        otherwise the resulting URL is generated for when a cycle is inactive.
+  Returns:
+    Full workflow cycle URL (as a string).
+  """
+  widget_name = "current_widget" if active else "history_widget"
+
+  url = "workflows/{workflow_id}#{widget_name}/cycle/{cycle_id}".format(
       workflow_id=cycle.workflow.id,
       cycle_id=cycle.id,
+      widget_name=widget_name
   )
   return urljoin(get_url_root(), url)

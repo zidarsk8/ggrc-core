@@ -25,7 +25,7 @@ from ggrc import settings
 from ggrc.models import Person
 from ggrc.models import Notification
 from ggrc.rbac import permissions
-from ggrc.utils import merge_dict
+from ggrc.utils import DATE_FORMAT_US, merge_dict
 
 from ggrc_workflows.notification.data_handler import (
     cycle_tasks_cache, deleted_task_rels_cache, get_cycle_task_data
@@ -412,5 +412,7 @@ def modify_data(data):
     for cycle in data["cycle_data"].values():
       if "my_tasks" in cycle:
         data["cycle_started_tasks"].update(cycle["my_tasks"])
+
+  data["DATE_FORMAT"] = DATE_FORMAT_US
 
   return data
