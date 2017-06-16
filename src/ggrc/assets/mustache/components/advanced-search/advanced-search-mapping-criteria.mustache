@@ -1,0 +1,46 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="mapping-criteria">
+  <h6>{{title}}</h6>
+  <div class="mapping-criteria__content  flex-box flex-box-multi">
+    <div class="mapping-criteria__type">
+      <select {($value)}="criteria.objectName">
+      {{#mappingTypes}}
+        <option value="{{model_singular}}"
+                label="{{title_singular}}">
+        </option>
+      {{/mappingTypes}}
+      </select>
+    </div>
+    <div class="mapping-criteria__attribute">
+      <advanced-search-filter-attribute
+              {(attribute)}="criteria.filter.value"
+              {available-attributes}="availableAttributes"
+              {show-actions}="false">
+      </advanced-search-filter-attribute>
+    </div>
+    <div class="mapping-criteria__action">
+      <button class="mapping-criteria__remove" ($click)="remove()"><i class="fa fa-trash"></i></button>
+      {{^if criteria.mappedTo}}
+      <a href="javascript:void(0)" class="advanced-filter" ($click)="addRelevant()">+ Add</a>
+      {{/if}}
+    </div>
+  </div>
+  {{#if criteria.mappedTo}}
+  <div class="mapping-criteria__relationship"></div>
+  <div class="mapping-criteria__relevant">
+    <advanced-search-mapping-criteria
+            {(criteria)}="criteria.mappedTo.value"
+            (remove)="removeRelevant(../)"
+            {available-attributes}="availableAttributes"
+            {model-name}="criteria.objectName">
+    </advanced-search-mapping-criteria>
+  </div>
+  {{/if}}
+</div>
+
+
+

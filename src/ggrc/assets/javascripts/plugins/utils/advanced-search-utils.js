@@ -31,6 +31,12 @@
           type: 'state',
           value: value || { }
         };
+      },
+      mappingCriteria: function (value) {
+        return {
+          type: 'mappingCriteria',
+          value: value || { }
+        };
       }
     };
 
@@ -50,7 +56,8 @@
       attribute: attributeToFilter,
       operator: operatorToFilter,
       state: stateToFilter,
-      group: groupToFilter
+      group: groupToFilter,
+      mappingCriteria: mappingCriteriaToFilter
     };
 
     function attributeToFilter(attribute) {
@@ -78,9 +85,43 @@
       return result;
     }
 
+    function mappingCriteriaToFilter(criteria, request) {
+      var criteriaId = addMappingCriteria(criteria, request);
+      return previousToFilter(criteriaId);
+    }
+    function previousToFilter(criteriaId) {
+      return '#__previous__,' + criteriaId + '#';
+    }
+    function addMappingCriteria(mapping, request) {
+      var filterObject = GGRC.query_parser
+        .parse(attributeToFilter(mapping.filter.value));
+      var criteriaId;
+      if (mapping.mappedTo) {
+        criteriaId = addMappingCriteria(mapping.mappedTo.value, request);
+        filterObject = GGRC.query_parser.join_queries(
+          filterObject,
+          GGRC.query_parser.parse(previousToFilter(criteriaId))
+        );
+      }
+      request.push({
+        object_name: mapping.objectName,
+        type: 'ids',
+        filters: filterObject
+      });
+      return request.length - 1;
+    }
+    function parseMappings(data, request) {
+      var result = '';
+      _.each(data, function (item) {
+        result += builders[item.type](item.value, request);
+      });
+      return GGRC.query_parser.parse(result);
+    }
+
     return {
       buildFilterString: buildFilterString,
-      create: create
+      create: create,
+      parseMappings: parseMappings
     };
   })();
 })(window.GGRC, window.can, window._);

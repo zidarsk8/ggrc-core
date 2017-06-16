@@ -76,13 +76,25 @@
       {{/if}}
     </div>
 
-    <simple-modal {state}="advancedSearch" modal-title="'{{modelName}} Advanced Filter'" extra-css-class="advanced-search">
-      <div class="simple-modal__body">
-        <advanced-search-filter-container
-          {(items)}="advancedSearch.filterItems"
-          {available-attributes}="columns.available"
-          {model-name}="modelName">
-        </advanced-search-filter-container>
+    <simple-modal {state}="advancedSearch" modal-title="'{{model.title_singular}} Advanced Filter'" extra-css-class="advanced-search">
+      <div class="advanced-search__content">
+        <div class="simple-modal__body">
+          <advanced-search-filter-container
+            {(items)}="advancedSearch.filterItems"
+            {available-attributes}="columns.available"
+            {model-name}="modelName">
+          </advanced-search-filter-container>
+        </div>
+        <div class="advanced-search__mapping-header">
+          <h4>Filter by Mapping</h4>
+        </div>
+        <div class="simple-modal__body">
+          <advanced-search-mapping-container
+            {(items)}="advancedSearch.mappingItems"
+            {available-attributes}="columns.available"
+            {model-name}="modelName">
+          </advanced-search-mapping-container>
+        </div>
       </div>
       <div class="simple-modal__footer">
         <div class="advanced-search__controls">

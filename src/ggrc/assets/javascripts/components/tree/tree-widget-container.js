@@ -450,18 +450,25 @@
       open: false,
       filterItems: can.List(),
       appliedFilterItems: can.List(),
-      filters: []
+      filters: [],
+      mappingItems: can.List(),
+      appliedMappingItems: can.List()
     },
     openAdvancedFilter: function () {
       this.attr('advancedSearch.filterItems',
         this.attr('advancedSearch.appliedFilterItems').slice());
+
+      this.attr('advancedSearch.mappingItems',
+        this.attr('advancedSearch.appliedMappingItems').slice());
 
       this.attr('advancedSearch.open', true);
     },
     applyAdvancedFilters: function () {
       var filterString;
       var filters = this.attr('advancedSearch.filterItems');
+      var mappings = this.attr('advancedSearch.mappingItems');
       this.attr('advancedSearch.appliedFilterItems', filters);
+      this.attr('advancedSearch.appliedMappingItems', mappings);
 
       filterString = GGRC.Utils.AdvancedSearch.buildFilterString(filters);
       this.attr('advancedSearch.filters', [{

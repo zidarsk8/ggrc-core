@@ -23,6 +23,20 @@
   }
 }
 
+@mixin remove-button {
+  border: 0;
+  background-color: transparent;
+  i {
+    color: $gray;
+  }
+  &:hover i {
+    color: $black;
+  }
+  &:focus {
+    outline: none;
+  }
+}
+
 .advanced-search {
   $simple-modal-header-height: 48px;
   $simple-modal-footer-height: 64px;
@@ -31,9 +45,6 @@
     max-height: 85%;
     .simple-modal__body {
       padding-right: 48px;
-      overflow: auto;
-      height: calc(100% - #{$simple-modal-header-height} - #{$simple-modal-footer-height});
-      min-height: 200px;
     }
     .simple-modal__header  {
       height: $simple-modal-header-height;
@@ -48,6 +59,16 @@
       border: none;
       padding: 16px 24px 24px 16px;
     }
+  }
+  &__content {
+    overflow: auto;
+    height: calc(100% - #{$simple-modal-header-height} - #{$simple-modal-footer-height});
+    min-height: 200px;
+  }
+  &__mapping-header {
+    margin-top: 14px;
+    padding: 24px 16px 14px 16px;
+    border-top: 1px solid $border-color;
   }
   &__controls {
     float: right;
@@ -73,17 +94,7 @@
     }
   }
   &__remove {
-    border: 0;
-    background-color: transparent;
-    i {
-      color: $gray;
-    }
-    &:hover i {
-      color: $black;
-    }
-    &:focus {
-      outline: none;
-    }
+    @include remove-button;
   }
 }
 
@@ -139,6 +150,7 @@
 }
 
 .filter-group {
+  @include advanced-search-controls;
   &__header {
     position: relative;
     .close-btn {
@@ -156,5 +168,42 @@
   &__attribute {
     @include element-attribute;
     margin-right: 24px;
+  }
+}
+
+.mapping-container {
+  &__operator {
+    @include element-operator;
+    margin-top: 17px;
+  }
+  &__criteria {
+    @include element-attribute;
+  }
+}
+
+.mapping-criteria {
+  &__content {
+    @include advanced-search-controls;
+  }
+  &__type {
+    margin-right: 16px;
+    select {
+      width: 150px;
+    }
+  }
+  &__remove {
+    @include remove-button;
+  }
+  &__relevant {
+    margin-left: 35px;
+    margin-top: 16px;
+  }
+  &__relationship {
+    width: 18px;
+    height: 45px;
+    float: left;
+    margin-left: 15px;
+    border-left: 2px solid $border-color;
+    border-bottom: 2px solid $border-color;
   }
 }

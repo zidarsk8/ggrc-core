@@ -1,0 +1,42 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="mapping-container">
+  <div class="mapping-container__content">
+    {{#each items}}
+      {{#switch type}}
+        {{#case "operator"}}
+        <div class="mapping-container__operator">
+          <advanced-search-filter-operator
+            {(operator)}="value">
+          </advanced-search-filter-operator>
+        </div>
+        {{/case}}
+        {{#case "mappingCriteria"}}
+        <div class="mapping-container__criteria">
+          <advanced-search-mapping-criteria
+            {(criteria)}="value"
+            (remove)="removeFilterCriterion(../)"
+            {available-attributes}="availableAttributes"
+            {model-name}="modelName"
+            {root}="true">
+          </advanced-search-mapping-criteria>
+        </div>
+        {{/case}}
+      {{/switch}}
+    {{/each}}
+  </div>
+  <div class="mapping-container__footer">
+    <div>
+      <button class="btn btn-small btn-white" ($click)="addMappingCriteria()">Add Mapping Filter</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+

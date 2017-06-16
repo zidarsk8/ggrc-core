@@ -27,6 +27,7 @@
     },
     attribute: {},
     extendable: false,
+    showActions: true,
     remove: function () {
       this.dispatch('remove');
     },
