@@ -907,6 +907,8 @@ class Resource(ModelView):
       # Note: Some data is created in listeners for model_put_after_commit
       # (like updates to snapshots), so we need to commit the changes
       db.session.commit()
+      if self.has_cache():
+        self.invalidate_cache_to(obj)
     with benchmark("Serialize collection"):
       object_for_json = self.object_for_json(obj)
     with benchmark("Make response"):
@@ -1097,45 +1099,24 @@ class Resource(ModelView):
       return resources
     # Skip right to memcache
     memcache_client = self.request.cache_manager.cache_object.memcache_client
-    key_matches = {}
-    keys = []
     for match in matches:
       key = get_cache_key(None, id=match[0], type=match[1])
-      key_matches[key] = match
-      keys.append(key)
-    while len(keys) > 0:
-      slice_keys = keys[:32]
-      keys = keys[32:]
-      result = memcache_client.get_multi(slice_keys)
-      for key in result:
-        if 'selfLink' in result[key]:
-          resources[key_matches[key]] = result[key]
+      val = memcache_client.get(key) or {}
+      if "selfLink" in val:
+        resources[match] = val
     return resources
 
   def add_resources_to_cache(self, match_obj_pairs):
     """Add resources to cache if they are not blocked by DeleteOp entries"""
     # Skip right to memcache
     memcache_client = self.request.cache_manager.cache_object.memcache_client
-    key_objs = {}
-    key_blockers = {}
-    keys = []
     for match, obj in match_obj_pairs.items():
-      key = get_cache_key(None, id=match[0], type=match[1])
-      delete_op_key = "DeleteOp:{}".format(key)
-      keys.append(key)
-      key_objs[key] = obj
-      key_blockers[key] = delete_op_key
-    while len(keys) > 0:
-      slice_keys = keys[:32]
-      keys = keys[32:]
-      blocker_keys = [key_blockers[slice_key] for slice_key in slice_keys]
-      result = memcache_client.get_multi(blocker_keys)
-      # Reduce `slice_keys` to only unblocked keys
-      slice_keys = [
-          slice_key for slice_key in slice_keys
-          if key_blockers[slice_key] not in result]
-      memcache_client.add_multi(
-          {key: key_objs[key] for key in slice_keys})
+      memcache_client.add(get_cache_key(None, id=match[0], type=match[1]), obj)
+
+  def invalidate_cache_to(self, obj):
+    """Invalidate api cache for sent object."""
+    memcache_client = self.request.cache_manager.cache_object.memcache_client
+    memcache_client.delete(get_cache_key(None, id=obj.id, type=obj.type))
 
   def json_create(self, obj, src):
     ggrc.builder.json.create(obj, src)
