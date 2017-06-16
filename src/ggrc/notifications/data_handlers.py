@@ -233,6 +233,7 @@ def get_assignable_data(notif):
   # notification types
   data_handlers = {
       "_open": assignable_open_data,
+      "_started": assignable_open_data,  # reuse logic, same data needed
       "_updated": assignable_updated_data,
       "_completed": assignable_updated_data,
       "_ready_for_review": assignable_updated_data,
