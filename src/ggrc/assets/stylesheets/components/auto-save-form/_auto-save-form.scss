@@ -56,6 +56,10 @@ auto-save-form {
       width: 100%;
     }
 
+    .form-field__content {
+      max-width: 100%;
+    }
+
     .form-field__validation-hint-placeholder {
       width: 120px;
       box-sizing: border-box;

@@ -162,8 +162,9 @@ dashboard-js-files:
   - components/assessment/urls-list.js
   - components/assessment/custom-attributes.js
   - components/assessment/inline.js
-  - components/assessment/add_comment.js
+  - components/comment/comment-add-form.js
   - components/comment/comment-input.js
+  - components/comment/comment-add-button.js
   - components/assessment/controls-toolbar/controls-toolbar.js
   - components/object-list-item/business-object-list-item.js
   - components/object-list-item/person-list-item.js
@@ -261,6 +262,7 @@ dashboard-js-files:
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
   - components/add-issue-button/add-issue-button.js
+  - components/add-mapping-button/add-mapping-button.js
   - components/effective-dates/effective-dates.js
   - components/snapshotter/revisions-comparer.js
   - components/snapshotter/scope-update.js
@@ -338,8 +340,7 @@ dashboard-js-template-files:
   - components/assessment/inline/date.mustache
   - components/assessment/inline/person.mustache
   - components/assessment/inline/checkbox.mustache
-  - components/assessment/add_comment.mustache
-  - components/assessment/comment/controls.mustache
+  - components/comment/comment-add-form.mustache
   - components/comment/comment-input.mustache
   - components/object-list/object-list.mustache
   - components/object-popover/object-popover.mustache
@@ -358,6 +359,7 @@ dashboard-js-template-files:
   - components/view-object-buttons/view-object-buttons.mustache
   - components/add-object-button/add-object-button.mustache
   - components/add-issue-button/add-issue-button.mustache
+  - components/add-mapping-button/add-mapping-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
   - components/questions-link/questions-link.mustache
   - base_objects/empty.mustache

@@ -16,6 +16,12 @@
     template: tpl,
     viewModel: {
       define: {
+        isInstanceCompleted: {
+          get: function () {
+            return this.attr('instance.status') === 'Completed' ||
+              this.attr('instance.status') === 'Ready for Review';
+          }
+        },
         isSaving: {
           type: 'boolean',
           value: false
@@ -60,8 +66,7 @@
               !this.attr('instance.archived');
           },
           set: function () {
-            this.attr('instance.status', 'In Progress');
-            this.attr('instance').save();
+            this.onStateChange({state: 'In Progress', undo: true});
           }
         },
         instance: {}
@@ -70,6 +75,7 @@
         open: false
       },
       formState: {},
+      noItemsText: '',
       triggerFormSaveCbs: $.Callbacks(),
       getQuery: function (type, sortObj, additionalFilter) {
         var relevantFilters = [{
@@ -174,6 +180,7 @@
         var undo = event.undo;
         var state = event.state;
         var instance = this.attr('instance');
+        var self = this;
 
         if (!instance.attr('_undo')) {
           instance.attr('_undo', []);
@@ -184,15 +191,19 @@
         } else {
           instance.attr('_undo').unshift(state);
         }
+        instance.attr('isPending', true);
 
-        instance.refresh()
+        this.attr('formState.formSavedDeferred')
           .then(function () {
-            instance.attr('status', state);
-            return instance.save();
-          })
-          .then(function () {
-            this.initializeFormFields();
-          }.bind(this));
+            instance.refresh().then(function () {
+              instance.attr('status', state);
+              return instance.save()
+              .then(function () {
+                instance.attr('isPending', false);
+                self.initializeFormFields();
+              });
+            });
+          });
       },
       saveFormFields: function (formFields) {
         var caValues = can.makeArray(
@@ -218,7 +229,8 @@
 
         return this.attr('instance').save();
       },
-      showRequiredInfoModal: function (scope) {
+      showRequiredInfoModal: function (e, field) {
+        var scope = field || e.field;
         var errors = scope.attr('errorsMap');
         var errorsList = can.Map.keys(errors)
           .map(function (error) {
@@ -228,6 +240,8 @@
             return !!errorCode;
           });
         var data = {
+          options: scope.attr('options'),
+          contextScope: scope,
           fields: errorsList,
           value: scope.attr('value'),
           title: scope.attr('title'),
@@ -241,10 +255,6 @@
         can.batch.start();
         this.attr('modal', {
           content: data,
-          caIds: {
-            defId: scope.attr('id'),
-            valueId: scope.attr('valueId')()
-          },
           modalTitle: title,
           state: {}
         });

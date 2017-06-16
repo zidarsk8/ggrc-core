@@ -31,6 +31,7 @@
         }
       },
       fieldId: null,
+      readonly: true,
       valueChanged: function (newValue) {
         this.dispatch({
           type: 'valueChanged',

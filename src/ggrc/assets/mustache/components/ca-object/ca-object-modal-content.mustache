@@ -3,39 +3,59 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <form class="simple-modal__body">
-    <div class="attachment-modal__field">
-        <h6 class="attachment-modal__field-title">{{content.title}}</h6>
-        <div class="attachment-modal__field-value">
-          {{#if isPerson}}
-              <person-info {person-obj}="content.value"></person-info>
-          {{else}}
-              <read-more {text}="content.value"></read-more>
-          {{/if}}
+    <div class="simple-modal__section">
+        <div class="field__title form-field__title">
+          <label class="field__title-text">{{content.title}}</label>
         </div>
+          <auto-save-form-field
+            {type}="content.type"
+            {value}="content.value"
+            {options}="content.options"
+            {disabled}="true"
+          ></auto-save-form-field>
     </div>
-    <div class="simple-modal__controls">
       {{#if comment}}
-          <assessment-add-comment {instance}="instance" {(is-empty)}="isEmpty" {(state)}="state" {ca-ids}="caIds"
-                                  comment-place-holder="Enter comment"></assessment-add-comment>
+          <div class="simple-modal__section">
+            <div class="simple-modal__section-title">Comment</div>
+            <comment-input
+                      {(value)}="*commentValue"
+                      {disabled}="*isSaving"
+            ></comment-input>
+          </div>
       {{/if}}
       {{#if evidence}}
-        <related-documents {instance}="instance" document-type="EVIDENCE">
-            <h6>Evidence</h6>
-            <object-list {items}="documents" {empty-message}="noItemsText">
-                <editable-document-object-list-item {document}="{.}">
-                </editable-document-object-list-item>
-            </object-list>
-            <attach-button (refresh-evidences)="loadDocuments()" {instance}="instance">
-            </attach-button>
-        </related-documents>
+        <div class="simple-modal__section">
+            <div class="simple-modal__section-title">Evidence
+              <spinner class="simple-modal__section-title-icon" {toggle}="*isUpdatingEvidences"></spinner>
+            </div>
+            <related-documents {instance}="instance" document-type="EVIDENCE" {^is-loading}="*isUpdatingEvidences">
+                <object-list {items}="documents" {empty-message}="noItemsText">
+                  <editable-document-object-list-item {document}="{.}">
+                      <action-toolbar-control>
+                          <unmap-button
+                              (unmapped)="loadDocuments()"
+                              {destination}="instance"
+                              {source}="document">
+                              <i class="fa fa-trash"></i>
+                          </unmap-button>
+                      </action-toolbar-control>
+                  </editable-document-object-list-item>
+                </object-list>
+                <attach-button (refresh-evidences)="loadDocuments()" {instance}="instance"></attach-button>
+            </related-documents>
+        </div>
       {{/if}}
     </div>
 </form>
 <div class="simple-modal__footer">
-    <div class="flex-box flex-row-reverse">
+    <div class="simple-modal__toolbar">
       {{#if comment}}
-          <button class="btn btn-small btn-green" {{#if isEmpty}}disabled{{/if}} ($click)="saveAttachments">Save</button>
+         <comment-add-button class="simple-modal__toolbar-item"
+                             {(value)}="*commentValue"
+                             {^is-saving}="*isSaving"
+                             (comment-created)="onCommentCreated(%event)"
+         >Save</comment-add-button>
       {{/if}}
-        <button class="btn btn-link btn-small" ($click)="hide">Close</button>
+        <button class="btn btn-small btn-white simple-modal__toolbar-item" ($click)="hide">Close</button>
     </div>
 </div>

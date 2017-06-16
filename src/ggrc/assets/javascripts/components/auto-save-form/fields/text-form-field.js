@@ -17,7 +17,8 @@
           set: function (newValue, setValue, onError, oldValue) {
             setValue(newValue);
             if (oldValue === undefined ||
-                newValue === oldValue) {
+                newValue === oldValue ||
+                newValue.length && !can.trim(newValue).length) {
               return;
             }
             this.valueChanged(newValue);
