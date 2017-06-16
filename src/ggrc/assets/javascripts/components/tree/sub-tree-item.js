@@ -11,6 +11,27 @@
   var BaseTreeItemVM = GGRC.VM.BaseTreeItemVM;
   var viewModel = BaseTreeItemVM.extend({
     define: {
+      dueDate: {
+        type: 'date',
+        get: function () {
+          return this.attr('instance.next_due_date') ||
+            this.attr('instance.end_date');
+        }
+      },
+      dueDateCssClass: {
+        type: 'string',
+        get: function () {
+          var isOverdue = this.attr('instance.isOverdue');
+          return isOverdue ? 'state-overdue' : '';
+        }
+      },
+      isCycleTaskGroupObjectTask: {
+        type: 'boolean',
+        get: function () {
+          return this.attr('instance') instanceof
+            CMS.Models.CycleTaskGroupObjectTask;
+        }
+      },
       cssClasses: {
         type: String,
         get: function () {
