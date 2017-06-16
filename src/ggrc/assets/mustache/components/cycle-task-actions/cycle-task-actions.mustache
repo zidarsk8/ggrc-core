@@ -11,57 +11,55 @@
 {{#if_instance_of instance 'CycleTaskGroupObjectTask'}}
 <div class="flex-box item-actions">
   {{#with_review_task}}
-    {{^if isBacklog}}
-      {{#if isCurrent}}
-        {{#is_allowed 'update' instance}}
-          <div class="request-control">
-            {{#if_equals instance.status 'Assigned'}}
+    {{#if isShowActionButtons}}
+      {{#is_allowed 'update' instance}}
+        <div class="request-control">
+          {{#if_equals instance.status 'Assigned'}}
+            <button {{#if disabled}}disabled{{/if}}
+                    class="btn btn-mini btn-lightBlue"
+                    ($click)="changeStatus"
+                    data-openclose="open"
+                    data-value="InProgress">Start</button>
+          {{/if_equals}}
+          {{#if_equals instance.status 'InProgress'}}
+            <button {{#if disabled}}disabled{{/if}}
+                    class="btn btn-mini btn-white"
+                    ($click)="changeStatus"
+                    data-value="Finished">Finish</button>
+          {{/if_equals}}
+          {{#if_equals instance.status 'Declined'}}
+            {{#if review_task.object_review}}
               <button {{#if disabled}}disabled{{/if}}
-                      class="btn btn-mini btn-lightBlue"
+                      class="btn btn-mini btn-white"
                       ($click)="changeStatus"
-                      data-openclose="open"
-                      data-value="InProgress">Start</button>
-            {{/if_equals}}
-            {{#if_equals instance.status 'InProgress'}}
+                      data-value="Verified">Finish</button>
+            {{else}}
               <button {{#if disabled}}disabled{{/if}}
                       class="btn btn-mini btn-white"
                       ($click)="changeStatus"
                       data-value="Finished">Finish</button>
-            {{/if_equals}}
-            {{#if_equals instance.status 'Declined'}}
-              {{#if review_task.object_review}}
-                <button {{#if disabled}}disabled{{/if}}
-                        class="btn btn-mini btn-white"
-                        ($click)="changeStatus"
-                        data-value="Verified">Finish</button>
-              {{else}}
-                <button {{#if disabled}}disabled{{/if}}
-                        class="btn btn-mini btn-white"
-                        ($click)="changeStatus"
-                        data-value="Finished">Finish</button>
-              {{/if}}
-            {{/if_equals}}
-            {{#if_equals instance.status 'Finished'}}
-              <button {{#if disabled}}disabled{{/if}}
-                      class="btn btn-mini btn-red"
-                      ($click)="changeStatus"
-                      data-value="Declined">Decline</button>
-              <button {{#if disabled}}disabled{{/if}}
-                      class="btn btn-mini btn-green"
-                      ($click)="changeStatus"
-                      data-openclose="close"
-                      data-value="Verified">Verify</button>
-            {{/if_equals}}
-            {{#if oldValues.length}}
-              <a href="javascript://" data-name="status"
-                 {{#if disabled}}disabled{{/if}}
-                 ($click)="undo"
-                 data-undo="true"
-                 class="undo">Undo</a>
             {{/if}}
-          </div>
-        {{/is_allowed}}
-      {{/if}}
+          {{/if_equals}}
+          {{#if_equals instance.status 'Finished'}}
+            <button {{#if disabled}}disabled{{/if}}
+                    class="btn btn-mini btn-red"
+                    ($click)="changeStatus"
+                    data-value="Declined">Decline</button>
+            <button {{#if disabled}}disabled{{/if}}
+                    class="btn btn-mini btn-green"
+                    ($click)="changeStatus"
+                    data-openclose="close"
+                    data-value="Verified">Verify</button>
+          {{/if_equals}}
+          {{#if oldValues.length}}
+            <a href="javascript://" data-name="status"
+                {{#if disabled}}disabled{{/if}}
+                ($click)="undo"
+                data-undo="true"
+                class="undo">Undo</a>
+          {{/if}}
+        </div>
+      {{/is_allowed}}
     {{/if}}
   {{/with_review_task}}
 </div>

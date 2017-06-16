@@ -31,6 +31,19 @@
 
           return classes.join(' ');
         }
+      },
+      isShowActionButtons: {
+        get: function () {
+          var pageType = GGRC.Utils.CurrentPage.getPageType();
+          var allowChangeState = this.attr('instance.allow_change_state');
+
+          if (pageType === 'Workflow') {
+            return !this.isBacklog() &&
+              this.attr('cycle').reify().is_current;
+          }
+
+          return allowChangeState;
+        }
       }
     },
     instance: null,
@@ -46,9 +59,6 @@
       }
 
       return result;
-    },
-    isCurrent: function () {
-      return this.attr('cycle').reify().is_current;
     },
     changeStatus: function (ctx, el, ev) {
       var status = el.data('value');
