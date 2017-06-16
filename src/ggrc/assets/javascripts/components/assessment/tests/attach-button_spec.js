@@ -33,10 +33,10 @@ describe('GGRC.Components.attachButton', function () {
   describe('confirmationCallback() method', function () {
     it('returns $.Deferred.promise if instance is not in "In Progress" state',
     function () {
-      var dfd = $.Deferred();
+      var dfd = can.Deferred();
       var result;
       viewModel.instance.status = 'Ready for Review';
-      spyOn($, 'Deferred').and.returnValue(dfd);
+      spyOn(can, 'Deferred').and.returnValue(dfd);
 
       result = viewModel.confirmationCallback();
 
