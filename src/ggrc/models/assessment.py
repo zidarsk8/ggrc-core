@@ -214,6 +214,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
           "display_name": "Archived",
           "mandatory": False,
           "ignore_on_update": True,
+          "view_only": True,
       },
   }
 
