@@ -25,11 +25,22 @@
       {{/if}}
       {{#if evidence}}
         <div class="simple-modal__section">
-            <div class="simple-modal__section-title">Evidence</div>
-            <related-documents {instance}="instance" document-type="EVIDENCE">
-              <object-list {items}="documents" {empty-message}="noItemsText">
-                  <document-object-list-item {instance}="{.}"></document-object-list-item>
-              </object-list>
+            <div class="simple-modal__section-title">Evidence
+              <spinner class="simple-modal__section-title-icon" {toggle}="*isUpdatingEvidences"></spinner>
+            </div>
+            <related-documents {instance}="instance" document-type="EVIDENCE" {^is-loading}="*isUpdatingEvidences">
+                <object-list {items}="documents" {empty-message}="noItemsText">
+                  <editable-document-object-list-item {document}="{.}">
+                      <action-toolbar-control>
+                          <unmap-button
+                              (unmapped)="loadDocuments()"
+                              {destination}="instance"
+                              {source}="document">
+                              <i class="fa fa-trash"></i>
+                          </unmap-button>
+                      </action-toolbar-control>
+                  </editable-document-object-list-item>
+                </object-list>
                 <attach-button (refresh-evidences)="loadDocuments()" {instance}="instance"></attach-button>
             </related-documents>
         </div>

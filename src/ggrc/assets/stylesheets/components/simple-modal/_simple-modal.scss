@@ -56,10 +56,6 @@ $grid-data-header-height: 66px;
     &:last-child {
       margin: 0;
     }
-    // Temporary Solution - should be removed
-    h6 {
-      display: none;
-    }
   }
 
   &__section-title {
@@ -72,6 +68,11 @@ $grid-data-header-height: 66px;
     width: 100%;
     max-width: 100%;
     text-overflow: ellipsis;
+
+  }
+
+  &__section-title-icon {
+    margin: 0 0 0 8px;
   }
 
   &__header {

@@ -20,7 +20,7 @@
 
         if (this.instance instanceof CMS.Models.Assessment &&
             this.instance.status !== 'In Progress') {
-          confirmation = $.Deferred();
+          confirmation = can.Deferred();
           GGRC.Controllers.Modals.confirm({
             modal_title: 'Confirm moving Assessment to "In Progress"',
             modal_description: 'You are about to move Assesment from "' +

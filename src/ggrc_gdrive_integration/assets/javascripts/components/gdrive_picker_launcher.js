@@ -10,7 +10,7 @@
     tag: 'ggrc-gdrive-picker-launcher',
     template: can.view(GGRC.mustache_path + '/gdrive/gdrive_file.mustache'),
     viewModel: {
-      instance: null,
+      instance: {},
       deferred: '@',
       link_class: '@',
       click_event: '@',
@@ -36,7 +36,7 @@
         var dfd;
         var folderId = el.data('folder-id');
 
-        scope.attr('pickerActive', true);
+        that.attr('pickerActive', true);
 
         // Create and render a Picker object for searching images.
         function createPicker() {
@@ -114,7 +114,7 @@
         dfd.done(function () {
           gapi.load('picker', {callback: createPicker});
         }).fail(function () {
-          scope.attr('pickerActive', false);
+          that.attr('pickerActive', false);
         });
       },
 
@@ -137,6 +137,8 @@
             return current || isOwnFolder(mp, instance);
           }, false);
         }
+
+        that.attr('pickerActive', true);
 
         if (that.instance.attr('_transient.folder')) {
           parentFolderDfd = can.when(
@@ -203,6 +205,7 @@
                     that, 'modal:success', {arr: can.makeArray(arguments)});
                   el.trigger('modal:success', {arr: can.makeArray(arguments)});
                   that.attr('pending', false);
+                  that.attr('pickerActive', false);
                 });
               });
           });
