@@ -150,8 +150,8 @@ class TestAssessmentUpdates(ggrc.TestCase):
           }
       )
 
-    assessment_id = assessment.id
-    self.assessment = all_models.Assessment.query.get(assessment_id)
+    self.assessment_id = assessment.id
+    self.assessment = all_models.Assessment.query.get(self.assessment_id)
 
   # pylint: disable=invalid-name
   def test_updated_at_changes_after_comment(self):
@@ -167,6 +167,34 @@ class TestAssessmentUpdates(ggrc.TestCase):
       asmt = all_models.Assessment.query.get(self.assessment.id)
       self.assertEqual(asmt.updated_at,
                        datetime.datetime(2016, 4, 1, 18, 22, 9))
+
+  def test_update_assessment_and_get_list(self):
+    """Test get value for assessment cached value after update."""
+    old_state = "In Progress"
+    all_models.Assessment.query.filter(
+        all_models.Assessment.id == self.assessment_id
+    ).update({
+        all_models.Assessment.status: old_state,
+    })
+    db.session.commit()
+    # required for populate cache
+    content = self.api.client.get(
+        "/api/assessments?id__in={}".format(self.assessment_id)
+    )
+    self.assertEqual(
+        old_state,
+        content.json['assessments_collection']['assessments'][0]['status']
+    )
+    new_state = "Ready for Review"
+    self.api.put(all_models.Assessment.query.get(self.assessment_id),
+                 {"status": new_state})
+    content = self.api.client.get(
+        "/api/assessments?id__in={}".format(self.assessment_id)
+    )
+    self.assertEqual(
+        new_state,
+        content.json['assessments_collection']['assessments'][0]['status']
+    )
 
 
 @ddt.ddt
