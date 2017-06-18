@@ -149,6 +149,7 @@ class TestCustomAttributesDefinitions(TestCase):
     self.assertTrue(vals["Choose"]["mandatory"])
 
 
+@ddt.ddt
 class TestGetObjectColumnDefinitions(TestCase):
 
   """
@@ -477,24 +478,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     }
     self._test_single_object(models.Issue, names, expected_fields)
 
-  def test_regulation_definitions(self):
-    """ test default headers for Regulation """
-    names = {
-        "Title",
-        "Description",
-        "Notes",
-        "Admin",
-        "Regulation URL",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-    }
-    self._test_single_object(models.Regulation, names, self.COMMON_EXPECTED)
-
   def test_policy_definitions(self):
     """ test default headers for Policy """
     names = {
@@ -513,42 +496,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
     }
     self._test_single_object(models.Policy, names, self.COMMON_EXPECTED)
-
-  def test_standard_definitions(self):
-    """ test default headers for Standard """
-    names = {
-        "Title",
-        "Description",
-        "Notes",
-        "Admin",
-        "Standard URL",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-    }
-    self._test_single_object(models.Standard, names, self.COMMON_EXPECTED)
-
-  def test_contract_definitions(self):
-    """ test default headers for Contract """
-    names = {
-        "Title",
-        "Description",
-        "Notes",
-        "Admin",
-        "Contract URL",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-    }
-    self._test_single_object(models.Contract, names, self.COMMON_EXPECTED)
 
   def test_clause_definitions(self):
     """ test default headers for Clause """
@@ -648,42 +595,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     }
     self._test_single_object(models.Person, names, expected_fields)
 
-  def test_org_group_definitions(self):
-    """ test default headers for OrgGroup """
-    names = {
-        "Title",
-        "Description",
-        "Notes",
-        "Admin",
-        "Org Group URL",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-    }
-    self._test_single_object(models.OrgGroup, names, self.COMMON_EXPECTED)
-
-  def test_vendor_definitions(self):
-    """ test default headers for Vendor """
-    names = {
-        "Title",
-        "Description",
-        "Notes",
-        "Admin",
-        "Vendor URL",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-    }
-    self._test_single_object(models.Vendor, names, self.COMMON_EXPECTED)
-
   def test_system_definitions(self):
     """ test default headers for System """
     names = {
@@ -722,42 +633,6 @@ class TestGetObjectColumnDefinitions(TestCase):
     }
     self._test_single_object(models.Process, names, self.COMMON_EXPECTED)
 
-  def test_data_asset_definitions(self):
-    """ test default headers for DataAsset """
-    names = {
-        "Title",
-        "Description",
-        "Notes",
-        "Admin",
-        "Data Asset URL",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-    }
-    self._test_single_object(models.DataAsset, names, self.COMMON_EXPECTED)
-
-  def test_access_group_definitions(self):
-    """ test default headers for AccessGroup """
-    names = {
-        "Title",
-        "Description",
-        "Notes",
-        "Admin",
-        "Access Group URL",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-    }
-    self._test_single_object(models.AccessGroup, names, self.COMMON_EXPECTED)
-
   def test_product_definitions(self):
     """ test default headers for Product """
     names = {
@@ -777,63 +652,8 @@ class TestGetObjectColumnDefinitions(TestCase):
     }
     self._test_single_object(models.Product, names, self.COMMON_EXPECTED)
 
-  def test_project_definitions(self):
-    """ test default headers for Project """
-    names = {
-        "Title",
-        "Description",
-        "Notes",
-        "Admin",
-        "Project URL",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-    }
-    self._test_single_object(models.Project, names, self.COMMON_EXPECTED)
-
-  def test_facility_definitions(self):
-    """ test default headers for Facility """
-    names = {
-        "Title",
-        "Description",
-        "Notes",
-        "Admin",
-        "Facility URL",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-    }
-    self._test_single_object(models.Facility, names, self.COMMON_EXPECTED)
-
-  def test_market_definitions(self):
-    """ test default headers for Market """
-    names = {
-        "Title",
-        "Description",
-        "Notes",
-        "Admin",
-        "Market URL",
-        "Reference URL",
-        "Code",
-        "Effective Date",
-        "Last Deprecated Date",
-        "State",
-        "Review State",
-        "Delete",
-    }
-    self._test_single_object(models.Market, names, self.COMMON_EXPECTED)
-
   def test_risk_definitions(self):
     """Test default headers for Risk."""
-
     names = {
         "Code",
         "Delete",
@@ -861,6 +681,36 @@ class TestGetObjectColumnDefinitions(TestCase):
         },
     }
     self._test_single_object(r_models.Risk, names, expected_fields)
+
+  @ddt.data(
+      models.AccessGroup,
+      models.Contract,
+      models.DataAsset,
+      models.Facility,
+      models.Market,
+      models.OrgGroup,
+      models.Project,
+      models.Regulation,
+      models.Standard,
+      models.Vendor,
+  )
+  def test_common_model_definitions(self, model):
+    """Test common definition names"""
+    names = {
+        "Title",
+        "Description",
+        "Notes",
+        "Admin",
+        "Reference URL",
+        "Code",
+        "Effective Date",
+        "Last Deprecated Date",
+        "State",
+        "Review State",
+        "Delete",
+    }
+    names.add("{} URL".format(model._inflector.title_singular.title()))
+    self._test_single_object(model, names, self.COMMON_EXPECTED)
 
 
 class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):
