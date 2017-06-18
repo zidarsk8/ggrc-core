@@ -13,7 +13,6 @@ from ggrc.utils.rules import get_mapping_rules, get_unmapping_rules
 from ggrc.utils import title_from_camelcase
 from ggrc_risks import models as r_models
 from ggrc_risk_assessments import models as ra_models
-from ggrc_workflows import models as wf_models
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 from integration.ggrc.generator import ObjectGenerator
@@ -862,112 +861,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         },
     }
     self._test_single_object(r_models.Risk, names, expected_fields)
-
-
-class TestGetWorkflowObjectColumnDefinitions(TestCase):
-  """Test default column difinitions for workflow objcts.
-  """
-
-  @classmethod
-  def setUpClass(cls):
-    TestCase.clear_data()
-
-  def setUp(self):
-    pass
-
-  def test_workflow_definitions(self):
-    """ test default headers for Workflow """
-    definitions = get_object_column_definitions(wf_models.Workflow)
-    display_names = {val["display_name"] for val in definitions.itervalues()}
-    expected_names = {
-        "Title",
-        "Description",
-        "Custom email message",
-        "Manager",
-        "Member",
-        "Frequency",
-        "Force real-time email updates",
-        "Code",
-        "Delete",
-        "Need Verification",
-    }
-    self.assertEqual(expected_names, display_names)
-    vals = {val["display_name"]: val for val in definitions.itervalues()}
-    self.assertTrue(vals["Title"]["mandatory"])
-    self.assertTrue(vals["Manager"]["mandatory"])
-    self.assertTrue(vals["Frequency"]["mandatory"])
-    self.assertIn("type", vals["Manager"])
-    self.assertIn("type", vals["Member"])
-    self.assertEqual(vals["Manager"]["type"], "user_role")
-    self.assertEqual(vals["Member"]["type"], "user_role")
-
-  def test_task_group_definitions(self):
-    """ test default headers for Task Group """
-    definitions = get_object_column_definitions(wf_models.TaskGroup)
-    display_names = {val["display_name"] for val in definitions.itervalues()}
-    expected_names = {
-        "Summary",
-        "Details",
-        "Assignee",
-        "Code",
-        "Workflow",
-        "Objects",
-        "Delete",
-    }
-    self.assertEqual(expected_names, display_names)
-    vals = {val["display_name"]: val for val in definitions.itervalues()}
-    self.assertTrue(vals["Summary"]["mandatory"])
-    self.assertTrue(vals["Assignee"]["mandatory"])
-
-  def test_task_group_task_definitions(self):
-    """ test default headers for Task Group Task """
-    definitions = get_object_column_definitions(wf_models.TaskGroupTask)
-    display_names = {val["display_name"] for val in definitions.itervalues()}
-    expected_names = {
-        "Summary",
-        "Task Type",
-        "Assignee",
-        "Task Description",
-        "Start",
-        "End",
-        "Task Group",
-        "Code",
-        "Delete",
-    }
-    self.assertEqual(expected_names, display_names)
-    vals = {val["display_name"]: val for val in definitions.itervalues()}
-    self.assertTrue(vals["Summary"]["mandatory"])
-    self.assertTrue(vals["Assignee"]["mandatory"])
-
-  def test_cycle_task_definitions(self):
-    """ test default headers for Cycle Task Group Object Task """
-    definitions = get_object_column_definitions(
-        wf_models.CycleTaskGroupObjectTask)
-    mapping_names = get_mapping_names(
-        wf_models.CycleTaskGroupObjectTask.__name__)
-    unmapping_names = get_unmapping_names(
-        wf_models.CycleTaskGroupObjectTask.__name__)
-    display_names = {val["display_name"] for val in definitions.itervalues()}
-    element_names = {
-        "Code",
-        "Cycle",
-        "Summary",
-        "Task Type",
-        "Assignee",
-        "Task Details",
-        "Start Date",
-        "Due Date",
-        "Actual Verified Date",
-        "Actual Finish Date",
-        "Task Group",
-        "State",
-        "Delete",
-    }
-    expected_names = element_names.union(mapping_names).union(unmapping_names)
-    self.assertEqual(expected_names, display_names)
-    vals = {val["display_name"]: val for val in definitions.itervalues()}
-    self.assertTrue(vals["Summary"]["mandatory"])
-    self.assertTrue(vals["Assignee"]["mandatory"])
 
 
 class TestGetRiskAssessmentObjectColumnDefinitions(TestCase):
