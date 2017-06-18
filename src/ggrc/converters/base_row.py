@@ -182,7 +182,8 @@ class RowConverter(object):
       return
 
     for item_handler in self.attrs.values():
-      item_handler.set_obj_attr()
+      if not item_handler.view_only:
+        item_handler.set_obj_attr()
 
   def send_post_commit_signals(self, event=None):
     """Send after commit signals for all objects
