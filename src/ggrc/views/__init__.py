@@ -13,6 +13,7 @@ from flask import flash
 from flask import g
 from flask import render_template
 from flask import url_for
+from flask import request
 from werkzeug.exceptions import Forbidden
 
 from ggrc import models
@@ -66,6 +67,28 @@ def reindex(_):
   """Web hook to update the full text search index."""
   do_reindex()
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
+@app.route("/_background_tasks/compute_attributes", methods=["POST"])
+@queued_task
+def compute_attributes(args):
+  """Web hook to update the full text search index."""
+  from ggrc.dp_models import computed_attributes
+  revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
+  computed_attributes.compute_attributes(revision_ids)
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
+def start_compute_attributes(revision_ids):
+  """Start a background task for computed attributes."""
+  task = create_task(
+      name="compute_attributes",
+      url=url_for(compute_attributes.__name__),
+      parameters={"revision_ids": revision_ids},
+      method=u"POST",
+      queued_callback=compute_attributes
+  )
+  task.start()
 
 
 def do_reindex():
@@ -307,7 +330,11 @@ def admin_reindex():
   """
   if not permissions.is_allowed_read("/admin", None, 1):
     raise Forbidden()
-  task_queue = create_task("reindex", url_for(reindex.__name__), reindex)
+  task_queue = create_task(
+      name="reindex",
+      url=url_for(reindex.__name__),
+      queued_callback=reindex
+  )
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
                          [('Content-Type', 'text/html')])))
@@ -326,6 +353,13 @@ def admin_refresh_revisions():
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
                          [('Content-Type', 'text/html')])))
+
+
+@app.route("/admin/compute_attributes", methods=["POST"])
+@login_required
+def send_event_job():
+  start_compute_attributes(request.get_json().get("revision_ids", []))
+  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
 @app.route("/admin")
