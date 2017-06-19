@@ -7,6 +7,13 @@ import sys
 
 from ggrc.access_control.role import AccessControlRole
 from ggrc.access_control.list import AccessControlList
+from ggrc.dp_models.attribute_definitions import AttributeDefinitions
+from ggrc.dp_models.attribute_templates import AttributeTemplates
+from ggrc.dp_models.attribute_types import AttributeTypes
+from ggrc.dp_models.attributes import Attributes
+from ggrc.dp_models.namespaces import Namespaces
+from ggrc.dp_models.object_templates import ObjectTemplates
+from ggrc.dp_models.object_types import ObjectTypes
 from ggrc.models import inflector
 from ggrc.models.access_group import AccessGroup
 from ggrc.models.assessment import Assessment
@@ -59,7 +66,17 @@ from ggrc.models.system import System
 from ggrc.models.system import SystemOrProcess
 from ggrc.models.vendor import Vendor
 
-all_models = [
+all_models = [  # pylint: disable=invalid-name
+    # data platform models
+    AttributeDefinitions,
+    AttributeTemplates,
+    AttributeTypes,
+    Attributes,
+    Namespaces,
+    ObjectTemplates,
+    ObjectTypes,
+
+    # ggrc models
     AccessControlRole,
     AccessControlList,
     AccessGroup,
@@ -114,7 +131,7 @@ all_models = [
     Snapshot,
 ]
 
-__all__ = [model.__name__ for model in all_models]
+__all__ = [m.__name__ for m in all_models]
 
 
 def register_model(model):
