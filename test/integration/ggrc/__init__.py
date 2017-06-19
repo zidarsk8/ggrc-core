@@ -163,6 +163,7 @@ class TestCase(BaseTestCase, object):
     responses = defaultdict(lambda: defaultdict(set))
 
     # Set default empty sets for non existing error messages in blocks
+    self.assertNotIn("message", response, str(response))
     for block in response:
       for message in messages:
         error_block = expected_messages.get(block["name"], {})
