@@ -25,7 +25,7 @@ from ggrc import settings
 from ggrc.models import Person
 from ggrc.models import Notification
 from ggrc.rbac import permissions
-from ggrc.utils import merge_dict
+from ggrc.utils import DATE_FORMAT_US, merge_dict
 
 from ggrc_workflows.notification.data_handler import (
     cycle_tasks_cache, deleted_task_rels_cache, get_cycle_task_data
@@ -389,7 +389,8 @@ def send_email(user_email, subject, body):
 def modify_data(data):
   """Modify notification data dictionary.
 
-  For easier use in templates, it joins the due_in and due today fields
+  For easier use in templates, it computes/aggregates some additional
+  notification data.
   together.
 
   Args:
@@ -399,18 +400,13 @@ def modify_data(data):
     dict: the received dict with some additional fields for easier traversal
       in the notification template.
   """
-
-  data["due_soon"] = {}
-  if "due_in" in data:
-    data["due_soon"].update(data["due_in"])
-  if "due_today" in data:
-    data["due_soon"].update(data["due_today"])
-
   # combine "my_tasks" from multiple cycles
   data["cycle_started_tasks"] = {}
   if "cycle_data" in data:
     for cycle in data["cycle_data"].values():
       if "my_tasks" in cycle:
         data["cycle_started_tasks"].update(cycle["my_tasks"])
+
+  data["DATE_FORMAT"] = DATE_FORMAT_US
 
   return data
