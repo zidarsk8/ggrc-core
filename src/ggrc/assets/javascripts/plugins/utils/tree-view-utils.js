@@ -324,9 +324,14 @@
      * @param {Number} filterInfo.sortDirection -
      * @param {Number} filterInfo.filter -
      * @param {Object} filter -
+     * @param {Object} request - Collection of QueryAPI sub-requests
      * @return {Promise} Deferred Object
      */
-    function loadFirstTierItems(modelName, parent, filterInfo, filter) {
+    function loadFirstTierItems(modelName,
+                                parent,
+                                filterInfo,
+                                filter,
+                                request) {
       var params = QueryAPI.buildParam(
         modelName,
         filterInfo,
@@ -335,6 +340,7 @@
         filter
       );
       var requestedType;
+      request = request || can.List();
 
       if (SnapshotUtils.isSnapshotScope(parent) &&
         SnapshotUtils.isSnapshotModel(modelName)) {
@@ -342,9 +348,10 @@
       }
 
       requestedType = params.object_name;
-      return QueryAPI.makeRequest({data: [params]})
+      request.push(params);
+      return QueryAPI.makeRequest({data: request.attr()})
         .then(function (response) {
-          response = response[0][requestedType];
+          response = _.last(response)[requestedType];
 
           response.values = response.values.map(function (source) {
             return _createInstance(source, modelName);

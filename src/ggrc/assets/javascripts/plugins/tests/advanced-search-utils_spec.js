@@ -6,7 +6,7 @@
 'use strict';
 
 describe('GGRC.Utils.AdvancedSearch', function () {
-  describe('buildFilterString() method', function () {
+  describe('buildFilter() method', function () {
     it('builds correct statuses with "ANY" operator', function () {
       var items = [
         GGRC.Utils.AdvancedSearch.create.state({
@@ -18,7 +18,7 @@ describe('GGRC.Utils.AdvancedSearch', function () {
                            'OR "Status"="Draft" ' +
                            'OR "Status"="Deprecated")';
 
-      expect(GGRC.Utils.AdvancedSearch.buildFilterString(items))
+      expect(GGRC.Utils.AdvancedSearch.buildFilter(items))
         .toBe(expectedResult);
     });
 
@@ -33,7 +33,7 @@ describe('GGRC.Utils.AdvancedSearch', function () {
                            'AND "Status"!="Draft" ' +
                            'AND "Status"!="Deprecated")';
 
-      expect(GGRC.Utils.AdvancedSearch.buildFilterString(items))
+      expect(GGRC.Utils.AdvancedSearch.buildFilter(items))
         .toBe(expectedResult);
     });
 
@@ -67,7 +67,7 @@ describe('GGRC.Utils.AdvancedSearch', function () {
       var expectedResult = '("Status"="Active" OR "Status"="Draft") ' +
                            'AND "Title" ~ "test" ' +
                            'OR ("Para" = "meter" AND "Other" ~= "value")';
-      expect(GGRC.Utils.AdvancedSearch.buildFilterString(items))
+      expect(GGRC.Utils.AdvancedSearch.buildFilter(items))
         .toBe(expectedResult);
     });
   });

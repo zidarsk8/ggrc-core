@@ -17,13 +17,13 @@
         <tree-status-filter {model-name}="modelName"
                             {register-filter}="@registerFilter"
                             (filter)="onFilter"
-                            {disabled}="advancedSearch.filters.length"
+                            {disabled}="advancedSearch.filter"
         >
           <multiselect-dropdown
             {options}="filterStates"
             placeholder="Filter by State"
             plural="States"
-            {disabled}="advancedSearch.filters.length">
+            {disabled}="advancedSearch.filter">
           </multiselect-dropdown>
         </tree-status-filter>
       {{/if}}

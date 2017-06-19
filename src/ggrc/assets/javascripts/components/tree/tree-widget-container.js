@@ -29,16 +29,15 @@
       currentFilter: {
         type: String,
         get: function () {
-          var filters;
+          var filters = can.makeArray(this.attr('filters'));
           var additionalFilter = this.attr('additionalFilter');
-          if (additionalFilter) {
-            additionalFilter = GGRC.query_parser.parse(additionalFilter);
+
+          if (this.attr('advancedSearch.filter')) {
+            return this.attr('advancedSearch.filter');
           }
 
-          if (this.attr('advancedSearch.filters.length')) {
-            filters = can.makeArray(this.attr('advancedSearch.filters'));
-          } else {
-            filters = can.makeArray(this.attr('filters'));
+          if (additionalFilter) {
+            additionalFilter = GGRC.query_parser.parse(additionalFilter);
           }
 
           return filters.filter(function (options) {
@@ -202,11 +201,13 @@
         sortBy: sortingInfo.sortBy,
         sortDirection: sortingInfo.sortDirection
       };
+      var request = this.attr('advancedSearch.request');
 
       pageInfo.attr('disabled', true);
       this.attr('loading', true);
 
-      return TreeViewUtils.loadFirstTierItems(modelName, parent, page, filter)
+      return TreeViewUtils
+        .loadFirstTierItems(modelName, parent, page, filter, request)
         .then(function (data) {
           var total = data.total;
           var modelName = this.attr('modelName');
@@ -448,9 +449,10 @@
 
     advancedSearch: {
       open: false,
+      filter: null,
+      request: can.List(),
       filterItems: can.List(),
       appliedFilterItems: can.List(),
-      filters: [],
       mappingItems: can.List(),
       appliedMappingItems: can.List()
     },
@@ -464,25 +466,28 @@
       this.attr('advancedSearch.open', true);
     },
     applyAdvancedFilters: function () {
-      var filterString;
       var filters = this.attr('advancedSearch.filterItems');
       var mappings = this.attr('advancedSearch.mappingItems');
+      var request = can.List();
+
       this.attr('advancedSearch.appliedFilterItems', filters);
       this.attr('advancedSearch.appliedMappingItems', mappings);
 
-      filterString = GGRC.Utils.AdvancedSearch.buildFilterString(filters);
-      this.attr('advancedSearch.filters', [{
-        filter: filterString,
-        operation: 'AND',
-        isExpression: true,
-        depth: false
-      }]);
+      this.attr('advancedSearch.filter', GGRC.query_parser.join_queries(
+        GGRC.query_parser
+          .parse(GGRC.Utils.AdvancedSearch.buildFilter(filters, request)),
+        GGRC.query_parser
+          .parse(GGRC.Utils.AdvancedSearch.buildFilter(mappings, request))
+      ));
+
+      this.attr('advancedSearch.request', request);
       this.attr('advancedSearch.open', false);
       this.onFilter();
     },
     removeAdvancedFilters: function () {
       this.attr('advancedSearch.appliedFilterItems', can.List());
-      this.attr('advancedSearch.filters', []);
+      this.attr('advancedSearch.appliedMappingItems', can.List());
+      this.attr('advancedSearch.filter', null);
       this.attr('advancedSearch.open', false);
       this.onFilter();
     },

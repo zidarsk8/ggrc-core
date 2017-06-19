@@ -75,14 +75,7 @@
         state.modelName) + ')';
     }
     function groupToFilter(items) {
-      return '(' + buildFilterString(items) + ')';
-    }
-    function buildFilterString(items) {
-      var result = '';
-      _.each(items, function (item) {
-        result += builders[item.type](item.value);
-      });
-      return result;
+      return '(' + buildFilter(items) + ')';
     }
 
     function mappingCriteriaToFilter(criteria, request) {
@@ -110,18 +103,18 @@
       });
       return request.length - 1;
     }
-    function parseMappings(data, request) {
+    function buildFilter(data, request) {
       var result = '';
+      request = request || [];
       _.each(data, function (item) {
         result += builders[item.type](item.value, request);
       });
-      return GGRC.query_parser.parse(result);
+      return result;
     }
 
     return {
-      buildFilterString: buildFilterString,
-      create: create,
-      parseMappings: parseMappings
+      buildFilter: buildFilter,
+      create: create
     };
   })();
 })(window.GGRC, window.can, window._);
