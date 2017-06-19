@@ -455,6 +455,7 @@ dashboard-js-template-files:
   - controls/object_list.mustache
   - controls/tree-item-attr.mustache
   - assessments/modal_content.mustache
+  - assessments/modal_content_additional_fields.mustache
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
   - assessments/related-assessments.mustache

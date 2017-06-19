@@ -1,0 +1,106 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="editable-form-row">
+  <div class="editable-form-long-input">
+    <label>
+      Notes
+    </label>
+    <input data-id="note_txtbx" tabindex="5" class="input-block-level"
+        placeholder="Enter Notes" name="notes" type="text" id="notes" value="{{notes}}"/>
+  </div>
+</div>
+
+<div class="editable-form-row">
+  <div class="editable-form-long-input">
+    <label>
+      Description
+    </label>
+    <div class="wysiwyg-area">
+      <textarea tabindex="2" id="control_description" class="span12 triple wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
+    </div>
+  </div>
+</div>
+
+<!--<div class="editable-form-row" style="margin-bottom: 10px">
+  <span style="color: red">TODO:</span>REFERENCES
+</div>-->
+
+<div class="editable-form-row">
+  <div class="editable-form-short-input">
+    <label>
+      Code
+    </label>
+    <input data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="ASSESSMENT-XXX" type="text" value="{{slug}}">
+  </div>
+  <div class="editable-form-short-input">
+    <label>
+      Effective Date
+    </label>
+    <datepicker
+      tabindex="20"
+      date="instance.start_date"
+      set-max-date="instance.end_date"
+      helptext="Enter the date this object becomes effective."
+      test-id="startTestId"
+    />
+  </div>
+  <div class="editable-form-short-input">
+    <label>
+      Stop Date
+    </label>
+    <datepicker
+      tabindex="21"
+      date="instance.end_date"
+      set-min-date="instance.start_date"
+      helptext="Enter the date this object stops being effective."
+      test-id="endTestId"
+    />
+  </div>
+</div>
+
+<div class="editable-form-row">
+  <div class="editable-form-short-input">
+    <label>
+      Conclusion: Design
+    </label>
+    <small>
+        <em>Is this control design effective?</em>
+    </small>
+    <dropdown tabindex="9"
+              options-list="model.conclusions"
+              no-value="true"
+              no-value-label="---"
+              name="instance.design"
+              tabindex="23">
+    </dropdown>
+  </div>
+  <div class="editable-form-short-input">
+    <label>
+      Conclusion: Operation
+    </label>
+    <small>
+      <em>Is this control design effective?</em>
+    </small>
+    <dropdown tabindex="10"
+              options-list="model.conclusions"
+              no-value="true"
+              no-value-label="---"
+              name="instance.operationally"
+              tabindex="23">
+    </dropdown>
+  </div>
+</div>
+
+<div class="editable-form-row">
+  <div class="editable-form-long-input">
+    <label>
+      Audit
+    </label>
+    <div>
+      {{instance.audit.title}}
+    </div>
+  </div>
+</div>

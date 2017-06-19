@@ -4,296 +4,176 @@
 }}
 
 {{!div class="modal-body"}}
-<div class="hideable-holder">
-{{#instance}}
-<form action="javascript://">
-  {{> '/static/mustache/base_objects/form_restore.mustache'}}
+  <div class="editable-form">
+    {{#instance}}
+    <form action="javascript://">
 
-  {{^if new_object_form}}
-    {{#if_in instance.status "Not Started,Completed,Verified"}}
-      <div class="alert warning">
-        <i class="fa fa-exclamation-triangle red"></i>
-        You are about to move assessment from "{{instance.status}}" to "In Progress".
+      {{^if new_object_form}}
+        {{#if_in instance.status "Not Started,Completed,Verified"}}
+          <div class="alert warning">
+            <i class="fa fa-exclamation-triangle red"></i>
+            You are about to move assessment from "{{instance.status}}" to "In Progress".
+          </div>
+        {{/if_in}}
+      {{/if}}
+
+      <!--<div class="editable-form-row">
+        <div class="editable-form-short-input">
+          <label><span style="color: red">TODO:</span> ASSESSMENT TYPE</label>
+          <dropdown options-list="model.conclusions"
+                    no-value="true"
+                    no-value-label="---"
+                    name="instance.design"
+                    tabindex="1">
+          </dropdown>
+        </div>
+      </div>-->
+      <div class="editable-form-row">
+        <div class="editable-form-long-input {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
+          <label>
+            Title
+            <span class="required">*</span>
+          </label>
+          <input data-id="title_txtbx" tabindex="2" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
+          {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
+        </div>
       </div>
-    {{/if_in}}
-  {{/if}}
 
-  <div class="row-fluid">
-    <div class="span6 {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-      <label>
-        Title
-        <span class="required">*</span>
-        <i class="fa fa-question-circle" rel="tooltip" title="Give new {{model.model_plural}} a name that's easy to search for and indicates the main goals of this {{model.model_singular}}."></i>
-      </label>
-      <input data-id="title_txtbx" tabindex="1" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
-      {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
-    </div>
-    {{#if new_object_form}}
-      <div class="span6">
-        <label>
-          Audit
-          <span class="required">*</span>
-          <i class="fa fa-question-circle" rel="tooltip" title="Audit for this Assessment"></i>
-        </label>
-        {{#using audit=instance.audit }}
-          <input tabindex="2" class="input-block-level" name="audit.title" data-permission-type="update" data-lookup="Audit" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Audit" type="text" null-if-empty="false" value="{{firstnonempty audit.title ''}}" disabled="disabled" />
-        {{/using}}
+      <div class="editable-form-row">
+        <div class="editable-form-long-input">
+          <label>
+            Test Plan
+          </label>
+          <div class="wysiwyg-area">
+            <textarea tabindex="3" id="control_test_plan" class="triple wysihtml5" name="test_plan" placeholder="Enter Test Plan">{{{test_plan}}}</textarea>
+          </div>
+        </div>
       </div>
-    {{else}}
-      <div class="span6"></div>
-    {{/if}}
-  </div>
-
-  <div class="row-fluid">
-    <div data-id="test_plan_hidden" class="span6 hidable">
-      <label>
-        Test Plan
-        <i class="fa fa-question-circle" rel="tooltip" title="Provide a test plan for this {{model.model_singular}}."></i>
-        <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      </label>
-      <div class="wysiwyg-area">
-        <textarea tabindex="2" id="control_test_plan" class="span12 triple wysihtml5" name="test_plan" placeholder="Enter Test Plan">{{{test_plan}}}</textarea>
+      <!-- TODO: people list -->
+      <div class="editable-form-row">
+        <checkbox-to-list property="recipients" instance="instance" class="flex-box">
+          <div class="editable-form-checkobox">
+            <label class="input--inline">
+                <input tabindex="11" type="checkbox"
+                      name="send_by_default"
+                      {{# send_by_default}}checked{{/send_by_default}}>
+                Enable notifications on comments
+              </label>
+          </div>
+          <div class="editable-form-checkobox">
+            <label class="input--inline">
+                  <input tabindex="12" type="checkbox" can-value="values.Creator">
+                  Notify creator(s)
+              </label>
+          </div>
+          <div class="editable-form-checkobox">
+            <label class="input--inline">
+                  <input tabindex="13" type="checkbox" can-value="values.Assessor">
+                  Notify assignee(s)
+            </label>
+          </div>
+          <div class="editable-form-checkobox">
+            <label class="input--inline">
+                  <input tabindex="14" type="checkbox" can-value="values.Verifier">
+                  Notify verifier(s)
+              </label>
+          </div>
+        </checkbox-to-list>
       </div>
-    </div>
-    <div class="span6">
-      <people-list tabindex="11" instance="instance" editable="true" deferred="true" validate="true"></people-list>
-    </div>
-  </div>
 
-  <div class="row-fluid">
-    <div class="span6 hidable bottom-spacing">
-      <ggrc-modal-connector
-              parent_instance="instance"
-              instance="instance"
-              mapping="related_objects_as_source"
-              from-binding="true"
-              deferred="true">
-        <label class="border-l">
-          Mapped Objects
-          <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        </label>
-        {{#prune_context}}
-          <ul class="tree-structure new-tree mapped-objects-tree">
-            {{#each list}}
-              <li class="tree-item task-item" data-object-type="{{class.table_singular}}"
-                {{#instance}}{{ data 'option' }}{{/instance}} data-id="{{ id }}">
-                  <div class="item-main {{snapshot_object_class}}">
-                    <div class="item-wrap">
-                      <div class="select">
-                        <div class="item-data">
-                          <div class="row-fluid">
-                            <div class="span10">
-                              <div class="tree-title-area">
-                                <a class="url" href="{{viewLink}}" target="_blank">
-                                    <i class="fa fa-{{class.table_singular}} color"></i>
-                                  {{firstexist title name email link}}
-                                </a>
-                              </div>
-                            </div> <!-- span10 end -->
-
-                            {{^is type 'Audit'}}
-                              <div class="span2">
-                                <div class="show-details">
-                                  <a href="javascript://" class="unmap" data-toggle="unmap">
-                                    <span class="result" {{data 'result'}}></span>
-                                    <i class="fa fa-trash"></i>
-                                  </a>
-                                </div>
-                              </div> <!-- span2 end -->
-                            {{/is}}
-                          </div> <!-- row-fluid end -->
-                        </div> <!-- item-data end -->
-                      </div> <!-- select end -->
-                    </div> <!-- item-wrap end -->
-                </div> <!-- item-main end -->
-              </li>
-            {{/each}}
-          </ul>
-        {{/prune_context}}
-        {{^list.length}}
-          <span class="gray"><em>No mapped objects</em></span>
-        {{/list.length}}
-          <div class="objective-selector">
-            <div style="clear:both">
-              <br>
+      <div class="editable-form-row mappings">
+        <ggrc-modal-connector
+                class="width-100"
+                parent_instance="instance"
+                instance="instance"
+                mapping="related_objects_as_source"
+                from-binding="true"
+                deferred="true">
+          <label>
+            Mapped Objects
+          </label>
+          {{#prune_context}}
+            <div class="mapped-objects">
+              {{#each list}}
+                <div class="mapped-object">
+                  <div class="mapped-object-details">
+                     <business-object-list-item {instance}="{.}">
+                       <div class="description">
+                          <read-more {text}="itemData.description" max-text-length="90"></read-more>
+                        </div>
+                     </business-object-list-item>
+                  </div>
+                  <div class="mapped-object-unmap">
+                    {{^is type 'Audit'}}
+                      <a href="javascript://" data-toggle="unmap">
+                        <span class="result" {{data 'result'}}></span>
+                        <i class="fa fa-trash"></i>
+                      </a>
+                    {{/is}}
+                  </div>
+                </div>
+              {{/each}}
+            </div>
+          {{/prune_context}}
+          {{^list.length}}
+            <span class="gray"><em>No mapped objects</em></span>
+          {{/list.length}}
+            <div class="objective-selector">
               {{#if instance.audit}}
                 <a class="section-add section-sticky btn btn-small btn-white"
-                   href="javascript://" rel="tooltip"
+                  href="javascript://" rel="tooltip"
                   {{data "deferred_to"}}
-                   data-placement="left"
-                   data-toggle="unified-mapper"
-                   data-deferred="true"
-                   data-object-source="true"
-                   data-is-new="{{instance.isNew}}"
-                   data-join-object-id="{{instance.id}}"
-                   data-join-object-type="{{instance.class.model_singular}}"
-                   data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6"
-                   data-snapshot-scope-id="{{instance.audit.id}}"
-                   data-snapshot-scope-type="{{instance.audit.type}}"
+                  data-placement="left"
+                  data-toggle="unified-mapper"
+                  data-deferred="true"
+                  data-object-source="true"
+                  data-is-new="{{instance.isNew}}"
+                  data-join-object-id="{{instance.id}}"
+                  data-join-object-type="{{instance.class.model_singular}}"
+                  data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6"
+                  data-snapshot-scope-id="{{instance.audit.id}}"
+                  data-snapshot-scope-type="{{instance.audit.type}}"
                 >
                   Map Objects
                 </a>
               {{else}}
                 <a class="section-add section-sticky btn btn-small btn-white"
-                   href="javascript://" rel="tooltip"
+                  href="javascript://" rel="tooltip"
                   {{data "deferred_to"}}
-                   data-placement="left"
-                   data-toggle="unified-mapper"
-                   data-deferred="true"
-                   data-object-source="true"
-                   data-is-new="{{instance.isNew}}"
-                   data-join-object-id="{{instance.id}}"
-                   data-join-object-type="{{instance.class.model_singular}}"
-                   data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6"
+                  data-placement="left"
+                  data-toggle="unified-mapper"
+                  data-deferred="true"
+                  data-object-source="true"
+                  data-is-new="{{instance.isNew}}"
+                  data-join-object-id="{{instance.id}}"
+                  data-join-object-type="{{instance.class.model_singular}}"
+                  data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6"
                 >
                   Map Objects
                 </a>
               {{/if}}
             </div>
-          </div>
-      </ggrc-modal-connector>
-    </div>
-    <div data-id="notifications_hidden" class="span6 hidable">
-      <div class="comment-notification" tabindex="13">
-        <a data-id="hide_notification_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        <label>
-          <input tabindex="11" type="checkbox"
-                 name="send_by_default"
-                 {{# send_by_default}}checked{{/send_by_default}}>
-          Enable notifications on comments
-        </label>
-
-        <checkbox-to-list property="recipients" instance="instance">
-          <ul class="comment-notification__list">
-            <li>
-              <label class="input--inline">
-                  <input tabindex="12" type="checkbox" can-value="values.Creator">
-                  Notify creator(s)
-              </label>
-            </li>
-            <li>
-              <label class="input--inline">
-                  <input tabindex="13" type="checkbox" can-value="values.Assessor">
-                  Notify assignee(s)
-              </label>
-            </li>
-            <li>
-              <label class="input--inline">
-                  <input tabindex="14" type="checkbox" can-value="values.Verifier">
-                  Notify verifier(s)
-              </label>
-            </li>
-          </ul>
-        </checkbox-to-list>
+        </ggrc-modal-connector>
       </div>
-    </div>
-  </div>
 
-  <div class="row">
-    <div class="span12 hide-wrap hidable">
-      <access-control-list
-          instance="."
-          {is-new-instance}="new_object_form"
-          top-wrapper-class="'span12'"
-          role-block-class="'span6'"></access-control-list>
-    </div>
-  </div>
-
-  <div class="row-fluid">
-    <div data-id="note_hidden" class="span6 hidable">
-      <label>
-        Notes
-        <i class="fa fa-question-circle" rel="tooltip" title="Append simple text or html notes here."></i>
-        <a data-id="hide_note_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-      </label>
-      <div class="wysiwyg-area">
-        <textarea data-id="note_txtbx" tabindex="5" id="notes" class="span12 double wysihtml5" name="notes" placeholder="Enter Notes">{{{notes}}}</textarea>
-      </div>
-    </div>
-  </div>
-
-    <div class="row-fluid">
-      <div data-id="description_hidden" class="span6 hidable">
-        <label>
-          Description
-          <i class="fa fa-question-circle" rel="tooltip" title="Provide more details on the purpose of this {{model.model_singular}} and provide context for how and when this {{model.model_singular}} might be used."></i>
-          <a data-id="hide_description_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        </label>
-        <div class="wysiwyg-area">
-          <textarea tabindex="2" id="control_description" class="span12 triple wysihtml5" name="description" placeholder="Enter Description">{{{description}}}</textarea>
+      <div class="additional-fields">
+        <div class="expand-link">
+          <a class="show-hidden-fields info-show-hide active" href="javascript://">
+            <span class="out">
+              <i class="fa fa-caret-right"></i>
+              SHOW
+            </span>
+            <span class="in">
+              <i class="fa fa-caret-down"></i>
+              HIDE
+            </span>
+            ADDITIONAL FIELDS
+          </a>
         </div>
+        <div class="hidden-fields-area">
+          {{>'/static/mustache/assessments/modal_content_additional_fields.mustache'}}
       </div>
-
-      <div class="span6 hide-wrap hidable">
-        <div class="row-fluid inner-hide">
-          <div data-id="url_hidden" class="span12 hidable">
-            <label>
-              Assessment URL
-              <i class="fa fa-question-circle" rel="tooltip" title="Web link to the Sites page / {{model.model_singular}} documentation."></i>
-              <a data-id="hide_url_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-            </label>
-            <input data-id="url_txtbx" tabindex="7" class="input-block-level" name="url" placeholder="http://www.domain.com/" type="text" value="{{url}}">
-          </div>
-        </div>
-        <div class="row-fluid inner-hide">
-          <div data-id="reference_url_hidden" class="span12 hidable">
-            <label>
-              Reference URL
-              <i class="fa fa-question-circle" rel="tooltip" title="Web links to other references."></i>
-              <a data-id="hide_reference_url_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-            </label>
-            <input data-id="reference_url_txtbx" tabindex="8" id="reference_url" class="input-block-level" placeholder="https://www.example.com/" name="reference_url" type="text" value="{{reference_url}}">
-          </div>
-        </div>
-      </div>
-    </div>
-
-  <div>
-    <div class="row-fluid">
-      <div data-id="code_hidden" class="span4 hidable">
-        <label>
-          Code
-          <i class="fa fa-question-circle" rel="tooltip" title="The GGRC application will automatically provide codes for new objects.  If you would like to override this feature you may manually enter a code of your choosing.  You should have a specific reason for doing this."></i>
-          <a data-id="hide_code_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        </label>
-        <input data-id="code_txtbx" tabindex="8" class="input-block-level" name="slug" placeholder="ASSESSMENT-XXX" type="text" value="{{slug}}">
-      </div>
-      <effective-dates instance="instance"/>
-    </div>
-
-    <div class="row-fluid">
-      <div class="span6 hidable">
-        <label>
-          Conclusion: Design
-          <i class="fa fa-question-circle" rel="tooltip" title="Is this control design effective?"></i>
-          <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        </label>
-          <dropdown tabindex="9"
-                    options-list="model.conclusions"
-                    no-value="true"
-                    no-value-label="---"
-                    name="instance.design"
-                    tabindex="23">
-          </dropdown>
-      </div>
-
-      <div class="span6 hidable">
-        <label>
-          Conclusion: Operation
-          <i class="fa fa-question-circle" rel="tooltip" title="Is this control operationally effective?"></i>
-          <a data-id="hide_state_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
-        </label>
-          <dropdown tabindex="10"
-                    options-list="model.conclusions"
-                    no-value="true"
-                    no-value-label="---"
-                    name="instance.operationally"
-                    tabindex="23">
-          </dropdown>
-      </div>
-    </div>
+    </form>
+    {{/instance}}
   </div>
-</form>
-{{/instance}}
-</div>
 {{!/div}}
