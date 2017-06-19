@@ -9,7 +9,11 @@ Create Date: 2017-05-26 17:34:17.676564
 # disable Invalid constant name pylint warning for mandatory Alembic variables.
 # pylint: disable=invalid-name
 
+import datetime
+
 import sqlalchemy as sa
+from sqlalchemy.sql import column
+from sqlalchemy.sql import table
 
 from alembic import op
 
@@ -183,9 +187,136 @@ def create_tables():
                   ["value_integer"], unique=False)
 
 
+def populate_tables():
+  """Create tables for data platform models."""
+  # Due to old version of alembic we have to redefine the tables in order to
+  # use them for insertion
+  attribute_types = table(
+      "attribute_types",
+      column("attribute_type_id", sa.Integer),
+      column("name", sa.Unicode),
+      column("field_type", sa.Unicode),
+      column("db_column_name", sa.Unicode),
+      column("computed", sa.Boolean),
+      column("aggregate_function", sa.UnicodeText),
+      column("created_at", sa.DateTime),
+      column("updated_at", sa.DateTime),
+  )
+  attribute_definitions = table(
+      "attribute_definitions",
+      column("attribute_definition_id", sa.Integer),
+      column("attribute_type_id", sa.Integer),
+      column("name", sa.Unicode),
+      column("display_name", sa.Unicode),
+      column("created_at", sa.DateTime),
+      column("updated_at", sa.DateTime),
+  )
+  object_types = table(
+      "object_types",
+      column("object_type_id", sa.Integer),
+      column("name", sa.Unicode),
+      column("display_name", sa.Unicode),
+      column("created_at", sa.DateTime),
+      column("updated_at", sa.DateTime),
+  )
+  object_templates = table(
+      "object_templates",
+      column("object_template_id", sa.Integer),
+      column("object_type_id", sa.Integer),
+      column("name", sa.Unicode),
+      column("display_name", sa.Unicode),
+      column("created_at", sa.DateTime),
+      column("updated_at", sa.DateTime),
+  )
+  attribute_templates = table(
+      "attribute_templates",
+      column("attribute_template_id", sa.Integer),
+      column("attribute_definition_id", sa.Integer),
+      column("object_template_id", sa.Integer),
+      column("order", sa.Integer),
+      column("read_only", sa.Boolean),
+      column("created_at", sa.DateTime),
+      column("updated_at", sa.DateTime),
+  )
+
+  op.bulk_insert(
+      object_types,
+      [{
+          "object_type_id": 1,
+          "name": u"basic_type",
+          "display_name": u"Basic Object",
+          "created_at": datetime.datetime.now(),
+          "updated_at": datetime.datetime.now(),
+      }]
+  )
+  op.bulk_insert(
+      object_templates,
+      [{
+          "object_template_id": 1,
+          "object_type_id": 1,
+          "name": u"Control",
+          "display_name": u"Control",
+          "created_at": datetime.datetime.now(),
+          "updated_at": datetime.datetime.now(),
+      }, {
+          "object_template_id": 2,
+          "object_type_id": 1,
+          "name": u"Objective",
+          "display_name": u"Objective",
+          "created_at": datetime.datetime.now(),
+          "updated_at": datetime.datetime.now(),
+      }]
+  )
+  op.bulk_insert(
+      attribute_types,
+      [{
+          "attribute_type_id": 1,
+          "name": u"Computed attribute for last assessment date",
+          "field_type": u"computed_assessment_finished_date",
+          "db_column_name": u"computed_assessment_finished_date",
+          "computed": True,
+          "aggregate_function": u"Assessment finished_date max",
+          "created_at": datetime.datetime.now(),
+          "updated_at": datetime.datetime.now(),
+      }]
+  )
+  op.bulk_insert(
+      attribute_definitions,
+      [{
+          "attribute_definition_id": 1,
+          "attribute_type_id": 1,
+          "name": u"last_assessment_date",
+          "display_name": u"Last Assessment Date",
+          "created_at": datetime.datetime.now(),
+          "updated_at": datetime.datetime.now(),
+      }]
+  )
+  op.bulk_insert(
+      attribute_templates,
+      [{
+          "attribute_template_id": 1,
+          "attribute_definition_id": 1,
+          "object_template_id": 1,
+          "order": 1,
+          "read_only": True,
+          "created_at": datetime.datetime.now(),
+          "updated_at": datetime.datetime.now(),
+      }, {
+          "attribute_template_id": 2,
+          "attribute_definition_id": 1,
+          "object_template_id": 2,
+          "order": 1,
+          "read_only": True,
+          "created_at": datetime.datetime.now(),
+          "updated_at": datetime.datetime.now(),
+      }]
+  )
+
+
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   create_tables()
+  populate_tables()
 
 
 def downgrade():
