@@ -356,10 +356,10 @@
         this.viewModel.list.push(item);
       },
       get_mapping: function () {
-        var instance = this.viewModel.attr('instance');
+        var parentInstance = this.viewModel.attr('instance');
         var dfd = can.Deferred();
         var snapshots = GGRC.Utils.Snapshots;
-        instance.get_binding('related_objects_as_source')
+        parentInstance.get_binding('related_objects_as_source')
           .refresh_instances()
           .then(function (list) {
             var newList = list.filter(function (item) {
@@ -370,9 +370,10 @@
             newList.forEach(function (item) {
               var query;
               var instance = item.instance;
+
               if (snapshots.isSnapshotType(instance)) {
                 query = snapshots.getSnapshotItemQuery(
-                  instance, instance.child_id, instance.child_type);
+                  parentInstance, instance.child_id, instance.child_type);
 
                 GGRC.Utils.QueryAPI
                   .makeRequest(query)
