@@ -68,11 +68,16 @@ describe('GGRC Utils Snapshots', function () {
     });
 
     beforeEach(function () {
+      new CMS.Models.Audit({id: 1});
       snapshot = {
         id: 12345,
         type: 'Snapshot',
         child_id: 42,
         child_type: 'Control',
+        parent: {
+          id: 1,
+          type: 'Audit'
+        },
         revision: {
           content: {
             access_control_list: [

@@ -710,6 +710,7 @@
       var model = CMS.Models[instance.child_type];
       var content = instance.revision.content;
       var type = model.root_collection;
+      var audit = CMS.Models[instance.parent.type].cache[instance.parent.id];
 
       content.isLatestRevision = instance.is_latest_revision;
       content.originalLink = '/' + type + '/' + content.id;
@@ -741,7 +742,17 @@
       }
 
       object = new model(content);
+      // Update archived flag in content when audit is archived:
+      audit.bind('change', function () {
+        var field = arguments[1];
+        var newValue = arguments[3];
+        if (field !== 'archived' || !object.snapshot) {
+          return;
+        }
+        object.snapshot.attr('archived', newValue);
+      });
       model.removeFromCacheById(content.id);  /* removes snapshot object from cache */
+
       return object;
     }
 
