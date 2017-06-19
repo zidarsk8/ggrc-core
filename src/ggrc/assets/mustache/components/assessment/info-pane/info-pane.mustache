@@ -160,6 +160,8 @@
                                                  (on-state-change)="onStateChange(%event)"
                     ></assessment-controls-toolbar>
                 </div>
+                <assessment-people {instance}="instance">
+                </assessment-people>
                 <div class="info-pane__section">
                     <div class="info-pane__section-title">
                        <div class="action-toolbar">
@@ -202,15 +204,6 @@
                     <div class="attribute-tab-panel-column">
                         <collapsible-panel title-text="Description" title-icon="fa-list-ol" class="details-item">
                             <read-more {text}="instance.description"></read-more>
-                        </collapsible-panel>
-                        <collapsible-panel title-text="People" title-icon="fa-users" class="details-item">
-                            <people-list {instance}="instance" editable="true" disable-title="true"></people-list>
-                            <access-control-list
-                                    instance="instance"
-                                    autosave="true"
-                                    top-wrapper-class="'body-inner'"
-                                    role-block-class="'span3'">
-                            </access-control-list>
                         </collapsible-panel>
                         <collapsible-panel title-text="Dates" title-icon="fa-calendar" class="details-item">
                           {{> '/static/mustache/assessments/dates_list.mustache'}}

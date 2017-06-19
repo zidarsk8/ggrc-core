@@ -293,6 +293,7 @@ dashboard-js-files:
   - components/assessment/mapped-objects/mapped-control-related-objects.js
   - components/assessment/mapped-objects/mapped-controls.js
   - components/assessment/mapped-objects/mapped-related-information.js
+  - components/assessment/assessment-people.js
   - components/assessment/mapped-objects/mapped-comments.js
   - components/assessment/info-pane/info-pane.js
   - components/auto-save-form/auto-save-form.js
@@ -321,6 +322,11 @@ dashboard-js-files:
   - components/assessment/attach-button.js
   - components/object-tasks/object-tasks.js
   - components/mapped-counter/mapped-counter.js
+  - components/people/deletable-people-group.js
+  - components/people/editable-people-group.js
+  - components/related-objects/related-people-mapping.js
+  - components/related-objects/related-people-access-control.js
+  - components/related-objects/related-people-access-control-group.js
 
 app-init-files:
   - apps/dashboard.js
@@ -343,6 +349,7 @@ dashboard-js-template-files:
   - components/assessment/mapped-objects/mapped-control-related-objects.mustache
   - components/assessment/mapped-objects/mapped-controls.mustache
   - components/assessment/mapped-objects/mapped-related-information.mustache
+  - components/assessment/assessment-people.mustache
   - components/assessment/mapped-objects/mapped-comments.mustache
   - components/assessment/urls-list.mustache
   - components/assessment/custom-attributes.mustache
@@ -676,6 +683,8 @@ dashboard-js-template-files:
   - snapshots/tree_add_item.mustache
   - components/object-list-item/editable-document-object-list-item.mustache
   - components/assessment/attach-button.mustache
+  - components/people/deletable-people-group.mustache
+  - components/people/editable-people-group.mustache
 
 dashboard-css-files:
   - dashboard.css

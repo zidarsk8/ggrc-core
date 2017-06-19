@@ -58,7 +58,8 @@
             return this.attr('person.system_wide_role') === 'No Access';
           }
         }
-      }
+      },
+      withDetails: true
     }
   });
 })(window.can, window.GGRC, window.CMS, window.RefreshQueue);

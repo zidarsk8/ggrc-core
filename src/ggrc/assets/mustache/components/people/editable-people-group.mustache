@@ -1,0 +1,71 @@
+{{!
+  Copyright (C) 2017 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="editable-people-group">
+<label class="action-toolbar editable-people-group__label required-label">
+  {{title}}
+  {{#if required}}
+    <form-validation-icon {validation}="validation"></form-validation-icon>
+  {{/if}}
+  {{#unless editableMode}}
+    <div class="action-toolbar__controls">
+      <action-toolbar-control>
+        <i class="fa fa-pencil set-editable-group"></i>
+      </action-toolbar-control>
+    </div>
+  {{/unless}}
+</label>
+{{#unless editableMode}}
+  <object-list ({items})="people" {empty-message}="emptyListMessage">
+    <person-list-item person="{.}" {with-details}="withDetails">
+    </person-list-item>
+  </object-list>
+{{else}}
+  <div class="inline-edit inline-edit--active">
+      <div class="inline-edit__content editable-people-group__inline">
+        <div class="editable-people-group__inline-content">
+          <object-list ({items})="people" {empty-message}="emptyListMessage">
+            <person-list-item person="{.}" {with-details}="withDetails">
+              {{#is_allowed 'update' instance}}
+                {{#if canUnmap}}
+                  {{#unmapablePerson required peopleLength}}
+                    <a href="javascript://" class="info-action" ($click)="unmap(person)">
+                      <i class="fa fa-trash"></i>
+                    </a>
+                  {{/unmapablePerson}}
+                {{/if}}
+              {{/is_allowed}}
+            </person-list-item>
+          </object-list>
+          <div>
+          {{#if isLoading}}
+            <spinner toggle="isLoading"></spinner>
+          {{else}}
+            {{#is_allowed 'update' instance}}
+              <autocomplete
+                  search-items-type="Person"
+                  (item-selected)="personSelected(%event.selectedItem)"
+                  placeholder="Add person">
+              </autocomplete>
+            {{/is_allowed}}
+          {{/if}}
+          </div>
+          <ul class="inline-edit__controls inline-edit__controls--edit-mode">
+              <li>
+                  <a href="javascript://" ($click)="save()">
+                      <i class="fa fa-check"></i>
+                  </a>
+              </li>
+              <li>
+                  <a href="javascript://" ($click)="cancel()">
+                      <i class="fa fa-times"></i>
+                  </a>
+              </li>
+          </ul>
+        </div>
+      </div>
+  </div>
+{{/unless}}
+</div>

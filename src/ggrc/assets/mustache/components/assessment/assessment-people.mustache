@@ -1,0 +1,140 @@
+{{!
+    Copyright (C) 2017 Google Inc., authors, and contributors
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="flex-box flex-box-multi">
+    <div class="flex-box width-100">
+      {{#instance.roleConflicts}}
+        <div class="centered width-100">
+          <div class="alert alert-verifier">
+            <p>
+                Please be informed that Assignee and Verifier are the same person.
+            </p>
+          </div>
+        </div>
+      {{/instance.roleConflicts}}
+    </div>
+
+    <div class="people-groups">
+      {{#instance.class.assignable_list}}
+        <related-people-mapping
+          class="people-group"
+          instance="instance"
+          mapping="mapping"
+          type="type"
+          heading="title"
+          {{#if required}}
+            required="true"
+            validate="validate"
+          {{/if}}>
+          {{#if infoPaneMode}}
+            <editable-people-group
+              (unmap)="removeRole(%event)"
+              (change-editable-mode)="changeEditableGroup(%event)"
+              (save-changes)="saveChanges()"
+              (person-selected)="personSelected(%event)"
+              {validation}="validation"
+              {editable-mode}="editableMode"
+              {is-loading}="isLoading"
+              {can-unmap}="canUnmap"
+              {required}="required"
+              {group-id}="type"
+              {instance}="instance"
+              {title}="title"
+              {people}="results">
+            </editable-people-group>
+          {{else}}
+            <deletable-people-group
+              (unmap)="removeRole(%event)"
+              {is-loading}="isLoading"
+              {can-unmap}="canUnmap"
+              {required}="required"
+              {group-id}="type"
+              {instance}="instance"
+              {people}="results">
+              <label class="required-label">
+                {{title}}
+                {{#if required}}
+                  <form-validation-icon {validation}="validation"></form-validation-icon>
+                {{/if}}
+              </label>
+            </deletable-people-group>
+            <div>
+              {{#is_allowed 'update' instance}}
+                <autocomplete
+                    search-items-type="Person"
+                    (item-selected)="addRole(%event.selectedItem, @type)"
+                    placeholder="Add person">
+                </autocomplete>
+              {{/is_allowed}}
+            </div>
+          {{/if}}
+        </related-people-mapping>
+      {{/instance.class.assignable_list}}
+    </div>
+</div>
+
+
+<!-- ACL -->
+  <div class="flex-box">
+    <related-people-access-control
+      class="width-100"
+      {is-new-instance}="new_object_form"
+      {instance}="instance">
+        <div class="people-groups">
+          {{#accessControlGroups}}
+            <related-people-access-control-group
+              {group-id}="groupId"
+              {title}="title"
+              {people}="people"
+              {instance}="instance"
+              class="people-group"
+            >
+            <div>
+              {{#if infoPaneMode}}
+                <editable-people-group
+                  (unmap)="removePerson(%event)"
+                  (change-editable-mode)="changeEditableGroup(%event)"
+                  (save-changes)="saveChanges()"
+                  (person-selected)="personSelected(%event)"
+                  {editable-mode}="editableMode"
+                  {can-unmap}="canEdit"
+                  {is-loading}="isUpdating"
+                  {group-id}="groupId"
+                  {instance}="instance"
+                  {title}="title"
+                  {people}="people">
+                </editable-people-group>
+              {{else}}
+                <deletable-people-group
+                  (unmap)="removePerson(%event)"
+                  {can-unmap}="canEdit"
+                  {is-loading}="isUpdating"
+                  {group-id}="groupId"
+                  {instance}="instance"
+                  {people}="people">
+                  <label>
+                    {{title}}
+                  </label>
+                </deletable-people-group>
+                <div>
+                  {{#if isLoading}}
+                    <spinner toggle="isLoading"></spinner>
+                  {{else}}
+                    {{#is_allowed 'update' instance}}
+                      <autocomplete
+                          search-items-type="Person"
+                          (item-selected)="addPerson(%event.selectedItem, @groupId)"
+                          placeholder="Add person">
+                      </autocomplete>
+                    {{/is_allowed}}
+                  {{/if}}
+                </div>
+              {{/if}}
+            </div>
+            </related-people-access-control-group>
+          {{/accessControlGroups}}
+        </div>
+    </related-people-access-control>
+  </div>

@@ -2884,4 +2884,19 @@ Example:
           return options.fn(options.contexts.add({hasRole: hasRole}));
         }, hasRoleForContextDfd);
     });
+
+  Mustache.registerHelper('unmapablePerson',
+    function (required, peopleGroupLength, options) {
+      required = Mustache.resolve(required);
+      peopleGroupLength = Mustache.resolve(peopleGroupLength);
+
+      if (required) {
+        if (peopleGroupLength > 1) {
+          return options.fn(options.context);
+        }
+        return options.inverse(options.context);
+      }
+      return options.fn(options.context);
+    }
+  );
 })(this, jQuery, can);

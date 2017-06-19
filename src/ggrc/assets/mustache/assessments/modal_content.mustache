@@ -30,9 +30,9 @@
       </div>-->
       <div class="editable-form-row">
         <div class="editable-form-long-input {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-          <label>
+          <label class="required">
             Title
-            <span class="required">*</span>
+            <i class="fa fa-asterisk"></i> 
           </label>
           <input data-id="title_txtbx" tabindex="2" class="input-block-level" placeholder="Enter Title" name="title" type="text" value="{{title}}" autofocus>
           {{#instance.computed_errors.title}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.title}}
@@ -49,7 +49,12 @@
           </div>
         </div>
       </div>
-      <!-- TODO: people list -->
+
+      <div class="width-100">
+        <assessment-people {instance}="instance" info-pane-mode=false>
+        </assessment-people>
+      </div>
+
       <div class="editable-form-row">
         <checkbox-to-list property="recipients" instance="instance" class="flex-box">
           <div class="editable-form-checkobox">
