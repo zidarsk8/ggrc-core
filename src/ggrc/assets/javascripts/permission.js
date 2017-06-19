@@ -148,23 +148,25 @@
       var condition;
       var i;
 
+      conditions = conditions.concat(conditions_by_context.null || []);
+
       if (checkAdmin(0) || checkAdmin(null)) {
         return true;
       }
       if (~resources.indexOf(instance.id)) {
         return true;
       }
-      if (!this._is_allowed(permissions,
-          new Permission(action, instance_type, null)) &&
-        !this._is_allowed(permissions,
-          new Permission(action, instance_type, context.id))) {
-        return false;
+      if (conditions.length === 0 && (this._is_allowed(permissions,
+          new Permission(action, instance_type, null)) ||
+        this._is_allowed(permissions,
+          new Permission(action, instance_type, context.id)))) {
+        return true;
       }
       // Check any conditions applied per instance
       // If there are no conditions, the user has unconditional access to
       // the current instance. We can safely return true in this case.
       if (conditions.length === 0) {
-        return true;
+        return false;
       }
       for (i = 0; i < conditions.length; i++) {
         condition = conditions[i];
