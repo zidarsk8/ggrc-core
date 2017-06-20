@@ -37,7 +37,9 @@
       var blacklist = args.blacklist[action] || [];
       return blacklist.indexOf(instance.type) < 0;
     },
-    has_changed: can.noop,
+    has_changed: function (instance, args) {
+      return (instance.attr(args.property_name) === args.prevent_if);
+    },
     has_not_changed: function (instance, args) {
       return !(instance.attr(args.property_name) === args.prevent_if);
     }
