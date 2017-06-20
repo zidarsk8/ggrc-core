@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, GGRC) {
+(function (can, GGRC, CMS) {
   'use strict';
 
   var template = can.view(GGRC.mustache_path +
@@ -25,7 +25,7 @@
     },
     modelName: null,
     root: false,
-    availableAttributes: [],
+    availableAttributes: can.List(),
     mappingTypes: function () {
       var mappings = GGRC.Mappings
         .get_canonical_mappings_for(this.attr('modelName'));
@@ -67,4 +67,4 @@
     viewModel: viewModel,
     leakScope: false
   });
-})(window.can, window.GGRC);
+})(window.can, window.GGRC, window.CMS);

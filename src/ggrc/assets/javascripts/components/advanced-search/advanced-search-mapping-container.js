@@ -20,18 +20,13 @@
       }
       items.push(GGRC.Utils.AdvancedSearch.create.mappingCriteria());
     },
-    removeFilterCriterion: function (item) {
+    removeMappingCriteria: function (item) {
       var items = this.attr('items');
       var index = items.indexOf(item);
       if (items.length === index + 1) {
         index--;
       }
       items.splice(index, 2);
-    },
-    createGroup: function (attribute) {
-      var items = this.attr('items');
-      var index = items.indexOf(attribute);
-      items.attr(index, GGRC.Utils.AdvancedSearch.create.group([attribute]));
     }
   });
 
