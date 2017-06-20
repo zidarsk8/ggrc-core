@@ -256,7 +256,5 @@ def refresh_documents(mapper, connection, target):
   elif target.destination_type == 'Document':
     for_refresh = target.source
   else:
-    for_refresh = None
-
-  if for_refresh:
-    db.session.expire(for_refresh, ['document_url', 'document_evidence'])
+    return
+  db.session.expire(for_refresh, ['documents'])

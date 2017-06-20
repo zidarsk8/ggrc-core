@@ -208,45 +208,38 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
   @classmethod
   def indexed_query(cls):
     return super(Control, cls).indexed_query().options(
+        orm.Load(cls).undefer_group(
+            "Control_complete"
+        ),
+        orm.Load(cls).joinedload(
+            "directive"
+        ).undefer_group(
+            "Directive_complete"
+        ),
         orm.Load(cls).joinedload(
             "principal_assessor"
-        ).load_only(
-            "id",
-            "email",
-            "name",
+        ).undefer_group(
+            "Person_complete"
         ),
         orm.Load(cls).joinedload(
             "secondary_assessor"
-        ).load_only(
-            "id",
-            "email",
-            "name",
-        ),
-        orm.Load(cls).load_only(
-            'active',
-            'company_control',
-            'documentation_description',
-            'fraud_related',
-            'key_control',
-            'version',
+        ).undefer_group(
+            "Person_complete"
         ),
         orm.Load(cls).joinedload(
             'kind',
-        ).load_only(
-            "id",
-            "title"
+        ).undefer_group(
+            "Option_complete"
         ),
         orm.Load(cls).joinedload(
             'means',
-        ).load_only(
-            "id",
-            "title"
+        ).undefer_group(
+            "Option_complete"
         ),
         orm.Load(cls).joinedload(
             'verify_frequency',
-        ).load_only(
-            "id",
-            "title"
+        ).undefer_group(
+            "Option_complete"
         ),
     )
 

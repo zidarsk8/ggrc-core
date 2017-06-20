@@ -73,6 +73,19 @@ class SystemOrProcess(track_object_state.HasObjectState, Timeboxed,
     return query.options(
         orm.joinedload('network_zone'))
 
+  @classmethod
+  def indexed_query(cls):
+    from sqlalchemy import orm
+
+    query = super(SystemOrProcess, cls).eager_query()
+    return query.options(
+        orm.joinedload(
+            'network_zone',
+        ).undefer_group(
+            "Option_complete",
+        )
+    )
+
   @staticmethod
   def _extra_table_args(cls):
     return (
