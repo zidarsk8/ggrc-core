@@ -140,6 +140,7 @@
   }
   &__group {
     @include element-attribute;
+    display: table;
     padding: 16px;
     background: $tabBgnd;
     border: solid 1px;
