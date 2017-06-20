@@ -14,11 +14,15 @@ Assumes app.yaml is configured with:
 E.g., ``login: required`` must be specified *at least* for the '/login' route.
 """
 
+import json
+
 from google.appengine.api import users
 import flask
 import flask_login
 
 from ggrc.login import common
+from ggrc.models import all_models
+from ggrc import settings
 
 
 def get_user():
@@ -47,3 +51,27 @@ def logout():
   flask_login.logout_user()
   return flask.redirect(users.create_logout_url(common.get_next_url(
       flask.request, default_url=flask.url_for('index'))))
+
+
+def request_loader(request):
+  """Get the user provided in X-GGRC-user if whitelisted Appid provided."""
+
+  whitelist = settings.ALLOWED_QUERYAPI_APP_IDS
+  inbound_appid = request.headers.get("X-Appengine-Inbound-Appid")
+  if inbound_appid not in whitelist:
+    # don't check X-GGRC-user if the request comes from an untrusted source
+    return None
+
+  user = request.headers.get("X-GGRC-user")
+  if not user:
+    # no user provided
+    return None
+
+  try:
+    user = json.loads(user)
+  except (TypeError, ValueError):
+    # user provided in invalid syntax
+    return None
+
+  db_user = all_models.Person.query.filter_by(email=user.get("email")).first()
+  return db_user
