@@ -8,7 +8,7 @@
   var _CONDITIONS_MAP = {
     contains: function (instance, args) {
       var value = Permission._resolve_permission_variable(args.value);
-      var list_value = instance[args.list_property];
+      var list_value = instance[args.list_property] || [];
       var i;
       for (i = 0; i < list_value.length; i++) {
         if (list_value[i].id == value.id) {
