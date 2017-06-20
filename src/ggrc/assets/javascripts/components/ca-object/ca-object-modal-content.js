@@ -34,7 +34,6 @@
           }
         }
       },
-      allSaved: false,
       formSavedDeferred: can.Deferred(),
       isUpdatingEvidences: false,
       content: {
@@ -49,14 +48,11 @@
         var comment = e.comment;
         var instance = this.attr('instance');
         var context = instance.attr('context');
-        var commentUpdate = {
-          context: context,
-          assignee_type: GGRC.Utils.getAssigneeType(instance)
-        };
         var relation = new CMS.Models.Relationship({
           context: context,
           destination: instance
         });
+        var self = this;
         var addComment = function (data) {
           return comment.attr(data)
             .save()
@@ -64,27 +60,45 @@
               relation.attr({source: comment.serialize()})
                 .save()
                 .then(function () {
+                  self.dispatch('afterCommentCreated');
                   instance.dispatch('refreshInstance');
                 });
             });
         };
-        var self = this;
 
+        this.dispatch({
+          type: 'beforeCommentCreated',
+          items: [can.extend(comment.attr(), {
+            assignee_type: GGRC.Utils.getAssigneeType(instance),
+            custom_attribute_revision: {
+              custom_attribute: {
+                title: this.attr('content.title')
+              },
+              custom_attribute_stored_value: this.attr('content.value')
+            }
+          })]
+        });
         this.attr('content.contextScope.errorsMap.comment', false);
         this.attr('content.contextScope.validation.valid',
           !this.attr('content.contextScope.errorsMap.evidence'));
         this.attr('state.open', false);
         this.attr('state.save', false);
 
-        this.attr('formSavedDeferred').then(function () {
-          commentUpdate.custom_attribute_revision_upd = {
-            custom_attribute_value:
-            {id: self.attr('content.contextScope.valueId')()},
-            custom_attribute_definition:
-            {id: self.attr('content.contextScope.id')}
-          };
-          addComment(commentUpdate);
-        });
+        this.attr('formSavedDeferred')
+          .then(function () {
+            addComment({
+              context: context,
+              assignee_type: GGRC.Utils.getAssigneeType(instance),
+              custom_attribute_revision_upd: {
+                custom_attribute_value: {
+                  id: self.attr('content.contextScope.valueId')()
+                },
+                custom_attribute_definition: {
+                  id: self.attr('content.contextScope.id')
+                }
+              }
+            });
+          });
       }
     }
   });

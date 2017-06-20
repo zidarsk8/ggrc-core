@@ -140,12 +140,13 @@
                     <simple-modal {(state)}="modal.state"
                                   {modal-title}="modal.modalTitle"
                                   {instance}="instance"
-                                  (on-close)="updateItems('comments', 'evidences')">
+                                  (on-close)="updateItems('evidences')">
                         <ca-object-modal-content {instance}="instance"
                                                  {(content)}="modal.content"
                                                  {(state)}="state"
                                                  {form-saved-deferred}="formState.formSavedDeferred"
-                                                 {all-saved}="formState.allSaved"
+                                                 (before-comment-created)="addItems(%event, 'comments')"
+                                                 (after-comment-created)="updateItems('comments')"
                         ></ca-object-modal-content>
                     </simple-modal>
                     <!-- End of Modal Window -->

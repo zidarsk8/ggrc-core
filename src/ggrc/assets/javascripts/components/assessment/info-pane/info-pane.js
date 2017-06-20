@@ -136,15 +136,15 @@
       },
       loadComments: function () {
         var query = this.getCommentQuery();
-        return this.requestQuery(query);
+        return this.requestQuery(query, 'comments');
       },
       loadEvidences: function () {
         var query = this.getEvidenceQuery();
-        return this.requestQuery(query, 'Evidences');
+        return this.requestQuery(query, 'evidences');
       },
       loadUrls: function () {
         var query = this.getUrlQuery();
-        return this.requestQuery(query, 'Urls');
+        return this.requestQuery(query, 'urls');
       },
       updateItems: function () {
         can.makeArray(arguments).forEach(function (type) {
@@ -288,7 +288,6 @@
       '{viewModel.instance} refreshInstance': function () {
         this.viewModel.attr('mappedSnapshots')
           .replace(this.viewModel.loadSnapshots());
-        this.viewModel.updateItems('comments');
       }
     }
   });
