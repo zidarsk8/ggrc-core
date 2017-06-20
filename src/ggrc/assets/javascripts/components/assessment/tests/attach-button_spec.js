@@ -35,7 +35,7 @@ describe('GGRC.Components.attachButton', function () {
     function () {
       var dfd = can.Deferred();
       var result;
-      viewModel.instance.status = 'Ready for Review';
+      viewModel.attr('instance.status', 'Ready for Review');
       spyOn(can, 'Deferred').and.returnValue(dfd);
 
       result = viewModel.confirmationCallback();
@@ -45,7 +45,7 @@ describe('GGRC.Components.attachButton', function () {
 
     it('returns null if instance is in "In Progress" state', function () {
       var result;
-      viewModel.instance.status = 'In Progress';
+      viewModel.attr('instance.status', 'In Progress');
 
       result = viewModel.confirmationCallback();
 
@@ -53,7 +53,7 @@ describe('GGRC.Components.attachButton', function () {
     });
 
     it('initializes confirmation modal with correct options', function () {
-      viewModel.instance.status = 'Ready for Review';
+      viewModel.attr('instance.status', 'Ready for Review');
       spyOn(GGRC.Controllers.Modals, 'confirm');
 
       viewModel.confirmationCallback();
@@ -69,7 +69,7 @@ describe('GGRC.Components.attachButton', function () {
 
     it('resolves Deferred if modal has been confirmed', function () {
       var result;
-      viewModel.instance.status = 'Ready for Review';
+      viewModel.attr('instance.status', 'Ready for Review');
       spyOn(GGRC.Controllers.Modals, 'confirm').and.callFake(
       function (options, confirm, cancel) {
         confirm();
@@ -82,7 +82,7 @@ describe('GGRC.Components.attachButton', function () {
 
     it('rejects Deferred if modal has been canceled', function () {
       var result;
-      viewModel.instance.status = 'Ready for Review';
+      viewModel.attr('instance.status', 'Ready for Review');
       spyOn(GGRC.Controllers.Modals, 'confirm').and.callFake(
       function (options, confirm, cancel) {
         cancel();
