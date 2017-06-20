@@ -36,6 +36,7 @@
       },
       allSaved: false,
       formSavedDeferred: can.Deferred(),
+      isUpdatingEvidences: false,
       content: {
         contextScope: {},
         fields: [],

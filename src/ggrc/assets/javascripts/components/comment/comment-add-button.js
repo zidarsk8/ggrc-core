@@ -20,7 +20,9 @@
       define: {
         disabled: {
           get: function () {
-            return this.attr('isSaving') || !this.attr('value').length;
+            return this.attr('isSaving') ||
+              !this.attr('value').length ||
+              this.attr('isDisabled');
           }
         },
         value: {
@@ -31,6 +33,7 @@
           }
         }
       },
+      isDisabled: false,
       isSaving: false,
       createComment: function () {
         var comment;

@@ -101,19 +101,20 @@
         var evidenceType = CMS.Models.Document.EVIDENCE;
         return this.getQuery(
           'Document',
-          undefined,
+          {sortBy: 'created_at', sortDirection: 'desc'},
           this.getDocumentAdditionFilter(evidenceType));
       },
       getUrlQuery: function () {
         var urlType = CMS.Models.Document.URL;
         return this.getQuery(
           'Document',
-          undefined,
+          {sortBy: 'created_at', sortDirection: 'desc'},
           this.getDocumentAdditionFilter(urlType));
       },
-      requestQuery: function (query) {
+      requestQuery: function (query, type) {
         var dfd = can.Deferred();
-        this.attr('isLoading', true);
+        type = type || '';
+        this.attr('isUpdating' + can.capitalize(type), true);
         GGRC.Utils.QueryAPI
           .batchRequests(query)
           .done(function (response) {
@@ -125,7 +126,7 @@
             dfd.resolve([]);
           })
           .always(function () {
-            this.attr('isLoading', false);
+            this.attr('isUpdating' + can.capitalize(type), false);
           }.bind(this));
         return dfd;
       },
@@ -139,11 +140,28 @@
       },
       loadEvidences: function () {
         var query = this.getEvidenceQuery();
-        return this.requestQuery(query);
+        return this.requestQuery(query, 'Evidences');
       },
       loadUrls: function () {
         var query = this.getUrlQuery();
-        return this.requestQuery(query);
+        return this.requestQuery(query, 'Urls');
+      },
+      updateItems: function () {
+        can.makeArray(arguments).forEach(function (type) {
+          this.attr(type).replace(this['load' + can.capitalize(type)]());
+        }.bind(this));
+      },
+      removeItem: function (event, type) {
+        var item = event.item;
+        var index = this.attr(type).indexOf(item);
+        this.attr('isUpdating' + can.capitalize(type), true);
+        return this.attr(type).splice(index, 1);
+      },
+      addItems: function (event, type) {
+        var items = event.items;
+        this.attr('isUpdating' + can.capitalize(type), true);
+        return this.attr(type).unshift.apply(this.attr(type),
+          can.makeArray(items));
       },
       getDocumentAdditionFilter: function (documentType) {
         return documentType ?
@@ -268,7 +286,9 @@
     },
     events: {
       '{viewModel.instance} refreshInstance': function () {
-        this.viewModel.updateRelatedItems();
+        this.viewModel.attr('mappedSnapshots')
+          .replace(this.viewModel.loadSnapshots());
+        this.viewModel.updateItems('comments');
       }
     }
   });

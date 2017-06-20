@@ -45,11 +45,16 @@
                     </div>
                     <div class="assessment-controls__extra-controls">
                         <div>
-                            <h6>Evidence</h6>
+                            <div class="info-pane__section-title">
+                                <spinner class="info-pane__section-title-icon" {toggle}="isUpdatingEvidences"></spinner>
+                                Evidence
+                            </div>
                             <object-list {items}="evidences" {empty-message}="noItemsText">
                                 <editable-document-object-list-item {document}="{.}">
                                     <action-toolbar-control>
                                         <unmap-button
+                                            (before-unmap)="removeItem(%event, 'evidences')"
+                                            (after-unmap)="updateItems('evidences')"
                                             {destination}="instance"
                                             {source}="document">
                                             <i class="fa fa-trash"></i>
@@ -57,14 +62,22 @@
                                     </action-toolbar-control>
                                 </editable-document-object-list-item>
                             </object-list>
-                            <attach-button {instance}="instance"></attach-button>
+                            <attach-button
+                                        (before-create)="addItems(%event, 'evidences')"
+                                        (refresh-evidences)="updateItems('evidences')"
+                                        {instance}="instance"></attach-button>
                         </div>
                         <div>
-                            <h6>URL</h6>
+                            <div class="info-pane__section-title">
+                                <spinner class="info-pane__section-title-icon" {toggle}="isUpdatingUrls"></spinner>
+                                URL
+                            </div>
                             <object-list {items}="urls" {empty-message}="noItemsText">
                                 <editable-document-object-list-item {document}="{.}">
                                     <action-toolbar-control>
                                       <unmap-button
+                                            (before-unmap)="removeItem(%event, 'urls')"
+                                            (after-unmap)="updateItems('urls')"
                                             {destination}="instance"
                                             {source}="document">
                                             <i class="fa fa-trash"></i>
@@ -76,6 +89,8 @@
                             {{#is_allowed 'update' instance context='for'}}
                             {{#toggle show_new_object_form}}
                                 <ggrc-quick-add
+                                        (before-create)="addItems(%event, 'urls')"
+                                        (after-create)="updateItems('urls')"
                                         {parent_instance}="instance"
                                         join_model="Relationship"
                                         quick_create="create_url">
@@ -122,7 +137,10 @@
                                     (validation-changed)="showRequiredInfoModal(%event)"
                     ></auto-save-form>
                     <!-- Modal Window to fix validation issues of CA fields -->
-                    <simple-modal {(state)}="modal.state" {modal-title}="modal.modalTitle" {instance}="instance">
+                    <simple-modal {(state)}="modal.state"
+                                  {modal-title}="modal.modalTitle"
+                                  {instance}="instance"
+                                  (on-close)="updateItems('comments', 'evidences')">
                         <ca-object-modal-content {instance}="instance"
                                                  {(content)}="modal.content"
                                                  {(state)}="state"
@@ -163,7 +181,10 @@
                   {{#unless isInstanceCompleted}}
                     {{#is_allowed 'update' instance context='for'}}
                       <comment-add-form class="comment-add-form"
-                                      {instance}="instance" {(is-saving)}="isLoading"
+                                      {instance}="instance"
+                                      {is-saving}="isUpdatingComments"
+                                      (after-create)="updateItems('comments')"
+                                      (before-create)="addItems(%event, 'comments')"
                       ></comment-add-form>
                     {{/is_allowed}}
                   {{/unless}}
