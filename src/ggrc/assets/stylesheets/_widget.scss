@@ -192,6 +192,11 @@
     a {
       color: $textGray;
     }
+    person-info {
+      > div {
+        display: inline;
+      }
+    }
   }
 }
 
