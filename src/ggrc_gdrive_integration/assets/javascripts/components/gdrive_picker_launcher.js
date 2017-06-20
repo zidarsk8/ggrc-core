@@ -17,6 +17,20 @@
       itemsUploadedCallback: '@',
       confirmationCallback: '@',
       pickerActive: false,
+      beforeCreateHnadler: function (files) {
+        var tempFiles = files.map(function (file) {
+          return {
+            title: file.name,
+            link: file.url,
+            created_at: new Date(),
+            isDraft: true
+          };
+        });
+        this.dispatch({
+          type: 'onBeforeAttach',
+          items: tempFiles
+        });
+      },
       onClickHandler: function () {
         var eventType = this.attr('click_event');
         var handler = this[eventType] || function () {};
@@ -90,6 +104,7 @@
             files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
             that.attr('pending', true);
             scope.attr('pickerActive', false);
+            that.beforeCreateHnadler(files);
 
             return new RefreshQueue().enqueue(files).trigger()
               .then(function (files) {
@@ -181,6 +196,7 @@
             parentFolder.uploadFiles()
               .then(function (files) {
                 that.attr('pending', true);
+                that.beforeCreateHnadler(files);
                 return new RefreshQueue().enqueue(files).trigger()
                   .then(function (fs) {
                     var mapped = can.map(fs, function (file) {
@@ -195,7 +211,7 @@
                   });
               })
               .done(function () {
-                var files = can.map(can.makeArray(arguments), function (file) {
+                var files = can.makeArray(arguments).map(function (file) {
                   return CMS.Models.GDriveFile.model(file);
                 });
                 var dfdsDoc = that.handle_file_upload(files);
