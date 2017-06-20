@@ -26,6 +26,7 @@ from ggrc.gcalendar import calendar_event_builder
 from ggrc.gcalendar import calendar_event_sync
 from ggrc.models import Person
 from ggrc.models import Notification, NotificationHistory
+from ggrc.notifications.unsubscribe import unsubscribe_url
 from ggrc.rbac import permissions
 from ggrc.utils import DATE_FORMAT_US, merge_dict, benchmark
 from ggrc.notifications.notification_handlers import SEND_TIME
@@ -296,7 +297,7 @@ def send_daily_digest_notifications():
 
     with benchmark("sending daily emails"):
       for user_email, data in notif_data.iteritems():
-        data = modify_data(data)
+        data = modify_data(data, user_email)
         email_body = settings.EMAIL_DIGEST.render(digest=data)
         send_email(user_email, subject, email_body)
         sent_emails.append(user_email)
@@ -390,8 +391,8 @@ def show_pending_notifications():
   _, notif_data = get_pending_notifications()
 
   for day_notif in notif_data.itervalues():
-    for data in day_notif.itervalues():
-      data = modify_data(data)
+    for user_email, data in day_notif.iteritems():
+      data = modify_data(data, user_email)
   return settings.EMAIL_PENDING.render(data=sorted(notif_data.iteritems()))
 
 
@@ -404,9 +405,10 @@ def show_daily_digest_notifications():
   # pylint: disable=invalid-name
   if not permissions.is_admin():
     raise Forbidden()
+
   _, notif_data = get_daily_notifications()
-  for data in notif_data.itervalues():
-    data = modify_data(data)
+  for user_email, data in notif_data.iteritems():
+    data = modify_data(data, user_email)
   return settings.EMAIL_DAILY.render(data=notif_data)
 
 
@@ -465,7 +467,7 @@ def send_email(user_email, subject, body):
   message.send()
 
 
-def modify_data(data):
+def modify_data(data, user_email):
   """Modify notification data dictionary.
 
   For easier use in templates, it computes/aggregates some additional
@@ -474,6 +476,7 @@ def modify_data(data):
 
   Args:
     data (dict): notification data.
+    user_email (string): email address of the user that `data` was built for
 
   Returns:
     dict: the received dict with some additional fields for easier traversal
@@ -485,6 +488,8 @@ def modify_data(data):
     for cycle in data["cycle_data"].values():
       if "my_tasks" in cycle:
         data["cycle_started_tasks"].update(cycle["my_tasks"])
+
+  data["unsubscribe_url"] = unsubscribe_url(user_email)
 
   # Move comment notifications for same object into list and sort by
   # created_at field
