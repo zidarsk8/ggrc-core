@@ -45,6 +45,7 @@
     max-height: 85%;
     .simple-modal__body {
       padding-right: 48px;
+      overflow: visible;
     }
     .simple-modal__header  {
       height: $simple-modal-header-height;
