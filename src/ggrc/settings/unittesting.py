@@ -3,6 +3,7 @@
 
 DEBUG = True
 TESTING = True
+LOGIN_DISABLED = False
 PRODUCTION = False
 HOST = '0.0.0.0'
 SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root:root@localhost/ggrcdevtest'
