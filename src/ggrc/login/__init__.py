@@ -58,6 +58,8 @@ def init_app(app):
   app.login_manager.user_loader(user_loader)
   if hasattr(login_module, 'before_request'):
     app.before_request(login_module.before_request)
+  if hasattr(login_module, 'request_loader'):
+    app.login_manager.request_loader(login_module.request_loader)
   # app.context_processor(login_module.session_context)
 
 
