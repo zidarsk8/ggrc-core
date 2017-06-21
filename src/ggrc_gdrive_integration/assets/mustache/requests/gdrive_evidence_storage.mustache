@@ -9,8 +9,8 @@
                 instance="instance"
                 click_event="trigger_upload_parent"
                 {confirmation-callback}="@confirmationCallback"
-                {items-uploaded-callback}="@itemsUploadedCallback">
-            Attach
+                {items-uploaded-callback}="@itemsUploadedCallback"
+                (on-before-attach)="onBeforeCreate(%event)">Attach
         </ggrc-gdrive-picker-launcher>
     {{else}}
       <div class="attachment-upload-control__icon attachment-upload-control__icon__error">
@@ -21,8 +21,8 @@
                 instance="instance"
                 click_event="trigger_upload"
                 {confirmation-callback}="@confirmationCallback"
-                {items-uploaded-callback}="@itemsUploadedCallback">
-            Attach
+                {items-uploaded-callback}="@itemsUploadedCallback"
+                (on-before-attach)="onBeforeCreate(%event)">Attach
         </ggrc-gdrive-picker-launcher>
     {{/if}}
   {{else}}

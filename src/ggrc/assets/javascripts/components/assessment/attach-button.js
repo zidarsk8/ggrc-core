@@ -15,11 +15,15 @@
     template: template,
     viewModel: {
       instance: {},
+      onBeforeCreate: function (event) {
+        var items = event.items;
+        this.dispatch({type: 'beforeCreate', items: items});
+      },
       confirmationCallback: function () {
         var confirmation = null;
 
-        if (this.instance instanceof CMS.Models.Assessment &&
-            this.instance.status !== 'In Progress') {
+        if (this.attr('instance') instanceof CMS.Models.Assessment &&
+            this.attr('instance.status') !== 'In Progress') {
           confirmation = can.Deferred();
           GGRC.Controllers.Modals.confirm({
             modal_title: 'Confirm moving Assessment to "In Progress"',

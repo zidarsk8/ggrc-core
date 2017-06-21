@@ -20,7 +20,9 @@
       define: {
         disabled: {
           get: function () {
-            return this.attr('isSaving') || !this.attr('value').length;
+            return this.attr('isSaving') ||
+              !this.attr('value').length ||
+              this.attr('isDisabled');
           }
         },
         value: {
@@ -31,13 +33,16 @@
           }
         }
       },
+      isDisabled: false,
       isSaving: false,
       createComment: function () {
         var comment;
         var description = this.attr('value');
 
         comment = new CMS.Models.Comment({
-          description: description
+          description: description,
+          created_at: new Date(),
+          modified_by: {type: 'Person', id: GGRC.current_user.id}
         });
         // Erase RichText Field after Comment Creation
         this.attr('value', '');

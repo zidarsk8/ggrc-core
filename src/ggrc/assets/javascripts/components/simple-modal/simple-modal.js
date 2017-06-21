@@ -27,6 +27,7 @@
       },
       hide: function () {
         this.attr('state.open', false);
+        this.dispatch('onClose');
       },
       show: function () {
         this.attr('state.open', true);

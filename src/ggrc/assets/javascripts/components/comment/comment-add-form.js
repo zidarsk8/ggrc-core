@@ -18,15 +18,10 @@
     tag: tag,
     template: template,
     viewModel: {
-      define: {
-        instance: {
-          value: function () {
-            return GGRC.page_instance();
-          }
-        }
-      },
+      instance: {},
       sendNotifications: true,
       isSaving: false,
+      isLoading: false,
       getCommentData: function () {
         var source = this.attr('instance');
 
@@ -34,7 +29,9 @@
           comment: source.attr('context'),
           send_notification: this.attr('sendNotifications'),
           context: source.context,
-          assignee_type: GGRC.Utils.getAssigneeType(source)
+          assignee_type: GGRC.Utils.getAssigneeType(source),
+          created_at: new Date(),
+          modified_by: {type: 'Person', id: GGRC.current_user.id}
         };
       },
       updateComment: function (comment) {
@@ -46,9 +43,9 @@
       onCommentCreated: function (e) {
         var comment = e.comment;
         this.attr('isSaving', true);
-
-        this.updateComment(comment)
-          .save()
+        comment = this.updateComment(comment);
+        this.dispatch({type: 'beforeCreate', items: [comment.attr()]});
+        comment.save()
           .always(function () {
             this.attr('isSaving', false);
             this.attr('instance').dispatch('refreshInstance');

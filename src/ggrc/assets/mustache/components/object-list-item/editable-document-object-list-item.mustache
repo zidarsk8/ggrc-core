@@ -9,9 +9,11 @@
     </div>
     <div class="action-toolbar__controls">
         {{#unless instance.archived}}
-          {{#is_allowed 'update' instance context='for'}}
-            <content></content>
-          {{/is_allowed}}
+          {{#unless document.isDraft}}
+            {{#is_allowed 'update' instance context='for'}}
+              <content></content>
+            {{/is_allowed}}
+          {{/unless}}
         {{/unless}}
     </div>
 </action-toolbar>

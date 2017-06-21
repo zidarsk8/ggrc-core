@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, $) {
+(function (GGRC) {
   'use strict';
 
   GGRC.Components('relatedDocuments', {
@@ -45,10 +45,22 @@
           self.attr('documents').replace(documents);
           self.attr('isLoading', false);
         });
+      },
+      removeDocument: function (event) {
+        var item = event.item;
+        var index = this.attr('documents').indexOf(item);
+        this.attr('isLoading', true);
+        return this.attr('documents').splice(index, 1);
+      },
+      addDocuments: function (event) {
+        var items = event.items;
+        this.attr('isLoading', true);
+        return this.attr('documents').unshift
+          .apply(this.attr('documents'), items);
       }
     },
     init: function () {
       this.viewModel.loadDocuments();
     }
   });
-})(window.can, window.can.$);
+})(window.GGRC, window);

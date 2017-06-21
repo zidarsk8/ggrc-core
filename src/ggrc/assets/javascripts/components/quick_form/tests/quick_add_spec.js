@@ -43,8 +43,8 @@ describe('GGRC.Components.quickAdd', function () {
           }
         }
       };
-      verifyDfd = $.Deferred();
-      spyOn($, 'Deferred')
+      verifyDfd = can.Deferred();
+      spyOn(can, 'Deferred')
         .and.returnValue(verifyDfd);
       spyOn(verifyDfd, 'resolve');
     });

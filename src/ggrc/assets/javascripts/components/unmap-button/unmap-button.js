@@ -16,18 +16,18 @@
       destination: {},
       source: {},
       unmapInstance: function () {
+        var self = this;
+        this.dispatch({type: 'beforeUnmap', item: this.attr('source')});
         this.getMapping()
           .refresh()
           .done(function (item) {
             item.destroy()
               .then(function () {
-                this.dispatch('unmapped');
-                this.attr('destination').dispatch('refreshInstance');
-                can.trigger('unmap', {params: [
-                  this.attr('source'),
-                  this.attr('destination')]});
-              }.bind(this));
-          }.bind(this));
+                self.dispatch('unmapped');
+                self.attr('destination').dispatch('refreshInstance');
+                self.dispatch('afterUnmap');
+              });
+          });
       },
       getMapping: function () {
         var type = this.attr('mappingType') || defaultType;
