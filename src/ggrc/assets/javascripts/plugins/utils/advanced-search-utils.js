@@ -74,8 +74,8 @@
         richOperators[state.operator],
         state.modelName) + ')';
     }
-    function groupToFilter(items) {
-      return '(' + buildFilter(items) + ')';
+    function groupToFilter(items, request) {
+      return '(' + buildFilter(items, request) + ')';
     }
 
     function mappingCriteriaToFilter(criteria, request) {
@@ -88,12 +88,13 @@
     function addMappingCriteria(mapping, request) {
       var filterObject = GGRC.query_parser
         .parse(attributeToFilter(mapping.filter.value));
-      var criteriaId;
+      var relevantResult;
       if (mapping.mappedTo) {
-        criteriaId = addMappingCriteria(mapping.mappedTo.value, request);
+        relevantResult =
+          builders[mapping.mappedTo.type](mapping.mappedTo.value, request);
         filterObject = GGRC.query_parser.join_queries(
           filterObject,
-          GGRC.query_parser.parse(previousToFilter(criteriaId))
+          GGRC.query_parser.parse(relevantResult)
         );
       }
       request.push({

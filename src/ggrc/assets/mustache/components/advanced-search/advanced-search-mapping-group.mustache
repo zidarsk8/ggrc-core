@@ -3,53 +3,40 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="mapping-container">
-  <div class="mapping-container__content">
+<div class="mapping-group">
+  <div class="mapping-group__header">
+    <a class="close-btn" href="javascript://" ($click)="remove()">
+      <i class="fa fa-remove"></i>
+    </a>
+  </div>
+  <div class="mapping-group__content">
     {{#each items}}
       {{#switch type}}
         {{#case "operator"}}
-        <div class="mapping-container__operator">
+        <div class="mapping-group__operator">
           <advanced-search-filter-operator
             {(operator)}="value">
           </advanced-search-filter-operator>
         </div>
         {{/case}}
         {{#case "mappingCriteria"}}
-        <div class="mapping-container__criteria">
+        <div class="mapping-group__criteria">
           <advanced-search-mapping-criteria
             {(criteria)}="value"
             (remove)="removeMappingCriteria(../)"
             {available-attributes}="availableAttributes"
             {model-name}="modelName"
-            {root}="true"
-            {extendable}="true"
-            (createGroup)="createGroup(../)">
+            {root}="root">
           </advanced-search-mapping-criteria>
-        </div>
-        {{/case}}
-        {{#case "group"}}
-        <div class="mapping-container__group">
-          <advanced-search-mapping-group
-            {(items)}="value"
-            (remove)="removeMappingCriteria(../)"
-            {available-attributes}="availableAttributes"
-            {model-name}="modelName"
-            {root}="true">
-          </advanced-search-mapping-group>
         </div>
         {{/case}}
       {{/switch}}
     {{/each}}
   </div>
-  <div class="mapping-container__footer">
+  <div class="mapping-group__footer">
     <div>
       <button class="btn btn-small btn-white" ($click)="addMappingCriteria()">Add Mapping Filter</button>
     </div>
   </div>
 </div>
-
-
-
-
-
 

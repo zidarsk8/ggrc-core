@@ -25,6 +25,7 @@
     },
     modelName: null,
     root: false,
+    extendable: false,
     availableAttributes: can.List(),
     mappingTypes: function () {
       var mappings = GGRC.Mappings
@@ -52,12 +53,23 @@
     remove: function () {
       this.dispatch('remove');
     },
+    createGroup: function () {
+      this.dispatch('createGroup');
+    },
     addRelevant: function () {
       this.attr('criteria.mappedTo',
         GGRC.Utils.AdvancedSearch.create.mappingCriteria());
     },
     removeRelevant: function () {
       this.removeAttr('criteria.mappedTo');
+    },
+    relevantToGroup: function () {
+      this.attr('criteria.mappedTo',
+        GGRC.Utils.AdvancedSearch.create.group([
+          this.attr('criteria.mappedTo'),
+          GGRC.Utils.AdvancedSearch.create.operator('AND'),
+          GGRC.Utils.AdvancedSearch.create.mappingCriteria()
+        ]));
     }
   });
 

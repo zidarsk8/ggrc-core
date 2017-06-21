@@ -38,7 +38,7 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
   });
 
   describe('removeMappingCriteria() method', function () {
-    it('removes criteria and operator in front if item is first',
+    it('removes criteria and operator behind if item is first',
     function () {
       var viewItems;
       viewModel.attr('items', [
@@ -55,7 +55,7 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
       expect(viewItems[0].value.objectName).toBe('second');
     });
 
-    it('removes mappingCriteria and operator behind if item is not first',
+    it('removes mappingCriteria and operator in front if item is not first',
     function () {
       var viewItems;
       viewModel.attr('items', [
@@ -70,6 +70,31 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
       expect(viewItems.length).toBe(1);
       expect(viewItems[0].type).toBe('mappingCriteria');
       expect(viewItems[0].value.objectName).toBe('first');
+    });
+  });
+
+  describe('createGroup() method', function () {
+    it('transforms criteria to group with 2 criteria and operator inside',
+    function () {
+      var viewItems;
+      viewModel.attr('items', new can.List([
+        GGRC.Utils.AdvancedSearch.create.mappingCriteria({field: 'first'}),
+        GGRC.Utils.AdvancedSearch.create.operator(),
+        GGRC.Utils.AdvancedSearch.create.mappingCriteria({field: 'second'})
+      ]));
+      viewItems = viewModel.attr('items');
+
+      viewModel.createGroup(viewItems[0]);
+
+      expect(viewItems.length).toBe(3);
+      expect(viewItems[0].type).toBe('group');
+      expect(viewItems[1].type).toBe('operator');
+      expect(viewItems[2].type).toBe('mappingCriteria');
+      expect(viewItems[0].value.length).toBe(3);
+      expect(viewItems[0].value[0].type).toBe('mappingCriteria');
+      expect(viewItems[0].value[0].value.field).toBe('first');
+      expect(viewItems[0].value[1].type).toBe('operator');
+      expect(viewItems[0].value[2].type).toBe('mappingCriteria');
     });
   });
 });

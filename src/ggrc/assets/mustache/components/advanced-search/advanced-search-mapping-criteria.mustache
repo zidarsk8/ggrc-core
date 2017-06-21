@@ -27,17 +27,34 @@
       {{^if criteria.mappedTo}}
       <a href="javascript:void(0)" class="advanced-filter" ($click)="addRelevant()">+ Add</a>
       {{/if}}
+      {{#if extendable}}
+      <a href="javascript:void(0)" class="advanced-filter" ($click)="createGroup()">Group Expression</a>
+      {{/if}}
     </div>
   </div>
   {{#if criteria.mappedTo}}
   <div class="mapping-criteria__relationship"></div>
   <div class="mapping-criteria__relevant">
-    <advanced-search-mapping-criteria
+    {{#switch criteria.mappedTo.type}}
+      {{#case "mappingCriteria"}}
+          <advanced-search-mapping-criteria
             {(criteria)}="criteria.mappedTo.value"
-            (remove)="removeRelevant(../)"
+            (remove)="removeRelevant()"
             {available-attributes}="availableAttributes"
-            {model-name}="criteria.objectName">
-    </advanced-search-mapping-criteria>
+            {model-name}="criteria.objectName"
+            {extendable}="extendable"
+            (createGroup)="relevantToGroup()">
+          </advanced-search-mapping-criteria>
+      {{/case}}
+      {{#case "group"}}
+        <advanced-search-mapping-group
+          {(items)}="criteria.mappedTo.value"
+          (remove)="removeRelevant()"
+          {available-attributes}="availableAttributes"
+          {model-name}="criteria.objectName">
+        </advanced-search-mapping-group>
+        {{/case}}
+      {{/switch}}
   </div>
   {{/if}}
 </div>

@@ -7,17 +7,16 @@
   'use strict';
 
   var template = can.view(GGRC.mustache_path +
-    '/components/advanced-search/advanced-search-mapping-container.mustache');
+    '/components/advanced-search/advanced-search-mapping-group.mustache');
 
   var viewModel = can.Map.extend({
     items: can.List(),
     modelName: null,
+    root: false,
     availableAttributes: can.List(),
     addMappingCriteria: function () {
       var items = this.attr('items');
-      if (items.length) {
-        items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
-      }
+      items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
       items.push(GGRC.Utils.AdvancedSearch.create.mappingCriteria());
     },
     removeMappingCriteria: function (item) {
@@ -27,21 +26,22 @@
       if (index > 0) {
         index--;
       }
+
+      // if there is only 1 item in group we have to remove the whole group
+      if (items.length === 1) {
+        this.remove();
+        return;
+      }
+
       items.splice(index, 2);
     },
-    createGroup: function (criteria) {
-      var items = this.attr('items');
-      var index = items.indexOf(criteria);
-      items.attr(index, GGRC.Utils.AdvancedSearch.create.group([
-        criteria,
-        GGRC.Utils.AdvancedSearch.create.operator('AND'),
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria()
-      ]));
+    remove: function () {
+      this.dispatch('remove');
     }
   });
 
-  GGRC.Components('advancedSearchMappingContainer', {
-    tag: 'advanced-search-mapping-container',
+  GGRC.Components('advancedSearchMappingGroup', {
+    tag: 'advanced-search-mapping-group',
     template: template,
     viewModel: viewModel
   });

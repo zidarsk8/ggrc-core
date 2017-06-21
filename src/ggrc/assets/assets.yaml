@@ -159,6 +159,7 @@ dashboard-js-files:
   - components/advanced-search/advanced-search-filter-operator.js
   - components/advanced-search/advanced-search-filter-state.js
   - components/advanced-search/advanced-search-mapping-container.js
+  - components/advanced-search/advanced-search-mapping-group.js
   - components/advanced-search/advanced-search-mapping-criteria.js
   - components/state-colors-map/state-colors-map.js
   - components/spinner/spinner.js
@@ -531,6 +532,7 @@ dashboard-js-template-files:
   - components/advanced-search/advanced-search-filter-operator.mustache
   - components/advanced-search/advanced-search-filter-state.mustache
   - components/advanced-search/advanced-search-mapping-container.mustache
+  - components/advanced-search/advanced-search-mapping-group.mustache
   - components/advanced-search/advanced-search-mapping-criteria.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache

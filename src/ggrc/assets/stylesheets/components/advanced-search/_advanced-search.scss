@@ -37,6 +37,26 @@
   }
 }
 
+@mixin element-group {
+  background: $tabBgnd;
+  border: solid 1px;
+  border-color: $itemBorder;
+  display: table;
+  padding: 16px;
+}
+
+@mixin group-header {
+  position: relative;
+  .close-btn {
+    position: absolute;
+    right: 0;
+    opacity: 0.3;
+    &:hover{
+      opacity: 1;
+    }
+  }
+}
+
 .advanced-search {
   $simple-modal-header-height: 48px;
   $simple-modal-footer-height: 64px;
@@ -140,11 +160,6 @@
   }
   &__group {
     @include element-attribute;
-    display: table;
-    padding: 16px;
-    background: $tabBgnd;
-    border: solid 1px;
-    border-color: $itemBorder;
   }
   &__footer {
     margin-top: 24px;
@@ -153,16 +168,9 @@
 
 .filter-group {
   @include advanced-search-controls;
+  @include element-group;
   &__header {
-    position: relative;
-    .close-btn {
-      position: absolute;
-      right: 0;
-      opacity: 0.3;
-      &:hover{
-        opacity: 1;
-      }
-    }
+    @include group-header;
   }
   &__operator {
     @include element-operator;
@@ -180,6 +188,32 @@
   }
   &__criteria {
     @include element-attribute;
+  }
+  &__group {
+    @include element-attribute;
+  }
+  &__content {
+    >* {
+      &:last-child {
+        margin-bottom: 24px;
+      }
+    }
+  }
+}
+
+.mapping-group {
+  @include advanced-search-controls;
+  @include element-group;
+  &__header {
+    @include group-header;
+  }
+  &__operator {
+    @include element-operator;
+    margin-top: 17px;
+  }
+  &__criteria {
+    @include element-attribute;
+    margin-right: 24px;
   }
 }
 

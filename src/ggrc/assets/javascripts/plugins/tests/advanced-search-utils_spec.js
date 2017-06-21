@@ -96,10 +96,29 @@ describe('GGRC.Utils.AdvancedSearch', function () {
             field: 'title',
             operator: '~',
             value: 'C'
-          })
+          }),
+          mappedTo: GGRC.Utils.AdvancedSearch.create.group([
+            GGRC.Utils.AdvancedSearch.create.mappingCriteria({
+              objectName: 'system',
+              filter: GGRC.Utils.AdvancedSearch.create.attribute({
+                field: 'title',
+                operator: '~',
+                value: 'D'
+              })
+            }),
+            GGRC.Utils.AdvancedSearch.create.operator('OR'),
+            GGRC.Utils.AdvancedSearch.create.mappingCriteria({
+              objectName: 'system',
+              filter: GGRC.Utils.AdvancedSearch.create.attribute({
+                field: 'title',
+                operator: '~',
+                value: 'E'
+              })
+            })
+          ])
         })
       ];
-      var expectedFilters = '#__previous__,1# AND #__previous__,2#';
+      var expectedFilters = '#__previous__,1# AND #__previous__,4#';
       var expectedRequest = [
         {
           object_name: 'system',
@@ -144,13 +163,63 @@ describe('GGRC.Utils.AdvancedSearch', function () {
           }
         },
         {
-          object_name: 'control',
+          object_name: 'system',
           type: 'ids',
           filters: {
             expression: {
               left: 'title',
               op: {name: '~'},
-              right: 'C'
+              right: 'D'
+            },
+            keys: ['title'],
+            order_by: {
+              keys: [],
+              order: '',
+              compare: null
+            }
+          }
+        },
+        {
+          object_name: 'system',
+          type: 'ids',
+          filters: {
+            expression: {
+              left: 'title',
+              op: {name: '~'},
+              right: 'E'
+            },
+            keys: ['title'],
+            order_by: {
+              keys: [],
+              order: '',
+              compare: null
+            }
+          }
+        },
+        {
+          object_name: 'control',
+          type: 'ids',
+          filters: {
+            expression: {
+              left: {
+                left: 'title',
+                op: {name: '~'},
+                right: 'C'
+              },
+              op: {name: 'AND'},
+              right: {
+                left: {
+                  object_name: '__previous__',
+                  op: {name: 'relevant'},
+                  ids: ['2']
+                },
+                op: {name: 'OR'},
+                right: {
+                  object_name: '__previous__',
+                  op: {name: 'relevant'},
+                  ids: ['3']
+                }
+              }
             },
             keys: ['title'],
             order_by: {

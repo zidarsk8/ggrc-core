@@ -63,4 +63,32 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
       expect(viewModel.attr('criteria.mappedTo')).toBe(undefined);
     });
   });
+
+  describe('createGroup() method', function () {
+    it('dispatches "createGroup" event', function () {
+      spyOn(viewModel, 'dispatch');
+
+      viewModel.createGroup();
+
+      expect(viewModel.dispatch).toHaveBeenCalledWith('createGroup');
+    });
+  });
+
+  describe('relevantToGroup() method', function () {
+    it('transforms criteria to group with 2 criteria and operator inside',
+    function () {
+      var relevant;
+      viewModel.attr('criteria.mappedTo',
+        GGRC.Utils.AdvancedSearch.create.mappingCriteria()
+      );
+
+      viewModel.relevantToGroup();
+
+      relevant = viewModel.attr('criteria.mappedTo');
+      expect(relevant.type).toBe('group');
+      expect(relevant.value[0].type).toBe('mappingCriteria');
+      expect(relevant.value[1].type).toBe('operator');
+      expect(relevant.value[2].type).toBe('mappingCriteria');
+    });
+  });
 });
