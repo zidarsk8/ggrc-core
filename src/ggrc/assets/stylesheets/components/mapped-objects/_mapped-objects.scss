@@ -224,3 +224,35 @@ directly-mapped-objects {
   }
 }
 
+.modal-mapped-objects {
+  display: block;
+  margin-bottom: 10px;
+
+  .modal-mapped-objects-item {
+    display: flex;
+
+    .modal-mapped-objects-item__details {
+      flex-grow: 9;
+      flex-basis: 550px;
+      align-self: center;
+      line-height: 50px;
+      margin-bottom: 5px;
+    }
+
+    .modal-mapped-objects-item__unmap {
+      flex-grow: 1;
+      flex-basis: 30px;
+      align-self: center;
+      display: flex;
+      justify-content: center;
+      line-height: 50px;
+
+      a {
+        .fa {
+          font-size: 20px;
+          opacity: 0.5;
+        }
+      }
+    }
+  }
+}

@@ -160,9 +160,11 @@
                                                  (on-state-change)="onStateChange(%event)"
                     ></assessment-controls-toolbar>
                 </div>
-                <assessment-people {instance}="instance">
-                </assessment-people>
-                <div class="info-pane__section">
+                <div class="info-pane__body-section">
+                    <assessment-people {instance}="instance">
+                    </assessment-people>
+                </div>
+                <div class="info-pane__body-section">
                     <div class="info-pane__section-title">
                        <div class="action-toolbar">
                           <div class="action-toolbar__content-item">Related Information</div>

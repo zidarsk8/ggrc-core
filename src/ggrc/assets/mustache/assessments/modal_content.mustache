@@ -4,15 +4,17 @@
 }}
 
 {{!div class="modal-body"}}
-  <div class="editable-form">
+  <div class="ggrc-form">
     {{#instance}}
     <form action="javascript://">
 
       {{^if new_object_form}}
         {{#if_in instance.status "Not Started,Completed,Verified"}}
-          <div class="alert warning">
-            <i class="fa fa-exclamation-triangle red"></i>
-            You are about to move assessment from "{{instance.status}}" to "In Progress".
+          <div class="ggrc-form-item">
+            <div class="alert warning">
+              <i class="fa fa-exclamation-triangle red"></i>
+              You are about to move assessment from "{{instance.status}}" to "In Progress".
+            </div>
           </div>
         {{/if_in}}
       {{/if}}
@@ -28,9 +30,9 @@
           </dropdown>
         </div>
       </div>-->
-      <div class="editable-form-row">
-        <div class="editable-form-long-input {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
-          <label class="required">
+      <div class="ggrc-form-item">
+        <div class="ggrc-form-item__row {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
+          <label class="required-label ggrc-form-item__label">
             Title
             <i class="fa fa-asterisk"></i> 
           </label>
@@ -39,9 +41,9 @@
         </div>
       </div>
 
-      <div class="editable-form-row">
-        <div class="editable-form-long-input">
-          <label>
+      <div class="ggrc-form-item ggrc-form-item__text-area">
+        <div class="ggrc-form-item__row">
+          <label class="ggrc-form-item__label">
             Test Plan
           </label>
           <div class="wysiwyg-area">
@@ -50,120 +52,131 @@
         </div>
       </div>
 
-      <div class="width-100">
+      <div class="ggrc-form-item width-100">
+        <div class="ggrc-form-item__row">
         <assessment-people {instance}="instance" info-pane-mode=false>
         </assessment-people>
+        </div>
       </div>
 
-      <div class="editable-form-row">
-        <checkbox-to-list property="recipients" instance="instance" class="flex-box">
-          <div class="editable-form-checkobox">
-            <label class="input--inline">
-                <input tabindex="11" type="checkbox"
-                      name="send_by_default"
-                      {{# send_by_default}}checked{{/send_by_default}}>
-                Enable notifications on comments
+      <div class="ggrc-form-item">
+        <div class="ggrc-form-item__row ggrc-from-item__checkbox-list">
+          <checkbox-to-list property="recipients" instance="instance" class="flex-box">
+            <div class="ggrc-form-item__checkbox-item">
+              <label class="input--inline">
+                  <input
+                    tabindex="4"
+                    type="checkbox"
+                    name="send_by_default"
+                    {{# send_by_default}}checked{{/send_by_default}}>
+                      Enable notifications on comments
+                </label>
+            </div>
+            <div class="ggrc-form-item__checkbox-item">
+              <label class="input--inline">
+                    <input tabindex="5" type="checkbox" can-value="values.Creator">
+                    Notify creator(s)
+                </label>
+            </div>
+            <div class="ggrc-form-item__checkbox-item">
+              <label class="input--inline">
+                    <input tabindex="6" type="checkbox" can-value="values.Assessor">
+                    Notify assignee(s)
               </label>
-          </div>
-          <div class="editable-form-checkobox">
-            <label class="input--inline">
-                  <input tabindex="12" type="checkbox" can-value="values.Creator">
-                  Notify creator(s)
-              </label>
-          </div>
-          <div class="editable-form-checkobox">
-            <label class="input--inline">
-                  <input tabindex="13" type="checkbox" can-value="values.Assessor">
-                  Notify assignee(s)
+            </div>
+            <div class="ggrc-form-item__checkbox-item">
+              <label class="input--inline">
+                    <input tabindex="7" type="checkbox" can-value="values.Verifier">
+                    Notify verifier(s)
+                </label>
+            </div>
+          </checkbox-to-list>
+        </div>
+      </div>
+
+      <div class="ggrc-form-item">
+        <div class="ggrc-form-item__row">
+          <ggrc-modal-connector
+                  class="width-100"
+                  parent_instance="instance"
+                  instance="instance"
+                  mapping="related_objects_as_source"
+                  from-binding="true"
+                  deferred="true">
+            <label class="ggrc-form-item__label">
+              Mapped Objects
             </label>
-          </div>
-          <div class="editable-form-checkobox">
-            <label class="input--inline">
-                  <input tabindex="14" type="checkbox" can-value="values.Verifier">
-                  Notify verifier(s)
-              </label>
-          </div>
-        </checkbox-to-list>
-      </div>
-
-      <div class="editable-form-row mappings">
-        <ggrc-modal-connector
-                class="width-100"
-                parent_instance="instance"
-                instance="instance"
-                mapping="related_objects_as_source"
-                from-binding="true"
-                deferred="true">
-          <label>
-            Mapped Objects
-          </label>
-          {{#prune_context}}
-            <div class="mapped-objects">
-              {{#each list}}
-                <div class="mapped-object">
-                  <div class="mapped-object-details">
-                     <business-object-list-item {instance}="{.}">
-                       <div class="description">
+            <div class="modal-mapped-objects">
+              {{#prune_context}}
+                {{#each list}}
+                  <div class="modal-mapped-objects-item">
+                    <div class="modal-mapped-objects-item__details">
+                      <business-object-list-item {instance}="{.}">
+                        <div class="description">
                           <read-more {text}="itemData.description" max-text-length="90"></read-more>
                         </div>
-                     </business-object-list-item>
+                      </business-object-list-item>
+                    </div>
+                    <div class="modal-mapped-objects-item__unmap">
+                      {{^is type 'Audit'}}
+                        <a href="javascript://" data-toggle="unmap">
+                          <span class="result" {{data 'result'}}></span>
+                          <i class="fa fa-trash"></i>
+                        </a>
+                      {{/is}}
+                    </div>
                   </div>
-                  <div class="mapped-object-unmap">
-                    {{^is type 'Audit'}}
-                      <a href="javascript://" data-toggle="unmap">
-                        <span class="result" {{data 'result'}}></span>
-                        <i class="fa fa-trash"></i>
-                      </a>
-                    {{/is}}
-                  </div>
-                </div>
-              {{/each}}
+                {{/each}}
+              {{/prune_context}}
+              {{^list.length}}
+                <span>
+                  <em>No mapped objects</em>
+                </span>
+              {{/list.length}}
             </div>
-          {{/prune_context}}
-          {{^list.length}}
-            <span class="gray"><em>No mapped objects</em></span>
-          {{/list.length}}
-            <div class="objective-selector">
-              {{#if instance.audit}}
-                <a class="section-add section-sticky btn btn-small btn-white"
-                  href="javascript://" rel="tooltip"
-                  {{data "deferred_to"}}
-                  data-placement="left"
-                  data-toggle="unified-mapper"
-                  data-deferred="true"
-                  data-object-source="true"
-                  data-is-new="{{instance.isNew}}"
-                  data-join-object-id="{{instance.id}}"
-                  data-join-object-type="{{instance.class.model_singular}}"
-                  data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6"
-                  data-snapshot-scope-id="{{instance.audit.id}}"
-                  data-snapshot-scope-type="{{instance.audit.type}}"
-                >
-                  Map Objects
-                </a>
-              {{else}}
-                <a class="section-add section-sticky btn btn-small btn-white"
-                  href="javascript://" rel="tooltip"
-                  {{data "deferred_to"}}
-                  data-placement="left"
-                  data-toggle="unified-mapper"
-                  data-deferred="true"
-                  data-object-source="true"
-                  data-is-new="{{instance.isNew}}"
-                  data-join-object-id="{{instance.id}}"
-                  data-join-object-type="{{instance.class.model_singular}}"
-                  data-original-title="Map Object to this {{instance.class.title_singular}}" tabindex="6"
-                >
-                  Map Objects
-                </a>
-              {{/if}}
-            </div>
-        </ggrc-modal-connector>
+              <div class="objective-selector">
+                {{#if instance.audit}}
+                  <a class="section-add section-sticky btn btn-small btn-white"
+                    href="javascript://"
+                    tabindex="8"
+                    rel="tooltip"
+                    {{data "deferred_to"}}
+                    data-placement="left"
+                    data-toggle="unified-mapper"
+                    data-deferred="true"
+                    data-object-source="true"
+                    data-is-new="{{instance.isNew}}"
+                    data-join-object-id="{{instance.id}}"
+                    data-join-object-type="{{instance.class.model_singular}}"
+                    data-original-title="Map Object to this {{instance.class.title_singular}}"
+                    data-snapshot-scope-id="{{instance.audit.id}}"
+                    data-snapshot-scope-type="{{instance.audit.type}}">
+                    Map Objects
+                  </a>
+                {{else}}
+                  <a class="section-add section-sticky btn btn-small btn-white"
+                    href="javascript://" rel="tooltip"
+                    tabindex="8"
+                    {{data "deferred_to"}}
+                    data-placement="left"
+                    data-toggle="unified-mapper"
+                    data-deferred="true"
+                    data-object-source="true"
+                    data-is-new="{{instance.isNew}}"
+                    data-join-object-id="{{instance.id}}"
+                    data-join-object-type="{{instance.class.model_singular}}"
+                    data-original-title="Map Object to this {{instance.class.title_singular}}">
+                    Map Objects
+                  </a>
+                {{/if}}
+              </div>
+          </ggrc-modal-connector>
+        </div>
       </div>
 
       <div class="additional-fields">
         <div class="expand-link">
-          <a class="show-hidden-fields info-show-hide active" href="javascript://">
+          <a tabindex="9" class="show-hidden-fields info-show-hide active" href="javascript://">
             <span class="out">
               <i class="fa fa-caret-right"></i>
               SHOW
@@ -177,6 +190,7 @@
         </div>
         <div class="hidden-fields-area">
           {{>'/static/mustache/assessments/modal_content_additional_fields.mustache'}}
+        </div>
       </div>
     </form>
     {{/instance}}

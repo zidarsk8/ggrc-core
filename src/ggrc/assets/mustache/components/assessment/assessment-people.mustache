@@ -6,7 +6,7 @@
 <div class="flex-box flex-box-multi">
     <div class="flex-box width-100">
       {{#instance.roleConflicts}}
-        <div class="centered width-100">
+        <div class="width-100">
           <div class="alert alert-verifier">
             <p>
                 Please be informed that Assignee and Verifier are the same person.
@@ -53,7 +53,7 @@
               {group-id}="type"
               {instance}="instance"
               {people}="results">
-              <label class="required-label">
+              <label class="required-label people-group__title">
                 {{title}}
                 {{#if required}}
                   <form-validation-icon {validation}="validation"></form-validation-icon>
@@ -114,7 +114,7 @@
                   {group-id}="groupId"
                   {instance}="instance"
                   {people}="people">
-                  <label>
+                  <label class="people-group__title">
                     {{title}}
                   </label>
                 </deletable-people-group>
