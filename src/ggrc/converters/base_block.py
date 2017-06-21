@@ -168,6 +168,7 @@ class BlockConverter(object):
     return {(d.definition_id, d.title): d for d in defs}
 
   def get_ca_definitions_cache(self):
+    """Return cached property value _ca_definitions_cache."""
     if self._ca_definitions_cache is None:
       self._ca_definitions_cache = self._create_ca_definitions_cache()
     return self._ca_definitions_cache
@@ -238,6 +239,7 @@ class BlockConverter(object):
       return cache
 
   def get_mapping_cache(self):
+    """Return mapping_cache attribute."""
     if self._mapping_cache is None:
       self._mapping_cache = self._create_mapping_cache()
     return self._mapping_cache
@@ -325,6 +327,7 @@ class BlockConverter(object):
                       duplicates=", ".join(duplicates))
 
   def organize_fields(self, fields):
+    """Setup fields property."""
     if fields == "all":
       fields = self.object_headers.keys()
     self.fields = get_column_order(fields)
@@ -345,6 +348,7 @@ class BlockConverter(object):
     return [r.to_array(self.fields) for r in self.row_converters]
 
   def to_array(self):
+    """Return tuple of csv_header and csv_body."""
     csv_header = self.generate_csv_header()
     csv_body = self.generate_csv_body()
     return csv_header, csv_body
@@ -447,6 +451,7 @@ class BlockConverter(object):
       self.remove_duplicate_keys(key, counts)
 
   def get_info(self):
+    """Returns info dict for current block."""
     created, updated, ignored, deleted = 0, 0, 0, 0
     for row in self.row_converters:
       if row.ignore:
@@ -473,6 +478,7 @@ class BlockConverter(object):
     return info
 
   def import_secondary_objects(self, slugs_dict):
+    """Import secondary objects procedure."""
     for row_converter in self.row_converters:
       row_converter.setup_secondary_objects(slugs_dict)
 
@@ -573,6 +579,7 @@ class BlockConverter(object):
       self.add_errors(errors.UNKNOWN_ERROR, line=self.offset + 2)
 
   def add_errors(self, template, **kwargs):
+    """Add errors for current block."""
     message = template.format(**kwargs)
     self.block_errors.append(message)
     self.ignore = True
@@ -581,18 +588,11 @@ class BlockConverter(object):
     message = template.format(**kwargs)
     self.block_warnings.append(message)
 
-  def get_new_values(self, key):
-    values = set([row.get_value(key) for row in self.row_converters])
-    return self.object_class, values
-
-  def get_new_objects(self):
-    objects = set([row.obj for row in self.row_converters])
-    return self.object_class, objects
-
   def generate_unique_counts(self):
-    unique = [key for key, header in self.object_headers.items()
-              if header["unique"]]
-    for key in unique:
+    """Populate unique_counts for sent data."""
+    for key, header in self.object_headers.items():
+      if not header["unique"]:
+        continue
       for index, row in enumerate(self.row_converters):
         value = row.get_value(key)
         if value:
@@ -626,7 +626,8 @@ class BlockConverter(object):
         if self.in_range(index, remove_offset=False):
           self.row_converters[index].set_ignore()
 
-  def _sanitize_header(self, header):
+  @staticmethod
+  def _sanitize_header(header):
     """Sanitaze column header string.
 
     Since we rely on header names to get the correct handlers, we should allow
@@ -647,7 +648,8 @@ class BlockConverter(object):
       header = ":".join(part.strip() for part in header.split(":"))
     return header
 
-  def _check_object(self, row_converter):
+  @staticmethod
+  def _check_object(row_converter):
     """Check object if it has any pre commit checks.
 
     The check functions can mutate the row_converter object and mark it
