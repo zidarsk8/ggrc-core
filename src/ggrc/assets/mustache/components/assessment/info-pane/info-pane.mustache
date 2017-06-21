@@ -140,10 +140,12 @@
                     <simple-modal {(state)}="modal.state"
                                   {modal-title}="modal.modalTitle"
                                   {instance}="instance"
-                                  (on-close)="updateItems('evidences')">
+                                  {is-disabled}="isUpdatingEvidences">
                         <ca-object-modal-content {instance}="instance"
                                                  {(content)}="modal.content"
                                                  {(state)}="state"
+                                                 {evidences}="evidences"
+                                                 {is-updating-evidences}="isUpdatingEvidences"
                                                  {form-saved-deferred}="formState.formSavedDeferred"
                                                  (before-comment-created)="addItems(%event, 'comments')"
                                                  (after-comment-created)="updateItems('comments')"
