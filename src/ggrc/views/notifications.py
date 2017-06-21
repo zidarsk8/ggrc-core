@@ -3,7 +3,7 @@
 
 """Views for email notifications."""
 
-from ggrc.notifications import common, fast_digest
+from ggrc.notifications import common, fast_digest,  unsubscribe
 
 from ggrc.login import login_required
 
@@ -34,3 +34,8 @@ def init_notification_views(app):
   app.add_url_rule(
       "/_notifications/send_calendar_events", "send_calendar_events",
       view_func=login_required(common.send_calendar_events))
+
+  app.add_url_rule(
+      "/unsubscribe/<path:email>",
+      "unsubscribe_from_notifications",
+      view_func=login_required(unsubscribe.unsubscribe_from_notifications))
