@@ -9,18 +9,15 @@
   GGRC.Components('relatedPeopleMapping', {
     tag: 'related-people-mapping',
     viewModel: {
-      limit: '@',
       mapping: null,
       required: '@',
       type: null,
       heading: null,
-      toggle_add: false,
       mapped_people: [],
       results: [],
       list_pending: [],
       list_mapped: [],
       computed_mapping: false,
-      forbiddenForUnmap: [],
       _EV_BEFORE_EDIT: 'before-edit',
       editableMode: false,
       isLoading: false,

@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, _, GGRC, Permission, Mustache) {
+(function (can, _, GGRC) {
   'use strict';
 
   GGRC.Components('relatedPeopleAccessControl', {
@@ -13,28 +13,29 @@
       define: {
         accessControlGroups: {
           get: function () {
-            return this._rebuildRolesInfo();
+            return this.getRoleList();
           }
         }
       },
-      _rebuildRolesInfo: function () {
+      getRoleList: function () {
         var roleAssignments;
         var roles;
-        var rolesInfo;
-        var instance = this.instance;
+        var groups;
+        var instance = this.attr('instance');
 
         if (!instance) {
           this.attr('rolesInfo', []);
           return;
         }
 
-        roleAssignments = _.groupBy(instance.access_control_list, 'ac_role_id');
+        roleAssignments = _.groupBy(instance
+          .attr('access_control_list'), 'ac_role_id');
 
         roles = _.filter(GGRC.access_control_roles, {
           object_type: instance.class.model_singular
         });
 
-        var groups = _.map(roles, function (role) {
+        groups = _.map(roles, function (role) {
           var groupId = role.id;
           var title = role.name;
           var group = roleAssignments[groupId];
@@ -48,11 +49,11 @@
             title: title,
             groupId: groupId,
             people: people
-          }
+          };
         });
 
         return groups;
       }
     }
   });
-})(window.can, window._, window.GGRC, window.Permission, can.Mustache);
+})(window.can, window._, window.GGRC);

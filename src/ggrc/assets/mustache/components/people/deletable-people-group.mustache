@@ -7,23 +7,23 @@
   <content/>
 
   <div class="people-list">
-    <object-list ({items})="people" {empty-message}="emptyListMessage">
+    <object-list ({items})="people" {empty-message}="emptyListMessage" {is-disabled}="isLoading">
       <div class="deletable-people-group__person action-toolbar">
         <person-list-item person="{.}" {with-details}="withDetails">
-          {{#unless isLoading}}
-            {{#is_allowed 'update' instance}}
-              {{#if canUnmap}}
-                {{#unmapablePerson required peopleLength}}
-                  <div class="action-toolbar__controls">
-                    <a href="javascript://" class="info-action unmap" ($click)="unmap(person)">
-                      <action-toolbar-control>
-                        <i class="fa fa-trash"></i>
-                      </action-toolbar-control>
-                    </a>
-                  </div>
-                {{/unmapablePerson}}
-              {{/if}}
-            {{/is_allowed}}
+          {{#unless isDisabled}}
+            {{#if canUnmap}}
+              {{#unmapablePerson required peopleLength}}
+                {{#is_allowed 'update' instance}}
+                <div class="action-toolbar__controls">
+                  <a href="javascript://" class="info-action unmap" ($click)="unmap(person)">
+                    <action-toolbar-control>
+                      <i class="fa fa-trash"></i>
+                    </action-toolbar-control>
+                  </a>
+                </div>
+                {{/is_allowed}}
+              {{/unmapablePerson}}
+            {{/if}}
           {{/unless}}
         </person-list-item>
       </div>

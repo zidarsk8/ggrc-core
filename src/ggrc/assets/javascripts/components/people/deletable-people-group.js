@@ -32,7 +32,7 @@
       isLoading: false,
       withDetails: false,
       unmap: function (person) {
-         this.dispatch({
+        this.dispatch({
           type: 'unmap',
           person: person,
           groupId: this.attr('groupId')

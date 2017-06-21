@@ -30,6 +30,16 @@
       max-width: 240px;
     }
 
+    .people-group__title-spinner {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      left: -28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
     .people-group__person {
       margin-bottom: 3px;
     }
@@ -59,12 +69,18 @@
       line-height: 28px;
     }
 
+    .editable-people-group__unmap {
+      &.disabled {
+        opacity: 0.1
+      }
+    }
+
     .editable-people-group__inline {
       margin-bottom: 10px;
       width: 100%;
 
       .editable-people-group__inline-content {
-        margin: 0 6px 6px 6px;
+        margin: 4px 6px 6px 6px;
       }
 
       .person-holder {

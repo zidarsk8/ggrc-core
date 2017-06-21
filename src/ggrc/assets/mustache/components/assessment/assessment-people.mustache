@@ -61,13 +61,17 @@
               </label>
             </deletable-people-group>
             <div>
-              {{#is_allowed 'update' instance}}
-                <autocomplete
-                    search-items-type="Person"
-                    (item-selected)="addRole(%event.selectedItem, @type)"
-                    placeholder="Add person">
-                </autocomplete>
-              {{/is_allowed}}
+              {{#if isLoading}}
+                <spinner {toggle}="isLoading"></spinner>
+              {{else}}
+                {{#is_allowed 'update' instance}}
+                  <autocomplete
+                      search-items-type="Person"
+                      (item-selected)="addRole(%event.selectedItem, @type)"
+                      placeholder="Add person">
+                  </autocomplete>
+                {{/is_allowed}}
+              {{/if}}
             </div>
           {{/if}}
         </related-people-mapping>
@@ -119,8 +123,8 @@
                   </label>
                 </deletable-people-group>
                 <div>
-                  {{#if isLoading}}
-                    <spinner toggle="isLoading"></spinner>
+                  {{#if isUpdating}}
+                    <spinner {toggle}="isUpdating"></spinner>
                   {{else}}
                     {{#is_allowed 'update' instance}}
                       <autocomplete

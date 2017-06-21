@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, _, GGRC, Permission, Mustache) {
+(function (can, _, GGRC, Permission) {
   'use strict';
 
   GGRC.Components('relatedPeopleAccessControlGroup', {
@@ -28,15 +28,14 @@
         // a flag indicating whether a user role modification is in progress
         isUpdating: {
           get: function () {
-            return Boolean(this.attr('isPendingGrant') ||
-                           this.attr('pendingRevoke') !== null);
+            return this.attr('isPendingGrant') ||
+              this.attr('pendingRevoke') !== null;
           }
         }
       },
       groupId: '@',
       title: '@',
       people: [],
-      isUpdating: false,
       canEdit: false,
       backUpAccessControlList: [],
       editableMode: false,
@@ -55,6 +54,8 @@
 
         if (isAddEditableGroup) {
           this.attr('editableMode', true);
+          this.attr('backUpAccessControlList')
+            .replace(this.attr('instance.access_control_list'));
         } else {
           this.refreshInstanceAfterCancel(groupId);
         }
@@ -62,10 +63,12 @@
       saveChanges: function () {
         var self = this;
         this.attr('editableMode', false);
+        this.attr('isPendingGrant', true);
         this.attr('instance').save()
           .then(function () {
             self.attr('instance').dispatch('refreshInstance');
-          })
+            self.attr('isPendingGrant', false);
+          });
       },
       personSelected: function (args) {
         this.addPerson(args.person, args.groupId);
@@ -90,7 +93,7 @@
        * @param {Number} roleId - ID if the role to grant
        */
       grantRole: function (person, roleId) {
-        var inst = this.instance;
+        var inst = this.attr('instance');
         var roleEntry;
 
         if (this.attr('isUpdating')) {
@@ -151,7 +154,7 @@
        */
       revokeRole: function (person, roleId) {
         var idx;
-        var inst = this.instance;
+        var inst = this.attr('instance');
 
         if (this.attr('isUpdating')) {
           return;
@@ -196,11 +199,11 @@
 
       _rebuildRolesInfo: function () {
         var self = this;
-        var instance = this.instance;
-        var list = instance.access_control_list;
+        var instance = this.attr('instance');
+        var list = instance.attr('access_control_list');
         var currentGroup = list ?
           list.filter(function (item) {
-            return item.ac_role_id == self.attr('groupId');
+            return item.ac_role_id === self.attr('groupId');
           }) :
           [];
 
@@ -222,7 +225,7 @@
       init: function ($element, options) {
         var canEdit;
         var vm = this.viewModel;
-        var instance = vm.instance;
+        var instance = vm.attr('instance');
         var isSnapshot;
 
         if (!instance) {
@@ -231,9 +234,10 @@
         }
 
         isSnapshot = GGRC.Utils.Snapshots.isSnapshot(instance);
-        canEdit = !isSnapshot &&  // snapshots are not editable
-                  (vm.isNewInstance ||
-                   Permission.is_allowed_for('update', instance));
+
+        // snapshots are not editable
+        canEdit = !isSnapshot && (vm.isNewInstance ||
+          Permission.is_allowed_for('update', instance));
 
         can.batch.start();
         vm.attr('canEdit', canEdit);
@@ -246,7 +250,8 @@
         vm._rebuildRolesInfo();
         can.batch.stop();
 
-        vm.attr('backUpAccessControlList').replace(vm.instance.access_control_list);
+        vm.attr('backUpAccessControlList')
+          .replace(vm.instance.access_control_list);
       },
 
       '{viewModel.instance.access_control_list} change':
@@ -260,7 +265,7 @@
         this.viewModel._rebuildRolesInfo();
       },
 
-      // FIXME: For some reson the rolesInfo object might get corrupted and
+      // (Need to fix) For some reson the rolesInfo object might get corrupted and
       // needs to be manually checked for consistency and fixed if needed. Not
       // an elegant approach, but it works.
       '{viewModel.rolesInfo} change': function () {
@@ -295,4 +300,4 @@
       }
     }
   });
-})(window.can, window._, window.GGRC, window.Permission, can.Mustache);
+})(window.can, window._, window.GGRC, window.Permission);
