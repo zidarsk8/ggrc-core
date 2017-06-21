@@ -19,6 +19,7 @@ import json
 from google.appengine.api import users
 import flask
 import flask_login
+from werkzeug import exceptions
 
 from ggrc.login import common
 from ggrc.models import all_models
@@ -58,20 +59,35 @@ def request_loader(request):
 
   whitelist = settings.ALLOWED_QUERYAPI_APP_IDS
   inbound_appid = request.headers.get("X-Appengine-Inbound-Appid")
-  if inbound_appid not in whitelist:
-    # don't check X-GGRC-user if the request comes from an untrusted source
+  if not inbound_appid:
+    # don't check X-GGRC-user if the request doesn't come from another app
     return None
+
+  if inbound_appid not in whitelist:
+    # by default, we don't allow incoming app2app connections from
+    # non-whitelisted apps
+    raise exceptions.BadRequest("X-Appengine-Inbound-Appid header contains "
+                                "untrusted application id: {}"
+                                .format(inbound_appid))
 
   user = request.headers.get("X-GGRC-user")
   if not user:
     # no user provided
-    return None
+    raise exceptions.BadRequest("X-GGRC-user should be set, contains {!r} "
+                                "instead."
+                                .format(user))
 
   try:
     user = json.loads(user)
-  except (TypeError, ValueError):
+    email = str(user["email"])
+  except (TypeError, ValueError, KeyError):
     # user provided in invalid syntax
-    return None
+    raise exceptions.BadRequest("X-GGRC-user should have JSON object like "
+                                "{{'email': str}}, contains {!r} instead."
+                                .format(user))
 
-  db_user = all_models.Person.query.filter_by(email=user.get("email")).first()
+  db_user = all_models.Person.query.filter_by(email=email).first()
+  if not db_user:
+    raise exceptions.BadRequest("No user with such email: {}"
+                                .format(email))
   return db_user
