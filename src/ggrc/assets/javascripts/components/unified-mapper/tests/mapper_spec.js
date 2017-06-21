@@ -772,11 +772,6 @@ describe('GGRC.Components.modalMapper', function () {
       result = handler.call(that, element, event);
       expect(result).toEqual('deferredSave');
     });
-    it('sets false to mapper.is_saving', function () {
-      scope.attr('mapper.is_saving', true);
-      handler.call(that, element, event);
-      expect(scope.attr('mapper.is_saving')).toEqual(false);
-    });
     it('calls closeModal()', function () {
       handler.call(that, element, event);
       expect(that.closeModal).toHaveBeenCalled();
