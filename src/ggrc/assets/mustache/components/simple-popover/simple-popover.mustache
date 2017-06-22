@@ -1,0 +1,15 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="simple-popover {{extraCssClass}}">
+    <div class="simple-popover__button">
+        <button class="btn btn-link" ($click)="show">{{buttonText}}</button>
+    </div>
+    {{#if open}}
+    <div class="simple-popover__content" ($click)="hide" ($mouseleave)="hide">
+        <content></content>
+    </div>
+    {{/if}}
+</div>

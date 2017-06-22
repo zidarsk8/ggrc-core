@@ -199,6 +199,7 @@ dashboard-js-files:
   - components/reusable-objects/reusable-objects-list.js
   - components/reusable-objects/reusable-objects-item.js
   - components/simple-modal/simple-modal.js
+  - components/simple-popover/simple-popover.js
   - components/show-more/show-more.js
   - components/show-related-assessments-button/show-related-assessments-button.js
   - components/mapping-controls/mapping-type-selector.js
@@ -509,6 +510,7 @@ dashboard-js-template-files:
   - components/tree/tree-item-status-for-workflow.mustache
   - components/cycle-task-actions/cycle-task-actions.mustache
   - components/simple-modal/simple-modal.mustache
+  - components/simple-popover/simple-popover.mustache
   - components/page-header/page-header.mustache
   - components/auto-save-form/auto-save-form.mustache
   - components/auto-save-form/auto-save-form-actions.mustache

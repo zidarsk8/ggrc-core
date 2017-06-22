@@ -89,7 +89,7 @@
   &__mapping-header {
     margin-top: 14px;
     padding: 24px 16px 14px 16px;
-    border-top: 1px solid $border-color;
+    border-top: 1px solid #E0E0E0;
   }
   &__controls {
     float: right;
@@ -116,6 +116,9 @@
   }
   &__remove {
     @include remove-button;
+  }
+  &__action {
+    font-size: 12px;
   }
 }
 
@@ -235,11 +238,30 @@
     margin-top: 16px;
   }
   &__relationship {
-    width: 18px;
+    width: 19px;
     height: 45px;
     float: left;
     margin-left: 15px;
-    border-left: 2px solid $border-color;
-    border-bottom: 2px solid $border-color;
+    border-left: 1px solid #CBCBCB;
+    border-bottom: 1px solid #CBCBCB;
+  }
+  &__action {
+    font-size: 12px;
+    width: 160px;
+  }
+  &__action-button {
+    display: block;
+    width: 100%;
+    padding: 0px 12px;
+    height: 26px;
+    line-height: 26px;
+    border: none;
+    text-align: left;
+    background: transparent;
+    outline: none;
+    font-size: 12px;
+    &:hover {
+      background: #ECECEC;
+    }
   }
 }

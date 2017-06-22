@@ -50,6 +50,15 @@
               CMS.Models[this.attr('modelName')].title_singular +
               ' is mapped to';
     },
+    showGroupedActions: function () {
+      return this.showMapConditionAction() && this.showGroupExpressionAction();
+    },
+    showMapConditionAction: function () {
+      return !this.attr('criteria.mappedTo');
+    },
+    showGroupExpressionAction: function () {
+      return this.attr('extendable');
+    },
     remove: function () {
       this.dispatch('remove');
     },
