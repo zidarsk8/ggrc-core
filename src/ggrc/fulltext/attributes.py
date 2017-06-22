@@ -18,14 +18,14 @@ EMPTY_SUBPROPERTY_KEY = ''
 class FullTextAttr(object):
   """Custom full text index attribute class
 
-  Allowed to add full text search rule for model with custom alias,
+  Allows to add full text indexing rule for attribute with a custom alias,
   getting value rule and subproperties.
   Alias should be a string that will be used as search field.
-  Value can be string or callable.
-  If value is string, then the stored value will be the current instance
-  attribute value.
-  If value is callable, then the stored value will be the result of
-  called value with current instance as attribute.
+  Prop_getter can be a string or a callable.
+  If prop_getter is a string, then the stored value will be the current
+  instance's attribute value.
+  If prop_getter is a callable, then the stored value will be the result of
+  called prop_getter with current instance as an attribute.
   Subproperties may be empty or a list of strings. Each element of the list
   should be an attribute of the stored value.
   The first subproperty in the list - the one used for sorting.
@@ -33,9 +33,9 @@ class FullTextAttr(object):
 
   SUB_KEY_TMPL = "{id_val}-{sub}"
 
-  def __init__(self, alias, value, subproperties=None, with_template=True):
+  def __init__(self, alias, prop_getter, subproperties=None, with_template=True):
     self.alias = alias
-    self.value = value
+    self.prop_getter = prop_getter
     self.subproperties = subproperties or [EMPTY_SUBPROPERTY_KEY]
     self.with_template = with_template
     self.is_sortable = EMPTY_SUBPROPERTY_KEY not in self.subproperties
@@ -55,13 +55,13 @@ class FullTextAttr(object):
     return self.alias
 
   def get_value_for(self, instance):
-    """Get value from sended instance using 'value' rule"""
-    if callable(self.value):
-      return self.value(instance)
-    return getattr(instance, self.value)
+    """Get value from the given instance using 'prop_getter' rule"""
+    if callable(self.prop_getter):
+      return self.prop_getter(instance)
+    return getattr(instance, self.prop_getter)
 
   def get_property_for(self, instance):
-    """Collect property dict for sended instance"""
+    """Collect property dict for the given instance"""
     value = self.get_value_for(instance)
     results = {}
     sorted_dict = {}
@@ -83,6 +83,48 @@ class FullTextAttr(object):
   @staticmethod
   def get_filter_value(value, operation):
     return value
+
+
+class ValueMapFullTextAttr(FullTextAttr):
+  """Custom full text index attribute class for specific values
+
+  Used in case when we need to cast property value to some
+  specific value to be indexed.
+  """
+  def __init__(self, *args, **kwargs):
+    value_map = kwargs.pop("value_map", None)
+    assert value_map is not None
+    self.value_map = value_map
+    super(ValueMapFullTextAttr, self).__init__(*args, **kwargs)
+
+  def get_value_for(self, instance):
+    """Get value from the instance using value_map rule"""
+    value = super(ValueMapFullTextAttr, self).get_value_for(instance)
+    # handle error if value_map doesn't have mapping for the given value
+    return self.value_map.get(value, None)
+
+
+class BooleanFullTextAttr(ValueMapFullTextAttr):
+  """Custom full text index attribute class for Boolean values
+
+  Used in case we need to cast property boolean value to some
+  specific value to be indexed.
+  E.g. 1/0 to key/non-key (for Significance field)
+  """
+  def __init__(self, alias, prop_getter, subproperties=None,
+               true_value="true", false_value="false",
+               with_template=True,):
+    value_map = {True: true_value, False: false_value}
+    super(BooleanFullTextAttr, self).__init__(alias, prop_getter,
+                                              subproperties=subproperties,
+                                              with_template=with_template,
+                                              value_map=value_map)
+
+  def get_value_for(self, instance):
+    """Get value from the instance using value_map rule"""
+    value = super(ValueMapFullTextAttr, self).get_value_for(instance)
+    if value is not None:
+      return self.value_map.get(value, None)
 
 
 class CustomRoleAttr(FullTextAttr):
