@@ -12,13 +12,13 @@
       {{> '/static/mustache/assessments/header.mustache' }}
         <div class="assessment-info-pane info-pane__body">
             <div class="assessment-attributes info-pane__main-content info-pane__main-content-with-sidebar">
-                <div class="info-pane__body-section">
+                <div class="info-pane__section">
                     <div class="info-pane__section-title">Test Plan</div>
                     <read-more {text}="instance.test_plan"></read-more>
                 </div>
-                <div class="info-pane__body-section">
+                <div class="info-pane__section">
                     <div class="info-pane__section-title">
-                        <action-toolbar class="action-toolbar">
+                        <div class="action-toolbar">
                             <div class="action-toolbar__content-item">Controls</div>
                           {{#unless instance.archived}}
                             <div class="action-toolbar__controls">
@@ -27,14 +27,14 @@
                                 </action-toolbar-control>
                             </div>
                           {{/unless}}
-                        </action-toolbar>
+                        </div>
                     </div>
-                    <assessment-mapped-controls
+                    <assessment-mapped-controls class="mapped-objects__list info-pane__section-content"
                             {instance}="instance"
                             {mapped-items}="controls"
                             title-text="Controls"></assessment-mapped-controls>
                 </div>
-                <div class="assessment-controls info-pane__body-section">
+                <div class="assessment-controls info-pane__section">
                     <div class="assessment-note">
                         <auto-save-form-status
                                 {form-saving}="formState.saving"
@@ -159,9 +159,9 @@
                                                  (on-state-change)="onStateChange(%event)"
                     ></assessment-controls-toolbar>
                 </div>
-                <div class="info-pane__body-section">
+                <div class="info-pane__section">
                     <div class="info-pane__section-title">
-                       <action-toolbar class="action-toolbar">
+                       <div class="action-toolbar">
                           <div class="action-toolbar__content-item">Related Information</div>
                          {{#unless instance.archived}}
                           <div class="action-toolbar__controls">
@@ -170,9 +170,9 @@
                             </action-toolbar-control>
                           </div>
                          {{/unless}}
-                        </action-toolbar>
+                        </div>
                     </div>
-                    <assessment-mapped-related-information
+                    <assessment-mapped-related-information class="mapped-objects__list info-pane__section-content"
                             {instance}="instance"
                             {mapped-items}="relatedInformation"
                             title-text="Related Information"></assessment-mapped-related-information>

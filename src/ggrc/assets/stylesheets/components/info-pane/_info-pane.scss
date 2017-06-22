@@ -12,8 +12,14 @@
     position: relative;
   }
 
-  &__body-section {
+  &__section {
+    display: block;
     margin: 0 16px 16px 0;
+  }
+
+  &__section-content {
+    display: block;
+    margin: 0 0 16px 0;
   }
 
   &__section-title {
@@ -43,6 +49,7 @@
   &__main-content {
     padding-bottom: 28px;
     min-width: 0;
+    flex: 1;
   }
 
   &__main-content-with-sidebar {
