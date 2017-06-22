@@ -250,7 +250,9 @@ def generate_common_fixtures(*fixtures):  # flake8: noqa
         elif fixture.startswith("delete_"):
           deleted_objs = delete_rest_fixture(fixture=fixture)
           dict_executed_fixtures.update({fixture: deleted_objs})
-  executed_fixtures_copy = copy.deepcopy(dict_executed_fixtures)
+  executed_fixtures_copy = (copy.deepcopy(dict_executed_fixtures) if
+                            not dict_executed_fixtures.get("selenium") else
+                            copy.copy(dict_executed_fixtures))
   return executed_fixtures_copy
 
 
