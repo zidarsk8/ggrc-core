@@ -182,8 +182,14 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
       'company_control',
       'directive',
       'documentation_description',
-      'fraud_related',
-      'key_control',
+      attributes.BooleanFullTextAttr(
+          'fraud_related',
+          'fraud_related',
+          true_value="yes", false_value="no"),
+      attributes.BooleanFullTextAttr(
+          'key_control',
+          'key_control',
+          true_value="key", false_value="non-key"),
       'kind',
       'means',
       'verify_frequency',
@@ -191,8 +197,7 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
       attributes.FullTextAttr(
           "principal_assessor",
           "principal_assessor",
-          ["name", "email"]
-      ),
+          ["name", "email"]),
       attributes.FullTextAttr(
           'secondary_assessor',
           'secondary_assessor',
