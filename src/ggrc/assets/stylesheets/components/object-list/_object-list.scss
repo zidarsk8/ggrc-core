@@ -53,14 +53,6 @@ object-list {
     }
   }
 
-  .object-list-item {
-    line-height: 28px;
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    color: $text;
-    min-width: 0;
-  }
 }
 object-list {
   flex-direction: column;
@@ -70,4 +62,20 @@ related-assessment-list > spinner.active {
 }
 related-assessment-list > object-list > .empty-message {
   margin: auto;
+}
+
+.object-list {
+  &__item {
+    line-height: 28px;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: $text;
+    min-width: 0;
+  }
+
+  &__item-empty {
+    color: #999;
+    font-style: italic;
+  }
 }
