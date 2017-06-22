@@ -25,16 +25,16 @@
     <div class="mapping-criteria__action">
       <button class="mapping-criteria__remove" ($click)="remove()"><i class="fa fa-trash"></i></button>
 
-      {{#if showGroupedActions}}
+      {{#if showPopover}}
         <simple-popover {button-text}="'+ Add''" extra-css-class="advanced-search">
           <button class="mapping-criteria__action-button" ($click)="addRelevant()">Map Condition</button>
           <button class="mapping-criteria__action-button" ($click)="createGroup()">Group Expression</button>
         </simple-popover>
       {{else}}
-        {{#if showMapConditionAction}}
+        {{#if canAddMapping}}
         <a href="javascript:void(0)" class="advanced-filter" ($click)="addRelevant()">+ Add Map Condition</a>
         {{/if}}
-        {{#if showGroupExpressionAction}}
+        {{#if canBeGrouped}}
         <a href="javascript:void(0)" class="advanced-filter" ($click)="createGroup()">+ Add Group Expression</a>
         {{/if}}
       {{/if}}

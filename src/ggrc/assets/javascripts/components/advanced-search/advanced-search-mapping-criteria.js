@@ -21,6 +21,26 @@
           }
           return criteria;
         }
+      },
+      canBeGrouped: {
+        value: false,
+        get: function () {
+          return this.attr('extendable');
+        }
+      },
+      canAddMapping: {
+        type: 'boolean',
+        value: false,
+        get: function () {
+          return !this.attr('criteria.mappedTo');
+        }
+      },
+      showPopover: {
+        type: 'boolean',
+        value: false,
+        get: function () {
+          return this.attr('canBeGrouped') && this.attr('canAddMapping');
+        }
       }
     },
     modelName: null,
@@ -49,15 +69,6 @@
       return 'Where ' +
               CMS.Models[this.attr('modelName')].title_singular +
               ' is mapped to';
-    },
-    showGroupedActions: function () {
-      return this.showMapConditionAction() && this.showGroupExpressionAction();
-    },
-    showMapConditionAction: function () {
-      return !this.attr('criteria.mappedTo');
-    },
-    showGroupExpressionAction: function () {
-      return this.attr('extendable');
     },
     remove: function () {
       this.dispatch('remove');
