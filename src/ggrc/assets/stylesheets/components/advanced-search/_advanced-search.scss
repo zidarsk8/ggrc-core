@@ -63,6 +63,7 @@
 
   &.simple-modal {
     max-height: 85%;
+    max-width: 90%;
     .simple-modal__body {
       padding-right: 48px;
       overflow: visible;
@@ -210,13 +211,14 @@
   &__header {
     @include group-header;
   }
+  &__content {
+    padding-right: 24px;
+  }
   &__operator {
-    @include element-operator;
-    margin-top: 17px;
+    margin-bottom: 16px;
   }
   &__criteria {
-    @include element-attribute;
-    margin-right: 24px;
+    margin-bottom: 16px;
   }
 }
 
