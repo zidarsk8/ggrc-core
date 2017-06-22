@@ -304,12 +304,12 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     });
   });
 
-  describe('resetAdvancedFilters() method', function () {
+  describe('removeAdvancedFilters() method', function () {
     beforeEach(function () {
       spyOn(vm, 'onFilter');
     });
 
-    it('resets applied filter and mapping items', function () {
+    it('removes applied filter and mapping items', function () {
       vm.attr('advancedSearch.appliedFilterItems', new can.List([
         {title: 'item'}
       ]));
@@ -317,7 +317,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
         {title: 'item'}
       ]));
 
-      vm.resetAdvancedFilters();
+      vm.removeAdvancedFilters();
 
       expect(vm.attr('advancedSearch.appliedFilterItems.length')).toBe(0);
       expect(vm.attr('advancedSearch.appliedMappingItems.length')).toBe(0);
@@ -326,7 +326,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     it('cleans advancedSearch.filter property', function () {
       vm.attr('advancedSearch.filter', {});
 
-      vm.resetAdvancedFilters();
+      vm.removeAdvancedFilters();
 
       expect(vm.attr('advancedSearch.filter')).toBe(null);
     });
@@ -334,15 +334,37 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     it('closes modal window', function () {
       vm.attr('advancedSearch.open', true);
 
-      vm.applyAdvancedFilters();
+      vm.removeAdvancedFilters();
 
       expect(vm.attr('advancedSearch.open')).toBe(false);
     });
 
     it('calls onFilter() method', function () {
-      vm.applyAdvancedFilters();
+      vm.removeAdvancedFilters();
 
       expect(vm.onFilter).toHaveBeenCalled();
+    });
+  });
+
+  describe('resetAdvancedFilters() method', function () {
+    it('resets filter items', function () {
+      vm.attr('advancedSearch.filterItems', new can.List([
+        {title: 'item'}
+      ]));
+
+      vm.resetAdvancedFilters();
+
+      expect(vm.attr('advancedSearch.filterItems.length')).toBe(0);
+    });
+
+    it('resets mapping items', function () {
+      vm.attr('advancedSearch.mappingItems', new can.List([
+        {title: 'item'}
+      ]));
+
+      vm.resetAdvancedFilters();
+
+      expect(vm.attr('advancedSearch.mappingItems.length')).toBe(0);
     });
   });
 });

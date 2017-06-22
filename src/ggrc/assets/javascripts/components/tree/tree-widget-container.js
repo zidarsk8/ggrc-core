@@ -493,6 +493,7 @@
     },
     resetAdvancedFilters: function () {
       this.attr('advancedSearch.filterItems', can.List());
+      this.attr('advancedSearch.mappingItems', can.List());
     }
   });
 
