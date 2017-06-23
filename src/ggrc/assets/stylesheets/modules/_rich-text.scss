@@ -20,6 +20,8 @@ rich-text {
     .rich-text__content {
       border: none;
       padding: 8px 10px;
+      max-height: 424px;
+      overflow-y: auto;
 
       .ql-editor {
         padding: 0;
