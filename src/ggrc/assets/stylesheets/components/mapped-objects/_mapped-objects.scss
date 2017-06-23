@@ -141,7 +141,7 @@ assessment-mapped-controls, assessment-mapped-related-information {
 }
 .comment-object-item {
   display: block;
-  margin: 0 0 16px 0;
+  margin: 0 16px 16px 0;
 
   .comment-list__ca-description {
     font-size: 11px;
@@ -174,6 +174,7 @@ assessment-mapped-controls, assessment-mapped-related-information {
   }
   .comment-object-item__text {
     font-size: 13px;
+    word-wrap: break-word;
 
     * {
       padding: 0;
