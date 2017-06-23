@@ -17,6 +17,10 @@
       {{title}}
     </span>
       <tree-item-status-for-workflow {instance}="instance"></tree-item-status-for-workflow>
+
+      {{#if isCycleTaskGroupObjectTask}}
+        <span class="tree-item__overdue {{dueDateCssClass}}">{{localize_date dueDate}}</span>
+      {{/if}}
   </div>
 
   <cycle-task-actions {instance}="instance"
