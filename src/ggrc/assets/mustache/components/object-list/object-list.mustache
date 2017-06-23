@@ -6,11 +6,11 @@
     <spinner {toggle}="isLoading" {extra-css-class}="spinnerCss" class="spinner-wrapper active"></spinner>
 {{else}}
   {{#if items.length}}
-    {{#each items}}
+    {{#items}}
         <div class="object-list__item {{#isSelected}}object-list__item-selected{{/isSelected}}" ($click)="modifySelection">
             <content>No item component or template is provided</content>
         </div>
-    {{/each}}
+    {{/items}}
   {{else}}
       <div class="object-list__item object-list__item-empty">
         {{emptyMessage}}
