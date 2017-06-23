@@ -53,12 +53,18 @@
     mappingTypes: function () {
       var mappings = GGRC.Mappings
         .get_canonical_mappings_for(this.attr('modelName'));
-      var types = _.filter(_.sortBy(_.compact(_.map(_.keys(mappings),
-        function (mapping) {
+      var types = _.chain(mappings)
+        .keys()
+        .map(function (mapping) {
           return CMS.Models[mapping];
-        })), 'model_singular'), function (mapping) {
-        return mapping.model_singular && mapping.title_singular;
-      });
+        })
+        .compact()
+        .sortBy('model_singular')
+        .filter(function (mapping) {
+          return mapping.model_singular && mapping.title_singular;
+        })
+        .value();
+
       if (!this.attr('criteria.objectName')) {
         this.attr('criteria.objectName', _.first(types).model_singular);
       }
