@@ -15,30 +15,30 @@
       {{/mappingTypes}}
       </select>
     </div>
-    <div class="mapping-criteria__attribute">
-      <advanced-search-filter-attribute
-              {(attribute)}="criteria.filter.value"
-              {available-attributes}="availableAttributes"
-              {show-actions}="false">
-      </advanced-search-filter-attribute>
-    </div>
-    <div class="mapping-criteria__action">
-      <button class="mapping-criteria__remove" ($click)="remove()"><i class="fa fa-trash"></i></button>
-
-      {{#if showPopover}}
-        <simple-popover {button-text}="'+ Add''" extra-css-class="advanced-search">
-          <button class="mapping-criteria__action-button" ($click)="addRelevant()">Map Condition</button>
-          <button class="mapping-criteria__action-button" ($click)="createGroup()">Group Expression</button>
-        </simple-popover>
-      {{else}}
-        {{#if canAddMapping}}
-        <a href="javascript:void(0)" class="advanced-filter" ($click)="addRelevant()">+ Add Map Condition</a>
+    <div class="flex-box flex-box-multi">
+      <div class="flex-box flex-box-multi">
+        <advanced-search-filter-attribute
+                {(attribute)}="criteria.filter.value"
+                {available-attributes}="availableAttributes"
+                {show-actions}="false">
+        </advanced-search-filter-attribute>
+        <button class="mapping-criteria__remove" ($click)="remove()"><i class="fa fa-trash"></i></button>
+      </div>
+      <div class="mapping-criteria__action">
+        {{#if showPopover}}
+          <simple-popover {button-text}="'+ Add''" extra-css-class="advanced-search">
+            <button class="mapping-criteria__action-button" ($click)="addRelevant()">Map Condition</button>
+            <button class="mapping-criteria__action-button" ($click)="createGroup()">Group Expression</button>
+          </simple-popover>
+        {{else}}
+          {{#if canAddMapping}}
+          <a href="javascript:void(0)" class="advanced-filter" ($click)="addRelevant()">+ Add Map Condition</a>
+          {{/if}}
+          {{#if canBeGrouped}}
+          <a href="javascript:void(0)" class="advanced-filter" ($click)="createGroup()">+ Add Group Expression</a>
+          {{/if}}
         {{/if}}
-        {{#if canBeGrouped}}
-        <a href="javascript:void(0)" class="advanced-filter" ($click)="createGroup()">+ Add Group Expression</a>
-        {{/if}}
-      {{/if}}
-
+      </div>
     </div>
   </div>
   {{#if criteria.mappedTo}}

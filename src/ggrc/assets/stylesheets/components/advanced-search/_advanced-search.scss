@@ -23,6 +23,13 @@
   }
 }
 
+@mixin multiline-flex {
+  margin-top: -8px;
+  >* {
+    margin-top: 8px;
+  }
+}
+
 @mixin remove-button {
   border: 0;
   background-color: transparent;
@@ -104,6 +111,7 @@
 
 .filter-attribute {
   @include advanced-search-controls;
+  @include multiline-flex;
   &__name, &__operator {
     margin-right: 16px;
     select {
@@ -225,6 +233,7 @@
 .mapping-criteria {
   &__content {
     @include advanced-search-controls;
+    @include multiline-flex;
   }
   &__type {
     margin-right: 16px;
@@ -250,6 +259,7 @@
   &__action {
     font-size: 12px;
     width: 160px;
+    line-height: 28px;
   }
   &__action-button {
     display: block;
