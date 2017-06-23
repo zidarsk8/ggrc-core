@@ -128,7 +128,7 @@ class Revision(Base, db.Model):
     map_field_to_role = {
         "principal_assessor": reverted_roles_dict.get("Principal Assignees"),
         "secondary_assessor": reverted_roles_dict.get("Secondary Assignees"),
-        "primary_contact": reverted_roles_dict.get("Primary Contacts"),
+        "contact": reverted_roles_dict.get("Primary Contacts"),
         "secondary_contact": reverted_roles_dict.get("Secondary Contacts"),
     }
     exists_roles = {i["ac_role_id"] for i in access_control_list}
