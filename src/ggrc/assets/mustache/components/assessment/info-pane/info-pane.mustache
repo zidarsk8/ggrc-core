@@ -65,6 +65,7 @@
                             <attach-button
                                         (before-create)="addItems(%event, 'evidences')"
                                         (refresh-evidences)="updateItems('evidences')"
+                                        {is-attach-action-disabled}="isUpdatingEvidences"
                                         {instance}="instance"></attach-button>
                         </div>
                         <div>

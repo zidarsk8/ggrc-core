@@ -15,6 +15,7 @@
     template: template,
     viewModel: {
       instance: {},
+      isAttachActionDisabled: false,
       onBeforeCreate: function (event) {
         var items = event.items;
         this.dispatch({type: 'beforeCreate', items: items});

@@ -10,6 +10,13 @@
     tag: 'ggrc-gdrive-picker-launcher',
     template: can.view(GGRC.mustache_path + '/gdrive/gdrive_file.mustache'),
     viewModel: {
+      define: {
+        isInactive: {
+          get: function () {
+            return this.attr('disabled');
+          }
+        }
+      },
       instance: {},
       deferred: '@',
       link_class: '@',
@@ -17,6 +24,7 @@
       itemsUploadedCallback: '@',
       confirmationCallback: '@',
       pickerActive: false,
+      disabled: false,
       beforeCreateHandler: function (files) {
         var tempFiles = files.map(function (file) {
           return {
@@ -50,8 +58,6 @@
         var that = this;
         var dfd;
         var folderId = el.data('folder-id');
-
-        that.attr('pickerActive', true);
 
         // Create and render a Picker object for searching images.
         function createPicker() {
@@ -89,9 +95,6 @@
               if (dialog) {
                 dialog.style.zIndex = 4001; // our modals start with 2050
               }
-            })
-            .fail(function () {
-              scope.attr('pickerActive', false);
             });
         }
 
@@ -104,7 +107,6 @@
 
           if (data[ACTION] === PICKED) {
             files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
-            that.attr('pending', true);
             scope.attr('pickerActive', false);
             that.beforeCreateHandler(files);
 
@@ -116,12 +118,10 @@
                   can.trigger(
                     that, 'modal:success', {arr: can.makeArray(arguments)});
                   el.trigger('modal:success', {arr: can.makeArray(arguments)});
-                  that.attr('pending', false);
                 });
               });
           } else if (data[ACTION] === CANCEL) {
             el.trigger('rejected');
-            scope.attr('pickerActive', false);
           }
         }
 
@@ -130,8 +130,6 @@
         );
         dfd.done(function () {
           gapi.load('picker', {callback: createPicker});
-        }).fail(function () {
-          that.attr('pickerActive', false);
         });
       },
 
@@ -154,8 +152,6 @@
             return current || isOwnFolder(mp, instance);
           }, false);
         }
-
-        that.attr('pickerActive', true);
 
         if (that.instance.attr('_transient.folder')) {
           parentFolderDfd = can.when(
@@ -197,7 +193,6 @@
             // --BM 11/19/2013
             parentFolder.uploadFiles()
               .then(function (files) {
-                that.attr('pending', true);
                 that.beforeCreateHandler(files);
                 return new RefreshQueue().enqueue(files).trigger()
                   .then(function (fs) {
@@ -222,8 +217,6 @@
                   can.trigger(
                     that, 'modal:success', {arr: can.makeArray(arguments)});
                   el.trigger('modal:success', {arr: can.makeArray(arguments)});
-                  that.attr('pending', false);
-                  that.attr('pickerActive', false);
                 });
               });
           });
