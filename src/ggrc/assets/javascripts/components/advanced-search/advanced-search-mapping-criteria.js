@@ -23,9 +23,11 @@
         }
       },
       canBeGrouped: {
+        type: 'boolean',
         value: false,
         get: function () {
-          return this.attr('extendable');
+          return this.attr('extendable') &&
+           !(this.attr('criteria.mappedTo') && !this.attr('childCanBeGrouped'));
         }
       },
       canAddMapping: {
@@ -43,6 +45,7 @@
         }
       }
     },
+    childCanBeGrouped: false,
     modelName: null,
     root: false,
     extendable: false,
