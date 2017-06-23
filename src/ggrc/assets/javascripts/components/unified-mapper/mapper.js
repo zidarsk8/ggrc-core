@@ -345,7 +345,7 @@
         var que = new RefreshQueue();
 
         ev.preventDefault();
-        if (el.hasClass('disabled')) {
+        if (el.hasClass('disabled') || this.scope.attr('mapper.is_saving')) {
           return;
         }
         if (this.scope.attr('mapper.assessmentGenerator')) {
