@@ -8,6 +8,7 @@
         <ggrc-gdrive-picker-launcher class="attachment-upload-control__button"
                 instance="instance"
                 click_event="trigger_upload_parent"
+                {disabled}="isAttachActionDisabled"
                 {confirmation-callback}="@confirmationCallback"
                 {items-uploaded-callback}="@itemsUploadedCallback"
                 (on-before-attach)="onBeforeCreate(%event)">Attach
@@ -16,6 +17,7 @@
         <ggrc-gdrive-picker-launcher class="attachment-upload-control__button"
                 instance="instance"
                 click_event="trigger_upload"
+                {disabled}="isAttachActionDisabled"
                 {confirmation-callback}="@confirmationCallback"
                 {items-uploaded-callback}="@itemsUploadedCallback"
                 (on-before-attach)="onBeforeCreate(%event)">Attach

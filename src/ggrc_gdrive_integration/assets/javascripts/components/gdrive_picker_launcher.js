@@ -10,6 +10,13 @@
     tag: 'ggrc-gdrive-picker-launcher',
     template: can.view(GGRC.mustache_path + '/gdrive/gdrive_file.mustache'),
     viewModel: {
+      define: {
+        isInactive: {
+          get: function () {
+            return this.attr('pickerActive') || this.attr('disabled');
+          }
+        }
+      },
       instance: {},
       deferred: '@',
       link_class: '@',
@@ -17,6 +24,7 @@
       itemsUploadedCallback: '@',
       confirmationCallback: '@',
       pickerActive: false,
+      disabled: false,
       beforeCreateHandler: function (files) {
         var tempFiles = files.map(function (file) {
           return {
