@@ -33,7 +33,8 @@ class FullTextAttr(object):
 
   SUB_KEY_TMPL = "{id_val}-{sub}"
 
-  def __init__(self, alias, prop_getter, subproperties=None, with_template=True):
+  def __init__(self, alias, prop_getter, subproperties=None,
+               with_template=True):
     self.alias = alias
     self.prop_getter = prop_getter
     self.subproperties = subproperties or [EMPTY_SUBPROPERTY_KEY]
@@ -84,6 +85,13 @@ class FullTextAttr(object):
   def get_filter_value(value, operation):
     return value
 
+  def get_attribute_revisioned_value(self, content):
+    """Get attribute value from the given revision content
+
+    accorging to the FullTextAttr rules
+    """
+    return content.get(self.alias, None)
+
 
 class ValueMapFullTextAttr(FullTextAttr):
   """Custom full text index attribute class for specific values
@@ -103,6 +111,13 @@ class ValueMapFullTextAttr(FullTextAttr):
     # handle error if value_map doesn't have mapping for the given value
     return self.value_map.get(value, None)
 
+  def get_attribute_revisioned_value(self, content):
+    """Get attribute value from the given revision content
+
+    accorging to the FullTextAttr rules
+    """
+    return self.value_map.get(content[self.alias], None)
+
 
 class BooleanFullTextAttr(ValueMapFullTextAttr):
   """Custom full text index attribute class for Boolean values
@@ -111,6 +126,7 @@ class BooleanFullTextAttr(ValueMapFullTextAttr):
   specific value to be indexed.
   E.g. 1/0 to key/non-key (for Significance field)
   """
+  # pylint: disable=too-many-arguments
   def __init__(self, alias, prop_getter, subproperties=None,
                true_value="true", false_value="false",
                with_template=True,):
@@ -122,13 +138,26 @@ class BooleanFullTextAttr(ValueMapFullTextAttr):
 
   def get_value_for(self, instance):
     """Get value from the instance using value_map rule"""
+    # pylint: disable=bad-super-call
     value = super(ValueMapFullTextAttr, self).get_value_for(instance)
     if value is not None:
       return self.value_map.get(value, None)
 
+  def get_attribute_revisioned_value(self, content):
+    """Get attribute value from the given revision content
+
+    accorging to the FullTextAttr rules
+    """
+    rev_val = content[self.alias]
+    if rev_val is None:
+      return
+    if not isinstance(rev_val, bool):
+      rev_val = bool(int(str(rev_val)))
+    return self.value_map.get(rev_val, None)
+
 
 class CustomRoleAttr(FullTextAttr):
-  """Custom index attribute class for custom roles"""
+  """Custom full text index attribute class for custom roles"""
   # pylint: disable=too-few-public-methods
   def __init__(self, alias):
     super(CustomRoleAttr, self).__init__(alias, alias)
@@ -249,8 +278,16 @@ class TimezonedDatetimeValue(DatetimeValue):
     return [(p - offset) if p else p for p in converted_pairs]
 
 
-DatetimeFullTextAttr = type(
-    "DatetimeFullTextAttr", (TimezonedDatetimeValue, FullTextAttr), {})
+class DatetimeFullTextAttr(TimezonedDatetimeValue, FullTextAttr):
+  """Custom full text index attribute class for Datetime values"""
+
+  def get_attribute_revisioned_value(self, content):
+    """Get attribute value from the given revision content
+
+    accorging to the FullTextAttr rules
+    """
+    if self.prop_getter in content:
+      return content[self.alias].replace("T", " ")
 
 
 DateFullTextAttr = type("DateFullTextAttr", (DateValue, FullTextAttr), {})
