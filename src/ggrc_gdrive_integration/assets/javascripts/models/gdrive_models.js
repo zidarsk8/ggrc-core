@@ -304,6 +304,7 @@
                   .setOAuthToken(gapi.auth.getToken().access_token)
                   .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
                   .setDeveloperKey(GGRC.config.GAPI_KEY)
+                  .setMaxItems(10)
                   .setCallback(pickerCallback)
                   .build();
 

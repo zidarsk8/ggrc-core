@@ -17,7 +17,7 @@
       itemsUploadedCallback: '@',
       confirmationCallback: '@',
       pickerActive: false,
-      beforeCreateHnadler: function (files) {
+      beforeCreateHandler: function (files) {
         var tempFiles = files.map(function (file) {
           return {
             title: file.name,
@@ -31,7 +31,7 @@
           items: tempFiles
         });
       },
-      onClickHandler: function () {
+      onClickHandler: function (scope, el, event) {
         var eventType = this.attr('click_event');
         var handler = this[eventType] || function () {};
         var confirmation = _.isFunction(this.confirmationCallback) ?
@@ -40,7 +40,8 @@
         var args = arguments;
         var that = this;
 
-        $.when(confirmation).then(function () {
+        event.preventDefault();
+        can.when(confirmation).then(function () {
           handler.apply(that, args);
         });
       },
@@ -63,6 +64,7 @@
               var picker = new google.picker.PickerBuilder()
                 .setOAuthToken(gapi.auth.getToken().access_token)
                 .setDeveloperKey(GGRC.config.GAPI_KEY)
+                .setMaxItems(10)
                 .setCallback(pickerCallback);
 
               if (el.data('type') === 'folders') {
@@ -104,7 +106,7 @@
             files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
             that.attr('pending', true);
             scope.attr('pickerActive', false);
-            that.beforeCreateHnadler(files);
+            that.beforeCreateHandler(files);
 
             return new RefreshQueue().enqueue(files).trigger()
               .then(function (files) {
@@ -196,7 +198,7 @@
             parentFolder.uploadFiles()
               .then(function (files) {
                 that.attr('pending', true);
-                that.beforeCreateHnadler(files);
+                that.beforeCreateHandler(files);
                 return new RefreshQueue().enqueue(files).trigger()
                   .then(function (fs) {
                     var mapped = can.map(fs, function (file) {

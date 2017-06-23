@@ -45,18 +45,6 @@
           self.attr('documents').replace(documents);
           self.attr('isLoading', false);
         });
-      },
-      removeDocument: function (event) {
-        var item = event.item;
-        var index = this.attr('documents').indexOf(item);
-        this.attr('isLoading', true);
-        return this.attr('documents').splice(index, 1);
-      },
-      addDocuments: function (event) {
-        var items = event.items;
-        this.attr('isLoading', true);
-        return this.attr('documents').unshift
-          .apply(this.attr('documents'), items);
       }
     },
     init: function () {

@@ -9,6 +9,9 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
   var Component;
   var events;
   var viewModel;
+  var eventStub = {
+    preventDefault: function () {}
+  };
 
   beforeAll(function () {
     Component = GGRC.Components.get('gDrivePickerLauncher');
@@ -23,34 +26,34 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
     it('call confirmationCallback() if it is provided', function () {
       spyOn(viewModel, 'confirmationCallback');
 
-      viewModel.onClickHandler();
+      viewModel.onClickHandler(null, null, eventStub);
 
       expect(viewModel.confirmationCallback).toHaveBeenCalled();
     });
 
-    it('pass callbackResult to $.when()', function () {
-      var dfd = $.Deferred();
+    it('pass callbackResult to can.when()', function () {
+      var dfd = can.Deferred();
       var thenSpy = jasmine.createSpy('then');
       spyOn(viewModel, 'confirmationCallback').and.returnValue(dfd);
-      spyOn($, 'when').and.returnValue({
+      spyOn(can, 'when').and.returnValue({
         then: thenSpy
       });
 
-      viewModel.onClickHandler();
+      viewModel.onClickHandler(null, null, eventStub);
 
-      expect($.when).toHaveBeenCalledWith(dfd);
+      expect(can.when).toHaveBeenCalledWith(dfd);
       expect(thenSpy).toHaveBeenCalled();
     });
 
-    it('pass null to $.when() when callback is not provided', function () {
+    it('pass null to can.when() when callback is not provided', function () {
       var thenSpy = jasmine.createSpy('then');
-      spyOn($, 'when').and.returnValue({
+      spyOn(can, 'when').and.returnValue({
         then: thenSpy
       });
 
-      viewModel.onClickHandler();
+      viewModel.onClickHandler(null, null, eventStub);
 
-      expect($.when).toHaveBeenCalledWith(null);
+      expect(can.when).toHaveBeenCalledWith(null);
       expect(thenSpy).toHaveBeenCalled();
     });
   });
