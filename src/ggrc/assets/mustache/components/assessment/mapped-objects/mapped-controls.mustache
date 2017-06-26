@@ -9,7 +9,39 @@
         </div>
     </business-object-list-item>
 </object-list>
-<object-popover class="object-popover" {item}="selectedItem">
-    <detailed-business-object-list-item {instance}="item.data" {^object-title}="popoverTitle" {^object-link}="popoverLink"></detailed-business-object-list-item>
-    <assessment-mapped-controls-popover class="assessment-mapped-controls-popover" {instance-id}="item.data.id" {^perform-loading}="expanded"></assessment-mapped-controls-popover>
-</object-popover>
+<simple-modal instance="snapshot" modal-title="modalTitle" state="state" extra-css-class="mapped-controls-info" replace-content="true">
+    <div class="simple-modal__header flex-box flex-row">
+        <div class="simple-modal__header-text flex-size-1">
+            Control:
+            <a target="_blank" href="{{instance.originalLink}}" title="{{instance.title}}">{{instance.title}}</a>
+            <span class="state-value snapshot">
+                {{instance.type}} version as on {{date instance.updated_at}}
+            </span>
+        </div>
+        <button class="btn btn-small btn-icon" can-click="hide">
+            <i class="fa fa-times black"></i>
+        </button>
+    </div>
+    <div class="simple-modal__body {{#if isLoading}}loading{{/if}}">
+        <spinner {toggle}="isLoading" class="spinner-wrapper active"
+                 extra-css-class="grid-spinner"></spinner>
+        <collapsible-panel title-text="Control Info"
+                           expanded="true"
+                           class="assessment-mapped-controls__info">
+            <detailed-business-object-list-item {instance}="instance"
+                                                {custom-attributes}="customAttributes"
+                                                class="collapsible-panel-body__control_info">
+            </detailed-business-object-list-item>
+        </collapsible-panel>
+        <assessment-mapped-control-related-objects class="assessment-mapped-controls"
+                                                   title-text="Show Related Objectives ({{objectives.length}})"
+                                                   type="Objective"
+                                                   {items}="objectives">
+        </assessment-mapped-control-related-objects>
+        <assessment-mapped-control-related-objects class="assessment-mapped-controls"
+                                                   title-text="Show Related Regulations ({{regulations.length}})"
+                                                   type="Regulation"
+                                                   {items}="regulations">
+        </assessment-mapped-control-related-objects>
+    </div>
+</simple-modal>

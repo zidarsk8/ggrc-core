@@ -17,6 +17,7 @@
     template: tpl,
     viewModel: {
       instance: {},
+      customAttributes: null,
       define: {
         isSnapshot: {
           get: function () {
