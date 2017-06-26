@@ -15,6 +15,7 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
   describe('addMappingCriteria() method', function () {
     it('adds only criteria if list is empty', function () {
       var items;
+      viewModel.attr('items', can.List());
 
       viewModel.addMappingCriteria();
 

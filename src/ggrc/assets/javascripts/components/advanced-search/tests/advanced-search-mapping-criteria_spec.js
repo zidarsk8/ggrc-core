@@ -91,4 +91,81 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
       expect(relevant.value[2].type).toBe('mappingCriteria');
     });
   });
+
+  describe('mappingTypes() method', function () {
+    var cmsModels;
+    beforeEach(function () {
+      spyOn(GGRC.Mappings, 'get_canonical_mappings_for').and.returnValue({
+        type1: {},
+        type2: {},
+        type3: {},
+        type4: {},
+        type5: {}
+      });
+      cmsModels = CMS.Models;
+      CMS.Models = {
+        type1: {
+          model_singular: '3',
+          title_singular: '3'
+        },
+        type2: {
+          model_singular: '1',
+          title_singular: '1'
+        },
+        type3: {
+          model_singular: '2',
+          title_singular: null
+        },
+        type4: null,
+        type5: {
+          model_singular: null,
+          title_singular: '4'
+        }
+      };
+    });
+    afterEach(function () {
+      CMS.Models = cmsModels;
+    });
+
+    it('retrieves canonical mappings for correct model', function () {
+      viewModel.attr('modelName', 'testModel');
+
+      viewModel.mappingTypes();
+
+      expect(GGRC.Mappings.get_canonical_mappings_for)
+        .toHaveBeenCalledWith('testModel');
+    });
+
+    it('returns correct filtered and sorted types', function () {
+      var result = viewModel.mappingTypes();
+
+      expect(result).toEqual([
+        {
+          model_singular: '1',
+          title_singular: '1'
+        },
+        {
+          model_singular: '3',
+          title_singular: '3'
+        }
+      ]);
+    });
+
+    it('sets criteria.objectName if objectName is not defined', function () {
+      viewModel.attr('criteria.objectName', undefined);
+
+      viewModel.mappingTypes();
+
+      expect(viewModel.attr('criteria.objectName')).toBe('1');
+    });
+
+    it('does not set criteria.objectName if objectName is defined',
+    function () {
+      viewModel.attr('criteria.objectName', 'test');
+
+      viewModel.mappingTypes();
+
+      expect(viewModel.attr('criteria.objectName')).toBe('test');
+    });
+  });
 });

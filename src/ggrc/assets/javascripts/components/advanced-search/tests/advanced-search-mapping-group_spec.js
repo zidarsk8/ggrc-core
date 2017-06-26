@@ -13,7 +13,7 @@ describe('GGRC.Components.advancedSearchMappingGroup', function () {
   });
 
   describe('addMappingCriteria() method', function () {
-    it('adds operator and criteria if list is not empty', function () {
+    it('adds operator and criteria', function () {
       var items;
       viewModel.attr('items',
         [GGRC.Utils.AdvancedSearch.create.mappingCriteria()]);

@@ -14,9 +14,7 @@
     availableAttributes: can.List(),
     addFilterCriterion: function () {
       var items = this.attr('items');
-      if (items.length) {
-        items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
-      }
+      items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
       items.push(GGRC.Utils.AdvancedSearch.create.attribute());
     },
     removeFilterCriterion: function (item) {

@@ -217,21 +217,25 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
   describe('openAdvancedFilter() method', function () {
     it('copies applied filter and mapping items', function () {
-      vm.attr('advancedSearch.appliedFilterItems', new can.List([
+      var appliedFilterItems = new can.List([
         GGRC.Utils.AdvancedSearch.create.attribute()
-      ]));
-      vm.attr('advancedSearch.appliedMappingItems', new can.List([
+      ]);
+      var appliedMappingItems = new can.List([
         GGRC.Utils.AdvancedSearch.create.mappingCriteria({
           filter: GGRC.Utils.AdvancedSearch.create.attribute()
         })
-      ]));
+      ]);
+      vm.attr('advancedSearch.appliedFilterItems', appliedFilterItems);
+      vm.attr('advancedSearch.appliedMappingItems', appliedMappingItems);
       vm.attr('advancedSearch.filterItems', can.List());
       vm.attr('advancedSearch.mappingItems', can.List());
 
       vm.openAdvancedFilter();
 
-      expect(vm.attr('advancedSearch.filterItems.length')).toBe(1);
-      expect(vm.attr('advancedSearch.mappingItems.length')).toBe(1);
+      expect(vm.attr('advancedSearch.filterItems').attr())
+        .toEqual(appliedFilterItems.attr());
+      expect(vm.attr('advancedSearch.mappingItems').attr())
+        .toEqual(appliedMappingItems.attr());
     });
 
     it('opens modal window', function () {
@@ -244,15 +248,17 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   });
 
   describe('applyAdvancedFilters() method', function () {
+    var filterItems = new can.List([
+      GGRC.Utils.AdvancedSearch.create.attribute()
+    ]);
+    var mappingItems = new can.List([
+      GGRC.Utils.AdvancedSearch.create.mappingCriteria({
+        filter: GGRC.Utils.AdvancedSearch.create.attribute()
+      })
+    ]);
     beforeEach(function () {
-      vm.attr('advancedSearch.filterItems', new can.List([
-        GGRC.Utils.AdvancedSearch.create.attribute()
-      ]));
-      vm.attr('advancedSearch.mappingItems', new can.List([
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria({
-          filter: GGRC.Utils.AdvancedSearch.create.attribute()
-        })
-      ]));
+      vm.attr('advancedSearch.filterItems', filterItems);
+      vm.attr('advancedSearch.mappingItems', mappingItems);
       vm.attr('advancedSearch.appliedFilterItems', can.List());
       vm.attr('advancedSearch.appliedMappingItems', can.List());
       spyOn(vm, 'onFilter');
@@ -261,8 +267,10 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     it('copies filter and mapping items to applied', function () {
       vm.applyAdvancedFilters();
 
-      expect(vm.attr('advancedSearch.appliedFilterItems.length')).toBe(1);
-      expect(vm.attr('advancedSearch.appliedMappingItems.length')).toBe(1);
+      expect(vm.attr('advancedSearch.appliedFilterItems').attr())
+        .toEqual(filterItems.attr());
+      expect(vm.attr('advancedSearch.appliedMappingItems').attr())
+        .toEqual(mappingItems.attr());
     });
 
     it('initializes advancedSearch.filter property', function () {

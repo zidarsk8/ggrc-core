@@ -13,17 +13,7 @@ describe('GGRC.Components.advancedSearchFilterGroup', function () {
   });
 
   describe('addFilterCriterion() method', function () {
-    it('adds only attribute if list is empty', function () {
-      var items;
-
-      viewModel.addFilterCriterion();
-
-      items = viewModel.attr('items');
-      expect(items.length).toBe(1);
-      expect(items[0].type).toBe('attribute');
-    });
-
-    it('adds operator and attribute if list is not empty', function () {
+    it('adds operator and attribute', function () {
       var items;
       viewModel.attr('items', [GGRC.Utils.AdvancedSearch.create.attribute()]);
       viewModel.addFilterCriterion();
