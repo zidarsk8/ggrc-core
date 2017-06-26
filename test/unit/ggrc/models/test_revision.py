@@ -32,7 +32,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
       (None, None),
       ('principal_assessor', ("Principal Assignees", 1)),
       ('secondary_assessor', ("Secondary Assignees", 2)),
-      ('primary_contact', ("Primary Contacts", 3)),
+      ('contact', ("Primary Contacts", 3)),
       ('secondary_contact', ("Secondary Contacts", 4)),
   )
   @ddt.unpack
@@ -89,7 +89,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
   @ddt.data(
       'principal_assessor',
       'secondary_assessor',
-      'primary_contact',
+      'contact',
       'secondary_contact',
   )
   def test_populated_content_no_role(self, key):

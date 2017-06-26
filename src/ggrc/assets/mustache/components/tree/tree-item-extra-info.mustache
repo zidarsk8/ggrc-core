@@ -4,13 +4,14 @@
 }}
 
 {{#if isActive}}
-  {{#if showingOverdueDate}}
-    <span class="tree-item__due-date {{dueDateCssClass}}">{{localize_date dueDate}}</span>
-  {{/if}}
+  {{#isShowOverdue}}
+    {{#isOverdue}}
+      <span class="tree-item__overdue state-overdue">OVERDUE</span>
+    {{/isOverdue}}
+  {{/isShowOverdue}}
   <i class="fa {{cssClasses}} popover-target"
      ($mouseenter)="onEnter()"
      ($mouseleave)="onLeave()"></i>
-
   {{^if disablePopover}}
   <div class="tree-item__popover">
     <div class="tree-item__popover-content">

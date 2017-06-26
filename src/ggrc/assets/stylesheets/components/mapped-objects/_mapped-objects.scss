@@ -5,20 +5,18 @@
 
 /* Mapped Object Component CSS spec */
 
-assessment-mapped-controls, assessment-mapped-related-information {
-  margin: 0 0 12px;
-  position: relative;
-  display: block;
+.mapped-objects__list {
+  .object-list__item-selected {
+    .mapped-objects__item {
+      position: relative;
+      border-radius: 2px;
+      box-shadow: none;
+      transition: background 0.2s ease;
+      background: $lightGray;
 
-  .selected .mapped-objects__item {
-    position: relative;
-    border-radius: 2px;
-    box-shadow: none;
-    transition: background 0.2s ease;
-    background: $lightGray;
-
-    &.mapped-snapshot-item {
-      background: $shapshotBorder;
+      &.mapped-snapshot-item {
+        background: $shapshotBorder;
+      }
     }
   }
 
@@ -139,9 +137,10 @@ assessment-mapped-controls, assessment-mapped-related-information {
     }
   }
 }
+
 .comment-object-item {
   display: block;
-  margin: 0 0 16px 0;
+  margin: 0 16px 16px 0;
 
   .comment-list__ca-description {
     font-size: 11px;
@@ -174,6 +173,7 @@ assessment-mapped-controls, assessment-mapped-related-information {
   }
   .comment-object-item__text {
     font-size: 13px;
+    word-wrap: break-word;
 
     * {
       padding: 0;

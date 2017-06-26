@@ -156,6 +156,9 @@ tree-item {
         i {
           visibility: visible;
         }
+        .tree-item__overdue {
+          z-index: -1;
+        }
       }
 
       tree-item-actions, .item-actions {

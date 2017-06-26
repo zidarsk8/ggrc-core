@@ -232,6 +232,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
+                        ({{ assessment_data['notif_created_at'] }})
                     </li>
                   {% endfor %}
                   </ul>
@@ -245,6 +246,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
+                        ({{ assessment_data['notif_created_at'] }})
                     </li>
                   {% endfor %}
                   </ul>
@@ -258,6 +260,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
+                        ({{ assessment_data['notif_created_at'] }})
                     </li>
                   {% endfor %}
                   </ul>
@@ -271,6 +274,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
+                        ({{ assessment_data['notif_created_at'] }})
                     </li>
                   {% endfor %}
                   </ul>
@@ -285,6 +289,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}
                       </a>
+                      ({{ assessment_data['notif_created_at'] }})
                     </li>
                   {% endfor %}
                   </ul>
@@ -298,6 +303,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
+                        ({{ assessment_data['notif_created_at'] }})
                     </li>
                   {% endfor %}
                   </ul>
@@ -342,11 +348,11 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       Comments on {{ parent_info.object_type }}
                       <a href="{{ parent_info.url }}">{{ parent_info.title }}</a>:
 
-                      {% for comment in comments.itervalues() %}
+                      {% for comment in comments %}
                         <ul {{ style.list_wrap() }}>
                           <li {{ style.list_item_sublist() }} >
                             {{ macro.user_name(comment['commentator']) }}
-                            left a comment at {{ comment['created_at'] }}:
+                            left a comment at {{ comment['created_at_str'] }}:
                             <div {{ style.comment_content() }}>
                               {{ comment['description'] }}
                             </div>

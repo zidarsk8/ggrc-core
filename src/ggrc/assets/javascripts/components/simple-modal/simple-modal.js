@@ -20,14 +20,14 @@
     template: tpl,
     viewModel: {
       extraCssClass: '@',
-      instance: null,
+      instance: {},
       modalTitle: '',
+      isDisabled: false,
       state: {
         open: false
       },
       hide: function () {
         this.attr('state.open', false);
-        this.dispatch('onClose');
       },
       show: function () {
         this.attr('state.open', true);

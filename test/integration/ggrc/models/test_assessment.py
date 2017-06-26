@@ -650,7 +650,7 @@ class TestAssessmentGeneration(ggrc.TestCase):
   @ddt.data(
       ("principal_assessor", "Principal Assignees"),
       ("secondary_assessor", "Secondary Assignees"),
-      ("primary_contact", "Primary Contacts"),
+      ("contact", "Primary Contacts"),
       ("secondary_contact", "Secondary Contacts"),
   )
   @ddt.unpack

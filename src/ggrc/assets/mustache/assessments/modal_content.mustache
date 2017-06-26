@@ -84,12 +84,10 @@
                           <div class="row-fluid">
                             <div class="span10">
                               <div class="tree-title-area">
-                                {{#update_link .}}
-                                  <a class="url" href="{{schemed_url link}}" target="_blank">
-                                      <i class="fa fa-{{class.table_singular}} color"></i>
-                                    {{firstexist title name email link}}
-                                  </a>
-                                {{/update_link}}
+                                <a class="url" href="{{viewLink}}" target="_blank">
+                                    <i class="fa fa-{{class.table_singular}} color"></i>
+                                  {{firstexist title name email link}}
+                                </a>
                               </div>
                             </div> <!-- span10 end -->
 

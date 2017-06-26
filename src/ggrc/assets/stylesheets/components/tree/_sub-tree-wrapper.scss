@@ -50,6 +50,18 @@ sub-tree-item {
       align-items: center;
       width: 80px;
     }
+
+    tree-item-status-for-workflow {
+      width: 25%;
+
+      .tree-item__icon-wrapper {
+        justify-content: flex-start;
+      }
+    }
+
+    .state-overdue {
+      color: $status-declined;
+    }
   }
 
   cycle-task-actions {
