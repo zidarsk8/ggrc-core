@@ -21,7 +21,8 @@ from ggrc_workflows.converters.handlers import COLUMN_HANDLERS
 from ggrc_workflows.services.common import Signals
 from ggrc_workflows.services import workflow_cycle_calculator
 from ggrc_workflows.roles import (
-    WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader
+    WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader,
+    WorkflowEditor
 )
 from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
 from ggrc_basic_permissions.contributed_roles import (
@@ -999,6 +1000,7 @@ class WorkflowRoleDeclarations(RoleDeclarations):
   def roles(self):
     return {
         'WorkflowOwner': WorkflowOwner,
+        'WorkflowEditor': WorkflowEditor,
         'WorkflowMember': WorkflowMember,
         'BasicWorkflowReader': BasicWorkflowReader,
         'WorkflowBasicReader': WorkflowBasicReader,
@@ -1011,13 +1013,14 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
   implications = {
       (None, 'Workflow'): {
           'ProgramCreator': ['BasicWorkflowReader'],
-          'Editor': ['WorkflowOwner'],
+          'Editor': ['WorkflowEditor'],
           'Reader': ['BasicWorkflowReader'],
           'Creator': ['WorkflowBasicReader'],
       },
       ('Workflow', None): {
           'WorkflowOwner': ['WorkflowBasicReader'],
           'WorkflowMember': ['WorkflowBasicReader'],
+          'WorkflowEditor': ['WorkflowBasicReader'],
       },
   }
 
