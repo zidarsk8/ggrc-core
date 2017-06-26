@@ -12,6 +12,7 @@ from sqlalchemy import orm
 from ggrc import builder
 from ggrc import db
 from ggrc.fulltext import get_indexer
+from ggrc.fulltext.attributes import ValueMapFullTextAttr
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
@@ -33,13 +34,14 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
 
   VALID_STATES = [u"Draft", u"Active", u"Inactive"]
 
-  VALID_FREQUENCIES = [
-      "one_time",
-      "weekly",
-      "monthly",
-      "quarterly",
-      "annually"
-  ]
+  # valid Frequency to user readable values mapping
+  VALID_FREQUENCIES = {
+      "one_time": "one time",
+      "weekly": "weekly",
+      "monthly": "monthly",
+      "quarterly": "quarterly",
+      "annually": "annually"
+  }
 
   @classmethod
   def default_frequency(cls):
@@ -57,7 +59,7 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       itself.
 
     Raises:
-      Value error, if the value is not None or in the VALID_FREQUENCIES array.
+      Value error, if the value is not in the VALID_FREQUENCIES
     """
     if value is None:
       value = self.default_frequency()
@@ -156,7 +158,11 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   ]
 
   _fulltext_attrs = [
-      "frequency",
+      ValueMapFullTextAttr(
+          "frequency",
+          "frequency",
+          value_map=VALID_FREQUENCIES,
+      )
   ]
 
   _aliases = {

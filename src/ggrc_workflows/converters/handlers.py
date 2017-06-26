@@ -20,10 +20,6 @@ class FrequencyColumnHandler(handlers.ColumnHandler):
 
   """ Handler for workflow frequency column """
 
-  frequency_map = {
-      "one time": "one_time"
-  }
-
   def parse_item(self):
     """ parse frequency value
 
@@ -34,15 +30,16 @@ class FrequencyColumnHandler(handlers.ColumnHandler):
                      column_names=self.display_name)
       return None
     value = self.raw_value.lower()
-    frequency = self.frequency_map.get(value, value)
+    inverted_map = {v: k for k, v in
+                    self.row_converter.object_class.VALID_FREQUENCIES.items()}
+    frequency = inverted_map.get(value, value)
     if frequency not in self.row_converter.object_class.VALID_FREQUENCIES:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
     return frequency
 
   def get_value(self):
-    reverse_map = {v: k for k, v in self.frequency_map.items()}
     value = getattr(self.row_converter.obj, self.key, self.value)
-    return reverse_map.get(value, value)
+    return self.row_converter.object_class.VALID_FREQUENCIES.get(value, value)
 
 
 class WorkflowColumnHandler(handlers.ParentColumnHandler):
