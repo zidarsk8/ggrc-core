@@ -331,7 +331,11 @@ _cycle_task_children_attr = {
 
 
 def update_cycle_task_child_state(obj):
+  """Update child attributes state of cycle task
 
+  Args:
+    obj: Cycle task instance
+  """
   status_order = (None, 'Assigned', 'InProgress',
                   'Declined', 'Finished', 'Verified')
   status = obj.status
@@ -881,6 +885,14 @@ def start_recurring_cycles():
 
 
 def get_cycles(workflow):
+  """Retrieve valid cycles for workflow
+
+  Args:
+    workflow: Workflow instance
+
+  Returns:
+    List of cycles for provided workflow
+  """
   def is_valid_cycle(cycle):
     return ([ct for ct in cycle.cycle_task_group_object_tasks] and
             isinstance(cycle.start_date, (date, datetime)))
@@ -978,7 +990,6 @@ class WorkflowRoleContributions(RoleContributions):
           'create': ['Workflow', 'CycleTaskGroupObjectTask'],
           'update': ['CycleTaskGroupObjectTask'],
           'edit': ['CycleTaskGroupObjectTask'],
-          'delete': ['CycleTaskGroupObjectTask']
       },
       'Reader': {
           'read': ['Workflow', 'CycleTaskGroupObjectTask'],
