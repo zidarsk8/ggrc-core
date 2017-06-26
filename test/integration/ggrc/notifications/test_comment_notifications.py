@@ -141,7 +141,7 @@ class TestCommentNotification(TestCase):
     # for that particular Assessment
     for parent_obj_key, comments_info in comment_notifs.iteritems():
       self.assertIn(parent_obj_key.id, asmt_ids)
-      for comment in comments_info.itervalues():
+      for comment in comments_info:
         self.assertEqual(comment["parent_id"], parent_obj_key.id)
         self.assertEqual(comment["parent_type"], "Assessment")
         expected_suffix = "asmt " + str(parent_obj_key.id)
