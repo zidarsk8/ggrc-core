@@ -14,12 +14,7 @@
    * Contains logic used in Mapping Group component.
    * @constructor
    */
-  var viewModel = can.Map.extend({
-    /**
-     * Contains Mapping Criteria and Operators.
-     * @type {can.List}
-     */
-    items: can.List(),
+  var viewModel = GGRC.VM.AdvancedSearchContainer.extend({
     /**
      * Contains specific model name.
      * @type {string}
@@ -45,32 +40,6 @@
       var items = this.attr('items');
       items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
       items.push(GGRC.Utils.AdvancedSearch.create.mappingCriteria());
-    },
-    /**
-     * Removes Filter Operator and Mapping Criteira from the collection.
-     * @param {can.Map} item - Mapping Criteria.
-     */
-    removeMappingCriteria: function (item) {
-      var items = this.attr('items');
-      var index = items.indexOf(item);
-      // we have to remove operator in front of each item except the first
-      if (index > 0) {
-        index--;
-      }
-
-      // if there is only 1 item in group we have to remove the whole group
-      if (items.length === 1) {
-        this.remove();
-        return;
-      }
-
-      items.splice(index, 2);
-    },
-    /**
-     * Dispatches event meaning that the component should be removed from parent container.
-     */
-    remove: function () {
-      this.dispatch('remove');
     }
   });
 

@@ -40,42 +40,6 @@ describe('GGRC.Components.advancedSearchFilterContainer', function () {
     });
   });
 
-  describe('removeFilterCriterion() method', function () {
-    it('removes attribute and operator behind if item is first',
-    function () {
-      var viewItems;
-      viewModel.attr('items', [
-        GGRC.Utils.AdvancedSearch.create.attribute({field: 'first'}),
-        GGRC.Utils.AdvancedSearch.create.operator(),
-        GGRC.Utils.AdvancedSearch.create.attribute({field: 'second'})
-      ]);
-      viewItems = viewModel.attr('items');
-
-      viewModel.removeFilterCriterion(viewItems[0]);
-
-      expect(viewItems.length).toBe(1);
-      expect(viewItems[0].type).toBe('attribute');
-      expect(viewItems[0].value.field).toBe('second');
-    });
-
-    it('removes attribute and operator in front if item is not first',
-    function () {
-      var viewItems;
-      viewModel.attr('items', [
-        GGRC.Utils.AdvancedSearch.create.attribute({field: 'first'}),
-        GGRC.Utils.AdvancedSearch.create.operator(),
-        GGRC.Utils.AdvancedSearch.create.attribute({field: 'second'})
-      ]);
-      viewItems = viewModel.attr('items');
-
-      viewModel.removeFilterCriterion(viewItems[2]);
-
-      expect(viewItems.length).toBe(1);
-      expect(viewItems[0].type).toBe('attribute');
-      expect(viewItems[0].value.field).toBe('first');
-    });
-  });
-
   describe('createGroup() method', function () {
     it('transforms attribute to group with 2 attributes and operator inside',
     function () {

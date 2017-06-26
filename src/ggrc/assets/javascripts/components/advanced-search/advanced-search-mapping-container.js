@@ -14,12 +14,7 @@
    * Contains logic used in Mapping Container component
    * @constructor
    */
-  var viewModel = can.Map.extend({
-    /**
-     * Contains Mapping Criteria, Groups and Operators.
-     * @type {can.List}
-     */
-    items: can.List(),
+  var viewModel = GGRC.VM.AdvancedSearchContainer.extend({
     /**
      * Contains specific model name.
      * @type {string}
@@ -43,19 +38,6 @@
         items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
       }
       items.push(GGRC.Utils.AdvancedSearch.create.mappingCriteria());
-    },
-    /**
-     * Removes Filter Operator and Advanced Search mapping item from the collection.
-     * @param {can.Map} item - Advanced Search mapping item.
-     */
-    removeMappingCriteria: function (item) {
-      var items = this.attr('items');
-      var index = items.indexOf(item);
-      // we have to remove operator in front of each item except the first
-      if (index > 0) {
-        index--;
-      }
-      items.splice(index, 2);
     },
     /**
      * Transforms Mapping Criteria to Mapping Group.

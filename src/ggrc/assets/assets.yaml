@@ -117,6 +117,7 @@ dashboard-js-files:
   - models/system.js
   - models/join_models.js
   # ViewModels
+  - components/view-models/advanced-search-container-vm.js
   - components/view-models/tree-item-base-vm.js
   - components/view-models/tree-people-base-vm.js
   - components/base-objects/pagination.js

@@ -18,7 +18,7 @@
         <div class="mapping-container__criteria">
           <advanced-search-mapping-criteria
             {(criteria)}="value"
-            (remove)="removeMappingCriteria(../)"
+            (remove)="removeItem(../)"
             {available-attributes}="availableAttributes"
             {model-name}="modelName"
             {root}="true"
@@ -31,7 +31,7 @@
         <div class="mapping-container__group">
           <advanced-search-mapping-group
             {(items)}="value"
-            (remove)="removeMappingCriteria(../)"
+            (remove)="removeItem(../)"
             {available-attributes}="availableAttributes"
             {model-name}="modelName"
             {root}="true">

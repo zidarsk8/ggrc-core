@@ -38,42 +38,6 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
     });
   });
 
-  describe('removeMappingCriteria() method', function () {
-    it('removes criteria and operator behind if item is first',
-    function () {
-      var viewItems;
-      viewModel.attr('items', [
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria({objectName: 'first'}),
-        GGRC.Utils.AdvancedSearch.create.operator(),
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria({objectName: 'second'})
-      ]);
-      viewItems = viewModel.attr('items');
-
-      viewModel.removeMappingCriteria(viewItems[0]);
-
-      expect(viewItems.length).toBe(1);
-      expect(viewItems[0].type).toBe('mappingCriteria');
-      expect(viewItems[0].value.objectName).toBe('second');
-    });
-
-    it('removes mappingCriteria and operator in front if item is not first',
-    function () {
-      var viewItems;
-      viewModel.attr('items', [
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria({objectName: 'first'}),
-        GGRC.Utils.AdvancedSearch.create.operator(),
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria({objectName: 'second'})
-      ]);
-      viewItems = viewModel.attr('items');
-
-      viewModel.removeMappingCriteria(viewItems[2]);
-
-      expect(viewItems.length).toBe(1);
-      expect(viewItems[0].type).toBe('mappingCriteria');
-      expect(viewItems[0].value.objectName).toBe('first');
-    });
-  });
-
   describe('createGroup() method', function () {
     it('transforms criteria to group with 2 criteria and operator inside',
     function () {

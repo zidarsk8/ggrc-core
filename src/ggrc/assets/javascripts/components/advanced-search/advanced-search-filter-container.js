@@ -16,7 +16,7 @@
    * Contains logic used in Filter Container component
    * @constructor
    */
-  var viewModel = can.Map.extend({
+  var viewModel = GGRC.VM.AdvancedSearchContainer.extend({
     define: {
       /**
        * Contains Filter Attributes, Groups and Operators.
@@ -56,19 +56,6 @@
       var items = this.attr('items');
       items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
       items.push(GGRC.Utils.AdvancedSearch.create.attribute());
-    },
-    /**
-     * Removes Filter Operator and Advanced Search filter item from the collection.
-     * @param {can.Map} item - Advanced Search filter item.
-     */
-    removeFilterCriterion: function (item) {
-      var items = this.attr('items');
-      var index = items.indexOf(item);
-      // we have to remove operator in front of each item except the first
-      if (index > 0) {
-        index--;
-      }
-      items.splice(index, 2);
     },
     /**
      * Transforms Filter Attribute to Filter Group.
