@@ -9,8 +9,18 @@
   var template = can.view(GGRC.mustache_path +
     '/components/advanced-search/advanced-search-filter-attribute.mustache');
 
+  /**
+   * Filter Attribute view model.
+   * Contains logic used in Filter Attribute component
+   * @constructor
+   */
   var viewModel = can.Map.extend({
     define: {
+      /**
+       * Contains available attributes for specific model.
+       * Initializes component with first attribute in the list.
+       * @type {can.List}
+       */
       availableAttributes: {
         type: '*',
         Value: can.List,
@@ -25,17 +35,40 @@
         }
       }
     },
+    /**
+     * Contains criterion's fields: field, operator, value.
+     * @type {object}
+     */
     attribute: {},
+    /**
+     * Indicates Filter Attribute can be transformed to Filter Group.
+     * @type {boolean}
+     */
     extendable: false,
+    /**
+     * Indicates that action buttons should be displayed.
+     * @type {boolean}
+     */
     showActions: true,
+    /**
+     * Dispatches event meaning that the component should be removed from parent container.
+     */
     remove: function () {
       this.dispatch('remove');
     },
+    /**
+     * Dispatches event meaning that the component should be transformed to Filter Group.
+     */
     createGroup: function () {
       this.dispatch('createGroup');
     }
   });
 
+  /**
+   * Filter Attribute is a component representing a filter criterion.
+   * Criterion has the following form:
+   * field - operator - value
+   */
   GGRC.Components('advancedSearchFilterAttribute', {
     tag: 'advanced-search-filter-attribute',
     template: template,
