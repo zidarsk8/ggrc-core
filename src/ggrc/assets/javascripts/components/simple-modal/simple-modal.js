@@ -22,6 +22,7 @@
       extraCssClass: '@',
       instance: {},
       modalTitle: '',
+      replaceContent: false,
       isDisabled: false,
       state: {
         open: false

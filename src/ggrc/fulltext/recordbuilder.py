@@ -3,6 +3,8 @@
 
 """Module for full text index record builder."""
 
+import logging
+
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.models.reflection import AttributeInfo
@@ -10,6 +12,9 @@ from ggrc.models.person import Person
 from ggrc.models.mixins import CustomAttributable
 from ggrc.fulltext.attributes import FullTextAttr
 from ggrc.fulltext.mixin import Indexed
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class Record(object):  # pylint: disable=too-few-public-methods
@@ -118,9 +123,16 @@ class RecordBuilder(object):
       ac_person_id = ac_list.person_id
     if ac_role_id not in self.indexer.cache['ac_role_map']:
       ac_role = db.session.query(all_models.AccessControlRole).get(ac_role_id)
-      self.indexer.cache['ac_role_map'][ac_role.id] = ac_role.name
+      ac_role_name = ac_role.name if ac_role else None
+      self.indexer.cache['ac_role_map'][ac_role_id] = ac_role_name
+      if ac_role_name is None:
+        # index only existed role, if it have already been
+        # removed than nothing to index.
+        LOGGER.error("Trying to index not existing ACR with id %s", ac_role_id)
     ac_role_name = self.indexer.cache['ac_role_map'][ac_role_id]
-    return ac_role_name.lower(), ac_person_id
+    if ac_role_name:
+      ac_role_name = ac_role_name.lower()
+    return ac_role_name, ac_person_id
 
   def build_person_subprops(self, person):
     """Get dict of Person properties for fulltext indexing

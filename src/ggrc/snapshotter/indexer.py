@@ -193,12 +193,13 @@ def get_access_control_role_data(rec, ac_list_item):
   indexer = get_indexer()
   builder = indexer.get_builder(models.Person)
   ac_role_name, person_id = (builder.get_ac_role_person_id(ac_list_item))
-  for key, val in builder.build_person_subprops({"id": person_id}).items():
-    newrec = rec.copy()
-    newrec.update({"property": ac_role_name,
-                   "subproperty": key,
-                   "content": val})
-    yield newrec
+  if ac_role_name:
+    for key, val in builder.build_person_subprops({"id": person_id}).items():
+      newrec = rec.copy()
+      newrec.update({"property": ac_role_name,
+                     "subproperty": key,
+                     "content": val})
+      yield newrec
 
 
 def get_access_control_sort_subprop(rec, access_control_list):
@@ -208,7 +209,8 @@ def get_access_control_sort_subprop(rec, access_control_list):
   collection = defaultdict(list)
   for ac_list_item in access_control_list:
     ac_role_name, person_id = builder.get_ac_role_person_id(ac_list_item)
-    collection[ac_role_name].append({"id": person_id})
+    if ac_role_name:
+      collection[ac_role_name].append({"id": person_id})
   for ac_role_name, people in collection.iteritems():
     for prop in get_person_sort_subprop({"property": ac_role_name}, people):
       newrec = rec.copy()
