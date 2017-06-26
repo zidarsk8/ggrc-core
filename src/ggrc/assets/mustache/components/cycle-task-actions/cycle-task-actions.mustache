@@ -41,15 +41,17 @@
             {{/if}}
           {{/if_equals}}
           {{#if_equals instance.status 'Finished'}}
-            <button {{#if disabled}}disabled{{/if}}
-                    class="btn btn-mini btn-red"
-                    ($click)="changeStatus"
-                    data-value="Declined">Decline</button>
-            <button {{#if disabled}}disabled{{/if}}
-                    class="btn btn-mini btn-green"
-                    ($click)="changeStatus"
-                    data-openclose="close"
-                    data-value="Verified">Verify</button>
+            {{#if instance.is_verification_needed}}
+              <button {{#if disabled}}disabled{{/if}}
+                      class="btn btn-mini btn-red"
+                      ($click)="changeStatus"
+                      data-value="Declined">Decline</button>
+              <button {{#if disabled}}disabled{{/if}}
+                      class="btn btn-mini btn-green"
+                      ($click)="changeStatus"
+                      data-openclose="close"
+                      data-value="Verified">Verify</button>
+            {{/if}}
           {{/if_equals}}
           {{#if oldValues.length}}
             <a href="javascript://" data-name="status"
