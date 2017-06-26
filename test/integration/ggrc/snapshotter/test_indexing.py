@@ -344,6 +344,17 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
 
     self.assertEqual(records.count(), 57)
 
+  def assert_indexed_fields(self, obj, search_property, values):
+    """Assert index content in full text search table."""
+    all_found_records = dict(Record.query.filter(
+        Record.key == obj.id,
+        Record.type == obj.type,
+        Record.property == search_property.lower(),
+    ).values("subproperty", "content"))
+    for field, value in values.iteritems():
+      self.assertIn(field, all_found_records)
+      self.assertEqual(value, all_found_records[field])
+
   @ddt.data(
       ("principal_assessor", "Principal Assignees"),
       ("secondary_assessor", "Secondary Assignees"),
@@ -373,19 +384,73 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
       revision.content[field] = {"id": person.id}
       db.session.add(revision)
     do_reindex()
+    self.assert_indexed_fields(snapshot, role_name, {
+        "{}-email".format(person.id): person.email,
+        "{}-name".format(person.id): person.name,
+        "{}-user_name".format(person.id): person.user_name,
+        "__sort__": person.user_name,
+    })
+
+  def test_index_by_acr(self):
+    """Test index by ACR."""
+    role_name = "Test name"
+    with factories.single_commit():
+      acr = factories.AccessControlRoleFactory(
+          name=role_name,
+          object_type="Control"
+      )
+      person = factories.PersonFactory(email="test@example.com", name='test')
+      control = factories.ControlFactory()
+      factories.AccessControlList(ac_role=acr, person=person, object=control)
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.type,
+    ).one()
+    revision.content = control.log_json()
+    db.session.add(revision)
+    with factories.single_commit():
+      snapshot = factories.SnapshotFactory(
+          child_id=control.id,
+          child_type=control.type,
+          revision=revision)
+    db.session.expire_all()
+    do_reindex()
+    self.assert_indexed_fields(snapshot, role_name, {
+        "{}-email".format(person.id): person.email,
+        "{}-name".format(person.id): person.name,
+        "{}-user_name".format(person.id): person.user_name,
+        "__sort__": person.user_name,
+    })
+
+  def test_index_deleted_acr(self):
+    """Test index by removed ACR."""
+    role_name = "Test name"
+    with factories.single_commit():
+      acr = factories.AccessControlRoleFactory(
+          name=role_name,
+          object_type="Control"
+      )
+      person = factories.PersonFactory(email="test@example.com", name='test')
+      control = factories.ControlFactory()
+      factories.AccessControlList(ac_role=acr, person=person, object=control)
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.type,
+    ).one()
+    revision.content = control.log_json()
+    db.session.add(revision)
+    with factories.single_commit():
+      snapshot = factories.SnapshotFactory(
+          child_id=control.id,
+          child_type=control.type,
+          revision=revision)
+    db.session.expire_all()
+    db.session.delete(acr)
+    db.session.commit()
+    do_reindex()
     all_found_records = dict(Record.query.filter(
         Record.key == snapshot.id,
         Record.type == snapshot.type,
         Record.property == role_name.lower()
     ).values("subproperty", "content"))
-    self.assertTrue(all_found_records)
-    self.assertIn("{}-email".format(person.id), all_found_records)
-    self.assertIn("{}-name".format(person.id), all_found_records)
-    self.assertIn("{}-user_name".format(person.id), all_found_records)
-    self.assertIn("__sort__", all_found_records)
-    self.assertEqual(person.email,
-                     all_found_records["{}-email".format(person.id)])
-    self.assertEqual(person.name,
-                     all_found_records["{}-name".format(person.id)])
-    self.assertEqual(person.user_name,
-                     all_found_records["{}-user_name".format(person.id)])
+    self.assertFalse(all_found_records)
