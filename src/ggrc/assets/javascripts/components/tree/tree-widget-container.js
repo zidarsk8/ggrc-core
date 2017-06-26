@@ -386,6 +386,9 @@
       }
 
       function _refresh(sortByUpdatedAt) {
+        if (self.attr('loading')) {
+          return;
+        }
         if (sortByUpdatedAt) {
           self.attr('sortingInfo.sortDirection', 'desc');
           self.attr('sortingInfo.sortBy', 'updated_at');
