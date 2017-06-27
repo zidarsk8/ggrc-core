@@ -487,6 +487,7 @@
     removeAdvancedFilters: function () {
       this.attr('advancedSearch.appliedFilterItems', can.List());
       this.attr('advancedSearch.appliedMappingItems', can.List());
+      this.attr('advancedSearch.request', can.List());
       this.attr('advancedSearch.filter', null);
       this.attr('advancedSearch.open', false);
       this.onFilter();

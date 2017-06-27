@@ -340,7 +340,7 @@
         filter
       );
       var requestedType;
-      request = request || can.List();
+      var requestData = request.slice() || can.List();
 
       if (SnapshotUtils.isSnapshotScope(parent) &&
         SnapshotUtils.isSnapshotModel(modelName)) {
@@ -348,8 +348,8 @@
       }
 
       requestedType = params.object_name;
-      request.push(params);
-      return QueryAPI.makeRequest({data: request.attr()})
+      requestData.push(params);
+      return QueryAPI.makeRequest({data: requestData.attr()})
         .then(function (response) {
           response = _.last(response)[requestedType];
 

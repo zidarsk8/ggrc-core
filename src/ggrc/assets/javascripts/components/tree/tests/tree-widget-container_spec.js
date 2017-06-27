@@ -352,6 +352,14 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
       expect(vm.onFilter).toHaveBeenCalled();
     });
+
+    it('resets advancedSearch.request list', function () {
+      vm.attr('advancedSearch.request', new can.List([{data: 'test'}]));
+
+      vm.removeAdvancedFilters();
+
+      expect(vm.attr('advancedSearch.request.length')).toBe(0);
+    });
   });
 
   describe('resetAdvancedFilters() method', function () {
