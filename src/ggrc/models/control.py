@@ -31,6 +31,7 @@ from ggrc.fulltext import attributes
 
 
 class ControlCategory(CategoryBase):
+  """Custom Category class for Control"""
   __mapper_args__ = {
       'polymorphic_identity': 'ControlCategory'
   }
@@ -38,6 +39,7 @@ class ControlCategory(CategoryBase):
 
 
 class ControlAssertion(CategoryBase):
+  """Custom Assertion class for Control"""
   __mapper_args__ = {
       'polymorphic_identity': 'ControlAssertion'
   }
@@ -51,6 +53,13 @@ class ControlCategorized(Categorizable):
     return cls.declare_categorizable(
         "ControlCategory", "category", "categories", "categorizations")
 
+  _fulltext_attrs = [
+      attributes.MultipleSubpropertyFullTextAttr(
+          "categories",
+          "categorizations",
+          ["category"]
+      ),
+  ]
   _publish_attrs = [
       'categories',
       PublishOnly('categorizations'),
@@ -59,21 +68,26 @@ class ControlCategorized(Categorizable):
   _include_links = []
 
   _aliases = {
-      "categories": {
-          "display_name": "Categories",
-          "filter_by": "_filter_by_categories",
-      },
+      "categories": "Categories",
   }
-
-  @classmethod
-  def _filter_by_categories(cls, predicate):
-    return cls._filter_by_category("ControlCategory", predicate)
 
   @classmethod
   def eager_query(cls):
     query = super(ControlCategorized, cls).eager_query()
     return query.options(
         orm.subqueryload('categorizations').joinedload('category'),
+    )
+
+  def log_json(self):
+    out_json = super(ControlCategorized, self).log_json()
+    # pylint: disable=not-an-iterable
+    out_json["categories"] = [c.log_json() for c in self.categorizations]
+    return out_json
+
+  @classmethod
+  def indexed_query(cls):
+    return super(ControlCategorized, cls).indexed_query().options(
+        orm.Load(cls).joinedload('categorizations',),
     )
 
 
@@ -85,27 +99,40 @@ class AssertionCategorized(Categorizable):
         "ControlAssertion", "assertion", "assertions",
         "categorized_assertions")
 
+  _fulltext_attrs = [
+      attributes.MultipleSubpropertyFullTextAttr(
+          "assertions",
+          "categorized_assertions",
+          ["category"]
+      ),
+  ]
   _publish_attrs = [
       'assertions',
       PublishOnly('categorized_assertions'),
   ]
   _include_links = []
   _aliases = {
-      "assertions": {
-          "display_name": "Assertions",
-          "filter_by": "_filter_by_assertions",
-      },
+      "assertions": "Assertions",
   }
-
-  @classmethod
-  def _filter_by_assertions(cls, predicate):
-    return cls._filter_by_category("ControlAssertion", predicate)
 
   @classmethod
   def eager_query(cls):
     query = super(AssertionCategorized, cls).eager_query()
     return query.options(
         orm.subqueryload('categorized_assertions').joinedload('category'),
+    )
+
+  def log_json(self):
+    out_json = super(AssertionCategorized, self).log_json()
+    # pylint: disable=not-an-iterable
+    out_json["assertions"] = [a.log_json()
+                              for a in self.categorized_assertions]
+    return out_json
+
+  @classmethod
+  def indexed_query(cls):
+    return super(AssertionCategorized, cls).indexed_query().options(
+        orm.Load(cls).joinedload('categorized_assertions',),
     )
 
 
