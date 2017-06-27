@@ -30,6 +30,7 @@ describe('GGRC.Components.advancedSearchFilterContainer', function () {
   describe('addFilterCriterion() method', function () {
     it('adds operator and attribute', function () {
       var items;
+      viewModel.attr('items', can.List());
 
       viewModel.addFilterCriterion();
 
