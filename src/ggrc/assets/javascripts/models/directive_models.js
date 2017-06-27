@@ -14,7 +14,7 @@ can.Model.Cacheable("CMS.Models.Directive", {
   , findAll : "/api/directives"
   , findOne : "/api/directives/{id}"
   , mixins : [
-    'ownable', 'contactable', 'unique_title', 'timeboxed', 'ca_update'
+    'ownable', 'unique_title', 'timeboxed', 'ca_update'
   ]
   , tree_view_options : {
     attr_view: GGRC.mustache_path + '/directives/tree-item-attr.mustache'
