@@ -1112,6 +1112,9 @@
       }
       /* Serialize only meaningful properties */
       Object.keys(this._data).forEach(function (name) {
+        if (name.startsWith('_')) {
+          return;
+        }
         val = this[name];
         if (this.constructor.attributes && this.constructor.attributes[name]) {
           fnName = this.constructor.attributes[name];
