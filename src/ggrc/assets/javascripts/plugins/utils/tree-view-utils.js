@@ -37,6 +37,9 @@
       'type',
       'viewLink',
       'workflow_state',
+      'archived',
+      // label for Audit
+      'program',
       // labels for assessment templates
       'DEFAULT_PEOPLE_LABELS'
     ]);

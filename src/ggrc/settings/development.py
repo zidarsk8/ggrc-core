@@ -4,7 +4,7 @@
 import os
 
 DEBUG = True
-TESTING = True
+TESTING = False
 PRODUCTION = False
 FLASK_DEBUGTOOLBAR = False
 HOST = '0.0.0.0'

@@ -10,24 +10,22 @@
   <ul>
     <!---->
     {{#if instance.viewLink}}
-      {{#is_allowed "view_object_page" instance}}
-        <!-- Link for open instance on info panel at bottom -->
+      <!-- Link for open instance on info panel at bottom -->
+        <li>
+          <a href="javascript://" ($click)="maximizeObject">
+            <i class="fa fa-info-circle"></i>
+            View Info
+          </a>
+        </li>
+        {{#unless isSnapshot}}
+          <!-- Link for open instance on new Browser tab -->
           <li>
-            <a href="javascript://" ($click)="maximizeObject">
-              <i class="fa fa-info-circle"></i>
-              View Info
+            <a href="{{instance.viewLink}}" target="_blank" ($click)="openObject">
+              <i class="fa fa-long-arrow-right"></i>
+              Open in a new tab
             </a>
           </li>
-          {{#unless isSnapshot}}
-            <!-- Link for open instance on new Browser tab -->
-            <li>
-              <a href="{{instance.viewLink}}" target="_blank" ($click)="openObject">
-                <i class="fa fa-long-arrow-right"></i>
-                Open in a new tab
-              </a>
-            </li>
-          {{/unless}}
-      {{/is_allowed}}
+        {{/unless}}
     {{/if}}
 
     {{#if isAllowedToEdit}}

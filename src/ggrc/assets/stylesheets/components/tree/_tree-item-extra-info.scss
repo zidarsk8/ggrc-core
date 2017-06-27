@@ -13,9 +13,10 @@ tree-item-extra-info {
   box-sizing: border-box;
   position: relative;
 
-  .tree-item__due-date {
+  .tree-item__overdue {
     position: absolute;
-    right: 38px;
+    right: 42px;
+    top: 1px;
     font-weight: 500;
   }
 
@@ -121,7 +122,7 @@ tree-item-extra-info {
 .sub-item-content {
   &:hover {
     tree-item-extra-info {
-      .tree-item__due-date {
+      .tree-item__overdue {
         z-index: -1;
       }
     }

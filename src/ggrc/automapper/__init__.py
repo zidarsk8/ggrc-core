@@ -143,6 +143,7 @@ class AutomapperGenerator(object):
       return
     with self.benchmark("Automapping flush"):
       current_user = get_current_user()
+      db.session.flush()
       now = datetime.now()
       # We are doing an INSERT IGNORE INTO here to mitigate a race condition
       # that happens when multiple simultaneous requests create the same

@@ -16,6 +16,9 @@
         {{#if status}}
           <span class="state-value {{addclass 'state-' status separator=''}}">{{un_camel_case status}}</span>
         {{/if}}
+        {{#if snapshot.archived}}
+          <span class="state-value state-archived">Archived</span>
+        {{/if}}
         {{#if type}}
         <p>
           {{type.title}}
@@ -28,6 +31,7 @@
       {{#using reified_snapshot=snapshot}}
       {{#canUpdate}}
         {{^isLatestRevision}}
+          {{^if instance.snapshot.archived}}
           <div class="span12 snapshot">
             <hr class="snapshot">
             <p>
@@ -38,6 +42,7 @@
               </revisions-comparer>
             </p>
           </div>
+          {{/if}}
         {{/isLatestRevision}}
       {{/canUpdate}}
       {{/using}}

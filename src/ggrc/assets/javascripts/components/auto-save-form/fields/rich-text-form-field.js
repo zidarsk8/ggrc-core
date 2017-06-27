@@ -13,14 +13,31 @@
     ),
     viewModel: {
       _value: '',
-      _oldValue: '',
+      _oldValue: null,
       focused: false,
       placeholder: '',
       define: {
         value: {
           set: function (newValue, setValue) {
             setValue(newValue);
-            this.attr('_value', newValue);
+            if (!_.isNull(newValue)) {
+              this.attr('_value', newValue);
+            }
+          }
+        },
+        _value: {
+          set: function (newValue, setValue, onError, oldValue) {
+            setValue(newValue);
+            this.attr('_oldValue', oldValue);
+            if (oldValue === undefined ||
+                newValue === oldValue ||
+                newValue.length && !can.trim(newValue).length) {
+              return;
+            }
+
+            setTimeout(function () {
+              this.checkValueChanged();
+            }.bind(this), 5000);
           }
         }
       },
@@ -41,10 +58,6 @@
       },
       onFocus: function () {
         this.attr('focused', true);
-        this.attr(
-          '_oldValue',
-          this.attr('_value')
-        );
       },
       onBlur: function () {
         this.attr('focused', false);
@@ -55,13 +68,7 @@
       '.ql-editor focus': function () {
         this.viewModel.onFocus();
       },
-      'rich-text mousedown': function (el, ev) {
-        ev.stopPropagation();
-      },
-      '{window} mousedown': function () {
-        if (!this.viewModel.attr('focused')) {
-          return;
-        }
+      '.ql-editor blur': function () {
         this.viewModel.onBlur();
       }
     }

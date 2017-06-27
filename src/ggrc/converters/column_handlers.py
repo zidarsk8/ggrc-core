@@ -92,6 +92,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "related_verifiers": related_person.RelatedVerifiersColumnHandler,
     "report_end_date": handlers.DateColumnHandler,
     "report_start_date": handlers.DateColumnHandler,
+    "archived": boolean.CheckboxColumnHandler,
     "secondary_assessor": handlers.UserColumnHandler,
     "secondary_contact": handlers.UserColumnHandler,
     "send_by_default": boolean.CheckboxColumnHandler,

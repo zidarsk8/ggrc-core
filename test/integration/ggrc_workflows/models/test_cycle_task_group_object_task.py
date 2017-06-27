@@ -5,7 +5,9 @@
 
 import ddt
 
+from ggrc import db
 from ggrc.models import all_models
+
 from integration.ggrc import TestCase as BaseTestCase
 from integration.ggrc import api_helper
 from integration.ggrc.models import factories
@@ -53,7 +55,7 @@ class TestCTGOT(BaseTestCase):
                                    context=workflow.context)
 
     generator = wf_generator.WorkflowsGenerator()
-    generator.generate_cycle(workflow)
+    self.cycle_id = generator.generate_cycle(workflow)[1].id
     generator.activate_workflow(workflow)
 
   @ddt.data((NOBODY, [False, False]),
@@ -61,7 +63,14 @@ class TestCTGOT(BaseTestCase):
             (TASK_ASSIGNEE_1, [True, False]),
             (TASK_ASSIGNEE_2, [False, True]))
   @ddt.unpack
-  def test_allow_change_state(self, user, expected_values):
+  def test_change_state_by_user(self, user, expected_values):
+    """Test cycle task allow_change_state value by user position."""
+    all_models.Cycle.query.filter(
+        all_models.Cycle.id == self.cycle_id
+    ).update({
+        all_models.Cycle.is_current: True,
+    })
+    db.session.commit()
     user = all_models.Person.query.filter_by(email=user).one()
     self.api.set_user(user)
     response = self.api.get_query(all_models.CycleTaskGroupObjectTask,
@@ -76,3 +85,29 @@ class TestCTGOT(BaseTestCase):
         [cycle_task["allow_change_state"] for cycle_task in cycle_tasks],
         expected_values,
     )
+
+  @ddt.data(True, False)
+  def test_change_state_by_is_current(self, cycle_is_current):
+    """Test cycle task allow_change_state value by Cycle is_current value."""
+    all_models.Cycle.query.filter(
+        all_models.Cycle.id == self.cycle_id
+    ).update({
+        all_models.Cycle.is_current: cycle_is_current,
+    })
+    db.session.commit()
+    user_mail = self.WORKFLOW_OWNER
+    user = all_models.Person.query.filter_by(email=user_mail).one()
+    self.api.set_user(user)
+    response = self.api.get_query(all_models.CycleTaskGroupObjectTask,
+                                  "__sort=id")
+    self.assert200(response)
+
+    cycle_tasks = (response.json
+                           .get("cycle_task_group_object_tasks_collection", {})
+                           .get("cycle_task_group_object_tasks", []))
+    # relies on same order of ids of TGT and CTGOT
+    states = [ct["allow_change_state"] for ct in cycle_tasks]
+    if cycle_is_current:
+      self.assertTrue(all(states))
+    else:
+      self.assertFalse(any(states))

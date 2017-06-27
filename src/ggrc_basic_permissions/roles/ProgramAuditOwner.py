@@ -51,7 +51,14 @@ permissions = {
         "AssessmentTemplate",
         "Issue",
         "UserRole",
-        "Audit",
+        {
+            "type": "Audit",
+            "terms": {
+                "property_name": "archived",
+                "prevent_if": False
+            },
+            "condition": "has_changed"
+        },
         "Snapshot",
         "AuditObject",
         "Meeting",
@@ -72,6 +79,13 @@ permissions = {
         "Document",
         "Meeting"
         "AuditObject",
-        "Audit",
+        {
+            "type": "Audit",
+            "terms": {
+                "property_name": "archived",
+                "prevent_if": False
+            },
+            "condition": "has_changed"
+        },
     ]
 }

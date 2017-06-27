@@ -20,8 +20,10 @@
     template: tpl,
     viewModel: {
       extraCssClass: '@',
-      instance: null,
+      instance: {},
       modalTitle: '',
+      replaceContent: false,
+      isDisabled: false,
       state: {
         open: false
       },

@@ -227,7 +227,7 @@ class CycleTaskGroupObjectTask(
 
   @builder.simple_property
   def allow_change_state(self):
-    return self.current_user_wfo_or_assignee()
+    return self.cycle.is_current and self.current_user_wfo_or_assignee()
 
   def current_user_wfo_or_assignee(self):
     """Current user is Workflow owner or Assignee for self."""

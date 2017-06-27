@@ -117,18 +117,23 @@ mapper-results {
     }
 
     object-list {
-      object-list-item {
+      .object-list__item {
         color: $black;
         border-bottom: 1px solid $items-separator-color;
 
         object-selection-item {
+          align-items: center;
           justify-content: flex-end;
           width: $object-selection-item-width;
+
+          input[type="checkbox"] {
+            margin: 0;
+          }
         }
       }
 
-      object-list-item:first-child,
-      spinner + object-list-item {
+      .object-list__item:first-child,
+      spinner + .object-list__item {
         border-top: 1px solid $items-separator-color;
       }
     }

@@ -133,11 +133,11 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
       response, workflow = self.wf_generator.activate_workflow(workflow)
       self.assert200(response)
 
-    tasks = workflow.cycles[0].cycle_task_group_object_tasks
-    task1, task2 = tasks
-    self.wf_generator.modify_object(task2, {"end_date": date(2099, 12, 31)})
+      tasks = workflow.cycles[0].cycle_task_group_object_tasks
+      task1, task2 = tasks
+      self.wf_generator.modify_object(task2, {"end_date": date(2099, 12, 31)})
 
-    user = models.Person.query.get(self.user.id)
+      user = models.Person.query.get(self.user.id)
 
     with freeze_time("2017-05-16 08:09:10"):  # a day after task1 due date
       _, notif_data = common.get_daily_notifications()
@@ -167,12 +167,12 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
       response, workflow = self.wf_generator.activate_workflow(workflow)
       self.assert200(response)
 
-    tasks = workflow.cycles[0].cycle_task_group_object_tasks
-    task1, task2 = tasks
-    self.wf_generator.modify_object(task2, {"end_date": date(2099, 12, 31)})
+      tasks = workflow.cycles[0].cycle_task_group_object_tasks
+      task1, task2 = tasks
+      self.wf_generator.modify_object(task2, {"end_date": date(2099, 12, 31)})
 
-    user = models.Person.query.get(self.user.id)
-    user_email = user.email
+      user = models.Person.query.get(self.user.id)
+      user_email = user.email
 
     with freeze_time("2017-05-16 08:09:10"):  # a day after task1 due date
       for state in CycleTaskGroupObjectTask.ACTIVE_STATES:

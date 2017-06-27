@@ -103,6 +103,8 @@
       return definitions.map(function (def) {
         var valueData = false;
         var id = def.id;
+        var options = (def.multi_choice_options || '').split(',');
+        var optionsRequirements = (def.multi_choice_mandatory || '').split(',');
         var type = getCustomAttributeType(def.attribute_type);
         var stub = {
           id: null,
@@ -143,7 +145,16 @@
           }
         });
 
-        return valueData || stub;
+        valueData = valueData || stub;
+
+        if (type === 'dropdown') {
+          valueData.validationConfig = {};
+          options.forEach(function (item, index) {
+            valueData.validationConfig[item] =
+              Number(optionsRequirements[index]);
+          });
+        }
+        return valueData;
       });
     }
 
@@ -175,29 +186,51 @@
      */
     function convertValuesToFormFields(customAttributeValues) {
       return (customAttributeValues || new can.List([]))
-        .map(function (attr) {
-          var options = attr.def.multi_choice_options;
-          return {
-            type: attr.attributeType,
-            id: attr.def.id,
-            value: convertFromCaValue(
-              attr.attributeType,
-              attr.attribute_value,
-              attr.attribute_object
-            ),
-            title: attr.def.title,
-            placeholder: attr.def.placeholder,
-            options: options &&
-            typeof options === 'string' ?
-              options.split(',') : [],
-            helptext: attr.def.helptext,
-            validation: attr.validation,
-            errorsMap: attr.errorsMap,
-            valueId: can.compute(function () {
-              return attr.attr('id');
-            })
-          };
-        });
+        .map(convertToEditableField);
+    }
+
+    function convertToFormViewField(attr) {
+      var options = attr.def.multi_choice_options;
+      return {
+        type: attr.attributeType,
+        id: attr.def.id,
+        value: convertFromCaValue(
+          attr.attributeType,
+          attr.attribute_value,
+          attr.attribute_object
+        ),
+        title: attr.def.title,
+        placeholder: attr.def.placeholder,
+        options: options &&
+        typeof options === 'string' ?
+          options.split(',') : [],
+        helptext: attr.def.helptext
+      };
+    }
+
+    function convertToEditableField(attr) {
+      var options = attr.def.multi_choice_options;
+      return {
+        type: attr.attributeType,
+        id: attr.def.id,
+        value: convertFromCaValue(
+          attr.attributeType,
+          attr.attribute_value,
+          attr.attribute_object
+        ),
+        title: attr.def.title,
+        placeholder: attr.def.placeholder,
+        options: options &&
+        typeof options === 'string' ?
+          options.split(',') : [],
+        helptext: attr.def.helptext,
+        validation: attr.validation.attr(),
+        validationConfig: attr.validationConfig,
+        errorsMap: attr.errorsMap.attr(),
+        valueId: can.compute(function () {
+          return attr.attr('id');
+        })
+      };
     }
 
     return {
@@ -206,7 +239,8 @@
       convertValuesToFormFields: convertValuesToFormFields,
       prepareCustomAttributes: prepareCustomAttributes,
       isEmptyCustomAttribute: isEmptyCustomAttribute,
-      getCustomAttributeType: getCustomAttributeType
+      getCustomAttributeType: getCustomAttributeType,
+      convertToFormViewField: convertToFormViewField
     };
   })();
 })(window.GGRC, window.can, window._);

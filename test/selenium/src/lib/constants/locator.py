@@ -27,6 +27,7 @@ class Common(object):
   # tree
   TREE_LIST = ".tree-action"
   TREE_HEADER = ".tree-header"
+  TREE_ITEM = " .object-list__item"
   # base
   BUTTON = "BUTTON_"
   BUTTON_CREATE_NEW = "BUTTON_CREATE_NEW_"
@@ -736,7 +737,7 @@ class WidgetInfoAssessment(WidgetInfoPanel):
                             WIDGET + " auto-save-form .flex-size-1")
   CAS_CHECKBOXES = (By.CSS_SELECTOR, '[class*="wrapper"] [type="checkbox"]')
   MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS = (By.CSS_SELECTOR,
-                                            WIDGET + ' .object-list-item')
+                                            WIDGET + Common.TREE_ITEM)
   # Assessment Attributes tab
   # People section
   _PEOPLE = WIDGET + ' [title-text="People"]'
@@ -925,7 +926,7 @@ class AdminTreeView(object):
 class UnifiedMapperTreeView(TreeView):
   MODAL = ".ggrc_controllers_mapper_modal"
   HEADER = MODAL + " .list-header"
-  ITEMS = MODAL + " .object-list-item"
+  ITEMS = MODAL + Common.TREE_ITEM
   BUTTON_SHOW_FIELDS = HEADER + " .fa-bars"
   NO_RESULTS_MESSAGE = ".well-small:not(.hidden)"
 

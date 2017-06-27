@@ -112,11 +112,11 @@ class TestExportSnapshots(TestCase):
             "person": self._get_cav(control, "person"),
             # Special snapshot export fields
             "Audit": audit.slug,
+            "Evidence": u"\n".join(c.slug for c in control.document_evidence),
 
             # Fields that are not included in snapshots - Known bugs.
             "Assertions": u"",  # "\n".join(c.name for c in control.assertions)
             "Categories": u"",  # "\n".join(c.name for c in control.categories)
-            "Evidence": u"",  # "\n".join(c.name for c in control.categories)
         }
         for snapshot, control in zip(snapshots, controls)
     }

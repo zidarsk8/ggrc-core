@@ -54,6 +54,7 @@ class ColumnHandler(object):
     self.raw_value = options.get("raw_value", "").strip()
     self.validator = options.get("validator")
     self.mandatory = options.get("mandatory", False)
+    self.view_only = options.get("view_only", False)
     self.default = options.get("default")
     self.description = options.get("description", "")
     self.display_name = options.get("display_name", "")

@@ -19,12 +19,14 @@
   {{#if_instance_of parent_instance 'Audit'}}
     {{#if_in model.shortName 'Assessment,Control'}}
         {{#is_allowed 'update' parent_instance context="for"}}
-          <li class="generate-control-assessments">
-            <a href="javascript://">
-              <i class="fa fa-fw fa-magic"></i>
-              Generate Assessments
-            </a>
-          </li>
+            {{^if instance.archived}}
+                <li class="generate-control-assessments">
+                  <a href="javascript://">
+                    <i class="fa fa-fw fa-magic"></i>
+                    Generate Assessments
+                  </a>
+                </li>
+            {{/if}}
         {{/is_allowed}}
     {{/if_in}}
   {{/if_instance_of}}

@@ -1,0 +1,19 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="centered">
+<p>
+{{#instance}}
+Are you sure you want to archive
+  <span class="user-string">
+    {{#if display_name}}
+      {{display_name}}?
+    {{else}}
+      this {{type_to_readable instance.type}}?
+    {{/if}}
+  </span>
+{{/instance}}
+</p>
+</div>

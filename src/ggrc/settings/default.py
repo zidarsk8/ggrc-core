@@ -35,7 +35,7 @@ try:
 except (ImportError):
   pass
 
-VERSION = "0.10.19-Raspberry" + BUILD_NUMBER
+VERSION = "0.10.20-Raspberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -127,3 +127,9 @@ AUDIT_DASHBOARD_INTEGRATION_URL = os.environ.get(
     'AUDIT_DASHBOARD_INTEGRATION_URL',
     '',
 )
+
+# App2app QueryAPI endpoints
+ALLOWED_QUERYAPI_APP_IDS = os.environ.get(
+    "ALLOWED_QUERYAPI_APP_IDS",
+    "",
+).split()

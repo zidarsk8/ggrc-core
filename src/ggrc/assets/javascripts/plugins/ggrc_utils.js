@@ -3,8 +3,15 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function ($, GGRC, moment, Permission) {
+(function ($, GGRC, moment, Permission, CMS) {
   'use strict';
+  var ROLE_TYPES = {
+    related_creators: 'creator',
+    related_verifiers: 'verifier',
+    related_assignees: 'assignee',
+    related_requesters: 'requester',
+    related_assessors: 'assessor'
+  };
   /**
    * A module containing various utility functions.
    */
@@ -187,7 +194,6 @@
       window.webkitRequestFileSystem(
         window.TEMPORARY, text.length, fileSystemObtained, errorHandler);
     },
-
     loadScript: function (url, callback) {
       var script = document.createElement('script');
       script.type = 'text/javascript';
@@ -513,6 +519,66 @@
           .value();
 
       return peopleIds;
+    },
+    hasRoleForContext: function (userId, contextId, roleName) {
+      var deferred = $.Deferred();
+      var contextRoles;
+      var filteredRoles;
+      var hasRole;
+      var userDfd =
+        CMS.Models.Person.findInCacheById(userId) ||
+        CMS.Models.Person.findOne({id: userId});
+
+      $.when(userDfd)
+        .then(function (user) {
+          return user.get_mapping_deferred('authorizations');
+        })
+        .then(function (uRoles) {
+          contextRoles = _.filter(uRoles, function (role) {
+            return role.context_id === contextId;
+          }).map(function (role) {
+            return role.reify();
+          });
+
+          filteredRoles = GGRC.roles.filter(function (role) {
+            return contextRoles.some(function (cr) {
+              return cr.role.id === role.id;
+            });
+          });
+
+          hasRole = filteredRoles.some(function (cr) {
+            return cr.name === roleName;
+          });
+
+          deferred.resolve(hasRole);
+        });
+
+      return deferred;
+    },
+    getAssigneeType: function (instance) {
+      var user = GGRC.current_user;
+      var userType = null;
+
+      if (!instance || !user) {
+        return;
+      }
+      _.each(ROLE_TYPES, function (type, mapping) {
+        var mappings = instance.get_mapping(mapping);
+        var isMapping;
+        if (!mappings.length) {
+          return;
+        }
+
+        isMapping = _.filter(mappings, function (mapping) {
+          return mapping.instance.id === user.id;
+        }).length;
+
+        if (isMapping) {
+          type = can.capitalize(type);
+          userType = userType ? userType + ',' + type : type;
+        }
+      });
+      return userType;
     }
   };
 
@@ -644,6 +710,7 @@
       var model = CMS.Models[instance.child_type];
       var content = instance.revision.content;
       var type = model.root_collection;
+      var audit;
 
       content.isLatestRevision = instance.is_latest_revision;
       content.originalLink = '/' + type + '/' + content.id;
@@ -675,7 +742,21 @@
       }
 
       object = new model(content);
+      // Update archived flag in content when audit is archived:
+      if (instance.parent &&
+        CMS.Models.Audit.findInCacheById(instance.parent.id)) {
+        audit = CMS.Models.Audit.findInCacheById(instance.parent.id);
+        audit.bind('change', function () {
+          var field = arguments[1];
+          var newValue = arguments[3];
+          if (field !== 'archived' || !object.snapshot) {
+            return;
+          }
+          object.snapshot.attr('archived', newValue);
+        });
+      }
       model.removeFromCacheById(content.id);  /* removes snapshot object from cache */
+
       return object;
     }
 
@@ -782,4 +863,5 @@
       getParentUrl: getParentUrl
     };
   })();
-})(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission);
+})(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission,
+  window.CMS = window.CMS || {});

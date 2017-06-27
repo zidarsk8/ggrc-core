@@ -44,8 +44,9 @@
         get: function () {
           var type = this.attr('instance.type');
           var isSnapshot = this.attr('isSnapshot');
+          var isArchived = this.attr('instance.archived');
           var isInForbiddenList = forbiddenList.indexOf(type) > -1;
-          return !(isSnapshot || isInForbiddenList);
+          return !(isSnapshot || isInForbiddenList || isArchived);
         }
       }
     },

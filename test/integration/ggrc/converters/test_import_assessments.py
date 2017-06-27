@@ -11,6 +11,7 @@ from collections import OrderedDict
 from cStringIO import StringIO
 from itertools import izip
 
+import ddt
 from flask.json import dumps
 
 from ggrc import db
@@ -22,6 +23,7 @@ from integration.ggrc import TestCase
 from integration.ggrc.generator import ObjectGenerator
 
 
+@ddt.ddt
 class TestAssessmentImport(TestCase):
   """Basic Assessment import tests with.
 
@@ -244,6 +246,33 @@ class TestAssessmentImport(TestCase):
         models.Relationship.get_related_query(
             assessment, models.Snapshot()
         ).exists()).first()[0])
+
+  @ddt.data(True, False)
+  def test_import_view_only_field(self, value):
+    "Test import view only fields"
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      factories.RelationshipFactory(source=audit, destination=assessment)
+    resp = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment.slug),
+        ("archived", value),
+    ]))
+    self.assertEqual(
+        [{
+            u'ignored': 0,
+            u'updated': 1,
+            u'block_errors': [],
+            u'name': u'Assessment',
+            u'created': 0,
+            u'deleted': 0,
+            u'row_warnings': [],
+            u'rows': 1,
+            u'block_warnings': [],
+            u'row_errors': [],
+        }],
+        resp)
 
   def test_create_new_assessment_with_mapped_control(self):
     "Test for creation assessment with mapped controls"

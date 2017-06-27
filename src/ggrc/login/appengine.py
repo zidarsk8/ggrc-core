@@ -14,30 +14,80 @@ Assumes app.yaml is configured with:
 E.g., ``login: required`` must be specified *at least* for the '/login' route.
 """
 
+import json
+
 from google.appengine.api import users
-from ggrc.login.common import find_or_create_user_by_email, get_next_url
+import flask
 import flask_login
-from flask import url_for, redirect, request, session, flash
+from werkzeug import exceptions
+
+from ggrc.login import common
+from ggrc.models import all_models
+from ggrc import settings
 
 
 def get_user():
+  """Get current user using appengine authentication."""
   ae_user = users.get_current_user()
   email = ae_user.email()
   nickname = ae_user.nickname()
-  user = find_or_create_user_by_email(email, name=nickname)
+  user = common.find_or_create_user_by_email(email, name=nickname)
   return user
 
+
 def login():
+  """Log in current user."""
   user = get_user()
   if user.system_wide_role != 'No Access':
     flask_login.login_user(user)
-    return redirect(get_next_url(request, default_url=url_for('dashboard')))
-  else:
-    flash(u'You do not have access. Please contact your administrator.', 'alert alert-info')
-    return redirect('/')
+    return flask.redirect(common.get_next_url(
+        flask.request, default_url=flask.url_for('dashboard')))
+
+  flask.flash(u'You do not have access. Please contact your administrator.',
+              'alert alert-info')
+  return flask.redirect('/')
+
 
 def logout():
   flask_login.logout_user()
-  return redirect(
-    users.create_logout_url(
-      get_next_url(request, default_url=url_for('index'))))
+  return flask.redirect(users.create_logout_url(common.get_next_url(
+      flask.request, default_url=flask.url_for('index'))))
+
+
+def request_loader(request):
+  """Get the user provided in X-GGRC-user if whitelisted Appid provided."""
+
+  whitelist = settings.ALLOWED_QUERYAPI_APP_IDS
+  inbound_appid = request.headers.get("X-Appengine-Inbound-Appid")
+  if not inbound_appid:
+    # don't check X-GGRC-user if the request doesn't come from another app
+    return None
+
+  if inbound_appid not in whitelist:
+    # by default, we don't allow incoming app2app connections from
+    # non-whitelisted apps
+    raise exceptions.BadRequest("X-Appengine-Inbound-Appid header contains "
+                                "untrusted application id: {}"
+                                .format(inbound_appid))
+
+  user = request.headers.get("X-GGRC-user")
+  if not user:
+    # no user provided
+    raise exceptions.BadRequest("X-GGRC-user should be set, contains {!r} "
+                                "instead."
+                                .format(user))
+
+  try:
+    user = json.loads(user)
+    email = str(user["email"])
+  except (TypeError, ValueError, KeyError):
+    # user provided in invalid syntax
+    raise exceptions.BadRequest("X-GGRC-user should have JSON object like "
+                                "{{'email': str}}, contains {!r} instead."
+                                .format(user))
+
+  db_user = all_models.Person.query.filter_by(email=email).first()
+  if not db_user:
+    raise exceptions.BadRequest("No user with such email: {}"
+                                .format(email))
+  return db_user

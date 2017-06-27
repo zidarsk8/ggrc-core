@@ -11,6 +11,7 @@ from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
+from ggrc.builder import simple_property
 from ggrc.models import reflection
 from ggrc.models.comment import Commentable
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
@@ -145,10 +146,12 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'design',
       'operationally',
       'audit',
+      PublishOnly('archived'),
       PublishOnly('object')
   ]
 
   _fulltext_attrs = [
+      'archived',
       'design',
       'operationally',
       MultipleSubpropertyFullTextAttr('related_assessors', 'assessors',
@@ -207,6 +210,12 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
           "display_name": "Verifiers",
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
+      "archived": {
+          "display_name": "Archived",
+          "mandatory": False,
+          "ignore_on_update": True,
+          "view_only": True,
+      },
   }
 
   AUTO_REINDEX_RULES = [
@@ -221,6 +230,10 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       },
       "threshold": 1,
   }
+
+  @simple_property
+  def archived(self):
+    return self.audit.archived if self.audit else False
 
   @property
   def assessors(self):

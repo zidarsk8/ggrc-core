@@ -56,10 +56,10 @@
       /**
        *
        * @param {can.Map} ctx - current item context
-       * @param {jQuery.Event} ev - click event
        * @param {jQuery} el - selected element
+       * @param {jQuery.Event} ev - click event
        */
-      modifySelection: function (ctx, ev, el) {
+      modifySelection: function (ctx, el, ev) {
         var selectionFilter = this.attr('itemSelector');
         var isSelected = selectionFilter ?
           can.$(ev.target).closest(selectionFilter, el).length :
@@ -94,7 +94,7 @@
       }
     },
     events: {
-      'object-list-item click': function () {
+      '.object-list__item click': function () {
         this.viewModel.attr('isInnerClick', true);
       },
       '{window} click': function () {

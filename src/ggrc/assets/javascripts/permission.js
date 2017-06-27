@@ -8,7 +8,7 @@
   var _CONDITIONS_MAP = {
     contains: function (instance, args) {
       var value = Permission._resolve_permission_variable(args.value);
-      var list_value = instance[args.list_property];
+      var list_value = instance[args.list_property] || [];
       var i;
       for (i = 0; i < list_value.length; i++) {
         if (list_value[i].id == value.id) {
@@ -36,6 +36,12 @@
     forbid: function (instance, args, action) {
       var blacklist = args.blacklist[action] || [];
       return blacklist.indexOf(instance.type) < 0;
+    },
+    has_changed: function (instance, args) {
+      return (instance.attr(args.property_name) === args.prevent_if);
+    },
+    has_not_changed: function (instance, args) {
+      return !(instance.attr(args.property_name) === args.prevent_if);
     }
   };
   var permissions_compute = can.compute(GGRC.permissions);
@@ -144,23 +150,25 @@
       var condition;
       var i;
 
+      conditions = conditions.concat(conditions_by_context.null || []);
+
       if (checkAdmin(0) || checkAdmin(null)) {
         return true;
       }
       if (~resources.indexOf(instance.id)) {
         return true;
       }
-      if (!this._is_allowed(permissions,
-          new Permission(action, instance_type, null)) &&
-        !this._is_allowed(permissions,
-          new Permission(action, instance_type, context.id))) {
-        return false;
+      if (conditions.length === 0 && (this._is_allowed(permissions,
+          new Permission(action, instance_type, null)) ||
+        this._is_allowed(permissions,
+          new Permission(action, instance_type, context.id)))) {
+        return true;
       }
       // Check any conditions applied per instance
       // If there are no conditions, the user has unconditional access to
       // the current instance. We can safely return true in this case.
       if (conditions.length === 0) {
-        return true;
+        return false;
       }
       for (i = 0; i < conditions.length; i++) {
         condition = conditions[i];

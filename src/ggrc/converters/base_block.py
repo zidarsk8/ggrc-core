@@ -207,13 +207,14 @@ class BlockConverter(object):
     id_map = {}
     for object_type, ids in object_ids.items():
       model = getattr(models.all_models, object_type, None)
-      id_column = getattr(model, "slug", getattr(model, "email", None))
-      if id_column:
-        query = db.session.query(model.id, id_column).filter(model.id.in_(ids))
-        id_map[object_type] = dict(query)
+      if hasattr(model, "slug"):
+        id_column = getattr(model, "slug")
+      elif hasattr(model, "email"):
+        id_column = getattr(model, "email")
       else:
-        # invalid model
-        pass
+        continue
+      query = db.session.query(model.id, id_column).filter(model.id.in_(ids))
+      id_map[object_type] = dict(query)
     return id_map
 
   def _create_mapping_cache(self):

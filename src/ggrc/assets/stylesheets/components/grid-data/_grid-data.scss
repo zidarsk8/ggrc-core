@@ -115,6 +115,18 @@
       }
     }
   }
+
+  &.mapped-object-list {
+    > object-list {
+      > .object-list__item {
+        background: #fff;
+
+        &:not(:last-child) {
+          border-bottom: 1px solid #e0e0e0;
+        }
+      }
+    }
+  }
 }
 
 // Extra style for the first index/order column
@@ -197,6 +209,18 @@
 
     &.loading {
       min-height: 64px;
+    }
+
+    &.mapped-object-list {
+      max-height: none;
+
+      > * {
+        padding: 0;
+      }
+
+      object-list > .empty-message {
+        padding-left: 7px;
+      }
     }
 
     > .spinner-wrapper {

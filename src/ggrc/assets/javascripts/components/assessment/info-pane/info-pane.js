@@ -16,6 +16,12 @@
     template: tpl,
     viewModel: {
       define: {
+        isInstanceCompleted: {
+          get: function () {
+            return this.attr('instance.status') === 'Completed' ||
+              this.attr('instance.status') === 'Ready for Review';
+          }
+        },
         isSaving: {
           type: 'boolean',
           value: false
@@ -56,11 +62,11 @@
           type: 'boolean',
           get: function () {
             return this.attr('instance.status') !== 'Completed' &&
-              this.attr('instance.status') !== 'Ready for Review';
+              this.attr('instance.status') !== 'Ready for Review' &&
+              !this.attr('instance.archived');
           },
           set: function () {
-            this.attr('instance.status', 'In Progress');
-            this.attr('instance').save();
+            this.onStateChange({state: 'In Progress', undo: true});
           }
         },
         instance: {}
@@ -69,6 +75,7 @@
         open: false
       },
       formState: {},
+      noItemsText: '',
       triggerFormSaveCbs: $.Callbacks(),
       getQuery: function (type, sortObj, additionalFilter) {
         var relevantFilters = [{
@@ -94,19 +101,20 @@
         var evidenceType = CMS.Models.Document.EVIDENCE;
         return this.getQuery(
           'Document',
-          undefined,
+          {sortBy: 'created_at', sortDirection: 'desc'},
           this.getDocumentAdditionFilter(evidenceType));
       },
       getUrlQuery: function () {
         var urlType = CMS.Models.Document.URL;
         return this.getQuery(
           'Document',
-          undefined,
+          {sortBy: 'created_at', sortDirection: 'desc'},
           this.getDocumentAdditionFilter(urlType));
       },
-      requestQuery: function (query) {
+      requestQuery: function (query, type) {
         var dfd = can.Deferred();
-        this.attr('isLoading', true);
+        type = type || '';
+        this.attr('isUpdating' + can.capitalize(type), true);
         GGRC.Utils.QueryAPI
           .batchRequests(query)
           .done(function (response) {
@@ -118,7 +126,7 @@
             dfd.resolve([]);
           })
           .always(function () {
-            this.attr('isLoading', false);
+            this.attr('isUpdating' + can.capitalize(type), false);
           }.bind(this));
         return dfd;
       },
@@ -128,15 +136,32 @@
       },
       loadComments: function () {
         var query = this.getCommentQuery();
-        return this.requestQuery(query);
+        return this.requestQuery(query, 'comments');
       },
       loadEvidences: function () {
         var query = this.getEvidenceQuery();
-        return this.requestQuery(query);
+        return this.requestQuery(query, 'evidences');
       },
       loadUrls: function () {
         var query = this.getUrlQuery();
-        return this.requestQuery(query);
+        return this.requestQuery(query, 'urls');
+      },
+      updateItems: function () {
+        can.makeArray(arguments).forEach(function (type) {
+          this.attr(type).replace(this['load' + can.capitalize(type)]());
+        }.bind(this));
+      },
+      removeItem: function (event, type) {
+        var item = event.item;
+        var index = this.attr(type).indexOf(item);
+        this.attr('isUpdating' + can.capitalize(type), true);
+        return this.attr(type).splice(index, 1);
+      },
+      addItems: function (event, type) {
+        var items = event.items;
+        this.attr('isUpdating' + can.capitalize(type), true);
+        return this.attr(type).unshift.apply(this.attr(type),
+          can.makeArray(items));
       },
       getDocumentAdditionFilter: function (documentType) {
         return documentType ?
@@ -173,6 +198,7 @@
         var undo = event.undo;
         var state = event.state;
         var instance = this.attr('instance');
+        var self = this;
 
         if (!instance.attr('_undo')) {
           instance.attr('_undo', []);
@@ -183,15 +209,19 @@
         } else {
           instance.attr('_undo').unshift(state);
         }
+        instance.attr('isPending', true);
 
-        instance.refresh()
+        this.attr('formState.formSavedDeferred')
           .then(function () {
-            instance.attr('status', state);
-            return instance.save();
-          })
-          .then(function () {
-            this.initializeFormFields();
-          }.bind(this));
+            instance.refresh().then(function () {
+              instance.attr('status', state);
+              return instance.save()
+              .then(function () {
+                instance.attr('isPending', false);
+                self.initializeFormFields();
+              });
+            });
+          });
       },
       saveFormFields: function (formFields) {
         var caValues = can.makeArray(
@@ -217,7 +247,8 @@
 
         return this.attr('instance').save();
       },
-      showRequiredInfoModal: function (scope) {
+      showRequiredInfoModal: function (e, field) {
+        var scope = field || e.field;
         var errors = scope.attr('errorsMap');
         var errorsList = can.Map.keys(errors)
           .map(function (error) {
@@ -227,6 +258,8 @@
             return !!errorCode;
           });
         var data = {
+          options: scope.attr('options'),
+          contextScope: scope,
           fields: errorsList,
           value: scope.attr('value'),
           title: scope.attr('title'),
@@ -240,10 +273,6 @@
         can.batch.start();
         this.attr('modal', {
           content: data,
-          caIds: {
-            defId: scope.attr('id'),
-            valueId: scope.attr('valueId')()
-          },
           modalTitle: title,
           state: {}
         });
@@ -257,7 +286,8 @@
     },
     events: {
       '{viewModel.instance} refreshInstance': function () {
-        this.viewModel.updateRelatedItems();
+        this.viewModel.attr('mappedSnapshots')
+          .replace(this.viewModel.loadSnapshots());
       }
     }
   });

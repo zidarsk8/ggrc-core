@@ -7,7 +7,9 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
         <div class="grid-data__toolbar flex-box">
             <tree-pagination {(paging)}="paging" class="grid-data__toolbar-item"></tree-pagination>
             {{#is_allowed 'update' baseInstance context='for'}}
-                <button class="btn btn-small btn-green grid-data__toolbar-item" ($click)="reuseSelected" {{^hasSelected}}disabled{{/hasSelected}}>Reuse</button>
+                {{^if instance.archived}}
+                    <button class="btn btn-small btn-green grid-data__toolbar-item" ($click)="reuseSelected" {{^hasSelected}}disabled{{/hasSelected}}>Reuse</button>
+                {{/if}}
             {{/is_allowed}}
         </div>
         <div class="grid-data-header flex-row flex-box">

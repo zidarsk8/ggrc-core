@@ -10,6 +10,9 @@ Copyright (C) 2017 Google Inc.
             <div class="pane-header__title">
                 <h3>{{instance.title}}</h3>
                   <span class="state-value {{addclass 'state-' instance.status separator=''}}">{{instance.status}}</span>
+                  {{#if instance.archived}}
+                      <span class="state-value state-archived">Archived</span>
+                  {{/if}}
                   {{#eq instance.status 'Completed'}}
                     {{#if instance.verified}}
                       <i class="fa fa-check-circle green"
@@ -30,7 +33,9 @@ Copyright (C) 2017 Google Inc.
                     </a>
                     <ul class="dropdown-menu three-dots-list" aria-labelledby="drop1" role="menu">
                       {{#is_allowed 'update' instance context='for'}}
-                        {{> '/static/mustache/base_objects/edit_object_link.mustache'}}
+                          {{^if instance.archived}}
+                            {{> '/static/mustache/base_objects/edit_object_link.mustache'}}
+                          {{/if}}
                       {{/is_allowed}}
                         <li>
                             <clipboard-link title="Get permalink" notify="true"
@@ -54,52 +59,59 @@ Copyright (C) 2017 Google Inc.
                         {{#is_allowed 'update' instance context='for'}}
                             <li>
                               {{#unless instance._disabled}}
-                                {{#if instance.assignees.Verifier.length}}
-                                    <reminder
-                                            {instance}="instance"
-                                            {type}="statusToPerson"
-                                            modal_title="Reminder for Assignees set"
-                                            modal_description="Tomorrow all Assignees will receive a notification to look at this Assessment if they didn't move it to 'Finished' in between."
-                                    >
-                                        <a href="javascript://" ($click)="reminder">
-                                            <i class="fa fa-bell-o"></i>
-                                            Send reminder to assignees</a>
-                                    </reminder>
-                                {{else}}
-                                    <reminder
-                                            {instance}="instance"
-                                            {type}="statusToPerson"
-                                            modal_title="Reminder for Assignees set"
-                                            modal_description="Tomorrow all Assignees will receive a notification to look at this Assessment if they didn't move it to 'Final' in between."
-                                    >
-                                        <a href="javascript://" ($click)="reminder">
-                                            <i class="fa fa-bell-o"></i>
-                                            Send reminder to assignees</a>
-                                    </reminder>
-                                {{/if}}
+                                {{#unless instance.archived}}
+                                  {{#if instance.assignees.Verifier.length}}
+                                      <reminder
+                                              {instance}="instance"
+                                              {type}="statusToPerson"
+                                              modal_title="Reminder for Assignees set"
+                                              modal_description="Tomorrow all Assignees will receive a notification to look at this Assessment if they didn't move it to 'Finished' in between."
+                                      >
+                                          <a href="javascript://" ($click)="reminder">
+                                              <i class="fa fa-bell-o"></i>
+                                              Send reminder to assignees</a>
+                                      </reminder>
+                                  {{else}}
+                                      <reminder
+                                              {instance}="instance"
+                                              {type}="statusToPerson"
+                                              modal_title="Reminder for Assignees set"
+                                              modal_description="Tomorrow all Assignees will receive a notification to look at this Assessment if they didn't move it to 'Final' in between."
+                                      >
+                                          <a href="javascript://" ($click)="reminder">
+                                              <i class="fa fa-bell-o"></i>
+                                              Send reminder to assignees</a>
+                                      </reminder>
+                                  {{/if}}
+                                {{/unless}}
                               {{/unless}}
                             </li>
                         {{/is_allowed}}
                       {{/if_in}}
 
                       {{#is_allowed 'delete' instance}}
-                          <li>
-                              <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}"
-                                 data-object-singular="{{model.model_singular}}" data-modal-reset="reset"
-                                 data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
-                                  <i class="fa fa-trash"></i>
-                                  Delete
-                              </a>
-                          </li>
+                          {{^if instance.archived}}
+                            <li>
+                                <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}"
+                                   data-object-singular="{{model.model_singular}}" data-modal-reset="reset"
+                                   data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
+                                    <i class="fa fa-trash"></i>
+                                    Delete
+                                </a>
+                            </li>
+                          {{/if}}
                       {{/is_allowed}}
                     </ul>
                 </div>
             </div>
           {{#is_allowed 'update' instance context='for'}}
-            <object-state-toolbar {verifiers}="instance.assignees.Verifier"
-                                  {instance}="instance"
-                                  (on-state-change)="onStateChange(%event)">
-            </object-state-toolbar>
+              {{^if instance.archived}}
+                  <object-state-toolbar {{#if is_info_pin}}class="object-state-toolbar__info-pin-state"{{/if}}
+                                        {verifiers}="instance.assignees.Verifier"
+                                        {instance}="instance"
+                                        (on-state-change)="onStateChange(%event)">
+                  </object-state-toolbar>
+              {{/if}}
           {{/is_allowed}}
         </div>
     </div>

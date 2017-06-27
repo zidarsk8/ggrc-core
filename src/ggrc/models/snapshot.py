@@ -44,6 +44,7 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
       "child_type",
       "revision",
       "revision_id",
+      reflection.PublishOnly("archived"),
       reflection.PublishOnly("revisions"),
       reflection.PublishOnly("is_latest_revision"),
       reflection.PublishOnly("original_object_deleted"),
@@ -93,6 +94,10 @@ class Snapshot(relationship.Relatable, mixins.Base, db.Model):
       "Revision.resource_type == foreign(Snapshot.child_type))",
       uselist=True,
   )
+
+  @builder.simple_property
+  def archived(self):
+    return self.parent.archived if self.parent else False
 
   @builder.simple_property
   def is_latest_revision(self):

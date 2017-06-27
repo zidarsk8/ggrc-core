@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, $) {
+(function (GGRC) {
   'use strict';
 
   GGRC.Components('relatedDocuments', {
@@ -51,4 +51,4 @@
       this.viewModel.loadDocuments();
     }
   });
-})(window.can, window.can.$);
+})(window.GGRC, window);

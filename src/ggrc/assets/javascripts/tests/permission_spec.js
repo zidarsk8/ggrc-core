@@ -434,6 +434,50 @@ describe('Permission', function () {
         expect(result).toEqual(true);
       });
     });
+    describe('for null context conditions', function () {
+      it('returns false when condition not matched', function () {
+        permissions.create = {
+          Audit: {
+            contexts: [null],
+            conditions: {
+              'null': [{
+                condition: 'contains',
+                terms: {
+                  value: {id: 0},
+                  list_property: 'list_value'
+                }
+              }]
+            }
+          }
+        };
+        instance = new CMS.Models.Audit();
+        instance.attr('context', {id: 101});
+        instance.list_value = [{id: 100}];
+        result = Permission._is_allowed_for(permissions, instance, 'create');
+        expect(result).toEqual(false);
+      });
+      it('returns true when condition matched', function () {
+        permissions.create = {
+          Audit: {
+            contexts: [null],
+            conditions: {
+              'null': [{
+                condition: 'contains',
+                terms: {
+                  value: {id: 0},
+                  list_property: 'list_value'
+                }
+              }]
+            }
+          }
+        };
+        instance = new CMS.Models.Audit();
+        instance.attr('context', {id: 101});
+        instance.list_value = [{id: 0}];
+        result = Permission._is_allowed_for(permissions, instance, 'create');
+        expect(result).toEqual(true);
+      });
+    });
   });
 
   describe('is_allowed() method', function () {

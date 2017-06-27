@@ -22,7 +22,6 @@
           value: ''
         },
         disabled: {
-          type: 'boolean',
           set: function (newValue) {
             this.toggle(!newValue);
             return newValue;
@@ -159,7 +158,9 @@
       setText: function (text) {
         var editor = this.getEditor();
         if (editor && !text.length) {
-          editor.setText('');
+          setTimeout(function () {
+            editor.setText('');
+          }, 0);
         }
       },
       /**

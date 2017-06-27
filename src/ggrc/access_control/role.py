@@ -3,7 +3,10 @@
 
 """Access Control Role model"""
 
-from sqlalchemy.orm import validates
+import collections
+
+import sqlalchemy as sa
+import flask
 
 from ggrc import db
 from ggrc.models import mixins
@@ -55,7 +58,7 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
       "my_work",
   ]
 
-  @validates("name", "object_type")
+  @sa.orm.validates("name", "object_type")
   def validates_name(self, key, value):  # pylint: disable=no-self-use
     """Validate Custom Role name uniquness.
 
@@ -94,3 +97,35 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
                        u"already exists for this object type"
                        .format(name))
     return value
+
+
+def invalidate_role_names_cache(mapper, content, target):
+  # pylint: disable=unused-argument
+  """Clear `global_role_names` if ACR created or update or deleted."""
+  if hasattr(flask.g, "global_role_names"):
+    del flask.g.global_role_names
+
+
+sa.event.listen(AccessControlRole, "after_insert", invalidate_role_names_cache)
+sa.event.listen(AccessControlRole, "after_delete", invalidate_role_names_cache)
+sa.event.listen(AccessControlRole, "after_update", invalidate_role_names_cache)
+
+
+def get_custom_roles_for(object_type):
+  """Get all access control role names for the given object type
+
+  return the dict off ACR ids and names related to sent object_type,
+  Ids are keys of this dict and names are values.
+  """
+  if getattr(flask.g, "global_role_names", None) is None:
+    flask.g.global_role_names = collections.defaultdict(dict)
+    query = db.session.query(
+        AccessControlRole.object_type,
+        AccessControlRole.id,
+        AccessControlRole.name,
+    ).filter(
+        AccessControlRole.object_type.isnot(None),  # noqa
+    )
+    for type_, id_, name_ in query:
+      flask.g.global_role_names[type_][id_] = name_
+  return flask.g.global_role_names[object_type]

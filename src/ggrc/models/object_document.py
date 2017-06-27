@@ -10,7 +10,6 @@ from ggrc import db
 from ggrc.models import reflection
 from ggrc.models.relationship import Relationship
 from ggrc.models.document import Document
-from ggrc.utils import create_stub
 from ggrc.fulltext.attributes import MultipleSubpropertyFullTextAttr
 
 
@@ -93,15 +92,17 @@ class Documentable(object):
 
   @staticmethod
   def _log_docs(documents):
-    return [create_stub(d) for d in documents if d]
+    """Returns serialization of the given docs"""
+    return [d.log_json() for d in documents if d]
 
   def log_json(self):
     """Serialize to JSON"""
+    # This query is required to refresh related documents collection after
+    # they were mapped to an object. Otherwise python uses cached value,
+    # which might not contain newly created documents.
     out_json = super(Documentable, self).log_json()
-    if hasattr(self, "urls"):
-      out_json["urls"] = self._log_docs(self.urls)
-    if hasattr(self, "attachments"):
-      out_json["attachments"] = self._log_docs(self.urls)
+    out_json["document_url"] = self._log_docs(self.document_url)
+    out_json["document_evidence"] = self._log_docs(self.document_evidence)
     return out_json
 
   @classmethod

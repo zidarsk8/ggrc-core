@@ -189,7 +189,6 @@ class SnapshotBlockConverter(object):
           stubs[value["type"]].add(value["id"])
         for val in value.values():
           walk(val, stubs)
-
     for snapshot in self.snapshots:
       walk(snapshot.content, stubs)
     return stubs
@@ -206,15 +205,15 @@ class SnapshotBlockConverter(object):
     for model_name, ids in stubs.iteritems():
       with benchmark("Generate snapshot cache for: {}".format(model_name)):
         model = getattr(models.all_models, model_name, None)
-        attr = getattr(model, id_map.get(model_name, "slug"), None)
-        if not attr:
+        attr_name = id_map.get(model_name, "slug")
+        if not hasattr(model, attr_name):
           continue
+        attr = getattr(model, attr_name)
         model_count = model.query.count()
-        if len(ids) > model_count / 2:
-          cache[model_name] = dict(db.session.query(model.id, attr))
-        else:
-          cache[model_name] = dict(db.session.query(
-              model.id, attr).filter(model.id.in_(ids)))
+        query = db.session.query(model.id, attr)
+        if len(ids) < model_count / 2:
+          query = query.filter(model.id.in_(ids))
+        cache[model_name] = dict(query)
     return cache
 
   def get_value_string(self, value):

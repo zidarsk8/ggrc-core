@@ -3,55 +3,30 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div {{#instance}}{{data 'model'}}{{/instance}} {{ (el) -> el.ggrc_controllers_quick_form({instance : el.data('model') }) }}>
-  {{#unless isDisabled}}
-    {{#if isInProgressOrNotStarted}}
-      {{^if hasErrors}}
-        {{#if hasVerifiers}}
-            <button class="btn btn-small btn-darkBlue pull-right btn-info-pin-header"
-                    ($click)="changeState('Ready for Review')">
-                Complete
-            </button>
-        {{else}}
-            <button class="btn btn-small btn-darkBlue pull-right btn-info-pin-header"
-                    ($click)="changeState('Completed')">
-                Complete
-            </button>
-        {{/if}}
-      {{else}}
-          <button class="btn btn-small btn-darkBlue pull-right btn-info-pin-header disabled" {{#if errorMsg }}title="{{errorMsg}}"{{/if}}>Complete</button>
-      {{/if}}
+<div class="object-state-toolbar">
+  {{#if isInProgressOrNotStarted}}
+      <button class="btn btn-small btn-darkBlue object-state-toolbar__item"
+              {{#if isDisabled}}disabled{{/if}}
+              ($click)="changeState()">Complete
+      </button>
+  {{/if}}
+  {{#if isInReview}}
+    {{#if isCurrentUserVerifier}}
+        <button class="btn btn-small btn-green object-state-toolbar__item"
+                {{#if isDisabled}}disabled{{/if}}
+                ($click)="changeState('Verified')">Verify</button>
+        <button class="btn btn-small btn-red object-state-toolbar__item"
+                {{#if isDisabled}}disabled{{/if}}
+                ($click)="changeState('In Progress')">Reject
+        </button>
     {{/if}}
-    {{#if isInReview}}
-      {{#if isCurrentUserVerifier}}
-        {{#unless hasErrors}}
-            <button class="btn btn-small btn-green pull-right btn-info-pin-header"
-                    ($click)="changeState('Verified')">
-                    Verify
-            </button>
-            <button class="btn btn-small btn-red pull-right btn-info-pin-header"
-                    ($click)="changeState('In Progress')">
-                Reject
-            </button>
-        {{else}}
-            <button class="btn btn-small btn-green pull-right btn-info-pin-header disabled"
-                    ($click)="changeState('Verified')"
-                    title="{{errorMsg}}">
-                Verify
-            </button>
-            <button class="btn btn-small btn-red pull-right btn-info-pin-header disabled"
-                    ($click)="changeState('In Progress')"
-                    title="{{errorMsg}}">
-                Reject
-            </button>
-        {{/unless}}
-      {{/if}}
-    {{/if}}
-    {{#unless isInProgress}}
-      {{#instance._undo.0}}
-          <a data-name="status" ($click)="changeState(instance._undo.0, true)"
-             class="btn btn-small btn-link btn-info-pin-header pull-right {{#if isDisabled}}disabled{{/if}}">Undo</a>
-      {{/instance._undo.0}}
-    {{/unless}}
+  {{/if}}
+  {{#unless isInProgress}}
+    {{#instance._undo.0}}
+        <button class="btn btn-small btn-link object-state-toolbar__item"
+                {{#if isDisabled}}disabled{{/if}}
+                ($click)="changeState('In Progress', true)">Undo
+        </button>
+    {{/instance._undo.0}}
   {{/unless}}
 </div>

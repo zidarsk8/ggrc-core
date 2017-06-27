@@ -10,6 +10,7 @@ date-form-field {
     datepicker {
       .datepicker__input-wrapper {
         input {
+          background: $white;
           margin: 0;
           width: 100%;
           box-sizing: border-box;
@@ -17,6 +18,16 @@ date-form-field {
           line-height: 28px;
           border-radius: 2px;
           padding-left: 24px;
+
+          &[readonly] {
+            background: $white;
+            border-color: #ccc;
+            cursor: pointer;
+
+            &:focus {
+              border-color: rgba(82, 168, 236, 0.8);
+            }
+          }
         }
 
         i {

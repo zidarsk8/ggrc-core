@@ -12,6 +12,7 @@ from collections import defaultdict
 from datetime import date
 from datetime import datetime
 from logging import getLogger
+from operator import itemgetter
 
 from sqlalchemy.orm import joinedload
 from sqlalchemy.sql.expression import true
@@ -153,7 +154,31 @@ def get_notification_data(notifications):
   # Remove notifications for objects without a contact (such as task groups)
   aggregate_data.pop("", None)
 
+  sort_comments(aggregate_data)
+
   return aggregate_data
+
+
+def sort_comments(notif_data):
+  """Inline sort comment notifications by comment creation times.
+
+  Comment notifications dictionaries are converted to sorted lists in the
+  process.
+
+  Args:
+    notif_data: Dictionary containing aggregated notification data for a single
+      day.
+  Returns:
+    None
+  """
+  for user_notifs in notif_data.itervalues():
+    comment_notifs = user_notifs.get("comment_created", {})
+
+    for parent_obj_info, comments in comment_notifs.iteritems():
+      comments_as_list = sorted(
+          comments.itervalues(), key=itemgetter("created_at"), reverse=True)
+      # modifying a value for a given existing key is fine...
+      comment_notifs[parent_obj_info] = comments_as_list
 
 
 def get_pending_notifications():

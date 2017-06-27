@@ -22,18 +22,13 @@
     instantiating the component.
   */
   GGRC.Components('quickAdd', {
-    tag: "ggrc-quick-add",
-    // <content> in a component template will be replaced with whatever is contained
-    //  within the component tag.  Since the views for the original uses of these components
-    //  were already created with content, we just used <content> instead of making
-    //  new view template files.
-    template: "<content/>",
-    scope: {
+    tag: 'ggrc-quick-add',
+    viewModel: {
       parent_instance: null,
       source_mapping: null,
-      join_model: "@",
+      join_model: '@',
       model: null,
-      delay: "@",
+      delay: '@',
       quick_create: "@",
       verify_event: "@",
       modal_description: "@",
@@ -49,7 +44,18 @@
       create_url: function () {
         var value = $.trim(this.element.find("input[type='text']").val());
         var dfd;
-
+        var context = this.viewModel.attr('parent_instance.context') ||
+            new CMS.Models.Context({id: null});
+        var attrs = {
+          link: value,
+          title: value,
+          context: context,
+          document_type: CMS.Models.Document.URL,
+          owners: [{type: 'Person', id: GGRC.current_user.id}],
+          created_at: new Date(),
+          isDraft: true
+        };
+        this.viewModel.dispatch({type: 'beforeCreate', items: [attrs]});
         // We are not validating the URL because application can locally we can
         // have URL's that are valid, but they wouldn't pass validation i.e.
         // - hi/there
@@ -57,35 +63,28 @@
         // - http://something.com etc
         // and thus we decided to validate just string existence
         if (!value || _.isEmpty(value)) {
-          dfd = $.Deferred();
+          dfd = can.Deferred();
           dfd.reject({
             message: 'Please enter a URL'
           });
           return dfd.promise();
         }
-        dfd = new CMS.Models.Document({
-          link: value,
-          title: value,
-          context: this.scope.parent_instance.context || new CMS.Models.Context({
-            id: null
-          }),
-          document_type: CMS.Models.Document.URL,
-          owners: [{type: 'Person', id: GGRC.current_user.id}]
-        });
+        dfd = new CMS.Models.Document(attrs);
         return dfd.save();
       }
     },
     events: {
       init: function () {
-        this.scope.attr("controller", this);
+        this.scope.attr('controller', this);
       },
       // The inserted event fires when the component content is added to the DOM.
       //  At this time, live bound rendering should be resolved, which is not the
       //  case during init.
       inserted: function (el) {
-        this.element.find("input:not([data-mapping], [data-lookup])").each(function(i, el) {
-          this.scope.attributes.attr($(el).attr("name"), $(el).val());
-        }.bind(this));
+        this.element.find('input:not([data-mapping], [data-lookup])')
+          .each(function (i, el) {
+            this.viewModel.attributes.attr($(el).attr('name'), $(el).val());
+          }.bind(this));
       },
       'a[data-toggle=submit]:not(.disabled):not([disabled]) click': function (el, ev) {
         var scope = this.scope;
@@ -93,7 +92,7 @@
         var join_object;
         var quick_create;
         var created_dfd;
-        var verify_dfd = $.Deferred();
+        var verify_dfd = can.Deferred();
         scope.attr('disabled', true);
         scope.attr('verify_event',
           !!this.element.context.attributes.verify_event);
@@ -137,7 +136,7 @@
             }
           }
           if (!created_dfd) {
-            created_dfd = $.Deferred().resolve();
+            created_dfd = can.Deferred().resolve();
           }
 
           if (created_dfd.state() === 'rejected') {
@@ -190,10 +189,11 @@
             this.bindXHRToButton(
               join_object.save()
                 .done(function () {
-                  el.trigger("modal:success", join_object);
+                  el.trigger('modal:success', join_object);
                   this.viewModel
                     .attr('parent_instance')
                     .dispatch('refreshInstance');
+                  this.viewModel.dispatch('afterCreate');
                 }.bind(this)), el);
           }.bind(this))
           .always(function () {

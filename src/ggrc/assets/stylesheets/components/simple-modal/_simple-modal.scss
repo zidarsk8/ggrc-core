@@ -32,12 +32,127 @@ $grid-data-header-height: 66px;
   background: $white;
   box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
 
+  &__toolbar {
+    display: flex;
+    flex-direction: row-reverse;
+    box-sizing: border-box;
+  }
+
+  &__toolbar-item {
+    margin: 0 0 0 8px;
+  }
+
+  &__body {
+    box-sizing: border-box;
+    padding: 16px;
+    overflow: auto;
+    background: $white;
+    margin: 0;
+
+    &.loading {
+      overflow: hidden;
+      opacity: 0.5;
+
+      // Should affect only direct children
+      > .spinner-wrapper {
+        padding: 0;
+        margin: 0;
+        display: flex;
+        opacity: 0;
+
+        &.active {
+          z-index: 9999;
+          opacity: 1;
+        }
+
+        .spinner {
+          position: absolute;
+          right: 0;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          display: flex;
+          align-items: center;
+          font-size: 18px;
+
+          &.grid-spinner {
+            justify-content: center;
+
+            .fa {
+              color: $defaultWidget;
+              font-size: 32px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  &__section {
+    margin: 0 0 16px;
+
+    &:last-child {
+      margin: 0;
+    }
+  }
+
+  &__section-title {
+    font-size: 11px;
+    font-weight: bold;
+    color: #333;
+    line-height: 28px;
+    text-transform: uppercase;
+    overflow: hidden;
+    width: 100%;
+    max-width: 100%;
+    text-overflow: ellipsis;
+
+  }
+
+  &__section-title-icon {
+    margin: 0 0 0 8px;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    background: $white;
+    height: $simple-modal-header-height;
+    padding: 8px;
+    position: relative;
+    margin: 0;
+    border-bottom: 1px solid $border-color;
+  }
+
+  &__header-text {
+    padding: 0 8px;
+    line-height: 28px;
+    font-size: 16px;
+    font-weight: normal;
+    color: $infoWidgetHeader;
+  }
+
+  &__footer {
+    border-top: 1px solid $border-color;
+    box-sizing: border-box;
+    padding: 8px;
+    margin: 0;
+    overflow: hidden;
+    background: $white;
+  }
+
   /* Specific Styles for Prior Responses Modal Window */
+  &.mapped-controls-info,
   &.related-assessments {
     width: 85%;
     max-width: 85%;
     height: 85%;
+  }
 
+  &.related-assessments {
     .simple-modal__body {
       overflow: hidden;
       max-height: none;
@@ -56,50 +171,17 @@ $grid-data-header-height: 66px;
     }
   }
 
-  &__body {
-    box-sizing: border-box;
-    padding: 16px;
-    overflow: auto;
-    background: $white;
-    margin: 0;
-  }
+  &.mapped-controls-info {
+    max-width: 850px;
 
-  &__controls {
-    > * {
-      display: block;
-      margin: 16px 0 0;
+    .simple-modal__body {
+      overflow: scroll;
+      max-height: calc(100% - #{$simple-modal-header-height});
 
-      &:first-child {
-        margin: 0;
+      .assessment-mapped-controls__info,
+      assessment-mapped-control-related-objects:not(:last-child) > collapsible-panel {
+        border-bottom: 1px solid #e0e0e0;
       }
     }
-  }
-
-  .simple-modal__header {
-    background: $white;
-    box-sizing: border-box;
-    height: $simple-modal-header-height;
-    padding: 8px;
-    position: relative;
-    margin: 0;
-    border-bottom: 1px solid $border-color;
-    align-items: center;
-
-    .simple-modal__header-text {
-      padding: 0 8px;
-      line-height: 26px;
-      font-size: 16px;
-      font-weight: normal;
-      color: $infoWidgetHeader;
-    }
-  }
-
-  .simple-modal__footer {
-    border-top: 1px solid $border-color;
-    box-sizing: border-box;
-    padding: 8px 16px;
-    margin: 0;
-    overflow: hidden;
-    background: $white;
   }
 }

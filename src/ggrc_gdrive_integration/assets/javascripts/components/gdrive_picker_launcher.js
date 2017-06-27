@@ -10,14 +10,36 @@
     tag: 'ggrc-gdrive-picker-launcher',
     template: can.view(GGRC.mustache_path + '/gdrive/gdrive_file.mustache'),
     viewModel: {
-      instance: null,
+      define: {
+        isInactive: {
+          get: function () {
+            return this.attr('disabled');
+          }
+        }
+      },
+      instance: {},
       deferred: '@',
       link_class: '@',
       click_event: '@',
       itemsUploadedCallback: '@',
       confirmationCallback: '@',
       pickerActive: false,
-      onClickHandler: function () {
+      disabled: false,
+      beforeCreateHandler: function (files) {
+        var tempFiles = files.map(function (file) {
+          return {
+            title: file.name,
+            link: file.url,
+            created_at: new Date(),
+            isDraft: true
+          };
+        });
+        this.dispatch({
+          type: 'onBeforeAttach',
+          items: tempFiles
+        });
+      },
+      onClickHandler: function (scope, el, event) {
         var eventType = this.attr('click_event');
         var handler = this[eventType] || function () {};
         var confirmation = _.isFunction(this.confirmationCallback) ?
@@ -26,7 +48,8 @@
         var args = arguments;
         var that = this;
 
-        $.when(confirmation).then(function () {
+        event.preventDefault();
+        can.when(confirmation).then(function () {
           handler.apply(that, args);
         });
       },
@@ -35,8 +58,6 @@
         var that = this;
         var dfd;
         var folderId = el.data('folder-id');
-
-        scope.attr('pickerActive', true);
 
         // Create and render a Picker object for searching images.
         function createPicker() {
@@ -49,6 +70,7 @@
               var picker = new google.picker.PickerBuilder()
                 .setOAuthToken(gapi.auth.getToken().access_token)
                 .setDeveloperKey(GGRC.config.GAPI_KEY)
+                .setMaxItems(10)
                 .setCallback(pickerCallback);
 
               if (el.data('type') === 'folders') {
@@ -73,9 +95,6 @@
               if (dialog) {
                 dialog.style.zIndex = 4001; // our modals start with 2050
               }
-            })
-            .fail(function () {
-              scope.attr('pickerActive', false);
             });
         }
 
@@ -88,8 +107,8 @@
 
           if (data[ACTION] === PICKED) {
             files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
-            that.attr('pending', true);
             scope.attr('pickerActive', false);
+            that.beforeCreateHandler(files);
 
             return new RefreshQueue().enqueue(files).trigger()
               .then(function (files) {
@@ -99,12 +118,10 @@
                   can.trigger(
                     that, 'modal:success', {arr: can.makeArray(arguments)});
                   el.trigger('modal:success', {arr: can.makeArray(arguments)});
-                  that.attr('pending', false);
                 });
               });
           } else if (data[ACTION] === CANCEL) {
             el.trigger('rejected');
-            scope.attr('pickerActive', false);
           }
         }
 
@@ -113,8 +130,6 @@
         );
         dfd.done(function () {
           gapi.load('picker', {callback: createPicker});
-        }).fail(function () {
-          scope.attr('pickerActive', false);
         });
       },
 
@@ -178,7 +193,7 @@
             // --BM 11/19/2013
             parentFolder.uploadFiles()
               .then(function (files) {
-                that.attr('pending', true);
+                that.beforeCreateHandler(files);
                 return new RefreshQueue().enqueue(files).trigger()
                   .then(function (fs) {
                     var mapped = can.map(fs, function (file) {
@@ -193,7 +208,7 @@
                   });
               })
               .done(function () {
-                var files = can.map(can.makeArray(arguments), function (file) {
+                var files = can.makeArray(arguments).map(function (file) {
                   return CMS.Models.GDriveFile.model(file);
                 });
                 var dfdsDoc = that.handle_file_upload(files);
@@ -202,7 +217,6 @@
                   can.trigger(
                     that, 'modal:success', {arr: can.makeArray(arguments)});
                   el.trigger('modal:success', {arr: can.makeArray(arguments)});
-                  that.attr('pending', false);
                 });
               });
           });

@@ -345,7 +345,7 @@
         var que = new RefreshQueue();
 
         ev.preventDefault();
-        if (el.hasClass('disabled')) {
+        if (el.hasClass('disabled') || this.scope.attr('mapper.is_saving')) {
           return;
         }
         if (this.scope.attr('mapper.assessmentGenerator')) {
@@ -419,6 +419,22 @@
               }
               // This Method should be modified to event
               GGRC.Utils.CurrentPage.refreshCounts();
+
+              _.each($('sub-tree-wrapper'), function (wrapper) {
+                var vm = $(wrapper).viewModel();
+
+                if (vm.attr('parent') === instance) {
+                  if (vm.attr('isOpen') && vm.attr('dataIsReady')) {
+                    vm.loadItems();
+                  } else {
+                    // remove old data
+                    // new data will be loaded after sub-tree is expanded
+                    vm.attr('dataIsReady', null);
+                  }
+
+                  return false;
+                }
+              });
             });
         }.bind(this));
       },

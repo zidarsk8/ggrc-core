@@ -5,7 +5,6 @@
 """
 
 from ggrc import db, settings
-from ggrc.models.context import Context
 from ggrc.models.person import Person
 from ggrc.services.common import log_event
 from ggrc_basic_permissions import basic_roles
@@ -51,13 +50,6 @@ def create_user(email, **kwargs):
   db.session.add(user)
   db.session.flush()
   log_event(db.session, user, user.id)
-  user_context = Context(
-      name='Personal Context for {0}'.format(email),
-      description='',
-      related_object=user,
-      context_id=1,
-  )
-  db.session.add(user_context)
   db.session.commit()
   return user
 

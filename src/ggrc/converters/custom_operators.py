@@ -18,7 +18,7 @@ from ggrc.converters.exceptions import BadQueryException
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.login import is_creator
 from ggrc.models import inflector
-from ggrc.models.relationship_helper import RelationshipHelper
+from ggrc.models import relationship_helper
 from ggrc.snapshotter import rules
 from ggrc.utils import query_helpers
 from ggrc_basic_permissions import UserRole
@@ -146,7 +146,7 @@ def related_people(exp, object_class, target_class, query):
     return sqlalchemy.sql.false()
   model = inflector.get_model(exp['object_name'])
   res = []
-  res.extend(RelationshipHelper.person_object(
+  res.extend(relationship_helper.person_object(
       object_class.__name__,
       exp['object_name'],
       exp['ids'],
@@ -277,7 +277,7 @@ def relevant(exp, object_class, target_class, query):
                 object_name in rules.Types.all)
   if not snapshoted:
     return object_class.id.in_(
-        RelationshipHelper.get_ids_related_to(
+        relationship_helper.get_ids_related_to(
             object_class.__name__,
             object_name,
             ids,

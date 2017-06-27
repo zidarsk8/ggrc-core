@@ -2851,4 +2851,31 @@ Example:
 
     return titlesMap[type] ? titlesMap[type] + field : field;
   });
+
+  Mustache.registerHelper(
+    'withRoleForInstance',
+    function (instance, roleName, options) {
+      var userId = GGRC.current_user.id;
+      var hasRoleForContextDfd;
+      instance = resolve_computed(instance);
+
+      // As a Creator user we seem to invoke this helper with a null instance.
+      // In this case we simply return and wait for the helper to be invoked a
+      // second time with the proper instance object.
+      if (!instance) {
+        return;
+      }
+
+      if (!instance.contextId) {
+        instance = CMS.Models[instance.type].findInCacheById(instance.id);
+      }
+
+      hasRoleForContextDfd =
+        GGRC.Utils.hasRoleForContext(userId, instance.context_id, roleName);
+
+      return Mustache.defer_render('span',
+        function (hasRole) {
+          return options.fn(options.contexts.add({hasRole: hasRole}));
+        }, hasRoleForContextDfd);
+    });
 })(this, jQuery, can);

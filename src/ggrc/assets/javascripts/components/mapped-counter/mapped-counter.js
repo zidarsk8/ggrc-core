@@ -14,6 +14,10 @@
     CycleTaskEntry: {
       title: 'Comments',
       icon: 'comment-o'
+    },
+    CycleTaskGroupObjectTask: {
+      title: 'Total',
+      icon: 'calendar-check-o'
     }
   };
 

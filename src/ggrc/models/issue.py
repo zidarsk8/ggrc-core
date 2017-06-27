@@ -5,11 +5,11 @@
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
-from ggrc.models.mixins.audit_relationship import AuditRelationship
+from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (
     BusinessObject, Timeboxed, CustomAttributable, TestPlanned
 )
-from ggrc.models.deferred import deferred
+from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable

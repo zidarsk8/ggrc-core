@@ -96,6 +96,11 @@ class TestSnapshot(TestCase):
       "modified_by_id",
 
       "attribute_object_id",
+
+      # revisions require complete data for documents,
+      # while api returns only basic data in stubs
+      "document_url",
+      "document_evidence",
   }
 
   def setUp(self):
@@ -133,6 +138,17 @@ class TestSnapshot(TestCase):
               definition_type=type_,
               **args
           )
+
+  def test_control_revision_content(self):
+    """Test if evidence was serialized correctly in control"""
+    control_revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_type == "Control").order_by(
+            all_models.Revision.id.desc()).first()
+    self.assertEqual(1, len(control_revision.content["document_evidence"]))
+    doc_id = control_revision.content["document_evidence"][0]["id"]
+    doc = all_models.Document.query.filter(
+        all_models.Document.id == doc_id).first()
+    self.assertEqual(doc.title, "Evidence name")
 
   def test_revision_content(self):
     """Test that revision contains all content needed."""

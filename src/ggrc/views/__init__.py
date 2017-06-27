@@ -165,6 +165,17 @@ def get_current_user_json():
     })
 
 
+def get_roles_json():
+  """Get a list of all roles"""
+  with benchmark("Get roles JSON"):
+    attrs = all_models.Role.query.all()
+    published = []
+    for attr in attrs:
+      published.append(publish(attr, attribute_whitelist=('id', 'name')))
+    published = publish_representation(published)
+    return as_json(published)
+
+
 def get_access_control_roles_json():
   """Get a list of all access control roles"""
   with benchmark("Get access roles JSON"):
@@ -254,6 +265,7 @@ def base_context():
       full_user_json=get_full_user_json,
       attributes_json=get_attributes_json,
       access_control_roles_json=get_access_control_roles_json,
+      roles_json=get_roles_json,
       all_attributes_json=get_all_attributes_json,
       import_definitions=get_import_definitions,
       export_definitions=get_export_definitions,

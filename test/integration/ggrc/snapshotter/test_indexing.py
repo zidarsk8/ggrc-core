@@ -3,10 +3,13 @@
 
 """Test for indexing of snapshotted objects"""
 
+import ddt
+
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
 from ggrc import models
+from ggrc.models import all_models
 from ggrc.views import do_reindex
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.snapshotter.indexer import delete_records
@@ -28,6 +31,7 @@ def get_records(_audit, _snapshots):
       ))
 
 
+@ddt.ddt
 class TestSnapshotIndexing(SnapshotterBaseTestCase):
   """Test cases for Snapshoter module"""
 
@@ -339,3 +343,114 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     records = get_records(audit, snapshots)
 
     self.assertEqual(records.count(), 57)
+
+  def assert_indexed_fields(self, obj, search_property, values):
+    """Assert index content in full text search table."""
+    all_found_records = dict(Record.query.filter(
+        Record.key == obj.id,
+        Record.type == obj.type,
+        Record.property == search_property.lower(),
+    ).values("subproperty", "content"))
+    for field, value in values.iteritems():
+      self.assertIn(field, all_found_records)
+      self.assertEqual(value, all_found_records[field])
+
+  @ddt.data(
+      ("principal_assessor", "Principal Assignees"),
+      ("secondary_assessor", "Secondary Assignees"),
+      ("contact", "Primary Contacts"),
+      ("secondary_contact", "Secondary Contacts"),
+  )
+  @ddt.unpack
+  def test_search_no_acl_in_content(self, field, role_name):
+    """Test search older revisions without access_control_list."""
+    with factories.single_commit():
+      factories.AccessControlRoleFactory(name=role_name,
+                                         object_type="Control")
+      person = factories.PersonFactory(email="{}@example.com".format(field),
+                                       name=field)
+      control = factories.ControlFactory()
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.type,
+    ).one()
+    with factories.single_commit():
+      snapshot = factories.SnapshotFactory(
+          child_id=control.id,
+          child_type=control.type,
+          revision=revision)
+      revision.content = revision.content.copy()
+      revision.content.pop("access_control_list")
+      revision.content[field] = {"id": person.id}
+      db.session.add(revision)
+    do_reindex()
+    self.assert_indexed_fields(snapshot, role_name, {
+        "{}-email".format(person.id): person.email,
+        "{}-name".format(person.id): person.name,
+        "{}-user_name".format(person.id): person.user_name,
+        "__sort__": person.user_name,
+    })
+
+  def test_index_by_acr(self):
+    """Test index by ACR."""
+    role_name = "Test name"
+    with factories.single_commit():
+      acr = factories.AccessControlRoleFactory(
+          name=role_name,
+          object_type="Control"
+      )
+      person = factories.PersonFactory(email="test@example.com", name='test')
+      control = factories.ControlFactory()
+      factories.AccessControlList(ac_role=acr, person=person, object=control)
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.type,
+    ).one()
+    revision.content = control.log_json()
+    db.session.add(revision)
+    with factories.single_commit():
+      snapshot = factories.SnapshotFactory(
+          child_id=control.id,
+          child_type=control.type,
+          revision=revision)
+    db.session.expire_all()
+    do_reindex()
+    self.assert_indexed_fields(snapshot, role_name, {
+        "{}-email".format(person.id): person.email,
+        "{}-name".format(person.id): person.name,
+        "{}-user_name".format(person.id): person.user_name,
+        "__sort__": person.user_name,
+    })
+
+  def test_index_deleted_acr(self):
+    """Test index by removed ACR."""
+    role_name = "Test name"
+    with factories.single_commit():
+      acr = factories.AccessControlRoleFactory(
+          name=role_name,
+          object_type="Control"
+      )
+      person = factories.PersonFactory(email="test@example.com", name='test')
+      control = factories.ControlFactory()
+      factories.AccessControlList(ac_role=acr, person=person, object=control)
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.type,
+    ).one()
+    revision.content = control.log_json()
+    db.session.add(revision)
+    with factories.single_commit():
+      snapshot = factories.SnapshotFactory(
+          child_id=control.id,
+          child_type=control.type,
+          revision=revision)
+    db.session.expire_all()
+    db.session.delete(acr)
+    db.session.commit()
+    do_reindex()
+    all_found_records = dict(Record.query.filter(
+        Record.key == snapshot.id,
+        Record.type == snapshot.type,
+        Record.property == role_name.lower()
+    ).values("subproperty", "content"))
+    self.assertFalse(all_found_records)

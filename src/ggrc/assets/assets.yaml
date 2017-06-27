@@ -126,6 +126,7 @@ dashboard-js-files:
   - controllers/summary_widget_controller.js
   - controllers/dashboard_widget_controller.js
   - controllers/modals_controller.js
+  - controllers/archive_modal_controller.js
   - controllers/delete_modal_controller.js
   - controllers/help_controller.js
   - controllers/quick_search_controller.js
@@ -161,8 +162,9 @@ dashboard-js-files:
   - components/assessment/urls-list.js
   - components/assessment/custom-attributes.js
   - components/assessment/inline.js
-  - components/assessment/add_comment.js
+  - components/comment/comment-add-form.js
   - components/comment/comment-input.js
+  - components/comment/comment-add-button.js
   - components/assessment/controls-toolbar/controls-toolbar.js
   - components/object-list-item/business-object-list-item.js
   - components/object-list-item/person-list-item.js
@@ -203,6 +205,7 @@ dashboard-js-files:
   - components/inline_edit/inline_text.js
   - components/inline_edit/inline_person.js
   - components/inline_edit/inline_datepicker.js
+  - components/unarchive_link.js
   - components/link_to_clipboard.js
   - components/relevant_filters.js
   - components/csv/export.js
@@ -236,7 +239,7 @@ dashboard-js-files:
   - components/reminder.js
   - components/rich_text/rich_text.js
   - components/object_cloner/object_cloner.js
-  - components/object_counter/object_counter.js
+  - components/tasks-counter/tasks-counter.js
   - components/sort_by_sort_index/sort_by_sort_index.js
   - components/tree_pagination/tree_pagination.js
   - components/tree/tree-header-selector.js
@@ -259,6 +262,7 @@ dashboard-js-files:
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
   - components/add-issue-button/add-issue-button.js
+  - components/add-mapping-button/add-mapping-button.js
   - components/effective-dates/effective-dates.js
   - components/snapshotter/revisions-comparer.js
   - components/snapshotter/scope-update.js
@@ -274,8 +278,8 @@ dashboard-js-files:
   - components/tree/tree-people-with-role-list-field.js
   - components/page-header/page-header.js
   - components/info-pane/info-pane-footer.js
+  - components/assessment/mapped-objects/mapped-control-related-objects.js
   - components/assessment/mapped-objects/mapped-controls.js
-  - components/assessment/mapped-objects/mapped-controls-popover.js
   - components/assessment/mapped-objects/mapped-related-information.js
   - components/assessment/mapped-objects/mapped-comments.js
   - components/assessment/info-pane/info-pane.js
@@ -323,8 +327,8 @@ dashboard-js-template-files:
   - components/collapsible-panel/collapsible-panel-header.mustache
   - components/assessment/info-pane/info-pane.mustache
   - components/assessment/controls-toolbar/controls-toolbar.mustache
+  - components/assessment/mapped-objects/mapped-control-related-objects.mustache
   - components/assessment/mapped-objects/mapped-controls.mustache
-  - components/assessment/mapped-objects/mapped-controls-popover.mustache
   - components/assessment/mapped-objects/mapped-related-information.mustache
   - components/assessment/mapped-objects/mapped-comments.mustache
   - components/assessment/urls-list.mustache
@@ -336,8 +340,7 @@ dashboard-js-template-files:
   - components/assessment/inline/date.mustache
   - components/assessment/inline/person.mustache
   - components/assessment/inline/checkbox.mustache
-  - components/assessment/add_comment.mustache
-  - components/assessment/comment/controls.mustache
+  - components/comment/comment-add-form.mustache
   - components/comment/comment-input.mustache
   - components/object-list/object-list.mustache
   - components/object-popover/object-popover.mustache
@@ -356,10 +359,12 @@ dashboard-js-template-files:
   - components/view-object-buttons/view-object-buttons.mustache
   - components/add-object-button/add-object-button.mustache
   - components/add-issue-button/add-issue-button.mustache
+  - components/add-mapping-button/add-mapping-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
   - components/questions-link/questions-link.mustache
   - base_objects/empty.mustache
   - base_objects/autocomplete_result.mustache
+  - base_objects/confirm_archive.mustache
   - base_objects/confirm_delete.mustache
   - base_objects/confirm_unmap.mustache
   - base_objects/contacts.mustache
@@ -478,7 +483,7 @@ dashboard-js-template-files:
   - components/spinner/spinner.mustache
   - components/rich_text/rich_text.mustache
   - components/datepicker/datepicker.mustache
-  - components/object_counter/object_counter.mustache
+  - components/tasks-counter/tasks-counter.mustache
   - components/tree_pagination/tree_pagination.mustache
   - components/tree/tree-no-results.mustache
   - components/tree/sub-tree-wrapper.mustache
@@ -548,6 +553,7 @@ dashboard-js-template-files:
   - help/help_modal_header.mustache
   - help/filters_helper_content.mustache
   - markets/modal_content.mustache
+  - modals/archive_cancel_buttons.mustache
   - modals/close_buttons.mustache
   - modals/confirm.mustache
   - modals/prompt_buttons.mustache
@@ -620,6 +626,7 @@ dashboard-js-template-files:
   - audits/search_result.mustache
   - audits/extended_info.mustache
   - audits/object_cloner.mustache
+  - audits/dropdown_menu.mustache
   - base_templates/subtree.mustache
   - objectives/autocomplete_result.mustache
   - documents/autocomplete_result.mustache

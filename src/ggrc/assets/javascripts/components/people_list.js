@@ -609,7 +609,9 @@
         if (this.attr('deferred')) {
           return options.fn(options.context);
         }
-        isAllowed = Permission.is_allowed_for('update', this.attr('instance'));
+        isAllowed =
+          Permission.is_allowed_for('update', this.attr('instance')) &&
+          !this.attr('instance.archived');
         return options[isAllowed ? 'fn' : 'inverse'](options.context);
       },
       can_unmap: function (options) {
