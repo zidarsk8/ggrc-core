@@ -19,17 +19,18 @@
         {{/if_in}}
       {{/if}}
 
-      <!--<div class="editable-form-row">
+      <div class="editable-form-row">
         <div class="editable-form-short-input">
-          <label><span style="color: red">TODO:</span> ASSESSMENT TYPE</label>
-          <dropdown options-list="model.conclusions"
-                    no-value="true"
-                    no-value-label="---"
-                    name="instance.design"
-                    tabindex="1">
-          </dropdown>
+           <label>
+             Assessment Type
+             <span class="required">*</span>
+           </label>
+           <assessment-object-type-dropdown
+             css-class="input-medium pull-left"
+             {(assessment-type)}="instance.assessment_type">
+           </assessment-object-type-dropdown>
         </div>
-      </div>-->
+      </div>
       <div class="ggrc-form-item">
         <div class="ggrc-form-item__row {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
           <label class="form-label required-label ggrc-form-item__label">
