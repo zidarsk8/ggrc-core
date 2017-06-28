@@ -386,6 +386,10 @@ $ nmcli dev show | grep 'IP4.DNS'
 IP4.DNS[1]:              10.0.0.2
 IP4.DNS[2]:              10.0.0.3
 ```
+
+NOTE: For older versions of `nmcli`, one should replace the first part of the
+command above with `nmcli device list` (tested with nmcli version 0.9.8.8).
+
 Using these addresses, create a file `/etc/docker/daemon.json`:
 ```
 $ sudo su root
