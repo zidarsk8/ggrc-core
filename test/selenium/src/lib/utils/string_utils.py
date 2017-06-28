@@ -106,3 +106,13 @@ def is_one_dict_is_subset_another_dict(src_dict, dest_dict):
   """
   # pylint: disable=invalid-name
   return not bool(set(src_dict) - set(dest_dict))
+
+
+def get_first_word_from_str(line):
+  """Get first word from string."""
+  return line.split(None, 1)[0]
+
+
+def dict_keys_to_upper_case(dictionary):
+  """Convert keys of dictionary to upper case."""
+  return {k.upper(): v for k, v in dictionary.iteritems()}

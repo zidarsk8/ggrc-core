@@ -11,6 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from lib import constants, exception
+from lib.constants import messages
 
 LOGGER = logging.getLogger(__name__)
 
@@ -24,6 +25,18 @@ def open_url(driver, url):
   """Open URL in current browser session if it hasn't been opened yet."""
   if driver.current_url != url:
     driver.get(url)
+
+
+def switch_to_new_window(driver):
+  """Wait until new window will be opened, have the number of windows handles
+  increase and then switch to last opened window.
+  """
+  try:
+    wait_until_condition(driver, EC.new_window_is_opened)
+    driver.switch_to.window(driver.window_handles.pop())
+  except exceptions.NoSuchWindowException as exception:
+    LOGGER.exception(exception, messages.ERR_SWITCH_TO_NEW_WINDOW)
+    raise exception
 
 
 def wait_until_stops_moving(element):
