@@ -4,12 +4,41 @@
 # pylint: disable=too-many-arguments
 # pylint: disable=too-few-public-methods
 
+from lib.constants import element, files
 from lib.utils import string_utils
 
 
 class Representation(object):
   """Class that contains methods to update Entity."""
   # pylint: disable=import-error
+
+  @staticmethod
+  def items_of_remap_keys():
+    """Get transformation dictionary {'OLD KEY': 'NEW KEY'}, where
+    'OLD KEY' - UI elements and CSV fields correspond to
+    'NEW KEY' - objects attributes.
+    """
+    el = element.TransformationSetVisibleFields
+    csv = files.TransformationCSVFields
+    # common for UI and CSV
+    result_remap_items = {
+        el.TITLE: "title", el.ADMIN: "owners", el.CODE: "slug",
+        el.REVIEW_STATE: "os_state", el.STATE: "status"
+    }
+    ui_remap_items = {
+        el.MANAGER: "manager", el.VERIFIED: "verified",
+        el.STATUS: "status", el.LAST_UPDATED: "updated_at",
+        el.AUDIT_LEAD: "contact", el.CAS: "custom_attributes",
+        el.MAPPED_OBJECTS: "objects_under_assessment",
+        el.ASSIGNEES: "assessor", el.CREATORS: "creator",
+        el.VERIFIERS: "verifier"
+    }
+    csv_remap_items = {
+        csv.REVISION_DATE: "updated_at"
+    }
+    result_remap_items.update(ui_remap_items)
+    result_remap_items.update(csv_remap_items)
+    return string_utils.dict_keys_to_upper_case(result_remap_items)
 
   def repr_ui(self):
     """Convert entity's attributes values from REST like to UI like
@@ -144,7 +173,6 @@ class CustomAttributeEntity(Representation):
 class ProgramEntity(Entity):
   """Class that represent model for Program."""
   # pylint: disable=too-many-instance-attributes
-  # from entities import entities_factory as fact
   __hash__ = None
 
   def __init__(self, slug=None, status=None, manager=None, contact=None,
@@ -343,6 +371,7 @@ class AssessmentEntity(Entity):
   # pylint: disable=too-many-instance-attributes
   # pylint: disable=redefined-builtin
   # pylint: disable=too-many-locals
+  # pylint: disable=duplicate-code
   __hash__ = None
 
   def __init__(self, slug=None, status=None, audit=None, owners=None,
