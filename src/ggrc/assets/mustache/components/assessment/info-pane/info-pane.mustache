@@ -35,7 +35,12 @@
                             {{#unless instance.archived}}
                                 <div class="action-toolbar__controls">
                                     <action-toolbar-control>
-                                    <add-mapping-button {parent-instance}="instance"></add-mapping-button>
+                                    <map-button-using-assessment-type
+                                        {instance}="instance"
+                                        {assessment-type}="instance.assessment_type">
+                                            <add-mapping-button {parent-instance}="instance">
+                                            </add-mapping-button>
+                                    </map-button-using-assessment-type>
                                     </action-toolbar-control>
                                 </div>
                             {{/unless}}
@@ -191,7 +196,12 @@
                          {{#unless instance.archived}}
                           <div class="action-toolbar__controls">
                             <action-toolbar-control>
-                                <add-mapping-button {parent-instance}="instance"></add-mapping-button>
+                                <map-button-using-assessment-type
+                                    {instance}="instance"
+                                    {assessment-type}="instance.assessment_type">
+                                        <add-mapping-button {parent-instance}="instance">
+                                        </add-mapping-button>
+                                </map-button-using-assessment-type>
                             </action-toolbar-control>
                           </div>
                          {{/unless}}
