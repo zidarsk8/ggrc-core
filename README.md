@@ -28,7 +28,7 @@ environment:
 |[Docker](https://www.docker.com/)                 | Container management tool                |
 |[Docker compose](https://docs.docker.com/compose/)| A tool for defining multi-container apps |
 
-**NOTE for Windows/OSX users:** The easiest way of getting docker is by installing the
+**NOTE for Windows/OSX users:** The easiest way of getting Docker is by installing the
 [docker toolbox](https://www.docker.com/products/docker-toolbox).
 
 Or alternatively with our legacy vagrant environment:
@@ -42,7 +42,7 @@ Or alternatively with our legacy vagrant environment:
 ## Quick Start with Docker
 
 Getting started with GGRC-Core development should be fast and easy once you
-have docker up and running. Here are the steps:
+have Docker up and running. Here are the steps:
 
 **NOTE for Windows/OSX users:** Make sure `docker` is up and running by following the [windows guide](https://docs.docker.com/engine/installation/windows/#using-docker-from-windows-command-prompt-cmd-exe) / [osx guide](https://docs.docker.com/engine/installation/mac/#from-your-shell).
 
@@ -66,7 +66,7 @@ step fails, try running `docker-compose build` (See [Reprovisioning a Docker con
 
 If apt-get fails to install anything (for example `Could not resolve 'archive.ubuntu.com'`), try [this](#dns-issues).
 
-_NOTE: Because docker shared volumes do not have permission mappings, you should run these commands as a user with UID 1000, to match the users inside the containers._
+_NOTE: Because Docker shared volumes do not have permission mappings, you should run these commands as a user with UID 1000, to match the users inside the containers._
 
 ## Quick Start with Vagrant (legacy)
 
@@ -133,7 +133,7 @@ make appengine_packages_zip
 The application will be accessible via this URL: <http://localhost:8080/>
 
 If you're running the Google App Engine SDK, the App Engine management console
-will be available via this URL: <http://localhost:8000/>. You can login as
+will be available via this URL: <http://localhost:8000/>. You can log in as
 user@example.com with admin rights and setup other users later.
 
 ## Running Tests
@@ -149,7 +149,7 @@ run_karma_chrome # To run karma in host browser (open http://localhost:9876)
 
 `run_karma` is the default way of running tests as it automatically
 builds the javascript assets on file changes. Use `run_karma_chrome` if you
-need to debug an issue in the chrome browser. For performance reasons
+need to debug an issue in the Chrome browser. For performance reasons
 `run_karma_chrome` does not automatically build assets, so make sure you do it
 manually by running `build_assets`.
 
@@ -161,7 +161,7 @@ run_pytests
 
 The script will run unit tests and integration tests.
 
-For better usage of unit tests you can use sniffer inside the test/unit folder.
+For better usage of unit tests, you can use sniffer inside the test/unit folder.
 This will run the tests on each file update.
 
 ```sh
@@ -184,14 +184,14 @@ On the host machine in the root of the repository run:
 
 ##### Manually running selenium tests
 
-For selenium tests, you must use the docker environment. There are two containers needed for running seleium tests `ggrccore_dev_1` and `ggrccore_selenium_1`. Due to a bug in the selenium container, you must start the containers with:
+For Selenium tests, you must use the docker environment. There are two containers needed for running selenium tests `ggrccore_dev_1` and `ggrccore_selenium_1`. Due to a bug in the selenium container, you must start the containers with:
 
 ```
 docker-compose  up -d --force-recreate
 ```
-After that you can make sure that both containers are running with `docker ps -a`.
+After that, you can make sure that both containers are running with `docker ps -a`.
 
-To run the selenium tests, you must login into your dev container, and run the server:
+To run the Selenium tests, you must login into your dev container, and run the server:
 ```
 docker exec -it ggrccore_dev_1 su vagrant
 make bower_components
@@ -208,7 +208,7 @@ docker exec -it ggrccore_selenium_1 bash
 python /selenium/src/run_selenium.py
 ```
 
-You should also feel free to check how the `./bin/jenkins/run_selenium` script works.
+You should also feel free to check how the `./bin/jenkins/run_selenium` the script works.
 
 _NOTE: that the "ggrccore" part of the name is due to the repository parent folder name. if you have your repo in a different folder, change the first part accordingly._
 
@@ -273,7 +273,7 @@ vagrant provision
 ##### Provisioning a halted Vagrant VM
 
 If you have halted your Vagrant VM via `vagrant halt`, simply `vagrant up`
-in the project directory to have provisioning run and update your development
+in the project, directory to have provisioning run and update your development
 environment.
 
 ##### Clean Slate Provisioning
@@ -307,7 +307,7 @@ Start reprovisioning:
 docker-compose build --pull --no-cache
 ```
 
-Because docker provisioning is done with Dockerfile which can not modify content of a shared volume, you need to enter the container and run one more step to finish the provisioning
+Because Docker provisioning is done with Dockerfile which can not modify content of a shared volume, you need to enter the container and run one more step to finish the provisioning
 
 ```
 docker-compose up -d --force-recreate
@@ -467,7 +467,7 @@ command *should* be an update Python virtualenv containing the Python packages
 required by the application as well as any new development package
 requirements.
 
-To Manually update the requirements, you can login to vagrant or docker virtual machine and run
+To Manually update the requirements, you can log in to vagrant or docker virtual machine and run
 
 ```sh
 pip install -r src/requirements-dev.txt
