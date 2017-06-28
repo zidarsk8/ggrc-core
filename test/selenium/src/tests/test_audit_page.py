@@ -10,8 +10,7 @@ import pytest
 
 from lib import base
 from lib.constants import messages
-from lib.entities.entities_factory import (
-    AuditsFactory, AssessmentTemplatesFactory, AssessmentsFactory)
+from lib.entities import entities_factory
 from lib.service import webui_service
 
 
@@ -35,13 +34,12 @@ class TestAuditPage(base.Test):
     - Issue mapped to Audit via REST API.
     """
     # pylint: disable=too-many-locals
-    expected_audit = AuditsFactory().clone(audit=new_audit_rest)[0]
-    expected_asmt_tmpl = AssessmentTemplatesFactory().clone(
+    expected_audit = entities_factory.AuditsFactory().clone(
+        audit=new_audit_rest)[0]
+    expected_asmt_tmpl = entities_factory.AssessmentTemplatesFactory().clone(
         asmt_tmpl=new_assessment_template_rest)[0]
-    actual_audit = (
-        webui_service.AuditsService(selenium).
-        clone_via_info_page_and_get_obj(audit_obj=new_audit_rest)
-    )
+    actual_audit = (webui_service.AuditsService(selenium).
+                    clone_via_info_page_and_get_obj(audit_obj=new_audit_rest))
     return {
         "audit": new_audit_rest, "expected_audit": expected_audit,
         "actual_audit": actual_audit, "assessment": new_assessment_rest,
@@ -59,15 +57,20 @@ class TestAuditPage(base.Test):
     Preconditions:
     - Audit created under Program via REST API.
     """
-    expected_asmt_tmpl = AssessmentTemplatesFactory().create()
+    expected_asmt_tmpl = (entities_factory.AssessmentTemplatesFactory().
+                          create().repr_ui())
     (webui_service.AssessmentTemplatesService(selenium).
      create_obj_via_tree_view(src_obj=new_audit_rest, obj=expected_asmt_tmpl))
     actual_asmt_tmpls_tab_count = (
         webui_service.AssessmentTemplatesService(selenium).
         get_count_objs_from_tab(src_obj=new_audit_rest))
     assert len([expected_asmt_tmpl]) == actual_asmt_tmpls_tab_count
-    actual_asmt_tmpls = (webui_service.AssessmentTemplatesService(selenium).
-                         get_list_objs_from_tree_view(src_obj=new_audit_rest))
+    actual_asmt_tmpls = (
+        webui_service.AssessmentTemplatesService(selenium).
+        get_list_objs_from_tree_view(src_obj=new_audit_rest))
+    # due to 'expected_asmt_tmpl.updated_at = None'
+    actual_asmt_tmpls = [actual_asmt_tmpl.update_attrs(updated_at=None)
+                         for actual_asmt_tmpl in actual_asmt_tmpls]
     assert [expected_asmt_tmpl] == actual_asmt_tmpls, (
         messages.ERR_MSG_FORMAT.format(
             [expected_asmt_tmpl], actual_asmt_tmpls))
@@ -79,7 +82,8 @@ class TestAuditPage(base.Test):
     Preconditions:
     - Audit created under Program via REST API.
     """
-    expected_asmt = AssessmentsFactory().create()
+    expected_asmt = (entities_factory.AssessmentsFactory().
+                     create().repr_ui())
     (webui_service.AssessmentsService(selenium).
      create_obj_via_tree_view(src_obj=new_audit_rest, obj=expected_asmt))
     actual_asmts_tab_count = (webui_service.AssessmentsService(selenium).
@@ -87,6 +91,9 @@ class TestAuditPage(base.Test):
     assert len([expected_asmt]) == actual_asmts_tab_count
     actual_asmts = (webui_service.AssessmentsService(selenium).
                     get_list_objs_from_tree_view(src_obj=new_audit_rest))
+    # due to 'expected_asmt.updated_at = None'
+    actual_asmts = [actual_asmt.update_attrs(updated_at=None)
+                    for actual_asmt in actual_asmts]
     assert [expected_asmt] == actual_asmts, (
         messages.ERR_MSG_FORMAT.format([expected_asmt], actual_asmts))
 
@@ -112,19 +119,26 @@ class TestAuditPage(base.Test):
     - Audit created under Program via REST API.
     - Assessment Template with CAs created under Audit via REST API.
     """
-    expected_asmts = (AssessmentsFactory().generate(
+    expected_asmts = (entities_factory.AssessmentsFactory().generate(
         objs_under_asmt=new_controls_rest, audit=new_audit_rest,
         asmt_tmpl=dynamic_new_assessment_template))
+    expected_asmts = [
+        expected_asmt.repr_ui() for expected_asmt in expected_asmts]
     (webui_service.AssessmentsService(selenium).generate_objs_via_tree_view(
         src_obj=new_audit_rest, objs_under_asmt=new_controls_rest,
         asmt_tmpl_obj=dynamic_new_assessment_template))
     actual_asmts_tab_count = (webui_service.AssessmentsService(selenium).
                               get_count_objs_from_tab(src_obj=new_audit_rest))
     assert len(expected_asmts) == actual_asmts_tab_count
+    actual_asmts = (webui_service.AssessmentsService(selenium).
+                    get_list_objs_from_info_panels(
+                        src_obj=new_audit_rest, objs=expected_asmts))
+    # due to 'expected_asmt.updated_at = None',
+    #        'expected_asmt.custom_attributes = {None: None}'
     actual_asmts = [
-        webui_service.AssessmentsService(selenium).get_obj_from_info_panel(
-            src_obj=new_audit_rest, obj=expected_asmt)
-        for expected_asmt in expected_asmts]
+        actual_asmt.update_attrs(is_replace_attrs=True, slug=None).
+        update_attrs(is_replace_attrs=False, custom_attributes={None: None})
+        for actual_asmt in actual_asmts]
     assert expected_asmts == actual_asmts, (
         messages.ERR_MSG_FORMAT.format(expected_asmts, actual_asmts))
 
@@ -135,8 +149,10 @@ class TestAuditPage(base.Test):
     Preconditions:
     - Execution and return of fixture 'create_and_clone_audit'.
     """
-    expected_audit = create_and_clone_audit["expected_audit"]
-    actual_audit = create_and_clone_audit["actual_audit"]
+    expected_audit = create_and_clone_audit["expected_audit"].repr_ui()
+    # due to 'expected_audit.slug = None'
+    actual_audit = (
+        create_and_clone_audit["actual_audit"].update_attrs(slug=None))
     assert expected_audit == actual_audit, (
         messages.ERR_MSG_FORMAT.format(expected_audit, actual_audit))
 
@@ -153,9 +169,14 @@ class TestAuditPage(base.Test):
     actual_audit = create_and_clone_audit["actual_audit"]
     actual_asmts_tab_count = (webui_service.AssessmentsService(selenium).
                               get_count_objs_from_tab(src_obj=actual_audit))
+    actual_asmts = (webui_service.AssessmentsService(selenium).
+                    get_list_objs_from_tree_view(src_obj=actual_audit))
     actual_issues_tab_count = (webui_service.IssuesService(selenium).
                                get_count_objs_from_tab(src_obj=actual_audit))
+    actual_issues = (webui_service.IssuesService(selenium).
+                     get_list_objs_from_tree_view(src_obj=actual_audit))
     assert actual_asmts_tab_count == actual_issues_tab_count == 0
+    assert bool(actual_asmts) == bool(actual_issues) == 0
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
@@ -168,9 +189,15 @@ class TestAuditPage(base.Test):
     -Execution and return of fixture 'create_and_clone_audit'.
     """
     actual_audit = create_and_clone_audit["actual_audit"]
-    expected_asmt_tmpl = create_and_clone_audit["expected_assessment_template"]
+    expected_asmt_tmpl = (
+        create_and_clone_audit["expected_assessment_template"].repr_ui())
     actual_asmt_tmpls = (webui_service.AssessmentTemplatesService(selenium).
                          get_list_objs_from_tree_view(src_obj=actual_audit))
+    # due to 'expected_asmt_tmpl.slug = None',
+    #        'expected_asmt_tmpl.updated_at = {None: None}'
+    actual_asmt_tmpls = [
+        actual_asmt_tmpl.update_attrs(slug=None, updated_at=None)
+        for actual_asmt_tmpl in actual_asmt_tmpls]
     assert [expected_asmt_tmpl] == actual_asmt_tmpls, (
         messages.ERR_MSG_FORMAT.format(
             [expected_asmt_tmpl], actual_asmt_tmpls))
@@ -186,8 +213,14 @@ class TestAuditPage(base.Test):
     -Execution and return of fixture 'create_and_clone_audit'.
     """
     actual_audit = create_and_clone_audit["actual_audit"]
-    expected_control = create_and_clone_audit["control"]
-    expected_program = create_and_clone_audit["program"]
+    # due to 'actual_control.custom_attributes = {None: None}'
+    expected_control = (create_and_clone_audit["control"].
+                        repr_ui().update_attrs(custom_attributes={None: None}))
+    # due to 'actual_program.manager = None',
+    #        'actual_program.custom_attributes = {None: None}'
+    expected_program = (create_and_clone_audit["program"].
+                        repr_ui().update_attrs(manager=None,
+                                               custom_attributes={None: None}))
     actual_controls = (webui_service.ControlsService(selenium).
                        get_list_objs_from_tree_view(src_obj=actual_audit))
     actual_programs = (webui_service.ProgramsService(selenium).

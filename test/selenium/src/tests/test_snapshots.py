@@ -15,7 +15,7 @@ from lib.constants.element import Lhn, MappingStatusAttrs
 from lib.page import dashboard
 from lib.service import webui_service
 from lib.utils.filter_utils import FilterUtils
-from lib.utils import selenium_utils
+from lib.utils import selenium_utils, string_utils
 
 
 class TestSnapshots(base.Test):
@@ -44,6 +44,27 @@ class TestSnapshots(base.Test):
         "second_control": new_control_rest
     }
 
+  @staticmethod
+  def assert_for_snapshotable_controls(expected_controls, actual_controls):
+    """Specific assert method for snapshotable Controls due of issue
+    in app GGRC-2344.
+    """
+    expected_controls = string_utils.convert_to_list(expected_controls)
+    actual_controls = string_utils.convert_to_list(actual_controls)
+    expected_controls_wo_cas = [
+        expected_control.update_attrs(custom_attributes={None: None})
+        for expected_control in expected_controls]
+    actual_controls_wo_cas = [
+        actual_control.update_attrs(custom_attributes={None: None})
+        for actual_control in actual_controls]
+    assert expected_controls_wo_cas == actual_controls_wo_cas, (
+        messages.ERR_MSG_FORMAT.format(
+            expected_controls_wo_cas, actual_controls_wo_cas))
+    assert (True if (all(string_utils.is_one_dict_is_subset_another_dict(
+        exp_ctrl.custom_attributes, act_ctrl.custom_attributes) for
+        exp_ctrl, act_ctrl in zip(expected_controls, actual_controls))) else
+        pytest.xfail(reason="Issue in app GGRC-2344"))
+
   @pytest.mark.smoke_tests
   def test_audit_contains_readonly_ver_of_control(
       self, create_audit_with_control, selenium
@@ -61,8 +82,8 @@ class TestSnapshots(base.Test):
                                  get_count_objs_from_tab(src_obj=audit))
     assert len([control]) == actual_controls_tab_count
     is_control_editable = (
-        webui_service.ControlsService(selenium).is_obj_editable_via_info_panel(
-            src_obj=audit, obj=control))
+        webui_service.ControlsService(selenium).
+        is_obj_editable_via_info_panel(src_obj=audit, obj=control))
     assert is_control_editable is False
 
   @pytest.mark.smoke_tests
@@ -75,9 +96,9 @@ class TestSnapshots(base.Test):
         "new_control_rest", True, False),
        ("create_audit_with_control_with_cas_and_update_control_with_cas",
         "new_control_with_cas_rest", True, True),
-       pytest.mark.skipif(True, reason="Issue in app GGRC-1773")
-       (("create_audit_with_control_with_cas_and_delete_cas_for_controls",
-         "new_control_with_cas_rest", True, False))],
+       pytest.mark.xfail(strict=True)(
+           ("create_audit_with_control_with_cas_and_delete_cas_for_controls",
+            "new_control_with_cas_rest", True, True))],
       ids=["Audit contains snapshotable Control after updating Control",
            "Audit contains snapshotable Control after deleting Control",
            "Audit contains snapshotable Control "
@@ -103,23 +124,26 @@ class TestSnapshots(base.Test):
     """
     audit_with_one_control = dynamic_create_audit_with_control
     audit = audit_with_one_control["new_audit_rest"][0]
-    expected_control = audit_with_one_control[expected_control][0]
+    # due to 'actual_control.os_state = None',
+    #        'actual_control.updated_at = None'
+    expected_control = (audit_with_one_control[expected_control][0].repr_ui().
+                        update_attrs(os_state=None, updated_at=None))
     actual_controls_tab_count = (webui_service.ControlsService(selenium).
                                  get_count_objs_from_tab(src_obj=audit))
     assert len([expected_control]) == actual_controls_tab_count
-    is_control_updateable = (webui_service.ControlsService(selenium).
-                             is_obj_updateble_via_info_panel(
-        src_obj=audit, obj=expected_control))
-    is_control_openable = (webui_service.ControlsService(selenium).
-                           is_obj_page_exist_via_info_panel(
-        src_obj=audit, obj=expected_control))
-    assert is_control_updateable is is_updateable
-    assert is_control_openable is is_openable
+    is_control_updateable = (
+        webui_service.ControlsService(selenium).
+        is_obj_updateble_via_info_panel(src_obj=audit, obj=expected_control))
+    is_control_openable = (
+        webui_service.ControlsService(selenium).
+        is_obj_page_exist_via_info_panel(src_obj=audit, obj=expected_control))
     actual_control = (
-        webui_service.ControlsService(selenium).get_obj_from_info_panel(
-            src_obj=audit, obj=expected_control))
-    assert expected_control == actual_control, (
-        messages.ERR_MSG_FORMAT.format(expected_control, actual_control))
+        webui_service.ControlsService(selenium).
+        get_list_objs_from_info_panels(src_obj=audit, objs=expected_control))
+    assert is_control_openable is is_openable
+    assert (True if is_control_updateable is is_updateable else
+            pytest.xfail(reason="Issue in app GGRC-1773"))
+    self.assert_for_snapshotable_controls(expected_control, actual_control)
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -132,10 +156,10 @@ class TestSnapshots(base.Test):
        ("create_audit_with_control_with_cas_and_update_control_with_cas",
         "new_control_with_cas_rest", "update_control_with_cas_rest",
         False, True),
-       pytest.mark.skipif(True, reason="Issue in app GGRC-1773")
-       (("create_audit_with_control_with_cas_and_delete_cas_for_controls",
-         "new_control_with_cas_rest", "new_control_with_cas_rest",
-         False, False))],
+       pytest.mark.xfail(strict=True)(
+           ("create_audit_with_control_with_cas_and_delete_cas_for_controls",
+            "new_control_with_cas_rest", "new_control_with_cas_rest",
+            False, False))],
       ids=["Update snapshotable Control to latest ver after updating Control",
            "Update snapshotable Control to latest ver after deleting Control",
            "Update snapshotable Control to latest ver "
@@ -164,25 +188,32 @@ class TestSnapshots(base.Test):
     audit_with_one_control = dynamic_create_audit_with_control
     audit = audit_with_one_control["new_audit_rest"][0]
     control = audit_with_one_control[control][0]
-    expected_control = audit_with_one_control[expected_control][0]
+    # due to 'actual_control.os_state = None',
+    #        'actual_control.updated_at = None'
+    expected_control = (audit_with_one_control[expected_control][0].repr_ui().
+                        update_attrs(os_state=None, updated_at=None))
+    is_control_updateable = (
+        webui_service.ControlsService(selenium).
+        is_obj_updateble_via_info_panel(src_obj=audit, obj=control))
+    assert (True if is_control_updateable is True else
+            pytest.xfail(reason="Issue in app GGRC-1773"))
     (webui_service.ControlsService(selenium).
      update_obj_ver_via_info_panel(src_obj=audit, obj=control))
     actual_controls_tab_count = (webui_service.ControlsService(selenium).
                                  get_count_objs_from_tab(src_obj=audit))
     assert len([expected_control]) == actual_controls_tab_count
-    is_control_updateable = (webui_service.ControlsService(selenium).
-                             is_obj_updateble_via_info_panel(
-        src_obj=audit, obj=expected_control))
-    is_control_openable = (webui_service.ControlsService(selenium).
-                           is_obj_page_exist_via_info_panel(
-        src_obj=audit, obj=expected_control))
-    assert is_control_updateable is is_updateable
-    assert is_control_openable is is_openable
+    is_control_updateable = (
+        webui_service.ControlsService(selenium).
+        is_obj_updateble_via_info_panel(src_obj=audit, obj=expected_control))
+    is_control_openable = (
+        webui_service.ControlsService(selenium).
+        is_obj_page_exist_via_info_panel(src_obj=audit, obj=expected_control))
     actual_control = (
-        webui_service.ControlsService(selenium).get_obj_from_info_panel(
-            src_obj=audit, obj=expected_control))
-    assert expected_control == actual_control, (
-        messages.ERR_MSG_FORMAT.format(expected_control, actual_control))
+        webui_service.ControlsService(selenium).
+        get_list_objs_from_info_panels(src_obj=audit, objs=expected_control))
+    assert is_control_openable is is_openable
+    assert is_control_updateable is is_updateable
+    self.assert_for_snapshotable_controls(expected_control, actual_control)
 
   @pytest.mark.smoke_tests
   def test_mapped_to_program_controls_does_not_added_to_existing_audit(
@@ -198,7 +229,9 @@ class TestSnapshots(base.Test):
     audit_with_two_controls = (
         create_audit_and_update_first_of_two_original_controls)
     audit = audit_with_two_controls["audit"]
-    expected_control = audit_with_two_controls["control"]
+    # due to 'actual_control.custom_attributes = {None: None}'
+    expected_control = (audit_with_two_controls["control"].repr_ui().
+                        update_attrs(custom_attributes={None: None}))
     actual_controls_tab_count = (webui_service.ControlsService(selenium).
                                  get_count_objs_from_tab(src_obj=audit))
     assert len([expected_control]) == actual_controls_tab_count
@@ -221,8 +254,11 @@ class TestSnapshots(base.Test):
     audit_with_two_controls = (
         create_audit_and_update_first_of_two_original_controls)
     audit = audit_with_two_controls["audit"]
-    expected_controls = [audit_with_two_controls["updated_control"],
-                         audit_with_two_controls["second_control"]]
+    # due to 'actual_control.custom_attributes = {None: None}'
+    expected_controls = [
+        expected_control.repr_ui().update_attrs(custom_attributes={None: None})
+        for expected_control in [audit_with_two_controls["updated_control"],
+                                 audit_with_two_controls["second_control"]]]
     (webui_service.AuditsService(selenium).
      bulk_update_via_info_page(audit_obj=audit))
     actual_controls_tab_count = (webui_service.ControlsService(selenium).
@@ -270,11 +306,13 @@ class TestSnapshots(base.Test):
     """
     audit_with_one_control = create_audit_with_control_and_update_control
     audit = audit_with_one_control["new_audit_rest"][0]
-    expected_control = audit_with_one_control[version_of_ctrl][0]
+    # due to 'actual_control.custom_attributes = {None: None}'
+    expected_control = (audit_with_one_control[version_of_ctrl][0].repr_ui().
+                        update_attrs(custom_attributes={None: None}))
     filter_exp = FilterUtils.get_filter_exp_by_title(expected_control.title)
-    actual_controls = (webui_service.ControlsService(selenium).
-                       filter_list_objs_from_tree_view(
-                       src_obj=audit, filter_exp=filter_exp))
+    actual_controls = (
+        webui_service.ControlsService(selenium).
+        filter_list_objs_from_tree_view(src_obj=audit, filter_exp=filter_exp))
     assert (expected_control in
             [ctrls for ctrls in actual_controls]
             ) == is_found, messages.ERR_MSG_FORMAT.format(
@@ -316,7 +354,9 @@ class TestSnapshots(base.Test):
     """
     audit_with_one_control = create_audit_with_control_and_update_control
     source_obj = dynamic_object[0]
-    expected_control = audit_with_one_control[version_of_ctrl][0]
+    # due to 'actual_control.custom_attributes = {None: None}'
+    expected_control = (audit_with_one_control[version_of_ctrl][0].repr_ui().
+                        update_attrs(custom_attributes={None: None}))
     expected_map_status = MappingStatusAttrs(
         expected_control.title, *map_status)
     controls_service = webui_service.ControlsService(selenium)
@@ -336,7 +376,10 @@ class TestSnapshots(base.Test):
     Preconditions:
     - Audit and program, and different control created via REST API
     """
-    expected_control = new_control_rest
+    # due to 'actual_control_in_audit.custom_attributes = {None: None}',
+    #        'actual_control_in_program.custom_attributes = {None: None}'
+    expected_control = (new_control_rest.repr_ui().
+                        update_attrs(custom_attributes={None: None}))
     (webui_service.ControlsService(selenium).map_objs_via_tree_view(
         src_obj=new_audit_rest, dest_objs=[new_control_rest]))
     actual_controls_count_in_tab_audit = (
@@ -374,10 +417,12 @@ class TestSnapshots(base.Test):
     audit_with_one_control = create_audit_with_control
     audit = audit_with_one_control["new_audit_rest"][0]
     control = audit_with_one_control["new_control_rest"][0]
-    is_mappable_on_tree_view_item = (webui_service.ControlsService(
-        selenium).is_obj_mappable_via_tree_view(audit, control))
-    is_unmappable_on_info_panel = (webui_service.ControlsService(
-        selenium).is_obj_unmappable_via_info_panel(src_obj=audit, obj=control))
+    is_mappable_on_tree_view_item = (
+        webui_service.ControlsService(selenium).
+        is_obj_mappable_via_tree_view(audit, control))
+    is_unmappable_on_info_panel = (
+        webui_service.ControlsService(selenium).
+        is_obj_unmappable_via_info_panel(src_obj=audit, obj=control))
     assert (False is
             is_mappable_on_tree_view_item is
             is_unmappable_on_info_panel), (
@@ -401,8 +446,10 @@ class TestSnapshots(base.Test):
     "Checking assessment"
     "Checking issue"
     """
-    expected_control = create_audit_with_control_and_update_control[
-        "new_control_rest"][0]
+    # due to 'actual_control.custom_attributes = {None: None}'
+    expected_control = (
+        create_audit_with_control_and_update_control["new_control_rest"][0].
+        repr_ui().update_attrs(custom_attributes={None: None}))
     source_obj = dynamic_object[0]
     control_service = webui_service.ControlsService(selenium)
     control_service.map_objs_via_tree_view(src_obj=source_obj,
@@ -431,7 +478,10 @@ class TestSnapshots(base.Test):
     "Checking issue"
     """
     audit_with_one_control = create_audit_with_control_and_update_control
-    expected_control = audit_with_one_control["new_control_rest"][0]
+    # due to 'actual_control.custom_attributes = {None: None}'
+    expected_control = (
+        audit_with_one_control["new_control_rest"][0].
+        repr_ui().update_attrs(custom_attributes={None: None}))
     audit = audit_with_one_control["new_audit_rest"][0]
     existing_obj = dynamic_object[0]
     existing_obj_service = get_ui_service(existing_obj.type)(selenium)
