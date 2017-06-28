@@ -95,6 +95,8 @@ def init_hook():
         assessment.test_plan = snapshot.revision.content['test_plan']
       else:
         assessment.test_plan = template.procedure_description
+      if template.template_object_type:
+        assessment.assessment_type = template.template_object_type
 
   @signals.Restful.model_put.connect_via(Assessment)
   @signals.Restful.model_put.connect_via(Issue)
