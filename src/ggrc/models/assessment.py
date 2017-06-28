@@ -111,6 +111,9 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   audit_id = deferred(
       db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False),
       'Assessment')
+  assessment_type = deferred(
+      db.Column(db.String, nullable=False, server_default="Control"),
+      "Assessment")
 
   @declared_attr
   def object_level_definitions(cls):  # pylint: disable=no-self-argument
@@ -146,6 +149,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'design',
       'operationally',
       'audit',
+      'assessment_type',
       PublishOnly('archived'),
       PublishOnly('object')
   ]
