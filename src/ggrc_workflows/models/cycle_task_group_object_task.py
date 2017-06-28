@@ -223,6 +223,7 @@ class CycleTaskGroupObjectTask(
     return db.relationship(
         bp_models.UserRole,
         primaryjoin=primaryjoin,
+        viewonly=True,
     )
 
   @builder.simple_property
