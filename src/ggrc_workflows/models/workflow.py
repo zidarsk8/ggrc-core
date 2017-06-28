@@ -133,6 +133,10 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       reflection.PublishOnly('kind')
   ]
 
+  _fulltext_attrs = [
+      "frequency",
+  ]
+
   _aliases = {
       "frequency": {
           "display_name": "Frequency",
