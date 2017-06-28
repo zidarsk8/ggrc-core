@@ -495,7 +495,6 @@ class Selectable(Element):
 
 class Widget(AbstractPage):
   """Page like class for which we don't know initial url."""
-  # pylint: disable=too-many-instance-attributes
 
   def __init__(self, driver):
     """
