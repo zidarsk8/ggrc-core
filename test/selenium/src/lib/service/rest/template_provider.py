@@ -25,7 +25,6 @@ class TemplateProvider(object):
     with open(path) as json_file:
       json_data = json_file.read()
     json_tmpl = json.loads(json_data)
-    dict()[json_tmpl_name] = json_tmpl
     json_tmpl_copy = copy.deepcopy(json_tmpl)
     json_tmpl_copy.update({k: v for k, v in kwargs.iteritems() if v})
     return {json_tmpl_name: json_tmpl_copy}
