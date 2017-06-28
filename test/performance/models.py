@@ -19,6 +19,7 @@ Items:
   - TABLES_SINGULAR = Model name to singular table name map
   - TABLES_SINGULAR_REV = Singular table name map to model name
   - TABLES_PLURAL = Model name to plural table name map
+  - INITIAL_MODELS = Models that get loaded on every test start
 """
 
 # role ids read from the database after a clean migration.
@@ -458,3 +459,50 @@ TABLES_PLURAL = {
     'Workflow': 'workflows',
     'WorkflowPerson': 'workflow_people'
 }
+
+
+SPECIAL_INITIAL_MODELS = [
+    # 'AccessControlRole',
+    # 'Person',
+    'UserRole',
+]
+
+INITIAL_MODELS = [
+    'AccessGroup',
+    'Assessment',
+    'AssessmentTemplate',
+    'Audit',
+    'Control',
+    'DataAsset',
+    'Contract',
+    'Policy',
+    'Regulation',
+    'Standard',
+    'Facility',
+    'Market',
+    'Objective',
+    'OrgGroup',
+    'Vendor',
+    'Person',
+    'Product',
+    'Program',
+    'Project',
+    'Section',
+    'Clause',
+    'Snapshot',
+    'System',
+    'Process',
+    'Issue',
+    'TaskGroup',
+    'TaskGroupObject',
+    'TaskGroupTask',
+    'Workflow',
+    'WorkflowPerson',
+    'Cycle',
+    'CycleTaskEntry',
+    'CycleTaskGroup',
+    'CycleTaskGroupObjectTask',
+    'RiskAssessment',
+    'Risk',
+    'Threat',
+]

@@ -143,7 +143,7 @@ class BaseTaskSet(locust.TaskSet):
     response = self.client.get(
         "/api/{}".format(model_plural),
         headers=self.headers,
-        name="/initial_object_get",
+        name="/_initial object get",
     )
     if response.status_code == 200:
       response_json = response.json()
@@ -152,7 +152,20 @@ class BaseTaskSet(locust.TaskSet):
 
   def get_all_objects(self):
     """Get all objects of all types."""
-    for model in models.MODELS:
+    response = self.client.get(
+        "/search",
+        params={
+            "q": "",
+            "types": ",".join(models.INITIAL_MODELS),
+            "counts_only": True,
+        },
+        headers=self.headers,
+        name="/_search model counts",
+    )
+    counts = response.json()["results"]["counts"]
+    for model, count in counts.items():
+      self.objects[model] = [generator.slug(model, i+1) for i in range(count)]
+    for model in models.SPECIAL_INITIAL_MODELS:
       self.get_objects(model)
 
   def _get_object(self, slug):
@@ -390,6 +403,8 @@ class BaseTaskSet(locust.TaskSet):
           "Facility",
       ]
     for audit in audits:
+      if not audit["context"]:
+        audit = self.get_from_slug(audit)
       for _ in range(count):
         for model in at_models:
           data = generator.assessment_template(audit, model, **kwargs)
@@ -464,6 +479,8 @@ class BaseTaskSet(locust.TaskSet):
     if not template_models:
       template_models = ["Control"]
     for audit in audits:
+      if not audit["context"]:
+        audit = self.get_from_slug(audit)
       for template_model in template_models:
         name = None if count == 1 else "count={}".format(count)
         audit_templates = self.assessment_templates[audit["id"]]
