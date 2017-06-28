@@ -4,11 +4,11 @@
 # pylint: disable=too-few-public-methods
 
 import re
-
 from selenium import webdriver
 from selenium.common import exceptions
 from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote import webelement
 
 from lib import constants, exception, mixin
 from lib.constants import url
@@ -61,7 +61,7 @@ class Element(InstanceRepresentation):
     self._driver = driver
     self._locator = locator
     self.element = (
-        locator if isinstance(locator, webdriver.remote.webelement.WebElement)
+        locator if isinstance(locator, webelement.WebElement)
         else self.get_element())
     self.text = self.element.text
 
@@ -495,6 +495,7 @@ class Selectable(Element):
 
 class Widget(AbstractPage):
   """Page like class for which we don't know initial url."""
+  # pylint: disable=too-many-instance-attributes
 
   def __init__(self, driver):
     """
@@ -606,13 +607,18 @@ class TreeView(Component):
     """Get list of scopes (dicts) from members (text scopes) which displayed on
     Tree View according to current set of visible fields.
     """
+    list_scopes = self._tree_view_items_elements
     if self.get_tree_view_items_elements():
       list_headers = [_item.text.splitlines()[:len(self.fields_to_set)] for
                       _item in self.tree_view_header_elements()]
-      list_lists_items = [_item.text.splitlines()[:len(self.fields_to_set)] for
-                          _item in self.tree_view_items_elements()]
-      return [dict(zip(list_headers[0], item)) for item in list_lists_items]
-    return self._tree_view_items_elements
+      # u'Ex' to u'Ex', u'Ex1, Ex2' to [u'Ex1', u'Ex2']
+      list_lists_items = [
+          [_.split(", ") if len(_.split(", ")) >= 2 else _ for
+           _ in _item.text.splitlines()[:len(self.fields_to_set)]] for
+          _item in self.tree_view_items_elements()]
+      list_scopes = [
+          dict(zip(list_headers[0], item)) for item in list_lists_items]
+    return list_scopes
 
 
 class UnifiedMapperTreeView(TreeView):

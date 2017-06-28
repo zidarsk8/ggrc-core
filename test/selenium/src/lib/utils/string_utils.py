@@ -5,6 +5,8 @@
 import random
 import string
 import uuid
+from collections import defaultdict
+
 
 BLANK = ''
 COMMA = ','  # comma is used as delimiter for multi-choice values
@@ -34,22 +36,23 @@ def random_list_strings(list_len=3, item_size=5,
 
 
 def get_bool_from_string(str_to_bool):
-  """Return True for 'Yes' or 'True' and False for 'No' or 'False'."""
-  if str_to_bool.title() in ['Yes', "True"]:
-    return True
-  elif str_to_bool.title() in ['No', "False"]:
-    return False
-  else:
-    raise ValueError("'{}' can't be converted to boolean".format(str_to_bool))
+  """Return True for 'Yes' or 'True' and False for 'No' or 'False'
+  for string and unicode 'str_to_bool', else return source value
+  of 'str_to_bool'.
+  """
+  return ((True if str_to_bool.title() in ['Yes', "True"] else
+           False if str_to_bool.title() in ['No', "False"] else str_to_bool)
+          if isinstance(str_to_bool, (str, unicode)) else str_to_bool)
 
 
-def remap_keys_for_list_dicts(dict_transformation_keys, list_dicts):
+def remap_keys_for_list_dicts(dict_of_transform_keys, list_dicts):
   """Remap keys names for old list of dictionaries according
- transformation dictionary {OLD KEY: NEW KEY} and return new updated
- list of dictionaries.
- """
-  return [{dict_transformation_keys[key]: value for key, value
-           in dic.iteritems()} for dic in list_dicts]
+  transformation dictionary {OLD KEY: NEW KEY} and return new updated
+  list of dictionaries.
+  """
+  return [
+      {(dict_of_transform_keys[k] if dict_of_transform_keys.get(k) else k): v
+       for k, v in dic.iteritems()} for dic in list_dicts]
 
 
 def convert_to_list(items):
@@ -71,3 +74,35 @@ def convert_list_elements_to_list(list_to_convert):
     else:
       converted_list.append(element)
   return converted_list
+
+
+def merge_dicts_by_same_key(*dicts):
+  """Merger multiple (at list two) dictionaries with the same keys to one witch
+  will be contain keys (all values from source dicts) and values (all values
+  from destination dicts).
+  Example:
+  :arg *dicts = ({1: 55, 2: 66}, {2: 67, 1: 56})
+  :return {55: 56, 66: 67}
+  """
+  merged_dict = defaultdict(list)
+  for _dict in dicts:
+    if isinstance(_dict, dict):
+      for key, val in _dict.iteritems():
+        merged_dict[key].append(val)
+  if merged_dict != {None: [None, None]}:
+    merged_dict = {
+        key: val for key, val in merged_dict.iteritems() if
+        val and len(val) == 2}
+  return dict([tuple(item) for item in merged_dict.values()])
+
+
+def is_one_dict_is_subset_another_dict(src_dict, dest_dict):
+  """Check is all items of one dictionary 'src_dict' is subset of items of
+  another dictionary 'dest_dict', where 'src_dict' should has same or less
+  length then 'dest_dict'.
+  Examples:
+  ({"b": 2, "a": 1}, {"a": 1, "b": 2, "c": 4}) = True
+  ({"a": 1, "b": 2, "c": 4}, {"b": 2, "a": 1}) = False
+  """
+  # pylint: disable=invalid-name
+  return not bool(set(src_dict) - set(dest_dict))

@@ -63,11 +63,11 @@ class CommonInfo(base.Widget):
                             [None, None])
     return header_and_value
 
-  def get_headers_and_values_text_from_cas_scopes(self):  # flake8: noqa
-    """Get and convert to entities form all headers and values elements text
-    from CAs scopes elements.
+  def get_headers_and_values_dict_from_cas_scopes(self):  # noqa: ignore=C901
+    """Get text of all CAs headers and values elements scopes and convert it to
+    dictionary.
     Example:
-    :return [['ca_header1', 'ca_header2'], ['ca_value1', 'ca_value2']]
+    :return {'ca_header1': 'ca_value1', 'ca_header2': 'ca_value2', ...}
     """
     # pylint: disable=invalid-name
     # pylint: disable=too-many-branches
@@ -75,30 +75,30 @@ class CommonInfo(base.Widget):
       selenium_utils.wait_for_js_to_load(self._driver)
       self.cas_headers_and_values = self._driver.find_elements(
           *self._locators.CAS_HEADERS_AND_VALUES)
-    if len(self.cas_headers_and_values) > 1:
+    dict_cas_scopes = {None: None}
+    if len(self.cas_headers_and_values) >= 1:
       list_text_cas_scopes = []
       for scope in self.cas_headers_and_values:
         ca_header_text = scope.text.splitlines()[0]
-        if any(unicode(ca_type.upper()) in ca_header_text for ca_type
-               in element.AdminWidgetCustomAttributes.ALL_CA_TYPES):
-          if len(scope.text.splitlines()) >= 2:
-            if scope.text.splitlines()[1].strip():
-              list_text_cas_scopes.append(
-                  [ca_header_text, scope.text.splitlines()[1]])
-            else:
-              list_text_cas_scopes.append([ca_header_text, None])
-          if len(scope.text.splitlines()) == 1:
-            if (element.AdminWidgetCustomAttributes.CHECKBOX.upper() in
-                    ca_header_text):
-              list_text_cas_scopes.append(
-                  [ca_header_text,
-                   unicode(int(base.Checkbox(self._driver, scope.find_element(
-                       *self._locators.CAS_CHECKBOXES)).is_element_checked()))
-                   ])
-            else:
-              list_text_cas_scopes.append([ca_header_text, None])
-      cas_headers, _cas_values = zip(*list_text_cas_scopes)
-      # convertation
+        if len(scope.text.splitlines()) >= 2:
+          if scope.text.splitlines()[1].strip():
+            list_text_cas_scopes.append(
+                [ca_header_text, scope.text.splitlines()[1]])
+          else:
+            list_text_cas_scopes.append([ca_header_text, None])
+        if len(scope.text.splitlines()) == 1:
+          if (element.AdminWidgetCustomAttributes.CHECKBOX.upper() in
+                  ca_header_text):
+            list_text_cas_scopes.append(
+                [ca_header_text,
+                 unicode(int(base.Checkbox(self._driver, scope.find_element(
+                     *self._locators.CAS_CHECKBOXES)).is_element_checked()))
+                 ])
+          else:
+            list_text_cas_scopes.append([ca_header_text, None])
+      cas_headers, _cas_values = [list(text_cas_scope) for text_cas_scope
+                                  in zip(*list_text_cas_scopes)]
+      # conversion
       cas_values = []
       for ca_val in _cas_values:
         if ca_val is None:
@@ -115,8 +115,8 @@ class CommonInfo(base.Widget):
         else:
           # Other
           cas_values.append(ca_val)
-      return cas_headers, cas_values
-    return [None, None]
+      dict_cas_scopes = dict(zip(cas_headers, cas_values))
+    return dict_cas_scopes
 
   def get_info_widget_obj_scope(self):
     """Get dict from object (text scope) which displayed on info page or
@@ -233,18 +233,15 @@ class Audits(InfoPanel):
     self.code_text, self.code_entered_text = (
         self.get_header_and_value_text_from_custom_scopes(
             self._elements.CODE.upper()))
-    self.cas_headers_text, self.cas_values_text = (
-        self.get_headers_and_values_text_from_cas_scopes())
+    self.cas_text = self.get_headers_and_values_dict_from_cas_scopes()
     # all obj scopes
     self.list_all_headers_text = [
-        self._elements.CAS_HEADERS.upper(), self._elements.CAS_VALUES.upper(),
-        self.title().text, self._elements.STATUS.upper(), self.audit_lead_text,
-        self.code_text]
+        self._elements.CAS.upper(), self.title().text,
+        self._elements.STATUS.upper(), self.audit_lead_text, self.code_text]
     self.list_all_values_text = [
-        self.cas_headers_text, self.cas_values_text, self.title_entered().text,
+        self.cas_text, self.title_entered().text,
         objects.get_normal_form(self.state().text),
-        self.audit_lead_entered_text,
-        self.code_entered_text]
+        self.audit_lead_entered_text, self.code_entered_text]
 
 
 class Assessments(InfoPanel):
@@ -272,16 +269,22 @@ class Assessments(InfoPanel):
           len(mapped_scope.text.splitlines()) >= 2]
       self.mapped_objects_descriptions_text = [
           mapped_scope.text.splitlines()[1]
-        for mapped_scope in self.mapped_objects_titles_and_descriptions if
-        len(mapped_scope.text.splitlines()) >= 2]
-    # CAs
-    self.cas_headers_text, self.cas_values_text = (
-        self.get_headers_and_values_text_from_cas_scopes())
+          for mapped_scope in self.mapped_objects_titles_and_descriptions if
+          len(mapped_scope.text.splitlines()) >= 2]
+    self.cas_text = self.get_headers_and_values_dict_from_cas_scopes()
     # people section
     self.people_section.toggle()
     self.creators_text, self.creators_entered_text = (
         self.get_header_and_value_text_from_custom_scopes(
             self._elements.CREATORS_.upper(),
+            self._locators.PEOPLE_HEADERS_AND_VALUES))
+    self.assignees_text, self.assignees_entered_text = (
+        self.get_header_and_value_text_from_custom_scopes(
+            self._elements.ASSIGNEES_.upper(),
+            self._locators.PEOPLE_HEADERS_AND_VALUES))
+    self.verifiers_text, self.verifiers_entered_text = (
+        self.get_header_and_value_text_from_custom_scopes(
+            self._elements.ASSIGNEES_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
     self.people_section.toggle(False)
     # code section
@@ -296,17 +299,17 @@ class Assessments(InfoPanel):
     self.code_section.toggle(False)
     # scope
     self.list_all_headers_text = [
-        self._elements.CAS_HEADERS.upper(), self._elements.CAS_VALUES.upper(),
-        self.title().text, self._elements.STATE.upper(),
-        self._elements.VERIFIED.upper(),
-        self._elements.CREATORS.upper(),
+        self._elements.CAS.upper(), self.title().text,
+        self._elements.STATE.upper(), self._elements.VERIFIED.upper(),
+        self._elements.CREATORS.upper(), self._elements.ASSIGNEES.upper(),
+        self._elements.VERIFIERS.upper(),
         self._elements.MAPPED_OBJECTS.upper(), self.code_text]
     self.list_all_values_text = [
-        self.cas_headers_text, self.cas_values_text, self.title_entered().text,
+        self.cas_text, self.title_entered().text,
         objects.get_normal_form(self.state().text),
         self.state().text.upper() in
-        element.AssessmentStates.COMPLETED.upper(),
-        self.creators_entered_text,
+        element.AssessmentStates.COMPLETED.upper(), self.creators_entered_text,
+        self.assignees_entered_text, self.verifiers_entered_text,
         self.mapped_objects_titles_text, self.code_entered_text]
 
 
@@ -392,15 +395,14 @@ class Controls(SnapshotableInfoPanel):
     self.code_text, self.code_entered_text = (
         self.get_header_and_value_text_from_custom_scopes(
             self._elements.CODE.upper()))
-    self.cas_headers_text, self.cas_values_text = (
-        self.get_headers_and_values_text_from_cas_scopes())
+    self.cas_text = self.get_headers_and_values_dict_from_cas_scopes()
     # scope
     self.list_all_headers_text = [
-        self._elements.CAS_HEADERS.upper(), self._elements.CAS_VALUES.upper(),
-        self.title().text, self._elements.STATE.upper(), self.admin_text,
+        self._elements.CAS.upper(), self.title().text,
+        self._elements.STATE.upper(), self.admin_text,
         self.primary_contact_text, self.code_text]
     self.list_all_values_text = [
-        self.cas_headers_text, self.cas_values_text, self.title_entered().text,
+        self.cas_text, self.title_entered().text,
         objects.get_normal_form(self.state().text), self.admin_entered_text,
         self.primary_contact_entered_text, self.code_entered_text]
 

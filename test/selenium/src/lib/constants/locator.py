@@ -50,6 +50,7 @@ class Login(object):
 class PageHeader(object):
   """Locators for Dashboard header."""
   _CONTENT = ".header-content"
+  SRC_OBJ_TITLE = (By.CSS_SELECTOR, _CONTENT + " .entity-name")
   TOGGLE_LHN = (By.CSS_SELECTOR, ".lhn-trigger")
   BUTTON_DASHBOARD = (
       By.CSS_SELECTOR, _CONTENT + ' .to-my-work[href="/dashboard"]')
