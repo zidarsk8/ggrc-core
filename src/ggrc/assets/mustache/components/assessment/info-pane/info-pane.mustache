@@ -29,20 +29,24 @@
                 <div class="info-pane__section">
                     <div class="info-pane__section-title">
                         <div class="action-toolbar">
-                            <div class="action-toolbar__content-item">Controls</div>
-                          {{#unless instance.archived}}
-                            <div class="action-toolbar__controls">
-                                <action-toolbar-control>
-                                  <add-mapping-button {parent-instance}="instance"></add-mapping-button>
-                                </action-toolbar-control>
+                            <div class="action-toolbar__content-item">
+                                {{assessmentTypeNamePlural}}
                             </div>
-                          {{/unless}}
+                            {{#unless instance.archived}}
+                                <div class="action-toolbar__controls">
+                                    <action-toolbar-control>
+                                    <add-mapping-button {parent-instance}="instance"></add-mapping-button>
+                                    </action-toolbar-control>
+                                </div>
+                            {{/unless}}
                         </div>
                     </div>
-                    <assessment-mapped-controls class="mapped-objects__list info-pane__section-content"
-                            {instance}="instance"
-                            {mapped-items}="controls"
-                            title-text="Controls"></assessment-mapped-controls>
+                    <assessment-mapped-controls
+                        class="mapped-objects__list info-pane__section-content"
+                        {instance}="instance"
+                        {mapped-items}="assessmentTypeObjects"
+                        {assessment-type}="instance.assessment_type">
+                    </assessment-mapped-controls>
                 </div>
                 <div class="assessment-controls info-pane__section">
                     <div class="assessment-note">

@@ -14,7 +14,7 @@
         <div class="simple-modal__header-text flex-size-1">
             <div class="simple-modal__title">
                 <div class="simple-modal__title__name">
-                    Control:
+                    {{assessmentType}}:
                     <a target="_blank" href="{{instance.originalLink}}" title="{{instance.title}}">{{instance.title}}</a>
                 </div>
                 <span class="state-value snapshot">
@@ -37,15 +37,17 @@
                                                 class="collapsible-panel-body__control_info">
             </detailed-business-object-list-item>
         </collapsible-panel>
-        <assessment-mapped-control-related-objects class="assessment-mapped-controls"
-                                                   title-text="Show Related Objectives ({{objectives.length}})"
-                                                   type="Objective"
-                                                   {items}="objectives">
-        </assessment-mapped-control-related-objects>
-        <assessment-mapped-control-related-objects class="assessment-mapped-controls"
-                                                   title-text="Show Related Regulations ({{regulations.length}})"
-                                                   type="Regulation"
-                                                   {items}="regulations">
-        </assessment-mapped-control-related-objects>
+        {{#is assessmentType 'Control'}}
+            <assessment-mapped-control-related-objects class="assessment-mapped-controls"
+                                                    title-text="Show Related Objectives ({{objectives.length}})"
+                                                    type="Objective"
+                                                    {items}="objectives">
+            </assessment-mapped-control-related-objects>
+            <assessment-mapped-control-related-objects class="assessment-mapped-controls"
+                                                    title-text="Show Related Regulations ({{regulations.length}})"
+                                                    type="Regulation"
+                                                    {items}="regulations">
+            </assessment-mapped-control-related-objects>
+        {{/is}}
     </div>
 </simple-modal>

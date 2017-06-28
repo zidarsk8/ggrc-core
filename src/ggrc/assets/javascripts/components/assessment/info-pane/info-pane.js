@@ -27,19 +27,29 @@
         mappedSnapshots: {
           Value: can.List
         },
-        controls: {
+        assessmentTypeNamePlural: {
           get: function () {
+            var type = this.attr('instance.assessment_type');
+            return CMS.Models[type].model_plural;
+          }
+        },
+        assessmentTypeObjects: {
+          get: function () {
+            var self = this;
             return this.attr('mappedSnapshots')
               .filter(function (item) {
-                return item.child_type === 'Control';
+                return item.child_type === self
+                  .attr('instance.assessment_type');
               });
           }
         },
         relatedInformation: {
           get: function () {
+            var self = this;
             return this.attr('mappedSnapshots')
               .filter(function (item) {
-                return item.child_type !== 'Control';
+                return item.child_type !== self
+                  .attr('instance.assessment_type');
               });
           }
         },
