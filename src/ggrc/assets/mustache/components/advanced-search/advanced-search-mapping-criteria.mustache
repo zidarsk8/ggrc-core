@@ -1,0 +1,74 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="mapping-criteria">
+  <h6>{{title}}</h6>
+  <div class="mapping-criteria__content flex-box flex-box-multi">
+    <div class="mapping-criteria__type">
+      <select {($value)}="criteria.objectName">
+      {{#mappingTypes}}
+        <option value="{{model_singular}}"
+                label="{{title_singular}}">
+        </option>
+      {{/mappingTypes}}
+      </select>
+    </div>
+    <div class="flex-box flex-box-multi">
+      <div class="flex-box flex-box-multi">
+        <advanced-search-filter-attribute
+                {(attribute)}="criteria.filter.value"
+                {available-attributes}="availableAttributes"
+                {show-actions}="false">
+        </advanced-search-filter-attribute>
+        <button class="mapping-criteria__remove" ($click)="remove()"><i class="fa fa-trash"></i></button>
+      </div>
+      <div class="mapping-criteria__action">
+        {{#if showPopover}}
+          <simple-popover {button-text}="'+ Add''" extra-css-class="advanced-search">
+            <button class="mapping-criteria__action-button" ($click)="addRelevant()">Map Condition</button>
+            <button class="mapping-criteria__action-button" ($click)="createGroup()">Group Expression</button>
+          </simple-popover>
+        {{else}}
+          {{#if canAddMapping}}
+          <a href="javascript:void(0)" class="advanced-filter" ($click)="addRelevant()">+ Add Map Condition</a>
+          {{/if}}
+          {{#if canBeGrouped}}
+            <a href="javascript:void(0)" class="advanced-filter" ($click)="createGroup()">+ Add Group Expression</a>
+          {{/if}}
+        {{/if}}
+      </div>
+    </div>
+  </div>
+  {{#if criteria.mappedTo}}
+  <div class="mapping-criteria__relationship"></div>
+  <div class="mapping-criteria__relevant">
+    {{#switch criteria.mappedTo.type}}
+      {{#case "mappingCriteria"}}
+        <advanced-search-mapping-criteria
+          {(criteria)}="criteria.mappedTo.value"
+          (remove)="removeRelevant()"
+          {available-attributes}="availableAttributes"
+          {model-name}="criteria.objectName"
+          {extendable}="extendable"
+          (createGroup)="relevantToGroup()"
+          {^can-be-grouped}="../childCanBeGrouped">
+        </advanced-search-mapping-criteria>
+      {{/case}}
+      {{#case "group"}}
+        <advanced-search-mapping-group
+          {(items)}="criteria.mappedTo.value"
+          (remove)="removeRelevant()"
+          {available-attributes}="availableAttributes"
+          {model-name}="criteria.objectName"
+          {^root}="../childCanBeGrouped">
+        </advanced-search-mapping-group>
+        {{/case}}
+      {{/switch}}
+  </div>
+  {{/if}}
+</div>
+
+
+

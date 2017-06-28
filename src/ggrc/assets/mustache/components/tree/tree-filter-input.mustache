@@ -4,14 +4,32 @@
 }}
 
 <div class="tree-filter__expression-holder width-100">
-  <input type="text" class="tree-filter__input width-100" {($value)}="filter">
+  <input type="text" 
+         class="tree-filter__input width-100" 
+         {($value)}="filter" 
+         {{#disabled}}disabled{{/disabled}}
+         placeholder="Type for search here...">
   <span class="tree-filter_is-expression {{#if isExpression}}valid{{/if}}">
     <i class="fa fa-check-circle{{#unless isExpression}}-o{{/unless}}"></i>
   </span>
+  {{^if disabled}}
+  <a href="javascript://" class="advanced-filter" ($click)="openAdvancedFilter()">
+    <i class="fa fa-filter"></i>
+  </a>
+  {{else}}
+  <div class="advanced-filter-controls">
+    <a href="javascript://" ($click)="openAdvancedFilter()">Filtered</a>
+    <a href="javascript://" ($click)="removeAdvancedFilters()"><i class="fa fa-remove"></i></a>
+  </div>
+  {{/if}}
 </div>
 <div class="flex-box tree-filter__actions">
-  <button type="submit" class="btn btn-small btn-lightBlue" ($click)="submit()">Filter</button>
-  <button type="reset" class="btn btn-small btn-white" ($click)="reset()">Reset</button>
+  <button type="submit" 
+          class="btn btn-small btn-lightBlue"
+          ($click)="submit()"
+          {{#disabled}}disabled{{/disabled}}>
+    Search
+  </button>
 
   <a id="page-help" class="popover-template" data-get-template="help/filters_helper_content" href="javascript://">
     <i class="fa fa-question-circle"></i>

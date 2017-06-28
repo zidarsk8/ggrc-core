@@ -44,6 +44,7 @@ dashboard-js-files:
   - apps/base_widgets.js
   - application.js
   - plugins/ggrc_utils.js
+  - plugins/utils/advanced-search-utils.js
   - plugins/utils/ca-utils.js
   - plugins/utils/query-api-utils.js
   - plugins/utils/current-page-utils.js
@@ -116,6 +117,7 @@ dashboard-js-files:
   - models/system.js
   - models/join_models.js
   # ViewModels
+  - components/view-models/advanced-search-container-vm.js
   - components/view-models/tree-item-base-vm.js
   - components/view-models/tree-people-base-vm.js
   - components/base-objects/pagination.js
@@ -152,6 +154,14 @@ dashboard-js-files:
   - apps/business_objects.js
   - apps/custom_attributes.js
   # Components
+  - components/advanced-search/advanced-search-filter-container.js
+  - components/advanced-search/advanced-search-filter-attribute.js
+  - components/advanced-search/advanced-search-filter-group.js
+  - components/advanced-search/advanced-search-filter-operator.js
+  - components/advanced-search/advanced-search-filter-state.js
+  - components/advanced-search/advanced-search-mapping-container.js
+  - components/advanced-search/advanced-search-mapping-group.js
+  - components/advanced-search/advanced-search-mapping-criteria.js
   - components/state-colors-map/state-colors-map.js
   - components/spinner/spinner.js
   - components/modal-connector.js
@@ -190,6 +200,7 @@ dashboard-js-files:
   - components/reusable-objects/reusable-objects-list.js
   - components/reusable-objects/reusable-objects-item.js
   - components/simple-modal/simple-modal.js
+  - components/simple-popover/simple-popover.js
   - components/show-more/show-more.js
   - components/show-related-assessments-button/show-related-assessments-button.js
   - components/mapping-controls/mapping-type-selector.js
@@ -500,6 +511,7 @@ dashboard-js-template-files:
   - components/tree/tree-item-status-for-workflow.mustache
   - components/cycle-task-actions/cycle-task-actions.mustache
   - components/simple-modal/simple-modal.mustache
+  - components/simple-popover/simple-popover.mustache
   - components/page-header/page-header.mustache
   - components/auto-save-form/auto-save-form.mustache
   - components/auto-save-form/auto-save-form-actions.mustache
@@ -517,6 +529,14 @@ dashboard-js-template-files:
   - components/auto-save-form/field-views/date-form-field-view.mustache
   - components/auto-save-form/field-views/person-form-field-view.mustache
   - components/object-tasks/object-tasks.mustache
+  - components/advanced-search/advanced-search-filter-container.mustache
+  - components/advanced-search/advanced-search-filter-attribute.mustache
+  - components/advanced-search/advanced-search-filter-group.mustache
+  - components/advanced-search/advanced-search-filter-operator.mustache
+  - components/advanced-search/advanced-search-filter-state.mustache
+  - components/advanced-search/advanced-search-mapping-container.mustache
+  - components/advanced-search/advanced-search-mapping-group.mustache
+  - components/advanced-search/advanced-search-mapping-criteria.mustache
   - custom_attributes/modal_content.mustache
   - custom_attributes/info.mustache
   - custom_attribute_definitions/modal_content.mustache

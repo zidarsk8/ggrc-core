@@ -32,6 +32,10 @@
           var filters = can.makeArray(this.attr('filters'));
           var additionalFilter = this.attr('additionalFilter');
 
+          if (this.attr('advancedSearch.filter')) {
+            return this.attr('advancedSearch.filter');
+          }
+
           if (additionalFilter) {
             additionalFilter = GGRC.query_parser.parse(additionalFilter);
           }
@@ -197,11 +201,13 @@
         sortBy: sortingInfo.sortBy,
         sortDirection: sortingInfo.sortDirection
       };
+      var request = this.attr('advancedSearch.request');
 
       pageInfo.attr('disabled', true);
       this.attr('loading', true);
 
-      return TreeViewUtils.loadFirstTierItems(modelName, parent, page, filter)
+      return TreeViewUtils
+        .loadFirstTierItems(modelName, parent, page, filter, request)
         .then(function (data) {
           var total = data.total;
           var modelName = this.attr('modelName');
@@ -439,7 +445,57 @@
           can.Model.Cacheable.bind('destroyed', onDestroyed);
         }
       };
-    })()
+    })(),
+
+    advancedSearch: {
+      open: false,
+      filter: null,
+      request: can.List(),
+      filterItems: can.List(),
+      appliedFilterItems: can.List(),
+      mappingItems: can.List(),
+      appliedMappingItems: can.List()
+    },
+    openAdvancedFilter: function () {
+      this.attr('advancedSearch.filterItems',
+        this.attr('advancedSearch.appliedFilterItems').slice());
+
+      this.attr('advancedSearch.mappingItems',
+        this.attr('advancedSearch.appliedMappingItems').slice());
+
+      this.attr('advancedSearch.open', true);
+    },
+    applyAdvancedFilters: function () {
+      var filters = this.attr('advancedSearch.filterItems');
+      var mappings = this.attr('advancedSearch.mappingItems');
+      var request = can.List();
+
+      this.attr('advancedSearch.appliedFilterItems', filters);
+      this.attr('advancedSearch.appliedMappingItems', mappings);
+
+      this.attr('advancedSearch.filter', GGRC.query_parser.join_queries(
+        GGRC.query_parser
+          .parse(GGRC.Utils.AdvancedSearch.buildFilter(filters, request)),
+        GGRC.query_parser
+          .parse(GGRC.Utils.AdvancedSearch.buildFilter(mappings, request))
+      ));
+
+      this.attr('advancedSearch.request', request);
+      this.attr('advancedSearch.open', false);
+      this.onFilter();
+    },
+    removeAdvancedFilters: function () {
+      this.attr('advancedSearch.appliedFilterItems', can.List());
+      this.attr('advancedSearch.appliedMappingItems', can.List());
+      this.attr('advancedSearch.request', can.List());
+      this.attr('advancedSearch.filter', null);
+      this.attr('advancedSearch.open', false);
+      this.onFilter();
+    },
+    resetAdvancedFilters: function () {
+      this.attr('advancedSearch.filterItems', can.List());
+      this.attr('advancedSearch.mappingItems', can.List());
+    }
   });
 
   /**

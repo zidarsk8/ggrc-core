@@ -9,16 +9,21 @@
       <tree-filter-input class="flex-size-1"
                          {register-filter}="@registerFilter"
                          (filter)="onFilter"
+                         (openAdvanced)="openAdvancedFilter"
+                         (removeAdvanced)="removeAdvancedFilters"
+                         {disabled}="advancedSearch.filter"
       ></tree-filter-input>
       {{#if statusFilterVisible}}
         <tree-status-filter {model-name}="modelName"
                             {register-filter}="@registerFilter"
                             (filter)="onFilter"
+                            {disabled}="advancedSearch.filter"
         >
           <multiselect-dropdown
             {options}="filterStates"
             placeholder="Filter by State"
-            plural="States">
+            plural="States"
+            {disabled}="advancedSearch.filter">
           </multiselect-dropdown>
         </tree-status-filter>
       {{/if}}
@@ -70,6 +75,34 @@
       </div>
       {{/if}}
     </div>
+
+    <simple-modal {state}="advancedSearch" modal-title="'{{model.title_singular}} Advanced Filter'" extra-css-class="advanced-search">
+      <div class="advanced-search__content">
+        <div class="simple-modal__body">
+          <advanced-search-filter-container
+            {(items)}="advancedSearch.filterItems"
+            {available-attributes}="columns.available"
+            {model-name}="modelName">
+          </advanced-search-filter-container>
+        </div>
+        <div class="advanced-search__mapping-header">
+          <h4>Filter by Mapping</h4>
+        </div>
+        <div class="simple-modal__body">
+          <advanced-search-mapping-container
+            {(items)}="advancedSearch.mappingItems"
+            {available-attributes}="columns.available"
+            {model-name}="modelName">
+          </advanced-search-mapping-container>
+        </div>
+      </div>
+      <div class="simple-modal__footer">
+        <div class="advanced-search__controls">
+          <button type="reset" class="btn btn-white" ($click)="resetAdvancedFilters()">Reset to Defaults</button>
+          <button type="submit" class="btn btn-lightBlue" ($click)="applyAdvancedFilters()">Apply</button>
+        </div>
+      </div>
+    </simple-modal>
 
     <tree-header {selected-columns}="columns.selected"
                  {available-columns}="columns.available"
