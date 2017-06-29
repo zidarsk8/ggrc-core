@@ -410,12 +410,16 @@ class BaseTaskSet(locust.TaskSet):
           "Facility",
       ]
     for audit in audits:
-      if not audit["context"]:
-        audit = self.get_from_slug(audit)
+      if not audit.get("context"):
+        audit = self._get_object(audit)
       for _ in range(count):
         for model in at_models:
-          data = generator.assessment_template(audit, model, **kwargs)
-          self._post("AssessmentTemplate", data)
+          data = generator.assessment_template(
+              audit=audit,
+              template_object=model,
+              prefixes=kwargs.get("prefixes")
+          )
+          self._post("AssessmentTemplate", data, kwargs.get("name"))
 
   def set_random_user(self, role="Administrator"):
     """Login as a random user of a given role."""
