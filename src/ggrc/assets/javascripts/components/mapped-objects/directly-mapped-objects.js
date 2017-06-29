@@ -12,7 +12,7 @@
   /**
    * Directly mapped objects view component
    */
-  can.Component.extend({
+  GGRC.Components('directlyMappedObjects', {
     tag: tag,
     template: tpl,
     viewModel: can.Map.extend({

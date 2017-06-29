@@ -11,12 +11,12 @@
         // Since we attach_files can re-use existing file references
         // from the picker, check for that case.
         var link = {link: file.alternateLink};
-        CMS.Models.Document.findAll(link).done(function (d) {
-          if (d.length) {
+        CMS.Models.Document.findAll(link).done(function (docResp) {
+          if (docResp.length) {
             new CMS.Models.Relationship({
               context: object.context || {id: null},
               source: object,
-              destination: d[0]
+              destination: docResp[0]
             }).save();
           } else {
             if (type === 'folders') {
@@ -153,80 +153,82 @@
       setCurrent: function (unsetPending) {
         return function (folders) {
           var folder;
-          if (this.scope.attr('hasRevisionFolder')) {
+          if (this.viewModel.attr('hasRevisionFolder')) {
             return;
           }
 
           folder = folders[0] ? folders[0].instance : null;
           if (unsetPending) {
-            this.scope.attr('_folder_change_pending', false);
+            this.viewModel.attr('_folder_change_pending', false);
           }
-          this.scope.attr('current_folder', folder);
-          this.scope.attr('folder_list').replace(folders);
+          this.viewModel.attr('current_folder', folder);
+          this.viewModel.attr('folder_list').replace(folders);
         }.bind(this);
       },
       setCurrentFail: function (error) {
-        this.scope.attr('_folder_change_pending', false);
-        this.scope.attr('folder_error', error);
+        this.viewModel.attr('_folder_change_pending', false);
+        this.viewModel.attr('folder_error', error);
       },
       unsetCurrent: function () {
-        this.scope.attr('_folder_change_pending', false);
-        this.scope.attr('folder_error', null);
-        this.scope.attr('current_folder', null);
+        this.viewModel.attr('_folder_change_pending', false);
+        this.viewModel.attr('folder_error', null);
+        this.viewModel.attr('current_folder', null);
       },
       setExtendedFolder: function () {
         // Try to load extended folders if main folder was not found
-        if (!this.scope.instance.get_binding('extended_folders') ||
-             this.scope.current_folder ||
-             this.scope.folder_error) {
-          return this.scope.attr('_folder_change_pending', false);
+        if (!this.viewModel.instance.get_binding('extended_folders') ||
+             this.viewModel.current_folder ||
+             this.viewModel.folder_error) {
+          return this.viewModel.attr('_folder_change_pending', false);
         }
-        this.scope.instance.get_binding('extended_folders')
+        this.viewModel.instance.get_binding('extended_folders')
           .refresh_instances()
           .done(this.setCurrent(true))
           .fail(this.setCurrentFail.bind(this));
       },
       inserted: function () {
         var foldersBinding;
-        if (this.scope.attr('hasRevisionFolder')) {
-          this.scope._setRevisionFolder();
+        if (this.viewModel.attr('hasRevisionFolder')) {
+          this.viewModel._setRevisionFolder();
         } else {
-          foldersBinding = this.scope.instance.get_binding('folders');
+          foldersBinding = this.viewModel.instance.get_binding('folders');
 
           this.element.removeAttr('tabindex');
-          this.scope.attr('_folder_change_pending', true);
+          this.viewModel.attr('_folder_change_pending', true);
 
           foldersBinding.refresh_instances()
             .then(this.setCurrent(), this.setCurrentFail.bind(this))
             .then(this.setExtendedFolder.bind(this));
         }
       },
-      '{scope.instance} change': function (inst, ev, attr) {
+      '{viewModel.instance} change': function (inst, ev, attr) {
         // Error recovery from previous refresh_instances error when we couldn't set up the binding.
-        if (!this.scope.folder_error) {
+        if (!this.viewModel.folder_error) {
           return;
         }
-        this.scope.instance.get_binding('folders')
+        this.viewModel.instance.get_binding('folders')
           .refresh_instances()
           .then(this.setCurrent(true), this.setCurrentFail.bind(this))
           .then(this.setExtendedFolder.bind(this));
       },
-      '{scope.folder_list} change': function () {
+      '{viewModel.folder_list} change': function () {
         var pjlength;
 
-        this.scope._updateCurrentFolder();
-        if (this.scope.deferred && this.scope.instance._pending_joins) {
-          pjlength = this.scope.instance._pending_joins.length;
-          can.each(this.scope.instance._pending_joins.slice(0).reverse(), function (pj, i) {
-            if (pj.through === 'folders') {
-              this.scope.instance._pending_joins.splice(pjlength - i - 1, 1);
-            }
-          }, this);
+        this.viewModel._updateCurrentFolder();
+        if (this.viewModel.deferred && this.viewModel.instance._pending_joins) {
+          pjlength = this.viewModel.instance._pending_joins.length;
+          can.each(this.viewModel.instance._pending_joins.slice(0).reverse(),
+            function (pj, i) {
+              if (pj.through === 'folders') {
+                this.viewModel.instance._pending_joins
+                  .splice(pjlength - i - 1, 1);
+              }
+            }, this);
         }
       },
 
-      '{scope.instance} object_folders': function () {
-        this.scope._updateCurrentFolder();
+      '{viewModel.instance} object_folders': function () {
+        this.viewModel._updateCurrentFolder();
       },
 
       /**
@@ -238,36 +240,41 @@
        * @param {Object} ev - The event object.
        */
       'a[data-toggle=gdrive-remover] click': function (el, ev) {
-        var scope = this.scope,
-          dfd;
+        var viewModel = this.viewModel;
+        var dfd;
 
-        if (scope.deferred) {
-          if (scope.current_folder) {
-            scope.instance.mark_for_deletion('folders', scope.current_folder);
-          } else if (scope.folder_error && !scope.instance.object_folders) {
+        if (viewModel.deferred) {
+          if (viewModel.current_folder) {
+            viewModel.instance
+              .mark_for_deletion('folders', viewModel.current_folder);
+          } else if (viewModel.folder_error &&
+            !viewModel.instance.object_folders) {
             // If object_folders are not defined for this instance the error
             // is from extended_folders, we just need to clear folder_error
             // in this case.
-            scope.attr('folder_error', null);
+            viewModel.attr('folder_error', null);
           } else {
-            can.each(scope.instance.object_folders.reify(), function (object_folder) {
-              object_folder.refresh().then(function (of) {
-                scope.instance.mark_for_deletion('object_folders', of);
+            can.each(viewModel.instance.object_folders.reify(),
+              function (objectFolder) {
+                objectFolder.refresh().then(function (of) {
+                  viewModel.instance.mark_for_deletion('object_folders', of);
+                });
               });
-            });
           }
           dfd = $.when();
         } else {
-          dfd = scope._unlinkObjFolders(scope.instance);
+          dfd = viewModel._unlinkObjFolders(viewModel.instance);
         }
 
         dfd.then(function () {
-          if (scope.instance.get_binding('extended_folders')) {
+          if (viewModel.instance.get_binding('extended_folders')) {
             $.when(
-              scope.instance.get_binding('folders').refresh_instances(),
-              scope.instance.get_binding('extended_folders').refresh_instances()
+              viewModel.instance.get_binding('folders').refresh_instances(),
+              viewModel.instance.get_binding('extended_folders')
+                .refresh_instances()
             ).then(function (local_bindings, extended_bindings) {
-              var self_folders, remote_folders;
+              var self_folders;
+              var remote_folders;
               self_folders = can.map(local_bindings, function (folder_binding) {
                 return folder_binding.instance;
               });
@@ -275,13 +282,13 @@
                 return ~can.inArray(folder_binding.instance, self_folders) ? undefined : folder_binding.instance;
               });
 
-              scope.attr('current_folder', remote_folders[0] || null);
+              viewModel.attr('current_folder', remote_folders[0] || null);
             });
           } else {
-            scope.attr('current_folder', null);
+            viewModel.attr('current_folder', null);
           }
 
-          scope.attr('folder_error', null);
+          viewModel.attr('folder_error', null);
         });
       },
 
@@ -375,7 +382,7 @@
       '.entry-attachment picked': function (el, ev, data) {
         var dfd;
         var files = data.files || [];
-        var scope = this.scope;
+        var viewModel = this.viewModel;
 
         if (el.data('type') === 'folders' &&
             files.length &&
@@ -387,49 +394,52 @@
           return;
         }
 
-        this.scope.attr('_folder_change_pending', true);
+        this.viewModel.attr('_folder_change_pending', true);
         if (!el.data('replace')) {
           dfd = $.when();
-        } else if (scope.deferred) {
-          if (scope.current_folder) {
-            scope.instance.mark_for_deletion('folders', scope.current_folder);
-          } else if (scope.folder_error && !scope.instance.object_folders) {
+        } else if (viewModel.deferred) {
+          if (viewModel.current_folder) {
+            viewModel.instance
+              .mark_for_deletion('folders', viewModel.current_folder);
+          } else if (viewModel.folder_error &&
+            viewModel.instance.object_folders) {
             // If object_folders are not defined for this instance the error
             // is from extended_folders, we just need to clear folder_error
             // in this case.
-            scope.attr('folder_error', null);
+            viewModel.attr('folder_error', null);
           } else {
-            can.each(scope.instance.object_folders.reify(), function (object_folder) {
-              object_folder.refresh().then(function (of) {
-                scope.instance.mark_for_deletion('object_folders', of);
+            can.each(viewModel.instance.object_folders.reify(),
+              function (objectFolder) {
+                objectFolder.refresh().then(function (of) {
+                  viewModel.instance.mark_for_deletion('object_folders', of);
+                });
               });
-            });
           }
           dfd = $.when();
         } else {
-          dfd = scope._unlinkObjFolders(scope.instance);
+          dfd = viewModel._unlinkObjFolders(viewModel.instance);
         }
 
         dfd
         .always(function () {
-          this.scope.attr('_folder_change_pending', false);
+          this.viewModel.attr('_folder_change_pending', false);
         }.bind(this))
         .then(function () {
-          if (scope.deferred) {
+          if (viewModel.deferred) {
             return $.when.apply($,
               can.map(files, function (file) {
-                scope.instance.mark_for_addition('folders', file);
+                viewModel.instance.mark_for_addition('folders', file);
                 return file.refresh();
               })
             );
           }
-          return attachFiles(files, el.data('type'), scope.instance);
+          return attachFiles(files, el.data('type'), viewModel.instance);
         })
         .then(function () {
-          scope.attr('folder_error', null);
-          scope.attr('current_folder', files[0]);
-          if (scope.deferred && scope.instance._transient) {
-            scope.instance.attr('_transient.folder', files[0]);
+          viewModel.attr('folder_error', null);
+          viewModel.attr('current_folder', files[0]);
+          if (viewModel.deferred && viewModel.instance._transient) {
+            viewModel.instance.attr('_transient.folder', files[0]);
           }
         })
         .fail(this.setCurrentFail.bind(this));
