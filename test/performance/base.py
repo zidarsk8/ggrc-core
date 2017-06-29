@@ -384,6 +384,7 @@ class BaseTaskSet(locust.TaskSet):
   def create_audits(self, programs=None, **kwargs):
     """Create audit entries from given programs."""
     audits = []
+    get_snapshots = kwargs.pop("get_snapshots", True)
     count = kwargs.get("count", 1)
     kwargs["count"] = 1
     for program in programs:
@@ -392,7 +393,9 @@ class BaseTaskSet(locust.TaskSet):
         people = generator.random_objects("Person", 2, self.objects)
         self.create_user_role("Auditor", people, audit[0]["context"])
         audits.append(audit)
-    self.get_objects("Snapshot")
+
+    if get_snapshots:
+      self.get_objects("Snapshot")
     return audits
 
   def create_at(self, audits, at_models=None, count=1, **kwargs):
