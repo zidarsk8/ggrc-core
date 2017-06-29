@@ -185,10 +185,13 @@ class BaseTaskSet(locust.TaskSet):
     else:
       obj = self.people.get(person["id"], self._get_object(person))
       person = {"name": obj["name"], "email": obj["email"]}
+
     if self.GAE:
       params = {"action": "Login"}
       params.update(person)
-      self.client.get("/_ah/login", params=params)
+      self.client.get("/logout")
+      self.client.get("/_ah/login", params=params, name="/_ah/login")
+      self.client.get("/dashboard")
     else:
       headers = {"X-ggrc-user": json.dumps(person)}
       self.client.get("/logout")
