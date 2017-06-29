@@ -867,11 +867,11 @@ class AssessmentsDropdown3bbsTreeView(CommonDropdown3bbsTreeView):
 class TreeView(object):
   """Locators for Tree View components."""
   # common
-  _WIDGET_NOT_HIDDEN_CSS = ".widget:not(.hidden)"
+  _WIDGET_NOT_HIDDEN_CSS = " .widget:not(.hidden) "
   ITEMS = _WIDGET_NOT_HIDDEN_CSS + " .tree-item-element"
   HEADER = Common.TREE_HEADER
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
-  ITEM_EXPAND_BUTTON = "tree-item-actions"
+  ITEM_EXPAND_BUTTON = " tree-item-actions"
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
   NO_RESULTS_MESSAGE = (
       By.CSS_SELECTOR, _WIDGET_NOT_HIDDEN_CSS + " .tree-no-results-message")
