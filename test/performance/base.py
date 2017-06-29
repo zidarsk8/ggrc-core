@@ -425,6 +425,7 @@ class BaseTaskSet(locust.TaskSet):
     """Login as a random user of a given role."""
     person = generator.random_object(role, self.user_roles)
     self._log_in(person=person)
+    return person
 
   def create_object(self, model, count=1, batch_size=1, **kwargs):
     """Create a generic object entry."""
