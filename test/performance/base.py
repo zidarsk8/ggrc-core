@@ -170,11 +170,12 @@ class BaseTaskSet(locust.TaskSet):
 
   def _get_object(self, slug):
     """Retrieve full object from slug."""
+    obj = None
     if slug["type"] == "Relationship":
       obj = self.relationships[slug["id"]]
     if not obj:
       response = self.get_from_slug(slug)
-      obj = response.json()[models.TABLES_SINGULAR[slug["type"]]]
+      obj = response.json().values()[0]
     return obj
 
   def _log_in(self, person=None):
@@ -182,7 +183,7 @@ class BaseTaskSet(locust.TaskSet):
     if not person:
       person = {"name": "Example User", "email": "user@example.com"}
     else:
-      obj = self.people[person["id"]]
+      obj = self.people.get(person["id"], self._get_object(person))
       person = {"name": obj["name"], "email": obj["email"]}
     if self.GAE:
       params = {"action": "Login"}
