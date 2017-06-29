@@ -137,7 +137,6 @@ dashboard-js-files:
   - controllers/tree/tree-view.js
   - controllers/tree/tree-view-node.js
   - controllers/tree/list_view_controller.js
-  - controllers/tree/tree_filter_controller.js
   - controllers/unmap_modal_controller.js
   - controllers/info_pin_controller.js
   - controllers/automapper_controller.js
@@ -418,8 +417,6 @@ dashboard-js-template-files:
   - base_objects/tree_placeholder.mustache
   - base_objects/tree_footer_no_access.mustache
   - base_objects/tree_footer_zero.mustache
-  - base_objects/tree_header.mustache
-  - base_objects/tree_view_filter.mustache
   - base_objects/tree_column_selector.mustache
   - base_objects/tree_column_selector_3bbs.mustache
   - base_objects/tree_column_selector_body.mustache
@@ -628,7 +625,6 @@ dashboard-js-template-files:
   - people/popover.mustache
   - people/tree-item-attr.mustache
   - people/tree_add_item.mustache
-  - people/tree_header.mustache
   - people/search_result.mustache
   - people/mapper-item-description.mustache
   - policies/info.mustache

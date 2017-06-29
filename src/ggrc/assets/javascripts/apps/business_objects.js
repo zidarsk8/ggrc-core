@@ -729,7 +729,6 @@
             mapping: 'extended_related_assessment_via_search',
             draw_children: true,
             add_item_view: null,
-            header_view: path + '/base_objects/tree_header.mustache',
             footer_view: path + '/base_objects/tree_footer.mustache'
           },
           Risk: {
