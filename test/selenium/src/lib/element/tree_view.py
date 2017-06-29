@@ -8,6 +8,8 @@ from selenium.webdriver.common.by import By
 from lib import base
 from lib.constants import locator, url
 from lib.page.modal import unified_mapper
+from lib.page import export_page
+from lib.utils import selenium_utils
 
 
 class CommonDropdownSettings(base.DropdownMenu):
@@ -26,8 +28,19 @@ class CommonDropdownSettings(base.DropdownMenu):
         self._locators.BUTTON_3BBS_SELECT_CHILD_TREE.format(self.widget_name))
     self.import_locator = (
         self._locators.BUTTON_3BBS_IMPORT.format(self.widget_name))
-    self.export_locator = (
+
+  def select_export(self):
+    """Select Export objects in 3BBS dropdown modal to open Export Page with
+    Export Panel witch contains pre-filled object type (mapped objects type)
+    and filter by mapping (source object title).
+    Return: lib.page.export_page.ExportPage
+    """
+    _locator_export = (
+        By.CSS_SELECTOR,
         self._locators.BUTTON_3BBS_EXPORT.format(self.widget_name))
+    base.Button(self._driver, _locator_export).click()
+    selenium_utils.switch_to_new_window(self._driver)
+    return export_page.ExportPage(self._driver)
 
 
 class Assessments(CommonDropdownSettings):

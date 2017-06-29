@@ -10,12 +10,12 @@ import pytest
 
 from lib import base
 from lib.factory import get_ui_service
-from lib.constants import messages
+from lib.constants import messages, objects
 from lib.constants.element import Lhn, MappingStatusAttrs
 from lib.page import dashboard
 from lib.service import webui_service
-from lib.utils.filter_utils import FilterUtils
 from lib.utils import selenium_utils, string_utils
+from lib.utils.filter_utils import FilterUtils
 
 
 class TestSnapshots(base.Test):
@@ -495,3 +495,29 @@ class TestSnapshots(base.Test):
     assert len([expected_control]) == actual_controls_count
     assert [expected_control] == actual_controls, (
         messages.ERR_MSG_FORMAT.format(expected_control, actual_controls))
+
+  @pytest.mark.smoke_tests
+  def test_export_of_snapshoted_control_from_audit_via_tree_view(
+      self, create_tmp_dir, create_audit_with_control_and_update_control,
+      selenium
+  ):
+    """Check if snapshoted Control can be exported from Audit via Tree View.
+    Preconditions:
+    - Execution and return of fixture
+      'create_audit_and_update_first_of_two_original_controls'.
+    Test parameters: None
+    """
+    audit_with_one_control = create_audit_with_control_and_update_control
+    audit = audit_with_one_control["new_audit_rest"][0]
+    # due to 'actual_control.custom_attributes = {None: None}'
+    expected_control = (audit_with_one_control["new_control_rest"][0].
+                        repr_ui().update_attrs(custom_attributes={None: None}))
+    export_service = webui_service.BaseWebUiService(
+        selenium, objects.get_plural(expected_control.type))
+    export_service.export_objs_via_tree_view(src_obj=audit)
+    actual_controls = export_service.get_list_objs_from_csv(
+        path_to_export_dir=create_tmp_dir)
+    actual_controls = [
+        actual_control.repr_ui() for actual_control in actual_controls]
+    assert [expected_control] == actual_controls, (
+        messages.ERR_MSG_FORMAT.format([expected_control], actual_controls))

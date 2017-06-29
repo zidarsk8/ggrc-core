@@ -49,7 +49,6 @@ def _new_objs_rest(obj_name, obj_count, has_cas=False, factory_params=None):
     and list extra attributes.
     Return: [lib.entities.entity.*Entity, ...]
     """
-    # pylint: disable=no-else-return
     if extra_attrs[0].type == objects.get_singular(objects.CUSTOM_ATTRIBUTES):
       if name == objects.ASSESSMENT_TEMPLATES:
         return factory.get_cls_rest_service(object_name=name)().create_objs(
@@ -103,7 +102,6 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
   'map_new_program_rest_to_new_controls_rest', 'new_audit_rest',
   'new_cas_for_controls').
   """
-  # pylint: disable=superfluous-parens
   global dict_executed_fixtures
   _list_cas_types = element.AdminWidgetCustomAttributes.ALL_CA_TYPES
 

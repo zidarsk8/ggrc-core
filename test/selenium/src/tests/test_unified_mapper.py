@@ -25,6 +25,7 @@ class TestProgramPage(base.Test):
     - Program, Controls created via REST API.
     """
     # pylint: disable=no-self-use
+    # due to 'actual_control.custom_attributes = {None: None}'
     expected_controls = [
         expected_control.repr_ui().update_attrs(custom_attributes={None: None})
         for expected_control in new_controls_rest]

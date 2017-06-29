@@ -91,9 +91,11 @@ class EntitiesFactory(object):
       obj_attr_value = (obj.assignees.get(obj_attr_name.title()) if (
           obj_attr_name in ["assessor", "creator", "verifier"] and
           "assignees" in obj.__dict__.keys()) else getattr(obj, obj_attr_name))
-      # u'2017-06-07T16:50:16' to u'06/07/2017'
+      # u'2017-06-07T16:50:16' and u'2017-06-07 16:50:16' to u'06/07/2017'
       if obj_attr_name == "updated_at" and isinstance(obj_attr_value, unicode):
-        obj_attr_value_as_list = str(obj_attr_value.split("T")[0]).split('-')
+        delimeter = "T" if "T" in obj_attr_value else " "
+        obj_attr_value_as_list = (
+            str(obj_attr_value.split(delimeter)[0]).split('-'))
         obj_attr_value = unicode(
             "/".join(obj_attr_value_as_list[1:] + [obj_attr_value_as_list[0]]))
       if isinstance(obj_attr_value, dict) and obj_attr_value:

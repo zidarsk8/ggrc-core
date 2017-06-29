@@ -40,6 +40,8 @@ class Common(object):
   XPATH_NOT_HIDDEN = "[not(ancestor::section[contains(@class, 'hidden')])]"
   INFO_WIDGET_XPATH = ("//section[starts-with(@class,'info')]" +
                        XPATH_NOT_HIDDEN)
+  # import / export pages
+  CONTENT = ".content"
 
 
 class Login(object):
@@ -175,6 +177,22 @@ class LhnMenu(object):
       By.CSS_SELECTOR, '[data-for="Workflow"]>[data-value="Draft"]')
   BUTTON_WORKFLOWS_INACTIVE = (
       By.CSS_SELECTOR, '[data-for="Workflow"]>[data-value="Inactive"]')
+
+
+class ExportPage(object):
+  """Locators for Export Page and Export Panels."""
+  _CONTENT = Common.CONTENT
+  _EXPORT_PAGE = _CONTENT + " #csv_export"
+  _EXPORT_PANEL = ".new-relevant-block"
+  # general
+  EXPORT_PAGE = (By.CSS_SELECTOR, _EXPORT_PAGE)
+  EXPORT_PANEL = (By.CSS_SELECTOR, _EXPORT_PANEL)
+  # labels
+  TITLE = (By.CSS_SELECTOR, ".title")
+  # user input elements
+  BUTTON_ADD_OBJECT_TYPE = (By.CSS_SELECTOR, "#addAnotherObjectType")
+  BUTTON_EXPORT_OBJECTS = (By.CSS_SELECTOR, "#export-csv-button")
+  SPINNER_EXPORT_OBJECTS = (By.CSS_SELECTOR, ".spinner")
 
 
 class ExtendedInfo(object):
