@@ -20,6 +20,21 @@
       showTitles: {
         type: Boolean,
         value: true
+      },
+      model: {
+        get: function () {
+          return this.attr('instance').class;
+        }
+      },
+      instance: {
+        get: function () {
+          return GGRC.page_instance();
+        }
+      },
+      current_user: {
+        get: function () {
+          return GGRC.current_user;
+        }
       }
     },
     showHideTitles: function (element) {
