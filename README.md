@@ -208,7 +208,7 @@ docker exec -it ggrccore_selenium_1 bash
 python /selenium/src/run_selenium.py
 ```
 
-You should also feel free to check how the `./bin/jenkins/run_selenium` the script works.
+You should also feel free to check how the `./bin/jenkins/run_selenium` script works.
 
 _NOTE: that the "ggrccore" part of the name is due to the repository parent folder name. if you have your repo in a different folder, change the first part accordingly._
 
@@ -273,7 +273,7 @@ vagrant provision
 ##### Provisioning a halted Vagrant VM
 
 If you have halted your Vagrant VM via `vagrant halt`, simply `vagrant up`
-in the project, directory to have provisioning run and update your development
+in the project directory to have provisioning run and update your development
 environment.
 
 ##### Clean Slate Provisioning
