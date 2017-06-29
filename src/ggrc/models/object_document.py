@@ -25,9 +25,9 @@ class Documentable(object):
                                       ['link']),
   ]
 
-  @classmethod
-  def documents(cls, document_type):
-    """Return documents releated for that instance and sent docuemtn type."""
+  @declared_attr
+  def documents(cls):
+    """Return documents releated for that instance."""
     document_id = case(
         [
             (
@@ -66,28 +66,32 @@ class Documentable(object):
         # after that we can compare values.
         # this is required for saving logic consistancy
         # case return 2 types of values BOOL(false) and INT(id) not Null
-        secondaryjoin=lambda: and_(document_id,
-                                   Document.id == document_id,
-                                   Document.document_type == document_type),
+        secondaryjoin=lambda: and_(document_id, Document.id == document_id),
         viewonly=True,
     )
 
-  @declared_attr
-  def document_url(cls):  # pylint: disable=no-self-argument
-    return cls.documents(Document.URL)
+  @property
+  def document_url(self):  # pylint: disable=no-self-argument
+    return [d for d in self.documents
+            if Document.URL == d.document_type]
 
-  @declared_attr
-  def document_evidence(cls):  # pylint: disable=no-self-argument
-    return cls.documents(Document.ATTACHMENT)
+  @property
+  def document_evidence(self):  # pylint: disable=no-self-argument
+    return [d for d in self.documents
+            if Document.ATTACHMENT == d.document_type]
 
   @classmethod
   def eager_query(cls):
     """Eager query classmethod."""
-    query = super(Documentable, cls).eager_query()
-    document_fields = ["id", "title", "link", "description", "document_type"]
-    return cls.eager_inclusions(query, Documentable._include_links).options(
-        orm.subqueryload('document_url').load_only(*document_fields),
-        orm.subqueryload('document_evidence').load_only(*document_fields),
+    return cls.eager_inclusions(
+        super(Documentable, cls).eager_query(),
+        Documentable._include_links,
+    ).options(
+        orm.subqueryload(
+            'documents',
+        ).undefer_group(
+            "Document_complete",
+        ),
     )
 
   @staticmethod
@@ -108,10 +112,7 @@ class Documentable(object):
   @classmethod
   def indexed_query(cls):
     return super(Documentable, cls).indexed_query().options(
-        orm.subqueryload("document_url").undefer_group("Document_complete"),
-        orm.subqueryload("document_evidence").undefer_group(
-            "Document_complete"
-        ),
+        orm.subqueryload("documents").undefer_group("Document_complete"),
     )
 
 
