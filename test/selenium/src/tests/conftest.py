@@ -8,6 +8,8 @@
 import pytest
 
 from lib import dynamic_fixtures
+from lib.utils import selenium_utils
+from lib.page import dashboard
 
 
 # pylint: disable=redefined-outer-name
@@ -41,6 +43,22 @@ def dynamic_new_assessment_template(request):
   Return: lib.entities.entity.AssessmentTemplateEntity
   """
   yield _common_fixtures(request.param)[0] if request.param else None
+
+
+@pytest.fixture(scope="function")
+def my_work_dashboard(selenium):
+  """Open My Work Dashboard URL and
+  return My Work Dashboard page objects model."""
+  selenium_utils.open_url(selenium, dashboard.Dashboard.URL)
+  return dashboard.Dashboard(selenium)
+
+
+@pytest.fixture(scope="function")
+def header_dashboard(selenium):
+  """Open My Work Dashboard URL and
+  return Header Dashboard page objects model."""
+  selenium_utils.open_url(selenium, dashboard.Dashboard.URL)
+  return dashboard.Header(selenium)
 
 
 @pytest.fixture(scope="function")
@@ -192,5 +210,5 @@ def create_audit_with_control_and_delete_control(request):
 
 @pytest.fixture(scope="function")
 def dynamic_object(request):
-  """Create object by passed indirect parameter in test"""
+  """Create object by passed indirect parameter in test."""
   yield _common_fixtures(request.param)

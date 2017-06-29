@@ -36,13 +36,26 @@ class BaseWebUiService(object):
     list_factory_objs = [
         entity_factory.create_empty() for _ in xrange(len(list_scopes))]
     list_scopes_remapped = string_utils.remap_keys_for_list_dicts(
-        dict_transformation_keys=self.ui_elements_to_obj_attrs(),
+        dict_of_transform_keys=self.ui_elements_to_obj_attrs(),
         list_dicts=list_scopes)
+    # add extra 'owners' attribute name and value if 'creator' in scopes
+    list_extra_scopes = [
+        dict(scope_remapped.items() +
+             [("owners", scope_remapped.get("creator"))]) if
+        "creator" in scope_remapped.keys() else scope_remapped for
+        scope_remapped in list_scopes_remapped]
+    # convert and represent values in scopes
+    for scope in list_extra_scopes:
+      for key, val in scope.iteritems():
+        # convert u'false' and u'true' to boolean
+        scope[key] = string_utils.get_bool_from_string(val)
+        # convert multiple values to list of strings
+        if key in ["owners", "assessor", "creator"]:
+          scope[key] = string_utils.convert_to_list(val)
     return [
-        EntitiesFactory.update_obj_attrs_values(
-            obj=factory_obj, **scope_remapped) for
-        scope_remapped, factory_obj in zip(list_scopes_remapped,
-                                           list_factory_objs)]
+        EntitiesFactory.update_objs_attrs_values_by_entered_data(
+            objs=factory_obj, is_allow_none_values=False, **scope) for
+        scope, factory_obj in zip(list_extra_scopes, list_factory_objs)]
 
   @staticmethod
   def ui_elements_to_obj_attrs():
@@ -55,11 +68,13 @@ class BaseWebUiService(object):
         fields.CODE.upper(): "slug", fields.VERIFIED.upper(): "verified",
         fields.STATE.upper(): "status", fields.STATUS.upper(): "status",
         fields.LAST_UPDATED.upper(): "updated_at",
-        fields.AUDIT_LEAD.upper(): "contact",
-        fields.ADMIN.upper(): "owners", fields.CREATORS.upper(): "owners",
-        fields.CAS_HEADERS.upper(): "custom_attribute_definitions",
-        fields.CAS_VALUES.upper(): "custom_attribute_values",
-        fields.MAPPED_OBJECTS.upper(): "objects_under_assessment"
+        fields.AUDIT_LEAD.upper(): "contact", fields.ADMIN.upper(): "owners",
+        fields.CAS.upper(): "custom_attributes",
+        fields.MAPPED_OBJECTS.upper(): "objects_under_assessment",
+        fields.REVIEW_STATE.upper(): "os_state",
+        fields.ASSIGNEES.upper(): "assessor",
+        fields.CREATORS.upper(): "creator",
+        fields.VERIFIERS.upper(): "verifier"
     }
 
   def open_widget_of_mapped_objs(self, src_obj):
@@ -78,17 +93,6 @@ class BaseWebUiService(object):
         obj_url=obj.url)
     selenium_utils.open_url(self.driver, info_page_url)
     return self.info_widget_cls(self.driver)
-
-  def open_info_panel_of_obj_by_id(self, src_obj, obj):
-    """Navigate to info panel URL of object according to URL of source object
-    and URL of mapped object used id of object,
-    return info widget class of object.
-    """
-    info_panel_url = (
-        self.url_mapped_objs.format(src_obj_url=src_obj.url) + "/" + obj.id)
-    selenium_utils.open_url(self.driver, info_panel_url)
-    obj_info_panel = self.info_widget_cls(self.driver)
-    return obj_info_panel
 
   def open_info_panel_of_obj_by_title(self, src_obj, obj):
     """Navigate to info panel URL of object according to URL of source object
@@ -122,13 +126,16 @@ class BaseWebUiService(object):
     return self.create_list_objs(
         entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
 
-  def get_obj_from_info_panel(self, src_obj, obj, navigate_by_title=True):
-    """Get and return object from Info panel navigate by object title
-    as default or by object id if navigate_by_title is False.
+  def get_list_objs_from_info_panels(self, src_obj, objs):
+    """Get and return list of objects from Info panels navigate by objects'
+    titles ('objs' can be list of objects or one object).
     """
-    scope = self.get_scope_from_info_panel(src_obj, obj, navigate_by_title)
-    return self.create_list_objs(
-        entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
+    def get_obj_from_info_panel(src_obj, obj):
+      scope = self.get_scope_from_info_panel(src_obj, obj)
+      return self.create_list_objs(
+          entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
+    return ([get_obj_from_info_panel(src_obj, obj) for obj in objs] if
+            isinstance(objs, list) else get_obj_from_info_panel(src_obj, objs))
 
   def create_obj_via_tree_view(self, src_obj, obj):
     """Open generic widget of mapped objects, open creation modal from
@@ -210,15 +217,12 @@ class BaseWebUiService(object):
     obj_info_page = self.open_info_page_of_obj(obj)
     return obj_info_page.get_info_widget_obj_scope()
 
-  def get_scope_from_info_panel(self, src_obj, obj, navigate_by_title=True):
-    """Open Info panel of obj navigate by object title as default or by
-    object id if navigate_by_title is False, maximize it and get object scope
-    as dict with titles (keys) and entered_titles (values) that displayed on
-    Info panel.
+  def get_scope_from_info_panel(self, src_obj, obj):
+    """Open Info panel of obj navigate by object title, maximize it and get
+    object scope as dict with titles (keys) and entered_titles (values) that
+    displayed on Info panel.
     """
-    obj_info_panel = (
-        self.open_info_panel_of_obj_by_title(src_obj, obj) if navigate_by_title
-        else self.open_info_panel_of_obj_by_id(src_obj, obj))
+    obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
     return obj_info_panel.get_info_widget_obj_scope()
 
   def is_obj_editable_via_info_panel(self, src_obj, obj):
@@ -234,6 +238,7 @@ class BaseWebUiService(object):
     """""Open generic widget of mapped objects, select object from Tree View
     by title open dropdown on Info Panel and check that object is unmappable.
     """
+    # pylint: disable=invalid-name
     dropdown_on_info_panel = (
         self.open_info_panel_of_obj_by_title(src_obj, obj).open_info_3bbs())
     element_to_verify = element.DropdownMenuItemTypes.UNMAP

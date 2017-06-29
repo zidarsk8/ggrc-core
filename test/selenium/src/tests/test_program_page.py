@@ -6,11 +6,10 @@
 # pylint: disable=too-few-public-methods
 # pylint: disable=unused-argument
 
-import pytest    # pylint: disable=import-error
+import pytest  # pylint: disable=import-error
 
 from lib import base
 from lib.constants import element, locator, url
-from lib.page import dashboard, widget_bar
 from lib.page.widget import info_widget
 from lib.utils import test_utils, selenium_utils
 
@@ -19,11 +18,11 @@ class TestProgramPage(base.Test):
   """A part of smoke tests, section 4."""
 
   @pytest.mark.smoke_tests
-  def test_object_count_updates(self, selenium, new_program_ui):
+  def test_object_count_updates(self, new_program_ui, header_dashboard):
     """Checks if count updates in LHN after creating new program
     object."""
     _, program_info_page = new_program_ui
-    lhn_menu = dashboard.Header(selenium).open_lhn_menu().select_my_objects()
+    lhn_menu = header_dashboard.open_lhn_menu().select_my_objects()
     assert (lhn_menu.toggle_programs.members_count >=
             int(program_info_page.source_obj_id_from_url))
 
@@ -40,7 +39,8 @@ class TestProgramPage(base.Test):
             program_info_page.url)
 
   @pytest.mark.smoke_tests
-  def test_info_tab_is_active_by_default(self, selenium, new_program_ui):
+  def test_info_tab_is_active_by_default(self, new_program_ui,
+                                         my_work_dashboard):
     """Tests if after lhn_modal is saved we're redirected and info
     tab is activated.
     Because app uses url arguments to remember state of page
@@ -49,8 +49,7 @@ class TestProgramPage(base.Test):
     """
     _, program_info_page = new_program_ui
     program_info_page.navigate_to()
-    horizontal_bar = widget_bar.Dashboard(selenium)
-    assert (horizontal_bar.get_active_widget_name() ==
+    assert (my_work_dashboard.get_active_widget_name() ==
             element.ProgramInfoWidget().WIDGET_HEADER)
 
   @pytest.mark.smoke_tests

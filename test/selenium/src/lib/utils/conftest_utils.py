@@ -2,31 +2,20 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """PyTest fixture utils."""
 
-from selenium.common import exceptions
-
 from lib import cache, constants, factory
 from lib.page import dashboard
-
-
-def navigate_to_page_with_lhn(driver):
-  """Navigate to Dashboard it LHN button isn't found."""
-  # pylint: disable=invalid-name
-  try:
-    driver.find_element(*dashboard.Header.locators.TOGGLE_LHN)
-  except exceptions.NoSuchElementException:
-    driver.get(dashboard.Dashboard.URL)
+from lib.utils import selenium_utils
 
 
 def get_lhn_accordion(driver, object_name):
-  """Select relevant section in LHN and return relevant section accordion.
- """
-  navigate_to_page_with_lhn(driver)
-  lhn_contents = dashboard.Header(driver).open_lhn_menu()
+  """Select relevant section in LHN and return relevant section accordion."""
+  selenium_utils.open_url(driver, dashboard.Dashboard.URL)
+  lhn_menu = dashboard.Header(driver).open_lhn_menu()
   # if object button not visible, open this section first
   if object_name in cache.LHN_SECTION_MEMBERS:
     method_name = factory.get_method_lhn_select(object_name)
-    lhn_contents = getattr(lhn_contents, method_name)()
-  return getattr(lhn_contents, constants.method.SELECT_PREFIX + object_name)()
+    lhn_menu = getattr(lhn_menu, method_name)()
+  return getattr(lhn_menu, constants.method.SELECT_PREFIX + object_name)()
 
 
 def create_obj_via_lhn(driver, object_name):

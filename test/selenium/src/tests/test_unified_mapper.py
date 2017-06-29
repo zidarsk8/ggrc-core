@@ -25,7 +25,9 @@ class TestProgramPage(base.Test):
     - Program, Controls created via REST API.
     """
     # pylint: disable=no-self-use
-    expected_controls = new_controls_rest
+    expected_controls = [
+        expected_control.repr_ui().update_attrs(custom_attributes={None: None})
+        for expected_control in new_controls_rest]
     (webui_service.ControlsService(selenium).map_objs_via_tree_view(
         src_obj=new_program_rest, dest_objs=expected_controls))
     actual_controls_tab_count = (
