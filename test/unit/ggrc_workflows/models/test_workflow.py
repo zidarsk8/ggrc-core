@@ -4,6 +4,7 @@
 """Unit Tests for Workflow model and WorkflowState mixin
 """
 
+import ddt
 from datetime import date
 import unittest
 
@@ -14,61 +15,32 @@ from ggrc_workflows.models import cycle
 from ggrc_workflows.models import workflow
 
 
+@ddt.ddt
 class TestWorkflowState(unittest.TestCase):
 
-  def test_get_state(self):
-
-    scenario_list = [
-        {
-            "task_states": ["Assigned", "Assigned", "Assigned"],
-            "result": "Assigned"
-        },
-        {
-            "task_states": ["InProgress", "Assigned", "Assigned"],
-            "result": "InProgress"
-        },
-        {
-            "task_states": ["Finished", "Assigned", "Assigned"],
-            "result": "InProgress"
-        },
-        {
-            "task_states": ["Verified", "Assigned", "Assigned"],
-            "result": "InProgress"
-        },
-        {
-            "task_states": ["InProgress", "InProgress", "InProgress"],
-            "result": "InProgress"
-        },
-        {
-            "task_states": ["Finished", "InProgress", "Assigned"],
-            "result": "InProgress"
-        },
-        {
-            "task_states": ["Finished", "Declined", "Assigned"],
-            "result": "InProgress"
-        },
-        {
-            "task_states": ["Finished", "Finished", "Finished"],
-            "result": "Finished"
-        },
-        {
-            "task_states": ["Verified", "Finished", "Finished"],
-            "result": "Finished"
-        },
-        {
-            "task_states": ["Verified", "Verified", "Verified"],
-            "result": "Verified"
-        },
-    ]
-
-    for scenario in scenario_list:
-      tasks_on_object = []
-      for task_status in scenario["task_states"]:
-        tasks_on_object.append(
-            cycle_task.CycleTaskGroupObjectTask(status=task_status),
-        )
-      self.assertEqual(scenario["result"], workflow
-                       .WorkflowState._get_state(tasks_on_object))
+  @ddt.data(
+      (["Assigned", "Assigned", "Assigned"], "Assigned"),
+      ([None, None, None], "Assigned"),
+      (["InProgress", "Assigned", "Assigned"], "InProgress"),
+      (["Finished", "Assigned", "Assigned"], "InProgress"),
+      (["Verified", "Assigned", "Assigned"], "InProgress"),
+      (["InProgress", "InProgress", "InProgress"], "InProgress"),
+      (["Finished", "InProgress", "Assigned"], "InProgress"),
+      (["Finished", "Declined", "Assigned"], "InProgress"),
+      (["Finished", "Finished", "Finished"], "Finished"),
+      (["Verified", "Finished", "Finished"], "Finished"),
+      (["Verified", "Verified", "Verified"], "Verified"),
+      (["Declined", "Declined", "Declined"], "InProgress"),
+      ([], None),
+  )
+  @ddt.unpack
+  def test_get_state(self, task_states, result):
+    self.assertEqual(
+        result,
+        workflow.WorkflowState._get_state([
+            cycle_task.CycleTaskGroupObjectTask(status=s) for s in task_states
+        ])
+    )
 
   def test_get_object_state(self):
 
@@ -83,5 +55,6 @@ class TestWorkflowState(unittest.TestCase):
         ),
     ]
     with freeze_time("2015-02-01 13:39:20"):
-      self.assertEqual("Overdue", workflow
-                       .WorkflowState.get_object_state(tasks_on_object))
+      self.assertEqual(
+          "Overdue", workflow.WorkflowState.get_object_state(tasks_on_object)
+      )
