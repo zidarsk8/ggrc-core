@@ -144,6 +144,16 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
         orm.subqueryload('object_people'),
     )
 
+  @classmethod
+  def indexed_query(cls):
+    from sqlalchemy import orm
+
+    return super(Person, cls).indexed_query().options(
+        orm.Load(cls).undefer_group(
+            "Person_complete",
+        ),
+    )
+
   def _display_name(self):
     return self.email
 
