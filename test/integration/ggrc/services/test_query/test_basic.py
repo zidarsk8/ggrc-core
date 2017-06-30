@@ -605,6 +605,27 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
     controls_ordered_2 = sorted(controls_unordered, key=sort_key)
     self.assertListEqual(controls_ordered_1, controls_ordered_2)
 
+  def test_query_wf_by_frequency(self):
+    """Test correct filtering of Workflows by frequency
+
+    The case this test was created for is: frequency = "one time"
+    Because it consists of two words, and we need to test the new
+    "value mapping"s for such cases
+    Also another regular test case added.
+    """
+    workflows = self._get_first_result_set(
+        self._make_query_dict("Workflow",
+                              expression=["frequency", "=", "one time"]),
+        "Workflow",
+    )
+    self.assertEqual(workflows["count"], 1)
+    workflows = self._get_first_result_set(
+        self._make_query_dict("Workflow",
+                              expression=["frequency", "=", "monthly"]),
+        "Workflow",
+    )
+    self.assertEqual(workflows["count"], 6)
+
   def test_filter_control_by_key_control(self):
     """Test correct filtering by SIGNIFICANCE field"""
     controls = self._get_first_result_set(
