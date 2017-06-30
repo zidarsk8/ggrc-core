@@ -20,7 +20,7 @@
     template: '<content />',
     viewModel: viewModel,
     events: {
-      '{viewModel} source': function () {
+      '{viewModel.source} change': function () {
         this.viewModel.refreshPeople();
       }
     }
