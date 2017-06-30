@@ -13,7 +13,6 @@
     create: 'POST /api/issues',
     mixins: [
       'ownable',
-      'contactable',
       'ca_update',
       'timeboxed',
       'mapping-limit',

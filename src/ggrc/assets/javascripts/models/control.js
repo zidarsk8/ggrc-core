@@ -14,8 +14,7 @@
     create: 'POST /api/controls',
     update: 'PUT /api/controls/{id}',
     destroy: 'DELETE /api/controls/{id}',
-    mixins: ['ownable', 'contactable', 'unique_title', 'ca_update',
-             'timeboxed'],
+    mixins: ['ownable', 'unique_title', 'ca_update', 'timeboxed'],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
