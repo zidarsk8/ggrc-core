@@ -215,9 +215,9 @@ class CommonAssessment(Common):
   """Common elements' labels and properties for Assessments objects."""
   ASMT = objects.get_normal_form(objects.get_singular(objects.ASSESSMENTS))
   STATE = Base.STATE
-  CREATORS_ = "Creator(s) *"
+  CREATORS_ = "Creator(s)"
   CREATORS = TransformationSetVisibleFields.CREATORS
-  ASSIGNEES_ = "Assignee(s) *"
+  ASSIGNEES_ = "Assignee(s)"
   ASSIGNEES = TransformationSetVisibleFields.ASSIGNEES
   VERIFIERS_ = "Verifier(s)"
   VERIFIERS = TransformationSetVisibleFields.ASSIGNEES

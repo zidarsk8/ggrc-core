@@ -104,6 +104,7 @@ class Widget(base.Widget):
     # pylint: disable=not-callable
     selenium_utils.wait_for_js_to_load(self._driver)
     self._set_members_listed()
+    # need "try-except" block due to issue GGRC-1675
     try:
       member = self.members_listed[num]
       # wait for the listed items animation to stop
@@ -113,7 +114,6 @@ class Widget(base.Widget):
       info_panel = selenium_utils.get_when_clickable(
           self._driver, locator.ObjectWidget.INFO_PANE)
       selenium_utils.wait_until_stops_moving(info_panel)
-      return self.info_widget_cls(self._driver)
     except exceptions.StaleElementReferenceException:
       self.members_listed = self._driver.find_elements(
           *locator.ObjectWidget.MEMBERS_TITLE_LIST)
@@ -121,6 +121,7 @@ class Widget(base.Widget):
     except exceptions.TimeoutException:
       # sometimes the click to the listed member results in hover
       return self.select_member_by_num(num)
+    return self.info_widget_cls(self._driver)
 
 
 class TreeView(base.TreeView):
