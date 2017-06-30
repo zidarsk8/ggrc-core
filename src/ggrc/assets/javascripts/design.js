@@ -233,7 +233,7 @@ $('body').on('click', '.fa fa-caret-right', function(e) {
       //We gave relationships
       //Pending approval, start-stop
       var $item2add = '<div class="btn-group inline"> <a class="span7 btn btn-red btn-mini dropdown-toggle nominheight fltrt" data-toggle="dropdown"> Select Relationship <span class="caret"></span> </a> <ul class="dropdown-menu"> <li> <a href="#" id="makeAccountable"> is Accountable for </a> </li> <li> <a href="#" id="makeResponsible"> is Responsible for </a> </li> </ul> </div>';
-      var $additionalinfo = '<div class="row-fluid additional"> <div class="span4"></div> <div class="span4"> <label>Start Date (Optional)</label> <input class="span12 date" id="datepicker-stopdate-rd" placeholder="MM/DD/YYYY" type="text"> </div> <div class="span4"> <label>Stop Date (Optional)</label> <input class="span12 date" id="datepicker-stopdate-rd" placeholder="MM/DD/YYYY" type="text"> </div>';
+      var $additionalinfo = '<div class="row-fluid additional"> <div class="span4"></div> <div class="span4"> <label>Start Date (Optional)</label> <input class="span12 date" id="datepicker-stopdate-rd" placeholder="MM/DD/YYYY" type="text"> </div> <div class="span4"> <label>Last Deprecated Date (Optional)</label> <input class="span12 date" id="datepicker-stopdate-rd" placeholder="MM/DD/YYYY" type="text"> </div>';
     } else if ($this.closest(".modal-body").find("#currentList").hasClass('reference-list')) {
       //Will have assignment items, nothing now.
       //Pending approval, no start-stop
