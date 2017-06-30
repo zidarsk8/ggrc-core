@@ -99,12 +99,6 @@ class TestIssueMapping(TestCase):
         archived=archived
     )
 
-    # Fix Audit context as AuditFactory's lazy context
-    # does not define related_object
-    audit.context = factories.ContextFactory(
-        related_object=audit
-    )
-
     # Add auditor & program editor roles
     rbac_factories.UserRoleFactory(
         context=audit.context,

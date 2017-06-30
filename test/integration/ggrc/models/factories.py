@@ -46,7 +46,7 @@ def single_commit():
     db.session.single_commit = True
 
 
-class ModelFactory(factory.Factory):
+class ModelFactory(factory.Factory, object):
 
   @classmethod
   def _create(cls, target_class, *args, **kwargs):
@@ -201,6 +201,15 @@ class AuditFactory(TitledFactory):
   contact = factory.LazyAttribute(lambda _: PersonFactory())
   program = factory.LazyAttribute(lambda _: ProgramFactory())
   context = factory.LazyAttribute(lambda _: ContextFactory())
+
+  @classmethod
+  def _create(cls, target_class, *args, **kwargs):
+    """Fix context related_object when audit is created"""
+    instance = super(AuditFactory, cls)._create(target_class, *args, **kwargs)
+    instance.context.related_object = instance
+    if getattr(db.session, "single_commit", True):
+      db.session.commit()
+    return instance
 
 
 class SnapshotFactory(ModelFactory):
