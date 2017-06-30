@@ -741,9 +741,8 @@ class WidgetInfoAssessment(WidgetInfoPanel):
                                             WIDGET + Common.TREE_ITEM)
   # Assessment Attributes tab
   # People section
-  _PEOPLE = WIDGET + ' [title-text="People"]'
-  BUTTON_PEOPLE_TOGGLE = (By.CSS_SELECTOR, _PEOPLE + TOGGLE)
-  PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR, _PEOPLE + " .label-list>li")
+  PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
+                               "assessment-people .editable-people-group")
   # Code section
   _CODE = WIDGET + ' [title-text="Code"]'
   BUTTON_CODE_TOGGLE = (By.CSS_SELECTOR, _CODE + TOGGLE)
