@@ -886,6 +886,7 @@ class TestGetWorkflowObjectColumnDefinitions(TestCase):
         "Force real-time email updates",
         "Code",
         "Delete",
+        "Need Verification",
     }
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}

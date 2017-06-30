@@ -8,8 +8,13 @@ from datetime import date
 from os.path import abspath
 from os.path import dirname
 from os.path import join
+import collections
+
+import ddt
 
 from integration.ggrc import TestCase
+from integration.ggrc_workflows.models import factories as wf_factories
+from integration.ggrc.models import factories
 
 from ggrc import db
 from ggrc.converters import errors
@@ -21,6 +26,7 @@ from ggrc_workflows.models.workflow import Workflow
 THIS_ABS_PATH = abspath(dirname(__file__))
 
 
+@ddt.ddt
 class TestWorkflowObjectsImport(TestCase):
   """Test imports for basic workflow objects."""
 
@@ -253,3 +259,80 @@ class TestWorkflowObjectsImport(TestCase):
           )
       )
     self.assertEqual(len(tasks), len(task_slugs))
+
+  @ddt.data(
+      (True, 'True'),
+      (True, 'true'),
+      (True, 'TRUE'),
+      (False, 'False'),
+      (False, 'false'),
+      (False, 'FALSE'),
+  )
+  @ddt.unpack
+  def test_import_verification_flag(self, flag, import_value):
+    """Create wf with need verification flag."""
+    person = factories.PersonFactory(email="test@email.py")
+    slug = "SomeCode"
+    resp = self.import_data(collections.OrderedDict([
+        ("object_type", "Workflow"),
+        ("code", slug),
+        ("title", "SomeTitle"),
+        ("Need Verification", import_value),
+        ("Frequency", "One time"),
+        ("force real-time email updates", "no"),
+        ("Manager", person.email),
+    ]))
+    self.assertEqual(1, resp[0]['created'])
+    workflow = Workflow.query.filter(Workflow.slug == slug).first()
+    self.assertEqual(flag, workflow.is_verification_needed)
+
+  @ddt.data(
+      # DB value, Import Value, ERROR
+      (False, 'FALSE', False),
+      (False, 'False', False),
+      (False, 'false', False),
+      (False, 'TRUE', True),
+      (False, 'True', True),
+      (False, 'true', True),
+      (True, 'FALSE', True),
+      (True, 'False', True),
+      (True, 'false', True),
+      (True, 'TRUE', False),
+      (True, 'True', False),
+      (True, 'true', False),
+  )
+  @ddt.unpack
+  def test_update_verification_flag(self, flag, import_value, error):
+    """Test try to change verification flag value"""
+    slug = "SomeCode"
+    with factories.single_commit():
+      wf_factories.WorkflowFactory(slug=slug, is_verification_needed=flag)
+      person = factories.PersonFactory(email="test@email.py")
+    resp = self.import_data(collections.OrderedDict([
+        ("object_type", "Workflow"),
+        ("code", slug),
+        ("title", "SomeTitle"),
+        ("Need Verification", import_value),
+        ("Frequency", "One time"),
+        ("force real-time email updates", "no"),
+        ("Manager", person.email),
+    ]))
+    self.assertEqual(int(error), resp[0]['ignored'])
+    workflow = Workflow.query.filter(Workflow.slug == slug).first()
+    self.assertEqual(flag, workflow.is_verification_needed)
+
+  def test_error_verification_flag(self):
+    """Test create wf without Needed Verification flag"""
+    slug = "SomeCode"
+    with factories.single_commit():
+      person = factories.PersonFactory(email="test@email.py")
+    resp = self.import_data(collections.OrderedDict([
+        ("object_type", "Workflow"),
+        ("code", slug),
+        ("title", "SomeTitle"),
+        ("Frequency", "One time"),
+        ("force real-time email updates", "no"),
+        ("Manager", person.email),
+    ]))
+    self.assertEqual(1, resp[0]['ignored'])
+    self.assertIsNone(Workflow.query.filter(Workflow.slug == slug).first())
