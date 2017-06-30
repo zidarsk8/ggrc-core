@@ -48,6 +48,13 @@ class CheckboxColumnHandler(handlers.ColumnHandler):
     This is the only handler that will allow setting a None value"""
     try:
       setattr(self.row_converter.obj, self.key, self.value)
+    except ValueError:
+      self.row_converter.add_error(errors.WRONG_VALUE_ERROR,
+                                   column_name=self.display_name)
+      logger.exception(
+          "Import failed with setattr(%r, %r, %r)",
+          self.row_converter.obj, self.key, self.value
+      )
     except:  # pylint: disable=bare-except
       self.row_converter.add_error(errors.UNKNOWN_ERROR)
       logger.exception(
@@ -67,3 +74,12 @@ class KeyControlColumnHandler(CheckboxColumnHandler):
   TRUE_VALUES = {"key"}
   _true = "key"
   _false = "non-key"
+
+
+class StrictBooleanColumnHandler(CheckboxColumnHandler):
+  """Handler for strict boolean values. """
+  ALLOWED_VALUES = {"true", "false"}
+  TRUE_VALUES = {"true"}
+  NONE_VALUES = set()
+  _true = "true"
+  _false = "false"

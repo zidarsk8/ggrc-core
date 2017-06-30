@@ -14,6 +14,7 @@ from ggrc.fulltext import mixin as index_mixin
 from ggrc.fulltext import attributes
 
 from ggrc_workflows.models.cycle import Cycle
+from ggrc_workflows.models import mixins as wf_mixins
 
 
 def _query_filtered_by_contact(person):
@@ -27,7 +28,7 @@ def _query_filtered_by_contact(person):
 
 
 class CycleTaskGroup(mixins.WithContact,
-                     mixins.Stateful,
+                     wf_mixins.CycleTaskGroupRelatedStatusValidatedMixin,
                      mixins.Slugged,
                      mixins.Timeboxed,
                      mixins.Described,
@@ -43,9 +44,6 @@ class CycleTaskGroup(mixins.WithContact,
   @classmethod
   def generate_slug_prefix_for(cls, obj):  # pylint: disable=unused-argument
     return "CYCLEGROUP"
-
-  VALID_STATES = (
-      u'Assigned', u'InProgress', u'Finished', u'Verified', u'Declined')
 
   cycle_id = db.Column(
       db.Integer,

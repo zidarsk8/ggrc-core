@@ -11,31 +11,30 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import builder
 from ggrc import db
-from ggrc.fulltext.attributes import (
-    FullTextAttr,
-    MultipleSubpropertyFullTextAttr,
-    DateFullTextAttr
-)
-from ggrc.fulltext.mixin import Indexed, ReindexRule
+from ggrc.fulltext import attributes as ft_attributes
+from ggrc.fulltext import mixin as ft_mixin
 from ggrc import login
-from ggrc.models.mixins import Base
-from ggrc.models.mixins import Described
-from ggrc.models.mixins import Notifiable
-from ggrc.models.mixins import Slugged
-from ggrc.models.mixins import Stateful
-from ggrc.models.mixins import Timeboxed
-from ggrc.models.mixins import Titled
-from ggrc.models.mixins import WithContact
-from ggrc.models.reflection import PublishOnly
+from ggrc.models import mixins
+from ggrc.models import reflection
 from ggrc.models import relationship
-from ggrc.models.types import JsonType
+from ggrc.models import types
 from ggrc_workflows.models.cycle import Cycle
 from ggrc_workflows.models.cycle_task_group import CycleTaskGroup
+from ggrc_workflows.models import mixins as wf_mixins
 
 
-class CycleTaskGroupObjectTask(
-        WithContact, Stateful, Timeboxed, relationship.Relatable, Notifiable,
-        Described, Titled, Slugged, Base, Indexed, db.Model):
+class CycleTaskGroupObjectTask(mixins.WithContact,
+                               wf_mixins.CycleTaskStatusValidatedMixin,
+                               mixins.Stateful,
+                               mixins.Timeboxed,
+                               relationship.Relatable,
+                               mixins.Notifiable,
+                               mixins.Described,
+                               mixins.Titled,
+                               mixins.Slugged,
+                               mixins.Base,
+                               ft_mixin.Indexed,
+                               db.Model):
   """Cycle task model
   """
   __tablename__ = 'cycle_task_group_object_tasks'
@@ -54,39 +53,42 @@ class CycleTaskGroupObjectTask(
   def generate_slug_prefix_for(cls, obj):
     return "CYCLETASK"
 
-  VALID_STATES = (None, 'InProgress', 'Assigned',
-                  'Finished', 'Declined', 'Verified')
-
   # Note: this statuses are used in utils/query_helpers to filter out the tasks
   # that should be visible on My Tasks pages.
-  ACTIVE_STATES = ("Assigned", "InProgress", "Finished", "Declined")
 
   PROPERTY_TEMPLATE = u"task {}"
 
   _fulltext_attrs = [
-      DateFullTextAttr("end_date", 'end_date',),
-      FullTextAttr("assignee", 'contact', ['name', 'email']),
-      FullTextAttr("group title", 'cycle_task_group', ['title'], False),
-      FullTextAttr("cycle title", 'cycle', ['title'], False),
-      FullTextAttr("group assignee",
-                   lambda x: x.cycle_task_group.contact,
-                   ['email', 'name'], False),
-      FullTextAttr("cycle assignee",
-                   lambda x: x.cycle.contact,
-                   ['email', 'name'], False),
-      DateFullTextAttr("group due date",
-                       lambda x: x.cycle_task_group.next_due_date,
-                       with_template=False),
-      DateFullTextAttr("cycle due date",
-                       lambda x: x.cycle.next_due_date,
-                       with_template=False),
-      MultipleSubpropertyFullTextAttr("comments",
-                                      "cycle_task_entries",
-                                      ["description"]),
+      ft_attributes.DateFullTextAttr("end_date", 'end_date',),
+      ft_attributes.FullTextAttr("assignee", 'contact', ['name', 'email']),
+      ft_attributes.FullTextAttr("group title",
+                                 'cycle_task_group',
+                                 ['title'],
+                                 False),
+      ft_attributes.FullTextAttr("cycle title", 'cycle', ['title'], False),
+      ft_attributes.FullTextAttr("group assignee",
+                                 lambda x: x.cycle_task_group.contact,
+                                 ['email', 'name'],
+                                 False),
+      ft_attributes.FullTextAttr("cycle assignee",
+                                 lambda x: x.cycle.contact,
+                                 ['email', 'name'],
+                                 False),
+      ft_attributes.DateFullTextAttr(
+          "group due date",
+          lambda x: x.cycle_task_group.next_due_date,
+          with_template=False),
+      ft_attributes.DateFullTextAttr("cycle due date",
+                                     lambda x: x.cycle.next_due_date,
+                                     with_template=False),
+      ft_attributes.MultipleSubpropertyFullTextAttr("comments",
+                                                    "cycle_task_entries",
+                                                    ["description"]),
   ]
 
   AUTO_REINDEX_RULES = [
-      ReindexRule("CycleTaskEntry", lambda x: x.cycle_task_group_object_task),
+      ft_mixin.ReindexRule("CycleTaskEntry",
+                           lambda x: x.cycle_task_group_object_task),
   ]
 
   cycle_id = db.Column(
@@ -105,15 +107,13 @@ class CycleTaskGroupObjectTask(
       "TaskGroupTask",
       foreign_keys="CycleTaskGroupObjectTask.task_group_task_id"
   )
-  task_type = db.Column(
-      db.String(length=250), nullable=False)
-  response_options = db.Column(
-      JsonType(), nullable=False, default=[])
-  selected_response_options = db.Column(
-      JsonType(), nullable=False, default=[])
+  task_type = db.Column(db.String(length=250), nullable=False)
+  response_options = db.Column(types.JsonType(), nullable=False, default=[])
+  selected_response_options = db.Column(types.JsonType(),
+                                        nullable=False,
+                                        default=[])
 
-  sort_index = db.Column(
-      db.String(length=250), default="", nullable=False)
+  sort_index = db.Column(db.String(length=250), default="", nullable=False)
 
   finished_date = db.Column(db.DateTime)
   verified_date = db.Column(db.DateTime)
@@ -137,10 +137,10 @@ class CycleTaskGroupObjectTask(
       'task_type',
       'response_options',
       'selected_response_options',
-      PublishOnly('object_approval'),
-      PublishOnly('finished_date'),
-      PublishOnly('verified_date'),
-      PublishOnly('allow_change_state'),
+      reflection.PublishOnly('object_approval'),
+      reflection.PublishOnly('finished_date'),
+      reflection.PublishOnly('verified_date'),
+      reflection.PublishOnly('allow_change_state'),
   ]
 
   default_description = "<ol>"\
@@ -173,13 +173,6 @@ class CycleTaskGroupObjectTask(
       "task_type": {
           "display_name": "Task Type",
           "mandatory": True,
-      },
-      "status": {
-          "display_name": "State",
-          "mandatory": False,
-          "description": "Options are:\n{}".
-                          format('\n'.join((item for item in VALID_STATES
-                                            if item)))
       },
       "end_date": "Due Date",
       "start_date": "Start Date",

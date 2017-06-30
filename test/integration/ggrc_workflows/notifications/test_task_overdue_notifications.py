@@ -12,6 +12,7 @@ from datetime import date, datetime
 from os.path import abspath, dirname, join
 
 from freezegun import freeze_time
+import ddt
 from mock import patch
 
 from ggrc import db, models
@@ -48,6 +49,7 @@ class TestTaskOverdueNotifications(TestCase):
     models.Notification.__init__ = init_decorator(models.Notification.__init__)
 
 
+@ddt.ddt
 class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
   """Tests for overdue notifications when changing Tasks with an API."""
 
@@ -67,15 +69,18 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
         user_role="Administrator")
     self._create_test_cases()
 
+  @ddt.data(True, False)
   @patch("ggrc.notifications.common.send_email")
-  def test_sending_overdue_notifications_for_tasks(self, _):
+  def test_sending_overdue_notifications_for_tasks(self, is_vf_needed, _):
     """Overdue notifications should be sent for overdue tasks every day.
 
     Even if an overdue notification has already been sent, it should still be
     sent in every following daily digest f a task is still overdue.
     """
     with freeze_time("2017-05-15 14:25:36"):
-      _, workflow = self.wf_generator.generate_workflow(self.one_time_workflow)
+      tmp = self.one_time_workflow.copy()
+      tmp['is_verification_needed'] = is_vf_needed
+      _, workflow = self.wf_generator.generate_workflow(tmp)
       self.wf_generator.generate_cycle(workflow)
       response, workflow = self.wf_generator.activate_workflow(workflow)
       self.assert200(response)
@@ -124,11 +129,16 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
       overdue_task_ids = sorted(user_notifs["task_overdue"].keys())
       self.assertEqual(overdue_task_ids, [task1_id, task2_id])
 
+  @ddt.data(True, False)
   @patch("ggrc.notifications.common.send_email")
-  def test_adjust_overdue_notifications_on_task_due_date_change(self, _):
+  def test_adjust_overdue_notifications_on_task_due_date_change(self,
+                                                                is_vf_needed,
+                                                                _):
     """Sending overdue notifications should adjust to task due date changes."""
     with freeze_time("2017-05-15 14:25:36"):
-      _, workflow = self.wf_generator.generate_workflow(self.one_time_workflow)
+      tmp = self.one_time_workflow.copy()
+      tmp['is_verification_needed'] = is_vf_needed
+      _, workflow = self.wf_generator.generate_workflow(tmp)
       self.wf_generator.generate_cycle(workflow)
       response, workflow = self.wf_generator.activate_workflow(workflow)
       self.assert200(response)
@@ -158,11 +168,16 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
       self.assertIn("task_overdue", user_notifs)
       self.assertEqual(len(user_notifs["task_overdue"]), 1)
 
+  @ddt.data(True, False)
   @patch("ggrc.notifications.common.send_email")
-  def test_adjust_overdue_notifications_on_task_status_change(self, _):
+  def test_adjust_overdue_notifications_on_task_status_change(self,
+                                                              is_vf_needed,
+                                                              _):
     """Sending overdue notifications should take task status into account."""
     with freeze_time("2017-05-15 14:25:36"):
-      _, workflow = self.wf_generator.generate_workflow(self.one_time_workflow)
+      tmp = self.one_time_workflow.copy()
+      tmp['is_verification_needed'] = is_vf_needed
+      _, workflow = self.wf_generator.generate_workflow(tmp)
       self.wf_generator.generate_cycle(workflow)
       response, workflow = self.wf_generator.activate_workflow(workflow)
       self.assert200(response)
@@ -173,9 +188,19 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
 
       user = models.Person.query.get(self.user.id)
       user_email = user.email
+    if is_vf_needed:
+      non_final_states = [CycleTaskGroupObjectTask.ASSIGNED,
+                          CycleTaskGroupObjectTask.IN_PROGRESS,
+                          CycleTaskGroupObjectTask.FINISHED,
+                          CycleTaskGroupObjectTask.DECLINED]
+      final_state = CycleTaskGroupObjectTask.VERIFIED
+    else:
+      non_final_states = [CycleTaskGroupObjectTask.ASSIGNED,
+                          CycleTaskGroupObjectTask.IN_PROGRESS]
+      final_state = CycleTaskGroupObjectTask.FINISHED
 
     with freeze_time("2017-05-16 08:09:10"):  # a day after task1 due date
-      for state in CycleTaskGroupObjectTask.ACTIVE_STATES:
+      for state in non_final_states:
         # clear all notifications before before changing the task status
         models.Notification.query.delete()
         _, notif_data = common.get_daily_notifications()
@@ -190,16 +215,22 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
 
       # WITHOUT clearing the overdue notifications, move the task to "verified"
       # state, and the overdue notification should disappear.
-      self.wf_generator.modify_object(task1, {"status": "Verified"})
+
+      self.wf_generator.modify_object(task1, {"status": final_state})
       _, notif_data = common.get_daily_notifications()
       user_notifs = notif_data.get(user_email, {})
       self.assertNotIn("task_overdue", user_notifs)
 
+  @ddt.data(True, False)
   @patch("ggrc.notifications.common.send_email")
-  def test_stop_sending_overdue_notification_if_task_gets_deleted(self, _):
+  def test_stop_sending_overdue_notification_if_task_gets_deleted(self,
+                                                                  is_vf_needed,
+                                                                  _):
     """Overdue notifications should not be sent for deleted tasks."""
     with freeze_time("2017-05-15 14:25:36"):
-      _, workflow = self.wf_generator.generate_workflow(self.one_time_workflow)
+      tmp = self.one_time_workflow.copy()
+      tmp['is_verification_needed'] = is_vf_needed
+      _, workflow = self.wf_generator.generate_workflow(tmp)
       self.wf_generator.generate_cycle(workflow)
       response, workflow = self.wf_generator.activate_workflow(workflow)
       self.assert200(response)

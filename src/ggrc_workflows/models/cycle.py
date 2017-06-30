@@ -8,19 +8,11 @@ import itertools
 from sqlalchemy import orm, inspect
 
 from ggrc import db
-from ggrc.models.mixins import Described
-from ggrc.models.mixins import Notifiable
-from ggrc.models.mixins import Slugged
-from ggrc.models.mixins import Stateful
-from ggrc.models.mixins import Timeboxed
-from ggrc.models.mixins import Titled
-from ggrc.models.mixins import WithContact
-from ggrc.fulltext.attributes import (
-    MultipleSubpropertyFullTextAttr,
-    DateMultipleSubpropertyFullTextAttr,
-    DateFullTextAttr,
-)
-from ggrc.fulltext.mixin import Indexed, ReindexRule
+from ggrc.models import mixins
+from ggrc.fulltext import attributes as ft_attributes
+from ggrc.fulltext import mixin as ft_mixin
+
+from ggrc_workflows.models import mixins as wf_mixins
 
 
 def _query_filtered_by_contact(person):
@@ -33,14 +25,19 @@ def _query_filtered_by_contact(person):
     return []
 
 
-class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
-            Notifiable, Indexed, db.Model):
+class Cycle(mixins.WithContact,
+            wf_mixins.CycleStatusValidatedMixin,
+            mixins.Timeboxed,
+            mixins.Described,
+            mixins.Titled,
+            mixins.Slugged,
+            mixins.Notifiable,
+            ft_mixin.Indexed,
+            db.Model):
   """Workflow Cycle model
   """
   __tablename__ = 'cycles'
   _title_uniqueness = False
-
-  VALID_STATES = (u'Assigned', u'InProgress', u'Finished', u'Verified')
 
   workflow_id = db.Column(
       db.Integer,
@@ -69,11 +66,6 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
           "display_name": "Workflow",
           "filter_by": "_filter_by_cycle_workflow",
       },
-      "status": {
-          "display_name": "State",
-          "mandatory": False,
-          "description": "Options are: \n{} ".format('\n'.join(VALID_STATES))
-      },
       "contact": "Assignee",
       "secondary_contact": None,
   }
@@ -81,42 +73,42 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
   PROPERTY_TEMPLATE = u"cycle {}"
 
   _fulltext_attrs = [
-      MultipleSubpropertyFullTextAttr(
+      ft_attributes.MultipleSubpropertyFullTextAttr(
           "group title", "cycle_task_groups", ["title"], False,
       ),
-      MultipleSubpropertyFullTextAttr(
+      ft_attributes.MultipleSubpropertyFullTextAttr(
           "group assignee",
           lambda instance: [g.contact for g in instance.cycle_task_groups],
           ["name", "email"],
           False,
       ),
-      DateMultipleSubpropertyFullTextAttr(
+      ft_attributes.DateMultipleSubpropertyFullTextAttr(
           "group due date",
           'cycle_task_groups',
           ["next_due_date"],
           False,
       ),
-      MultipleSubpropertyFullTextAttr(
+      ft_attributes.MultipleSubpropertyFullTextAttr(
           "task title",
           'cycle_task_group_object_tasks',
           ["title"],
           False,
       ),
-      MultipleSubpropertyFullTextAttr(
+      ft_attributes.MultipleSubpropertyFullTextAttr(
           "task assignee",
           lambda instance: [t.contact for t in
                             instance.cycle_task_group_object_tasks],
           ["name", "email"],
           False
       ),
-      DateMultipleSubpropertyFullTextAttr(
+      ft_attributes.DateMultipleSubpropertyFullTextAttr(
           "task due date",
           "cycle_task_group_object_tasks",
           ["end_date"],
           False
       ),
-      DateFullTextAttr("due date", "next_due_date"),
-      MultipleSubpropertyFullTextAttr(
+      ft_attributes.DateFullTextAttr("due date", "next_due_date"),
+      ft_attributes.MultipleSubpropertyFullTextAttr(
           "task comments",
           lambda instance: list(itertools.chain(*[
               t.cycle_task_entries
@@ -128,10 +120,10 @@ class Cycle(WithContact, Stateful, Timeboxed, Described, Titled, Slugged,
   ]
 
   AUTO_REINDEX_RULES = [
-      ReindexRule("CycleTaskGroup", lambda x: x.cycle),
-      ReindexRule("CycleTaskGroupObjectTask",
-                  lambda x: x.cycle_task_group.cycle),
-      ReindexRule("Person", _query_filtered_by_contact)
+      ft_mixin.ReindexRule("CycleTaskGroup", lambda x: x.cycle),
+      ft_mixin.ReindexRule("CycleTaskGroupObjectTask",
+                           lambda x: x.cycle_task_group.cycle),
+      ft_mixin.ReindexRule("Person", _query_filtered_by_contact)
   ]
 
   @classmethod

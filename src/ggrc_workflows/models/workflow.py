@@ -6,7 +6,6 @@
 This contains the basic Workflow object and a mixin for determining the state
 of the Objects that are mapped to any cycle tasks.
 """
-from datetime import date
 from sqlalchemy import and_
 from sqlalchemy import orm
 
@@ -108,6 +107,28 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   # there is no 'kind' column yet
   kind = deferred(
       db.Column(db.String, default=None, nullable=True), 'Workflow')
+  IS_VERIFICATION_NEEDED_DEFAULT = True
+  is_verification_needed = db.Column(
+      db.Boolean,
+      default=IS_VERIFICATION_NEEDED_DEFAULT,
+      nullable=False)
+
+  @orm.validates('is_verification_needed')
+  def validate_is_verification_needed(self, key, value):
+    # pylint: disable=unused-argument
+    """Validate is_verification_needed field for Workflow.
+
+    It's not allowed to change is_verification_needed flag after creation.
+    If is_verification_needed doesn't send,
+    then is_verification_needed flag is True.
+    """
+    if self.is_verification_needed is None:
+      return self.IS_VERIFICATION_NEEDED_DEFAULT if value is None else value
+    if value is None:
+      return self.is_verification_needed
+    if value != self.is_verification_needed:
+      raise ValueError("is_verification_needed value isn't changeble")
+    return value
 
   @builder.simple_property
   def workflow_state(self):
@@ -127,10 +148,11 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       'cycles',
       'object_approval',
       'recurrences',
+      'is_verification_needed',
       reflection.PublishOnly('next_cycle_start_date'),
       reflection.PublishOnly('non_adjusted_next_cycle_start_date'),
       reflection.PublishOnly('workflow_state'),
-      reflection.PublishOnly('kind')
+      reflection.PublishOnly('kind'),
   ]
 
   _fulltext_attrs = [
@@ -140,6 +162,10 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   _aliases = {
       "frequency": {
           "display_name": "Frequency",
+          "mandatory": True,
+      },
+      "is_verification_needed": {
+          "display_name": "Need Verification",
           "mandatory": True,
       },
       "notify_custom_message": "Custom email message",
@@ -285,8 +311,15 @@ class WorkflowState(object):
   _publish_attrs = [reflection.PublishOnly('workflow_state')]
   _update_attrs = []
 
+  OVERDUE = "Overdue"
+  VERIFIED = "Verified"
+  FINISHED = "Finished"
+  ASSIGNED = "Assigned"
+  IN_PROGRESS = "InProgress"
+  UNKNOWN_STATE = None
+
   @classmethod
-  def _get_state(cls, current_tasks):
+  def _get_state(cls, statusable_childs):
     """Get overall state of a group of tasks.
 
     Rules, the first that is true is selected:
@@ -306,23 +339,13 @@ class WorkflowState(object):
     Returns:
       Overall state according to the rules described above.
     """
-    states = [task.status or "Assigned" for task in current_tasks]
 
-    if states.count("Verified") == len(states):
-      resulting_state = "Verified"
-    elif states.count("Finished") == len(states):
-      resulting_state = "Finished"
-    elif not set(states).intersection({"InProgress", "Assigned", "Declined"}):
-      resulting_state = "Finished"
-    elif set(states).intersection({"InProgress", "Declined", "Finished",
-                                   "Verified"}):
-      resulting_state = "InProgress"
-    elif "Assigned" in states:
-      resulting_state = "Assigned"
-    else:
-      resulting_state = None
-
-    return resulting_state
+    states = {i.status or i.ASSIGNED for i in statusable_childs}
+    if states in [{cls.VERIFIED}, {cls.FINISHED}, {cls.ASSIGNED}]:
+      return states.pop()
+    if states == {cls.FINISHED, cls.VERIFIED}:
+      return cls.FINISHED
+    return cls.IN_PROGRESS if states else cls.UNKNOWN_STATE
 
   @classmethod
   def get_object_state(cls, objs):
@@ -339,20 +362,13 @@ class WorkflowState(object):
       Name of the lowest state of all active cycle tasks that relate to the
       given objects.
     """
-    current_tasks = [task for task in objs if task.cycle.is_current]
-
-    if not current_tasks:
-      return None
-
-    today = date.today()
-    overdue_tasks = any(task.end_date and
-                        task.end_date < today and
-                        task.status != "Verified"
-                        for task in current_tasks)
-
-    if overdue_tasks:
-      return "Overdue"
-
+    current_tasks = []
+    for task in objs:
+      if not task.cycle.is_current:
+        continue
+      if task.is_overdue:
+        return cls.OVERDUE
+      current_tasks.append(task)
     return cls._get_state(current_tasks)
 
   @classmethod
@@ -370,18 +386,14 @@ class WorkflowState(object):
       Name of the lowest workflow state, if there are any active cycles.
       Otherwise it returns None.
     """
-    current_cycles = [cycle for cycle in cycles if cycle.is_current]
-
-    if not current_cycles:
-      return None
-
-    today = date.today()
-    for cycle in current_cycles:
-      for task in cycle.cycle_task_group_object_tasks:
-        if (task.status != "Verified" and
-           task.end_date is not None and task.end_date < today):
-          return "Overdue"
-
+    current_cycles = []
+    for cycle_instance in cycles:
+      if not cycle_instance.is_current:
+        continue
+      for task in cycle_instance.cycle_task_group_object_tasks:
+        if task.is_overdue:
+          return cls.OVERDUE
+      current_cycles.append(cycle_instance)
     return cls._get_state(current_cycles)
 
   @builder.simple_property

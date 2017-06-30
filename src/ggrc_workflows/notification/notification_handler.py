@@ -82,7 +82,7 @@ def add_cycle_task_due_notifications(task):
   Args:
     task: CycleTaskGroupObjectTask instance to generate the notifications for.
   """
-  if task.status == "Verified":
+  if task.status in task.inactive_states:
     return
   if not task.cycle_task_group.cycle.is_current:
     return
@@ -128,36 +128,31 @@ def add_cycle_task_reassigned_notification(obj):
 
 
 def modify_cycle_task_notification(obj, notification_name):
-  notif = db.session.query(Notification)\
-      .join(NotificationType)\
-      .filter(and_(Notification.object_id == obj.id,
-                   Notification.object_type == obj.type,
-                   or_(
-                       Notification.sent_at.is_(None),
-                       Notification.repeating == true()
-                   ),
-                   NotificationType.name == notification_name,
-                   ))
   notif_type = get_notification_type(notification_name)
+  notif = Notification.query.filter(
+      Notification.object_id == obj.id,
+      Notification.object_type == obj.type,
+      Notification.notification_type == notif_type,
+      or_(Notification.sent_at.is_(None), Notification.repeating == true()),
+  ).first()
   send_on = datetime.combine(obj.end_date, datetime.min.time()) - timedelta(
       notif_type.advance_notice)
 
   today = datetime.combine(date.today(), datetime.min.time())
-  if send_on >= today:
-      # when cycle date is moved in the future, we update the current
-      # notification or add a new one.
-    if notif.count() == 1:
-      notif = notif.one()
-      notif.send_on = (datetime.combine(obj.end_date, datetime.min.time()) -
-                       timedelta(notif.notification_type.advance_notice))
-      db.session.add(notif)
-    else:
-      add_notif(obj, notif_type, send_on)
-  else:
+  if send_on < today:
     # this should not be allowed, but if a cycle task is changed to a past
     # date, we remove the current pending notification if it exists
-    for notif in notif.all():
+    if notif:
       db.session.delete(notif)
+  elif notif:
+    # when cycle date is moved in the future and current exists we update
+    # the current
+    notif.send_on = send_on
+    db.session.add(notif)
+  else:
+    # when cycle date is moved in the future and no current create new
+    # notification
+    add_notif(obj, notif_type, send_on)
 
 
 def modify_cycle_task_overdue_notification(task):
@@ -171,37 +166,26 @@ def modify_cycle_task_overdue_notification(task):
     task: The CycleTaskGroupObjectTask instance for which to update the overdue
           notifications.
   """
-  notif = db.session.query(Notification)\
-      .join(NotificationType)\
-      .filter(
-          (Notification.object_id == task.id) &
-          (Notification.object_type == task.type) &
-          (
-              Notification.sent_at.is_(None) |
-              (Notification.repeating == true())
-          ) &
-          (NotificationType.name == u"cycle_task_overdue"))
-
   notif_type = get_notification_type(u"cycle_task_overdue")
-  send_on = datetime.combine(task.end_date, datetime.min.time()) + \
-      timedelta(1)
+  send_on = datetime.combine(task.end_date, datetime.min.time()) + timedelta(1)
+  notif = Notification.query.filter(
+      Notification.object_id == task.id,
+      Notification.object_type == task.type,
+      (Notification.sent_at.is_(None) | (Notification.repeating == true())),
+      Notification.notification_type == notif_type,
+  ).first()
 
-  if notif.count() > 0:
-    notif = notif.one()
+  if notif:
+    if notif.send_on != send_on:
+      notif.send_on = send_on
+      db.session.add(notif)
+    return
 
-    if notif.send_on == send_on:
-      return  # nothing to do here...
-    notif.send_on = send_on
-    db.session.add(notif)
-  else:
-    # NOTE: The "task.id" check is to assure a notification is created for
-    # existing task instances only, avoiding DB errors. Overdue notifications
-    # for new tasks are handled and added elsewhere.
-    if (
-        task.id and task.status in CycleTaskGroupObjectTask.ACTIVE_STATES and
-        task.cycle.is_current
-    ):
-      add_notif(task, notif_type, send_on, repeating=True)
+  # NOTE: The "task.id" check is to assure a notification is created for
+  # existing task instances only, avoiding DB errors. Overdue notifications
+  # for new tasks are handled and added elsewhere.
+  if all([task.id, task.status in task.active_states, task.cycle.is_current]):
+    add_notif(task, notif_type, send_on, repeating=True)
 
 
 def modify_cycle_task_end_date(obj):
@@ -211,30 +195,23 @@ def modify_cycle_task_end_date(obj):
   modify_cycle_task_overdue_notification(obj)
 
 
-def check_all_cycle_tasks_finished(cycle):
-  statuses = set([task.status for task in cycle.cycle_task_group_object_tasks])
-  acceptable_statuses = set(['Verified'])
-  return statuses.issubset(acceptable_statuses)
-
-
 def handle_cycle_task_status_change(obj, new_status, old_status):
-  if obj.status == "Declined":
+  if obj.status == CycleTaskGroupObjectTask.DECLINED:
     notif_type = get_notification_type("cycle_task_declined")
     add_notif(obj, notif_type)
+    return
 
-  elif obj.status == "Verified":
+  if obj.status in obj.inactive_states:
     for notif in get_notification(obj):
-      db.session.delete(notif)
-
-    cycle = obj.cycle_task_group.cycle
-    if check_all_cycle_tasks_finished(cycle):
-      notif_type = get_notification_type("all_cycle_tasks_completed")
-      add_notif(cycle, notif_type)
+      db.session.delete(notif)  # delete all notification for inactive obj
+    # if all tasks are in inactive states then add notification to cycle
+    if all(task.status in task.inactive_states for task in
+           obj.cycle.cycle_task_group_object_tasks):
+      add_notif(obj.cycle, get_notification_type("all_cycle_tasks_completed"))
     db.session.flush()
-
-  # NOTE: The only inactive state is "Verified", which is sufficiently handled
-  # by the code above, thus we only need to handle active states
-  if new_status in CycleTaskGroupObjectTask.ACTIVE_STATES:
+    return
+  # Modify overdue notification if task is still in active state
+  if new_status in obj.active_states:
     modify_cycle_task_overdue_notification(obj)
 
 
@@ -271,15 +248,12 @@ def handle_cycle_task_group_object_task_put(obj):
   modify_cycle_task_end_date(obj)
 
 
-def remove_all_cycle_task_notifications(obj):
+def handle_cycle_modify(sender, obj=None, src=None, service=None):
+  if obj.is_current:
+    return
   for cycle_task in obj.cycle_task_group_object_tasks:
     for notif in get_notification(cycle_task):
       db.session.delete(notif)
-
-
-def handle_cycle_modify(sender, obj=None, src=None, service=None):
-  if not obj.is_current:
-    remove_all_cycle_task_notifications(obj)
 
 
 def handle_cycle_created(sender, obj=None, src=None, service=None,

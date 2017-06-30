@@ -230,7 +230,7 @@ def _create_cycle_task(task_group_task, cycle, cycle_task_group,
       start_date=start_date,
       end_date=end_date,
       contact=task_group_task.contact,
-      status="Assigned",
+      status=models.CycleTaskGroupObjectTask.ASSIGNED,
       modified_by=current_user,
       task_type=task_group_task.task_type,
       response_options=task_group_task.response_options,
@@ -279,7 +279,8 @@ def build_cycle(cycle, current_user=None, base_date=None):
   cycle.context = workflow.context
   cycle.title = workflow.title
   cycle.description = workflow.description
-  cycle.status = 'Assigned'
+  cycle.is_verification_needed = workflow.is_verification_needed
+  cycle.status = models.Cycle.ASSIGNED
 
   # Populate CycleTaskGroups based on Workflow's TaskGroups
   for task_group in workflow.task_groups:
@@ -292,7 +293,7 @@ def build_cycle(cycle, current_user=None, base_date=None):
         end_date=cycle.end_date,
         modified_by=current_user,
         contact=task_group.contact,
-        status="Assigned",
+        status=models.CycleTaskGroup.ASSIGNED,
         sort_index=task_group.sort_index,
     )
 
