@@ -107,7 +107,6 @@
         this.after_preload();
       }.bind(this));
     },
-
     after_preload: function (content) {
       var that = this;
       if (content) {
@@ -437,6 +436,8 @@
         // When we start, all the ui elements are visible
         this.options.ui_array.push(0);
       }
+
+      document.body.classList.remove('no-events');
     },
 
     setup_wysihtml5: function () {
