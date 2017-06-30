@@ -42,7 +42,7 @@
       onClickHandler: function (scope, el, event) {
         var eventType = this.attr('click_event');
         var handler = this[eventType] || function () {};
-        var confirmation = _.isFunction(this.confirmationCallback) ?
+        var confirmation = can.isFunction(this.confirmationCallback) ?
           this.confirmationCallback() :
           null;
         var args = arguments;
@@ -113,7 +113,7 @@
             return new RefreshQueue().enqueue(files).trigger()
               .then(function (files) {
                 var docDfds = that.handle_file_upload(files);
-                $.when.apply($, docDfds).then(function () {
+                can.when.apply(can, docDfds).then(function () {
                   // Trigger modal:success event on scope
                   can.trigger(
                     that, 'modal:success', {arr: can.makeArray(arguments)});
@@ -204,7 +204,7 @@
                       }
                       return file;
                     });
-                    return can.when.apply($, mapped);
+                    return can.when.apply(can, mapped);
                   });
               })
               .done(function () {
@@ -213,7 +213,7 @@
                 });
                 var dfdsDoc = that.handle_file_upload(files);
 
-                can.when.apply($, dfdsDoc).then(function () {
+                can.when.apply(can, dfdsDoc).then(function () {
                   can.trigger(
                     that, 'modal:success', {arr: can.makeArray(arguments)});
                   el.trigger('modal:success', {arr: can.makeArray(arguments)});
@@ -278,7 +278,7 @@
         var instance = this.viewModel.instance;
         var itemsUploadedCallback = this.viewModel.itemsUploadedCallback;
 
-        if (_.isFunction(itemsUploadedCallback)) {
+        if (can.isFunction(itemsUploadedCallback)) {
           itemsUploadedCallback();
         } else {
           instance.reify();
