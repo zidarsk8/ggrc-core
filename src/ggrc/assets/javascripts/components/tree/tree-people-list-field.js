@@ -25,9 +25,6 @@
     template: '<content />',
     viewModel: viewModel,
     events: {
-      '{viewModel} source': function () {
-        this.viewModel.refreshPeople();
-      },
       '{viewModel.source} change': function () {
         this.viewModel.refreshPeople();
       }
