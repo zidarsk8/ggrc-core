@@ -5,7 +5,7 @@
 
 from ggrc_basic_permissions import models
 
-from integration.ggrc.models.factories import ModelFactory
+from integration.ggrc.models.model_factory import ModelFactory
 
 
 class RoleFactory(ModelFactory):

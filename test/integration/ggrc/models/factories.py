@@ -20,11 +20,11 @@ import factory
 
 from ggrc import db
 from ggrc import models
-from ggrc.login import noop
-from ggrc.fulltext import get_indexer
 
 from ggrc.access_control.role import AccessControlRole
 from ggrc.access_control.list import AccessControlList
+
+from integration.ggrc.models.model_factory import ModelFactory
 
 
 def random_str(length=8, prefix="", chars=None):
@@ -44,52 +44,6 @@ def single_commit():
     db.session.commit()
   finally:
     db.session.single_commit = True
-
-
-class ModelFactory(factory.Factory, object):
-
-  @classmethod
-  def _create(cls, target_class, *args, **kwargs):
-    instance = target_class(*args, **kwargs)
-    db.session.add(instance)
-    if isinstance(instance, models.CustomAttributeValue):
-      cls._log_event(instance.attributable)
-    if hasattr(instance, "log_json"):
-      cls._log_event(instance)
-    if getattr(db.session, "single_commit", True):
-      db.session.commit()
-    return instance
-
-  @classmethod
-  def _log_event(cls, instance):
-    indexer = get_indexer()
-    db.session.flush()
-    user = cls._get_user()
-    revision = models.Revision(
-        instance, user.id, 'created', instance.log_json())
-    event = models.Event(
-        modified_by=user,
-        action="POST",
-        resource_id=instance.id,
-        resource_type=instance.type,
-        context=instance.context,
-        revisions=[revision],
-    )
-    db.session.add(revision)
-    db.session.add(event)
-    indexer.update_record(indexer.fts_record_for(instance), commit=False)
-
-  @staticmethod
-  def _get_user():
-    user = models.Person.query.first()
-    if not user:
-      user = models.Person(
-          name=noop.default_user_name,
-          email=noop.default_user_email,
-      )
-      db.session.add(user)
-      db.session.flush()
-    return user
 
 
 class TitledFactory(ModelFactory):
