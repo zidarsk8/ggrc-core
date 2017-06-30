@@ -108,11 +108,6 @@ class TestIssueMapping(TestCase):
         context=audit.program.context,
         role=self.roles['program_editor'],
         person=self.users['auditlead'])
-    rbac_factories.ContextImplicationFactory(
-        context=audit.context,
-        source_context=audit.program.context,
-        context_scope="Audit",
-        source_context_scope="Program")
 
     return audit
 
