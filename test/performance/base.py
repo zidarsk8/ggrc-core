@@ -96,19 +96,19 @@ class BaseTaskSet(locust.TaskSet):
         name="/api/{}/XYZ".format(models.TABLES_PLURAL[model]),
     )
 
-  def update_object(self, slug, properties=True, cavs=True, acls=True):
+  def update_object(self, slug, changes=None):
     """Fetch update and PUT an object."""
     response = self.get_from_slug(slug)
     obj = response.json().values()[0]
-    if properties:
+    if changes:
+      obj.update(changes)
+    else:
       obj = generator.update_properties(obj)
-    if cavs:
+      obj = generator.update_acl(obj)
       if obj["type"] == "Assessment":
         obj = generator.update_cavs_new(obj, self.objects)
       else:
         obj = generator.update_cavs_old(obj, self.objects)
-    if acls:
-      obj = generator.update_acl(obj)
     self._put(response, obj)
 
   def get_multiple(self, model, ids):
@@ -164,7 +164,10 @@ class BaseTaskSet(locust.TaskSet):
     )
     counts = response.json()["results"]["counts"]
     for model, count in counts.items():
-      self.objects[model] = [generator.slug(model, i+1) for i in range(count)]
+      self.objects[model] = [
+          generator.slug(model, i + 1)
+          for i in range(count)
+      ]
     for model in models.SPECIAL_INITIAL_MODELS:
       self.get_objects(model)
 
