@@ -4,6 +4,7 @@
 """Module for locust update tasks."""
 
 import random
+import logging
 
 import locust
 
@@ -11,6 +12,8 @@ from performance import base
 from performance import generator
 
 random.seed(1)
+
+logger = logging.getLogger()
 
 
 class ObjectUpdateTests(base.BaseTaskSet):
@@ -24,10 +27,13 @@ class ObjectUpdateTests(base.BaseTaskSet):
         "Completed",
     ]
     assessment = generator.random_object("Assessment", self.objects)
+    state = random.choice(states)
+    self.set_random_user(roles=["Administrator", "Editor"])
     self.update_object(assessment)
     self.update_object(assessment, changes={
-        "state": random.choice(states),
+        "status": state,
     })
+    logger.debug("\nAssessment: {}\n - state: {}".format(assessment, state))
 
   @locust.task(1)
   def test_market_update(self):

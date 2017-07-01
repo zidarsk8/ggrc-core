@@ -24,12 +24,11 @@ class AssessmentTest(base.BaseTaskSet):
 
   @locust.task(1)
   def get_assessments_view(self):
-    role = random.choice(models.GLOBAL_ROLES)
-    self.set_random_user(role=role)
+    self.set_random_user(roles=models.GLOBAL_ROLES)
     self.client.get(
         "/assessments_view",
         headers=self.headers_text,
-        name="{} /assessments_view".format(role),
+        name="{} /assessments_view".format(self.role),
     )
 
   @locust.task(10)
@@ -41,8 +40,7 @@ class AssessmentTest(base.BaseTaskSet):
         "Completed",
     ]
     status_sample = random.sample(statuses, random.randint(1, len(statuses)))
-    role = random.choice(models.GLOBAL_ROLES)
-    person = self.set_random_user(role=role)
+    person = self.set_random_user(roles=models.GLOBAL_ROLES)
     query = request_templates.assessment_related_status_query(
         person,
         status_sample,
@@ -51,8 +49,8 @@ class AssessmentTest(base.BaseTaskSet):
         "/query",
         headers=self.headers_text,
         json=query,
-        name="/query rel {}, status = {}".format(
-            role[:4],
+        name="{} /query related, status = {}".format(
+            self.role,
             len(status_sample),
         ),
     )
@@ -62,7 +60,7 @@ class AssessmentTest(base.BaseTaskSet):
         "response_code: {}\n"
         "query:\n{}\n"
         "results:\n{}\n".format(
-            role,
+            self.role,
             status_sample,
             response.status_code,
             json.dumps(query, sort_keys=True, indent=4),

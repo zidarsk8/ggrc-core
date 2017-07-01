@@ -4,6 +4,7 @@
 """Base locust task module."""
 
 import collections
+import random
 import json
 
 import locust
@@ -41,6 +42,7 @@ class BaseTaskSet(locust.TaskSet):
                    "image/webp,*/*;q=0.8"),
 
     }
+    self.role = "Admin"
 
     # id, relationship object
     self.relationships = collections.defaultdict(dict)
@@ -93,7 +95,7 @@ class BaseTaskSet(locust.TaskSet):
         obj["selfLink"],
         json=data,
         headers=headers,
-        name="/api/{}/XYZ".format(models.TABLES_PLURAL[model]),
+        name="{} /api/{}/XYZ".format(self.role, models.TABLES_PLURAL[model]),
     )
 
   def update_object(self, slug, changes=None):
@@ -118,7 +120,7 @@ class BaseTaskSet(locust.TaskSet):
         "/api/{}".format(model_plural),
         params={"id__in": ",".join(str(id_) for id_ in ids)},
         headers=self.headers,
-        name="id_in ({}) /api/{}".format(len(ids), model_plural),
+        name="{} id_in ({}) /api/{}".format(self.role, len(ids), model_plural),
     )
     return response
 
@@ -128,7 +130,7 @@ class BaseTaskSet(locust.TaskSet):
     response = self.client.get(
         "/api/{}/{}".format(model_plural, id_),
         headers=self.headers,
-        name="/api/{}/XYZ".format(model_plural),
+        name="{} /api/{}/XYZ".format(self.role, model_plural),
     )
     return response
 
@@ -291,7 +293,7 @@ class BaseTaskSet(locust.TaskSet):
         url,
         json=data,
         headers=self.headers,
-        name=name,
+        name="{} {}".format(self.role, name),
     )
     response_json = response.json()
     return self._store_object(model, response_json, unpack=True)
@@ -424,9 +426,13 @@ class BaseTaskSet(locust.TaskSet):
           )
           self._post("AssessmentTemplate", data, kwargs.get("name"))
 
-  def set_random_user(self, role="Administrator"):
+  def set_random_user(self, roles=None):
     """Login as a random user of a given role."""
+    if not roles:
+      roles = ["Administrator"]
+    role = random.choice(roles)
     person = generator.random_object(role, self.user_roles)
+    self.role = role[:5]
     self._log_in(person=person)
     return person
 
