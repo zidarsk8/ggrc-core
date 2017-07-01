@@ -45,6 +45,13 @@ ROLES = {
     21: "WorkflowBasicReader",
 }
 
+GLOBAL_ROLES = [
+    "Reader",
+    "Editor",
+    "Administrator",
+    "Creator",
+]
+
 ROLES_REV = {v: k for k, v in ROLES.items()}
 
 DEFAULT_USER = {

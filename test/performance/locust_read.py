@@ -3,7 +3,9 @@
 
 """Module for locust read tasks."""
 
+import logging
 import random
+import json
 
 import locust
 
@@ -12,6 +14,9 @@ from performance import models
 from performance import request_templates
 
 random.seed(1)
+
+
+logger = logging.getLogger()
 
 
 class AssessmentTest(base.BaseTaskSet):
@@ -27,7 +32,7 @@ class AssessmentTest(base.BaseTaskSet):
         name="{} /assessments_view".format(role),
     )
 
-  @locust.task(1)
+  @locust.task(10)
   def get_query_related_asssessments(self):
     statuses = [
         "Not Started",
@@ -35,13 +40,34 @@ class AssessmentTest(base.BaseTaskSet):
         "Ready for Review",
         "Completed",
     ]
+    status_sample = random.sample(statuses, random.randint(1, len(statuses)))
     role = random.choice(models.GLOBAL_ROLES)
     person = self.set_random_user(role=role)
-    request_templates.assessment_related_status_query(person, statuses)
-    self.client.get(
-        "/assessments_view",
+    query = request_templates.assessment_related_status_query(
+        person,
+        status_sample,
+    )
+    response = self.client.post(
+        "/query",
         headers=self.headers_text,
-        name="/query rel person - {}".format(role),
+        json=query,
+        name="/query rel {}, status = {}".format(
+            role[:4],
+            len(status_sample),
+        ),
+    )
+    logger.debug(
+        "\nrole: {}\n"
+        "\nstatuses: {}\n"
+        "response_code: {}\n"
+        "query:\n{}\n"
+        "results:\n{}\n".format(
+            role,
+            status_sample,
+            response.status_code,
+            json.dumps(query, sort_keys=True, indent=4),
+            json.dumps(response.json(), sort_keys=True, indent=4)[:500],
+        )
     )
 
 
@@ -49,5 +75,5 @@ class WebsiteUser(locust.HttpLocust):
   """Locust http task runner."""
   # pylint: disable=too-few-public-methods
   task_set = AssessmentTest
-  min_wait = 500
-  max_wait = 1000
+  min_wait = 100
+  max_wait = 100

@@ -1186,3 +1186,50 @@ query_not_started_in_progress_relevant_user = [
         "limit": [0, 10]
     }
 ]
+
+
+def _build_exp(left, op, right):
+  return {
+      "left": left,
+      "op": {"name": op},
+      "right": right,
+  }
+
+
+def _build_relevant(stub):
+  return {
+      "object_name": stub["type"],
+      "op": {"name": "relevant"},
+      "ids": [str(stub["id"])]
+  }
+
+
+def _join_exp(expressions, op="OR"):
+  if not expressions:
+    return {}
+  joined = expressions.pop()
+  while expressions:
+    joined = _build_exp(expressions.pop(), op, joined)
+  return joined
+
+
+def assessment_related_status_query(person, statuses):
+  """Query for assessments related to a person with status filters."""
+  status_expressions = [
+      _build_exp("status", "=", status)
+      for status in statuses
+  ]
+  status_exp = _join_exp(status_expressions, op="OR")
+  expression = _join_exp([_build_relevant(person), status_exp], "AND")
+
+  return [
+      {
+          "object_name": "Assessment",
+          "filters": {
+              "expression": expression,
+              "keys": ["status"],
+              "order_by": {"keys": [], "order":"", "compare":None}
+          },
+          "limit": [0, 10]
+      }
+  ]
