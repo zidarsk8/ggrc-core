@@ -39,7 +39,7 @@ class AssessmentTest(base.BaseTaskSet):
         "Ready for Review",
         "Completed",
     ]
-    status_sample = random.sample(statuses, random.randint(1, len(statuses)))
+    status_sample = random.sample(statuses, random.randint(0, len(statuses)))
     person = self.set_random_user(roles=models.GLOBAL_ROLES)
     query = request_templates.assessment_related_status_query(
         person,
@@ -56,7 +56,7 @@ class AssessmentTest(base.BaseTaskSet):
     )
     logger.debug(
         "\nrole: {}\n"
-        "\nstatuses: {}\n"
+        "statuses: {}\n"
         "response_code: {}\n"
         "query:\n{}\n"
         "results:\n{}\n".format(
