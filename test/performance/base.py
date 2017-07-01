@@ -177,10 +177,16 @@ class BaseTaskSet(locust.TaskSet):
     """Retrieve full object from slug."""
     obj = None
     if slug["type"] == "Relationship":
-      obj = self.relationships[slug["id"]]
+      obj = self.relationships.get(slug["id"])
+    if slug["type"] == "Person":
+      obj = self.people.get(slug["id"])
     if not obj:
       response = self.get_from_slug(slug)
       obj = response.json().values()[0]
+      if obj["type"] == "Relationship":
+        self.relationships[obj["id"]] = obj
+      if obj["type"] == "Person":
+        self.people[obj["id"]] = obj
     return obj
 
   def _log_in(self, person=None):
