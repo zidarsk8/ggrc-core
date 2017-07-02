@@ -246,6 +246,10 @@ class BaseTaskSet(locust.TaskSet):
       role_name = models.ROLES[data["role"]["id"]]
       self.user_roles[role_name].append(data["person"])
 
+  def _store_acr(self, response_json):
+    for data in response_json:
+      self.acr[data["object_type"]].append(data)
+
   def _store_people(self, response_json):
     """Store people to local variable."""
     filter_keys = ["id", "name", "email", "company"]
@@ -267,18 +271,17 @@ class BaseTaskSet(locust.TaskSet):
           for item in response_json
       ]
 
-    if model == "CustomAttributeDefinition":
-      self._store_cads(response_json)
-    elif model == "AssessmentTemplate":
-      self._store_assessment_templates(response_json)
-    elif model == "Snapshot":
-      self._store_snapshots(response_json)
-    elif model == "Relationship":
-      self._store_relationships(response_json)
-    elif model == "Person":
-      self._store_people(response_json)
-    elif model == "UserRole":
-      self._store_user_roles(response_json)
+    store_map = {
+        "CustomAttributeDefinition": self._store_cads,
+        "AssessmentTemplate": self._store_assessment_templates,
+        "Snapshot": self._store_snapshots,
+        "Relationship": self._store_relationships,
+        "Person": self._store_people,
+        "UserRole": self._store_user_roles,
+        "AccessControlRole": self._store_acr,
+    }
+    if model in store_map:
+      store_map[model](response_json)
 
     new_slugs = [
         generator.obj_to_slug(item)

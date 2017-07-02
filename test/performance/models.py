@@ -469,7 +469,7 @@ TABLES_PLURAL = {
 
 
 SPECIAL_INITIAL_MODELS = [
-    # 'AccessControlRole',
+    'AccessControlRole',
     # 'Person',
     'UserRole',
 ]
