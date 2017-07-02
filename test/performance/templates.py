@@ -16,20 +16,9 @@ FACILITY = {
     "_transient": {},
     "status": "Draft",
     "owners": [],
+    "access_control_list": [],
     "custom_attribute_definitions": [],
-    "custom_attributes": {
-        "49": "Person:56",
-        "103": "four",
-        "157": True,
-        "211": "2017-06-16",
-        "265": "<br><div>uoea</div>",
-        "319": "aoue"
-    },
-    "contact": {
-        "id": 1,
-        "href": "/api/people/1",
-        "type": "Person"
-    },
+    "custom_attributes": {},
     "title": "aa",
     "description": "ee",
     "notes": "uuu",
@@ -51,11 +40,6 @@ CONTROL = {
     "owners": [],
     "custom_attribute_definitions": [],
     "custom_attributes": {},
-    "contact": {
-        "id": 1,
-        "href": "/api/people/1",
-        "type": "Person"
-    },
     "test_plan": "",
     "notes": "",
     "reference_url": "",
@@ -73,7 +57,6 @@ PERSON = {
     "_transient": {},
     "name": "",
     "email": "",
-    "contact": None,
     "owners": None,
     "custom_attribute_definitions": [],
     "custom_attributes": {},
@@ -137,11 +120,6 @@ OBJECTIVE = {
     "owners": [],
     "custom_attribute_definitions": [],
     "custom_attributes": {},
-    "contact": {
-        "id": 1,
-        "href": "/api/people/1",
-        "type": "Person",
-    },
     "title": "",
     "description": "",
     "notes": "",
@@ -159,11 +137,6 @@ MARKET = {
     "owners": [],
     "custom_attribute_definitions": [],
     "custom_attributes": {},
-    "contact": {
-        "id": 1,
-        "href": "/api/people/1",
-        "type": "Person"
-    },
     "title": "aou",
     "description": "uoe",
     "notes": "oe",
@@ -184,11 +157,6 @@ REGULATION = {
     "owners": [],
     "custom_attribute_definitions": [],
     "custom_attributes": {},
-    "contact": {
-        "id": 1,
-        "href": "/api/people/1",
-        "type": "Person"
-    },
     "title": "eeee",
     "description": "eeeee",
     "notes": "o",
@@ -206,16 +174,11 @@ PROGRAM = {
     "status": "Draft",
     "custom_attribute_definitions": [],
     "custom_attributes": {},
-    "contact": {
-        "id": 1,
-        "href": "/api/people/1",
-        "type": "Person"
-    },
     "kind": "Directive",
     "title": "aaa",
     "description": "aaa",
     "notes": "aaaa",
-    "url": "facility url",
+    "url": "Program url",
     "reference_url": "reference url",
     "slug": "",
     "access_control_list": [],
@@ -229,11 +192,6 @@ AUDIT = {
     "custom_attribute_definitions": [],
     "custom_attributes": {},
     "_transient": {},
-    "contact": {
-        "id": 1,
-        "href": "/api/people/1",
-        "type": "Person"
-    },
     "title": "",
     "program": {
         "id": 1,
@@ -322,14 +280,10 @@ ORG_GROUP = {
     "status": "Active",
     "_pending_joins": [],
     "owners": [],
+    "access_control_list": [],
     "custom_attribute_definitions": [],
     "custom_attributes": {},
     "_transient": {},
-    "contact": {
-        "id": 1,
-        "href": "/api/people/1",
-        "type": "Person"
-    },
     "title": "uoau",
     "description": "uoauoe",
     "notes": "uoauo",
