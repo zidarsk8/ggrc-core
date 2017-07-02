@@ -19,7 +19,7 @@ class BigSetup(locust_setup_base.SetUpBaseTask):
   """
 
   _object_count = 1000
-  _user_count = 50
+  _user_count = 30
   _cad_prefixes = ["1"]
 
   _program_count = 10
