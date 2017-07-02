@@ -451,7 +451,7 @@ class BaseTaskSet(locust.TaskSet):
 
     while count > 0:
       if random_user:
-        self.set_random_user(roles=["Administrator", "Editor"])
+        self.set_random_user(roles=["Administrator"])
       batch_count = min(count, batch_size)
       name = None if batch_count == 1 else "count={}".format(batch_count)
       count -= batch_count
@@ -520,7 +520,7 @@ class BaseTaskSet(locust.TaskSet):
             snapshots=self.snapshots,
             count=count,
         )
-        self.set_random_user(roles=["Administrator", "Editor"])
+        self.set_random_user(roles=["Administrator"])
         slugs = self._post(model, data, name=name)
         all_slugs.extend(slugs)
     self._log_in()
