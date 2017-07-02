@@ -3,6 +3,7 @@
 
 """Base locust task module."""
 
+import logging
 import collections
 import random
 import json
@@ -11,6 +12,9 @@ import locust
 
 from performance import generator
 from performance import models
+
+
+logger = logging.getLogger()
 
 
 class BaseTaskSet(locust.TaskSet):
@@ -300,6 +304,8 @@ class BaseTaskSet(locust.TaskSet):
     elif not name:
       name = url
 
+    logger.debug(url)
+    logger.debug(json.dumps(data, sort_keys=True, indent=4))
     response = self.client.post(
         url,
         json=data,
