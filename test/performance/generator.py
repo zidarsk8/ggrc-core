@@ -120,8 +120,8 @@ def get_cav_value(cad_, objects):
       "Dropdown": cad_multichoice,
       "Checkbox": lambda: random.choice([True, False]) or cad_["mandatory"],
       "Date": lambda: "2017-06-21",
-      "Rich Text": lambda: random_str(length=random.randint(100, 1000)),
-      "Text": lambda: random_str(length=random.randint(10, 100)),
+      "Rich Text": lambda: random_str(length=random.randint(50, 200)),
+      "Text": lambda: random_str(length=random.randint(10, 50)),
   }
   return value_map[cad_["attribute_type"]]()
 
@@ -175,7 +175,7 @@ def generate(model, count, objects, cads, acr, **kwargs):
   content = []
   value_map = {
       "title": lambda i: random_str(prefix="{} title ({}) ".format(model, i)),
-      "description": lambda _: random_str(length=random.randint(100, 1000)),
+      "description": lambda _: random_str(length=random.randint(50, 200)),
       "custom_attribute_definitions": lambda _: cads,
       "custom_attributes": lambda _: cavs_old(cads, objects),
       "access_control_list": lambda _: acl(acr, objects),
@@ -250,8 +250,8 @@ def update_properties(obj):
   """Update first class properties of an object."""
   conclusions = ["", "Needs improvement", "Effective", "Ineffective"]
   value_map = {
-      "description": lambda: random_str(length=random.randint(100, 1000)),
-      "notes": lambda: random_str(length=random.randint(100, 1000)),
+      "description": lambda: random_str(length=random.randint(50, 200)),
+      "notes": lambda: random_str(length=random.randint(50, 200)),
       "design": lambda: random.choice(conclusions),
       "operationally": lambda: random.choice(conclusions),
   }
