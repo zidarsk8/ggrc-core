@@ -138,14 +138,14 @@ class BaseTaskSet(locust.TaskSet):
     """Get a single object from a slug."""
     return self.get_single(slug["type"], slug["id"])
 
-  def get_objects(self, model):
+  def get_objects(self, model, name=None):
     """Get all objects of a single type."""
     model_plural = models.TABLES_PLURAL[model]
     model_collection = "{}_collection".format(model_plural)
     response = self.client.get(
         "/api/{}".format(model_plural),
         headers=self.headers,
-        name="/_initial object get",
+        name=name,
     )
     if response.status_code == 200:
       response_json = response.json()
@@ -171,7 +171,7 @@ class BaseTaskSet(locust.TaskSet):
           for i in range(count)
       ]
     for model in models.SPECIAL_INITIAL_MODELS:
-      self.get_objects(model)
+      self.get_objects(model, name="/_initial object get")
 
   def _get_object(self, slug):
     """Retrieve full object from slug."""
