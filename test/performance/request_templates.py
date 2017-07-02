@@ -1230,6 +1230,7 @@ def assessment_related_status_query(person, statuses):
               "keys": ["status"],
               "order_by": {"keys": [], "order":"", "compare":None}
           },
-          "limit": [0, 10]
+          "limit": [0, 10],
+          "order_by": [{"name": "title", "desc": True}]
       }
   ]
