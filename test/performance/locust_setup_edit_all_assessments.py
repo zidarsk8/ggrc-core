@@ -29,13 +29,16 @@ class SetUpAssessments(base.BaseTaskSet):
         "Completed",
     ]
     count = len(self.objects["Assessment"])
-    edit_count = count - random.randint(count / 5, count / 2)
+    edit_count = count - random.randint(0, count / 3)
     assessments = generator.random_objects(
         "Assessment",
         edit_count,
         self.objects
     )
-    logger.debug("Updating {} assessments of {}.".format(edit_count, count))
+    logger.debug("Updating {} assessments of {}.".format(
+        len(assessments),
+        count,
+    ))
     for assessment in assessments:
       state = random.choice(states)
       self.update_object(assessment)
