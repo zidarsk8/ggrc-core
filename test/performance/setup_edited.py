@@ -23,29 +23,32 @@ class SetUpAssessments(base.BaseTaskSet):
   def set_up(self):
     super(SetUpAssessments, self).set_up()
 
+    self._edit_assessments()
+    self._edit_assessment_states()
+
+    sys.exit(0)
+
+  def _edit_assessments(self):
+    for assessment in self.objects["Assessment"][:30]:
+      self.update_object(assessment)
+
+  def _edit_assessment_states(self):
+    count = len(self.objects["Assessment"])
+    edit_count = count / 3
     states = [
-        "In Progress",
         "Ready for Review",
         "Completed",
     ]
-    count = len(self.objects["Assessment"])
-    edit_count = count - random.randint(0, count / 3)
     assessments = generator.random_objects(
         "Assessment",
         edit_count,
         self.objects
     )
-    logger.debug("Updating {} assessments of {}.".format(
-        len(assessments),
-        count,
-    ))
-    for assessment in assessments:
+    for assessment in assessments[:30]:
       state = random.choice(states)
-      self.update_object(assessment)
       self.update_object(assessment, changes={
           "status": state,
       })
-    sys.exit(0)
 
 
 class WebsiteUser(locust.HttpLocust):
