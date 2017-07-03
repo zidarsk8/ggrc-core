@@ -321,9 +321,9 @@ def upgrade():
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-  op.drop_index("value_integer", table_name="attributes")
-  op.drop_index("value_datetime", table_name="attributes")
-  op.drop_index("source_type", table_name="attributes")
+  op.drop_index("ix_value_integer", table_name="attributes")
+  op.drop_index("ix_value_datetime", table_name="attributes")
+  op.drop_index("ix_source", table_name="attributes")
   op.drop_table("attributes")
   op.drop_table("attribute_templates")
   op.drop_table("object_templates")
