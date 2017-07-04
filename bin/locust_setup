@@ -46,7 +46,7 @@ do
     --host="http://localhost:8080" \
     --locustfile="performance/setup_edited.py"
 
-  dump_name="../$filename-edited.sql"
+  dump_name="../${filename}_edited.sql"
   echo "Create dump file: $dump_name.gz"
   mysqldump -uroot -proot -h$DBHOST ggrcdev > $dump_name
   gzip -c $dump_name > "$dump_name.gz"
