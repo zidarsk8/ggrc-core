@@ -14,6 +14,8 @@ DBHOST=${GGRC_DATABASE_HOST-"127.0.0.1"}
 declare -a setup_files=(
   "setup_small" 
   "setup_medium" 
+  "setup_big" 
+  "setup_huge" 
 )
 
 
