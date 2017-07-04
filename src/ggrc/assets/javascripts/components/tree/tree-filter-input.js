@@ -32,6 +32,7 @@
       }
     },
     disabled: false,
+    showAdvanced: false,
     options: {},
     filters: null,
     init: function () {
