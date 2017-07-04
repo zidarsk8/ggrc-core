@@ -39,9 +39,9 @@
         return function (el) {
           showContent.bind('change', function (ev, val) {
             if (val) {
-              $(el).dialog();
+              $(el).modal();
             } else {
-              $(el).dialog('destroy');
+              $(el).modal('hide');
             }
           });
         };
