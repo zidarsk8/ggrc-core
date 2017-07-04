@@ -52,10 +52,6 @@ class AssessmentGET(base.BaseTaskSet):
     self._test_get_multiple(100)
 
   @locust.task(1)
-  def test_get_multiple_500(self):
-    self._test_get_multiple(500)
-
-  @locust.task(1)
   def test_get_multiple_1000(self):
     self._test_get_multiple(1000)
 
