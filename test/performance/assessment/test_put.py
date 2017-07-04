@@ -16,11 +16,11 @@ random.seed(1)
 logger = logging.getLogger()
 
 
-class ObjectUpdateTests(base.BaseTaskSet):
+class AssessmentPUT(base.BaseTaskSet):
   """Tests for object update operation."""
 
   @locust.task(1)
-  def test_assessment_update(self):
+  def test_put(self):
     states = [
         "In Progress",
         "Ready for Review",
@@ -35,15 +35,10 @@ class ObjectUpdateTests(base.BaseTaskSet):
     })
     logger.debug("\nAssessment: {}\n - state: {}".format(assessment, state))
 
-  @locust.task(1)
-  def test_market_update(self):
-    market = generator.random_object("Market", self.objects)
-    self.update_object(market)
-
 
 class WebsiteUser(locust.HttpLocust):
   """Locust http task runner."""
   # pylint: disable=too-few-public-methods
-  task_set = ObjectUpdateTests
+  task_set = AssessmentPUT
   min_wait = 100
   max_wait = 200
