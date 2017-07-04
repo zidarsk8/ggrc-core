@@ -517,8 +517,8 @@ class BaseTaskSet(locust.TaskSet):
     if not template_models:
       template_models = ["Control"]
     for audit in audits:
-      if not audit["context"]:
-        audit = self.get_from_slug(audit)
+      if not audit.get("context"):
+        audit = self.get_from_slug(audit).json().values()[0]
       for template_model in template_models:
         name = None if count == 1 else "count={}".format(count)
         audit_templates = self.assessment_templates[audit["id"]]
