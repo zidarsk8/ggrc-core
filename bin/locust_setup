@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Copyright (C) 2017 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+set -o nounset
+set -o errexit
+
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+ROOT_PATH="${SCRIPTPATH}/../"
+DBHOST=${GGRC_DATABASE_HOST-"127.0.0.1"}
+
+# filenames of locust setup files without .py
+declare -a setup_files=(
+  "setup_small" 
+  "setup_medium" 
+)
+
+
+cd "$ROOT_PATH/test"
+
+## now loop through the above array
+for filename in "${setup_files[@]}"
+do
+  echo "Locust setup for: $filename"
+  echo "db_reset"
+  db_reset
+  launch_ggrc &
+  sleep 1
+  SERVER_PID=$!
+
+  locust --no-web \
+    --clients=1 \
+    --hatch-rate=1 \
+    --host="http://localhost:8080" \
+    --locustfile="performance/$filename.py"
+
+  dump_name="../$filename.sql"
+  echo "Create dump file: $dump_name.gz"
+  mysqldump -uroot -proot -h$DBHOST ggrcdev > $dump_name
+  gzip -c $dump_name > "$dump_name.gz"
+  
+  # locust --no-web \
+  #   --clients=1 \
+  #   --hatch-rate=1 \
+  #   --host="http://localhost:8080" \
+  #   --locustfile="performance/setup_edited.py"
+
+  # dump_name="../$filename-edited.sql"
+  # echo "Create dump file: $dump_name.gz"
+  # mysqldump -uroot -proot -h$DBHOST ggrcdev > $dump_name
+  # gzip -f $dump_name
+
+  kill $SERVER_PID
+  echo ""
+done
