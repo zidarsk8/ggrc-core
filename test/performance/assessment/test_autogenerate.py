@@ -8,6 +8,7 @@ import random
 import locust
 
 from performance import base
+from performance import generator
 
 random.seed(1)
 
@@ -15,18 +16,36 @@ random.seed(1)
 class AutogenerateAssessmentTaskSet(base.BaseTaskSet):
   """Base class for locust setup tasks."""
 
-  @locust.task(1)
-  def test_autogenerate_assessments(self):
+  def set_up(self):
+    super(AutogenerateAssessmentTaskSet, self).set_up()
+    self.get_objects("Relationship")
+    self.get_objects("AssessmentTemplate")
+    self.get_objects("Snapshot")
+
+  def _genarate(self, count):
+    audits = generator.random_objects("Audit", 1, self.objects)
     self.autogenerate_assessments(
-        audits=self.objects["Audit"][:1],
+        audits=audits,
         template_models=["Control"],
-        count=10,
+        count=count,
     )
+
+  @locust.task(1)
+  def test_generate_10(self):
+    self._genarate(10)
+
+  @locust.task(1)
+  def test_generate_100(self):
+    self._genarate(100)
+
+  @locust.task(1)
+  def test_generate_1000(self):
+    self._genarate(1000)
 
 
 class WebsiteUser(locust.HttpLocust):
   """Locust http task runner."""
   # pylint: disable=too-few-public-methods
   task_set = AutogenerateAssessmentTaskSet
-  min_wait = 10000
-  max_wait = 10000
+  min_wait = 100
+  max_wait = 200
