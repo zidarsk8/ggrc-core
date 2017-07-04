@@ -11,6 +11,7 @@
                          (filter)="onFilter"
                          (openAdvanced)="openAdvancedFilter"
                          (removeAdvanced)="removeAdvancedFilters"
+                         {show-advanced}="statusFilterVisible"
                          {disabled}="advancedSearch.filter"
       ></tree-filter-input>
       {{#if statusFilterVisible}}
