@@ -11,19 +11,17 @@
       <div class="deletable-people-group__person action-toolbar">
         <person-list-item person="{.}" {with-details}="withDetails">
           {{#unless isDisabled}}
-            {{#if canUnmap}}
-              {{#unmapablePerson required peopleLength}}
-                {{#is_allowed 'update' instance}}
-                <div class="action-toolbar__controls">
-                  <a href="javascript://" class="info-action unmap" ($click)="unmap(person)">
-                    <action-toolbar-control>
-                      <i class="fa fa-trash"></i>
-                    </action-toolbar-control>
-                  </a>
-                </div>
-                {{/is_allowed}}
-              {{/unmapablePerson}}
-            {{/if}}
+            {{#unmapablePerson}}
+              {{#is_allowed 'update' instance}}
+              <div class="action-toolbar__controls">
+                <a href="javascript://" class="info-action unmap" ($click)="unmap(person)">
+                  <action-toolbar-control>
+                    <i class="fa fa-trash"></i>
+                  </action-toolbar-control>
+                </a>
+              </div>
+              {{/is_allowed}}
+            {{/unmapablePerson}}
           {{/unless}}
         </person-list-item>
       </div>

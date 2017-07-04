@@ -6,63 +6,40 @@
 (function (can, GGRC, Mustache) {
   'use strict';
 
+  var viewModel = GGRC.VM.DeletablePeopleGroup.extend({
+    title: '@',
+    editableMode: false,
+    validation: {},
+    personSelected: function (person) {
+      this.dispatch({
+        type: 'personSelected',
+        person: person,
+        groupId: this.attr('groupId')
+      });
+    },
+    save: function () {
+      this.dispatch('saveChanges');
+    },
+    cancel: function () {
+      this.changeEditableMode(false);
+    },
+    changeEditableMode: function (editableMode) {
+      this.attr('editableMode', editableMode);
+      this.dispatch({
+        type: 'changeEditableMode',
+        isAddEditableGroup: editableMode,
+        groupId: this.attr('groupId')
+      });
+    }
+  });
+
   GGRC.Components('editablePeopleGroup', {
     tag: 'editable-people-group',
     template: can.view(
       GGRC.mustache_path +
       '/components/people/editable-people-group.mustache'
     ),
-    viewModel: {
-      define: {
-        peopleLength: {
-          get: function () {
-            return this.attr('people').length;
-          }
-        },
-        emptyListMessage: {
-          type: 'string',
-          value: ''
-        }
-      },
-      title: '@',
-      required: '@',
-      people: [],
-      groupId: '@',
-      instance: {},
-      isLoading: false,
-      canUnmap: true,
-      withDetails: false,
-      editableMode: false,
-      validation: {},
-      personSelected: function (person) {
-        this.dispatch({
-          type: 'personSelected',
-          person: person,
-          groupId: this.attr('groupId')
-        });
-      },
-      unmap: function (person) {
-        this.dispatch({
-          type: 'unmap',
-          person: person,
-          groupId: this.attr('groupId')
-        });
-      },
-      save: function () {
-        this.dispatch('saveChanges');
-      },
-      cancel: function () {
-        this.changeEditableMode(false);
-      },
-      changeEditableMode: function (editableMode) {
-        this.attr('editableMode', editableMode);
-        this.dispatch({
-          type: 'changeEditableMode',
-          isAddEditableGroup: editableMode,
-          groupId: this.attr('groupId')
-        });
-      }
-    },
+    viewModel: viewModel,
     events: {
       '{window} mousedown': function (el, ev) {
         var viewModel = this.viewModel;

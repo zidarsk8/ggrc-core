@@ -15,7 +15,7 @@
       name="notes"
       type="text"
       id="notes"
-      value="{{notes}}"/>
+      {$value}="notes"/>
   </div>
 </div>
 
@@ -53,7 +53,7 @@
       class="input-block-level"
       placeholder="http://www.domain.com/"
       type="text"
-      value="{{url}}">
+      {$value}="url">
   </div>
   <div class="ggrc-form-item__multiple-row">
     <label class="ggrc-form-item__label">
@@ -66,7 +66,7 @@
       placeholder="https://www.example.com/"
       name="reference_url"
       type="text"
-      value="{{reference_url}}">
+      {$value}="reference_url">
   </div>
 </div>
 
@@ -81,7 +81,7 @@
       name="slug"
       placeholder="ASSESSMENT-XXX"
       type="text"
-      value="{{slug}}">
+      {$value}="slug">
   </div>
   <div class="ggrc-form-item__multiple-row">
     <label class="ggrc-form-item__label">
@@ -89,8 +89,8 @@
     </label>
     <datepicker
       tabindex="15"
-      date="instance.start_date"
-      set-max-date="instance.end_date"
+      date="start_date"
+      set-max-date="end_date"
       helptext="Enter the date this object becomes effective."
       test-id="startTestId"
     />
@@ -101,8 +101,8 @@
     </label>
     <datepicker
       tabindex="16"
-      date="instance.end_date"
-      set-min-date="instance.start_date"
+      date="end_date"
+      set-min-date="start_date"
       helptext="Enter the date this object stops being effective."
       test-id="endTestId"
     />

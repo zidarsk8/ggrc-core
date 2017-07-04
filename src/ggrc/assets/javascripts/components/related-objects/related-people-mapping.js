@@ -49,7 +49,6 @@
           this.attr('backUpPendings').replace(pendingJoins);
         } else {
           this.attr('editableMode', false);
-          this.attr('instance').dispatch('refreshInstance');
           pendingJoins.replace(this.attr('backUpPendings'));
           this.updateResult();
         }

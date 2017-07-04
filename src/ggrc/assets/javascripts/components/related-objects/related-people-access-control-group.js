@@ -82,6 +82,40 @@
 
         this.revokeRole(person, groupId);
       },
+      _save: function (isAdding) {
+        var successMessage = 'User role ' +
+          (isAdding ? 'added.' : 'removed.');
+        var errorMessage = isAdding ? 'Adding' : 'Removing' +
+          ' user role failed.';
+
+        if (!this.autosave) {
+          if (isAdding) {
+            this.attr('isPendingGrant', false);
+          } else {
+            this.attr('pendingRevoke', null);
+          }
+          this._rebuildRolesInfo();
+          can.batch.stop();
+          return;
+        }
+
+        this.attr('instance').save()
+          .done(function () {
+            GGRC.Errors.notifier('success', successMessage);
+          })
+          .fail(function () {
+            GGRC.Errors.notifier('error', errorMessage);
+          })
+          .always(function () {
+            if (isAdding) {
+              this.attr('isPendingGrant', false);
+            } else {
+              this.attr('pendingRevoke', null);
+            }
+            this._rebuildRolesInfo();
+            can.batch.stop();
+          }.bind(this));
+      },
 
       /**
        * Grant role to user on the model instance.
@@ -122,25 +156,7 @@
         roleEntry = {person: person, ac_role_id: roleId};
         inst.attr('access_control_list').push(roleEntry);
 
-        if (!this.autosave) {
-          this.attr('isPendingGrant', false);
-          this._rebuildRolesInfo();
-          can.batch.stop();
-          return;
-        }
-
-        inst.save()
-          .done(function () {
-            GGRC.Errors.notifier('success', 'User role added.');
-          })
-          .fail(function () {
-            GGRC.Errors.notifier('error', 'Adding user role failed.');
-          })
-          .always(function () {
-            this.attr('isPendingGrant', false);
-            this._rebuildRolesInfo();
-            can.batch.stop();
-          }.bind(this));
+        this._save(true);
       },
 
       /**
@@ -176,25 +192,7 @@
         can.batch.start();
         inst.access_control_list.splice(idx, 1);
 
-        if (!this.autosave) {
-          this.attr('pendingRevoke', null);
-          this._rebuildRolesInfo();
-          can.batch.stop();
-          return;
-        }
-
-        inst.save()
-          .done(function () {
-            GGRC.Errors.notifier('success', 'User role removed.');
-          })
-          .fail(function () {
-            GGRC.Errors.notifier('error', 'Removing user role failed.');
-          })
-          .always(function () {
-            this.attr('pendingRevoke', null);
-            this._rebuildRolesInfo();
-            can.batch.stop();
-          }.bind(this));
+        this._save();
       },
 
       _rebuildRolesInfo: function () {

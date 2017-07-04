@@ -4,7 +4,7 @@
 }}
 
 <div class="editable-people-group">
-<label class="action-toolbar editable-people-group__label required-label">
+<label class="action-toolbar editable-people-group__label form-label required-label">
   <span class="people-group__title">
     {{#unless editableMode}}
       <spinner class="people-group__title-spinner" {toggle}="isLoading"></spinner>
@@ -36,17 +36,15 @@
             {is-disabled}="isLoading"
             {empty-message}="emptyListMessage">
             <person-list-item person="{.}" {with-details}="withDetails">
-              {{#if canUnmap}}
-                {{#unmapablePerson required peopleLength}}
-                  {{#is_allowed 'update' instance}}
-                  <a href="javascript://"
-                    class="info-action editable-people-group__unmap {{#if isDisabled}}disabled{{/if}}"
-                    ($click)="unmap(person)">
-                    <i class="fa fa-trash"></i>
-                  </a>
-                  {{/is_allowed}}
-                {{/unmapablePerson}}
-              {{/if}}
+              {{#unmapablePerson}}
+                {{#is_allowed 'update' instance}}
+                <a href="javascript://"
+                  class="info-action editable-people-group__unmap {{#if isDisabled}}disabled{{/if}}"
+                  ($click)="unmap(person)">
+                  <i class="fa fa-trash"></i>
+                </a>
+                {{/is_allowed}}
+              {{/unmapablePerson}}
             </person-list-item>
           </object-list>
           <div>
