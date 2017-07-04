@@ -237,6 +237,14 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
     )
 
   @classmethod
+  def indexed_query(cls):
+    return super(Workflow, cls).indexed_query().options(
+        orm.Load(cls).undefer_group(
+            "Workflow_complete",
+        ),
+    )
+
+  @classmethod
   def ensure_backlog_workflow_exists(cls):
     """Ensures there is at least one backlog workflow with an active cycle.
     If such workflow does not exist it creates one."""

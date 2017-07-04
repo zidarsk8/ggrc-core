@@ -113,9 +113,9 @@ class Document(Ownable, Relatable, Base, Indexed, db.Model):
   @classmethod
   def indexed_query(cls):
     return super(Document, cls).indexed_query().options(
-        orm.Load(cls).load_only("title"),
-        orm.Load(cls).load_only("link"),
-        orm.Load(cls).load_only("description"),
+        orm.Load(cls).undefer_group(
+            "Document_complete",
+        ),
     )
 
   @classmethod

@@ -20,7 +20,7 @@ from ggrc.utils import generate_query_chunks
 
 from ggrc.snapshotter.rules import Types
 from ggrc.snapshotter.datastructures import Pair
-from ggrc.fulltext.attributes import FullTextAttr, DatetimeFullTextAttr
+from ggrc.fulltext.attributes import FullTextAttr
 
 
 LOGGER = logging.getLogger(__name__)
@@ -41,10 +41,9 @@ def _get_class_properties():
         getattr(all_models, klass_name), '_fulltext_attrs'
     )
     for attr in full_text_attrs:
-      is_dt_field = isinstance(attr, DatetimeFullTextAttr)
-      if isinstance(attr, FullTextAttr):
-        attr = attr.alias
-      class_properties[klass_name].append((attr, is_dt_field))
+      if not isinstance(attr, FullTextAttr):
+        attr = FullTextAttr(attr, attr)
+      class_properties[klass_name].append(attr)
   return class_properties
 
 
@@ -91,11 +90,9 @@ def get_searchable_attributes(attributes, cad_dict, content):
     Dict of "key": "value" from objects revision
   """
   searchable_values = {}
-  for attr, is_datetime_field in attributes:
-    value = content.get(attr)
-    if value and is_datetime_field:
-      value = value.replace("T", " ")
-    searchable_values[attr] = value
+  for attr in attributes:
+    value = attr.get_attribute_revisioned_value(content)
+    searchable_values[attr.alias] = value
 
   cav_list = content.get("custom_attributes", [])
 

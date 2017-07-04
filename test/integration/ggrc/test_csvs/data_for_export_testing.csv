@@ -605,31 +605,31 @@ clause,Title,Text of Clause,Notes,Admin,,,Clause URL,Reference URL,Code,Effectiv
 ,,,,,,,,,,,,,,,,,,,,,,,,
 Object Type,,,,,,,,,,,,,,,,,,,,,,,,
 control,Title,Description,Test Plan,Notes,Admin,,,Control URL,Reference URL,Code,Kind/Nature,Fraud Related,Significance,Type/Means,Effective Date,Stop Date,Frequency,Assertions,Categories,,,State,map:standard,map:clause
-,Startupsum 115,Series A financing success channels.<br> Ecosystem conversion rockstar value proposition bandwidth,success 111,,smotko@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-1,Preventative,,,Technical,,,Monthly,,,,,Draft,"standard-1
+,Startupsum 115,Series A financing success channels.<br> Ecosystem conversion rockstar value proposition bandwidth,success 111,,smotko@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-1,Preventative,yes,,Technical,,,Monthly,,,,,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 116,facebook validation responsive web design business plan.<br> Startup pivot founders.<br> Infrastructure f,success 112,,smotko@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-2,Preventative,,,automated,,,Monthly,,,,,Draft,"standard-1
+,Startupsum 116,facebook validation responsive web design business plan.<br> Startup pivot founders.<br> Infrastructure f,success 112,,smotko@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-2,Preventative,no,,automated,,,Monthly,,,,,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 117,unding stock iteration founders freemium hackathon alpha research & development seed money branding.<br> In,success 113,,smotko@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-3,Preventative,,,Technical,,,,,,,,Draft,"standard-1
+,Startupsum 117,unding stock iteration founders freemium hackathon alpha research & development seed money branding.<br> In,success 113,,smotko@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-3,Preventative,yes,,Technical,,,,,,,,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 118,fluencer scrum project startup android.<br> Partner network interaction design network effects creative conversion business plan equity influencer innovator return on investment validation buzz A/B testing research & development.<br> Non-disclosure agreement business-to-consumer gen-z.<br> Graphical user interface sales conversion pivot market scrum project android angel investor product management ramen entrepreneur rockstar.<br> Churn rate vesting period infographic social proof stealth prototype android traction freemium www.<br>discoverartisans.<br>com.<br> Gamification leverage responsive web design seed money social proof.<br>,success 114,,Urbon.S@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-4,,,,automated,,,,,,,,Draft,"standard-1
+,Startupsum 118,fluencer scrum project startup android.<br> Partner network interaction design network effects creative conversion business plan equity influencer innovator return on investment validation buzz A/B testing research & development.<br> Non-disclosure agreement business-to-consumer gen-z.<br> Graphical user interface sales conversion pivot market scrum project android angel investor product management ramen entrepreneur rockstar.<br> Churn rate vesting period infographic social proof stealth prototype android traction freemium www.<br>discoverartisans.<br>com.<br> Gamification leverage responsive web design seed money social proof.<br>,success 114,,Urbon.S@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-4,,no,,automated,,,,,,,,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 119,,success 115,,Urbon.S@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-5,,,,manual,,,,,,,,Draft,"standard-1
+,Startupsum 119,,success 115,,Urbon.S@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-5,,,key,manual,,,,,,,,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 120,Business plan startup A/B testing direct mailing angel investor infrastructure gamification business model canvas,success 116,,Urbon.S@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-6,,,,Physical,,,,,,,,Draft,"standard-1
+,Startupsum 120,Business plan startup A/B testing direct mailing angel investor infrastructure gamification business model canvas,success 116,,Urbon.S@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-6,,,Non-key,Physical,,,,,,,,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 121,graphical user interface.<br> Accelerator user experience metrics MVP.<br> Business model canvas termsheet respo,success 117,,Urbon.S@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-7,,,,manual,,,,,,,,Draft,"standard-1
+,Startupsum 121,graphical user interface.<br> Accelerator user experience metrics MVP.<br> Business model canvas termsheet respo,success 117,,Urbon.S@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-7,,,key,manual,,,,,,,,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 122,nsive web design launch party long tail innovator burn rate stealth seed money disruptive startup metrics business plan funding.<br> Early adopters bandwidth monetization equity.<br> Infrastructure ownership iPhone early adopters lean startup buyer iPad founders equity accelerator.<br> Graphical user interface angel investor niche market partnership strategy business-to-business di,success 118,,zidar@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-8,,,,automated,,,,,,,,Draft,"standard-1
+,Startupsum 122,nsive web design launch party long tail innovator burn rate stealth seed money disruptive startup metrics business plan funding.<br> Early adopters bandwidth monetization equity.<br> Infrastructure ownership iPhone early adopters lean startup buyer iPad founders equity accelerator.<br> Graphical user interface angel investor niche market partnership strategy business-to-business di,success 118,,zidar@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-8,,,Non-key,automated,,,,,,,,Draft,"standard-1
 standard-5","clause-1
 clause-2"
-,Startupsum 123,rect mailing founders burn rate crowdsource.<br> Alpha startup client channels hackathon value proposition.<br> Vira,success 119,,Urbon.S@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-9,,,,Technical,,,,,,,,Draft,"standard-1
+,Startupsum 123,rect mailing founders burn rate crowdsource.<br> Alpha startup client channels hackathon value proposition.<br> Vira,success 119,,Urbon.S@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-9,,,key,Technical,,,,,,,,Draft,"standard-1
 standard-5","clause-1
 clause-2"
 ,Startupsum 124,lity pivot seed round social media creative burn rate vesting period hackathon metrics branding.<br> Conversion analytics launch party growth hacking android virality.<br> Partnership mass market twitter return on investment seed money lean startup investor iPad.<br>,success 120,,Urbon.S@example.com,,,,http://i.imgur.com/aP8UU5I.jpg,control-10,,,,Physical,,,,,,,,Draft,"standard-1

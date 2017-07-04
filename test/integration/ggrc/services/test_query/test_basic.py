@@ -605,6 +605,59 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
     controls_ordered_2 = sorted(controls_unordered, key=sort_key)
     self.assertListEqual(controls_ordered_1, controls_ordered_2)
 
+  def test_filter_control_by_key_control(self):
+    """Test correct filtering by SIGNIFICANCE field"""
+    controls = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              expression=["significance", "=", "non-key"]),
+        "Control",
+    )
+    self.assertEqual(controls["count"], 2)
+
+  def test_order_control_by_key_control(self):
+    """Test correct ordering and by SIGNIFICANCE field"""
+    controls_unordered = self._get_first_result_set(
+        self._make_query_dict("Control",),
+        "Control", "values"
+    )
+    controls_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "significance"},
+                                        {"name": "id"}]),
+        "Control", "values"
+    )
+    controls_ordered_2 = sorted(controls_unordered,
+                                key=lambda ctrl: (ctrl["key_control"] is None,
+                                                  ctrl["key_control"]),
+                                reverse=True)
+    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+
+  def test_filter_control_by_fraud_related(self):
+    """Test correct filtering by fraud_related field"""
+    controls = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              expression=["fraud related", "=", "yes"]),
+        "Control",
+    )
+    self.assertEqual(controls["count"], 2)
+
+  def test_order_control_by_fraud_related(self):
+    """Test correct ordering and by fraud_related field"""
+    controls_unordered = self._get_first_result_set(
+        self._make_query_dict("Control",),
+        "Control", "values"
+    )
+
+    controls_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "fraud related"},
+                                        {"name": "id"}]),
+        "Control", "values"
+    )
+    controls_ordered_2 = sorted(controls_unordered,
+                                key=lambda ctrl: ctrl["fraud_related"])
+    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
     programs_values = self._get_first_result_set(
