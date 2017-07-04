@@ -28,11 +28,14 @@
         set: function (state) {
           var filterStates =
             StateUtils.getStatesForModel(this.attr('modelName'));
-          var selectedStates = state.items;
-          this.attr('filterStates', filterStates.map(function (state) {
+
+          state.items = state.items ||
+            StateUtils.getDefaultStatesForModel(this.attr('modelName'));
+
+          this.attr('filterStates', filterStates.map(function (filterState) {
             return {
-              value: state,
-              checked: (selectedStates && (selectedStates.indexOf(state) > -1))
+              value: filterState,
+              checked: (state.items.indexOf(filterState) > -1)
             };
           }));
 
