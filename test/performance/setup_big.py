@@ -7,12 +7,12 @@ import random
 
 import locust
 
-from performance import locust_setup_base
+from performance import setup_base
 
 random.seed(1)
 
 
-class BigSetup(locust_setup_base.SetUpBaseTask):
+class BigSetup(setup_base.SetUpBaseTask):
   """Big setup task.
 
   For property and number descriptions see the super class.
