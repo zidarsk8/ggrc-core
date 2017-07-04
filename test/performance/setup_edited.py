@@ -23,28 +23,24 @@ class SetUpAssessments(base.BaseTaskSet):
   def set_up(self):
     super(SetUpAssessments, self).set_up()
 
-    self._edit_assessments()
-    self._edit_assessment_states()
+    count = len(self.objects["Assessment"]) / 10
+    assessments = generator.random_objects("Assessment", count, self.objects)
+    self._edit_assessments(assessments)
+    self._edit_assessment_states(assessments[:count / 2])
 
     sys.exit(0)
 
-  def _edit_assessments(self):
-    for assessment in self.objects["Assessment"][:30]:
+  def _edit_assessments(self, assessments):
+    for assessment in assessments:
       self.update_object(assessment)
 
-  def _edit_assessment_states(self):
-    count = len(self.objects["Assessment"])
-    edit_count = count / 3
+  def _edit_assessment_states(self, assessments):
     states = [
         "Ready for Review",
         "Completed",
+        "Verified",
     ]
-    assessments = generator.random_objects(
-        "Assessment",
-        edit_count,
-        self.objects
-    )
-    for assessment in assessments[:30]:
+    for assessment in assessments:
       state = random.choice(states)
       self.update_object(assessment, changes={
           "status": state,
