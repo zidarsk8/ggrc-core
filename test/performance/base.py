@@ -510,27 +510,45 @@ class BaseTaskSet(locust.TaskSet):
   def create_org_groups(self, **kwargs):
     return self.create_object("OrgGroup", **kwargs)
 
-  def autogenerate_assessments(self, audits, template_models, count):
+  def _get_audit_slug(self, audit):
+    """Get a full audit slug with context."""
+    if not audit.get("context"):
+      audit = self.get_from_slug(audit).json().values()[0]
+    return audit
+
+  def _get_audit_templates(self, audit):
+    """Get assessment templates for the given audit."""
+    audit_templates = self.assessment_templates[audit["id"]]
+    # TODO: fetch assessment templates from server if not available
+    return audit_templates
+
+  def _get_audit_snapshots(self, audit):
+    """Get all snapshot related to a given audit."""
+    snapshots = self.snapshots[audit["id"]]
+    # TODO: fetch snapshots from server if not available
+    return snapshots
+
+  def autogenerate_assessments(self, audits, template_models=None, count=10):
     """Auto-generate assessments from templates."""
     model = "Assessment"
     all_slugs = []
-    if not template_models:
-      template_models = ["Control"]
+    template_models = template_models or ["Control"]
     for audit in audits:
-      if not audit.get("context"):
-        audit = self.get_from_slug(audit).json().values()[0]
+      audit = self._get_audit_slug(audit)
       for template_model in template_models:
-        name = None if count == 1 else "count={}".format(count)
-        audit_templates = self.assessment_templates[audit["id"]]
+        snapshots = self._get_audit_snapshots(audit)
+        audit_templates = self._get_audit_templates(audit)
         template = generator.random_object(template_model, audit_templates)
         data = generator.assessment_from_template(
             audit=audit,
             template=template,
-            snapshots=self.snapshots,
+            snapshots=snapshots,
             count=count,
         )
-        self.set_random_user(roles=["Administrator"])
-        slugs = self._post(model, data, name=name)
-        all_slugs.extend(slugs)
+        if data:
+          name = "count={}".format(len(data))
+          self.set_random_user(roles=["Administrator"])
+          slugs = self._post(model, data, name=name)
+          all_slugs.extend(slugs)
     self._log_in()
     return all_slugs

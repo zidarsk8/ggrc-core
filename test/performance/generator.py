@@ -232,8 +232,7 @@ def assessment_from_template(audit, template, snapshots, count=10):
   model = "Assessment"
   content = []
   template_object_type = template["template_object_type"]
-  objects = snapshots[audit["id"]]
-  template_objects = random_objects(template_object_type, count, objects)
+  template_objects = random_objects(template_object_type, count, snapshots)
   for template_object in template_objects:
     data = templates.get_template("AssessmentGeneration")
     data["object"] = template_object
