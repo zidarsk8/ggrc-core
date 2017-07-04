@@ -5,7 +5,10 @@ Test if global editor and global reader role has the permission to access
 the workflow objects, owned by Admin.
 """
 # T0D0: write tests for create, update, delete
+import ddt as ddt
 
+from appengine.base import with_memcache
+from ggrc.models import all_models
 from ggrc_workflows.models import Workflow
 from ggrc_workflows.models import WorkflowPerson
 from ggrc_workflows.models import TaskGroup
@@ -16,8 +19,11 @@ from ggrc_workflows.models import CycleTaskGroup
 from ggrc_workflows.models import CycleTaskGroupObjectTask
 
 from integration.ggrc_workflows.roles import WorkflowRolesTestCase
+from integration.ggrc_basic_permissions.models import factories as bp_factories
 
 
+@with_memcache
+@ddt.ddt
 class GlobalEditorReaderGetTest(WorkflowRolesTestCase):
   """ Get workflow objects owned by another user
   as global editor and global reader.
@@ -127,3 +133,37 @@ class GlobalEditorReaderGetTest(WorkflowRolesTestCase):
     cycle_object_res = self.api.get(
         CycleTaskGroupObjectTask, cycle_object_obj.id)
     self.assert200_helper(cycle_object_res)
+
+  @ddt.data(("reader", "WorkflowMember", False),
+            ("creator", "WorkflowMember", False),
+            ("editor", "WorkflowMember", False),
+            ("admin2", "WorkflowMember", True),
+            ("reader", "WorkflowOwner", True),
+            ("creator", "WorkflowOwner", True),
+            ("editor", "WorkflowOwner", True),
+            ("admin2", "WorkflowOwner", True))
+  @ddt.unpack
+  def test_assigned_task_delete(self, user_role, workflow_role, can_delete):
+    """ Test possibility to delete of assigned cycle task"""
+    user = self.users[user_role]
+    self.api.set_user(user)
+
+    wf_role_obj = all_models.Role.query.filter_by(name=workflow_role).one()
+
+    _, self.workflow_obj = self.activate_workflow_with_cycle(self.workflow_obj)
+
+    bp_factories.UserRoleFactory(person=user,
+                                 role=wf_role_obj,
+                                 context=self.workflow_obj.context)
+
+    cycle_task = self.session.query(CycleTaskGroupObjectTask).filter(
+        CycleTaskGroupObjectTask.task_group_task_id ==
+        self.first_task_group_task.id
+    ).first()
+
+    res = self.api.delete(cycle_task)
+
+    if can_delete:
+      self.assert200(res)
+    else:
+      self.assert403(res)

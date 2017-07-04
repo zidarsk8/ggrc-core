@@ -6,7 +6,7 @@ from sqlalchemy import and_
 from sqlalchemy import case
 from sqlalchemy import literal
 from sqlalchemy import or_
-from sqlalchemy import true
+from sqlalchemy import true, false
 from sqlalchemy import union
 from sqlalchemy import alias
 from sqlalchemy.orm import aliased
@@ -177,16 +177,30 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
         model.id.label('id'),
         literal(model.__name__).label('type'),
         literal(None).label('context_id'),
-    ).join(Cycle, Cycle.id == model.cycle_id).filter(
-        and_(
-            Cycle.is_current == true(),
-            model.contact_id == contact_id,
-            model.status.in_(
-                all_models.CycleTaskGroupObjectTask.ACTIVE_STATES
-            )
+    ).join(
+        Cycle,
+        Cycle.id == model.cycle_id
+    ).filter(
+        Cycle.is_current == true(),
+        model.contact_id == contact_id
+    )
+    return task_query.filter(
+        Cycle.is_verification_needed == true(),
+        model.status.in_([
+            all_models.CycleTaskGroupObjectTask.ASSIGNED,
+            all_models.CycleTaskGroupObjectTask.IN_PROGRESS,
+            all_models.CycleTaskGroupObjectTask.FINISHED,
+            all_models.CycleTaskGroupObjectTask.DECLINED,
+        ])
+    ).union_all(
+        task_query.filter(
+            Cycle.is_verification_needed == false(),
+            model.status.in_([
+                all_models.CycleTaskGroupObjectTask.ASSIGNED,
+                all_models.CycleTaskGroupObjectTask.IN_PROGRESS,
+            ])
         )
     )
-    return task_query
 
   def _get_model_specific_query(model):
     """Prepare query specific for a particular model."""

@@ -104,7 +104,7 @@
         this.on();
       },
       destroy: function () {
-        this.viewModel.parent_instance.removeAttr('changes');
+        this.viewModel.parent_instance.removeAttr('_changes');
       },
       setListItems: function (list) {
         var currentList = this.viewModel.attr('list');
@@ -180,7 +180,7 @@
             how: 'add',
             extra: extraAttrs
           });
-          this.viewModel.parent_instance.attr('changes',
+          this.viewModel.parent_instance.attr('_changes',
             this.viewModel.changes);
         } else {
           mapping = this.viewModel.mapping ||
@@ -215,7 +215,7 @@
 
           if (this.viewModel.attr('deferred')) {
             this.viewModel.changes.push({what: obj, how: 'remove'});
-            this.viewModel.parent_instance.attr('changes',
+            this.viewModel.parent_instance.attr('_changes',
               this.viewModel.changes);
           } else {
             mapping = this.viewModel.mapping ||
@@ -300,7 +300,7 @@
         can.each(data.arr || [data], function (obj) {
           if (this.viewModel.attr('deferred')) {
             this.viewModel.changes.push({what: obj, how: 'add'});
-            this.viewModel.parent_instance.attr('changes',
+            this.viewModel.parent_instance.attr('_changes',
               this.viewModel.changes);
           } else {
             mapping = this.viewModel.mapping ||

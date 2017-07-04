@@ -14,7 +14,7 @@
     destroy: 'DELETE /api/assessments/{id}',
     create: 'POST /api/assessments',
     mixins: [
-      'ownable', 'contactable', 'unique_title',
+      'ownable', 'unique_title',
       'autoStatusChangeable', 'timeboxed', 'mapping-limit',
       'inScopeObjects'
     ],

@@ -120,8 +120,7 @@ class Common(object):
   TRUE = "true"
   FALSE = "false"
   # fictional elements (need to convert UI attrs to Entities attrs)
-  CAS_HEADERS = "CAs Headers"
-  CAS_VALUES = "CAs Values"
+  CAS = "CAs"
 
 
 class Base(object):
@@ -165,8 +164,11 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   AUDIT_LEAD = "Internal Audit Lead"
   MANAGER = "Manager"
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
-  CREATORS = "Creators"
   MAPPED_OBJECTS = "Mapped Objects"
+  REVIEW_STATE = "Review State"
+  CREATORS = "Creators"
+  ASSIGNEES = "Assignees"
+  VERIFIERS = "Verifiers"
 
 
 class CommonProgram(Common):
@@ -215,6 +217,10 @@ class CommonAssessment(Common):
   STATE = Base.STATE
   CREATORS_ = "Creator(s) *"
   CREATORS = TransformationSetVisibleFields.CREATORS
+  ASSIGNEES_ = "Assignee(s) *"
+  ASSIGNEES = TransformationSetVisibleFields.ASSIGNEES
+  VERIFIERS_ = "Verifier(s)"
+  VERIFIERS = TransformationSetVisibleFields.ASSIGNEES
   MAPPED_OBJECTS = TransformationSetVisibleFields.MAPPED_OBJECTS
   VERIFIED = TransformationSetVisibleFields.VERIFIED
 
@@ -308,6 +314,8 @@ class AssessmentModalSetVisibleFields(CommonModalSetVisibleFields):
  """
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonAssessment.ASMT)
+  CREATORS = TransformationSetVisibleFields.CREATORS
+  ASSIGNEES = TransformationSetVisibleFields.ASSIGNEES
   VERIFIED = TransformationSetVisibleFields.VERIFIED
   CONCLUSION_DESIGN = "Conclusion: Design"
   CONCLUSION_OPERATION = "Conclusion: Operation"
@@ -317,8 +325,8 @@ class AssessmentModalSetVisibleFields(CommonModalSetVisibleFields):
   REFERENCE_URL = Base.REFERENCE_URL
   TYPE = Base.TYPE
   DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.STATE, VERIFIED,
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.STATE,
+      VERIFIED, CommonModalSetVisibleFields.CODE, CREATORS, ASSIGNEES,
       CommonModalSetVisibleFields.LAST_UPDATED)
 
 
@@ -329,6 +337,7 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonControl.CONTROL)
+  REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
   ADMIN = TransformationSetVisibleFields.ADMIN
   URL = Base.URL
   REFERENCE_URL = Base.REFERENCE_URL
@@ -343,7 +352,8 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   CATEGORIES = "Categories"
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, ADMIN,
-      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE)
+      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED, REVIEW_STATE)
 
 
 class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -354,7 +364,7 @@ class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonIssue.ISSUE)
   ADMIN = TransformationSetVisibleFields.ADMIN
-  REVIEW_STATE = "Review State"
+  REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
   URL = Base.URL
   REFERENCE_URL = Base.REFERENCE_URL
   DEFAULT_SET_FIELDS = (
@@ -370,7 +380,7 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   # pylint: disable=too-many-instance-attributes
   MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
       CommonProgram.PROGRAM)
-  REVIEW_STATE = "Review State"
+  REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
   MANAGER = CommonProgram.MANAGER
   URL = Base.URL
   REFERENCE_URL = Base.REFERENCE_URL
@@ -378,10 +388,23 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   STOP_DATE = Base.STOP_DATE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.STATE, MANAGER)
+      CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED, REVIEW_STATE)
 
 
 class MappingStatusAttrs(namedtuple('_MappingStatusAttrs',
                                     ['title', 'is_checked', 'is_disabled'])):
   """Class for representation of html attributes for mapping checkboxes
    on unified mapper"""
+
+
+class DropdownMenuItemTypes(object):
+  """Class for types of DropdownMenu Item according to "icon" css class"""
+  EDIT = "pencil-square-o"
+  OPEN = "long-arrow-right"
+  GET_PERMALINK = "link"
+  DELETE = "trash"
+  MAP = "code-fork"
+  UNMAP = "ban"
+  CLONE = "clone"
+  UPDATE = "refresh"

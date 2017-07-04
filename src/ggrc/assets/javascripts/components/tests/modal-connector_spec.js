@@ -157,7 +157,7 @@ describe('GGRC.Components.modalConnector', function () {
     it('removes changes from parent_instance', function () {
       that.viewModel.parent_instance.attr('changes', [1, 2]);
       handler();
-      expect(that.viewModel.parent_instance.changes).toEqual(undefined);
+      expect(that.viewModel.parent_instance._changes).toEqual(undefined);
     });
   });
   describe('setListItems() method', function () {
@@ -219,9 +219,9 @@ describe('GGRC.Components.modalConnector', function () {
           .toEqual(jasmine.objectContaining({what: 'mock', how: 'remove'}));
       });
     it('adds all changes to parent_instance if it is deferred', function () {
-      that.viewModel.parent_instance.changes = [];
+      that.viewModel.parent_instance._changes = [];
       handler(element, event);
-      expect(that.viewModel.parent_instance.changes.length).toEqual(2);
+      expect(that.viewModel.parent_instance._changes.length).toEqual(2);
     });
   });
   describe('addMapings() method', function () {
@@ -254,9 +254,9 @@ describe('GGRC.Components.modalConnector', function () {
           .toEqual(jasmine.objectContaining({how: 'add'}));
       });
     it('adds all changes to parent_instance if it is deferred', function () {
-      that.viewModel.parent_instance.changes = [];
+      that.viewModel.parent_instance._changes = [];
       handler({}, event, {data: [1, 2]});
-      expect(that.viewModel.parent_instance.changes.length).toEqual(2);
+      expect(that.viewModel.parent_instance._changes.length).toEqual(2);
     });
   });
   describe('autocomplete_select() method', function () {
@@ -287,9 +287,9 @@ describe('GGRC.Components.modalConnector', function () {
           }));
       });
     it('adds all changes to parent_instance if it is deferred', function () {
-      that.viewModel.parent_instance.changes = [];
+      that.viewModel.parent_instance._changes = [];
       handler(element, {}, {item: 'mock'});
-      expect(that.viewModel.parent_instance.changes.length).toEqual(2);
+      expect(that.viewModel.parent_instance._changes.length).toEqual(2);
     });
   });
   describe('get_mapping() method', function () {

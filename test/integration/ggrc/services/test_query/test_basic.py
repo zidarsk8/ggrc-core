@@ -15,6 +15,7 @@ from flask import json
 
 from ggrc import app
 from ggrc import db
+from ggrc import models
 from ggrc.models import CustomAttributeDefinition as CAD
 
 from integration.ggrc import TestCase
@@ -504,6 +505,105 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
         sorted(sorted(controls_unsorted, key=itemgetter("id")),
                key=lambda p: control_id_assignee[p["id"]]),
     )
+
+  def test_filter_control_by_frequency(self):
+    """Test correct filtering by frequency"""
+    controls = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              expression=["frequency", "=", "yearly"]),
+        "Control",
+    )
+    self.assertEqual(controls["count"], 4)
+
+  def test_order_control_by_frequency(self):
+    """Test correct ordering and by frequency"""
+    controls_unordered = self._get_first_result_set(
+        self._make_query_dict("Control",),
+        "Control", "values"
+    )
+    controls_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "Frequency"},
+                                        {"name": "id"}]),
+        "Control", "values"
+    )
+    options_map = {o.id: o.title for o in models.Option.query}
+
+    def sort_key(val):
+      """sorting key getter function"""
+      freq = val["verify_frequency"]
+      if not freq:
+        return None
+      return options_map[freq["id"]]
+
+    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
+    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+
+  def test_filter_control_by_kind(self):
+    """Test correct filtering by kind/nature"""
+    controls = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              expression=["kind/nature", "=", "Corrective"]),
+        "Control",
+    )
+    self.assertEqual(controls["count"], 3)
+
+  def test_order_control_by_kind(self):
+    """Test correct ordering and by kind/nature"""
+    controls_unordered = self._get_first_result_set(
+        self._make_query_dict("Control",),
+        "Control", "values"
+    )
+    controls_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "kind/nature"},
+                                        {"name": "id"}]),
+        "Control", "values"
+    )
+    options_map = {o.id: o.title for o in models.Option.query}
+
+    def sort_key(val):
+      """sorting key getter function"""
+      kind = val["kind"]
+      if not kind:
+        return None
+      return options_map[kind["id"]]
+
+    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
+    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+
+  def test_filter_control_by_means(self):
+    """Test correct filtering by means"""
+    controls = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              expression=["type/means", "=", "Physical"]),
+        "Control",
+    )
+    self.assertEqual(controls["count"], 3)
+
+  def test_order_control_by_means(self):
+    """Test correct ordering and by means"""
+    controls_unordered = self._get_first_result_set(
+        self._make_query_dict("Control",),
+        "Control", "values"
+    )
+    controls_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "type/means"},
+                                        {"name": "id"}]),
+        "Control", "values"
+    )
+    options_map = {o.id: o.title for o in models.Option.query}
+
+    def sort_key(val):
+      """sorting key getter function"""
+      kind = val["means"]
+      if not kind:
+        return None
+      return options_map[kind["id"]]
+
+    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
+    self.assertListEqual(controls_ordered_1, controls_ordered_2)
 
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""

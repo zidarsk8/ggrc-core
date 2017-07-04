@@ -72,6 +72,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "email": handlers.EmailColumnHandler,
     "end_date": handlers.DateColumnHandler,
     "fraud_related": boolean.CheckboxColumnHandler,
+    "is_verification_needed": boolean.StrictBooleanColumnHandler,
     "is_enabled": boolean.CheckboxColumnHandler,
     "key_control": boolean.KeyControlColumnHandler,
     "kind": handlers.OptionColumnHandler,

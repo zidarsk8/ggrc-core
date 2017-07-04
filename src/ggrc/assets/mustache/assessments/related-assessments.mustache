@@ -2,14 +2,17 @@
 Copyright (C) 2017 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<related-objects {base-instance}="instance" related-items-type="Assessment" order-by="finished_date,created_at">
-    <reusable-objects-list {base-instance}="instance" {evidences}="evidences" {urls}="urls">
+<reusable-objects-list {base-instance}="instance"
+                       {evidences}="evidences"
+                       {urls}="urls"
+                       (after-object-reused)="updateItems('evidences', 'urls')">
+    <related-objects {base-instance}="instance" related-items-type="Assessment" order-by="finished_date,created_at">
         <div class="grid-data__toolbar flex-box">
             <tree-pagination {(paging)}="paging" class="grid-data__toolbar-item"></tree-pagination>
             {{#is_allowed 'update' baseInstance context='for'}}
-                {{^if instance.archived}}
-                    <button class="btn btn-small btn-green grid-data__toolbar-item" ($click)="reuseSelected" {{^hasSelected}}disabled{{/hasSelected}}>Reuse</button>
-                {{/if}}
+                {{#unless instance.archived}}
+                    <button class="btn btn-small btn-green grid-data__toolbar-item" ($click)="reuseSelected()" {{^hasSelected}}disabled{{/hasSelected}}>Reuse</button>
+                {{/unless}}
             {{/is_allowed}}
         </div>
         <div class="grid-data-header flex-row flex-box">
@@ -38,7 +41,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 More info
             </div>
         </div>
-        <div class="grid-data-body center-empty-message {{#if isLoading}}loading{{/if}}">
+        <div class="grid-data-body center-empty-message {{#isLoading}}loading{{/isLoading}}">
             <related-assessment-list {assessments}="relatedObjects">
                 {{#if assessments.length}}
                     <spinner {toggle}="itemsLoading" class="spinner-wrapper active"
@@ -96,8 +99,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                                 </related-documents>
                             </div>
                             <div class="grid-data__action-column">
-                                <button class="btn btn-icon btn-icon-sm" title="Show More Information"><i
-                                        class="fa fa-info-circle"></i></button>
+                                <button class="btn btn-icon btn-icon-sm" title="Show More Information"><i class="fa fa-info-circle"></i></button>
                             </div>
                         </div>
                     </related-assessment-item>
@@ -106,5 +108,5 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
             <related-assessment-popover class="object-popover related-assessments__object-popover"
                                         {selected-assessment}="selectedItem" hide-title="true"></related-assessment-popover>
         </div>
-    </reusable-objects-list>
-</related-objects>
+    </related-objects>
+</reusable-objects-list>

@@ -166,10 +166,14 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   def indexed_query(cls):
     query = super(Assessment, cls).indexed_query()
     return query.options(
-        orm.Load(cls).load_only(
-            "design",
-            "operationally",
-        )
+        orm.Load(cls).undefer_group(
+            "Assessment_complete",
+        ),
+        orm.Load(cls).joinedload(
+            "audit"
+        ).undefer_group(
+            "Audit_complete",
+        ),
     )
 
   _tracked_attrs = {

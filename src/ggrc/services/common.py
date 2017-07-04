@@ -130,23 +130,11 @@ def set_ids_for_new_custom_attributes(parent_obj):
   """
   if not hasattr(parent_obj, "PER_OBJECT_CUSTOM_ATTRIBUTABLE"):
     return
-
-  modified_objects = get_modified_objects(db.session).new
-
-  object_attrs = {
-      "CustomAttributeValue": "attributable_id",
-      "CustomAttributeDefinition": "definition_id"
-  }
-
-  for obj in modified_objects:
-    if obj.type not in object_attrs:
-      continue
-
-    attr = object_attrs[obj.type]
-    setattr(obj, attr, parent_obj.id)
-
-    db.session.add(obj)
-  db.session.flush()
+  for obj in get_modified_objects(db.session).new:
+    if obj.type == "CustomAttributeValue":
+      obj.attributable = parent_obj
+    elif obj.type == "CustomAttributeDefinition":
+      obj.definition = parent_obj
 
 
 def memcache_mark_for_deletion(context, objects_to_mark):
@@ -309,26 +297,17 @@ def get_modified_objects(session):
     return None
 
 
-def update_index(session, cache):
-  """Update fulltext index records for cached objects."""
+def update_snapshot_index(session, cache):
+  """Update fulltext index records for cached snapshtos."""
   from ggrc.snapshotter.indexer import reindex_snapshots
-  from ggrc.fulltext.mixin import Indexed
   if cache is None:
     return
-  indexer = get_indexer()
-  reindex_snapshots_list = []
-  for obj in itertools.chain(cache.new, cache.dirty):
-    if obj.type == "Snapshot":
-      reindex_snapshots_list.append(obj.id)
-    elif not isinstance(obj, Indexed):
-      indexer.update_record(indexer.fts_record_for(obj), commit=False)
-  for obj in cache.deleted:
-    indexer.delete_record(obj.id, obj.__class__.__name__, commit=False)
-  session.commit()
-  if reindex_snapshots_list:
-    for snapshot_id in reindex_snapshots_list:
-      indexer.delete_record(snapshot_id, "Snapshot", commit=False)
-    reindex_snapshots(reindex_snapshots_list)
+  objs = itertools.chain(cache.new, cache.dirty, cache.deleted)
+  reindex_snapshots_ids = [o.id for o in objs if o.type == "Snapshot"]
+  get_indexer().delete_records_by_ids("Snapshot",
+                                      reindex_snapshots_ids,
+                                      commit=False)
+  reindex_snapshots(reindex_snapshots_ids)
 
 
 def _revision_generator(user_id, action, objects):
@@ -898,7 +877,7 @@ class Resource(ModelView):
     with benchmark("Query for object"):
       obj = self.get_object(id)
     with benchmark("Update index"):
-      update_index(db.session, modified_objects)
+      update_snapshot_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for collection PUT"):
       update_memcache_after_commit(self.request)
     with benchmark("Send PUT - after commit event"):
@@ -955,7 +934,7 @@ class Resource(ModelView):
       with benchmark("Commit"):
         db.session.commit()
       with benchmark("Update index"):
-        update_index(db.session, modified_objects)
+        update_snapshot_index(db.session, modified_objects)
       with benchmark("Update memcache after commit for collection DELETE"):
         update_memcache_after_commit(self.request)
       with benchmark("Send DELETEd - after commit event"):
@@ -1313,7 +1292,7 @@ class Resource(ModelView):
     with benchmark("Commit collection"):
       db.session.commit()
     with benchmark("Update index"):
-      update_index(db.session, modified_objects)
+      update_snapshot_index(db.session, modified_objects)
     with benchmark("Update memcache after commit for collection POST"):
       update_memcache_after_commit(self.request)
 

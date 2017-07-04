@@ -33,6 +33,19 @@
       show: function () {
         this.attr('state.open', true);
       }
+    },
+    helpers: {
+      modalWrapper: function (showContent) {
+        return function (el) {
+          showContent.bind('change', function (ev, val) {
+            if (val) {
+              $(el).modal();
+            } else {
+              $(el).modal('hide');
+            }
+          });
+        };
+      }
     }
   });
 })(window.can, window.GGRC);

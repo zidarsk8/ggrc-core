@@ -4,17 +4,17 @@
 # pylint: disable=too-few-public-methods
 
 import re
-
 from selenium import webdriver
 from selenium.common import exceptions
 from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.remote import webelement
 
 from lib import constants, exception, mixin
-from lib.constants import objects, url
+from lib.constants import url
 from lib.constants.element import MappingStatusAttrs
 from lib.constants.test import batch
-from lib.utils import selenium_utils, string_utils
+from lib.utils import selenium_utils
 
 
 class InstanceRepresentation(object):
@@ -61,7 +61,7 @@ class Element(InstanceRepresentation):
     self._driver = driver
     self._locator = locator
     self.element = (
-        locator if isinstance(locator, webdriver.remote.webelement.WebElement)
+        locator if isinstance(locator, webelement.WebElement)
         else self.get_element())
     self.text = self.element.text
 
@@ -389,13 +389,10 @@ class Modal(Component):
 class FilterCommon(Component):
   """Common filter elements for LHN and Tree View."""
 
-  def __init__(self, driver, text_box_locator, bt_submit_locator,
-               bt_clear_locator):
+  def __init__(self, driver, text_box_locator, bt_submit_locator):
     super(FilterCommon, self).__init__(driver)
     self.text_box = TextInputField(driver, text_box_locator)
     self.button_submit = Button(driver, bt_submit_locator)
-    # for LHN the clear button is only visible after a query is entered
-    self.button_clear = driver.find_element(*bt_clear_locator)
 
   def enter_query(self, query):
     """Enter query to field."""
@@ -406,15 +403,26 @@ class FilterCommon(Component):
     self.button_submit.click()
     selenium_utils.wait_for_js_to_load(self._driver)
 
-  def clear_query(self):
-    """Clear query that was entered to field."""
-    self.button_clear.click()
-    selenium_utils.wait_for_js_to_load(self._driver)
-
   def perform_query(self, query):
     """Clear filtering field, enter query and click submit."""
     self.enter_query(query)
     self.submit_query()
+
+
+class FilterLHN(FilterCommon):
+  """Filter elements for LHN."""
+
+  def __init__(self, driver, text_box_locator,
+               bt_submit_locator, bt_clear_locator):
+    super(FilterLHN, self).__init__(driver, text_box_locator,
+                                    bt_submit_locator)
+    # clear button is only visible after a query is entered
+    self.button_clear = driver.find_element(*bt_clear_locator)
+
+  def clear_query(self):
+    """Clear query that was entered to field."""
+    self.button_clear.click()
+    selenium_utils.wait_for_js_to_load(self._driver)
 
 
 class AbstractPage(Component):
@@ -504,12 +512,6 @@ class Widget(AbstractPage):
                                  constants.element.WidgetBar.INFO)
     self.mapped_obj_from_url = mapped_obj_singular
     self.mapped_obj_id_from_url = mapped_obj_id
-    self.is_under_audit = (self.source_obj_from_url == objects.AUDITS and
-                           self.widget_name_from_url != "info")
-    self.is_info_page = self.widget_name_from_url == "info"
-    self.is_info_panel = (
-        self.widget_name_from_url != "" and self.mapped_obj_from_url != "" and
-        self.mapped_obj_id_from_url != "")
 
 
 class TreeView(Component):
@@ -567,7 +569,7 @@ class TreeView(Component):
     self._tree_view_items = [
         TreeViewItem(
             driver=self._driver, text=el.text,
-            expand_btn=el.find_element(
+            item_btn=el.find_element(
                 By.CSS_SELECTOR, self._locators.ITEM_EXPAND_BUTTON)) for el in
         self._tree_view_items_elements]
 
@@ -604,14 +606,18 @@ class TreeView(Component):
     """Get list of scopes (dicts) from members (text scopes) which displayed on
     Tree View according to current set of visible fields.
     """
+    list_scopes = self._tree_view_items_elements
     if self.get_tree_view_items_elements():
       list_headers = [_item.text.splitlines()[:len(self.fields_to_set)] for
                       _item in self.tree_view_header_elements()]
-      list_lists_items = [_item.text.splitlines()[:len(self.fields_to_set)] for
-                          _item in self.tree_view_items_elements()]
-      return [dict(zip(list_headers[0], item)) for item in list_lists_items]
-    else:
-      return self._tree_view_items_elements
+      # u'Ex' to u'Ex', u'Ex1, Ex2' to [u'Ex1', u'Ex2']
+      list_lists_items = [
+          [_.split(", ") if len(_.split(", ")) >= 2 else _ for
+           _ in _item.text.splitlines()[:len(self.fields_to_set)]] for
+          _item in self.tree_view_items_elements()]
+      list_scopes = [
+          dict(zip(list_headers[0], item)) for item in list_lists_items]
+    return list_scopes
 
 
 class UnifiedMapperTreeView(TreeView):
@@ -694,28 +700,28 @@ class MapperSetVisibleFieldsModal(SetVisibleFieldsModal):
 
 class TreeViewItem(Component):
   """Class for describing single item on Tree View."""
-  def __init__(self, driver, text=None, expand_btn=None):
+  def __init__(self, driver, text=None, item_btn=None):
     super(TreeViewItem, self).__init__(driver)
     self.text = text
-    self.expand_btn = expand_btn
+    self.item_btn = item_btn
 
   def expand(self):
     """Expand Tree View item if it is not expanded already."""
     from lib.page.widget.widget_base import CustomAttributesItemContent
     if not self.is_expanded:
-      self.expand_btn.click()
-      selenium_utils.wait_until_stops_moving(self.expand_btn)
+      self.item_btn.click()
+      selenium_utils.wait_until_stops_moving(self.item_btn)
     return CustomAttributesItemContent(self._driver, self.text)
 
   def collapse(self):
     """Collapse Tree View item if it is expanded."""
     if self.is_expanded:
-      self.expand_btn.click()
-      selenium_utils.wait_until_stops_moving(self.expand_btn)
+      self.item_btn.click()
+      selenium_utils.wait_until_stops_moving(self.item_btn)
 
   @property
   def is_expanded(self):
-    return selenium_utils.is_value_in_attr(self.expand_btn)
+    return selenium_utils.is_value_in_attr(self.item_btn)
 
 
 class ListCheckboxes(Component):
@@ -760,7 +766,89 @@ class ListCheckboxes(Component):
     objs = [
         MappingStatusAttrs(obj[0], obj[1][0], obj[1][1]) for obj in zip(
             [obj.text for obj in objs_titles],
-            [[string_utils.get_bool_from_string(obj.get_attribute("checked")),
-              string_utils.get_bool_from_string(obj.get_attribute("disabled"))]
+            [[obj.is_selected(),
+              not obj.is_enabled()]
                 for obj in objs_checkboxes])]
     return objs
+
+
+class DropdownMenu(Component):
+  """Class for common DropdownMenu Element"""
+  _locators = constants.locator.CommonDropdownMenu
+
+  def __init__(self, driver, element_or_locator):
+    super(DropdownMenu, self).__init__(driver)
+    self._driver = driver
+    self.dropdown_element = self._get_dropdown_element(element_or_locator)
+    self._dropdown_items = []
+
+  def _get_dropdown_element(self, el_or_loc):
+    """Return  DropdownMenu element if element not defined find it by
+    locator"""
+    element = (el_or_loc if isinstance(
+               el_or_loc, webdriver.remote.webelement.WebElement)
+               else selenium_utils.get_when_visible(self._driver, el_or_loc))
+    return (element if element.tag_name == self._locators.DROPDOWN_MAIN_CSS[1]
+            else element.find_element(*self._locators.DROPDOWN_MAIN_CSS))
+
+  def dropdown_items(self):
+    """Return list of DropdownMenu Items defined  by "li" tag"""
+    if not self._dropdown_items:
+      elements_on_dropdown = selenium_utils.get_when_all_visible(
+          self.dropdown_element,
+          self._locators.DROPDOWN_ITEMS_CSS)
+      self._dropdown_items = [DropdownMenuItem(self._driver, el) for el in
+                              elements_on_dropdown]
+    return self._dropdown_items
+
+  def get_dropdown_item(self, out_item_type):
+    """Return DropdownItem element according to type"""
+    return next(elem_val for elem_val in self.dropdown_items()
+                if out_item_type in elem_val.item_type)
+
+  def is_item_exists(self, out_item_type):
+    """Check if element enable on dropdown and return Bool, by comparing
+    icon type.
+    Return bool
+    """
+    return any(elem_val.item_type for elem_val in self.dropdown_items()
+               if out_item_type in elem_val.item_type)
+
+  def is_item_enabled(self, out_item_type):
+    """Check if element enable on dropdown.
+    Return bool if element found
+    If element not found raise exception
+    """
+    return self.get_dropdown_item(out_item_type).enabled
+
+
+class DropdownMenuItem(Element):
+  """Class for dropdown item"""
+  _locators = constants.locator.CommonDropdownMenu
+  _elements = constants.element.DropdownMenuItemTypes
+
+  def __init__(self, driver, locator):
+    super(DropdownMenuItem, self).__init__(driver, locator)
+    self._enabled = None
+    self._item_type = ""
+
+  @property
+  def item_type(self):
+    """Item type defined by class of icon"""
+    if not self._item_type:
+      icon = selenium_utils.get_element_by_element_safe(
+          self.element, self._locators.DROPDOWN_ITEM_ICON_CSS)
+      if icon:
+        icon_type = icon.get_attribute("class")
+        self._item_type = next(
+            (v for k, v in self._elements.__dict__.iteritems()
+             if not k.startswith("_") and v in icon_type),
+            icon_type)
+    return self._item_type
+
+  @property
+  def enabled(self):
+    """Return True if DropdownMenu Item enabled"""
+    if not self._enabled:
+      self._enabled = selenium_utils.is_element_enabled(self.element)
+    return self._enabled

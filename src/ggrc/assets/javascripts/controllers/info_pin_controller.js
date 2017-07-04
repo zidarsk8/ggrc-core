@@ -103,6 +103,7 @@ can.Control('CMS.Controllers.InfoPin', {
 
     this.element.html(can.view(view, {
       instance: instance,
+      isSnapshot: !!instance.snapshot || instance.isRevision,
       parentInstance: parentInstance,
       model: instance.class,
       confirmEdit: confirmEdit,

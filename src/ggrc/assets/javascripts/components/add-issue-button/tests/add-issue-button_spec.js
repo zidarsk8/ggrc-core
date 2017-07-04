@@ -21,18 +21,18 @@ describe('GGRC.Components.addIssueButton', function () {
     viewModel = GGRC.Components.getViewModel('addIssueButton');
   });
 
-  describe('on "{window} modal:success" event', function () {
+  describe('refreshIssueList() method', function () {
+    var relatedInstance;
     var handler;
     var that;
-    var relatedInstance;
 
     beforeEach(function () {
       that = {
         viewModel: viewModel
       };
       relatedInstance = viewModel.attr('relatedInstance');
-      handler = events['{window} modal:success'].bind(that);
       spyOn(relatedInstance, 'dispatch');
+      handler = events.refreshIssueList.bind(that);
     });
 
     describe('in case of Issue instance', function () {

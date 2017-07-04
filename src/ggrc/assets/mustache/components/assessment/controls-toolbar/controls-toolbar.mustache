@@ -3,24 +3,21 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 <button class="btn btn-small btn-lightBlue" ($click)="showRelatedResponses" title="Show Related Assessments">Related Assessments</button>
-{{^if instance.archived}}
-    <auto-save-form-actions
-      {(form-edit-mode)}="editMode"
-      {form-saving}="formState.saving"
-      {form-fields-to-save-available}="formState.fieldsToSaveAvailable"
-      (on-save)="onFormSave()"
-    ></auto-save-form-actions>
-{{/if}}
-{{#is_allowed 'update' instance context='for'}}
-    {{^if instance.archived}}
-         <object-state-toolbar {verifiers}="instance.assignees.Verifier"
-                          {instance}="instance"
-                          (on-state-change)="onStateChange(%event)">
-         </object-state-toolbar>
-    {{/if}}
-{{/is_allowed}}
 <simple-modal {instance}="instance" modal-title="modalTitle" {(state)}="state" extra-css-class="related-assessments">
     <div class="simple-modal__body">
       {{> '/static/mustache/assessments/related-assessments.mustache' }}
     </div>
 </simple-modal>
+{{#unless instance.archived}}
+  {{#is_allowed 'update' instance context='for'}}
+      <auto-save-form-actions
+              {(form-edit-mode)}="editMode"
+              {form-saving}="formState.saving"
+              {form-fields-to-save-available}="formState.fieldsToSaveAvailable"
+              (on-save)="onFormSave()"></auto-save-form-actions>
+      <object-state-toolbar {verifiers}="instance.assignees.Verifier"
+                            {instance}="instance"
+                            (on-state-change)="onStateChange(%event)">
+      </object-state-toolbar>
+  {{/is_allowed}}
+{{/unless}}

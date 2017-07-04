@@ -9,7 +9,7 @@ from requests import exceptions
 
 from lib import environment, factory
 from lib.constants import url, objects, templates
-from lib.entities.entities_factory import ObjectOwnersFactory
+from lib.entities.entities_factory import ObjectPersonsFactory
 from lib.service.rest.client import RestClient
 from lib.utils import string_utils
 
@@ -33,13 +33,13 @@ class BaseRestService(object):
     list_factory_objs = [entity_factory.create() for _ in xrange(count)]
     if attrs_to_factory:
       list_factory_objs = [
-        entity_factory.create(**attrs_to_factory) for _ in xrange(count)]
+          entity_factory.create(**attrs_to_factory) for _ in xrange(count)]
     list_attrs = [self.get_items_from_resp(self.client.create_object(
         **dict(factory_obj.__dict__.items() + attrs_for_template.items())))
-                  for factory_obj in list_factory_objs]
-    return [self.set_obj_attrs(
-        attrs=attrs, obj=factory_obj, **attrs_for_template)
-            for attrs, factory_obj in zip(list_attrs, list_factory_objs)]
+        for factory_obj in list_factory_objs]
+    return [
+        self.set_obj_attrs(attrs=attrs, obj=factory_obj, **attrs_for_template)
+        for attrs, factory_obj in zip(list_attrs, list_factory_objs)]
 
   def update_list_objs(self, entity_factory, list_objs_to_update,
                        attrs_to_factory=None, **attrs_for_template):
@@ -55,11 +55,12 @@ class BaseRestService(object):
       list_new_objs = [entity_factory.create(**attrs_to_factory) for _ in
                        xrange(len(list_objs_to_update))]
     list_new_attrs = [
-      self.get_items_from_resp(self.client.update_object(
-          href=old_obj.href,
-          **dict({k: v for k, v in new_obj.__dict__.iteritems()
-                  if k != "href"}.items() + attrs_for_template.items())))
-      for old_obj, new_obj in zip(list_objs_to_update, list_new_objs)]
+        self.get_items_from_resp(
+            self.client.update_object(
+                href=old_obj.href,
+                **dict({k: v for k, v in new_obj.__dict__.iteritems() if
+                        k != "href"}.items() + attrs_for_template.items()))
+        ) for old_obj, new_obj in zip(list_objs_to_update, list_new_objs)]
     return [self.set_obj_attrs(new_attrs, new_obj) for
             new_attrs, new_obj in zip(list_new_attrs, list_new_objs)]
 
@@ -76,9 +77,9 @@ class BaseRestService(object):
             {"url": environment.APP_URL + response.get("viewLink")[1:]})
       return extra
     resp = json.loads(response.text)
-    if response.status_code == 200: # check response from server
-      if (isinstance(resp, list) and len(resp[0]) == 2 and
-              isinstance(resp[0][1], dict)):
+    if response.status_code == 200:  # check response from server
+      if (isinstance(resp, list) and
+              len(resp[0]) == 2 and isinstance(resp[0][1], dict)):
         resp = resp[0][1]  # [[201, {"k": "v"}]] to {"k": "v"}
       resp = resp.itervalues().next()  # {"obj": {"k": "v"}} to {"k": "v"}
       return dict(resp.items() + get_extra_items(resp).items())
@@ -89,7 +90,7 @@ class BaseRestService(object):
       raise exceptions.ContentDecodingError
 
   @staticmethod
-  def set_obj_attrs(attrs, obj, **kwargs): # flake8: noqa
+  def set_obj_attrs(attrs, obj, **kwargs):
     """Update object according to new attributes exclude "type", "contact",
     "owners" due of objects assertion specific, and keyword arguments -
     attributes witch used to make JSON template to request and witch contain
@@ -107,17 +108,27 @@ class BaseRestService(object):
     return obj
 
   def create_objs(self, count, factory_params=None, **attrs_for_template):
-    """Create new objects via REST API and return created."""
-    return self.create_list_objs(
+    """Create new objects via REST API and return list of created objects with
+    filtered attributes.
+    """
+    list_objs = self.create_list_objs(
         entity_factory=self.entities_factory_cls(), count=count,
         attrs_to_factory=factory_params, **attrs_for_template)
+    return self.entities_factory_cls().filter_objs_attrs(
+        objs=list_objs,
+        attrs_to_include=self.entities_factory_cls().obj_attrs_names)
 
   def update_objs(self, objs, factory_params=None, **attrs_for_template):
-    """Update existing objects via REST API and return updated."""
-    return self.update_list_objs(
+    """Update existing objects via REST API and return list of updated objects
+    with filtered attributes.
+    """
+    list_objs = self.update_list_objs(
         entity_factory=self.entities_factory_cls(),
         list_objs_to_update=string_utils.convert_to_list(objs),
         attrs_to_factory=factory_params, **attrs_for_template)
+    return self.entities_factory_cls().filter_objs_attrs(
+        objs=list_objs,
+        attrs_to_include=self.entities_factory_cls().obj_attrs_names)
 
   def delete_objs(self, objs):
     """Delete existing objects via REST API."""
@@ -186,8 +197,8 @@ class RelationshipsService(HelpRestService):
     """
     return [self.client.create_object(
         type=objects.get_singular(self.endpoint), source=src_obj.__dict__,
-        destination=dest_obj.__dict__) for dest_obj in
-            string_utils.convert_to_list(dest_objs)]
+        destination=dest_obj.__dict__) for
+        dest_obj in string_utils.convert_to_list(dest_objs)]
 
 
 class ObjectsOwnersService(HelpRestService):
@@ -195,7 +206,7 @@ class ObjectsOwnersService(HelpRestService):
   def __init__(self):
     super(ObjectsOwnersService, self).__init__(url.OBJECT_OWNERS)
 
-  def assign_owner_to_objs(self, objs, owner=ObjectOwnersFactory().default()):
+  def assign_owner_to_objs(self, objs, owner=ObjectPersonsFactory().default()):
     """Assign of an owner to objects."""
     return [self.client.create_object(
         type=objects.get_singular(self.endpoint), ownable=obj.__dict__,

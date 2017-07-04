@@ -77,6 +77,10 @@ ATTRIBUTE_ORDER = (
     "send_by_default",
     "document_url",
     "document_evidence",
+    "notify_custom_message",
+    "frequency",
+    "notify_on_change",
+    "is_verification_needed",
     "delete",
 )
 

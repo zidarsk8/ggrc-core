@@ -5,3 +5,5 @@
 ERR_MSG_FORMAT = "Expected: '{}', Got: '{}'\n"
 ERR_MSG_TRIPLE_FORMAT = "Expected: '{}', First Got: '{}', Second Got: '{}'\n"
 ERR_VALUE_OF_ARGUMENT = "The argument does not contain numbers\n"
+ERR_SWITCH_TO_NEW_WINDOW = "New window target doesn't exist\n"
+ERR_CSV_FORMAT = "CSV file has unexpected structure: {}\n"

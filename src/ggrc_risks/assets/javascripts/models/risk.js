@@ -15,12 +15,11 @@
     create: 'POST /api/risks',
     update: 'PUT /api/risks/{id}',
     destroy: 'DELETE /api/risks/{id}',
-    mixins: ['ownable', 'contactable', 'unique_title', 'ca_update'],
+    mixins: ['ownable', 'unique_title', 'ca_update'],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
-      contact: 'CMS.Models.Person.stub',
       owners: 'CMS.Models.Person.stubs',
       modified_by: 'CMS.Models.Person.stub',
       objects: 'CMS.Models.get_stubs',
@@ -36,7 +35,7 @@
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
-      var reqFields = ['title', 'description', 'contact'];
+      var reqFields = ['title', 'description'];
       if (this._super) {
         this._super.apply(this, arguments);
       }

@@ -1,0 +1,279 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+
+@mixin element-attribute {
+  margin-left: 70px;
+  margin-bottom: 16px;
+  &:first-child{
+    margin-left: 0;
+  }
+}
+
+@mixin element-operator {
+  float: left;
+}
+
+@mixin advanced-search-controls {
+  align-items: center;
+  select, input{
+    margin: 0 auto;
+    background: $white;
+  }
+}
+
+@mixin multiline-flex {
+  margin-top: -8px;
+  >* {
+    margin-top: 8px;
+  }
+}
+
+@mixin remove-button {
+  border: 0;
+  background-color: transparent;
+  i {
+    color: $gray;
+  }
+  &:hover i {
+    color: $black;
+  }
+  &:focus {
+    outline: none;
+  }
+}
+
+@mixin element-group {
+  background: $tabBgnd;
+  border: solid 1px;
+  border-color: $itemBorder;
+  display: table;
+  padding: 16px;
+}
+
+@mixin group-header {
+  position: relative;
+  .close-btn {
+    position: absolute;
+    right: 0;
+    opacity: 0.3;
+    &:hover{
+      opacity: 1;
+    }
+  }
+}
+
+.advanced-search {
+  $simple-modal-header-height: 48px;
+  $simple-modal-footer-height: 64px;
+
+  &.simple-modal {
+    max-height: 85%;
+    max-width: 90%;
+    .simple-modal__body {
+      padding-right: 48px;
+      overflow: visible;
+    }
+    .simple-modal__header  {
+      height: $simple-modal-header-height;
+      padding-top: 12px;
+      border: none;
+      .simple-modal__header-text {
+        font-size: 24px;
+      }
+    }
+    .simple-modal__footer {
+      height: $simple-modal-footer-height;
+      border: none;
+      padding: 16px 24px 24px 16px;
+    }
+  }
+  &__content {
+    overflow: auto;
+    height: calc(100% - #{$simple-modal-header-height} - #{$simple-modal-footer-height});
+    min-height: 200px;
+  }
+  &__mapping-header {
+    margin-top: 14px;
+    padding: 24px 16px 14px 16px;
+    border-top: 1px solid #E0E0E0;
+  }
+  &__controls {
+    float: right;
+    button {
+      height: 24px;
+      padding: 0px 12px;
+      line-height: 12px;
+    }
+  }
+}
+
+.filter-attribute {
+  @include advanced-search-controls;
+  @include multiline-flex;
+  &__name, &__operator {
+    margin-right: 16px;
+    select {
+      width: 150px;
+    }
+  }
+  &__value {
+    .multiselect-dropdown {
+      width: 320px;
+    }
+  }
+  &__remove {
+    @include remove-button;
+  }
+  &__action {
+    font-size: 12px;
+  }
+}
+
+.filter-state {
+  @include advanced-search-controls;
+  >* {
+    margin-right: 16px;
+  }
+  &__name {
+    width: 35px;
+  }
+  &__operator {
+    select {
+      width: 170px;
+    }
+  }
+  &__value {
+    .multiselect-dropdown {
+      width: 320px;
+    }
+  }
+}
+
+.filter-operator {
+  @include advanced-search-controls;
+  &__content {
+    select {
+      width: 55px;
+    }
+  }
+}
+
+.filter-container {
+  &__state {
+    margin-bottom: 24px;
+  }
+  &__operator {
+    @include element-operator;
+  }
+  &__attribute {
+    @include element-attribute;
+  }
+  &__group {
+    @include element-attribute;
+  }
+  &__footer {
+    margin-top: 24px;
+  }
+}
+
+.filter-group {
+  @include advanced-search-controls;
+  @include element-group;
+  &__header {
+    @include group-header;
+  }
+  &__operator {
+    @include element-operator;
+  }
+  &__attribute {
+    @include element-attribute;
+    margin-right: 24px;
+  }
+}
+
+.mapping-container {
+  &__operator {
+    @include element-operator;
+    margin-top: 17px;
+  }
+  &__criteria {
+    @include element-attribute;
+  }
+  &__group {
+    @include element-attribute;
+  }
+  &__content {
+    >* {
+      &:last-child {
+        margin-bottom: 24px;
+      }
+    }
+  }
+}
+
+.mapping-group {
+  @include advanced-search-controls;
+  @include element-group;
+  &__header {
+    @include group-header;
+  }
+  &__content {
+    padding-right: 24px;
+  }
+  &__operator {
+    margin-bottom: 16px;
+  }
+  &__criteria {
+    margin-bottom: 16px;
+  }
+}
+
+.mapping-criteria {
+  &__content {
+    @include advanced-search-controls;
+    @include multiline-flex;
+  }
+  &__type {
+    margin-right: 16px;
+    select {
+      width: 150px;
+    }
+  }
+  &__remove {
+    @include remove-button;
+  }
+  &__relevant {
+    margin-left: 35px;
+    margin-top: 16px;
+  }
+  &__relationship {
+    width: 19px;
+    height: 45px;
+    float: left;
+    margin-left: 15px;
+    border-left: 1px solid #CBCBCB;
+    border-bottom: 1px solid #CBCBCB;
+  }
+  &__action {
+    font-size: 12px;
+    width: 160px;
+    line-height: 28px;
+  }
+  &__action-button {
+    display: block;
+    width: 100%;
+    padding: 0px 12px;
+    height: 26px;
+    line-height: 26px;
+    border: none;
+    text-align: left;
+    background: transparent;
+    outline: none;
+    font-size: 12px;
+    &:hover {
+      background: #ECECEC;
+    }
+  }
+}

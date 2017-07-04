@@ -14,8 +14,7 @@
     create: 'POST /api/controls',
     update: 'PUT /api/controls/{id}',
     destroy: 'DELETE /api/controls/{id}',
-    mixins: ['ownable', 'contactable', 'unique_title', 'ca_update',
-             'timeboxed'],
+    mixins: ['ownable', 'unique_title', 'ca_update', 'timeboxed'],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
@@ -23,6 +22,7 @@
       owners: 'CMS.Models.Person.stubs',
       modified_by: 'CMS.Models.Person.stub',
       object_people: 'CMS.Models.ObjectPerson.stubs',
+      documents: 'CMS.Models.Document.stubs',
       people: 'CMS.Models.Person.stubs',
       categories: 'CMS.Models.ControlCategory.stubs',
       assertions: 'CMS.Models.ControlAssertion.stubs',
@@ -84,6 +84,14 @@
       show_related_assessments: true,
       draw_children: true
     },
+    info_pane_options: {
+      evidence: {
+        model: CMS.Models.Document,
+        mapping: 'all_documents',
+        show_view: GGRC.mustache_path + '/base_templates/attachment.mustache',
+        sort_function: GGRC.Utils.sortingHelpers.commentSort
+      }
+    },
     statuses: ['Draft', 'Deprecated', 'Active'],
     init: function () {
       this.validateNonBlank('title');
@@ -104,6 +112,7 @@
           delete that.directive;
         }
       });
+      this.bind('refreshInstance', this.refresh.bind(this));
     }
   });
 })(this, can.$);

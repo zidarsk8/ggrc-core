@@ -79,30 +79,6 @@ can.Control('GGRC.Controllers.TreeFilter', {}, {
     this.apply_filter(this.$txtFilter.val(), selectedStates);
     ev.stopPropagation();
   },
-  'input keyup': function (el, ev) {
-    this.toggle_indicator(GGRC.query_parser.parse(el.val()));
-
-    if (ev.keyCode === 13) {
-      this.apply_filter(el.val());
-    }
-    ev.stopPropagation();
-  },
-  'input[data-lookup] focus': function (el, ev) {
-    this.autocomplete(el);
-  },
-  autocomplete: function (el) {
-    $.cms_autocomplete.call(this, el);
-  },
-  autocomplete_select: function (el, event, ui) {
-    setTimeout(function () {
-      if (ui.item.title) {
-        el.val(ui.item.title, ui.item);
-      } else {
-        el.val(ui.item.name ? ui.item.name : ui.item.email, ui.item);
-      }
-      el.trigger('change');
-    }, 0);
-  },
   '{states} change': function (states) {
     var that = this;
     this.element

@@ -677,3 +677,43 @@ class TestAssessmentGeneration(ggrc.TestCase):
       db.session.add(self.snapshot.revision)
     response = self.assessment_post(template)
     self.assert_assignees("Assessor", response, email)
+
+  @ddt.data(1, 2, 3, 4)
+  def test_remap_doc_from_assessment(self, test_asmt_num):
+    """Test mappings saving for assessment"""
+    urls = ["url1", "url2"]
+    evidences = ["evidence1", "evidence2"]
+
+    with factories.single_commit():
+      asmts = {i: factories.AssessmentFactory() for i in range(1, 4)}
+
+    url_str = "\n".join(urls)
+    evidences_str = "\n".join(evidences)
+    import_data, update_data = [], []
+    for num, asmt in asmts.items():
+      import_data.append(collections.OrderedDict([
+          ("object_type", "Assessment"),
+          ("Code", asmt.slug),
+          ("Url", url_str),
+          ("Evidence", evidences_str),
+      ]))
+      update_data.append(collections.OrderedDict([
+          ("object_type", "Assessment"),
+          ("Code", asmt.slug),
+          ("Url", "" if num == test_asmt_num else url_str),
+          ("Evidence", "" if num == test_asmt_num else evidences_str),
+      ]))
+
+    res = self.import_data(*import_data)
+    self._check_csv_response(res, {})
+    res = self.import_data(*update_data)
+    self._check_csv_response(res, {})
+
+    for num, asmt in asmts.items():
+      asmt = all_models.Assessment.query.get(asmt.id)
+      if num == test_asmt_num:
+        self.assertFalse(asmt.document_url)
+        self.assertFalse(asmt.document_evidence)
+      else:
+        self.assertEqual([url.link for url in asmt.document_url], urls)
+        self.assertEqual([ev.link for ev in asmt.document_evidence], evidences)
