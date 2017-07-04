@@ -25,9 +25,9 @@ do
   echo "Locust setup for: $filename"
   echo "db_reset"
   db_reset
-  launch_ggrc &
-  sleep 1
-  SERVER_PID=$!
+  # launch_ggrc &
+  # sleep 1
+  # SERVER_PID=$!
 
   locust --no-web \
     --clients=1 \
@@ -40,17 +40,17 @@ do
   mysqldump -uroot -proot -h$DBHOST ggrcdev > $dump_name
   gzip -c $dump_name > "$dump_name.gz"
   
-  # locust --no-web \
-  #   --clients=1 \
-  #   --hatch-rate=1 \
-  #   --host="http://localhost:8080" \
-  #   --locustfile="performance/setup_edited.py"
+  locust --no-web \
+    --clients=1 \
+    --hatch-rate=1 \
+    --host="http://localhost:8080" \
+    --locustfile="performance/setup_edited.py"
 
-  # dump_name="../$filename-edited.sql"
-  # echo "Create dump file: $dump_name.gz"
-  # mysqldump -uroot -proot -h$DBHOST ggrcdev > $dump_name
-  # gzip -f $dump_name
+  dump_name="../$filename-edited.sql"
+  echo "Create dump file: $dump_name.gz"
+  mysqldump -uroot -proot -h$DBHOST ggrcdev > $dump_name
+  gzip -c $dump_name > "$dump_name.gz"
 
-  kill $SERVER_PID
+  # kill $SERVER_PID
   echo ""
 done
