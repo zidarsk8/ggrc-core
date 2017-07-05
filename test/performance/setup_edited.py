@@ -23,7 +23,7 @@ class SetUpAssessments(base.BaseTaskSet):
   def set_up(self):
     super(SetUpAssessments, self).set_up()
 
-    count = len(self.objects["Assessment"]) / 10
+    count = len(self.objects["Assessment"]) / 2
     assessments = generator.random_objects("Assessment", count, self.objects)
     self._edit_assessments(assessments)
     self._edit_assessment_states(assessments[:count / 2])
