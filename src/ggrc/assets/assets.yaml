@@ -232,7 +232,10 @@ dashboard-js-files:
   - components/assessment_attributes.js
   - components/lazy_open_close.js
   - components/revision-log/revision-log.js
-  - components/unified-mapper/mapper.js
+  - components/object-mapper/object-mapper.js
+  - components/object-generator/object-generator.js
+  - components/object-search/object-search.js
+  - components/unified-mapper/mapper-model.js
   - components/unified-mapper/mapper-toolbar.js
   - components/unified-mapper/mapper-filter.js
   - components/unified-mapper/mapper-results.js
@@ -422,7 +425,6 @@ dashboard-js-template-files:
   - base_objects/modal_contact_fields.mustache
   - base_objects/open_close.mustache
   - base_objects/sub_tree_type_selector.mustache
-  - base_objects/modal/search_title.mustache
   - base_objects/mapper-item-description.mustache
   - base_templates/objects_tooltip.mustache
   - base_templates/attachment_list.mustache
@@ -462,7 +464,6 @@ dashboard-js-template-files:
   - assessments/header.mustache
   - assessments/urls.mustache
   - assessments/dates_list.mustache
-  - assessments/generator_title.mustache
   - assessment_templates/attribute_field.mustache
   - assessment_templates/attribute_add_field.mustache
   - assessment_templates/modal_content.mustache
@@ -480,6 +481,9 @@ dashboard-js-template-files:
   - components/inline_edit/person.mustache
   - components/inline_edit/datepicker.mustache
   - components/autocomplete/autocomplete.mustache
+  - components/object-mapper/object-mapper.mustache
+  - components/object-generator/object-generator.mustache
+  - components/object-search/object-search.mustache
   - components/unified-mapper/mapper-toolbar.mustache
   - components/unified-mapper/mapper-filter.mustache
   - components/unified-mapper/mapper-results.mustache
@@ -590,8 +594,9 @@ dashboard-js-template-files:
   - modals/save_cancel_buttons.mustache
   - modals/save_cancel_delete_buttons.mustache
   - modals/unmap_cancel_buttons.mustache
-  - modals/mapper/component.mustache
-  - modals/mapper/base.mustache
+  - modals/mapper/object-mapper-modal.mustache
+  - modals/mapper/object-generator-modal.mustache
+  - modals/mapper/object-search-modal.mustache
   - objectives/info.mustache
   - objectives/list_popover.mustache
   - objectives/modal_content.mustache

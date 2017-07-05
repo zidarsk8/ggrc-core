@@ -501,9 +501,9 @@ mapper-results-columns-configuration {
   }
 }
 
-.ggrc_controllers_mapper_modal {
+.object-modal {
 
-  modal-mapper {
+  object-mapper, object-search, object-generator {
     .modal-body {
       padding-bottom: 30px !important;
 
