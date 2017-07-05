@@ -439,6 +439,10 @@ class ModalCreateNewControl(BaseModalCreateNew):
   BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
 
 
+class ModalCreateNewObjective(BaseModalCreateNew):
+  """Locators for Create new Objective modals."""
+
+
 class ModalCreateNewIssue(BaseModalCreateNew):
   """Locators for Create new Issue modals."""
 
@@ -976,6 +980,11 @@ class WidgetAssessments(BaseWidgetGeneric):
 class WidgetControls(BaseWidgetGeneric):
   """Locators for Controls generic widgets."""
   _object_name = objects.get_singular(objects.CONTROLS)
+
+
+class WidgetObjectives(BaseWidgetGeneric):
+  """Locators for Controls generic widgets."""
+  _object_name = objects.get_singular(objects.OBJECTIVES)
 
 
 class WidgetProducts(BaseWidgetGeneric):

@@ -200,6 +200,11 @@ class ControlsModal(BaseModal):
     self.ui_code.enter_text(text)
 
 
+class ObjectivesModal(BaseModal):
+  """Modal base for Objective objects."""
+  _locator_ui_title = locator.ModalCreateNewObjective.UI_TITLE
+
+
 class RisksModal(BaseModal):
   """Modal base for Risk objects."""
   _locators = locator.ModalCreateNewRisk

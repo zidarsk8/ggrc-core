@@ -137,6 +137,22 @@ def new_controls_rest(request):
 
 
 @pytest.fixture(scope="function")
+def new_objective_rest(request):
+  """Create new Objective object via REST API.
+  Return: lib.entities.entity.ObjectiveEntity
+  """
+  yield _common_fixtures(request.fixturename)[0]
+
+
+@pytest.fixture(scope="function")
+def new_objectives_rest(request):
+  """Create new Objective objects via REST API.
+  Return: [lib.entities.entity.ObjectiveEntity, ...]
+  """
+  yield _common_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
 def new_audit_rest(request):
   """Create new Audit under Program object via REST API.
   Return: lib.entities.entity.AuditEntity
@@ -174,6 +190,20 @@ def new_assessment_template_with_cas_rest(request):
   Return: lib.entities.entity.AssessmentTemplateEntity
   """
   yield _common_fixtures(request.fixturename)[0]
+
+
+@pytest.fixture(scope="function")
+def map_new_control_rest_to_new_objective_rest(request):
+  """Map Objective to Control object via REST API return response from server.
+  """
+  yield _common_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
+def map_new_control_rest_to_new_objectives_rest(request):
+  """Map Objectives to Control object via REST API return response from server.
+  """
+  yield _common_fixtures(request.fixturename)
 
 
 @pytest.fixture(scope="function")

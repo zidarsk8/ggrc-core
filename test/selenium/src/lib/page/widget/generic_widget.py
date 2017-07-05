@@ -218,6 +218,10 @@ class Controls(Widget):
   """Model for Controls generic widgets."""
 
 
+class Objectives(Widget):
+  """Model for Objectives generic widgets."""
+
+
 class Issues(Widget):
   """Model for Issues generic widgets"""
 
