@@ -348,6 +348,7 @@
           item.snapshotObject) {
           snapshotObject = item.snapshotObject;
           item.attr('title', snapshotObject.title);
+          item.attr('description', snapshotObject.description);
           item.attr('class', snapshotObject.class);
           item.attr('snapshot_object_class', 'snapshot-object');
           item.attr('viewLink', snapshotObject.originalLink);
@@ -391,6 +392,7 @@
                     instance.attr('snapshot_object_class',
                       'snapshot-object');
                     instance.attr('title', object.title);
+                    instance.attr('description', object.description);
                     instance.attr('viewLink', object.originalLink);
                   });
               }
