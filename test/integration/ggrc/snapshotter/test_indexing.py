@@ -379,9 +379,10 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
           child_id=control.id,
           child_type=control.type,
           revision=revision)
-      revision.content = revision.content.copy()
-      revision.content.pop("access_control_list")
-      revision.content[field] = {"id": person.id}
+      old_content = revision.content.copy()
+      old_content.pop("access_control_list")
+      old_content[field] = {"id": person.id}
+      revision.content = old_content
       db.session.add(revision)
     do_reindex()
     self.assert_indexed_fields(snapshot, role_name, {
