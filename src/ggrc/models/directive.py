@@ -4,7 +4,8 @@
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
+from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
+                                CustomAttributable)
 from ggrc.fulltext.mixin import Indexed
 from .object_person import Personable
 from .object_owner import Ownable
@@ -16,7 +17,8 @@ from sqlalchemy import orm
 from .track_object_state import HasObjectState
 
 
-class Directive(HasObjectState, Timeboxed, BusinessObject, db.Model):
+class Directive(HasObjectState, LastDeprecatedTimeboxed, BusinessObject,
+                db.Model):
   __tablename__ = 'directives'
 
   version = deferred(db.Column(db.String), 'Directive')

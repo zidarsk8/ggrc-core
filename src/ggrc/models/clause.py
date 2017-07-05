@@ -9,7 +9,7 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Hierarchical
-from ggrc.models.mixins import Timeboxed
+from ggrc.models.mixins import LastDeprecatedTimeboxed
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
@@ -19,8 +19,8 @@ from ggrc.fulltext.mixin import Indexed
 
 
 class Clause(Roleable, HasObjectState, Hierarchical, CustomAttributable,
-             Personable, Ownable, Timeboxed, Relatable, BusinessObject,
-             Indexed, db.Model):
+             Personable, Ownable, LastDeprecatedTimeboxed, Relatable,
+             BusinessObject, Indexed, db.Model):
 
   __tablename__ = 'clauses'
   _table_plural = 'clauses'

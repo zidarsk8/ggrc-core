@@ -4,7 +4,8 @@
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
-from .mixins import BusinessObject, Timeboxed, CustomAttributable
+from .mixins import (BusinessObject, LastDeprecatedTimeboxed,
+                     CustomAttributable)
 from .object_owner import Ownable
 from .object_person import Personable
 from .relationship import Relatable
@@ -12,7 +13,7 @@ from .track_object_state import HasObjectState
 
 
 class Project(Roleable, HasObjectState, CustomAttributable, Personable,
-              Relatable, Timeboxed, Ownable, BusinessObject, Indexed,
-              db.Model):
+              Relatable, LastDeprecatedTimeboxed, Ownable, BusinessObject,
+              Indexed, db.Model):
   __tablename__ = 'projects'
   _aliases = {"url": "Project URL"}

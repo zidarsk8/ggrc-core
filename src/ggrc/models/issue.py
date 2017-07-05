@@ -7,7 +7,7 @@ from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (
-    BusinessObject, Timeboxed, CustomAttributable, TestPlanned
+    BusinessObject, LastDeprecatedTimeboxed, CustomAttributable, TestPlanned
 )
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.object_document import PublicDocumentable
@@ -19,8 +19,8 @@ from ggrc.fulltext.mixin import Indexed
 
 
 class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
-            PublicDocumentable, Personable, Timeboxed, Ownable, Relatable,
-            AuditRelationship, BusinessObject, Indexed, db.Model):
+            PublicDocumentable, Personable, LastDeprecatedTimeboxed, Ownable,
+            Relatable, AuditRelationship, BusinessObject, Indexed, db.Model):
   """Issue Model."""
 
   __tablename__ = 'issues'
