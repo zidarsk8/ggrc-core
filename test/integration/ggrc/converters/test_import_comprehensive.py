@@ -228,7 +228,7 @@ class TestComprehensiveSheets(TestCase):
                 errors.WRONG_VALUE_ERROR.format(
                     line=9, column_name="Effective Date"),
                 errors.WRONG_VALUE_ERROR.format(
-                    line=9, column_name="Stop Date"),
+                    line=9, column_name="Last Deprecated Date"),
             },
         },
         "Assessment": {

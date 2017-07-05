@@ -1,5 +1,5 @@
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,,,,,,
-Program,Code*,Title*,Description,Notes,Manager*,Editor,Reader,Effective Date,Stop Date,State,,,,,Program URL,Reference URL,,,,,,,,,
+Program,Code*,Title*,Description,Notes,Manager*,Editor,Reader,Effective Date,Last Deprecated Date,State,,,,,Program URL,Reference URL,,,,,,,,,
 ,PCI Program,PCI-DSS 3.1 Security Program (Reference Program),"
 The PCI Data Security Standard specifies 12 requirements for compliance, organized into six logically related groups called ""control objectives.""  Each version of PCI DSS has divided these 12 requirements into a number of sub-requirements differently, but the 12 high level requirements have not changed since the inception of the standard.
 
@@ -18,7 +18,7 @@ Procure an ASV Vendor
 ,Consolidated,SOC program,,,miha@reciprocitylabs.com,,,,,Draft,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,,,,,,
-Control,Code*,Title*,Description,,,Admin*,Effective Date,Stop Date,State,Assertions,Categories,,Fraud Related,Significance,Kind/Nature,Type/Means,,,,Control URL,Reference URL,Frequency,Test Plan,Notes,map:program
+Control,Code*,Title*,Description,,,Admin*,Effective Date,Last Deprecated Date,State,Assertions,Categories,,Fraud Related,Significance,Kind/Nature,Type/Means,,,,Control URL,Reference URL,Frequency,Test Plan,Notes,map:program
 ,PCI 1.1,PCI 1.1 Firewall and Router Configuration,"1.1 Establish and implement firewall and router configuration standards that include the following:<br><br>
 
 1.1.1 A formal process for approving and testing all network connections and changes to the firewall and router configurations<br><br>
@@ -147,7 +147,7 @@ Assessment,Code*,Audit*,Title*,Description,Notes,Test Plan,Creators,Assignees,Ef
 ,CA.PCI 2.6,AUDIT-PCI,PCI 2.6 Testing Procedures assessment for 2015: PCI-DSS 3.0 Security Program (Reference Program) - Audit 1 1,,,,danny@reciprocitylabs.com,danny@reciprocitylabs.com,,,Not Started,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,,,,,,
-System,Code*,Title*,Description,Notes,Admin*,Effective Date,Stop Date,State,,Network Zone,,System URL,Reference URL,map:program,,,,,,,,,,,
+System,Code*,Title*,Description,Notes,Admin*,Effective Date,Last Deprecated Date,State,,Network Zone,,System URL,Reference URL,map:program,,,,,,,,,,,
 ,SYSTEM-1,Application Delivery System,Automated system for classifying incoming applications and initial data-base entry for candidates,Example System<br>,albert@reciprocitylabs.com,,,Draft,,,,,,PCI Program,,,,,,,,,,,
 ,SYSTEM-3,Web Application,,Example System<br>,albert@reciprocitylabs.com,,,Draft,,,,,,PCI Program,,,,,,,,,,,
 ,SYSTEM-4,Salesforce CRM,,Example System<br>,albert@reciprocitylabs.com,,,Draft,,,,,,PCI Program,,,,,,,,,,,
