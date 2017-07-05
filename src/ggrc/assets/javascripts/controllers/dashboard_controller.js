@@ -53,6 +53,14 @@
       }.bind(this));
     },
 
+    disableAll: function (el, ev) {
+      document.body.classList.add('no-events');
+    },
+
+    '[data-toggle="modal-ajax-form"] click': 'disableAll',
+    '[data-toggle="unified-search"] click': 'disableAll',
+    '[data-toggle="unified-mapper"] click': 'disableAll',
+
     initCurrentRelatedInstanses: function () {
       var instance;
       if (!GGRC.Utils.CurrentPage.isObjectContextPage()) {
@@ -93,11 +101,10 @@
     },
 
     init_page_header: function () {
-      var that = this;
-      if (this.options.header_view) {
-        can.view(this.options.header_view, this.options, function (frag) {
-          that.element.find('#page-header').html(frag);
-        });
+      var $pageHeader = this.element.find('#page-header');
+
+      if (this.options.header_view && $pageHeader.length) {
+        $pageHeader.html(can.view(this.options.header_view));
       }
     },
 

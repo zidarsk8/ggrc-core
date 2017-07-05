@@ -779,7 +779,8 @@ class Slugged(Base):
     # session rollback at this point we are sticking with a
     # suboptimal solution for now.
     INCREMENT = 1000
-    while cls.query.filter(cls.slug == obj.slug).count():
+    while db.session.query(
+            cls.query.filter(cls.slug == obj.slug).exists()).scalar():
       _id += INCREMENT
       obj.slug = "{0}-{1}".format(cls.generate_slug_prefix_for(obj), _id)
 

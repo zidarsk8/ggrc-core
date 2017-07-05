@@ -43,7 +43,7 @@
     }
   });
 
-  function openMapper(ev, disableMapper) {
+  $('body').on('click', selectors.join(', '), function (ev, disableMapper) {
     var btn = $(ev.currentTarget);
     var data = {};
     var isSearch;
@@ -140,13 +140,5 @@
       };
       GGRC.Controllers.MapperModal.launch(btn, can.extend(config, data));
     }
-  }
-
-  $('body').on('openMapper', function (el, ev, disableMapper) {
-    openMapper(ev, disableMapper);
-  });
-
-  $('body').on('click', selectors.join(', '), function (ev, disableMapper) {
-    openMapper(ev, disableMapper);
   });
 })(window.can, window.can.$);

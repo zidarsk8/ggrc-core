@@ -23,14 +23,13 @@ from ggrc.builder.json import publish
 from ggrc.builder.json import publish_representation
 from ggrc.converters import get_importables, get_exportables
 from ggrc.extensions import get_extension_modules
-from ggrc.fulltext import get_indexer, get_indexed_model_names, mixin
+from ggrc.fulltext import get_indexer, mixin
 from ggrc.login import get_current_user
 from ggrc.login import login_required
 from ggrc.models import all_models
 from ggrc.models.background_task import create_task
 from ggrc.models.background_task import make_task_response
 from ggrc.models.background_task import queued_task
-from ggrc.models.inflector import get_model
 from ggrc.models.reflection import AttributeInfo
 from ggrc.rbac import permissions
 from ggrc.services.common import as_json
@@ -73,40 +72,29 @@ def do_reindex():
   """Update the full text search index."""
 
   indexer = get_indexer()
-  indexed_models = get_indexed_model_names()
-
-  people = db.session.query(all_models.Person.id, all_models.Person.name,
-                            all_models.Person.email)
-  indexer.cache["people_map"] = {p.id: (p.name, p.email) for p in people}
+  indexed_models = {
+      m.__name__: m for m in all_models.all_models
+      if issubclass(m, mixin.Indexed) and m.REQUIRED_GLOBAL_REINDEX
+  }
+  people_query = db.session.query(all_models.Person.id,
+                                  all_models.Person.name,
+                                  all_models.Person.email)
+  indexer.cache["people_map"] = {p.id: (p.name, p.email) for p in people_query}
   indexer.cache["ac_role_map"] = dict(db.session.query(
       all_models.AccessControlRole.id,
       all_models.AccessControlRole.name,
   ))
-  for model in sorted(indexed_models):
-    # pylint: disable=protected-access
-    logger.info("Updating index for: %s", model)
-    with benchmark("Create records for %s" % model):
-      model = get_model(model)
-      mapper_class = model._sa_class_manager.mapper.base_mapper.class_
-      if issubclass(model, mixin.Indexed):
-        for query_chunk in generate_query_chunks(db.session.query(model.id)):
-          model.bulk_record_update_for([i.id for i in query_chunk])
-          db.session.commit()
-      else:
-        logger.warning(
-            "Try to index model that not inherited from Indexed mixin: %s",
-            model.__name__
-        )
-        indexer.delete_records_by_type(model.__name__)
-        query = model.query.options(
-            db.undefer_group(mapper_class.__name__ + '_complete'),
-        )
-        for query_chunk in generate_query_chunks(query):
-          for instance in query_chunk:
-            indexer.create_record(indexer.fts_record_for(instance), False)
-          db.session.commit()
+  for model_name in sorted(indexed_models.keys()):
+    logger.info("Updating index for: %s", model_name)
+    with benchmark("Create records for %s" % model_name):
+      model = indexed_models[model_name]
+      for query_chunk in generate_query_chunks(db.session.query(model.id)):
+        model.bulk_record_update_for([i.id for i in query_chunk])
+        db.session.commit()
 
-  reindex_snapshots()
+  logger.info("Updating index for: %s", "Snapshot")
+  with benchmark("Create records for %s" % "Snapshot"):
+    reindex_snapshots()
   indexer.invalidate_cache()
 
 

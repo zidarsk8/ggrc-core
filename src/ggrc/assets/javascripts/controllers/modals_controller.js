@@ -107,7 +107,6 @@
         this.after_preload();
       }.bind(this));
     },
-
     after_preload: function (content) {
       var that = this;
       if (content) {
@@ -156,10 +155,11 @@
       var instance;
       var value;
 
-      // in some cases we want to disable automapping the selected item to the
-      // modal's underlying object (e.g. we don't want to map the picked Persons
-      // to an AssessmentTemplates object)
-      if (el.data('no-automap')) {
+      // * in some cases we want to disable automapping the selected item to the
+      // * modal's underlying object (e.g. we don't want to map the picked Persons
+      // * to an AssessmentTemplates object)
+      // ** does nothing after press tab to not lose deafault value in input
+      if (el.data('no-automap') || ev.keyCode === 9) {
         return;
       }
 
@@ -436,6 +436,8 @@
         // When we start, all the ui elements are visible
         this.options.ui_array.push(0);
       }
+
+      document.body.classList.remove('no-events');
     },
 
     setup_wysihtml5: function () {

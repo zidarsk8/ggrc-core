@@ -31,6 +31,8 @@
         value: false
       }
     },
+    disabled: false,
+    showAdvanced: false,
     options: {},
     filters: null,
     init: function () {
@@ -51,10 +53,6 @@
     submit: function () {
       this.dispatch('filter');
     },
-    reset: function () {
-      this.attr('filter', '');
-      this.submit();
-    },
     onFilterChange: function (newValue) {
       var filter = GGRC.query_parser.parse(newValue);
       var isExpression =
@@ -62,6 +60,12 @@
         filter.expression.op.name !== 'text_search' &&
         filter.expression.op.name !== 'exclude_text_search';
       this.attr('isExpression', isExpression);
+    },
+    openAdvancedFilter: function () {
+      this.dispatch('openAdvanced');
+    },
+    removeAdvancedFilters: function () {
+      this.dispatch('removeAdvanced');
     }
   });
 
@@ -77,6 +81,9 @@
           this.viewModel.submit();
         }
         ev.stopPropagation();
+      },
+      '{viewModel} disabled': function () {
+        this.viewModel.attr('filter', '');
       }
     }
   });

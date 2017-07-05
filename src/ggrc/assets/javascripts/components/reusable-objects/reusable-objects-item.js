@@ -23,9 +23,11 @@
               return false;
             }
 
-            isMapped = baseInstanceObjects.map(function (document) {
-              return document.id;
-            }).indexOf(this.attr('instance.id')) > -1;
+            isMapped = baseInstanceObjects
+                .map(function (document) {
+                  return document.id;
+                })
+                .indexOf(this.attr('instance.id')) > -1;
 
             return this.attr('instance.isMapped') ||
               isMapped;
@@ -44,9 +46,11 @@
       isSelected: function () {
         var instanceId = this.attr('instance.id');
 
-        return _.some(this.attr('selectedList'), function (item) {
-          return item.id === instanceId;
-        });
+        return this.attr('selectedList')
+            .map(function (item) {
+              return item.id;
+            })
+            .indexOf(instanceId) > -1;
       },
       toggleSelection: function (isChecked) {
         var list = this.attr('selectedList');
@@ -73,13 +77,13 @@
       }
     },
     init: function () {
-      if (this.scope.isSelected()) {
-        this.scope.attr('isChecked', true);
+      if (this.viewModel.isSelected()) {
+        this.viewModel.attr('isChecked', true);
       }
     },
     events: {
       '{viewModel} isChecked': function (scope, ev, isChecked) {
-        this.scope.toggleSelection(isChecked);
+        this.viewModel.toggleSelection(isChecked);
       }
     }
   });

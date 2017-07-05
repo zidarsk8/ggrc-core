@@ -22,7 +22,6 @@ from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
 from ggrc.models.deferred import deferred
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
-from ggrc.models.option import Option
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
@@ -208,45 +207,38 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
   @classmethod
   def indexed_query(cls):
     return super(Control, cls).indexed_query().options(
+        orm.Load(cls).undefer_group(
+            "Control_complete"
+        ),
+        orm.Load(cls).joinedload(
+            "directive"
+        ).undefer_group(
+            "Directive_complete"
+        ),
         orm.Load(cls).joinedload(
             "principal_assessor"
-        ).load_only(
-            "id",
-            "email",
-            "name",
+        ).undefer_group(
+            "Person_complete"
         ),
         orm.Load(cls).joinedload(
             "secondary_assessor"
-        ).load_only(
-            "id",
-            "email",
-            "name",
-        ),
-        orm.Load(cls).load_only(
-            'active',
-            'company_control',
-            'documentation_description',
-            'fraud_related',
-            'key_control',
-            'version',
+        ).undefer_group(
+            "Person_complete"
         ),
         orm.Load(cls).joinedload(
             'kind',
-        ).load_only(
-            "id",
-            "title"
+        ).undefer_group(
+            "Option_complete"
         ),
         orm.Load(cls).joinedload(
             'means',
-        ).load_only(
-            "id",
-            "title"
+        ).undefer_group(
+            "Option_complete"
         ),
         orm.Load(cls).joinedload(
             'verify_frequency',
-        ).load_only(
-            "id",
-            "title"
+        ).undefer_group(
+            "Option_complete"
         ),
     )
 
@@ -254,18 +246,9 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
 
   _aliases = {
       "url": "Control URL",
-      "kind": {
-          "display_name": "Kind/Nature",
-          "filter_by": "_filter_by_kind",
-      },
-      "means": {
-          "display_name": "Type/Means",
-          "filter_by": "_filter_by_means",
-      },
-      "verify_frequency": {
-          "display_name": "Frequency",
-          "filter_by": "_filter_by_verify_frequency",
-      },
+      "kind": "Kind/Nature",
+      "means": "Type/Means",
+      "verify_frequency": "Frequency",
       "fraud_related": "Fraud Related",
       "key_control": {
           "display_name": "Significance",
@@ -279,24 +262,6 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
   def validate_control_options(self, key, option):
     desired_role = key if key == 'verify_frequency' else 'control_' + key
     return validate_option(self.__class__.__name__, key, option, desired_role)
-
-  @classmethod
-  def _filter_by_kind(cls, predicate):
-    return Option.query.filter(
-        (Option.id == cls.kind_id) & predicate(Option.title)
-    ).exists()
-
-  @classmethod
-  def _filter_by_means(cls, predicate):
-    return Option.query.filter(
-        (Option.id == cls.means_id) & predicate(Option.title)
-    ).exists()
-
-  @classmethod
-  def _filter_by_verify_frequency(cls, predicate):
-    return Option.query.filter(
-        (Option.id == cls.verify_frequency_id) & predicate(Option.title)
-    ).exists()
 
   @classmethod
   def eager_query(cls):

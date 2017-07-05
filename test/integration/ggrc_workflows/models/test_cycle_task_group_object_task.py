@@ -111,3 +111,27 @@ class TestCTGOT(BaseTestCase):
       self.assertTrue(all(states))
     else:
       self.assertFalse(any(states))
+
+  def test_context_after_task_delete(self):
+    """Test UserRoles context keeping after cycle task deletion."""
+    workflow_owner_role = all_models.Role.query.filter_by(
+        name="WorkflowOwner"
+    ).one()
+    ctask = all_models.CycleTaskGroupObjectTask.query.first()
+    ctask_context_id = ctask.context_id
+    self.assertTrue(ctask_context_id)
+
+    user = all_models.Person.query.filter_by(email=self.WORKFLOW_OWNER).one()
+    self.api.set_user(user)
+
+    response = self.api.delete(ctask)
+    self.assert200(response)
+
+    user_role = all_models.UserRole.query.filter_by(
+        role_id=workflow_owner_role.id,
+        person_id=user.id,
+    ).one()
+    self.assertEqual(user_role.context_id, ctask_context_id)
+
+    for ctask in all_models.CycleTaskGroupObjectTask.query.all():
+      self.assertEqual(ctask.context_id, ctask_context_id)

@@ -110,7 +110,13 @@
         }
 
         can.batch.start();
-        roleEntry = {person: person, ac_role_id: roleId};
+        roleEntry = {
+          person: {
+            id: person.id,
+            type: person.type
+          },
+          ac_role_id: roleId
+        };
         inst.attr('access_control_list').push(roleEntry);
 
         if (!this.autosave) {

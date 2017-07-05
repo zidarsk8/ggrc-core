@@ -11,6 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from lib import constants, exception
+from lib.constants import messages
 
 LOGGER = logging.getLogger(__name__)
 
@@ -24,6 +25,18 @@ def open_url(driver, url):
   """Open URL in current browser session if it hasn't been opened yet."""
   if driver.current_url != url:
     driver.get(url)
+
+
+def switch_to_new_window(driver):
+  """Wait until new window will be opened, have the number of windows handles
+  increase and then switch to last opened window.
+  """
+  try:
+    wait_until_condition(driver, EC.new_window_is_opened)
+    driver.switch_to.window(driver.window_handles.pop())
+  except exceptions.NoSuchWindowException as exception:
+    LOGGER.exception(exception, messages.ERR_SWITCH_TO_NEW_WINDOW)
+    raise exception
 
 
 def wait_until_stops_moving(element):
@@ -172,11 +185,6 @@ def scroll_into_view(driver, element):
   return element
 
 
-def get_parent_element(driver, element):
-  """Get parent element of current element using JS."""
-  return driver.execute_script("return arguments[0].parentNode;", element)
-
-
 def wait_for_js_to_load(driver):
   """Wait until there all JS are completed."""
   return wait_until_condition(
@@ -186,3 +194,30 @@ def wait_for_js_to_load(driver):
 def click_via_js(driver, element):
   """Click on element using JS."""
   driver.execute_script("arguments[0].click();", element)
+
+
+def is_element_enabled(element):
+  """Is this element and first parent and first level child elements is
+  enabled, use when common WebDriver "isEnabled"  isn't working"""
+  elements_to_check = [element, element.find_element_by_xpath("../.")]
+  elements_to_check.extend(get_nested_elements(element))
+  return all([el.is_enabled() and
+              not is_value_in_attr(el, value="disabled")
+              for el in elements_to_check])
+
+
+def get_nested_elements(element, all_nested=False):
+  """Get nested elements of current element by Xpath. If all_nested=True,
+  return all-levels nested elements
+  """
+  nested_locator = './*'
+  if all_nested:
+    nested_locator = './/*'
+  return element.find_elements_by_xpath(nested_locator)
+
+
+def get_element_by_element_safe(element, locator):
+  """Get element from current element by locator.
+  Return "None" if element not found
+  """
+  return next((el for el in element.find_elements(*locator)), None)

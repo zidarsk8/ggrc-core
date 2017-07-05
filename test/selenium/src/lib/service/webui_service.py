@@ -2,11 +2,14 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Services for create and manipulate objects via UI."""
 
+import os
+
 from lib import factory
-from lib.constants import element, objects, url
+from lib.constants import objects, url, path, messages, roles, element
 from lib.entities.entities_factory import EntitiesFactory
+from lib.entities.entity import Entity
 from lib.page.widget.info_widget import SnapshotableInfoPanel
-from lib.utils import selenium_utils, string_utils
+from lib.utils import selenium_utils, string_utils, file_utils
 
 
 class BaseWebUiService(object):
@@ -35,32 +38,35 @@ class BaseWebUiService(object):
     """
     list_factory_objs = [
         entity_factory.create_empty() for _ in xrange(len(list_scopes))]
+    list_scopes_with_upper_keys = [
+        string_utils.dict_keys_to_upper_case(scope) for scope in list_scopes]
     list_scopes_remapped = string_utils.remap_keys_for_list_dicts(
-        dict_transformation_keys=self.ui_elements_to_obj_attrs(),
-        list_dicts=list_scopes)
+        dict_of_transform_keys=Entity.items_of_remap_keys(),
+        list_dicts=list_scopes_with_upper_keys)
+    # add extra 'owners' attribute name and value if 'creator' in scopes
+    list_extra_scopes = [
+        dict(scope_remapped.items() +
+             [("owners", scope_remapped.get("creator"))]) if
+        "creator" in scope_remapped.keys() else scope_remapped for
+        scope_remapped in list_scopes_remapped]
+    # convert and represent values in scopes
+    for scope in list_extra_scopes:
+      for key, val in scope.iteritems():
+        # convert u'false' and u'true' to boolean
+        scope[key] = string_utils.get_bool_from_string(val)
+        # convert multiple values to list of strings
+        if key in ["owners", "assessor", "creator"]:
+          # convert CSV like u'user@example.com' to u'Example User'
+          val = val if val != url.DEFAULT_USER_EMAIL else roles.DEFAULT_USER
+          scope[key] = string_utils.convert_to_list(val)
+        # convert 'slug' from CSV for snapshoted objects u'*23eb72ac-4d9d'
+        if (key == "slug" and
+                self.obj_name in objects.ALL_SNAPSHOTABLE_OBJS and "*" in val):
+          scope[key] = val.replace("*", "")
     return [
-        EntitiesFactory.update_obj_attrs_values(
-            obj=factory_obj, **scope_remapped) for
-        scope_remapped, factory_obj in zip(list_scopes_remapped,
-                                           list_factory_objs)]
-
-  @staticmethod
-  def ui_elements_to_obj_attrs():
-    """Get transformation dictionary {"OLD KEY": "NEW KEY"}, where
-    "OLD KEY" - UI elements correspond to "NEW KEY" - objects attributes.
-    """
-    fields = element.TransformationSetVisibleFields
-    return {
-        fields.TITLE.upper(): "title", fields.MANAGER.upper(): "manager",
-        fields.CODE.upper(): "slug", fields.VERIFIED.upper(): "verified",
-        fields.STATE.upper(): "status", fields.STATUS.upper(): "status",
-        fields.LAST_UPDATED.upper(): "updated_at",
-        fields.AUDIT_LEAD.upper(): "contact",
-        fields.ADMIN.upper(): "owners", fields.CREATORS.upper(): "owners",
-        fields.CAS_HEADERS.upper(): "custom_attribute_definitions",
-        fields.CAS_VALUES.upper(): "custom_attribute_values",
-        fields.MAPPED_OBJECTS.upper(): "objects_under_assessment"
-    }
+        EntitiesFactory.update_objs_attrs_values_by_entered_data(
+            objs=factory_obj, is_allow_none_values=False, **scope) for
+        scope, factory_obj in zip(list_extra_scopes, list_factory_objs)]
 
   def open_widget_of_mapped_objs(self, src_obj):
     """Navigate to generic widget URL of mapped objects according to URL of
@@ -78,17 +84,6 @@ class BaseWebUiService(object):
         obj_url=obj.url)
     selenium_utils.open_url(self.driver, info_page_url)
     return self.info_widget_cls(self.driver)
-
-  def open_info_panel_of_obj_by_id(self, src_obj, obj):
-    """Navigate to info panel URL of object according to URL of source object
-    and URL of mapped object used id of object,
-    return info widget class of object.
-    """
-    info_panel_url = (
-        self.url_mapped_objs.format(src_obj_url=src_obj.url) + "/" + obj.id)
-    selenium_utils.open_url(self.driver, info_panel_url)
-    obj_info_panel = self.info_widget_cls(self.driver)
-    return obj_info_panel
 
   def open_info_panel_of_obj_by_title(self, src_obj, obj):
     """Navigate to info panel URL of object according to URL of source object
@@ -122,13 +117,35 @@ class BaseWebUiService(object):
     return self.create_list_objs(
         entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
 
-  def get_obj_from_info_panel(self, src_obj, obj, navigate_by_title=True):
-    """Get and return object from Info panel navigate by object title
-    as default or by object id if navigate_by_title is False.
+  def get_list_objs_from_info_panels(self, src_obj, objs):
+    """Get and return list of objects from Info panels navigate by objects'
+    titles ('objs' can be list of objects or one object).
     """
-    scope = self.get_scope_from_info_panel(src_obj, obj, navigate_by_title)
-    return self.create_list_objs(
-        entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
+    def get_obj_from_info_panel(src_obj, obj):
+      scope = self.get_scope_from_info_panel(src_obj, obj)
+      return self.create_list_objs(
+          entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
+    return ([get_obj_from_info_panel(src_obj, obj) for obj in objs] if
+            isinstance(objs, list) else get_obj_from_info_panel(src_obj, objs))
+
+  def get_list_objs_from_csv(self, path_to_export_dir):
+    """Get and return list of objects from CSV file of exported objects in
+    test's temporary directory 'path_to_export_dir'.
+    """
+    # pylint: disable=invalid-name
+    path_to_exported_file = os.path.join(
+        path_to_export_dir, path.EXPORTED_FILE_NAME)
+    dict_list_objs_scopes = file_utils.get_list_objs_scopes_from_csv(
+        path_to_csv=path_to_exported_file)
+    dict_key = dict_list_objs_scopes.iterkeys().next()
+    # 'Control' to 'controls', 'Control Snapshot' to 'controls'
+    obj_name_from_dict = objects.get_plural(
+        string_utils.get_first_word_from_str(dict_key))
+    if self.obj_name == obj_name_from_dict:
+      return self.create_list_objs(entity_factory=self.entities_factory_cls,
+                                   list_scopes=dict_list_objs_scopes[dict_key])
+    else:
+      raise ValueError(messages.ERR_CSV_FORMAT.format(dict_list_objs_scopes))
 
   def create_obj_via_tree_view(self, src_obj, obj):
     """Open generic widget of mapped objects, open creation modal from
@@ -137,6 +154,15 @@ class BaseWebUiService(object):
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     (objs_widget.tree_view.open_create().
      fill_minimal_data(title=obj.title, code=obj.slug).save_and_close())
+
+  def export_objs_via_tree_view(self, src_obj):
+    """Open generic widget of mapped objects, open modal of export from
+    Tree View, fill data according to 'src_objs' (filter by mapping to source
+    objects), 'mapped_objs' (export objects' types, export objects' filter
+    queries) and export objects to test's temporary directory as CSV file.
+    """
+    objs_widget = self.open_widget_of_mapped_objs(src_obj)
+    objs_widget.tree_view.open_3bbs().select_export().export_objects()
 
   def _get_unified_mapper(self, src_obj):
     """Open generic widget of mapped objects, open unified mapper modal from
@@ -210,31 +236,42 @@ class BaseWebUiService(object):
     obj_info_page = self.open_info_page_of_obj(obj)
     return obj_info_page.get_info_widget_obj_scope()
 
-  def get_scope_from_info_panel(self, src_obj, obj, navigate_by_title=True):
-    """Open Info panel of obj navigate by object title as default or by
-    object id if navigate_by_title is False, maximize it and get object scope
-    as dict with titles (keys) and entered_titles (values) that displayed on
-    Info panel.
+  def get_scope_from_info_panel(self, src_obj, obj):
+    """Open Info panel of obj navigate by object title, maximize it and get
+    object scope as dict with titles (keys) and entered_titles (values) that
+    displayed on Info panel.
     """
-    obj_info_panel = (
-        self.open_info_panel_of_obj_by_title(src_obj, obj) if navigate_by_title
-        else self.open_info_panel_of_obj_by_id(src_obj, obj))
+    obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
     return obj_info_panel.get_info_widget_obj_scope()
 
   def is_obj_editable_via_info_panel(self, src_obj, obj):
     """Open generic widget of mapped objects, select object from Tree View
     by title and check via Info panel that object is editable.
     """
-    obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
-    return obj_info_panel.open_info_3bbs().is_edit_exist()
+    dropdown_on_info_panel = (
+        self.open_info_panel_of_obj_by_title(src_obj, obj).open_info_3bbs())
+    element_to_verify = element.DropdownMenuItemTypes.EDIT
+    return dropdown_on_info_panel.is_item_exists(element_to_verify)
+
+  def is_obj_unmappable_via_info_panel(self, src_obj, obj):
+    """""Open generic widget of mapped objects, select object from Tree View
+    by title open dropdown on Info Panel and check that object is unmappable.
+    """
+    # pylint: disable=invalid-name
+    dropdown_on_info_panel = (
+        self.open_info_panel_of_obj_by_title(src_obj, obj).open_info_3bbs())
+    element_to_verify = element.DropdownMenuItemTypes.UNMAP
+    return dropdown_on_info_panel.is_item_exists(element_to_verify)
 
   def is_obj_page_exist_via_info_panel(self, src_obj, obj):
     """Open generic widget of mapped objects, select object from Tree View
     by title and check via Info panel that object page is exist.
     """
     # pylint: disable=invalid-name
-    obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
-    return obj_info_panel.open_info_3bbs().is_open_enabled()
+    dropdown_on_info_panel = (
+        self.open_info_panel_of_obj_by_title(src_obj, obj).open_info_3bbs())
+    element_to_verify = element.DropdownMenuItemTypes.OPEN
+    return dropdown_on_info_panel.is_item_enabled(element_to_verify)
 
   def filter_list_objs_from_tree_view(self, src_obj, filter_exp):
     """Filter by specified criteria and return list of objects from Tree
@@ -245,6 +282,33 @@ class BaseWebUiService(object):
     list_objs_scopes = self.get_list_objs_scopes_from_tree_view(src_obj)
     return self.create_list_objs(entity_factory=self.entities_factory_cls,
                                  list_scopes=list_objs_scopes)
+
+  def is_obj_mappable_via_tree_view(self, src_obj, obj):
+    """Open dropdown of Tree View Item  by title, an check is object
+    mappable.
+    """
+    objs_widget = self.open_widget_of_mapped_objs(src_obj)
+    dropdown_on_tree_view_item = (objs_widget.tree_view.
+                                  open_tree_actions_dropdown_by_title
+                                  (title=obj.title))
+    element_to_verify = element.DropdownMenuItemTypes.MAP
+    return dropdown_on_tree_view_item.is_item_exists(element_to_verify)
+
+  def map_objs_via_tree_view_item(self, src_obj, dest_objs):
+    """Open generic widget of mapped objects, open unified mapper modal from
+    Tree View, fill data according to destination objects, search by them
+    titles and then map to source object.
+    """
+    dest_objs_titles = [dest_obj.title for dest_obj in dest_objs]
+    objs_widget = self.open_widget_of_mapped_objs(src_obj)
+    objs_tree_view_items = (
+        objs_widget.tree_view.get_list_members_as_list_scopes())
+    for obj in objs_tree_view_items:
+      dropdown = objs_widget.tree_view.open_tree_actions_dropdown_by_title(
+          title=obj['TITLE'])
+      dropdown.select_map().map_dest_objs(
+          dest_objs_type=dest_objs[0].type.title(),
+          dest_objs_titles=dest_objs_titles)
 
 
 class SnapshotsWebUiService(BaseWebUiService):

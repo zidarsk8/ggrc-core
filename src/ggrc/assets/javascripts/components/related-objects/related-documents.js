@@ -45,10 +45,43 @@
           self.attr('documents').replace(documents);
           self.attr('isLoading', false);
         });
+      },
+      setDocuments: function () {
+        var instance = this.attr('instance');
+        var documentType = this.attr('documentType');
+        var documents = [];
+
+        if (!instance.snapshot && !instance.isRevision) {
+          this.loadDocuments();
+          return;
+        }
+
+        if (documentType) {
+          documents = documentType === CMS.Models.Document.EVIDENCE ?
+            instance.document_evidence :
+            instance.document_url;
+        } else {
+          documents = instance.document_url
+            .concat(instance.document_evidence);
+        }
+
+        this.attr('documents').replace(documents);
+      },
+      removeDocument: function (event) {
+        var item = event.item;
+        var index = this.attr('documents').indexOf(item);
+        this.attr('isLoading', true);
+        return this.attr('documents').splice(index, 1);
+      },
+      addDocuments: function (event) {
+        var items = event.items;
+        this.attr('isLoading', true);
+        return this.attr('documents').unshift
+          .apply(this.attr('documents'), items);
       }
     },
     init: function () {
-      this.viewModel.loadDocuments();
+      this.viewModel.setDocuments();
     }
   });
 })(window.GGRC, window);

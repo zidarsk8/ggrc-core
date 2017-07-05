@@ -79,7 +79,25 @@
     </div>
   </div>
 
-  {{{render_hooks "Workflow.storage_folder_picker"}}}
+
+  <div class="row-fluid">
+    {{{render_hooks "Workflow.storage_folder_picker"}}}
+
+    <div class="span4 hide-wrap hidable">
+      <div class="row-fluid inner-hide">
+        <div class="span12 hidable">
+          <label>
+            Need Verification for tasks?
+          </label>
+          <input type="checkbox" name="is_verification_needed"
+            {{#if instance.is_verification_needed}}checked="checked"{{/if}}
+            {{^new_object_form}}disabled{{/new_object_form}}
+            tabindex="-1">
+          Show Verify button next to tasks
+        </div>
+      </div>
+    </div>
+  </div>
 
   {{#if new_object_form}}
   <div class="row-fluid">

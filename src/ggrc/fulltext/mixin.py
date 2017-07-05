@@ -22,6 +22,7 @@ class Indexed(object):
   AUTO_REINDEX_RULES = [
       # Usage: ReindexRule("ModelName", lambda x: x.value)
   ]
+  REQUIRED_GLOBAL_REINDEX = True
 
   PROPERTY_TEMPLATE = u"{}"
 
@@ -38,8 +39,6 @@ class Indexed(object):
 
   def update_indexer(self):
     """Update indexer for current instance"""
-    if self.__class__.__name__ not in fulltext.get_indexed_model_names():
-      return
     self.delete_record()
     self.create_record()
 

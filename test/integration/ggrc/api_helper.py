@@ -95,10 +95,12 @@ class Api(object):
       response = request(api_link, data=json_data, headers=headers.items())
     return self.data_to_json(response)
 
-  def put(self, obj, data):
+  def put(self, obj, data=None, not_send_fields=None):
     """Simple put request."""
     name = obj._inflector.table_singular
     response = self.get(obj, obj.id)
+    data = data or {}
+    not_send_fields = not_send_fields or []
     if response.status_code == 403:
       return response
     headers = {
@@ -109,6 +111,9 @@ class Api(object):
     if name not in data:
       response.json[name].update(data)
       data = response.json
+
+    for field in not_send_fields:
+      del data[name][field]
 
     return self.send_request(
         self.client.put, obj, data, headers=headers, api_link=api_link)

@@ -61,7 +61,7 @@ def _new_objs_rest(obj_name, obj_count, has_cas=False, factory_params=None):
         return factory.get_cls_rest_service(object_name=name)().create_objs(
             count=1, factory_params=factory_params,
             custom_attributes=CustomAttributeDefinitionsFactory().
-            generate_ca_values(list_ca_objs=extra_attrs))
+            generate_ca_values(list_ca_def_objs=extra_attrs))
     else:
       return ([factory.get_cls_rest_service(object_name=name)().
               create_objs(count=1, factory_params=factory_params,
@@ -76,16 +76,17 @@ def _new_objs_rest(obj_name, obj_count, has_cas=False, factory_params=None):
                   objects.ISSUES):
     parent_obj_name = (objects.get_singular(objects.AUDITS) if obj_count == 1
                        else objects.AUDITS)
-  if (has_cas and obj_name in objects.ALL_OBJS
-      and obj_name not in objects.ASSESSMENT_TEMPLATES):
+  if (has_cas and obj_name in objects.ALL_OBJS and
+          obj_name not in objects.ASSESSMENT_TEMPLATES):
     parent_obj_name = "cas_for_" + obj_name
   if parent_obj_name:
     parent_objs = _get_fixture_from_dict_fixtures(
         fixture="new_{}_rest".format(parent_obj_name))
     if has_cas and obj_name in objects.ASSESSMENT_TEMPLATES:
-      parent_objs = ([CustomAttributeDefinitionsFactory().create(
-          attribute_type=ca_type, definition_type="") for
-                         ca_type in _list_cas_types] + parent_objs)
+      parent_objs = (
+          [CustomAttributeDefinitionsFactory().create(
+              attribute_type=ca_type, definition_type="") for
+              ca_type in _list_cas_types] + parent_objs)
     objs = create_objs_rest_used_exta_arrts(
         name=obj_name, factory_params=factory_params, extra_attrs=parent_objs)
   else:
@@ -94,7 +95,7 @@ def _new_objs_rest(obj_name, obj_count, has_cas=False, factory_params=None):
   return objs
 
 
-def generate_common_fixtures(*fixtures):  # flake8: noqa
+def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
   """Generate, run and return of results for common dynamic fixtures according
   to tuple of fixtures names and used if exist 'web_driver' fixture for UI.
   Examples: fixtures = ('new_program_rest', 'new_controls_rest',
@@ -115,11 +116,12 @@ def generate_common_fixtures(*fixtures):  # flake8: noqa
           attribute_type=ca_type,
           definition_type=objects.get_singular(fixture_params))
           for ca_type in _list_cas_types]
-      new_objs = [_new_objs_rest(obj_name=obj_name, obj_count=1,
-                                 factory_params=dict(
-          attribute_type=ca.attribute_type, definition_type=ca.definition_type,
-          multi_choice_options=ca.multi_choice_options))[0]
-                  for ca in factory_cas_for_objs]
+      new_objs = [
+          _new_objs_rest(obj_name=obj_name, obj_count=1, factory_params=dict(
+              attribute_type=ca.attribute_type,
+              definition_type=ca.definition_type,
+              multi_choice_options=ca.multi_choice_options))[0]
+          for ca in factory_cas_for_objs]
     else:
       fixture_params = fixture.replace("new_", "").replace("_rest", "")
       has_cas = False
@@ -193,17 +195,17 @@ def generate_common_fixtures(*fixtures):  # flake8: noqa
       has_cas = True
       obj_name = objects.get_plural(obj_name.replace("_with_cas", ""))
       parent_objs = _get_fixture_from_dict_fixtures(
-        fixture="new_{}_rest".format("cas_for_" + obj_name))
+          fixture="new_{}_rest".format("cas_for_" + obj_name))
     if objs_to_update:
       if has_cas and parent_objs:
         updated_objs = (
-          factory.get_cls_rest_service(object_name=obj_name)().update_objs(
-            objs=objs_to_update,
-            custom_attributes=CustomAttributeDefinitionsFactory().
-              generate_ca_values(list_ca_objs=parent_objs)))
+            factory.get_cls_rest_service(object_name=obj_name)().update_objs(
+                objs=objs_to_update,
+                custom_attributes=CustomAttributeDefinitionsFactory().
+                generate_ca_values(list_ca_def_objs=parent_objs)))
       else:
         updated_objs = factory.get_cls_rest_service(
-          object_name=obj_name)().update_objs(objs=objs_to_update)
+            object_name=obj_name)().update_objs(objs=objs_to_update)
       return updated_objs
 
   def delete_rest_fixture(fixture):

@@ -46,8 +46,8 @@ class TestAssessmentMixins(test_mixins_base.TestMixinsBase):
         ('description', attributes.InstrumentedAttribute),               # Described      # noqa
         ('end_date', attributes.InstrumentedAttribute),                  # Timeboxed      # noqa
         ('notes', attributes.InstrumentedAttribute),                     # Noted          # noqa
-        ('document_url', attributes.InstrumentedAttribute),              # Documentable   # noqa
-        ('document_evidence', attributes.InstrumentedAttribute),         # Documentable   # noqa
+        ('document_url', property),                                      # Documentable   # noqa
+        ('document_evidence', property),                                 # Documentable   # noqa
         ('object_people', attributes.InstrumentedAttribute),             # Personable     # noqa
         ('os_state', attributes.InstrumentedAttribute),                  # HasObjectState # noqa
         ('reference_url', attributes.InstrumentedAttribute),             # HyperLinked    # noqa

@@ -181,4 +181,46 @@
     }
   }
 }
+directly-mapped-objects {
+  display: block;
+}
+
+.mapped-folder {
+  display: flex;
+  line-height: 26px;
+
+  .mapped-folder__folder-info {
+    display: flex;
+    max-width: 100%;
+    margin-bottom: 5px;
+
+    .mapped-folder__link {
+      font-style: italic;
+      font-size: 13px;
+      cursor: pointer;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
+      i {
+        color: $link;
+        opacity: 0.9;
+      }
+    }
+
+    .mapped-folder__action-button {
+      width: auto;
+    }
+  }
+
+  .mapped-folder__add-button {
+    height: 18px;
+    margin-bottom: 10px;
+  }
+
+  .mapped-folder__spinner {
+    display: flex;
+    align-self: center;
+    margin-right: 5px;
+  }
+}
 
