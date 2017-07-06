@@ -67,7 +67,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
 
     with mock.patch("ggrc.access_control.role.get_custom_roles_for",
                     return_value=role_dict) as get_roles:
-      self.assertEqual(revision.populated_content, expected)
+      self.assertEqual(revision.content, expected)
       get_roles.assert_called_once_with(self.object_type)
 
   @ddt.data(None, {}, {"id": None})
@@ -83,7 +83,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
     with mock.patch("ggrc.access_control.role.get_custom_roles_for",
                     return_value=role_dict) as get_roles:
-      self.assertEqual(revision.populated_content, expected)
+      self.assertEqual(revision.content, expected)
       get_roles.assert_called_once_with(self.object_type)
 
   @ddt.data(
@@ -103,5 +103,5 @@ class TestCheckPopulatedContent(unittest.TestCase):
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
     with mock.patch("ggrc.access_control.role.get_custom_roles_for",
                     return_value={}) as get_roles:
-      self.assertEqual(revision.populated_content, expected)
+      self.assertEqual(revision.content, expected)
       get_roles.assert_called_once_with(self.object_type)

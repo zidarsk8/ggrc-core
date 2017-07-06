@@ -19,7 +19,7 @@ from integration.ggrc.snapshotter import snapshot_identity
 class TestSnapshoting(SnapshotterBaseTestCase):
   """Test cases for Snapshoter module"""
 
-  # pylint: disable=invalid-name
+  # pylint: disable=invalid-name,protected-access
 
   def test_snapshot_create(self):
     """Test simple snapshot creation with a simple change"""
@@ -63,7 +63,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     snapshot_revision = db.session.query(
         models.Revision.resource_type,
         models.Revision.resource_id,
-        models.Revision.content
+        models.Revision._content
     ).filter(
         models.Revision.resource_type == "Snapshot",
         models.Revision.resource_id == snapshot.first().id,
@@ -93,7 +93,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     relationship_revision = db.session.query(
         models.Revision.resource_type,
         models.Revision.resource_id,
-        models.Revision.content,
+        models.Revision._content,
     ).filter(
         models.Revision.resource_type == "Relationship",
         models.Revision.resource_id == relationship.first().id,
@@ -243,11 +243,11 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         models.Revision.id,
         models.Revision.resource_type,
         models.Revision.resource_id,
-        models.Revision.content,
+        models.Revision._content,
     ).filter(
         models.Revision.resource_type == control.type,
         models.Revision.resource_id == control.id,
-        models.Revision.content.like("%Test Control Snapshot 1 EDIT 2%"),
+        models.Revision._content.like("%Test Control Snapshot 1 EDIT 2%"),
     ).one()
 
     audit = self.refresh_object(audit)

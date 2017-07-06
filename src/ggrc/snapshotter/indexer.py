@@ -290,7 +290,7 @@ def reindex_pairs(pairs):
           "id",
           "resource_type",
           "resource_id",
-          "content",
+          "_content",
       ),
       orm.load_only(
           "id",
@@ -315,7 +315,7 @@ def reindex_pairs(pairs):
         "revision": get_searchable_attributes(
             CLASS_PROPERTIES[revision.resource_type],
             cad_dict,
-            revision.populated_content)
+            revision.content)
     }
   search_payload = []
   for snapshot in snapshots.values():
