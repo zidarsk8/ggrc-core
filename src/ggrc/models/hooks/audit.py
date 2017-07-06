@@ -41,16 +41,29 @@ def init_hook():
 
   @signals.Restful.model_deleted.connect_via(all_models.Comment)
   @signals.Restful.model_deleted.connect_via(all_models.Document)
-  @signals.Restful.model_deleted.connect_via(all_models.Relationship)
   @signals.Restful.model_deleted.connect_via(all_models.UserRole)
   @signals.Restful.model_posted.connect_via(all_models.Comment)
   @signals.Restful.model_posted.connect_via(all_models.Document)
-  @signals.Restful.model_posted.connect_via(all_models.Relationship)
   @signals.Restful.model_posted.connect_via(all_models.Snapshot)
   @signals.Restful.model_posted.connect_via(all_models.UserRole)
   def handle_archived_context(sender, obj=None, src=None, service=None):
     """Make sure admins cannot delete/update archived audits"""
     # pylint: disable=unused-argument
+    if (hasattr(obj, 'context') and
+        hasattr(obj.context, 'related_object') and getattr(
+            obj.context.related_object, 'archived', False)):
+      raise Forbidden()
+
+  @signals.Restful.model_posted.connect_via(all_models.Relationship)
+  @signals.Restful.model_deleted.connect_via(all_models.Relationship)
+  def handle_archived_relationships(sender, obj=None, src=None, service=None):
+    """Make sure users can not map objects to archived audits"""
+    # pylint: disable=unused-argument
+    if (getattr(obj, 'source_type', None) == 'Issue' or
+       getattr(obj, 'destination_type', None) == 'Issue'):
+      # Issues can be mapped even if audit is archived so skip the permission
+      # check here
+      return
     if (hasattr(obj, 'context') and
         hasattr(obj.context, 'related_object') and getattr(
             obj.context.related_object, 'archived', False)):
