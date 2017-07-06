@@ -9,6 +9,7 @@ import sys
 import locust
 
 from performance import base
+from performance import generator
 
 random.seed(1)
 
@@ -40,7 +41,7 @@ class SetUpBaseTask(base.BaseTaskSet):
       "Facility",
   ]
 
-  _audit_count = 1  # number of audits for each program
+  _audit_count = 1  # number of audits per program, for half the programs.
 
   # number of AT for each AT model on each audit
   _assessment_template_count = 1
@@ -82,8 +83,14 @@ class SetUpBaseTask(base.BaseTaskSet):
         mapping_count=self._program_mapping_count,
         count=self._program_count,
     )
+
+    programs = generator.random_objects(
+        "Program",
+        (len(self.objects["Program"]) + 1) / 2,
+        self.objects
+    )
     self.create_audits(
-        programs=self.objects["Program"],
+        programs=programs,
         count=self._audit_count
     )
 
