@@ -728,6 +728,9 @@ class TestAssessmentGeneration(ggrc.TestCase):
       ("Objective", "Control", "Objective"),
       ("Objective", "Objective", "Objective"),
       ("Objective", None, "Objective"),
+      ("Invalid Type", "Invalid Type", None),
+      (None, "Invalid Type", None),
+      ("Invalid Type", None, None),
   )
   @ddt.unpack
   def test_generated_assessment_type(self, templ_type, obj_type, exp_type):
@@ -745,7 +748,9 @@ class TestAssessmentGeneration(ggrc.TestCase):
         template=template,
         extra_data=assessment_type
     )
-    self.assertEqual(response.status_code, 201)
-
-    assessment = all_models.Assessment.query.first()
-    self.assertEqual(assessment.assessment_type, exp_type)
+    if exp_type:
+      self.assertEqual(response.status_code, 201)
+      assessment = all_models.Assessment.query.first()
+      self.assertEqual(assessment.assessment_type, exp_type)
+    else:
+      self.assertEqual(response.status_code, 400)
