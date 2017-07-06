@@ -919,7 +919,7 @@ class AdminTreeView(object):
 
 
 class UnifiedMapperTreeView(TreeView):
-  MODAL = ".ggrc_controllers_mapper_modal"
+  MODAL = ".object-modal"
   HEADER = MODAL + " .list-header"
   ITEMS = MODAL + Common.TREE_ITEM
   BUTTON_SHOW_FIELDS = HEADER + " .fa-bars"
