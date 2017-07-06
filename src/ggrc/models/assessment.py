@@ -271,6 +271,14 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
     # pylint: disable=unused-argument
     return self.validate_conclusion(value)
 
+  @validates("assessment_type")
+  def validate_assessment_type(self, key, value):
+    # pylint: disable=unused-argument
+    from ggrc.models.all_models import __all__ as model_names
+    if value and value not in model_names:
+      raise ValueError("Assessment type '{}' doesn't exist".format(value))
+    return value
+
   @classmethod
   def _ignore_filter(cls, _):
     return None
