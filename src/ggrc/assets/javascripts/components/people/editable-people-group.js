@@ -9,7 +9,7 @@
   var viewModel = GGRC.VM.DeletablePeopleGroup.extend({
     title: '@',
     editableMode: false,
-    validation: {},
+    canEdit: {},
     personSelected: function (person) {
       this.dispatch({
         type: 'personSelected',

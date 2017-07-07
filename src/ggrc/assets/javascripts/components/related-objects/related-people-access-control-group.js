@@ -9,43 +9,42 @@
   GGRC.Components('relatedPeopleAccessControlGroup', {
     tag: 'related-people-access-control-group',
     viewModel: {
-      instance: {},
-
       define: {
-        // whether or not the instance is a new object that is yet to be
-        // created on the backend
-        isNewInstance: {
-          type: 'boolean',
-          value: false
-        },
-
-        // whether or not to automatically save instance on person role changes
-        autosave: {
-          type: 'boolean',
-          value: false
-        },
-
-        // a flag indicating whether a user role modification is in progress
-        isUpdating: {
+        canEdit: {
           get: function () {
-            return this.attr('isPendingGrant') ||
-              this.attr('pendingRevoke') !== null;
+            var instance = this.attr('instance');
+            var isSnapshot = GGRC.Utils.Snapshots.isSnapshot(instance);
+            var canEdit = !isSnapshot &&
+              !this.attr('updatableGroupId') &&
+              (this.attr('isNewInstance') ||
+                Permission.is_allowed_for('update', instance));
+
+            return canEdit;
+          }
+        },
+        isLoading: {
+          get: function () {
+            return this.attr('updatableGroupId') ===
+              this.attr('groupId');
           }
         }
       },
+      instance: {},
+      isNewInstance: false,
       groupId: '@',
       title: '@',
       people: [],
-      canEdit: false,
-      backUpAccessControlList: [],
       editableMode: false,
-      isPendingGrant: false,
+      isDirty: false,
+      required: false,
+      backUpPeople: [],
+      infoPaneMode: true,
+      updatableGroupId: null,
 
       refreshInstanceAfterCancel: function (groupId) {
         this.attr('editableMode', false);
-        this.attr('instance.access_control_list')
-          .replace(this.attr('backUpAccessControlList'));
-        this.attr('instance').dispatch('refreshInstance');
+        this.attr('isDirty', false);
+        this.attr('people').replace(this.attr('backUpPeople'));
       },
       // only one group can be editable
       changeEditableGroup: function (args) {
@@ -54,162 +53,73 @@
 
         if (isAddEditableGroup) {
           this.attr('editableMode', true);
-          this.attr('backUpAccessControlList')
-            .replace(this.attr('instance.access_control_list'));
+          this.attr('backUpPeople')
+            .replace(this.attr('people'));
         } else {
           this.refreshInstanceAfterCancel(groupId);
         }
       },
       saveChanges: function () {
-        var self = this;
         this.attr('editableMode', false);
-        this.attr('isPendingGrant', true);
-        this.attr('instance').save()
-          .then(function () {
-            self.attr('instance').dispatch('refreshInstance');
-            self.attr('isPendingGrant', false);
+
+        if (this.attr('isDirty')) {
+          this.attr('isDirty', false);
+          this.dispatch({
+            type: 'saveRoles',
+            people: this.attr('people'),
+            roleId: this.attr('groupId')
           });
+        }
       },
       personSelected: function (args) {
         this.addPerson(args.person, args.groupId);
       },
       addPerson: function (person, groupId) {
-        this.grantRole(person, groupId);
+        var exist = _.find(
+          this.attr('people'),
+          {id: person.id}
+        );
+
+        if (exist) {
+          console.warn('User ', person.id,
+            'already has role', groupId, 'assigned');
+          return;
+        }
+
+        this.attr('isDirty', true);
+        this.attr('people').push(person);
+
+        // Don't dispatch add role if NOT modal mode
+        if (this.attr('infoPaneMode')) {
+          return;
+        }
+
+        this.dispatch({
+          type: 'addRole',
+          person: person,
+          groupId: groupId
+        });
       },
       removePerson: function (args) {
         var groupId = args.groupId;
         var person = args.person;
+        var idx = _.findIndex(
+          this.attr('people'),
+          {id: person.id});
 
-        this.revokeRole(person, groupId);
-      },
-      _save: function (isAdding) {
-        var successMessage = 'User role ' +
-          (isAdding ? 'added.' : 'removed.');
-        var errorMessage = isAdding ? 'Adding' : 'Removing' +
-          ' user role failed.';
+        this.attr('isDirty', true);
+        this.attr('people').splice(idx, 1);
 
-        if (!this.autosave) {
-          if (isAdding) {
-            this.attr('isPendingGrant', false);
-          } else {
-            this.attr('pendingRevoke', null);
-          }
-          this._rebuildRolesInfo();
-          can.batch.stop();
+        // Don't dispatch add role if NOT modal mode
+        if (this.attr('infoPaneMode')) {
           return;
         }
 
-        this.attr('instance').save()
-          .done(function () {
-            GGRC.Errors.notifier('success', successMessage);
-          })
-          .fail(function () {
-            GGRC.Errors.notifier('error', errorMessage);
-          })
-          .always(function () {
-            if (isAdding) {
-              this.attr('isPendingGrant', false);
-            } else {
-              this.attr('pendingRevoke', null);
-            }
-            this._rebuildRolesInfo();
-            can.batch.stop();
-          }.bind(this));
-      },
-
-      /**
-       * Grant role to user on the model instance.
-       *
-       * If the user already has this role assigned on the model instance,
-       * nothing happens.
-       *
-       * @param {CMS.Models.Person} person - the user to grant a role to
-       * @param {Number} roleId - ID if the role to grant
-       */
-      grantRole: function (person, roleId) {
-        var inst = this.attr('instance');
-        var roleEntry;
-
-        if (this.attr('isUpdating')) {
-          return;
-        }
-
-        this.attr('isPendingGrant', true);
-
-        roleEntry = _.find(
-          inst.attr('access_control_list'),
-          {person: {id: person.id}, ac_role_id: roleId}
-        );
-
-        if (roleEntry) {
-          console.warn(
-            'User ', person.id, 'already has role', roleId, 'assigned');
-          this.attr('isPendingGrant', false);
-          return;
-        }
-
-        if (!inst.access_control_list) {
-          inst.attr('access_control_list', []);
-        }
-
-        can.batch.start();
-        roleEntry = {person: person, ac_role_id: roleId};
-        inst.attr('access_control_list').push(roleEntry);
-
-        this._save(true);
-      },
-
-      /**
-       * Revoke role from user on the model instance.
-       *
-       * If the user already does not have this role assigned on the model
-       * instance, nothing happens.
-       *
-       * @param {CMS.Models.Person} person - the user to grant a role to
-       * @param {Number} roleId - ID if the role to grant
-       */
-      revokeRole: function (person, roleId) {
-        var idx;
-        var inst = this.attr('instance');
-
-        if (this.attr('isUpdating')) {
-          return;
-        }
-
-        this.attr('pendingRevoke', [person.id, roleId]);
-
-        idx = _.findIndex(
-          inst.attr('access_control_list'),
-          {person: {id: person.id}, ac_role_id: roleId}
-        );
-
-        if (idx < 0) {
-          console.warn('Role ', roleId, 'not found for user', person.id);
-          this.attr('pendingRevoke', null);
-          return;
-        }
-
-        can.batch.start();
-        inst.access_control_list.splice(idx, 1);
-
-        this._save();
-      },
-
-      _rebuildRolesInfo: function () {
-        var self = this;
-        var instance = this.attr('instance');
-        var list = instance.attr('access_control_list');
-        var currentGroup = list ?
-          list.filter(function (item) {
-            return item.ac_role_id === self.attr('groupId');
-          }) :
-          [];
-
-        var people = currentGroup.map(function (item) {
-          return item.person;
+        this.dispatch({
+          type: 'removeRole',
+          person: person,
+          groupId: groupId
         });
-
-        this.attr('people').replace(people);
       }
     },
     events: {
@@ -221,80 +131,14 @@
        * @param {Object} options - the component instantiation options
        */
       init: function ($element, options) {
-        var canEdit;
         var vm = this.viewModel;
         var instance = vm.attr('instance');
-        var isSnapshot;
-
         if (!instance) {
           console.error('accessControlList component: instance not given.');
           return;
         }
 
-        isSnapshot = GGRC.Utils.Snapshots.isSnapshot(instance);
-
-        // snapshots are not editable
-        canEdit = !isSnapshot && (vm.isNewInstance ||
-          Permission.is_allowed_for('update', instance));
-
-        can.batch.start();
-        vm.attr('canEdit', canEdit);
-        vm.attr('isPendingGrant', false);
-
-         // which [personId, roleId] combination is currently being revoked
-        vm.attr('pendingRevoke', null);
-
-        vm.attr('_rolesInfoFixed', false);
-        vm._rebuildRolesInfo();
-        can.batch.stop();
-
-        vm.attr('backUpAccessControlList')
-          .replace(vm.instance.access_control_list);
-      },
-
-      '{viewModel.instance.access_control_list} change':
-      function (context, ev, index, how, newVal, oldVal) {
-        if (how === 'set') {
-          // we are not interested in collection items' changes, all we care
-          // about is ading and removing role assignments
-          return;
-        }
-
-        this.viewModel._rebuildRolesInfo();
-      },
-
-      // (Need to fix) For some reson the rolesInfo object might get corrupted and
-      // needs to be manually checked for consistency and fixed if needed. Not
-      // an elegant approach, but it works.
-      '{viewModel.rolesInfo} change': function () {
-        var vm = this.viewModel;
-        var fixNeeded = false;
-
-        if (vm.attr('_rolesInfoFixed')) {
-          // It seems that once the roleInfo object is fixed, the issue does
-          // not occur anymore, thus fixing the object only once suffices.
-          return;
-        }
-
-        vm.attr('rolesInfo').forEach(function (item) {
-          var roleId = item.role.id;
-
-          if (!item.roleAssignments) {
-            return;
-          }
-
-          item.roleAssignments.forEach(function (entry) {
-            if (entry.ac_role_id !== roleId) {
-              fixNeeded = true;
-            }
-          });
-        });
-
-        if (fixNeeded) {
-          vm.attr('_rolesInfoFixed', true);
-          console.warn('accessControlList: Need TO fix rolesInfo');
-          vm._rebuildRolesInfo();
-        }
+        vm.attr('backUpPeople').replace(vm.attr('people'));
       }
     }
   });

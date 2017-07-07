@@ -11,16 +11,18 @@
     {{/unless}}
     {{title}}
   </span>
-  {{#if required}}
-    <form-validation-icon {validation}="validation"></form-validation-icon>
+  {{#if canEdit}}
+    {{#if required}}
+      <i class="fa fa-asterisk"></i>
+    {{/if}}
+    {{#unless editableMode}}
+      <div class="action-toolbar__controls">
+        <action-toolbar-control>
+          <i class="fa fa-pencil set-editable-group"></i>
+        </action-toolbar-control>
+      </div>
+    {{/unless}}
   {{/if}}
-  {{#unless editableMode}}
-    <div class="action-toolbar__controls">
-      <action-toolbar-control>
-        <i class="fa fa-pencil set-editable-group"></i>
-      </action-toolbar-control>
-    </div>
-  {{/unless}}
 </label>
 {{#unless editableMode}}
   <object-list ({items})="people" {empty-message}="emptyListMessage">

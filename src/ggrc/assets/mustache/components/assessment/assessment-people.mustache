@@ -79,66 +79,8 @@
     </div>
 </div>
 
-
-<!-- ACL -->
-  <div class="flex-box">
-    <related-people-access-control
-      class="width-100"
-      {is-new-instance}="new_object_form"
-      {instance}="instance">
-        <div class="people-groups">
-          {{#accessControlGroups}}
-            <related-people-access-control-group
-              {group-id}="groupId"
-              {title}="title"
-              {people}="people"
-              {instance}="instance"
-              class="people-group"
-            >
-            <div>
-              {{#if infoPaneMode}}
-                <editable-people-group
-                  (unmap)="removePerson(%event)"
-                  (change-editable-mode)="changeEditableGroup(%event)"
-                  (save-changes)="saveChanges()"
-                  (person-selected)="personSelected(%event)"
-                  {editable-mode}="editableMode"
-                  {can-unmap}="canEdit"
-                  {is-loading}="isUpdating"
-                  {group-id}="groupId"
-                  {instance}="instance"
-                  {title}="title"
-                  {people}="people">
-                </editable-people-group>
-              {{else}}
-                <deletable-people-group
-                  (unmap)="removePerson(%event)"
-                  {can-unmap}="canEdit"
-                  {is-loading}="isUpdating"
-                  {group-id}="groupId"
-                  {instance}="instance"
-                  {people}="people">
-                  <label class="people-group__title">
-                    {{title}}
-                  </label>
-                </deletable-people-group>
-                <div>
-                  {{#if isUpdating}}
-                    <spinner {toggle}="isUpdating"></spinner>
-                  {{else}}
-                    {{#is_allowed 'update' instance}}
-                      <autocomplete
-                          search-items-type="Person"
-                          (item-selected)="addPerson(%event.selectedItem, @groupId)"
-                          placeholder="Add person">
-                      </autocomplete>
-                    {{/is_allowed}}
-                  {{/if}}
-                </div>
-              {{/if}}
-            </div>
-            </related-people-access-control-group>
-          {{/accessControlGroups}}
-        </div>
-    </related-people-access-control>
-  </div>
+<custom-roles
+  {info-pane-mode}="infoPaneMode"
+  {instance}="instance"
+  {is-new-instance}="new_object_form">
+</custom-roles>
