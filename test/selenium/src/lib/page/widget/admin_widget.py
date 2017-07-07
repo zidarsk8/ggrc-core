@@ -101,6 +101,5 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
     return ca_item_content.get_ca_list_from_group()
 
 
-class ModalCustomAttributes(widget_base.CustomAttributeModal,
-                            widget_base.CreateNewCustomAttributeModal):
+class ModalCustomAttributes(widget_base.CustomAttributeModal):
   """Custom attributes modal."""

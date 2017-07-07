@@ -735,14 +735,17 @@ class WidgetInfoAudit(WidgetInfoPanel):
 
 class WidgetInfoAssessment(WidgetInfoPanel):
   """Locators for Assessment Info widgets."""
+  # pylint: disable=invalid-name
   WIDGET = Common.INFO_WIDGET
   TOGGLE = ' [class*="fa-caret"]'
   # Base
   CAS_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
                             WIDGET + " auto-save-form .flex-size-1")
   CAS_CHECKBOXES = (By.CSS_SELECTOR, '[class*="wrapper"] [type="checkbox"]')
-  MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS = (By.CSS_SELECTOR,
-                                            WIDGET + Common.TREE_ITEM)
+  MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS = (
+      By.CSS_SELECTOR, WIDGET + " .mapped-objects__item-body")
+  MAPPED_OBJECT_TITLE = (By.CSS_SELECTOR, ".title")
+  MAPPED_OBJECT_DESCRIPTION = (By.CSS_SELECTOR, ".description")
   # Assessment Attributes tab
   # People section
   PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
