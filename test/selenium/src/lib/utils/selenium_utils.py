@@ -34,9 +34,9 @@ def switch_to_new_window(driver):
   try:
     wait_until_condition(driver, EC.new_window_is_opened)
     driver.switch_to.window(driver.window_handles.pop())
-  except exceptions.NoSuchWindowException as exception:
-    LOGGER.exception(exception, messages.ERR_SWITCH_TO_NEW_WINDOW)
-    raise exception
+  except:
+    raise exceptions.NoSuchWindowException(
+        messages.ExceptionsMessages.err_switch_to_new_window)
 
 
 def wait_until_stops_moving(element):
