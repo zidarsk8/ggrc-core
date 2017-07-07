@@ -3,9 +3,10 @@
 """Services for create and manipulate objects via UI."""
 
 import os
+import re
 
 from lib import factory
-from lib.constants import objects, url, path, messages, roles, element
+from lib.constants import objects, url, path, messages, roles, element, regex
 from lib.entities.entities_factory import EntitiesFactory
 from lib.entities.entity import Entity
 from lib.page.widget.info_widget import SnapshotableInfoPanel
@@ -40,33 +41,48 @@ class BaseWebUiService(object):
         entity_factory.create_empty() for _ in xrange(len(list_scopes))]
     list_scopes_with_upper_keys = [
         string_utils.dict_keys_to_upper_case(scope) for scope in list_scopes]
-    list_scopes_remapped = string_utils.remap_keys_for_list_dicts(
-        dict_of_transform_keys=Entity.items_of_remap_keys(),
-        list_dicts=list_scopes_with_upper_keys)
-    # add extra 'owners' attribute name and value if 'creator' in scopes
-    list_extra_scopes = [
-        dict(scope_remapped.items() +
-             [("owners", scope_remapped.get("creator"))]) if
-        "creator" in scope_remapped.keys() else scope_remapped for
-        scope_remapped in list_scopes_remapped]
+    list_scopes_remapped = string_utils.exchange_dicts_items(
+        transform_dict=Entity.items_of_remap_keys(),
+        dicts=list_scopes_with_upper_keys, is_keys_not_values=True)
+    # convert u'None', u'No person' to None type
+    list_scopes_to_convert = [
+        {k: (None if v in ["None", "No person"] else v)
+         for k, v in scope.iteritems()} for scope in list_scopes_remapped]
     # convert and represent values in scopes
-    for scope in list_extra_scopes:
+    for scope in list_scopes_to_convert:
       for key, val in scope.iteritems():
-        # convert u'false' and u'true' to boolean
-        scope[key] = string_utils.get_bool_from_string(val)
-        # convert multiple values to list of strings
-        if key in ["owners", "assessor", "creator"]:
-          # convert CSV like u'user@example.com' to u'Example User'
-          val = val if val != url.DEFAULT_USER_EMAIL else roles.DEFAULT_USER
-          scope[key] = string_utils.convert_to_list(val)
-        # convert 'slug' from CSV for snapshoted objects u'*23eb72ac-4d9d'
-        if (key == "slug" and
-                self.obj_name in objects.ALL_SNAPSHOTABLE_OBJS and "*" in val):
-          scope[key] = val.replace("*", "")
+        if val:
+          if key in ["mandatory", "verified"]:
+            # convert u'false', u'true' like to Boolean
+            scope[key] = string_utils.get_bool_value_from_arg(val)
+          # convert datetime attributes' directly
+          if key in ["updated_at", "created_at"]:
+            scope[key] = string_utils.convert_str_to_datetime(val)
+          # convert datetime attributes' in 'comments'
+          if (key == "comments" and isinstance(val, list) and
+                  all(isinstance(comment, dict) for comment in val)):
+            # u'(Creator) 07/06/2017 05:47:14 AM UTC'
+            # to u'07/06/2017 05:47:14 AM UTC'
+            scope[key] = [
+                {k: (string_utils.convert_str_to_datetime(
+                     re.sub(regex.TEXT_WITHIN_PARENTHESES, "", v))
+                     if k == "created_at" else v)
+                 for k, v in comment.iteritems()} for comment in val]
+          # convert multiple values to list of strings and split if need it
+          if key in ["owners", "assessor", "creator", "verifier"]:
+            # convert CSV like u'user@example.com' to u'Example User'
+            val = val if val != url.DEFAULT_USER_EMAIL else roles.DEFAULT_USER
+            # split multiple values if need 'Ex1, Ex2 F' to ['Ex1', 'Ex2 F']
+            scope[key] = val.split(", ")
+          # convert 'slug' from CSV for snapshoted objects u'*23eb72ac-4d9d'
+          if (key == "slug" and
+                  (self.obj_name in objects.ALL_SNAPSHOTABLE_OBJS) and
+                  "*" in val):
+            scope[key] = val.replace("*", "")
     return [
         EntitiesFactory.update_objs_attrs_values_by_entered_data(
             objs=factory_obj, is_allow_none_values=False, **scope) for
-        scope, factory_obj in zip(list_extra_scopes, list_factory_objs)]
+        scope, factory_obj in zip(list_scopes_to_convert, list_factory_objs)]
 
   def open_widget_of_mapped_objs(self, src_obj):
     """Navigate to generic widget URL of mapped objects according to URL of
@@ -145,7 +161,8 @@ class BaseWebUiService(object):
       return self.create_list_objs(entity_factory=self.entities_factory_cls,
                                    list_scopes=dict_list_objs_scopes[dict_key])
     else:
-      raise ValueError(messages.ERR_CSV_FORMAT.format(dict_list_objs_scopes))
+      raise ValueError(messages.ExceptionsMessages.err_csv_format.
+                       format(dict_list_objs_scopes))
 
   def create_obj_via_tree_view(self, src_obj, obj):
     """Open generic widget of mapped objects, open creation modal from
