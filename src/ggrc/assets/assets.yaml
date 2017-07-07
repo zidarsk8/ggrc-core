@@ -330,6 +330,8 @@ dashboard-js-files:
   - components/related-objects/related-people-mapping.js
   - components/related-objects/related-people-access-control.js
   - components/related-objects/related-people-access-control-group.js
+  - components/custom-roles/custom-roles.js
+  - components/custom-roles/custom-roles-modal.js
 
 app-init-files:
   - apps/dashboard.js
@@ -690,6 +692,8 @@ dashboard-js-template-files:
   - components/assessment/attach-button.mustache
   - components/people/deletable-people-group.mustache
   - components/people/editable-people-group.mustache
+  - components/custom-roles/custom-roles.mustache
+  - components/custom-roles/custom-roles-modal.mustache
 
 dashboard-css-files:
   - dashboard.css

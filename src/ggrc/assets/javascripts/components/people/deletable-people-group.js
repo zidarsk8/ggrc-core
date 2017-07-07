@@ -9,10 +9,12 @@
   var viewModel = can.Map.extend('GGRC.VM.DeletablePeopleGroup', {
     define: {
       emptyListMessage: {
-        type: 'string',
-        value: ''
+        get: function () {
+          return this.attr('showEmptyMessage') ? 'None' : '';
+        }
       }
     },
+    showEmptyMessage: true,
     required: '@',
     people: [],
     groupId: '@',

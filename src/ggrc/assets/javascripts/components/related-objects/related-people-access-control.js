@@ -10,12 +10,66 @@
     tag: 'related-people-access-control',
     viewModel: {
       instance: {},
-      define: {
-        accessControlGroups: {
-          get: function () {
-            return this.getRoleList();
-          }
+      includeRoles: [],
+      groups: [],
+      updatableGroupId: null,
+      isNewInstance: false,
+
+      updateRoles: function (args) {
+        this.updateAccessContolList(args.people, args.roleId);
+        this.dispatch({
+          type: 'saveCustomRole',
+          groupId: args.roleId
+        });
+      },
+      updateAccessContolList: function (people, roleId) {
+        var instance = this.attr('instance');
+
+        // remove all people with current role
+        var listWithoutRole = instance
+          .attr('access_control_list').filter(function (item) {
+            return item.ac_role_id !== roleId;
+          });
+
+        // push update people with current role
+        people.forEach(function (person) {
+          listWithoutRole.push({
+            ac_role_id: roleId,
+            person: {id: person.id, type: 'Person'}
+          });
+        });
+
+        instance.attr('access_control_list')
+          .replace(listWithoutRole);
+      },
+
+      buildGroups: function (role, roleAssignments) {
+        var includeRoles = this.attr('includeRoles');
+        var groupId = role.id;
+        var title = role.name;
+        var group;
+        var people;
+
+        if (includeRoles.length && includeRoles.indexOf(title) === -1) {
+          return;
         }
+
+        group = roleAssignments[groupId];
+        people = group ?
+          group.map(function (groupItem) {
+            return {
+              id: groupItem.person.id,
+              type: 'Person'
+            };
+          }) :
+          [];
+
+        return {
+          title: title,
+          groupId: groupId,
+          people: people,
+          required: role.mandatory
+        };
       },
       getRoleList: function () {
         var roleAssignments;
@@ -36,23 +90,34 @@
         });
 
         groups = _.map(roles, function (role) {
-          var groupId = role.id;
-          var title = role.name;
-          var group = roleAssignments[groupId];
-          var people = group ?
-            group.map(function (groupItem) {
-              return groupItem.person;
-            }) :
-            [];
+          return this.buildGroups(role, roleAssignments);
+        }.bind(this))
+        .filter(function (group) {
+          return typeof group !== 'undefined';
+        })
+        // sort by required
+        .sort(function (a, b) {
+          if (a.required === b.required) {
+            return 0;
+          }
 
-          return {
-            title: title,
-            groupId: groupId,
-            people: people
-          };
+          return a.required ? -1 : 1;
         });
 
         return groups;
+      }
+    },
+    events: {
+      refreshGroups: function () {
+        this.viewModel.attr('groups',
+          this.viewModel.getRoleList());
+      },
+      inserted: function () {
+        this.refreshGroups();
+      },
+      '{viewModel.instance.access_control_list} change':
+      function () {
+        this.refreshGroups();
       }
     }
   });

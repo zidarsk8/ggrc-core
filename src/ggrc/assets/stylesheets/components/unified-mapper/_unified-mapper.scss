@@ -116,8 +116,8 @@ mapper-results {
       }
     }
 
-    object-list {
-      .object-list__item {
+    > object-list {
+      > .object-list__item {
         color: $black;
         border-bottom: 1px solid $items-separator-color;
 
@@ -132,7 +132,7 @@ mapper-results {
         }
       }
 
-      .object-list__item:first-child,
+      > .object-list__item:first-child,
       spinner + .object-list__item {
         border-top: 1px solid $items-separator-color;
       }
