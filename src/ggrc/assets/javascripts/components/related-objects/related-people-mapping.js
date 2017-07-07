@@ -41,10 +41,9 @@
         }
       },
       changeEditableGroup: function (args) {
-        var isAddEditableGroup = args.isAddEditableGroup;
         var pendingJoins = this.attr('instance._pending_joins');
 
-        if (isAddEditableGroup) {
+        if (args.editableMode) {
           this.attr('editableMode', true);
           this.attr('backUpPendings').replace(pendingJoins);
         } else {
