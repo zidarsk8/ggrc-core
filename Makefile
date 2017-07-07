@@ -17,8 +17,7 @@ GCLOUD_ZIP_NAME=google-cloud-sdk-154.0.1-linux-x86_64.tar.gz
 GCLOUD_ZIP_PATH=$(DEV_PREFIX)/opt/$(GCLOUD_ZIP_NAME)
 GCLOUD_SDK_PATH=$(DEV_PREFIX)/opt/google-cloud-sdk
 
-APPENGINE_PACKAGES_DIR=$(PREFIX)/src/packages
-APPENGINE_PACKAGES_TEMP_DIR=$(DEV_PREFIX)/opt/gae_packages
+APPENGINE_PACKAGES_DIR=$(DEV_PREFIX)/opt/gae_packages
 
 APPENGINE_ENV_DIR=$(DEV_PREFIX)/opt/gae_virtualenv
 APPENGINE_REQUIREMENTS_TXT=$(PREFIX)/src/requirements.txt
@@ -53,7 +52,6 @@ appengine_sdk : $(GCLOUD_SDK_PATH)
 
 clean_appengine_packages :
 	rm -rf -- "$(APPENGINE_PACKAGES_DIR)"
-	rm -rf -- "$(APPENGINE_PACKAGES_TEMP_DIR)"
 	rm -rf -- "$(APPENGINE_ENV_DIR)"
 
 $(APPENGINE_ENV_DIR) :
@@ -64,18 +62,15 @@ $(APPENGINE_ENV_DIR) :
 
 appengine_virtualenv : $(APPENGINE_ENV_DIR)
 
-$(APPENGINE_PACKAGES_TEMP_DIR) : $(APPENGINE_ENV_DIR)
-	mkdir -p $(APPENGINE_PACKAGES_TEMP_DIR)
+$(APPENGINE_PACKAGES_DIR) : $(APPENGINE_ENV_DIR)
+	mkdir -p $(APPENGINE_PACKAGES_DIR)
 	source "$(APPENGINE_ENV_DIR)/bin/activate"; \
-		pip install --no-deps -r "$(APPENGINE_REQUIREMENTS_TXT)" --target "$(APPENGINE_PACKAGES_TEMP_DIR)"
-	cd "$(APPENGINE_PACKAGES_TEMP_DIR)/webassets"; \
+		pip install --no-deps -r "$(APPENGINE_REQUIREMENTS_TXT)" --target "$(APPENGINE_PACKAGES_DIR)"
+	cd "$(APPENGINE_PACKAGES_DIR)/webassets"; \
 		patch -p3 < "${PREFIX}/extras/webassets__fix_builtin_filter_loading.diff"
-
-$(APPENGINE_PACKAGES_DIR) : $(APPENGINE_PACKAGES_TEMP_DIR)
-	cd "$(APPENGINE_PACKAGES_TEMP_DIR)"; \
+	cd "$(APPENGINE_PACKAGES_DIR)"; \
 		find . -name "*.pyc" -delete; \
 		find . -name "*.egg-info" | xargs rm -rf
-	cp -r "$(APPENGINE_PACKAGES_TEMP_DIR)" "$(APPENGINE_PACKAGES_DIR)"
 
 appengine_packages : $(APPENGINE_PACKAGES_DIR)
 

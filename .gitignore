@@ -6,7 +6,6 @@ cookbooks
 vagrant_ansible_inventory_*
 Cheffile.lock
 tmp
-src/packages
 src/app.yaml
 *.pyc
 src/instance
