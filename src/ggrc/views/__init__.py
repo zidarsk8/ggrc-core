@@ -73,7 +73,7 @@ def reindex(_):
 @queued_task
 def compute_attributes(args):
   """Web hook to update the full text search index."""
-  from ggrc.dp_models import computed_attributes
+  from ggrc.data_platform import computed_attributes
   revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
   computed_attributes.compute_attributes(revision_ids)
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))

@@ -4,7 +4,7 @@
 """Test last assessment module."""
 
 
-from ggrc.dp_models import computed_attributes
+from ggrc.data_platform import computed_attributes
 
 from integration.ggrc import TestCase
 

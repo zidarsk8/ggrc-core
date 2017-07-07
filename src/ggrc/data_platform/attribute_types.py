@@ -6,7 +6,7 @@
 from sqlalchemy import orm
 
 from ggrc import db
-from ggrc.dp_models import base
+from ggrc.data_platform import base
 
 
 class AttributeTypes(base.Base, db.Model):

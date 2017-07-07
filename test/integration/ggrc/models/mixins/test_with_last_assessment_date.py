@@ -10,7 +10,7 @@ import freezegun
 
 from ggrc import db
 from ggrc.models import all_models
-from ggrc.dp_models import computed_attributes
+from ggrc.data_platform import computed_attributes
 
 from integration.ggrc.api_helper import Api
 import integration.ggrc.generator

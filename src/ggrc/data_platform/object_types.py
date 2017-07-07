@@ -7,7 +7,7 @@ from sqlalchemy import orm
 from sqlalchemy.ext.declarative import declared_attr
 
 from ggrc import db
-from ggrc.dp_models import base
+from ggrc.data_platform import base
 
 
 class ObjectTypes(base.Base, db.Model):

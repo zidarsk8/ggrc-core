@@ -4,7 +4,7 @@
 """Namespaces module."""
 
 from ggrc import db
-from ggrc.dp_models import base
+from ggrc.data_platform import base
 
 
 class Namespaces(base.Base, db.Model):
