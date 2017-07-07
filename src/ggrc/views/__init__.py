@@ -74,7 +74,10 @@ def reindex(_):
 def compute_attributes(args):
   """Web hook to update the full text search index."""
   from ggrc.data_platform import computed_attributes
-  revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
+  if str(args.parameters["revision_ids"]) == "all_latest":
+    revision_ids = "all_latest"
+  else:
+    revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
   computed_attributes.compute_attributes(revision_ids)
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
@@ -358,7 +361,9 @@ def admin_refresh_revisions():
 @app.route("/admin/compute_attributes", methods=["POST"])
 @login_required
 def send_event_job():
-  start_compute_attributes(request.get_json().get("revision_ids", []))
+  revision_ids = request.get_json().get("revision_ids", [])
+  if revision_ids:
+    start_compute_attributes(revision_ids)
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 

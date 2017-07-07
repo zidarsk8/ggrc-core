@@ -23,6 +23,7 @@ import sqlalchemy as sa
 
 from ggrc import db
 from ggrc import login
+from ggrc.utils import revisions as revision_utils
 from ggrc.models import all_models as models
 
 # Statement for inserting attribute values without explicit call of delete.
@@ -565,6 +566,24 @@ def store_data(attributes_data, index_data):
   db.session.commit()
 
 
+def get_all_latest_revisions_ids():
+  attributes = get_computed_attributes()
+  revision_ids = []
+  for attribute in attributes:
+    aggregate_type = get_aggregate_type(attribute)
+    revisions = revision_utils._get_revisions_by_type(aggregate_type)
+    revision_ids.extend(revisions.values())
+  return revision_ids
+
+
+def delete_all_computed_values():
+  """Remove all attribute values for computed attributes."""
+  attributes = get_computed_attributes()
+  models.Attributes.query.filter_by(
+      models.Attributes.attribute_template.in_(attributes)
+  ).delete()
+
+
 def compute_attributes(revision_ids):
   """Compute new values based an changed objects.
 
@@ -574,6 +593,9 @@ def compute_attributes(revision_ids):
 
   if not revision_ids:
     return
+  if revision_ids == "all_latest":
+    revision_ids = get_all_latest_revisions_ids()
+
   revisions = models.Revision.query.filter(
       models.Revision.id.in_(revision_ids))
 
