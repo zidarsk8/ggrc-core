@@ -38,25 +38,18 @@
       isDirty: false,
       required: false,
       backUpPeople: [],
-      infoPaneMode: true,
+      autoUpdate: false,
       updatableGroupId: null,
 
-      refreshInstanceAfterCancel: function (groupId) {
-        this.attr('editableMode', false);
-        this.attr('isDirty', false);
-        this.attr('people').replace(this.attr('backUpPeople'));
-      },
-      // only one group can be editable
       changeEditableGroup: function (args) {
-        var groupId = args.groupId;
-        var isAddEditableGroup = args.isAddEditableGroup;
-
-        if (isAddEditableGroup) {
+        if (args.editableMode) {
           this.attr('editableMode', true);
           this.attr('backUpPeople')
             .replace(this.attr('people'));
         } else {
-          this.refreshInstanceAfterCancel(groupId);
+          this.attr('editableMode', false);
+          this.attr('isDirty', false);
+          this.attr('people').replace(this.attr('backUpPeople'));
         }
       },
       saveChanges: function () {
@@ -65,7 +58,7 @@
         if (this.attr('isDirty')) {
           this.attr('isDirty', false);
           this.dispatch({
-            type: 'saveRoles',
+            type: 'updateRoles',
             people: this.attr('people'),
             roleId: this.attr('groupId')
           });
@@ -75,10 +68,7 @@
         this.addPerson(args.person, args.groupId);
       },
       addPerson: function (person, groupId) {
-        var exist = _.find(
-          this.attr('people'),
-          {id: person.id}
-        );
+        var exist = _.find(this.attr('people'), {id: person.id});
 
         if (exist) {
           console.warn('User ', person.id,
@@ -89,19 +79,11 @@
         this.attr('isDirty', true);
         this.attr('people').push(person);
 
-        // Don't dispatch add role if NOT modal mode
-        if (this.attr('infoPaneMode')) {
-          return;
+        if (this.attr('autoUpdate')) {
+          this.saveChanges();
         }
-
-        this.dispatch({
-          type: 'addRole',
-          person: person,
-          groupId: groupId
-        });
       },
       removePerson: function (args) {
-        var groupId = args.groupId;
         var person = args.person;
         var idx = _.findIndex(
           this.attr('people'),
@@ -110,34 +92,14 @@
         this.attr('isDirty', true);
         this.attr('people').splice(idx, 1);
 
-        // Don't dispatch add role if NOT modal mode
-        if (this.attr('infoPaneMode')) {
-          return;
+        if (this.attr('autoUpdate')) {
+          this.saveChanges();
         }
-
-        this.dispatch({
-          type: 'removeRole',
-          person: person,
-          groupId: groupId
-        });
       }
     },
     events: {
-      /**
-       * The component entry point.
-       *
-       * @param {jQuery} $element - the DOM element that triggered
-       *   creating the component instance
-       * @param {Object} options - the component instantiation options
-       */
       init: function ($element, options) {
         var vm = this.viewModel;
-        var instance = vm.attr('instance');
-        if (!instance) {
-          console.error('accessControlList component: instance not given.');
-          return;
-        }
-
         vm.attr('backUpPeople').replace(vm.attr('people'));
       }
     }

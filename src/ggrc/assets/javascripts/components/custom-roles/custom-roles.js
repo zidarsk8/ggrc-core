@@ -15,8 +15,16 @@
     template: tpl,
     viewModel: {
       instance: {},
-      infoPaneMode: false,
-      isNewInstance: false
+      updatableGroupId: null,
+      save: function (args) {
+        var self = this;
+        this.attr('updatableGroupId', args.groupId);
+        this.attr('instance').save()
+          .then(function () {
+            self.attr('instance').dispatch('refreshInstance');
+            self.attr('updatableGroupId', null);
+          });
+      }
     }
   });
 })(window.can, window.GGRC);

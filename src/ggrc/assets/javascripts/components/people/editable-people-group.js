@@ -27,7 +27,7 @@
       this.attr('editableMode', editableMode);
       this.dispatch({
         type: 'changeEditableMode',
-        isAddEditableGroup: editableMode,
+        editableMode: editableMode,
         groupId: this.attr('groupId')
       });
     }
