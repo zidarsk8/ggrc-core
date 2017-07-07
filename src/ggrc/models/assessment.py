@@ -201,6 +201,10 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
           "filter_by": "_ignore_filter",
           "type": reflection.AttributeInfo.Type.MAPPING,
       },
+      "assessment_type": {
+          "display_name": "Assessment Type",
+          "mandatory": False,
+      },
       "url": "Assessment URL",
       "design": "Conclusion: Design",
       "operationally": "Conclusion: Operation",
@@ -273,10 +277,14 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
 
   @validates("assessment_type")
   def validate_assessment_type(self, key, value):
+    """Validate assessment type to be the same as existing model name"""
     # pylint: disable=unused-argument
-    from ggrc.models.all_models import __all__ as model_names
-    if value and value not in model_names:
-      raise ValueError("Assessment type '{}' doesn't exist".format(value))
+    # pylint: disable=no-self-use
+    from ggrc.snapshotter.rules import Types
+    if value and value not in Types.all:
+      raise ValueError(
+          "Assessment type '{}' is not snapshotable".format(value)
+      )
     return value
 
   @classmethod
