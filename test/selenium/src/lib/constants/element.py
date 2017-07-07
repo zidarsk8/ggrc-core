@@ -211,6 +211,16 @@ class CommonControl(Common):
   MAPPED_OBJECTS = "Mapped Objects"
 
 
+class CommonObjective(Common):
+  """Common elements' labels and properties for Objective objects."""
+  OBJECTIVE = objects.get_normal_form(objects.get_singular(objects.OBJECTIVES))
+  STATE = Base.STATE
+  ADMIN = roles.ADMIN
+  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
+  CREATORS = "Creators"
+  MAPPED_OBJECTS = "Mapped Objects"
+
+
 class CommonAssessment(Common):
   """Common elements' labels and properties for Assessments objects."""
   ASMT = objects.get_normal_form(objects.get_singular(objects.ASSESSMENTS))
@@ -350,6 +360,25 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   FREQUENCY = "Frequency"
   ASSERTIONS = "Assertions"
   CATEGORIES = "Categories"
+  DEFAULT_SET_FIELDS = (
+      CommonModalSetVisibleFields.TITLE, ADMIN,
+      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED, REVIEW_STATE)
+
+
+class ObjectiveModalSetVisibleFields(CommonModalSetVisibleFields):
+  """Common elements' labels and properties for Modal to Set visible
+ fields for Controls.
+ """
+  # pylint: disable=too-many-instance-attributes
+  MODAL_HEADER = CommonModalSetVisibleFields.MODAL_HEADER_FORMAT.format(
+      CommonObjective.OBJECTIVE)
+  REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
+  ADMIN = TransformationSetVisibleFields.ADMIN
+  URL = Base.URL
+  REFERENCE_URL = Base.REFERENCE_URL
+  EFFECTIVE_DATE = Base.EFFECTIVE_DATE
+  STOP_DATE = Base.STOP_DATE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, ADMIN,
       CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,

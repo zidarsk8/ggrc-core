@@ -149,6 +149,12 @@ class ControlsService(BaseRestService):
     super(ControlsService, self).__init__(url.CONTROLS)
 
 
+class ObjectivesService(BaseRestService):
+  """Service for working with Objectives entities."""
+  def __init__(self):
+    super(ObjectivesService, self).__init__(url.OBJECTIVES)
+
+
 class ProgramsService(BaseRestService):
   """Service for working with Programs entities."""
   def __init__(self):

@@ -396,6 +396,12 @@ class ControlsService(SnapshotsWebUiService):
     super(ControlsService, self).__init__(driver, objects.CONTROLS)
 
 
+class ObjectivesService(SnapshotsWebUiService):
+  """Class for Objectives business layer's services objects."""
+  def __init__(self, driver):
+    super(ObjectivesService, self).__init__(driver, objects.OBJECTIVES)
+
+
 class IssuesService(BaseWebUiService):
   """Class for Issues business layer's services objects."""
   def __init__(self, driver):

@@ -12,7 +12,8 @@ from lib.constants import element, objects, roles, url as const_url
 from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities.entity import (
     Entity, PersonEntity, CustomAttributeEntity, ProgramEntity, ControlEntity,
-    AuditEntity, AssessmentTemplateEntity, AssessmentEntity, IssueEntity)
+    ObjectiveEntity, AuditEntity, AssessmentTemplateEntity, AssessmentEntity,
+    IssueEntity)
 from lib.utils import string_utils
 from lib.utils.string_utils import (random_list_strings, random_string,
                                     random_uuid)
@@ -24,6 +25,7 @@ class EntitiesFactory(object):
   obj_person = unicode(objects.get_singular(objects.PEOPLE, title=True))
   obj_program = unicode(objects.get_singular(objects.PROGRAMS, title=True))
   obj_control = unicode(objects.get_singular(objects.CONTROLS, title=True))
+  obj_objective = unicode(objects.get_singular(objects.OBJECTIVES, title=True))
   obj_audit = unicode(objects.get_singular(objects.AUDITS, title=True))
   obj_asmt_tmpl = unicode(objects.get_singular(
       objects.ASSESSMENT_TEMPLATES, title=True))
@@ -506,6 +508,54 @@ class ControlsFactory(EntitiesFactory):
     random_control.contact = ObjectPersonsFactory().default().__dict__
     random_control.owners = [ObjectPersonsFactory().default().__dict__]
     return random_control
+
+
+class ObjectivesFactory(EntitiesFactory):
+  """Factory class for Objectives entities."""
+  # pylint: disable=too-many-locals
+
+  obj_attrs_names = Entity().get_attrs_names_for_entities(ObjectiveEntity)
+
+  @classmethod
+  def create_empty(cls):
+    """Create blank Objective object."""
+    empty_objective = ObjectiveEntity()
+    empty_objective.type = cls.obj_objective
+    empty_objective.custom_attributes = {None: None}
+    return empty_objective
+
+  @classmethod
+  def create(cls, type=None, id=None, title=None, href=None, url=None,
+             slug=None, status=None, owners=None, contact=None,
+             secondary_contact=None, updated_at=None, os_state=None,
+             custom_attribute_definitions=None, custom_attribute_values=None,
+             custom_attributes=None):
+    """Create Objective object.
+    Random values will be used for title and slug.
+    Predictable values will be used for type, status, owners and contact.
+    """
+    objective_entity = cls._create_random_objective()
+    objective_entity = cls.update_objs_attrs_values_by_entered_data(
+        objs=objective_entity, is_allow_none_values=False, type=type, id=id,
+        title=title, href=href, url=url, slug=slug, status=status,
+        owners=owners, contact=contact, secondary_contact=secondary_contact,
+        updated_at=updated_at, os_state=os_state,
+        custom_attribute_definitions=custom_attribute_definitions,
+        custom_attribute_values=custom_attribute_values,
+        custom_attributes=custom_attributes)
+    return objective_entity
+
+  @classmethod
+  def _create_random_objective(cls):
+    """Create Objective entity with randomly and predictably filled fields."""
+    random_objective = ObjectiveEntity()
+    random_objective.type = cls.obj_objective
+    random_objective.title = cls.generate_string(cls.obj_objective)
+    random_objective.slug = cls.generate_slug()
+    random_objective.status = unicode(element.ObjectStates.DRAFT)
+    random_objective.contact = ObjectPersonsFactory().default().__dict__
+    random_objective.owners = [ObjectPersonsFactory().default().__dict__]
+    return random_objective
 
 
 class AuditsFactory(EntitiesFactory):

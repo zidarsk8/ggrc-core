@@ -75,6 +75,10 @@ class Controls(CommonDropdownSettings):
   """Controls 3BBS button/dropdown settings on Tree View."""
 
 
+class Objectives(CommonDropdownSettings):
+  """Objectives 3BBS button/dropdown settings on Tree View."""
+
+
 class Processes(CommonDropdownSettings):
   """Processes 3BBS button/dropdown settings on Tree View."""
 
