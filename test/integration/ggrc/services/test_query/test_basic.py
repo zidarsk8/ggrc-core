@@ -708,16 +708,6 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
         set(programs_ids["ids"]),
     )
 
-  @unittest.skip("Not implemented")
-  def test_self_link(self):
-    # It would be good if the api accepted get requests and we could add the
-    # query into a get parameter, then each request would also get a self link
-    # that could be tested to see that it truly returns what the original
-    # request was.
-    # In the end, instead of returning mapped object stubs like we do now, we'd
-    # just return a self link for fetching those objects.
-    pass
-
   def test_multiple_queries(self):
     """Multiple queries POST is identical to multiple single-query POSTs."""
     data_list = [
