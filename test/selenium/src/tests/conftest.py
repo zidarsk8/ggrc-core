@@ -269,3 +269,10 @@ def create_audit_with_control_and_delete_control(request):
 def dynamic_object(request):
   """Create object by passed indirect parameter in test."""
   yield _common_fixtures(request.param)
+
+
+@pytest.fixture(scope="function")
+def dynamic_relationships(request):
+  """Create relationships between source and destinations objects by passed
+  indirect parameter in test."""
+  yield _common_fixtures(request.param)
