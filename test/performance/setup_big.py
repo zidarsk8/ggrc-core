@@ -22,7 +22,7 @@ class BigSetup(setup_base.SetUpBaseTask):
   _user_count = 30
   _cad_prefixes = ["1"]
 
-  _program_count = 10
+  _program_count = 100
   _program_mapping_count = 200
   _program_mapping_models = [
       "Control",
@@ -32,7 +32,7 @@ class BigSetup(setup_base.SetUpBaseTask):
       "Facility",
   ]
 
-  _audit_count = 5
+  _audit_count = 3
 
   _assessment_template_count = 3
   _assessment_template_models = [

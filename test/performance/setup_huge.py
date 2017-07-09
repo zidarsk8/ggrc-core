@@ -19,7 +19,7 @@ class BigSetup(setup_base.SetUpBaseTask):
   """
 
   _object_count = 3000
-  _user_count = 40
+  _user_count = 50
   _cad_prefixes = ["1"]
 
   _program_count = 200
@@ -32,7 +32,7 @@ class BigSetup(setup_base.SetUpBaseTask):
       "Facility",
   ]
 
-  _audit_count = 2
+  _audit_count = 3
 
   _assessment_template_count = 5
   _assessment_template_models = [

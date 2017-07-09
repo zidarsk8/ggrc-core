@@ -22,7 +22,7 @@ class MediumSetup(setup_base.SetUpBaseTask):
   _user_count = 30
   _cad_prefixes = ["1"]
 
-  _program_count = 10
+  _program_count = 50
   _program_mapping_count = 20
   _program_mapping_models = [
       "Control",
@@ -32,7 +32,7 @@ class MediumSetup(setup_base.SetUpBaseTask):
       "Facility",
   ]
 
-  _audit_count = 5
+  _audit_count = 2
 
   _assessment_template_count = 2
   _assessment_template_models = [

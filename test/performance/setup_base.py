@@ -41,7 +41,8 @@ class SetUpBaseTask(base.BaseTaskSet):
       "Facility",
   ]
 
-  _audit_count = 1  # number of audits per program, for half the programs.
+  # number of audits per program for one tenth of all programs
+  _audit_count = 1
 
   # number of AT for each AT model on each audit
   _assessment_template_count = 1
