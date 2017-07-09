@@ -118,7 +118,7 @@ def get_aggregate_function(attribute):
       values = [
           (aggregate_values[aggregate_id], aggregate_id)
           for aggregate_id in rel_map
-          if aggregate_values[aggregate_id] is not None
+          if aggregate_values.get(aggregate_id) is not None
       ]
       if not values:
         return None, None
