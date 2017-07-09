@@ -24,6 +24,7 @@ import sqlalchemy as sa
 from ggrc import db
 from ggrc import login
 from ggrc.utils import revisions as revision_utils
+from ggrc.utils import benchmark
 from ggrc.models import all_models as models
 
 # Statement for inserting attribute values without explicit call of delete.
@@ -567,21 +568,24 @@ def store_data(attributes_data, index_data):
 
 
 def get_all_latest_revisions_ids():
-  attributes = get_computed_attributes()
-  revision_ids = []
-  for attribute in attributes:
-    aggregate_type = get_aggregate_type(attribute)
-    revisions = revision_utils._get_revisions_by_type(aggregate_type)
-    revision_ids.extend(revisions.values())
-  return revision_ids
+  """Get latest revisions for aggregate objects."""
+  with benchmark("Get all latest revision ids"):
+    attributes = get_computed_attributes()
+    revision_ids = []
+    for attribute in attributes:
+      aggregate_type = get_aggregate_type(attribute)
+      revisions = revision_utils._get_revisions_by_type(aggregate_type)
+      revision_ids.extend(revisions.values())
+    return revision_ids
 
 
 def delete_all_computed_values():
   """Remove all attribute values for computed attributes."""
-  attributes = get_computed_attributes()
-  models.Attributes.query.filter_by(
-      models.Attributes.attribute_template.in_(attributes)
-  ).delete()
+  with benchmark("Delete all computed attribute values"):
+    attributes = get_computed_attributes()
+    models.Attributes.query.filter_by(
+        models.Attributes.attribute_template.in_(attributes)
+    ).delete()
 
 
 def compute_attributes(revision_ids):
@@ -591,24 +595,37 @@ def compute_attributes(revision_ids):
     objects: array of object stubs of modified objects.
   """
 
-  if not revision_ids:
-    return
-  if revision_ids == "all_latest":
-    revision_ids = get_all_latest_revisions_ids()
+  with benchmark("Compute attributes"):
 
-  revisions = models.Revision.query.filter(
-      models.Revision.id.in_(revision_ids))
+    if not revision_ids:
+      return
 
-  attributes = get_computed_attributes()
+    with benchmark("Get revisions."):
+      if revision_ids == "all_latest":
+        revision_ids = get_all_latest_revisions_ids()
 
-  attribute_groups = group_revisions(attributes, revisions)
-  affected_objects = get_affected_objects(attribute_groups)
-  relationships = get_relationships(affected_objects)
-  snapshot_map, snapshot_tag_map = get_snapshot_data(affected_objects)
+      revisions = models.Revision.query.filter(
+          models.Revision.id.in_(revision_ids))
 
-  computed_values = compute_values(affected_objects, relationships,
-                                   snapshot_map)
+    with benchmark("Get all computed attributes"):
+      attributes = get_computed_attributes()
 
-  attributes_data = get_attributes_data(computed_values)
-  index_data = get_index_data(computed_values, snapshot_tag_map)
-  store_data(attributes_data, index_data)
+    with benchmark("Group revisions by computed attributes"):
+      attribute_groups = group_revisions(attributes, revisions)
+    with benchmark("get all objects affected by computed attributes"):
+      affected_objects = get_affected_objects(attribute_groups)
+    with benchmark("Get all relationships for these computed objects"):
+      relationships = get_relationships(affected_objects)
+    with benchmark("Get snapshot data"):
+      snapshot_map, snapshot_tag_map = get_snapshot_data(affected_objects)
+
+    with benchmark("Compute values"):
+      computed_values = compute_values(affected_objects, relationships,
+                                       snapshot_map)
+
+    with benchmark("Get computed attributes data"):
+      attributes_data = get_attributes_data(computed_values)
+    with benchmark("Get computed attribute full-text index data"):
+      index_data = get_index_data(computed_values, snapshot_tag_map)
+    with benchmark("Store attribute data and full-text index data"):
+      store_data(attributes_data, index_data)

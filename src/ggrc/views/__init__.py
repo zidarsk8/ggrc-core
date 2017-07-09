@@ -73,13 +73,14 @@ def reindex(_):
 @queued_task
 def compute_attributes(args):
   """Web hook to update the full text search index."""
-  from ggrc.data_platform import computed_attributes
-  if str(args.parameters["revision_ids"]) == "all_latest":
-    revision_ids = "all_latest"
-  else:
-    revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
-  computed_attributes.compute_attributes(revision_ids)
-  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+  with benchmark("Run compute_attributes background task"):
+    from ggrc.data_platform import computed_attributes
+    if str(args.parameters["revision_ids"]) == "all_latest":
+      revision_ids = "all_latest"
+    else:
+      revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
+    computed_attributes.compute_attributes(revision_ids)
+    return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
 def start_compute_attributes(revision_ids):
@@ -361,12 +362,13 @@ def admin_refresh_revisions():
 @app.route("/admin/compute_attributes", methods=["POST"])
 @login_required
 def send_event_job():
-  if request.data:
-    revision_ids = request.get_json().get("revision_ids", [])
-  else:
-    revision_ids = "all_latest"
-  start_compute_attributes(revision_ids)
-  return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+  with benchmark("POST /admin/compute_attributes"):
+    if request.data:
+      revision_ids = request.get_json().get("revision_ids", [])
+    else:
+      revision_ids = "all_latest"
+    start_compute_attributes(revision_ids)
+    return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
 @app.route("/admin")
