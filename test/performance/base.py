@@ -341,6 +341,8 @@ class BaseTaskSet(locust.TaskSet):
 
   def create_user_role(self, role_name, people_slugs, context=None):
     """Create user role entry for given people."""
+    if not people_slugs:
+      return
     data = generator.user_role(role_name, people_slugs, context=context)
     count = len(people_slugs)
     name = "count {}".format(count) if count > 1 else ""
@@ -412,7 +414,7 @@ class BaseTaskSet(locust.TaskSet):
     for program in programs:
       for _ in range(count):
         audit = self.create_object("Audit", program=program, **kwargs)
-        people = generator.random_objects("Person", 2, self.objects)
+        people = generator.random_objects("Person", 30, self.objects)
         self.create_user_role("Auditor", people, audit[0]["context"])
         audits.append(audit)
 
@@ -503,6 +505,14 @@ class BaseTaskSet(locust.TaskSet):
     sets a different user for each request and sets the default user at the
     end.
     """
+    slugs = self.create_object("Program", random_user=True, **kwargs)
+    for slug in slugs:
+      people = generator.random_objects("Person", 30, self.objects)
+      self.create_user_role("ProgramEditor", people[:15], slug["context"])
+      self.create_user_role("ProgramReader", people[15:], slug["context"])
+    self._log_in()
+    return slugs
+
     response = self.create_object("Program", random_user=True, **kwargs)
     self._log_in()
     return response
