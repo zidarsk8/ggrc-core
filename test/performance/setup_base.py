@@ -86,7 +86,7 @@ class SetUpBaseTask(base.BaseTaskSet):
 
     programs = generator.random_objects(
         "Program",
-        (len(self.objects["Program"]) + 1) / 2,
+        (len(self.objects["Program"]) + 9) / 10,
         self.objects
     )
     self.create_audits(
