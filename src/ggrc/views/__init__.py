@@ -361,9 +361,11 @@ def admin_refresh_revisions():
 @app.route("/admin/compute_attributes", methods=["POST"])
 @login_required
 def send_event_job():
-  revision_ids = request.get_json().get("revision_ids", [])
-  if revision_ids:
-    start_compute_attributes(revision_ids)
+  if request.data:
+    revision_ids = request.get_json().get("revision_ids", [])
+  else:
+    revision_ids = "all_latest"
+  start_compute_attributes(revision_ids)
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 

@@ -130,7 +130,7 @@ def get_aggregate_function(attribute):
 
 
 def snapshot_from_rel(rel_revision):
-  """Get snapshot objects form relationship revisions."""
+  """Get snapshot objects from relationship revisions."""
   if rel_revision.source_type == "Snapshot":
     return models.Snapshot.query.get(rel_revision.source_id)
   elif rel_revision.destination_type == "Snapshot":
