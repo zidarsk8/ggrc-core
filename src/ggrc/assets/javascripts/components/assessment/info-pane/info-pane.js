@@ -16,12 +16,6 @@
     template: tpl,
     viewModel: {
       define: {
-        isInstanceCompleted: {
-          get: function () {
-            return this.attr('instance.status') === 'Completed' ||
-              this.attr('instance.status') === 'Ready for Review';
-          }
-        },
         isSaving: {
           type: 'boolean',
           value: false
