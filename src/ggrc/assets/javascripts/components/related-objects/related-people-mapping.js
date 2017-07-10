@@ -390,7 +390,7 @@
         var rolesDfd = $.Deferred();
 
         CMS.Models.Relationship
-          .getRelationshipBetweenInstances(person, instance, instance.isNew())
+          .getRelationshipBetweenInstances(person, instance, true)
           .done(function (relationships) {
             var found = false;
             _.map(relationships, function (relationship) {
