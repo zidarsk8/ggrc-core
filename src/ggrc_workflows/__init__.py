@@ -664,7 +664,7 @@ def handle_cycle_task_entry_post(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   if src['is_declining_review'] == '1':
     task = obj.cycle_task_group_object_task
-    task.status = 'Declined'
+    task.status = task.DECLINED
     db.session.add(obj)
   else:
     src['is_declining_review'] = 0
@@ -676,7 +676,7 @@ def handle_cycle_task_entry_post(
 def handle_cycle_status_change(sender, obj=None, new_status=None,  # noqa pylint: disable=unused-argument
                                old_status=None):  # noqa pylint: disable=unused-argument  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.status.history.has_changes():
-    if obj.status == 'Verified':
+    if obj.status in obj.inactive_states:
       obj.is_current = False
       db.session.add(obj)
       update_workflow_state(obj.workflow)
@@ -686,9 +686,9 @@ def handle_cycle_status_change(sender, obj=None, new_status=None,  # noqa pylint
 def handle_cycle_task_status_change(sender, obj=None, new_status=None,  # noqa pylint: disable=unused-argument
                                     old_status=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.status.history.has_changes():
-    if new_status == 'Verified':
+    if new_status == obj.VERIFIED:
       obj.verified_date = datetime.now()
-    elif new_status == 'Finished':
+    elif new_status == obj.FINISHED:
       obj.finished_date = datetime.now()
       obj.verified_date = None
     else:
