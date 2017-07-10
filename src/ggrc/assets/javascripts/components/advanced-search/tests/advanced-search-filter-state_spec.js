@@ -13,10 +13,30 @@ describe('GGRC.Components.advancedSearchFilterState', function () {
   });
 
   describe('stateModel set() method', function () {
-    it('initializes all "filterStates" unchecked if "stateModel" is empty',
+    it('initializes all "filterStates" checked if "stateModel" is empty',
+    function () {
+      var states = ['state1', 'state2', 'state3'];
+      spyOn(GGRC.Utils.State, 'getDefaultStatesForModel')
+        .and.returnValue(states);
+      spyOn(GGRC.Utils.State, 'getStatesForModel')
+        .and.returnValue(states);
+      viewModel.attr('modelName', 'Section');
+
+      viewModel.attr('stateModel', {});
+
+      viewModel.attr('filterStates').each(function (item) {
+        expect(item.checked).toBeTruthy();
+      });
+    });
+
+    it('initializes all "filterStates" unchecked ' +
+       'if "stateModel.items" is empty',
     function () {
       viewModel.attr('modelName', 'Section');
-      viewModel.attr('stateModel', {});
+
+      viewModel.attr('stateModel', {
+        items: []
+      });
 
       viewModel.attr('filterStates').each(function (item) {
         expect(item.checked).toBeFalsy();
@@ -43,7 +63,9 @@ describe('GGRC.Components.advancedSearchFilterState', function () {
     it('updates items collection', function () {
       var items;
       var selectedStates = [{value: 'Active'}, {value: 'Draft'}];
-      viewModel.attr('stateModel', can.Map());
+      viewModel.attr('stateModel', new can.Map({
+        items: []
+      }));
 
       viewModel.saveTreeStates(selectedStates);
 

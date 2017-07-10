@@ -20,6 +20,9 @@ class RestClient(object):
                    'Content-Type': 'application/json',
                    'Accept-Encoding': 'gzip, deflate'}
 
+  STATUS_CODES = {'OK': 200,
+                  'FAIL': [400, 404, 500]}
+
   def __init__(self, endpoint):
     self.url = urlparse.urljoin(environment.APP_URL,
                                 "/".join([url.API, endpoint]))

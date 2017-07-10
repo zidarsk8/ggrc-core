@@ -18,23 +18,16 @@
       'a click': function (el, ev) {
         var instance = this.scope.attr('audit') || GGRC.page_instance();
         this._results = null;
-        GGRC.Controllers.MapperModal.launch(el, {
+        GGRC.Controllers.ObjectGenerator.launch(el, {
           object: 'Audit',
           type: 'Control',
           'join-object-id': instance.id,
           'join-mapping': 'program_controls',
-          useTemplates: true,
-          assessmentGenerator: true,
           relevantTo: [{
             readOnly: true,
             type: instance.type,
             id: instance.id
           }],
-          template: {
-            title: '/static/mustache/assessments/generator_title.mustache',
-            submitButton: 'Generate Assessments',
-            count: 'assessment(s) will be generated for each selection'
-          },
           callback: this.generateAssessments.bind(this)
         });
       },

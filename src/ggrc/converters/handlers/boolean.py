@@ -19,21 +19,23 @@ class CheckboxColumnHandler(handlers.ColumnHandler):
   and False.
   """
 
-  ALLOWED_VALUES = {"yes", "true", "no", "false", "--", "---"}
   TRUE_VALUES = {"yes", "true"}
+  FALSE_VALUES = {"no", "false"}
   NONE_VALUES = {"--", "---"}
+  IGNORED_VALUES = {"", }
+  ALLOWED_VALUES = TRUE_VALUES | FALSE_VALUES | NONE_VALUES | IGNORED_VALUES
   _true = "yes"
   _false = "no"
 
   def parse_item(self):
     """ mandatory checkboxes will get evelauted to false on empty value """
-    if self.raw_value == "":
-      return False
     value = self.raw_value.lower() in self.TRUE_VALUES
     if self.raw_value in self.NONE_VALUES:
       value = None
     if self.raw_value.lower() not in self.ALLOWED_VALUES:
       self.add_warning(errors.WRONG_VALUE, column_name=self.display_name)
+    if self.raw_value in self.IGNORED_VALUES:
+      self.set_empty = True
     return value
 
   def get_value(self):
@@ -46,6 +48,8 @@ class CheckboxColumnHandler(handlers.ColumnHandler):
     """ handle set object for boolean values
 
     This is the only handler that will allow setting a None value"""
+    if self.set_empty:
+      return
     try:
       setattr(self.row_converter.obj, self.key, self.value)
     except ValueError:
@@ -70,8 +74,11 @@ class KeyControlColumnHandler(CheckboxColumnHandler):
   dropdown menu that contains key, non-key and --- as values.
   """
 
-  ALLOWED_VALUES = {"key", "non-key", "--", "---"}
   TRUE_VALUES = {"key"}
+  FALSE_VALUES = {"non-key", }
+  NONE_VALUES = {"--", "---"}
+  IGNORED_VALUES = {"", }
+  ALLOWED_VALUES = TRUE_VALUES | FALSE_VALUES | NONE_VALUES | IGNORED_VALUES
   _true = "key"
   _false = "non-key"
 

@@ -25,6 +25,7 @@ from ggrc.rbac import context_query_filter
 from ggrc.fulltext.sql import SqlIndexer
 
 
+# pylint: disable=too-few-public-methods
 class MysqlRecordProperty(db.Model):
   """ Db model for collect fulltext index records"""
   __tablename__ = 'fulltext_record_properties'
@@ -241,6 +242,7 @@ def update_indexer(session):  # pylint:disable=unused-argument
     type_name, id_value = for_index.get_reindex_pair()
     if type_name:
       models_ids_to_reindex[type_name].add(id_value)
+  db.session.expire_all()  # expire required to fix declared_attr cached value
   db.session.reindex_set = set()
   for model_name, ids in models_ids_to_reindex.iteritems():
     get_model(model_name).bulk_record_update_for(ids)

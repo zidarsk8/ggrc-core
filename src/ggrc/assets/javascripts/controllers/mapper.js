@@ -13,9 +13,10 @@
   var OBJECT_REQUIRED_MESSAGE = 'Required Data for In Scope Object is missing' +
     ' - Original Object is mandatory';
 
-  can.Control.extend('GGRC.Controllers.MapperModal', {
+  can.Control.extend('GGRC.Controllers.ObjectMapper', {
     defaults: {
-      component: GGRC.mustache_path + '/modals/mapper/component.mustache'
+      component: GGRC.mustache_path +
+        '/modals/mapper/object-mapper-modal.mustache'
     },
     launch: function ($trigger, options) {
       var href = $trigger.attr('data-href') ||
@@ -24,7 +25,8 @@
           .replace(/[\/\?=\&#%]/g, '-')
           .replace(/^-/, '');
       var $target =
-        $('<div id="' + modalId + '" class="modal modal-selector hide"></div>');
+        $('<div id="' + modalId +
+        '" class="modal modal-selector object-modal hide"></div>');
 
       $target.modal_form({}, $trigger);
       this.newInstance($target[0], can.extend({
@@ -42,6 +44,18 @@
       this.element.html(can.view(this.options.component, this.options));
     }
   });
+  GGRC.Controllers.ObjectMapper.extend('GGRC.Controllers.ObjectSearch', {
+    defaults: {
+      component: GGRC.mustache_path +
+        '/modals/mapper/object-search-modal.mustache'
+    }
+  }, {});
+  GGRC.Controllers.ObjectMapper.extend('GGRC.Controllers.ObjectGenerator', {
+    defaults: {
+      component: GGRC.mustache_path +
+        '/modals/mapper/object-generator-modal.mustache'
+    }
+  }, {});
 
   $('body').on('click', selectors.join(', '), function (ev, disableMapper) {
     var btn = $(ev.currentTarget);
@@ -90,7 +104,7 @@
             id: data.snapshot_scope_id
           }]
         };
-        GGRC.Controllers.MapperModal.launch(btn, can.extend(config, data));
+        GGRC.Controllers.ObjectMapper.launch(btn, can.extend(config, data));
         return;
       }
 
@@ -123,7 +137,7 @@
           }]
         };
 
-        GGRC.Controllers.MapperModal.launch(btn, can.extend(config, data));
+        GGRC.Controllers.ObjectMapper.launch(btn, can.extend(config, data));
       });
     }
 
@@ -131,14 +145,13 @@
       var config = {
         object: data.join_object_type,
         type: data.join_option_type,
-        'join-object-id': data.join_object_id,
-        'search-only': isSearch,
-        template: {
-          title: isSearch ?
-            '/static/mustache/base_objects/modal/search_title.mustache' : ''
-        }
+        'join-object-id': data.join_object_id
       };
-      GGRC.Controllers.MapperModal.launch(btn, can.extend(config, data));
+      if (isSearch) {
+        GGRC.Controllers.ObjectSearch.launch(btn, can.extend(config, data));
+      } else {
+        GGRC.Controllers.ObjectMapper.launch(btn, can.extend(config, data));
+      }
     }
   });
 })(window.can, window.can.$);

@@ -270,6 +270,56 @@ class ControlEntity(Entity):
     return self.slug < other.slug
 
 
+class ObjectiveEntity(Entity):
+  """Class that represent model for Objective."""
+  # pylint: disable=too-many-instance-attributes
+  __hash__ = None
+
+  def __init__(self, slug=None, status=None, owners=None, contact=None,
+               secondary_contact=None, updated_at=None, os_state=None,
+               custom_attribute_definitions=None, custom_attribute_values=None,
+               custom_attributes=None):
+    super(ObjectiveEntity, self).__init__()
+    self.slug = slug  # code
+    self.status = status  # state
+    self.owners = owners
+    self.contact = contact  # primary contact
+    self.secondary_contact = secondary_contact
+    self.updated_at = updated_at  # last updated
+    self.os_state = os_state  # review state
+    self.custom_attribute_definitions = custom_attribute_definitions
+    self.custom_attribute_values = custom_attribute_values
+    self.custom_attributes = custom_attributes  # map of cas def and values
+
+  def __repr__(self):
+    return ("type: {type}, id: {id}, title: {title}, href: {href}, "
+            "url: {url}, slug: {slug}, status: {status}, owners: {owners}, "
+            "contact: {contact}, secondary_contact: {secondary_contact}, "
+            "updated_at: {updated_at}, os_state: {os_state}, "
+            "custom_attribute_definitions: {custom_attribute_definitions}, "
+            "custom_attribute_values: {custom_attribute_values}, "
+            "custom_attributes: {custom_attributes}").format(
+        type=self.type, title=self.title, id=self.id, href=self.href,
+        url=self.url, slug=self.slug, status=self.status, owners=self.owners,
+        contact=self.contact, secondary_contact=self.secondary_contact,
+        updated_at=self.updated_at, os_state=self.os_state,
+        custom_attribute_definitions=self.custom_attribute_definitions,
+        custom_attribute_values=self.custom_attribute_values,
+        custom_attributes=self.custom_attributes)
+
+  def __eq__(self, other):
+    return (isinstance(other, self.__class__) and
+            string_utils.is_one_dict_is_subset_another_dict(
+                self.custom_attributes, other.custom_attributes) and
+            self.os_state == other.os_state and self.owners == other.owners and
+            self.slug == other.slug and self.status == other.status and
+            self.title == other.title and self.type == other.type and
+            self.updated_at == other.updated_at)
+
+  def __lt__(self, other):
+    return self.slug < other.slug
+
+
 class AuditEntity(Entity):
   """Class that represent model for Audit."""
   # pylint: disable=too-many-instance-attributes

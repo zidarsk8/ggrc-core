@@ -55,6 +55,10 @@ class Controls(SnapshotsDropdownTreeViewItem):
   """Class for Dropdown of Controls TreeViewItem"""
 
 
+class Objectives(SnapshotsDropdownTreeViewItem):
+  """Class for Dropdown of Objectives TreeViewItem"""
+
+
 class Programs(CommonDropdownTreeViewItem):
   """Class for Dropdown of Programs TreeViewItem"""
 

@@ -88,55 +88,59 @@ class TestAuditArchivingBase(TestCase):
     """Prepare data needed to run the tests"""
     TestCase.clear_data()
     cls.response = cls._import_file("audit_rbac.csv")
-    cls.people = {
-        person.name: person for person in all_models.Person.eager_query().all()
-    }
-    created_objects = (
-        (all_models.Audit, all_models.Audit.slug == 'AUDIT-1', 'audit'),
-        (all_models.Audit,
-         all_models.Audit.slug == 'AUDIT-2', 'archived_audit'),
-        (all_models.Issue, all_models.Issue.slug == 'PMRBACISSUE-1', 'issue'),
-        (all_models.Issue, all_models.Issue.slug == 'PMRBACISSUE-2',
-         'archived_issue'),
-        (all_models.Assessment,
-         all_models.Assessment.slug == 'PMRBACASSESSMENT-1', 'assessment'),
-        (all_models.Assessment,
-         all_models.Assessment.slug == 'PMRBACASSESSMENT-2',
-         'archived_assessment')
-    )
-    for obj, cond, name in created_objects:
-      setattr(cls, name, obj.eager_query().filter(cond).first())
 
-    revision = all_models.Revision.query.filter(
-        all_models.Revision.resource_type == 'Objective').first()
-    cls.rev_id = revision.id
-
-    # Create snapshot objects:
-    for audit, name in ((cls.audit, 'snapshot'),
-                        (cls.archived_audit, 'archived_snapshot')):
-      setattr(cls, name, factories.SnapshotFactory(
-          child_id=revision.resource_id,
-          child_type=revision.resource_type,
-          revision=revision,
-          parent=audit,
-          context=audit.context,
-      ))
-
-    # Create asessment template objects:
-    for audit, name in ((cls.audit, 'template'),
-                        (cls.archived_audit, 'archived_template')):
-      template = factories.AssessmentTemplateFactory(
-          context=audit.context,
+    with app.app_context():
+      cls.people = {
+          person.name: person
+          for person in all_models.Person.eager_query().all()
+      }
+      created_objects = (
+          (all_models.Audit, all_models.Audit.slug == 'AUDIT-1', 'audit'),
+          (all_models.Audit,
+           all_models.Audit.slug == 'AUDIT-2', 'archived_audit'),
+          (all_models.Issue, all_models.Issue.slug == 'PMRBACISSUE-1',
+           'issue'),
+          (all_models.Issue, all_models.Issue.slug == 'PMRBACISSUE-2',
+           'archived_issue'),
+          (all_models.Assessment,
+           all_models.Assessment.slug == 'PMRBACASSESSMENT-1', 'assessment'),
+          (all_models.Assessment,
+           all_models.Assessment.slug == 'PMRBACASSESSMENT-2',
+           'archived_assessment')
       )
-      factories.RelationshipFactory(
-          source=audit,
-          destination=template,
-          context=audit.context
-      )
-      setattr(cls, name, template)
-    # Refresh objects in the session
-    for obj in db.session:
-      db.session.refresh(obj)
+      for obj, cond, name in created_objects:
+        setattr(cls, name, obj.eager_query().filter(cond).first())
+
+      revision = all_models.Revision.query.filter(
+          all_models.Revision.resource_type == 'Objective').first()
+      cls.rev_id = revision.id
+
+      # Create snapshot objects:
+      for audit, name in ((cls.audit, 'snapshot'),
+                          (cls.archived_audit, 'archived_snapshot')):
+        setattr(cls, name, factories.SnapshotFactory(
+            child_id=revision.resource_id,
+            child_type=revision.resource_type,
+            revision=revision,
+            parent=audit,
+            context=audit.context,
+        ))
+
+      # Create asessment template objects:
+      for audit, name in ((cls.audit, 'template'),
+                          (cls.archived_audit, 'archived_template')):
+        template = factories.AssessmentTemplateFactory(
+            context=audit.context,
+        )
+        factories.RelationshipFactory(
+            source=audit,
+            destination=template,
+            context=audit.context
+        )
+        setattr(cls, name, template)
+      # Refresh objects in the session
+      for obj in db.session:
+        db.session.refresh(obj)
 
   def setUp(self):
     """Imports test_csvs/audit_rbac.csv needed by the tests"""

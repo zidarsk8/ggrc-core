@@ -23,7 +23,6 @@ def build_collection_representation(model, description):
   # pylint: disable=protected-access
   collection = {
       model.__name__: description,
-      "selfLink": None,  # not implemented yet
   }
   return collection
 

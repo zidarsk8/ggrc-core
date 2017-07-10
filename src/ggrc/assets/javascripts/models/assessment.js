@@ -273,7 +273,6 @@
       return this._super(checkAssociations);
     },
     after_save: function () {
-      this.dispatch('refreshInstance');
       if (this.audit && this.audit.selfLink) {
         this.audit.refresh();
       }
