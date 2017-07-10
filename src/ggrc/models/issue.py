@@ -39,4 +39,4 @@ class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
 
   audit_id = deferred(
       db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False),
-      'Assessment')
+      'Issue')
