@@ -164,7 +164,7 @@ class AutomapperGenerator(object):
           "destination_type": dst.type,
           "context_id": None,
           "status": None,
-          "automapping_id": parent_relationship.id}
+          "parent_id": parent_relationship.id}
           for src, dst in self.auto_mappings
           if (src, dst) != original]))  # (src, dst) is sorted
       cache = get_cache(create=True)
@@ -175,7 +175,7 @@ class AutomapperGenerator(object):
         cache.new.update(
             (relationship, relationship.log_json())
             for relationship in Relationship.query.filter_by(
-                automapping_id=parent_relationship.id,
+                parent_id=parent_relationship.id,
                 modified_by_id=current_user.id,
                 created_at=now,
                 updated_at=now,
