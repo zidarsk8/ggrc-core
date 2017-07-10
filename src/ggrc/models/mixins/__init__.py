@@ -371,6 +371,13 @@ class Timeboxed(object):
     )
 
 
+class LastDeprecatedTimeboxed(Timeboxed):
+  """Mixin that redefines `end_date`'s alias."""
+  _aliases = {
+      "end_date": "Last Deprecated Date",
+  }
+
+
 class Stateful(object):
   """Mixin that defines `status` field and status validation logic.
 
@@ -706,6 +713,7 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
 
   @classmethod
   def attributes_map(cls):
+    """Get class attributes map"""
     if cls.CACHED_ATTRIBUTE_MAP:
       return cls.CACHED_ATTRIBUTE_MAP
     aliases = AttributeInfo.gather_aliases(cls)
@@ -769,6 +777,7 @@ class Slugged(Base):
 
   @classmethod
   def generate_slug_for(cls, obj):
+    """Generate unique Slug among the objects of the current class"""
     _id = getattr(obj, 'id', uuid1())
     obj.slug = "{0}-{1}".format(cls.generate_slug_prefix_for(obj), _id)
     # We need to make sure the generated slug is not already present in the

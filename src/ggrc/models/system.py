@@ -7,7 +7,8 @@ from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
+from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
+                                CustomAttributable)
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
@@ -15,8 +16,8 @@ from ggrc.models.utils import validate_option
 from ggrc.models import track_object_state
 
 
-class SystemOrProcess(track_object_state.HasObjectState, Timeboxed,
-                      BusinessObject, db.Model):
+class SystemOrProcess(track_object_state.HasObjectState, BusinessObject,
+                      LastDeprecatedTimeboxed, db.Model):
   # Override model_inflector
   _table_plural = 'systems_or_processes'
   __tablename__ = 'systems'
