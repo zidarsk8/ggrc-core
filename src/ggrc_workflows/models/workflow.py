@@ -175,7 +175,10 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
           "mandatory": True,
       },
       "notify_custom_message": "Custom email message",
-      "notify_on_change": "Force real-time email updates",
+      "notify_on_change": {
+          "display_name": "Force real-time email updates",
+          "mandatory": False,
+      },
       "workflow_owner": {
           "display_name": "Manager",
           "type": reflection.AttributeInfo.Type.USER_ROLE,
