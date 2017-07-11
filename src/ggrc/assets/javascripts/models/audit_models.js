@@ -334,7 +334,7 @@
       test_plan_procedure: false,
       template_object_type: 'Control',
       default_people: {
-        assessors: 'Audit Lead',
+        assessors: '',
         verifiers: 'Auditors'
       },
       // the custom lists of assessor / verifier IDs if "other" is selected for
@@ -364,6 +364,7 @@
     init: function () {
       this._super.apply(this, arguments);
       this.validateNonBlank('title');
+      this.validateNonBlank('default_people.assessors');
 
       this.validateListNonBlank(
         'assessorsList',
