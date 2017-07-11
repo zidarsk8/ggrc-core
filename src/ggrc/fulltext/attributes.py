@@ -76,7 +76,7 @@ class FullTextAttr(object):
           sorted_dict[value.id] = unicode(result)
       else:
         results[subprop] = value
-    if self.is_sortable:
+    if self.is_sortable and results:
       results['__sort__'] = u':'.join(sorted(sorted_dict.values()))
     return {self.get_attribute_name(instance): results}
 
@@ -213,7 +213,7 @@ class MultipleSubpropertyFullTextAttr(FullTextAttr):
         else:
           sub_key = self.SUB_KEY_TMPL.format(id_val='EMPTY', sub=sub)
           results[sub_key] = None
-    if self.is_sortable:
+    if self.is_sortable and results:
       results['__sort__'] = u':'.join(sorted(sorted_dict.values()))
     return {self.get_attribute_name(instance): results}
 

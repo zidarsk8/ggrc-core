@@ -679,6 +679,73 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
                                 key=lambda ctrl: ctrl["fraud_related"])
     self.assertListEqual(controls_ordered_1, controls_ordered_2)
 
+  def test_filter_control_by_assertions(self):
+    """Test correct filtering by assertions field"""
+    controls = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              expression=["assertions", "=", "privacy"]),
+        "Control",
+    )
+    self.assertEqual(controls["count"], 3)
+
+  def test_order_control_by_assertions(self):
+    """Test correct ordering and by assertions"""
+    controls_unordered = self._get_first_result_set(
+        self._make_query_dict("Control",),
+        "Control", "values"
+    )
+
+    controls_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "assertions"},
+                                        {"name": "id"}]),
+        "Control", "values"
+    )
+    categories = {c.id: c.name for c in models.CategoryBase.query}
+
+    def sort_key(val):
+      ctrl_assertions = val.get("assertions")
+      if isinstance(ctrl_assertions, list) and ctrl_assertions:
+        return (categories.get(ctrl_assertions[0]["id"]), val["id"])
+      return (None, val["id"])
+
+    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
+    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+
+  def test_filter_control_by_categories(self):
+    """Test correct filtering by categories field"""
+    controls = self._get_first_result_set(
+        self._make_query_dict(
+            "Control",
+            expression=["categories", "=", "Physical Security"]),
+        "Control",
+    )
+    self.assertEqual(controls["count"], 3)
+
+  def test_order_control_by_categories(self):
+    """Test correct ordering and by categories"""
+    controls_unordered = self._get_first_result_set(
+        self._make_query_dict("Control",),
+        "Control", "values"
+    )
+
+    controls_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "categories"},
+                                        {"name": "id"}]),
+        "Control", "values"
+    )
+    categories = {c.id: c.name for c in models.CategoryBase.query}
+
+    def sort_key(val):
+      ctrl_categories = val.get("categories")
+      if isinstance(ctrl_categories, list) and ctrl_categories:
+        return (categories.get(ctrl_categories[0]["id"]), val["id"])
+      return (None, val["id"])
+
+    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
+    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
     programs_values = self._get_first_result_set(
