@@ -31,21 +31,37 @@ class BaseTaskSet(locust.TaskSet):
   def __init__(self, *args, **kwargs):
     super(BaseTaskSet, self).__init__(*args, **kwargs)
 
+    self.session = (
+        "session=eyJfZnJlc2giOnRyd add your session info here"
+    )
+    self.sacsid = (
+        "SACSID=~AJKiYcFWy1SNUj2qoYLXC add your sacsid info here"
+    )
+
+    self.header_base = {
+        "pragma": "no-cache",
+        "accept-encoding": "gzip, deflate, sdch, br",
+        "accept-language": "en-US,en;q=0.8,sl;q=0.6",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_5) AppleWe"
+        "bKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+        "cache-control": "no-cache",
+        "authority": "ggrc-ux-demo.appspot.com",
+    }
+
     self.headers = {
-        "X-Requested-By": "GGRC",
-        "X-Requested-With": "XMLHttpRequest",
-        "Content-Type": "application/json",
-        "Accept-Encoding": "gzip, deflate, br"
+        "accept": "application/json, text/javascript, */*; q=0.01",
     }
-
     self.headers_text = {
-        "X-Requested-By": "GGRC",
-        "X-Requested-With": "XMLHttpRequest",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Accept": ("text/html,application/xhtml+xml,application/xml;q=0.9,"
+        "accept": ("text/html,application/xhtml+xml,application/xml;q=0.9,"
                    "image/webp,*/*;q=0.8"),
-
     }
+
+    self.headers.update(self.header_base)
+    self.headers_text.update(self.header_base)
+
+    self._update_cookie()
+
     self.role = "Admin"
 
     # id, relationship object
@@ -68,14 +84,7 @@ class BaseTaskSet(locust.TaskSet):
     self.user_roles = collections.defaultdict(list)
 
     # id, person data
-    self.people = {
-        1: {
-            "company": None,
-            "email": "user@example.com",
-            "id": 1,
-            "name": "Example User"
-        }
-    }
+    self.people = {}
     self.user_roles["Administrator"].append(generator.slug("Person", 1))
 
   def on_start(self):
@@ -196,21 +205,31 @@ class BaseTaskSet(locust.TaskSet):
   def _log_in(self, person=None):
     """Log in as a given user."""
     if not person:
-      person = {"name": "Example User", "email": "user@example.com"}
-    else:
-      obj = self.people.get(person["id"], self._get_object(person))
-      person = {"name": obj["name"], "email": obj["email"]}
+      person = models.DEFAULT_USER
+    elif "name" not in person or "email" not in person:
+      person = self.people.get(person["id"], self._get_object(person))
 
+    user = {"name": person["name"], "email": person["email"]}
     if self.GAE:
       params = {"action": "Login"}
-      params.update(person)
+      params.update(user)
       self.client.get("/logout")
       self.client.get("/_ah/login", params=params, name="/_ah/login")
       self.client.get("/dashboard")
     else:
-      headers = {"X-ggrc-user": json.dumps(person)}
-      self.client.get("/logout")
-      self.client.get("/login", headers=headers)
+      user_json = json.dumps(user)
+      logger.debug("logging in as: %s", user_json)
+      self.headers_text["x-ggrc-user"] = user_json
+      response = self.client.get("/login", headers=self.headers_text)
+      logger.debug("login response: %s", response.status_code)
+      self.session = response.headers["Set-Cookie"].split(";")[0]
+      logger.debug("session cookie: %s", self.session)
+      self._update_cookie()
+
+  def _update_cookie(self):
+    cookie = "; ".join([self.sacsid, self.session])
+    self.headers["cookie"] = cookie
+    self.headers_text["cookie"] = cookie
 
   def _store_cads(self, response_json):
     """Store custom attribute definitions to local variable."""
