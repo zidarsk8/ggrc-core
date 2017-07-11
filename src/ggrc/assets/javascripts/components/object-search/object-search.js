@@ -10,7 +10,7 @@
     tag: 'object-search',
     template: can.view(GGRC.mustache_path +
       '/components/object-search/object-search.mustache'),
-    viewModel: function (attrs, parentViewModel, el) {
+    viewModel: function () {
       var data = {
         search_only: true,
         object: 'MultitypeSearch',

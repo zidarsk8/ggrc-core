@@ -20,22 +20,14 @@ describe('GGRC.Components.objectSearch', function () {
   });
 
   describe('viewModel() method', function () {
-    var el;
-    var parentViewModel;
-
-    beforeEach(function () {
-      el = new can.Map();
-      parentViewModel = new can.Map();
-    });
     it('returns object with function "isLoadingOrSaving"', function () {
-      var result = Component.prototype.viewModel({}, parentViewModel, el);
+      var result = Component.prototype.viewModel();
       expect(result.isLoadingOrSaving).toEqual(jasmine.any(Function));
     });
 
     describe('isLoadingOrSaving() method', function () {
       beforeEach(function () {
-        viewModel =
-          new can.Map(Component.prototype.viewModel({}, parentViewModel, el));
+        viewModel = new can.Map(Component.prototype.viewModel());
       });
       it('returns true if mapper is loading', function () {
         viewModel.attr('mapper.is_loading', true);

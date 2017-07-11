@@ -16,6 +16,15 @@
     Contract: 'Clause'
   };
 
+  var getDefaultType = function (type, object) {
+    var treeView = GGRC.tree_view.sub_tree_for[object];
+    var defaultType =
+      (CMS.Models[type] && type) ||
+      DEFAULT_OBJECT_MAP[object] ||
+      (treeView ? treeView.display_list[0] : 'Control');
+    return defaultType;
+  };
+
   /**
    * A component implementing a modal for mapping objects to other objects,
    * taking the object type mapping constraints into account.
@@ -24,34 +33,13 @@
     tag: 'object-mapper',
     template: can.view(GGRC.mustache_path +
       '/components/object-mapper/object-mapper.mustache'),
-    viewModel: function (attrs, parentViewModel, el) {
-      var $el = $(el);
-      var data = {};
-      var id = Number($el.attr('join-object-id'));
-      var object = $el.attr('object');
-      var type = $el.attr('type');
-      var isNew = parentViewModel.attr('is_new');
-      var treeView = GGRC.tree_view.sub_tree_for[object];
-
-      if (object) {
-        data.object = object;
-      }
-
-      type = CMS.Models[type] && type;
-      if (type) {
-        data.type = type;
-      } else {
-        data.type = DEFAULT_OBJECT_MAP[object];
-        if (!data.type) {
-          data.type = treeView ? treeView.display_list[0] : 'Control';
-        }
-      }
-
-      if (isNew) {
-        data.join_object_id = null;
-      } else if (id || GGRC.page_instance()) {
-        data.join_object_id = id || GGRC.page_instance().id;
-      }
+    viewModel: function (attrs, parentViewModel) {
+      var data = {
+        join_object_id: attrs.joinObjectId ||
+          (GGRC.page_instance() && GGRC.page_instance().id),
+        object: attrs.object,
+        type: getDefaultType(attrs.type, attrs.object)
+      };
 
       return {
         isLoadingOrSaving: function () {
