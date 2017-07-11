@@ -10,7 +10,7 @@
     tag: 'object-search',
     template: can.view(GGRC.mustache_path +
       '/components/object-search/object-search.mustache'),
-    scope: function (attrs, parentScope, el) {
+    viewModel: function (attrs, parentViewModel, el) {
       var data = {
         search_only: true,
         object: 'MultitypeSearch',
@@ -28,16 +28,16 @@
     events: {
       inserted: function () {
         this.setModel();
-        this.scope.attr('mapper').afterShown();
+        this.viewModel.attr('mapper').afterShown();
       },
       setModel: function () {
-        var type = this.scope.attr('mapper.type');
+        var type = this.viewModel.attr('mapper.type');
 
-        this.scope.attr(
-          'mapper.model', this.scope.mapper.modelFromType(type));
+        this.viewModel.attr(
+          'mapper.model', this.viewModel.mapper.modelFromType(type));
       },
       '{mapper} type': function () {
-        var mapper = this.scope.attr('mapper');
+        var mapper = this.viewModel.attr('mapper');
         mapper.attr('filter', '');
         mapper.attr('afterSearch', false);
         mapper.attr('relevant').replace([]);
