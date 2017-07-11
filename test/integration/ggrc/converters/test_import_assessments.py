@@ -247,8 +247,13 @@ class TestAssessmentImport(TestCase):
             assessment, models.Snapshot()
         ).exists()).first()[0])
 
-  @ddt.data(True, False)
-  def test_import_view_only_field(self, value):
+  @ddt.data(
+      ("yes", True),
+      ("no", True),
+      ("invalid_data", False),
+  )
+  @ddt.unpack
+  def test_import_view_only_field(self, value, is_valid):
     "Test import view only fields"
     with factories.single_commit():
       audit = factories.AuditFactory()
@@ -259,6 +264,10 @@ class TestAssessmentImport(TestCase):
         ("Code*", assessment.slug),
         ("archived", value),
     ]))
+    row_warnings = []
+    if not is_valid:
+      row_warnings.append(u"Line 3: Field 'Archived' contains invalid data. "
+                          u"The value will be ignored.")
     self.assertEqual(
         [{
             u'ignored': 0,
@@ -267,7 +276,7 @@ class TestAssessmentImport(TestCase):
             u'name': u'Assessment',
             u'created': 0,
             u'deleted': 0,
-            u'row_warnings': [],
+            u'row_warnings': row_warnings,
             u'rows': 1,
             u'block_warnings': [],
             u'row_errors': [],
