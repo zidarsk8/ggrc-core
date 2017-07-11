@@ -27,10 +27,16 @@
         mappedSnapshots: {
           Value: can.List
         },
+        assessmentTypeNameSingular: {
+          get: function () {
+            var type = this.attr('instance.assessment_type');
+            return CMS.Models[type].title_singular;
+          }
+        },
         assessmentTypeNamePlural: {
           get: function () {
             var type = this.attr('instance.assessment_type');
-            return CMS.Models[type].model_plural;
+            return CMS.Models[type].title_plural;
           }
         },
         assessmentTypeObjects: {

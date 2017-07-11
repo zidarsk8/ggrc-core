@@ -18,7 +18,8 @@
         objectTypes: {
           get: function () {
             var self = this;
-            var objectTypes = GGRC.Mappings.getMappingTypes('AssessmentTemplate');
+            var objectTypes = GGRC.Mappings
+              .getMappingTypes('AssessmentTemplate');
             // remove ignored types and sort the rest
             _.each(objectTypes, function (objGroup) {
               objGroup.items = _.filter(objGroup.items, function (item) {

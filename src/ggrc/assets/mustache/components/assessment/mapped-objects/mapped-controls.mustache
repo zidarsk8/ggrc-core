@@ -30,8 +30,10 @@
         <spinner {toggle}="isLoading" class="spinner-wrapper active"
                  extra-css-class="grid-spinner"></spinner>
         <collapsible-panel title-text="Control Info"
-                           expanded="true"
-                           class="assessment-mapped-controls__info">
+                           {{#is assessmentType 'Control'}}
+                                class="assessment-mapped-controls__info"
+                           {{/is}}
+                           expanded="true">
             <detailed-business-object-list-item {instance}="instance"
                                                 {custom-attributes}="customAttributes"
                                                 class="collapsible-panel-body__control_info">
