@@ -86,7 +86,7 @@ def _get_min_next_due_date(due_dated_objects):
   next_due_date = None
 
   for obj in due_dated_objects:
-    if obj.status not in obj.inactive_states:
+    if not obj.is_done:
       obj_next_due_date = obj.next_due_date
       if isinstance(obj_next_due_date, datetime):
         obj_next_due_date = obj_next_due_date.date()
@@ -100,7 +100,7 @@ def _get_min_next_due_date(due_dated_objects):
 def _get_min_end_date(timeboxed_objects):
   end_date = None
   for obj in timeboxed_objects:
-    if obj.status not in obj.inactive_states:
+    if not obj.is_done:
       obj_end_date = obj.end_date
       if isinstance(obj_end_date, datetime):
         obj_end_date = obj_end_date.date()
@@ -672,7 +672,7 @@ def handle_cycle_task_entry_post(
 def handle_cycle_status_change(sender, obj=None, new_status=None,  # noqa pylint: disable=unused-argument
                                old_status=None):  # noqa pylint: disable=unused-argument  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.status.history.has_changes():
-    if obj.status in obj.inactive_states:
+    if obj.is_done:
       obj.is_current = False
       db.session.add(obj)
       update_workflow_state(obj.workflow)
