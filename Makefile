@@ -22,7 +22,6 @@ APPENGINE_PACKAGES_DIR=$(DEV_PREFIX)/opt/gae_packages
 APPENGINE_ENV_DIR=$(DEV_PREFIX)/opt/gae_virtualenv
 APPENGINE_REQUIREMENTS_TXT=$(PREFIX)/src/requirements.txt
 
-FLASH_PATH=$(PREFIX)/src/ggrc/static/flash
 STATIC_PATH=$(PREFIX)/src/ggrc/static
 BOWER_PATH=$(PREFIX)/bower_components
 DEV_BOWER_PATH=$(DEV_PREFIX)/bower_components
@@ -147,14 +146,13 @@ src/app.yaml : src/app.yaml.dist
 	bin/build_app_yaml src/app.yaml.dist src/app.yaml --from-env
 
 bower_components : bower.json
-	mkdir -p $(FLASH_PATH)
 	mkdir -p $(DEV_BOWER_PATH)
 	ln -sf $(DEV_BOWER_PATH) $(BOWER_PATH)
 	$(BOWER_BIN_PATH) install --allow-root
 	cp -r $(NODE_MODULES_PATH)/font-awesome/fonts $(STATIC_PATH)
 
 clean_bower_components :
-	rm -rf $(BOWER_PATH) $(FLASH_PATH) $(STATIC_PATH)/fonts
+	rm -rf $(BOWER_PATH) $(STATIC_PATH)/fonts
 
 deploy : appengine_packages bower_components src/ggrc/assets/assets.manifest src/app.yaml
 
