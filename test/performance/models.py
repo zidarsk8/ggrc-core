@@ -58,6 +58,8 @@ DEFAULT_USER = {
     "id": 1,
     "href": "/api/people/1",
     "type": "Person",
+    "name": "Example User",
+    "email": "user@example.com",
 }
 
 CAD_TYPES = [
