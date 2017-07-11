@@ -486,7 +486,8 @@
           $(ev.target).closest('.modal').attr('tabindex', -1).focus();
           ev.stopPropagation();
           ev.originalEvent && ev.originalEvent.stopPropagation();
-          that.hide();
+          // perform additional check before simple hide
+          that.hide(ev, true);
         }
       });
       $el.attr('tabindex') || $el.attr('tabindex', -1);
