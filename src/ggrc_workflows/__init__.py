@@ -82,14 +82,11 @@ def contributed_object_views():
   ]
 
 
-DONE_STATUSES = ("Verified",)
-
-
-def _get_min_next_due_date(due_dated_objects, exclude_statuses=DONE_STATUSES):
+def _get_min_next_due_date(due_dated_objects):
   next_due_date = None
 
   for obj in due_dated_objects:
-    if obj.status not in exclude_statuses:
+    if obj.status not in obj.inactive_states:
       obj_next_due_date = obj.next_due_date
       if isinstance(obj_next_due_date, datetime):
         obj_next_due_date = obj_next_due_date.date()
@@ -100,11 +97,10 @@ def _get_min_next_due_date(due_dated_objects, exclude_statuses=DONE_STATUSES):
   return next_due_date
 
 
-def _get_min_end_date(timeboxed_objects, exclude_statuses=DONE_STATUSES):
+def _get_min_end_date(timeboxed_objects):
   end_date = None
-
   for obj in timeboxed_objects:
-    if obj.status not in exclude_statuses:
+    if obj.status not in obj.inactive_states:
       obj_end_date = obj.end_date
       if isinstance(obj_end_date, datetime):
         obj_end_date = obj_end_date.date()
