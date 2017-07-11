@@ -62,7 +62,10 @@
         },
         mapper: new GGRC.Models.MapperModel(can.extend(data, {
           relevantTo: parentViewModel.attr('relevantTo')
-        }))
+        })),
+        deferred_to: parentViewModel.attr('deferred_to'),
+        deferred_list: [],
+        deferred: false
       };
     },
 
@@ -97,16 +100,15 @@
 
         this.setModel();
 
-        if (this.viewModel.attr('deferred_to') &&
-          this.viewModel.attr('deferred_to').list) {
-          deferredToList = this.viewModel.attr('deferred_to').list
+        if (this.viewModel.attr('deferred_to.list')) {
+          deferredToList = this.viewModel.attr('deferred_to.list')
             .map(function (item) {
               return {
                 id: item.id,
                 type: item.type
               };
             });
-          this.viewModel.attr('mapper.deferred_list', deferredToList);
+          this.viewModel.attr('deferred_list', deferredToList);
         }
 
         self.viewModel.attr('mapper').afterShown();
