@@ -293,12 +293,9 @@ describe('GGRC.Components.objectMapper', function () {
     var that;
     var event;
     var element;
-    var callback;
 
     beforeEach(function () {
-      callback = jasmine.createSpy().and.returnValue('expectedResult');
       viewModel.attr('mapper', {
-        callback: callback,
         type: 'type',
         object: 'Program',
         join_object_id: '123',
