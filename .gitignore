@@ -55,9 +55,6 @@ src/ggrc/static/flash
 src/**/.sass-cache
 src/**/_*.css
 
-# Copied font awesome icons into static
-src/ggrc/static/fonts/
-
 # pythest cache folder
 .cache
 

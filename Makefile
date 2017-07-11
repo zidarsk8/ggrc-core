@@ -149,7 +149,6 @@ bower_components : bower.json
 	mkdir -p $(DEV_BOWER_PATH)
 	ln -sf $(DEV_BOWER_PATH) $(BOWER_PATH)
 	$(BOWER_BIN_PATH) install --allow-root
-	cp -r $(NODE_MODULES_PATH)/font-awesome/fonts $(STATIC_PATH)
 
 clean_bower_components :
 	rm -rf $(BOWER_PATH) $(STATIC_PATH)/fonts
