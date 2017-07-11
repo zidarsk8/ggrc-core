@@ -224,53 +224,31 @@
 
       handle_file_upload: function (files) {
         var that = this;
-        var dfdsDoc = [];
-        var dfd;
 
-        can.each(files, function (file) {
-          // Since we can re-use existing file references from the picker,
-          // check for that case.
-          dfd = CMS.Models.Document.findAll({
-            link: file.alternateLink
-          })
-            .then(function (docs) {
-              var dfdDoc;
-              var objectDoc;
+        return files.map(function (file) {
+          return new CMS.Models.Document({
+            context: that.instance.context || {id: null},
+            title: file.title,
+            link: file.alternateLink,
+            owners: [{type: 'Person', id: GGRC.current_user.id}]
+          }).save().then(function (doc) {
+            var objectDoc;
 
-              if (docs.length < 1) {
-                docs.push(new CMS.Models.Document({
-                  context: that.instance.context || {id: null},
-                  title: file.title,
-                  link: file.alternateLink,
-                  owners: [{type: 'Person', id: GGRC.current_user.id}]
-                }));
-              }
-              if (that.deferred || !docs[0].isNew()) {
-                dfdDoc = $.when(docs[0]);
-              } else {
-                dfdDoc = docs[0].save();
-              }
-
-              dfdDoc = dfdDoc.then(function (doc) {
-                if (that.deferred) {
-                  that.instance.mark_for_addition('documents', doc, {
-                    context: that.instance.context || {id: null}
-                  });
-                } else {
-                  objectDoc = new CMS.Models.Relationship({
-                    context: that.instance.context || {id: null},
-                    source: that.instance,
-                    destination: doc
-                  }).save();
-                }
-
-                return objectDoc;
+            if (that.deferred) {
+              that.instance.mark_for_addition('documents', doc, {
+                context: that.instance.context || {id: null}
               });
-              return dfdDoc;
-            });
-          dfdsDoc.push(dfd);
+            } else {
+              objectDoc = new CMS.Models.Relationship({
+                context: that.instance.context || {id: null},
+                source: that.instance,
+                destination: doc
+              }).save();
+            }
+
+            return objectDoc;
+          });
         });
-        return dfdsDoc;
       }
     },
     events: {
