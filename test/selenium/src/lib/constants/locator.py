@@ -439,6 +439,10 @@ class ModalCreateNewControl(BaseModalCreateNew):
   BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
 
 
+class ModalCreateNewObjective(BaseModalCreateNew):
+  """Locators for Create new Objective modals."""
+
+
 class ModalCreateNewIssue(BaseModalCreateNew):
   """Locators for Create new Issue modals."""
 
@@ -741,9 +745,8 @@ class WidgetInfoAssessment(WidgetInfoPanel):
                                             WIDGET + Common.TREE_ITEM)
   # Assessment Attributes tab
   # People section
-  _PEOPLE = WIDGET + ' [title-text="People"]'
-  BUTTON_PEOPLE_TOGGLE = (By.CSS_SELECTOR, _PEOPLE + TOGGLE)
-  PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR, _PEOPLE + " .label-list>li")
+  PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
+                               "assessment-people .editable-people-group")
   # Code section
   _CODE = WIDGET + ' [title-text="Code"]'
   BUTTON_CODE_TOGGLE = (By.CSS_SELECTOR, _CODE + TOGGLE)
@@ -920,7 +923,7 @@ class AdminTreeView(object):
 
 
 class UnifiedMapperTreeView(TreeView):
-  MODAL = ".ggrc_controllers_mapper_modal"
+  MODAL = ".object-modal"
   HEADER = MODAL + " .list-header"
   ITEMS = MODAL + Common.TREE_ITEM
   BUTTON_SHOW_FIELDS = HEADER + " .fa-bars"
@@ -976,6 +979,11 @@ class WidgetAssessments(BaseWidgetGeneric):
 class WidgetControls(BaseWidgetGeneric):
   """Locators for Controls generic widgets."""
   _object_name = objects.get_singular(objects.CONTROLS)
+
+
+class WidgetObjectives(BaseWidgetGeneric):
+  """Locators for Controls generic widgets."""
+  _object_name = objects.get_singular(objects.OBJECTIVES)
 
 
 class WidgetProducts(BaseWidgetGeneric):

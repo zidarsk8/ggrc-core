@@ -472,18 +472,21 @@
       var filters = this.attr('advancedSearch.filterItems');
       var mappings = this.attr('advancedSearch.mappingItems');
       var request = can.List();
+      var advancedFilters;
 
       this.attr('advancedSearch.appliedFilterItems', filters);
       this.attr('advancedSearch.appliedMappingItems', mappings);
 
-      this.attr('advancedSearch.filter', GGRC.query_parser.join_queries(
+      advancedFilters = GGRC.query_parser.join_queries(
         GGRC.query_parser
           .parse(GGRC.Utils.AdvancedSearch.buildFilter(filters, request)),
         GGRC.query_parser
           .parse(GGRC.Utils.AdvancedSearch.buildFilter(mappings, request))
-      ));
-
+      );
       this.attr('advancedSearch.request', request);
+
+      this.attr('advancedSearch.filter', advancedFilters);
+
       this.attr('advancedSearch.open', false);
       this.onFilter();
     },

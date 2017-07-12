@@ -80,6 +80,8 @@ alphabetically):
 - ``migration`` - the PR contains a migration script that changes the
   database schema. Such pull requests require additional setup and
   verification steps,
+- ``mising tests`` - the changes submitted are not sufficiently covered with
+  automated tests, and the latter need to be added,
 - ``needs work`` - a reviewer or the PR author has concluded that the PR
   requires additional work before it can be accepted and merged,
 - ``new contribution`` - the PR author is a new contributor that might not yet
@@ -222,9 +224,9 @@ A pull request can be merged only if **all** of the following is true:
    not allowed to merge your own work, including the pull requests that
    you have at least partially contributed to,
 -  The pull request is **not** labeled with any of the "blocking" labels
-   (``code freeze``, ``needs work``, ``next release``, ``on hold``,
-   ``question``, ``wrong branch``), meaning that not all open questions and
-   issues have been resolved yet,
+   (``code freeze``, ``missing tests``, ``needs work``, ``next release``,
+   ``on hold``, ``question``, ``wrong branch``), meaning that not all open
+   questions and issues have been resolved yet,
 -  The pull request does **not** have any Reviewers assigned that have not yet
    completed their review (seek information on why, if necessary), or if at
    least one of the reviewers has requested changes.

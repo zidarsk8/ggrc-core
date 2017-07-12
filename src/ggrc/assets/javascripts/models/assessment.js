@@ -16,7 +16,7 @@
     mixins: [
       'ownable', 'unique_title',
       'autoStatusChangeable', 'timeboxed', 'mapping-limit',
-      'inScopeObjects'
+      'inScopeObjects', 'accessControlList'
     ],
     is_custom_attributable: true,
     isRoleable: true,
@@ -273,7 +273,6 @@
       return this._super(checkAssociations);
     },
     after_save: function () {
-      this.dispatch('refreshInstance');
       if (this.audit && this.audit.selfLink) {
         this.audit.refresh();
       }

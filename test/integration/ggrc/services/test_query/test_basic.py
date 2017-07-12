@@ -605,6 +605,80 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
     controls_ordered_2 = sorted(controls_unordered, key=sort_key)
     self.assertListEqual(controls_ordered_1, controls_ordered_2)
 
+  def test_query_wf_by_frequency(self):
+    """Test correct filtering of Workflows by frequency
+
+    The case this test was created for is: frequency = "one time"
+    Because it consists of two words, and we need to test the new
+    "value mapping"s for such cases
+    Also another regular test case added.
+    """
+    workflows = self._get_first_result_set(
+        self._make_query_dict("Workflow",
+                              expression=["frequency", "=", "one time"]),
+        "Workflow",
+    )
+    self.assertEqual(workflows["count"], 1)
+    workflows = self._get_first_result_set(
+        self._make_query_dict("Workflow",
+                              expression=["frequency", "=", "monthly"]),
+        "Workflow",
+    )
+    self.assertEqual(workflows["count"], 6)
+
+  def test_filter_control_by_key_control(self):
+    """Test correct filtering by SIGNIFICANCE field"""
+    controls = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              expression=["significance", "=", "non-key"]),
+        "Control",
+    )
+    self.assertEqual(controls["count"], 2)
+
+  def test_order_control_by_key_control(self):
+    """Test correct ordering and by SIGNIFICANCE field"""
+    controls_unordered = self._get_first_result_set(
+        self._make_query_dict("Control",),
+        "Control", "values"
+    )
+    controls_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "significance"},
+                                        {"name": "id"}]),
+        "Control", "values"
+    )
+    controls_ordered_2 = sorted(controls_unordered,
+                                key=lambda ctrl: (ctrl["key_control"] is None,
+                                                  ctrl["key_control"]),
+                                reverse=True)
+    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+
+  def test_filter_control_by_fraud_related(self):
+    """Test correct filtering by fraud_related field"""
+    controls = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              expression=["fraud related", "=", "yes"]),
+        "Control",
+    )
+    self.assertEqual(controls["count"], 2)
+
+  def test_order_control_by_fraud_related(self):
+    """Test correct ordering and by fraud_related field"""
+    controls_unordered = self._get_first_result_set(
+        self._make_query_dict("Control",),
+        "Control", "values"
+    )
+
+    controls_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "fraud related"},
+                                        {"name": "id"}]),
+        "Control", "values"
+    )
+    controls_ordered_2 = sorted(controls_unordered,
+                                key=lambda ctrl: ctrl["fraud_related"])
+    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
     programs_values = self._get_first_result_set(
@@ -633,16 +707,6 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
         set(obj.get("id") for obj in programs_values["values"]),
         set(programs_ids["ids"]),
     )
-
-  @unittest.skip("Not implemented")
-  def test_self_link(self):
-    # It would be good if the api accepted get requests and we could add the
-    # query into a get parameter, then each request would also get a self link
-    # that could be tested to see that it truly returns what the original
-    # request was.
-    # In the end, instead of returning mapped object stubs like we do now, we'd
-    # just return a self link for fetching those objects.
-    pass
 
   def test_multiple_queries(self):
     """Multiple queries POST is identical to multiple single-query POSTs."""

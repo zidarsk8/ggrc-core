@@ -5,7 +5,7 @@
 
 from ggrc_basic_permissions import models
 
-from integration.ggrc.models.factories import ModelFactory
+from integration.ggrc.models.model_factory import ModelFactory
 
 
 class RoleFactory(ModelFactory):
@@ -25,3 +25,11 @@ class UserRoleFactory(ModelFactory):
 
   class Meta:
     model = models.UserRole
+
+
+class ContextImplicationFactory(ModelFactory):
+  # pylint: disable=too-few-public-methods,missing-docstring,old-style-class
+  # pylint: disable=no-init
+
+  class Meta:
+    model = models.ContextImplication

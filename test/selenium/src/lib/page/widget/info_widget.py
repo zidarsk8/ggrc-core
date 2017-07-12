@@ -255,8 +255,6 @@ class Assessments(InfoPanel):
   def __init__(self, driver):
     super(Assessments, self).__init__(driver)
     # toggles
-    self.people_section = base.Toggle(
-        self._driver, self._locators.BUTTON_PEOPLE_TOGGLE, locator.Common.DOWN)
     self.code_section = base.Toggle(
         self._driver, self._locators.BUTTON_CODE_TOGGLE, locator.Common.DOWN)
     # mapped objects
@@ -273,7 +271,6 @@ class Assessments(InfoPanel):
           len(mapped_scope.text.splitlines()) >= 2]
     self.cas_text = self.get_headers_and_values_dict_from_cas_scopes()
     # people section
-    self.people_section.toggle()
     self.creators_text, self.creators_entered_text = (
         self.get_header_and_value_text_from_custom_scopes(
             self._elements.CREATORS_.upper(),
@@ -286,7 +283,6 @@ class Assessments(InfoPanel):
         self.get_header_and_value_text_from_custom_scopes(
             self._elements.ASSIGNEES_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
-    self.people_section.toggle(False)
     # code section
     self.code_section.toggle()
     self.code_and_code_entered = self._driver.find_elements(

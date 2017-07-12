@@ -84,12 +84,8 @@ class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
   @classmethod
   def indexed_query(cls):
     return super(Audit, cls).indexed_query().options(
-        orm.Load(cls).joinedload("audit_firm"),
-        orm.Load(cls).load_only(
-            'report_start_date',
-            'report_end_date',
-            'status',
-            'gdrive_evidence_folder',
+        orm.Load(cls).undefer_group(
+            "Audit_complete",
         ),
     )
 

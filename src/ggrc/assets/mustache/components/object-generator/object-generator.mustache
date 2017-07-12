@@ -1,0 +1,68 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="modal-header">
+  <a class="modal-dismiss pull-right" href="javascript://" data-dismiss="modal">
+    <i class="fa fa-times black"></i>
+  </a>
+  <h2>
+    Select {{un_camel_case mapper.model.singular true}} to generate assessments
+  </h2>
+</div>
+<div class="modal-filter modal-body">
+  <mapper-toolbar class="flex-box search-toolbar flex-box-multi"
+    mapper="mapper"
+    is-loading="mapper.is_loading"
+    {(filter)}="mapper.filter"
+    (submit)="mapper.onSubmit()"
+    total-objects="totalObjects"
+    {(status-filter)}="mapper.statusFilter">
+  </mapper-toolbar>
+  <hr/>
+  <mapper-results
+    class="{{#mapper.useSnapshots}}snapshot-list{{/mapper.useSnapshots}}
+      {{^mapper.afterSearch}}hidden{{/mapper.afterSearch}}"
+    base-instance="mapper.parentInstance"
+    {(is-loading)}="mapper.is_loading"
+    object="mapper.object"
+    mapper="mapper"
+    type="mapper.type"
+    selected="mapper.selected"
+    filter="mapper.filter"
+    submit-cbs="mapper.submitCbs"
+    {^paging.total}="totalObjects"
+    status-filter="mapper.statusFilter">
+  </mapper-results>
+  <div class="well well-small
+              {{#mapper.afterSearch}}hidden{{/mapper.afterSearch}}">
+    No results
+  </div>
+</div>
+
+<div class="modal-footer">
+  <div class="row-fluid">
+    <div class="span5">
+      <div class="deny-buttons"></div>
+    </div>
+    <div class="span7">
+      <div class="confirm-buttons">
+        <span>
+        {{mapper.selected.length}}
+        assessment(s) will be generated for each selection
+        </span>
+
+        <button class="btn-map btn btn-small btn-green preventdoubleclick"
+                {{^if mapper.selected.length}}disabled="disabled"{{/if}}>
+          {{#if mapper.is_saving}}
+            Saving, please wait...
+          {{else}}
+            Generate Assessments
+          {{/if}}
+        </button>
+        <spinner toggle="mapper.is_saving"></spinner>
+      </div>
+    </div>
+  </div>
+</div>

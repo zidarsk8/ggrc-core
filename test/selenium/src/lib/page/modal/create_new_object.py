@@ -40,6 +40,10 @@ class ControlsCreate(modal_base.ControlsModal, CreateNewObjectModal):
   """Controls create modal."""
 
 
+class ObjectivesCreate(modal_base.ObjectivesModal, CreateNewObjectModal):
+  """Objectives create modal."""
+
+
 class OrgGroupsCreate(modal_base.OrgGroupsModal, CreateNewObjectModal):
   """Org Groups create modal."""
 
