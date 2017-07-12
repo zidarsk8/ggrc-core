@@ -399,8 +399,24 @@ class BaseTaskSet(locust.TaskSet):
     data = generator.object_owner(self.objects, object_slugs)
     self._post("ObjectOwner", data, **kwargs)
 
+  def relationships_from_pairs(self, pairs, batch_size=1000):
+    pair_chunks = [
+        pairs[i: i + batch_size]
+        for i in range(0, len(pairs), batch_size)
+    ]
+    slugs = []
+    model = "Relationship"
+    for chunk in pair_chunks:
+      data = [
+          generator.relationship(source, [destination])[0]
+          for source, destination in chunk
+      ]
+      name = "count={}".format(len(data))
+      slugs.extend(self._post(model, data, name=name))
+    return slugs
+
   def create_relationships(self, sources, destinations, batch_size=1000):
-    """Create relationship entries."""
+    """Create relationships between all source/destination combinations."""
     if not sources or not destinations:
       return []
     slugs = []
