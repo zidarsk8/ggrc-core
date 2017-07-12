@@ -223,7 +223,7 @@ ASSESSMENT_TEMPLATE = {
     "template_object_type": "Control",
     "default_people": {
         "assessors": "Primary Contacts",
-        "verifiers": "Auditors"
+        "verifiers": "Secondary Contacts"
     },
     "assessorsList": {},
     "verifiersList": {},
