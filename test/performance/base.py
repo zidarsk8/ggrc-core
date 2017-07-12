@@ -445,9 +445,13 @@ class BaseTaskSet(locust.TaskSet):
       list of newly created program slugs.
     """
     programs = self.create_programs(count=count)
-    for model in models_:
-      objects = generator.random_objects(model, mapping_count, self.objects)
-      self.create_relationships(programs, objects)
+    pairs = []
+    for program in programs:
+      for model in models_:
+        objects = generator.random_objects(model, mapping_count, self.objects)
+        for obj in objects:
+          pairs.append((program, obj))
+    self.relationships_from_pairs(pairs)
     return programs
 
   def create_audits(self, programs=None, **kwargs):
