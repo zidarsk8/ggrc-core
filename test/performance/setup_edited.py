@@ -33,6 +33,7 @@ class SetUpAssessments(base.BaseTaskSet):
     sys.exit(0)
 
   def _map_snapshots(self, full_assessments):
+    pairs = []
     for assessment in full_assessments:
       all_snapshots = self.snapshots[assessment["audit"]["id"]]
       destinations = (
@@ -40,7 +41,9 @@ class SetUpAssessments(base.BaseTaskSet):
           generator.random_objects("Objective", 5, all_snapshots) +
           generator.random_objects("Regulation", 5, all_snapshots)
       )
-      self.create_relationships([slug], destinations)
+      for destination in destinations:
+        pairs.append((generator.obj_to_slug(assessment), destination))
+    self.relationships_from_pairs(pairs)
 
   def _edit_assessments(self, assessments):
     for assessment in assessments:
@@ -60,6 +63,7 @@ class SetUpAssessments(base.BaseTaskSet):
       })
       full_assessments.append(response.json().values()[0])
     return full_assessments
+
 
 class WebsiteUser(locust.HttpLocust):
   """Locust http task runner."""
