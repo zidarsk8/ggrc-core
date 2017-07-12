@@ -9,15 +9,15 @@ query_cycle_task_count_and_overdue = [
     {
         "object_name": "CycleTaskGroupObjectTask",
         "type": "count",
-                "filters": {
-                    "expression": {
-                        "object_name": "Person",
-                        "op": {"name": "owned"},
-                        "ids": ["1"]
-                    },
-                    "keys":[],
-                    "order_by":{"keys": [], "order":"", "compare":None}
-                }
+        "filters": {
+            "expression": {
+                "object_name": "Person",
+                "op": {"name": "owned"},
+                "ids": ["1"]
+            },
+            "keys":[],
+            "order_by":{"keys": [], "order":"", "compare":None}
+        }
     }, {
         "object_name": "CycleTaskGroupObjectTask",
         "filters": {
@@ -31,7 +31,7 @@ query_cycle_task_count_and_overdue = [
                 "right": {
                     "op": {"name": "<"},
                     "left": "task due date",
-                            "right": "2017-06-26"
+                    "right": "2017-06-26"
                 }
             },
             "keys": [None]
@@ -469,8 +469,8 @@ query_assessment_relevant_count = [
                 "op":{"name": "AND"},
                 "right": {
                     "left": "child_type",
-                            "op": {"name": "="},
-                            "right": "AccessGroup"
+                    "op": {"name": "="},
+                    "right": "AccessGroup"
                 }
             },
             "keys": [
@@ -505,9 +505,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Clause"
                 }
             },
@@ -531,9 +531,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Contract"
                 }
             },
@@ -557,9 +557,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Control"
                 }
             },
@@ -583,9 +583,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "DataAsset"
                 }
             },
@@ -609,9 +609,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Facility"
                 }
             },
@@ -635,9 +635,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Market"
                 }
             },
@@ -661,9 +661,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Objective"
                 }
             },
@@ -687,9 +687,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "OrgGroup"
                 }
             },
@@ -713,9 +713,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Policy"
                 }
             },
@@ -739,9 +739,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Process"
                 }
             },
@@ -765,9 +765,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Product"
                 }
             },
@@ -791,9 +791,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Regulation"
                 }
             },
@@ -817,9 +817,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Risk"
                 }
             },
@@ -843,9 +843,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Section"
                 }
             },
@@ -869,9 +869,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Standard"
                 }
             },
@@ -895,9 +895,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "System"
                 }
             },
@@ -921,9 +921,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Threat"
                 }
             },
@@ -947,9 +947,9 @@ query_assessment_relevant_count = [
                 },
                 "right": {
                     "left": "child_type",
-                            "op": {
-                                "name": "="
-                            },
+                    "op": {
+                        "name": "="
+                    },
                     "right": "Vendor"
                 }
             },
@@ -1169,14 +1169,14 @@ query_not_started_in_progress_relevant_user = [
                 "right": {
                     "left": {
                         "left": "status",
-                                "op": {"name": "="},
-                                "right": "Not Started"
+                        "op": {"name": "="},
+                        "right": "Not Started"
                     },
                     "op": {"name": "OR"},
                     "right": {
                         "left": "status",
-                                "op": {"name": "="},
-                                "right": "In Progress"
+                        "op": {"name": "="},
+                        "right": "In Progress"
                     }
                 }
             },
