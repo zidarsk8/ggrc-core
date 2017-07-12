@@ -47,6 +47,7 @@ class BaseTaskSet(locust.TaskSet):
         "bKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
         "cache-control": "no-cache",
         "authority": "ggrc-ux-demo.appspot.com",
+        "x-requested-by": "GGRC",
     }
 
     self.headers = {
@@ -104,6 +105,14 @@ class BaseTaskSet(locust.TaskSet):
     headers.update(self.headers)
     model = obj["type"]
     data = {models.TABLES_SINGULAR[model]: obj}
+
+    logger.debug(
+        "\nPUT\nURL: %s\nHeaders: %s\n\nData: %s\n",
+        obj["selfLink"],
+        json.dumps(headers, indent=4, sort_keys=True),
+        json.dumps(data, indent=4, sort_keys=True)
+    )
+
     response = self.client.put(
         obj["selfLink"],
         json=data,
