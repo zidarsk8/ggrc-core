@@ -27,14 +27,13 @@ class SetUpAssessments(base.BaseTaskSet):
     count = len(self.objects["Assessment"]) / 2
     assessments = generator.random_objects("Assessment", count, self.objects)
     self._edit_assessments(assessments)
-    self._edit_assessment_states(assessments[:count / 2])
-    self._map_snapshots(assessments)
+    full_assessments = self._edit_assessment_states(assessments[:count / 2])
+    self._map_snapshots(full_assessments)
 
     sys.exit(0)
 
-  def _map_snapshots(self, assessments):
-    for slug in assessments:
-      assessment = self._get_object(slug)
+  def _map_snapshots(self, full_assessments):
+    for assessment in full_assessments:
       all_snapshots = self.snapshots[assessment["audit"]["id"]]
       destinations = (
           generator.random_objects("Control", 5, all_snapshots) +
@@ -53,12 +52,14 @@ class SetUpAssessments(base.BaseTaskSet):
         "Completed",
         "Verified",
     ]
+    full_assessments = []
     for assessment in assessments:
       state = random.choice(states)
-      self.update_object(assessment, changes={
+      response = self.update_object(assessment, changes={
           "status": state,
       })
-
+      full_assessments.append(response.json().values()[0])
+    return full_assessments
 
 class WebsiteUser(locust.HttpLocust):
   """Locust http task runner."""
