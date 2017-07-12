@@ -68,9 +68,13 @@
       modal: {
         open: false
       },
+      onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
       triggerFormSaveCbs: $.Callbacks(),
+      setInProgressState: function () {
+        this.onStateChange({state: 'In Progress', undo: false});
+      },
       getQuery: function (type, sortObj, additionalFilter) {
         var relevantFilters = [{
           type: this.attr('instance.type'),
@@ -194,6 +198,7 @@
         var instance = this.attr('instance');
         var self = this;
         var previousStatus = instance.attr('previousStatus') || 'In Progress';
+        this.attr('onStateChangeDfd', can.Deferred());
 
         if (isUndo) {
           instance.attr('previousStatus', undefined);
@@ -210,6 +215,7 @@
               .then(function () {
                 instance.attr('isPending', false);
                 self.initializeFormFields();
+                self.attr('onStateChangeDfd').resolve();
               });
             });
           });

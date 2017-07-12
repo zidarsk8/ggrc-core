@@ -38,4 +38,12 @@ rich-text {
       margin: -2px -2px -2px -4px;
     }
   }
+
+  .inline__content & {
+    .rich-text__wrapper {
+      border-radius: 0;
+      border: none;
+      margin: -2px -2px -2px -4px;
+    }
+  }
 }

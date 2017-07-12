@@ -1,0 +1,30 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<assessment-inline-confirm-action
+  (set-in-progress)="setInProgressState()"
+  {on-state-change-dfd}="onStateChangeDfd"
+  {type}="type"
+  {instance}="instance">
+    <inline-form-control-item
+      (inline-form-item-save)="saveInlineForm(%event)"
+      {value}="value"
+      {is-allow-edit}="isAllowEdit"
+      {edit-mode}="editMode"
+      {type}="type"
+      {prop-name}="propName">
+        <inline-edit-control
+          (inline-save)="save(%event)"
+          {edit-mode}="editMode"
+          {is-allow-edit}="isAllowEdit"
+          {is-loading}="isLoading"
+          {instance}="instance"
+          {value}="value"
+          {type}="type"
+          with-read-more="true">
+            <content></content>
+        </inline-edit-control>
+    </inline-form-control-item>
+</assessment-inline-confirm-action>

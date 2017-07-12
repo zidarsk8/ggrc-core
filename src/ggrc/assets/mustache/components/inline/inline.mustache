@@ -1,0 +1,45 @@
+{{!
+  Copyright (C) 2017 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="inline">
+  <div class="inline__header action-toolbar">
+    {{#unless editMode}}
+      <spinner class="inline__header-spinner" {toggle}="isLoading"></spinner>
+    {{/unless}}
+
+    <!-- header (laber/h1-6) -->
+    <content></content>
+
+    <!-- display edit icon when isLoading == false and editMode == false -->
+    {{#unless editMode}}
+      {{#unless isLoading}}
+        <div class="action-toolbar__controls">
+          <action-toolbar-control>
+            <i class="fa fa-pencil inline-edit-icon"></i>
+          </action-toolbar-control>
+        </div>
+      {{/unless}}
+    {{/unless}}
+  </div>
+
+  <div class="inline__content {{#if editMode}}inline--active{{/if}}">
+    {{#renderInnerInlineTemplate type}}{{/renderInnerInlineTemplate}}
+
+    {{#if editMode}}
+      <ul class="inline__controls ">
+        <li>
+          <a href="javascript://" ($click)="save()">
+            <i class="fa fa-check"></i>
+          </a>
+        </li>
+        <li>
+          <a href="javascript://" ($click)="cancel()">
+            <i class="fa fa-times"></i>
+          </a>
+        </li>
+      </ul>
+    {{/if}}
+  </div>
+</div>
