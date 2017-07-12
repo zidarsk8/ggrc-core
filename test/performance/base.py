@@ -119,6 +119,7 @@ class BaseTaskSet(locust.TaskSet):
         headers=headers,
         name="{} /api/{}/XYZ".format(self.role, models.TABLES_PLURAL[model]),
     )
+    return response
 
   def update_object(self, slug, changes=None):
     """Fetch update and PUT an object."""
@@ -133,7 +134,7 @@ class BaseTaskSet(locust.TaskSet):
         obj = generator.update_cavs_new(obj, self.objects)
       else:
         obj = generator.update_cavs_old(obj, self.objects)
-    self._put(response, obj)
+    return self._put(response, obj)
 
   def get_multiple(self, model, ids):
     """Generate GET request with id__in filter."""
