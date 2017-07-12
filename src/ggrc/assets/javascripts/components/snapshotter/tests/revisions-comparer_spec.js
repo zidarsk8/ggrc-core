@@ -165,4 +165,90 @@ describe('GGRC.Components.revisionsComparer', function () {
       expect(dfds.length).toEqual(0);
     });
   });
+
+  describe('getRevisions() method', function () {
+    var method;
+    var Revision;
+
+    beforeEach(function () {
+      method = Component.prototype.scope.getRevisions;
+      Revision = CMS.Models.Revision;
+    });
+
+    it('when cache is empty doing ajax call for all revisions',
+      function (done) {
+        Revision.store = undefined;
+
+        spyOn(Revision, 'findAll').and.returnValue(
+          can.Deferred().resolve([{id: 42}, {id: 11}])
+        );
+
+        spyOn(Revision, 'findOne').and.returnValue(
+          can.Deferred().resolve({id: 42})
+        );
+
+        method(42, 11).then(function (result) {
+          expect(result.length).toEqual(2);
+
+          expect(Revision.findAll).toHaveBeenCalledWith({
+            id__in: '42,11'
+          });
+
+          expect(Revision.findOne).not.toHaveBeenCalled();
+
+          done();
+        });
+      });
+
+    it('when in cache only one object doing findOne call',
+      function (done) {
+        Revision.store = {
+          '42': {id: 42}
+        };
+
+        spyOn(Revision, 'findAll').and.returnValue(
+          can.Deferred().resolve([{id: 42}, {id: 11}])
+        );
+
+        spyOn(Revision, 'findOne').and.returnValue(
+          can.Deferred().resolve({id: 42})
+        );
+
+        method(42, 11).then(function (result) {
+          expect(result.length).toEqual(2);
+
+          expect(Revision.findAll).not.toHaveBeenCalled();
+
+          expect(Revision.findOne).toHaveBeenCalledWith({id: 11});
+
+          done();
+        });
+      });
+
+    it('when cache contains all objects are not doing ajax call',
+      function (done) {
+        Revision.store = {
+          '11': {id: 11},
+          '42': {id: 42}
+        };
+
+        spyOn(Revision, 'findAll').and.returnValue(
+          can.Deferred().resolve([{id: 42}, {id: 11}])
+        );
+
+        spyOn(Revision, 'findOne').and.returnValue(
+          can.Deferred().resolve({id: 42})
+        );
+
+        method(42, 11).then(function (result) {
+          expect(result.length).toEqual(2);
+
+          expect(Revision.findAll).not.toHaveBeenCalled();
+
+          expect(Revision.findOne).not.toHaveBeenCalled();
+
+          done();
+        });
+      });
+  });
 });
