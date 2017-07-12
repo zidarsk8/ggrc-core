@@ -30,8 +30,21 @@ def upgrade():
           server_default="Control",
       )
   )
+  # Change CA help text "Assessment type" to "Assessment Category"
+  op.execute(
+      'UPDATE custom_attribute_definitions '
+      'SET helptext = "Assessment Category" '
+      'WHERE helptext = "Assessment type" '
+      'AND definition_type = "assessment" AND title = "Type";'
+  )
 
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   op.drop_column('assessments', 'assessment_type')
+  op.execute(
+      'UPDATE custom_attribute_definitions '
+      'SET helptext = "Assessment type" '
+      'WHERE helptext = "Assessment Category"'
+      'AND definition_type = "assessment" AND title = "Type";'
+  )
