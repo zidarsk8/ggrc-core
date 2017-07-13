@@ -143,11 +143,24 @@
       },
       updateRevision: function () {
         var instance = new CMS.Models.Snapshot(this.instance.snapshot);
-        instance.refresh().then(function () {
+
+        // close info-pane
+        $('info-pin-buttons:visible [data-trigger="close"]')
+          .first()
+          .trigger('click');
+
+        instance.refresh()
+        .then(function () {
           instance.attr('update_revision', 'latest');
           return instance.save();
-        }).then(function () {
-          GGRC.Utils.Browser.refreshPage(true);
+        })
+        .then(function () {
+          var FORSE_REFRESH = true;
+
+          return $('tree-widget-container:visible')
+            .first()
+            .viewModel()
+            .display(FORSE_REFRESH);
         });
       },
 
