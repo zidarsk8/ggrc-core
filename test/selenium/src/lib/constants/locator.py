@@ -453,6 +453,11 @@ class ModalCreateNewAsmt(BaseModalCreateNew):
 
 class ModalCreateNewAsmtTmpl(BaseModalCreateNew):
   """Locators for Create new Assessment Template modals."""
+  ASSIGNEE_DROPDOWN = (
+      By.CSS_SELECTOR, 'select[can-value="instance.default_people.assessors"]')
+  ASSIGNEE_DROPDOWN_OPTION = (
+      By.CSS_SELECTOR,
+      'select[can-value="instance.default_people.assessors"] option')
 
 
 class ModalEditObject(BaseModalCreateNew):
