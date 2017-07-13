@@ -63,7 +63,6 @@ dashboard-js-files:
   - plugins/tooltip.js
   - plugins/popover.js
   - plugins/popover_template.js
-  - client_record_replay.js
   - mustache_helper.js
   - generated/ggrc_filter_query_parser.js
   # Models
