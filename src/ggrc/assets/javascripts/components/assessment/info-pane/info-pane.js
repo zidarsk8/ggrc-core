@@ -191,9 +191,8 @@
       },
       initializeFormFields: function () {
         this.attr('formFields',
-          GGRC.Utils.CustomAttributes.convertValuesToFormFields(
-            this.attr('instance.custom_attribute_values')
-          )
+            this.attr('instance.local_attributes')
+              .map(GGRC.Utils.CustomAttributes.prepareLocalAttribute)
         );
       },
       onFormSave: function () {
@@ -228,30 +227,30 @@
           });
       },
       saveFormFields: function (formFields) {
-        return this.attr('instance').refresh().then(function () {
-          var caValues = can.makeArray(
-            this.attr('instance.custom_attribute_values')
-          );
-          Object.keys(formFields).forEach(function (fieldId) {
-            var caValue =
-              caValues
-                .find(function (item) {
-                  return item.def.id === Number(fieldId);
-                });
-            if (!caValue) {
-              console.error('Corrupted Date: ', caValues);
-              return;
-            }
-            caValue.attr('attribute_value',
-              GGRC.Utils.CustomAttributes.convertToCaValue(
-                caValue.attr('attributeType'),
-                formFields[fieldId]
-              )
-            );
-          });
+        var self = this;
+        return this.attr('instance')
+          .refresh()
+          .then(function () {
+            var caValues = self.attr('instance.local_attributes');
 
-          return this.attr('instance').save();
-        }.bind(this));
+            Object.keys(formFields).forEach(function (fieldId) {
+              var caValue =
+                caValues.filter(function (item) {
+                  return item.id === Number(fieldId);
+                })[0];
+              if (!caValue) {
+                console.error('Corrupted Date: ', caValues);
+                return;
+              }
+              if (caValue.attr('values').length) {
+                caValue.attr('values')[0].attr('value', formFields[fieldId]);
+              } else {
+                caValue.attr('values').push({value: formFields[fieldId]});
+              }
+            });
+
+            return self.attr('instance').save();
+          });
       },
       showRequiredInfoModal: function (e, field) {
         var scope = field || e.field;
