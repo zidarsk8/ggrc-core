@@ -16,26 +16,23 @@ describe('GGRC.Components.objectSearch', function () {
     events = Component.prototype.events;
   });
   beforeEach(function () {
-    viewModel = new can.Map(GGRC.Components.getViewModel('objectSearch'));
+    viewModel = new GGRC.Components.getViewModel('objectSearch')();
   });
 
   describe('viewModel() method', function () {
     it('returns object with function "isLoadingOrSaving"', function () {
-      var result = Component.prototype.viewModel();
+      var result = Component.prototype.viewModel()();
       expect(result.isLoadingOrSaving).toEqual(jasmine.any(Function));
     });
 
     describe('isLoadingOrSaving() method', function () {
-      beforeEach(function () {
-        viewModel = new can.Map(Component.prototype.viewModel());
-      });
-      it('returns true if mapper is loading', function () {
-        viewModel.attr('mapper.is_loading', true);
+      it('returns true if it is loading', function () {
+        viewModel.attr('is_loading', true);
         expect(viewModel.isLoadingOrSaving()).toEqual(true);
       });
       it('returns false if page is not loading, it is not saving,' +
       ' type change is not blocked and mapper is not loading', function () {
-        viewModel.attr('mapper.is_loading', false);
+        viewModel.attr('is_loading', false);
         expect(viewModel.isLoadingOrSaving()).toEqual(false);
       });
     });
@@ -45,7 +42,7 @@ describe('GGRC.Components.objectSearch', function () {
     var that;
 
     beforeEach(function () {
-      viewModel.attr('mapper', {
+      viewModel.attr({
         afterShown: function () {}
       });
       that = {
@@ -63,23 +60,23 @@ describe('GGRC.Components.objectSearch', function () {
 
   describe('"setModel" handler', function () {
     beforeEach(function () {
-      viewModel.attr('mapper', {
+      viewModel.attr({
         modelFromType: function () {}
       });
-      spyOn(viewModel.mapper, 'modelFromType')
+      spyOn(viewModel, 'modelFromType')
         .and.returnValue('mockModel');
       handler = events.setModel;
     });
-    it('sets model to mapper.model', function () {
+    it('sets model to model', function () {
       handler.call({viewModel: viewModel});
-      expect(viewModel.attr('mapper.model')).toEqual('mockModel');
+      expect(viewModel.attr('model')).toEqual('mockModel');
     });
   });
 
-  describe('"{mapper} type" handler', function () {
+  describe('"{viewModel} type" handler', function () {
     var that;
     beforeEach(function () {
-      viewModel.attr('mapper', {
+      viewModel.attr({
         relevant: [1, 2, 3],
         onSubmit: function () {}
       });
@@ -87,27 +84,27 @@ describe('GGRC.Components.objectSearch', function () {
         viewModel: viewModel,
         setModel: jasmine.createSpy()
       };
-      handler = events['{mapper} type'];
+      handler = events['{viewModel} type'];
     });
 
-    it('sets empty string to mapper.filter', function () {
+    it('sets empty string to filter', function () {
       handler.call(that);
-      expect(viewModel.attr('mapper.filter')).toEqual('');
+      expect(viewModel.attr('filter')).toEqual('');
     });
-    it('sets false to mapper.afterSearch', function () {
+    it('sets false to afterSearch', function () {
       handler.call(that);
-      expect(viewModel.attr('mapper.afterSearch')).toEqual(false);
+      expect(viewModel.attr('afterSearch')).toEqual(false);
     });
     it('calls setModel()', function () {
       handler.call(that);
       expect(that.setModel).toHaveBeenCalled();
     });
-    it('sets empty array to mapper.relevant if it is not in scope model',
+    it('sets empty array to relevant if it is not in scope model',
       function () {
         spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
           .and.returnValue(false);
         handler.call(that);
-        expect(viewModel.attr('mapper.relevant').length)
+        expect(viewModel.attr('relevant').length)
           .toEqual(0);
       });
   });

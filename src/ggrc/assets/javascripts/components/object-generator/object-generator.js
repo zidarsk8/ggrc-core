@@ -15,60 +15,54 @@
     template: can.view(GGRC.mustache_path +
       '/components/object-generator/object-generator.mustache'),
     viewModel: function (attrs, parentViewModel) {
-      var data = {
+      return GGRC.Models.MapperModel.extend({
         object: attrs.object,
         join_object_id: attrs.joinObjectId,
-        type: attrs.type
-      };
-
-      return {
+        type: attrs.type,
+        relevantTo: parentViewModel.attr('relevantTo'),
+        callback: parentViewModel.attr('callback'),
+        useTemplates: true,
+        assessmentGenerator: true,
         isLoadingOrSaving: function () {
-          return this.attr('mapper.is_saving') ||
-          this.attr('mapper.block_type_change') ||
+          return this.attr('is_saving') ||
+          this.attr('block_type_change') ||
           //  disable changing of object type while loading
           //  to prevent errors while speedily selecting different types
-          this.attr('mapper.is_loading');
-        },
-        mapper: new GGRC.Models.MapperModel(can.extend(data, {
-          relevantTo: parentViewModel.attr('relevantTo'),
-          callback: parentViewModel.attr('callback'),
-          useTemplates: true,
-          assessmentGenerator: true
-        }))
-      };
+          this.attr('is_loading');
+        }
+      });
     },
 
     events: {
       inserted: function () {
         var self = this;
-        this.viewModel.attr('mapper.selected').replace([]);
-        this.viewModel.attr('mapper.entries').replace([]);
+        this.viewModel.attr('selected').replace([]);
+        this.viewModel.attr('entries').replace([]);
 
         this.setModel();
 
-        self.viewModel.attr('mapper').afterShown();
+        self.viewModel.afterShown();
       },
       closeModal: function () {
-        this.viewModel.attr('mapper.is_saving', false);
+        this.viewModel.attr('is_saving', false);
         this.element.find('.modal-dismiss').trigger('click');
       },
       '.modal-footer .btn-map click': function (el, ev) {
-        var callback = this.viewModel.attr('mapper.callback');
-        var type = this.viewModel.attr('mapper.type');
-        var object = this.viewModel.attr('mapper.object');
+        var type = this.viewModel.attr('type');
+        var object = this.viewModel.attr('object');
         var assessmentTemplate =
-          this.viewModel.attr('mapper.assessmentTemplate');
+          this.viewModel.attr('assessmentTemplate');
         var instance = CMS.Models[object].findInCacheById(
-          this.viewModel.attr('mapper.join_object_id'));
+          this.viewModel.attr('join_object_id'));
 
         ev.preventDefault();
         if (el.hasClass('disabled') ||
-        this.viewModel.attr('mapper.is_saving')) {
+        this.viewModel.attr('is_saving')) {
           return;
         }
 
-        this.viewModel.attr('mapper.is_saving', true);
-        return callback(this.viewModel.attr('mapper.selected'), {
+        this.viewModel.attr('is_saving', true);
+        return this.viewModel.callback(this.viewModel.attr('selected'), {
           type: type,
           target: object,
           instance: instance,
@@ -77,30 +71,28 @@
         });
       },
       setModel: function () {
-        var type = this.viewModel.attr('mapper.type');
+        var type = this.viewModel.attr('type');
 
-        this.viewModel.attr(
-          'mapper.model', this.viewModel.mapper.modelFromType(type));
+        this.viewModel.attr('model', this.viewModel.modelFromType(type));
       },
-      '{mapper} type': function () {
-        var mapper = this.viewModel.attr('mapper');
-        mapper.attr('filter', '');
-        mapper.attr('afterSearch', false);
+      '{viewModel} type': function () {
+        this.viewModel.attr('filter', '');
+        this.viewModel.attr('afterSearch', false);
 
         this.setModel();
 
-        setTimeout(mapper.onSubmit.bind(mapper));
+        setTimeout(this.viewModel.onSubmit.bind(this.viewModel));
       },
-      '{mapper} assessmentTemplate': function (viewModel, ev, val, oldVal) {
+      '{viewModel} assessmentTemplate': function (viewModel, ev, val, oldVal) {
         var type;
         if (_.isEmpty(val)) {
-          return this.viewModel.attr('mapper.block_type_change', false);
+          return this.viewModel.attr('block_type_change', false);
         }
 
         val = val.split('-');
         type = val[1];
-        this.viewModel.attr('mapper.block_type_change', true);
-        this.viewModel.attr('mapper.type', type);
+        this.viewModel.attr('block_type_change', true);
+        this.viewModel.attr('type', type);
       }
     }
   });
