@@ -161,6 +161,11 @@
             .first()
             .viewModel()
             .display(FORSE_REFRESH);
+        })
+        .then(function () {
+          var message = instance.child_type +
+          ' has refreshed successfully.';
+          GGRC.Errors.notifier('success', [message]);
         });
       },
 

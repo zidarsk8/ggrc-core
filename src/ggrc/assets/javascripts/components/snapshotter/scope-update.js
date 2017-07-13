@@ -69,7 +69,7 @@
       _success: function () {
         var instance = this.instance;
 
-
+        this._showProgressWindow();
         instance
           .refresh()
           .then(function () {
@@ -80,9 +80,16 @@
             return instance.save();
           })
           .then(this._refreshContainers.bind(this))
-          .then(this._updateVisibleContainer.bind(this));
+          .then(this._updateVisibleContainer.bind(this))
+          .then(this._showSuccessMsg.bind(this));
       },
       _dismiss: _.identity,
+      _showProgressWindow: function () {
+        var message =
+          'Audit refresh is in progress. This may take several minutes.';
+
+        GGRC.Errors.notifier('progress', [message]);
+      },
       _updateVisibleContainer: function () {
         var visibleContainer = $('tree-widget-container:visible');
         var FORCE_REFRESH = true;
@@ -92,6 +99,11 @@
         // if a user switches to the snapshot tab during the audit refresh
         // then update the tab
         visibleContainer.viewModel().display(FORCE_REFRESH);
+      },
+      _showSuccessMsg: function () {
+        var message = 'Audit has refreshed successfully.';
+        $('alert-progress').remove();
+        GGRC.Errors.notifier('success', [message]);
       }
     }
   });

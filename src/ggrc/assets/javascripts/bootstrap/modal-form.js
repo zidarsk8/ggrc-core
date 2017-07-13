@@ -361,6 +361,7 @@
         Running: 'progress',
         Pending: 'progress'
       };
+      var textContainer;
       var $html;
       var gotMessage = _.some(_.values(flash), function (msg) {
         return !!msg;
@@ -395,10 +396,25 @@
 
           $html = $('<div></div>');
           $html.addClass('alert').addClass('alert-' + flashClass);
+
           if (flashClass !== 'progress') {
+            textContainer = '<span></span>';
             $html.addClass('alert-autohide');
+          } else {
+            textContainer = '<h6></h6>';
+            $html.append(
+              '<div class="spinner alert_spinner-left">' +
+                '<i class="spinner-icon fa fa-spinner fa-pulse" ' +
+                   'aria-hidden="true"></i>' +
+              '</div>'
+            );
           }
-          $html.append('<a href="#" class="close" data-dismiss="alert">x</a>');
+
+          $html.append(
+            '<a href="#" class="close" data-dismiss="alert">' +
+              '<i class="fa fa-times" aria-hidden="true"></i>' +
+            '</a>'
+          );
 
           for (messageI in flash[type]) {
             if (!flash[type].hasOwnProperty(messageI)) {
@@ -410,7 +426,7 @@
             if (_.isString(message)) {
               addLink = message.indexOf('{reload_link}') > -1;
               message = message.replace('{reload_link}', '');
-              $html.append($('<span></span>').text(message));
+              $html.append($(textContainer).text(message));
               if (addLink) {
                 $html.removeClass('alert-autohide');
                 $link = $('<a href="javascript://">Show results</a>');

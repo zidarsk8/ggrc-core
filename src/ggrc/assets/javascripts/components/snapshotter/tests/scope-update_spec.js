@@ -171,6 +171,13 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
             })
           );
       });
+      it('shows an alert with certain message',
+        function () {
+          method();
+          refreshDfd.resolve();
+
+          expect(GGRC.Errors.notifier).toHaveBeenCalled();
+        });
     });
   });
 /**
