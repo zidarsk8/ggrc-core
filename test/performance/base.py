@@ -27,6 +27,7 @@ class BaseTaskSet(locust.TaskSet):
       "Audit",
       "Program",
   }
+  INCLUDE_ROLE = True
 
   def __init__(self, *args, **kwargs):
     super(BaseTaskSet, self).__init__(*args, **kwargs)
@@ -63,7 +64,9 @@ class BaseTaskSet(locust.TaskSet):
 
     self._update_cookie()
 
-    self.role = "Admin"
+    self.role = ""
+    if self.INCLUDE_ROLE:
+      self.role = "Admin"
 
     # id, relationship object
     self.relationships = collections.defaultdict(dict)
@@ -500,7 +503,8 @@ class BaseTaskSet(locust.TaskSet):
       roles = ["Administrator"]
     role = random.choice(roles)
     person = generator.random_object(role, self.user_roles)
-    self.role = role[:5]
+    if self.INCLUDE_ROLE:
+      self.role = role[:5]
     self._log_in(person=person)
     return person
 
