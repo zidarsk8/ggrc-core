@@ -57,7 +57,6 @@
     afterSearch: false,
     afterShown: function () {
       this.onSubmit();
-      document.body.classList.remove('no-events');
     },
     allowedToCreate: function () {
       var isSearch = this.attr('search_only');
