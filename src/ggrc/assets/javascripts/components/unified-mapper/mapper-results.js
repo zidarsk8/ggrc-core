@@ -207,8 +207,7 @@
         return GGRC.query_parser.parse(filterString);
       },
       shouldApplyUnlockedFilter: function (modelName) {
-        return modelName === 'Audit' &&
-          !this.searchOnly;
+        return modelName === 'Audit' && !this.attr('searchOnly');
       },
       loadAllItems: function () {
         this.attr('allItems', this.loadAllItemsIds());
@@ -245,8 +244,8 @@
         }
 
         // Add Permission check
-        query.permissions = (modelName === 'Person') || this.searchOnly ?
-          'read' : 'update';
+        query.permissions = (modelName === 'Person') ||
+          this.attr('searchOnly') ? 'read' : 'update';
         query.type = queryType || 'values';
 
         if (!relatedQuery) {
@@ -270,8 +269,7 @@
         return CMS.Models[this.attr('type')];
       },
       setDisabledItems: function (allItems, relatedIds) {
-        if (this.searchOnly ||
-            this.attr('assessmentGenerator')) {
+        if (this.attr('searchOnly') || this.attr('assessmentGenerator')) {
           return;
         }
         allItems.forEach(function (item) {

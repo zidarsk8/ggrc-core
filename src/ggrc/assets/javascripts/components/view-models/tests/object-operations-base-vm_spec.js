@@ -22,23 +22,11 @@ describe('GGRC.VM.ObjectOperationsBaseVM', function () {
       GGRC.Utils.Snapshots.inScopeModels = originalInScopeModels;
     });
 
-    beforeEach(function () {
+    it('correctly calls getMappingTypes', function () {
+      var result;
       spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue('types');
       baseVM.attr('object', 'testObject');
-    });
 
-    it('correctly calls getMappingTypes it is search', function () {
-      var result;
-      baseVM.attr('search_only', true);
-      result = baseVM.attr('types');
-      expect(GGRC.Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
-        ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'], []);
-      expect(result).toEqual('types');
-    });
-
-    it('correctly calls getMappingTypes it is not search', function () {
-      var result;
-      baseVM.attr('search_only', false);
       result = baseVM.attr('types');
       expect(GGRC.Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
         [], ['test1', 'test2']);
@@ -89,40 +77,18 @@ describe('GGRC.VM.ObjectOperationsBaseVM', function () {
   });
 
   describe('allowedToCreate() method', function () {
-    it('returns true if not in a search mode and is not an in-scope model',
+    it('returns true if it is not an in-scope model',
       function () {
         var result;
-        baseVM.attr('search_only', false);
         spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
           .and.returnValue(false);
         result = baseVM.allowedToCreate();
         expect(result).toEqual(true);
       });
 
-    it('returns false if in a search mode and is an in-scope model',
+    it('returns false if it is an in-scope model',
       function () {
         var result;
-        baseVM.attr('search_only', true);
-        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-          .and.returnValue(true);
-        result = baseVM.allowedToCreate();
-        expect(result).toEqual(false);
-      });
-
-    it('returns false if in a search mode and is not an in-scope model',
-      function () {
-        var result;
-        baseVM.attr('search_only', true);
-        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-          .and.returnValue(false);
-        result = baseVM.allowedToCreate();
-        expect(result).toEqual(false);
-      });
-
-    it('returns false if not in a search mode and is an in-scope model',
-      function () {
-        var result;
-        baseVM.attr('search_only', false);
         spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
           .and.returnValue(true);
         result = baseVM.allowedToCreate();
@@ -148,15 +114,6 @@ describe('GGRC.VM.ObjectOperationsBaseVM', function () {
         result = baseVM.showWarning();
         expect(result).toEqual(false);
       });
-
-    it('returns false if is in a search mode', function () {
-      var result;
-      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-        .and.returnValue(false);
-      baseVM.attr('search_only', true);
-      result = baseVM.showWarning();
-      expect(result).toEqual(false);
-    });
 
     it('returns true if source object is a Snapshot parent', function () {
       var result;

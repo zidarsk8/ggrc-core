@@ -108,4 +108,31 @@ describe('GGRC.Components.objectSearch', function () {
           .toEqual(0);
       });
   });
+
+  describe('get() for types', function () {
+    it('correctly calls getMappingTypes', function () {
+      var result;
+      spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue('types');
+      viewModel.attr('object', 'testObject');
+
+      result = viewModel.attr('types');
+      expect(GGRC.Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
+        ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'], []);
+      expect(result).toEqual('types');
+    });
+  });
+
+  describe('allowedToCreate() method', function () {
+    it('returns false', function () {
+      var result = viewModel.allowedToCreate();
+      expect(result).toEqual(false);
+    });
+  });
+
+  describe('showWarning() method', function () {
+    it('returns false', function () {
+      var result = viewModel.showWarning();
+      expect(result).toEqual(false);
+    });
+  });
 });

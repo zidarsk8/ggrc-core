@@ -12,12 +12,27 @@
       '/components/object-search/object-search.mustache'),
     viewModel: function () {
       return GGRC.VM.ObjectOperationsBaseVM.extend({
+        define: {
+          types: {
+            get: function () {
+              return GGRC.Mappings.getMappingTypes(
+                this.attr('object'),
+                ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'],
+                []);
+            }
+          }
+        },
         isLoadingOrSaving: function () {
           return this.attr('is_loading');
         },
-        search_only: true,
         object: 'MultitypeSearch',
-        type: 'Program'
+        type: 'Program',
+        allowedToCreate: function () {
+          return false;
+        },
+        showWarning: function () {
+          return false;
+        }
       });
     },
     events: {

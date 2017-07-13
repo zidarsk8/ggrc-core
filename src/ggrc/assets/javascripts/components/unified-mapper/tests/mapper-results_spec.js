@@ -494,7 +494,7 @@ describe('GGRC.Components.mapperResults', function () {
       }));
     });
 
-    it('set "read" permission if "search_only"', function () {
+    it('set "read" permission if "searchOnly"', function () {
       var result;
       viewModel.attr('searchOnly', true);
       spyOn(viewModel, 'prepareBaseQuery')

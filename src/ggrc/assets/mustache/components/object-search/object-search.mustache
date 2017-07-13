@@ -19,7 +19,8 @@
     total-objects="totalObjects"
     {(status-filter)}="statusFilter"
     {(type)}="type"
-    {after-search}="afterSearch">
+    {after-search}="afterSearch"
+    {search-only}="true">
   </mapper-toolbar>
   <hr/>
   <mapper-results
@@ -32,7 +33,7 @@
     submit-cbs="submitCbs"
     {^paging.total}="totalObjects"
     status-filter="statusFilter"
-    {search-only}="search_only"
+    {search-only}="true"
     {use-snapshots}="useSnapshots"
     {new-entries}="newEntries"
     {(after-search)}="afterSearch"
