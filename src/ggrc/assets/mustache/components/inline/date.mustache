@@ -6,11 +6,6 @@
 {{#if editMode}}
   <datepicker is-shown="true" date="context.value"></datepicker>
 {{else}}
-  <div class="inline-edit__text">
-    {{#if context.value}}
-      {{date context.value true}}
-    {{else}}
-      <span class="empty-message">None</span>
-    {{/if}}
-  </div>
+  <readonly-inline-content {value}="context.value">
+  </readonly-inline-content>
 {{/if}}

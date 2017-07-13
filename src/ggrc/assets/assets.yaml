@@ -708,6 +708,7 @@ dashboard-js-template-files:
   - components/inline/date.mustache
   - components/inline/checkbox.mustache
   - components/inline/person.mustache
+  - components/inline/simple-readonly-text.mustache
   - components/assessment/info-pane/inline-item.mustache
 
 dashboard-css-files:

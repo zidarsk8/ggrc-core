@@ -4,8 +4,9 @@
 }}
 <label>
   {{#if editMode}}
-      <input can-value="context.value" type="checkbox" autofocus>
+    <input can-value="context.value" type="checkbox" autofocus>
   {{else}}
-      <input disabled type="checkbox" can-value="context.value">
+    <readonly-inline-content {value}="context.value">
+    </readonly-inline-content>
   {{/if}}
 </label>

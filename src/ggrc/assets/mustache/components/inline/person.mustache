@@ -17,9 +17,6 @@
     class-name="">
   </autocomplete>
 {{else}}
-  {{#if context.value}}
-    <person-info {person-obj}="context.value"></person-info>
-  {{else}}
-    <span class="empty-message">No person</span>
-  {{/if}}
+  <readonly-inline-content {value}="context.value">
+  </readonly-inline-content>
 {{/if}}

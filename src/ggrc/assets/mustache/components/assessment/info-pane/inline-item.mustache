@@ -6,10 +6,16 @@
 <assessment-inline-confirm-action
   (set-in-progress)="setInProgressState()"
   {on-state-change-dfd}="onStateChangeDfd"
+  {dropdown-options}="dropdownOptions"
+  {dropdown-class}="dropdownClass"
+  {dropdown-no-value}="dropdownNoValue"
   {type}="type"
   {instance}="instance">
     <inline-form-control-item
       (inline-form-item-save)="saveInlineForm(%event)"
+      {dropdown-options}="dropdownOptions"
+      {dropdown-class}="dropdownClass"
+      {dropdown-no-value}="dropdownNoValue"
       {value}="value"
       {is-allow-edit}="isAllowEdit"
       {edit-mode}="editMode"
@@ -17,6 +23,9 @@
       {prop-name}="propName">
         <inline-edit-control
           (inline-save)="save(%event)"
+          {dropdown-options}="dropdownOptions"
+          {dropdown-class}="dropdownClass"
+          {dropdown-no-value}="dropdownNoValue"
           {edit-mode}="editMode"
           {is-allow-edit}="isAllowEdit"
           {is-loading}="isLoading"

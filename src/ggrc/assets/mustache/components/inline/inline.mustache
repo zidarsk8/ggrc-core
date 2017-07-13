@@ -24,22 +24,33 @@
     {{/unless}}
   </div>
 
-  <div class="inline__content {{#if editMode}}inline--active{{/if}}">
-    {{#renderInnerInlineTemplate type}}{{/renderInnerInlineTemplate}}
+  {{#if editMode}}
+    <div class="inline__content-wrapper">
+      <div class="inline__content inline--active">
+        {{#renderInnerInlineTemplate type}}{{/renderInnerInlineTemplate}}
 
-    {{#if editMode}}
-      <ul class="inline__controls ">
-        <li>
-          <a href="javascript://" ($click)="save()">
-            <i class="fa fa-check"></i>
-          </a>
-        </li>
-        <li>
-          <a href="javascript://" ($click)="cancel()">
-            <i class="fa fa-times"></i>
-          </a>
-        </li>
-      </ul>
-    {{/if}}
+        <ul class="inline__controls">
+          <li class="inline__controls-item">
+            <a class="inline__controls-link" href="javascript://" ($click)="save()">
+              <i class="fa fa-check"></i>
+            </a>
+          </li>
+          <li class="inline__controls-item">
+            <a class="inline__controls-link" href="javascript://" ($click)="cancel()">
+              <i class="fa fa-times"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  {{/if}}
+
+  <div class="inline__content-wrapper">
+    <div class="inline__content {{#if editMode}}inline--hidden{{/if}}">
+      <readonly-inline-content
+        {with-read-more}="withReadMore"
+        {value}="context.value">
+      </readonly-inline-content>
+    </div>
   </div>
 </div>

@@ -17,6 +17,9 @@
       propName: '@',
       value: '',
       type: '@',
+      dropdownOptions: [],
+      dropdownClass: '@',
+      dropdownNoValue: false,
       onStateChangeDfd: can.Deferred().resolve()
     }
   });

@@ -16,6 +16,9 @@
       propName: '@',
       type: '@',
       value: '',
+      dropdownOptions: [],
+      dropdownClass: '@',
+      dropdownNoValue: false,
       save: function (args) {
         var value = args.value;
 
