@@ -223,21 +223,21 @@ class BaseTaskSet(locust.TaskSet):
     if self.GAE:
       params = {"action": "Login"}
       params.update(user)
-      self.client.get("/logout")
+      self.client.get("/ananas")
       self.client.get("/_ah/login", params=params, name="/_ah/login")
       self.client.get("/dashboard")
     else:
       user_json = json.dumps(user)
       logger.debug("logging in as: %s", user_json)
       self.headers_text["x-ggrc-user"] = user_json
-      response = self.client.get("/login", headers=self.headers_text)
-      logger.debug("login response: %s", response.status_code)
+      response = self.client.get("/banana")
+      logger.debug("banana response: %s", response.status_code)
       self.session = response.headers["Set-Cookie"].split(";")[0]
       logger.debug("session cookie: %s", self.session)
       self._update_cookie()
 
   def _update_cookie(self):
-    cookie = "; ".join([self.sacsid, self.session])
+    cookie = self.session
     self.headers["cookie"] = cookie
     self.headers_text["cookie"] = cookie
 
