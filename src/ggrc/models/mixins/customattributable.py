@@ -473,7 +473,12 @@ class CustomAttributable(object):
 
   @builder.simple_property
   def preconditions_failed(self):
-    """Returns True if any mandatory CAV, comment or evidence is missing."""
+    """Returns True if any mandatory CAV, comment or evidence is missing.
+
+    Note: return value may be incorrect if evidence count is changed
+    after the first property calculation (see check_mandatory_evidence
+    function).
+    """
     values_map = {
         cav.custom_attribute_id or cav.custom_attribute.id: cav
         for cav in self.custom_attribute_values
@@ -490,6 +495,7 @@ class CustomAttributable(object):
 
   def check_mandatory_evidence(self):
     """Check presence of mandatory evidence.
+
     Note:  mandatory evidence precondition is checked only once.
     Any additional changes to evidences after the first checking
     of the precondition will cause incorrect result of the function.
