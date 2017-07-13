@@ -15,7 +15,7 @@
     template: can.view(GGRC.mustache_path +
       '/components/object-generator/object-generator.mustache'),
     viewModel: function (attrs, parentViewModel) {
-      return GGRC.Models.MapperModel.extend({
+      return GGRC.VM.ObjectOperationsBaseVM.extend({
         object: attrs.object,
         join_object_id: attrs.joinObjectId,
         type: attrs.type,

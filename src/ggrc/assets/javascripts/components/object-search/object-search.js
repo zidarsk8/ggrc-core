@@ -11,7 +11,7 @@
     template: can.view(GGRC.mustache_path +
       '/components/object-search/object-search.mustache'),
     viewModel: function () {
-      return GGRC.Models.MapperModel.extend({
+      return GGRC.VM.ObjectOperationsBaseVM.extend({
         isLoadingOrSaving: function () {
           return this.attr('is_loading');
         },

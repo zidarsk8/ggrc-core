@@ -118,6 +118,7 @@ dashboard-js-files:
   - models/join_models.js
   # ViewModels
   - components/view-models/advanced-search-container-vm.js
+  - components/view-models/object-operations-base-vm.js
   - components/view-models/tree-item-base-vm.js
   - components/view-models/tree-people-base-vm.js
   - components/base-objects/pagination.js
@@ -235,7 +236,6 @@ dashboard-js-files:
   - components/object-mapper/object-mapper.js
   - components/object-generator/object-generator.js
   - components/object-search/object-search.js
-  - components/unified-mapper/mapper-model.js
   - components/unified-mapper/mapper-toolbar.js
   - components/unified-mapper/mapper-filter.js
   - components/unified-mapper/mapper-results.js

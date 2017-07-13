@@ -34,7 +34,7 @@
     template: can.view(GGRC.mustache_path +
       '/components/object-mapper/object-mapper.mustache'),
     viewModel: function (attrs, parentViewModel) {
-      return GGRC.Models.MapperModel.extend({
+      return GGRC.VM.ObjectOperationsBaseVM.extend({
         join_object_id: attrs.joinObjectId ||
           (GGRC.page_instance() && GGRC.page_instance().id),
         object: attrs.object,

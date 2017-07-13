@@ -3,16 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-describe('GGRC.Models.MapperModel', function () {
+describe('GGRC.VM.ObjectOperationsBaseVM', function () {
   'use strict';
 
-  var mapper;
+  var baseVM;
 
   beforeEach(function () {
-    mapper = GGRC.Models.MapperModel();
+    baseVM = GGRC.VM.ObjectOperationsBaseVM();
   });
 
-  describe('get() for mapper.types', function () {
+  describe('get() for baseVM.types', function () {
     var originalInScopeModels;
     beforeAll(function () {
       originalInScopeModels = GGRC.Utils.Snapshots.inScopeModels;
@@ -24,13 +24,13 @@ describe('GGRC.Models.MapperModel', function () {
 
     beforeEach(function () {
       spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue('types');
-      mapper.attr('object', 'testObject');
+      baseVM.attr('object', 'testObject');
     });
 
     it('correctly calls getMappingTypes it is search', function () {
       var result;
-      mapper.attr('search_only', true);
-      result = mapper.attr('types');
+      baseVM.attr('search_only', true);
+      result = baseVM.attr('types');
       expect(GGRC.Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
         ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'], []);
       expect(result).toEqual('types');
@@ -38,32 +38,32 @@ describe('GGRC.Models.MapperModel', function () {
 
     it('correctly calls getMappingTypes it is not search', function () {
       var result;
-      mapper.attr('search_only', false);
-      result = mapper.attr('types');
+      baseVM.attr('search_only', false);
+      result = baseVM.attr('types');
       expect(GGRC.Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
         [], ['test1', 'test2']);
       expect(result).toEqual('types');
     });
   });
 
-  describe('get() for mapper.parentInstance', function () {
+  describe('get() for baseVM.parentInstance', function () {
     beforeEach(function () {
       spyOn(CMS.Models, 'get_instance')
         .and.returnValue('parentInstance');
     });
 
     it('returns parentInstance', function () {
-      var result = mapper.attr('parentInstance');
+      var result = baseVM.attr('parentInstance');
       expect(result).toEqual('parentInstance');
     });
   });
 
-  describe('get() for mapper.useSnapshots', function () {
+  describe('get() for baseVM.useSnapshots', function () {
     it('use Snapshots if using in-scope model', function () {
       var result;
       spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
         .and.returnValue(true);
-      result = mapper.attr('useSnapshots');
+      result = baseVM.attr('useSnapshots');
       expect(result).toEqual(true);
     });
 
@@ -72,8 +72,8 @@ describe('GGRC.Models.MapperModel', function () {
         var result;
         spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
           .and.returnValue(false);
-        mapper.attr('assessmentGenerator', true);
-        result = mapper.attr('useSnapshots');
+        baseVM.attr('assessmentGenerator', true);
+        result = baseVM.attr('useSnapshots');
         expect(result).toEqual(true);
       });
 
@@ -82,8 +82,8 @@ describe('GGRC.Models.MapperModel', function () {
       var result;
       spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
         .and.returnValue(false);
-      mapper.attr('assessmentGenerator', false);
-      result = mapper.attr('useSnapshots');
+      baseVM.attr('assessmentGenerator', false);
+      result = baseVM.attr('useSnapshots');
       expect(result).toEqual(false);
     });
   });
@@ -92,40 +92,40 @@ describe('GGRC.Models.MapperModel', function () {
     it('returns true if not in a search mode and is not an in-scope model',
       function () {
         var result;
-        mapper.attr('search_only', false);
+        baseVM.attr('search_only', false);
         spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
           .and.returnValue(false);
-        result = mapper.allowedToCreate();
+        result = baseVM.allowedToCreate();
         expect(result).toEqual(true);
       });
 
     it('returns false if in a search mode and is an in-scope model',
       function () {
         var result;
-        mapper.attr('search_only', true);
+        baseVM.attr('search_only', true);
         spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
           .and.returnValue(true);
-        result = mapper.allowedToCreate();
+        result = baseVM.allowedToCreate();
         expect(result).toEqual(false);
       });
 
     it('returns false if in a search mode and is not an in-scope model',
       function () {
         var result;
-        mapper.attr('search_only', true);
+        baseVM.attr('search_only', true);
         spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
           .and.returnValue(false);
-        result = mapper.allowedToCreate();
+        result = baseVM.allowedToCreate();
         expect(result).toEqual(false);
       });
 
     it('returns false if not in a search mode and is an in-scope model',
       function () {
         var result;
-        mapper.attr('search_only', false);
+        baseVM.attr('search_only', false);
         spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
           .and.returnValue(true);
-        result = mapper.allowedToCreate();
+        result = baseVM.allowedToCreate();
         expect(result).toEqual(false);
       });
   });
@@ -135,7 +135,7 @@ describe('GGRC.Models.MapperModel', function () {
       var result;
       spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
         .and.returnValue(true);
-      result = mapper.showWarning();
+      result = baseVM.showWarning();
       expect(result).toEqual(false);
     });
 
@@ -144,8 +144,8 @@ describe('GGRC.Models.MapperModel', function () {
         var result;
         spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
           .and.returnValue(false);
-        mapper.attr('assessmentGenerator', true);
-        result = mapper.showWarning();
+        baseVM.attr('assessmentGenerator', true);
+        result = baseVM.showWarning();
         expect(result).toEqual(false);
       });
 
@@ -153,8 +153,8 @@ describe('GGRC.Models.MapperModel', function () {
       var result;
       spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
         .and.returnValue(false);
-      mapper.attr('search_only', true);
-      result = mapper.showWarning();
+      baseVM.attr('search_only', true);
+      result = baseVM.showWarning();
       expect(result).toEqual(false);
     });
 
@@ -166,9 +166,9 @@ describe('GGRC.Models.MapperModel', function () {
         .and.callFake(function (v) {
           return v === 'o';
         });
-      mapper.attr('object', 'o');
-      mapper.attr('type', 't');
-      result = mapper.showWarning();
+      baseVM.attr('object', 'o');
+      baseVM.attr('type', 't');
+      result = baseVM.showWarning();
       expect(result).toEqual(true);
     });
 
@@ -181,16 +181,16 @@ describe('GGRC.Models.MapperModel', function () {
         .and.callFake(function (v) {
           return v === 't';
         });
-      mapper.attr('object', 'o');
-      mapper.attr('type', 't');
-      result = mapper.showWarning();
+      baseVM.attr('object', 'o');
+      baseVM.attr('type', 't');
+      result = baseVM.showWarning();
       expect(result).toEqual(true);
     });
   });
 
   describe('modelFromType() method', function () {
     it('returns undefined if no models', function () {
-      var result = mapper.modelFromType('program');
+      var result = baseVM.modelFromType('program');
       expect(result).toEqual(undefined);
     });
 
@@ -211,16 +211,16 @@ describe('GGRC.Models.MapperModel', function () {
       spyOn(GGRC.Mappings, 'getMappingTypes')
         .and.returnValue(types);
 
-      result = mapper.modelFromType('v2');
+      result = baseVM.modelFromType('v2');
       expect(result).toEqual(types.governance.items[1]);
     });
   });
 
   describe('onSubmit() method', function () {
-    it('sets true to mapper.afterSearch', function () {
-      mapper.attr('afterSearch', false);
-      mapper.onSubmit();
-      expect(mapper.attr('afterSearch')).toEqual(true);
+    it('sets true to baseVM.afterSearch', function () {
+      baseVM.attr('afterSearch', false);
+      baseVM.onSubmit();
+      expect(baseVM.attr('afterSearch')).toEqual(true);
     });
   });
 });

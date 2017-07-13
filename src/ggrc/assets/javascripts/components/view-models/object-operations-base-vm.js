@@ -6,7 +6,7 @@
 (function (can, $) {
   'use strict';
 
-  GGRC.Models.MapperModel = can.Map.extend({
+  can.Map.extend('GGRC.VM.ObjectOperationsBaseVM', {
     define: {
       types: {
         get: function () {
