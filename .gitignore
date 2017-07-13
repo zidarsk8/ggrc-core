@@ -12,7 +12,7 @@ src/instance
 .DS_Store
 
 # Deployment-specific settings
-extras/deploy
+extras/deploy/*/*
 
 # Non-shared default recipe extension
 site-cookbooks/ggrc/recipes/local.rb
