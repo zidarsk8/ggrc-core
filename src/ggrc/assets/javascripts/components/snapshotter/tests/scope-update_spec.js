@@ -6,46 +6,37 @@
 describe('GGRC.Components.SnapshotScopeUpdater', function () {
   'use strict';
 
-  var Component;  // the component under test
-  var scope;
-  var originalHtml;
-  var original;
+  var updaterViewModel;
   var containerVM;
+  var originalHtml;
 
   beforeAll(function () {
-    Component = GGRC.Components.get('SnapshotScopeUpdater');
-    scope = Component.prototype.scope;
     originalHtml = document.body.innerHTML;
-    original = {
-      instance: scope.instance,
-      snapshotModels: scope.snapshotModels
-    };
   });
 
   afterAll(function () {
     document.body.innerHTML = originalHtml;
-    _.extend(scope, original);
   });
 
   beforeEach(function () {
+    updaterViewModel = GGRC.Components.getViewModel('SnapshotScopeUpdater');
     document.body.innerHTML =
-      '<tree-widget-container><tree-widget-container>' +
-      '<tree-widget-container><tree-widget-container>';
+      '<tree-widget-container></tree-widget-container>' +
+      '<tree-widget-container></tree-widget-container>';
     containerVM = {
       setRefreshFlag: jasmine.createSpy('setRefreshFlag'),
       display: jasmine.createSpy('display'),
       model: {
-        model_singular: 'A'
+        model_singular: 'Control'
       }
     };
-    _.extend(scope, {
+    _.extend(updaterViewModel, {
       instance: new can.Map({
         title: 'TITLE',
         refresh: jasmine
           .createSpy('refresh'),
         save: jasmine.createSpy('save')
-      }),
-      snapshotModels: ['A', 'B']
+      })
     });
     spyOn($.prototype, 'viewModel').and.returnValue(containerVM);
   });
@@ -53,27 +44,24 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
   describe('upsertIt() method', function () {
     var method;
 
-    beforeAll(function () {
-      method = scope.upsertIt.bind(scope);
-    });
-
     beforeEach(function () {
+      method = updaterViewModel.upsertIt.bind(updaterViewModel);
       spyOn(GGRC.Controllers.Modals, 'confirm').and.callThrough();
     });
 
     describe('calls confirm method', function () {
       it('one time', function () {
-        method(scope);
+        method(updaterViewModel);
 
         expect(GGRC.Controllers.Modals.confirm).toHaveBeenCalled();
       });
 
       it('with given params', function () {
-        method(scope);
+        method(updaterViewModel);
 
         expect(GGRC.Controllers.Modals.confirm.calls.argsFor(0)).toEqual([
           jasmine.objectContaining({
-            instance: scope.instance,
+            instance: updaterViewModel.instance,
             button_view: GGRC.Controllers.Modals.BUTTON_VIEW_OK_CLOSE,
             skip_refresh: true
           }),
@@ -84,21 +72,24 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
     });
   });
 
-/**
- * Next are tests depended on upsertIt() method
- * Begin
- */
   describe('_refreshContainers() method', function () {
     var method;
+    var refreshDfd;
 
-    beforeAll(function () {
-      method = scope._refreshContainers.bind(scope);
-      spyOn(GGRC.Utils.CurrentPage, 'refreshCounts');
+    beforeEach(function () {
+      method = updaterViewModel._refreshContainers.bind(updaterViewModel);
+      refreshDfd = new $.Deferred().resolve();
+      spyOn(GGRC.Utils.CurrentPage, 'refreshCounts').and.returnValue(refreshDfd);
     });
 
-    it('refreshes all page counters', function () {
-      method();
-      expect(GGRC.Utils.CurrentPage.refreshCounts).toHaveBeenCalled();
+    it('refreshes all page counters', function (done) {
+      var result = method();
+      result.then(
+        function () {
+          expect(GGRC.Utils.CurrentPage.refreshCounts).toHaveBeenCalled();
+          done();
+        }
+      );
     });
 
     it('sets refresh flag for each tree-widget-container that contains' +
@@ -113,7 +104,7 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
 
     it('does not set refresh flag for each tree-widget-container that does ' +
     'not contain snapshots', function () {
-      _.extend(containerVM.model, {model_singular: 'C'});
+      _.extend(containerVM.model, {model_singular: 'Something'});
       method();
       $('tree-widget-container').each(function () {
         var viewModel = $(this).viewModel();
@@ -126,61 +117,55 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
     var method;
     var refreshDfd;
 
-    beforeAll(function () {
-      method = scope._success.bind(scope);
-    });
-
     beforeEach(function () {
+      method = updaterViewModel._success.bind(updaterViewModel);
       refreshDfd = new $.Deferred();
-      scope.instance.refresh.and.returnValue(refreshDfd);
-      spyOn(GGRC.Errors, 'notifier');
+      updaterViewModel.instance.refresh.and.returnValue(refreshDfd);
+      spyOn(updaterViewModel, '_showSuccessMsg');
+      spyOn(updaterViewModel, '_showProgressWindow');
     });
 
     it('refreshes the instance attached to the component', function () {
       method();
-      expect(scope.instance.refresh).toHaveBeenCalled();
+      expect(updaterViewModel.instance.refresh).toHaveBeenCalled();
     });
 
     describe('after instance refresh', function () {
       it('saves the instance attached to the component', function () {
         method();
         refreshDfd.resolve();
-        expect(scope.instance.save).toHaveBeenCalled();
+        expect(updaterViewModel.instance.save).toHaveBeenCalled();
       });
 
       it('sets snapshots attr for the instance', function () {
+        var expectedResult = {
+          operation: 'upsert'
+        };
+        var wrongValue = {
+          operation: 'wrongValue'
+        };
+        updaterViewModel.instance.attr('snapshots', wrongValue);
         method();
         refreshDfd.resolve();
-
-        expect(scope.instance.attr('snapshots'))
+        expect(updaterViewModel.instance.attr('snapshots'))
           .toEqual(
-            jasmine.objectContaining({
-              operation: 'upsert'
-            })
+            jasmine.objectContaining(expectedResult)
           );
       });
 
-      it('sets snapshots attr for the instance', function () {
-        method();
-        refreshDfd.resolve();
-
-        expect(scope.instance.attr('snapshots'))
-          .toEqual(
-            jasmine.objectContaining({
-              operation: 'upsert'
-            })
-          );
-      });
-      it('shows an alert with certain message',
+      it('shows progress message',
         function () {
           method();
           refreshDfd.resolve();
+          expect(updaterViewModel._showProgressWindow).toHaveBeenCalled();
+        });
 
-          expect(GGRC.Errors.notifier).toHaveBeenCalled();
+      it('shows success message',
+        function () {
+          method();
+          refreshDfd.resolve();
+          expect(updaterViewModel._showSuccessMsg).toHaveBeenCalled();
         });
     });
   });
-/**
- * End
- */
 });

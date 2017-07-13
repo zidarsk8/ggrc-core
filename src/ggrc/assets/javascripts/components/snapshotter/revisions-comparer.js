@@ -155,16 +155,16 @@
           return instance.save();
         })
         .then(function () {
-          var FORSE_REFRESH = true;
+          var forceRefresh = true;
 
           return $('tree-widget-container:visible')
             .first()
             .viewModel()
-            .display(FORSE_REFRESH);
+            .display(forceRefresh);
         })
         .then(function () {
           var message = instance.child_type +
-          ' has refreshed successfully.';
+          ' was refreshed successfully.';
           GGRC.Errors.notifier('success', [message]);
         });
       },

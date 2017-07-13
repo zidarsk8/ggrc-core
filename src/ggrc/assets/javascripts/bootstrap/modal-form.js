@@ -172,8 +172,8 @@
       // Same behavior if extra flag is sent
       if (e && $(e.target).is('.modal-backdrop,.fa-times') || verifyChanges) {
         if ($(e.target).is('.disabled')) {
-            // In the case of a disabled modal backdrop, treat it like any other disabled data-dismiss,
-            //  i.e. do nothing.
+          // In the case of a disabled modal backdrop, treat it like any other disabled data-dismiss,
+          //  i.e. do nothing.
           e.stopPropagation();
           return;
         }
@@ -187,7 +187,7 @@
           }
         }
         if (this.is_form_dirty() || changedInstance || hasPending) {
-            // Confirm that the user wants to lose the data prior to hiding
+          // Confirm that the user wants to lose the data prior to hiding
           GGRC.Controllers.Modals.confirm({
             modal_title: 'Discard Changes',
             modal_description: 'Are you sure that you want' +
@@ -403,10 +403,12 @@
           } else {
             textContainer = '<h6></h6>';
             $html.append(
-              '<div class="spinner alert_spinner-left">' +
-                '<i class="spinner-icon fa fa-spinner fa-pulse" ' +
-                   'aria-hidden="true"></i>' +
-              '</div>'
+              can.view.mustache([
+                '<spinner ',
+                'toggle="true" ',
+                'extra-css-class="alert_spinner-left"',
+                '></spinner>'
+              ].join(''))
             );
           }
 
