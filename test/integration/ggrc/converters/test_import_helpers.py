@@ -405,6 +405,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Assignees",
         "Verifiers",
         "Assessment URL",
+        "Assessment Type",
         "Reference URL",
         "Evidence",
         "Url",
