@@ -5,40 +5,44 @@
 
 # pylint: disable=too-many-lines,invalid-name
 
-query_cycle_task_count_and_overdue = [
-    {
-        "object_name": "CycleTaskGroupObjectTask",
-        "type": "count",
-        "filters": {
-            "expression": {
-                "object_name": "Person",
-                "op": {"name": "owned"},
-                "ids": ["1"]
-            },
-            "keys":[],
-            "order_by":{"keys": [], "order":"", "compare":None}
-        }
-    }, {
-        "object_name": "CycleTaskGroupObjectTask",
-        "filters": {
-            "expression": {
-                "left": {
-                    "object_name": "Person",
-                    "op": {"name": "owned"},
-                    "ids": ["1"]
-                },
-                "op":{"name": "AND"},
-                "right": {
-                    "op": {"name": "<"},
-                    "left": "task due date",
-                    "right": "2017-06-26"
-                }
-            },
-            "keys": [None]
-        },
-        "type":"count"
-    }
-]
+
+def cycle_task_count_and_overdue(person, due_date="2017-06-26"):
+  """Query for assessments related to a person with status filters."""
+
+  relevant_exp = _build_relevant(person)
+  overdue_exp = _build_exp("task due date", "<", due_date)
+  joined_exp = _join_exp([relevant_exp, overdue_exp], "AND")
+
+  return [{
+      "object_name": "CycleTaskGroupObjectTask",
+      "type": "count",
+      "filters": {
+          "expression": relevant_exp,
+          "keys": [],
+          "order_by":{"keys": [], "order":"", "compare":None}
+      }
+  }, {
+      "object_name": "CycleTaskGroupObjectTask",
+      "filters": {
+          "expression": joined_exp,
+          "keys": [None]
+      },
+      "type":"count"
+  }]
+
+
+def relevant_count(model, person):
+  """Query for assessments related to a person with status filters."""
+  relevant_exp = _build_relevant(person)
+  return [{
+      "object_name": model,
+      "type": "count",
+      "filters": {
+          "expression": relevant_exp,
+          "keys": [],
+          "order_by":{"keys": [], "order":"", "compare":None}
+      }
+  }]
 
 query_all_original_related_ids = [
     {
