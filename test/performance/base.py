@@ -99,7 +99,7 @@ class BaseTaskSet(locust.TaskSet):
   def set_up(self):
     self.get_all_objects()
 
-  def _put(self, response, obj):
+  def _put(self, response, obj, postfix=""):
     """Generate an object PUT request."""
     headers = {
         "If-Match": response.headers["Etag"],
@@ -120,11 +120,15 @@ class BaseTaskSet(locust.TaskSet):
         obj["selfLink"],
         json=data,
         headers=headers,
-        name="{} /api/{}/XYZ".format(self.role, models.TABLES_PLURAL[model]),
+        name="{} /api/{}/XYZ {}".format(
+            self.role,
+            models.TABLES_PLURAL[model],
+            postfix
+        ),
     )
     return response
 
-  def update_object(self, slug, changes=None):
+  def update_object(self, slug, changes=None, postfix=""):
     """Fetch update and PUT an object."""
     response = self.get_from_slug(slug)
     obj = response.json().values()[0]
@@ -137,7 +141,7 @@ class BaseTaskSet(locust.TaskSet):
         obj = generator.update_cavs_new(obj, self.objects)
       else:
         obj = generator.update_cavs_old(obj, self.objects)
-    return self._put(response, obj)
+    return self._put(response, obj, postfix=postfix)
 
   def get_multiple(self, model, ids):
     """Generate GET request with id__in filter."""
