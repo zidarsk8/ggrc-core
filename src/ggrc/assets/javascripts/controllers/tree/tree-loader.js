@@ -167,6 +167,11 @@
         list = this.options.list;
       }
 
+      // make attributes queue is correct.
+      list.sort(function (a, b) {
+        return a.id - b.id;
+      });
+
       if (!this.element) {
         return undefined;  // controller has been destroyed
       }
