@@ -52,21 +52,24 @@ directory
 * run the following:
 
     ```
-    git submodule update --init
-    docker-compose --file docker-compose-clean.yml up -d
-    docker exec -it ggrccore_cleandev_1 su
-    make -B bower_components
-    build_css
-    build_assets
-    db_reset
+    ./bin/containers setup dev
     ```
+
+To log into the container, run the following:
+
+``` sh
+    docker exec -it ggrccore_cleandev_1 su
+```
 
 If you see download errors during the `docker-compose up -d` stage, or if any subsequent
 step fails, try running `docker-compose build` (See [Reprovisioning a Docker container](#reprovisioning-a-docker-container) below for more).
 
 If apt-get fails to install anything (for example `Could not resolve 'archive.ubuntu.com'`), try [this](#dns-issues).
 
-_NOTE: Because Docker shared volumes do not have permission mappings, you should run these commands as a user with UID 1000, to match the users inside the containers._
+_NOTE: Because Docker shared volumes do not have permission mappings, you should
+not use git and other file-creating commands from inside the container, as these
+files will be owned by root and may disrupt future git usage on the host
+machine._
 
 ## Quick Start with Vagrant (legacy)
 
@@ -113,20 +116,18 @@ launching the application in the Google App Engine SDK environment is simple:
 launch_gae_ggrc
 ```
 
-This requires `src/app.yaml` and `src/packages.zip` with settings. You can generate the yaml file with:
+This requires `src/app.yaml` with settings and `src/packages` with
+requirements. You can generate the yaml file with:
 
 ```sh
 deploy_appengine extras/deploy_settings_local.sh
 ```
 
-And the packages.zip file with:
-
+To (re-)generate the requirements, you can run:
 
 ```
-make appengine_packages_zip
+make clean_appengine && make appengine
 ```
-
-
 
 ### Accessing the Application
 
@@ -475,10 +476,10 @@ pip install --no-deps -r src/requirements.txt
 ```
 
 Note that if you're using `launch_gae_ggrc`, then changes to
-`src/requirements.txt` will require rebuilding the `src/packages.zip` via
+`src/requirements.txt` will require rebuilding the `src/packages` via
 
 ```
-make appengine_packages_zip
+make appengine_packages
 ```
 
 
