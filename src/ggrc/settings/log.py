@@ -1,6 +1,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Log settings that will be used for deployment."""
+
 SQLALCHEMY_RECORD_QUERIES = 'slow'
 LOGGING_LOGGERS = {
     "ggrc": "INFO",
