@@ -306,7 +306,14 @@
 
         this.audit.findAuditors().then(function (list) {
           list.forEach(function (item) {
-            markForAddition(self, item.person, 'Verifier');
+            var type = 'Verifier';
+            if (item.person === auditLead) {
+              type += ',Assessor';
+            }
+            if (item.person === currentUser) {
+              type += ',Creator';
+            }
+            markForAddition(self, item.person, type);
           });
         });
       } else {
