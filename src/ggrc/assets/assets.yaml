@@ -411,7 +411,6 @@ dashboard-js-template-files:
   - base_objects/search_actions.mustache
   - base_objects/search_result.mustache
   - base_objects/title.mustache
-  - base_objects/tree.mustache
   - base_objects/tree-item-attr.mustache
   - base_objects/tree_placeholder.mustache
   - base_objects/tree_footer_no_access.mustache
@@ -423,7 +422,6 @@ dashboard-js-template-files:
   - base_objects/sub_tree_expand.mustache
   - base_objects/sub_tree_all_related_link.mustache
   - base_objects/generate_assessments_button.mustache
-  - base_objects/states.mustache
   - base_objects/form_restore.mustache
   - base_objects/info-pane-utility.mustache
   - base_objects/info_header.mustache
