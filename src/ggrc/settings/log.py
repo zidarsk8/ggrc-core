@@ -3,13 +3,13 @@
 
 SQLALCHEMY_RECORD_QUERIES = 'slow'
 LOGGING_LOGGERS = {
-  "ggrc": "INFO",
-  "sqlalchemy": "WARNING",
-  # WARNING - logs warnings and errors only
-  # INFO    - logs SQL-queries
-  # DEBUG   - logs SQL-queries + result sets
-  "werkzeug": "INFO",
-  # WARNING - logs warnings and errors only
-  # INFO    - logs HTTP-queries
-  "ggrc.utils.benchmarks": "DEBUG"
+    "ggrc": "INFO",
+    "sqlalchemy": "WARNING",
+    # WARNING - logs warnings and errors only
+    # INFO    - logs SQL-queries
+    # DEBUG   - logs SQL-queries + result sets
+    "werkzeug": "INFO",
+    # WARNING - logs warnings and errors only
+    # INFO    - logs HTTP-queries
+    "ggrc.utils.benchmarks": "DEBUG"
 }
