@@ -20,22 +20,6 @@ KEY_FILE="$CONFIG_DIR/$SERVICE_ACCOUNT.key"
 SETTINGS_FILE="$CONFIG_DIR/settings.sh"
 OVERRIDE_FILE="$CONFIG_DIR/override.sh"
 
-# Custom logging settings
-cat >src/ggrc/settings/log.py <<EOL
-SQLALCHEMY_RECORD_QUERIES = 'slow'
-LOGGING_LOGGERS = {
-    "ggrc": "INFO",
-    "sqlalchemy": "WARNING",
-    # WARNING - logs warnings and errors only
-    # INFO    - logs SQL-queries
-    # DEBUG   - logs SQL-queries + result sets
-    "werkzeug": "INFO",
-    # WARNING - logs warnings and errors only
-    # INFO    - logs HTTP-queries
-    "ggrc.utils.benchmarks": "DEBUG",
-}
-EOL
-
 echo $SERVICE_ACCOUNT > "$SERVICE_ACCOUNT_FILE"
 
 # Fill in private.key with the user's private key
@@ -81,9 +65,8 @@ STATIC_SERVING="$STATIC_SERVING"
 GGRC_Q_INTEGRATION_URL="$GGRC_Q_INTEGRATION_URL"
 AUDIT_DASHBOARD_INTEGRATION_URL="$AUDIT_DASHBOARD_INTEGRATION_URL"
 ALLOWED_QUERYAPI_APP_IDS="$ALLOWED_QUERYAPI_APP_IDS"
-# Not present in extras/deploy_settings_local.sh
 APPENGINE_EMAIL="$APPENGINE_EMAIL"
-AUTHORIZED_DOMAINS=""
+AUTHORIZED_DOMAINS="$AUTHORIZED_DOMAINS"
 EOL
 
 cat >"$OVERRIDE_FILE" <<EOF
