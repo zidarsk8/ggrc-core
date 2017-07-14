@@ -54,7 +54,7 @@
       entries: [],
       afterSearch: false,
       relevant: [],
-      assessmentGenerator: false,
+      objectGenerator: false,
       deferredList: [],
       init: function () {
         var self = this;
@@ -269,7 +269,7 @@
         return CMS.Models[this.attr('type')];
       },
       setDisabledItems: function (allItems, relatedIds) {
-        if (this.attr('searchOnly') || this.attr('assessmentGenerator')) {
+        if (this.attr('searchOnly') || this.attr('objectGenerator')) {
           return;
         }
         allItems.forEach(function (item) {
@@ -391,8 +391,8 @@
                 type: modelKey
               };
             });
-            // Do not perform extra mapping validation in case Assessment generation
-            if (!this.attr('assessmentGenerator') && relatedData) {
+            // Do not perform extra mapping validation in case object generation
+            if (!this.attr('objectGenerator') && relatedData) {
               result = result.filter(function (item) {
                 return relatedData[modelKey].ids.indexOf(item.id) < 0;
               });

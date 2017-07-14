@@ -584,10 +584,10 @@ describe('GGRC.Components.mapperResults', function () {
       expect(allItems).toEqual(allItems);
     });
 
-    it('does nothing if it is case of assesment generation',
+    it('does nothing if it is case of object generation',
       function () {
         viewModel.attr({
-          assessmentGenerator: {}
+          objectGenerator: true
         });
         viewModel.setDisabledItems(allItems, relatedIds);
         expect(allItems).toEqual(allItems);
@@ -796,7 +796,7 @@ describe('GGRC.Components.mapperResults', function () {
     it('rerturns promise with items', function (done) {
       var responseArr = [data, filters];
       dfdRequest.resolve(responseArr);
-      viewModel.attr('assessmentGenerator', true);
+      viewModel.attr('objectGenerator', true);
       resultDfd = viewModel.loadAllItemsIds();
       expect(resultDfd.state()).toEqual('resolved');
       resultDfd.then(function (result) {
@@ -809,7 +809,7 @@ describe('GGRC.Components.mapperResults', function () {
       function (done) {
         var responseArr = [data, filters];
         dfdRequest.resolve(responseArr);
-        viewModel.attr('assessmentGenerator', false);
+        viewModel.attr('objectGenerator', false);
         resultDfd = viewModel.loadAllItemsIds();
         expect(resultDfd.state()).toEqual('resolved');
         resultDfd.then(function (result) {
@@ -821,7 +821,7 @@ describe('GGRC.Components.mapperResults', function () {
     it('rerturns promise with empty array if fail',
       function (done) {
         dfdRequest.reject();
-        viewModel.attr('assessmentGenerator', true);
+        viewModel.attr('objectGenerator', true);
         resultDfd = viewModel.loadAllItemsIds();
         expect(resultDfd.state()).toEqual('resolved');
         resultDfd.then(function (result) {

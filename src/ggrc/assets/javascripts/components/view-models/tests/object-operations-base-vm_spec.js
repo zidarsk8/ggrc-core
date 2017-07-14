@@ -75,16 +75,6 @@ describe('GGRC.VM.ObjectOperationsBaseVM', function () {
       expect(result).toEqual(false);
     });
 
-    it('returns false if is in assessment generation mode',
-      function () {
-        var result;
-        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-          .and.returnValue(false);
-        baseVM.attr('assessmentGenerator', true);
-        result = baseVM.showWarning();
-        expect(result).toEqual(false);
-      });
-
     it('returns true if source object is a Snapshot parent', function () {
       var result;
       spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')

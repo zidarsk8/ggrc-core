@@ -22,7 +22,6 @@
         relevantTo: parentViewModel.attr('relevantTo'),
         callback: parentViewModel.attr('callback'),
         useTemplates: true,
-        assessmentGenerator: true,
         useSnapshots: true,
         isLoadingOrSaving: function () {
           return this.attr('is_saving') ||
@@ -30,6 +29,9 @@
           //  disable changing of object type while loading
           //  to prevent errors while speedily selecting different types
           this.attr('is_loading');
+        },
+        showWarning: function () {
+          return false;
         }
       });
     },

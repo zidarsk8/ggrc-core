@@ -165,10 +165,8 @@ describe('GGRC.Components.objectGenerator', function () {
       expect(result).toEqual(undefined);
     });
 
-    it('sets true to is_saving and' +
-      'returns callback if it is assessment generation', function () {
+    it('sets true to is_saving and returns callback', function () {
       var result;
-      viewModel.attr('assessmentGenerator', true);
       result = handler.call(that, element, event);
       expect(viewModel.attr('is_saving')).toEqual(true);
       expect(result).toEqual('expectedResult');
@@ -203,7 +201,6 @@ describe('GGRC.Components.objectGenerator', function () {
     var that;
     beforeEach(function () {
       viewModel.attr({
-        assessmentGenerator: true,
         relevant: [1, 2, 3],
         onSubmit: function () {}
       });
@@ -252,5 +249,12 @@ describe('GGRC.Components.objectGenerator', function () {
         expect(viewModel.attr('type'))
           .toEqual('value');
       });
+  });
+
+  describe('showWarning() method', function () {
+    it('returns false', function () {
+      var result = viewModel.showWarning();
+      expect(result).toEqual(false);
+    });
   });
 });
