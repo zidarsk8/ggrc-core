@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-APPENGINE_INSTANCE=local
-SETTINGS_MODULE="development app_engine ggrc_basic_permissions.settings.development ggrc_risks.settings.development ggrc_risk_assessments.settings.development ggrc_workflows.settings.development"
-DATABASE_URI="mysql+mysqldb://root:root@${GGRC_DATABASE_HOST:-localhost}/ggrcdev?charset=utf8"
+APPENGINE_INSTANCE=some-project
+SETTINGS_MODULE="app_engine ggrc_basic_permissions.settings.development ggrc_risks.settings.development ggrc_risk_assessments.settings.development ggrc_workflows.settings.development ggrc_gdrive_integration.settings.development"
+DATABASE_URI='mysql+mysqldb://db-user@/db_name?unix_socket=/cloudsql/some-project:db-server-id&charset=utf8'
 SECRET_KEY='Something-secret'
 GOOGLE_ANALYTICS_ID=""
 GOOGLE_ANALYTICS_DOMAIN=""
@@ -12,7 +12,7 @@ GAPI_CLIENT_SECRET='<Google OAuth Client Secret>'
 GAPI_ADMIN_GROUP='<Google Group Email Address>'
 BOOTSTRAP_ADMIN_USERS='user@example.com'
 MIGRATOR='Default Migrator <migrator@example.com>'
-RISK_ASSESSMENT_URL='http://localhost:8080'
+RISK_ASSESSMENT_URL='#'
 CUSTOM_URL_ROOT=''
 ABOUT_URL='#'
 ABOUT_TEXT='About GGRC'
