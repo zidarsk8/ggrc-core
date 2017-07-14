@@ -21,13 +21,6 @@
           return CMS.Models
             .get_instance(this.attr('object'), this.attr('join_object_id'));
         }
-      },
-      useSnapshots: {
-        get: function () {
-          return GGRC.Utils.Snapshots.isInScopeModel(this.attr('object')) ||
-            // In case Assessment generation - use Snapshot Objects
-            this.attr('assessmentGenerator');
-        }
       }
     },
     type: 'Control', // We set default as Control
@@ -47,6 +40,7 @@
     relevant: [],
     submitCbs: $.Callbacks(),
     afterSearch: false,
+    useSnapshots: false,
     afterShown: function () {
       this.onSubmit();
     },

@@ -23,6 +23,7 @@
         callback: parentViewModel.attr('callback'),
         useTemplates: true,
         assessmentGenerator: true,
+        useSnapshots: true,
         isLoadingOrSaving: function () {
           return this.attr('is_saving') ||
           this.attr('block_type_change') ||

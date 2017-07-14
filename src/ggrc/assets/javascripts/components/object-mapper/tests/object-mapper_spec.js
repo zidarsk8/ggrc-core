@@ -28,6 +28,24 @@ describe('GGRC.Components.objectMapper', function () {
       expect(result.isLoadingOrSaving).toEqual(jasmine.any(Function));
     });
 
+    describe('initializes useSnapshots flag', function () {
+      it('with true if using in-scope model', function () {
+        var result;
+        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
+          .and.returnValue(true);
+        result = Component.prototype.viewModel({}, parentViewModel)();
+        expect(result.attr('useSnapshots')).toEqual(true);
+      });
+
+      it('do not use Snapshots if not an in-scope model', function () {
+        var result;
+        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
+          .and.returnValue(false);
+        result = Component.prototype.viewModel({}, parentViewModel)();
+        expect(result.attr('useSnapshots')).toEqual(false);
+      });
+    });
+
     describe('isLoadingOrSaving() method', function () {
       beforeEach(function () {
         viewModel = new Component.prototype.viewModel({}, parentViewModel)();

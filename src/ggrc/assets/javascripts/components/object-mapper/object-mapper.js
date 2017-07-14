@@ -40,6 +40,7 @@
         object: attrs.object,
         type: getDefaultType(attrs.type, attrs.object),
         relevantTo: parentViewModel.attr('relevantTo'),
+        useSnapshots: GGRC.Utils.Snapshots.isInScopeModel(attrs.object),
         isLoadingOrSaving: function () {
           return this.attr('is_saving') ||
           //  disable changing of object type while loading

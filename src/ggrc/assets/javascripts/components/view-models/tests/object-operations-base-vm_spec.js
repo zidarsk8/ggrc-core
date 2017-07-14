@@ -46,36 +46,6 @@ describe('GGRC.VM.ObjectOperationsBaseVM', function () {
     });
   });
 
-  describe('get() for baseVM.useSnapshots', function () {
-    it('use Snapshots if using in-scope model', function () {
-      var result;
-      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-        .and.returnValue(true);
-      result = baseVM.attr('useSnapshots');
-      expect(result).toEqual(true);
-    });
-
-    it('use Snapshots in case Assessment generation',
-      function () {
-        var result;
-        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-          .and.returnValue(false);
-        baseVM.attr('assessmentGenerator', true);
-        result = baseVM.attr('useSnapshots');
-        expect(result).toEqual(true);
-      });
-
-    it('do not use Snapshots if not an in-scope model ' +
-      'and not in assessment generation mode', function () {
-      var result;
-      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-        .and.returnValue(false);
-      baseVM.attr('assessmentGenerator', false);
-      result = baseVM.attr('useSnapshots');
-      expect(result).toEqual(false);
-    });
-  });
-
   describe('allowedToCreate() method', function () {
     it('returns true if it is not an in-scope model',
       function () {
