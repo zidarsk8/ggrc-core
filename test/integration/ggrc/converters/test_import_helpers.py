@@ -95,6 +95,8 @@ class TestCustomAttributesDefinitions(TestCase):
         "Mandatory Attribute",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     expected_names = element_names.union(mapping_names).union(unmapping_names)
     self.assertEqual(expected_names, display_names)
@@ -142,6 +144,8 @@ class TestCustomAttributesDefinitions(TestCase):
         "Choose",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     expected_names = element_names.union(mapping_names).union(unmapping_names)
     self.assertEqual(expected_names, display_names)
@@ -306,6 +310,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     expected_fields = {
         "mandatory": {
@@ -422,6 +428,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Send by default",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     expected_fields = {
         "mandatory": {
@@ -460,6 +468,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Url",
         "Evidence",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     expected_fields = {
         "mandatory": {
@@ -493,6 +503,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     self._test_single_object(models.Policy, names, self.COMMON_EXPECTED)
 
@@ -510,6 +522,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     self._test_single_object(models.Clause, names, self.COMMON_EXPECTED)
 
@@ -526,6 +540,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     self._test_single_object(models.Section, names, self.COMMON_EXPECTED)
 
@@ -553,6 +569,10 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Review State",
         "Evidence",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
+        "Principal Assignees",
+        "Secondary Assignees",
     }
     self._test_single_object(models.Control, names, self.COMMON_EXPECTED)
 
@@ -569,6 +589,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     self._test_single_object(models.Objective, names, self.COMMON_EXPECTED)
 
@@ -605,6 +627,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     self._test_single_object(models.System, names, self.COMMON_EXPECTED)
 
@@ -623,6 +647,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     self._test_single_object(models.Process, names, self.COMMON_EXPECTED)
 
@@ -641,6 +667,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     self._test_single_object(models.Product, names, self.COMMON_EXPECTED)
 
@@ -658,6 +686,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Review State",
         "Last Deprecated Date",
         "Title",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     expected_fields = {
         "mandatory": {
@@ -699,6 +729,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Review State",
         "Delete",
+        "Primary Contacts",
+        "Secondary Contacts",
     }
     self._test_single_object(model, names, self.COMMON_EXPECTED)
 
