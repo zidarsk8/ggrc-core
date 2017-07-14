@@ -277,6 +277,8 @@ class AssessmentStates(BaseStates):
 
 class IssueStates(ObjectStates):
   """States for Issues objects."""
+  FIXED = "Fixed"
+  FIXED_AND_VERIFIED = "Fixed and Verified"
 
 
 class ProgramInfoWidget(CommonProgram):
