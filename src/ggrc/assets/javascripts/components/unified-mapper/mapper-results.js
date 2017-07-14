@@ -128,7 +128,7 @@
       },
       setRelatedAssessments: function () {
         var Model = this.getDisplayModel();
-        if (this.useSnapshots) {
+        if (this.attr('useSnapshots')) {
           this.attr('relatedAssessments.show', false);
           return;
         }
@@ -238,7 +238,7 @@
 
         query = this.prepareBaseQuery(modelName, paging, filters, statusFilter);
         relatedQuery = this.prepareRelatedQuery(modelName, statusFilter);
-        if (this.useSnapshots) {
+        if (this.attr('useSnapshots')) {
           // Transform Base Query to Snapshot
           query = GGRC.Utils.Snapshots.transformQuery(query);
         }
@@ -251,14 +251,14 @@
         if (!relatedQuery) {
           return {data: [query]};
         }
-        if (this.useSnapshots) {
+        if (this.attr('useSnapshots')) {
           // Transform Related Query to Snapshot
           relatedQuery = GGRC.Utils.Snapshots.transformQuery(relatedQuery);
         }
         return {data: [query, relatedQuery]};
       },
       getModelKey: function () {
-        return this.useSnapshots ?
+        return this.attr('useSnapshots') ?
           CMS.Models.Snapshot.model_singular :
           this.attr('type');
       },
@@ -298,7 +298,7 @@
       },
       transformValue: function (value) {
         var Model = this.getDisplayModel();
-        if (this.useSnapshots) {
+        if (this.attr('useSnapshots')) {
           value.snapshotObject =
             GGRC.Utils.Snapshots.toObject(value);
           value.revision.content =
