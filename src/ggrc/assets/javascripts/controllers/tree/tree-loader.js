@@ -84,22 +84,6 @@
       return this._prepare_deferred;
     },
 
-    show_info_pin: function () {
-      var children;
-      var controller;
-      if (this.element && !this.element.data('no-pin')) {
-        children = this.element.children();
-        controller = children && children.find('.select:visible')
-            .first()
-            .closest('.cms_controllers_tree_view_node')
-            .control();
-
-        if (controller) {
-          controller.select();
-        }
-      }
-    },
-
     display: function (refetch) {
       var that = this;
       var trackerStop = GGRC.Tracker.start(

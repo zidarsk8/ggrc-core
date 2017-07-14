@@ -17,17 +17,6 @@
       filteredList: [],
       single_object: false,
       find_params: {},
-      paging: {
-        current: 1,
-        total: null,
-        pageSize: 10,
-        count: null,
-        pageSizeSelect: [10, 25, 50],
-        filter: null,
-        sortDirection: null,
-        sortBy: null,
-        disabled: false
-      },
       fields: [],
       filter_states: [],
       sortable: true,
@@ -94,174 +83,6 @@
       hash.pop();
       window.location.hash = hash.join('/');
     },
-    // Total display with is set to be span12.
-    // Default: title: span4
-    //          middle selectable: span4, by default 2 attributes are selected
-    //          action: span4
-    // When user selects 3 middle selectable attribute, title width is reduced to span3
-    // and when user selects 4 attributes, the action column is also reduced to span3
-    setup_column_width: function () {
-      // Special case when import and export buttons should not be wisible for snapshots
-      var snapshots = GGRC.Utils.Snapshots;
-      var hideImportExport =
-        snapshots.isSnapshotScope(this.options.parent_instance) &&
-        snapshots.isSnapshotModel(this.options.model.model_singular);
-      var displayOptions;
-      var displayWidth = 12;
-      var attrCount = this.options.display_attr_list.length;
-      var nested = this.options.parent !== null;
-      var widths = {
-        defaults: [4, 4, 4],
-        '0': [7, 1, 4],
-        '3': [3, 5, 4],
-        '4': [3, 6, 3],
-        nested: [4, 0, 8]
-      };
-      var selectedWidths = widths[attrCount] || widths.defaults;
-
-      if (nested) {
-        selectedWidths = widths.nested;
-      }
-
-      displayOptions = {
-        title_width: selectedWidths[0],
-        selectable_width: selectedWidths[1],
-        action_width: selectedWidths[2],
-        selectable_attr_width: displayWidth / Math.max(attrCount, 1),
-        hideImportExport: hideImportExport
-      };
-      this.options.attr('display_options', displayOptions);
-    },
-
-    init_child_tree_display: function (model) {
-      var modelName;
-      var childTreeModelList;
-      var validModels;
-      var wList;
-      var subTree;
-      if (!GGRC.page_object) { // Admin dashboard
-        return;
-      }
-
-      // Set child tree options
-      modelName = model.model_singular;
-      childTreeModelList = [];
-      validModels = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
-
-      wList = GGRC.tree_view.base_widgets_by_type[modelName]; // possible widget/mapped model_list
-      if (wList === undefined) {
-        childTreeModelList = GGRC.tree_view.basic_model_list;
-        GGRC.tree_view.sub_tree_for.attr(modelName, {
-          model_list: childTreeModelList,
-          display_list: validModels
-        });
-      }
-
-      subTree = GGRC.tree_view.sub_tree_for[modelName];
-      this.options.attr('child_tree_model_list', subTree.model_list);
-      this.options.attr('selected_child_tree_model_list', subTree.model_list);
-      this.options.attr('select_model_list', GGRC.tree_view.basic_model_list);
-      this.options.attr('selected_model_name', modelName);
-    },
-
-    // Displays attribute list for tree-header, Select attribute list drop down
-    // Gets default and custom attribute list for each model, and sets upthe display-list
-    init_display_options: function (opts) {
-      var i;
-      var savedAttrList;
-      var selectAttrList = [];
-      var displayAttrList = [];
-      var model = opts.model;
-      var modelName = model.model_singular;
-      var modelDefinition = model().class.root_object;
-      var mandatoryAttrNames;
-      var displayAttrNames;
-      var attr;
-
-      // get standard attrs for each model
-      can.each(model.tree_view_options.attr_list ||
-        can.Model.Cacheable.attr_list, function (item) {
-        if (!item.attr_sort_field) {
-          item.attr_sort_field = item.attr_name;
-        }
-        selectAttrList.push(item);
-      });
-
-      selectAttrList.sort(function (a, b) {
-        if (a.order && !b.order) {
-          return -1;
-        } else if (!a.order && b.order) {
-          return 1;
-        }
-        return a.order - b.order;
-      });
-      // Get mandatory_attr_names
-      mandatoryAttrNames = model.tree_view_options.mandatory_attr_names ?
-        model.tree_view_options.mandatory_attr_names :
-        can.Model.Cacheable.tree_view_options.mandatory_attr_names;
-
-      // get custom attrs
-      can.each(GGRC.custom_attr_defs, function (def, i) {
-        var obj;
-        if (def.definition_type === modelDefinition &&
-          def.attribute_type !== 'Rich Text') {
-          obj = {};
-          obj.attr_title = obj.attr_name = def.title;
-          obj.display_status = false;
-          obj.attr_type = 'custom';
-          obj.attr_sort_field = obj.attr_name;
-          selectAttrList.push(obj);
-        }
-      });
-
-      // Get the display attr_list from local storage
-      savedAttrList = this.display_prefs.getTreeViewHeaders(modelName);
-
-      this.loadTreeStates(modelName);
-      this.options.attr('statusFilterVisible',
-        GGRC.Utils.State.hasFilter(modelName));
-
-      if (!savedAttrList.length) {
-        // Initialize the display status, Get display_attr_names for model
-        displayAttrNames = model.tree_view_options.display_attr_names ?
-          model.tree_view_options.display_attr_names :
-          can.Model.Cacheable.tree_view_options.display_attr_names;
-
-        if (GGRC.Utils.CurrentPage.isMyAssessments()) {
-          displayAttrNames.push('updated_at');
-        }
-
-        for (i = 0; i < selectAttrList.length; i++) {
-          attr = selectAttrList[i];
-
-          attr.display_status = displayAttrNames.indexOf(attr.attr_name) !== -1;
-          attr.mandatory = mandatoryAttrNames.indexOf(attr.attr_name) !== -1;
-        }
-      } else {
-        // Mandatory attr should be always displayed in tree view
-        can.each(mandatoryAttrNames, function (attrName) {
-          savedAttrList.push(attrName);
-        });
-
-        for (i = 0; i < selectAttrList.length; i++) {
-          attr = selectAttrList[i];
-          attr.display_status = savedAttrList.indexOf(attr.attr_name) !== -1;
-          attr.mandatory = mandatoryAttrNames.indexOf(attr.attr_name) !== -1;
-        }
-      }
-
-      // Create display list
-      can.each(selectAttrList, function (item) {
-        if (!item.mandatory && item.display_status) {
-          displayAttrList.push(item);
-        }
-      });
-
-      this.options.attr('select_attr_list', selectAttrList);
-      this.options.attr('display_attr_list', displayAttrList);
-      this.setup_column_width();
-      this.init_child_tree_display(model);
-    },
 
     init: function (el, opts) {
       var setAllowMapping;
@@ -281,10 +102,6 @@
         .on('widget_shown', this.widget_shown.bind(this));
       CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
         var allowed;
-        // TODO: Currently Query API doesn't support CustomAttributable.
-        var isCustomAttr = /CustomAttr/.test(this.options.model.shortName);
-        var isRoleable = /Roleable|AccessControlRole/.test(
-                            this.options.model.shortName);
 
         this.display_prefs = displayPrefs;
 
@@ -292,22 +109,6 @@
 
         this.options.attr('is_subtree',
           this.element && this.element.closest('.inner-tree').length > 0);
-
-        if (
-          !this.options.attr('is_subtree') && !isCustomAttr && !isRoleable
-        ) {
-          this.page_loader = new GGRC.ListLoaders.TreePageLoader(
-            this.options.model, this.options.parent_instance,
-            this.options.mapping);
-        } else if (this.options.attr('is_subtree')) {
-          if (GGRC.Utils.CurrentPage.isObjectContextPage() &&
-            GGRC.page_instance().type !== 'Workflow') {
-            this.options.attr('drawSubTreeExpander', true);
-          }
-          this.page_loader = new GGRC.ListLoaders.SubTreeLoader(
-            this.options.model, this.options.parent_instance,
-            this.options.mapping);
-        }
 
         if ('parent_instance' in opts && 'status' in opts.parent_instance) {
           setAllowMapping = function () {
@@ -355,7 +156,6 @@
         if (this.element && this.element.closest('body').length) {
           this._attached_deferred.resolve();
         }
-        this.init_display_options(opts);
       }.bind(this));
       // Make sure the parent_instance is not a computable
       if (typeof this.options.parent_instance === 'function') {
@@ -365,20 +165,6 @@
 
     ' inserted': function () { // eslint-disable-line quote-props
       this._attached_deferred.resolve();
-    },
-
-    initNoResultsMessage: function () {
-      var self = this;
-      var context = new can.Map({
-        text: 'No results, please check your filter criteria'
-      });
-      var html = can.mustache('<tree-no-results/>')(context);
-
-      this.options.bind('paging.total', function () {
-        context.attr('show', !self.options.attr('paging.total'));
-      });
-
-      this.element.after(html);
     },
 
     init_view: function () {
@@ -393,15 +179,6 @@
           can.view(this.options.header_view, optionsDfd).then(
             this._ifNotRemoved(function (frag) {
               this.element.before(frag);
-              this.initNoResultsMessage();
-
-              can.bind.call(this.element.parent()
-                .find('.tview-dropdown-toggle'),
-                  'click',
-                  function () {
-                    this.init_display_options(this.options);
-                  }.bind(this)
-              );
 
               statusControl = this.element.parent()
                 .find('.tree-filter__status-wrap');
