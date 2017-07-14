@@ -5,8 +5,6 @@ set -o errexit
 
 . /tmpfs/src/gfile/settings
 
-#$CURRENT_SCRIPTPATH/install_deps.sh
-
 cd "${CURRENT_SCRIPTPATH}/../"
 ./git_hooks/post-checkout
 
@@ -16,7 +14,7 @@ CONFIG_DIR="$CONFIG_PREFIX/$PROJECT_NAME/"
 
 mkdir -p "$CONFIG_DIR"
 
-SERVICE_ACCOUNT="$SERVICE_ACCOUNT" #"test-jenkins@ggrc-dev.iam.gserviceaccount.com"
+SERVICE_ACCOUNT="$SERVICE_ACCOUNT"
 SERVICE_ACCOUNT_FILE="$CONFIG_DIR/service-account"
 KEY_FILE="$CONFIG_DIR/$SERVICE_ACCOUNT.key"
 SETTINGS_FILE="$CONFIG_DIR/settings.sh"
