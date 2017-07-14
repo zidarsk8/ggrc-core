@@ -472,22 +472,18 @@ def get_snapshot_data(affected_objects):
   query = db.session.query(
       models.Snapshot.child_type,
       models.Snapshot.child_id,
-      sa.func.group_concat(models.Snapshot.id)
+      models.Snapshot.id
   ).filter(
       sa.tuple_(
           models.Snapshot.child_type,
           models.Snapshot.child_id,
       ).in_(all_objects)
-  ).group_by(
-      models.Snapshot.child_type,
-      models.Snapshot.child_id,
   )
   all_ids = []
-  snapshot_map = {}
-  for computed_type, computed_id, snapshot_ids in query:
-    ids = [int(i) for i in snapshot_ids.split(",")]
-    snapshot_map[(computed_type, computed_id)] = ids
-    all_ids.extend(ids)
+  snapshot_map = collections.defaultdict(list)
+  for computed_type, computed_id, snapshot_id in query:
+    snapshot_map[(computed_type, computed_id)].append(snapshot_id)
+    all_ids.append(snapshot_id)
 
   snapshot_tag_map = {}
   if all_ids:
