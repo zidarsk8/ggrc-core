@@ -26,6 +26,7 @@ var GGRC = {
 
 module.exports = {
   entry: {
+    vendor: 'ggrc/vendor',
     dashboard: GGRC.get_dashboard_modules()
   },
   output: {
