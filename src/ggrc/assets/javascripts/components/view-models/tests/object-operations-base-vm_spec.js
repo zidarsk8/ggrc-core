@@ -12,7 +12,7 @@ describe('GGRC.VM.ObjectOperationsBaseVM', function () {
     baseVM = GGRC.VM.ObjectOperationsBaseVM();
   });
 
-  describe('get() for baseVM.types', function () {
+  describe('availableTypes() method', function () {
     var originalInScopeModels;
     beforeAll(function () {
       originalInScopeModels = GGRC.Utils.Snapshots.inScopeModels;
@@ -27,7 +27,7 @@ describe('GGRC.VM.ObjectOperationsBaseVM', function () {
       spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue('types');
       baseVM.attr('object', 'testObject');
 
-      result = baseVM.attr('types');
+      result = baseVM.availableTypes();
       expect(GGRC.Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
         [], ['test1', 'test2']);
       expect(result).toEqual('types');

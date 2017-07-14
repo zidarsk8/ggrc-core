@@ -12,16 +12,6 @@
       '/components/object-search/object-search.mustache'),
     viewModel: function () {
       return GGRC.VM.ObjectOperationsBaseVM.extend({
-        define: {
-          types: {
-            get: function () {
-              return GGRC.Mappings.getMappingTypes(
-                this.attr('object'),
-                ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'],
-                []);
-            }
-          }
-        },
         isLoadingOrSaving: function () {
           return this.attr('is_loading');
         },
@@ -32,6 +22,13 @@
         },
         showWarning: function () {
           return false;
+        },
+        availableTypes: function () {
+          var types = GGRC.Mappings.getMappingTypes(
+            this.attr('object'),
+            ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'],
+            []);
+          return types;
         }
       });
     },

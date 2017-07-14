@@ -109,13 +109,13 @@ describe('GGRC.Components.objectSearch', function () {
       });
   });
 
-  describe('get() for types', function () {
+  describe('availableTypes() method', function () {
     it('correctly calls getMappingTypes', function () {
       var result;
       spyOn(GGRC.Mappings, 'getMappingTypes').and.returnValue('types');
       viewModel.attr('object', 'testObject');
 
-      result = viewModel.attr('types');
+      result = viewModel.availableTypes();
       expect(GGRC.Mappings.getMappingTypes).toHaveBeenCalledWith('testObject',
         ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'], []);
       expect(result).toEqual('types');

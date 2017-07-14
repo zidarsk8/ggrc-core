@@ -8,14 +8,6 @@
 
   can.Map.extend('GGRC.VM.ObjectOperationsBaseVM', {
     define: {
-      types: {
-        get: function () {
-          return GGRC.Mappings.getMappingTypes(
-            this.attr('object'),
-            [],
-            GGRC.Utils.Snapshots.inScopeModels);
-        }
-      },
       parentInstance: {
         get: function () {
           return CMS.Models
@@ -24,6 +16,13 @@
       }
     },
     type: 'Control', // We set default as Control
+    availableTypes: function () {
+      var types = GGRC.Mappings.getMappingTypes(
+        this.attr('object'),
+        [],
+        GGRC.Utils.Snapshots.inScopeModels);
+      return types;
+    },
     filter: '',
     statusFilter: '',
     object: '',
@@ -64,7 +63,7 @@
     },
     modelFromType: function (type) {
       var types = _.reduce(_.values(
-        this.attr('types')), function (memo, val) {
+        this.availableTypes()), function (memo, val) {
         if (val.items) {
           return memo.concat(val.items);
         }
