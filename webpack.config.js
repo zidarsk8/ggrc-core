@@ -34,7 +34,7 @@ module.exports = {
     publicPath: '/src/ggrc/static/'
   },
   module: {
-    loaders: [{
+    rules: [{
       test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
       loader: 'url?limit=10000&mimetype=application/font-woff'
     }, {
@@ -51,19 +51,31 @@ module.exports = {
       loader: 'url?limit=10000&mimetype=image/svg+xml'
     }, {
       test: /\.css$/,
-      loader: ExtractTextPlugin.extract('style-loader', 'css-loader')
+      loader: ExtractTextPlugin.extract(['style-loader', 'css-loader'])
     }, {
       test: /\.s[ca]ss$/,
-      loader: ExtractTextPlugin.extract('style-loader', 'css-loader!sass-loader')
+      use: ExtractTextPlugin.extract({
+        use: [{
+          loader: "css-loader"
+        }, {
+          loader: "sass-loader"
+        }],
+        fallback: "style-loader"
+      })
     }]
   },
   resolve: {
-    root: ['node_modules', 'bower_components'].map(function (dir) {
+    modules: ['node_modules', 'bower_components', 'third_party'].map(function (dir) {
       return path.join(__dirname, dir);
-    })
+    }),
+    alias: {
+      'can': 'canjs/amd/can/',
+      'ggrc': './src/ggrc/assets/javascripts'
+    }
   },
   plugins: [
-    new ExtractTextPlugin('[name].css', {
+    new ExtractTextPlugin({
+      filename: '[name].css',
       allChunks: true
     })
   ]
