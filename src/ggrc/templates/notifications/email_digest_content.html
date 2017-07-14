@@ -237,7 +237,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
-                        ({{ assessment_data['notif_created_at'] }})
+                        ({{ assessment_data['notif_created_at'].values()[0] }})
                     </li>
                   {% endfor %}
                   </ul>
@@ -251,7 +251,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
-                        ({{ assessment_data['notif_created_at'] }})
+                        ({{ assessment_data['notif_created_at'].values()[0] }})
                     </li>
                   {% endfor %}
                   </ul>
@@ -265,7 +265,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
-                        ({{ assessment_data['notif_created_at'] }})
+                        ({{ assessment_data['notif_created_at'].values()[0] }})
                     </li>
                   {% endfor %}
                   </ul>
@@ -279,7 +279,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
-                        ({{ assessment_data['notif_created_at'] }})
+                        ({{ assessment_data['notif_created_at'].values()[0] }})
                     </li>
                   {% endfor %}
                   </ul>
@@ -292,9 +292,8 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                     <li {{ style.list_item() }} >
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
-                        {{ assessment_data['title'] }}
-                      </a>
-                      ({{ assessment_data['notif_created_at'] }})
+                        {{ assessment_data['title'] }}</a>
+                        ({{ assessment_data['notif_created_at'].values()[0] }})
                     </li>
                   {% endfor %}
                   </ul>
@@ -308,7 +307,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                       Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
-                        ({{ assessment_data['notif_created_at'] }})
+                        ({{ assessment_data['notif_created_at'].values()[0] }})
                     </li>
                   {% endfor %}
                   </ul>
