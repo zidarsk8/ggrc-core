@@ -573,3 +573,44 @@ class TestSnapshots(base.Test):
     assert [expected_obj] == actual_objs, (
         messages.AssertionMessages.
         format_err_msg_equal(expected_obj, actual_objs))
+
+  @pytest.mark.parametrize(
+      "dynamic_object",
+      ["new_assessment_rest",
+       pytest.mark.xfail(strict=True)("new_issue_rest")],
+      indirect=["dynamic_object"])
+  @pytest.mark.smoke_tests
+  def test_snapshot_can_be_unmapped_from_assessment_or_issue(
+      self, create_audit_with_control_and_update_control, dynamic_object,
+      selenium
+  ):
+    """Check Snapshot can be unmapped from assessment using "Unmap" button on
+    info panel.
+    Test parameters:
+      "Checking assessment"
+      "Checking issue"
+    Steps:
+      - Create assessment
+      - Map snapshoted control with assessment
+      - Unmap snapshot from assessment
+      - Make sure that assessment has no any mapped snapshots
+    """
+    # pylint: disable=misplaced-comparison-constant
+    audit_with_one_control = create_audit_with_control_and_update_control
+    # due to 'actual_control.custom_attributes = {None: None}'
+    control = (
+        audit_with_one_control["new_control_rest"][0].
+        repr_ui().update_attrs(custom_attributes={None: None}))
+    audit = audit_with_one_control["new_audit_rest"][0]
+    existing_obj = dynamic_object[0]
+    existing_obj_service = get_ui_service(existing_obj.type)(selenium)
+    (existing_obj_service.map_objs_via_tree_view_item(
+        src_obj=audit, dest_objs=[control]))
+    controls_service = get_ui_service(control.type)(selenium)
+    controls_service.unmap_via_info_panel(existing_obj, control)
+    actual_controls_count = controls_service.get_count_objs_from_tab(
+        src_obj=existing_obj)
+    actual_controls = (controls_service.get_list_objs_from_tree_view(
+        src_obj=existing_obj))
+    assert 0 == actual_controls_count
+    assert [] == actual_controls
