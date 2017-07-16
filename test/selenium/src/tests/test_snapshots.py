@@ -570,4 +570,6 @@ class TestSnapshots(base.Test):
         src_obj=expected_obj, dest_objs=[snapshoted_control]))
     actual_objs = expected_obj_service.get_list_objs_from_tree_view(
         src_obj=origin_control)
-    assert [expected_obj] == actual_objs
+    assert [expected_obj] == actual_objs, (
+        messages.AssertionMessages.
+        format_err_msg_equal(expected_obj, actual_objs))
