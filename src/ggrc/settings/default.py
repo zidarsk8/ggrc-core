@@ -114,6 +114,9 @@ LOGGING_LOGGERS = {
     "werkzeug": "INFO",
     # WARNING - logs warnings and errors only
     # INFO    - logs HTTP-queries
+
+    # "ggrc.utils.benchmarks": "DEBUG"
+    # DEBUG - logs all benchmarks
 }
 
 
