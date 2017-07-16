@@ -899,7 +899,7 @@ class TreeView(object):
   # common
   _WIDGET_NOT_HIDDEN_CSS = " .widget:not(.hidden) "
   ITEMS = _WIDGET_NOT_HIDDEN_CSS + " .tree-item-element"
-  HEADER = Common.TREE_HEADER
+  HEADER = _WIDGET_NOT_HIDDEN_CSS + Common.TREE_HEADER
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
   ITEM_EXPAND_BUTTON = " tree-item-actions"
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
