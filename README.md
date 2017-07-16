@@ -104,6 +104,21 @@ If you're running the Google App Engine SDK, the App Engine management console
 will be available via this URL: <http://localhost:8000/>. You can log in as
 user@example.com with admin rights and setup other users later.
 
+### Accessing MySQL query logs
+
+If using the `docker-compose-clean.yml` file, the myqsl query logs are enabled
+by default and can be monitored with:
+
+```
+docker exec ggrccore_db_1 tail -f /tmp/mysql.log
+```
+
+Or slow queries, that take more than 0.5s, with:
+
+```
+docker exec ggrccore_db_1 tail -f /tmp/slow_query.log
+```
+
 ## Running Tests
 
 Tests are your friend! Keep them running, keep them updated.
