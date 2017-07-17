@@ -179,3 +179,17 @@ def convert_str_to_datetime(datetime_str):
       datetime_format = ("%Y-%m-%dT%H:%M:%S" if "T" in datetime_str
                          else "%Y-%m-%d %H:%M:%S")
   return datetime.strptime(datetime_str, datetime_format)
+
+
+def update_dicts_values(dic, old_values_list, new_value):
+  """Update values in all nested dicts to 'new_value' if value of dict item
+  contains in 'old_values_list'.
+  """
+  if not isinstance(old_values_list, list):
+    raise TypeError("Pass list of values to replace. Current type: {}".format(
+        type(old_values_list)))
+  for key, val in dic.iteritems():
+    if isinstance(val, dict):
+      update_dicts_values(val, old_values_list, new_value)
+    elif val in old_values_list:
+      dic[key] = new_value

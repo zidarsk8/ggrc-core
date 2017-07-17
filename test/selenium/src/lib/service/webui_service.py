@@ -41,15 +41,13 @@ class BaseWebUiService(object):
         entity_factory.create_empty() for _ in xrange(len(list_scopes))]
     list_scopes_with_upper_keys = [
         string_utils.dict_keys_to_upper_case(scope) for scope in list_scopes]
-    list_scopes_remapped = string_utils.exchange_dicts_items(
+    list_scopes_to_convert = string_utils.exchange_dicts_items(
         transform_dict=Entity.items_of_remap_keys(),
         dicts=list_scopes_with_upper_keys, is_keys_not_values=True)
-    # convert u'None', u'No person' to None type
-    list_scopes_to_convert = [
-        {k: (None if v in ["None", "No person"] else v)
-         for k, v in scope.iteritems()} for scope in list_scopes_remapped]
     # convert and represent values in scopes
     for scope in list_scopes_to_convert:
+      # convert u'None', u'No person' to None type
+      string_utils.update_dicts_values(scope, ["None", "No person"], None)
       for key, val in scope.iteritems():
         if val:
           if key in ["mandatory", "verified"]:
