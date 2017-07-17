@@ -4,7 +4,7 @@
 import unittest
 import mock
 
-from ggrc.converters import query_helper
+from ggrc.query import builder
 
 
 class TestQueryHelper(unittest.TestCase):
@@ -21,7 +21,7 @@ class TestQueryHelper(unittest.TestCase):
     # pylint: disable=protected-access
     # needed for testing protected function inside the query helper
     query = mock.MagicMock()
-    helper = query_helper.QueryHelper(query)
+    helper = builder.QueryHelper(query)
 
     expressions = [
         (set(), {}),

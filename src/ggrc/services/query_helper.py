@@ -4,7 +4,7 @@
 """This module contains special query helper class for query API."""
 
 from ggrc.builder import json
-from ggrc.converters.query_helper import QueryHelper
+from ggrc.query.builder import QueryHelper
 from ggrc.models import inflector
 from ggrc.utils import benchmark
 
