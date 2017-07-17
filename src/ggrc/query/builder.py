@@ -1,7 +1,10 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""This module contains a class for handling request queries."""
+"""Default query builder for /query API.
+
+This class is used to build SqlAlchemy queries and fetch the result ids.
+"""
 
 # flake8: noqa
 import collections
@@ -431,7 +434,7 @@ class QueryHelper(object):
           attr = getattr(model, key.encode('utf-8'), None)
           if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
               isinstance(attr.property,
-                             sa.orm.properties.RelationshipProperty)):
+                         sa.orm.properties.RelationshipProperty)):
             joins, order = by_foreign_key()
           else:
             # a simple attribute
