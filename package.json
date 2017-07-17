@@ -9,7 +9,12 @@
   "dependencies": {
     "bower": "^1.6.8",
     "doctoc": "^0.11.0",
-    "font-awesome": "~4.5.0"
+    "font-awesome": "~4.5.0",
+    "jquery": "^2.2.4",
+    "jquery-ui": "^1.12.1",
+    "lodash": "^3.10.1",
+    "moment": "^2.17.1",
+    "moment-timezone": "^0.5.10"
   },
   "devDependencies": {
     "compass-mixins": "~0.12.7",
@@ -24,8 +29,8 @@
     "karma": "^0.13.15",
     "karma-cli": "^0.1.1",
     "karma-jasmine": "^0.3.6",
-    "karma-phantomjs-launcher": "^1.0.2",
     "karma-junit-reporter": "^0.3.8",
+    "karma-phantomjs-launcher": "^1.0.2",
     "lodash": "~4.0.0",
     "mkdirp": "^0.5.1",
     "node-sass": "^4.5.3",
@@ -33,6 +38,7 @@
     "pegjs": "^0.9.0",
     "sass-loader": "^6.0.6",
     "style-loader": "~0.13.0",
+    "uglifyjs-webpack-plugin": "^0.4.6",
     "url-loader": "~0.5.7",
     "webpack": "^2.7.0"
   },

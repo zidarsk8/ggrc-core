@@ -1,12 +1,14 @@
 /*
-    Copyright (C) 2017 Google Inc.
-    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-    */
+ Copyright (C) 2017 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var _ = require('lodash');
-var path = require('path');
-var GGRC = {
+const webpack = require('webpack');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const _ = require('lodash');
+const path = require('path');
+const GGRC = {
   get_dashboard_modules: function () {
     return _.compact(_.map(process.env.GGRC_SETTINGS_MODULE.split(' '), function (module) {
       var name;
@@ -78,6 +80,16 @@ module.exports = {
     new ExtractTextPlugin({
       filename: '[name].css',
       allChunks: true
-    })
-  ]
+    }),
+    new webpack.ProvidePlugin({
+      $: 'jquery',
+      jQuery: 'jquery',
+      _: 'lodash'
+    }),
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new UglifyJSPlugin()
+  ],
+  stats: {
+    errorDetails: true
+  }
 };
