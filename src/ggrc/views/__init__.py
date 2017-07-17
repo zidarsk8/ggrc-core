@@ -207,14 +207,18 @@ def get_access_control_roles_json():
 def get_attributes_json():
   """Get a list of all custom attribute definitions"""
   with benchmark("Get attributes JSON"):
-    attrs = models.CustomAttributeDefinition.eager_query().filter(
-        models.CustomAttributeDefinition.definition_id.is_(None)
-    )
-    published = []
-    for attr in attrs:
-      published.append(publish(attr))
-    published = publish_representation(published)
-    return as_json(published)
+    with benchmark("Get attributes JSON: query"):
+      attrs = models.CustomAttributeDefinition.eager_query().filter(
+          models.CustomAttributeDefinition.definition_id.is_(None)
+      ).all()
+    with benchmark("Get attributes JSON: publish"):
+      published = []
+      for attr in attrs:
+        published.append(publish(attr))
+      published = publish_representation(published)
+    with benchmark("Get attributes JSON: json"):
+      publish_json = as_json(published)
+      return publish_json
 
 
 def get_import_types(export_only=False):
