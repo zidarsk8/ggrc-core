@@ -11,7 +11,7 @@ from flask import current_app
 from werkzeug.exceptions import BadRequest
 
 from ggrc.converters.exceptions import BadQueryException
-from ggrc.services.query_helper import QueryAPIQueryHelper
+from ggrc.query.default_handler import DefaultHandler
 from ggrc.login import login_required
 from ggrc.models.inflector import get_model
 from ggrc.services.common import etag
@@ -49,8 +49,8 @@ def get_objects_by_query():
   """Return objects corresponding to a POST'ed query list."""
   query = request.json
 
-  query_helper = QueryAPIQueryHelper(query)
-  results = query_helper.get_results()
+  query_handler = DefaultHandler(query)
+  results = query_handler.get_results()
 
   last_modified_list = [result["last_modified"] for result in results
                         if result["last_modified"]]

@@ -11,7 +11,7 @@ from ggrc.utils import benchmark
 
 # pylint: disable=too-few-public-methods
 
-class QueryAPIQueryHelper(QueryHelper):
+class DefaultHandler(QueryHelper):
   """Helper class for handling request queries for query API.
 
   query object = [
