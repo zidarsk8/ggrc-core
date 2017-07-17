@@ -33,6 +33,7 @@ class QueryAPIQueryHelper(QueryHelper):
       count: the number of objects filtered, after "limit" is applied
       total: the number of objects filtered, before "limit" is applied
   """
+
   def get_results(self):
     """Filter the objects and get their information.
 
