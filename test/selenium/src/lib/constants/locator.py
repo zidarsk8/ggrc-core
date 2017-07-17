@@ -909,6 +909,12 @@ class TreeView(object):
       (_WIDGET_NOT_HIDDEN_CSS, ITEM_EXPAND_BUTTON)))
 
 
+class TreeViewItem(object):
+  """Locators for Tree View Item element"""
+  CELL = (By.CSS_SELECTOR,
+          "div[class*='attr']:not(.attr-content):not(.selectable-attrs)")
+
+
 class AdminTreeView(object):
   """Locators for Tree View components in Admin dashboard."""
   # common

@@ -521,8 +521,7 @@ class TreeView(Component):
 
   def __init__(self, driver, obj_name=None):
     super(TreeView, self).__init__(driver)
-    self._tree_view_header_elements = []
-    self._tree_view_items_elements = []
+    self._tree_view_headers = []
     self._tree_view_items = []
     self.locator_set_visible_fields = None
     self.locator_no_results_message = self._locators.NO_RESULTS_MESSAGE
@@ -541,14 +540,14 @@ class TreeView(Component):
     selenium_utils.get_when_invisible(self._driver, self._locators.SPINNER)
     selenium_utils.wait_for_js_to_load(self._driver)
 
-  def get_tree_view_header_elements(self):
-    """Get Tree View header as list of elements from current widget."""
+  def _init_tree_view_headers(self):
+    """Init Tree View headers as list of elements from current widget."""
     _locator_header = (By.CSS_SELECTOR, self._locators.HEADER)
-    self._tree_view_header_elements = selenium_utils.get_when_all_visible(
+    self._tree_view_headers = selenium_utils.get_when_all_visible(
         self._driver, _locator_header)
 
-  def get_tree_view_items_elements(self):
-    """Get Tree View items as list of elements from current widget.
+  def _init_tree_view_items(self):
+    """Init Tree View items as list of TreeViewItem from current widget.
     If no items in tree view return empty list.
     """
     _locator_items = (
@@ -556,41 +555,26 @@ class TreeView(Component):
     self.wait_loading_after_actions()
     has_no_record_found = selenium_utils.is_element_exist(
         self._driver, self.locator_no_results_message)
-    self._tree_view_items_elements = (
-        [] if has_no_record_found else
-        selenium_utils.get_when_all_visible(self._driver, _locator_items))
-    return self._tree_view_items_elements
+    self._tree_view_items = (
+        [] if has_no_record_found else [
+            TreeViewItem(
+                driver=self._driver, loc_or_el=el,
+                item_btn_locator=(
+                    By.CSS_SELECTOR, self._locators.ITEM_EXPAND_BUTTON))
+            for el in selenium_utils.get_when_all_visible(
+                self._driver, _locator_items)])
+    return self._tree_view_items
 
-  def set_tree_view_items(self):
-    """Set Tree View items as list of Tree View item objects from current
-    widget.
-    """
-    self.get_tree_view_items_elements()
-    self._tree_view_items = [
-        TreeViewItem(
-            driver=self._driver, text=el.text,
-            item_btn=el.find_element(
-                By.CSS_SELECTOR, self._locators.ITEM_EXPAND_BUTTON)) for el in
-        self._tree_view_items_elements]
-
-  def tree_view_header_elements(self):
+  def tree_view_headers(self):
     """Return Tree View header as list of elements from current widget."""
-    if not self._tree_view_header_elements:
-      self.get_tree_view_header_elements()
-    return self._tree_view_header_elements
-
-  def tree_view_items_elements(self):
-    """Return Tree View items as list of elements from current widget."""
-    if not self._tree_view_items_elements:
-      self.get_tree_view_items_elements()
-    return self._tree_view_items_elements
+    if not self._tree_view_headers:
+      self._init_tree_view_headers()
+    return self._tree_view_headers
 
   def tree_view_items(self):
-    """Return Tree View items as list of Tree View item objects from
-    current widget.
-    """
+    """Return Tree View items as list of TreeViewItem from current widget."""
     if not self._tree_view_items:
-      self.set_tree_view_items()
+      self._init_tree_view_items()
     return self._tree_view_items
 
   def open_set_visible_fields(self):
@@ -606,15 +590,15 @@ class TreeView(Component):
     """Get list of scopes (dicts) from members (text scopes) which displayed on
     Tree View according to current set of visible fields.
     """
-    list_scopes = self._tree_view_items_elements
-    if self.get_tree_view_items_elements():
+    list_scopes = self._tree_view_items
+    if self._init_tree_view_items():
       list_headers = [_item.text.splitlines()[:len(self.fields_to_set)] for
-                      _item in self.tree_view_header_elements()]
+                      _item in self.tree_view_headers()]
       # u'Ex' to u'Ex', u'Ex1, Ex2' to [u'Ex1', u'Ex2']
       list_lists_items = [
           [_.split(", ") if len(_.split(", ")) >= 2 else _ for
-           _ in _item.text.splitlines()[:len(self.fields_to_set)]] for
-          _item in self.tree_view_items_elements()]
+           _ in _item.cell_values[:len(self.fields_to_set)]] for
+          _item in self.tree_view_items()]
       list_scopes = [
           dict(zip(list_headers[0], item)) for item in list_lists_items]
     return list_scopes
@@ -698,12 +682,16 @@ class MapperSetVisibleFieldsModal(SetVisibleFieldsModal):
   _locators = constants.locator.ModalSetVisibleFieldsMapper
 
 
-class TreeViewItem(Component):
+class TreeViewItem(Element):
   """Class for describing single item on Tree View."""
-  def __init__(self, driver, text=None, item_btn=None):
-    super(TreeViewItem, self).__init__(driver)
-    self.text = text
-    self.item_btn = item_btn
+  _locators = constants.locator.TreeViewItem
+
+  def __init__(self, driver, loc_or_el, item_btn_locator=None):
+    super(TreeViewItem, self).__init__(driver, loc_or_el)
+    self.item_btn = (
+        None if item_btn_locator is None else
+        selenium_utils.get_element_by_element_safe(
+            self.element, item_btn_locator))
 
   def expand(self):
     """Expand Tree View item if it is not expanded already."""
@@ -722,6 +710,13 @@ class TreeViewItem(Component):
   @property
   def is_expanded(self):
     return selenium_utils.is_value_in_attr(self.item_btn)
+
+  @property
+  def cell_values(self):
+    """Return list of text from each cell"""
+    return [cell.text for
+            cell in selenium_utils.get_when_all_visible(
+                self.element, self._locators.CELL)]
 
 
 class ListCheckboxes(Component):

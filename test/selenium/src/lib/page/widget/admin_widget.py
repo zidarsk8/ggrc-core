@@ -46,8 +46,9 @@ class Roles(Widget):
         self._driver, widget_name=url.Widget.ROLES)
 
   def get_role_scopes_text_as_dict(self):
-    """Get dictionary of labels that displayed in Tree View on Event widget."""
-    tree_view_items = self.roles_tree_view.tree_view_items_elements()
+    """Get dictionary of labels that displayed in Tree View on Roles widget.
+    """
+    tree_view_items = self.roles_tree_view.tree_view_items()
     return dict([item.text.splitlines() for item in tree_view_items])
 
 

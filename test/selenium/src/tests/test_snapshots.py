@@ -539,3 +539,37 @@ class TestSnapshots(base.Test):
     assert [expected_control] == actual_controls, (
         messages.AssertionMessages.
         format_err_msg_equal([expected_control], actual_controls))
+
+  @pytest.mark.smoke_tests
+  @pytest.mark.parametrize(
+      "dynamic_object",
+      ["new_assessment_rest",
+       pytest.mark.xfail(reason="Issue GGRC-1407", strict=True)
+          ("new_issue_rest")],
+      indirect=["dynamic_object"])
+  def test_asmt_and_issue_mapped_to_origin_control(
+      self, create_audit_with_control_and_update_control,
+      dynamic_object, selenium
+  ):
+    """
+    Check Assessment or Issue was mapped to origin control after mapping
+    snapshot of control to Assessment or Issue.
+    Test parameters:
+      - check Assessment
+      - check Issue
+    """
+    origin_control = create_audit_with_control_and_update_control[
+        "update_control_rest"][0]
+    snapshoted_control = create_audit_with_control_and_update_control[
+        "new_control_rest"][0]
+    # due to 'actual_control.custom_attributes = {None: None}'
+    expected_obj = (dynamic_object[0].repr_ui().update_attrs(
+        custom_attributes={None: None}))
+    expected_obj_service = get_ui_service(expected_obj.type)(selenium)
+    (webui_service.ControlsService(selenium).map_objs_via_tree_view(
+        src_obj=expected_obj, dest_objs=[snapshoted_control]))
+    actual_objs = expected_obj_service.get_list_objs_from_tree_view(
+        src_obj=origin_control)
+    assert [expected_obj] == actual_objs, (
+        messages.AssertionMessages.
+        format_err_msg_equal(expected_obj, actual_objs))
