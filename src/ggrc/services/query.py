@@ -27,15 +27,6 @@ def build_collection_representation(model, description):
   return collection
 
 
-def get_last_modified(model, objects):
-  """Get last object update time for Last-Modified header."""
-  if hasattr(model, 'updated_at') and objects:
-    last_modified = max(obj.updated_at for obj in objects)
-  else:
-    last_modified = None
-  return last_modified
-
-
 def json_success_response(response_object, last_modified=None, status=200):
   """Build a 200-response with metadata headers."""
   headers = [
