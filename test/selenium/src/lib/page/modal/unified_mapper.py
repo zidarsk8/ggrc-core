@@ -22,8 +22,7 @@ class CommonUnifiedMapperModal(base.Modal):
     self.filter_via_expression_text_box = base.TextInputField(
         driver, self._locators.FILTER_VIA_EXPRESSION_TEXT_BOX)
     self.filter_by_state_text_box = base.DropdownStatic(
-        driver, self._locators.FILTER_BY_STATE_DROPDOWN,
-        self._locators.FILTER_BY_STATE_DROPDOWN_OPTIONS)
+        driver, self._locators.FILTER_BY_STATE_DROPDOWN)
     self.tree_view = base.UnifiedMapperTreeView(driver, obj_name=obj_name)
 
   def _select_dest_obj_type(self, obj_name, is_asmts_generation=False):
@@ -32,13 +31,11 @@ class CommonUnifiedMapperModal(base.Modal):
     """
     if obj_name:
       obj_type_dropdown = base.DropdownStatic(
-          self._driver, self._locators.OBJ_TYPE_DROPDOWN,
-          self._locators.OBJ_TYPE_DROPDOWN_OPTIONS)
+          self._driver, self._locators.OBJ_TYPE_DROPDOWN)
       obj_type_dropdown.select(obj_name)
       if is_asmts_generation:
         asmt_tmpl_dropdown = base.TextFilterDropdown(
-            self._driver, self._locators.OBJ_TYPE_DROPDOWN,
-            self._locators.OBJ_TYPE_DROPDOWN_OPTIONS)
+            self._driver, self._locators.OBJ_TYPE_DROPDOWN)
         asmt_tmpl_dropdown.find_and_select_el_by_text(obj_name)
 
   def _filter_dest_objs_via_expression_by_titles(self, objs_titles):

@@ -13,6 +13,7 @@ from selenium.webdriver.remote import webelement
 from lib import constants, exception, mixin
 from lib.constants import url
 from lib.constants.element import MappingStatusAttrs
+from lib.constants.locator import CommonDropdownMenu
 from lib.constants.test import batch
 from lib.utils import selenium_utils
 
@@ -126,9 +127,10 @@ class TextFilterDropdown(Element):
  dropdown list of found results and static dropdown list of text elements.
  """
 
-  def __init__(self, driver, textbox_locator, dropdown_locator):
+  def __init__(self, driver, textbox_locator):
     super(TextFilterDropdown, self).__init__(driver, textbox_locator)
-    self._locator_dropdown = dropdown_locator
+    self._locator_dropdown = (
+        CommonDropdownMenu.get_options_locator(textbox_locator))
     self._elements_dropdown = None
     self.text_to_filter = None
 
@@ -293,12 +295,13 @@ class Dropdown(Element):
 class DropdownStatic(Element):
   """Dropdown with predefined static elements."""
 
-  def __init__(self, driver, dropdown_locator, elements_locator):
+  def __init__(self, driver, dropdown_locator):
     """
     Args: driver (CustomDriver)
     """
     super(DropdownStatic, self).__init__(driver, dropdown_locator)
-    self._locator_dropdown_elements = elements_locator
+    self._locator_dropdown_elements = (
+        CommonDropdownMenu.get_options_locator(dropdown_locator))
     self.elements_dropdown = self._driver.find_elements(
         *self._locator_dropdown_elements)
 
