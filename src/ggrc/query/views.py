@@ -78,7 +78,7 @@ def get_objects_by_query():
   return json_success_response(collections, last_modified)
 
 
-def init_query_view(app):
+def init_query_views(app):
   # pylint: disable=unused-variable
   @app.route('/query', methods=['POST'])
   @login_required
