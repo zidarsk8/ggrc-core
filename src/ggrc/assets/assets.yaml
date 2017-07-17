@@ -332,6 +332,12 @@ dashboard-js-files:
   - components/related-objects/related-people-access-control-group.js
   - components/custom-roles/custom-roles.js
   - components/custom-roles/custom-roles-modal.js
+  - components/inline/inline.js
+  - components/inline/readonly-inline-content.js
+  - components/inline/inline-form-control.js
+  - components/inline/inline-form-control-item.js
+  - components/assessment/info-pane/inline-item.js
+  - components/assessment/info-pane/inline-confirm-action.js
 
 app-init-files:
   - apps/dashboard.js
@@ -694,6 +700,16 @@ dashboard-js-template-files:
   - components/people/editable-people-group.mustache
   - components/custom-roles/custom-roles.mustache
   - components/custom-roles/custom-roles-modal.mustache
+  - components/inline/inline.mustache
+  - components/inline/input.mustache
+  - components/inline/text.mustache
+  - components/inline/readonly-inline-content.mustache
+  - components/inline/dropdown.mustache
+  - components/inline/date.mustache
+  - components/inline/checkbox.mustache
+  - components/inline/person.mustache
+  - components/inline/simple-readonly-text.mustache
+  - components/assessment/info-pane/inline-item.mustache
 
 dashboard-css-files:
   - dashboard.css
