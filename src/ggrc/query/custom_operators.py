@@ -14,7 +14,7 @@ from sqlalchemy.orm import load_only
 from ggrc import db
 from ggrc import models
 from ggrc.converters import autocast
-from ggrc.converters.exceptions import BadQueryException
+from ggrc.query.exceptions import BadQueryException
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.login import is_creator
 from ggrc.models import inflector

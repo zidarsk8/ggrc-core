@@ -10,7 +10,7 @@ from flask import request
 from flask import current_app
 from werkzeug.exceptions import BadRequest
 
-from ggrc.converters.exceptions import BadQueryException
+from ggrc.query.exceptions import BadQueryException
 from ggrc.query.default_handler import DefaultHandler
 from ggrc.login import login_required
 from ggrc.models.inflector import get_model

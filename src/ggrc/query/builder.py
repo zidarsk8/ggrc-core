@@ -20,7 +20,7 @@ from ggrc.models import inflector
 from ggrc.rbac import context_query_filter
 from ggrc.utils import query_helpers, benchmark
 from ggrc.query import custom_operators
-from ggrc.converters.exceptions import BadQueryException
+from ggrc.query.exceptions import BadQueryException
 
 
 # pylint: disable=too-few-public-methods

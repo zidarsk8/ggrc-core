@@ -19,7 +19,7 @@ from ggrc.app import app
 from ggrc.converters.base import Converter
 from ggrc.converters.import_helper import generate_csv_string
 from ggrc.converters.import_helper import read_csv_file
-from ggrc.converters.exceptions import BadQueryException
+from ggrc.query.exceptions import BadQueryException
 from ggrc.query.builder import QueryHelper
 from ggrc.login import login_required
 from ggrc.utils import benchmark
