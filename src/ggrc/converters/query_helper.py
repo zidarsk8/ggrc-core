@@ -16,7 +16,7 @@ from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models import inflector
 from ggrc.rbac import context_query_filter
 from ggrc.utils import query_helpers, benchmark
-from ggrc.converters import custom_operators
+from ggrc.query import custom_operators
 from ggrc.converters.exceptions import BadQueryException
 
 
