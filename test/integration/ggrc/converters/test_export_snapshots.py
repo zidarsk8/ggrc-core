@@ -100,7 +100,7 @@ class TestExportSnapshots(TestCase):
             "Review State": control.os_state,
             "Significance": u"key" if control.key_control else u"non-key",
             "State": control.status,
-            "Stop Date": control.end_date.strftime("%m/%d/%Y"),
+            "Last Deprecated Date": control.end_date.strftime("%m/%d/%Y"),
             "Test Plan": control.test_plan,
             "Title": control.title,
             "Type/Means": control.means.display_name,
@@ -113,10 +113,8 @@ class TestExportSnapshots(TestCase):
             # Special snapshot export fields
             "Audit": audit.slug,
             "Evidence": u"\n".join(c.slug for c in control.document_evidence),
-
-            # Fields that are not included in snapshots - Known bugs.
-            "Assertions": u"",  # "\n".join(c.name for c in control.assertions)
-            "Categories": u"",  # "\n".join(c.name for c in control.categories)
+            "Assertions": u"\n".join(c.name for c in control.assertions),
+            "Categories": u"\n".join(c.name for c in control.categories),
         }
         for snapshot, control in zip(snapshots, controls)
     }
@@ -207,7 +205,7 @@ class TestExportSnapshots(TestCase):
             "Review State": u"Unreviewed",
             "Significance": u"",
             "State": u"Draft",
-            "Stop Date": u"",
+            "Last Deprecated Date": u"",
             "Test Plan": u"",
             "Title": control.title,
             "Type/Means": u"",

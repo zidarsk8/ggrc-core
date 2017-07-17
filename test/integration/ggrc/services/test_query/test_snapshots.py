@@ -787,3 +787,36 @@ class TestSnapshotIndexing(BaseQueryAPITestCase):
                   [i["id"] for i in control_user1_result["values"]])
     self.assertNotIn(snaps_dict[control2_id],
                      [i["id"] for i in control_user1_result["values"]])
+
+  def test_categories_filter(self):
+    """Control Snapshots are filtered by categories."""
+    with factories.single_commit():
+      program = factories.ProgramFactory()
+      program_id = program.id
+
+      category = factories.ControlCategoryFactory(scope_id=100)
+      category_id = category.id
+      control = factories.ControlFactory()
+      control.categories.append(category)
+      control_id = control.id
+      factories.RelationshipFactory(source=program, destination=control)
+      revision = all_models.Revision.query.filter(
+          all_models.Revision.resource_type == "Control",
+          all_models.Revision.resource_id == control_id
+      ).order_by(all_models.Revision.updated_at.desc()).first()
+      revision.content = control.log_json()
+
+    program = models.Program.query.filter_by(id=program_id).one()
+    self._create_audit(program=program, title="some title")
+    category = models.ControlCategory.query.get(category_id)
+    control_result = self._get_first_result_set(
+        self._make_snapshot_query_dict(
+            "Control",
+            expression=["categories", "=", "{}".format(category.name)]
+        ),
+        "Snapshot",
+    )
+    self.assertEqual(control_result["count"], 1)
+    snapshot_categories = \
+        control_result["values"][0]["revision"]["content"]["categories"]
+    self.assertEqual(category.name, snapshot_categories[0]["display_name"])

@@ -93,9 +93,34 @@
         return instance.type === 'Control';
       },
       getRevisions: function (currentRevisionID, newRevisionID) {
-        return CMS.Models.Revision.findAll({
-          id__in: currentRevisionID + ',' + newRevisionID,
-          __sort: 'id'
+        var Revision = CMS.Models.Revision;
+        var notCached = [];
+        var cached = [currentRevisionID, newRevisionID].map(function (id) {
+          var cache = Revision.store ? Revision.store[id] : undefined;
+          if (!cache) {
+            notCached.push(id);
+          }
+          return cache;
+        }).filter(function (revision) {
+          return !!revision;
+        });
+        var result;
+
+        if (cached.length === 2) {
+          result = can.when(cached);
+        } else if (cached.length === 1) {
+          result = can.when(cached[0], Revision.findOne({id: notCached[0]}))
+            .then(function () {
+              return can.makeArray(arguments);
+            });
+        } else {
+          result = Revision.findAll({
+            id__in: notCached.join(',')
+          });
+        }
+
+        return result.then(function (revisions) {
+          return new can.List(_.sortBy(revisions, 'id'));
         });
       },
       prepareInstances: function (data) {

@@ -32,6 +32,11 @@ class Categorization(Base, db.Model):
         else None
     return setattr(self, self.category_attr, value)
 
+  @property
+  def category_name(self):
+    from ggrc.models.category import CategoryBase
+    return CategoryBase.query.get(self.category_id).name
+
   _publish_attrs = [
       # 'categorizable',
       'category',
@@ -44,6 +49,11 @@ class Categorization(Base, db.Model):
     query = super(Categorization, cls).eager_query()
     return query.options(
         orm.subqueryload('category'))
+
+  def log_json(self):
+    out_json = super(Categorization, self).log_json()
+    out_json["display_name"] = self.category_name
+    return out_json
 
 
 class Categorizable(object):
@@ -61,6 +71,7 @@ class Categorizable(object):
         )
   """
 
+  # pylint: disable=unused-argument
   @classmethod
   def declare_categorizable(cls, category_type, single, plural, ation):
     setattr(
@@ -93,12 +104,3 @@ class Categorizable(object):
         backref=backref,
         cascade='all, delete-orphan',
     )
-
-  @classmethod
-  def _filter_by_category(cls, category_type, predicate):
-    from ggrc.models.category import CategoryBase
-    return Categorization.query.join(CategoryBase).filter(
-        (Categorization.categorizable_type == cls.__name__) &
-        (Categorization.categorizable_id == cls.id) &
-        predicate(CategoryBase.name)
-    ).exists()

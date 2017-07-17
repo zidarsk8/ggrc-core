@@ -6,7 +6,8 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from sqlalchemy.orm import validates
 from ggrc.models.deferred import deferred
-from ggrc.models.mixins import BusinessObject, Timeboxed, CustomAttributable
+from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
+                                CustomAttributable)
 from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.option import Option
@@ -16,8 +17,8 @@ from ggrc.models.track_object_state import HasObjectState
 
 
 class Product(Roleable, HasObjectState, CustomAttributable, Personable,
-              Relatable, Timeboxed, Ownable, BusinessObject, Indexed,
-              db.Model):
+              Relatable, LastDeprecatedTimeboxed, Ownable, BusinessObject,
+              Indexed, db.Model):
   __tablename__ = 'products'
 
   kind_id = deferred(db.Column(db.Integer), 'Product')

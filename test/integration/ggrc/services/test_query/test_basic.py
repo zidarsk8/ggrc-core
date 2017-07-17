@@ -13,12 +13,15 @@ from datetime import datetime
 from operator import itemgetter
 from flask import json
 
+import ddt
+
 from ggrc import app
 from ggrc import db
 from ggrc import models
-from ggrc.models import CustomAttributeDefinition as CAD
+from ggrc.models import CustomAttributeDefinition as CAD, all_models
+from ggrc.snapshotter.rules import Types
 
-from integration.ggrc import TestCase
+from integration.ggrc import TestCase, generator
 from integration.ggrc.models import factories
 
 
@@ -36,6 +39,7 @@ class BaseQueryAPITestCase(TestCase):
     # we don't call super as TestCase.setUp clears the DB
     # super(BaseQueryAPITestCase, self).setUp()
     self.client.get("/login")
+    self.generator = generator.ObjectGenerator()
 
   def _post(self, data):
     """Make a POST to /query endpoint."""
@@ -94,6 +98,7 @@ class BaseQueryAPITestCase(TestCase):
 
 
 # pylint: disable=too-many-public-methods
+@ddt.ddt
 class TestAdvancedQueryAPI(BaseQueryAPITestCase):
   """Basic tests for /query api."""
 
@@ -679,6 +684,73 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
                                 key=lambda ctrl: ctrl["fraud_related"])
     self.assertListEqual(controls_ordered_1, controls_ordered_2)
 
+  def test_filter_control_by_assertions(self):
+    """Test correct filtering by assertions field"""
+    controls = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              expression=["assertions", "=", "privacy"]),
+        "Control",
+    )
+    self.assertEqual(controls["count"], 3)
+
+  def test_order_control_by_assertions(self):
+    """Test correct ordering and by assertions"""
+    controls_unordered = self._get_first_result_set(
+        self._make_query_dict("Control",),
+        "Control", "values"
+    )
+
+    controls_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "assertions"},
+                                        {"name": "id"}]),
+        "Control", "values"
+    )
+    categories = {c.id: c.name for c in models.CategoryBase.query}
+
+    def sort_key(val):
+      ctrl_assertions = val.get("assertions")
+      if isinstance(ctrl_assertions, list) and ctrl_assertions:
+        return (categories.get(ctrl_assertions[0]["id"]), val["id"])
+      return (None, val["id"])
+
+    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
+    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+
+  def test_filter_control_by_categories(self):
+    """Test correct filtering by categories field"""
+    controls = self._get_first_result_set(
+        self._make_query_dict(
+            "Control",
+            expression=["categories", "=", "Physical Security"]),
+        "Control",
+    )
+    self.assertEqual(controls["count"], 3)
+
+  def test_order_control_by_categories(self):
+    """Test correct ordering and by categories"""
+    controls_unordered = self._get_first_result_set(
+        self._make_query_dict("Control",),
+        "Control", "values"
+    )
+
+    controls_ordered_1 = self._get_first_result_set(
+        self._make_query_dict("Control",
+                              order_by=[{"name": "categories"},
+                                        {"name": "id"}]),
+        "Control", "values"
+    )
+    categories = {c.id: c.name for c in models.CategoryBase.query}
+
+    def sort_key(val):
+      ctrl_categories = val.get("categories")
+      if isinstance(ctrl_categories, list) and ctrl_categories:
+        return (categories.get(ctrl_categories[0]["id"]), val["id"])
+      return (None, val["id"])
+
+    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
+    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
     programs_values = self._get_first_result_set(
@@ -766,6 +838,94 @@ class TestAdvancedQueryAPI(BaseQueryAPITestCase):
                      set([program["title"] for program
                           in programs["values"]]))
 
+  @ddt.data(
+      (all_models.Control, [all_models.Objective, all_models.Control,
+                            all_models.Market, all_models.Objective]),
+      (all_models.Assessment, [all_models.Control, all_models.Control,
+                               all_models.Market, all_models.Objective]),
+      (all_models.Assessment, [all_models.Issue, all_models.Issue,
+                               all_models.Issue, all_models.Issue]),
+      (all_models.Issue, [all_models.Assessment, all_models.Control,
+                          all_models.Market, all_models.Objective]),
+  )
+  @ddt.unpack
+  def test_search_relevant_to_type(self, base_type, relevant_types):
+    """Test filter with 'relevant to' conditions."""
+    is_scoped = base_type.__name__ in Types.scoped
+    audit_data = {}
+    if is_scoped:
+      audit = factories.AuditFactory()
+      audit_data = {"audit": {"id": audit.id}}
+
+    _, base_obj = self.generator.generate_object(base_type, audit_data)
+    relevant_objects = [
+        self.generator.generate_object(type_, audit_data)[1]
+        for type_ in relevant_types
+    ]
+
+    with factories.single_commit():
+      query_data = []
+      for relevant_obj in relevant_objects:
+        related_obj = relevant_obj
+
+        # Snapshotable objects are related through the Snapshot
+        if is_scoped and relevant_obj.type in Types.all:
+          related_obj = factories.SnapshotFactory(
+              parent=audit,
+              child_id=relevant_obj.id,
+              child_type=relevant_obj.type,
+              revision_id=models.Revision.query.filter_by(
+                  resource_type=relevant_obj.type
+              ).first().id,
+          )
+        factories.RelationshipFactory(source=base_obj, destination=related_obj)
+
+        query_data.append(self._make_query_dict(
+            relevant_obj.type,
+            expression=["id", "=", relevant_obj.id],
+            type_="ids",
+        ))
+
+    filter_relevant = {
+        "filters": {
+            "expression": {
+                "left": {
+                    "left": {
+                        "ids": "0",
+                        "object_name": "__previous__",
+                        "op": {"name": "relevant"}
+                    },
+                    "op": {"name": "AND"},
+                    "right": {
+                        "ids": "1",
+                        "object_name": "__previous__",
+                        "op": {"name": "relevant"}
+                    }
+                },
+                "op": {"name": "AND"},
+                "right": {
+                    "left": {
+                        "ids": "2",
+                        "object_name": "__previous__",
+                        "op": {"name": "relevant"}
+                    },
+                    "op": {"name": "AND"},
+                    "right": {
+                        "ids": "3",
+                        "object_name": "__previous__",
+                        "op": {"name": "relevant"}
+                    }
+                }
+            }
+        },
+        "object_name": base_type.__name__
+    }
+    query_data.append(filter_relevant)
+    response = json.loads(self._post(query_data).data)
+    # Last batch contain result for query with "related" condition
+    result_count = response[-1][base_type.__name__]["count"]
+    self.assertEqual(result_count, 1)
+
 
 class TestQueryAssessmentCA(BaseQueryAPITestCase):
   """Test filtering assessments by CAs"""
@@ -779,9 +939,9 @@ class TestQueryAssessmentCA(BaseQueryAPITestCase):
     self.client.get("/login")
 
   def _generate_special_assessments(self):
+    """Generate two Assessments for two local CADs with same name."""
     assessment_with_date = None
     assessment_with_text = None
-    """Generate two Assessments for two local CADs with same name."""
     audit = factories.AuditFactory(
         slug="audit"
     )

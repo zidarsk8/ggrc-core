@@ -57,10 +57,12 @@ class CommonInfo(base.Widget):
       if not custom_scopes_locator and self.locator_headers_and_values:
         self.all_headers_and_values = self._driver.find_elements(
             *self.locator_headers_and_values)
-    header_and_value = next((scope.text.splitlines()[:2]
-                             for scope in self.all_headers_and_values
-                             if header_text in scope.text),
-                            [None, None])
+    header_and_value = (
+        next((scope.text.splitlines() + [None]
+              if len(scope.text.splitlines()) == 1
+              else scope.text.splitlines()[:2]
+              for scope in self.all_headers_and_values
+              if header_text in scope.text), [None, None]))
     return header_and_value
 
   def get_headers_and_values_dict_from_cas_scopes(self):  # noqa: ignore=C901
@@ -237,7 +239,8 @@ class Audits(InfoPanel):
     # all obj scopes
     self.list_all_headers_text = [
         self._elements.CAS.upper(), self.title().text,
-        self._elements.STATUS.upper(), self.audit_lead_text, self.code_text]
+        self._elements.STATUS.upper(), self.audit_lead_text,
+        self.code_text]
     self.list_all_values_text = [
         self.cas_text, self.title_entered().text,
         objects.get_normal_form(self.state().text),
@@ -260,15 +263,12 @@ class Assessments(InfoPanel):
     # mapped objects
     self.mapped_objects_titles_and_descriptions = self._driver.find_elements(
         *self._locators.MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS)
-    if self.mapped_objects_titles_and_descriptions:
-      self.mapped_objects_titles_text = [
-          mapped_scope.text.splitlines()[0]
-          for mapped_scope in self.mapped_objects_titles_and_descriptions if
-          len(mapped_scope.text.splitlines()) >= 2]
-      self.mapped_objects_descriptions_text = [
-          mapped_scope.text.splitlines()[1]
-          for mapped_scope in self.mapped_objects_titles_and_descriptions if
-          len(mapped_scope.text.splitlines()) >= 2]
+    self.mapped_objects_titles_text = [
+        mapped_el.find_element(*self._locators.MAPPED_OBJECT_TITLE).text
+        for mapped_el in self.mapped_objects_titles_and_descriptions]
+    self.mapped_objects_descriptions_text = [
+        mapped_el.find_element(*self._locators.MAPPED_OBJECT_DESCRIPTION).text
+        for mapped_el in self.mapped_objects_titles_and_descriptions]
     self.cas_text = self.get_headers_and_values_dict_from_cas_scopes()
     # people section
     self.creators_text, self.creators_entered_text = (
@@ -281,7 +281,7 @@ class Assessments(InfoPanel):
             self._locators.PEOPLE_HEADERS_AND_VALUES))
     self.verifiers_text, self.verifiers_entered_text = (
         self.get_header_and_value_text_from_custom_scopes(
-            self._elements.ASSIGNEES_.upper(),
+            self._elements.VERIFIERS_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
     # code section
     self.code_section.toggle()
@@ -296,17 +296,19 @@ class Assessments(InfoPanel):
     # scope
     self.list_all_headers_text = [
         self._elements.CAS.upper(), self.title().text,
-        self._elements.STATE.upper(), self._elements.VERIFIED.upper(),
-        self._elements.CREATORS.upper(), self._elements.ASSIGNEES.upper(),
-        self._elements.VERIFIERS.upper(),
-        self._elements.MAPPED_OBJECTS.upper(), self.code_text]
+        self._elements.STATE.upper(),
+        self._elements.VERIFIED.upper(),
+        self.creators_text, self.assignees_text,
+        self.verifiers_text, self._elements.MAPPED_OBJECTS.upper(),
+        self.code_text]
     self.list_all_values_text = [
         self.cas_text, self.title_entered().text,
         objects.get_normal_form(self.state().text),
         self.state().text.upper() in
-        element.AssessmentStates.COMPLETED.upper(), self.creators_entered_text,
-        self.assignees_entered_text, self.verifiers_entered_text,
-        self.mapped_objects_titles_text, self.code_entered_text]
+        element.AssessmentStates.COMPLETED.upper(),
+        self.creators_entered_text, self.assignees_entered_text,
+        self.verifiers_entered_text, self.mapped_objects_titles_text,
+        self.code_entered_text]
 
 
 class AssessmentTemplates(InfoPanel):
