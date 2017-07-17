@@ -43,7 +43,6 @@ from ggrc.views import cron
 from ggrc.views import filters
 from ggrc.views import mockups
 from ggrc.views import notifications
-from ggrc.views.common import RedirectedPolymorphView
 from ggrc.views.registry import object_view
 from ggrc.utils import benchmark
 from ggrc.utils import generate_query_chunks
@@ -401,7 +400,6 @@ def contributed_object_views():
       object_view(models.BackgroundTask),
       object_view(models.Program),
       object_view(models.Audit),
-      object_view(models.Directive, RedirectedPolymorphView),
       object_view(models.Contract),
       object_view(models.Policy),
       object_view(models.Regulation),
