@@ -307,7 +307,7 @@ def relevant(exp, object_class, target_class, query):
   ).options(
       load_only("destination_id")
   ).distinct()
-  ids_qs = dest_qs.union(source_qs).distinct().subquery("ids")
+  ids_qs = dest_qs.union(source_qs).distinct().subquery()
   return object_class.id == ids_qs.c.relationships_source_id
 
 

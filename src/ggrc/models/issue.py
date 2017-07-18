@@ -7,7 +7,7 @@ from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (
-    BusinessObject, Timeboxed, CustomAttributable, TestPlanned
+    BusinessObject, LastDeprecatedTimeboxed, CustomAttributable, TestPlanned
 )
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.object_document import PublicDocumentable
@@ -19,11 +19,19 @@ from ggrc.fulltext.mixin import Indexed
 
 
 class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
-            PublicDocumentable, Personable, Timeboxed, Ownable, Relatable,
-            AuditRelationship, BusinessObject, Indexed, db.Model):
+            PublicDocumentable, Personable, LastDeprecatedTimeboxed, Ownable,
+            Relatable, AuditRelationship, BusinessObject, Indexed, db.Model):
   """Issue Model."""
 
   __tablename__ = 'issues'
+
+  VALID_STATES = [
+      "Draft",
+      "Active",
+      "Deprecated",
+      "Fixed",
+      "Fixed and Verified"
+  ]
 
   # REST properties
   _publish_attrs = [
@@ -34,9 +42,14 @@ class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
       "url": "Issue URL",
       "test_plan": {
           "display_name": "Remediation Plan"
-      }
+      },
+      "status": {
+          "display_name": "State",
+          "mandatory": False,
+          "description": "Options are: \n{} ".format('\n'.join(VALID_STATES))
+      },
   }
 
   audit_id = deferred(
       db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False),
-      'Assessment')
+      'Issue')

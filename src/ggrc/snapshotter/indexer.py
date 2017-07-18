@@ -215,6 +215,28 @@ def get_access_control_sort_subprop(rec, access_control_list):
       yield newrec
 
 
+def get_category_sort_subprop(rec, category_list):
+  """Get a categories_list subproperty for sorting
+  """
+  newrec = rec.copy()
+  newrec.update({
+      "content": ":".join(sorted([c.get("display_name", None)
+                                  for c in category_list])),
+      "subproperty": "__sort__",
+  })
+  yield newrec
+
+
+def get_category_data(rec, category_item):
+  """Get category's name for fulltext indexing
+  """
+  newrec = rec.copy()
+  newrec.update({
+      "content": category_item.get("display_name"),
+      "subproperty": "{}-category".format(category_item.get("id"))})
+  yield newrec
+
+
 def get_properties(snapshot):
   """Return properties for sent revision dict and pair object."""
   properties = snapshot["revision"].copy()
@@ -249,6 +271,9 @@ def get_record_value(prop, val, rec):
     elif prop == "access_control_list":
       sort_getter = get_access_control_sort_subprop
       item_getter = get_access_control_role_data
+    elif prop in ("assertions", "categories"):
+      sort_getter = get_category_sort_subprop
+      item_getter = get_category_data
     else:
       return []
     results = [item_getter(rec, i) for i in val]

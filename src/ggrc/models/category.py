@@ -24,6 +24,7 @@ class CategorizedPublishable(object):
 
 
 class CategoryBase(Hierarchical, Base, db.Model):
+  """Base class for Categories"""
   _table_plural = 'category_bases'
   __tablename__ = 'categories'
 
@@ -45,6 +46,10 @@ class CategoryBase(Hierarchical, Base, db.Model):
       cascade='all, delete-orphan',
   )
 
+  def __str__(self):
+    return self.name
+
+  # pylint: disable=unused-argument
   @validates('type')
   def validates_type(self, key, value):
     return self.__class__.__name__

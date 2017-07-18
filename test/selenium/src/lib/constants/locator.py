@@ -735,14 +735,17 @@ class WidgetInfoAudit(WidgetInfoPanel):
 
 class WidgetInfoAssessment(WidgetInfoPanel):
   """Locators for Assessment Info widgets."""
+  # pylint: disable=invalid-name
   WIDGET = Common.INFO_WIDGET
   TOGGLE = ' [class*="fa-caret"]'
   # Base
   CAS_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
                             WIDGET + " auto-save-form .flex-size-1")
   CAS_CHECKBOXES = (By.CSS_SELECTOR, '[class*="wrapper"] [type="checkbox"]')
-  MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS = (By.CSS_SELECTOR,
-                                            WIDGET + Common.TREE_ITEM)
+  MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS = (
+      By.CSS_SELECTOR, WIDGET + " .mapped-objects__item-body")
+  MAPPED_OBJECT_TITLE = (By.CSS_SELECTOR, ".title")
+  MAPPED_OBJECT_DESCRIPTION = (By.CSS_SELECTOR, ".description")
   # Assessment Attributes tab
   # People section
   PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
@@ -904,6 +907,12 @@ class TreeView(object):
   BUTTON_MAP = "{} " + Common.TREE_LIST + " .map-button"
   ITEM_DROPDOWN_BUTTON = (By.CSS_SELECTOR, " ".join(
       (_WIDGET_NOT_HIDDEN_CSS, ITEM_EXPAND_BUTTON)))
+
+
+class TreeViewItem(object):
+  """Locators for Tree View Item element"""
+  CELL = (By.CSS_SELECTOR,
+          "div[class*='attr']:not(.attr-content):not(.selectable-attrs)")
 
 
 class AdminTreeView(object):
