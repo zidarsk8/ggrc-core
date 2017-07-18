@@ -1431,4 +1431,4 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
     this.on_mouseleave();
   }
 });
-})(this.can, this.can.$, Mousetrap);
+})(window.can, window.can.$, Mousetrap);

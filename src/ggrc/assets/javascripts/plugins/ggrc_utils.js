@@ -841,5 +841,5 @@
       getParentUrl: getParentUrl
     };
   })();
-})(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission,
+})(jQuery, window.GGRC = window.GGRC || {}, moment, window.Permission,
   window.CMS = window.CMS || {});

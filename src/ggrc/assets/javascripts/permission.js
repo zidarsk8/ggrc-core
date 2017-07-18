@@ -230,4 +230,4 @@
   });
 
   ADMIN_PERMISSION = new Permission('__GGRC_ADMIN__', '__GGRC_ALL__', 0);
-})(this.can);
+})(window.can);

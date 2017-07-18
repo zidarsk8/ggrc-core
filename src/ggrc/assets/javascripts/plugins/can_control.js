@@ -39,4 +39,4 @@
       });
     }
   });
-})(this.can);
+})(window.can);

@@ -268,4 +268,4 @@
       });
     }
   });
-})(this.can, this.can.$);
+})(window.can, window.can.$);

@@ -24,4 +24,4 @@
     attributes: {}
   },
   {});
-})(this.can);
+})(window.can);

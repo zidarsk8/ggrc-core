@@ -3,7 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, $, Mustache) {
+(function (can, $) {
+  var Mustache = can.Mustache;
   /*
    sort_index_at_end mustache helper
 
@@ -199,4 +200,4 @@
     }
     return options.inverse(this);
   });
-})(this.can, this.can.$, this.Mustache);
+})(window.can, window.can.$);

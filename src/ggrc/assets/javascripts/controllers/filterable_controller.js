@@ -61,4 +61,4 @@ can.Control("CMS.Controllers.Filterable", {
 
 });
 
-})(this.can, this.can.$);
+})(window.can, window.can.$);
