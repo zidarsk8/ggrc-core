@@ -682,6 +682,7 @@ class AssessmentTemplatesFactory(EntitiesFactory):
     random_asmt_tmpl = AssessmentTemplateEntity()
     random_asmt_tmpl.type = cls.obj_asmt_tmpl
     random_asmt_tmpl.title = cls.generate_string(cls.obj_asmt_tmpl)
+    random_asmt_tmpl.assessors = unicode(roles.AUDIT_LEAD)
     random_asmt_tmpl.slug = cls.generate_slug()
     random_asmt_tmpl.template_object_type = cls.obj_control.title()
     random_asmt_tmpl.default_people = {"verifiers": unicode(roles.AUDITORS),

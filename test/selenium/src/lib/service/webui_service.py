@@ -382,6 +382,14 @@ class AssessmentTemplatesService(BaseWebUiService):
     super(AssessmentTemplatesService, self).__init__(
         driver, objects.ASSESSMENT_TEMPLATES)
 
+  def create_obj_via_tree_view(self, src_obj, obj):
+    """Open generic widget of mapped objects, open creation modal from
+    Tree View, fill data according to object attributes and create new object.
+    """
+    objs_widget = self.open_widget_of_mapped_objs(src_obj)
+    (objs_widget.tree_view.open_create().select_assignee(obj.assessors).
+        fill_minimal_data(title=obj.title, code=obj.slug).save_and_close())
+
 
 class AssessmentsService(BaseWebUiService):
   """Class for Assessments business layer's services objects."""
