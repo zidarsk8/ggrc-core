@@ -3,7 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, GGRC, Quill) {
+import Quill from 'quill';
+
+(function (can, GGRC) {
   'use strict';
 
   var URL_CLIPBOARD_REGEX = /https?:\/\/[^\s]+/g;
@@ -228,4 +230,4 @@
       }
     }
   });
-})(window.can, window.GGRC, window.Quill);
+})(window.can, window.GGRC);

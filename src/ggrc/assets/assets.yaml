@@ -16,7 +16,6 @@ dashboard-js-files:
   - bootstrap/js/bootstrap-popover.js
   - clipboard/dist/clipboard.min.js
   - mousetrap/mousetrap.min.js
-  - quill/dist/quill.min.js
   - canjs/can.jquery.js
   - canjs/can.construct.super.js
   - canjs/can.list.sort.js
@@ -714,8 +713,6 @@ dashboard-css-files:
   - dashboard.css
   - wysihtml5/bootstrap-wysihtml5-0.0.2.css
   - jquery/jquery-ui.css
-  - quill/dist/quill.core.css
-  - quill/dist/quill.snow.css
 
 dashboard-js-spec-files:
   - spec_setup.js
