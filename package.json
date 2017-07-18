@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "bower": "^1.6.8",
+    "clipboard": "^1.5.16",
     "doctoc": "^0.11.0",
     "exports-loader": "^0.6.4",
     "font-awesome": "~4.5.0",

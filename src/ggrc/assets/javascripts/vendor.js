@@ -14,7 +14,7 @@ import 'bootstrap/js/bootstrap-modal.js';
 import 'bootstrap/js/bootstrap-tab.js';
 import 'bootstrap/js/bootstrap-tooltip.js';
 import 'bootstrap/js/bootstrap-popover.js';
-import 'clipboard/dist/clipboard.min.js';
+import 'clipboard';
 import 'mousetrap/mousetrap.min.js';
 import 'quill/dist/quill.min.js';
 import 'canjs/amd/can';
