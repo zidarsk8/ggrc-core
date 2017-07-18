@@ -122,13 +122,6 @@ describe('GGRC.Components.objectSearch', function () {
     });
   });
 
-  describe('allowedToCreate() method', function () {
-    it('returns false', function () {
-      var result = viewModel.allowedToCreate();
-      expect(result).toEqual(false);
-    });
-  });
-
   describe('showWarning() method', function () {
     it('returns false', function () {
       var result = viewModel.showWarning();

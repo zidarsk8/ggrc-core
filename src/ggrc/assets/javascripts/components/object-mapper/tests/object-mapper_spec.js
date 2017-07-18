@@ -469,4 +469,23 @@ describe('GGRC.Components.objectMapper', function () {
       expect(result).toEqual('Objects');
     });
   });
+
+  describe('allowedToCreate() method', function () {
+    it('returns true if it is not an in-scope model',
+      function () {
+        var result;
+        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
+          .and.returnValue(false);
+        result = viewModel.allowedToCreate();
+        expect(result).toEqual(true);
+      });
+    it('returns false if it is an in-scope model',
+      function () {
+        var result;
+        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
+          .and.returnValue(true);
+        result = viewModel.allowedToCreate();
+        expect(result).toEqual(false);
+      });
+  });
 });

@@ -43,12 +43,6 @@
     afterShown: function () {
       this.onSubmit();
     },
-    allowedToCreate: function () {
-      // Don't allow to create new instances for "In Scope" Objects
-      var isInScopeModel =
-        GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'));
-      return !isInScopeModel;
-    },
     showWarning: function () {
       // Never show warning for In Scope Objects
       if (GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {

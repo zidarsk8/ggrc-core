@@ -17,9 +17,6 @@
         },
         object: 'MultitypeSearch',
         type: 'Program',
-        allowedToCreate: function () {
-          return false;
-        },
         showWarning: function () {
           return false;
         },

@@ -49,7 +49,13 @@
         },
         deferred_to: parentViewModel.attr('deferred_to'),
         deferred_list: [],
-        deferred: false
+        deferred: false,
+        allowedToCreate: function () {
+          // Don't allow to create new instances for "In Scope" Objects
+          var isInScopeModel =
+            GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'));
+          return !isInScopeModel;
+        }
       });
     },
 
