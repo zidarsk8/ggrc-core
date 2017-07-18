@@ -9,6 +9,7 @@
   "dependencies": {
     "bower": "^1.6.8",
     "doctoc": "^0.11.0",
+    "exports-loader": "^0.6.4",
     "font-awesome": "~4.5.0",
     "jquery": "^2.2.4",
     "jquery-ui": "^1.12.1",
@@ -43,7 +44,8 @@
     "webpack": "^2.7.0"
   },
   "scripts": {
-    "test": "run_unittests"
+    "test": "run_unittests",
+    "watch": "./node_modules/.bin/webpack --watch --profile --progress"
   },
   "repository": {
     "type": "git",

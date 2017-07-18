@@ -65,12 +65,17 @@ module.exports = {
         }],
         fallback: "style-loader"
       })
+    }, {
+      test: /wysihtml5-0\.4\.0pre\.js$/,
+      loader: 'exports-loader?wysihtml5'
     }]
   },
+  devtool: 'eval',
   resolve: {
-    modules: ['node_modules', 'bower_components', 'third_party'].map(function (dir) {
-      return path.join(__dirname, dir);
-    }),
+    modules: ['node_modules', 'bower_components', 'third_party']
+      .map(function (dir) {
+        return path.join(__dirname, dir);
+      }),
     alias: {
       'can': 'canjs/amd/can/',
       'ggrc': './src/ggrc/assets/javascripts'
@@ -84,7 +89,12 @@ module.exports = {
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
-      _: 'lodash'
+      'window.jQuery': 'jquery',
+      _: 'lodash',
+      moment: 'moment'
+    }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'vendor'
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new UglifyJSPlugin()
