@@ -1,0 +1,55 @@
+/*!
+  Copyright (C) 2017 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+*/
+
+import './mappers/mapping-result';
+import './mappers/list-binding';
+import './mappers/base-list-loader';
+import './mappers/stub-filtered-list-loader';
+import './mappers/cross-list-loader';
+import './mappers/type-filtered-list-loader';
+import './mappers/attr-filtered-list-loader';
+import './mappers/first-element-loader';
+import './mappers/custom-filtered-list-loader';
+import './mappers/multi-list-loader';
+import './mappers/intersecting-list-loader';
+import './mappers/proxy-list-loader';
+import './mappers/direct-list-loader';
+import './mappers/indirect-list-loader';
+import './mappers/search-list-loader';
+import './mappers/reifying-list-loader';
+import './mappers/tree-base-loader';
+import './mappers/mapper-helpers';
+import './mappers/mappings';
+import './mappers/mappings-ggrc';
+import './mixins';
+import './cacheable';
+import './local_storage';
+import './display_prefs';
+import './local_list_cache';
+import './document';
+import './person';
+import './simple_models';
+import './business_object_models';
+import './directive_models';
+import './recently_viewed_object';
+import './search';
+import './audit_models';
+import './comment';
+import './issue';
+import './notification_config';
+import './category';
+import './refresh_queue';
+import './revision';
+import './save_queue';
+import './custom_attributes';
+import './custom_roles';
+import './assessment';
+import './control';
+import './section';
+import './system';
+import './join_models';
+
+
+
