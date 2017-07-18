@@ -24,8 +24,6 @@
       object_people: 'CMS.Models.ObjectPerson.stubs',
       documents: 'CMS.Models.Document.stubs',
       people: 'CMS.Models.Person.stubs',
-      categories: 'CMS.Models.ControlCategory.stubs',
-      assertions: 'CMS.Models.ControlAssertion.stubs',
       objectives: 'CMS.Models.Objective.stubs',
       directive: 'CMS.Models.Directive.stub',
       audit_objects: 'CMS.Models.AuditObject.stubs',
