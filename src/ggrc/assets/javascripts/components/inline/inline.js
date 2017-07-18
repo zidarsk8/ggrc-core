@@ -6,13 +6,6 @@
 (function (can, $) {
   'use strict';
 
-  var innerTplFolder = GGRC.mustache_path + '/components/inline';
-
-  function getInnerInlineTemplat(type) {
-    type = can.Mustache.resolve(type);
-    return innerTplFolder + '/' + type + '.mustache';
-  }
-
   GGRC.Components('inlineEditControl', {
     tag: 'inline-edit-control',
     template: can.view(
@@ -24,8 +17,8 @@
       isLoading: false,
       type: '@',
       value: '@',
+      placeholder: '@',
       dropdownOptions: [],
-      dropdownClass: '@',
       dropdownNoValue: false,
       isAllowEdit: true,
       context: {
@@ -77,6 +70,9 @@
       updateContext: function () {
         var value = this.attr('value');
         this.attr('context.value', value);
+      },
+      fieldValueChanged: function (args) {
+        this.attr('context.value', args.value);
       }
     },
     events: {
@@ -102,12 +98,6 @@
         if (!this.viewModel.attr('editMode')) {
           this.viewModel.updateContext();
         }
-      }
-    },
-    helpers: {
-      renderInnerInlineTemplate: function (type, options) {
-        return can.view
-          .render(getInnerInlineTemplat(type), options.context);
       }
     }
   });
