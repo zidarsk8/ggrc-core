@@ -46,45 +46,6 @@ describe('GGRC.VM.ObjectOperationsBaseVM', function () {
     });
   });
 
-  describe('showWarning() method', function () {
-    it('returns false if is an in-scope model', function () {
-      var result;
-      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-        .and.returnValue(true);
-      result = baseVM.showWarning();
-      expect(result).toEqual(false);
-    });
-
-    it('returns true if source object is a Snapshot parent', function () {
-      var result;
-      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-        .and.returnValue(false);
-      spyOn(GGRC.Utils.Snapshots, 'isSnapshotParent')
-        .and.callFake(function (v) {
-          return v === 'o';
-        });
-      baseVM.attr('object', 'o');
-      baseVM.attr('type', 't');
-      result = baseVM.showWarning();
-      expect(result).toEqual(true);
-    });
-
-    it('returns true if is mapped object is a ' +
-      'Snapshot parent', function () {
-      var result;
-      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-        .and.returnValue(false);
-      spyOn(GGRC.Utils.Snapshots, 'isSnapshotParent')
-        .and.callFake(function (v) {
-          return v === 't';
-        });
-      baseVM.attr('object', 'o');
-      baseVM.attr('type', 't');
-      result = baseVM.showWarning();
-      expect(result).toEqual(true);
-    });
-  });
-
   describe('modelFromType() method', function () {
     it('returns undefined if no models', function () {
       var result = baseVM.modelFromType('program');

@@ -121,11 +121,4 @@ describe('GGRC.Components.objectSearch', function () {
       expect(result).toEqual('types');
     });
   });
-
-  describe('showWarning() method', function () {
-    it('returns false', function () {
-      var result = viewModel.showWarning();
-      expect(result).toEqual(false);
-    });
-  });
 });

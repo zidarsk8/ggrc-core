@@ -488,4 +488,43 @@ describe('GGRC.Components.objectMapper', function () {
         expect(result).toEqual(false);
       });
   });
+
+  describe('showWarning() method', function () {
+    it('returns false if is an in-scope model', function () {
+      var result;
+      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
+        .and.returnValue(true);
+      result = viewModel.showWarning();
+      expect(result).toEqual(false);
+    });
+
+    it('returns true if source object is a Snapshot parent', function () {
+      var result;
+      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
+        .and.returnValue(false);
+      spyOn(GGRC.Utils.Snapshots, 'isSnapshotParent')
+        .and.callFake(function (v) {
+          return v === 'o';
+        });
+      viewModel.attr('object', 'o');
+      viewModel.attr('type', 't');
+      result = viewModel.showWarning();
+      expect(result).toEqual(true);
+    });
+
+    it('returns true if is mapped object is a ' +
+      'Snapshot parent', function () {
+      var result;
+      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
+        .and.returnValue(false);
+      spyOn(GGRC.Utils.Snapshots, 'isSnapshotParent')
+        .and.callFake(function (v) {
+          return v === 't';
+        });
+      viewModel.attr('object', 'o');
+      viewModel.attr('type', 't');
+      result = viewModel.showWarning();
+      expect(result).toEqual(true);
+    });
+  });
 });

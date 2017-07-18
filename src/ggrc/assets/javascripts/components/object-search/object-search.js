@@ -17,9 +17,6 @@
         },
         object: 'MultitypeSearch',
         type: 'Program',
-        showWarning: function () {
-          return false;
-        },
         availableTypes: function () {
           var types = GGRC.Mappings.getMappingTypes(
             this.attr('object'),

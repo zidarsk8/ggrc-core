@@ -55,6 +55,14 @@
           var isInScopeModel =
             GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'));
           return !isInScopeModel;
+        },
+        showWarning: function () {
+          // Never show warning for In Scope Objects
+          if (GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
+            return false;
+          }
+          return GGRC.Utils.Snapshots.isSnapshotParent(this.attr('object')) ||
+            GGRC.Utils.Snapshots.isSnapshotParent(this.attr('type'));
         }
       });
     },

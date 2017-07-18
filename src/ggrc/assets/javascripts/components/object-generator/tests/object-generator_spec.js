@@ -250,11 +250,4 @@ describe('GGRC.Components.objectGenerator', function () {
           .toEqual('value');
       });
   });
-
-  describe('showWarning() method', function () {
-    it('returns false', function () {
-      var result = viewModel.showWarning();
-      expect(result).toEqual(false);
-    });
-  });
 });
