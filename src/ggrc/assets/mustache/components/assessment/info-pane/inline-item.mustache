@@ -3,37 +3,23 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<assessment-inline-confirm-action
-  (set-in-progress)="setInProgressState()"
-  {on-state-change-dfd}="onStateChangeDfd"
+<inline-edit-control
+  (inline-save)="saveInlineForm(%event)"
+  {prop-name}="propName"
   {dropdown-options}="dropdownOptions"
   {dropdown-class}="dropdownClass"
   {dropdown-no-value}="dropdownNoValue"
+  {is-loading}="isLoading"
+  {instance}="instance"
+  {value}="value"
   {type}="type"
-  {instance}="instance">
-    <inline-form-control-item
-      (inline-form-item-save)="saveInlineForm(%event)"
-      {dropdown-options}="dropdownOptions"
-      {dropdown-class}="dropdownClass"
-      {dropdown-no-value}="dropdownNoValue"
-      {value}="value"
-      {is-allow-edit}="isAllowEdit"
-      {edit-mode}="editMode"
-      {type}="type"
-      {prop-name}="propName">
-        <inline-edit-control
-          (inline-save)="save(%event)"
-          {dropdown-options}="dropdownOptions"
-          {dropdown-class}="dropdownClass"
-          {dropdown-no-value}="dropdownNoValue"
-          {edit-mode}="editMode"
-          {is-allow-edit}="isAllowEdit"
-          {is-loading}="isLoading"
-          {instance}="instance"
-          {value}="value"
-          {type}="type"
-          with-read-more="true">
-            <content></content>
-        </inline-edit-control>
-    </inline-form-control-item>
-</assessment-inline-confirm-action>
+  with-read-more="true">
+    <confirm-inline-control-title
+      (set-edit-mode-inline)="setEditModeInline()"
+      (set-in-progress)="setInProgressState()"
+      {instance}="instance"
+      {on-state-change-dfd}="onStateChangeDfd"
+      {edit-mode}="editMode">
+        <content></content>
+    </confirm-inline-control-title>
+</inline-edit-control>

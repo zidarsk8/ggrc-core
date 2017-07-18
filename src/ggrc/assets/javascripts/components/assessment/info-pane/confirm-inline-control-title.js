@@ -6,25 +6,21 @@
 (function (can) {
   'use strict';
 
-  GGRC.Components('assessmentInlineConfirmAction', {
-    tag: 'assessment-inline-confirm-action',
+  var tpl = can.view(GGRC.mustache_path +
+    '/components/assessment/info-pane/confirm-inline-control-title.mustache');
+
+  GGRC.Components('confirmInlineControlTitle', {
+    tag: 'confirm-inline-control-title',
+    template: tpl,
     viewModel: {
-      define: {
-        isAllowEdit: {
-          get: function () {
-            return this.isInProgress();
-          }
-        }
-      },
       instance: {},
       setInProgress: null,
       editMode: false,
-      type: '@',
       onStateChangeDfd: can.Deferred().resolve(),
       openInlineEdit: function (el) {
         this.attr('onStateChangeDfd').then(function () {
           if (this.isInProgress()) {
-            this.attr('editMode', true);
+            this.dispatch('setEditModeInline');
           }
         }.bind(this));
       },
@@ -46,17 +42,14 @@
           self.dispatch('setInProgress');
           self.openInlineEdit();
         });
-      }
-    },
-    events: {
-      '{.inline-edit-icon} mousedown': function (el, ev) {
-        var viewModel = this.viewModel;
-
-        if (!viewModel.isInProgress()) {
-          viewModel.showConfirm();
-          ev.preventDefault();
-          return false;
+      },
+      setEditModeInline: function () {
+        if (!this.isInProgress()) {
+          this.showConfirm();
+          return;
         }
+
+        this.dispatch('setEditModeInline');
       }
     }
   });

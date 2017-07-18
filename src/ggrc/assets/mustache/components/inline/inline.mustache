@@ -5,23 +5,7 @@
 
 <div class="inline">
   <div class="inline__header action-toolbar">
-    {{#unless editMode}}
-      <spinner class="inline__header-spinner" {toggle}="isLoading"></spinner>
-    {{/unless}}
-
-    <!-- header (laber/h1-6) -->
     <content></content>
-
-    <!-- display edit icon when isLoading == false and editMode == false -->
-    {{#unless editMode}}
-      {{#unless isLoading}}
-        <div class="action-toolbar__controls">
-          <action-toolbar-control>
-            <i class="fa fa-pencil inline-edit-icon"></i>
-          </action-toolbar-control>
-        </div>
-      {{/unless}}
-    {{/unless}}
   </div>
 
   {{#if editMode}}

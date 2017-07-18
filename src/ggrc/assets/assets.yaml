@@ -331,9 +331,9 @@ dashboard-js-files:
   - components/inline/inline.js
   - components/inline/readonly-inline-content.js
   - components/inline/inline-form-control.js
-  - components/inline/inline-form-control-item.js
+  - components/inline/base-inline-control-title.js
   - components/assessment/info-pane/inline-item.js
-  - components/assessment/info-pane/inline-confirm-action.js
+  - components/assessment/info-pane/confirm-inline-control-title.js
 
 app-init-files:
   - apps/dashboard.js
@@ -694,7 +694,9 @@ dashboard-js-template-files:
   - components/inline/inline.mustache
   - components/inline/readonly-inline-content.mustache
   - components/inline/simple-readonly-text.mustache
+  - components/inline/base-inline-control-title.mustache
   - components/assessment/info-pane/inline-item.mustache
+  - components/assessment/info-pane/confirm-inline-control-title.mustache
 
 dashboard-css-files:
   - dashboard.css
