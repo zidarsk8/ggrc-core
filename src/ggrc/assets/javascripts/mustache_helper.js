@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Spinner from 'spin.js';
+
 (function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.
   var mustache_urls = {};

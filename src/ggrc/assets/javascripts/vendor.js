@@ -29,4 +29,4 @@ import 'wysihtml5/wysihtml5-0.4.0pre';
 import 'wysihtml5/bootstrap-wysihtml5-0.0.2';
 import 'moment';
 import 'moment-timezone/builds/moment-timezone-with-data.min';
-import 'spinjs/spin.js';
+import 'spin.js';
