@@ -6,20 +6,20 @@
 (function (GGRC) {
   'use strict';
 
-  GGRC.Components('accessControlListAdminHelper', {
-    tag: 'access-control-list-admin-helper',
+  GGRC.Components('accessControlListRolesHelper', {
+    tag: 'access-control-list-roles-helper',
 
     viewModel: {
       instance: {},
       isNewInstance: false,
-      addAdmin: function () {
+      setAutoPopulatedRoles: function () {
         var instance = this.attr('instance');
-        var adminRole = _.filter(GGRC.access_control_roles, {
+        var autoPopulatedRoles = _.filter(GGRC.access_control_roles, {
           object_type: instance.class.model_singular,
-          name: 'Admin'
+          default_to_current_user: true
         });
 
-        if (!adminRole.length) {
+        if (!autoPopulatedRoles.length) {
           return;
         }
 
@@ -27,17 +27,18 @@
           instance.attr('access_control_list', []);
         }
 
-        // Use push because ACL is subscribed on change event.
-        instance.attr('access_control_list').push({
-          ac_role_id: adminRole[0].id,
-          person: {type: 'Person', id: GGRC.current_user.id}
+        autoPopulatedRoles.forEach(function (role) {
+          instance.attr('access_control_list').push({
+            ac_role_id: role.id,
+            person: {type: 'Person', id: GGRC.current_user.id}
+          });
         });
       }
     },
     events: {
       inserted: function () {
         if (this.viewModel.attr('isNewInstance')) {
-          this.viewModel.addAdmin();
+          this.viewModel.setAutoPopulatedRoles();
         }
       }
     }
