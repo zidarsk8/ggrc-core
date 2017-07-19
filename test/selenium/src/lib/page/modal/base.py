@@ -56,9 +56,6 @@ class ProgramsModal(BaseModal):
     self.ui_effective_date = base.DatePicker(
         self._driver, self._locators.EFFECTIVE_DATE_DATEPICKER,
         self._locators.UI_EFFECTIVE_DATE)
-    self.ui_stop_date = base.DatePicker(
-        self._driver, self._locators.STOP_DATE_DATEPICKER,
-        self._locators.UI_STOP_DATE)
     # static elements
     self.title = base.Label(self._driver, self._locators.TITLE)
     self.description = base.Label(self._driver, self._locators.DESCRIPTION)
@@ -109,12 +106,6 @@ class ProgramsModal(BaseModal):
     # pylint: disable=invalid-name
     self.ui_effective_date.select_day_in_current_month(day)
 
-  def enter_stop_date_end_month(self, day):
-    """Select from datepicker end date.
-    Args: day (int): #base.DatePicker.select_day_in_current_month
-    """
-    self.ui_stop_date.select_day_in_current_month(day)
-
 
 class ControlsModal(BaseModal):
   """Modal base for Control objects."""
@@ -153,8 +144,6 @@ class ControlsModal(BaseModal):
     self.ui_effective_date = base.DatePicker(
         driver, self._locators.EFFECTIVE_DATE,
         self._locators.DATEPICKER_EFFECTIVE_DATE)
-    self.ui_stop_date = base.DatePicker(
-        driver, self._locators.STOP_DATE, self._locators.DATEPICKER_STOP_DATE)
     # dropdowns
     self.ui_kind_or_nature = base.Dropdown(
         driver, self._locators.DROPDOWN_KIND_OR_NATURE)
