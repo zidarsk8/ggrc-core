@@ -3,9 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-//require can.jquery-all
-
-(function(can, $, Mousetrap) {
+(function(can, $) {
   function with_params(href, params) {
     if (href.charAt(href.length - 1) === '?')
       return href + params;
@@ -402,11 +400,12 @@ can.Control("CMS.Controllers.LHN", {
         this.options.display_prefs.getLHNState().panel_scroll
         || 0
     );
-  }
+  },
   // this uses polling to make sure LHN is there
   // requestAnimationFrame takes browser render optimizations into account
   // it ain't pretty, but it works
-  , initial_lhn_render: function (try_count) {
+  initial_lhn_render: function () {
+    var self = this;
     if (!$(".lhs-holder").size() || !$(".lhn-trigger").size()) {
       window.requestAnimationFrame(this.initial_lhn_render.bind(this));
       return;
@@ -414,15 +413,17 @@ can.Control("CMS.Controllers.LHN", {
 
     // this is ugly, but the trigger doesn't nest inside our top element
     $(".lhn-trigger").on("click", this.toggle_lhn.bind(this));
-    Mousetrap.bind("alt+m", this.toggle_lhn.bind(this));
-
+    import(/* webpackChunkName: "mousetrap" */'mousetrap')
+      .then(function (Mousetrap) {
+        Mousetrap.bind("alt+m", self.toggle_lhn.bind(self));
+      });
     this.resize_lhn();
     this.open_lhn();
-  }
-  , lhn_width : function(){
+  },
+  lhn_width : function(){
     return $(".lhs-holder").width()+8;
-  }
-  , hide_lhn: function() {
+  },
+  hide_lhn: function() {
     //UI-revamp
     //Here we should hide the button ||| also
       var $area = $(".area")
@@ -1431,4 +1432,4 @@ can.Control("CMS.Controllers.LHN_Tooltips", {
     this.on_mouseleave();
   }
 });
-})(window.can, window.can.$, Mousetrap);
+})(window.can, window.can.$);

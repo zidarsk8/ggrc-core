@@ -15,7 +15,6 @@ import 'bootstrap/js/bootstrap-tab.js';
 import 'bootstrap/js/bootstrap-tooltip.js';
 import 'bootstrap/js/bootstrap-popover.js';
 import 'clipboard';
-import 'mousetrap/mousetrap.min.js';
 import 'quill';
 import 'canjs/amd/can';
 import 'can/construct/super';
@@ -25,7 +24,6 @@ import 'can/list/sort';
 import 'can/map/attributes';
 import 'can/map/backup';
 import 'can/map/validations';
-
 import 'moment';
 import 'moment-timezone/builds/moment-timezone-with-data.min';
 import 'spin.js';
