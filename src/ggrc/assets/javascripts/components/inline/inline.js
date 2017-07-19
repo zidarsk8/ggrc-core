@@ -12,6 +12,15 @@
       GGRC.mustache_path + '/components/inline/inline.mustache'
     ),
     viewModel: {
+      define: {
+        isShowContent: {
+          get: function () {
+            return this.attr('hideContentInEditMode') ?
+              this.attr('editMode') :
+              true;
+          }
+        }
+      },
       instance: {},
       editMode: false,
       withReadMore: false,
@@ -24,6 +33,7 @@
       dropdownNoValue: false,
       isLastOpenInline: false,
       isEditIconDenied: false,
+      hideContentInEditMode: false,
       context: {
         value: null
       },
