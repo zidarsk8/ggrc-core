@@ -5,6 +5,7 @@
 
 <inline-edit-control
   (inline-save)="saveInlineForm(%event)"
+  {is-edit-icon-denied}="isEditIconDenied"
   {prop-name}="propName"
   {dropdown-options}="dropdownOptions"
   {dropdown-class}="dropdownClass"
@@ -13,10 +14,11 @@
   {instance}="instance"
   {value}="value"
   {type}="type"
-  with-read-more="true">
+  {with-read-more}="withReadMore">
     <confirm-inline-control-title
-      (set-edit-mode-inline)="setEditModeInline()"
+      (set-edit-mode-inline)="setEditModeInline(%event)"
       (set-in-progress)="setInProgressState()"
+      {is-edit-icon-denied}="isEditIconDenied"
       {instance}="instance"
       {on-state-change-dfd}="onStateChangeDfd"
       {edit-mode}="editMode">

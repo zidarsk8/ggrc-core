@@ -6,13 +6,10 @@
 <!-- header (laber/h1-6) -->
 <content></content>
 
-<!-- display edit icon when isLoading == false and editMode == false -->
-{{#unless editMode}}
-  {{#unless isLoading}}
-    <div class="action-toolbar__controls">
-      <action-toolbar-control>
-        <i class="fa fa-pencil inline-edit-icon"></i>
-      </action-toolbar-control>
-    </div>
-  {{/unless}}
-{{/unless}}
+{{#if isEditIconAllowed}}
+  <div class="action-toolbar__controls">
+    <action-toolbar-control>
+      <i class="fa fa-pencil inline-edit-icon"></i>
+    </action-toolbar-control>
+  </div>
+{{/if}}

@@ -16,6 +16,7 @@
       instance: {},
       setInProgress: null,
       editMode: false,
+      isEditIconDenied: false,
       onStateChangeDfd: can.Deferred().resolve(),
       openInlineEdit: function (el) {
         this.attr('onStateChangeDfd').then(function () {
@@ -49,7 +50,11 @@
           return;
         }
 
-        this.dispatch('setEditModeInline');
+        // send 'isLastOpenInline' when inline is opening without confirm
+        this.dispatch({
+          type: 'setEditModeInline',
+          isLastOpenInline: true
+        });
       }
     }
   });

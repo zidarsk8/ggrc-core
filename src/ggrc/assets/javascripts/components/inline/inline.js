@@ -23,11 +23,12 @@
       dropdownOptions: [],
       dropdownNoValue: false,
       isLastOpenInline: false,
+      isEditIconDenied: false,
       context: {
         value: null
       },
-      setEditModeInline: function () {
-        this.attr('isLastOpenInline', true);
+      setEditModeInline: function (args) {
+        this.attr('isLastOpenInline', args.isLastOpenInline);
         this.attr('editMode', true);
       },
       setPerson: function (scope, el, ev) {
