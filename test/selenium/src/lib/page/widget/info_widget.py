@@ -295,7 +295,7 @@ class Assessments(InfoPanel):
     self.code_section.toggle(False)
     # scope
     self.list_all_headers_text = [
-        self._elements.CAS.upper(), self.title().text,
+        self._elements.CAS.upper(), self._elements.TITLE,
         self._elements.STATE.upper(),
         self._elements.VERIFIED.upper(),
         self.creators_text, self.assignees_text,

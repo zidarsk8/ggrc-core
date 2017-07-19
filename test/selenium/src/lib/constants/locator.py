@@ -618,7 +618,7 @@ class CommonWidgetInfo(object):
   """Common locators for Info widgets and Info panels."""
   _NOT_HIDDEN = Common.XPATH_NOT_HIDDEN
   _INFO_WIDGET_XPATH = Common.INFO_WIDGET_XPATH + _NOT_HIDDEN
-  _MAIN_HEADER_XPATH = "//div[@class='span9']" + _NOT_HIDDEN
+  _MAIN_HEADER_XPATH = "//div[contains(@class,'pane-header')]" + _NOT_HIDDEN
   _HEADERS_AND_VALUES = (_INFO_WIDGET_XPATH +
                          '//div[starts-with(./@class, "span")]//h6/..')
   HEADERS_AND_VALUES = (By.XPATH, _HEADERS_AND_VALUES)
@@ -628,7 +628,8 @@ class CommonWidgetInfo(object):
   # labels
   TITLE = (By.XPATH, _MAIN_HEADER_XPATH + "//h6")
   TITLE_ENTERED = (By.XPATH, _MAIN_HEADER_XPATH + "//h3")
-  STATE = (By.XPATH, _MAIN_HEADER_XPATH + "//span[last()]")
+  STATE = (By.XPATH, _MAIN_HEADER_XPATH +
+           "//*[contains(normalize-space(./@class), 'state-value state')]")
   # user input elements
   BUTTON_3BBS = (By.XPATH, _INFO_WIDGET_XPATH + "//*[@data-toggle='dropdown']")
 
