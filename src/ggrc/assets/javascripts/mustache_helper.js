@@ -1092,7 +1092,7 @@ Mustache.registerHelper('system_role', function (role, options) {
   role = role.toLowerCase();
   // If there is no user, it's same as No Role
   var user_role = (GGRC.current_user ? GGRC.current_user.system_wide_role : 'no access').toLowerCase();
-      isValid = role === user_role;
+  var isValid = role === user_role;
 
   return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
 });

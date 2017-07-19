@@ -3,15 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-//= require can.jquery-all
-//= require controllers/quick_search_controller
-
-(function(namespace, $) {
+(function($) {
   $(document.body).on("click", ".lhn-no-init", function() {
     $(this).removeClass('lhn-no-init');
     $("#lhn").cms_controllers_lhn();
     $(document.body).ggrc_controllers_recently_viewed();
   });
+
   $(document.body).on("click", "a[data-toggle=unmap]", function(ev) {
     var $el = $(this)
       ;
@@ -139,5 +137,4 @@
     }
 
   });
-
-})(this, jQuery);
+})(jQuery);

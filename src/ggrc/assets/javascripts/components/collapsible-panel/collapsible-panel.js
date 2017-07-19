@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './collapsible-panel-header';
+import './collapsible-panel-body';
+
 (function (can, GGRC) {
   'use strict';
 

@@ -18,6 +18,12 @@ import './tree-header';
 import './tree-filter-input';
 import './tree-status-filter';
 import './tree-item-status-for-workflow';
+import './tree-no-results';
+import './tree-assignee-field';
+import './tree-people-list-field';
+import './tree-people-with-role-list-field';
+import '../advanced-search/advanced-search-filter-container';
+import '../advanced-search/advanced-search-mapping-container';
 
 (function (can, GGRC) {
   'use strict';
@@ -26,6 +32,12 @@ import './tree-item-status-for-workflow';
     '/components/tree/tree-widget-container.mustache');
   var TreeViewUtils = GGRC.Utils.TreeView;
   var CurrentPageUtils = GGRC.Utils.CurrentPage;
+
+  if (!GGRC.tree_view) {
+    GGRC.tree_view = new can.Map();
+  }
+  GGRC.tree_view.attr('basic_model_list', []);
+  GGRC.tree_view.attr('sub_tree_for', {});
 
   var viewModel = can.Map.extend({
     define: {

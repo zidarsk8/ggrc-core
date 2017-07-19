@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './mapper-results-item-status';
+import './mapper-results-item-details';
+import './mapper-results-item-attrs';
+
 (function (can, GGRC, CMS) {
   'use strict';
 
