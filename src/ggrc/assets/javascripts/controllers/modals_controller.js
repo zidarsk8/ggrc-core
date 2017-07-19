@@ -445,7 +445,10 @@
         return;
       }
       this.element.find('.wysihtml5').each(function () {
-        $(this).cms_wysihtml5();
+        var element = this;
+        import(/* webpackChunkName: "wysiwyg" */'../plugins/wysiwyg').then(function () {
+          $(element).cms_wysihtml5();
+        });
       });
     },
 

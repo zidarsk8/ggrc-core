@@ -25,8 +25,7 @@ import 'can/list/sort';
 import 'can/map/attributes';
 import 'can/map/backup';
 import 'can/map/validations';
-import 'wysihtml5/wysihtml5-0.4.0pre';
-import 'wysihtml5/bootstrap-wysihtml5-0.0.2';
+
 import 'moment';
 import 'moment-timezone/builds/moment-timezone-with-data.min';
 import 'spin.js';
