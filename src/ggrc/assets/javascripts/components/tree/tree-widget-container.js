@@ -3,6 +3,22 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './tree-header-selector';
+import './tree-type-selector';
+import './sub-tree-expander';
+import './sub-tree-wrapper';
+import './sub-tree-item';
+import './sub-tree-models';
+import './tree-item-extra-info';
+import './tree-item-actions';
+import './tree-item-map';
+import './tree-view';
+import './tree-item';
+import './tree-header';
+import './tree-filter-input';
+import './tree-status-filter';
+import './tree-item-status-for-workflow';
+
 (function (can, GGRC) {
   'use strict';
 
