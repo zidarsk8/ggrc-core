@@ -1400,6 +1400,7 @@ Mustache.registerHelper("current_user_is_admin", function (options) {
 
 Mustache.registerHelper("owned_by_current_user", function (instance, options) {
   var current_user_id = GGRC.current_user.id;
+  var owners;
   instance = Mustache.resolve(instance);
   owners = instance.attr('owners');
   if (owners) {
