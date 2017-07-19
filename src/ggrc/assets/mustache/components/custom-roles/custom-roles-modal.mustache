@@ -43,13 +43,13 @@
                   {{#if isUpdating}}
                     <spinner {toggle}="isUpdating"></spinner>
                   {{else}}
-                    {{#is_allowed 'update' instance}}
+                    {{#if canEdit}}
                       <autocomplete
                           search-items-type="Person"
                           (item-selected)="addPerson(%event.selectedItem, @groupId)"
                           placeholder="Add person">
                       </autocomplete>
-                    {{/is_allowed}}
+                    {{/if}}
                   {{/if}}
                 </div>
               </div>
