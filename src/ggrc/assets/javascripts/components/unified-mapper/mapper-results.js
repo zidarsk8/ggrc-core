@@ -5,6 +5,7 @@
 import './mapper-results-item';
 import './mapper-results-items-header';
 import './mapper-results-columns-configuration';
+import '../object-selection/object-selection';
 
 (function (can, GGRC, CMS, $) {
   'use strict';

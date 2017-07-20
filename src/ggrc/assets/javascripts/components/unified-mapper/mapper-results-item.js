@@ -6,6 +6,8 @@
 import './mapper-results-item-status';
 import './mapper-results-item-details';
 import './mapper-results-item-attrs';
+import '../view-object-buttons/view-object-buttons';
+import '../object-selection/object-selection-item';
 
 (function (can, GGRC, CMS) {
   'use strict';

@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import '../components/add-object-button/add-object-button';
+
 (function (can, $) {
   can.Control('GGRC.Controllers.SummaryWidget', {
     defaults: {

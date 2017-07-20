@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../../auto-save-form/auto-save-form-actions';
+
 (function (can, GGRC) {
   'use strict';
   var tpl = can.view(GGRC.mustache_path +

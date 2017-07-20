@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../object-tasks/object-tasks';
+import '../mapped-counter/mapped-counter';
+
 (function (can, GGRC) {
   'use strict';
 
