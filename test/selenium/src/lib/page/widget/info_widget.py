@@ -94,7 +94,7 @@ class CommonInfo(base.Widget):
             list_text_cas_scopes.append(
                 [ca_header_text,
                  unicode(int(base.Checkbox(self._driver, scope.find_element(
-                     *self._locators.CAS_CHECKBOXES)).is_element_checked()))
+                     *self._locators.CAS_CHECKBOXES)).is_checked_via_js()))
                  ])
           else:
             list_text_cas_scopes.append([ca_header_text, None])
@@ -289,6 +289,9 @@ class Assessments(InfoPanel):
     self.code_entered_text = (
         self.code_section.element.find_element(
             *self._locators.CODE_VALUE_CSS).text)
+    # comments section
+    self.comments = base.CommentsPanel(
+        self._driver, self._locators.COMMENTS_CSS)
     # scope
     self.list_all_headers_text = [
         self._elements.CAS.upper(), self._elements.TITLE,
@@ -296,7 +299,7 @@ class Assessments(InfoPanel):
         self._elements.VERIFIED.upper(),
         self.creators_text, self.assignees_text,
         self.verifiers_text, self._elements.MAPPED_OBJECTS.upper(),
-        self.code_text]
+        self.code_text, self.comments.header_lbl.text]
     self.list_all_values_text = [
         self.cas_text, self.title_entered().text,
         objects.get_normal_form(self.state().text),
@@ -304,7 +307,7 @@ class Assessments(InfoPanel):
         element.AssessmentStates.COMPLETED.upper(),
         self.creators_entered_text, self.assignees_entered_text,
         self.verifiers_entered_text, self.mapped_objects_titles_text,
-        self.code_entered_text]
+        self.code_entered_text, self.comments.scopes]
 
 
 class AssessmentTemplates(InfoPanel):

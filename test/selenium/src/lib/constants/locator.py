@@ -761,6 +761,8 @@ class WidgetInfoAssessment(WidgetInfoPanel):
   CODE_CSS = (By.CSS_SELECTOR, _CODE)
   CODE_HEADER_CSS = (By.CSS_SELECTOR, _CODE + " .info-pane__section-title")
   CODE_VALUE_CSS = (By.CSS_SELECTOR, _CODE + " .inline__content-wrapper")
+  # comments section
+  COMMENTS_CSS = (By.CSS_SELECTOR, ".assessment-comments")
 
 
 class WidgetInfoAssessmentTemplate(WidgetInfoPanel):
@@ -1108,3 +1110,21 @@ class CustomAttributesItemContent(AdminCustomAttributes):
   EDIT_BTN = (By.CSS_SELECTOR, CONTENT_OPEN + " " + Common.TREE_LIST)
   ADD_BTN = (By.CSS_SELECTOR, CONTENT_OPEN + " .add-item .btn")
   TREE_SPINNER = (By.CSS_SELECTOR, ".tree-spinner")
+
+
+class CommentsPanel(object):
+  """Locators for comments' panel."""
+  # _form = ".comment-add-form"
+  HEADER_LBL_CSS = (By.CSS_SELECTOR, ".info-pane__section-title")
+  INPUT_TXT_CSS = (By.CSS_SELECTOR, ".ql-editor")
+  CB_SEND_CSS = (By.CSS_SELECTOR, ".comment-add-form__toolbar-item")
+  CB_SPINNER_CSS = (By.CSS_SELECTOR, ".spinner")
+  ADD_BTN_CSS = (By.CSS_SELECTOR, "comment-add-button")
+  ITEMS_CSS = (By.CSS_SELECTOR, "comment-list-item")
+
+
+class CommentItem(object):
+  """Locators for single item in comments' panel."""
+  AUTHOR_CSS = (By.CSS_SELECTOR, ".person-holder")
+  DATETIME_CSS = (By.CSS_SELECTOR, ".comment-object-item__author_info")
+  CONTENT_CSS = (By.CSS_SELECTOR, ".comment-object-item__text")

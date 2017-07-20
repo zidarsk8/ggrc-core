@@ -405,6 +405,16 @@ class AssessmentsService(BaseWebUiService):
     super(AssessmentsService, self).__init__(
         driver, objects.ASSESSMENTS)
 
+  def add_comments(self, src_obj, obj, comment_objs):
+    """Open Info Panel of 'obj' navigate by object's title, maximize it and
+    add comments according to 'comment_objs' descriptions, return
+    'CommentsPanel' class after adding of comments.
+    """
+    comments_descriptions = [comment_obj.description for comment_obj in
+                             comment_objs]
+    obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
+    return obj_info_panel.comments.add_comments(comments_descriptions)
+
   def generate_objs_via_tree_view(self, src_obj, objs_under_asmt,
                                   asmt_tmpl_obj=None):
     """Open generic widget of mapped objects, open Generation modal from

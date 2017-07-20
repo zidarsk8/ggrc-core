@@ -76,7 +76,7 @@ def get_when_visible(driver, locator):
  Return: selenium.webdriver.remote.webelement.WebElement
  """
   return (_webdriver_wait(driver).
-          until(EC.presence_of_element_located(locator)))
+          until(EC.visibility_of_element_located(locator)))
 
 
 def wait_until_condition(driver, condition):
@@ -210,6 +210,14 @@ def is_element_enabled(element):
   return all([el.is_enabled() and
               not is_value_in_attr(el, value="disabled")
               for el in elements_to_check])
+
+
+def is_element_checked(driver, element):
+  """Check DOM input element checked property using JS.
+  Args: driver (base.CustomDriver), locator (tuple)
+  Return: True if element is checked, False if element is not checked.
+  """
+  return driver.execute_script("return arguments[0].checked", element)
 
 
 def get_nested_elements(element, all_nested=False):
