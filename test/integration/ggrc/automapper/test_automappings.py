@@ -5,6 +5,7 @@ import itertools
 
 import ggrc
 from ggrc import models
+from ggrc.models import Automapping
 from integration.ggrc import TestCase
 from integration.ggrc import generator
 from integration.ggrc.models import factories
@@ -324,3 +325,52 @@ class TestAutomappings(TestCase):
                  (section, regulation),
                  (control, section)],
     )
+
+  def test_automapping_deletion(self):
+    """Test if automapping data is preserved even when the parent relationship
+       is deleted.
+    """
+    # Prepare some data:
+    program = self.create_object(models.Program, {
+        'title': make_name('Program')
+    })
+    regulation = self.create_object(models.Regulation, {
+        'title': make_name('Regulation')
+    })
+    control = self.create_object(models.Control, {
+        'title': make_name('Control')
+    })
+    self.create_mapping(program, regulation)
+    rel1 = self.create_mapping(regulation, control)
+
+    # Check if the correct automapping row is inserted:
+    auto = Automapping.query.filter_by(
+        source_id=rel1.source_id,
+        source_type=rel1.source_type,
+        destination_id=rel1.destination_id,
+        destination_type=rel1.destination_type
+    ).one()
+    assert auto is not None
+
+    # Check if the correct parent id is set:
+    rel2 = models.Relationship.query.filter_by(
+        parent_id=rel1.id
+    ).one()
+    assert rel2 is not None
+
+    # Check if the new relationship points to the correct automapping
+    assert rel2.automapping_id == auto.id
+
+    # Delete the parent relationship
+    self.api.delete(rel1)
+
+    # Use the automapping_id to find the relationship again
+    rel2_after_delete = models.Relationship.query.filter_by(
+        automapping_id=auto.id
+    ).one()
+
+    assert rel2_after_delete is not None
+    # Make sure we are looking at the same object
+    assert rel2.id == rel2_after_delete.id
+    # Parent id should now be None
+    assert rel2_after_delete.parent_id is None
