@@ -173,6 +173,7 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       "is_verification_needed": {
           "display_name": "Need Verification",
           "mandatory": True,
+          "description": "This field is not changeable after creation.",
       },
       "notify_custom_message": "Custom email message",
       "notify_on_change": {
