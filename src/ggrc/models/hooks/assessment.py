@@ -12,7 +12,7 @@ from itertools import izip
 from collections import defaultdict
 
 
-from sqlalchemy import inspect, orm
+from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.login import get_current_user_id
@@ -20,8 +20,8 @@ from ggrc.models import all_models
 from ggrc.models import inflector
 from ggrc.models import Assessment
 from ggrc.models import Issue
-from ggrc.models import Relationship
 from ggrc.models import Snapshot
+from ggrc.models.hooks import common
 from ggrc.services import signals
 from ggrc.access_control import role
 
@@ -76,8 +76,8 @@ def init_hook():
 
     for assessment, src in izip(objects, sources):
       snapshot_dict = src.get("object") or {}
-      map_objects(assessment, snapshot_dict)
-      map_objects(assessment, src.get("audit"))
+      common.map_objects(assessment, snapshot_dict)
+      common.map_objects(assessment, src.get("audit"))
       snapshot = snapshot_cache.get(snapshot_dict.get('id'))
       if not src.get("_generated") and not snapshot:
         continue
@@ -102,9 +102,7 @@ def init_hook():
   @signals.Restful.model_put.connect_via(Issue)
   def handle_assessment_put(sender, obj=None, src=None, service=None):
     # pylint: disable=unused-argument
-    if inspect(obj).attrs["audit"].history.added or \
-            inspect(obj).attrs["audit"].history.deleted:
-      raise ValueError("Audit field should not be changed")
+    common.ensure_field_not_changed(obj, "audit")
 
 
 @signals.Restful.collection_posted.connect_via(Issue)
@@ -119,29 +117,6 @@ def handle_issue_post(sender, objects=None, sources=None):
     assessment = src.get("assessment")
     map_objects(obj, audit)
     map_objects(obj, assessment)
-
-
-def map_objects(src, dst):
-  """Creates a relationship between an src and dst. This also
-  generates automappings. Fails silently if dst dict does not have id and type
-  keys.
-
-  Args:
-    src (model): The src model
-    dst (dict): A dict with `id` and `type`.
-  Returns:
-    None
-  """
-  if not dst:
-    return
-  if 'id' not in dst or 'type' not in dst:
-    return
-  db.session.add(Relationship(
-      source=src,
-      destination_id=dst["id"],
-      destination_type=dst["type"],
-      context_id=src.context_id,
-  ))
 
 
 def get_by_id(obj):
