@@ -4,8 +4,8 @@
 }}
 
 <div class="centered">
-<p>
 {{#instance}}
+<p>
 Are you sure you want to delete
   <span class="user-string">
     {{#if display_name}}
@@ -21,11 +21,14 @@ Are you sure you want to delete
     <p>The action is not reversible.</p>
   </div>
   {{/if_instance_of}}
-  {{#if delete_counts.loading}}
-	<br/><span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block;' }}></span>
-  {{else}}
-	<br/>{{delete_counts.counts}}
-  {{/if}}
-{{/instance}}
 </p>
+<p>
+  {{#delete_counts}}
+    <spinner {toggle}="loading"></spinner>
+    {{#if counts}}
+      This may also delete {{counts}} object mappings.
+    {{/if}}
+  {{/delete_counts}}
+</p>
+{{/instance}}
 </div>

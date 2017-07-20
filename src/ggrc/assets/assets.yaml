@@ -52,6 +52,8 @@ dashboard-js-files:
   - plugins/utils/ggrcq-utils.js
   - plugins/utils/tree-view-utils.js
   - plugins/utils/dashboards-utils.js
+  - plugins/utils/controllers.js
+  - plugins/utils/modals.js
   - plugins/datepicker.js
   - plugins/can_control.js
   - plugins/wysiwyg.js
@@ -394,6 +396,7 @@ dashboard-js-template-files:
   - base_objects/confirm_archive.mustache
   - base_objects/confirm_delete.mustache
   - base_objects/confirm_unmap.mustache
+  - base_objects/confirm_warning.mustache
   - base_objects/contacts.mustache
   - base_objects/create_objective_dropdown_option.mustache
   - base_objects/general_info.mustache
@@ -597,6 +600,7 @@ dashboard-js-template-files:
   - modals/prompt_buttons.mustache
   - modals/confirm_buttons.mustache
   - modals/confirm_cancel_buttons.mustache
+  - modals/confirm_button.mustache
   - modals/delete_cancel_buttons.mustache
   - modals/done_buttons.mustache
   - modals/modal_header.mustache
