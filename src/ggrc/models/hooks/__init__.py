@@ -6,12 +6,14 @@
 from ggrc.models.hooks import assessment
 from ggrc.models.hooks import audit
 from ggrc.models.hooks import comment
+from ggrc.models.hooks import issue
 
 
 ALL_HOOKS = [
     assessment,
     audit,
     comment,
+    issue,
 ]
 
 

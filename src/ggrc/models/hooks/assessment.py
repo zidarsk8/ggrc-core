@@ -19,7 +19,6 @@ from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.models import inflector
 from ggrc.models import Assessment
-from ggrc.models import Issue
 from ggrc.models import Snapshot
 from ggrc.models.hooks import common
 from ggrc.services import signals
@@ -99,24 +98,9 @@ def init_hook():
         assessment.assessment_type = template.template_object_type
 
   @signals.Restful.model_put.connect_via(Assessment)
-  @signals.Restful.model_put.connect_via(Issue)
   def handle_assessment_put(sender, obj=None, src=None, service=None):
     # pylint: disable=unused-argument
     common.ensure_field_not_changed(obj, "audit")
-
-
-@signals.Restful.collection_posted.connect_via(Issue)
-def handle_issue_post(sender, objects=None, sources=None):
-  # pylint: disable=unused-argument
-  """Map issue to audit. This makes sure an auditor is able to create
-  an issue on the audit without having permissions to create Relationships
-  in the context"""
-
-  for obj, src in izip(objects, sources):
-    audit = src.get("audit")
-    assessment = src.get("assessment")
-    map_objects(obj, audit)
-    map_objects(obj, assessment)
 
 
 def get_by_id(obj):
