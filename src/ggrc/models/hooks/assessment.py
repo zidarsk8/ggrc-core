@@ -17,7 +17,6 @@ from sqlalchemy import orm
 from ggrc import db
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
-from ggrc.models import inflector
 from ggrc.models import Assessment
 from ggrc.models import Snapshot
 from ggrc.models.hooks import common
@@ -101,16 +100,6 @@ def init_hook():
   def handle_assessment_put(sender, obj=None, src=None, service=None):
     # pylint: disable=unused-argument
     common.ensure_field_not_changed(obj, "audit")
-
-
-def get_by_id(obj):
-  """Get object instance by id"""
-  if not obj:
-    return
-  model = inflector.get_model(obj['type'])
-  if not model:
-    return
-  return model.query.get(obj["id"])
 
 
 def generate_assignee_relations(assessment,
