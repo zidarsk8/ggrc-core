@@ -32,7 +32,7 @@ class Widget(base.Widget):
         bt_submit_locator=self._locators_filter.BUTTON_FILTER)
     if self.__class__ not in self.cls_without_state_filtering:
       self.dropdown_states = base.DropdownStatic(
-          driver, dropdown_locator=self._locators_filter.DROPDOWN)
+          driver, self._locators_filter.DROPDOWN)
     super(Widget, self).__init__(driver)
     # Tree View
     self.tree_view = TreeView(driver, self.info_widget_cls, self.obj_name)

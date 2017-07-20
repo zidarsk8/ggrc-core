@@ -5,7 +5,6 @@
 
 import re
 from selenium import webdriver
-from selenium.common import exceptions
 from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote import webelement
@@ -14,7 +13,6 @@ from lib import constants, exception, mixin
 from lib.constants import url
 from lib.constants.element import MappingStatusAttrs
 from lib.constants.locator import CommonDropdownMenu
-from lib.constants.test import batch
 from lib.utils import selenium_utils
 
 
@@ -120,48 +118,6 @@ class RichTextInputField(Element):
 
 class TextInputField(RichTextInputField):
   """Generic model for text input field."""
-
-
-class TextFilterDropdown(Element):
-  """Model for elements which are using autocomplete in text field with
- dropdown list of found results and static dropdown list of text elements.
- """
-
-  def __init__(self, driver, textbox_locator):
-    super(TextFilterDropdown, self).__init__(driver, textbox_locator)
-    self._locator_dropdown = (
-        CommonDropdownMenu.get_options_locator(textbox_locator))
-    self._elements_dropdown = None
-    self.text_to_filter = None
-
-  def _filter_results(self, text):
-    """Insert text into textbox field."""
-    self.text_to_filter = text
-    self.element.click()
-    self.element.clear()
-    self._driver.find_element(*self.locator_or_element).send_keys(text)
-
-  def _select_first_result(self):
-    """Wait when dropdown elements appear and select first one."""
-    for _ in xrange(batch.TRY_COUNT):
-      try:
-        selenium_utils.get_when_visible(self._driver, self._locator_dropdown)
-        dropdown_elements = self._driver.find_elements(*self._locator_dropdown)
-        self.text = dropdown_elements[0].text
-        dropdown_elements[0].click()
-        break
-      except exceptions.StaleElementReferenceException:
-        pass
-
-  def filter_and_select_el_by_text(self, text):
-    """Make filtering and select first filtered text element in dropdown."""
-    self._filter_results(text)
-    self._select_first_result()
-
-  def find_and_select_el_by_text(self, text):
-    """Find and select text element in dropdown by text."""
-    self.text_to_filter = text
-    self.element.click()
 
 
 class Iframe(Element):
@@ -295,19 +251,12 @@ class Dropdown(Element):
 class DropdownStatic(Element):
   """Dropdown with predefined static elements."""
 
-  def __init__(self, driver, dropdown_locator):
-    """
-    Args: driver (CustomDriver)
-    """
-    super(DropdownStatic, self).__init__(driver, dropdown_locator)
-    self._locator_dropdown_elements = (
-        CommonDropdownMenu.get_options_locator(dropdown_locator))
-    self.elements_dropdown = self._driver.find_elements(
-        *self._locator_dropdown_elements)
+  def find_options(self):
+    return self.element.find_elements(*CommonDropdownMenu.DROPDOWN_OPTIONS)
 
   def select(self, member_name):
     """Selects dropdown element based on dropdown element name."""
-    for element in self.elements_dropdown:
+    for element in self.find_options():
       if element.get_attribute("value") == member_name:
         element.click()
         break
