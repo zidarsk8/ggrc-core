@@ -15,7 +15,6 @@ import 'bootstrap/js/bootstrap-tab.js';
 import 'bootstrap/js/bootstrap-tooltip.js';
 import 'bootstrap/js/bootstrap-popover.js';
 import 'clipboard';
-import 'quill';
 import 'canjs/amd/can';
 import 'can/construct/super';
 import 'can/construct/proxy';

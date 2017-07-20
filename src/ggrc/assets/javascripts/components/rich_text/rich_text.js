@@ -3,8 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import Quill from 'quill';
-
 (function (can, GGRC) {
   'use strict';
 
@@ -60,31 +58,34 @@ import Quill from 'quill';
       editor: false,
       editorHasFocus: false,
       initEditor: function (container, toolbarContainer, text) {
-        var editor = new Quill(container, {
-          theme: 'snow',
-          bounds: container,
-          placeholder: this.attr('placeholder'),
-          modules: {
-            toolbar: {
-              container: toolbarContainer
-            },
-            clipboard: {
-              matchers: [
-                [Node.TEXT_NODE, this.urlMatcher]
-              ]
+        var self = this;
+        import(/* webpackChunkName: "quill" */'quill').then(function (Quill) {
+          var editor = new Quill(container, {
+            theme: 'snow',
+            bounds: container,
+            placeholder: self.attr('placeholder'),
+            modules: {
+              toolbar: {
+                container: toolbarContainer
+              },
+              clipboard: {
+                matchers: [
+                  [Node.TEXT_NODE, self.urlMatcher]
+                ]
+              }
             }
+          });
+          if (text) {
+            editor.clipboard.dangerouslyPasteHTML(0, text);
           }
-        });
-        if (text) {
-          editor.clipboard.dangerouslyPasteHTML(0, text);
-        }
-        editor.on('text-change', this.onChange.bind(this));
+          editor.on('text-change', self.onChange.bind(self));
 
-        if (this.attr('hiddenToolbar')) {
-          editor.on('selection-change',
-            this.onSelectionChange.bind(this));
-        }
-        this.attr('editor', editor);
+          if (self.attr('hiddenToolbar')) {
+            editor.on('selection-change',
+              self.onSelectionChange.bind(self));
+          }
+          self.attr('editor', editor);
+        });
       },
       urlMatcher: function (node, delta) {
         var matches;
