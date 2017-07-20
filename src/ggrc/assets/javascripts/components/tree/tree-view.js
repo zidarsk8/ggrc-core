@@ -3,11 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import template from './templates/tree-view.mustache';
+
 (function (can, GGRC) {
   'use strict';
 
-  var template = can.view(GGRC.mustache_path +
-    '/components/tree/tree-view.mustache');
   var viewModel = can.Map.extend({
     define: {
       notResult: {

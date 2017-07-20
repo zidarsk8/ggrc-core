@@ -3,11 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import template from './templates/sub-tree-models.mustache';
+
 (function (can, GGRC) {
   'use strict';
-
-  var template = can.view(GGRC.mustache_path +
-    '/components/tree/sub-tree-models.mustache');
 
   var viewModel = can.Map.extend({
     define: {
