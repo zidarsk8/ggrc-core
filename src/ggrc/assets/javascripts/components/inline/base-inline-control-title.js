@@ -13,8 +13,18 @@
       '/components/inline/base-inline-control-title.mustache'
     ),
     viewModel: {
+      define: {
+        isEditIconAllowed: {
+          get: function () {
+            return !this.attr('editMode') &&
+              !this.attr('isLoading') &&
+              !this.attr('isEditIconDenied');
+          }
+        }
+      },
       isLoading: false,
-      editMode: false
+      editMode: false,
+      isEditIconDenied: false
     },
     events: {
       '.inline-edit-icon click': function () {

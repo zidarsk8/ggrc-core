@@ -4,9 +4,7 @@
 }}
 
 <div class="inline">
-  <div class="inline__header action-toolbar">
-    <content></content>
-  </div>
+  <content></content>
 
   {{#if editMode}}
     <div class="inline__content-wrapper">
@@ -64,12 +62,14 @@
     </div>
   {{/if}}
 
-  <div class="inline__content-wrapper">
-    <div class="inline__content {{#if editMode}}inline--hidden{{/if}}">
-      <readonly-inline-content
-        {with-read-more}="withReadMore"
-        {value}="context.value">
-      </readonly-inline-content>
+  {{#if isShowContent}}
+    <div class="inline__content-wrapper">
+      <div class="inline__content {{#if editMode}}inline--hidden{{/if}}">
+        <readonly-inline-content
+          {with-read-more}="withReadMore"
+          {value}="context.value">
+        </readonly-inline-content>
+      </div>
     </div>
-  </div>
+  {{/if}}
 </div>

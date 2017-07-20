@@ -257,9 +257,8 @@ class Assessments(InfoPanel):
 
   def __init__(self, driver):
     super(Assessments, self).__init__(driver)
-    # toggles
-    self.code_section = base.Toggle(
-        self._driver, self._locators.BUTTON_CODE_TOGGLE, locator.Common.DOWN)
+    self.code_section = base.Label(
+        self._driver, self._locators.CODE_CSS)
     # mapped objects
     self.mapped_objects_titles_and_descriptions = self._driver.find_elements(
         *self._locators.MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS)
@@ -284,15 +283,12 @@ class Assessments(InfoPanel):
             self._elements.VERIFIERS_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
     # code section
-    self.code_section.toggle()
-    self.code_and_code_entered = self._driver.find_elements(
-        *self._locators.CODE_HEADER_AND_VALUE)
-    if self.code_and_code_entered:
-      self.code_text, self.code_entered_text = [
-          [mapped_scope.text.split()[0], mapped_scope.text.split()[1]] for
-          mapped_scope in self.code_and_code_entered if
-          len(mapped_scope.text.split()) >= 2][0]
-    self.code_section.toggle(False)
+    self.code_text = (
+        self.code_section.element.find_element(
+            *self._locators.CODE_HEADER_CSS).text)
+    self.code_entered_text = (
+        self.code_section.element.find_element(
+            *self._locators.CODE_VALUE_CSS).text)
     # scope
     self.list_all_headers_text = [
         self._elements.CAS.upper(), self._elements.TITLE,

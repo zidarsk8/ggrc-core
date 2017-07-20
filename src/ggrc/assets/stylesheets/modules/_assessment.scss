@@ -109,9 +109,18 @@
     }
   }
 
+  .conclusion-small-text {
+    line-height: 4px;
+  }
+
   .tabs-wrap {
     margin-top: -28px;
     position: relative;
+
+    .assessment-attributes-tab {
+      margin-right: 30%;
+      padding-right: 24px;
+    }
 
     .attribute-tab-panel-column {
       display: inline-block;
