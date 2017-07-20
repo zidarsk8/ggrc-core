@@ -138,6 +138,7 @@ class Revision(Base, db.Model):
         "secondary_assessor": reverted_roles_dict.get("Secondary Assignees"),
         "contact": reverted_roles_dict.get("Primary Contacts"),
         "secondary_contact": reverted_roles_dict.get("Secondary Contacts"),
+        "owners": reverted_roles_dict.get("Admin"),
     }
     exists_roles = {i["ac_role_id"] for i in access_control_list}
     for field, role_id in map_field_to_role.items():
@@ -145,22 +146,32 @@ class Revision(Base, db.Model):
         continue
       if role_id in exists_roles or role_id is None:
         continue
-      person_id = (self._content.get(field) or {}).get("id")
-      if not person_id:
+      field_content = self._content.get(field) or {}
+      if not field_content:
         continue
-      access_control_list.append({
-          "display_name": roles_dict[role_id],
-          "ac_role_id": role_id,
-          "context_id": None,
-          "created_at": None,
-          "object_type": self.resource_type,
-          "updated_at": None,
-          "object_id": self.resource_id,
-          "modified_by_id": None,
-          "person_id": person_id,
-          "modified_by": None,
-          "id": None,
-      })
+      if not isinstance(field_content, list):
+        field_content = [field_content]
+      person_ids = {fc.get("id") for fc in field_content if fc.get("id")}
+      for person_id in person_ids:
+        access_control_list.append({
+            "display_name": roles_dict[role_id],
+            "ac_role_id": role_id,
+            "context_id": None,
+            "created_at": None,
+            "object_type": self.resource_type,
+            "updated_at": None,
+            "object_id": self.resource_id,
+            "modified_by_id": None,
+            "person_id": person_id,
+            # Frontend require data in such format
+            "person": {
+                "id": person_id,
+                "type": "Person",
+                "href": "/api/people/{}".format(person_id)
+            },
+            "modified_by": None,
+            "id": None,
+        })
     populated_content = self._content.copy()
     populated_content["access_control_list"] = access_control_list
     return populated_content

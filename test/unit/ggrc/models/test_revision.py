@@ -34,6 +34,7 @@ class TestCheckPopulatedContent(unittest.TestCase):
       ('secondary_assessor', ("Secondary Assignees", 2)),
       ('contact', ("Primary Contacts", 3)),
       ('secondary_contact', ("Secondary Contacts", 4)),
+      ('owners', ("Admin", 5)),
   )
   @ddt.unpack
   def test_check_populated_content(self, key, role):
@@ -56,6 +57,12 @@ class TestCheckPopulatedContent(unittest.TestCase):
           "object_id": self.object_id,
           "modified_by_id": None,
           "person_id": self.user_id,
+          # Frontend require data in such format
+          "person": {
+              "id": self.user_id,
+              "type": "Person",
+              "href": "/api/people/{}".format(self.user_id)
+          },
           "modified_by": None,
           "id": None,
       })
