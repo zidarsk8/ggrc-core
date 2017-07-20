@@ -80,6 +80,9 @@ module.exports = function (env, argv) {
           loader: 'expose-loader',
           options: '$'
         }]
+      }, {
+        test: /\.mustache/,
+        loader: 'raw-loader'
       }]
     },
     devtool: isDevelopment(env) ? 'eval' : 'source-map',
