@@ -757,9 +757,10 @@ class WidgetInfoAssessment(WidgetInfoPanel):
   PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
                                "assessment-people .editable-people-group")
   # Code section
-  _CODE = WIDGET + ' [title-text="Code"]'
-  BUTTON_CODE_TOGGLE = (By.CSS_SELECTOR, _CODE + TOGGLE)
-  CODE_HEADER_AND_VALUE = (By.CSS_SELECTOR, _CODE + " .label-list>li")
+  _CODE = "assessment-inline-item[prop-name='slug'] "
+  CODE_CSS = (By.CSS_SELECTOR, _CODE)
+  CODE_HEADER_CSS = (By.CSS_SELECTOR, _CODE + " .info-pane__section-title")
+  CODE_VALUE_CSS = (By.CSS_SELECTOR, _CODE + " .inline__content-wrapper")
 
 
 class WidgetInfoAssessmentTemplate(WidgetInfoPanel):
