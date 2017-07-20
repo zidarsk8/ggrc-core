@@ -316,12 +316,14 @@
           });
         }.bind(this));
 
-      can.view.render(GGRC.mustache_path + template,
+      import(/* webpackChunkName: "infiniteScroll" */'../controllers/infinite-scroll-controller').then(function () {
+        can.view.render(GGRC.mustache_path + template,
         context, function (frag) {
           $ul.html(frag);
           $ul.cms_controllers_lhn_tooltips().cms_controllers_infinite_scroll();
           can.view.hookup(ul);
         });
+      });
     }
   });
 

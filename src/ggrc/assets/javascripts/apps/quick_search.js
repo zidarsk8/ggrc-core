@@ -6,8 +6,11 @@
 (function($) {
   $(document.body).on("click", ".lhn-no-init", function() {
     $(this).removeClass('lhn-no-init');
-    $("#lhn").cms_controllers_lhn();
-    $(document.body).ggrc_controllers_recently_viewed();
+    import(/* webpackChunkName: "lhn" */'../controllers/lhn_controllers')
+      .then(function () {
+        $("#lhn").cms_controllers_lhn();
+        $(document.body).ggrc_controllers_recently_viewed();
+      });
   });
 
   $(document.body).on("click", "a[data-toggle=unmap]", function(ev) {

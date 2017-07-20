@@ -33,7 +33,6 @@ import './person';
 import './simple_models';
 import './business_object_models';
 import './directive_models';
-import './recently_viewed_object';
 import './search';
 import './audit_models';
 import './comment';
