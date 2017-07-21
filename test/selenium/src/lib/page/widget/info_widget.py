@@ -207,9 +207,6 @@ class Programs(InfoPanel):
         self._driver, self._locators.EFFECTIVE_DATE)
     self.effective_date_entered = base.Label(
         self._driver, self._locators.EFFECTIVE_DATE_ENTERED)
-    self.stop_date = base.Label(self._driver, self._locators.STOP_DATE)
-    self.stop_date_entered = base.Label(
-        self._driver, self._locators.STOP_DATE_ENTERED)
 
 
 class Workflows(InfoPanel):

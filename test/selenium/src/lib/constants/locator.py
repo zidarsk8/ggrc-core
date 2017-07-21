@@ -299,14 +299,6 @@ class ModalCreateNewProgram(BaseModalCreateNew):
       By.CSS_SELECTOR,
       '[test-id="new_program_field_effective_date_f2783a28"] '
       '[data-id="effective_date_hidden"] [data-handler="selectDay"]')
-  UI_STOP_DATE = (
-      By.CSS_SELECTOR,
-      '[test-id="new_program_field_effective_date_f2783a28"] '
-      '[data-id="stop_date_hidden"] .datepicker__input')
-  STOP_DATE_DATEPICKER = (
-      By.CSS_SELECTOR,
-      '[test-id="new_program_field_effective_date_f2783a28"] '
-      '[data-id="stop_date_hidden"] [data-handler="selectDay"]')
   TITLE = (By.CSS_SELECTOR, '[data-test-id="label_title_2c925d94"]')
   DESCRIPTION = (
       By.CSS_SELECTOR, '[data-test-id="label_description_2c925d94"]')
@@ -428,14 +420,6 @@ class ModalCreateNewControl(BaseModalCreateNew):
       By.CSS_SELECTOR,
       '[test-id="control_effective_dates_0376cf90"] '
       '[data-id="effective_date_hidden"] [data-handler="selectDay"]')
-  STOP_DATE = (
-      By.CSS_SELECTOR,
-      '[test-id="control_effective_dates_0376cf90"] '
-      '[data-id="stop_date_hidden"] .datepicker__input')
-  DATEPICKER_STOP_DATE = (
-      By.CSS_SELECTOR,
-      '[test-id="control_effective_dates_0376cf90"] '
-      '[data-id="stop_date_hidden"] [data-handler="selectDay"]')
   BUTTON_HIDE_ALL_OPTIONAL_FIELDS = (By.CSS_SELECTOR, '#formHide')
 
 
@@ -700,12 +684,6 @@ class WidgetInfoProgram(WidgetInfoPanel):
   EFFECTIVE_DATE_ENTERED = (
       By.CSS_SELECTOR,
       '[data-test-id="title_effective_date_cf47bc01"] p'.format(WIDGET))
-  STOP_DATE = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_stop_date_cf47bc01"] h6'.format(WIDGET))
-  STOP_DATE_ENTERED = (
-      By.CSS_SELECTOR,
-      '[data-test-id="title_stop_date_cf47bc01"] p'.format(WIDGET))
   PRIVATE_PROGRAM = (By.CSS_SELECTOR,
                      '[data-test-id="title_private_ec758af9"] h6')
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
