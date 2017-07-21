@@ -97,7 +97,7 @@ class TestExportSnapshots(TestCase):
             "Review State": control.os_state,
             "Significance": u"key" if control.key_control else u"non-key",
             "State": control.status,
-            "Last Deprecated Date": control.end_date.strftime("%m/%d/%Y"),
+            "Last Deprecated Date": "",
             "Test Plan": control.test_plan,
             "Title": control.title,
             "Type/Means": control.means.display_name,

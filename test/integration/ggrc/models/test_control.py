@@ -7,9 +7,14 @@ from ggrc import db
 from ggrc.models import Control
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
+from integration.ggrc import api_helper
 
 
 class TestControl(TestCase):
+
+  def setUp(self):
+    super(TestControl, self).setUp()
+    self.api = api_helper.Api()
 
   def test_simple_categorization(self):
     category = factories.ControlCategoryFactory(scope_id=100)
@@ -25,3 +30,18 @@ class TestControl(TestCase):
     control = factories.ControlFactory(test_plan="This is a test text")
     control = db.session.query(Control).get(control.id)
     self.assertEqual(control.test_plan, "This is a test text")
+
+  def test_set_end_date(self):
+    """End_date can't to be updated."""
+    control = factories.ControlFactory()
+    self.api.put(control, {"end_date": "2015-10-10"})
+    control = db.session.query(Control).get(control.id)
+    self.assertIsNone(control.end_date)
+
+  def test_set_deprecated_status(self):
+    """Deprecated status setup end_date."""
+    control = factories.ControlFactory()
+    self.assertIsNone(control.end_date)
+    self.api.put(control, {"status": Control.DEPRECATED})
+    control = db.session.query(Control).get(control.id)
+    self.assertIsNotNone(control.end_date)
