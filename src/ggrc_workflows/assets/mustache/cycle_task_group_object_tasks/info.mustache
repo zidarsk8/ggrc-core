@@ -127,7 +127,7 @@
             or #if_null' instance.task_type}}
             <h6>Task details</h6>
             <div class="rtf-block">
-              {{{firstnonempty instance.description 'No additional details'}}}
+              <read-more {text}="instance.description"></read-more>
             </div>
           {{/if_helpers}}
           {{#if_equals instance.task_type 'menu'}}
