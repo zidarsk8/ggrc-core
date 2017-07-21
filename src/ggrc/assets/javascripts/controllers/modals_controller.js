@@ -691,6 +691,10 @@
       }, this);
     },
 
+    '[data-toggle="unified-mapper"] click': function (el, ev) {
+      document.body.classList.add('no-events');
+    },
+
     "{$footer} a.btn[data-toggle='modal-submit-addmore'] click":
       function (el, ev) {
         if (el.hasClass('disabled')) {
