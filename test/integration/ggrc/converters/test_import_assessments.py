@@ -276,6 +276,7 @@ class TestAssessmentImport(TestCase):
             u'name': u'Assessment',
             u'created': 0,
             u'deleted': 0,
+            u'deprecated': 0,
             u'row_warnings': row_warnings,
             u'rows': 1,
             u'block_warnings': [],

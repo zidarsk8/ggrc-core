@@ -453,16 +453,23 @@ class BlockConverter(object):
 
   def get_info(self):
     """Returns info dict for current block."""
-    created, updated, ignored, deleted = 0, 0, 0, 0
+    created = 0
+    updated = 0
+    ignored = 0
+    deleted = 0
+    deprecated = 0
     for row in self.row_converters:
       if row.ignore:
         ignored += 1
-      elif row.is_delete:
+        continue
+      if row.is_delete:
         deleted += 1
-      elif row.is_new:
+        continue
+      if row.is_new:
         created += 1
       else:
         updated += 1
+      deprecated += int(row.is_deprecated)
     info = {
         "name": self.name,
         "rows": len(self.rows),
@@ -470,6 +477,7 @@ class BlockConverter(object):
         "updated": updated,
         "ignored": ignored,
         "deleted": deleted,
+        "deprecated": deprecated,
         "block_warnings": self.block_warnings,
         "block_errors": self.block_errors,
         "row_warnings": self.row_warnings,
