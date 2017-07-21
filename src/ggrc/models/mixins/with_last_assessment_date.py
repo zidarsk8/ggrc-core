@@ -23,7 +23,10 @@ class WithLastAssessmentDate(attributable.Attributable):
   ]
 
   _aliases = {
-      "last_assessment_date": "Last Assessment Date",
+      "last_assessment_date": {
+          "display_name": "Last Assessment Date",
+          "view_only": True,
+      },
   }
 
   _fulltext_attrs = [attributes.DatetimeFullTextAttr("last_assessment_date",

@@ -24,6 +24,7 @@ Corner cases:
 
 """
 
+import collections
 import datetime
 
 import freezegun
@@ -58,16 +59,14 @@ class TestLastAssessmentDate(TestCase):
     self.client.get("/login")
     person = models.Person.query.first()
     with factories.single_commit():
-      controls = [
-          factories.ControlFactory(title="Control_{}".format(i),
-                                   owners=[person])
-          for i in range(5)
-      ]
-      objectives = [
-          factories.ObjectiveFactory(title="Objective_{}".format(i),
-                                     owners=[person])
-          for i in range(2)
-      ]
+      controls = [factories.ControlFactory(slug="Control_{}".format(i),
+                                           title="Control_{}".format(i),
+                                           owners=[person])
+                  for i in range(5)]
+      objectives = [factories.ObjectiveFactory(slug="Objective_{}".format(i),
+                                               title="Objective_{}".format(i),
+                                               owners=[person])
+                    for i in range(2)]
       audit_0 = factories.AuditFactory(title="Audit_0", contact=person)
       audit_1 = factories.AuditFactory(title="Audit_1", contact=person)
       audit_0_snapshots = self._create_snapshots(
@@ -161,3 +160,21 @@ class TestLastAssessmentDate(TestCase):
       else:
         f_date = ""
       self.assertEqual(control["Last Assessment Date"], f_date)
+
+  def test_import_lad_field(self):
+    """Test Last Assessment Date field read only on import."""
+    finish_date = datetime.datetime(2017, 2, 20, 13, 40, 0)
+    with freezegun.freeze_time(finish_date):
+      asmt = models.Assessment.query.filter_by(title="Assessment_0").first()
+      self.api.put(asmt, {"status": "Completed"})
+    resp = self.import_data(collections.OrderedDict([
+        ("object_type", "Control"),
+        ("code", "Control_1"),
+        ("Last Assessment Date", "06/06/2017"),
+    ]))
+    control = models.Control.query.filter(
+        models.Control.slug == "Control_1"
+    ).one()
+    self.assertEqual(1, len(resp))
+    self.assertEqual(1, resp[0]["updated"])
+    self.assertEqual(control.last_assessment_date, finish_date)
