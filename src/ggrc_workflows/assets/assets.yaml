@@ -1,4 +1,5 @@
 dashboard-js-files:
+  - apps/workflow-config.js
   - apps/workflows.js
   - controllers/dashboard_page.js
   - controllers/workflow_page.js
@@ -14,6 +15,8 @@ dashboard-js-files:
   - components/end_cycle.js
   - components/workflow_active.js
   - components/workflow_deactivate.js
+  - components/repeat-on-button.js
+  - components/repeat-on-button-wrapper.js
 
 dashboard-js-spec-files:
 
@@ -22,6 +25,8 @@ dashboard-js-template-files:
   - base_objects/task_group_subtree_add_item.mustache
   - base_objects/task_group_subtree.mustache
   - base_objects/approval_link.mustache
+  - base_objects/repeat-on-button.mustache
+  - base_objects/repeat-on-options.mustache
   - cycles/info.mustache
   - cycle_task_entries/tree.mustache
   - cycle_task_entries/tree_footer.mustache

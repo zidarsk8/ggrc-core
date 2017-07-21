@@ -1,0 +1,41 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="ggrc-form-item">
+    <div class="ggrc-form-item__row">
+        <div class="ggrc-form-item__checkbox-item">
+            <label class="input--inline" for="repeat-checkbox">
+                <input type="checkbox" can-value="repeatEnabled" id="repeat-checkbox"/>
+                Repeat Workflow
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="ggrc-form-item">
+    <div class="ggrc-form-item__multiple-row">
+        <label class="ggrc-form-item__label {{#unless repeatEnabled}}disabled{{/unless}}"
+               for="repeats-select">
+            Repeats
+        </label>
+        <dropdown options-list="unitOptions"
+                  name="state.result.unit"
+                  id="repeats-select"
+                  {is-disabled}="repeatDisabled">
+        </dropdown>
+    </div>
+
+    <div class="ggrc-form-item__multiple-row">
+        <label class="ggrc-form-item__label {{#unless repeatEnabled}}disabled{{/unless}}"
+               for="repeat-every-select">
+            Repeat Every
+        </label>
+        <dropdown {options-list}="repeatOptions"
+                  name="state.result.repeatEvery"
+                  id="repeat-every-select"
+                  {is-disabled}="repeatDisabled">
+        </dropdown>
+    </div>
+</div>
