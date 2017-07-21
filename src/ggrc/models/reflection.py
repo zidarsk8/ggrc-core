@@ -187,42 +187,35 @@ class AttributeInfo(object):
     result.update(attrs)
     return result
 
+  @staticmethod
+  def _get_first_exist_attr(obj, *attrs):
+    """First exist attr value will be return."""
+    for attr in attrs:
+      if hasattr(obj, attr):
+        return getattr(obj, attr)
+
   @classmethod
-  def gather_attrs(cls, tgt_class, src_attrs, accumulator=None,
-                   main_class=None):
+  def gather_attrs(cls, tgt_class, src_attrs, ignore_publishonly=False):
     """Gathers the attrs to be included in a list for publishing, update, or
     some other purpose. Supports inheritance by iterating the list of
     ``src_attrs`` until a list is found.
-
-    Inheritance of some attributes can be circumvented through use of the
-    ``DontPropoagate`` decorator class.
     """
-    if main_class is None:
-      main_class = tgt_class
-    src_attrs = src_attrs if isinstance(src_attrs, list) else [src_attrs]
-    accumulator = accumulator if accumulator is not None else set()
-    ignore_publishonly = True
-    for attr in src_attrs:
-      attrs = None
-      # Only get the attribute if it is defined on the target class, but
-      # get it via `getattr`, to handle `@declared_attr`
-      if attr in tgt_class.__dict__:
-        attrs = getattr(tgt_class, attr, None)
-        if callable(attrs):
-          attrs = attrs(main_class)
-      if attrs is not None:
-        if not ignore_publishonly:
-          attrs = [a for a in attrs if not isinstance(a, PublishOnly)]
-        else:
-          attrs = [a if not isinstance(a, PublishOnly) else a.attr_name for
-                   a in attrs]
-        accumulator.update(attrs)
-        break
-      else:
-        ignore_publishonly = False
-    for base in tgt_class.__bases__:
-      cls.gather_attrs(base, src_attrs, accumulator, main_class=main_class)
-    return accumulator
+    if not isinstance(src_attrs, list):
+      src_attrs = [src_attrs]
+    accumulator = {}
+    for base in tgt_class.__mro__:
+      attrs = cls._get_first_exist_attr(base, *src_attrs) or []
+      if callable(attrs):
+        attrs = attrs(tgt_class)
+      for attr in attrs:
+        pub_only = isinstance(attr, PublishOnly)
+        if pub_only:
+          attr = attr.attr_name
+        if attr not in accumulator:
+          accumulator[attr] = pub_only
+    if ignore_publishonly:
+      return {a for a, f in accumulator.iteritems() if not f}
+    return set(accumulator.keys())
 
   @classmethod
   def gather_publish_attrs(cls, tgt_class):
@@ -242,13 +235,17 @@ class AttributeInfo(object):
 
   @classmethod
   def gather_update_attrs(cls, tgt_class):
-    attrs = cls.gather_attrs(tgt_class, ['_update_attrs', '_publish_attrs'])
+    attrs = cls.gather_attrs(tgt_class,
+                             ['_update_attrs', '_publish_attrs'],
+                             True)
     return attrs
 
   @classmethod
   def gather_create_attrs(cls, tgt_class):
-    return cls.gather_attrs(tgt_class, [
-        '_create_attrs', '_update_attrs', '_publish_attrs'])
+    return cls.gather_attrs(
+        tgt_class,
+        ['_create_attrs', '_update_attrs', '_publish_attrs'],
+        True)
 
   @classmethod
   def gather_include_links(cls, tgt_class):
