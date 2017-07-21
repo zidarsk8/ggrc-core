@@ -3,7 +3,7 @@
    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import './tracker';
+import '../tracker';
 import 'jquery';
 import 'lodash';
 import 'jquery-ui/jquery-ui.min';

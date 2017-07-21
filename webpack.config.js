@@ -8,6 +8,7 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const _ = require('lodash');
 const path = require('path');
+const ENV = process.env;
 const GGRC = {
   get_dashboard_modules: function () {
     return _.compact(_.map(process.env.GGRC_SETTINGS_MODULE.split(' '), function (module) {
@@ -29,12 +30,13 @@ const GGRC = {
 module.exports = {
   entry: {
     vendor: 'ggrc/vendor',
-    dashboard: GGRC.get_dashboard_modules()
+    dashboard: 'ggrc/dashboard',
+    styles: GGRC.get_dashboard_modules()
   },
   output: {
-    filename: '[name]_.js',
-    path: path.join(__dirname, './src/ggrc/assets/stylesheets/'),
-    publicPath: '/src/ggrc/static/'
+    filename: isProduction() ? '[name].[chunkhash].js' : '[name]_.js',
+    path: path.join(__dirname, './src/ggrc/static/'),
+    publicPath: '/static/'
   },
   module: {
     rules: [{
@@ -70,7 +72,7 @@ module.exports = {
       loader: 'exports-loader?wysihtml5'
     }]
   },
-  devtool: 'eval',
+  // devtool: 'eval',
   resolve: {
     modules: ['node_modules', 'bower_components', 'third_party']
       .map(function (dir) {
@@ -78,7 +80,7 @@ module.exports = {
       }),
     alias: {
       'can': 'canjs/amd/can/',
-      'ggrc': './src/ggrc/assets/javascripts'
+      'ggrc': './src/ggrc/assets/javascripts/entrypoints'
     }
   },
   plugins: [
@@ -93,13 +95,23 @@ module.exports = {
       _: 'lodash',
       moment: 'moment'
     }),
+    new webpack.DefinePlugin({
+      GGRC_SETTINGS_MODULE: JSON.stringify(process.env.GGRC_SETTINGS_MODULE)
+    }),
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor'
     }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new UglifyJSPlugin()
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
   ],
   stats: {
     errorDetails: true
   }
 };
+
+if (isProduction()) {
+  module.exports.plugins.push(new UglifyJSPlugin());
+}
+
+function isProduction() {
+  return ENV.NODE_ENV === 'production';
+}
