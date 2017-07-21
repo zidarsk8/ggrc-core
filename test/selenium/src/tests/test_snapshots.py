@@ -577,7 +577,8 @@ class TestSnapshots(base.Test):
   @pytest.mark.parametrize(
       "dynamic_object",
       ["new_assessment_rest",
-       pytest.mark.xfail(strict=True)("new_issue_rest")],
+       pytest.mark.xfail(reason="Issue GGRC-2817", strict=True)
+          ("new_issue_rest")],
       indirect=["dynamic_object"])
   @pytest.mark.smoke_tests
   def test_snapshot_can_be_unmapped_from_assessment_or_issue(
