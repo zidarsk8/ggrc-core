@@ -11,12 +11,15 @@ from integration.ggrc import api_helper
 
 
 class TestControl(TestCase):
+  """Tests for control model."""
 
   def setUp(self):
+    """setUp, nothing else to add."""
     super(TestControl, self).setUp()
     self.api = api_helper.Api()
 
   def test_simple_categorization(self):
+    """Check append category append to control."""
     category = factories.ControlCategoryFactory(scope_id=100)
     control = factories.ControlFactory()
     control.categories.append(category)
@@ -27,6 +30,7 @@ class TestControl(TestCase):
     self.assertIn(category, control.categories)
 
   def test_has_test_plan(self):
+    """Check test plan setup to control."""
     control = factories.ControlFactory(test_plan="This is a test text")
     control = db.session.query(Control).get(control.id)
     self.assertEqual(control.test_plan, "This is a test text")
