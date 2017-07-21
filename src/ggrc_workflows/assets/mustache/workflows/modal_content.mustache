@@ -53,8 +53,11 @@
             Repeat Workflow
             <a data-id="hide_frequency_hidden_lk" href="javascript://" class="field-hide" tabindex="-1">hide</a>
           </label>
-          <repeat-on-button-wrapper {(instance)}="instance"></repeat-on-button-wrapper>
-          <repeat-on-summary {unit}="instance.unit" {repeat-every}="instance.repeat_every">
+          {{#if instance.isNew}}
+            <repeat-on-button-wrapper {(instance)}="instance"></repeat-on-button-wrapper>
+          {{/if}}
+          <repeat-on-summary {unit}="instance.unit" {repeat-every}="instance.repeat_every"
+                             {hide-repeat-off}="instance.isNew">
           </repeat-on-summary>
         </div>
       </div>

@@ -8,9 +8,9 @@
         Repeat every {{unitText}}
     </div>
 {{else}}
-    {{#if showRepeatOff}}
+    {{#unless hideRepeatOff}}
         <div class="repeat-summary">
             Repeat Off
         </div>
-    {{/if}}
+    {{/unless}}
 {{/if}}

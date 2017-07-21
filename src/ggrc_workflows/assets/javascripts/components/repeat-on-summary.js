@@ -33,9 +33,9 @@
             return result;
           }
         },
-        showRepeatOff: {
+        hideRepeatOff: {
           type: 'boolean',
-          value: false
+          value: true
         }
       },
       unit: null,
