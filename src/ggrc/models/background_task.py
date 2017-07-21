@@ -97,12 +97,22 @@ def create_task(name, url, queued_callback=None, parameters=None, method=None):
   task.modified_by = get_current_user()
   db.session.add(task)
   db.session.commit()
+  banned = {
+      "X-Appengine-Country",
+      "X-Appengine-Queuename",
+      "X-Appengine-Current-Namespace",
+      "X-Appengine-Taskname",
+      "X-Appengine-Tasketa",
+      "X-Appengine-Taskexecutioncount",
+      "X-Appengine-Taskretrycount",
+      "X-Task-Id",
+  }
 
   # schedule a task queue
   if getattr(settings, 'APP_ENGINE', False):
     from google.appengine.api import taskqueue
-    headers = Headers(request.headers)
-    headers.add('x-task-id', task.id)
+    headers = Headers({k: v for k, v in request.headers if k not in banned})
+    headers.add('X-Task-Id', task.id)
     taskqueue.add(
         queue_name="ggrc",
         url=url,
