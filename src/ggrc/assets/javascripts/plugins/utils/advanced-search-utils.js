@@ -110,7 +110,7 @@
     function attributeToFilter(attribute) {
       return '"' + attribute.field +
              '" ' + attribute.operator +
-             ' "' + attribute.value + '"';
+             ' "' + attribute.value.trim() + '"';
     }
     /**
      * Transforms Operator model to valid QueryAPI filter string.
