@@ -18,7 +18,8 @@ from ggrc import models
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models import inflector
 from ggrc.rbac import context_query_filter
-from ggrc.utils import query_helpers, benchmark
+from ggrc.utils import benchmark
+from ggrc.rbac import permissions
 from ggrc.query import custom_operators
 from ggrc.query.exceptions import BadQueryException
 
@@ -218,7 +219,7 @@ class QueryHelper(object):
     Prepare query to filter models based on the available contexts and
     resources for the given type of object.
     """
-    contexts, resources = query_helpers.get_context_resource(
+    contexts, resources = permissions.get_context_resource(
         model_name=model.__name__, permission_type=permission_type
     )
 

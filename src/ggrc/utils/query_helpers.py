@@ -297,25 +297,3 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
       type_union_queries.append(_get_results_by_context(model))
 
   return alias(union(*type_union_queries))
-
-
-def get_context_resource(model_name, permission_type='read',
-                         permission_model=None):
-  """Get allowed contexts and resources."""
-  permissions_map = {
-      "create": (pr.create_contexts_for, pr.create_resources_for),
-      "read": (pr.read_contexts_for, pr.read_resources_for),
-      "update": (pr.update_contexts_for, pr.update_resources_for),
-      "delete": (pr.delete_contexts_for, pr.delete_resources_for),
-  }
-
-  contexts = permissions_map[permission_type][0](
-      permission_model or model_name)
-  resources = permissions_map[permission_type][1](
-      permission_model or model_name)
-
-  if permission_model and contexts:
-    contexts = set(contexts) & set(
-        pr.read_contexts_for(model_name))
-
-  return contexts, resources
