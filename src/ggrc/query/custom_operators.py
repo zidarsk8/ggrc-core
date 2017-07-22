@@ -20,7 +20,7 @@ from ggrc.login import is_creator
 from ggrc.models import inflector
 from ggrc.models import relationship_helper
 from ggrc.snapshotter import rules
-from ggrc.utils import query_helpers
+from ggrc.query import my_objects
 from ggrc_basic_permissions import UserRole
 
 
@@ -202,7 +202,7 @@ def owned(exp, object_class, target_class, query):
     is owned by one of the given users.
   """
   res = db.session.query(
-      query_helpers.get_myobjects_query(
+      my_objects.get_myobjects_query(
           types=[object_class.__name__],
           contact_id=exp['ids'][0],
           is_creator=is_creator(),
