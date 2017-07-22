@@ -13,7 +13,7 @@ from sqlalchemy.orm import load_only
 
 from ggrc import db
 from ggrc import models
-from ggrc.converters import autocast
+from ggrc.query import autocast
 from ggrc.query.exceptions import BadQueryException
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.login import is_creator
