@@ -40,6 +40,7 @@ from ggrc.rbac import permissions, context_query_filter
 from ggrc.services.attribute_query import AttributeQueryBuilder
 from ggrc.services import signals
 from ggrc.models.background_task import BackgroundTask, create_task
+from ggrc.query import utils as query_utils
 from ggrc import settings
 
 
@@ -433,21 +434,6 @@ class ModelView(View):
   def modified_at(self, obj):
     return getattr(obj, self.modified_attr_name)
 
-  def _get_type_select_column(self, model):
-    mapper = model._sa_class_manager.mapper
-    if mapper.polymorphic_on is None:
-      # if len(mapper.self_and_descendants) == 1:
-      type_column = sqlalchemy.literal(mapper.class_.__name__)
-    else:
-      # Handle polymorphic types with CASE
-      type_column = sqlalchemy.case(
-          value=mapper.polymorphic_on,
-          whens={
-              val: m.class_.__name__
-              for val, m in mapper.polymorphic_map.items()
-          })
-    return type_column
-
   def _get_type_where_clause(self, model):
     mapper = model._sa_class_manager.mapper
     if mapper.polymorphic_on is None:
@@ -473,7 +459,7 @@ class ModelView(View):
     columns = []
     columns.append(mapper.primary_key[0].label('id'))
     # columns.append(model.id.label('id'))
-    columns.append(self._get_type_select_column(model).label('type'))
+    columns.append(query_utils.get_type_select_column(model).label('type'))
     if hasattr(mapper.c, 'context_id'):
       columns.append(mapper.c.context_id.label('context_id'))
     if hasattr(mapper.c, 'updated_at'):

@@ -3,7 +3,6 @@
 
 """This module helper query builder for my dashboard page."""
 from sqlalchemy import and_
-from sqlalchemy import case
 from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy import true, false
@@ -15,26 +14,10 @@ from ggrc.models import all_models
 from ggrc.models.object_person import ObjectPerson
 from ggrc.models.relationship import Relationship
 from ggrc.models.custom_attribute_value import CustomAttributeValue
-from ggrc.rbac import permissions as pr
+from ggrc.query import utils as query_utils
 from ggrc_basic_permissions import backlog_workflows
 from ggrc_basic_permissions.models import UserRole, Role
 from ggrc_workflows.models import Cycle
-
-
-def get_type_select_column(model):
-  """Get column name,taking into account polymorphic types."""
-  mapper = model._sa_class_manager.mapper
-  if mapper.polymorphic_on is None:
-    type_column = literal(mapper.class_.__name__)
-  else:
-    # Handle polymorphic types with CASE
-    type_column = case(
-        value=mapper.polymorphic_on,
-        whens={
-            val: m.class_.__name__
-            for val, m in mapper.polymorphic_map.items()
-        })
-  return type_column
 
 
 def _types_to_type_models(types):
@@ -210,7 +193,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     else:
       model_type_queries = _get_assigned_to_records(model)
       if model_type_queries:
-        type_column = get_type_select_column(model)
+        type_column = query_utils.get_type_select_column(model)
         model_type_query = db.session.query(
             model.id.label('id'),
             type_column.label('type'),
