@@ -59,11 +59,6 @@ def get_objects_by_query():
   collection_fields = ["ids", "values", "count", "total"]
 
   for result in results:
-    if last_modified is None:
-      last_modified = result["last_modified"]
-    elif result["last_modified"] is not None:
-      last_modified = max(last_modified, result["last_modified"])
-
     model = get_model(result["object_name"])
 
     collection = build_collection_representation(
