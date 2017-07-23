@@ -56,7 +56,7 @@ def get_objects_by_query():
                         if result["last_modified"]]
   last_modified = max(last_modified_list) if last_modified_list else None
   collections = []
-  collection_fields = ["ids", "values", "count", "total"]
+  collection_fields = ["ids", "values", "count", "total", "object_name"]
 
   for result in results:
     model = get_model(result["object_name"])
