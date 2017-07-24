@@ -50,7 +50,8 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Custom email message",
         "Manager",
         "Member",
-        "Frequency",
+        "Unit",
+        "Repeat Every",
         "Force real-time email updates",
         "Code",
         "Delete",
@@ -60,7 +61,6 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
     vals = {val["display_name"]: val for val in definitions.itervalues()}
     self.assertTrue(vals["Title"]["mandatory"])
     self.assertTrue(vals["Manager"]["mandatory"])
-    self.assertTrue(vals["Frequency"]["mandatory"])
     self.assertIn("type", vals["Manager"])
     self.assertIn("type", vals["Member"])
     self.assertEqual(vals["Manager"]["type"], "user_role")

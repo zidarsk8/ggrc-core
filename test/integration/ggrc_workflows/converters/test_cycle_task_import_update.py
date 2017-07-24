@@ -183,7 +183,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     self.workflow_active = {
         "title": "workflow active title",
         "description": "workflow active description",
-        "frequency": "one_time",
         "owners": [person_dict(self.person_1.id)],
         "notify_on_change": False,
     }
@@ -278,7 +277,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     self.workflow_historical = {
         "title": "workflow historical title",
         "description": "workflow historical description",
-        "frequency": "one_time",
         "owners": [person_dict(self.person_1.id)],
         "notify_on_change": False,
     }

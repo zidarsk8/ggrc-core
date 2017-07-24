@@ -75,7 +75,7 @@ class WorkflowsGenerator(Generator):
 
     default_start = self.random_date()
     default_end = self.random_date(default_start, date.today())
-    day_range = 5 if task_group.workflow.frequency == "weekly" else 31
+    day_range = 5 if task_group.workflow.unit == "week" else 31
 
     obj_name = "task_group_task"
 
