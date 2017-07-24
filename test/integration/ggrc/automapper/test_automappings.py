@@ -1,6 +1,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Test automappings"""
+
 import itertools
 
 import ggrc
@@ -9,37 +11,39 @@ from ggrc.models import Automapping
 from integration.ggrc import TestCase
 from integration.ggrc import generator
 from integration.ggrc.models import factories
-
-counter = 0
+from integration.ggrc.models.factories import random_str
 
 
 def make_name(msg):
-  global counter
-  counter += 1
-  return msg + str(counter)
+  """Make name helper function"""
+  return random_str(prefix=msg)
 
 
 def relate(src, dst):
+  """Helper function for creating a mapping between two objects"""
   if src < dst:
     return (src, dst)
   else:
     return (dst, src)
 
 
-class automapping_count_limit(object):
+class AutomappingCountLimit(object):
+  """Automapping count limit"""
+  # pylint: disable=too-few-public-methods
   def __init__(self, new_limit):
     self.new_limit = new_limit
+    self.original_limit = None
 
   def __enter__(self):
     self.original_limit = ggrc.automapper.rules.count_limit
     ggrc.automapper.rules.count_limit = self.new_limit
 
-  def __exit__(self, type, value, traceback):
+  def __exit__(self, type_, value, traceback):
     ggrc.automapper.rules.count_limit = self.original_limit
 
 
 class TestAutomappings(TestCase):
-
+  """Test automappings"""
   def setUp(self):
     super(TestAutomappings, self).setUp()
     self.gen = generator.ObjectGenerator()
@@ -47,6 +51,7 @@ class TestAutomappings(TestCase):
 
   @classmethod
   def create_ac_roles(cls, obj, person_id):
+    """Create access control roles"""
     ac_role = models.AccessControlRole.query.filter_by(
         object_type=obj.type,
         name="Admin"
@@ -58,6 +63,7 @@ class TestAutomappings(TestCase):
     )
 
   def create_object(self, cls, data):
+    """Helper function for creating an object"""
     name = cls._inflector.table_singular
     data['context'] = None
     res, obj = self.gen.generate(cls, name, {name: data})
@@ -65,12 +71,14 @@ class TestAutomappings(TestCase):
     return obj
 
   def create_mapping(self, src, dst):
+    """Helper function for creating mappings"""
     return self.create_object(models.Relationship, {
         'source': {'id': src.id, 'type': src.type},
         'destination': {'id': dst.id, 'type': dst.type}
     })
 
   def assert_mapping(self, obj1, obj2, missing=False):
+    """Helper function for asserting mappings"""
     ggrc.db.session.flush()
     rel = models.Relationship.find_related(obj1, obj2)
     if not missing:
@@ -85,19 +93,22 @@ class TestAutomappings(TestCase):
       self.assertIsNone(rel,
                         msg='%s mapped to %s' % (obj1.type, obj2.type))
 
-  def assert_mapping_implication(self, to_create, implied, relevant=set()):
+  def assert_mapping_implication(self, to_create, implied, relevant=None):
+    """Helper function for asserting mapping implication"""
+    if relevant is None:
+      relevant = set()
     objects = set()
     for obj in relevant:
       objects.add(obj)
     mappings = set()
-    if type(to_create) is not list:
+    if not isinstance(to_create, list):
       to_create = [to_create]
     for src, dst in to_create:
       objects.add(src)
       objects.add(dst)
       self.create_mapping(src, dst)
       mappings.add(relate(src, dst))
-    if type(implied) is not list:
+    if not isinstance(implied, list):
       implied = [implied]
     for src, dst in implied:
       objects.add(src)
@@ -111,6 +122,7 @@ class TestAutomappings(TestCase):
       self.assert_mapping(src, dst, missing=True)
 
   def with_permutations(self, mk1, mk2, mk3):
+    """Helper function for creating permutations"""
     obj1, obj2, obj3 = mk1(), mk2(), mk3()
     self.assert_mapping_implication(
         to_create=[(obj1, obj2), (obj2, obj3)],
@@ -122,7 +134,8 @@ class TestAutomappings(TestCase):
         implied=(obj1, obj3),
     )
 
-  def test_mapping_directive_to_a_program(self):
+  def test_directive_program_mapping(self):
+    """Test mapping directive to a program"""
     self.with_permutations(
         lambda: self.create_object(models.Program, {
             'title': make_name('Program')
@@ -149,6 +162,7 @@ class TestAutomappings(TestCase):
     )
 
   def test_mapping_to_sections(self):
+    """Test mapping to section"""
     regulation = self.create_object(models.Regulation, {
         'title': make_name('Test Regulation')
     })
@@ -175,7 +189,8 @@ class TestAutomappings(TestCase):
     )
 
   def test_automapping_limit(self):
-    with automapping_count_limit(-1):
+    """Test mapping limit"""
+    with AutomappingCountLimit(-1):
       program = self.create_object(models.Program, {
           'title': make_name('Program')
       })
@@ -191,6 +206,7 @@ class TestAutomappings(TestCase):
       )
 
   def test_mapping_to_objective(self):
+    """Test mapping to objective"""
     regulation = self.create_object(models.Regulation, {
         'title': make_name('Test PD Regulation')
     })
@@ -232,6 +248,7 @@ class TestAutomappings(TestCase):
     )
 
   def test_mapping_between_objectives(self):
+    """Test mapping between objectives"""
     regulation = self.create_object(models.Regulation, {
         'title': make_name('Test PD Regulation')
     })
@@ -257,6 +274,7 @@ class TestAutomappings(TestCase):
     )
 
   def test_mapping_nested_controls(self):
+    """Test mapping of nested controls"""
     objective = self.create_object(models.Objective, {
         'title': make_name('Test Objective')
     })
@@ -276,7 +294,8 @@ class TestAutomappings(TestCase):
         implied=[(objective, control1), (objective, control2)]
     )
 
-  def test_automapping_permissions_check(self):
+  def test_automapping_permissions(self):
+    """Test automapping permissions"""
     _, creator = self.gen.generate_person(user_role="Creator")
     _, admin = self.gen.generate_person(user_role="Administrator")
 
