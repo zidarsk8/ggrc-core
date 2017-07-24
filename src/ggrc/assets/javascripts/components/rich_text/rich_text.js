@@ -52,6 +52,7 @@
           }
         }
       },
+      tabIndex: '-1',
       hiddenToolbar: false,
       forceShow: false,
       editor: false,
@@ -217,6 +218,9 @@
       },
       removed: function () {
         this.viewModel.onRemoved();
+      },
+      '.rich-text__content focus': function () {
+        this.viewModel.attr('editor').focus();
       }
     }
   });
