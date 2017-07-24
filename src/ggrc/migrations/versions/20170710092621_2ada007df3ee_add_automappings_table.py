@@ -15,7 +15,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '2ada007df3ee'
-down_revision = '436dc4cea0f3'
+down_revision = '1e3f798a4cc6'
 
 
 def upgrade():
@@ -54,6 +54,14 @@ def upgrade():
                   ['context_id'], unique=False)
   op.create_index('ix_automappings_updated_at', 'automappings',
                   ['updated_at'], unique=False)
+  op.add_column(
+      'relationships',
+      sa.Column('automapping_id', sa.Integer(), nullable=True))
+  op.create_foreign_key(
+      "fk_relationships_automapping_id",
+      "relationships", "automappings",
+      ["automapping_id"], ["id"],
+      ondelete='CASCADE')
 
 
 def downgrade():
@@ -65,7 +73,10 @@ def downgrade():
 
   # Rename parent id to automapping id
   op.drop_constraint(
+      'fk_relationship_automapping_id', 'relationships', type_='foreignkey')
+  op.drop_constraint(
       'fk_relationship_parent_id', 'relationships', type_='foreignkey')
+  op.drop_column('relationships', 'automapping_id')
   op.alter_column(
       'relationships',
       'parent_id',

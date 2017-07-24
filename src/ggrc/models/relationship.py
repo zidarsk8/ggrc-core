@@ -30,6 +30,11 @@ class Relationship(Base, db.Model):
       lambda: Relationship,
       remote_side=lambda: Relationship.id
   )
+  automapping_id = db.Column(
+      db.Integer,
+      db.ForeignKey('automappings.id', ondelete='CASCADE'),
+      nullable=True,
+  )
   relationship_attrs = db.relationship(
       lambda: RelationshipAttr,
       collection_class=attribute_mapped_collection("attr_name"),
