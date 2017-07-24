@@ -82,12 +82,12 @@ def init_hook():
       if not src.get("_generated") and not snapshot:
         continue
       template = template_cache.get(src.get("template", {}).get("id"))
-      audit = audit_cache.get(src.get("audit", {}).get("id"))
+      audit = audit_cache[src["audit"]["id"]]
       relate_assignees(assessment, snapshot, template, audit)
       relate_ca(assessment, template)
       assessment.title = u'{} assessment for {}'.format(
           snapshot.revision.content['title'],
-          snapshot.parent.title,
+          audit.title,
       )
       if not template:
         continue

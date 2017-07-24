@@ -87,6 +87,8 @@ setup () {
   if [[ "$MODE" == "dev" ]]; then
     docker exec -i "${PROJECT}_cleandev_1" su -c "
       source /vagrant/bin/init_vagrant_env
+      build_css
+      build_assets
       db_reset
     "
   fi

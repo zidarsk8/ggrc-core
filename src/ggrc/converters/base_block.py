@@ -95,6 +95,7 @@ class BlockConverter(object):
     # This class holds cache and object data for all rows and handlers below
     # it, so it is expected to hold a lot of instance attributes.
     # The protected access is a false warning for inflector access.
+    self.revision_ids = []
     self._mapping_cache = None
     self._owners_cache = None
     self._roles_cache = None
@@ -452,16 +453,23 @@ class BlockConverter(object):
 
   def get_info(self):
     """Returns info dict for current block."""
-    created, updated, ignored, deleted = 0, 0, 0, 0
+    created = 0
+    updated = 0
+    ignored = 0
+    deleted = 0
+    deprecated = 0
     for row in self.row_converters:
       if row.ignore:
         ignored += 1
-      elif row.is_delete:
+        continue
+      if row.is_delete:
         deleted += 1
-      elif row.is_new:
+        continue
+      if row.is_new:
         created += 1
       else:
         updated += 1
+      deprecated += int(row.is_deprecated)
     info = {
         "name": self.name,
         "rows": len(self.rows),
@@ -469,6 +477,7 @@ class BlockConverter(object):
         "updated": updated,
         "ignored": ignored,
         "deleted": deleted,
+        "deprecated": deprecated,
         "block_warnings": self.block_warnings,
         "block_errors": self.block_errors,
         "row_warnings": self.row_warnings,
@@ -562,6 +571,11 @@ class BlockConverter(object):
           sources=[{} for _ in xrange(len(objects))],
       )
 
+  def _store_revision_ids(self, event):
+    """Store revision ids from the current event."""
+    if event:
+      self.revision_ids.extend(revision.id for revision in event.revisions)
+
   def save_import(self):
     """Commit all changes in the session and update memcache."""
     try:
@@ -570,6 +584,7 @@ class BlockConverter(object):
       update_memcache_before_commit(
           self, modified_objects, CACHE_EXPIRY_IMPORT)
       db.session.commit()
+      self._store_revision_ids(import_event)
       update_memcache_after_commit(self)
       update_snapshot_index(db.session, modified_objects)
       return import_event

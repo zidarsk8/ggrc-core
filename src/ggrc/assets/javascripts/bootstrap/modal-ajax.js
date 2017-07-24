@@ -18,6 +18,7 @@
       var model = CMS.Models[$trigger.attr('data-object-singular')];
       var instance;
       var deleteCounts = new can.Map({loading: true, counts: ''});
+      var modalSettings;
 
       if ($trigger.attr('data-object-id') === 'page') {
         instance = GGRC.page_instance();
@@ -32,20 +33,39 @@
         deleteCounts.attr('loading', false);
       });
 
-      $target
-        .modal_form(option, $trigger)
-        .ggrc_controllers_delete({
-          $trigger: $trigger,
-          skip_refresh: !$trigger.data('refresh'),
-          new_object_form: false,
-          button_view:
-            GGRC.mustache_path + '/modals/delete_cancel_buttons.mustache',
-          model: model,
-          instance: instance,
-          delete_counts: deleteCounts,
-          modal_title: 'Delete ' + $trigger.attr('data-object-singular'),
-          content_view:
-            GGRC.mustache_path + '/base_objects/confirm_delete.mustache'
+      modalSettings = {
+        $trigger: $trigger,
+        skip_refresh: !$trigger.data('refresh'),
+        new_object_form: false,
+        button_view:
+          GGRC.mustache_path + '/modals/delete_cancel_buttons.mustache',
+        model: model,
+        instance: instance,
+        delete_counts: deleteCounts,
+        modal_title: 'Delete ' + $trigger.attr('data-object-singular'),
+        content_view:
+          GGRC.mustache_path + '/base_objects/confirm_delete.mustache'
+      };
+
+      if (GGRC.Utils.Controllers.hasWarningType(instance)) {
+        modalSettings = _.extend(
+          modalSettings,
+          GGRC.Utils.Modals.warning.settings,
+          {
+            objectShortInfo: [instance.type, instance.title].join(' '),
+            confirmOperationName: 'delete',
+            operation: 'deletion'
+          }
+        );
+      }
+
+      GGRC.Utils.Modals.warning(
+        modalSettings,
+        _.constant({}),
+        _.constant({}), {
+          controller: $target
+            .modal_form(option, $trigger)
+            .ggrc_controllers_delete.bind($target)
         });
 
       $target.on('modal:success', function (e, data) {
@@ -160,6 +180,9 @@
           object_params: objectParams,
           button_view: GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE,
           model: model,
+          oldData: {
+            status: instance && instance.status // status before changing
+          },
           current_user: GGRC.current_user,
           instance: instance,
           modal_title: objectParams.modal_title || modalTitle,

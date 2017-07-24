@@ -182,7 +182,6 @@ class CommonProgram(Common):
   REFERENCE_URL = Base.REFERENCE_URL
   NOTES = "Notes"
   EFFECTIVE_DATE = Base.EFFECTIVE_DATE
-  STOP_DATE = Base.STOP_DATE
   STATE = Base.STATE
 
 
@@ -356,7 +355,6 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   URL = Base.URL
   REFERENCE_URL = Base.REFERENCE_URL
   EFFECTIVE_DATE = Base.EFFECTIVE_DATE
-  STOP_DATE = Base.STOP_DATE
   KIND_NATURE = "Kind/Nature"
   FRAUD_RELATED = "Fraud Related"
   SIGNIFICANCE = "Significance"
@@ -382,7 +380,6 @@ class ObjectiveModalSetVisibleFields(CommonModalSetVisibleFields):
   URL = Base.URL
   REFERENCE_URL = Base.REFERENCE_URL
   EFFECTIVE_DATE = Base.EFFECTIVE_DATE
-  STOP_DATE = Base.STOP_DATE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, ADMIN,
       CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
@@ -418,7 +415,6 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   URL = Base.URL
   REFERENCE_URL = Base.REFERENCE_URL
   EFFECTIVE_DATE = Base.EFFECTIVE_DATE
-  STOP_DATE = Base.STOP_DATE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
       CommonModalSetVisibleFields.STATE,

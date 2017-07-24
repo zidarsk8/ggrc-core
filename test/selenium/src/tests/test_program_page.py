@@ -64,7 +64,7 @@ class TestProgramPage(base.Test):
         test_utils.HtmlParser.parse_text(modal.ui_title.text),
         modal.ui_description.text, modal.ui_notes.text, modal.ui_code.text,
         modal.ui_program_url.text, modal.ui_reference_url.text,
-        modal.ui_effective_date.text, modal.ui_stop_date.text]
+        modal.ui_effective_date.text]
     actual_list_texts = [
         program_info_page.title_entered().text,
         program_info_page.description_entered.text,
@@ -72,8 +72,7 @@ class TestProgramPage(base.Test):
         program_info_page.code_entered.text,
         program_info_page.program_url_entered.text,
         program_info_page.reference_url_entered.text,
-        program_info_page.effective_date_entered.text,
-        program_info_page.stop_date_entered.text]
+        program_info_page.effective_date_entered.text]
     assert expected_list_texts == actual_list_texts
 
   @pytest.mark.smoke_tests
@@ -103,7 +102,7 @@ class TestProgramPage(base.Test):
     program_info_page = info_widget.Programs(selenium)
     modal = program_info_page.open_info_3bbs().select_edit()
     test_utils.ModalNewPrograms.enter_test_data(modal)
-    test_utils.ModalNewPrograms.set_start_end_dates(modal, 1, -2)
+    test_utils.ModalNewPrograms.set_start_date(modal, 1)
     modal.save_and_close()
     selenium_utils.open_url(selenium, program_info_page.url)
     updated_program_info_page = info_widget.Programs(selenium)

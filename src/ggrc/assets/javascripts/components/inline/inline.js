@@ -6,39 +6,40 @@
 (function (can, $) {
   'use strict';
 
-  var innerTplFolder = GGRC.mustache_path + '/components/inline';
-
-  function getInnerInlineTemplat(type) {
-    type = can.Mustache.resolve(type);
-    return innerTplFolder + '/' + type + '.mustache';
-  }
-
   GGRC.Components('inlineEditControl', {
     tag: 'inline-edit-control',
     template: can.view(
       GGRC.mustache_path + '/components/inline/inline.mustache'
     ),
     viewModel: {
+      define: {
+        isShowContent: {
+          get: function () {
+            return this.attr('hideContentInEditMode') ?
+              this.attr('editMode') :
+              true;
+          }
+        }
+      },
+      instance: {},
       editMode: false,
       withReadMore: false,
       isLoading: false,
       type: '@',
       value: '@',
+      placeholder: '@',
+      propName: '@',
       dropdownOptions: [],
-      dropdownClass: '@',
       dropdownNoValue: false,
-      isAllowEdit: true,
+      isLastOpenInline: false,
+      isEditIconDenied: false,
+      hideContentInEditMode: false,
       context: {
         value: null
       },
-      changeEditMode: function (editMode) {
-        if (!editMode) {
-          this.attr('editMode', false);
-        }
-
-        if (this.attr('isAllowEdit')) {
-          this.attr('editMode', true);
-        }
+      setEditModeInline: function (args) {
+        this.attr('isLastOpenInline', args.isLastOpenInline);
+        this.attr('editMode', true);
       },
       setPerson: function (scope, el, ev) {
         this.attr('context.value', ev.selectedItem.serialize());
@@ -66,7 +67,8 @@
 
         this.dispatch({
           type: 'inlineSave',
-          value: value
+          value: value,
+          propName: this.attr('propName')
         });
       },
       cancel: function () {
@@ -77,37 +79,39 @@
       updateContext: function () {
         var value = this.attr('value');
         this.attr('context.value', value);
+      },
+      fieldValueChanged: function (args) {
+        this.attr('context.value', args.value);
       }
     },
     events: {
       init: function () {
         this.viewModel.updateContext();
       },
-      '{window} mousedown': function (el, ev) {
-        var viewModel = this.viewModel;
-        var editIcon = $(ev.target).hasClass('inline-edit-icon');
-        var isInside = GGRC.Utils.events.isInnerClick(this.element, ev.target);
-        var editMode = viewModel.attr('editMode');
-
-        if (!isInside && editMode) {
-          viewModel.cancel();
-        }
-
-        if (isInside && !editMode && editIcon) {
-          viewModel.changeEditMode(true);
-        }
-      },
       '{viewModel} value': function () {
         // update value in the readonly mode
         if (!this.viewModel.attr('editMode')) {
           this.viewModel.updateContext();
         }
-      }
-    },
-    helpers: {
-      renderInnerInlineTemplate: function (type, options) {
-        return can.view
-          .render(getInnerInlineTemplat(type), options.context);
+      },
+      '{window} click': function (el, ev) {
+        var viewModel = this.viewModel;
+        var isInside;
+        var editMode;
+
+        // prevent closing of current inline after opening...
+        if (viewModel.attr('isLastOpenInline')) {
+          viewModel.attr('isLastOpenInline', false);
+          return;
+        }
+
+        isInside = GGRC.Utils.events
+          .isInnerClick(this.element, ev.target);
+        editMode = viewModel.attr('editMode');
+
+        if (editMode && !isInside) {
+          viewModel.cancel();
+        }
       }
     }
   });

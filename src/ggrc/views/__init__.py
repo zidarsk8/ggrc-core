@@ -13,6 +13,7 @@ from flask import flash
 from flask import g
 from flask import render_template
 from flask import url_for
+from flask import request
 from werkzeug.exceptions import Forbidden
 
 from ggrc import models
@@ -42,7 +43,6 @@ from ggrc.views import cron
 from ggrc.views import filters
 from ggrc.views import mockups
 from ggrc.views import notifications
-from ggrc.views.common import RedirectedPolymorphView
 from ggrc.views.registry import object_view
 from ggrc.utils import benchmark
 from ggrc.utils import generate_query_chunks
@@ -66,6 +66,32 @@ def reindex(_):
   """Web hook to update the full text search index."""
   do_reindex()
   return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
+@app.route("/_background_tasks/compute_attributes", methods=["POST"])
+@queued_task
+def compute_attributes(args):
+  """Web hook to update the full text search index."""
+  with benchmark("Run compute_attributes background task"):
+    from ggrc.data_platform import computed_attributes
+    if str(args.parameters["revision_ids"]) == "all_latest":
+      revision_ids = "all_latest"
+    else:
+      revision_ids = [id_ for id_ in args.parameters["revision_ids"]]
+    computed_attributes.compute_attributes(revision_ids)
+    return app.make_response(("success", 200, [("Content-Type", "text/html")]))
+
+
+def start_compute_attributes(revision_ids):
+  """Start a background task for computed attributes."""
+  task = create_task(
+      name="compute_attributes",
+      url=url_for(compute_attributes.__name__),
+      parameters={"revision_ids": revision_ids},
+      method=u"POST",
+      queued_callback=compute_attributes
+  )
+  task.start()
 
 
 def do_reindex():
@@ -307,7 +333,11 @@ def admin_reindex():
   """
   if not permissions.is_allowed_read("/admin", None, 1):
     raise Forbidden()
-  task_queue = create_task("reindex", url_for(reindex.__name__), reindex)
+  task_queue = create_task(
+      name="reindex",
+      url=url_for(reindex.__name__),
+      queued_callback=reindex
+  )
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
                          [('Content-Type', 'text/html')])))
@@ -326,6 +356,18 @@ def admin_refresh_revisions():
   return task_queue.make_response(
       app.make_response(("scheduled %s" % task_queue.name, 200,
                          [('Content-Type', 'text/html')])))
+
+
+@app.route("/admin/compute_attributes", methods=["POST"])
+@login_required
+def send_event_job():
+  with benchmark("POST /admin/compute_attributes"):
+    if request.data:
+      revision_ids = request.get_json().get("revision_ids", [])
+    else:
+      revision_ids = "all_latest"
+    start_compute_attributes(revision_ids)
+    return app.make_response(("success", 200, [("Content-Type", "text/html")]))
 
 
 @app.route("/admin")
@@ -358,7 +400,6 @@ def contributed_object_views():
       object_view(models.BackgroundTask),
       object_view(models.Program),
       object_view(models.Audit),
-      object_view(models.Directive, RedirectedPolymorphView),
       object_view(models.Contract),
       object_view(models.Policy),
       object_view(models.Regulation),

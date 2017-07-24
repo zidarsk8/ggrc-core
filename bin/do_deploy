@@ -40,6 +40,7 @@ cat /vagrant/src/app.yaml
 
 source "$SETTINGS_FILE"
 source "$ENV_OVERRIDE_FILE"
+export GGRC_SETTINGS_MODULE="$SETTINGS_MODULE"
 
 db_migrate
 

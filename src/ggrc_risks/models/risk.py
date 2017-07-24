@@ -16,18 +16,18 @@ from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 
 
-class Risk(Roleable, HasObjectState, mixins.CustomAttributable,
-           mixins.Stateful, Relatable, mixins.Described, Ownable, Personable,
-           mixins.Titled, mixins.LastDeprecatedTimeboxed,
-           mixins.Noted, mixins.Hyperlinked, mixins.Slugged, Indexed,
+class Risk(Roleable,
+           HasObjectState,
+           mixins.CustomAttributable,
+           Relatable,
+           Ownable,
+           Personable,
+           mixins.LastDeprecatedTimeboxed,
+           mixins.BusinessObject,
+           Indexed,
            db.Model):
-  __tablename__ = 'risks'
 
-  VALID_STATES = [
-      'Draft',
-      'Deprecated',
-      'Active'
-  ]
+  __tablename__ = 'risks'
 
   # Overriding mixin to make mandatory
   @declared_attr
@@ -47,6 +47,7 @@ class Risk(Roleable, HasObjectState, mixins.CustomAttributable,
       "status": {
           "display_name": "State",
           "mandatory": False,
-          "description": "Options are: \n {}".format('\n'.join(VALID_STATES))
+          "description": "Options are: \n {}".format('\n'.join(
+              mixins.BusinessObject.VALID_STATES))
       }
   }

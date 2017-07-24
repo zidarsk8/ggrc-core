@@ -15,7 +15,7 @@ from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities.entity import (
     Entity, PersonEntity, CustomAttributeEntity, ProgramEntity, ControlEntity,
     ObjectiveEntity, AuditEntity, AssessmentTemplateEntity, AssessmentEntity,
-    IssueEntity)
+    IssueEntity, CommentEntity)
 from lib.utils import string_utils
 from lib.utils.string_utils import (random_list_strings, random_string,
                                     random_uuid)
@@ -34,6 +34,7 @@ class EntitiesFactory(object):
   obj_asmt = unicode(objects.get_singular(objects.ASSESSMENTS, title=True))
   obj_issue = unicode(objects.get_singular(objects.ISSUES, title=True))
   obj_ca = unicode(objects.get_singular(objects.CUSTOM_ATTRIBUTES))
+  obj_comment = unicode(objects.get_singular(objects.COMMENTS, title=True))
 
   types_of_values_ui_like_attrs = (str, unicode, int)
   all_objs_attrs_names = Entity().get_attrs_names_for_entities()
@@ -89,6 +90,12 @@ class EntitiesFactory(object):
         if attr_name in ["custom_attribute_values"]:
           converted_attr_value = {attr_value.get("custom_attribute_id"):
                                   attr_value.get("attribute_value")}
+        if obj_attr_name == "comments":
+          converted_attr_value = {
+              k: (string_utils.convert_str_to_datetime(v) if
+                  k == "created_at" and isinstance(v, unicode) else v)
+              for k, v in attr_value.iteritems()
+              if k in ["modified_by", "created_at", "description"]}
         return converted_attr_value
     origin_obj = copy.deepcopy(obj)
     for obj_attr_name in obj.__dict__.keys():
@@ -252,6 +259,43 @@ class EntitiesFactory(object):
     """Generate email in unicode format according to domain."""
     return unicode("{mail_name}@{domain}".format(
         mail_name=random_uuid(), domain=domain))
+
+
+class CommentsFactory(EntitiesFactory):
+  """Factory class for Comments entities."""
+  # pylint: disable=too-many-locals
+
+  obj_attrs_names = Entity().get_attrs_names_for_entities(CommentEntity)
+
+  @classmethod
+  def create_empty(cls):
+    """Create blank Comment object."""
+    empty_comment = CommentEntity()
+    empty_comment.type = cls.obj_comment
+    return empty_comment
+
+  @classmethod
+  def create(cls, type=None, id=None, href=None, modified_by=None,
+             created_at=None, description=None):
+    """Create Comment object.
+    Random values will be used for description.
+    Predictable values will be used for type, owners, modified_by.
+    """
+    comment_entity = cls._create_random_comment()
+    comment_entity = cls.update_objs_attrs_values_by_entered_data(
+        objs=comment_entity, is_allow_none_values=False, type=type, id=id,
+        href=href, modified_by=modified_by,
+        created_at=created_at, description=description)
+    return comment_entity
+
+  @classmethod
+  def _create_random_comment(cls):
+    """Create Comment entity with randomly and predictably filled fields."""
+    random_comment = CommentEntity()
+    random_comment.type = cls.obj_comment
+    random_comment.modified_by = ObjectPersonsFactory().default().__dict__
+    random_comment.description = cls.generate_string(cls.obj_comment)
+    return random_comment
 
 
 class ObjectPersonsFactory(EntitiesFactory):
@@ -682,6 +726,7 @@ class AssessmentTemplatesFactory(EntitiesFactory):
     random_asmt_tmpl = AssessmentTemplateEntity()
     random_asmt_tmpl.type = cls.obj_asmt_tmpl
     random_asmt_tmpl.title = cls.generate_string(cls.obj_asmt_tmpl)
+    random_asmt_tmpl.assessors = unicode(roles.AUDIT_LEAD)
     random_asmt_tmpl.slug = cls.generate_slug()
     random_asmt_tmpl.template_object_type = cls.obj_control.title()
     random_asmt_tmpl.default_people = {"verifiers": unicode(roles.AUDITORS),

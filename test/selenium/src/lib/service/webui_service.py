@@ -325,6 +325,14 @@ class BaseWebUiService(object):
           dest_objs_type=dest_objs[0].type.title(),
           dest_objs_titles=dest_objs_titles)
 
+  def unmap_via_info_panel(self, src_obj, obj):
+    """Open info panel of 'obj' from generic widget of 'src_obj'. Then unmap
+    this by click on "Unmap" button.
+    """
+    dropdown_on_info_panel = (
+        self.open_info_panel_of_obj_by_title(src_obj, obj).open_info_3bbs())
+    dropdown_on_info_panel.select_unmap()
+
 
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""
@@ -382,12 +390,30 @@ class AssessmentTemplatesService(BaseWebUiService):
     super(AssessmentTemplatesService, self).__init__(
         driver, objects.ASSESSMENT_TEMPLATES)
 
+  def create_obj_via_tree_view(self, src_obj, obj):
+    """Open generic widget of mapped objects, open creation modal from
+    Tree View, fill data according to object attributes and create new object.
+    """
+    objs_widget = self.open_widget_of_mapped_objs(src_obj)
+    (objs_widget.tree_view.open_create().select_assignee(obj.assessors).
+        fill_minimal_data(title=obj.title, code=obj.slug).save_and_close())
+
 
 class AssessmentsService(BaseWebUiService):
   """Class for Assessments business layer's services objects."""
   def __init__(self, driver):
     super(AssessmentsService, self).__init__(
         driver, objects.ASSESSMENTS)
+
+  def add_comments(self, src_obj, obj, comment_objs):
+    """Open Info Panel of 'obj' navigate by object's title, maximize it and
+    add comments according to 'comment_objs' descriptions, return
+    'CommentsPanel' class after adding of comments.
+    """
+    comments_descriptions = [comment_obj.description for comment_obj in
+                             comment_objs]
+    obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
+    return obj_info_panel.comments.add_comments(comments_descriptions)
 
   def generate_objs_via_tree_view(self, src_obj, objs_under_asmt,
                                   asmt_tmpl_obj=None):

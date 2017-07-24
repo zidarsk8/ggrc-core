@@ -262,6 +262,10 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       vm.attr('advancedSearch.appliedFilterItems', can.List());
       vm.attr('advancedSearch.appliedMappingItems', can.List());
       spyOn(vm, 'onFilter');
+      spyOn(GGRC.Utils.AdvancedSearch, 'buildFilter')
+        .and.callFake(function (items, request) {
+          request.push({name: 'item'});
+        });
     });
 
     it('copies filter and mapping items to applied', function () {
@@ -287,10 +291,6 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     it('initializes advancedSearch.request property', function () {
       vm.attr('advancedSearch.request', can.List());
       spyOn(GGRC.query_parser, 'join_queries');
-      spyOn(GGRC.Utils.AdvancedSearch, 'buildFilter')
-        .and.callFake(function (items, request) {
-          request.push({name: 'item'});
-        });
 
       vm.applyAdvancedFilters();
 

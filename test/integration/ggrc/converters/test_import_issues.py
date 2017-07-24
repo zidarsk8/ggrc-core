@@ -4,8 +4,9 @@
 # pylint: disable=maybe-no-member, invalid-name
 
 """Test Issue import and updates."""
-
 from collections import OrderedDict
+
+import ddt
 
 from ggrc import models
 from ggrc.converters import errors
@@ -14,6 +15,7 @@ from integration.ggrc.models import factories
 from integration.ggrc import TestCase
 
 
+@ddt.ddt
 class TestImportIssues(TestCase):
   """Basic Issue import tests."""
 
@@ -58,6 +60,25 @@ class TestImportIssues(TestCase):
             }
         }
     })
+
+  @ddt.data(
+      ("Deprecated", "Deprecated", 0),
+      ("Fixed", "Deprecated", 1),
+      ("Deprecated", "Fixed", 0),
+  )
+  @ddt.unpack
+  def test_issue_deprecate_change(self, start_state, final_state, dep_count):
+    """Test counter on changing state to deprecate"""
+    factories.AuditFactory()
+    issue = factories.IssueFactory(status=start_state)
+    response = self.import_data(OrderedDict([
+        ("object_type", "Issue"),
+        ("Code*", issue.slug),
+        ("State", final_state),
+    ]))
+    self._check_csv_response(response, {})
+    self.assertEqual(dep_count, response[0]['deprecated'])
+    self.assertEqual(final_state, models.Issue.query.get(issue.id).status)
 
   def test_issue_state_import(self):
     """Test import of issue state."""

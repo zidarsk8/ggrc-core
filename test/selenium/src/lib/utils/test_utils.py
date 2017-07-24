@@ -62,17 +62,14 @@ class ModalNewPrograms(ModalInput):
   """Methods for simulating common user actions."""
 
   @staticmethod
-  def set_start_end_dates(modal, day_start, day_end):
-    """Sets dates from datepicker in new program/edit modal.
+  def set_start_date(modal, day_start):
+    """Sets start date from datepicker in new program/edit modal.
     Args:
     modal (lib.page.modal.edit_object.Programs)
     day_start (int): for more info see
     base.DatePicker.select_day_in_current_month
-    day_end (int): for more info see
-    base.DatePicker.select_day_in_current_month
     """
     modal.enter_effective_date_start_month(day_start)
-    modal.enter_stop_date_end_month(day_end)
 
   @staticmethod
   def enter_test_data(modal):
@@ -88,7 +85,7 @@ class ModalNewPrograms(ModalInput):
         modal_create_new.Programs.PROGRAM_URL))
     modal.enter_reference_url(prepend_random_string(
         modal_create_new.Programs.REFERENCE_URL))
-    ModalNewPrograms.set_start_end_dates(modal, 0, -1)
+    ModalNewPrograms.set_start_date(modal, 0)
 
 
 class ModalNewProgramCustomAttribute(ModalInput):

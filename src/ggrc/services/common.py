@@ -891,6 +891,8 @@ class Resource(ModelView):
       db.session.commit()
       if self.has_cache():
         self.invalidate_cache_to(obj)
+    with benchmark("Send event job"):
+      send_event_job(event)
     with benchmark("Make response"):
       return self.json_success_response(
           object_for_json, self.modified_at(obj),
@@ -944,6 +946,8 @@ class Resource(ModelView):
             obj.__class__, obj=obj, service=self, event=event)
       with benchmark("Query for object"):
         object_for_json = self.object_for_json(obj)
+      with benchmark("Send event job"):
+        send_event_job(event)
       with benchmark("Make response"):
         result = self.json_success_response(
             object_for_json, self.modified_at(obj))
@@ -1305,6 +1309,8 @@ class Resource(ModelView):
         # Note: In model_posted_after_commit necessary mapping and
         # relationships are set, so need to commit the changes
       db.session.commit()
+    with benchmark("Send event job"):
+      send_event_job(event)
 
   @staticmethod
   def _make_error_from_exception(exc):
@@ -1645,3 +1651,10 @@ def etag(last_modified, info=''):
       the same etag due to two updates performed in rapid succession.
   """
   return '"{0}"'.format(hashlib.sha1(str(last_modified) + info).hexdigest())
+
+
+def send_event_job(event):
+  """Create bacground job for handling new revisions."""
+  revision_ids = [revision.id for revision in event.revisions]
+  from ggrc import views
+  views.start_compute_attributes(revision_ids)
