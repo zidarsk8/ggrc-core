@@ -653,9 +653,27 @@ def handle_cycle_put(
 # Check if workflow should be Inactive after recurrence change
 
 
+def _validate_put_workflow_fields(workflow):
+  """Validates Workflow's fields update.
+
+    Args:
+        workflow: Workflow class instance.
+    Raises:
+        ValueError: An error occurred in case of failed validation.
+    """
+  if (inspect(workflow).attrs.unit.history.has_changes() or
+          inspect(workflow).attrs.repeat_every.history.has_changes()):
+    raise ValueError("'unit', 'repeat_every' fields are unchangeable")
+  if (inspect(workflow).attrs.recurrences.history.has_changes() and
+          workflow.recurrences and workflow.unit is None and
+          workflow.repeat_every is None):
+    raise ValueError("OneTime workflow cannot be recurrent")
+
+
 @signals.Restful.model_put.connect_via(models.Workflow)
 def handle_workflow_put(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument  # noqa pylint: disable=unused-argument
+  _validate_put_workflow_fields(obj)
   update_workflow_state(obj)
 
 
