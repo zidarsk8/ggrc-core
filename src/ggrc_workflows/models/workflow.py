@@ -123,6 +123,8 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   VALID_UNITS = (DAY_UNIT, WEEK_UNIT, MONTH_UNIT)
   unit = deferred(db.Column(db.Enum(*VALID_UNITS), nullable=True,
                             default=None), 'Workflow')
+  repeat_multiplier = deferred(db.Column(db.Integer, nullable=False,
+                                         default=0), 'Workflow')
 
   @orm.validates('unit')
   def validate_unit(self, _, value):
