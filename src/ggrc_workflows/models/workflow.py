@@ -117,6 +117,12 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
 
   repeat_every = deferred(db.Column(db.Integer, nullable=True, default=None),
                           'Workflow')
+  DAY_UNIT = 'day'
+  WEEK_UNIT = 'week'
+  MONTH_UNIT = 'month'
+  VALID_UNITS = (DAY_UNIT, WEEK_UNIT, MONTH_UNIT)
+  unit = deferred(db.Column(db.Enum(*VALID_UNITS), nullable=True,
+                            default=None), 'Workflow')
 
   @orm.validates('is_verification_needed')
   def validate_is_verification_needed(self, key, value):
@@ -155,6 +161,7 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       'recurrences',
       'is_verification_needed',
       'repeat_every',
+      'unit',
       reflection.PublishOnly('next_cycle_start_date'),
       reflection.PublishOnly('non_adjusted_next_cycle_start_date'),
       reflection.PublishOnly('workflow_state'),
