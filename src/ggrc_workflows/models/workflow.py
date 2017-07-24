@@ -124,6 +124,17 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   unit = deferred(db.Column(db.Enum(*VALID_UNITS), nullable=True,
                             default=None), 'Workflow')
 
+  @orm.validates('unit')
+  def validate_unit(self, _, value):
+    """Validate unit field for Workflow.
+
+    Unit should have one of the value from VALID_UNITS list or None.
+    """
+    if value is not None and value not in self.VALID_UNITS:
+      raise ValueError("'unit' field should be one of the "
+                       "value: null, {}".format(", ".join(self.VALID_UNITS)))
+    return value
+
   @orm.validates('is_verification_needed')
   def validate_is_verification_needed(self, key, value):
     # pylint: disable=unused-argument
