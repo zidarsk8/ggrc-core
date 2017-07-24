@@ -29,9 +29,9 @@ def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   # Add new columns to 'workflows' table
   op.add_column('workflows', sa.Column('repeat_every', sa.Integer,
-                                       nullable=True, default=None))
+                                       nullable=True, server_default=None))
   op.add_column('workflows', sa.Column('unit', sa.Enum(*VALID_UNITS),
-                                       nullable=True, default=None))
+                                       nullable=True, server_default=None))
   op.add_column('workflows', sa.Column('repeat_multiplier', sa.Integer,
                                        nullable=False, server_default='0'))
 
