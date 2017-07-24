@@ -32,9 +32,12 @@ def upgrade():
                                        nullable=True, default=None))
   op.add_column('workflows', sa.Column('unit', sa.Enum(*VALID_UNITS),
                                        nullable=True, default=None))
+  op.add_column('workflows', sa.Column('repeat_multiplier', sa.Integer,
+                                       nullable=False, server_default='0'))
 
 
 def downgrade():
   """"Downgrade database schema and/or data back to the previous revision."""
+  op.drop_column('workflows', 'repeat_multiplier')
   op.drop_column('workflows', 'unit')
   op.drop_column('workflows', 'repeat_every')
