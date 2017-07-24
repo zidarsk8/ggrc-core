@@ -728,8 +728,27 @@ def handle_workflow_person_post(sender, obj=None, src=None, service=None):  # no
   db.session.add(user_role)
 
 
+def _validate_post_workflow_fields(workflow):
+  """Validates Workflow's 'repeat_every' and 'unit' fields dependency.
+
+  Validates that Workflow's 'repeat_every' and 'unit' fields can have NULL
+  only simultaneously.
+
+  Args:
+      workflow: Workflow class instance.
+  Raises:
+      ValueError: An error occurred in case of failed dependency validation.
+  """
+  if ((workflow.repeat_every is None and workflow.unit is not None) or
+          (workflow.repeat_every is not None and workflow.unit is None)):
+    raise ValueError("Workflow 'repeat_every' and 'unit' fields "
+                     "can be NULL only simultaneously")
+
+
 @signals.Restful.model_posted.connect_via(models.Workflow)
 def handle_workflow_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+  _validate_post_workflow_fields(obj)
+
   source_workflow = None
 
   if src.get('clone'):
