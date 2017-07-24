@@ -42,7 +42,7 @@
       var $target = $('<div class="modal hide ' +
                       options.extraCssClass +
                       '"></div>');
-      $target
+      return $target
         .modal({backdrop: 'static'})
         .ggrc_controllers_modals(can.extend({
           new_object_form: false,
@@ -706,11 +706,31 @@
       },
 
     "{$footer} a.btn[data-toggle='modal-submit'] click": function (el, ev) {
+      var options = this.options;
+      var instance = options.attr('instance');
+      var oldData = options.attr('oldData');
+
       if (el.hasClass('disabled')) {
         return;
       }
-      this.options.attr('add_more', false);
-      this.triggerSave(el, ev);
+
+      GGRC.Utils.Controllers.checkPreconditions({
+        instance: instance,
+        operation: 'deprecation',
+        // functions that will be called as an extra conditions (return true
+        // or false). If all conditions are passed then are showed a
+        // message else - called success handler.
+        extraConditions: [
+          GGRC.Utils.Controllers.becameDeprecated.bind(
+            null,
+            instance,
+            oldData.status
+          )
+        ]
+      }, function () {
+        options.attr('add_more', false);
+        this.triggerSave(el, ev);
+      }.bind(this));
     },
 
     '{$content} a.field-hide click': function (el, ev) { // field hide

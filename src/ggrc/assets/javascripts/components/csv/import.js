@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function(can, $) {
+(function(can, $, utils) {
 
   GGRC.Components('csvImportWidget', {
     tag: "csv-import",
@@ -63,17 +63,121 @@
             };
 
         return _.extend(states[state], {state: state});
+      },
+      prepareDataForCheck: function (requestData) {
+        var checkResult = {
+          hasDeprecations: false,
+          hasDeletions: false
+        };
+
+        // check if imported data has deprecated or deleted objects
+        _.each(requestData, function (element) {
+          if (
+            checkResult.hasDeprecations &&
+            checkResult.hasDeletions
+          ) {
+            return false;
+          }
+
+          if (!checkResult.hasDeletions) {
+            checkResult.hasDeletions = (element.deleted > 0);
+          }
+
+          if (!checkResult.hasDeprecations) {
+            checkResult.hasDeprecations = (element.deprecated > 0);
+          }
+        });
+
+        return {
+          data: requestData,
+          check: checkResult
+        };
+      },
+      processLoadedInfo: function (data) {
+        this.attr("import", _.map(data, function (element) {
+          element.data = [];
+          if (element.block_errors.concat(element.row_errors).length) {
+            element.data.push({
+              status: "errors",
+              messages: element.block_errors.concat(element.row_errors)
+            });
+          }
+          if (element.block_warnings.concat(element.row_warnings).length) {
+            element.data.push({
+              status: "warnings",
+              messages: element.block_warnings.concat(element.row_warnings)
+            });
+          }
+          return element;
+        }));
+        this.attr("state", "import");
+      },
+      needWarning: function (checkObj, data) {
+        var hasWarningTypes = _.every(data, function (item) {
+          return utils.Controllers.hasWarningType({type: item.name});
+        });
+        return hasWarningTypes &&
+          (
+            checkObj.hasDeletions ||
+            checkObj.hasDeprecations
+          );
+      },
+      beforeProcess: function (check, data, element) {
+        var operation;
+        var needWarning = this.needWarning(check, data);
+
+        if (needWarning) {
+          operation = this.getOperationNameFromCheckObj(check);
+
+          GGRC.Utils.Modals.warning(
+            {
+              objectShortInfo: 'imported object(s)',
+              modal_description:
+                'In the result of import some Products, Systems or ' +
+                'Processes will be ' + operation.past + '.',
+              operation: operation.action
+            },
+            function () {
+              this.processLoadedInfo(data);
+            }.bind(this),
+            function () {
+              this.attr('state', 'import');
+              this.resetFile(element);
+            }.bind(this)
+          );
+          return;
+        }
+
+        this.processLoadedInfo(data);
+      },
+      getOperationNameFromCheckObj: function (checkObj) {
+        var action = _.compact([
+          checkObj.hasDeletions ? 'deletion' : '',
+          checkObj.hasDeprecations ? 'deprecation' : ''
+        ]).join(' and ');
+        var pastForm = _.compact([
+          checkObj.hasDeletions ? 'deleted' : '',
+          checkObj.hasDeprecations ? 'deprecated' : ''
+        ]).join(' and ');
+
+        return {
+          action: action,
+          past: pastForm
+        };
+      },
+      resetFile: function (element) {
+        this.attr({
+          state: "select",
+          filename: "",
+          import: null
+        });
+        element.find(".csv-upload").val("");
       }
     },
     events: {
       ".state-reset click": function (el, ev) {
         ev.preventDefault();
-        this.scope.attr({
-          state: "select",
-          filename: "",
-          import: null
-        });
-        this.element.find(".csv-upload").val("");
+        this.scope.resetFile(this.element);
       },
       ".state-select click": function (el, ev) {
         ev.preventDefault();
@@ -127,36 +231,24 @@
             "X-requested-by": "GGRC"
           }
         };
-
         $.ajax(this.requestData)
-        .done(function (data) {
-          this.scope.attr("import", _.map(data, function (element) {
-            element.data = [];
-            if (element.block_errors.concat(element.row_errors).length) {
-              element.data.push({
-                status: "errors",
-                messages: element.block_errors.concat(element.row_errors)
-              });
-            }
-            if (element.block_warnings.concat(element.row_warnings).length) {
-              element.data.push({
-                status: "warnings",
-                messages: element.block_warnings.concat(element.row_warnings)
-              });
-            }
-            return element;
-          }));
-          this.scope.attr("state", "import");
-        }.bind(this))
-        .fail(function (data) {
-          this.scope.attr("state", "select");
-          $("body").trigger("ajax:flash", {
-            "error": $(data.responseText.split("\n")[3]).text()
-          });
-        }.bind(this))
-        .always(function () {
-          this.scope.attr("isLoading", false);
-        }.bind(this));
+          .then(this.scope.prepareDataForCheck.bind(this.scope))
+          .then(function (checkObject) {
+            this.scope.beforeProcess(
+              checkObject.check,
+              checkObject.data,
+              this.element
+            );
+          }.bind(this))
+          .fail(function (data) {
+            this.attr("state", "select");
+            $("body").trigger("ajax:flash", {
+              "error": $(data.responseText.split("\n")[3]).text()
+            });
+          }.bind(this))
+          .always(function () {
+            this.scope.attr("isLoading", false);
+          }.bind(this));
       }
     }
   });
@@ -164,5 +256,4 @@
   if (csvImport.length) {
     csvImport.html(can.view(GGRC.mustache_path + "/import_export/import.mustache", {}));
   }
-
-})(window.can, window.can.$);
+})(window.can, window.can.$, GGRC.Utils);

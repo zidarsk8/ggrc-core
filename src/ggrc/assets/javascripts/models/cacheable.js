@@ -938,8 +938,6 @@
       return this.get_binding(name).refresh_list();
     },
 
-  // This retrieves the potential orphan stats for a given instance
-  // Example: "This may also delete 3 Sections, 2 Controls, and 4 object mappings."
     get_orphaned_count: function () {
       if (!this.get_binding('orphaned_objects')) {
         return can.Deferred().reject();
@@ -947,9 +945,7 @@
       return this.get_list_loader('orphaned_objects').then(function (list) {
         var objects = [];
         var mappings = [];
-        var counts = {};
         var result = [];
-        var parts = 0;
 
         function is_join(mapping) {
           if (mapping.mappings.length > 0) {
@@ -971,35 +967,11 @@
           objects.push(mapping.instance);
         });
 
-      // Generate the summary
-        if (objects.length || mappings.length) {
-          result.push('This may also delete');
-        }
-        if (objects.length) {
-          can.each(objects, function (instance) {
-            var title = instance.constructor.title_singular;
-            counts[title] = counts[title] ||
-              {
-                model: instance.constructor,
-                count: 0
-              };
-            counts[title].count++;
-          });
-          can.each(counts, function (count, i) {
-            parts++;
-            result.push(count.count + ' ' + (count.count === 1 ? count.model.title_singular : count.model.title_plural) + ',');
-          });
-        }
         if (mappings.length) {
-          parts++;
-          result.push(mappings.length + ' object mapping' + (mappings.length !== 1 ? 's' : ''));
+          result.push(mappings.length);
         }
 
-      // Clean up commas, add an "and" if appropriate
-        parts >= 1 && parts <= 2 && (result[result.length - 1] = result[result.length - 1].replace(',', ''));
-        parts === 2 && (result[result.length - 2] = result[result.length - 2].replace(',', ''));
-        parts >= 2 && result.splice(result.length - 1, 0, 'and');
-        return result.join(' ') + (objects.length || mappings.length ? '.' : '');
+        return mappings.length;
       });
     },
 
