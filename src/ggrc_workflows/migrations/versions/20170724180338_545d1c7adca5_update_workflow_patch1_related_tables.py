@@ -19,13 +19,22 @@ revision = '545d1c7adca5'
 down_revision = '59aaa4750320'
 
 
+DAY_UNIT = 'day'
+WEEK_UNIT = 'week'
+MONTH_UNIT = 'month'
+VALID_UNITS = (DAY_UNIT, WEEK_UNIT, MONTH_UNIT)
+
+
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   # Add new columns to 'workflows' table
   op.add_column('workflows', sa.Column('repeat_every', sa.Integer,
                                        nullable=True, default=None))
+  op.add_column('workflows', sa.Column('unit', sa.Enum(*VALID_UNITS),
+                                       nullable=True, default=None))
 
 
 def downgrade():
   """"Downgrade database schema and/or data back to the previous revision."""
+  op.drop_column('workflows', 'unit')
   op.drop_column('workflows', 'repeat_every')
