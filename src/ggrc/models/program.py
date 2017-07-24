@@ -11,7 +11,7 @@ from ggrc.models.mixins import LastDeprecatedTimeboxed
 from ggrc.models.deferred import deferred
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
-from ggrc.models.reflection import AttributeInfo
+from ggrc.models import reflection
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 
@@ -29,10 +29,7 @@ class Program(HasObjectState, CustomAttributable, PublicDocumentable, Roleable,
   audits = db.relationship(
       'Audit', backref='program', cascade='all, delete-orphan')
 
-  _publish_attrs = [
-      'kind',
-      'audits',
-  ]
+  _api_attrs = reflection.ApiAttributes('kind', 'audits')
   _include_links = []
   _aliases = {
       "document_url": None,
@@ -41,17 +38,17 @@ class Program(HasObjectState, CustomAttributable, PublicDocumentable, Roleable,
       "program_owner": {
           "display_name": "Manager",
           "mandatory": True,
-          "type": AttributeInfo.Type.USER_ROLE,
+          "type": reflection.AttributeInfo.Type.USER_ROLE,
           "filter_by": "_filter_by_program_owner",
       },
       "program_editor": {
           "display_name": "Editor",
-          "type": AttributeInfo.Type.USER_ROLE,
+          "type": reflection.AttributeInfo.Type.USER_ROLE,
           "filter_by": "_filter_by_program_editor",
       },
       "program_reader": {
           "display_name": "Reader",
-          "type": AttributeInfo.Type.USER_ROLE,
+          "type": reflection.AttributeInfo.Type.USER_ROLE,
           "filter_by": "_filter_by_program_reader",
       },
   }

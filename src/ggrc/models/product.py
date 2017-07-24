@@ -12,6 +12,7 @@ from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models.option import Option
+from ggrc.models import reflection
 from ggrc.models.relationship import Relatable
 from ggrc.models.utils import validate_option
 from ggrc.models.track_object_state import HasObjectState
@@ -32,10 +33,7 @@ class Product(Roleable, HasObjectState, CustomAttributable, Personable,
       uselist=False,
   )
 
-  _publish_attrs = [
-      'kind',
-      'version',
-  ]
+  _api_attrs = reflection.ApiAttributes('kind', 'version')
   _fulltext_attrs = [
       'kind',
       'version',

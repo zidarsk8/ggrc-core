@@ -109,36 +109,34 @@ def is_filter_only(alias_properties):
   return False
 
 
-class PublishOnly(object):
-  """Attributes wrapped by ``PublishOnly`` instances should not be considered
-  to be a part of an inherited list. For example, ``_update_attrs`` can be
-  inherited from ``_publish_attrs`` if left unspecified. This class provides
-  a mechanism to use that inheritance while excluding some elements from the
-  resultant inherited list. For example, this:
+class Attribute(object):
+  """Class to define api attribute with allowed actions with that attribute."""
 
-  .. sourcecode::
+  __slots__ = ["attr", "create", "update", "read"]
 
-    _publish_attrs = [
-      'inherited_attr',
-      PublishOnly('not_inherited_attr'),
-      ]
+  def __init__(self, attr, create=True, update=True, read=True):
+    self.attr = attr
+    self.create = create
+    self.update = update
+    self.read = read
 
-  is equivalent to this:
 
-  .. sourcecode::
+class ApiAttributes(dict):
+  """Class to collect all required api attributes."""
 
-    _publish_attrs = [
-    'inherited_attr',
-    'not_inherited_attr',
-    ]
-    _update_attrs = [
-    'inherited_attr',
-    ]
-  """
-  # pylint: disable=too-few-public-methods
+  def __init__(self, *attrs):
+    super(ApiAttributes, self).__init__()
+    self.add(*attrs)
 
-  def __init__(self, attr_name):
-    self.attr_name = attr_name
+  def add(self, *attrs):
+    """Append attrs.
+
+    Attrs is the list of strings/unicodes or instances of Attribute class.
+    """
+    for attr in attrs:
+      if isinstance(attr, basestring):
+        attr = Attribute(attr)
+      self[attr.attr] = attr
 
 
 class AttributeInfo(object):
@@ -181,42 +179,32 @@ class AttributeInfo(object):
     """ Gather dictionaries from target class parets """
     result = {}
     for base in reversed(tgt_class.__mro__):
-      result.update(getattr(base, src_attr, {}))
+      result.update(getattr(base, src_attr, None) or {})
     return result
 
-  @staticmethod
-  def _get_first_exist_attr(obj, *attrs):
-    """First exist attr value will be return."""
-    for attr in attrs:
-      if hasattr(obj, attr):
-        return getattr(obj, attr)
-
   @classmethod
-  def gather_attrs(cls, tgt_class, src_attrs, ignore_publishonly=False):
+  def gather_attrs(cls, tgt_class, src_attr):
     """Gathers the attrs to be included in a list for publishing, update, or
     some other purpose. Supports inheritance by iterating the list of
     ``src_attrs`` until a list is found.
     """
-    if not isinstance(src_attrs, list):
-      src_attrs = [src_attrs]
-    accumulator = {}
+    accumulator = set()
+    callable_attrs = set()
     for base in tgt_class.__mro__:
-      attrs = cls._get_first_exist_attr(base, *src_attrs) or []
+      attrs = getattr(base, src_attr, None)
       if callable(attrs):
-        attrs = attrs(tgt_class)
-      for attr in attrs:
-        pub_only = isinstance(attr, PublishOnly)
-        if pub_only:
-          attr = attr.attr_name
-        if attr not in accumulator:
-          accumulator[attr] = pub_only
-    if ignore_publishonly:
-      return {a for a, f in accumulator.iteritems() if not f}
-    return set(accumulator.keys())
+        callable_attrs.add(attrs)
+      else:
+        accumulator = accumulator.union(set(attrs or []))
+    for attr in callable_attrs:
+      accumulator = accumulator.union(attr(tgt_class))
+    return accumulator
 
   @classmethod
   def gather_publish_attrs(cls, tgt_class):
-    return cls.gather_attrs(tgt_class, '_publish_attrs')
+    return [attr_name for attr_name, attr in
+            cls.gather_attr_dicts(tgt_class, "_api_attrs").iteritems()
+            if attr.read]
 
   @classmethod
   def gather_aliases(cls, tgt_class):
@@ -232,25 +220,23 @@ class AttributeInfo(object):
 
   @classmethod
   def gather_update_attrs(cls, tgt_class):
-    attrs = cls.gather_attrs(tgt_class,
-                             ['_update_attrs', '_publish_attrs'],
-                             True)
-    return attrs
+    return [attr_name for attr_name, attr in
+            cls.gather_attr_dicts(tgt_class, "_api_attrs").iteritems()
+            if attr.update]
 
   @classmethod
   def gather_create_attrs(cls, tgt_class):
-    return cls.gather_attrs(
-        tgt_class,
-        ['_create_attrs', '_update_attrs', '_publish_attrs'],
-        True)
+    return [attr_name for attr_name, attr in
+            cls.gather_attr_dicts(tgt_class, "_api_attrs").iteritems()
+            if attr.create]
 
   @classmethod
   def gather_include_links(cls, tgt_class):
-    return cls.gather_attrs(tgt_class, ['_include_links'])
+    return cls.gather_attrs(tgt_class, '_include_links')
 
   @classmethod
   def gather_update_raw(cls, tgt_class):
-    return cls.gather_attrs(tgt_class, ['_update_raw'])
+    return cls.gather_attrs(tgt_class, '_update_raw')
 
   @classmethod
   def get_acl_definitions(cls, object_class):

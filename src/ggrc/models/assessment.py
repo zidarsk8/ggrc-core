@@ -12,7 +12,6 @@ from sqlalchemy import orm
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
-from ggrc.models import reflection
 from ggrc.models.comment import Commentable
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models.mixins.audit_relationship import AuditRelationship
@@ -32,7 +31,7 @@ from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.deferred import deferred
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
-from ggrc.models.reflection import PublishOnly
+from ggrc.models import reflection
 from ggrc.models.relationship import Relatable
 from ggrc.models.relationship import Relationship
 from ggrc.models.track_object_state import HasObjectState
@@ -127,14 +126,14 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   ])
 
   # REST properties
-  _publish_attrs = [
+  _api_attrs = reflection.ApiAttributes(
       'design',
       'operationally',
       'audit',
       'assessment_type',
-      PublishOnly('archived'),
-      PublishOnly('object')
-  ]
+      reflection.Attribute('archived', create=False, update=False),
+      reflection.Attribute('object', create=False, update=False),
+  )
 
   _fulltext_attrs = [
       'archived',

@@ -9,6 +9,7 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
                                 CustomAttributable)
+from ggrc.models import reflection
 from ggrc.fulltext.mixin import Indexed
 from .object_document import PublicDocumentable
 from .object_person import Personable
@@ -55,7 +56,7 @@ class Directive(HasObjectState, LastDeprecatedTimeboxed, PublicDocumentable,
       'polymorphic_on': meta_kind
   }
 
-  _publish_attrs = [
+  _api_attrs = reflection.ApiAttributes(
       'audit_start_date',
       'audit_frequency',
       'audit_duration',
@@ -64,7 +65,7 @@ class Directive(HasObjectState, LastDeprecatedTimeboxed, PublicDocumentable,
       'organization',
       'scope',
       'version',
-  ]
+  )
 
   _fulltext_attrs = [
       'audit_start_date',

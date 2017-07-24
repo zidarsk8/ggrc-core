@@ -42,9 +42,11 @@ class StatusValidatedMixin(mixins.Stateful):
   NO_VALIDATION_STATES = [ASSIGNED, IN_PROGRESS, FINISHED]
   VALID_STATES = NO_VALIDATION_STATES + [VERIFIED]
 
-  _publish_attrs = [
-      reflection.PublishOnly("is_verification_needed"),
-  ]
+  _api_attrs = reflection.ApiAttributes(
+      reflection.Attribute("is_verification_needed",
+                           create=False,
+                           update=False),
+  )
 
   def is_verification_needed(self):
     raise NotImplementedError()

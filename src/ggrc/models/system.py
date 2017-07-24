@@ -14,6 +14,7 @@ from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 from ggrc.models.utils import validate_option
 from ggrc.models import track_object_state
+from ggrc.models import reflection
 
 
 class SystemOrProcess(track_object_state.HasObjectState,
@@ -39,18 +40,13 @@ class SystemOrProcess(track_object_state.HasObjectState,
   }
 
   # REST properties
-  _publish_attrs = [
+  _api_attrs = reflection.ApiAttributes(
       'infrastructure',
-      'is_biz_process',
       'version',
       'network_zone',
-  ]
+      reflection.Attribute('is_biz_process', create=False, update=False),
+  )
   _fulltext_attrs = [
-      'infrastructure',
-      'version',
-      'network_zone',
-  ]
-  _update_attrs = [
       'infrastructure',
       'version',
       'network_zone',

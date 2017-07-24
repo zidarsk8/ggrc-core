@@ -17,7 +17,6 @@ class Objective(WithLastAssessmentDate, Roleable, HasObjectState,
                 CustomAttributable, Auditable, Relatable, Personable,
                 PublicDocumentable, BusinessObject, Indexed, db.Model):
   __tablename__ = 'objectives'
-  _publish_attrs = []
   _include_links = []
   _aliases = {
       "document_url": None,

@@ -12,6 +12,7 @@ from sqlalchemy.orm.collections import attribute_mapped_collection
 from ggrc import db
 from ggrc.models.mixins import Identifiable
 from ggrc.models.mixins import Base
+from ggrc.models import reflection
 
 
 class Relationship(Base, db.Model):
@@ -122,11 +123,7 @@ class Relationship(Base, db.Model):
             'destination_type', 'destination_id'),
     )
 
-  _publish_attrs = [
-      'source',
-      'destination',
-      'attrs',
-  ]
+  _api_attrs = reflection.ApiAttributes('source', 'destination', 'attrs')
   attrs.publish_raw = True
 
   def _display_name(self):
@@ -185,10 +182,10 @@ class Relatable(object):
       return {obj for obj in related if obj.type in _types}
     return set(related)
 
-  _publish_attrs = [
+  _api_attrs = reflection.ApiAttributes(
       'related_sources',
       'related_destinations'
-  ]
+  )
 
   _include_links = []
 
