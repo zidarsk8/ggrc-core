@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('CMS.Models.Comment', function () {
+xdescribe('CMS.Models.Comment', function () {
   'use strict';
 
   describe('updateDescription() method', function () {

@@ -724,5 +724,4 @@ dashboard-js-spec-files:
   - models/cacheable_spec.js
 
 dashboard-js-spec-helpers:
-  - jasmine-fixture/dist/jasmine-fixture.min.js
   - spec_helpers.js
