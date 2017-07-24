@@ -692,7 +692,6 @@ dashboard-js-template-files:
   - components/inline/base-inline-control-title.mustache
   - components/assessment/info-pane/inline-item.mustache
   - components/assessment/info-pane/confirm-inline-control-title.mustache
-  - components/assessment/assessment-object-type-dropdown.mustache
 
 dashboard-css-files:
   - dashboard.css

@@ -21,14 +21,20 @@
 
       <div class="ggrc-form-item">
         <div class="ggrc-form-item__multiple-row">
-           <label class="form-label required-label">
-             Assessment Type
-             <i class="fa fa-asterisk"></i>
-           </label>
-           <assessment-object-type-dropdown
-             css-class="input-medium pull-left"
-             {(assessment-type)}="instance.assessment_type">
-           </assessment-object-type-dropdown>
+          <label class="form-label required-label">
+            Assessment Type
+            <i class="fa fa-asterisk"></i>
+          </label>
+          <assessment-object-type-dropdown
+            {instance}="instance"
+            {(assessment-type)}="instance.assessment_type">
+            <dropdown
+              {options-groups}="objectTypes"
+              is-grouped-dropdown="true"
+              name="assessmentType"
+              no-value="false">
+            </dropdown>
+          </assessment-object-type-dropdown>
         </div>
       </div>
       <div class="ggrc-form-item">

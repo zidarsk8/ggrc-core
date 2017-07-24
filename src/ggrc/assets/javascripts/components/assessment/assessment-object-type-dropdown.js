@@ -6,13 +6,8 @@
 (function (GGRC, can) {
   'use strict';
 
-  var tag = 'assessment-object-type-dropdown';
-  var template = can.view(GGRC.mustache_path +
-    '/components/assessment/assessment-object-type-dropdown.mustache');
-
   GGRC.Components('assessmentObjectTypeDropdown', {
-    tag: tag,
-    template: template,
+    tag: 'assessment-object-type-dropdown',
     viewModel: {
       define: {
         objectTypes: {
@@ -38,7 +33,7 @@
         }
       },
       assessmentType: '',
-      cssClass: '@',
+      instance: {},
       getNonRelevantObjectTypes: function () {
         return Object.freeze({
           AssessmentTemplate: true,

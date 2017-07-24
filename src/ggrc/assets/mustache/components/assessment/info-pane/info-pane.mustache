@@ -189,6 +189,28 @@
                                                   {items}="globalAttributes"
                     ></assessment-custom-attributes>
                 </div>
+                <div class="info-pane__section ggrc-form">
+                    <div class="ggrc-form-item">
+                        <div class="ggrc-form-item__multiple-row">
+                            <assessment-object-type-dropdown
+                                {instance}="instance"
+                                {(assessment-type)}="instance.assessment_type">
+                                <assessment-inline-item
+                                    type="dropdown"
+                                    prop-name="assessment_type"
+                                    is-grouped-dropdown="true"
+                                    {set-in-progress}="@setInProgressState"
+                                    {on-state-change-dfd}="onStateChangeDfd"
+                                    {dropdwon-options-groups}="objectTypes"
+                                    {is-edit-icon-denied}="isEditDenied"
+                                    {value}="instance.assessment_type"
+                                    {instance}="instance">
+                                        <div class="info-pane__section-title">Assessment Type</div>
+                                </assessment-inline-item>
+                            </assessment-object-type-dropdown>
+                        </div>
+                    </div>
+                </div>
                 <div class="info-pane__section">
                     <div class="info-pane__section-title">
                        <div class="action-toolbar">
@@ -287,6 +309,7 @@
                                     type="dropdown"
                                     prop-name="design"
                                     with-read-more="true"
+                                    dropdown-no-value="true"
                                     {set-in-progress}="@setInProgressState"
                                     {on-state-change-dfd}="onStateChangeDfd"
                                     {dropdown-options}="model.conclusions"
@@ -306,6 +329,7 @@
                                     type="dropdown"
                                     prop-name="operationally"
                                     with-read-more="true"
+                                    dropdown-no-value="true"
                                     {set-in-progress}="@setInProgressState"
                                     {on-state-change-dfd}="onStateChangeDfd"
                                     {dropdown-options}="model.conclusions"

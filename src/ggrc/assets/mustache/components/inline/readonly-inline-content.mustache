@@ -13,7 +13,15 @@
   {{/case}}
 
   {{#case 'dropdown'}}
-    {{> '/static/mustache/components/inline/simple-readonly-text.mustache'}}
+    <dropdown-form-field
+      class="disabled-dropdown"
+      {value}="context.value"
+      {options}="dropdownOptions"
+      {no-value}="dropdownNoValue"
+      {dropdwon-options-groups}="dropdwonOptionsGroups"
+      {is-grouped-dropdown}="isGroupedDropdown"
+      disabled="true"
+    ></dropdown-form-field>
   {{/case}}
 
   {{#case 'checkbox'}}

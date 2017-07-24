@@ -16,8 +16,15 @@
         </label>
 
         <assessment-object-type-dropdown
-          css-class="input-medium pull-left"
+          {instance}="instance"
           {(assessment-type)}="instance.template_object_type">
+          <dropdown
+            class="input-medium pull-left"
+            {options-groups}="objectTypes"
+            is-grouped-dropdown="true"
+            name="assessmentType"
+            no-value="false">
+          </dropdown>
         </assessment-object-type-dropdown>
 
         {{#if_equals instance.template_object_type 'Control'}}
