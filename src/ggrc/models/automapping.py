@@ -25,3 +25,10 @@ class Automapping(Base, db.Model):
   source_type = db.Column(db.String, nullable=False)
   destination_id = db.Column(db.Integer, nullable=False)
   destination_type = db.Column(db.String, nullable=False)
+
+  def __init__(self, parent):
+    """Automapping helper"""
+    self.source_id = parent.source_id
+    self.source_type = parent.source_type
+    self.destination_type = parent.destination_type
+    self.destination_id = parent.destination_id

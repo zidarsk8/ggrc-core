@@ -11,6 +11,7 @@ from ggrc import db
 from ggrc import models
 from ggrc.automapper.rules import rules
 from ggrc.login import get_current_user
+from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship
 from ggrc.models.comment import Commentable
 from ggrc.models.mixins import ChangeTracked
@@ -143,6 +144,8 @@ class AutomapperGenerator(object):
       return
     with self.benchmark("Automapping flush"):
       current_user = get_current_user()
+      automapping = Automapping(parent_relationship)
+      db.session.add(automapping)
       db.session.flush()
       now = datetime.now()
       # We are doing an INSERT IGNORE INTO here to mitigate a race condition
@@ -164,7 +167,8 @@ class AutomapperGenerator(object):
           "destination_type": dst.type,
           "context_id": None,
           "status": None,
-          "parent_id": parent_relationship.id}
+          "parent_id": parent_relationship.id,
+          "automapping_id": automapping.id}
           for src, dst in self.auto_mappings
           if (src, dst) != original]))  # (src, dst) is sorted
       cache = get_cache(create=True)
