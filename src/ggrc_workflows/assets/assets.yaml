@@ -1,23 +1,4 @@
 dashboard-js-files:
-  - apps/workflow-config.js
-  - apps/workflows.js
-  - controllers/dashboard_page.js
-  - controllers/workflow_page.js
-  - models/cycle_models.js
-  - models/task_group.js
-  - models/workflow.js
-  - models/workflow_join_models.js
-  - models/helpers.js
-  - workflow_mustache_helpers.js
-  - controllers/approval_workflow_controller.js
-  - components/workflow_clone.js
-  - components/taskgroup_clone.js
-  - components/end_cycle.js
-  - components/workflow_active.js
-  - components/workflow_deactivate.js
-  - components/repeat-on-button.js
-  - components/repeat-on-button-wrapper.js
-  - components/repeat-on-summary.js
 
 dashboard-js-spec-files:
 

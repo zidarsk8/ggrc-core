@@ -2,11 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 dashboard-js-files:
-  - apps/risks.js
-  - models/risk.js
-  - models/risk_join_models.js
-  - models/threat.js
-  - controllers/workflow_page.js
 
 dashboard-js-spec-files:
 

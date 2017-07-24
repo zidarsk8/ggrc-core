@@ -4,7 +4,7 @@
  */
 
 import '../cycle-task-actions/cycle-task-actions';
-import '../last-assessment-date/last-assessment-date';
+import './tree-item-custom-attribute';
 
 (function (can, GGRC) {
   'use strict';

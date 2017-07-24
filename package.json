@@ -9,10 +9,10 @@
   "dependencies": {
     "bower": "^1.6.8",
     "clipboard": "^1.5.16",
+    "components-jqueryui": "^1.12.1",
     "doctoc": "^0.11.0",
     "font-awesome": "~4.5.0",
     "jquery": "^2.2.4",
-    "jquery-ui": "^1.12.1",
     "lodash": "^3.10.1",
     "moment": "^2.17.1",
     "moment-timezone": "^0.5.10",

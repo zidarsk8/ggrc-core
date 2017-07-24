@@ -6,7 +6,7 @@
 import '../tracker';
 import 'jquery';
 import 'lodash';
-import 'jquery-ui/jquery-ui.min';
+import 'components-jqueryui';
 import 'bootstrap/js/bootstrap-alert.js';
 import 'bootstrap/js/bootstrap-collapse.js';
 import 'bootstrap/js/bootstrap-dropdown.js';

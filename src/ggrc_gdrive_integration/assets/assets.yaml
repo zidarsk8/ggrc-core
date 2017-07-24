@@ -2,12 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 dashboard-js-files:
-  - models/gdrive_models.js
-  - models/gcal_models.js
-  - controllers/gapi_controllers.js
-  - apps/gdrive.js
-  - components/gdrive_picker_launcher.js
-  - components/gdrive_folder_picker.js
 
 dashboard-js-spec-files:
   - models/gdrive_models_spec.js

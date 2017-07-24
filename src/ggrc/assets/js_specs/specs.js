@@ -13,5 +13,5 @@ import '../javascripts/entrypoints/dashboard';
 import '../javascripts/components/csv/export'
 import '../javascripts/components/csv/import'
 
-let testsContext = require.context('../../..', true, /_spec\.js$/);
+var testsContext = require.context('../../..', true, /_spec\.js$/);
 testsContext.keys().forEach(testsContext);

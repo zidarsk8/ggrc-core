@@ -3,11 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import '../components/view-models/object-operations-base-vm';
+import '../components/advanced-search/advanced-search-wrapper';
 import '../components/object-mapper/object-mapper';
 import '../components/object-generator/object-generator';
 import '../components/object-search/object-search';
-import '../components/unified-mapper/mapper-model';
-import '../components/unified-mapper/mapper-toolbar';
 import '../components/unified-mapper/mapper-results';
 
 (function (can, $) {

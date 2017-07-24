@@ -8,8 +8,9 @@ import '../../auto-save-form/auto-save-form';
 import '../../auto-save-form/auto-save-form-status';
 import '../mapped-objects/mapped-related-information';
 import '../mapped-objects/mapped-comments';
-import '../../add-mapping-button/add-mapping-button';
 import '../mapped-objects/mapped-controls';
+import '../../inline/inline-form-control';
+import './inline-item';
 
 (function (can, GGRC, CMS) {
   'use strict';
