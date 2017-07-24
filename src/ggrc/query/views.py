@@ -45,12 +45,24 @@ def http_timestamp(timestamp):
   return format_date_time(time.mktime(timestamp.utctimetuple()))
 
 
+def get_handler_results(query):
+  """Get results from the best matching query handler.
+
+  Args:
+    query: dict containing query parameters.
+  Returns:
+    dict containing json serializable query results.
+  """
+
+  query_handler = DefaultHandler(query)
+  return query_handler.get_results()
+
+
 def get_objects_by_query():
   """Return objects corresponding to a POST'ed query list."""
   query = request.json
 
-  query_handler = DefaultHandler(query)
-  results = query_handler.get_results()
+  results = get_handler_results(query)
 
   last_modified_list = [result["last_modified"] for result in results
                         if result["last_modified"]]
