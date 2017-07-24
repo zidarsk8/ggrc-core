@@ -979,20 +979,6 @@ def handle_resource_deleted(sender, obj=None, service=None):
     # db.session.delete(obj.context)
 
 
-# Removed because this is now handled purely client-side, but kept
-# here as a reference for the next one.
-# @BaseObjectView.extension_contributions.connect_via(Program)
-def contribute_to_program_view(sender, obj=None, context=None):
-  if obj.context_id is not None and \
-     rbac_permissions.is_allowed_read('Role', None, 1) and \
-     rbac_permissions.is_allowed_read('UserRole', None, obj.context_id) and \
-     rbac_permissions.is_allowed_create('UserRole', None, obj.context_id) and \
-     rbac_permissions.is_allowed_update('UserRole', None, obj.context_id) and \
-     rbac_permissions.is_allowed_delete('UserRole', None, obj.context_id):
-    return 'permissions/programs/_role_assignments.haml'
-  return None
-
-
 @app.context_processor
 def authorized_users_for():
   return {'authorized_users_for': UserRole.role_assignments_for}

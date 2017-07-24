@@ -50,11 +50,6 @@ logger = getLogger(__name__)
 CACHE_EXPIRY_COLLECTION = 60
 
 
-def get_oauth_credentials():
-  from flask import session
-  return session.get('oauth_credentials')
-
-
 def _get_cache_manager():
   from ggrc.cache import CacheManager, MemCache
   cache_manager = CacheManager()
