@@ -69,13 +69,18 @@
     <div class="span4" id="frequency-div">
       {{#using task_group=instance.task_group}}
       {{#using workflow=task_group.workflow}}
+          <div class="frequency-wrap">
+              <label>
+                  Repeat
+                  <i class="fa fa-question-circle" rel="tooltip" title="Choose start and end dates"></i>
+              </label>
+              <repeat-on-summary {unit}="workflow.unit" {repeat-every}="workflow.repeat_every"
+              {hide-repeat-off}="false">
+              </repeat-on-summary>
+          </div>
       {{#switch workflow.frequency}}
       {{#case "one_time"}}
       <div id="one-time" class="frequency-wrap" style="display:block">
-        <label>
-          Frequency: One time
-          <i class="fa fa-question-circle" rel="tooltip" title="Choose start and end dates"></i>
-        </label>
         <label class="smaller">
            <datepicker date="instance.start_date"
                        required="true"
@@ -91,10 +96,6 @@
       {{/case}}
       {{#case "weekly"}}
       <div id="weekly" class="frequency-wrap" style="display:block">
-        <label>
-          Frequency: Weekly
-          <i class="fa fa-question-circle" rel="tooltip" title="Choose start/end days of the week"></i>
-        </label>
         <label class="smaller">
           <span class="start-text">
             Starts every
@@ -121,10 +122,6 @@
       {{/case}}
       {{#case "monthly"}}
       <div id="monthly" class="frequency-wrap" style="display:block">
-        <label>
-          Frequency: Each month
-          <i class="fa fa-question-circle" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
-        </label>
         <label class="smaller">
           <span class="start-text">
             Starts every
@@ -151,10 +148,6 @@
       {{/case}}
       {{#case "quarterly"}}
       <div id="quarterly" class="frequency-wrap" style="display:block">
-        <label>
-          Frequency: Every quarter
-          <i class="fa fa-question-circle" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
-        </label>
         <label class="smaller">
           <span class="start-text extrasmall">
             Starts
@@ -191,10 +184,6 @@
       {{/case}}
       {{#case "annually"}}
       <div id="annually" class="frequency-wrap" style="display:block">
-        <label>
-          Frequency: Each year
-          <i class="fa fa-question-circle" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
-        </label>
         <label class="smaller">
           <span class="start-text">
             Starts every
