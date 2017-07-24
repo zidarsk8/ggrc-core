@@ -126,6 +126,16 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   repeat_multiplier = deferred(db.Column(db.Integer, nullable=False,
                                          default=0), 'Workflow')
 
+  @orm.validates('repeat_every')
+  def validate_repeat_every(self, _, value):
+    """Validate repeat_every field for Workflow.
+
+    repeat_every shouldn't have 0 value.
+    """
+    if value == 0:
+      raise ValueError("'repeat_every' cannot be set to 0")
+    return value
+
   @orm.validates('unit')
   def validate_unit(self, _, value):
     """Validate unit field for Workflow.
