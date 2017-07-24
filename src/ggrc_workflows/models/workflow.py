@@ -115,6 +115,9 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       default=IS_VERIFICATION_NEEDED_DEFAULT,
       nullable=False)
 
+  repeat_every = deferred(db.Column(db.Integer, nullable=True, default=None),
+                          'Workflow')
+
   @orm.validates('is_verification_needed')
   def validate_is_verification_needed(self, key, value):
     # pylint: disable=unused-argument
@@ -151,6 +154,7 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       'object_approval',
       'recurrences',
       'is_verification_needed',
+      'repeat_every',
       reflection.PublishOnly('next_cycle_start_date'),
       reflection.PublishOnly('non_adjusted_next_cycle_start_date'),
       reflection.PublishOnly('workflow_state'),
