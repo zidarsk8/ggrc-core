@@ -10,7 +10,7 @@
 import pytest
 
 from lib import base
-from lib.constants import messages, objects
+from lib.constants import messages, objects, element
 from lib.constants.element import Lhn, MappingStatusAttrs
 from lib.factory import get_ui_service
 from lib.page import dashboard
@@ -558,7 +558,8 @@ class TestSnapshots(base.Test):
         "new_control_rest"][0]
     # due to 'actual_control.custom_attributes = {None: None}'
     expected_obj = (dynamic_object.repr_ui().update_attrs(
-        custom_attributes={None: None}))
+        custom_attributes={None: None},
+        status=element.AssessmentStates.IN_PROGRESS))
     expected_obj_service = get_ui_service(expected_obj.type)(selenium)
     (webui_service.ControlsService(selenium).map_objs_via_tree_view(
         src_obj=expected_obj, dest_objs=[snapshoted_control]))
@@ -566,7 +567,7 @@ class TestSnapshots(base.Test):
         src_obj=origin_control)
     assert [expected_obj] == actual_objs, (
         messages.AssertionMessages.
-        format_err_msg_equal(expected_obj, actual_objs))
+        format_err_msg_equal([expected_obj], actual_objs))
 
   @pytest.mark.parametrize(
       "dynamic_object",
