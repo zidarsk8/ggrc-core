@@ -55,19 +55,11 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.post(all_models.Workflow, data)
     self.assertEqual(response.status_code, 201)
 
-  def test_create_wrong_repeat_every_workflow(self):
+  @ddt.data("wrong value", 0, -4)
+  def test_create_wrong_repeat_every_workflow(self, value):
     """Test case for invalid repeat_every value"""
     data = self.get_workflow_dict()
-    data["workflow"]["repeat_every"] = "wrong value"
-    data["workflow"]["unit"] = "month"
-    data["workflow"]["title"] = "Wrong wf"
-    response = self.api.post(all_models.Workflow, data)
-    self.assertEqual(response.status_code, 400)
-
-  def test_create_repeat_every_zero(self):
-    """Test case for invalid repeat_every = 0 """
-    data = self.get_workflow_dict()
-    data["workflow"]["repeat_every"] = 0
+    data["workflow"]["repeat_every"] = value
     data["workflow"]["unit"] = "month"
     data["workflow"]["title"] = "Wrong wf"
     response = self.api.post(all_models.Workflow, data)
