@@ -219,9 +219,6 @@ def generate_role_object_dict(snapshot, audit):
   acl_dict["Auditors"].extend([user_role.person_id
                                for user_role in audit.context.user_roles
                                if user_role.role.name == u"Auditor"])
-  acl_dict["Object Owners"].extend(
-      i["id"] for i in snapshot.revision.content.get("owners", [])
-  )
   return acl_dict
 
 

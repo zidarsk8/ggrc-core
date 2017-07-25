@@ -8,16 +8,16 @@ from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from ggrc import db
+from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Base
 from ggrc.models.relationship import Relatable
-from ggrc.models.object_owner import Ownable
 from ggrc.models.utils import validate_option
 from ggrc.models import exceptions
 
 
-class Document(Ownable, Relatable, Base, Indexed, db.Model):
+class Document(Roleable, Relatable, Base, Indexed, db.Model):
   """Audit model."""
   __tablename__ = 'documents'
 

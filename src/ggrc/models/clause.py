@@ -11,7 +11,6 @@ from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Hierarchical
 from ggrc.models.mixins import LastDeprecatedTimeboxed
 from ggrc.models.mixins import BusinessObject
-from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
@@ -19,7 +18,7 @@ from ggrc.fulltext.mixin import Indexed
 
 
 class Clause(Roleable, HasObjectState, Hierarchical, CustomAttributable,
-             Personable, Ownable, LastDeprecatedTimeboxed, Relatable,
+             Personable, LastDeprecatedTimeboxed, Relatable,
              BusinessObject, Indexed, db.Model):
 
   __tablename__ = 'clauses'

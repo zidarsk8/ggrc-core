@@ -22,7 +22,6 @@ from ggrc.login import get_current_user
 from ggrc.models import all_models
 from ggrc.models.audit import Audit
 from ggrc.models.program import Program
-from ggrc.models.object_owner import ObjectOwner
 from ggrc.rbac import permissions as rbac_permissions
 from ggrc.rbac.permissions_provider import DefaultUserPermissions
 from ggrc.services.common import _get_cache_manager
@@ -558,29 +557,6 @@ def load_implied_roles(permissions, source_contexts_to_rolenames,
           implied_role.permissions, implied_context_id, permissions)
 
 
-def load_object_owners(user, permissions):
-  """Load object owners permissions
-
-  Args:
-      user (Person): Person object
-      permissions (dict): dict where the permissions will be stored
-  Returns:
-      None
-  """
-  with benchmark("load_object_owners > get owners"):
-    object_owners = db.session.query(
-        ObjectOwner.ownable_type, ObjectOwner.ownable_id
-    ).filter(ObjectOwner.person_id == user.id).all()
-  with benchmark("load_object_owners > update permissions"):
-    actions = ("read", "create", "update", "delete", "view_object_page")
-    for ownable_type, ownable_id in object_owners:
-      for action in actions:
-        permissions.setdefault(action, {})\
-            .setdefault(ownable_type, {})\
-            .setdefault('resources', list())\
-            .append(ownable_id)
-
-
 def context_relationship_query(contexts):
   """Load a list of objects related to the given contexts
 
@@ -802,9 +778,6 @@ def load_permissions_for(user):
   with benchmark("load_permissions > load implied roles"):
     load_implied_roles(permissions, source_contexts_to_rolenames,
                        all_context_implications)
-
-  with benchmark("load_permissions > load object owners"):
-    load_object_owners(user, permissions)
 
   with benchmark("load_permissions > load context relationships"):
     load_context_relationships(permissions)

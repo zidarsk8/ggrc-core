@@ -11,7 +11,6 @@ from ggrc.models.mixins import (
 )
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.object_document import PublicDocumentable
-from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
@@ -19,7 +18,7 @@ from ggrc.fulltext.mixin import Indexed
 
 
 class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
-            PublicDocumentable, Personable, LastDeprecatedTimeboxed, Ownable,
+            PublicDocumentable, Personable, LastDeprecatedTimeboxed,
             Relatable, AuditRelationship, BusinessObject, Indexed, db.Model):
   """Issue Model."""
 

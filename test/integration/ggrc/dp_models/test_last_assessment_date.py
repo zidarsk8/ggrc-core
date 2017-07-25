@@ -28,6 +28,7 @@ import collections
 import datetime
 
 import freezegun
+import itertools
 
 from ggrc import models
 from integration.ggrc import TestCase
@@ -58,15 +59,30 @@ class TestLastAssessmentDate(TestCase):
     self.api = Api()
     self.client.get("/login")
     person = models.Person.query.first()
+    admin_control = models.AccessControlRole.query.filter_by(
+        name="Admin", object_type="Control"
+    ).first()
+    admin_objective = models.AccessControlRole.query.filter_by(
+        name="Admin", object_type="Objective"
+    ).first()
     with factories.single_commit():
-      controls = [factories.ControlFactory(slug="Control_{}".format(i),
-                                           title="Control_{}".format(i),
-                                           owners=[person])
-                  for i in range(5)]
-      objectives = [factories.ObjectiveFactory(slug="Objective_{}".format(i),
-                                               title="Objective_{}".format(i),
-                                               owners=[person])
-                    for i in range(2)]
+      controls = [
+          factories.ControlFactory(slug="Control_{}".format(i),
+                                   title="Control_{}".format(i))
+          for i in range(5)
+      ]
+      objectives = [
+          factories.ObjectiveFactory(slug="Objective_{}".format(i),
+                                     title="Objective_{}".format(i))
+          for i in range(2)
+      ]
+
+      for obj in itertools.chain(controls, objectives):
+        acr = admin_control if obj.type == "Control" else admin_objective
+        factories.AccessControlList(
+            object=obj, person=person, ac_role=acr
+        )
+
       audit_0 = factories.AuditFactory(title="Audit_0", contact=person)
       audit_1 = factories.AuditFactory(title="Audit_1", contact=person)
       audit_0_snapshots = self._create_snapshots(

@@ -108,7 +108,7 @@ class ChangeTracked(object):
   @declared_attr
   def modified_by_id(cls):  # pylint: disable=no-self-argument
     """Id of user who did the last modification of the object."""
-    return deferred(db.Column(db.Integer), cls.__name__)
+    return db.Column(db.Integer)
 
   @declared_attr
   def created_at(cls):  # pylint: disable=no-self-argument
@@ -118,7 +118,7 @@ class ChangeTracked(object):
         nullable=False,
         default=db.text('current_timestamp'),
     )
-    return deferred(column, cls.__name__)
+    return column
 
   @declared_attr
   def updated_at(cls):  # pylint: disable=no-self-argument
@@ -129,7 +129,7 @@ class ChangeTracked(object):
         default=db.text('current_timestamp'),
         onupdate=db.text('current_timestamp'),
     )
-    return deferred(column, cls.__name__)
+    return column
 
   @declared_attr
   def modified_by(cls):  # pylint: disable=no-self-argument
@@ -652,11 +652,6 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
         value = getattr(self, attr)
         # hardcoded [:-3] is used to strip "_id" suffix
         res[attr[:-3]] = self._person_stub(value) if value else None
-
-    if hasattr(self, "owners"):
-      res["owners"] = [
-          self._person_stub(owner.id) for owner in self.owners if owner
-      ]
 
     for attr_name in AttributeInfo.gather_publish_attrs(self.__class__):
       if is_attr_of_type(self, attr_name, models.Option):

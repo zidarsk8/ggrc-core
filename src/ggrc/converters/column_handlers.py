@@ -82,7 +82,6 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "network_zone": handlers.OptionColumnHandler,
     "notes": handlers.TextareaColumnHandler,
     "operationally": handlers.ConclusionColumnHandler,
-    "owners": handlers.OwnerColumnHandler,
     "principal_assessor": handlers.UserColumnHandler,
     "program": handlers.ProgramColumnHandler,
     "recipients": list_handlers.ValueListHandler,
