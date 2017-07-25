@@ -70,6 +70,15 @@ module.exports = {
     }, {
       test: /wysihtml5-0\.4\.0pre\.js$/,
       loader: 'exports-loader?wysihtml5'
+    }, {
+      test: require.resolve('jquery'),
+      use: [{
+        loader: 'expose-loader',
+        options: 'jQuery'
+      },{
+        loader: 'expose-loader',
+        options: '$'
+      }]
     }]
   },
   // devtool: 'eval',
