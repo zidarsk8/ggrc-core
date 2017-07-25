@@ -182,3 +182,5 @@ import '../../modules';
 import './bootstrap';
 
 import '../../dashboard';
+
+import '../../../stylesheets/dashboard.scss';
