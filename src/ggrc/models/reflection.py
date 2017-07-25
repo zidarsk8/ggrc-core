@@ -109,6 +109,7 @@ def is_filter_only(alias_properties):
   return False
 
 
+# pylint: disable=too-few-public-methods
 class Attribute(object):
   """Class to define api attribute with allowed actions with that attribute."""
 
@@ -212,9 +213,9 @@ class AttributeInfo(object):
 
   @classmethod
   def gather_visible_aliases(cls, tgt_class):
-    aliases = AttributeInfo.gather_aliases(tgt_class)
     return {
-        attr: props for attr, props in aliases.items()
+        attr: props for attr, props
+        in AttributeInfo.gather_aliases(tgt_class).iteritems()
         if props is not None and not is_filter_only(props)
     }
 
@@ -240,6 +241,7 @@ class AttributeInfo(object):
 
   @classmethod
   def get_acl_definitions(cls, object_class):
+    """Return list of ACL dicts."""
     from ggrc.access_control.role import AccessControlRole
     from ggrc import db
     if not hasattr(flask.g, "acl_role_names"):
@@ -324,8 +326,7 @@ class AttributeInfo(object):
     return definitions
 
   @classmethod
-  def get_custom_attr_definitions(cls, object_class, ca_cache=None,
-                                  include_oca=True):
+  def get_custom_attr_definitions(cls, object_class, ca_cache=None):
     """Get column definitions for custom attributes on object_class.
 
     Args:
@@ -333,8 +334,6 @@ class AttributeInfo(object):
       ca_cache: dictionary containing custom attribute definitions. If it's set
         this function will not look for CAD in the database. This should be
         used for bulk operations, and eventually replaced with memcache.
-      include_oca: Flag for including object level custom attributes. This
-        should be true only for defenitions needed for csv imports.
 
     returns:
       dict of custom attribute definitions.
@@ -388,8 +387,7 @@ class AttributeInfo(object):
     return set(sum(unique_columns, []))
 
   @classmethod
-  def get_object_attr_definitions(cls, object_class, ca_cache=None,
-                                  include_oca=True):
+  def get_object_attr_definitions(cls, object_class, ca_cache=None):
     """Get all column definitions for object_class.
 
     This function joins custom attribute definitions, mapping definitions and
@@ -398,7 +396,6 @@ class AttributeInfo(object):
     Args:
       object_class: Model for which we want the attribute definitions.
       ca_cache: dictionary containing custom attribute definitions.
-      include_oca: Flag for including object level custom attributes.
     """
     definitions = {}
 
@@ -431,9 +428,9 @@ class AttributeInfo(object):
     definitions.update(cls.get_acl_definitions(object_class))
 
     if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
-      definitions.update(
-          cls.get_custom_attr_definitions(object_class, ca_cache=ca_cache,
-                                          include_oca=include_oca))
+      definitions.update(cls.get_custom_attr_definitions(
+          object_class, ca_cache=ca_cache
+      ))
 
     if object_class.__name__ not in EXCLUDE_MAPPINGS:
       definitions.update(cls.get_mapping_definitions(object_class))
@@ -472,10 +469,3 @@ class AttributeInfo(object):
     custom_attrs.sort(key=lambda x: x.lower())
     mapping_attrs.sort(key=lambda x: x.lower())
     return default_attrs + custom_attrs + mapping_attrs
-
-
-class SanitizeHtmlInfo(AttributeInfo):
-
-  def __init__(self, tgt_class):
-    self._sanitize_html = SanitizeHtmlInfo.gather_attrs(
-        tgt_class, '_sanitize_html')
