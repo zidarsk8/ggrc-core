@@ -133,9 +133,9 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
     repeat_every shouldn't have 0 value.
     """
     if value is not None and not isinstance(value, int):
-      raise ValueError("'repeat_every' should be integer")
-    if value == 0:
-      raise ValueError("'repeat_every' cannot be set to 0")
+      raise ValueError("'repeat_every' should be integer or 'null'")
+    if value <= 0:
+      raise ValueError("'repeat_every' should be strictly greater than 0")
     return value
 
   @orm.validates('unit')
