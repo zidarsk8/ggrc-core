@@ -715,6 +715,13 @@ def handle_cycle_task_status_change(sender, obj=None, new_status=None,  # noqa p
 
 
 def _get_or_create_personal_context(user):
+  """Get or create personal context.
+
+  Args:
+      user: User instance.
+  Returns:
+      Personal context instance.
+  """
   personal_context = user.get_or_create_object_context(
       context=1,
       name='Personal Context for {0}'.format(user.id),
@@ -727,6 +734,13 @@ def _get_or_create_personal_context(user):
 
 
 def _find_role(role_name):
+  """Find role by its name.
+
+  Args:
+      role_name: User role name.
+  Returns:
+      Role instance.
+  """
   return db.session.query(Role).filter(Role.name == role_name).first()
 
 
