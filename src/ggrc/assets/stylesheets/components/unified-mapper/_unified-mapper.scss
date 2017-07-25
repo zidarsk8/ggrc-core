@@ -403,6 +403,10 @@ mapper-results-item-attrs {
         display: inline;
       }
     }
+
+    .repeat-cell > .repeat-summary {
+      margin: 0;
+    }
   }
 }
 
