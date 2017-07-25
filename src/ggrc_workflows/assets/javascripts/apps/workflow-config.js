@@ -6,9 +6,9 @@
 (function (GGRC) {
   GGRC.Workflow = {
     unitOptions: [
-      {title: 'Daily', value: 'Day', plural: 'days', singular: 'day'},
-      {title: 'Weekly', value: 'Week', plural: 'weeks', singular: 'week'},
-      {title: 'Monthly', value: 'Month', plural: 'months', singular: 'month'}
+      {title: 'Daily', value: 'day', plural: 'days', singular: 'day'},
+      {title: 'Weekly', value: 'week', plural: 'weeks', singular: 'week'},
+      {title: 'Monthly', value: 'month', plural: 'months', singular: 'month'}
     ],
     repeatOptions: _.range(1, 31)
       .map(function (option) {
@@ -17,7 +17,7 @@
         };
       }),
     defaultRepeatValues: {
-      unit: 'Month',
+      unit: 'month',
       repeatEvery: 1
     }
   };

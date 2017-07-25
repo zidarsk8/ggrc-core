@@ -27,6 +27,7 @@
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
       custom_attribute_values: "CMS.Models.CustomAttributeValue.stubs",
+      repeat_every: 'number',
       default_lhn_filters: {
         Workflow: {status: 'Active'},
         Workflow_All: {},
