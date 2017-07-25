@@ -35,7 +35,6 @@ class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
   ]
 
   _aliases = {
-      "url": "Issue URL",
       "test_plan": {
           "display_name": "Remediation Plan"
       },

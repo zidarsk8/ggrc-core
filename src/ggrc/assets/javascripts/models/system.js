@@ -51,7 +51,6 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
       },
       {attr_title: 'Effective Date', attr_name: 'start_date'},
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
-      {attr_title: 'URL', attr_name: 'url'},
       {attr_title: 'Reference URL', attr_name: 'reference_url'}
     ]),
     add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache',
@@ -128,6 +127,9 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
   init: function () {
     this._super && this._super.apply(this, arguments);
     this.attr('is_biz_process', false);
+  },
+  after_save: function () {
+    this.dispatch('refreshRelatedDocuments');
   }
 });
 
