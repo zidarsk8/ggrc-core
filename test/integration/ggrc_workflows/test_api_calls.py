@@ -37,33 +37,50 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.post(all_models.Workflow, data)
     self.assertEqual(response.status_code, 201)
 
-  def test_create_weekly_workflows(self):
+  def test_create_weekly_workflow(self):
+    """Test create valid weekly wf"""
     data = self.get_workflow_dict()
-    data["workflow"]["frequency"] = "weekly"
+    data["workflow"]["repeat_every"] = 7
+    data["workflow"]["unit"] = "day"
     data["workflow"]["title"] = "Weekly"
     response = self.api.post(all_models.Workflow, data)
     self.assertEqual(response.status_code, 201)
 
-  def test_create_monthly_workflows(self):
+  def test_create_annually_workflow(self):
+    """Test create valid annual wf"""
     data = self.get_workflow_dict()
-    data["workflow"]["frequency"] = "monthly"
-    data["workflow"]["title"] = "Monthly"
-    response = self.api.post(all_models.Workflow, data)
-    self.assertEqual(response.status_code, 201)
-
-  def test_create_quarterly_workflows(self):
-    data = self.get_workflow_dict()
-    data["workflow"]["frequency"] = "quarterly"
-    data["workflow"]["title"] = "Quarterly"
-    response = self.api.post(all_models.Workflow, data)
-    self.assertEqual(response.status_code, 201)
-
-  def test_create_annually_workflows(self):
-    data = self.get_workflow_dict()
-    data["workflow"]["frequency"] = "annually"
+    data["workflow"]["repeat_every"] = 12
+    data["workflow"]["unit"] = "month"
     data["workflow"]["title"] = "Annually"
     response = self.api.post(all_models.Workflow, data)
     self.assertEqual(response.status_code, 201)
+
+  def test_create_wrong_repeat_every_workflow(self):
+    """Test case for invalid repeat_every value"""
+    data = self.get_workflow_dict()
+    data["workflow"]["repeat_every"] = "wrong value"
+    data["workflow"]["unit"] = "month"
+    data["workflow"]["title"] = "Wrong wf"
+    response = self.api.post(all_models.Workflow, data)
+    self.assertEqual(response.status_code, 400)
+
+  def test_create_repeat_every_zero(self):
+    """Test case for invalid repeat_every = 0 """
+    data = self.get_workflow_dict()
+    data["workflow"]["repeat_every"] = 0
+    data["workflow"]["unit"] = "month"
+    data["workflow"]["title"] = "Wrong wf"
+    response = self.api.post(all_models.Workflow, data)
+    self.assertEqual(response.status_code, 400)
+
+  def test_create_wrong_unit_workflow(self):
+    """Test case for invalid unit value"""
+    data = self.get_workflow_dict()
+    data["workflow"]["repeat_every"] = 12
+    data["workflow"]["unit"] = "wrong value"
+    data["workflow"]["title"] = "Wrong wf"
+    response = self.api.post(all_models.Workflow, data)
+    self.assertEqual(response.status_code, 400)
 
   def test_create_task_group(self):
     wf_data = self.get_workflow_dict()
@@ -129,6 +146,53 @@ class TestWorkflowsApiPost(TestCase):
         }
     }
     return data
+
+  @ddt.data({},
+            {"repeat_every": 5,
+             "unit": "month"})
+  def test_repeat_multiplier_field(self, data):
+    """Check repeat_multiplier is set to 0 after wf creation.
+    """
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory(**data)
+    workflow_id = workflow.id
+    self.assertEqual(
+        0,
+        all_models.Workflow.query.get(workflow_id).repeat_multiplier
+    )
+
+  # TODO: Unskip in the patch 2
+  @unittest.skip("Will be activated in patch 2")
+  def test_change_to_one_time_wf(self):
+    """Check repeat_every and unit can be set to Null only together."""
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory(repeat_every=12,
+                                              unit="day")
+    resp = self.api.put(workflow, {"repeat_every": None,
+                                   "unit": None})
+    self.assert200(resp)
+
+  @ddt.data({"repeat_every": 5},
+            {"unit": "month"})
+  def test_change_repeat_every(self, data):
+    """Check repeat_every or unit can not be changed once set."""
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory()
+    resp = self.api.put(workflow, data)
+    self.assert400(resp)
+
+  def test_not_change_to_one_time_wf(self):
+    """Check repeat_every or unit can't be set to Null separately.
+    This test will be useful in the 2nd patch, where we allow to change
+    WF setup
+    """
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory(repeat_every=12,
+                                              unit="day")
+    resp = self.api.put(workflow, {"repeat_every": None})
+    self.assert400(resp)
+    resp = self.api.put(workflow, {"unit": None})
+    self.assert400(resp)
 
   @ddt.data(True, False)
   def test_autogen_verification_flag(self, flag):
