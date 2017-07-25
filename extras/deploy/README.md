@@ -25,7 +25,7 @@ The directory structure:
 
 "*.key" file (the filename can be generated in bash by "$(< service-account).key") is JSON file with private key for the service account.
 
-"override.sh" is a config featuring ``GGRC_DATABASE_URL`` compatible with ``db_migrate`` script and ``GGRC_SETTINGS_MODULE`` which should be equal to ``SETTINGS_MODULE`` from "settings.sh".
+"override.sh" is a config featuring ``GGRC_DATABASE_URL`` compatible with ``db_migrate``.
 
 "settings.sh" contains settings to be passed to app.yaml.
 

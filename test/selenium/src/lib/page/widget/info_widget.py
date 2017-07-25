@@ -94,7 +94,7 @@ class CommonInfo(base.Widget):
             list_text_cas_scopes.append(
                 [ca_header_text,
                  unicode(int(base.Checkbox(self._driver, scope.find_element(
-                     *self._locators.CAS_CHECKBOXES)).is_element_checked()))
+                     *self._locators.CAS_CHECKBOXES)).is_checked_via_js()))
                  ])
           else:
             list_text_cas_scopes.append([ca_header_text, None])
@@ -207,9 +207,6 @@ class Programs(InfoPanel):
         self._driver, self._locators.EFFECTIVE_DATE)
     self.effective_date_entered = base.Label(
         self._driver, self._locators.EFFECTIVE_DATE_ENTERED)
-    self.stop_date = base.Label(self._driver, self._locators.STOP_DATE)
-    self.stop_date_entered = base.Label(
-        self._driver, self._locators.STOP_DATE_ENTERED)
 
 
 class Workflows(InfoPanel):
@@ -257,9 +254,8 @@ class Assessments(InfoPanel):
 
   def __init__(self, driver):
     super(Assessments, self).__init__(driver)
-    # toggles
-    self.code_section = base.Toggle(
-        self._driver, self._locators.BUTTON_CODE_TOGGLE, locator.Common.DOWN)
+    self.code_section = base.Label(
+        self._driver, self._locators.CODE_CSS)
     # mapped objects
     self.mapped_objects_titles_and_descriptions = self._driver.find_elements(
         *self._locators.MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS)
@@ -284,23 +280,23 @@ class Assessments(InfoPanel):
             self._elements.VERIFIERS_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
     # code section
-    self.code_section.toggle()
-    self.code_and_code_entered = self._driver.find_elements(
-        *self._locators.CODE_HEADER_AND_VALUE)
-    if self.code_and_code_entered:
-      self.code_text, self.code_entered_text = [
-          [mapped_scope.text.split()[0], mapped_scope.text.split()[1]] for
-          mapped_scope in self.code_and_code_entered if
-          len(mapped_scope.text.split()) >= 2][0]
-    self.code_section.toggle(False)
+    self.code_text = (
+        self.code_section.element.find_element(
+            *self._locators.CODE_HEADER_CSS).text)
+    self.code_entered_text = (
+        self.code_section.element.find_element(
+            *self._locators.CODE_VALUE_CSS).text)
+    # comments section
+    self.comments = base.CommentsPanel(
+        self._driver, self._locators.COMMENTS_CSS)
     # scope
     self.list_all_headers_text = [
-        self._elements.CAS.upper(), self.title().text,
+        self._elements.CAS.upper(), self._elements.TITLE,
         self._elements.STATE.upper(),
         self._elements.VERIFIED.upper(),
         self.creators_text, self.assignees_text,
         self.verifiers_text, self._elements.MAPPED_OBJECTS.upper(),
-        self.code_text]
+        self.code_text, self.comments.header_lbl.text]
     self.list_all_values_text = [
         self.cas_text, self.title_entered().text,
         objects.get_normal_form(self.state().text),
@@ -308,7 +304,7 @@ class Assessments(InfoPanel):
         element.AssessmentStates.COMPLETED.upper(),
         self.creators_entered_text, self.assignees_entered_text,
         self.verifiers_entered_text, self.mapped_objects_titles_text,
-        self.code_entered_text]
+        self.code_entered_text, self.comments.scopes]
 
 
 class AssessmentTemplates(InfoPanel):

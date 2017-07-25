@@ -47,7 +47,7 @@ describe('GGRC.Utils.AdvancedSearch', function () {
         GGRC.Utils.AdvancedSearch.create.attribute({
           field: 'Title',
           operator: '~',
-          value: 'test'
+          value: ' test'
         }),
         GGRC.Utils.AdvancedSearch.create.operator('OR'),
         GGRC.Utils.AdvancedSearch.create.group([
@@ -60,7 +60,7 @@ describe('GGRC.Utils.AdvancedSearch', function () {
           GGRC.Utils.AdvancedSearch.create.attribute({
             field: 'Other',
             operator: '~=',
-            value: 'value'
+            value: 'value '
           })
         ])
       ];

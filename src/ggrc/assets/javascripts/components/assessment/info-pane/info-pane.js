@@ -63,6 +63,13 @@
             this.onStateChange({state: 'In Progress', undo: false});
           }
         },
+        isEditDenied: {
+          get: function () {
+            return !Permission
+              .is_allowed_for('update', this.attr('instance')) ||
+              this.attr('instance.archived');
+          }
+        },
         instance: {}
       },
       modal: {

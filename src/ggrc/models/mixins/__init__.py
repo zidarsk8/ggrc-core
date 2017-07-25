@@ -901,11 +901,11 @@ class WithContact(object):
 class BusinessObject(Stateful, Noted, Described, Hyperlinked,
                      Titled, Slugged):
   """Mixin that groups most commonly-used mixins into one."""
-  VALID_STATES = (
-      'Draft',
-      'Active',
-      'Deprecated'
-  )
+  DRAFT = 'Draft'
+  ACTIVE = 'Active'
+  DEPRECATED = 'Deprecated'
+
+  VALID_STATES = (DRAFT, ACTIVE, DEPRECATED, )
 
   _aliases = {
       "status": {

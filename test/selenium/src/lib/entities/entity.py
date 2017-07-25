@@ -115,6 +115,9 @@ class Representation(object):
           elif attr_name in ["updated_at", "created_at"]:
             is_equal = self.compare_datetime(
                 self_attr_value, other_attr_value)
+          elif attr_name == "comments":
+            is_equal = self.compare_comments(
+                self_attr_value, other_attr_value)
           else:
             is_equal = self_attr_value == other_attr_value
         if is_equal:
@@ -157,6 +160,31 @@ class Representation(object):
       Representation.attrs_values_types_error(
           self_attr=self_datetime, other_attr=other_datetime,
           expected_types=(datetime.__name__, type(None).__name__))
+
+  @staticmethod
+  def compare_comments(self_comments, other_comments):
+    """Compare entities' 'comments' attributes due to specific dictionaries'
+    format values in list comments.
+    """
+    if (isinstance(self_comments and other_comments, list) and
+            all(isinstance(self_comment and other_comment, dict) for
+                self_comment, other_comment
+                in zip(self_comments, other_comments))):
+      for self_comment, other_comment in zip(self_comments, other_comments):
+        is_comments_datetime_equal = (
+            Representation.compare_datetime(self_comment.get("created_at"),
+                                            other_comment.get("created_at")))
+        self_comment.pop("created_at")
+        other_comment.pop("created_at")
+        # compare comments' datetime and remaining attributes
+        return (is_comments_datetime_equal and
+                string_utils.is_subset_of_dicts(self_comment, other_comment))
+    if isinstance(self_comments and other_comments, (list, type(None))):
+      return self_comments == other_comments
+    else:
+      Representation.attrs_values_types_error(
+          self_attr=self_comments, other_attr=other_comments,
+          expected_types=(list.__name__, type(None).__name__))
 
   @staticmethod
   def attrs_values_types_error(self_attr, other_attr, expected_types):

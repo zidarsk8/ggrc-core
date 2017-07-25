@@ -25,13 +25,10 @@ class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
 
   __tablename__ = 'issues'
 
-  VALID_STATES = [
-      "Draft",
-      "Active",
-      "Deprecated",
-      "Fixed",
-      "Fixed and Verified"
-  ]
+  FIXED = "Fixed"
+  FIXED_AND_VERIFIED = "Fixed and Verified"
+
+  VALID_STATES = BusinessObject.VALID_STATES + (FIXED, FIXED_AND_VERIFIED, )
 
   # REST properties
   _publish_attrs = [

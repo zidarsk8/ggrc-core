@@ -27,6 +27,7 @@ class RowConverter(object):
     self.from_ids = self.obj is not None
     self.is_new = True
     self.is_delete = False
+    self.is_deprecated = False
     self.ignore = False
     self.index = options.get("index", -1)
     self.row = options.get("row", [])
@@ -74,11 +75,15 @@ class RowConverter(object):
         self.attrs[attr_name] = item
       else:
         self.objects[attr_name] = item
-
-      if not self.ignore and attr_name in ("slug", "email"):
-        self.id_key = attr_name
-        self.obj = self.get_or_generate_object(attr_name)
-        item.set_obj_attr()
+      if not self.ignore:
+        if attr_name == "status" and hasattr(self.obj, "DEPRECATED"):
+          self.is_deprecated = (
+              self.obj.DEPRECATED == item.value != self.obj.status
+          )
+        if attr_name in ("slug", "email"):
+          self.id_key = attr_name
+          self.obj = self.get_or_generate_object(attr_name)
+          item.set_obj_attr()
       item.check_unique_consistency()
 
   def handle_obj_row_data(self):
