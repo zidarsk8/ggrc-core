@@ -95,7 +95,7 @@
         if (aws.length < 1) {
           ret = $.when(
             new CMS.Models.Workflow({
-              frequency: 'one_time',
+              unit: null,
               status: 'Active',
               title: reviewTemplate({
                 type: that.original_object.constructor.title_singular,
