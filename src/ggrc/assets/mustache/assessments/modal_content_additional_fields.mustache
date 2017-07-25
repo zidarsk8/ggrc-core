@@ -19,21 +19,16 @@
   </div>
 </div>
 
-<div class="ggrc-form-item ggrc-form-item__text-area">
+<div class="ggrc-form-item">
   <div class="ggrc-form-item__row">
     <label class="ggrc-form-item__label">
       Description
     </label>
-    <div class="wysiwyg-area">
-      <textarea
-        tabindex="11"
-        id="control_description"
-        class="span12 triple wysihtml5"
-        name="description"
-        placeholder="Enter Description">
-          {{{description}}}
-      </textarea>
-    </div>
+    <rich-text tab-Index="11"
+        hidden-toolbar="true"
+        placeholder="Enter Description"
+        {(text)}="description">
+    </rich-text>
   </div>
 </div>
 

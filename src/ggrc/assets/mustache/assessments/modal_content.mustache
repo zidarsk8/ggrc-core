@@ -47,14 +47,16 @@
         </div>
       </div>
 
-      <div class="ggrc-form-item ggrc-form-item__text-area">
+      <div class="ggrc-form-item">
         <div class="ggrc-form-item__row">
           <label class="ggrc-form-item__label">
             Test Plan
           </label>
-          <div class="wysiwyg-area">
-            <textarea tabindex="3" id="control_test_plan" class="triple wysihtml5" name="test_plan" placeholder="Enter Test Plan">{{{test_plan}}}</textarea>
-          </div>
+          <rich-text tab-index="3"
+              hidden-toolbar="true"
+              placeholder="Enter Test Plan"
+              {(text)}="test_plan">
+          </rich-text>
         </div>
       </div>
 
