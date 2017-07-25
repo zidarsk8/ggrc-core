@@ -134,7 +134,7 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
     """
     if value is not None and not isinstance(value, int):
       raise ValueError("'repeat_every' should be integer or 'null'")
-    if value <= 0:
+    if value is not None and value <= 0:
       raise ValueError("'repeat_every' should be strictly greater than 0")
     return value
 
