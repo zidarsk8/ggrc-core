@@ -169,6 +169,8 @@ class TestEnableAndDisableNotifications(TestCase):
         "description": "",
         "owners": [person_dict(self.user.id)],
         "frequency": "quarterly",
+        "unit": "month",
+        "repeat_every": 3,
         "task_groups": [{
             "title": "tg_1",
             "contact": person_dict(self.user.id),
@@ -190,6 +192,8 @@ class TestEnableAndDisableNotifications(TestCase):
         "description": "",
         "owners": [person_dict(self.user.id)],
         "frequency": "quarterly",
+        "unit": "month",
+        "repeat_every": 3,
         "task_groups": [{
             "title": "tg_1",
             "contact": person_dict(self.user.id),

@@ -653,9 +653,27 @@ def handle_cycle_put(
 # Check if workflow should be Inactive after recurrence change
 
 
+def _validate_put_workflow_fields(workflow):
+  """Validates Workflow's fields update.
+
+    Args:
+        workflow: Workflow class instance.
+    Raises:
+        ValueError: An error occurred in case of failed validation.
+    """
+  if (inspect(workflow).attrs.unit.history.has_changes() or
+          inspect(workflow).attrs.repeat_every.history.has_changes()):
+    raise ValueError("'unit', 'repeat_every' fields are unchangeable")
+  if (inspect(workflow).attrs.recurrences.history.has_changes() and
+          workflow.recurrences and workflow.unit is None and
+          workflow.repeat_every is None):
+    raise ValueError("OneTime workflow cannot be recurrent")
+
+
 @signals.Restful.model_put.connect_via(models.Workflow)
 def handle_workflow_put(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument  # noqa pylint: disable=unused-argument
+  _validate_put_workflow_fields(obj)
   update_workflow_state(obj)
 
 
@@ -697,6 +715,13 @@ def handle_cycle_task_status_change(sender, obj=None, new_status=None,  # noqa p
 
 
 def _get_or_create_personal_context(user):
+  """Get or create personal context.
+
+  Args:
+      user: User instance.
+  Returns:
+      Personal context instance.
+  """
   personal_context = user.get_or_create_object_context(
       context=1,
       name='Personal Context for {0}'.format(user.id),
@@ -709,6 +734,13 @@ def _get_or_create_personal_context(user):
 
 
 def _find_role(role_name):
+  """Find role by its name.
+
+  Args:
+      role_name: User role name.
+  Returns:
+      Role instance.
+  """
   return db.session.query(Role).filter(Role.name == role_name).first()
 
 
@@ -728,8 +760,27 @@ def handle_workflow_person_post(sender, obj=None, src=None, service=None):  # no
   db.session.add(user_role)
 
 
+def _validate_post_workflow_fields(workflow):
+  """Validates Workflow's 'repeat_every' and 'unit' fields dependency.
+
+  Validates that Workflow's 'repeat_every' and 'unit' fields can have NULL
+  only simultaneously.
+
+  Args:
+      workflow: Workflow class instance.
+  Raises:
+      ValueError: An error occurred in case of failed dependency validation.
+  """
+  if ((workflow.repeat_every is None and workflow.unit is not None) or
+          (workflow.repeat_every is not None and workflow.unit is None)):
+    raise ValueError("Workflow 'repeat_every' and 'unit' fields "
+                     "can be NULL only simultaneously")
+
+
 @signals.Restful.model_posted.connect_via(models.Workflow)
 def handle_workflow_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+  _validate_post_workflow_fields(obj)
+
   source_workflow = None
 
   if src.get('clone'):

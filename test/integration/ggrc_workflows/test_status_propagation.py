@@ -31,6 +31,8 @@ class TestWorkflowCycleStatePropagantion(TestCase):
         "title": "weekly thingy",
         "description": "start this many a time",
         "frequency": "weekly",
+        "unit": "week",
+        "repeat_every": 1,
         "task_groups": [{
             "title": "weekly task group",
             "task_group_tasks": [{

@@ -115,6 +115,40 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       default=IS_VERIFICATION_NEEDED_DEFAULT,
       nullable=False)
 
+  repeat_every = deferred(db.Column(db.Integer, nullable=True, default=None),
+                          'Workflow')
+  DAY_UNIT = 'day'
+  WEEK_UNIT = 'week'
+  MONTH_UNIT = 'month'
+  VALID_UNITS = (DAY_UNIT, WEEK_UNIT, MONTH_UNIT)
+  unit = deferred(db.Column(db.Enum(*VALID_UNITS), nullable=True,
+                            default=None), 'Workflow')
+  repeat_multiplier = deferred(db.Column(db.Integer, nullable=False,
+                                         default=0), 'Workflow')
+
+  @orm.validates('repeat_every')
+  def validate_repeat_every(self, _, value):
+    """Validate repeat_every field for Workflow.
+
+    repeat_every shouldn't have 0 value.
+    """
+    if value is not None and not isinstance(value, int):
+      raise ValueError("'repeat_every' should be integer or 'null'")
+    if value is not None and value <= 0:
+      raise ValueError("'repeat_every' should be strictly greater than 0")
+    return value
+
+  @orm.validates('unit')
+  def validate_unit(self, _, value):
+    """Validate unit field for Workflow.
+
+    Unit should have one of the value from VALID_UNITS list or None.
+    """
+    if value is not None and value not in self.VALID_UNITS:
+      raise ValueError("'unit' field should be one of the "
+                       "value: null, {}".format(", ".join(self.VALID_UNITS)))
+    return value
+
   @orm.validates('is_verification_needed')
   def validate_is_verification_needed(self, key, value):
     # pylint: disable=unused-argument
@@ -151,6 +185,8 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       'object_approval',
       'recurrences',
       'is_verification_needed',
+      'repeat_every',
+      'unit',
       reflection.PublishOnly('next_cycle_start_date'),
       reflection.PublishOnly('non_adjusted_next_cycle_start_date'),
       reflection.PublishOnly('workflow_state'),
