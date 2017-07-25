@@ -117,6 +117,8 @@ class TestMonthlyWorkflowNotification(TestCase):
         "description": "some test workflow",
         "owners": [person_dict(self.person_2.id)],
         "frequency": "monthly",
+        "unit": "month",
+        "repeat_every": 1,
         "task_groups": [{
             "title": "one time task group",
             "contact": person_dict(self.person_1.id),

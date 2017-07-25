@@ -27,6 +27,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "tg_2",
@@ -82,6 +84,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "tg_2",
@@ -160,6 +164,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "tg_2",
@@ -231,6 +237,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "tg_2",
@@ -302,6 +310,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "task group 1",
@@ -347,6 +357,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "tg 1",
@@ -405,6 +417,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "tg 1",
@@ -463,6 +477,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "tg 1",
@@ -494,6 +510,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "tg 1",
@@ -582,6 +600,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "tg 1",
@@ -663,6 +683,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "tg 1",
@@ -731,6 +753,8 @@ class TestWeeklyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
+        "unit": "week",
+        "repeat_every": 1,
         "frequency": "weekly",
         "task_groups": [{
             "title": "task group",

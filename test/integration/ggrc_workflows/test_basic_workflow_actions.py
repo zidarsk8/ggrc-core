@@ -129,6 +129,8 @@ class TestBasicWorkflowActions(TestCase):
         "title": "quarterly wf 1",
         "description": "",
         "frequency": "quarterly",
+        "unit": "month",
+        "repeat_every": 3,
         "task_groups": [{
             "title": "tg_1",
             "task_group_tasks": [{
@@ -159,6 +161,8 @@ class TestBasicWorkflowActions(TestCase):
         "title": "weekly thingy",
         "description": "start this many a time",
         "frequency": "weekly",
+        "unit": "week",
+        "repeat_every": 1,
         "task_groups": [{
             "title": "tg_2",
             "task_group_tasks": [{
@@ -252,6 +256,8 @@ class TestBasicWorkflowActions(TestCase):
         "title": "monthly test wf",
         "description": "start this many a time",
         "frequency": "monthly",
+        "unit": "month",
+        "repeat_every": 1,
         "task_groups": [
             {
                 "title": "tg_2",
