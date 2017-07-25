@@ -6,7 +6,6 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from .mixins import (BusinessObject, LastDeprecatedTimeboxed,
                      CustomAttributable)
-from .object_owner import Ownable
 from .object_person import Personable
 from .relationship import Relatable
 from .track_object_state import HasObjectState
@@ -14,7 +13,7 @@ from .track_object_state import HasObjectState
 
 class OrgGroup(Roleable, HasObjectState, CustomAttributable,
                Personable, Relatable, LastDeprecatedTimeboxed,
-               Ownable, BusinessObject, Indexed, db.Model):
+               BusinessObject, Indexed, db.Model):
   __tablename__ = 'org_groups'
   _aliases = {"url": "Org Group URL"}
 

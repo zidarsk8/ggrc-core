@@ -626,6 +626,8 @@ class WidgetInfoPanel(CommonWidgetInfo):
                               _PIN_ACTION + ' [can-click="toggleSize"]')
   BUTTON_CLOSE = (By.CSS_SELECTOR,
                   _PIN_ACTION + ' [can-click="close"]')
+  # People section
+  PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR, ".editable-people-group")
 
 
 class WidgetSnapshotsInfoPanel(WidgetInfoPanel):
@@ -731,9 +733,6 @@ class WidgetInfoAssessment(WidgetInfoPanel):
   MAPPED_OBJECT_TITLE = (By.CSS_SELECTOR, ".title")
   MAPPED_OBJECT_DESCRIPTION = (By.CSS_SELECTOR, ".description")
   # Assessment Attributes tab
-  # People section
-  PEOPLE_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
-                               "assessment-people .editable-people-group")
   # Code section
   _CODE = "assessment-inline-item[prop-name='slug'] "
   CODE_CSS = (By.CSS_SELECTOR, _CODE)

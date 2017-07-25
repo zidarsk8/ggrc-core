@@ -9,7 +9,6 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models import mixins
 from ggrc.models.deferred import deferred
-from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import PublishOnly
 from ggrc.models.relationship import Relatable
@@ -20,7 +19,6 @@ class Risk(Roleable,
            HasObjectState,
            mixins.CustomAttributable,
            Relatable,
-           Ownable,
            Personable,
            mixins.LastDeprecatedTimeboxed,
            mixins.BusinessObject,

@@ -32,6 +32,8 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
   delete = db.Column(db.Boolean, nullable=False, default=True)
   my_work = db.Column(db.Boolean, nullable=False, default=True)
   mandatory = db.Column(db.Boolean, nullable=False, default=False)
+  default_to_current_user = db.Column(
+      db.Boolean, nullable=False, default=False)
 
   access_control_list = db.relationship(
       'AccessControlList', backref='ac_role', cascade='all, delete-orphan')
@@ -46,6 +48,7 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
 
   @classmethod
   def eager_query(cls):
+    """Define fields to be loaded eagerly to lower the count of DB queries."""
     return super(AccessControlRole, cls).eager_query()
 
   _publish_attrs = [
@@ -56,6 +59,8 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
       "update",
       "delete",
       "my_work",
+      "mandatory",
+      "default_to_current_user",
   ]
 
   @sa.orm.validates("name", "object_type")

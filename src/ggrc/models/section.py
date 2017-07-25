@@ -9,7 +9,6 @@ from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import Hierarchical
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.deferred import deferred
-from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
@@ -18,7 +17,7 @@ from ggrc.models.track_object_state import HasObjectState
 
 
 class Section(Roleable, HasObjectState, Hierarchical, db.Model,
-              CustomAttributable, Personable, Ownable, Relatable, Indexed,
+              CustomAttributable, Personable, Relatable, Indexed,
               BusinessObject):
 
   __tablename__ = 'sections'

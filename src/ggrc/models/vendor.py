@@ -6,14 +6,13 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
 from .mixins import (BusinessObject, LastDeprecatedTimeboxed,
                      CustomAttributable)
-from .object_owner import Ownable
 from .object_person import Personable
 from .relationship import Relatable
 from .track_object_state import HasObjectState
 
 
 class Vendor(Roleable, HasObjectState, CustomAttributable, Personable,
-             Relatable, LastDeprecatedTimeboxed, Ownable, BusinessObject,
+             Relatable, LastDeprecatedTimeboxed, BusinessObject,
              Indexed, db.Model):
   __tablename__ = 'vendors'
 

@@ -9,7 +9,6 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
                                 CustomAttributable)
-from ggrc.models.object_owner import Ownable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 from ggrc.models.utils import validate_option
@@ -96,7 +95,7 @@ class SystemOrProcess(track_object_state.HasObjectState, BusinessObject,
 
 
 class System(CustomAttributable, Personable, Roleable,
-             Relatable, Ownable, SystemOrProcess, Indexed):
+             Relatable, SystemOrProcess, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': False
   }
@@ -110,7 +109,7 @@ class System(CustomAttributable, Personable, Roleable,
 
 
 class Process(CustomAttributable, Personable, Roleable,
-              Relatable, Ownable, SystemOrProcess, Indexed):
+              Relatable, SystemOrProcess, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': True
   }
