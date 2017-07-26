@@ -477,7 +477,7 @@ def get_workflow_data(notification):
   if not workflow:
     return {}
 
-  if workflow.frequency == "one_time":
+  if workflow.unit is None:
     # one time workflows get cycles manually created and that triggers
     # the instant notification.
     return {}

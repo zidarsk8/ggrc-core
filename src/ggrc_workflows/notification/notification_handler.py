@@ -51,7 +51,7 @@ def handle_task_group_task(obj, notif_type=None):
 
 def handle_workflow_modify(sender, obj=None, src=None, service=None):
   """Update or add notifications on a workflow update."""
-  if obj.status != "Active" or obj.frequency == "one_time":
+  if obj.status != "Active" or obj.unit is None:
     return
 
   if not obj.next_cycle_start_date:
@@ -59,7 +59,7 @@ def handle_workflow_modify(sender, obj=None, src=None, service=None):
 
   notification = get_notification(obj)
   notif_type = get_notification_type(
-      "{}_workflow_starts_in".format(obj.frequency))
+      "{}_workflow_starts_in".format(obj.unit))
 
   if not notification:
     send_on = obj.next_cycle_start_date - timedelta(notif_type.advance_notice)
@@ -100,8 +100,9 @@ def add_cycle_task_due_notifications(task):
   # existing notifications and time checks revolving around TODAY, requiring
   # a holistic approac to solving it.
 
-  notif_type = get_notification_type("{}_cycle_task_due_in".format(
-      task.cycle_task_group.cycle.workflow.frequency))
+  notif_type = get_notification_type("{}cycle_task_due_in".format(
+      task.cycle_task_group.cycle.workflow.unit + "_"
+      if task.cycle_task_group.cycle.workflow.unit else ""))
   send_on = task.end_date - timedelta(notif_type.advance_notice)
   if send_on > today:
     add_notif(task, notif_type, send_on)
@@ -204,8 +205,9 @@ def modify_cycle_task_overdue_notification(task):
 
 
 def modify_cycle_task_end_date(obj):
-  modify_cycle_task_notification(obj, "{}_cycle_task_due_in".format(
-      obj.cycle_task_group.cycle.workflow.frequency))
+  modify_cycle_task_notification(obj, "{}cycle_task_due_in".format(
+      obj.cycle_task_group.cycle.workflow.unit + "_"
+      if obj.cycle_task_group.cycle.workflow.unit else ""))
   modify_cycle_task_notification(obj, "cycle_task_due_today")
   modify_cycle_task_overdue_notification(obj)
 

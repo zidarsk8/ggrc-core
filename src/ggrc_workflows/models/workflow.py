@@ -12,7 +12,6 @@ from sqlalchemy import orm
 from ggrc import builder
 from ggrc import db
 from ggrc.fulltext import get_indexer
-from ggrc.fulltext.attributes import ValueMapFullTextAttr
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
@@ -34,49 +33,10 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
 
   VALID_STATES = [u"Draft", u"Active", u"Inactive"]
 
-  # valid Frequency to user readable values mapping
-  VALID_FREQUENCIES = {
-      "one_time": "one time",
-      "weekly": "weekly",
-      "monthly": "monthly",
-      "quarterly": "quarterly",
-      "annually": "annually"
-  }
-
-  @classmethod
-  def default_frequency(cls):
-    return 'one_time'
-
-  @orm.validates('frequency')
-  def validate_frequency(self, _, value):
-    """Make sure that value is listed in valid frequencies.
-
-    Args:
-      value: A string value for requested frequency
-
-    Returns:
-      default_frequency which is 'one_time' if the value is None, or the value
-      itself.
-
-    Raises:
-      Value error, if the value is not in the VALID_FREQUENCIES
-    """
-    if value is None:
-      value = self.default_frequency()
-    if value not in self.VALID_FREQUENCIES:
-      message = u"Invalid state '{}'".format(value)
-      raise ValueError(message)
-    return value
-
   notify_on_change = deferred(
       db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
   notify_custom_message = deferred(
       db.Column(db.Text, nullable=True), 'Workflow')
-
-  frequency = deferred(
-      db.Column(db.String, nullable=True, default=default_frequency),
-      'Workflow'
-  )
 
   object_approval = deferred(
       db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
@@ -178,7 +138,6 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       'workflow_people',
       reflection.Attribute('people', create=False, update=False),
       'task_groups',
-      'frequency',
       'notify_on_change',
       'notify_custom_message',
       'cycles',
@@ -197,19 +156,7 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
                            create=False, update=False),
   )
 
-  _fulltext_attrs = [
-      ValueMapFullTextAttr(
-          "frequency",
-          "frequency",
-          value_map=VALID_FREQUENCIES,
-      )
-  ]
-
   _aliases = {
-      "frequency": {
-          "display_name": "Frequency",
-          "mandatory": True,
-      },
       "is_verification_needed": {
           "display_name": "Need Verification",
           "mandatory": True,
@@ -249,7 +196,7 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
     """
     columns = [
         'title', 'description', 'notify_on_change', 'notify_custom_message',
-        'frequency', 'end_date', 'start_date'
+        'end_date', 'start_date'
     ]
     target = self.copy_into(_other, columns, **kwargs)
     return target
@@ -308,18 +255,17 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       return False
 
     # Check if backlog workflow already exists
-    backlog_workflows = Workflow.query\
-                                .filter(and_
-                                        (Workflow.kind == "Backlog",
-                                         Workflow.frequency == "one_time"))\
-                                .all()
+    backlog_workflows = Workflow.query.filter(
+        and_(Workflow.kind == "Backlog",
+             # the following means one_time wf
+             Workflow.unit is None)
+    ).all()
 
     if len(backlog_workflows) > 0 and any_active_cycle(backlog_workflows):
       return "At least one backlog workflow already exists"
     # Create a backlog workflow
     backlog_workflow = Workflow(description="Backlog workflow",
                                 title="Backlog (one time)",
-                                frequency="one_time",
                                 status="Active",
                                 recurrences=0,
                                 kind="Backlog")
