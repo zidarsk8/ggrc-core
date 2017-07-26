@@ -143,8 +143,6 @@ dashboard-js-files:
   - controllers/dashboard_controller.js
   - controllers/quick_form_controller.js
   - controllers/mapper.js
-  # Helpers
-  - helpers/mapping_helpers.js
   # Modules and Apps
   - modules/widget_descriptor.js
   - modules/widget_list.js
@@ -440,7 +438,6 @@ dashboard-js-template-files:
   - base_objects/sub_tree_type_selector.mustache
   - base_objects/mapper-item-description.mustache
   - base_templates/objects_tooltip.mustache
-  - base_templates/attachment_list.mustache
   - base_templates/url_list.mustache
   - base_templates/attachment.mustache
   - base_templates/base.mustache

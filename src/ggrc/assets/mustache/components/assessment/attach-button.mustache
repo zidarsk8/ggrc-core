@@ -4,11 +4,9 @@
 }}
 
 <div>
-  {{#if_mapping_ready "audits" instance}}
-    {{#is_allowed 'update' instance context='for'}}
-        {{^if instance.archived}}
-            {{{render_hooks "Request.gdrive_evidence_storage"}}}
-        {{/if}}
-    {{/is_allowed}}
-  {{/if_mapping_ready}}
+  {{#is_allowed 'update' instance context='for'}}
+    {{^if instance.archived}}
+      {{{render_hooks "Request.gdrive_evidence_storage"}}}
+    {{/if}}
+  {{/is_allowed}}
 </div>
