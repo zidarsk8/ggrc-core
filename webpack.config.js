@@ -6,6 +6,7 @@
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
 const _ = require('lodash');
 const path = require('path');
 const ENV = process.env;
@@ -98,7 +99,10 @@ module.exports = {
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor'
     }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    new ManifestPlugin({
+      publicPath: '/static/'
+    })
   ],
   stats: {
     errorDetails: true

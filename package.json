@@ -47,11 +47,14 @@
     "style-loader": "~0.13.0",
     "uglifyjs-webpack-plugin": "^0.4.6",
     "url-loader": "~0.5.7",
-    "webpack": "^2.7.0"
+    "webpack": "^2.7.0",
+    "webpack-manifest-plugin": "^1.2.1"
   },
   "scripts": {
     "test": "run_unittests",
-    "watch": "./node_modules/.bin/webpack --watch --profile --progress"
+    "watch": "./node_modules/.bin/webpack --watch --profile --progress",
+    "build": "./node_modules/.bin/webpack --profile --progress",
+    "stats": "./node_modules/.bin/webpack --json > stats.json"
   },
   "repository": {
     "type": "git",
