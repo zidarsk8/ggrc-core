@@ -289,12 +289,6 @@
     init: function () {
       this.viewModel.initializeFormFields();
       this.viewModel.updateRelatedItems();
-    },
-    events: {
-      '{viewModel.instance} refreshInstance': function () {
-        this.viewModel.attr('mappedSnapshots')
-          .replace(this.viewModel.loadSnapshots());
-      }
     }
   });
 })(window.can, window.GGRC);
