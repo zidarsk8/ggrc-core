@@ -1594,6 +1594,9 @@ def filter_resource(resource, depth=0, user_permissions=None):  # noqa
         return None
     elif resource['type'] == "Revision" and _is_creator():
       # Make a check for revision objects that are a special case
+      if not hasattr(ggrc.models.all_models, resource['resource_type']):
+        # there are no permissions for old objects
+        return None
       res_model = getattr(ggrc.models.all_models, resource['resource_type'])
       instance = res_model.query.get(resource['resource_id'])
       if instance is None or\
