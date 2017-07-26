@@ -4,8 +4,6 @@
 """Utils for migration of url and reference url values to documents table"""
 
 from alembic import op
-from sqlalchemy import Column
-from sqlalchemy import String
 from sqlalchemy import Enum
 
 
@@ -120,15 +118,6 @@ def migrate_urls_to_documents(objects):
     _create_documents(connection, object_type, table_name)
 
   connection.execute('DROP TABLE temp_url')
-
-
-def restore_url_columns(objects):
-  """Restore url and reference_url columns for specified objects"""
-  for table_name in objects.itervalues():
-    op.add_column(table_name,
-                  Column('url', String(length=250), nullable=True))
-    op.add_column(table_name,
-                  Column('reference_url', String(length=250), nullable=True))
 
 
 def delete_reference_urls(object_types):
