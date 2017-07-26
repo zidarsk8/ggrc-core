@@ -18,17 +18,6 @@
     destroy: "DELETE /api/workflows/{id}",
     is_custom_attributable: true,
 
-    defaults: {
-      frequency_options: [
-        {title: 'One time', value: 'one_time'},
-        {title: 'Weekly', value: 'weekly'},
-        {title: 'Monthly', value: 'monthly'},
-        {title: 'Quarterly', value: 'quarterly'},
-        {title: 'Annually', value: 'annually'}
-      ],
-      frequency: 'one_time' // default value
-    },
-
     attributes: {
       people: "CMS.Models.Person.stubs",
       workflow_people: "CMS.Models.WorkflowPerson.stubs",
@@ -38,6 +27,7 @@
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
       custom_attribute_values: "CMS.Models.CustomAttributeValue.stubs",
+      repeat_every: 'number',
       default_lhn_filters: {
         Workflow: {status: 'Active'},
         Workflow_All: {},
@@ -56,7 +46,7 @@
         {attr_title: 'Manager', attr_name: 'owner', attr_sort_field: ''},
         {attr_title: 'Code', attr_name: 'slug'},
         {attr_title: 'State', attr_name: 'status'},
-        {attr_title: 'Frequency', attr_name: 'frequency'},
+        {attr_title: 'Repeat', attr_name: 'repeat'},
         {attr_title: 'Last Updated', attr_name: 'updated_at'}
       ]
     },
