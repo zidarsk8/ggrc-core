@@ -100,6 +100,8 @@ class TestWorkflowsApiPost(TestCase):
             "title": "One_time",
             "description": "",
             "frequency": "one_time",
+            "unit": None,
+            "repeat_every": None,
             "notify_on_change": False,
             "task_group_title": "Task Group 1",
             "notify_custom_message": "",
