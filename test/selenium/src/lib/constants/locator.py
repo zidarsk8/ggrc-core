@@ -42,6 +42,7 @@ class Common(object):
                        XPATH_NOT_HIDDEN)
   # import / export pages
   CONTENT = ".content"
+  OPTION = "option"
 
 
 class Login(object):
@@ -216,13 +217,9 @@ class CommonModalUnifiedMapper(object):
   FILTER_BY_EXPRESSION = (By.CSS_SELECTOR, MODAL + " .col.filter h6")
   # user input elements
   OBJ_TYPE_DROPDOWN = (By.CSS_SELECTOR, MODAL + " .input-block-level")
-  OBJ_TYPE_DROPDOWN_OPTIONS = (By.CSS_SELECTOR,
-                               MODAL + " .input-block-level option")
   FILTER_VIA_EXPRESSION_TEXT_BOX = (By.CSS_SELECTOR, MODAL + " #mapper-filter")
   FILTER_BY_STATE_DROPDOWN = (By.CSS_SELECTOR,
                               MODAL + " .multiselect-dropdown__input")
-  FILTER_BY_STATE_DROPDOWN_OPTIONS = (By.CSS_SELECTOR,
-                                      MODAL + " .multiselect-dropdown__label")
   BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .filter-buttons .btn-small")
   FOUND_OBJECTS_TITLES = (By.CSS_SELECTOR, MODAL + " .flex-box .title-attr")
   FOUND_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
@@ -425,9 +422,6 @@ class ModalCreateNewAsmtTmpl(BaseModalCreateNew):
   """Locators for Create new Assessment Template modals."""
   ASSIGNEE_DROPDOWN = (
       By.CSS_SELECTOR, 'select[can-value="instance.default_people.assessors"]')
-  ASSIGNEE_DROPDOWN_OPTION = (
-      By.CSS_SELECTOR,
-      'select[can-value="instance.default_people.assessors"] option')
 
 
 class ModalEditObject(BaseModalCreateNew):
@@ -456,7 +450,6 @@ class ModalCustomAttribute(object):
       By.CSS_SELECTOR,
       '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
   ATTRIBUTE_TYPE_SELECTOR = (By.CSS_SELECTOR, "dropdown select")
-  ATTRIBUTE_TYPE_OPTIONS = (By.CSS_SELECTOR, "dropdown select option")
 
 
 class ModalSetVisibleFields(object):
@@ -814,12 +807,14 @@ class WidgetAdminEvents(object):
 
 
 class CommonDropdownMenu(object):
+  """Locators for common drop down elements."""
   _DROPDOWN_MAIN = 'ul'
   _DROPDOWN_ITEMS = 'li'
   _DROPDOWN_ITEM_ICON = 'i'
   DROPDOWN_MAIN_CSS = (By.CSS_SELECTOR, _DROPDOWN_MAIN)
   DROPDOWN_ITEMS_CSS = (By.CSS_SELECTOR, _DROPDOWN_ITEMS)
   DROPDOWN_ITEM_ICON_CSS = (By.CSS_SELECTOR, _DROPDOWN_ITEM_ICON)
+  DROPDOWN_OPTIONS = (By.CSS_SELECTOR, Common.OPTION)
 
 
 class CommonDropdown3bbsInfoWidget(CommonDropdownMenu):
