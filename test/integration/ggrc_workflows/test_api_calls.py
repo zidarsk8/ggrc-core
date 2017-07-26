@@ -99,7 +99,6 @@ class TestWorkflowsApiPost(TestCase):
             "custom_attributes": {},
             "title": "One_time",
             "description": "",
-            "frequency": "one_time",
             "unit": None,
             "repeat_every": None,
             "notify_on_change": False,

@@ -128,7 +128,6 @@ class TestBasicWorkflowActions(TestCase):
     self.quarterly_wf_1 = {
         "title": "quarterly wf 1",
         "description": "",
-        "frequency": "quarterly",
         "unit": "month",
         "repeat_every": 3,
         "task_groups": [{
@@ -160,7 +159,6 @@ class TestBasicWorkflowActions(TestCase):
     self.weekly_wf_1 = {
         "title": "weekly thingy",
         "description": "start this many a time",
-        "frequency": "weekly",
         "unit": "week",
         "repeat_every": 1,
         "task_groups": [{
@@ -255,18 +253,17 @@ class TestBasicWorkflowActions(TestCase):
     self.monthly_workflow_1 = {
         "title": "monthly test wf",
         "description": "start this many a time",
-        "frequency": "monthly",
         "unit": "month",
         "repeat_every": 1,
         "task_groups": [
             {
                 "title": "tg_2",
                 "task_group_tasks": [{
-                     "description": factories.random_str(100),
-                     "relative_end_day": 1,
-                     "relative_end_month": None,
-                     "relative_start_day": 5,
-                     "relative_start_month": None,
+                    "description": factories.random_str(100),
+                    "relative_end_day": 1,
+                    "relative_end_month": None,
+                    "relative_start_day": 5,
+                    "relative_start_month": None,
                 }, {
                     "title": "monday task",
                     "relative_end_day": 1,

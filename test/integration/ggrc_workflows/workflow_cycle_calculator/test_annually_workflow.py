@@ -32,7 +32,6 @@ class TestAnnuallyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     annually_wf = {
         "title": "annually thingy",
         "description": "start this many a time",
-        "frequency": "annually",
         "unit": "month",
         "repeat_every": 12,
         "task_groups": [{
@@ -97,7 +96,6 @@ class TestAnnuallyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
     annually_wf = {
         "title": "annually thingy",
         "description": "start this many a time",
-        "frequency": "annually",
         "unit": "month",
         "repeat_every": 12,
         "task_groups": [{
@@ -148,7 +146,6 @@ class TestAnnuallyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 12,
-        "frequency": "annually",
         "task_groups": [{
             "title": "task group",
             "task_group_tasks": [
@@ -216,7 +213,6 @@ class TestAnnuallyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 12,
-        "frequency": "annually",
         "task_groups": [{
             "title": "task group",
             "task_group_tasks": [
@@ -275,7 +271,6 @@ class TestAnnuallyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 12,
-        "frequency": "annually",
         "task_groups": [{
             "title": "task group",
             "task_group_tasks": [
@@ -346,7 +341,6 @@ class TestAnnuallyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 12,
-        "frequency": "annually",
         "task_groups": [{
             "title": "task group",
             "task_group_tasks": [
@@ -433,7 +427,6 @@ class TestAnnuallyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 12,
-        "frequency": "annually",
         "task_groups": [{
             "title": "task group",
             "task_group_tasks": [

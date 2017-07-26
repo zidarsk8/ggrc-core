@@ -59,7 +59,6 @@ class TestRecurringWorkflowRevisions(TestCase):
         "notify_on_change": True,
         "description": "some test workflow",
         "owners": [person_dict(self.person_2.id)],
-        "frequency": "monthly",
         "unit": "month",
         "repeat_every": 1,
         "task_groups": [{

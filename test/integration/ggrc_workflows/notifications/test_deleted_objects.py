@@ -88,7 +88,6 @@ class TestNotificationsForDeletedObjects(TestCase):
         "notify_on_change": True,
         "description": "",
         "owners": [person_dict(self.user.id)],
-        "frequency": "quarterly",
         "unit": "month",
         "repeat_every": 3,
         "task_groups": [{

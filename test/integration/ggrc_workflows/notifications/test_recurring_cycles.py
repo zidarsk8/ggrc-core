@@ -93,7 +93,6 @@ class TestRecurringCycleNotifications(TestCase):
         "title": "quarterly wf 1",
         "description": "",
         "owners": [person_dict(self.assignee.id)],
-        "frequency": "quarterly",
         "unit": "month",
         "repeat_every": 3,
         "notify_on_change": True,

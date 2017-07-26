@@ -31,7 +31,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {"title": "task group 1",
              "task_group_tasks": [
@@ -102,7 +101,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {"title": "task group 1",
              "task_group_tasks": [
@@ -150,7 +148,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {"title": "task group 1",
              "task_group_tasks": [
@@ -207,7 +204,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {"title": "task group 1",
              "task_group_tasks": [
@@ -265,7 +261,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {"title": "task group 1",
              "task_group_tasks": [
@@ -320,7 +315,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {"title": "task group 1",
              "task_group_tasks": [
@@ -367,7 +361,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {"title": "task group 1",
              "task_group_tasks": [],
@@ -419,7 +412,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {
                 "title": "task group 1",
@@ -530,7 +522,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {
                 "title": "task group 1",
@@ -653,7 +644,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {
                 "title": "task group 1",
@@ -752,7 +742,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {
                 "title": "task group 1",
@@ -812,7 +801,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {
                 "title": "task group 1",
@@ -873,7 +861,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {
                 "title": "task group 1",
@@ -939,7 +926,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {
                 "title": "task group 1",
@@ -1001,7 +987,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {"title": "task group 1",
              "task_group_tasks": [
@@ -1087,7 +1072,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {"title": "task group 1",
              "task_group_tasks": [
@@ -1161,7 +1145,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {"title": "task group 1",
              "task_group_tasks": [
@@ -1247,7 +1230,6 @@ class TestMonthlyWorkflow(base_workflow_test_case.BaseWorkflowTestCase):
         "description": "start this many a time",
         "unit": "month",
         "repeat_every": 1,
-        "frequency": "monthly",
         "task_groups": [
             {"title": "task group 1",
              "task_group_tasks": [

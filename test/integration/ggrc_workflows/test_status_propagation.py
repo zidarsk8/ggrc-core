@@ -30,7 +30,6 @@ class TestWorkflowCycleStatePropagantion(TestCase):
     self.weekly_wf = {
         "title": "weekly thingy",
         "description": "start this many a time",
-        "frequency": "weekly",
         "unit": "week",
         "repeat_every": 1,
         "task_groups": [{

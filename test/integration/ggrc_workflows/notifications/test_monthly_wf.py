@@ -1,14 +1,14 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from integration.ggrc import TestCase
-from freezegun import freeze_time
 from datetime import datetime
+from freezegun import freeze_time
 from mock import patch
 
 from ggrc.notifications import common
 from ggrc.models import Notification, Person
 from ggrc_workflows import start_recurring_cycles
+from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
@@ -116,7 +116,6 @@ class TestMonthlyWorkflowNotification(TestCase):
         "notify_on_change": True,
         "description": "some test workflow",
         "owners": [person_dict(self.person_2.id)],
-        "frequency": "monthly",
         "unit": "month",
         "repeat_every": 1,
         "task_groups": [{

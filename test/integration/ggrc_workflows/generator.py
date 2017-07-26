@@ -1,6 +1,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-
+"""
+Workflow related generators
+"""
 import random
 import copy
 
@@ -19,10 +21,12 @@ from integration.ggrc.models import factories
 
 class WorkflowsGenerator(Generator):
 
-  def generate_workflow(self, data={}):
+  def generate_workflow(self, data=None):
     """ create a workflow with dict data
     return: wf if it was created, or response otherwise
     """
+    if data is None:
+      data = {}
     obj_name = "workflow"
     data = copy.deepcopy(data)
 
@@ -39,7 +43,9 @@ class WorkflowsGenerator(Generator):
 
     return response, workflow
 
-  def generate_task_group(self, workflow=None, data={}):
+  def generate_task_group(self, workflow=None, data=None):
+    if data is None:
+      data = {}
     if not workflow:
       _, workflow = self.generate_workflow()
     data = copy.deepcopy(data)
@@ -68,7 +74,9 @@ class WorkflowsGenerator(Generator):
 
     return response, task_group
 
-  def generate_task_group_task(self, task_group=None, data={}):
+  def generate_task_group_task(self, task_group=None, data=None):
+    if data is None:
+      data = {}
     if not task_group:
       _, task_group = self.generate_task_group()
     task_group = self._session_add(task_group)
@@ -144,10 +152,12 @@ class WorkflowsGenerator(Generator):
     workflow = self._session_add(workflow)
     return self.modify_workflow(workflow, {
         "status": "Active",
-        "recurrences": workflow.frequency != "one_time"
+        "recurrences": workflow.unit is not None
     })
 
-  def modify_workflow(self, wf=None, data={}):
+  def modify_workflow(self, wf=None, data=None):
+    if data is None:
+      data = {}
     if not wf:
       _, wf = self.generate_workflow()
     wf = self._session_add(wf)
@@ -164,7 +174,9 @@ class WorkflowsGenerator(Generator):
 
     return response, workflow
 
-  def modify_object(self, obj, data={}):
+  def modify_object(self, obj, data=None):
+    if data is None:
+      data = {}
     obj = self._session_add(obj)
 
     obj_name = obj._inflector.table_singular
