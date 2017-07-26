@@ -1,7 +1,10 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""This module contains a class for handling request queries."""
+"""Default query builder for /query API.
+
+This class is used to build SqlAlchemy queries and fetch the result ids.
+"""
 
 # flake8: noqa
 import collections
@@ -15,9 +18,10 @@ from ggrc import models
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.models import inflector
 from ggrc.rbac import context_query_filter
-from ggrc.utils import query_helpers, benchmark
-from ggrc.converters import custom_operators
-from ggrc.converters.exceptions import BadQueryException
+from ggrc.utils import benchmark
+from ggrc.rbac import permissions
+from ggrc.query import custom_operators
+from ggrc.query.exceptions import BadQueryException
 
 
 # pylint: disable=too-few-public-methods
@@ -215,7 +219,7 @@ class QueryHelper(object):
     Prepare query to filter models based on the available contexts and
     resources for the given type of object.
     """
-    contexts, resources = query_helpers.get_context_resource(
+    contexts, resources = permissions.get_context_resource(
         model_name=model.__name__, permission_type=permission_type
     )
 
@@ -431,7 +435,7 @@ class QueryHelper(object):
           attr = getattr(model, key.encode('utf-8'), None)
           if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
               isinstance(attr.property,
-                             sa.orm.properties.RelationshipProperty)):
+                         sa.orm.properties.RelationshipProperty)):
             joins, order = by_foreign_key()
           else:
             # a simple attribute

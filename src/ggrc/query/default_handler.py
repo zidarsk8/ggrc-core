@@ -4,14 +4,14 @@
 """This module contains special query helper class for query API."""
 
 from ggrc.builder import json
-from ggrc.converters.query_helper import QueryHelper
+from ggrc.query.builder import QueryHelper
 from ggrc.models import inflector
 from ggrc.utils import benchmark
 
 
 # pylint: disable=too-few-public-methods
 
-class QueryAPIQueryHelper(QueryHelper):
+class DefaultHandler(QueryHelper):
   """Helper class for handling request queries for query API.
 
   query object = [
@@ -33,6 +33,7 @@ class QueryAPIQueryHelper(QueryHelper):
       count: the number of objects filtered, after "limit" is applied
       total: the number of objects filtered, before "limit" is applied
   """
+
   def get_results(self):
     """Filter the objects and get their information.
 

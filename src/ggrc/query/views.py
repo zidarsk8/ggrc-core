@@ -10,8 +10,8 @@ from flask import request
 from flask import current_app
 from werkzeug.exceptions import BadRequest
 
-from ggrc.converters.query_helper import BadQueryException
-from ggrc.services.query_helper import QueryAPIQueryHelper
+from ggrc.query.exceptions import BadQueryException
+from ggrc.query.default_handler import DefaultHandler
 from ggrc.login import login_required
 from ggrc.models.inflector import get_model
 from ggrc.services.common import etag
@@ -25,15 +25,6 @@ def build_collection_representation(model, description):
       model.__name__: description,
   }
   return collection
-
-
-def get_last_modified(model, objects):
-  """Get last object update time for Last-Modified header."""
-  if hasattr(model, 'updated_at') and objects:
-    last_modified = max(obj.updated_at for obj in objects)
-  else:
-    last_modified = None
-  return last_modified
 
 
 def json_success_response(response_object, last_modified=None, status=200):
@@ -58,8 +49,8 @@ def get_objects_by_query():
   """Return objects corresponding to a POST'ed query list."""
   query = request.json
 
-  query_helper = QueryAPIQueryHelper(query)
-  results = query_helper.get_results()
+  query_handler = DefaultHandler(query)
+  results = query_handler.get_results()
 
   last_modified_list = [result["last_modified"] for result in results
                         if result["last_modified"]]
@@ -87,7 +78,7 @@ def get_objects_by_query():
   return json_success_response(collections, last_modified)
 
 
-def init_query_view(app):
+def init_query_views(app):
   # pylint: disable=unused-variable
   @app.route('/query', methods=['POST'])
   @login_required
