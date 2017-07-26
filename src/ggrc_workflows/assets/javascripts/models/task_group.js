@@ -128,10 +128,8 @@
         }
 
         // Handle cases of a workflow with start and end dates
-        if (workflow.frequency === 'one_time') {
-          datesAreValid = that.start_date && that.end_date &&
-            that.start_date <= that.end_date;
-        }
+        datesAreValid = that.start_date && that.end_date &&
+          that.start_date <= that.end_date;
 
         if (!datesAreValid) {
           return 'Start and/or end date is invalid';
