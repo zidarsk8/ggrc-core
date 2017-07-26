@@ -4,7 +4,6 @@
 import functools
 import inspect
 
-from sqlalchemy import event
 from sqlalchemy import or_, and_
 from sqlalchemy.ext.associationproxy import association_proxy
 from sqlalchemy.ext.declarative import declared_attr
@@ -139,9 +138,6 @@ class Relationship(Base, db.Model):
     # manually add attrs since the base log_json only captures table columns
     json["attrs"] = self.attrs.copy()  # copy in order to detach from orm
     return json
-
-event.listen(Relationship, 'before_insert', Relationship.validate_attrs)
-event.listen(Relationship, 'before_update', Relationship.validate_attrs)
 
 
 class Relatable(object):
