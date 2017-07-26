@@ -6,6 +6,7 @@
 from ggrc import builder
 from ggrc import db
 from ggrc.models.mixins import Base
+from ggrc.models import reflection
 from ggrc.access_control import role
 from ggrc.models.types import LongJsonType
 
@@ -39,7 +40,7 @@ class Revision(Base, db.Model):
         db.Index('ix_revisions_resource_slug', 'resource_slug'),
     )
 
-  _publish_attrs = [
+  _api_attrs = reflection.ApiAttributes(
       'resource_id',
       'resource_type',
       'source_type',
@@ -49,7 +50,7 @@ class Revision(Base, db.Model):
       'action',
       'content',
       'description',
-  ]
+  )
 
   @classmethod
   def eager_query(cls):

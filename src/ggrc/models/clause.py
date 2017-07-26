@@ -16,6 +16,7 @@ from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.fulltext.mixin import Indexed
+from ggrc.models import reflection
 
 
 class Clause(Roleable, HasObjectState, Hierarchical, CustomAttributable,
@@ -36,10 +37,8 @@ class Clause(Roleable, HasObjectState, Hierarchical, CustomAttributable,
                 'Clause')
   notes = deferred(db.Column(db.Text), 'Clause')
 
-  _publish_attrs = [
-      'na',
-      'notes',
-  ]
+  _api_attrs = reflection.ApiAttributes('na', 'notes')
+
   _fulltext_attrs = [
       'na',
       'notes',

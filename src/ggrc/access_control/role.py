@@ -10,6 +10,7 @@ import flask
 
 from ggrc import db
 from ggrc.models import mixins
+from ggrc.models import reflection
 from ggrc.models.mixins import attributevalidator
 from ggrc.fulltext.mixin import Indexed
 
@@ -51,7 +52,7 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
     """Define fields to be loaded eagerly to lower the count of DB queries."""
     return super(AccessControlRole, cls).eager_query()
 
-  _publish_attrs = [
+  _api_attrs = reflection.ApiAttributes(
       "name",
       "object_type",
       "tooltip",
@@ -61,7 +62,7 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
       "my_work",
       "mandatory",
       "default_to_current_user",
-  ]
+  )
 
   @sa.orm.validates("name", "object_type")
   def validates_name(self, key, value):  # pylint: disable=no-self-use

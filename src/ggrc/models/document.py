@@ -15,6 +15,7 @@ from ggrc.models.mixins import Base
 from ggrc.models.relationship import Relatable
 from ggrc.models.utils import validate_option
 from ggrc.models import exceptions
+from ggrc.models import reflection
 
 
 class Document(Roleable, Relatable, Base, Indexed, db.Model):
@@ -68,7 +69,7 @@ class Document(Roleable, Relatable, Base, Indexed, db.Model):
       "document_type",
   ]
 
-  _publish_attrs = [
+  _api_attrs = reflection.ApiAttributes(
       'title',
       'link',
       'description',
@@ -76,7 +77,7 @@ class Document(Roleable, Relatable, Base, Indexed, db.Model):
       'year',
       'language',
       "document_type",
-  ]
+  )
 
   _sanitize_html = [
       'title',
