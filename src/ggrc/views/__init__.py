@@ -42,7 +42,6 @@ from ggrc.snapshotter.indexer import reindex as reindex_snapshots
 from ggrc.views import converters
 from ggrc.views import cron
 from ggrc.views import filters
-from ggrc.views import mockups
 from ggrc.views import notifications
 from ggrc.views.registry import object_view
 from ggrc.utils import benchmark
@@ -452,7 +451,6 @@ def init_extra_views(app_):
 
   This should be used for any views that might use extension modules.
   """
-  mockups.init_mockup_views()
   filters.init_filter_views()
   converters.init_converter_views()
   cron.init_cron_views(app_)
