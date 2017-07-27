@@ -373,20 +373,11 @@
       var workflows;
       var _workflow;
       var cycle;
-      var person = {
-        id: GGRC.current_user.id,
-        type: 'Person'
-      };
 
       if (newObjectForm) {
         // prepopulate dates with default ones
         this.attr('start_date', new Date());
         this.attr('end_date', moment().add({month: 3}).toDate());
-
-        if (!form.contact) {
-          form.attr('contact', person);
-          form.attr('_transient.contact', person);
-        }
 
         // using setTimeout to execute this after the modal is loaded
         // so we can see when the workflow is already set and use that one
