@@ -190,6 +190,7 @@
     filters: [],
     loaded: null,
     refreshLoaded: true,
+    canOpenInfoPin: true,
     loadItems: function () {
       var modelName = this.attr('modelName');
       var pageInfo = this.attr('pageInfo');
@@ -578,6 +579,7 @@
       },
       ' selectTreeItem': function (el, ev, selectedEl, instance) {
         var parent = this.viewModel.attr('parent_instance');
+        var setInstanceDfd;
         var infoPaneOptions = new can.Map({
           instance: instance,
           parent_instance: parent,
@@ -585,11 +587,21 @@
         });
 
         ev.stopPropagation();
+
+        if (!this.viewModel.attr('canOpenInfoPin')) {
+          return;
+        }
+
+        this.viewModel.attr('canOpenInfoPin', false);
         el.find('.item-active').removeClass('item-active');
         selectedEl.addClass('item-active');
 
-        $('.pin-content').control()
+        setInstanceDfd = $('.pin-content').control()
           .setInstance(infoPaneOptions, selectedEl, true);
+
+        setInstanceDfd.then(function () {
+          this.viewModel.attr('canOpenInfoPin', true);
+        }.bind(this));
       },
       ' refreshTree': function (el, ev) {
         ev.stopPropagation();
