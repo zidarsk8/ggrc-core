@@ -27,6 +27,12 @@ DUPLICATE_COLUMN = (u"Line {line}: Duplicate columns found {duplicates}."
 DUPLICATE_VALUE = (u"Line {line}: {column_name} '{value}' already exists."
                    u"Record will be ignored.")
 
+DUPLICATE_IN_MULTI_VALUE = (
+    u"Line {line}: {column_name} contains duplicate values. Only a single "
+    u"value from each group of identical values will be used. "
+    u"Duplicates: {duplicates}"
+)
+
 DUPLICATE_VALUE_IN_CSV = (u"Lines {line_list} have same {column_name}"
                           u" '{value}'. Line{s} {ignore_lines} will be"
                           u" ignored.")
@@ -52,7 +58,6 @@ WRONG_VALUE = (u"Line {line}: Field '{column_name}' contains invalid data. The"
 
 WRONG_VALUE_DEFAULT = (u"Line {line}: Field '{column_name}' contains invalid"
                        u" data. The default value will be used.")
-
 
 WRONG_VALUE_ERROR = (u"Line {line}: Field '{column_name}' contains invalid "
                      u"data. The line will be ignored.")
