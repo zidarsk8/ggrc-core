@@ -587,7 +587,7 @@
       var relates = CurrentPage.related.attr(instance.type);
       var result = true;
       var instanceId = SnapshotUtils.isSnapshot(instance) ?
-        instance.snapshot.child_id :
+        instance.snapshot.id :
         instance.id;
 
       if (needToSplit) {
