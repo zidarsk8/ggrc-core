@@ -514,3 +514,90 @@ class TestSnapshotWithActionMixin(TestCase, WithQueryApi):
     self.assert200(response)
     self.assertEqual(response.json["assessment"]["status"],
                      all_models.Assessment.PROGRESS_STATE)
+
+
+class TestMultiplyActions(TestCase, WithQueryApi):
+  """Test case for WithAction mixin with multiply actions."""
+
+  def setUp(self):
+    super(TestMultiplyActions, self).setUp()
+    self.client.get("/login")
+    self.api = api_helper.Api()
+
+  def test_multiply_actions(self):
+    """Test multiply actions"""
+    assessment = factories.AssessmentFactory()
+    doc_map = factories.DocumentFactory(link="google1.com")
+    doc_del = factories.DocumentFactory(link="google2.com")
+    factories.RelationshipFactory(source=assessment,
+                                  destination=doc_del)
+
+    ca_def = factories.CustomAttributeDefinitionFactory(
+        title="def1",
+        definition_type="assessment",
+        definition_id=assessment.id,
+        attribute_type="Dropdown",
+        multi_choice_options="no,yes",
+        multi_choice_mandatory="0,3"
+    )
+    ca_val = factories.CustomAttributeValueFactory(
+        custom_attribute=ca_def,
+        attributable=assessment,
+        attribute_value="no"
+    )
+    response = self.api.put(assessment, {
+        "custom_attribute_values": [
+            {
+                "id": ca_val.id,
+                "custom_attribute_id": ca_def.id,
+                "attribute_value": "yes",
+                "type": "CustomAttributeValue",
+            }],
+        "actions": {"add_related": [
+            {
+                "id": None,
+                "type": "Document",
+                "document_type": "EVIDENCE",
+                "title": "evidence1",
+                "link": "google3.com",
+            },
+            {
+                "id": doc_map.id,
+                "type": "Document",
+            },
+            {
+                "id": None,
+                "type": "Comment",
+                "description": "comment1",
+                "custom_attribute_definition_id": ca_def.id,
+            }
+        ], "remove_related": [
+            {
+                "id": doc_del.id,
+                "type": "Document",
+            }]}})
+    self.assert200(response)
+
+    preconditions_failed = response.json["assessment"]["preconditions_failed"]
+    self.assertIs(preconditions_failed, False)
+
+    assessment_by_url = self.simple_query(
+        "Assessment",
+        expression=["url", "~", "google1.com"]
+    )
+    self.assertEqual(len(assessment_by_url), 1)
+    assessment_by_url = self.simple_query(
+        "Assessment",
+        expression=["url", "~", "google2.com"]
+    )
+    self.assertFalse(assessment_by_url)
+    assessment_by_evidence = self.simple_query(
+        "Assessment",
+        expression=["evidence", "~", "google3.com"]
+    )
+    self.assertEqual(len(assessment_by_evidence), 1)
+    assessment_by_comment = self.simple_query(
+        "Assessment",
+        expression=["comment", "~", "comment1"]
+    )
+    self.assertEqual(len(assessment_by_comment), 1)
