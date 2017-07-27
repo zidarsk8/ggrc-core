@@ -555,6 +555,23 @@ class BaseTaskSet(locust.TaskSet):
   def create_objectives(self, **kwargs):
     return self.create_object("Objective", **kwargs)
 
+  def create_assessment_documents(self, assessments, **kwargs):
+    single_count = kwargs.pop("count", 1)
+    count = len(assessments) * single_count
+    kwargs["count"] = count
+
+    kwargs["document_type"] = "URL"
+    documents = self.create_object("Document", **kwargs)
+    pairs = zip(assessments * single_count, documents)
+    self.relationships_from_pairs(pairs)
+
+    kwargs["document_type"] = "EVIDENCE"
+    documents = self.create_object("Document", **kwargs)
+    pairs = zip(assessments * single_count, documents)
+    self.relationships_from_pairs(pairs)
+
+    return documents
+
   def create_programs(self, **kwargs):
     """Create program entries.
 

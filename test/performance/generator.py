@@ -181,6 +181,7 @@ def generate(model, count, objects, cads, acr, **kwargs):
       "access_control_list": lambda _: acl(acr, objects),
       "audit_firm": lambda _: random_object("OrgGroup", objects),
       "contact": lambda _: random.choice(objects["Person"]),
+      "document_type": lambda _: kwargs.get("document_type", "URL"),
       "program": lambda _: kwargs.get("program",
                                       random_object("Program", objects))
   }

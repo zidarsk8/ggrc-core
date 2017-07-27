@@ -295,6 +295,15 @@ ORG_GROUP = {
     "context": None,
 }
 
+DOCUMENT = {
+    "document_type": "URL",
+    "link": "aueo",
+    "title": "aueo",
+    "context": None,
+    "owners": [],
+    "isDraft": True,
+}
+
 RELATIONSHIP = {
     "source": {},
     "destination": {},
@@ -330,6 +339,7 @@ MAP = {
     "Audit": AUDIT,
     "OrgGroup": ORG_GROUP,
     "AssessmentTemplate": ASSESSMENT_TEMPLATE,
+    "Document": DOCUMENT,
 
     # special objects
     "Person": PERSON,

@@ -26,11 +26,15 @@ class SetUpAssessments(base.BaseTaskSet):
 
     count = len(self.objects["Assessment"]) / 2
     assessments = generator.random_objects("Assessment", count, self.objects)
-    self._edit_assessments(assessments)
-    full_assessments = self._edit_assessment_states(assessments[:count / 2])
+    full_assessments = self._edit_assessments(assessments)
     self._map_snapshots(full_assessments)
+    self._add_documents(assessments)
+    self._edit_assessment_states(assessments[:count / 2])
 
     sys.exit(0)
+
+  def _add_documents(self, assessments):
+    self.create_assessment_documents(assessments, count=3, batch_size=1000)
 
   def _map_snapshots(self, full_assessments):
     pairs = []
@@ -46,8 +50,11 @@ class SetUpAssessments(base.BaseTaskSet):
     self.relationships_from_pairs(pairs)
 
   def _edit_assessments(self, assessments):
+    full_assessments = []
     for assessment in assessments:
-      self.update_object(assessment)
+      response = self.update_object(assessment)
+      full_assessments.append(response.json().values()[0])
+    return full_assessments
 
   def _edit_assessment_states(self, assessments):
     states = [
