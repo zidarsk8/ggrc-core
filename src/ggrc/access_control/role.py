@@ -6,7 +6,10 @@
 import collections
 
 import sqlalchemy as sa
+from sqlalchemy import inspect
+from sqlalchemy.orm.session import Session
 import flask
+from werkzeug.exceptions import Forbidden
 
 from ggrc import db
 from ggrc.models import mixins
@@ -33,6 +36,7 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
   delete = db.Column(db.Boolean, nullable=False, default=True)
   my_work = db.Column(db.Boolean, nullable=False, default=True)
   mandatory = db.Column(db.Boolean, nullable=False, default=False)
+  non_editable = db.Column(db.Boolean, nullable=False, default=False)
   default_to_current_user = db.Column(
       db.Boolean, nullable=False, default=False)
 
@@ -62,6 +66,7 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
       "my_work",
       "mandatory",
       "default_to_current_user",
+      reflection.Attribute("non_editable", create=False, update=False),
   )
 
   @sa.orm.validates("name", "object_type")
@@ -112,9 +117,33 @@ def invalidate_role_names_cache(mapper, content, target):
     del flask.g.global_role_names
 
 
+def acr_modified(obj, session):
+  """Check if ACR object was changed or deleted"""
+  changed = False
+  for attr in inspect(obj).attrs:
+    # ACL changes should not be checked
+    if attr.key == "access_control_list":
+      continue
+    changed = changed or attr.history.has_changes()
+  return changed or obj in session.deleted
+
+
+def invalidate_noneditable_change(session, flush_context, instances):
+  """Handle snapshot objects on api post requests."""
+  # pylint: disable=unused-argument
+  acrs = [o for o in session if isinstance(o, AccessControlRole)]
+  if not acrs:
+    return
+  for acr in acrs:
+    # Reject modifying or deleting of existing roles, creating allowed
+    if acr.id and acr_modified(acr, session) and acr.non_editable:
+      raise Forbidden()
+
+
 sa.event.listen(AccessControlRole, "after_insert", invalidate_role_names_cache)
 sa.event.listen(AccessControlRole, "after_delete", invalidate_role_names_cache)
 sa.event.listen(AccessControlRole, "after_update", invalidate_role_names_cache)
+sa.event.listen(Session, 'before_flush', invalidate_noneditable_change)
 
 
 def get_custom_roles_for(object_type):

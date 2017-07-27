@@ -543,10 +543,10 @@ class TestAssessmentGeneration(ggrc.TestCase):
       audit_context = factories.ContextFactory()
       self.audit.context = audit_context
       users = [factories.PersonFactory(email=e) for e in people]
-      ac_role_id = factories.AccessControlRoleFactory(
+      ac_role_id = all_models.AccessControlRole.query.filter_by(
           name="Principal Assignees",
           object_type=self.snapshot.child_type,
-      ).id
+      ).first().id
       for user in users:
         if user.email in auditors:
           rbac_factories.UserRoleFactory(
@@ -610,11 +610,6 @@ class TestAssessmentGeneration(ggrc.TestCase):
       auditors[assessor_role].append(factories.PersonFactory(email=assessor))
       if verifier_role is not None:
         auditors[verifier_role].append(factories.PersonFactory(email=verifier))
-      for role in auditors:
-        factories.AccessControlRoleFactory(
-            name=role,
-            object_type=self.snapshot.child_type,
-        )
       default_people = {"assessors": assessor_role}
       if verifier_role is not None:
         default_people["verifiers"] = verifier_role
@@ -656,10 +651,6 @@ class TestAssessmentGeneration(ggrc.TestCase):
     email = "{}@example.com".format(field)
     with factories.single_commit():
       person = factories.PersonFactory(email=email, name=field)
-      factories.AccessControlRoleFactory(
-          name=role_name,
-          object_type=self.snapshot.child_type,
-      )
       template = factories.AssessmentTemplateFactory(
           test_plan_procedure=False,
           procedure_description="Assessment Template Test Plan",
