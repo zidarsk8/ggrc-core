@@ -19,11 +19,11 @@ class BigSetup(setup_base.SetUpBaseTask):
   """
 
   _object_count = 3000
-  _user_count = 50
+  _user_count = 100
   _cad_prefixes = ["1"]
 
-  _program_count = 200
-  _program_mapping_count = 500
+  _program_count = 100
+  _program_mapping_count = 1000
   _program_mapping_models = [
       "Control",
       "Regulation",

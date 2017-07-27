@@ -18,12 +18,12 @@ class BigSetup(setup_base.SetUpBaseTask):
   For property and number descriptions see the super class.
   """
 
-  _object_count = 1000
-  _user_count = 30
+  _object_count = 2000
+  _user_count = 60
   _cad_prefixes = ["1"]
 
-  _program_count = 100
-  _program_mapping_count = 200
+  _program_count = 50
+  _program_mapping_count = 500
   _program_mapping_models = [
       "Control",
       "Regulation",
@@ -32,7 +32,7 @@ class BigSetup(setup_base.SetUpBaseTask):
       "Facility",
   ]
 
-  _audit_count = 3
+  _audit_count = 2
 
   _assessment_template_count = 3
   _assessment_template_models = [
