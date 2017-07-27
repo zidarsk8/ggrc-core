@@ -342,12 +342,27 @@ class Timeboxed(object):
 class LastDeprecatedTimeboxed(Timeboxed):
   """Mixin that redefines `end_date`'s alias."""
   _aliases = {
-      "end_date": "Last Deprecated Date",
+      "end_date": {
+          "display_name": "Last Deprecated Date",
+          "view_only": True,
+      },
   }
 
   _api_attrs = reflection.ApiAttributes(
       reflection.Attribute('end_date', create=False, update=False),
   )
+
+  AUTO_SETUP_STATUS = "Deprecated"
+
+  @validates('status')
+  def validate_status(self, key, value):
+    """Autosetup current date as end date if 'Deprecated' status will setup."""
+    superinstance = super(Timeboxed, self)
+    if hasattr(superinstance, "validate_status"):
+      value = superinstance.validate_status(key, value)
+    if value != self.status and value == self.AUTO_SETUP_STATUS:
+      self.end_date = datetime.datetime.now()
+    return value
 
 
 class Stateful(object):
