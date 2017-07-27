@@ -129,3 +129,23 @@ class TestGetRevisionsList(TestCase):
       self.assertEqual(
           expected_results,
           [r.action for r in self.get_log_revisions(dirty[0])])
+
+
+class TestFilterResource(TestCase):
+  """Tests for common.filter_resource"""
+
+  @mock.patch("ggrc.services.common._is_creator", return_value=True)
+  def test_filter_revision(self, _):
+    """Test old revision filtering"""
+    resource = {
+        'description': u'document1',
+        'resource_id': 1L,
+        'resource_type': u'ObjectDocument',
+        'type': 'Revision',
+        'context': None,
+    }
+
+    res = common.filter_resource(resource=resource,
+                                 depth=1,
+                                 user_permissions=object())
+    self.assertIsNone(res)
