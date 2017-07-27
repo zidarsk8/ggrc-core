@@ -1,19 +1,22 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-from integration.ggrc import TestCase
-from freezegun import freeze_time
+import unittest
+
 from datetime import datetime
+from freezegun import freeze_time
 from mock import patch
 
 from ggrc.notifications import common
 from ggrc import models
+from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
 
 
+@unittest.skip("unskip when import/export fixed for workflows")
 class TestEnableAndDisableNotifications(TestCase):
 
   """ This class contains simple one time workflow tests that are not

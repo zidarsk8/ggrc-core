@@ -1,6 +1,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+import unittest
+
 from integration.ggrc import TestCase
 from freezegun import freeze_time
 
@@ -14,6 +16,7 @@ from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
 
 
+@unittest.skip("unskip when import/export fixed for workflows")
 class TestRecurringCycleNotifications(TestCase):
 
   def setUp(self):
