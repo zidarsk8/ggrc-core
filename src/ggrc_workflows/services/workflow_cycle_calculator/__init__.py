@@ -2,13 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from ggrc_workflows.services.workflow_cycle_calculator import \
-    annually_cycle_calculator
-from ggrc_workflows.services.workflow_cycle_calculator import \
     monthly_cycle_calculator
 from ggrc_workflows.services.workflow_cycle_calculator import \
     one_time_cycle_calculator
-from ggrc_workflows.services.workflow_cycle_calculator import \
-    quarterly_cycle_calculator
 from ggrc_workflows.services.workflow_cycle_calculator import \
     weekly_cycle_calculator
 
@@ -23,10 +19,12 @@ def get_cycle_calculator(workflow, base_date=None):
     SomeCalculator(CycleCalculator): CycleCalculator's concrete implementation
   """
   calculators = {
-      "one_time": one_time_cycle_calculator.OneTimeCycleCalculator,
-      "weekly": weekly_cycle_calculator.WeeklyCycleCalculator,
-      "monthly": monthly_cycle_calculator.MonthlyCycleCalculator,
-      "quarterly": quarterly_cycle_calculator.QuarterlyCycleCalculator,
-      "annually": annually_cycle_calculator.AnnuallyCycleCalculator
+      "day": None,
+      "week": weekly_cycle_calculator.WeeklyCycleCalculator,
+      "month": monthly_cycle_calculator.MonthlyCycleCalculator,
+      # "quarterly": quarterly_cycle_calculator.QuarterlyCycleCalculator,
+      # "annually": annually_cycle_calculator.AnnuallyCycleCalculator
   }
-  return calculators[workflow.frequency](workflow, base_date)
+  return calculators.get(
+      workflow.unit,
+      one_time_cycle_calculator.OneTimeCycleCalculator)(workflow, base_date)
