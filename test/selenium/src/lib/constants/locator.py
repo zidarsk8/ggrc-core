@@ -36,6 +36,8 @@ class Common(object):
   MAX = "max"
   NORMAL = "normal"
   DOWN = "down"
+  # list item delimiter
+  HTML_LIST_CSS = (By.CSS_SELECTOR, 'ul')
   # xpath helper
   XPATH_NOT_HIDDEN = "[not(ancestor::section[contains(@class, 'hidden')])]"
   INFO_WIDGET_XPATH = ("//section[starts-with(@class,'info')]" +
@@ -717,6 +719,20 @@ class WidgetInfoAssessment(WidgetInfoPanel):
   CODE_VALUE_CSS = (By.CSS_SELECTOR, _CODE + " .inline__content-wrapper")
   # comments section
   COMMENTS_CSS = (By.CSS_SELECTOR, ".assessment-comments")
+  # asmt tab container
+  ASMT_CONTROLLER_SECTION_CSS = (By.CSS_SELECTOR, "assessment-controls")
+  _ASMT_PANEL = ".tab-pane"
+  ASMT_LOG_PANEL_CSS = (By.CSS_SELECTOR,
+                        " ".join([_ASMT_PANEL, "ul.entry-list"]))
+  RELATED_ASMTS_CSS = (By.CSS_SELECTOR, " ".join(
+      [_ASMT_PANEL, "related-objects[related-items-type='Assessment']"]))
+  RELATED_ISSUES_CSS = (By.CSS_SELECTOR, " ".join(
+      [_ASMT_PANEL, "related-objects[related-items-type='Issue']"]))
+  ASMT_TAB_CONTAINER_CSS = (By.CSS_SELECTOR, "tab-container")
+
+  class TabContainer(object):
+    TAB_CONTROLLER = (By.CSS_SELECTOR, "ul.nav.nav-tabs")
+    TAB_CONTENT = (By.CSS_SELECTOR, '.tab-pane.active')
 
 
 class WidgetInfoAssessmentTemplate(WidgetInfoPanel):
@@ -827,8 +843,12 @@ class CommonDropdownMenu(object):
 class CommonDropdown3bbsInfoWidget(CommonDropdownMenu):
   """Locators for common settings 3BBS dropdown on Info widget and Info page.
  """
+  _INFO_3BBS_DROPDOWN_BUTTON_XPATH = (Common.INFO_WIDGET_XPATH +
+                                      "//*[contains(@class,'dropdown-menu')]")
   _INFO_3BBS_DROPDOWN_XPATH = (Common.INFO_WIDGET_XPATH +
-                               "//*[contains(@class,'dropdown-menu')]")
+                               "//ul[contains(@class,'dropdown-menu "
+                               "three-dots-list')]")
+  INFO_3BBS_DROPDOWN_BUTTON = (By.XPATH, _INFO_3BBS_DROPDOWN_BUTTON_XPATH)
   INFO_3BBS_DROPDOWN = (By.XPATH, _INFO_3BBS_DROPDOWN_XPATH)
 
 
@@ -862,6 +882,7 @@ class TreeView(object):
   HEADER = _WIDGET_NOT_HIDDEN_CSS + Common.TREE_HEADER
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
   ITEM_EXPAND_BUTTON = " tree-item-actions"
+  ITEM_DROPDOWN_MENU_CSS = Common.HTML_LIST_CSS
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
   NO_RESULTS_MESSAGE = (
       By.CSS_SELECTOR, _WIDGET_NOT_HIDDEN_CSS + " .tree-no-results-message")
@@ -1101,3 +1122,18 @@ class CommentItem(object):
   AUTHOR_CSS = (By.CSS_SELECTOR, ".person-holder")
   DATETIME_CSS = (By.CSS_SELECTOR, ".comment-object-item__author_info")
   CONTENT_CSS = (By.CSS_SELECTOR, ".comment-object-item__text")
+
+
+class AssessmentLogTab(object):
+  CELLS_CSS = (By.CSS_SELECTOR, '.third-col')
+  COMMENT_PERSON_CSS = (By.CSS_SELECTOR, '.person-tooltip-trigger')
+  PERSON_LABEL = (By.CSS_SELECTOR, '.person-label')
+  LOG_LIST_CSS = Common.HTML_LIST_CSS
+  LOG_TAB_SPINNER_CSS = (By.CSS_SELECTOR, '.spinner')
+
+
+class AssessmentRelatedTable(object):
+  HEADERS = (By.CSS_SELECTOR, ".grid-data-header")
+  ROWS = (By.CSS_SELECTOR, ".grid-data-row")
+  CELLS = (By.CSS_SELECTOR, "div")
+  TAB_BUTTON = (By.CSS_SELECTOR, ".btn.btn-small")

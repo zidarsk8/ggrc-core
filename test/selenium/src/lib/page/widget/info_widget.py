@@ -5,7 +5,7 @@
 
 from lib import base
 from lib.constants import locator, objects, element, roles
-from lib.element import widget_info
+from lib.element import widget_info, tab_containers
 from lib.page.modal import update_object
 from lib.utils import selenium_utils
 
@@ -252,6 +252,10 @@ class Assessments(InfoPanel):
 
   def __init__(self, driver):
     super(Assessments, self).__init__(driver)
+    self.workflow_container = tab_containers.AssessmentTabContainer(
+        self._driver,
+        self._driver.find_element(*self._locators.ASMT_TAB_CONTAINER_CSS))
+    self.workflow_container.switch_to_default_tab()
     self.code_section = base.Label(
         self._driver, self._locators.CODE_CSS)
     # mapped objects

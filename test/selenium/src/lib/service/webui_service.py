@@ -266,7 +266,7 @@ class BaseWebUiService(object):
     dropdown_on_info_panel = (
         self.open_info_panel_of_obj_by_title(src_obj, obj).open_info_3bbs())
     element_to_verify = element.DropdownMenuItemTypes.EDIT
-    return dropdown_on_info_panel.is_item_exists(element_to_verify)
+    return dropdown_on_info_panel.is_item_exist(element_to_verify)
 
   def is_obj_unmappable_via_info_panel(self, src_obj, obj):
     """""Open generic widget of mapped objects, select object from Tree View
@@ -276,7 +276,7 @@ class BaseWebUiService(object):
     dropdown_on_info_panel = (
         self.open_info_panel_of_obj_by_title(src_obj, obj).open_info_3bbs())
     element_to_verify = element.DropdownMenuItemTypes.UNMAP
-    return dropdown_on_info_panel.is_item_exists(element_to_verify)
+    return dropdown_on_info_panel.is_item_exist(element_to_verify)
 
   def is_obj_page_exist_via_info_panel(self, src_obj, obj):
     """Open generic widget of mapped objects, select object from Tree View
@@ -307,7 +307,7 @@ class BaseWebUiService(object):
                                   open_tree_actions_dropdown_by_title
                                   (title=obj.title))
     element_to_verify = element.DropdownMenuItemTypes.MAP
-    return dropdown_on_tree_view_item.is_item_exists(element_to_verify)
+    return dropdown_on_tree_view_item.is_item_exist(element_to_verify)
 
   def map_objs_via_tree_view_item(self, src_obj, dest_objs):
     """Open generic widget of mapped objects, open unified mapper modal from
@@ -451,6 +451,42 @@ class AssessmentsService(BaseWebUiService):
     (objs_widget.tree_view.open_3bbs().select_generate().
      generate_asmts(asmt_tmpl_title=asmt_tmpl_title,
                     objs_under_asmt_titles=objs_under_asmt_titles))
+
+  def get_log_pane_validation_result(self, obj):
+    """Open assessment Info Page. Open Log Pane on Assessment Info Page.
+    And return result of validation of all items.
+    """
+    asmt_page = self.open_info_page_of_obj(obj)
+    return asmt_page.workflow_container.get_tab_object(
+        element.AssessmentTabContainer.ASMT_LOG_TAB)
+
+  def get_related_asmts_titles(self, obj):
+    """Open assessment Info Page. Open Related Assessments Tab on Assessment
+    Info Page. And return list of related Assessments Titles.
+    """
+    asmt_page = self.open_info_page_of_obj(obj=obj)
+    related_asmts_tab = asmt_page.workflow_container.get_tab_object(
+        element.AssessmentTabContainer.RELATED_ASMTS_TAB)
+    return related_asmts_tab.get_related_titles()
+
+  def get_related_issues_titles(self, obj):
+    """Open assessment Info Page. Open Open Related Issues Tab on Assessment
+    Info Page. And return list of related Issues Titles.
+    """
+    asmt_page = self.open_info_page_of_obj(obj=obj)
+    related_issues_tab = asmt_page.workflow_container.get_tab_object(
+        element.AssessmentTabContainer.RELATED_ISSUES_TAB)
+    return [issue[element.RelatedIssuesTab.TITLE.upper()]
+            for issue in related_issues_tab.get_items()]
+
+  def raise_issue(self, src_obj, issue_obj):
+    """Open assessment Info Page by 'src_obj'. Open Related Issues Tab on
+    Assessment Info Page and raise Issue.
+    """
+    asmt_page = self.open_info_page_of_obj(obj=src_obj)
+    related_issues_tab = asmt_page.workflow_container.get_tab_object(
+        element.AssessmentTabContainer.RELATED_ISSUES_TAB)
+    related_issues_tab.raise_issue(issue_entity=issue_obj)
 
 
 class ControlsService(SnapshotsWebUiService):
