@@ -48,3 +48,42 @@ class TestAssessmentsWorkflow(base.Test):
     assert expected_asmt == actual_asmt, (
         messages.AssertionMessages.
         format_err_msg_equal(expected_asmt, actual_asmt))
+
+  @pytest.mark.smoke_tests
+  def test_asmt_related_asmts(
+      self, new_programs_rest, new_control_rest,
+      map_new_control_rest_to_new_programs_rest, new_audits_rest,
+      new_assessments_rest, selenium
+  ):
+    """Test for checking Related Assessments. Map two Assessments to one
+    snapshot of control. And check second Assessment contains in "Related
+    Assessments" Tab of first Assessment. 3 Titles will be compared:
+    Assessment, Audit of Assessment, generic Control
+    """
+    expected_titles = [(new_assessments_rest[1].title,
+                        new_control_rest.title,
+                        new_audits_rest[1].title)]
+    asmt_service = webui_service.AssessmentsService(selenium)
+    asmt_service.map_objs_via_tree_view_item(
+        src_obj=new_audits_rest[0], dest_objs=[new_control_rest])
+    asmt_service.map_objs_via_tree_view_item(
+        src_obj=new_audits_rest[1], dest_objs=[new_control_rest])
+    related_asmts_objs = (webui_service.AssessmentsService(
+        selenium).get_related_asmts_titles(obj=new_assessments_rest[0]))
+    assert expected_titles == related_asmts_objs
+
+  @pytest.mark.smoke_tests
+  def test_raise_issue(
+      self, new_program_rest, new_audit_rest, new_assessment_rest, selenium
+  ):
+    """Test for checking raising Issues in Related Issues Tab. Open
+    Related Issues tab on Assessments Info page. Raise Issue with pre-defined
+    attributes via "raise issue" button. Compare expected Issue title and
+    actual issue_titles.
+    """
+    expected_issue = (entities_factory.IssuesFactory().create().repr_ui())
+    asmt_service = webui_service.AssessmentsService(selenium)
+    asmt_service.raise_issue(new_assessment_rest, expected_issue)
+    related_issues_titles = asmt_service.get_related_issues_titles(
+        obj=new_assessment_rest)
+    assert related_issues_titles == [expected_issue.title]
