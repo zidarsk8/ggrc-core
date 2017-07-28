@@ -25,7 +25,6 @@ import sqlalchemy as sa
 # from ggrc.app import app
 # from ggrc import settings, db
 # import ggrc_workflows.models as models
-# from ggrc_workflows import adjust_next_cycle_start_date
 # from ggrc_workflows.services.workflow_cycle_calculator import \
 #     get_cycle_calculator
 

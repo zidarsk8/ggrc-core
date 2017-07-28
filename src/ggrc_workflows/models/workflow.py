@@ -6,6 +6,9 @@
 This contains the basic Workflow object and a mixin for determining the state
 of the Objects that are mapped to any cycle tasks.
 """
+import itertools
+from dateutil import relativedelta
+
 from sqlalchemy import and_
 from sqlalchemy import orm
 
@@ -21,6 +24,7 @@ from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
 from ggrc_workflows.models import cycle
 from ggrc_workflows.models import cycle_task_group
+from ggrc_workflows.services.workflow_cycle_calculator import google_holidays
 
 
 class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
@@ -31,7 +35,14 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   __tablename__ = 'workflows'
   _title_uniqueness = False
 
-  VALID_STATES = [u"Draft", u"Active", u"Inactive"]
+  DRAFT = u"Draft"
+  ACTIVE = u"Active"
+  INACTIVE = u"Inactive"
+  VALID_STATES = [DRAFT, ACTIVE, INACTIVE]
+
+  @classmethod
+  def default_status(cls):
+    return cls.DRAFT
 
   notify_on_change = deferred(
       db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
@@ -85,6 +96,54 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
                             default=None), 'Workflow')
   repeat_multiplier = deferred(db.Column(db.Integer, nullable=False,
                                          default=0), 'Workflow')
+
+  @property
+  def min_task_start_date(self):
+    """Fetches non adjusted setup cycle start date based on TGT user's setup.
+
+    Args:
+        self: Workflow instance.
+
+    Returns:
+        Date when first cycle should be started based on user's setup.
+    """
+    tasks = itertools.chain(*[t.task_group_tasks for t in self.task_groups])
+    return min(t.start_date for t in tasks)
+
+  FRIDAY = 5
+
+  @classmethod
+  def first_work_day(cls, day):
+    holidays = google_holidays.GoogleHolidays()
+    while day.isoweekday() > cls.FRIDAY or day in holidays:
+      day -= relativedelta.relativedelta(days=1)
+    return day
+
+  def calc_next_adjusted_date(self, setup_date):
+    """Calculates adjusted date which are expected in next cycle.
+
+    Args:
+        setup_date: Date which was setup by user.
+
+    Returns:
+        Adjusted date which are expected to be in next Workflow cycle.
+    """
+    if self.repeat_every is None or self.unit is None:
+      return self.first_work_day(setup_date)
+    try:
+      key = {
+          self.WEEK_UNIT: "weeks",
+          self.MONTH_UNIT: "months",
+          self.DAY_UNIT: "days",
+      }[self.unit]
+    except KeyError:
+      raise ValueError("Invalid Workflow unit")
+    repeater = self.repeat_every * self.repeat_multiplier
+    calc_date = setup_date + relativedelta.relativedelta(
+        setup_date,
+        **{key: repeater}
+    )
+    return self.first_work_day(calc_date)
 
   @orm.validates('repeat_every')
   def validate_repeat_every(self, _, value):
