@@ -136,10 +136,9 @@
       // Needs refactoring: Should be removed and replaced with Routing!!!
       var isObjectBrowser = /^\/objectBrowser\/?$/.test(path);
 
-      // Remove info and task tabs from object-browser list of tabs
+      // Remove info tab from object-browser list of tabs
       if (isObjectBrowser) {
         defaults.splice(defaults.indexOf('info'), 1);
-        defaults.splice(defaults.indexOf('task'), 1);
       }
       return defaults;
     }
