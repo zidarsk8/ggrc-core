@@ -15,7 +15,7 @@ from ggrc.models.exceptions import ValidationError
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Base, CustomAttributable
 from ggrc.models.custom_attribute_definition import CustomAttributeMapable
-from ggrc.models.reflection import PublishOnly
+from ggrc.models import reflection
 from ggrc.models.relationship import Relatable
 from ggrc.models.utils import validate_option
 
@@ -53,14 +53,14 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
       'email',
       'name',
   ]
-  _publish_attrs = [
+  _api_attrs = reflection.ApiAttributes(
       'company',
       'email',
       'language',
       'name',
-      PublishOnly('object_people'),
-      PublishOnly('system_wide_role'),
-  ]
+      reflection.Attribute('object_people', create=False, update=False),
+      reflection.Attribute('system_wide_role', create=False, update=False),
+  )
   _sanitize_html = [
       'company',
       'name',

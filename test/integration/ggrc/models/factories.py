@@ -318,6 +318,7 @@ class AccessControlRoleFactory(ModelFactory):
   name = factory.LazyAttribute(
       lambda _: random_str(prefix="Access Control Role - ")
   )
+  non_editable = False
 
 
 class AccessControlRoleAdminFactory(AccessControlRoleFactory):
