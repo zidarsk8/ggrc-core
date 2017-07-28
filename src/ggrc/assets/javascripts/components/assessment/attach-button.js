@@ -14,6 +14,10 @@
     tag: tag,
     template: template,
     viewModel: {
+      canAttach: false,
+      isFolderAttached: false,
+      checksPassed: false,
+      error: {},
       instance: {},
       isAttachActionDisabled: false,
       onBeforeCreate: function (event) {
@@ -43,6 +47,62 @@
 
         if (this.attr('instance')) {
           this.attr('instance').dispatch('refreshInstance');
+        }
+      },
+      checkFolder: function () {
+        var self = this;
+
+        return this.findFolder().then(function (folder) {
+          if (folder) {
+            self.attr('isFolderAttached', true);
+          }
+          self.attr('canAttach', true);
+        }, function (err) {
+          console.log(err);
+          self.attr('error', err);
+          self.attr('canAttach', false);
+        }).always(function () {
+          self.attr('checksPassed', true);
+        });
+      },
+      findFolderId: function () {
+        var self = this;
+        var Audit = CMS.Models.Audit;
+        var auditId = this.attr('instance.audit.id');
+        var cached = Audit.findInCacheById(auditId);
+        var auditDfd = cached ? $.when(cached) : Audit.findOne({id: auditId});
+
+        return auditDfd.then(function (audit) {
+          var folder = audit.folders[0];
+
+          if (!folder) {
+            self.attr('canAttach', true);
+          }
+          return folder ? folder.id : undefined;
+        });
+      },
+      findFolder: function () {
+        var GFolder = CMS.Models.GDriveFolder;
+
+        return this.findFolderId().then(function (id) {
+          if (!id) {
+            return can.Deferred().resolve();
+          }
+
+          return GFolder.findOne({id: id});
+        });
+      }
+    },
+    events: {
+      inserted: function () {
+        var viewModel = this.viewModel;
+        var instance = viewModel.attr('instance');
+
+        if (Permission.is_allowed_for('update', instance) &&
+          !instance.archived) {
+          viewModel.checkFolder().always(function () {
+            viewModel.attr('hasPermissions', true);
+          });
         }
       }
     }
