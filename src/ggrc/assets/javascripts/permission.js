@@ -19,11 +19,15 @@
     },
     is: function (instance, args) {
       var value = Permission._resolve_permission_variable(args.value);
-      var property_value = instance[args.property_name];
-      if (property_value instanceof can.Stub) {
-        property_value = property_value.reify();
-      }
-      return value == property_value;
+      var propertyValue = _.reduce(args.property_name.split('.'),
+        function (obj, key) {
+          var value = obj.attr(key);
+          if (value instanceof can.Stub) {
+            value = value.reify();
+          }
+          return value;
+        }, instance);
+      return value == propertyValue;
     },
     'in': function (instance, args) {
       var value = Permission._resolve_permission_variable(args.value);
