@@ -40,8 +40,7 @@ class Common(object):
   HTML_LIST_CSS = (By.CSS_SELECTOR, 'ul')
   # xpath helper
   XPATH_NOT_HIDDEN = "[not(ancestor::section[contains(@class, 'hidden')])]"
-  INFO_WIDGET_XPATH = ("//section[starts-with(@class,'info')]" +
-                       XPATH_NOT_HIDDEN)
+  INFO_WIDGET_XPATH = "//section[contains(@class,'info')]" + XPATH_NOT_HIDDEN
   # import / export pages
   CONTENT = ".content"
   OPTION = "option"
@@ -584,7 +583,7 @@ class ModalCloneAudit(ModalCommonConfirmAction):
 class CommonWidgetInfo(object):
   """Common locators for Info widgets and Info panels."""
   _NOT_HIDDEN = Common.XPATH_NOT_HIDDEN
-  _INFO_WIDGET_XPATH = Common.INFO_WIDGET_XPATH + _NOT_HIDDEN
+  _INFO_WIDGET_XPATH = Common.INFO_WIDGET_XPATH
   _MAIN_HEADER_XPATH = "//div[contains(@class,'pane-header')]" + _NOT_HIDDEN
   _HEADERS_AND_VALUES = (_INFO_WIDGET_XPATH +
                          '//div[starts-with(./@class, "span")]//h6/..')
@@ -729,10 +728,16 @@ class WidgetInfoAssessment(WidgetInfoPanel):
   RELATED_ISSUES_CSS = (By.CSS_SELECTOR, " ".join(
       [_ASMT_PANEL, "related-objects[related-items-type='Issue']"]))
   ASMT_TAB_CONTAINER_CSS = (By.CSS_SELECTOR, "tab-container")
+  # state section
+  BUTTON_3BBS = (By.CSS_SELECTOR, ".btn-3bbps")
+  BUTTON_COMPLETE = (By.XPATH, "//button[contains(text(), 'Complete')]")
+  BUTTON_VERIFY = (By.XPATH, "//button[contains(text(), 'Verify')]")
+  BUTTON_REJECT = (By.XPATH, "//button[contains(text(), 'Reject')]")
 
-  class TabContainer(object):
-    TAB_CONTROLLER = (By.CSS_SELECTOR, "ul.nav.nav-tabs")
-    TAB_CONTENT = (By.CSS_SELECTOR, '.tab-pane.active')
+
+class TabContainer(object):
+  TAB_CONTROLLER = (By.CSS_SELECTOR, "ul.nav.nav-tabs")
+  TAB_CONTENT = (By.CSS_SELECTOR, '.tab-pane.active')
 
 
 class WidgetInfoAssessmentTemplate(WidgetInfoPanel):

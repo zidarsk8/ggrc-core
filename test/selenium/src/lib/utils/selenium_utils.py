@@ -33,6 +33,11 @@ def open_url(driver, url):
     driver.get(url)
 
 
+def refresh_page(driver):
+  """Refresh Page in current browser session"""
+  driver.refresh()
+
+
 def switch_to_new_window(driver):
   """Wait until new window will be opened, have the number of windows handles
   increase and then switch to last opened window.

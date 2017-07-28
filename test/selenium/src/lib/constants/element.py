@@ -223,6 +223,7 @@ class CommonAssessment(Common):
   STATE = Base.STATE
   CREATORS = "Creators"
   CREATORS_ = "Creator(s)"
+  COMMENTS = "Comments"
   ASSIGNEES = "Assignees"
   ASSIGNEES_ = "Assignee(s)"
   VERIFIERS = "Verifiers"

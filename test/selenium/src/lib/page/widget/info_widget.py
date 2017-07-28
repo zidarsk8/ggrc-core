@@ -5,7 +5,9 @@
 
 from lib import base
 from lib.constants import locator, objects, element, roles
+from lib.constants.locator import WidgetInfoAssessment
 from lib.element import widget_info, tab_containers
+from lib.element import widget_info
 from lib.page.modal import update_object
 from lib.utils import selenium_utils
 
@@ -310,6 +312,15 @@ class Assessments(InfoPanel):
         self.creators_entered_text, self.assignees_entered_text,
         self.verifiers_entered_text, self.mapped_objects_titles_text,
         self.code_entered_text, self.comments.scopes]
+
+  def click_complete(self):
+    base.Button(self._driver, WidgetInfoAssessment.BUTTON_COMPLETE).click()
+
+  def click_verify(self):
+    base.Button(self._driver, WidgetInfoAssessment.BUTTON_VERIFY).click()
+
+  def click_reject(self):
+    base.Button(self._driver, WidgetInfoAssessment.BUTTON_REJECT).click()
 
 
 class AssessmentTemplates(InfoPanel):

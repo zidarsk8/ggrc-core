@@ -106,3 +106,4 @@ class OrgGroups(CommonInfoDropdownSettings):
 class Assessments(CommonInfoDropdownSettings):
   """Assessments 3BBS button/dropdown settings on Info pages and Info panels.
   """
+  # _locators = locator.AssessmentsDropdown3bbsTreeView

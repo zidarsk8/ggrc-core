@@ -444,13 +444,22 @@ class AssessmentsService(BaseWebUiService):
     and if 'asmt_tmpl_obj' then to Assessment Template title, generate
     new Assessment(s).
     """
-    objs_under_asmt_titles = [obj_under.title for obj_under in
-                              objs_under_asmt]
+    objs_under_asmt_titles = [obj_under.title for obj_under in objs_under_asmt]
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     asmt_tmpl_title = asmt_tmpl_obj.title if asmt_tmpl_obj else None
     (objs_widget.tree_view.open_3bbs().select_generate().
      generate_asmts(asmt_tmpl_title=asmt_tmpl_title,
                     objs_under_asmt_titles=objs_under_asmt_titles))
+
+  def edit_obj_title_via_info_widget(self, src_obj):
+    """Open generic widget of object, open edit modal from drop down menu.
+    Modify current title and apply changes by pressing 'save and close' button
+    """
+    obj_info_page = self.open_info_page_of_obj(src_obj)
+    modal = obj_info_page.open_info_3bbs().select_edit()
+    modal.enter_title("Assessment " + string_utils.random_string(size=20))
+    modal.save_and_close()
+    return self
 
   def get_log_pane_validation_result(self, obj):
     """Open assessment Info Page. Open Log Pane on Assessment Info Page.
@@ -487,6 +496,24 @@ class AssessmentsService(BaseWebUiService):
     related_issues_tab = asmt_page.workflow_container.get_tab_object(
         element.AssessmentTabContainer.RELATED_ISSUES_TAB)
     related_issues_tab.raise_issue(issue_entity=issue_obj)
+
+  def complete_assessment(self, obj):
+    """Navigate to info page of object according to URL of object then find and
+    click 'Complete' button then return info page of object in new state"""
+    self.open_info_page_of_obj(obj).click_complete()
+    return self
+
+  def verify_assessment(self, obj):
+    """Navigate to info page of object according to URL of object then find and
+    click 'Verify' button then return info page of object in new state"""
+    self.open_info_page_of_obj(obj).click_verify()
+    return self
+
+  def reject_assessment(self, obj):
+    """Navigate to info page of object according to URL of object then find and
+    click 'Reject' button then return info page of object in new state"""
+    self.open_info_page_of_obj(obj).click_reject()
+    return self
 
 
 class ControlsService(SnapshotsWebUiService):
