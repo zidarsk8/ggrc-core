@@ -15,11 +15,7 @@
       </tree-people-list-field>
   {{/case}}
   {{#case 'last_assessment_date'}}
-    {{#if instance.snapshot}}
-      <last-assessment-date instance="instance"/>
-    {{else}}
-      {{localize_date instance.last_assessment_date}}
-    {{/if}}
+    {{localize_date instance.last_assessment_date}}
   {{/case}}
   {{#case 'status'}}
     {{#using status=instance.status}}
