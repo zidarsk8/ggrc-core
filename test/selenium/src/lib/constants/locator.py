@@ -526,6 +526,8 @@ class WidgetBarButtonAddDropdown(object):
         setattr(cls, object_, cls._Locator.get_dropdown_item(name))
   THREAD_ACTORS = _Locator.get_dropdown_item("threat_actor")
   WORKFLOW_TASKS = _Locator.get_dropdown_item("workflow_task")
+  ALL_MAPPABLE_WIDGETS_OBJS = (
+      By.CSS_SELECTOR, ".inner-nav-item a[data-toggle='unified-mapper']")
 
 
 class ObjectWidget(object):
@@ -890,6 +892,7 @@ class AdminTreeView(object):
 
 
 class UnifiedMapperTreeView(TreeView):
+  """Common locators for UnifiedMapper from Tree View"""
   MODAL = ".object-modal"
   HEADER = MODAL + " .list-header"
   ITEMS = MODAL + Common.TREE_ITEM
@@ -907,6 +910,7 @@ class BaseWidgetGeneric(object):
     class should look like. Note that same functionality can be
     implemented using properties though with more code."""
     def __init__(cls, *args):
+      # pylint: disable=invalid-name
       _WIDJET = "#{}_widget"
       _FILTER_BUTTON = _WIDJET + " tree-filter-input .tree-filter__actions"
       _FILTER_DROPDOWN = _WIDJET + " tree-status-filter"
