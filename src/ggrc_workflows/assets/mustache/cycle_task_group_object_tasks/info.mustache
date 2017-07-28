@@ -31,7 +31,7 @@
             </li>
 
 
-            {{#is_allowed 'delete' instance}}
+            {{#is_allowed 'delete' instance context='for'}}
               <li>
                 <a data-toggle="modal-ajax-deleteform" data-object-plural="{{model.table_plural}}" data-object-singular="{{model.model_singular}}" data-modal-reset="reset" data-modal-class="modal" data-object-id="{{instance.id}}" href="javascript://">
                   <i class="fa fa-trash"></i>
