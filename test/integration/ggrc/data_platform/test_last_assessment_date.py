@@ -33,6 +33,7 @@ import itertools
 from ggrc import models
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
+from integration.ggrc import generator
 from integration.ggrc.models import factories
 
 
@@ -57,6 +58,7 @@ class TestLastAssessmentDate(TestCase):
   def setUp(self):
     super(TestLastAssessmentDate, self).setUp()
     self.api = Api()
+    self.generator = generator.ObjectGenerator()
     self.client.get("/login")
     person = models.Person.query.first()
     admin_control = models.AccessControlRole.query.filter_by(
@@ -148,6 +150,38 @@ class TestLastAssessmentDate(TestCase):
         self.assertEqual(control.last_assessment_date, None)
 
     for snapshot in models.Snapshot.query.all():
+      if snapshot.revision.content["title"] in related_objects:
+        self.assertEqual(snapshot.last_assessment_date, finish_date)
+      else:
+        self.assertEqual(snapshot.last_assessment_date, None)
+
+  def test_snapshot_lad_on_new_audits(self):
+    """Test snapshot last assessment date for new audits."""
+
+    finish_date = datetime.datetime(2017, 2, 20, 13, 40, 0)
+    related_objects = {"Control_1", "Objective_0"}
+
+    with freezegun.freeze_time(finish_date):
+      asmt = models.Assessment.query.filter_by(title="Assessment_0").first()
+      self.api.put(asmt, {"status": "Completed"})
+
+      program = models.Program.query.first()
+      for control in models.Control.query.all():
+        factories.RelationshipFactory(source=program, destination=control)
+
+      self.generator.generate_object(models.Audit, data={
+          "title": "dummy",
+          "program": self.generator.create_stub(program),
+          "context": self.generator.create_stub(program.context),
+      })
+
+    audit = models.Audit.query.filter_by(title="dummy").first()
+    snapshots = models.Snapshot.query.filter(
+        models.Snapshot.parent_id == audit.id
+    ).all()
+    self.assertEqual(len(snapshots), 5)
+
+    for snapshot in snapshots:
       if snapshot.revision.content["title"] in related_objects:
         self.assertEqual(snapshot.last_assessment_date, finish_date)
       else:
