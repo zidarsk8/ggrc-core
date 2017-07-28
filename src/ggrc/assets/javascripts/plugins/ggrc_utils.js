@@ -721,6 +721,11 @@
         });
       }
 
+      if (instance.child_type === 'Control' ||
+        instance.child_type === 'Objective') {
+        content.last_assessment_date = instance.last_assessment_date;
+      }
+
       object = new model(content);
       // Update archived flag in content when audit is archived:
       if (instance.parent &&
