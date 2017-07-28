@@ -128,9 +128,8 @@ class TestCase(BaseTestCase, object):
     db.engine.execute(contexts.delete(contexts.c.id > 1))
     people = db.metadata.tables["people"]
     db.engine.execute(people.delete(people.c.email != "user@example.com"))
-    keep_roles = ["Admin"]
     acr = db.metadata.tables["access_control_roles"]
-    db.engine.execute(acr.delete(~acr.c.name.in_(keep_roles),))
+    db.engine.execute(acr.delete(~acr.c.non_editable))
     db.session.reindex_set = set()
     db.session.commit()
 
@@ -366,6 +365,7 @@ class TestCase(BaseTestCase, object):
     return snapshots
 
   def assert_roles(self, obj, **roles):
+    """Assert if persons have required role for object"""
     acl_person_roles = [
         (acl.ac_role.name, acl.person) for acl in obj.access_control_list
     ]

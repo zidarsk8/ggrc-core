@@ -13,6 +13,7 @@ from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
+from ggrc.models import reflection
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.fulltext.mixin import Indexed
 
@@ -30,12 +31,9 @@ class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
   VALID_STATES = BusinessObject.VALID_STATES + (FIXED, FIXED_AND_VERIFIED, )
 
   # REST properties
-  _publish_attrs = [
-      "audit"
-  ]
+  _api_attrs = reflection.ApiAttributes("audit")
 
   _aliases = {
-      "url": "Issue URL",
       "test_plan": {
           "display_name": "Remediation Plan"
       },
