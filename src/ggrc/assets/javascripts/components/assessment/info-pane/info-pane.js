@@ -121,10 +121,10 @@
         type = type || '';
         this.attr('isUpdating' + can.capitalize(type), true);
         GGRC.Utils.QueryAPI
-          .batchRequests(query)
+          .makeRequest({data: [query]})
           .done(function (response) {
-            var type = Object.keys(response)[0];
-            var values = response[type].values;
+            var type = Object.keys(response[0])[0];
+            var values = response[0][type].values;
             dfd.resolve(values);
           })
           .fail(function () {
