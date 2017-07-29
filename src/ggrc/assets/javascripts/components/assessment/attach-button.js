@@ -67,18 +67,16 @@
       },
       findFolderId: function () {
         var self = this;
-        var Audit = CMS.Models.Audit;
         var auditId = this.attr('instance.audit.id');
-        var cached = Audit.findInCacheById(auditId);
-        var auditDfd = cached ? $.when(cached) : Audit.findOne({id: auditId});
+        var foldersDfd = CMS.Models.ObjectFolder.findAll({
+          folderable_id: auditId,
+          folderable_type: 'Audit'});
 
-        return auditDfd.then(function (audit) {
-          var folder = audit.folders[0];
-
-          if (!folder) {
-            self.attr('canAttach', true);
+        return foldersDfd.then(function (folders) {
+          if (folders.length > 0) {
+            return folders[0].folder_id;
           }
-          return folder ? folder.id : undefined;
+          self.attr('canAttach', true);
         });
       },
       findFolder: function () {
