@@ -12,10 +12,12 @@ from werkzeug.exceptions import BadRequest
 
 from ggrc.query.exceptions import BadQueryException
 from ggrc.query.default_handler import DefaultHandler
+from ggrc.query.assessments_summary_handler import AssessmentsSummaryHandler
 from ggrc.login import login_required
 from ggrc.models.inflector import get_model
 from ggrc.services.common import etag
 from ggrc.utils import as_json
+from ggrc.utils import benchmark
 
 
 def build_collection_representation(model, description):
@@ -53,9 +55,13 @@ def get_handler_results(query):
   Returns:
     dict containing json serializable query results.
   """
-
-  query_handler = DefaultHandler(query)
-  return query_handler.get_results()
+  if AssessmentsSummaryHandler.match(query):
+    query_handler = AssessmentsSummaryHandler(query)
+  else:
+    query_handler = DefaultHandler(query)
+  name = query_handler.__class__.__name__
+  with benchmark("Get query Handler results from: {}".format(name)):
+    return query_handler.get_results()
 
 
 def get_objects_by_query():
