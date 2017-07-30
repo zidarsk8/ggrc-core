@@ -145,8 +145,7 @@ class QueryHelper(object):
     left = exp.get("left", None)
     if left is not None and isinstance(left, collections.Hashable):
       return set([left])
-    else:
-      return set()
+    return set()
 
   def _macro_expand_object_query(self, object_query):
     """Expand object query."""
@@ -308,7 +307,8 @@ class QueryHelper(object):
       delattr(flask.g, "similar_objects_query")
     return ids
 
-  def _get_limit(self, limit):
+  @classmethod
+  def _get_limit(cls, limit):
     """Get limit parameters for sqlalchemy."""
     try:
       first = int(limit[0])

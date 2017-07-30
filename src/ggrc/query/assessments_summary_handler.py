@@ -49,6 +49,7 @@ class AssessmentsSummaryHandler(DefaultHandler):
 
   @cached_property
   def _audit(self):
+    """Get the audit used in the query and verify its permissions."""
     audit_id = self.query[0]["filters"]["expression"]["ids"][0]
     audit = models.Audit.query.get(audit_id)
     if permissions.is_allowed_read_for(audit):
