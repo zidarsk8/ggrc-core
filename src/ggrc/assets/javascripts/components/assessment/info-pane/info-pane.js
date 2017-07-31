@@ -231,6 +231,23 @@
             });
           });
       },
+      updateAttributes: function (attrs, fields) {
+        can.Map.keys(fields).forEach(function (fieldId) {
+          var caValue =
+            attrs.filter(function (item) {
+              return item.id === Number(fieldId);
+            })[0];
+          if (!caValue) {
+            console.error('Corrupted Date: ', attrs);
+            return;
+          }
+          if (caValue.attr('values').length) {
+            caValue.attr('values')[0].attr('value', fields[fieldId]);
+          } else {
+            caValue.attr('values').push({value: fields[fieldId]});
+          }
+        });
+      },
       saveGlobalAttributes: function (event) {
         var self = this;
         var globalAttributes = event.globalAttributes;
@@ -238,27 +255,10 @@
           .refresh()
           .then(function () {
             var caValues = self.attr('instance.global_attributes');
+            self.updateAttributes(caValues, globalAttributes);
 
-            can.Map.keys(globalAttributes).forEach(function (fieldId) {
-              var caValue =
-                caValues.filter(function (item) {
-                  return item.id === Number(fieldId);
-                })[0];
-              if (!caValue) {
-                console.error('Corrupted Date: ', caValues);
-                return;
-              }
-              if (caValue.attr('values').length) {
-                caValue.attr('values')[0]
-                  .attr('value', globalAttributes[fieldId]);
-              } else {
-                caValue.attr('values')
-                  .push({value: globalAttributes[fieldId]});
-              }
-            });
-
-          return this.attr('instance').save();
-        });
+            return self.attr('instance').save();
+          });
       },
       saveFormFields: function (formFields) {
         var self = this;
@@ -266,22 +266,7 @@
           .refresh()
           .then(function () {
             var caValues = self.attr('instance.local_attributes');
-
-            can.Map.keys(formFields).forEach(function (fieldId) {
-              var caValue =
-                caValues.filter(function (item) {
-                  return item.id === Number(fieldId);
-                })[0];
-              if (!caValue) {
-                console.error('Corrupted Date: ', caValues);
-                return;
-              }
-              if (caValue.attr('values').length) {
-                caValue.attr('values')[0].attr('value', formFields[fieldId]);
-              } else {
-                caValue.attr('values').push({value: formFields[fieldId]});
-              }
-            });
+            self.updateAttributes(caValues, formFields);
 
             return self.attr('instance').save();
           });
