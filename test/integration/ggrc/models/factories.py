@@ -20,9 +20,9 @@ import factory
 
 from ggrc import db
 from ggrc import models
-
 from ggrc.access_control.role import AccessControlRole
 from ggrc.access_control.list import AccessControlList
+from ggrc_risks import models as risk_models
 
 from integration.ggrc.models.model_factory import ModelFactory
 from integration.ggrc_basic_permissions.models \
@@ -325,3 +325,14 @@ class AccessControlRoleAdminFactory(AccessControlRoleFactory):
   """Access Control Role Admin factory class"""
   mandatory = u"1"
   name = "Admin"
+
+
+class RiskFactory(TitledFactory):
+  """Risk factory class"""
+
+  class Meta:
+    model = risk_models.Risk
+
+  description = factory.LazyAttribute(
+      lambda _: random_str(prefix="Risk - ")
+  )
