@@ -391,8 +391,7 @@ def update_cycle_task_object_task_parent_state(obj, for_delete=False):
       models.CycleTaskGroupObjectTask.cycle_task_group_id ==
       obj.cycle_task_group_id,
       models.CycleTaskGroupObjectTask.id != obj.id
-  ).distinct(
-  ))
+  ).distinct().with_for_update())
   if not for_delete:
     child_statuses.add(obj.status)
   _update_parent_state(
@@ -411,8 +410,7 @@ def update_cycle_task_group_parent_state(obj):
   ).filter(
       models.CycleTaskGroup.cycle_id == obj.cycle_id,
       models.CycleTaskGroup.id != obj.id
-  ).distinct(
-  )) | {obj.status}
+  ).distinct().with_for_update()) | {obj.status}
   _update_parent_state(
       obj.cycle,
       child_statuses
