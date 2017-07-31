@@ -381,7 +381,7 @@ def _update_parent_state(parent, child_statuses):
   )
 
 
-def update_cycle_task_object_task_parent_state(obj):
+def update_cycle_task_object_task_parent_state(obj, for_delete=False):
   """Update cycle task group status for sent cycle task"""
   if obj.cycle.workflow.kind == "Backlog":
     return
@@ -392,7 +392,9 @@ def update_cycle_task_object_task_parent_state(obj):
       obj.cycle_task_group_id,
       models.CycleTaskGroupObjectTask.id != obj.id
   ).distinct(
-  )) | {obj.status}
+  ))
+  if not for_delete:
+    child_statuses.add(obj.status)
   _update_parent_state(
       obj.cycle_task_group,
       child_statuses
@@ -520,8 +522,10 @@ def handle_task_group_delete(sender, obj=None, src=None, service=None):  # noqa 
 @signals.Restful.model_deleted.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_delete(sender, obj=None,
                                                src=None, service=None):  # noqa pylint: disable=unused-argument
+  """Update cycle dates and statuses"""
   db.session.flush()
   update_cycle_dates(obj.cycle)
+  update_cycle_task_object_task_parent_state(obj, for_delete=True)
 
 
 @signals.Restful.model_put.connect_via(models.CycleTaskGroupObjectTask)
