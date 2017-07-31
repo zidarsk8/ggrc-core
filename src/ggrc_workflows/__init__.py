@@ -356,18 +356,19 @@ def update_cycle_task_child_state(obj):
           update_cycle_task_child_state(child)
 
 
-def _update_parent_state(obj, parent, child_statuses):
+def _update_parent_state(parent, child_statuses):
   """Util function, update status of sent parent, if it's allowed.
 
   New status based on sent object status and sent child_statuses"""
-  if not is_allowed_update(obj.__class__.__name__, obj.id, obj.context.id):
-    return
   old_status = parent.status
-  if obj.status in {"InProgress", "Declined"}:
+  if len(child_statuses) == 1:
+    new_status = child_statuses.pop()
+    if new_status == "Declined":
+      new_status = "InProgress"
+  elif {"InProgress", "Declined", "Assigned"} & child_statuses:
     new_status = "InProgress"
-  elif obj.status in {"Finished", "Verified", "Assigned"}:
-    in_same_status = len(child_statuses) == 1
-    new_status = child_statuses.pop() if in_same_status else old_status
+  else:
+    new_status = "Finished"
   if old_status == new_status:
     return
   parent.status = new_status
@@ -393,7 +394,6 @@ def update_cycle_task_object_task_parent_state(obj):
   ).distinct(
   )) | {obj.status}
   _update_parent_state(
-      obj,
       obj.cycle_task_group,
       child_statuses
   )
@@ -412,7 +412,6 @@ def update_cycle_task_group_parent_state(obj):
   ).distinct(
   )) | {obj.status}
   _update_parent_state(
-      obj,
       obj.cycle,
       child_statuses
   )
