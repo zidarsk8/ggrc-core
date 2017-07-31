@@ -450,8 +450,14 @@ def ensure_assignee_is_workflow_member(workflow, assignee):
     db.session.add(user_role)
 
 
+def start_end_date_validator(tgt):
+  if tgt.start_date > tgt.end_date:
+      raise ValueError('End date can not be behind Start date')
+
+
 @signals.Restful.model_put.connect_via(models.TaskGroupTask)
 def handle_task_group_task_put(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+  start_end_date_validator(obj)
   if inspect(obj).attrs.contact.history.has_changes():
     ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
 
@@ -464,6 +470,7 @@ def handle_task_group_task_put(sender, obj=None, src=None, service=None):  # noq
 
 @signals.Restful.model_posted.connect_via(models.TaskGroupTask)
 def handle_task_group_task_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+  start_end_date_validator(obj)
   ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
   if update_workflow_state(obj.task_group.workflow):
     db.session.add(obj.task_group.workflow)

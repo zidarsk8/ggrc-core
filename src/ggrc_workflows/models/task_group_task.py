@@ -5,6 +5,7 @@
 
 
 import datetime
+
 from sqlalchemy import orm
 from sqlalchemy import schema
 
@@ -72,7 +73,12 @@ class TaskGroupTask(mixins.WithContact,
       raise ValueError(u"Invalid type '{}'".format(value))
     return value
 
-  def validate_date(self, value):
+  # pylint: disable=unused-argument
+  @orm.validates("start_date", "end_date")
+  def validate_date(self, key, value):
+    """Validates date's itself correctness, start_ end_ dates relative to each
+    other correctness is checked with 'before_insert' hook
+    """
     if value is None:
       return
     if isinstance(value, datetime.datetime):
@@ -82,16 +88,6 @@ class TaskGroupTask(mixins.WithContact,
       return datetime.date(value.year + current_century * 100,
                            value.month,
                            value.day)
-    return value
-
-  @orm.validates("start_date", "end_date")
-  def validate_end_date(self, key, value):
-    value = self.validate_date(value)
-    if key == "start_date":
-      self._start_changed = True
-    if key == "end_date" and self._start_changed and self.start_date > value:
-      self._start_changed = False
-      raise ValueError("Start date can not be after end date.")
     return value
 
   _api_attrs = reflection.ApiAttributes(
