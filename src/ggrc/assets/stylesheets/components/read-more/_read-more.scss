@@ -57,6 +57,7 @@ read-more {
   read-more {
     .read-more__controls {
       box-shadow: -6px 0px 18px 7px $snapshotBgnd;
+      background: $snapshotBgnd;
 
       .read-more__btn {
         background-color: $snapshotBgnd;
@@ -64,13 +65,16 @@ read-more {
     }
   }
 }
-.mapped-snapshot-item:hover {
-  read-more {
-    .read-more__controls {
-      box-shadow: -6px 0px 18px 7px $shapshotBorder;
 
-      .read-more__btn {
-        background-color: $shapshotBorder;
+.mapped-objects__list {
+  .mapped-snapshot-item:hover {
+    read-more {
+      .read-more__controls {
+        box-shadow: -6px 0px 18px 7px $shapshotBorder;
+
+        .read-more__btn {
+          background-color: $shapshotBorder;
+        }
       }
     }
   }

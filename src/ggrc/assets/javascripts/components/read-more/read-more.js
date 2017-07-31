@@ -22,9 +22,7 @@
       define: {
         text: {
           type: 'string',
-          set: function (newValue) {
-            return GGRC.Utils.getPlainText(newValue);
-          }
+          value: ''
         },
         maxLinesNumber: {
           type: 'number',

@@ -36,16 +36,6 @@ describe('GGRC.Component.ReadMore', function () {
       expect(vm.attr('expanded')).toBe(true);
     });
   });
-  describe('set() of "text" attribute', function () {
-    it('sets plain text to attribute', function () {
-      var htmlText = '<p>test-text</p>';
-      var expectedResult = GGRC.Utils.getPlainText(htmlText);
-
-      vm.attr('text', htmlText);
-
-      expect(vm.attr('text')).toEqual(expectedResult);
-    });
-  });
   describe('set() of cssClass attribute', function () {
     it('returns empty string if viewModel.expanded is true', function () {
       vm.attr('expanded', true);
