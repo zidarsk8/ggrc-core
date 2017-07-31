@@ -24,7 +24,7 @@ from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
 from ggrc_workflows.models import cycle
 from ggrc_workflows.models import cycle_task_group
-from ggrc_workflows.services.workflow_cycle_calculator import google_holidays
+from ggrc_workflows.services import google_holidays
 
 
 class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
