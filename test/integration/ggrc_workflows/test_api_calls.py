@@ -1,6 +1,7 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+import datetime
 import unittest
 
 import ddt
@@ -11,6 +12,7 @@ from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
+from integration.ggrc_workflows import WorkflowTestCase
 from integration.ggrc_workflows.models import factories as wf_factories
 
 
@@ -255,6 +257,29 @@ class TestWorkflowsApiPost(TestCase):
     self.assertEqual(
         flag if flag is not None else True,
         all_models.Workflow.query.get(workflow_id).is_verification_needed)
+
+
+class TestTaskGroupTaskApiPost(WorkflowTestCase):
+  """
+  Tesk TestTaskGroupTask basic api actions
+  """
+  def test_create_tgt_correct_dates(self):
+    """Test case for correct tgt start_ end_ dates"""
+    response, _ = self.generator.generate_task_group_task(
+        data={"start_date": datetime.date.today(),
+              "end_date": datetime.date.today() + datetime.timedelta(days=4)}
+    )
+    self.assertEqual(response.status_code, 201)
+
+  def test_create_tgt_wrong_dates(self):
+    """Test case for tgt wrong start_ end_ dates"""
+    with self.assertRaises(Exception):
+      self.generator.generate_task_group_task(
+          data={
+              "start_date": datetime.date.today(),
+              "end_date": datetime.date.today() - datetime.timedelta(days=4)
+          }
+      )
 
 
 @ddt.ddt
