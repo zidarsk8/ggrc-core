@@ -3,7 +3,6 @@
 """
 Workflow related generators
 """
-import random
 import copy
 
 from datetime import date
@@ -83,8 +82,6 @@ class WorkflowsGenerator(Generator):
 
     default_start = self.random_date()
     default_end = self.random_date(default_start, date.today())
-    day_range = 5 if task_group.workflow.unit == "week" else 31
-
     obj_name = "task_group_task"
 
     tgt = TaskGroupTask(
@@ -93,10 +90,6 @@ class WorkflowsGenerator(Generator):
         title="tgt " + factories.random_str(),
         start_date=default_start,
         end_date=default_end,
-        relative_start_day=random.randrange(1, day_range),
-        relative_start_month=random.randrange(1, 12),
-        relative_end_day=random.randrange(1, day_range),
-        relative_end_month=random.randrange(1, 12),
         contact_id=1
     )
     obj_dict = self.obj_to_dict(tgt, obj_name)

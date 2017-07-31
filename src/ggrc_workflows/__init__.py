@@ -456,13 +456,8 @@ def handle_task_group_task_put(sender, obj=None, src=None, service=None):  # noq
     ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
 
   # If relative days were change we must update workflow next cycle start date
-  workflow_modifying_attrs = [
-      "relative_start_day", "relative_start_month",
-      "relative_end_day", "relative_end_month"]
-
   if any(getattr(inspect(obj).attrs, attr).history.has_changes()
-         for attr in workflow_modifying_attrs):
-    db.session.add(obj)
+         for attr in ["start_date", "end_date"]):
     if update_workflow_state(obj.task_group.workflow):
       db.session.add(obj.task_group.workflow)
 

@@ -26,34 +26,13 @@ class TestRecurringWorkflowRevisions(TestCase):
         user_role="Administrator")
     _, self.person_2 = self.object_generator.generate_person(
         user_role="Administrator")
-    self._create_test_cases()
 
-  @patch("ggrc.notifications.common.send_email")
-  def test_revisions(self, mock_mail):  # pylint: disable=unused-argument
-    with freeze_time("2015-04-01"):
-      _, workflow = self.wf_generator.generate_workflow(self.monthly_workflow)
-      self.wf_generator.activate_workflow(workflow)
-
-    event_count = Event.query.count()
-    revision_query = Revision.query.filter_by(
-        resource_type='CycleTaskGroupObjectTask',
-    )
-    revision_count = revision_query.count()
-    # cycle starts on monday - 6th, and not on 5th
-    with freeze_time("2015-04-03"):
-      start_recurring_cycles()
-
-    self.assertEqual(event_count + 1, Event.query.count())
-    self.assertNotEqual(revision_count, revision_query.count())
-
-  def _create_test_cases(self):
     def person_dict(person_id):
       return {
           "href": "/api/people/%d" % person_id,
           "id": person_id,
           "type": "Person"
       }
-
     self.monthly_workflow = {
         "title": "test monthly wf notifications",
         "notify_on_change": True,
@@ -68,14 +47,10 @@ class TestRecurringWorkflowRevisions(TestCase):
                 "title": "task 1",
                 "description": "some task",
                 "contact": person_dict(self.person_1.id),
-                "relative_start_day": 5,
-                "relative_end_day": 25,
             }, {
                 "title": "task 2",
                 "description": "some task",
                 "contact": person_dict(self.person_1.id),
-                "relative_start_day": 10,
-                "relative_end_day": 21,
             }],
             "task_group_objects": self.random_objects[:2]
         }, {
@@ -85,15 +60,28 @@ class TestRecurringWorkflowRevisions(TestCase):
                 "title": "task 1 in tg 2",
                 "description": "some task",
                 "contact": person_dict(self.person_1.id),
-                "relative_start_day": 15,
-                "relative_end_day": 15,
             }, {
                 "title": "task 2 in tg 2",
                 "description": "some task",
                 "contact": person_dict(self.person_2.id),
-                "relative_start_day": 15,
-                "relative_end_day": 28,
             }],
             "task_group_objects": []
         }]
     }
+
+  @patch("ggrc.notifications.common.send_email")
+  def test_revisions(self, mock_mail):  # pylint: disable=unused-argument
+    with freeze_time("2015-04-01"):
+      _, workflow = self.wf_generator.generate_workflow(self.monthly_workflow)
+      self.wf_generator.activate_workflow(workflow)
+    event_count = Event.query.count()
+    revision_query = Revision.query.filter_by(
+        resource_type='CycleTaskGroupObjectTask',
+    )
+    revision_count = revision_query.count()
+    # cycle starts on monday - 6th, and not on 5th
+    with freeze_time("2015-04-03"):
+      start_recurring_cycles()
+
+    self.assertEqual(event_count + 1, Event.query.count())
+    self.assertNotEqual(revision_count, revision_query.count())

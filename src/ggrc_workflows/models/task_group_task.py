@@ -4,23 +4,26 @@
 """A module containing the workflow TaskGroupTask model."""
 
 
-from datetime import date
-from datetime import datetime
+import datetime
 from sqlalchemy import orm
 from sqlalchemy import schema
 
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
-from ggrc.models.mixins import Slugged, Titled, Described, WithContact
+from ggrc.models import mixins
 from ggrc.models.types import JsonType
 from ggrc.models import reflection
-from ggrc_workflows.models.mixins import RelativeTimeboxed
 from ggrc_workflows.models.task_group import TaskGroup
 
 
-class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
-                    Slugged, Indexed, db.Model):
+class TaskGroupTask(mixins.WithContact,
+                    mixins.Titled,
+                    mixins.Described,
+                    mixins.Slugged,
+                    mixins.Timeboxed,
+                    Indexed,
+                    db.Model):
   """Workflow TaskGroupTask model."""
 
   __tablename__ = 'task_group_tasks'
@@ -32,7 +35,7 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
 
   @classmethod
   def default_task_type(cls):
-    return "text"
+    return cls.TEXT
 
   @classmethod
   def generate_slug_prefix_for(cls, obj):
@@ -55,7 +58,10 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
   response_options = db.Column(
       JsonType(), nullable=False, default=[])
 
-  VALID_TASK_TYPES = ['text', 'menu', 'checkbox']
+  TEXT = 'text'
+  MENU = 'menu'
+  CHECKBOX = 'checkbox'
+  VALID_TASK_TYPES = [TEXT, MENU, CHECKBOX]
 
   @orm.validates('task_type')
   def validate_task_type(self, key, value):
@@ -67,12 +73,15 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
     return value
 
   def validate_date(self, value):
-    if isinstance(value, datetime):
+    if value is None:
+      return
+    if isinstance(value, datetime.datetime):
       value = value.date()
-    if value is not None and value.year <= 1900:
-      current_century = date.today().year / 100 * 100
-      year = current_century + value.year % 100
-      return date(year, value.month, value.day)
+    if value < datetime.date(100, 1, 1):
+      current_century = datetime.date.today().year / 100
+      return datetime.date(value.year + current_century * 100,
+                           value.month,
+                           value.day)
     return value
 
   @orm.validates("start_date", "end_date")
@@ -88,10 +97,6 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
   _api_attrs = reflection.ApiAttributes(
       'task_group',
       'sort_index',
-      'relative_start_month',
-      'relative_start_day',
-      'relative_end_month',
-      'relative_end_day',
       'object_approval',
       'task_type',
       'response_options'
@@ -108,14 +113,7 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
           "mandatory": True,
       },
       "secondary_contact": None,
-      "start_date": None,
-      "end_date": None,
-      "task_group": {
-          "display_name": "Task Group",
-          "mandatory": True,
-          "filter_by": "_filter_by_task_group",
-      },
-      "relative_start_date": {
+      "start_date": {
           "display_name": "Start",
           "mandatory": True,
           "description": (
@@ -129,7 +127,7 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
               "'mm/dd' for yearly workflows"
           ),
       },
-      "relative_end_date": {
+      "end_date": {
           "display_name": "End",
           "mandatory": True,
           "description": (
@@ -142,6 +140,11 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
               "e.g. feb/may/aug/nov 17\n"
               "'mm/dd' for yearly workflows"
           ),
+      },
+      "task_group": {
+          "display_name": "Task Group",
+          "mandatory": True,
+          "filter_by": "_filter_by_task_group",
       },
       "task_type": {
           "display_name": "Task Type",
@@ -172,8 +175,6 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
     columns = [
         'title', 'description',
         'task_group', 'sort_index',
-        'relative_start_month', 'relative_start_day',
-        'relative_end_month', 'relative_end_day',
         'start_date', 'end_date',
         'contact', 'modified_by',
         'task_type', 'response_options',
