@@ -25,27 +25,26 @@ class AssessmentsSummaryHandler(DefaultHandler):
   @classmethod
   def match(cls, query):
     """Check if the given query matches current handler."""
-    try:
-      assert len(query) == 1
-      query = query[0]
-      audit_ids = query["filters"]["expression"]["ids"]
-      expected = {
-          "object_name": "Assessment",
-          "filters": {
-              "expression": {
-                  "object_name": "Audit",
-                  "op": {"name": "relevant"},
-                  "ids": audit_ids},
-              "keys": [],
-              "order_by": {"keys": [], "order": "", "compare": None}},
-          "fields": ["status", "verified"]
-      }
-      assert isinstance(audit_ids, list)
-      assert len(audit_ids) == 1
-      assert query == expected
-      return True
-    except (AssertionError, KeyError):
+    if len(query) != 1:
       return False
+    query = query[0]
+    audit_ids = query["filters"]["expression"]["ids"]
+    if not isinstance(audit_ids, list) or len(audit_ids) != 1:
+      return False
+    expected = {
+        "object_name": "Assessment",
+        "filters": {
+            "expression": {
+                "object_name": "Audit",
+                "op": {"name": "relevant"},
+                "ids": audit_ids},
+            "keys": [],
+            "order_by": {"keys": [], "order": "", "compare": None}},
+        "fields": ["status", "verified"]
+    }
+    if query == expected:
+      return False
+    return True
 
   @cached_property
   def _audit(self):
