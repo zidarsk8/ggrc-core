@@ -236,20 +236,10 @@
         var that = this;
 
         return files.map(function (file) {
-          var adminRole = _.filter(GGRC.access_control_roles, {
-            object_type: 'Document',
-            name: 'Admin'
-          });
           return new CMS.Models.Document({
             context: that.instance.context || {id: null},
             title: file.title,
-            link: file.alternateLink,
-            access_control_list: adminRole ?
-              [{
-                ac_role_id: adminRole[0].id,
-                person: {type: 'Person', id: GGRC.current_user.id}
-              }] :
-              []
+            link: file.alternateLink
           }).save().then(function (doc) {
             var objectDoc;
 
