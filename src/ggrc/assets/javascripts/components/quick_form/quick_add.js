@@ -192,9 +192,7 @@
                 .done(function () {
                   var instance = this.viewModel.attr('instance');
                   el.trigger('modal:success', join_object);
-                  this.viewModel
-                    .attr('parent_instance')
-                    .dispatch('refreshInstance');
+
                   this.viewModel.dispatch({
                     type: 'afterCreate',
                     item: instance
