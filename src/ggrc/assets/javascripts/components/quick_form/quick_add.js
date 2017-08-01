@@ -53,7 +53,8 @@
           document_type: CMS.Models.Document.URL,
           owners: [{type: 'Person', id: GGRC.current_user.id}],
           created_at: new Date(),
-          isDraft: true
+          isDraft: true,
+          _stamp: Date.now()
         };
         this.viewModel.dispatch({type: 'beforeCreate', items: [attrs]});
         // We are not validating the URL because application can locally we can
@@ -189,11 +190,15 @@
             this.bindXHRToButton(
               join_object.save()
                 .done(function () {
+                  var instance = this.viewModel.attr('instance');
                   el.trigger('modal:success', join_object);
                   this.viewModel
                     .attr('parent_instance')
                     .dispatch('refreshInstance');
-                  this.viewModel.dispatch('afterCreate');
+                  this.viewModel.dispatch({
+                    type: 'afterCreate',
+                    item: instance
+                  });
                 }.bind(this)), el);
           }.bind(this))
           .always(function () {

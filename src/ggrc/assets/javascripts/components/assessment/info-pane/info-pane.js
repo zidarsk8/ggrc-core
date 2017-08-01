@@ -156,6 +156,19 @@
           this.attr(type).replace(this['load' + can.capitalize(type)]());
         }.bind(this));
       },
+      afterCreate: function (event, type) {
+        var instance = event.item;
+        var items = this.attr(type);
+
+        this.attr('isUpdating' + can.capitalize(type), false);
+        items.replace(items.map(function (item) {
+          if (item._stamp === instance._stamp) {
+            instance.attr('isDraft', false);
+            return instance;
+          }
+          return item;
+        }));
+      },
       removeItem: function (event, type) {
         var item = event.item;
         var index = this.attr(type).indexOf(item);
