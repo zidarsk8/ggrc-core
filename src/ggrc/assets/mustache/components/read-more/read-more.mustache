@@ -5,11 +5,13 @@
 <div class="read-more">
   {{#if text}}
       <div class="read-more__body {{cssClass}}">
-        {{{text}}}
+        <div>
+            {{{text}}}
+        </div>
       </div>
       {{#if overflowing}}
         <div class="read-more__controls">
-            <a can-click="toggle" class="read-more__btn">{{btnText}}</a>
+            <a ($click)="toggle(%event)" class="read-more__btn">{{btnText}}</a>
         </div>
       {{/if}}
   {{else}}

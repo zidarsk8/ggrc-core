@@ -21,17 +21,17 @@ describe('GGRC.Component.ReadMore', function () {
     });
 
     it('calls stopPropagation()', function () {
-      vm.toggle(null, null, eventMock);
+      vm.toggle(eventMock);
 
       expect(eventMock.stopPropagation).toHaveBeenCalled();
     });
 
     it('switchs expanded attribute', function () {
       vm.attr('expanded', true);
-      vm.toggle(null, null, eventMock);
+      vm.toggle(eventMock);
 
       expect(vm.attr('expanded')).toBe(false);
-      vm.toggle(null, null, eventMock);
+      vm.toggle(eventMock);
 
       expect(vm.attr('expanded')).toBe(true);
     });
