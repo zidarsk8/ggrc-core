@@ -15,13 +15,19 @@
   {value}="value"
   {type}="type"
   {with-read-more}="withReadMore">
-    <confirm-inline-control-title
-      (set-edit-mode-inline)="setEditModeInline(%event)"
+    <confirm-edit-action
+      (set-edit-mode)="setEditModeInline(%event)"
       (set-in-progress)="setInProgressState()"
       {is-edit-icon-denied}="isEditIconDenied"
       {instance}="instance"
       {on-state-change-dfd}="onStateChangeDfd"
       {edit-mode}="editMode">
-        <content></content>
-    </confirm-inline-control-title>
+        <base-inline-control-title
+          class="inline__header"
+          {edit-mode}="editMode"
+          {is-edit-icon-denied}="isEditIconDenied"
+          (set-edit-mode-inline)="confirmEdit()">
+            <content></content>
+        </base-inline-control-title>
+    </confirm-edit-action>
 </inline-edit-control>

@@ -80,18 +80,9 @@
       }
     }
   }
-
-  &__toggle {
-    margin-bottom: 2em;
-    &--hidden {
-      display: none;
-    }
-  }
 }
 
 .create-form {
-  display: none;
-
   &__layout {
     display: inline-block;
   }
@@ -134,9 +125,5 @@
 
   &__cancel {
     border-left: none;
-  }
-
-  &--visible {
-    display: block;
   }
 }
