@@ -167,7 +167,7 @@ class CustomAttributable(object):
         mapping_type = definition.attribute_type[4:]
       for val in data['values']:
         attr_val = val['value']
-        if mapping_type:
+        if mapping_type and attr_val is not None:
           attr_val = "{}:{}".format(mapping_type, attr_val)
         if val.get("id"):
           vals[int(val['id'])].attribute_value = attr_val
