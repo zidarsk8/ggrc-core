@@ -19,7 +19,14 @@ from .utils import validate_option
 from .track_object_state import HasObjectState
 
 
-class Directive(HasObjectState, LastDeprecatedTimeboxed, PublicDocumentable,
+# NOTE: The PublicDocumentable mixin is not applied directly to the Directive
+# base class, but instead to all of its specialized subclasses. The reason for
+# this is the PublicDocumentable's declared attribute `documents` that builds a
+# dynamic DB relationship based on the class name, and thus the attribute needs
+# to be run in the context of each particular subclass.
+# (of course, if there is a nice way of overriding/customizing declared
+# attributes in subclasses, we might want to use that approach)
+class Directive(HasObjectState, LastDeprecatedTimeboxed,
                 BusinessObject, db.Model):
   __tablename__ = 'directives'
 
@@ -138,7 +145,7 @@ class Directive(HasObjectState, LastDeprecatedTimeboxed, PublicDocumentable,
 
 # FIXME: For subclasses, restrict kind
 class Policy(Roleable, CustomAttributable, Relatable,
-             Personable, Directive, Indexed):
+             Personable, PublicDocumentable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Policy'
   }
@@ -150,13 +157,18 @@ class Policy(Roleable, CustomAttributable, Relatable,
       "Product Policy", "Contract-Related Policy", "Company Controls Policy"
   ])
 
+  _aliases = {
+      "document_url": None,
+      "document_evidence": None,
+  }
+
   @validates('meta_kind')
   def validates_meta_kind(self, key, value):
     return 'Policy'
 
 
 class Regulation(Roleable, CustomAttributable, Relatable,
-                 Personable, Directive, Indexed):
+                 Personable, PublicDocumentable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Regulation'
   }
@@ -167,6 +179,8 @@ class Regulation(Roleable, CustomAttributable, Relatable,
 
   _aliases = {
       "kind": None,
+      "document_url": None,
+      "document_evidence": None,
   }
 
   @validates('meta_kind')
@@ -175,7 +189,7 @@ class Regulation(Roleable, CustomAttributable, Relatable,
 
 
 class Standard(Roleable, CustomAttributable, Relatable,
-               Personable, Directive, Indexed):
+               Personable, PublicDocumentable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Standard'
   }
@@ -186,6 +200,8 @@ class Standard(Roleable, CustomAttributable, Relatable,
 
   _aliases = {
       "kind": None,
+      "document_url": None,
+      "document_evidence": None,
   }
 
   @validates('meta_kind')
@@ -194,7 +210,7 @@ class Standard(Roleable, CustomAttributable, Relatable,
 
 
 class Contract(Roleable, CustomAttributable, Relatable,
-               Personable, Directive, Indexed):
+               Personable, PublicDocumentable, Directive, Indexed):
   __mapper_args__ = {
       'polymorphic_identity': 'Contract'
   }
@@ -205,6 +221,8 @@ class Contract(Roleable, CustomAttributable, Relatable,
 
   _aliases = {
       "kind": None,
+      "document_url": None,
+      "document_evidence": None,
   }
 
   @validates('meta_kind')

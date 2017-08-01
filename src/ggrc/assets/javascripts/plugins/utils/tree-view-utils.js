@@ -406,9 +406,9 @@
               relevant,
               subTreeFields);
 
-            if ((SnapshotUtils.isSnapshotParent(relevant.type) ||
-              SnapshotUtils.isInScopeModel(relevant.type)) &&
-              SnapshotUtils.isSnapshotModel(params.object_name)) {
+            if (SnapshotUtils.isSnapshotRelated(
+                relevant.type,
+                params.object_name)) {
               params = SnapshotUtils.transformQuery(params);
             }
 
@@ -511,13 +511,23 @@
           showMore: false
         });
       } else {
-        countQuery = QueryAPI.buildCountParams(models, relevant, filter);
+        countQuery = QueryAPI.buildCountParams(models, relevant, filter)
+          .map(function (param) {
+            if (SnapshotUtils.isSnapshotRelated(
+                relevant.type,
+                param.object_name)) {
+              param = SnapshotUtils.transformQuery(param);
+            }
+            return param;
+          });
 
         result = QueryAPI.makeRequest({data: countQuery})
           .then(function (response) {
             var total = 0;
             var showMore = models.some(function (model, index) {
-              var count = response[index][model].total;
+              var count = response[index][model] ?
+                response[index][model].total :
+                response[index].Snapshot.total;
 
               if (!count) {
                 return false;
@@ -577,7 +587,7 @@
       var relates = CurrentPage.related.attr(instance.type);
       var result = true;
       var instanceId = SnapshotUtils.isSnapshot(instance) ?
-        instance.snapshot.child_id :
+        instance.snapshot.id :
         instance.id;
 
       if (needToSplit) {

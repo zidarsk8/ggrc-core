@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Modals for map objects."""
 
-from lib import base
+from lib import base, decorator
 from lib.constants import locator
 from lib.utils import filter_utils, selenium_utils
 
@@ -25,14 +25,22 @@ class CommonUnifiedMapperModal(base.Modal):
         driver, self._locators.FILTER_BY_STATE_DROPDOWN)
     self.tree_view = base.UnifiedMapperTreeView(driver, obj_name=obj_name)
 
+  def get_available_to_map_obj_aliases(self):
+    """Return texts of all objects available to map via UnifiedMapper."""
+    # pylint: disable=invalid-name
+    return [opt.get_attribute("label")
+            for opt in self.obj_type_dropdown.find_options()]
+
+  @decorator.lazy_property
+  def obj_type_dropdown(self):
+    return base.DropdownStatic(self._driver, self._locators.OBJ_TYPE_DROPDOWN)
+
   def _select_dest_obj_type(self, obj_name):
     """Open dropdown and select element according to destination object name.
     If is_asmts_generation then TextFilterDropdown, else DropdownStatic.
     """
     if obj_name:
-      obj_type_dropdown = base.DropdownStatic(
-          self._driver, self._locators.OBJ_TYPE_DROPDOWN)
-      obj_type_dropdown.select(obj_name)
+      self.obj_type_dropdown.select(obj_name)
 
   def _filter_dest_objs_via_expression_by_titles(self, objs_titles):
     """Enter expression is like 'title=obj1_title or title=obj2_title' into
@@ -101,16 +109,10 @@ class MapObjectsModal(CommonUnifiedMapperModal):
   """Modal for map objects."""
   _locators = locator.ModalMapObjects
 
-  def __init__(self, driver, obj_name):
-    super(MapObjectsModal, self).__init__(driver, obj_name)
-
 
 class SearchObjectsModal(CommonUnifiedMapperModal):
   """Modal for search objects."""
   _locators = locator.ModalMapObjects
-
-  def __init__(self, driver, obj_name):
-    super(SearchObjectsModal, self).__init__(driver, obj_name)
 
 
 class GenerateAssessmentsModal(CommonUnifiedMapperModal):
