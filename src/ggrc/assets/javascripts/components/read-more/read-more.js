@@ -43,7 +43,7 @@
       btnText: function () {
         return this.attr('expanded') ? readLess : readMore;
       },
-      toggle: function (viewModel, el, ev) {
+      toggle: function (ev) {
         ev.stopPropagation();
         this.attr('expanded', !this.attr('expanded'));
       },
@@ -59,21 +59,22 @@
             (this.attr('lineHeight') * this.attr('maxLinesNumber'));
         }
         this.attr('overflowing', result);
+      },
+      checkOverflowing: function (el) {
+        var $element = $(el).find('.read-more__body');
+        var element = $element[0];
+
+        this.attr('lineHeight',
+          parseInt($element.css('line-height'), 10));
+
+        if (element) {
+          this.isOverflowing(element);
+        }
       }
     },
     events: {
-      inserted: function () {
-        var $element = $(this.element).find('.read-more__body');
-
-        this.viewModel.attr('lineHeight',
-          parseInt($element.css('line-height'), 10));
-      },
-      '{element} mouseover': function (ev) {
-        var element = $(this.element).find('.read-more__body')[0];
-
-        if (element) {
-          this.viewModel.isOverflowing(element);
-        }
+      '{element} mouseover': function () {
+        this.viewModel.checkOverflowing(this.element);
       }
     }
   });
