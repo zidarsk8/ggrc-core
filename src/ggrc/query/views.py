@@ -4,6 +4,7 @@
 """This module contains logic to handle '/query' endpoint."""
 
 import time
+import logging
 from wsgiref.handlers import format_date_time
 
 from flask import request
@@ -18,6 +19,14 @@ from ggrc.models.inflector import get_model
 from ggrc.services.common import etag
 from ggrc.utils import as_json
 from ggrc.utils import benchmark
+
+
+logger = logging.getLogger()
+
+
+OPTIMIZED_HANDLERS = [
+    AssessmentsSummaryHandler,
+]
 
 
 def build_collection_representation(model, description):
@@ -55,10 +64,19 @@ def get_handler_results(query):
   Returns:
     dict containing json serializable query results.
   """
-  if AssessmentsSummaryHandler.match(query):
-    query_handler = AssessmentsSummaryHandler(query)
-  else:
-    query_handler = DefaultHandler(query)
+  handler_class = DefaultHandler
+  for optimized_handler in OPTIMIZED_HANDLERS:
+    try:
+      if optimized_handler.match(query):
+        handler_class = optimized_handler
+        break
+    except Exception:  # pylint: disable=broad-except
+      # No exception in the query matcher should affect the response of the
+      # request. We need to safely fallback to default query handler if
+      # anything happens.
+      logger.warning("Error matching %s handler.", optimized_handler.__name__)
+
+  query_handler = handler_class(query)
   name = query_handler.__class__.__name__
   with benchmark("Get query Handler results from: {}".format(name)):
     return query_handler.get_results()
