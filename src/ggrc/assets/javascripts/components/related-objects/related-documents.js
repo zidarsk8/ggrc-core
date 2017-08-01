@@ -133,11 +133,7 @@
           context: this.instance.context || new CMS.Models.Context({
             id: null
           }),
-          document_type: this.documentType,
-          owners: [{
-            type: 'Person',
-            id: GGRC.current_user.id
-          }]
+          document_type: this.documentType
         });
         return document;
       },
