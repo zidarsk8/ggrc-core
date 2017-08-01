@@ -10,10 +10,20 @@ from ggrc import login
 from ggrc.extensions import get_extension_instance
 
 
+from enum import Enum
+
+
+class SystemWideRoles(Enum):
+  Editor = "Editor"
+  Administrator = "Administrator"
+  Reader = "Reader"
+  NoAccess = "No Access"
+
+
 SYSTEM_WIDE_READ_ROLES = {
-    "Editor",
-    "Administrator",
-    "Reader",
+    SystemWideRoles.Administrator,
+    SystemWideRoles.Editor,
+    SystemWideRoles.Reader,
 }
 
 
@@ -55,7 +65,8 @@ def is_allowed_create_for(instance):
 def _system_wide_read():
   """Check if user has system wide read access to all objects."""
   user = login.get_current_user()
-  system_wide_role = getattr(user, "system_wide_role", "No Access")
+  system_wide_role = getattr(user, "system_wide_role",
+                             SystemWideRoles.NoAccess)
   return system_wide_role in SYSTEM_WIDE_READ_ROLES
 
 
