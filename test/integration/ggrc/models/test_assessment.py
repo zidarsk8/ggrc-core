@@ -161,6 +161,7 @@ class TestAssessment(ggrc.TestCase):
 
 
 @base.with_memcache
+@ddt.ddt
 class TestAssessmentUpdates(ggrc.TestCase):
   """ Test various actions on Assessment updates """
 
@@ -288,6 +289,171 @@ class TestAssessmentUpdates(ggrc.TestCase):
         new_state,
         content.json['assessments_collection']['assessments'][0]['status']
     )
+
+  @ddt.data(
+      ('Map:Person', None, 'Person', factories.PersonFactory),
+  )
+  @ddt.unpack
+  def test_update_local_mapped_cav(self, cad_type, choices, cav_value,
+                                   obj_factory):
+    """Test update local mapped CAVs with empty value."""
+    with factories.single_commit():
+      obj_id = obj_factory().id
+      asmt = factories.AssessmentFactory()
+      local_cav = factories.CustomAttributeValueFactory(
+          attributable=asmt,
+          attribute_value=cav_value,
+          attribute_object_id=obj_id,
+          custom_attribute=factories.CustomAttributeDefinitionFactory(
+              definition_type='assessment',
+              definition_id=asmt.id,
+              attribute_type=cad_type,
+              multi_choice_options=choices,
+          )
+      )
+      local_cav_custom_attribute_id = local_cav.custom_attribute_id
+      local_cav_id = local_cav.id
+
+    # Check two scenarios: update with empty value and
+    # update back with non-empty test data
+    for update_val, results in [
+        (None, [None, None]),
+        (obj_id, [cav_value, obj_id])
+    ]:
+      response = self.api.put(asmt, {
+          'local_attributes': [{
+              'id': local_cav_custom_attribute_id,
+              'values': [{'id': local_cav_id, 'value': update_val}]
+          }],
+      })
+      self.assert200(response)
+      local_cav = all_models.CustomAttributeValue.query.get(local_cav_id)
+      self.assertEqual(
+          results,
+          [local_cav.attribute_value, local_cav.attribute_object_id]
+      )
+
+  @ddt.data(
+      ('Map:Person', None, 'Person', factories.PersonFactory),
+  )
+  @ddt.unpack
+  def test_update_global_mapped_cav(self, cad_type, choices, cav_value,
+                                    obj_factory):
+    """Test update global mapped CAVs with empty value."""
+    with factories.single_commit():
+      obj_id = obj_factory().id
+      asmt = factories.AssessmentFactory()
+      global_cav = factories.CustomAttributeValueFactory(
+          attributable=asmt,
+          attribute_value=cav_value,
+          attribute_object_id=obj_id,
+          custom_attribute=factories.CustomAttributeDefinitionFactory(
+              definition_type='assessment',
+              attribute_type=cad_type,
+              multi_choice_options=choices,
+          )
+      )
+      global_cav_custom_attribute_id = global_cav.custom_attribute_id
+      global_cav_id = global_cav.id
+    # Check two scenarios: update with empty value and
+    # update back with non-empty test data
+    for update_val, results in [
+        (None, [None, None]),
+        (obj_id, [cav_value, obj_id])
+    ]:
+      response = self.api.put(asmt, {
+          'global_attributes': [{
+              'id': global_cav_custom_attribute_id,
+              'values': [{'id': global_cav_id, 'value': update_val}]
+          }],
+      })
+      self.assert200(response)
+      global_cav = all_models.CustomAttributeValue.query.get(global_cav_id)
+      self.assertEqual(
+          results,
+          [global_cav.attribute_value, global_cav.attribute_object_id]
+      )
+
+  @ddt.data(
+      ('Text', None, 'Some text'),
+      ('Rich Text', None, '<p>Some text</p>'),
+      ('Date', None, '2017-08-01'),
+      ('Checkbox', None, '1'),
+      ('Dropdown', 'case1,case2,case3', 'case1'),
+  )
+  @ddt.unpack
+  def test_empty_update_local_cav(self, cad_type, choices, cav_value):
+    """Test update local CAVs with empty value."""
+    with factories.single_commit():
+      asmt = factories.AssessmentFactory()
+      local_cav = factories.CustomAttributeValueFactory(
+          attributable=asmt,
+          attribute_value=cav_value,
+          custom_attribute=factories.CustomAttributeDefinitionFactory(
+              definition_type='assessment',
+              definition_id=asmt.id,
+              attribute_type=cad_type,
+              multi_choice_options=choices,
+          )
+      )
+      local_cav_custom_attribute_id = local_cav.custom_attribute_id
+      local_cav_id = local_cav.id
+
+    # Check two scenarios: update with empty value and
+    # update back with non-empty test data
+    for update_val in (None, cav_value):
+      response = self.api.put(asmt, {
+          'local_attributes': [{
+              'id': local_cav_custom_attribute_id,
+              'values': [{'id': local_cav_id, 'value': update_val}]
+          }],
+      })
+      self.assert200(response)
+      local_cav = all_models.CustomAttributeValue.query.get(local_cav_id)
+      self.assertEqual(
+          update_val,
+          local_cav.attribute_value,
+      )
+
+  @ddt.data(
+      ('Text', None, 'Some text'),
+      ('Rich Text', None, '<p>Some text</p>'),
+      ('Date', None, '2017-08-01'),
+      ('Checkbox', None, '1'),
+      ('Dropdown', 'case1,case2,case3', 'case1'),
+  )
+  @ddt.unpack
+  def test_empty_update_global_cav(self, cad_type, choices, cav_value):
+    """Test update global CAVs with empty value."""
+    with factories.single_commit():
+      asmt = factories.AssessmentFactory()
+      global_cav = factories.CustomAttributeValueFactory(
+          attributable=asmt,
+          attribute_value=cav_value,
+          custom_attribute=factories.CustomAttributeDefinitionFactory(
+              definition_type='assessment',
+              attribute_type=cad_type,
+              multi_choice_options=choices,
+          )
+      )
+      global_cav_custom_attribute_id = global_cav.custom_attribute_id
+      global_cav_id = global_cav.id
+
+    # Check two scenarios: update with empty value and
+    # update back with non-empty test data
+    for update_val in (None, cav_value):
+      response = self.api.put(asmt, {
+          'global_attributes': [{
+              'id': global_cav_custom_attribute_id,
+              'values': [{'id': global_cav_id, 'value': update_val}]
+          }],
+      })
+      self.assert200(response)
+      global_cav = all_models.CustomAttributeValue.query.get(global_cav_id)
+      self.assertEqual(
+          update_val,
+          global_cav.attribute_value,
+      )
 
 
 @ddt.ddt
