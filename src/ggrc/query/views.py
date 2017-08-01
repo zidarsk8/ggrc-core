@@ -56,6 +56,20 @@ def http_timestamp(timestamp):
   return format_date_time(time.mktime(timestamp.utctimetuple()))
 
 
+def _get_query_handler(query):
+  """Get the first matching query handler for a given query."""
+  for optimized_handler in OPTIMIZED_HANDLERS:
+    try:
+      if optimized_handler.match(query):
+        return optimized_handler
+    except Exception:  # pylint: disable=broad-except
+      # No exception in the query matcher should affect the response of the
+      # request. We need to safely fallback to default query handler if
+      # anything happens.
+      logger.warning("Error matching %s handler.", optimized_handler.__name__)
+  return DefaultHandler
+
+
 def get_handler_results(query):
   """Get results from the best matching query handler.
 
@@ -64,17 +78,8 @@ def get_handler_results(query):
   Returns:
     dict containing json serializable query results.
   """
-  handler_class = DefaultHandler
-  for optimized_handler in OPTIMIZED_HANDLERS:
-    try:
-      if optimized_handler.match(query):
-        handler_class = optimized_handler
-        break
-    except Exception:  # pylint: disable=broad-except
-      # No exception in the query matcher should affect the response of the
-      # request. We need to safely fallback to default query handler if
-      # anything happens.
-      logger.warning("Error matching %s handler.", optimized_handler.__name__)
+
+  handler_class = _get_query_handler(query)
 
   query_handler = handler_class(query)
   name = query_handler.__class__.__name__
