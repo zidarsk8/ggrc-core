@@ -183,6 +183,8 @@
           oldData: {
             status: instance && instance.status // status before changing
           },
+          applyPreconditions:
+            GGRC.Utils.Controllers.shouldApplyPreconditions(instance),
           current_user: GGRC.current_user,
           instance: instance,
           modal_title: objectParams.modal_title || modalTitle,
