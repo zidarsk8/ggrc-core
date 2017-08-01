@@ -256,7 +256,7 @@
                     <comment-add-form class="comment-add-form"
                                     {instance}="instance"
                                     {is-saving}="isUpdatingComments"
-                                    (after-create)="updateItems('comments')"
+                                    (after-create)="afterCreate(%event, 'comments')"
                                     (before-create)="addItems(%event, 'comments')"
                     ></comment-add-form>
                 {{/unless}}
