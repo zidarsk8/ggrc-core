@@ -3,6 +3,8 @@
 
 """This module contains special query helper class for query API."""
 
+import copy
+
 from werkzeug.exceptions import Forbidden
 from cached_property import cached_property
 
@@ -27,9 +29,12 @@ class AssessmentsSummaryHandler(DefaultHandler):
     """Check if the given query matches current handler."""
     if len(query) != 1:
       return False
-    query = query[0]
+    query = copy.deepcopy(query[0])
     audit_ids = query["filters"]["expression"]["ids"]
     if not isinstance(audit_ids, list) or len(audit_ids) != 1:
+      return False
+    query_type = query.pop("type", "values")
+    if query_type != "values":
       return False
     expected = {
         "object_name": "Assessment",
@@ -42,7 +47,7 @@ class AssessmentsSummaryHandler(DefaultHandler):
             "order_by": {"keys": [], "order": "", "compare": None}},
         "fields": ["status", "verified"]
     }
-    if query == expected:
+    if query != expected:
       return False
     return True
 
