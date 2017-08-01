@@ -293,11 +293,15 @@ unqoted_char = [a-zA-Z0-9_\-./]
 
 
 quoted_char
-  = '\\"'
-    {
-      return '"';
-    }
+  = escaped_symbol
   / [^"]
+
+
+escaped_symbol
+  = escape:'\\' symbol:.
+    {
+      return escape + symbol;
+    }
 
 
 AND
