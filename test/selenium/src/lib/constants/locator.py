@@ -526,6 +526,8 @@ class WidgetBarButtonAddDropdown(object):
         setattr(cls, object_, cls._Locator.get_dropdown_item(name))
   THREAD_ACTORS = _Locator.get_dropdown_item("threat_actor")
   WORKFLOW_TASKS = _Locator.get_dropdown_item("workflow_task")
+  ALL_MAPPABLE_WIDGETS_OBJS = (
+      By.CSS_SELECTOR, ".inner-nav-item a[data-toggle='unified-mapper']")
 
 
 class ObjectWidget(object):
@@ -585,6 +587,7 @@ class CommonWidgetInfo(object):
   _HEADERS_AND_VALUES = (_INFO_WIDGET_XPATH +
                          '//div[starts-with(./@class, "span")]//h6/..')
   HEADERS_AND_VALUES = (By.XPATH, _HEADERS_AND_VALUES)
+  LCAS_HEADERS_AND_VALUES = None  # due to exist only for WidgetInfoAssessment
   CAS_HEADERS_AND_VALUES = (By.XPATH, _INFO_WIDGET_XPATH + "//inline-edit/div")
   CAS_CHECKBOXES = (By.XPATH, _INFO_WIDGET_XPATH + "//inline-edit//input["
                                                    "@type='checkbox']")
@@ -695,8 +698,12 @@ class WidgetInfoAssessment(WidgetInfoPanel):
   WIDGET = Common.INFO_WIDGET
   TOGGLE = ' [class*="fa-caret"]'
   # Base
-  CAS_HEADERS_AND_VALUES = (By.CSS_SELECTOR,
-                            WIDGET + " auto-save-form .flex-size-1")
+  LCAS_HEADERS_AND_VALUES = (
+      By.CSS_SELECTOR,
+      WIDGET + " .field-wrapper.flex-size-1")
+  CAS_HEADERS_AND_VALUES = (
+      By.CSS_SELECTOR,
+      WIDGET + " assessment-custom-attributes inline-edit-control")
   CAS_CHECKBOXES = (By.CSS_SELECTOR, '[class*="wrapper"] [type="checkbox"]')
   MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS = (
       By.CSS_SELECTOR, WIDGET + " .mapped-objects__item-body")
@@ -890,6 +897,7 @@ class AdminTreeView(object):
 
 
 class UnifiedMapperTreeView(TreeView):
+  """Common locators for UnifiedMapper from Tree View"""
   MODAL = ".object-modal"
   HEADER = MODAL + " .list-header"
   ITEMS = MODAL + Common.TREE_ITEM
@@ -907,6 +915,7 @@ class BaseWidgetGeneric(object):
     class should look like. Note that same functionality can be
     implemented using properties though with more code."""
     def __init__(cls, *args):
+      # pylint: disable=invalid-name
       _WIDJET = "#{}_widget"
       _FILTER_BUTTON = _WIDJET + " tree-filter-input .tree-filter__actions"
       _FILTER_DROPDOWN = _WIDJET + " tree-status-filter"

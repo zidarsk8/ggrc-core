@@ -32,7 +32,7 @@ def get_unmapping_names(class_name):
 
 @unittest.skip("unskip when import/export fixed for workflows")
 class TestWorkflowObjectColumnDefinitions(TestCase):
-  """Test default column difinitions for workflow objcts.
+  """Test default column difinitions for workflow objects.
   """
 
   @classmethod

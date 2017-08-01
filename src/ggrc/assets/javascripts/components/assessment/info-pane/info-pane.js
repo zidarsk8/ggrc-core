@@ -121,10 +121,10 @@
         type = type || '';
         this.attr('isUpdating' + can.capitalize(type), true);
         GGRC.Utils.QueryAPI
-          .batchRequests(query)
+          .makeRequest({data: [query]})
           .done(function (response) {
-            var type = Object.keys(response)[0];
-            var values = response[type].values;
+            var type = Object.keys(response[0])[0];
+            var values = response[0][type].values;
             dfd.resolve(values);
           })
           .fail(function () {
@@ -191,10 +191,14 @@
       },
       initializeFormFields: function () {
         this.attr('formFields',
-          GGRC.Utils.CustomAttributes.convertValuesToFormFields(
-            this.attr('instance.custom_attribute_values')
-          )
+            this.attr('instance.local_attributes')
+              .map(GGRC.Utils.CustomAttributes.prepareLocalAttribute)
         );
+      },
+      initGlobalAttributes: function () {
+        return this.attr('globalAttributes',
+          this.attr('instance.global_attributes')
+            .map(GGRC.Utils.CustomAttributes.prepareGlobalAttribute));
       },
       onFormSave: function () {
         this.attr('triggerFormSaveCbs').fire();
@@ -227,29 +231,45 @@
             });
           });
       },
-      saveFormFields: function (formFields) {
-        var caValues = can.makeArray(
-          this.attr('instance.custom_attribute_values')
-        );
-        Object.keys(formFields).forEach(function (fieldId) {
+      updateAttributes: function (attrs, fields) {
+        can.Map.keys(fields).forEach(function (fieldId) {
           var caValue =
-            caValues
-              .find(function (item) {
-                return item.def.id === Number(fieldId);
-              });
+            attrs.filter(function (item) {
+              return item.id === Number(fieldId);
+            })[0];
           if (!caValue) {
-            console.error('Corrupted Date: ', caValues);
+            console.error('Corrupted Date: ', attrs);
             return;
           }
-          caValue.attr('attribute_value',
-            GGRC.Utils.CustomAttributes.convertToCaValue(
-              caValue.attr('attributeType'),
-              formFields[fieldId]
-            )
-          );
+          if (caValue.attr('values').length) {
+            caValue.attr('values')[0].attr('value', fields[fieldId]);
+          } else {
+            caValue.attr('values').push({value: fields[fieldId]});
+          }
         });
+      },
+      saveGlobalAttributes: function (event) {
+        var self = this;
+        var globalAttributes = event.globalAttributes;
+        return self.attr('instance')
+          .refresh()
+          .then(function () {
+            var caValues = self.attr('instance.global_attributes');
+            self.updateAttributes(caValues, globalAttributes);
 
-        return this.attr('instance').save();
+            return self.attr('instance').save();
+          });
+      },
+      saveFormFields: function (formFields) {
+        var self = this;
+        return self.attr('instance')
+          .refresh()
+          .then(function () {
+            var caValues = self.attr('instance.local_attributes');
+            self.updateAttributes(caValues, formFields);
+
+            return self.attr('instance').save();
+          });
       },
       showRequiredInfoModal: function (e, field) {
         var scope = field || e.field;
@@ -286,6 +306,7 @@
     },
     init: function () {
       this.viewModel.initializeFormFields();
+      this.viewModel.initGlobalAttributes();
       this.viewModel.updateRelatedItems();
     },
     events: {
