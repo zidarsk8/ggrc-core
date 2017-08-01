@@ -311,8 +311,7 @@ class QueryHelper(object):
   def _get_limit(cls, limit):
     """Get limit parameters for sqlalchemy."""
     try:
-      first = int(limit[0])
-      last = int(limit[1])
+      first, last = [int(i) for i in limit]
     except (ValueError, TypeError):
       raise BadQueryException("Invalid limit operator. Integers expected.")
 
