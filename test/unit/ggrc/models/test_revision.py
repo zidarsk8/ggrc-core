@@ -2,6 +2,8 @@
 
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Unittests for Revision model """
+
+import datetime
 import unittest
 
 import ddt
@@ -13,6 +15,8 @@ from ggrc.models import all_models
 @ddt.ddt
 class TestCheckPopulatedContent(unittest.TestCase):
   """Unittest checks populated content."""
+  # pylint: disable=invalid-name
+
   LIST_OF_REQUIRED_ROLES = [
       "Principal Assignees",
       "Secondary Assignees",
@@ -269,19 +273,65 @@ class TestCheckPopulatedContent(unittest.TestCase):
                  'document_type': 'REFERENCE_URL',
                  'id': None,
                  'link': 'url1',
-                 'title': 'url1'},
+                 'title': 'url1',
+                 'created_at': '2017-11-12T13:14:15',
+                 'updated_at': '2018-11-12T13:14:15', },
                 {'display_name': 'url2',
                  'document_type': 'REFERENCE_URL',
                  'id': None,
                  'link': 'url2',
-                 'title': 'url2'}]
+                 'title': 'url2',
+                 'created_at': '2017-11-12T13:14:15',
+                 'updated_at': '2018-11-12T13:14:15', }]
     obj = mock.Mock()
     obj.id = self.object_id
     obj.__class__.__name__ = self.object_type
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
+    revision.created_at = datetime.datetime(2017, 11, 12, 13, 14, 15)
+    revision.updated_at = datetime.datetime(2018, 11, 12, 13, 14, 15)
+
     with mock.patch("ggrc.access_control.role.get_custom_roles_for",
                     return_value={}):
       self.assertEqual(revision.content["reference_url"], expected)
+
+  @ddt.data({
+      "url": "www.url.com",
+      "reference_url": "www.refurl.com",
+      "created_at": "2017-07-15T15:49:14",
+      "updated_at": "2017-08-20T13:32:42",
+  }, {
+      "url": "www.url.com",
+      "reference_url": "www.refurl.com",
+  })
+  def test_populating_content_url_dates_in_populate_url_method(
+      self, revision_content
+  ):
+    """Test populating created_at/updated_at dates for reference URLs."""
+    # pylint: disable=protected-access
+    revisioned_object = mock.Mock()
+    revision = all_models.Revision(revisioned_object, 123, "modified", {})
+    revision._content = revision_content
+    revision.created_at = datetime.datetime(2017, 11, 12, 13, 14, 15)
+    revision.updated_at = datetime.datetime(2018, 11, 12, 13, 14, 15)
+
+    result = revision._populate_url()
+
+    url_list = result.get("reference_url")
+    self.assertEqual(len(url_list), 2)
+
+    dates_in_content = "created_at" in revision_content
+
+    for url in url_list:
+      if dates_in_content:
+        expected_created_at = "2017-07-15T15:49:14"
+        expected_updated_at = "2017-08-20T13:32:42"
+      else:
+        # Revision's own dates should be used as a fallback
+        expected_created_at = "2017-11-12T13:14:15"
+        expected_updated_at = "2018-11-12T13:14:15"
+
+      self.assertEqual(url.get("created_at"), expected_created_at)
+      self.assertEqual(url.get("updated_at"), expected_updated_at)
 
   def test_populate_wf(self):
     """Check population content workflow procedure."""
