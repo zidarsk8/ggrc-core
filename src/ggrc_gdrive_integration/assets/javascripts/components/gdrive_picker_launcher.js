@@ -239,8 +239,7 @@
           return new CMS.Models.Document({
             context: that.instance.context || {id: null},
             title: file.title,
-            link: file.alternateLink,
-            owners: [{type: 'Person', id: GGRC.current_user.id}]
+            link: file.alternateLink
           }).save().then(function (doc) {
             var objectDoc;
 

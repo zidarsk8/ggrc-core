@@ -183,6 +183,8 @@
           oldData: {
             status: instance && instance.status // status before changing
           },
+          applyPreconditions:
+            GGRC.Utils.Controllers.shouldApplyPreconditions(instance),
           current_user: GGRC.current_user,
           instance: instance,
           modal_title: objectParams.modal_title || modalTitle,
@@ -487,6 +489,7 @@
       $el.on('keypress.preventdoublesubmit', function (ev) {
         if (ev.which === 13 &&
           !$(document.activeElement).hasClass('wysihtml5') &&
+          !$(document.activeElement).hasClass('create-form__input') &&
           !$(document.activeElement).parents('.pagination').length
         ) {
           ev.preventDefault();
