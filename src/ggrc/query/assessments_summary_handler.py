@@ -6,7 +6,6 @@
 import copy
 
 from werkzeug.exceptions import Forbidden
-from cached_property import cached_property
 
 from ggrc import db
 from ggrc import models
@@ -49,7 +48,6 @@ class AssessmentsSummaryHandler(DefaultHandler):
     }
     return query == expected
 
-  @cached_property
   def _audit(self):
     """Get the audit used in the query and verify its permissions."""
     audit_id = self.query[0]["filters"]["expression"]["ids"][0]
@@ -75,7 +73,7 @@ class AssessmentsSummaryHandler(DefaultHandler):
           models.Assessment.status,
           models.Assessment.verified,
       ).filter(
-          models.Assessment.audit_id == self._audit.id
+          models.Assessment.audit_id == self._audit().id
       ).all()
     with benchmark("serialization: get_results > _transform_to_json"):
       object_query["count"] = len(data)
