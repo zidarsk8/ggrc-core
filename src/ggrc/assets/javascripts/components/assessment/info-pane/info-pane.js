@@ -249,27 +249,16 @@
         });
       },
       saveGlobalAttributes: function (event) {
-        var self = this;
         var globalAttributes = event.globalAttributes;
-        return self.attr('instance')
-          .refresh()
-          .then(function () {
-            var caValues = self.attr('instance.global_attributes');
-            self.updateAttributes(caValues, globalAttributes);
+        var caValues = this.attr('instance.global_attributes');
+        this.updateAttributes(caValues, globalAttributes);
 
-            return self.attr('instance').save();
-          });
+        return this.attr('instance').save();
       },
       saveFormFields: function (formFields) {
-        var self = this;
-        return self.attr('instance')
-          .refresh()
-          .then(function () {
-            var caValues = self.attr('instance.local_attributes');
-            self.updateAttributes(caValues, formFields);
-
-            return self.attr('instance').save();
-          });
+        var caValues = this.attr('instance.local_attributes');
+        this.updateAttributes(caValues, formFields);
+        return this.attr('instance').save();
       },
       showRequiredInfoModal: function (e, field) {
         var scope = field || e.field;
