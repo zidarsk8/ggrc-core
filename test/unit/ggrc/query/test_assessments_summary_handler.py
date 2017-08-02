@@ -9,89 +9,106 @@ import ddt
 from ggrc.query import assessments_summary_handler
 
 
+class TestQueries(object):
+  """Test data for matcher for assessment query handler."""
+  # pylint: disable=too-few-public-methods
+
+  NO_QUERIES = []
+
+  MULTIPLE_EMPTY = [{}, {}, {}]
+
+  ORDER_BY_TITLE = [{
+      "object_name": "Assessment",
+      "filters": {
+          "expression": {
+              "object_name": "Audit",
+              "op": {"name": "relevant"},
+              "ids": ["347"]},
+          "keys":[],
+          "order_by":{"keys": [], "order":"title", "compare":None}},
+      "fields":["status", "verified"],
+  }]
+
+  INVALID_REQUESTED_FIELDS = [{
+      "object_name": "Assessment",
+      "filters": {
+          "expression": {
+              "object_name": "Audit",
+              "op": {"name": "relevant"},
+              "ids": ["347"]},
+          "keys":[],
+          "order_by":{"keys": [], "order":"", "compare":None}},
+      "fields":["status"],
+  }]
+
+  TOO_MANY_AUDIT_IDS = [{
+      "object_name": "Assessment",
+      "filters": {
+          "expression": {
+              "object_name": "Audit",
+              "op": {"name": "relevant"},
+              "ids": ["1", "2", "55"]},
+          "keys":[],
+          "order_by":{"keys": [], "order":"", "compare":None}},
+      "fields":["status", "verified"],
+      "type": "values",
+  }]
+
+  MISSING_AUDIT_IDS = [{
+      "object_name": "Assessment",
+      "filters": {
+          "expression": {
+              "object_name": "Audit",
+              "op": {"name": "relevant"},
+              "ids": []},
+          "keys":[],
+          "order_by":{"keys": [], "order":"", "compare":None}},
+      "fields":["status", "verified"],
+      "type": "values",
+  }]
+
+  NORMAL_REQUEST = [{
+      "object_name": "Assessment",
+      "filters": {
+          "expression": {
+              "object_name": "Audit",
+              "op": {"name": "relevant"},
+              "ids": ["347"]},
+          "keys":[],
+          "order_by":{"keys": [], "order":"", "compare":None}},
+      "fields":["status", "verified"],
+  }]
+
+  WITH_QUERY_TYPE_FIELD = [{
+      "object_name": "Assessment",
+      "filters": {
+          "expression": {
+              "object_name": "Audit",
+              "op": {"name": "relevant"},
+              "ids": ["347"]},
+          "keys":[],
+          "order_by":{"keys": [], "order":"", "compare":None}},
+      "fields":["status", "verified"],
+      "type": "values",
+  }]
+
+
 @ddt.ddt
 class TestAssessmentSummarHandler(unittest.TestCase):
   """Unit tests for Assessment summary query handler."""
 
-  @ddt.data(
-      [],
-      [{}, {}, {}],
-      [{  # contains order by title
-          "object_name": "Assessment",
-          "filters": {
-              "expression": {
-                  "object_name": "Audit",
-                  "op": {"name": "relevant"},
-                  "ids": ["347"]},
-              "keys":[],
-              "order_by":{"keys": [], "order":"title", "compare":None}},
-          "fields":["status", "verified"],
-      }],
-      [{  # invalid requested fields
-          "object_name": "Assessment",
-          "filters": {
-              "expression": {
-                  "object_name": "Audit",
-                  "op": {"name": "relevant"},
-                  "ids": ["347"]},
-              "keys":[],
-              "order_by":{"keys": [], "order":"", "compare":None}},
-          "fields":["status"],
-      }],
-      [{  # too many Audit ids
-          "object_name": "Assessment",
-          "filters": {
-              "expression": {
-                  "object_name": "Audit",
-                  "op": {"name": "relevant"},
-                  "ids": ["1", "2", "55"]},
-              "keys":[],
-              "order_by":{"keys": [], "order":"", "compare":None}},
-          "fields":["status", "verified"],
-          "type": "values",
-      }],
-      [{  # missing audit ids
-          "object_name": "Assessment",
-          "filters": {
-              "expression": {
-                  "object_name": "Audit",
-                  "op": {"name": "relevant"},
-                  "ids": []},
-              "keys":[],
-              "order_by":{"keys": [], "order":"", "compare":None}},
-          "fields":["status", "verified"],
-          "type": "values",
-      }],
-  )
-  def test_not_matching(self, data):
-    handler = assessments_summary_handler.AssessmentsSummaryHandler
-    self.assertFalse(handler.match(data))
+  HANDLER = assessments_summary_handler.AssessmentsSummaryHandler
 
   @ddt.data(
-      [{  # normal request
-          "object_name": "Assessment",
-          "filters": {
-              "expression": {
-                  "object_name": "Audit",
-                  "op": {"name": "relevant"},
-                  "ids": ["347"]},
-              "keys":[],
-              "order_by":{"keys": [], "order":"", "compare":None}},
-          "fields":["status", "verified"],
-      }],
-      [{  # with query type filed
-          "object_name": "Assessment",
-          "filters": {
-              "expression": {
-                  "object_name": "Audit",
-                  "op": {"name": "relevant"},
-                  "ids": ["347"]},
-              "keys":[],
-              "order_by":{"keys": [], "order":"", "compare":None}},
-          "fields":["status", "verified"],
-          "type": "values",
-      }],
+      (False, TestQueries.INVALID_REQUESTED_FIELDS),
+      (False, TestQueries.MISSING_AUDIT_IDS),
+      (False, TestQueries.MULTIPLE_EMPTY),
+      (False, TestQueries.NO_QUERIES),
+      (False, TestQueries.ORDER_BY_TITLE),
+      (False, TestQueries.TOO_MANY_AUDIT_IDS),
+      (True, TestQueries.NORMAL_REQUEST),
+      (True, TestQueries.WITH_QUERY_TYPE_FIELD),
   )
-  def test_matching(self, data):
-    handler = assessments_summary_handler.AssessmentsSummaryHandler
-    self.assertTrue(handler.match(data))
+  @ddt.unpack
+  def test_not_matching(self, match, data):
+    self.assertIs(match, self.HANDLER.match(data))
