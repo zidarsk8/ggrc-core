@@ -58,3 +58,42 @@ class TestWorkflowState(unittest.TestCase):
       self.assertEqual(
           "Overdue", workflow.WorkflowState.get_object_state(tasks_on_object)
       )
+
+  @ddt.data(
+      # (expected, setup_date, repeat_every, unit),
+      (date(2017, 3, 28), date(2017, 2, 28), 1, workflow.Workflow.MONTH_UNIT),
+      (date(2017, 2, 28), date(2017, 1, 31), 1, workflow.Workflow.MONTH_UNIT),
+      (date(2017, 3, 3), date(2017, 3, 3), 1, workflow.Workflow.DAY_UNIT),
+      (date(2017, 3, 17), date(2017, 3, 10), 1, workflow.Workflow.WEEK_UNIT),
+      (date(2016, 12, 30), date(2016, 12, 30), 3, workflow.Workflow.DAY_UNIT),
+      (date(2017, 2, 28), date(2016, 2, 29), 12, workflow.Workflow.MONTH_UNIT),
+      (date(2016, 12, 30), date(2016, 12, 31), 1, workflow.Workflow.DAY_UNIT),
+      (date(2017, 4, 28), date(2017, 1, 31), 3, workflow.Workflow.MONTH_UNIT),
+  )
+  @ddt.unpack
+  def test_calc_repeated_dates(self, expected, setup_date, repeat_every, unit):
+    self.assertEqual(
+        expected,
+        workflow.Workflow(
+            repeat_every=repeat_every,
+            unit=unit,
+            repeat_multiplier=1
+        ).calc_next_adjusted_date(
+            setup_date
+        )
+    )
+
+  @ddt.data(
+      # (expected, setup_date),
+      (date(2016, 12, 30), date(2016, 12, 31)),
+      (date(2016, 12, 30), date(2017, 1, 2)),
+      (date(2017, 8, 4), date(2017, 8, 5)),
+      (date(2017, 8, 4), date(2017, 8, 6)),
+      (date(2017, 8, 7), date(2017, 8, 7)),
+  )
+  @ddt.unpack
+  def test_calc_one_time_dates(self, expected, setup_date):
+    self.assertEqual(
+        expected,
+        workflow.Workflow().calc_next_adjusted_date(setup_date)
+    )
