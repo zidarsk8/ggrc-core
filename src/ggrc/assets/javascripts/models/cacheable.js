@@ -629,8 +629,20 @@
     model: function (params) {
       var model;
       params = this.object_from_resource(params);
-      if (!params)
+      if (!params) {
         return params;
+      }
+      // Temporary Solution to fix saving of Custom Attributable Instances
+      if (this.is_custom_attributable) {
+        if (params.local_attributes) {
+          delete params.local_attributes;
+        }
+
+        if (params.global_attributes) {
+          delete params.global_attributes;
+        }
+      }
+
       if (GGRC.Utils.Snapshots.isSnapshot(params)) {
         this.removeFromCacheById(params[this.id]);
         delete this.cache[params[this.id]];
