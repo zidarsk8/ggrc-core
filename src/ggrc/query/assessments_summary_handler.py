@@ -47,9 +47,7 @@ class AssessmentsSummaryHandler(DefaultHandler):
             "order_by": {"keys": [], "order": "", "compare": None}},
         "fields": ["status", "verified"]
     }
-    if query != expected:
-      return False
-    return True
+    return query == expected
 
   @cached_property
   def _audit(self):
