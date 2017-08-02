@@ -228,30 +228,28 @@
           });
       },
       saveFormFields: function (formFields) {
-        return this.attr('instance').refresh().then(function () {
-          var caValues = can.makeArray(
-            this.attr('instance.custom_attribute_values')
+        var caValues = can.makeArray(
+          this.attr('instance.custom_attribute_values')
+        );
+        Object.keys(formFields).forEach(function (fieldId) {
+          var caValue =
+            caValues
+              .find(function (item) {
+                return item.def.id === Number(fieldId);
+              });
+          if (!caValue) {
+            console.error('Corrupted Date: ', caValues);
+            return;
+          }
+          caValue.attr('attribute_value',
+            GGRC.Utils.CustomAttributes.convertToCaValue(
+              caValue.attr('attributeType'),
+              formFields[fieldId]
+            )
           );
-          Object.keys(formFields).forEach(function (fieldId) {
-            var caValue =
-              caValues
-                .find(function (item) {
-                  return item.def.id === Number(fieldId);
-                });
-            if (!caValue) {
-              console.error('Corrupted Date: ', caValues);
-              return;
-            }
-            caValue.attr('attribute_value',
-              GGRC.Utils.CustomAttributes.convertToCaValue(
-                caValue.attr('attributeType'),
-                formFields[fieldId]
-              )
-            );
-          });
+        });
 
-          return this.attr('instance').save();
-        }.bind(this));
+        return this.attr('instance').save();
       },
       showRequiredInfoModal: function (e, field) {
         var scope = field || e.field;

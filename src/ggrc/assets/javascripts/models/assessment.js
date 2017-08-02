@@ -368,7 +368,7 @@
       return dfd;
     },
     info_pane_preload: function () {
-      return;
+      this.refresh();
     }
   });
 })(window.can, window.GGRC, window.CMS);
