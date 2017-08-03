@@ -185,12 +185,22 @@ class Revision(Base, db.Model):
       # as non-existing (empty) reference URLs
       if not link:
         continue
+
+      # if creation/modification date is not available, we estimate it by using
+      # the corresponding information from the Revision itself
+      created_at = (self._content.get("created_at") or
+                    self.created_at.isoformat())
+      updated_at = (self._content.get("updated_at") or
+                    self.updated_at.isoformat())
+
       reference_url_list.append({
           "display_name": link,
           "document_type": "REFERENCE_URL",
           "link": link,
           "title": link,
-          "id": None
+          "id": None,
+          "created_at": created_at,
+          "updated_at": updated_at,
       })
     return {'reference_url': reference_url_list}
 
