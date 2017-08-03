@@ -248,7 +248,9 @@ class CustomAttributeValue(Base, Indexed, db.Model):
 
     Note: this validator does not check if id is a proper person id.
     """
-    if self.attribute_value and ":" in self.attribute_value:
+    if self.attribute_value is None:
+      self.attribute_object_id = None
+    elif ":" in self.attribute_value:
       value, id_ = self.attribute_value.split(":")
       self.attribute_value = value
       if not id_.isdigit():
