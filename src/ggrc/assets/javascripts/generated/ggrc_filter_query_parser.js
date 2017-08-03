@@ -335,8 +335,8 @@ GGRC.query_parser = {
             },
         peg$c36 = "\"",
         peg$c37 = { type: "literal", value: "\"", description: "\"\\\"\"" },
-        peg$c38 = /^[a-zA-Z0-9_\-.\/]/,
-        peg$c39 = { type: "class", value: "[a-zA-Z0-9_\\-./]", description: "[a-zA-Z0-9_\\-./]" },
+        peg$c38 = /^[a-zA-Z0-9_\-.\/%]/,
+        peg$c39 = { type: "class", value: "[a-zA-Z0-9_\\-./%]", description: "[a-zA-Z0-9_\\-./%]" },
         peg$c40 = /^[^"]/,
         peg$c41 = { type: "class", value: "[^\"]", description: "[^\"]" },
         peg$c42 = "\\",
@@ -1426,12 +1426,15 @@ GGRC.query_parser = {
     function peg$parseunqoted_char() {
       var s0;
 
-      if (peg$c38.test(input.charAt(peg$currPos))) {
-        s0 = input.charAt(peg$currPos);
-        peg$currPos++;
-      } else {
-        s0 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c39); }
+      s0 = peg$parseescaped_symbol();
+      if (s0 === peg$FAILED) {
+        if (peg$c38.test(input.charAt(peg$currPos))) {
+          s0 = input.charAt(peg$currPos);
+          peg$currPos++;
+        } else {
+          s0 = peg$FAILED;
+          if (peg$silentFails === 0) { peg$fail(peg$c39); }
+        }
       }
 
       return s0;
