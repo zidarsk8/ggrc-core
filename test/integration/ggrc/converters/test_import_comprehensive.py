@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Comprehensive import tests.
@@ -242,6 +244,15 @@ class TestComprehensiveSheets(TestCase):
                 errors.MISSING_VALUE_ERROR.format(
                     line=15, column_name="Audit"),
             },
+        },
+        "Regulation": {
+            "row_warnings": {
+                errors.DUPLICATE_IN_MULTI_VALUE.format(
+                    line=21,
+                    column_name=u"Reference URL",
+                    duplicates=u"double-url.com, duplicate-nonascii-url-€™.com"
+                )
+            }
         }
     }
 
