@@ -633,7 +633,7 @@
         return params;
       }
       // Temporary Solution to fix saving of Custom Attributable Instances
-      if (this.is_custom_attributable) {
+      if (this.is_custom_attributable || this.hasCustomAttributes) {
         if (params.local_attributes) {
           delete params.local_attributes;
         }

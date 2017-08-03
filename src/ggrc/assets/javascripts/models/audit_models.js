@@ -325,6 +325,7 @@
     destroy: 'DELETE /api/assessment_templates/{id}',
     create: 'POST /api/assessment_templates',
     is_custom_attributable: false,
+    hasCustomAttributes: true,
     attributes: {
       audit: 'CMS.Models.Audit.stub',
       context: 'CMS.Models.Context.stub'
