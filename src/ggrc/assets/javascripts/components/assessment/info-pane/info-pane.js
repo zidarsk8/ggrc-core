@@ -174,17 +174,28 @@
         }.bind(this));
       },
       afterCreate: function (event, type) {
-        var instance = event.item;
+        var createdItems = event.items;
+        var success = event.success;
         var items = this.attr(type);
-
+        var resultList = items
+          .map(function (item) {
+            createdItems.forEach(function (newItem) {
+              if (item._stamp && item._stamp === newItem._stamp) {
+                if (!success) {
+                  newItem.attr('isNotSaved', true);
+                }
+                newItem.removeAttr('_stamp');
+                item = newItem;
+              }
+            });
+            return item;
+          })
+          .filter(function (item) {
+            return !item.attr('isNotSaved');
+          });
         this.attr('isUpdating' + can.capitalize(type), false);
-        items.replace(items.map(function (item) {
-          if (item._stamp === instance._stamp) {
-            instance.attr('isDraft', false);
-            return instance;
-          }
-          return item;
-        }));
+
+        items.replace(resultList);
       },
       removeItem: function (event, type) {
         var item = event.item;

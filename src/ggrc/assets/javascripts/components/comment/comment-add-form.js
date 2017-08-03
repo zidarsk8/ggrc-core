@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (_, GGRC, can) {
+(function (GGRC, can, CMS) {
   'use strict';
 
   var tag = 'comment-add-form';
@@ -36,26 +36,50 @@
         };
       },
       updateComment: function (comment) {
-        comment.mark_for_addition('related_objects_as_destination',
-          this.attr('instance'));
         comment.attr(this.getCommentData());
         return comment;
       },
+      afterCreation: function (comment, wasSuccessful) {
+        this.attr('isSaving', false);
+        this.dispatch({
+          type: 'afterCreate',
+          items: [comment],
+          success: wasSuccessful
+        });
+        this.attr('instance').dispatch('refreshInstance');
+      },
+      mapToParent: function (comment, parent) {
+        return (new CMS.Models.Relationship({
+          context: parent.attr('context') || {id: null},
+          source: parent,
+          destination: comment
+        })).save();
+      },
       onCommentCreated: function (e) {
         var comment = e.comment;
-        this.attr('isSaving', true);
-        comment = this.updateComment(comment);
-        this.dispatch({type: 'beforeCreate', items: [comment.attr()]});
+        var self = this;
+        var parent = self.attr('instance');
+
+        self.attr('isSaving', true);
+        comment = self.updateComment(comment);
+        self.dispatch({type: 'beforeCreate', items: [comment.attr()]});
+
         comment.save()
-          .always(function (instance) {
-            this.attr('isSaving', false);
-            this.dispatch({
-              type: 'afterCreate',
-              item: instance
-            });
-            this.attr('instance').dispatch('refreshInstance');
-          }.bind(this));
+          .done(function (comment) {
+            self.mapToParent(comment, parent)
+              .done(function () {
+                self.afterCreation(comment, true);
+              })
+              .fail(function () {
+                GGRC.Errors.notifier('error', 'Saving has failed');
+                self.afterCreation(comment, false);
+              });
+          })
+          .fail(function () {
+            GGRC.Errors.notifier('error', 'Saving has failed');
+            self.afterCreation(comment, false);
+          });
       }
     }
   });
-})(window._, window.GGRC, window.can);
+})(window.GGRC, window.can, window.CMS);

@@ -87,7 +87,7 @@
           }.bind(this));
       },
       'a[data-toggle=submit]:not(.disabled):not([disabled]) click': function (el, ev) {
-        var scope = this.scope;
+        var scope = this.viewModel;
         var join_model_class;
         var join_object;
         var quick_create;
@@ -141,6 +141,12 @@
 
           if (created_dfd.state() === 'rejected') {
             created_dfd.fail(function (error) {
+              var instance = scope.attr('instance');
+              scope.dispatch({
+                type: 'afterCreate',
+                items: [instance],
+                success: false
+              });
               $(document.body).trigger('ajax:flash', {
                 error: error.message
               });
@@ -189,14 +195,24 @@
             this.bindXHRToButton(
               join_object.save()
                 .done(function () {
-                  var instance = this.viewModel.attr('instance');
+                  var instance = scope.attr('instance');
                   el.trigger('modal:success', join_object);
 
-                  this.viewModel.dispatch({
+                  scope.dispatch({
                     type: 'afterCreate',
-                    item: instance
+                    items: [instance],
+                    success: true
                   });
-                }.bind(this)), el);
+                })
+                .fail(function () {
+                  var instance = scope.attr('instance');
+
+                  scope.dispatch({
+                    type: 'afterCreate',
+                    items: [instance],
+                    success: false
+                  });
+                }));
           }.bind(this))
           .always(function () {
             scope.attr('disabled', false);
