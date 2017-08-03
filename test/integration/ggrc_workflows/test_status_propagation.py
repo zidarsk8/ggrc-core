@@ -36,16 +36,8 @@ class TestWorkflowCycleStatePropagantion(TestCase):
             "title": "weekly task group",
             "task_group_tasks": [{
                 "title": "weekly task 1",
-                "relative_end_day": 1,
-                "relative_end_month": None,
-                "relative_start_day": 5,
-                "relative_start_month": None,
             }, {
                 "title": "weekly task 1",
-                "relative_end_day": 1,
-                "relative_end_month": None,
-                "relative_start_day": 1,
-                "relative_start_month": None,
             }
             ]},
         ]

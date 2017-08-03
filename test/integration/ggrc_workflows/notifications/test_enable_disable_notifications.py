@@ -179,10 +179,6 @@ class TestEnableAndDisableNotifications(TestCase):
             "task_group_tasks": [{
                 "contact": person_dict(self.user.id),
                 "description": factories.random_str(100),
-                "relative_start_day": 5,
-                "relative_start_month": 2,
-                "relative_end_day": 25,
-                "relative_end_month": 2,
             },
             ],
         },
@@ -201,10 +197,6 @@ class TestEnableAndDisableNotifications(TestCase):
             "task_group_tasks": [{
                 "contact": person_dict(self.user.id),
                 "description": factories.random_str(100),
-                "relative_start_day": 5,
-                "relative_start_month": 2,
-                "relative_end_day": 25,
-                "relative_end_month": 2,
             },
             ],
         },
