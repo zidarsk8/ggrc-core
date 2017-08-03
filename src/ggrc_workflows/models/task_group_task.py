@@ -110,7 +110,7 @@ class TaskGroupTask(mixins.WithContact,
       },
       "secondary_contact": None,
       "start_date": {
-          "display_name": "Start",
+          "display_name": "Start Date",
           "mandatory": True,
           "description": (
               "Enter the task start date in the following format:\n"
@@ -124,7 +124,7 @@ class TaskGroupTask(mixins.WithContact,
           ),
       },
       "end_date": {
-          "display_name": "End",
+          "display_name": "End Date",
           "mandatory": True,
           "description": (
               "Enter the task end date in the following format:\n"
