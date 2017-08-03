@@ -354,8 +354,6 @@ COLUMN_HANDLERS = {
         "cycle_workflow": CycleWorkflowColumnHandler,
         "frequency": FrequencyColumnHandler,
         "notify_on_change": boolean.CheckboxColumnHandler,
-        "relative_end_date": TaskDateColumnHandler,
-        "relative_start_date": TaskDateColumnHandler,
         "task_description": TaskDescriptionColumnHandler,
         "task_group": TaskGroupColumnHandler,
         "task_group_objects": ObjectsColumnHandler,

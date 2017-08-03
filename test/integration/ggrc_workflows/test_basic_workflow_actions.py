@@ -134,22 +134,10 @@ class TestBasicWorkflowActions(TestCase):
             "title": "tg_1",
             "task_group_tasks": [{
                 "description": factories.random_str(100),
-                "relative_start_day": 5,
-                "relative_start_month": 1,
-                "relative_end_day": 25,
-                "relative_end_month": 2,
             }, {
                 "description": factories.random_str(100),
-                "relative_start_day": 15,
-                "relative_start_month": 2,
-                "relative_end_day": 28,
-                "relative_end_month": 2,
             }, {
                 "description": factories.random_str(100),
-                "relative_start_day": 1,
-                "relative_start_month": 1,
-                "relative_end_day": 1,
-                "relative_end_month": 1,
             },
             ],
         },
@@ -165,22 +153,10 @@ class TestBasicWorkflowActions(TestCase):
             "title": "tg_2",
             "task_group_tasks": [{
                 "description": factories.random_str(100),
-                "relative_end_day": 1,
-                "relative_end_month": None,
-                "relative_start_day": 5,
-                "relative_start_month": None,
             }, {
                 "title": "monday task",
-                "relative_end_day": 1,
-                "relative_end_month": None,
-                "relative_start_day": 1,
-                "relative_start_month": None,
             }, {
                 "title": "weekend task",
-                "relative_end_day": 4,
-                "relative_end_month": None,
-                "relative_start_day": 1,
-                "relative_start_month": None,
             },
             ],
             "task_group_objects": self.random_objects
@@ -260,22 +236,10 @@ class TestBasicWorkflowActions(TestCase):
                 "title": "tg_2",
                 "task_group_tasks": [{
                     "description": factories.random_str(100),
-                    "relative_end_day": 1,
-                    "relative_end_month": None,
-                    "relative_start_day": 5,
-                    "relative_start_month": None,
                 }, {
                     "title": "monday task",
-                    "relative_end_day": 1,
-                    "relative_end_month": None,
-                    "relative_start_day": 1,
-                    "relative_start_month": None,
                 }, {
                     "title": "weekend task",
-                    "relative_end_day": 4,
-                    "relative_end_month": None,
-                    "relative_start_day": 1,
-                    "relative_start_month": None,
                 }],
                 "task_group_objects": self.random_objects
             },

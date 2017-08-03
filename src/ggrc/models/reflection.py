@@ -44,8 +44,6 @@ ATTRIBUTE_ORDER = (
     "archived",
     "report_start_date",
     "report_end_date",
-    "relative_start_date",
-    "relative_end_date",
     "finished_date",
     "verified_date",
     "status",
