@@ -489,7 +489,6 @@ class TestSnapshots(base.Test):
         messages.AssertionMessages.
         format_err_msg_equal([expected_control], actual_controls))
 
-  @pytest.mark.xfail(strict=True)
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "dynamic_object, dynamic_relationships",
