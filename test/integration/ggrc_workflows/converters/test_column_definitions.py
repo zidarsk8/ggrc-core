@@ -30,7 +30,6 @@ def get_unmapping_names(class_name):
   return unmapping_names
 
 
-@unittest.skip("unskip when import/export fixed for workflows")
 class TestWorkflowObjectColumnDefinitions(TestCase):
   """Test default column difinitions for workflow objcts.
   """
@@ -95,8 +94,8 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Task Type",
         "Assignee",
         "Task Description",
-        "Start",
-        "End",
+        "Start Date",
+        "End Date",
         "Task Group",
         "Code",
         "Delete",

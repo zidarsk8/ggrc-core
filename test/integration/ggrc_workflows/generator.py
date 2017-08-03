@@ -145,7 +145,6 @@ class WorkflowsGenerator(Generator):
     workflow = self._session_add(workflow)
     return self.modify_workflow(workflow, {
         "status": "Active",
-        "recurrences": workflow.unit is not None
     })
 
   def modify_workflow(self, wf=None, data=None):
