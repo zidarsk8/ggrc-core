@@ -162,7 +162,6 @@ def update_cycle_dates(cycle):
     cycle.start_date, cycle.end_date = None, None
     cycle.next_due_date = None
     cycle.is_current = False
-    db.session.add(cycle)
     return
 
   # Don't update cycle and cycle task group dates for backlog workflows
@@ -189,11 +188,10 @@ def build_cycles(workflow, cycle=None, user=None):
   user = user or get_current_user()
   if not workflow.next_cycle_start_date:
     workflow.next_cycle_start_date = workflow.min_task_start_date
-  db.session.add(build_cycle(workflow, cycle, user))
+  build_cycle(workflow, cycle, user)
   if workflow.unit and workflow.repeat_every:
     while workflow.next_cycle_start_date <= date.today():
-      db.session.add(build_cycle(workflow, current_user=user))
-  db.session.add(workflow)
+      build_cycle(workflow, current_user=user)
 
 
 @signals.Restful.model_posted.connect_via(models.Cycle)
@@ -250,8 +248,7 @@ def create_old_style_cycle(cycle, task_group, cycle_task_group, current_user):
       cycle_task_group_object_task = _create_cycle_task(
           task_group_task, cycle, cycle_task_group,
           current_user)
-      db.session.add(Relationship(source=cycle_task_group_object_task,
-                                  destination=object_))
+      Relationship(source=cycle_task_group_object_task, destination=object_)
 
 
 def build_cycle(workflow, cycle=None, current_user=None):
@@ -301,8 +298,8 @@ def build_cycle(workflow, cycle=None, current_user=None):
 
         for task_group_object in task_group.task_group_objects:
           object_ = task_group_object.object
-          db.session.add(Relationship(source=cycle_task_group_object_task,
-                                      destination=object_))
+          Relationship(source=cycle_task_group_object_task,
+                       destination=object_)
   Signals.workflow_cycle_start.send(
       cycle.__class__,
       obj=cycle,
@@ -342,7 +339,6 @@ def update_cycle_task_child_state(obj):
                                child.id, child.context.id):
             old_status = child.status
             child.status = status
-            db.session.add(child)
             Signals.status_change.send(
                 child.__class__,
                 obj=child,
@@ -367,7 +363,6 @@ def _update_parent_state(obj, parent, child_statuses):
   if old_status == new_status:
     return
   parent.status = new_status
-  db.session.add(parent)
   Signals.status_change.send(
       parent.__class__,
       obj=parent,
@@ -428,12 +423,11 @@ def ensure_assignee_is_workflow_member(workflow, assignee):
       models.WorkflowPerson.workflow_id == workflow.id,
       models.WorkflowPerson.person_id == assignee.id).count()
   if not workflow_people:
-    workflow_person = models.WorkflowPerson(
+    models.WorkflowPerson(
         person=assignee,
         workflow=workflow,
         context=workflow.context
     )
-    db.session.add(workflow_person)
 
   # Check if assignee has a role assignment
   user_roles = UserRole.query.filter(
@@ -441,13 +435,12 @@ def ensure_assignee_is_workflow_member(workflow, assignee):
       UserRole.person_id == assignee.id).count()
   if not user_roles:
     workflow_member_role = _find_role('WorkflowMember')
-    user_role = UserRole(
+    UserRole(
         person=assignee,
         role=workflow_member_role,
         context=workflow.context,
         modified_by=get_current_user(),
     )
-    db.session.add(user_role)
 
 
 @signals.Restful.model_put.connect_via(models.TaskGroupTask)
@@ -458,22 +451,19 @@ def handle_task_group_task_put(sender, obj=None, src=None, service=None):  # noq
   # If relative days were change we must update workflow next cycle start date
   if any(getattr(inspect(obj).attrs, attr).history.has_changes()
          for attr in ["start_date", "end_date"]):
-    if update_workflow_state(obj.task_group.workflow):
-      db.session.add(obj.task_group.workflow)
+    update_workflow_state(obj.task_group.workflow)
 
 
 @signals.Restful.model_posted.connect_via(models.TaskGroupTask)
 def handle_task_group_task_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
-  if update_workflow_state(obj.task_group.workflow):
-    db.session.add(obj.task_group.workflow)
+  update_workflow_state(obj.task_group.workflow)
 
 
 @signals.Restful.model_deleted.connect_via(models.TaskGroupTask)
 def handle_task_group_task_delete(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   db.session.flush()
-  if update_workflow_state(obj.task_group.workflow):
-    db.session.add(obj.task_group.workflow)
+  update_workflow_state(obj.task_group.workflow)
 
 
 @signals.Restful.model_put.connect_via(models.TaskGroup)
@@ -498,9 +488,6 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa py
         clone_objects=src.get('clone_objects', False)
     )
 
-    db.session.add(obj)
-    db.session.flush()
-
     obj.title = source_task_group.title + ' (copy ' + str(obj.id) + ')'
 
   ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
@@ -509,8 +496,7 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa py
 @signals.Restful.model_deleted.connect_via(models.TaskGroup)
 def handle_task_group_delete(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   db.session.flush()
-  if update_workflow_state(obj.workflow):
-    db.session.add(obj.workflow)
+  update_workflow_state(obj.workflow)
 
 
 @signals.Restful.model_deleted.connect_via(models.CycleTaskGroupObjectTask)
@@ -551,7 +537,6 @@ def handle_cycle_task_group_object_task_put(
       if obj.status == 'Verified':
         tgobj.modified_by = get_current_user()
         tgobj.set_reviewed_state()
-        db.session.add(tgobj)
     db.session.flush()
 
 
@@ -596,8 +581,7 @@ def update_workflow_state(workflow):
 def handle_cycle_put(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.is_current.history.has_changes():
-    if update_workflow_state(obj.workflow):
-      db.session.add(obj.workflow)
+    update_workflow_state(obj.workflow)
 
 # Check if workflow should be Inactive after recurrence change
 
@@ -638,7 +622,6 @@ def handle_cycle_task_entry_post(
   if src['is_declining_review'] == '1':
     task = obj.cycle_task_group_object_task
     task.status = task.DECLINED
-    db.session.add(obj)
   else:
     src['is_declining_review'] = 0
 
@@ -653,9 +636,7 @@ def handle_cycle_status_change(sender, obj=None, new_status=None,  # noqa pylint
   if not obj.is_done:
     return
   obj.is_current = False
-  db.session.add(obj)
-  if update_workflow_state(obj.workflow):
-    db.session.add(obj.workflow)
+  update_workflow_state(obj.workflow)
 
 
 @Signals.status_change.connect_via(models.CycleTaskGroupObjectTask)
@@ -687,7 +668,6 @@ def _get_or_create_personal_context(user):
   )
   personal_context.modified_by = get_current_user()
   db.session.add(personal_context)
-  db.session.flush()
   return personal_context
 
 
