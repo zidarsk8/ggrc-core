@@ -243,6 +243,38 @@ describe('GGRC.query_parser', function () {
         });
     });
 
+    it('correctly handles escaped symbols inside quotes', function () {
+      var queries = [
+        'title ~ "test\\\\"',
+        'title ~ "test\\%"',
+        'title ~ "test\\_"',
+        'title ~ "test\\""'
+      ];
+
+      _.each(queries, function (query) {
+        var value = query.split('~')[1].trim().replace(/^"|"$/g, '');
+        var result = GGRC.query_parser.parse(query);
+
+        expect(result.expression.right).toEqual(value);
+      });
+    });
+
+    it('correctly handles escaped symbols outside quotes', function () {
+      var queries = [
+        'title ~ test\\\\',
+        'title ~ test\\%',
+        'title ~ test\\_',
+        'title ~ test\\"'
+      ];
+
+      _.each(queries, function (query) {
+        var value = query.split('~')[1].trim();
+        var result = GGRC.query_parser.parse(query);
+
+        expect(result.expression.right).toEqual(value);
+      });
+    });
+
     describe('evaluate', function () {
       it('returns true on an empty query', function () {
         expect(GGRC.query_parser.parse('').evaluate()).toEqual(true);
