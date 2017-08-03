@@ -309,9 +309,9 @@ def build_cycle(workflow, cycle=None, current_user=None):
       new_status=cycle.status,
       old_status=None
   )
+  workflow.repeat_multiplier += 1
   workflow.next_cycle_start_date = workflow.calc_next_adjusted_date(
       workflow.min_task_start_date)
-  workflow.repeat_multiplier += 1
   return cycle
 
 
