@@ -271,10 +271,9 @@
         valid: isValid,
         hasMissingInfo: hasMissingInfo
       };
-      inputValue = convertFromCaValue(
-        type,
-        value().attr('value')
-      );
+      // send the same Value also as a valueObject
+      inputValue = convertFromCaValue(type,
+        value().attr('value'), value().attr('value'));
       return {
         type: type,
         id: attr.id,
