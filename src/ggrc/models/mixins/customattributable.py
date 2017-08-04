@@ -511,7 +511,7 @@ class CustomAttributable(object):
     count = 0
     for cav in self.custom_attribute_values:
       cav_flags = cav.custom_attribute.options.get(cav.attribute_value)
-      if cav_flags and cav_flags.evidence_required:
+      if cav_flags and cav_flags["evidence_required"]:
         count += 1
     return count
 

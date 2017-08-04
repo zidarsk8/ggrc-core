@@ -335,12 +335,14 @@ class CustomAttributeValue(Base, Indexed, db.Model):
     if not flags:
       return {}
     failed_preconditions = {}
-    if flags.comment_required and isinstance(self.attributable, Commentable):
+    if flags["comment_required"] and isinstance(self.attributable,
+                                                Commentable):
       failed_preconditions["comment"] = not any(
           self.custom_attribute_id == c.custom_attribute_definition_id and
           self.latest_revision.id == c.revision_id
           for c in self.attributable.comments)
-    if flags.evidence_required and isinstance(self.attributable, Documentable):
+    if flags["evidence_required"] and isinstance(self.attributable,
+                                                 Documentable):
       evidences_count = len(self.attributable.document_evidence)
       cav_evidence_count = self.attributable.cav_evidence_count
       failed_preconditions["evidence"] = evidences_count < cav_evidence_count
