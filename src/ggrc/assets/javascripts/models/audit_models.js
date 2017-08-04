@@ -94,7 +94,7 @@
         attr_title: 'Title',
         attr_name: 'title'
       }, {
-        attr_title: 'Internal Audit Lead',
+        attr_title: 'Audit Captain',
         attr_name: 'audit_lead',
         attr_sort_field: 'contact'
       }, {
@@ -129,7 +129,7 @@
       this.validatePresenceOf('program');
       this.validateNonBlank('title');
       this.validateContact(['_transient.contact', 'contact'], {
-        message: 'Internal audit lead cannot be empty'
+        message: 'Audit captain cannot be empty'
       });
       this.validate(['_transient.audit_firm', 'audit_firm'],
         function () {
