@@ -235,6 +235,13 @@
           .then(function () {
             instance.refresh().then(function () {
               instance.attr('status', isUndo ? previousStatus : newStatus);
+
+              if (instance.attr('status') === 'Ready for Review' && !isUndo) {
+                $(document.body).trigger('ajax:flash',
+                  {hint: 'The assessment is complete. ' +
+                  'The verifier may revert it if further input is needed.'});
+              }
+
               return instance.save()
               .then(function () {
                 instance.attr('isPending', false);
