@@ -4,6 +4,9 @@
  */
 
 .inline-edit {
+  &__text {
+    word-break: break-word;
+  }
   &__title {
     padding-left: 4px;
   }

@@ -141,8 +141,12 @@
   cursor: default;
   line-height: 16px;
   a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     line-height: 16px;
-    display: inline-block;
   }
   a:hover {
     text-decoration: underline;
