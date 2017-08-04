@@ -128,22 +128,13 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     DATE = "Date"
     MAP = "Map"
 
-  class MultiChoiceMandatoryFlags(dict):
-    """Enum representing flags in multi_choice_mandatory bitmaps."""
-    # pylint: disable=too-few-public-methods
-    COMMENT_REQUIRED = 0b01
-    EVIDENCE_REQUIRED = 0b10
+  COMMENT_REQUIRED = 0b01
+  EVIDENCE_REQUIRED = 0b10
 
-    def __init__(self, mask):
-      """Initialize flag instance."""
-      self.comment_required = bool(mask & self.COMMENT_REQUIRED)
-      self.evidence_required = bool(mask & self.EVIDENCE_REQUIRED)
-      super(
-          CustomAttributeDefinition.MultiChoiceMandatoryFlags,
-          self
-      ).__init__(
-          **self.__dict__
-      )
+  def _multi_choice_flags(self, mask):
+    """ Create flags dict from multi_choice_mandatory bitmaps."""
+    return {"comment_required": bool(mask & self.COMMENT_REQUIRED),
+            "evidence_required": bool(mask & self.EVIDENCE_REQUIRED)}
 
   VALID_TYPES = {
       "Text": "Text",
@@ -303,7 +294,7 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     masks = itertools.cycle([0])
     if self.multi_choice_mandatory:
       masks = (int(m) for m in self.multi_choice_mandatory.split(","))
-    flags = (self.MultiChoiceMandatoryFlags(m) for m in masks)
+    flags = (self._multi_choice_flags(m) for m in masks)
     return dict(itertools.izip(mc_options, flags))
 
   @validates("mandatory")
