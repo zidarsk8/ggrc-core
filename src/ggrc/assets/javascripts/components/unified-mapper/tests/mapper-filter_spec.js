@@ -11,19 +11,18 @@ describe('GGRC.Components.mapperFilter', function () {
     viewModel = GGRC.Components.getViewModel('mapperFilter');
   });
 
-  describe('text set()', function () {
+  describe('filter set()', function () {
     beforeEach(function () {
       spyOn(viewModel, 'checkExpression');
     });
 
     it('sets viewModel.filter', function () {
-      viewModel.attr('filter', '');
-      viewModel.attr('text', 'program');
+      viewModel.attr('filter', 'program');
       expect(viewModel.attr('filter')).toEqual('program');
     });
 
     it('calls checkExpression()', function () {
-      viewModel.attr('text', 'program');
+      viewModel.attr('filter', 'program');
       expect(viewModel.checkExpression)
         .toHaveBeenCalledWith('program');
     });
@@ -64,10 +63,10 @@ describe('GGRC.Components.mapperFilter', function () {
   });
 
   describe('reset() method', function () {
-    it('updates viewModel.text', function () {
-      viewModel.attr('text', 'stub');
+    it('updates viewModel.filter', function () {
+      viewModel.attr('filter', 'text');
       viewModel.reset();
-      expect(viewModel.attr('text')).toEqual('');
+      expect(viewModel.attr('filter')).toEqual('');
     });
   });
 });
