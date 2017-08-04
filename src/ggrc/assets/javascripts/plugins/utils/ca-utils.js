@@ -244,6 +244,7 @@
       var showValidation;
       var validationMap;
       var hasMissingInfo;
+      var inputValue;
 
       if (!attr || !attr.values) {
         console.warn('Attribute is mandatory argument');
@@ -252,8 +253,10 @@
 
       options = can.Map.keys(attr.options || {});
       type = getCustomAttributeType(attr.attribute_type);
-      value = new can.Map(attr.values[0] || {});
-      validationMap = new can.Map(value.attr('preconditions_failed') || {});
+      value = can.compute(function () {
+        return new can.Map(attr.values[0] || {});
+      });
+      validationMap = new can.Map(value().attr('preconditions_failed') || {});
       isDropdown = type === 'dropdown';
       showValidation = attr.mandatory || isDropdown;
       isValid = showValidation ? !attr.attr('is_preconditions_failed') : true;
@@ -268,10 +271,14 @@
         valid: isValid,
         hasMissingInfo: hasMissingInfo
       };
+      inputValue = convertFromCaValue(
+        type,
+        value().attr('value')
+      );
       return {
         type: type,
         id: attr.id,
-        value: value.attr('value'),
+        value: inputValue,
         title: attr.title,
         placeholder: attr.placeholder,
         options: options,
@@ -286,7 +293,7 @@
           evidence: false
         },
         valueId: can.compute(function () {
-          return value.attr('id');
+          return value().attr('id');
         })
       };
     }
