@@ -19,14 +19,20 @@
           </div>
           <div class="related-reference-urls__list">
             <object-list {(items)}="urls" {empty-message}="''">
-              <div class="related-reference-urls__list-item">
+              <div class="action-toolbar">
                 <document-object-list-item {instance}="{.}">
                 </document-object-list-item>
                 {{#unless isNotEditable}}
-                  <button type="button" class="related-reference-urls__remove"
-                    {{#if isDisabled}}disabled{{/if}}
-                    ($click)="removeReferenceUrl(%context)">
-                  </button>
+                  <div class="action-toolbar__controls">
+                    <a href="javascript://"
+                      class="info-action unmap"
+                      {{#if isDisabled}}disabled{{/if}}
+                      ($click)="removeReferenceUrl(%context)">
+                        <action-toolbar-control>
+                          <i class="fa fa-trash"></i>
+                        </action-toolbar-control>
+                    </a>
+                  </div>
                 {{/unless}}
               </div>
             </object-list>
