@@ -121,6 +121,7 @@ tree-view {
 tree-item {
   >.tree-item-wrapper {
     background-color: $white;
+    cursor: pointer;
 
     &.snapshot {
       .tree-item-content {
