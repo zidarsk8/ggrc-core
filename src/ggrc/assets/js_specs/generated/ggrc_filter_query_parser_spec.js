@@ -275,6 +275,22 @@ describe('GGRC.query_parser', function () {
       });
     });
 
+    it('does not change escaped symbols in case of text search', function () {
+      var query = 'some \\\\ test \\% \\_ query';
+
+      var result = GGRC.query_parser.parse(query);
+
+      expect(result.expression.op.name).toBe('text_search');
+      expect(result.expression.text).toBe(query);
+    });
+
+    it('correctly handles escaped symbol inside attribute name', function () {
+      var query = '"my \\" quote" ~ aaa';
+      var result = GGRC.query_parser.parse(query);
+
+      expect(result.expression.left).toEqual('my \\" quote');
+    });
+
     describe('evaluate', function () {
       it('returns true on an empty query', function () {
         expect(GGRC.query_parser.parse('').evaluate()).toEqual(true);
