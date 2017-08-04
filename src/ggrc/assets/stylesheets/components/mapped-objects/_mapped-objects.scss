@@ -71,6 +71,17 @@
     width: 100%;
     padding: 0 8px 0 28px;
     box-sizing: border-box;
+
+    &.control-description {
+      position: relative;
+    }
+  }
+
+  .more-information-button {
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    line-height: 12px;
   }
 
   .fa {
