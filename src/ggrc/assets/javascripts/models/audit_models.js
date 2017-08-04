@@ -58,6 +58,7 @@
     destroy: 'DELETE /api/audits/{id}',
     create: 'POST /api/audits',
     mixins: [
+      'contactable',
       'unique_title',
       'ca_update',
       'timeboxed',
