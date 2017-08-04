@@ -13,10 +13,9 @@
     ),
     viewModel: {
       define: {
-        text: {
+        filter: {
           type: 'string',
           set: function (newValue) {
-            this.attr('filter', newValue.replace(/\\/g, '\\\\'));
             this.checkExpression(newValue);
             return newValue;
           }
@@ -35,12 +34,12 @@
         this.dispatch('submit');
       },
       reset: function () {
-        this.attr('text', '');
+        this.attr('filter', '');
       }
     },
     events: {
       '#mapper-filter input': function (el) {
-        this.viewModel.attr('text', el.val());
+        this.viewModel.attr('filter', el.val());
       }
     }
   });
