@@ -63,14 +63,10 @@
   }
 }
 
-.alert-progress, .alert-hint {
+.alert-progress {
   color: $darkText;
   background-color: $messageTurquoise;
   padding-left: 35px;
-}
-
-.alert-hint {
-  text-align: center;
 }
 
 .alert {

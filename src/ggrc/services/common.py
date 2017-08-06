@@ -837,8 +837,6 @@ class Resource(ModelView):
     with benchmark("Query update permissions"):
       new_context = self.get_context_id_from_json(src)
       self._check_put_permissions(obj, new_context)
-    with benchmark("Process actions"):
-      self.process_actions(obj)
     with benchmark("Validate custom attributes"):
       if hasattr(obj, "validate_custom_attributes"):
         obj.validate_custom_attributes()
@@ -1085,16 +1083,6 @@ class Resource(ModelView):
     memcache_client.delete(get_cache_key(None, id=obj.id, type=obj.type))
 
   def json_create(self, obj, src):
-    cad = ggrc.models.CustomAttributeDefinition
-    if isinstance(obj, ggrc.models.mixins.CustomAttributable):
-
-      type_name = obj.__class__._inflector.table_singular
-      obj.custom_attribute_definitions = cad.query.filter(
-          cad.definition_id.is_(None),
-          cad.definition_type == type_name,
-      ).order_by(
-          cad.id
-      ).all()
     ggrc.builder.json.create(obj, src)
 
   def get_context_id_from_json(self, src):
@@ -1523,26 +1511,6 @@ class Resource(ModelView):
       headers.append(('X-GGRC-Cache', cache_op))
     return current_app.make_response(
         (self.as_json(response_object), status, headers))
-
-  def process_actions(self, obj):
-    if hasattr(obj, 'process_actions'):
-      # process actionsS
-      added, deleted = obj.process_actions()
-      # send signals for added/deleted objects
-      for _class, _objects in added.items():
-        if not _objects:
-          continue
-        signals.Restful.collection_posted.send(
-            _class, objects=_objects, service=self,
-            sources=[{} for _ in xrange(len(_objects))])
-        for _obj in _objects:
-          signals.Restful.model_posted.send(
-              _class, obj=_obj, service=self)
-      for _obj in deleted:
-        signals.Restful.model_deleted.send(
-            _obj.__class__, obj=_obj, service=self)
-      if added or deleted:
-        obj.invalidate_evidence_found()
 
 
 class ReadOnlyResource(Resource):

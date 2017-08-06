@@ -36,13 +36,12 @@
     },
     helpers: {
       modalWrapper: function (showContent) {
-        var self = this;
         return function (el) {
           showContent.bind('change', function (ev, val) {
             if (val) {
-              $(el).modal().on('hidden.bs.modal', self.hide.bind(self));
+              $(el).modal();
             } else {
-              $(el).modal('hide').off('hidden.bs.modal');
+              $(el).modal('hide');
             }
           });
         };

@@ -2,7 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Defines a Revision model for storing snapshots."""
-import collections
 
 from ggrc import builder
 from ggrc import db
@@ -127,12 +126,14 @@ class Revision(Base, db.Model):
       result += ", via bulk action"
     return result
 
-  def _populate_acl(self):
-    """Append acl values to content dict if it's needed."""
-    content = self._content or {}
+  @builder.simple_property
+  def content(self):
+    """Property. Contains the revision content dict.
+
+    Updated by required values, generated from saved content dict."""
     roles_dict = role.get_custom_roles_for(self.resource_type)
     reverted_roles_dict = {n: i for i, n in roles_dict.iteritems()}
-    access_control_list = content.get("access_control_list") or []
+    access_control_list = self._content.get("access_control_list") or []
     map_field_to_role = {
         "principal_assessor": reverted_roles_dict.get("Principal Assignees"),
         "secondary_assessor": reverted_roles_dict.get("Secondary Assignees"),
@@ -142,7 +143,7 @@ class Revision(Base, db.Model):
     }
     exists_roles = {i["ac_role_id"] for i in access_control_list}
     for field, role_id in map_field_to_role.items():
-      if field not in content:
+      if field not in self._content:
         continue
       if role_id in exists_roles or role_id is None:
         continue
@@ -151,7 +152,7 @@ class Revision(Base, db.Model):
         continue
       if not isinstance(field_content, list):
         field_content = [field_content]
-      person_ids = {fc["id"] for fc in field_content if fc.get("id")}
+      person_ids = {fc.get("id") for fc in field_content if fc.get("id")}
       for person_id in person_ids:
         access_control_list.append({
             "display_name": roles_dict[role_id],
@@ -172,86 +173,27 @@ class Revision(Base, db.Model):
             "modified_by": None,
             "id": None,
         })
-    return {"access_control_list": access_control_list}
+    populated_content = self._content.copy()
+    populated_content["access_control_list"] = access_control_list
 
-  def _populate_url(self):
-    """Append reference urls for older revisions."""
-    if 'url' not in self._content:
-      return {}
-    reference_url_list = []
-    for key in ('url', 'reference_url'):
-      link = self._content[key]
-      # link might exist, but can be an empty string - we treat those values
-      # as non-existing (empty) reference URLs
-      if not link:
-        continue
+    if 'url' in self._content:
+      reference_url_list = []
+      for key in ('url', 'reference_url'):
+        link = self._content[key]
+        # link might exist, but can be an empty string - we treat those values
+        # as non-existing (empty) reference URLs
+        if not link:
+          continue
+        reference_url_list.append({
+            "display_name": link,
+            "document_type": "REFERENCE_URL",
+            "link": link,
+            "title": link,
+            "id": None
+        })
+      populated_content['reference_url'] = reference_url_list
 
-      # if creation/modification date is not available, we estimate it by using
-      # the corresponding information from the Revision itself
-      created_at = (self._content.get("created_at") or
-                    self.created_at.isoformat())
-      updated_at = (self._content.get("updated_at") or
-                    self.updated_at.isoformat())
-
-      reference_url_list.append({
-          "display_name": link,
-          "document_type": "REFERENCE_URL",
-          "link": link,
-          "title": link,
-          "id": None,
-          "created_at": created_at,
-          "updated_at": updated_at,
-      })
-    return {'reference_url': reference_url_list}
-
-  def _populate_cads(self):
-    """Append cads in content list if it's needed."""
-    from ggrc.models import custom_attribute_definition as CAD
-    if "local_attributes" in self._content:
-      return {}
-    cads = {}
-    local_cads = set()
-    global_cads = set()
-    content = self._content or {}
-    for cad in content.get("custom_attribute_definitions") or []:
-      if cad.get("definition_id"):
-        local_cads.add(cad["id"])
-      else:
-        global_cads.add(cad["id"])
-      cads[cad["id"]] = cad
-    vals = collections.defaultdict(list)
-    for val in content.get("custom_attribute_values") or []:
-      cad = cads.get(val.get("custom_attribute_id"))
-      if not cad:
-        continue
-      if cad["attribute_type"].startswith("Map:"):
-        key = "attributable_id"
-      else:
-        key = "attribute_value"
-      vals[cad["id"]].append({"id": val["id"], "value": val.get(key)})
-
-    result = {"local_attributes": [], "global_attributes": []}
-    for key in sorted(cads.keys()):
-      cad = cads[key]
-      cad["values"] = vals[key]
-      cad["options"] = CAD.CustomAttributeDefinition(
-          multi_choice_options=cad.get("multi_choice_options") or "",
-          multi_choice_mandatory=cad.get("multi_choice_mandatory") or "",
-      ).options
-      marker = "local_attributes" if key in local_cads else "global_attributes"
-      result[marker].append(cad)
-    return result
-
-  @builder.simple_property
-  def content(self):
-    """Property. Contains the revision content dict.
-
-    Updated by required values, generated from saved content dict."""
-    content = self._content.copy()
-    content.update(self._populate_acl())
-    content.update(self._populate_cads())
-    content.update(self._populate_url())
-    return content
+    return populated_content
 
   @content.setter
   def content(self, value):

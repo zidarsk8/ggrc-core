@@ -2,9 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for snapshot export."""
-import collections
 
-from ggrc import models, db
+
+from ggrc import models
 from ggrc.utils import QueryCounter
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -76,13 +76,12 @@ class TestExportSnapshots(TestCase):
     self.import_file("control_snapshot_data_single.csv")
     # Duplicate import because we have a bug in logging revisions and this
     # makes sure that the fixture created properly.
-    response = self.import_file("control_snapshot_data_single.csv")
-    self._check_csv_response(response, {})
+    self.import_file("control_snapshot_data_single.csv")
 
     controls = models.Control.query.all()
     with factories.single_commit():
       audit = factories.AuditFactory()
-      snapshots = self._create_snapshots(audit, *controls)
+      snapshots = self._create_snapshots(audit, controls)
 
     control_dicts = {
         control.slug: {
@@ -116,12 +115,6 @@ class TestExportSnapshots(TestCase):
             "Categories": u"\n".join(c.name for c in control.categories),
             # Computed attributes
             "Last Assessment Date": u"",
-            "Admin": u"admin@example.com\ncreator@example.com\n"
-                     u"editor@example.com",
-            "Primary Contacts": u"creator@example.com",
-            "Secondary Contacts": u"creator@example.com",
-            "Principal Assignees": u"creator@example.com",
-            "Secondary Assignees": u"creator@example.com",
         }
         for snapshot, control in zip(snapshots, controls)
     }
@@ -149,7 +142,7 @@ class TestExportSnapshots(TestCase):
     with factories.single_commit():
       control = factories.ControlFactory(slug="Control 1")
       audit = factories.AuditFactory()
-      snapshot = self._create_snapshots(audit, control)[0]
+      snapshot = self._create_snapshots(audit, [control])[0]
       assessments = [factories.AssessmentFactory() for _ in range(3)]
       issues = [factories.IssueFactory() for _ in range(3)]
       assessment_slugs = {assessment.slug for assessment in assessments}
@@ -186,14 +179,15 @@ class TestExportSnapshots(TestCase):
     """Test exporting of a single full control snapshot."""
     cads = self._create_cads("control")
     with factories.single_commit():
-      control = factories.ControlFactory(slug="Control 1")
+      controls = [factories.ControlFactory(slug="Control 1")]
       for cad in cads:
         factories.CustomAttributeValueFactory(
-            attributable=control,
+            attributable=controls[0],
             custom_attribute=cad,
         )
       audit = factories.AuditFactory()
-      snapshot = self._create_snapshots(audit, control)[0]
+      snapshots = self._create_snapshots(audit, controls)
+
     control_dicts = {
         control.slug: {
             # normal fields
@@ -229,12 +223,8 @@ class TestExportSnapshots(TestCase):
             "Assertions": u"",
             "Categories": u"",
             "Evidence": u"",
-            "Admin": u"",
-            "Primary Contacts": u"",
-            "Secondary Contacts": u"",
-            "Principal Assignees": u"",
-            "Secondary Assignees": u"",
         }
+        for snapshot, control in zip(snapshots, controls)
     }
 
     search_request = [{
@@ -258,11 +248,11 @@ class TestExportSnapshots(TestCase):
   def test_same_revison_export(self):
     """Exporting the same revision multiple times."""
     with factories.single_commit():
-      control = factories.ControlFactory(slug="Control 1")
+      controls = [factories.ControlFactory(slug="Control 1")]
       audit1 = factories.AuditFactory()
-      self._create_snapshots(audit1, control)
+      self._create_snapshots(audit1, controls)
       audit2 = factories.AuditFactory()
-      self._create_snapshots(audit2, control)
+      self._create_snapshots(audit2, controls)
       audit_codes = {audit1.slug, audit2.slug}
 
     search_request = [{
@@ -292,18 +282,16 @@ class TestExportSnapshots(TestCase):
     The number of database queries should not be linked to the amount of data
     that is being exported.
     """
-    # pylint: disable=too-many-locals
     self._create_cads("control")
     self.import_file("control_snapshot_data_multiple.csv")
     # Duplicate import because we have a bug in logging revisions and this
     # makes sure that the fixture created properly.
-    response = self.import_file("control_snapshot_data_multiple.csv")
-    self._check_csv_response(response, {})
+    self.import_file("control_snapshot_data_multiple.csv")
 
     controls = models.Control.query.all()
     with factories.single_commit():
       audit = factories.AuditFactory()
-      snapshots = self._create_snapshots(audit, *controls)
+      snapshots = self._create_snapshots(audit, controls)
       count = len(snapshots)
       assessments = [factories.AssessmentFactory() for _ in range(count)]
       issues = [factories.IssueFactory() for _ in range(count)]
@@ -357,86 +345,3 @@ class TestExportSnapshots(TestCase):
       multiple_query_count = counter.get
 
     self.assertEqual(multiple_query_count, single_query_count)
-
-  def test_acr_control_export(self):
-    """Test exporting of a AC roles with linked users."""
-    # pylint: disable=too-many-locals
-    ac_roles = models.AccessControlRole.query.filter_by(
-        object_type="Control"
-    ).all()
-    control_acr_people = collections.defaultdict(dict)
-    with factories.single_commit():
-      # Create one more custom role
-      ac_roles.append(
-          factories.AccessControlRoleFactory(object_type="Control")
-      )
-      controls = [factories.ControlFactory(slug="Control {}".format(i))
-                  for i in range(3)]
-      for control in controls:
-        for ac_role in ac_roles:
-          person = factories.PersonFactory()
-          factories.AccessControlListFactory(
-              ac_role=ac_role,
-              person=person,
-              object=control,
-          )
-          control_acr_people[control.slug][ac_role.name] = person.email
-      audit = factories.AuditFactory()
-      snapshots = self._create_snapshots(audit, *controls)
-
-    control_dicts = {}
-    for snapshot, control in zip(snapshots, controls):
-      # As revisions for snapshot are created using factories need to
-      # update their content and rewrite acl
-      snapshot.revision.content = control.log_json()
-      for acl in snapshot.revision.content["access_control_list"]:
-        acl["person"] = {
-            "id": acl["person_id"],
-            "type": "Person",
-        }
-      db.session.add(snapshot.revision)
-      db.session.commit()
-
-      control_dicts[control.slug] = {
-          "Code": "*" + control.slug,
-          "Revision Date": unicode(snapshot.revision.created_at),
-          "Description": u"",
-          "Effective Date": u"",
-          "Fraud Related": u"",
-          "Frequency": u"",
-          "Kind/Nature": u"",
-          "Notes": u"",
-          "Reference URL": u"",
-          "Review State": u"Unreviewed",
-          "Significance": u"",
-          "State": u"Draft",
-          "Last Assessment Date": u"",
-          "Last Deprecated Date": u"",
-          "Test Plan": u"",
-          "Title": control.title,
-          "Type/Means": u"",
-          "Audit": audit.slug,
-          "Assertions": u"",
-          "Categories": u"",
-          "Evidence": u"",
-      }
-      control_dicts[control.slug].update(**control_acr_people[control.slug])
-
-    search_request = [{
-        "object_name": "Snapshot",
-        "filters": {
-            "expression": {
-                "left": "child_type",
-                "op": {"name": "="},
-                "right": "Control",
-            },
-        },
-    }]
-    parsed_data = self.export_parsed_csv(search_request)["Control Snapshot"]
-    parsed_dict = {line["Code"]: line for line in parsed_data}
-
-    for i, _ in enumerate(controls):
-      self.assertEqual(
-          parsed_dict["*Control {}".format(i)],
-          control_dicts["Control {}".format(i)],
-      )

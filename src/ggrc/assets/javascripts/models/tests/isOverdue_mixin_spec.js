@@ -28,20 +28,8 @@ describe('can.Model.Mixin.isOverdue', function () {
       expect(method).toBeDefined();
     });
 
-    it('returns false, if status is "Verified" ' +
-    'and is_verification_needed is true', function () {
-      instance.attr('next_due_date', moment().subtract(1, 'd'));
-      instance.attr('is_verification_needed', true);
+    it('returns false, if status is "Verified"', function () {
       instance.attr('status', 'Verified');
-
-      expect(method.apply(instance)).toEqual(false);
-    });
-
-    it('returns false, if status is "Finished"' +
-    ' and is_verification_needed is false', function () {
-      instance.attr('next_due_date', moment().subtract(1, 'd'));
-      instance.attr('is_verification_needed', false);
-      instance.attr('status', 'Finished');
 
       expect(method.apply(instance)).toEqual(false);
     });

@@ -53,18 +53,14 @@
         return data.length > 0;
       },
       /**
-       * Handle changes during toggling form visibility.
+       * @description Handles changes during toggling form visibility
        *
-       * @param  {Boolean} isVisible - New value for form visibility
-       * @param  {Boolean} [keepValue=false] - Whether to preserve the existing
-       *   value of the form input field or not.
+       * @param  {Boolean} value New value for form visibility
        */
 
-      toggleFormVisibility: function (isVisible, keepValue) {
+      toggleFormVisibility: function (isVisible) {
         this.attr('isFormVisible', isVisible);
-        if (!keepValue) {
-          this.attr('value', '');
-        }
+        this.attr('value', '');
         if (isVisible) {
           this.moveFocusToInput();
         }
@@ -75,24 +71,17 @@
        * @param  {String} url - url to create
        * @return {Boolean} - it returns false to prevent page refresh
        */
+
       submitCreateReferenceUrlForm: function (url) {
-        var existingUrls;
         var trimmedUrl = url.trim();
         var isValid = this.validateUserInput(trimmedUrl);
 
         // non-valid user input case - empty string
         if (!isValid) {
-          GGRC.Errors.notifier('error', 'Please enter a URL.');
+          $(document.body).trigger('ajax:flash', {
+            error: 'Please enter a URL'
+          });
           this.toggleFormVisibility(true);
-          return false;
-        }
-
-        // duplicate URLs check
-        existingUrls = _.map(this.attr('urls'), 'link');
-
-        if (_.contains(existingUrls, trimmedUrl)) {
-          GGRC.Errors.notifier('error', 'URL already exists.');
-          this.toggleFormVisibility(true, true);
           return false;
         }
 

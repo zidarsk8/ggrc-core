@@ -16,7 +16,9 @@
         _value: {
           set: function (newValue, setValue, onError, oldValue) {
             setValue(newValue);
-            if (oldValue === undefined || oldValue === newValue) {
+            if (oldValue === undefined ||
+                (oldValue && newValue &&
+                oldValue.id === newValue.id)) {
               return;
             }
             this.valueChanged(newValue);
@@ -27,24 +29,20 @@
             setValue(newValue);
             this.attr('_value', newValue);
           }
-        },
-        fieldId: {
-          type: 'number'
         }
       },
-      withDetails: false,
-      setPerson: function (ev) {
-        this.attr('_value', ev.selectedItem.serialize().id);
+      fieldId: null,
+      setPerson: function (scope, el, ev) {
+        this.attr('_value', ev.selectedItem.serialize());
       },
       unsetPerson: function (scope, el, ev) {
         ev.preventDefault();
-        ev.stopPropagation();
         this.attr('_value', null);
       },
       valueChanged: function (newValue) {
         this.dispatch({
           type: 'valueChanged',
-          fieldId: this.attr('fieldId'),
+          fieldId: this.fieldId,
           value: newValue
         });
       }

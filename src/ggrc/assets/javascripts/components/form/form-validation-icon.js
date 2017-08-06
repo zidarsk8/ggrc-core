@@ -28,10 +28,13 @@
         iconCls: {
           get: function () {
             var icon = icons.noValidation;
-            /* Show Validations for Mandatory Fields and for DropDowns with required attachments */
-            if (this.attr('validation.show')) {
-              icon = this.attr('validation.valid') ?
-                icons.valid : icons.invalid;
+
+            if (this.attr('validation.mandatory')) {
+              icon = this.attr('validation.empty') ? icons.empty : icons.valid;
+            }
+            /* This validation is required for DropDowns with required attachments */
+            if (!this.attr('validation.valid')) {
+              icon = icons.invalid;
             }
             return icon;
           }

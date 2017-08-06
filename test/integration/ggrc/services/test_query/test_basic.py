@@ -7,7 +7,6 @@
 
 """Tests for /query api endpoint."""
 
-import itertools
 import unittest
 
 from datetime import datetime
@@ -23,7 +22,6 @@ from ggrc.models import CustomAttributeDefinition as CAD, all_models
 from ggrc.snapshotter.rules import Types
 
 from integration.ggrc import TestCase, generator
-from integration.ggrc.query_helper import WithQueryApi
 from integration.ggrc.models import factories
 
 
@@ -32,9 +30,76 @@ DATE_FORMAT_REQUEST = "%m/%d/%Y"
 DATE_FORMAT_RESPONSE = "%Y-%m-%d"
 
 
+# pylint: disable=super-on-old-class; false positive
+class BaseQueryAPITestCase(TestCase):
+  """Base class for /query api tests with utility methods."""
+
+  def setUp(self):
+    """Log in before performing queries."""
+    # we don't call super as TestCase.setUp clears the DB
+    # super(BaseQueryAPITestCase, self).setUp()
+    self.client.get("/login")
+    self.generator = generator.ObjectGenerator()
+
+  def _post(self, data):
+    """Make a POST to /query endpoint."""
+    if not isinstance(data, list):
+      data = [data]
+    headers = {"Content-Type": "application/json", }
+    return self.client.post("/query", data=json.dumps(data), headers=headers)
+
+  def _get_first_result_set(self, data, *keys):
+    """Post data, get response, get values from it like in obj["a"]["b"]."""
+    response = self._post(data)
+    self.assert200(response)
+    result = json.loads(response.data)[0]
+    for key in keys:
+      result = result.get(key)
+      self.assertIsNot(result, None)
+    return result
+
+  @staticmethod
+  def _make_query_dict_base(object_name, type_=None, filters=None, limit=None,
+                            order_by=None):
+    """Make a dict with query for object_name with optional parameters."""
+    query = {
+        "object_name": object_name,
+        "filters": filters if filters else {"expression": {}},
+    }
+    if type_:
+      query["type"] = type_
+    if limit:
+      query["limit"] = limit
+    if order_by:
+      query["order_by"] = order_by
+    return query
+
+  @staticmethod
+  def make_filter_expression(expression):
+    """Convert a three-tuple to a simple expression filter."""
+    left, op_name, right = expression
+    return {"left": left, "op": {"name": op_name}, "right": right}
+
+  @classmethod
+  def _make_query_dict(cls, object_name, expression=None, *args, **kwargs):
+    """Make a dict with query for object_name with expression shortcut.
+
+    expression should be in format: (left, op_name, right), like
+    ("title", "=", "hello").
+    """
+
+    if expression:
+      filters = {"expression": cls.make_filter_expression(expression)}
+    else:
+      filters = None
+
+    return cls._make_query_dict_base(object_name, filters=filters, *args,
+                                     **kwargs)
+
+
 # pylint: disable=too-many-public-methods
 @ddt.ddt
-class TestAdvancedQueryAPI(TestCase, WithQueryApi):
+class TestAdvancedQueryAPI(BaseQueryAPITestCase):
   """Basic tests for /query api."""
 
   @classmethod
@@ -43,10 +108,6 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     TestCase.clear_data()
     # This imported file could be simplified a bit to speed up testing.
     cls._import_file("data_for_export_testing.csv")
-
-  def setUp(self):
-    self.client.get("/login")
-    self.generator = generator.ObjectGenerator()
 
   def test_basic_query_eq(self):
     """Filter by = operator."""
@@ -870,7 +931,7 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     self.assertEqual(result_count, 1)
 
 
-class TestQueryAssessmentCA(TestCase, WithQueryApi):
+class TestQueryAssessmentCA(BaseQueryAPITestCase):
   """Test filtering assessments by CAs"""
 
   def setUp(self):
@@ -881,8 +942,7 @@ class TestQueryAssessmentCA(TestCase, WithQueryApi):
     self._check_csv_response(response, {})
     self.client.get("/login")
 
-  @staticmethod
-  def _generate_special_assessments():
+  def _generate_special_assessments(self):
     """Generate two Assessments for two local CADs with same name."""
     assessment_with_date = None
     assessment_with_text = None
@@ -966,7 +1026,7 @@ class TestQueryAssessmentCA(TestCase, WithQueryApi):
                           ["Assessment with text", "Assessment with date"])
 
 
-class TestSortingQuery(TestCase, WithQueryApi):
+class TestSortingQuery(BaseQueryAPITestCase):
   """Test sorting is correct requested with query API"""
   def setUp(self):
     TestCase.clear_data()
@@ -1096,7 +1156,7 @@ class TestSortingQuery(TestCase, WithQueryApi):
                          ["Assessment_2", "Assessment_1"])
 
 
-class TestQueryAssessmentByEvidenceURL(TestCase, WithQueryApi):
+class TestQueryAssessmentByEvidenceURL(BaseQueryAPITestCase):
   """Test assessments filtering by Evidence and/or URL"""
   def setUp(self):
     """Set up test cases for all tests."""
@@ -1134,7 +1194,7 @@ class TestQueryAssessmentByEvidenceURL(TestCase, WithQueryApi):
                            "Assessment title 4"])
 
 
-class TestQueryWithCA(TestCase, WithQueryApi):
+class TestQueryWithCA(BaseQueryAPITestCase):
   """Test query API with custom attributes."""
 
   def setUp(self):
@@ -1145,16 +1205,7 @@ class TestQueryWithCA(TestCase, WithQueryApi):
     self._check_csv_response(response, {})
     self.client.get("/login")
 
-  def _assert_in_custom_attributes(self, data, attr, *args):
-    self.assertIn(attr, data)
-    for key in args:
-      self.assertIn(key, [i['title'] for i in data[attr]])
-
-  def assert_in_global_cads(self, data, *args):
-    self._assert_in_custom_attributes(data, "global_attributes", *args)
-
-  @staticmethod
-  def _generate_cad():
+  def _generate_cad(self):
     """Generate custom attribute definitions."""
     factories.CustomAttributeDefinitionFactory(
         title="CA dropdown",
@@ -1176,6 +1227,21 @@ class TestQueryWithCA(TestCase, WithQueryApi):
         attribute_type="Map:Person",
     )
 
+  @staticmethod
+  def _flatten_cav(data):
+    """Unpack CAVs and put them in data as object attributes."""
+    cad_names = dict(db.session.query(CAD.id, CAD.title))
+    for entry in data:
+      for cav in entry.get("custom_attribute_values", []):
+        entry[cad_names[cav["custom_attribute_id"]]] = cav["attribute_value"]
+    return data
+
+  def _get_first_result_set(self, *args, **kwargs):
+    """Call this method from super and flatten CAVs additionally."""
+    return self._flatten_cav(
+        super(TestQueryWithCA, self)._get_first_result_set(*args, **kwargs),
+    )
+
   def test_single_ca_sorting(self):
     """Results get sorted by single custom attribute field."""
 
@@ -1193,12 +1259,8 @@ class TestQueryWithCA(TestCase, WithQueryApi):
                               order_by=[{"name": "CA text"}]),
         "Program", "values",
     )
-    keys = []
-    for program in programs:
-      self.assert_in_global_cads(program, "CA text")
-      for attr in program["global_attributes"]:
-        if attr["title"] == "CA text":
-          keys.append(attr["values"][0]["value"])
+
+    keys = [program["CA text"] for program in programs]
     self.assertEqual(keys, sorted(keys))
 
   def test_mixed_ca_sorting(self):
@@ -1211,13 +1273,7 @@ class TestQueryWithCA(TestCase, WithQueryApi):
         "Program", "values",
     )
 
-    keys = []
-    for program in programs:
-      self.assert_in_global_cads(program, "CA text")
-      for attr in program["global_attributes"]:
-        if attr["title"] == "CA text":
-          keys.append((attr["values"][0]["value"], attr['title']))
-
+    keys = [(program["CA text"], program["title"]) for program in programs]
     self.assertEqual(keys, sorted(keys))
 
     programs = self._get_first_result_set(
@@ -1227,13 +1283,7 @@ class TestQueryWithCA(TestCase, WithQueryApi):
         "Program", "values",
     )
 
-    keys = []
-    for program in programs:
-      self.assert_in_global_cads(program, "CA text")
-      for attr in program["global_attributes"]:
-        if attr["title"] == "CA text":
-          keys.append((program['title'], attr["values"][0]["value"]))
-
+    keys = [(program["title"], program["CA text"]) for program in programs]
     self.assertEqual(keys, sorted(keys))
 
   def test_multiple_ca_sorting(self):
@@ -1246,16 +1296,7 @@ class TestQueryWithCA(TestCase, WithQueryApi):
         "Program", "values",
     )
 
-    keys = []
-    for program in programs:
-      self.assert_in_global_cads(
-          program, "CA text", "CA dropdown")
-      res = []
-      for key in ("CA text", "CA dropdown"):
-        for attr in program["global_attributes"]:
-          if attr["title"] == key:
-            res.append(attr["values"][0]["value"])
-      keys.append(tuple(res))
+    keys = [(prog["CA text"], prog["CA dropdown"]) for prog in programs]
     self.assertEqual(keys, sorted(keys))
 
   def test_ca_query_eq(self):
@@ -1320,7 +1361,7 @@ class TestQueryWithCA(TestCase, WithQueryApi):
     self.assertEqual(response.json['message'], "Invalid filter data")
 
 
-class TestQueryWithUnicode(TestCase, WithQueryApi):
+class TestQueryWithUnicode(BaseQueryAPITestCase):
   """Test query API with unicode values."""
 
   CAD_TITLE1 = u"CA список" + "X" * 200
@@ -1352,10 +1393,8 @@ class TestQueryWithUnicode(TestCase, WithQueryApi):
     """Unpack CAVs and put them in data as object attributes."""
     cad_names = dict(db.session.query(CAD.id, CAD.title))
     for entry in data:
-      for cav in itertools.chain(entry.get("global_attributes", []),
-                                 entry.get("local_attributes", [])):
-        for value in cav['values']:
-          entry[cad_names[cav["id"]]] = value["value"]
+      for cav in entry.get("custom_attribute_values", []):
+        entry[cad_names[cav["custom_attribute_id"]]] = cav["attribute_value"]
     return data
 
   def setUp(self):

@@ -6,11 +6,10 @@ describe('GGRC.Components.dropdownFormField', function () {
     viewModel = GGRC.Components
       .getViewModel('dropdownFormField');
     spyOn(viewModel, 'dispatch');
-    viewModel.attr('fieldId', 1);
+    viewModel.attr('fieldId', 'id');
   });
 
-  it('does not fire valueChanged event on' +
-    ' first value assignation', function () {
+  it('does not fire valueChanged event on first value assignation', function () {
     viewModel.attr('value', '');
     expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
@@ -33,13 +32,13 @@ describe('GGRC.Components.dropdownFormField', function () {
     viewModel.attr('_value', 'newValue');
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
-      fieldId: 1,
+      fieldId: 'id',
       value: 'newValue'
     });
     viewModel.attr('_value', 'newValue2');
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',
-      fieldId: 1,
+      fieldId: 'id',
       value: 'newValue2'
     });
   });

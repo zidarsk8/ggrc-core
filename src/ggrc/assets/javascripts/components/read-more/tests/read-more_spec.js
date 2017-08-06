@@ -5,100 +5,65 @@
 
 describe('GGRC.Component.ReadMore', function () {
   'use strict';
-  var vm;
+  var testingText = 'Lorem ipsum ' +
+    'dolor sit amet, consectetur adipiscing elit.' +
+    ' Mauris accumsan porta nisl ut lobortis.' +
+    ' Proin sollicitudin enim ante,' +
+    ' sit amet elementum ipsum fringilla sed';
+  var readMore = 'Read More';
 
-  beforeEach(function () {
-    vm = GGRC.Components.getViewModel('readMore');
-  });
-
-  describe('toggle() method', function () {
-    var eventMock;
+  var defaultScopeState = {
+    text: testingText,
+    expanded: false,
+    showButton: false,
+    overflowing: false,
+    btnText: readMore,
+    maxTextLength: 10
+  };
+  describe('.toggle() method', function () {
+    var Component;  // the component under test
+    var toggle;
+    var scope;
+    var eventMock = {
+      stopPropagation: function () {}
+    };
 
     beforeEach(function () {
-      eventMock = {
-        stopPropagation: jasmine.createSpy()
-      };
+      Component = GGRC.Components.get('readMore');
+      scope = new can.Map(Component.prototype.scope);
+      toggle = Component.prototype.scope.toggle;
+      toggle = toggle.bind(scope);
     });
 
-    it('calls stopPropagation()', function () {
-      vm.toggle(eventMock);
+    it('switch default state', function () {
+      scope.attr('expanded', true);
 
-      expect(eventMock.stopPropagation).toHaveBeenCalled();
-    });
+      toggle(null, null, eventMock);
 
-    it('switchs expanded attribute', function () {
-      vm.attr('expanded', true);
-      vm.toggle(eventMock);
-
-      expect(vm.attr('expanded')).toBe(false);
-      vm.toggle(eventMock);
-
-      expect(vm.attr('expanded')).toBe(true);
+      expect(scope.attr('expanded')).toBe(defaultScopeState.expanded);
     });
   });
-  describe('set() of cssClass attribute', function () {
-    it('returns empty string if viewModel.expanded is true', function () {
-      vm.attr('expanded', true);
-      expect(vm.attr('cssClass')).toEqual('');
-    });
-    it('returns specific css string ' +
-    'if viewModel.expanded is false', function () {
-      var i = 1;
-      for (; i <= 10; i++) {
-        vm.attr('maxLinesNumber', i);
-        expect(vm.attr('cssClass')).toEqual('ellipsis-truncation-' + i);
-      }
-    });
-  });
-  describe('isOverflowing(element) method', function () {
-    var element;
+  describe('.setValues() method', function () {
+    var Component;  // the component under test
+    var setValues;
+    var scope;
 
-    describe('if component is not expanded', function () {
-      it('sets true to overflowing' +
-      ' if scrollHeight of element greater then clientHeight', function () {
-        vm.attr('expanded', false);
-        element = {
-          scrollHeight: 100,
-          clientHeight: 50
-        };
-        vm.isOverflowing(element);
-        expect(vm.attr('overflowing')).toBe(true);
-      });
-      it('sets false to overflowing if scrollHeight' +
-      ' of element less or equal then clientHeight', function () {
-        vm.attr('expanded', false);
-        element = {
-          scrollHeight: 100,
-          clientHeight: 101
-        };
-        vm.isOverflowing(element);
-        expect(vm.attr('overflowing')).toBe(false);
-      });
+    beforeEach(function () {
+      Component = GGRC.Components.get('readMore');
+      scope = new can.Map(Component.prototype.scope);
+      setValues = Component.prototype.scope.setValues;
+      setValues = setValues.bind(scope);
     });
 
-    describe('if component is expanded', function () {
-      it('sets true to overflowing if clientHeight of element' +
-      ' greater or equal then minimal allowed height', function () {
-        vm.attr('expanded', true);
-        vm.attr('lineHeight', 20);
-        vm.attr('maxLinesNumber', 5);
-        element = {
-          clientHeight: 100
-        };
-        vm.isOverflowing(element);
-        expect(vm.attr('overflowing')).toBe(true);
-      });
-      it('sets false to overflowing if clientHeight of element' +
-      ' less then minimal allowed height', function () {
-        vm.attr('expanded', true);
-        vm.attr('lineHeight', 20);
-        vm.attr('maxLinesNumber', 5);
-        element = {
-          clientHeight: 80
-        };
-        vm.isOverflowing(element);
-        expect(vm.attr('overflowing')).toBe(false);
-      });
+    it('switch update resultedText, overflowing', function () {
+      scope.attr('maxTextLength', defaultScopeState.maxTextLength);
+      scope.attr('text', testingText);
+
+      setValues(testingText);
+
+      expect(scope.attr('text')).toBe(testingText);
+      expect(scope.attr('overflowing')).toBe(true);
+      expect(scope.attr('resultedText')).toBe(testingText.slice(0, 7) + '...');
     });
   });
 });

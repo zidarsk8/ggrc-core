@@ -1,8 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-# pylint: disable=redefined-outer-name
-
 from datetime import datetime, date
 from flask import Blueprint
 from sqlalchemy import inspect, and_, orm
@@ -358,19 +356,18 @@ def update_cycle_task_child_state(obj):
           update_cycle_task_child_state(child)
 
 
-def _update_parent_state(parent, child_statuses):
+def _update_parent_state(obj, parent, child_statuses):
   """Util function, update status of sent parent, if it's allowed.
 
   New status based on sent object status and sent child_statuses"""
+  if not is_allowed_update(obj.__class__.__name__, obj.id, obj.context.id):
+    return
   old_status = parent.status
-  if len(child_statuses) == 1:
-    new_status = child_statuses.pop()
-    if new_status == "Declined":
-      new_status = "InProgress"
-  elif {"InProgress", "Declined", "Assigned"} & child_statuses:
+  if obj.status in {"InProgress", "Declined"}:
     new_status = "InProgress"
-  else:
-    new_status = "Finished"
+  elif obj.status in {"Finished", "Verified", "Assigned"}:
+    in_same_status = len(child_statuses) == 1
+    new_status = child_statuses.pop() if in_same_status else old_status
   if old_status == new_status:
     return
   parent.status = new_status
@@ -383,7 +380,7 @@ def _update_parent_state(parent, child_statuses):
   )
 
 
-def update_cycle_task_object_task_parent_state(obj, for_delete=False):
+def update_cycle_task_object_task_parent_state(obj):
   """Update cycle task group status for sent cycle task"""
   if obj.cycle.workflow.kind == "Backlog":
     return
@@ -391,9 +388,12 @@ def update_cycle_task_object_task_parent_state(obj, for_delete=False):
       models.CycleTaskGroupObjectTask.status
   ).filter(
       models.CycleTaskGroupObjectTask.cycle_task_group_id ==
-      obj.cycle_task_group_id
-  ).distinct().with_for_update())
+      obj.cycle_task_group_id,
+      models.CycleTaskGroupObjectTask.id != obj.id
+  ).distinct(
+  )) | {obj.status}
   _update_parent_state(
+      obj,
       obj.cycle_task_group,
       child_statuses
   )
@@ -409,8 +409,10 @@ def update_cycle_task_group_parent_state(obj):
   ).filter(
       models.CycleTaskGroup.cycle_id == obj.cycle_id,
       models.CycleTaskGroup.id != obj.id
-  ).distinct().with_for_update()) | {obj.status}
+  ).distinct(
+  )) | {obj.status}
   _update_parent_state(
+      obj,
       obj.cycle,
       child_statuses
   )
@@ -519,7 +521,6 @@ def handle_task_group_delete(sender, obj=None, src=None, service=None):  # noqa 
 @signals.Restful.model_deleted.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_delete(sender, obj=None,
                                                src=None, service=None):  # noqa pylint: disable=unused-argument
-  """Update cycle dates and statuses"""
   db.session.flush()
   update_cycle_dates(obj.cycle)
 
@@ -545,6 +546,7 @@ def handle_cycle_task_group_object_task_put(
         new_status=obj.status,
         old_status=inspect(obj).attrs.status.history.deleted.pop(),
     )
+    update_cycle_task_object_task_parent_state(obj)
 
   # Doing this regardless of status.history.has_changes() is important in order
   # to update objects that have been declined. It updates the os_last_updated
@@ -556,19 +558,6 @@ def handle_cycle_task_group_object_task_put(
         tgobj.set_reviewed_state()
         db.session.add(tgobj)
     db.session.flush()
-
-
-@signals.Restful.model_posted_after_commit.connect_via(
-    models.CycleTaskGroupObjectTask)
-@signals.Restful.model_put_after_commit.connect_via(
-    models.CycleTaskGroupObjectTask)
-@signals.Restful.model_deleted_after_commit.connect_via(
-    models.CycleTaskGroupObjectTask)
-# noqa pylint: disable=unused-argument
-def handle_cycle_object_status(
-        sender, obj=None, src=None, service=None, event=None):
-  """Calculate status of cycle and cycle task group"""
-  update_cycle_task_object_task_parent_state(obj)
 
 
 @signals.Restful.model_posted.connect_via(models.CycleTaskGroupObjectTask)
@@ -585,6 +574,7 @@ def handle_cycle_task_group_object_task_post(
       new_status=obj.status,
       old_status=None,
   )
+  update_cycle_task_object_task_parent_state(obj)
   db.session.flush()
 
 
@@ -661,7 +651,7 @@ def handle_cycle_put(
 
 @signals.Restful.model_put.connect_via(models.Workflow)
 def handle_workflow_put(
-        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument  # noqa pylint: disable=unused-argument
   update_workflow_state(obj)
 
 

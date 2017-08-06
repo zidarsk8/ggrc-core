@@ -4,7 +4,6 @@
 """This module contains logic to handle '/query' endpoint."""
 
 import time
-import logging
 from wsgiref.handlers import format_date_time
 
 from flask import request
@@ -13,20 +12,10 @@ from werkzeug.exceptions import BadRequest
 
 from ggrc.query.exceptions import BadQueryException
 from ggrc.query.default_handler import DefaultHandler
-from ggrc.query.assessments_summary_handler import AssessmentsSummaryHandler
 from ggrc.login import login_required
 from ggrc.models.inflector import get_model
 from ggrc.services.common import etag
 from ggrc.utils import as_json
-from ggrc.utils import benchmark
-
-
-logger = logging.getLogger()
-
-
-OPTIMIZED_HANDLERS = [
-    AssessmentsSummaryHandler,
-]
 
 
 def build_collection_representation(model, description):
@@ -56,50 +45,25 @@ def http_timestamp(timestamp):
   return format_date_time(time.mktime(timestamp.utctimetuple()))
 
 
-def _get_query_handler(query):
-  """Get the first matching query handler for a given query."""
-  for optimized_handler in OPTIMIZED_HANDLERS:
-    try:
-      if optimized_handler.match(query):
-        return optimized_handler
-    except Exception:  # pylint: disable=broad-except
-      # No exception in the query matcher should affect the response of the
-      # request. We need to safely fallback to default query handler if
-      # anything happens.
-      logger.warning("Error matching %s handler.", optimized_handler.__name__)
-  return DefaultHandler
-
-
-def get_handler_results(query):
-  """Get results from the best matching query handler.
-
-  Args:
-    query: dict containing query parameters.
-  Returns:
-    dict containing json serializable query results.
-  """
-
-  handler_class = _get_query_handler(query)
-
-  query_handler = handler_class(query)
-  name = query_handler.__class__.__name__
-  with benchmark("Get query Handler results from: {}".format(name)):
-    return query_handler.get_results()
-
-
 def get_objects_by_query():
   """Return objects corresponding to a POST'ed query list."""
   query = request.json
 
-  results = get_handler_results(query)
+  query_handler = DefaultHandler(query)
+  results = query_handler.get_results()
 
   last_modified_list = [result["last_modified"] for result in results
                         if result["last_modified"]]
   last_modified = max(last_modified_list) if last_modified_list else None
   collections = []
-  collection_fields = ["ids", "values", "count", "total", "object_name"]
+  collection_fields = ["ids", "values", "count", "total"]
 
   for result in results:
+    if last_modified is None:
+      last_modified = result["last_modified"]
+    elif result["last_modified"] is not None:
+      last_modified = max(last_modified, result["last_modified"])
+
     model = get_model(result["object_name"])
 
     collection = build_collection_representation(

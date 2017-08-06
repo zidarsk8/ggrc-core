@@ -6,6 +6,7 @@
 """Tests for /query api endpoint."""
 
 from sqlalchemy import func
+from flask import json
 
 from ddt import data
 from ddt import ddt
@@ -18,14 +19,15 @@ from ggrc import db
 
 from integration.ggrc import TestCase
 from integration.ggrc import generator
-from integration.ggrc.query_helper import WithQueryApi
 from integration.ggrc.models import factories
 from integration.ggrc.models.factories import single_commit
+from integration.ggrc.services.test_query.test_basic import (
+    BaseQueryAPITestCase)
 
 
 # pylint: disable=super-on-old-class
 @ddt
-class TestAuditSnapshotQueries(TestCase, WithQueryApi):
+class TestAuditSnapshotQueries(TestCase):
   """Tests for /query api for Audit snapshots"""
 
   # objects mapped to assessments after set up:
@@ -62,6 +64,13 @@ class TestAuditSnapshotQueries(TestCase, WithQueryApi):
     """Log in before performing queries."""
     self.client.get("/login")
     self.client.post("/admin/reindex")
+
+  def _post(self, request_data):
+    return self.client.post(
+        "/query",
+        data=json.dumps(request_data),
+        headers={"Content-Type": "application/json", }
+    )
 
   @classmethod
   def setUpClass(cls):
@@ -403,14 +412,13 @@ class TestAuditSnapshotQueries(TestCase, WithQueryApi):
 
 
 @ddt
-class TestSnapshotIndexing(TestCase, WithQueryApi):
+class TestSnapshotIndexing(BaseQueryAPITestCase):
   """Test suite to check indexing of special fields in Snapshots."""
 
   def setUp(self):
     self.clear_data()
     super(TestSnapshotIndexing, self).setUp()
     self.generator = generator.ObjectGenerator()
-    self.client.get("/login")
 
   @classmethod
   def _make_snapshot_query_dict(cls, child_type, expression=None, *args,

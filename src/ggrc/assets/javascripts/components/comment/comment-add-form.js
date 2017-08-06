@@ -31,8 +31,7 @@
           context: source.context,
           assignee_type: GGRC.Utils.getAssigneeType(source),
           created_at: new Date(),
-          modified_by: {type: 'Person', id: GGRC.current_user.id},
-          _stamp: Date.now()
+          modified_by: {type: 'Person', id: GGRC.current_user.id}
         };
       },
       updateComment: function (comment) {
@@ -47,12 +46,9 @@
         comment = this.updateComment(comment);
         this.dispatch({type: 'beforeCreate', items: [comment.attr()]});
         comment.save()
-          .always(function (instance) {
+          .always(function () {
             this.attr('isSaving', false);
-            this.dispatch({
-              type: 'afterCreate',
-              item: instance
-            });
+            this.dispatch('afterCreate');
             this.attr('instance').dispatch('refreshInstance');
           }.bind(this));
       }

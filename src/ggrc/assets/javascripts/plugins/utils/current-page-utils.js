@@ -34,18 +34,14 @@
       models = can.makeArray(models);
 
       models.forEach(function (model) {
-        var query = queryAPI.buildRelevantIdsQuery(
+        reqParams.push(queryAPI.batchRequests(queryAPI.buildRelevantIdsQuery(
           model,
           {},
           {
             type: currentPageInstance.type,
             id: currentPageInstance.id,
             operation: 'relevant'
-          });
-        if (SnapshotUtils.isSnapshotRelated(currentPageInstance.type, model)) {
-          query = SnapshotUtils.transformQuery(query);
-        }
-        reqParams.push(queryAPI.batchRequests(query));
+          })));
       });
 
       return can.when.apply(can, reqParams)
@@ -53,9 +49,7 @@
           var response = can.makeArray(arguments);
 
           models.forEach(function (model, idx) {
-            var ids = response[idx][model] ?
-              response[idx][model].ids :
-              response[idx].Snapshot.ids;
+            var ids = response[idx][model].ids;
             var map = ids.reduce(function (mapped, id) {
               mapped[id] = true;
               return mapped;
@@ -136,9 +130,10 @@
       // Needs refactoring: Should be removed and replaced with Routing!!!
       var isObjectBrowser = /^\/objectBrowser\/?$/.test(path);
 
-      // Remove info tab from object-browser list of tabs
+      // Remove info and task tabs from object-browser list of tabs
       if (isObjectBrowser) {
         defaults.splice(defaults.indexOf('info'), 1);
+        defaults.splice(defaults.indexOf('task'), 1);
       }
       return defaults;
     }

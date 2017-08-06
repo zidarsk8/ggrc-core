@@ -38,10 +38,10 @@ class TestObjectivePage(base.Test):
   ):
     """Check if Objectives can be mapped to Control via REST."""
     # pylint: disable=too-many-arguments
+
     expected_status_code = RestClient.STATUS_CODES["OK"]
-    dynamic_relationships = string_utils.convert_to_list(dynamic_relationships)
-    assert all(expected_status_code == relationship.status_code
-               for relationship in dynamic_relationships)
+    actual_status_code = dynamic_relationships[0].status_code
+    assert expected_status_code == actual_status_code
     assert (
         (rest_service.RelationshipsService().map_objs(
             src_obj=new_control_rest,

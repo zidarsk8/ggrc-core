@@ -156,19 +156,6 @@
           this.attr(type).replace(this['load' + can.capitalize(type)]());
         }.bind(this));
       },
-      afterCreate: function (event, type) {
-        var instance = event.item;
-        var items = this.attr(type);
-
-        this.attr('isUpdating' + can.capitalize(type), false);
-        items.replace(items.map(function (item) {
-          if (item._stamp === instance._stamp) {
-            instance.attr('isDraft', false);
-            return instance;
-          }
-          return item;
-        }));
-      },
       removeItem: function (event, type) {
         var item = event.item;
         var index = this.attr(type).indexOf(item);
@@ -204,14 +191,10 @@
       },
       initializeFormFields: function () {
         this.attr('formFields',
-            this.attr('instance.local_attributes')
-              .map(GGRC.Utils.CustomAttributes.prepareLocalAttribute)
+          GGRC.Utils.CustomAttributes.convertValuesToFormFields(
+            this.attr('instance.custom_attribute_values')
+          )
         );
-      },
-      initGlobalAttributes: function () {
-        return this.attr('globalAttributes',
-          this.attr('instance.global_attributes')
-            .map(GGRC.Utils.CustomAttributes.prepareGlobalAttribute));
       },
       onFormSave: function () {
         this.attr('triggerFormSaveCbs').fire();
@@ -235,13 +218,6 @@
           .then(function () {
             instance.refresh().then(function () {
               instance.attr('status', isUndo ? previousStatus : newStatus);
-
-              if (instance.attr('status') === 'Ready for Review' && !isUndo) {
-                $(document.body).trigger('ajax:flash',
-                  {hint: 'The assessment is complete. ' +
-                  'The verifier may revert it if further input is needed.'});
-              }
-
               return instance.save()
               .then(function () {
                 instance.attr('isPending', false);
@@ -251,33 +227,28 @@
             });
           });
       },
-      updateAttributes: function (attrs, fields) {
-        can.Map.keys(fields).forEach(function (fieldId) {
+      saveFormFields: function (formFields) {
+        var caValues = can.makeArray(
+          this.attr('instance.custom_attribute_values')
+        );
+        Object.keys(formFields).forEach(function (fieldId) {
           var caValue =
-            attrs.filter(function (item) {
-              return item.id === Number(fieldId);
-            })[0];
+            caValues
+              .find(function (item) {
+                return item.def.id === Number(fieldId);
+              });
           if (!caValue) {
-            console.error('Corrupted Date: ', attrs);
+            console.error('Corrupted Date: ', caValues);
             return;
           }
-          if (caValue.attr('values').length) {
-            caValue.attr('values')[0].attr('value', fields[fieldId]);
-          } else {
-            caValue.attr('values').push({value: fields[fieldId]});
-          }
+          caValue.attr('attribute_value',
+            GGRC.Utils.CustomAttributes.convertToCaValue(
+              caValue.attr('attributeType'),
+              formFields[fieldId]
+            )
+          );
         });
-      },
-      saveGlobalAttributes: function (event) {
-        var globalAttributes = event.globalAttributes;
-        var caValues = this.attr('instance.global_attributes');
-        this.updateAttributes(caValues, globalAttributes);
 
-        return this.attr('instance').save();
-      },
-      saveFormFields: function (formFields) {
-        var caValues = this.attr('instance.local_attributes');
-        this.updateAttributes(caValues, formFields);
         return this.attr('instance').save();
       },
       showRequiredInfoModal: function (e, field) {
@@ -315,8 +286,13 @@
     },
     init: function () {
       this.viewModel.initializeFormFields();
-      this.viewModel.initGlobalAttributes();
       this.viewModel.updateRelatedItems();
+    },
+    events: {
+      '{viewModel.instance} refreshInstance': function () {
+        this.viewModel.attr('mappedSnapshots')
+          .replace(this.viewModel.loadSnapshots());
+      }
     }
   });
 })(window.can, window.GGRC);

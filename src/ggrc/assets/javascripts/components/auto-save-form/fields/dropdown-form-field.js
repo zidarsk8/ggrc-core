@@ -14,7 +14,6 @@
     viewModel: {
       define: {
         _value: {
-          type: 'string',
           set: function (newValue, setValue, onError, oldValue) {
             setValue(newValue);
             if (oldValue === undefined ||
@@ -29,16 +28,14 @@
             setValue(newValue);
             this.attr('_value', newValue);
           }
-        },
-        fieldId: {
-          type: 'number'
         }
       },
+      fieldId: null,
       options: [],
       valueChanged: function (newValue) {
         this.dispatch({
           type: 'valueChanged',
-          fieldId: this.attr('fieldId'),
+          fieldId: this.fieldId,
           value: newValue
         });
       }

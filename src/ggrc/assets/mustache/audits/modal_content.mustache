@@ -48,13 +48,13 @@
       </div>
       <div class="span3">
         <label>
-          Audit Captain
+          Internal Audit Lead
           <span class="required">*</span>
         </label>
         <i class="fa fa-person green pull-left icon-field"></i>
         <div class="objective-selector">
           {{#using contact=instance.contact}}
-            <input data-id="audit_lead" tabindex="3" type="text" name="contact.email" data-lookup="Person" class="span10 audit-selector search-icon" placeholder="Enter text to search for Audit Captain" value="{{firstnonempty contact.email ''}}">
+            <input data-id="internal_audit_lead" tabindex="3" type="text" name="contact.email" data-lookup="Person" class="span10 audit-selector search-icon" placeholder="Enter text to search for Internal Audit Lead" value="{{firstnonempty contact.email ''}}">
           {{/using}}
         </div>
       </div>

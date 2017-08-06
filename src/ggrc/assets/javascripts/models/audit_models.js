@@ -58,7 +58,6 @@
     destroy: 'DELETE /api/audits/{id}',
     create: 'POST /api/audits',
     mixins: [
-      'contactable',
       'unique_title',
       'ca_update',
       'timeboxed',
@@ -94,7 +93,7 @@
         attr_title: 'Title',
         attr_name: 'title'
       }, {
-        attr_title: 'Audit Captain',
+        attr_title: 'Internal Audit Lead',
         attr_name: 'audit_lead',
         attr_sort_field: 'contact'
       }, {
@@ -129,7 +128,7 @@
       this.validatePresenceOf('program');
       this.validateNonBlank('title');
       this.validateContact(['_transient.contact', 'contact'], {
-        message: 'Audit captain cannot be empty'
+        message: 'Internal audit lead cannot be empty'
       });
       this.validate(['_transient.audit_firm', 'audit_firm'],
         function () {
@@ -326,7 +325,6 @@
     destroy: 'DELETE /api/assessment_templates/{id}',
     create: 'POST /api/assessment_templates',
     is_custom_attributable: false,
-    hasCustomAttributes: true,
     attributes: {
       audit: 'CMS.Models.Audit.stub',
       context: 'CMS.Models.Context.stub'

@@ -6,7 +6,6 @@
 from logging import getLogger
 
 from ggrc import models
-from ggrc.converters import errors
 from ggrc.converters.handlers import handlers
 from ggrc.login import get_current_user_id
 
@@ -36,36 +35,19 @@ class DocumentLinkHandler(handlers.ColumnHandler):
     Returns:
       list of documents for all URLs and evidences.
     """
-    new_links = set()
-    duplicate_new_links = set()
-
     documents = []
     user_id = get_current_user_id()
-
     for line in self.raw_value.splitlines():
       link, title = self._parse_line(line)
       if not (link and title):
         continue
-
-      if link in new_links:
-        duplicate_new_links.add(link)
-      else:
-        new_links.add(link)
-        documents.append(models.Document(
-            link=link,
-            title=title,
-            modified_by_id=user_id,
-            context=self.row_converter.obj.context,
-            document_type=self.DOCUMENT_TYPE,
-        ))
-
-    if duplicate_new_links:
-      # NOTE: We rely on the fact that links in duplicate_new_links are all
-      # instances of unicode (if that assumption breaks, unicode encode/decode
-      # errors can occur for non-ascii link values)
-      self.add_warning(errors.DUPLICATE_IN_MULTI_VALUE,
-                       column_name=self.display_name,
-                       duplicates=u", ".join(sorted(duplicate_new_links)))
+      documents.append(models.Document(
+          link=link,
+          title=title,
+          modified_by_id=user_id,
+          context=self.row_converter.obj.context,
+          document_type=self.DOCUMENT_TYPE,
+      ))
 
     return documents
 
