@@ -140,8 +140,8 @@ class DeleteColumnHandler(ColumnHandler):
   TRUE_VALUES = {"true", "yes", "force"}
 
   def __init__(self, *args, **kwargs):
-    super(DeleteColumnHandler, self).__init__(*args, **kwargs)
     self._allow_cascade = False
+    super(DeleteColumnHandler, self).__init__(*args, **kwargs)
 
   def get_value(self):
     return ""
