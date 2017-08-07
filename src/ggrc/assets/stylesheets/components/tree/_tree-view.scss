@@ -313,6 +313,22 @@ tree-filter-input {
   }
 }
 
+tree-status-filter {
+  display: flex;
+  align-items: center;
+
+  .fa-question-circle {
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    margin: 0 0 0 8px;
+    color: $black;
+    &:hover {
+      opacity: 1;
+      cursor: pointer;
+    }
+  }
+}
+
 tree-header {
   .tree-header {
     align-items: center;
