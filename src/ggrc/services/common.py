@@ -869,7 +869,14 @@ class Resource(ModelView):
           obj.__class__, obj=obj, src=src, service=self, event=event)
       # Note: Some data is created in listeners for model_put_after_commit
       # (like updates to snapshots), so we need to commit the changes
+      with benchmark("Get modified objects"):
+        modified_objects = get_modified_objects(db.session)
+      with benchmark("Update memcache before commit"):
+        update_memcache_before_commit(
+            self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
       db.session.commit()
+      with benchmark("Update memcache after commit"):
+        update_memcache_after_commit(self.request)
       if self.has_cache():
         self.invalidate_cache_to(obj)
     with benchmark("Send event job"):
