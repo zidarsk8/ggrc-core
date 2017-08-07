@@ -34,14 +34,18 @@
       models = can.makeArray(models);
 
       models.forEach(function (model) {
-        reqParams.push(queryAPI.batchRequests(queryAPI.buildRelevantIdsQuery(
+        var query = queryAPI.buildRelevantIdsQuery(
           model,
           {},
           {
             type: currentPageInstance.type,
             id: currentPageInstance.id,
             operation: 'relevant'
-          })));
+          });
+        if (SnapshotUtils.isSnapshotRelated(currentPageInstance.type, model)) {
+          query = SnapshotUtils.transformQuery(query);
+        }
+        reqParams.push(queryAPI.batchRequests(query));
       });
 
       return can.when.apply(can, reqParams)
@@ -49,7 +53,9 @@
           var response = can.makeArray(arguments);
 
           models.forEach(function (model, idx) {
-            var ids = response[idx][model].ids;
+            var ids = response[idx][model] ?
+              response[idx][model].ids :
+              response[idx].Snapshot.ids;
             var map = ids.reduce(function (mapped, id) {
               mapped[id] = true;
               return mapped;
