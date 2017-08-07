@@ -3,6 +3,12 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+$dashboard-list-height: 40px;
+$dashboard-list-top-padding: 5px;
+$dashboard-list-side-paddings: 15px;
+
+$dashboard-tab-active-background-color: #e0e0e0;
+$dashboard-tab-border-color: #d8d8d8;
 
 .dashboard-widget {
   height: 100%;
@@ -10,10 +16,40 @@
   &.info {
     padding: 0;
     margin-top: -5px;
+
+    ul.dashboard-list {
+      list-style: none;
+      display: flex;
+      margin: 0;
+      padding: $dashboard-list-top-padding $dashboard-list-side-paddings 0;
+      height: $dashboard-list-height - 1px;
+      border-bottom: 1px solid $dashboard-tab-border-color;
+
+      li {
+        padding: 0 10px;
+        height: $dashboard-list-height - 2px;
+        line-height: $dashboard-list-height - 2px;
+        border: 1px solid $dashboard-tab-border-color;
+
+        &:not(:first-child) {
+          margin-left: -1px;
+        }
+
+        &:not(.active) {
+          cursor: pointer;
+        }
+
+        &.active {
+          background-color: $dashboard-tab-active-background-color;
+          border-bottom-color: $dashboard-tab-active-background-color;
+          font-weight: bold;
+        }
+      }
+    }
   }
 
   iframe {
     width: 100%;
-    height: 100%;
+    height: calc(100% - #{$dashboard-list-height + $dashboard-list-top-padding});
   }
 }

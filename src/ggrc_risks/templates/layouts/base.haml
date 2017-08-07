@@ -24,9 +24,9 @@
       window.st=Date.now();
       -block extra_javascript
 
-    -if config.get("AUDIT_DASHBOARD_INTEGRATION_URL")
+    -if config.get("DASHBOARD_INTEGRATION")
       :javascript
-        GGRC.AUDIT_DASHBOARD_INTEGRATION_URL='{{config.get("AUDIT_DASHBOARD_INTEGRATION_URL" | safe)}}';
+        GGRC.DASHBOARD_INTEGRATION='{{config.get("DASHBOARD_INTEGRATION") | safe}}';
 
     -assets "dashboard-js"
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
