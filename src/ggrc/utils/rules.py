@@ -57,7 +57,7 @@ def get_mapping_rules():
   # Audit and Audit-scope objects
   # Assessment and Issue have a special Audit field instead of map:audit
   business_object_rules.update({
-      "Audit": set(),
+      "Audit": snapshots | {"Assessment", "Issue"},
       "Assessment": snapshots | {"Issue"},
       "Issue": snapshots | {"Assessment"},
   })
