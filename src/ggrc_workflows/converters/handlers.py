@@ -4,7 +4,7 @@
 
 """ Module for all special column handlers for workflow objects """
 
-import datetime
+from sqlalchemy import inspection
 
 from ggrc import db
 from ggrc import models
@@ -53,16 +53,27 @@ class UnitColumnHandler(handlers.ColumnHandler):
 
   def parse_item(self):
     """Parse Unit column value."""
-    if not self.mandatory and self.raw_value in {"-", "--", "---"}:
-      self.set_empty = True
-      return None
     value = self.raw_value.lower().strip()
-    if not value:
+    if value in {"-", "--", "---"}:
+      self.set_empty = True
+      value = None
+    elif not value:
+      value = None
+
+    if not self.row_converter.is_new and self.raw_value:
+      insp = inspection.inspect(self.row_converter.obj)
+      unit_prev = getattr(insp.attrs, self.key).history.unchanged
+      if not value in unit_prev:
+        self.add_warning(errors.UNMODIFIABLE_COLUMN,
+                         column_name=self.display_name)
+        self.set_empty = False
       return None
-    if value not in wf_models.Workflow.VALID_UNITS:
+
+    if value and value not in wf_models.Workflow.VALID_UNITS:
       self.add_error(errors.WRONG_VALUE_ERROR,
                      column_name=self.display_name)
       return None
+
     return value
 
 
@@ -73,21 +84,34 @@ class RepeatEveryColumnHandler(handlers.ColumnHandler):
   def parse_item(self):
     """Parse 'repeat every' value
     """
-    if not self.mandatory and self.raw_value in {"-", "--", "---"}:
+    value = self.raw_value.strip()
+    if value in {"-", "--", "---"}:
       self.set_empty = True
+      value = None
+    elif value:
+      try:
+        value = int(self.raw_value)
+        if not (0 < value < 31):
+          raise ValueError
+      except ValueError:
+        self.add_error(errors.WRONG_VALUE_ERROR,
+                       column_name=self.display_name)
+        return
+    else:
+      # if it is an empty string
+      value = None
+
+    # check if value is unmodified for existing workflow
+    if not self.row_converter.is_new and self.raw_value:
+      insp = inspection.inspect(self.row_converter.obj)
+      repeat_prev = getattr(insp.attrs, self.key).history.unchanged
+      if not value in repeat_prev:
+        self.add_warning(errors.UNMODIFIABLE_COLUMN,
+                         column_name=self.display_name)
+        self.set_empty = False
       return None
-    if not self.raw_value.strip():
-      return None
-    try:
-      value = int(self.raw_value)
-      if 0 < value < 31:
-        return value
-      else:
-        raise ValueError
-    except ValueError:
-      self.add_error(errors.WRONG_VALUE_ERROR,
-                     column_name=self.display_name)
-      return None
+
+    return value
 
   def get_value(self):
     """Get 'Repeat Every' user readable value for Workflow."""

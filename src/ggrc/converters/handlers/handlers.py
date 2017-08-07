@@ -109,8 +109,11 @@ class ColumnHandler(object):
     try:
       if getattr(self.row_converter.obj, self.key, None) != self.value:
         setattr(self.row_converter.obj, self.key, self.value)
+    except ValueError as e:
+      self.add_error(errors.VALIDATION_ERROR, column_name=self.display_name,
+                     message=e.message)
     except:  # pylint: disable=bare-except
-      self.row_converter.add_error(errors.UNKNOWN_ERROR)
+      self.add_error(errors.UNKNOWN_ERROR)
       logger.exception(
           "Import failed with setattr(%r, %r, %r)",
           self.row_converter.obj, self.key, self.value,
