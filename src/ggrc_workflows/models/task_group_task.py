@@ -113,28 +113,16 @@ class TaskGroupTask(mixins.WithContact,
           "display_name": "Start Date",
           "mandatory": True,
           "description": (
-              "Enter the task start date in the following format:\n"
-              "'mm/dd/yyyy' for one time workflows\n"
-              "'#' for weekly workflows (where # represents day "
-              "of the week & Monday = day 1)\n"
-              "'dd' for monthly workflows\n"
-              "'mmm/mmm/mmm/mmm dd' for monthly workflows "
-              "e.g. feb/may/aug/nov 17\n"
-              "'mm/dd' for yearly workflows"
+              "Enter the task start date\nin the following format:\n"
+              "'mm/dd/yyyy'"
           ),
       },
       "end_date": {
           "display_name": "End Date",
           "mandatory": True,
           "description": (
-              "Enter the task end date in the following format:\n"
-              "'mm/dd/yyyy' for one time workflows\n"
-              "'#' for weekly workflows (where # represents day "
-              "of the week & Monday = day 1)\n"
-              "'dd' for monthly workflows\n"
-              "'mmm/mmm/mmm/mmm dd' for monthly workflows "
-              "e.g. feb/may/aug/nov 17\n"
-              "'mm/dd' for yearly workflows"
+              "Enter the task end date\nin the following format:\n"
+              "'mm/dd/yyyy'"
           ),
       },
       "task_group": {

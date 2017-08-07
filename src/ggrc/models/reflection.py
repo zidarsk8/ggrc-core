@@ -80,6 +80,8 @@ ATTRIBUTE_ORDER = (
     "notify_on_change",
     "is_verification_needed",
     "delete",
+    "repeat_every",
+    "unit",
 )
 
 EXCLUDE_CUSTOM_ATTRIBUTES = set([

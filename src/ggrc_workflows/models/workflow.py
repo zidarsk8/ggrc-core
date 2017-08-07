@@ -218,18 +218,18 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   _aliases = {
       "repeat_every" : {
           "display_name": "Repeat Every",
-          "description": "'Repeat Every' value must fall into the range 1~30"
-                         "or '-' for None",
+          "description": "'Repeat Every' value\nmust fall into\nthe range 1~30"
+                         "\nor '-' for None",
       },
       "unit":  {
           "display_name": "Unit",
-          "description": "Allowed values for 'Unit' are: {}".format(
-              VALID_UNITS),
+          "description": "Allowed values for\n'Unit' are:\n{}"
+                         "\nor '-' for None".format("\n".join(VALID_UNITS)),
       },
       "is_verification_needed": {
           "display_name": "Need Verification",
           "mandatory": True,
-          "description": "This field is not changeable after creation.",
+          "description": "This field is not changeable\nafter creation.",
       },
       "notify_custom_message": "Custom email message",
       "notify_on_change": {
