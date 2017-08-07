@@ -160,7 +160,7 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   ADMIN = roles.ADMIN
   VERIFIED = "Verified"
   STATUS = "Status"
-  AUDIT_LEAD = "Audit Captain"
+  AUDIT_LEAD = "Internal Audit Lead"
   MANAGER = "Manager"
   PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   MAPPED_OBJECTS = "Mapped Objects"
@@ -189,7 +189,7 @@ class CommonAudit(Common):
   PLANNED_START_DATE = "Planned Start Date"
   PLANNED_END_DATE = "Planned End Date"
   PLANNED_REPORT_PERIOD = "Report Period"
-  AUDIT_LEAD = "Audit Captain"
+  AUDIT_LEAD = "Internal Audit Lead"
   AUDIT_FIRM = " Audit Firm"
   AUDITORS = "Auditors"
   ADD_AUDITOR = "+ Add Auditor"
@@ -252,7 +252,7 @@ class ObjectStates(object):
 
 class BaseStates(object):
   """Common states for Audit and Assessment objects."""
-  IN_PROGRESS = "In Progress"
+  IN_PROGRESS = "In progress"
   COMPLETED = "Completed"
 
 
@@ -404,7 +404,7 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
       CommonModalSetVisibleFields.STATE,
-      CommonModalSetVisibleFields.LAST_UPDATED, REVIEW_STATE, MANAGER)
+      CommonModalSetVisibleFields.LAST_UPDATED, REVIEW_STATE)
 
 
 class MappingStatusAttrs(namedtuple('_MappingStatusAttrs',

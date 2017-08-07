@@ -335,15 +335,15 @@ GGRC.query_parser = {
             },
         peg$c36 = "\"",
         peg$c37 = { type: "literal", value: "\"", description: "\"\\\"\"" },
-        peg$c38 = /^[a-zA-Z0-9_\-.\/%]/,
-        peg$c39 = { type: "class", value: "[a-zA-Z0-9_\\-./%]", description: "[a-zA-Z0-9_\\-./%]" },
-        peg$c40 = /^[^"]/,
-        peg$c41 = { type: "class", value: "[^\"]", description: "[^\"]" },
-        peg$c42 = "\\",
-        peg$c43 = { type: "literal", value: "\\", description: "\"\\\\\"" },
-        peg$c44 = function(escape, symbol) {
-              return escape + symbol;
+        peg$c38 = /^[a-zA-Z0-9_\-.\/]/,
+        peg$c39 = { type: "class", value: "[a-zA-Z0-9_\\-./]", description: "[a-zA-Z0-9_\\-./]" },
+        peg$c40 = "\\\"",
+        peg$c41 = { type: "literal", value: "\\\"", description: "\"\\\\\\\"\"" },
+        peg$c42 = function() {
+              return '"';
             },
+        peg$c43 = /^[^"]/,
+        peg$c44 = { type: "class", value: "[^\"]", description: "[^\"]" },
         peg$c45 = "and",
         peg$c46 = { type: "literal", value: "AND", description: "\"AND\"" },
         peg$c47 = function() {
@@ -1426,67 +1426,41 @@ GGRC.query_parser = {
     function peg$parseunqoted_char() {
       var s0;
 
-      s0 = peg$parseescaped_symbol();
-      if (s0 === peg$FAILED) {
-        if (peg$c38.test(input.charAt(peg$currPos))) {
-          s0 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s0 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c39); }
-        }
+      if (peg$c38.test(input.charAt(peg$currPos))) {
+        s0 = input.charAt(peg$currPos);
+        peg$currPos++;
+      } else {
+        s0 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c39); }
       }
 
       return s0;
     }
 
     function peg$parsequoted_char() {
-      var s0;
+      var s0, s1;
 
-      s0 = peg$parseescaped_symbol();
+      s0 = peg$currPos;
+      if (input.substr(peg$currPos, 2) === peg$c40) {
+        s1 = peg$c40;
+        peg$currPos += 2;
+      } else {
+        s1 = peg$FAILED;
+        if (peg$silentFails === 0) { peg$fail(peg$c41); }
+      }
+      if (s1 !== peg$FAILED) {
+        peg$savedPos = s0;
+        s1 = peg$c42();
+      }
+      s0 = s1;
       if (s0 === peg$FAILED) {
-        if (peg$c40.test(input.charAt(peg$currPos))) {
+        if (peg$c43.test(input.charAt(peg$currPos))) {
           s0 = input.charAt(peg$currPos);
           peg$currPos++;
         } else {
           s0 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c41); }
+          if (peg$silentFails === 0) { peg$fail(peg$c44); }
         }
-      }
-
-      return s0;
-    }
-
-    function peg$parseescaped_symbol() {
-      var s0, s1, s2;
-
-      s0 = peg$currPos;
-      if (input.charCodeAt(peg$currPos) === 92) {
-        s1 = peg$c42;
-        peg$currPos++;
-      } else {
-        s1 = peg$FAILED;
-        if (peg$silentFails === 0) { peg$fail(peg$c43); }
-      }
-      if (s1 !== peg$FAILED) {
-        if (input.length > peg$currPos) {
-          s2 = input.charAt(peg$currPos);
-          peg$currPos++;
-        } else {
-          s2 = peg$FAILED;
-          if (peg$silentFails === 0) { peg$fail(peg$c3); }
-        }
-        if (s2 !== peg$FAILED) {
-          peg$savedPos = s0;
-          s1 = peg$c44(s1, s2);
-          s0 = s1;
-        } else {
-          peg$currPos = s0;
-          s0 = peg$FAILED;
-        }
-      } else {
-        peg$currPos = s0;
-        s0 = peg$FAILED;
       }
 
       return s0;

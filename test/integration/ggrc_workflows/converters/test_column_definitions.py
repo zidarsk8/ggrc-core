@@ -30,7 +30,7 @@ def get_unmapping_names(class_name):
 
 
 class TestWorkflowObjectColumnDefinitions(TestCase):
-  """Test default column difinitions for workflow objects.
+  """Test default column difinitions for workflow objcts.
   """
 
   @classmethod

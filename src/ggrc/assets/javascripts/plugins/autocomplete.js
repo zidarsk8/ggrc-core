@@ -264,9 +264,8 @@
     },
 
     _renderMenu: function (ul, items) {
-      var self = this;
       var template = this.element.data('template');
-      var context = new can.Map(this._setup_menu_context(items));
+      var context = new can.Observe(this._setup_menu_context(items));
       var model = context.model;
       var $ul = $(ul);
 
@@ -284,7 +283,7 @@
       context.attr('disableCreate', this.options.disableCreate);
 
       $ul.unbind('scrollNext')
-        .bind('scrollNext', function () {
+        .bind('scrollNext', function (ev, data) {
           var listItems;
           if (context.attr('scroll_op_in_progress') ||
               context.attr('oldLen') === context.attr('items').length) {
@@ -320,10 +319,7 @@
       can.view.render(GGRC.mustache_path + template,
         context, function (frag) {
           $ul.html(frag);
-          if (!self.options.noToolTips) {
-            $ul.cms_controllers_lhn_tooltips();
-          }
-          $ul.cms_controllers_infinite_scroll();
+          $ul.cms_controllers_lhn_tooltips().cms_controllers_infinite_scroll();
           can.view.hookup(ul);
         });
     }

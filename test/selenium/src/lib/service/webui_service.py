@@ -7,6 +7,7 @@ import re
 
 from lib import factory
 from lib.constants import objects, url, path, messages, roles, element, regex
+from lib.entities.entities_factory import EntitiesFactory
 from lib.entities.entity import Entity
 from lib.page import dashboard
 from lib.page.widget.info_widget import SnapshotableInfoPanel
@@ -78,8 +79,8 @@ class BaseWebUiService(object):
                   "*" in val):
             scope[key] = val.replace("*", "")
     return [
-        Entity.update_objs_attrs_values_by_entered_data(
-            obj_or_objs=factory_obj, is_allow_none_values=False, **scope) for
+        EntitiesFactory.update_objs_attrs_values_by_entered_data(
+            objs=factory_obj, is_allow_none_values=False, **scope) for
         scope, factory_obj in zip(list_scopes_to_convert, list_factory_objs)]
 
   def open_widget_of_mapped_objs(self, src_obj):

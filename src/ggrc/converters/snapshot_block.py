@@ -3,7 +3,6 @@
 
 """Module for snapshot block converter."""
 
-import itertools
 import logging
 
 from collections import defaultdict
@@ -40,10 +39,6 @@ class SnapshotBlockConverter(object):
   SNAPSHOT_MAPPING_ALIASES = {
       "__mapping__:Assessment": "Map: Assessment",
       "__mapping__:Issue": "Map: Issue",
-  }
-
-  EXTRA_CACHE_MODELS = {
-      "AccessControlRole": "name",
   }
 
   BOOLEAN_ALIASES = {
@@ -145,12 +140,19 @@ class SnapshotBlockConverter(object):
     """Get id to cad mapping for all cad ordered by title."""
     cad_map = {}
     for snap in self.snapshots:
-      for cad in itertools.chain(snap.content.get("global_attributes", []),
-                                 snap.content.get("local_attributes", [])):
-        cad_map[cad["id"]] = cad["title"]
+      for cad in snap.content.get("custom_attribute_definitions", []):
+        cad_map[cad["id"]] = cad
     return OrderedDict(
-        sorted(cad_map.iteritems(), key=lambda x: x[1])
+        sorted(cad_map.iteritems(), key=lambda x: x[1]["title"])
     )
+
+  @cached_property
+  def _cad_name_map(self):
+    """Get id to name mapping for all cad ordered by title."""
+    return OrderedDict([
+        (key, value["title"])
+        for key, value in self._cad_map.items()
+    ])
 
   @cached_property
   def _attribute_name_map(self):
@@ -160,7 +162,6 @@ class SnapshotBlockConverter(object):
       logger.warning("Exporting invalid snapshot model: %s", self.child_type)
       return {}
     aliases = AttributeInfo.gather_visible_aliases(model)
-    aliases.update(AttributeInfo.get_acl_definitions(model))
     aliases.update(self.CUSTOM_SNAPSHOT_ALIASES)
     if self.MAPPINGS_KEY in self.fields:
       aliases.update(self.SNAPSHOT_MAPPING_ALIASES)
@@ -199,9 +200,7 @@ class SnapshotBlockConverter(object):
         "Person": "email",
         "Option": "title",
     }
-    id_map.update(self.EXTRA_CACHE_MODELS)
     stubs = self._gather_stubs()
-    stubs.update({model: None for model in self.EXTRA_CACHE_MODELS})
     cache = {}
     for model_name, ids in stubs.iteritems():
       with benchmark("Generate snapshot cache for: {}".format(model_name)):
@@ -210,33 +209,12 @@ class SnapshotBlockConverter(object):
         if not hasattr(model, attr_name):
           continue
         attr = getattr(model, attr_name)
+        model_count = model.query.count()
         query = db.session.query(model.id, attr)
-        if ids:
-          model_count = model.query.count()
-          if len(ids) < model_count / 2:
-            query = query.filter(model.id.in_(ids))
+        if len(ids) < model_count / 2:
+          query = query.filter(model.id.in_(ids))
         cache[model_name] = dict(query)
     return cache
-
-  @cached_property
-  def _access_control_map(self):
-    """Get AC role name to person emails mapping."""
-    acr = self._stub_cache.get("AccessControlRole", {})
-    people = self._stub_cache.get("Person", {})
-    _access_control_map = {}
-    for snap in self.snapshots:
-      _access_control_map[snap.content["id"]] = defaultdict(list)
-      for acl in snap.content.get("access_control_list", []):
-        role_name = acr[acl["ac_role_id"]]
-        email = people.get(acl["person_id"], "")
-        _access_control_map[snap.content["id"]][role_name].append(email)
-
-      # Emails should be sorted in asc order
-      _access_control_map[snap.content["id"]] = {
-          role: sorted(emails)
-          for role, emails in _access_control_map[snap.content["id"]].items()
-      }
-    return _access_control_map
 
   def get_value_string(self, value):
     """Get string representation of a given value."""
@@ -272,18 +250,28 @@ class SnapshotBlockConverter(object):
         # values in format of "YYYY-MM-DDThh:mm:ss" and "YYYY-MM-DD hh:mm:ss"
         return val.replace("T", " ")
       return utils.iso_to_us_date(val)
-    elif AttributeInfo.ALIASES_PREFIX in name:
-      _, role_name = name.split(":")
-      return "\n".join(
-          self._access_control_map[content["id"]].get(role_name, [])
-      )
     return self.get_value_string(content.get(name))
+
+  def get_cav_value_string(self, value):
+    """Get string representation of a custom attribute value."""
+    if value is None:
+      return u""
+    cad = self._cad_map[value["custom_attribute_id"]]
+    val = value.get("attribute_value") or u""
+    if cad["attribute_type"] == "Map:Person":
+      return self._stub_cache.get(val, {}).get(
+          value.get("attribute_object_id"), u"")
+    if cad["attribute_type"] == "Checkbox":
+      return self.BOOLEAN_ALIASES.get(val, u"")
+    if cad["attribute_type"] == "Date" and val:
+      return utils.iso_to_us_date(val)
+    return val
 
   @property
   def _header_list(self):
     return [
         [],  # empty line reserved for column descriptions
-        self._attribute_name_map.values() + self._cad_map.values()
+        self._attribute_name_map.values() + self._cad_name_map.values()
     ]
 
   def _obj_attr_line(self, content):
@@ -295,22 +283,14 @@ class SnapshotBlockConverter(object):
 
   def _cav_attr_line(self, content):
     """Get custom attribute CSV values."""
-    results = {}
-    for cad in itertools.chain(content.get("global_attributes", []),
-                               content.get("local_attributes", [])):
-      values = []
-      for value_dict in cad.get("values", []):
-        value = value_dict.get("value") or u""
-        attr_type = cad.get("attribute_type") or ""
-        if attr_type == "Map:Person":
-          value = self._stub_cache.get("Person", {}).get(value) or u""
-        elif attr_type == "Checkbox":
-          value = self.BOOLEAN_ALIASES.get(value) or u""
-        elif attr_type == "Date" and value:
-          value = utils.iso_to_us_date(value)
-        values.append(value)
-      results[cad["id"]] = u"\n".join(values)
-    return [results.get(i) or "" for i in self._cad_map]
+    cav_map = {
+        cav["custom_attribute_id"]: cav
+        for cav in content.get("custom_attribute_values", [])
+    }
+    return [
+        self.get_cav_value_string(cav_map.get(cad_id))
+        for cad_id in self._cad_name_map
+    ]
 
   def _content_line_list(self, snapshot):
     """Get a CSV content line for a single snapshot."""
