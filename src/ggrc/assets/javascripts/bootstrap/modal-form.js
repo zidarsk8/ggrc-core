@@ -398,19 +398,26 @@
           $html = $('<div></div>');
           $html.addClass('alert').addClass('alert-' + flashClass);
 
-          if (flashClass !== 'progress') {
-            textContainer = '<span></span>';
-            $html.addClass('alert-autohide');
-          } else {
-            textContainer = '<h6></h6>';
-            $html.append(
-              can.view.mustache([
-                '<spinner ',
-                'toggle="true" ',
-                'extra-css-class="alert_spinner-left"',
-                '></spinner>'
-              ].join(''))
-            );
+          switch (flashClass) {
+            case 'hint':
+              textContainer = '<h6></h6>';
+              $html.addClass('alert-autohide');
+              break;
+
+            case 'progress':
+              textContainer = '<h6></h6>';
+              $html.append(
+                can.view.mustache([
+                  '<spinner ',
+                  'toggle="true" ',
+                  'extra-css-class="alert_spinner-left"',
+                  '></spinner>'
+                ].join('')));
+              break;
+
+            default:
+              textContainer = '<span></span>';
+              $html.addClass('alert-autohide');
           }
 
           $html.append(
