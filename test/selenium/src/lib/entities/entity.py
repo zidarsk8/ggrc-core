@@ -441,7 +441,7 @@ class AuditEntity(Entity):
     super(AuditEntity, self).__init__()
     # REST and UI
     self.status = status  # status (e.g. "Planned")
-    self.contact = contact  # internal audit lead
+    self.contact = contact  # audit captain
     self.updated_at = updated_at  # last updated datetime
     # REST
     self.custom_attribute_definitions = custom_attribute_definitions
