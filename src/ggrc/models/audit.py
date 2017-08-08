@@ -112,7 +112,7 @@ class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
       "report_start_date": "Planned Report Period from",
       "report_end_date": "Planned Report Period to",
       "contact": {
-          "display_name": "Internal Audit Lead",
+          "display_name": "Audit Captain",
           "mandatory": True,
       },
       "secondary_contact": None,
