@@ -54,7 +54,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                                              class="{{#itemsLoading}}hidden{{/itemsLoading}}">
                         <div class="grid-data-row flex-row flex-box">
                             <div class="flex-size-3">
-                                <a href="{{instance.viewLink}}" target="_blank" title="{{instance.title}}">{{instance.title}}</a>
+                                <a href="{{instance.viewLink}}" class="grid-data-item__title-cell" target="_blank" title="{{instance.title}}">{{instance.title}}</a>
                             </div>
                             <div class="grid-data-item-index">
                                 <state-colors-map {state}="instance.status"></state-colors-map>
@@ -82,7 +82,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                                             {parent-instance}="parentInstance"
                                             {related-types}="relatedTypes"
                                             {^is-loading}="loadingState.auditLoading">
-                                        <a href="{{instance.viewLink}}" target="_blank">{{instance.title}}</a>
+                                        <a href="{{instance.viewLink}}" class="grid-data-item__title-cell" target="_blank">{{instance.title}}</a>
                                     </mapped-objects>
                                 </related-audits>
                             </div>
