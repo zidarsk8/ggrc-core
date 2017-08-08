@@ -3,10 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, GGRC) {
+(function (can, GGRC, CMS) {
   'use strict';
   var tpl = can.view(GGRC.mustache_path +
     '/components/assessment/info-pane/info-pane.mustache');
+  var CAUtils = GGRC.Utils.CustomAttributes;
 
   /**
    * Assessment Specific Info Pane View Component
@@ -78,7 +79,7 @@
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
-      triggerFormSaveCbs: $.Callbacks(),
+      triggerFormSaveCbs: can.$.Callbacks(),
       setInProgressState: function () {
         this.onStateChange({state: 'In Progress', undo: false});
       },
@@ -190,10 +191,21 @@
           .replace(this.loadUrls());
       },
       initializeFormFields: function () {
+        var cavs =
+          CAUtils.getAttributes(
+            this.attr('instance.custom_attribute_values'), true);
         this.attr('formFields',
-          GGRC.Utils.CustomAttributes.convertValuesToFormFields(
-            this.attr('instance.custom_attribute_values')
-          )
+          CAUtils.convertValuesToFormFields(cavs)
+        );
+      },
+      initGlobalAttributes: function () {
+        var cavs =
+          CAUtils.getAttributes(
+              this.attr('instance.custom_attribute_values'), false);
+        this.attr('globalAttributes',
+          cavs.map(function (cav) {
+            return CAUtils.convertToFormViewField(cav);
+          })
         );
       },
       onFormSave: function () {
@@ -234,27 +246,16 @@
             });
           });
       },
-      saveFormFields: function (formFields) {
-        var caValues = can.makeArray(
-          this.attr('instance.custom_attribute_values')
-        );
-        Object.keys(formFields).forEach(function (fieldId) {
-          var caValue =
-            caValues
-              .find(function (item) {
-                return item.def.id === Number(fieldId);
-              });
-          if (!caValue) {
-            console.error('Corrupted Date: ', caValues);
-            return;
-          }
-          caValue.attr('attribute_value',
-            GGRC.Utils.CustomAttributes.convertToCaValue(
-              caValue.attr('attributeType'),
-              formFields[fieldId]
-            )
-          );
-        });
+      saveGlobalAttributes: function (event) {
+        var globalAttributes = event.globalAttributes;
+        var caValues = this.attr('instance.custom_attribute_values');
+        CAUtils.applyChangesToCustomAttributeValue(caValues, globalAttributes);
+
+        return this.attr('instance').save();
+      },
+      saveFormFields: function (modifiedFields) {
+        var caValues = this.attr('instance.custom_attribute_values');
+        CAUtils.applyChangesToCustomAttributeValue(caValues, modifiedFields);
 
         return this.attr('instance').save();
       },
@@ -293,6 +294,7 @@
     },
     init: function () {
       this.viewModel.initializeFormFields();
+      this.viewModel.initGlobalAttributes();
       this.viewModel.updateRelatedItems();
     },
     events: {
@@ -302,4 +304,4 @@
       }
     }
   });
-})(window.can, window.GGRC);
+})(window.can, window.GGRC, window.CMS);
