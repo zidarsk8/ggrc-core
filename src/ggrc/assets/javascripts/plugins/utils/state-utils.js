@@ -75,6 +75,15 @@
     }
 
     /**
+     * Check if tooltip should be shown for filter by state
+     * @param {String} model - The model name
+     * @return {Boolean} True or False
+     */
+    function hasFilterTooltip(model) {
+      return model === 'Product' || model === 'System';
+    }
+
+    /**
      * Get States-Models pair.
      * @param {String} model - The model name
      * @return {Object} object with 'models' and 'states' properties
@@ -212,6 +221,7 @@
     return {
       hasState: hasState,
       hasFilter: hasFilter,
+      hasFilterTooltip: hasFilterTooltip,
       statusFilter: statusFilter,
       unlockedFilter: unlockedFilter,
       getStatesForModel: getStatesForModel,
