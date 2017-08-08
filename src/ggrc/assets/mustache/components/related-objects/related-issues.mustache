@@ -3,6 +3,7 @@ Copyright (C) 2017 Google Inc.
 Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 `}}
 
+{{#baseInstance}}
 <related-objects {base-instance}="baseInstance" {predefined-filter}="relatedIssuesFilter" related-items-type="Issue">
     <div class="grid-data__toolbar flex-box">
         <tree-pagination {(paging)}="paging" class="grid-data__toolbar-item"></tree-pagination>
@@ -33,3 +34,4 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
         </object-list>
     </div>
 </related-objects>
+{{/baseInstance}}
