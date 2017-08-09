@@ -6,22 +6,18 @@
 (function (can) {
   'use strict';
 
-  var tpl = can.view(GGRC.mustache_path +
-    '/components/assessment/info-pane/confirm-inline-control-title.mustache');
-
-  GGRC.Components('confirmInlineControlTitle', {
-    tag: 'confirm-inline-control-title',
-    template: tpl,
+  GGRC.Components('confirmEditAction', {
+    tag: 'confirm-edit-action',
     viewModel: {
       instance: {},
       setInProgress: null,
       editMode: false,
       isEditIconDenied: false,
       onStateChangeDfd: can.Deferred().resolve(),
-      openInlineEdit: function (el) {
+      openEditMode: function (el) {
         this.attr('onStateChangeDfd').then(function () {
           if (this.isInProgress()) {
-            this.dispatch('setEditModeInline');
+            this.dispatch('setEditMode');
           }
         }.bind(this));
       },
@@ -41,10 +37,10 @@
 
         confirmation.then(function (data) {
           self.dispatch('setInProgress');
-          self.openInlineEdit();
+          self.openEditMode();
         });
       },
-      setEditModeInline: function () {
+      confirmEdit: function () {
         if (!this.isInProgress()) {
           this.showConfirm();
           return;
@@ -52,7 +48,7 @@
 
         // send 'isLastOpenInline' when inline is opening without confirm
         this.dispatch({
-          type: 'setEditModeInline',
+          type: 'setEditMode',
           isLastOpenInline: true
         });
       }

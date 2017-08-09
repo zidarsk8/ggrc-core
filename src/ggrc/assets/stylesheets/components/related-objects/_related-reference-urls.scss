@@ -11,25 +11,6 @@
     margin-right: 5px;
   }
 
-  &__list {
-
-    &-item {
-      display: inline-flex;
-      max-width: 100%;
-
-      & .related-reference-urls__remove {
-        visibility: hidden;
-      }
-
-      &:hover {
-
-        & .related-reference-urls__remove {
-          visibility: visible;
-        }
-      }
-    }
-  }
-
   document-object-list-item {
     min-width: 0;
   }
@@ -80,18 +61,9 @@
       }
     }
   }
-
-  &__toggle {
-    margin-bottom: 2em;
-    &--hidden {
-      display: none;
-    }
-  }
 }
 
 .create-form {
-  display: none;
-
   &__layout {
     display: inline-block;
   }
@@ -134,9 +106,5 @@
 
   &__cancel {
     border-left: none;
-  }
-
-  &--visible {
-    display: block;
   }
 }

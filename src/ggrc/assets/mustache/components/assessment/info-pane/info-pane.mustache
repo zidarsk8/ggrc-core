@@ -308,7 +308,95 @@
                         </div>
                         <div class="ggrc-form-item">
                             <div class="ggrc-form-item__row">
-                                {{>'/static/mustache/base_objects/urls.mustache'}}
+                                <div class="row-fluid wrap-row">
+
+                                    <!-- <REFERENCE URLS> -->
+                                    <related-documents {instance}="instance" document-type="REFERENCE_URL">
+                                        <related-reference-urls class="related-reference-urls"
+                                            {(urls)}="documents"
+                                            {is-disabled}="isLoading"
+                                            {is-not-editable}="isSnapshot"
+                                            (createReferenceUrl)="createRelatedDocument(%event.payload)"
+                                            (removeReferenceUrl)="removeRelatedDocument(%event.payload)">
+                                                <div class="related-reference-urls__heading">
+                                                    <spinner class="related-reference-urls__spinner" {toggle}="isLoading"></spinner>
+                                                    <h6 class="info-pane__section-title">Reference URL</h6>
+                                                </div>
+                                                <div class="related-reference-urls__list">
+                                                    <object-list {(items)}="urls" {empty-message}="''">
+                                                        <div class="action-toolbar">
+                                                            <document-object-list-item {instance}="{.}">
+                                                            </document-object-list-item>
+                                                            {{#unless isEditDenied}}
+                                                                <confirm-edit-action
+                                                                    (set-edit-mode)="removeReferenceUrl(%context)"
+                                                                    (set-in-progress)="setInProgressState()"
+                                                                    {is-edit-icon-denied}="isEditDenied"
+                                                                    {instance}="instance"
+                                                                    {on-state-change-dfd}="onStateChangeDfd"
+                                                                    {edit-mode}="editMode">
+                                                                        <div class="action-toolbar__controls">
+                                                                            <a href="javascript://"
+                                                                                class="info-action unmap" 
+                                                                                {{#if isDisabled}}disabled{{/if}}
+                                                                                ($click)="confirmEdit()">
+                                                                                    <action-toolbar-control>
+                                                                                        <i class="fa fa-trash"></i>
+                                                                                    </action-toolbar-control>
+                                                                            </a>
+                                                                        </div>
+                                                                </confirm-edit-action>
+                                                            {{/unless}}
+                                                        </div>
+                                                    </object-list>
+                                                </div>
+                                                {{#unless isEditDenied}}
+                                                    {{#if isFormVisible}}
+                                                        <form class="related-reference-urls__create create-form">
+                                                            <fieldset class="create-form__layout"
+                                                                {{#if isDisabled}}disabled{{/if}}>
+                                                                <input {($value)}="value"
+                                                                    class="create-form__input"
+                                                                    type="text"
+                                                                    placeholder="Add URL"
+                                                                    spellcheck="false"
+                                                                    autocomplete="false"/>
+                                                                <div class="create-form__controls">
+                                                                <button type="submit"
+                                                                    class="create-form__confirm"
+                                                                    ($click)="submitCreateReferenceUrlForm(value)">
+                                                                        <i class="fa fa-check"></i>
+                                                                </button>
+                                                                <button type="button"
+                                                                    class="create-form__cancel"
+                                                                    ($click)="toggleFormVisibility(false)">
+                                                                        <i class="fa fa-times"></i>
+                                                                </button>
+                                                                </div>
+                                                            </fieldset>
+                                                        </form>
+                                                    {{else}}
+                                                        <confirm-edit-action
+                                                            (set-edit-mode)="toggleFormVisibility(true)"
+                                                            (set-in-progress)="setInProgressState()"
+                                                            {is-edit-icon-denied}="isEditDenied"
+                                                            {instance}="instance"
+                                                            {on-state-change-dfd}="onStateChangeDfd"
+                                                            {edit-mode}="editMode">
+                                                                <button
+                                                                    type="button"
+                                                                    class="related-reference-urls__toggle btn btn-small btn-gray"
+                                                                    ($click)="confirmEdit()">
+                                                                        Add
+                                                                </button>
+                                                        </confirm-edit-action>
+                                                    {{/if}}
+                                                {{/unless}}
+                                        </related-reference-urls>
+                                    </related-documents>
+
+                                    <!-- </REFERENCE URLS> -->
+                                </div>
                             </div>
                         </div>
                     </div>
