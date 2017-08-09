@@ -137,6 +137,7 @@ def all_mapping_entries():
       mapping('CycleTaskGroup', 'task_group'),
       mapping('CycleTaskGroupObjectTask', 'cycle'),
       mapping('CycleTaskGroupObjectTask', 'cycle_task_entries'),
+      mapping('CycleTaskGroupObjectTask', 'cycle_task_group'),
       mapping('CycleTaskGroupObjectTask', 'task_group_task'),
       mapping('CycleTaskGroupObjectTask', 'cycle_task_objects_for_cache'),
       mapping('CycleTaskEntry', 'cycle'),
