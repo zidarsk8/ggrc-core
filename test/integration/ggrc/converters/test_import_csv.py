@@ -214,7 +214,7 @@ class TestBasicCsvImport(TestCase):
         ("object_type", "Audit"),
         ("Code*", "audit"),
         ("title", "audit"),
-        ("Internal Audit Lead", "user@example.com"),
+        ("Audit Captain", "user@example.com"),
         ("status", "In Progress"),
         ("program", "P"),
     ]))
@@ -228,7 +228,7 @@ class TestBasicCsvImport(TestCase):
         ("object_type", "Audit"),
         ("Code*", "audit"),
         ("title", "audit"),
-        ("Internal Audit Lead", "user@example.com"),
+        ("Audit Captain", "user@example.com"),
         ("status", "In Progress"),
         ("program", "P"),
     ]))

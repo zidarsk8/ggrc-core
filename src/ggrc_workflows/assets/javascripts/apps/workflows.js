@@ -635,6 +635,21 @@
         }
       }
     };
+
+    // add 'Workflows' tab for 'All Objects' view
+    if (/^\/objectBrowser\/?$/.test(window.location.pathname)) {
+      descriptor[pageInstance.constructor.shortName].workflow = {
+        widget_id: 'workflow',
+        widget_name: 'Workflows',
+        widgetType: 'treeview',
+        treeViewDepth: 0,
+        content_controller_options: {
+          mapping: 'workflows',
+          parent_instance: pageInstance,
+          model: CMS.Models.Workflow
+        }
+      };
+    }
     new GGRC.WidgetList('ggrc_workflows', descriptor, [
       'info_widget',
       'task_widget'

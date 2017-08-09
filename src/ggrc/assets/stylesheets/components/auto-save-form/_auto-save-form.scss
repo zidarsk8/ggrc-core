@@ -57,7 +57,7 @@ auto-save-form {
     }
 
     .form-field__content {
-      max-width: 100%;
+      max-width: 360px;
     }
 
     .form-field__validation-hint-placeholder {
@@ -70,10 +70,6 @@ auto-save-form {
       top: 0;
       left: 0;
     }
-  }
-
-  .input-wrapper {
-    max-width: 360px;
   }
 }
 

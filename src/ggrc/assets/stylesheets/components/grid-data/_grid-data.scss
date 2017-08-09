@@ -141,8 +141,12 @@
   cursor: default;
   line-height: 16px;
   a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
     line-height: 16px;
-    display: inline-block;
   }
   a:hover {
     text-decoration: underline;
@@ -152,6 +156,14 @@
     overflow: hidden;
     padding: 0 8px;
     box-sizing: border-box;
+  }
+
+  .grid-data-item__title-cell {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 }
 .grid-data__action-column {

@@ -293,12 +293,15 @@
       }.bind(this));
     },
     _isOverdue: function () {
+      var doneState = this.attr('is_verification_needed') ?
+        'Verified' : 'Finished';
       var endDate = moment(
         this.attr('next_due_date') || this.attr('end_date'));
       var today = moment().startOf('day');
       var startOfDate = moment(endDate).startOf('day');
       var isOverdue = endDate && today.diff(startOfDate, 'days') > 0;
-      if (this.attr('status') === 'Verified') {
+
+      if (this.attr('status') === doneState) {
         return false;
       }
       return isOverdue;
