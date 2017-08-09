@@ -54,6 +54,7 @@ class TestWorkflowsCycleGeneration(TestCase):
           task_group=group,
           start_date=setup_date,
           end_date=setup_date + dtm.timedelta(days=4))
+    self.generator.generate_cycle(workflow)
     self.generator.activate_workflow(workflow)
     active_wf = db.session.query(Workflow).filter(
         Workflow.status == 'Active').one()
@@ -80,6 +81,7 @@ class TestWorkflowsCycleGeneration(TestCase):
           task_group=group,
           start_date=setup_date - dtm.timedelta(days=4),
           end_date=setup_date)
+    self.generator.generate_cycle(workflow)
     self.generator.activate_workflow(workflow)
     active_wf = db.session.query(Workflow).filter(
         Workflow.status == 'Active').one()
