@@ -6,6 +6,23 @@
   'use strict';
 
   var AUTO_SAVE_DELAY = 1000;
+  var CA_DD_REQUIRED_DEPS =
+    GGRC.Utils.CustomAttributes.CA_DD_REQUIRED_DEPS;
+
+  // helper functions
+  function addToSet(arr, value) {
+    var idx = arr.indexOf(value);
+    if (idx === -1) {
+      arr.push(value);
+    }
+  }
+
+  function removeFromSet(arr, value) {
+    var idx = arr.indexOf(value);
+    if (idx > -1) {
+      arr.splice(idx, 1);
+    }
+  }
 
   GGRC.Components('autoSaveForm', {
     tag: 'auto-save-form',
@@ -14,6 +31,7 @@
       '/components/auto-save-form/auto-save-form.mustache'
     ),
     viewModel: {
+      _fields: new can.List([]),
       define: {
         fieldsToSave: {
           Value: can.Map
@@ -29,10 +47,7 @@
           get: function () {
             return this.attr('fields')
               .filter(function (field) {
-                var isEmpty = field.attr('validation.mandatory') &&
-                  field.attr('validation.empty');
-                var isNotValid = !field.attr('validation.valid');
-                return isEmpty || isNotValid;
+                return !field.attr('validation.valid');
               }).length;
           }
         },
@@ -43,10 +58,63 @@
             this.updateEvidenceValidation();
           }
         },
-        isEvidenceRequired: {
+        notEnoughEvidences: {
           get: function () {
-            return this.hasMissingEvidence();
+            var optionsWithEvidence = this.attr('fields')
+                  .filter(function (item) {
+                    return item.attr('type') === 'dropdown';
+                  })
+                  .filter(function (item) {
+                    var requiredOption =
+                      item.attr('validationConfig')[item.attr('value')];
+
+                    return requiredOption === CA_DD_REQUIRED_DEPS.EVIDENCE ||
+                       requiredOption ===
+                        CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+                  }).length;
+            return optionsWithEvidence > this.attr('evidenceAmount');
           }
+<<<<<<< HEAD
+=======
+        },
+        // update only the fields which values are updated
+        // this helps canJS to update only those components which need to be
+        // updated
+        fields: {
+          get: function () {
+            return this.attr('_fields');
+          },
+          set: function (newFields) {
+            var fields = this.attr('_fields');
+
+            if (!fields.length) {
+              this.attr('_fields', newFields);
+              return;
+            }
+
+            newFields.forEach(function (nf) {
+              var oldField = null;
+              var valuesEqual;
+              var validationEqual;
+
+              fields.forEach(function (field) {
+                if (field.id === nf.id) {
+                  oldField = field;
+                }
+              });
+              if (oldField) {
+                valuesEqual = oldField.value === nf.value;
+                validationEqual =
+                  _.isEqual(oldField.validation.attr(), nf.validation.attr());
+
+                if (!valuesEqual || !validationEqual) {
+                  oldField.attr(nf);
+                }
+              }
+            });
+            this.attr('_fields', fields);
+          }
+>>>>>>> 57f60d0a7... fixup! 20bc9d1e8
         }
       },
       formSavedDeferred: can.Deferred().resolve(),
@@ -67,83 +135,95 @@
       unsubscribe: function () {
         this.attr('triggerSaveCbs').remove(this._save);
       },
+
+      // part of latency compensation. reflects evidence changes
       updateEvidenceValidation: function () {
-        var isEvidenceRequired = this.attr('isEvidenceRequired');
+        var self = this;
+        var notEnoughEvidences = this.attr('notEnoughEvidences');
         this.attr('fields')
-          .filter(function (item) {
-            return item.attr('type') === 'dropdown';
+          .filter(function (field) {
+            return field.attr('type') === 'dropdown';
           })
-          .each(function (item) {
-            var isCommentRequired;
-            if ((item.attr('validationConfig')[item.attr('value')] === 2 ||
-                item.attr('validationConfig')[item.attr('value')] === 3)) {
-              isCommentRequired = item.attr('errorsMap.comment');
-              item.attr('errorsMap.evidence', isEvidenceRequired);
-              item.attr('validation.valid',
-                !isEvidenceRequired && !isCommentRequired);
+          .each(function (field) {
+            var valCfg = field.validationConfig;
+            var fieldValidationConf = valCfg && valCfg[field.value];
+            var errors = field.attr('preconditions_failed') || [];
+            var evidenceRequired =
+              fieldValidationConf === CA_DD_REQUIRED_DEPS.EVIDENCE ||
+              fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+
+            if (notEnoughEvidences) {
+              if (evidenceRequired) {
+                addToSet(errors, 'evidence');
+              }
+            } else {
+              removeFromSet(errors, 'evidence');
             }
+            field.attr('preconditions_failed', errors);
+<<<<<<< HEAD
+            self.performValidation(field, field.value);
+=======
+            self.performValidation(field, field.value, true);
+>>>>>>> 57f60d0a7... fixup! 20bc9d1e8
           });
       },
-      hasMissingEvidence: function () {
-        var optionsWithEvidence = this.attr('fields')
-              .filter(function (item) {
-                return item.attr('type') === 'dropdown' &&
-                  (item.attr('validationConfig')[item.attr('value')] === 2 ||
-                item.attr('validationConfig')[item.attr('value')] === 3);
-              }).length;
-        return optionsWithEvidence > this.attr('evidenceAmount');
+
+      hasMissingComment: function (field, value) {
+        return field.attr('errorsMap.comment');
       },
-      performValidation: function (field, value) {
-        var isEvidenceRequired = this.attr('isEvidenceRequired');
-        this.updateEvidenceValidation();
-        field.attr('validation.empty', !(value));
+      hasMissingEvidence: function (field) {
+        var requiredOption =
+          field.attr('validationConfig')[field.attr('value')];
+
+        return requiredOption === CA_DD_REQUIRED_DEPS.EVIDENCE ||
+           requiredOption === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+      },
+
+      // instantly reflects changes to the document
+      // to compesate for network latency
+      networkLatencyCompensation: function (field, value) {
+        var valCfg = field.validationConfig;
+        var fieldValidationConf = valCfg && valCfg[value];
+        var errors = field.attr('preconditions_failed') || [];
+
+        var requiresComment =
+          fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
+          fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+
         if (field.attr('type') === 'dropdown') {
-          if (!field.attr('validationConfig')[value]) {
-            field.attr('errorsMap.evidence', false);
-            field.attr('errorsMap.comment', false);
-            field.attr('validation.valid', true);
+          if (requiresComment) {
+            addToSet(errors, 'comment');
+          } else {
+            removeFromSet(errors, 'comment');
           }
-          if (field.attr('validationConfig')[value] === 0) {
-            field.attr('errorsMap.evidence', false);
-            field.attr('errorsMap.comment', false);
-            field.attr('validation.valid', true);
-          }
-          if (field.attr('validationConfig')[value] === 2) {
-            field.attr('errorsMap.evidence', isEvidenceRequired);
-            field.attr('errorsMap.comment', false);
-            field.attr('validation.valid', !isEvidenceRequired);
-            if (isEvidenceRequired) {
-              this.dispatch({
-                type: 'validationChanged',
-                field: field
-              });
-            }
-          }
-          if (field.attr('validationConfig')[value] === 1) {
-            field.attr('errorsMap.evidence', false);
-            field.attr('errorsMap.comment', true);
-            field.attr('validation.valid', false);
-            this.dispatch({
-              type: 'validationChanged',
-              field: field
-            });
-          }
-          if (field.attr('validationConfig')[value] === 3) {
-            field.attr('errorsMap.evidence', isEvidenceRequired);
-            field.attr('errorsMap.comment', true);
-            field.attr('validation.valid', false);
-            this.dispatch({
-              type: 'validationChanged',
-              field: field
-            });
-          }
+
+          field.attr('preconditions_failed', errors);
         }
+
+        if (errors.indexOf('value') > -1 && value) {
+          removeFromSet(errors, 'value');
+          field.attr('preconditions_failed', errors);
+        }
+
+        this.updateEvidenceValidation();
+      },
+
+      performValidation: function (field, value) {
+        var plainFieldObj = field.attr();
+
+        var valResult = GGRC.Utils.CustomAttributes
+          .validateField(plainFieldObj, value);
+
+        field.attr(valResult);
       },
       fieldValueChanged: function (e, field) {
         field.attr('value', e.value);
         this.fieldsToSave.attr(e.fieldId, e.value);
         this.attr('fieldsToSaveAvailable', true);
+
+        this.networkLatencyCompensation(field, e.value);
         this.performValidation(field, e.value);
+
         this.attr('formSavedDeferred', can.Deferred());
         this.triggerAutoSave();
       },
@@ -172,7 +252,7 @@
             self.attr('allSaved', true);
             self.attr('formSavedDeferred').resolve();
           })
-          // todo: error handling
+          // fix: error handling
           .always(function () {
             self.attr('saving', false);
           });

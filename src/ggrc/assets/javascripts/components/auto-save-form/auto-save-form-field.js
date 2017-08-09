@@ -15,6 +15,16 @@
       define: {
         disabled: {
           type: 'htmlbool'
+        },
+        value: {
+          get: function () {
+            return this._value;
+          },
+          set: function (newValue) {
+            if (!this.attr('isDirty')) {
+              this._value = newValue;
+            }
+          }
         }
       },
       type: null,
