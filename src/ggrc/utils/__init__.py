@@ -1,6 +1,7 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+import logging
 import datetime
 import json
 import re
@@ -11,6 +12,8 @@ from flask import request
 from ggrc.settings import CUSTOM_URL_ROOT
 from ggrc.utils import benchmarks
 
+
+logger = logging.getLogger()
 
 DATE_FORMAT_ISO = "%Y-%m-%d"
 DATE_FORMAT_US = "%m/%d/%Y"
@@ -109,7 +112,12 @@ def merge_dict(destination, source, path=None):
       elif destination[key] == source[key]:
         pass  # same leaf value
       else:
-        raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+        # raise Exception('Conflict at %s' % '.'.join(path + [str(key)]))
+        # if merging does not work we should just log the warning instead of
+        # raising an error and so sent out whatever notifications we can. This
+        # might cause some data to be missing from the notifications themselves
+        # but at least they will be sent
+        logger.warning('Conflict at %s', '.'.join(path + [str(key)]))
     else:
       destination[key] = source[key]
   return destination

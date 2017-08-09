@@ -121,7 +121,7 @@
                     <div class="modal-mapped-objects-item__details">
                       <business-object-list-item {instance}="{.}">
                         <div class="description">
-                          <read-more {text}="itemData.description" max-text-length="90"></read-more>
+                          <read-more {text}="itemData.description" max-lines-number="1"></read-more>
                         </div>
                       </business-object-list-item>
                     </div>
@@ -182,9 +182,64 @@
         </div>
       </div>
 
-      <div class="hide-wrap hidable">
-        <div class="row-fluid inner-hide">
-          {{> '/static/mustache/base_objects/modal_content_urls.mustache'}}
+      <div class="ggrc-form-item">
+        <div class="ggrc-form-item__multiple-row">
+          <related-documents instance={instance} document-type="REFERENCE_URL" autorefresh="false">
+            <related-reference-urls class="related-reference-urls"
+              {(urls)}="documents"
+              {is-disabled}="isLoading"
+              (createReferenceUrl)="markDocumentForAddition(%event.payload)"
+              (removeReferenceUrl)="markDocumentForDeletion(%event.payload)">
+              <label>
+                Reference URL
+                <spinner {toggle}="isDisabled"></spinner>
+              </label>
+              <div class="related-reference-urls__list">
+                <object-list {(items)}="urls" {empty-message}="''">
+                  <div class="action-toolbar">
+                    <document-object-list-item {instance}="{.}">
+                    </document-object-list-item>
+                    <div class="action-toolbar__controls">
+                      <a href="javascript://"
+                        class="info-action unmap"
+                        {{#if isDisabled}}disabled{{/if}}
+                        ($click)="removeReferenceUrl(%context)">
+                          <action-toolbar-control>
+                            <i class="fa fa-trash"></i>
+                          </action-toolbar-control>
+                      </a>
+                    </div>
+                  </div>
+                </object-list>
+              </div>
+              {{#if isFormVisible}}
+                <form class="related-reference-urls__create create-form">
+                  <fieldset class="create-form__layout"
+                    {{#if isDisabled}}disabled{{/if}}>
+                    <input {($value)}="value"
+                      class="create-form__input"
+                      type="text"
+                      placeholder="Add URL"
+                      spellcheck="false"
+                      autocomplete="false">
+                    <div class="create-form__controls">
+                      <button type="submit" class="create-form__confirm" ($click)="submitCreateReferenceUrlForm(value)">
+                        <i class="fa fa-check"></i>
+                      </button>
+                      <button type="button" class="create-form__cancel" ($click)="toggleFormVisibility(false)">
+                        <i class="fa fa-times"></i>
+                      </button>
+                    </div>
+                  </fieldset>
+              </form>
+              {{else}}
+                <button class="related-reference-urls__toggle btn btn-small btn-gray {{#if isFormVisible}}related-reference-urls__toggle--hidden{{/if}}"
+                  ($click)="toggleFormVisibility(true)">
+                  Add
+                </button>
+              {{/if}}
+            </related-reference-urls>
+          </related-documents>
         </div>
       </div>
 

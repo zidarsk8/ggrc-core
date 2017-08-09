@@ -57,6 +57,12 @@
           return GGRC.Utils.State.hasFilter(this.attr('modelName'));
         }
       },
+      statusTooltipVisible: {
+        type: Boolean,
+        get: function () {
+          return GGRC.Utils.State.hasFilterTooltip(this.attr('modelName'));
+        }
+      },
       cssClasses: {
         type: String,
         get: function () {

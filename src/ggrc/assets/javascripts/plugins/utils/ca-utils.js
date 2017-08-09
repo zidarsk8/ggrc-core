@@ -80,7 +80,7 @@
 
       if (type === 'person') {
         if (valueObj) {
-          return valueObj;
+          return valueObj.id;
         }
         return null;
       }
@@ -170,9 +170,8 @@
       }
 
       if (type === 'person') {
-        if (value && value instanceof can.Map) {
-          value = value.serialize();
-          return 'Person:' + value.id;
+        if (value) {
+          return 'Person:' + value;
         }
         return 'Person:None';
       }
@@ -233,117 +232,52 @@
       };
     }
 
-    function prepareLocalAttribute(attr) {
-      var options;
-      var value;
-      var validation;
-      var validationConfig;
-      var type;
-      var isValid;
-      var isDropdown;
-      var showValidation;
-      var validationMap;
-      var hasMissingInfo;
-
-      if (!attr || !attr.values) {
-        console.warn('Attribute is mandatory argument');
-        return {};
+    function getAttributes(values, onlyLocal) {
+      return (values || []).filter(function (value) {
+        return !onlyLocal ?
+        value.def.definition_id === null :
+        value.def.definition_id !== null;
+      });
+    }
+    function updateCustomAttributeValue(ca, value) {
+      var id;
+      if (ca.attr('attributeType') === 'person') {
+        id = value || null;
+        ca.attr('attribute_value', 'Person');
+        ca.attr('attribute_object', {id: id, type: 'Person'});
+      } else {
+        ca.attr('attribute_value',
+          GGRC.Utils.CustomAttributes.convertToCaValue(
+            ca.attr('attributeType'), value)
+        );
       }
-
-      options = can.Map.keys(attr.options || {});
-      type = getCustomAttributeType(attr.attribute_type);
-      value = new can.Map(attr.values[0] || {});
-      validationMap = new can.Map(value.attr('preconditions_failed') || {});
-      isDropdown = type === 'dropdown';
-      showValidation = attr.mandatory || isDropdown;
-      isValid = showValidation ? !attr.attr('is_preconditions_failed') : true;
-
-      if (isDropdown) {
-        validationConfig = attr.options || {};
-        hasMissingInfo = validationMap.attr('comment') ||
-          validationMap.attr('evidence');
-      }
-      validation = {
-        show: showValidation,
-        valid: isValid,
-        hasMissingInfo: hasMissingInfo
-      };
-      return {
-        type: type,
-        id: attr.id,
-        value: value.attr('value'),
-        title: attr.title,
-        placeholder: attr.placeholder,
-        options: options,
-        helptext: attr.helptext,
-        required: attr.mandatory,
-        isDropdown: isDropdown,
-        validation: validation,
-        validationConfig: validationConfig,
-        errorsMap: {
-          value: false,
-          comment: false,
-          evidence: false
-        },
-        valueId: can.compute(function () {
-          return value.attr('id');
-        })
-      };
     }
 
-    function prepareGlobalAttribute(attr) {
-      var options;
-      var value;
-      var type;
-
-      if (!attr || !attr.values) {
-        console.warn('Attribute is mandatory argument');
-        return {};
-      }
-
-      options = can.Map.keys(attr.options || {});
-      type = getCustomAttributeType(attr.attribute_type);
-      value = new can.Map(attr.values[0] || {});
-
-      return {
-        type: type,
-        id: attr.id,
-        value: value.value,
-        title: attr.title,
-        placeholder: attr.placeholder,
-        options: options,
-        helptext: attr.helptext
-      };
+    function applyChangesToCustomAttributeValue(values, changes) {
+      var caValues = can.makeArray(values);
+      can.Map.keys(changes).forEach(function (fieldId) {
+        var caValue =
+          caValues
+            .find(function (item) {
+              return item.def.id === Number(fieldId);
+            });
+        if (!caValue) {
+          console.error('Corrupted Date: ', caValues);
+          return;
+        }
+        updateCustomAttributeValue(caValue, changes[fieldId]);
+      });
     }
-
-    /**
-     * Simple function to update Custom Attributes
-     * Temporary as Custom Attributes doesn't support multiple values value parameter is single object
-     * @param {can.Map} attr - attribute to update
-     * @param {Object} value - updated value object
-     */
-    function updateAttribute(attr, value) {
-      if (!attr || !attr.values) {
-        console.warn('Attribute is mandatory argument');
-        return;
-      }
-      // Start Temporary: Till Custom Attributes support only single Value we transform passed "value" object to Array
-      value = can.makeArray(value);
-      // End of Temporary
-      attr.values.replace(value);
-    }
-
     return {
       convertFromCaValue: convertFromCaValue,
       convertToCaValue: convertToCaValue,
       convertValuesToFormFields: convertValuesToFormFields,
       prepareCustomAttributes: prepareCustomAttributes,
       isEmptyCustomAttribute: isEmptyCustomAttribute,
+      getAttributes: getAttributes,
       getCustomAttributeType: getCustomAttributeType,
       convertToFormViewField: convertToFormViewField,
-      prepareLocalAttribute: prepareLocalAttribute,
-      prepareGlobalAttribute: prepareGlobalAttribute,
-      updateAttribute: updateAttribute
+      applyChangesToCustomAttributeValue: applyChangesToCustomAttributeValue
     };
   })();
 })(window.GGRC, window.can, window._);

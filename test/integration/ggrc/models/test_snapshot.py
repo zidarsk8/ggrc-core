@@ -151,10 +151,9 @@ class TestSnapshot(TestCase):
         all_models.Revision.resource_type == "Facility").order_by(
         all_models.Revision.id.desc()).first()
 
-    self.assertIn("global_attributes", facility_revision.content)
-    self.assertNotEqual(facility_revision.content["global_attributes"], [])
-    self.assertIn("local_attributes", facility_revision.content)
-    self.assertEqual(facility_revision.content["local_attributes"], [])
+    self.assertIn("custom_attribute_values", facility_revision.content)
+    self.assertNotEqual(facility_revision.content[
+                        "custom_attribute_values"], [])
 
   def _get_object(self, obj):
     return self.client.get(

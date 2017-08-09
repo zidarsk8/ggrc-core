@@ -26,6 +26,10 @@
             plural="States"
             {disabled}="advancedSearch.filter">
           </multiselect-dropdown>
+          {{#if statusTooltipVisible}}
+            <i class="fa fa-question-circle" rel="tooltip"
+              title="The state represents the state of this object information within GGRC. It does not indicate the state of the underlying product or system."></i>
+          {{/if}}
         </tree-status-filter>
       {{/if}}
       {{^if noResults}}

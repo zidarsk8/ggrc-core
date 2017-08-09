@@ -9,57 +9,72 @@
   var tpl = can.view(GGRC.mustache_path +
     '/components/read-more/read-more.mustache');
   var tag = 'read-more';
-  var defaultTextLength = 200;
   var readMore = 'Read More';
   var readLess = 'Read Less';
-  var overflowPostfix = '...';
+  var classPrefix = 'ellipsis-truncation-';
   /**
    * Assessment specific read more view component
    */
   GGRC.Components('readMore', {
     tag: tag,
     template: tpl,
-    scope: {
-      maxTextLength: '@',
-      text: null,
+    viewModel: {
+      define: {
+        text: {
+          type: 'string',
+          value: ''
+        },
+        maxLinesNumber: {
+          type: 'number',
+          value: 5
+        },
+        cssClass: {
+          type: 'string',
+          value: '',
+          get: function () {
+            return this.attr('expanded') ? '' :
+              classPrefix + this.attr('maxLinesNumber');
+          }
+        }
+      },
       expanded: false,
-      resultedText: null,
       overflowing: false,
+      lineHeight: null,
       btnText: function () {
         return this.attr('expanded') ? readLess : readMore;
       },
-      toggle: function (scope, el, ev) {
+      toggle: function (ev) {
         ev.stopPropagation();
         this.attr('expanded', !this.attr('expanded'));
       },
-      /**
-       * Get Limited text string
-       * @param {String} text - is original text
-       * @param {Number} limit - is maximum allowed text length
-       * @return {string} - returns resulted text part with "..." ending
-         */
-      getSlicedText: function (text, limit) {
-        // As we add extra postfix at the end - remove it's length from the limit
-        limit -= overflowPostfix.length;
-        return text.slice(0, limit) + overflowPostfix;
+      isOverflowing: function (element) {
+        var result;
+        var clientHeight = element.clientHeight;
+        var scrollHeight = element.scrollHeight;
+
+        if (!this.attr('expanded')) {
+          result = scrollHeight > clientHeight;
+        } else {
+          result = clientHeight >=
+            (this.attr('lineHeight') * this.attr('maxLinesNumber'));
+        }
+        this.attr('overflowing', result);
       },
-      setValues: function (originalText) {
-        var limit = Number(this.attr('maxTextLength')) || defaultTextLength;
-        var trimmedText = GGRC.Utils.getPlainText(originalText);
-        var isOverflowing = trimmedText.length >= limit;
-        this.attr('maxTextLength', limit);
-        this.attr('overflowing', isOverflowing);
-        this.attr('resultedText', isOverflowing ?
-          this.getSlicedText(trimmedText, limit) :
-          originalText);
+      checkOverflowing: function (el) {
+        var $element = $(el).find('.read-more__body');
+        var element = $element[0];
+
+        this.attr('lineHeight',
+          parseInt($element.css('line-height'), 10));
+
+        if (element) {
+          this.isOverflowing(element);
+        }
       }
     },
     events: {
-      init: function () {
-        this.scope.setValues(this.scope.attr('text'));
-      },
-      '{scope} text': function (scope, ev, val) {
-        this.scope.setValues(val);
+      '{element} mouseover': function () {
+        this.viewModel.checkOverflowing(this.element);
       }
     }
   });

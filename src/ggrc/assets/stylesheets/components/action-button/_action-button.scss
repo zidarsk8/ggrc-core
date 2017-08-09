@@ -182,7 +182,8 @@
       color: $darkBlue;
     }
 
-    .related-assessments &:hover {
+    .related-assessments &:hover,
+    .related-assessments__tab-container &:hover {
       text-decoration: underline;
       color: $blue;
     }

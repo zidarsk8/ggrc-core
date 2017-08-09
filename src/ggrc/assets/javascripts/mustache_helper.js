@@ -2479,9 +2479,14 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
     function (attr, instance, options) {
       var value = '';
       var definition;
+      var customAttrItem;
+      var getValue;
 
       attr = Mustache.resolve(attr);
       instance = Mustache.resolve(instance);
+      customAttrItem = Mustache.resolve(
+        (options.hash || {}).customAttrItem
+      );
 
       can.each(GGRC.custom_attr_defs, function (item) {
         if (item.definition_type === instance.class.table_singular &&
@@ -2491,7 +2496,7 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
       });
 
       if (definition) {
-        can.each(instance.custom_attribute_values, function (item) {
+        getValue = function (item) {
           if (!(instance instanceof CMS.Models.Assessment)) {
             // reify all models with the exception of the Assessment,
             // because it has a different logic of work with the CA
@@ -2507,7 +2512,13 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
               value = item.attribute_value;
             }
           }
-        });
+        };
+
+        if (!_.isUndefined(customAttrItem)) {
+          getValue(customAttrItem);
+        } else {
+          can.each(instance.custom_attribute_values, getValue);
+        }
       }
 
       return value;
