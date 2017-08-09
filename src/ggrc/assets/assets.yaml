@@ -270,6 +270,7 @@ dashboard-js-files:
   - components/tree/tree-filter-input.js
   - components/tree/tree-status-filter.js
   - components/tree/tree-item-status-for-workflow.js
+  - components/tree/tree-item-custom-attribute.js
   - components/cycle-task-actions/cycle-task-actions.js
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
@@ -527,6 +528,7 @@ dashboard-js-template-files:
   - components/tree/tree-header.mustache
   - components/tree/tree-filter-input.mustache
   - components/tree/tree-item-status-for-workflow.mustache
+  - components/tree/tree-item-custom-attribute.mustache
   - components/cycle-task-actions/cycle-task-actions.mustache
   - components/simple-modal/simple-modal.mustache
   - components/simple-popover/simple-popover.mustache
