@@ -18,6 +18,8 @@ from ggrc import db
 from ggrc.models.relationship import Relationship
 from ggrc.models.snapshot import Snapshot
 
+DEFAULT_WEIGHT = 1
+
 
 class WithSimilarityScore(object):
   """Defines a routine to get similar object with mappings to same objects."""
@@ -32,17 +34,15 @@ class WithSimilarityScore(object):
 
   @classmethod
   def get_similar_objects_query(cls, id_, types="all", relevant_types=None,
-                                threshold=None):
+                                threshold=1):
     """Get objects of types similar to cls instance by their mappings.
 
     Args:
       id_: the id of the object to which the search will be applied;
       types: a list of types of relevant objects (or "all" if you need to find
              objects of any type);
-      relevant_types: use this parameter to override parameters from
-                      cls.similarity_options["relevant_types"];
-      threshold: use this parameter to override
-                 cls.similarity_options["threshold"].
+      relevant_types: use this parameter to override assessment_type;
+      threshold: use this parameter to set similarity threshold.
 
     Returns:
       SQLAlchemy query that yields results with columns [(id, type, weight)] -
@@ -51,17 +51,15 @@ class WithSimilarityScore(object):
     if not types or (not isinstance(types, list) and types != "all"):
       raise ValueError("Expected types = 'all' or a non-empty list of "
                        "requested types, got {!r} instead.".format(types))
-    if not hasattr(cls, "similarity_options"):
-      raise AttributeError("Expected 'similarity_options' defined for "
+    if not hasattr(cls, "assessment_type"):
+      raise AttributeError("Expected 'assessment_type' field defined for "
                            "'{c.__name__}' model.".format(c=cls))
     if relevant_types is None:
-      relevant_types = cls.similarity_options["relevant_types"]
-    if threshold is None:
-      threshold = cls.similarity_options["threshold"]
+      relevant_types = db.session.query(cls.assessment_type)\
+                                 .filter(cls.id == id_)
 
     # naming: self is "object", the object mapped to it is "related",
     # the object mapped to "related" is "similar"
-
     queries_for_union = []
 
     # find "similar" objects with Relationship table
@@ -72,11 +70,9 @@ class WithSimilarityScore(object):
 
     joined = queries_for_union.pop().union_all(*queries_for_union).subquery()
 
-    # define weights for every "related" object type with values from
-    # relevant_types dict
+    # define weights for every "related" object type with default_weight
     weight_case = case(
-        [(joined.c.related_type == type_, parameters["weight"])
-         for type_, parameters in relevant_types.items()],
+        [(joined.c.related_type == relevant_types, DEFAULT_WEIGHT)],
         else_=0)
     weight_sum = func.sum(weight_case).label("weight")
 
@@ -92,6 +88,16 @@ class WithSimilarityScore(object):
         joined.c.similar_type != cls.__name__,
     ))
 
+    # Filter Assessments with proper assessment_type
+    asmnt_cond = case([(
+        joined.c.similar_type == "Assessment",
+        and_(
+            joined.c.similar_id == cls.id,
+            cls.assessment_type == relevant_types,
+        )
+    )], else_=True)
+    result = result.join(cls, asmnt_cond)
+
     # do the filtering by "similar" object types
     if types is not None:
       if not types:
@@ -104,7 +110,7 @@ class WithSimilarityScore(object):
         # retain only types from the provided list
         result = result.filter(joined.c.similar_type.in_(types))
 
-    # group by "similar" objects to sum up weights correctly
+    # group by "similar" objects to remove duplicated rows
     result = result.group_by(
         joined.c.similar_type,
         joined.c.similar_id,
@@ -112,7 +118,6 @@ class WithSimilarityScore(object):
         # filter out "similar" objects that have insufficient similarity
         weight_sum >= threshold,
     )
-
     return result
 
   @classmethod

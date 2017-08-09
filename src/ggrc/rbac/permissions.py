@@ -1,9 +1,30 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+"""Basic RBAC permissions module."""
+
 from flask import g
 from flask.ext.login import current_user
+
+from ggrc import login
 from ggrc.extensions import get_extension_instance
+
+
+from enum import Enum
+
+
+class SystemWideRoles(Enum):
+  Editor = "Editor"
+  Administrator = "Administrator"
+  Reader = "Reader"
+  NoAccess = "No Access"
+
+
+SYSTEM_WIDE_READ_ROLES = {
+    SystemWideRoles.Administrator,
+    SystemWideRoles.Editor,
+    SystemWideRoles.Reader,
+}
 
 
 def get_permissions_provider():
@@ -13,17 +34,17 @@ def get_permissions_provider():
 
 
 def permissions_for(user=None):
+  """Get full permissions for user."""
   if user is None:
     user = get_user()
   return get_permissions_provider().permissions_for(user)
 
 
 def get_user():
+  """Get selected user."""
   if hasattr(g, 'user'):
     return g.user
-  else:
-    return current_user
-  return None
+  return current_user
 
 
 def is_allowed_create(resource_type, resource_id, context_id):
@@ -41,10 +62,20 @@ def is_allowed_create_for(instance):
   return permissions_for(get_user()).is_allowed_create_for(instance)
 
 
+def _system_wide_read():
+  """Check if user has system wide read access to all objects."""
+  user = login.get_current_user()
+  system_wide_role = getattr(user, "system_wide_role",
+                             SystemWideRoles.NoAccess)
+  return system_wide_role in SYSTEM_WIDE_READ_ROLES
+
+
 def is_allowed_read(resource_type, resource_id, context_id):
   """Whether or not the user is allowed to read a resource of the specified
   type in the context.
   """
+  if _system_wide_read():
+    return True
   return permissions_for(get_user()).is_allowed_read(
       resource_type, resource_id, context_id)
 
@@ -53,6 +84,8 @@ def is_allowed_read_for(instance):
   """Whether or not the user is allowed to read this particular resource
   instance.
   """
+  if _system_wide_read():
+    return True
   return permissions_for(get_user()).is_allowed_read_for(instance)
 
 
@@ -131,15 +164,17 @@ def is_allowed_view_object_page_for(instance):
 
 
 def is_admin():
-  """Whether the current user has ADMIN permission"""
+  """Whether the current user has ADMIN permission."""
   return permissions_for(get_user()).is_admin()
 
 
 def has_conditions(action, resource):
-  """
+  """Check permission conditions.
+
   Checks if the resource has a condition that needs to be checked with
-  is_allowed_for
+  is_allowed_for.
   """
+  # pylint disable=protected-access
   _permissions = permissions_for()._permissions()
   return bool(_permissions.get(action, {})
               .get(resource, {})

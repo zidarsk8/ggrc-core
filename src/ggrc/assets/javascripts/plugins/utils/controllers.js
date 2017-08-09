@@ -52,10 +52,15 @@ GGRC.Utils.Controllers = (function () {
     });
   }
 
+  function shouldApplyPreconditions(instance) {
+    return hasWarningType(instance);
+  }
+
   return {
     TYPES_WITH_CONFIRMATION: typesWithWarning,
     checkPreconditions: checkPreconditions,
     hasWarningType: hasWarningType,
-    becameDeprecated: becameDeprecated
+    becameDeprecated: becameDeprecated,
+    shouldApplyPreconditions: shouldApplyPreconditions
   };
 })();

@@ -19,29 +19,35 @@ Copyright (C) 2017 Google Inc.
                 {value}="instance.title"
                 {is-edit-icon-denied}="isEditDenied">
                     {{#unless editMode}}
-                        <confirm-inline-control-title
-                            (set-edit-mode-inline)="setEditModeInline(%event)"
+                        <confirm-edit-action
+                            (set-edit-mode)="setEditModeInline(%event)"
                             (set-in-progress)="setInProgressState()"
                             {is-edit-icon-denied}="isEditIconDenied"
                             {instance}="instance"
                             {on-state-change-dfd}="onStateChangeDfd"
                             {edit-mode}="editMode">
-                                <h3 class="pane-header__title-name">{{instance.title}}</h3>
-                                <div class="state-value {{addclass 'state-' instance.status separator=''}}">
-                                    {{instance.status}}
-                                </div>
-                                {{#if instance.archived}}
-                                    <span class="state-value state-archived">Archived</span>
-                                {{/if}}
-                                {{#eq instance.status 'Completed'}}
-                                    {{#if instance.verified}}
-                                        <i class="fa fa-check-circle green verified-icon"
-                                            rel="tooltip"
-                                            title="Verified on {{localize_date instance.verified_date}}">
-                                        </i>
-                                    {{/if}}
-                                {{/eq}}
-                        </confirm-inline-control-title>
+                                <base-inline-control-title
+                                    class="inline__header"
+                                    {edit-mode}="editMode"
+                                    {is-edit-icon-denied}="isEditIconDenied"
+                                    (set-edit-mode-inline)="confirmEdit()">
+                                        <h3 class="pane-header__title-name">{{instance.title}}</h3>
+                                        <div class="state-value {{addclass 'state-' instance.status separator=''}}">
+                                            {{instance.status}}
+                                        </div>
+                                        {{#if instance.archived}}
+                                            <span class="state-value state-archived">Archived</span>
+                                        {{/if}}
+                                        {{#eq instance.status 'Completed'}}
+                                            {{#if instance.verified}}
+                                                <i class="fa fa-check-circle green verified-icon"
+                                                    rel="tooltip"
+                                                    title="Verified on {{localize_date instance.verified_date}}">
+                                                </i>
+                                            {{/if}}
+                                        {{/eq}}
+                                </base-inline-control-title>
+                        </confirm-edit-action>
                     {{/unless}}
             </inline-edit-control>
         </div>

@@ -9,9 +9,9 @@ describe('GGRC.Components.personFormField', function () {
     viewModel.attr('fieldId', 1);
   });
 
-  it('does not fire valueChanged' +
-    ' event on first value assignation', function () {
-    viewModel.attr('value', 1);
+  it('does not fire valueChanged event' +
+    ' on first value assignation', function () {
+    viewModel.attr('value', undefined);
     expect(viewModel.dispatch).not.toHaveBeenCalled();
   });
 
@@ -21,7 +21,7 @@ describe('GGRC.Components.personFormField', function () {
   });
 
   it('does not fire valueChanged event if value wasn\'t changed', function () {
-    viewModel.attr('value', null);
+    viewModel.attr('value', {});
     viewModel.attr('_value', 1);
     viewModel.dispatch.calls.reset();
     viewModel.attr('_value', 1);
@@ -29,7 +29,7 @@ describe('GGRC.Components.personFormField', function () {
   });
 
   it('fires valueChanged event on input value change', function () {
-    viewModel.attr('value', null);
+    viewModel.attr('value', '');
     viewModel.attr('_value', 1);
     expect(viewModel.dispatch).toHaveBeenCalledWith({
       type: 'valueChanged',

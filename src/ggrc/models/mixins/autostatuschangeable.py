@@ -210,11 +210,16 @@ class AutoStatusChangeable(object):
         for value in obj.custom_attribute_values
         for attr_name in ("attribute_value", "attribute_object_id")
     )
+
     for attr_history in histories:
       added, _, deleted = attr_history
       if attr_history.has_changes() and (any(added) or deleted):
-        return True
-    return False
+        has_ca_changes = True
+        break
+    else:
+      has_ca_changes = False
+
+    return has_ca_changes
 
   @classmethod  # noqa: C901  # ignore flake8 method too complex warning
   def set_handlers(cls, model):

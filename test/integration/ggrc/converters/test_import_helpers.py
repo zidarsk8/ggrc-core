@@ -337,7 +337,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Code",
         "Title",
         "Description",
-        "Internal Audit Lead",
+        "Audit Captain",
         "Status",
         "Planned Start Date",
         "Planned End Date",
@@ -355,7 +355,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Title",
             "Program",
             "Status",
-            "Internal Audit Lead",
+            "Audit Captain",
         },
         "unique": {
             "Title",
@@ -736,7 +736,7 @@ class TestGetObjectColumnDefinitions(TestCase):
 
 
 class TestRiskAssessmentColumnDefinitions(TestCase):
-  """Test default column difinitions for risk assessment objects."""
+  """Test default column difinitions for risk assessment objcts."""
 
   @classmethod
   def setUpClass(cls):

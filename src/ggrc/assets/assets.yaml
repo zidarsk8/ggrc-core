@@ -168,6 +168,7 @@ dashboard-js-files:
   - components/read-more/read-more.js
   - components/assessment/urls-list.js
   - components/assessment/custom-attributes.js
+  - components/assessment/inline.js
   - components/comment/comment-add-form.js
   - components/comment/comment-input.js
   - components/comment/comment-add-button.js
@@ -189,8 +190,9 @@ dashboard-js-files:
   - components/related-objects/related-issues.js
   - components/object-state-toolbar/object-state-toolbar.js
   - components/object-list/object-list.js
-  - components/form/form-required-check.js
+  - components/ca-object/ca-object.js
   - components/form/form-validation-icon.js
+  - components/ca-object/ca-object-value-mapper.js
   - components/ca-object/ca-object-modal-content.js
   - components/related-objects/related-objects.js
   - components/reusable-objects/reusable-objects-list.js
@@ -268,6 +270,7 @@ dashboard-js-files:
   - components/tree/tree-filter-input.js
   - components/tree/tree-status-filter.js
   - components/tree/tree-item-status-for-workflow.js
+  - components/tree/tree-item-custom-attribute.js
   - components/cycle-task-actions/cycle-task-actions.js
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
@@ -332,7 +335,7 @@ dashboard-js-files:
   - components/inline/inline-form-control.js
   - components/inline/base-inline-control-title.js
   - components/assessment/info-pane/inline-item.js
-  - components/assessment/info-pane/confirm-inline-control-title.js
+  - components/assessment/info-pane/confirm-edit-action.js
 
 app-init-files:
   - apps/dashboard.js
@@ -359,6 +362,13 @@ dashboard-js-template-files:
   - components/assessment/mapped-objects/mapped-comments.mustache
   - components/assessment/urls-list.mustache
   - components/assessment/custom-attributes.mustache
+  - components/assessment/inline/inline.mustache
+  - components/assessment/inline/text.mustache
+  - components/assessment/inline/input.mustache
+  - components/assessment/inline/dropdown.mustache
+  - components/assessment/inline/date.mustache
+  - components/assessment/inline/person.mustache
+  - components/assessment/inline/checkbox.mustache
   - components/comment/comment-add-form.mustache
   - components/comment/comment-input.mustache
   - components/object-list/object-list.mustache
@@ -463,7 +473,6 @@ dashboard-js-template-files:
   - assessments/related-assessments.mustache
   - assessments/related-assessments-without-reuse.mustache
   - assessments/header.mustache
-  - assessments/urls.mustache
   - assessments/dates_list.mustache
   - assessment_templates/attribute_field.mustache
   - assessment_templates/attribute_add_field.mustache
@@ -518,6 +527,7 @@ dashboard-js-template-files:
   - components/tree/tree-header.mustache
   - components/tree/tree-filter-input.mustache
   - components/tree/tree-item-status-for-workflow.mustache
+  - components/tree/tree-item-custom-attribute.mustache
   - components/cycle-task-actions/cycle-task-actions.mustache
   - components/simple-modal/simple-modal.mustache
   - components/simple-popover/simple-popover.mustache
@@ -689,7 +699,6 @@ dashboard-js-template-files:
   - components/inline/simple-readonly-text.mustache
   - components/inline/base-inline-control-title.mustache
   - components/assessment/info-pane/inline-item.mustache
-  - components/assessment/info-pane/confirm-inline-control-title.mustache
 
 dashboard-css-files:
   - dashboard.css

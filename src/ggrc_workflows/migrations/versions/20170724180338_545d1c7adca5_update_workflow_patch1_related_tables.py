@@ -16,7 +16,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '545d1c7adca5'
-down_revision = '59aaa4750320'
+down_revision = '396f47dcc433'
 
 
 DAY_UNIT = 'day'

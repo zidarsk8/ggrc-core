@@ -145,8 +145,7 @@ class QueryHelper(object):
     left = exp.get("left", None)
     if left is not None and isinstance(left, collections.Hashable):
       return set([left])
-    else:
-      return set()
+    return set()
 
   def _macro_expand_object_query(self, object_query):
     """Expand object query."""
@@ -308,8 +307,23 @@ class QueryHelper(object):
       delattr(flask.g, "similar_objects_query")
     return ids
 
-  @staticmethod
-  def _apply_limit(query, limit):
+  @classmethod
+  def _get_limit(cls, limit):
+    """Get limit parameters for sqlalchemy."""
+    try:
+      first, last = [int(i) for i in limit]
+    except (ValueError, TypeError):
+      raise BadQueryException("Invalid limit operator. Integers expected.")
+
+    if first < 0 or last < 0:
+      raise BadQueryException("Limit cannot contain negative numbers.")
+    elif first >= last:
+      raise BadQueryException("Limit start should be smaller than end.")
+    else:
+      page_size = last - first
+    return page_size, first
+
+  def _apply_limit(self, query, limit):
     """Apply limits for pagination.
 
     Args:
@@ -320,30 +334,20 @@ class QueryHelper(object):
     Returns:
       matched objects ids and total count.
     """
-    try:
-      first, last = limit
-      first, last = int(first), int(last)
-    except (ValueError, TypeError):
-      raise BadQueryException("Invalid limit operator. Integers expected.")
+    page_size, first = self._get_limit(limit)
 
-    if first < 0 or last < 0:
-      raise BadQueryException("Limit cannot contain negative numbers.")
-    elif first >= last:
-      raise BadQueryException("Limit start should be smaller than end.")
-    else:
-      page_size = last - first
-      with benchmark("Apply limit: _apply_limit > query_limit"):
-        # Note: limit request syntax is limit:[0,10]. We are counting
-        # offset from 0 as the offset of the initial row for sql is 0 (not 1).
-        ids = [obj.id for obj in query.limit(page_size).offset(first)]
-      with benchmark("Apply limit: _apply_limit > query_count"):
-        if len(ids) < page_size:
-          total = len(ids) + first
-        else:
-          # Note: using func.count() as query.count() is generating additional
-          # subquery
-          count_q = query.statement.with_only_columns([sa.func.count()])
-          total = db.session.execute(count_q).scalar()
+    with benchmark("Apply limit: _apply_limit > query_limit"):
+      # Note: limit request syntax is limit:[0,10]. We are counting
+      # offset from 0 as the offset of the initial row for sql is 0 (not 1).
+      ids = [obj.id for obj in query.limit(page_size).offset(first)]
+    with benchmark("Apply limit: _apply_limit > query_count"):
+      if len(ids) < page_size:
+        total = len(ids) + first
+      else:
+        # Note: using func.count() as query.count() is generating additional
+        # subquery
+        count_q = query.statement.with_only_columns([sa.func.count()])
+        total = db.session.execute(count_q).scalar()
 
     return ids, total
 

@@ -3,10 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, GGRC) {
+(function (can, GGRC, CMS) {
   'use strict';
   var tpl = can.view(GGRC.mustache_path +
     '/components/assessment/info-pane/info-pane.mustache');
+  var CAUtils = GGRC.Utils.CustomAttributes;
 
   /**
    * Assessment Specific Info Pane View Component
@@ -78,7 +79,7 @@
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
-      triggerFormSaveCbs: $.Callbacks(),
+      triggerFormSaveCbs: can.$.Callbacks(),
       setInProgressState: function () {
         this.onStateChange({state: 'In Progress', undo: false});
       },
@@ -190,15 +191,22 @@
           .replace(this.loadUrls());
       },
       initializeFormFields: function () {
+        var cavs =
+          CAUtils.getAttributes(
+            this.attr('instance.custom_attribute_values'), true);
         this.attr('formFields',
-            this.attr('instance.local_attributes')
-              .map(GGRC.Utils.CustomAttributes.prepareLocalAttribute)
+          CAUtils.convertValuesToFormFields(cavs)
         );
       },
       initGlobalAttributes: function () {
-        return this.attr('globalAttributes',
-          this.attr('instance.global_attributes')
-            .map(GGRC.Utils.CustomAttributes.prepareGlobalAttribute));
+        var cavs =
+          CAUtils.getAttributes(
+              this.attr('instance.custom_attribute_values'), false);
+        this.attr('globalAttributes',
+          cavs.map(function (cav) {
+            return CAUtils.convertToFormViewField(cav);
+          })
+        );
       },
       onFormSave: function () {
         this.attr('triggerFormSaveCbs').fire();
@@ -222,6 +230,13 @@
           .then(function () {
             instance.refresh().then(function () {
               instance.attr('status', isUndo ? previousStatus : newStatus);
+
+              if (instance.attr('status') === 'Ready for Review' && !isUndo) {
+                $(document.body).trigger('ajax:flash',
+                  {hint: 'The assessment is complete. ' +
+                  'The verifier may revert it if further input is needed.'});
+              }
+
               return instance.save()
               .then(function () {
                 instance.attr('isPending', false);
@@ -231,45 +246,18 @@
             });
           });
       },
-      updateAttributes: function (attrs, fields) {
-        can.Map.keys(fields).forEach(function (fieldId) {
-          var caValue =
-            attrs.filter(function (item) {
-              return item.id === Number(fieldId);
-            })[0];
-          if (!caValue) {
-            console.error('Corrupted Date: ', attrs);
-            return;
-          }
-          if (caValue.attr('values').length) {
-            caValue.attr('values')[0].attr('value', fields[fieldId]);
-          } else {
-            caValue.attr('values').push({value: fields[fieldId]});
-          }
-        });
-      },
       saveGlobalAttributes: function (event) {
-        var self = this;
         var globalAttributes = event.globalAttributes;
-        return self.attr('instance')
-          .refresh()
-          .then(function () {
-            var caValues = self.attr('instance.global_attributes');
-            self.updateAttributes(caValues, globalAttributes);
+        var caValues = this.attr('instance.custom_attribute_values');
+        CAUtils.applyChangesToCustomAttributeValue(caValues, globalAttributes);
 
-            return self.attr('instance').save();
-          });
+        return this.attr('instance').save();
       },
-      saveFormFields: function (formFields) {
-        var self = this;
-        return self.attr('instance')
-          .refresh()
-          .then(function () {
-            var caValues = self.attr('instance.local_attributes');
-            self.updateAttributes(caValues, formFields);
+      saveFormFields: function (modifiedFields) {
+        var caValues = this.attr('instance.custom_attribute_values');
+        CAUtils.applyChangesToCustomAttributeValue(caValues, modifiedFields);
 
-            return self.attr('instance').save();
-          });
+        return this.attr('instance').save();
       },
       showRequiredInfoModal: function (e, field) {
         var scope = field || e.field;
@@ -316,4 +304,4 @@
       }
     }
   });
-})(window.can, window.GGRC);
+})(window.can, window.GGRC, window.CMS);

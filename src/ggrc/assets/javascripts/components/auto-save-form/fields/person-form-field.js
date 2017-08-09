@@ -16,7 +16,8 @@
         _value: {
           set: function (newValue, setValue, onError, oldValue) {
             setValue(newValue);
-            if (oldValue === undefined || oldValue === newValue) {
+            if (oldValue === undefined ||
+              oldValue === newValue) {
               return;
             }
             this.valueChanged(newValue);
@@ -38,7 +39,6 @@
       },
       unsetPerson: function (scope, el, ev) {
         ev.preventDefault();
-        ev.stopPropagation();
         this.attr('_value', null);
       },
       valueChanged: function (newValue) {

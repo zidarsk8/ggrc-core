@@ -5,15 +5,19 @@
 
 import json
 
+import ddt
+
 from ggrc import db
 from ggrc import models
 from ggrc.snapshotter.rules import Types
+from ggrc_risks import models as risk_models
 
 from integration.ggrc import TestCase
 import integration.ggrc.generator
 from integration.ggrc.models import factories
 
 
+@ddt.ddt
 class TestWithSimilarityScore(TestCase):
   """Integration test suite for WithSimilarityScore functionality."""
 
@@ -48,7 +52,7 @@ class TestWithSimilarityScore(TestCase):
       snapshots += [snapshot]
     self.make_relationships(source, snapshots)
 
-  def make_assessments(self, assessment_mappings):
+  def make_assessments(self, assessment_mappings, with_types=False):
     """Create six assessments and map them to audit, control, objective.
 
     Each of the created assessments is mapped to its own subset of {audit,
@@ -59,9 +63,18 @@ class TestWithSimilarityScore(TestCase):
 
     assessments = []
     for all_mappings in assessment_mappings:
-      audit = [x for x in all_mappings if x.type == "Audit"][0]
-      assessment = factories.AssessmentFactory(audit=audit)
-      mappings = all_mappings[1:]
+      audit = [x for x in all_mappings
+               if hasattr(x, "type") and x.type == "Audit"][0]
+      if with_types:
+        assessment_type = all_mappings[1]
+        mappings_bound = 2
+      else:
+        assessment_type = "Control"
+        mappings_bound = 1
+      assessment = factories.AssessmentFactory(
+          audit=audit, assessment_type=assessment_type
+      )
+      mappings = all_mappings[mappings_bound:]
       ordinary_mappings = [x for x in mappings if x.type not in Types.all]
       snapshot_mappings = [x for x in mappings if x.type in Types.all]
       self.make_relationships(assessment, [audit] + ordinary_mappings)
@@ -71,84 +84,109 @@ class TestWithSimilarityScore(TestCase):
 
     return assessments
 
-  def test_get_similar_basic(self):
+  @ddt.data(
+      ("Risk", "Risk", "Risk"),
+      ("Risk", "Control", "Risk"),
+      ("Control", "Control", "Risk"),
+      ("Control", "Control", "Control"),
+  )
+  def test_get_similar_basic(self, asmnt_types):
     """Basic check of similar objects manually and via Query API.
 
-    We create two programs, map them to the same control, create two audits
+    We create three programs, map them to the same risk, create thress audits
     and verify that we get the same result manually and via Query API.
     """
-    program_1 = factories.ProgramFactory(title="Program 1")
-    program_2 = factories.ProgramFactory(title="Program 2")
+    # pylint: disable=too-many-locals
+    with factories.single_commit():
+      program_1 = factories.ProgramFactory(title="Program 1")
+      program_2 = factories.ProgramFactory(title="Program 2")
+      program_3 = factories.ProgramFactory(title="Program 3")
 
-    control_program_1 = factories.ControlFactory(title="Control 1")
+      risk_program_1 = factories.RiskFactory(title="Risk 1")
 
     self.make_relationships(
         program_1, [
-            control_program_1,
+            risk_program_1,
         ],
     )
-
     self.make_relationships(
         program_2, [
-            control_program_1,
+            risk_program_1,
+        ],
+    )
+    self.make_relationships(
+        program_3, [
+            risk_program_1,
         ],
     )
 
     program_1 = models.Program.query.filter_by(title="Program 1").one()
     program_2 = models.Program.query.filter_by(title="Program 2").one()
-    control_program_1 = models.Control.query.filter_by(title="Control 1").one()
+    program_3 = models.Program.query.filter_by(title="Program 3").one()
+    risk_program_1 = risk_models.Risk.query.get(risk_program_1.id)
 
     audit_1 = self.obj_gen.generate_object(models.Audit, {
         "title": "Audit 1",
         "program": {"id": program_1.id},
         "status": "Planned"
     })[1]
-
     audit_2 = self.obj_gen.generate_object(models.Audit, {
         "title": "Audit 2",
         "program": {"id": program_2.id},
         "status": "Planned"
     })[1]
+    audit_3 = self.obj_gen.generate_object(models.Audit, {
+        "title": "Audit 3",
+        "program": {"id": program_3.id},
+        "status": "Planned"
+    })[1]
 
     assessment_mappings = [
-        [audit_1, control_program_1],
-        [audit_2, control_program_1],
+        [audit_1, asmnt_types[0], risk_program_1],
+        [audit_2, asmnt_types[1], risk_program_1],
+        [audit_3, asmnt_types[2], risk_program_1],
     ]
+    assessments = self.make_assessments(assessment_mappings, with_types=True)
 
-    assessments = self.make_assessments(assessment_mappings)
+    risk_asmnt_ids = {asmnt.id for asmnt in assessments
+                      if asmnt.assessment_type == "Risk"}
+    for assessment in assessments:
+      similar_objects = models.Assessment.get_similar_objects_query(
+          id_=assessment.id,
+          types=["Assessment"],
+      ).all()
 
-    similar_objects = models.Assessment.get_similar_objects_query(
-        id_=assessments[0].id,
-        types=["Assessment"],
-    ).all()
+      # Current assessment is not similar to itself
+      if risk_asmnt_ids and assessment.id in risk_asmnt_ids:
+        expected_ids = risk_asmnt_ids - {assessment.id}
+      else:
+        expected_ids = set()
 
-    expected_ids = {assessments[1].id}
+      self.assertSetEqual(
+          {obj.id for obj in similar_objects},
+          expected_ids,
+      )
 
-    self.assertSetEqual(
-        {obj.id for obj in similar_objects},
-        expected_ids,
-    )
-
-    query = [{
-        "object_name": "Assessment",
-        "type": "ids",
-        "filters": {
-            "expression": {
-                "op": {"name": "similar"},
-                "object_name": "Assessment",
-                "ids": [str(assessments[0].id)],
-            },
-        },
-    }]
-    response = self.client.post(
-        "/query",
-        data=json.dumps(query),
-        headers={"Content-Type": "application/json"},
-    )
-    self.assertSetEqual(
-        set(json.loads(response.data)[0]["Assessment"]["ids"]),
-        expected_ids,
-    )
+      query = [{
+          "object_name": "Assessment",
+          "type": "ids",
+          "filters": {
+              "expression": {
+                  "op": {"name": "similar"},
+                  "object_name": "Assessment",
+                  "ids": [str(assessment.id)],
+              },
+          },
+      }]
+      response = self.client.post(
+          "/query",
+          data=json.dumps(query),
+          headers={"Content-Type": "application/json"},
+      )
+      self.assertSetEqual(
+          set(json.loads(response.data)[0]["Assessment"]["ids"]),
+          expected_ids,
+      )
 
   def test_similar_partially_matching(self):
     """Basic check of similar objects manually and via Query API.
@@ -161,13 +199,13 @@ class TestWithSimilarityScore(TestCase):
     """
 
     # pylint: disable=too-many-locals
+    with factories.single_commit():
+      program_1 = factories.ProgramFactory(title="Program 1")
+      program_2 = factories.ProgramFactory(title="Program 2")
+      program_3 = factories.ProgramFactory(title="Program 3")
 
-    program_1 = factories.ProgramFactory(title="Program 1")
-    program_2 = factories.ProgramFactory(title="Program 2")
-    program_3 = factories.ProgramFactory(title="Program 3")
-
-    objective_1_program_1 = factories.ObjectiveFactory(title="Objective 1")
-    objective_2_program_1 = factories.ObjectiveFactory(title="Objective 2")
+      objective_1_program_1 = factories.ObjectiveFactory(title="Objective 1")
+      objective_2_program_1 = factories.ObjectiveFactory(title="Objective 2")
 
     self.make_relationships(
         program_1, [
@@ -217,12 +255,12 @@ class TestWithSimilarityScore(TestCase):
     })
 
     assessment_mappings = [
-        [audit_1, objective_1_program_1, objective_2_program_1],
-        [audit_2, objective_1_program_1, objective_2_program_1],
-        [audit_3],
+        [audit_1, "Objective", objective_1_program_1, objective_2_program_1],
+        [audit_2, "Objective", objective_1_program_1, objective_2_program_1],
+        [audit_3, "Objective"],
     ]
 
-    assessments = self.make_assessments(assessment_mappings)
+    assessments = self.make_assessments(assessment_mappings, with_types=True)
 
     similar_objects = models.Assessment.get_similar_objects_query(
         id_=assessments[0].id,
@@ -262,13 +300,13 @@ class TestWithSimilarityScore(TestCase):
     """Check sorting by __similarity__ value with query API."""
 
     # pylint: disable=too-many-locals
+    with factories.single_commit():
+      program_1 = factories.ProgramFactory(title="Program 1")
 
-    program_1 = factories.ProgramFactory(title="Program 1")
-
-    objective_1_program_1 = factories.ObjectiveFactory(title="Objective 1")
-    objective_2_program_1 = factories.ObjectiveFactory(title="Objective 2")
-    control_1_program_1 = factories.ControlFactory(title="Control 1")
-    control_2_program_1 = factories.ControlFactory(title="Control 2")
+      objective_1_program_1 = factories.ObjectiveFactory(title="Objective 1")
+      objective_2_program_1 = factories.ObjectiveFactory(title="Objective 2")
+      control_1_program_1 = factories.ControlFactory(title="Control 1")
+      control_2_program_1 = factories.ControlFactory(title="Control 2")
 
     self.make_relationships(
         program_1, [
@@ -317,17 +355,18 @@ class TestWithSimilarityScore(TestCase):
         [audit_2, control_1_program_1, control_2_program_1],
     ]
 
+    # All created Assessments has 'Control' type so result weights are
+    # equal to count of controls in assessment objects related to current one
     weights = [
-        [4, 4, 4, 4, 8],
-        [2, 2, 4, 4, 4],
-        [2, 2, 4, 4, 4],
-        [4, 4, 4, 4, 8],
-        [2, 2, 4, 4, 4],
-        [2, 2, 4, 4, 4],
+        [1, 1, 2, 2, 2],
+        [1, 1, 2, 2, 2],
+        [1, 1, 1, 1, 1],
+        [1, 1, 2, 2, 2],
+        [1, 1, 1, 1, 1],
+        [1, 1, 2, 2, 2],
     ]
 
-    assessments = self.make_assessments(
-        assessment_mappings)
+    assessments = self.make_assessments(assessment_mappings)
     assessment_ids = [ass.id for ass in assessments]
 
     for aid, weight_defs in zip(assessment_ids, weights):
@@ -443,26 +482,39 @@ class TestWithSimilarityScore(TestCase):
     )
     self.assert400(response)
 
-  def test_asmt_issue_similarity(self):
-    """Test Issues related to assessments."""
-    audit = factories.AuditFactory()
-    assessment1 = factories.AssessmentFactory(audit=audit)
-    assessment2 = factories.AssessmentFactory(audit=audit)
-    issue = factories.IssueFactory(audit=audit)
-    control = factories.ControlFactory()
+  @ddt.data(
+      ("Control", factories.ControlFactory, True),
+      ("Objective", factories.ControlFactory, False),
+      ("Control", factories.ObjectiveFactory, False),
+      ("Objective", factories.ObjectiveFactory, True),
+  )
+  @ddt.unpack
+  def test_asmt_issue_similarity(self, asmnt_type, obj_factory, issue_exists):
+    """Test Issues related to assessments with 'similar' operation."""
+    # Test object has to be created before others to produce revision
+    obj = obj_factory()
 
-    snapshot = factories.SnapshotFactory(
-        parent=audit,
-        child_id=control.id,
-        child_type=control.type,
-        revision_id=models.Revision.query.filter_by(
-            resource_type=control.type).one().id
-    )
-    factories.RelationshipFactory(source=audit, destination=assessment1)
-    factories.RelationshipFactory(source=audit, destination=assessment2)
-    factories.RelationshipFactory(source=audit, destination=issue)
-    factories.RelationshipFactory(source=snapshot, destination=assessment1)
-    factories.RelationshipFactory(source=snapshot, destination=issue)
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment1 = factories.AssessmentFactory(
+          audit=audit, assessment_type=asmnt_type
+      )
+      assessment2 = factories.AssessmentFactory(audit=audit)
+      issue = factories.IssueFactory(audit=audit)
+
+      snapshot = factories.SnapshotFactory(
+          parent=audit,
+          child_id=obj.id,
+          child_type=obj.type,
+          revision_id=models.Revision.query.filter_by(
+              resource_type=obj.type).one().id
+      )
+
+      factories.RelationshipFactory(source=audit, destination=assessment1)
+      factories.RelationshipFactory(source=audit, destination=assessment2)
+      factories.RelationshipFactory(source=audit, destination=issue)
+      factories.RelationshipFactory(source=snapshot, destination=assessment1)
+      factories.RelationshipFactory(source=snapshot, destination=issue)
 
     query = [{
         "object_name": "Issue",
@@ -482,8 +534,96 @@ class TestWithSimilarityScore(TestCase):
         data=json.dumps(query),
         headers={"Content-Type": "application/json"},
     )
+    if issue_exists:
+      self.assertListEqual(
+          response.json[0]["Issue"]["ids"],
+          expected_ids
+      )
+    else:
+      self.assertListEqual(
+          response.json[0]["Issue"]["ids"],
+          []
+      )
 
-    self.assertListEqual(
-        response.json[0]["Issue"]["ids"],
-        expected_ids
+  @ddt.data(
+      (("Risk", "Risk"), False, (True, True)),
+      (("Risk", "Risk"), True, (True, True)),
+      (("Risk", "Control"), False, (True, False)),
+      (("Risk", "Control"), True, (True, True)),
+      (("Control", "Risk"), False, (False, True)),
+      (("Control", "Risk"), True, (False, True)),
+      (("Control", "Control"), False, (False, False)),
+      (("Control", "Control"), True, (False, True)),
+  )
+  @ddt.unpack
+  def test_asmt_issue_related(self, asmnt_types, asmnt_related, issues_exist):
+    """Test Issues related to assessments."""
+    # pylint: disable=too-many-locals
+
+    # Test object has to be created before others to produce revision
+    obj = factories.RiskFactory()
+
+    with factories.single_commit():
+      assessments = []
+      for asmnt_type in asmnt_types:
+        audit = factories.AuditFactory()
+        assessment = factories.AssessmentFactory(
+            audit=audit, assessment_type=asmnt_type
+        )
+        assessments.append(assessment)
+        snapshot = factories.SnapshotFactory(
+            parent=audit,
+            child_id=obj.id,
+            child_type=obj.type,
+            revision_id=models.Revision.query.filter_by(
+                resource_type=obj.type).one().id
+        )
+        factories.RelationshipFactory(source=audit, destination=assessment)
+        factories.RelationshipFactory(source=snapshot, destination=assessment)
+
+      # Create one issue in the last audit linked to snapshot/assessment
+      issue = factories.IssueFactory(audit=audit)
+      factories.RelationshipFactory(source=audit, destination=issue)
+      factories.RelationshipFactory(source=snapshot, destination=issue)
+      if asmnt_related:
+        factories.RelationshipFactory(source=issue, destination=assessment)
+
+    query = []
+    for assessment in assessments:
+      query.append({
+          "object_name": "Issue",
+          "type": "ids",
+          "filters": {
+              "expression": {
+                  "left": {
+                      "object_name": "Assessment",
+                      "op": {"name": "relevant"},
+                      "ids": [assessment.id],
+                  },
+                  "op": {"name": "OR"},
+                  "right": {
+                      "object_name": "Assessment",
+                      "op": {"name": "similar"},
+                      "ids": [assessment.id],
+                  },
+              },
+          },
+      })
+
+    expected_ids = [issue.id]
+    response = self.client.post(
+        "/query",
+        data=json.dumps(query),
+        headers={"Content-Type": "application/json"},
     )
+    for num, data in enumerate(response.json):
+      if issues_exist[num]:
+        self.assertListEqual(
+            data["Issue"]["ids"],
+            expected_ids
+        )
+      else:
+        self.assertListEqual(
+            data["Issue"]["ids"],
+            []
+        )

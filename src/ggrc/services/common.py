@@ -867,7 +867,14 @@ class Resource(ModelView):
           obj.__class__, obj=obj, src=src, service=self, event=event)
       # Note: Some data is created in listeners for model_put_after_commit
       # (like updates to snapshots), so we need to commit the changes
+      with benchmark("Get modified objects"):
+        modified_objects = get_modified_objects(db.session)
+      with benchmark("Update memcache before commit"):
+        update_memcache_before_commit(
+            self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
       db.session.commit()
+      with benchmark("Update memcache after commit"):
+        update_memcache_after_commit(self.request)
       if self.has_cache():
         self.invalidate_cache_to(obj)
     with benchmark("Send event job"):
@@ -1083,16 +1090,6 @@ class Resource(ModelView):
     memcache_client.delete(get_cache_key(None, id=obj.id, type=obj.type))
 
   def json_create(self, obj, src):
-    cad = ggrc.models.CustomAttributeDefinition
-    if isinstance(obj, ggrc.models.mixins.CustomAttributable):
-
-      type_name = obj.__class__._inflector.table_singular
-      obj.custom_attribute_definitions = cad.query.filter(
-          cad.definition_id.is_(None),
-          cad.definition_type == type_name,
-      ).order_by(
-          cad.id
-      ).all()
     ggrc.builder.json.create(obj, src)
 
   def get_context_id_from_json(self, src):

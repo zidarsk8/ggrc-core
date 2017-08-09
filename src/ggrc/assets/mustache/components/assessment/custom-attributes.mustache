@@ -15,13 +15,18 @@
         {value}="value"
         {type}="type"
         with-read-more="true">
-              <confirm-inline-control-title
-                  (set-edit-mode-inline)="setEditModeInline(%event)"
+              <confirm-edit-action
+                  (set-edit-mode)="setEditModeInline(%event)"
                   (set-in-progress)="setInProgressState()"
                   {instance}="instance"
                   {on-state-change-dfd}="onStateChangeDfd"
                   {edit-mode}="editMode">
-                <div class="info-pane__section-title">{{title}}</div>
-              </confirm-inline-control-title>
+                    <base-inline-control-title
+                        {edit-mode}="editMode"
+                        {is-edit-icon-denied}="isEditIconDenied"
+                        (set-edit-mode-inline)="confirmEdit()">
+                      <div class="info-pane__section-title">{{title}}</div>
+                    </base-inline-control-title>
+              </confirm-edit-action>
     </inline-edit-control>
 {{/each}}

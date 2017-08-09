@@ -41,10 +41,28 @@
         this.attr('isLastOpenInline', args.isLastOpenInline);
         this.attr('editMode', true);
       },
-      updateFieldValue: function () {
+      setPerson: function (scope, el, ev) {
+        this.attr('context.value', ev.selectedItem.serialize().id);
+      },
+      unsetPerson: function (scope, el, ev) {
+        ev.preventDefault();
+        this.attr('context.value', null);
+      },
+      save: function () {
+        var oldValue = this.attr('value');
         var value = this.attr('context.value');
 
         this.attr('editMode', false);
+        // In case value is String and consists only of spaces - do nothing
+        if (typeof value === 'string' && !value.trim()) {
+          this.attr('context.value', '');
+          value = null;
+        }
+
+        if (oldValue === value) {
+          return;
+        }
+
         this.attr('value', value);
 
         this.dispatch({
