@@ -52,7 +52,7 @@ describe('GGRC.Components.quickAdd', function () {
     it('calls confirm panel if verify_event is true', function () {
       spyOn(GGRC.Controllers.Modals, 'confirm');
       handler.call({
-        scope: scope,
+        viewModel: scope,
         element: element
       });
       expect(GGRC.Controllers.Modals.confirm)
@@ -63,7 +63,7 @@ describe('GGRC.Components.quickAdd', function () {
       spyOn(GGRC.Controllers.Modals, 'confirm');
       element.context.attributes.verify_event = false;
       handler.call({
-        scope: scope,
+        viewModel: scope,
         element: element
       });
       expect(GGRC.Controllers.Modals.confirm)
@@ -74,7 +74,7 @@ describe('GGRC.Components.quickAdd', function () {
         spyOn(GGRC.Controllers.Modals, 'confirm')
           .and.returnValue(verifyDfd.reject());
         handler.call({
-          scope: scope,
+          viewModel: scope,
           element: element
         });
         expect(scope.attr('disabled')).toEqual(false);
