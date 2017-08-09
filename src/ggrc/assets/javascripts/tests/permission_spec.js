@@ -379,7 +379,32 @@ describe('Permission', function () {
 
         instance = new CMS.Models.UserRole();
         instance.attr('context', {id: 101});
-        instance.property_value = 'mockValue';
+        instance.attr('property_value', 'mockValue');
+
+        result = Permission._is_allowed_for(permissions, instance, 'create');
+        expect(result).toEqual(true);
+      });
+      it('for complex "is" condition', function () {
+        permissions.create = {
+          UserRole: {
+            contexts: [101],
+            conditions: {
+              '101': [{
+                condition: 'is',
+                terms: {
+                  value: 'mockValue',
+                  property_name: 'container.property_value'
+                }
+              }]
+            }
+          }
+        };
+
+        instance = new CMS.Models.UserRole();
+        instance.attr('context', {id: 101});
+        instance.attr('container', {
+          property_value: 'mockValue'
+        });
 
         result = Permission._is_allowed_for(permissions, instance, 'create');
         expect(result).toEqual(true);
