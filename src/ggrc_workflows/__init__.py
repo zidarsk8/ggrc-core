@@ -188,7 +188,8 @@ def build_cycles(workflow, cycle=None, user=None):
   user = user or get_current_user()
   if not workflow.next_cycle_start_date:
     workflow.next_cycle_start_date = workflow.min_task_start_date
-  build_cycle(workflow, cycle, user)
+  if cycle:
+    build_cycle(workflow, cycle, user)
   if workflow.unit and workflow.repeat_every:
     while workflow.next_cycle_start_date <= date.today():
       build_cycle(workflow, current_user=user)
