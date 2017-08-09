@@ -10,7 +10,9 @@ import itertools
 from dateutil import relativedelta
 
 from sqlalchemy import and_
+from sqlalchemy import case
 from sqlalchemy import orm
+from sqlalchemy.ext import hybrid
 
 from ggrc import builder
 from ggrc import db
@@ -96,6 +98,29 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
                             default=None), 'Workflow')
   repeat_multiplier = deferred(db.Column(db.Integer, nullable=False,
                                          default=0), 'Workflow')
+
+  UNIT_FREQ_MAPPING = {
+      None: "one_time",
+      DAY_UNIT: "daily",
+      WEEK_UNIT: "weekly",
+      MONTH_UNIT: "monthly"
+  }
+
+  @hybrid.hybrid_property
+  def frequency(self):
+    """Hybrid property for SearchAPI filtering backward compatibility"""
+    return self.UNIT_FREQ_MAPPING[self.unit]
+
+  @frequency.expression
+  def frequency(self):
+    """Hybrid property for SearchAPI filtering backward compatibility"""
+    return case([
+        (self.unit.is_(None), self.UNIT_FREQ_MAPPING[None]),
+        (self.unit == self.DAY_UNIT, self.UNIT_FREQ_MAPPING[self.DAY_UNIT]),
+        (self.unit == self.WEEK_UNIT, self.UNIT_FREQ_MAPPING[self.WEEK_UNIT]),
+        (self.unit == self.MONTH_UNIT,
+         self.UNIT_FREQ_MAPPING[self.MONTH_UNIT]),
+    ])
 
   @property
   def min_task_start_date(self):
