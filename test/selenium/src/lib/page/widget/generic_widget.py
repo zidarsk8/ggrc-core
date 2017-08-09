@@ -198,8 +198,10 @@ class TreeView(base.TreeView):
     selenium_utils.hover_over_element(
         self._driver, item_dropdown_button)
     item_dropdown_button.click()
+    dropdown_menu_element = item_dropdown_button.find_element(
+        *self._locators.ITEM_DROPDOWN_MENU_CSS)
     return self.dropdown_tree_view_item_cls(self._driver, self.obj_name,
-                                            item_dropdown_button)
+                                            dropdown_menu_element)
 
 
 class Audits(Widget):

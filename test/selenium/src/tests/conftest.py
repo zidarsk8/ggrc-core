@@ -212,6 +212,13 @@ def map_new_program_rest_to_new_controls_rest(request):
   yield _common_fixtures(request.fixturename)
 
 
+@pytest.fixture(scope="function")
+def map_new_control_rest_to_new_programs_rest(request):
+  """Map Control to Programs objects via REST API return response from server.
+  """
+  yield _common_fixtures(request.fixturename)
+
+
 def _snapshots_fixtures(fixturename):
   """Generate snapshot fixtures used generation of common fixtures and return
   dictionary of executed common fixtures in scope of snapshot fixtures.
@@ -272,3 +279,32 @@ def create_audit_with_control_and_delete_control(request):
   fixtures.
   """
   yield _snapshots_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
+def new_programs_rest(request):
+  """Create new Controls objects via REST API.
+  Return: [lib.entities.entity.ProgramEntity, ...]
+  """
+  yield _common_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
+def new_audits_rest(request):
+  """Create new Controls objects via REST API.
+  Return: [lib.entities.entity.AuditEntity, ...]
+  """
+  yield _common_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
+def new_assessments_rest(request):
+  """Create new Assessments objects via REST API.
+   Return: [lib.entities.entity.AssessmentEntity, ...]
+   """
+  yield _common_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
+def map_new_control_rest_to_new_assessments_rest(request):
+  yield _common_fixtures(request.fixturename)
