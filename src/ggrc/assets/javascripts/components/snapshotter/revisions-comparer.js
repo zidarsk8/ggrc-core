@@ -94,7 +94,7 @@
         var Revision = CMS.Models.Revision;
         var notCached = [];
         var cached = [currentRevisionID, newRevisionID].map(function (id) {
-          var cache = Revision.store ? Revision.store[id] : undefined;
+          var cache = Revision.findInCacheById(id);
           if (!cache) {
             notCached.push(id);
           }
