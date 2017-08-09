@@ -534,10 +534,17 @@ class WidgetBarButtonAddDropdown(object):
 class ObjectWidget(object):
   """Locators for Generic objects widget."""
   _HEADER = '.header [class^="span"]'
+  _STATE = 'div.state-value'
   HEADER_TITLE = (By.CSS_SELECTOR, _HEADER + ' [data-field="title"]')
   HEADER_OWNER = (
       By.CSS_SELECTOR, _HEADER + ' [data-field="owners"]')
-  HEADER_STATE = (By.CSS_SELECTOR, _HEADER + ' [data-field="status"]')
+  HEADER_STATE = (By.CSS_SELECTOR, _STATE)
+  HEADER_STATE_IN_PROGRESS = (By.CSS_SELECTOR, _STATE + '.state-inprogress')
+  HEADER_STATE_COMPLETED = (By.CSS_SELECTOR, _STATE + '.state-completed')
+  HEADER_STATE_READY_FOR_REVIEW = (
+      By.CSS_SELECTOR, _STATE + '.state-readyforreview')
+  HEADER_STATE_VERIFIED = (By.CSS_SELECTOR, _STATE + '.state-verified')
+
   HEADER_LAST_ASSESSMENT_DATE = (
       By.CSS_SELECTOR, _HEADER + ' [data-field="last_assessment_date"]')
   MEMBERS_TITLE_LIST = (
@@ -729,15 +736,15 @@ class WidgetInfoAssessment(WidgetInfoPanel):
       [_ASMT_PANEL, "related-objects[related-items-type='Issue']"]))
   ASMT_TAB_CONTAINER_CSS = (By.CSS_SELECTOR, "tab-container")
   # state section
-  BUTTON_3BBS = (By.CSS_SELECTOR, ".btn-3bbps")
-  BUTTON_COMPLETE = (By.XPATH, "//button[contains(text(), 'Complete')]")
-  BUTTON_VERIFY = (By.XPATH, "//button[contains(text(), 'Verify')]")
-  BUTTON_REJECT = (By.XPATH, "//button[contains(text(), 'Reject')]")
+  _PNL_STATE = ".pane-header__toolbar"
+  BUTTON_COMPLETE = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-darkBlue")
+  BUTTON_VERIFY = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-green")
+  BUTTON_REJECT = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-red")
+  ICON_VERIFIED = (By.CSS_SELECTOR, "i.verified-icon")
 
-
-class TabContainer(object):
-  TAB_CONTROLLER = (By.CSS_SELECTOR, "ul.nav.nav-tabs")
-  TAB_CONTENT = (By.CSS_SELECTOR, '.tab-pane.active')
+  class TabContainer(object):
+    TAB_CONTROLLER = (By.CSS_SELECTOR, "ul.nav.nav-tabs")
+    TAB_CONTENT = (By.CSS_SELECTOR, '.tab-pane.active')
 
 
 class WidgetInfoAssessmentTemplate(WidgetInfoPanel):

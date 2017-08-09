@@ -211,8 +211,9 @@ class AssessmentsService(BaseRestService):
           attrs={"AssigneeType": ",".join(assignees)})
     return objs
 
-  def update_obj(self, obj):
+  def update_obj(self, obj, **attrs):
     """Update attributes values of existing Assessment via REST API"""
+    obj.update_attrs(**attrs)
     return (self.client.update_object(
         href=obj.href, **dict({k: v for k, v in obj.__dict__
                               .iteritems() if k != "href"}.items())))

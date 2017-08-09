@@ -451,15 +451,16 @@ class AssessmentsService(BaseWebUiService):
      generate_asmts(asmt_tmpl_title=asmt_tmpl_title,
                     objs_under_asmt_titles=objs_under_asmt_titles))
 
-  def edit_obj_title_via_info_widget(self, src_obj):
+  def edit_obj_via_edit_modal_from_info_page(self, src_obj):
     """Open generic widget of object, open edit modal from drop down menu.
-    Modify current title and apply changes by pressing 'save and close' button
+    Modify current title and code and then apply changes by pressing
+    'save and close' button
     """
-    obj_info_page = self.open_info_page_of_obj(src_obj)
-    modal = obj_info_page.open_info_3bbs().select_edit()
-    modal.enter_title("Assessment " + string_utils.random_string(size=20))
-    modal.save_and_close()
-    return self
+    # pylint: disable=invalid-name
+    src_obj_info_page = self.open_info_page_of_obj(src_obj)
+    (src_obj_info_page.open_info_3bbs().select_edit().
+     edit_minimal_data(title="[EDITED]" + src_obj.title).save_and_close())
+    return self.info_widget_cls(self.driver)
 
   def get_log_pane_validation_result(self, obj):
     """Open assessment Info Page. Open Log Pane on Assessment Info Page.
@@ -501,19 +502,25 @@ class AssessmentsService(BaseWebUiService):
     """Navigate to info page of object according to URL of object then find and
     click 'Complete' button then return info page of object in new state"""
     self.open_info_page_of_obj(obj).click_complete()
-    return self
+    return self.info_widget_cls(self.driver)
 
   def verify_assessment(self, obj):
     """Navigate to info page of object according to URL of object then find and
     click 'Verify' button then return info page of object in new state"""
+    from lib.constants.locator import ObjectWidget
+    from lib.constants.locator import WidgetInfoAssessment
     self.open_info_page_of_obj(obj).click_verify()
-    return self
+    for locator in [ObjectWidget.HEADER_STATE_VERIFIED,
+                    ObjectWidget.HEADER_STATE_COMPLETED,
+                    WidgetInfoAssessment.ICON_VERIFIED]:
+      selenium_utils.wait_until_element_visible(self.driver, locator)
+    return self.info_widget_cls(self.driver)
 
   def reject_assessment(self, obj):
     """Navigate to info page of object according to URL of object then find and
     click 'Reject' button then return info page of object in new state"""
     self.open_info_page_of_obj(obj).click_reject()
-    return self
+    return self.info_widget_cls(self.driver)
 
 
 class ControlsService(SnapshotsWebUiService):

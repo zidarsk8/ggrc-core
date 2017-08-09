@@ -5,8 +5,8 @@
 # pylint: disable=too-few-public-methods
 
 import copy
-from datetime import datetime
 
+from datetime import datetime
 from lib.utils import string_utils, help_utils
 
 
@@ -75,7 +75,7 @@ class Representation(object):
     'attr_value' to dictionary or list of dictionaries with items
     {'attr_name': 'attr_value'}.
     """
-    if obj_or_objs:
+    if obj_or_objs or isinstance(obj_or_objs, bool):
       if isinstance(obj_or_objs, list):
         if (all(not isinstance(_, dict) and
                 not isinstance(_, (str, unicode, int)) and

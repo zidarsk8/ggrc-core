@@ -7,7 +7,6 @@ from lib import base
 from lib.constants import locator, objects, element, roles
 from lib.constants.locator import WidgetInfoAssessment
 from lib.element import widget_info, tab_containers
-from lib.element import widget_info
 from lib.page.modal import update_object
 from lib.utils import selenium_utils
 
@@ -286,6 +285,9 @@ class Assessments(InfoPanel):
         self.get_header_and_value_text_from_custom_scopes(
             self._elements.VERIFIERS_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
+    self.verified = (
+        selenium_utils.is_element_exist(self._driver,
+                                        self._locators.ICON_VERIFIED))
     # code section
     self.code_text = (
         self.code_section.element.find_element(
@@ -307,8 +309,7 @@ class Assessments(InfoPanel):
     self.list_all_values_text = [
         self.cas_text, self.title_entered().text,
         objects.get_normal_form(self.state().text),
-        self.state().text.upper() in
-        element.AssessmentStates.COMPLETED.upper(),
+        self.verified,
         self.creators_entered_text, self.assignees_entered_text,
         self.verifiers_entered_text, self.mapped_objects_titles_text,
         self.code_entered_text, self.comments.scopes]
