@@ -23,7 +23,7 @@ describe('GGRC.Components.dropdown', function () {
       expect(frag.find('option').length).toEqual(list.length);
       $.each(frag.find('option'), function (index, el) {
         el = $(el);
-        expect(el.attr('label')).toEqual(list[index]);
+        expect(el.text()).toEqual(list[index]);
         expect(el.val()).toEqual(list[index]);
       });
     });
@@ -51,7 +51,7 @@ describe('GGRC.Components.dropdown', function () {
       $.each(frag.find('option'), function (index, el) {
         var item = list[index];
         el = $(el);
-        expect(el.attr('label')).toEqual(item.title);
+        expect(el.text()).toEqual(item.title);
         expect(el.val()).toEqual(String(item.value));
       });
     });
@@ -111,6 +111,90 @@ describe('GGRC.Components.dropdown', function () {
         expect(el.attr('label')).toEqual(subitem.title);
         expect(el.val()).toEqual(String(subitem.value));
       });
+    });
+  });
+
+  describe('build of options', function () {
+    var viewModel;
+    var optionsList = [
+      {title: 'title 1', value: 'value1'},
+      {title: 'title 2', value: 'value2'},
+      {title: 'title 3', value: 'value3'}
+    ];
+
+    var optionsGroups = {
+      group1: {
+        name: 'group 1',
+        items: [
+          {value: 'gr_1_value_1', name: 'gr 1 name 1'},
+          {value: 'gr_1_value_2', name: 'gr 1 name 2'},
+          {value: 'gr_1_value_3', name: 'gr 1 name 3'}
+        ]
+      },
+      group2: {
+        name: 'group 2',
+        items: [
+          {value: 'gr_2_value_1', name: 'gr 2 name 1'},
+          {value: 'gr_2_value_2', name: 'gr 2 name 2'}
+        ]
+      }
+    };
+
+    beforeEach(function () {
+      viewModel = GGRC.Components.getViewModel('dropdown');
+    });
+
+    it('should build list from optionsList', function () {
+      var list;
+      viewModel.attr('optionsList', optionsList);
+      list = viewModel.attr('options');
+
+      expect(list.length).toEqual(3);
+      expect(list[0].title).toEqual(optionsList[0].title);
+      expect(list[2].title).toEqual(optionsList[2].title);
+    });
+
+    it('should build list from optionsList with None', function () {
+      var list;
+
+      viewModel.attr('optionsList', optionsList);
+      viewModel.attr('noValue', true);
+      viewModel.attr('noValueLabel', '');
+      list = viewModel.attr('options');
+
+      expect(list.length).toEqual(4);
+      expect(list[0].title).toEqual('None');
+      expect(list[3].title).toEqual(optionsList[2].title);
+    });
+
+    it('should build list from optionsGroups', function () {
+      var list;
+      viewModel.attr('optionsGroups', optionsGroups);
+      viewModel.attr('isGroupedDropdown', true);
+      list = viewModel.attr('options');
+
+      expect(list.length).toEqual(2);
+      expect(list[0].subitems.length).toEqual(3);
+      expect(list[1].subitems.length).toEqual(2);
+      expect(list[0].group).toEqual('group 1');
+      expect(list[1].subitems[0].title).toEqual('gr 2 name 1');
+    });
+
+    it('should build list from optionsGroups with None', function () {
+      var list;
+      viewModel.attr('optionsGroups', optionsGroups);
+      viewModel.attr('isGroupedDropdown', true);
+      viewModel.attr('noValue', true);
+      viewModel.attr('noValueLabel', '');
+      list = viewModel.attr('options');
+
+      expect(list.length).toEqual(3);
+      expect(list[0].subitems.length).toEqual(1);
+      expect(list[1].subitems.length).toEqual(3);
+      expect(list[2].subitems.length).toEqual(2);
+      expect(list[1].group).toEqual('group 1');
+      expect(list[0].group).toEqual('None');
+      expect(list[2].subitems[0].title).toEqual('gr 2 name 1');
     });
   });
 });

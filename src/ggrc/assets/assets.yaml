@@ -320,6 +320,8 @@ dashboard-js-files:
   - components/object-list-item/editable-document-object-list-item.js
   - components/related-objects/related-documents.js
   - components/assessment/attach-button.js
+  - components/assessment/assessment-object-type-dropdown.js
+  - components/assessment/map-button-using-assessment-type.js
   - components/object-tasks/object-tasks.js
   - components/mapped-counter/mapped-counter.js
   - components/people/deletable-people-group.js

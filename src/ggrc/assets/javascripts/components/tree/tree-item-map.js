@@ -38,12 +38,36 @@
       }
     },
     instance: null,
-    cssClasses: null
+    cssClasses: null,
+    disableLink: false
   });
 
   GGRC.Components('treeItemMap', {
     tag: 'tree-item-map',
     template: template,
-    viewModel: viewModel
+    viewModel: viewModel,
+    events: {
+      'a click': function (el, ev) {
+        var viewModel = this.viewModel;
+        var instance = viewModel.attr('instance');
+
+        if (!viewModel.attr('disableLink')) {
+          if (instance.attr('type') === 'Assessment') {
+            el.data('type', instance.attr('assessment_type'));
+          }
+          el.trigger('openMapper', ev);
+        }
+
+        viewModel.attr('disableLink', true);
+
+        // prevent open of two mappers
+        setTimeout(function () {
+          viewModel.attr('disableLink', false);
+        }, 300);
+
+        ev.preventDefault();
+        return false;
+      }
+    }
   });
 })(window.can, window.GGRC);
