@@ -162,7 +162,7 @@ tree-item {
         }
       }
 
-      tree-item-actions, .item-actions {
+      .tree-item-actions, .item-actions {
         visibility: visible;
       }
     }
@@ -214,12 +214,6 @@ tree-item {
     justify-content: flex-end;
     padding: 0 5px;
     visibility: hidden;
-  }
-
-  tree-item-actions {
-    margin-left: 10px;
-    margin-right: 10px;
-    background-color: $white;
   }
 
   .sub-tier {

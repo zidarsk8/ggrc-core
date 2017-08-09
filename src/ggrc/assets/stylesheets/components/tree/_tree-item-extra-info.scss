@@ -129,101 +129,111 @@ tree-item-extra-info {
   }
 }
 
-tree-item-actions {
-  display: flex;
-  border: 1px solid $warmGray;
-  border-radius: 5px;
-  margin: auto 0;
+.tree-item-actions {
+  margin-left: 10px;
+  margin-right: 10px;
   visibility: hidden;
-  position: relative;
 
-  &.show-force {
+  &--visible {
     visibility: visible;
-
-    ul {
-      display: block;
-    }
   }
 
-  &:hover {
-    ul {
-      display: block;
-    }
-  }
-
-  a {
-    text-decoration: none;
-    line-height: 18px;
-
-    &:hover {
-      text-decoration: none;
-    }
-  }
-
-  > a {
+  &__content {
+    background-color: $white;
     display: flex;
-    margin: 3px 5px;
-    i {
-      font-size: 13px !important;
+    border: 1px solid $warmGray;
+    border-radius: 5px;
+    margin: auto 0;
+    position: relative;
 
-      &:first-child {
-        margin-right: 5px;
+    &.show-force {
+      visibility: visible;
+
+      ul {
+        display: block;
       }
     }
-  }
-  > ul {
-    display: none;
-    position: absolute;
-    top: 20px;
-    width: 220px;
-    background-color: $white;
-    list-style-type: none;
-    z-index: 1000;
-    border: 1px solid $warmGray;
-    margin: 0;
-    box-shadow: 0 3px 1px rgba(0,0,0,.05);
 
     &:hover {
-      display: block;
+      ul {
+        display: block;
+      }
     }
 
-    li {
-      margin: 0;
-      padding: 0;
-      transition: all linear 0.1s;
+    a {
+      text-decoration: none;
+      line-height: 18px;
 
       &:hover {
-        background-color: $lightGray !important;
+        text-decoration: none;
+      }
+    }
 
+    > a {
+      display: flex;
+      margin: 3px 5px;
+      i {
+        font-size: 13px !important;
+
+        &:first-child:not(:only-child) {
+          margin-right: 5px;
+        }
+      }
+    }
+    > ul {
+      display: none;
+      position: absolute;
+      top: 20px;
+      width: 220px;
+      background-color: $white;
+      list-style-type: none;
+      z-index: 1000;
+      border: 1px solid $warmGray;
+      margin: 0;
+      box-shadow: 0 3px 1px rgba(0,0,0,.05);
+
+      &:hover {
+        display: block;
+      }
+
+      li {
+        margin: 0;
+        padding: 0;
+        transition: all linear 0.1s;
+
+        &:hover {
+          background-color: $lightGray !important;
+
+          > a, show-related-assessments-button > a,
+          tree-item-map > a, sub-tree-models > a {
+            color: $black !important;
+          }
+        }
         > a, show-related-assessments-button > a,
         tree-item-map > a, sub-tree-models > a {
-          color: $black !important;
-        }
-      }
-      > a, show-related-assessments-button > a,
-      tree-item-map > a, sub-tree-models > a {
-        line-height: 30px;
-        color: $black;
-        display: block;
-        font-size: 13px;
-        padding: 5px 15px;
-        text-decoration: none;
-        cursor: pointer;
-
-        i.fa {
-          margin-right: 3px;
-          width: 16px;
+          line-height: 30px;
+          color: $black;
+          display: block;
           font-size: 13px;
+          padding: 5px 15px;
+          text-decoration: none;
+          cursor: pointer;
+
+          i.fa {
+            margin-right: 3px;
+            width: 16px;
+            font-size: 13px;
+          }
         }
-      }
 
-      .openclose {
-        float: none !important;
-        padding: 0;
-      }
+        .openclose {
+          float: none !important;
+          padding: 0;
+        }
 
-      &.splitter {
-        border-bottom: 1px solid $lightGray;
+        &.splitter {
+          border-bottom: 1px solid $lightGray;
+        }
       }
     }
   }
