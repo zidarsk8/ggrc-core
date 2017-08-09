@@ -70,13 +70,6 @@
     subTreeTypes: function () {
       can.trigger(this.attr('$el'), 'childTreeTypes');
     },
-    onForceShow: function (event) {
-      if (event.state) {
-        this.attr('$el').addClass('show-force');
-      } else {
-        this.attr('$el').removeClass('show-force');
-      }
-    },
     instance: null,
     childOptions: null,
     addItem: null,

@@ -146,14 +146,6 @@ tree-item-extra-info {
     margin: auto 0;
     position: relative;
 
-    &.show-force {
-      visibility: visible;
-
-      ul {
-        display: block;
-      }
-    }
-
     &:hover {
       ul {
         display: block;
