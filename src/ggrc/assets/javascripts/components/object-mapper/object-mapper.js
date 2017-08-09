@@ -215,6 +215,7 @@
             .done(function () {
               if (instance && instance.dispatch) {
                 instance.dispatch('refreshInstance');
+                instance.dispatch('refreshMapping');
               }
               // This Method should be modified to event
               GGRC.Utils.CurrentPage.refreshCounts();

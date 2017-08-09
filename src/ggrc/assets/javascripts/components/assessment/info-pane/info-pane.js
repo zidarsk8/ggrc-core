@@ -338,7 +338,7 @@
       this.viewModel.updateRelatedItems();
     },
     events: {
-      '{viewModel.instance} refreshInstance': function () {
+      '{viewModel.instance} refreshMapping': function () {
         this.viewModel.attr('mappedSnapshots')
           .replace(this.viewModel.loadSnapshots());
       },
