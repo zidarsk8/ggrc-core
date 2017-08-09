@@ -43,16 +43,11 @@
     events: {
       '{window} mousedown': function (el, ev) {
         var viewModel = this.viewModel;
-        var editableIcon = $(ev.target).hasClass('set-editable-group');
         var isInside = GGRC.Utils.events.isInnerClick(this.element, ev.target);
         var editableMode = viewModel.attr('editableMode');
 
         if (!isInside && editableMode) {
           viewModel.save();
-        }
-
-        if (isInside && !editableMode && editableIcon) {
-          viewModel.changeEditableMode(true);
         }
       }
     }
