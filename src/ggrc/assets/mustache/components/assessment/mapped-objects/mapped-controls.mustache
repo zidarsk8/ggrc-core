@@ -4,8 +4,10 @@
 }}
 <object-list {(selected-item)}="selectedItem" {items}="mappedItems">
     <business-object-list-item {instance}="instance">
-        <div class="description control-description">
+        <div class="description">
             {{{itemData.description}}}
+        </div>
+        <div class="more-information-wrapper">
             <button class="btn btn-link more-information-button">More Information</button>
         </div>
     </business-object-list-item>
