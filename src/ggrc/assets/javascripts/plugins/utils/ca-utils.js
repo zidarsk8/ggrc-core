@@ -16,12 +16,12 @@
     Dropdown: 'dropdown'
   };
 
-  var CA_DD_REQUIRED_DEPS = {
+  var CA_DD_REQUIRED_DEPS = Object.freeze({
     NONE: 0,
     COMMENT: 1,
     EVIDENCE: 2,
     COMMENT_AND_EVIDENCE: 3
-  };
+  });
 
   /**
    * Util methods for custom attributes.
@@ -211,10 +211,10 @@
         valObj = findValueByDefinitionId(values, id);
 
         if (type === 'dropdown') {
-          base.validationConfig = options.reduce(function (conf, item, idx) {
-            conf[item] = Number(optionsRequirements[idx]);
-            return conf;
-          }, {});
+          base.validationConfig = {};
+          options.forEach(function (item, idx) {
+            base.validationConfig[item] = Number(optionsRequirements[idx]);
+          });
         }
 
         if (valObj) {

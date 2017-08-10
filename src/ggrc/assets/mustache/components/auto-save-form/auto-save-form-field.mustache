@@ -9,6 +9,7 @@
                      {field-id}="id"
                      {placeholder}="placeholder"
                      {disabled}="disabled"
+		     {(is-dirty)}="isDirty"
                      (value-changed)="fieldValueChanged(%event)"
     ></text-form-field>
   {{/case}}
@@ -17,6 +18,7 @@
                           {field-id}="id"
                           {placeholder}="placeholder"
                           {disabled}="disabled"
+			  {(is-dirty)}="isDirty"
                           (value-changed)="fieldValueChanged(%event)"
     ></rich-text-form-field>
   {{/case}}

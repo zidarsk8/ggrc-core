@@ -59,6 +59,10 @@
           }
         },
         notEnoughEvidences: {
+          /**
+           * Checks if there's enough evidences to pass validation
+           * @return {Boolean} has missing evidences
+           */
           get: function () {
             var optionsWithEvidence = this.attr('fields')
                   .filter(function (item) {
@@ -74,8 +78,6 @@
                   }).length;
             return optionsWithEvidence > this.attr('evidenceAmount');
           }
-<<<<<<< HEAD
-=======
         },
         // update only the fields which values are updated
         // this helps canJS to update only those components which need to be
@@ -114,7 +116,6 @@
             });
             this.attr('_fields', fields);
           }
->>>>>>> 57f60d0a7... fixup! 20bc9d1e8
         }
       },
       formSavedDeferred: can.Deferred().resolve(),
@@ -138,7 +139,6 @@
 
       // part of latency compensation. reflects evidence changes
       updateEvidenceValidation: function () {
-        var self = this;
         var notEnoughEvidences = this.attr('notEnoughEvidences');
         this.attr('fields')
           .filter(function (field) {
@@ -160,12 +160,8 @@
               removeFromSet(errors, 'evidence');
             }
             field.attr('preconditions_failed', errors);
-<<<<<<< HEAD
-            self.performValidation(field, field.value);
-=======
-            self.performValidation(field, field.value, true);
->>>>>>> 57f60d0a7... fixup! 20bc9d1e8
-          });
+            this.performValidation(field, field.value, true);
+          }.bind(this));
       },
 
       hasMissingComment: function (field, value) {
@@ -180,7 +176,7 @@
       },
 
       // instantly reflects changes to the document
-      // to compesate for network latency
+      // to compensate for network latency
       networkLatencyCompensation: function (field, value) {
         var valCfg = field.validationConfig;
         var fieldValidationConf = valCfg && valCfg[value];
@@ -208,11 +204,26 @@
         this.updateEvidenceValidation();
       },
 
-      performValidation: function (field, value) {
+      /**
+       * Performs validation of the changed field
+       * @param  {Object}  field                    field or custom attribute object
+       * @param  {Any}     value                    new value
+       * @param  {Boolean} isAllEvidencesValidation is validation called for all
+       *                                            evidence required fields in
+       *                                            a loop
+       */
+      performValidation: function (field, value, isAllEvidencesValidation) {
         var plainFieldObj = field.attr();
 
         var valResult = GGRC.Utils.CustomAttributes
           .validateField(plainFieldObj, value);
+
+        if (!isAllEvidencesValidation && valResult.validation.hasMissingInfo) {
+          this.dispatch({
+            type: 'validationChanged',
+            field: field
+          });
+        }
 
         field.attr(valResult);
       },

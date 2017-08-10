@@ -18,7 +18,7 @@
         },
         value: {
           get: function () {
-            return this._value;
+            return this._value || null;
           },
           set: function (newValue) {
             if (!this.attr('isDirty')) {
@@ -27,8 +27,8 @@
           }
         }
       },
+      isDirty: false,
       type: null,
-      value: null,
       fieldId: null,
       placeholder: '',
       options: [],

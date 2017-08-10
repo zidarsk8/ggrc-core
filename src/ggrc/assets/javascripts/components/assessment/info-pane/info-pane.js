@@ -326,14 +326,13 @@
         return this.attr('instance').save();
       },
       saveFormFields: function (modifiedFields) {
-        var self = this;
         var caValues = this.attr('instance.custom_attribute_values');
         CAUtils.applyChangesToCustomAttributeValue(caValues, modifiedFields);
 
         return this.attr('instance').save().then(function (data) {
-          self.initializeFormFields();
+          this.initializeFormFields();
           return data;
-        });
+        }.bind(this));
       },
       showRequiredInfoModal: function (e, field) {
         var scope = field || e.field;
@@ -374,13 +373,12 @@
       this.viewModel.updateRelatedItems();
     },
     events: {
-      '{viewModel.instance} refreshInstance': function () {
-        var self = this;
+      '{viewModel.instance} refreshed': function () {
+        this.viewModel.initializeFormFields();
+      },
+      '{viewModel.instance} refreshMapping': function () {
         this.viewModel.attr('mappedSnapshots')
-          .replace(this.viewModel.loadSnapshots().then(function (data) {
-            self.viewModel.initializeFormFields();
-            return data;
-          }));
+          .replace(this.viewModel.loadSnapshots());
       },
       '{viewModel.instance} modelBeforeSave': function () {
         this.viewModel.attr('isAssessmentSaving', true);
