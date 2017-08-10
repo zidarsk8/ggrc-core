@@ -141,7 +141,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     self.assertEqual(recipient, u"user@example.com")
     self.assertIn(u"Assessments have been updated", content)
 
-    # the assessment updated notification should not be sent if there exists a
+    # the assessment updated notification should be sent even if there exists a
     # status change notification , regardless of the order of actions
     self.import_data(OrderedDict([
         (u"object_type", u"Assessment"),
@@ -165,7 +165,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
 
     self.client.get("/_notifications/send_daily_digest")
     recipient, _, content = send_email.call_args[0]
-    self.assertNotIn(u"Assessments have been updated", content)
+    self.assertIn(u"Assessments have been updated", content)
 
   @unittest.skip("An issue needs to be fixed.")
   @patch("ggrc.notifications.common.send_email")
@@ -775,7 +775,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
       query = self._get_notifications(notif_type="assessment_updated")
       self.assertEqual(query.count(), 1)
 
-      # the assessment updated notification should not be sent if there exists
+      # the assessment updated notification should be sent even if there exists
       # a status change notification, regardless of the order of actions
       asmt = Assessment.query.get(asmts["A 5"].id)
       self.api_helper.modify_object(
@@ -787,7 +787,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
       self.client.get("/_notifications/send_daily_digest")
       _, _, content = send_email.call_args[0]
 
-      self.assertNotIn(u"Assessments have been updated", content)
+      self.assertIn(u"Assessments have been updated", content)
 
   @patch("ggrc.notifications.common.send_email")
   def test_assessment_with_verifiers(self, _):
@@ -912,7 +912,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
 
       self.assertEqual(recipient, u"user@example.com")
       self.assertRegexpMatches(content, ur"Assessment\s+has\s+been\s+started")
-      self.assertNotIn(u"Assessments have been updated", content)
+      self.assertIn(u"Assessments have been updated", content)
 
   @patch("ggrc.notifications.common.send_email")
   def test_reverting_assessment_status_changes(self, _):
@@ -1059,9 +1059,9 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
         }
     )
 
-    # there should still be no notifications...
+    # there should be a notification...
     self.assertEqual(
-        self._get_notifications(notif_type="assessment_updated").count(), 0)
+        self._get_notifications(notif_type="assessment_updated").count(), 1)
 
     # now change the CA value and check if notification gets generated
     cad2 = CustomAttributeDefinition.query.filter(
