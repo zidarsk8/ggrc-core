@@ -19,7 +19,8 @@ IGNORE_ATTRS = frozenset((
     u"_custom_attribute_values", u"finished_date", u"id", u"modified_by",
     u"modified_by_id", u"object_level_definitions", u"os_state",
     u"related_destinations", u"related_sources", u"status",
-    u"task_group_objects", u"updated_at", u"verified_date",
+    u"task_group_objects", u"updated_at", u"verified_date", u"audit_id",
+    u"custom_attributes", u"display_name",
 ))
 
 
