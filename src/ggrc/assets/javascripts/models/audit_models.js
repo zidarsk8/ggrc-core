@@ -318,7 +318,8 @@
     table_plural: 'assessment_templates',
     mixins: [
       'mapping-limit',
-      'inScopeObjects'
+      'inScopeObjects',
+      'refetchHash'
     ],
     findOne: 'GET /api/assessment_templates/{id}',
     findAll: 'GET /api/assessment_templates',
@@ -567,18 +568,6 @@
       });
     },
 
-    getHashFragment: function () {
-      var widgetName = this.constructor.table_singular;
-      if (window.location.hash
-          .startsWith(['#', widgetName, '_widget'].join(''))) {
-        return;
-      }
-
-      return [widgetName,
-              '_widget/',
-              this.hash_fragment(),
-              '&refetch'].join('');
-    },
     ignore_ca_errors: true
   });
 })(window.can, window.CMS);
