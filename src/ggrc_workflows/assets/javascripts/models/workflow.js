@@ -46,7 +46,6 @@
         {attr_title: 'Manager', attr_name: 'owner', attr_sort_field: ''},
         {attr_title: 'Code', attr_name: 'slug'},
         {attr_title: 'State', attr_name: 'status'},
-        {attr_title: 'Repeat', attr_name: 'repeat'},
         {attr_title: 'Last Updated', attr_name: 'updated_at'}
       ]
     },
