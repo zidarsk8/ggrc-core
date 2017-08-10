@@ -453,41 +453,41 @@ def start_end_date_validator(tgt):
       raise ValueError("Daily tasks cannot be started or stopped on weekend")
 
 
+def calculate_new_next_cycle_start_date(workflow):
+  today = date.today()
+  min_task_start_date = workflow.min_task_start_date
+  workflow.repeat_multiplier = 0
+  workflow.next_cycle_start_date = min_task_start_date
+  if min_task_start_date is None:
+    return
+  while not workflow.next_cycle_start_date > today:
+    workflow.repeat_multiplier += 1
+    workflow.next_cycle_start_date = workflow.calc_next_adjusted_date(
+        min_task_start_date)
+
+
 @signals.Restful.model_put.connect_via(models.TaskGroupTask)
-def handle_task_group_task_put(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+@signals.Restful.model_posted.connect_via(models.TaskGroupTask)
+def handle_task_group_task_put_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   start_end_date_validator(obj)
   if inspect(obj).attrs.contact.history.has_changes():
     ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
 
   # If relative days were change we must update workflow next cycle start date
-  if any(getattr(inspect(obj).attrs, attr).history.has_changes()
-         for attr in ["start_date", "end_date"]):
-    update_workflow_state(obj.task_group.workflow)
-
-
-@signals.Restful.model_posted.connect_via(models.TaskGroupTask)
-def handle_task_group_task_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
-  start_end_date_validator(obj)
-  ensure_assignee_is_workflow_member(obj.task_group.workflow, obj.contact)
-  update_workflow_state(obj.task_group.workflow)
+  if inspect(obj).attrs.start_date.history.has_changes():
+    calculate_new_next_cycle_start_date(obj.task_group.workflow)
 
 
 @signals.Restful.model_deleted.connect_via(models.TaskGroupTask)
 def handle_task_group_task_delete(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
-  db.session.flush()
-  update_workflow_state(obj.task_group.workflow)
-
-
-@signals.Restful.model_put.connect_via(models.TaskGroup)
-def handle_task_group_put(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
-  if inspect(obj).attrs.contact.history.has_changes():
-    ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
+  task_group = obj.task_group
+  task_group.task_group_tasks = [t for t in task_group.task_group_tasks
+                                 if t.id != obj.id]
+  calculate_new_next_cycle_start_date(task_group.workflow)
 
 
 @signals.Restful.model_posted.connect_via(models.TaskGroup)
 def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
-  source_task_group = None
-
   if src.get('clone'):
     source_task_group_id = src.get('clone')
     source_task_group = models.TaskGroup.query.filter_by(
@@ -499,16 +499,25 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa py
         clone_tasks=src.get('clone_tasks', False),
         clone_objects=src.get('clone_objects', False)
     )
-
     obj.title = source_task_group.title + ' (copy ' + str(obj.id) + ')'
 
   ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
+  calculate_new_next_cycle_start_date(obj.workflow)
 
 
 @signals.Restful.model_deleted.connect_via(models.TaskGroup)
 def handle_task_group_delete(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
-  db.session.flush()
-  update_workflow_state(obj.workflow)
+  workflow = obj.workflow
+  workflow.task_groups = [t for t in obj.workflow.task_groups
+                          if t.id != obj.id]
+  calculate_new_next_cycle_start_date(workflow)
+
+
+@signals.Restful.model_put.connect_via(models.TaskGroup)
+def handle_task_group_put(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+  if inspect(obj).attrs.contact.history.has_changes():
+    ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
+  calculate_new_next_cycle_start_date(obj.workflow)
 
 
 @signals.Restful.model_deleted.connect_via(models.CycleTaskGroupObjectTask)
@@ -593,12 +602,10 @@ def handle_cycle_task_group_put(
 def update_workflow_state(workflow):
   if workflow.status == workflow.DRAFT:
     return False
-  old_status = workflow.status
   if any(c.is_current for c in workflow.cycles):
     workflow.status = workflow.ACTIVE
   else:
     workflow.status = workflow.INACTIVE
-  return old_status != workflow.status
 
 
 @signals.Restful.model_put.connect_via(models.Cycle)
