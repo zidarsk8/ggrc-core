@@ -69,6 +69,7 @@
 
     events: {
       '.create-control modal:success': function (el, ev, model) {
+        this.viewModel.attr('showResults', true);
         this.viewModel.attr('newEntries').push(model);
         this.element.find('mapper-results').viewModel().showNewEntries();
       },
@@ -96,8 +97,6 @@
         this.viewModel.attr('selected').replace([]);
         this.viewModel.attr('entries').replace([]);
 
-        this.setModel();
-
         if (this.viewModel.attr('deferred_to.list')) {
           deferredToList = this.viewModel.attr('deferred_to.list')
             .map(function (item) {
@@ -109,7 +108,7 @@
           this.viewModel.attr('deferred_list', deferredToList);
         }
 
-        self.viewModel.afterShown();
+        self.viewModel.attr('submitCbs').fire();
       },
       closeModal: function () {
         this.viewModel.attr('is_saving', false);
@@ -244,23 +243,6 @@
               });
             });
         }.bind(this));
-      },
-      setModel: function () {
-        var type = this.viewModel.attr('type');
-
-        this.viewModel.attr('model', this.viewModel.modelFromType(type));
-      },
-      '{viewModel} type': function () {
-        this.viewModel.attr('filter', '');
-        this.viewModel.attr('afterSearch', false);
-        // Edge case for objects that are not in Snapshot scope
-        if (!GGRC.Utils.Snapshots.isInScopeModel(
-          this.viewModel.attr('object'))) {
-          this.viewModel.attr('relevant').replace([]);
-        }
-        this.setModel();
-
-        setTimeout(this.viewModel.onSubmit.bind(this.viewModel));
       }
     },
 

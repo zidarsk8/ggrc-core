@@ -473,3 +473,11 @@ class RelatedIssuesTab(object):
   TAB_NAME = AssessmentTabContainer.RELATED_ISSUES_TAB
   TITLE = Common.TITLE
   DESCRIPTION = Common.DESCRIPTION
+
+
+class UnifiedMapperModal(object):
+  """Class that represent ui of Unified Mapper"""
+  OPERATOR_AND = "AND"
+  OPERATOR_OR = "OR"
+  ATTRIBUTE_TITLE = Common.TITLE
+  COMPARE_OPERATOR_EQUALS = "="
