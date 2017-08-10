@@ -54,6 +54,7 @@ class TestWorkflowsCycleGeneration(TestCase):
           task_group=group,
           start_date=setup_date,
           end_date=setup_date + dtm.timedelta(days=4))
+    self.generator.generate_cycle(workflow)
     self.generator.activate_workflow(workflow)
     active_wf = db.session.query(Workflow).filter(
         Workflow.status == 'Active').one()
@@ -80,6 +81,7 @@ class TestWorkflowsCycleGeneration(TestCase):
           task_group=group,
           start_date=setup_date - dtm.timedelta(days=4),
           end_date=setup_date)
+    self.generator.generate_cycle(workflow)
     self.generator.activate_workflow(workflow)
     active_wf = db.session.query(Workflow).filter(
         Workflow.status == 'Active').one()
@@ -158,6 +160,32 @@ class TestWorkflowsCycleGeneration(TestCase):
     cycle_task = active_wf.cycles[0].cycle_task_group_object_tasks[0]
     adj_start_date = cycle_task.start_date
     self.assertEqual(setup_date, adj_start_date)
+
+  @ddt.data(
+      # (setup_date, freeze_date, repeat_every, unit),
+      (dtm.date(2017, 4, 28), dtm.date(2017, 2, 28), 1, Workflow.MONTH_UNIT),
+      (dtm.date(2017, 3, 5), dtm.date(2017, 3, 3), 1, Workflow.DAY_UNIT),
+      (dtm.date(2017, 3, 24), dtm.date(2017, 3, 10), 1, Workflow.WEEK_UNIT),
+  )
+  @ddt.unpack
+  def test_recurring_wf_future_start_date(self, setup_date, freeze_date,
+                                          repeat_every, unit):
+    """Test case for 0 number of cycles for future setup date"""
+    with freeze_time(freeze_date):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(repeat_every=repeat_every,
+                                                unit=unit)
+        group = wf_factories.TaskGroupFactory(workflow=workflow)
+        wf_factories.TaskGroupTaskFactory(
+            task_group=group,
+            start_date=setup_date,
+            end_date=setup_date + dtm.timedelta(days=4))
+      self.generator.activate_workflow(workflow)
+
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.status == 'Active').one()
+    # no cycles should be generated:
+    self.assertEqual(len(active_wf.cycles), 0)
 
 
 class TestBasicWorkflowActions(TestCase):
