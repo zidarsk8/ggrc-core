@@ -12,7 +12,7 @@ needed by ggrc notifications.
 # pylint: disable=too-few-public-methods
 
 from collections import namedtuple
-from datetime import date
+from datetime import date, datetime
 from functools import partial
 from itertools import chain, izip
 from numbers import Number
@@ -61,6 +61,20 @@ def _add_notification(obj, notif_type, when=None):
       send_on=when,
       notification_type=notif_type,
   ))
+
+
+def _update_notification(obj, notif_type):
+  """Update updated_at field"""
+  notif = db.session.query(models.Notification).join(
+      models.NotificationType).filter(and_(
+          models.NotificationType.id == notif_type.id,
+          models.Notification.object_id == obj.id,
+          models. Notification.object_type == obj.type,
+          (models.Notification.sent_at.is_(None) |
+              (models.Notification.repeating == true()))
+      )).one()
+  notif.updated_at = datetime.now()
+  db.session.add(notif)
 
 
 def _has_unsent_notifications(notif_type, obj):
@@ -113,32 +127,13 @@ def _add_assessment_updated_notif(obj):
   """
   # If there already exists a status change notification, an assessment updated
   # notification should not be sent, and is thus not added.
-  notif_type_names = ["assessment_declined"]
-  notif_type_names.extend(item.value for item in Transitions)
-
-  notif_types = models.NotificationType.query.filter(
-      models.NotificationType.name.in_(notif_type_names)
-  )
-  notif_type_ids = [ntype.id for ntype in notif_types]
-
-  has_status_change = models.Notification.query.filter(
-      models.Notification.object_id == obj.id,
-      models.Notification.object_type == obj.type,
-      models.Notification.notification_type_id.in_(notif_type_ids),
-      (
-          models.Notification.sent_at.is_(None) |
-          (models.Notification.repeating == true())
-      )
-  ).exists()
-
-  if db.session.query(has_status_change).scalar():
-    return
-
   notif_type = models.NotificationType.query.filter_by(
       name="assessment_updated").first()
 
   if not _has_unsent_notifications(notif_type, obj):
     _add_notification(obj, notif_type)
+  else:
+    _update_notification(obj, notif_type)
 
 
 def _add_state_change_notif(obj, state_change, remove_existing=False):
@@ -185,8 +180,6 @@ def handle_assignable_modified(obj):  # noqa: ignore=C901
   Args:
     obj (models.mixins.Assignable): an object that has been modified
   """
-  state_change_occurred = False
-
   attrs = inspect(obj).attrs
   status_history = attrs["status"].history
 
@@ -221,7 +214,6 @@ def handle_assignable_modified(obj):  # noqa: ignore=C901
   state_change = transitions_map.get((old_state, new_state))
   if state_change:
     _add_state_change_notif(obj, state_change, remove_existing=True)
-    state_change_occurred = True
 
   is_changed = False
 
@@ -246,15 +238,10 @@ def handle_assignable_modified(obj):  # noqa: ignore=C901
   # not directly observable via status change history, thus an extra check.
   if obj.status in Statusable.DONE_STATES:
     _add_state_change_notif(obj, Transitions.TO_REOPENED, remove_existing=True)
-    state_change_occurred = True
   elif obj.status == Statusable.START_STATE:
     _add_state_change_notif(obj, Transitions.TO_STARTED, remove_existing=True)
-    state_change_occurred = True
 
-  if not state_change_occurred:
-    # explicit check needed, because state change notifications might not yet
-    # be visible within the current transaction
-    _add_assessment_updated_notif(obj)
+  _add_assessment_updated_notif(obj)
 
 
 def _ca_values_changed(obj):
