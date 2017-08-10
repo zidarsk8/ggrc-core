@@ -25,6 +25,7 @@ from sqlalchemy import and_
 from sqlalchemy.sql.expression import true
 
 from ggrc import db
+from ggrc import notifications
 from ggrc.services import signals
 from ggrc import models
 from ggrc.models.mixins.statusable import Statusable
@@ -222,23 +223,10 @@ def handle_assignable_modified(obj):  # noqa: ignore=C901
     _add_state_change_notif(obj, state_change, remove_existing=True)
     state_change_occurred = True
 
-  # changes of some of the attributes are not considered as a modification of
-  # the obj itself, e.g. metadata not editable by the end user, or changes
-  # covered by other event types such as "comment created"
-  # pylint: disable=invalid-name
-  IGNORE_ATTRS = frozenset((
-      u"_notifications", u"comments", u"context", u"context_id", u"created_at",
-      u"custom_attribute_definitions", u"custom_attribute_values",
-      u"_custom_attribute_values", u"finished_date", u"id", u"modified_by",
-      u"modified_by_id", u"object_level_definitions", u"os_state",
-      u"related_destinations", u"related_sources", u"status",
-      u"task_group_objects", u"updated_at", u"verified_date",
-  ))
-
   is_changed = False
 
   for attr_name, val in attrs.items():
-    if attr_name in IGNORE_ATTRS:
+    if attr_name in notifications.IGNORE_ATTRS:
       continue
 
     if val.history.has_changes():
