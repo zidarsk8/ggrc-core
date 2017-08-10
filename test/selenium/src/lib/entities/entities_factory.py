@@ -648,7 +648,7 @@ class IssuesFactory(EntitiesFactory):
   @classmethod
   def create_empty(cls):
     """Create blank Issue object."""
-    empty_issue = IssueEntity
+    empty_issue = IssueEntity()
     empty_issue.type = cls.obj_issue
     empty_issue.custom_attributes = {None: None}
     empty_issue.access_control_list = []
