@@ -13,6 +13,7 @@
     template: tpl,
     viewModel: {
       globalAttributes: [],
+      items: [],
       editMode: false,
       modifiedFields: {},
       updateGlobalAttribute: function (event, field) {

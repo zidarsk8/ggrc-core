@@ -42,7 +42,7 @@
       },
       options: [],
       isGroupedDropdown: false,
-      dropdwonOptionsGroups: {},
+      dropdownOptionsGroups: {},
       noValue: true,
       valueChanged: function (newValue) {
         this.dispatch({

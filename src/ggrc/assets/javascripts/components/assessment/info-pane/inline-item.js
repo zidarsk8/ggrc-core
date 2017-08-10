@@ -18,7 +18,7 @@
       value: '',
       type: '@',
       dropdownOptions: [],
-      dropdwonOptionsGroups: {},
+      dropdownOptionsGroups: {},
       dropdownClass: '@',
       isGroupedDropdown: false,
       dropdownNoValue: false,
