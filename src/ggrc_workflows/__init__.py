@@ -620,9 +620,9 @@ def _validate_put_workflow_fields(workflow):
     raise ValueError("OneTime workflow cannot be recurrent")
 
 
+# noqa pylint: disable=unused-argument  # noqa pylint: disable=unused-argument
 @signals.Restful.model_put.connect_via(models.Workflow)
-def handle_workflow_put(
-        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+def handle_workflow_put(sender, obj=None, src=None, service=None):
   _validate_put_workflow_fields(obj)
   if not inspect(obj).attrs.status.history.has_changes():
     return
@@ -630,24 +630,26 @@ def handle_workflow_put(
   old = inspect(obj).attrs.status.history.deleted[-1]
   # first activate wf
   if (old, new) == (obj.DRAFT, obj.ACTIVE):
+    # allow only of it has at leask one task_group
+    if not obj.task_groups:
+      raise ValueError("Workflow with no Task Groups can not be activated.")
     build_cycles(obj)
 
 
+# noqa pylint: disable=unused-argument
 @signals.Restful.model_posted.connect_via(models.CycleTaskEntry)
-def handle_cycle_task_entry_post(
-        sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+def handle_cycle_task_entry_post(sender, obj=None, src=None, service=None):
   if src['is_declining_review'] == '1':
     task = obj.cycle_task_group_object_task
     task.status = task.DECLINED
   else:
     src['is_declining_review'] = 0
 
-# Check if workflow should be Inactive after cycle status change
 
-
+# noqa pylint: disable=unused-argument
 @Signals.status_change.connect_via(models.Cycle)
-def handle_cycle_status_change(sender, obj=None, new_status=None,  # noqa pylint: disable=unused-argument
-                               old_status=None):  # noqa pylint: disable=unused-argument  # noqa pylint: disable=unused-argument
+def handle_cycle_status_change(sender, obj=None, new_status=None,
+                               old_status=None):
   if not inspect(obj).attrs.status.history.has_changes():
     return
   if not obj.is_done:
@@ -656,9 +658,10 @@ def handle_cycle_status_change(sender, obj=None, new_status=None,  # noqa pylint
   update_workflow_state(obj.workflow)
 
 
+# noqa pylint: disable=unused-argument
 @Signals.status_change.connect_via(models.CycleTaskGroupObjectTask)
-def handle_cycle_task_status_change(sender, obj=None, new_status=None,  # noqa pylint: disable=unused-argument
-                                    old_status=None):  # noqa pylint: disable=unused-argument
+def handle_cycle_task_status_change(sender, obj=None, new_status=None,
+                                    old_status=None):
   if inspect(obj).attrs.status.history.has_changes():
     if new_status == obj.VERIFIED:
       obj.verified_date = datetime.now()
@@ -699,8 +702,9 @@ def _find_role(role_name):
   return db.session.query(Role).filter(Role.name == role_name).first()
 
 
+# noqa pylint: disable=unused-argument
 @signals.Restful.model_posted.connect_via(models.WorkflowPerson)
-def handle_workflow_person_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+def handle_workflow_person_post(sender, obj=None, src=None, service=None):
   db.session.flush()
 
   # add a user_roles mapping assigning the user creating the workflow
@@ -732,8 +736,9 @@ def _validate_post_workflow_fields(workflow):
                      "can be NULL only simultaneously")
 
 
+# noqa pylint: disable=unused-argument
 @signals.Restful.model_posted.connect_via(models.Workflow)
-def handle_workflow_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
+def handle_workflow_post(sender, obj=None, src=None, service=None):
   _validate_post_workflow_fields(obj)
 
   source_workflow = None

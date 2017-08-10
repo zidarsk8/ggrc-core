@@ -4,7 +4,7 @@
 
 """ Module for all special column handlers for workflow objects """
 
-import datetime
+from sqlalchemy import inspection
 
 from ggrc import db
 from ggrc import models
@@ -14,32 +14,6 @@ from ggrc.converters.handlers import handlers
 from ggrc.converters.handlers import multi_object
 from ggrc_basic_permissions import models as bp_models
 from ggrc_workflows import models as wf_models
-
-
-class FrequencyColumnHandler(handlers.ColumnHandler):
-
-  """ Handler for workflow frequency column """
-
-  def parse_item(self):
-    """ parse frequency value
-
-    Returning None will set the default frequency to one_time.
-    """
-    if not self.raw_value:
-      self.add_error(errors.MISSING_COLUMN, s="",
-                     column_names=self.display_name)
-      return None
-    value = self.raw_value.lower()
-    inverted_map = {v: k for k, v in
-                    self.row_converter.object_class.VALID_FREQUENCIES.items()}
-    frequency = inverted_map.get(value, value)
-    if frequency not in self.row_converter.object_class.VALID_FREQUENCIES:
-      self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
-    return frequency
-
-  def get_value(self):
-    value = getattr(self.row_converter.obj, self.key, self.value)
-    return self.row_converter.object_class.VALID_FREQUENCIES.get(value, value)
 
 
 class WorkflowColumnHandler(handlers.ParentColumnHandler):
@@ -73,140 +47,78 @@ class CycleTaskGroupColumnHandler(handlers.ParentColumnHandler):
         .__init__(row_converter, key, **options)
 
 
-class TaskDateColumnHandler(handlers.ColumnHandler):
+class UnitColumnHandler(handlers.ColumnHandler):
 
-  """ handler for start and end columns in task group tasks """
-
-  quarterly_names = {
-      1: "Jan/Apr/Jul/Oct",
-      2: "Feb/May/Aug/Nov",
-      3: "Mar/Jun/Sep/Dec",
-  }
-
-  def add_error(self, template, **kwargs):
-    """Add row error.
-
-    This function adds a row error for the current task group task and removes
-    it from any task groups that it might belong to.
-    """
-    if self.row_converter.obj.task_group:
-      self.row_converter.obj.task_group = None
-    super(TaskDateColumnHandler, self).add_error(template, **kwargs)
+  """Handler for workflow 'repeat every' units column."""
 
   def parse_item(self):
-    """ parse start and end columns fow workflow tasks
-    """
-    if not self.raw_value.strip():
-      if self.row_converter.is_new:
-        self.add_error(errors.MISSING_VALUE_ERROR,
-                       column_name=self.display_name)
+    """Parse Unit column value."""
+    value = self.raw_value.lower().strip()
+    if value in {"-", "--", "---"}:
+      self.set_empty = True
+      value = None
+    elif not value:
+      value = None
+
+    if not self.row_converter.is_new and self.raw_value:
+      insp = inspection.inspect(self.row_converter.obj)
+      unit_prev = getattr(insp.attrs, self.key).history.unchanged
+      if not value in unit_prev:
+        self.add_warning(errors.UNMODIFIABLE_COLUMN,
+                         column_name=self.display_name)
+        self.set_empty = False
       return None
-    raw_parts = self.raw_value.lower().split(" ")
-    try:
-      if len(raw_parts) == 2:
-        quarter_name, day = raw_parts
-        for month, quarter in self.quarterly_names.items():
-          if quarter.lower() == quarter_name:
-            return [month, int(day)]
-      raw_parts = self.raw_value.split("/")
-      return map(int, raw_parts)
-    except ValueError:
+
+    if value and value not in wf_models.Workflow.VALID_UNITS:
       self.add_error(errors.WRONG_VALUE_ERROR,
                      column_name=self.display_name)
       return None
 
-  def get_value(self):
-    freq = self.row_converter.obj.task_group.workflow.frequency
-    date = self._get_obj_attr("{}_date")
-    day = self._get_obj_attr("relative_{}_day")
-    month = self._get_obj_attr("relative_{}_month")
-    if freq == "one_time":
-      return "" if date is None else "{}/{}/{}".format(
-          date.month,
-          date.day,
-          date.year
-      )
-    elif freq in ["weekly", "monthly"]:
-      return "" if day is None else str(day)
-    elif freq == "quarterly":
-      quarter = self.quarterly_names.get(month, None)
-      return "" if None in [day, quarter] else "{} {}".format(quarter, day)
-    elif freq == "annually":
-      return "" if None in [day, month] else "{}/{}".format(month, day)
-    else:
-      return ""
-
-  def set_obj_attr(self):
-    if not self.value or self.row_converter.ignore:
-      return
-    freq = self.row_converter.obj.task_group.workflow.frequency
-    handler_map = {
-        "one_time": (
-            lambda v: v,
-            lambda v: len(v) == 3,
-            self._set_obj_date,
-        ),
-        "weekly": (
-            lambda v: v,
-            lambda v: len(v) == 1 and 1 <= v[0] <= 5,
-            self._set_obj_relative_day,
-        ),
-        "monthly": (
-            lambda v: v,
-            lambda v: len(v) == 1 and 1 <= v[0] <= 31,
-            self._set_obj_relative_day,
-        ),
-        "quarterly": (
-            self._prepare_month_day,
-            lambda v: len(v) == 2 and 1 <= v[0] <= 3 and 1 <= v[1] <= 31,
-            self._set_obj_relative_month_day,
-        ),
-        "annually": (
-            self._prepare_month_day,
-            lambda v: len(v) == 2 and 1 <= v[0] <= 12 and 1 <= v[1] <= 31,
-            self._set_obj_relative_month_day,
-        ),
-    }
-    prepare, validate, set_obj_attr = handler_map[freq]
-    self.value = prepare(self.value)
-    if not validate(self.value):
-      self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
-    set_obj_attr(self.value)
-
-  def _prepare_month_day(self, value):
-    if len(value) == 3:
-      self.add_warning(errors.WRONG_DATE_FORMAT, column_name=self.display_name)
-      value = value[:2]
     return value
 
-  def _set_obj_date(self, value):
-    month, day, year = value
-    try:
-      self._set_obj_attr("{}_date", datetime.date(year, month, day))
-    except ValueError as error:
-      if error.message == "Start date can not be after end date.":
-        self.add_error(errors.INVALID_START_END_DATES,
-                       start_date="Start date",
-                       end_date="End date")
-      else:
-        self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
 
-  def _set_obj_relative_day(self, value):
-    self._set_obj_attr("relative_{}_day", value[0])
+class RepeatEveryColumnHandler(handlers.ColumnHandler):
 
-  def _set_obj_relative_month_day(self, value):
-    self._set_obj_attr("relative_{}_month", value[0])
-    self._set_obj_attr("relative_{}_day", value[1])
+  """Handler for workflow 'repeat every' column."""
 
-  def _obj_attr_name(self, template):
-    key = "start" if "start" in self.key else "end"
-    return template.format(key)
+  def parse_item(self):
+    """Parse 'repeat every' value
+    """
+    value = self.raw_value.strip()
+    if value in {"-", "--", "---"}:
+      self.set_empty = True
+      value = None
+    elif value:
+      try:
+        value = int(self.raw_value)
+        if not (0 < value < 31):
+          raise ValueError
+      except ValueError:
+        self.add_error(errors.WRONG_VALUE_ERROR,
+                       column_name=self.display_name)
+        return
+    else:
+      # if it is an empty string
+      value = None
 
-  def _get_obj_attr(self, attr):
-    return getattr(self.row_converter.obj, self._obj_attr_name(attr), None)
+    # check if value is unmodified for existing workflow
+    if not self.row_converter.is_new and self.raw_value:
+      insp = inspection.inspect(self.row_converter.obj)
+      repeat_prev = getattr(insp.attrs, self.key).history.unchanged
+      if not value in repeat_prev:
+        self.add_warning(errors.UNMODIFIABLE_COLUMN,
+                         column_name=self.display_name)
+        self.set_empty = False
+      return None
 
-  def _set_obj_attr(self, attr, value):
-    setattr(self.row_converter.obj, self._obj_attr_name(attr), value)
+    return value
+
+  def get_value(self):
+    """Get 'Repeat Every' user readable value for Workflow."""
+    value = super(RepeatEveryColumnHandler, self).get_value()
+    if value:
+      return str(value)
+    return ""
 
 
 class TaskTypeColumnHandler(handlers.ColumnHandler):
@@ -352,7 +264,8 @@ COLUMN_HANDLERS = {
         "cycle": CycleColumnHandler,
         "cycle_task_group": CycleTaskGroupColumnHandler,
         "cycle_workflow": CycleWorkflowColumnHandler,
-        "frequency": FrequencyColumnHandler,
+        "unit": UnitColumnHandler,
+        "repeat_every": RepeatEveryColumnHandler,
         "notify_on_change": boolean.CheckboxColumnHandler,
         "task_description": TaskDescriptionColumnHandler,
         "task_group": TaskGroupColumnHandler,

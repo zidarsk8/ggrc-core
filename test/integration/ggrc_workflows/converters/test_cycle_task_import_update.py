@@ -43,7 +43,6 @@ class BaseTestCycleTaskImportUpdate(TestCase):
     }
 
 
-@unittest.skip("Required to fix import for new workflow format")
 # pylint: disable=too-many-instance-attributes
 class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
 
@@ -261,7 +260,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "title": self.task_group_tasks_active[3]["title"],
             "description": self.task_group_tasks_active[3]["description"],
             "start_date": "2016-07-19",
-            "end_date": "2016-07-24",
+            "end_date": "2016-07-22",
             "finished_date": "2016-07-01 00:00:00",
             "verified_date": "None",
             "status": "Finished"
@@ -270,7 +269,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "title": self.task_group_tasks_active[4]["title"],
             "description": self.task_group_tasks_active[4]["description"],
             "start_date": "2016-07-25",
-            "end_date": "2016-07-30",
+            "end_date": "2016-07-29",
             "finished_date": "2016-07-01 00:00:00",
             "verified_date": "2016-07-01 00:00:00",
             "status": "Verified"
@@ -347,7 +346,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "title": self.task_group_tasks_historical[2]["title"],
             "description": self.task_group_tasks_historical[2]["description"],
             "start_date": "2014-05-13",
-            "end_date": "2014-05-18",
+            "end_date": "2014-05-16",
             "finished_date": "None",
             "verified_date": "None",
             "status": "InProgress"
@@ -356,7 +355,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
             "title": self.task_group_tasks_historical[3]["title"],
             "description": self.task_group_tasks_historical[3]["description"],
             "start_date": "2014-05-19",
-            "end_date": "2014-05-24",
+            "end_date": "2014-05-23",
             "finished_date": "2014-05-01 00:00:00",
             "verified_date": "None",
             "status": "Finished"
@@ -364,7 +363,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
         "CYCLETASK-10": {
             "title": self.task_group_tasks_historical[4]["title"],
             "description": self.task_group_tasks_historical[4]["description"],
-            "start_date": "2014-05-25",
+            "start_date": "2014-05-23",
             "end_date": "2014-05-30",
             "finished_date": "2014-05-01 00:00:00",
             "verified_date": "2014-05-01 00:00:00",
