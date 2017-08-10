@@ -444,13 +444,23 @@ class AssessmentsService(BaseWebUiService):
     and if 'asmt_tmpl_obj' then to Assessment Template title, generate
     new Assessment(s).
     """
-    objs_under_asmt_titles = [obj_under.title for obj_under in
-                              objs_under_asmt]
+    objs_under_asmt_titles = [obj_under.title for obj_under in objs_under_asmt]
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     asmt_tmpl_title = asmt_tmpl_obj.title if asmt_tmpl_obj else None
     (objs_widget.tree_view.open_3bbs().select_generate().
      generate_asmts(asmt_tmpl_title=asmt_tmpl_title,
                     objs_under_asmt_titles=objs_under_asmt_titles))
+
+  def edit_obj_via_edit_modal_from_info_page(self, src_obj):
+    """Open generic widget of object, open edit modal from drop down menu.
+    Modify current title and code and then apply changes by pressing
+    'save and close' button
+    """
+    # pylint: disable=invalid-name
+    src_obj_info_page = self.open_info_page_of_obj(src_obj)
+    (src_obj_info_page.open_info_3bbs().select_edit().
+     edit_minimal_data(title="[EDITED]" + src_obj.title).save_and_close())
+    return self.info_widget_cls(self.driver)
 
   def get_log_pane_validation_result(self, obj):
     """Open assessment Info Page. Open Log Pane on Assessment Info Page.
@@ -487,6 +497,30 @@ class AssessmentsService(BaseWebUiService):
     related_issues_tab = asmt_page.workflow_container.get_tab_object(
         element.AssessmentTabContainer.RELATED_ISSUES_TAB)
     related_issues_tab.raise_issue(issue_entity=issue_obj)
+
+  def complete_assessment(self, obj):
+    """Navigate to info page of object according to URL of object then find and
+    click 'Complete' button then return info page of object in new state"""
+    self.open_info_page_of_obj(obj).click_complete()
+    return self.info_widget_cls(self.driver)
+
+  def verify_assessment(self, obj):
+    """Navigate to info page of object according to URL of object then find and
+    click 'Verify' button then return info page of object in new state"""
+    from lib.constants.locator import ObjectWidget
+    from lib.constants.locator import WidgetInfoAssessment
+    self.open_info_page_of_obj(obj).click_verify()
+    for locator in [ObjectWidget.HEADER_STATE_VERIFIED,
+                    ObjectWidget.HEADER_STATE_COMPLETED,
+                    WidgetInfoAssessment.ICON_VERIFIED]:
+      selenium_utils.wait_until_element_visible(self.driver, locator)
+    return self.info_widget_cls(self.driver)
+
+  def reject_assessment(self, obj):
+    """Navigate to info page of object according to URL of object then find and
+    click 'Reject' button then return info page of object in new state"""
+    self.open_info_page_of_obj(obj).click_reject()
+    return self.info_widget_cls(self.driver)
 
 
 class ControlsService(SnapshotsWebUiService):

@@ -56,43 +56,6 @@ class EntitiesFactory(object):
         mail_name=random_uuid(), domain=domain))
 
 
-class CommentsFactory(EntitiesFactory):
-  """Factory class for Comments entities."""
-  # pylint: disable=too-many-locals
-
-  obj_attrs_names = Entity.get_attrs_names_for_entities(CommentEntity)
-
-  @classmethod
-  def create_empty(cls):
-    """Create blank Comment object."""
-    empty_comment = CommentEntity()
-    empty_comment.type = cls.obj_comment
-    return empty_comment
-
-  @classmethod
-  def create(cls, type=None, id=None, href=None, modified_by=None,
-             created_at=None, description=None):
-    """Create Comment object.
-    Random values will be used for description.
-    Predictable values will be used for type, owners, modified_by.
-    """
-    comment_entity = cls._create_random_comment()
-    comment_entity = Entity.update_objs_attrs_values_by_entered_data(
-        obj_or_objs=comment_entity, is_allow_none_values=False, type=type,
-        id=id, href=href, modified_by=modified_by,
-        created_at=created_at, description=description)
-    return comment_entity
-
-  @classmethod
-  def _create_random_comment(cls):
-    """Create Comment entity with randomly and predictably filled fields."""
-    random_comment = CommentEntity()
-    random_comment.type = cls.obj_comment
-    random_comment.modified_by = ObjectPersonsFactory().default().__dict__
-    random_comment.description = cls.generate_string(cls.obj_comment)
-    return random_comment
-
-
 class ObjectPersonsFactory(EntitiesFactory):
   """Factory class for Persons entities."""
 
@@ -137,6 +100,43 @@ class ObjectPersonsFactory(EntitiesFactory):
     random_person.email = cls.generate_email()
     random_person.system_wide_role = unicode(roles.SUPERUSER)
     return random_person
+
+
+class CommentsFactory(EntitiesFactory):
+  """Factory class for Comments entities."""
+  # pylint: disable=too-many-locals
+
+  obj_attrs_names = Entity.get_attrs_names_for_entities(CommentEntity)
+
+  @classmethod
+  def create_empty(cls):
+    """Create blank Comment object."""
+    empty_comment = CommentEntity()
+    empty_comment.type = cls.obj_comment
+    return empty_comment
+
+  @classmethod
+  def create(cls, type=None, id=None, href=None, modified_by=None,
+             created_at=None, description=None):
+    """Create Comment object.
+    Random values will be used for description.
+    Predictable values will be used for type, owners, modified_by.
+    """
+    comment_entity = cls._create_random_comment()
+    comment_entity = Entity.update_objs_attrs_values_by_entered_data(
+        obj_or_objs=comment_entity, is_allow_none_values=False, type=type,
+        id=id, href=href, modified_by=modified_by, created_at=created_at,
+        description=description)
+    return comment_entity
+
+  @classmethod
+  def _create_random_comment(cls):
+    """Create Comment entity with randomly and predictably filled fields."""
+    random_comment = CommentEntity()
+    random_comment.type = cls.obj_comment
+    random_comment.modified_by = ObjectPersonsFactory().default().__dict__
+    random_comment.description = cls.generate_string(cls.obj_comment)
+    return random_comment
 
 
 class CustomAttributeDefinitionsFactory(EntitiesFactory):
@@ -279,6 +279,7 @@ class ProgramsFactory(EntitiesFactory):
   # pylint: disable=too-many-locals
 
   obj_attrs_names = Entity.get_attrs_names_for_entities(ProgramEntity)
+  default_person = ObjectPersonsFactory().default()
 
   @classmethod
   def create_empty(cls):
@@ -317,8 +318,8 @@ class ProgramsFactory(EntitiesFactory):
     random_program.title = cls.generate_string(cls.obj_program)
     random_program.slug = cls.generate_slug()
     random_program.status = unicode(element.ObjectStates.DRAFT)
-    random_program.manager = ObjectPersonsFactory().default().__dict__
-    random_program.contact = ObjectPersonsFactory().default().__dict__
+    random_program.manager = cls.default_person.__dict__
+    random_program.contact = cls.default_person.__dict__
     return random_program
 
 
@@ -327,6 +328,7 @@ class ControlsFactory(EntitiesFactory):
   # pylint: disable=too-many-locals
 
   obj_attrs_names = Entity.get_attrs_names_for_entities(ControlEntity)
+  default_person = ObjectPersonsFactory().default()
 
   @classmethod
   def create_empty(cls):
@@ -367,8 +369,8 @@ class ControlsFactory(EntitiesFactory):
     random_control.title = cls.generate_string(cls.obj_control)
     random_control.slug = cls.generate_slug()
     random_control.status = unicode(element.ObjectStates.DRAFT)
-    random_control.contact = ObjectPersonsFactory().default().__dict__
-    random_control.owners = [ObjectPersonsFactory().default().__dict__]
+    random_control.contact = cls.default_person.__dict__
+    random_control.owners = [cls.default_person.__dict__]
     random_control.access_control_list = [
         ObjectPersonsFactory().get_acl_member(roles.ADMIN_ID,
                                               random_control.owners[0]),
@@ -382,6 +384,7 @@ class ObjectivesFactory(EntitiesFactory):
   # pylint: disable=too-many-locals
 
   obj_attrs_names = Entity.get_attrs_names_for_entities(ObjectiveEntity)
+  default_person = ObjectPersonsFactory().default()
 
   @classmethod
   def create_empty(cls):
@@ -420,7 +423,7 @@ class ObjectivesFactory(EntitiesFactory):
     random_objective.title = cls.generate_string(cls.obj_objective)
     random_objective.slug = cls.generate_slug()
     random_objective.status = unicode(element.ObjectStates.DRAFT)
-    random_objective.owners = [ObjectPersonsFactory().default().__dict__]
+    random_objective.owners = [cls.default_person.__dict__]
     return random_objective
 
 
@@ -428,6 +431,7 @@ class AuditsFactory(EntitiesFactory):
   """Factory class for Audit entity."""
 
   obj_attrs_names = Entity.get_attrs_names_for_entities(AuditEntity)
+  default_person = ObjectPersonsFactory().default()
 
   @classmethod
   def clone(cls, audit, count_to_clone=1):
@@ -476,7 +480,7 @@ class AuditsFactory(EntitiesFactory):
     random_audit.title = cls.generate_string(cls.obj_audit)
     random_audit.slug = cls.generate_slug()
     random_audit.status = unicode(element.AuditStates().PLANNED)
-    random_audit.contact = ObjectPersonsFactory().default().__dict__
+    random_audit.contact = cls.default_person.__dict__
     return random_audit
 
 
@@ -547,6 +551,7 @@ class AssessmentsFactory(EntitiesFactory):
   """Factory class for Assessments entities."""
 
   obj_attrs_names = Entity.get_attrs_names_for_entities(AssessmentEntity)
+  default_person = ObjectPersonsFactory().default()
 
   @classmethod
   def generate(cls, objs_under_asmt, audit, asmt_tmpl=None):
@@ -580,11 +585,11 @@ class AssessmentsFactory(EntitiesFactory):
 
   @classmethod
   def create(cls, type=None, id=None, title=None, href=None, url=None,
-             slug=None, status=None, owners=None, audit=None,
-             recipients=None, assignees=None, verified=None, updated_at=None,
-             objects_under_assessment=None, os_state=None,
-             custom_attribute_definitions=None, custom_attribute_values=None,
-             custom_attributes=None):
+             slug=None, status=None, owners=None, audit=None, recipients=None,
+             assignees=None, verified=None, verifier=None, creator=None,
+             assessor=None, updated_at=None, objects_under_assessment=None,
+             os_state=None, custom_attribute_definitions=None,
+             custom_attribute_values=None, custom_attributes=None):
     """Create Assessment object.
     Random values will be used for title and slug.
     Predictable values will be used for type, status, recipients,
@@ -592,11 +597,12 @@ class AssessmentsFactory(EntitiesFactory):
     """
     # pylint: disable=too-many-locals
     asmt_entity = cls._create_random_asmt()
-    asmt_entity = Entity.update_objs_attrs_values_by_entered_data(
-        obj_or_objs=asmt_entity, is_allow_none_values=False, type=type, id=id,
+    asmt_entity = cls._update_asmt_attrs_values(
+        obj=asmt_entity, is_allow_none_values=False, type=type, id=id,
         title=title, href=href, url=url, slug=slug, status=status,
         owners=owners, audit=audit, recipients=recipients, assignees=assignees,
-        verified=verified, updated_at=updated_at,
+        verified=verified, verifier=verifier, creator=creator,
+        assessor=assessor, updated_at=updated_at,
         objects_under_assessment=objects_under_assessment, os_state=os_state,
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values,
@@ -615,16 +621,29 @@ class AssessmentsFactory(EntitiesFactory):
         (unicode(roles.ASSESSOR), unicode(roles.CREATOR),
          unicode(roles.VERIFIER)))
     random_asmt.verified = False
+    random_asmt.assessor = [unicode(cls.default_person.name)]
+    random_asmt.creator = [unicode(cls.default_person.name)]
     random_asmt.assignees = {
-        "Assessor": [ObjectPersonsFactory().default().__dict__],
-        "Creator": [ObjectPersonsFactory().default().__dict__]}
+        "Assessor": [cls.default_person.__dict__],
+        "Creator": [cls.default_person.__dict__]}
     return random_asmt
+
+  @classmethod
+  def _update_asmt_attrs_values(cls, obj, **arguments):
+    """Update Assessments (obj) attributes values according to dictionary of
+    arguments (key = value). Generated data-'obj', entered data-'**arguments'.
+    """
+    if arguments.get("verifier"):
+      obj.assignees['Verifier'] = [cls.default_person.__dict__]
+    return Entity.update_objs_attrs_values_by_entered_data(
+        obj_or_objs=obj, **arguments)
 
 
 class IssuesFactory(EntitiesFactory):
   """Factory class for Issues entities."""
 
   obj_attrs_names = Entity.get_attrs_names_for_entities(IssueEntity)
+  default_person = ObjectPersonsFactory().default()
 
   @classmethod
   def create_empty(cls):
