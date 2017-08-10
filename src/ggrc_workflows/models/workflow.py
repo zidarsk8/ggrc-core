@@ -334,7 +334,14 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
         orm.subqueryload('cycles').undefer_group('Cycle_complete')
            .subqueryload("cycle_task_group_object_tasks")
            .undefer_group("CycleTaskGroupObjectTask_complete"),
-        orm.subqueryload('task_groups'),
+        orm.subqueryload('task_groups').undefer_group('TaskGroup_complete'),
+        orm.subqueryload(
+            'task_groups'
+        ).subqueryload(
+            "task_group_tasks"
+        ).undefer_group(
+            'TaskGroupTask_complete'
+        ),
         orm.subqueryload('workflow_people'),
     )
 
