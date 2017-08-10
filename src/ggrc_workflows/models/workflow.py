@@ -133,7 +133,10 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
         Date when first cycle should be started based on user's setup.
     """
     tasks = itertools.chain(*[t.task_group_tasks for t in self.task_groups])
-    return min(t.start_date for t in tasks)
+    min_date = None
+    for task in tasks:
+      min_date = min(task.start_date, min_date or task.start_date)
+    return min_date
 
   WORK_WEEK_LEN = 5
 
