@@ -114,7 +114,9 @@
         this.viewModel.attr('is_saving', false);
 
         // TODO: Find proper way to dismiss the modal
-        this.element.find('.modal-dismiss').trigger('click');
+        if (this.element) {
+          this.element.find('.modal-dismiss').trigger('click');
+        }
       },
       deferredSave: function () {
         var source = this.viewModel.attr('deferred_to').instance ||
