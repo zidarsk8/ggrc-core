@@ -341,4 +341,22 @@
       return isOverdue;
     }
   });
+
+  /**
+   * A mixin to generate hash with refetch param.
+   */
+  can.Model.Mixin('refetchHash', {
+    getHashFragment: function () {
+      var widgetName = this.constructor.table_singular;
+      if (window.location.hash
+          .startsWith(['#', widgetName, '_widget'].join(''))) {
+        return;
+      }
+
+      return [widgetName,
+              '_widget/',
+              this.hash_fragment(),
+              '&refetch'].join('');
+    }
+  });
 })(window.can, window.GGRC);
