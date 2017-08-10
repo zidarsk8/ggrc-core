@@ -70,20 +70,23 @@
     subTreeTypes: function () {
       can.trigger(this.attr('$el'), 'childTreeTypes');
     },
-    onForceShow: function (event) {
-      if (event.state) {
-        this.attr('$el').addClass('show-force');
-      } else {
-        this.attr('$el').removeClass('show-force');
-      }
-    },
     instance: null,
     childOptions: null,
     addItem: null,
     allowMapping: null,
     isAllowToExpand: null,
     childModelsList: null,
-    expanded: false
+    expanded: false,
+    showReducedIcon: function () {
+      var pages = ['Workflow'];
+      var instanceTypes = [
+        'Cycle',
+        'CycleTaskGroup',
+        'CycleTaskGroupObjectTask'
+      ];
+      return _.contains(pages, GGRC.Utils.CurrentPage.getPageType()) &&
+        _.contains(instanceTypes, this.attr('instance').type);
+    }
   });
 
   GGRC.Components('treeItemActions', {
