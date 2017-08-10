@@ -31,7 +31,7 @@
       propName: '@',
       dropdownOptions: [],
       dropdownNoValue: false,
-      dropdwonOptionsGroups: {},
+      dropdownOptionsGroups: {},
       isGroupedDropdown: false,
       isLastOpenInline: false,
       isEditIconDenied: false,

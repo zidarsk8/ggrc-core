@@ -142,6 +142,7 @@ describe('GGRC.Components.dropdown', function () {
 
     beforeEach(function () {
       viewModel = GGRC.Components.getViewModel('dropdown');
+      viewModel.attr('noValue', false);
     });
 
     it('should build list from optionsList', function () {
@@ -163,7 +164,7 @@ describe('GGRC.Components.dropdown', function () {
       list = viewModel.attr('options');
 
       expect(list.length).toEqual(4);
-      expect(list[0].title).toEqual('None');
+      expect(list[0].title).toEqual('--');
       expect(list[3].title).toEqual(optionsList[2].title);
     });
 
@@ -193,7 +194,7 @@ describe('GGRC.Components.dropdown', function () {
       expect(list[1].subitems.length).toEqual(3);
       expect(list[2].subitems.length).toEqual(2);
       expect(list[1].group).toEqual('group 1');
-      expect(list[0].group).toEqual('None');
+      expect(list[0].group).toEqual('--');
       expect(list[2].subitems[0].title).toEqual('gr 2 name 1');
     });
   });

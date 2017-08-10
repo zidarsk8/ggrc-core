@@ -24,7 +24,7 @@
           get: function () {
             var isGroupedDropdown = this.attr('isGroupedDropdown');
             var optionsGroups = this.attr('optionsGroups');
-            var noneValue = this.attr('noValueLabel') || 'None';
+            var noneValue = this.attr('noValueLabel') || '--';
             var none = isGroupedDropdown ?
               [{
                 group: noneValue,
@@ -69,7 +69,7 @@
       name: '@',
       className: '@',
       onChange: $.noop,
-      noValue: false,
+      noValue: '@',
       noValueLabel: '@',
       controlId: '@',
       isGroupedDropdown: false,
