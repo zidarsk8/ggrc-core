@@ -13,6 +13,7 @@
       {{> '/static/mustache/assessments/header.mustache' }}
         <div class="assessment-info-pane info-pane__body">
             <div class="assessment-attributes info-pane__main-content info-pane__main-content-with-sidebar">
+            {{#if instance.test_plan}}
                <div class="info-pane__section">
                     <assessment-inline-item
                         type="text"
@@ -26,6 +27,7 @@
                             <div class="info-pane__section-title">Test Plan</div>
                     </assessment-inline-item>
                 </div>
+            {{/if}}
                 <div class="info-pane__section">
                     <div class="info-pane__section-title">
                         <div class="action-toolbar">
