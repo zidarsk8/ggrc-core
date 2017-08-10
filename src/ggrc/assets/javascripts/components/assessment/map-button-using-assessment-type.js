@@ -13,12 +13,18 @@
     viewModel: {
       assessmentType: '',
       instance: {},
+      deferredTo: {},
       onClick: function (el, ev) {
         el.data('type', this.attr('assessmentType'));
+        el.data('deferred_to', this.attr('deferredTo'));
         can.trigger(el, 'openMapper', ev);
       }
     },
     events: {
+      inserted: function () {
+        this.viewModel.attr('deferredTo',
+          this.element.data('deferred_to'));
+      },
       '.assessment-map-btn click': function (el, ev) {
         this.viewModel.onClick(el, ev);
         ev.preventDefault();

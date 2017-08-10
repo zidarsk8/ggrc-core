@@ -117,6 +117,7 @@
                   instance="instance"
                   mapping="related_objects_as_source"
                   from-binding="true"
+                  {type}="instance.assessment_type"
                   deferred="true">
             <label class="ggrc-form-item__label">
               Mapped Objects
@@ -150,14 +151,14 @@
               {{/list.length}}
             </div>
             <div class="objective-selector">
-              <map-button-using-assessment-type
+               <map-button-using-assessment-type
+                {{data "deferred_to"}}
                 {instance}="instance"
                 {assessment-type}="instance.assessment_type">
                   {{#if instance.audit}}
                     <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
                       href="javascript://"
                       rel="tooltip"
-                      {{data "deferred_to"}}
                       data-placement="left"
                       data-deferred="true"
                       data-object-source="true"
@@ -175,7 +176,6 @@
                     <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
                       href="javascript://"
                       rel="tooltip"
-                      {{data "deferred_to"}}
                       data-placement="left"
                       data-deferred="true"
                       data-object-source="true"
