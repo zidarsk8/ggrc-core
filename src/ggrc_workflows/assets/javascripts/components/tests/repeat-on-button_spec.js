@@ -196,7 +196,7 @@ describe('GGRC.Components.repeatOnButton', function () {
     it('should update repeat options when unit changed',
     function () {
       var actualTitles;
-      var expectedTitles = ['1 day', '2 days'];
+      var expectedTitles = ['1 weekday', '2 weekdays'];
       context.viewModel.attr('state.result.unit', 'day');
 
       unitChanged.apply(context);
