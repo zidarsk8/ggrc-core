@@ -114,8 +114,10 @@
       },
       onSelectionChange: function () {
         var editor = this.attr('editor');
+        var activeElement = document.activeElement;
 
-        if (editor.hasFocus()) {
+        if (editor.hasFocus() ||
+          $(activeElement).closest('.rich-text__content').length) {
           this.attr('editorHasFocus', true);
           return;
         }
@@ -218,9 +220,6 @@
       },
       removed: function () {
         this.viewModel.onRemoved();
-      },
-      '.rich-text__content focus': function () {
-        this.viewModel.attr('editor').focus();
       }
     }
   });
