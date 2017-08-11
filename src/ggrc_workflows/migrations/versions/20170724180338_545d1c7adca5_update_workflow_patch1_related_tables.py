@@ -34,6 +34,7 @@ def upgrade():
                                        nullable=True, server_default=None))
   op.add_column('workflows', sa.Column('repeat_multiplier', sa.Integer,
                                        nullable=False, server_default='0'))
+  op.create_index('ix_workflows_unit', 'workflows', ['unit'])
 
 
 def downgrade():
