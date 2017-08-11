@@ -105,11 +105,11 @@
             <h3>{{title}}</h3>
             <span class="state-value {{addclass 'state-' status separator=''}}">{{status}}</span>
             {{#instance.next_cycle_start_date}}
-              {{^if_equals instance.frequency 'one_time'}}
+              {{#if instance.unit}}
                 {{^if instance.recurrences}}
                   <span class="state-value state-archived">Archived</span>
                 {{/if}}
-              {{/if_equals}}
+              {{/if}}
             {{/instance.next_cycle_start_date}}
             {{#if type}}
             <p>
