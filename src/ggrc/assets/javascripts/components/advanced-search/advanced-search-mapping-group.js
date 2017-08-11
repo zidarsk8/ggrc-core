@@ -29,11 +29,6 @@
      */
     root: false,
     /**
-     * Contains available attributes for specific model.
-     * @type {can.List}
-     */
-    availableAttributes: can.List(),
-    /**
      * Adds Filter Operator and Mapping Criteria to the collection.
      */
     addMappingCriteria: function () {
