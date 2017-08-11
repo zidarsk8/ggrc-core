@@ -164,11 +164,19 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
     except KeyError:
       raise ValueError("Invalid Workflow unit")
     repeater = self.repeat_every * self.repeat_multiplier
-    calc_date = setup_date + relativedelta.relativedelta(
-        setup_date,
-        **{key: repeater}
-    )
-    return self.first_work_day(calc_date)
+    if self.unit == self.DAY_UNIT:
+      weeks = repeater / self.FRIDAY
+      days = repeater % self.FRIDAY
+      # append weekends if it's needed
+      days += ((setup_date.isoweekday() + days) > self.FRIDAY) * 2
+      return setup_date + relativedelta.relativedelta(
+          setup_date, weeks=weeks, days=days)
+    else:
+      calc_date = setup_date + relativedelta.relativedelta(
+          setup_date,
+          **{key: repeater}
+      )
+      return self.first_work_day(calc_date)
 
   @orm.validates('repeat_every')
   def validate_repeat_every(self, _, value):
