@@ -337,6 +337,7 @@ dashboard-js-files:
   - components/inline/base-inline-control-title.js
   - components/assessment/info-pane/inline-item.js
   - components/assessment/info-pane/confirm-edit-action.js
+  - components/object-list-item/object-list-item-updater.js
 
 app-init-files:
   - apps/dashboard.js

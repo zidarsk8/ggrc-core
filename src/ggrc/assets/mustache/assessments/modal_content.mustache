@@ -126,11 +126,15 @@
                 {{#each list}}
                   <div class="modal-mapped-objects-item">
                     <div class="modal-mapped-objects-item__details">
-                      <business-object-list-item {instance}="{.}">
-                        <div class="description">
-                          <read-more {text}="itemData.description" max-lines-number="1"></read-more>
-                        </div>
-                      </business-object-list-item>
+                      <object-list-item-updater {target-instance}="{.}">
+                        {{#if instanceUpdated}}
+                          <business-object-list-item {instance}="instance">
+                            <div class="description">
+                              <read-more {text}="itemData.description" max-lines-number="1"></read-more>
+                            </div>
+                          </business-object-list-item>
+                        {{/if}}
+                      </object-list-item-updater>
                     </div>
                     <div class="modal-mapped-objects-item__unmap">
                       {{^is type 'Audit'}}
