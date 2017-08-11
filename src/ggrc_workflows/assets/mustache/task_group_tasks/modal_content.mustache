@@ -80,12 +80,20 @@
               <label class="smaller">
                   <datepicker date="instance.start_date"
                               required="true"
+                              {{#is workflow.unit 'day'}}
+                                no-weekends="true"
+                                deny-input="true"
+                              {{/is}}
                               label="Start Date"></datepicker>
               </label>
               <label class="smaller">
                   <datepicker set-min-date="instance.start_date"
                               date="instance.end_date"
                               required="true"
+                              {{#is workflow.unit 'day'}}
+                                no-weekends="true"
+                                deny-input="true"
+                              {{/is}}
                               label="Due Date"></datepicker>
               </label>
           </div>
