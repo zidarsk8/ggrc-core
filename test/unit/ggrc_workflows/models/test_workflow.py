@@ -63,12 +63,27 @@ class TestWorkflowState(unittest.TestCase):
       # (expected, setup_date, repeat_every, unit),
       (date(2017, 3, 28), date(2017, 2, 28), 1, workflow.Workflow.MONTH_UNIT),
       (date(2017, 2, 28), date(2017, 1, 31), 1, workflow.Workflow.MONTH_UNIT),
-      (date(2017, 3, 3), date(2017, 3, 3), 1, workflow.Workflow.DAY_UNIT),
-      (date(2017, 3, 17), date(2017, 3, 10), 1, workflow.Workflow.WEEK_UNIT),
-      (date(2016, 12, 30), date(2016, 12, 30), 3, workflow.Workflow.DAY_UNIT),
-      (date(2017, 2, 28), date(2016, 2, 29), 12, workflow.Workflow.MONTH_UNIT),
-      (date(2016, 12, 30), date(2016, 12, 31), 1, workflow.Workflow.DAY_UNIT),
       (date(2017, 4, 28), date(2017, 1, 31), 3, workflow.Workflow.MONTH_UNIT),
+      (date(2017, 2, 28), date(2016, 2, 29), 12, workflow.Workflow.MONTH_UNIT),
+      (date(2017, 3, 17), date(2017, 3, 10), 1, workflow.Workflow.WEEK_UNIT),
+      # -------------------
+      # custom day unit logic
+      (date(2017, 8, 11), date(2017, 8, 10), 1, workflow.Workflow.DAY_UNIT),
+      (date(2017, 8, 14), date(2017, 8, 10), 2, workflow.Workflow.DAY_UNIT),
+      (date(2017, 8, 15), date(2017, 8, 10), 3, workflow.Workflow.DAY_UNIT),
+      (date(2017, 8, 16), date(2017, 8, 10), 4, workflow.Workflow.DAY_UNIT),
+      (date(2017, 8, 17), date(2017, 8, 10), 5, workflow.Workflow.DAY_UNIT),
+      (date(2017, 8, 18), date(2017, 8, 10), 6, workflow.Workflow.DAY_UNIT),
+      (date(2017, 8, 21), date(2017, 8, 10), 7, workflow.Workflow.DAY_UNIT),
+      (date(2017, 8, 14), date(2017, 8, 11), 1, workflow.Workflow.DAY_UNIT),
+      (date(2017, 8, 25), date(2017, 8, 11), 10, workflow.Workflow.DAY_UNIT),
+      # -------------------
+      # holidays don't matter
+      (date(2017, 1, 2), date(2016, 12, 30), 1, workflow.Workflow.DAY_UNIT),
+      (date(2017, 1, 3), date(2016, 12, 30), 2, workflow.Workflow.DAY_UNIT),
+      (date(2017, 1, 4), date(2016, 12, 30), 3, workflow.Workflow.DAY_UNIT),
+      # ------------------
+
   )
   @ddt.unpack
   def test_calc_repeated_dates(self, expected, setup_date, repeat_every, unit):
