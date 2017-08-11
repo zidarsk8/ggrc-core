@@ -66,7 +66,7 @@ def _get_query_handler(query):
       # No exception in the query matcher should affect the response of the
       # request. We need to safely fallback to default query handler if
       # anything happens.
-      logger.warning("Error matching %s handler.", optimized_handler.__name__)
+      logger.info("Error matching %s handler.", optimized_handler.__name__)
   return DefaultHandler
 
 
