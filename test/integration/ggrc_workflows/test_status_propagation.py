@@ -4,6 +4,7 @@
 """Tests for workflow cycle state propagation between tasks and task groups"""
 
 # pylint: disable=invalid-name
+import datetime as dtm
 
 from copy import deepcopy
 from threading import Thread
@@ -38,8 +39,12 @@ class TestWorkflowCycleStatePropagantion(TestCase):
             "title": "weekly task group",
             "task_group_tasks": [{
                 "title": "weekly task 1",
+                "start_date": dtm.date(2016, 6, 10),
+                "end_date": dtm.date(2016, 6, 13),
             }, {
                 "title": "weekly task 1",
+                "start_date": dtm.date(2016, 6, 10),
+                "end_date": dtm.date(2016, 6, 13),
             }
             ]},
         ]
@@ -246,23 +251,25 @@ class TestWorkflowCycleStatePropagantion(TestCase):
     """Test InProgress to Finished transition after task is deleted"""
     _, wf = self.generator.generate_workflow(self.weekly_wf)
 
-    self.generator.activate_workflow(wf)
+    with freeze_time("2016-6-10 13:00:00"):  # Friday, 6/10/2016
+      self.generator.activate_workflow(wf)
 
-    ctg = db.session.query(CycleTaskGroup).join(
-        Cycle).join(Workflow).filter(Workflow.id == wf.id).all()[0]
+      ctg = db.session.query(CycleTaskGroup).join(
+          Cycle).join(Workflow).filter(Workflow.id == wf.id).all()[0]
+      # import ipdb
+      # ipdb.set_trace()
+      first_ct, second_ct = db.session.query(CycleTaskGroupObjectTask).join(
+          Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
 
-    first_ct, second_ct = db.session.query(CycleTaskGroupObjectTask).join(
-        Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
+      # Move first task to InProgress
+      self.generator.modify_object(first_ct, {"status": "InProgress"})
+      self.generator.modify_object(first_ct, {"status": "Finished"})
+      # Delete second task
+      response = self.generator.api.delete(second_ct)
+      self.assert200(response)
 
-    # Move first task to InProgress
-    self.generator.modify_object(first_ct, {"status": "InProgress"})
-    self.generator.modify_object(first_ct, {"status": "Finished"})
-    # Delete second task
-    response = self.generator.api.delete(second_ct)
-    self.assert200(response)
-
-    ctg = db.session.query(CycleTaskGroup).get(ctg.id)
-    self.assertEqual(ctg.status, "Finished")
+      ctg = db.session.query(CycleTaskGroup).get(ctg.id)
+      self.assertEqual(ctg.status, "Finished")
 
   def test_async_request_state_transitions(self):
     """Test asynchronous transitions"""
@@ -274,26 +281,27 @@ class TestWorkflowCycleStatePropagantion(TestCase):
         [{"title": "weekly task 1"} for _ in xrange(3)])
     _, wf = self.generator.generate_workflow(updated_wf)
 
-    self.generator.activate_workflow(wf)
+    with freeze_time("2016-6-10 13:00:00"):  # Friday, 6/10/2016
+      self.generator.activate_workflow(wf)
 
-    ctg = db.session.query(CycleTaskGroup).join(
-        Cycle).join(Workflow).filter(Workflow.id == wf.id).all()[0]
+      ctg = db.session.query(CycleTaskGroup).join(
+          Cycle).join(Workflow).filter(Workflow.id == wf.id).all()[0]
 
-    cycle_tasks = db.session.query(CycleTaskGroupObjectTask).join(
-        Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
+      cycle_tasks = db.session.query(CycleTaskGroupObjectTask).join(
+          Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
 
-    # Move all tasks to InProgress
-    threads = []
-    for cycle_task in cycle_tasks:
-      change_state(cycle_task, "InProgress")
-      threads.append(Thread(target=change_state,
-                            args=(cycle_task, "Finished")))
+      # Move all tasks to InProgress
+      threads = []
+      for cycle_task in cycle_tasks:
+        change_state(cycle_task, "InProgress")
+        threads.append(Thread(target=change_state,
+                              args=(cycle_task, "Finished")))
 
-    for t in threads:
-      t.start()
-    for t in threads:
-      t.join()
+      for t in threads:
+        t.start()
+      for t in threads:
+        t.join()
 
-    db.session.commit()
-    ctg = db.session.query(CycleTaskGroup).get(ctg.id)
-    self.assertEqual(ctg.status, "Finished")
+      db.session.commit()
+      ctg = db.session.query(CycleTaskGroup).get(ctg.id)
+      self.assertEqual(ctg.status, "Finished")
