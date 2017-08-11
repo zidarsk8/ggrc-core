@@ -168,4 +168,21 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
       expect(viewModel.attr('criteria.objectName')).toBe('test');
     });
   });
+
+  describe('availableAttributes() method', function () {
+    it('returns available attributes', function () {
+      var attributes = ['attr1', 'attr2'];
+      spyOn(GGRC.Utils.TreeView, 'getColumnsForModel').and.returnValue({
+        available: attributes
+      });
+      viewModel.attr('criteria.objectName', 'test');
+
+      expect(viewModel.availableAttributes()).toBe(attributes);
+      expect(GGRC.Utils.TreeView.getColumnsForModel).toHaveBeenCalledWith(
+        'test',
+        null,
+        true
+      );
+    });
+  });
 });
