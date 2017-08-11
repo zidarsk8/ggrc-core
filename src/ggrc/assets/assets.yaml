@@ -325,6 +325,7 @@ dashboard-js-files:
   - components/mapped-counter/mapped-counter.js
   - components/people/deletable-people-group.js
   - components/people/editable-people-group.js
+  - components/people/people-list-info.js
   - components/related-objects/related-people-mapping.js
   - components/related-objects/related-people-access-control.js
   - components/related-objects/related-people-access-control-group.js
@@ -691,6 +692,7 @@ dashboard-js-template-files:
   - components/assessment/attach-button.mustache
   - components/people/deletable-people-group.mustache
   - components/people/editable-people-group.mustache
+  - components/people/people-list-info.mustache
   - components/custom-roles/custom-roles.mustache
   - components/custom-roles/custom-roles-modal.mustache
   - components/inline/inline.mustache
