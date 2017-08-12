@@ -15,7 +15,6 @@ declare -a setup_files=(
   "setup_small" 
   "setup_medium" 
   "setup_big" 
-  "setup_huge" 
 )
 
 
