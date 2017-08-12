@@ -21,7 +21,6 @@ class BaseTaskSet(locust.TaskSet):
   """Base locust task set with object generator helpers."""
   # pylint: disable=too-many-instance-attributes,too-many-public-methods
 
-  GAE = False
   INCLUDE_ROLE = True
 
   def __init__(self, *args, **kwargs):
@@ -222,21 +221,14 @@ class BaseTaskSet(locust.TaskSet):
       person = self.people.get(person["id"], self._get_object(person))
 
     user = {"name": person["name"], "email": person["email"]}
-    if self.GAE:
-      params = {"action": "Login"}
-      params.update(user)
-      self.client.get("/ananas")
-      self.client.get("/_ah/login", params=params, name="/_ah/login")
-      self.client.get("/dashboard")
-    else:
-      user_json = json.dumps(user)
-      logger.debug("logging in as: %s", user_json)
-      self.headers_text["x-ggrc-user"] = user_json
-      response = self.client.get("/banana")
-      logger.debug("banana response: %s", response.status_code)
-      self.session = response.headers["Set-Cookie"].split(";")[0]
-      logger.debug("session cookie: %s", self.session)
-      self._update_cookie()
+    user_json = json.dumps(user)
+    logger.debug("logging in as: %s", user_json)
+    self.headers_text["x-ggrc-user"] = user_json
+    response = self.client.get("/banana")
+    logger.debug("banana response: %s", response.status_code)
+    self.session = response.headers["Set-Cookie"].split(";")[0]
+    logger.debug("session cookie: %s", self.session)
+    self._update_cookie()
 
   def _update_cookie(self):
     cookie = self.session
