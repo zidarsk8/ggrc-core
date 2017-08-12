@@ -223,8 +223,8 @@ class BaseTaskSet(locust.TaskSet):
     user = {"name": person["name"], "email": person["email"]}
     user_json = json.dumps(user)
     logger.debug("logging in as: %s", user_json)
-    self.headers_text["x-ggrc-user"] = user_json
-    response = self.client.get("/banana")
+    self.headers_text["X-Ggrc-User"] = user_json
+    response = self.client.get("/banana", headers=self.headers_text)
     logger.debug("banana response: %s", response.status_code)
     self.session = response.headers["Set-Cookie"].split(";")[0]
     logger.debug("session cookie: %s", self.session)
@@ -501,7 +501,7 @@ class BaseTaskSet(locust.TaskSet):
 
     while count > 0:
       if random_user:
-        self.set_random_user(roles=["Administrator"])
+        self.set_random_user(roles=["Administrator", "Editor"])
       batch_count = min(count, batch_size)
       name = None if batch_count == 1 else "count={}".format(batch_count)
       count -= batch_count
@@ -531,6 +531,20 @@ class BaseTaskSet(locust.TaskSet):
 
   def create_objectives(self, **kwargs):
     return self.create_object("Objective", **kwargs)
+
+  def create_assessment_comments(self, full_assessments, **kwargs):
+    for assessment in full_assessments:
+      assessment_slug = generator.obj_to_slug(assessment)
+      comments = self.create_object(
+        "Comment",
+        random_user=True,
+        context=assessment["context"],
+        **kwargs
+      )
+      pairs = zip([assessment_slug] * len(comments), comments)
+      self.relationships_from_pairs(pairs)
+
+    return comments
 
   def create_assessment_documents(self, assessments, **kwargs):
     single_count = kwargs.pop("count", 1)
@@ -608,7 +622,7 @@ class BaseTaskSet(locust.TaskSet):
         )
         if data:
           name = "count={}".format(len(data))
-          self.set_random_user(roles=["Administrator"])
+          self.set_random_user(roles=["Administrator", "Editor"])
           slugs = self._post(model, data, name=name)
           all_slugs.extend(slugs)
     self._log_in()

@@ -183,7 +183,8 @@ def generate(model, count, objects, cads, acr, **kwargs):
       "contact": lambda _: random.choice(objects["Person"]),
       "document_type": lambda _: kwargs.get("document_type", "URL"),
       "program": lambda _: kwargs.get("program",
-                                      random_object("Program", objects))
+                                      random_object("Program", objects)),
+      "context": lambda _: kwargs.get("context", None),
   }
   model_count = len(objects[model])
   for i in range(count):

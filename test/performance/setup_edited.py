@@ -28,10 +28,13 @@ class SetUpAssessments(base.BaseTaskSet):
     assessments = generator.random_objects("Assessment", count, self.objects)
     full_assessments = self._edit_assessments(assessments)
     self._map_snapshots(full_assessments)
+    self._add_comments(full_assessments)
     self._add_documents(assessments)
     self._edit_assessment_states(assessments[:count / 2])
-
     sys.exit(0)
+
+  def _add_comments(self, assessments):
+    self.create_assessment_comments(assessments, count=3, batch_size=1000)
 
   def _add_documents(self, assessments):
     self.create_assessment_documents(assessments, count=3, batch_size=1000)

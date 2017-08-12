@@ -287,6 +287,16 @@ DOCUMENT = {
     "isDraft": True,
 }
 
+COMMENT = {
+    "description": "",
+    "created_at": "2017-08-12T21:26:47.421Z",
+    "modified_by": {"type": "Person", "id": 11},
+    "comment": None,  # bug in the frontend,
+    "send_notification": True,
+    "context": None,
+    "assignee_type": None,
+}
+
 RELATIONSHIP = {
     "source": {},
     "destination": {},
@@ -322,6 +332,7 @@ MAP = {
     "OrgGroup": ORG_GROUP,
     "AssessmentTemplate": ASSESSMENT_TEMPLATE,
     "Document": DOCUMENT,
+    "Comment": COMMENT,
 
     # special objects
     "Person": PERSON,
