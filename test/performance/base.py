@@ -22,11 +22,6 @@ class BaseTaskSet(locust.TaskSet):
   # pylint: disable=too-many-instance-attributes,too-many-public-methods
 
   GAE = False
-  EXCLUDE_OWNER_MODELS = {
-      "Assessment",
-      "Audit",
-      "Program",
-  }
   INCLUDE_ROLE = True
 
   def __init__(self, *args, **kwargs):
@@ -402,11 +397,6 @@ class BaseTaskSet(locust.TaskSet):
         slugs.extend(people_slugs)
     return slugs
 
-  def create_object_owners(self, object_slugs, **kwargs):
-    """Create random object owner entries for given objects."""
-    data = generator.object_owner(self.objects, object_slugs)
-    self._post("ObjectOwner", data, **kwargs)
-
   def relationships_from_pairs(self, pairs, batch_size=1000):
     pair_chunks = [
         pairs[i: i + batch_size]
@@ -533,11 +523,6 @@ class BaseTaskSet(locust.TaskSet):
       )
       slugs = self._post(model, data, name=name)
       all_slugs.extend(slugs)
-      if model not in self.EXCLUDE_OWNER_MODELS:
-        self.create_object_owners(
-            slugs,
-            name=name,
-        )
     return all_slugs
 
   def create_facilities(self, **kwargs):

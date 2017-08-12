@@ -15,7 +15,6 @@ FACILITY = {
     "_pending_joins": [],
     "_transient": {},
     "status": "Draft",
-    "owners": [],
     "access_control_list": [],
     "custom_attribute_definitions": [],
     "custom_attributes": {},
@@ -37,7 +36,6 @@ CONTROL = {
     "description": "",
     "url": "",
     "status": "Draft",
-    "owners": [],
     "custom_attribute_definitions": [],
     "custom_attributes": {},
     "test_plan": "",
@@ -57,7 +55,6 @@ PERSON = {
     "_transient": {},
     "name": "",
     "email": "",
-    "owners": None,
     "custom_attribute_definitions": [],
     "custom_attributes": {},
     "company": "",
@@ -106,18 +103,11 @@ USER_ROLE = {
     "context": None,
 }
 
-OBJECT_OWNER = {
-    "context": None,
-    "_pending_joins": [],
-    "ownable": "",
-    "person": "",
-}
 
 OBJECTIVE = {
     "_pending_joins": [],
     "_transient": {},
     "status": "Draft",
-    "owners": [],
     "custom_attribute_definitions": [],
     "custom_attributes": {},
     "title": "",
@@ -134,7 +124,6 @@ MARKET = {
     "_pending_joins": [],
     "_transient": {},
     "status": "Draft",
-    "owners": [],
     "custom_attribute_definitions": [],
     "custom_attributes": {},
     "title": "aou",
@@ -154,7 +143,6 @@ REGULATION = {
     "_transient": {},
     "status": "Draft",
     "kind": "Regulation",
-    "owners": [],
     "custom_attribute_definitions": [],
     "custom_attributes": {},
     "title": "eeee",
@@ -228,9 +216,6 @@ ASSESSMENT_TEMPLATE = {
     "assessorsList": {},
     "verifiersList": {},
     "people_values": [{
-        "value": "Object Owners",
-        "title": "Object Admins"
-    }, {
         "value": "Audit Lead",
         "title": "Audit Lead"
     }, {
@@ -279,7 +264,6 @@ ASSESSMENT_TEMPLATE = {
 ORG_GROUP = {
     "status": "Active",
     "_pending_joins": [],
-    "owners": [],
     "access_control_list": [],
     "custom_attribute_definitions": [],
     "custom_attributes": {},
@@ -300,7 +284,6 @@ DOCUMENT = {
     "link": "aueo",
     "title": "aueo",
     "context": None,
-    "owners": [],
     "isDraft": True,
 }
 
@@ -316,7 +299,6 @@ ASSESSMENT_GENERATION = {
     "audit": {},
     "context": {},
     "object": {},
-    "owners": [],
     "recipients": "Assessor,Creator,Verifier",
     "run_in_background": False,
     "send_by_default": True,
@@ -346,7 +328,6 @@ MAP = {
     "CustomAttributeDefinition": CUSTOM_ATTRIBUTE_DEFINITION,
     "CustomAttributeValue": CUSTOM_ATTRIBUTE_VALUE,
     "UserRole": USER_ROLE,
-    "ObjectOwner": OBJECT_OWNER,
     "Relationship": RELATIONSHIP,
     "AssessmentGeneration": ASSESSMENT_GENERATION,
 }
