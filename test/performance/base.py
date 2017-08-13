@@ -536,10 +536,10 @@ class BaseTaskSet(locust.TaskSet):
     for assessment in full_assessments:
       assessment_slug = generator.obj_to_slug(assessment)
       comments = self.create_object(
-        "Comment",
-        random_user=True,
-        context=assessment["context"],
-        **kwargs
+          "Comment",
+          random_user=True,
+          context=assessment["context"],
+          **kwargs
       )
       pairs = zip([assessment_slug] * len(comments), comments)
       self.relationships_from_pairs(pairs)
