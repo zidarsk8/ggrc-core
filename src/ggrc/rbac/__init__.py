@@ -3,6 +3,8 @@
 
 """Basic permissions module."""
 
+from sqlalchemy import or_
+
 
 class SystemWideRoles(object):
   """List of system wide roles."""
@@ -22,7 +24,6 @@ def context_query_filter(context_column, contexts):
   If `contexts == None`, it's Admin (no filter), so return `True`
   Else, return the full query
   '''
-  from sqlalchemy import or_
 
   if contexts is None:
     # Admin context, no filter
@@ -31,11 +32,11 @@ def context_query_filter(context_column, contexts):
     filter_expr = None
     # Handle `NULL` context specially
     if None in contexts:
-      filter_expr = context_column == None
+      filter_expr = context_column.is_(None)
       # We're modifying `contexts`, so copy
       contexts = set(contexts)
       contexts.remove(None)
-    if len(contexts) > 0:
+    if contexts:
       filter_in_expr = context_column.in_(contexts)
       if filter_expr is not None:
         filter_expr = or_(filter_expr, filter_in_expr)
