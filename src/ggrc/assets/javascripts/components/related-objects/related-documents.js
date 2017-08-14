@@ -247,7 +247,7 @@
       }
     },
     events: {
-      '{viewModel.instance} refreshRelatedDocuments': function () {
+      '{viewModel.instance} resolvePendingBindings': function () {
         if (this.viewModel.autorefresh) {
           this.viewModel.loadDocuments();
         }
