@@ -2,27 +2,31 @@
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-{{#items}}
+{{#each items}}
     <inline-edit-control class="info-pane__section"
         (inline-save)="updateGlobalAttribute(%event, %context)"
         {instance}="instance"
         {dropdown-options}="options"
         {dropdown-class}="dropdownClass"
-        {dropdown-no-value}="dropdownNoValue"
+        dropdown-no-value="true"
         {edit-mode}="editMode"
         {is-allow-edit}="isAllowEdit"
         {is-loading}="isLoading"
-        {instance}="instance"
         {value}="value"
         {type}="type"
         with-read-more="true">
-              <confirm-inline-control-title
-                  (set-edit-mode-inline)="setEditModeInline(%event)"
+              <confirm-edit-action
+                  (set-edit-mode)="setEditModeInline(%event)"
                   (set-in-progress)="setInProgressState()"
                   {instance}="instance"
                   {on-state-change-dfd}="onStateChangeDfd"
                   {edit-mode}="editMode">
-                <div class="info-pane__section-title">{{title}}</div>
-              </confirm-inline-control-title>
+                    <base-inline-control-title
+                        {edit-mode}="editMode"
+                        {is-edit-icon-denied}="isEditIconDenied"
+                        (set-edit-mode-inline)="confirmEdit()">
+                      <div class="info-pane__section-title">{{title}}</div>
+                    </base-inline-control-title>
+              </confirm-edit-action>
     </inline-edit-control>
-{{/items}}
+{{/each}}

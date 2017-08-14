@@ -34,12 +34,10 @@
       this.loadItems(sourceList)
         .then(function (data) {
           result = data.map(function (item) {
-            var shortEmail = item.email.replace(/@.*$/, '');
-            var displayName = item.name || shortEmail;
+            var displayName = item.email;
             return {
               name: item.name,
               email: item.email,
-              shortEmail: shortEmail,
               displayName: displayName
             };
           });

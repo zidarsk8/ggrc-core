@@ -764,7 +764,7 @@
           params.__page = 1;
         }
         if (!params.__page_size) {
-          params.__page_size = 50;
+          params.__page_size = 20;
         }
         return findPageFunc(collectionUrl, params, baseParams, that);
       };

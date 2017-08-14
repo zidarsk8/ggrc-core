@@ -85,6 +85,7 @@
     mappingType: '@',
     selectedItem: {},
     snapshot: {},
+    assessmentType: '@',
     /**
      * Generate params required for Query API
      * @param {Number} id - Id of Control's Snapshot

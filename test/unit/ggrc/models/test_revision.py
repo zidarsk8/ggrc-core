@@ -3,6 +3,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Unittests for Revision model """
 
+import datetime
 import unittest
 
 import ddt
@@ -14,6 +15,8 @@ from ggrc.models import all_models
 @ddt.ddt
 class TestCheckPopulatedContent(unittest.TestCase):
   """Unittest checks populated content."""
+  # pylint: disable=invalid-name
+
   LIST_OF_REQUIRED_ROLES = [
       "Principal Assignees",
       "Secondary Assignees",
@@ -113,23 +116,49 @@ class TestCheckPopulatedContent(unittest.TestCase):
       self.assertEqual(revision.content, expected)
       get_roles.assert_called_once_with(self.object_type)
 
-  @ddt.data({'url': 'url1', 'reference_url': 'url2'})
+  @ddt.data({
+      "url": "www.url-foo.com",
+      "reference_url": "www.refurl-bar.com",
+      "created_at": "2017-07-15T15:49:14",
+      "updated_at": "2017-08-20T13:32:42",
+  }, {
+      "url": "www.url-foo.com",
+      "reference_url": "www.refurl-bar.com",
+  })
   def test_populated_content_urls(self, content):
     """Test populated content for revision with urls."""
-    expected = [{'display_name': 'url1',
+    dates_in_content = "created_at" in content
+
+    if dates_in_content:
+      expected_created_at = "2017-07-15T15:49:14"
+      expected_updated_at = "2017-08-20T13:32:42"
+    else:
+      # Revision's own dates should be used as a fallback
+      expected_created_at = "2017-11-12T13:14:15"
+      expected_updated_at = "2018-11-12T13:14:15"
+
+    expected = [{'display_name': 'www.url-foo.com',
                  'document_type': 'REFERENCE_URL',
                  'id': None,
-                 'link': 'url1',
-                 'title': 'url1'},
-                {'display_name': 'url2',
+                 'link': 'www.url-foo.com',
+                 'title': 'www.url-foo.com',
+                 'created_at': expected_created_at,
+                 'updated_at': expected_updated_at, },
+                {'display_name': 'www.refurl-bar.com',
                  'document_type': 'REFERENCE_URL',
                  'id': None,
-                 'link': 'url2',
-                 'title': 'url2'}]
+                 'link': 'www.refurl-bar.com',
+                 'title': 'www.refurl-bar.com',
+                 'created_at': expected_created_at,
+                 'updated_at': expected_updated_at, }]
+
     obj = mock.Mock()
     obj.id = self.object_id
     obj.__class__.__name__ = self.object_type
     revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
+    revision.created_at = datetime.datetime(2017, 11, 12, 13, 14, 15)
+    revision.updated_at = datetime.datetime(2018, 11, 12, 13, 14, 15)
+
     with mock.patch("ggrc.access_control.role.get_custom_roles_for",
                     return_value={}):
       self.assertEqual(revision.content["reference_url"], expected)

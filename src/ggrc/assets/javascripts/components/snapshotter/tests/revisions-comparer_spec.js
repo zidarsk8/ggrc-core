@@ -177,7 +177,7 @@ describe('GGRC.Components.revisionsComparer', function () {
 
     it('when cache is empty doing ajax call for all revisions',
       function (done) {
-        Revision.store = undefined;
+        spyOn(Revision, 'findInCacheById').and.returnValue(undefined);
 
         spyOn(Revision, 'findAll').and.returnValue(
           can.Deferred().resolve([{id: 42}, {id: 11}])
@@ -202,9 +202,8 @@ describe('GGRC.Components.revisionsComparer', function () {
 
     it('when in cache only one object doing findOne call',
       function (done) {
-        Revision.store = {
-          '42': {id: 42}
-        };
+        spyOn(Revision, 'findInCacheById').and
+          .returnValues({id: 42}, undefined);
 
         spyOn(Revision, 'findAll').and.returnValue(
           can.Deferred().resolve([{id: 42}, {id: 11}])
@@ -227,10 +226,7 @@ describe('GGRC.Components.revisionsComparer', function () {
 
     it('when cache contains all objects are not doing ajax call',
       function (done) {
-        Revision.store = {
-          '11': {id: 11},
-          '42': {id: 42}
-        };
+        spyOn(Revision, 'findInCacheById').and.returnValues({id: 42}, {id: 11});
 
         spyOn(Revision, 'findAll').and.returnValue(
           can.Deferred().resolve([{id: 42}, {id: 11}])

@@ -1,13 +1,12 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Module of TreeViewItem dropdownsMenu presented on Genetic TreeView."""
-from lib import base
 from lib.constants import element
+from lib.element import elements_list
 from lib.page.modal import unified_mapper
-from lib.utils import selenium_utils
 
 
-class CommonDropdownTreeViewItem(base.DropdownMenu):
+class CommonDropdownTreeViewItem(elements_list.DropdownMenu):
   """Common Dropdown for TreeView Item"""
   _elements = element.DropdownMenuItemTypes
 
@@ -24,9 +23,6 @@ class CommonDropdownTreeViewItem(base.DropdownMenu):
     Returns:
     Unified mapper
     """
-    if not self.dropdown_element.is_displayed():
-      selenium_utils.hover_over_element(self._driver, self.dropdown_btn)
-      self.dropdown_btn.click()
     self.get_dropdown_item(self._elements.MAP).click()
     return unified_mapper.MapObjectsModal(self._driver, self.obj_name)
 

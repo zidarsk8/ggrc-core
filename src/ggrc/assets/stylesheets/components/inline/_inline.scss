@@ -39,6 +39,30 @@ inline-edit-control {
       position: relative;
       border: 1px solid transparent;
 
+      .disabled-dropdown {
+        .input-wrapper {
+          select {
+            border-color: transparent;
+            border-left: none;
+            outline: none;
+            opacity: 1;
+            padding-left: 0px;
+            box-shadow: none;
+            background: transparent;
+            height: 14px;
+            line-height: 14px;
+            min-height: 5px;
+          }
+
+          &.none-selected {
+            select {
+              color: #999;
+              font-style: italic;
+            }
+          }
+        }
+      }
+
       p {
         margin: 0;
         padding: 0;

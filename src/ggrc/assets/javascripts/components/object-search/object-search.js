@@ -12,9 +12,6 @@
       '/components/object-search/object-search.mustache'),
     viewModel: function () {
       return GGRC.VM.ObjectOperationsBaseVM.extend({
-        isLoadingOrSaving: function () {
-          return this.attr('is_loading');
-        },
         object: 'MultitypeSearch',
         type: 'Program',
         availableTypes: function () {
@@ -23,25 +20,20 @@
             ['TaskGroupTask', 'TaskGroup', 'CycleTaskGroupObjectTask'],
             []);
           return types;
+        },
+        resultsRequested: false,
+        onSubmit: function () {
+          this.attr('resultsRequested', true);
+          this._super();
         }
       });
     },
-    events: {
-      inserted: function () {
-        this.setModel();
-        this.viewModel.afterShown();
-      },
-      setModel: function () {
-        var type = this.viewModel.attr('type');
-
-        this.viewModel.attr('model', this.viewModel.modelFromType(type));
-      },
-      '{viewModel} type': function () {
-        this.viewModel.attr('filter', '');
-        this.viewModel.attr('afterSearch', false);
-        this.viewModel.attr('relevant').replace([]);
-        this.setModel();
-        setTimeout(this.viewModel.onSubmit.bind(this.viewModel));
+    helpers: {
+      displayCount: function (countObserver) {
+        var count = countObserver();
+        if (count) {
+          return '(' + count + ')';
+        }
       }
     }
   });

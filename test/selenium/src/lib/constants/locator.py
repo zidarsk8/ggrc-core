@@ -16,6 +16,7 @@ class Common(object):
   MODAL_CREATE = ".modal-wide"
   MODAL_CONFIRM = ".modal.hide"
   MODAL_MAP = ".modal-selector"
+  MODAL_FOOTER = " .modal-footer"
   # info page (panel)
   INFO_WIDGET = ".info"
   # dropdown
@@ -36,10 +37,11 @@ class Common(object):
   MAX = "max"
   NORMAL = "normal"
   DOWN = "down"
+  # list item delimiter
+  HTML_LIST_CSS = (By.CSS_SELECTOR, 'ul')
   # xpath helper
   XPATH_NOT_HIDDEN = "[not(ancestor::section[contains(@class, 'hidden')])]"
-  INFO_WIDGET_XPATH = ("//section[starts-with(@class,'info')]" +
-                       XPATH_NOT_HIDDEN)
+  INFO_WIDGET_XPATH = "//section[contains(@class,'info')]" + XPATH_NOT_HIDDEN
   # import / export pages
   CONTENT = ".content"
   OPTION = "option"
@@ -210,21 +212,33 @@ class ExtendedInfo(object):
 
 class CommonModalUnifiedMapper(object):
   """Common locators for unified mapper modals."""
+  # pylint: disable=invalid-name
   MODAL = Common.MODAL_MAP
-  # labels
+  FILTER_TOGGLE_CSS = (By.CSS_SELECTOR,
+                       '.object-controls__container collapse-panel-click-area')
+  FILTER_ADD_ATTRIBUTE = (By.CSS_SELECTOR, ".filter-container__footer button")
+  FILTER_OPERATOR = (By.CSS_SELECTOR, ".filter-operator__content select")
+  FILTER_ATTRIBUTE_NAME = (By.CSS_SELECTOR, ".filter-attribute__name select")
+  FILTER_ATTRIBUTE_COMPARE = (
+      By.CSS_SELECTOR, ".filter-attribute__operator select")
+  FILTER_ATTRIBUTE_VALUE = (By.CSS_SELECTOR, ".filter-attribute__value input")
   MODAL_TITLE = (By.CSS_SELECTOR, MODAL + " h2")
-  OBJ_TYPE = (By.CSS_SELECTOR, MODAL + " .col:nth-child(1) h6")
-  FILTER_BY_EXPRESSION = (By.CSS_SELECTOR, MODAL + " .col.filter h6")
+  OBJ_TYPE = (By.CSS_SELECTOR, MODAL + " .object-controls__type h6")
   # user input elements
   OBJ_TYPE_DROPDOWN = (By.CSS_SELECTOR, MODAL + " .input-block-level")
   FILTER_VIA_EXPRESSION_TEXT_BOX = (By.CSS_SELECTOR, MODAL + " #mapper-filter")
   FILTER_BY_STATE_DROPDOWN = (By.CSS_SELECTOR,
                               MODAL + " .multiselect-dropdown__input")
-  BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " .filter-buttons .btn-small")
+  FILTER_BY_STATE_DROPDOWN_OPTIONS = (By.CSS_SELECTOR,
+                                      MODAL + " .multiselect-dropdown__label")
+  BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " button[type='submit']")
   FOUND_OBJECTS_TITLES = (By.CSS_SELECTOR, MODAL + " .flex-box .title-attr")
   FOUND_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
                               MODAL + ' .flex-box [type="checkbox"]')
-  BUTTON_MAP_SELECTED = (By.CSS_SELECTOR, MODAL + " .modal-footer .btn-map")
+  BUTTON_MAP_SELECTED = (By.CSS_SELECTOR, MODAL + Common.MODAL_FOOTER +
+                         " .btn-map")
+  RESULT_TOGGLE_CSS = (By.CSS_SELECTOR, MODAL + Common.MODAL_FOOTER +
+                       " collapse-panel-click-area")
 
 
 class ModalMapObjects(CommonModalUnifiedMapper):
@@ -466,7 +480,7 @@ class ModalSetVisibleFields(object):
 
 class ModalSetVisibleFieldsMapper(ModalSetVisibleFields):
   """Locators for Set visible fields modals."""
-  MODAL = ".modal-body"
+  MODAL = ".modal"
   # labels
   MODAL_TITLE = MODAL + " h5"
   ATTR_LIST = ModalSetVisibleFields.ATTR_LIST
@@ -533,10 +547,17 @@ class WidgetBarButtonAddDropdown(object):
 class ObjectWidget(object):
   """Locators for Generic objects widget."""
   _HEADER = '.header [class^="span"]'
+  _STATE = 'div.state-value'
   HEADER_TITLE = (By.CSS_SELECTOR, _HEADER + ' [data-field="title"]')
   HEADER_OWNER = (
       By.CSS_SELECTOR, _HEADER + ' [data-field="owners"]')
-  HEADER_STATE = (By.CSS_SELECTOR, _HEADER + ' [data-field="status"]')
+  HEADER_STATE = (By.CSS_SELECTOR, _STATE)
+  HEADER_STATE_IN_PROGRESS = (By.CSS_SELECTOR, _STATE + '.state-inprogress')
+  HEADER_STATE_COMPLETED = (By.CSS_SELECTOR, _STATE + '.state-completed')
+  HEADER_STATE_READY_FOR_REVIEW = (
+      By.CSS_SELECTOR, _STATE + '.state-readyforreview')
+  HEADER_STATE_VERIFIED = (By.CSS_SELECTOR, _STATE + '.state-verified')
+
   HEADER_LAST_ASSESSMENT_DATE = (
       By.CSS_SELECTOR, _HEADER + ' [data-field="last_assessment_date"]')
   MEMBERS_TITLE_LIST = (
@@ -582,7 +603,7 @@ class ModalCloneAudit(ModalCommonConfirmAction):
 class CommonWidgetInfo(object):
   """Common locators for Info widgets and Info panels."""
   _NOT_HIDDEN = Common.XPATH_NOT_HIDDEN
-  _INFO_WIDGET_XPATH = Common.INFO_WIDGET_XPATH + _NOT_HIDDEN
+  _INFO_WIDGET_XPATH = Common.INFO_WIDGET_XPATH
   _MAIN_HEADER_XPATH = "//div[contains(@class,'pane-header')]" + _NOT_HIDDEN
   _HEADERS_AND_VALUES = (_INFO_WIDGET_XPATH +
                          '//div[starts-with(./@class, "span")]//h6/..')
@@ -717,6 +738,26 @@ class WidgetInfoAssessment(WidgetInfoPanel):
   CODE_VALUE_CSS = (By.CSS_SELECTOR, _CODE + " .inline__content-wrapper")
   # comments section
   COMMENTS_CSS = (By.CSS_SELECTOR, ".assessment-comments")
+  # asmt tab container
+  ASMT_CONTROLLER_SECTION_CSS = (By.CSS_SELECTOR, "assessment-controls")
+  _ASMT_PANEL = ".tab-pane"
+  ASMT_LOG_PANEL_CSS = (By.CSS_SELECTOR,
+                        " ".join([_ASMT_PANEL, "ul.entry-list"]))
+  RELATED_ASMTS_CSS = (By.CSS_SELECTOR, " ".join(
+      [_ASMT_PANEL, "related-objects[related-items-type='Assessment']"]))
+  RELATED_ISSUES_CSS = (By.CSS_SELECTOR, " ".join(
+      [_ASMT_PANEL, "related-objects[related-items-type='Issue']"]))
+  ASMT_TAB_CONTAINER_CSS = (By.CSS_SELECTOR, "tab-container")
+  # state section
+  _PNL_STATE = ".pane-header__toolbar"
+  BUTTON_COMPLETE = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-darkBlue")
+  BUTTON_VERIFY = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-green")
+  BUTTON_REJECT = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-red")
+  ICON_VERIFIED = (By.CSS_SELECTOR, "i.verified-icon")
+
+  class TabContainer(object):
+    TAB_CONTROLLER = (By.CSS_SELECTOR, "ul.nav.nav-tabs")
+    TAB_CONTENT = (By.CSS_SELECTOR, '.tab-pane.active')
 
 
 class WidgetInfoAssessmentTemplate(WidgetInfoPanel):
@@ -827,8 +868,12 @@ class CommonDropdownMenu(object):
 class CommonDropdown3bbsInfoWidget(CommonDropdownMenu):
   """Locators for common settings 3BBS dropdown on Info widget and Info page.
  """
+  _INFO_3BBS_DROPDOWN_BUTTON_XPATH = (Common.INFO_WIDGET_XPATH +
+                                      "//*[contains(@class,'dropdown-menu')]")
   _INFO_3BBS_DROPDOWN_XPATH = (Common.INFO_WIDGET_XPATH +
-                               "//*[contains(@class,'dropdown-menu')]")
+                               "//ul[contains(@class,'dropdown-menu "
+                               "three-dots-list')]")
+  INFO_3BBS_DROPDOWN_BUTTON = (By.XPATH, _INFO_3BBS_DROPDOWN_BUTTON_XPATH)
   INFO_3BBS_DROPDOWN = (By.XPATH, _INFO_3BBS_DROPDOWN_XPATH)
 
 
@@ -862,6 +907,7 @@ class TreeView(object):
   HEADER = _WIDGET_NOT_HIDDEN_CSS + Common.TREE_HEADER
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
   ITEM_EXPAND_BUTTON = " tree-item-actions"
+  ITEM_DROPDOWN_MENU_CSS = Common.HTML_LIST_CSS
   SPINNER = (By.CSS_SELECTOR, " .tree-spinner")
   NO_RESULTS_MESSAGE = (
       By.CSS_SELECTOR, _WIDGET_NOT_HIDDEN_CSS + " .tree-no-results-message")
@@ -1101,3 +1147,18 @@ class CommentItem(object):
   AUTHOR_CSS = (By.CSS_SELECTOR, ".person-holder")
   DATETIME_CSS = (By.CSS_SELECTOR, ".comment-object-item__author_info")
   CONTENT_CSS = (By.CSS_SELECTOR, ".comment-object-item__text")
+
+
+class AssessmentLogTab(object):
+  CELLS_CSS = (By.CSS_SELECTOR, '.third-col')
+  COMMENT_PERSON_CSS = (By.CSS_SELECTOR, '.person-tooltip-trigger')
+  PERSON_LABEL = (By.CSS_SELECTOR, '.person-label')
+  LOG_LIST_CSS = Common.HTML_LIST_CSS
+  LOG_TAB_SPINNER_CSS = (By.CSS_SELECTOR, '.spinner')
+
+
+class AssessmentRelatedTable(object):
+  HEADERS = (By.CSS_SELECTOR, ".grid-data-header")
+  ROWS = (By.CSS_SELECTOR, ".grid-data-row")
+  CELLS = (By.CSS_SELECTOR, "div")
+  TAB_BUTTON = (By.CSS_SELECTOR, ".btn.btn-small")
