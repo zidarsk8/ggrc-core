@@ -10,6 +10,7 @@
       <i class="fa fa-caret-down"></i>
     </a>
     <ul>
+      <lazy-render trigger="activated">
       <!---->
       {{#if instance.viewLink}}
         <!-- Link for open instance on info panel at bottom -->
@@ -77,6 +78,7 @@
         </li>
         {{/if}}
       {{/unless}}
+      </lazy-render>
     </ul>
   </div>
 </div>
