@@ -340,6 +340,8 @@ can.Control("CMS.Controllers.LHN", {
     var value = ["all", "my_work"][Number(newval)];
     $("a[data-name='work_type']").removeClass("active");
     $("a[data-name='work_type'][data-value='"+value+"'").addClass("active");
+    $('input.widgetsearch').attr('placeholder',
+      'Filter ' + (newval ? 'my' : 'all') + ' objects...');
   }
 
   , init_lhn: function() {
