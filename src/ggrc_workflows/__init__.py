@@ -447,7 +447,7 @@ def start_end_date_validator(tgt):
       raise ValueError('End date can not be behind Start date')
 
   if max(tgt.start_date.isoweekday(),
-         tgt.end_date.isoweekday()) > all_models.Workflow.FRIDAY:
+         tgt.end_date.isoweekday()) > all_models.Workflow.WORK_WEEK_LEN:
     workflow = tgt.task_group.workflow
     if workflow.unit == workflow.DAY_UNIT:
       raise ValueError("Daily tasks cannot be started or stopped on weekend")

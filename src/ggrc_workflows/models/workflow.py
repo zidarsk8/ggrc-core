@@ -135,12 +135,12 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
     tasks = itertools.chain(*[t.task_group_tasks for t in self.task_groups])
     return min(t.start_date for t in tasks)
 
-  FRIDAY = 5
+  WORK_WEEK_LEN = 5
 
   @classmethod
   def first_work_day(cls, day):
     holidays = google_holidays.GoogleHolidays()
-    while day.isoweekday() > cls.FRIDAY or day in holidays:
+    while day.isoweekday() > cls.WORK_WEEK_LEN or day in holidays:
       day -= relativedelta.relativedelta(days=1)
     return day
 
@@ -165,10 +165,10 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       raise ValueError("Invalid Workflow unit")
     repeater = self.repeat_every * self.repeat_multiplier
     if self.unit == self.DAY_UNIT:
-      weeks = repeater / self.FRIDAY
-      days = repeater % self.FRIDAY
+      weeks = repeater / self.WORK_WEEK_LEN
+      days = repeater % self.WORK_WEEK_LEN
       # append weekends if it's needed
-      days += ((setup_date.isoweekday() + days) > self.FRIDAY) * 2
+      days += ((setup_date.isoweekday() + days) > self.WORK_WEEK_LEN) * 2
       return setup_date + relativedelta.relativedelta(
           setup_date, weeks=weeks, days=days)
     else:
