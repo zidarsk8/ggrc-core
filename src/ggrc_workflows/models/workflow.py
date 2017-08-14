@@ -249,12 +249,12 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   )
 
   _aliases = {
-      "repeat_every" : {
+      "repeat_every": {
           "display_name": "Repeat Every",
           "description": "'Repeat Every' value\nmust fall into\nthe range 1~30"
                          "\nor '-' for None",
       },
-      "unit":  {
+      "unit": {
           "display_name": "Unit",
           "description": "Allowed values for\n'Unit' are:\n{}"
                          "\nor '-' for None".format("\n".join(VALID_UNITS)),
