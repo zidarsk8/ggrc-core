@@ -34,15 +34,22 @@
                             <div class="action-toolbar__content-item">
                                 {{assessmentTypeNamePlural}}
                             </div>
-                            {{#unless instance.archived}}
+                            {{#unless isEditDenied}}
                                 <div class="action-toolbar__controls">
                                     <action-toolbar-control>
-                                    <map-button-using-assessment-type
-                                        {instance}="instance"
-                                        {assessment-type}="instance.assessment_type">
-                                            <add-mapping-button {parent-instance}="instance">
-                                            </add-mapping-button>
-                                    </map-button-using-assessment-type>
+                                        <map-button-using-assessment-type {instance}="instance">
+                                            <confirm-edit-action
+                                                (set-edit-mode)="openMapper()"
+                                                (set-in-progress)="setInProgressState()"
+                                                {is-edit-icon-denied}="isEditDenied"
+                                                {instance}="instance"
+                                                {on-state-change-dfd}="onStateChangeDfd"
+                                                {edit-mode}="editMode">
+                                                    <i ($click)="confirmEdit()"
+                                                        class="fa fa-code-fork action-toolbar__item-icon">
+                                                    </i>
+                                            </confirm-edit-action>
+                                        </map-button-using-assessment-type>
                                     </action-toolbar-control>
                                 </div>
                             {{/unless}}
@@ -216,14 +223,21 @@
                     <div class="info-pane__section-title">
                        <div class="action-toolbar">
                           <div class="action-toolbar__content-item">Related Information</div>
-                         {{#unless instance.archived}}
+                         {{#unless isEditDenied}}
                           <div class="action-toolbar__controls">
                             <action-toolbar-control>
-                                <map-button-using-assessment-type
-                                    {instance}="instance"
-                                    {assessment-type}="instance.assessment_type">
-                                        <add-mapping-button {parent-instance}="instance">
-                                        </add-mapping-button>
+                                <map-button-using-assessment-type {instance}="instance">
+                                    <confirm-edit-action
+                                        (set-edit-mode)="openMapper()"
+                                        (set-in-progress)="setInProgressState()"
+                                        {is-edit-icon-denied}="isEditDenied"
+                                        {instance}="instance"
+                                        {on-state-change-dfd}="onStateChangeDfd"
+                                        {edit-mode}="editMode">
+                                            <i ($click)="confirmEdit()"
+                                                class="fa fa-code-fork action-toolbar__item-icon">
+                                            </i>
+                                    </confirm-edit-action>
                                 </map-button-using-assessment-type>
                             </action-toolbar-control>
                           </div>

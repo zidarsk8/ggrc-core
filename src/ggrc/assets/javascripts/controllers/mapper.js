@@ -54,12 +54,12 @@
 
       if (GGRC.Utils.Snapshots
           .isInScopeModel(data.join_object_type) && !isSearch) {
-        openForSnapshots(btn, data);
+        openForSnapshots(data);
       } else {
-        openForCommonObjects(btn, data, isSearch);
+        openForCommonObjects(data, isSearch);
       }
 
-      function openForSnapshots(btn, data) {
+      function openForSnapshots(data) {
         var config;
         var inScopeObject;
 
@@ -111,7 +111,7 @@
         });
       }
 
-      function openForCommonObjects(btn, data, isSearch) {
+      function openForCommonObjects(data, isSearch) {
         var config = {
           object: data.join_object_type,
           type: data.join_option_type,
