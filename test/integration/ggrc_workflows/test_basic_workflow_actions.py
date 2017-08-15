@@ -14,6 +14,7 @@ from ggrc import db
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroupObjectTask
 from ggrc_workflows.models import TaskGroup
+from ggrc_workflows.models import TaskGroupTask
 from ggrc_workflows.models import Workflow
 from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
@@ -125,6 +126,66 @@ class TestWorkflowsCycleGeneration(TestCase):
     cycle_task = active_wf.cycles[1].cycle_task_group_object_tasks[0]
     adj_start_date = cycle_task.start_date
     self.assertEqual(expected, adj_start_date)
+
+  @ddt.data(
+      # today is dtm.date(2017, 8, 15), task repeat every
+      # (setup_start_date, update_start_date, expected_date),
+      (dtm.date(2017, 1, 15), dtm.date(2017, 1, 1), dtm.date(2017, 9, 1)),
+      (dtm.date(2017, 1, 15), dtm.date(2017, 1, 5), dtm.date(2017, 9, 5)),
+      # new cycle starts on weekend that's why it moves to friday
+      (dtm.date(2017, 1, 15), dtm.date(2017, 1, 10), dtm.date(2017, 9, 8)),
+      (dtm.date(2017, 1, 15), dtm.date(2017, 8, 15), dtm.date(2017, 9, 15)),
+      # new cycle starts on weekend that's why it moves to friday
+      (dtm.date(2017, 1, 15), dtm.date(2017, 1, 20), dtm.date(2017, 8, 18)),
+      (dtm.date(2017, 1, 15), dtm.date(2017, 1, 25), dtm.date(2017, 8, 25)),
+      (dtm.date(2017, 8, 16), dtm.date(2017, 8, 14), dtm.date(2017, 9, 14)),
+      (dtm.date(2017, 8, 16), dtm.date(2017, 8, 18), dtm.date(2017, 8, 18)),
+      (dtm.date(2017, 8, 14), dtm.date(2017, 8, 18), dtm.date(2017, 8, 18)),
+  )
+  @ddt.unpack
+  def test_recalculate_date(self,
+                            setup_start_date,
+                            update_start_date,
+                            expected_date):
+    """Recalculate next cycle start date"""
+    with freeze_time(dtm.date(2017, 8, 15)):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(repeat_every=1,
+                                                status=Workflow.DRAFT,
+                                                unit=Workflow.MONTH_UNIT)
+        group = wf_factories.TaskGroupFactory(workflow=workflow)
+        task_id = wf_factories.TaskGroupTaskFactory(
+            task_group=group,
+            start_date=setup_start_date,
+            end_date=setup_start_date + dtm.timedelta(days=4)).id
+      self.generator.activate_workflow(workflow)
+    self.api.put(TaskGroupTask.query.get(task_id),
+                 {"start_date": update_start_date,
+                  "end_date": update_start_date + dtm.timedelta(4)})
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.status == 'Active').one()
+    self.assertEqual(expected_date, active_wf.next_cycle_start_date)
+
+  def test_recalculate_date_not_started(self):
+    """Changing start_date on notstarted workflow will
+       not affect next_cycle_start_date"""
+    setup_start_date = dtm.date(2017, 1, 15)
+    update_start_date = dtm.date(2017, 1, 1)
+    with freeze_time(dtm.date(2017, 8, 15)):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(repeat_every=1,
+                                                status=Workflow.DRAFT,
+                                                unit=Workflow.MONTH_UNIT)
+        group = wf_factories.TaskGroupFactory(workflow=workflow)
+        task_id = wf_factories.TaskGroupTaskFactory(
+            task_group=group,
+            start_date=setup_start_date,
+            end_date=setup_start_date + dtm.timedelta(days=4)).id
+        workflow_id = workflow.id
+    self.api.put(TaskGroupTask.query.get(task_id),
+                 {"start_date": update_start_date,
+                  "end_date": update_start_date + dtm.timedelta(4)})
+    self.assertIsNone(Workflow.query.get(workflow_id).next_cycle_start_date)
 
   @ddt.data(
       # (setup_date, freeze_date, repeat_every, unit),

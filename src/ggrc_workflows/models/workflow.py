@@ -133,7 +133,10 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
         Date when first cycle should be started based on user's setup.
     """
     tasks = itertools.chain(*[t.task_group_tasks for t in self.task_groups])
-    return min(t.start_date for t in tasks)
+    min_date = None
+    for task in tasks:
+      min_date = min(task.start_date, min_date or task.start_date)
+    return min_date
 
   WORK_WEEK_LEN = 5
 
@@ -331,7 +334,14 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
         orm.subqueryload('cycles').undefer_group('Cycle_complete')
            .subqueryload("cycle_task_group_object_tasks")
            .undefer_group("CycleTaskGroupObjectTask_complete"),
-        orm.subqueryload('task_groups'),
+        orm.subqueryload('task_groups').undefer_group('TaskGroup_complete'),
+        orm.subqueryload(
+            'task_groups'
+        ).subqueryload(
+            "task_group_tasks"
+        ).undefer_group(
+            'TaskGroupTask_complete'
+        ),
         orm.subqueryload('workflow_people'),
     )
 
