@@ -184,7 +184,7 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
 
     repeat_every shouldn't have 0 value.
     """
-    if value is not None and not isinstance(value, int):
+    if value is not None and not isinstance(value, (int, long)):
       raise ValueError("'repeat_every' should be integer or 'null'")
     if value is not None and value <= 0:
       raise ValueError("'repeat_every' should be strictly greater than 0")
@@ -296,10 +296,14 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   def copy(self, _other=None, **kwargs):
     """Create a partial copy of the current workflow.
     """
-    columns = [
-        'title', 'description', 'notify_on_change', 'notify_custom_message',
-        'end_date', 'start_date'
-    ]
+    columns = ['title',
+               'description',
+               'notify_on_change',
+               'notify_custom_message',
+               'end_date',
+               'start_date',
+               'repeat_every',
+               'unit']
     target = self.copy_into(_other, columns, **kwargs)
     return target
 
