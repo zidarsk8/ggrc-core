@@ -135,12 +135,12 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
     tasks = itertools.chain(*[t.task_group_tasks for t in self.task_groups])
     return min(t.start_date for t in tasks)
 
-  FRIDAY = 5
+  WORK_WEEK_LEN = 5
 
   @classmethod
   def first_work_day(cls, day):
     holidays = google_holidays.GoogleHolidays()
-    while day.isoweekday() > cls.FRIDAY or day in holidays:
+    while day.isoweekday() > cls.WORK_WEEK_LEN or day in holidays:
       day -= relativedelta.relativedelta(days=1)
     return day
 
@@ -164,11 +164,19 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
     except KeyError:
       raise ValueError("Invalid Workflow unit")
     repeater = self.repeat_every * self.repeat_multiplier
-    calc_date = setup_date + relativedelta.relativedelta(
-        setup_date,
-        **{key: repeater}
-    )
-    return self.first_work_day(calc_date)
+    if self.unit == self.DAY_UNIT:
+      weeks = repeater / self.WORK_WEEK_LEN
+      days = repeater % self.WORK_WEEK_LEN
+      # append weekends if it's needed
+      days += ((setup_date.isoweekday() + days) > self.WORK_WEEK_LEN) * 2
+      return setup_date + relativedelta.relativedelta(
+          setup_date, weeks=weeks, days=days)
+    else:
+      calc_date = setup_date + relativedelta.relativedelta(
+          setup_date,
+          **{key: repeater}
+      )
+      return self.first_work_day(calc_date)
 
   @orm.validates('repeat_every')
   def validate_repeat_every(self, _, value):
@@ -241,12 +249,12 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   )
 
   _aliases = {
-      "repeat_every" : {
+      "repeat_every": {
           "display_name": "Repeat Every",
           "description": "'Repeat Every' value\nmust fall into\nthe range 1~30"
                          "\nor '-' for None",
       },
-      "unit":  {
+      "unit": {
           "display_name": "Unit",
           "description": "Allowed values for\n'Unit' are:\n{}"
                          "\nor '-' for None".format("\n".join(VALID_UNITS)),

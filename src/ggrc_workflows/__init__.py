@@ -446,6 +446,12 @@ def start_end_date_validator(tgt):
   if tgt.start_date > tgt.end_date:
       raise ValueError('End date can not be behind Start date')
 
+  if max(tgt.start_date.isoweekday(),
+         tgt.end_date.isoweekday()) > all_models.Workflow.WORK_WEEK_LEN:
+    workflow = tgt.task_group.workflow
+    if workflow.unit == workflow.DAY_UNIT:
+      raise ValueError("Daily tasks cannot be started or stopped on weekend")
+
 
 @signals.Restful.model_put.connect_via(models.TaskGroupTask)
 def handle_task_group_task_put(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
