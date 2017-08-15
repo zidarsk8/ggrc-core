@@ -423,6 +423,46 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
         "__sort__": person.user_name,
     })
 
+  @ddt.data(
+      (True, "Yes"),
+      (False, "No"),
+      ("1", "Yes"),
+      ("0", "No"),
+      (1, "Yes"),
+      (0, "No"),
+  )
+  @ddt.unpack
+  def test_filter_by_checkbox_cad(self, value, search_value):
+    """Test index by Checkdoxed cad."""
+    checkbox_type = all_models.CustomAttributeDefinition.ValidTypes.CHECKBOX
+    cad_title = "Checkbox"
+    with factories.single_commit():
+      cad = factories.CustomAttributeDefinitionFactory(
+          attribute_type=checkbox_type,
+          definition_type="control",
+          title=cad_title,
+      )
+      control = factories.ControlFactory()
+      factories.CustomAttributeValueFactory(
+          custom_attribute=cad,
+          attributable=control,
+          attribute_value=value,
+      )
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.type,
+    ).first()
+    revision.content = control.log_json()
+    db.session.add(revision)
+    with factories.single_commit():
+      snapshot = factories.SnapshotFactory(
+          child_id=control.id,
+          child_type=control.type,
+          revision=revision)
+    db.session.expire_all()
+    do_reindex()
+    self.assert_indexed_fields(snapshot, cad_title, {"": search_value})
+
   def test_index_deleted_acr(self):
     """Test index by removed ACR."""
     role_name = "Test name"
