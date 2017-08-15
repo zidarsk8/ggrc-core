@@ -11,6 +11,7 @@ from ggrc.models import all_models
 
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
+from integration.ggrc import generator
 from integration.ggrc.models import factories
 from integration.ggrc_workflows import WorkflowTestCase
 from integration.ggrc_workflows.models import factories as wf_factories
@@ -454,3 +455,28 @@ class TestStatusApiPost(TestCase):
         resp.json["cycle_task_group_object_task"]["id"]
     )
     self.assertEqual(is_current, task.cycle.is_current)
+
+
+@ddt.ddt
+class TestCloneWorkflow(TestCase):
+
+  def setUp(self):
+    super(TestCloneWorkflow, self).setUp()
+    self.object_generator = generator.ObjectGenerator()
+
+  @ddt.data(
+      (None, None),
+      (all_models.Workflow.DAY_UNIT, 10),
+      (all_models.Workflow.MONTH_UNIT, 10),
+      (all_models.Workflow.WEEK_UNIT, 10),
+  )
+  @ddt.unpack
+  def test_workflow_copy(self, unit, repeat_every):
+    """Check clone wf with unit and repeat."""
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory(unit=unit,
+                                              repeat_every=repeat_every)
+    _, clone_wf = self.object_generator.generate_object(
+        all_models.Workflow, {"title": "WF - copy 1", "clone": workflow.id})
+    self.assertEqual(unit, clone_wf.unit)
+    self.assertEqual(repeat_every, clone_wf.repeat_every)
