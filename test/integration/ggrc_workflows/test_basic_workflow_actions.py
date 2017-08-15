@@ -98,15 +98,13 @@ class TestWorkflowsCycleGeneration(TestCase):
        Workflow.MONTH_UNIT),
       (dtm.date(2017, 2, 28), dtm.date(2017, 1, 31), dtm.date(2017, 3, 31), 1,
        Workflow.MONTH_UNIT),
-      (dtm.date(2017, 3, 3), dtm.date(2017, 3, 3), dtm.date(2017, 3, 5), 1,
-       Workflow.DAY_UNIT),
       (dtm.date(2017, 3, 17), dtm.date(2017, 3, 10), dtm.date(2017, 3, 24), 1,
        Workflow.WEEK_UNIT),
-      (dtm.date(2016, 12, 30), dtm.date(2016, 12, 30), dtm.date(2017, 1, 8), 3,
+      (dtm.date(2017, 1, 4), dtm.date(2016, 12, 30), dtm.date(2017, 1, 8), 3,
        Workflow.DAY_UNIT),
       (dtm.date(2017, 2, 28), dtm.date(2016, 2, 29), dtm.date(2017, 3, 29), 12,
        Workflow.MONTH_UNIT),
-      (dtm.date(2016, 12, 30), dtm.date(2016, 12, 31), dtm.date(2017, 1, 3), 1,
+      (dtm.date(2017, 1, 2), dtm.date(2016, 12, 30), dtm.date(2017, 1, 2), 1,
        Workflow.DAY_UNIT),
       (dtm.date(2017, 4, 28), dtm.date(2017, 1, 31), dtm.date(2017, 5, 31), 3,
        Workflow.MONTH_UNIT),
@@ -114,7 +112,7 @@ class TestWorkflowsCycleGeneration(TestCase):
   @ddt.unpack
   def test_recurring_wf_start_date_shifting(self, expected, setup_date,
                                             freeze_date, repeat_every, unit):
-    """Test case for correct next cycle task start_ date for recurring wf"""
+    """Test case for correct next cycle task start_date for recurring wf"""
     with freeze_time(freeze_date):
       with factories.single_commit():
         workflow = wf_factories.WorkflowFactory(repeat_every=repeat_every,
@@ -135,7 +133,7 @@ class TestWorkflowsCycleGeneration(TestCase):
   @ddt.data(
       # (setup_date, freeze_date, repeat_every, unit),
       (dtm.date(2017, 2, 28), dtm.date(2017, 4, 28), 1, Workflow.MONTH_UNIT),
-      (dtm.date(2017, 3, 3), dtm.date(2017, 3, 5), 1, Workflow.DAY_UNIT),
+      (dtm.date(2017, 3, 6), dtm.date(2017, 3, 8), 1, Workflow.DAY_UNIT),
       (dtm.date(2017, 3, 10), dtm.date(2017, 3, 24), 1, Workflow.WEEK_UNIT),
   )
   @ddt.unpack
