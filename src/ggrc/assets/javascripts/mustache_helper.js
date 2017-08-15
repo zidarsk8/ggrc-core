@@ -2481,6 +2481,9 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
       var definition;
       var customAttrItem;
       var getValue;
+      var typeValueMap = {
+        checkbox: ['No', 'Yes']
+      };
 
       attr = Mustache.resolve(attr);
       instance = Mustache.resolve(instance);
@@ -2508,8 +2511,9 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
                 object: item.attribute_object ?
                   item.attribute_object.reify() : null
               }));
-            } else {
-              value = item.attribute_value;
+            } else if (typeValueMap[item.attributeType]) {
+              value = typeValueMap[item.attributeType][item.attribute_value] ||
+                'No';
             }
           }
         };
