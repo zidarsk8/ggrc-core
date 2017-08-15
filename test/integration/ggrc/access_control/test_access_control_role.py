@@ -16,6 +16,7 @@ class TestAccessControlRole(TestCase):
   """TestAccessControlRole"""
 
   def setUp(self):
+    self.clear_data()
     super(TestAccessControlRole, self).setUp()
     self.api = Api()
     self.object_generator = ObjectGenerator()
