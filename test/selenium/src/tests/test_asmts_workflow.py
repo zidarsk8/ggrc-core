@@ -53,6 +53,21 @@ class TestAssessmentsWorkflow(base.Test):
         format_err_msg_equal(expected_asmt, actual_asmt))
 
   @pytest.mark.smoke_tests
+  def test_asmt_logs(
+      self, new_program_rest, new_audit_rest, new_assessment_rest, selenium
+  ):
+    """Test for validation of Assessment log pane.
+    Acceptance criteria:
+      1) 3 log items at the log pane
+      2) all items return 'True' for all attrs.
+    """
+    log_items_validation = webui_service.AssessmentsService(
+        selenium).get_log_pane_validation_result(obj=new_assessment_rest)
+    log_validation_results = [all(item_result.values()) for item_result in
+                              log_items_validation]
+    assert ([True] * 3) == log_validation_results, str(log_items_validation)
+
+  @pytest.mark.smoke_tests
   def test_asmt_related_asmts(
       self, new_programs_rest, new_control_rest,
       map_new_control_rest_to_new_programs_rest, new_audits_rest,
