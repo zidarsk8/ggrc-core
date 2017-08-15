@@ -44,6 +44,17 @@
 
           return state;
         }
+      },
+      /**
+       * Indicates whether status tooltip should be displayed
+       * @type {boolean}
+       */
+      statusTooltipVisible: {
+        type: 'boolean',
+        value: false,
+        get: function () {
+          return StateUtils.hasFilterTooltip(this.attr('modelName'));
+        }
       }
     },
     /**
