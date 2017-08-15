@@ -6,7 +6,7 @@
 (function (GGRC) {
   GGRC.Workflow = {
     unitOptions: [
-      {title: 'Daily', value: 'day', plural: 'days', singular: 'day'},
+      {title: 'Weekday', value: 'day', plural: 'weekdays', singular: 'weekday'},
       {title: 'Weekly', value: 'week', plural: 'weeks', singular: 'week'},
       {title: 'Monthly', value: 'month', plural: 'months', singular: 'month'}
     ],
