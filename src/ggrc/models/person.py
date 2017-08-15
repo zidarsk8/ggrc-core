@@ -18,6 +18,7 @@ from ggrc.models.custom_attribute_definition import CustomAttributeMapable
 from ggrc.models import reflection
 from ggrc.models.relationship import Relatable
 from ggrc.models.utils import validate_option
+from ggrc.rbac import SystemWideRoles
 
 
 class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
@@ -165,13 +166,13 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
     #   depends on `Role` and `UserRole` objects
 
     if self.email in getattr(settings, "BOOTSTRAP_ADMIN_USERS", []):
-      return u"Superuser"
+      return SystemWideRoles.SUPERUSER
 
     role_hierarchy = {
-        u'Administrator': 0,
-        u'Editor': 1,
-        u'Reader': 2,
-        u'Creator': 3,
+        SystemWideRoles.ADMINISTRATOR: 0,
+        SystemWideRoles.EDITOR: 1,
+        SystemWideRoles.READER: 2,
+        SystemWideRoles.CREATOR: 3,
     }
     unique_roles = set([
         user_role.role.name

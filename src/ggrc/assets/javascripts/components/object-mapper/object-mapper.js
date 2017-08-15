@@ -69,6 +69,7 @@
 
     events: {
       '.create-control modal:success': function (el, ev, model) {
+        this.viewModel.attr('showResults', true);
         this.viewModel.attr('newEntries').push(model);
         this.element.find('mapper-results').viewModel().showNewEntries();
       },
@@ -96,8 +97,6 @@
         this.viewModel.attr('selected').replace([]);
         this.viewModel.attr('entries').replace([]);
 
-        this.setModel();
-
         if (this.viewModel.attr('deferred_to.list')) {
           deferredToList = this.viewModel.attr('deferred_to.list')
             .map(function (item) {
@@ -109,13 +108,15 @@
           this.viewModel.attr('deferred_list', deferredToList);
         }
 
-        self.viewModel.afterShown();
+        self.viewModel.attr('submitCbs').fire();
       },
       closeModal: function () {
         this.viewModel.attr('is_saving', false);
 
         // TODO: Find proper way to dismiss the modal
-        this.element.find('.modal-dismiss').trigger('click');
+        if (this.element) {
+          this.element.find('.modal-dismiss').trigger('click');
+        }
       },
       deferredSave: function () {
         var source = this.viewModel.attr('deferred_to').instance ||
@@ -127,20 +128,11 @@
           arr: _.compact(_.map(
             this.viewModel.attr('selected'),
             function (desination) {
-              var isAllowed = GGRC.Utils.allowed_to_map(source, desination);
-              var instance =
-                can.makeArray(this.viewModel.attr('entries'))
-                  .map(function (entry) {
-                    return entry.instance || entry;
-                  })
-                  .find(function (instance) {
-                    return instance.id === desination.id &&
-                      instance.type === desination.type;
-                  });
-              if (instance && isAllowed) {
-                return instance;
+              if (GGRC.Utils.allowed_to_map(source, desination)) {
+                desination.isNeedRefresh = true;
+                return desination;
               }
-            }.bind(this)
+            }
           ))
         };
 
@@ -244,23 +236,6 @@
               });
             });
         }.bind(this));
-      },
-      setModel: function () {
-        var type = this.viewModel.attr('type');
-
-        this.viewModel.attr('model', this.viewModel.modelFromType(type));
-      },
-      '{viewModel} type': function () {
-        this.viewModel.attr('filter', '');
-        this.viewModel.attr('afterSearch', false);
-        // Edge case for objects that are not in Snapshot scope
-        if (!GGRC.Utils.Snapshots.isInScopeModel(
-          this.viewModel.attr('object'))) {
-          this.viewModel.attr('relevant').replace([]);
-        }
-        this.setModel();
-
-        setTimeout(this.viewModel.onSubmit.bind(this.viewModel));
       }
     },
 

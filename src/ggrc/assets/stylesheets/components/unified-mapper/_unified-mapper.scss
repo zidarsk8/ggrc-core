@@ -3,8 +3,6 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-@import "unified-mapper-toolbar";
-
 $list-item-padding: 15px;
 $item-status-width: 8px;
 $icon-width: 32px;
@@ -508,8 +506,29 @@ mapper-results-columns-configuration {
 .object-modal {
 
   object-mapper, object-search, object-generator {
+    collapsible-panel {
+      h6 {
+        width: inherit;
+        float: inherit;
+      }
+      collapsible-panel-header {
+        .fa {
+          width: auto;
+          margin-right: 12px;
+        }
+        .title-text {
+          font-size: 13px;
+        }
+      }
+      collapsible-panel-body .body-inner {
+        padding: 0px;
+      }
+    }
     .modal-body {
       padding-bottom: 30px !important;
+      select, input {
+        margin: 0;
+      }
 
       .well.well-small {
         font-size: 13px;
@@ -517,7 +536,19 @@ mapper-results-columns-configuration {
       }
     }
     .modal-footer {
-      padding-top: 10px !important;
+      padding-top: 10px;
+
+      &.expanded{
+        border-top: 1px solid #E0E0E0;
+        padding-top: 24px;
+      }
+
+      collapsible-panel-body{
+        padding-top: 24px;
+        mapper-results {
+          margin-bottom: 24px;
+        }
+      }
 
       .btn-map {
         margin-left: 10px;
@@ -539,5 +570,77 @@ mapper-results-columns-configuration {
   @media (min-width: 1300px) {
     width: 1260px !important;
     margin-left: -630px !important;
+  }
+}
+
+.object-controls {
+  @mixin controls-row {
+    display: flex;
+    margin: 16px 0px;
+    align-items: center;
+    >* {
+      margin-right: 16px;
+    }
+  }
+
+  &__container {
+    select {
+      background: $white;
+    }
+  }
+  &__filters {
+    padding-bottom: 24px;
+  }
+  &__mappings {
+    padding-top: 24px;
+    border-top: 1px solid #E0E0E0;
+  }
+  &__mappings-header {
+    margin-bottom: 24px;
+  }
+  &__filter-string {
+    font-size: 12px;
+    color: #969696;
+    padding-left: 20px;
+    font-style: italic;
+    display: block;
+  }
+  &__actions {
+    float: right;
+    button {
+      height: 24px;
+      padding: 0px 12px;
+      line-height: 12px;
+    }
+  }
+  &__relevant {
+    margin-bottom: 16px;
+    h6 {
+      display: inline;
+    }
+    span {
+      font-size: 13px;
+    }
+    >* {
+      margin-right: 8px;
+    }
+  }
+  &__template {
+    assessment-templates {
+      @include controls-row;
+      select {
+        width: 140px;
+      }
+    }
+  }
+  &__type {
+    @include controls-row;
+
+    select {
+      width: 200px;
+    }
+    .btn {
+      padding: 0px;
+    }
   }
 }

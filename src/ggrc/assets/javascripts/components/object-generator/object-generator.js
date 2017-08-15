@@ -39,9 +39,7 @@
         this.viewModel.attr('selected').replace([]);
         this.viewModel.attr('entries').replace([]);
 
-        this.setModel();
-
-        self.viewModel.afterShown();
+        self.viewModel.attr('submitCbs').fire();
       },
       closeModal: function () {
         this.viewModel.attr('is_saving', false);
@@ -71,19 +69,6 @@
           assessmentTemplate: assessmentTemplate,
           context: this
         });
-      },
-      setModel: function () {
-        var type = this.viewModel.attr('type');
-
-        this.viewModel.attr('model', this.viewModel.modelFromType(type));
-      },
-      '{viewModel} type': function () {
-        this.viewModel.attr('filter', '');
-        this.viewModel.attr('afterSearch', false);
-
-        this.setModel();
-
-        setTimeout(this.viewModel.onSubmit.bind(this.viewModel));
       },
       '{viewModel} assessmentTemplate': function (viewModel, ev, val, oldVal) {
         var type;

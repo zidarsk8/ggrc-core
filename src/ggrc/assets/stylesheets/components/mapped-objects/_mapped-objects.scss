@@ -55,6 +55,7 @@
     color: $middleText;
     padding: 0 16px 0 24px;
     position: relative;
+    font-size: 13px;
 
     .fa {
       position: absolute;
@@ -71,17 +72,16 @@
     width: 100%;
     padding: 0 8px 0 28px;
     box-sizing: border-box;
-
-    &.control-description {
-      position: relative;
-    }
   }
 
-  .more-information-button {
-    bottom: 0;
-    right: 0;
-    position: absolute;
-    line-height: 12px;
+  .more-information-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    height: 18px;
+
+    .more-information-button {
+      line-height: 12px;
+    }
   }
 
   .fa {

@@ -223,6 +223,7 @@ class CommonAssessment(Common):
   STATE = Base.STATE
   CREATORS = "Creators"
   CREATORS_ = "Creator(s)"
+  COMMENTS = "Comments"
   ASSIGNEES = "Assignees"
   ASSIGNEES_ = "Assignee(s)"
   VERIFIERS = "Verifiers"
@@ -252,7 +253,7 @@ class ObjectStates(object):
 
 class BaseStates(object):
   """Common states for Audit and Assessment objects."""
-  IN_PROGRESS = "In progress"
+  IN_PROGRESS = "In Progress"
   COMPLETED = "Completed"
 
 
@@ -429,3 +430,54 @@ class TransformationElements(TransformationSetVisibleFields, CommonAssessment):
   """All transformation elements' labels and properties witch are using to
   convert UI attributes to entities attributes.
   """
+
+
+class AssessmentTabContainer(object):
+  """Elements' labels for Assessment Tab Container"""
+  ASMT_ATTRS_TAB = 'Assessment Attributes'
+  ASMT_LOG_TAB = 'Assessment Log'
+  RELATED_ASMTS_TAB = 'Related Assessments'
+  RELATED_ISSUES_TAB = 'Related Issues'
+
+
+class AsmtAttrsTab(object):
+  """Common elements' labels of Assessment Attributes Tab on Assessment Info
+  Widget."""
+  TAB_NAME = AssessmentTabContainer.ASMT_ATTRS_TAB
+
+
+class AsmtLogTab(object):
+  """Common elements' labels of Assessment Log Tab on Assessment Info
+   Widget."""
+  TAB_NAME = AssessmentTabContainer.ASMT_LOG_TAB
+  FIELD = "Field"
+  ORIGINAL_VALUE = "Original value"
+  NEW_VALUE = "New value"
+  EMPTY_STATEMENT = u"\u2014"  # em-dash
+
+
+class RelatedAsmtsTab(object):
+  """Common elements' labels of Assessment Related Assessments Tab on
+  Assessment InfoWidget.
+  """
+  TAB_NAME = AssessmentTabContainer.RELATED_ASMTS_TAB
+  ASSESSMENT_TITLE = "Assessment Title"
+  RELATED_CONTROLS_OBJECTIVES = "Related Controls / Objectives"
+  AUDIT_TITLE = "Audit Title"
+
+
+class RelatedIssuesTab(object):
+  """Common elements' labels of Assessment Related Issues Tab on
+   Assessment InfoWidget.
+   """
+  TAB_NAME = AssessmentTabContainer.RELATED_ISSUES_TAB
+  TITLE = Common.TITLE
+  DESCRIPTION = Common.DESCRIPTION
+
+
+class UnifiedMapperModal(object):
+  """Class that represent ui of Unified Mapper"""
+  OPERATOR_AND = "AND"
+  OPERATOR_OR = "OR"
+  ATTRIBUTE_TITLE = Common.TITLE
+  COMPARE_OPERATOR_EQUALS = "="

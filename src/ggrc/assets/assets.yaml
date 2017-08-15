@@ -159,6 +159,7 @@ dashboard-js-files:
   - components/advanced-search/advanced-search-mapping-container.js
   - components/advanced-search/advanced-search-mapping-group.js
   - components/advanced-search/advanced-search-mapping-criteria.js
+  - components/advanced-search/advanced-search-wrapper.js
   - components/state-colors-map/state-colors-map.js
   - components/spinner/spinner.js
   - components/modal-connector.js
@@ -232,8 +233,6 @@ dashboard-js-files:
   - components/object-mapper/object-mapper.js
   - components/object-generator/object-generator.js
   - components/object-search/object-search.js
-  - components/unified-mapper/mapper-toolbar.js
-  - components/unified-mapper/mapper-filter.js
   - components/unified-mapper/mapper-results.js
   - components/unified-mapper/mapper-results-item.js
   - components/unified-mapper/mapper-results-item-status.js
@@ -320,10 +319,13 @@ dashboard-js-files:
   - components/object-list-item/editable-document-object-list-item.js
   - components/related-objects/related-documents.js
   - components/assessment/attach-button.js
+  - components/assessment/assessment-object-type-dropdown.js
+  - components/assessment/map-button-using-assessment-type.js
   - components/object-tasks/object-tasks.js
   - components/mapped-counter/mapped-counter.js
   - components/people/deletable-people-group.js
   - components/people/editable-people-group.js
+  - components/people/people-list-info.js
   - components/related-objects/related-people-mapping.js
   - components/related-objects/related-people-access-control.js
   - components/related-objects/related-people-access-control-group.js
@@ -336,6 +338,7 @@ dashboard-js-files:
   - components/inline/base-inline-control-title.js
   - components/assessment/info-pane/inline-item.js
   - components/assessment/info-pane/confirm-edit-action.js
+  - components/object-list-item/object-list-item-updater.js
 
 app-init-files:
   - apps/dashboard.js
@@ -494,8 +497,6 @@ dashboard-js-template-files:
   - components/object-mapper/object-mapper.mustache
   - components/object-generator/object-generator.mustache
   - components/object-search/object-search.mustache
-  - components/unified-mapper/mapper-toolbar.mustache
-  - components/unified-mapper/mapper-filter.mustache
   - components/unified-mapper/mapper-results.mustache
   - components/unified-mapper/mapper-results-item.mustache
   - components/unified-mapper/mapper-results-item-status.mustache
@@ -692,6 +693,7 @@ dashboard-js-template-files:
   - components/assessment/attach-button.mustache
   - components/people/deletable-people-group.mustache
   - components/people/editable-people-group.mustache
+  - components/people/people-list-info.mustache
   - components/custom-roles/custom-roles.mustache
   - components/custom-roles/custom-roles-modal.mustache
   - components/inline/inline.mustache

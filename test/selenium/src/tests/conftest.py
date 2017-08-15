@@ -7,24 +7,25 @@
 
 import pytest
 
-import lib.utils.help_utils
 from lib import dynamic_fixtures
 from lib.page import dashboard
-from lib.utils import selenium_utils
+from lib.utils import selenium_utils, help_utils
 
 # pylint: disable=redefined-outer-name
 pytest_plugins = "selenium", "xdist", "xvfb", "timeout", "flask", \
                  "rerunfailures", "timeout", "repeat", "pycharm"
 
 
-def _common_fixtures(fixturename):
+def _common_fixtures(fixture):
   """Generate common fixtures and return global dictionary of executed
   common fixtures.
   """
-  dynamic_fixtures.generate_common_fixtures(fixturename)
-  fixture = dynamic_fixtures.dict_executed_fixtures[fixturename]
-  return (lib.utils.help_utils.get_single_obj(fixture)
-          if not lib.utils.help_utils.is_multiple_objs(fixture) else fixture)
+  dynamic_fixtures.generate_common_fixtures(fixture)
+  if isinstance(fixture, tuple):
+    fixture, _ = fixture
+  fixture = dynamic_fixtures.dict_executed_fixtures[fixture]
+  return (help_utils.get_single_obj(fixture)
+          if not help_utils.is_multiple_objs(fixture) else fixture)
 
 
 @pytest.fixture(scope="function")
@@ -62,6 +63,16 @@ def chrome_options(chrome_options, create_tmp_dir):
            "download.prompt_for_download": False}
   chrome_options.add_experimental_option("prefs", prefs)
   return chrome_options
+
+
+@pytest.yield_fixture(scope="function")
+def dynamic_new_assessment_template(request):
+  """Dynamically create new Assessment Template under Audit object according
+  to fixturename. Fixturename is indirect parameter that get from
+  'request.param' and have to be string or boolean.
+  Return: lib.entities.entity.AssessmentTemplateEntity
+  """
+  yield _common_fixtures(request.param) if request.param else None
 
 
 @pytest.fixture(scope="function")
@@ -212,6 +223,13 @@ def map_new_program_rest_to_new_controls_rest(request):
   yield _common_fixtures(request.fixturename)
 
 
+@pytest.fixture(scope="function")
+def map_new_control_rest_to_new_programs_rest(request):
+  """Map Control to Programs objects via REST API return response from server.
+  """
+  yield _common_fixtures(request.fixturename)
+
+
 def _snapshots_fixtures(fixturename):
   """Generate snapshot fixtures used generation of common fixtures and return
   dictionary of executed common fixtures in scope of snapshot fixtures.
@@ -233,6 +251,15 @@ def dynamic_create_audit_with_control(request):
 
 @pytest.fixture(scope="function")
 def dynamic_object(request):
+  """Create object by passed indirect parameter that get from 'request.param'
+  and have to be string or boolean. Return singular or plural object's form
+  according to length of the list objects.
+  """
+  yield _common_fixtures(request.param) if request.param else None
+
+
+@pytest.fixture(scope="function")
+def dynamic_object_w_factory_params(request):
   """Create object by passed indirect parameter that get from 'request.param'
   and have to be string or boolean. Return singular or plural object's form
   according to length of the list objects.
@@ -272,3 +299,32 @@ def create_audit_with_control_and_delete_control(request):
   fixtures.
   """
   yield _snapshots_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
+def new_programs_rest(request):
+  """Create new Controls objects via REST API.
+  Return: [lib.entities.entity.ProgramEntity, ...]
+  """
+  yield _common_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
+def new_audits_rest(request):
+  """Create new Controls objects via REST API.
+  Return: [lib.entities.entity.AuditEntity, ...]
+  """
+  yield _common_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
+def new_assessments_rest(request):
+  """Create new Assessments objects via REST API.
+   Return: [lib.entities.entity.AssessmentEntity, ...]
+   """
+  yield _common_fixtures(request.fixturename)
+
+
+@pytest.fixture(scope="function")
+def map_new_control_rest_to_new_assessments_rest(request):
+  yield _common_fixtures(request.fixturename)

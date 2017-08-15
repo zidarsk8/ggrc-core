@@ -19,17 +19,23 @@
         {{/if_in}}
       {{/if}}
 
-      <!--<div class="editable-form-row">
-        <div class="editable-form-short-input">
-          <label><span style="color: red">TODO:</span> ASSESSMENT TYPE</label>
-          <dropdown options-list="model.conclusions"
-                    no-value="true"
-                    no-value-label="---"
-                    name="instance.design"
-                    tabindex="1">
-          </dropdown>
+      <div class="ggrc-form-item">
+        <div class="ggrc-form-item__multiple-row">
+          <label class="form-label required-label">
+            Assessment Type
+            <i class="fa fa-asterisk"></i>
+          </label>
+          <assessment-object-type-dropdown
+            {instance}="instance"
+            {(assessment-type)}="instance.assessment_type">
+            <dropdown
+              {options-groups}="objectTypes"
+              is-grouped-dropdown="true"
+              name="assessmentType">
+            </dropdown>
+          </assessment-object-type-dropdown>
         </div>
-      </div>-->
+      </div>
       <div class="ggrc-form-item">
         <div class="ggrc-form-item__row {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">
           <label class="form-label required-label ggrc-form-item__label">
@@ -110,6 +116,7 @@
                   instance="instance"
                   mapping="related_objects_as_source"
                   from-binding="true"
+                  {type}="instance.assessment_type"
                   deferred="true">
             <label class="ggrc-form-item__label">
               Mapped Objects
@@ -119,11 +126,15 @@
                 {{#each list}}
                   <div class="modal-mapped-objects-item">
                     <div class="modal-mapped-objects-item__details">
-                      <business-object-list-item {instance}="{.}">
-                        <div class="description">
-                          <read-more {text}="itemData.description" max-lines-number="1"></read-more>
-                        </div>
-                      </business-object-list-item>
+                      <object-list-item-updater {target-instance}="{.}">
+                        {{#if instanceUpdated}}
+                          <business-object-list-item {instance}="instance">
+                            <div class="description">
+                              <read-more {text}="itemData.description" max-lines-number="1"></read-more>
+                            </div>
+                          </business-object-list-item>
+                        {{/if}}
+                      </object-list-item-updater>
                     </div>
                     <div class="modal-mapped-objects-item__unmap">
                       {{^is type 'Audit'}}
@@ -142,42 +153,46 @@
                 </span>
               {{/list.length}}
             </div>
-              <div class="objective-selector">
-                {{#if instance.audit}}
-                  <a class="section-add section-sticky btn btn-small btn-white"
-                    href="javascript://"
-                    tabindex="8"
-                    rel="tooltip"
-                    {{data "deferred_to"}}
-                    data-placement="left"
-                    data-toggle="unified-mapper"
-                    data-deferred="true"
-                    data-object-source="true"
-                    data-is-new="{{instance.isNew}}"
-                    data-join-object-id="{{instance.id}}"
-                    data-join-object-type="{{instance.class.model_singular}}"
-                    data-original-title="Map Object to this {{instance.class.title_singular}}"
-                    data-snapshot-scope-id="{{instance.audit.id}}"
-                    data-snapshot-scope-type="{{instance.audit.type}}">
-                    Map Objects
-                  </a>
-                {{else}}
-                  <a class="section-add section-sticky btn btn-small btn-white"
-                    href="javascript://" rel="tooltip"
-                    tabindex="8"
-                    {{data "deferred_to"}}
-                    data-placement="left"
-                    data-toggle="unified-mapper"
-                    data-deferred="true"
-                    data-object-source="true"
-                    data-is-new="{{instance.isNew}}"
-                    data-join-object-id="{{instance.id}}"
-                    data-join-object-type="{{instance.class.model_singular}}"
-                    data-original-title="Map Object to this {{instance.class.title_singular}}">
-                    Map Objects
-                  </a>
-                {{/if}}
-              </div>
+            <div class="objective-selector">
+               <map-button-using-assessment-type
+                {{data "deferred_to"}}
+                {instance}="instance"
+                {assessment-type}="instance.assessment_type">
+                  {{#if instance.audit}}
+                    <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
+                      href="javascript://"
+                      rel="tooltip"
+                      data-placement="left"
+                      data-deferred="true"
+                      data-object-source="true"
+                      data-is-new="{{instance.isNew}}"
+                      data-join-object-id="{{instance.id}}"
+                      data-join-object-type="{{instance.class.model_singular}}"
+                      data-original-title="Map Object to this {{instance.class.title_singular}}"
+                      tabindex="8"
+                      data-snapshot-scope-id="{{instance.audit.id}}"
+                      data-snapshot-scope-type="{{instance.audit.type}}"
+                    >
+                      Map Objects
+                    </a>
+                  {{else}}
+                    <a class="section-add section-sticky btn btn-small btn-white assessment-map-btn"
+                      href="javascript://"
+                      rel="tooltip"
+                      data-placement="left"
+                      data-deferred="true"
+                      data-object-source="true"
+                      data-is-new="{{instance.isNew}}"
+                      data-join-object-id="{{instance.id}}"
+                      data-join-object-type="{{instance.class.model_singular}}"
+                      data-original-title="Map Object to this {{instance.class.title_singular}}"
+                      tabindex="8"
+                    >
+                      Map Objects
+                    </a>
+                  {{/if}}
+              </map-button-using-assessment-type>
+            </div>
           </ggrc-modal-connector>
         </div>
       </div>

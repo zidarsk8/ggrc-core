@@ -168,8 +168,7 @@ class TreeView(base.TreeView):
     _locator_3bbs = (
         By.CSS_SELECTOR, self._locators.BUTTON_3BBS.format(self.widget_name))
     base.Button(self._driver, _locator_3bbs).click()
-    return self.dropdown_settings_cls(
-        self._driver, self.obj_name)
+    return self.dropdown_settings_cls(self._driver, self.obj_name)
 
   def select_member_by_title(self, title):
     """Select member on Tree View by title.
@@ -198,8 +197,10 @@ class TreeView(base.TreeView):
     selenium_utils.hover_over_element(
         self._driver, item_dropdown_button)
     item_dropdown_button.click()
+    dropdown_menu_element = item_dropdown_button.find_element(
+        *self._locators.ITEM_DROPDOWN_MENU_CSS)
     return self.dropdown_tree_view_item_cls(self._driver, self.obj_name,
-                                            item_dropdown_button)
+                                            dropdown_menu_element)
 
 
 class Audits(Widget):

@@ -15,6 +15,7 @@
     create: 'POST /api/task_groups',
     update: 'PUT /api/task_groups/{id}',
     destroy: 'DELETE /api/task_groups/{id}',
+    mixins: ['contactable'],
     permalink_options: {
       url: '<%= base.viewLink %>#task_group_widget/' +
       'task_group/<%= instance.id %>',
@@ -87,7 +88,7 @@
     update: 'PUT /api/task_group_tasks/{id}',
     destroy: 'DELETE /api/task_group_tasks/{id}',
 
-    mixins: ['timeboxed'],
+    mixins: ['contactable', 'timeboxed'],
     permalink_options: {
       url: '<%= base.viewLink %>#task_group_widget/' +
       'task_group/<%= instance.task_group.id %>',

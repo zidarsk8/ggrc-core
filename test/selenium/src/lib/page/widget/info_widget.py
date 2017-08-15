@@ -5,7 +5,8 @@
 
 from lib import base
 from lib.constants import locator, objects, element, roles
-from lib.element import widget_info
+from lib.constants.locator import WidgetInfoAssessment
+from lib.element import widget_info, tab_containers
 from lib.page.modal import update_object
 from lib.utils import selenium_utils
 
@@ -252,6 +253,10 @@ class Assessments(InfoPanel):
 
   def __init__(self, driver):
     super(Assessments, self).__init__(driver)
+    self.workflow_container = tab_containers.AssessmentTabContainer(
+        self._driver,
+        self._driver.find_element(*self._locators.ASMT_TAB_CONTAINER_CSS))
+    self.workflow_container.switch_to_default_tab()
     self.code_section = base.Label(
         self._driver, self._locators.CODE_CSS)
     # mapped objects
@@ -280,6 +285,9 @@ class Assessments(InfoPanel):
         self.get_header_and_value_text_from_custom_scopes(
             self._elements.VERIFIERS_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
+    self.verified = (
+        selenium_utils.is_element_exist(self._driver,
+                                        self._locators.ICON_VERIFIED))
     # code section
     self.code_text = (
         self.code_section.element.find_element(
@@ -301,11 +309,19 @@ class Assessments(InfoPanel):
     self.list_all_values_text = [
         self.cas_text, self.title_entered().text,
         objects.get_normal_form(self.state().text),
-        self.state().text.upper() in
-        element.AssessmentStates.COMPLETED.upper(),
+        self.verified,
         self.creators_entered_text, self.assignees_entered_text,
         self.verifiers_entered_text, self.mapped_objects_titles_text,
         self.code_entered_text, self.comments.scopes]
+
+  def click_complete(self):
+    base.Button(self._driver, WidgetInfoAssessment.BUTTON_COMPLETE).click()
+
+  def click_verify(self):
+    base.Button(self._driver, WidgetInfoAssessment.BUTTON_VERIFY).click()
+
+  def click_reject(self):
+    base.Button(self._driver, WidgetInfoAssessment.BUTTON_REJECT).click()
 
 
 class AssessmentTemplates(InfoPanel):

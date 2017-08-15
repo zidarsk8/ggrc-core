@@ -266,7 +266,7 @@ class BaseWebUiService(object):
     dropdown_on_info_panel = (
         self.open_info_panel_of_obj_by_title(src_obj, obj).open_info_3bbs())
     element_to_verify = element.DropdownMenuItemTypes.EDIT
-    return dropdown_on_info_panel.is_item_exists(element_to_verify)
+    return dropdown_on_info_panel.is_item_exist(element_to_verify)
 
   def is_obj_unmappable_via_info_panel(self, src_obj, obj):
     """""Open generic widget of mapped objects, select object from Tree View
@@ -276,7 +276,7 @@ class BaseWebUiService(object):
     dropdown_on_info_panel = (
         self.open_info_panel_of_obj_by_title(src_obj, obj).open_info_3bbs())
     element_to_verify = element.DropdownMenuItemTypes.UNMAP
-    return dropdown_on_info_panel.is_item_exists(element_to_verify)
+    return dropdown_on_info_panel.is_item_exist(element_to_verify)
 
   def is_obj_page_exist_via_info_panel(self, src_obj, obj):
     """Open generic widget of mapped objects, select object from Tree View
@@ -307,7 +307,7 @@ class BaseWebUiService(object):
                                   open_tree_actions_dropdown_by_title
                                   (title=obj.title))
     element_to_verify = element.DropdownMenuItemTypes.MAP
-    return dropdown_on_tree_view_item.is_item_exists(element_to_verify)
+    return dropdown_on_tree_view_item.is_item_exist(element_to_verify)
 
   def map_objs_via_tree_view_item(self, src_obj, dest_objs):
     """Open generic widget of mapped objects, open unified mapper modal from
@@ -444,13 +444,83 @@ class AssessmentsService(BaseWebUiService):
     and if 'asmt_tmpl_obj' then to Assessment Template title, generate
     new Assessment(s).
     """
-    objs_under_asmt_titles = [obj_under.title for obj_under in
-                              objs_under_asmt]
+    objs_under_asmt_titles = [obj_under.title for obj_under in objs_under_asmt]
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     asmt_tmpl_title = asmt_tmpl_obj.title if asmt_tmpl_obj else None
     (objs_widget.tree_view.open_3bbs().select_generate().
      generate_asmts(asmt_tmpl_title=asmt_tmpl_title,
                     objs_under_asmt_titles=objs_under_asmt_titles))
+
+  def edit_obj_via_edit_modal_from_info_page(self, src_obj):
+    """Open generic widget of object, open edit modal from drop down menu.
+    Modify current title and code and then apply changes by pressing
+    'save and close' button
+    """
+    # pylint: disable=invalid-name
+    src_obj_info_page = self.open_info_page_of_obj(src_obj)
+    (src_obj_info_page.open_info_3bbs().select_edit().
+     edit_minimal_data(title="[EDITED]" + src_obj.title).save_and_close())
+    return self.info_widget_cls(self.driver)
+
+  def get_log_pane_validation_result(self, obj):
+    """Open assessment Info Page. Open Log Pane on Assessment Info Page.
+    And return result of validation of all items.
+    """
+    asmt_page = self.open_info_page_of_obj(obj)
+    return asmt_page.workflow_container.get_tab_object(
+        element.AssessmentTabContainer.ASMT_LOG_TAB)
+
+  def get_related_asmts_titles(self, obj):
+    """Open assessment Info Page. Open Related Assessments Tab on Assessment
+    Info Page. And return list of related Assessments Titles.
+    """
+    asmt_page = self.open_info_page_of_obj(obj=obj)
+    related_asmts_tab = asmt_page.workflow_container.get_tab_object(
+        element.AssessmentTabContainer.RELATED_ASMTS_TAB)
+    return related_asmts_tab.get_related_titles()
+
+  def get_related_issues_titles(self, obj):
+    """Open assessment Info Page. Open Open Related Issues Tab on Assessment
+    Info Page. And return list of related Issues Titles.
+    """
+    asmt_page = self.open_info_page_of_obj(obj=obj)
+    related_issues_tab = asmt_page.workflow_container.get_tab_object(
+        element.AssessmentTabContainer.RELATED_ISSUES_TAB)
+    return [issue[element.RelatedIssuesTab.TITLE.upper()]
+            for issue in related_issues_tab.get_items()]
+
+  def raise_issue(self, src_obj, issue_obj):
+    """Open assessment Info Page by 'src_obj'. Open Related Issues Tab on
+    Assessment Info Page and raise Issue.
+    """
+    asmt_page = self.open_info_page_of_obj(obj=src_obj)
+    related_issues_tab = asmt_page.workflow_container.get_tab_object(
+        element.AssessmentTabContainer.RELATED_ISSUES_TAB)
+    related_issues_tab.raise_issue(issue_entity=issue_obj)
+
+  def complete_assessment(self, obj):
+    """Navigate to info page of object according to URL of object then find and
+    click 'Complete' button then return info page of object in new state"""
+    self.open_info_page_of_obj(obj).click_complete()
+    return self.info_widget_cls(self.driver)
+
+  def verify_assessment(self, obj):
+    """Navigate to info page of object according to URL of object then find and
+    click 'Verify' button then return info page of object in new state"""
+    from lib.constants.locator import ObjectWidget
+    from lib.constants.locator import WidgetInfoAssessment
+    self.open_info_page_of_obj(obj).click_verify()
+    for locator in [ObjectWidget.HEADER_STATE_VERIFIED,
+                    ObjectWidget.HEADER_STATE_COMPLETED,
+                    WidgetInfoAssessment.ICON_VERIFIED]:
+      selenium_utils.wait_until_element_visible(self.driver, locator)
+    return self.info_widget_cls(self.driver)
+
+  def reject_assessment(self, obj):
+    """Navigate to info page of object according to URL of object then find and
+    click 'Reject' button then return info page of object in new state"""
+    self.open_info_page_of_obj(obj).click_reject()
+    return self.info_widget_cls(self.driver)
 
 
 class ControlsService(SnapshotsWebUiService):

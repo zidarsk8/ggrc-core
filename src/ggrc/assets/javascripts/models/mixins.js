@@ -128,6 +128,40 @@
     }
   });
 
+  can.Model.Mixin('contactable', {
+    // NB : Because the attributes object
+    //  isn't automatically cloned into subclasses by CanJS (this is an intentional
+    //  exception), when subclassing a class that uses this mixin, be sure to pull in the
+    //  parent class's attributes using `can.extend(this.attributes, <parent_class>.attributes);`
+    //  in the child class's static init function.
+    'extend:attributes': {
+      contact: 'CMS.Models.Person.stub',
+      secondary_contact: 'CMS.Models.Person.stub'
+    }
+  }, {
+    before_create: function () {
+      var person = {
+        id: GGRC.current_user.id,
+        type: 'Person'
+      };
+      if (!this.contact) {
+        this.attr('contact', person);
+      }
+    },
+    form_preload: function (newObjectForm) {
+      var person = {
+        id: GGRC.current_user.id,
+        type: 'Person'
+      };
+      if (newObjectForm && !this.contact) {
+        this.attr('contact', person);
+        this.attr('_transient.contact', person);
+      } else if (this.contact) {
+        this.attr('_transient.contact', this.contact);
+      }
+    }
+  });
+
   can.Model.Mixin('accessControlList', {
     'after:init': function () {
       if (!this.access_control_list) {
@@ -305,6 +339,24 @@
         return false;
       }
       return isOverdue;
+    }
+  });
+
+  /**
+   * A mixin to generate hash with refetch param.
+   */
+  can.Model.Mixin('refetchHash', {
+    getHashFragment: function () {
+      var widgetName = this.constructor.table_singular;
+      if (window.location.hash
+          .startsWith(['#', widgetName, '_widget'].join(''))) {
+        return;
+      }
+
+      return [widgetName,
+              '_widget/',
+              this.hash_fragment(),
+              '&refetch'].join('');
     }
   });
 })(window.can, window.GGRC);
