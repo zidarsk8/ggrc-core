@@ -456,6 +456,8 @@ def start_end_date_validator(tgt):
 def calculate_new_next_cycle_start_date(workflow):
   if not workflow.unit or not workflow.repeat_every:
     return
+  if workflow.status != workflow.ACTIVE:
+    return
   today = date.today()
   min_task_start_date = workflow.min_task_start_date
   workflow.repeat_multiplier = 0
