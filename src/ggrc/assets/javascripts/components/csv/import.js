@@ -3,8 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function(can, $, utils) {
-
+(function (can, $, utils) {
   GGRC.Components('csvImportWidget', {
     tag: "csv-import",
     template: "<content></content>",
@@ -29,8 +28,8 @@
                 text: "Analyzing"
               },
               import: {
-                'class': "btn-darkBlue",
-                text: "Import data",
+                'class': "btn-green",
+                text: "Import",
                 isDisabled: function () {
                   var toImport = this.import;  // info on blocks to import
                   var nonEmptyBlockExists;
