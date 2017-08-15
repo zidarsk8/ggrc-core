@@ -33,6 +33,11 @@ class BaseModal(base.Modal):
     self.enter_code(code)
     return self.__class__(self._driver)
 
+  def edit_minimal_data(self, title):
+    """Edit title of current modal."""
+    self.enter_title(title)
+    return self.__class__(self._driver)
+
 
 class ProgramsModal(BaseModal):
   """Modal base for Program objects."""

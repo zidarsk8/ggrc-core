@@ -108,7 +108,7 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
       }
     }
   },
-  display: function () {
+  display: function (refetch) {
     var that = this;
     var tracker_stop = GGRC.Tracker.start(
       'DashboardWidget', 'display', this.options.model.shortName
@@ -124,7 +124,7 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
       if (!that.content_controller && $containerVM.needToRefresh()) {
         dfd = $containerVM.display(FORCE_REFRESH);
       } else if (that.options.widgetType === 'treeview') {
-        dfd = $containerVM.display();
+        dfd = $containerVM.display(refetch);
       } else if (that.content_controller && that.content_controller.display) {
         dfd = that.content_controller.display();
       } else {
@@ -142,7 +142,7 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
   display_path: function (path, refetch) {
     var that = this;
     if (!that.content_controller) {
-      return this.display();
+      return this.display(refetch);
     }
     return this.display().then(function () {
       if (that.content_controller && that.content_controller.display_path)

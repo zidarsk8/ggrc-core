@@ -26,7 +26,8 @@
           relevantTo: [{
             readOnly: true,
             type: instance.type,
-            id: instance.id
+            id: instance.id,
+            title: instance.title
           }],
           callback: this.generateAssessments.bind(this)
         });
@@ -79,7 +80,7 @@
         que.enqueue(list).trigger().then(function (items) {
           var results = _.map(items, function (item) {
             var id = options.assessmentTemplate.split('-')[0];
-            return this.generateModel(item, id);
+            return this.generateModel(item, id, options.type);
           }.bind(this));
           this._results = results;
           $.when.apply($, results)
@@ -100,7 +101,7 @@
             }.bind(this));
         }.bind(this));
       },
-      generateModel: function (object, template) {
+      generateModel: function (object, template, type) {
         var assessmentTemplate = CMS.Models.AssessmentTemplate.findInCacheById(
           template);
         var title = 'Generated Assessment for ' + this.scope.audit.title;
@@ -115,7 +116,8 @@
           },
           context: this.scope.audit.context,
           template: assessmentTemplate && assessmentTemplate.stub(),
-          title: title
+          title: title,
+          assessment_type: type
         };
         data.run_in_background = true;
         return new CMS.Models.Assessment(data).save();

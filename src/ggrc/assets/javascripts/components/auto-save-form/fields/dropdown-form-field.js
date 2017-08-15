@@ -13,6 +13,12 @@
     ),
     viewModel: {
       define: {
+        isNoneSelected: {
+          get: function () {
+            return this.attr('value') === null &&
+              this.attr('disabled');
+          }
+        },
         _value: {
           type: 'string',
           set: function (newValue, setValue, onError, oldValue) {
@@ -35,6 +41,9 @@
         }
       },
       options: [],
+      isGroupedDropdown: false,
+      dropdownOptionsGroups: {},
+      noValue: true,
       valueChanged: function (newValue) {
         this.dispatch({
           type: 'valueChanged',

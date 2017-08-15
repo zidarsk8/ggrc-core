@@ -58,6 +58,7 @@
     destroy: 'DELETE /api/audits/{id}',
     create: 'POST /api/audits',
     mixins: [
+      'contactable',
       'unique_title',
       'ca_update',
       'timeboxed',
@@ -317,7 +318,8 @@
     table_plural: 'assessment_templates',
     mixins: [
       'mapping-limit',
-      'inScopeObjects'
+      'inScopeObjects',
+      'refetchHash'
     ],
     findOne: 'GET /api/assessment_templates/{id}',
     findAll: 'GET /api/assessment_templates',
@@ -379,18 +381,6 @@
       );
     }
   }, {
-    // the object types that are not relevant to the AssessmentTemplate,
-    // i.e. it does not really make sense to assess them
-    _NON_RELEVANT_OBJ_TYPES: Object.freeze({
-      AssessmentTemplate: true,
-      Assessment: true,
-      Audit: true,
-      CycleTaskGroupObjectTask: true,
-      TaskGroup: true,
-      TaskGroupTask: true,
-      Workflow: true
-    }),
-
     /**
      * An event handler when the add/edit form is about to be displayed.
      *
@@ -406,9 +396,6 @@
     form_preload: function (isNewObject) {
       if (!this.custom_attribute_definitions) {
         this.attr('custom_attribute_definitions', new can.List());
-      }
-      if (!this.attr('_objectTypes')) {
-        this.attr('_objectTypes', this._choosableObjectTypes());
       }
       this._unpackPeopleData();
 
@@ -426,10 +413,6 @@
       this.attr('default_people', this._packPeopleData());
 
       return this._super.apply(this, arguments);
-    },
-
-    before_save: function () {
-      this.attr('_objectTypes', undefined);
     },
 
     after_save: function () {
@@ -585,45 +568,6 @@
       });
     },
 
-    /**
-     * Return the object types that can be assessed.
-     *
-     * Used to populate the "Objects under assessment" dropdown on the modal
-     * AssessmentTemplate's modal form.
-     *
-     * @return {Object} - the "assessable" object types
-     */
-    _choosableObjectTypes: function () {
-      var ignoreTypes = this._NON_RELEVANT_OBJ_TYPES;
-      var objectTypes = GGRC.Mappings.getMappingTypes('AssessmentTemplate');
-      // remove ignored types and sort the rest
-      _.each(objectTypes, function (objGroup) {
-        objGroup.items = _.filter(objGroup.items, function (item) {
-          return !ignoreTypes[item.value];
-        });
-        objGroup.items = _.sortBy(objGroup.items, 'name');
-      });
-
-      // remove the groups that have ended up being empty
-      objectTypes = _.pick(objectTypes, function (objGroup) {
-        return objGroup.items && objGroup.items.length > 0;
-      });
-
-      return objectTypes;
-    },
-
-    getHashFragment: function () {
-      var widgetName = this.constructor.table_singular;
-      if (window.location.hash
-          .startsWith(['#', widgetName, '_widget'].join(''))) {
-        return;
-      }
-
-      return [widgetName,
-              '_widget/',
-              this.hash_fragment(),
-              '&refetch'].join('');
-    },
     ignore_ca_errors: true
   });
 })(window.can, window.CMS);

@@ -4,11 +4,12 @@
 
 from lib import base
 from lib.constants import locator, element
+from lib.element import elements_list
 from lib.page.modal import (delete_object, edit_object, update_object,
                             clone_object)
 
 
-class CommonInfoDropdownSettings(base.DropdownMenu):
+class CommonInfoDropdownSettings(elements_list.DropdownMenu):
   """Common for 3BBS button/dropdown settings on Info pages and Info panels.
   """
   _locators = locator.CommonDropdown3bbsInfoWidget
@@ -17,6 +18,8 @@ class CommonInfoDropdownSettings(base.DropdownMenu):
   def __init__(self, driver):
     super(CommonInfoDropdownSettings, self).__init__(
         driver, self._locators.INFO_3BBS_DROPDOWN)
+    self.dropdown_button = base.Button(
+        self._driver, self._locators.INFO_3BBS_DROPDOWN_BUTTON)
 
   def select_open(self):
     """Select open button in 3BBS dropdown modal."""

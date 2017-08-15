@@ -7,12 +7,13 @@ from selenium.webdriver.common.by import By
 
 from lib import base
 from lib.constants import locator, url
+from lib.element import elements_list
 from lib.page.modal import unified_mapper
 from lib.page import export_page
 from lib.utils import selenium_utils
 
 
-class CommonDropdownSettings(base.DropdownMenu):
+class CommonDropdownSettings(elements_list.DropdownMenu):
   """Common for 3BBS button/dropdown settings on Tree View."""
   _locators = locator.CommonDropdown3bbsTreeView
 

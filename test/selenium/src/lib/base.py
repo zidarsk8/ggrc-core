@@ -2,17 +2,21 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Base classes."""
 # pylint: disable=too-few-public-methods
+# pylint: disable=too-many-lines
 
 import re
+import pytest
+
 from selenium import webdriver
 from selenium.webdriver.common import keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote import webelement
 
 from lib import constants, exception, mixin
-from lib.constants import url
+from lib.constants import url, messages
 from lib.constants.element import MappingStatusAttrs
 from lib.constants.locator import CommonDropdownMenu
+from lib.entities.entity import Entity
 from lib.utils import selenium_utils
 
 
@@ -43,6 +47,53 @@ class CustomDriver(webdriver.Chrome):
 
 class Test(InstanceRepresentation):
   __metaclass__ = mixin.MetaTestDecorator
+
+  @staticmethod
+  def extended_assert(expected_objs, actual_objs, issue_msg, *exclude_attrs):
+    """Perform extended assert for expected and actual objects according to
+    dictionary of attributes to exclude and providing issue's message.
+    Initially, based on original objects prepare expected and actual
+    collections to performing of extended comparison procedure ('split_objs'),
+    where:
+    'exp_objs_wo_ex_attrs', 'act_objs_wo_ex_attrs' - list objects w/o excluding
+    attributes;
+    'exp_ex_attrs', 'act_ex_attrs' - list dictionaries w/ excluding attributes
+    (items which contain attributes' names and values);
+    'issue_msg' - issue message for pytest xfail procedure;
+    'exclude_attrs' - list of excluding attributes names.
+    Finally, make pytest assert for objects, then xfail assert for attributes.
+    """
+    split_objs = (
+        Test.extended_assert_w_excluded_attrs(
+            expected_objs, actual_objs, *exclude_attrs))
+    assert (True if Entity.is_list_of_attrs_equal(
+        split_objs["exp_ex_attrs"], split_objs["act_ex_attrs"])
+        else pytest.xfail(reason=issue_msg))
+
+  @staticmethod
+  def extended_assert_w_excluded_attrs(expected_objs, actual_objs,
+                                       *exclude_attrs):
+    """Perform extended assert for expected and actual objects according to
+    dictionary of attributes to exclude and providing issue's message.
+    Initially, based on original objects prepare expected and actual
+    collections to performing of extended comparison procedure ('split_objs'),
+    where:
+    'exp_objs_wo_ex_attrs', 'act_objs_wo_ex_attrs' - list objects w/o excluding
+    attributes;
+    'exp_ex_attrs', 'act_ex_attrs' - list dictionaries w/ excluding attributes
+    (items which contain attributes' names and values);
+    'issue_msg' - issue message for pytest xfail procedure;
+    'exclude_attrs' - list of excluding attributes names.
+    """
+    # pylint: disable=invalid-name
+    split_objs = Entity.extract_excluding_attrs(
+        expected_objs, actual_objs, *exclude_attrs)
+    assert (split_objs["exp_objs_wo_ex_attrs"] ==
+            split_objs["act_objs_wo_ex_attrs"]), (
+        messages.AssertionMessages.format_err_msg_equal(
+            split_objs["exp_objs_wo_ex_attrs"],
+            split_objs["act_objs_wo_ex_attrs"]))
+    return split_objs
 
 
 class TestUtil(InstanceRepresentation):
@@ -92,8 +143,8 @@ class Label(Element):
   """Generic label."""
 
 
-class RichTextInputField(Element):
-  """Common class for representation of Rich Text input."""
+class TextInputField(Element):
+  """Common class for representation of Text input."""
 
   def enter_text(self, text):
     """Clear text from element and enter new text."""
@@ -116,8 +167,8 @@ class RichTextInputField(Element):
     self.text = element.get_attribute("value")
 
 
-class TextInputField(RichTextInputField):
-  """Generic model for text input field."""
+class RichTextInputField(TextInputField):
+  """Generic model for rich text input field."""
 
 
 class Iframe(Element):
@@ -252,16 +303,25 @@ class DropdownStatic(Element):
   """Dropdown with predefined static elements."""
 
   def find_options(self):
+    """Find all options of dropdown by options locator"""
     return self.element.find_elements(*CommonDropdownMenu.DROPDOWN_OPTIONS)
 
   def select(self, member_name):
-    """Selects dropdown element based on dropdown element name."""
+    """Selects dropdown element based on dropdown element value."""
+    self._select_by("value", member_name)
+
+  def select_by_label(self, label):
+    """Selects dropdown element based on dropdown element label."""
+    self._select_by("label", label)
+
+  def _select_by(self, by_attr, val):
+    """Selects dropdown element based on dropdown attr"""
     for element in self.find_options():
-      if element.get_attribute("value") == member_name:
+      if element.get_attribute(by_attr) == val:
         element.click()
         break
     else:
-      exception.ElementNotFound(member_name)
+      exception.ElementNotFound(val)
 
 
 class Component(InstanceRepresentation):
@@ -453,9 +513,6 @@ class MultiInputField(Element):
 class MultiInputItem(Element):
   """Representing single item in multi input field."""
   _locators = constants.locator.MultiInputItem
-
-  def __init__(self, driver, loc_or_el):
-    super(MultiInputItem, self).__init__(driver, loc_or_el)
 
   @property
   def link(self):
@@ -814,54 +871,65 @@ class ListCheckboxes(Component):
     return objs
 
 
-class DropdownMenu(Component):
-  """Class for common DropdownMenu Element"""
-  _locators = constants.locator.CommonDropdownMenu
+class ElementsList(Component):
+  """List represent of list of DOM ui elements. 'list_element' is items
+  container in DOM it equal to 'ul'.
+  """
 
   def __init__(self, driver, element_or_locator):
-    super(DropdownMenu, self).__init__(driver)
+    super(ElementsList, self).__init__(driver)
     self._driver = driver
-    self.dropdown_element = self._get_dropdown_element(element_or_locator)
-    self._dropdown_items = []
+    self.list_element = self._get_list_element(element_or_locator)
+    self._items = []
+    self._item_class = None
+    self.item_class = Element
 
-  def _get_dropdown_element(self, el_or_loc):
-    """Return  DropdownMenu element if element not defined find it by
-    locator"""
-    element = (el_or_loc if isinstance(
-               el_or_loc, webdriver.remote.webelement.WebElement)
-               else selenium_utils.get_when_visible(self._driver, el_or_loc))
-    return (element if element.tag_name == self._locators.DROPDOWN_MAIN_CSS[1]
-            else element.find_element(*self._locators.DROPDOWN_MAIN_CSS))
+  @property
+  def item_class(self):
+    """Getter for class of Items"""
+    return self._item_class
 
-  def dropdown_items(self):
-    """Return list of DropdownMenu Items defined  by "li" tag"""
-    if not self._dropdown_items:
-      elements_on_dropdown = selenium_utils.get_when_all_visible(
-          self.dropdown_element,
-          self._locators.DROPDOWN_ITEMS_CSS)
-      self._dropdown_items = [DropdownMenuItem(self._driver, el) for el in
-                              elements_on_dropdown]
-    return self._dropdown_items
+  @item_class.setter
+  def item_class(self, element_class):
+    """Setter for class of Items"""
+    self._item_class = element_class
 
-  def get_dropdown_item(self, out_item_type):
-    """Return DropdownItem element according to type"""
-    return next(elem_val for elem_val in self.dropdown_items()
-                if out_item_type in elem_val.item_type)
-
-  def is_item_exists(self, out_item_type):
-    """Check if element enable on dropdown and return Bool, by comparing
-    icon type.
-    Return bool
+  def _get_list_element(self, element_or_locactor):
+    """Find element by locator or do nothing if passed var is 'WebElement'.
+    Then check tag of element and if it is not 'ul' raise Error
     """
-    return any(elem_val.item_type for elem_val in self.dropdown_items()
-               if out_item_type in elem_val.item_type)
+    element = (element_or_locactor if isinstance(
+               element_or_locactor, webdriver.remote.webelement.WebElement)
+               else selenium_utils.get_when_visible(self._driver,
+                                                    element_or_locactor))
+    if element.tag_name != 'ul':
+      raise ValueError("WebElement is {}. Pass 'ul' element".format(
+          element.tag_name))
+    return element
 
-  def is_item_enabled(self, out_item_type):
-    """Check if element enable on dropdown.
-    Return bool if element found
-    If element not found raise exception
+  def get_items(self):
+    """Return list of items object. Class of item selected according to
+    "self.item_class" property.
     """
-    return self.get_dropdown_item(out_item_type).enabled
+    if not self._items:
+      items_elements = selenium_utils.get_nested_elements(
+          self.list_element)
+      self._items = [self.item_class(self._driver, el) for el in
+                     items_elements]
+    return self._items
+
+  def get_item(self, text):
+    """Return item from list of items by element text"""
+    return next(elem_val for elem_val in self.get_items() if
+                text in elem_val.text)
+
+  def is_item_exist(self, condition_property):
+    """Check if item exists in item list return Boolean True, by comparing
+    texts.
+    Return boolean True if element exists.
+    """
+    return any(elem_val.text for elem_val in self.get_items()
+               if condition_property in elem_val.text)
 
 
 class DropdownMenuItem(Element):
@@ -894,3 +962,60 @@ class DropdownMenuItem(Element):
     if not self._enabled:
       self._enabled = selenium_utils.is_element_enabled(self.element)
     return self._enabled
+
+
+class AbstractTabContainer(Component):
+  """Abstract class for TabContainer. You should define "_get_locators" and
+  "_tabs" methods in the child classes
+  """
+  def __init__(self, driver, container_element):
+    super(AbstractTabContainer, self).__init__(driver)
+    self.container_element = container_element
+    self._locators = self._get_locators()
+    from lib.element.elements_list import TabController
+    self._tab_controller = TabController(
+        self._driver, self._locators.TAB_CONTROLLER)
+    self.tabs = self._tabs()
+
+  def _get_locators(self):
+    """Abstract method. Should return locators class."""
+    raise NotImplementedError
+
+  def _get_active_tab_element(self):
+    """Return element of active tab"""
+    return self.container_element.find_element(*self._locators.TAB_CONTENT)
+
+  def get_tab_object(self, tab_name):
+    """Switch to tab, then return object of this tab, for example:
+    Page Object or any
+    """
+    self._tab_controller.active_tab = tab_name
+    return self.tabs[tab_name](
+        self._driver, self._get_active_tab_element())
+
+  def _tabs(self):
+    """Abstract method. Should return dict. {'tab_name': tab_object, ...}"""
+    raise NotImplementedError
+
+
+class AbstractTable(Component):
+  """Abstract class for generic table."""
+  def __init__(self, driver):
+    super(AbstractTable, self).__init__(driver)
+
+  def get_headers(self):
+    """"Abstract method. Should return headers element of table."""
+    raise NotImplementedError
+
+  def get_rows(self):
+    """"Abstract method. Should return rows element of table."""
+    raise NotImplementedError
+
+  def get_cells(self, row):
+    """"Abstract method. Should return cells element of table."""
+    raise NotImplementedError
+
+  def get_items(self, as_element=False):
+    """Abstract method. Should return list of dicts for header and cell value.
+    """
+    raise NotImplementedError

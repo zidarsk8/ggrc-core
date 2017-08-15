@@ -15,6 +15,9 @@
             <dropdown-form-field {value}="value"
               class="inline__content-input"
               {options}="dropdownOptions"
+              {no-value}="dropdownNoValue"
+              {dropdown-options-groups}="dropdownOptionsGroups"
+              {is-grouped-dropdown}="isGroupedDropdown"
               (value-changed)="fieldValueChanged(%event)"
             ></dropdown-form-field>
           {{/case}}

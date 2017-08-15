@@ -162,7 +162,7 @@ tree-item {
         }
       }
 
-      tree-item-actions, .item-actions {
+      .tree-item-actions, .item-actions {
         visibility: visible;
       }
     }
@@ -216,19 +216,12 @@ tree-item {
     visibility: hidden;
   }
 
-  tree-item-actions {
-    margin-left: 10px;
-    margin-right: 10px;
-    background-color: $white;
-  }
-
   .sub-tier {
     padding-left: 32px;
   }
 
   .reference-urls-list {
     overflow: hidden;
-    white-space: nowrap;
     width: 100%;
     text-overflow: ellipsis;
 

@@ -90,7 +90,17 @@ describe('GGRC.Components.objectMapper', function () {
       handler = events['.create-control modal:success'];
     });
 
+    it('shows results', function () {
+      viewModel.attr('showResults', false);
+      handler.call({
+        viewModel: viewModel,
+        element: element
+      }, {}, {}, 'model');
+      expect(viewModel.attr('showResults')).toBe(true);
+    });
+
     it('adds model to newEntries', function () {
+      viewModel.attr('newEntries', []);
       handler.call({
         viewModel: viewModel,
         element: element
@@ -205,11 +215,10 @@ describe('GGRC.Components.objectMapper', function () {
       viewModel.attr({
         selected: [1, 2, 3],
         entries: [3, 2, 1],
-        afterShown: function () {}
+        onSubmit: function () {}
       });
       that = {
-        viewModel: viewModel,
-        setModel: jasmine.createSpy('setModel')
+        viewModel: viewModel
       };
       handler = events.inserted;
     });
@@ -223,10 +232,6 @@ describe('GGRC.Components.objectMapper', function () {
       handler.call(that);
       expect(viewModel.attr('entries').length)
         .toEqual(0);
-    });
-    it('calls setModel()', function () {
-      handler.call(that);
-      expect(that.setModel).toHaveBeenCalled();
     });
   });
 
@@ -364,58 +369,6 @@ describe('GGRC.Components.objectMapper', function () {
       expect($.prototype.trigger)
         .toHaveBeenCalledWith('ajax:flash', {error: undefined});
     });
-  });
-
-  describe('"setModel" handler', function () {
-    beforeEach(function () {
-      viewModel.attr({
-        modelFromType: function () {}
-      });
-      spyOn(viewModel, 'modelFromType')
-        .and.returnValue('mockModel');
-      handler = events.setModel;
-    });
-    it('sets model to model', function () {
-      handler.call({viewModel: viewModel});
-      expect(viewModel.attr('model')).toEqual('mockModel');
-    });
-  });
-
-  describe('"{viewModel} type" handler', function () {
-    var that;
-    beforeEach(function () {
-      viewModel.attr({
-        relevant: [1, 2, 3],
-        onSubmit: function () {}
-      });
-      that = {
-        viewModel: viewModel,
-        setModel: jasmine.createSpy(),
-        setBinding: jasmine.createSpy()
-      };
-      handler = events['{viewModel} type'];
-    });
-
-    it('sets empty string to filter', function () {
-      handler.call(that);
-      expect(viewModel.attr('filter')).toEqual('');
-    });
-    it('sets false to afterSearch', function () {
-      handler.call(that);
-      expect(viewModel.attr('afterSearch')).toEqual(false);
-    });
-    it('calls setModel()', function () {
-      handler.call(that);
-      expect(that.setModel).toHaveBeenCalled();
-    });
-    it('sets empty array to relevant if it is not in scope model',
-      function () {
-        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-          .and.returnValue(false);
-        handler.call(that);
-        expect(viewModel.attr('relevant').length)
-          .toEqual(0);
-      });
   });
 
   describe('get_title() helper', function () {

@@ -20,13 +20,10 @@
             {{#switch attr_type}}
               {{#case 'custom'}}
                 <div class="custom attr-content">
-                  {{#get_custom_attr_value thisColumn instance}}
-                     {{! because the object can currently only be a
-                      person there is no need to switch }}
-                      <tree-people-list-field {source}="object">
-                          {{peopleStr}}
-                      </tree-people-list-field>
-                  {{/get_custom_attr_value}}
+                  <tree-item-custom-attribute {instance}="instance"
+                                              {values}="instance.custom_attribute_values"
+                                              {column}="thisColumn"
+                  ></tree-item-custom-attribute>
                 </div>
               {{/case}}
 

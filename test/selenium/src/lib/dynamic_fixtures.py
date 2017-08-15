@@ -4,6 +4,7 @@
 # pylint: disable=invalid-name
 # pylint: disable=global-variable-not-assigned
 # pylint: disable=global-statement
+# pylint: disable=no-else-return
 
 import copy
 
@@ -11,6 +12,7 @@ from lib import factory
 from lib.constants import element, objects
 from lib.constants.test import batch
 from lib.entities.entities_factory import CustomAttributeDefinitionsFactory
+from lib.entities.entity import Entity
 from lib.page.widget import info_widget
 from lib.service import rest_service
 from lib.utils import conftest_utils, test_utils, string_utils
@@ -22,6 +24,14 @@ def _get_fixture_from_dict_fixtures(fixture):
   """Get value of fixture by key (fixture name) from dictionary of
   executed fixtures."""
   global dict_executed_fixtures
+  # extend executed fixtures using exist fixture in snapshot representation
+  if fixture.endswith("_snapshot"):
+    origin_obj = _get_fixture_from_dict_fixtures(
+        fixture.replace("_snapshot", ""))
+    parent_obj = _get_fixture_from_dict_fixtures("new_audit_rest")[0]
+    dict_executed_fixtures.update(
+        {fixture: Entity.convert_objs_repr_to_snapshot(
+            obj_or_objs=origin_obj, parent_obj=parent_obj)})
   return {k: v for k, v in dict_executed_fixtures.iteritems()
           if k == fixture}[fixture]
 
@@ -105,7 +115,7 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
   global dict_executed_fixtures
   _list_cas_types = element.AdminWidgetCustomAttributes.ALL_CA_TYPES
 
-  def new_rest_fixture(fixture):
+  def new_rest_fixture(fixture, factory_params=None):
     """Extract arguments of 'new_rest_fixture' fixture from fixture name,
     create new objects via REST API and return created.
     """
@@ -134,7 +144,7 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
         obj_name = objects.get_plural(obj_name)
         obj_count = 1
       new_objs = _new_objs_rest(obj_name=obj_name, obj_count=obj_count,
-                                has_cas=has_cas)
+                                has_cas=has_cas, factory_params=factory_params)
     return new_objs
 
   def new_ui_fixture(web_driver, fixture):
@@ -174,7 +184,7 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
         src_obj=src_obj, dest_objs=dest_objs)
     return mapped_objs
 
-  def update_rest_fixture(fixture):
+  def update_rest_fixture(fixture, factory_params=None):
     """Extract arguments of 'update_rest_fixture' fixture from fixture name,
     update existing objects via REST API and return updated.
     """
@@ -200,12 +210,13 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
       if has_cas and parent_objs:
         updated_objs = (
             factory.get_cls_rest_service(object_name=obj_name)().update_objs(
-                objs=objs_to_update,
+                objs=objs_to_update, factory_params=factory_params,
                 custom_attributes=CustomAttributeDefinitionsFactory().
                 generate_ca_values(list_ca_def_objs=parent_objs)))
       else:
         updated_objs = factory.get_cls_rest_service(
-            object_name=obj_name)().update_objs(objs=objs_to_update)
+            object_name=obj_name)().update_objs(objs=objs_to_update,
+                                                factory_params=factory_params)
       return updated_objs
 
   def delete_rest_fixture(fixture):
@@ -233,21 +244,26 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
       return deleted_objs
 
   for fixture in fixtures:
+    fixture_params = None
+    if isinstance(fixture, tuple):
+      fixture, fixture_params = fixture
     if isinstance(fixture, str):
       if (fixture.startswith("new_") and fixture.endswith("_ui") and
               dict_executed_fixtures.get("selenium")):
         new_objs = new_ui_fixture(
             web_driver=dict_executed_fixtures["selenium"], fixture=fixture)
         dict_executed_fixtures.update({fixture: new_objs})
-      elif fixture.endswith("_rest"):
+      elif fixture.endswith(("_rest", "_snapshot")):
         if fixture.startswith("new_"):
-          new_objs = new_rest_fixture(fixture=fixture)
+          new_objs = new_rest_fixture(fixture=fixture,
+                                      factory_params=fixture_params)
           dict_executed_fixtures.update({fixture: new_objs})
-        elif (fixture.startswith("map_") and "_to_" in fixture):
+        elif fixture.startswith("map_") and "_to_" in fixture:
           mapped_objs = map_rest_fixture(fixture=fixture)
           dict_executed_fixtures.update({fixture: mapped_objs})
         elif fixture.startswith("update_"):
-          updated_objs = update_rest_fixture(fixture=fixture)
+          updated_objs = update_rest_fixture(fixture=fixture,
+                                             factory_params=fixture_params)
           dict_executed_fixtures.update({fixture: updated_objs})
         elif fixture.startswith("delete_"):
           deleted_objs = delete_rest_fixture(fixture=fixture)
