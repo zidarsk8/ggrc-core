@@ -13,7 +13,7 @@
       {{else}}
         <div class="deny-buttons">
           {{^new_object_form}}
-            {{#is_allowed 'delete' instance}}
+            {{#is_allowed 'delete' instance context='for'}}
               {{^if_equals modal_title 'Edit Person'}}
                 <a
                   tabindex="37"
