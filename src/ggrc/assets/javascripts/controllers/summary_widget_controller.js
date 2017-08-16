@@ -126,7 +126,7 @@
 
       that.setState(type, {total: 0, statuses: { }}, true);
       that.getStatuses(type, that.options.instance.id).then(function (raw) {
-        var data = that.parseStatuses(raw[0][type]);
+        var data = that.parseStatuses(type, raw[0][type]);
         var chart = that.drawChart(elementId, data);
 
         that.prepareLegend(type, chart, data);
@@ -173,35 +173,17 @@
     prepareLegend: function (type, chart, data) {
       var legendData = [];
       var that = this;
-      var statuses = CMS.Models[type].statuses;
       var chartOptions = this.options.context.charts[type];
       var colorsMap = this.options.colorsMap;
 
-      statuses.forEach(function (status) {
-        var rowIndex = _.findIndex(data.statuses, function (row) {
-          return row[0] === status;
+      data.statuses.forEach(function (statusData, rowIndex) {
+        legendData.push({
+          title: that.prepareTitle(statusData[0]),
+          count: statusData[1],
+          percent: (statusData[1] / data.total * 100).toFixed(1),
+          rowIndex: rowIndex,
+          color: colorsMap[statusData[0]]
         });
-        var statusData;
-
-        if (rowIndex > -1) {
-          statusData = data.statuses[rowIndex];
-        }
-        if (statusData) {
-          legendData.push({
-            title: that.prepareTitle(statusData[0]),
-            count: statusData[1],
-            percent: (statusData[1] / data.total * 100).toFixed(1),
-            rowIndex: rowIndex,
-            color: colorsMap[status]
-          });
-        } else {
-          legendData.push({
-            title: that.prepareTitle(status),
-            count: 0,
-            percent: 0,
-            color: colorsMap[status]
-          });
-        }
       });
 
       chartOptions.attr('legend', legendData);
@@ -250,18 +232,15 @@
         chartOptions.attr('legend', []);
       }
     },
-    parseStatuses: function (data) {
-      var groups = {};
+    parseStatuses: function (type, data) {
+      var statuses = CMS.Models[type].statuses;
+      var groups = _.object(statuses, new Array(statuses.length).fill(0));
       var result;
       data.values.forEach(function (item) {
         if (item.verified) {
           item.status = 'Verified';
         }
-        if (!groups[item.status]) {
-          groups[item.status] = 1;
-        } else {
-          groups[item.status]++;
-        }
+        groups[item.status]++;
       });
       result = _.pairs(groups);
       return {
