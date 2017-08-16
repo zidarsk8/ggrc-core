@@ -284,6 +284,37 @@ class TestAssessmentImport(TestCase):
         }],
         resp)
 
+  @ddt.data((False, "no", 0, 1, []),
+            (True, "yes", 1, 0, [u'Line 3: Importing archived instance is '
+                                 u'prohibited. The line will be ignored.']))
+  @ddt.unpack
+  # pylint: disable=too-many-arguments
+  def test_import_archived_assessment(self, is_archived, value, ignored,
+                                      updated, row_errors):
+    """Test archived assessment import procedure"""
+    audit = factories.AuditFactory(archived=is_archived)
+    assessment = factories.AssessmentFactory(audit=audit)
+    factories.RelationshipFactory(source=audit, destination=assessment)
+    resp = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", assessment.slug),
+        ("archived", value),
+        ("description", "archived assessment description")
+    ]))
+    self.assertEqual([{
+        u'ignored': ignored,
+        u'updated': updated,
+        u'block_errors': [],
+        u'name': u'Assessment',
+        u'created': 0,
+        u'deleted': 0,
+        u'deprecated': 0,
+        u'row_warnings': [],
+        u'rows': 1,
+        u'block_warnings': [],
+        u'row_errors': row_errors
+    }], resp)
+
   def test_create_new_assessment_with_mapped_control(self):
     "Test for creation assessment with mapped controls"
     audit = factories.AuditFactory()
