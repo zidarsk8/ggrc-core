@@ -50,7 +50,16 @@ auto-save-form {
     align-items: flex-start;
     justify-content: flex-start;
 
+    &.inline-reverse {
+      flex-direction: row-reverse;
+      flex-wrap: nowrap
+    }
+
     auto-save-form-field {
+      &.inline-reverse {
+        min-width: auto;
+        padding-top: 5px;
+      }
       display: block;
       flex: 1;
       min-width: 150px;
