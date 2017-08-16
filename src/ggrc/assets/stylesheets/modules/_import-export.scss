@@ -181,6 +181,10 @@ form.import {
   margin-top: 10px;
 }
 
+.csv-input > .state-reset {
+  margin-left: 10px;
+}
+
 .import-analyze {
   ul {
     @extend %reset-list;
