@@ -16,8 +16,16 @@ from ggrc.rbac import permissions
 from ggrc.query.default_handler import DefaultHandler
 
 
-# pylint: disable=too-few-public-methods
+def _set_data(object_query, data):
+  """Helper function for setting basic data in object_query"""
+  object_query["count"] = len(data)
+  object_query["total"] = len(data)
+  object_query["last_modified"] = None
+  object_query["values"] = data
+  return object_query
 
+
+# pylint: disable=too-few-public-methods
 class AssessmentRelatedObjects(DefaultHandler):
   """Handler for assessment filter on my assessments page.
 
@@ -145,14 +153,8 @@ class AssessmentRelatedObjects(DefaultHandler):
       return assessment
     raise Forbidden()
 
-  def _set_data(self, object_query, data):
-    object_query["count"] = len(data)
-    object_query["total"] = len(data)
-    object_query["last_modified"] = None
-    object_query["values"] = data
-    return object_query
-
   def set_audit_result(self, assessment):
+    """Set audit result"""
     object_query = self.query[5]
     data = db.session.query(
         models.Audit.id,
@@ -178,6 +180,7 @@ class AssessmentRelatedObjects(DefaultHandler):
       }]
 
   def set_snapshot_result(self, assessment):
+    """Set snapshot result"""
     query = self.query[0]
     with benchmark("Get assessment snapshot relationships"):
       snapshots = db.session.query(
@@ -225,9 +228,10 @@ class AssessmentRelatedObjects(DefaultHandler):
             "type": snapshot.type,
         })
 
-      self._set_data(query, data)
+      _set_data(query, data)
 
   def set_comment_result(self, assessment):
+    """Set comment result"""
     query = self.query[1]
     self.query[1]["last_modified"] = None
     with benchmark("Get assessment snapshot relationships"):
@@ -260,9 +264,10 @@ class AssessmentRelatedObjects(DefaultHandler):
       for comment in comments:
         data.append(comment.log_json())
         sorted_data = sorted(data, key=lambda x: x["created_at"], reverse=True)
-      self._set_data(query, sorted_data)
+      _set_data(query, sorted_data)
 
   def set_document_result(self, assessment):
+    """Set document result"""
     data_map = collections.defaultdict(list)
     query_map = {
         models.Document.ATTACHMENT: self.query[2],
@@ -298,7 +303,7 @@ class AssessmentRelatedObjects(DefaultHandler):
       for document in documents:
         data_map[document.document_type].append(document.log_json())
       for document_type, query in query_map.items():
-        self._set_data(query, data_map[document_type])
+        _set_data(query, data_map[document_type])
 
   def get_results(self):
     """Filter the objects and get their information.
