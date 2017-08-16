@@ -16,6 +16,7 @@
       items: [],
       editMode: false,
       modifiedFields: {},
+      isEditDenied: false,
       updateGlobalAttribute: function (event, field) {
         this.attr('modifiedFields').attr(field.id, event.value);
         this.dispatch({
