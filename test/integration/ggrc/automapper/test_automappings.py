@@ -4,6 +4,7 @@
 """Test automappings"""
 
 import itertools
+from contextlib import contextmanager
 
 import ggrc
 from ggrc import models
@@ -27,19 +28,13 @@ def relate(src, dst):
     return (dst, src)
 
 
-class AutomappingCountLimit(object):
+@contextmanager
+def automapping_count_limit(new_limit):
   """Automapping count limit"""
-  # pylint: disable=too-few-public-methods
-  def __init__(self, new_limit):
-    self.new_limit = new_limit
-    self.original_limit = None
-
-  def __enter__(self):
-    self.original_limit = ggrc.automapper.rules.count_limit
-    ggrc.automapper.rules.count_limit = self.new_limit
-
-  def __exit__(self, type_, value, traceback):
-    ggrc.automapper.rules.count_limit = self.original_limit
+  original_limit = ggrc.automapper.rules.count_limit
+  ggrc.automapper.rules.count_limit = new_limit
+  yield
+  ggrc.automapper.rules.count_limit = original_limit
 
 
 class TestAutomappings(TestCase):
@@ -190,18 +185,18 @@ class TestAutomappings(TestCase):
 
   def test_automapping_limit(self):
     """Test mapping limit"""
-    with AutomappingCountLimit(-1):
-      program = self.create_object(models.Program, {
-          'title': make_name('Program')
-      })
+    with automapping_count_limit(-1):
       regulation = self.create_object(models.Regulation, {
-          'title': make_name('Test PD Regulation')
+          'title': make_name('Test Regulation')
+      })
+      section = self.create_object(models.Section, {
+          'title': make_name('Test section'),
       })
       objective = self.create_object(models.Objective, {
           'title': make_name('Objective')
       })
       self.assert_mapping_implication(
-          to_create=[(regulation, objective), (objective, program)],
+          to_create=[(regulation, section), (objective, section)],
           implied=[],
       )
 
