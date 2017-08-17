@@ -60,20 +60,21 @@ class TestWorkflow(TestCase):
                                   start_date,
                                   update_date,
                                   expected_date):
-    with glob_factories.single_commit():
-      workflow = factories.WorkflowFactory(title="This is a test WF",
-                                           unit=all_models.Workflow.WEEK_UNIT,
-                                           repeat_every=1)
-      task_group = factories.TaskGroupFactory(workflow=workflow)
-      task = factories.TaskGroupTaskFactory(
-          task_group=task_group,
-          start_date=start_date,
-          end_date=start_date + datetime.timedelta(1))
-    wf_id = workflow.id
-    task_id = task.id
-    self.generator.activate_workflow(workflow)
-    task = all_models.TaskGroupTask.query.get(task_id)
     with freezegun.freeze_time(today):
+      with glob_factories.single_commit():
+        workflow = factories.WorkflowFactory(
+            title="This is a test WF",
+            unit=all_models.Workflow.WEEK_UNIT,
+            repeat_every=1)
+        task_group = factories.TaskGroupFactory(workflow=workflow)
+        task = factories.TaskGroupTaskFactory(
+            task_group=task_group,
+            start_date=start_date,
+            end_date=start_date + datetime.timedelta(1))
+      wf_id = workflow.id
+      task_id = task.id
+      self.generator.activate_workflow(workflow)
+      task = all_models.TaskGroupTask.query.get(task_id)
       self.api.put(task, {"start_date": update_date})
     workflow = all_models.Workflow.query.get(wf_id)
     self.assertEqual(expected_date, workflow.next_cycle_start_date)
@@ -88,29 +89,30 @@ class TestWorkflow(TestCase):
   def test_recalculate_start_date_on_delete(self, idxs, expected_date):
     start_date_1 = datetime.date(2017, 8, 10)
     start_date_2 = datetime.date(2017, 8, 11)
-    with glob_factories.single_commit():
-      workflow = factories.WorkflowFactory(title="This is a test WF",
-                                           unit=all_models.Workflow.WEEK_UNIT,
-                                           repeat_every=1)
-      tasks = (
-          factories.TaskGroupTaskFactory(
-              task_group=factories.TaskGroupFactory(workflow=workflow),
-              start_date=start_date_1,
-              end_date=start_date_1 + datetime.timedelta(1),
-          ),
-          factories.TaskGroupTaskFactory(
-              task_group=factories.TaskGroupFactory(workflow=workflow),
-              start_date=start_date_2,
-              end_date=start_date_2 + datetime.timedelta(1),
-          ),
-      )
-    wf_id = workflow.id
-    task_ids = [t.id for t in tasks]
-    self.generator.activate_workflow(workflow)
-    workflow = all_models.Workflow.query.get(wf_id)
-    self.assertEqual(datetime.date(2017, 8, 17),
-                     workflow.next_cycle_start_date)
     with freezegun.freeze_time("2017-08-10"):
+      with glob_factories.single_commit():
+        workflow = factories.WorkflowFactory(
+            title="This is a test WF",
+            unit=all_models.Workflow.WEEK_UNIT,
+            repeat_every=1)
+        tasks = (
+            factories.TaskGroupTaskFactory(
+                task_group=factories.TaskGroupFactory(workflow=workflow),
+                start_date=start_date_1,
+                end_date=start_date_1 + datetime.timedelta(1),
+            ),
+            factories.TaskGroupTaskFactory(
+                task_group=factories.TaskGroupFactory(workflow=workflow),
+                start_date=start_date_2,
+                end_date=start_date_2 + datetime.timedelta(1),
+            ),
+        )
+      wf_id = workflow.id
+      task_ids = [t.id for t in tasks]
+      self.generator.activate_workflow(workflow)
+      workflow = all_models.Workflow.query.get(wf_id)
+      self.assertEqual(datetime.date(2017, 8, 17),
+                       workflow.next_cycle_start_date)
       for idx in idxs:
         task = all_models.TaskGroupTask.query.get(task_ids[idx])
         self.api.delete(task)
@@ -133,26 +135,27 @@ class TestWorkflow(TestCase):
   def test_recalculate_start_date_on_create(self,
                                             new_start_date,
                                             expected_date):
-    with glob_factories.single_commit():
-      workflow = factories.WorkflowFactory(title="This is a test WF",
-                                           unit=all_models.Workflow.WEEK_UNIT,
-                                           repeat_every=1)
-      task = factories.TaskGroupTaskFactory(
-          task_group=factories.TaskGroupFactory(
-              workflow=workflow,
-              context=glob_factories.ContextFactory(),
-          ),
-          start_date=datetime.date(2017, 8, 10),
-          end_date=datetime.date(2017, 8, 11),
-      )
-    wf_id = workflow.id
-    task_id = task.id
-    self.generator.activate_workflow(workflow)
-    workflow = all_models.Workflow.query.get(wf_id)
-    task = all_models.TaskGroupTask.query.get(task_id)
-    self.assertEqual(datetime.date(2017, 8, 17),
-                     workflow.next_cycle_start_date)
     with freezegun.freeze_time("2017-08-10"):
+      with glob_factories.single_commit():
+        workflow = factories.WorkflowFactory(
+            title="This is a test WF",
+            unit=all_models.Workflow.WEEK_UNIT,
+            repeat_every=1)
+        task = factories.TaskGroupTaskFactory(
+            task_group=factories.TaskGroupFactory(
+                workflow=workflow,
+                context=glob_factories.ContextFactory(),
+            ),
+            start_date=datetime.date(2017, 8, 10),
+            end_date=datetime.date(2017, 8, 11),
+        )
+      wf_id = workflow.id
+      task_id = task.id
+      self.generator.activate_workflow(workflow)
+      workflow = all_models.Workflow.query.get(wf_id)
+      task = all_models.TaskGroupTask.query.get(task_id)
+      self.assertEqual(datetime.date(2017, 8, 17),
+                       workflow.next_cycle_start_date)
       self.generator.generate_task_group_task(
           task.task_group,
           {
