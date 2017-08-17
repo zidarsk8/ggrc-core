@@ -71,7 +71,6 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
         user_role="Administrator")
     self._create_test_cases()
 
-  @unittest.skip("required to fix notifications for new calucation")
   @ddt.data(True, False)
   @patch("ggrc.notifications.common.send_email")
   def test_sending_overdue_notifications_for_tasks(self, is_vf_needed, _):

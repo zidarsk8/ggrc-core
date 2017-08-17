@@ -189,7 +189,8 @@ def build_cycles(workflow, cycle=None, user=None):
   """
   user = user or get_current_user()
   if not workflow.next_cycle_start_date:
-    workflow.next_cycle_start_date = workflow.min_task_start_date
+    workflow.next_cycle_start_date = workflow.calc_next_adjusted_date(
+        workflow.min_task_start_date)
   if cycle:
     build_cycle(workflow, cycle, user)
   if workflow.unit and workflow.repeat_every:
@@ -268,6 +269,7 @@ def build_cycle(workflow, cycle=None, current_user=None):
         break
   # Populate the top-level Cycle object
   cycle.workflow = workflow
+  cycle.is_current = True
   cycle.context = workflow.context
   cycle.title = workflow.title
   cycle.description = workflow.description
@@ -723,18 +725,14 @@ def _find_role(role_name):
 # noqa pylint: disable=unused-argument
 @signals.Restful.model_posted.connect_via(models.WorkflowPerson)
 def handle_workflow_person_post(sender, obj=None, src=None, service=None):
-  db.session.flush()
-
   # add a user_roles mapping assigning the user creating the workflow
   # the WorkflowOwner role in the workflow's context.
-  workflow_member_role = _find_role('WorkflowMember')
-  user_role = UserRole(
+  UserRole(
       person=obj.person,
-      role=workflow_member_role,
+      role=_find_role('WorkflowMember'),
       context=obj.context,
       modified_by=get_current_user(),
   )
-  db.session.add(user_role)
 
 
 def _validate_post_workflow_fields(workflow):
@@ -879,7 +877,7 @@ def start_recurring_cycles():
     # Follow same steps as in model_posted.connect_via(models.Cycle)
     cycle = build_cycle(workflow)
     db.session.add(cycle)
-    notification.handle_cycle_created(None, obj=cycle)
+    notification.handle_cycle_created(cycle, False)
     notification.handle_workflow_modify(None, workflow)
     db.session.add(workflow)
   log_event(db.session)

@@ -1,8 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-import unittest
-
 from datetime import date
 from datetime import datetime
 from freezegun import freeze_time
@@ -45,7 +43,6 @@ class TestOneTimeWfEndDateChange(TestCase):
 
     Notification.__init__ = init_decorator(Notification.__init__)
 
-  @unittest.skip("required to fix notifications for new calucation")
   @patch("ggrc.notifications.common.send_email")
   def test_no_date_change(self, mock_mail):
     def get_person(person_id):
@@ -97,7 +94,6 @@ class TestOneTimeWfEndDateChange(TestCase):
       self.assertIn("due_today", notif_data[user.email])
       self.assertEqual(len(notif_data[user.email]["due_today"]), 2)
 
-  @unittest.skip("required to fix notifications for new calucation")
   @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_future(self, mock_mail):
     """
@@ -166,14 +162,12 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertIn(user.email, notif_data)
 
-      # yesterdays mail has not been sent
       self.assertIn("due_in", notif_data[user.email])
 
       self.assertIn("due_today", notif_data[user.email])
       self.assertEqual(len(notif_data[user.email]["due_today"]),
                        len(self.random_objects))
 
-  @unittest.skip("required to fix notifications for new calucation")
   @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_past(self, mock_mail):
     def get_person(person_id):
@@ -219,7 +213,6 @@ class TestOneTimeWfEndDateChange(TestCase):
       self.assertIn("task_overdue", user_notifs)
       self.assertEqual(len(user_notifs["task_overdue"]), 2)
 
-  @unittest.skip("required to fix notifications for new calucation")
   @patch("ggrc.notifications.common.send_email")
   def test_move_end_date_to_today(self, mock_mail):
     def get_person(person_id):

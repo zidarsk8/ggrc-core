@@ -319,6 +319,12 @@ class Timeboxed(object):
   def end_date(cls):  # pylint: disable=no-self-argument
     return deferred(db.Column(db.Date), cls.__name__)
 
+  @validates('start_date', 'end_date')
+  def validate_date(self, key, value):
+    if isinstance(value, datetime.datetime):
+      value = value.date()
+    return value
+
   # REST properties
   _api_attrs = reflection.ApiAttributes('start_date', 'end_date')
 

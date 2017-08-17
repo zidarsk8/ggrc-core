@@ -1,8 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-import unittest
-
 from datetime import date
 from datetime import datetime
 
@@ -168,7 +166,6 @@ class TestCycleTaskStatusChange(TestCase):
 
       self.assertEqual(len(notif), 1, "notifications: {}".format(str(notif)))
 
-  @unittest.skip("required to fix notifications for new calucation")
   @patch("ggrc.notifications.common.send_email")
   def test_single_task_declined(self, mock_mail):
     """
@@ -210,7 +207,6 @@ class TestCycleTaskStatusChange(TestCase):
       self.assertIn(user.email, notif_data)
       self.assertIn("task_declined", notif_data[user.email])
 
-  @unittest.skip("required to fix notifications for new calucation")
   @patch("ggrc.notifications.common.send_email")
   def test_single_task_accepted(self, mock_mail):
     """
