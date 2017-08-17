@@ -340,6 +340,8 @@ dashboard-js-files:
   - components/inline/base-inline-control-title.js
   - components/assessment/info-pane/inline-item.js
   - components/assessment/info-pane/confirm-edit-action.js
+  - components/assessment/info-pane-save-status.js
+  - components/loading/loading-status.js
   - components/object-list-item/object-list-item-updater.js
 
 app-init-files:
@@ -704,6 +706,7 @@ dashboard-js-template-files:
   - components/inline/simple-readonly-text.mustache
   - components/inline/base-inline-control-title.mustache
   - components/assessment/info-pane/inline-item.mustache
+  - components/loading/loading-status.mustache
 
 dashboard-css-files:
   - dashboard.css

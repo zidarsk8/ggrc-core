@@ -68,7 +68,14 @@
                         <auto-save-form-status
                                 {form-saving}="formState.saving"
                                 {form-all-saved}="formState.allSaved"
-                                {is-dirty}="formState.isDirty"></auto-save-form-status>
+                                {is-dirty}="formState.isDirty">
+                                <loading-status
+                                    {is-loading}="formSaving"
+                                    {loading-text}="formStatusText"
+                                    always-Show-Text="true"
+                                    show-Spinner="true">
+                                </loading-status>
+                        </auto-save-form-status>
                         <i class="fa fa-question-circle" rel="tooltip"
                            data-original-title="Respond to assessment here. Use comments on the right for free text responses."></i>
                     </div>

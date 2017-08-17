@@ -92,6 +92,7 @@
       modal: {
         open: false
       },
+      isAssessmentSaving: false,
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
@@ -342,6 +343,12 @@
       '{viewModel.instance} refreshMapping': function () {
         this.viewModel.attr('mappedSnapshots')
           .replace(this.viewModel.loadSnapshots());
+      },
+      '{viewModel.instance} modelBeforeSave': function () {
+        this.viewModel.attr('isAssessmentSaving', true);
+      },
+      '{viewModel.instance} modelAfterSave': function () {
+        this.viewModel.attr('isAssessmentSaving', false);
       },
       '{viewModel} instance': function () {
         this.viewModel.initializeFormFields();
