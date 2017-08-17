@@ -53,6 +53,10 @@
       'Assessment'
     ]);
 
+    var treeViewExcess = {
+      AssessmentTemplate: ['os_state']
+    };
+
     allTypes.forEach(function (type) {
       var related = baseWidgets[type].slice(0);
 
@@ -83,6 +87,22 @@
     function hasNoFieldsLimit(type) {
       return NO_FIELDS_LIMIT_LIST.indexOf(type) > -1;
     }
+
+    /**
+     * Skip attrs which unused in current model name tree
+     * @param {String} modelName - Name of current page.
+     * @param {String} attrList - Attr list.
+     * @return {Object} Changed attr list.
+     */
+    function skipUnusable(modelName, attrList) {
+      if (treeViewExcess[modelName]) {
+        attrList = attrList.filter(function (item) {
+          return treeViewExcess[modelName].indexOf(item.attr_name) < 0;
+        });
+      }
+      return attrList;
+    }
+
     /**
      * Get available and selected columns for Model type
      * @param {String} modelType - Model type.
@@ -108,29 +128,36 @@
         !!Model.tree_view_options.disable_columns_configuration;
       var mandatoryColumns;
       var displayColumns;
+      var attrs;
+      var customAttrs;
+      var allAttrs;
+      var modelRoles;
+      var roleAttrs;
 
-      var attrs =
-        can.makeArray(
-          Model.tree_view_options.mapper_attr_list ||
-          Model.tree_view_options.attr_list ||
-          Cacheable.attr_list
-        ).map(function (attr) {
-          attr = _.assign({}, attr);
-          if (!attr.attr_sort_field) {
-            attr.attr_sort_field = attr.attr_name;
-          }
-          return attr;
-        }).sort(function (a, b) {
-          if (a.order && !b.order) {
-            return -1;
-          } else if (!a.order && b.order) {
-            return 1;
-          }
-          return a.order - b.order;
-        });
+      attrs = can.makeArray(
+        Model.tree_view_options.mapper_attr_list ||
+        Model.tree_view_options.attr_list ||
+        Cacheable.attr_list
+      ).map(function (attr) {
+        attr = _.assign({}, attr);
+        if (!attr.attr_sort_field) {
+          attr.attr_sort_field = attr.attr_name;
+        }
+        return attr;
+      }).sort(function (a, b) {
+        if (a.order && !b.order) {
+          return -1;
+        } else if (!a.order && b.order) {
+          return 1;
+        }
+        return a.order - b.order;
+      });
+
+      // skip attrs which unused in current model name tree
+      attrs = skipUnusable(modelName, attrs);
 
       // add custom attributes information
-      var customAttrs = disableConfiguration ?
+      customAttrs = disableConfiguration ?
         [] :
         GGRC.custom_attr_defs
           .filter(function (def) {
@@ -150,13 +177,13 @@
               attr_type: 'custom'
             };
           });
-      var allAttrs = attrs.concat(customAttrs);
+      allAttrs = attrs.concat(customAttrs);
 
       // add custom roles information
-      var modelRoles = _.filter(GGRC.access_control_roles, {
+      modelRoles = _.filter(GGRC.access_control_roles, {
         object_type: modelType
       });
-      var roleAttrs = modelRoles.map(function (role) {
+      roleAttrs = modelRoles.map(function (role) {
         return {
           attr_title: role.name,
           attr_name: role.name,
