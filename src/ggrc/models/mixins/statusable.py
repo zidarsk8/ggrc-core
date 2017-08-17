@@ -14,7 +14,7 @@ class Statusable(object):
 
   START_STATE = u"Not Started"
   PROGRESS_STATE = u"In Progress"
-  DONE_STATE = u"Ready for Review"
+  DONE_STATE = u"In Review"
   VERIFIED_STATE = u"Verified"
   FINAL_STATE = u"Completed"
   END_STATES = {VERIFIED_STATE, FINAL_STATE}
