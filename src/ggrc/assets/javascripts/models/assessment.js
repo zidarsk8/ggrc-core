@@ -26,7 +26,7 @@
       send_by_default: true,  // notifications when a comment is added
       recipients: 'Assessor,Creator,Verifier'  // user roles to be notified
     },
-    statuses: ['Not Started', 'In Progress', 'Ready for Review',
+    statuses: ['Not Started', 'In Progress', 'In Review',
       'Verified', 'Completed'],
     tree_view_options: {
       add_item_view: GGRC.mustache_path +

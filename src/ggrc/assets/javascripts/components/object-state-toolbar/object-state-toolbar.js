@@ -26,7 +26,7 @@
       define: {
         updateState: {
           get: function () {
-            return this.attr('hasVerifiers') ? 'Ready for Review' : 'Completed';
+            return this.attr('hasVerifiers') ? 'In Review' : 'Completed';
           }
         },
         isCurrentUserVerifier: {
@@ -63,7 +63,7 @@
         return this.attr('instance.status') === 'In Progress';
       },
       isInReview: function () {
-        return this.attr('instance.status') === 'Ready for Review';
+        return this.attr('instance.status') === 'In Review';
       },
       changeState: function (newState, isUndo) {
         newState = newState || this.attr('updateState');

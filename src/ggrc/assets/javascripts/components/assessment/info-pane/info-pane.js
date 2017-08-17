@@ -73,7 +73,7 @@
           type: 'boolean',
           get: function () {
             return this.attr('instance.status') !== 'Completed' &&
-              this.attr('instance.status') !== 'Ready for Review' &&
+              this.attr('instance.status') !== 'In Review' &&
               !this.attr('instance.archived');
           },
           set: function () {
@@ -247,7 +247,7 @@
             instance.refresh().then(function () {
               instance.attr('status', isUndo ? previousStatus : newStatus);
 
-              if (instance.attr('status') === 'Ready for Review' && !isUndo) {
+              if (instance.attr('status') === 'In Review' && !isUndo) {
                 $(document.body).trigger('ajax:flash',
                   {hint: 'The assessment is complete. ' +
                   'The verifier may revert it if further input is needed.'});
