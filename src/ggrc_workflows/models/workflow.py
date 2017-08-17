@@ -123,6 +123,11 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
     ])
 
   @property
+  def tasks(self):
+    return list(itertools.chain(*[t.task_group_tasks
+                                  for t in self.task_groups]))
+
+  @property
   def min_task_start_date(self):
     """Fetches non adjusted setup cycle start date based on TGT user's setup.
 
@@ -132,7 +137,7 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
     Returns:
         Date when first cycle should be started based on user's setup.
     """
-    tasks = itertools.chain(*[t.task_group_tasks for t in self.task_groups])
+    tasks = self.tasks
     min_date = None
     for task in tasks:
       min_date = min(task.start_date, min_date or task.start_date)
