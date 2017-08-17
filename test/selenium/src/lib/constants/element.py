@@ -267,7 +267,7 @@ class AuditStates(BaseStates):
 class AssessmentStates(BaseStates):
   """States for Assessments objects."""
   NOT_STARTED = "Not Started"
-  READY_FOR_REVIEW = "Ready for Review"
+  READY_FOR_REVIEW = "In Review"
   VERIFIED = "Verified"
 
 
