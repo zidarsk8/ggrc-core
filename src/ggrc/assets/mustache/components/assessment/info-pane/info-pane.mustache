@@ -177,7 +177,7 @@
                                                    {is-updating-evidences}="isUpdatingEvidences"
                                                    {form-saved-deferred}="formState.formSavedDeferred"
                                                    (before-comment-created)="addItems(%event, 'comments')"
-                                                   (after-comment-created)="updateItems('comments')"
+                                                   (after-comment-created)="afterCreate(%event, 'comments')"
                           ></ca-object-modal-content>
                       </simple-modal>
                     {{/if}}
