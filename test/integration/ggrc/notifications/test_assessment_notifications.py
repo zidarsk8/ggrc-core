@@ -74,8 +74,7 @@ class TestAssessmentNotification(TestCase):
     )
     factories.CustomAttributeValueFactory(
         custom_attribute=self.cad1,
-        attributable=self.assessment,
-        attribute_value="val1"
+        attributable=self.assessment
     )
 
     self.cad2 = factories.CustomAttributeDefinitionFactory(
@@ -186,3 +185,17 @@ class TestAssessmentNotification(TestCase):
     self.assertEqual(len(notifs), 1)
     self.assertEqual(updated[self.assessment.id]["updated_fields"],
                      ["PRIMARY CONTACTS", "SECONDARY CONTACTS"])
+
+  def test_multiply_updates(self):
+    """Test notification for multiply updates"""
+    response = self.api.put(self.assessment, {"test_plan": "steps"})
+    self.assert200(response)
+
+    response = self.api.put(self.assessment, {"title": "new title"})
+    self.assert200(response)
+
+    notifs, notif_data = common.get_daily_notifications()
+    updated = notif_data["user@example.com"]["assessment_updated"]
+    self.assertEqual(len(notifs), 1)
+    self.assertEqual(sorted(updated[self.assessment.id]["updated_fields"]),
+                     ["TEST PLAN", "TITLE"])
