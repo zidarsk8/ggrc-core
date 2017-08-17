@@ -12,6 +12,8 @@ from ggrc.models import mixins
 from ggrc.models import reflection
 from ggrc.fulltext import attributes as ft_attributes
 from ggrc.fulltext import mixin as ft_mixin
+from urlparse import urljoin
+from ggrc.utils import get_url_root
 
 from ggrc_workflows.models import mixins as wf_mixins
 
@@ -37,6 +39,7 @@ class Cycle(mixins.WithContact,
             db.Model):
   """Workflow Cycle model
   """
+
   __tablename__ = 'cycles'
   _title_uniqueness = False
 
@@ -52,7 +55,9 @@ class Cycle(mixins.WithContact,
       cascade='all, delete-orphan')
   cycle_task_entries = db.relationship(
       'CycleTaskEntry', backref='cycle', cascade='all, delete-orphan')
-  is_current = db.Column(db.Boolean, default=True, nullable=False)
+  is_current = db.Column(db.Boolean,
+                         default=True,
+                         nullable=False)
   next_due_date = db.Column(db.Date)
 
   _api_attrs = reflection.ApiAttributes(
@@ -192,3 +197,21 @@ class Cycle(mixins.WithContact,
             "id"
         ),
     )
+
+  def _get_cycle_url(self, widget_name):
+    return urljoin(
+        get_url_root(),
+        "workflows/{workflow_id}#{widget_name}/cycle/{cycle_id}".format(
+            workflow_id=self.workflow.id,
+            cycle_id=self.id,
+            widget_name=widget_name
+        )
+    )
+
+  @property
+  def cycle_url(self):
+    return self._get_cycle_url("current_widget")
+
+  @property
+  def cycle_inactive_url(self):
+    return self._get_cycle_url("history_widget")
