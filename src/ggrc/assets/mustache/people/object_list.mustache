@@ -24,29 +24,19 @@
                   </div>
                 </div>
                 <div class="span2">
-                  {{#person_roles this "System|Admin"}}
-                    {{#if roles.length}}
-                      <li>
-                        <div class="item-data">
-                          <div class="tree-title-area">
-                            <span class="role" title="{{#roles}}{{permission_summary}} {{/roles}}">
-                              {{roles.0.permission_summary}}
-                            </span>
-                          </div>
-                        </div>
-                      </li>
-                    {{else}}
-                      <li>
-                        <div class="item-data">
-                          <div class="tree-title-area">
-                            <span class="no-role">
-                              No Role
-                            </span>
-                          </div>
-                        </div>
-                      </li>
-                    {{/if}}
-                  {{/person_roles}}
+                  <div class="item-data">
+                    <div class="tree-title-area">
+                      {{#if_equals system_wide_role 'No Access'}}
+                        <span class="no-role">
+                          No Role
+                        </span>
+                      {{else}}
+                        <span class="role">
+                          {{system_wide_role}}
+                        </span>
+                      {{/if_equals}}
+                    </div>
+                  </div>
                 </div>
                 <div class="span2">
                   <div class="show-details">
@@ -61,10 +51,10 @@
           </div><!-- select end -->
         </div><!-- item-wrap end -->
       </div><!-- item-main end -->
-      
+
       <people-list-info {instance}="this"></people-list-info>
     </li>
-    
+
   {{/each}}
 
   <li class="tree-item">
