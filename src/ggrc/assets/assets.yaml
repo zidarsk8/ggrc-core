@@ -274,7 +274,6 @@ dashboard-js-files:
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
   - components/add-issue-button/add-issue-button.js
-  - components/add-mapping-button/add-mapping-button.js
   - components/effective-dates/effective-dates.js
   - components/snapshotter/revisions-comparer.js
   - components/snapshotter/scope-update.js
@@ -393,7 +392,6 @@ dashboard-js-template-files:
   - components/view-object-buttons/view-object-buttons.mustache
   - components/add-object-button/add-object-button.mustache
   - components/add-issue-button/add-issue-button.mustache
-  - components/add-mapping-button/add-mapping-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
   - components/questions-link/questions-link.mustache
   - components/folder-attachments-list/folder-attachments-list.mustache

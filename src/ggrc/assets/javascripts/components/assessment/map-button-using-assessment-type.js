@@ -11,11 +11,20 @@
   GGRC.Components('mapButtonUsingAssessmentType', {
     tag: tag,
     viewModel: {
-      assessmentType: '',
       instance: {},
       deferredTo: {},
+      openMapper: function () {
+        var data = {
+          join_object_type: this.attr('instance.type'),
+          join_object_id: this.attr('instance.id'),
+          type: this.attr('instance.assessment_type'),
+          deferred_to: this.attr('deferredTo')
+        };
+
+        GGRC.Controllers.ObjectMapper.openMapper(data);
+      },
       onClick: function (el, ev) {
-        el.data('type', this.attr('assessmentType'));
+        el.data('type', this.attr('instance.assessment_type'));
         el.data('deferred_to', this.attr('deferredTo'));
         can.trigger(el, 'openMapper', ev);
       }
