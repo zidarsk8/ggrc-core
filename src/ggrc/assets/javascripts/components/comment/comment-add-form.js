@@ -65,15 +65,11 @@
         self.dispatch({type: 'beforeCreate', items: [comment.attr()]});
 
         comment.save()
-          .done(function (comment) {
-            self.mapToParent(comment, parent)
-              .done(function () {
-                self.afterCreation(comment, true);
-              })
-              .fail(function () {
-                GGRC.Errors.notifier('error', 'Saving has failed');
-                self.afterCreation(comment, false);
-              });
+          .then(function (comment) {
+            return self.mapToParent(comment, parent);
+          })
+          .then(function () {
+            return self.afterCreation(comment, true);
           })
           .fail(function () {
             GGRC.Errors.notifier('error', 'Saving has failed');

@@ -185,6 +185,7 @@
                   newItem.attr('isNotSaved', true);
                 }
                 newItem.removeAttr('_stamp');
+                newItem.removeAttr('isDraft');
                 item = newItem;
               }
             });
