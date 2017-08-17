@@ -20,7 +20,10 @@
             plural="States">
     </multiselect-dropdown>
   </div>
+  {{#if statusTooltipVisible}}
+    <div class="filter-state__helper">
+        <i class="fa fa-question-circle" rel="tooltip"
+          title="The state represents the state of this object information within GGRC. It does not indicate the state of the underlying product or system."></i>
+    </div>
+  {{/if}}
 </div>
-
-
-
