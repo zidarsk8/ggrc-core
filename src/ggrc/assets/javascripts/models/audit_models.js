@@ -344,7 +344,7 @@
       verifiersList: {},
       people_values: [
         {value: 'Admin', title: 'Object Admins'},
-        {value: 'Audit Lead', title: 'Audit Lead'},
+        {value: 'Audit Lead', title: 'Audit Captain'},
         {value: 'Auditors', title: 'Auditors'},
         {value: 'Principal Assignees', title: 'Principal Assignees'},
         {value: 'Secondary Assignees', title: 'Secondary Assignees'},

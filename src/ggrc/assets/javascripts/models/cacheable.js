@@ -421,7 +421,7 @@
         obj.attr('_pending_joins_dfd', dfds_apply);
 
         return dfds_apply.then(function () {
-          can.trigger(this, 'resolved');
+          obj.dispatch('resolvePendingBindings');
           return obj.refresh();
         });
       });

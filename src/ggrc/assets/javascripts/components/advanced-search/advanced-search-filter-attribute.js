@@ -72,6 +72,13 @@
   GGRC.Components('advancedSearchFilterAttribute', {
     tag: 'advanced-search-filter-attribute',
     template: template,
-    viewModel: viewModel
+    viewModel: viewModel,
+    events: {
+      '{viewModel} availableAttributes': function (ev, desc, attributes) {
+        if (attributes[0] && attributes[0].attr_title) {
+          this.viewModel.attr('attribute.field', attributes[0].attr_title);
+        }
+      }
+    }
   });
 })(window.can, window.GGRC);

@@ -60,6 +60,19 @@ class Cycle(mixins.WithContact,
                          nullable=False)
   next_due_date = db.Column(db.Date)
 
+  @property
+  def is_done(self):
+    """Check if cycle's done
+
+    Overrides StatusValidatedMixin method because cycle's is_done state
+    depends on is_verification_needed flag
+    """
+    if super(Cycle, self).is_done:
+      return True
+    if self.cycle_task_group_object_tasks:
+      return False
+    return True
+
   _api_attrs = reflection.ApiAttributes(
       'workflow',
       'cycle_task_groups',

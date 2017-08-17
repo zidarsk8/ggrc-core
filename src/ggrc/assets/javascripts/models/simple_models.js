@@ -84,11 +84,7 @@
       this.validateNonBlank('title');
       this._super.apply(this, arguments);
     }
-  }, {
-    after_save: function () {
-      this.dispatch('refreshRelatedDocuments');
-    }
-  });
+  }, {});
 
   can.Model.Cacheable('CMS.Models.Option', {
     root_object: 'option',
@@ -163,11 +159,7 @@
       this.validateNonBlank('title');
       this._super.apply(this, arguments);
     }
-  }, {
-    after_save: function () {
-      this.dispatch('refreshRelatedDocuments');
-    }
-  });
+  }, {});
 
   can.Model.Cacheable('CMS.Models.Help', {
     root_object: 'help',

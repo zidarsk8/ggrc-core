@@ -670,12 +670,9 @@ def handle_cycle_task_entry_post(sender, obj=None, src=None, service=None):
 @Signals.status_change.connect_via(models.Cycle)
 def handle_cycle_status_change(sender, obj=None, new_status=None,
                                old_status=None):
-  if not inspect(obj).attrs.status.history.has_changes():
-    return
-  if not obj.is_done:
-    return
-  obj.is_current = False
-  update_workflow_state(obj.workflow)
+  if inspect(obj).attrs.status.history.has_changes():
+    obj.is_current = not obj.is_done
+    update_workflow_state(obj.workflow)
 
 
 # noqa pylint: disable=unused-argument

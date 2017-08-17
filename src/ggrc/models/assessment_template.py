@@ -51,7 +51,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
   # labels to show to the user in the UI for various default people values
   DEFAULT_PEOPLE_LABELS = {
       "Admin": "Object Admins",
-      "Audit Lead": "Audit Lead",
+      "Audit Lead": "Audit Captain",
       "Auditors": "Auditors",
       "Principal Assignees": "Principal Assignees",
       "Secondary Assignees": "Secondary Assignees",

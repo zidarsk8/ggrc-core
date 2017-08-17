@@ -394,12 +394,16 @@ mapper-results-item-attrs {
       flex: 1 1 $first-column-width;
     }
 
-    .roles {
+    .roles, .reference-urls-list {
       overflow: hidden;
       text-overflow: ellipsis;;
       .person {
         display: inline;
       }
+    }
+
+    .reference-urls-list {
+      color: $link;
     }
 
     .repeat-cell > .repeat-summary {

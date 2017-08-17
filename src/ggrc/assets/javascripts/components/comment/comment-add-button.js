@@ -7,8 +7,7 @@
   'use strict';
 
   var tag = 'comment-add-button';
-  var template = '<button class="btn btn-small btn-green"' +
-    ' {{#if disabled}}disabled{{/if}}' +
+  var template = '<button class="btn btn-small btn-gray"' +
     ' ($click)="createComment()">' +
     '<content></content>' +
     '</button>';
@@ -38,6 +37,10 @@
       createComment: function () {
         var comment;
         var description = this.attr('value');
+
+        if (this.attr('disabled')) {
+          return;
+        }
 
         comment = new CMS.Models.Comment({
           description: description,

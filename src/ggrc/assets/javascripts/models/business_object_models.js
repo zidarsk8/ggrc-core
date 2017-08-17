@@ -63,11 +63,7 @@
 
       this.validateNonBlank('title');
     }
-  }, {
-    after_save: function () {
-      this.dispatch('refreshRelatedDocuments');
-    }
-  });
+  }, {});
 
   can.Model.Cacheable('CMS.Models.Project', {
     root_object: 'project',
@@ -127,11 +123,7 @@
 
         this.validateNonBlank('title');
       }
-    }, {
-      after_save: function () {
-        this.dispatch('refreshRelatedDocuments');
-      }
-    });
+    }, {});
 
   can.Model.Cacheable('CMS.Models.Facility', {
     root_object: 'facility',
@@ -192,11 +184,7 @@
 
       this.validateNonBlank('title');
     }
-  }, {
-    after_save: function () {
-      this.dispatch('refreshRelatedDocuments');
-    }
-  });
+  }, {});
 
   can.Model.Cacheable('CMS.Models.Product', {
     root_object: 'product',
@@ -257,11 +245,7 @@
 
       this.validateNonBlank('title');
     }
-  }, {
-    after_save: function () {
-      this.dispatch('refreshRelatedDocuments');
-    }
-  });
+  }, {});
 
   can.Model.Cacheable('CMS.Models.DataAsset', {
     root_object: 'data_asset',
@@ -321,11 +305,7 @@
 
       this.validateNonBlank('title');
     }
-  }, {
-    after_save: function () {
-      this.dispatch('refreshRelatedDocuments');
-    }
-  });
+  }, {});
 
   can.Model.Cacheable('CMS.Models.AccessGroup', {
     root_object: 'access_group',
@@ -385,11 +365,7 @@
 
       this.validateNonBlank('title');
     }
-  }, {
-    after_save: function () {
-      this.dispatch('refreshRelatedDocuments');
-    }
-  });
+  }, {});
 
   can.Model.Cacheable('CMS.Models.Market', {
     root_object: 'market',
@@ -448,11 +424,7 @@
 
       this.validateNonBlank('title');
     }
-  }, {
-    after_save: function () {
-      this.dispatch('refreshRelatedDocuments');
-    }
-  });
+  }, {});
 
   can.Model.Cacheable('CMS.Models.Vendor', {
     root_object: 'vendor',
@@ -512,9 +484,5 @@
 
       this.validateNonBlank('title');
     }
-  }, {
-    after_save: function () {
-      this.dispatch('refreshRelatedDocuments');
-    }
-  });
+  }, {});
 })(this.can);

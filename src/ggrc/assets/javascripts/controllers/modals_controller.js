@@ -85,7 +85,7 @@
       // loaded before rendering the form, otherwise initial validation can
       // incorrectly fail for form fields whose values rely on current user's
       // attributes.
-      currentUser = CMS.Models.Person.cache[GGRC.current_user.id];
+      currentUser = CMS.Models.Person.store[GGRC.current_user.id];
 
       if (currentUser) {
         currentUser = currentUser.reify();
