@@ -18,17 +18,6 @@
     destroy: "DELETE /api/workflows/{id}",
     is_custom_attributable: true,
 
-    defaults: {
-      frequency_options: [
-        {title: 'One time', value: 'one_time'},
-        {title: 'Weekly', value: 'weekly'},
-        {title: 'Monthly', value: 'monthly'},
-        {title: 'Quarterly', value: 'quarterly'},
-        {title: 'Annually', value: 'annually'}
-      ],
-      frequency: 'one_time' // default value
-    },
-
     attributes: {
       people: "CMS.Models.Person.stubs",
       workflow_people: "CMS.Models.WorkflowPerson.stubs",
@@ -38,6 +27,7 @@
       modified_by: "CMS.Models.Person.stub",
       context: "CMS.Models.Context.stub",
       custom_attribute_values: "CMS.Models.CustomAttributeValue.stubs",
+      repeat_every: 'number',
       default_lhn_filters: {
         Workflow: {status: 'Active'},
         Workflow_All: {},
@@ -56,7 +46,6 @@
         {attr_title: 'Manager', attr_name: 'owner', attr_sort_field: ''},
         {attr_title: 'Code', attr_name: 'slug'},
         {attr_title: 'State', attr_name: 'status'},
-        {attr_title: 'Frequency', attr_name: 'frequency'},
         {attr_title: 'Last Updated', attr_name: 'updated_at'}
       ]
     },
@@ -114,89 +103,6 @@
           }.bind(this));
       }.bind(this));
       return dfd;
-    },
-    // Check if task groups are slated to start
-    //   in the current week/month/quarter/year
-    is_mid_frequency: function() {
-      var dfd = new $.Deferred(),
-          self = this;
-
-      function _afterOrSame(d1, d2) {
-        return d1.isAfter(d2, 'day') || d1.isSame(d2, 'day');
-      }
-      function _beforeOrSame(d1, d2) {
-        return d1.isBefore(d2, 'day') || d1.isSame(d2, 'day');
-      }
-      function _currentQuarter() {
-        return moment().dayOfYear(1).quarter(moment().quarter());
-      }
-      function _check_all_tasks(tasks) {
-        tasks.each(function(task) {
-          var start, end, current = moment();
-          task = task.reify();
-          switch(self.frequency) {
-            case "weekly":
-              start = moment().isoWeekday(task.relative_start_day);
-              end = moment().isoWeekday(task.relative_end_day);
-              if (_afterOrSame(start, end)) {
-                end.add(1, 'w');
-              }
-              break;
-            case "monthly":
-              start = moment().date(task.relative_start_day);
-              end = moment().date(task.relative_end_day);
-              if (_afterOrSame(start, end)) {
-                end.add(1, 'M');
-              }
-              break;
-            case "quarterly":
-              start = _currentQuarter().date(task.relative_start_day).add(task.relative_start_month-1, 'M');
-              end = _currentQuarter().date(task.relative_end_day).add(task.relative_end_month-1, 'M');
-              if (_afterOrSame(start, end)) {
-                end.add(1, 'q');
-              }
-              break;
-            case "annually":
-              start = moment().date(task.relative_start_day).month(task.relative_start_month-1);
-              end = moment().date(task.relative_end_day).month(task.relative_end_month-1);
-              if (_afterOrSame(start, end)) {
-                end.add(1, 'y');
-              }
-              break;
-          }
-          if (_afterOrSame(current, start) && _beforeOrSame(current, end)) {
-            dfd.resolve(true);
-          }
-        });
-        dfd.resolve(false);
-      }
-
-      if (!this.frequency_duration || this.frequency === 'one_time') {
-        return dfd.resolve(false);
-      }
-
-      // Check each task in the workflow:
-      this.refresh_all('task_groups', 'task_group_tasks').then(function(s) {
-        var tasks = new can.List();
-        self.task_groups.each(function(task_group) {
-          task_group.reify().task_group_tasks.each(function(task) {
-            tasks.push(task.reify());
-          });
-        });
-        _check_all_tasks(tasks);
-      });
-      return dfd;
-    },
-
-    // Get duration from frequency or false for one_time or continuous wfs.
-    frequency_duration: function() {
-      switch (this.frequency) {
-        case "weekly": return "week";
-        case "monthly": return "month";
-        case "quarterly": return "quarter";
-        case "annually": return "year";
-        default: return false;
-      }
     },
     // start day of month, affects start_date.
     //  Use when month number doesn't matter or is

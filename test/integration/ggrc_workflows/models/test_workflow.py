@@ -1,0 +1,166 @@
+# Copyright (C) 2017 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+"""Tests for Workflow model."""
+
+import datetime
+import ddt
+import freezegun
+
+from ggrc import db
+from ggrc.models import all_models
+from ggrc_workflows.models import Workflow
+from integration.ggrc import TestCase
+from integration.ggrc.models import factories as glob_factories
+from integration.ggrc_workflows.models import factories
+from integration.ggrc import api_helper
+from integration.ggrc_workflows import generator as wf_generator
+
+
+@ddt.ddt
+class TestWorkflow(TestCase):
+  """Tests for Workflow model inner logic"""
+
+  def setUp(self):
+    super(TestWorkflow, self).setUp()
+
+    self.api = api_helper.Api()
+    self.generator = wf_generator.WorkflowsGenerator()
+
+  def test_basic_workflow_creation(self):
+    """Test basic WF"""
+    workflow = factories.WorkflowFactory(title="This is a test WF")
+    workflow = db.session.query(Workflow).get(workflow.id)
+    self.assertEqual(workflow.title, "This is a test WF")
+
+  @ddt.data(
+      # (today, start_date, update_date, expected_date)
+      (
+          "2017-08-10",
+          datetime.date(2017, 8, 10),
+          datetime.date(2017, 8, 9),
+          datetime.date(2017, 8, 16)
+      ),
+      (
+          "2017-08-10",
+          datetime.date(2017, 8, 10),
+          datetime.date(2017, 8, 11),
+          datetime.date(2017, 8, 11)
+      ),
+      (
+          "2017-08-10",
+          datetime.date(2017, 8, 10),
+          datetime.date(2017, 8, 10),
+          datetime.date(2017, 8, 17)
+      ),
+  )
+  @ddt.unpack
+  def test_recalculate_start_date(self,
+                                  today,
+                                  start_date,
+                                  update_date,
+                                  expected_date):
+    with freezegun.freeze_time(today):
+      with glob_factories.single_commit():
+        workflow = factories.WorkflowFactory(
+            title="This is a test WF",
+            unit=all_models.Workflow.WEEK_UNIT,
+            repeat_every=1)
+        task_group = factories.TaskGroupFactory(workflow=workflow)
+        task = factories.TaskGroupTaskFactory(
+            task_group=task_group,
+            start_date=start_date,
+            end_date=start_date + datetime.timedelta(1))
+      wf_id = workflow.id
+      task_id = task.id
+      self.generator.activate_workflow(workflow)
+      task = all_models.TaskGroupTask.query.get(task_id)
+      self.api.put(task, {"start_date": update_date})
+    workflow = all_models.Workflow.query.get(wf_id)
+    self.assertEqual(expected_date, workflow.next_cycle_start_date)
+
+  @ddt.data(
+      # (delete_task_idx, expected_date)
+      ([0], datetime.date(2017, 8, 11)),
+      ([1], datetime.date(2017, 8, 17)),
+      ([0, 1], None),
+  )
+  @ddt.unpack
+  def test_recalculate_start_date_on_delete(self, idxs, expected_date):
+    start_date_1 = datetime.date(2017, 8, 10)
+    start_date_2 = datetime.date(2017, 8, 11)
+    with freezegun.freeze_time("2017-08-10"):
+      with glob_factories.single_commit():
+        workflow = factories.WorkflowFactory(
+            title="This is a test WF",
+            unit=all_models.Workflow.WEEK_UNIT,
+            repeat_every=1)
+        tasks = (
+            factories.TaskGroupTaskFactory(
+                task_group=factories.TaskGroupFactory(workflow=workflow),
+                start_date=start_date_1,
+                end_date=start_date_1 + datetime.timedelta(1),
+            ),
+            factories.TaskGroupTaskFactory(
+                task_group=factories.TaskGroupFactory(workflow=workflow),
+                start_date=start_date_2,
+                end_date=start_date_2 + datetime.timedelta(1),
+            ),
+        )
+      wf_id = workflow.id
+      task_ids = [t.id for t in tasks]
+      self.generator.activate_workflow(workflow)
+      workflow = all_models.Workflow.query.get(wf_id)
+      self.assertEqual(datetime.date(2017, 8, 17),
+                       workflow.next_cycle_start_date)
+      for idx in idxs:
+        task = all_models.TaskGroupTask.query.get(task_ids[idx])
+        self.api.delete(task)
+    workflow = all_models.Workflow.query.get(wf_id)
+    self.assertEqual(expected_date, workflow.next_cycle_start_date)
+
+  @ddt.data(
+      # NOTE: today is datetime.date(2017, 8, 10)
+      # (new_start_date, expected_date)
+      (datetime.date(2017, 8, 10), datetime.date(2017, 8, 17)),
+      (datetime.date(2017, 8, 3), datetime.date(2017, 8, 17)),
+      (datetime.date(2017, 8, 17), datetime.date(2017, 8, 17)),
+      (datetime.date(2017, 8, 9), datetime.date(2017, 8, 16)),
+      (datetime.date(2017, 8, 8), datetime.date(2017, 8, 15)),
+      (datetime.date(2017, 8, 7), datetime.date(2017, 8, 14)),
+      (datetime.date(2017, 8, 6), datetime.date(2017, 8, 11)),
+      (datetime.date(2017, 8, 5), datetime.date(2017, 8, 11)),
+  )
+  @ddt.unpack
+  def test_recalculate_start_date_on_create(self,
+                                            new_start_date,
+                                            expected_date):
+    with freezegun.freeze_time("2017-08-10"):
+      with glob_factories.single_commit():
+        workflow = factories.WorkflowFactory(
+            title="This is a test WF",
+            unit=all_models.Workflow.WEEK_UNIT,
+            repeat_every=1)
+        task = factories.TaskGroupTaskFactory(
+            task_group=factories.TaskGroupFactory(
+                workflow=workflow,
+                context=glob_factories.ContextFactory(),
+            ),
+            start_date=datetime.date(2017, 8, 10),
+            end_date=datetime.date(2017, 8, 11),
+        )
+      wf_id = workflow.id
+      task_id = task.id
+      self.generator.activate_workflow(workflow)
+      workflow = all_models.Workflow.query.get(wf_id)
+      task = all_models.TaskGroupTask.query.get(task_id)
+      self.assertEqual(datetime.date(2017, 8, 17),
+                       workflow.next_cycle_start_date)
+      self.generator.generate_task_group_task(
+          task.task_group,
+          {
+              'start_date': new_start_date,
+              'end_date': new_start_date + datetime.timedelta(1),
+          })
+    workflow = all_models.Workflow.query.get(wf_id)
+    self.assertEqual(expected_date, workflow.next_cycle_start_date)

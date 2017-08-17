@@ -1,6 +1,7 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+import unittest
 
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.utils.rules import get_mapping_rules, get_unmapping_rules
@@ -50,7 +51,8 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Custom email message",
         "Manager",
         "Member",
-        "Frequency",
+        "Unit",
+        "Repeat Every",
         "Force real-time email updates",
         "Code",
         "Delete",
@@ -60,7 +62,6 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
     vals = {val["display_name"]: val for val in definitions.itervalues()}
     self.assertTrue(vals["Title"]["mandatory"])
     self.assertTrue(vals["Manager"]["mandatory"])
-    self.assertTrue(vals["Frequency"]["mandatory"])
     self.assertIn("type", vals["Manager"])
     self.assertIn("type", vals["Member"])
     self.assertEqual(vals["Manager"]["type"], "user_role")
@@ -93,8 +94,8 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Task Type",
         "Assignee",
         "Task Description",
-        "Start",
-        "End",
+        "Start Date",
+        "End Date",
         "Task Group",
         "Code",
         "Delete",

@@ -7,7 +7,8 @@
 """
 
 import functools
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
+import sqlalchemy as sa
 
 from freezegun import freeze_time
 from mock import patch
@@ -114,12 +115,12 @@ class TestTaskDueNotifications(TestCase):
 
   @ddt.unpack
   @ddt.data(
-      ("2017-06-12 12:12:12", [], []),
-      ("2017-06-13 13:13:13", ["task 3"], ["task 4"]),
+      ("2017-06-12 12:12:12", ["task 1"], ["task 2"], ["task 3"]),
+      ("2017-06-13 13:13:13", ["task 1", "task 2"], ["task 3"], ["task 4"]),
   )
   @patch("ggrc.notifications.common.send_email")
   def test_creating_obsolete_notifications(
-      self, fake_now, expected_due_today, expected_due_in, _
+      self, fake_now, expected_overdue, expected_due_today, expected_due_in, _
   ):
     """Notifications already obsolete on creation date should not be created.
     """
@@ -133,13 +134,25 @@ class TestTaskDueNotifications(TestCase):
     user = models.Person.query.get(self.user.id)
 
     with freeze_time(fake_now):
+      # mark all yeasterday notifications as sent
+      models.all_models.Notification.query.filter(
+          sa.func.DATE(models.all_models.Notification.send_on) < date.today()
+      ).update({models.all_models.Notification.sent_at:
+                datetime.now() - timedelta(1)},
+               synchronize_session="fetch")
+
       _, notif_data = common.get_daily_notifications()
       user_notifs = notif_data.get(user.email, {})
 
-      due_today_notifs = user_notifs.get("due_today", {})
-      titles = [n['title'] for n in due_today_notifs.itervalues()]
-      self.assertEqual(titles, expected_due_today)
+      self.assertEqual(
+          [n['title'] for n in
+           user_notifs.get("task_overdue", {}).itervalues()],
+          expected_overdue)
 
-      due_in_notifs = user_notifs.get("due_in", {})
-      titles = [n['title'] for n in due_in_notifs.itervalues()]
-      self.assertEqual(titles, expected_due_in)
+      self.assertEqual(
+          [n['title'] for n in user_notifs.get("due_today", {}).itervalues()],
+          expected_due_today)
+
+      self.assertEqual(
+          [n['title'] for n in user_notifs.get("due_in", {}).itervalues()],
+          expected_due_in)

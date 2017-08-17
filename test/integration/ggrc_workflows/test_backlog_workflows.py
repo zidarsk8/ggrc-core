@@ -4,7 +4,6 @@
 """Test cases which cover backlog workflow functionality"""
 
 import mock
-from sqlalchemy import and_
 
 from ggrc import db
 from ggrc.models import Person
@@ -46,8 +45,7 @@ class TestBacklogWorkflow(TestCase):
     # find a backlog workflow
     backlog_workflow = db.session\
                          .query(Workflow)\
-                         .filter(and_(Workflow.kind == "Backlog",
-                                      Workflow.frequency == "one_time")).one()
+                         .filter(Workflow.kind == "Backlog").one()
     backlog_workflow_context_id = backlog_workflow.context.id
 
     # check that it has an active cycle and a cycle task group
@@ -113,8 +111,7 @@ class TestBacklogWorkflow(TestCase):
                                                 email="wha12t@who.com")
     backlog_workflow = db.session\
                          .query(Workflow)\
-                         .filter(and_(Workflow.kind == "Backlog",
-                                      Workflow.frequency == "one_time")).one()
+                         .filter(Workflow.kind == "Backlog").one()
     workflow_ctx = backlog_workflow.context.id
     user_perms = load_permissions_for(my_person)
 

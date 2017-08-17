@@ -27,6 +27,11 @@
   margin-bottom: 0;
   // This is not good, but our global inputs have fixed height and paddings
   height: 26px !important;
+
+  &--denied {
+    background: $white;
+    cursor: default;
+  }
 }
 
 .datepicker__input-wrapper {

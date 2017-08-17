@@ -203,4 +203,24 @@ $grid-data-header-height: 66px;
       }
     }
   }
+
+  &.repeat-on {
+    min-width: 480px;
+    .simple-modal__body {
+      max-height: calc(100% - #{$simple-modal-header-height});
+    }
+
+    .simple-modal__header {
+      border-bottom: none;
+    }
+
+    .repeat-options__toggle {
+      margin-bottom: 10px;
+    }
+
+    .simple-modal__footer {
+      border-top: none;
+      text-align: right;
+    }
+  }
 }
