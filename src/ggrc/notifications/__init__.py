@@ -28,3 +28,37 @@ def register_notification_listeners():
   listeners = extensions.get_module_contributions("NOTIFICATION_LISTENERS")
   for listener in listeners:
     listener()
+
+
+def _get_value(cav, _type):
+  """Get value of custom attribute item"""
+  if _type == 'Map:Person':
+    return cav["attribute_object_id"]
+  if _type == 'Checkbox':
+    return cav["attribute_value"] == '1'
+  return cav["attribute_value"]
+
+
+def get_updated_cavs(new_attrs, old_attrs):
+  """Get dict of updated custom attributes of assessment"""
+  cad_list = new_attrs.get("custom_attribute_definitions", [])
+  cad_names = {cad["id"]: cad["display_name"] for cad in cad_list}
+  cad_types = {cad["id"]: cad["attribute_type"] for cad in cad_list}
+
+  old_cavs = old_attrs.get("custom_attribute_values", [])
+  new_cavs = new_attrs.get("custom_attribute_values", [])
+
+  old_cavs = {cad_names[cav["custom_attribute_id"]]:
+              _get_value(cav, cad_types[cav["custom_attribute_id"]])
+              for cav in old_cavs}
+
+  new_cavs = {cad_names[cav["custom_attribute_id"]]:
+              _get_value(cav, cad_types[cav["custom_attribute_id"]])
+              for cav in new_cavs}
+
+  for attr_name, new_val in new_cavs.iteritems():
+    old_val = old_cavs.get(attr_name, None)
+    if old_val != new_val:
+      if not old_val and not new_val:
+        continue
+      yield attr_name

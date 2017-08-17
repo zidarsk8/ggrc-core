@@ -67,15 +67,6 @@ def as_user_time(utc_datetime):
   return local_time.strftime(datetime_format)
 
 
-def _get_value(cav, _type):
-  """Get value of custom attribute item"""
-  if _type == 'Map:Person':
-    return cav["attribute_object_id"]
-  if _type == 'Checkbox':
-    return '0' if not cav["attribute_value"] == '1' else cav["attribute_value"]
-  return cav["attribute_value"]
-
-
 def _get_updated_roles(new_list, old_list, roles):
   """Get difference between old and new access control lists"""
   new_dict = defaultdict(set)
@@ -148,7 +139,7 @@ def _get_updated_fields(obj, created_at, definitions, roles):
         continue
       fields.append(attr_name)
 
-  fields.extend(_get_updated_cavs(new_attrs, old_attrs))
+  fields.extend(list(notifications.get_updated_cavs(new_attrs, old_attrs)))
   updated_fields = []
   for field in fields:
     definition = definitions.get(field, None)
@@ -156,35 +147,6 @@ def _get_updated_fields(obj, created_at, definitions, roles):
       updated_fields.append(definition["display_name"].upper())
     else:
       updated_fields.append(field.upper())
-  return updated_fields
-
-
-def _get_updated_cavs(new_attrs, old_attrs):
-  """Get dict of updated custom attributes of assessment"""
-  updated_fields = []
-  cad_list = new_attrs.get("custom_attribute_definitions", [])
-  cad_names = {cad["id"]: cad["display_name"] for cad in cad_list}
-  cad_types = {cad["id"]: cad["attribute_type"] for cad in cad_list}
-
-  old_cavs = old_attrs.get("custom_attribute_values", [])
-  new_cavs = new_attrs.get("custom_attribute_values", [])
-
-  old_cavs = {cad_names[cav["custom_attribute_id"]]:
-              _get_value(cav, cad_types[cav["custom_attribute_id"]])
-              for cav in old_cavs}
-
-  new_cavs = {cad_names[cav["custom_attribute_id"]]:
-              _get_value(cav, cad_types[cav["custom_attribute_id"]])
-              for cav in new_cavs}
-
-  for attr_name, new_val in new_cavs.iteritems():
-    old_val = old_cavs.get(attr_name, None)
-    if old_val != new_val:
-      if not old_val and not new_val:
-        continue
-
-      updated_fields.append(attr_name)
-
   return updated_fields
 
 
