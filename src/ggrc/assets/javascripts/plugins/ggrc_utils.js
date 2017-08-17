@@ -727,6 +727,7 @@
       }
 
       object = new model(content);
+      object.attr('originalLink', content.originalLink);
       // Update archived flag in content when audit is archived:
       if (instance.parent &&
         CMS.Models.Audit.findInCacheById(instance.parent.id)) {
