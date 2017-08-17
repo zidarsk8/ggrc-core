@@ -207,6 +207,7 @@ dashboard-js-files:
   - components/dropdown/multiselect-dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
+  - components/prev-next-buttons/prev-next-buttons.js
   - components/person/person.js
   - components/inline_edit/inline.js
   - components/inline_edit/inline_checkbox.js
@@ -508,6 +509,7 @@ dashboard-js-template-files:
   - components/dropdown/dropdown.mustache
   - components/dropdown/multiselect_dropdown.mustache
   - components/revision-log/revision-log.mustache
+  - components/prev-next-buttons/prev-next-buttons.mustache
   - components/person/person.mustache
   - components/spinner/spinner.mustache
   - components/rich_text/rich_text.mustache

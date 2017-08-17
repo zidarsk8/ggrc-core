@@ -317,6 +317,11 @@
       '{viewModel.instance} refreshInstance': function () {
         this.viewModel.attr('mappedSnapshots')
           .replace(this.viewModel.loadSnapshots());
+      },
+      '{viewModel} instance': function () {
+        this.viewModel.initializeFormFields();
+        this.viewModel.initGlobalAttributes();
+        this.viewModel.updateRelatedItems();
       }
     },
     helpers: {

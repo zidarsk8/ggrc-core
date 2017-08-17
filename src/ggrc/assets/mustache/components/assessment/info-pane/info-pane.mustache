@@ -4,6 +4,7 @@
 }}
 
 <section class="assessment-module info info-pane{{#is_info_pin}} sticky-info-panel assignable{{/is_info_pin}}">
+  <spinner {toggle}="isLoading" class="spinner-wrapper active"></spinner>
   <inline-form-control {instance}="instance">
   {{#is_info_pin}}
       <info-pin-buttons class="details-wrap" maximized="maximized" on-change-maximized-state="@onChangeMaximizedState"
@@ -114,12 +115,11 @@
                                     </action-toolbar-control>
                                 </editable-document-object-list-item>
                             </object-list>
-                          {{#unless instance.archived}}
-                            {{#is_allowed 'update' instance context='for'}}
+                          {{#unless isEditDenied}}
                             {{#toggle show_new_object_form}}
                                 <ggrc-quick-add
                                         (before-create)="addItems(%event, 'urls')"
-                                        (after-create)="updateItems('urls')"
+                                        (after-create)="updateItems( 'urls')"
                                         {parent_instance}="instance"
                                         join_model="Relationship"
                                         quick_create="create_url">
@@ -148,7 +148,6 @@
                             {{else}}
                                 <button class="btn btn-small btn-gray" {{toggle_button}}>Add</button>
                             {{/toggle}}
-                          {{/is_allowed}}
                           {{/unless}}
                         </div>
                     </div>
@@ -253,15 +252,13 @@
             </div>
             <div class="assessment-comments info-pane__sidebar">
                 <div class="info-pane__section-title">Responses/Comments</div>
-                {{#unless instance.archived}}
-                  {{#is_allowed 'update' instance context='for'}}
+                {{#unless isEditDenied}}
                     <comment-add-form class="comment-add-form"
                                     {instance}="instance"
                                     {is-saving}="isUpdatingComments"
                                     (after-create)="updateItems('comments')"
                                     (before-create)="addItems(%event, 'comments')"
                     ></comment-add-form>
-                  {{/is_allowed}}
                 {{/unless}}
                 <assessment-mapped-comments {mapped-items}="comments"></assessment-mapped-comments>
             </div>

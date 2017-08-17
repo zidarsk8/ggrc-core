@@ -291,10 +291,12 @@
 
       this.attr('pageInfo.current', 1);
       this.loadItems();
+      this.closeInfoPane();
     },
     onFilter: function () {
       this.attr('pageInfo.current', 1);
       this.loadItems();
+      this.closeInfoPane();
     },
     getDepthFilter: function () {
       var filters = can.makeArray(this.attr('filters'));
@@ -438,6 +440,7 @@
           self.attr('pageInfo.current', 1);
         }
         self.loadItems();
+        self.closeInfoPane();
       }
 
       function _verifyRelationship(instance, shortName, parentInstance) {
@@ -538,6 +541,47 @@
     resetAdvancedFilters: function () {
       this.attr('advancedSearch.filterItems', can.List());
       this.attr('advancedSearch.mappingItems', can.List());
+    },
+    closeInfoPane: function () {
+      $('.pin-content')
+        .control()
+        .close();
+    },
+    getAbsoluteItemNumber: function (instance) {
+      var showedItems = this.attr('showedItems');
+      var pageInfo = this.attr('pageInfo');
+      var startIndex = pageInfo.pageSize * (pageInfo.current - 1);
+      var relativeItemIndex = _.findIndex(showedItems, {id: instance.id});
+      return relativeItemIndex > 0 ?
+        startIndex + relativeItemIndex :
+        relativeItemIndex;
+    },
+    getRelativeItemNumber: function (absoluteNumber, pageSize) {
+      var pageNumber = Math.floor(absoluteNumber / pageSize);
+      var startIndex = pageSize * pageNumber;
+      return absoluteNumber - startIndex;
+    },
+    getNextItemPage: function (absoluteNumber, pageInfo) {
+      var pageNumber = Math.floor(absoluteNumber / pageInfo.pageSize) + 1;
+      var dfd = can.Deferred().resolve();
+
+      if (pageInfo.current !== pageNumber) {
+        this.attr('loading', true);
+        this.attr('pageInfo.current', pageNumber);
+        dfd = this.loadItems();
+      }
+
+      return dfd;
+    },
+    updateActiveItemIndicator: function (index) {
+      var element = this.attr('$el');
+      element
+        .find('.item-active')
+        .removeClass('item-active');
+      element
+        .find('tree-item:nth-of-type(' + (index + 1) +
+          ') .tree-item-content')
+        .addClass('item-active');
     }
   });
 
@@ -578,7 +622,10 @@
     },
     events: {
       '{viewModel.pageInfo} current': function () {
-        this.viewModel.loadItems();
+        if (!this.viewModel.attr('loading')) {
+          this.viewModel.loadItems();
+          this.viewModel.closeInfoPane();
+        }
       },
       '{viewModel.pageInfo} pageSize': function () {
         this.viewModel.loadItems();
@@ -591,6 +638,8 @@
           parent_instance: parent,
           options: this.viewModel
         });
+        var itemNumber = this.viewModel.getAbsoluteItemNumber(instance);
+        var isSubTreeItem = itemNumber === -1;
 
         ev.stopPropagation();
 
@@ -598,7 +647,12 @@
           return;
         }
 
+        if (!isSubTreeItem) {
+          this.viewModel.attr('selectedItem', itemNumber);
+        }
+
         this.viewModel.attr('canOpenInfoPin', false);
+        this.viewModel.attr('isSubTreeItem', isSubTreeItem);
         el.find('.item-active').removeClass('item-active');
         selectedEl.addClass('item-active');
 
@@ -608,6 +662,49 @@
         setInstanceDfd.then(function () {
           this.viewModel.attr('canOpenInfoPin', true);
         }.bind(this));
+      },
+      '{viewModel} selectedItem': function () {
+        var componentSelector = 'assessment-info-pane';
+        var itemIndex = this.viewModel.attr('selectedItem');
+        var pageInfo = this.viewModel.attr('pageInfo');
+        var newInstance;
+        var items;
+
+        var relativeIndex = this.viewModel
+          .getRelativeItemNumber(itemIndex, pageInfo.pageSize);
+        var pageLoadDfd = this.viewModel
+          .getNextItemPage(itemIndex, pageInfo);
+        var pinControl = $('.pin-content').control();
+
+        if (!this.viewModel.attr('canOpenInfoPin')) {
+          return;
+        }
+
+        pinControl.setLoadingIndicator(componentSelector, true);
+
+        pageLoadDfd
+          .then(function () {
+            items = this.viewModel.attr('showedItems');
+            newInstance = items[relativeIndex];
+
+            return newInstance
+              .refresh();
+          }.bind(this))
+          .then(function () {
+            pinControl
+              .updateInstance(componentSelector, newInstance);
+            newInstance.dispatch('refreshRelatedDocuments');
+
+            this.viewModel.updateActiveItemIndicator(relativeIndex);
+          }.bind(this))
+          .fail(function () {
+            $('body').trigger('ajax:flash', {
+              error: 'Failed to fetch an object.'
+            });
+          })
+          .always(function () {
+            pinControl.setLoadingIndicator(componentSelector, false);
+          });
       },
       ' refreshTree': function (el, ev) {
         ev.stopPropagation();
