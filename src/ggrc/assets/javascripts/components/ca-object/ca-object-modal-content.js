@@ -60,7 +60,11 @@
               relation.attr({source: comment.serialize()})
                 .save()
                 .then(function () {
-                  self.dispatch('afterCommentCreated');
+                  self.dispatch({
+                    type: 'afterCommentCreated',
+                    items: [comment],
+                    success: true
+                  });
                   instance.dispatch('refreshInstance');
                 });
             });

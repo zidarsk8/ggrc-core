@@ -173,6 +173,31 @@
           this.attr(type).replace(this['load' + can.capitalize(type)]());
         }.bind(this));
       },
+      afterCreate: function (event, type) {
+        var createdItems = event.items;
+        var success = event.success;
+        var items = this.attr(type);
+        var resultList = items
+          .map(function (item) {
+            createdItems.forEach(function (newItem) {
+              if (item._stamp && item._stamp === newItem._stamp) {
+                if (!success) {
+                  newItem.attr('isNotSaved', true);
+                }
+                newItem.removeAttr('_stamp');
+                newItem.removeAttr('isDraft');
+                item = newItem;
+              }
+            });
+            return item;
+          })
+          .filter(function (item) {
+            return !item.attr('isNotSaved');
+          });
+        this.attr('isUpdating' + can.capitalize(type), false);
+
+        items.replace(resultList);
+      },
       removeItem: function (event, type) {
         var item = event.item;
         var index = this.attr(type).indexOf(item);
@@ -314,7 +339,7 @@
       this.viewModel.updateRelatedItems();
     },
     events: {
-      '{viewModel.instance} refreshInstance': function () {
+      '{viewModel.instance} refreshMapping': function () {
         this.viewModel.attr('mappedSnapshots')
           .replace(this.viewModel.loadSnapshots());
       },

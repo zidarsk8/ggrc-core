@@ -119,7 +119,7 @@
                             {{#toggle show_new_object_form}}
                                 <ggrc-quick-add
                                         (before-create)="addItems(%event, 'urls')"
-                                        (after-create)="updateItems( 'urls')"
+                                        (after-create)="afterCreate(%event, 'urls')"
                                         {parent_instance}="instance"
                                         join_model="Relationship"
                                         quick_create="create_url">
@@ -177,7 +177,7 @@
                                                    {is-updating-evidences}="isUpdatingEvidences"
                                                    {form-saved-deferred}="formState.formSavedDeferred"
                                                    (before-comment-created)="addItems(%event, 'comments')"
-                                                   (after-comment-created)="updateItems('comments')"
+                                                   (after-comment-created)="afterCreate(%event, 'comments')"
                           ></ca-object-modal-content>
                       </simple-modal>
                     {{/if}}
@@ -256,7 +256,7 @@
                     <comment-add-form class="comment-add-form"
                                     {instance}="instance"
                                     {is-saving}="isUpdatingComments"
-                                    (after-create)="updateItems('comments')"
+                                    (after-create)="afterCreate(%event, 'comments')"
                                     (before-create)="addItems(%event, 'comments')"
                     ></comment-add-form>
                 {{/unless}}
@@ -389,7 +389,7 @@
                                                                     {edit-mode}="editMode">
                                                                         <div class="action-toolbar__controls">
                                                                             <a href="javascript://"
-                                                                                class="info-action unmap" 
+                                                                                class="info-action unmap"
                                                                                 {{#if isDisabled}}disabled{{/if}}
                                                                                 ($click)="confirmEdit()">
                                                                                     <action-toolbar-control>

@@ -52,7 +52,8 @@
           context: context,
           document_type: CMS.Models.Document.URL,
           created_at: new Date(),
-          isDraft: true
+          isDraft: true,
+          _stamp: Date.now()
         };
         this.viewModel.dispatch({type: 'beforeCreate', items: [attrs]});
         // We are not validating the URL because application can locally we can
@@ -86,7 +87,7 @@
           }.bind(this));
       },
       'a[data-toggle=submit]:not(.disabled):not([disabled]) click': function (el, ev) {
-        var scope = this.scope;
+        var scope = this.viewModel;
         var join_model_class;
         var join_object;
         var quick_create;
@@ -140,6 +141,12 @@
 
           if (created_dfd.state() === 'rejected') {
             created_dfd.fail(function (error) {
+              var instance = scope.attr('instance');
+              scope.dispatch({
+                type: 'afterCreate',
+                items: [instance],
+                success: false
+              });
               $(document.body).trigger('ajax:flash', {
                 error: error.message
               });
@@ -188,12 +195,24 @@
             this.bindXHRToButton(
               join_object.save()
                 .done(function () {
+                  var instance = scope.attr('instance');
                   el.trigger('modal:success', join_object);
-                  this.viewModel
-                    .attr('parent_instance')
-                    .dispatch('refreshInstance');
-                  this.viewModel.dispatch('afterCreate');
-                }.bind(this)), el);
+
+                  scope.dispatch({
+                    type: 'afterCreate',
+                    items: [instance],
+                    success: true
+                  });
+                })
+                .fail(function () {
+                  var instance = scope.attr('instance');
+
+                  scope.dispatch({
+                    type: 'afterCreate',
+                    items: [instance],
+                    success: false
+                  });
+                }));
           }.bind(this))
           .always(function () {
             scope.attr('disabled', false);
