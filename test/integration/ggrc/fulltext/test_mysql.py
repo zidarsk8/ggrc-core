@@ -3,10 +3,12 @@
 
 """Integration tests for custom attribute definitions model."""
 
+import ddt
 import sqlalchemy.exc
 
 from ggrc import db
 from ggrc import views
+from ggrc.models import all_models
 from ggrc.fulltext import mysql
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -15,6 +17,7 @@ CAD = factories.CustomAttributeDefinitionFactory
 CAV = factories.CustomAttributeValueFactory
 
 
+@ddt.ddt
 class TestCAD(TestCase):
   """Tests for basic functionality of cad model."""
 
@@ -50,6 +53,43 @@ class TestCAD(TestCase):
         mysql.MysqlRecordProperty.property == title1
     ).count()
     self.assertEqual(title1_count, 1)
+
+  @ddt.data(
+      (True, "Yes"),
+      (False, "No"),
+      (1, "Yes"),
+      (0, "No"),
+      ("1", "Yes"),
+      ("0", "No"),
+  )
+  @ddt.unpack
+  def test_checkbox_fulltext(self, value, search_value):
+    """Test filter by checkbox value."""
+
+    title = "checkbox"
+    checkbox_type = all_models.CustomAttributeDefinition.ValidTypes.CHECKBOX
+    with factories.single_commit():
+      market = factories.MarketFactory()
+      cad = factories.CustomAttributeDefinitionFactory(
+          title=title,
+          definition_type="market",
+          attribute_type=checkbox_type)
+      factories.CustomAttributeValueFactory(
+          custom_attribute=cad,
+          attributable=market,
+          attribute_value=value)
+
+    views.do_reindex()
+
+    contents = [
+        i.content
+        for i in mysql.MysqlRecordProperty.query.filter(
+            mysql.MysqlRecordProperty.property == title,
+            mysql.MysqlRecordProperty.type == market.type,
+            mysql.MysqlRecordProperty.key == market.id,
+        )
+    ]
+    self.assertEqual([search_value], contents)
 
   def test_unique_key(self):
     """Test object property uniqueness."""
