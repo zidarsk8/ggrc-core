@@ -22,7 +22,7 @@
         if (isAlreadyAdded) {
           return;
         }
-        this.attr('tabIndex', Date.now());
+        this.attr('tabIndex', panels.length + 1);
         panels.push(this);
       },
       removePanel: function () {
