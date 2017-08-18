@@ -342,6 +342,7 @@ dashboard-js-files:
   - components/assessment/info-pane-save-status.js
   - components/loading/loading-status.js
   - components/object-list-item/object-list-item-updater.js
+  - components/lazy-render/lazy-render.js
 
 app-init-files:
   - apps/dashboard.js
