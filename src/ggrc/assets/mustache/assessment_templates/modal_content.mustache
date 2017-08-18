@@ -12,7 +12,6 @@
       <div class="span12">
         <label>
           Default Assessment Type
-          <span class="required">*</span>
         </label>
 
         <assessment-object-type-dropdown
@@ -112,15 +111,12 @@
           <div class="span6 bottom-spacing{{#validation_error instance.computed_errors 'default_people.assessors'}} field-failure{{/validation_error}}">
             <label>
               Default Assignees
-              <span class="required">*</span>
             </label>
             <dropdown
               class-name="input-block-level js-toggle-field"
               options-list="instance.people_values"
               name="instance.default_people.assessors"
               on-change="instance.defaultAssesorsChanged"
-              no-value="true"
-              no-value-label=" "
             ></dropdown>
 
             {{#validation_error instance.computed_errors 'default_people.assessors'}}
