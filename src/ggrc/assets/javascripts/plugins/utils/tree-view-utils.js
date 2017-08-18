@@ -472,7 +472,7 @@
             values.forEach(function (source) {
               var instance = _createInstance(source, modelName);
 
-              if (_isDirectlyRelated(instance)) {
+              if (isDirectlyRelated(instance)) {
                 directlyRelated.push(instance);
               } else {
                 notRelated.push(instance);
@@ -514,6 +514,28 @@
           _getTreeViewOperation(requestedType);
       }
       return expression;
+    }
+
+    /**
+     * Check if object directly mapped to the current context.
+     * @param {Object} instance - Instance of model.
+     * @private
+     * @return {Boolean} Is associated with the current context.
+     */
+    function isDirectlyRelated(instance) {
+      var needToSplit = CurrentPage.isObjectContextPage() &&
+        CurrentPage.getPageType() !== 'Workflow';
+      var relates = CurrentPage.related.attr(instance.type);
+      var result = true;
+      var instanceId = SnapshotUtils.isSnapshot(instance) ?
+        instance.snapshot.id :
+        instance.id;
+
+      if (needToSplit) {
+        result = !!(relates && relates[instanceId]);
+      }
+
+      return result;
     }
 
     /**
@@ -602,28 +624,6 @@
       return instance;
     }
 
-    /**
-     * Check if object directly mapped to the current context.
-     * @param {Object} instance - Instance of model.
-     * @private
-     * @return {Boolean} Is associated with the current context.
-     */
-    function _isDirectlyRelated(instance) {
-      var needToSplit = CurrentPage.isObjectContextPage() &&
-        CurrentPage.getPageType() !== 'Workflow';
-      var relates = CurrentPage.related.attr(instance.type);
-      var result = true;
-      var instanceId = SnapshotUtils.isSnapshot(instance) ?
-        instance.snapshot.id :
-        instance.id;
-
-      if (needToSplit) {
-        result = !!(relates && relates[instanceId]);
-      }
-
-      return result;
-    }
-
     function _getTreeViewOperation(objectName) {
       var isDashboard = /dashboard/.test(window.location);
       var operation;
@@ -643,7 +643,8 @@
       loadFirstTierItems: loadFirstTierItems,
       loadItemsForSubTier: loadItemsForSubTier,
       makeRelevantExpression: makeRelevantExpression,
-      createSelectedColumnsMap: createSelectedColumnsMap
+      createSelectedColumnsMap: createSelectedColumnsMap,
+      isDirectlyRelated: isDirectlyRelated
     };
   })();
 })(window.GGRC);

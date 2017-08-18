@@ -483,7 +483,9 @@ describe('GGRC.Components.treeWidgetContainer', function () {
           pageSize: 10,
           count: 5
         },
-        showedItems: [{id: 1}, {id: 2}, {id: 3}]
+        showedItems: [{id: 1, type: 'object'},
+          {id: 2, type: 'object'},
+          {id: 3, type: 'object'}]
       });
       vm.attr('pageInfo.current', 3);
     });
@@ -492,7 +494,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       function () {
         var result;
 
-        result = vm.getAbsoluteItemNumber({id: 2});
+        result = vm.getAbsoluteItemNumber({id: 2, type: 'object'});
 
         expect(result).toEqual(21);
       });
@@ -501,15 +503,23 @@ describe('GGRC.Components.treeWidgetContainer', function () {
        function () {
          var result;
 
-         result = vm.getAbsoluteItemNumber({id: 4});
+         result = vm.getAbsoluteItemNumber({id: 4, type: 'object'});
 
          expect(result).toEqual(-1);
        });
+    it('should return "-1" when item is of different type',
+      function () {
+        var result;
+
+        result = vm.getAbsoluteItemNumber({id: 3, type: 'snapshot'});
+
+        expect(result).toEqual(-1);
+      });
     it('should return correct item number for first item on non first page',
        function () {
          var result;
 
-         result = vm.getAbsoluteItemNumber({id: 1});
+         result = vm.getAbsoluteItemNumber({id: 1, type: 'object'});
 
          expect(result).toEqual(20);
        });

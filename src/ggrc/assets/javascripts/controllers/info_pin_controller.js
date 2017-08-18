@@ -122,6 +122,11 @@ can.Control('CMS.Controllers.InfoPin', {
     var panelHeight = this.getPinHeight(maximizedState);
     var currentPanelHeight;
     var infoPaneOpenDfd = can.Deferred();
+    var isSubtreeItem = opts.attr('options.isSubTreeItem');
+
+    opts.attr('options.isDirectlyRelated',
+      !isSubtreeItem ||
+      GGRC.Utils.TreeView.isDirectlyRelated(instance));
 
     this.prepareView(opts, el, maximizedState, true);
     // Load trees inside info pin
