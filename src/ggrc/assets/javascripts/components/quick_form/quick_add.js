@@ -30,6 +30,7 @@
       model: null,
       delay: '@',
       quick_create: "@",
+      type: '@',
       verify_event: "@",
       modal_description: "@",
       modal_title: "@",
@@ -50,7 +51,7 @@
           link: value,
           title: value,
           context: context,
-          document_type: CMS.Models.Document.URL,
+          document_type: this.viewModel.attr('type'),
           created_at: new Date(),
           isDraft: true,
           _stamp: Date.now()

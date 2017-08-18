@@ -122,7 +122,8 @@
                                         (after-create)="afterCreate(%event, 'urls')"
                                         {parent_instance}="instance"
                                         join_model="Relationship"
-                                        quick_create="create_url">
+                                        quick_create="create_url"
+                                        type="URL">
                                   {{#prune_context}}
                                       <div class="inline-edit inline-edit--active">
                                           <div class="inline-edit__content">
@@ -391,7 +392,8 @@
                                                     (after-create)="updateItems('referenceUrls')"
                                                     {parent_instance}="instance"
                                                     join_model="Relationship"
-                                                    quick_create="create_url">
+                                                    quick_create="create_url"
+                                                    type="REFERENCE_URL">
                                             {{#prune_context}}
                                                 <div class="inline-edit inline-edit--active">
                                                     <div class="inline-edit__content">
