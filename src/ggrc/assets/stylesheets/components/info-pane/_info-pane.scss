@@ -125,6 +125,14 @@
       flex-direction: row-reverse;
       flex: 3 3;
 
+      .form-status {
+        line-height: 28px;
+
+        .loading-status {
+          margin-right: 5px;
+        }
+      }
+
       .pane-header__toolbar-item {
         margin-top: 20px;
 

@@ -11,7 +11,7 @@
 
   GGRC.Components('autoSaveFormStatus', {
     tag: 'auto-save-form-status',
-    template: '{{formStatusText}}<content></content>',
+    template: '<content></content>',
     viewModel: {
       define: {
         isDirty: {
