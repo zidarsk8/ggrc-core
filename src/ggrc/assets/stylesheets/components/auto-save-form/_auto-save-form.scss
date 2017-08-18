@@ -50,6 +50,11 @@ auto-save-form {
     align-items: flex-start;
     justify-content: flex-start;
 
+    &.inline-reverse {
+      flex-direction: row-reverse;
+      flex-wrap: nowrap
+    }
+
     auto-save-form-field {
       display: block;
       flex: 1;
@@ -66,6 +71,10 @@ auto-save-form {
 
     .form-field__content {
       max-width: 360px;
+      &.inline-reverse {
+        min-width: auto;
+        padding: 5px 8px 0 0;
+      }
     }
 
     .form-field__validation-hint-placeholder {
@@ -101,6 +110,9 @@ auto-save-form {
     text-transform: uppercase;
     line-height: 16px;
     padding: 5px 0;
+    &.inline-reverse {
+      max-width: 332px;
+    }
   }
 
   &__title-helper-text {

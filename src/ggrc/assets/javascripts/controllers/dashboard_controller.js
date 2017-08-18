@@ -354,7 +354,7 @@
       }
       if (widget) {
         this.set_active_widget(widget);
-        return this.display_widget_path(rest, refetch);
+        return this.display_widget_path(rest, refetch || widget.forceRefetch);
       }
       return new $.Deferred().resolve();
     },
@@ -493,6 +493,7 @@
       widget.attr({
         internav_icon: icon,
         internav_display: title,
+        forceRefetch: widgetOptions && widgetOptions.forceRefetch,
         spinner: this.options.spinners['#' + $widget.attr('id')],
         model: widgetOptions && widgetOptions.model,
         order: (widgetOptions || widget).order
