@@ -122,7 +122,8 @@
                                         (after-create)="afterCreate(%event, 'urls')"
                                         {parent_instance}="instance"
                                         join_model="Relationship"
-                                        quick_create="create_url">
+                                        quick_create="create_url"
+                                        {type}="documentTypes.urls">
                                   {{#prune_context}}
                                       <div class="inline-edit inline-edit--active">
                                           <div class="inline-edit__content">
@@ -363,89 +364,64 @@
                                 <div class="row-fluid wrap-row">
 
                                     <!-- <REFERENCE URLS> -->
-                                    <related-documents {instance}="instance" document-type="REFERENCE_URL">
-                                        <related-reference-urls class="related-reference-urls"
-                                            {(urls)}="documents"
-                                            {is-disabled}="isLoading"
-                                            {is-not-editable}="isSnapshot"
-                                            (createReferenceUrl)="createRelatedDocument(%event.payload)"
-                                            (removeReferenceUrl)="removeRelatedDocument(%event.payload)">
-                                                <div class="related-reference-urls__heading">
-                                                    <spinner class="related-reference-urls__spinner" {toggle}="isLoading"></spinner>
-                                                    <h6 class="info-pane__section-title">Reference URL</h6>
+                                    <div>
+                                        <div class="info-pane__section-title">
+                                            <spinner class="info-pane__section-title-icon"
+                                                {toggle}="isUpdatingReferenceUrls">
+                                            </spinner>
+                                            Reference Url
+                                        </div>
+                                        <object-list {items}="referenceUrls" {empty-message}="noItemsText">
+                                            <editable-document-object-list-item {document}="{.}">
+                                                <action-toolbar-control>
+                                                    <unmap-button
+                                                            (before-unmap)="removeItem(%event, 'referenceUrls')"
+                                                            (after-unmap)="updateItems('referenceUrls')"
+                                                            {destination}="instance"
+                                                            {source}="document">
+                                                            <i class="fa fa-trash"></i>
+                                                    </unmap-button>
+                                                </action-toolbar-control>
+                                            </editable-document-object-list-item>
+                                        </object-list>
+                                    {{#unless instance.archived}}
+                                        {{#is_allowed 'update' instance context='for'}}
+                                        {{#toggle show_new_object_form}}
+                                            <ggrc-quick-add
+                                                    (before-create)="addItems(%event, 'referenceUrls')"
+                                                    (after-create)="updateItems('referenceUrls')"
+                                                    {parent_instance}="instance"
+                                                    join_model="Relationship"
+                                                    quick_create="create_url"
+                                                    {type}="documentTypes.referenceUrls">
+                                            {{#prune_context}}
+                                                <div class="inline-edit inline-edit--active">
+                                                    <div class="inline-edit__content">
+                                                        <input tabindex="3" type="text" name="instance" placeholder="Add URL">
+                                                        <input type="hidden" name="role_name" value="Auditor"/>
+                                                        <ul class="inline-edit__controls inline-edit__controls--edit-mode">
+                                                            <li>
+                                                                <a href="javascript://" class="{{#if disabled}}disabled{{/if}}"
+                                                                    data-toggle="submit" {{toggle_button 'modal:success'}}>
+                                                                    <i class="fa fa-check"></i>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="javascript://" {{toggle_button}}>
+                                                                    <i class="fa fa-times"></i>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
                                                 </div>
-                                                <div class="related-reference-urls__list">
-                                                    <object-list {(items)}="urls" {empty-message}="''">
-                                                        <div class="action-toolbar">
-                                                            <document-object-list-item {instance}="{.}">
-                                                            </document-object-list-item>
-                                                            {{#unless isEditDenied}}
-                                                                <confirm-edit-action
-                                                                    (set-edit-mode)="removeReferenceUrl(%context)"
-                                                                    (set-in-progress)="setInProgressState()"
-                                                                    {is-edit-icon-denied}="isEditDenied"
-                                                                    {instance}="instance"
-                                                                    {on-state-change-dfd}="onStateChangeDfd"
-                                                                    {edit-mode}="editMode">
-                                                                        <div class="action-toolbar__controls">
-                                                                            <a href="javascript://"
-                                                                                class="info-action unmap"
-                                                                                {{#if isDisabled}}disabled{{/if}}
-                                                                                ($click)="confirmEdit()">
-                                                                                    <action-toolbar-control>
-                                                                                        <i class="fa fa-trash"></i>
-                                                                                    </action-toolbar-control>
-                                                                            </a>
-                                                                        </div>
-                                                                </confirm-edit-action>
-                                                            {{/unless}}
-                                                        </div>
-                                                    </object-list>
-                                                </div>
-                                                {{#unless isEditDenied}}
-                                                    {{#if isFormVisible}}
-                                                        <form class="related-reference-urls__create create-form">
-                                                            <fieldset class="create-form__layout"
-                                                                {{#if isDisabled}}disabled{{/if}}>
-                                                                <input {($value)}="value"
-                                                                    class="create-form__input"
-                                                                    type="text"
-                                                                    placeholder="Add URL"
-                                                                    spellcheck="false"
-                                                                    autocomplete="false"/>
-                                                                <div class="create-form__controls">
-                                                                <button type="submit"
-                                                                    class="create-form__confirm"
-                                                                    ($click)="submitCreateReferenceUrlForm(value)">
-                                                                        <i class="fa fa-check"></i>
-                                                                </button>
-                                                                <button type="button"
-                                                                    class="create-form__cancel"
-                                                                    ($click)="toggleFormVisibility(false)">
-                                                                        <i class="fa fa-times"></i>
-                                                                </button>
-                                                                </div>
-                                                            </fieldset>
-                                                        </form>
-                                                    {{else}}
-                                                        <confirm-edit-action
-                                                            (set-edit-mode)="toggleFormVisibility(true)"
-                                                            (set-in-progress)="setInProgressState()"
-                                                            {is-edit-icon-denied}="isEditDenied"
-                                                            {instance}="instance"
-                                                            {on-state-change-dfd}="onStateChangeDfd"
-                                                            {edit-mode}="editMode">
-                                                                <button
-                                                                    type="button"
-                                                                    class="related-reference-urls__toggle btn btn-small btn-gray"
-                                                                    ($click)="confirmEdit()">
-                                                                        Add
-                                                                </button>
-                                                        </confirm-edit-action>
-                                                    {{/if}}
-                                                {{/unless}}
-                                        </related-reference-urls>
-                                    </related-documents>
+                                            {{/prune_context}}
+                                            </ggrc-quick-add>
+                                        {{else}}
+                                            <button class="btn btn-small btn-gray" {{toggle_button}}>Add</button>
+                                        {{/toggle}}
+                                    {{/is_allowed}}
+                                    {{/unless}}
+                                    </div>
 
                                     <!-- </REFERENCE URLS> -->
                                 </div>

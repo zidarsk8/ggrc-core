@@ -16,6 +16,11 @@
     tag: 'assessment-info-pane',
     template: tpl,
     viewModel: {
+      documentTypes: {
+        evidences: CMS.Models.Document.EVIDENCE,
+        urls: CMS.Models.Document.URL,
+        referenceUrls: CMS.Models.Document.REFERENCE_URL
+      },
       define: {
         isSaving: {
           type: 'boolean',
@@ -64,6 +69,9 @@
           Value: can.List
         },
         urls: {
+          Value: can.List
+        },
+        referenceUrls: {
           Value: can.List
         },
         evidences: {
@@ -119,19 +127,12 @@
       getSnapshotQuery: function () {
         return this.getQuery('Snapshot');
       },
-      getEvidenceQuery: function () {
-        var evidenceType = CMS.Models.Document.EVIDENCE;
-        return this.getQuery(
+      getDocumentQuery: function (documentType) {
+        var query = this.getQuery(
           'Document',
           {sortBy: 'created_at', sortDirection: 'desc'},
-          this.getDocumentAdditionFilter(evidenceType));
-      },
-      getUrlQuery: function () {
-        var urlType = CMS.Models.Document.URL;
-        return this.getQuery(
-          'Document',
-          {sortBy: 'created_at', sortDirection: 'desc'},
-          this.getDocumentAdditionFilter(urlType));
+          this.getDocumentAdditionFilter(documentType));
+        return query;
       },
       requestQuery: function (query, type) {
         var dfd = can.Deferred();
@@ -161,12 +162,19 @@
         return this.requestQuery(query, 'comments');
       },
       loadEvidences: function () {
-        var query = this.getEvidenceQuery();
+        var query = this.getDocumentQuery(
+          this.attr('documentTypes.evidences'));
         return this.requestQuery(query, 'evidences');
       },
       loadUrls: function () {
-        var query = this.getUrlQuery();
+        var query = this.getDocumentQuery(
+          this.attr('documentTypes.urls'));
         return this.requestQuery(query, 'urls');
+      },
+      loadReferenceUrls: function () {
+        var query = this.getDocumentQuery(
+          this.attr('documentTypes.referenceUrls'));
+        return this.requestQuery(query, 'referenceUrls');
       },
       updateItems: function () {
         can.makeArray(arguments).forEach(function (type) {
@@ -230,6 +238,8 @@
           .replace(this.loadEvidences());
         this.attr('urls')
           .replace(this.loadUrls());
+        this.attr('referenceUrls')
+          .replace(this.loadReferenceUrls());
       },
       initializeFormFields: function () {
         var cavs =
@@ -347,6 +357,9 @@
         this.viewModel.initializeFormFields();
         this.viewModel.initGlobalAttributes();
         this.viewModel.updateRelatedItems();
+      },
+      '{viewModel.instance} resolvePendingBindings': function () {
+        this.viewModel.updateItems('referenceUrls');
       }
     },
     helpers: {
