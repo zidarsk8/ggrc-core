@@ -148,18 +148,13 @@ class GlobalEditorReaderGetTest(WorkflowRolesTestCase):
     user = self.users[user_role]
     self.api.set_user(user)
 
+    workflow_obj = self.activate_workflow_with_cycle(self.workflow_obj)[1]
     wf_role_obj = all_models.Role.query.filter_by(name=workflow_role).one()
-
-    _, self.workflow_obj = self.activate_workflow_with_cycle(self.workflow_obj)
-
-    bp_factories.UserRoleFactory(person=user,
-                                 role=wf_role_obj,
-                                 context=self.workflow_obj.context)
-
-    cycle_task = self.session.query(CycleTaskGroupObjectTask).filter(
-        CycleTaskGroupObjectTask.task_group_task_id ==
-        self.first_task_group_task.id
-    ).first()
+    cycle_task = workflow_obj.cycles[0].cycle_task_group_object_tasks[0]
+    bp_factories.UserRoleFactory(
+        person=user,
+        role=wf_role_obj,
+        context=self.workflow_obj.context)
 
     res = self.api.delete(cycle_task)
 
