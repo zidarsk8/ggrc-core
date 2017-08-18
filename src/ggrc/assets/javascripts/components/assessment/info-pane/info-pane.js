@@ -16,6 +16,11 @@
     tag: 'assessment-info-pane',
     template: tpl,
     viewModel: {
+      documentTypes: {
+        evidences: CMS.Models.Document.EVIDENCE,
+        urls: CMS.Models.Document.URL,
+        referenceUrls: CMS.Models.Document.REFERENCE_URL
+      },
       define: {
         isSaving: {
           type: 'boolean',
@@ -157,15 +162,18 @@
         return this.requestQuery(query, 'comments');
       },
       loadEvidences: function () {
-        var query = this.getDocumentQuery(CMS.Models.Document.EVIDENCE);
+        var query = this.getDocumentQuery(
+          this.attr('documentTypes.evidences'));
         return this.requestQuery(query, 'evidences');
       },
       loadUrls: function () {
-        var query = this.getDocumentQuery(CMS.Models.Document.URL);
+        var query = this.getDocumentQuery(
+          this.attr('documentTypes.urls'));
         return this.requestQuery(query, 'urls');
       },
       loadReferenceUrls: function () {
-        var query = this.getDocumentQuery(CMS.Models.Document.REFERENCE_URL);
+        var query = this.getDocumentQuery(
+          this.attr('documentTypes.referenceUrls'));
         return this.requestQuery(query, 'referenceUrls');
       },
       updateItems: function () {
