@@ -349,6 +349,9 @@
         this.viewModel.initializeFormFields();
         this.viewModel.initGlobalAttributes();
         this.viewModel.updateRelatedItems();
+      },
+      '{viewModel.instance} resolvePendingBindings': function () {
+        this.viewModel.updateItems('referenceUrls');
       }
     },
     helpers: {
