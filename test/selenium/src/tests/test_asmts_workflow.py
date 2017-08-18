@@ -142,11 +142,11 @@ class TestAssessmentsWorkflow(base.Test):
            "Edit asmt w'o verifier 'Completed' - 'In Progress'",
            "Edit asmt w' verifier 'Completed' - 'In Progress'",
            "Complete asmt w'o verifier 'Not Started' - 'Completed'",
-           "Complete asmt w' verifier 'Not Started' - 'Ready for Review'",
+           "Complete asmt w' verifier 'Not Started' - 'In Review'",
            "Complete asmt w'o verifier 'In Progress' - 'Completed'",
-           "Complete asmt w' verifier 'In Progress' - 'Ready for Review'",
-           "Verify asmt w' verifier 'Ready for Review' - 'Completed'",
-           "Reject asmt w' verifier 'Ready for Review' - 'In Progress'"],
+           "Complete asmt w' verifier 'In Progress' - 'In Review'",
+           "Verify asmt w' verifier 'In Review' - 'Completed'",
+           "Reject asmt w' verifier 'In Review' - 'In Progress'"],
       indirect=["dynamic_object_w_factory_params"])
   def test_check_asmt_state_change(
       self, new_program_rest, new_audit_rest, dynamic_object_w_factory_params,

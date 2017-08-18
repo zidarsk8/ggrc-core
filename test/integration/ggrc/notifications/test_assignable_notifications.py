@@ -354,7 +354,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     self.client.get("/_notifications/send_daily_digest")
     recipient, _, content = send_email.call_args[0]
     self.assertEqual(recipient, u"user@example.com")
-    self.assertIn(u"Assessments ready for review", content)
+    self.assertIn(u"Assessments in review", content)
 
     # test verifying an assessment
     self.assertEqual(self._get_notifications().count(), 0)
@@ -452,7 +452,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     self.client.get("/_notifications/send_daily_digest")
     recipient, _, content = send_email.call_args[0]
     self.assertEqual(recipient, u"user@example.com")
-    self.assertIn(u"Assessments ready for review", content)
+    self.assertIn(u"Assessments in review", content)
 
     # directly completing a not started assessment
     self.import_data(OrderedDict([
@@ -551,7 +551,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     self.client.get("/_notifications/send_daily_digest")
     recipient, _, content = send_email.call_args[0]
     self.assertEqual(recipient, u"user@example.com")
-    self.assertNotIn(u"Assessments ready for review", content)
+    self.assertNotIn(u"Assessments in review", content)
     self.assertNotIn(u"Declined assessments", content)
     self.assertNotIn(u"Reopened assessments", content)
     self.assertIn(u"Completed assessments", content)
@@ -928,7 +928,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     self.client.get("/_notifications/send_daily_digest")
     self.assertEqual(self._get_notifications().count(), 0)
 
-    # mark Assessment as ready for review, verify it, then revert the change
+    # mark Assessment as in review, verify it, then revert the change
     asmt = Assessment.query.get(asmts["A 4"].id)
     self.api_helper.modify_object(
         asmt, {"status": Assessment.DONE_STATE})
@@ -991,7 +991,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     self.client.get("/_notifications/send_daily_digest")
     recipient, _, content = send_email.call_args[0]
     self.assertEqual(recipient, u"user@example.com")
-    self.assertNotIn(u"Assessments ready for review", content)
+    self.assertNotIn(u"Assessments in review", content)
     self.assertNotIn(u"Declined assessments", content)
     self.assertNotIn(u"Reopened assessments", content)
     self.assertIn(u"Completed assessments", content)
@@ -1090,7 +1090,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     """Test that immediately finishing an Assessment produces a notification.
 
     "Immediately" here means directly sending an Assessment to either the
-    "Completed", or the "Ready for Review" state, skipping the "In Progress"
+    "Completed", or the "In Review" state, skipping the "In Progress"
     state.
     """
     self.import_file("assessment_with_templates.csv")
@@ -1099,7 +1099,7 @@ class TestAssignableNotificationUsingAPI(TestAssignableNotification):
     self.client.get("/_notifications/send_daily_digest")
     self.assertEqual(self._get_notifications().count(), 0)
 
-    # directly sending an Assessment to the "Ready for Review" state
+    # directly sending an Assessment to the "In Review" state
     asmt4 = Assessment.query.get(asmts["A 4"].id)
     self.api_helper.modify_object(asmt4,
                                   {"status": Assessment.DONE_STATE})
