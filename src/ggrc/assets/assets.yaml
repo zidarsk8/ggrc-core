@@ -339,7 +339,10 @@ dashboard-js-files:
   - components/inline/base-inline-control-title.js
   - components/assessment/info-pane/inline-item.js
   - components/assessment/info-pane/confirm-edit-action.js
+  - components/assessment/info-pane-save-status.js
+  - components/loading/loading-status.js
   - components/object-list-item/object-list-item-updater.js
+  - components/lazy-render/lazy-render.js
 
 app-init-files:
   - apps/dashboard.js
@@ -439,6 +442,7 @@ dashboard-js-template-files:
   - base_objects/open_close.mustache
   - base_objects/sub_tree_type_selector.mustache
   - base_objects/mapper-item-description.mustache
+  - base_objects/dashboard_widget.mustache
   - base_templates/objects_tooltip.mustache
   - base_templates/attachment.mustache
   - base_templates/base.mustache
@@ -660,7 +664,6 @@ dashboard-js-template-files:
   - audits/tree-item-attr.mustache
   - audits/info.mustache
   - audits/summary.mustache
-  - audits/dashboard.mustache
   - audits/tree_add_item.mustache
   - audits/search_result.mustache
   - audits/extended_info.mustache
@@ -701,6 +704,7 @@ dashboard-js-template-files:
   - components/inline/simple-readonly-text.mustache
   - components/inline/base-inline-control-title.mustache
   - components/assessment/info-pane/inline-item.mustache
+  - components/loading/loading-status.mustache
 
 dashboard-css-files:
   - dashboard.css

@@ -12,17 +12,23 @@
   can.Component.extend({
     tag: 'related-assessment-list',
     viewModel: {
-      assessments: null,
-      itemsLoading: function () {
-        var items = this.attr('assessments');
-        if (!items) {
-          return false;
-        }
+      define: {
+        itemsLoading: {
+          get: function () {
+            // due to 'assessments' will be updated via
+            // replace method, 'assessments.length' adds
+            // subscription on 'add' and 'remove' events
+            if (!this.attr('assessments.length')) {
+              return false;
+            }
 
-        return _.any(items, function (item) {
-          return item.attr('itemLoading');
-        });
-      }
+            return _.any(this.attr('assessments'), function (item) {
+              return item.attr('itemLoading');
+            });
+          }
+        }
+      },
+      assessments: null
     }
   });
 })(window.can);

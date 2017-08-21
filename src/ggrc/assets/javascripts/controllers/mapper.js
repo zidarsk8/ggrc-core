@@ -118,7 +118,7 @@
           'join-object-id': data.join_object_id
         };
         if (isSearch) {
-          self.launch(btn, can.extend(config, data));
+          GGRC.Controllers.ObjectSearch.launch(btn, can.extend(config, data));
         } else {
           self.launch(btn, can.extend(config, data));
         }

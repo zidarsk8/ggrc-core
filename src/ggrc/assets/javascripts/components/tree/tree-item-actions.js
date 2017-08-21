@@ -88,6 +88,7 @@
     isAllowToExpand: null,
     childModelsList: null,
     expanded: false,
+    activated: false,
     showReducedIcon: function () {
       var pages = ['Workflow'];
       var instanceTypes = [
@@ -110,6 +111,15 @@
         var canExpand = parents < this.viewModel.attr('deepLimit');
         this.viewModel.attr('canExpand', canExpand);
         this.viewModel.attr('$el', this.element);
+      },
+      '.tree-item-actions__content mouseenter': function (el, ev) {
+        var vm = this.viewModel;
+
+        if (!vm.attr('activated')) {
+          vm.attr('activated', true);
+        }
+        // event not needed after render of content
+        el.off(ev);
       }
     }
   });

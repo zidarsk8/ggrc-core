@@ -56,6 +56,13 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
   def definition(self):
     return getattr(self, self.definition_attr)
 
+  @property
+  def value_mapping(self):
+    return self.ValidTypes.DEFAULT_VALUE_MAPPING.get(self.attribute_type) or {}
+
+  def get_indexed_value(self, value):
+    return self.value_mapping.get(value, value)
+
   @definition.setter
   def definition(self, value):
     self.definition_id = getattr(value, 'id', None)
@@ -121,6 +128,15 @@ class CustomAttributeDefinition(attributevalidator.AttributeValidator,
     CHECKBOX = "Checkbox"
     DATE = "Date"
     MAP = "Map"
+
+    DEFAULT_VALUE_MAPPING = {
+        CHECKBOX: {
+            True: "Yes",
+            False: "No",
+            "0": "No",
+            "1": "Yes",
+        },
+    }
 
   class MultiChoiceMandatoryFlags(object):
     """Enum representing flags in multi_choice_mandatory bitmaps."""

@@ -23,7 +23,7 @@
       {
         models: ['Assessment'],
         states: [
-          'Not Started', 'In Progress', 'Ready for Review',
+          'Not Started', 'In Progress', 'In Review',
           'Completed and Verified', 'Completed (no verification)'
         ]
       },

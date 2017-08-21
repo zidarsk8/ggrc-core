@@ -14,6 +14,7 @@ from werkzeug.exceptions import BadRequest
 from ggrc.query.exceptions import BadQueryException
 from ggrc.query.default_handler import DefaultHandler
 from ggrc.query.assessments_summary_handler import AssessmentsSummaryHandler
+from ggrc.query.assessment_related_objects import AssessmentRelatedObjects
 from ggrc.login import login_required
 from ggrc.models.inflector import get_model
 from ggrc.services.common import etag
@@ -26,6 +27,7 @@ logger = logging.getLogger()
 
 OPTIMIZED_HANDLERS = [
     AssessmentsSummaryHandler,
+    AssessmentRelatedObjects,
 ]
 
 
@@ -66,7 +68,7 @@ def _get_query_handler(query):
       # No exception in the query matcher should affect the response of the
       # request. We need to safely fallback to default query handler if
       # anything happens.
-      logger.warning("Error matching %s handler.", optimized_handler.__name__)
+      logger.info("Error matching %s handler.", optimized_handler.__name__)
   return DefaultHandler
 
 

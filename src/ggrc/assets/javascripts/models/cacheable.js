@@ -1218,6 +1218,8 @@
         new PersistentNotifier({name:
         this.constructor.model_singular + ' (pre-save)'});
 
+      that.dispatch('modelBeforeSave');
+
       if (this.before_save) {
         this.before_save(pre_save_notifier);
       }
@@ -1257,6 +1259,9 @@
         that.notifier.on_empty(function () {
           dfd.resolve(that);
         });
+      })
+      .always(function () {
+        that.dispatch('modelAfterSave');
       });
 
         GGRC.delay_leaving_page_until(xhr);

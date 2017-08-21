@@ -81,7 +81,7 @@
           type: 'boolean',
           get: function () {
             return this.attr('instance.status') !== 'Completed' &&
-              this.attr('instance.status') !== 'Ready for Review' &&
+              this.attr('instance.status') !== 'In Review' &&
               !this.attr('instance.archived');
           },
           set: function () {
@@ -100,6 +100,7 @@
       modal: {
         open: false
       },
+      isAssessmentSaving: false,
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
@@ -282,7 +283,7 @@
             instance.refresh().then(function () {
               instance.attr('status', isUndo ? previousStatus : newStatus);
 
-              if (instance.attr('status') === 'Ready for Review' && !isUndo) {
+              if (instance.attr('status') === 'In Review' && !isUndo) {
                 $(document.body).trigger('ajax:flash',
                   {hint: 'The assessment is complete. ' +
                   'The verifier may revert it if further input is needed.'});
@@ -352,6 +353,12 @@
       '{viewModel.instance} refreshMapping': function () {
         this.viewModel.attr('mappedSnapshots')
           .replace(this.viewModel.loadSnapshots());
+      },
+      '{viewModel.instance} modelBeforeSave': function () {
+        this.viewModel.attr('isAssessmentSaving', true);
+      },
+      '{viewModel.instance} modelAfterSave': function () {
+        this.viewModel.attr('isAssessmentSaving', false);
       },
       '{viewModel} instance': function () {
         this.viewModel.initializeFormFields();

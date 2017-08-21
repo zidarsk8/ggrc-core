@@ -17,6 +17,9 @@
 
   & .document-object-item__body {
     padding-right: 8px;
+    .link {
+      max-width: 200px;
+    }
   }
 
   & .link {

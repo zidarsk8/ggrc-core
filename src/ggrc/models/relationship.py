@@ -21,14 +21,19 @@ class Relationship(Base, db.Model):
   source_type = db.Column(db.String, nullable=False)
   destination_id = db.Column(db.Integer, nullable=False)
   destination_type = db.Column(db.String, nullable=False)
-  automapping_id = db.Column(
+  parent_id = db.Column(
       db.Integer,
       db.ForeignKey('relationships.id', ondelete='SET NULL'),
       nullable=True,
   )
-  automapping = db.relationship(
+  parent = db.relationship(
       lambda: Relationship,
       remote_side=lambda: Relationship.id
+  )
+  automapping_id = db.Column(
+      db.Integer,
+      db.ForeignKey('automappings.id', ondelete='CASCADE'),
+      nullable=True,
   )
   relationship_attrs = db.relationship(
       lambda: RelationshipAttr,

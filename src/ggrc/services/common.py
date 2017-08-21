@@ -932,13 +932,10 @@ class Resource(ModelView):
       with benchmark("Send DELETEd - after commit event"):
         signals.Restful.model_deleted_after_commit.send(
             obj.__class__, obj=obj, service=self, event=event)
-      with benchmark("Query for object"):
-        object_for_json = self.object_for_json(obj)
       with benchmark("Send event job"):
         send_event_job(event)
       with benchmark("Make response"):
-        result = self.json_success_response(
-            object_for_json, self.modified_at(obj))
+        result = self.json_success_response({}, datetime.datetime.now())
     except:
       import traceback
       task.finish("Failure", traceback.format_exc())

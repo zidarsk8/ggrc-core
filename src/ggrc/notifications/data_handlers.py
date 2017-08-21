@@ -10,15 +10,20 @@ Main contributed functions are:
 import datetime
 import urlparse
 
+from collections import defaultdict
 from collections import namedtuple
 from logging import getLogger
 
 import pytz
 from pytz import timezone
+from sqlalchemy import and_
 
+from ggrc import db
 from ggrc import models
+from ggrc import notifications
 from ggrc import utils
 from ggrc.utils import DATE_FORMAT_US
+from ggrc.models.reflection import AttributeInfo
 
 
 # a helper type for storing comments' parent object information
@@ -62,6 +67,98 @@ def as_user_time(utc_datetime):
   return local_time.strftime(datetime_format)
 
 
+def _get_updated_roles(new_list, old_list, roles):
+  """Get difference between old and new access control lists"""
+  new_dict = defaultdict(set)
+  for new_val in new_list:
+    role_id = new_val["ac_role_id"]
+    person_id = new_val["person_id"]
+    new_dict[role_id].add(person_id)
+
+  old_dict = defaultdict(set)
+  for old_val in old_list:
+    role_id = old_val["ac_role_id"]
+    person_id = old_val["person_id"]
+    old_dict[role_id].add(person_id)
+
+  diff_roles = set(new_dict.keys()) ^ set(old_dict.keys())
+  role_set = {roles[role_id] for role_id in diff_roles}
+
+  common_roles = set(new_dict.keys()) & set(old_dict.keys())
+  for role_id in common_roles:
+    if sorted(new_dict[role_id]) != sorted(old_dict[role_id]):
+      role_set.add(roles[role_id])
+
+  return role_set
+
+
+def _get_revisions(obj, created_at):
+  """Get current revision and revision before notification is created"""
+  new_rev = db.session.query(models.Revision) \
+      .filter_by(resource_id=obj.id, resource_type=obj.type) \
+      .order_by(models.Revision.id.desc()) \
+      .first()
+  old_rev = db.session.query(models.Revision) \
+      .filter_by(resource_id=obj.id, resource_type=obj.type) \
+      .filter(and_(models.Revision.created_at < created_at,
+                   models.Revision.id < new_rev.id)) \
+      .order_by(models.Revision.id.desc()) \
+      .first()
+  if not old_rev:
+    old_rev = db.session.query(models.Revision) \
+        .filter_by(resource_id=obj.id, resource_type=obj.type) \
+        .filter(and_(models.Revision.created_at == created_at,
+                     models.Revision.id < new_rev.id)) \
+        .order_by(models.Revision.id) \
+        .first()
+  return new_rev, old_rev
+
+
+def _get_updated_fields(obj, created_at, definitions, roles):
+  """Get dict of updated  attributes of assessment"""
+  fields = []
+
+  new_rev, old_rev = _get_revisions(obj, created_at)
+  if not old_rev:
+    return []
+
+  new_attrs = new_rev.content
+  old_attrs = old_rev.content
+  for attr_name, new_val in new_attrs.iteritems():
+    if attr_name in notifications.IGNORE_ATTRS:
+      continue
+    old_val = old_attrs.get(attr_name, None)
+    if old_val != new_val:
+      if not old_val and not new_val:
+        continue
+      if attr_name == u"recipients" and old_val and new_val and \
+         sorted(old_val.split(",")) == sorted(new_val.split(",")):
+        continue
+      if attr_name == "access_control_list":
+        fields.extend(_get_updated_roles(new_val, old_val, roles))
+        continue
+      fields.append(attr_name)
+
+  fields.extend(list(notifications.get_updated_cavs(new_attrs, old_attrs)))
+  updated_fields = []
+  for field in fields:
+    definition = definitions.get(field, None)
+    if definition:
+      updated_fields.append(definition["display_name"].upper())
+    else:
+      updated_fields.append(field.upper())
+  return updated_fields
+
+
+def _get_assignable_roles(obj):
+  """Get access control roles for assignable"""
+  query = db.session.query(
+      models.AccessControlRole.id,
+      models.AccessControlRole.name).filter_by(
+      object_type=obj.__class__.__name__)
+  return {role_id: name for role_id, name in query}
+
+
 def _get_assignable_dict(people, notif):
   """Get dict data for assignable object in notification.
 
@@ -76,6 +173,9 @@ def _get_assignable_dict(people, notif):
   obj = get_notification_object(notif)
   data = {}
 
+  definitions = AttributeInfo.get_object_attr_definitions(obj.__class__)
+  roles = _get_assignable_roles(obj)
+
   for person in people:
     # We should default to today() if no start date is found on the object.
     start_date = getattr(obj, "start_date", datetime.date.today())
@@ -88,8 +188,15 @@ def _get_assignable_dict(people, notif):
                     start_date, "start", True),
                 "url": get_object_url(obj),
                 "notif_created_at": {
-                    notif.id: as_user_time(notif.created_at)
-                }
+                    notif.id: as_user_time(notif.created_at)},
+                "notif_updated_at": {
+                    notif.id: as_user_time(notif.updated_at)},
+                "updated_fields": _get_updated_fields(obj,
+                                                      notif.created_at,
+                                                      definitions,
+                                                      roles)
+                if notif.notification_type.name == "assessment_updated"
+                else None,
             }
         }
     }
