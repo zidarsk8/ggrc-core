@@ -73,12 +73,11 @@ class AssessmentTabContainer(base.AbstractTabContainer):
               "field_is_valid": field_is_valid,
               "orignal_value_is_valid": orignal_value_is_valid,
               "new_value_is_valid": new_value_is_valid,
-              "person_is_valid": person_element.text == roles.DEFAULT_USER
+              "person_is_valid": (
+                  person_element.text == roles.DEFAULT_USER_EMAIL)
               }
-    selenium_utils.get_when_invisible(
+    selenium_utils.wait_until_not_present(
         _driver, tab_locators.LOG_TAB_SPINNER_CSS)
-    log_list = base.ElementsList(
-        _driver, selenium_utils.get_when_visible(
-            log_panel_element, tab_locators.LOG_LIST_CSS))
-    return [check_log_item(el.element)
-            for el in log_list.get_items()]
+    log_list = selenium_utils.get_when_all_visible(
+        log_panel_element, tab_locators.LOG_LIST_CSS)
+    return [check_log_item(el) for el in log_list]
