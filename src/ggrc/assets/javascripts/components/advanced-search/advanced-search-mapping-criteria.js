@@ -92,10 +92,17 @@
      */
     extendable: false,
     /**
-     * Contains available attributes for specific model.
-     * @type {can.List}
+     * Returns a list of available attributes for specific model.
+     * @return {can.List} - List of available attributes.
      */
-    availableAttributes: can.List(),
+    availableAttributes: function () {
+      var available = GGRC.Utils.TreeView.getColumnsForModel(
+        this.attr('criteria.objectName'),
+        null,
+        true
+      ).available;
+      return available;
+    },
     /**
      * Returns a list of available mapping types for specific model.
      * @return {Array} - List of available mapping types.

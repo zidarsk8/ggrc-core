@@ -176,7 +176,9 @@ class RecordBuilder(object):
       properties[attribute_name].update(self.build_list_sort_subprop(
           [obj.attribute_object]))
     else:
-      properties[attribute_name] = {"": obj.attribute_value}
+      properties[attribute_name] = {
+          "": obj.custom_attribute.get_indexed_value(obj.attribute_value)
+      }
     return properties
 
   def as_record(self, obj):  # noqa  # pylint:disable=too-many-branches

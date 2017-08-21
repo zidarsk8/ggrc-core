@@ -53,9 +53,15 @@
 
   .title {
     color: $middleText;
+    display: -webkit-box;
     padding: 0 16px 0 24px;
     position: relative;
     font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
 
     .fa {
       position: absolute;

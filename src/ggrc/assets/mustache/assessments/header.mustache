@@ -133,14 +133,38 @@ Copyright (C) 2017 Google Inc.
                 </ul>
             </div>
         </div>
-        {{#is_allowed 'update' instance context='for'}}
-            {{^if instance.archived}}
+
+        {{#is_info_pin}}
+            {{#unless options.isSubTreeItem}}
+                <div class="pane-header__toolbar-item">
+                    <prev-next-buttons {(current-index)}="options.selectedItem"
+                                       {(total-count)}="options.pageInfo.total"
+                    is-subtree-item="isSubTreeItem">
+                    </prev-next-buttons>
+                </div>
+            {{/unless}}
+        {{/is_info_pin}}
+
+        {{#unless isEditDenied}}
                 <object-state-toolbar {{#if is_info_pin}}class="pane-header__toolbar-item"{{/if}}
                                     {verifiers}="instance.assignees.Verifier"
                                     {instance}="instance"
                                     (on-state-change)="onStateChange(%event)">
                 </object-state-toolbar>
-            {{/if}}
-        {{/is_allowed}}
+        {{/unless}}
+        <div class="form-status {{#if is_info_pin}}pane-header__toolbar-item{{/if}}">
+            <info-pane-save-status
+                {evidences-saving}="isUpdatingEvidences"
+                {urls-saving}="isUpdatingUrls"
+                {comments-saving}="isUpdatingComments"
+                {assessment-saving}="isAssessmentSaving">
+                    <loading-status
+                        class="loading-status"
+                        {is-loading}="infoPaneSaving"
+                        loading-text="Saving..."
+                        show-Spinner="true">
+                    </loading-status>
+            </info-pane-save-status>
+        </div>
     </div>
 </div>

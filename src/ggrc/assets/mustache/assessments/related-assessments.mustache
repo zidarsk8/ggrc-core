@@ -35,7 +35,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 Audit Title
             </div>
             <div class="flex-size-3">
-                Attachments / Urls
+                Evidence files / Urls
             </div>
             <div class="grid-data__action-column">
                 More info
@@ -87,16 +87,17 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                                 </related-audits>
                             </div>
                             <div class="flex-size-3">
-                                <related-documents {instance}="instance" {^is-loading}="loadingState.attachmentsLoading">
-                                    <object-list {items}="documents">
+                                <related-evidences-and-urls {parent-instance}="instance"
+                                                            {^is-loading}="loadingState.evidencesAndUrlsLoading">
+                                    <object-list items="documents">
                                         <reusable-objects-item {instance}="{.}"
-                                                            {is-saving}="isSaving"
-                                                            {base-instance-documents}="baseInstanceDocuments"
-                                                            {(selected-list)}="documentList">
+                                                               {is-saving}="isSaving"
+                                                               {base-instance-documents}="baseInstanceDocuments"
+                                                               {(selected-list)}="documentList">
                                             <document-object-list-item {instance}="instance"></document-object-list-item>
                                         </reusable-objects-item>
                                     </object-list>
-                                </related-documents>
+                                </related-evidences-and-urls>
                             </div>
                             <div class="grid-data__action-column">
                                 <button class="btn btn-icon btn-icon-sm" title="Show More Information"><i class="fa fa-info-circle"></i></button>

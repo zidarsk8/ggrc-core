@@ -10,7 +10,7 @@
 import pytest
 
 from lib import base
-from lib.constants import messages, objects
+from lib.constants import messages, objects, element
 from lib.constants.element import Lhn, MappingStatusAttrs
 from lib.factory import get_ui_service
 from lib.page import dashboard
@@ -559,7 +559,8 @@ class TestSnapshots(base.Test):
     # expected_obj = (dynamic_object.repr_ui().update_attrs(
     #     custom_attributes={None: None}))
     expected_obj = (dynamic_object.repr_ui().update_attrs(
-        custom_attributes={None: None}, updated_at=None))
+        custom_attributes={None: None}, updated_at=None,
+        status=element.AssessmentStates.IN_PROGRESS))
     expected_obj_service = get_ui_service(expected_obj.type)(selenium)
     (webui_service.ControlsService(selenium).map_objs_via_tree_view(
         src_obj=expected_obj, dest_objs=[snapshoted_control]))

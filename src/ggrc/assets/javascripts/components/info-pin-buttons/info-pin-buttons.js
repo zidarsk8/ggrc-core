@@ -39,6 +39,7 @@
       },
       close: function (el, ev) {
         var onClose = Mustache.resolve(this.onClose);
+        $(el).find('[rel="tooltip"]').tooltip('hide');
         ev.preventDefault();
         onClose();
       }

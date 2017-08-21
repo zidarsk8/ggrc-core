@@ -16,6 +16,11 @@
     tag: 'assessment-info-pane',
     template: tpl,
     viewModel: {
+      documentTypes: {
+        evidences: CMS.Models.Document.EVIDENCE,
+        urls: CMS.Models.Document.URL,
+        referenceUrls: CMS.Models.Document.REFERENCE_URL
+      },
       define: {
         isSaving: {
           type: 'boolean',
@@ -66,6 +71,9 @@
         urls: {
           Value: can.List
         },
+        referenceUrls: {
+          Value: can.List
+        },
         evidences: {
           Value: can.List
         },
@@ -73,7 +81,7 @@
           type: 'boolean',
           get: function () {
             return this.attr('instance.status') !== 'Completed' &&
-              this.attr('instance.status') !== 'Ready for Review' &&
+              this.attr('instance.status') !== 'In Review' &&
               !this.attr('instance.archived');
           },
           set: function () {
@@ -92,6 +100,7 @@
       modal: {
         open: false
       },
+      isAssessmentSaving: false,
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
@@ -119,29 +128,22 @@
       getSnapshotQuery: function () {
         return this.getQuery('Snapshot');
       },
-      getEvidenceQuery: function () {
-        var evidenceType = CMS.Models.Document.EVIDENCE;
-        return this.getQuery(
+      getDocumentQuery: function (documentType) {
+        var query = this.getQuery(
           'Document',
           {sortBy: 'created_at', sortDirection: 'desc'},
-          this.getDocumentAdditionFilter(evidenceType));
-      },
-      getUrlQuery: function () {
-        var urlType = CMS.Models.Document.URL;
-        return this.getQuery(
-          'Document',
-          {sortBy: 'created_at', sortDirection: 'desc'},
-          this.getDocumentAdditionFilter(urlType));
+          this.getDocumentAdditionFilter(documentType));
+        return query;
       },
       requestQuery: function (query, type) {
         var dfd = can.Deferred();
         type = type || '';
         this.attr('isUpdating' + can.capitalize(type), true);
         GGRC.Utils.QueryAPI
-          .makeRequest({data: [query]})
+          .batchRequests(query)
           .done(function (response) {
-            var type = Object.keys(response[0])[0];
-            var values = response[0][type].values;
+            var type = Object.keys(response)[0];
+            var values = response[type].values;
             dfd.resolve(values);
           })
           .fail(function () {
@@ -161,17 +163,49 @@
         return this.requestQuery(query, 'comments');
       },
       loadEvidences: function () {
-        var query = this.getEvidenceQuery();
+        var query = this.getDocumentQuery(
+          this.attr('documentTypes.evidences'));
         return this.requestQuery(query, 'evidences');
       },
       loadUrls: function () {
-        var query = this.getUrlQuery();
+        var query = this.getDocumentQuery(
+          this.attr('documentTypes.urls'));
         return this.requestQuery(query, 'urls');
+      },
+      loadReferenceUrls: function () {
+        var query = this.getDocumentQuery(
+          this.attr('documentTypes.referenceUrls'));
+        return this.requestQuery(query, 'referenceUrls');
       },
       updateItems: function () {
         can.makeArray(arguments).forEach(function (type) {
           this.attr(type).replace(this['load' + can.capitalize(type)]());
         }.bind(this));
+      },
+      afterCreate: function (event, type) {
+        var createdItems = event.items;
+        var success = event.success;
+        var items = this.attr(type);
+        var resultList = items
+          .map(function (item) {
+            createdItems.forEach(function (newItem) {
+              if (item._stamp && item._stamp === newItem._stamp) {
+                if (!success) {
+                  newItem.attr('isNotSaved', true);
+                }
+                newItem.removeAttr('_stamp');
+                newItem.removeAttr('isDraft');
+                item = newItem;
+              }
+            });
+            return item;
+          })
+          .filter(function (item) {
+            return !item.attr('isNotSaved');
+          });
+        this.attr('isUpdating' + can.capitalize(type), false);
+
+        items.replace(resultList);
       },
       removeItem: function (event, type) {
         var item = event.item;
@@ -205,6 +239,8 @@
           .replace(this.loadEvidences());
         this.attr('urls')
           .replace(this.loadUrls());
+        this.attr('referenceUrls')
+          .replace(this.loadReferenceUrls());
       },
       initializeFormFields: function () {
         var cavs =
@@ -247,7 +283,7 @@
             instance.refresh().then(function () {
               instance.attr('status', isUndo ? previousStatus : newStatus);
 
-              if (instance.attr('status') === 'Ready for Review' && !isUndo) {
+              if (instance.attr('status') === 'In Review' && !isUndo) {
                 $(document.body).trigger('ajax:flash',
                   {hint: 'The assessment is complete. ' +
                   'The verifier may revert it if further input is needed.'});
@@ -314,9 +350,33 @@
       this.viewModel.updateRelatedItems();
     },
     events: {
-      '{viewModel.instance} refreshInstance': function () {
+      '{viewModel.instance} refreshMapping': function () {
         this.viewModel.attr('mappedSnapshots')
           .replace(this.viewModel.loadSnapshots());
+      },
+      '{viewModel.instance} modelBeforeSave': function () {
+        this.viewModel.attr('isAssessmentSaving', true);
+      },
+      '{viewModel.instance} modelAfterSave': function () {
+        this.viewModel.attr('isAssessmentSaving', false);
+      },
+      '{viewModel} instance': function () {
+        this.viewModel.initializeFormFields();
+        this.viewModel.initGlobalAttributes();
+        this.viewModel.updateRelatedItems();
+      },
+      '{viewModel.instance} resolvePendingBindings': function () {
+        this.viewModel.updateItems('referenceUrls');
+      }
+    },
+    helpers: {
+      extraClass: function (type) {
+        switch (type()) {
+          case 'checkbox':
+            return 'inline-reverse';
+          default:
+            return '';
+        }
       }
     }
   });

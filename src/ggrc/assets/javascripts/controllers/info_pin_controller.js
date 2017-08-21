@@ -148,6 +148,18 @@ can.Control('CMS.Controllers.InfoPin', {
     this.element.trigger('scroll');
     return infoPaneOpenDfd;
   },
+  updateInstance: function (selector, instance) {
+    this.element.find(selector)
+      .viewModel()
+      .attr('instance', instance);
+  },
+  setLoadingIndicator: function (selector, isLoading) {
+    this.element.toggleClass('loading');
+
+    this.element.find(selector)
+      .viewModel()
+      .attr('isLoading', isLoading);
+  },
   ensureElementVisible: function (el) {
     var $objectArea;
     var $header;

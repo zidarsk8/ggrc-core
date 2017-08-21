@@ -546,6 +546,7 @@
       widget_name: 'History',
       widget_icon: 'history',
       model: CMS.Models.Cycle,
+      forceRefetch: true,
       content_controller_options: {
         draw_children: true,
         parent_instance: object,
@@ -563,6 +564,7 @@
       widget_name: 'Active Cycles',
       widget_icon: 'cycle',
       model: CMS.Models.Cycle,
+      forceRefetch: true,
       content_controller_options: {
         draw_children: true,
         parent_instance: object,

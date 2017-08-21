@@ -53,15 +53,15 @@
                       data-value="Verified">Verify</button>
             {{/if}}
           {{/if_equals}}
-          {{#if oldValues.length}}
-            <a href="javascript://" data-name="status"
-                {{#if disabled}}disabled{{/if}}
-                ($click)="undo"
-                data-undo="true"
-                class="undo">Undo</a>
-          {{/if}}
         </div>
       {{/is_allowed}}
+    {{/if}}
+    {{#if oldValues.length}}
+      <a href="javascript://" data-name="status"
+         {{#if disabled}}disabled{{/if}}
+         ($click)="undo"
+         data-undo="true"
+         class="undo">Undo</a>
     {{/if}}
   {{/with_review_task}}
 </div>

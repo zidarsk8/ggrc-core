@@ -38,6 +38,13 @@
                     {instance}="instance"
                     {title}="title"
                     {people}="people">
+                      <editable-people-group-header
+                        {editable-mode}="editableMode"
+                        {is-loading}="isLoading"
+                        {can-edit}="canEdit"
+                        {required}="required"
+                        (edit-people-group)="changeEditableMode(true)">
+                      </editable-people-group-header>
                   </editable-people-group>
               </div>
           </related-people-access-control-group>

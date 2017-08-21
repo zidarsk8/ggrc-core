@@ -61,6 +61,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       vm.attr('pageInfo.count', 3);
 
       spyOn(vm, 'loadItems');
+      spyOn(vm, 'closeInfoPane');
     });
 
     it('sets current order properties', function () {
@@ -72,6 +73,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       expect(vm.attr('sortingInfo.sortDirection')).toEqual('desc');
       expect(vm.attr('pageInfo.current')).toEqual(1);
       expect(vm.loadItems).toHaveBeenCalled();
+      expect(vm.closeInfoPane).toHaveBeenCalled();
     });
 
     it('changes sortDirection for current column', function () {
@@ -87,6 +89,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       expect(vm.attr('sortingInfo.sortDirection')).toEqual('asc');
       expect(vm.attr('pageInfo.current')).toEqual(1);
       expect(vm.loadItems).toHaveBeenCalled();
+      expect(vm.closeInfoPane).toHaveBeenCalled();
     });
 
     it('changes sortBy property', function () {
@@ -471,5 +474,66 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
       expect(vm.attr('advancedSearch.mappingItems.length')).toBe(0);
     });
+  });
+
+  describe('getAbsoluteItemNumber() method', function () {
+    beforeEach(function () {
+      vm.attr({
+        pageInfo: {
+          pageSize: 10,
+          count: 5
+        },
+        showedItems: [{id: 1}, {id: 2}, {id: 3}]
+      });
+      vm.attr('pageInfo.current', 3);
+    });
+
+    it('should return correct item number when item is on page',
+      function () {
+        var result;
+
+        result = vm.getAbsoluteItemNumber({id: 2});
+
+        expect(result).toEqual(21);
+      });
+
+    it('should return "-1" when item is not on page',
+       function () {
+         var result;
+
+         result = vm.getAbsoluteItemNumber({id: 4});
+
+         expect(result).toEqual(-1);
+       });
+  });
+
+  describe('getRelativeItemNumber() method', function () {
+    it('should return correct item number on page', function () {
+      var result = vm.getRelativeItemNumber(12, 5);
+
+      expect(result).toEqual(2);
+    });
+  });
+
+  describe('getNextItemPage() method', function () {
+    beforeEach(function () {
+      spyOn(vm, 'loadItems');
+    });
+
+    it('should load items for appropriate page when item is not loaded',
+      function () {
+        vm.getNextItemPage(10, {current: 2, pageSize: 5});
+
+        expect(vm.attr('loading')).toBeTruthy();
+        expect(vm.loadItems).toHaveBeenCalled();
+      });
+
+    it('shouldn\'t load items when current item was already loaded',
+      function () {
+        vm.getNextItemPage(10, {current: 3, pageSize: 5});
+
+        expect(vm.attr('loading')).toBeFalsy();
+        expect(vm.loadItems).not.toHaveBeenCalled();
+      });
   });
 });

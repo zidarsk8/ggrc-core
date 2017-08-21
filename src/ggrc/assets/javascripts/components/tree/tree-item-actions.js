@@ -6,7 +6,8 @@
 (function (can, GGRC) {
   'use strict';
 
-  var forbiddenList = ['Cycle', 'CycleTaskGroup'];
+  var forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
+  var forbiddenMapList = ['Workflow'];
 
   var template = can.view(GGRC.mustache_path +
     '/components/tree/tree-item-actions.mustache');
@@ -45,8 +46,18 @@
           var type = this.attr('instance.type');
           var isSnapshot = this.attr('isSnapshot');
           var isArchived = this.attr('instance.archived');
-          var isInForbiddenList = forbiddenList.indexOf(type) > -1;
+          var isInForbiddenList = forbiddenEditList.indexOf(type) > -1;
           return !(isSnapshot || isInForbiddenList || isArchived);
+        }
+      },
+      isAllowedToMap: {
+        type: 'boolean',
+        get: function () {
+          var type = this.attr('instance.type');
+          var isAllowedToEdit = this.attr('isAllowedToEdit');
+          var isInForbiddenList = forbiddenMapList.indexOf(type) > -1;
+
+          return isAllowedToEdit && !isInForbiddenList;
         }
       }
     },
@@ -77,6 +88,7 @@
     isAllowToExpand: null,
     childModelsList: null,
     expanded: false,
+    activated: false,
     showReducedIcon: function () {
       var pages = ['Workflow'];
       var instanceTypes = [
@@ -99,6 +111,15 @@
         var canExpand = parents < this.viewModel.attr('deepLimit');
         this.viewModel.attr('canExpand', canExpand);
         this.viewModel.attr('$el', this.element);
+      },
+      '.tree-item-actions__content mouseenter': function (el, ev) {
+        var vm = this.viewModel;
+
+        if (!vm.attr('activated')) {
+          vm.attr('activated', true);
+        }
+        // event not needed after render of content
+        el.off(ev);
       }
     }
   });

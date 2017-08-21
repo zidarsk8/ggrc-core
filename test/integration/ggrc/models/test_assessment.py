@@ -185,7 +185,7 @@ class TestAssessmentUpdates(ggrc.TestCase):
         old_state,
         content.json['assessments_collection']['assessments'][0]['status']
     )
-    new_state = "Ready for Review"
+    new_state = "In Review"
     self.api.put(all_models.Assessment.query.get(self.assessment_id),
                  {"status": new_state})
     content = self.api.client.get(

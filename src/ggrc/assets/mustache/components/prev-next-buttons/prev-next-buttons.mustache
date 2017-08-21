@@ -1,0 +1,17 @@
+{{!
+  Copyright (C) 2017 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="navigation-wrap">
+    <div class="navigation-item">
+        <a can-click="setPrev()" class="{{#unless hasPrev}}disabled{{/unless}}">
+            <i class="fa fa-angle-left"></i>
+        </a>
+    </div>
+    <div class="navigation-item">
+        <a ($click)="setNext()" class="{{#unless hasNext}}disabled{{/unless}}">
+            <i class="fa fa-angle-right"></i>
+        </a>
+    </div>
+</div>

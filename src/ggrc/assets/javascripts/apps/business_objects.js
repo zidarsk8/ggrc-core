@@ -59,7 +59,6 @@
       var path = GGRC.mustache_path;
       var infoWidgetViews;
       var summaryWidgetViews;
-      var dashboardWidgetViews;
       var modelNames;
       var possibleModelType;
       var farModels;
@@ -76,9 +75,6 @@
       summaryWidgetViews = {
         audits: path + '/audits/summary.mustache'
       };
-      dashboardWidgetViews = {
-        audits: path + '/audits/dashboard.mustache'
-      };
       if (summaryWidgetViews[objectTable]) {
         widgetList.add_widget(object.constructor.shortName, 'summary', {
           widget_id: 'summary',
@@ -88,15 +84,13 @@
           order: 3
         });
       }
-      if (dashboardWidgetViews[objectTable] &&
-          GGRC.Utils.Dashboards.isDashboardEnabled(
-            objectClass && objectClass.table_singular)) {
+      if (GGRC.Utils.Dashboards.isDashboardEnabled(object)) {
         widgetList.add_widget(object.constructor.shortName, 'dashboard', {
           widget_id: 'dashboard',
           content_controller: GGRC.Controllers.DashboardWidget,
           instance: object,
-          widget_view: dashboardWidgetViews[objectTable],
-          order: 2
+          widget_view: path + '/base_objects/dashboard_widget.mustache',
+          order: 6
         });
       }
       infoWidgetViews = {
@@ -245,13 +239,13 @@
         // order among the non-prioritized object types.
         Audit: {
           Assessment: {
-            order: 6
-          },
-          Issue: {
             order: 7
           },
-          Program: {
+          Issue: {
             order: 8
+          },
+          Program: {
+            order: 9
           },
           program: {
             widget_id: 'program',

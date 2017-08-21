@@ -271,6 +271,34 @@ class TestWorkflowCycleStatePropagantion(TestCase):
     ctg = db.session.query(CycleTaskGroup).get(ctg.id)
     self.assertEqual(ctg.status, "Finished")
 
+  def test_cycle_change_on_ct_status_transition(self):
+    """Test cycle is_current change on task Finished to InProgress transition
+    """
+    _, wf = self.generator.generate_workflow(self.weekly_wf)
+
+    self.generator.activate_workflow(wf)
+
+    ctg = db.session.query(CycleTaskGroup).join(
+        Cycle).join(Workflow).filter(Workflow.id == wf.id).one()
+    c_id = ctg.cycle.id
+
+    first_ct, second_ct = db.session.query(CycleTaskGroupObjectTask).join(
+        Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
+
+    self.generator.modify_object(first_ct, {"status": "Verified"})
+    self.generator.modify_object(second_ct, {"status": "Verified"})
+    # cycle now should have is_current == False
+    cycle = db.session.query(Cycle).get(c_id)
+
+    self.assertEqual(cycle.is_current, False)
+
+    # Move second task back to InProgress
+    self.generator.modify_object(second_ct, {"status": "InProgress"})
+    # cycle now should have is_current == True
+
+    cycle = db.session.query(Cycle).get(ctg.cycle.id)
+    self.assertEqual(cycle.is_current, True)
+
   def test_async_request_state_transitions(self):
     """Test asynchronous transitions"""
     def change_state(cycle_task, status):

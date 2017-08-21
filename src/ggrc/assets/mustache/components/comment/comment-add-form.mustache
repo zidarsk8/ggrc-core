@@ -14,7 +14,10 @@
           <input type="checkbox"
                  class="comment-add-form__toolbar-checkbox"
                  name="send_notification"
-                 can-value="sendNotifications">Send Notifications</label>
+                 can-value="sendNotifications">
+          Notify Assignees and Verifiers
+          <i class="fa fa-question-circle" rel="tooltip" title="Comments will be sent as part of daily digest email notification."></i>
+      </label>
       <comment-add-button class="comment-add-form__toolbar-item"
                           {(value)}="*commentValue"
                           (comment-created)="onCommentCreated(%event)"

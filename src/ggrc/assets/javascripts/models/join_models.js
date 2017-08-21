@@ -107,8 +107,7 @@
     attributes: {
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
-      parent: 'CMS.Models.Cacheable.stub',
-      revision: 'CMS.Models.Revision.stub'
+      parent: 'CMS.Models.Cacheable.stub'
     },
     join_keys: {
       parent: can.Model.Cacheable,

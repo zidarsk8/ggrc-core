@@ -912,10 +912,9 @@ class ElementsList(Component):
     "self.item_class" property.
     """
     if not self._items:
-      items_elements = selenium_utils.get_nested_elements(
-          self.list_element)
       self._items = [self.item_class(self._driver, el) for el in
-                     items_elements]
+                     self.list_element.find_elements(
+                         *CommonDropdownMenu.DROPDOWN_ITEMS_CSS)]
     return self._items
 
   def get_item(self, text):

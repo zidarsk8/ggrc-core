@@ -19,8 +19,9 @@
         '/modals/mapper/object-mapper-modal.mustache'
     },
     launch: function ($trigger, options) {
-      var href = $trigger.attr('data-href') ||
-        $trigger.attr('href');
+      var href = $trigger ?
+        $trigger.attr('data-href') || $trigger.attr('href') :
+        '';
       var modalId = 'ajax-modal-' + (href || '')
           .replace(/[\/\?=\&#%]/g, '-')
           .replace(/^-/, '');
@@ -38,6 +39,90 @@
       });
 
       return $target;
+    },
+    openMapper: function (data, disableMapper, btn) {
+      var self = this;
+      var isSearch = /unified-search/ig.test(data.toggle);
+
+      if (disableMapper) {
+        return;
+      }
+
+      if (!data.join_object_type) {
+        throw new Error(OBJECT_REQUIRED_MESSAGE);
+      }
+
+      if (GGRC.Utils.Snapshots
+          .isInScopeModel(data.join_object_type) && !isSearch) {
+        openForSnapshots(data);
+      } else {
+        openForCommonObjects(data, isSearch);
+      }
+
+      function openForSnapshots(data) {
+        var config;
+        var inScopeObject;
+
+        if (data.is_new) {
+          config = {
+            object: data.join_object_type,
+            type: data.join_option_type,
+            relevantTo: [{
+              readOnly: true,
+              type: data.snapshot_scope_type,
+              id: data.snapshot_scope_id
+            }]
+          };
+          self.launch(btn, can.extend(config, data));
+          return;
+        }
+
+        if (!data.join_object_id) {
+          throw new Error(OBJECT_REQUIRED_MESSAGE);
+        }
+
+        inScopeObject =
+          CMS.Models[data.join_object_type].store[data.join_object_id];
+
+        inScopeObject.updateScopeObject().then(function () {
+          var scopeObject = inScopeObject.attr('scopeObject');
+
+          if (!scopeObject.id) {
+            GGRC.Errors.notifier('error', DATA_CORRUPTION_MESSAGE);
+            setTimeout(function () {
+              window.location.assign(location.origin + '/dashboard');
+            }, 3000);
+            return;
+          }
+
+          config = {
+            object: data.join_object_type,
+            'join-object-id': data.join_object_id,
+            type: data.join_option_type,
+            relevantTo: [{
+              readOnly: true,
+              type: scopeObject.type,
+              id: scopeObject.id,
+              title: scopeObject.title
+            }]
+          };
+
+          self.launch(btn, can.extend(config, data));
+        });
+      }
+
+      function openForCommonObjects(data, isSearch) {
+        var config = {
+          object: data.join_object_type,
+          type: data.join_option_type,
+          'join-object-id': data.join_object_id
+        };
+        if (isSearch) {
+          GGRC.Controllers.ObjectSearch.launch(btn, can.extend(config, data));
+        } else {
+          self.launch(btn, can.extend(config, data));
+        }
+      }
     }
   }, {
     init: function () {
@@ -58,10 +143,9 @@
     }
   }, {});
 
-  function openMapper(ev, disableMapper) {
+  function openMapperByElement(ev, disableMapper) {
     var btn = $(ev.currentTarget);
     var data = {};
-    var isSearch;
 
     can.each(btn.data(), function (val, key) {
       data[can.camelCaseToUnderscore(key)] = val;
@@ -70,97 +154,18 @@
     if (data.tooltip) {
       data.tooltip.hide();
     }
+
     if (!data.clickable) {
       ev.preventDefault();
     }
 
-    isSearch = /unified-search/ig.test(data.toggle);
-
-    if (disableMapper) {
-      return;
-    }
-
-    if (!data.join_object_type) {
-      throw new Error(OBJECT_REQUIRED_MESSAGE);
-    }
-
-    if (GGRC.Utils.Snapshots
-        .isInScopeModel(data.join_object_type) && !isSearch) {
-      openForSnapshots(btn, data);
-    } else {
-      openForCommonObjects(btn, data, isSearch);
-    }
-
-    function openForSnapshots(btn, data) {
-      var config;
-      var inScopeObject;
-
-      if (data.is_new) {
-        config = {
-          object: data.join_object_type,
-          type: data.join_option_type,
-          relevantTo: [{
-            readOnly: true,
-            type: data.snapshot_scope_type,
-            id: data.snapshot_scope_id
-          }]
-        };
-        GGRC.Controllers.ObjectMapper.launch(btn, can.extend(config, data));
-        return;
-      }
-
-      if (!data.join_object_id) {
-        throw new Error(OBJECT_REQUIRED_MESSAGE);
-      }
-
-      inScopeObject =
-        CMS.Models[data.join_object_type].store[data.join_object_id];
-
-      inScopeObject.updateScopeObject().then(function () {
-        var scopeObject = inScopeObject.attr('scopeObject');
-
-        if (!scopeObject.id) {
-          GGRC.Errors.notifier('error', DATA_CORRUPTION_MESSAGE);
-          setTimeout(function () {
-            window.location.assign(location.origin + '/dashboard');
-          }, 3000);
-          return;
-        }
-
-        config = {
-          object: data.join_object_type,
-          'join-object-id': data.join_object_id,
-          type: data.join_option_type,
-          relevantTo: [{
-            readOnly: true,
-            type: scopeObject.type,
-            id: scopeObject.id,
-            title: scopeObject.title
-          }]
-        };
-
-        GGRC.Controllers.ObjectMapper.launch(btn, can.extend(config, data));
-      });
-    }
-
-    function openForCommonObjects(btn, data, isSearch) {
-      var config = {
-        object: data.join_object_type,
-        type: data.join_option_type,
-        'join-object-id': data.join_object_id
-      };
-      if (isSearch) {
-        GGRC.Controllers.ObjectSearch.launch(btn, can.extend(config, data));
-      } else {
-        GGRC.Controllers.ObjectMapper.launch(btn, can.extend(config, data));
-      }
-    }
+    GGRC.Controllers.ObjectMapper.openMapper(data, disableMapper, btn);
   }
   $('body').on('openMapper', function (el, ev, disableMapper) {
-    openMapper(ev, disableMapper);
+    openMapperByElement(ev, disableMapper);
   });
 
   $('body').on('click', selectors.join(', '), function (ev, disableMapper) {
-    openMapper(ev, disableMapper);
+    openMapperByElement(ev, disableMapper);
   });
 })(window.can, window.can.$);

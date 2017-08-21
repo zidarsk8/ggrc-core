@@ -335,7 +335,7 @@
       test_plan_procedure: false,
       template_object_type: 'Control',
       default_people: {
-        assessors: '',
+        assessors: 'Principal Assignees',
         verifiers: 'Auditors'
       },
       // the custom lists of assessor / verifier IDs if "other" is selected for
@@ -344,7 +344,7 @@
       verifiersList: {},
       people_values: [
         {value: 'Admin', title: 'Object Admins'},
-        {value: 'Audit Lead', title: 'Audit Lead'},
+        {value: 'Audit Lead', title: 'Audit Captain'},
         {value: 'Auditors', title: 'Auditors'},
         {value: 'Principal Assignees', title: 'Principal Assignees'},
         {value: 'Secondary Assignees', title: 'Secondary Assignees'},

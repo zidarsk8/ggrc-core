@@ -16,13 +16,14 @@
       onStateChangeDfd: can.Deferred().resolve(),
       openEditMode: function (el) {
         this.attr('onStateChangeDfd').then(function () {
-          if (this.isInProgress()) {
+          if (this.isInEditableState()) {
             this.dispatch('setEditMode');
           }
         }.bind(this));
       },
-      isInProgress: function () {
-        return this.attr('instance.status') === 'In Progress';
+      isInEditableState: function () {
+        var editableStates = ['In Progress', 'Not Started'];
+        return _.contains(editableStates, this.attr('instance.status'));
       },
       showConfirm: function () {
         var self = this;
@@ -41,7 +42,7 @@
         });
       },
       confirmEdit: function () {
-        if (!this.isInProgress()) {
+        if (!this.isInEditableState()) {
           this.showConfirm();
           return;
         }
