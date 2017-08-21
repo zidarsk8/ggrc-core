@@ -13,8 +13,9 @@ const ENV = process.env;
 
 module.exports = {
   entry: {
-    vendor: 'ggrc/vendor',
-    dashboard: 'ggrc/dashboard'
+    vendor: 'entrypoints/vendor',
+    dashboard: ['entrypoints/dashboard'].concat(getExtraModules())
+      .concat(['entrypoints/dashboard/bootstrap'])
   },
   output: {
     filename: isProduction() ? '[name].[chunkhash].js' : '[name]_.js',
@@ -78,7 +79,7 @@ module.exports = {
       }),
     alias: {
       'can': 'canjs/amd/can/',
-      'ggrc': './src/ggrc/assets/javascripts/entrypoints'
+      'entrypoints': './src/ggrc/assets/javascripts/entrypoints'
     }
   },
   plugins: [
@@ -115,4 +116,20 @@ if (isProduction()) {
 
 function isProduction() {
   return ENV.NODE_ENV === 'production';
+}
+
+function getExtraModules() {
+  var modules = ENV.GGRC_SETTINGS_MODULE.split(' ');
+
+  return _.compact(_.map(modules, function (module) {
+    var name;
+    if (/^ggrc/.test(module)) {
+      name = module.split('.')[0];
+    }
+
+    if (!name) {
+      return '';
+    }
+    return './src/' + name + '/assets/javascripts';
+  }));
 }

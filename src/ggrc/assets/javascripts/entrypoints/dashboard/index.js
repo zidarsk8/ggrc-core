@@ -169,12 +169,6 @@ import '../../components/prev-next-buttons/prev-next-buttons';
 import '../../components/loading/loading-status';
 import '../../components/lazy-render/lazy-render';
 
-// Modules
-import '../../modules';
-
-// Bootstrap
-import './bootstrap';
-
 import '../../dashboard';
 
 import '../../../stylesheets/dashboard.scss';
