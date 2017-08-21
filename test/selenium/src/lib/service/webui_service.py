@@ -508,8 +508,7 @@ class AssessmentsService(BaseWebUiService):
     from lib.constants.locator import ObjectWidget
     from lib.constants.locator import WidgetInfoAssessment
     self.open_info_page_of_obj(obj).click_verify()
-    for locator in [ObjectWidget.HEADER_STATE_VERIFIED,
-                    ObjectWidget.HEADER_STATE_COMPLETED,
+    for locator in [ObjectWidget.HEADER_STATE_COMPLETED,
                     WidgetInfoAssessment.ICON_VERIFIED]:
       selenium_utils.wait_until_element_visible(self.driver, locator)
     return self.info_widget_cls(self.driver)

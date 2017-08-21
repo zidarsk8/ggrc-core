@@ -44,8 +44,8 @@ def get_bool_value_from_arg(arg):
   """
   converted_value = arg
   if isinstance(arg, (str, unicode)):
-    converted_value = (True if arg.title() in ["Yes", "True"] else
-                       False if arg.title() in ["No", "False"] else arg)
+    converted_value = (True if arg.title() in ["Yes", "True", "1"] else
+                       False if arg.title() in ["No", "False", "0"] else arg)
   return converted_value
 
 
@@ -182,6 +182,8 @@ def convert_str_to_datetime(datetime_str):
     if len(datetime_parts) == 2:
       datetime_format = ("%Y-%m-%dT%H:%M:%S" if "T" in datetime_str
                          else "%Y-%m-%d %H:%M:%S")
+    elif len(datetime_parts) == 1:
+      datetime_format = "%Y-%m-%d"
   return datetime.strptime(datetime_str, datetime_format)
 
 

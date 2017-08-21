@@ -35,3 +35,10 @@ class Query(object):
             }
         }
     }
+
+  @staticmethod
+  def expression_get_obj_by_id(obj_id):
+    """Expression to get object according to object's id.
+    """
+    return {"expression": {
+        "left": "id", "op": {"name": "="}, "right": obj_id}}
