@@ -43,6 +43,25 @@ ul.internav {
       &:nth-child(n+5) {
         order: 20;
       }
+      // dashboard tab
+      &.tachometer {
+        ~ li:nth-child(4) {
+          margin-right: 0;
+        }
+
+        ~ li:nth-child(5) {
+          margin-left: 0;
+          margin-right: auto;
+        }
+
+        ~ li:nth-child(n+5) {
+          order: 10;
+        }
+
+        ~ li:nth-child(n+6) {
+          order: 20;
+        }
+      }
     }
   }
   li {
