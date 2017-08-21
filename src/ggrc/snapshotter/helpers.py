@@ -221,7 +221,7 @@ def create_relationship_revision_dict(action, event_id, relationship,  # noqa # 
           relationship.destination_id
       ),
       "modified_by": create_json_stub("Person", context_id, user_id),
-      "automapping_id": None,
+      "parent_id": None,
       "attrs": {}
   }
   revision_content.update(metadata)
