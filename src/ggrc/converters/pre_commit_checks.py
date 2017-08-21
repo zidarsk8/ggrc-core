@@ -85,7 +85,22 @@ def check_cycle_tasks(row_converter):  # noqa
         )
 
 
+def check_assessment(row_converter):
+  """Checker for Assessment model instance.
+
+  This checker should make sure if an assessment are invalid or non-importable
+  and should be ignored.
+
+  Args:
+    row_converter: RowConverter object with row data for an assessment
+        import.
+  """
+  if row_converter.obj.archived:
+    row_converter.add_error(errors.ARCHIVED_IMPORT_ERROR)
+
+
 CHECKS = {
     "TaskGroupTask": check_tasks,
     "CycleTaskGroupObjectTask": check_cycle_tasks,
+    "Assessment": check_assessment
 }
