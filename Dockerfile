@@ -1,7 +1,6 @@
-FROM phusion/baseimage:0.9.15
+FROM phusion/baseimage
 
-RUN rm /usr/sbin/policy-rc.d \
-  && curl -sL https://deb.nodesource.com/setup_5.x | sudo -E bash \
+RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
   && apt-get update \
   && apt-get install -y \
     curl \
@@ -9,7 +8,7 @@ RUN rm /usr/sbin/policy-rc.d \
     git-core \
     libfontconfig \
     make \
-    mysql-server \
+    mysql-client \
     nodejs \
     python-imaging \
     python-mysqldb \
@@ -19,39 +18,28 @@ RUN rm /usr/sbin/policy-rc.d \
     unzip \
     vim \
     wget \
-    zip
+    zip \
+  && rm -rf /var/lib/apt/lists/*
 
-COPY ./provision/docker/01_start_mysql.sh /etc/my_init.d/
-
-RUN /etc/init.d/mysql start \
-  && mysql -uroot -e "SET PASSWORD FOR 'root'@'localhost' = PASSWORD('root'); \
-                      SET PASSWORD FOR 'root'@'127.0.0.1' = PASSWORD('root')" \
-  && /etc/init.d/mysql stop \
-  && cd /var/lib \
-  && mv mysql mysql-hd \
-  && ln -s mysql-hd mysql \
-  && chmod +x /etc/my_init.d/01_start_mysql.sh \
-  && useradd -G sudo -u 1000 -m vagrant \
-  && echo "vagrant ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
-  && mkdir -p /vagrant-dev /vagrant/src /vagrant/bin
-
-COPY ./provision/docker/vagrant.bashrc /home/vagrant/.bashrc
+COPY ./provision/docker/vagrant.bashrc /root/.bashrc
 COPY ./git_hooks/post-checkout /home/vagrant/.git/hooks/post-checkout
 COPY ./git_hooks/post-merge /home/vagrant/.git/hooks/post-merge
-
 WORKDIR /vagrant
 
-COPY ./package.json /vagrant-dev/
+# Javascript dependencies
+COPY ./package.json ./bower.json /vagrant-dev/
 RUN cd /vagrant-dev \
-  && npm install
+  && npm install \
+  && node_modules/.bin/bower --allow-root install
 
-COPY ./Makefile ./bower.json /vagrant/
-RUN make bower_components DEV_PREFIX=/vagrant-dev
-
+# Python packages
+COPY ./Makefile /vagrant/
 COPY ./src/requirements*.txt /vagrant/src/
 COPY ./bin/init_env ./bin/setup_linked_packages.py /vagrant/bin/
 COPY ./extras /vagrant/extras
 RUN make setup_dev DEV_PREFIX=/vagrant-dev \
-  && make appengine DEV_PREFIX=/vagrant-dev
+  && make appengine_sdk DEV_PREFIX=/vagrant-dev \
+  && make appengine_packages DEV_PREFIX=/vagrant-dev \
+  && rm /vagrant-dev/opt/google-cloud-sdk-154.0.1-linux-x86_64.tar.gz
 
-RUN chown -R vagrant:vagrant /vagrant /vagrant-dev
+CMD bash -c 'tail -f bin/init_env'
