@@ -24,6 +24,7 @@
         GGRC.Controllers.ObjectMapper.openMapper(data);
       },
       onClick: function (el, ev) {
+        document.body.classList.add('no-events');
         el.data('type', this.attr('instance.assessment_type'));
         el.data('deferred_to', this.attr('deferredTo'));
         can.trigger(el, 'openMapper', ev);
