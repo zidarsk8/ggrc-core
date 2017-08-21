@@ -209,6 +209,16 @@
       &.disabled {
         cursor: default;
         opacity: 0.7;
+
+        i {
+          color: $grayLight;
+        }
+      }
+    }
+
+    & + .navigation-item {
+      > a {
+        border-left: none;
       }
     }
   }
