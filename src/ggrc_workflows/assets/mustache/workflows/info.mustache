@@ -140,9 +140,15 @@
         <h6>
           Repeat Workflow
         </h6>
-            <repeat-on-summary {unit}="instance.unit" {repeat-every}="instance.repeat_every"
-                               hide-repeat-off="false">
-        </repeat-on-summary>
+        <p>
+          <repeat-on-summary {unit}="instance.unit" {repeat-every}="instance.repeat_every"
+                             hide-repeat-off="false">
+          </repeat-on-summary>
+        <p>
+        {{#instance.recurrences}}
+          <h6>Next cycle start date</h6>
+          {{date instance.next_cycle_start_date}}
+        {{/instance.recurrences}}
       </div>
     </div>
     <div class="row-fluid">
