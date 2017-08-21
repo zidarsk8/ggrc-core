@@ -164,6 +164,7 @@ dashboard-js-template-files:
   - components/dropdown/dropdown.mustache
   - components/dropdown/multiselect_dropdown.mustache
   - components/revision-log/revision-log.mustache
+  - components/revision-log/revision-log-data.mustache
   - components/prev-next-buttons/prev-next-buttons.mustache
   - components/person/person.mustache
   - components/spinner/spinner.mustache
