@@ -172,6 +172,10 @@ def convert_str_to_datetime(datetime_str):
     # u'07/02/2017 04:34:05 PM UTC'
     if len(datetime_parts) == 4 and ":" in datetime_str:
       datetime_format = "%m/%d/%Y %I:%M:%S %p %Z"
+      # u'07/02/2017 04:34:05 PM +03'
+      if datetime_parts[3].upper() != 'UTC':
+        from dateutil import parser
+        return parser.parse(datetime_str)
   # REST and CSV like datetime
   if "/" not in datetime_str and any(_ in datetime_str for _ in ["-", ":"]):
     # u'2017-07-02T16:34:05' and u'2017-07-02 16:34:05'
