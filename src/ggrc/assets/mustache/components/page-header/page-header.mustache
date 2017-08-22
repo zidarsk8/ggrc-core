@@ -2,6 +2,23 @@
   Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
+<div class="header-content {{headerStyle}}">
+
+  <button class="lhn-trigger lhn-no-init pull-left" href="javascript://">
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+    <span class="icon-bar"></span>
+  </button>
+
+  <h2 class="logo-wrap ">
+    <a class="to-my-work" href="/dashboard">
+        <img src="{{#if headerStyle}}
+          /static/images/ggrc-one-color.png
+        {{else}}
+          /static/images/ggrc-logo.png
+        {{/if}}" alt="GRC" title="GRC">
+    </a>
+  </h2>
 
 <h1 class="entities">
   {{#if_equals model.table_singular 'person'}}
@@ -124,3 +141,4 @@
     </ul>
   </li>
 </ul>
+</div>

@@ -18,19 +18,8 @@
 -block body
   %header.header.main
   .area{ 'class': '={ model_display_class }' }
-    .header-content
-      -if current_user.system_wide_role.lower() != 'no access'
-        %button{ 'class': 'lhn-trigger lhn-no-init pull-left', 'href': 'javascript://'}
-          %span.icon-bar
-          %span.icon-bar
-          %span.icon-bar
-      %h2.logo-wrap{ 'class': '={ logo_wrap_class }' }
-        %a{ 'class': 'to-my-work', 'href': '/dashboard' }
-          -set logo_url = config.get("COMPANY_LOGO")
-          -if logo_url
-            %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
-      #page-header
-        -block header
+    #page-header
+      -block header
 
     -block nav
       .top-inner-nav

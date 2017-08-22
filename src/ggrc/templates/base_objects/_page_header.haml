@@ -1,69 +1,81 @@
 -# Copyright (C) 2017 Google Inc.
 -# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-%h1.entities
-  -if request.path.startswith('/admin')
-    Admin Dashboard
+.header-content
+  -if current_user.system_wide_role.lower() != 'no access'
+    %button{ 'class': 'lhn-trigger lhn-no-init pull-left', 'href': 'javascript://'}
+      %span.icon-bar
+      %span.icon-bar
+      %span.icon-bar
+  %h2.logo-wrap{ 'class': '={ logo_wrap_class }' }
+    %a{ 'class': 'to-my-work', 'href': '/dashboard' }
+      -set logo_url = config.get("COMPANY_LOGO")
+      -if logo_url
+        %img{ "src" : "#{logo_url}", 'alt' : 'GRC', 'title' : 'GRC'}
 
-%ul.menu
-  %li
-    %a{ 'href': 'javascript://', 'class': 'btn btn-small btn-lightBlue search', 'data-toggle': 'unified-search', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
-      %i.fa.fa-search
-      %span
-        Global Search
-  %li
-    %a{ 'href': "/dashboard#task_widget" }
-      %span
-        My Tasks
-        %span.task-count
-  %li
-    %a{ 'href': '/assessments_view' }
-      %span
-        My Assessments
-  %li
-    %a{ 'href': '/objectBrowser#regulation_widget' }
-      %span
-        All Objects
-  %li
-    %a{ 'href': '/import', 'target': '_blank' }
-      %span
-        Import
+  %h1.entities
+    -if request.path.startswith('/admin')
+      Admin Dashboard
 
-  %li.user.dropdown
-    %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
-      %i.fa.fa-user
-      %i.fa.fa-caret-down
-    %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
-      %li{'class': 'user-email'}
+  %ul.menu
+    %li
+      %a{ 'href': 'javascript://', 'class': 'btn btn-small btn-lightBlue search', 'data-toggle': 'unified-search', 'data-join-object-type': 'MultitypeSearch', 'data-original-title': 'search items' }
+        %i.fa.fa-search
         %span
-          =current_user.email
+          Global Search
+    %li
+      %a{ 'href': "/dashboard#task_widget" }
+        %span
+          My Tasks
+          %span.task-count
+    %li
+      %a{ 'href': '/assessments_view' }
+        %span
+          My Assessments
+    %li
+      %a{ 'href': '/objectBrowser#regulation_widget' }
+        %span
+          All Objects
+    %li
+      %a{ 'href': '/import', 'target': '_blank' }
+        %span
+          Import
 
-      %li
-        %a{ 'href': '/export', 'class': 'export-btn', 'target': '_blank' }
-          %i.fa.fa-sign-out
+    %li.user.dropdown
+      %a.dropdown-toggle{ 'href': "#", 'data-toggle': "dropdown", 'role': "button" }
+        %i.fa.fa-user
+        %i.fa.fa-caret-down
+      %ul.dropdown-menu{'aria-labelledby': 'drop1', 'role': "menu"}
+        %li{'class': 'user-email'}
           %span
-            Export
+            =current_user.email
 
-      -if self.page_help
         %li
-        %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
-          %i.fa.fa-question-circle
+          %a{ 'href': '/export', 'class': 'export-btn', 'target': '_blank' }
+            %i.fa.fa-sign-out
             %span
-              Help
+              Export
 
-      %li.notify-wrap
-        %span
-          %i.fa.fa-clock-o
-          Notifications
-        %div.inner-list
-          %label
-            %input{
-              'type': 'checkbox',
-              'name': 'notifications',
-              'value': 'Email_Digest'
-            }
-            Daily email digest
-      %li
-        %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
-          %i.fa.fa-power-off
-          Logout
+        -if self.page_help
+          %li
+          %a#page-help{ 'href': "javascript://", 'data-toggle': 'modal-ajax-helpform', 'data-help-slug' : '{{ self.page_help()|trim }}'}
+            %i.fa.fa-question-circle
+              %span
+                Help
+
+        %li.notify-wrap
+          %span
+            %i.fa.fa-clock-o
+            Notifications
+          %div.inner-list
+            %label
+              %input{
+                'type': 'checkbox',
+                'name': 'notifications',
+                'value': 'Email_Digest'
+              }
+              Daily email digest
+        %li
+          %a{'href': '={ url_for("logout") }', 'tabindex': "-1"}
+            %i.fa.fa-power-off
+            Logout
