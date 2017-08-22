@@ -26,6 +26,17 @@ class WithQueryApi(object):
       self.assertIsNot(result, None)
     return result
 
+  def _get_all_result_sets(self, data, *keys):
+    """Post data, get response, get values for provided models."""
+    response = self._post(data)
+    self.assert200(response)
+    resp_data = json.loads(response.data)
+
+    result = []
+    for obj in resp_data:
+      result.extend(obj for key in keys if obj.get(key))
+    return result
+
   @staticmethod
   def _make_query_dict_base(object_name, type_=None, filters=None,
                             limit=None, order_by=None):
