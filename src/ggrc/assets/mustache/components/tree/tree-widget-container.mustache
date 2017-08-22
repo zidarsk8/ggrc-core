@@ -8,7 +8,7 @@
     <div class="flex-box tree-filter">
       <tree-filter-input class="flex-size-1"
                          {register-filter}="@registerFilter"
-                         (filter)="onFilter"
+                         (submit)="onFilter"
                          (openAdvanced)="openAdvancedFilter"
                          (removeAdvanced)="removeAdvancedFilters"
                          {show-advanced}="statusFilterVisible"
