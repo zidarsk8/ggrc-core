@@ -10,11 +10,11 @@
 import pytest
 
 from lib import base
-from lib.constants import roles
+from lib.constants import messages, roles, value_aliases as alias
 from lib.constants.element import AssessmentStates
 from lib.entities import entities_factory
 from lib.entities.entities_factory import CustomAttributeDefinitionsFactory
-from lib.service import webui_service, rest_service
+from lib.service import rest_service, webui_service
 from lib.utils.filter_utils import FilterUtils
 
 
@@ -183,44 +183,40 @@ class TestAssessmentsWorkflow(base.Test):
                                    verified=actual_asmt.verified).repr_ui(),
         actual_asmt, "updated_at")
 
-  @pytest.mark.parametrize("operator", ["=", "~"])
+  @pytest.mark.parametrize("operator", [alias.EQUAL_OP, alias.CONTAINS_OP])
   @pytest.mark.smoke_tests
-  def test_asmts_gca_filtering(
-      self, new_program_rest, operator, new_audit_rest,
-      new_cas_for_assessments_rest, new_assessments_rest, selenium,
+  def test_asmts_gcas_filtering(
+      self, new_program_rest, new_audit_rest, new_cas_for_assessments_rest,
+      new_assessments_rest, selenium, operator
   ):
     """Test for checking filtering of Assessment by Custom Attributes in
     audit scope.
     Preconditions:
+    - Program created via REST API.
     - Audit created via REST API.
     - Assessment created via REST API.
     - Global Custom Attributes for Assessment created via REST API.
     """
-    custom_attributes = CustomAttributeDefinitionsFactory().generate_ca_values(
-        list_ca_def_objs=new_cas_for_assessments_rest)
-    expected_obj = new_assessments_rest[0]
+    custom_attr_values = (
+        CustomAttributeDefinitionsFactory().generate_ca_values(
+            list_ca_def_objs=new_cas_for_assessments_rest))
+    expected_asmt = new_assessments_rest[0]
     (rest_service.AssessmentsService().update_obj(
-        obj=expected_obj, custom_attributes=custom_attributes))
+        obj=expected_asmt, custom_attributes=custom_attr_values))
     filter_exprs = FilterUtils().get_filter_exprs_by_cas(
-        expected_obj.custom_attribute_definitions, custom_attributes,
+        expected_asmt.custom_attribute_definitions, custom_attr_values,
         operator)
-    expected_obj = expected_obj.repr_ui().update_attrs(
-        custom_attributes={None: None}, status=AssessmentStates.IN_PROGRESS,
-        audit=None)
+    # due to 'actual_asmt.custom_attributes = {None: None}'
+    expected_asmt = expected_asmt.repr_ui().update_attrs(
+        custom_attributes={None: None}, status=AssessmentStates.IN_PROGRESS)
     expected_results = [{"filter": filter_expr,
-                         "objs": [expected_obj]}
+                         "objs": [expected_asmt]}
                         for filter_expr in filter_exprs]
     actual_results = [
         {"filter": filter_expr,
          "objs": webui_service.AssessmentsService(selenium).
-         filter_list_objs_from_tree_view(new_audit_rest, filter_expr)}
+         filter_and_get_list_objs_from_tree_view(new_audit_rest, filter_expr)}
         for filter_expr in filter_exprs]
-    # due to GGRC-3059
-    for exp_result in expected_results:
-      if (operator + ' "Yes"' in exp_result["filter"] or
-              operator + ' "No"' in exp_result["filter"]):
-        exp_result['objs'] = []
-    # end (due to GGRC-3059)
     assert expected_results == actual_results, (
         messages.AssertionMessages.format_err_msg_equal(expected_results,
                                                         actual_results))

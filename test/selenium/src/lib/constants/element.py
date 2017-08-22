@@ -118,8 +118,6 @@ class Common(object):
   TITLE = "Title"
   DESCRIPTION = "Description"
   CODE = "Code"
-  TRUE = "true"
-  FALSE = "false"
   # fictional elements (need to convert UI attrs to Entities attrs)
   CAS = "CAs"
 
@@ -484,8 +482,5 @@ class RelatedIssuesTab(object):
 
 
 class UnifiedMapperModal(object):
-  """Class that represent ui of Unified Mapper"""
-  OPERATOR_AND = "AND"
-  OPERATOR_OR = "OR"
+  """Class that represent ui of Unified Mapper."""
   ATTRIBUTE_TITLE = Common.TITLE
-  COMPARE_OPERATOR_EQUALS = "="

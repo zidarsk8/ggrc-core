@@ -44,9 +44,28 @@ def get_bool_value_from_arg(arg):
   """
   converted_value = arg
   if isinstance(arg, (str, unicode)):
-    converted_value = (True if arg.title() in ["Yes", "True", "1"] else
-                       False if arg.title() in ["No", "False", "0"] else arg)
+    from lib.constants import value_aliases as alias
+    converted_value = (True if arg.title() in [alias.YES_VAL, alias.TRUE_VAL,
+                                               "1"] else
+                       False if arg.title() in [alias.NO_VAL, alias.FALSE_VAL,
+                                                "0"] else arg)
   return converted_value
+
+
+def get_list_of_all_cases(*args):
+  """Return list of all cases (title, lower, upper) for string if string has
+  alpha characters. Return empty list of args are not string type.
+  """
+  list_of_cases = []
+  for arg in args:
+    if isinstance(arg, (str, unicode)):
+      if (str(arg).isdigit() or
+              all(char in string.punctuation for char in str(arg))):
+        list_of_cases.append(arg)
+      else:
+        list_of_cases.extend(
+            [str(arg).title(), str(arg).lower(), str(arg).upper()])
+  return list_of_cases
 
 
 def exchange_dicts_items(transform_dict, dicts,
@@ -182,6 +201,7 @@ def convert_str_to_datetime(datetime_str):
     if len(datetime_parts) == 2:
       datetime_format = ("%Y-%m-%dT%H:%M:%S" if "T" in datetime_str
                          else "%Y-%m-%d %H:%M:%S")
+    # due to issue GGRC-3130
     elif len(datetime_parts) == 1:
       datetime_format = "%Y-%m-%d"
   return datetime.strptime(datetime_str, datetime_format)

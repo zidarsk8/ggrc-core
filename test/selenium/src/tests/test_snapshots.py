@@ -293,9 +293,9 @@ class TestSnapshots(base.Test):
     expected_control = (audit_with_one_control[version_of_ctrl][0].repr_ui().
                         update_attrs(custom_attributes={None: None}))
     filter_exp = FilterUtils.get_filter_exp_by_title(expected_control.title)
-    actual_controls = (
-        webui_service.ControlsService(selenium).
-        filter_list_objs_from_tree_view(src_obj=audit, filter_exp=filter_exp))
+    actual_controls = (webui_service.ControlsService(selenium).
+                       filter_and_get_list_objs_from_tree_view(
+                           src_obj=audit, filter_exp=filter_exp))
     assert (expected_control in
             [ctrls for ctrls in actual_controls]
             ) == is_found, (

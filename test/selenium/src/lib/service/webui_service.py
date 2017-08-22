@@ -286,15 +286,12 @@ class BaseWebUiService(object):
     element_to_verify = element.DropdownMenuItemTypes.OPEN
     return dropdown_on_info_panel.is_item_enabled(element_to_verify)
 
-  def filter_list_objs_from_tree_view(self, src_obj, filter_exp):
+  def filter_and_get_list_objs_from_tree_view(self, src_obj, filter_exp):
     """Filter by specified criteria and return list of objects from Tree
     View."""
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     objs_widget.filter.perform_query(filter_exp)
-    self.set_list_objs_scopes_representation_on_tree_view(src_obj)
-    list_objs_scopes = self.get_list_objs_scopes_from_tree_view(src_obj)
-    return self.create_list_objs(entity_factory=self.entities_factory_cls,
-                                 list_scopes=list_objs_scopes)
+    return self.get_list_objs_from_tree_view(src_obj)
 
   def is_obj_mappable_via_tree_view(self, src_obj, obj):
     """Open dropdown of Tree View Item  by title, an check is object
