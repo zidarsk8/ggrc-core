@@ -148,15 +148,23 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     self.assert400(response)
 
   # pylint: disable=invalid-name
-  def test_basic_query_incorrect_date_format(self):
+  @ddt.data(
+      ("effective date", ">", "05-18-2015"),
+      ("start_date", "=", "2017-06/12"),
+  )
+  @ddt.unpack
+  def test_basic_query_incorrect_date_format(self, field, operation, date):
     """Filtering should fail because of incorrect date input."""
     data = self._make_query_dict(
-        "Program",
-        expression=["effective date", ">", "05-18-2015"]
+        "Program", expression=[field, operation, date]
     )
     response = self._post(data)
     self.assert400(response)
-    self.assertEqual(response.json['message'], "Invalid filter data")
+
+    self.assertEqual(
+        ("Invalid date was typed into `{}` field, "
+         "please change it and try again!").format(field),
+        response.json['message'])
 
   def test_basic_query_text_search(self):
     """Filter by fulltext search."""
@@ -1298,7 +1306,10 @@ class TestQueryWithCA(TestCase, WithQueryApi):
     )
     response = self._post(data)
     self.assert400(response)
-    self.assertEqual(response.json['message'], "Invalid filter data")
+    self.assertEqual(
+        ("Invalid date was typed into `ca date` field, "
+         "please change it and try again!"),
+        response.json['message'])
 
 
 class TestQueryWithUnicode(TestCase, WithQueryApi):
