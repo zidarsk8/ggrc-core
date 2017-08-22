@@ -163,7 +163,9 @@ class ChangeTracked(object):
   _fulltext_attrs = [
       attributes.DatetimeFullTextAttr('created_at', 'created_at'),
       attributes.DatetimeFullTextAttr('updated_at', 'updated_at'),
-      attributes.FullTextAttr("modified_by", "modified_by", ["name", "email"]),
+      attributes.FullTextAttr(
+          "modified_by", "modified_by", ["name", "email", "user_name"]
+      ),
   ]
 
   _aliases = {
