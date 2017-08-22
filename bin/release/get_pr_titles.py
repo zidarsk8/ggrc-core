@@ -26,7 +26,7 @@ import requests
 
 class PrGetter(object):  # pylint: disable=too-few-public-methods
   """Github REST client to fetch PR data."""
-  URL_PATTERN = "https://api.github.com/repos/google/ggrc-core/pulls/{id}"
+  URL_PATTERN = "https://api.github.com/repos/google/ggrc-core/issues/{id}"
 
   def __init__(self, auth):
     self.session = requests.Session()
@@ -124,6 +124,13 @@ def try_parse_ticket_ids(title):
   return tickets
 
 
+def parse_ticket_labels(labels):
+  """Get a generator that returns names of labels passed if any."""
+  if not labels:
+    return []
+  return (label.get("name") for label in labels)
+
+
 def print_unicode(line):
   """A wrapper to print data encoded as UTF-8 manually.
 
@@ -140,21 +147,28 @@ def print_pr_details(pr_details):
     - ticket id(s) comma-separated
     - assignee username or "None"
     - milestone name or "None"
+    - labels list
     - PR title
 
   Also print a Jira-friendly list of ticket ids guessed from the PRs.
   """
   assumed_tickets = set()
+  ok_labels = {"cla: no",
+               "cla: yes",
+               "new contribution",
+               "next release",
+               "please review"}
 
   row_tuple = collections.namedtuple(
       "Row",
-      ["id", "ticket", "assignee", "milestone", "title"],
+      ["id", "ticket", "assignee", "milestone", "labels", "title"],
   )
   header = row_tuple(*row_tuple._fields)
   rows = [header]
 
   for id_, details in pr_details.iteritems():
     tickets = try_parse_ticket_ids(details.get("title"))
+    labels = set(parse_ticket_labels(details.get("labels"))) - ok_labels
     assumed_tickets.update(tickets)
     rows.append(row_tuple(
         id=str(id_),
@@ -162,6 +176,7 @@ def print_pr_details(pr_details):
         assignee=(details.get("assignee") or {}).get("login"),
         milestone=(details.get("milestone") or {}).get("title"),
         title=details.get("title"),
+        labels=", ".join(labels),
     ))
 
   max_widths = [max(len(unicode(v)) for v in column)
