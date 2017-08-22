@@ -131,6 +131,25 @@ def parse_ticket_labels(labels):
   return (label.get("name") for label in labels)
 
 
+def print_table(item_type, items):
+  """Print list of named tuples in table form.
+
+  The title row is taken from namedtuple field list.
+  """
+  header = item_type(*item_type._fields)
+
+  max_widths = [max(len(unicode(v)) for v in column)
+                for column in zip(*items)]
+
+  print_unicode(u" | ".join(u"{0:{width}}".format(field, width=width)
+                            for field, width in zip(header, max_widths)))
+  print_unicode(u"-|-".join(u"-" * width for width in max_widths))
+
+  for item in items:
+    print_unicode(u" | ".join(u"{0:{width}}".format(field, width=width)
+                              for field, width in zip(item, max_widths)))
+
+
 def print_unicode(line):
   """A wrapper to print data encoded as UTF-8 manually.
 
@@ -163,8 +182,7 @@ def print_pr_details(pr_details):
       "Row",
       ["id", "ticket", "assignee", "milestone", "labels", "title"],
   )
-  header = row_tuple(*row_tuple._fields)
-  rows = [header]
+  rows = []
 
   for id_, details in pr_details.iteritems():
     tickets = try_parse_ticket_ids(details.get("title"))
@@ -179,16 +197,7 @@ def print_pr_details(pr_details):
         labels=", ".join(labels),
     ))
 
-  max_widths = [max(len(unicode(v)) for v in column)
-                for column in zip(*rows)]
-
-  print_unicode(u" | ".join(u"{0:{width}}".format(field, width=width)
-                            for field, width in zip(header, max_widths)))
-  print_unicode(u"-|-".join(u"-" * width for width in max_widths))
-
-  for row in rows[1:]:
-    print_unicode(u" | ".join(u"{0:{width}}".format(field, width=width)
-                              for field, width in zip(row, max_widths)))
+  print_table(row_tuple, rows)
 
   print_unicode("")
   print_unicode("Assumed ticket ids")
