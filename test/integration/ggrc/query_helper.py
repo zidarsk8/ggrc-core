@@ -75,6 +75,23 @@ class WithQueryApi(object):
     return cls._make_query_dict_base(object_name, filters=filters, *args,
                                      **kwargs)
 
+  @classmethod
+  def _make_snapshot_query_dict(cls, child_type, expression=None, *args,
+                                **kwargs):
+    """Make a dict with query for Snapshots of child_type."""
+    child_type_filter = cls.make_filter_expression(("child_type", "=",
+                                                    child_type))
+    if expression:
+      snapshot_filter = cls.make_filter_expression(expression)
+      filters = {"expression": {"op": {"name": "AND"},
+                                "left": snapshot_filter,
+                                "right": child_type_filter}}
+    else:
+      filters = {"expression": child_type_filter}
+
+    return cls._make_query_dict_base("Snapshot", filters=filters, *args,
+                                     **kwargs)
+
   def simple_query(self, model_name, expression=None, *args, **kwargs):
     return self._get_first_result_set(
         self._make_query_dict(
