@@ -1,6 +1,6 @@
 cleandev:
   build: .
-  dockerfile: Dockerfile-clean
+  dockerfile: Dockerfile
   volumes:
    - ".:/vagrant"
   environment:
