@@ -41,7 +41,8 @@ def _get_value(cav, _type):
 
 def get_updated_cavs(new_attrs, old_attrs):
   """Get dict of updated custom attributes of assessment"""
-  cad_list = new_attrs.get("custom_attribute_definitions", [])
+  cad_list = old_attrs.get("custom_attribute_definitions", []) + \
+      new_attrs.get("custom_attribute_definitions", [])
   cad_names = {cad["id"]: cad["display_name"] for cad in cad_list}
   cad_types = {cad["id"]: cad["attribute_type"] for cad in cad_list}
 
