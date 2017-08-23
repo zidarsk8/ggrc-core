@@ -10,10 +10,7 @@ from lib.utils import selenium_utils
 
 class AssessmentTabContainer(base.AbstractTabContainer):
   """Class of TabContainer in Assessment info."""
-  def __init__(self, driver, container_element):
-    super(AssessmentTabContainer, self).__init__(driver,
-                                                 container_element)
-    self._default_tab = element.AssessmentTabContainer.ASMT_ATTRS_TAB
+  _elements = element.AssessmentTabContainer
 
   def _get_locators(self):
     return locator.WidgetInfoAssessment.TabContainer
@@ -23,17 +20,16 @@ class AssessmentTabContainer(base.AbstractTabContainer):
     validation result, because there is no reason for create AssessmentLog
     page object class.
     """
-    elements = element.AssessmentTabContainer
     selenium_utils.scroll_into_view(self._driver, self.container_element)
     return {
-        elements.RELATED_ASMTS_TAB: AssessmentRelatedAsmtsTable,
-        elements.RELATED_ISSUES_TAB: AssessmentRelatedIssuesTable,
-        elements.ASMT_LOG_TAB: self._log_tab_validate}
+        self._elements.RELATED_ASMTS_TAB: AssessmentRelatedAsmtsTable,
+        self._elements.RELATED_ISSUES_TAB: AssessmentRelatedIssuesTable,
+        self._elements.CHANGE_LOG_TAB: self._log_tab_validate}
 
-  def switch_to_default_tab(self):
-    """Method for switch active tab to default tab."""
-    if self._tab_controller.active_tab.text != self._default_tab:
-      self._tab_controller.active_tab = self._default_tab
+  def switch_to_tab(self, tab_name):
+    """Method for switch active tab to another one according to tab's name."""
+    if self._tab_controller.active_tab.text != tab_name:
+      self._tab_controller.active_tab = tab_name
 
   @staticmethod
   def _log_tab_validate(_driver, log_panel_element):
