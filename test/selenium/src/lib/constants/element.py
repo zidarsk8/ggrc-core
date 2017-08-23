@@ -434,22 +434,23 @@ class TransformationElements(TransformationSetVisibleFields, CommonAssessment):
 
 class AssessmentTabContainer(object):
   """Elements' labels for Assessment Tab Container"""
-  ASMT_ATTRS_TAB = 'Assessment Attributes'
-  ASMT_LOG_TAB = 'Assessment Log'
-  RELATED_ASMTS_TAB = 'Related Assessments'
-  RELATED_ISSUES_TAB = 'Related Issues'
+  ASMT_TAB = "Assessment"
+  RELATED_ASMTS_TAB = "Related Assessments"
+  RELATED_ISSUES_TAB = "Related Issues"
+  OTHER_ATTRS_TAB = "Other Attributes"
+  CHANGE_LOG_TAB = "Change Log"
 
 
 class AsmtAttrsTab(object):
   """Common elements' labels of Assessment Attributes Tab on Assessment Info
   Widget."""
-  TAB_NAME = AssessmentTabContainer.ASMT_ATTRS_TAB
+  TAB_NAME = AssessmentTabContainer.OTHER_ATTRS_TAB
 
 
 class AsmtLogTab(object):
   """Common elements' labels of Assessment Log Tab on Assessment Info
    Widget."""
-  TAB_NAME = AssessmentTabContainer.ASMT_LOG_TAB
+  TAB_NAME = AssessmentTabContainer.CHANGE_LOG_TAB
   FIELD = "Field"
   ORIGINAL_VALUE = "Original value"
   NEW_VALUE = "New value"

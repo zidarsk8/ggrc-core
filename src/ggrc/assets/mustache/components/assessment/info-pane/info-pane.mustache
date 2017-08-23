@@ -12,6 +12,8 @@
   {{/is_info_pin}}
     <div class="tier-content">
       {{> '/static/mustache/assessments/header.mustache' }}
+      <tab-container>
+          <tab-panel {(panels)}="panels" title-text="Assessment">
         <div class="assessment-info-pane info-pane__body">
             <div class="assessment-attributes info-pane__main-content info-pane__main-content-with-sidebar">
             {{#if instance.test_plan}}
@@ -200,12 +202,35 @@
                 <div class="info-pane__section">
                     <assessment-people {instance}="instance">
                     </assessment-people>
-                    <assessment-custom-attributes (on-update-attributes)="saveGlobalAttributes(%event)"
+                </div>
+            </div>
+            <div class="assessment-comments info-pane__sidebar">
+                <div class="info-pane__section-title">Responses/Comments</div>
+                {{#unless isEditDenied}}
+                    <comment-add-form class="comment-add-form"
+                                    {instance}="instance"
+                                    {is-saving}="isUpdatingComments"
+                                    (after-create)="afterCreate(%event, 'comments')"
+                                    (before-create)="addItems(%event, 'comments')"
+                    ></comment-add-form>
+                {{/unless}}
+                <assessment-mapped-comments {mapped-items}="comments"></assessment-mapped-comments>
+            </div>
+        </div>
+         </tab-panel>
+          <tab-panel {(panels)}="panels" title-text="Related Assessments">
+                  {{> '/static/mustache/assessments/related-assessments.mustache' }}
+          </tab-panel>
+          <tab-panel {(panels)}="panels" title-text="Related Issues">
+              <related-issues {base-instance}="instance"
+                                    {all-related-snapshots}="mappedSnapshots"></related-issues>
+          </tab-panel>
+          <tab-panel {(panels)}="panels" title-text="Other Attributes">
+              <assessment-custom-attributes (on-update-attributes)="saveGlobalAttributes(%event)"
                                                   {items}="globalAttributes"
                                                   {is-edit-denied}="isEditDenied"
-                    ></assessment-custom-attributes>
-                </div>
-                <div class="info-pane__section ggrc-form">
+              ></assessment-custom-attributes>
+            <div class="info-pane__section ggrc-form">
                     <div class="ggrc-form-item">
                         <div class="ggrc-form-item__multiple-row">
                             <assessment-object-type-dropdown
@@ -257,23 +282,6 @@
                             {mapped-items}="relatedInformation"
                             title-text="Related Information"></assessment-mapped-related-information>
                 </div>
-            </div>
-            <div class="assessment-comments info-pane__sidebar">
-                <div class="info-pane__section-title">Responses/Comments</div>
-                {{#unless isEditDenied}}
-                    <comment-add-form class="comment-add-form"
-                                    {instance}="instance"
-                                    {is-saving}="isUpdatingComments"
-                                    (after-create)="afterCreate(%event, 'comments')"
-                                    (before-create)="addItems(%event, 'comments')"
-                    ></comment-add-form>
-                {{/unless}}
-                <assessment-mapped-comments {mapped-items}="comments"></assessment-mapped-comments>
-            </div>
-        </div>
-        <div class="tabs-wrap">
-            <tab-container>
-                <tab-panel {(panels)}="panels" title-text="Assessment Attributes">
                     <div class="ggrc-form assessment-attributes-tab">
                         <div class="ggrc-form-item">
                             <div class="ggrc-form-item__row">
@@ -358,7 +366,7 @@
                                     {value}="instance.operationally"
                                     {instance}="instance">
                                         <div>
-                                            <div class="info-pane__section-title">Conclusion: Design</div>
+                                            <div class="info-pane__section-title">Conclusion: Operation</div>
                                             <p class="conclusion-small-text">
                                                 <small><em>Is this control design effective?</em></small>
                                             </p>
@@ -436,17 +444,11 @@
                         </div>
                     </div>
                 </tab-panel>
-                <tab-panel {(panels)}="panels" title-text="Assessment Log">
+
+                <tab-panel {(panels)}="panels" title-text="Change Log">
                     <revision-log {instance}="instance"></revision-log>
                 </tab-panel>
-                <tab-panel {(panels)}="panels" title-text="Related Assessments">
-                  {{> '/static/mustache/assessments/related-assessments.mustache' }}
-                </tab-panel>
-                <tab-panel {(panels)}="panels" title-text="Related Issues">
-                    <related-issues {base-instance}="instance"
-                                    {all-related-snapshots}="mappedSnapshots"></related-issues>
-                </tab-panel>
-            </tab-container>
+          </tab-container>
         </div>
     </div><!-- tier-content end -->
   </inline-form-control>

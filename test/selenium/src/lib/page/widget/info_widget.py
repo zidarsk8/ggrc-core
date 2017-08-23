@@ -253,13 +253,13 @@ class Assessments(InfoPanel):
 
   def __init__(self, driver):
     super(Assessments, self).__init__(driver)
+    self.verified = selenium_utils.is_element_exist(
+        self._driver, self._locators.ICON_VERIFIED)
     self.workflow_container = tab_containers.AssessmentTabContainer(
         self._driver,
         self._driver.find_element(*self._locators.ASMT_TAB_CONTAINER_CSS))
-    self.workflow_container.switch_to_default_tab()
-    self.code_section = base.Label(
-        self._driver, self._locators.CODE_CSS)
-    # mapped objects
+    self.workflow_container.switch_to_tab(
+        element.AssessmentTabContainer.ASMT_TAB)
     self.mapped_objects_titles_and_descriptions = self._driver.find_elements(
         *self._locators.MAPPED_OBJECTS_TITLES_AND_DESCRIPTIONS)
     self.mapped_objects_titles_text = [
@@ -268,11 +268,8 @@ class Assessments(InfoPanel):
     self.mapped_objects_descriptions_text = [
         mapped_el.find_element(*self._locators.MAPPED_OBJECT_DESCRIPTION).text
         for mapped_el in self.mapped_objects_titles_and_descriptions]
-    # LCAs and GCAs
-    self.cas_text = self.get_headers_and_values_dict_from_cas_scopes()
-    self.cas_text.update(self.get_headers_and_values_dict_from_cas_scopes(
-        is_gcas_not_lcas=False))
-    # people section
+    self.lcas_text = self.get_headers_and_values_dict_from_cas_scopes(
+        is_gcas_not_lcas=False)
     self.creators_text, self.creators_entered_text = (
         self.get_header_and_value_text_from_custom_scopes(
             self._elements.CREATORS_.upper(),
@@ -285,34 +282,39 @@ class Assessments(InfoPanel):
         self.get_header_and_value_text_from_custom_scopes(
             self._elements.VERIFIERS_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
-    self.verified = (
-        selenium_utils.is_element_exist(self._driver,
-                                        self._locators.ICON_VERIFIED))
-    # code section
-    self.code_text = (
-        self.code_section.element.find_element(
-            *self._locators.CODE_HEADER_CSS).text)
-    self.code_entered_text = (
-        self.code_section.element.find_element(
-            *self._locators.CODE_VALUE_CSS).text)
-    # comments section
     self.comments = base.CommentsPanel(
         self._driver, self._locators.COMMENTS_CSS)
-    # scope
+    self.comments_scopes = self.comments.scopes
+
+  def get_info_widget_obj_scope(self):
+    """Get an Assessment object's text scope (headers' (real and synthetic)
+    and values' txt) from Info Widget navigating through the Assessment's tabs.
+    """
+    self.workflow_container.switch_to_tab(
+        element.AssessmentTabContainer.OTHER_ATTRS_TAB)
+    cas_text = self.get_headers_and_values_dict_from_cas_scopes()
+    code_section = base.Label(self._driver, self._locators.CODE_CSS)
+    code_text = code_section.element.find_element(
+        *self._locators.CODE_HEADER_CSS).text
+    code_entered_text = code_section.element.find_element(
+        *self._locators.CODE_VALUE_CSS).text
+    # todo: implement separate entities' model for asmts' lcas and gcas
+    cas_text.update(self.lcas_text)
     self.list_all_headers_text = [
         self._elements.CAS.upper(), self._elements.TITLE,
         self._elements.STATE.upper(),
         self._elements.VERIFIED.upper(),
         self.creators_text, self.assignees_text,
         self.verifiers_text, self._elements.MAPPED_OBJECTS.upper(),
-        self.code_text, self.comments.header_lbl.text]
+        code_text, self.comments.header_lbl.text]
     self.list_all_values_text = [
-        self.cas_text, self.title_entered().text,
+        cas_text, self.title_entered().text,
         objects.get_normal_form(self.state().text),
         self.verified,
         self.creators_entered_text, self.assignees_entered_text,
         self.verifiers_entered_text, self.mapped_objects_titles_text,
-        self.code_entered_text, self.comments.scopes]
+        code_entered_text, self.comments_scopes]
+    return dict(zip(self.list_all_headers_text, self.list_all_values_text))
 
   def click_complete(self):
     base.Button(self._driver, WidgetInfoAssessment.BUTTON_COMPLETE).click()
