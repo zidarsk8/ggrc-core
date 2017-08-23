@@ -55,6 +55,7 @@
       relevantTo: [],
       objectGenerator: false,
       deferredList: [],
+      disabledIds: [],
       init: function () {
         var self = this;
         this.attr('submitCbs').add(this.onSearch.bind(this, true));
@@ -305,6 +306,7 @@
             var relatedData = this.buildRelatedData(
               responseArr[query.relatedQueryIndex],
               modelKey);
+            var disabledIds;
 
             var result =
               data[modelKey].values.map(function (value) {
@@ -316,7 +318,9 @@
               });
             this.setSelectedItems(result);
             if (relatedData) {
-              this.setDisabledItems(result, relatedData[modelKey].ids);
+              disabledIds = relatedData[modelKey].ids;
+              this.attr('disabledIds', disabledIds);
+              this.setDisabledItems(result, disabledIds);
             }
             // Update paging object
             this.paging.attr('total', data[modelKey].total);
