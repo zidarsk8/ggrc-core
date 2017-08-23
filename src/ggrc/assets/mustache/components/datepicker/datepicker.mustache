@@ -28,6 +28,11 @@
       {(value)}="_date"
       can-focus="onFocus"
     >
+    {{#if date}}
+    <a class="datepicker__remove-value" ($click)="removeValue(%event)">
+      <i class="fa fa-times"></i>
+    </a>
+    {{/if}}
     <div
       class="datepicker__calendar {{#showTop}}datepicker__calendar--top{{/showTop}}
       {{#isHidden}}hide{{/isHidden}}"

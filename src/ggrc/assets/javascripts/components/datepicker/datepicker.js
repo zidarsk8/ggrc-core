@@ -62,6 +62,12 @@
           this.attr('showTop', true);
         }
       },
+      removeValue: function (event) {
+        event.preventDefault();
+
+        this.picker.datepicker('setDate', null);
+        this.attr('date', null);
+      },
 
       // Date formats for the actual selected value, and for the date as
       // displayed to the user. The Moment.js library and the jQuery datepicker

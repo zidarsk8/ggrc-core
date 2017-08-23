@@ -1153,7 +1153,7 @@ class AssessmentLogTab(object):
   CELLS_CSS = (By.CSS_SELECTOR, '.third-col')
   COMMENT_PERSON_CSS = (By.CSS_SELECTOR, '.person-tooltip-trigger')
   PERSON_LABEL = (By.CSS_SELECTOR, '.person-label')
-  LOG_LIST_CSS = Common.HTML_LIST_CSS
+  LOG_LIST_CSS = (By.CSS_SELECTOR, ' .w-status')
   LOG_TAB_SPINNER_CSS = (By.CSS_SELECTOR, '.spinner')
 
 

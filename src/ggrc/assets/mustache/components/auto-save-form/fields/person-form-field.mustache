@@ -6,8 +6,8 @@
 <div class="input-wrapper">
   {{#if _value}}
     <div class="person-info-wrapper">
-      <a href="#" ($click)="unsetPerson">
-        <i class="fa fa-fw fa-times" aria-hidden="true"></i>
+      <a class="person-info-wrapper__remove-value" href="#" ($click)="unsetPerson">
+        <i class="fa fa-times" aria-hidden="true"></i>
       </a>
       <person-list-item {person-id}="_value" {with-Details}="withDetails"></person-list-item>
     </div>

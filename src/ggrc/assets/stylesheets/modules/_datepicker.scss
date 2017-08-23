@@ -36,6 +36,19 @@
 
 .datepicker__input-wrapper {
   position: relative;
+  .datepicker__remove-value {
+    cursor: pointer;
+    position: absolute;
+    top: 4px;
+    right: 5px;
+    i {
+      font-size: 16px;
+      color: $icon-color-dark;
+      &:hover {
+        color: $black;
+      }
+    }
+  }
 }
 
 .ui-datepicker-inline {

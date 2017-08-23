@@ -84,6 +84,7 @@ def check_cycle_tasks(row_converter):  # noqa
             column_name="Actual Finish Date",
         )
 
+
 def check_workflows(row_converter):
   """Checker for Workflow object.
 
@@ -99,8 +100,8 @@ def check_workflows(row_converter):
     return
 
   obj = row_converter.obj
-  if (obj.unit is None and obj.repeat_every is not None) or\
-      (obj.unit is not None and obj.repeat_every is None):
+  if (obj.unit is None and obj.repeat_every is not None or
+          obj.unit is not None and obj.repeat_every is None):
     row_converter.add_error(
         errors.VALIDATION_ERROR,
         column_name="'repeat_every', 'unit'",
@@ -109,8 +110,23 @@ def check_workflows(row_converter):
     )
 
 
+def check_assessment(row_converter):
+  """Checker for Assessment model instance.
+
+  This checker should make sure if an assessment are invalid or non-importable
+  and should be ignored.
+
+  Args:
+    row_converter: RowConverter object with row data for an assessment
+        import.
+  """
+  if row_converter.obj.archived:
+    row_converter.add_error(errors.ARCHIVED_IMPORT_ERROR)
+
+
 CHECKS = {
     "TaskGroupTask": check_tasks,
     "CycleTaskGroupObjectTask": check_cycle_tasks,
     "Workflow": check_workflows,
+    "Assessment": check_assessment
 }
