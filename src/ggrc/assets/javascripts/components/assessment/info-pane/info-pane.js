@@ -95,11 +95,25 @@
               this.attr('instance.archived');
           }
         },
-        instance: {}
+        instance: {},
+        isInfoPaneSaving: {
+          get: function () {
+            if (this.attr('isUpdatingRelatedItems')) {
+              return false;
+            }
+
+            return this.attr('isUpdatingEvidences') ||
+              this.attr('isUpdatingUrls') ||
+              this.attr('isUpdatingComments') ||
+              this.attr('isUpdatingReferenceUrls') ||
+              this.attr('isAssessmentSaving');
+          }
+        }
       },
       modal: {
         open: false
       },
+      isUpdatingRelatedItems: false,
       isAssessmentSaving: false,
       onStateChangeDfd: {},
       formState: {},
@@ -151,6 +165,10 @@
           })
           .always(function () {
             this.attr('isUpdating' + can.capitalize(type), false);
+
+            if (this.attr('isUpdatingRelatedItems')) {
+              this.attr('isUpdatingRelatedItems', false);
+            }
           }.bind(this));
         return dfd;
       },
@@ -231,6 +249,8 @@
           [];
       },
       updateRelatedItems: function () {
+        this.attr('isUpdatingRelatedItems', true);
+
         this.attr('mappedSnapshots')
           .replace(this.loadSnapshots());
         this.attr('comments')
