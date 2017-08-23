@@ -242,6 +242,7 @@ class CommonAssessmentTemplate(Common):
 class CommonIssue(Common):
   """Common elements' labels and properties for Issues objects."""
   ISSUE = objects.get_normal_form(objects.get_singular(objects.ISSUES))
+  STATE = Base.STATE
 
 
 class ObjectStates(object):
@@ -303,6 +304,12 @@ class AssessmentInfoWidget(CommonAssessment):
   TITLE_UPPER = CommonAssessment.TITLE.upper()
   CODE_UPPER = CommonAssessment.CODE.upper()
   COMMENTS_HEADER = "RESPONSES/COMMENTS"
+
+
+class IssueInfoWidget(CommonIssue):
+  """Elements' labels and properties for Issue Info widgets."""
+  TITLE_UPPER = CommonIssue.TITLE.upper()
+  CODE_UPPER = CommonIssue.CODE.upper()
 
 
 class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):

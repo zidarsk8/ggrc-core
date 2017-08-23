@@ -337,9 +337,22 @@ class AssessmentTemplates(InfoPanel):
 class Issues(InfoPanel):
   """Model for Issue object Info pages and Info panels."""
   _locators = locator.WidgetInfoIssue
+  _elements = element.IssueInfoWidget
 
   def __init__(self, driver):
     super(Issues, self).__init__(driver)
+    self.code_text, self.code_entered_text = (
+        self.get_header_and_value_text_from_custom_scopes(
+            self._elements.CODE.upper()))
+    # all obj scopes
+    self.list_all_headers_text = [
+        self.title().text,
+        self._elements.STATE.upper(),
+        self.code_text]
+    self.list_all_values_text = [
+        self.title_entered().text,
+        objects.get_normal_form(self.state().text),
+        self.code_entered_text]
 
 
 class Regulations(SnapshotableInfoPanel):
