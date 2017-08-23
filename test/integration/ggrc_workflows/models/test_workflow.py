@@ -164,3 +164,79 @@ class TestWorkflow(TestCase):
           })
     workflow = all_models.Workflow.query.get(wf_id)
     self.assertEqual(expected_date, workflow.next_cycle_start_date)
+
+  @ddt.data(
+      (
+          # One cycle should be created
+          datetime.date(2017, 8, 10),
+          datetime.date(2017, 8, 14),
+          all_models.Workflow.ACTIVE
+      ),
+      (
+          # No cycles should be created
+          datetime.date(2017, 8, 11),
+          datetime.date(2017, 8, 14),
+          all_models.Workflow.INACTIVE
+      ),
+  )
+  @ddt.unpack
+  def test_archive_workflow(self, tgt_start_date, tgt_end_date, wf_status):
+    with freezegun.freeze_time("2017-08-10"):
+      with glob_factories.single_commit():
+        workflow = factories.WorkflowFactory(
+            title="This is a test WF",
+            unit=all_models.Workflow.WEEK_UNIT,
+            repeat_every=1)
+        factories.TaskGroupTaskFactory(
+            task_group=factories.TaskGroupFactory(
+                workflow=workflow,
+                context=glob_factories.ContextFactory(),
+            ),
+            start_date=tgt_start_date,
+            end_date=tgt_end_date,
+        )
+      wf_id = workflow.id
+      self.generator.activate_workflow(workflow)
+      workflow = all_models.Workflow.query.get(wf_id)
+      self.assertEqual(all_models.Workflow.ACTIVE, workflow.status)
+      self.assertIs(workflow.recurrences, True)
+      # Archive workflow
+      self.generator.modify_workflow(workflow, {'recurrences': False})
+      workflow = all_models.Workflow.query.get(wf_id)
+      self.assertIs(workflow.recurrences, False)
+      self.assertEqual(wf_status, workflow.status)
+
+  def test_ending_archived_workflow_cycles(self):  # noqa pylint: disable=invalid-name
+    """Archived workflow should be INACTIVE if current cycles are ended."""
+    with freezegun.freeze_time("2017-08-10"):
+      with glob_factories.single_commit():
+        workflow = factories.WorkflowFactory(
+            title="This is a test WF",
+            unit=all_models.Workflow.WEEK_UNIT,
+            repeat_every=1)
+        factories.TaskGroupTaskFactory(
+            task_group=factories.TaskGroupFactory(
+                workflow=workflow,
+                context=glob_factories.ContextFactory(),
+            ),
+            # Two cycles should be created
+            start_date=datetime.date(2017, 8, 3),
+            end_date=datetime.date(2017, 8, 7),
+        )
+      wf_id = workflow.id
+      self.generator.activate_workflow(workflow)
+      workflow = all_models.Workflow.query.get(wf_id)
+      self.assertEqual(all_models.Workflow.ACTIVE, workflow.status)
+      self.assertIs(workflow.recurrences, True)
+      self.assertEqual(2, len(workflow.cycles))
+      # Archive workflow
+      self.generator.modify_workflow(workflow, {'recurrences': False})
+      workflow = all_models.Workflow.query.get(wf_id)
+      self.assertIs(workflow.recurrences, False)
+      self.assertEqual(all_models.Workflow.ACTIVE, workflow.status)
+      # End all current cycles
+      for cycle in workflow.cycles:
+        self.generator.modify_object(cycle, {'is_current': False})
+      # Archived workflow should be inactive
+      workflow = all_models.Workflow.query.get(wf_id)
+      self.assertEqual(all_models.Workflow.INACTIVE, workflow.status)
