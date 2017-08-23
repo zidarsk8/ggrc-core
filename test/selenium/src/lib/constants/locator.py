@@ -999,7 +999,8 @@ class BaseWidgetGeneric(object):
           str(_FILTER_DROPDOWN_ELEMENTS).format(cls._object_name))
   FILTER_PANE_COUNTER = (
       By.CSS_SELECTOR,
-      "section.widget:not(.hidden) .tree-view-pagination__count__title")
+      "section.widget:not(.hidden) "
+      ".dropdown-toggle.tree-view-pagination__count__title")
 
 
 class WidgetAudits(BaseWidgetGeneric):
