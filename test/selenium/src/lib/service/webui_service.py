@@ -466,7 +466,7 @@ class AssessmentsService(BaseWebUiService):
     """
     asmt_page = self.open_info_page_of_obj(obj)
     return asmt_page.workflow_container.get_tab_object(
-        element.AssessmentTabContainer.ASMT_LOG_TAB)
+        element.AssessmentTabContainer.CHANGE_LOG_TAB)
 
   def get_related_asmts_titles(self, obj):
     """Open assessment Info Page. Open Related Assessments Tab on Assessment
