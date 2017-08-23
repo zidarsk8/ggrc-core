@@ -5,12 +5,14 @@
 
 <div class="navigation-wrap">
     <div class="navigation-item">
-        <a can-click="setPrev()" class="{{#unless hasPrev}}disabled{{/unless}}">
+        <a ($click)="setPrev()" rel="tooltip" title="Open previous Assessment"
+           class="{{#unless hasPrev}}disabled{{/unless}}">
             <i class="fa fa-angle-left"></i>
         </a>
     </div>
     <div class="navigation-item">
-        <a ($click)="setNext()" class="{{#unless hasNext}}disabled{{/unless}}">
+        <a ($click)="setNext()" rel="tooltip" title="Open next Assessment"
+           class="{{#unless hasNext}}disabled{{/unless}}">
             <i class="fa fa-angle-right"></i>
         </a>
     </div>
