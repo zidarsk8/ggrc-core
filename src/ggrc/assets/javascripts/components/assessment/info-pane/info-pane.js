@@ -248,6 +248,55 @@
           } :
           [];
       },
+      addRelatedItem: function (event, type) {
+        var self = this;
+        var assessment = this.attr('instance');
+
+        assessment.attr('actions', {
+          add_related: [{
+            id: event.item.attr('id'),
+            type: event.item.attr('type')
+          }]
+        }).save()
+          .done(function () {
+            self.afterCreate({
+              items: [event.item],
+              success: true
+            }, type);
+          })
+          .fail(function () {
+            self.afterCreate({
+              items: [event.item],
+              success: false
+            }, type);
+          })
+          .always(function (assessment) {
+            assessment.removeAttr('actions');
+          });
+      },
+      removeRelatedItem: function (item, type) {
+        var self = this;
+        var assessment = this.attr('instance');
+        var items = self.attr(type);
+        var index = items.indexOf(item);
+        this.attr('isUpdating' + can.capitalize(type), true);
+        items.splice(index, 1);
+
+        assessment.attr('actions', {
+          remove_related: [{
+            id: item.attr('id'),
+            type: item.attr('type')
+          }]
+        }).save()
+          .fail(function () {
+            GGRC.Errors.notifier('error', 'Unable to remove URL.');
+            items.splice(index, 0, item);
+          })
+          .always(function (assessment) {
+            assessment.removeAttr('actions');
+            self.attr('isUpdating' + can.capitalize(type), false);
+          });
+      },
       updateRelatedItems: function () {
         this.attr('isUpdatingRelatedItems', true);
 

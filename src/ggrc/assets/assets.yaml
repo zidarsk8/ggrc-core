@@ -339,6 +339,7 @@ dashboard-js-files:
   - components/inline/base-inline-control-title.js
   - components/assessment/info-pane/inline-item.js
   - components/assessment/info-pane/confirm-edit-action.js
+  - components/assessment/info-pane/create-url.js
   - components/assessment/info-pane-save-status.js
   - components/loading/loading-status.js
   - components/object-list-item/object-list-item-updater.js
