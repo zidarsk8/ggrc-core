@@ -124,6 +124,14 @@ def try_parse_ticket_ids(title):
   return tickets
 
 
+def print_unicode(line):
+  """A wrapper to print data encoded as UTF-8 manually.
+
+  The manual encoding is required to print to pipes which accept ASCII only.
+  """
+  print(line.encode("UTF-8"))
+
+
 def print_pr_details(pr_details):
   """Print PR list summary in table format.
 
@@ -159,17 +167,17 @@ def print_pr_details(pr_details):
   max_widths = [max(len(unicode(v)) for v in column)
                 for column in zip(*rows)]
 
-  print(u" | ".join(u"{0:{width}}".format(field, width=width)
-                    for field, width in zip(header, max_widths)))
-  print(u"-|-".join(u"-" * width for width in max_widths))
+  print_unicode(u" | ".join(u"{0:{width}}".format(field, width=width)
+                            for field, width in zip(header, max_widths)))
+  print_unicode(u"-|-".join(u"-" * width for width in max_widths))
 
   for row in rows[1:]:
-    print(u" | ".join(u"{0:{width}}".format(field, width=width)
-                      for field, width in zip(row, max_widths)))
+    print_unicode(u" | ".join(u"{0:{width}}".format(field, width=width)
+                              for field, width in zip(row, max_widths)))
 
-  print("")
-  print("Assumed ticket ids")
-  print(", ".join(assumed_tickets))
+  print_unicode("")
+  print_unicode("Assumed ticket ids")
+  print_unicode(u", ".join(assumed_tickets))
 
 
 def main():
