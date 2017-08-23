@@ -151,6 +151,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'assessment_type',
       reflection.Attribute('issue_tracker', create=False, update=False),
       reflection.Attribute('archived', create=False, update=False),
+      reflection.Attribute('folder', create=False, update=False),
       reflection.Attribute('object', create=False, update=False),
   )
 
