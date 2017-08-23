@@ -159,9 +159,9 @@ class TestWorkflowsCycleGeneration(TestCase):
             start_date=setup_start_date,
             end_date=setup_start_date + dtm.timedelta(days=4)).id
       self.generator.activate_workflow(workflow)
-    self.api.put(TaskGroupTask.query.get(task_id),
-                 {"start_date": update_start_date,
-                  "end_date": update_start_date + dtm.timedelta(4)})
+      self.api.put(TaskGroupTask.query.get(task_id),
+                   {"start_date": update_start_date,
+                    "end_date": update_start_date + dtm.timedelta(4)})
     active_wf = db.session.query(Workflow).filter(
         Workflow.status == 'Active').one()
     self.assertEqual(expected_date, active_wf.next_cycle_start_date)
