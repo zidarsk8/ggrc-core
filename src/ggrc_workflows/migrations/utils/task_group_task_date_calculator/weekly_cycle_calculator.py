@@ -1,10 +1,14 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+"""
+Calculator for task group task start_, end_ dates in annual Workflow
+"""
 
 import datetime
 from dateutil import relativedelta
 
-from ggrc_workflows.services.workflow_cycle_calculator import cycle_calculator
+from ggrc_workflows.migrations.utils.task_group_task_date_calculator import \
+    cycle_calculator
 
 
 class WeeklyCycleCalculator(cycle_calculator.CycleCalculator):
@@ -15,31 +19,6 @@ class WeeklyCycleCalculator(cycle_calculator.CycleCalculator):
   """
   time_delta = datetime.timedelta(weeks=1)
   date_domain = {1, 2, 3, 4, 5}
-
-  def __init__(self, workflow, base_date=None):
-    if not base_date:
-      base_date = datetime.date.today()
-
-    super(WeeklyCycleCalculator, self).__init__(workflow)
-
-    self.reified_tasks = {}
-    for task in self.tasks:
-      start_date, end_date = self.non_adjusted_task_date_range(
-          task, base_date, initialisation=True)
-      self.reified_tasks[task.id] = {
-          'start_date': start_date,
-          'end_date': end_date,
-          'relative_start': task.relative_start_day,
-          'relative_end': task.relative_end_day
-      }
-
-  @staticmethod
-  def get_relative_start(task):
-    return (None, task.relative_start_day)
-
-  @staticmethod
-  def get_relative_end(task):
-    return (None, task.relative_end_day)
 
   def relative_day_to_date(self, relative_day, relative_month=None,
                            base_date=None):
@@ -55,7 +34,6 @@ class WeeklyCycleCalculator(cycle_calculator.CycleCalculator):
       get back Friday.
     """
     today = datetime.date.today()
-    relative_day = int(relative_day)
     if relative_day not in WeeklyCycleCalculator.date_domain:
       raise ValueError(
           "Weekly recurring cycles can only have relative day in 1-5 "
@@ -71,4 +49,4 @@ class WeeklyCycleCalculator(cycle_calculator.CycleCalculator):
         days=base_date.weekday())
 
     return base_date + relativedelta.relativedelta(
-        days=relative_day - 1)  # -1 because we are counting from 1
+        days=relative_day - 1), False  # -1 because we are counting from 1

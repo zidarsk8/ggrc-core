@@ -1,23 +1,294 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+"""
+Tests for the basic Workflows logic and actions
+"""
+# pylint: disable=invalid-name
 
-from datetime import datetime
+import datetime as dtm
 from freezegun import freeze_time
+
+import ddt
 
 from ggrc import db
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroupObjectTask
 from ggrc_workflows.models import TaskGroup
+from ggrc_workflows.models import TaskGroupTask
 from ggrc_workflows.models import Workflow
 from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
+from integration.ggrc_workflows.models import factories as wf_factories
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
 
 
-class TestBasicWorkflowActions(TestCase):
+@ddt.ddt
+class TestWorkflowsCycleGeneration(TestCase):
+  """
+  Tests for Cycle generation logic
+  """
+  def setUp(self):
+    super(TestWorkflowsCycleGeneration, self).setUp()
+    self.api = Api()
+    self.generator = WorkflowsGenerator()
+    self.object_generator = ObjectGenerator()
 
+  def tearDown(self):
+    pass
+
+  @ddt.data(
+      # (expected, setup_date),
+      (dtm.date(2017, 2, 28), dtm.date(2017, 2, 28)),
+      (dtm.date(2017, 3, 3), dtm.date(2017, 3, 3)),
+      (dtm.date(2017, 8, 4), dtm.date(2017, 8, 5)),
+      (dtm.date(2017, 7, 21), dtm.date(2017, 7, 22)),
+  )
+  @ddt.unpack
+  def test_one_time_wf_start_date_shifting(self, expected, setup_date):
+    """Test case for correct cycle task start_ dates for one_time wf"""
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory()
+      group = wf_factories.TaskGroupFactory(workflow=workflow)
+      wf_factories.TaskGroupTaskFactory(
+          task_group=group,
+          start_date=setup_date,
+          end_date=setup_date + dtm.timedelta(days=4))
+    self.generator.generate_cycle(workflow)
+    self.generator.activate_workflow(workflow)
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.status == 'Active').one()
+    self.assertEqual(1,
+                     len(active_wf.cycles[0].cycle_task_group_object_tasks))
+    cycle_task = active_wf.cycles[0].cycle_task_group_object_tasks[0]
+    adj_start_date = cycle_task.start_date
+    self.assertEqual(expected, adj_start_date)
+
+  @ddt.data(
+      # (expected, end_date),
+      (dtm.date(2017, 2, 28), dtm.date(2017, 2, 28)),
+      (dtm.date(2017, 3, 3), dtm.date(2017, 3, 3)),
+      (dtm.date(2017, 8, 4), dtm.date(2017, 8, 5)),
+      (dtm.date(2017, 7, 21), dtm.date(2017, 7, 22)),
+  )
+  @ddt.unpack
+  def test_one_time_wf_end_date_shifting(self, expected, setup_date):
+    """Test case for correct cycle task end_ dates for one_time wf"""
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory()
+      group = wf_factories.TaskGroupFactory(workflow=workflow)
+      wf_factories.TaskGroupTaskFactory(
+          task_group=group,
+          start_date=setup_date - dtm.timedelta(days=4),
+          end_date=setup_date)
+    self.generator.generate_cycle(workflow)
+    self.generator.activate_workflow(workflow)
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.status == 'Active').one()
+    self.assertEqual(1,
+                     len(active_wf.cycles[0].cycle_task_group_object_tasks))
+    cycle_task = active_wf.cycles[0].cycle_task_group_object_tasks[0]
+    adj_end_date = cycle_task.end_date
+    self.assertEqual(expected, adj_end_date)
+
+  # pylint: disable=too-many-arguments
+  @ddt.data(
+      # (expected, setup_date, freeze_date, repeat_every, unit),
+      (dtm.date(2017, 3, 28), dtm.date(2017, 2, 28), dtm.date(2017, 4, 28), 1,
+       Workflow.MONTH_UNIT),
+      (dtm.date(2017, 2, 28), dtm.date(2017, 1, 31), dtm.date(2017, 3, 31), 1,
+       Workflow.MONTH_UNIT),
+      (dtm.date(2017, 3, 17), dtm.date(2017, 3, 10), dtm.date(2017, 3, 24), 1,
+       Workflow.WEEK_UNIT),
+      (dtm.date(2017, 2, 28), dtm.date(2016, 2, 29), dtm.date(2017, 3, 29), 12,
+       Workflow.MONTH_UNIT),
+      (dtm.date(2017, 4, 28), dtm.date(2017, 1, 31), dtm.date(2017, 5, 31), 3,
+       Workflow.MONTH_UNIT),
+  )
+  @ddt.unpack
+  def test_recurring_wf_start_date_shifting(self, expected, setup_date,
+                                            freeze_date, repeat_every, unit):
+    """Test case for correct next cycle task start_date for recurring wf"""
+    with freeze_time(freeze_date):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(repeat_every=repeat_every,
+                                                unit=unit)
+        group = wf_factories.TaskGroupFactory(workflow=workflow)
+        wf_factories.TaskGroupTaskFactory(
+            task_group=group,
+            start_date=setup_date,
+            end_date=setup_date + dtm.timedelta(days=4))
+      self.generator.activate_workflow(workflow)
+
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.status == 'Active').one()
+    cycle_task = active_wf.cycles[1].cycle_task_group_object_tasks[0]
+    adj_start_date = cycle_task.start_date
+    self.assertEqual(expected, adj_start_date)
+
+  @ddt.data(
+      # today is dtm.date(2017, 8, 15), task repeat every
+      # (setup_start_date, update_start_date, expected_date),
+      (dtm.date(2017, 1, 15), dtm.date(2017, 1, 1), dtm.date(2017, 9, 1)),
+      (dtm.date(2017, 1, 15), dtm.date(2017, 1, 5), dtm.date(2017, 9, 5)),
+      # new cycle starts on weekend that's why it moves to friday
+      (dtm.date(2017, 1, 15), dtm.date(2017, 1, 10), dtm.date(2017, 9, 8)),
+      (dtm.date(2017, 1, 15), dtm.date(2017, 8, 15), dtm.date(2017, 9, 15)),
+      # new cycle starts on weekend that's why it moves to friday
+      (dtm.date(2017, 1, 15), dtm.date(2017, 1, 20), dtm.date(2017, 8, 18)),
+      (dtm.date(2017, 1, 15), dtm.date(2017, 1, 25), dtm.date(2017, 8, 25)),
+      (dtm.date(2017, 8, 16), dtm.date(2017, 8, 14), dtm.date(2017, 9, 14)),
+      (dtm.date(2017, 8, 16), dtm.date(2017, 8, 18), dtm.date(2017, 8, 18)),
+      (dtm.date(2017, 8, 14), dtm.date(2017, 8, 18), dtm.date(2017, 8, 18)),
+  )
+  @ddt.unpack
+  def test_recalculate_date(self,
+                            setup_start_date,
+                            update_start_date,
+                            expected_date):
+    """Recalculate next cycle start date"""
+    with freeze_time(dtm.date(2017, 8, 15)):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(repeat_every=1,
+                                                status=Workflow.DRAFT,
+                                                unit=Workflow.MONTH_UNIT)
+        group = wf_factories.TaskGroupFactory(workflow=workflow)
+        task_id = wf_factories.TaskGroupTaskFactory(
+            task_group=group,
+            start_date=setup_start_date,
+            end_date=setup_start_date + dtm.timedelta(days=4)).id
+      self.generator.activate_workflow(workflow)
+    self.api.put(TaskGroupTask.query.get(task_id),
+                 {"start_date": update_start_date,
+                  "end_date": update_start_date + dtm.timedelta(4)})
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.status == 'Active').one()
+    self.assertEqual(expected_date, active_wf.next_cycle_start_date)
+
+  def test_recalculate_date_not_started(self):
+    """Changing start_date on notstarted workflow will
+       not affect next_cycle_start_date"""
+    setup_start_date = dtm.date(2017, 1, 15)
+    update_start_date = dtm.date(2017, 1, 1)
+    with freeze_time(dtm.date(2017, 8, 15)):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(repeat_every=1,
+                                                status=Workflow.DRAFT,
+                                                unit=Workflow.MONTH_UNIT)
+        group = wf_factories.TaskGroupFactory(workflow=workflow)
+        task_id = wf_factories.TaskGroupTaskFactory(
+            task_group=group,
+            start_date=setup_start_date,
+            end_date=setup_start_date + dtm.timedelta(days=4)).id
+        workflow_id = workflow.id
+    self.api.put(TaskGroupTask.query.get(task_id),
+                 {"start_date": update_start_date,
+                  "end_date": update_start_date + dtm.timedelta(4)})
+    self.assertIsNone(Workflow.query.get(workflow_id).next_cycle_start_date)
+
+  @ddt.data(
+      # (setup_date, freeze_date, repeat_every, unit),
+      (dtm.date(2017, 2, 28), dtm.date(2017, 4, 28), 1, Workflow.MONTH_UNIT),
+      (dtm.date(2017, 3, 10), dtm.date(2017, 3, 24), 1, Workflow.WEEK_UNIT),
+  )
+  @ddt.unpack
+  def test_recurring_wf_start_date_and_cycles(self, setup_date, freeze_date,
+                                              repeat_every, unit):
+    """Test case for correct cycle start date and number of cycles"""
+    with freeze_time(freeze_date):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(repeat_every=repeat_every,
+                                                unit=unit)
+        group = wf_factories.TaskGroupFactory(workflow=workflow)
+        wf_factories.TaskGroupTaskFactory(
+            task_group=group,
+            start_date=setup_date,
+            end_date=setup_date + dtm.timedelta(days=4))
+      self.generator.activate_workflow(workflow)
+
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.status == 'Active').one()
+    # freeze_date is chosen so that we expect 3 cycles to be generated:
+    self.assertEqual(len(active_wf.cycles), 3)
+    cycle_task = active_wf.cycles[0].cycle_task_group_object_tasks[0]
+    adj_start_date = cycle_task.start_date
+    self.assertEqual(setup_date, adj_start_date)
+
+  @ddt.data(
+      # (setup_date, freeze_date, repeat_every, unit),
+      (dtm.date(2017, 4, 28), dtm.date(2017, 2, 28), 1, Workflow.MONTH_UNIT),
+      (dtm.date(2017, 3, 5), dtm.date(2017, 3, 3), 1, Workflow.DAY_UNIT),
+      (dtm.date(2017, 3, 24), dtm.date(2017, 3, 10), 1, Workflow.WEEK_UNIT),
+  )
+  @ddt.unpack
+  def test_recurring_wf_future_start_date(self, setup_date, freeze_date,
+                                          repeat_every, unit):
+    """Test case for 0 number of cycles for future setup date"""
+    with freeze_time(freeze_date):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(repeat_every=repeat_every,
+                                                unit=unit)
+        group = wf_factories.TaskGroupFactory(workflow=workflow)
+        wf_factories.TaskGroupTaskFactory(
+            task_group=group,
+            start_date=setup_date,
+            end_date=setup_date + dtm.timedelta(days=4))
+      self.generator.activate_workflow(workflow)
+
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.status == 'Active').one()
+    # no cycles should be generated:
+    self.assertEqual(len(active_wf.cycles), 0)
+
+  @ddt.data(
+      # (expected_date, expected_num, setup_date, freeze_date, repeat_every),
+      # should not exclude Jul 4
+      (dtm.date(2017, 1, 2), 2, dtm.date(2016, 12, 30), dtm.date(2017, 1, 2), 1),
+      (dtm.date(2017, 1, 4), 2, dtm.date(2016, 12, 30), dtm.date(2017, 1, 8), 3),
+      (dtm.date(2017, 7, 7), 5, dtm.date(2017, 7, 3), dtm.date(2017, 7, 8), 1),
+      (dtm.date(2017, 7, 11), 3, dtm.date(2017, 7, 3), dtm.date(2017, 7, 12), 3),
+      (dtm.date(2017, 7, 10), 2, dtm.date(2017, 7, 3), dtm.date(2017, 7, 11), 5),
+      (dtm.date(2017, 7, 12), 2, dtm.date(2017, 7, 3), dtm.date(2017, 7, 20), 7),
+      (dtm.date(2017, 7, 13), 2, dtm.date(2017, 6, 1), dtm.date(2017, 7, 31), 30),
+  )
+  @ddt.unpack
+  def test_recurring_daily_workflow_dates(self,
+                                          expected_date,
+                                          expected_num,
+                                          setup_date,
+                                          freeze_date,
+                                          repeat_every):
+    """
+    Test for correct weekdays for daily based workflows
+    When calculating the dates for daily workflows - only week working days
+    are taken into account. So neither start date nor end date can fall on
+    a weekend. But can fall on holiday.
+    Params:
+    expected - last generated cycle start date
+    """
+    with freeze_time(freeze_date):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(repeat_every=repeat_every,
+                                                unit=Workflow.DAY_UNIT)
+        group = wf_factories.TaskGroupFactory(workflow=workflow)
+        wf_factories.TaskGroupTaskFactory(
+            task_group=group,
+            start_date=setup_date,
+            end_date=setup_date + dtm.timedelta(days=repeat_every))
+      self.generator.activate_workflow(workflow)
+
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.status == 'Active').one()
+    self.assertEqual(len(active_wf.cycles), expected_num)
+    last_cycle_task = active_wf.cycles[-1].cycle_task_group_object_tasks[0]
+    self.assertEqual(expected_date, last_cycle_task.start_date)
+
+
+class TestBasicWorkflowActions(TestCase):
+  """
+  Tests for basic workflow actions
+  """
   def setUp(self):
     super(TestBasicWorkflowActions, self).setUp()
     self.api = Api()
@@ -92,7 +363,7 @@ class TestBasicWorkflowActions(TestCase):
     cycle_tasks = db.session.query(CycleTaskGroupObjectTask).join(
         Cycle).join(Workflow).filter(Workflow.id == wflow.id).all()
     with freeze_time("2015-6-9 13:00:00"):
-      today = datetime.now()
+      today = dtm.datetime.now()
       transitions = [
           ("InProgress", None, None),
           ("Finished", today, None),
@@ -128,27 +399,16 @@ class TestBasicWorkflowActions(TestCase):
     self.quarterly_wf_1 = {
         "title": "quarterly wf 1",
         "description": "",
-        "frequency": "quarterly",
+        "unit": "month",
+        "repeat_every": 3,
         "task_groups": [{
             "title": "tg_1",
             "task_group_tasks": [{
                 "description": factories.random_str(100),
-                "relative_start_day": 5,
-                "relative_start_month": 1,
-                "relative_end_day": 25,
-                "relative_end_month": 2,
             }, {
                 "description": factories.random_str(100),
-                "relative_start_day": 15,
-                "relative_start_month": 2,
-                "relative_end_day": 28,
-                "relative_end_month": 2,
             }, {
                 "description": factories.random_str(100),
-                "relative_start_day": 1,
-                "relative_start_month": 1,
-                "relative_end_day": 1,
-                "relative_end_month": 1,
             },
             ],
         },
@@ -158,27 +418,16 @@ class TestBasicWorkflowActions(TestCase):
     self.weekly_wf_1 = {
         "title": "weekly thingy",
         "description": "start this many a time",
-        "frequency": "weekly",
+        "unit": "week",
+        "repeat_every": 1,
         "task_groups": [{
             "title": "tg_2",
             "task_group_tasks": [{
                 "description": factories.random_str(100),
-                "relative_end_day": 1,
-                "relative_end_month": None,
-                "relative_start_day": 5,
-                "relative_start_month": None,
             }, {
                 "title": "monday task",
-                "relative_end_day": 1,
-                "relative_end_month": None,
-                "relative_start_day": 1,
-                "relative_start_month": None,
             }, {
                 "title": "weekend task",
-                "relative_end_day": 4,
-                "relative_end_month": None,
-                "relative_start_day": 1,
-                "relative_start_month": None,
             },
             ],
             "task_group_objects": self.random_objects
@@ -251,28 +500,17 @@ class TestBasicWorkflowActions(TestCase):
     self.monthly_workflow_1 = {
         "title": "monthly test wf",
         "description": "start this many a time",
-        "frequency": "monthly",
+        "unit": "month",
+        "repeat_every": 1,
         "task_groups": [
             {
                 "title": "tg_2",
                 "task_group_tasks": [{
-                     "description": factories.random_str(100),
-                     "relative_end_day": 1,
-                     "relative_end_month": None,
-                     "relative_start_day": 5,
-                     "relative_start_month": None,
+                    "description": factories.random_str(100),
                 }, {
                     "title": "monday task",
-                    "relative_end_day": 1,
-                    "relative_end_month": None,
-                    "relative_start_day": 1,
-                    "relative_start_month": None,
                 }, {
                     "title": "weekend task",
-                    "relative_end_day": 4,
-                    "relative_end_month": None,
-                    "relative_start_day": 1,
-                    "relative_start_month": None,
                 }],
                 "task_group_objects": self.random_objects
             },

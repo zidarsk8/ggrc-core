@@ -20,7 +20,6 @@ class WorkflowFactory(TitledFactory):
     model = models.Workflow
 
   context = factory.SubFactory(ContextFactory)
-  frequency = "one_time"
 
 
 class TaskGroupFactory(TitledFactory):

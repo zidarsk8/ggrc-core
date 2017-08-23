@@ -130,3 +130,7 @@ UNMODIFIABLE_COLUMN = ("Line {line}: Column '{column_name}' can not be "
 
 ARCHIVED_IMPORT_ERROR = (u"Line {line}: Importing archived instance is "
                          u"prohibited. The line will be ignored.")
+
+VALIDATION_ERROR = (u"Line {line}: Field '{column_name}' validation failed "
+                    u"with the following reason: {message}."
+                    u"The line will be ignored.")

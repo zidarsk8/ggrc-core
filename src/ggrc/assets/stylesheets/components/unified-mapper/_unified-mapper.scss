@@ -401,8 +401,13 @@ mapper-results-item-attrs {
         display: inline;
       }
     }
+
     .reference-urls-list {
       color: $link;
+    }
+
+    .repeat-cell > .repeat-summary {
+      margin: 0;
     }
   }
 }

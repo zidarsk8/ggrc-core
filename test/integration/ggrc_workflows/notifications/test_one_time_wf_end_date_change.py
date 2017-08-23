@@ -162,7 +162,6 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertIn(user.email, notif_data)
 
-      # yesterdays mail has not been sent
       self.assertIn("due_in", notif_data[user.email])
 
       self.assertIn("due_today", notif_data[user.email])
