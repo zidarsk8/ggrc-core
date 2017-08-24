@@ -9,7 +9,7 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
-                                CustomAttributable)
+                                CustomAttributable, TestPlanned)
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models.relationship import Relatable
@@ -27,7 +27,7 @@ from ggrc.models import reflection
 # (of course, if there is a nice way of overriding/customizing declared
 # attributes in subclasses, we might want to use that approach)
 class SystemOrProcess(track_object_state.HasObjectState,
-                      Commentable, LastDeprecatedTimeboxed,
+                      Commentable, TestPlanned, LastDeprecatedTimeboxed,
                       BusinessObject, db.Model):
   # Override model_inflector
   _table_plural = 'systems_or_processes'
