@@ -169,7 +169,7 @@
                                                    {is-updating-evidences}="isUpdatingEvidences"
                                                    {form-saved-deferred}="formState.formSavedDeferred"
                                                    (before-comment-created)="addItems(%event, 'comments')"
-                                                   (after-comment-created)="afterCreate(%event, 'comments')"
+                                                   (after-comment-created)="addRelatedItem(%event, 'comments')"
                           ></ca-object-modal-content>
                       </simple-modal>
                     {{/if}}
@@ -192,7 +192,7 @@
                     <comment-add-form class="comment-add-form"
                                     {instance}="instance"
                                     {is-saving}="isUpdatingComments"
-                                    (after-create)="afterCreate(%event, 'comments')"
+                                    (after-create)="addRelatedItem(%event, 'comments')"
                                     (before-create)="addItems(%event, 'comments')"
                     ></comment-add-form>
                 {{/unless}}
