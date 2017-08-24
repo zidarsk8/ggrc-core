@@ -225,12 +225,6 @@
 
         items.replace(resultList);
       },
-      removeItem: function (event, type) {
-        var item = event.item;
-        var index = this.attr(type).indexOf(item);
-        this.attr('isUpdating' + can.capitalize(type), true);
-        return this.attr(type).splice(index, 1);
-      },
       addItems: function (event, type) {
         var items = event.items;
         this.attr('isUpdating' + can.capitalize(type), true);
