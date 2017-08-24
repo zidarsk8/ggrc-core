@@ -144,10 +144,10 @@ class TestTaskDueNotifications(TestCase):
       _, notif_data = common.get_daily_notifications()
       user_notifs = notif_data.get(user.email, {})
 
-      self.assertEqual(
-          [n['title'] for n in
-           user_notifs.get("task_overdue", {}).itervalues()],
-          expected_overdue)
+      actual_overdue = [n['title'] for n in
+                        user_notifs.get("task_overdue", {}).itervalues()]
+      actual_overdue.sort()
+      self.assertEqual(actual_overdue, expected_overdue)
 
       self.assertEqual(
           [n['title'] for n in user_notifs.get("due_today", {}).itervalues()],
