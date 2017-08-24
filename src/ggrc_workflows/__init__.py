@@ -645,6 +645,10 @@ def _validate_put_workflow_fields(workflow):
 @signals.Restful.model_put.connect_via(models.Workflow)
 def handle_workflow_put(sender, obj=None, src=None, service=None):
   _validate_put_workflow_fields(obj)
+  if (inspect(obj).attrs.recurrences.history.has_changes() and
+          not obj.recurrences):
+    update_workflow_state(obj)
+    return
   if not inspect(obj).attrs.status.history.has_changes():
     return
   new = inspect(obj).attrs.status.history.added[0]
