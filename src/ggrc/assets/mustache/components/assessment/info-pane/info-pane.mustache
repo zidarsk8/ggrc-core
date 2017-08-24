@@ -229,6 +229,7 @@
               <assessment-custom-attributes (on-update-attributes)="saveGlobalAttributes(%event)"
                                                   {items}="globalAttributes"
                                                   {is-edit-denied}="isEditDenied"
+                                            class="ggrc-form ggrc-form-multiple-columns"
               ></assessment-custom-attributes>
             <div class="info-pane__section ggrc-form">
                     <div class="ggrc-form-item">
@@ -246,7 +247,7 @@
                                     {is-edit-icon-denied}="isEditDenied"
                                     {value}="instance.assessment_type"
                                     {instance}="instance">
-                                        <div class="info-pane__section-title">Assessment Type</div>
+                                        <div class="ggrc-form__title">Assessment Type</div>
                                 </assessment-inline-item>
                             </assessment-object-type-dropdown>
                         </div>
@@ -282,7 +283,7 @@
                             {mapped-items}="relatedInformation"
                             title-text="Related Information"></assessment-mapped-related-information>
                 </div>
-                    <div class="ggrc-form assessment-attributes-tab">
+                    <div class="ggrc-form ggrc-form-multiple-columns">
                         <div class="ggrc-form-item">
                             <div class="ggrc-form-item__row">
                                 <assessment-inline-item
@@ -294,7 +295,7 @@
                                     {is-edit-icon-denied}="isEditDenied"
                                     {value}="instance.description"
                                     {instance}="instance">
-                                        <div class="info-pane__section-title">Description</div>
+                                        <div class="ggrc-form__title">Description</div>
                                 </assessment-inline-item>
                             </div>
                         </div>
@@ -312,7 +313,7 @@
                                     {is-edit-icon-denied}="isEditDenied"
                                     {value}="instance.notes"
                                     {instance}="instance">
-                                        <div class="info-pane__section-title">Notes</div>
+                                        <div class="ggrc-form__title">Notes</div>
                                 </assessment-inline-item>
                             </div>
                         </div>
@@ -327,7 +328,7 @@
                                     {is-edit-icon-denied}="isEditDenied"
                                     {value}="instance.slug"
                                     {instance}="instance">
-                                        <div class="info-pane__section-title">Code</div>
+                                        <div class="ggrc-form__title">Code</div>
                                 </assessment-inline-item>
                             </div>
                             <!-- TODO: Assessment object type -->
@@ -346,7 +347,7 @@
                                     {value}="instance.design"
                                     {instance}="instance">
                                         <div>
-                                            <div class="info-pane__section-title">Conclusion: Design</div>
+                                            <div class="ggrc-form__title">Conclusion: Design</div>
                                             <p class="conclusion-small-text">
                                                 <small><em>Is this control design effective?</em></small>
                                             </p>
@@ -366,7 +367,7 @@
                                     {value}="instance.operationally"
                                     {instance}="instance">
                                         <div>
-                                            <div class="info-pane__section-title">Conclusion: Operation</div>
+                                            <div class="ggrc-form__title">Conclusion: Operation</div>
                                             <p class="conclusion-small-text">
                                                 <small><em>Is this control design effective?</em></small>
                                             </p>
@@ -380,7 +381,7 @@
 
                                     <!-- <REFERENCE URLS> -->
                                     <div>
-                                        <div class="info-pane__section-title">
+                                        <div class="ggrc-form__title">
                                             <spinner class="info-pane__section-title-icon"
                                                 {toggle}="isUpdatingReferenceUrls">
                                             </spinner>
