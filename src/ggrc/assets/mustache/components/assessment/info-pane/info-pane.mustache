@@ -109,28 +109,37 @@
                             </div>
                             <object-list {items}="urls" {empty-message}="noItemsText">
                                 <editable-document-object-list-item {document}="{.}">
-                                    <a ($click)="removeRelatedItem(document, 'urls')">
-                                        <action-toolbar-control>
-                                            <i class="fa fa-trash"></i>
-                                        </action-toolbar-control>
-                                    </a>
+                                    <confirm-edit-action
+                                        (set-edit-mode)="removeRelatedItem(document, 'urls')"
+                                        (set-in-progress)="setInProgressState()"
+                                        {is-edit-icon-denied}="isEditDenied"
+                                        {instance}="instance"
+                                        {on-state-change-dfd}="onStateChangeDfd"
+                                        {edit-mode}="editMode">
+                                            <a ($click)="confirmEdit">
+                                                <action-toolbar-control>
+                                                    <i class="fa fa-trash"></i>
+                                                </action-toolbar-control>
+                                            </a>
+                                    </confirm-edit-action>
                                 </editable-document-object-list-item>
                             </object-list>
                           {{#unless isEditDenied}}
-                            {{#toggle show_new_object_form}}
+                            {{#if urlsEditMode}}
                                 <create-url
                                     {type}="documentTypes.urls"
                                     {context}="instance.context"
+                                    (create-url-triggered)="setUrlEditMode(false, 'urls')"
                                     (before-create)="addItems(%event, 'urls')"
                                     (created)="addRelatedItem(%event, 'urls')">
                                     <form class="create-form">
                                         <fieldset class="create-form__layout">
                                             <input {($value)}="value" class="create-form__input"type="text" placeholder="Add URL" spellcheck="false" autocomplete="false">
                                             <div class="create-form__controls">
-                                                <button type="submit" class="create-form__confirm" {{toggle_button}} ($click)="create">
+                                                <button type="button" class="create-form__confirm" ($click)="create">
                                                     <i class="fa fa-check"></i>
                                                 </button>
-                                                <button type="button" class="create-form__cancel" {{toggle_button}} ($click)="clear">
+                                                <button type="button" class="create-form__cancel" ($click)="clear">
                                                     <i class="fa fa-times"></i>
                                                 </button>
                                             </div>
@@ -138,8 +147,17 @@
                                     </form>
                                 </create-url>
                             {{else}}
-                                <button class="btn btn-small btn-gray" {{toggle_button}}>Add</button>
-                            {{/toggle}}
+                                <confirm-edit-action
+                                    (set-edit-mode)="setUrlEditMode(true, 'urls')"
+                                    (set-in-progress)="setInProgressState()"
+                                    {is-edit-icon-denied}="isEditDenied"
+                                    {instance}="instance"
+                                    {on-state-change-dfd}="onStateChangeDfd"
+                                    {edit-mode}="editMode">
+                                        <button class="btn btn-small btn-gray"
+                                            ($click)="confirmEdit()">Add</button>
+                                </confirm-edit-action>
+                            {{/if}}
                           {{/unless}}
                         </div>
                     </div>

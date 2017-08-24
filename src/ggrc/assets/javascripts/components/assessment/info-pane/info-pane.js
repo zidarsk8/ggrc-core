@@ -119,6 +119,9 @@
       formState: {},
       noItemsText: '',
       triggerFormSaveCbs: can.$.Callbacks(),
+      setUrlEditMode: function (value, type) {
+        this.attr(type + 'EditMode', value);
+      },
       setInProgressState: function () {
         this.onStateChange({state: 'In Progress', undo: false});
       },
