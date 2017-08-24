@@ -4,11 +4,11 @@
 }}
 
 <div class="tree-filter__expression-holder width-100">
-  <input type="text" 
-         class="tree-filter__input width-100" 
-         {($value)}="filter" 
+  <input type="text"
+         class="tree-filter__input width-100"
+         {($value)}="filter"
          {{#disabled}}disabled{{/disabled}}
-         placeholder="Type for search here...">
+         placeholder="Type here to search or click the advanced search icon">
   <span class="tree-filter_is-expression {{#if isExpression}}valid{{/if}}">
     <i class="fa fa-check-circle{{#unless isExpression}}-o{{/unless}}"></i>
   </span>
@@ -26,7 +26,7 @@
   {{/if}}
 </div>
 <div class="flex-box tree-filter__actions">
-  <button type="submit" 
+  <button type="submit"
           class="btn btn-small btn-lightBlue"
           ($click)="submit()"
           {{#disabled}}disabled{{/disabled}}>
