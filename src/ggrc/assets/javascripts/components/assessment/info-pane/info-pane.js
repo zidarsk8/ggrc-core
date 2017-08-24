@@ -248,6 +248,68 @@
           } :
           [];
       },
+      addAction: function (actionType, related) {
+        var assessment = this.attr('instance');
+        var path = 'actions.' + actionType;
+
+        if (!assessment.attr('actions')) {
+          assessment.attr('actions', {});
+        }
+        if (assessment.attr(path)) {
+          assessment.attr(path).push(related);
+        } else {
+          assessment.attr(path, [related]);
+        }
+      },
+      addRelatedItem: function (event, type) {
+        var self = this;
+        var related = {
+          id: event.item.attr('id'),
+          type: event.item.attr('type')
+        };
+
+        this.attr('deferredSave').push(function () {
+          self.addAction('add_related', related);
+        })
+        .done(function () {
+          self.afterCreate({
+            items: [event.item],
+            success: true
+          }, type);
+        })
+        .fail(function () {
+          self.afterCreate({
+            items: [event.item],
+            success: false
+          }, type);
+        })
+        .always(function (assessment) {
+          assessment.removeAttr('actions');
+        });
+      },
+      removeRelatedItem: function (item, type) {
+        var self = this;
+        var related = {
+          id: item.attr('id'),
+          type: item.attr('type')
+        };
+        var items = self.attr(type);
+        var index = items.indexOf(item);
+        this.attr('isUpdating' + can.capitalize(type), true);
+        items.splice(index, 1);
+
+        this.attr('deferredSave').push(function () {
+          self.addAction('remove_related', related);
+        })
+        .fail(function () {
+          GGRC.Errors.notifier('error', 'Unable to remove URL.');
+          items.splice(index, 0, item);
+        })
+        .always(function (assessment) {
+          assessment.removeAttr('actions');
+          self.attr('isUpdating' + can.capitalize(type), false);
+        });
+      },
       updateRelatedItems: function () {
         this.attr('isUpdatingRelatedItems', true);
 
@@ -279,6 +341,12 @@
             return CAUtils.convertToFormViewField(cav);
           })
         );
+      },
+      initializeDeferredSave: function () {
+        this.attr('deferredSave', new GGRC.Utils.DeferredTransaction(
+          function (resolve, reject) {
+            this.attr('instance').save().done(resolve).fail(reject);
+          }.bind(this), 1000));
       },
       onFormSave: function () {
         this.attr('triggerFormSaveCbs').fire();
@@ -371,6 +439,7 @@
       this.viewModel.initializeFormFields();
       this.viewModel.initGlobalAttributes();
       this.viewModel.updateRelatedItems();
+      this.viewModel.initializeDeferredSave();
     },
     events: {
       '{viewModel.instance} refreshed': function () {
