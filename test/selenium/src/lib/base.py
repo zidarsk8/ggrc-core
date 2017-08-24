@@ -998,8 +998,6 @@ class AbstractTabContainer(Component):
 
 class AbstractTable(Component):
   """Abstract class for generic table."""
-  def __init__(self, driver):
-    super(AbstractTable, self).__init__(driver)
 
   def get_headers(self):
     """"Abstract method. Should return headers element of table."""
