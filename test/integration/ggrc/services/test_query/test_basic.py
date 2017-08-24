@@ -1312,11 +1312,14 @@ class TestQueryWithCA(TestCase, WithQueryApi):
         response.json['message'])
 
 
+@ddt.ddt
 class TestQueryWithUnicode(TestCase, WithQueryApi):
   """Test query API with unicode values."""
 
   CAD_TITLE1 = u"CA список" + "X" * 200
   CAD_TITLE2 = u"CA текст" + "X" * 200
+  # pylint: disable=anomalous-backslash-in-string
+  CAD_TITLE3 = u"АС\ЫЦУМПА"  # definitely did not work
 
   @classmethod
   def setUpClass(cls):
@@ -1338,6 +1341,10 @@ class TestQueryWithUnicode(TestCase, WithQueryApi):
           title=cls.CAD_TITLE2,
           definition_type="program",
       )
+      factories.CustomAttributeDefinitionFactory(
+          title=cls.CAD_TITLE3,
+          definition_type="program",
+      )
 
   @staticmethod
   def _flatten_cav(data):
@@ -1351,17 +1358,20 @@ class TestQueryWithUnicode(TestCase, WithQueryApi):
   def setUp(self):
     self.client.get("/login")
 
-  def test_query(self):
+  @ddt.data(
+      ("title", u"программа A"),
+      (CAD_TITLE3, u"Ы текст")
+  )
+  @ddt.unpack
+  def test_query(self, title, text):
     """Test query by unicode value."""
-    title = u"программа A"
     programs = self._get_first_result_set(
-        self._make_query_dict("Program", expression=["title", "=", title]),
+        self._make_query_dict("Program", expression=[title, "=", text]),
         "Program",
     )
 
     self.assertEqual(programs["count"], 1)
     self.assertEqual(len(programs["values"]), programs["count"])
-    self.assertEqual(programs["values"][0]["title"], title)
 
   def test_sorting_by_ca(self):
     """Test sorting by CA fields with unicode names."""

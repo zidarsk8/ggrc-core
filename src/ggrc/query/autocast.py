@@ -72,9 +72,10 @@ def get_parsers(klass, key):
       return (fulltext_parser, None)
     else:
       return (None, fulltext_parser)
-  try:
-    attr_type = getattr(klass, key).property.columns[0].type
-  except AttributeError:
+  columns = {i.name: i.type for i in klass.__table__.columns}
+  if key in columns:
+    attr_type = columns[key]
+  else:
     value_types = [i[0] for i in db.session.query(
         CustomAttributeDefinition.attribute_type
     ).filter(
