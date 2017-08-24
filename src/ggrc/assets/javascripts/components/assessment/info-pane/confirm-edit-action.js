@@ -30,7 +30,7 @@
         var confirmation = can.Deferred();
         GGRC.Controllers.Modals.confirm({
           modal_title: 'Confirm moving Assessment to "In Progress"',
-          modal_description: 'You are about to move Assesment from "' +
+          modal_description: 'You are about to move Assessment from "' +
             this.instance.status +
             '" to "In Progress" - are you sure about that?',
           button_view: GGRC.mustache_path + '/modals/prompt_buttons.mustache'
