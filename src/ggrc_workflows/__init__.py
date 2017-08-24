@@ -275,7 +275,6 @@ def build_cycle(workflow, cycle=None, current_user=None):
   cycle.description = workflow.description
   cycle.is_verification_needed = workflow.is_verification_needed
   cycle.status = models.Cycle.ASSIGNED
-  cycle.start_date = cycle.start_date or date.today()
 
   # Populate CycleTaskGroups based on Workflow's TaskGroups
   for task_group in workflow.task_groups:
@@ -305,6 +304,8 @@ def build_cycle(workflow, cycle=None, current_user=None):
           object_ = task_group_object.object
           Relationship(source=cycle_task_group_object_task,
                        destination=object_)
+
+  update_cycle_dates(cycle)
   Signals.workflow_cycle_start.send(
       cycle.__class__,
       obj=cycle,

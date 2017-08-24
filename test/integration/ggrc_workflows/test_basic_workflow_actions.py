@@ -216,6 +216,46 @@ class TestWorkflowsCycleGeneration(TestCase):
     self.assertEqual(setup_date, adj_start_date)
 
   @ddt.data(
+      # (setup_date, freeze_date, repeat_every, unit,
+      #  exp_start_date, exp_end_date),
+      (dtm.date(2017, 2, 28), dtm.date(2017, 4, 28), 1, Workflow.MONTH_UNIT,
+       dtm.date(2017, 2, 27), dtm.date(2017, 3, 3)),
+      (dtm.date(2017, 3, 10), dtm.date(2017, 3, 24), 1, Workflow.WEEK_UNIT,
+       dtm.date(2017, 3, 9), dtm.date(2017, 3, 14)),
+  )
+  @ddt.unpack
+  def test_recurring_wf_start_end_cycle_dates(self,
+                                              setup_date,
+                                              freeze_date,
+                                              repeat_every,
+                                              unit,
+                                              exp_start_date,
+                                              exp_end_date):
+    """Test case for correct cycle start and end dates"""
+    with freeze_time(freeze_date):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(repeat_every=repeat_every,
+                                                unit=unit)
+        group = wf_factories.TaskGroupFactory(workflow=workflow)
+        wf_factories.TaskGroupTaskFactory(
+            task_group=group,
+            start_date=setup_date,
+            end_date=setup_date + dtm.timedelta(days=4))
+        wf_factories.TaskGroupTaskFactory(
+            task_group=group,
+            start_date=setup_date - dtm.timedelta(days=1),
+            end_date=setup_date + dtm.timedelta(days=3))
+      self.generator.activate_workflow(workflow)
+
+    active_wf = db.session.query(Workflow).filter(
+        Workflow.status == 'Active').one()
+    # freeze_date is chosen so that we expect 3 cycles to be generated:
+    self.assertEqual(len(active_wf.cycles), 3)
+    cycle = active_wf.cycles[0]
+    self.assertEqual(cycle.start_date, exp_start_date)
+    self.assertEqual(cycle.end_date, exp_end_date)
+
+  @ddt.data(
       # (setup_date, freeze_date, repeat_every, unit),
       (dtm.date(2017, 4, 28), dtm.date(2017, 2, 28), 1, Workflow.MONTH_UNIT),
       (dtm.date(2017, 3, 5), dtm.date(2017, 3, 3), 1, Workflow.DAY_UNIT),
@@ -242,15 +282,23 @@ class TestWorkflowsCycleGeneration(TestCase):
     self.assertEqual(len(active_wf.cycles), 0)
 
   @ddt.data(
-      # (expected_date, expected_num, setup_date, freeze_date, repeat_every),
+      # (expected_date, expected_num, setup_date,
+      #  freeze_date, repeat_every),
       # should not exclude Jul 4
-      (dtm.date(2017, 1, 2), 2, dtm.date(2016, 12, 30), dtm.date(2017, 1, 2), 1),
-      (dtm.date(2017, 1, 4), 2, dtm.date(2016, 12, 30), dtm.date(2017, 1, 8), 3),
-      (dtm.date(2017, 7, 7), 5, dtm.date(2017, 7, 3), dtm.date(2017, 7, 8), 1),
-      (dtm.date(2017, 7, 11), 3, dtm.date(2017, 7, 3), dtm.date(2017, 7, 12), 3),
-      (dtm.date(2017, 7, 10), 2, dtm.date(2017, 7, 3), dtm.date(2017, 7, 11), 5),
-      (dtm.date(2017, 7, 12), 2, dtm.date(2017, 7, 3), dtm.date(2017, 7, 20), 7),
-      (dtm.date(2017, 7, 13), 2, dtm.date(2017, 6, 1), dtm.date(2017, 7, 31), 30),
+      (dtm.date(2017, 1, 2), 2, dtm.date(2016, 12, 30),
+       dtm.date(2017, 1, 2), 1),
+      (dtm.date(2017, 1, 4), 2, dtm.date(2016, 12, 30),
+       dtm.date(2017, 1, 8), 3),
+      (dtm.date(2017, 7, 7), 5, dtm.date(2017, 7, 3),
+       dtm.date(2017, 7, 8), 1),
+      (dtm.date(2017, 7, 11), 3, dtm.date(2017, 7, 3),
+       dtm.date(2017, 7, 12), 3),
+      (dtm.date(2017, 7, 10), 2, dtm.date(2017, 7, 3),
+       dtm.date(2017, 7, 11), 5),
+      (dtm.date(2017, 7, 12), 2, dtm.date(2017, 7, 3),
+       dtm.date(2017, 7, 20), 7),
+      (dtm.date(2017, 7, 13), 2, dtm.date(2017, 6, 1),
+       dtm.date(2017, 7, 31), 30),
   )
   @ddt.unpack
   def test_recurring_daily_workflow_dates(self,

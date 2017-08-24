@@ -21,11 +21,11 @@ from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 
 
-class TestWorkflowCycleStatePropagantion(TestCase):
+class TestWorkflowCycleStatePropagation(TestCase):
   """Test case for cycle task to cycle task group status propagation"""
 
   def setUp(self):
-    super(TestWorkflowCycleStatePropagantion, self).setUp()
+    super(TestWorkflowCycleStatePropagation, self).setUp()
     self.api = Api()
     self.generator = WorkflowsGenerator()
     self.object_generator = ObjectGenerator()
@@ -50,7 +50,7 @@ class TestWorkflowCycleStatePropagantion(TestCase):
     }
 
   def test_weekly_state_transitions_assigned_inprogress(self):
-    "Test that starting one cycle task changes cycle task group"
+    """Test that starting one cycle task changes cycle task group"""
 
     with freeze_time("2016-6-10 13:00:00"):  # Friday, 6/10/2016
       _, wf = self.generator.generate_workflow(self.weekly_wf)
@@ -112,7 +112,7 @@ class TestWorkflowCycleStatePropagantion(TestCase):
       self.assertEqual(ctg.status, "Assigned")
 
   def test_weekly_state_transitions_inprogress_finished(self):
-    "Test In Progress to Finished transitions"
+    """Test In Progress to Finished transitions"""
 
     with freeze_time("2016-6-10 13:00:00"):  # Friday, 6/10/2016
       _, wf = self.generator.generate_workflow(self.weekly_wf)
@@ -161,7 +161,7 @@ class TestWorkflowCycleStatePropagantion(TestCase):
       self.assertEqual(ctg.status, "InProgress")
 
   def test_weekly_state_transitions_finished_verified(self):
-    "Test Finished to Verified transitions"
+    """Test Finished to Verified transitions"""
 
     with freeze_time("2016-6-10 13:00:00"):  # Friday, 6/10/2016
       _, wf = self.generator.generate_workflow(self.weekly_wf)
@@ -212,7 +212,7 @@ class TestWorkflowCycleStatePropagantion(TestCase):
       self.assertEqual(ctg.status, "Verified")
 
   def test_weekly_state_transitions_finished_declined(self):
-    "Test Finished to Declined transitions"
+    """Test Finished to Declined transitions"""
 
     with freeze_time("2016-6-10 13:00:00"):  # Friday, 6/10/2016
       _, wf = self.generator.generate_workflow(self.weekly_wf)
@@ -255,8 +255,6 @@ class TestWorkflowCycleStatePropagantion(TestCase):
 
       ctg = db.session.query(CycleTaskGroup).join(
           Cycle).join(Workflow).filter(Workflow.id == wf.id).all()[0]
-      # import ipdb
-      # ipdb.set_trace()
       first_ct, second_ct = db.session.query(CycleTaskGroupObjectTask).join(
           Cycle).join(Workflow).filter(Workflow.id == wf.id).all()
 
