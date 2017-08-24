@@ -52,8 +52,8 @@
   },
   "scripts": {
     "test": "run_unittests",
-    "watch": "./node_modules/.bin/webpack --watch --profile --progress",
-    "build": "./node_modules/.bin/webpack --profile --progress",
+    "watch": "./node_modules/.bin/webpack --watch --profile --progress --env.development",
+    "build": "./node_modules/.bin/webpack --profile --progress --env.production",
     "stats": "./node_modules/.bin/webpack --json > stats.json"
   },
   "repository": {
