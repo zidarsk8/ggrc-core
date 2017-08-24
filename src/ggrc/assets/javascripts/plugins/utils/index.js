@@ -14,3 +14,4 @@ import './tree-view-utils';
 import './dashboards-utils';
 import './modals';
 import './controllers';
+import './deferred-transaction-utils';

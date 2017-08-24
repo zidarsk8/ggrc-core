@@ -5,4 +5,3 @@
 
 import './models/risk_assessment';
 import './apps/risk_assessments';
-import './mustache_helpers';

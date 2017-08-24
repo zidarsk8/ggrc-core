@@ -4,13 +4,16 @@
  */
 
 import '../controls-toolbar/controls-toolbar';
-import '../../auto-save-form/auto-save-form';
-import '../../auto-save-form/auto-save-form-status';
+import '../assessment-local-ca';
+import '../../local-custom-attributes/local-custom-attributes';
+import '../../local-custom-attributes/local-custom-attributes-field';
+import '../../local-custom-attributes/local-custom-attributes-status';
 import '../mapped-objects/mapped-related-information';
 import '../mapped-objects/mapped-comments';
 import '../mapped-objects/mapped-controls';
 import '../../inline/inline-form-control';
 import './inline-item';
+import './create-url';
 
 (function (can, GGRC, CMS) {
   'use strict';

@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../../auto-save-form/auto-save-form-actions';
+import '../../local-custom-attributes/local-custom-attributes-actions';
 
 (function (can, GGRC) {
   'use strict';

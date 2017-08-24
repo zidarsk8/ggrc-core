@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import './apps/workflow-config';
 import './apps/workflows';
 import './controllers/dashboard_page';
 import './controllers/workflow_page';
@@ -18,3 +19,6 @@ import './components/taskgroup_clone';
 import './components/end_cycle';
 import './components/workflow_active';
 import './components/workflow_deactivate';
+import './components/repeat-on-button-wrapper';
+import './components/repeat-on-button';
+import './components/repeat-on-summary';
