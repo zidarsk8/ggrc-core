@@ -2,10 +2,10 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests of assessment notifications."""
-
 from ggrc import db
 from ggrc.notifications import common
 from ggrc.models import Person, Assessment, AccessControlRole
+from ggrc.models import all_models
 from integration.ggrc import api_helper
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
@@ -199,3 +199,30 @@ class TestAssessmentNotification(TestCase):
     self.assertEqual(len(notifs), 1)
     self.assertEqual(sorted(updated[self.assessment.id]["updated_fields"]),
                      ["TEST PLAN", "TITLE"])
+
+  def test_multiply_mapping(self):
+    """Test notification for multiply mapping"""
+    controls = [factories.ControlFactory() for _ in xrange(5)]
+    snapshots = self._create_snapshots(self.assessment.audit, controls)
+
+    def get_relation_dict(destination_obj):
+      return {
+          "relationship": {
+              "context": {"id": self.assessment.audit.context.id,
+                          "type": self.assessment.audit.context.type},
+              "source": {"id": self.assessment.id,
+                         "type": self.assessment.type},
+              "destination": {"id": destination_obj.id,
+                              "type": destination_obj.type}
+          }
+      }
+    notifs, _ = common.get_daily_notifications()
+    self.assertFalse(len(notifs))
+    self.assessment.status = "In Progress"
+    post_data = [get_relation_dict(s) for s in snapshots]
+    db.session.add(self.assessment)
+    resp = self.api.send_request(
+        self.api.client.post, obj=all_models.Relationship, data=post_data)
+    self.assert200(resp)
+    notifs, _ = common.get_daily_notifications()
+    self.assertEqual(len(notifs), 1)
