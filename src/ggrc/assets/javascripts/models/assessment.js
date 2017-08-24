@@ -356,7 +356,6 @@
           })
           .done(function () {
             dfd.resolve.apply(dfd, arguments);
-            that.dispatch('refreshed');
           })
           .fail(function () {
             dfd.reject.apply(dfd, arguments);

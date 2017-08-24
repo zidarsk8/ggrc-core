@@ -15,7 +15,6 @@
       _value: '',
       _oldValue: null,
       placeholder: '',
-      isDirty: false,
       define: {
         value: {
           set: function (newValue, setValue) {
@@ -61,11 +60,7 @@
       }
     },
     events: {
-      '.ql-editor focus': function () {
-        this.viewModel.attr('isDirty', true);
-      },
       '.ql-editor blur': function () {
-        this.viewModel.attr('isDirty', false);
         this.viewModel.onBlur();
       }
     }

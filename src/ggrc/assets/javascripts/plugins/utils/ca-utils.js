@@ -1,4 +1,4 @@
-/* !
+/*!
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -15,14 +15,6 @@
     Checkbox: 'checkbox',
     Dropdown: 'dropdown'
   };
-
-  var CA_DD_REQUIRED_DEPS = Object.freeze({
-    NONE: 0,
-    COMMENT: 1,
-    EVIDENCE: 2,
-    COMMENT_AND_EVIDENCE: 3
-  });
-
   /**
    * Util methods for custom attributes.
    */
@@ -101,79 +93,6 @@
       return value;
     }
 
-    function validateField(field, value) {
-      var fieldValid;
-      var hasMissingEvidence;
-      var hasMissingComment;
-      var hasMissingValue;
-      var requiresEvidence;
-      var requiresComment;
-      var valCfg = field.validationConfig;
-      var fieldValidationConf = valCfg && valCfg[value];
-      var isMandatory = field.validation.mandatory;
-      var errors = field.preconditions_failed || [];
-      var type = field.attributeType || field.type;
-
-      hasMissingValue = errors.indexOf('value') > -1;
-
-      if (type === 'checkbox') {
-        if (value === '1') {
-          value = true;
-        } else if (value === '0') {
-          value = false;
-        }
-
-        return {
-          validation: {
-            show: isMandatory,
-            valid: isMandatory ? !hasMissingValue && !!(value) : true,
-            hasMissingInfo: false
-          }
-        };
-      } else if (type !== 'dropdown') {
-        return {
-          validation: {
-            show: isMandatory,
-            valid: isMandatory ? !hasMissingValue && !!(value) : true,
-            hasMissingInfo: false
-          }
-        };
-      }
-
-      requiresEvidence =
-        fieldValidationConf === CA_DD_REQUIRED_DEPS.EVIDENCE ||
-        fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
-
-      requiresComment =
-        fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
-        fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
-
-      hasMissingEvidence = requiresEvidence && errors.indexOf('evidence') > -1;
-      hasMissingComment = requiresComment && errors.indexOf('comment') > -1;
-
-      fieldValid = (value) ?
-        !(hasMissingEvidence || hasMissingComment || hasMissingValue) :
-        !isMandatory && !hasMissingValue;
-
-      return {
-        validation: {
-          show: isMandatory || !!value,
-          valid: fieldValid,
-          hasMissingInfo: (hasMissingEvidence || hasMissingComment)
-        },
-        errorsMap: {
-          evidence: hasMissingEvidence,
-          comment: hasMissingComment
-        }
-      };
-    }
-
-    function findValueByDefinitionId(values, defId) {
-      return values.find(function (v) {
-        return v.custom_attribute_id === defId;
-      });
-    }
-
     /**
      * Custom Attributes specific parsing logic to simplify business logic of Custom Attributes
      * @param {Array} definitions - original list of Custom Attributes Definition
@@ -182,23 +101,21 @@
      */
     function prepareCustomAttributes(definitions, values) {
       return definitions.map(function (def) {
-        var valObj;
+        var valueData = false;
         var id = def.id;
         var options = (def.multi_choice_options || '').split(',');
         var optionsRequirements = (def.multi_choice_mandatory || '').split(',');
         var type = getCustomAttributeType(def.attribute_type);
-
-        var base = {
+        var stub = {
           id: null,
           custom_attribute_id: id,
           attribute_value: null,
           attribute_object: null,
           validation: {
-            show: false,
+            empty: true,
             mandatory: def.mandatory,
             valid: true
           },
-          validationConfig: null,
           def: def,
           attributeType: type,
           preconditions_failed: [],
@@ -208,21 +125,36 @@
           }
         };
 
-        valObj = findValueByDefinitionId(values, id);
+        values.forEach(function (value) {
+          var errors = [];
+          if (value.custom_attribute_id === id) {
+            errors = value.preconditions_failed || [];
+            value.def = def;
+            value.attributeType = type;
+            value.validation = {
+              empty: errors.indexOf('value') > -1,
+              mandatory: def.mandatory,
+              valid: errors.indexOf('comment') < 0 &&
+              errors.indexOf('evidence') < 0
+            };
+            value.errorsMap = {
+              comment: errors.indexOf('comment') > -1,
+              evidence: errors.indexOf('evidence') > -1
+            };
+            valueData = value;
+          }
+        });
+
+        valueData = valueData || stub;
 
         if (type === 'dropdown') {
-          base.validationConfig = {};
-          options.forEach(function (item, idx) {
-            base.validationConfig[item] = Number(optionsRequirements[idx]);
+          valueData.validationConfig = {};
+          options.forEach(function (item, index) {
+            valueData.validationConfig[item] =
+              Number(optionsRequirements[index]);
           });
         }
-
-        if (valObj) {
-          _.merge(base, valObj);
-          _.merge(base, validateField(base, base.attribute_value));
-        }
-
-        return base;
+        return valueData;
       });
     }
 
@@ -293,7 +225,6 @@
         helptext: attr.def.helptext,
         validation: attr.validation.attr(),
         validationConfig: attr.validationConfig,
-        preconditions_failed: attr.preconditions_failed,
         errorsMap: attr.errorsMap.attr(),
         valueId: can.compute(function () {
           return attr.attr('id');
@@ -338,9 +269,7 @@
       });
     }
     return {
-      CA_DD_REQUIRED_DEPS: CA_DD_REQUIRED_DEPS,
       convertFromCaValue: convertFromCaValue,
-      validateField: validateField,
       convertToCaValue: convertToCaValue,
       convertValuesToFormFields: convertValuesToFormFields,
       prepareCustomAttributes: prepareCustomAttributes,

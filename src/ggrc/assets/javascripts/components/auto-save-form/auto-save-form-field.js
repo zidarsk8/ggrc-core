@@ -15,20 +15,10 @@
       define: {
         disabled: {
           type: 'htmlbool'
-        },
-        value: {
-          get: function () {
-            return this._value || null;
-          },
-          set: function (newValue) {
-            if (!this.attr('isDirty')) {
-              this._value = newValue;
-            }
-          }
         }
       },
-      isDirty: false,
       type: null,
+      value: null,
       fieldId: null,
       placeholder: '',
       options: [],

@@ -391,10 +391,7 @@
         var caValues = this.attr('instance.custom_attribute_values');
         CAUtils.applyChangesToCustomAttributeValue(caValues, modifiedFields);
 
-        return this.attr('instance').save().then(function (data) {
-          this.initializeFormFields();
-          return data;
-        }.bind(this));
+        return this.attr('instance').save();
       },
       showRequiredInfoModal: function (e, field) {
         var scope = field || e.field;
@@ -436,9 +433,6 @@
       this.viewModel.initializeDeferredSave();
     },
     events: {
-      '{viewModel.instance} refreshed': function () {
-        this.viewModel.initializeFormFields();
-      },
       '{viewModel.instance} refreshMapping': function () {
         this.viewModel.attr('mappedSnapshots')
           .replace(this.viewModel.loadSnapshots());
