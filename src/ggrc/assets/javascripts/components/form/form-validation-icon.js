@@ -10,7 +10,7 @@
    * State object to present possible icons for validation
    */
   var icons = {
-    noValidation: '',
+    noValidation: 'fa-check-circle',
     empty: 'fa-asterisk form-validation-icon__color-empty',
     valid: 'fa-check form-validation-icon__color-valid',
     invalid: 'fa-times form-validation-icon__color-invalid'
@@ -29,9 +29,12 @@
           get: function () {
             var icon = icons.noValidation;
 
-            if (this.attr('validation.show')) {
-              icon = this.attr('validation.valid') ?
-                icons.valid : icons.invalid;
+            if (this.attr('validation.mandatory')) {
+              icon = this.attr('validation.empty') ? icons.empty : icons.valid;
+            }
+            /* This validation is required for DropDowns with required attachments */
+            if (!this.attr('validation.valid')) {
+              icon = icons.invalid;
             }
             return icon;
           }

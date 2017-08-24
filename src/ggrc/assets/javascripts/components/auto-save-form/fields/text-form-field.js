@@ -31,7 +31,6 @@
           }
         }
       },
-      isDirty: false,
       fieldId: null,
       placeholder: '',
       valueChanged: function (newValue) {
