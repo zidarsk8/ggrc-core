@@ -52,6 +52,7 @@ dashboard-js-files:
   - plugins/utils/ggrcq-utils.js
   - plugins/utils/tree-view-utils.js
   - plugins/utils/dashboards-utils.js
+  - plugins/utils/deferred-transaction-utils.js
   - plugins/utils/controllers.js
   - plugins/utils/modals.js
   - plugins/datepicker.js
