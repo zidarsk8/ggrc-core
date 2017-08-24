@@ -388,40 +388,57 @@
                                         </div>
                                         <object-list {items}="referenceUrls" {empty-message}="noItemsText">
                                             <editable-document-object-list-item {document}="{.}">
-                                                <a ($click)="removeRelatedItem(document, 'referenceUrls')">
-                                                    <action-toolbar-control>
-                                                        <i class="fa fa-trash"></i>
-                                                    </action-toolbar-control>
-                                                </a>
+                                                <confirm-edit-action
+                                                    (set-edit-mode)="removeRelatedItem(document, 'referenceUrls')"
+                                                    (set-in-progress)="setInProgressState()"
+                                                    {is-edit-icon-denied}="isEditDenied"
+                                                    {instance}="instance"
+                                                    {on-state-change-dfd}="onStateChangeDfd"
+                                                    {edit-mode}="editMode">
+                                                        <a ($click)="confirmEdit">
+                                                            <action-toolbar-control>
+                                                                <i class="fa fa-trash"></i>
+                                                            </action-toolbar-control>
+                                                        </a>
+                                                </confirm-edit-action>
                                             </editable-document-object-list-item>
                                         </object-list>
-                                    {{#unless instance.archived}}
-                                        {{#is_allowed 'update' instance context='for'}}
-                                        {{#toggle show_new_object_form}}
-                                            <create-url
-                                                {type}="documentTypes.referenceUrls"
-                                                {context}="instance.context"
-                                                (before-create)="addItems(%event, 'referenceUrls')"
-                                                (created)="addRelatedItem(%event, 'referenceUrls')">
-                                                <form class="create-form">
-                                                    <fieldset class="create-form__layout">
-                                                        <input {($value)}="value" class="create-form__input"type="text" placeholder="Add URL" spellcheck="false" autocomplete="false">
-                                                        <div class="create-form__controls">
-                                                            <button type="submit" class="create-form__confirm" {{toggle_button}} ($click)="create">
-                                                                <i class="fa fa-check"></i>
-                                                            </button>
-                                                            <button type="button" class="create-form__cancel" {{toggle_button}} ($click)="clear">
-                                                                <i class="fa fa-times"></i>
-                                                            </button>
-                                                        </div>
-                                                    </fieldset>
-                                                </form>
-                                            </create-url>
-                                        {{else}}
-                                            <button class="btn btn-small btn-gray" {{toggle_button}}>Add</button>
-                                        {{/toggle}}
-                                    {{/is_allowed}}
-                                    {{/unless}}
+                                        {{#unless isEditDenied}}
+                                            {{#if referenceUrlsEditMode}}
+                                                <create-url
+                                                    {type}="documentTypes.referenceUrls"
+                                                    {context}="instance.context"
+                                                    (create-url-triggered)="setUrlEditMode(false, 'referenceUrls')"
+                                                    (before-create)="addItems(%event, 'referenceUrls')"
+                                                    (created)="addRelatedItem(%event, 'referenceUrls')">
+                                                    <form class="create-form">
+                                                        <fieldset class="create-form__layout">
+                                                            <input {($value)}="value" class="create-form__input"type="text" placeholder="Add URL" spellcheck="false" autocomplete="false">
+                                                            <div class="create-form__controls">
+                                                                <button type="button" class="create-form__confirm" ($click)="create">
+                                                                    <i class="fa fa-check"></i>
+                                                                </button>
+                                                                <button type="button" class="create-form__cancel" ($click)="clear">
+                                                                    <i class="fa fa-times"></i>
+                                                                </button>
+                                                            </div>
+                                                        </fieldset>
+                                                    </form>
+                                                </create-url>
+                                            {{else}}
+                                                <confirm-edit-action
+                                                    (set-edit-mode)="setUrlEditMode(true, 'referenceUrls')"
+                                                    (set-in-progress)="setInProgressState()"
+                                                    {is-edit-icon-denied}="isEditDenied"
+                                                    {instance}="instance"
+                                                    {on-state-change-dfd}="onStateChangeDfd"
+                                                    {edit-mode}="editMode">
+                                                        <button class="btn btn-small btn-gray" ($click)="confirmEdit()">
+                                                            Add
+                                                        </button>
+                                                </confirm-edit-action>
+                                            {{/if}}
+                                        {{/unless}}
                                     </div>
 
                                     <!-- </REFERENCE URLS> -->
