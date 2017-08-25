@@ -16,7 +16,7 @@
       parentModel: {
         type: String,
         get: function () {
-          return this.attr('parent').type
+          return this.attr('parent').type;
         }
       },
       parentId: {
@@ -86,7 +86,7 @@
           } else {
             this.loadItems(models).then(function () {
               setResult(models);
-            })
+            });
           }
         }
       },
@@ -128,6 +128,8 @@
       models = can.makeArray(models);
 
       if (!models.length) {
+        this.attr('directlyItems', []);
+        this.attr('notDirectlyItems', []);
         return can.Deferred().resolve();
       }
 
