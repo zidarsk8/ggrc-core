@@ -9,7 +9,6 @@
 import pytest
 
 from lib import base
-from lib.constants import messages
 from lib.entities import entities_factory
 from lib.service import webui_service
 
@@ -69,11 +68,8 @@ class TestAuditPage(base.Test):
         webui_service.AssessmentTemplatesService(selenium).
         get_list_objs_from_tree_view(src_obj=new_audit_rest))
     # due to 'expected_asmt_tmpl.updated_at = None'
-    actual_asmt_tmpls = [actual_asmt_tmpl.update_attrs(updated_at=None)
-                         for actual_asmt_tmpl in actual_asmt_tmpls]
-    assert [expected_asmt_tmpl] == actual_asmt_tmpls, (
-        messages.AssertionMessages.
-        format_err_msg_equal([expected_asmt_tmpl], actual_asmt_tmpls))
+    self.general_assert(
+        [expected_asmt_tmpl], actual_asmt_tmpls, "updated_at")
 
   @pytest.mark.smoke_tests
   def test_asmt_creation(self, new_program_rest, new_audit_rest, selenium):
@@ -92,11 +88,8 @@ class TestAuditPage(base.Test):
     actual_asmts = (webui_service.AssessmentsService(selenium).
                     get_list_objs_from_tree_view(src_obj=new_audit_rest))
     # due to 'expected_asmt.updated_at = None'
-    actual_asmts = [actual_asmt.update_attrs(updated_at=None)
-                    for actual_asmt in actual_asmts]
-    assert [expected_asmt] == actual_asmts, (
-        messages.AssertionMessages.
-        format_err_msg_equal([expected_asmt], actual_asmts))
+    self.general_assert(
+        [expected_asmt], actual_asmts, "updated_at")
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -136,14 +129,12 @@ class TestAuditPage(base.Test):
                     get_list_objs_from_info_panels(
                         src_obj=new_audit_rest, objs=expected_asmts))
     # due to 'expected_asmt.updated_at = None',
+    #        'expected_asmt.slug = None'
     #        'expected_asmt.custom_attributes = {None: None}'
-    actual_asmts = [
-        actual_asmt.update_attrs(is_replace_attrs=True, slug=None).
-        update_attrs(is_replace_attrs=False, custom_attributes={None: None})
+    actual_asmts = [actual_asmt.update_attrs(
+        is_replace_attrs=False, custom_attributes={None: None})
         for actual_asmt in actual_asmts]
-    assert expected_asmts == actual_asmts, (
-        messages.AssertionMessages.
-        format_err_msg_equal(expected_asmts, actual_asmts))
+    self.general_assert(expected_asmts, actual_asmts, "updated_at", "slug")
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
@@ -153,12 +144,10 @@ class TestAuditPage(base.Test):
     - Execution and return of fixture 'create_and_clone_audit'.
     """
     expected_audit = create_and_clone_audit["expected_audit"].repr_ui()
+    actual_audit = create_and_clone_audit["actual_audit"]
     # due to 'expected_audit.slug = None'
-    actual_audit = (
-        create_and_clone_audit["actual_audit"].update_attrs(slug=None))
-    assert expected_audit == actual_audit, (
-        messages.AssertionMessages.
-        format_err_msg_equal(expected_audit, actual_audit))
+    self.general_assert(
+        expected_audit, actual_audit, "slug")
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
@@ -199,12 +188,8 @@ class TestAuditPage(base.Test):
                          get_list_objs_from_tree_view(src_obj=actual_audit))
     # due to 'expected_asmt_tmpl.slug = None',
     #        'expected_asmt_tmpl.updated_at = {None: None}'
-    actual_asmt_tmpls = [
-        actual_asmt_tmpl.update_attrs(slug=None, updated_at=None)
-        for actual_asmt_tmpl in actual_asmt_tmpls]
-    assert [expected_asmt_tmpl] == actual_asmt_tmpls, (
-        messages.AssertionMessages.
-        format_err_msg_equal([expected_asmt_tmpl], actual_asmt_tmpls))
+    self.general_assert(
+        expected_asmt_tmpl, actual_asmt_tmpls, "slug", "updated_at")
 
   @pytest.mark.xfail(strict=True)
   @pytest.mark.smoke_tests
@@ -218,9 +203,7 @@ class TestAuditPage(base.Test):
     -Execution and return of fixture 'create_and_clone_audit'.
     """
     actual_audit = create_and_clone_audit["actual_audit"]
-    # due to 'actual_control.custom_attributes = {None: None}'
-    expected_control = (create_and_clone_audit["control"].
-                        repr_ui().update_attrs(custom_attributes={None: None}))
+    expected_control = create_and_clone_audit["control"].repr_ui()
     # due to 'actual_program.custom_attributes = {None: None}'
     expected_program = (create_and_clone_audit["program"].
                         repr_ui().update_attrs(custom_attributes={None: None}))
@@ -228,8 +211,8 @@ class TestAuditPage(base.Test):
                        get_list_objs_from_tree_view(src_obj=actual_audit))
     actual_programs = (webui_service.ProgramsService(selenium).
                        get_list_objs_from_tree_view(src_obj=actual_audit))
-    assert [expected_control] == actual_controls, (
-        messages.AssertionMessages.
-        format_err_msg_equal([expected_control], actual_controls))
+    # due to 'actual_control.custom_attributes = {None: None}'
+    self.general_assert(
+        [expected_control], actual_controls, "custom_attributes")
     self.extended_assert([expected_program], actual_programs,
                          "Issue in app GGRC-2381", "manager")

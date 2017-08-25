@@ -51,7 +51,7 @@
       }
     },
     submit: function () {
-      this.dispatch('filter');
+      this.dispatch('submit');
     },
     onFilterChange: function (newValue) {
       var filter = GGRC.query_parser.parse(newValue);

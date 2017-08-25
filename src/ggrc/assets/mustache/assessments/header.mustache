@@ -153,17 +153,13 @@ Copyright (C) 2017 Google Inc.
                 </object-state-toolbar>
         {{/unless}}
         <div class="form-status {{#if is_info_pin}}pane-header__toolbar-item{{/if}}">
-            <info-pane-save-status
-                {evidences-saving}="isUpdatingEvidences"
-                {urls-saving}="isUpdatingUrls"
-                {comments-saving}="isUpdatingComments"
-                {assessment-saving}="isAssessmentSaving">
-                    <loading-status
-                        class="loading-status"
-                        {is-loading}="infoPaneSaving"
-                        loading-text="Saving..."
-                        show-Spinner="true">
-                    </loading-status>
+            <info-pane-save-status {info-pane-saving}="isInfoPaneSaving">
+                <loading-status
+                    class="loading-status"
+                    {is-loading}="infoPaneSaving"
+                    loading-text="Saving..."
+                    show-Spinner="true">
+                </loading-status>
             </info-pane-save-status>
         </div>
     </div>

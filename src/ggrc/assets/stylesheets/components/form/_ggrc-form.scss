@@ -5,6 +5,36 @@
 
 .ggrc-form {
 
+  &__title {
+    font-size: 11px;
+    text-transform: uppercase;
+    font-weight: bold;
+    line-height: 28px;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &.ggrc-form-multiple-columns {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 720px;
+
+    .ggrc-form-item {
+      .ggrc-form-item__multiple-row {
+        flex-basis: 200px;
+        width: 200px;
+        margin-right: 40px;
+      }
+
+      .ggrc-form-item__row {
+        width: 720px;
+      }
+    }
+  }
+
   .additional-fields {
     .hidden-fields-area {
       padding: 0;

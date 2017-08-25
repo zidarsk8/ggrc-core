@@ -597,8 +597,8 @@ class AssessmentsFactory(EntitiesFactory):
     """
     # pylint: disable=too-many-locals
     asmt_entity = cls._create_random_asmt()
-    asmt_entity = cls._update_asmt_attrs_values(
-        obj=asmt_entity, is_allow_none_values=False, type=type, id=id,
+    asmt_entity = Entity.update_objs_attrs_values_by_entered_data(
+        obj_or_objs=asmt_entity, is_allow_none_values=False, type=type, id=id,
         title=title, href=href, url=url, slug=slug, status=status,
         owners=owners, audit=audit, recipients=recipients, assignees=assignees,
         verified=verified, verifier=verifier, creator=creator,
@@ -628,16 +628,6 @@ class AssessmentsFactory(EntitiesFactory):
         "Creator": [cls.default_person.__dict__]}
     return random_asmt
 
-  @classmethod
-  def _update_asmt_attrs_values(cls, obj, **arguments):
-    """Update Assessments (obj) attributes values according to dictionary of
-    arguments (key = value). Generated data-'obj', entered data-'**arguments'.
-    """
-    if arguments.get("verifier"):
-      obj.assignees['Verifier'] = [cls.default_person.__dict__]
-    return Entity.update_objs_attrs_values_by_entered_data(
-        obj_or_objs=obj, **arguments)
-
 
 class IssuesFactory(EntitiesFactory):
   """Factory class for Issues entities."""
@@ -648,7 +638,7 @@ class IssuesFactory(EntitiesFactory):
   @classmethod
   def create_empty(cls):
     """Create blank Issue object."""
-    empty_issue = IssueEntity
+    empty_issue = IssueEntity()
     empty_issue.type = cls.obj_issue
     empty_issue.custom_attributes = {None: None}
     empty_issue.access_control_list = []

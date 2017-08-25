@@ -17,6 +17,7 @@
       items: [],
       // This is an array by default replace with deferred on actual load
       allItems: [],
+      disabledIds: [],
       refreshSelection: null,
       allSelected: false,
       selectAllCheckboxValue: false,
@@ -83,11 +84,16 @@
         this.emptySelection();
       },
       selectAll: function () {
+        var selectedItems;
+        var disabledIds = this.attr('disabledIds');
         this.attr('allSelected', true);
         // Replace with actual items loaded from Query API
         this.attr('allItems')
           .done(function (allItems) {
-            this.attr('selectedItems').replace(allItems);
+            selectedItems = allItems.filter(function (item) {
+              return disabledIds.indexOf(item.id) < 0;
+            });
+            this.attr('selectedItems').replace(selectedItems);
             // Add visual selection
             this.toggleItems(true);
           }.bind(this))

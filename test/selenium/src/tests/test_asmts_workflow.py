@@ -10,11 +10,12 @@
 import pytest
 
 from lib import base
-from lib.base import Test
-from lib.constants import messages, roles
+from lib.constants import messages, roles, value_aliases as alias
 from lib.constants.element import AssessmentStates
 from lib.entities import entities_factory
-from lib.service import webui_service, rest_service
+from lib.entities.entities_factory import CustomAttributeDefinitionsFactory
+from lib.service import rest_service, webui_service
+from lib.utils.filter_utils import FilterUtils
 
 
 class TestAssessmentsWorkflow(base.Test):
@@ -48,9 +49,7 @@ class TestAssessmentsWorkflow(base.Test):
         get_list_objs_from_info_panels(
             src_obj=new_audit_rest, objs=expected_asmt).update_attrs(
             comments={"created_at": None}, is_replace_dicts_values=True))
-    assert expected_asmt == actual_asmt, (
-        messages.AssertionMessages.
-        format_err_msg_equal(expected_asmt, actual_asmt))
+    self.general_assert(expected_asmt, actual_asmt)
 
   @pytest.mark.smoke_tests
   def test_asmt_logs(
@@ -69,8 +68,8 @@ class TestAssessmentsWorkflow(base.Test):
 
   @pytest.mark.smoke_tests
   def test_asmt_related_asmts(
-      self, new_programs_rest, new_control_rest,
-      map_new_control_rest_to_new_programs_rest, new_audits_rest,
+      self, new_program_rest, new_control_rest,
+      map_new_program_rest_to_new_control_rest, new_audit_rest,
       new_assessments_rest, selenium
   ):
     """Test for checking Related Assessments. Map two Assessments to one
@@ -80,12 +79,10 @@ class TestAssessmentsWorkflow(base.Test):
     """
     expected_titles = [(new_assessments_rest[1].title,
                         new_control_rest.title,
-                        new_audits_rest[1].title)]
+                        new_audit_rest.title)]
     asmt_service = webui_service.AssessmentsService(selenium)
     asmt_service.map_objs_via_tree_view_item(
-        src_obj=new_audits_rest[0], dest_objs=[new_control_rest])
-    asmt_service.map_objs_via_tree_view_item(
-        src_obj=new_audits_rest[1], dest_objs=[new_control_rest])
+        src_obj=new_audit_rest, dest_objs=[new_control_rest])
     related_asmts_objs = (webui_service.AssessmentsService(
         selenium).get_related_asmts_titles(obj=new_assessments_rest[0]))
     assert expected_titles == related_asmts_objs
@@ -180,8 +177,46 @@ class TestAssessmentsWorkflow(base.Test):
     assessments_service = webui_service.AssessmentsService(selenium)
     getattr(assessments_service, action)(expected_asmt)
     actual_asmt = assessments_service.get_obj_from_info_page(expected_asmt)
-    Test.extended_assert_w_excluded_attrs(
+    self.general_assert(
         expected_asmt.update_attrs(status=expected_final_state.title(),
                                    title=actual_asmt.title,
                                    verified=actual_asmt.verified).repr_ui(),
         actual_asmt, "updated_at")
+
+  @pytest.mark.parametrize("operator", [alias.EQUAL_OP, alias.CONTAINS_OP])
+  @pytest.mark.smoke_tests
+  def test_asmts_gcas_filtering(
+      self, new_program_rest, new_audit_rest, new_cas_for_assessments_rest,
+      new_assessments_rest, selenium, operator
+  ):
+    """Test for checking filtering of Assessment by Custom Attributes in
+    audit scope.
+    Preconditions:
+    - Program created via REST API.
+    - Audit created via REST API.
+    - Assessment created via REST API.
+    - Global Custom Attributes for Assessment created via REST API.
+    """
+    custom_attr_values = (
+        CustomAttributeDefinitionsFactory().generate_ca_values(
+            list_ca_def_objs=new_cas_for_assessments_rest))
+    expected_asmt = new_assessments_rest[0]
+    (rest_service.AssessmentsService().update_obj(
+        obj=expected_asmt, custom_attributes=custom_attr_values))
+    filter_exprs = FilterUtils().get_filter_exprs_by_cas(
+        expected_asmt.custom_attribute_definitions, custom_attr_values,
+        operator)
+    # due to 'actual_asmt.custom_attributes = {None: None}'
+    expected_asmt = expected_asmt.repr_ui().update_attrs(
+        custom_attributes={None: None}, status=AssessmentStates.IN_PROGRESS)
+    expected_results = [{"filter": filter_expr,
+                         "objs": [expected_asmt]}
+                        for filter_expr in filter_exprs]
+    actual_results = [
+        {"filter": filter_expr,
+         "objs": webui_service.AssessmentsService(selenium).
+         filter_and_get_list_objs_from_tree_view(new_audit_rest, filter_expr)}
+        for filter_expr in filter_exprs]
+    assert expected_results == actual_results, (
+        messages.AssertionMessages.format_err_msg_equal(expected_results,
+                                                        actual_results))

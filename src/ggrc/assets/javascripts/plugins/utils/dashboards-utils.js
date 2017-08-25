@@ -77,13 +77,9 @@
         return [];
       }
 
-      cavs = cavs.map(function (cav) {
-        return cav.reify();
-      });
-
       return cads.reduce(function (result, cad) {
         var caType = cad.attr('attribute_type');
-        var dashboardName = '';
+        var dashboardName;
         var caName;
         var caNameMatches;
         var caValue;

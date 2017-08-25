@@ -52,6 +52,7 @@ dashboard-js-files:
   - plugins/utils/ggrcq-utils.js
   - plugins/utils/tree-view-utils.js
   - plugins/utils/dashboards-utils.js
+  - plugins/utils/deferred-transaction-utils.js
   - plugins/utils/controllers.js
   - plugins/utils/modals.js
   - plugins/datepicker.js
@@ -339,6 +340,7 @@ dashboard-js-files:
   - components/inline/base-inline-control-title.js
   - components/assessment/info-pane/inline-item.js
   - components/assessment/info-pane/confirm-edit-action.js
+  - components/assessment/info-pane/create-url.js
   - components/assessment/info-pane-save-status.js
   - components/loading/loading-status.js
   - components/object-list-item/object-list-item-updater.js
