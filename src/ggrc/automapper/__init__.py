@@ -10,7 +10,6 @@ import collections
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
-from ggrc import models
 from ggrc.automapper import rules
 from ggrc.login import get_current_user
 from ggrc.models.automapping import Automapping
@@ -182,49 +181,14 @@ class AutomapperGenerator(object):
         )
 
   def _step(self, src, dst):
-    explicit, implicit = rules.rules[src.type, dst.type]
-    self._step_explicit(src, dst, explicit)
-    self._step_implicit(src, dst, implicit)
-
-  def _step_explicit(self, src, dst, explicit):
-    if explicit:
+    mappings = rules.rules[src.type, dst.type]
+    if mappings:
       src_related = (o for o in self.related(src)
-                     if o.type in explicit and o != dst)
+                     if o.type in mappings and o != dst)
       for r in src_related:
         entry = self.relate(r, dst)
         if entry not in self.processed:
           self.queue.add(entry)
-
-  def _step_implicit(self, src, dst, implicit):
-    if not hasattr(models.all_models, src.type):
-      logger.warning('Automapping by attr: cannot find model %s', src.type)
-      return
-    instance = self.instance_cache.get(src)
-    if instance is None:
-      model = getattr(models.all_models, src.type)
-      instance = model.query.filter(model.id == src.id).first()
-      self.instance_cache[src] = instance
-    if instance is None:
-      logger.warning("Automapping by attr: cannot load model %s: %s",
-                     src.type, src.id)
-      return
-    for attr in implicit:
-      if hasattr(instance, attr.name):
-        values = getattr(instance, attr.name)
-        if not isinstance(values, collections.Iterable):
-          values = [values]
-        for value in values:
-          if value is not None:
-            entry = self.relate(Stub(value.type, value.id), dst)
-            if entry not in self.processed:
-              self.queue.add(entry)
-          else:
-            logger.warning('Automapping by attr: %s is None', attr.name)
-      else:
-        logger.warning(
-            'Automapping by attr: object %s has no attribute %s',
-            src, attr.name,
-        )
 
   def _ensure_relationship(self, src, dst):
     """Create the relationship if not exists already.

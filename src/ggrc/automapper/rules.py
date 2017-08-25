@@ -4,15 +4,11 @@
 """Automapping rules generator."""
 
 import itertools
-from collections import namedtuple
 from logging import getLogger
 
 
 class AutomappingRuleConfigError(ValueError):
   pass
-
-
-Attr = namedtuple('Attr', ['name'])
 
 
 TYPE_ORDERING = [['Program'],
@@ -37,8 +33,7 @@ Rule = collections.namedtuple("Rule", ["name", "top", "mid", "bottom"])
 
 class RuleSet(object):
   """Automapping Rule collection with validation logic."""
-  Entry = namedtuple('RuleSetEntry', ['explicit', 'implicit'])
-  entry_empty = Entry(frozenset(set()), frozenset(set()))
+  entry_empty = frozenset()
   _type_indices = get_type_indices()
 
   @classmethod
@@ -59,16 +54,10 @@ class RuleSet(object):
     for rule in rule_list:
       for top, mid, bottom in itertools.product(rule.top, rule.mid,
                                                 rule.bottom):
-        if Attr in map(type, [top, mid, bottom]):
-          # if this is a direct mapping
-          # there is only one way to form the triangle
-          # TODO rule sanity check
-          yield (mid, bottom, top, rule)
-        else:
-          cls._assert_type_order(higher=top, lower=mid)
-          cls._assert_type_order(higher=mid, lower=bottom)
-          yield (mid, bottom, top, rule)
-          yield (mid, top, bottom, rule)
+        cls._assert_type_order(higher=top, lower=mid)
+        cls._assert_type_order(higher=mid, lower=bottom)
+        yield (mid, bottom, top, rule)
+        yield (mid, top, bottom, rule)
 
   def __init__(self, count_limit, rule_list):
     self.count_limit = count_limit
@@ -78,11 +67,8 @@ class RuleSet(object):
 
     for src, dst, mapping, source in self._explode_rules(rule_list):
       key = (src, dst)
-      entry = self._rules.get(key, RuleSet.Entry(set(), set()))
-      if isinstance(mapping, Attr):
-        entry = RuleSet.Entry(entry.explicit, entry.implicit | {mapping})
-      else:
-        entry = RuleSet.Entry(entry.explicit | {mapping}, entry.implicit)
+      entry = self._rules.get(key, self.entry_empty)
+      entry = entry | {mapping}
       self._rules[key] = entry
 
       sources = self._rule_source.get((src, dst, mapping), set())
@@ -93,9 +79,8 @@ class RuleSet(object):
 
   def _freeze(self):
     for key in self._rules:
-      explicit, implicit = self._rules[key]
-      self._rules[key] = RuleSet.Entry(frozenset(explicit),
-                                       frozenset(implicit))
+      entry = self._rules[key]
+      self._rules[key] = frozenset(entry)
 
   def __getitem__(self, key):
     return self._rules.get(key, RuleSet.entry_empty)
@@ -107,7 +92,7 @@ class RuleSet(object):
     lines = []
     for key in self._rules:
       src, dst = key
-      for mapping in self._rules[key].explicit | self._rules[key].implicit:
+      for mapping in self._rules[key]:
         source = ','.join(r.name for r in self._rule_source[src, dst, mapping])
         rule = ('  -> %s <--> %s <--> %s <- )' % (dst, src, mapping))
         rule += ' ' * (70 - len(rule))
