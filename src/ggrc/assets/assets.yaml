@@ -28,6 +28,7 @@ dashboard-js-template-files:
   - components/assessment/inline/date.mustache
   - components/assessment/inline/person.mustache
   - components/assessment/inline/checkbox.mustache
+  - components/gca-controls/gca-controls.mustache
   - components/comment/comment-add-form.mustache
   - components/comment/comment-input.mustache
   - components/object-list/object-list.mustache

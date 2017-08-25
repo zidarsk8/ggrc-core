@@ -5,7 +5,6 @@
 
 import '../../permission';
 import '../../bootstrap/sticky-popover';
-import '../../bootstrap/modal-ajax';
 import '../../bootstrap/modal-form';
 import '../../plugins/lodash_helpers';
 import '../../plugins/persistent_notifier';
@@ -163,6 +162,9 @@ import '../../components/form/fields/person-form-field';
 import '../../components/form/fields/rich-text-form-field';
 import '../../components/form/fields/text-form-field';
 import '../../components/custom-attributes/global-custom-attributes';
+
+// This modal should be loaded here as it requires some components
+import '../../bootstrap/modal-ajax';
 
 import '../../dashboard';
 

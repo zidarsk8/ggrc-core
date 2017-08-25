@@ -339,16 +339,20 @@ import './create-url';
       },
       initializeFormFields: function () {
         var cavs =
-          CAUtils.getAttributes(
-            this.attr('instance.custom_attribute_values'), true);
+          CAUtils.getCustomAttributes(
+            this.attr('instance'),
+            CAUtils.CUSTOM_ATTRIBUTE_TYPE.LOCAL
+          );
         this.attr('formFields',
           CAUtils.convertValuesToFormFields(cavs)
         );
       },
       initGlobalAttributes: function () {
         var cavs =
-          CAUtils.getAttributes(
-              this.attr('instance.custom_attribute_values'), false);
+          CAUtils.getCustomAttributes(
+            this.attr('instance'),
+            CAUtils.CUSTOM_ATTRIBUTE_TYPE.GLOBAL
+          );
         this.attr('globalAttributes',
           cavs.map(function (cav) {
             return CAUtils.convertToFormViewField(cav);
