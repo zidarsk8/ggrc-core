@@ -505,6 +505,14 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
          expect(result).toEqual(-1);
        });
+    it('should return correct item number for first item on non first page',
+       function () {
+         var result;
+
+         result = vm.getAbsoluteItemNumber({id: 1});
+
+         expect(result).toEqual(20);
+       });
   });
 
   describe('getRelativeItemNumber() method', function () {
