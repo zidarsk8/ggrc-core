@@ -317,7 +317,7 @@
                 };
               });
             this.setSelectedItems(result);
-            if (relatedData) {
+            if (!this.attr('objectGenerator') && relatedData) {
               disabledIds = relatedData[modelKey].ids;
               this.attr('disabledIds', disabledIds);
               this.setDisabledItems(result, disabledIds);
