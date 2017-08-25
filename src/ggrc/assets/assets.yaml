@@ -345,6 +345,7 @@ dashboard-js-files:
   - components/loading/loading-status.js
   - components/object-list-item/object-list-item-updater.js
   - components/lazy-render/lazy-render.js
+  - components/custom-attributes/global-custom-attributes.js
 
 app-init-files:
   - apps/dashboard.js
