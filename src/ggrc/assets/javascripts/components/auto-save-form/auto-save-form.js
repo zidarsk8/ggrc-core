@@ -5,8 +5,6 @@
 (function (can, GGRC, $) {
   'use strict';
 
-  var AUTO_SAVE_DELAY = 1000;
-
   GGRC.Components('autoSaveForm', {
     tag: 'auto-save-form',
     template: can.view(
@@ -15,15 +13,6 @@
     ),
     viewModel: {
       define: {
-        fieldsToSave: {
-          Value: can.Map
-        },
-        isDirty: {
-          type: 'boolean',
-          get: function () {
-            return can.Map.keys(this.attr('fieldsToSave') || {}).length;
-          }
-        },
         hasValidationErrors: {
           type: 'boolean',
           get: function () {
@@ -50,13 +39,9 @@
         }
       },
       formSavedDeferred: can.Deferred().resolve(),
+      isDirty: false,
       editMode: false,
       saving: false,
-      allSaved: true,
-      fieldsToSaveAvailable: false,
-      autoSaveScheduled: false,
-      autoSaveAfterSave: false,
-      autoSaveTimeoutHandler: null,
       fields: [],
       saveCallback: null,
       triggerSaveCbs: null,
@@ -141,58 +126,24 @@
       },
       fieldValueChanged: function (e, field) {
         field.attr('value', e.value);
-        this.fieldsToSave.attr(e.fieldId, e.value);
-        this.attr('fieldsToSaveAvailable', true);
         this.performValidation(field, e.value);
         this.attr('formSavedDeferred', can.Deferred());
-        this.triggerAutoSave();
+        this.save(e.fieldId, e.value);
       },
-      save: function () {
+      save: function (fieldId, fieldValue) {
         var self = this;
-        var toSave = {};
 
-        this.attr('fieldsToSave').each(function (v, k) {
-          toSave[k] = v;
-        });
+        this.attr('isDirty', true);
 
-        this.attr('fieldsToSave', {}, true);
-        this.attr('fieldsToSaveAvailable', false);
-
-        clearTimeout(this.attr('autoSaveTimeoutHandler'));
-        this.attr('autoSaveScheduled', false);
-
-        this.attr('saving', true);
-        this.saveCallback(new can.Map(toSave))
+        this.saveCallback(new can.Map({[fieldId]: fieldValue}))
           .done(function () {
-            if (self.attr('autoSaveAfterSave')) {
-              self.attr('autoSaveAfterSave', false);
-              setTimeout(self.save.bind(self));
-            }
-
-            self.attr('allSaved', true);
             self.attr('formSavedDeferred').resolve();
           })
           // todo: error handling
           .always(function () {
             self.attr('saving', false);
+            self.attr('isDirty', false);
           });
-      },
-      triggerAutoSave: function () {
-        if (this.attr('autoSaveScheduled')) {
-          return;
-        }
-        if (this.attr('saving')) {
-          this.attr('autoSaveAfterSave', true);
-          return;
-        }
-
-        this.attr('allSaved', false);
-
-        this.attr(
-          'autoSaveTimeoutHandler',
-          setTimeout(this.save.bind(this), AUTO_SAVE_DELAY)
-        );
-        this.attr('autoSaveScheduled', true);
       }
     },
     events: {

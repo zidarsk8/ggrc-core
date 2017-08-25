@@ -69,7 +69,6 @@
                     <div class="assessment-note">
                         <auto-save-form-status
                                 {form-saving}="formState.saving"
-                                {form-all-saved}="formState.allSaved"
                                 {is-dirty}="formState.isDirty">
                                 <loading-status
                                     {is-loading}="formSaving"
@@ -162,9 +161,7 @@
                                     {edit-mode}="editMode"
                                     {save-callback}="@saveFormFields"
                                     {trigger-save-cbs}="triggerFormSaveCbs"
-                                    {^fields-to-save-available}="formState.fieldsToSaveAvailable"
-                                    {^saving}="formState.saving"
-                                    {^all-saved}="formState.allSaved"
+                                    {(saving)}="formState.saving"
                                     {^form-saved-deferred}="formState.formSavedDeferred"
                                     {^is-dirty}="formState.isDirty"
                                     {^has-validation-errors}="instance.hasValidationErrors"
