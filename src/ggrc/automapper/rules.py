@@ -8,6 +8,10 @@ from collections import namedtuple
 from logging import getLogger
 
 
+class AutomappingRuleConfigError(ValueError):
+  pass
+
+
 Attr = namedtuple('Attr', ['name'])
 
 
@@ -38,16 +42,17 @@ class RuleSet(object):
   _type_indices = get_type_indices()
 
   @classmethod
-  def _check_type_order(cls, type1, type2):
-    """Get error message if type1 and type2 violate type ordering."""
-    i1 = cls._type_indices.get(type1, None)
+  def _assert_type_order(cls, higher, lower):
+    """Raise exception if types higher and lower violate type ordering."""
+    i1 = cls._type_indices.get(higher)
     if i1 is None:
-      return "Unknown level for %s" % type1
-    i2 = cls._type_indices.get(type2, None)
+      raise AutomappingRuleConfigError("Unknown level for {}".format(higher))
+    i2 = cls._type_indices.get(lower)
     if i2 is None:
-      return "Unknown level for %s" % type2
+      raise AutomappingRuleConfigError("Unknown level for {}".format(higher))
     if not i1 <= i2:
-      return "Type %s does not occur higher than type %s" % (type1, type2)
+      raise AutomappingRuleConfigError("Type {} must be higher than type {}"
+                                       .format(higher, lower))
 
   @classmethod
   def _explode_rules(cls, rule_list):
@@ -60,16 +65,8 @@ class RuleSet(object):
           # TODO rule sanity check
           yield (mid, bottom, top, rule)
         else:
-          err1 = cls._check_type_order(top, mid)
-          err2 = cls._check_type_order(mid, bottom)
-          if err1 is not None or err2 is not None:
-            logger.warning("Automapping rule ordering violation")
-            if err1 is not None:
-              logger.warning(err1)
-            if err2 is not None:
-              logger.warning(err2)
-            logger.warning("Skipping bad rule (%s, %s, %s)", top, mid, bottom)
-            continue
+          cls._assert_type_order(higher=top, lower=mid)
+          cls._assert_type_order(higher=mid, lower=bottom)
           yield (mid, bottom, top, rule)
           yield (mid, top, bottom, rule)
 
