@@ -220,3 +220,41 @@ class TestAssessmentsWorkflow(base.Test):
     assert expected_results == actual_results, (
         messages.AssertionMessages.format_err_msg_equal(expected_results,
                                                         actual_results))
+
+  @pytest.mark.parametrize(
+      "dynamic_object, dynamic_relationships",
+      [("new_objective_rest", "map_new_program_rest_to_new_objective_rest"),
+       ("new_control_rest", "map_new_program_rest_to_new_control_rest")],
+      indirect=True)
+  def test_map_snapsots_to_asmt_via_edit_modal(
+      self, new_program_rest, dynamic_object, dynamic_relationships,
+      new_audit_rest, new_assessment_rest, selenium
+  ):
+    """Check Assessment can be mapped with snapshot via Modal Edit
+    on Assessments Info Page. Additional check existing of mapped obj Titles
+    on Modal Edite.
+    Preconditions:
+    - Program, dynamic_object created via REST API.
+    - dynamic_object mapped to Program via REST API.
+    - Audit created under Program via REST API.
+    Test parameters:
+    - 'dynamic_object'.
+    - 'dynamic_relationships'.
+    """
+    expected_asmt = (new_assessment_rest.update_attrs(
+        objects_under_assessment=[dynamic_object],
+        status=AssessmentStates.IN_PROGRESS))
+    expected_titles = [dynamic_object.title]
+    actual_titles = (webui_service.AssessmentsService(selenium).
+                     map_objs_and_get_mapped_titles_from_edit_modal(
+                     expected_asmt, expected_asmt.objects_under_assessment))
+    actual_asmt = (webui_service.AssessmentsService(selenium).
+                   get_obj_from_info_page(expected_asmt))
+    # due to GGRC-3157
+    if actual_asmt.objects_under_assessment is None:
+      expected_asmt.objects_under_assessment = None
+    else:
+      raise ValueError("GGRC-3157 Issue was fixed")
+    self.general_assert(expected_asmt.repr_ui(), actual_asmt, "updated_at")
+    assert expected_titles == actual_titles
+    pytest.xfail(reason="GGRC-3157 Issue")
