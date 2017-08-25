@@ -42,7 +42,6 @@
         });
       },
       confirmEdit: function () {
-        document.body.classList.add('no-events');
         if (!this.isInEditableState()) {
           this.showConfirm();
           return;
