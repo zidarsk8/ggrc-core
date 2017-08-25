@@ -118,7 +118,6 @@
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
-      triggerFormSaveCbs: can.$.Callbacks(),
       setUrlEditMode: function (value, type) {
         this.attr(type + 'EditMode', value);
       },
@@ -344,9 +343,6 @@
           function (resolve, reject) {
             this.attr('instance').save().done(resolve).fail(reject);
           }.bind(this), 1000));
-      },
-      onFormSave: function () {
-        this.attr('triggerFormSaveCbs').fire();
       },
       onStateChange: function (event) {
         var isUndo = event.undo;

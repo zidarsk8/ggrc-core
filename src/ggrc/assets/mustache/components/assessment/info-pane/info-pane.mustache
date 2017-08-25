@@ -157,19 +157,22 @@
                           {{/unless}}
                         </div>
                     </div>
-                    <auto-save-form {instance}="instance"
-                                    {deferred-save}="deferredSave"
-                                    {fields}="formFields"
-                                    {edit-mode}="editMode"
-                                    {save-callback}="@saveFormFields"
-                                    {trigger-save-cbs}="triggerFormSaveCbs"
-                                    {^saving}="formState.saving"
-                                    {^form-saved-deferred}="formState.formSavedDeferred"
-                                    {^is-dirty}="formState.isDirty"
-                                    {^has-validation-errors}="instance.hasValidationErrors"
-                                    {evidence-amount}="evidences.length"
-                                    (validation-changed)="showRequiredInfoModal(%event)"
-                    ></auto-save-form>
+                    <assessment-local-ca
+                        {instance}="instance"
+                        {deferred-save}="deferredSave"
+                        {evidence-amount}="evidences.length"
+                        {^has-validation-errors}="instance.hasValidationErrors"
+                        {fields}="formFields"
+                        {^saving}="formState.saving"
+                        {^form-saved-deferred}="formState.formSavedDeferred"
+                        {^is-dirty}="formState.isDirty"
+                        (validation-changed)="showRequiredInfoModal(%event)">
+                        <auto-save-form
+                            {fields}="fields"
+                            {edit-mode}="editMode"
+                            (value-changed)="attributeChanged(%event)">
+                        </auto-save-form>
+                    </assessment-local-ca>
                     <!-- Modal Window to fix validation issues of CA fields -->
                     {{#if modal.state}}
                       <simple-modal {state}="modal.state"
@@ -189,10 +192,9 @@
                     {{/if}}
                     <!-- End of Modal Window -->
                     <assessment-controls-toolbar class="assessment-controls-toolbar"
-                                                 {instance}="instance"
-                                                 {form-state}="formState"
-                                                 (on-form-save)="onFormSave()"
-                                                 (on-state-change)="onStateChange(%event)"
+                        {instance}="instance"
+                        {form-state}="formState"
+                        (on-state-change)="onStateChange(%event)"
                     ></assessment-controls-toolbar>
                 </div>
                 <div class="info-pane__section">

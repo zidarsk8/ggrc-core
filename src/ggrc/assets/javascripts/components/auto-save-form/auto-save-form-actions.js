@@ -13,24 +13,8 @@
     ),
     viewModel: {
       formEditMode: false,
-      formSaving: false,
-      formFieldsToSaveAvailable: false,
-      saveDisabled: function () {
-        return !this.attr('formFieldsToSaveAvailable') ||
-               this.attr('formSaving');
-      },
-      viewDisabled: function () {
-        return this.attr('formFieldsToSaveAvailable') ||
-               this.attr('formSaving');
-      },
-      view: function () {
-        this.attr('formEditMode', false);
-      },
       edit: function () {
         this.attr('formEditMode', true);
-      },
-      save: function () {
-        this.dispatch('onSave');
       }
     }
   });
