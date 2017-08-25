@@ -3,16 +3,6 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if formEditMode}}
-  <button class="btn btn-small btn-gray"
-          ($click)="save()"
-          {{#saveDisabled}}disabled{{/saveDisabled}}>
-    {{#if formSaving}}
-      Saving...
-    {{else}}
-      Save Changes
-    {{/if}}
-  </button>
-{{else}}
+{{#unless formEditMode}}
   <button class="btn btn-small btn-gray" ($click)="edit()">Edit Answers</button>
-{{/if}}
+{{/unless}}

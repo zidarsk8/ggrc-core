@@ -96,12 +96,9 @@
     </div>
 </div>
 
-{{#if infoPaneMode}}
-  <custom-roles {instance}="instance">
-  </custom-roles>
-{{else}}
+{{#unless infoPaneMode}}
   <custom-roles-modal
     {instance}="instance"
     {is-new-instance}="new_object_form">
   </custom-roles-modal>
-{{/if}}
+{{/unless}}
