@@ -13,8 +13,6 @@ from ggrc.automapper.rules import rules
 from ggrc.login import get_current_user
 from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship
-from ggrc.models.comment import Commentable
-from ggrc.models.mixins import ChangeTracked
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import get_cache
 from ggrc.services import signals
@@ -267,13 +265,3 @@ def register_automapping_listeners():
         logger.warning("Automapping listener: no obj, no mappings created")
         return
       automapper.generate_automappings(obj)
-
-      if obj.source_type != u"Comment" and obj.destination_type != u"Comment":
-        continue
-
-      comment, other = obj.source, obj.destination
-      if comment.type != u"Comment":
-        comment, other = other, comment
-
-      if isinstance(other, (Commentable, ChangeTracked)):
-        other.updated_at = datetime.now()
