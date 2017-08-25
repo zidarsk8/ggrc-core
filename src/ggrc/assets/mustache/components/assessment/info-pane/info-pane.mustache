@@ -157,11 +157,13 @@
                           {{/unless}}
                         </div>
                     </div>
-                    <auto-save-form {fields}="formFields"
+                    <auto-save-form {instance}="instance"
+                                    {deferred-save}="deferredSave"
+                                    {fields}="formFields"
                                     {edit-mode}="editMode"
                                     {save-callback}="@saveFormFields"
                                     {trigger-save-cbs}="triggerFormSaveCbs"
-                                    {(saving)}="formState.saving"
+                                    {^saving}="formState.saving"
                                     {^form-saved-deferred}="formState.formSavedDeferred"
                                     {^is-dirty}="formState.isDirty"
                                     {^has-validation-errors}="instance.hasValidationErrors"

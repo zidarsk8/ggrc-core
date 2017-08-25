@@ -390,15 +390,6 @@
 
         return this.attr('instance').save();
       },
-      saveFormFields: function (modifiedFields) {
-        var self = this;
-
-        return this.attr('deferredSave').push(function () {
-          var caValues = self.attr('instance.custom_attribute_values');
-          CAUtils.applyChangesToCustomAttributeValue(caValues, modifiedFields);
-          self.attr('formState.saving', true);
-        });
-      },
       showRequiredInfoModal: function (e, field) {
         var scope = field || e.field;
         var errors = scope.attr('errorsMap');

@@ -5,6 +5,8 @@
 (function (can, GGRC, $) {
   'use strict';
 
+  var CAUtils = GGRC.Utils.CustomAttributes;
+
   GGRC.Components('autoSaveForm', {
     tag: 'auto-save-form',
     template: can.view(
@@ -12,6 +14,7 @@
       '/components/auto-save-form/auto-save-form.mustache'
     ),
     viewModel: {
+      instance: null,
       define: {
         hasValidationErrors: {
           type: 'boolean',
@@ -135,15 +138,22 @@
 
         this.attr('isDirty', true);
 
-        this.saveCallback(new can.Map({[fieldId]: fieldValue}))
-          .done(function () {
-            self.attr('formSavedDeferred').resolve();
-          })
-          // todo: error handling
-          .always(function () {
-            self.attr('saving', false);
-            self.attr('isDirty', false);
-          });
+        this.attr('deferredSave').push(function () {
+          var caValues = self.attr('instance.custom_attribute_values');
+          CAUtils.applyChangesToCustomAttributeValue(
+            caValues,
+            new can.Map({[fieldId]: fieldValue}));
+
+          self.attr('saving', true);
+        })
+        .done(function () {
+          self.attr('formSavedDeferred').resolve();
+        })
+        // todo: error handling
+        .always(function () {
+          self.attr('saving', false);
+          self.attr('isDirty', false);
+        });
       }
     },
     events: {
