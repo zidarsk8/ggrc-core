@@ -114,8 +114,7 @@
                                         (set-in-progress)="setInProgressState()"
                                         {is-edit-icon-denied}="isEditDenied"
                                         {instance}="instance"
-                                        {on-state-change-dfd}="onStateChangeDfd"
-                                        {edit-mode}="editMode">
+                                        {on-state-change-dfd}="onStateChangeDfd">
                                             <a ($click)="confirmEdit">
                                                 <action-toolbar-control>
                                                     <i class="fa fa-trash"></i>
@@ -129,17 +128,16 @@
                                 <create-url
                                     {type}="documentTypes.urls"
                                     {context}="instance.context"
-                                    (create-url-triggered)="setUrlEditMode(false, 'urls')"
                                     (before-create)="addItems(%event, 'urls')"
                                     (created)="addRelatedItem(%event, 'urls')">
                                     <form class="create-form">
                                         <fieldset class="create-form__layout">
-                                            <input {($value)}="value" class="create-form__input"type="text" placeholder="Add URL" spellcheck="false" autocomplete="false">
+                                            <input {($value)}="value" class="create-form__input" type="text" placeholder="Add URL" spellcheck="false" autocomplete="false">
                                             <div class="create-form__controls">
-                                                <button type="button" class="create-form__confirm" ($click)="create">
+                                                <button type="button" class="create-form__confirm" ($click)="create; setUrlEditMode(false, 'urls')">
                                                     <i class="fa fa-check"></i>
                                                 </button>
-                                                <button type="button" class="create-form__cancel" ($click)="clear">
+                                                <button type="button" class="create-form__cancel" ($click)="clear; setUrlEditMode(false, 'urls')">
                                                     <i class="fa fa-times"></i>
                                                 </button>
                                             </div>
@@ -152,8 +150,7 @@
                                     (set-in-progress)="setInProgressState()"
                                     {is-edit-icon-denied}="isEditDenied"
                                     {instance}="instance"
-                                    {on-state-change-dfd}="onStateChangeDfd"
-                                    {edit-mode}="editMode">
+                                    {on-state-change-dfd}="onStateChangeDfd">
                                         <button class="btn btn-small btn-gray"
                                             ($click)="confirmEdit()">Add</button>
                                 </confirm-edit-action>
@@ -393,9 +390,8 @@
                                                     (set-in-progress)="setInProgressState()"
                                                     {is-edit-icon-denied}="isEditDenied"
                                                     {instance}="instance"
-                                                    {on-state-change-dfd}="onStateChangeDfd"
-                                                    {edit-mode}="editMode">
-                                                        <a ($click)="confirmEdit">
+                                                    {on-state-change-dfd}="onStateChangeDfd">
+                                                        <a ($click)="confirmEdit()">
                                                             <action-toolbar-control>
                                                                 <i class="fa fa-trash"></i>
                                                             </action-toolbar-control>
@@ -408,17 +404,16 @@
                                                 <create-url
                                                     {type}="documentTypes.referenceUrls"
                                                     {context}="instance.context"
-                                                    (create-url-triggered)="setUrlEditMode(false, 'referenceUrls')"
                                                     (before-create)="addItems(%event, 'referenceUrls')"
                                                     (created)="addRelatedItem(%event, 'referenceUrls')">
                                                     <form class="create-form">
                                                         <fieldset class="create-form__layout">
                                                             <input {($value)}="value" class="create-form__input"type="text" placeholder="Add URL" spellcheck="false" autocomplete="false">
                                                             <div class="create-form__controls">
-                                                                <button type="button" class="create-form__confirm" ($click)="create">
+                                                                <button type="button" class="create-form__confirm" ($click)="create; setUrlEditMode(false, 'referenceUrls')">
                                                                     <i class="fa fa-check"></i>
                                                                 </button>
-                                                                <button type="button" class="create-form__cancel" ($click)="clear">
+                                                                <button type="button" class="create-form__cancel" ($click)="clear; setUrlEditMode(false, 'referenceUrls')">
                                                                     <i class="fa fa-times"></i>
                                                                 </button>
                                                             </div>
@@ -431,8 +426,7 @@
                                                     (set-in-progress)="setInProgressState()"
                                                     {is-edit-icon-denied}="isEditDenied"
                                                     {instance}="instance"
-                                                    {on-state-change-dfd}="onStateChangeDfd"
-                                                    {edit-mode}="editMode">
+                                                    {on-state-change-dfd}="onStateChangeDfd">
                                                         <button class="btn btn-small btn-gray" ($click)="confirmEdit()">
                                                             Add
                                                         </button>

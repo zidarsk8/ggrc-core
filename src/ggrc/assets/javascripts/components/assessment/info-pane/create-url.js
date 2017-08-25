@@ -18,8 +18,6 @@
         var document;
         var attrs;
 
-        this.dispatch('createUrlTriggered');
-
         if (!value || !value.length) {
           GGRC.Errors.notifier('error', 'Please enter a URL.');
           return;
@@ -48,7 +46,6 @@
       },
       clear: function () {
         this.attr('value', null);
-        this.dispatch('createUrlTriggered');
       }
     }
   });
