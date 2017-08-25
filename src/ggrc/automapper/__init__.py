@@ -11,7 +11,7 @@ from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
 from ggrc import models
-from ggrc.automapper.rules import rules
+from ggrc.automapper import rules
 from ggrc.login import get_current_user
 from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship
@@ -105,7 +105,7 @@ class AutomapperGenerator(object):
       self._step(src, dst)
       self._step(dst, src)
       while self.queue:
-        if len(self.auto_mappings) > rules.count_limit:
+        if len(self.auto_mappings) > rules.rules.count_limit:
           break
         src, dst = entry = self.queue.pop()
 
@@ -122,7 +122,7 @@ class AutomapperGenerator(object):
         self._step(src, dst)
         self._step(dst, src)
 
-      if len(self.auto_mappings) <= rules.count_limit:
+      if len(self.auto_mappings) <= rules.rules.count_limit:
         self._flush(relationship)
       else:
         relationship._json_extras = {
@@ -182,7 +182,7 @@ class AutomapperGenerator(object):
         )
 
   def _step(self, src, dst):
-    explicit, implicit = rules[src.type, dst.type]
+    explicit, implicit = rules.rules[src.type, dst.type]
     self._step_explicit(src, dst, explicit)
     self._step_implicit(src, dst, implicit)
 
