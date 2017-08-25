@@ -60,4 +60,5 @@ class TabController(base.ElementsList):
     """
     if tab_name != self.active_tab.text:
       self._active_tab = self.get_item(tab_name)
+      selenium_utils.scroll_into_view(self._driver, self._active_tab.element)
       self._active_tab.click()

@@ -83,7 +83,7 @@
     &:hover,
     &:focus,
     &:active {
-      background: darken($redBtn, 10%);
+      background: mix($white, $redBtn, 30%);
     }
   }
 
@@ -93,7 +93,7 @@
     &:hover,
     &:focus,
     &:active {
-      background: darken($white, 10%);
+      background: mix($black, $white, 6%);
     }
 
     &:focus {
@@ -109,7 +109,7 @@
     &:hover,
     &:focus,
     &:active {
-      background: lighten($lightBlueBtn, 10%);
+      background: mix($white, $lightBlueBtn, 30%);
     }
   }
 
@@ -121,7 +121,7 @@
     &:hover,
     &:focus,
     &:active {
-      background: darken($btnGreen, 10%);
+      background: mix($white, $btnGreen, 30%);
     }
   }
 
@@ -133,7 +133,7 @@
     &:hover,
     &:focus,
     &:active {
-      background: lighten($createBtn, 10%);
+      background: mix($white, $createBtn, 30%);
     }
   }
 
@@ -146,7 +146,7 @@
     &:hover,
     &:focus,
     &:active {
-      background: $widgetBorder;
+      background: mix($black, $white, 6%);
     }
 
     &.dropdown-toggle {

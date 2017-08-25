@@ -31,6 +31,9 @@ SECONDARY_CONTACT = "Secondary Contact"
 # user names
 DEFAULT_USER = "Example User"
 
+# user emails
+DEFAULT_USER_EMAIL = "user@example.com"
+
 # role scopes
 SYSTEM = "System"
 PRIVATE_PROGRAM = "Private Program"

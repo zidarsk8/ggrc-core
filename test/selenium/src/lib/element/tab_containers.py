@@ -10,10 +10,7 @@ from lib.utils import selenium_utils
 
 class AssessmentTabContainer(base.AbstractTabContainer):
   """Class of TabContainer in Assessment info."""
-  def __init__(self, driver, container_element):
-    super(AssessmentTabContainer, self).__init__(driver,
-                                                 container_element)
-    self._default_tab = element.AssessmentTabContainer.ASMT_ATTRS_TAB
+  _elements = element.AssessmentTabContainer
 
   def _get_locators(self):
     return locator.WidgetInfoAssessment.TabContainer
@@ -23,16 +20,16 @@ class AssessmentTabContainer(base.AbstractTabContainer):
     validation result, because there is no reason for create AssessmentLog
     page object class.
     """
-    elements = element.AssessmentTabContainer
+    selenium_utils.scroll_into_view(self._driver, self.container_element)
     return {
-        elements.RELATED_ASMTS_TAB: AssessmentRelatedAsmtsTable,
-        elements.RELATED_ISSUES_TAB: AssessmentRelatedIssuesTable,
-        elements.ASMT_LOG_TAB: self._log_tab_validate}
+        self._elements.RELATED_ASMTS_TAB: AssessmentRelatedAsmtsTable,
+        self._elements.RELATED_ISSUES_TAB: AssessmentRelatedIssuesTable,
+        self._elements.CHANGE_LOG_TAB: self._log_tab_validate}
 
-  def switch_to_default_tab(self):
-    """Method for switch active tab to default tab."""
-    if self._tab_controller.active_tab.text != self._default_tab:
-      self._tab_controller.active_tab = self._default_tab
+  def switch_to_tab(self, tab_name):
+    """Method for switch active tab to another one according to tab's name."""
+    if self._tab_controller.active_tab.text != tab_name:
+      self._tab_controller.active_tab = tab_name
 
   @staticmethod
   def _log_tab_validate(_driver, log_panel_element):
@@ -43,9 +40,8 @@ class AssessmentTabContainer(base.AbstractTabContainer):
     tab_locators = locator.AssessmentLogTab
     selenium_utils.wait_for_js_to_load(_driver)
 
-    def check_log_item(log_element, label_value):
-      """Check consistency of log item by passed log element. Person's label
-      will be checked by comparing element 'class' and passed 'label_value'
+    def check_log_item(log_element):
+      """Check consistency of log item by passed log element.
       Return: dict of bool.
       """
       all_cells_texts = [elem.text for elem in
@@ -66,9 +62,6 @@ class AssessmentTabContainer(base.AbstractTabContainer):
           cell != "" and cell != tab_elements.EMPTY_STATEMENT
           for cell in all_cells_texts[2::3])
 
-      person_label_is_valid = selenium_utils.is_value_in_attr(
-          log_element.find_element(*tab_locators.PERSON_LABEL),
-          "class", value=label_value)
       person_element = log_element.find_element(
           *tab_locators.COMMENT_PERSON_CSS)
 
@@ -76,13 +69,11 @@ class AssessmentTabContainer(base.AbstractTabContainer):
               "field_is_valid": field_is_valid,
               "orignal_value_is_valid": orignal_value_is_valid,
               "new_value_is_valid": new_value_is_valid,
-              "person_is_valid": person_element.text == roles.DEFAULT_USER,
-              "person_label_is_valid": person_label_is_valid
+              "person_is_valid": (
+                  person_element.text == roles.DEFAULT_USER_EMAIL)
               }
-    selenium_utils.get_when_invisible(
+    selenium_utils.wait_until_not_present(
         _driver, tab_locators.LOG_TAB_SPINNER_CSS)
-    log_list = base.ElementsList(
-        _driver, selenium_utils.get_when_visible(
-            log_panel_element, tab_locators.LOG_LIST_CSS))
-    return [check_log_item(el.element, 'assessor' if i == 0 else 'none')
-            for i, el in enumerate(log_list.get_items())]
+    log_list = selenium_utils.get_when_all_visible(
+        log_panel_element, tab_locators.LOG_LIST_CSS)
+    return [check_log_item(el) for el in log_list]

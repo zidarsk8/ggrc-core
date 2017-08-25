@@ -10,6 +10,7 @@ from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
 from ggrc.models.reflection import AttributeInfo
 from ggrc.fulltext.mixin import Indexed
 from ggrc.fulltext.attributes import FullTextAttr, DatetimeValue, DateValue
+from ggrc.query.exceptions import BadQueryException
 
 
 EXP_TMPL = {'is_autocasted': True}
@@ -71,9 +72,10 @@ def get_parsers(klass, key):
       return (fulltext_parser, None)
     else:
       return (None, fulltext_parser)
-  try:
-    attr_type = getattr(klass, key).property.columns[0].type
-  except AttributeError:
+  columns = {i.name: i.type for i in klass.__table__.columns}
+  if key in columns:
+    attr_type = columns[key]
+  else:
     value_types = [i[0] for i in db.session.query(
         CustomAttributeDefinition.attribute_type
     ).filter(
@@ -113,6 +115,8 @@ def autocast(exp, target_class):
   if extra_parser:
     left_date, right_date = extra_parser.get_filter_value(
         unicode(exp['right']), operation) or [None, None]
+    if not left_date and not right_date and not any_parser:
+      raise BadQueryException(extra_parser.get_value_error_msg(exp['left']))
     if any(o in operation for o in ["~", "="]):
       operator_suffix = "="
     else:

@@ -20,7 +20,6 @@ from operator import attrgetter
 from enum import Enum
 
 from sqlalchemy import inspect
-from sqlalchemy import and_
 from sqlalchemy.sql.expression import true
 
 from ggrc import db
@@ -62,20 +61,6 @@ def _add_notification(obj, notif_type, when=None):
   ))
 
 
-def _update_notification(obj, notif_type):
-  """Update updated_at field"""
-  notif = db.session.query(models.Notification).join(
-      models.NotificationType).filter(and_(
-          models.NotificationType.id == notif_type.id,
-          models.Notification.object_id == obj.id,
-          models. Notification.object_type == obj.type,
-          (models.Notification.sent_at.is_(None) |
-              (models.Notification.repeating == true()))
-      )).one()
-  notif.updated_at = datetime.now()
-  db.session.add(notif)
-
-
 def _has_unsent_notifications(notif_type, obj):
   """Helper for searching unsent notifications.
 
@@ -88,15 +73,26 @@ def _has_unsent_notifications(notif_type, obj):
     True if there are any unsent notifications of notif_type for the given
     object, and False otherwise.
   """
-  Notification = models.Notification  # pylint: disable=invalid-name
+  obj_key = (obj.id, obj.type, notif_type.id)
+  for notification in db.session:
+    if not isinstance(notification, models.Notification):
+      continue
+    notif_key = (notification.object_id,
+                 notification.object_type,
+                 notification.notification_type.id)
+    if obj_key == notif_key:
+      return notification
 
-  return db.session.query(models.Notification).join(
-      models.NotificationType).filter(and_(
-          models.NotificationType.id == notif_type.id,
-          Notification.object_id == obj.id,
-          Notification.object_type == obj.type,
-          (Notification.sent_at.is_(None) | (Notification.repeating == true()))
-      )).count() > 0
+  return models.Notification.query.filter(
+      models.Notification.notification_type_id == notif_type.id,
+      models.Notification.object_id == obj.id,
+      models.Notification.object_type == obj.type,
+      (
+          models.Notification.sent_at.is_(None) | (
+              models.Notification.repeating == true()
+          )
+      )
+  ).first()
 
 
 def _add_assignable_declined_notif(obj):
@@ -129,10 +125,12 @@ def _add_assessment_updated_notif(obj):
   notif_type = models.NotificationType.query.filter_by(
       name="assessment_updated").first()
 
-  if not _has_unsent_notifications(notif_type, obj):
+  notification = _has_unsent_notifications(notif_type, obj)
+  if not notification:
     _add_notification(obj, notif_type)
   else:
-    _update_notification(obj, notif_type)
+    notification.updated_at = datetime.now()
+    db.session.add(notification)
 
 
 def _add_state_change_notif(obj, state_change, remove_existing=False):

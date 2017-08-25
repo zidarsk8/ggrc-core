@@ -552,7 +552,7 @@
       var pageInfo = this.attr('pageInfo');
       var startIndex = pageInfo.pageSize * (pageInfo.current - 1);
       var relativeItemIndex = _.findIndex(showedItems, {id: instance.id});
-      return relativeItemIndex > 0 ?
+      return relativeItemIndex > -1 ?
         startIndex + relativeItemIndex :
         relativeItemIndex;
     },

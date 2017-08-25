@@ -199,16 +199,25 @@
     > a {
       border: 1px solid #ccc;
       background: #fff;
+      color: $black;
       cursor: pointer;
       padding: 6px 10px;
+      text-decoration: none;
 
       &:hover {
         background: $warmGray;
       }
 
       &.disabled {
+        color: $disabled;
         cursor: default;
         opacity: 0.7;
+      }
+    }
+
+    & + .navigation-item {
+      > a {
+        border-left: none;
       }
     }
   }

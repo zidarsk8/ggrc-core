@@ -202,7 +202,7 @@ class AssessmentsService(BaseRestService):
     'Creator', 'Assessor' to them via REST API and return list of created
     objects with filtered attributes.
     """
-    objs = BaseRestService(url.ASSESSMENTS).create_objs(
+    objs = BaseRestService(self.endpoint).create_objs(
         count, factory_params, **attrs_for_template)
     assignees = [assignee for obj in objs for assignee in obj.assignees]
     if assignees:
@@ -214,9 +214,10 @@ class AssessmentsService(BaseRestService):
   def update_obj(self, obj, **attrs):
     """Update attributes values of existing Assessment via REST API"""
     obj.update_attrs(**attrs)
-    return (self.client.update_object(
-        href=obj.href, **dict({k: v for k, v in obj.__dict__
-                              .iteritems() if k != "href"}.items())))
+    return self.get_items_from_resp(
+        self.client.update_object(
+            href=obj.href, **dict({k: v for k, v in obj.__dict__
+                                  .iteritems() if k != "href"}.items())))
 
 
 class IssuesService(BaseRestService):
@@ -276,3 +277,11 @@ class ObjectsInfoService(HelpRestService):
                 parent_type=paren_obj.type,
                 parent_id=paren_obj.id))).get("values")[0])
     return Entity.convert_dict_to_obj_repr(snapshoted_obj_item)
+
+  def get_obj_by_id(self, obj_type, obj_id):
+    """Get and return object according to passed 'obj_type' and 'obj_id'"""
+    obj = (BaseRestService.get_items_from_resp(self.client.create_object(
+        type=self.endpoint, object_name=unicode(obj_type),
+        filters=query.Query.expression_get_obj_by_id(obj_id))).get(
+        "values")[0])
+    return Entity.convert_dict_to_obj_repr(obj)

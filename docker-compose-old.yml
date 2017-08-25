@@ -2,6 +2,10 @@ dev:
   build: .
   dockerfile: Dockerfile-old
   command: /sbin/my_init
+  ports:
+   - "8000:8000"
+   - "8080:8080"
+   - "9876:9876"
   volumes:
    - ".:/vagrant"
    - ".:/vagrant_bind"
@@ -14,6 +18,8 @@ dev:
 selenium:
   build: .
   dockerfile: Dockerfile-selenium
+  ports:
+   - "4444:4444"
   volumes:
    - "./test/selenium:/selenium"
    - "/dev/shm:/dev/shm"
@@ -22,5 +28,3 @@ selenium:
   environment:
    - PYTHONDONTWRITEBYTECODE=true
    - PYTHONPATH=/selenium/src
-   - SCREEN_WIDTH=1440
-   - SCREEN_HEIGHT=900

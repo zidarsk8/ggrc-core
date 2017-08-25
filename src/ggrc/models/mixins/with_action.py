@@ -101,7 +101,7 @@ class WithAction(object):
         continue
 
       if not self._actions[operation]:
-        raise ValueError('Empty actions list')
+        continue
 
       self._build_relationships_map()
       self._process_operation(operation)

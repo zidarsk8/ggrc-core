@@ -9,20 +9,7 @@
   GGRC.Components('infoPaneSaveStatus', {
     tag: 'info-pane-save-status',
     viewModel: {
-      define: {
-        infoPaneSaving: {
-          get: function () {
-            return this.attr('assessmentSaving') ||
-              this.attr('evidencesSaving') ||
-              this.attr('commentsSaving') ||
-              this.attr('urlsSaving');
-          }
-        }
-      },
-      assessmentSaving: false,
-      evidencesSaving: false,
-      urlsSaving: false,
-      commentsSaving: false
+      infoPaneSaving: false
     }
   });
 })(window.can, window.GGRC);

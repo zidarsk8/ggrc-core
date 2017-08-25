@@ -286,15 +286,12 @@ class BaseWebUiService(object):
     element_to_verify = element.DropdownMenuItemTypes.OPEN
     return dropdown_on_info_panel.is_item_enabled(element_to_verify)
 
-  def filter_list_objs_from_tree_view(self, src_obj, filter_exp):
+  def filter_and_get_list_objs_from_tree_view(self, src_obj, filter_exp):
     """Filter by specified criteria and return list of objects from Tree
     View."""
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     objs_widget.filter.perform_query(filter_exp)
-    self.set_list_objs_scopes_representation_on_tree_view(src_obj)
-    list_objs_scopes = self.get_list_objs_scopes_from_tree_view(src_obj)
-    return self.create_list_objs(entity_factory=self.entities_factory_cls,
-                                 list_scopes=list_objs_scopes)
+    return self.get_list_objs_from_tree_view(src_obj)
 
   def is_obj_mappable_via_tree_view(self, src_obj, obj):
     """Open dropdown of Tree View Item  by title, an check is object
@@ -466,7 +463,7 @@ class AssessmentsService(BaseWebUiService):
     """
     asmt_page = self.open_info_page_of_obj(obj)
     return asmt_page.workflow_container.get_tab_object(
-        element.AssessmentTabContainer.ASMT_LOG_TAB)
+        element.AssessmentTabContainer.CHANGE_LOG_TAB)
 
   def get_related_asmts_titles(self, obj):
     """Open assessment Info Page. Open Related Assessments Tab on Assessment
@@ -508,8 +505,7 @@ class AssessmentsService(BaseWebUiService):
     from lib.constants.locator import ObjectWidget
     from lib.constants.locator import WidgetInfoAssessment
     self.open_info_page_of_obj(obj).click_verify()
-    for locator in [ObjectWidget.HEADER_STATE_VERIFIED,
-                    ObjectWidget.HEADER_STATE_COMPLETED,
+    for locator in [ObjectWidget.HEADER_STATE_COMPLETED,
                     WidgetInfoAssessment.ICON_VERIFIED]:
       selenium_utils.wait_until_element_visible(self.driver, locator)
     return self.info_widget_cls(self.driver)

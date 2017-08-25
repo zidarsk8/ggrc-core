@@ -50,7 +50,9 @@ class TestAssessmentDataHandlers(TestCase):
 
   def test_open_assessment(self):
     """Test data handlers for opened requests."""
-    notif = self._get_notification(self.asmt1, "assessment_open").first()
+    notifs = self._get_notification(self.asmt1, "assessment_open").all()
+    self.assertEqual(1, len(notifs))
+    notif = notifs[0]
 
     revisions = Revision.query.filter_by(resource_type='Notification',
                                          resource_id=notif.id).count()
@@ -65,7 +67,9 @@ class TestAssessmentDataHandlers(TestCase):
 
     self.assertEqual(set(open_data.keys()), asmt_1_expected_keys)
 
-    notif = self._get_notification(self.asmt3, "assessment_open").first()
+    notifs = self._get_notification(self.asmt3, "assessment_open").all()
+    self.assertEqual(1, len(notifs))
+    notif = notifs[0]
 
     revisions = Revision.query.filter_by(resource_type='Notification',
                                          resource_id=notif.id).count()
@@ -84,7 +88,9 @@ class TestAssessmentDataHandlers(TestCase):
     self.api_helper.modify_object(asmt1, {"status": Assessment.DONE_STATE})
     self.api_helper.modify_object(asmt1, {"status": Assessment.PROGRESS_STATE})
 
-    notif = self._get_notification(self.asmt1, "assessment_declined").first()
+    notifs = self._get_notification(self.asmt1, "assessment_declined").all()
+    self.assertEqual(1, len(notifs))
+    notif = notifs[0]
 
     revisions = Revision.query.filter_by(resource_type='Notification',
                                          resource_id=notif.id).count()
@@ -105,7 +111,9 @@ class TestAssessmentDataHandlers(TestCase):
     _, comment = self.generator.generate_comment(
         asmt1, "Verifier", "some comment", send_notification="true")
 
-    notif = self._get_notification(comment, "comment_created").first()
+    notifs = self._get_notification(comment, "comment_created").all()
+    self.assertEqual(1, len(notifs))
+    notif = notifs[0]
 
     revisions = Revision.query.filter_by(resource_type='Notification',
                                          resource_id=notif.id).count()
@@ -119,3 +127,21 @@ class TestAssessmentDataHandlers(TestCase):
     }
 
     self.assertEqual(set(declined_data.keys()), requester_emails)
+
+  def test_assessment_updated(self):
+    """Test data handlers for update assessment"""
+
+    # decline assessment 1
+    asmt1 = Assessment.query.filter_by(slug="A 1").first()
+    notifs = self._get_notification(self.asmt1, "assessment_updated").all()
+    self.assertFalse(notifs)
+    self.api_helper.modify_object(asmt1, {"title": "update_assessment",
+                                          "status": asmt1.DONE_STATE})
+
+    notifs = self._get_notification(self.asmt1, "assessment_updated").all()
+    self.assertEqual(1, len(notifs))
+
+    self.api_helper.modify_object(asmt1, {"title": "title_update_again"})
+
+    notifs = self._get_notification(self.asmt1, "assessment_updated").all()
+    self.assertEqual(1, len(notifs))

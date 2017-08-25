@@ -23,6 +23,13 @@ class TestDocumentWithActionMixin(TestCase, WithQueryApi):
     self.client.get("/login")
     self.api = api_helper.Api()
 
+  def test_empty_list(self):
+    """Test actions with empty lists."""
+    assessment = factories.AssessmentFactory()
+    response = self.api.put(assessment, {"actions": {"add_related": [],
+                                                     "remove_related": []}})
+    self.assert200(response)
+
   def test_add_url(self):
     """Test add url action."""
     assessment = factories.AssessmentFactory()
@@ -91,9 +98,6 @@ class TestDocumentWithActionMixin(TestCase, WithQueryApi):
   def test_wrong_add_action(self):
     """Test wrong add action."""
     assessment = factories.AssessmentFactory()
-    response = self.api.put(assessment, {"actions": {"add_related": []}})
-    self.assert400(response)
-
     response = self.api.put(assessment, {"actions": {"add_related": [{}]}})
     self.assert400(response)
 
@@ -147,9 +151,6 @@ class TestDocumentWithActionMixin(TestCase, WithQueryApi):
     """Test wrong remove action."""
     assessment = factories.AssessmentFactory()
     document_id = factories.DocumentFactory().id
-
-    response = self.api.put(assessment, {"actions": {"remove_related": []}})
-    self.assert400(response)
 
     response = self.api.put(assessment, {"actions": {"remove_related": [{}]}})
     self.assert400(response)

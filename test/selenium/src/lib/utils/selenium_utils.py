@@ -189,7 +189,7 @@ def click_on_staleable_element(driver, el_locator):
 
 def scroll_into_view(driver, element):
   """Scroll page to element using JS."""
-  driver.execute_script("return arguments[0].scrollIntoView();", element)
+  driver.execute_script("return arguments[0].scrollIntoView(false);", element)
   # compensate for the header
   driver.execute_script(
       "window.scrollBy(0, -{});".format(constants.settings.SIZE_HEADER))

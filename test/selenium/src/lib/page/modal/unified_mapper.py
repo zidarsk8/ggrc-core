@@ -3,7 +3,7 @@
 """Modals for map objects."""
 
 from lib import base, decorator
-from lib.constants import locator, element
+from lib.constants import element, locator, value_aliases as alias
 from lib.utils import selenium_utils
 
 
@@ -49,10 +49,8 @@ class CommonUnifiedMapperModal(base.Modal):
             self._driver, self._locators.OBJ_TYPE_DROPDOWN,)
         asmt_tmpl_dropdown.select_by_label(obj_name)
 
-  def add_filter_attr(
-      self, attr_name, value, operator=_elements.OPERATOR_AND,
-      compare=_elements.COMPARE_OPERATOR_EQUALS
-  ):
+  def add_filter_attr(self, attr_name, value,
+                      operator=alias.AND_OP, compare=alias.EQUAL_OP):
     """Add filter attribute according to passed parameters. """
     if not self._add_attr_btn:
       self._add_attr_btn = selenium_utils.get_when_visible(
@@ -127,9 +125,9 @@ class CommonUnifiedMapperModal(base.Modal):
                                is_asmts_generation=is_asmts_generation)
     for enum, title in enumerate(dest_objs_titles):
       if enum == 0:
-        operator = self._elements.OPERATOR_AND
+        operator = alias.AND_OP
       else:
-        operator = self._elements.OPERATOR_OR
+        operator = alias.OR_OP
       self.add_filter_attr(self._elements.ATTRIBUTE_TITLE, title,
                            operator=operator)
     self._select_search_dest_objs()

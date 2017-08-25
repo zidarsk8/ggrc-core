@@ -106,7 +106,7 @@ user@example.com with admin rights and setup other users later.
 
 ### Accessing MySQL query logs
 
-If using the `docker-compose-clean.yml` file, the myqsl query logs are enabled
+If using the `docker-compose.yml` file, the mysql query logs are enabled
 by default and can be monitored with:
 
 ```
@@ -283,7 +283,7 @@ After syncing your local clone of GGRC-Core you may experience a failure when
 trying to run the application due to a change (usually an addition) to the
 prerequisites.
 
-There are three primary classes of requirements for GGRC-Core: Submodules, 
+There are three primary classes of requirements for GGRC-Core: Submodules,
 Python requirements and other provision steps
 
 There are two pip requirements files: a runtime requirements file,
