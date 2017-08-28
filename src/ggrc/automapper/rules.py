@@ -63,8 +63,7 @@ class RuleSet(object):
         yield (bottom, mid, top, rule)
         yield (top, mid, bottom, rule)
 
-  def __init__(self, count_limit, rule_list):
-    self.count_limit = count_limit
+  def __init__(self, rule_list):
     self._rules = collections.defaultdict(lambda: self.no_mappings)
     self._rule_source = collections.defaultdict(set)
 
@@ -100,7 +99,7 @@ class Types(object):
   people_groups = {'AccessGroup', 'Person', 'OrgGroup', 'Vendor'}
 
 
-rules = RuleSet(count_limit=10000, rule_list=[
+rules = RuleSet(rule_list=[
     Rule(
         'mapping directive to a program',
         {'Program'},

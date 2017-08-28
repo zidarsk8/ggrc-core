@@ -31,10 +31,10 @@ def relate(src, dst):
 @contextmanager
 def automapping_count_limit(new_limit):
   """Automapping count limit"""
-  original_limit = ggrc.automapper.rules.rules.count_limit
-  ggrc.automapper.rules.rules.count_limit = new_limit
+  original_limit = ggrc.automapper.AutomapperGenerator.COUNT_LIMIT
+  ggrc.automapper.AutomapperGenerator.COUNT_LIMIT = new_limit
   yield
-  ggrc.automapper.rules.rules.count_limit = original_limit
+  ggrc.automapper.AutomapperGenerator.COUNT_LIMIT = original_limit
 
 
 class TestAutomappings(TestCase):
