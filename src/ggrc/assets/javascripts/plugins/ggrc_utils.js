@@ -98,14 +98,6 @@
 
       return isVisible;
     },
-    firstWorkingDay: function (date) {
-      date = moment(date);
-      // 6 is Saturday 0 is Sunday
-      while (_.contains([0, 6], date.day())) {
-        date.add(1, 'day');
-      }
-      return date.toDate();
-    },
     formatDate: function (date, hideTime) {
       var currentTimezone = moment.tz.guess();
       var inst;
