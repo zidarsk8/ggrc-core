@@ -261,7 +261,7 @@ class AsmtsModal(BaseModal):
     """Open Unified Mapper on modal and map objs.
     Return: self
     """
-    base.Button(self._driver, self._locators.MAP_OBJS_CSS).click()
+    base.Button(self._driver, self._locators.MAP_OBJS_BTN_CSS).click()
     mapper = unified_mapper.AssessmentCreationMapperModal(
         self._driver, objects.ASSESSMENTS)
     mapper.map_dest_objs(
@@ -270,6 +270,9 @@ class AsmtsModal(BaseModal):
     return self
 
   def get_mapped_snapshots_titles(self):
+    """Return titles of mapped snapshots on Assessment Modal.
+    Return: list of str
+    """
     return [base.Label(self._driver, el.find_element(
             *self._locators.MAPPED_SNAPSHOT_TITLE_CSS)).text
             for el in selenium_utils.get_when_all_visible(

@@ -550,7 +550,7 @@ class AssessmentsService(BaseWebUiService):
 
   def map_objs_and_get_mapped_titles_from_edit_modal(self, src_obj,
                                                      objs_to_map):
-    """Open Modal Edit on InfoPage of object. Open 3BBS. Select 'Edit' button
+    """Open ModalEdit from InfoPage of object. Open 3BBS. Select 'Edit' button
     and map snapshots from objects_under_assessment attribute of passed object.
       - Return: list of str. Titles of mapped Snapshots from Modal Edit.
     """

@@ -280,9 +280,7 @@ class Assessments(InfoPanel):
     self.comments_scopes = self.comments.scopes
 
   def _get_mapped_objs_titles(self):
-    """Return tuple of two lists of str for mapped snapshots and descriptions.
-    from current tab.
-    """
+    """Return lists of str for mapped snapshots titles from current tab."""
     mapped_items = self._driver.find_elements(
         *self._locators.MAPPED_SNAPSHOTS_CSS)
     return [mapped_el.find_element(

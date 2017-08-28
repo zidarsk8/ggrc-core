@@ -232,11 +232,12 @@ class TestAssessmentsWorkflow(base.Test):
   ):
     """Check Assessment can be mapped with snapshot via Modal Edit
     on Assessments Info Page. Additional check existing of mapped obj Titles
-    on Modal Edite.
+    on Modal Edit.
     Preconditions:
     - Program, dynamic_object created via REST API.
     - dynamic_object mapped to Program via REST API.
     - Audit created under Program via REST API.
+    - Assessment created under audit via REST API.
     Test parameters:
     - 'dynamic_object'.
     - 'dynamic_relationships'.
@@ -251,10 +252,13 @@ class TestAssessmentsWorkflow(base.Test):
     actual_asmt = (webui_service.AssessmentsService(selenium).
                    get_obj_from_info_page(expected_asmt))
     # due to GGRC-3157
+    attrs_to_exclude = ["updated_at"]
     if actual_asmt.objects_under_assessment is None:
-      expected_asmt.objects_under_assessment = None
-    else:
-      raise ValueError("GGRC-3157 Issue was fixed")
-    self.general_assert(expected_asmt.repr_ui(), actual_asmt, "updated_at")
+      attrs_to_exclude.append("objects_under_assessment")
+    self.general_assert(
+        expected_asmt.repr_ui(), actual_asmt, *attrs_to_exclude)
     assert expected_titles == actual_titles
-    pytest.xfail(reason="GGRC-3157 Issue")
+    if "objects_under_assessment" in attrs_to_exclude:
+      pytest.xfail(reason="GGRC-3157 Issue")
+    else:
+      pytest.fail(msg="GGRC-3157 Issue was fixed")

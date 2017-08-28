@@ -104,12 +104,11 @@ class TestAuditPage(base.Test):
   ):
     """Check if Assessment can be created with mapped snapshot via
     Modal Create on Assessments TreeView. Additional check existing of
-    mapped objs Titles on Modal Create
+    mapped objs Titles on Modal Create.
     Preconditions:
     - Program, dynamic_object created via REST API.
     - dynamic_object mapped to Program via REST API.
     - Audit created under Program via REST API.
-    - Assessment created under Audit via REST_API
     Test parameters:
     - 'dynamic_object'.
     - 'dynamic_relationships'.
@@ -125,13 +124,16 @@ class TestAuditPage(base.Test):
     actual_asmt = assessments_service.get_list_objs_from_info_panels(
         src_obj=new_audit_rest, objs=[expected_asmt])[0]
     # due to issue GGRC-3033
+    attrs_to_exclude = []
     if actual_asmt.status == AssessmentStates.IN_PROGRESS:
-      expected_asmt.status = AssessmentStates.IN_PROGRESS
-    else:
-      raise ValueError("GGRC-3033 Issue was fixed")
-    self.general_assert(expected_asmt.repr_ui(), actual_asmt)
+      attrs_to_exclude.append("status")
+    self.general_assert(
+        expected_asmt.repr_ui(), actual_asmt, *attrs_to_exclude)
     assert expected_titles == actual_titles
-    pytest.xfail(reason="GGRC-3033 Issue")
+    if "status" in attrs_to_exclude:
+      pytest.xfail(reason="GGRC-3033 Issue")
+    else:
+      pytest.fail(msg="GGRC-3033 Issue was fixed")
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(

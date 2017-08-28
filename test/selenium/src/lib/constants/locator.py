@@ -50,9 +50,9 @@ class Common(object):
 
 
 class CommonAssessment(object):
-  """Common Assessment locators for Modal and Info"""
-  MAP_OBJS = " map-button-using-assessment-type"
-  MAP_OBJS_CSS = (By.CSS_SELECTOR, "map-button-using-assessment-type")
+  """Common Assessment locators for Modal and Info."""
+  MAP_OBJS_BTN = " map-button-using-assessment-type"
+  MAP_OBJS_BTN_CSS = (By.CSS_SELECTOR, MAP_OBJS_BTN)
   MAPPED_SNAPSHOTS = " .mapped-objects__item.mapped-snapshot-item"
   MAPPED_SNAPSHOTS_CSS = (By.CSS_SELECTOR, MAPPED_SNAPSHOTS)
   MAPPED_SNAPSHOT_TITLE_CSS = (
@@ -447,8 +447,8 @@ class ModalCreateNewAsmt(BaseModalCreateNew, CommonAssessment):
   """Locators for Create new Assessment modals."""
   MAPPED_SNAPSHOTS_CSS = (By.CSS_SELECTOR, BaseModalCreateNew.MODAL +
                           CommonAssessment.MAPPED_SNAPSHOTS)
-  MAP_OBJS_CSS = (By.CSS_SELECTOR,
-                  BaseModalCreateNew.MODAL + CommonAssessment.MAP_OBJS)
+  MAP_OBJS_BTN_CSS = (By.CSS_SELECTOR,
+                      BaseModalCreateNew.MODAL + CommonAssessment.MAP_OBJS_BTN)
 
 
 class ModalCreateNewAsmtTmpl(BaseModalCreateNew):
@@ -1165,7 +1165,7 @@ class CommentItem(object):
 
 
 class AssessmentLogTab(object):
-  """Locators for Log Tab elements on Assessment InfoWidget"""
+  """Locators for Log Tab elements on Assessment InfoWidget."""
   CELLS_CSS = (By.CSS_SELECTOR, '.third-col')
   COMMENT_PERSON_CSS = (By.CSS_SELECTOR, '.person-tooltip-trigger')
   PERSON_LABEL = (By.CSS_SELECTOR, '.person-label')
@@ -1174,7 +1174,7 @@ class AssessmentLogTab(object):
 
 
 class AssessmentRelatedTable(object):
-  """Locators for Related Assessments Tab elements on Assessment InfoWidget"""
+  """Locators for RelatedAssessments Tab elements on Assessment InfoWidget."""
   HEADERS = (By.CSS_SELECTOR, ".grid-data-header")
   ROWS = (By.CSS_SELECTOR, ".grid-data-row")
   CELLS = (By.CSS_SELECTOR, "div")

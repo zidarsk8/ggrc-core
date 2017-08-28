@@ -174,8 +174,8 @@ class GenerateAssessmentsModal(CommonUnifiedMapperModal):
 
 
 class AssessmentCreationMapperModal(CommonUnifiedMapperModal):
-  """Modal for Create Assessment"""
+  """Class for UnifiedMapper modal on Assessment Edit/Create Modal."""
   def _confirm_items_added(self):
-    """Wait until items shown on Create Assessment Modal"""
+    """Wait until items shown on Edit/Create Assessment Modal."""
     selenium_utils.get_when_invisible(
         self._driver, locator.TreeView.NO_RESULTS_MESSAGE)
