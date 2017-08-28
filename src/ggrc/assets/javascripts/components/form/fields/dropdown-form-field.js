@@ -5,15 +5,22 @@
 (function (can, GGRC) {
   'use strict';
 
-  GGRC.Components('dateFormField', {
-    tag: 'date-form-field',
+  GGRC.Components('dropdownFormField', {
+    tag: 'dropdown-form-field',
     template: can.view(
-      GGRC.mustache_path +
-      '/components/auto-save-form/fields/date-form-field.mustache'
+      GGRC.mustache_path + '/components/form/' +
+        'fields/dropdown-form-field.mustache'
     ),
     viewModel: {
       define: {
+        isNoneSelected: {
+          get: function () {
+            return this.attr('value') === null &&
+              this.attr('disabled');
+          }
+        },
         _value: {
+          type: 'string',
           set: function (newValue, setValue, onError, oldValue) {
             setValue(newValue);
             if (oldValue === undefined ||
@@ -28,14 +35,19 @@
             setValue(newValue);
             this.attr('_value', newValue);
           }
+        },
+        fieldId: {
+          type: 'number'
         }
       },
-      fieldId: null,
-      readonly: true,
+      options: [],
+      isGroupedDropdown: false,
+      dropdownOptionsGroups: {},
+      noValue: true,
       valueChanged: function (newValue) {
         this.dispatch({
           type: 'valueChanged',
-          fieldId: this.fieldId,
+          fieldId: this.attr('fieldId'),
           value: newValue
         });
       }

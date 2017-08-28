@@ -5,11 +5,11 @@
 (function (can, GGRC) {
   'use strict';
 
-  GGRC.Components('autoSaveFormFieldView', {
-    tag: 'auto-save-form-field-view',
+  GGRC.Components('localCustomAttributesFieldView', {
+    tag: 'local-custom-attributes-field-view',
     template: can.view(
-      GGRC.mustache_path +
-      '/components/auto-save-form/auto-save-form-field-view.mustache'
+      GGRC.mustache_path + '/components/local-custom-attributes/' +
+        'local-custom-attributes-field-view.mustache'
     ),
     viewModel: {
       type: null,

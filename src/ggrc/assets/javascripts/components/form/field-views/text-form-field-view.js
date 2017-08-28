@@ -8,8 +8,8 @@
   GGRC.Components('textFormFieldView', {
     tag: 'text-form-field-view',
     template: can.view(
-      GGRC.mustache_path +
-      '/components/auto-save-form/field-views/text-form-field-view.mustache'
+      GGRC.mustache_path + '/components/form/' +
+        'field-views/text-form-field-view.mustache'
     ),
     viewModel: {
       value: null,

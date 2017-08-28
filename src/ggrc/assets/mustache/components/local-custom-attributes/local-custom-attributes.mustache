@@ -14,7 +14,7 @@
         {{/if}}
       </div>
       {{#if editMode}}
-        <auto-save-form-field
+        <local-custom-attributes-field
           {type}="type"
           {(value)}="value"
           {field-id}="id"
@@ -22,13 +22,13 @@
           {options}="options"
           (value-changed)="fieldValueChanged(%event, %context)"
           class="form-field__content {{{extraClass type}}"
-        ></auto-save-form-field>
+        ></local-custom-attributes-field>
       {{else}}
-        <auto-save-form-field-view
+        <local-custom-attributes-field-view
           {type}="type"
           {value}="value"
           class="form-field__content {{extraClass type}}"
-        ></auto-save-form-field-view>
+        ></local-custom-attributes-field-view>
       {{/if}}
       {{#unless validation.valid}}
         <div class="form-field__validation-hint-placeholder">

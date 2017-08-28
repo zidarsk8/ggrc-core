@@ -118,7 +118,6 @@
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
-      triggerFormSaveCbs: can.$.Callbacks(),
       setUrlEditMode: function (value, type) {
         this.attr(type + 'EditMode', value);
       },
@@ -345,9 +344,6 @@
             this.attr('instance').save().done(resolve).fail(reject);
           }.bind(this), 1000));
       },
-      onFormSave: function () {
-        this.attr('triggerFormSaveCbs').fire();
-      },
       onStateChange: function (event) {
         var isUndo = event.undo;
         var newStatus = event.state;
@@ -387,12 +383,6 @@
         var globalAttributes = event.globalAttributes;
         var caValues = this.attr('instance.custom_attribute_values');
         CAUtils.applyChangesToCustomAttributeValue(caValues, globalAttributes);
-
-        return this.attr('instance').save();
-      },
-      saveFormFields: function (modifiedFields) {
-        var caValues = this.attr('instance.custom_attribute_values');
-        CAUtils.applyChangesToCustomAttributeValue(caValues, modifiedFields);
 
         return this.attr('instance').save();
       },

@@ -8,8 +8,8 @@
   GGRC.Components('checkboxFormField', {
     tag: 'checkbox-form-field',
     template: can.view(
-      GGRC.mustache_path +
-      '/components/auto-save-form/fields/checkbox-form-field.mustache'
+      GGRC.mustache_path + '/components/form/' +
+        'fields/checkbox-form-field.mustache'
     ),
     viewModel: {
       define: {

@@ -296,22 +296,22 @@ dashboard-js-files:
   - components/assessment/assessment-people.js
   - components/assessment/mapped-objects/mapped-comments.js
   - components/assessment/info-pane/info-pane.js
-  - components/auto-save-form/auto-save-form.js
-  - components/auto-save-form/auto-save-form-status.js
-  - components/auto-save-form/auto-save-form-actions.js
-  - components/auto-save-form/auto-save-form-field.js
-  - components/auto-save-form/auto-save-form-field-view.js
-  - components/auto-save-form/fields/text-form-field.js
-  - components/auto-save-form/fields/rich-text-form-field.js
-  - components/auto-save-form/fields/checkbox-form-field.js
-  - components/auto-save-form/fields/dropdown-form-field.js
-  - components/auto-save-form/fields/date-form-field.js
-  - components/auto-save-form/fields/person-form-field.js
-  - components/auto-save-form/field-views/text-form-field-view.js
-  - components/auto-save-form/field-views/rich-text-form-field-view.js
-  - components/auto-save-form/field-views/checkbox-form-field-view.js
-  - components/auto-save-form/field-views/date-form-field-view.js
-  - components/auto-save-form/field-views/person-form-field-view.js
+  - components/form/fields/text-form-field.js
+  - components/form/fields/rich-text-form-field.js
+  - components/form/fields/checkbox-form-field.js
+  - components/form/fields/dropdown-form-field.js
+  - components/form/fields/date-form-field.js
+  - components/form/fields/person-form-field.js
+  - components/form/field-views/text-form-field-view.js
+  - components/form/field-views/rich-text-form-field-view.js
+  - components/form/field-views/checkbox-form-field-view.js
+  - components/form/field-views/date-form-field-view.js
+  - components/form/field-views/person-form-field-view.js
+  - components/local-custom-attributes/local-custom-attributes.js
+  - components/local-custom-attributes/local-custom-attributes-status.js
+  - components/local-custom-attributes/local-custom-attributes-actions.js
+  - components/local-custom-attributes/local-custom-attributes-field.js
+  - components/local-custom-attributes/local-custom-attributes-field-view.js
   - components/folder-attachments-list/folder-attachments-list.js
   - components/action-toolbar/action-toolbar.js
   - components/action-toolbar-control/action-toolbar-control.js
@@ -321,6 +321,7 @@ dashboard-js-files:
   - components/related-objects/related-documents.js
   - components/assessment/attach-button.js
   - components/assessment/assessment-object-type-dropdown.js
+  - components/assessment/assessment-local-ca.js
   - components/assessment/map-button-using-assessment-type.js
   - components/object-tasks/object-tasks.js
   - components/mapped-counter/mapped-counter.js
@@ -538,21 +539,21 @@ dashboard-js-template-files:
   - components/simple-modal/simple-modal.mustache
   - components/simple-popover/simple-popover.mustache
   - components/page-header/page-header.mustache
-  - components/auto-save-form/auto-save-form.mustache
-  - components/auto-save-form/auto-save-form-actions.mustache
-  - components/auto-save-form/auto-save-form-field.mustache
-  - components/auto-save-form/auto-save-form-field-view.mustache
-  - components/auto-save-form/fields/text-form-field.mustache
-  - components/auto-save-form/fields/rich-text-form-field.mustache
-  - components/auto-save-form/fields/checkbox-form-field.mustache
-  - components/auto-save-form/fields/dropdown-form-field.mustache
-  - components/auto-save-form/fields/date-form-field.mustache
-  - components/auto-save-form/fields/person-form-field.mustache
-  - components/auto-save-form/field-views/text-form-field-view.mustache
-  - components/auto-save-form/field-views/rich-text-form-field-view.mustache
-  - components/auto-save-form/field-views/checkbox-form-field-view.mustache
-  - components/auto-save-form/field-views/date-form-field-view.mustache
-  - components/auto-save-form/field-views/person-form-field-view.mustache
+  - components/form/fields/text-form-field.mustache
+  - components/form/fields/rich-text-form-field.mustache
+  - components/form/fields/checkbox-form-field.mustache
+  - components/form/fields/dropdown-form-field.mustache
+  - components/form/fields/date-form-field.mustache
+  - components/form/fields/person-form-field.mustache
+  - components/form/field-views/text-form-field-view.mustache
+  - components/form/field-views/rich-text-form-field-view.mustache
+  - components/form/field-views/checkbox-form-field-view.mustache
+  - components/form/field-views/date-form-field-view.mustache
+  - components/form/field-views/person-form-field-view.mustache
+  - components/local-custom-attributes/local-custom-attributes.mustache
+  - components/local-custom-attributes/local-custom-attributes-actions.mustache
+  - components/local-custom-attributes/local-custom-attributes-field.mustache
+  - components/local-custom-attributes/local-custom-attributes-field-view.mustache
   - components/object-tasks/object-tasks.mustache
   - components/advanced-search/advanced-search-filter-container.mustache
   - components/advanced-search/advanced-search-filter-attribute.mustache
