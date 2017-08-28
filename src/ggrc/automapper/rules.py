@@ -32,9 +32,9 @@ def get_type_levels():
 Rule = collections.namedtuple("Rule", ["top", "mid", "bottom"])
 
 
-class RuleSet(object):
+class RuleSet(collections.defaultdict):
   """Automapping Rule collection with validation logic."""
-  no_mappings = frozenset()
+  DEFAULT = frozenset()
   _type_levels = get_type_levels()
 
   @classmethod
@@ -67,14 +67,11 @@ class RuleSet(object):
         yield (top, mid, bottom)
 
   def __init__(self, rule_list):
-    self._rules = collections.defaultdict(lambda: self.no_mappings)
+    super(RuleSet, self).__init__(lambda: self.DEFAULT)
 
     # TODO: rewrite so that "for src, dst, mapping in ..." works
     for dst, src, mapping in self._explode_rules(rule_list):
-      self._rules[src, dst] |= {mapping}
-
-  def __getitem__(self, key):
-    return self._rules[key]
+      self[src, dst] |= {mapping}
 
 
 class Types(object):
