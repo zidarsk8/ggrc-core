@@ -8,8 +8,8 @@
   GGRC.Components('richTextFormField', {
     tag: 'rich-text-form-field',
     template: can.view(
-      GGRC.mustache_path +
-      '/components/local-custom-attributes/fields/rich-text-form-field.mustache'
+      GGRC.mustache_path + '/components/form/' +
+        'fields/rich-text-form-field.mustache'
     ),
     viewModel: {
       _value: '',

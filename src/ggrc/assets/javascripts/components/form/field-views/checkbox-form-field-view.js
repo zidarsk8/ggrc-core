@@ -5,11 +5,11 @@
 (function (can, GGRC) {
   'use strict';
 
-  GGRC.Components('personFormFieldView', {
-    tag: 'person-form-field-view',
+  GGRC.Components('checkboxFormFieldView', {
+    tag: 'checkbox-form-field-view',
     template: can.view(
-      GGRC.mustache_path + '/components/local-custom-attributes/' +
-        'field-views/person-form-field-view.mustache'
+      GGRC.mustache_path + '/components/form/' +
+        'field-views/checkbox-form-field-view.mustache'
     ),
     viewModel: {
       value: null,

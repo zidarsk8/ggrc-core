@@ -5,11 +5,11 @@
 (function (can, GGRC) {
   'use strict';
 
-  GGRC.Components('dateFormField', {
-    tag: 'date-form-field',
+  GGRC.Components('textFormField', {
+    tag: 'text-form-field',
     template: can.view(
-      GGRC.mustache_path +
-      '/components/local-custom-attributes/fields/date-form-field.mustache'
+      GGRC.mustache_path + '/components/form/' +
+        'fields/text-form-field.mustache'
     ),
     viewModel: {
       define: {
@@ -17,7 +17,8 @@
           set: function (newValue, setValue, onError, oldValue) {
             setValue(newValue);
             if (oldValue === undefined ||
-                newValue === oldValue) {
+                newValue === oldValue ||
+                newValue.length && !can.trim(newValue).length) {
               return;
             }
             this.valueChanged(newValue);
@@ -31,7 +32,7 @@
         }
       },
       fieldId: null,
-      readonly: true,
+      placeholder: '',
       valueChanged: function (newValue) {
         this.dispatch({
           type: 'valueChanged',

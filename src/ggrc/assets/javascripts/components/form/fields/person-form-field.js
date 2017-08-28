@@ -8,8 +8,8 @@
   GGRC.Components('personFormField', {
     tag: 'person-form-field',
     template: can.view(
-      GGRC.mustache_path +
-      '/components/local-custom-attributes/fields/person-form-field.mustache'
+      GGRC.mustache_path + '/components/form/' +
+        'fields/person-form-field.mustache'
     ),
     viewModel: {
       define: {
