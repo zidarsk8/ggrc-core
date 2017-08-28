@@ -56,8 +56,8 @@ class RuleSet(object):
                                                 rule.bottom):
         cls._assert_type_order(higher=top, lower=mid)
         cls._assert_type_order(higher=mid, lower=bottom)
-        yield (mid, bottom, top, rule)
-        yield (mid, top, bottom, rule)
+        yield (bottom, mid, top, rule)
+        yield (top, mid, bottom, rule)
 
   def __init__(self, count_limit, rule_list):
     self.count_limit = count_limit
@@ -65,7 +65,8 @@ class RuleSet(object):
     self._rules = dict()
     self._rule_source = dict()
 
-    for src, dst, mapping, source in self._explode_rules(rule_list):
+    # TODO: rewrite so that "for src, dst, mapping, source in ..." works
+    for dst, src, mapping, source in self._explode_rules(rule_list):
       key = (src, dst)
       entry = self._rules.get(key, self.entry_empty)
       entry = entry | {mapping}
