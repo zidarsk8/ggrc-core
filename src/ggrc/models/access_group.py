@@ -3,6 +3,7 @@
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
+from ggrc.models.comment import Commentable
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
                                 CustomAttributable)
 from ggrc.models.object_document import PublicDocumentable
@@ -12,7 +13,7 @@ from ggrc.models.track_object_state import HasObjectState
 from ggrc.fulltext.mixin import Indexed
 
 
-class AccessGroup(Roleable, HasObjectState, PublicDocumentable,
+class AccessGroup(Roleable, HasObjectState, PublicDocumentable, Commentable,
                   CustomAttributable, Personable, Relatable,
                   LastDeprecatedTimeboxed, BusinessObject, Indexed, db.Model):
   __tablename__ = 'access_groups'

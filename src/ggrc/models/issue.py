@@ -8,6 +8,7 @@ import itertools
 from ggrc import builder
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
+from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (
     BusinessObject, LastDeprecatedTimeboxed, CustomAttributable, TestPlanned
@@ -24,8 +25,8 @@ from ggrc.fulltext.mixin import Indexed
 
 class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
             PublicDocumentable, Personable, LastDeprecatedTimeboxed,
-            Relatable, AuditRelationship, WithAction, BusinessObject, Indexed,
-            db.Model):
+            Relatable, Commentable, AuditRelationship, WithAction,
+            BusinessObject, Indexed, db.Model):
   """Issue Model."""
 
   __tablename__ = 'issues'
