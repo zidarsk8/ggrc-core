@@ -3,6 +3,7 @@
 
 """Automapping rules generator."""
 
+import collections
 import itertools
 from logging import getLogger
 
@@ -33,7 +34,7 @@ Rule = collections.namedtuple("Rule", ["name", "top", "mid", "bottom"])
 
 class RuleSet(object):
   """Automapping Rule collection with validation logic."""
-  entry_empty = frozenset()
+  no_mappings = frozenset()
   _type_levels = get_type_levels()
 
   @classmethod
@@ -64,29 +65,23 @@ class RuleSet(object):
 
   def __init__(self, count_limit, rule_list):
     self.count_limit = count_limit
-    self._rules = dict()
-    self._rule_source = dict()
+    self._rules = collections.defaultdict(lambda: self.no_mappings)
+    self._rule_source = collections.defaultdict(set)
 
     # TODO: rewrite so that "for src, dst, mapping, source in ..." works
     for dst, src, mapping, source in self._explode_rules(rule_list):
-      key = (src, dst)
-      entry = self._rules.get(key, self.entry_empty)
-      entry = entry | {mapping}
-      self._rules[key] = entry
-
-      sources = self._rule_source.get((src, dst, mapping), set())
-      sources.add(source)
-      self._rule_source[src, dst, mapping] = sources
+      self._rules[src, dst] |= {mapping}
+      self._rule_source[src, dst, mapping] |= {source}
 
     self._freeze()
 
   def _freeze(self):
     for key in self._rules:
-      entry = self._rules[key]
-      self._rules[key] = frozenset(entry)
+      mappings = self._rules[key]
+      self._rules[key] = frozenset(mappings)
 
   def __getitem__(self, key):
-    return self._rules.get(key, RuleSet.entry_empty)
+    return self._rules[key]
 
   def __str__(self):
     lines = []
