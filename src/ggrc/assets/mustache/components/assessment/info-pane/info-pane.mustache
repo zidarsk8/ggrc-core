@@ -222,7 +222,7 @@
               <related-issues {base-instance}="instance"
                                     {all-related-snapshots}="mappedSnapshots"></related-issues>
           </tab-panel>
-          <tab-panel {(panels)}="panels" title-text="Other Attributes">
+          <tab-panel {(panels)}="panels" title-text="Other Attributes" class="assessment-attributes-panel">
               <assessment-custom-attributes (on-update-attributes)="saveGlobalAttributes(%event)"
                                                   {items}="globalAttributes"
                                                   {is-edit-denied}="isEditDenied"
