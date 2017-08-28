@@ -38,28 +38,31 @@ class RuleSet(object):
   _type_levels = get_type_levels()
 
   @classmethod
-  def _assert_type_order(cls, *types):
+  def _assert_type_order(cls, *type_sets):
     """Raise exception if types violate type ordering.
 
     In a correct Rule, the levels of types must not be decreasing.
     """
     try:
-      levels = [cls._type_levels[type_] for type_ in types]
+      levels = [{(cls._type_levels[type_])
+                 for type_ in set_}
+                for set_ in type_sets]
     except KeyError as e:
       raise AutomappingRuleConfigError("Unknown level for {}"
                                        .format(e.args[0]))
 
     for i, level in enumerate(levels[1:], 1):
-      if level < levels[i - 1]:
-        raise AutomappingRuleConfigError("Type {} must be higher than type {}"
-                                         .format(types[i - 1], types[i]))
+      if max(level) < min(levels[i - 1]):
+        raise AutomappingRuleConfigError(
+            "All types {} must be higher than all types {}"
+            .format(type_sets[i - 1], type_sets[i]))
 
   @classmethod
   def _explode_rules(cls, rule_list):
     for rule in rule_list:
+      cls._assert_type_order(rule.top, rule.mid, rule.bottom)
       for top, mid, bottom in itertools.product(rule.top, rule.mid,
                                                 rule.bottom):
-        cls._assert_type_order(top, mid, bottom)
         yield (bottom, mid, top)
         yield (top, mid, bottom)
 
