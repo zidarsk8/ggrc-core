@@ -526,73 +526,6 @@ Mustache.registerHelper("allow_help_edit", function () {
   return options.inverse(this);
 });
 
-Mustache.registerHelper("all", function (type, params, options) {
-  var model = CMS.Models[type] || GGRC.Models[type]
-  , $dummy_content = $(options.fn({}).trim()).first()
-  , tag_name = $dummy_content.prop("tagName")
-  , context = this.instance ? this.instance : this instanceof can.Model.Cacheable ? this : null
-  , require_permission = ""
-  , items_dfd, hook;
-
-  if (!options) {
-    options = params;
-    params = {};
-  } else {
-    params = JSON.parse(resolve_computed(params));
-  }
-  if ("require_permission" in params) {
-    require_permission = params.require_permission;
-    delete params.require_permission;
-  }
-
-  function hookup(element, parent, view_id) {
-    items_dfd.done(function (items) {
-      var val
-      , $parent = $(element.parentNode)
-      , $el = $(element);
-      items = can.map(items, function (item) {
-        if (require_permission === "" || Permission.is_allowed(require_permission, type, item.context.id)) {
-          return item;
-        }
-      });
-      can.each(items, function (item) {
-        $(can.view.frag(options.fn(item), parent)).appendTo(element.parentNode);
-      });
-      if ($parent.is("select")
-        && $parent.attr("name")
-        && context
-      ) {
-        val = context.attr($parent.attr("name"));
-        if (val) {
-          $parent.find("option[value=" + val + "]").attr("selected", true);
-        } else {
-          context.attr($parent.attr("name").substr(0, $parent.attr("name").lastIndexOf(".")), items[0] || null);
-        }
-      }
-      $parent.parent().find(":data(spinner)").each(function (i, el) {
-        var spinner = $(el).data("spinner");
-        if (spinner) spinner.stop();
-      });
-      $el.remove();
-      //since we are removing the original live bound element, replace the
-      // live binding reference to it, with a reference to the new
-      // child nodes. We assume that at least one new node exists.
-      can.view.nodeLists.update($el.get(), $parent.children().get());
-    });
-    return element.parentNode;
-  }
-
-  if ($dummy_content.attr("data-view-id")) {
-    can.view.hookups[$dummy_content.attr("data-view-id")] = hookup;
-  } else {
-    hook = can.view.hook(hookup);
-    $dummy_content.attr.apply($dummy_content, can.map(hook.split('='), function (s) { return s.replace(/'|"| /, "");}));
-  }
-
-  items_dfd = model.findAll(params);
-  return "<" + tag_name + " data-view-id='" + $dummy_content.attr("data-view-id") + "'></" + tag_name + ">";
-});
-
 can.each(["with_page_object_as", "with_current_user_as"], function (fname) {
   Mustache.registerHelper(fname, function (name, options) {
     if (!options) {
@@ -955,34 +888,6 @@ Mustache.registerHelper("person_roles", function (person, scope, options) {
   }
 
   return defer_render('span', finish, roles_deferred);
-});
-
-Mustache.registerHelper("result_direct_mappings", function (bindings, parent_instance, options) {
-  bindings = Mustache.resolve(bindings);
-  bindings = resolve_computed(bindings);
-  parent_instance = Mustache.resolve(parent_instance);
-  var has_direct_mappings = false
-    , has_external_mappings = false
-    , mappings_type = ""
-    , i
-    ;
-
-  if (bindings && bindings.length > 0) {
-    for (i=0; i<bindings.length; i++) {
-      if (bindings[i].instance && parent_instance
-          && bindings[i].instance.reify() === parent_instance.reify())
-        has_direct_mappings = true;
-      else {
-        has_external_mappings = true;
-      }
-    }
-  }
-
-  mappings_type = has_direct_mappings ?
-      (has_external_mappings ? "Dir & Ext" : "Dir") : "Ext";
-  options.context.mappings_type = mappings_type;
-
-  return options.fn(options.contexts);
 });
 
 Mustache.registerHelper("if_result_has_extended_mappings", function (
@@ -1362,34 +1267,6 @@ Mustache.registerHelper("lowercase", function (value, options) {
     return _.isEmpty(value) ? '' : '(' + capitalizeFirst(value) + ')';
   });
 
-Mustache.registerHelper("local_time_range", function (value, start, end, options) {
-  var tokens = [];
-  var sod;
-  value = resolve_computed(value) || undefined;
-  //  Calculate "start of day" in UTC and offsets in local timezone
-  sod = moment(value).startOf("day").utc();
-  start = moment(value).startOf("day").add(moment(start, "HH:mm").diff(moment("0", "Y")));
-  end = moment(value).startOf("day").add(moment(end, "HH:mm").diff(moment("0", "Y")));
-
-  function selected(time) {
-    if (time
-      && value
-      && time.hours() === value.getHours()
-      && time.minutes() === value.getMinutes()
-    ) {
-      return " selected='true'";
-    } else {
-      return "";
-    }
-  }
-
-  while(start.isBefore(end) || start.isSame(end)) {
-    tokens.push("<option value='", start.diff(sod), "'", selected(start), ">", start.format("hh:mm A"), "</option>\n");
-    start.add(1, "hour");
-  }
-  return new Mustache.safeString(tokens.join(""));
-});
-
 Mustache.registerHelper("visibility_delay", function (delay, options) {
   delay = resolve_computed(delay);
 
@@ -1631,12 +1508,6 @@ Mustache.registerHelper("sum", function () {
     sum += parseInt(resolve_computed(arguments[i]), 10);
   }
   return ''+sum;
-});
-
-Mustache.registerHelper("to_class", function (prop, delimiter, options) {
-  prop = resolve_computed(prop) || "";
-  delimiter = (arguments.length > 2 && resolve_computed(delimiter)) || '-';
-  return prop.toLowerCase().replace(/[\s\t]+/g, delimiter);
 });
 
 /*
@@ -1916,52 +1787,6 @@ Mustache.registerHelper("mixed_content_check", function (url, options) {
   }
 });
 
-/**
-  scriptwrap - create live-bound content contained within a <script> tag as CDATA
-  to prevent, e.g. iframes being rendered in hidden fields, or temporary storage
-  of markup being found by $().
-
-  Usage
-  -----
-  To render a section of markup in a script tag:
-  {{#scriptwrap}}<section content>{{/scriptwrap}}
-
-  To render the output of another helper in a script tag:
-  {{scriptwrap "name_of_other_helper" helper_arg helper_arg... hashkey=hashval}}
-
-  Hash keys starting with "attr_" will be treated as attributes to place on the script tag itself.
-  e.g. {{#scriptwrap attr_class="data-popover-content" attr_aria_
-*/
-Mustache.registerHelper("scriptwrap", function (helper) {
-  var extra_attrs = ""
-  , args = can.makeArray(arguments).slice(1, arguments.length)
-  , options = args[args.length - 1] || helper
-  , ret = "<script type='text/html'" + can.view.hook(function (el, parent, view_id) {
-    var c = can.compute(function () {
-      var $d = $("<div>").html(
-        helper === options
-        ? options.fn(options.contexts)  //not calling a separate helper case
-        : Mustache.getHelper(helper, options.contexts).fn.apply(options.context, args));
-      can.view.hookup($d);
-      return "<script type='text/html'" + extra_attrs + ">" + $d.html() + "</script>";
-    });
-
-    can.view.live.html(el, c, parent);
-  });
-
-  if (options.hash) {
-    can.each(Object.keys(options.hash), function (key) {
-      if (/^attr_/.test(key)) {
-        extra_attrs += " " + key.substr(5).replace("_", "-") + "='" + resolve_computed(options.hash[key]) + "'";
-        delete options.hash[key];
-      }
-    });
-  }
-
-  ret += "></script>";
-  return new Mustache.safeString(ret);
-});
-
 Mustache.registerHelper("ggrc_config_value", function (key, default_, options) {
   key = resolve_computed(key);
   if (!options) {
@@ -2019,26 +1844,6 @@ Mustache.registerHelper("if_auditor", function (instance, options) {
     return options.fn(options.contexts);
   }
   return options.inverse(options.contexts);
-});
-
-Mustache.registerHelper("if_verifiers_defined", function (instance, options) {
-  var verifiers;
-
-  instance = Mustache.resolve(instance);
-  instance = !instance ? instance : instance.reify();
-
-  if (!instance) {
-    return '';
-  }
-
-  verifiers = instance.get_binding('related_verifiers');
-
-  return defer_render('span', function(list) {
-    if (list.length) {
-      return options.fn(options.contexts);
-    }
-    return options.inverse(options.contexts);
-  }, verifiers.refresh_instances());
 });
 
 Mustache.registerHelper("switch", function (value, options) {
