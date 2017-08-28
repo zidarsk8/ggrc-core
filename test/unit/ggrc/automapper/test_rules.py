@@ -20,16 +20,13 @@ class TestRuleSet(TestCase):
 
   @mock.patch("ggrc.automapper.rules.TYPE_ORDERING", new=MOCK_TYPE_ORDERING)
   def test_explode_rules_ok(self):
-    rule1 = rules.Rule("T - UM1,LM1 - B1, B3",
-                       {"TopLevel"},
+    rule1 = rules.Rule({"TopLevel"},
                        {"UpperMidLevel1", "LowerMidLevel1"},
                        {"BottomLevel1", "BottomLevel3"})
-    rule2 = rules.Rule("T - T - B2",
-                       {"TopLevel"},
+    rule2 = rules.Rule({"TopLevel"},
                        {"TopLevel"},
                        {"BottomLevel2"})
-    rule3 = rules.Rule("UM2 - LM1 - LM1",
-                       {"UpperMidLevel2"},
+    rule3 = rules.Rule({"UpperMidLevel2"},
                        {"LowerMidLevel1"},
                        {"LowerMidLevel1"})
     rule_list = [rule1, rule2, rule3]
@@ -42,30 +39,29 @@ class TestRuleSet(TestCase):
         sorted(result),
         sorted([
             # rule1 - straight
-            ("TopLevel", "UpperMidLevel1", "BottomLevel1", rule1),
-            ("TopLevel", "UpperMidLevel1", "BottomLevel3", rule1),
-            ("TopLevel", "LowerMidLevel1", "BottomLevel1", rule1),
-            ("TopLevel", "LowerMidLevel1", "BottomLevel3", rule1),
+            ("TopLevel", "UpperMidLevel1", "BottomLevel1"),
+            ("TopLevel", "UpperMidLevel1", "BottomLevel3"),
+            ("TopLevel", "LowerMidLevel1", "BottomLevel1"),
+            ("TopLevel", "LowerMidLevel1", "BottomLevel3"),
             # rule1 - reverse
-            ("BottomLevel1", "LowerMidLevel1", "TopLevel", rule1),
-            ("BottomLevel3", "LowerMidLevel1", "TopLevel", rule1),
-            ("BottomLevel1", "UpperMidLevel1", "TopLevel", rule1),
-            ("BottomLevel3", "UpperMidLevel1", "TopLevel", rule1),
+            ("BottomLevel1", "LowerMidLevel1", "TopLevel"),
+            ("BottomLevel3", "LowerMidLevel1", "TopLevel"),
+            ("BottomLevel1", "UpperMidLevel1", "TopLevel"),
+            ("BottomLevel3", "UpperMidLevel1", "TopLevel"),
             # rule2 - straight
-            ("TopLevel", "TopLevel", "BottomLevel2", rule2),
+            ("TopLevel", "TopLevel", "BottomLevel2"),
             # rule2 - reverse
-            ("BottomLevel2", "TopLevel", "TopLevel", rule2),
+            ("BottomLevel2", "TopLevel", "TopLevel"),
             # rule3 - straight
-            ("UpperMidLevel2", "LowerMidLevel1", "LowerMidLevel1", rule3),
+            ("UpperMidLevel2", "LowerMidLevel1", "LowerMidLevel1"),
             # rule3 - reverse
-            ("LowerMidLevel1", "LowerMidLevel1", "UpperMidLevel2", rule3),
+            ("LowerMidLevel1", "LowerMidLevel1", "UpperMidLevel2"),
         ]),
     )
 
   @mock.patch("ggrc.automapper.rules.TYPE_ORDERING", new=MOCK_TYPE_ORDERING)
   def test_explode_rules_wrong_order(self):
-    rule = rules.Rule("TopLevel is after LowerMidLevel1",
-                      {"LowerMidLevel1"},
+    rule = rules.Rule({"LowerMidLevel1"},
                       {"TopLevel"},
                       {"BottomLevel1"})
 
@@ -78,8 +74,7 @@ class TestRuleSet(TestCase):
 
   @mock.patch("ggrc.automapper.rules.TYPE_ORDERING", new=MOCK_TYPE_ORDERING)
   def test_explode_rules_unknown_type(self):
-    rule = rules.Rule("Lists unknown type",
-                      {"TopLevel"},
+    rule = rules.Rule({"TopLevel"},
                       {"UnknownType"},
                       {"BottomLevel1"})
 

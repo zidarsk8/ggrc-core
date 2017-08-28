@@ -29,7 +29,7 @@ def get_type_levels():
   return indices
 
 
-Rule = collections.namedtuple("Rule", ["name", "top", "mid", "bottom"])
+Rule = collections.namedtuple("Rule", ["top", "mid", "bottom"])
 
 
 class RuleSet(object):
@@ -60,33 +60,18 @@ class RuleSet(object):
       for top, mid, bottom in itertools.product(rule.top, rule.mid,
                                                 rule.bottom):
         cls._assert_type_order(top, mid, bottom)
-        yield (bottom, mid, top, rule)
-        yield (top, mid, bottom, rule)
+        yield (bottom, mid, top)
+        yield (top, mid, bottom)
 
   def __init__(self, rule_list):
     self._rules = collections.defaultdict(lambda: self.no_mappings)
-    self._rule_source = collections.defaultdict(set)
 
-    # TODO: rewrite so that "for src, dst, mapping, source in ..." works
-    for dst, src, mapping, source in self._explode_rules(rule_list):
+    # TODO: rewrite so that "for src, dst, mapping in ..." works
+    for dst, src, mapping in self._explode_rules(rule_list):
       self._rules[src, dst] |= {mapping}
-      self._rule_source[src, dst, mapping] |= {source}
 
   def __getitem__(self, key):
     return self._rules[key]
-
-  def __str__(self):
-    lines = []
-    for key in self._rules:
-      src, dst = key
-      for mapping in self._rules[key]:
-        source = ','.join(r.name for r in self._rule_source[src, dst, mapping])
-        rule = ('  -> %s <--> %s <--> %s <- )' % (dst, src, mapping))
-        rule += ' ' * (70 - len(rule))
-        rule += source
-        lines.append(rule)
-    lines.sort()
-    return 'RulesSet\n' + '\n'.join(lines)
 
 
 class Types(object):
@@ -101,28 +86,28 @@ class Types(object):
 
 rules = RuleSet(rule_list=[
     Rule(
-        'mapping directive to a program',
+        # mapping directive to a program
         {'Program'},
         Types.directives,
         Types.all - {'Program'} - Types.directives,
     ),
 
     Rule(
-        'mapping to sections and clauses',
+        # mapping to sections and clauses
         Types.directives,
         {'Section', 'Clause'},
         {'Objective', 'Control'},
     ),
 
     Rule(
-        'mapping to objective',
+        # mapping to objective
         {'Section'},
         {'Objective'},
         {'Objective', 'Control'},
     ),
 
     Rule(
-        'mapping nested controls',
+        # mapping nested controls
         {'Objective'},
         {'Control'},
         {'Control'},
