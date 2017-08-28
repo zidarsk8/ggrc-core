@@ -19,7 +19,7 @@ TYPE_ORDERING = [['Program'],
 logger = getLogger(__name__)
 
 
-def get_type_indices():
+def get_type_levels():
   """Translate TYPE_ORDERING into type->level map to check rule ordering."""
   indices = dict()
   for i, layer in enumerate(TYPE_ORDERING):
@@ -34,28 +34,31 @@ Rule = collections.namedtuple("Rule", ["name", "top", "mid", "bottom"])
 class RuleSet(object):
   """Automapping Rule collection with validation logic."""
   entry_empty = frozenset()
-  _type_indices = get_type_indices()
+  _type_levels = get_type_levels()
 
   @classmethod
-  def _assert_type_order(cls, higher, lower):
-    """Raise exception if types higher and lower violate type ordering."""
-    i1 = cls._type_indices.get(higher)
-    if i1 is None:
-      raise AutomappingRuleConfigError("Unknown level for {}".format(higher))
-    i2 = cls._type_indices.get(lower)
-    if i2 is None:
-      raise AutomappingRuleConfigError("Unknown level for {}".format(higher))
-    if not i1 <= i2:
-      raise AutomappingRuleConfigError("Type {} must be higher than type {}"
-                                       .format(higher, lower))
+  def _assert_type_order(cls, *types):
+    """Raise exception if types violate type ordering.
+
+    In a correct Rule, the levels of types must not be decreasing.
+    """
+    try:
+      levels = [cls._type_levels[type_] for type_ in types]
+    except KeyError as e:
+      raise AutomappingRuleConfigError("Unknown level for {}"
+                                       .format(e.args[0]))
+
+    for i, level in enumerate(levels[1:], 1):
+      if level < levels[i - 1]:
+        raise AutomappingRuleConfigError("Type {} must be higher than type {}"
+                                         .format(types[i - 1], types[i]))
 
   @classmethod
   def _explode_rules(cls, rule_list):
     for rule in rule_list:
       for top, mid, bottom in itertools.product(rule.top, rule.mid,
                                                 rule.bottom):
-        cls._assert_type_order(higher=top, lower=mid)
-        cls._assert_type_order(higher=mid, lower=bottom)
+        cls._assert_type_order(top, mid, bottom)
         yield (bottom, mid, top, rule)
         yield (top, mid, bottom, rule)
 

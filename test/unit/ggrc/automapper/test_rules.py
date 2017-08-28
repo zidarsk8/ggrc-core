@@ -34,7 +34,7 @@ class TestRuleSet(TestCase):
                        {"LowerMidLevel1"})
     rule_list = [rule1, rule2, rule3]
 
-    rules.RuleSet._type_indices = rules.get_type_indices()
+    rules.RuleSet._type_levels = rules.get_type_levels()
 
     result = rules.RuleSet._explode_rules(rule_list)
 
@@ -69,7 +69,7 @@ class TestRuleSet(TestCase):
                       {"TopLevel"},
                       {"BottomLevel1"})
 
-    rules.RuleSet._type_indices = rules.get_type_indices()
+    rules.RuleSet._type_levels = rules.get_type_levels()
 
     with self.assertRaises(rules.AutomappingRuleConfigError):
       for _ in rules.RuleSet._explode_rules([rule]):
@@ -83,7 +83,7 @@ class TestRuleSet(TestCase):
                       {"UnknownType"},
                       {"BottomLevel1"})
 
-    rules.RuleSet._type_indices = rules.get_type_indices()
+    rules.RuleSet._type_levels = rules.get_type_levels()
 
     with self.assertRaises(rules.AutomappingRuleConfigError):
       for _ in rules.RuleSet._explode_rules([rule]):
