@@ -61,7 +61,6 @@ class RuleSet(object):
 
   def __init__(self, count_limit, rule_list):
     self.count_limit = count_limit
-    self._rule_list = rule_list
     self._rules = dict()
     self._rule_source = dict()
 
@@ -85,9 +84,6 @@ class RuleSet(object):
 
   def __getitem__(self, key):
     return self._rules.get(key, RuleSet.entry_empty)
-
-  def __repr__(self):
-    return 'Rules(%s)' % repr(self._rule_list)
 
   def __str__(self):
     lines = []
