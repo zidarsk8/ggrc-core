@@ -44,21 +44,13 @@
               {instance}="instance"
               {title}="title"
               {people}="results">
-                <confirm-edit-action
-                  (set-edit-mode)="changeEditableMode(true)"
-                  (set-in-progress)="setInProgressState()"
-                  {is-edit-icon-denied}="isEditDenied"
-                  {instance}="instance"
-                  {on-state-change-dfd}="onStateChangeDfd"
-                  {edit-mode}="editMode">
-                    <editable-people-group-header
-                      {editable-mode}="editableMode"
-                      {is-loading}="isLoading"
-                      {can-edit}="canEdit"
-                      {required}="required"
-                      (edit-people-group)="confirmEdit()">
-                    </editable-people-group-header>
-                </confirm-edit-action>
+                <editable-people-group-header
+                  {editable-mode}="editableMode"
+                  {is-loading}="isLoading"
+                  {can-edit}="canEdit"
+                  {required}="required"
+                  (edit-people-group)="changeEditableMode(true)">
+                </editable-people-group-header>
             </editable-people-group>
           {{else}}
             <deletable-people-group
