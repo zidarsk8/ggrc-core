@@ -5,19 +5,18 @@
 (function (can, GGRC) {
   'use strict';
 
-  GGRC.Components('dateFormField', {
-    tag: 'date-form-field',
+  GGRC.Components('checkboxFormField', {
+    tag: 'checkbox-form-field',
     template: can.view(
       GGRC.mustache_path +
-      '/components/auto-save-form/fields/date-form-field.mustache'
+      '/components/local-custom-attributes/fields/checkbox-form-field.mustache'
     ),
     viewModel: {
       define: {
         _value: {
           set: function (newValue, setValue, onError, oldValue) {
             setValue(newValue);
-            if (oldValue === undefined ||
-                newValue === oldValue) {
+            if (oldValue === undefined) {
               return;
             }
             this.valueChanged(newValue);
@@ -31,7 +30,6 @@
         }
       },
       fieldId: null,
-      readonly: true,
       valueChanged: function (newValue) {
         this.dispatch({
           type: 'valueChanged',

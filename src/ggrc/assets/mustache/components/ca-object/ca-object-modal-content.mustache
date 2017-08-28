@@ -7,12 +7,12 @@
         <div class="field__title form-field__title">
           <label class="field__title-text">{{content.title}}</label>
         </div>
-          <auto-save-form-field
+          <local-custom-attributes-field
             {type}="content.type"
             {value}="content.value"
             {options}="content.options"
             {disabled}="true"
-          ></auto-save-form-field>
+          ></local-custom-attributes-field>
     </div>
       {{#if comment}}
           <div class="simple-modal__section">

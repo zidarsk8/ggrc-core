@@ -9,8 +9,8 @@
   var UNSAVED_TEXT = 'Unsaved changes';
   var IS_SAVING_TEXT = 'Saving...';
 
-  GGRC.Components('autoSaveFormStatus', {
-    tag: 'auto-save-form-status',
+  GGRC.Components('localCustomAttributesStatus', {
+    tag: 'local-custom-attributes-status',
     template: '<content></content>',
     viewModel: {
       define: {

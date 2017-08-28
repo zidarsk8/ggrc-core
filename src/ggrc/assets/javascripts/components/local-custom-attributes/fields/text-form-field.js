@@ -9,7 +9,7 @@
     tag: 'text-form-field',
     template: can.view(
       GGRC.mustache_path +
-      '/components/auto-save-form/fields/text-form-field.mustache'
+      '/components/local-custom-attributes/fields/text-form-field.mustache'
     ),
     viewModel: {
       define: {

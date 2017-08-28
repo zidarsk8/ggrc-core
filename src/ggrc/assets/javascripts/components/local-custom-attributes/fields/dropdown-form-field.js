@@ -5,18 +5,26 @@
 (function (can, GGRC) {
   'use strict';
 
-  GGRC.Components('checkboxFormField', {
-    tag: 'checkbox-form-field',
+  GGRC.Components('dropdownFormField', {
+    tag: 'dropdown-form-field',
     template: can.view(
       GGRC.mustache_path +
-      '/components/auto-save-form/fields/checkbox-form-field.mustache'
+      '/components/local-custom-attributes/fields/dropdown-form-field.mustache'
     ),
     viewModel: {
       define: {
+        isNoneSelected: {
+          get: function () {
+            return this.attr('value') === null &&
+              this.attr('disabled');
+          }
+        },
         _value: {
+          type: 'string',
           set: function (newValue, setValue, onError, oldValue) {
             setValue(newValue);
-            if (oldValue === undefined) {
+            if (oldValue === undefined ||
+                newValue === oldValue) {
               return;
             }
             this.valueChanged(newValue);
@@ -27,13 +35,19 @@
             setValue(newValue);
             this.attr('_value', newValue);
           }
+        },
+        fieldId: {
+          type: 'number'
         }
       },
-      fieldId: null,
+      options: [],
+      isGroupedDropdown: false,
+      dropdownOptionsGroups: {},
+      noValue: true,
       valueChanged: function (newValue) {
         this.dispatch({
           type: 'valueChanged',
-          fieldId: this.fieldId,
+          fieldId: this.attr('fieldId'),
           value: newValue
         });
       }

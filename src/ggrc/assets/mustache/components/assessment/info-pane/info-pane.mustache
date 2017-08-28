@@ -67,7 +67,7 @@
                 </div>
                 <div class="assessment-controls info-pane__section">
                     <div class="assessment-note">
-                        <auto-save-form-status
+                        <local-custom-attributes-status
                                 {form-saving}="formState.saving"
                                 {is-dirty}="formState.isDirty">
                                 <loading-status
@@ -76,7 +76,7 @@
                                     always-Show-Text="true"
                                     show-Spinner="true">
                                 </loading-status>
-                        </auto-save-form-status>
+                        </local-custom-attributes-status>
                         <i class="fa fa-question-circle" rel="tooltip"
                            data-original-title="Respond to assessment here. Use comments on the right for free text responses."></i>
                     </div>
@@ -167,11 +167,11 @@
                         {^form-saved-deferred}="formState.formSavedDeferred"
                         {^is-dirty}="formState.isDirty"
                         (validation-changed)="showRequiredInfoModal(%event)">
-                        <auto-save-form
+                        <local-custom-attributes
                             {fields}="fields"
                             {edit-mode}="editMode"
                             (value-changed)="attributeChanged(%event)">
-                        </auto-save-form>
+                        </local-custom-attributes>
                     </assessment-local-ca>
                     <!-- Modal Window to fix validation issues of CA fields -->
                     {{#if modal.state}}

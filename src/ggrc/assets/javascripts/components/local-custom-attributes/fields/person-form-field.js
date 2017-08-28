@@ -9,7 +9,7 @@
     tag: 'person-form-field',
     template: can.view(
       GGRC.mustache_path +
-      '/components/auto-save-form/fields/person-form-field.mustache'
+      '/components/local-custom-attributes/fields/person-form-field.mustache'
     ),
     viewModel: {
       define: {

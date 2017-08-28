@@ -5,11 +5,11 @@
 (function (can, GGRC) {
   'use strict';
 
-  GGRC.Components('personFormFieldView', {
-    tag: 'person-form-field-view',
+  GGRC.Components('dateFormFieldView', {
+    tag: 'date-form-field-view',
     template: can.view(
-      GGRC.mustache_path +
-      '/components/auto-save-form/field-views/person-form-field-view.mustache'
+      GGRC.mustache_path + '/components/local-custom-attributes/' +
+        'field-views/date-form-field-view.mustache'
     ),
     viewModel: {
       value: null,

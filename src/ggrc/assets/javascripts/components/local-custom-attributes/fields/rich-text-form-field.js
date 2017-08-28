@@ -9,7 +9,7 @@
     tag: 'rich-text-form-field',
     template: can.view(
       GGRC.mustache_path +
-      '/components/auto-save-form/fields/rich-text-form-field.mustache'
+      '/components/local-custom-attributes/fields/rich-text-form-field.mustache'
     ),
     viewModel: {
       _value: '',

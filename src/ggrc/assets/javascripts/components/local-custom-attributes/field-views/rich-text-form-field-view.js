@@ -5,11 +5,11 @@
 (function (can, GGRC) {
   'use strict';
 
-  GGRC.Components('checkboxFormFieldView', {
-    tag: 'checkbox-form-field-view',
+  GGRC.Components('richTextFormFieldView', {
+    tag: 'rich-text-form-field-view',
     template: can.view(
-      GGRC.mustache_path +
-      '/components/auto-save-form/field-views/checkbox-form-field-view.mustache'
+      GGRC.mustache_path + '/components/local-custom-attributes/field-views' +
+        '/rich-text-form-field-view.mustache'
     ),
     viewModel: {
       value: null,

@@ -5,11 +5,11 @@
 (function (can) {
   'use strict';
 
-  GGRC.Components('autoSaveFormActions', {
-    tag: 'auto-save-form-actions',
+  GGRC.Components('localCustomAttributesActions', {
+    tag: 'local-custom-attributes-actions',
     template: can.view(
-      GGRC.mustache_path +
-      '/components/auto-save-form/auto-save-form-actions.mustache'
+      GGRC.mustache_path + '/components/local-custom-attributes/' +
+        'local-custom-attributes-actions.mustache'
     ),
     viewModel: {
       formEditMode: false,
