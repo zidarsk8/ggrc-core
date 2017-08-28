@@ -10,6 +10,7 @@
       <i class="fa fa-caret-down"></i>
     </a>
     <ul>
+      <lazy-render trigger="activated">
       <!---->
       {{#if instance.viewLink}}
         <!-- Link for open instance on info panel at bottom -->
@@ -30,10 +31,13 @@
           {{/unless}}
       {{/if}}
 
-      {{#if isAllowedToEdit}}
+
+      {{#if isAllowedToMap}}
         <li>
           <tree-item-map {instance}="instance"></tree-item-map>
         </li>
+      {{/if}}
+      {{#if isAllowedToEdit}}
         {{#is_allowed 'update' instance context='for'}}
           <li>
             <a href="javascript://"
@@ -77,6 +81,7 @@
         </li>
         {{/if}}
       {{/unless}}
+      </lazy-render>
     </ul>
   </div>
 </div>

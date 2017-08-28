@@ -10,10 +10,10 @@
         <tab-panel {(panels)}="panels" title-text="Attributes">
             <div class="fields-wrapper flex-box flex-row">
                 <show-more items="selectedAssessmentFields">
-                    <div class="field-wrapper flex-size-1">
+                    <div class="field-wrapper flex-size-1 {{extraClass type}}">
                         <form-validation-icon {validation}="validation"></form-validation-icon>
                         <div class="field__title form-field__title">
-                            <label class="field__title-text" for="form-field-{{id}}">{{title}}</label>
+                            <label class="field__title-text {{extraClass type}}" for="form-field-{{id}}">{{title}}</label>
                             {{#if helptext}}
                                 <i class="fa fa-question-circle field__title-helper-text" rel="tooltip" title="{{helptext}}"></i>
                             {{/if}}
@@ -21,6 +21,7 @@
                         <auto-save-form-field-view
                                 {type}="type"
                                 {value}="value"
+                                class="form-field__content {{{extraClass type}}"
                         ></auto-save-form-field-view>
                     </div>
                 </show-more>

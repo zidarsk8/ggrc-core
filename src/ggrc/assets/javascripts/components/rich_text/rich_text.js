@@ -116,8 +116,10 @@
         var editor = this.attr('editor');
         var activeElement = document.activeElement;
 
+        // checks case when we click on another rich-text component
+        // or outside of component
         if (editor.hasFocus() ||
-          $(activeElement).closest('.rich-text__content').length) {
+          $(activeElement).closest('rich-text').viewModel() === this) {
           this.attr('editorHasFocus', true);
           return;
         }
@@ -125,8 +127,11 @@
         this.attr('editorHasFocus', false);
       },
       onRemoved: function () {
-        this.attr('editor')
-          .off('selection-change', this.onSelectionChang);
+        var editor = this.getEditor();
+
+        if (this.attr('hiddenToolbar') && editor) {
+          editor.off('selection-change');
+        }
       },
       onChange: function (delta) {
         var match;

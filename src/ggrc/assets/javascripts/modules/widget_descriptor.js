@@ -71,8 +71,11 @@
         '/base_objects/dashboard.mustache';
       return new this(
         instance.constructor.shortName + ':dashboard', {
-          widget_id: 'Dashboard',
+          widget_id: 'dashboard',
           widget_name: function () {
+            if (instance.constructor.title_singular === 'Person') {
+              return 'Dashboard';
+            }
             return instance.constructor.title_singular + ' Dashboard';
           },
           widget_icon: 'tachometer',
@@ -82,7 +85,7 @@
             model: instance.constructor,
             widget_view: widgetView || defaultView
           },
-          order: 2
+          order: 6
         });
     },
     /*

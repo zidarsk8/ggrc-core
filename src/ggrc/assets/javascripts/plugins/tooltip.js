@@ -8,7 +8,7 @@
   var tooltipPrototype = $.fn.tooltip.Constructor.prototype;
   var bootstrapTooltipShow = tooltipPrototype.show;
   var bootstrapTooltipHide = tooltipPrototype.hide;
-  var actions;
+  var actions = {};
 
   tooltipPrototype.show = function () {
     if (!this.hasContent() || !this.enabled) {

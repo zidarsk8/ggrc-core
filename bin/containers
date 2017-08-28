@@ -7,7 +7,7 @@ set -o errexit
 
 declare -r SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
-declare -r DOCKERFILE_DEV="docker-compose-clean.yml"
+declare -r DOCKERFILE_DEV="docker-compose.yml"
 declare -r DOCKERFILE_DEPLOY="docker-compose-deploy.yml"
 
 cd "${SCRIPTPATH}/../"

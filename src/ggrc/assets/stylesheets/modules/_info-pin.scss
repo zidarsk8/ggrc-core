@@ -16,6 +16,45 @@
   transition: height 0.3s ease-in, z-index 0.3s ease-in, opacity 0.3s ease-in;
 
   .info {
+    > .spinner-wrapper {
+      display: none;
+    }
+  }
+
+  &.loading {
+    overflow: hidden;
+
+    .info {
+      // Should affect only direct children
+      > .spinner-wrapper {
+        align-items: center;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        left: 0;
+        right: 0;
+        top: 0;
+        position: absolute;
+        z-index: 1;
+
+        .spinner {
+          font-size: 18px;
+
+          .fa {
+            color: $defaultWidget;
+            font-size: 32px;
+          }
+        }
+      }
+
+      .tier-content {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+    }
+  }
+
+  .info {
     box-shadow: none;
     padding: 15px 25px 20px;
     .small-info {

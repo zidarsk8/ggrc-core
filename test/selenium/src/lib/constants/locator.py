@@ -734,8 +734,8 @@ class WidgetInfoAssessment(WidgetInfoPanel):
   # Code section
   _CODE = "assessment-inline-item[prop-name='slug'] "
   CODE_CSS = (By.CSS_SELECTOR, _CODE)
-  CODE_HEADER_CSS = (By.CSS_SELECTOR, _CODE + " .info-pane__section-title")
-  CODE_VALUE_CSS = (By.CSS_SELECTOR, _CODE + " .inline__content-wrapper")
+  CODE_HEADER_CSS = (By.CSS_SELECTOR, _CODE + ".ggrc-form__title")
+  CODE_VALUE_CSS = (By.CSS_SELECTOR, _CODE + ".read-more__body")
   # comments section
   COMMENTS_CSS = (By.CSS_SELECTOR, ".assessment-comments")
   # asmt tab container
@@ -1153,7 +1153,7 @@ class AssessmentLogTab(object):
   CELLS_CSS = (By.CSS_SELECTOR, '.third-col')
   COMMENT_PERSON_CSS = (By.CSS_SELECTOR, '.person-tooltip-trigger')
   PERSON_LABEL = (By.CSS_SELECTOR, '.person-label')
-  LOG_LIST_CSS = Common.HTML_LIST_CSS
+  LOG_LIST_CSS = (By.CSS_SELECTOR, ' .w-status')
   LOG_TAB_SPINNER_CSS = (By.CSS_SELECTOR, '.spinner')
 
 

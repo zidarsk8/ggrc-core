@@ -14,11 +14,26 @@
     tag: tag,
     template: template,
     viewModel: {
+      define: {
+        hasPermissions: {
+          get: function (prevValue, setValue) {
+            var instance = this.attr('instance');
+            if (Permission.is_allowed_for('update', instance) &&
+              !instance.archived) {
+              this.checkFolder().always(function () {
+                setValue(true);
+              });
+            } else {
+              setValue(false);
+            }
+          }
+        }
+      },
       canAttach: false,
       isFolderAttached: false,
       checksPassed: false,
       error: {},
-      instance: {},
+      instance: null,
       isAttachActionDisabled: false,
       onBeforeCreate: function (event) {
         var items = event.items;
@@ -89,19 +104,6 @@
 
           return GFolder.findOne({id: id});
         });
-      }
-    },
-    events: {
-      inserted: function () {
-        var viewModel = this.viewModel;
-        var instance = viewModel.attr('instance');
-
-        if (Permission.is_allowed_for('update', instance) &&
-          !instance.archived) {
-          viewModel.checkFolder().always(function () {
-            viewModel.attr('hasPermissions', true);
-          });
-        }
       }
     }
   });

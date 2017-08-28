@@ -52,6 +52,7 @@ dashboard-js-files:
   - plugins/utils/ggrcq-utils.js
   - plugins/utils/tree-view-utils.js
   - plugins/utils/dashboards-utils.js
+  - plugins/utils/deferred-transaction-utils.js
   - plugins/utils/controllers.js
   - plugins/utils/modals.js
   - plugins/datepicker.js
@@ -167,7 +168,6 @@ dashboard-js-files:
   - components/collapsible-panel/collapsible-panel-header.js
   - components/collapsible-panel/collapsible-panel-body.js
   - components/read-more/read-more.js
-  - components/assessment/urls-list.js
   - components/assessment/custom-attributes.js
   - components/assessment/inline.js
   - components/comment/comment-add-form.js
@@ -189,6 +189,7 @@ dashboard-js-files:
   - components/related-objects/related-comments.js
   - components/related-objects/related-controls-objectives.js
   - components/related-objects/related-issues.js
+  - components/related-objects/related-evidences-and-urls.js
   - components/object-state-toolbar/object-state-toolbar.js
   - components/object-list/object-list.js
   - components/ca-object/ca-object.js
@@ -207,6 +208,7 @@ dashboard-js-files:
   - components/dropdown/multiselect-dropdown.js
   - components/autocomplete/autocomplete.js
   - components/datepicker/datepicker.js
+  - components/prev-next-buttons/prev-next-buttons.js
   - components/person/person.js
   - components/inline_edit/inline.js
   - components/inline_edit/inline_checkbox.js
@@ -274,7 +276,6 @@ dashboard-js-files:
   - components/view-object-buttons/view-object-buttons.js
   - components/add-object-button/add-object-button.js
   - components/add-issue-button/add-issue-button.js
-  - components/add-mapping-button/add-mapping-button.js
   - components/effective-dates/effective-dates.js
   - components/snapshotter/revisions-comparer.js
   - components/snapshotter/scope-update.js
@@ -326,6 +327,7 @@ dashboard-js-files:
   - components/people/deletable-people-group.js
   - components/people/editable-people-group.js
   - components/people/people-list-info.js
+  - components/people/editable-people-group-header.js
   - components/related-objects/related-people-mapping.js
   - components/related-objects/related-people-access-control.js
   - components/related-objects/related-people-access-control-group.js
@@ -338,6 +340,11 @@ dashboard-js-files:
   - components/inline/base-inline-control-title.js
   - components/assessment/info-pane/inline-item.js
   - components/assessment/info-pane/confirm-edit-action.js
+  - components/assessment/info-pane/create-url.js
+  - components/assessment/info-pane-save-status.js
+  - components/loading/loading-status.js
+  - components/object-list-item/object-list-item-updater.js
+  - components/lazy-render/lazy-render.js
 
 app-init-files:
   - apps/dashboard.js
@@ -362,7 +369,6 @@ dashboard-js-template-files:
   - components/assessment/mapped-objects/mapped-related-information.mustache
   - components/assessment/assessment-people.mustache
   - components/assessment/mapped-objects/mapped-comments.mustache
-  - components/assessment/urls-list.mustache
   - components/assessment/custom-attributes.mustache
   - components/assessment/inline/inline.mustache
   - components/assessment/inline/text.mustache
@@ -391,7 +397,6 @@ dashboard-js-template-files:
   - components/view-object-buttons/view-object-buttons.mustache
   - components/add-object-button/add-object-button.mustache
   - components/add-issue-button/add-issue-button.mustache
-  - components/add-mapping-button/add-mapping-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
   - components/questions-link/questions-link.mustache
   - components/folder-attachments-list/folder-attachments-list.mustache
@@ -439,8 +444,8 @@ dashboard-js-template-files:
   - base_objects/open_close.mustache
   - base_objects/sub_tree_type_selector.mustache
   - base_objects/mapper-item-description.mustache
+  - base_objects/dashboard_widget.mustache
   - base_templates/objects_tooltip.mustache
-  - base_templates/url_list.mustache
   - base_templates/attachment.mustache
   - base_templates/base.mustache
   - base_templates/comment_list.mustache
@@ -508,6 +513,7 @@ dashboard-js-template-files:
   - components/dropdown/dropdown.mustache
   - components/dropdown/multiselect_dropdown.mustache
   - components/revision-log/revision-log.mustache
+  - components/prev-next-buttons/prev-next-buttons.mustache
   - components/person/person.mustache
   - components/spinner/spinner.mustache
   - components/rich_text/rich_text.mustache
@@ -660,7 +666,6 @@ dashboard-js-template-files:
   - audits/tree-item-attr.mustache
   - audits/info.mustache
   - audits/summary.mustache
-  - audits/dashboard.mustache
   - audits/tree_add_item.mustache
   - audits/search_result.mustache
   - audits/extended_info.mustache
@@ -693,6 +698,7 @@ dashboard-js-template-files:
   - components/people/deletable-people-group.mustache
   - components/people/editable-people-group.mustache
   - components/people/people-list-info.mustache
+  - components/people/editable-people-group-header.mustache
   - components/custom-roles/custom-roles.mustache
   - components/custom-roles/custom-roles-modal.mustache
   - components/inline/inline.mustache
@@ -700,6 +706,7 @@ dashboard-js-template-files:
   - components/inline/simple-readonly-text.mustache
   - components/inline/base-inline-control-title.mustache
   - components/assessment/info-pane/inline-item.mustache
+  - components/loading/loading-status.mustache
 
 dashboard-css-files:
   - dashboard.css

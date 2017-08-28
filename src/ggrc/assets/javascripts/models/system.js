@@ -127,9 +127,6 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
   init: function () {
     this._super && this._super.apply(this, arguments);
     this.attr('is_biz_process', false);
-  },
-  after_save: function () {
-    this.dispatch('refreshRelatedDocuments');
   }
 });
 
@@ -169,8 +166,5 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
   init: function () {
     this._super && this._super.apply(this, arguments);
     this.attr('is_biz_process', true);
-  },
-  after_save: function () {
-    this.dispatch('refreshRelatedDocuments');
   }
 });

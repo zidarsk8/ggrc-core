@@ -39,7 +39,7 @@
 
           if (pageType === 'Workflow') {
             return !this.isBacklog() &&
-              this.attr('cycle').reify().is_current;
+              this.attr('cycle').reify().attr('is_current');
           }
 
           return allowChangeState;

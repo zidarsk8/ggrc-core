@@ -35,7 +35,7 @@ try:
 except (ImportError):
   pass
 
-VERSION = "0.10.27-Raspberry" + BUILD_NUMBER
+VERSION = "0.10.28-Raspberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -126,10 +126,15 @@ DEBUG_BENCHMARK = os.environ.get("GGRC_BENCHMARK")
 GGRC_Q_INTEGRATION_URL = os.environ.get('GGRC_Q_INTEGRATION_URL', '')
 
 # Dashboard integration
-AUDIT_DASHBOARD_INTEGRATION_URL = os.environ.get(
-    'AUDIT_DASHBOARD_INTEGRATION_URL',
-    '',
-)
+_DEFAULT_DASHBOARD_INTEGRATION_CONFIG = {
+    "ca_name_regexp": r"^Dashboard_(.*)$",
+    "ca_value_regexp": r"^https?://[^\s]+$",
+}
+
+if bool(os.environ.get("DASHBOARD_INTEGRATION", "")):
+  DASHBOARD_INTEGRATION = _DEFAULT_DASHBOARD_INTEGRATION_CONFIG.copy()
+else:
+  DASHBOARD_INTEGRATION = None
 
 # App2app QueryAPI endpoints
 ALLOWED_QUERYAPI_APP_IDS = os.environ.get(

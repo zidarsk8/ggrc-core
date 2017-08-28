@@ -10,8 +10,9 @@
 import pytest
 
 from lib import base
-from lib.constants import messages, objects
+from lib.constants import messages, objects, element
 from lib.constants.element import Lhn, MappingStatusAttrs
+from lib.entities import entities_factory
 from lib.factory import get_ui_service
 from lib.page import dashboard
 from lib.service import webui_service
@@ -211,17 +212,15 @@ class TestSnapshots(base.Test):
     audit_with_two_controls = (
         create_audit_and_update_first_of_two_original_controls)
     audit = audit_with_two_controls["audit"]
-    # due to 'actual_control.custom_attributes = {None: None}'
-    expected_control = (audit_with_two_controls["control"].repr_ui().
-                        update_attrs(custom_attributes={None: None}))
+    expected_control = audit_with_two_controls["control"].repr_ui()
     actual_controls_tab_count = (webui_service.ControlsService(selenium).
                                  get_count_objs_from_tab(src_obj=audit))
     assert len([expected_control]) == actual_controls_tab_count
     actual_controls = (webui_service.ControlsService(selenium).
                        get_list_objs_from_tree_view(src_obj=audit))
-    assert [expected_control] == actual_controls, (
-        messages.AssertionMessages.
-        format_err_msg_equal([expected_control], actual_controls))
+    # due to 'actual_control.custom_attributes = {None: None}'
+    self.general_assert(
+        [expected_control], actual_controls, "custom_attributes")
 
   @pytest.mark.smoke_tests
   def test_bulk_update_audit_objects_to_latest_ver(
@@ -237,11 +236,9 @@ class TestSnapshots(base.Test):
     audit_with_two_controls = (
         create_audit_and_update_first_of_two_original_controls)
     audit = audit_with_two_controls["audit"]
-    # due to 'actual_control.custom_attributes = {None: None}'
-    expected_controls = [
-        expected_control.repr_ui().update_attrs(custom_attributes={None: None})
-        for expected_control in [audit_with_two_controls["updated_control"],
-                                 audit_with_two_controls["second_control"]]]
+    expected_controls = [expected_control.repr_ui() for expected_control
+                         in [audit_with_two_controls["updated_control"],
+                             audit_with_two_controls["second_control"]]]
     (webui_service.AuditsService(selenium).
      bulk_update_via_info_page(audit_obj=audit))
     actual_controls_tab_count = (webui_service.ControlsService(selenium).
@@ -249,9 +246,9 @@ class TestSnapshots(base.Test):
     assert len(expected_controls) == actual_controls_tab_count
     actual_controls = (webui_service.ControlsService(selenium).
                        get_list_objs_from_tree_view(src_obj=audit))
-    assert expected_controls == actual_controls, (
-        messages.AssertionMessages.
-        format_err_msg_equal(expected_controls, actual_controls))
+    # due to 'actual_control.custom_attributes = {None: None}'
+    self.general_assert(expected_controls, actual_controls,
+                        "custom_attributes")
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize("tab_name", [Lhn.ALL_OBJS, Lhn.MY_OBJS])
@@ -296,9 +293,9 @@ class TestSnapshots(base.Test):
     expected_control = (audit_with_one_control[version_of_ctrl][0].repr_ui().
                         update_attrs(custom_attributes={None: None}))
     filter_exp = FilterUtils.get_filter_exp_by_title(expected_control.title)
-    actual_controls = (
-        webui_service.ControlsService(selenium).
-        filter_list_objs_from_tree_view(src_obj=audit, filter_exp=filter_exp))
+    actual_controls = (webui_service.ControlsService(selenium).
+                       filter_and_get_list_objs_from_tree_view(
+                           src_obj=audit, filter_exp=filter_exp))
     assert (expected_control in
             [ctrls for ctrls in actual_controls]
             ) == is_found, (
@@ -437,10 +434,9 @@ class TestSnapshots(base.Test):
     "Checking assessment"
     "Checking issue"
     """
-    # due to 'actual_control.custom_attributes = {None: None}'
     expected_control = (
         create_audit_with_control_and_update_control["new_control_rest"][0].
-        repr_ui().update_attrs(custom_attributes={None: None}))
+        repr_ui())
     source_obj = dynamic_object
     control_service = webui_service.ControlsService(selenium)
     control_service.map_objs_via_tree_view(src_obj=source_obj,
@@ -449,9 +445,9 @@ class TestSnapshots(base.Test):
         src_obj=source_obj)
     actual_controls = control_service.get_list_objs_from_tree_view(source_obj)
     assert len([expected_control]) == actual_controls_count_in_tab
-    assert [expected_control] == actual_controls, (
-        messages.AssertionMessages.
-        format_err_msg_equal([expected_control], actual_controls))
+    # due to 'actual_control.custom_attributes = {None: None}'
+    self.general_assert([expected_control], actual_controls,
+                        "custom_attributes")
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -470,10 +466,7 @@ class TestSnapshots(base.Test):
     "Checking issue"
     """
     audit_with_one_control = create_audit_with_control_and_update_control
-    # due to 'actual_control.custom_attributes = {None: None}'
-    expected_control = (
-        audit_with_one_control["new_control_rest"][0].
-        repr_ui().update_attrs(custom_attributes={None: None}))
+    expected_control = audit_with_one_control["new_control_rest"][0].repr_ui()
     audit = audit_with_one_control["new_audit_rest"][0]
     existing_obj = dynamic_object
     existing_obj_service = get_ui_service(existing_obj.type)(selenium)
@@ -485,9 +478,9 @@ class TestSnapshots(base.Test):
     actual_controls = (controls_service.get_list_objs_from_tree_view(
         src_obj=existing_obj))
     assert len([expected_control]) == actual_controls_count
-    assert [expected_control] == actual_controls, (
-        messages.AssertionMessages.
-        format_err_msg_equal([expected_control], actual_controls))
+    # due to 'actual_control.custom_attributes = {None: None}'
+    self.general_assert([expected_control], actual_controls,
+                        "custom_attributes")
 
   @pytest.mark.xfail(strict=True)
   @pytest.mark.smoke_tests
@@ -537,14 +530,14 @@ class TestSnapshots(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      "dynamic_object",
-      ["new_assessment_rest",
-       pytest.mark.xfail(reason="Issue GGRC-1407", strict=True)
-          ("new_issue_rest")],
+      "dynamic_object, expected_state",
+      [("new_assessment_rest", element.BaseStates.IN_PROGRESS),
+       pytest.mark.xfail(reason="Issue GGRC-1407", strict=True)(
+          ("new_issue_rest", element.IssueStates.DRAFT))],
       indirect=["dynamic_object"])
   def test_asmt_and_issue_mapped_to_origin_control(
       self, create_audit_with_control_and_update_control,
-      dynamic_object, selenium
+      dynamic_object, expected_state, selenium
   ):
     """
     Check Assessment or Issue was mapped to origin control after mapping
@@ -553,23 +546,22 @@ class TestSnapshots(base.Test):
       - check Assessment
       - check Issue
     """
+    origin_control = create_audit_with_control_and_update_control[
+        "update_control_rest"][0]
     snapshoted_control = create_audit_with_control_and_update_control[
         "new_control_rest"][0]
-    # due to 'actual_control.custom_attributes = {None: None}'
-    # expected_obj = (dynamic_object.repr_ui().update_attrs(
-    #     custom_attributes={None: None}))
-    expected_obj = (dynamic_object.repr_ui().update_attrs(
-        custom_attributes={None: None}, updated_at=None))
+    expected_obj = dynamic_object.repr_ui().update_attrs(status=expected_state)
     expected_obj_service = get_ui_service(expected_obj.type)(selenium)
     (webui_service.ControlsService(selenium).map_objs_via_tree_view(
         src_obj=expected_obj, dest_objs=[snapshoted_control]))
-    actual_obj = expected_obj_service.get_obj_from_info_page(obj=expected_obj)
-    # due to 'expected_obj.objects_under_assessment = None'
-    actual_obj.update_attrs(objects_under_assessment=None,
-                            custom_attributes={None: None})
-    assert expected_obj == actual_obj, (
-        messages.AssertionMessages.
-        format_err_msg_equal(expected_obj, actual_obj))
+    actual_objs = expected_obj_service.get_list_objs_from_tree_view(
+        src_obj=origin_control)
+    # due to 'actual_obj.custom_attributes = {None: None}'
+    #        'expected_asmt.objects_under_assessment = None'
+    self.general_assert(
+        [expected_obj], actual_objs, "custom_attributes"
+        if dynamic_object.type == entities_factory.EntitiesFactory.obj_issue
+        else "objects_under_assessment", "custom_attributes")
 
   @pytest.mark.parametrize(
       "dynamic_object",

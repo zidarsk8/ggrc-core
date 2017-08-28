@@ -1,0 +1,19 @@
+{{!
+  Copyright (C) 2017 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="navigation-wrap">
+    <div class="navigation-item">
+        <a ($click)="setPrev()" rel="tooltip" title="Open previous Assessment"
+           class="{{#unless hasPrev}}disabled{{/unless}}">
+            Prev
+        </a>
+    </div>
+    <div class="navigation-item">
+        <a ($click)="setNext()" rel="tooltip" title="Open next Assessment"
+           class="{{#unless hasNext}}disabled{{/unless}}">
+            Next
+        </a>
+    </div>
+</div>

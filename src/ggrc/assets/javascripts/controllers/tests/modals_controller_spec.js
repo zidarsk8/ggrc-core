@@ -64,7 +64,7 @@ describe('GGRC.Controllers.Modals', function () {
         });
 
         spyOn(partialUser, 'reify').and.returnValue(partialUser);
-        CMS.Models.Person.cache[userId] = partialUser;
+        CMS.Models.Person.store[userId] = partialUser;
 
         init();
 
@@ -86,7 +86,7 @@ describe('GGRC.Controllers.Modals', function () {
         });
 
         spyOn(fullUser, 'reify').and.returnValue(fullUser);
-        CMS.Models.Person.cache[userId] = fullUser;
+        CMS.Models.Person.store[userId] = fullUser;
 
         init();
 

@@ -24,11 +24,6 @@
      */
     modelName: null,
     /**
-     * Contains available attributes for specific model.
-     * @type {can.List}
-     */
-    availableAttributes: can.List(),
-    /**
      * Adds Mapping Criteria and Operator to the collection.
      * Adds only Mapping Criteria if collection is empty.
      */

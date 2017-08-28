@@ -35,7 +35,7 @@ describe('GGRC.Components.attachButton', function () {
     function () {
       var dfd = can.Deferred();
       var result;
-      viewModel.attr('instance.status', 'Ready for Review');
+      viewModel.attr('instance.status', 'In Review');
       spyOn(can, 'Deferred').and.returnValue(dfd);
 
       result = viewModel.confirmationCallback();
@@ -53,7 +53,7 @@ describe('GGRC.Components.attachButton', function () {
     });
 
     it('initializes confirmation modal with correct options', function () {
-      viewModel.attr('instance.status', 'Ready for Review');
+      viewModel.attr('instance.status', 'In Review');
       spyOn(GGRC.Controllers.Modals, 'confirm');
 
       viewModel.confirmationCallback();
@@ -61,7 +61,7 @@ describe('GGRC.Components.attachButton', function () {
       expect(GGRC.Controllers.Modals.confirm).toHaveBeenCalledWith({
         modal_title: 'Confirm moving Assessment to "In Progress"',
         modal_description: 'You are about to move Assesment from "' +
-          'Ready for Review' +
+          'In Review' +
           '" to "In Progress" - are you sure about that?',
         button_view: GGRC.mustache_path + '/modals/prompt_buttons.mustache'
       }, jasmine.any(Function), jasmine.any(Function));
@@ -69,7 +69,7 @@ describe('GGRC.Components.attachButton', function () {
 
     it('resolves Deferred if modal has been confirmed', function () {
       var result;
-      viewModel.attr('instance.status', 'Ready for Review');
+      viewModel.attr('instance.status', 'In Review');
       spyOn(GGRC.Controllers.Modals, 'confirm').and.callFake(
       function (options, confirm, cancel) {
         confirm();
@@ -82,7 +82,7 @@ describe('GGRC.Components.attachButton', function () {
 
     it('rejects Deferred if modal has been canceled', function () {
       var result;
-      viewModel.attr('instance.status', 'Ready for Review');
+      viewModel.attr('instance.status', 'In Review');
       spyOn(GGRC.Controllers.Modals, 'confirm').and.callFake(
       function (options, confirm, cancel) {
         cancel();

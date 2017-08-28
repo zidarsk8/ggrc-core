@@ -218,7 +218,7 @@ class TestMixinAutoStatusChangeable(TestCase):
     assessment = self.refresh_object(assessment)
     self.assertEqual(assessment.status, models.Assessment.PROGRESS_STATE)
 
-    # perform the same test for the "ready for review" state
+    # perform the same test for the "in review" state
     assessment = self.change_status(assessment, assessment.DONE_STATE)
     assessment = self.refresh_object(assessment)
 

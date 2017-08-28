@@ -12,19 +12,18 @@ needed by ggrc notifications.
 # pylint: disable=too-few-public-methods
 
 from collections import namedtuple
-from datetime import date
+from datetime import date, datetime
 from functools import partial
 from itertools import chain, izip
-from numbers import Number
 from operator import attrgetter
 
 from enum import Enum
 
 from sqlalchemy import inspect
-from sqlalchemy import and_
 from sqlalchemy.sql.expression import true
 
 from ggrc import db
+from ggrc import notifications
 from ggrc.services import signals
 from ggrc import models
 from ggrc.models.mixins.statusable import Statusable
@@ -74,15 +73,26 @@ def _has_unsent_notifications(notif_type, obj):
     True if there are any unsent notifications of notif_type for the given
     object, and False otherwise.
   """
-  Notification = models.Notification  # pylint: disable=invalid-name
+  obj_key = (obj.id, obj.type, notif_type.id)
+  for notification in db.session:
+    if not isinstance(notification, models.Notification):
+      continue
+    notif_key = (notification.object_id,
+                 notification.object_type,
+                 notification.notification_type.id)
+    if obj_key == notif_key:
+      return notification
 
-  return db.session.query(models.Notification).join(
-      models.NotificationType).filter(and_(
-          models.NotificationType.id == notif_type.id,
-          Notification.object_id == obj.id,
-          Notification.object_type == obj.type,
-          (Notification.sent_at.is_(None) | (Notification.repeating == true()))
-      )).count() > 0
+  return models.Notification.query.filter(
+      models.Notification.notification_type_id == notif_type.id,
+      models.Notification.object_id == obj.id,
+      models.Notification.object_type == obj.type,
+      (
+          models.Notification.sent_at.is_(None) | (
+              models.Notification.repeating == true()
+          )
+      )
+  ).first()
 
 
 def _add_assignable_declined_notif(obj):
@@ -112,32 +122,15 @@ def _add_assessment_updated_notif(obj):
   """
   # If there already exists a status change notification, an assessment updated
   # notification should not be sent, and is thus not added.
-  notif_type_names = ["assessment_declined"]
-  notif_type_names.extend(item.value for item in Transitions)
-
-  notif_types = models.NotificationType.query.filter(
-      models.NotificationType.name.in_(notif_type_names)
-  )
-  notif_type_ids = [ntype.id for ntype in notif_types]
-
-  has_status_change = models.Notification.query.filter(
-      models.Notification.object_id == obj.id,
-      models.Notification.object_type == obj.type,
-      models.Notification.notification_type_id.in_(notif_type_ids),
-      (
-          models.Notification.sent_at.is_(None) |
-          (models.Notification.repeating == true())
-      )
-  ).exists()
-
-  if db.session.query(has_status_change).scalar():
-    return
-
   notif_type = models.NotificationType.query.filter_by(
       name="assessment_updated").first()
 
-  if not _has_unsent_notifications(notif_type, obj):
+  notification = _has_unsent_notifications(notif_type, obj)
+  if not notification:
     _add_notification(obj, notif_type)
+  else:
+    notification.updated_at = datetime.now()
+    db.session.add(notification)
 
 
 def _add_state_change_notif(obj, state_change, remove_existing=False):
@@ -184,8 +177,6 @@ def handle_assignable_modified(obj):  # noqa: ignore=C901
   Args:
     obj (models.mixins.Assignable): an object that has been modified
   """
-  state_change_occurred = False
-
   attrs = inspect(obj).attrs
   status_history = attrs["status"].history
 
@@ -220,25 +211,11 @@ def handle_assignable_modified(obj):  # noqa: ignore=C901
   state_change = transitions_map.get((old_state, new_state))
   if state_change:
     _add_state_change_notif(obj, state_change, remove_existing=True)
-    state_change_occurred = True
-
-  # changes of some of the attributes are not considered as a modification of
-  # the obj itself, e.g. metadata not editable by the end user, or changes
-  # covered by other event types such as "comment created"
-  # pylint: disable=invalid-name
-  IGNORE_ATTRS = frozenset((
-      u"_notifications", u"comments", u"context", u"context_id", u"created_at",
-      u"custom_attribute_definitions", u"custom_attribute_values",
-      u"_custom_attribute_values", u"finished_date", u"id", u"modified_by",
-      u"modified_by_id", u"object_level_definitions", u"os_state",
-      u"related_destinations", u"related_sources", u"status",
-      u"task_group_objects", u"updated_at", u"verified_date",
-  ))
 
   is_changed = False
 
   for attr_name, val in attrs.items():
-    if attr_name in IGNORE_ATTRS:
+    if attr_name in notifications.IGNORE_ATTRS:
       continue
 
     if val.history.has_changes():
@@ -258,15 +235,10 @@ def handle_assignable_modified(obj):  # noqa: ignore=C901
   # not directly observable via status change history, thus an extra check.
   if obj.status in Statusable.DONE_STATES:
     _add_state_change_notif(obj, Transitions.TO_REOPENED, remove_existing=True)
-    state_change_occurred = True
   elif obj.status == Statusable.START_STATE:
     _add_state_change_notif(obj, Transitions.TO_STARTED, remove_existing=True)
-    state_change_occurred = True
 
-  if not state_change_occurred:
-    # explicit check needed, because state change notifications might not yet
-    # be visible within the current transaction
-    _add_assessment_updated_notif(obj)
+  _add_assessment_updated_notif(obj)
 
 
 def _ca_values_changed(obj):
@@ -283,39 +255,18 @@ def _ca_values_changed(obj):
   Returns:
     (bool) True if there is a change to any of the CA values, False otherwise.
   """
-  def stringify_if_number(val):
-    """Convert a maybe-number to a string so that e.g. u"1" will match 1."""
-    if isinstance(val, bool):
-      return val
-    return str(val) if isinstance(val, Number) else val
-
   rev = db.session.query(models.Revision) \
                   .filter_by(resource_id=obj.id, resource_type=obj.type) \
                   .order_by(models.Revision.id.desc()) \
                   .first()
 
-  old_cavs = rev.content.get("custom_attribute_values", []) if rev else []
-  new_cavs = getattr(obj, "custom_attribute_values", [])
-
-  # It can happen that CAV objects have no IDs - we ignore those, as those
-  # cannot be considered "changed".
-  old_cavs = (IdValPair(cav["id"], cav["attribute_value"]) for cav in old_cavs
-              if cav["id"] is not None)
-  new_cavs = (IdValPair(cav.id, cav.attribute_value) for cav in new_cavs
-              if cav.id is not None)
-
-  for old, new in _align_by_ids(old_cavs, new_cavs):
-    # one of the items is None only in an (unlikely) scenario when a CA was
-    # added/removed - we do not consider that as a CA value change
-    if old is None or new is None:
-      continue
-
-    old_val = stringify_if_number(old.val)
-    new_val = stringify_if_number(new.val)
-    if old_val != new_val:
-      return True
-
-  return False
+  new_attrs = {
+      "custom_attribute_values":
+      [value.log_json() for value in obj.custom_attribute_values],
+      "custom_attribute_definitions":
+      [defn.log_json() for defn in obj.custom_attribute_definitions]
+  }
+  return any(notifications.get_updated_cavs(new_attrs, rev.content))
 
 
 def _align_by_ids(items, items2):
@@ -435,11 +386,13 @@ def handle_relationship_altered(rel):
   if asmt.type != u"Assessment":
     asmt, other = other, asmt
 
-  if other.type not in (u"Document", u"Person"):
+  if other.type not in (u"Document", u"Person", u"Snapshot"):
     return
 
   if asmt.status != Statusable.START_STATE:
     _add_assessment_updated_notif(asmt)
+  else:
+    _add_state_change_notif(asmt, Transitions.TO_STARTED, remove_existing=True)
 
   # when modified, a done Assessment gets automatically reopened
   if asmt.status in Statusable.DONE_STATES:

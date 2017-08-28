@@ -231,7 +231,6 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_open'].iteritems() %}
                     <li {{ style.list_item() }} >
-                      Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
                       {% if assessment_data.get('start_date_statement') %}
@@ -250,7 +249,6 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_started'].iteritems() %}
                     <li {{ style.list_item() }} >
-                      Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
                     </li>
@@ -263,10 +261,13 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_updated'].iteritems() %}
                     <li {{ style.list_item() }} >
-                      Assessment:
+                      The below fields were updated for
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
-                        ({{ assessment_data['notif_created_at'].values()[0] }})
+                      ({{ assessment_data['notif_updated_at'].values()[0] }}):
+                      <ul>
+                        {{ assessment_data['updated_fields']|sort|join(', ') }}
+                      </ul>
                     </li>
                   {% endfor %}
                   </ul>
@@ -277,7 +278,6 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_completed'].iteritems() %}
                     <li {{ style.list_item() }} >
-                      Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
                         ({{ assessment_data['notif_created_at'].values()[0] }})
@@ -287,11 +287,10 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                 {% endif %}
 
                 {% if digest.get('assessment_ready_for_review') %}
-                  <h2 {{ style.sub_title() }} >Assessments ready for review</h2>
+                  <h2 {{ style.sub_title() }} >Assessments in review</h2>
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_ready_for_review'].iteritems() %}
                     <li {{ style.list_item() }} >
-                      Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
                         ({{ assessment_data['notif_created_at'].values()[0] }})
@@ -305,7 +304,6 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_verified'].iteritems() %}
                     <li {{ style.list_item() }} >
-                      Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
                         ({{ assessment_data['notif_created_at'].values()[0] }})
@@ -319,7 +317,6 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_declined'].iteritems() %}
                     <li {{ style.list_item() }} >
-                      Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
                         ({{ assessment_data['notif_created_at'].values()[0] }})
@@ -333,7 +330,6 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                   <ul {{ style.list_wrap() }} >
                   {% for assessment_id, assessment_data in digest['assessment_reopened'].iteritems() %}
                     <li {{ style.list_item() }} >
-                      Assessment:
                       <a href="{{ assessment_data['url'] }}" {{ style.link_text() }} >
                         {{ assessment_data['title'] }}</a>
                         ({{ assessment_data['notif_created_at'].values()[0] }})

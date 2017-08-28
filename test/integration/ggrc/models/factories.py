@@ -251,6 +251,9 @@ class DocumentFactory(ModelFactory):
   class Meta:
     model = models.Document
 
+  title = "some link"
+  link = "some link"
+
 
 class UrlFactory(DocumentFactory):
   document_type = models.Document.URL

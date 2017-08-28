@@ -837,6 +837,8 @@ class Resource(ModelView):
     with benchmark("Query update permissions"):
       new_context = self.get_context_id_from_json(src)
       self._check_put_permissions(obj, new_context)
+    with benchmark("Process actions"):
+      self.process_actions(obj)
     with benchmark("Validate custom attributes"):
       if hasattr(obj, "validate_custom_attributes"):
         obj.validate_custom_attributes()
@@ -930,13 +932,10 @@ class Resource(ModelView):
       with benchmark("Send DELETEd - after commit event"):
         signals.Restful.model_deleted_after_commit.send(
             obj.__class__, obj=obj, service=self, event=event)
-      with benchmark("Query for object"):
-        object_for_json = self.object_for_json(obj)
       with benchmark("Send event job"):
         send_event_job(event)
       with benchmark("Make response"):
-        result = self.json_success_response(
-            object_for_json, self.modified_at(obj))
+        result = self.json_success_response({}, datetime.datetime.now())
     except:
       import traceback
       task.finish("Failure", traceback.format_exc())
@@ -1518,6 +1517,26 @@ class Resource(ModelView):
       headers.append(('X-GGRC-Cache', cache_op))
     return current_app.make_response(
         (self.as_json(response_object), status, headers))
+
+  def process_actions(self, obj):
+    if hasattr(obj, 'process_actions'):
+      # process actionsS
+      added, deleted = obj.process_actions()
+      # send signals for added/deleted objects
+      for _class, _objects in added.items():
+        if not _objects:
+          continue
+        signals.Restful.collection_posted.send(
+            _class, objects=_objects, service=self,
+            sources=[{} for _ in xrange(len(_objects))])
+        for _obj in _objects:
+          signals.Restful.model_posted.send(
+              _class, obj=_obj, service=self)
+      for _obj in deleted:
+        signals.Restful.model_deleted.send(
+            _obj.__class__, obj=_obj, service=self)
+      if added or deleted:
+        obj.invalidate_evidence_found()
 
 
 class ReadOnlyResource(Resource):

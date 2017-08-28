@@ -128,20 +128,11 @@
           arr: _.compact(_.map(
             this.viewModel.attr('selected'),
             function (desination) {
-              var isAllowed = GGRC.Utils.allowed_to_map(source, desination);
-              var instance =
-                can.makeArray(this.viewModel.attr('entries'))
-                  .map(function (entry) {
-                    return entry.instance || entry;
-                  })
-                  .find(function (instance) {
-                    return instance.id === desination.id &&
-                      instance.type === desination.type;
-                  });
-              if (instance && isAllowed) {
-                return instance;
+              if (GGRC.Utils.allowed_to_map(source, desination)) {
+                desination.isNeedRefresh = true;
+                return desination;
               }
-            }.bind(this)
+            }
           ))
         };
 
@@ -224,6 +215,7 @@
             .done(function () {
               if (instance && instance.dispatch) {
                 instance.dispatch('refreshInstance');
+                instance.dispatch('refreshMapping');
               }
               // This Method should be modified to event
               GGRC.Utils.CurrentPage.refreshCounts();

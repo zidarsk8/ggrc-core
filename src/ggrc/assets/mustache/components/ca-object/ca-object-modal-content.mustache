@@ -25,20 +25,16 @@
       {{/if}}
       {{#if evidence}}
         <div class="simple-modal__section">
-            <div class="simple-modal__section-title">Evidence
+            <div class="simple-modal__section-title">Evidence file
               <spinner class="simple-modal__section-title-icon" {toggle}="isUpdatingEvidences"></spinner>
             </div>
             <object-list {items}="evidences" {empty-message}="noItemsText">
                 <editable-document-object-list-item {document}="{.}">
-                    <action-toolbar-control>
-                        <unmap-button
-                                (before-unmap)="removeItem(%event, 'evidences')"
-                                (after-unmap)="updateItems('evidences')"
-                                {destination}="instance"
-                                {source}="document">
+                    <a ($click)="removeRelatedItem(document, 'evidences')">
+                        <action-toolbar-control>
                             <i class="fa fa-trash"></i>
-                        </unmap-button>
-                    </action-toolbar-control>
+                        </action-toolbar-control>
+                    </a>
                 </editable-document-object-list-item>
             </object-list>
             <attach-button

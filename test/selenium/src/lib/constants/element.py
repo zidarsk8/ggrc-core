@@ -118,8 +118,6 @@ class Common(object):
   TITLE = "Title"
   DESCRIPTION = "Description"
   CODE = "Code"
-  TRUE = "true"
-  FALSE = "false"
   # fictional elements (need to convert UI attrs to Entities attrs)
   CAS = "CAs"
 
@@ -242,6 +240,7 @@ class CommonAssessmentTemplate(Common):
 class CommonIssue(Common):
   """Common elements' labels and properties for Issues objects."""
   ISSUE = objects.get_normal_form(objects.get_singular(objects.ISSUES))
+  STATE = Base.STATE
 
 
 class ObjectStates(object):
@@ -267,7 +266,7 @@ class AuditStates(BaseStates):
 class AssessmentStates(BaseStates):
   """States for Assessments objects."""
   NOT_STARTED = "Not Started"
-  READY_FOR_REVIEW = "Ready for Review"
+  READY_FOR_REVIEW = "In Review"
   VERIFIED = "Verified"
 
 
@@ -303,6 +302,12 @@ class AssessmentInfoWidget(CommonAssessment):
   TITLE_UPPER = CommonAssessment.TITLE.upper()
   CODE_UPPER = CommonAssessment.CODE.upper()
   COMMENTS_HEADER = "RESPONSES/COMMENTS"
+
+
+class IssueInfoWidget(CommonIssue):
+  """Elements' labels and properties for Issue Info widgets."""
+  TITLE_UPPER = CommonIssue.TITLE.upper()
+  CODE_UPPER = CommonIssue.CODE.upper()
 
 
 class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -434,22 +439,23 @@ class TransformationElements(TransformationSetVisibleFields, CommonAssessment):
 
 class AssessmentTabContainer(object):
   """Elements' labels for Assessment Tab Container"""
-  ASMT_ATTRS_TAB = 'Assessment Attributes'
-  ASMT_LOG_TAB = 'Assessment Log'
-  RELATED_ASMTS_TAB = 'Related Assessments'
-  RELATED_ISSUES_TAB = 'Related Issues'
+  ASMT_TAB = "Assessment"
+  RELATED_ASMTS_TAB = "Related Assessments"
+  RELATED_ISSUES_TAB = "Related Issues"
+  OTHER_ATTRS_TAB = "Other Attributes"
+  CHANGE_LOG_TAB = "Change Log"
 
 
 class AsmtAttrsTab(object):
   """Common elements' labels of Assessment Attributes Tab on Assessment Info
   Widget."""
-  TAB_NAME = AssessmentTabContainer.ASMT_ATTRS_TAB
+  TAB_NAME = AssessmentTabContainer.OTHER_ATTRS_TAB
 
 
 class AsmtLogTab(object):
   """Common elements' labels of Assessment Log Tab on Assessment Info
    Widget."""
-  TAB_NAME = AssessmentTabContainer.ASMT_LOG_TAB
+  TAB_NAME = AssessmentTabContainer.CHANGE_LOG_TAB
   FIELD = "Field"
   ORIGINAL_VALUE = "Original value"
   NEW_VALUE = "New value"
@@ -476,8 +482,5 @@ class RelatedIssuesTab(object):
 
 
 class UnifiedMapperModal(object):
-  """Class that represent ui of Unified Mapper"""
-  OPERATOR_AND = "AND"
-  OPERATOR_OR = "OR"
+  """Class that represent ui of Unified Mapper."""
   ATTRIBUTE_TITLE = Common.TITLE
-  COMPARE_OPERATOR_EQUALS = "="

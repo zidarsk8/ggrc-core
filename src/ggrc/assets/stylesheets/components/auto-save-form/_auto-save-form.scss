@@ -2,7 +2,6 @@
  * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
-@import "auto-save-form-status";
 @import "auto-save-form-actions";
 @import "fields/fields";
 @import "field-views/field-views";
@@ -24,6 +23,14 @@ auto-save-form {
   }
 }
 
+.import-wrap > show-more  {
+  .limit-button-container {
+    button {
+      padding-left: 0px;
+    }
+  }
+}
+
 .fields-wrapper {
   display: flex;
   flex-wrap: wrap;
@@ -34,13 +41,18 @@ auto-save-form {
     flex: 1 1 50%;
     margin: 0;
     max-width: 50%;
-    padding: 0 16px 16px 28px;
+    padding: 0 16px 20px 28px;
     position: relative;
     flex-wrap: wrap;
     display: flex;
     box-sizing: border-box;
     align-items: flex-start;
     justify-content: flex-start;
+
+    &.inline-reverse {
+      flex-direction: row-reverse;
+      flex-wrap: nowrap
+    }
 
     auto-save-form-field {
       display: block;
@@ -58,6 +70,10 @@ auto-save-form {
 
     .form-field__content {
       max-width: 360px;
+      &.inline-reverse {
+        min-width: auto;
+        padding: 5px 8px 0 0;
+      }
     }
 
     .form-field__validation-hint-placeholder {
@@ -93,6 +109,9 @@ auto-save-form {
     text-transform: uppercase;
     line-height: 16px;
     padding: 5px 0;
+    &.inline-reverse {
+      max-width: 332px;
+    }
   }
 
   &__title-helper-text {

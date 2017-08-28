@@ -17,6 +17,7 @@
     </div>
 
     <div class="people-groups">
+    {{#instance}}
       {{#instance.class.assignable_list}}
         <related-people-mapping
           class="people-group"
@@ -43,6 +44,21 @@
               {instance}="instance"
               {title}="title"
               {people}="results">
+                <confirm-edit-action
+                  (set-edit-mode)="changeEditableMode(true)"
+                  (set-in-progress)="setInProgressState()"
+                  {is-edit-icon-denied}="isEditDenied"
+                  {instance}="instance"
+                  {on-state-change-dfd}="onStateChangeDfd"
+                  {edit-mode}="editMode">
+                    <editable-people-group-header
+                      {editable-mode}="editableMode"
+                      {is-loading}="isLoading"
+                      {can-edit}="canEdit"
+                      {required}="required"
+                      (edit-people-group)="confirmEdit()">
+                    </editable-people-group-header>
+                </confirm-edit-action>
             </editable-people-group>
           {{else}}
             <deletable-people-group
@@ -76,15 +92,13 @@
           {{/if}}
         </related-people-mapping>
       {{/instance.class.assignable_list}}
+    {{/instance}}
     </div>
 </div>
 
-{{#if infoPaneMode}}
-  <custom-roles {instance}="instance">
-  </custom-roles>
-{{else}}
+{{#unless infoPaneMode}}
   <custom-roles-modal
     {instance}="instance"
     {is-new-instance}="new_object_form">
   </custom-roles-modal>
-{{/if}}
+{{/unless}}

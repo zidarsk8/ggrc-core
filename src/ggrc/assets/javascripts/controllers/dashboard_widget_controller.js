@@ -8,7 +8,6 @@
     defaults: {
       model: null,
       instance: null,
-      widget_view: GGRC.mustache_path + '/base_objects/dashboard.mustache',
       isLoading: true
     },
     init: function () {
@@ -25,30 +24,24 @@
   }, {
     init: function () {
       var frag;
-      if (this.element.data('widget-view')) {
-        this.options.widget_view = GGRC.mustache_path +
-          this.element.data('widget-view');
-      }
+      var dashboards =
+        GGRC.Utils.Dashboards.getDashboards(this.options.instance);
+
       this.options.context = new can.Map({
         model: this.options.model,
         instance: this.options.instance,
-        dashboardUrl: GGRC.Utils.Dashboards.getDashboardUrl(
-          this.options.model.table_singular,
-          this.options.instance
-        )
+        dashboards: dashboards,
+        activeDashboard: dashboards[0],
+        showDashboardList: dashboards.length > 1,
+        selectDashboard: function (dashboard) {
+          this.attr('activeDashboard', dashboard);
+        }
       });
-      frag = can.view(this.get_widget_view(this.element),
+
+      frag = can.view(this.options.widget_view,
                       this.options.context);
       this.element.html(frag);
       return 0;
-    },
-    get_widget_view: function (el) {
-      var widgetView = $(el)
-        .closest('[data-widget-view]')
-        .attr('data-widget-view');
-      return (widgetView && widgetView.length > 0) ?
-          GGRC.mustache_path + widgetView :
-          this.options.widget_view;
     }
   });
 })(this.can, this.can.$);

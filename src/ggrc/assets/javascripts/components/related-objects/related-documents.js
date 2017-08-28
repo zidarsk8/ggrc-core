@@ -160,7 +160,7 @@
           .then(this.createRelationship.bind(this))
           .then(function (result) {
             self.fetchAndUpdate(self.instance);
-            self.instance.dispatch('refreshRelatedDocuments');
+            self.refreshRelatedDocuments();
           })
           .fail(function (err) {
             console.error('Unable to create related document: ', err);
@@ -197,7 +197,7 @@
         return this.removeRelationship(relationship)
           .then(function () {
             self.fetchAndUpdate(self.instance);
-            self.instance.dispatch('refreshRelatedDocuments');
+            self.refreshRelatedDocuments();
           })
           .fail(function (err) {
             console.error('Unable to remove related document: ', err);
@@ -233,6 +233,11 @@
         instance.refresh().then(function (refreshed) {
           refreshed.save();
         });
+      },
+      refreshRelatedDocuments: function () {
+        if (this.autorefresh) {
+          this.loadDocuments();
+        }
       }
     },
     init: function () {
@@ -247,10 +252,8 @@
       }
     },
     events: {
-      '{viewModel.instance} refreshRelatedDocuments': function () {
-        if (this.viewModel.autorefresh) {
-          this.viewModel.loadDocuments();
-        }
+      '{viewModel.instance} resolvePendingBindings': function () {
+        this.viewModel.refreshRelatedDocuments();
       }
     }
   });

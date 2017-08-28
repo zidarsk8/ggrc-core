@@ -36,7 +36,8 @@ def _get_fixture_from_dict_fixtures(fixture):
           if k == fixture}[fixture]
 
 
-def _new_objs_rest(obj_name, obj_count, has_cas=False, factory_params=None):
+def _new_objs_rest(obj_name, obj_count,  # noqa: ignore=C901
+                   has_cas=False, factory_params=None):
   """Create new objects via REST API according to object name (plural form),
   objects count and requirements for presence of Custom Attributes.
   Return: [lib.entities.entity.*Entity, ...]
@@ -84,14 +85,15 @@ def _new_objs_rest(obj_name, obj_count, has_cas=False, factory_params=None):
                        else objects.PROGRAMS)
   if obj_name in (objects.ASSESSMENT_TEMPLATES, objects.ASSESSMENTS,
                   objects.ISSUES):
-    parent_obj_name = (objects.get_singular(objects.AUDITS) if obj_count == 1
-                       else objects.AUDITS)
+    parent_obj_name = objects.get_singular(objects.AUDITS)
   if (has_cas and obj_name in objects.ALL_OBJS and
           obj_name not in objects.ASSESSMENT_TEMPLATES):
     parent_obj_name = "cas_for_" + obj_name
   if parent_obj_name:
     parent_objs = _get_fixture_from_dict_fixtures(
         fixture="new_{}_rest".format(parent_obj_name))
+    if "new_{}_rest".format(parent_obj_name) == "new_audit_rest":
+      parent_objs *= obj_count
     if has_cas and obj_name in objects.ASSESSMENT_TEMPLATES:
       parent_objs = (
           [CustomAttributeDefinitionsFactory().create(

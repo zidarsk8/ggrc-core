@@ -28,7 +28,7 @@ describe('GGRC.Utils.State', function () {
     it('statesFilter should not update Assessmnet statuses',
       function () {
         var statuses = [
-          'Not Started', 'In Progress', 'Ready for Review'
+          'Not Started', 'In Progress', 'In Review'
         ];
 
         var statesFilter = GGRC.Utils.State
@@ -38,7 +38,7 @@ describe('GGRC.Utils.State', function () {
           .toBe(true);
         expect(statesFilter.indexOf('"Status"="In Progress"') > -1)
           .toBe(true);
-        expect(statesFilter.indexOf('"Status"="Ready for Review"') > -1)
+        expect(statesFilter.indexOf('"Status"="In Review"') > -1)
           .toBe(true);
         expect(statesFilter.indexOf('"Status"="verified="') > -1)
           .toBe(false);
@@ -48,13 +48,13 @@ describe('GGRC.Utils.State', function () {
     it('statesFilter should have "Completed" status and "verified=true"',
       function () {
         var statuses = [
-          'Ready for Review', 'Completed and Verified'
+          'In Review', 'Completed and Verified'
         ];
 
         var statesFilter = GGRC.Utils.State
           .statusFilter(statuses, '', 'Assessment');
 
-        expect(statesFilter.indexOf('"Status"="Ready for Review"') > -1)
+        expect(statesFilter.indexOf('"Status"="In Review"') > -1)
           .toBe(true);
         expect(statesFilter.indexOf('"Status"="Completed"') > -1)
           .toBe(true);
@@ -69,13 +69,13 @@ describe('GGRC.Utils.State', function () {
     it('statesFilter should have "Completed" status and "verified=false"',
       function () {
         var statuses = [
-          'Ready for Review', 'Completed (no verification)'
+          'In Review', 'Completed (no verification)'
         ];
 
         var statesFilter = GGRC.Utils.State
           .statusFilter(statuses, '', 'Assessment');
 
-        expect(statesFilter.indexOf('"Status"="Ready for Review"') > -1)
+        expect(statesFilter.indexOf('"Status"="In Review"') > -1)
           .toBe(true);
         expect(statesFilter.indexOf('"Status"="Completed"') > -1)
           .toBe(true);

@@ -5,17 +5,10 @@
 
 {{#person}}
 <span class="person-holder">
-  {{#if show_email}}
-    <a data-test-id="text_manager_7a906d2e" href='mailto:{{email}}'
-       target="_blank"><span class="person-tooltip-trigger" data-placement="top">
-      {{email}}
-    </span></a>
-  {{else}}
     <a data-test-id="text_manager_7a906d2e" href="/people/{{id}}"><span
             class="person-tooltip-trigger" data-placement="top">
-      {{firstnonempty name email}}
+      {{email}}
     </span></a>
-  {{/if}}
   {{#if_equals system_wide_role 'No Access'}}
     <span class="user-disabled">
       (Inactive user)

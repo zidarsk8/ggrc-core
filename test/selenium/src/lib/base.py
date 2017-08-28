@@ -64,15 +64,14 @@ class Test(InstanceRepresentation):
     Finally, make pytest assert for objects, then xfail assert for attributes.
     """
     split_objs = (
-        Test.extended_assert_w_excluded_attrs(
+        Test.general_assert(
             expected_objs, actual_objs, *exclude_attrs))
     assert (True if Entity.is_list_of_attrs_equal(
         split_objs["exp_ex_attrs"], split_objs["act_ex_attrs"])
         else pytest.xfail(reason=issue_msg))
 
   @staticmethod
-  def extended_assert_w_excluded_attrs(expected_objs, actual_objs,
-                                       *exclude_attrs):
+  def general_assert(expected_objs, actual_objs, *exclude_attrs):
     """Perform extended assert for expected and actual objects according to
     dictionary of attributes to exclude and providing issue's message.
     Initially, based on original objects prepare expected and actual
@@ -912,10 +911,9 @@ class ElementsList(Component):
     "self.item_class" property.
     """
     if not self._items:
-      items_elements = selenium_utils.get_nested_elements(
-          self.list_element)
       self._items = [self.item_class(self._driver, el) for el in
-                     items_elements]
+                     self.list_element.find_elements(
+                         *CommonDropdownMenu.DROPDOWN_ITEMS_CSS)]
     return self._items
 
   def get_item(self, text):
@@ -1000,8 +998,6 @@ class AbstractTabContainer(Component):
 
 class AbstractTable(Component):
   """Abstract class for generic table."""
-  def __init__(self, driver):
-    super(AbstractTable, self).__init__(driver)
 
   def get_headers(self):
     """"Abstract method. Should return headers element of table."""

@@ -682,10 +682,8 @@ def handle_cycle_task_entry_post(
 def handle_cycle_status_change(sender, obj=None, new_status=None,  # noqa pylint: disable=unused-argument
                                old_status=None):  # noqa pylint: disable=unused-argument  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.status.history.has_changes():
-    if obj.is_done:
-      obj.is_current = False
-      db.session.add(obj)
-      update_workflow_state(obj.workflow)
+    obj.is_current = not obj.is_done
+    update_workflow_state(obj.workflow)
 
 
 @Signals.status_change.connect_via(models.CycleTaskGroupObjectTask)
