@@ -73,13 +73,6 @@ class RuleSet(object):
       self._rules[src, dst] |= {mapping}
       self._rule_source[src, dst, mapping] |= {source}
 
-    self._freeze()
-
-  def _freeze(self):
-    for key in self._rules:
-      mappings = self._rules[key]
-      self._rules[key] = frozenset(mappings)
-
   def __getitem__(self, key):
     return self._rules[key]
 
