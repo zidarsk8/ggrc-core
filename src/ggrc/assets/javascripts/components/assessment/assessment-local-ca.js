@@ -114,6 +114,8 @@
       },
       save: function (fieldId, fieldValue) {
         var self = this;
+        var changes = {};
+        changes[fieldId] = fieldValue;
 
         this.attr('isDirty', true);
 
@@ -121,7 +123,7 @@
           var caValues = self.attr('instance.custom_attribute_values');
           CAUtils.applyChangesToCustomAttributeValue(
             caValues,
-            {fieldId: fieldValue});
+            new can.Map(changes));
 
           self.attr('saving', true);
         })
