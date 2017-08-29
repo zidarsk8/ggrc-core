@@ -7,6 +7,7 @@ const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 const _ = require('lodash');
 const path = require('path');
 const ENV = process.env;
@@ -21,7 +22,7 @@ module.exports = function (env, argv) {
         .concat(['entrypoints/dashboard/bootstrap'])
     },
     output: {
-      filename: isProduction(env) ? '[name].[chunkhash].js' : '[name]_.js',
+      filename: isProduction(env) ? '[name].[chunkhash].js' : '[name].js',
       sourceMapFilename: '[file].map',
       path: path.join(__dirname, './src/ggrc/static/'),
       publicPath: STATIC_FOLDER
@@ -75,7 +76,7 @@ module.exports = function (env, argv) {
         }]
       }]
     },
-    devtool: isDevelopment(env) ? 'eval' : 'hidden-source-map',
+    devtool: isDevelopment(env) ? 'eval' : 'source-map',
     resolve: {
       modules: ['node_modules', 'bower_components', 'third_party']
         .map(function (dir) {
@@ -121,6 +122,10 @@ module.exports = function (env, argv) {
         comments: false,
         beautify: false,
       }
+    }));
+
+    config.plugins.push(new CleanWebpackPlugin(['./src/ggrc/static/'], {
+      exclude: ['images', 'fonts', 'favicon.ico']
     }));
   }
 
