@@ -3,11 +3,13 @@
 
 """Tests for workflow object exports."""
 
+from ggrc import db
+
 from os.path import abspath, dirname, join
 from flask.json import dumps
 
 from ggrc.app import app  # NOQA
-from ggrc_workflows.models import Workflow
+from ggrc_workflows.models import Workflow, TaskGroup
 from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 
@@ -78,7 +80,10 @@ class TestExportMultipleObjects(TestCase):
     if wf1:
       gen.generate_cycle(wf1)
 
-    workflows = Workflow.query.filter_by(status="Draft").all()
+    # Only workflows with at least one task group could be activated
+    workflows = db.session.query(Workflow).join(TaskGroup).filter(
+        Workflow.id == TaskGroup.workflow_id,
+        Workflow.status == 'Draft').all()
     for wf in workflows:
       gen.activate_workflow(wf)
 

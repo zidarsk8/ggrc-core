@@ -1,10 +1,14 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+"""
+Calculator for task group task start_, end_ dates in annual Workflow
+"""
 
 import datetime
 from dateutil import relativedelta
 
-from ggrc_workflows.services.workflow_cycle_calculator import cycle_calculator
+from ggrc_workflows.migrations.utils.task_group_task_date_calculator import \
+    cycle_calculator
 
 
 class MonthlyCycleCalculator(cycle_calculator.CycleCalculator):
@@ -16,29 +20,6 @@ class MonthlyCycleCalculator(cycle_calculator.CycleCalculator):
   time_delta = relativedelta.relativedelta(months=1)
   date_domain = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
                  19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31}
-
-  def __init__(self, workflow, base_date=None):
-    super(MonthlyCycleCalculator, self).__init__(workflow)
-
-    base_date = self.get_base_date(base_date)
-    self.reified_tasks = {}
-    for task in self.tasks:
-      start_date, end_date = self.non_adjusted_task_date_range(
-          task, base_date=base_date, initialisation=True)
-      self.reified_tasks[task.id] = {
-          'start_date': start_date,
-          'end_date': end_date,
-          'relative_start': task.relative_start_day,
-          'relative_end': task.relative_end_day
-      }
-
-  @staticmethod
-  def get_relative_start(task):
-    return (None, task.relative_start_day)
-
-  @staticmethod
-  def get_relative_end(task):
-    return (None, task.relative_end_day)
 
   def relative_day_to_date(self, relative_day, relative_month=None,
                            base_date=None):
@@ -61,8 +42,8 @@ class MonthlyCycleCalculator(cycle_calculator.CycleCalculator):
       3rd of March, therefore 3 days are subtracted to get back 28th
       of February.
     """
+    date_adj = False
     today = datetime.date.today()
-    relative_day = int(relative_day)
     if relative_day not in MonthlyCycleCalculator.date_domain:
       raise ValueError(
           "Monthly recurring cycles can only have relative day in 1-31 range.")
@@ -75,4 +56,5 @@ class MonthlyCycleCalculator(cycle_calculator.CycleCalculator):
     # We want to go up to the end of the month and not over.
     if ddate.month != base_date.month:
       ddate = ddate - relativedelta.relativedelta(days=ddate.day)
-    return ddate
+      date_adj = True
+    return ddate, date_adj

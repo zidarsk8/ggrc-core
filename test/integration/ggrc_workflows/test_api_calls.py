@@ -1,6 +1,7 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+import datetime
 import unittest
 
 import ddt
@@ -10,7 +11,9 @@ from ggrc.models import all_models
 
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
+from integration.ggrc import generator
 from integration.ggrc.models import factories
+from integration.ggrc_workflows import WorkflowTestCase
 from integration.ggrc_workflows.models import factories as wf_factories
 
 
@@ -37,33 +40,42 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.post(all_models.Workflow, data)
     self.assertEqual(response.status_code, 201)
 
-  def test_create_weekly_workflows(self):
+  def test_create_weekly_workflow(self):
+    """Test create valid weekly wf"""
     data = self.get_workflow_dict()
-    data["workflow"]["frequency"] = "weekly"
+    data["workflow"]["repeat_every"] = 7
+    data["workflow"]["unit"] = "day"
     data["workflow"]["title"] = "Weekly"
     response = self.api.post(all_models.Workflow, data)
     self.assertEqual(response.status_code, 201)
 
-  def test_create_monthly_workflows(self):
+  def test_create_annually_workflow(self):
+    """Test create valid annual wf"""
     data = self.get_workflow_dict()
-    data["workflow"]["frequency"] = "monthly"
-    data["workflow"]["title"] = "Monthly"
-    response = self.api.post(all_models.Workflow, data)
-    self.assertEqual(response.status_code, 201)
-
-  def test_create_quarterly_workflows(self):
-    data = self.get_workflow_dict()
-    data["workflow"]["frequency"] = "quarterly"
-    data["workflow"]["title"] = "Quarterly"
-    response = self.api.post(all_models.Workflow, data)
-    self.assertEqual(response.status_code, 201)
-
-  def test_create_annually_workflows(self):
-    data = self.get_workflow_dict()
-    data["workflow"]["frequency"] = "annually"
+    data["workflow"]["repeat_every"] = 12
+    data["workflow"]["unit"] = "month"
     data["workflow"]["title"] = "Annually"
     response = self.api.post(all_models.Workflow, data)
     self.assertEqual(response.status_code, 201)
+
+  @ddt.data("wrong value", 0, -4)
+  def test_create_wrong_repeat_every_workflow(self, value):
+    """Test case for invalid repeat_every value"""
+    data = self.get_workflow_dict()
+    data["workflow"]["repeat_every"] = value
+    data["workflow"]["unit"] = "month"
+    data["workflow"]["title"] = "Wrong wf"
+    response = self.api.post(all_models.Workflow, data)
+    self.assertEqual(response.status_code, 400)
+
+  def test_create_wrong_unit_workflow(self):
+    """Test case for invalid unit value"""
+    data = self.get_workflow_dict()
+    data["workflow"]["repeat_every"] = 12
+    data["workflow"]["unit"] = "wrong value"
+    data["workflow"]["title"] = "Wrong wf"
+    response = self.api.post(all_models.Workflow, data)
+    self.assertEqual(response.status_code, 400)
 
   def test_create_task_group(self):
     wf_data = self.get_workflow_dict()
@@ -90,7 +102,8 @@ class TestWorkflowsApiPost(TestCase):
             "custom_attributes": {},
             "title": "One_time",
             "description": "",
-            "frequency": "one_time",
+            "unit": None,
+            "repeat_every": None,
             "notify_on_change": False,
             "task_group_title": "Task Group 1",
             "notify_custom_message": "",
@@ -129,6 +142,53 @@ class TestWorkflowsApiPost(TestCase):
         }
     }
     return data
+
+  @ddt.data({},
+            {"repeat_every": 5,
+             "unit": "month"})
+  def test_repeat_multiplier_field(self, data):
+    """Check repeat_multiplier is set to 0 after wf creation.
+    """
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory(**data)
+    workflow_id = workflow.id
+    self.assertEqual(
+        0,
+        all_models.Workflow.query.get(workflow_id).repeat_multiplier
+    )
+
+  # TODO: Unskip in the patch 2
+  @unittest.skip("Will be activated in patch 2")
+  def test_change_to_one_time_wf(self):
+    """Check repeat_every and unit can be set to Null only together."""
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory(repeat_every=12,
+                                              unit="day")
+    resp = self.api.put(workflow, {"repeat_every": None,
+                                   "unit": None})
+    self.assert200(resp)
+
+  @ddt.data({"repeat_every": 5},
+            {"unit": "month"})
+  def test_change_repeat_every(self, data):
+    """Check repeat_every or unit can not be changed once set."""
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory()
+    resp = self.api.put(workflow, data)
+    self.assert400(resp)
+
+  def test_not_change_to_one_time_wf(self):
+    """Check repeat_every or unit can't be set to Null separately.
+    This test will be useful in the 2nd patch, where we allow to change
+    WF setup
+    """
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory(repeat_every=12,
+                                              unit="day")
+    resp = self.api.put(workflow, {"repeat_every": None})
+    self.assert400(resp)
+    resp = self.api.put(workflow, {"unit": None})
+    self.assert400(resp)
 
   @ddt.data(True, False)
   def test_autogen_verification_flag(self, flag):
@@ -198,6 +258,29 @@ class TestWorkflowsApiPost(TestCase):
     self.assertEqual(
         flag if flag is not None else True,
         all_models.Workflow.query.get(workflow_id).is_verification_needed)
+
+
+class TestTaskGroupTaskApiPost(WorkflowTestCase):
+  """
+  Tesk TestTaskGroupTask basic api actions
+  """
+  def test_create_tgt_correct_dates(self):
+    """Test case for correct tgt start_ end_ dates"""
+    response, _ = self.generator.generate_task_group_task(
+        data={"start_date": datetime.date.today(),
+              "end_date": datetime.date.today() + datetime.timedelta(days=4)}
+    )
+    self.assertEqual(response.status_code, 201)
+
+  def test_create_tgt_wrong_dates(self):
+    """Test case for tgt wrong start_ end_ dates"""
+    with self.assertRaises(Exception):
+      self.generator.generate_task_group_task(
+          data={
+              "start_date": datetime.date.today(),
+              "end_date": datetime.date.today() - datetime.timedelta(days=4)
+          }
+      )
 
 
 @ddt.ddt
@@ -372,3 +455,28 @@ class TestStatusApiPost(TestCase):
         resp.json["cycle_task_group_object_task"]["id"]
     )
     self.assertEqual(is_current, task.cycle.is_current)
+
+
+@ddt.ddt
+class TestCloneWorkflow(TestCase):
+
+  def setUp(self):
+    super(TestCloneWorkflow, self).setUp()
+    self.object_generator = generator.ObjectGenerator()
+
+  @ddt.data(
+      (None, None),
+      (all_models.Workflow.DAY_UNIT, 10),
+      (all_models.Workflow.MONTH_UNIT, 10),
+      (all_models.Workflow.WEEK_UNIT, 10),
+  )
+  @ddt.unpack
+  def test_workflow_copy(self, unit, repeat_every):
+    """Check clone wf with unit and repeat."""
+    with factories.single_commit():
+      workflow = wf_factories.WorkflowFactory(unit=unit,
+                                              repeat_every=repeat_every)
+    _, clone_wf = self.object_generator.generate_object(
+        all_models.Workflow, {"title": "WF - copy 1", "clone": workflow.id})
+    self.assertEqual(unit, clone_wf.unit)
+    self.assertEqual(repeat_every, clone_wf.repeat_every)

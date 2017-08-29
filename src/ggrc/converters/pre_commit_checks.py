@@ -85,6 +85,31 @@ def check_cycle_tasks(row_converter):  # noqa
         )
 
 
+def check_workflows(row_converter):
+  """Checker for Workflow object.
+
+  Check if a Workflow has any invalid values. If so, it should be ignored.
+  Object will not be checked if there's already an error exists
+  and it's marked as ignored.
+
+  Args:
+    row_converter: RowConverter object with row data for a task group task
+      import.
+  """
+  if row_converter.ignore:
+    return
+
+  obj = row_converter.obj
+  if (obj.unit is None and obj.repeat_every is not None or
+          obj.unit is not None and obj.repeat_every is None):
+    row_converter.add_error(
+        errors.VALIDATION_ERROR,
+        column_name="'repeat_every', 'unit'",
+        message="'repeat_every' and 'unit' fields can be set to NULL only"
+                " simultaneously",
+    )
+
+
 def check_assessment(row_converter):
   """Checker for Assessment model instance.
 
@@ -102,5 +127,6 @@ def check_assessment(row_converter):
 CHECKS = {
     "TaskGroupTask": check_tasks,
     "CycleTaskGroupObjectTask": check_cycle_tasks,
+    "Workflow": check_workflows,
     "Assessment": check_assessment
 }

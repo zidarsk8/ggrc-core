@@ -59,7 +59,6 @@ class TestOneTimeWorkflowNotification(TestCase):
     # setup
     with freeze_time("2015-04-07 03:21:34"):
       wf_response, wf = self.wf_generator.generate_workflow(data={
-          "frequency": "one_time",
           "owners": None,  # owner will be the current user
           "notify_on_change": True,  # force real time updates
           "title": "One-time WF",

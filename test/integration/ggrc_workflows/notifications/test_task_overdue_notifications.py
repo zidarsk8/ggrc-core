@@ -5,6 +5,8 @@
 
 """Integration tests for sending the notifications about overdue WF tasks."""
 
+import unittest
+
 import functools
 
 from collections import OrderedDict
@@ -297,6 +299,7 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
     }
 
 
+@unittest.skip("unskip when import/export fixed for workflows")
 class TestTaskOverdueNotificationsUsingImports(TestTaskOverdueNotifications):
   """Tests for overdue notifications when changing Tasks via imports."""
 
