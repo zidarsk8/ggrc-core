@@ -82,6 +82,7 @@
       },
       '{window} modal:dismiss': function (el, ev, options) {
         var joinObjectId = this.viewModel.attr('join_object_id');
+        $('body').trigger('closeMapper');
 
         // mapper sets uniqueId for modal-ajax.
         // we can check using unique id which modal-ajax is closing
@@ -111,6 +112,7 @@
         self.viewModel.attr('submitCbs').fire();
       },
       closeModal: function () {
+        $('body').trigger('closeMapper');
         this.viewModel.attr('is_saving', false);
 
         // TODO: Find proper way to dismiss the modal
