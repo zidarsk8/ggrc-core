@@ -4,8 +4,6 @@
 """Module contains integration tests for Cycle Task Group Object Task Object
 updates via import"""
 
-import unittest
-
 # pylint: disable=invalid-name
 from collections import OrderedDict
 

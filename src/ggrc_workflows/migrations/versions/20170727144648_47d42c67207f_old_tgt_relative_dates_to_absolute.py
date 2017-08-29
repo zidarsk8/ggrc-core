@@ -112,7 +112,7 @@ def upgrade():
 
     if res:
       values = ["({}, '{}', '{}')".format(tgt_id, start_date, end_date)
-                for tgt_id, start_date, end_date in res]
+                for tgt_id, start_date, end_date in res]  # noqa
       op.execute("""
         INSERT INTO task_group_tasks (id, start_date, end_date)
         VALUES {}
