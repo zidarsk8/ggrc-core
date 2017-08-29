@@ -110,7 +110,8 @@ class TestExportSnapshots(TestCase):
             "person": self._get_cav(control, "person"),
             # Special snapshot export fields
             "Audit": audit.slug,
-            "Evidence": u"\n".join(c.slug for c in control.document_evidence),
+            "Evidence File": u"\n".join(c.slug for c in\
+                                        control.document_evidence),
             "Reference URL": u"\n".join(c.slug for c in control.reference_url),
             "Assertions": u"\n".join(c.name for c in control.assertions),
             "Categories": u"\n".join(c.name for c in control.categories),
@@ -229,7 +230,7 @@ class TestExportSnapshots(TestCase):
             # Fields that are not included in snapshots - Known bugs.
             "Assertions": u"",
             "Categories": u"",
-            "Evidence": u"",
+            "Evidence File": u"",
             "Admin": u"",
             "Primary Contacts": u"",
             "Secondary Contacts": u"",
@@ -420,7 +421,7 @@ class TestExportSnapshots(TestCase):
           "Audit": audit.slug,
           "Assertions": u"",
           "Categories": u"",
-          "Evidence": u"",
+          "Evidence File": u"",
       }
       control_dicts[control.slug].update(**control_acr_people[control.slug])
 

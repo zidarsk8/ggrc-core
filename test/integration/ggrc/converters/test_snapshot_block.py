@@ -95,7 +95,7 @@ class TestSnapshotBlockConverter(TestCase):
         ('means', 'Type/Means'),
         ('reference_url', 'Reference URL'),
         ('verify_frequency', 'Frequency'),
-        ('document_evidence', 'Evidence'),
+        ('document_evidence', 'Evidence File'),
     ]
     ac_roles = db.session.query(all_models.AccessControlRole.name).filter(
         all_models.AccessControlRole.object_type == "Control"

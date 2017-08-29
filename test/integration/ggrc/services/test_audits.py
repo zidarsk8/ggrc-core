@@ -32,7 +32,8 @@ class TestAuditActions(TestCase, WithQueryApi):
     """Filter by = operator."""
     evidence = "Some title 3"
     audits = self._get_first_result_set(
-        self._make_query_dict("Audit", expression=["evidence", "=", evidence]),
+        self._make_query_dict("Audit",
+                              expression=["evidence file", "=", evidence]),
         "Audit",
     )
     self.assertEqual(audits["count"], 1)
@@ -71,7 +72,7 @@ class TestAuditActions(TestCase, WithQueryApi):
 
     audits = self._get_first_result_set(
         self._make_query_dict("Audit",
-                              expression=["url", "=", "test_link"]),
+                              expression=["evidence url", "=", "test_link"]),
         "Audit",
     )
     self.assertEqual(audits["count"], 1)

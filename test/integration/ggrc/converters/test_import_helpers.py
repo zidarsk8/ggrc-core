@@ -346,8 +346,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Auditors",
         "Archived",
         "Delete",
-        "Url",
-        "Evidence"
+        "Evidence URL",
+        "Evidence File"
     }
     expected_fields = {
         "mandatory": {
@@ -414,8 +414,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Verifiers",
         "Assessment Type",
         "Reference URL",
-        "Evidence",
-        "Url",
+        "Evidence File",
+        "Evidence URL",
         "Code",
         "Effective Date",
         "Stop Date",
@@ -465,8 +465,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Deprecated Date",
         "State",
         "Review State",
-        "Url",
-        "Evidence",
+        "Evidence URL",
+        "Evidence File",
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
@@ -567,7 +567,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Last Assessment Date",
         "Review State",
-        "Evidence",
+        "Evidence File",
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
