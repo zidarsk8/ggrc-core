@@ -137,23 +137,6 @@ $grid-data-header-height: 66px;
     color: $infoWidgetHeader;
   }
 
-  &__title {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-
-    .simple-modal__title__name {
-      margin-right: 10px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
-    }
-
-    .state-value {
-      line-height: 18px;
-    }
-  }
-
   &__footer {
     border-top: 1px solid $border-color;
     box-sizing: border-box;
@@ -194,13 +177,9 @@ $grid-data-header-height: 66px;
     max-width: 850px;
 
     .simple-modal__body {
+      padding: 0 16px;
       overflow: scroll;
       max-height: calc(100% - #{$simple-modal-header-height});
-
-      .assessment-mapped-controls__info,
-      assessment-mapped-control-related-objects:not(:last-child) > collapsible-panel {
-        border-bottom: 1px solid #e0e0e0;
-      }
     }
   }
 }
