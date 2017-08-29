@@ -1,8 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-import unittest
-
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.utils.rules import get_mapping_rules, get_unmapping_rules
 from ggrc.utils import title_from_camelcase

@@ -81,9 +81,9 @@ class TestExportMultipleObjects(TestCase):
       gen.generate_cycle(wf1)
 
     # Only workflows with at least one task group could be activated
-    workflows = db.session.query(Workflow).join(TaskGroup).\
-      filter(Workflow.id == TaskGroup.workflow_id,
-             Workflow.status == 'Draft').all()
+    workflows = db.session.query(Workflow).join(TaskGroup).filter(
+        Workflow.id == TaskGroup.workflow_id,
+        Workflow.status == 'Draft').all()
     for wf in workflows:
       gen.activate_workflow(wf)
 

@@ -125,8 +125,8 @@ ILLEGAL_APPEND_CONTROL_VALUE = ("Line {line}: "
                                 "{object_type}, because this {mapped_type} is "
                                 "not mapped to the related audit.")
 
-UNMODIFIABLE_COLUMN = ("Line {line}: Column '{column_name}' can not be "
-                       "modified. The value will be ignored.")
+UNMODIFIABLE_COLUMN = (u"Line {line}: Column '{column_name}' can not be "
+                       u"modified. The value will be ignored.")
 
 ARCHIVED_IMPORT_ERROR = (u"Line {line}: Importing archived instance is "
                          u"prohibited. The line will be ignored.")

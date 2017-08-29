@@ -63,7 +63,7 @@ class UnitColumnHandler(handlers.ColumnHandler):
     if not self.row_converter.is_new and self.raw_value:
       insp = inspection.inspect(self.row_converter.obj)
       unit_prev = getattr(insp.attrs, self.key).history.unchanged
-      if not value in unit_prev:
+      if value not in unit_prev:
         self.add_warning(errors.UNMODIFIABLE_COLUMN,
                          column_name=self.display_name)
         self.set_empty = False
@@ -105,7 +105,7 @@ class RepeatEveryColumnHandler(handlers.ColumnHandler):
     if not self.row_converter.is_new and self.raw_value:
       insp = inspection.inspect(self.row_converter.obj)
       repeat_prev = getattr(insp.attrs, self.key).history.unchanged
-      if not value in repeat_prev:
+      if value not in repeat_prev:
         self.add_warning(errors.UNMODIFIABLE_COLUMN,
                          column_name=self.display_name)
         self.set_empty = False
