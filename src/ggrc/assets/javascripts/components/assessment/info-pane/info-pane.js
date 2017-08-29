@@ -342,7 +342,7 @@
         this.attr('deferredSave', new GGRC.Utils.DeferredTransaction(
           function (resolve, reject) {
             this.attr('instance').save().done(resolve).fail(reject);
-          }.bind(this), 1000));
+          }.bind(this), 1000, true));
       },
       onStateChange: function (event) {
         var isUndo = event.undo;
