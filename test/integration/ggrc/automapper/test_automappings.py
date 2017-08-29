@@ -7,6 +7,7 @@ import itertools
 from contextlib import contextmanager
 
 import ggrc
+from ggrc import automapper
 from ggrc import models
 from ggrc.models import Automapping
 from integration.ggrc import TestCase
@@ -18,14 +19,6 @@ from integration.ggrc.models.factories import random_str
 def make_name(msg):
   """Make name helper function"""
   return random_str(prefix=msg)
-
-
-def relate(src, dst):
-  """Helper function for creating a mapping between two objects"""
-  if src < dst:
-    return (src, dst)
-  else:
-    return (dst, src)
 
 
 @contextmanager
@@ -102,17 +95,17 @@ class TestAutomappings(TestCase):
       objects.add(src)
       objects.add(dst)
       self.create_mapping(src, dst)
-      mappings.add(relate(src, dst))
+      mappings.add(automapper.AutomapperGenerator.order(src, dst))
     if not isinstance(implied, list):
       implied = [implied]
     for src, dst in implied:
       objects.add(src)
       objects.add(dst)
       self.assert_mapping(src, dst)
-      mappings.add(relate(src, dst))
+      mappings.add(automapper.AutomapperGenerator.order(src, dst))
     possible = set()
     for src, dst in itertools.product(objects, objects):
-      possible.add(relate(src, dst))
+      possible.add(automapper.AutomapperGenerator.order(src, dst))
     for src, dst in possible - mappings:
       self.assert_mapping(src, dst, missing=True)
 

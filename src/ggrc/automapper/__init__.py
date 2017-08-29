@@ -92,7 +92,7 @@ class AutomapperGenerator(object):
     return self.cache[obj]
 
   @staticmethod
-  def relate(src, dst):
+  def order(src, dst):
     return (src, dst) if src < dst else (dst, src)
 
   def generate_automappings(self, relationship):
@@ -150,8 +150,8 @@ class AutomapperGenerator(object):
       # it means that the mapping was already created by another request
       # and we can safely ignore it.
       inserter = Relationship.__table__.insert().prefix_with("IGNORE")
-      original = self.relate(Stub.from_source(parent_relationship),
-                             Stub.from_destination(parent_relationship))
+      original = self.order(Stub.from_source(parent_relationship),
+                            Stub.from_destination(parent_relationship))
       db.session.execute(inserter.values([{
           "id": None,
           "modified_by_id": current_user.id,
@@ -188,7 +188,7 @@ class AutomapperGenerator(object):
       src_related = (o for o in self.related(src)
                      if o.type in mappings and o != dst)
       for r in src_related:
-        entry = self.relate(r, dst)
+        entry = self.order(r, dst)
         if entry not in self.processed:
           self.queue.add(entry)
 
