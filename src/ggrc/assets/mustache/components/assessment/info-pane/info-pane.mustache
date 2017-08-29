@@ -223,7 +223,10 @@
               <related-issues {base-instance}="instance"
                                     {all-related-snapshots}="mappedSnapshots"></related-issues>
           </tab-panel>
-          <tab-panel {(panels)}="panels" title-text="Other Attributes" class="assessment-attributes-panel">
+          <tab-panel {(panels)}="panels"
+                     title-text="Other Attributes"
+                     class="assessment-attributes-panel"
+                     (update-active-tab)="initGlobalAttributes">
               <div class="assessment-attributes-panel">
                 <custom-roles {instance}="instance"></custom-roles>
                 <assessment-custom-attributes (on-update-attributes)="saveGlobalAttributes(%event)"
@@ -447,11 +450,10 @@
             </div>
           </tab-panel>
 
-                <tab-panel {(panels)}="panels" title-text="Change Log">
-                    <revision-log {instance}="instance"></revision-log>
-                </tab-panel>
-          </tab-container>
-        </div>
+          <tab-panel {(panels)}="panels" title-text="Change Log">
+              <revision-log {instance}="instance"></revision-log>
+          </tab-panel>
+      </tab-container>
     </div><!-- tier-content end -->
   </inline-form-control>
 </section>
