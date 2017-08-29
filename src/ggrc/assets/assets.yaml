@@ -1,13 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-dashboard-js-files:
-  - tracker.js
-
-app-init-files:
-  - apps/dashboard.js
-  - dashboard.js
-
 dashboard-js-template-files:
   - components/info-pane/info-pane-footer.mustache
   - components/tabs/tab-container.mustache
@@ -365,11 +358,6 @@ dashboard-js-template-files:
   - components/inline/base-inline-control-title.mustache
   - components/assessment/info-pane/inline-item.mustache
   - components/loading/loading-status.mustache
-
-dashboard-css-files:
-  - dashboard.css
-  - wysihtml5/bootstrap-wysihtml5-0.0.2.css
-  - jquery/jquery-ui.css
 
 dashboard-js-spec-files:
   - spec_setup.js
