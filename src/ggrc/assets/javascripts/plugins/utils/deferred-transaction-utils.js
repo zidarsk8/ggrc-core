@@ -10,27 +10,77 @@
    * The util allows to perform batch of actions with some delay in a single transaction.
    * @param {function} completeTransaction - The function that allows to submit result of transaction.
    * @param {number} timeout - The execution delay in milliseconds.
+   * @param {bool} sequentially - The flag indicates that transactions must be completed sequentially.
    */
-  GGRC.Utils.DeferredTransaction = function (completeTransaction, timeout) {
+  GGRC.Utils.DeferredTransaction = function (
+      completeTransaction,
+      timeout,
+      sequentially) {
     var deferredQueue = [];
     var timeoutId = null;
 
-    function runQueue(queue) {
-      can.each(queue, function (actionItem) {
+    var sequence = {
+      transactionDfd: can.Deferred().resolve(),
+      callbackAdded: false
+    };
+
+    function runBatch(batch) {
+      can.each(batch, function (actionItem) {
         actionItem.action();
       });
     }
 
-    function resolveQueue(queue, result) {
-      can.each(queue, function (actionItem) {
+    function resolveBatch(batch, batchDfd, result) {
+      can.each(batch, function (actionItem) {
         actionItem.deferred.resolve(result);
       });
+      batchDfd.resolve();
     }
 
-    function rejectQueue(queue, result) {
-      can.each(queue, function (actionItem) {
+    function rejectBatch(batch, batchDfd, result) {
+      can.each(batch, function (actionItem) {
         actionItem.deferred.reject(result);
       });
+      batchDfd.resolve();
+    }
+
+    function processQueue() {
+      var batchDfd = can.Deferred();
+      var currentBatch = deferredQueue.splice(0, deferredQueue.length);
+
+      runBatch(currentBatch);
+      completeTransaction(
+        resolveBatch.bind(this, currentBatch, batchDfd),
+        rejectBatch.bind(this, currentBatch, batchDfd));
+
+      return batchDfd.promise();
+    }
+
+    function run() {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(processQueue, timeout);
+    }
+
+    function runSequence() {
+      if (sequence.transactionDfd.state() !== 'pending') {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(processSequentially, timeout);
+      } else {
+        addSequenceCallback();
+      }
+    }
+
+    function processSequentially() {
+      sequence.transactionDfd = can.Deferred();
+      sequence.callbackAdded = false;
+      processQueue().then(sequence.transactionDfd.resolve);
+    }
+
+    function addSequenceCallback() {
+      if (!sequence.callbackAdded) {
+        sequence.transactionDfd.then(processSequentially);
+        sequence.callbackAdded = true;
+      }
     }
 
     /**
@@ -45,22 +95,11 @@
         action: action
       });
 
-      if (timeoutId) {
-        clearTimeout(timeoutId);
+      if (sequentially) {
+        runSequence();
+      } else {
+        run();
       }
-
-      timeoutId = setTimeout(function () {
-        var currentQueue = deferredQueue.slice();
-        runQueue(currentQueue);
-
-        completeTransaction(
-          resolveQueue.bind(this, currentQueue),
-          rejectQueue.bind(this, currentQueue));
-
-        deferredQueue = deferredQueue.filter(function (action) {
-          return currentQueue.indexOf(action) < 0;
-        });
-      }, timeout);
 
       return dfd.promise();
     };
