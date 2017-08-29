@@ -126,14 +126,117 @@
       width: 32%;
       vertical-align: top;
     }
+  }
+}
 
-    collapsible-panel.details-item {
+.mapped-controls-info {
+  font-size: 13px;
 
-      .collapsible-panel-body {
-        .body-inner {
-          border-bottom: 0;
-        }
+  &__header-text {
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-right: 8px;
+    font-size: 13px;
+    color: $link;
+  }
+
+  &__title-text {
+    font-size: 16px;
+    color: $infoWidgetHeader;
+  }
+
+  &__title-state {
+    line-height: 18px;
+    font-size: 13px;
+  }
+
+  &__body {
+    collapsible-panel-header {
+      margin: 23px 0;
+
+      .fa {
+        width: auto;
+        margin-right: 12px;
       }
+    }
+
+    .collapsible-panel-body {
+
+      > .body-inner {
+        padding: 0;
+      }
+
+      h6 {
+        float: none;
+        width: 100%;
+      }
+    }
+
+    .object-list__item {
+      line-height: 18px;
+    }
+
+    .object-list__item:not(:first-child) {
+      padding-top: 24px;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .object-list__item-empty {
+      margin: 0 0 20px 0;
+    }
+  }
+
+  &__related-objects {
+    .mapped-related-objects {
+      border-top: 1px solid #e0e0e0;
+    }
+  }
+}
+
+.mapped-object-info {
+  &__title {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  &__title-text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+    font-size: 13px;
+    color: $link;
+  }
+
+  &__item {
+    margin: 0 0 20px 0;
+    padding: 0 15px 0 0;
+    box-sizing: border-box;
+  }
+
+  &__attributes {
+    display: flex;
+    flex-wrap: wrap;
+
+    .mapped-object-info__item{
+      flex-basis: 50%;
+    }
+
+    custom-attributes {
+      width: 100%;
+    }
+
+    .inline-edit__title,
+    .inline-edit__content {
+      padding-left: 0px;
     }
   }
 }

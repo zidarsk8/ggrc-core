@@ -24,89 +24,8 @@ collapsible-panel {
       width: 50%;
     }
 
-    .collapsible-panel-body__control_info {
-      h6 {
-        float: none;
-      }
-
-      .object-popover-attributes {
-        flex: 0 0 100%;
-        align-items: stretch;
-
-        > * {
-          margin: 8px 0 0;
-          flex-basis: 50%;
-          min-width: 50%;
-        }
-      }
-    }
-
     .object-list__item h6 {
       float: none;
-    }
-
-    .mapped-object-attributes custom-attributes {
-      flex: 0 0 100%;
-    }
-
-    .mapped-object-attributes .row-fluid.wrap-row {
-      flex: 0 0 100%;
-      align-items: stretch;
-
-      > * {
-        padding: 0 7px;
-        margin: 8px 0 0;
-        flex-basis: 50%;
-        min-width: 50%;
-      }
-
-      .inline-edit__title,
-      .inline-edit__content {
-        padding-left: 0px;
-      }
-    }
-
-    .collapsible-panel-body__control_info > .flex-size-1,
-    .collapsible-panel-body__control_info .object-popover-attributes .flex-size-1,
-    .mapped-controls-list .flex-size-1 {
-      margin-top: 8px;
-      margin-bottom: 20px;
-      padding: 0 7px;
-    }
-
-    .mapped-controls-list .object-popover-attributes custom-attributes {
-      padding: 0 7px;
-    }
-  }
-
-  &.details-item {
-    margin: 0;
-
-    .collapsible-panel-body {
-      > .body-inner {
-        padding: 0;
-        border-bottom: 1px solid #ccc;
-
-        &.is-expanded {
-          padding: 4px 8px 4px 24px;
-        }
-      }
-    }
-
-    collapsible-panel-header {
-      height: 46px;
-      line-height: 46px;
-
-      .title-text {
-        text-transform: capitalize;
-        font-size: 13px;
-        font-weight: normal;
-      }
-
-      .fa {
-        height: 46px;
-        line-height: 46px;
-      }
     }
   }
 }
@@ -182,4 +101,3 @@ collapsible-panel-header {
     display: inline-block;
   }
 }
-
