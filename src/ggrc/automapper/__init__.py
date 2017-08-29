@@ -58,10 +58,17 @@ class AutomapperGenerator(object):
   def related(self, obj):
     if obj in self.cache:
       return self.cache[obj]
-    # Pre-fetch neighborhood for enqueued object since we're gonna need that
+
+    # Pre-fetch neighborhood for enqueued objects since we're gonna need these
     # results in a few steps. This drastically reduces number of queries.
     stubs = {s for rel in self.queue for s in rel}
     stubs.add(obj)
+    self._populate_cache(stubs)
+
+    return self.cache[obj]
+
+  def _populate_cache(self, stubs):
+    """Fetch all mappings for objects in stubs, cache them in self.cache."""
     # Union is here to convince mysql to use two separate indices and
     # merge te results. Just using `or` results in a full-table scan
     # Manual column list avoids loading the full object which would also try to
@@ -88,8 +95,6 @@ class AutomapperGenerator(object):
         self.cache[src].add(dst)
       if dst in stubs:
         self.cache[dst].add(src)
-
-    return self.cache[obj]
 
   @staticmethod
   def order(src, dst):
