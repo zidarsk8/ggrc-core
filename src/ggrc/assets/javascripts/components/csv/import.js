@@ -251,8 +251,4 @@
       }
     }
   });
-  var csvImport = $("#csv_import");
-  if (csvImport.length) {
-    csvImport.html(can.view(GGRC.mustache_path + "/import_export/import.mustache", {}));
-  }
 })(window.can, window.can.$, GGRC.Utils);
