@@ -159,10 +159,12 @@ class CustomAttributable(object):
         value.custom_attribute_id or value.custom_attribute.id: value
         for value in self.custom_attribute_values
     }
+    # pylint: disable=not-an-iterable
     self._definitions_map = {
         definition.id: definition
         for definition in self.custom_attribute_definitions
     }
+    # pylint: enable=not-an-iterable
 
     if isinstance(values[0], dict):
       self._add_ca_value_dicts(values)
@@ -306,6 +308,7 @@ class CustomAttributable(object):
     This code should only be used for custom attribute definitions until
     setter for that is updated.
     """
+    # pylint: disable=too-many-locals
     from ggrc.models.custom_attribute_value import CustomAttributeValue
     from ggrc.services import signals
 
@@ -515,6 +518,7 @@ class CustomAttributable(object):
       # it should be refactored once Evicence-CA mapping is introduced
       def evidence_required(cav):
         """Return True if an evidence is required for this `cav`."""
+        # pylint: disable=protected-access
         flags = (cav._multi_choice_options_to_flags(cav.custom_attribute)
                  .get(cav.attribute_value))
         return flags and flags.evidence_required

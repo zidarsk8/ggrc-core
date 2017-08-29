@@ -481,7 +481,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
         models.Snapshot.child_type == control.__class__.__name__,
         models.Snapshot.child_id == control.id).one()
 
-    for field in update_data.keys():
+    for field in update_data:
       self.assertEqual(
           getattr(control_snapshot, field),
           getattr(control_snapshot_updated, field)
