@@ -8,7 +8,6 @@ from sqlalchemy import orm
 
 from ggrc import db
 from ggrc import fulltext
-from ggrc import views
 from ggrc.fulltext.mysql import MysqlRecordProperty
 from ggrc.utils import QueryCounter
 from ggrc.fulltext import mysql
@@ -93,7 +92,10 @@ class TestTotalReindex(TestCase):
           factory()
     indexer = fulltext.get_indexer()
     count = indexer.record_type.query.count()
-    views.do_reindex()
+    count = indexer.record_type.query.delete()
+    self.client.get("/login")
+    self.client.post("/admin/reindex")
+
     # ACR roles are created in migration and aren't removed in setup
     # Index for them will be created only after reindexing
     reindexed_count = indexer.record_type.query.filter(
