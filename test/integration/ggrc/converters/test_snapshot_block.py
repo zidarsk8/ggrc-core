@@ -95,6 +95,8 @@ class TestSnapshotBlockConverter(TestCase):
         ('means', 'Type/Means'),
         ('reference_url', 'Reference URL'),
         ('verify_frequency', 'Frequency'),
+        ('recipients', 'Recipients'),
+        ('send_by_default', 'Send by default'),
         ('document_evidence', 'Evidence File'),
         ('updated_at', 'Last Updated'),
         ('modified_by', 'Last Updated By'),
