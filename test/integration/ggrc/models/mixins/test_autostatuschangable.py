@@ -3,6 +3,8 @@
 
 """Integration test for AutoStatusChangeable mixin"""
 
+import ddt
+
 from ggrc import models
 
 from integration.ggrc import TestCase
@@ -11,6 +13,7 @@ from integration.ggrc import generator
 from integration.ggrc.models import factories
 
 
+@ddt.ddt
 class TestMixinAutoStatusChangeable(TestCase):
 
   """Test case for AutoStatusChangeable mixin"""
@@ -35,8 +38,13 @@ class TestMixinAutoStatusChangeable(TestCase):
     assessment = self.refresh_object(assessment)
     self.assertEqual(assessment.status, models.Assessment.PROGRESS_STATE)
 
-  def test_chaning_assignees_when_open_should_not_change_status(self):
-    """Adding/chaning/removing assignees shouldn't change status when open"""
+  @ddt.data("DONE_STATE", "START_STATE")
+  def test_changing_assignees_should_not_change_status(self, test_state):
+    """Adding/chaning/removing assignees shouldn't change status
+
+    Test assessment in FINAL_STATE should not get to PROGRESS_STATE on
+    assignee edit.
+    """
     people = [
         ("creator@example.com", "Creator"),
         ("assessor_1@example.com", "Assessor"),
@@ -44,31 +52,26 @@ class TestMixinAutoStatusChangeable(TestCase):
     ]
 
     assessment = self.create_assessment(people)
-
     assessment = self.refresh_object(assessment)
+    assessment = self.change_status(assessment,
+                                    getattr(assessment, test_state))
     self.assertEqual(assessment.status,
-                     models.Assessment.START_STATE)
-
+                     getattr(models.Assessment, test_state))
     self.modify_assignee(assessment,
                          "creator@example.com",
                          "Creator,Assessor")
-
     assessment = self.refresh_object(assessment)
     self.assertEqual(assessment.status,
-                     models.Assessment.START_STATE)
-
+                     getattr(models.Assessment, test_state))
     new_assessors = [("assessor_3_added_later@example.com", "Verifier")]
     self.create_assignees_restful(assessment, new_assessors)
-
     assessment = self.refresh_object(assessment)
     self.assertEqual(assessment.status,
-                     models.Assessment.START_STATE)
-
+                     getattr(models.Assessment, test_state))
     self.delete_assignee(assessment, "assessor_1@example.com")
-
     assessment = self.refresh_object(assessment)
     self.assertEqual(assessment.status,
-                     models.Assessment.START_STATE)
+                     getattr(models.Assessment, test_state))
 
   def test_assessment_verifiers_full_cycle_first_class_edit(self):
     """Test Assessment with verifiers full flow
@@ -124,61 +127,6 @@ class TestMixinAutoStatusChangeable(TestCase):
                      True)
     self.assertEqual(assessment.status,
                      models.Assessment.PROGRESS_STATE)
-
-  def test_adding_assignees(self):
-    """Test that adding assignees reverts back to in progress"""
-    assessment = self.create_simple_assessment()
-
-    new_assessors = [("assessor_3_added_later@example.com", "Assessor")]
-    self.create_assignees_restful(assessment, new_assessors)
-
-    assessment = self.refresh_object(assessment)
-    self.assertEqual(assessment.status,
-                     models.Assessment.PROGRESS_STATE)
-
-  def test_deleting_existing_assignees(self):
-    """Test that deleting assignees reverts back to in progress"""
-
-    assessment = self.create_simple_assessment()
-
-    for_deletion = "assessor_2@example.com"
-    self.delete_assignee(assessment, for_deletion)
-
-    assessment = self.refresh_object(assessment)
-    self.assertEqual(assessment.status,
-                     models.Assessment.PROGRESS_STATE)
-
-  def test_modifying_existing_assignees(self):
-    """Test that adding assignee new role reverts back to in progress"""
-    assessment = self.create_simple_assessment()
-
-    self.modify_assignee(assessment,
-                         "creator@example.com",
-                         "Creator,Assessor")
-
-    assessment = self.refresh_object(assessment)
-    self.assertEqual(assessment.status,
-                     models.Assessment.PROGRESS_STATE)
-
-    # test reverting an Assessment in review
-    assessment = self.change_status(assessment, assessment.DONE_STATE)
-    assessment = self.refresh_object(assessment)
-
-    self.modify_assignee(
-        assessment, "creator@example.com", "Creator,Assessor,Verifier")
-
-    assessment = self.refresh_object(assessment)
-    self.assertEqual(assessment.status, models.Assessment.PROGRESS_STATE)
-
-    # test reverting a completed Assessment
-    assessment = self.change_status(assessment, assessment.FINAL_STATE)
-    assessment = self.refresh_object(assessment)
-
-    self.modify_assignee(
-        assessment, "creator@example.com", "Creator,Verifier")
-
-    assessment = self.refresh_object(assessment)
-    self.assertEqual(assessment.status, models.Assessment.PROGRESS_STATE)
 
   def test_modifying_person_custom_attribute_changes_status(self):
     """Test that changing a Person CA changes the status to in progress."""
@@ -453,17 +401,3 @@ class TestMixinAutoStatusChangeable(TestCase):
     self.assertEqual(assessment.status,
                      models.Assessment.DONE_STATE)
     return assessment
-
-  def test_assessment_with_ready_to_review_add_verifier(self):
-    """
-    Test that adding verifier reverts back assessment status to in progress
-    """
-    assessment = self.create_assessment_in_ready_to_review()
-    self.assertEqual(assessment.status,
-                     models.Assessment.DONE_STATE)
-    self.modify_assignee(assessment,
-                         "creator@example.com",
-                         "Verifier")
-    assessment = self.refresh_object(assessment)
-    self.assertEqual(assessment.status,
-                     models.Assessment.PROGRESS_STATE)
