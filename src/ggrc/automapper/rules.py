@@ -32,45 +32,49 @@ def get_type_levels():
 Rule = collections.namedtuple("Rule", ["top", "mid", "bottom"])
 
 
-class RuleSet(collections.defaultdict):
-  """Automapping Rule collection with validation logic."""
-  DEFAULT = frozenset()
-  _type_levels = get_type_levels()
+def _check_rule_type_order(type_levels, *type_sets):
+  """Raise exception if types violate type ordering.
 
-  @classmethod
-  def _assert_type_order(cls, *type_sets):
-    """Raise exception if types violate type ordering.
+  In a correct Rule, the levels of types must not be decreasing.
+  """
+  try:
+    levels = [{(type_levels[type_]) for type_ in set_}
+              for set_ in type_sets]
+  except KeyError as e:
+    raise AutomappingRuleConfigError("Unknown level for {}"
+                                     .format(e.args[0]))
 
-    In a correct Rule, the levels of types must not be decreasing.
-    """
-    try:
-      levels = [{(cls._type_levels[type_])
-                 for type_ in set_}
-                for set_ in type_sets]
-    except KeyError as e:
-      raise AutomappingRuleConfigError("Unknown level for {}"
-                                       .format(e.args[0]))
+  for i, level in enumerate(levels[1:], 1):
+    if max(level) < min(levels[i - 1]):
+      raise AutomappingRuleConfigError(
+          "All types {} must be higher than all types {}"
+          .format(type_sets[i - 1], type_sets[i]))
 
-    for i, level in enumerate(levels[1:], 1):
-      if max(level) < min(levels[i - 1]):
-        raise AutomappingRuleConfigError(
-            "All types {} must be higher than all types {}"
-            .format(type_sets[i - 1], type_sets[i]))
 
-  @classmethod
-  def _explode_rules(cls, rule_list):
-    for rule in rule_list:
-      cls._assert_type_order(rule.top, rule.mid, rule.bottom)
-      for top, mid, bottom in itertools.product(rule.top, rule.mid,
-                                                rule.bottom):
-        yield (bottom, mid, top)
-        yield (top, mid, bottom)
+def validate_rules(rule_list):
+  """Validate te order of types in every rule from a list."""
+  type_levels = get_type_levels()
+  for rule in rule_list:
+    _check_rule_type_order(type_levels, rule.top, rule.mid, rule.bottom)
 
-  def __init__(self, rule_list):
-    super(RuleSet, self).__init__(lambda: self.DEFAULT)
 
-    for src, dst, mapping in self._explode_rules(rule_list):
-      self[src, dst] |= {mapping}
+def explode_rules(rule_list):
+  for rule in rule_list:
+    for top, mid, bottom in itertools.product(rule.top, rule.mid,
+                                              rule.bottom):
+      yield (bottom, mid, top)
+      yield (top, mid, bottom)
+
+
+def make_rule_set(rule_list):
+  """Validate and explode rule list into elementary rules."""
+  validate_rules(rule_list)
+
+  rule_set = collections.defaultdict(frozenset)
+  for src, dst, mapping in explode_rules(rule_list):
+    rule_set[src, dst] |= {mapping}
+
+  return rule_set
 
 
 class Types(object):
@@ -83,7 +87,7 @@ class Types(object):
   people_groups = {'AccessGroup', 'Person', 'OrgGroup', 'Vendor'}
 
 
-rules = RuleSet(rule_list=[
+rules = make_rule_set(rule_list=[
     Rule(
         # mapping directive to a program
         {'Program'},

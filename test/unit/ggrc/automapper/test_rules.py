@@ -10,8 +10,8 @@ import mock
 from ggrc.automapper import rules
 
 
-class TestRuleSet(TestCase):
-  """Unit tests for rule set container."""
+class TestRules(TestCase):
+  """Unit tests for rule set maker."""
 
   MOCK_TYPE_ORDERING = [["TopLevel"],
                         ["UpperMidLevel1", "UpperMidLevel2"],
@@ -31,9 +31,7 @@ class TestRuleSet(TestCase):
                        {"LowerMidLevel1"})
     rule_list = [rule1, rule2, rule3]
 
-    rules.RuleSet._type_levels = rules.get_type_levels()
-
-    result = rules.RuleSet._explode_rules(rule_list)
+    result = rules.explode_rules(rule_list)
 
     self.assertEqual(
         sorted(result),
@@ -60,27 +58,19 @@ class TestRuleSet(TestCase):
     )
 
   @mock.patch("ggrc.automapper.rules.TYPE_ORDERING", new=MOCK_TYPE_ORDERING)
-  def test_explode_rules_wrong_order(self):
+  def test_validate_rules_wrong_order(self):
     rule = rules.Rule({"LowerMidLevel1"},
                       {"TopLevel"},
                       {"BottomLevel1"})
 
-    rules.RuleSet._type_levels = rules.get_type_levels()
-
     with self.assertRaises(rules.AutomappingRuleConfigError):
-      for _ in rules.RuleSet._explode_rules([rule]):
-        # force the generator to yield all values
-        pass
+      rules.validate_rules([rule])
 
   @mock.patch("ggrc.automapper.rules.TYPE_ORDERING", new=MOCK_TYPE_ORDERING)
-  def test_explode_rules_unknown_type(self):
+  def test_validate_rules_unknown_type(self):
     rule = rules.Rule({"TopLevel"},
                       {"UnknownType"},
                       {"BottomLevel1"})
 
-    rules.RuleSet._type_levels = rules.get_type_levels()
-
     with self.assertRaises(rules.AutomappingRuleConfigError):
-      for _ in rules.RuleSet._explode_rules([rule]):
-        # force the generator to yield all values
-        pass
+      rules.validate_rules([rule])
