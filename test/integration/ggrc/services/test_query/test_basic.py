@@ -161,10 +161,9 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     response = self._post(data)
     self.assert400(response)
 
-    self.assertEqual(
-        ("Invalid date was typed into `{}` field, "
-         "please change it and try again!").format(field),
-        response.json['message'])
+    self.assertEqual(u"Specified date format is invalid for search, "
+                     u"please update it and try again.",
+                     response.json['message'])
 
   def test_basic_query_text_search(self):
     """Filter by fulltext search."""
@@ -1285,10 +1284,9 @@ class TestQueryWithCA(TestCase, WithQueryApi):
     )
     response = self._post(data)
     self.assert400(response)
-    self.assertEqual(
-        ("Invalid date was typed into `ca date` field, "
-         "please change it and try again!"),
-        response.json['message'])
+    self.assertEqual(u"Specified date format is invalid for search, "
+                     u"please update it and try again.",
+                     response.json['message'])
 
 
 @ddt.ddt
