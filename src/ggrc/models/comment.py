@@ -45,6 +45,9 @@ class Commentable(object):
       "Assignees",
       "Creators",
       "Verifiers",
+      "Admin",
+      "Primary Contacts",
+      "Secondary Contacts",
   ])
 
   @validates("recipients")
