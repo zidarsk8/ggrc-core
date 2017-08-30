@@ -101,6 +101,12 @@ class Commentable(object):
         orm.Load(cls).subqueryload("comments").load_only("id", "description")
     )
 
+  @classmethod
+  def eager_query(cls):
+    """Eager Query"""
+    query = super(Commentable, cls).eager_query()
+    return query.options(orm.subqueryload('comments'))
+
   @declared_attr
   def comments(cls):  # pylint: disable=no-self-argument
     """Comments related to self via Relationship table."""
