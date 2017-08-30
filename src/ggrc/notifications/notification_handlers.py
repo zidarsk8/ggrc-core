@@ -386,18 +386,18 @@ def handle_relationship_altered(rel):
   if asmt.type != u"Assessment":
     asmt, other = other, asmt
 
-  if other.type not in (u"Document", u"Person", u"Snapshot"):
-    return
+  if other.type in (u"Document", u"Person", u"Snapshot"):
+    if asmt.status != Statusable.START_STATE:
+      _add_assessment_updated_notif(asmt)
+    else:
+      _add_state_change_notif(
+          asmt, Transitions.TO_STARTED, remove_existing=True)
 
-  if asmt.status != Statusable.START_STATE:
-    _add_assessment_updated_notif(asmt)
-  else:
-    _add_state_change_notif(asmt, Transitions.TO_STARTED, remove_existing=True)
-
-  # when modified, a done Assessment gets automatically reopened
-  if asmt.status in Statusable.DONE_STATES:
-    _add_state_change_notif(
-        asmt, Transitions.TO_REOPENED, remove_existing=True)
+  if other.type in (u"Document", u"Snapshot"):
+    # when modified, a done Assessment gets automatically reopened
+    if asmt.status in Statusable.DONE_STATES:
+      _add_state_change_notif(
+          asmt, Transitions.TO_REOPENED, remove_existing=True)
 
 
 def register_handlers():  # noqa: C901
@@ -433,13 +433,7 @@ def register_handlers():  # noqa: C901
       handle_comment_created(obj, src)
 
   @signals.Restful.model_posted.connect_via(models.Relationship)
-  def relationship_created_listener(sender, obj=None, src=None, service=None):
-    handle_relationship_altered(obj)
-
   @signals.Restful.model_put.connect_via(models.Relationship)
-  def relationship_updated_listener(sender, obj=None, src=None, service=None):
-    handle_relationship_altered(obj)
-
   @signals.Restful.model_deleted.connect_via(models.Relationship)
-  def relationship_deleted_listener(sender, obj=None, src=None, service=None):
+  def relationship_altered_listener(sender, obj=None, src=None, service=None):
     handle_relationship_altered(obj)
