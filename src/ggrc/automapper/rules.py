@@ -69,8 +69,7 @@ class RuleSet(collections.defaultdict):
   def __init__(self, rule_list):
     super(RuleSet, self).__init__(lambda: self.DEFAULT)
 
-    # TODO: rewrite so that "for src, dst, mapping in ..." works
-    for dst, src, mapping in self._explode_rules(rule_list):
+    for src, dst, mapping in self._explode_rules(rule_list):
       self[src, dst] |= {mapping}
 
 

@@ -190,10 +190,10 @@ class AutomapperGenerator(object):
   def _step(self, src, dst):
     mappings = rules.rules[src.type, dst.type]
     if mappings:
-      src_related = (o for o in self.related(src)
-                     if o.type in mappings and o != dst)
-      for r in src_related:
-        entry = self.order(r, dst)
+      dst_related = (o for o in self.related(dst)
+                     if o.type in mappings and o != src)
+      for r in dst_related:
+        entry = self.order(r, src)
         if entry not in self.processed:
           self.queue.add(entry)
 
