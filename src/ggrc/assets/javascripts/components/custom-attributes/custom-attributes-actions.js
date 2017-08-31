@@ -6,10 +6,10 @@
   'use strict';
 
   GGRC.Components('localCustomAttributesActions', {
-    tag: 'local-custom-attributes-actions',
+    tag: 'custom-attributes-actions',
     template: can.view(
-      GGRC.mustache_path + '/components/local-custom-attributes/' +
-        'local-custom-attributes-actions.mustache'
+      GGRC.mustache_path + '/components/custom-attributes/' +
+        'custom-attributes-actions.mustache'
     ),
     viewModel: {
       formEditMode: false,

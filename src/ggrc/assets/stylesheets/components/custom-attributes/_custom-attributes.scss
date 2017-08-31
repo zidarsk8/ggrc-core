@@ -2,9 +2,9 @@
  * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
-@import "local-custom-attributes-actions";
+@import "custom-attributes-actions";
 
-local-custom-attributes {
+custom-attributes {
   display: block;
   position: relative;
 }
@@ -52,7 +52,7 @@ local-custom-attributes {
       flex-wrap: nowrap
     }
 
-    local-custom-attributes-field {
+    custom-attributes-field {
       display: block;
       flex: 1;
       min-width: 150px;

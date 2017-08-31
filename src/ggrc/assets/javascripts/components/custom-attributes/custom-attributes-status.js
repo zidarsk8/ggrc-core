@@ -10,7 +10,7 @@
   var IS_SAVING_TEXT = 'Saving...';
 
   GGRC.Components('localCustomAttributesStatus', {
-    tag: 'local-custom-attributes-status',
+    tag: 'custom-attributes-status',
     template: '<content></content>',
     viewModel: {
       define: {

@@ -5,9 +5,9 @@
 
 import '../controls-toolbar/controls-toolbar';
 import '../assessment-local-ca';
-import '../../local-custom-attributes/local-custom-attributes';
-import '../../local-custom-attributes/local-custom-attributes-field';
-import '../../local-custom-attributes/local-custom-attributes-status';
+import '../../custom-attributes/custom-attributes';
+import '../../custom-attributes/custom-attributes-field';
+import '../../custom-attributes/custom-attributes-status';
 import '../mapped-objects/mapped-related-information';
 import '../mapped-objects/mapped-comments';
 import '../mapped-objects/mapped-controls';

@@ -16,7 +16,7 @@
 	<em>{{helptext}}</em>
       </small>
     </div>
-    <local-custom-attributes-field
+    <custom-attributes-field
       {type}="type"
       {(value)}="value"
       {field-id}="id"
@@ -24,7 +24,7 @@
       {options}="options"
       (value-changed)="updateGlobalAttribute(%event, %context)"
       class="form-field__content {{extraClass type}}"
-    ></local-custom-attributes-field>
+    ></custom-attributes-field>
   </div>
 </div>
 {{/each}}

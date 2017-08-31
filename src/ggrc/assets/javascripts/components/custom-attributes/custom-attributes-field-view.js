@@ -13,10 +13,10 @@ import '../form/field-views/text-form-field-view';
   'use strict';
 
   GGRC.Components('localCustomAttributesFieldView', {
-    tag: 'local-custom-attributes-field-view',
+    tag: 'custom-attributes-field-view',
     template: can.view(
-      GGRC.mustache_path + '/components/local-custom-attributes/' +
-        'local-custom-attributes-field-view.mustache'
+      GGRC.mustache_path + '/components/custom-attributes/' +
+        'custom-attributes-field-view.mustache'
     ),
     viewModel: {
       type: null,
