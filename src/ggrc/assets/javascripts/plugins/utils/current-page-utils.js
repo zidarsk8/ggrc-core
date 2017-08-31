@@ -160,6 +160,8 @@
      * @return {can.Deferred} - resolved deferred object
      */
     function initCounts(widgets, type, id) {
+      // Request params generation logic should be moved in
+      // a separate place
       var params = can.makeArray(widgets)
         .map(function (widgetType) {
           var expression = GGRC.Utils.TreeView

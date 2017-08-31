@@ -16,7 +16,7 @@
       parentModel: {
         type: String,
         get: function () {
-          return this.attr('parent').type
+          return this.attr('parent').type;
         }
       },
       parentId: {
@@ -43,7 +43,8 @@
         type: Boolean,
         get: function () {
           return CurrentPage.isObjectContextPage() &&
-            CurrentPage.getPageType() !== 'Workflow';
+            CurrentPage.getPageType() !== 'Workflow' &&
+            this.attr('notDirectlyItems').length;
         }
       },
       notResult: {
@@ -86,7 +87,7 @@
           } else {
             this.loadItems(models).then(function () {
               setResult(models);
-            })
+            });
           }
         }
       },
@@ -128,6 +129,8 @@
       models = can.makeArray(models);
 
       if (!models.length) {
+        this.attr('directlyItems', []);
+        this.attr('notDirectlyItems', []);
         return can.Deferred().resolve();
       }
 

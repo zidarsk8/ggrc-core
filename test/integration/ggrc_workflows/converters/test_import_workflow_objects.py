@@ -1,7 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-
 """Tests for workflow specific imports."""
 
 from datetime import date
@@ -70,56 +69,6 @@ class TestWorkflowObjectsImport(TestCase):
         }
     }
     self._check_csv_response(response, expected_errors)
-
-  def test_import_task_date_format(self):
-    """Test import of tasks for workflows
-
-    This is a test for various imports of task dates for all types of
-    workflows. This test ignores all warnings returned by the file import,
-    since those are verified in a different test.
-
-    Raises:
-      AssertionError: if the start and end values on tasks don't match the
-        values in the imported csv files.
-    """
-    filename = "workflow_big_sheet.csv"
-    self.import_file(filename)
-
-    # Assert that CSV import got imported correctly
-    getters = {
-        "one_time": lambda task: (task.start_date, task.end_date),
-        "weekly": lambda task: (task.relative_start_day,
-                                task.relative_end_day),
-        "monthly": lambda task: (task.relative_start_day,
-                                 task.relative_end_day),
-        "quarterly": lambda task: ((task.relative_start_month,
-                                    task.relative_start_day),
-                                   (task.relative_end_month,
-                                    task.relative_end_day)),
-        "annually": lambda task: ((task.relative_start_month,
-                                   task.relative_start_day),
-                                  (task.relative_end_month,
-                                   task.relative_end_day))
-    }
-
-    tasks = [
-        ["task-1", "one_time", (date(2015, 7, 1), date(2015, 7, 15))],
-        ["task-2", "weekly", (2, 5)],
-        ["task-3", "monthly", (1, 22)],
-        ["task-4", "quarterly", ((1, 5), (2, 15))],
-        ["task-10", "quarterly", ((3, 5), (1, 1))],
-        ["task-11", "quarterly", ((3, 5), (1, 1))],
-        ["task-5", "annually", ((5, 7), (7, 15))],
-    ]
-
-    for slug, freq, result in tasks:
-      task = db.session.query(TaskGroupTask).filter(
-          TaskGroupTask.slug == slug).one()
-      getter = getters[freq]
-      self.assertEqual(task.task_group.workflow.frequency, freq)
-      self.assertEqual(
-          getter(task), result,
-          "Failed importing data for task with slug = '{}'".format(slug))
 
   def test_import_task_types(self):
     """Test task import with warnings
@@ -200,39 +149,6 @@ class TestWorkflowObjectsImport(TestCase):
     }
     self._check_csv_response(response, expected_errors)
 
-  def test_malformed_task_dates(self):
-    """Test import updates with malformed task dates.
-
-    Check that the warnings for task dates in MM/DD/YYYY format of annually
-    workflow are shown up and YYYY part of date is ignored.
-
-    Raises:
-      AssertionError: When file import does not return correct warnings for the
-        example csv, or if any of the tasks does not have the expected
-        relative dates.
-    """
-    response = self.import_file("workflow_malformed_task_dates.csv")
-
-    expected_errors = {
-        "Task Group Task": {
-            "row_warnings": {
-                errors.WRONG_DATE_FORMAT.format(line=15, column_name="Start"),
-                errors.WRONG_DATE_FORMAT.format(line=15, column_name="End"),
-                errors.WRONG_DATE_FORMAT.format(line=16, column_name="Start"),
-                errors.WRONG_DATE_FORMAT.format(line=17, column_name="End"),
-            },
-        },
-    }
-    self._check_csv_response(response, expected_errors)
-    task_slugs = ["t-1", "t-2", "t-3", "t-4"]
-    tasks = db.session.query(TaskGroupTask).filter(
-        TaskGroupTask.slug.in_(task_slugs)).all()
-    for task in tasks:
-      self.assertEqual(task.relative_start_month, 7)
-      self.assertEqual(task.relative_start_day, 10)
-      self.assertEqual(task.relative_end_month, 12)
-      self.assertEqual(task.relative_end_day, 30)
-
   def _test_task_types(self, expected_type, task_slugs):
     """Test that all listed tasks have rich text type.
 
@@ -278,7 +194,6 @@ class TestWorkflowObjectsImport(TestCase):
         ("code", slug),
         ("title", "SomeTitle"),
         ("Need Verification", import_value),
-        ("Frequency", "One time"),
         ("force real-time email updates", "no"),
         ("Manager", person.email),
     ]))
@@ -313,7 +228,6 @@ class TestWorkflowObjectsImport(TestCase):
         ("code", slug),
         ("title", "SomeTitle"),
         ("Need Verification", import_value),
-        ("Frequency", "One time"),
         ("force real-time email updates", "no"),
         ("Manager", person.email),
     ]))
@@ -330,7 +244,6 @@ class TestWorkflowObjectsImport(TestCase):
         ("object_type", "Workflow"),
         ("code", slug),
         ("title", "SomeTitle"),
-        ("Frequency", "One time"),
         ("force real-time email updates", "no"),
         ("Manager", person.email),
     ]))
@@ -348,7 +261,6 @@ class TestWorkflowObjectsImport(TestCase):
         ("object_type", "Workflow"),
         ("code", slug),
         ("title", "SomeTitle"),
-        ("Frequency", "One time"),
         ("force real-time email updates", "no"),
         ("Manager", person.email),
         ("Need Verification", data),

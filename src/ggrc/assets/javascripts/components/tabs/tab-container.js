@@ -23,6 +23,7 @@
       setActive: function (scope, el, ev) {
         ev.preventDefault();
         this.setActivePanel(scope.attr('tabIndex'));
+        this.dispatch('tabChanged');
       },
       /**
        * Update Panels List setting all panels except selected to inactive state
@@ -33,6 +34,7 @@
         this.attr('panels').forEach(function (panel) {
           var isActive = (panel.attr('tabIndex') === tabIndex);
           panel.attr('active', isActive);
+          panel.dispatch('updateActiveTab');
         });
       },
       /**

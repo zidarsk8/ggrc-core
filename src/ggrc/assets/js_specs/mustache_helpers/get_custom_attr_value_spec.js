@@ -22,16 +22,23 @@ describe('can.mustache.helper.get_custom_attr_value', function () {
       id: 3,
       attribute_type: '',
       title: 'Type'
+    },
+    {
+      definition_type: 'control',
+      title: 'CheckBox',
+      attribute_type: 'checkbox',
+      id: 4
     }];
 
     origValue = GGRC.custom_attr_defs;
     GGRC.custom_attr_defs = fakeCustomAttrDefs;
 
-    getHash = function (attrValue) {
+    getHash = function (attrValue, attrId, attrType) {
       var value = new can.Map({
         customAttrItem: {
           attribute_value: attrValue,
-          custom_attribute_id: 3
+          custom_attribute_id: attrId || 3,
+          attributeType: attrType
         }
       });
 
@@ -62,23 +69,23 @@ describe('can.mustache.helper.get_custom_attr_value', function () {
     expect(fakeOptions.hash.customAttrItem.reify).toHaveBeenCalled();
   });
 
-  it('return correct value if customAttrItem is undefined', function () {
+  it('return "No" if customAttrItem is undefined', function () {
     var value;
     fakeOptions.hash = false;
     fakeInstance.custom_attribute_values = [
-      getHash('correctValue').customAttrItem
+      getHash('correctValue', undefined, 'checkbox').customAttrItem
     ];
     value = helper(fakeAttr, fakeInstance, fakeOptions);
 
-    expect(value).toEqual('correctValue');
+    expect(value).toEqual('No');
   });
 
-  it('return correct value if customAttrItem is not undefined', function () {
+  it('return an empty string if customAttrItem is not undefined', function () {
     var value;
     fakeOptions.hash = getHash('correctValue');
     value = helper(fakeAttr, fakeInstance, fakeOptions);
 
-    expect(value).toEqual('correctValue');
+    expect(value).toEqual('');
   });
 
   it('fn() exec and return correct value (person type)', function () {
@@ -99,4 +106,49 @@ describe('can.mustache.helper.get_custom_attr_value', function () {
 
     expect(fakeOptions.fn).toHaveBeenCalledWith('correctValue');
   });
+
+  it('returns "on" for CA of type checkbox with value "1"',
+    function () {
+      var attr = {
+        attr_name: 'CheckBox'
+      };
+      var value;
+      fakeOptions = {
+        hash: getHash('1', 4, 'checkbox')
+      };
+
+      value = helper(attr, fakeInstance, fakeOptions);
+
+      expect(value).toEqual('Yes');
+    });
+
+  it('returns "off" for CA of type checkbox with value "0"',
+    function () {
+      var attr = {
+        attr_name: 'CheckBox'
+      };
+      var value;
+      fakeOptions = {
+        hash: getHash('0', 4, 'checkbox')
+      };
+
+      value = helper(attr, fakeInstance, fakeOptions);
+
+      expect(value).toEqual('No');
+    });
+
+  it('returns "" for CA of type checkbox with value ""',
+    function () {
+      var attr = {
+        attr_name: 'CheckBox'
+      };
+      var value;
+      fakeOptions = {
+        hash: getHash('', 4, 'checkbox')
+      };
+
+      value = helper(attr, fakeInstance, fakeOptions);
+
+      expect(value).toEqual('No');
+    });
 });

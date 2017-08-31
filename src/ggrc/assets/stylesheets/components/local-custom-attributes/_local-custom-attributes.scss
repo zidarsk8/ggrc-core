@@ -1,0 +1,125 @@
+/*
+ * Copyright (C) 2017 Google Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
+@import "local-custom-attributes-actions";
+
+local-custom-attributes {
+  display: block;
+  position: relative;
+}
+
+.fields-wrapper > show-more {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  .limit-button-container {
+    width: 100%;
+    padding: 0 0 0 12px;
+  }
+}
+
+.import-wrap > show-more  {
+  .limit-button-container {
+    button {
+      padding-left: 0px;
+    }
+  }
+}
+
+.fields-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  .field-wrapper {
+    flex: 1 1 50%;
+    margin: 0;
+    max-width: 50%;
+    padding: 0 16px 20px 28px;
+    position: relative;
+    flex-wrap: wrap;
+    display: flex;
+    box-sizing: border-box;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    &.inline-reverse {
+      flex-direction: row-reverse;
+      flex-wrap: nowrap
+    }
+
+    local-custom-attributes-field {
+      display: block;
+      flex: 1;
+      min-width: 150px;
+      max-width: 360px;
+      padding: 0 8px 0 0;
+      box-sizing: border-box;
+    }
+
+    .form-field__title {
+      padding: 0 8px 0 0;
+      width: 100%;
+    }
+
+    .form-field__content {
+      max-width: 360px;
+      &.inline-reverse {
+        min-width: auto;
+        padding: 5px 8px 0 0;
+      }
+    }
+
+    .form-field__validation-hint-placeholder {
+      width: 120px;
+      box-sizing: border-box;
+    }
+
+    form-validation-icon {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
+}
+
+.field {
+  &__title {
+    display: flex;
+    align-items: center;
+    line-height: 28px;
+    min-height: 28px;
+    box-sizing: border-box;
+  }
+
+  &__title-text {
+    display: inline-flex;
+    margin: 0;
+    font-weight: normal;
+    font-size: 11px;
+    color: #333;
+    white-space: normal;
+    word-wrap: break-word;
+    text-transform: uppercase;
+    line-height: 16px;
+    padding: 5px 0;
+    &.inline-reverse {
+      max-width: 332px;
+    }
+  }
+
+  &__title-helper-text {
+    margin: 0 2px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: $icon-color-dark;
+    width: 28px;
+    text-align: center;
+    line-height: 28px;
+  }
+}

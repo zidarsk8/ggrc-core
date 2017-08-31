@@ -652,6 +652,10 @@
         }
       }
     }
+
+    .repeat-summary {
+      margin: 16px 0 10px 0;
+    }
   }
   .modal-footer {
     @include box-shadow(none);

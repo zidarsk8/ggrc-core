@@ -19,12 +19,10 @@
       {{/each}}
     {{/with_mapping}}
   {{/case}}
-  {{#case 'frequency'}}
-    {{#if_equals instance.frequency 'one_time'}}
-      One time
-    {{else}}
-      {{instance.frequency}}
-    {{/if_equals}}
+  {{#case 'repeat'}}
+      <repeat-on-summary {unit}="instance.unit" {repeat-every}="instance.repeat_every"
+                         hide-repeat-off="false" class="repeat-cell">
+      </repeat-on-summary>
   {{/case}}
   {{#case 'status'}}
     {{#using status=instance.status}}

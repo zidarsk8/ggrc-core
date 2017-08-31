@@ -103,7 +103,7 @@
         var restore_button = scope._restore_button.bind(scope);
 
         scope.attr('waiting', true);
-        if (workflow.frequency !== 'one_time') {
+        if (workflow.unit !== null) {
           workflow.refresh().then(function () {
             workflow.attr('recurrences', true);
             workflow.attr('status', 'Active');

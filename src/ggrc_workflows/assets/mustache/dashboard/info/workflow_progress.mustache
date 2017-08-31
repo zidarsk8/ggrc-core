@@ -47,9 +47,13 @@
                 {{/if}}
               </div>
               <ul class="item-util">
-                <li>
-                  {{ins.task_data.task_count}} tasks in total / {{ins.task_data.verified_percentage}}% completed
-                </li>
+                {{#if ins.task_data.over_due_flag}}
+                  <li class="overdue-text">
+                    {{ins.task_data.over_due}} of {{ins.task_data.task_count}} tasks are overdue / {{ins.task_data.completed_percentage}}% completed
+                  </li>
+                {{else}}
+                  <li>{{ins.task_data.task_count}} tasks in total / {{ins.task_data.completed_percentage}}% completed</li>
+                {{/if}}
               </ul>
             </div>
           </div>

@@ -8,6 +8,7 @@
 import unittest
 from mock import MagicMock, patch
 
+from ggrc_workflows import models
 from ggrc_workflows.notification import data_handler
 
 
@@ -63,9 +64,8 @@ class GetCycleTaskUrlTestCase(unittest.TestCase):
     self.assertEqual(result, expected_url)
 
 
-@patch(
-    u"ggrc_workflows.notification.data_handler.get_url_root",
-    return_value=u"http://www.foo.com/")
+@patch(u"ggrc_workflows.models.cycle.get_url_root",
+       return_value=u"http://www.foo.com/")
 class GetCycleUrlTestCase(unittest.TestCase):
   """Tests for the get_cycle_url() function."""
 
@@ -73,31 +73,27 @@ class GetCycleUrlTestCase(unittest.TestCase):
 
   def test_generates_correct_url_for_active_cycle(self, *mocks):
     """The method should return correct URL for active Cycles."""
-    cycle = MagicMock()
-    cycle.id = 22
-    cycle.workflow.id = 111
+    workflow = MagicMock()
+    workflow.id = 111
+    cycle = models.Cycle(id=22, workflow=workflow)
 
     # by default, a cycle is considered active
-    result = data_handler.get_cycle_url(cycle)
-
     expected_url = (
         u"http://www.foo.com/"
         u"workflows/111#current_widget"
         u"/cycle/22"
     )
-    self.assertEqual(result, expected_url)
+    self.assertEqual(expected_url, cycle.cycle_url)
 
   def test_generates_correct_url_for_inactive_cycle(self, *mocks):
     """The method should return correct URL for inactive Cycles."""
-    cycle = MagicMock()
-    cycle.id = 22
-    cycle.workflow.id = 111
-
-    result = data_handler.get_cycle_url(cycle, active=False)
+    workflow = MagicMock()
+    workflow.id = 111
+    cycle = models.Cycle(id=22, workflow=workflow)
 
     expected_url = (
         u"http://www.foo.com/"
         u"workflows/111#history_widget"
         u"/cycle/22"
     )
-    self.assertEqual(result, expected_url)
+    self.assertEqual(expected_url, cycle.cycle_inactive_url)

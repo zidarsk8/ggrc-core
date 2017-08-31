@@ -43,32 +43,20 @@
         this.attr('isSaving', false);
         this.dispatch({
           type: 'afterCreate',
-          items: [comment],
+          item: comment,
           success: wasSuccessful
         });
-        this.attr('instance').dispatch('refreshInstance');
-      },
-      mapToParent: function (comment, parent) {
-        return (new CMS.Models.Relationship({
-          context: parent.attr('context') || {id: null},
-          source: parent,
-          destination: comment
-        })).save();
       },
       onCommentCreated: function (e) {
         var comment = e.comment;
         var self = this;
-        var parent = self.attr('instance');
 
         self.attr('isSaving', true);
         comment = self.updateComment(comment);
         self.dispatch({type: 'beforeCreate', items: [comment.attr()]});
 
         comment.save()
-          .then(function (comment) {
-            return self.mapToParent(comment, parent);
-          })
-          .then(function () {
+          .done(function () {
             return self.afterCreation(comment, true);
           })
           .fail(function () {

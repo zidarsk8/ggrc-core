@@ -6,13 +6,17 @@
 This contains the basic Workflow object and a mixin for determining the state
 of the Objects that are mapped to any cycle tasks.
 """
+import itertools
+from dateutil import relativedelta
+
 from sqlalchemy import and_
+from sqlalchemy import case
 from sqlalchemy import orm
+from sqlalchemy.ext import hybrid
 
 from ggrc import builder
 from ggrc import db
 from ggrc.fulltext import get_indexer
-from ggrc.fulltext.attributes import ValueMapFullTextAttr
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
@@ -22,6 +26,7 @@ from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
 from ggrc_workflows.models import cycle
 from ggrc_workflows.models import cycle_task_group
+from ggrc_workflows.services import google_holidays
 
 
 class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
@@ -32,51 +37,19 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   __tablename__ = 'workflows'
   _title_uniqueness = False
 
-  VALID_STATES = [u"Draft", u"Active", u"Inactive"]
-
-  # valid Frequency to user readable values mapping
-  VALID_FREQUENCIES = {
-      "one_time": "one time",
-      "weekly": "weekly",
-      "monthly": "monthly",
-      "quarterly": "quarterly",
-      "annually": "annually"
-  }
+  DRAFT = u"Draft"
+  ACTIVE = u"Active"
+  INACTIVE = u"Inactive"
+  VALID_STATES = [DRAFT, ACTIVE, INACTIVE]
 
   @classmethod
-  def default_frequency(cls):
-    return 'one_time'
-
-  @orm.validates('frequency')
-  def validate_frequency(self, _, value):
-    """Make sure that value is listed in valid frequencies.
-
-    Args:
-      value: A string value for requested frequency
-
-    Returns:
-      default_frequency which is 'one_time' if the value is None, or the value
-      itself.
-
-    Raises:
-      Value error, if the value is not in the VALID_FREQUENCIES
-    """
-    if value is None:
-      value = self.default_frequency()
-    if value not in self.VALID_FREQUENCIES:
-      message = u"Invalid state '{}'".format(value)
-      raise ValueError(message)
-    return value
+  def default_status(cls):
+    return cls.DRAFT
 
   notify_on_change = deferred(
       db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
   notify_custom_message = deferred(
       db.Column(db.Text, nullable=True), 'Workflow')
-
-  frequency = deferred(
-      db.Column(db.String, nullable=True, default=default_frequency),
-      'Workflow'
-  )
 
   object_approval = deferred(
       db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
@@ -115,6 +88,127 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       default=IS_VERIFICATION_NEEDED_DEFAULT,
       nullable=False)
 
+  repeat_every = deferred(db.Column(db.Integer, nullable=True, default=None),
+                          'Workflow')
+  DAY_UNIT = 'day'
+  WEEK_UNIT = 'week'
+  MONTH_UNIT = 'month'
+  VALID_UNITS = (DAY_UNIT, WEEK_UNIT, MONTH_UNIT)
+  unit = deferred(db.Column(db.Enum(*VALID_UNITS), nullable=True,
+                            default=None), 'Workflow')
+  repeat_multiplier = deferred(db.Column(db.Integer, nullable=False,
+                                         default=0), 'Workflow')
+
+  UNIT_FREQ_MAPPING = {
+      None: "one_time",
+      DAY_UNIT: "daily",
+      WEEK_UNIT: "weekly",
+      MONTH_UNIT: "monthly"
+  }
+
+  @hybrid.hybrid_property
+  def frequency(self):
+    """Hybrid property for SearchAPI filtering backward compatibility"""
+    return self.UNIT_FREQ_MAPPING[self.unit]
+
+  @frequency.expression
+  def frequency(self):
+    """Hybrid property for SearchAPI filtering backward compatibility"""
+    return case([
+        (self.unit.is_(None), self.UNIT_FREQ_MAPPING[None]),
+        (self.unit == self.DAY_UNIT, self.UNIT_FREQ_MAPPING[self.DAY_UNIT]),
+        (self.unit == self.WEEK_UNIT, self.UNIT_FREQ_MAPPING[self.WEEK_UNIT]),
+        (self.unit == self.MONTH_UNIT,
+         self.UNIT_FREQ_MAPPING[self.MONTH_UNIT]),
+    ])
+
+  @property
+  def tasks(self):
+    return list(itertools.chain(*[t.task_group_tasks
+                                  for t in self.task_groups]))
+
+  @property
+  def min_task_start_date(self):
+    """Fetches non adjusted setup cycle start date based on TGT user's setup.
+
+    Args:
+        self: Workflow instance.
+
+    Returns:
+        Date when first cycle should be started based on user's setup.
+    """
+    tasks = self.tasks
+    min_date = None
+    for task in tasks:
+      min_date = min(task.start_date, min_date or task.start_date)
+    return min_date
+
+  WORK_WEEK_LEN = 5
+
+  @classmethod
+  def first_work_day(cls, day):
+    holidays = google_holidays.GoogleHolidays()
+    while day.isoweekday() > cls.WORK_WEEK_LEN or day in holidays:
+      day -= relativedelta.relativedelta(days=1)
+    return day
+
+  def calc_next_adjusted_date(self, setup_date):
+    """Calculates adjusted date which are expected in next cycle.
+
+    Args:
+        setup_date: Date which was setup by user.
+
+    Returns:
+        Adjusted date which are expected to be in next Workflow cycle.
+    """
+    if self.repeat_every is None or self.unit is None:
+      return self.first_work_day(setup_date)
+    try:
+      key = {
+          self.WEEK_UNIT: "weeks",
+          self.MONTH_UNIT: "months",
+          self.DAY_UNIT: "days",
+      }[self.unit]
+    except KeyError:
+      raise ValueError("Invalid Workflow unit")
+    repeater = self.repeat_every * self.repeat_multiplier
+    if self.unit == self.DAY_UNIT:
+      weeks = repeater / self.WORK_WEEK_LEN
+      days = repeater % self.WORK_WEEK_LEN
+      # append weekends if it's needed
+      days += ((setup_date.isoweekday() + days) > self.WORK_WEEK_LEN) * 2
+      return setup_date + relativedelta.relativedelta(
+          setup_date, weeks=weeks, days=days)
+    else:
+      calc_date = setup_date + relativedelta.relativedelta(
+          setup_date,
+          **{key: repeater}
+      )
+      return self.first_work_day(calc_date)
+
+  @orm.validates('repeat_every')
+  def validate_repeat_every(self, _, value):
+    """Validate repeat_every field for Workflow.
+
+    repeat_every shouldn't have 0 value.
+    """
+    if value is not None and not isinstance(value, (int, long)):
+      raise ValueError("'repeat_every' should be integer or 'null'")
+    if value is not None and value <= 0:
+      raise ValueError("'repeat_every' should be strictly greater than 0")
+    return value
+
+  @orm.validates('unit')
+  def validate_unit(self, _, value):
+    """Validate unit field for Workflow.
+
+    Unit should have one of the value from VALID_UNITS list or None.
+    """
+    if value is not None and value not in self.VALID_UNITS:
+      raise ValueError("'unit' field should be one of the "
+                       "value: null, {}".format(", ".join(self.VALID_UNITS)))
+    return value
+
   @orm.validates('is_verification_needed')
   def validate_is_verification_needed(self, key, value):
     # pylint: disable=unused-argument
@@ -144,13 +238,14 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       'workflow_people',
       reflection.Attribute('people', create=False, update=False),
       'task_groups',
-      'frequency',
       'notify_on_change',
       'notify_custom_message',
       'cycles',
       'object_approval',
       'recurrences',
       'is_verification_needed',
+      'repeat_every',
+      'unit',
       reflection.Attribute('next_cycle_start_date',
                            create=False, update=False),
       reflection.Attribute('non_adjusted_next_cycle_start_date',
@@ -161,23 +256,21 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
                            create=False, update=False),
   )
 
-  _fulltext_attrs = [
-      ValueMapFullTextAttr(
-          "frequency",
-          "frequency",
-          value_map=VALID_FREQUENCIES,
-      )
-  ]
-
   _aliases = {
-      "frequency": {
-          "display_name": "Frequency",
-          "mandatory": True,
+      "repeat_every": {
+          "display_name": "Repeat Every",
+          "description": "'Repeat Every' value\nmust fall into\nthe range 1~30"
+                         "\nor '-' for None",
+      },
+      "unit": {
+          "display_name": "Unit",
+          "description": "Allowed values for\n'Unit' are:\n{}"
+                         "\nor '-' for None".format("\n".join(VALID_UNITS)),
       },
       "is_verification_needed": {
           "display_name": "Need Verification",
           "mandatory": True,
-          "description": "This field is not changeable after creation.",
+          "description": "This field is not changeable\nafter creation.",
       },
       "notify_custom_message": "Custom email message",
       "notify_on_change": {
@@ -211,10 +304,14 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
   def copy(self, _other=None, **kwargs):
     """Create a partial copy of the current workflow.
     """
-    columns = [
-        'title', 'description', 'notify_on_change', 'notify_custom_message',
-        'frequency', 'end_date', 'start_date'
-    ]
+    columns = ['title',
+               'description',
+               'notify_on_change',
+               'notify_custom_message',
+               'end_date',
+               'start_date',
+               'repeat_every',
+               'unit']
     target = self.copy_into(_other, columns, **kwargs)
     return target
 
@@ -246,7 +343,14 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
         orm.subqueryload('cycles').undefer_group('Cycle_complete')
            .subqueryload("cycle_task_group_object_tasks")
            .undefer_group("CycleTaskGroupObjectTask_complete"),
-        orm.subqueryload('task_groups'),
+        orm.subqueryload('task_groups').undefer_group('TaskGroup_complete'),
+        orm.subqueryload(
+            'task_groups'
+        ).subqueryload(
+            "task_group_tasks"
+        ).undefer_group(
+            'TaskGroupTask_complete'
+        ),
         orm.subqueryload('workflow_people'),
     )
 
@@ -272,18 +376,17 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       return False
 
     # Check if backlog workflow already exists
-    backlog_workflows = Workflow.query\
-                                .filter(and_
-                                        (Workflow.kind == "Backlog",
-                                         Workflow.frequency == "one_time"))\
-                                .all()
+    backlog_workflows = Workflow.query.filter(
+        and_(Workflow.kind == "Backlog",
+             # the following means one_time wf
+             Workflow.unit is None)
+    ).all()
 
     if len(backlog_workflows) > 0 and any_active_cycle(backlog_workflows):
       return "At least one backlog workflow already exists"
     # Create a backlog workflow
     backlog_workflow = Workflow(description="Backlog workflow",
                                 title="Backlog (one time)",
-                                frequency="one_time",
                                 status="Active",
                                 recurrences=0,
                                 kind="Backlog")

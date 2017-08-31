@@ -98,14 +98,6 @@
 
       return isVisible;
     },
-    firstWorkingDay: function (date) {
-      date = moment(date);
-      // 6 is Saturday 0 is Sunday
-      while (_.contains([0, 6], date.day())) {
-        date.add(1, 'day');
-      }
-      return date.toDate();
-    },
     formatDate: function (date, hideTime) {
       var currentTimezone = moment.tz.guess();
       var inst;
@@ -123,7 +115,7 @@
       if (hideTime === true) {
         return inst.format('MM/DD/YYYY');
       }
-      return inst.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A z');
+      return inst.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A Z');
     },
     getPickerElement: function (picker) {
       return _.find(_.values(picker), function (val) {

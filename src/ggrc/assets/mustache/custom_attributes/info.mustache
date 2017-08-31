@@ -3,44 +3,30 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<custom-attributes instance="instance">
-    {{#if instance.custom_attribute_definitions.length}}
-      {{#iterate_by_two items}}
-      <div class="row-fluid wrap-row">
-      {{#list}}
-        <div class="span6">
-          <div data-custom-attribute="{{id}}" data-type="{{attribute_type}}">
-            {{#if_helpers '\
-                #if' instance.snapshot '\
-                or #if' instance.isRevision '\
-                or #if' instance.archived '\
-                or ^is_allowed' 'update' instance context='for'}}
-                <inline-edit instance="instance" ca-id="cad.id"
-                        {{#if cav.attribute_object}}
-                            value="cav.attribute_object"
-                        {{else}}
-                            value="cav.attribute_value"
-                        {{/if}}
-                        values="cad.multi_choice_options" title-text="cad.title"
-                        label="cad.label" type="{{type}}" mandatory="cad.mandatory"
-                        placeholder="cad.placeholder" helptext="cad.helptext" readonly="true">
-                </inline-edit>
-            {{else}}
-                <inline-edit instance="instance" ca-id="cad.id"
-                    {{#if cav.attribute_object}}
-                             value="cav.attribute_object"
-                    {{else}}
-                             value="cav.attribute_value"
-                    {{/if}}
-                             values="cad.multi_choice_options" title-text="cad.title"
-                             label="cad.label" type="{{type}}" mandatory="cad.mandatory"
-                             placeholder="cad.placeholder" helptext="cad.helptext">
-                </inline-edit>
-            {{/if_helpers}}
-          </div>
+<global-custom-attributes
+  instance="instance"
+  class="ggrc-form ggrc-form-multiple-columns">
+    {{#each items}}
+      <div class="ggrc-form-item {{#is type 'input'}}ggrc-form-item__row{{else}}ggrc-form-item__multiple-row{{/if}}">
+        <div class="{{#is type 'input'}}ggrc-form-item__row{{else}}ggrc-form-item__multiple-row{{/if}}">
+          <inline-edit-control class="inline-edit-control"
+            (inline-save)="saveCustomAttributes(%event, %context)"
+            {instance}="instance"
+            {dropdown-options}="options"
+            dropdown-no-value="true"
+            {edit-mode}="editMode"
+            {is-edit-icon-denied}="isEditDenied"
+            {is-loading}="isSaving"
+            {value}="value"
+            {type}="type"
+            with-read-more="true">
+              <base-inline-control-title
+                {edit-mode}="editMode"
+                (set-edit-mode-inline)="setEditModeInline(%event)">
+                  <div class="info-pane__section-title">{{title}}</div>
+              </base-inline-control-title>
+           </inline-edit-control>
         </div>
-      {{/list}}
       </div>
-      {{/iterate_by_two}}
-    {{/if}}
-</custom-attributes>
+    {{/each}}
+</global-custom-attributes>

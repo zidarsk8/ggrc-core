@@ -551,7 +551,8 @@
       var showedItems = this.attr('showedItems');
       var pageInfo = this.attr('pageInfo');
       var startIndex = pageInfo.pageSize * (pageInfo.current - 1);
-      var relativeItemIndex = _.findIndex(showedItems, {id: instance.id});
+      var relativeItemIndex = _.findIndex(showedItems,
+        {id: instance.id, type: instance.type});
       return relativeItemIndex > -1 ?
         startIndex + relativeItemIndex :
         relativeItemIndex;
@@ -694,6 +695,7 @@
             pinControl
               .updateInstance(componentSelector, newInstance);
             newInstance.dispatch('refreshRelatedDocuments');
+            newInstance.dispatch('refreshRelatedAssessments');
 
             this.viewModel.updateActiveItemIndicator(relativeIndex);
           }.bind(this))

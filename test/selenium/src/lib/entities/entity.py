@@ -5,8 +5,10 @@
 # pylint: disable=too-few-public-methods
 
 import copy
-
 from datetime import datetime
+
+from dateutil import parser, tz
+
 from lib.utils import string_utils, help_utils
 
 
@@ -23,8 +25,8 @@ class Representation(object):
     """Get list unique attributes names for entities. If 'entity' then get
     attributes of one entered entity, else get attributes of all entities.
     """
-    all_entities_cls = (string_utils.convert_to_list(entity) if entity
-                        else Entity.all_entities_classes())
+    all_entities_cls = (help_utils.convert_to_list(entity) if entity
+                        else list(Entity.all_entities_classes()))
     all_entities_attrs_names = string_utils.convert_list_elements_to_list(
         [entity_cls().__dict__.keys() for entity_cls in all_entities_cls])
     return list(set(all_entities_attrs_names))
@@ -144,7 +146,7 @@ class Representation(object):
                                     attr_value.get("attribute_value")}
           if obj_attr_name == "comments":
             converted_attr_value = {
-                k: (string_utils.convert_str_to_datetime(v) if
+                k: (parser.parse(v).replace(tzinfo=tz.tzutc()) if
                     k == "created_at" and isinstance(v, unicode) else v)
                 for k, v in attr_value.iteritems()
                 if k in ["modified_by", "created_at", "description"]}
@@ -156,10 +158,12 @@ class Representation(object):
             obj_attr_name in ["assessor", "creator", "verifier"] and
             "assignees" in obj.__dict__.keys())
             else getattr(obj, obj_attr_name))
-        # u'2017-06-07T16:50:16' and u'2017-06-07 16:50:16' to datetime
+        # REST like u'08-20-2017T04:30:45' to date=2017-08-20,
+        # timetz=04:30:45+00:00
         if (obj_attr_name in ["updated_at", "created_at"] and
                 isinstance(obj_attr_value, unicode)):
-          obj_attr_value = string_utils.convert_str_to_datetime(obj_attr_value)
+          obj_attr_value = (parser.parse(obj_attr_value).
+                            replace(tzinfo=tz.tzutc()))
         if isinstance(obj_attr_value, dict) and obj_attr_value:
           # to "assignees" = {"Assessor": [], "Creator": [], "Verifier": []}
           if obj_attr_name == "assignees":
@@ -294,8 +298,8 @@ class Representation(object):
               obj_attr_value = (
                   dict(origin_obj_attr_value.items() + obj_attr_value.items())
                   if obj_attr_name == "custom_attributes" else
-                  string_utils.convert_to_list(origin_obj_attr_value) +
-                  string_utils.convert_to_list(obj_attr_value))
+                  help_utils.convert_to_list(origin_obj_attr_value) +
+                  help_utils.convert_to_list(obj_attr_value))
             setattr(obj, obj_attr_name, obj_attr_value)
             if obj_attr_name in ["creator", "assessor", "verifier"]:
               from lib.entities.entities_factory import ObjectPersonsFactory
@@ -306,7 +310,7 @@ class Representation(object):
           if is_replace_values_of_dicts and isinstance(_obj_attr_value, dict):
             obj_attr_value = string_utils.exchange_dicts_items(
                 transform_dict=_obj_attr_value,
-                dicts=string_utils.convert_to_list(
+                dicts=help_utils.convert_to_list(
                     getattr(obj, obj_attr_name)),
                 is_keys_not_values=False)
             obj_attr_value = (
@@ -476,8 +480,8 @@ class Representation(object):
     ''*exclude_attrs' - tuple of excluding attributes names.
     """
     # pylint: disable=invalid-name
-    expected_objs = string_utils.convert_to_list(expected_objs)
-    actual_objs = string_utils.convert_to_list(actual_objs)
+    expected_objs = help_utils.convert_to_list(expected_objs)
+    actual_objs = help_utils.convert_to_list(actual_objs)
     expected_excluded_attrs = [
         dict([(attr, getattr(expected_obj, attr)) for attr in exclude_attrs])
         for expected_obj in expected_objs]
@@ -497,6 +501,21 @@ class Representation(object):
             "exp_ex_attrs": expected_excluded_attrs,
             "act_ex_attrs": actual_excluded_attrs}
 
+  @staticmethod
+  def filter_objs_by_attrs(objs, **attrs):
+    """Filter objects by attributes' items and return matched according to
+    plurality.
+    'objs' - object or list objects;
+    '**attrs' - items of attributes' names and values.
+    """
+    list_objs = help_utils.convert_to_list(objs)
+    matched_objs = [obj for obj in list_objs
+                    if isinstance(obj, Entity.all_entities_classes()) and
+                    string_utils.is_subset_of_dicts(dict(**attrs),
+                                                    obj.__dict__)]
+    return (help_utils.get_single_obj(matched_objs)
+            if not help_utils.is_multiple_objs(matched_objs) else matched_objs)
+
 
 class Entity(Representation):
   """Class that represent model for base entity."""
@@ -515,11 +534,11 @@ class Entity(Representation):
 
   @staticmethod
   def all_entities_classes():
-    """Explicitly return list of all entities' classes."""
-    return [
+    """Explicitly return tuple of all entities' classes."""
+    return (
         PersonEntity, CustomAttributeEntity, ProgramEntity, ControlEntity,
         AuditEntity, AssessmentEntity, AssessmentTemplateEntity, IssueEntity,
-        CommentEntity]
+        CommentEntity, ObjectiveEntity)
 
   def __lt__(self, other):
     return self.slug < other.slug

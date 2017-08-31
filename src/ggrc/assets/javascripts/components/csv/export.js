@@ -241,14 +241,7 @@
       panel_number: '@',
       has_parent: false,
       fetch_relevant_data: function (id, type) {
-        var dfd;
-        var Model = CMS.Models[type];
-
-        //  some models isn't defined at this moment (example: Workflow)
-        if (!Model) {
-          return;
-        }
-        dfd = Model.findOne({id: id});
+        var dfd = CMS.Models[type].findOne({id: id});
         dfd.then(function (result) {
           this.attr('item.relevant').push(new filterModel({
             model_name: url.relevant_type,
@@ -312,11 +305,4 @@
       }
     }
   });
-
-  csvExport = $('#csv_export');
-  if (csvExport.length) {
-    csvExport.html(
-      can.view(GGRC.mustache_path + '/import_export/export.mustache', {})
-    );
-  }
 })(window.can, window.can.$);
