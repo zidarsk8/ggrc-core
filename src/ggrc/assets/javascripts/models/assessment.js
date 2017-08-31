@@ -53,25 +53,29 @@
         attr_name: 'updated_at',
         order: 9
       }, {
+        attr_title: 'Last Updated By',
+        attr_name: 'modified_by',
+        order: 10
+      }, {
         attr_title: 'Conclusion: Design',
         attr_name: 'design',
-        order: 13
+        order: 14
       }, {
         attr_title: 'Conclusion: Operation',
         attr_name: 'operationally',
-        order: 14
+        order: 15
       }, {
         attr_title: 'Finished Date',
         attr_name: 'finished_date',
-        order: 11
+        order: 12
       }, {
         attr_title: 'Verified Date',
         attr_name: 'verified_date',
-        order: 10
+        order: 11
       }, {
         attr_title: 'Reference URL',
         attr_name: 'reference_url',
-        order: 12
+        order: 13
       }, {
         attr_title: 'Creators',
         attr_name: 'creators',

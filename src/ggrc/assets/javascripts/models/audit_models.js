@@ -107,6 +107,9 @@
         attr_title: 'Last Updated',
         attr_name: 'updated_at'
       }, {
+        attr_title: 'Last Updated By',
+        attr_name: 'modified_by'
+      }, {
         attr_title: 'Planned Start Date',
         attr_name: 'start_date'
       }, {
