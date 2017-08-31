@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Utility functions for selenium."""
 
+import json
 import logging
 import time
 
@@ -11,7 +12,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from lib import constants, exception
-from lib.constants import messages
+from lib.constants import messages, locator as locators
+from lib.constants import value_aliases as alias
 
 LOGGER = logging.getLogger(__name__)
 
@@ -235,8 +237,76 @@ def get_nested_elements(element, all_nested=False):
   return element.find_elements_by_xpath(nested_locator)
 
 
-def get_element_by_element_safe(element, locator):
+def get_element_safe(element, locator):
   """Get element from current element by locator.
   Return "None" if element not found
   """
   return next((el for el in element.find_elements(*locator)), None)
+
+
+def _send_custom_command(chromedriver, command, params):
+  """Send custom command to chromedriver. For full list of commands
+  take a look at Chrome Protocol doc.
+  """
+  # pylint: disable=protected-access
+  resource = "/session/{}/chromium/send_command_and_get_result".format(
+      chromedriver.session_id)
+  url = chromedriver.command_executor._url + resource
+  body = json.dumps({'cmd': command, 'params': params})
+  response = chromedriver.command_executor._request('POST', url, body)
+  return response.get('value')
+
+
+def set_element_attribute(element, attr_name, attr_value):
+  """Set attribute value of element's style. If attr_value is string
+  it will be wrapped with double-quotes.
+  """
+  if isinstance(attr_value, basestring):
+    attr_value = "'{0}'".format(attr_value)
+  element.parent.execute_script("arguments[0].setAttribute('{0}', {1})".
+                                format(attr_name, attr_value), element)
+
+
+def get_full_screenshot_as_base64(driver):
+  """Get full screenshot according to size of HEADER, FOOTER and
+  object area content. If InfoPanel exists, screenshot height will be increase
+  according to sum of TreeView and InfoPanel size. This method manipulate with
+  Viewport attribute of ChromeBrowser.
+  Return: screenshot as base64.
+  """
+  def size(width, height):
+    """Return dict with width and height items."""
+    return {alias.HEIGHT: height, alias.WIDTH: width}
+
+  panel_elem = get_element_safe(driver, locators.Common.PANEL_CSS)
+  panel_origin_style = None
+  page_origin_size = size(
+      driver.execute_script("return window.innerWidth"),
+      driver.execute_script("return window.innerHeight"))
+  page_content_size = size(
+      driver.execute_script("return document.body.scrollWidth"),
+      driver.execute_script("return document.body.scrollHeight"))
+  full_area = get_element_safe(driver, locators.Common.OBJECT_AREA_CSS)
+  if panel_elem and panel_elem.size[alias.HEIGHT]:
+    panel_origin_style = panel_elem.get_attribute("style")
+    panel_content_size = (panel_elem.get_property("scrollHeight") +
+                          constants.settings.SIZE_PANE_HEADER)
+    driver.execute_script("arguments[0].removeAttribute('style')", panel_elem)
+    tree_view_height = driver.find_element(
+        *locators.TreeView.TREE_VIEW_CONTAINER_CSS).size[alias.HEIGHT]
+    page_content_size[alias.HEIGHT] = panel_content_size + tree_view_height
+  elif full_area:
+    page_content_size[alias.HEIGHT] = full_area.get_property("scrollHeight")
+  page_content_size[alias.HEIGHT] += (
+      constants.settings.SIZE_FOOTER + constants.settings.SIZE_HEADER)
+  _send_custom_command(driver, "Emulation.setVisibleSize",
+                       page_content_size)
+  _send_custom_command(driver, "Emulation.forceViewport",
+                       {"x": 0, "y": 0, "scale": 1})
+  value = _send_custom_command(driver, "Page.captureScreenshot",
+                               {"format": "png", "fromSurface": True})
+  if panel_origin_style is not None:
+    set_element_attribute(panel_elem, "style", panel_origin_style)
+  _send_custom_command(driver, "Emulation.resetViewport", {})
+  _send_custom_command(driver, "Emulation.setVisibleSize", page_origin_size)
+  return value["data"]

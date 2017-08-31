@@ -46,6 +46,7 @@ class CustomDriver(webdriver.Chrome):
 
 
 class Test(InstanceRepresentation):
+  """Base test class."""
   __metaclass__ = mixin.MetaTestDecorator
 
   @staticmethod
@@ -723,7 +724,7 @@ class TreeViewItem(Element):
     super(TreeViewItem, self).__init__(driver, locator_or_element)
     self.item_btn = (
         None if item_btn_locator is None else
-        selenium_utils.get_element_by_element_safe(
+        selenium_utils.get_element_safe(
             self.element, item_btn_locator))
 
   def expand(self):
@@ -944,7 +945,7 @@ class DropdownMenuItem(Element):
   def item_type(self):
     """Item type defined by class of icon"""
     if not self._item_type:
-      icon = selenium_utils.get_element_by_element_safe(
+      icon = selenium_utils.get_element_safe(
           self.element, self._locators.DROPDOWN_ITEM_ICON_CSS)
       if icon:
         icon_type = icon.get_attribute("class")

@@ -48,6 +48,9 @@ class Common(object):
   # import / export pages
   CONTENT = ".content"
   OPTION = "option"
+  # panel locator
+  PANEL_CSS = (By.CSS_SELECTOR, ".pin-content.cms_controllers_info_pin")
+  OBJECT_AREA_CSS = (By.CSS_SELECTOR, ".object-area")
 
 
 class CommonAssessment(object):
@@ -917,6 +920,8 @@ class TreeView(object):
   """Locators for Tree View components."""
   # common
   _WIDGET_NOT_HIDDEN_CSS = " .widget:not(.hidden) "
+  TREE_VIEW_CONTAINER_CSS = (
+      By.CSS_SELECTOR, _WIDGET_NOT_HIDDEN_CSS + " tree-widget-container>div")
   ITEMS = _WIDGET_NOT_HIDDEN_CSS + " .tree-item-element"
   HEADER = _WIDGET_NOT_HIDDEN_CSS + Common.TREE_HEADER
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")

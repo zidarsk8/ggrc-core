@@ -13,3 +13,7 @@ AND_OP = "AND"
 OR_OP = "OR"
 EQUAL_OP = "="
 CONTAINS_OP = "~"
+
+# aliases for size attrs
+WIDTH = "width"
+HEIGHT = "height"
