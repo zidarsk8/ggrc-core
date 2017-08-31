@@ -313,7 +313,7 @@ import '../utils/gdrive-picker-utils.js';
                   .setMaxItems(10)
                   .setCallback(pickerCallback)
                   .build();
-
+          console.warn('Next two errors are expected.');
           picker.setVisible(true);
           dialog = GGRC.Utils.getPickerElement(picker);
           if (dialog) {
@@ -326,6 +326,9 @@ import '../utils/gdrive-picker-utils.js';
       function pickerCallback(data) {
         var action = data[google.picker.Response.ACTION];
         if (action === google.picker.Action.PICKED) {
+          data[google.picker.Response.DOCUMENTS].forEach((file) => {
+            file.newUpload = file.uploadState === 'success';
+          });
           dfd.resolve(CMS.Models.GDriveFile.models(data[google.picker.Response.DOCUMENTS]));
         } else if (action === google.picker.Action.CANCEL) {
           dfd.reject('action canceled');
