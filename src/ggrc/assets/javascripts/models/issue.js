@@ -20,7 +20,8 @@
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
-      context: 'CMS.Models.Context.stub'
+      context: 'CMS.Models.Context.stub',
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     tree_view_options: {
       attr_list: can.Model.Cacheable.attr_list.concat([
