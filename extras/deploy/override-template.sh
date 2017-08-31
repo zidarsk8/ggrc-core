@@ -1,4 +1,5 @@
-#!/usr/bin/env bash
+# Copyright (C) 2017 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 # DB_NAME is taken from settings.sh
 DB_USER="some_username"
