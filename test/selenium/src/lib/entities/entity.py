@@ -26,7 +26,7 @@ class Representation(object):
     attributes of one entered entity, else get attributes of all entities.
     """
     all_entities_cls = (help_utils.convert_to_list(entity) if entity
-                        else Entity.all_entities_classes())
+                        else list(Entity.all_entities_classes()))
     all_entities_attrs_names = string_utils.convert_list_elements_to_list(
         [entity_cls().__dict__.keys() for entity_cls in all_entities_cls])
     return list(set(all_entities_attrs_names))
@@ -501,6 +501,21 @@ class Representation(object):
             "exp_ex_attrs": expected_excluded_attrs,
             "act_ex_attrs": actual_excluded_attrs}
 
+  @staticmethod
+  def filter_objs_by_attrs(objs, **attrs):
+    """Filter objects by attributes' items and return matched according to
+    plurality.
+    'objs' - object or list objects;
+    '**attrs' - items of attributes' names and values.
+    """
+    list_objs = help_utils.convert_to_list(objs)
+    matched_objs = [obj for obj in list_objs
+                    if isinstance(obj, Entity.all_entities_classes()) and
+                    string_utils.is_subset_of_dicts(dict(**attrs),
+                                                    obj.__dict__)]
+    return (help_utils.get_single_obj(matched_objs)
+            if not help_utils.is_multiple_objs(matched_objs) else matched_objs)
+
 
 class Entity(Representation):
   """Class that represent model for base entity."""
@@ -519,11 +534,11 @@ class Entity(Representation):
 
   @staticmethod
   def all_entities_classes():
-    """Explicitly return list of all entities' classes."""
-    return [
+    """Explicitly return tuple of all entities' classes."""
+    return (
         PersonEntity, CustomAttributeEntity, ProgramEntity, ControlEntity,
         AuditEntity, AssessmentEntity, AssessmentTemplateEntity, IssueEntity,
-        CommentEntity]
+        CommentEntity, ObjectiveEntity)
 
   def __lt__(self, other):
     return self.slug < other.slug
