@@ -33,6 +33,7 @@
                 isDisabled: function () {
                   var toImport = this.import;  // info on blocks to import
                   var nonEmptyBlockExists;
+                  var hasErrors;
 
                   if (!toImport || toImport.length < 1) {
                     return true;
@@ -44,7 +45,11 @@
                     return block.rows > block.ignored;
                   });
 
-                  return !nonEmptyBlockExists;
+                  hasErrors = _.any(toImport, function (block) {
+                    return block.block_errors.length;
+                  });
+
+                  return hasErrors || !nonEmptyBlockExists;
                 }.bind(this)  // bind the scope object as context
               },
               importing: {
