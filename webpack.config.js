@@ -16,6 +16,11 @@ const ENV = process.env;
 const STATIC_FOLDER = '/static/';
 
 module.exports = function (env, argv) {
+  const extractSass = new ExtractTextPlugin({
+    filename: isProduction(env) ? '[name].[chunkhash].css' : '[name].css',
+    allChunks: true,
+    // disable: isDevelopment(env)
+  });
   const config = {
     entry: {
       vendor: 'entrypoints/vendor',
@@ -23,7 +28,7 @@ module.exports = function (env, argv) {
         .concat(['entrypoints/dashboard/bootstrap'])
     },
     output: {
-      filename: isProduction(env) ? '[name].[chunkhash].js' : '[name].js',
+      filename: isProduction(env) ? '[name].[chunkhash].js' : '[name].js?[chunkhash]',
       sourceMapFilename: '[file].map',
       path: path.join(__dirname, './src/ggrc/static/'),
       publicPath: STATIC_FOLDER
@@ -46,22 +51,22 @@ module.exports = function (env, argv) {
         loader: 'url?limit=10000&mimetype=image/svg+xml'
       }, {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: "style-loader",
+        use: extractSass.extract({
+          fallback: 'style-loader',
           use: {
-            loader: "css-loader",
+            loader: 'css-loader',
             options: {url: false}
           }
         })
       }, {
-        test: /\.s[ca]ss$/,
-        use: ExtractTextPlugin.extract({
+        test: /\.scss$/,
+        use: extractSass.extract({
           use: [{
-            loader: "css-loader"
+            loader: 'css-loader'
           }, {
-            loader: "sass-loader"
+            loader: 'sass-loader'
           }],
-          fallback: "style-loader"
+          fallback: 'style-loader'
         })
       }, {
         test: /wysihtml5-0\.4\.0pre\.js$/,
@@ -89,10 +94,7 @@ module.exports = function (env, argv) {
       }
     },
     plugins: [
-      new ExtractTextPlugin({
-        filename: '[name].css',
-        allChunks: true
-      }),
+      extractSass,
       new webpack.ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
