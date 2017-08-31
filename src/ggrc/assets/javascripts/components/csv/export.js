@@ -236,6 +236,14 @@
     tag: 'export-panel',
     template: '<content></content>',
     scope: {
+      define: {
+        first_panel: {
+          type: 'boolean',
+          get: function () {
+            return Number(this.attr('panel_number')) === 0;
+          }
+        }
+      },
       exportable: GGRC.Bootstrap.exportable,
       snapshotable_objects: GGRC.config.snapshotable_objects,
       panel_number: '@',
@@ -294,14 +302,6 @@
         }
 
         this.setSelected();
-      }
-    },
-    helpers: {
-      first_panel: function (options) {
-        if (Number(this.attr('panel_number')) > 0) {
-          return options.fn();
-        }
-        return options.inverse();
       }
     }
   });
