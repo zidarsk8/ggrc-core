@@ -5,48 +5,97 @@
 
 import json
 
+import ddt
+
+from ggrc.models import all_models
+
 from integration.ggrc import TestCase
+from integration.ggrc import api_helper
 from integration.ggrc.models import factories
 
 
+@ddt.ddt
 class TestRelationship(TestCase):
   """Integration test suite for Relationship."""
 
   def setUp(self):
     """Create a Person, an Assessment, prepare a Relationship json."""
     super(TestRelationship, self).setUp()
-
+    self.api = api_helper.Api()
     self.client.get("/login")
     self.person = factories.PersonFactory()
     self.assessment = factories.AssessmentFactory()
 
-  def _post_relationship(self, attr, value):
-    """POST a Relationship with attr between the Person and the Assessment."""
-    headers = {
-        "Content-Type": "application/json",
-        "X-requested-by": "GGRC",
-    }
-    relationship_json = [{"relationship": {
-        "source": {"id": self.person.id, "type": "Person"},
-        "destination": {"id": self.assessment.id, "type": "Assessment"},
-        "context": {"id": None},
-        "attrs": {attr: value},
-    }}]
-    return self.client.post("/api/relationships",
-                            data=json.dumps(relationship_json),
-                            headers=headers)
+  HEADERS = {
+      "Content-Type": "application/json",
+      "X-requested-by": "GGRC",
+  }
+  REL_URL = "/api/relationships"
 
-  def test_attrs_validation_ok(self):
-    """Can create a Relationship with valid attrs."""
-    response = self._post_relationship("AssigneeType", "Creator")
+  @staticmethod
+  def build_relationship_json(source, destination, **attrs):
+    return json.dumps([{
+        "relationship": {
+            "source": {"id": source.id, "type": source.type},
+            "destination": {"id": destination.id, "type": destination.type},
+            "context": {"id": None},
+            "attrs": attrs,
+        }
+    }])
+
+  @ddt.data(
+      ("AssigneeType", "Creator", 200),
+      ("Invalid", "Data", 400),
+      ("AssigneeType", "Monkey", 400),
+  )
+  @ddt.unpack
+  def test_attrs_validation(self, attr, value, status_code):
+    """Test validation attrs on relationship creation."""
+    data = self.build_relationship_json(self.person,
+                                        self.assessment,
+                                        **{attr: value})
+    resp = self.client.post(self.REL_URL, data=data, headers=self.HEADERS)
+    self.assertStatus(resp, status_code)
+
+  def test_changing_log_on_doc_change(self):
+    """Changing object documents should generate new object revision."""
+    url_link = u"www.foo.com"
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      url = factories.ReferenceUrlFactory(link=url_link)
+
+    def get_revisions():
+      return all_models.Revision.query.filter(
+          all_models.Revision.resource_id == control.id,
+          all_models.Revision.resource_type == control.type,
+      ).order_by(
+          all_models.Revision.id.desc()
+      ).all()
+
+    # attach an url to a control
+    revisions = get_revisions()
+    count = len(revisions)
+    response = self.client.post(
+        self.REL_URL,
+        data=self.build_relationship_json(control, url),
+        headers=self.HEADERS)
     self.assert200(response)
 
-  def test_attrs_validation_invalid_attr(self):
-    """Can not create a Relationship with invalid attr name."""
-    response = self._post_relationship("Invalid", "Data")
-    self.assert400(response)
+    relationship = all_models.Relationship.query.get(
+        response.json[0][-1]["relationship"]["id"])
 
-  def test_attrs_validation_invalid_value(self):
-    """Can not create a Relationship with invalid attr value."""
-    response = self._post_relationship("AssigneeType", "Monkey")
-    self.assert400(response)
+    # check if a revision was created and contains the attached url
+    revisions = get_revisions()
+    self.assertEqual(count + 1, len(revisions))
+    url_list = revisions[0].content.get("reference_url") or []
+    self.assertEqual(1, len(url_list))
+    self.assertIn("link", url_list[0])
+    self.assertEqual(url_link, url_list[0]["link"])
+
+    # now test whether a new revision is created when url is unmapped
+    self.assert200(self.api.delete(relationship))
+
+    revisions = get_revisions()
+    self.assertEqual(count + 2, len(revisions))
+    url_list = revisions[0].content.get("reference_url") or []
+    self.assertEqual(url_list, [])

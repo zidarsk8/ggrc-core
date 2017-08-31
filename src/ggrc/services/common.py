@@ -317,23 +317,30 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
   cache = get_cache()
   if not cache:
     return revisions
-  owner_modified_objects = []
-  folder_modified_objects = []
+  modified_objects = set(cache.dirty)
+  new_objects = set(cache.new)
+  delete_objects = set(cache.deleted)
   all_edited_objects = itertools.chain(cache.new, cache.dirty, cache.deleted)
   for o in all_edited_objects:
     if o.type == "ObjectFolder" and o.folderable:
-      folder_modified_objects.append(o.folderable)
+      modified_objects.add(o.folderable)
+    if o.type == "Relationship" and o.get_related_for("Document"):
+      documentable = o.get_related_for("Document")
+      document = o.get_related_for(documentable.type)
+      if o in new_objects and document not in documentable.documents:
+        documentable.documents.append(document)
+      if o in delete_objects and document in documentable.documents:
+        documentable.documents.remove(document)
+      if (
+              documentable not in new_objects and
+              documentable not in delete_objects):
+         modified_objects.add(documentable)
+
   revisions.extend(_revision_generator(
       current_user_id, "created", cache.new
   ))
   revisions.extend(_revision_generator(
-      current_user_id, "modified", cache.dirty
-  ))
-  revisions.extend(_revision_generator(
-      current_user_id, "modified", owner_modified_objects
-  ))
-  revisions.extend(_revision_generator(
-      current_user_id, "modified", folder_modified_objects
+      current_user_id, "modified", modified_objects
   ))
   if force_obj and obj is not None and obj not in cache.dirty:
     # If the ``obj`` has been updated, but only its custom attributes have
