@@ -87,7 +87,7 @@
           </label>
           <input type="checkbox" name="is_verification_needed"
             {{#if instance.is_verification_needed}}checked="checked"{{/if}}
-            {{^new_object_form}}disabled{{/new_object_form}}
+            {{#is instance.status 'Active'}}disabled{{/is}}
             tabindex="-1">
           Show Verify button next to tasks
         </div>
