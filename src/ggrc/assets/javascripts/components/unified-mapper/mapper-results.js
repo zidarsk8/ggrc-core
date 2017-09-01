@@ -55,7 +55,6 @@ import '../object-selection/object-selection';
       },
       searchOnly: false,
       useSnapshots: false,
-      newEntries: [],
       entries: [],
       relevantTo: [],
       objectGenerator: false,
@@ -70,41 +69,6 @@ import '../object-selection/object-selection';
       },
       destroy: function () {
         this.attr('submitCbs').remove(this.onSearch.bind(this));
-      },
-      showNewEntries: function () {
-        var self = this;
-        var sortKey = 'updated_at';
-        var sortDirection = 'desc';
-        var newEntries = this.attr('newEntries').map(function (value) {
-          return {
-            id: value.id,
-            type: value.type,
-            data: self.transformValue(value),
-            isSelected: true,
-            markedSelected: true
-          };
-        });
-
-        // select new entries
-        this.attr('selected').push.apply(this.attr('selected'), newEntries);
-
-        // clear filter
-        this.attr('filterItems', []);
-        this.attr('mappingItems', []);
-        this.attr('prevSelected', this.attr('selected').slice());
-
-        if (this.attr('sort.key') === sortKey &&
-          this.attr('sort.direction') === sortDirection) {
-          this.onSearch();
-        } else {
-          // sort by update date.
-          // this action triggers search
-          this.attr('sort.key', sortKey);
-          this.attr('sort.direction', sortDirection);
-        }
-
-        // set current page
-        this.attr('paging.current', 1);
       },
       setItems: function () {
         var self = this;
