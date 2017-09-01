@@ -119,7 +119,7 @@ def objects_via_assignable_query(user_id, context_not_role=True):
           (rel1.destination_type == "Person",
            rel1.source_type)
       ], else_=rel1.destination_type),
-      rel1.context_id if context_not_role else literal('RUD')))
+      rel1.context_id if context_not_role else literal('RU')))
 
   # The user should also have access to objects mapped to the assigned_objects
   # We accomplish this by filtering out relationships where the user is
@@ -643,8 +643,10 @@ def load_assignee_relationships(user, permissions):
   """
   for id_, type_, role_name in objects_via_assignable_query(user.id, False):
     actions = ["read", "view_object_page"]
-    if role_name == "RUD":
-      actions += ["update", "delete"]
+    if "U" in role_name:
+      actions.append("update")
+    if "D" in role_name:
+      actions.append("delete")
     for action in actions:
       permissions.setdefault(action, {})\
           .setdefault(type_, {})\
