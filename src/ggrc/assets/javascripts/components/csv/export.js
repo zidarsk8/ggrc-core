@@ -29,9 +29,9 @@
     url: '/_service/export_csv',
     type: url.model_type || 'Program',
     only_relevant: false,
-    filename: 'export_objects.csv'
+    filename: 'export_objects.csv',
+    format: 'gdrive'
   });
-  var csvExport;
 
   can.Component.extend({
     tag: 'csv-template',
@@ -58,21 +58,26 @@
         });
       },
       '.import-button click': function (el, ev) {
-        var data;
+        var objects;
         ev.preventDefault();
-        data = _.map(this.scope.attr('selected'), function (el) {
+
+        objects = _.map(this.viewModel.attr('selected'), function (el) {
           return {
             object_name: el.value,
             fields: 'all'
           };
         });
-        if (!data.length) {
+        if (!objects.length) {
           return;
         }
 
         GGRC.Utils.export_request({
-          data: data
-        }).then(function (data) {
+          data: {
+            objects: objects,
+            export_to: 'csv'
+          }
+        })
+        .done(function (data) {
           GGRC.Utils.download('import_template.csv', data);
         })
         .fail(function (data) {
@@ -121,15 +126,10 @@
       '.option-type-selector change': function (el, ev) {
         this.scope.attr('isFilterActive', false);
       },
-      '#export-csv-button click': function (el, ev) {
-        var panels;
-        var query;
+      getObjectsForExport: function () {
+        var panels = this.scope.attr('export.panels.items');
 
-        ev.preventDefault();
-        this.scope.attr('export.loading', true);
-
-        panels = this.scope.attr('export.panels.items');
-        query = _.map(panels, function (panel, index) {
+        return _.map(panels, function (panel, index) {
           var relevantFilter;
           var predicates;
           predicates = _.map(panel.attr('relevant'), function (el) {
@@ -159,11 +159,32 @@
             )
           };
         });
+      },
+      '#export-csv-button click': function (el, ev) {
+        this.scope.attr('export.loading', true);
 
         GGRC.Utils.export_request({
-          data: query
+          data: {
+            objects: this.getObjectsForExport(),
+            export_to: this.scope.attr('export.chosenFormat')
+          }
         }).then(function (data) {
-          GGRC.Utils.download(this.scope.attr('export.filename'), data);
+          var link;
+
+          if (this.scope.attr('export.chosenFormat') === 'gdrive') {
+            data = JSON.parse(data);
+            link = 'https://docs.google.com/spreadsheets/d/' + data.id;
+
+            GGRC.Controllers.Modals.confirm({
+              modal_title: 'Export Completed',
+              modal_description: 'File is exported successfully. ' +
+              'You can view the file here: ' +
+              '<a href="' + link + '" target="_blank">' + link + '</a>',
+              button_view: GGRC.mustache_path + '/modals/close_buttons.mustache'
+            });
+          } else {
+            GGRC.Utils.download(this.scope.attr('export.filename'), data);
+          }
         }.bind(this))
         .fail(function (data) {
           $('body').trigger('ajax:flash', {
@@ -173,6 +194,10 @@
         .always(function () {
           this.scope.attr('export.loading', false);
         }.bind(this));
+      },
+      '#addAnotherObjectType click': function (el, ev) {
+        ev.preventDefault();
+        this.scope.attr('export').dispatch('addPanel');
       }
     }
   });
@@ -181,7 +206,8 @@
     tag: 'export-group',
     template: '<content></content>',
     scope: {
-      _index: 0
+      _index: 0,
+      'export': '@'
     },
     events: {
       inserted: function () {
@@ -225,8 +251,7 @@
         ev.preventDefault();
         this.scope.attr('panels.items').splice(index, 1);
       },
-      '#addAnotherObjectType click': function (el, ev) {
-        ev.preventDefault();
+      '{scope.export} addPanel': function () {
         this.addPanel();
       }
     }
