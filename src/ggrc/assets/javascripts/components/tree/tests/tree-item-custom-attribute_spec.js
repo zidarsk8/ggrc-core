@@ -3,7 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('can.mustache.helper.get_custom_attr_value', function () {
+import helpers from './../tree-item-custom-attribute';
+
+describe('helpers.get_custom_attr_value', function () {
   'use strict';
 
   var helper;
@@ -15,7 +17,7 @@ describe('can.mustache.helper.get_custom_attr_value', function () {
   var getHash;
 
   beforeAll(function () {
-    helper = can.Mustache._helpers.get_custom_attr_value.fn;
+    helper = helpers.get_custom_attr_value;
 
     fakeCustomAttrDefs = [{
       definition_type: 'control',
@@ -26,7 +28,7 @@ describe('can.mustache.helper.get_custom_attr_value', function () {
     {
       definition_type: 'control',
       title: 'CheckBox',
-      attribute_type: 'checkbox',
+      attribute_type: 'Checkbox',
       id: 4
     }];
 
@@ -69,20 +71,20 @@ describe('can.mustache.helper.get_custom_attr_value', function () {
     expect(fakeOptions.hash.customAttrItem.reify).toHaveBeenCalled();
   });
 
-  it('return "No" if customAttrItem is undefined', function () {
+  it('return "correctValue"', function () {
     var value;
     fakeOptions.hash = false;
     fakeInstance.custom_attribute_values = [
-      getHash('correctValue', undefined, 'checkbox').customAttrItem
+      getHash('correctValue', 3, 'richText').customAttrItem
     ];
     value = helper(fakeAttr, fakeInstance, fakeOptions);
 
-    expect(value).toEqual('No');
+    expect(value).toEqual('correctValue');
   });
 
-  it('return an empty string if customAttrItem is not undefined', function () {
+  it('return an empty string if customAttrItem is undefined', function () {
     var value;
-    fakeOptions.hash = getHash('correctValue');
+    fakeOptions.hash = getHash();
     value = helper(fakeAttr, fakeInstance, fakeOptions);
 
     expect(value).toEqual('');
@@ -107,7 +109,7 @@ describe('can.mustache.helper.get_custom_attr_value', function () {
     expect(fakeOptions.fn).toHaveBeenCalledWith('correctValue');
   });
 
-  it('returns "on" for CA of type checkbox with value "1"',
+  it('returns "Yes" for CA of type checkbox with value "1"',
     function () {
       var attr = {
         attr_name: 'CheckBox'
@@ -122,29 +124,14 @@ describe('can.mustache.helper.get_custom_attr_value', function () {
       expect(value).toEqual('Yes');
     });
 
-  it('returns "off" for CA of type checkbox with value "0"',
+  it('returns "No" for CA of type checkbox with value "0"',
     function () {
       var attr = {
         attr_name: 'CheckBox'
       };
       var value;
       fakeOptions = {
-        hash: getHash('0', 4, 'checkbox')
-      };
-
-      value = helper(attr, fakeInstance, fakeOptions);
-
-      expect(value).toEqual('No');
-    });
-
-  it('returns "" for CA of type checkbox with value ""',
-    function () {
-      var attr = {
-        attr_name: 'CheckBox'
-      };
-      var value;
-      fakeOptions = {
-        hash: getHash('', 4, 'checkbox')
+        hash: getHash(0, 4, 'checkbox')
       };
 
       value = helper(attr, fakeInstance, fakeOptions);
