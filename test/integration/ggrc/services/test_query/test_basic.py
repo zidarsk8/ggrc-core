@@ -151,6 +151,8 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
   @ddt.data(
       ("effective date", ">", "05-18-2015"),
       ("start_date", "=", "2017-06/12"),
+      ("start_date", "=", "2017-33-12"),
+      ("start_date", "=", "2017-06-33"),
   )
   @ddt.unpack
   def test_basic_query_incorrect_date_format(self, field, operation, date):
