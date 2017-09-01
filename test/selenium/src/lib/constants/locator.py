@@ -628,9 +628,10 @@ class CommonWidgetInfo(object):
                          '//div[starts-with(./@class, "span")]//h6/..')
   HEADERS_AND_VALUES = (By.XPATH, _HEADERS_AND_VALUES)
   LCAS_HEADERS_AND_VALUES = None  # due to exist only for WidgetInfoAssessment
-  CAS_HEADERS_AND_VALUES = (By.XPATH, _INFO_WIDGET_XPATH + "//inline-edit/div")
-  CAS_CHECKBOXES = (By.XPATH, _INFO_WIDGET_XPATH + "//inline-edit//input["
-                                                   "@type='checkbox']")
+  CAS_HEADERS_AND_VALUES = (By.XPATH,
+                            _INFO_WIDGET_XPATH + "//inline-edit-control/div")
+  CAS_CHECKBOXES = (By.XPATH, _INFO_WIDGET_XPATH +
+                    "//inline-edit-control//input[""@type='checkbox']")
   # labels
   TITLE = (By.XPATH, _MAIN_HEADER_XPATH + "//h6")
   TITLE_ENTERED = (By.XPATH, _MAIN_HEADER_XPATH + "//h3")
