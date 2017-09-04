@@ -809,3 +809,18 @@ class ExportOnlyColumnHandler(ColumnHandler):
 
   def set_value(self):
     pass
+
+
+class DirecPersonMappingColumnHandler(ExportOnlyColumnHandler):
+
+  def get_value(self):
+    return getattr(self.row_converter.obj, self.key, self.value).email
+
+
+class ExportOnlyDateColumnHandler(ExportOnlyColumnHandler):
+
+  def get_value(self):
+    value = getattr(self.row_converter.obj, self.key)
+    if value:
+      return value.strftime("%m/%d/%Y")
+    return ""

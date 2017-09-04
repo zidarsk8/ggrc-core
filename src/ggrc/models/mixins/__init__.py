@@ -169,11 +169,15 @@ class ChangeTracked(object):
   _aliases = {
       "updated_at": {
           "display_name": "Last Updated",
-          "filter_only": True,
+          "mandatory": False,
+      },
+      "modified_by": {
+          "display_name": "Last Updated By",
+          "mandatory": False,
       },
       "created_at": {
           "display_name": "Created Date",
-          "filter_only": True,
+          "mandatory": False,
       },
   }
 
