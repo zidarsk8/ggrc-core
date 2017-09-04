@@ -16,7 +16,6 @@ HOST=${GGRC_DATABASE_HOST-"127.0.0.1"}
 mysql -uroot -proot -h$HOST -e "DROP DATABASE IF EXISTS ggrcdevtest; CREATE DATABASE ggrcdevtest CHARACTER SET utf8; USE ggrcdevtest;"
 db_migrate
 
-build_css
 build_assets
 
 python -m "ggrc"

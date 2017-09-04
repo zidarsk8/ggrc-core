@@ -131,7 +131,7 @@ module.exports = function (env, argv) {
     }));
 
     config.plugins.push(new CleanWebpackPlugin(['./src/ggrc/static/'], {
-      exclude: ['images', 'fonts', 'favicon.ico']
+      exclude: ['images', 'fonts', 'favicon.ico', 'dashboard-templates*']
     }));
   }
 

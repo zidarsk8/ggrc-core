@@ -69,7 +69,6 @@ setup () {
     source /vagrant/bin/init_vagrant_env
     make bower_components > /dev/null
     ln -s /vagrant-dev/node_modules /vagrant/node_modules
-    build_css
     build_assets
     make appengine_packages
   "
