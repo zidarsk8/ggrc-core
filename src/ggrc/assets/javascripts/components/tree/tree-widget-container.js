@@ -31,6 +31,7 @@ import template from './templates/tree-widget-container.mustache';
 
   var TreeViewUtils = GGRC.Utils.TreeView;
   var CurrentPageUtils = GGRC.Utils.CurrentPage;
+  var viewModel;
 
   if (!GGRC.tree_view) {
     GGRC.tree_view = new can.Map();
@@ -38,7 +39,7 @@ import template from './templates/tree-widget-container.mustache';
   GGRC.tree_view.attr('basic_model_list', []);
   GGRC.tree_view.attr('sub_tree_for', {});
 
-  var viewModel = can.Map.extend({
+  viewModel = can.Map.extend({
     define: {
       /**
        * Condition that adds into all request to server-side Query API
@@ -413,7 +414,7 @@ import template from './templates/tree-widget-container.mustache';
           parentInstance.on('change', callback);
         } else if (activeTabModel === instance.type) {
           _refresh(true);
-        } else if (isPerson(instance)) {
+        } else if (activeTabModel === 'Person' && isPerson(instance)) {
           parentInstance.refresh().then(function () {
             _refresh();
           });
@@ -445,6 +446,9 @@ import template from './templates/tree-widget-container.mustache';
               srcType === 'Document' || destType === 'Document') {
               return;
             }
+          } else if (instance instanceof CMS.Models.UserRole &&
+            activeTabModel === 'Audit') {
+            return;
           }
 
           _refresh();
