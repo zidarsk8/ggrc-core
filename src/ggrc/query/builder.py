@@ -221,16 +221,10 @@ class QueryHelper(object):
     contexts, resources = permissions.get_context_resource(
         model_name=model.__name__, permission_type=permission_type
     )
-
     if contexts is not None:
-      if resources:
-        resource_sql = model.id.in_(resources)
-      else:
-        resource_sql = sa.sql.false()
-
-      return sa.or_(
-          context_query_filter(model.context_id, contexts),
-          resource_sql)
+      return sa.or_(context_query_filter(model.context_id, contexts),
+                    model.id.in_(resources) if resources else sa.sql.false())
+    return sa.sql.true()
 
   def _get_objects(self, object_query):
     """Get a set of objects described in the filters."""
