@@ -104,7 +104,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "verify_frequency": handlers.OptionColumnHandler,
     "updated_at": handlers.ExportOnlyDateColumnHandler,
     "created_at": handlers.ExportOnlyDateColumnHandler,
-    "modified_by": handlers.ExportOnlyUserColumnHandler,
+    "modified_by": handlers.DirecPersonMappingColumnHandler,
 
     # Mapping column handlers
     "__mapping__:person": handlers.PersonMappingColumnHandler,

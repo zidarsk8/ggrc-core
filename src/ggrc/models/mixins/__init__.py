@@ -170,9 +170,18 @@ class ChangeTracked(object):
   ]
 
   _aliases = {
-      "updated_at": "Last Updated",
-      "created_at": "Created Date",
-      "modified_by": "Last Updated By",
+      "updated_at": {
+          "display_name": "Last Updated",
+          "mandatory": False,
+      },
+      "modified_by": {
+          "display_name": "Last Updated By",
+          "mandatory": False,
+      },
+      "created_at": {
+          "display_name": "Created Date",
+          "mandatory": False,
+      },
   }
 
   @classmethod
