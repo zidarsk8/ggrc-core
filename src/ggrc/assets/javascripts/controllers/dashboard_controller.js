@@ -51,14 +51,6 @@
       }.bind(this));
     },
 
-    disableAll: function (el, ev) {
-      document.body.classList.add('no-events');
-    },
-
-    '[data-toggle="modal-ajax-form"] click': 'disableAll',
-    '[data-toggle="unified-search"] click': 'disableAll',
-    '[data-toggle="unified-mapper"] click': 'disableAll',
-
     init_page_title: function () {
       var pageTitle = null;
       if (typeof (this.options.page_title) === 'function') {

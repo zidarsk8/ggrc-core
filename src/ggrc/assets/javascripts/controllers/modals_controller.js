@@ -438,8 +438,6 @@ import '../components/access_control_list/access_control_list_roles_helper'
         // When we start, all the ui elements are visible
         this.options.ui_array.push(0);
       }
-
-      document.body.classList.remove('no-events');
     },
 
     setup_wysihtml5: function () {
@@ -694,10 +692,6 @@ import '../components/access_control_list/access_control_list_roles_helper'
           targetEl.datepicker('option', options[otherKey], date);
         }
       }, this);
-    },
-
-    '[data-toggle="unified-mapper"] click': function (el, ev) {
-      document.body.classList.add('no-events');
     },
 
     "{$footer} a.btn[data-toggle='modal-submit-addmore'] click":
