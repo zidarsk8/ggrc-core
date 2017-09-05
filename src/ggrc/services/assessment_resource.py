@@ -4,13 +4,17 @@
 """Assessment API resource optimization."""
 
 from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import BadRequest
 from sqlalchemy import orm
+from flask import current_app
 
 from ggrc import db
 from ggrc import models
+from ggrc.login import get_current_user_id
 from ggrc.utils import benchmark
 from ggrc.rbac import permissions
 from ggrc.services import common
+from ggrc.services import signals
 
 
 class AssessmentResource(common.ExtendedResource):
@@ -25,6 +29,18 @@ class AssessmentResource(common.ExtendedResource):
     command_map = {
         None: super(AssessmentResource, self).get,
         "related_objects": self.related_objects,
+    }
+    command = kwargs.pop("command", None)
+    if command not in command_map:
+      self.not_found_response()
+    return command_map[command](*args, **kwargs)
+
+  def put(self, *args, **kwargs):
+    # This is to extend the get request for additional data.
+    # pylint: disable=arguments-differ
+    command_map = {
+        None: super(AssessmentResource, self).put,
+        "status": self.put_status,
     }
     command = kwargs.pop("command", None)
     if command not in command_map:
@@ -189,17 +205,103 @@ class AssessmentResource(common.ExtendedResource):
     }
     return data
 
-  def related_objects(self, id):
-    """Get data for assessment related_objects page."""
-    # id name is used as a kw argument and can't be changed here
-    # pylint: disable=invalid-name,redefined-builtin
+  def _get_assessment(self, id):
     with benchmark("check assessment permissions"):
       assessment = models.Assessment.query.options(
           orm.undefer_group("Assessment_complete")
       ).get(id)
       if not permissions.is_allowed_read_for(assessment):
         raise Forbidden()
+      if not assessment:
+        return self.not_found_response()
+      return assessment
+
+  def related_objects(self, id):
+    """Get data for assessment related_objects page."""
+    # id name is used as a kw argument and can't be changed here
+    # pylint: disable=invalid-name,redefined-builtin
+    assessment = self._get_assessment(id)
     with benchmark("Get assessment related_objects data"):
       data = self._get_related_data(assessment)
     with benchmark("Make response"):
       return self.json_success_response(data, )
+
+  def put_status(self, id):
+    assessment = self._get_assessment(id)
+    src = self.request.json
+    if self.request.mimetype != 'application/json':
+      return current_app.make_response(
+          ('Content-Type must be application/json', 415, []))
+    header_error = self.validate_headers_for_put_or_delete(assessment)
+    if header_error:
+      return header_error
+    root_attribute = "assessment"
+    try:
+      src = src[root_attribute]
+    except KeyError:
+      raise BadRequest('Required attribute "{0}" not found'.format(
+          root_attribute))
+
+    assessment.status = src["status"]
+    assessment.modified_by_id = get_current_user_id()
+    src["modified_by"] = {
+        "type": "Person",
+        "id": assessment.modified_by_id,
+        "href": "/api/people/{}".format(assessment.modified_by_id),
+    }
+
+    with benchmark("Send PUT event"):
+      signals.Restful.model_put.send(
+          assessment.__class__, obj=assessment, src=src, service=self)
+    with benchmark("Log event"):
+
+      event = models.Event(
+          modified_by_id=get_current_user_id(),
+          action=self.request.method,
+          resource_id=assessment.id,
+          resource_type=assessment.type,
+          context_id=assessment.context_id
+      )
+      event.revisions = _get_log_revisions(current_user_id, obj=assessment)
+      db.session.add(event)
+
+
+    with benchmark("Update memcache before commit for collection PUT"):
+      common.update_memcache_before_commit(
+          self.request, [assessment], common.CACHE_EXPIRY_COLLECTION)
+    with benchmark("Update index"):
+      db.session.execute("""REPLACE INTO fulltext_record_properties VALUES (
+          :key,
+          :type,
+          :tags,
+          :property,
+          :content,
+          :context_id,
+          :subproperty
+      )""", {
+          "key": assessment.id,
+          "type": assessment.type,
+          "tags": "",
+          "property": "status",
+          "content": assessment.status,
+          "context_id": assessment.context_id,
+          "subproperty": "",
+      })
+    with benchmark("Commit"):
+      db.session.commit()
+    with benchmark("Update memcache after commit for collection PUT"):
+      common.update_memcache_after_commit(self.request)
+    with benchmark("Send PUT - after commit event"):
+      assessment = self._get_assessment(id)
+      signals.Restful.model_put_after_commit.send(
+          assessment.__class__, obj=assessment, src=src, service=self,
+          event=event)
+      # Note: Some data is created in listeners for model_put_after_commit
+      # (like updates to snapshots), so we need to commit the changes
+    with benchmark("Send event job"):
+      common.send_event_job(event)
+    with benchmark("Make response"):
+      return self.json_success_response(
+          src, self.modified_at(assessment),
+          obj_etag=common.etag(self.modified_at(assessment),
+                               common.get_info(assessment)))
