@@ -31,6 +31,7 @@ import freezegun
 import itertools
 
 from ggrc import models
+from ggrc.converters import errors
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc import generator
@@ -222,6 +223,16 @@ class TestLastAssessmentDate(TestCase):
         ("code", "Control_1"),
         ("Last Assessment Date", "06/06/2017"),
     ]))
+    self._check_csv_response(resp, {
+        "Control": {
+            "row_warnings": {
+                errors.UNMODIFIABLE_COLUMN.format(
+                    line=3, column_name="Last Assessment Date"
+                )
+            }
+        }
+    })
+
     control = models.Control.query.filter(
         models.Control.slug == "Control_1"
     ).one()

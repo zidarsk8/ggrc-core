@@ -292,6 +292,8 @@ class DateColumnHandler(ColumnHandler):
       if not value:
         return
       parsed_value = parse(value)
+      if self.key == "last_assessment_date":
+        self.check_last_asmnt_date(parsed_value)
       if type(getattr(self.row_converter.obj, self.key, None)) is date:
         return parsed_value.date()
       else:
@@ -304,6 +306,19 @@ class DateColumnHandler(ColumnHandler):
     if value:
       return value.strftime("%m/%d/%Y")
     return ""
+
+  def check_last_asmnt_date(self, new_last_asmnt_date):
+    """Check if the new object don't contain changed Last Assessment Date."""
+    old_last_asmnt_date = getattr(
+        self.row_converter.obj, "last_assessment_date", None
+    )
+    date_modified = old_last_asmnt_date and new_last_asmnt_date and \
+        old_last_asmnt_date.date() != new_last_asmnt_date.date()
+    if date_modified:
+      self.add_warning(
+          errors.UNMODIFIABLE_COLUMN,
+          column_name=self.display_name,
+      )
 
 
 class EmailColumnHandler(ColumnHandler):
