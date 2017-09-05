@@ -1023,7 +1023,7 @@ import '../components/access_control_list/access_control_list_roles_helper'
           this.reset_form(function () {
             var $form = $(this.element).find('form');
             $form.trigger('reset');
-          });
+          }.bind(this));
         }.bind(this))
         .then(this.proxy('apply_object_params'))
         .then(this.proxy('serialize_form'))
