@@ -276,6 +276,11 @@ import './create-url';
           type: event.item.attr('type')
         };
 
+        // dispatching event on instance to pass to the auto-save-form
+        this.attr('instance').dispatch({
+          type: 'afterCommentCreated'
+        });
+
         this.attr('deferredSave').push(function () {
           self.addAction('add_related', related);
         })
