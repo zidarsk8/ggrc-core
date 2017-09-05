@@ -20,8 +20,10 @@ import factory
 
 from ggrc import db
 from ggrc import models
+
 from ggrc.access_control.role import AccessControlRole
 from ggrc.access_control.list import AccessControlList
+
 from ggrc_risks import models as risk_models
 
 from integration.ggrc.models.model_factory import ModelFactory
@@ -330,12 +332,117 @@ class AccessControlRoleAdminFactory(AccessControlRoleFactory):
   name = "Admin"
 
 
+class AccessGroupFactory(TitledFactory):
+  """Access Group factory class"""
+
+  class Meta:
+    model = models.AccessGroup
+
+
+class ClauseFactory(TitledFactory):
+  """Clause factory class"""
+
+  class Meta:
+    model = models.Clause
+
+
+class DataAssetFactory(TitledFactory):
+  """DataAsset factory class"""
+
+  class Meta:
+    model = models.DataAsset
+
+
+class FacilityFactory(TitledFactory):
+  """Facility factory class"""
+
+  class Meta:
+    model = models.Facility
+
+
+class ProductFactory(TitledFactory):
+  """Product factory class"""
+
+  class Meta:
+    model = models.Product
+
+
+class SectionFactory(TitledFactory):
+  """Section factory class"""
+
+  class Meta:
+    model = models.Section
+
+
+class StandardFactory(TitledFactory):
+  """Standard factory class"""
+
+  class Meta:
+    model = models.Standard
+
+  description = factory.LazyAttribute(lambda _: random_str(length=100))
+
+
+class VendorFactory(TitledFactory):
+  """Vendor factory class"""
+
+  class Meta:
+    model = models.Vendor
+
+
 class RiskFactory(TitledFactory):
   """Risk factory class"""
 
   class Meta:
     model = risk_models.Risk
 
-  description = factory.LazyAttribute(
-      lambda _: random_str(prefix="Risk - ")
-  )
+  description = factory.LazyAttribute(lambda _: random_str(length=100))
+
+
+class ThreatFactory(TitledFactory):
+  """Threat factory class"""
+
+  class Meta:
+    model = risk_models.Threat
+
+
+def get_model_factory(model_name):
+  """Get object factory for provided model name"""
+  from integration.ggrc_workflows.models import factories as wf_factories
+  model_factories = {
+      "AccessControlRole": AccessControlRoleFactory,
+      "AccessControlList": AccessControlListFactory,
+      "AccessGroup": AccessGroupFactory,
+      "Assessment": AssessmentFactory,
+      "AssessmentTemplate": AssessmentTemplateFactory,
+      "Audit": AuditFactory,
+      "Clause": ClauseFactory,
+      "Contract": ContractFactory,
+      "Control": ControlFactory,
+      "TaskGroupFactory": wf_factories.TaskGroupFactory,
+      "TaskGroupObjectFactory": wf_factories.TaskGroupObjectFactory,
+      "TaskGroupTaskFactory": wf_factories.TaskGroupTaskFactory,
+      "CycleFactory": wf_factories.CycleFactory,
+      "CycleTaskGroupFactory": wf_factories.CycleTaskGroupFactory,
+      "CycleTaskFactory": wf_factories.CycleTaskFactory,
+      "CycleTaskEntryFactory": wf_factories.CycleTaskEntryFactory,
+      "DataAsset": DataAssetFactory,
+      "Facility": FacilityFactory,
+      "Issue": IssueFactory,
+      "Market": MarketFactory,
+      "Objective": ObjectiveFactory,
+      "OrgGroup": OrgGroupFactory,
+      "Person": PersonFactory,
+      "Policy": PolicyFactory,
+      "Process": ProcessFactory,
+      "Product": ProductFactory,
+      "Regulation": RegulationFactory,
+      "Section": SectionFactory,
+      "Standard": StandardFactory,
+      "System": SystemFactory,
+      "Vendor": VendorFactory,
+      "Risk": RiskFactory,
+      "Threat": ThreatFactory,
+      "Workflow": wf_factories.WorkflowFactory,
+  }
+  return model_factories[model_name]

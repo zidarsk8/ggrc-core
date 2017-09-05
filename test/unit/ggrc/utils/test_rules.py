@@ -36,7 +36,10 @@ class TestMappingRules(BaseTestMappingRules):
                       'OrgGroup', 'Policy', 'Process', 'Product', 'Regulation',
                       'Risk', 'Section', 'Standard', 'System', 'Threat',
                       'Vendor', ]
-  audit_rules = []
+  audit_rules = ['AccessGroup', 'Assessment', 'Clause', 'Contract', 'Control',
+                 'DataAsset', 'Facility', 'Issue', 'Market', 'Objective',
+                 'OrgGroup', 'Policy', 'Process', 'Product', 'Regulation',
+                 'Risk', 'Section', 'Standard', 'System', 'Threat', 'Vendor']
   accessgroup_rules = ['Clause', 'Contract', 'Control',
                        'CycleTaskGroupObjectTask', 'DataAsset', 'Facility',
                        'Market', 'Objective', 'OrgGroup', 'Person', 'Policy',

@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Handler for imports and exports snapshoted instances."""
 import sqlalchemy
+from sqlalchemy import orm
 from sqlalchemy.orm import load_only
 
 from cached_property import cached_property
@@ -11,6 +12,7 @@ from ggrc import models
 from ggrc.automapper import AutomapperGenerator
 from ggrc.converters import errors
 from ggrc.converters.handlers.handlers import MappingColumnHandler
+from ggrc.snapshotter.rules import Types
 
 
 class SnapshotInstanceColumnHandler(MappingColumnHandler):
@@ -86,6 +88,15 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
         self.mapping_object.id == snapshot.c.child_id
     )
 
+  @property
+  def audit_mapped_query(self):
+    """Property, return query of mapping to Audit objects"""
+    return db.session.query(models.Revision).join(models.Snapshot).filter(
+        models.Snapshot.parent_id == self.row_converter.obj.id,
+        models.Snapshot.parent_type == self.row_converter.obj.type,
+        models.Snapshot.child_type == self.mapping_object.__name__,
+    ).options(orm.undefer_group("Revision_complete").load_only("_content"))
+
   def insert_object(self):
     "insert object handler"
     if self.dry_run or not self.value:
@@ -117,8 +128,18 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
     "return column value"
     if self.unmap or not self.mapping_object:
       return ""
-    human_readable_ids = [getattr(i, "slug", getattr(i, "email", None))
-                          for i in self.snapshoted_instances_query.all()]
+    if self.row_converter.obj.type == models.Audit.__name__ and \
+       self.mapping_object.__name__ in Types.all:
+      # Audit should have the same mappings as Assessment. Mapped objects
+      # will be loaded from snapshots.
+      objects = self.audit_mapped_query.all()
+      human_readable_ids = [
+          obj.content.get("slug", obj.content.get("email")) for obj in objects
+      ]
+    else:
+      objects = self.snapshoted_instances_query.all()
+      human_readable_ids = [getattr(i, "slug", getattr(i, "email", None))
+                            for i in objects]
     return "\n".join(human_readable_ids)
 
   def is_valid_creation(self, to_append_ids):
