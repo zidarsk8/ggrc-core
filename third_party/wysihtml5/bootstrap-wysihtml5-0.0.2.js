@@ -1,5 +1,7 @@
-!function($, wysi) {
-	"use strict"
+import wysi from './wysihtml5-0.4.0pre';
+
+!function($) {
+	"use strict";
 
 	var templates = {
 		"font-styles": "<li class='dropdown'>" +
@@ -315,5 +317,4 @@
   	};
 
   	$.fn.wysihtml5.Constructor = Wysihtml5;
-
-}(window.jQuery, window.wysihtml5);
+}(window.jQuery);

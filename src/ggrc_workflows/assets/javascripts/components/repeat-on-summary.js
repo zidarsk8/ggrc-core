@@ -18,10 +18,9 @@
           get: function () {
             var result = '';
             var repeatEvery = this.attr('repeatEvery');
-            var unit = GGRC.Workflow.unitOptions
-              .find(function (option) {
-                return option.value === this.attr('unit');
-              }.bind(this));
+            var unit = _.find(GGRC.Workflow.unitOptions, function (option) {
+              return option.value === this.attr('unit');
+            }.bind(this));
 
             if (unit) {
               if (repeatEvery > 1) {

@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './advanced-search-filter-attribute';
+import './advanced-search-filter-group';
+import './advanced-search-filter-operator';
+import './advanced-search-filter-state';
+
 (function (can, GGRC) {
   'use strict';
 

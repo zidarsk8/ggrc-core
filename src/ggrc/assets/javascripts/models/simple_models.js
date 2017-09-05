@@ -369,4 +369,4 @@
     }
     return type;
   };
-})(this.can);
+})(window.can);

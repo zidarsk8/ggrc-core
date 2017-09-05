@@ -259,4 +259,4 @@
       }
     }
   });
-})(window.can, window.GGRC, window.moment);
+})(window.can, window.GGRC, moment);

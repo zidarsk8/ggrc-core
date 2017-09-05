@@ -3,6 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import './inline_checkbox';
+import './inline_dropdown';
+import './inline_input';
+import './inline_text';
+import './inline_person';
+import './inline_datepicker';
+
 (function (can, $) {
   'use strict';
 

@@ -42,4 +42,4 @@ can.Control("GGRC.Controllers.RecentlyViewed", {
   }
 });
 
-})(this.can, this.can.$);
+})(window.can, window.can.$);

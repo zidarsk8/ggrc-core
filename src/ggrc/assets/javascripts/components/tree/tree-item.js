@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../cycle-task-actions/cycle-task-actions';
+import './tree-item-custom-attribute';
+
 (function (can, GGRC) {
   'use strict';
 

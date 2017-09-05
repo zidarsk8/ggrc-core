@@ -3,9 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (namespace, $, can) {
+import Spinner from 'spin.js';
+
+(function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.
   var mustache_urls = {};
+  var Mustache = can.Mustache;
   $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
     if (/\.mustache$/.test(options.url)) {
       if (mustache_urls[options.url]) {
@@ -1089,7 +1092,7 @@ Mustache.registerHelper('system_role', function (role, options) {
   role = role.toLowerCase();
   // If there is no user, it's same as No Role
   var user_role = (GGRC.current_user ? GGRC.current_user.system_wide_role : 'no access').toLowerCase();
-      isValid = role === user_role;
+  var isValid = role === user_role;
 
   return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
 });
@@ -1397,6 +1400,7 @@ Mustache.registerHelper("current_user_is_admin", function (options) {
 
 Mustache.registerHelper("owned_by_current_user", function (instance, options) {
   var current_user_id = GGRC.current_user.id;
+  var owners;
   instance = Mustache.resolve(instance);
   owners = instance.attr('owners');
   if (owners) {
@@ -2699,4 +2703,4 @@ Example:
           return options.fn(options.contexts.add({hasRole: hasRole}));
         }, hasRoleForContextDfd);
     });
-})(this, jQuery, can);
+})(jQuery, can);

@@ -136,7 +136,7 @@ misspell :
 ## Deployment!
 
 src/ggrc/assets/stylesheets/dashboard.css : src/ggrc/assets/stylesheets/*.scss
-	bin/build_css -p
+	bin/build_assets -p
 
 src/ggrc/assets/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/ggrc/assets
 	source "bin/init_env"; \

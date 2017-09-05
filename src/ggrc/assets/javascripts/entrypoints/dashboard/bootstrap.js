@@ -1,7 +1,7 @@
 /*!
-  Copyright (C) 2017 Google Inc.
-  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+ Copyright (C) 2017 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 (function ($, can, CMS, GGRC) {
   var $area = $('.area').first();
@@ -56,7 +56,7 @@
       object_display: 'People',
       tooltip_view: '/static/mustache/people/object_tooltip.mustache',
       header_view:
-        // includes only the filter, not the column headers
+      // includes only the filter, not the column headers
         '/static/mustache/people/filters.mustache',
       list_view: '/static/mustache/people/object_list.mustache',
       draw_children: true,
@@ -80,10 +80,10 @@
       parent_instance: CMS.Models.CustomAttributable,
       model: CMS.Models.CustomAttributable,
       header_view:
-        GGRC.mustache_path +
-        '/custom_attribute_definitions/tree_header.mustache',
+      GGRC.mustache_path +
+      '/custom_attribute_definitions/tree_header.mustache',
       show_view:
-        GGRC.mustache_path + '/custom_attribute_definitions/tree.mustache',
+      GGRC.mustache_path + '/custom_attribute_definitions/tree.mustache',
       sortable: false,
       list_loader: function () {
         return CMS.Models.CustomAttributable.findAll();
@@ -93,8 +93,8 @@
         model: CMS.Models.CustomAttributeDefinition,
         mapping: 'custom_attribute_definitions',
         show_view:
-          GGRC.mustache_path +
-          '/custom_attribute_definitions/subtree.mustache',
+        GGRC.mustache_path +
+        '/custom_attribute_definitions/subtree.mustache',
         footer_view: null,
         add_item_view: null
       }]
@@ -103,9 +103,9 @@
       parent_instance: CMS.Models.Roleable,
       model: CMS.Models.Roleable,
       header_view:
-        GGRC.mustache_path + '/access_control_roles/tree_header.mustache',
+      GGRC.mustache_path + '/access_control_roles/tree_header.mustache',
       show_view:
-        GGRC.mustache_path + '/access_control_roles/tree.mustache',
+      GGRC.mustache_path + '/access_control_roles/tree.mustache',
       sortable: false,
       list_loader: function () {
         return CMS.Models.Roleable.findAll();
@@ -115,7 +115,7 @@
         model: CMS.Models.AccessControlRole,
         mapping: 'access_control_roles',
         show_view:
-          GGRC.mustache_path + '/access_control_roles/subtree.mustache',
+        GGRC.mustache_path + '/access_control_roles/subtree.mustache',
         footer_view: null,
         add_item_view: null
       }]
@@ -173,10 +173,10 @@
         content_controller_selector: 'ul',
         model: CMS.Models.CustomAttributable,
         widget_initial_content:
-          '<ul' +
-          '  class="tree-structure new-tree colored-list"' +
-          '  data-no-pin="true"' +
-          '></ul>',
+        '<ul' +
+        '  class="tree-structure new-tree colored-list"' +
+        '  data-no-pin="true"' +
+        '></ul>',
         content_controller_options: adminListDescriptors.custom_attributes
       },
       custom_roles: {
@@ -211,8 +211,8 @@
         return /dashboard/.test(window.location) ?
           'GRC: My Work' :
           'GRC Profile: ' +
-              (instance.name && instance.name.trim()) ||
-              (instance.email && instance.email.trim());
+          (instance.name && instance.name.trim()) ||
+          (instance.email && instance.email.trim());
       }
     }
   };
@@ -221,7 +221,7 @@
   isObjectBrowser = /^\/objectBrowser\/?$/.test(location);
 
   if (/^\/\w+\/\d+($|\?|\#)/.test(location) || /^\/dashboard/.test(location) ||
-      isAssessmentsView || isObjectBrowser) {
+    isAssessmentsView || isObjectBrowser) {
     instance = GGRC.page_instance();
     modelName = instance.constructor.shortName;
 
@@ -284,7 +284,7 @@
 
     $(ev.target).closest('.note').cms_controllers_section_notes({
       section_id: $object.data('object-id') ||
-                  (/\d+$/.exec(window.location.pathname) || [null])[0],
+      (/\d+$/.exec(window.location.pathname) || [null])[0],
       model_class: notesModel
     });
   });

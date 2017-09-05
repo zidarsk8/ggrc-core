@@ -178,7 +178,6 @@ To run the Selenium tests, you must login into your dev container, and run the s
 ```
 docker exec -it ggrccore_dev_1 su vagrant
 make bower_components
-build_css
 build_assets
 db_reset
 launch_ggrc
@@ -237,33 +236,18 @@ make bower_components
 ```
 
 
-### Compiling Sass Templates
+### Compiling JavaScript and Sass Templates
 
-Since GGRC uses Sass for CSS templating, the templates need to be compiled.
+Since GGRC uses Webpack to bundle JavaScript and Sass Templates, the sources need to be compiled.
 This has been automated via a script available in $PATH in the virtual
 machine:
-
-```sh
-build_css
-```
-
-To have a process watch the Sass resources and compile them as they are changed
-you could use this command:
-
-```sh
-watch_css
-```
-
-### Compiling Assets
-
-For other asset bundling required, there is the following command:
 
 ```sh
 build_assets
 ```
 
-As for CSS, there is an asset builder that can watch for changes and update
-files as they change:
+To have a process watch Javascript and Sass resources and compile them as they are changed
+you could use this command:
 
 ```sh
 watch_assets
@@ -409,7 +393,6 @@ requirements of GGRC, it may also be necessary to rebuild the Sass and other
 web assets:
 
 ```sh
-build_css
 build_assets
 ```
 

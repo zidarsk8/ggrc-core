@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../../local-custom-attributes/local-custom-attributes-actions';
+
 (function (can, GGRC) {
   'use strict';
   var tpl = can.view(GGRC.mustache_path +
