@@ -169,14 +169,9 @@ class ChangeTracked(object):
   ]
 
   _aliases = {
-      "updated_at": {
-          "display_name": "Last Updated",
-          "filter_only": True,
-      },
-      "created_at": {
-          "display_name": "Created Date",
-          "filter_only": True,
-      },
+      "updated_at": "Last Updated",
+      "created_at": "Created Date",
+      "modified_by": "Last Updated By",
   }
 
   @classmethod
@@ -629,7 +624,6 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
       except AttributeError:
         pass
     res["display_name"] = self.display_name
-
     return res
 
   def log_json(self):
