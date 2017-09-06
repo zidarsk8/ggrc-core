@@ -172,6 +172,7 @@
     model: function (attributes, oldModel) {
       var model;
       var id;
+      var backup;
       if (!attributes) {
         return;
       }
@@ -190,6 +191,14 @@
       model = oldModel && can.isFunction(oldModel.attr) ?
         oldModel.attr(attributes) :
           new this(attributes);
+
+      // Sometimes we are updating model partially and asynchronous
+      // for example when we load relationships.
+      // In this case we have to update backup to solve isDirty issues.
+      backup = model._backupStore();
+      if (backup) {
+        _.extend(backup, attributes);
+      }
 
       // This is a temporary solution
       if (attributes.documents) {
