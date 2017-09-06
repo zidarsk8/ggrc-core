@@ -24,6 +24,7 @@ module.exports = function (env, argv) {
   const config = {
     entry: {
       vendor: 'entrypoints/vendor',
+      styles: 'entrypoints/styles',
       dashboard: ['entrypoints/dashboard'].concat(getExtraModules())
         .concat(['entrypoints/dashboard/bootstrap']),
       login: 'entrypoints/login',
