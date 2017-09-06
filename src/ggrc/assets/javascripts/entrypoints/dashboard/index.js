@@ -49,8 +49,6 @@ import '../../controllers/info_pin_controller';
 import '../../controllers/automapper_controller';
 import '../../controllers/dashboard_controller';
 import '../../controllers/mapper';
-import '../../controllers/quick_search_controller';
-import '../../controllers/recently_viewed_controller';
 
 // Modules and Apps
 import '../../modules/widget_list';
