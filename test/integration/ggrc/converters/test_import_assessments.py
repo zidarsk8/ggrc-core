@@ -5,24 +5,23 @@
 
 """Test request import and updates."""
 
+from cStringIO import StringIO
+from collections import OrderedDict
+from itertools import izip
 import csv
 import datetime
-import freezegun
 
-from collections import OrderedDict
-from cStringIO import StringIO
-from itertools import izip
-
-import ddt
 from flask.json import dumps
+import ddt
+import freezegun
 
 from ggrc import db
 from ggrc import models
 from ggrc.converters import errors
 
-from integration.ggrc.models import factories
 from integration.ggrc import TestCase
 from integration.ggrc.generator import ObjectGenerator
+from integration.ggrc.models import factories
 
 
 @ddt.ddt
