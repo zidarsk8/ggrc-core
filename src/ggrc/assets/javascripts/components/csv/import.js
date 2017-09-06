@@ -19,7 +19,7 @@
             states = {
               select: {
                 'class': "btn-green",
-                text: "Choose CSV file to import"
+                text: 'Choose file to import'
               },
               analyzing: {
                 'class': "btn-white",
@@ -173,9 +173,46 @@
         this.attr({
           state: "select",
           filename: "",
-          import: null
+          'import': null
         });
         element.find(".csv-upload").val("");
+      },
+      requestImport: function (file) {
+        var formData = new FormData();
+        this.attr('state', 'analyzing');
+        this.attr('isLoading', true);
+        this.attr('filename', file.name);
+        formData.append('id', file.id);
+
+        this.requestData = {
+          type: 'POST',
+          url: this.attr('importUrl'),
+          data: formData,
+          cache: false,
+          contentType: false,
+          processData: false,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-test-only': 'true',
+            'X-requested-by': 'GGRC'
+          }
+        };
+        $.ajax(this.requestData)
+          .then(this.prepareDataForCheck.bind(this))
+          .then(function (checkObject) {
+            this.beforeProcess(
+              checkObject.check,
+              checkObject.data,
+              this.element
+            );
+          }.bind(this))
+          .fail(function (data) {
+            this.attr('state', 'select');
+            GGRC.Errors.notifier('error', data.responseJSON.message);
+          }.bind(this))
+          .always(function () {
+            this.attr('isLoading', false);
+          }.bind(this));
       }
     },
     events: {
@@ -183,16 +220,12 @@
         ev.preventDefault();
         this.scope.resetFile(this.element);
       },
-      ".state-select click": function (el, ev) {
-        ev.preventDefault();
-        this.element.find(".csv-upload").trigger("click");
-      },
       ".state-import click": function (el, ev) {
         ev.preventDefault();
-        this.scope.attr("state", "importing");
-        this.requestData.headers["X-test-only"] = "false";
+        this.scope.attr('state', 'importing');
+        this.scope.requestData.headers['X-test-only'] = 'false';
 
-        $.ajax(this.requestData)
+        $.ajax(this.scope.requestData)
         .done(function (data) {
           var result_count = data.reduce(function (prev, curr) {
                 _.each(Object.keys(prev), function(key) {
@@ -212,43 +245,73 @@
           this.scope.attr("isLoading", false);
         }.bind(this));
       },
-      ".csv-upload change": function (el, ev) {
-        var file = el[0].files[0],
-            formData = new FormData();
+      'a.state-select[data-toggle=gdrive-picker] click': function (el, ev) {
+        var that = this;
+        var allowedTypes = ['text/csv', 'application/vnd.google-apps.document',
+          'application/vnd.google-apps.spreadsheet'];
+        var dfd = GGRC.Controllers
+          .GAPI.authorize(['https://www.googleapis.com/auth/drive']);
 
-        this.scope.attr("state", "analyzing");
-        this.scope.attr("isLoading", true);
-        this.scope.attr("filename", file.name);
-        formData.append("file", file);
+        dfd.done(function () {
+          gapi.load('picker', {
+            callback: createPicker
+          });
+        });
 
-        this.requestData = {
-          type: "POST",
-          url: this.scope.attr("importUrl"),
-          data: formData,
-          cache: false,
-          contentType: false,
-          processData: false,
-          headers: {
-            "X-test-only": "true",
-            "X-requested-by": "GGRC"
+        // Create and render a Picker object for searching images.
+        function createPicker() {
+          window.oauth_dfd.done(function (token, oauth_user) {
+            var dialog;
+            var docsUploadView;
+            var docsView;
+            var picker = new google.picker.PickerBuilder()
+                  .setOAuthToken(gapi.auth.getToken().access_token)
+                  .setDeveloperKey(GGRC.config.GAPI_KEY)
+                  .setCallback(pickerCallback);
+
+            docsUploadView = new google.picker.DocsUploadView();
+            docsView = new google.picker.DocsView()
+              .setMimeTypes(allowedTypes);
+
+            picker.addView(docsUploadView)
+              .addView(docsView);
+
+            picker = picker.build();
+            picker.setVisible(true);
+            // use undocumented fu to make the Picker be "modal"
+            // this is the "mask" displayed behind the dialog box div
+            $('div.picker-dialog-bg').css('zIndex', 4000);  // there are multiple divs of that sort
+            // and this is the dialog box modal div, which we must display on top of our modal, if any
+
+            dialog = GGRC.Utils.getPickerElement(picker);
+            if (dialog) {
+              dialog.style.zIndex = 4001; // our modals start with 2050
+            }
+          });
+        }
+
+        function pickerCallback(data) {
+          var file;
+          var model;
+          var PICKED = google.picker.Action.PICKED;
+          var ACTION = google.picker.Response.ACTION;
+          var DOCUMENTS = google.picker.Response.DOCUMENTS;
+
+          if (data[ACTION] === PICKED) {
+            model = CMS.Models.GDriveFile;
+            file = model.models(data[DOCUMENTS])[0];
+
+            if (file && _.any(allowedTypes, function (type) {
+              return type === file.mimeType;
+            })) {
+              that.scope.requestImport(file);
+            } else {
+              GGRC.Errors.notifier('error',
+                'Something other than a csv-file was chosen. ' +
+                'Please choose a csv-file.');
+            }
           }
-        };
-        $.ajax(this.requestData)
-          .then(this.scope.prepareDataForCheck.bind(this.scope))
-          .then(function (checkObject) {
-            this.scope.beforeProcess(
-              checkObject.check,
-              checkObject.data,
-              this.element
-            );
-          }.bind(this))
-          .fail(function (data) {
-            this.scope.attr("state", "select");
-            GGRC.Errors.notifier('error', data.responseJSON.message);
-          }.bind(this))
-          .always(function () {
-            this.scope.attr("isLoading", false);
-          }.bind(this));
+        }
       }
     }
   });
