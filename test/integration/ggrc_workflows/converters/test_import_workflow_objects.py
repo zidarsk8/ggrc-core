@@ -10,8 +10,10 @@ from os.path import join
 import collections
 
 import ddt
+import freezegun
 
 from integration.ggrc import TestCase
+from integration.ggrc_workflows import generator as wf_generator
 from integration.ggrc_workflows.models import factories as wf_factories
 from integration.ggrc.models import factories
 
@@ -34,6 +36,7 @@ class TestWorkflowObjectsImport(TestCase):
   def setUp(self):
     super(TestWorkflowObjectsImport, self).setUp()
     self.client.get("/login")
+    self.generator = wf_generator.WorkflowsGenerator()
 
   def test_full_good_import(self):
     """Test full good import without any warnings."""
@@ -202,38 +205,108 @@ class TestWorkflowObjectsImport(TestCase):
     self.assertEqual(flag, workflow.is_verification_needed)
 
   @ddt.data(
-      # DB value, Import Value, ERROR
-      (False, 'FALSE', False),
-      (False, 'False', False),
-      (False, 'false', False),
-      (False, 'TRUE', True),
-      (False, 'True', True),
-      (False, 'true', True),
-      (True, 'FALSE', True),
-      (True, 'False', True),
-      (True, 'false', True),
-      (True, 'TRUE', False),
-      (True, 'True', False),
-      (True, 'true', False),
+      ('FALSE', False),
+      ('False', False),
+      ('false', False),
+      ('TRUE', True),
+      ('True', True),
+      ('true', True),
   )
-  @ddt.unpack
-  def test_update_verification_flag(self, flag, import_value, error):
-    """Test try to change verification flag value"""
-    slug = "SomeCode"
-    with factories.single_commit():
-      wf_factories.WorkflowFactory(slug=slug, is_verification_needed=flag)
-      person = factories.PersonFactory(email="test@email.py")
-    resp = self.import_data(collections.OrderedDict([
-        ("object_type", "Workflow"),
-        ("code", slug),
-        ("title", "SomeTitle"),
-        ("Need Verification", import_value),
-        ("force real-time email updates", "no"),
-        ("Manager", person.email),
-    ]))
-    self.assertEqual(int(error), resp[0]['ignored'])
-    workflow = Workflow.query.filter(Workflow.slug == slug).first()
-    self.assertEqual(flag, workflow.is_verification_needed)
+  @ddt.unpack  # pylint: disable=invalid-name
+  def test_update_verification_flag_positive(self, import_value,
+                                             expected_value):
+    workflow_test_data = {
+        'WORKFLOW_VERIF': True,
+        'WORKFLOW_NO_VERIF': False
+    }
+    with freezegun.freeze_time("2017-08-10"):
+      for slug, db_value in workflow_test_data.iteritems():
+        with factories.single_commit():
+          workflow = wf_factories.WorkflowFactory(
+              slug=slug, is_verification_needed=db_value)
+          wf_factories.TaskGroupTaskFactory(
+              task_group=wf_factories.TaskGroupFactory(
+                  workflow=workflow,
+                  context=factories.ContextFactory()
+              ),
+              start_date=date(2017, 8, 3),
+              end_date=date(2017, 8, 7))
+          person = factories.PersonFactory(email="{}@email.py".format(slug))
+        wf_id = workflow.id
+        self.assertEqual(workflow.status, workflow.DRAFT)
+        resp = self.import_data(collections.OrderedDict([
+            ("object_type", "Workflow"),
+            ("code", slug),
+            ("title", "SomeTitle"),
+            ("Need Verification", import_value),
+            ("force real-time email updates", "no"),
+            ("Manager", person.email),
+        ]))
+        self.assertEqual(1, resp[0]['updated'])
+        workflow = Workflow.query.filter(Workflow.id == wf_id).first()
+        self.assertEqual(workflow.is_verification_needed, expected_value)
+
+  @ddt.data(
+      (True, 'FALSE'),
+      (True, 'False'),
+      (True, 'false'),
+      (False, 'TRUE'),
+      (False, 'True'),
+      (False, 'true'),
+  )
+  @ddt.unpack  # pylint: disable=invalid-name
+  def test_update_verification_flag_negative(self, db_value, import_value):
+    slug = 'SomeCode'
+    with freezegun.freeze_time("2017-08-10"):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(
+            slug=slug,
+            is_verification_needed=db_value,
+            repeat_every=1,
+            unit=Workflow.WEEK_UNIT)
+        wf_factories.TaskGroupTaskFactory(
+            task_group=wf_factories.TaskGroupFactory(
+                workflow=workflow,
+                context=factories.ContextFactory()
+            ),
+            # Two cycles should be created
+            start_date=date(2017, 8, 3),
+            end_date=date(2017, 8, 7))
+        person = factories.PersonFactory(email="{}@email.py".format(slug))
+      wf_id = workflow.id
+      person_email = person.email
+
+      self.generator.activate_workflow(workflow)
+      workflow = Workflow.query.filter(Workflow.id == wf_id).first()
+      self.assertEqual(workflow.status, workflow.ACTIVE)
+      resp = self.import_data(collections.OrderedDict([
+          ("object_type", "Workflow"),
+          ("code", slug),
+          ("title", "SomeTitle"),
+          ("Need Verification", import_value),
+          ("force real-time email updates", "no"),
+          ("Manager", person_email),
+      ]))
+      self.assertEqual(1, resp[0]['ignored'])
+      workflow = Workflow.query.filter(Workflow.id == wf_id).first()
+      self.assertEqual(workflow.is_verification_needed, db_value)
+
+      # End all current cycles
+      for cycle in workflow.cycles:
+        self.generator.modify_object(cycle, {'is_current': False})
+      workflow = Workflow.query.filter(Workflow.id == wf_id).first()
+      self.assertEqual(workflow.status, workflow.INACTIVE)
+      resp = self.import_data(collections.OrderedDict([
+          ("object_type", "Workflow"),
+          ("code", slug),
+          ("title", "SomeTitle"),
+          ("Need Verification", import_value),
+          ("force real-time email updates", "no"),
+          ("Manager", person_email),
+      ]))
+      self.assertEqual(1, resp[0]['ignored'])
+      workflow = Workflow.query.filter(Workflow.id == wf_id).first()
+      self.assertEqual(workflow.is_verification_needed, db_value)
 
   def test_error_verification_flag(self):
     """Test create wf without Needed Verification flag"""
