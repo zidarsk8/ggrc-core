@@ -46,7 +46,7 @@
           $(this).trigger('shown'); // this will reposition the modal stack
         })
         .on('delete-object', $.proxy(this.delete_object, this))
-        .draggable({handle: '.modal-header'});
+        .draggable({handle: '.modal-header', cancel: '.btn'});
     },
 
     doNothing: function (e) {
@@ -219,7 +219,12 @@
         can.trigger(instance, 'modal:dismiss');
       }
       $.fn.modal.Constructor.prototype.hide.apply(this, [e]);
+      this.$element.trigger('modal:dismiss');
       this.$element.off('modal_form');
+    },
+
+    silentHide: function () {
+      $.fn.modal.Constructor.prototype.hide.call(this);
     },
 
     focus_first_input: function (ev) {

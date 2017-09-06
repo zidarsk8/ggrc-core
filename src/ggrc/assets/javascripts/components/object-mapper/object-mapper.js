@@ -69,9 +69,8 @@
 
     events: {
       '.create-control modal:success': function (el, ev, model) {
-        this.viewModel.attr('showResults', true);
         this.viewModel.attr('newEntries').push(model);
-        this.element.find('mapper-results').viewModel().showNewEntries();
+        this.mapObjects(this.viewModel.attr('newEntries'));
       },
       '.create-control modal:added': function (el, ev, model) {
         this.viewModel.attr('newEntries').push(model);
@@ -79,6 +78,7 @@
       '.create-control click': function () {
         // reset new entries
         this.viewModel.attr('newEntries', []);
+        this.element.trigger('hideModal');
       },
       '{window} modal:dismiss': function (el, ev, options) {
         var joinObjectId = this.viewModel.attr('join_object_id');
@@ -89,7 +89,9 @@
         if (options.uniqueId &&
           joinObjectId === options.uniqueId &&
           this.viewModel.attr('newEntries').length > 0) {
-          this.element.find('mapper-results').viewModel().showNewEntries();
+          this.mapObjects(this.viewModel.attr('newEntries'));
+        } else {
+          this.element.trigger('showModal');
         }
       },
       inserted: function () {
@@ -143,16 +145,6 @@
         this.closeModal();
       },
       '.modal-footer .btn-map click': function (el, ev) {
-        var type = this.viewModel.attr('type');
-        var object = this.viewModel.attr('object');
-        var instance = CMS.Models[object].findInCacheById(
-          this.viewModel.attr('join_object_id'));
-        var mapping;
-        var Model;
-        var data = {};
-        var defer = [];
-        var que = new RefreshQueue();
-
         ev.preventDefault();
         if (el.hasClass('disabled') ||
           this.viewModel.attr('is_saving')) {
@@ -164,11 +156,22 @@
           return this.deferredSave();
         }
         this.viewModel.attr('is_saving', true);
+        this.mapObjects(this.viewModel.attr('selected'));
+      },
+      mapObjects: function (objects) {
+        var type = this.viewModel.attr('type');
+        var object = this.viewModel.attr('object');
+        var instance = CMS.Models[object].findInCacheById(
+          this.viewModel.attr('join_object_id'));
+        var mapping;
+        var Model;
+        var data = {};
+        var defer = [];
+        var que = new RefreshQueue();
 
         que.enqueue(instance).trigger().done(function (inst) {
           data.context = instance.context || null;
-          this.viewModel.attr('selected').forEach(
-          function (destination) {
+          objects.forEach(function (destination) {
             var modelInstance;
             var isMapped;
             var isAllowed;

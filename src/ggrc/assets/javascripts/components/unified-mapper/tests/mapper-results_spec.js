@@ -51,86 +51,6 @@ describe('GGRC.Components.mapperResults', function () {
     });
   });
 
-  describe('showNewEntries() method', function () {
-    beforeEach(function () {
-      viewModel.attr({});
-    });
-
-    it('updates viewModel.selected', function () {
-      viewModel.attr('selected', []);
-      viewModel.attr('newEntries', [
-          {id: 'mockId', type: 'mockType'}
-      ]);
-      spyOn(viewModel, 'transformValue')
-        .and.returnValue('mockData');
-      viewModel.showNewEntries();
-      expect(viewModel.attr('selected').length)
-        .toEqual(1);
-      expect(viewModel.attr('selected')[0])
-        .toEqual(jasmine.objectContaining({
-          id: 'mockId',
-          type: 'mockType',
-          data: 'mockData',
-          isSelected: true,
-          markedSelected: true
-        }));
-    });
-
-    it('sets empty array to filterItems', function () {
-      viewModel.attr('filterItems', ['someData']);
-      viewModel.showNewEntries();
-      expect(viewModel.attr('filterItems.length')).toEqual(0);
-    });
-    it('sets empty array to mappingItems', function () {
-      viewModel.attr('mappingItems', ['someData']);
-      viewModel.showNewEntries();
-      expect(viewModel.attr('mappingItems.length')).toEqual(0);
-    });
-
-    it('updates viewModel.prevSelected', function () {
-      viewModel.attr('prevSelected', []);
-      viewModel.attr('newEntries', [
-          {id: 'mockId', type: 'mockType'}
-      ]);
-      spyOn(viewModel, 'transformValue')
-        .and.returnValue('mockData');
-      viewModel.showNewEntries();
-      expect(viewModel.attr('prevSelected').length)
-        .toEqual(1);
-      expect(viewModel.attr('prevSelected')[0])
-        .toEqual(jasmine.objectContaining({
-          id: 'mockId',
-          type: 'mockType',
-          data: 'mockData',
-          isSelected: true,
-          markedSelected: true
-        }));
-    });
-
-    it('calls viewModel.onSearch() ', function () {
-      viewModel.attr('sort.key', 'updated_at');
-      viewModel.attr('sort.direction', 'desc');
-      spyOn(viewModel, 'onSearch');
-      viewModel.showNewEntries();
-      expect(viewModel.onSearch).toHaveBeenCalled();
-    });
-
-    it('updates sort.key and sort.direction in viewModel', function () {
-      viewModel.attr('sort.key', 'mockKey');
-      viewModel.attr('sort.direcion', 'mockDirection');
-      viewModel.showNewEntries();
-      expect(viewModel.attr('sort.key')).toEqual('updated_at');
-      expect(viewModel.attr('sort.direction')).toEqual('desc');
-    });
-
-    it('sets current page to 1', function () {
-      viewModel.attr('paging.count', 10);
-      viewModel.attr('paging.current', 9);
-      viewModel.showNewEntries();
-      expect(viewModel.attr('paging.current')).toEqual(1);
-    });
-  });
-
   describe('setItems() method', function () {
     var items;
 
@@ -360,6 +280,11 @@ describe('GGRC.Components.mapperResults', function () {
     };
     var mockFilterItems = ['filterItem'];
     var mockMappingItems = ['mappingItem'];
+    var mockStatusItem = new can.Map({
+      value: {
+        items: ['statusItem']
+      }
+    });
 
     beforeEach(function () {
       viewModel.attr('type', 'mockName');
@@ -367,6 +292,7 @@ describe('GGRC.Components.mapperResults', function () {
       viewModel.attr('sort', mockSort);
       viewModel.attr('filterItems', mockFilterItems);
       viewModel.attr('mappingItems', mockMappingItems);
+      viewModel.attr('statusItem', mockStatusItem);
 
       spyOn(viewModel, 'prepareRelevantQuery')
         .and.returnValue('relevant');
@@ -390,6 +316,19 @@ describe('GGRC.Components.mapperResults', function () {
       viewModel.getQuery('values', true);
       expect(GGRC.Utils.AdvancedSearch.buildFilter.calls.argsFor(1)[0].attr())
         .toEqual(mockMappingItems);
+    });
+
+    it('builds advanced status', function () {
+      viewModel.getQuery('values', true);
+      expect(GGRC.Utils.AdvancedSearch.buildFilter.calls.argsFor(2)[0][0])
+        .toEqual(mockStatusItem);
+    });
+
+    it('does not build advanced status if sttatus items are not provided',
+    function () {
+      viewModel.attr('statusItem', {});
+      viewModel.getQuery('values', true);
+      expect(GGRC.Utils.AdvancedSearch.buildFilter.calls.count()).toBe(2);
     });
 
     it('adds paging to query if addPaging is true', function () {
@@ -454,7 +393,7 @@ describe('GGRC.Components.mapperResults', function () {
       spyOn(viewModel, 'prepareUnlockedFilter').and.returnValue('unlocked');
       viewModel.getQuery();
 
-      expect(GGRC.query_parser.join_queries.calls.argsFor(1)[1])
+      expect(GGRC.query_parser.join_queries.calls.argsFor(2)[1])
         .toBe('unlocked');
     });
   });
