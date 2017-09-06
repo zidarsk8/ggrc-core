@@ -85,7 +85,7 @@ class TestWorkflow(TestCase):
       ([1], datetime.date(2017, 8, 17)),
       ([0, 1], None),
   )
-  @ddt.unpack
+  @ddt.unpack  # pylint: disable=invalid-name
   def test_recalculate_start_date_on_delete(self, idxs, expected_date):
     start_date_1 = datetime.date(2017, 8, 10)
     start_date_2 = datetime.date(2017, 8, 11)
@@ -131,7 +131,7 @@ class TestWorkflow(TestCase):
       (datetime.date(2017, 8, 6), datetime.date(2017, 8, 11)),
       (datetime.date(2017, 8, 5), datetime.date(2017, 8, 11)),
   )
-  @ddt.unpack
+  @ddt.unpack  # pylint: disable=invalid-name
   def test_recalculate_start_date_on_create(self,
                                             new_start_date,
                                             expected_date):

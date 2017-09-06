@@ -62,7 +62,7 @@ class TestWorkflowsApiPost(TestCase):
     self.assertEqual(response.status_code, 201)
 
   @ddt.data("wrong value", 0, -4)
-  def test_create_wrong_repeat_every_workflow(self, value):
+  def test_create_wrong_repeat_every_workflow(self, value):  # noqa pylint: disable=invalid-name
     """Test case for invalid repeat_every value"""
     data = self.get_workflow_dict()
     data["workflow"]["repeat_every"] = value
@@ -92,7 +92,7 @@ class TestWorkflowsApiPost(TestCase):
 
   # TODO: Api should be able to handle invalid data
   @unittest.skip("Not implemented.")
-  def test_create_task_group_invalid_workflow_data(self):
+  def test_create_task_group_invalid_workflow_data(self):  # noqa pylint: disable=invalid-name
     data = self.get_task_group_dict({"id": -1, "context": {"id": -1}})
     response = self.api.post(all_models.TaskGroup, data)
     self.assert400(response)
