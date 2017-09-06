@@ -7,6 +7,7 @@ from datetime import datetime
 from logging import getLogger
 import collections
 
+import sqlalchemy as sa
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
@@ -16,7 +17,6 @@ from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import get_cache
-from ggrc.services import signals
 from ggrc.utils import benchmark, with_nop
 
 
@@ -222,19 +222,10 @@ def register_automapping_listeners():
   """Register event listeners for auto mapper."""
   # pylint: disable=unused-variable,unused-argument
 
-  @signals.Restful.collection_posted.connect_via(Relationship)
-  def handle_relationship_collection_post(sender, objects=None, **kwargs):
-    """Handle bulk creation of relationships.
-
-    This handler reuses auto mapper cache and is more efficient than handling
-    one object at a time.
-
-    Args:
-      objects: list of relationship Models.
-    """
+  def automap(session, _):
     automapper = AutomapperGenerator()
-    for obj in objects:
-      if obj is None:
-        logger.warning("Automapping listener: no obj, no mappings created")
-        return
-      automapper.generate_automappings(obj)
+    for obj in session.new:
+      if isinstance(obj, Relationship):
+        automapper.generate_automappings(obj)
+
+  sa.event.listen(sa.orm.session.Session, "after_flush", automap)
