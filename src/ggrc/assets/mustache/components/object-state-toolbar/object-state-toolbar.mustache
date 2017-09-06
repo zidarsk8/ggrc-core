@@ -6,17 +6,14 @@
 <div class="object-state-toolbar">
   {{#if isInProgressOrNotStarted}}
       <button class="btn btn-small btn-darkBlue object-state-toolbar__item"
-              {{#if isDisabled}}disabled{{/if}}
               ($click)="changeState()">Complete
       </button>
   {{/if}}
   {{#if isInReview}}
     {{#if isCurrentUserVerifier}}
         <button class="btn btn-small btn-green object-state-toolbar__item"
-                {{#if isDisabled}}disabled{{/if}}
                 ($click)="changeState('Verified')">Verify</button>
         <button class="btn btn-small btn-red object-state-toolbar__item"
-                {{#if isDisabled}}disabled{{/if}}
                 ($click)="changeState('In Progress')">Reject
         </button>
     {{/if}}
@@ -24,7 +21,6 @@
   {{#unless isInProgress}}
     {{#instance.previousStatus}}
         <button class="btn btn-small btn-link object-state-toolbar__item"
-                {{#if isDisabled}}disabled{{/if}}
                 ($click)="changeState('In Progress', true)">Undo
         </button>
     {{/instance._undo.0}}

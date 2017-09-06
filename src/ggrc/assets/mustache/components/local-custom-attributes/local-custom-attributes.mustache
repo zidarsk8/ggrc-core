@@ -5,7 +5,7 @@
 
 <div class="fields-wrapper flex-box flex-row">
   {{#each fields}}
-    <div class="field-wrapper flex-size-1 {{extraClass type}}">
+    <div class="field-wrapper flex-size-1 {{extraClass type}} {{#isInvalidField validation.show validation.valid highlightInvalidFields}}invalid-field{{/isInvalidField}}">
       <form-validation-icon {validation}="validation"></form-validation-icon>
       <div class="field__title form-field__title">
         <label class="field__title-text {{extraClass type}}" for="form-field-{{id}}">{{title}}</label>
@@ -38,6 +38,12 @@
             <button class="btn btn-small btn-link btn-link-nopadding" ($click)="showRequiredInfoModal(%event, %context)">Add required info</button>
         </div>
       {{/if}}
+      {{#isInvalidField validation.show validation.valid highlightInvalidFields}}
+        <form-validation-text
+          {validation}="validation"
+          {type}="type">
+        </form-validation-text>
+      {{/isInvalidField}}
     </div>
   {{/each}}
 </div>

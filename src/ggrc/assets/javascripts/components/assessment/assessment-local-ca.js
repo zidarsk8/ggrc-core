@@ -17,6 +17,7 @@
       fields: [],
       isDirty: false,
       saving: false,
+      highlightInvalidFields: false,
 
       define: {
         hasValidationErrors: {
@@ -26,6 +27,16 @@
               .filter(function (field) {
                 return !field.attr('validation.valid');
               }).length;
+          }
+        },
+        editMode: {
+          type: 'boolean',
+          value: false,
+          set: function (newValue) {
+            if (newValue === true) {
+              this.attr('highlightInvalidFields', false);
+            }
+            return newValue;
           }
         },
         evidenceAmount: {
@@ -187,11 +198,51 @@
       }
     },
     events: {
+      inserted: function () {
+        this.viewModel.validateForm();
+      },
       '{viewModel.instance} update': function () {
         this.viewModel.validateForm();
       },
       '{viewModel.instance} afterCommentCreated': function () {
         this.viewModel.validateForm();
+      },
+      '{viewModel.instance} showInvalidField': function (ev) {
+        var pageType = GGRC.page_instance().type;
+        var $container = (pageType === 'Assessment') ?
+          $('.object-area') : $('.cms_controllers_info_pin');
+        var $body = (pageType === 'Assessment') ?
+          $('.inner-content.widget-area') : $('.info-pane__body');
+        var field;
+        var index;
+
+        index = _.findIndex(this.viewModel.attr('fields'), function (field) {
+          var validation = field.attr('validation');
+          return validation.show && !validation.valid;
+        });
+
+        field = $('.field-wrapper')[index];
+
+        if (!field) {
+          return;
+        }
+
+        this.viewModel.attr('highlightInvalidFields', true);
+        $container.animate({
+          scrollTop: $(field).offset().top - $body.offset().top
+        }, 500);
+      }
+    },
+    helpers: {
+      isInvalidField: function (show, valid, highlightInvalidFields, options) {
+        show = Mustache.resolve(show);
+        valid = Mustache.resolve(valid);
+        highlightInvalidFields = Mustache.resolve(highlightInvalidFields);
+
+        if (highlightInvalidFields && show && !valid) {
+          return options.fn(options.context);
+        }
+        return options.inverse(options.context);
       }
     }
   });

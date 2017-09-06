@@ -23,10 +23,6 @@ date-form-field {
             background: $white;
             border-color: #ccc;
             cursor: pointer;
-
-            &:focus {
-              border-color: rgba(82, 168, 236, 0.8);
-            }
           }
         }
 
