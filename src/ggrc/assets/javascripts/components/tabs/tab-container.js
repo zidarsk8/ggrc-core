@@ -11,6 +11,16 @@
     template: can.view(GGRC.mustache_path +
       '/components/tabs/tab-container.mustache'),
     viewModel: {
+      define: {
+        showTabs: {
+          type: 'boolean',
+          get: function () {
+            return !(this.attr('hideOneTab') &&
+              this.attr('panels.length') === 1);
+          }
+        }
+      },
+      hideOneTab: true,
       selectedTabIndex: 0,
       panels: [],
       /**
@@ -52,9 +62,15 @@
     },
     events: {
       /**
-       * Update Currently selected Tab on each add/remove of Panels
+       * Update Currently selected Tab on each add of Panels
        */
-      '{viewModel.panels} length': function () {
+      '{viewModel.panels} panelAdded': function () {
+        this.viewModel.setDefaultActivePanel();
+      },
+      /**
+       * Update Currently selected Tab on each remove of Panels
+       */
+      '{viewModel.panels} panelRemoved': function () {
         this.viewModel.setDefaultActivePanel();
       }
     }

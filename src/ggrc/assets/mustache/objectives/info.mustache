@@ -13,24 +13,34 @@
     {{> /static/mustache/base_objects/info-pane-utility.mustache}}
 
     <div class="tier-content">
-      {{>'/static/mustache/base_objects/general_info.mustache'}}
-      {{>'/static/mustache/base_objects/description.mustache'}}
-      {{>'/static/mustache/base_objects/notes.mustache'}}
-      {{>'/static/mustache/base_objects/contacts.mustache'}}
-      {{>'/static/mustache/base_objects/urls.mustache'}}
+      {{>'/static/mustache/base_objects/general-page-header.mustache'}}
 
-      <div class="row-fluid wrap-row">
-        <div class="span6">
-          <h6>Code</h6>
-          <p>
-            {{slug}}
-          </p>
-        </div>
-      </div>
+      <tab-container>
+        <tab-panel {(panels)}="panels" title-text="{{instance.type}}">
+          {{>'/static/mustache/base_objects/object-review.mustache'}}
+          {{>'/static/mustache/base_objects/description.mustache'}}
+          {{>'/static/mustache/base_objects/notes.mustache'}}
+          {{>'/static/mustache/base_objects/contacts.mustache'}}
+          {{>'/static/mustache/base_objects/urls.mustache'}}
+
+          <div class="row-fluid wrap-row">
+            <div class="span6">
+              <h6>Code</h6>
+              <p>
+                {{slug}}
+              </p>
+            </div>
+          </div>
+
+          {{>'/static/mustache/custom_attributes/info.mustache'}}
+        </tab-panel>
+        {{^if instance.snapshot}}
+          <tab-panel {(panels)}="panels" title-text="Change Log">
+              <revision-log {instance}="instance"></revision-log>
+          </tab-panel>
+        {{/if}}
+      </tab-container>
     </div><!-- tier-content end -->
-
-  {{>'/static/mustache/custom_attributes/info.mustache'}}
-
   </section>
 
   <info-pane-footer {created-at}="instance.created_at" {modified-at}="instance.updated_at" {modified-by}="instance.modified_by"></info-pane-footer>

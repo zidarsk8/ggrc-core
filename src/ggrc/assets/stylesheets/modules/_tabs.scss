@@ -3,6 +3,18 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+.tab-container {
+  &_hidden-tabs {
+    .nav-tabs {
+      display: none;
+    }
+
+    .tab-pane {
+      padding: 0;
+    }
+  }
+}
+
 .nav-tabs {
   padding-left: 12px;
   border-bottom: 1px solid darken($itemBorder,10%);
