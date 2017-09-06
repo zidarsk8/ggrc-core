@@ -5,66 +5,66 @@
 
 (function (can, $, utils) {
   GGRC.Components('csvImportWidget', {
-    tag: "csv-import",
-    template: "<content></content>",
+    tag: 'csv-import',
+    template: '<content></content>',
     requestData: null,
     scope: {
-      importUrl: "/_service/import_csv",
-      import: null,
-      filename: "",
+      importUrl: '/_service/import_csv',
+      'import': null,
+      filename: '',
       isLoading: false,
-      state: "select",
+      state: 'select',
       states: function () {
-        var state = this.attr("state") || "select",
-            states = {
-              select: {
-                'class': "btn-green",
-                text: 'Choose file to import'
-              },
-              analyzing: {
-                'class': "btn-white",
-                showSpinner: true,
-                isDisabled: true,
-                text: "Analyzing"
-              },
-              import: {
-                'class': "btn-green",
-                text: "Import",
-                isDisabled: function () {
-                  var toImport = this.import;  // info on blocks to import
-                  var nonEmptyBlockExists;
-                  var hasErrors;
+        var state = this.attr('state') || 'select';
+        var states = {
+          select: {
+            'class': 'btn-green',
+            text: 'Choose file to import'
+          },
+          analyzing: {
+            'class': 'btn-white',
+            showSpinner: true,
+            isDisabled: true,
+            text: 'Analyzing'
+          },
+          'import': {
+            'class': 'btn-green',
+            text: 'Import',
+            isDisabled: function () {
+              var toImport = this.import;  // info on blocks to import
+              var nonEmptyBlockExists;
+              var hasErrors;
 
-                  if (!toImport || toImport.length < 1) {
-                    return true;
-                  }
-
-                  // A non-empty block is a block containing at least one
-                  // line that is not ignored (due to errors, etc.).
-                  nonEmptyBlockExists = _.any(toImport, function (block) {
-                    return block.rows > block.ignored;
-                  });
-
-                  hasErrors = _.any(toImport, function (block) {
-                    return block.block_errors.length;
-                  });
-
-                  return hasErrors || !nonEmptyBlockExists;
-                }.bind(this)  // bind the scope object as context
-              },
-              importing: {
-                'class': "btn-white",
-                showSpinner: true,
-                isDisabled: true,
-                text: "Importing"
-              },
-              success: {
-                'class': "btn-green",
-                isDisabled: true,
-                text: "<i class=\"fa fa-check-square-o white\">"+
-                  "</i> Import successful"
+              if (!toImport || toImport.length < 1) {
+                return true;
               }
-            };
+
+              // A non-empty block is a block containing at least one
+              // line that is not ignored (due to errors, etc.).
+              nonEmptyBlockExists = _.any(toImport, function (block) {
+                return block.rows > block.ignored;
+              });
+
+              hasErrors = _.any(toImport, function (block) {
+                return block.block_errors.length;
+              });
+
+              return hasErrors || !nonEmptyBlockExists;
+            }.bind(this)  // bind the scope object as context
+          },
+          importing: {
+            'class': 'btn-white',
+            showSpinner: true,
+            isDisabled: true,
+            text: 'Importing'
+          },
+          success: {
+            'class': 'btn-green',
+            isDisabled: true,
+            text: '<i class="fa fa-check-square-o white">' +
+              '</i> Import successful'
+          }
+        };
 
         return _.extend(states[state], {state: state});
       },
@@ -98,23 +98,23 @@
         };
       },
       processLoadedInfo: function (data) {
-        this.attr("import", _.map(data, function (element) {
+        this.attr('import', _.map(data, function (element) {
           element.data = [];
           if (element.block_errors.concat(element.row_errors).length) {
             element.data.push({
-              status: "errors",
+              status: 'errors',
               messages: element.block_errors.concat(element.row_errors)
             });
           }
           if (element.block_warnings.concat(element.row_warnings).length) {
             element.data.push({
-              status: "warnings",
+              status: 'warnings',
               messages: element.block_warnings.concat(element.row_warnings)
             });
           }
           return element;
         }));
-        this.attr("state", "import");
+        this.attr('state', 'import');
       },
       needWarning: function (checkObj, data) {
         var hasWarningTypes = _.every(data, function (item) {
@@ -171,23 +171,21 @@
       },
       resetFile: function (element) {
         this.attr({
-          state: "select",
-          filename: "",
+          state: 'select',
+          filename: '',
           'import': null
         });
-        element.find(".csv-upload").val("");
+        element.find('.csv-upload').val('');
       },
       requestImport: function (file) {
-        var formData = new FormData();
         this.attr('state', 'analyzing');
         this.attr('isLoading', true);
         this.attr('filename', file.name);
-        formData.append('id', file.id);
 
         this.requestData = {
           type: 'POST',
           url: this.attr('importUrl'),
-          data: formData,
+          data: JSON.stringify({id: file.id}),
           cache: false,
           contentType: false,
           processData: false,
@@ -216,33 +214,33 @@
       }
     },
     events: {
-      ".state-reset click": function (el, ev) {
+      '.state-reset click': function (el, ev) {
         ev.preventDefault();
         this.scope.resetFile(this.element);
       },
-      ".state-import click": function (el, ev) {
+      '.state-import click': function (el, ev) {
         ev.preventDefault();
         this.scope.attr('state', 'importing');
         this.scope.requestData.headers['X-test-only'] = 'false';
 
         $.ajax(this.scope.requestData)
         .done(function (data) {
-          var result_count = data.reduce(function (prev, curr) {
-                _.each(Object.keys(prev), function(key) {
-                  prev[key] += curr[key] || 0;
-                });
-                return prev;
-              }, {created: 0, updated: 0, deleted: 0, ignored: 0});
+          var resultCount = data.reduce(function (prev, curr) {
+            _.each(Object.keys(prev), function (key) {
+              prev[key] += curr[key] || 0;
+            });
+            return prev;
+          }, {created: 0, updated: 0, deleted: 0, ignored: 0});
 
-          this.scope.attr("state", "success");
-          this.scope.attr("data", [result_count]);
+          this.scope.attr('state', 'success');
+          this.scope.attr('data', [resultCount]);
         }.bind(this))
         .fail(function (data) {
-          this.scope.attr("state", "select");
+          this.scope.attr('state', 'select');
           GGRC.Errors.notifier('error', data.responseJSON.message);
         }.bind(this))
         .always(function () {
-          this.scope.attr("isLoading", false);
+          this.scope.attr('isLoading', false);
         }.bind(this));
       },
       'a.state-select[data-toggle=gdrive-picker] click': function (el, ev) {
@@ -278,8 +276,8 @@
 
             picker = picker.build();
             picker.setVisible(true);
-            // use undocumented fu to make the Picker be "modal"
-            // this is the "mask" displayed behind the dialog box div
+            // use undocumented fu to make the Picker be 'modal'
+            // this is the 'mask' displayed behind the dialog box div
             $('div.picker-dialog-bg').css('zIndex', 4000);  // there are multiple divs of that sort
             // and this is the dialog box modal div, which we must display on top of our modal, if any
 
