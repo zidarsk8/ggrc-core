@@ -12,6 +12,7 @@ from collections import defaultdict
 from collections import OrderedDict
 from collections import Counter
 
+from cached_property import cached_property
 from sqlalchemy import exc
 from sqlalchemy import or_
 from sqlalchemy import and_
@@ -311,6 +312,23 @@ class BlockConverter(object):
     if self._owners_cache is None:
       self._owners_cache = self._create_owners_cache()
     return self._owners_cache
+
+  @cached_property
+  def mapped_snapshots(self):
+    """Cached property of mapped to audit snapshots"""
+    # pylint: disable=protected-access
+    snapshots = defaultdict(lambda: defaultdict(set))
+    query = db.session.query(
+        models.Revision.resource_slug,
+        models.Snapshot.parent_id,
+        models.Snapshot.child_type,
+    ).join(models.Snapshot).filter(
+        models.Snapshot.parent_type == self.object_class.__name__,
+        models.Snapshot.parent_id.in_(self.object_ids),
+    )
+    for slug, parent_id, child_type in query:
+      snapshots[parent_id][child_type].add(slug)
+    return snapshots
 
   def check_for_duplicate_columns(self, raw_headers):
     """Check for duplicate column names in the current block.
