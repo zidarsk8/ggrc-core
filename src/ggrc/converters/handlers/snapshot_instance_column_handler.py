@@ -2,7 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Handler for imports and exports snapshoted instances."""
 import sqlalchemy
-from sqlalchemy import orm
 from sqlalchemy.orm import load_only
 
 from cached_property import cached_property
@@ -88,15 +87,6 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
         self.mapping_object.id == snapshot.c.child_id
     )
 
-  @property
-  def audit_mapped_query(self):
-    """Property, return query of mapping to Audit objects"""
-    return db.session.query(models.Revision).join(models.Snapshot).filter(
-        models.Snapshot.parent_id == self.row_converter.obj.id,
-        models.Snapshot.parent_type == self.row_converter.obj.type,
-        models.Snapshot.child_type == self.mapping_object.__name__,
-    ).options(orm.undefer_group("Revision_complete").load_only("_content"))
-
   def insert_object(self):
     "insert object handler"
     if self.dry_run or not self.value:
@@ -132,10 +122,11 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
        self.mapping_object.__name__ in Types.all:
       # Audit should have the same mappings as Assessment. Mapped objects
       # will be loaded from snapshots.
-      objects = self.audit_mapped_query.all()
-      human_readable_ids = [
-          obj.content.get("slug", obj.content.get("email")) for obj in objects
+      mapped_snapshots = self.row_converter.block_converter.mapped_snapshots
+      snapshot_slugs = mapped_snapshots[self.row_converter.obj.id][
+          self.mapping_object.__name__
       ]
+      human_readable_ids = sorted(list(snapshot_slugs))
     else:
       objects = self.snapshoted_instances_query.all()
       human_readable_ids = [getattr(i, "slug", getattr(i, "email", None))
