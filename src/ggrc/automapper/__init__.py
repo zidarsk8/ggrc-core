@@ -145,9 +145,16 @@ class AutomapperGenerator(object):
       return
     with self.benchmark("Automapping flush"):
       current_user = get_current_user()
-      automapping = Automapping(parent_relationship)
-      db.session.add(automapping)
-      db.session.flush()
+      automapping_result = db.session.execute(
+          Automapping.__table__.insert().values(
+              relationship_id=parent_relationship.id,
+              source_id=parent_relationship.source_id,
+              source_type=parent_relationship.source_type,
+              destination_id=parent_relationship.destination_id,
+              destination_type=parent_relationship.destination_type,
+          )
+      )
+      automapping_id = automapping_result.inserted_primary_key
       now = datetime.now()
       # We are doing an INSERT IGNORE INTO here to mitigate a race condition
       # that happens when multiple simultaneous requests create the same
@@ -169,7 +176,7 @@ class AutomapperGenerator(object):
           "context_id": None,
           "status": None,
           "parent_id": parent_relationship.id,
-          "automapping_id": automapping.id}
+          "automapping_id": automapping_id}
           for src, dst in self.auto_mappings
           if (src, dst) != original]))  # (src, dst) is sorted
       cache = get_cache(create=True)
@@ -180,7 +187,7 @@ class AutomapperGenerator(object):
         cache.new.update(
             (relationship, relationship.log_json())
             for relationship in Relationship.query.filter_by(
-                automapping_id=automapping.id,
+                automapping_id=automapping_id,
             )
         )
 
