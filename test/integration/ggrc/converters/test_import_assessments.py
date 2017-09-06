@@ -6,6 +6,8 @@
 """Test request import and updates."""
 
 import csv
+import datetime
+import freezegun
 
 from collections import OrderedDict
 from cStringIO import StringIO
@@ -429,7 +431,55 @@ class TestAssessmentImport(TestCase):
     ).first()
     self.assertEqual([assignee_id], [i.id for i in assessment.assessors])
 
+  @ddt.data(
+      (
+          "Last Updated",
+          lambda: datetime.date.today() - datetime.timedelta(7),
+      ),
+      (
+          "Created Date",
+          lambda: datetime.date.today() - datetime.timedelta(7),
+      ),
+      # NOTE: skiped error on import every object setup as modified rather
+      # if object isn't changed
+      # (
+      #     "Last Updated By",
+      #     lambda: factories.PersonFactory(email="new_user@email.com").email,
+      # ),
+  )
+  @ddt.unpack
+  def test_update_non_changeable_field(self, field, value_creator):
+    "Test for creation assessment with unchangeable fields"
+    slug = "TestAssessment"
+    with factories.single_commit():
+      value = value_creator()
+      factories.AssessmentFactory(
+          slug=slug,
+          modified_by=factories.PersonFactory(email="modifier@email.com"),
+          updated_at=datetime.date.today(),
+          created_at=datetime.date.today(),
+      )
+    data = [{
+        "object_name": "Assessment",
+        "fields": "all",
+        "filters": {
+            "expression": {
+                "left": "code",
+                "op": {"name": "="},
+                "right": slug
+            },
+        }
+    }]
+    before_update = self.export_parsed_csv(data)["Assessment"][0][field]
+    with freezegun.freeze_time("2017-9-10"):
+      self.import_data(OrderedDict([("object_type", "Assessment"),
+                                    ("Code*", slug),
+                                    (field, value)]))
+    self.assertEqual(before_update,
+                     self.export_parsed_csv(data)["Assessment"][0][field])
 
+
+@ddt.ddt
 class TestAssessmentExport(TestCase):
   """Test Assessment object export."""
 
@@ -601,3 +651,32 @@ class TestAssessmentExport(TestCase):
 
     response = self.export_csv(data)
     self.assertIn(u"No template Assessment 2", response.data)
+
+  @ddt.data(
+      ("Last Updated By", "new_user@email.com"),
+      ("modified_by", "new_user1@email.com"),
+  )
+  @ddt.unpack
+  def test_export_by_modified_by(self, field, email):
+    "Test for creation assessment with mapped creator"
+    slug = "TestAssessment"
+    with factories.single_commit():
+      factories.AssessmentFactory(
+          slug=slug,
+          modified_by=factories.PersonFactory(email=email),
+      )
+    data = [{
+        "object_name": "Assessment",
+        "fields": "all",
+        "filters": {
+            "expression": {
+                "left": field,
+                "op": {"name": "="},
+                "right": email
+            },
+        }
+    }]
+
+    resp = self.export_parsed_csv(data)["Assessment"]
+    self.assertEqual(1, len(resp))
+    self.assertEqual(slug, resp[0]["Code*"])
