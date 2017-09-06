@@ -28,6 +28,7 @@ import '../custom-roles/custom-roles-modal';
           value: ''
         }
       },
+      roleConflicts: false,
       infoPaneMode: true,
       withDetails: false,
       instance: {}
