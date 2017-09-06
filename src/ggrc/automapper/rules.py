@@ -77,6 +77,23 @@ def make_rule_set(rule_list):
   return rule_set
 
 
+def rules_to_str(rules):
+  """Make rules printable in a pretty format for debugging.
+
+  Usage:
+    from ggrc.automapper import rules
+    print rules.rules_to_str(rules.rules)
+  """
+  lines = []
+  for key in rules:
+    src, dst = key
+    for mapping in rules[key]:
+      rule = ("%s <--> %s <--> %s" % (src, dst, mapping))
+      lines.append(rule)
+  lines.sort()
+  return "\n".join(lines)
+
+
 class Types(object):
   """Model names and collections to use in Rule initialization."""
   all = {'Program', 'Regulation', 'Policy', 'Standard', 'Contract',
