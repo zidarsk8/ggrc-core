@@ -173,7 +173,6 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
 
   def test_update_indexing(self):
     """Test that creating objects results in full index"""
-    custom_attribute_defs = self.create_custom_attribute_definitions()
 
     self._import_file("snapshotter_create.csv")
 
@@ -183,6 +182,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     objective = db.session.query(models.Objective).filter(
         models.Objective.title == "obj-1"
     ).one()
+    custom_attribute_defs = self.create_custom_attribute_definitions()
     custom_attribute_values = [
         {
             "custom_attribute": custom_attribute_defs["objective"],
