@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-can.Model.LocalStorage("GGRC.Models.RecentlyViewedObject", {
+export default can.Model.LocalStorage("GGRC.Models.RecentlyViewedObject", {
 
   newInstance : function(attrs) {
     if(attrs instanceof can.Model) {

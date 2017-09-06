@@ -3,8 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import '../models/recently_viewed_object';
 import './infinite-scroll-controller';
+import RecentlyViewedObject from '../models/recently_viewed_object';
 
 can.Control('CMS.Controllers.LHN', {
   defaults: {}
@@ -1028,10 +1028,10 @@ can.Control('GGRC.Controllers.RecentlyViewed', {
     var instance_list = [];
     var that = this;
 
-    GGRC.Models.RecentlyViewedObject.findAll().done(function (objs) {
+    RecentlyViewedObject.findAll().done(function (objs) {
       var max_history = that.options.max_history;
       if (page_model) {
-        instance_list.push(new GGRC.Models.RecentlyViewedObject(page_model));
+        instance_list.push(new RecentlyViewedObject(page_model));
         instance_list[0].save();
         max_history--;
       }

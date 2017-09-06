@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import RecentlyViewedObject from '../models/recently_viewed_object';
+
 can.Control('CMS.Controllers.InfiniteScroll', {
   defaults: {}
 }, {
@@ -95,7 +97,7 @@ can.Control('CMS.Controllers.LHN_Tooltips', {
     var delay = this.options.fade_in_delay;
 
     // There isn't tooltip data available for recently viewed objects
-    if (instance instanceof GGRC.Models.RecentlyViewedObject) {
+    if (instance instanceof RecentlyViewedObject) {
       return;
     }
 
