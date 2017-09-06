@@ -16,6 +16,8 @@ TYPE_ORDERING = [['Program'],
                  ['Regulation', 'Policy', 'Standard', 'Contract'],
                  ['Section', 'Clause'], ['Objective'], ['Control']]
 
+TYPE_ORDERING += [["Issue"], ["Assessment"], ["Snapshot"]]
+
 # pylint: disable=invalid-name
 logger = getLogger(__name__)
 
@@ -133,4 +135,10 @@ rules = make_rule_set(rule_list=[
         {'Control'},
     ),
 
+    Rule(
+        # mappings for 'raise an issue' on assessment page
+        {"Issue"},
+        {"Assessment"},
+        {"Snapshot"},
+    ),
 ])
