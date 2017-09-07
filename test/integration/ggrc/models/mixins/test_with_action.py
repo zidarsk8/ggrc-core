@@ -496,7 +496,9 @@ class TestCommentWithActionMixin(TestCase):
         }
     ]}})
     self.assert200(response)
-    rel_id = response.json["assessment"]["related_destinations"][0]["id"]
+    # last relationship id (newly created relationship)
+    rel_id = max(i["id"] for i in
+                 response.json["assessment"]["related_destinations"])
     relationship = all_models.Relationship.query.get(rel_id)
     self.assertIsNotNone(relationship)
     comment = all_models.Comment.query.get(relationship.destination_id)

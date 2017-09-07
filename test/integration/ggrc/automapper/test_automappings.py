@@ -67,10 +67,7 @@ class TestAutomappings(TestCase):
 
   def create_mapping(self, src, dst):
     """Helper function for creating mappings"""
-    return self.create_object(models.Relationship, {
-        'source': {'id': src.id, 'type': src.type},
-        'destination': {'id': dst.id, 'type': dst.type}
-    })
+    return self.gen.generate_relationship(src, dst)[1]
 
   def assert_mapping(self, obj1, obj2, missing=False):
     """Helper function for asserting mappings"""
@@ -293,7 +290,6 @@ class TestAutomappings(TestCase):
     """Test automapping permissions"""
     _, creator = self.gen.generate_person(user_role="Creator")
     _, admin = self.gen.generate_person(user_role="Administrator")
-
     program = self.create_object(models.Program, {
         'title': make_name('Program')
     })
