@@ -6,11 +6,10 @@
 import '../object-tasks/object-tasks';
 import '../mapped-counter/mapped-counter';
 
+import template from './templates/tree-item-extra-info.mustache';
+
 (function (can, GGRC) {
   'use strict';
-
-  var template = can.view(GGRC.mustache_path +
-    '/components/tree/tree-item-extra-info.mustache');
 
   var viewModel = can.Map.extend({
     define: {

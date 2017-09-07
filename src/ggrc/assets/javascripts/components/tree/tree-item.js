@@ -5,12 +5,11 @@
 
 import '../cycle-task-actions/cycle-task-actions';
 import './tree-item-custom-attribute';
+import template from './templates/tree-item.mustache';
 
 (function (can, GGRC) {
   'use strict';
 
-  var template = can.view(GGRC.mustache_path +
-    '/components/tree/tree-item.mustache');
   var BaseTreeItemVM = GGRC.VM.BaseTreeItemVM;
   var viewModel = BaseTreeItemVM.extend({
     define: {

@@ -1,9 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-dashboard-js-spec-files:
-  - models/gdrive_models_spec.js
-
 dashboard-js-template-files:
   - responses/gdrive_upload_evidence.mustache
   - responses/gdrive_evidence_tree.mustache

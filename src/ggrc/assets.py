@@ -132,12 +132,3 @@ environment.register("dashboard-js-templates", webassets.Bundle(
     output='dashboard-templates' + version_suffix + '.js',
     # Always keep `debug` False here, since raw mustache is not valid JS
     debug=False))
-
-if settings.ENABLE_JASMINE:
-  environment.register("dashboard-js-specs", webassets.Bundle(
-      *asset_paths['dashboard-js-spec-files'],
-      output='dashboard' + version_suffix + '-specs.js'))
-
-  environment.register("dashboard-js-spec-helpers", webassets.Bundle(
-      *asset_paths['dashboard-js-spec-helpers'],
-      output='dashboard' + version_suffix + '-spec-helpers.js'))

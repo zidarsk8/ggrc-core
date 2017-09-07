@@ -184,12 +184,7 @@ def _enable_jasmine():
     jasmine = Jasmine(app)
 
     jasmine.sources(
-        Asset("dashboard-js"),
-        Asset("dashboard-js-spec-helpers"),
         Asset("dashboard-js-templates"))
-
-    jasmine.specs(
-        Asset("dashboard-js-specs"))
 
 
 def _display_sql_queries():

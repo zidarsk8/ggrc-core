@@ -24,12 +24,11 @@ import './tree-people-list-field';
 import './tree-people-with-role-list-field';
 import '../advanced-search/advanced-search-filter-container';
 import '../advanced-search/advanced-search-mapping-container';
+import template from './templates/tree-widget-container.mustache';
 
 (function (can, GGRC) {
   'use strict';
 
-  var template = can.view(GGRC.mustache_path +
-    '/components/tree/tree-widget-container.mustache');
   var TreeViewUtils = GGRC.Utils.TreeView;
   var CurrentPageUtils = GGRC.Utils.CurrentPage;
 
