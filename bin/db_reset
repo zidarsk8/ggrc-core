@@ -6,24 +6,57 @@ set -o nounset
 set -o errexit
 
 
-DB_NAME="ggrcdev"
-API_SEARCH_DB_NAME="ggrcdevtest_apisearch"
+usage () {
+  cat <<EOF
+Usage: $(basename ${0}) [-h] [-d DATABASE_NAME] [SQL_DUMP_FILE]
+
+Reset entire database. If sql dump file is provided, it gets imported and 
+migrations applied on top of it.
+
+Arguments:
+  -h : print help
+  -d DATABASE : Reset and use the selected database
+     DUMPFILE : Mysql dump file that will be imported into the cleand database.
+
+Example usage:
+  $(basename $0) 
+  $(basename $0) ggrc-qa-dump.sql
+  $(basename $0) -d ggrcdevtest
+  $(basename $0) -d ggrcdevtest test-data-dump.sql
+EOF
+  exit 0
+}
+
+
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 ROOT_PATH="${SCRIPTPATH}/../"
-DUMP_FILE=${1:-}
-HOST=${GGRC_DATABASE_HOST-"127.0.0.1"}
 
-if [[ "$DUMP_FILE" == "-h" || "$DUMP_FILE" == "--help" ]] ; then
-  echo "Usage: $(basename $0) [sql_dump_file.sql]"
-  echo ""
-  echo "Reset entire database. If sql dump file is provided, it gets imported"
-  echo "and migrations applied on top of it."
-  exit 0
+DB_NAME="ggrcdev"
+while getopts "d:h" arg; do
+  case $arg in
+    d)
+      DB_NAME="${OPTARG:-}"
+      shift
+      shift
+      ;;
+    h)
+      usage
+      shift
+      ;;
+  esac
+done
+
+DUMP_FILE=${1:-}
+
+if [[ ! -f "$DUMP_FILE" ]] &&  [[ -n "$DUMP_FILE" ]]
+then
+  echo "Dump file not found: $DUMP_FILE"
+  exit 1
 fi
 
-find $ROOT_PATH -iname "*.pyc" -delete
-
-if [[ -f "$DUMP_FILE" ]] && grep "^USE " $DUMP_FILE; then
+echo "Resetting database: $DB_NAME"
+if [[ -f "$DUMP_FILE" ]] && grep "^USE " $DUMP_FILE
+then
   echo "Error: 'USE' statement found in the database dump."
   echo ""
   echo "Importing into $DB_NAME will fail if there is USE block in the"
@@ -31,16 +64,12 @@ if [[ -f "$DUMP_FILE" ]] && grep "^USE " $DUMP_FILE; then
   exit 1
 fi
 
-
-
-mysql -uroot -proot -h$HOST -e "drop database if exists $DB_NAME"
-mysql -uroot -proot -h$HOST -e "create database $DB_NAME character set utf8"
-mysql -uroot -proot -h$HOST -e "DROP DATABASE IF EXISTS $API_SEARCH_DB_NAME"
-mysql -uroot -proot -h$HOST -e "CREATE DATABASE $API_SEARCH_DB_NAME CHARACTER SET utf8"
+mysql -uroot -proot -hdb -e "drop database if exists $DB_NAME"
+mysql -uroot -proot -hdb -e "create database $DB_NAME character set utf8"
 
 if [[ -f "$DUMP_FILE" ]]; then
   echo "Importing: $DUMP_FILE"
-  mysql -uroot -proot -h$HOST $DB_NAME < $DUMP_FILE
+  mysql -uroot -proot -hdb $DB_NAME < $DUMP_FILE
 fi
 
 db_migrate
