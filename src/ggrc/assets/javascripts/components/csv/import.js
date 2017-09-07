@@ -3,6 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import '../../plugins/utils/controllers';
+import '../../plugins/utils/modals';
+import './csv-template';
+import '../show-more/show-more';
+
 (function (can, $, utils) {
   GGRC.Components('csvImportWidget', {
     tag: "csv-import",

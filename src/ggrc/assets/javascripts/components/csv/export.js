@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import './csv-template';
+
 var url = can.route.deparam(window.location.search.substr(1));
 var filterModel = can.Map({
   model_name: 'Program',
@@ -30,70 +32,6 @@ var exportModel = can.Map({
   only_relevant: false,
   filename: 'export_objects.csv',
   format: 'gdrive'
-});
-
-GGRC.Components('csvTemplate', {
-  tag: 'csv-template',
-  template: '<content></content>',
-  viewModel: {
-    url: '/_service/export_csv',
-    selected: [],
-    importable: GGRC.Bootstrap.importable
-  },
-  events: {
-    '#importSelect change': function (el, ev) {
-      var $items = el.find(':selected');
-      var selected = this.viewModel.attr('selected');
-
-      $items.each(function () {
-        var $item = $(this);
-        if (_.findWhere(selected, {value: $item.val()})) {
-          return;
-        }
-        return selected.push({
-          name: $item.attr('label'),
-          value: $item.val()
-        });
-      });
-    },
-    '.import-button click': function (el, ev) {
-      var objects;
-      ev.preventDefault();
-
-      objects = _.map(this.viewModel.attr('selected'), function (el) {
-        return {
-          object_name: el.value,
-          fields: 'all'
-        };
-      });
-      if (!objects.length) {
-        return;
-      }
-
-      GGRC.Utils.export_request({
-        data: {
-          objects: objects,
-          export_to: 'csv'
-        }
-      })
-      .done(function (data) {
-        GGRC.Utils.download('import_template.csv', data);
-      });
-    },
-    '.import-list a click': function (el, ev) {
-      var index = el.data('index');
-      var item = this.viewModel.attr('selected').splice(index, 1)[0];
-
-      ev.preventDefault();
-
-      this.element.find('#importSelect option:selected').each(function () {
-        var $item = $(this);
-        if ($item.val() === item.value) {
-          $item.prop('selected', false);
-        }
-      });
-    }
-  }
 });
 
 GGRC.Components('csvExport', {
