@@ -23,6 +23,8 @@ from ggrc import models
 
 from ggrc.access_control.role import AccessControlRole
 from ggrc.access_control.list import AccessControlList
+from ggrc.access_control.roleable import Roleable
+from ggrc.models.mixins import CustomAttributable
 
 from ggrc_risks import models as risk_models
 
@@ -52,6 +54,47 @@ def single_commit():
 
 class TitledFactory(ModelFactory):
   title = factory.LazyAttribute(lambda m: random_str(prefix='title '))
+
+
+class WithACLandCAFactory(ModelFactory):
+  """Factory class to create object with ACL and CA in one step"""
+  @classmethod
+  def _create(cls, target_class, *args, **kwargs):
+    """Create instance of model"""
+    acls = []
+    if "access_control_list_" in kwargs:
+      acls = kwargs.pop("access_control_list_")
+    cavs = []
+    if "custom_attribute_values_" in kwargs:
+      cavs = kwargs.pop("custom_attribute_values_")
+
+    instance = target_class(**kwargs)
+    db.session.add(instance)
+    db.session.flush()
+
+    if acls and isinstance(instance, Roleable):
+      for acl in acls:
+        db.session.add(models.AccessControlList(
+            object=instance,
+            ac_role_id=acl.get("ac_role_id"),
+            person_id=acl.get("person_id"),
+        ))
+    if cavs and isinstance(instance, CustomAttributable):
+      for cav in cavs:
+        db.session.add(models.CustomAttributeValue(
+            attributable=instance,
+            attribute_value=cav.get("attribute_value"),
+            attribute_object_id=cav.get("attribute_object_id"),
+            custom_attribute_id=cav.get("custom_attribute_id"),
+        ))
+
+    if isinstance(instance, models.CustomAttributeValue):
+      cls._log_event(instance.attributable)
+    if hasattr(instance, "log_json"):
+      cls._log_event(instance)
+    if getattr(db.session, "single_commit", True):
+      db.session.commit()
+    return instance
 
 
 class CustomAttributeDefinitionFactory(TitledFactory):

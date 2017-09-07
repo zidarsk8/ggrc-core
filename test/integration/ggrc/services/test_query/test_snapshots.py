@@ -412,23 +412,6 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
     self.generator = generator.ObjectGenerator()
     self.client.get("/login")
 
-  @classmethod
-  def _make_snapshot_query_dict(cls, child_type, expression=None, *args,
-                                **kwargs):
-    """Make a dict with query for Snapshots of child_type."""
-    child_type_filter = cls.make_filter_expression(("child_type", "=",
-                                                    child_type))
-    if expression:
-      snapshot_filter = cls.make_filter_expression(expression)
-      filters = {"expression": {"op": {"name": "AND"},
-                                "left": snapshot_filter,
-                                "right": child_type_filter}}
-    else:
-      filters = {"expression": child_type_filter}
-
-    return cls._make_query_dict_base("Snapshot", filters=filters, *args,
-                                     **kwargs)
-
   def _create_audit(self, program, title):
     """Make a POST to create an Audit.
 

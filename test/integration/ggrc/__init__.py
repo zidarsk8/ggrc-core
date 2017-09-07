@@ -347,12 +347,13 @@ class TestCase(BaseTestCase, object):
     )
     return revisions
 
-  def _create_snapshots(self, audit, objects):
+  @classmethod
+  def _create_snapshots(cls, audit, objects):
     """Create snapshots of latest object revisions for given objects."""
     # This commit is needed if we're using factories with single_commit, so
     # that the latest revisions will be fetched properly.
     db.session.commit()
-    revisions = self._get_latest_object_revisions(objects)
+    revisions = cls._get_latest_object_revisions(objects)
     snapshots = [
         factories.SnapshotFactory(
             child_id=revision.resource_id,
