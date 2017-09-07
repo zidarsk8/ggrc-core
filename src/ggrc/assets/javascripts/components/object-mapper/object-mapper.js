@@ -13,7 +13,27 @@
     Regulation: 'Section',
     Product: 'System',
     Standard: 'Section',
-    Contract: 'Clause'
+    Contract: 'Clause',
+    Control: 'Objective',
+    System: 'Product',
+    Process: 'Risk',
+    AccessGroup: 'System',
+    Clause: 'Contract',
+    DataAsset: 'Policy',
+    Facility: 'Program',
+    Issue: 'Control',
+    Market: 'Program',
+    OrgGroup: 'Program',
+    Policy: 'DataAsset',
+    Program: 'Standard',
+    Project: 'Program',
+    Risk: 'Control',
+    TaskGroupTask: 'Control',
+    Threat: 'Risk',
+    Vendor: 'Program',
+    Audit: 'Product',
+    RiskAssessment: 'Program',
+    TaskGroup: 'Control'
   };
 
   var getDefaultType = function (type, object) {
