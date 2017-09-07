@@ -10,12 +10,17 @@
 
       {{^if new_object_form}}
         {{#if_in instance.status "Not Started,Completed,Verified"}}
+          {{#if_helpers '\
+            #if' instance.isDirty '\
+            or #if' mappedObjectsChanges.length '\
+            or #if' referenceUrlChanged}}
           <div class="ggrc-form-item">
-            <div class="alert warning">
+            <div class="alert warning width-100">
               <i class="fa fa-exclamation-triangle red"></i>
               You are about to move assessment from "{{instance.status}}" to "In Progress".
             </div>
           </div>
+          {{/if_helpers}}
         {{/if_in}}
       {{/if}}
 
@@ -117,7 +122,8 @@
                   mapping="related_objects_as_source"
                   from-binding="true"
                   {type}="instance.assessment_type"
-                  deferred="true">
+                  deferred="true"
+                  {^changes}="mappedObjectsChanges">
             <label class="ggrc-form-item__label">
               Mapped Objects
             </label>
@@ -198,7 +204,11 @@
 
       <div class="ggrc-form-item">
         <div class="ggrc-form-item__multiple-row">
-          <related-documents instance={instance} document-type="REFERENCE_URL" autorefresh="false">
+          <related-documents
+            instance={instance}
+            document-type="REFERENCE_URL"
+            autorefresh="false"
+            {^pending-items-changed}="referenceUrlChanged">
             <related-reference-urls class="related-reference-urls"
               {(urls)}="documents"
               {is-disabled}="isLoading"
