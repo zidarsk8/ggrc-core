@@ -54,7 +54,7 @@ import '../../modules/widget_list';
 import '../../pbc/workflow_controller';
 import '../../apps/quick_search';
 import '../../apps/business_objects';
-import '../../apps/custom_attributes';
+import '../../apps/custom_attributes_wrap';
 
 // Components
 import '../../components/state-colors-map/state-colors-map';
