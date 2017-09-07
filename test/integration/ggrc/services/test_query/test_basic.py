@@ -363,9 +363,9 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     the same order they must not raise an exception.
     """
     for line in data_list:
-      for item in line.iteritems():
-        if isinstance(item, list):
-          item.sort(key=lambda x: x["id"])
+      for value in line.viewvalues():
+        if isinstance(value, list):
+          value.sort(key=lambda x: x["id"])
     return data_list
 
   def test_order_by_several_fields(self):
