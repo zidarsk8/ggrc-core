@@ -201,9 +201,7 @@
         }.bind(this))
         .fail(function (data) {
           this.scope.attr("state", "select");
-          $("body").trigger("ajax:flash", {
-            "error": $(data.responseText.split("\n")[3]).text()
-          });
+          GGRC.Errors.notifier('error', data.responseJSON.message);
         }.bind(this))
         .always(function () {
           this.scope.attr("isLoading", false);
@@ -240,10 +238,8 @@
             );
           }.bind(this))
           .fail(function (data) {
-            this.attr("state", "select");
-            $("body").trigger("ajax:flash", {
-              "error": $(data.responseText.split("\n")[3]).text()
-            });
+            this.scope.attr("state", "select");
+            GGRC.Errors.notifier('error', data.responseJSON.message);
           }.bind(this))
           .always(function () {
             this.scope.attr("isLoading", false);
