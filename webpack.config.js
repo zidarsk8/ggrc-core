@@ -25,7 +25,8 @@ module.exports = function (env, argv) {
     entry: {
       vendor: 'entrypoints/vendor',
       dashboard: ['entrypoints/dashboard'].concat(getExtraModules())
-        .concat(['entrypoints/dashboard/bootstrap'])
+        .concat(['entrypoints/dashboard/bootstrap']),
+      login: 'entrypoints/login',
     },
     output: {
       filename: isProduction(env) ? '[name].[chunkhash].js' : '[name].js?[chunkhash]',
