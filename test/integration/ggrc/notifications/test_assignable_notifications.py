@@ -218,7 +218,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     self.import_data(OrderedDict([
         (u"object_type", u"Assessment"),
         (u"Code*", asmt.slug),
-        (u"Url", u"www.foo-url.bar"),
+        (u"Evidence Url", u"www.foo-url.bar"),
     ]))
 
     query = self._get_notifications(notif_type="assessment_updated")
@@ -251,7 +251,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
     self.import_data(OrderedDict([
         (u"object_type", u"Assessment"),
         (u"Code*", asmt.slug),
-        (u"Evidence", u"https://gdrive.com/qwerty1/view evidence.txt"),
+        (u"Evidence File", u"https://gdrive.com/qwerty1/view evidence.txt"),
     ]))
 
     query = self._get_notifications(notif_type="assessment_updated")
@@ -642,7 +642,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
       self.import_data(OrderedDict([
           (u"object_type", u"Assessment"),
           (u"Code*", asmt_slug),
-          (u"Url", u"www.foo-url-{}.bar".format(i)),
+          (u"Evidence Url", u"www.foo-url-{}.bar".format(i)),
       ]))
 
       query = self._get_notifications(notif_type="assessment_reopened")
@@ -677,7 +677,7 @@ class TestAssignableNotificationUsingImports(TestAssignableNotification):
           (u"object_type", u"Assessment"),
           (u"Code*", asmt_slug),
           (
-              u"Evidence",
+              u"Evidence File",
               u"https://gdrive.com/qwerty{0}/view evidence-{0}.txt".format(i)
           ),
       ]))

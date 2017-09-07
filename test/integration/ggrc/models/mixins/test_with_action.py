@@ -108,7 +108,7 @@ class TestDocumentWithActionMixin(TestCase, WithQueryApi):
     ]}})
     self.assert400(response)
 
-    wrong_params["document_type"] = "URL"
+    wrong_params["document_type"] = "Evidence URL"
     response = self.api.put(assessment, {"actions": {"add_related": [
         wrong_params
     ]}})
@@ -435,7 +435,7 @@ class TestDocumentWithActionMixin(TestCase, WithQueryApi):
 
     assessments_by_url = self.simple_query(
         "Assessment",
-        expression=["url", "~", "google.com"]
+        expression=["evidence url", "~", "google.com"]
     )
     self.assertEqual(len(assessments_by_url), 1)
 
@@ -453,7 +453,7 @@ class TestDocumentWithActionMixin(TestCase, WithQueryApi):
 
     assessments_by_url = self.simple_query(
         "Assessment",
-        expression=["url", "~", "google.com"]
+        expression=["evidence url", "~", "google.com"]
     )
     self.assertFalse(assessments_by_url)
 
@@ -732,17 +732,17 @@ class TestMultiplyActions(TestCase, WithQueryApi):
 
     assessment_by_url = self.simple_query(
         "Assessment",
-        expression=["url", "~", "google1.com"]
+        expression=["evidence url", "~", "google1.com"]
     )
     self.assertEqual(len(assessment_by_url), 1)
     assessment_by_url = self.simple_query(
         "Assessment",
-        expression=["url", "~", "google2.com"]
+        expression=["evidence url", "~", "google2.com"]
     )
     self.assertFalse(assessment_by_url)
     assessment_by_evidence = self.simple_query(
         "Assessment",
-        expression=["evidence", "~", "google3.com"]
+        expression=["evidence file", "~", "google3.com"]
     )
     self.assertEqual(len(assessment_by_evidence), 1)
     assessment_by_comment = self.simple_query(

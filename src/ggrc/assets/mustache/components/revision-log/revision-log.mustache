@@ -23,15 +23,17 @@
                 <p class="instruction">New value</p>
               </div>
             {{#changes}}
+              <div class="clearfix">
                 <div class="third-col">
                   {{fieldName}}
                 </div>
                 <div class="third-col">
-                  {{{origVal}}}
+                  <revision-log-data {data}="origVal"></revision-log-data>
                 </div>
                 <div class="third-col">
-                  {{{newVal}}}
+                  <revision-log-data {data}="newVal"></revision-log-data>
                 </div>
+              </div>
             {{/changes}}
           </div>
         </li>

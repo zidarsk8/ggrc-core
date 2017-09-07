@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './revision-log-data';
+
 (function (GGRC, can) {
   'use strict';
 
@@ -290,6 +292,16 @@
         can.each(rev2.content, function (value, fieldName) {
           var origVal = rev1.content[fieldName];
           var displayName;
+          var unifyValue = function (value) {
+            value = value || '—';
+            value = value.length ? value : '—';
+            if (_.isObject(value)) {
+              value = value.map(function (item) {
+                return item.display_name;
+              });
+            }
+            return value;
+          };
           if (attrDefs) {
             displayName = (_.find(attrDefs, function (attr) {
               return attr.attr_name === fieldName;
@@ -317,11 +329,15 @@
               }
             }
             if (origVal || value) {
-              diff.changes.push({
-                fieldName: displayName,
-                origVal: origVal || '—',
-                newVal: value || '—'
-              });
+              origVal = unifyValue(origVal);
+              value = unifyValue(value);
+              if (origVal !== value) {
+                diff.changes.push({
+                  fieldName: displayName,
+                  origVal: origVal,
+                  newVal: value
+                });
+              }
             }
           }
         }.bind(this));
