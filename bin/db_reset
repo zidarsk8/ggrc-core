@@ -30,6 +30,7 @@ EOF
 
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 ROOT_PATH="${SCRIPTPATH}/../"
+HOST=${GGRC_DATABASE_HOST-"127.0.0.1"}
 
 DB_NAME="ggrcdev"
 while getopts "d:h" arg; do
@@ -64,12 +65,12 @@ then
   exit 1
 fi
 
-mysql -uroot -proot -hdb -e "drop database if exists $DB_NAME"
-mysql -uroot -proot -hdb -e "create database $DB_NAME character set utf8"
+mysql -uroot -proot -h$HOST -e "drop database if exists $DB_NAME"
+mysql -uroot -proot -h$HOST -e "create database $DB_NAME character set utf8"
 
 if [[ -f "$DUMP_FILE" ]]; then
   echo "Importing: $DUMP_FILE"
-  mysql -uroot -proot -hdb $DB_NAME < $DUMP_FILE
+  mysql -uroot -proot -h$HOST $DB_NAME < $DUMP_FILE
 fi
 
 db_migrate
