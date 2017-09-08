@@ -56,7 +56,8 @@ class TestStates(unittest.TestCase):
     """Test states for Assignable objects (Assessment)"""
     assignable_states = (
         'In Progress', 'Completed', 'Not Started', 'Verified', 'In Review',
-        'Deprecated')
+        'Deprecated', 'Rework Needed',
+    )
     self._assert_states('Assessment', assignable_states, 'Not Started')
 
   def test_issue_states(self):
