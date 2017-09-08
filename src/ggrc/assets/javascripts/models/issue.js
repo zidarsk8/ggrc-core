@@ -25,7 +25,8 @@
     },
     tree_view_options: {
       attr_list: can.Model.Cacheable.attr_list.concat([
-        {attr_title: 'Reference URL', attr_name: 'reference_url'}
+        {attr_title: 'Reference URL', attr_name: 'reference_url'},
+        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
       ]),
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache'
     },
