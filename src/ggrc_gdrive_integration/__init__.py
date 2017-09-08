@@ -12,7 +12,6 @@ from ggrc import db             # noqa
 from ggrc import settings       # noqa
 from ggrc.app import app        # noqa
 from ggrc.models import Document
-from ggrc.models import Meeting
 from ggrc.services.registry import service
 from ggrc_basic_permissions.contributed_roles import RoleContributions
 import ggrc_gdrive_integration.models as models
@@ -34,8 +33,6 @@ blueprint = Blueprint(
 
 Document.__bases__ = (Fileable, ) + Document.__bases__
 Document.late_init_fileable()
-Meeting.__bases__ = (Eventable, ) + Meeting.__bases__
-Meeting.late_init_eventable()
 
 
 # Initialize views
