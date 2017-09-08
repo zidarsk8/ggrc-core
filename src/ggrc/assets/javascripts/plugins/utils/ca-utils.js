@@ -262,18 +262,17 @@
     }
 
     function applyChangesToCustomAttributeValue(values, changes) {
-      var caValues = can.makeArray(values);
       can.Map.keys(changes).forEach(function (fieldId) {
-        var caValue =
-          caValues
-            .find(function (item) {
-              return item.def.id === Number(fieldId);
-            });
-        if (!caValue) {
-          console.error('Corrupted Date: ', caValues);
-          return;
-        }
-        updateCustomAttributeValue(caValue, changes[fieldId]);
+        values.each(function (item, key) {
+          if (item.def.id === Number(fieldId)) {
+            if (!item) {
+              console.error('Corrupted Date: ', values);
+              return;
+            }
+            updateCustomAttributeValue(item, changes[fieldId]);
+            values.splice(key, 1, values[key]);
+          }
+        });
       });
     }
     return {

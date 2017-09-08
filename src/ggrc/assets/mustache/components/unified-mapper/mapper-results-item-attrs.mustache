@@ -1,13 +1,13 @@
 <div class="flex-box flex-box-single">
   {{#each selectedColumns}}
+    {{#add_to_current_scope thisColumn=this}}
     <div class="attr">
       {{#switch attr_type}}
         {{#case 'custom'}}
-          {{#get_custom_attr_value this instance}}
-            {{#using person=object}}
-              {{>'/static/mustache/people/popover.mustache'}}
-            {{/using}}
-          {{/get_custom_attr_value}}
+          <tree-item-custom-attribute {instance}="instance"
+                                      {values}="instance.custom_attribute_values"
+                                      {column}="thisColumn"
+          ></tree-item-custom-attribute>
         {{/case}}
 
         {{#case 'role'}}
@@ -37,5 +37,6 @@
         {{/case}}
       {{/switch}}
     </div>
+    {{/add_to_current_scope}}
   {{/each}}
 </div>
