@@ -12,7 +12,7 @@ from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
 from ggrc.automapper import rules
-from ggrc.login import get_current_user
+from ggrc import login
 from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship
 from ggrc.rbac.permissions import is_allowed_update
@@ -144,7 +144,7 @@ class AutomapperGenerator(object):
     if not self.auto_mappings:
       return
     with self.benchmark("Automapping flush"):
-      current_user = get_current_user()
+      current_user_id = login.get_current_user_id()
       automapping_result = db.session.execute(
           Automapping.__table__.insert().values(
               relationship_id=parent_relationship.id,
@@ -166,7 +166,7 @@ class AutomapperGenerator(object):
                             Stub.from_destination(parent_relationship))
       db.session.execute(inserter.values([{
           "id": None,
-          "modified_by_id": current_user.id,
+          "modified_by_id": current_user_id,
           "created_at": now,
           "updated_at": now,
           "source_id": src.id,
