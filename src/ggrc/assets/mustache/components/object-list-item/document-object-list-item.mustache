@@ -5,7 +5,11 @@
 <div class="document-object-item {{#if iconCls}}document-object-item__with-icon{{/if}}">
     {{#if iconCls}}<i class="fa {{iconCls}}"></i>{{/if}}
     <div class="document-object-item__body">
-        <a class="link" href="{{itemData.link}}" target="_blank">{{itemTitle}}</a>
+        <a class="link" 
+           href="{{itemData.link}}" 
+           target="_blank"
+           rel="tooltip"
+           data-original-title="{{itemTitle}}">{{itemTitle}}</a>
         <span class="date">{{localize_date itemCreationDate}}</span>
     </div>
 </div>
