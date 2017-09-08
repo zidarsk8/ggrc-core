@@ -37,17 +37,21 @@
         attr_name: 'title',
         order: 1,
       }, {
-        attr_title: 'Code',
-        attr_name: 'slug',
-        order: 4,
-      }, {
         attr_title: 'State',
         attr_name: 'status',
         order: 2,
       }, {
+        attr_title: 'Label',
+        attr_name: 'label',
+        order: 3,
+      }, {
         attr_title: 'Verified',
         attr_name: 'verified',
-        order: 3,
+        order: 4,
+      }, {
+        attr_title: 'Code',
+        attr_name: 'slug',
+        order: 5,
       }, {
         attr_title: 'Last Updated',
         attr_name: 'updated_at',
@@ -101,8 +105,8 @@
         attr_name: 'archived',
         order: 17,
       }],
-      display_attr_names: ['title', 'status', 'assignees', 'verifiers',
-      'start_date', 'updated_at'],
+      display_attr_names: ['title', 'status', 'label', 'assignees', 'verifiers',
+        'start_date', 'updated_at'],
     },
     sub_tree_view_options: {
       default_filter: ['Control'],
