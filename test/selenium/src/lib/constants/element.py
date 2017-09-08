@@ -484,3 +484,8 @@ class RelatedIssuesTab(object):
 class UnifiedMapperModal(object):
   """Class that represent ui of Unified Mapper."""
   ATTRIBUTE_TITLE = Common.TITLE
+
+
+class GenericWidget(object):
+  """Elements' labels and properties for Generic Widget."""
+  NO_FILTER_RESULTS = "No results, please check your filter criteria"

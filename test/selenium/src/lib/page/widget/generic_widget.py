@@ -8,7 +8,7 @@ from selenium.common import exceptions
 from selenium.webdriver.common.by import By
 
 from lib import base, factory
-from lib.constants import locator, regex
+from lib.constants import locator, regex, element, counters, messages
 from lib.page.modal import unified_mapper
 from lib.utils import selenium_utils
 
@@ -66,21 +66,37 @@ class Widget(base.Widget):
     else:
       self.members_listed = []
 
-  def wait_for_counter_loaded(self):
-    """Wait for elements' counter on Filter panel to be visible."""
-    return selenium_utils.get_when_visible(
-        self._driver, locator.BaseWidgetGeneric.FILTER_PANE_COUNTER)
+  def wait_and_get_pagination_controllers(self):
+    """Wait for pagination controllers on filter panel and footer to be
+    visible. First element have to belong filter panel, second - to footer.
+    """
+    # pylint: disable=invalid-name
+    exp_pagination_count = counters.PAGINATION_CTRLS_COUNT
+    pagination_elements = selenium_utils.get_when_all_visible(
+        self._driver, locator.BaseWidgetGeneric.PAGINATION_CONTROLLERS)
+    if pagination_elements:
+      if len(pagination_elements) == exp_pagination_count:
+        return pagination_elements
+      else:
+        raise ValueError(messages.ExceptionsMessages.
+                         err_pagination_count.format(exp_pagination_count))
+    else:
+      raise exceptions.NoSuchElementException(
+          messages.ExceptionsMessages.err_pagination_elements.format(",".join(
+              ["".join(pag_el.text.splitlines())
+               for pag_el in pagination_elements])))
 
   def verify_counter_not_loaded(self):
     """Check that in case of empty table, counter not loaded on filter panel.
     """
     selenium_utils.wait_for_element_text(
-        self._driver, locator.TreeView.NO_RESULTS_MESSAGE, "No results")
+        self._driver, locator.TreeView.NO_RESULTS_MESSAGE,
+        element.GenericWidget.NO_FILTER_RESULTS)
 
   def get_items_count(self):
-    """Get elements' count from counter on filter panel."""
+    """Get elements' count from pagination controller on filter panel."""
     selenium_utils.wait_for_js_to_load(self._driver)
-    return self.wait_for_counter_loaded().text.split()[2]
+    return self.wait_and_get_pagination_controllers()[0].text.split()[2]
 
   def wait_member_deleted(self, count):
     """Wait until elements' counter on filter panel refreshed with new value.
@@ -90,7 +106,7 @@ class Widget(base.Widget):
     if count != '1':
       new_count = ' {}'.format(int(count) - 1)
       selenium_utils.wait_for_element_text(
-          self._driver, locator.BaseWidgetGeneric.FILTER_PANE_COUNTER,
+          self._driver, locator.BaseWidgetGeneric.PAGINATION_CONTROLLERS,
           new_count)
     else:
       self.verify_counter_not_loaded()
