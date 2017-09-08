@@ -16,7 +16,6 @@ from ggrc.services.registry import service
 from ggrc_basic_permissions.contributed_roles import RoleContributions
 import ggrc_gdrive_integration.models as models
 from ggrc_gdrive_integration.models.object_file import Fileable
-import ggrc_gdrive_integration.views
 
 from oauth2client import client
 
@@ -32,11 +31,6 @@ blueprint = Blueprint(
 
 Document.__bases__ = (Fileable, ) + Document.__bases__
 Document.late_init_fileable()
-
-
-# Initialize views
-def init_extra_views(application):
-  ggrc_gdrive_integration.views.init_extra_views(application)
 
 
 contributed_services = [
