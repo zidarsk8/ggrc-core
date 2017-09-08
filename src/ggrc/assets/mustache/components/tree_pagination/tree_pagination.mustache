@@ -1,18 +1,21 @@
 <div class="tree-pagination flex-box">
   <div class="tree-pagination__count">
-    <div class="dropdown">
-      <div class="dropdown-toggle tree-view-pagination__count__title"
-          data-toggle="dropdown">{{getPaginationInfo}}</div>
-      <div class="dropdown-menu">
-        <span>Items per page:</span>
-        <div class="btn-group">
-          {{#paging.pageSizeSelect}}
-            <button can-click="changePageSize" class="btn tree-view-pagination__count__button{{#if_equals paging.pageSize .}} active{{/if_equals}}"
-                      data-size="{{.}}">{{.}}</button>
-          {{/paging.pageSizeSelect}}
-        </div>
-      </div>
+    <div class="tree-view-pagination__count__title">
+      {{getPaginationInfo}}
     </div>
+  </div>
+  <div class="pagination dropdown-container">
+    {{#paging}}
+      <dropdown class="pagination-dropdown"
+                tabindex="18"
+                simple-list="true"
+                options-list="pageSizeSelect" 
+                name="pageSize">
+      </dropdown>
+    {{/paging}}
+  </div>
+  <div class="tree-pagination__count per-page">
+    <div class="tree-view-pagination__count__title">per page</div>
   </div>
   <div class="pagination">
     <div class="pagination-item {{#if_equals paging.current 1}} disabled{{/if_equals}}">

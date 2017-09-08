@@ -15,7 +15,8 @@
                          {disabled}="advancedSearch.filter"
       ></tree-filter-input>
       {{#if statusFilterVisible}}
-        <tree-status-filter {model-name}="modelName"
+        <tree-status-filter class="flex-size-1"
+                            {model-name}="modelName"
                             {register-filter}="@registerFilter"
                             (filter)="onFilter"
                             {disabled}="advancedSearch.filter"
