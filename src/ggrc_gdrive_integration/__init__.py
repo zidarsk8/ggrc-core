@@ -16,7 +16,6 @@ from ggrc.services.registry import service
 from ggrc_basic_permissions.contributed_roles import RoleContributions
 import ggrc_gdrive_integration.models as models
 from ggrc_gdrive_integration.models.object_file import Fileable
-from ggrc_gdrive_integration.models.object_event import Eventable
 import ggrc_gdrive_integration.views
 
 from oauth2client import client
@@ -42,31 +41,30 @@ def init_extra_views(application):
 
 contributed_services = [
     service('object_files', models.ObjectFile),
-    service('object_events', models.ObjectEvent)
 ]
 
 
 class GDriveRoleContributions(RoleContributions):
   contributions = {
       'Auditor': {
-          'read': ['ObjectFile', 'ObjectEvent'],
+          'read': ['ObjectFile'],
       },
       'ProgramAuditEditor': {
-          'read': ['ObjectFile', 'ObjectEvent'],
-          'create': ['ObjectFile', 'ObjectEvent'],
-          'update': ['ObjectFile', 'ObjectEvent'],
-          'delete': ['ObjectFile', 'ObjectEvent'],
+          'read': ['ObjectFile'],
+          'create': ['ObjectFile'],
+          'update': ['ObjectFile'],
+          'delete': ['ObjectFile'],
       },
       'ProgramAuditOwner': {
-          'read': ['ObjectFile', 'ObjectEvent'],
-          'create': ['ObjectFile', 'ObjectEvent'],
-          'update': ['ObjectFile', 'ObjectEvent'],
-          'delete': ['ObjectFile', 'ObjectEvent'],
+          'read': ['ObjectFile'],
+          'create': ['ObjectFile'],
+          'update': ['ObjectFile'],
+          'delete': ['ObjectFile'],
       },
       'ProgramAuditReader': {
-          'read': ['ObjectFile', 'ObjectEvent'],
-          'create': ['ObjectFile', 'ObjectEvent'],
-          'delete': ['ObjectFile', 'ObjectEvent'],
+          'read': ['ObjectFile'],
+          'create': ['ObjectFile'],
+          'delete': ['ObjectFile'],
       },
       'ProgramOwner': {
           'read': [],
@@ -75,10 +73,10 @@ class GDriveRoleContributions(RoleContributions):
           'delete': [],
       },
       'Editor': {
-          'read': ['ObjectFile', 'ObjectEvent'],
-          'create': ['ObjectFile', 'ObjectEvent'],
-          'update': ['ObjectFile', 'ObjectEvent'],
-          'delete': ['ObjectFile', 'ObjectEvent'],
+          'read': ['ObjectFile'],
+          'create': ['ObjectFile'],
+          'update': ['ObjectFile'],
+          'delete': ['ObjectFile'],
       },
 
   }
