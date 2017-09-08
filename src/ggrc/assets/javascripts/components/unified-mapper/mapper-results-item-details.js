@@ -3,15 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import template from './templates/mapper-results-item-details.mustache';
+
 (function (can, GGRC, CMS) {
   'use strict';
 
   GGRC.Components('mapperResultsItemDetails', {
     tag: 'mapper-results-item-details',
-    template: can.view(
-      GGRC.mustache_path +
-      '/components/unified-mapper/mapper-results-item-details.mustache'
-    ),
+    template: template,
     viewModel: {
       init: function () {
         var instance = this.attr('instance');

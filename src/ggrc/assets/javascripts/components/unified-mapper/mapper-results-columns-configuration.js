@@ -2,15 +2,15 @@
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import tmpl from './templates/mapper-results-columns-configuration.mustache';
+
 (function (can, GGRC, CMS) {
   'use strict';
 
   GGRC.Components('mapperResultsColumnsConfiguration', {
     tag: 'mapper-results-columns-configuration',
-    template: can.view(
-      GGRC.mustache_path +
-      '/components/unified-mapper/mapper-results-columns-configuration.mustache'
-    ),
+    template: tmpl,
     viewModel: {
       define: {
         selectedColumns: {
