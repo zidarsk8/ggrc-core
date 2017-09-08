@@ -12,6 +12,7 @@ const WebpackShellPlugin = require('webpack-shell-plugin');
 const _ = require('lodash');
 const path = require('path');
 const ENV = process.env;
+var BundleAnalyzerPlugin;
 
 const STATIC_FOLDER = '/static/';
 
@@ -147,6 +148,15 @@ module.exports = function (env, argv) {
     }));
   }
 
+  if (isDubug(env)) {
+    BundleAnalyzerPlugin =
+      require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+    config.plugins.push(new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      generateStatsFile: true,
+    }));
+  }
+
   return config;
 };
 
@@ -156,6 +166,10 @@ function isProduction(env) {
 
 function isDevelopment(env) {
   return env.development;
+}
+
+function isDubug(env) {
+  return env.debug;
 }
 
 function getExtraModules() {
