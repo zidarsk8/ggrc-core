@@ -30,6 +30,7 @@ try:
   STYLES_CSS_PATH = manifest_data['styles.css']
   VENDOR_CSS_PATH = manifest_data['vendor.css']
   VENDOR_JS_PATH = manifest_data['vendor.js']
+  COMMON_JS_PATH = manifest_data['common.js']
   DASHBOARD_JS_PATH = manifest_data['dashboard.js']
   IMPORT_JS_PATH = manifest_data['import.js']
   EXPORT_JS_PATH = manifest_data['export.js']

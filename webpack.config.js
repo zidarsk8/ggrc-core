@@ -13,7 +13,6 @@ const _ = require('lodash');
 const path = require('path');
 const ENV = process.env;
 const isProd = ENV.NODE_ENV === 'production';
-var BundleAnalyzerPlugin;
 
 const STATIC_FOLDER = '/static/';
 const enabledModules = _.compact(_.map(ENV.GGRC_SETTINGS_MODULE.split(' '), function (module) {
@@ -163,6 +162,10 @@ module.exports = function (env) {
         IS_GDRIVE_ENABLED: JSON.stringify(isModuleEnabled('ggrc_gdrive_integration')),
       }),
       new webpack.optimize.CommonsChunkPlugin({
+        name: 'common',
+        chunks: ['dashboard', 'import', 'export', 'admin'],
+      }),
+      new webpack.optimize.CommonsChunkPlugin({
         name: 'vendor',
       }),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
@@ -179,26 +182,31 @@ module.exports = function (env) {
   };
 
   if (isProd) {
-    config.plugins.push(new UglifyJSPlugin({
-      sourceMap: true,
-      output: {
-        comments: false,
-        beautify: false,
-      },
-    }));
-
-    config.plugins.push(new CleanWebpackPlugin(['./src/ggrc/static/'], {
-      exclude: ['dashboard-templates*'],
-    }));
+    config.plugins = [
+      ...config.plugins,
+      new UglifyJSPlugin({
+        sourceMap: true,
+        output: {
+          comments: false,
+          beautify: false,
+        },
+      }),
+      new CleanWebpackPlugin(['./src/ggrc/static/'], {
+        exclude: ['dashboard-templates*'],
+      }),
+    ];
   }
 
   if (env && env.debug) {
-    BundleAnalyzerPlugin =
-      require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-    config.plugins.push(new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      generateStatsFile: true,
-    }));
+    let BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
+    config.plugins = [
+      ...config.plugins,
+      new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        generateStatsFile: true,
+      }),
+    ];
   }
 
   return config;
