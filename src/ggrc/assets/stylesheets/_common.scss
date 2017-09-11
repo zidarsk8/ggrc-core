@@ -66,6 +66,7 @@ a {
 .tooltip {
   // The bootstrap default is incorrect with modals as of bootstrap 2.0.x
   z-index: zIndex(tooltip) !important;
+  word-wrap: break-word;
 }
 
 // status
