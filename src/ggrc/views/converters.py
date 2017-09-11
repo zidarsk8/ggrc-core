@@ -13,12 +13,15 @@ import httplib2
 
 from apiclient import discovery
 from apiclient import http
+from apiclient.errors import HttpError
 
 from flask import current_app
 from flask import request
 from flask import json
 from flask import render_template
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import (
+    BadRequest, NotFound, InternalServerError, Unauthorized
+)
 
 from ggrc import settings
 from ggrc_gdrive_integration import get_credentials
@@ -129,16 +132,48 @@ def parse_import_request():
       "X-test-only": ["true", "false"],
   }
   check_required_headers(required_headers)
-  csv_file = check_import_file()
-  csv_data = read_csv_file(csv_file)
-  dry_run = request.headers["X-test-only"] == "true"
-  return dry_run, csv_data
+  try:
+    file_data = request.json
+    dry_run = request.headers["X-test-only"] == "true"
+    return dry_run, file_data
+  except:
+    raise BadRequest("Export failed due incorrect request data.")
+
+
+def get_gdrive_file(file_data):
+  credentials = get_credentials()
+  try:
+    http_auth = credentials.authorize(httplib2.Http())
+    drive_service = discovery.build('drive', 'v3', http=http_auth)
+    # check file type
+    file_meta = drive_service.files().get(fileId=file_data['id']).execute()
+    if file_meta.get("mimeType") == "text/csv":
+      file_data = drive_service.files().get_media(
+          fileId=file_data['id']).execute()
+    else:
+      file_data = drive_service.files().export_media(
+          fileId=file_data['id'], mimeType='text/csv').execute()
+    csv_data = read_csv_file(file_data.splitlines())
+  except AttributeError:
+    # when file_data has no splitlines() method
+    raise BadRequest("Wrong file type.")
+  except HttpError as e:
+    message = json.loads(e.content).get("error").get("message")
+    if e.resp.code == 404:
+      raise NotFound(message)
+    if e.resp.code == 401:
+      raise Unauthorized("{} Try to reload /import page".format(message))
+    raise InternalServerError(message)
+  except:
+    raise InternalServerError("Import failed due to internal server error.")
+  return csv_data
 
 
 def handle_import_request():
   """Import request handler"""
+  dry_run, file_data = parse_import_request()
+  csv_data = get_gdrive_file(file_data)
   try:
-    dry_run, csv_data = parse_import_request()
     converter = Converter(dry_run=dry_run, csv_data=csv_data)
     converter.import_csv()
     response_data = converter.get_info()
@@ -173,6 +208,9 @@ def init_converter_views():
   @login_required
   def import_view():
     """Get import view"""
+    authorize = verify_credentials()
+    if authorize:
+      return authorize
     return render_template("import_export/import.haml")
 
   @app.route("/export")
