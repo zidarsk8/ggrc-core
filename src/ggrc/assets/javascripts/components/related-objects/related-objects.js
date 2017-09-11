@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './sortable-column';
+
 (function (can, GGRC, CMS) {
   'use strict';
 
@@ -37,7 +39,8 @@
       },
       baseInstance: null,
       relatedItemsType: '@',
-      orderBy: '@',
+      orderBy: {},
+      initialOrderBy: '@',
       selectedItem: {},
       objectSelectorEl: '.grid-data__action-column button',
       getFilters: function (id, type, isAssessment) {
@@ -61,7 +64,6 @@
         var id;
         var type;
         var relatedType = this.attr('relatedItemsType');
-        var orderBy = this.attr('orderBy') || defaultOrderBy;
         var isAssessment = this.attr('baseInstance.type') === 'Assessment';
         var isSnapshot = !!this.attr('baseInstance.snapshot');
         var filters;
@@ -78,9 +80,7 @@
         params.data = [{
           limit: this.attr('paging.limits'),
           object_name: relatedType,
-          order_by: orderBy.split(',').map(function (field) {
-            return {name: field, desc: true};
-          }),
+          order_by: this.getSortingInfo(),
           filters: filters
         }];
         return params;
@@ -112,6 +112,21 @@
           }.bind(this));
         return dfd;
       },
+      getSortingInfo: function () {
+        var orderBy = this.attr('orderBy');
+        var defaultOrder;
+
+        if (!orderBy.attr('field')) {
+          defaultOrder = this.attr('initialOrderBy') || defaultOrderBy;
+          return defaultOrder.split(',').map(function (field) {
+            return {name: field, desc: true};
+          });
+        }
+
+        return [{
+          name: orderBy.attr('field'),
+          desc: orderBy.attr('direction') === 'desc'}];
+      },
       setRelatedItems: function () {
         this.attr('relatedObjects').replace(this.loadRelatedItems());
       }
@@ -130,6 +145,9 @@
         this.viewModel.setRelatedItems();
       },
       '{viewModel.baseInstance} refreshRelatedAssessments': function () {
+        this.viewModel.setRelatedItems();
+      },
+      '{viewModel.orderBy} changed': function () {
         this.viewModel.setRelatedItems();
       }
     }
