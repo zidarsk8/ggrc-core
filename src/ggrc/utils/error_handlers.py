@@ -23,3 +23,36 @@ def register_handlers(app):
             "message": err.description}
     headers = [('Content-Type', 'application/json'), ]
     return current_app.make_response((as_json(resp), 400, headers),)
+
+  @app.errorhandler(401)
+  def unauthorized(err):
+    """Custom handler for Unauthorized error
+
+    Returns JSON object with error code and message in response body.
+    """
+    resp = {"code": 401,
+            "message": err.description}
+    headers = [('Content-Type', 'application/json'), ]
+    return current_app.make_response((as_json(resp), 401, headers),)
+
+  @app.errorhandler(404)
+  def not_found(err):
+    """CUstom handler for NotFound error
+
+    Returns JSON object with error code and message in response body.
+    """
+    resp = {"code": 404,
+            "message": err.description}
+    headers = [('Content-Type', 'application/json'), ]
+    return current_app.make_response((as_json(resp), 404, headers),)
+
+  @app.errorhandler(500)
+  def internal_error(err):
+    """CUstom handler for InternalServerError
+
+    Returns JSON object with error code and message in response body.
+    """
+    resp = {"code": 500,
+            "message": err.description}
+    headers = [('Content-Type', 'application/json'), ]
+    return current_app.make_response((as_json(resp), 500, headers),)
