@@ -6,6 +6,7 @@ import './mapper-results-item';
 import './mapper-results-items-header';
 import './mapper-results-columns-configuration';
 import '../object-selection/object-selection';
+import template from './templates/mapper-results.mustache';
 
 (function (can, GGRC, CMS, $) {
   'use strict';
@@ -15,10 +16,7 @@ import '../object-selection/object-selection';
 
   GGRC.Components('mapperResults', {
     tag: 'mapper-results',
-    template: can.view(
-      GGRC.mustache_path +
-      '/components/unified-mapper/mapper-results.mustache'
-    ),
+    template: template,
     viewModel: {
       define: {
         paging: {
