@@ -49,12 +49,14 @@ class TestACLAttributeDefinitions(TestCase):
   @ddt.data(*models.all_models.all_models)
   def test_acl_definitions(self, model):
     """Test ACL column definitions."""
-    factory = factories.AccessControlRoleFactory
-    factories.AccessControlRoleFactory(
-        object_type="Control",
-        read=True
-    )
-    role_names = {factory(object_type=model.__name__).name for _ in range(2)}
+    with factories.single_commit():
+      factory = factories.AccessControlRoleFactory
+      factories.AccessControlRoleFactory(
+          object_type="Control",
+          read=True
+      )
+      role_names = {factory(object_type=model.__name__).name for _ in range(2)}
+
     expected_names = set()
     if issubclass(model, roleable.Roleable):
       expected_names = role_names

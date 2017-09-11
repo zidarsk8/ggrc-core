@@ -369,8 +369,9 @@ class TestExportMultipleObjects(TestCase):
 
   def test_simple_multi_export(self):
     match = 1
-    programs = [factories.ProgramFactory().title for i in range(3)]
-    regulations = [factories.RegulationFactory().title for i in range(3)]
+    with factories.single_commit():
+      programs = [factories.ProgramFactory().title for i in range(3)]
+      regulations = [factories.RegulationFactory().title for i in range(3)]
 
     data = [{
         "object_name": "Program",  # prog-1
