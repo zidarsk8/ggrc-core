@@ -42,7 +42,6 @@ import '../../controllers/dashboard_controller';
 // Modules and Apps
 import '../../modules/widget_list';
 import '../../pbc/workflow_controller';
-import '../../apps/quick_search';
 import '../../apps/business_objects';
 
 // Components
@@ -88,4 +87,4 @@ import '../../components/custom-roles/custom-roles-modal';
 // This modal should be loaded here as it requires some components
 import '../../bootstrap/modal-ajax';
 
-import '../../dashboard';
+import '../../common-handlers';
