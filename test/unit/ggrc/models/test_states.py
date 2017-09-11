@@ -1,10 +1,12 @@
 """Test Object State Module"""
 
 import unittest
-import ggrc.app  # noqa pylint: disable=unused-import
+
 from ddt import ddt
 from ddt import data
+
 from ggrc.models import all_models
+import ggrc.app  # noqa pylint: disable=unused-import
 
 
 @ddt
