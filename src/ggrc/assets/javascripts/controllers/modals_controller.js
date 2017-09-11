@@ -349,6 +349,7 @@ import '../components/access_control_list/access_control_list_roles_helper'
     reset_form: function (setFieldsCb) {
       var $textArea = $('#program_description');
       var editorData = $textArea.data('wysihtml5');
+      var preloadDfd;
 
       // If the modal is closed early, the element no longer exists
       if (this.element) {
@@ -363,8 +364,14 @@ import '../components/access_control_list/access_control_list_roles_helper'
         this.options.instance.attr('_transient', new can.Observe({}));
       }
       if (this.options.instance.form_preload) {
-        this.options.instance.form_preload(this.options.new_object_form,
+        preloadDfd = this.options.instance.form_preload(
+          this.options.new_object_form,
           this.options.object_params);
+        if (preloadDfd) {
+          preloadDfd.then(function () {
+            this.options.instance.backup();
+          }.bind(this))
+        }
       }
 
       // The rich text editor's content is not a "normal" form field, thus

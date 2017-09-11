@@ -172,6 +172,7 @@
     model: function (attributes, oldModel) {
       var model;
       var id;
+      var backup;
       if (!attributes) {
         return;
       }
@@ -190,6 +191,14 @@
       model = oldModel && can.isFunction(oldModel.attr) ?
         oldModel.attr(attributes) :
           new this(attributes);
+
+      // Sometimes we are updating model partially and asynchronous
+      // for example when we load relationships.
+      // In this case we have to update backup to solve isDirty issues.
+      backup = model._backupStore();
+      if (backup) {
+        _.extend(backup, attributes);
+      }
 
       // This is a temporary solution
       if (attributes.documents) {
@@ -299,7 +308,7 @@
           markForAddition(this, currentUser, 'Creator');
         }
 
-        this.audit.findAuditors().then(function (list) {
+        return this.audit.findAuditors().then(function (list) {
           list.forEach(function (item) {
             var type = 'Verifier';
             if (item.person === auditLead) {
@@ -311,9 +320,9 @@
             markForAddition(self, item.person, type);
           });
         });
-      } else {
-        markForAddition(this, currentUser, 'Creator');
       }
+
+      markForAddition(this, currentUser, 'Creator');
 
       function markForAddition(instance, user, type) {
         instance.mark_for_addition('related_objects_as_destination', user, {
