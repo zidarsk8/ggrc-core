@@ -25,6 +25,7 @@ import './comment-add-button';
       sendNotifications: true,
       isSaving: false,
       isLoading: false,
+      notificationsInfo: 'Send Notifications',
       getCommentData: function () {
         var source = this.attr('instance');
 
