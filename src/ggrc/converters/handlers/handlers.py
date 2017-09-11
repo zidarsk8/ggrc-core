@@ -810,6 +810,11 @@ class DocumentsColumnHandler(ColumnHandler):
 
 class ExportOnlyColumnHandler(ColumnHandler):
 
+  def __init__(self, *args, **kwargs):
+    kwargs["view_only"] = True
+    kwargs["mandatory"] = False
+    super(ExportOnlyColumnHandler, self).__init__(*args, **kwargs)
+
   def parse_item(self):
     pass
 
@@ -824,3 +829,17 @@ class ExportOnlyColumnHandler(ColumnHandler):
 
   def set_value(self):
     pass
+
+
+ExportOnlyDateColumnHandler = type(
+    "ExportOnlyDateColumnHandler",
+    (ExportOnlyColumnHandler, DateColumnHandler),
+    {}
+)
+
+
+ExportOnlyUserColumnHandler = type(
+    "ExportOnlyUserColumnHandler",
+    (ExportOnlyColumnHandler, UserColumnHandler),
+    {}
+)

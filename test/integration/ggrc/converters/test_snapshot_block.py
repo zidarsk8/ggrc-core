@@ -96,6 +96,9 @@ class TestSnapshotBlockConverter(TestCase):
         ('reference_url', 'Reference URL'),
         ('verify_frequency', 'Frequency'),
         ('document_evidence', 'Evidence File'),
+        ('updated_at', 'Last Updated'),
+        ('modified_by', 'Last Updated By'),
+        ('created_at', 'Created Date'),
     ]
     ac_roles = db.session.query(all_models.AccessControlRole.name).filter(
         all_models.AccessControlRole.object_type == "Control"

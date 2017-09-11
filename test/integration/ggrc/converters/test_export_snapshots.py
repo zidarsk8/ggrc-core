@@ -123,6 +123,9 @@ class TestExportSnapshots(TestCase):
             "Secondary Contacts": u"creator@example.com",
             "Principal Assignees": u"creator@example.com",
             "Secondary Assignees": u"creator@example.com",
+            'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Last Updated': control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Last Updated By': control.modified_by.email,
         }
         for snapshot, control in zip(snapshots, controls)
     }
@@ -236,6 +239,9 @@ class TestExportSnapshots(TestCase):
             "Secondary Contacts": u"",
             "Principal Assignees": u"",
             "Secondary Assignees": u"",
+            'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Last Updated': control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Last Updated By': "",
         }
         for snapshot, control in zip(snapshots, controls)
     }
@@ -422,6 +428,9 @@ class TestExportSnapshots(TestCase):
           "Assertions": u"",
           "Categories": u"",
           "Evidence File": u"",
+          'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
+          'Last Updated': control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+          'Last Updated By': "",
       }
       control_dicts[control.slug].update(**control_acr_people[control.slug])
 

@@ -79,6 +79,9 @@ ATTRIBUTE_ORDER = (
     "frequency",
     "notify_on_change",
     "is_verification_needed",
+    "updated_at",
+    "modified_by",
+    "created_at",
     "delete",
     "repeat_every",
     "unit",
@@ -412,10 +415,13 @@ class AttributeInfo(object):
 
     for key, value in aliases:
       column = object_class.__table__.columns.get(key)
+      mandatory = False
+      if column is not None:
+        mandatory = not column.nullable and not column.default
       definition = {
           "display_name": value,
           "attr_name": key,
-          "mandatory": False if column is None else not column.nullable,
+          "mandatory": mandatory,
           "unique": key in unique_columns,
           "description": "",
           "type": cls.Type.PROPERTY,
