@@ -9,13 +9,10 @@ DUMP_NAME="api_search.sql"
 DUMP_PATH="${SCRIPTPATH}/../test/api_search/db_dump/${DUMP_NAME}"
 cd "${SCRIPTPATH}/../test"
 
-export GGRC_SETTINGS_MODULE="testing \
-  testing_api_search_db \
-  ggrc_basic_permissions.settings.development \
-  ggrc_risk_assessments.settings.development \
-  ggrc_risks.settings.development \
-  ggrc_workflows.settings.development \
-  ggrc_gdrive_integration.settings.development"
+source "${SCRIPTPATH}/init_test_env"
+
+export GGRC_SETTINGS_MODULE="${GGRC_SETTINGS_MODULE} \
+  testing_api_search_db"
 
 if [[ ! -f "$DUMP_PATH" ]]; then
   echo "File $DUMP_PATH wasn't found. New one will be created"
