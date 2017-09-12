@@ -64,7 +64,26 @@ def parse_export_request():
   return request.json
 
 
+def create_gdrive_file(csv_string, filename):
+  """Post text/csv data to a gdrive file"""
+  credentials = get_credentials()
+  http_auth = credentials.authorize(httplib2.Http())
+  drive_service = discovery.build('drive', 'v3', http=http_auth)
+  # make export to sheets
+  file_metadata = {
+      'name': filename,
+      'mimeType': 'application/vnd.google-apps.spreadsheet'
+  }
+  media = http.MediaInMemoryUpload(csv_string,
+                                   mimetype='text/csv',
+                                   resumable=True)
+  return drive_service.files().create(body=file_metadata,
+                                      media_body=media,
+                                      fields='id, name, parents').execute()
+
+
 def handle_export_request():
+  """Export request handler"""
   try:
     with benchmark("handle export request"):
       data = parse_export_request()
@@ -80,25 +99,8 @@ def handle_export_request():
     with benchmark("Make response."):
       object_names = "_".join(converter.get_object_names())
       filename = "{}.csv".format(object_names)
-
       if export_to == "gdrive":
-        credentials = get_credentials()
-
-        http_auth = credentials.authorize(httplib2.Http())
-        drive_service = discovery.build('drive', 'v3', http=http_auth)
-
-        # make export to sheets
-        file_metadata = {
-            'name': filename,
-            'mimeType': 'application/vnd.google-apps.spreadsheet'
-        }
-        media = http.MediaInMemoryUpload(csv_string,
-                                         mimetype='text/csv',
-                                         resumable=True)
-        gfile = drive_service.files().create(
-            body=file_metadata,
-            media_body=media,
-            fields='id, name, parents').execute()
+        gfile = create_gdrive_file(csv_string, filename)
         headers = [('Content-Type', 'application/json'), ]
         return current_app.make_response((json.dumps(gfile), 200, headers))
       if export_to == "csv":
@@ -141,6 +143,7 @@ def parse_import_request():
 
 
 def get_gdrive_file(file_data):
+  """Get text/csv data from gdrive file"""
   credentials = get_credentials()
   try:
     http_auth = credentials.authorize(httplib2.Http())
