@@ -115,11 +115,13 @@ class TestComprehensiveSheets(TestCase):
   def create_custom_attributes():
     """Generate custom attributes needed by comprehensive_sheet1.csv."""
     cad = factories.CustomAttributeDefinitionFactory
-    cad(definition_type="control", title="my custom text", mandatory=True)
-    cad(definition_type="program", title="my_text", mandatory=True)
-    cad(definition_type="program", title="my_date", attribute_type="Date")
-    cad(definition_type="program", title="my_checkbox",
-        attribute_type="Checkbox")
-    cad(definition_type="program", title="my_dropdown",
-        attribute_type="Dropdown",
-        multi_choice_options="a,b,c,d")
+
+    with factories.single_commit():
+      cad(definition_type="control", title="my custom text", mandatory=True)
+      cad(definition_type="program", title="my_text", mandatory=True)
+      cad(definition_type="program", title="my_date", attribute_type="Date")
+      cad(definition_type="program", title="my_checkbox",
+          attribute_type="Checkbox")
+      cad(definition_type="program", title="my_dropdown",
+          attribute_type="Dropdown",
+          multi_choice_options="a,b,c,d")

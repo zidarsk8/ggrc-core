@@ -23,17 +23,18 @@ class TestExportControls(TestCase):
           "X-Requested-By": "GGRC",
           "X-export-view": "blocks",
       }
-      self.basic_owner = factories.PersonFactory(name="basic owner")
-      self.control = factories.ControlFactory()
-      self.acr_id = all_models.AccessControlRole.query.filter_by(
-          object_type=self.control.type,
-          name="Admin"
-      ).first().id
-      self.owner_object = factories.AccessControlListFactory(
-          person=self.basic_owner,
-          object=self.control,
-          ac_role_id=self.acr_id
-      )
+      with factories.single_commit():
+        self.basic_owner = factories.PersonFactory(name="basic owner")
+        self.control = factories.ControlFactory()
+        self.acr_id = all_models.AccessControlRole.query.filter_by(
+            object_type=self.control.type,
+            name="Admin"
+        ).first().id
+        self.owner_object = factories.AccessControlListFactory(
+            person=self.basic_owner,
+            object=self.control,
+            ac_role_id=self.acr_id
+        )
 
   def test_search_by_owner_email(self):
     self.assert_slugs("Admin",
@@ -48,12 +49,14 @@ class TestExportControls(TestCase):
   def test_search_by_new_owner(self):
     """Filter by added new owner and old owner"""
     basic_email, basic_name = self.basic_owner.email, self.basic_owner.name
-    new_owner = factories.PersonFactory(name="new owner")
-    factories.AccessControlListFactory(
-        person=new_owner,
-        object=self.control,
-        ac_role_id=self.acr_id
-    )
+    with factories.single_commit():
+      new_owner = factories.PersonFactory(name="new owner")
+      factories.AccessControlListFactory(
+          person=new_owner,
+          object=self.control,
+          ac_role_id=self.acr_id
+      )
+
     self.assert_slugs("Admin",
                       new_owner.email,
                       [self.control.slug])
