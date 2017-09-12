@@ -8,7 +8,6 @@
   "ignore": [],
   "dependencies": {
     "canjs": "2.3.27",
-    "bootstrap": "2.0.4",
-    "fontawesome": "~4.7.0"
+    "bootstrap": "2.0.4"
   }
 }
