@@ -125,9 +125,7 @@
           }
         }
 
-        dfd = GGRC.Controllers.GAPI.authorize(
-          ['https://www.googleapis.com/auth/drive']
-        );
+        dfd = GGRC.Controllers.GAPI.reAuthorize(gapi.auth.getToken());
         dfd.done(function () {
           gapi.load('picker', {callback: createPicker});
         });
