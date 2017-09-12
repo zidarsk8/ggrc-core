@@ -74,7 +74,7 @@ teardown () {
     PROJECT="${1}"
   fi
 
-  docker-compose -p ${PROJECT} stop
+  docker-compose --file docker-compose-testing.yml -p ${PROJECT} stop
 }
 
 print_line () {
