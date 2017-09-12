@@ -19,8 +19,7 @@ export GGRC_SETTINGS_MODULE="testing \
   ggrc_workflows.settings.development \
   ggrc_gdrive_integration.settings.development"
 
-mysql -uroot -proot -h$HOST -e "DROP DATABASE IF EXISTS ${DB_NAME}; CREATE DATABASE ${DB_NAME} CHARACTER SET utf8; USE ${DB_NAME};"
-db_migrate
+db_reset -d "$DB_NAME"
 
 echo "Fill database with test setup data"
 python -c "\

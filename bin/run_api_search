@@ -23,8 +23,7 @@ if [[ ! -f "$DUMP_PATH" ]]; then
   create_apisearch_dump
 fi
 
-echo "Recreating test db from: $DUMP_PATH"
-mysql -uroot -proot -h$HOST $DB_NAME < $DUMP_PATH
+db_reset -d "$DB_NAME" "$DUMP_PATH"
 
 echo -e "\nRunning api_search tests"
 nosetests api_search --logging-clear-handlers -v ${@:1}
