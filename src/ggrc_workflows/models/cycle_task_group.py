@@ -87,14 +87,14 @@ class CycleTaskGroup(mixins.WithContact,
           "task assignee",
           lambda instance: [t.contact for t in
                             instance.cycle_task_group_tasks],
-          ["name", "email"],
+          ["email", "name"],
           False
       ),
       attributes.DateMultipleSubpropertyFullTextAttr(
           "task due date", "cycle_task_group_tasks", ["end_date"], False
       ),
       attributes.DateFullTextAttr("due date", 'next_due_date',),
-      attributes.FullTextAttr("assignee", "contact", ['name', 'email']),
+      attributes.FullTextAttr("assignee", "contact", ['email', 'name']),
       attributes.FullTextAttr("cycle title", 'cycle', ['title'], False),
       attributes.FullTextAttr("cycle assignee",
                               lambda x: x.cycle.contact,

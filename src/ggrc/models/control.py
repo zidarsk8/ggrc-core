@@ -224,11 +224,11 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
       attributes.FullTextAttr(
           "principal_assessor",
           "principal_assessor",
-          ["name", "email"]),
+          ["email", "name"]),
       attributes.FullTextAttr(
           'secondary_assessor',
           'secondary_assessor',
-          ["name", "email"]),
+          ["email", "name"]),
   ]
 
   _sanitize_html = [
