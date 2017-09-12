@@ -8,7 +8,6 @@ DB_NAME="ggrcdevtest_apisearch"
 DUMP_NAME="api_search.sql"
 DUMP_PATH="${SCRIPTPATH}/../test/api_search/db_dump/${DUMP_NAME}"
 cd "${SCRIPTPATH}/../test"
-find . -iname "*.pyc" -delete
 
 export GGRC_SETTINGS_MODULE="testing \
   testing_api_search_db \

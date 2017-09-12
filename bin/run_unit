@@ -4,7 +4,6 @@
 
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 cd "${SCRIPTPATH}/../test"
-find ./../ -iname "*.pyc" -delete
 
 echo -e "\nRunning unit tests"
 nosetests unit --with-xunit --xunit-file="nosetests-unit.xml" --logging-clear-handlers ${@:1}
