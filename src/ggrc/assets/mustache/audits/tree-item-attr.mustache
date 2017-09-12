@@ -9,6 +9,11 @@
           {{peopleStr}}
       </tree-people-list-field>
   {{/case}}
+  {{#case 'modified_by'}}
+      <tree-people-list-field {source}="instance.modified_by">
+          {{peopleStr}}
+      </tree-people-list-field>
+  {{/case}}
   {{#case 'report_period'}}
     {{#if instance.report_start_date}}
       {{#if instance.report_end_date}}

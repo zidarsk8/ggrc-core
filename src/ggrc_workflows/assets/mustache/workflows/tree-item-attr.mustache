@@ -19,6 +19,11 @@
       {{/each}}
     {{/with_mapping}}
   {{/case}}
+  {{#case 'modified_by'}}
+      <tree-people-list-field {source}="instance.modified_by">
+          {{peopleStr}}
+      </tree-people-list-field>
+  {{/case}}
   {{#case 'repeat'}}
       <repeat-on-summary {unit}="instance.unit" {repeat-every}="instance.repeat_every"
                          hide-repeat-off="false" class="repeat-cell">

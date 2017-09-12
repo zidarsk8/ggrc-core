@@ -26,6 +26,11 @@
       <tree-people-list-field {source}="instance.secondary_contact">
       </tree-people-list-field>
   {{/case}}
+  {{#case 'modified_by'}}
+      <tree-people-list-field {source}="instance.modified_by">
+          {{peopleStr}}
+      </tree-people-list-field>
+  {{/case}}
   {{#case 'status'}}
     {{#using status=instance.status}}
       <span class="state-value-dot {{addclass 'state-' status separator=''}}">
