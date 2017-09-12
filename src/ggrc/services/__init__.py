@@ -13,12 +13,13 @@ def contributed_services():
   """
   import ggrc.models.all_models as models
   from ggrc.services.relationship_resource import RelationshipResource
+  from ggrc.services.audit_resource import AuditResource
   from ggrc.access_control.role import AccessControlRole
 
   return [
       service('background_tasks', models.BackgroundTask),
       service('access_groups', models.AccessGroup),
-      service('audits', models.Audit),
+      service('audits', models.Audit, AuditResource),
       service('audit_objects', models.AuditObject),
       service('categorizations', models.Categorization),
       service('category_bases', models.CategoryBase),
@@ -69,6 +70,7 @@ def contributed_services():
 
 
 def all_services():
+  """Get services from all modules."""
   from ggrc.extensions import get_extension_modules
 
   services = contributed_services()
@@ -83,6 +85,7 @@ def all_services():
 
 
 def init_extra_services(app):
+  """Add extra service url rules."""
   from ggrc.login import login_required
 
   from .search import search

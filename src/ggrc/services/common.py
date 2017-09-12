@@ -1509,13 +1509,12 @@ class Resource(ModelView):
   def http_timestamp(self, timestamp):
     return format_date_time(time.mktime(timestamp.utctimetuple()))
 
-  def json_success_response(self, response_object, last_modified,
+  def json_success_response(self, response_object, last_modified=None,
                             status=200, id=None, cache_op=None,
                             obj_etag=None):
-    headers = [
-        ('Last-Modified', self.http_timestamp(last_modified)),
-        ('Content-Type', 'application/json'),
-    ]
+    headers = [('Content-Type', 'application/json')]
+    if last_modified:
+      headers.append(('Last-Modified', self.http_timestamp(last_modified)))
     if obj_etag:
       headers.append(('Etag', obj_etag))
     if id is not None:
@@ -1555,6 +1554,46 @@ class ReadOnlyResource(Resource):
       return super(ReadOnlyResource, self).dispatch_request(*args, **kwargs)
     else:
       raise NotImplementedError()
+
+
+class ExtendedResource(Resource):
+  """Extended resource with additional command support."""
+
+  @classmethod
+  def add_to(cls, app, url, model_class=None, decorators=()):
+    """Register view methods.
+
+    This method only extends original resource add_to, with a command option
+    for get requests.
+    """
+    if model_class:
+      service_class = type(model_class.__name__, (cls,), {
+          '_model': model_class,
+      })
+      import ggrc.services
+      setattr(ggrc.services, model_class.__name__, service_class)
+    else:
+      service_class = cls
+    view_func = service_class.as_view(service_class.endpoint_name())
+    view_func = cls.decorate_view_func(view_func, decorators)
+    app.add_url_rule(
+        url,
+        defaults={cls.pk: None},
+        view_func=view_func,
+        methods=['GET', 'POST'])
+    app.add_url_rule(
+        '{url}/<{type}:{pk}>'.format(url=url, type=cls.pk_type, pk=cls.pk),
+        view_func=view_func,
+        methods=['GET', 'PUT', 'DELETE'])
+    app.add_url_rule(
+        '{url}/<{type}:{pk}>/<command>'.format(
+            url=url,
+            type=cls.pk_type,
+            pk=cls.pk
+        ),
+        view_func=view_func,
+        methods=['GET']
+    )
 
 
 def filter_resource(resource, depth=0, user_permissions=None):  # noqa
