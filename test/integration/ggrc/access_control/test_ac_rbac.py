@@ -29,7 +29,7 @@ class TestAccessControlRBAC(TestCase):
     for name in ["Creator", "Reader", "Editor"]:
       _, user = object_generator.generate_person(
           data={"name": name}, user_role=name)
-      self.people[name] = user
+      self.people[name] = user.id
 
   def set_up_acl_object(self):
     """Set up a control with an access control role that grants RUD"""
@@ -44,7 +44,7 @@ class TestAccessControlRBAC(TestCase):
       factories.AccessControlListFactory(
           object=self.control,
           ac_role_id=self.all_acr.id,
-          person=self.people.get(name)
+          person=all_models.Person.query.get(self.people.get(name))
       )
 
   def test_acl_object_cru(self):
@@ -52,7 +52,7 @@ class TestAccessControlRBAC(TestCase):
     control_id = self.control.id
     # role_id = self.all_acr.id
     for name in ("Creator", "Reader", "Editor"):
-      person = self.people.get(name)
+      person = all_models.Person.query.get(self.people.get(name))
       role_id = self.all_acr.id
       db.session.add(person)
       self.api.set_user(person)
