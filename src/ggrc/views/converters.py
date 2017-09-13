@@ -7,12 +7,12 @@ This module handles all view related function to import and export pages
 including the import/export api endponts.
 """
 
+from logging import getLogger
+
 import httplib2
 
 from apiclient import discovery
 from apiclient import http
-
-from logging import getLogger
 
 from flask import current_app
 from flask import request
@@ -20,6 +20,7 @@ from flask import json
 from flask import render_template
 from werkzeug.exceptions import BadRequest
 
+from ggrc import settings
 from ggrc_gdrive_integration import get_credentials
 from ggrc_gdrive_integration import verify_credentials
 from ggrc.app import app
@@ -37,6 +38,7 @@ logger = getLogger(__name__)
 
 
 def check_required_headers(required_headers):
+  """Check required headers to the current request"""
   errors = []
   for header, valid_values in required_headers.items():
     if header not in request.headers:
@@ -156,24 +158,29 @@ def init_converter_views():
   @app.route("/_service/export_csv", methods=["POST"])
   @login_required
   def handle_export_csv():
+    """Calls export handler"""
     with benchmark("handle export request"):
       return handle_export_request()
 
   @app.route("/_service/import_csv", methods=["POST"])
   @login_required
   def handle_import_csv():
+    """Calls import handler"""
     with benchmark("handle import request"):
       return handle_import_request()
 
   @app.route("/import")
   @login_required
   def import_view():
+    """Get import view"""
     return render_template("import_export/import.haml")
 
   @app.route("/export")
   @login_required
   def export_view():
-    authorize = verify_credentials()
-    if authorize:
-      return authorize
+    """Get export view"""
+    if getattr(settings, "GAPI_CLIENT_ID", None):
+      authorize = verify_credentials()
+      if authorize:
+        return authorize
     return render_template("import_export/export.haml")
