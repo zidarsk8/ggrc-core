@@ -59,6 +59,21 @@ local-custom-attributes {
       max-width: 360px;
       padding: 0 8px 0 0;
       box-sizing: border-box;
+
+      input,
+      .rich-text__wrapper,
+      date-form-field .input-wrapper datepicker .datepicker__input-wrapper input[readonly] {
+        border: 1px solid #ccc;
+        box-shadow: none;
+        outline: none;
+      }
+    }
+
+    &.invalid-field input,
+    &.invalid-field select,
+    &.invalid-field .rich-text__wrapper,
+    &.invalid-field date-form-field .input-wrapper datepicker .datepicker__input-wrapper input[readonly] {
+      border-color: $red;
     }
 
     .form-field__title {
@@ -83,6 +98,27 @@ local-custom-attributes {
       position: absolute;
       top: 0;
       left: 0;
+    }
+
+    form-validation-text {
+      display: none;
+    }
+
+    &.invalid-field {
+      margin-bottom: 16px;
+
+      form-validation-text {
+        display: block;
+        position: absolute;
+        left: 28px;
+        bottom: -5px;
+        width: 100%;
+        line-height: 16px;
+
+        p {
+          margin: 0;
+        }
+      }
     }
   }
 }

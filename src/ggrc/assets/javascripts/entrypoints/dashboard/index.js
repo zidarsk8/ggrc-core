@@ -155,6 +155,7 @@ import '../../components/loading/loading-status';
 import '../../components/lazy-render/lazy-render';
 import '../../components/local-custom-attributes/local-custom-attributes-field-view';
 import '../../components/form/form-validation-icon';
+import '../../components/form/form-validation-text';
 import '../../components/form/fields/checkbox-form-field';
 import '../../components/form/fields/date-form-field';
 import '../../components/form/fields/dropdown-form-field';
