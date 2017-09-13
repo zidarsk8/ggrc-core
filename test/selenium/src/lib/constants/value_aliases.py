@@ -17,3 +17,4 @@ CONTAINS_OP = "~"
 # aliases for size attrs
 WIDTH = "width"
 HEIGHT = "height"
+SCROLL_HEIGHT = "scrollHeight"

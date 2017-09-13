@@ -274,39 +274,44 @@ def get_full_screenshot_as_base64(driver):
   Viewport attribute of ChromeBrowser.
   Return: screenshot as base64.
   """
-  def size(width, height):
-    """Return dict with width and height items."""
-    return {alias.HEIGHT: height, alias.WIDTH: width}
+
+  def get_page_body_size():
+    """Return dict with width and height of page size."""
+    return {alias.HEIGHT: driver.execute_script(
+            "return document.documentElement.scrollHeight"),
+            alias.WIDTH: driver.execute_script(
+            "return document.documentElement.scrollWidth")}
+
+  def get_screenshot_by_size(width, height):
+    """Change device metrics according to passed width and height, then
+    do screenshot and reset device metrics.
+    Return: Screenshot as base64.
+    """
+    _send_custom_command(driver, "Emulation.setVisibleSize",
+                         {alias.HEIGHT: height, alias.WIDTH: width})
+    scrnshot = driver.get_screenshot_as_base64()
+    _send_custom_command(driver, "Emulation.resetViewport", {})
+    return scrnshot
 
   panel_elem = get_element_safe(driver, locators.Common.PANEL_CSS)
   panel_origin_style = None
-  page_origin_size = size(
-      driver.execute_script("return window.innerWidth"),
-      driver.execute_script("return window.innerHeight"))
-  page_content_size = size(
-      driver.execute_script("return document.body.scrollWidth"),
-      driver.execute_script("return document.body.scrollHeight"))
+  page_content_size = get_page_body_size()
   full_area = get_element_safe(driver, locators.Common.OBJECT_AREA_CSS)
   if panel_elem and panel_elem.size[alias.HEIGHT]:
     panel_origin_style = panel_elem.get_attribute("style")
-    panel_content_size = (panel_elem.get_property("scrollHeight") +
+    panel_content_size = (panel_elem.get_property(alias.SCROLL_HEIGHT) +
                           constants.settings.SIZE_PANE_HEADER)
     driver.execute_script("arguments[0].removeAttribute('style')", panel_elem)
     tree_view_height = driver.find_element(
         *locators.TreeView.TREE_VIEW_CONTAINER_CSS).size[alias.HEIGHT]
     page_content_size[alias.HEIGHT] = panel_content_size + tree_view_height
   elif full_area:
-    page_content_size[alias.HEIGHT] = full_area.get_property("scrollHeight")
+    full_area_height = full_area.get_property(alias.SCROLL_HEIGHT)
+    if full_area_height > page_content_size[alias.HEIGHT]:
+      page_content_size[alias.HEIGHT] = full_area_height
   page_content_size[alias.HEIGHT] += (
       constants.settings.SIZE_FOOTER + constants.settings.SIZE_HEADER)
-  _send_custom_command(driver, "Emulation.setVisibleSize",
-                       page_content_size)
-  _send_custom_command(driver, "Emulation.forceViewport",
-                       {"x": 0, "y": 0, "scale": 1})
-  value = _send_custom_command(driver, "Page.captureScreenshot",
-                               {"format": "png", "fromSurface": True})
-  if panel_origin_style is not None:
+  screenshot_base64 = get_screenshot_by_size(**page_content_size)
+  if panel_origin_style:
     set_element_attribute(panel_elem, "style", panel_origin_style)
-  _send_custom_command(driver, "Emulation.resetViewport", {})
-  _send_custom_command(driver, "Emulation.setVisibleSize", page_origin_size)
-  return value["data"]
+  return screenshot_base64
