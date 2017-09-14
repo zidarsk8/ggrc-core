@@ -9,7 +9,7 @@
     <form action="javascript://">
 
       {{^if new_object_form}}
-        {{#if_in instance.status "Not Started,Completed,Verified"}}
+        {{#if_in instance.status "Not Started,Completed,Verified,In Review"}}
           {{#if_helpers '\
             #if' instance.isDirty '\
             or #if' mappedObjectsChanges.length '\
