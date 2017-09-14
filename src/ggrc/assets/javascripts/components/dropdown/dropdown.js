@@ -25,7 +25,6 @@
             var isGroupedDropdown = this.attr('isGroupedDropdown');
             var optionsGroups = this.attr('optionsGroups');
             var noneValue = this.attr('noValueLabel') || '--';
-            var simpleList = this.attr('simpleList');
             var none = isGroupedDropdown ?
               [{
                 group: noneValue,
@@ -38,7 +37,7 @@
             var list = [];
             if (!isGroupedDropdown) {
               list = can.map(this.attr('optionsList') || [], function (option) {
-                if (_.isString(option) || simpleList) {
+                if (_.isString(option)) {
                   return {
                     value: option,
                     title: option
@@ -83,7 +82,6 @@
        */
       optionsList: [],
       optionsGroups: {},
-      simpleList: false,
       isDisabled: false
     },
     init: function (element, options) {

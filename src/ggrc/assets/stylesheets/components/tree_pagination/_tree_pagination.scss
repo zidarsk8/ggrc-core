@@ -42,13 +42,16 @@ tree-pagination {
       border-radius: 2px;
 
       &.dropdown-container {
-        dropdown {
+        select {
+          color: $textGray;
+          width: 100%;
+          cursor: pointer;
           &.pagination-dropdown {
-            select {
-              cursor: pointer;
-              background-color: $paginationGray;
-              border-radius: 2px;
-            }
+            background-color: $paginationGray;
+            border-radius: 2px;
+          }
+          &:disabled {
+            cursor: default;
           }
         }
       }
