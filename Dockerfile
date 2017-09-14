@@ -21,6 +21,7 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     zip \
   && rm -rf /var/lib/apt/lists/*
 
+COPY ./provision/docker/my.cnf /root/.my.cnf
 COPY ./provision/docker/vagrant.bashrc /root/.bashrc
 COPY ./git_hooks/post-checkout /home/vagrant/.git/hooks/post-checkout
 COPY ./git_hooks/post-merge /home/vagrant/.git/hooks/post-merge
