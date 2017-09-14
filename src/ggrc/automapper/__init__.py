@@ -7,16 +7,16 @@ from datetime import datetime
 from logging import getLogger
 import collections
 
+import sqlalchemy as sa
 from sqlalchemy.sql.expression import tuple_
 
 from ggrc import db
 from ggrc.automapper import rules
-from ggrc.login import get_current_user
+from ggrc import login
 from ggrc.models.automapping import Automapping
 from ggrc.models.relationship import Relationship
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.services.common import get_cache
-from ggrc.services import signals
 from ggrc.utils import benchmark, with_nop
 
 
@@ -144,10 +144,17 @@ class AutomapperGenerator(object):
     if not self.auto_mappings:
       return
     with self.benchmark("Automapping flush"):
-      current_user = get_current_user()
-      automapping = Automapping(parent_relationship)
-      db.session.add(automapping)
-      db.session.flush()
+      current_user_id = login.get_current_user_id()
+      automapping_result = db.session.execute(
+          Automapping.__table__.insert().values(
+              relationship_id=parent_relationship.id,
+              source_id=parent_relationship.source_id,
+              source_type=parent_relationship.source_type,
+              destination_id=parent_relationship.destination_id,
+              destination_type=parent_relationship.destination_type,
+          )
+      )
+      automapping_id = automapping_result.inserted_primary_key
       now = datetime.now()
       # We are doing an INSERT IGNORE INTO here to mitigate a race condition
       # that happens when multiple simultaneous requests create the same
@@ -159,7 +166,7 @@ class AutomapperGenerator(object):
                             Stub.from_destination(parent_relationship))
       db.session.execute(inserter.values([{
           "id": None,
-          "modified_by_id": current_user.id,
+          "modified_by_id": current_user_id,
           "created_at": now,
           "updated_at": now,
           "source_id": src.id,
@@ -169,7 +176,7 @@ class AutomapperGenerator(object):
           "context_id": None,
           "status": None,
           "parent_id": parent_relationship.id,
-          "automapping_id": automapping.id}
+          "automapping_id": automapping_id}
           for src, dst in self.auto_mappings
           if (src, dst) != original]))  # (src, dst) is sorted
       cache = get_cache(create=True)
@@ -180,7 +187,7 @@ class AutomapperGenerator(object):
         cache.new.update(
             (relationship, relationship.log_json())
             for relationship in Relationship.query.filter_by(
-                automapping_id=automapping.id,
+                automapping_id=automapping_id,
             )
         )
 
@@ -222,19 +229,10 @@ def register_automapping_listeners():
   """Register event listeners for auto mapper."""
   # pylint: disable=unused-variable,unused-argument
 
-  @signals.Restful.collection_posted.connect_via(Relationship)
-  def handle_relationship_collection_post(sender, objects=None, **kwargs):
-    """Handle bulk creation of relationships.
-
-    This handler reuses auto mapper cache and is more efficient than handling
-    one object at a time.
-
-    Args:
-      objects: list of relationship Models.
-    """
+  def automap(session, _):
     automapper = AutomapperGenerator()
-    for obj in objects:
-      if obj is None:
-        logger.warning("Automapping listener: no obj, no mappings created")
-        return
-      automapper.generate_automappings(obj)
+    for obj in session.new:
+      if isinstance(obj, Relationship):
+        automapper.generate_automappings(obj)
+
+  sa.event.listen(sa.orm.session.Session, "after_flush", automap)

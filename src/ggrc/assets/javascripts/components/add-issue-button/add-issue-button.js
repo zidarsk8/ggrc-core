@@ -19,20 +19,8 @@
           get: function () {
             var instance = this.attr('relatedInstance');
             var audit = instance.attr('audit');
-            var json;
-            var relatedSnapshots = this.attr('snapshots').attr() || [];
-
-            relatedSnapshots = relatedSnapshots.map(function (item) {
-              return {
-                title: item.title,
-                id: item.id,
-                type: item.type,
-                context: item.context
-              };
-            });
-            json = {
+            var json = {
               audit: {title: audit.title, id: audit.id, type: audit.type},
-              relatedSnapshots: relatedSnapshots,
               context: {
                 type: audit.attr('context.type'),
                 id: audit.attr('context.id')
