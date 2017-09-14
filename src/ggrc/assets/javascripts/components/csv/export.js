@@ -78,11 +78,6 @@ GGRC.Components('csvTemplate', {
       })
       .done(function (data) {
         GGRC.Utils.download('import_template.csv', data);
-      })
-      .fail(function (data) {
-        $('body').trigger('ajax:flash', {
-          error: $(data.responseText.split('\n')[3]).text()
-        });
       });
     },
     '.import-list a click': function (el, ev) {
@@ -169,7 +164,6 @@ GGRC.Components('csvExport', {
         var link;
 
         if (this.viewModel.attr('export.chosenFormat') === 'gdrive') {
-          data = JSON.parse(data);
           link = 'https://docs.google.com/spreadsheets/d/' + data.id;
 
           GGRC.Controllers.Modals.confirm({
@@ -183,11 +177,6 @@ GGRC.Components('csvExport', {
           GGRC.Utils.download(this.viewModel.attr('export.filename'), data);
         }
       }.bind(this))
-      .fail(function (data) {
-        $('body').trigger('ajax:flash', {
-          error: $(data.responseText.split('\n')[3]).text()
-        });
-      })
       .always(function () {
         this.viewModel.attr('export.loading', false);
       }.bind(this));

@@ -202,7 +202,6 @@
     export_request: function (request) {
       return $.ajax({
         type: 'POST',
-        dataType: 'text',
         headers: $.extend({
           'Content-Type': 'application/json',
           'X-export-view': 'blocks',
