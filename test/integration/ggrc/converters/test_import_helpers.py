@@ -395,6 +395,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Last Updated',
         'Last Updated By',
         "Delete",
+        "State",
     }
     expected_fields = {
         "mandatory": {
