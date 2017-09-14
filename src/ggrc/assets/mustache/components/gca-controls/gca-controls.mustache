@@ -4,7 +4,7 @@
 }}
 {{#each items}}
 <div class="ggrc-form-item">
-  <div class="ggrc-form-item__row ">
+  <div class="ggrc-form-item__row {{#if caError}}field-failure{{/if}}">
     <label for="form-field-{{id}}" class="form-label required-label ggrc-form-item__label">
       {{title}}
       {{#if required}}
@@ -25,6 +25,9 @@
       (value-changed)="updateGlobalAttribute(%event, %context)"
       class="form-field__content {{extraClass type}}"
     ></custom-attributes-field>
+    {{#if caError}}
+      <label class="help-inline warning">{{caError}}</label>
+    {{/if}}
   </div>
 </div>
 {{/each}}

@@ -148,6 +148,14 @@
           }
         }
       );
+      this.validate(
+        '_gca_valid',
+        function () {
+          if (!this._gca_valid) {
+            return 'Missing required global custom attribute';
+          }
+        }
+      );
     },
     prepareAttributes: function (attrs) {
       return attrs[this.root_object] ? attrs[this.root_object] : attrs;
