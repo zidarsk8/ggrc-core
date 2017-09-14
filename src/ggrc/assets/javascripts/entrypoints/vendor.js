@@ -6,7 +6,13 @@
 import '../tracker';
 import 'jquery';
 import 'lodash';
-import 'components-jqueryui';
+import 'components-jqueryui/ui/widgets/autocomplete';
+import 'components-jqueryui/ui/widgets/datepicker';
+import 'components-jqueryui/ui/widgets/draggable';
+import 'components-jqueryui/ui/widgets/droppable';
+import 'components-jqueryui/ui/widgets/resizable';
+import 'components-jqueryui/ui/widgets/sortable';
+import 'components-jqueryui/ui/widgets/tooltip';
 import 'bootstrap/js/bootstrap-alert.js';
 import 'bootstrap/js/bootstrap-collapse.js';
 import 'bootstrap/js/bootstrap-dropdown.js';
