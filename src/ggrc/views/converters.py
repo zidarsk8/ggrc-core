@@ -112,9 +112,14 @@ def handle_export_request():
         return current_app.make_response((csv_string, 200, headers))
   except BadQueryException as exception:
     raise BadRequest(exception.message)
-  except:  # pylint: disable=bare-except
-    logger.exception("Export failed")
-  raise BadRequest("Export failed due to server error.")
+  except HttpError as e:
+    message = json.loads(e.content).get("error").get("message")
+    if e.resp.code == 401:
+      raise Unauthorized("{} Try to reload /export page".format(message))
+    raise InternalServerError(message)
+  except Exception as e:  # pylint: disable=broad-except
+    logger.exception("Export failed: {}".format(e.message))
+    raise InternalServerError("Export failed due to internal server error.")
 
 
 def check_import_file():
@@ -138,7 +143,7 @@ def parse_import_request():
     file_data = request.json
     dry_run = request.headers["X-test-only"] == "true"
     return dry_run, file_data
-  except:
+  except:  # pylint: disable=bare-except
     raise BadRequest("Export failed due incorrect request data.")
 
 
@@ -167,7 +172,7 @@ def get_gdrive_file(file_data):
     if e.resp.code == 401:
       raise Unauthorized("{} Try to reload /import page".format(message))
     raise InternalServerError(message)
-  except:
+  except:  # pylint: disable=bare-except
     raise InternalServerError("Import failed due to internal server error.")
   return csv_data
 
