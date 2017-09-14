@@ -30,6 +30,12 @@ describe('helpers.get_custom_attr_value', function () {
       title: 'CheckBox',
       attribute_type: 'Checkbox',
       id: 4
+    },
+    {
+      definition_type: 'control',
+      title: 'Date',
+      attribute_type: 'Date',
+      id: 5
     }];
 
     origValue = GGRC.custom_attr_defs;
@@ -138,4 +144,18 @@ describe('helpers.get_custom_attr_value', function () {
 
       expect(value).toEqual('No');
     });
+
+  it('returns formatted date', function () {
+    var attr = {
+      attr_name: 'Date'
+    };
+    var value;
+    fakeOptions = {
+      hash: getHash('2017-09-30', 5, 'Date')
+    };
+
+    value = helper(attr, fakeInstance, fakeOptions);
+
+    expect(value).toEqual('09/30/2017');
+  });
 });
