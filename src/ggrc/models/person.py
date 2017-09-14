@@ -3,7 +3,7 @@
 
 import re
 from sqlalchemy import event
-from sqlalchemy.orm import validates
+from sqlalchemy import orm
 from sqlalchemy.orm.session import Session
 
 from ggrc import builder
@@ -32,9 +32,13 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
   company = deferred(db.Column(db.String), 'Person')
 
   object_people = db.relationship(
-      'ObjectPerson', backref='person', cascade='all, delete-orphan')
+      'ObjectPerson',
+      backref='person',
+      cascade='all, delete-orphan')
   access_control_list = db.relationship(
-      'AccessControlList', backref='person', cascade='all, delete-orphan')
+      'AccessControlList',
+      backref=orm.backref("person", lazy="joined"),
+      cascade='all, delete-orphan')
   language = db.relationship(
       'Option',
       primaryjoin='and_(foreign(Person.language_id) == Option.id, '
@@ -110,12 +114,12 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
   def get_id(self):
     return unicode(self.id)  # noqa
 
-  @validates('language')
+  @orm.validates('language')
   def validate_person_options(self, key, option):
     return validate_option(self.__class__.__name__, key, option,
                            'person_language')
 
-  @validates('email')
+  @orm.validates('email')
   def validate_email(self, key, email):
     if not Person.is_valid_email(email):
       message = "Must provide a valid email address"
@@ -133,8 +137,6 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
 
   @classmethod
   def eager_query(cls):
-    from sqlalchemy import orm
-
     # query = super(Person, cls).eager_query()
     # Completely overriding eager_query to avoid eager loading of the
     # modified_by relationship
@@ -145,8 +147,6 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
 
   @classmethod
   def indexed_query(cls):
-    from sqlalchemy import orm
-
     return super(Person, cls).indexed_query().options(
         orm.Load(cls).undefer_group(
             "Person_complete",
