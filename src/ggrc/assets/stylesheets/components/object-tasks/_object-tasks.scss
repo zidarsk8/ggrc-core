@@ -43,7 +43,7 @@ object-tasks {
         &.state-inprogress{
           color: $status-inprogress;
         }
-        &.state-deprecated {
+        &.state-declined {
           color: $status-declined;
         }
       }
