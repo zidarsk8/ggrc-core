@@ -12,8 +12,9 @@ import pytest
 from lib import base
 from lib.constants import messages, objects, element
 from lib.constants.element import Lhn, MappingStatusAttrs
+from lib.constants.element import AssessmentStates, ObjectStates
 from lib.entities import entities_factory
-from lib.factory import get_ui_service
+from lib.factory import get_ui_service, get_rest_service
 from lib.page import dashboard
 from lib.service import webui_service
 from lib.utils import selenium_utils
@@ -563,15 +564,18 @@ class TestSnapshots(base.Test):
         else "objects_under_assessment", "custom_attributes")
 
   @pytest.mark.parametrize(
-      "dynamic_object",
-      ["new_assessment_rest",
+      "dynamic_object, dynamic_object_state",
+      [("new_assessment_rest", AssessmentStates.NOT_STARTED),
+       ("new_assessment_rest", AssessmentStates.IN_PROGRESS),
+       ("new_assessment_rest", AssessmentStates.READY_FOR_REVIEW),
+       ("new_assessment_rest", AssessmentStates.COMPLETED),
        pytest.mark.xfail(reason="Issue GGRC-2817", strict=True)
-          ("new_issue_rest")],
+          (("new_issue_rest", ObjectStates.DRAFT))],
       indirect=["dynamic_object"])
   @pytest.mark.smoke_tests
   def test_snapshot_can_be_unmapped_from_assessment_or_issue(
       self, create_audit_with_control_and_update_control, dynamic_object,
-      selenium
+      selenium, dynamic_object_state
   ):
     """Check Snapshot can be unmapped from assessment using "Unmap" button on
     info panel.
@@ -596,6 +600,8 @@ class TestSnapshots(base.Test):
     (existing_obj_service.map_objs_via_tree_view_item(
         src_obj=audit, dest_objs=[control]))
     controls_service = get_ui_service(control.type)(selenium)
+    (get_rest_service(dynamic_object.type)().
+     update_obj(existing_obj, status=dynamic_object_state))
     controls_service.unmap_via_info_panel(existing_obj, control)
     actual_controls_count = controls_service.get_count_objs_from_tab(
         src_obj=existing_obj)

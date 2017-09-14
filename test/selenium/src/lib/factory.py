@@ -175,3 +175,14 @@ def get_ui_service(object_name):
   from lib.service import webui_service
   service_classname = service_name + constants.cls_name.SERVICE
   return getattr(webui_service, service_classname)
+
+
+def get_rest_service(object_name):
+  """Get and return class of REST service according to name of object
+  Returns:
+    class of REST service by object_name
+  """
+  service_name = objects.get_plural(object_name, title=True)
+  from lib.service import rest_service
+  service_classname = service_name + constants.cls_name.SERVICE
+  return getattr(rest_service, service_classname)
