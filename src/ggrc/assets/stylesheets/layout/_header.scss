@@ -9,14 +9,71 @@
 
 #page-header {
   position: relative;
-  display: flex;
 }
 
 .header-content {
   height: 47px;
   line-height: 47px;
   position: fixed;
+  display: flex;
   top: 0;
   width: 100%;
   border-bottom: 1px solid $headerBorder;
+
+  @for $i from 1 through 5 {
+    &.header-style-#{$i} {
+      background-color: nth($header-colors, $i);
+      color: $white;
+
+      .lhn-trigger {
+        .icon-bar {
+          background-color: $white;
+        }
+
+        &:hover,
+        &:active {
+          background: $white;
+          .icon-bar {
+            background-color: nth($header-colors, $i);
+          }
+        }
+      }
+
+      .entities {
+        color: $white;
+      }
+      .menu {
+        > li {
+          > a {
+            color: $white;
+            .fa {
+              color: $white;
+            }
+
+            .tasks-counter__overdue-state {
+              background-color: $white;
+              color: nth($header-colors, $i);
+            }
+
+            &:hover {
+              background-color: lighten(nth($header-colors, $i), 10%);
+            }
+
+            &.search {
+              background-color: $white;
+              border: none;
+              color: nth($header-colors, $i);
+              .fa {
+                color: nth($header-colors, $i);
+              }
+
+              &:hover {
+                background-color: darken($white, 10%);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

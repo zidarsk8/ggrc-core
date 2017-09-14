@@ -5,6 +5,29 @@
 
 (function (GGRC, can) {
   'use strict';
+  var colorsMap = {
+    System: 'header-style-1',
+    Process: 'header-style-1',
+    DataAsset: 'header-style-1',
+    Product: 'header-style-1',
+    Project: 'header-style-1',
+    Facility: 'header-style-1',
+    Market: 'header-style-1',
+    Audit: 'header-style-2',
+    Assessment: 'header-style-2',
+    Issue: 'header-style-3',
+    Risk: 'header-style-3',
+    Threat: 'header-style-3',
+    Regulation: 'header-style-4',
+    Policy: 'header-style-4',
+    Standard: 'header-style-4',
+    Contract: 'header-style-4',
+    Clause: 'header-style-4',
+    Section: 'header-style-4',
+    Control: 'header-style-4',
+    Objective: 'header-style-4',
+    Program: 'header-style-5'
+  };
 
   var template = can.view(GGRC.mustache_path +
     '/components/page-header/page-header.mustache'
@@ -34,6 +57,12 @@
       current_user: {
         get: function () {
           return GGRC.current_user;
+        }
+      },
+      headerStyle: {
+        type: 'string',
+        get: function () {
+          return colorsMap[this.attr('instance.type')] || '';
         }
       }
     },

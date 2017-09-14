@@ -49,7 +49,6 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
 
   def test_create_indexing(self):
     """Test that creating objects results in full index"""
-    custom_attribute_defs = self.create_custom_attribute_definitions()
 
     self._import_file("snapshotter_create.csv")
 
@@ -65,6 +64,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     process = db.session.query(models.Process).filter(
         models.Process.slug == "proc-2"
     ).one()
+    custom_attribute_defs = self.create_custom_attribute_definitions()
     custom_attribute_values = [
         {
             "custom_attribute": custom_attribute_defs["control"],
@@ -447,6 +447,33 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
           attributable=control,
           attribute_value=value,
       )
+    revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == control.id,
+        all_models.Revision.resource_type == control.type,
+    ).first()
+    revision.content = control.log_json()
+    db.session.add(revision)
+    with factories.single_commit():
+      snapshot = factories.SnapshotFactory(
+          child_id=control.id,
+          child_type=control.type,
+          revision=revision)
+    db.session.expire_all()
+    do_reindex()
+    self.assert_indexed_fields(snapshot, cad_title, {"": search_value})
+
+  def test_filter_by_checkbox_cad_no_cav(self):
+    """Test index by Checkdoxed cad no cav."""
+    checkbox_type = all_models.CustomAttributeDefinition.ValidTypes.CHECKBOX
+    cad_title = "Checkbox"
+    search_value = "No"
+    with factories.single_commit():
+      factories.CustomAttributeDefinitionFactory(
+          attribute_type=checkbox_type,
+          definition_type="control",
+          title=cad_title,
+      )
+      control = factories.ControlFactory()
     revision = all_models.Revision.query.filter(
         all_models.Revision.resource_id == control.id,
         all_models.Revision.resource_type == control.type,

@@ -35,7 +35,7 @@ try:
 except (ImportError):
   pass
 
-VERSION = "0.10.28-Raspberry" + BUILD_NUMBER
+VERSION = "0.10.29-Raspberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(

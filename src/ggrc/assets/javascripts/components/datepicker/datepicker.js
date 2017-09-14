@@ -40,6 +40,14 @@
         isShown: {
           type: 'boolean',
           value: false
+        },
+        noWeekends: {
+          type: 'boolean',
+          value: false
+        },
+        denyInput: {
+          type: 'boolean',
+          value: false
         }
       },
       onSelect: function (val, ev) {
@@ -79,13 +87,18 @@
         var minDate;
         var maxDate;
         var date;
-
-        element.datepicker({
+        var options = {
           dateFormat: viewModel.PICKER_ISO_DATE,
           altField: this.element.find('.datepicker__input'),
           altFormat: viewModel.PICKER_DISPLAY_FMT,
           onSelect: this.viewModel.onSelect.bind(this.viewModel)
-        });
+        };
+
+        if (viewModel.attr('noWeekends')) {
+          options.beforeShowDay = can.$.datepicker.noWeekends;
+        }
+
+        element.datepicker(options);
         viewModel.attr('picker', element);
 
         date = this.getDate(viewModel.attr('date'));

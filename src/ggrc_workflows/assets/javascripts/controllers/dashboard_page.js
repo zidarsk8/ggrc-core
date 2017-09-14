@@ -165,6 +165,8 @@
               var day_in_milli_secs = 24 * 60 * 60 * 1000;
               task_data.days_left_for_first_task = Math.floor(time_interval/day_in_milli_secs);
             }
+            task_data.completed_percentage = workflow.is_verification_needed ?
+              task_data.verified_percentage : task_data.finished_percentage;
 
             //set overdue flag
             task_data.over_due_flag = over_due ? true : false;

@@ -447,7 +447,7 @@ OP
         }
       };
     }
-  / _* op:'is' _*
+  / _+ op:'is' _+
     {
       return {
         name: op,
@@ -460,6 +460,3 @@ LEFT_P = '(' _*
 RIGHT_P = _* ')'
 
 _ = [ \t\r\n\f]+
-
-
-

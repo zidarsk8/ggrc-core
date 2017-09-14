@@ -71,6 +71,7 @@ EOL
 
 cat >"$OVERRIDE_FILE" <<EOF
 #!/usr/bin/env bash
+export VERSION="${VERSION:-1}"
 export GGRC_DATABASE_URI="$GGRC_DATABASE_URI"
 EOF
 

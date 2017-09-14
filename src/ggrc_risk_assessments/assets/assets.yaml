@@ -1,7 +1,6 @@
 dashboard-js-files:
   - models/risk_assessment.js
   - apps/risk_assessments.js
-  - mustache_helpers.js
 
 dashboard-js-spec-files:
 

@@ -5,6 +5,8 @@
 import os
 import re
 
+from dateutil import parser, tz
+
 from lib import factory
 from lib.constants import objects, url, path, messages, element, regex
 from lib.entities.entity import Entity
@@ -31,7 +33,7 @@ class BaseWebUiService(object):
     self.url_obj_info_page = "{obj_url}" + url.Widget.INFO
     self._unified_mapper = None
 
-  def create_list_objs(self, entity_factory, list_scopes):
+  def _create_list_objs(self, entity_factory, list_scopes):
     """Create and return list of objects used entity factory and UI data
     (list of scopes UI text elements {"header": "item", ...} remapped to
     list of dicts {"attr": "value", ...}).
@@ -53,17 +55,24 @@ class BaseWebUiService(object):
           if key in ["mandatory", "verified"]:
             # convert u'false', u'true' like to Boolean
             scope[key] = string_utils.get_bool_value_from_arg(val)
-          # convert datetime attributes' directly
           if key in ["updated_at", "created_at"]:
-            scope[key] = string_utils.convert_str_to_datetime(val)
-          # convert datetime attributes' in 'comments'
+            # UI like u'08/20/2017' to date=2017-08-20, timetz=00:00:00
+            datetime_val = parser.parse(val)
+            if str(datetime_val.time()) != "00:00:00":
+              # UI like u'08/20/2017 07:30:45 AM +03:00' to date=2017-08-20,
+              # timetz=04:30:45+00:00 if 'tzinfo', else:
+              # CSV like u'08-20-2017 04:30:45' to date=2017-08-20,
+              # timetz=04:30:45+00:00
+              datetime_val = (
+                  datetime_val.astimezone(tz=tz.tzutc()) if datetime_val.tzinfo
+                  else datetime_val.replace(tzinfo=tz.tzutc()))
+            scope[key] = datetime_val
           if (key == "comments" and isinstance(val, list) and
                   all(isinstance(comment, dict) for comment in val)):
-            # u'(Creator) 07/06/2017 05:47:14 AM UTC'
-            # to u'07/06/2017 05:47:14 AM UTC'
+            # extract datetime from u'(Creator) 08/20/2017 07:30:45 AM +03:00'
             scope[key] = [
-                {k: (string_utils.convert_str_to_datetime(
-                     re.sub(regex.TEXT_WITHIN_PARENTHESES, "", v))
+                {k: (parser.parse(re.sub(regex.TEXT_WITHIN_PARENTHESES, "", v)
+                                  ).replace(tzinfo=tz.tzutc())
                      if k == "created_at" else v)
                  for k, v in comment.iteritems()} for comment in val]
           # convert multiple values to list of strings and split if need it
@@ -110,8 +119,8 @@ class BaseWebUiService(object):
     """Get and return list of objects from Tree View."""
     self.set_list_objs_scopes_representation_on_tree_view(src_obj)
     list_objs_scopes = self.get_list_objs_scopes_from_tree_view(src_obj)
-    return self.create_list_objs(entity_factory=self.entities_factory_cls,
-                                 list_scopes=list_objs_scopes)
+    return self._create_list_objs(entity_factory=self.entities_factory_cls,
+                                  list_scopes=list_objs_scopes)
 
   def get_list_objs_from_mapper(self, src_obj, dest_objs):
     """Get and return list of objects from Unified Mapper Tree View and
@@ -119,14 +128,14 @@ class BaseWebUiService(object):
     self._set_list_objs_scopes_repr_on_mapper_tree_view(src_obj)
     list_objs_scopes, mapping_statuses = (
         self._search_objs_via_tree_view(src_obj, dest_objs))
-    return self.create_list_objs(
+    return self._create_list_objs(
         entity_factory=self.entities_factory_cls,
         list_scopes=list_objs_scopes), mapping_statuses
 
   def get_obj_from_info_page(self, obj):
     """Get and return object from Info page."""
     scope = self.get_scope_from_info_page(obj)
-    return self.create_list_objs(
+    return self._create_list_objs(
         entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
 
   def get_list_objs_from_info_panels(self, src_obj, objs):
@@ -135,7 +144,7 @@ class BaseWebUiService(object):
     """
     def get_obj_from_info_panel(src_obj, obj):
       scope = self.get_scope_from_info_panel(src_obj, obj)
-      return self.create_list_objs(
+      return self._create_list_objs(
           entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
     return ([get_obj_from_info_panel(src_obj, obj) for obj in objs] if
             isinstance(objs, list) else get_obj_from_info_panel(src_obj, objs))
@@ -154,8 +163,9 @@ class BaseWebUiService(object):
     obj_name_from_dict = objects.get_plural(
         string_utils.get_first_word_from_str(dict_key))
     if self.obj_name == obj_name_from_dict:
-      return self.create_list_objs(entity_factory=self.entities_factory_cls,
-                                   list_scopes=dict_list_objs_scopes[dict_key])
+      return self._create_list_objs(
+          entity_factory=self.entities_factory_cls,
+          list_scopes=dict_list_objs_scopes[dict_key])
     else:
       raise ValueError(messages.ExceptionsMessages.err_csv_format.
                        format(dict_list_objs_scopes))
@@ -164,9 +174,7 @@ class BaseWebUiService(object):
     """Open generic widget of mapped objects, open creation modal from
     Tree View, fill data according to object attributes and create new object.
     """
-    objs_widget = self.open_widget_of_mapped_objs(src_obj)
-    (objs_widget.tree_view.open_create().
-     fill_minimal_data(title=obj.title, code=obj.slug).save_and_close())
+    self._open_create_modal_and_fill_data(src_obj, obj).save_and_close()
 
   def export_objs_via_tree_view(self, src_obj):
     """Open generic widget of mapped objects, open modal of export from
@@ -350,6 +358,17 @@ class BaseWebUiService(object):
     return sorted(dashboard.Dashboard(
         self.driver).get_mappable_via_add_widgets_objs_aliases())
 
+  def _open_create_modal_and_fill_data(self, src_obj, obj):
+    """Open generic widget of mapped objects, open creation modal from
+    Tree View, fill minimal data according to object attributes.
+      - Return: "Create New Object", according to object type.
+    """
+    # pylint: disable=invalid-name
+    modal_create = (self.open_widget_of_mapped_objs(src_obj).
+                    tree_view.open_create())
+    modal_create.fill_minimal_data(title=obj.title, code=obj.slug)
+    return modal_create
+
 
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""
@@ -411,9 +430,8 @@ class AssessmentTemplatesService(BaseWebUiService):
     """Open generic widget of mapped objects, open creation modal from
     Tree View, fill data according to object attributes and create new object.
     """
-    objs_widget = self.open_widget_of_mapped_objs(src_obj)
-    (objs_widget.tree_view.open_create().select_assignee(obj.assessors).
-        fill_minimal_data(title=obj.title, code=obj.slug).save_and_close())
+    (self._open_create_modal_and_fill_data(src_obj, obj).
+     select_assignee(obj.assessors).save_and_close())
 
 
 class AssessmentsService(BaseWebUiService):
@@ -515,6 +533,42 @@ class AssessmentsService(BaseWebUiService):
     click 'Reject' button then return info page of object in new state"""
     self.open_info_page_of_obj(obj).click_reject()
     return self.info_widget_cls(self.driver)
+
+  def create_obj_and_get_mapped_titles_from_modal(self, src_obj, obj):
+    """Open generic widget of mapped objects, open creation modal from
+    Tree View, fill data according to object attributes and create new object.
+      - Return: [mapped_titles on create_modal]
+    """
+    modal_create = self._open_create_modal_and_fill_data(src_obj, obj)
+    mapped_titles = modal_create.get_mapped_snapshots_titles()
+    modal_create.save_and_close()
+    return mapped_titles
+
+  def _open_create_modal_and_fill_data(self, src_obj, obj):
+    """Open generic widget of mapped objects, open creation modal from
+    Tree View, fill minimal data according to object attributes,
+    map objs_under_assessment if exists.
+      - Return: lib.page.modal.create_new_object.AssessmentsCreate
+    """
+    modal_create = (self.open_widget_of_mapped_objs(src_obj).
+                    tree_view.open_create())
+    modal_create.fill_minimal_data(title=obj.title, code=obj.slug)
+    if obj.objects_under_assessment:
+      modal_create.map_controls(obj.objects_under_assessment)
+    return modal_create
+
+  def map_objs_and_get_mapped_titles_from_edit_modal(self, src_obj,
+                                                     objs_to_map):
+    """Open ModalEdit from InfoPage of object. Open 3BBS. Select 'Edit' button
+    and map snapshots from objects_under_assessment attribute of passed object.
+      - Return: list of str. Titles of mapped Snapshots from Modal Edit.
+    """
+    modal_edit = (self.open_info_page_of_obj(src_obj).open_info_3bbs().
+                  select_edit())
+    modal_edit.map_controls(objs_to_map)
+    mapped_titles = modal_edit.get_mapped_snapshots_titles()
+    modal_edit.save_and_close()
+    return mapped_titles
 
 
 class ControlsService(SnapshotsWebUiService):

@@ -391,13 +391,10 @@ def get_cycle_task_data(notification, tasks_cache=None, del_rels_cache=None):
     return get_cycle_created_task_data(notification)
   elif notification_name == "cycle_task_declined":
     return get_cycle_task_declined_data(notification)
-  elif notification_name in ["cycle_task_due_in",
-                             "one_time_cycle_task_due_in",
-                             "weekly_cycle_task_due_in",
-                             "monthly_cycle_task_due_in",
-                             "quarterly_cycle_task_due_in",
-                             "annually_cycle_task_due_in",
-                             "cycle_task_due_today"]:
+  elif notification_name.endswith("cycle_task_due_in"):
+    return get_cycle_task_due(
+        notification, tasks_cache=tasks_cache, del_rels_cache=del_rels_cache)
+  elif "cycle_task_due_today" == notification_name:
     return get_cycle_task_due(
         notification, tasks_cache=tasks_cache, del_rels_cache=del_rels_cache)
   elif notification_name == "cycle_task_overdue":
@@ -477,7 +474,7 @@ def get_workflow_data(notification):
   if not workflow:
     return {}
 
-  if workflow.frequency == "one_time":
+  if workflow.unit is None:
     # one time workflows get cycles manually created and that triggers
     # the instant notification.
     return {}
@@ -581,8 +578,8 @@ def get_cycle_dict(cycle, manual=False):
       "cycle_slug": cycle.slug,
       "cycle_title": cycle.title,
       "workflow_owners": workflow_owners,
-      "cycle_url": get_cycle_url(cycle),
-      "cycle_inactive_url": get_cycle_url(cycle, active=False),
+      "cycle_url": cycle.cycle_url,
+      "cycle_inactive_url": cycle.cycle_inactive_url,
   }
 
 
@@ -655,26 +652,5 @@ def cycle_task_workflow_cycle_url(cycle_task, filter_exp=u""):
       workflow_id=cycle_task.cycle_task_group.cycle.workflow.id,
       filter_exp=filter_exp,
       cycle_id=cycle_task.cycle_task_group.cycle.id,
-  )
-  return urljoin(get_url_root(), url)
-
-
-def get_cycle_url(cycle, active=True):
-  """Build the URL to the given workflow cycle.
-
-  Args:
-    cycle: The cycle instance to build the URL for.
-    active:
-        If True (default), the URL is generated for when a cycle is active,
-        otherwise the resulting URL is generated for when a cycle is inactive.
-  Returns:
-    Full workflow cycle URL (as a string).
-  """
-  widget_name = "current_widget" if active else "history_widget"
-
-  url = "workflows/{workflow_id}#{widget_name}/cycle/{cycle_id}".format(
-      workflow_id=cycle.workflow.id,
-      cycle_id=cycle.id,
-      widget_name=widget_name
   )
   return urljoin(get_url_root(), url)

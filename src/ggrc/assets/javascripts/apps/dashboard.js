@@ -258,7 +258,15 @@
       ]
     });
     initWidgets();
-  } else if (/^\/import|export/i.test(location)) {
+  } else if (/^\/import/i.test(location)) {
+    $('#csv_import').html(
+      can.view(GGRC.mustache_path + "/import_export/import.mustache", {}));
+
+    initWidgets();
+  } else if (/^\/export/i.test(location)) {
+    $('#csv_export').html(
+      can.view(GGRC.mustache_path + '/import_export/export.mustache', {}));
+
     initWidgets();
   } else {
     $area.cms_controllers_dashboard({

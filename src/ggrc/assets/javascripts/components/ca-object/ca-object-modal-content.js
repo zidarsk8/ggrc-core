@@ -44,29 +44,26 @@
         value: null,
         options: []
       },
+      afterCreation: function (comment, success) {
+        this.dispatch({
+          type: 'afterCommentCreated',
+          item: comment,
+          success: success
+        });
+      },
       onCommentCreated: function (e) {
         var comment = e.comment;
         var instance = this.attr('instance');
         var context = instance.attr('context');
-        var relation = new CMS.Models.Relationship({
-          context: context,
-          destination: instance
-        });
         var self = this;
         var addComment = function (data) {
           return comment.attr(data)
             .save()
             .done(function (comment) {
-              relation.attr({source: comment.serialize()})
-                .save()
-                .then(function () {
-                  self.dispatch({
-                    type: 'afterCommentCreated',
-                    items: [comment],
-                    success: true
-                  });
-                  instance.dispatch('refreshInstance');
-                });
+              self.afterCreation(comment, true);
+            })
+            .fail(function (comment) {
+              self.afterCreation(comment, false);
             });
         };
 

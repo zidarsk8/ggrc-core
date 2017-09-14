@@ -115,18 +115,6 @@
       }
     }
   }
-
-  &.mapped-object-list {
-    > object-list {
-      > .object-list__item {
-        background: #fff;
-
-        &:not(:last-child) {
-          border-bottom: 1px solid #e0e0e0;
-        }
-      }
-    }
-  }
 }
 
 // Extra style for the first index/order column
@@ -171,88 +159,4 @@
   display: flex;
   justify-content: center;
   align-items: flex-start;
-}
-.grid-data-simple {
-
-  .title-text {
-    color: $darkText;
-    font-size: 11px;
-    font-weight: bold;
-    text-transform: uppercase;
-    padding: 0 8px 0 0;
-    line-height: 24px;
-    max-width: 100%;
-    box-sizing: border-box;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
-  .grid-data-sub-header {
-    padding: 0;
-
-    > * {
-      padding: 0 16px 0 0;
-    }
-  }
-
-  .grid-data-header {
-    background: transparent;
-    border-color: transparent;
-    padding: 4px 0;
-
-    .fa {
-      color: $gray;
-      display: inline-block;
-      width: 20px;
-      line-height: 24px;
-      text-align: left;
-    }
-
-    > * {
-      padding: 0 8px 0 0;
-    }
-  }
-
-  .grid-data-body {
-    max-height: 250px;
-    height: auto;
-    padding: 4px 0;
-
-    &.loading {
-      min-height: 64px;
-    }
-
-    &.mapped-object-list {
-      max-height: none;
-
-      > * {
-        padding: 0;
-      }
-
-      object-list > .empty-message {
-        padding-left: 7px;
-      }
-    }
-
-    > .spinner-wrapper {
-      padding: 0;
-
-      > .spinner {
-        background: rgba(124, 124, 124, 0.03);
-      }
-    }
-
-    > * {
-      padding: 0 8px 0 0;
-    }
-  }
-
-  .grid-data-row {
-    padding: 4px 0;
-
-    > * {
-      padding: 0 8px 0 0;
-    }
-  }
 }

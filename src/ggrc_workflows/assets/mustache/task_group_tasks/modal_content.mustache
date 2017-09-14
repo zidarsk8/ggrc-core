@@ -69,167 +69,34 @@
     <div class="span4" id="frequency-div">
       {{#using task_group=instance.task_group}}
       {{#using workflow=task_group.workflow}}
-      {{#switch workflow.frequency}}
-      {{#case "one_time"}}
-      <div id="one-time" class="frequency-wrap" style="display:block">
-        <label>
-          Frequency: One time
-          <i class="fa fa-question-circle" rel="tooltip" title="Choose start and end dates"></i>
-        </label>
-        <label class="smaller">
-           <datepicker date="instance.start_date"
-                       required="true"
-                       label="Start Date"></datepicker>
-        </label>
-        <label class="smaller">
-          <datepicker set-min-date="instance.start_date"
-                      date="instance.end_date"
-                      required="true"
-                      label="Due Date"></datepicker>
-        </label>
-      </div>
-      {{/case}}
-      {{#case "weekly"}}
-      <div id="weekly" class="frequency-wrap" style="display:block">
-        <label>
-          Frequency: Weekly
-          <i class="fa fa-question-circle" rel="tooltip" title="Choose start/end days of the week"></i>
-        </label>
-        <label class="smaller">
-          <span class="start-text">
-            Starts every
-            <span class="required">*</span>
-          </span>
-          <select name="relative_start_day" class="input-medium" can-value="instance.relative_start_day" tabindex="4">
-            {{#iterate 1 "Monday" 2 "Tuesday" 3 "Wednesday" 4 "Thursday" 5 "Friday" step=2}}
-            <option value="{{iterator_0}}">{{iterator_1}}</option>
-            {{/iterate}}
-          </select>
-        </label>
-        <label class="smaller">
-          <span class="start-text">
-            Due every
-            <span class="required">*</span>
-          </span>
-          <select name="relative_end_day" class="input-medium" can-value="instance.relative_end_day" tabindex="5">
-            {{#iterate 1 "Monday" 2 "Tuesday" 3 "Wednesday" 4 "Thursday" 5 "Friday" step=2}}
-            <option value="{{iterator_0}}">{{iterator_1}}</option>
-            {{/iterate}}
-          </select>
-        </label>
-      </div>
-      {{/case}}
-      {{#case "monthly"}}
-      <div id="monthly" class="frequency-wrap" style="display:block">
-        <label>
-          Frequency: Each month
-          <i class="fa fa-question-circle" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
-        </label>
-        <label class="smaller">
-          <span class="start-text">
-            Starts every
-            <span class="required">*</span>
-          </span>
-          <select name="relative_start_day" class="input-small" can-value="instance.relative_start_day" tabindex="4">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
-            <option value="{{iterator}}">{{iterator}}</option>
-            {{/iterate}}
-          </select>
-        </label>
-        <label class="smaller">
-          <span class="start-text">
-            Due every
-            <span class="required">*</span>
-          </span>
-          <select name="relative_end_day" class="input-small" can-value="instance.relative_end_day" tabindex="5">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
-            <option value="{{iterator}}">{{iterator}}</option>
-            {{/iterate}}
-          </select>
-        </label>
-      </div>
-      {{/case}}
-      {{#case "quarterly"}}
-      <div id="quarterly" class="frequency-wrap" style="display:block">
-        <label>
-          Frequency: Every quarter
-          <i class="fa fa-question-circle" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
-        </label>
-        <label class="smaller">
-          <span class="start-text extrasmall">
-            Starts
-            <span class="required">*</span>
-          </span>
-          <select name="relative_start_month" class="input-medium" can-value="instance.relative_start_month" tabindex="4">
-            {{#iterate 1 "Jan, Apr, Jul, Oct" 2 "Feb, May, Aug, Nov" 3 "Mar, Jun, Sep, Dec" step=2}}
-            <option value="{{iterator_0}}">{{iterator_1}}</option>
-            {{/iterate}}
-          </select>
-          <select name="relative_start_day" class="input-mini" can-value="instance.relative_start_day" tabindex="5">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
-            <option value="{{iterator}}">{{iterator}}</option>
-            {{/iterate}}
-          </select>
-        </label>
-        <label class="smaller">
-          <span class="start-text extrasmall">
-            Due
-            <span class="required">*</span>
-          </span>
-          <select name="relative_end_month" class="input-medium" can-value="instance.relative_end_month" tabindex="6">
-            {{#iterate 1 "Jan, Apr, Jul, Oct" 2 "Feb, May, Aug, Nov" 3 "Mar, Jun, Sep, Dec" step=2}}
-            <option value="{{iterator_0}}">{{iterator_1}}</option>
-            {{/iterate}}
-          </select>
-          <select name="relative_end_day" class="input-mini" can-value="instance.relative_end_day" tabindex="7">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
-            <option value="{{iterator}}">{{iterator}}</option>
-            {{/iterate}}
-          </select>
-        </label>
-      </div>
-      {{/case}}
-      {{#case "annually"}}
-      <div id="annually" class="frequency-wrap" style="display:block">
-        <label>
-          Frequency: Each year
-          <i class="fa fa-question-circle" rel="tooltip" title="If date is Saturday, Sunday or holiday, Start/End date will be triggered on the first upcoming business day"></i>
-        </label>
-        <label class="smaller">
-          <span class="start-text">
-            Starts every
-            <span class="required">*</span>
-          </span>
-          <select name="relative_start_month" class="input-small" can-value="instance.relative_start_month" tabindex="4">
-            {{#iterate 1 "January" 2 "February" 3 "March" 4 "April" 5 "May" 6 "June" 7 "July" 8 "August" 9 "September" 10 "October" 11 "November" 12 "December" step=2}}
-              <option value="{{iterator_0}}">{{iterator_1}}</option>
-            {{/iterate}}
-          </select>
-          <select name="relative_start_day" class="input-mini" can-value="instance.relative_start_day" tabindex="5">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
-            <option value="{{iterator}}">{{iterator}}</option>
-            {{/iterate}}
-          </select>
-        </label>
-        <label class="smaller">
-          <span class="start-text">
-            Due every
-            <span class="required">*</span>
-          </span>
-          <select name="relative_end_month" class="input-small" can-value="instance.relative_end_month" tabindex="6">
-            {{#iterate 1 "January" 2 "February" 3 "March" 4 "April" 5 "May" 6 "June" 7 "July" 8 "August" 9 "September" 10 "October" 11 "November" 12 "December" step=2}}
-              <option value="{{iterator_0}}">{{iterator_1}}</option>
-            {{/iterate}}
-          </select>
-          <select name="relative_end_day" class="input-mini" can-value="instance.relative_end_day" tabindex="7">
-            {{#iterate 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31}}
-            <option value="{{iterator}}">{{iterator}}</option>
-            {{/iterate}}
-          </select>
-        </label>
-      </div>
-      {{/case}}
-      {{/switch}}
+          <div class="frequency-wrap">
+              <label>
+                  Repeat
+                  <i class="fa fa-question-circle" rel="tooltip" title="Choose start and end dates"></i>
+              </label>
+              <repeat-on-summary {unit}="workflow.unit" {repeat-every}="workflow.repeat_every"
+              {hide-repeat-off}="false">
+              </repeat-on-summary>
+              <label class="smaller">
+                  <datepicker date="instance.start_date"
+                              required="true"
+                              {{#is workflow.unit 'day'}}
+                                no-weekends="true"
+                                deny-input="true"
+                              {{/is}}
+                              label="Start Date"></datepicker>
+              </label>
+              <label class="smaller">
+                  <datepicker set-min-date="instance.start_date"
+                              date="instance.end_date"
+                              required="true"
+                              {{#is workflow.unit 'day'}}
+                                no-weekends="true"
+                                deny-input="true"
+                              {{/is}}
+                              label="Due Date"></datepicker>
+              </label>
+          </div>
       {{/using}}
       {{/using}}
     </div>

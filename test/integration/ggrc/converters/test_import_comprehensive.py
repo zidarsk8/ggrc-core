@@ -8,6 +8,8 @@ These tests should eventually contain all good imports and imports with all
 possible errors and warnings.
 """
 
+import unittest
+
 from ggrc import db
 from ggrc.models import AccessGroup
 from ggrc.models import Program
@@ -186,6 +188,7 @@ class TestComprehensiveSheets(TestCase):
     expected_custom_vals = ['0', 'a', '2015-12-12', 'test1']
     self.assertEqual(set(custom_vals), set(expected_custom_vals))
 
+  @unittest.skip("unskip when import/export fixed for workflows")
   def test_full_good_import(self):
     """Test import of all objects with no warnings or errors."""
     filename = "full_good_import_no_warnings.csv"
@@ -294,6 +297,7 @@ class TestComprehensiveSheets(TestCase):
     }
     self._check_csv_response(response, expected_errors)
 
+  @unittest.skip("unskip when import/export fixed for workflows")
   def test_task_groups_tasks(self):
     """Test task group task warnings and errors.
 

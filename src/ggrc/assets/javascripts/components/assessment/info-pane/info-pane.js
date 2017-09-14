@@ -118,7 +118,9 @@
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
-      triggerFormSaveCbs: can.$.Callbacks(),
+      setUrlEditMode: function (value, type) {
+        this.attr(type + 'EditMode', value);
+      },
       setInProgressState: function () {
         this.onStateChange({state: 'In Progress', undo: false});
       },
@@ -340,10 +342,7 @@
         this.attr('deferredSave', new GGRC.Utils.DeferredTransaction(
           function (resolve, reject) {
             this.attr('instance').save().done(resolve).fail(reject);
-          }.bind(this), 1000));
-      },
-      onFormSave: function () {
-        this.attr('triggerFormSaveCbs').fire();
+          }.bind(this), 1000, true));
       },
       onStateChange: function (event) {
         var isUndo = event.undo;
@@ -384,12 +383,6 @@
         var globalAttributes = event.globalAttributes;
         var caValues = this.attr('instance.custom_attribute_values');
         CAUtils.applyChangesToCustomAttributeValue(caValues, globalAttributes);
-
-        return this.attr('instance').save();
-      },
-      saveFormFields: function (modifiedFields) {
-        var caValues = this.attr('instance.custom_attribute_values');
-        CAUtils.applyChangesToCustomAttributeValue(caValues, modifiedFields);
 
         return this.attr('instance').save();
       },

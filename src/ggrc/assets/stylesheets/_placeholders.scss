@@ -94,19 +94,19 @@
 
 // progress bar placeholder colors
 %bar-finish {
-  background: $lightBlue;
+  background: $status-completed;
 }
 %bar-verify {
-  background: $lightGreen;
+  background: $status-verified;
 }
 %bar-progress {
-  background: $orange;
+  background: $status-inprogress;
 }
 %bar-pending {
-  background: $gray;
+  background: $status-draft;
 }
 %bar-warning {
-  background: $red;
+  background: $status-declined;
 }
 
 // status label placeholder colors

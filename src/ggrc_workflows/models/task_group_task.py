@@ -4,23 +4,27 @@
 """A module containing the workflow TaskGroupTask model."""
 
 
-from datetime import date
-from datetime import datetime
+import datetime
+
 from sqlalchemy import orm
 from sqlalchemy import schema
 
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
-from ggrc.models.mixins import Slugged, Titled, Described, WithContact
+from ggrc.models import mixins
 from ggrc.models.types import JsonType
 from ggrc.models import reflection
-from ggrc_workflows.models.mixins import RelativeTimeboxed
 from ggrc_workflows.models.task_group import TaskGroup
 
 
-class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
-                    Slugged, Indexed, db.Model):
+class TaskGroupTask(mixins.WithContact,
+                    mixins.Titled,
+                    mixins.Described,
+                    mixins.Slugged,
+                    mixins.Timeboxed,
+                    Indexed,
+                    db.Model):
   """Workflow TaskGroupTask model."""
 
   __tablename__ = 'task_group_tasks'
@@ -32,7 +36,7 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
 
   @classmethod
   def default_task_type(cls):
-    return "text"
+    return cls.TEXT
 
   @classmethod
   def generate_slug_prefix_for(cls, obj):
@@ -55,7 +59,10 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
   response_options = db.Column(
       JsonType(), nullable=False, default=[])
 
-  VALID_TASK_TYPES = ['text', 'menu', 'checkbox']
+  TEXT = 'text'
+  MENU = 'menu'
+  CHECKBOX = 'checkbox'
+  VALID_TASK_TYPES = [TEXT, MENU, CHECKBOX]
 
   @orm.validates('task_type')
   def validate_task_type(self, key, value):
@@ -66,32 +73,26 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
       raise ValueError(u"Invalid type '{}'".format(value))
     return value
 
-  def validate_date(self, value):
-    if isinstance(value, datetime):
-      value = value.date()
-    if value is not None and value.year <= 1900:
-      current_century = date.today().year / 100 * 100
-      year = current_century + value.year % 100
-      return date(year, value.month, value.day)
-    return value
-
+  # pylint: disable=unused-argument
   @orm.validates("start_date", "end_date")
-  def validate_end_date(self, key, value):
-    value = self.validate_date(value)
-    if key == "start_date":
-      self._start_changed = True
-    if key == "end_date" and self._start_changed and self.start_date > value:
-      self._start_changed = False
-      raise ValueError("Start date can not be after end date.")
+  def validate_date(self, key, value):
+    """Validates date's itself correctness, start_ end_ dates relative to each
+    other correctness is checked with 'before_insert' hook
+    """
+    if value is None:
+      return
+    if isinstance(value, datetime.datetime):
+      value = value.date()
+    if value < datetime.date(100, 1, 1):
+      current_century = datetime.date.today().year / 100
+      return datetime.date(value.year + current_century * 100,
+                           value.month,
+                           value.day)
     return value
 
   _api_attrs = reflection.ApiAttributes(
       'task_group',
       'sort_index',
-      'relative_start_month',
-      'relative_start_day',
-      'relative_end_month',
-      'relative_end_day',
       'object_approval',
       'task_type',
       'response_options'
@@ -108,40 +109,26 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
           "mandatory": True,
       },
       "secondary_contact": None,
-      "start_date": None,
-      "end_date": None,
+      "start_date": {
+          "display_name": "Start Date",
+          "mandatory": True,
+          "description": (
+              "Enter the task start date\nin the following format:\n"
+              "'mm/dd/yyyy'"
+          ),
+      },
+      "end_date": {
+          "display_name": "End Date",
+          "mandatory": True,
+          "description": (
+              "Enter the task end date\nin the following format:\n"
+              "'mm/dd/yyyy'"
+          ),
+      },
       "task_group": {
           "display_name": "Task Group",
           "mandatory": True,
           "filter_by": "_filter_by_task_group",
-      },
-      "relative_start_date": {
-          "display_name": "Start",
-          "mandatory": True,
-          "description": (
-              "Enter the task start date in the following format:\n"
-              "'mm/dd/yyyy' for one time workflows\n"
-              "'#' for weekly workflows (where # represents day "
-              "of the week & Monday = day 1)\n"
-              "'dd' for monthly workflows\n"
-              "'mmm/mmm/mmm/mmm dd' for monthly workflows "
-              "e.g. feb/may/aug/nov 17\n"
-              "'mm/dd' for yearly workflows"
-          ),
-      },
-      "relative_end_date": {
-          "display_name": "End",
-          "mandatory": True,
-          "description": (
-              "Enter the task end date in the following format:\n"
-              "'mm/dd/yyyy' for one time workflows\n"
-              "'#' for weekly workflows (where # represents day "
-              "of the week & Monday = day 1)\n"
-              "'dd' for monthly workflows\n"
-              "'mmm/mmm/mmm/mmm dd' for monthly workflows "
-              "e.g. feb/may/aug/nov 17\n"
-              "'mm/dd' for yearly workflows"
-          ),
       },
       "task_type": {
           "display_name": "Task Type",
@@ -172,8 +159,6 @@ class TaskGroupTask(WithContact, Titled, Described, RelativeTimeboxed,
     columns = [
         'title', 'description',
         'task_group', 'sort_index',
-        'relative_start_month', 'relative_start_day',
-        'relative_end_month', 'relative_end_day',
         'start_date', 'end_date',
         'contact', 'modified_by',
         'task_type', 'response_options',
