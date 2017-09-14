@@ -23,6 +23,10 @@ def upgrade():
         "Assessment Procedure",
         ["assessment", "assessment_template", "control"]
     )
+    rename_ca_title(
+        "Use Control Assessment Procedure",
+        ["assessment_template"]
+    )
 
 
 def downgrade():
