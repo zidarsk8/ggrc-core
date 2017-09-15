@@ -4,6 +4,7 @@
 */
 
 import Spinner from 'spin.js';
+import '../components/gca-controls/gca-controls';
 
 (function (can, $, GGRC, Permission) {
   'use strict';

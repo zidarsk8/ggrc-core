@@ -10,9 +10,9 @@
 </simple-modal>
 {{#unless instance.archived}}
   {{#is_allowed 'update' instance context='for'}}
-      <local-custom-attributes-actions
+      <custom-attributes-actions
         {(form-edit-mode)}="editMode">
-      </local-custom-attributes-actions>
+      </custom-attributes-actions>
       <object-state-toolbar {verifiers}="instance.assignees.Verifier"
                             {instance}="instance"
                             (on-state-change)="onStateChange(%event)">

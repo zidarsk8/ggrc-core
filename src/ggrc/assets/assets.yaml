@@ -28,6 +28,7 @@ dashboard-js-template-files:
   - components/assessment/inline/date.mustache
   - components/assessment/inline/person.mustache
   - components/assessment/inline/checkbox.mustache
+  - components/gca-controls/gca-controls.mustache
   - components/comment/comment-add-form.mustache
   - components/comment/comment-input.mustache
   - components/object-list/object-list.mustache
@@ -181,10 +182,10 @@ dashboard-js-template-files:
   - components/form/field-views/checkbox-form-field-view.mustache
   - components/form/field-views/date-form-field-view.mustache
   - components/form/field-views/person-form-field-view.mustache
-  - components/local-custom-attributes/local-custom-attributes.mustache
-  - components/local-custom-attributes/local-custom-attributes-actions.mustache
-  - components/local-custom-attributes/local-custom-attributes-field.mustache
-  - components/local-custom-attributes/local-custom-attributes-field-view.mustache
+  - components/custom-attributes/custom-attributes.mustache
+  - components/custom-attributes/custom-attributes-actions.mustache
+  - components/custom-attributes/custom-attributes-field.mustache
+  - components/custom-attributes/custom-attributes-field-view.mustache
   - components/object-tasks/object-tasks.mustache
   - components/advanced-search/advanced-search-filter-container.mustache
   - components/advanced-search/advanced-search-filter-attribute.mustache

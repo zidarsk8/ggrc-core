@@ -5,7 +5,6 @@
 
 import '../../permission';
 import '../../bootstrap/sticky-popover';
-import '../../bootstrap/modal-ajax';
 import '../../bootstrap/modal-form';
 import '../../plugins/lodash_helpers';
 import '../../plugins/persistent_notifier';
@@ -55,7 +54,7 @@ import '../../modules/widget_list';
 import '../../pbc/workflow_controller';
 import '../../apps/quick_search';
 import '../../apps/business_objects';
-import '../../apps/custom_attributes';
+import '../../apps/custom_attributes_wrap';
 
 // Components
 import '../../components/state-colors-map/state-colors-map';
@@ -153,16 +152,20 @@ import '../../components/people/people-list-info';
 import '../../components/prev-next-buttons/prev-next-buttons';
 import '../../components/loading/loading-status';
 import '../../components/lazy-render/lazy-render';
-import '../../components/local-custom-attributes/local-custom-attributes-field-view';
-import '../../components/form/form-validation-icon';
+
+import '../../components/custom-attributes/custom-attributes-field-view';
 import '../../components/form/form-validation-text';
+
 import '../../components/form/fields/checkbox-form-field';
 import '../../components/form/fields/date-form-field';
 import '../../components/form/fields/dropdown-form-field';
 import '../../components/form/fields/person-form-field';
 import '../../components/form/fields/rich-text-form-field';
 import '../../components/form/fields/text-form-field';
-import '../../components/custom-attributes/global-custom-attributes';
+import '../../components/global-custom-attributes/global-custom-attributes';
+
+// This modal should be loaded here as it requires some components
+import '../../bootstrap/modal-ajax';
 
 import '../../dashboard';
 

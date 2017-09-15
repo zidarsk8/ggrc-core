@@ -194,7 +194,7 @@
        * @return {Object} - jQuery object
        */
       getCAPanes: function ($target) {
-        return $target.find('.info custom-attributes');
+        return $target.find('.info custom-attributes-wrap');
       },
 
       /**

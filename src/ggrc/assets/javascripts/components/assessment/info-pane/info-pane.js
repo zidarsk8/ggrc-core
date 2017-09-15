@@ -5,9 +5,9 @@
 
 import '../controls-toolbar/controls-toolbar';
 import '../assessment-local-ca';
-import '../../local-custom-attributes/local-custom-attributes';
-import '../../local-custom-attributes/local-custom-attributes-field';
-import '../../local-custom-attributes/local-custom-attributes-status';
+import '../../custom-attributes/custom-attributes';
+import '../../custom-attributes/custom-attributes-field';
+import '../../custom-attributes/custom-attributes-status';
 import '../mapped-objects/mapped-related-information';
 import '../mapped-objects/mapped-comments';
 import '../mapped-objects/mapped-controls';
@@ -339,16 +339,20 @@ import './create-url';
       },
       initializeFormFields: function () {
         var cavs =
-          CAUtils.getAttributes(
-            this.attr('instance.custom_attribute_values'), true);
+          CAUtils.getCustomAttributes(
+            this.attr('instance'),
+            CAUtils.CUSTOM_ATTRIBUTE_TYPE.LOCAL
+          );
         this.attr('formFields',
           CAUtils.convertValuesToFormFields(cavs)
         );
       },
       initGlobalAttributes: function () {
         var cavs =
-          CAUtils.getAttributes(
-              this.attr('instance.custom_attribute_values'), false);
+          CAUtils.getCustomAttributes(
+            this.attr('instance'),
+            CAUtils.CUSTOM_ATTRIBUTE_TYPE.GLOBAL
+          );
         this.attr('globalAttributes',
           cavs.map(function (cav) {
             return CAUtils.convertToFormViewField(cav);

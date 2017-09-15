@@ -7,7 +7,7 @@
   'use strict';
 
   GGRC.Components('customAttributes', {
-    tag: 'custom-attributes',
+    tag: 'custom-attributes-wrap',
     template: '<content/>',
     scope: {
       instance: null,
