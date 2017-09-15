@@ -14,7 +14,6 @@ from ggrc.fulltext import attributes as ft_attributes
 from ggrc.fulltext import mixin as ft_mixin
 from urlparse import urljoin
 from ggrc.utils import get_url_root
-from ggrc import builder
 
 from ggrc_workflows.models import mixins as wf_mixins
 
@@ -74,18 +73,11 @@ class Cycle(mixins.WithContact,
       return False
     return True
 
-  @builder.simple_property
-  def folder(self):
-    if self.workflow:
-      return self.workflow.folder
-    return ""
-
   _api_attrs = reflection.ApiAttributes(
       'workflow',
       'cycle_task_groups',
       'is_current',
       'next_due_date',
-      reflection.Attribute('folder', create=False, update=False),
   )
 
   _aliases = {
@@ -144,7 +136,6 @@ class Cycle(mixins.WithContact,
           ["description"],
           False
       ),
-      "folder",
   ]
 
   AUTO_REINDEX_RULES = [
@@ -176,9 +167,6 @@ class Cycle(mixins.WithContact,
     query = super(Cycle, cls).eager_query()
     return query.options(
         orm.joinedload('cycle_task_groups'),
-        orm.Load(cls).joinedload("workflow").undefer_group(
-            "Workflow_complete"
-        ),
     )
 
   @classmethod
@@ -221,9 +209,6 @@ class Cycle(mixins.WithContact,
             "name",
             "id"
         ),
-        orm.Load(cls).joinedload("workflow").undefer_group(
-            "Workflow_complete"
-        ),
     )
 
   def _get_cycle_url(self, widget_name):
@@ -243,8 +228,3 @@ class Cycle(mixins.WithContact,
   @property
   def cycle_inactive_url(self):
     return self._get_cycle_url("history_widget")
-
-  def log_json(self):
-    out_json = super(Cycle, self).log_json()
-    out_json["folder"] = self.folder
-    return out_json

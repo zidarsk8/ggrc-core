@@ -115,7 +115,6 @@ class TestExportSnapshots(TestCase):
             "Reference URL": u"\n".join(c.slug for c in control.reference_url),
             "Assertions": u"\n".join(c.name for c in control.assertions),
             "Categories": u"\n".join(c.name for c in control.categories),
-            "Folder": "",
             # Computed attributes
             "Last Assessment Date": u"",
             "Admin": u"admin@example.com\ncreator@example.com\n"
@@ -243,7 +242,6 @@ class TestExportSnapshots(TestCase):
             'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
             'Last Updated': control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
             'Last Updated By': "",
-            "Folder": u"",
         }
         for snapshot, control in zip(snapshots, controls)
     }
@@ -433,7 +431,6 @@ class TestExportSnapshots(TestCase):
           'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
           'Last Updated': control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
           'Last Updated By': "",
-          "Folder": u"",
       }
       control_dicts[control.slug].update(**control_acr_people[control.slug])
 

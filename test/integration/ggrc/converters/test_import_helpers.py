@@ -154,7 +154,6 @@ class TestCustomAttributesDefinitions(TestCase):
         'Created Date',
         'Last Updated',
         'Last Updated By',
-        "Folder",
     }
     expected_names = element_names.union(mapping_names).union(unmapping_names)
     self.assertEqual(expected_names, display_names)
@@ -324,7 +323,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Created Date',
         'Last Updated',
         'Last Updated By',
-        "Folder",
     }
     expected_fields = {
         "mandatory": {
@@ -364,7 +362,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Created Date',
         'Last Updated',
         'Last Updated By',
-        "Folder",
     }
     expected_fields = {
         "mandatory": {
@@ -611,7 +608,6 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Created Date',
         'Last Updated',
         'Last Updated By',
-        "Folder",
     }
     self._test_single_object(models.Control, names, self.COMMON_EXPECTED)
 

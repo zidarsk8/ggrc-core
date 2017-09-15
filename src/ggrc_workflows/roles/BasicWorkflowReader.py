@@ -19,6 +19,7 @@ permissions = {
         "UserRole",
         "Context",
         "Document",
+        "ObjectFolder",
         "ObjectFile",
     ],
     "create": [

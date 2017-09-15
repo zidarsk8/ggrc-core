@@ -135,24 +135,51 @@
         // upload files with a parent folder (audits and workflows)
         var that = this;
         var parentFolderDfd;
-        var folderId;
+        var folderInstance = this.folder_instance || this.instance;
+
+        function isOwnFolder(mapping, instance) {
+          if (mapping.binding.instance !== instance) {
+            return false;
+          }
+          if (!mapping.mappings ||
+            mapping.mappings.length < 1 ||
+            mapping.instance === true) {
+            return true;
+          }
+          return can.reduce(mapping.mappings, function (current, mp) {
+            return current || isOwnFolder(mp, instance);
+          }, false);
+        }
 
         if (that.instance.attr('_transient.folder')) {
           parentFolderDfd = can.when(
-            [{instance: this.instance.attr('_transient.folder')}]
+            [{instance: folderInstance.attr('_transient.folder')}]
           );
         } else {
-          folderId = this.instance.attr('folder');
-
-          parentFolderDfd = new CMS.Models.GDriveFolder({
-            id: folderId,
-            href: '/drive/v2/files/' + folderId
-          }).refresh();
+          parentFolderDfd = folderInstance
+            .get_binding('extended_folders')
+            .refresh_instances();
         }
         can.Control.prototype.bindXHRToButton(parentFolderDfd, el);
 
         parentFolderDfd
-          .done(function (parentFolder) {
+          .done(function (bindings) {
+            var parentFolder;
+            if (bindings.length < 1 || !bindings[0].instance.selfLink) {
+              // no ObjectFolder or cannot access folder from GAPI
+              el.trigger('ajax:flash', {
+                warning: 'Can\'t upload: No GDrive folder found'
+              });
+              return;
+            }
+
+            parentFolder = can.map(bindings, function (binding) {
+              return can.reduce(binding.mappings, function (current, mp) {
+                return current || isOwnFolder(mp, that.instance);
+              }, false) ? binding.instance : undefined;
+            });
+            parentFolder = parentFolder[0] || bindings[0].instance;
+
             // NB: resources returned from uploadFiles() do not match the
             // properties expected from getting files from GAPI --
             // "name" <=> "title", "url" <=> "alternateLink". Of greater
@@ -200,12 +227,6 @@
                   el.trigger('modal:success');
                 }
               });
-          })
-          .fail(function () {
-            // no ObjectFolder or cannot access folder from GAPI
-            el.trigger('ajax:flash', {
-              warning: 'Can\'t upload: No GDrive folder found'
-            });
           });
       },
 

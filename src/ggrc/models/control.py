@@ -13,7 +13,11 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.models.audit_object import Auditable
 from ggrc.models.categorization import Categorizable
 from ggrc.models.category import CategoryBase
-from ggrc.models import mixins
+from ggrc.models.mixins import BusinessObject
+from ggrc.models.mixins import CustomAttributable
+from ggrc.models.mixins import Hierarchical
+from ggrc.models.mixins import TestPlanned
+from ggrc.models.mixins import LastDeprecatedTimeboxed
 from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
 from ggrc.models.deferred import deferred
 from ggrc.models.object_person import Personable
@@ -133,23 +137,11 @@ class AssertionCategorized(Categorizable):
     )
 
 
-class Control(WithLastAssessmentDate,
-              HasObjectState,
-              Roleable,
-              Relatable,
-              mixins.CustomAttributable,
-              Personable,
-              ControlCategorized,
-              PublicDocumentable,
-              AssertionCategorized,
-              mixins.Hierarchical,
-              mixins.LastDeprecatedTimeboxed,
-              Auditable,
-              mixins.TestPlanned,
-              mixins.BusinessObject,
-              Indexed,
-              mixins.Folderable,
-              db.Model):
+class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
+              CustomAttributable, Personable, ControlCategorized,
+              PublicDocumentable, AssertionCategorized, Hierarchical,
+              LastDeprecatedTimeboxed, Auditable, TestPlanned,
+              BusinessObject, Indexed, db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
