@@ -69,6 +69,15 @@ a {
   word-wrap: break-word;
 }
 
+.need-comma {
+  &:after {
+    content: ",";
+  }
+  &:last-child:after {
+    content: none;
+  }
+}
+
 // status
 .status-label {
   border-radius: 50%;
