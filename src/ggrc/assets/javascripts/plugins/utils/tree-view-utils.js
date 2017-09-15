@@ -46,7 +46,8 @@
 
     var FULL_SUB_LEVEL_LIST = Object.freeze([
       'Cycle',
-      'CycleTaskGroup'
+      'CycleTaskGroup',
+      'CycleTaskGroupObjectTask'
     ]);
 
     var NO_FIELDS_LIMIT_LIST = Object.freeze([
@@ -75,6 +76,7 @@
     // Define specific rules for Workflow models
     orderedModelsForSubTier.Cycle = ['CycleTaskGroup'];
     orderedModelsForSubTier.CycleTaskGroup = ['CycleTaskGroupObjectTask'];
+    orderedModelsForSubTier.CycleTaskGroupObjectTask = [];
 
     function getSubTreeFields(parent, child) {
       var noFieldsLimitOnChild = hasNoFieldsLimit(child);
@@ -335,6 +337,13 @@
     }
 
     function getModelsForSubTier(model) {
+      // getMappableTypes can't be run at once,
+      // cause GGRC.Mappings is not loaded yet
+      if (model === 'CycleTaskGroupObjectTask' &&
+      !orderedModelsForSubTier[model].length) {
+        orderedModelsForSubTier[model] =
+        GGRC.Utils.getMappableTypes('CycleTaskGroupObjectTask');
+      }
       return orderedModelsForSubTier[model] || [];
     }
 
