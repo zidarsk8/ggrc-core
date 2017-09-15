@@ -6,12 +6,13 @@
   </div>
   <div class="pagination dropdown-container">
     {{#paging}}
-      <dropdown class="pagination-dropdown"
-                tabindex="18"
-                simple-list="true"
-                options-list="pageSizeSelect" 
-                name="pageSize">
-      </dropdown>
+    <select class="pagination-dropdown"
+            ($change)="changePageSize(%element.value)">
+      <option selected hidden>{{pageSize}}</option>
+      {{#pageSizeSelect}}
+        <option value="{{.}}" >{{.}}</option>
+      {{/pageSizeSelect}}
+    </select>
     {{/paging}}
   </div>
   <div class="tree-pagination__count per-page">
