@@ -89,44 +89,50 @@
     </div>
 
     <div class="row-fluid wrap-row">
-      <div class="span6">
-        <h6>Authorizations</h6>
-        <p>
-          {{#with_program_roles_as "roles" result}}
-            {{#roles}}
-              {{#if_helpers '\
-                ^if_equals' role.permission_summary 'Mapped' '\
-                or #if_equals' roles.length 1}}
-                  {{role.permission_summary}}
-                  {{#if_equals role.permission_summary 'Auditor'}}:
-                    {{#with_mapping 'audit_via_context' user_role}}
-                      <span class="role">
-                        {{audit_via_context.0.instance.title}}
-                      </span>
-                    {{/with_mapping}}
-                  {{/if_equals}}
-              {{/if_helpers}}
-            {{/roles}}
-          {{/with_program_roles_as}}
-        </p>
-      </div>
-      {{#if_match instance.company '\\\\S'}}
-        {{#instance.company}}
+      <tab-container>
+        <tab-panel {(panels)}="panels" title-text="{{instance.type}}">
           <div class="span6">
-            <h6>Company</h6>
-            {{instance.company}}
+            <h6>Authorizations</h6>
+            <p>
+              {{#with_program_roles_as "roles" result}}
+                {{#roles}}
+                  {{#if_helpers '\
+                    ^if_equals' role.permission_summary 'Mapped' '\
+                    or #if_equals' roles.length 1}}
+                      {{role.permission_summary}}
+                      {{#if_equals role.permission_summary 'Auditor'}}:
+                        {{#with_mapping 'audit_via_context' user_role}}
+                          <span class="role">
+                            {{audit_via_context.0.instance.title}}
+                          </span>
+                        {{/with_mapping}}
+                      {{/if_equals}}
+                  {{/if_helpers}}
+                {{/roles}}
+              {{/with_program_roles_as}}
+            </p>
           </div>
-        {{/instance.company}}
-      {{/if_match}}
+          {{#if_match instance.company '\\\\S'}}
+            {{#instance.company}}
+              <div class="span6">
+                <h6>Company</h6>
+                {{instance.company}}
+              </div>
+            {{/instance.company}}
+          {{/if_match}}
 
-    </div>
+        </div>
 
-    <div class="row-fluid wrap-row">
-      <div class="span12">
-        {{>'/static/mustache/custom_attributes/info.mustache'}}
-      </div>
-    </div>
-
+        <div class="row-fluid wrap-row">
+          <div class="span12">
+            {{>'/static/mustache/custom_attributes/info.mustache'}}
+          </div>
+        </div>
+      </tab-panel>
+      <tab-panel {(panels)}="panels" title-text="Change Log">
+          <revision-log {instance}="instance"></revision-log>
+      </tab-panel>
+    </tab-container>
   </div>
 
 </section>

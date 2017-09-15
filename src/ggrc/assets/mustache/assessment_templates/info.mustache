@@ -27,84 +27,91 @@
         </div>
       </div>
 
-      <div class="row-fluid wrap-row">
-        <div class="span4">
-          <h6>Objects under assessment</h6>
-          {{#if template_object_type}}
-            {{template_object_type}}
-          {{else}}
-            <span class="empty-message">None</span>
-          {{/if}}
-        </div>
-
-        <div class="span4">
-          <h6>Use control test plans as procedures</h6>
-          {{#if test_plan_procedure}}YES{{else}}NO{{/if}}
-        </div>
-
-        <div class="span4">
-          <h6>Default procedure description</h6>
-          {{#if procedure_description}}
-            {{{procedure_description}}}
-          {{else}}
-            <span class="empty-message">None</span>
-          {{/if}}
-        </div>
-      </div>
-
-      <div class="row-fluid wrap-row">
-        <div class="span4">
-          <h6>Default Assignees</h6>
-          {{#if default_people.assessors}}
-            {{#if_string default_people.assessors}}
-              {{get_item DEFAULT_PEOPLE_LABELS default_people.assessors}}
-            {{else}}
-              {{#if default_people.assessors.length}}
-                <ul>
-                  {{#each default_people.assessors}}
-                    <li>
-                      <person-info editable="true" person-id="{{.}}"></person-info>
-                    </li>
-                  {{/each}}
-                </ul>
+      <tab-container>
+        <tab-panel {(panels)}="panels" title-text="Assessment Template">
+          <div class="row-fluid wrap-row">
+            <div class="span4">
+              <h6>Objects under assessment</h6>
+              {{#if template_object_type}}
+                {{template_object_type}}
               {{else}}
                 <span class="empty-message">None</span>
               {{/if}}
-            {{/if_string}}
-          {{else}}
-            <span class="empty-message">None</span>
-          {{/if}}
-        </div>
+            </div>
 
-        <div class="span4">
-          <h6>Default Verifier</h6>
-          {{#if default_people.verifiers}}
-            {{#if_string default_people.verifiers}}
-              {{get_item DEFAULT_PEOPLE_LABELS default_people.verifiers}}
-            {{else}}
-              {{#if default_people.verifiers.length}}
-                <ul>
-                  {{#each default_people.verifiers}}
-                    <li>
-                      <person-info editable="true" person-id="{{.}}"></person-info>
-                    </li>
-                  {{/each}}
-                </ul>
+            <div class="span4">
+              <h6>Use control test plans as procedures</h6>
+              {{#if test_plan_procedure}}YES{{else}}NO{{/if}}
+            </div>
+
+            <div class="span4">
+              <h6>Default procedure description</h6>
+              {{#if procedure_description}}
+                {{{procedure_description}}}
               {{else}}
                 <span class="empty-message">None</span>
               {{/if}}
-            {{/if_string}}
-          {{else}}
-            <span class="empty-message">None</span>
-          {{/if}}
-        </div>
+            </div>
+          </div>
 
-        <div class="span4">
-          <h6>Code</h6>
-          <span class="empty-message">{{slug}}</span>
-        </div>
-      </div>
+          <div class="row-fluid wrap-row">
+            <div class="span4">
+              <h6>Default Assignees</h6>
+              {{#if default_people.assessors}}
+                {{#if_string default_people.assessors}}
+                  {{get_item DEFAULT_PEOPLE_LABELS default_people.assessors}}
+                {{else}}
+                  {{#if default_people.assessors.length}}
+                    <ul>
+                      {{#each default_people.assessors}}
+                        <li>
+                          <person-info editable="true" person-id="{{.}}"></person-info>
+                        </li>
+                      {{/each}}
+                    </ul>
+                  {{else}}
+                    <span class="empty-message">None</span>
+                  {{/if}}
+                {{/if_string}}
+              {{else}}
+                <span class="empty-message">None</span>
+              {{/if}}
+            </div>
 
+            <div class="span4">
+              <h6>Default Verifier</h6>
+              {{#if default_people.verifiers}}
+                {{#if_string default_people.verifiers}}
+                  {{get_item DEFAULT_PEOPLE_LABELS default_people.verifiers}}
+                {{else}}
+                  {{#if default_people.verifiers.length}}
+                    <ul>
+                      {{#each default_people.verifiers}}
+                        <li>
+                          <person-info editable="true" person-id="{{.}}"></person-info>
+                        </li>
+                      {{/each}}
+                    </ul>
+                  {{else}}
+                    <span class="empty-message">None</span>
+                  {{/if}}
+                {{/if_string}}
+              {{else}}
+                <span class="empty-message">None</span>
+              {{/if}}
+            </div>
+
+            <div class="span4">
+              <h6>Code</h6>
+              <span class="empty-message">{{slug}}</span>
+            </div>
+          </div>
+
+        </tab-panel>
+        <tab-panel {(panels)}="panels" title-text="Change Log">
+            <revision-log {instance}="instance"></revision-log>
+        </tab-panel>
+      </tab-container>
     </div><!-- tier-content end -->
   </section>
 

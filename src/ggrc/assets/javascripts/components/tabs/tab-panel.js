@@ -24,6 +24,7 @@
         }
         this.attr('tabIndex', panels.length + 1);
         panels.push(this);
+        panels.dispatch('panelAdded');
       },
       removePanel: function () {
         var itemTabIndex = this.attr('tabIndex');
@@ -38,6 +39,7 @@
         });
         if (indexToRemove > -1) {
           panels.splice(indexToRemove, 1);
+          panels.dispatch('panelRemoved');
         }
       }
     },
