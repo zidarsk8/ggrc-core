@@ -84,6 +84,7 @@ class CycleTaskGroupObjectTask(mixins.WithContact,
       ft_attributes.MultipleSubpropertyFullTextAttr("comments",
                                                     "cycle_task_entries",
                                                     ["description"]),
+      "folder",
   ]
 
   AUTO_REINDEX_RULES = [
@@ -121,6 +122,12 @@ class CycleTaskGroupObjectTask(mixins.WithContact,
   object_approval = association_proxy('cycle', 'workflow.object_approval')
   object_approval.publish_raw = True
 
+  @builder.simple_property
+  def folder(self):
+    if self.cycle:
+      return self.cycle.folder
+    return ""
+
   @property
   def cycle_task_objects_for_cache(self):
     """Changing task state must invalidate `workflow_state` on objects
@@ -141,6 +148,7 @@ class CycleTaskGroupObjectTask(mixins.WithContact,
       reflection.Attribute('finished_date', create=False, update=False),
       reflection.Attribute('verified_date', create=False, update=False),
       reflection.Attribute('allow_change_state', create=False, update=False),
+      reflection.Attribute('folder', create=False, update=False),
   )
 
   default_description = "<ol>"\
@@ -328,7 +336,15 @@ class CycleTaskGroupObjectTask(mixins.WithContact,
             "name",
             "id"
         ),
+        orm.Load(cls).joinedload("cycle").joinedload("workflow").undefer_group(
+            "Workflow_complete"
+        ),
     )
+
+  def log_json(self):
+    out_json = super(CycleTaskGroupObjectTask, self).log_json()
+    out_json["folder"] = self.folder
+    return out_json
 
 
 class CycleTaskable(object):

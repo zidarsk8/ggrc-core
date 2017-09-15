@@ -133,6 +133,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'audit',
       'assessment_type',
       reflection.Attribute('archived', create=False, update=False),
+      reflection.Attribute('folder', create=False, update=False),
       reflection.Attribute('object', create=False, update=False),
   )
 
@@ -146,11 +147,11 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
                                       ['user_name', 'email', 'name']),
       MultipleSubpropertyFullTextAttr('related_verifiers', 'verifiers',
                                       ['user_name', 'email', 'name']),
+      "folder",
   ]
 
   @classmethod
-  def indexed_query(cls):
-    query = super(Assessment, cls).indexed_query()
+  def _populate_query(cls, query):
     return query.options(
         orm.Load(cls).undefer_group(
             "Assessment_complete",
@@ -161,6 +162,19 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
             "Audit_complete",
         ),
     )
+
+  @classmethod
+  def eager_query(cls):
+    return cls._populate_query(super(Assessment, cls).eager_query())
+
+  @classmethod
+  def indexed_query(cls):
+    return cls._populate_query(super(Assessment, cls).indexed_query())
+
+  def log_json(self):
+    out_json = super(Assessment, self).log_json()
+    out_json["folder"] = self.folder
+    return out_json
 
   _tracked_attrs = {
       'description',
@@ -225,6 +239,10 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   @simple_property
   def archived(self):
     return self.audit.archived if self.audit else False
+
+  @simple_property
+  def folder(self):
+    return self.audit.folder if self.audit else ""
 
   @property
   def assessors(self):
