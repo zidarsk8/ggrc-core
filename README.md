@@ -141,7 +141,7 @@ Tests are your friend! Keep them running, keep them updated.
 #### For JavaScript tests:
 
 ```sh
-run_karma # To run karma with PhantomJS
+run_karma # To run karma with Chrome Headless
 run_karma_chrome # To run karma in host browser (open http://localhost:9876)
 ```
 
