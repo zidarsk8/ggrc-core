@@ -99,7 +99,7 @@ class TestExportSnapshots(TestCase):
             "Significance": u"key" if control.key_control else u"non-key",
             "State": control.status,
             "Last Deprecated Date": "",
-            "Test Plan": control.test_plan,
+            "Assessment Procedure": control.test_plan,
             "Title": control.title,
             "Type/Means": control.means.display_name,
             # Custom attributes
@@ -214,7 +214,7 @@ class TestExportSnapshots(TestCase):
             "Significance": u"",
             "State": u"Draft",
             "Last Deprecated Date": u"",
-            "Test Plan": u"",
+            "Assessment Procedure": u"",
             "Title": control.title,
             "Type/Means": u"",
             # Special snapshot export fields
@@ -421,7 +421,7 @@ class TestExportSnapshots(TestCase):
           "State": u"Draft",
           "Last Assessment Date": u"",
           "Last Deprecated Date": u"",
-          "Test Plan": u"",
+          "Assessment Procedure": u"",
           "Title": control.title,
           "Type/Means": u"",
           "Audit": audit.slug,

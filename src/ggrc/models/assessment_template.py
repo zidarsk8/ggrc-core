@@ -93,7 +93,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
           "filter_by": "_nop_filter",
       },
       "test_plan_procedure": {
-          "display_name": "Use Control Test Plan",
+          "display_name": "Use Control Assessment Procedure",
           "mandatory": False,
       },
       "template_object_type": {
