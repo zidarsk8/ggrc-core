@@ -10,6 +10,7 @@ import pytest
 from lib import dynamic_fixtures
 from lib.page import dashboard
 from lib.utils import selenium_utils, help_utils
+from lib.utils.selenium_utils import get_full_screenshot_as_base64
 
 # pylint: disable=redefined-outer-name
 pytest_plugins = "selenium", "xdist", "xvfb", "timeout", "flask", \
@@ -26,6 +27,37 @@ def _common_fixtures(fixture):
   fixture = dynamic_fixtures.dict_executed_fixtures[fixture]
   return (help_utils.get_single_obj(fixture)
           if not help_utils.is_multiple_objs(fixture) else fixture)
+
+
+@pytest.mark.hookwrapper
+def pytest_runtest_makereport(item, call):
+  """Replace common screenshot from html-report by full size screenshot."""
+  # pylint: disable=too-many-locals
+  outcome = yield
+  report = outcome.get_result()
+  summary = []
+  extra = getattr(report, "extra", [])
+  driver = getattr(item, "_driver", None)
+  xfail = hasattr(report, "wasxfail")
+  failure = (report.skipped and xfail) or (report.failed and not xfail)
+  when = item.config.getini("selenium_capture_debug").lower()
+  capture_debug = when == "always" or (when == "failure" and failure)
+  pytest_html = item.config.pluginmanager.getplugin("html")
+  if driver is not None and capture_debug and pytest_html is not None:
+    exclude = item.config.getini("selenium_exclude_debug").lower()
+    if "screenshot" not in exclude:
+      try:
+        screenshot = get_full_screenshot_as_base64(driver)
+        for ex in extra:
+          if ex["name"] == "Screenshot":
+            extra.remove(ex)
+        # add screenshot to the html report
+        extra.append(pytest_html.extras.image(screenshot, "Screenshot"))
+      except Exception as e:
+        summary.append("WARNING: Failed to gather screenshot: {0}".format(e))
+  if summary:
+    report.sections.append(("pytest-selenium", "\n".join(summary)))
+  report.extra = extra
 
 
 @pytest.fixture(scope="function")
