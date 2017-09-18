@@ -20,8 +20,9 @@ class StatusValidatedMixin(mixins.Stateful):
   IN_PROGRESS = u"InProgress"
   FINISHED = u"Finished"
   VERIFIED = u"Verified"
+  DEPRECATED = u"Deprecated"
 
-  NO_VALIDATION_STATES = [ASSIGNED, IN_PROGRESS, FINISHED]
+  NO_VALIDATION_STATES = [ASSIGNED, IN_PROGRESS, FINISHED, DEPRECATED]
   VALID_STATES = NO_VALIDATION_STATES + [VERIFIED]
 
   _api_attrs = reflection.ApiAttributes(

@@ -159,6 +159,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
             all_models.CycleTaskGroupObjectTask.IN_PROGRESS,
             all_models.CycleTaskGroupObjectTask.FINISHED,
             all_models.CycleTaskGroupObjectTask.DECLINED,
+            all_models.CycleTaskGroupObjectTask.DEPRECATED,
         ])
     ).union_all(
         task_query.filter(
@@ -166,6 +167,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
             model.status.in_([
                 all_models.CycleTaskGroupObjectTask.ASSIGNED,
                 all_models.CycleTaskGroupObjectTask.IN_PROGRESS,
+                all_models.CycleTaskGroupObjectTask.DEPRECATED,
             ])
         )
     )
