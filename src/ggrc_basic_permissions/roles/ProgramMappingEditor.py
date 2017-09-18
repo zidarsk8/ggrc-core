@@ -15,6 +15,7 @@ permissions = {
         "ObjectSection",
         "Program",
         "Relationship",
+        "ObjectFolder",
         "UserRole",
         "Context",
     ],
@@ -23,6 +24,7 @@ permissions = {
         "ObjectPerson",
         "ObjectSection",
         "Relationship",
+        "ObjectFolder"
     ],
     "view_object_page": [
         "__GGRC_ALL__"
@@ -38,5 +40,6 @@ permissions = {
         "ObjectPerson",
         "ObjectSection",
         "Relationship",
+        "ObjectFolder"
     ]
 }
