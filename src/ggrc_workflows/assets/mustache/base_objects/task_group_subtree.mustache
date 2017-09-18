@@ -4,26 +4,21 @@
 }}
 
   <li data-object-id="{{instance.id}}" data-object-type="{{instance.class.table_singular}}">
-    <div class="item-main objective-selector field-wrap" data-model="true" {{#instance}}{{data "model"}}{{/instance}}>
-      <div class="row-fluid">
-        <div class="span11">
-          <span class="inline-data-content oneline" rel="tooltip" title="{{instance.title}}">
-            <i class="fa fa-{{instance.class.table_singular}} color"></i>
-            {{instance.title}}
-          </span>
-        </div>
-        <div class="span1">
-          {{^if_equals parent_instance.workflow.reify.status 'Inactive'}}
+    <div class="item-main objective-selector" data-model="true" {{#instance}}{{data "model"}}{{/instance}}>
+      <span class="inline-data-content oneline" rel="tooltip" title="{{instance.title}}">
+        <i class="fa fa-{{instance.class.table_singular}} color"></i>
+        {{instance.title}}
+        {{^if_equals parent_instance.workflow.reify.status 'Inactive'}}
             {{#if mappings}}
-              {{#is_allowed_all 'delete' mappings}}
-                <a href="javascript://" data-toggle="unmap" data-id="{{instance.id}}" data-type="{{instance.class.shortName}}" class="deleteTrigger">
-                  <i class="fa fa-trash"></i>
-                  <span class="result" {{data 'result'}}></span>
-                </a>
-              {{/is_allowed_all}}
+                {{#is_allowed_all 'delete' mappings}}
+                    <a href="javascript://" data-toggle="unmap" data-id="{{instance.id}}"
+                       data-type="{{instance.class.shortName}}" class="deleteTrigger">
+                        <i class="fa fa-trash"></i>
+                        <span class="result" {{data 'result'}}></span>
+                    </a>
+                {{/is_allowed_all}}
             {{/if}}
-          {{/if_equals}}
-        </div>
-      </div>
+        {{/if_equals}}
+      </span>
     </div>
   </li>

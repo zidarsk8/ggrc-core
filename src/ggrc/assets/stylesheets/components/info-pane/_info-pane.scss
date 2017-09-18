@@ -30,6 +30,10 @@
     margin: 0;
     padding: 0;
     position: relative;
+
+    &--underlined {
+      border-bottom: 1px solid $lightGray;
+    }
   }
 
   &__section-title-icon {
