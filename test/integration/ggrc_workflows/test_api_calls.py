@@ -323,6 +323,16 @@ class TestTaskGroupTaskApiPost(WorkflowTestCase):
           }
       )
 
+  def test_tgt_has_view_dates(self):
+    """Test get view only fields for TGT."""
+    workflow = wf_factories.WorkflowFactory()
+    task_group = wf_factories.TaskGroupFactory(workflow=workflow)
+    tgt = wf_factories.TaskGroupTaskFactory(task_group=task_group)
+    resp = self.api.get(tgt, tgt.id)
+    self.assertIn("task_group_task", resp.json)
+    self.assertIn("view_start_date", resp.json["task_group_task"])
+    self.assertIn("view_end_date", resp.json["task_group_task"])
+
 
 @ddt.ddt
 class TestStatusApiPost(TestCase):
