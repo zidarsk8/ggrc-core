@@ -13,15 +13,17 @@ GGRC.Controllers.Modals("GGRC.Controllers.ApprovalWorkflow", {
     modal_title: "Submit for review",
     custom_save_button_text: "Submit",
     content_view: GGRC.mustache_path + "/wf_objects/approval_modal_content.mustache",
-    button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL
+    button_view : GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL,
+    afterFetch: function () {
+      this.attr("instance", new CMS.ModelHelpers.ApprovalWorkflow({
+        original_object : this.attr('instance')
+      }));
+    }
   }
 }, {
   init : function() {
     this.options.button_view = GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL;
     this._super.apply(this, arguments);
-    this.options.attr("instance", new CMS.ModelHelpers.ApprovalWorkflow({
-      original_object : this.options.instance
-    }));
   },
   "input[null-if-empty] change" : function(el, ev) {
     if(el.val() === "") {
