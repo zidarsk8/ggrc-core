@@ -48,13 +48,15 @@ class TestStates(unittest.TestCase):
   def test_audit_states(self):
     """Test states for Audit object"""
     audit_states = ('Planned', 'In Progress', 'Manager Review',
-                    'Ready for External Review', 'Completed')
+                    'Ready for External Review', 'Completed',
+                    'Deprecated')
     self._assert_states('Audit', audit_states, 'Planned')
 
   def test_assignable_states(self):
     """Test states for Assignable objects (Assessment)"""
     assignable_states = (
-        'In Progress', 'Completed', 'Not Started', 'Verified', 'In Review')
+        'In Progress', 'Completed', 'Not Started', 'Verified', 'In Review',
+        'Deprecated')
     self._assert_states('Assessment', assignable_states, 'Not Started')
 
   def test_issue_states(self):

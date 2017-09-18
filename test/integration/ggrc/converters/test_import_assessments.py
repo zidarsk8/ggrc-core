@@ -521,7 +521,7 @@ class TestAssessmentExport(TestCase):
     }]
     response = self.export_csv(data)
 
-    keys, vals = response.data.strip().split("\n")[9:11]
+    keys, vals = response.data.strip().split("\n")[10:12]
     keys = next(csv.reader(StringIO(keys), delimiter=","), [])
     vals = next(csv.reader(StringIO(vals), delimiter=","), [])
     instance_dict = dict(izip(keys, vals))
