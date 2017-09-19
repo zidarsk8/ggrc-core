@@ -172,19 +172,21 @@ class AssessmentResource(common.ExtendedResource):
     This function should return all data needed for displaying a full
     assessment.
     """
-    data = []
     relationships = self._get_relationships(assessment)
-    data.append({"Relationship": self._get_relationships_data(relationships)})
-    data.append({"Audit": self._get_audit_data(assessment)})
-    data.append(
-        {"Snapshot": self._get_snapshot_data(assessment, relationships)}
-    )
     urls, ref_urls, attachments = self._get_document_data(relationships)
-    data.append({"Document": urls})
-    data.append({"Document": ref_urls})
-    data.append({"Document": attachments})
-    data.append({"Comment": self._get_comment_data(relationships)})
-    data.append({"Person": self._get_people_data(relationships)})
+    urls_key = "Document:{}".format(models.Document.URL)
+    attachments_key = "Document:{}".format(models.Document.ATTACHMENT)
+    ref_urls_key = "Document:{}".format(models.Document.REFERENCE_URL)
+    data = {
+        "Relationship": self._get_relationships_data(relationships),
+        "Audit": self._get_audit_data(assessment),
+        "Snapshot": self._get_snapshot_data(assessment, relationships),
+        "Comment": self._get_comment_data(relationships),
+        "Person": self._get_people_data(relationships),
+        urls_key: urls,
+        ref_urls_key: ref_urls,
+        attachments_key: attachments,
+    }
     return data
 
   def related_objects(self, id):
