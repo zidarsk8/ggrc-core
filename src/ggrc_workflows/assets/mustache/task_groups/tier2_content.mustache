@@ -19,21 +19,21 @@
 {{/using}}
 
 {{#instance.description}}
-  <div class="row-fluid">
-    <div class="span12">
-      <h6>Description</h6>
-      <div class="tree-description">
-        {{{instance.description}}}
+  <div class="info-pane__section">
+      <div class="info-pane__section-title">
+          Description
       </div>
-    </div>
+      <div class="tree-description">
+          {{{instance.description}}}
+      </div>
   </div>
 {{/instance.description}}
 
-<div class="row-fluid">
-  <div class="span12">
-    <h6>Code</h6>
-    <div class="tree-description">
-      {{{instance.slug}}}
+<div class="info-pane__section">
+    <div class="info-pane__section-title">
+        Code
     </div>
-  </div>
+    <div class="info-pane__section-content">
+        {{{instance.slug}}}
+    </div>
 </div>

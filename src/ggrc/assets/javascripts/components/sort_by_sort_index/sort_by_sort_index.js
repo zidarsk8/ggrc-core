@@ -109,8 +109,9 @@
         var mapping = this.scope.attr('mapping');
         var instanceIndex = _.indexBy(_.pluck(mapping, 'instance'), 'id');
 
-        var instances = _.map(ui.item.parent().children('li'), function (el) {
-          return instanceIndex[$(el).data('object-id')];
+        var instances = _.map(ui.item.parent()
+          .children('.task_group_tasks__list-item'), function (el) {
+            return instanceIndex[$(el).data('object-id')];
         });
 
         var targetIndex = _.findIndex(instances, {
