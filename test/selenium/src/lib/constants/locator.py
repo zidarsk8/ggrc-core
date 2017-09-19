@@ -51,6 +51,8 @@ class Common(object):
   # panel locator
   PANEL_CSS = (By.CSS_SELECTOR, ".pin-content.cms_controllers_info_pin")
   OBJECT_AREA_CSS = (By.CSS_SELECTOR, ".object-area")
+  # alerts
+  ALERT_SUCCESS_CSS = (By.CSS_SELECTOR, ".content>.flash>.alert-success")
 
 
 class CommonAssessment(object):
@@ -611,7 +613,7 @@ class ModalDeleteObject(ModalCommonConfirmAction):
 
 class ModalUpdateObject(ModalCommonConfirmAction):
   """Locators for Update object modals."""
-  PERMALINK_ALERT = (By.CSS_SELECTOR, '.content>.flash>.alert-success')
+  PERMALINK_ALERT = Common.ALERT_SUCCESS_CSS
 
 
 class ModalCloneAudit(ModalCommonConfirmAction):
@@ -707,7 +709,7 @@ class WidgetInfoProgram(WidgetInfoPanel):
   PRIVATE_PROGRAM = (By.CSS_SELECTOR,
                      '[data-test-id="title_private_ec758af9"] h6')
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
-  PERMALINK_ALERT = (By.CSS_SELECTOR, ".content>.flash>.alert-success")
+  PERMALINK_ALERT = Common.ALERT_SUCCESS_CSS
   ALERT_LINK_COPIED = (By.CSS_SELECTOR, ".alert.alert-success")
   MODAL_DELETE = (By.ID, '[id="ajax-lhn_modal-javascript:--"]')
   MODAL_DELETE_CLOSE = (By.CSS_SELECTOR, ".lhn_modal .grcicon-x-grey")
