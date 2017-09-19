@@ -80,9 +80,9 @@ describe('can.mustache.helper.get_custom_attr_value', function () {
     expect(value).toEqual('No');
   });
 
-  it('return an empty string if customAttrItem is not undefined', function () {
+  it('return an empty string if customAttrItem is undefined', function () {
     var value;
-    fakeOptions.hash = getHash('correctValue');
+    fakeOptions.hash = getHash();
     value = helper(fakeAttr, fakeInstance, fakeOptions);
 
     expect(value).toEqual('');
