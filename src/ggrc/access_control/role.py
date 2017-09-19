@@ -41,10 +41,7 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
       db.Boolean, nullable=False, default=False)
 
   access_control_list = db.relationship(
-      'AccessControlList',
-      backref=sa.orm.backref('ac_role', lazy="joined"),
-      cascade='all, delete-orphan',
-      lazy='subquery')
+      'AccessControlList', backref='ac_role', cascade='all, delete-orphan')
 
   _reserved_names = {}
 
