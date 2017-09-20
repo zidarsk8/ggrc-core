@@ -54,6 +54,16 @@ var helpers = {
 
     }
 
+    // Parent mustache helper should not loop through all and expect this
+    // filter to work. It should only call this once with the correct CAV
+    // see tree-item-custom-attribute.mustache - for every single value that
+    // it needs to display, it loop through all values and then hopefully just
+    // displays the single one that matches the column name
+    // NOTE: The current implementation of the mustache file is also really bad
+    // for performance!
+    if (definition.title !== attr.attr_title) {
+      return ''
+    }
 
     if (definition) {
       if (customAttrItem.custom_attribute_id === definition.id) {
