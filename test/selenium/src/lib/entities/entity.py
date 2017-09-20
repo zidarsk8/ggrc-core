@@ -5,20 +5,24 @@
 # pylint: disable=too-few-public-methods
 
 import copy
-from datetime import datetime
 
+from datetime import datetime
 from dateutil import parser, tz
 
-from lib.utils import string_utils, help_utils
+from lib.utils import help_utils, string_utils
 
 
 class Representation(object):
   """Class that contains methods to update Entity."""
   # pylint: disable=import-error
+  # pylint: disable=too-many-public-methods
   diff_info = None  # {"equal": {"atr7": val7, ...}, "diff": {"atr3": val3}}
   attrs_names_to_compare = None
   attrs_names_to_repr = None
-  core_attrs_names_to_repr = ["type", "title", "id", "href", "url", "slug"]
+  core_attrs_names_to_repr = [
+      "type", "title", "id", "href", "url", "slug", "created_at"]
+  tree_view_attrs_to_exclude = (
+      "created_at", "updated_at", "custom_attributes")
 
   @classmethod
   def get_attrs_names_for_entities(cls, entity=None):
@@ -51,6 +55,7 @@ class Representation(object):
     result_remap_items = {
         els.TITLE: "title", els.ADMIN: "owners",
         els.CODE: "slug", els.REVIEW_STATE: "os_state",
+        els.OBJECT_REVIEW: "os_state",
         els.STATE: "status"
     }
     ui_remap_items = {
@@ -62,7 +67,10 @@ class Representation(object):
         els.CREATORS: "creator", els.CREATORS_: "creator",
         els.VERIFIERS: "verifier", els.VERIFIERS_: "verifier",
         element.AssessmentInfoWidget.COMMENTS_HEADER: "comments",
-        els.PRIMARY_CONTACT: "contact"
+        els.PRIMARY_CONTACTS: "contact", els.CREATED_AT: "created_at",
+        els.MODIFIED_BY: "modified_by", els.LAST_UPDATED_BY: "modified_by",
+        els.UPDATED_AT: "updated_at"
+
     }
     csv_remap_items = {
         csv.REVISION_DATE: "updated_at"
@@ -173,6 +181,11 @@ class Representation(object):
                     convert_attr_value_from_dict_to_unicode(k, v))
                 for k, v in obj_attr_value.iteritems()
                 if k in ["Assessor", "Creator", "Verifier"]}
+          # "modified_by" {"type": "Person", "id": x} to u'user@example.com'
+          if obj_attr_name == "modified_by":
+            from lib.service import rest_service
+            obj_attr_value = getattr(rest_service.ObjectsInfoService().get_obj(
+                obj=Entity.convert_dict_to_obj_repr(obj_attr_value)), "email")
           # {'name': u'Ex1', 'type': u'Ex2', ...} to u'Ex1'
           else:
             obj_attr_value = convert_attr_value_from_dict_to_unicode(
@@ -395,13 +408,7 @@ class Representation(object):
     """Compare entities' datetime ('created_at', 'updated_at') attributes."""
     # pylint: disable=superfluous-parens
     if (isinstance(self_datetime and other_datetime, (datetime, type(None)))):
-      return (
-          (self_datetime == other_datetime
-           if all(str(_.time()) != "00:00:00"
-                  for _ in [self_datetime, other_datetime])
-           else self_datetime.date() == other_datetime.date())
-          if self_datetime and other_datetime
-          else self_datetime == other_datetime)
+      return self_datetime == other_datetime
     else:
       Representation.attrs_values_types_error(
           self_attr=self_datetime, other_attr=other_datetime,
@@ -412,21 +419,35 @@ class Representation(object):
     """Compare entities' 'comments' attributes due to specific dictionaries'
     format values in list comments.
     """
-    if (isinstance(self_comments and other_comments, list) and
-            all(isinstance(self_comment and other_comment, dict) for
-                self_comment, other_comment
-                in zip(self_comments, other_comments))):
-      for self_comment, other_comment in zip(self_comments, other_comments):
-        is_comments_datetime_equal = (
-            Representation.compare_datetime(self_comment.get("created_at"),
-                                            other_comment.get("created_at")))
-        self_comment.pop("created_at")
-        other_comment.pop("created_at")
-        # compare comments' datetime and remaining attributes
-        return (is_comments_datetime_equal and
-                string_utils.is_subset_of_dicts(self_comment, other_comment))
-    if isinstance(self_comments and other_comments, (list, type(None))):
-      return self_comments == other_comments
+    # pylint: disable=no-else-return
+    if help_utils.is_multiple_objs(
+        string_utils.convert_list_elements_to_list(
+            [self_comments, other_comments]), (dict, type(None))):
+      if self_comments and other_comments:
+        is_comments_equal_list = []
+        for self_comment, other_comment in zip(self_comments, other_comments):
+          is_comments_equal = False
+          if self_comment and other_comment:
+            is_comments_equal = (
+                all((Representation.compare_datetime(
+                    self_comment.get("created_at"),
+                    other_comment.get("created_at")
+                ) if isinstance(_self and _other, datetime) else
+                    _self == _other) for _self, _other in zip(
+                    self_comment.iteritems(), other_comment.iteritems())))
+            # convert datetime to unicode in order to get visible repr
+            if self_comment.get("created_at"):
+              self_comment["created_at"] = unicode(
+                  self_comment.get("created_at"))
+            if other_comment.get("created_at"):
+              other_comment["created_at"] = unicode(
+                  other_comment.get("created_at"))
+          else:
+            is_comments_equal = self_comment == other_comment
+          is_comments_equal_list.append(is_comments_equal)
+        return all(is_equal for is_equal in is_comments_equal_list)
+      else:
+        return self_comments == other_comments
     else:
       Representation.attrs_values_types_error(
           self_attr=self_comments, other_attr=other_comments,
@@ -454,14 +475,17 @@ class Representation(object):
           is_equal = self.is_attrs_equal(
               attr_name=attr_name, self_attr_value=self_attr_value,
               other_attr_value=other_attr_value)
+          # convert datetime to unicode in order to get visible representation
+          if isinstance(self_attr_value, datetime):
+            self_attr_value = unicode(self_attr_value)
+          if isinstance(other_attr_value, datetime):
+            other_attr_value = unicode(other_attr_value)
         if is_equal:
           self_equal[attr_name] = self_attr_value
           other_equal[attr_name] = other_attr_value
         else:
-          self_diff[attr_name] = {"val": self_attr_value,
-                                  "type": type(self_attr_value)}
-          other_diff[attr_name] = {"val": other_attr_value,
-                                   "type": type(other_attr_value)}
+          self_diff[attr_name] = self_attr_value, type(self_attr_value)
+          other_diff[attr_name] = other_attr_value, type(other_attr_value)
       is_equal = self_diff == other_diff == {}
     return {"is_equal": is_equal,
             "self_diff": {"equal": self_equal, "diff": self_diff},
@@ -480,26 +504,49 @@ class Representation(object):
     ''*exclude_attrs' - tuple of excluding attributes names.
     """
     # pylint: disable=invalid-name
-    expected_objs = help_utils.convert_to_list(copy.deepcopy(expected_objs))
-    actual_objs = help_utils.convert_to_list(copy.deepcopy(actual_objs))
-    expected_excluded_attrs = [
-        dict([(attr, getattr(expected_obj, attr)) for attr in exclude_attrs])
-        for expected_obj in expected_objs]
-    actual_excluded_attrs = [
-        dict([(attr, getattr(actual_obj, attr)) for attr in exclude_attrs])
-        for actual_obj in actual_objs]
-    expected_objs_wo_excluded_attrs = [
-        expected_obj.update_attrs(**dict(
-            [(attr, ({None: None} if attr == "custom_attributes" else None))
-             for attr in exclude_attrs])) for expected_obj in expected_objs]
-    actual_objs_wo_excluded_attrs = [
-        actual_obj.update_attrs(**dict(
-            [(attr, ({None: None} if attr == "custom_attributes" else None))
-             for attr in exclude_attrs])) for actual_obj in actual_objs]
+    expected_excluded_attrs, actual_excluded_attrs = (
+        cls.extract_simple_collections(
+            exclude_attrs, actual_objs, *expected_objs))
+    expected_objs_wo_excluded_attrs, actual_objs_wo_excluded_attrs = (
+        cls.extract_objs(exclude_attrs, actual_objs, *expected_objs))
     return {"exp_objs_wo_ex_attrs": expected_objs_wo_excluded_attrs,
             "act_objs_wo_ex_attrs": actual_objs_wo_excluded_attrs,
             "exp_ex_attrs": expected_excluded_attrs,
             "act_ex_attrs": actual_excluded_attrs}
+
+  @staticmethod
+  def extract_objs_wo_excluded_attrs(objs, *exclude_attrs):
+    """Return list objects w/ attributes values set to 'None' according to
+    '*exclude_attrs' tuple attributes' names.
+    """
+    return [expected_obj.update_attrs(
+        **dict([(attr, ({None: None} if attr == "custom_attributes" else None))
+                for attr in exclude_attrs])) for expected_obj in objs]
+
+  @staticmethod
+  def extract_excluded_attrs_collection(objs, *exclude_attrs):
+    """Return list dictionaries (attributes' names and values) according to
+    '*exclude_attrs' tuple attributes' names.
+    """
+    # pylint: disable=invalid-name
+    return [dict([(attr, getattr(expected_obj, attr))
+                  for attr in exclude_attrs]) for expected_obj in objs]
+
+  @staticmethod
+  def extract_simple_collections(expected_objs, actual_objs, *exclude_attrs):
+    """Extract expected and actual simple collections excluded attributes."""
+    return [Representation.extract_excluded_attrs_collection(
+        copy.deepcopy(objs), *exclude_attrs)
+        for objs in [expected_objs, actual_objs]]
+
+  @staticmethod
+  def extract_objs(expected_objs, actual_objs, *exclude_attrs):
+    """Extract expected and actual objects w/ set to 'None' excluded
+    attributes.
+    """
+    return [Representation.extract_objs_wo_excluded_attrs(
+        copy.deepcopy(objs), *exclude_attrs)
+        for objs in [expected_objs, actual_objs]]
 
   @staticmethod
   def filter_objs_by_attrs(objs, **attrs):
@@ -523,7 +570,7 @@ class Entity(Representation):
   # pylint: disable=redefined-builtin
 
   def __init__(self, type=None, slug=None, id=None, title=None, href=None,
-               url=None):
+               url=None, created_at=None):
     # REST and UI
     self.type = type
     self.slug = slug  # code
@@ -531,6 +578,7 @@ class Entity(Representation):
     self.title = title
     self.href = href
     self.url = url
+    self.created_at = created_at
 
   @staticmethod
   def all_entities_classes():
@@ -579,12 +627,12 @@ class PersonEntity(Representation):
       "type", "name", "email"]
   attrs_names_to_repr = [
       "type", "id", "name", "href", "url", "email", "company",
-      "system_wide_role", "updated_at", "ac_role_id"]
+      "system_wide_role", "created_at", "updated_at", "ac_role_id"]
 
   def __init__(self, type=None, id=None, name=None, href=None, url=None,
                email=None, company=None, system_wide_role=None,
                updated_at=None, custom_attribute_definitions=None,
-               custom_attribute_values=None, ac_role_id=None):
+               custom_attribute_values=None, ac_role_id=None, created_at=None):
     super(PersonEntity, self).__init__()
     # REST and UI
     self.name = name
@@ -595,6 +643,7 @@ class PersonEntity(Representation):
     self.email = email
     self.company = company
     self.system_wide_role = system_wide_role  # authorizations
+    self.created_at = created_at
     self.updated_at = updated_at  # last updated datetime
     # REST
     self.custom_attribute_definitions = custom_attribute_definitions
@@ -616,12 +665,12 @@ class CustomAttributeEntity(Representation):
   attrs_names_to_repr = [
       "type", "title", "id", "href", "definition_type", "attribute_type",
       "helptext", "placeholder", "mandatory", "multi_choice_options",
-      "created_at", "modified_by"]
+      "created_at", "modified_by", "updated_at"]
 
   def __init__(self, title=None, id=None, href=None, type=None,
                definition_type=None, attribute_type=None, helptext=None,
                placeholder=None, mandatory=None, multi_choice_options=None,
-               created_at=None, modified_by=None):
+               created_at=None, modified_by=None, updated_at=None):
     super(CustomAttributeEntity, self).__init__()
     # REST and UI
     self.title = title
@@ -636,6 +685,7 @@ class CustomAttributeEntity(Representation):
     self.multi_choice_options = multi_choice_options
     # REST
     self.created_at = created_at  # to generate same CAs values
+    self.updated_at = updated_at  # last updated datetime
     self.modified_by = modified_by
 
   def __lt__(self, other):
@@ -649,15 +699,15 @@ class ProgramEntity(Entity):
 
   attrs_names_to_compare = [
       "custom_attributes", "manager", "os_state", "slug", "status", "title",
-      "type", "updated_at"]
+      "type", "created_at", "updated_at", "modified_by"]
   attrs_names_to_repr = Representation.core_attrs_names_to_repr + [
       "status", "manager", "contact", "secondary_contact", "updated_at",
-      "custom_attributes"]
+      "custom_attributes", "os_state", "modified_by"]
 
   def __init__(self, status=None, manager=None, contact=None,
                secondary_contact=None, updated_at=None, os_state=None,
                custom_attribute_definitions=None, custom_attribute_values=None,
-               custom_attributes=None):
+               custom_attributes=None, modified_by=None):
     super(ProgramEntity, self).__init__()
     # REST and UI
     self.status = status  # state
@@ -665,6 +715,7 @@ class ProgramEntity(Entity):
     self.contact = contact  # primary contact
     self.secondary_contact = secondary_contact
     self.updated_at = updated_at  # last updated datetime
+    self.modified_by = modified_by
     # REST
     self.os_state = os_state  # review state (e.g. "Unreviewed")
     self.custom_attribute_definitions = custom_attribute_definitions
@@ -680,15 +731,17 @@ class ControlEntity(Entity):
 
   attrs_names_to_compare = [
       "custom_attributes", "os_state", "slug", "status", "title", "type",
-      "updated_at", "owners"]
+      "owners", "created_at", "updated_at", "modified_by"]
   attrs_names_to_repr = Representation.core_attrs_names_to_repr + [
       "status", "contact", "secondary_contact", "updated_at",
-      "os_state", "custom_attributes", "access_control_list", "owners"]
+      "os_state", "custom_attributes", "access_control_list", "owners",
+      "modified_by"]
 
   def __init__(self, status=None, owners=None, contact=None,
                secondary_contact=None, updated_at=None, os_state=None,
                custom_attribute_definitions=None, custom_attribute_values=None,
-               custom_attributes=None, access_control_list=None):
+               custom_attributes=None, access_control_list=None,
+               modified_by=None):
     super(ControlEntity, self).__init__()
     # REST and UI
     self.status = status  # state (e.g. "Draft")
@@ -696,6 +749,7 @@ class ControlEntity(Entity):
     self.secondary_contact = secondary_contact
     self.updated_at = updated_at  # last updated datetime
     self.os_state = os_state  # review state (e.g. "Unreviewed")
+    self.modified_by = modified_by
     # REST
     self.owners = owners
     self.custom_attribute_definitions = custom_attribute_definitions
@@ -712,15 +766,16 @@ class ObjectiveEntity(Entity):
 
   attrs_names_to_compare = [
       "custom_attributes", "os_state", "slug", "status", "title", "type",
-      "updated_at"]
+      "created_at", "updated_at", "modified_by"]
   attrs_names_to_repr = Representation.core_attrs_names_to_repr + [
       "status", "contact", "secondary_contact", "updated_at",
-      "os_state", "custom_attributes", "access_control_list"]
+      "os_state", "custom_attributes", "access_control_list", "modified_by"]
 
   def __init__(self, status=None, owners=None, contact=None,
                secondary_contact=None, updated_at=None, os_state=None,
                custom_attribute_definitions=None, custom_attribute_values=None,
-               custom_attributes=None, access_control_list=None):
+               custom_attributes=None, access_control_list=None,
+               modified_by=None):
     super(ObjectiveEntity, self).__init__()
     # REST and UI
     self.status = status  # state
@@ -728,6 +783,7 @@ class ObjectiveEntity(Entity):
     self.secondary_contact = secondary_contact
     self.updated_at = updated_at  # last updated
     self.os_state = os_state  # review state
+    self.modified_by = modified_by
     # REST
     self.owners = owners
     self.custom_attribute_definitions = custom_attribute_definitions
@@ -744,18 +800,21 @@ class AuditEntity(Entity):
 
   attrs_names_to_compare = [
       "contact", "custom_attributes", "slug", "status", "title", "type",
-      "updated_at"]
+      "created_at", "updated_at", "modified_by"]
   attrs_names_to_repr = Representation.core_attrs_names_to_repr + [
-      "status", "program", "contact", "updated_at", "custom_attributes"]
+      "status", "program", "contact", "updated_at", "custom_attributes",
+      "modified_by"]
 
   def __init__(self, status=None, program=None, contact=None,
                updated_at=None, custom_attribute_definitions=None,
-               custom_attribute_values=None, custom_attributes=None):
+               custom_attribute_values=None, custom_attributes=None,
+               created_at=None, modified_by=None):
     super(AuditEntity, self).__init__()
     # REST and UI
     self.status = status  # status (e.g. "Planned")
     self.contact = contact  # audit captain
     self.updated_at = updated_at  # last updated datetime
+    self.modified_by = modified_by
     # REST
     self.custom_attribute_definitions = custom_attribute_definitions
     self.custom_attribute_values = custom_attribute_values
@@ -771,22 +830,24 @@ class AssessmentTemplateEntity(Entity):
   __hash__ = None
 
   attrs_names_to_compare = [
-      "custom_attributes", "slug", "title", "type", "updated_at", "status"]
+      "custom_attributes", "slug", "title", "type", "created_at", "updated_at",
+      "modified_by", "status"]
   attrs_names_to_repr = Representation.core_attrs_names_to_repr + [
       "audit", "template_object_type", "updated_at", "custom_attributes",
-      "status"]
+      "modified_by", "status"]
 
   def __init__(self, audit=None, default_people=None,
                template_object_type=None, updated_at=None,
                custom_attribute_definitions=None,
                custom_attribute_values=None, custom_attributes=None,
-               status=None):
+               modified_by=None, status=None):
     super(AssessmentTemplateEntity, self).__init__()
     # REST and UI
     self.status = status  # state ("Active", "Draft", "Deprecated")
     self.default_people = default_people  # {"verifiers": *, "assessors": *}
     self.template_object_type = template_object_type  # objs under asmt
     self.updated_at = updated_at  # last updated datetime
+    self.modified_by = modified_by
     # REST
     self.custom_attribute_definitions = custom_attribute_definitions
     self.custom_attribute_values = custom_attribute_values
@@ -806,18 +867,17 @@ class AssessmentEntity(Entity):
   attrs_names_to_compare = [
       "assessor", "creator", "verifier", "custom_attributes",
       "objects_under_assessment", "slug", "status", "title", "type",
-      "updated_at", "verified", "comments"]
+      "verified", "comments", "created_at", "updated_at", "modified_by"]
   attrs_names_to_repr = Representation.core_attrs_names_to_repr + [
       "status", "audit", "assessor", "creator", "verifier", "verified",
       "updated_at", "objects_under_assessment", "custom_attributes",
-      "comments"]
+      "comments", "modified_by"]
 
   def __init__(self, status=None, audit=None, owners=None, recipients=None,
                assignees=None, assessor=None, creator=None, verifier=None,
                verified=None, updated_at=None, objects_under_assessment=None,
-               os_state=None, custom_attribute_definitions=None,
-               custom_attribute_values=None, custom_attributes=None,
-               comments=None):
+               custom_attribute_definitions=None, custom_attribute_values=None,
+               custom_attributes=None, comments=None, modified_by=None):
     super(AssessmentEntity, self).__init__()
     # REST and UI
     self.status = status  # state (e.g. "Not Started")
@@ -827,11 +887,11 @@ class AssessmentEntity(Entity):
     self.verified = verified
     self.updated_at = updated_at  # last updated datetime
     self.objects_under_assessment = objects_under_assessment  # mapped objs
+    self.modified_by = modified_by
     # REST
     # {"Assessor": [{}, {}], "Creator": [{}, {}], "Verifier": [{}, {}]}
     self.assignees = assignees
     self.owners = owners
-    self.os_state = os_state  # review state (e.g. "Unreviewed")
     self.recipients = recipients  # "Verifier,Assessor,Creator"
     self.custom_attribute_definitions = custom_attribute_definitions
     self.custom_attribute_values = custom_attribute_values
@@ -848,22 +908,24 @@ class IssueEntity(Entity):
   __hash__ = None
 
   attrs_names_to_compare = [
-      "type", "title", "slug", "status", "contact"]
+      "type", "title", "slug", "status", "contact", "os_state", "created_at",
+      "updated_at", "modified_by"]
   attrs_names_to_repr = Representation.core_attrs_names_to_repr + [
       "status", "audit", "contact", "secondary_contact", "updated_at",
-      "custom_attributes", "access_control_list"]
+      "custom_attributes", "access_control_list", "os_state", "modified_by"]
 
   def __init__(self, status=None, audit=None, owners=None,
                contact=None, secondary_contact=None, updated_at=None,
                custom_attribute_definitions=None, os_state=None,
                custom_attribute_values=None, custom_attributes=None,
-               access_control_list=None):
+               access_control_list=None, modified_by=None):
     super(IssueEntity, self).__init__()
     # REST and UI
     self.status = status  # state
     self.contact = contact  # primary contact
     self.secondary_contact = secondary_contact
     self.updated_at = updated_at  # last updated datetime
+    self.modified_by = modified_by
     # REST
     self.owners = owners
     self.os_state = os_state  # review state (e.g. "Unreviewed")
