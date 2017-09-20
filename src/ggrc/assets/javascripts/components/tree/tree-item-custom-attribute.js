@@ -46,25 +46,17 @@ var helpers = {
     });
 
     if (definition) {
-      getValue = function (item) {
-        if (!(instance instanceof CMS.Models.Assessment)) {
-          // reify all models with the exception of the Assessment,
-          // because it has a different logic of work with the CA
-          item = item.reify();
+      if (!(instance instanceof CMS.Models.Assessment)) {
+        // reify all models with the exception of the Assessment,
+        // because it has a different logic of work with the CA
+        customAttrItem = customAttrItem.reify();
+      }
+      if (customAttrItem.custom_attribute_id === definition.id) {
+        if (formatValueMap[definition.attribute_type]) {
+          value = formatValueMap[definition.attribute_type](customAttrItem);
+        } else {
+          value = customAttrItem.attribute_value;
         }
-        if (item.custom_attribute_id === definition.id) {
-          if (formatValueMap[definition.attribute_type]) {
-            value = formatValueMap[definition.attribute_type](item);
-          } else {
-            value = item.attribute_value;
-          }
-        }
-      };
-
-      if (!_.isUndefined(customAttrItem)) {
-        getValue(customAttrItem);
-      } else {
-        can.each(instance.custom_attribute_values, getValue);
       }
     }
 
