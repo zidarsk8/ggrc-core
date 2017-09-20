@@ -87,9 +87,9 @@ def get_cls_widget(object_name, is_info=False, is_admin=False):
   base_cls = None
   if is_info:
     if object_name not in objects.ALL_SNAPSHOTABLE_OBJS:
-      base_cls = info_widget.InfoPanel
+      base_cls = info_widget.InfoWidget
     elif object_name in objects.ALL_SNAPSHOTABLE_OBJS:
-      base_cls = info_widget.SnapshotableInfoPanel
+      base_cls = info_widget.InfoWidget
     elif object_name == objects.PEOPLE:
       base_cls = info_widget.base.Widget
   elif is_admin:
