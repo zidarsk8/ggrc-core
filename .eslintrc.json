@@ -43,6 +43,9 @@
   },
 
   "rules": {
+    "comma-dangle": [
+      1, "always-multiline"
+    ],
     "id-length": [1, {
       "min": 2,
       "max": 25,
@@ -76,8 +79,10 @@
       "args": "none",
       "vars": "all"
     }],
+    "no-var": 0,
     // Each variable declaration must have its own var keyword
     "one-var": [2, "never"],
+    "prefer-rest-params": 0,
     "quote-props": [2, "as-needed", {
       "numbers": true,
       "keywords": true
