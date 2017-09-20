@@ -632,6 +632,7 @@ class CommonWidgetInfo(object):
   _MAIN_HEADER_XPATH = "//div[contains(@class,'pane-header')]" + _NOT_HIDDEN
   _HEADERS_AND_VALUES = (_INFO_WIDGET_XPATH +
                          '//div[starts-with(./@class, "span")]//h6/..')
+  WIDGET = Common.INFO_WIDGET
   HEADERS_AND_VALUES = (By.XPATH, _HEADERS_AND_VALUES)
   LCAS_HEADERS_AND_VALUES = None  # due to exist only for WidgetInfoAssessment
   CAS_HEADERS_AND_VALUES = (By.XPATH,
@@ -643,6 +644,16 @@ class CommonWidgetInfo(object):
   TITLE_ENTERED = (By.XPATH, _MAIN_HEADER_XPATH + "//h3")
   STATE = (By.XPATH, _MAIN_HEADER_XPATH +
            "//*[contains(normalize-space(./@class), 'state-value state')]")
+  TXT_FOOTER_CSS = (By.CSS_SELECTOR, ".info-widget-footer em")
+  TXT_MODIFIED_BY_CSS = (By.CSS_SELECTOR,
+                         '[data-test-id="text_manager_7a906d2e"]')
+  TXT_OBJECT_REVIEW = (
+      By.CSS_SELECTOR,
+      '{} [data-test-id="title_review_0ad9fbaf"] h6'.format(WIDGET))
+  TXT_OBJECT_REVIEWED = (
+      By.CSS_SELECTOR, "{} .object-approved".format(WIDGET))
+  LINK_SUBMIT_FOR_REVIEW = (By.CSS_SELECTOR,
+                            "{} .non-transparent".format(WIDGET))
   # user input elements
   BUTTON_3BBS = (By.XPATH, _INFO_WIDGET_XPATH + "//*[@data-toggle='dropdown']")
 
@@ -673,10 +684,6 @@ class WidgetInfoProgram(WidgetInfoPanel):
       By.CSS_SELECTOR, "{} .show-hidden-fields".format(WIDGET))
   TOGGLE_SHOW_ADVANCED_ACTIVATED = (
       By.CSS_SELECTOR, "{} .show-hidden-fields.active".format(WIDGET))
-  OBJECT_REVIEW = (
-      By.CSS_SELECTOR,
-      '{} [data-test-id="title_review_0ad9fbaf"] h6'.format(WIDGET))
-  SUBMIT_FOR_REVIEW = (By.CSS_SELECTOR, "{} .non-transparent".format(WIDGET))
   DESCRIPTION = (
       By.CSS_SELECTOR,
       '{} [data-test-id="title_description_7a906d2e"] h6'.format(WIDGET))
