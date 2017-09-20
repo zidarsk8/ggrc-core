@@ -4,7 +4,6 @@
 
 import os
 import re
-
 from dateutil import parser, tz
 
 from lib import factory
@@ -12,7 +11,7 @@ from lib.constants import objects, url, path, messages, element, regex
 from lib.entities.entity import Entity
 from lib.page import dashboard
 from lib.page.widget.info_widget import SnapshotableInfoPanel
-from lib.utils import selenium_utils, string_utils, file_utils
+from lib.utils import selenium_utils, file_utils, string_utils
 
 
 class BaseWebUiService(object):
@@ -71,8 +70,9 @@ class BaseWebUiService(object):
                   all(isinstance(comment, dict) for comment in val)):
             # extract datetime from u'(Creator) 08/20/2017 07:30:45 AM +03:00'
             scope[key] = [
-                {k: (parser.parse(re.sub(regex.TEXT_WITHIN_PARENTHESES, "", v)
-                                  ).replace(tzinfo=tz.tzutc())
+                {k: (parser.parse(re.sub(regex.TEXT_WITHIN_PARENTHESES,
+                                         string_utils.BLANK, v)
+                                  ).astimezone(tz=tz.tzutc())
                      if k == "created_at" else v)
                  for k, v in comment.iteritems()} for comment in val]
           # convert multiple values to list of strings and split if need it
@@ -82,8 +82,8 @@ class BaseWebUiService(object):
           # convert 'slug' from CSV for snapshoted objects u'*23eb72ac-4d9d'
           if (key == "slug" and
                   (self.obj_name in objects.ALL_SNAPSHOTABLE_OBJS) and
-                  "*" in val):
-            scope[key] = val.replace("*", "")
+                  string_utils.STAR in val):
+            scope[key] = val.replace(string_utils.STAR, string_utils.BLANK)
     return [
         Entity.update_objs_attrs_values_by_entered_data(
             obj_or_objs=factory_obj, is_allow_none_values=False, **scope) for
@@ -139,15 +139,16 @@ class BaseWebUiService(object):
         entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
 
   def get_list_objs_from_info_panels(self, src_obj, objs):
-    """Get and return list of objects from Info panels navigate by objects'
-    titles ('objs' can be list of objects or one object).
+    """Get and return object or list of objects from Info panels navigate by
+    objects' titles ('objs' can be list of objects or one object).
     """
     def get_obj_from_info_panel(src_obj, obj):
       scope = self.get_scope_from_info_panel(src_obj, obj)
       return self._create_list_objs(
           entity_factory=self.entities_factory_cls, list_scopes=[scope])[0]
     return ([get_obj_from_info_panel(src_obj, obj) for obj in objs] if
-            isinstance(objs, list) else get_obj_from_info_panel(src_obj, objs))
+            isinstance(objs, list) else
+            get_obj_from_info_panel(src_obj, objs))
 
   def get_list_objs_from_csv(self, path_to_export_dir):
     """Get and return list of objects from CSV file of exported objects in
@@ -378,8 +379,9 @@ class SnapshotsWebUiService(BaseWebUiService):
     Tree View by title and update object to latest version via Info panel.
     """
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
-    obj_info_panel = (objs_widget.tree_view.
-                      select_member_by_title(title=obj.title))
+    obj_info_panel = (
+        objs_widget.tree_view.select_member_by_title(title=obj.title).
+        panel.snapshotable)
     obj_info_panel.open_link_get_latest_ver().confirm_update()
     objs_widget.tree_view.wait_loading_after_actions()
     selenium_utils.get_when_invisible(
@@ -389,7 +391,8 @@ class SnapshotsWebUiService(BaseWebUiService):
     """Open generic widget of mapped objects, select snapshotable object from
     Tree View by title and check via Info panel that object is updateble.
     """
-    obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
+    obj_info_panel = (self.open_info_panel_of_obj_by_title(src_obj, obj).
+                      panel.snapshotable)
     return obj_info_panel.is_link_get_latest_ver_exist()
 
 
@@ -406,11 +409,11 @@ class AuditsService(BaseWebUiService):
     audit_info_page = self.open_info_page_of_obj(audit_obj)
     (audit_info_page.
      open_info_3bbs().select_clone().confirm_clone(is_full=True))
-    cloned_audit_obj = self.entities_factory_cls().create_empty()
-    cloned_audit_obj.url = self.driver.current_url
+    cloned_audit_obj = self.entities_factory_cls().create_empty().update_attrs(
+        url=self.driver.current_url)
     actual_cloned_audit_obj = self.get_obj_from_info_page(obj=cloned_audit_obj)
-    actual_cloned_audit_obj.url = cloned_audit_obj.url
-    return actual_cloned_audit_obj
+    self.driver.refresh()
+    return actual_cloned_audit_obj.update_attrs(url=cloned_audit_obj.url)
 
   def bulk_update_via_info_page(self, audit_obj):
     """Open Info page of Audit object and bulk update objects to
@@ -471,8 +474,9 @@ class AssessmentsService(BaseWebUiService):
     """
     # pylint: disable=invalid-name
     src_obj_info_page = self.open_info_page_of_obj(src_obj)
-    (src_obj_info_page.open_info_3bbs().select_edit().
-     edit_minimal_data(title="[EDITED]" + src_obj.title).save_and_close())
+    (src_obj_info_page.open_info_3bbs().select_edit().edit_minimal_data(
+        title=element.AssessmentInfoWidget.TITLE_EDITED_PART + src_obj.title).
+        save_and_close())
     return self.info_widget_cls(self.driver)
 
   def get_log_pane_validation_result(self, obj):
