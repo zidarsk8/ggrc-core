@@ -42,14 +42,18 @@ var helpers = {
       // reify all models with the exception of the Assessment,
       // because it has a different logic of work with the CA
       customAttrItem = customAttrItem.reify();
+
+      // Getting a definition should be done with a def map for both
+      // assessment and non assessment objects.
+      definition = _.find(instance.custom_attribute_definitions, function(def){
+        return def.id == customAttrItem.custom_attribute_id
+      });
+    } else {
+      // In assessments we have custom attr def right in the CAV
+      definition = customAttrItem.def
+
     }
 
-    can.each(GGRC.custom_attr_defs, function (item) {
-      if (item.definition_type === instance.class.table_singular &&
-        item.title === attr.attr_name) {
-        definition = item;
-      }
-    });
 
     if (definition) {
       if (customAttrItem.custom_attribute_id === definition.id) {
