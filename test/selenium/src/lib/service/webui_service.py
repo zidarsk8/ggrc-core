@@ -8,6 +8,7 @@ from dateutil import parser, tz
 
 from lib import factory
 from lib.constants import objects, url, path, messages, element, regex
+from lib.element.tab_containers import DashboardWidget
 from lib.entities.entity import Entity
 from lib.page import dashboard
 from lib.page.widget.info_widget import SnapshotableInfoPanel
@@ -371,6 +372,24 @@ class BaseWebUiService(object):
                     tree_view.open_create())
     modal_create.fill_minimal_data(title=obj.title, code=obj.slug)
     return modal_create
+
+  def is_dashboard_tab_exist(self, obj):
+    """Navigate to InfoPage of object and check is 'Dashboard' tab exist.
+      - Return: bool.
+    """
+    self.open_info_page_of_obj(obj)
+    return dashboard.Dashboard(self.driver).is_dashboard_tab_exist()
+
+  def get_items_from_dashboard_widget(self, obj):
+    """Navigate to InfoPage of object. Open 'Dashboard' tab and return
+    all urls of dashboard items.
+      - Return: list of str
+    """
+    self.open_info_page_of_obj(obj)
+    dashboard_widget_elem = (
+        dashboard.Dashboard(self.driver).select_dashboard_tab())
+    return DashboardWidget(
+        self.driver, dashboard_widget_elem).get_all_tab_names_and_urls()
 
 
 class SnapshotsWebUiService(BaseWebUiService):

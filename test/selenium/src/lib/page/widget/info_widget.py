@@ -320,7 +320,7 @@ class Assessments(InfoWidget):
     self.workflow_container = tab_containers.AssessmentTabContainer(
         self._driver,
         self._driver.find_element(*self._locators.ASMT_TAB_CONTAINER_CSS))
-    self.workflow_container.switch_to_tab(
+    self.workflow_container.tab_controller.active_tab = (
         element.AssessmentTabContainer.ASMT_TAB)
     self.mapped_objects_lbl_txt = self._elements.MAPPED_OBJECTS.upper()
     self.mapped_objects_titles_txt = self._get_mapped_objs_titles_txt()
@@ -366,7 +366,7 @@ class Assessments(InfoWidget):
     """Get an Assessment object's text scope (headers' (real and synthetic)
     and values' txt) from Info Widget navigating through the Assessment's tabs.
     """
-    self.workflow_container.switch_to_tab(
+    self.workflow_container.tab_controller.active_tab = (
         element.AssessmentTabContainer.OTHER_ATTRS_TAB)
     self.mapped_objects_titles_txt += self._get_mapped_objs_titles_txt()
     cas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes()

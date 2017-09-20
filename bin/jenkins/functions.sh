@@ -112,6 +112,7 @@ selenium_tests () {
   docker exec -id ${PROJECT}_dev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     source /vagrant/bin/init_test_env
+    export DASHBOARD_INTEGRATION='on'
     launch_ggrc
   "
 

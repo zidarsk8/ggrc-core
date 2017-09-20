@@ -13,9 +13,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote import webelement
 
 from lib import constants, exception, mixin
-from lib.constants import url, messages, objects, locator
+from lib.constants import url, messages, objects
 from lib.constants.element import MappingStatusAttrs, WidgetBar
 from lib.constants.locator import CommonDropdownMenu
+from lib.decorator import lazy_property
 from lib.entities.entity import Entity
 from lib.utils import selenium_utils, help_utils
 
@@ -569,7 +570,7 @@ class Widget(AbstractPage):
     checking existing of element by locator and URL's logic."""
     is_info_page = False
     if selenium_utils.is_element_exist(
-        self._driver, (By.XPATH, locator.Common.INFO_PAGE_XPATH)
+        self._driver, (By.XPATH, constants.locator.Common.INFO_PAGE_XPATH)
     ):
       if ((self.widget_name_from_url == WidgetBar.INFO.lower()) or
           ((objects.get_singular(self.source_obj_from_url) ==
@@ -1004,9 +1005,6 @@ class AbstractTabContainer(Component):
     super(AbstractTabContainer, self).__init__(driver)
     self.container_element = container_element
     self._locators = self._get_locators()
-    from lib.element.elements_list import TabController
-    self._tab_controller = TabController(
-        self._driver, self._locators.TAB_CONTROLLER)
     self.tabs = self._tabs()
 
   def _get_locators(self):
@@ -1017,17 +1015,15 @@ class AbstractTabContainer(Component):
     """Return element of active tab"""
     return self.container_element.find_element(*self._locators.TAB_CONTENT)
 
-  def get_tab_object(self, tab_name):
-    """Switch to tab, then return object of this tab, for example:
-    Page Object or any
-    """
-    self._tab_controller.active_tab = tab_name
-    return self.tabs[tab_name](
-        self._driver, self._get_active_tab_element())
-
   def _tabs(self):
     """Abstract method. Should return dict. {'tab_name': tab_object, ...}"""
     raise NotImplementedError
+
+  @lazy_property
+  def tab_controller(self):
+    """Lazy property for dashboard controller."""
+    from lib.element.elements_list import TabController
+    return TabController(self._driver, self._locators.TAB_CONTROLLER)
 
 
 class AbstractTable(Component):

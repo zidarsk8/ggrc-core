@@ -9,11 +9,13 @@
 import pytest
 
 from lib import base
+from lib.constants import value_aliases as aliases
 from lib.constants.element import ObjectStates, objects
 from lib.entities import entities_factory
+from lib.service import webui_service, rest_service
 from lib.entities.entity import Representation
 from lib.factory import get_cls_rest_service
-from lib.service import webui_service
+from lib.utils.string_utils import random_string
 
 
 class TestAuditPage(base.Test):
@@ -296,3 +298,36 @@ class TestAuditPage(base.Test):
     self.general_equal_assert(
         [expected_program], actual_programs,
         *Representation.tree_view_attrs_to_exclude)
+
+  @pytest.mark.smoke_tests
+  def test_dashboard_gca(self, new_control_rest, selenium, base_url):
+    # pylint: disable=anomalous-backslash-in-string
+    """Check Dashboard Tab is exist if 'Dashboard' GCA filled
+    with right value. Possible values match to regexp r"^https?://[^\s]+$".
+    Steps:
+      - Create 'Dashboard' gcas for object.
+      - Fill with values
+      - Check if 'Dashboard' tab exist.
+      - Navigate to 'Dashboard' tab.
+      - Check only GCAs filled with right values displayed on the tab.
+    """
+    urls = ["https://gmail.by/", "https://www.google.com/",
+            base_url, random_string(), "ftp://something.com/"]
+    cads_rest_service = rest_service.CustomAttributeDefinitionsService()
+    gca_defs = (cads_rest_service.create_dashboard_gcas(
+        new_control_rest.type, count=len(urls)))
+    control_rest_service = rest_service.ControlsService()
+    control_rest_service.update_obj(
+        obj=new_control_rest, custom_attributes=dict(
+            zip([gca_def.id for gca_def in gca_defs], urls)))
+    expected_result = dict(zip(
+        [gca_def.title.replace(aliases.DASHBOARD + "_", "")
+         for gca_def in gca_defs], urls[:3]))
+    control_ui_service = webui_service.ControlsService(selenium)
+    is_dashboard_tab_exist = (control_ui_service.
+                              is_dashboard_tab_exist(new_control_rest))
+    assert is_dashboard_tab_exist
+    actual_result = (control_ui_service.
+                     get_items_from_dashboard_widget(new_control_rest))
+    assert expected_result == actual_result
+    cads_rest_service.delete_objs(gca_defs)

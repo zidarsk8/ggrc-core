@@ -18,3 +18,6 @@ CONTAINS_OP = "~"
 WIDTH = "width"
 HEIGHT = "height"
 SCROLL_HEIGHT = "scrollHeight"
+
+DEFAULT = "default"
+DASHBOARD = "Dashboard"
