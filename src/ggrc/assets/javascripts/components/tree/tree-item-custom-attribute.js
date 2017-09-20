@@ -65,12 +65,9 @@ var helpers = {
     }
 
     if (formatValueMap[definition.attribute_type]) {
-      value = formatValueMap[definition.attribute_type](customAttrItem);
-    } else {
-      value = customAttrItem.attribute_value;
+      return formatValueMap[definition.attribute_type](customAttrItem);
     }
-
-    return value || '';
+    return customAttrItem.attribute_value;
   }
 };
 
