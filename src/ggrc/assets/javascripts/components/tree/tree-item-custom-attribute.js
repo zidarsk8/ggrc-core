@@ -21,11 +21,11 @@ var helpers = {
     var customAttrItem;
     var getValue;
     var formatValueMap = {
-      Checkbox: function (value) {
-        return ['No', 'Yes'][value];
+      Checkbox: function (item) {
+        return ['No', 'Yes'][item.attribute_value];
       },
-      Date: function (value) {
-        return GGRC.Utils.formatDate(value, true);
+      Date: function (item) {
+        return GGRC.Utils.formatDate(item.attribute_value, true);
       }
     };
 
@@ -56,8 +56,7 @@ var helpers = {
                 item.attribute_object.reify() : null
             }));
           } else if (formatValueMap[definition.attribute_type]) {
-            value =
-              formatValueMap[definition.attribute_type](item.attribute_value);
+            value = formatValueMap[definition.attribute_type](item);
           } else {
             value = item.attribute_value;
           }
