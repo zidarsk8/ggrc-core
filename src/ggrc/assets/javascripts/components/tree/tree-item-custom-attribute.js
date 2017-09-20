@@ -38,6 +38,12 @@ var helpers = {
     instance = Mustache.resolve(instance);
     customAttrItem = Mustache.resolve(customAttrItem);
 
+    if (!(instance instanceof CMS.Models.Assessment)) {
+      // reify all models with the exception of the Assessment,
+      // because it has a different logic of work with the CA
+      customAttrItem = customAttrItem.reify();
+    }
+
     can.each(GGRC.custom_attr_defs, function (item) {
       if (item.definition_type === instance.class.table_singular &&
         item.title === attr.attr_name) {
@@ -46,11 +52,6 @@ var helpers = {
     });
 
     if (definition) {
-      if (!(instance instanceof CMS.Models.Assessment)) {
-        // reify all models with the exception of the Assessment,
-        // because it has a different logic of work with the CA
-        customAttrItem = customAttrItem.reify();
-      }
       if (customAttrItem.custom_attribute_id === definition.id) {
         if (formatValueMap[definition.attribute_type]) {
           value = formatValueMap[definition.attribute_type](customAttrItem);
