@@ -51,7 +51,6 @@ var helpers = {
     } else {
       // In assessments we have custom attr def right in the CAV
       definition = customAttrItem.def
-
     }
 
     // Parent mustache helper should not loop through all and expect this
@@ -65,14 +64,10 @@ var helpers = {
       return ''
     }
 
-    if (definition) {
-      if (customAttrItem.custom_attribute_id === definition.id) {
-        if (formatValueMap[definition.attribute_type]) {
-          value = formatValueMap[definition.attribute_type](customAttrItem);
-        } else {
-          value = customAttrItem.attribute_value;
-        }
-      }
+    if (formatValueMap[definition.attribute_type]) {
+      value = formatValueMap[definition.attribute_type](customAttrItem);
+    } else {
+      value = customAttrItem.attribute_value;
     }
 
     return value || '';
