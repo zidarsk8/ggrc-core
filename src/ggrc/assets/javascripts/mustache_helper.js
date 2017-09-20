@@ -2319,6 +2319,10 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
             } else if (typeValueMap[item.attributeType]) {
               value = typeValueMap[item.attributeType][item.attribute_value] ||
                 'No';
+            } else {
+              value = (item.attributeType === 'date') ?
+                GGRC.Utils.formatDate(item.attribute_value, true) :
+                item.attribute_value;
             }
           }
         };
@@ -2330,7 +2334,7 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
         }
       }
 
-      return value;
+      return value || '';
     });
 
   Mustache.registerHelper('pretty_role_name', function (name) {
