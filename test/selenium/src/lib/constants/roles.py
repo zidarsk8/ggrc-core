@@ -25,8 +25,8 @@ AUDIT_LEAD = "Audit Lead"
 AUDITORS = "Auditors"
 PRINCIPAL_ASSIGNEE = "Principal Assignee"
 SECONDARY_ASSIGNEE = "Secondary Assignee"
-PRIMARY_CONTACT = "Primary Contacts"
-SECONDARY_CONTACT = "Secondary Contact"
+PRIMARY_CONTACTS = "Primary Contacts"
+SECONDARY_CONTACTS = "Secondary Contacts"
 
 # user names
 DEFAULT_USER = "Example User"
