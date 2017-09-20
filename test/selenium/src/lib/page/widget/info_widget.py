@@ -3,17 +3,21 @@
 """Info widgets."""
 # pylint: disable=useless-super-delegation
 
+import re
+
 from lib import base
 from lib.constants import locator, objects, element, roles
 from lib.constants.locator import WidgetInfoAssessment
 from lib.element import widget_info, tab_containers
 from lib.page.modal import update_object
-from lib.utils import selenium_utils
+from lib.utils import selenium_utils, string_utils
 
 
-class CommonInfo(base.Widget):
+class InfoWidget(base.Widget):
   """Abstract class of common info for Info pages and Info panels."""
+  # pylint: disable=too-many-instance-attributes
   _locators = locator.CommonWidgetInfo
+  _elements = element.Common
   dropdown_settings_cls = widget_info.CommonInfoDropdownSettings
   locator_headers_and_values = None
   all_headers_and_values = []
@@ -22,17 +26,51 @@ class CommonInfo(base.Widget):
   list_all_values_text = []
 
   def __init__(self, driver):
-    super(CommonInfo, self).__init__(driver)
-    self.locator_headers_and_values = self._locators.HEADERS_AND_VALUES
+    super(InfoWidget, self).__init__(driver)
+    self.is_info_page_not_panel = (
+        self.widget_name_from_url == element.WidgetBar.INFO.lower())
+    self.cls_name = self.__class__.__name__.lower()
+    if self.is_info_page_not_panel:
+      self.info_page_footer = base.Label(
+          self._driver, self._locators.TXT_FOOTER_CSS)
+      self.modified_by = self.info_page_footer.element.find_element(
+          *self._locators.TXT_MODIFIED_BY_CSS)
+      _created_at_text, _updated_at_text = (
+          self.info_page_footer.text.split(string_utils.WHITESPACE * 6))
+      self.created_at_text = (
+          re.sub("Created at", string_utils.BLANK, _created_at_text))
+      self.updated_at_text = (
+          _updated_at_text.splitlines()[1].replace("on ", string_utils.BLANK))
+      self.list_all_headers_text.extend(
+          [self._elements.CREATED_AT, self._elements.MODIFIED_BY,
+           self._elements.UPDATED_AT])
+      self.list_all_values_text.extend(
+          [self.created_at_text, self.modified_by.text, self.updated_at_text])
+    else:
+      self.is_snapshotable = (
+          True if self.cls_name in objects.ALL_SNAPSHOTABLE_OBJS else False)
+      self.panel = InfoPanel(self._driver, self.is_snapshotable)
+    if self.cls_name in objects.ALL_OBJS_W_REVIEW_STATE:
+      self.object_review = base.Label(
+          self._driver, self._locators.TXT_OBJECT_REVIEW)
 
+  @property
   def title(self):
     return base.Label(self._driver, self._locators.TITLE)
 
+  @property
   def title_entered(self):
     return base.Label(self._driver, self._locators.TITLE_ENTERED)
 
+  @property
   def state(self):
     return base.Label(self._driver, self._locators.STATE)
+
+  @property
+  def review_state(self):
+    return (element.ReviewStates.REVIEWED if selenium_utils.is_element_exist(
+        self._driver, self._locators.TXT_OBJECT_REVIEWED) else
+        element.ReviewStates.UNREVIEWED)
 
   def open_info_3bbs(self):
     """Click to 3BBS button on Info page or Info panel to open info 3BBS modal.
@@ -54,9 +92,9 @@ class CommonInfo(base.Widget):
     if custom_scopes_locator:
       self.all_headers_and_values = self._driver.find_elements(
           *custom_scopes_locator)
-    if not custom_scopes_locator and self.locator_headers_and_values:
+    if not custom_scopes_locator and self._locators.HEADERS_AND_VALUES:
       self.all_headers_and_values = self._driver.find_elements(
-          *self.locator_headers_and_values)
+          *self._locators.HEADERS_AND_VALUES)
     header_and_value = (
         next((scope.text.splitlines() + [None]
               if len(scope.text.splitlines()) == 1
@@ -80,7 +118,7 @@ class CommonInfo(base.Widget):
                    else self._locators.LCAS_HEADERS_AND_VALUES)
     self.cas_headers_and_values = self._driver.find_elements(*cas_locator)
 
-    dict_cas_scopes = {None: None}
+    dict_cas_scopes = {}
     if len(self.cas_headers_and_values) >= 1:
       list_text_cas_scopes = []
       for scope in self.cas_headers_and_values:
@@ -130,12 +168,14 @@ class CommonInfo(base.Widget):
     return dict(zip(self.list_all_headers_text, self.list_all_values_text))
 
 
-class InfoPanel(CommonInfo):
+class InfoPanel(object):
   """Class for Info Panels."""
   _locators = locator.WidgetInfoPanel
 
-  def __init__(self, driver):
-    super(InfoPanel, self).__init__(driver)
+  def __init__(self, driver, is_snapshotable):
+    self._driver = driver
+    if is_snapshotable:
+      self.snapshotable = SnapshotableInfoPanel(self._driver)
 
   def button_maximize_minimize(self):
     """Button (toggle) maximize and minimize for Info Panels."""
@@ -147,7 +187,7 @@ class InfoPanel(CommonInfo):
     return self._driver.find_element(*self._locators.BUTTON_CLOSE)
 
 
-class SnapshotableInfoPanel(InfoPanel):
+class SnapshotableInfoPanel(object):
   """Class for Info Panels of snapshotable objects."""
   # pylint: disable=too-few-public-methods
   _locators = locator.WidgetSnapshotsInfoPanel
@@ -155,7 +195,7 @@ class SnapshotableInfoPanel(InfoPanel):
   locator_link_get_latest_ver = _locators.LINK_GET_LAST_VER
 
   def __init__(self, driver):
-    super(SnapshotableInfoPanel, self).__init__(driver)
+    self._driver = driver
 
   def snapshot_obj_version(self):
     """Label of snapshot version"""
@@ -175,7 +215,7 @@ class SnapshotableInfoPanel(InfoPanel):
         self._driver, self.locator_link_get_latest_ver)
 
 
-class Programs(InfoPanel):
+class Programs(InfoWidget):
   """Model for program object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
   _locators = locator.WidgetInfoProgram
@@ -187,9 +227,10 @@ class Programs(InfoPanel):
     self.show_advanced = base.Toggle(
         self._driver, self._locators.TOGGLE_SHOW_ADVANCED)
     self.show_advanced.toggle()
-    self.object_review = base.Label(self._driver, self._locators.OBJECT_REVIEW)
+    self.object_review = base.Label(
+        self._driver, self._locators.TXT_OBJECT_REVIEW)
     self.submit_for_review = base.Label(
-        self._driver, self._locators.SUBMIT_FOR_REVIEW)
+        self._driver, self._locators.LINK_SUBMIT_FOR_REVIEW)
     self.description = base.Label(self._driver, self._locators.DESCRIPTION)
     self.description_entered = base.Label(
         self._driver, self._locators.DESCRIPTION_ENTERED)
@@ -208,7 +249,7 @@ class Programs(InfoPanel):
         self._driver, self._locators.EFFECTIVE_DATE_ENTERED)
 
 
-class Workflows(InfoPanel):
+class Workflows(InfoWidget):
   """Model for Workflow object Info pages and Info panels."""
   _locators = locator.WidgetInfoWorkflow
 
@@ -216,7 +257,7 @@ class Workflows(InfoPanel):
     super(Workflows, self).__init__(driver)
 
 
-class Audits(InfoPanel):
+class Audits(InfoWidget):
   """Model for Audit object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
   _locators = locator.WidgetInfoAudit
@@ -233,17 +274,17 @@ class Audits(InfoPanel):
             self._elements.CODE.upper()))
     self.cas_text = self.get_headers_and_values_dict_from_cas_scopes()
     # all obj scopes
-    self.list_all_headers_text = [
-        self._elements.CAS.upper(), self.title().text,
-        self._elements.STATUS.upper(), self.audit_lead_text,
-        self.code_text]
-    self.list_all_values_text = [
-        self.cas_text, self.title_entered().text,
-        objects.get_normal_form(self.state().text),
-        self.audit_lead_entered_text, self.code_entered_text]
+    self.list_all_headers_text.extend(
+        [self._elements.CAS.upper(), self.title.text,
+         self._elements.STATUS.upper(), self.audit_lead_text,
+         self.code_text])
+    self.list_all_values_text.extend(
+        [self.cas_text, self.title_entered.text,
+         objects.get_normal_form(self.state.text),
+         self.audit_lead_entered_text, self.code_entered_text])
 
 
-class Assessments(InfoPanel):
+class Assessments(InfoWidget):
   """Model for Assessment object Info pages and Info panels."""
   # pylint: disable=invalid-name
   # pylint: disable=too-many-instance-attributes
@@ -253,7 +294,7 @@ class Assessments(InfoPanel):
 
   def __init__(self, driver):
     super(Assessments, self).__init__(driver)
-    self.verified = selenium_utils.is_element_exist(
+    self.is_verified = selenium_utils.is_element_exist(
         self._driver, self._locators.ICON_VERIFIED)
     self.workflow_container = tab_containers.AssessmentTabContainer(
         self._driver,
@@ -302,20 +343,20 @@ class Assessments(InfoPanel):
         *self._locators.CODE_VALUE_CSS).text
     # todo: implement separate entities' model for asmts' lcas and gcas
     cas_text.update(self.lcas_text)
-    self.list_all_headers_text = [
-        self._elements.CAS.upper(), self._elements.TITLE,
-        self._elements.STATE.upper(),
-        self._elements.VERIFIED.upper(),
-        self.creators_text, self.assignees_text,
-        self.verifiers_text, self._elements.MAPPED_OBJECTS.upper(),
-        code_text, self.comments.header_lbl.text]
-    self.list_all_values_text = [
-        cas_text, self.title_entered().text,
-        objects.get_normal_form(self.state().text),
-        self.verified,
-        self.creators_entered_text, self.assignees_entered_text,
-        self.verifiers_entered_text, self.mapped_objects_titles_text,
-        code_entered_text, self.comments_scopes]
+    self.list_all_headers_text.extend(
+        [self._elements.CAS.upper(), self._elements.TITLE,
+         self._elements.STATE.upper(),
+         self._elements.VERIFIED.upper(),
+         self.creators_text, self.assignees_text,
+         self.verifiers_text, self._elements.MAPPED_OBJECTS.upper(),
+         code_text, self.comments.header_lbl.text])
+    self.list_all_values_text.extend(
+        [cas_text, self.title_entered.text,
+         objects.get_normal_form(self.state.text),
+         self.is_verified,
+         self.creators_entered_text, self.assignees_entered_text,
+         self.verifiers_entered_text, self.mapped_objects_titles_text,
+         code_entered_text, self.comments_scopes])
     return dict(zip(self.list_all_headers_text, self.list_all_values_text))
 
   def click_complete(self):
@@ -328,7 +369,7 @@ class Assessments(InfoPanel):
     base.Button(self._driver, WidgetInfoAssessment.BUTTON_REJECT).click()
 
 
-class AssessmentTemplates(InfoPanel):
+class AssessmentTemplates(InfoWidget):
   """Model for Assessment Template object Info pages and Info panels."""
   _locators = locator.WidgetInfoAssessmentTemplate
 
@@ -336,7 +377,7 @@ class AssessmentTemplates(InfoPanel):
     super(AssessmentTemplates, self).__init__(driver)
 
 
-class Issues(InfoPanel):
+class Issues(InfoWidget):
   """Model for Issue object Info pages and Info panels."""
   _locators = locator.WidgetInfoIssue
   _elements = element.IssueInfoWidget
@@ -347,17 +388,15 @@ class Issues(InfoPanel):
         self.get_header_and_value_text_from_custom_scopes(
             self._elements.CODE.upper()))
     # all obj scopes
-    self.list_all_headers_text = [
-        self.title().text,
-        self._elements.STATE.upper(),
-        self.code_text]
-    self.list_all_values_text = [
-        self.title_entered().text,
-        objects.get_normal_form(self.state().text),
-        self.code_entered_text]
+    self.list_all_headers_text.extend(
+        [self.title.text, self._elements.STATE.upper(),
+         self.code_text])
+    self.list_all_values_text.extend(
+        [self.title_entered.text, objects.get_normal_form(self.state.text),
+         self.code_entered_text])
 
 
-class Regulations(SnapshotableInfoPanel):
+class Regulations(InfoWidget):
   """Model for Assessment object Info pages and Info panels."""
   _locators = locator.WidgetInfoRegulations
 
@@ -365,7 +404,7 @@ class Regulations(SnapshotableInfoPanel):
     super(Regulations, self).__init__(driver)
 
 
-class Policies(SnapshotableInfoPanel):
+class Policies(InfoWidget):
   """Model for Policy object Info pages and Info panels."""
   _locators = locator.WidgetInfoPolicy
 
@@ -373,7 +412,7 @@ class Policies(SnapshotableInfoPanel):
     super(Policies, self).__init__(driver)
 
 
-class Standards(SnapshotableInfoPanel):
+class Standards(InfoWidget):
   """Model for Standard object Info pages and Info panels."""
   _locators = locator.WidgetInfoStandard
 
@@ -381,7 +420,7 @@ class Standards(SnapshotableInfoPanel):
     super(Standards, self).__init__(driver)
 
 
-class Contracts(SnapshotableInfoPanel):
+class Contracts(InfoWidget):
   """Model for Contract object Info pages and Info panels."""
   _locators = locator.WidgetInfoContract
 
@@ -389,7 +428,7 @@ class Contracts(SnapshotableInfoPanel):
     super(Contracts, self).__init__(driver)
 
 
-class Clauses(SnapshotableInfoPanel):
+class Clauses(InfoWidget):
   """Model for Clause object Info pages and Info panels."""
   _locators = locator.WidgetInfoClause
 
@@ -397,7 +436,7 @@ class Clauses(SnapshotableInfoPanel):
     super(Clauses, self).__init__(driver)
 
 
-class Sections(SnapshotableInfoPanel):
+class Sections(InfoWidget):
   """Model for Section object Info pages and Info panels."""
   _locators = locator.WidgetInfoSection
 
@@ -405,7 +444,7 @@ class Sections(SnapshotableInfoPanel):
     super(Sections, self).__init__(driver)
 
 
-class Controls(SnapshotableInfoPanel):
+class Controls(InfoWidget):
   """Model for Control object Info pages and Info panels."""
   # pylint: disable=too-many-instance-attributes
   _locators = locator.WidgetInfoControl
@@ -423,21 +462,23 @@ class Controls(SnapshotableInfoPanel):
             self._locators.PEOPLE_HEADERS_AND_VALUES))
     self.primary_contact_text, self.primary_contact_entered_text = (
         self.get_header_and_value_text_from_custom_scopes(
-            self._elements.PRIMARY_CONTACT.upper(),
+            self._elements.PRIMARY_CONTACTS.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
     self.cas_text = self.get_headers_and_values_dict_from_cas_scopes()
     # scope
-    self.list_all_headers_text = [
-        self._elements.CAS.upper(), self.title().text,
-        self._elements.STATE.upper(), self.admin_text,
-        self.primary_contact_text, self.code_text]
-    self.list_all_values_text = [
-        self.cas_text, self.title_entered().text,
-        objects.get_normal_form(self.state().text), self.admin_entered_text,
-        self.primary_contact_entered_text, self.code_entered_text]
+    self.list_all_headers_text.extend(
+        [self._elements.CAS.upper(), self.title.text,
+         self._elements.STATE.upper(), self.admin_text,
+         self.primary_contact_text, self.code_text,
+         self.object_review.text])
+    self.list_all_values_text = (
+        [self.cas_text, self.title_entered.text,
+         objects.get_normal_form(self.state.text), self.admin_entered_text,
+         self.primary_contact_entered_text, self.code_entered_text,
+         self.review_state])
 
 
-class Objectives(SnapshotableInfoPanel):
+class Objectives(InfoWidget):
   """Model for Objective object Info pages and Info panels."""
   _locators = locator.WidgetInfoObjective
 
@@ -451,7 +492,7 @@ class People(base.Widget):
   _locators = locator.WidgetInfoPeople
 
 
-class OrgGroups(SnapshotableInfoPanel):
+class OrgGroups(InfoWidget):
   """Model for Org Group object Info pages and Info panels."""
   _locators = locator.WidgetInfoOrgGroup
   dropdown_settings_cls = widget_info.OrgGroups
@@ -460,7 +501,7 @@ class OrgGroups(SnapshotableInfoPanel):
     super(OrgGroups, self).__init__(driver)
 
 
-class Vendors(SnapshotableInfoPanel):
+class Vendors(InfoWidget):
   """Model for Vendor object Info pages and Info panels."""
   _locators = locator.WidgetInfoVendor
 
@@ -468,7 +509,7 @@ class Vendors(SnapshotableInfoPanel):
     super(Vendors, self).__init__(driver)
 
 
-class AccessGroup(SnapshotableInfoPanel):
+class AccessGroup(InfoWidget):
   """Model for Access Group object Info pages and Info panels."""
   _locators = locator.WidgetInfoAccessGroup
 
@@ -476,7 +517,7 @@ class AccessGroup(SnapshotableInfoPanel):
     super(AccessGroup, self).__init__(driver)
 
 
-class Systems(SnapshotableInfoPanel):
+class Systems(InfoWidget):
   """Model for System object Info pages and Info panels."""
   _locators = locator.WidgetInfoSystem
   dropdown_settings_cls = widget_info.Systems
@@ -485,7 +526,7 @@ class Systems(SnapshotableInfoPanel):
     super(Systems, self).__init__(driver)
 
 
-class Processes(SnapshotableInfoPanel):
+class Processes(InfoWidget):
   """Model for Process object Info pages and Info panels."""
   _locators = locator.WidgetInfoProcess
   dropdown_settings_cls = widget_info.Processes
@@ -494,7 +535,7 @@ class Processes(SnapshotableInfoPanel):
     super(Processes, self).__init__(driver)
 
 
-class DataAssets(SnapshotableInfoPanel):
+class DataAssets(InfoWidget):
   """Model for Data Asset object Info pages and Info panels."""
   _locators = locator.WidgetInfoDataAsset
   dropdown_settings_cls = widget_info.DataAssets
@@ -503,7 +544,7 @@ class DataAssets(SnapshotableInfoPanel):
     super(DataAssets, self).__init__(driver)
 
 
-class Products(SnapshotableInfoPanel):
+class Products(InfoWidget):
   """Model for Product object Info pages and Info panels."""
   _locators = locator.WidgetInfoProduct
   dropdown_settings_cls = widget_info.Products
@@ -512,7 +553,7 @@ class Products(SnapshotableInfoPanel):
     super(Products, self).__init__(driver)
 
 
-class Projects(SnapshotableInfoPanel):
+class Projects(InfoWidget):
   """Model for Project object Info pages and Info panels."""
   _locators = locator.WidgetInfoProject
   dropdown_settings_cls = widget_info.Projects
@@ -521,7 +562,7 @@ class Projects(SnapshotableInfoPanel):
     super(Projects, self).__init__(driver)
 
 
-class Facilities(SnapshotableInfoPanel):
+class Facilities(InfoWidget):
   """Model for Facility object Info pages and Info panels."""
   _locators = locator.WidgetInfoFacility
 
@@ -529,7 +570,7 @@ class Facilities(SnapshotableInfoPanel):
     super(Facilities, self).__init__(driver)
 
 
-class Markets(SnapshotableInfoPanel):
+class Markets(InfoWidget):
   """Model for Market object Info pages and Info panels."""
   _locators = locator.WidgetInfoMarket
 
@@ -537,7 +578,7 @@ class Markets(SnapshotableInfoPanel):
     super(Markets, self).__init__(driver)
 
 
-class Risks(SnapshotableInfoPanel):
+class Risks(InfoWidget):
   """Model for Risk object Info pages and Info panels."""
   _locators = locator.WidgetInfoRisk
 
@@ -545,7 +586,7 @@ class Risks(SnapshotableInfoPanel):
     super(Risks, self).__init__(driver)
 
 
-class Threats(SnapshotableInfoPanel):
+class Threats(InfoWidget):
   """Model for Threat object Info pages and Info panels."""
   _locators = locator.WidgetInfoThreat
 
@@ -553,7 +594,7 @@ class Threats(SnapshotableInfoPanel):
     super(Threats, self).__init__(driver)
 
 
-class Dashboard(CommonInfo):
+class Dashboard(InfoWidget):
   """Model for Dashboard object Info pages and Info panels."""
   _locators = locator.Dashboard
 
