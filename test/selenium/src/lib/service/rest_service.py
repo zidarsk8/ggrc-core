@@ -269,19 +269,34 @@ class ObjectsInfoService(HelpRestService):
     """Get and return snapshoted object according to 'origin_obj' and
     'paren_obj'.
     """
-    snapshoted_obj_item = (
+    snapshoted_obj_dict = (
         BaseRestService.get_items_from_resp(self.client.create_object(
             type=self.endpoint, object_name=EntitiesFactory.obj_snapshot,
             filters=query.Query.expression_get_snapshoted_obj(
                 obj_type=origin_obj.type, obj_id=origin_obj.id,
                 parent_type=paren_obj.type,
                 parent_id=paren_obj.id))).get("values")[0])
-    return Entity.convert_dict_to_obj_repr(snapshoted_obj_item)
+    return Entity.convert_dict_to_obj_repr(snapshoted_obj_dict)
 
-  def get_obj_by_id(self, obj_type, obj_id):
-    """Get and return object according to passed 'obj_type' and 'obj_id'"""
-    obj = (BaseRestService.get_items_from_resp(self.client.create_object(
-        type=self.endpoint, object_name=unicode(obj_type),
-        filters=query.Query.expression_get_obj_by_id(obj_id))).get(
+  def get_obj(self, obj):
+    """Get and return object according to 'obj.type' and 'obj.id'."""
+    obj_dict = (BaseRestService.get_items_from_resp(self.client.create_object(
+        type=self.endpoint, object_name=unicode(obj.type),
+        filters=query.Query.expression_get_obj_by_id(obj.id))).get(
         "values")[0])
-    return Entity.convert_dict_to_obj_repr(obj)
+    return Entity.convert_dict_to_obj_repr(obj_dict)
+
+  def get_comment_obj(self, paren_obj, comment_description):
+    """Get and return comment object according to 'paren_obj' type) and
+    comment_description 'paren_obj'. As default 'is_sort_by_created_at' and if
+    even comments have the same descriptions query return selection w/ latest
+    created datetime.
+    """
+    comment_obj_dict = (
+        BaseRestService.get_items_from_resp(self.client.create_object(
+            type=self.endpoint, object_name=EntitiesFactory.obj_comment,
+            filters=query.Query.expression_get_comment_by_desc(
+                parent_type=paren_obj.type, parent_id=paren_obj.id,
+                comment_desc=comment_description),
+            order_by=[{"name": "created_at", "desc": True}])).get("values")[0])
+    return Entity.convert_dict_to_obj_repr(comment_obj_dict)
