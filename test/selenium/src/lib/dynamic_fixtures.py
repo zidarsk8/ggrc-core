@@ -9,8 +9,7 @@
 import copy
 
 from lib import factory
-from lib.constants import element, objects
-from lib.constants.test import batch
+from lib.constants import element, objects, counters
 from lib.entities.entities_factory import CustomAttributeDefinitionsFactory
 from lib.entities.entity import Entity
 from lib.page.widget import info_widget
@@ -141,7 +140,7 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
         has_cas = True
         fixture_params = fixture_params.replace("_with_cas", "")
       obj_name = fixture_params
-      obj_count = batch.COUNT
+      obj_count = counters.BATCH_COUNT
       if objects.get_plural(obj_name) in objects.ALL_OBJS:
         obj_name = objects.get_plural(obj_name)
         obj_count = 1
@@ -155,7 +154,7 @@ def generate_common_fixtures(*fixtures):  # noqa: ignore=C901
     """
     fixture_params = fixture.replace("new_", "").replace("_ui", "")
     obj_name = fixture_params
-    obj_count = batch.COUNT
+    obj_count = counters.BATCH_COUNT
     if (objects.get_plural(obj_name) in objects.ALL_OBJS and
             objects.get_plural(obj_name) != objects.PROGRAMS):
       obj_name = objects.get_plural(obj_name)
