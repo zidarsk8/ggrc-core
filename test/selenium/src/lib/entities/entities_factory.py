@@ -72,7 +72,7 @@ class ObjectPersonsFactory(EntitiesFactory):
   def create(cls, type=None, id=None, name=None, href=None, url=None,
              email=None, company=None, system_wide_role=None, updated_at=None,
              custom_attribute_definitions=None, custom_attribute_values=None,
-             custom_attributes=None):
+             custom_attributes=None, created_at=None):
     """Create Person object.
     Random values will be used for name.
     Predictable values will be used for type, email and system_wide_role.
@@ -84,7 +84,7 @@ class ObjectPersonsFactory(EntitiesFactory):
         system_wide_role=system_wide_role, updated_at=updated_at,
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values,
-        custom_attributes=custom_attributes)
+        custom_attributes=custom_attributes, created_at=created_at)
     return person_entity
 
   @classmethod
@@ -207,7 +207,7 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
   def create(cls, title=None, id=None, href=None, type=None,
              definition_type=None, attribute_type=None, helptext=None,
              placeholder=None, mandatory=None, multi_choice_options=None,
-             updated_at=None, modified_by=None):
+             updated_at=None, modified_by=None, created_at=None):
     """Create Custom Attribute object. CA object attribute 'definition_type'
     is used as default for REST operations e.g. 'risk_assessment', for UI
     operations need convert to normal form used method objects.get_normal_form
@@ -222,7 +222,7 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
         attribute_type=attribute_type, helptext=helptext,
         placeholder=placeholder, mandatory=mandatory,
         multi_choice_options=multi_choice_options, updated_at=updated_at,
-        modified_by=modified_by)
+        modified_by=modified_by, created_at=created_at)
     return ca_entity
 
   @classmethod
@@ -294,7 +294,7 @@ class ProgramsFactory(EntitiesFactory):
              slug=None, status=None, manager=None, contact=None,
              secondary_contact=None, updated_at=None, os_state=None,
              custom_attribute_definitions=None, custom_attribute_values=None,
-             custom_attributes=None):
+             custom_attributes=None, created_at=None, modified_by=None):
     """Create Program object.
     Random values will be used for title and slug.
     Predictable values will be used for type, status, manager, contact.
@@ -307,7 +307,8 @@ class ProgramsFactory(EntitiesFactory):
         updated_at=updated_at, os_state=os_state,
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values,
-        custom_attributes=custom_attributes)
+        custom_attributes=custom_attributes, created_at=created_at,
+        modified_by=modified_by)
     return program_entity
 
   @classmethod
@@ -320,6 +321,7 @@ class ProgramsFactory(EntitiesFactory):
     random_program.status = unicode(element.ObjectStates.DRAFT)
     random_program.manager = cls.default_person.__dict__
     random_program.contact = cls.default_person.__dict__
+    random_program.os_state = unicode(element.ReviewStates.UNREVIEWED)
     return random_program
 
 
@@ -344,7 +346,8 @@ class ControlsFactory(EntitiesFactory):
              slug=None, status=None, owners=None, contact=None,
              secondary_contact=None, updated_at=None, os_state=None,
              custom_attribute_definitions=None, custom_attribute_values=None,
-             custom_attributes=None, access_control_list=None):
+             custom_attributes=None, access_control_list=None, created_at=None,
+             modified_by=None):
     """Create Control object.
     Random values will be used for title and slug.
     Predictable values will be used for type, status, owners and contact.
@@ -358,7 +361,8 @@ class ControlsFactory(EntitiesFactory):
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values,
         custom_attributes=custom_attributes,
-        access_control_list=access_control_list)
+        access_control_list=access_control_list, created_at=created_at,
+        modified_by=modified_by)
     return control_entity
 
   @classmethod
@@ -376,6 +380,7 @@ class ControlsFactory(EntitiesFactory):
                                               random_control.owners[0]),
         ObjectPersonsFactory().get_acl_member(roles.PRIMARY_CONTACT_ID,
                                               random_control.contact)]
+    random_control.os_state = unicode(element.ReviewStates.UNREVIEWED)
     return random_control
 
 
@@ -399,7 +404,7 @@ class ObjectivesFactory(EntitiesFactory):
              slug=None, status=None, owners=None, contact=None,
              secondary_contact=None, updated_at=None, os_state=None,
              custom_attribute_definitions=None, custom_attribute_values=None,
-             custom_attributes=None):
+             custom_attributes=None, created_at=None, modified_by=None):
     """Create Objective object.
     Random values will be used for title and slug.
     Predictable values will be used for type, status, owners.
@@ -412,7 +417,8 @@ class ObjectivesFactory(EntitiesFactory):
         updated_at=updated_at, os_state=os_state,
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values,
-        custom_attributes=custom_attributes)
+        custom_attributes=custom_attributes, created_at=created_at,
+        modified_by=modified_by)
     return objective_entity
 
   @classmethod
@@ -424,6 +430,7 @@ class ObjectivesFactory(EntitiesFactory):
     random_objective.slug = cls.generate_slug()
     random_objective.status = unicode(element.ObjectStates.DRAFT)
     random_objective.owners = [cls.default_person.__dict__]
+    random_objective.os_state = unicode(element.ReviewStates.UNREVIEWED)
     return random_objective
 
 
@@ -441,8 +448,8 @@ class AuditsFactory(EntitiesFactory):
     # pylint: disable=anomalous-backslash-in-string
     return [Entity.update_objs_attrs_values_by_entered_data(
         obj_or_objs=copy.deepcopy(audit),
-        title=audit.title + " - copy " + str(num),
-        slug=None, updated_at=None, href=None, url=None, id=None)
+        title=audit.title + " - copy " + str(num), slug=None, created_at=None,
+        updated_at=None, href=None, url=None, id=None)
         for num in xrange(1, count_to_clone + 1)]
 
   @classmethod
@@ -457,11 +464,13 @@ class AuditsFactory(EntitiesFactory):
   def create(cls, type=None, id=None, title=None, href=None, url=None,
              slug=None, status=None, program=None, contact=None,
              updated_at=None, custom_attribute_definitions=None,
-             custom_attribute_values=None, custom_attributes=None):
+             custom_attribute_values=None, custom_attributes=None,
+             created_at=None, modified_by=None):
     """Create Audit object.
     Random values will be used for title and slug.
     Predictable values will be used for type, status, contact.
     """
+    # pylint: disable=too-many-locals
     audit_entity = cls._create_random_audit()
     audit_entity = Entity.update_objs_attrs_values_by_entered_data(
         obj_or_objs=audit_entity, is_allow_none_values=False, type=type,
@@ -469,7 +478,8 @@ class AuditsFactory(EntitiesFactory):
         program=program, contact=contact, updated_at=updated_at,
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values,
-        custom_attributes=custom_attributes)
+        custom_attributes=custom_attributes, created_at=created_at,
+        modified_by=modified_by)
     return audit_entity
 
   @classmethod
@@ -513,7 +523,8 @@ class AssessmentTemplatesFactory(EntitiesFactory):
              slug=None, audit=None, default_people=None,
              template_object_type=None, updated_at=None,
              custom_attribute_definitions=None, custom_attribute_values=None,
-             custom_attributes=None, status=None):
+             custom_attributes=None, created_at=None, modified_by=None,
+             status=None):
     """Create Assessment Template object.
     Random values will be used for title and slug.
     Predictable values will be used for type, template_object_type and
@@ -528,7 +539,8 @@ class AssessmentTemplatesFactory(EntitiesFactory):
         template_object_type=template_object_type, updated_at=updated_at,
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values,
-        custom_attributes=custom_attributes, status=status)
+        custom_attributes=custom_attributes, created_at=created_at,
+        modified_by=modified_by, status=status)
     return asmt_tmpl_entity
 
   @classmethod
@@ -589,8 +601,8 @@ class AssessmentsFactory(EntitiesFactory):
              slug=None, status=None, owners=None, audit=None, recipients=None,
              assignees=None, verified=None, verifier=None, creator=None,
              assessor=None, updated_at=None, objects_under_assessment=None,
-             os_state=None, custom_attribute_definitions=None,
-             custom_attribute_values=None, custom_attributes=None):
+             custom_attribute_definitions=None, custom_attribute_values=None,
+             custom_attributes=None, created_at=None, modified_by=None):
     """Create Assessment object.
     Random values will be used for title and slug.
     Predictable values will be used for type, status, recipients,
@@ -604,10 +616,11 @@ class AssessmentsFactory(EntitiesFactory):
         owners=owners, audit=audit, recipients=recipients, assignees=assignees,
         verified=verified, verifier=verifier, creator=creator,
         assessor=assessor, updated_at=updated_at,
-        objects_under_assessment=objects_under_assessment, os_state=os_state,
+        objects_under_assessment=objects_under_assessment,
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values,
-        custom_attributes=custom_attributes)
+        custom_attributes=custom_attributes, created_at=created_at,
+        modified_by=modified_by)
     return asmt_entity
 
   @classmethod
@@ -650,7 +663,8 @@ class IssuesFactory(EntitiesFactory):
              slug=None, status=None, audit=None, owners=None, contact=None,
              secondary_contact=None, updated_at=None, os_state=None,
              custom_attribute_definitions=None, custom_attribute_values=None,
-             custom_attributes=None, access_control_list=None):
+             custom_attributes=None, access_control_list=None, created_at=None,
+             modified_by=None):
     """Create Issue object.
     Random values will be used for title and slug.
     Predictable values will be used for type, status, owners and contact.
@@ -665,7 +679,8 @@ class IssuesFactory(EntitiesFactory):
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values,
         custom_attributes=custom_attributes,
-        access_control_list=access_control_list)
+        access_control_list=access_control_list, created_at=created_at,
+        modified_by=modified_by)
     return issue_entity
 
   @classmethod
@@ -683,4 +698,5 @@ class IssuesFactory(EntitiesFactory):
                                               random_issue.owners[0]),
         ObjectPersonsFactory().get_acl_member(roles.PRIMARY_CONTACT_ID,
                                               random_issue.contact)]
+    random_issue.os_state = unicode(element.ReviewStates.UNREVIEWED)
     return random_issue
