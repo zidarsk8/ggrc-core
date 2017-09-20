@@ -17,7 +17,8 @@ RUN usermod -u 1000 seluser
 WORKDIR /selenium
 USER seluser
 
-# Chrome webdriver
+# Specify version of Chrome webdriver using 'CHROME_DRIVER_VERSION' argument
+# Latest released version will be used by default
 ARG CHROME_DRIVER_VERSION="latest"
 RUN CD_VER=$(if [ ${CHROME_DRIVER_VERSION:-latest} = "latest" ]; then echo\
   $(wget -qO- https://chromedriver.storage.googleapis.com/LATEST_RELEASE); \
