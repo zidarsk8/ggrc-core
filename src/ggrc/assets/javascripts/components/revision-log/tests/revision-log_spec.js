@@ -42,18 +42,13 @@ describe('GGRC.Components.revisionLog', function () {
       viewModel = GGRC.Components.getViewModel('revisionLog');
     });
 
-    xit('displays a toaster error if fetching the data fails', function () {
-      var $fakeElement = {
-        trigger: jasmine.createSpy()
-      };
-
-      spyOn(window, '$').and.returnValue($fakeElement);
+    it('displays a toaster error if fetching the data fails', function () {
+      var trigger = spyOn($.prototype, 'trigger');
 
       viewModel.fetchItems();
       dfdFetchData.reject('Server error');
 
-      expect(window.$).toHaveBeenCalled();
-      expect($fakeElement.trigger).toHaveBeenCalledWith(
+      expect(trigger).toHaveBeenCalledWith(
         'ajax:flash',
         {error: 'Failed to fetch revision history data.'}
       );

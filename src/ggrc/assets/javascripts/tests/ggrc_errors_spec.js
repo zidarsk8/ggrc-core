@@ -7,7 +7,7 @@
 
 xdescribe('GGRC.Errors module', function () {
   var notifier;
-  var $fake;
+  var trigger;
   var _originalMessages;
 
   beforeAll(function () {
@@ -18,23 +18,17 @@ xdescribe('GGRC.Errors module', function () {
       '401': 'Mock auth invalid message'
     };
 
-    $fake = {
-      trigger: jasmine.createSpy()
-    };
+    trigger = spyOn($.prototype, 'trigger');
   });
 
   afterAll(function () {
     GGRC.Errors.messages = _originalMessages;
   });
 
-  beforeEach(function () {
-    spyOn(window, '$').and.returnValue($fake);
-  });
-
   afterEach(function () {
     expect(window.$).toHaveBeenCalledWith('body');
-    expect($fake.trigger.calls.count()).toEqual(1);
-    $fake.trigger.calls.reset();
+    expect(trigger.calls.count()).toEqual(1);
+    trigger.calls.reset();
   });
 
   describe('notifier method', function () {
@@ -46,7 +40,7 @@ xdescribe('GGRC.Errors module', function () {
       describe('and warning type', function () {
         it('if all parameters empty', function () {
           notifier();
-          expect($fake.trigger).toHaveBeenCalledWith('ajax:flash',
+          expect(trigger).toHaveBeenCalledWith('ajax:flash',
             {warning: 'Some error!'});
         });
       });
@@ -55,7 +49,7 @@ xdescribe('GGRC.Errors module', function () {
         it('and error type', function () {
           notifier('error');
 
-          expect($fake.trigger).toHaveBeenCalledWith('ajax:flash',
+          expect(trigger).toHaveBeenCalledWith('ajax:flash',
             {error: 'Some error!'});
         });
       });
@@ -72,7 +66,7 @@ xdescribe('GGRC.Errors module', function () {
         it('for unknown errors', function () {
           notifier()({status: 666});
 
-          expect($fake.trigger).toHaveBeenCalledWith('ajax:flash',
+          expect(trigger).toHaveBeenCalledWith('ajax:flash',
             {warning: 'Some error!'});
         });
       });
@@ -81,7 +75,7 @@ xdescribe('GGRC.Errors module', function () {
         it('for unknown errors', function () {
           notifier('error')({status: 666});
 
-          expect($fake.trigger).toHaveBeenCalledWith('ajax:flash',
+          expect(trigger).toHaveBeenCalledWith('ajax:flash',
             {error: 'Some error!'});
         });
       });
@@ -91,7 +85,7 @@ xdescribe('GGRC.Errors module', function () {
       it('for 401 status', function () {
         notifier('error')({status: 401});
 
-        expect($fake.trigger).toHaveBeenCalledWith('ajax:flash',
+        expect(trigger).toHaveBeenCalledWith('ajax:flash',
           {error: 'Mock auth invalid message'});
       });
     });
@@ -100,7 +94,7 @@ xdescribe('GGRC.Errors module', function () {
       it('for defined error statuses', function () {
         notifier('error', 'Fake message')({status: 403});
 
-        expect($fake.trigger).toHaveBeenCalledWith('ajax:flash',
+        expect(trigger).toHaveBeenCalledWith('ajax:flash',
           {error: 'Fake message'});
       });
     });
