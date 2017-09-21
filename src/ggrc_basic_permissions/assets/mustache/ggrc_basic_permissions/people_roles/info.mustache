@@ -95,20 +95,18 @@
             <h6>Authorizations</h6>
             <p>
               {{#with_program_roles_as "roles" result}}
-                {{#roles}}
-                  {{#if_helpers '\
-                    ^if_equals' role.permission_summary 'Mapped' '\
-                    or #if_equals' roles.length 1}}
-                      {{role.permission_summary}}
-                      {{#if_equals role.permission_summary 'Auditor'}}:
-                        {{#with_mapping 'audit_via_context' user_role}}
-                          <span class="role">
-                            {{audit_via_context.0.instance.title}}
-                          </span>
-                        {{/with_mapping}}
-                      {{/if_equals}}
-                  {{/if_helpers}}
-                {{/roles}}
+                {{#if_equals roles.0.role.permission_summary 'Mapped'}}
+                  No Role
+                {{else}}
+                  {{roles.0.role.permission_summary}}
+                  {{#if_equals role.permission_summary 'Auditor'}}:
+                    {{#with_mapping 'audit_via_context' user_role}}
+                      <span class="role">
+                        {{audit_via_context.0.instance.title}}
+                      </span>
+                    {{/with_mapping}}
+                  {{/if_equals}}
+                {{/if_equals}}
               {{/with_program_roles_as}}
             </p>
           </div>
