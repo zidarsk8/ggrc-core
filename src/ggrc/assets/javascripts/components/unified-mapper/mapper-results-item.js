@@ -3,15 +3,19 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './mapper-results-item-status';
+import './mapper-results-item-details';
+import './mapper-results-item-attrs';
+import '../view-object-buttons/view-object-buttons';
+import '../object-selection/object-selection-item';
+import template from './templates/mapper-results-item.mustache';
+
 (function (can, GGRC, CMS) {
   'use strict';
 
   GGRC.Components('mapperResultsItem', {
     tag: 'mapper-results-item',
-    template: can.view(
-      GGRC.mustache_path +
-      '/components/unified-mapper/mapper-results-item.mustache'
-    ),
+    template: template,
     viewModel: {
       itemData: {},
       searchOnly: false,

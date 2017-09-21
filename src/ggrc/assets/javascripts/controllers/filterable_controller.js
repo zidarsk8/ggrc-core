@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-//= require can.jquery-all
+import Spinner from 'spin.js';
 
 (function(can, $) {
 
@@ -61,4 +61,4 @@ can.Control("CMS.Controllers.Filterable", {
 
 });
 
-})(this.can, this.can.$);
+})(window.can, window.can.$);

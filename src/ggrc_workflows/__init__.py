@@ -872,15 +872,16 @@ def init_extra_views(app):
 def start_recurring_cycles():
   today = date.today()
   workflows = models.Workflow.query.filter(
-      models.Workflow.next_cycle_start_date == today,
+      models.Workflow.next_cycle_start_date <= today,
       models.Workflow.recurrences == True  # noqa
   )
   for workflow in workflows:
     # Follow same steps as in model_posted.connect_via(models.Cycle)
-    cycle = build_cycle(workflow)
-    db.session.add(cycle)
-    notification.handle_cycle_created(cycle, False)
-    notification.handle_workflow_modify(None, workflow)
+    while workflow.next_cycle_start_date <= date.today():
+      cycle = build_cycle(workflow)
+      db.session.add(cycle)
+      notification.handle_cycle_created(cycle, False)
+      notification.handle_workflow_modify(None, workflow)
     db.session.add(workflow)
   log_event(db.session)
   db.session.commit()

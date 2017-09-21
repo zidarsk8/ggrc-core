@@ -193,4 +193,4 @@
     computed_errors: ApprovalWorkflowErrors,
     computed_unsuppressed_errors: ApprovalWorkflowErrors
   });
-})(this.can, this.can.$, this.CMS);
+})(window.can, window.can.$, window.CMS);

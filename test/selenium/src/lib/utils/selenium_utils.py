@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Utility functions for selenium."""
 
+import json
 import logging
 import time
 
@@ -11,7 +12,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 from lib import constants, exception
-from lib.constants import messages
+from lib.constants import messages, locator as locators
+from lib.constants import value_aliases as alias
 
 LOGGER = logging.getLogger(__name__)
 
@@ -235,8 +237,81 @@ def get_nested_elements(element, all_nested=False):
   return element.find_elements_by_xpath(nested_locator)
 
 
-def get_element_by_element_safe(element, locator):
+def get_element_safe(element, locator):
   """Get element from current element by locator.
   Return "None" if element not found
   """
   return next((el for el in element.find_elements(*locator)), None)
+
+
+def _send_custom_command(chromedriver, command, params):
+  """Send custom command to chromedriver. For full list of commands
+  take a look at Chrome Protocol doc.
+  """
+  # pylint: disable=protected-access
+  resource = "/session/{}/chromium/send_command_and_get_result".format(
+      chromedriver.session_id)
+  url = chromedriver.command_executor._url + resource
+  body = json.dumps({'cmd': command, 'params': params})
+  response = chromedriver.command_executor._request('POST', url, body)
+  return response.get('value')
+
+
+def set_element_attribute(element, attr_name, attr_value):
+  """Set attribute value of element's style. If attr_value is string
+  it will be wrapped with double-quotes.
+  """
+  if isinstance(attr_value, basestring):
+    attr_value = "'{0}'".format(attr_value)
+  element.parent.execute_script("arguments[0].setAttribute('{0}', {1})".
+                                format(attr_name, attr_value), element)
+
+
+def get_full_screenshot_as_base64(driver):
+  """Get full screenshot according to size of HEADER, FOOTER and
+  object area content. If InfoPanel exists, screenshot height will be increase
+  according to sum of TreeView and InfoPanel size. This method manipulate with
+  Viewport attribute of ChromeBrowser.
+  Return: screenshot as base64.
+  """
+
+  def get_page_body_size():
+    """Return dict with width and height of page size."""
+    return {alias.HEIGHT: driver.execute_script(
+            "return document.documentElement.scrollHeight"),
+            alias.WIDTH: driver.execute_script(
+            "return document.documentElement.scrollWidth")}
+
+  def get_screenshot_by_size(width, height):
+    """Change device metrics according to passed width and height, then
+    do screenshot and reset device metrics.
+    Return: Screenshot as base64.
+    """
+    _send_custom_command(driver, "Emulation.setVisibleSize",
+                         {alias.HEIGHT: height, alias.WIDTH: width})
+    scrnshot = driver.get_screenshot_as_base64()
+    _send_custom_command(driver, "Emulation.resetViewport", {})
+    return scrnshot
+
+  panel_elem = get_element_safe(driver, locators.Common.PANEL_CSS)
+  panel_origin_style = None
+  page_content_size = get_page_body_size()
+  full_area = get_element_safe(driver, locators.Common.OBJECT_AREA_CSS)
+  if panel_elem and panel_elem.size[alias.HEIGHT]:
+    panel_origin_style = panel_elem.get_attribute("style")
+    panel_content_size = (panel_elem.get_property(alias.SCROLL_HEIGHT) +
+                          constants.settings.SIZE_PANE_HEADER)
+    driver.execute_script("arguments[0].removeAttribute('style')", panel_elem)
+    tree_view_height = driver.find_element(
+        *locators.TreeView.TREE_VIEW_CONTAINER_CSS).size[alias.HEIGHT]
+    page_content_size[alias.HEIGHT] = panel_content_size + tree_view_height
+  elif full_area:
+    full_area_height = full_area.get_property(alias.SCROLL_HEIGHT)
+    if full_area_height > page_content_size[alias.HEIGHT]:
+      page_content_size[alias.HEIGHT] = full_area_height
+  page_content_size[alias.HEIGHT] += (
+      constants.settings.SIZE_FOOTER + constants.settings.SIZE_HEADER)
+  screenshot_base64 = get_screenshot_by_size(**page_content_size)
+  if panel_origin_style:
+    set_element_attribute(panel_elem, "style", panel_origin_style)
+  return screenshot_base64

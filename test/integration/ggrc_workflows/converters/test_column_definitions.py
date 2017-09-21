@@ -55,6 +55,9 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Code",
         "Delete",
         "Need Verification",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}
@@ -77,6 +80,9 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Workflow",
         "Objects",
         "Delete",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}
@@ -97,6 +103,9 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Task Group",
         "Code",
         "Delete",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}
@@ -126,6 +135,9 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Task Group",
         "State",
         "Delete",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     expected_names = element_names.union(mapping_names).union(unmapping_names)
     self.assertEqual(expected_names, display_names)

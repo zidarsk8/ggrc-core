@@ -5,6 +5,8 @@
 
 .new-tree {
   .tree-item-add {
+    padding-top: 10px;
+
     .add-single-object {
       padding-top: 4px;
       select,
@@ -136,7 +138,6 @@
   h3 {
     font-size:14px;
     font-weight:bold;
-    border-bottom:1px solid #eee;
   }
 }
 
@@ -149,6 +150,7 @@
 .inline-data-content {
   display:inline-block;
   line-height:30px;
+  margin: 10px 0;
   text-overflow: ellipsis;
   word-wrap:no-wrap;
   width:100%;
@@ -158,6 +160,10 @@
   &.oneline {
     display: block;
   }
+
+  .deleteTrigger {
+    margin-left: 10px;
+  }
 }
 
 .inline-explanation {
@@ -165,6 +171,9 @@
   font-style:italic;
   line-height:30px;
   font-size:12px;
+  font-weight: normal;
+  padding-left: 10px;
+  text-transform: none;
 }
 
 .btn.end-cycle.pull-right {
@@ -274,4 +283,42 @@
 ul.add-task-comment {
   margin: 20px 0 0;
   list-style-type: none;
+}
+
+.task_group_tasks {
+  &__header {
+    border-bottom: 1px solid $lightGray;
+    display: flex;
+    padding: 10px 0 10px 40px;
+
+    &-item {
+      flex: 1 1 25%;
+      text-transform: uppercase;
+
+      &-edit {
+        width: 60px;
+      }
+    }
+  }
+
+  &__list-item {
+    .task-wrap {
+      border-bottom: 1px solid $lightGray;
+      display: flex;
+    }
+
+    &-column {
+      flex: 1 1 25%;
+
+      &-drag,
+      &-action {
+        padding-top: 10px;
+        width: 60px;
+      }
+
+      &-drag {
+        width: 40px;
+      }
+    }
+  }
 }

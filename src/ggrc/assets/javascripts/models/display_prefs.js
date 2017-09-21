@@ -471,4 +471,4 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     };
   }
 
-})(this.can, this.can.$);
+})(window.can, window.can.$);

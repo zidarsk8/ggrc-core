@@ -3,6 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import '../components/view-models/object-operations-base-vm';
+import '../components/advanced-search/advanced-search-wrapper';
+import '../components/object-mapper/object-mapper';
+import '../components/object-generator/object-generator';
+import '../components/object-search/object-search';
+import '../components/unified-mapper/mapper-results';
+
 (function (can, $) {
   var selectors = ['unified-mapper', 'unified-search']
     .map(function (val) {
@@ -12,6 +19,8 @@
               'Missing Scope Object';
   var OBJECT_REQUIRED_MESSAGE = 'Required Data for In Scope Object is missing' +
     ' - Original Object is mandatory';
+
+  var isMapperOpen = false;
 
   can.Control.extend('GGRC.Controllers.ObjectMapper', {
     defaults: {
@@ -34,8 +43,16 @@
         $trigger: $trigger
       }, options));
 
-      $target.on('hidden.bs.modal', function () {
+      $target.on('modal:dismiss', function () {
         $(this).remove();
+      });
+
+      $target.on('hideModal', function (e) {
+        $target.modal_form('silentHide');
+      });
+
+      $target.on('showModal', function () {
+        $target.modal_form('show');
       });
 
       return $target;
@@ -44,7 +61,7 @@
       var self = this;
       var isSearch = /unified-search/ig.test(data.toggle);
 
-      if (disableMapper) {
+      if (disableMapper || isMapperOpen) {
         return;
       }
 
@@ -54,6 +71,7 @@
 
       if (GGRC.Utils.Snapshots
           .isInScopeModel(data.join_object_type) && !isSearch) {
+        isMapperOpen = true;
         openForSnapshots(data);
       } else {
         openForCommonObjects(data, isSearch);
@@ -127,7 +145,6 @@
   }, {
     init: function () {
       this.element.html(can.view(this.options.component, this.options));
-      document.body.classList.remove('no-events');
     }
   });
   GGRC.Controllers.ObjectMapper.extend('GGRC.Controllers.ObjectSearch', {
@@ -162,10 +179,16 @@
     GGRC.Controllers.ObjectMapper.openMapper(data, disableMapper, btn);
   }
   $('body').on('openMapper', function (el, ev, disableMapper) {
-    openMapperByElement(ev, disableMapper);
+    if (!isMapperOpen) {
+      openMapperByElement(ev, disableMapper);
+    }
   });
 
   $('body').on('click', selectors.join(', '), function (ev, disableMapper) {
     openMapperByElement(ev, disableMapper);
+  });
+
+  $('body').on('closeMapper', function () {
+    isMapperOpen = false;
   });
 })(window.can, window.can.$);

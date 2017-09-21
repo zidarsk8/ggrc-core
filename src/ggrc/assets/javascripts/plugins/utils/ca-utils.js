@@ -15,10 +15,26 @@
     Checkbox: 'checkbox',
     Dropdown: 'dropdown'
   };
+
+  var CA_DD_REQUIRED_DEPS = Object.freeze({
+    NONE: 0,
+    COMMENT: 1,
+    EVIDENCE: 2,
+    COMMENT_AND_EVIDENCE: 3
+  });
+  var CUSTOM_ATTRIBUTE_TYPE = Object.freeze({
+    LOCAL: 1,
+    GLOBAL: 2
+  });
+
   /**
    * Util methods for custom attributes.
    */
   GGRC.Utils.CustomAttributes = (function () {
+    function sortCustomAttributes(a, b) {
+      return a.custom_attribute_id - b.custom_attribute_id;
+    }
+
     /**
      * Return normalized Custom Attribute Type from Custom Attribute Definition
      * @param {String} type - String Custom Attribute Value from JSON
@@ -150,8 +166,10 @@
         if (type === 'dropdown') {
           valueData.validationConfig = {};
           options.forEach(function (item, index) {
-            valueData.validationConfig[item] =
-              Number(optionsRequirements[index]);
+            if (optionsRequirements[index]) {
+              valueData.validationConfig[item] =
+                Number(optionsRequirements[index]);
+            }
           });
         }
         return valueData;
@@ -193,6 +211,7 @@
       return {
         type: attr.attributeType,
         id: attr.def.id,
+        required: attr.def.mandatory,
         value: convertFromCaValue(
           attr.attributeType,
           attr.attribute_value,
@@ -232,13 +251,36 @@
       };
     }
 
-    function getAttributes(values, onlyLocal) {
-      return (values || []).filter(function (value) {
-        return !onlyLocal ?
-        value.def.definition_id === null :
-        value.def.definition_id !== null;
-      });
+    /**
+     * Gets local or global custom attributes from the instance
+     * @param  {can.Map} instance object instance
+     * @param  {Number}  type     types of custom attributes we want to get
+     *                            can be either CUSTOM_ATTRIBUTE_TYPE.LOCAL or
+     *                            CUSTOM_ATTRIBUTE_TYPE.GLOBAL
+     * @return {Array}            Array of filtered custom attributes
+     */
+    function getCustomAttributes(instance, type) {
+      var filterFn;
+      var values = instance && instance.attr('custom_attribute_values') || [];
+      switch (type) {
+        case CUSTOM_ATTRIBUTE_TYPE.LOCAL:
+          filterFn = function (v) {
+            return v.def.definition_id !== null;
+          };
+          break;
+        case CUSTOM_ATTRIBUTE_TYPE.GLOBAL:
+          filterFn = function (v) {
+            return v.def.definition_id === null;
+          };
+          break;
+        default:
+          throw new Error('Unknown attributes type ' + type);
+      }
+      return values
+        .filter(filterFn)
+        .sort(sortCustomAttributes);
     }
+
     function updateCustomAttributeValue(ca, value) {
       var id;
       if (ca.attr('attributeType') === 'person') {
@@ -254,30 +296,61 @@
     }
 
     function applyChangesToCustomAttributeValue(values, changes) {
-      var caValues = can.makeArray(values);
       can.Map.keys(changes).forEach(function (fieldId) {
-        var caValue =
-          caValues
-            .find(function (item) {
-              return item.def.id === Number(fieldId);
-            });
-        if (!caValue) {
-          console.error('Corrupted Date: ', caValues);
-          return;
-        }
-        updateCustomAttributeValue(caValue, changes[fieldId]);
+        values.each(function (item, key) {
+          if (item.def.id === Number(fieldId)) {
+            if (!item) {
+              console.error('Corrupted Date: ', values);
+              return;
+            }
+            updateCustomAttributeValue(item, changes[fieldId]);
+            values.splice(key, 1, values[key]);
+          }
+        });
       });
     }
+
+    /**
+     * Ensures that the Global Custom Attributes are present in the instance
+     * @param  {can.Map} instance assessment instance
+     * @return {Promise} Promise whichi is resolved when GCAs are present in
+     *                   the assessment instance
+     */
+    function ensureGlobalCA(instance) {
+      var definitions;
+      var values;
+      var def = can.Deferred();
+      if (instance.attr('id')) {
+        def.resolve();
+        return def.promise();
+      }
+
+      definitions = GGRC.custom_attr_defs.filter(function (gca) {
+        return gca.definition_type === instance.constructor.root_object &&
+          gca.definition_id === null;
+      });
+
+      values = GGRC.Utils.CustomAttributes
+        .prepareCustomAttributes(definitions, [])
+        .sort(sortCustomAttributes);
+
+      instance.attr('custom_attribute_definitions', definitions);
+      instance.attr('custom_attribute_values', values);
+    }
+
     return {
       convertFromCaValue: convertFromCaValue,
       convertToCaValue: convertToCaValue,
       convertValuesToFormFields: convertValuesToFormFields,
       prepareCustomAttributes: prepareCustomAttributes,
       isEmptyCustomAttribute: isEmptyCustomAttribute,
-      getAttributes: getAttributes,
+      getCustomAttributes: getCustomAttributes,
       getCustomAttributeType: getCustomAttributeType,
       convertToFormViewField: convertToFormViewField,
-      applyChangesToCustomAttributeValue: applyChangesToCustomAttributeValue
+      applyChangesToCustomAttributeValue: applyChangesToCustomAttributeValue,
+      CA_DD_REQUIRED_DEPS: CA_DD_REQUIRED_DEPS,
+      ensureGlobalCA: ensureGlobalCA,
+      CUSTOM_ATTRIBUTE_TYPE: CUSTOM_ATTRIBUTE_TYPE
     };
   })();
 })(window.GGRC, window.can, window._);

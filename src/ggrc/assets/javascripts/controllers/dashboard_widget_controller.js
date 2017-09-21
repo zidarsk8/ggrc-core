@@ -44,4 +44,4 @@
       return 0;
     }
   });
-})(this.can, this.can.$);
+})(window.can, window.can.$);

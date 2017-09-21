@@ -112,3 +112,5 @@ class ExceptionsMessages(CommonMessages):
   err_csv_format = "CSV file has unexpected structure: {}\n"
   err_comments_count = "Comments's count." + CommonMessages.err_common
   err_server_response = "Server response: (code: {}, message: {})\n"
+  err_pagination_count = "Count of pagination controllers is not {}\n"
+  err_pagination_elements = "Pagination controllers were not found {}\n"

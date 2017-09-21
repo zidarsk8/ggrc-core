@@ -11,7 +11,6 @@ from sqlalchemy import and_
 from sqlalchemy import or_
 
 from ggrc import db
-from ggrc.automapper import AutomapperGenerator
 from ggrc.converters import errors
 from ggrc.converters import get_exportables
 from ggrc.login import get_current_user
@@ -292,6 +291,8 @@ class DateColumnHandler(ColumnHandler):
       if not value:
         return
       parsed_value = parse(value)
+      if self.key == "last_assessment_date":
+        self.check_last_asmnt_date(parsed_value)
       if type(getattr(self.row_converter.obj, self.key, None)) is date:
         return parsed_value.date()
       else:
@@ -304,6 +305,19 @@ class DateColumnHandler(ColumnHandler):
     if value:
       return value.strftime("%m/%d/%Y")
     return ""
+
+  def check_last_asmnt_date(self, new_last_asmnt_date):
+    """Check if the new object don't contain changed Last Assessment Date."""
+    old_last_asmnt_date = getattr(
+        self.row_converter.obj, "last_assessment_date", None
+    )
+    date_modified = old_last_asmnt_date and new_last_asmnt_date and \
+        old_last_asmnt_date.date() != new_last_asmnt_date.date()
+    if date_modified:
+      self.add_warning(
+          errors.UNMODIFIABLE_COLUMN,
+          column_name=self.display_name,
+      )
 
 
 class EmailColumnHandler(ColumnHandler):
@@ -443,12 +457,6 @@ class MappingColumnHandler(ColumnHandler):
       elif self.unmap and mapping:
         db.session.delete(mapping)
     db.session.flush()
-    # it is safe to reuse this automapper since no other objects will be
-    # created while creating automappings and cache reuse yields significant
-    # performance boost
-    automapper = AutomapperGenerator(use_benchmark=False)
-    for relation in relationships:
-      automapper.generate_automappings(relation)
     self.dry_run = True
 
   def get_value(self):
@@ -795,6 +803,11 @@ class DocumentsColumnHandler(ColumnHandler):
 
 class ExportOnlyColumnHandler(ColumnHandler):
 
+  def __init__(self, *args, **kwargs):
+    kwargs["view_only"] = True
+    kwargs["mandatory"] = False
+    super(ExportOnlyColumnHandler, self).__init__(*args, **kwargs)
+
   def parse_item(self):
     pass
 
@@ -809,3 +822,17 @@ class ExportOnlyColumnHandler(ColumnHandler):
 
   def set_value(self):
     pass
+
+
+ExportOnlyDateColumnHandler = type(
+    "ExportOnlyDateColumnHandler",
+    (ExportOnlyColumnHandler, DateColumnHandler),
+    {}
+)
+
+
+ExportOnlyUserColumnHandler = type(
+    "ExportOnlyUserColumnHandler",
+    (ExportOnlyColumnHandler, UserColumnHandler),
+    {}
+)

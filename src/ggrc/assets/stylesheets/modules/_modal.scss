@@ -7,10 +7,6 @@
   background-color: $white;
 }
 
-.no-events {
-  pointer-events: none;
-}
-
 .field-hide {
   display: none;
   .modal & {
@@ -321,11 +317,16 @@
       @include placeholder($footerBorder);
       @include box-shadow(none);
       @include border-radius(0);
-      margin-bottom: 16px;
       border: 1px solid $status-draft;
       .choose-object-wrap & {
         margin-bottom: 0;
       }
+    }
+    input,
+    textarea,
+    select,
+    rich-text {
+      margin-bottom: 16px;
     }
     .single-line-filter {
       margin-bottom:6px;
@@ -434,6 +435,9 @@
         textarea {
           border: 1px solid $red;
         }
+      }
+      rich-text .rich-text__wrapper {
+        border-color: $red;
       }
     }
     .wysiwyg-area {

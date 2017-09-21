@@ -41,6 +41,18 @@
     o2dfd : null,
     drivedfd : null,
     gapidfd : new $.Deferred(),
+    reAuthorize: function (token) {
+      var params = ['https://www.googleapis.com/auth/drive'];
+      var dfd;
+
+      if (_.isEmpty(token)) {
+        dfd = this.authorize(params, true);
+      } else {
+        dfd = this.authorize(params);
+      }
+
+      return dfd;
+    },
     authorize : function(newscopes, force) {
       return this.canonical_instance.authorize(newscopes, force);
     },
@@ -220,4 +232,4 @@
       this.doGAuthWithScopes(); //debounce in case we push several scopes in sequence
     }
   });
-})(this.CMS, this.GGRC, this.can, this.can.$);
+})(window.CMS, window.GGRC, window.can, window.can.$);

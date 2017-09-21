@@ -19,6 +19,7 @@
       documentType: '@',
       documents: [],
       isLoading: false,
+      pendingItemsChanged: false,
       define: {
 
         // automatically refresh instance on related document create/remove
@@ -213,6 +214,7 @@
 
         this.attr('documents', documents);
         this.instance.mark_for_deletion('related_objects_as_source', document);
+        this.attr('pendingItemsChanged', true);
       },
       markDocumentForAddition: function (data) {
         var self = this;
@@ -221,6 +223,7 @@
         this.attr('documents').unshift(document);
         this.attr('isLoading', true);
 
+        this.attr('pendingItemsChanged', true);
         return this.saveDocument(document).then(function () {
           self.instance.mark_for_addition(
             'related_objects_as_source',

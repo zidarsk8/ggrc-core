@@ -107,6 +107,9 @@
         attr_title: 'Last Updated',
         attr_name: 'updated_at'
       }, {
+        attr_title: 'Last Updated By',
+        attr_name: 'modified_by'
+      }, {
         attr_title: 'Planned Start Date',
         attr_name: 'start_date'
       }, {
@@ -338,6 +341,7 @@
         assessors: 'Principal Assignees',
         verifiers: 'Auditors'
       },
+      status: 'Draft',
       // the custom lists of assessor / verifier IDs if "other" is selected for
       // the corresponding default_people setting
       assessorsList: {},
@@ -353,6 +357,7 @@
         {value: 'other', title: 'Others...'}
       ]
     },
+    statuses: ['Draft', 'Deprecated', 'Active'],
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache'
     },

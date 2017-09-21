@@ -5,6 +5,7 @@ import datetime
 import unittest
 
 import ddt
+import freezegun
 
 from ggrc import db
 from ggrc.models import all_models
@@ -13,6 +14,7 @@ from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc import generator
 from integration.ggrc.models import factories
+from integration.ggrc_workflows import generator as wf_generator
 from integration.ggrc_workflows import WorkflowTestCase
 from integration.ggrc_workflows.models import factories as wf_factories
 
@@ -23,6 +25,7 @@ class TestWorkflowsApiPost(TestCase):
   def setUp(self):
     super(TestWorkflowsApiPost, self).setUp()
     self.api = Api()
+    self.generator = wf_generator.WorkflowsGenerator()
 
   def tearDown(self):
     pass
@@ -59,7 +62,7 @@ class TestWorkflowsApiPost(TestCase):
     self.assertEqual(response.status_code, 201)
 
   @ddt.data("wrong value", 0, -4)
-  def test_create_wrong_repeat_every_workflow(self, value):
+  def test_create_wrong_repeat_every_workflow(self, value):  # noqa pylint: disable=invalid-name
     """Test case for invalid repeat_every value"""
     data = self.get_workflow_dict()
     data["workflow"]["repeat_every"] = value
@@ -89,7 +92,7 @@ class TestWorkflowsApiPost(TestCase):
 
   # TODO: Api should be able to handle invalid data
   @unittest.skip("Not implemented.")
-  def test_create_task_group_invalid_workflow_data(self):
+  def test_create_task_group_invalid_workflow_data(self):  # noqa pylint: disable=invalid-name
     data = self.get_task_group_dict({"id": -1, "context": {"id": -1}})
     response = self.api.post(all_models.TaskGroup, data)
     self.assert400(response)
@@ -221,16 +224,54 @@ class TestWorkflowsApiPost(TestCase):
         all_models.Cycle.query.get(cycle_id).is_verification_needed)
 
   @ddt.data(True, False)
-  def test_change_verification_flag(self, flag):
-    """Check is_verification_needed flag isn't changeable."""
+  def test_change_verification_flag_positive(self, flag):  # noqa pylint: disable=invalid-name
+    """is_verification_needed flag is changeable for DRAFT workflow."""
     with factories.single_commit():
       workflow = wf_factories.WorkflowFactory(is_verification_needed=flag)
+    self.assertEqual(workflow.status, all_models.Workflow.DRAFT)
     workflow_id = workflow.id
     resp = self.api.put(workflow, {"is_verification_needed": not flag})
-    self.assert400(resp)
+    self.assert200(resp)
     self.assertEqual(
-        flag,
-        all_models.Workflow.query.get(workflow_id).is_verification_needed)
+        all_models.Workflow.query.get(workflow_id).is_verification_needed,
+        not flag)
+
+  @ddt.data(True, False)
+  def test_change_verification_flag_negative(self, flag):  # noqa pylint: disable=invalid-name
+    with freezegun.freeze_time("2017-08-10"):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(
+            unit=all_models.Workflow.WEEK_UNIT,
+            is_verification_needed=flag,
+            repeat_every=1)
+        wf_factories.TaskGroupTaskFactory(
+            task_group=wf_factories.TaskGroupFactory(
+                context=factories.ContextFactory(),
+                workflow=workflow
+            ),
+            # Two cycles should be created
+            start_date=datetime.date(2017, 8, 3),
+            end_date=datetime.date(2017, 8, 7))
+      workflow_id = workflow.id
+      self.assertEqual(workflow.status, all_models.Workflow.DRAFT)
+      self.generator.activate_workflow(workflow)
+      workflow = all_models.Workflow.query.get(workflow_id)
+      self.assertEqual(workflow.status, all_models.Workflow.ACTIVE)
+      resp = self.api.put(workflow, {"is_verification_needed": not flag})
+      self.assert400(resp)
+      workflow = all_models.Workflow.query.get(workflow_id)
+      self.assertEqual(workflow.is_verification_needed, flag)
+
+      # End all current cycles
+      for cycle in workflow.cycles:
+        self.generator.modify_object(cycle, {'is_current': False})
+      workflow = all_models.Workflow.query.filter(
+          all_models.Workflow.id == workflow_id).first()
+      self.assertEqual(workflow.status, all_models.Workflow.INACTIVE)
+      resp = self.api.put(workflow, {"is_verification_needed": not flag})
+      self.assert400(resp)
+      workflow = all_models.Workflow.query.get(workflow_id)
+      self.assertEqual(workflow.is_verification_needed, flag)
 
   @ddt.data(True, False)
   def test_not_change_vf_flag(self, flag):
@@ -281,6 +322,16 @@ class TestTaskGroupTaskApiPost(WorkflowTestCase):
               "end_date": datetime.date.today() - datetime.timedelta(days=4)
           }
       )
+
+  def test_tgt_has_view_dates(self):
+    """Test get view only fields for TGT."""
+    workflow = wf_factories.WorkflowFactory()
+    task_group = wf_factories.TaskGroupFactory(workflow=workflow)
+    tgt = wf_factories.TaskGroupTaskFactory(task_group=task_group)
+    resp = self.api.get(tgt, tgt.id)
+    self.assertIn("task_group_task", resp.json)
+    self.assertIn("view_start_date", resp.json["task_group_task"])
+    self.assertIn("view_end_date", resp.json["task_group_task"])
 
 
 @ddt.ddt

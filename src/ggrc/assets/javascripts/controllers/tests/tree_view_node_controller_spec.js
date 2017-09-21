@@ -12,7 +12,7 @@ describe('CMS.Controllers.TreeViewNode', function () {
     Ctrl = CMS.Controllers.TreeViewNode;
   });
 
-  describe('draw_node() method', function () {
+  xdescribe('draw_node() method', function () {
     var ctrlInst;  // fake controller instance
     var ifNotRemovedResult;  // fake return value of the _ifNotRemoved() method
     var method;
@@ -103,7 +103,7 @@ describe('CMS.Controllers.TreeViewNode', function () {
     );
   });
 
-  describe('expand() method', function () {
+  xdescribe('expand() method', function () {
     var ctrlInst;  // fake controller instance
     var displaySubtreesDfd;
     var method;

@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../components/access_control_list/access_control_list_roles_helper'
+
 (function (can, $) {
   can.Control('GGRC.Controllers.Modals', {
     BUTTON_VIEW_DONE: GGRC.mustache_path + '/modals/done_buttons.mustache',
@@ -347,6 +349,7 @@
     reset_form: function (setFieldsCb) {
       var $textArea = $('#program_description');
       var editorData = $textArea.data('wysihtml5');
+      var preloadDfd;
 
       // If the modal is closed early, the element no longer exists
       if (this.element) {
@@ -361,8 +364,14 @@
         this.options.instance.attr('_transient', new can.Observe({}));
       }
       if (this.options.instance.form_preload) {
-        this.options.instance.form_preload(this.options.new_object_form,
+        preloadDfd = this.options.instance.form_preload(
+          this.options.new_object_form,
           this.options.object_params);
+        if (preloadDfd) {
+          preloadDfd.then(function () {
+            this.options.instance.backup();
+          }.bind(this))
+        }
       }
 
       // The rich text editor's content is not a "normal" form field, thus
@@ -436,8 +445,6 @@
         // When we start, all the ui elements are visible
         this.options.ui_array.push(0);
       }
-
-      document.body.classList.remove('no-events');
     },
 
     setup_wysihtml5: function () {
@@ -445,7 +452,10 @@
         return;
       }
       this.element.find('.wysihtml5').each(function () {
-        $(this).cms_wysihtml5();
+        var element = this;
+        import(/* webpackChunkName: "wysiwyg" */'../plugins/wysiwyg').then(function () {
+          $(element).cms_wysihtml5();
+        });
       });
     },
 
@@ -689,10 +699,6 @@
           targetEl.datepicker('option', options[otherKey], date);
         }
       }, this);
-    },
-
-    '[data-toggle="unified-mapper"] click': function (el, ev) {
-      document.body.classList.add('no-events');
     },
 
     "{$footer} a.btn[data-toggle='modal-submit-addmore'] click":
@@ -1024,7 +1030,7 @@
           this.reset_form(function () {
             var $form = $(this.element).find('form');
             $form.trigger('reset');
-          });
+          }.bind(this));
         }.bind(this))
         .then(this.proxy('apply_object_params'))
         .then(this.proxy('serialize_form'))

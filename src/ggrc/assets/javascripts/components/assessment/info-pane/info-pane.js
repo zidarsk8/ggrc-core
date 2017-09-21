@@ -3,6 +3,18 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../controls-toolbar/controls-toolbar';
+import '../assessment-local-ca';
+import '../../custom-attributes/custom-attributes';
+import '../../custom-attributes/custom-attributes-field';
+import '../../custom-attributes/custom-attributes-status';
+import '../mapped-objects/mapped-related-information';
+import '../mapped-objects/mapped-comments';
+import '../mapped-objects/mapped-controls';
+import '../../inline/inline-form-control';
+import './inline-item';
+import './create-url';
+
 (function (can, GGRC, CMS) {
   'use strict';
   var tpl = can.view(GGRC.mustache_path +
@@ -264,6 +276,11 @@
           type: event.item.attr('type')
         };
 
+        // dispatching event on instance to pass to the auto-save-form
+        this.attr('instance').dispatch({
+          type: 'afterCommentCreated'
+        });
+
         this.attr('deferredSave').push(function () {
           self.addAction('add_related', related);
         })
@@ -322,16 +339,20 @@
       },
       initializeFormFields: function () {
         var cavs =
-          CAUtils.getAttributes(
-            this.attr('instance.custom_attribute_values'), true);
+          CAUtils.getCustomAttributes(
+            this.attr('instance'),
+            CAUtils.CUSTOM_ATTRIBUTE_TYPE.LOCAL
+          );
         this.attr('formFields',
           CAUtils.convertValuesToFormFields(cavs)
         );
       },
       initGlobalAttributes: function () {
         var cavs =
-          CAUtils.getAttributes(
-              this.attr('instance.custom_attribute_values'), false);
+          CAUtils.getCustomAttributes(
+            this.attr('instance'),
+            CAUtils.CUSTOM_ATTRIBUTE_TYPE.GLOBAL
+          );
         this.attr('globalAttributes',
           cavs.map(function (cav) {
             return CAUtils.convertToFormViewField(cav);

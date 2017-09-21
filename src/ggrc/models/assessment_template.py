@@ -22,7 +22,7 @@ from ggrc.fulltext.mixin import Indexed
 
 class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
                          mixins.Titled, mixins.CustomAttributable,
-                         mixins.Slugged, Indexed, db.Model):
+                         mixins.Slugged, mixins.Stateful, Indexed, db.Model):
   """A class representing the assessment template entity.
 
   An Assessment Template is a template that allows users for easier creation of
@@ -61,6 +61,12 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
 
   _title_uniqueness = False
 
+  DRAFT = 'Draft'
+  ACTIVE = 'Active'
+  DEPRECATED = 'Deprecated'
+
+  VALID_STATES = (DRAFT, ACTIVE, DEPRECATED, )
+
   # REST properties
   _api_attrs = reflection.ApiAttributes(
       "template_object_type",
@@ -78,6 +84,11 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
   ]
 
   _aliases = {
+      "status": {
+          "display_name": "State",
+          "mandatory": False,
+          "description": "Options are:\n{}".format('\n'.join(VALID_STATES))
+      },
       "default_assessors": {
           "display_name": "Default Assignee",
           "mandatory": True,
@@ -93,7 +104,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
           "filter_by": "_nop_filter",
       },
       "test_plan_procedure": {
-          "display_name": "Use Control Test Plan",
+          "display_name": "Use Control Assessment Procedure",
           "mandatory": False,
       },
       "template_object_type": {
@@ -230,4 +241,4 @@ def handle_assessment_template(sender, obj=None, src=None, service=None):
   If "audit" is set on POST, create relationship with Assessment template.
   """
   if "audit" in src:
-      create_audit_relationship(src["audit"], obj)
+    create_audit_relationship(src["audit"], obj)

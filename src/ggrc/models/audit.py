@@ -8,8 +8,7 @@ from sqlalchemy import orm
 from ggrc import db
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (
-    Timeboxed, Noted, Described, WithContact,
-    Titled, Slugged, CustomAttributable, Stateful
+    Timeboxed, WithContact, CustomAttributable, BusinessObject
 )
 
 from ggrc.models.object_document import PublicDocumentable
@@ -27,8 +26,7 @@ from ggrc.fulltext.mixin import Indexed
 
 class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
             CustomAttributable, Personable, HasOwnContext, Relatable,
-            Timeboxed, Noted, Described, WithContact, Titled,
-            Stateful, Slugged, Indexed, db.Model):
+            Timeboxed, WithContact, BusinessObject, Indexed, db.Model):
   """Audit model."""
 
   __tablename__ = 'audits'
@@ -64,7 +62,6 @@ class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
       'report_start_date',
       'report_end_date',
       'audit_firm',
-      'status',
       'gdrive_evidence_folder',
       'program',
       'object_type',
@@ -77,7 +74,6 @@ class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
       'report_start_date',
       'report_end_date',
       'audit_firm',
-      'status',
       'gdrive_evidence_folder',
   ]
 

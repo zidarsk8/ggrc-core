@@ -245,4 +245,4 @@ can.Model.Join("CMS.Models.ObjectEvent", {
     }
   }
 });
-})(this.can, this.can.$);
+})(window.can, window.can.$);

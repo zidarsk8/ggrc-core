@@ -48,8 +48,9 @@ class TestACLImportExport(TestCase):
 
   def test_acl_multiple_entries(self):
     """Test ACL column import with multiple emails."""
-    role = factories.AccessControlRoleFactory(object_type="Market")
-    emails = {factories.PersonFactory().email for _ in range(3)}
+    with factories.single_commit():
+      role = factories.AccessControlRoleFactory(object_type="Market")
+      emails = {factories.PersonFactory().email for _ in range(3)}
 
     response = self.import_data(OrderedDict([
         ("object_type", "Market"),
@@ -67,8 +68,10 @@ class TestACLImportExport(TestCase):
 
   def test_acl_update(self):
     """Test ACL column import with multiple emails."""
-    role_name = factories.AccessControlRoleFactory(object_type="Market").name
-    emails = {factories.PersonFactory().email for _ in range(4)}
+    with factories.single_commit():
+      role_name = factories.AccessControlRoleFactory(object_type="Market").name
+      emails = {factories.PersonFactory().email for _ in range(4)}
+
     update_emails = set(list(emails)[:2]) | {"user@example.com"}
 
     response = self.import_data(OrderedDict([
@@ -95,8 +98,9 @@ class TestACLImportExport(TestCase):
 
   def test_acl_empty_update(self):
     """Test ACL column import with multiple emails."""
-    role_name = factories.AccessControlRoleFactory(object_type="Market").name
-    emails = {factories.PersonFactory().email for _ in range(3)}
+    with factories.single_commit():
+      role_name = factories.AccessControlRoleFactory(object_type="Market").name
+      emails = {factories.PersonFactory().email for _ in range(3)}
 
     response = self.import_data(OrderedDict([
         ("object_type", "Market"),
@@ -122,9 +126,13 @@ class TestACLImportExport(TestCase):
 
   def test_acl_export(self):
     """Test ACL field export."""
-    role_name = factories.AccessControlRoleFactory(object_type="Market").name
-    empty_name = factories.AccessControlRoleFactory(object_type="Market").name
-    emails = {factories.PersonFactory().email for _ in range(3)}
+    with factories.single_commit():
+      role_name = factories.AccessControlRoleFactory(object_type="Market").name
+      empty_name = factories.AccessControlRoleFactory(
+          object_type="Market",
+      ).name
+      emails = {factories.PersonFactory().email for _ in range(3)}
+
     self.import_data(OrderedDict([
         ("object_type", "Market"),
         ("code", "market-1"),
@@ -177,14 +185,15 @@ class TestACLImportExport(TestCase):
   })
   def test_multiple_acl_roles_add(self, roles):
     """Test importing new object with multiple ACL roles."""
-    for email in self._random_emails:
-      factories.PersonFactory(email=email)
+    with factories.single_commit():
+      for email in self._random_emails:
+        factories.PersonFactory(email=email)
 
-    for role_name in roles.keys():
-      factories.AccessControlRoleFactory(
-          object_type="Market",
-          name=role_name + "  ",
-      )
+      for role_name in roles.keys():
+        factories.AccessControlRoleFactory(
+            object_type="Market",
+            name=role_name + "  ",
+        )
 
     import_dict = self._generate_role_import_dict(roles)
     self.import_data(import_dict)
@@ -219,14 +228,15 @@ class TestACLImportExport(TestCase):
   @ddt.unpack
   def test_multiple_acl_roles_update(self, first_roles, edited_roles):
     """Test updating objects via import with multiple ACL roles."""
-    for email in self._random_emails:
-      factories.PersonFactory(email=email)
+    with factories.single_commit():
+      for email in self._random_emails:
+        factories.PersonFactory(email=email)
 
-    for role_name in first_roles.keys():
-      factories.AccessControlRoleFactory(
-          object_type="Market",
-          name=role_name,
-      )
+      for role_name in first_roles.keys():
+        factories.AccessControlRoleFactory(
+            object_type="Market",
+            name=role_name,
+        )
 
     import_dict = self._generate_role_import_dict(first_roles)
     self.import_data(import_dict)
@@ -267,18 +277,21 @@ class TestACLImportExport(TestCase):
   })
   def test_same_name_roles(self, model_dict):
     """Test role with the same names on different objects."""
-    for email in self._random_emails:
-      factories.PersonFactory(email=email)
+    with factories.single_commit():
+      for email in self._random_emails:
+        factories.PersonFactory(email=email)
 
-    import_dicts = []
-    for object_type, roles in model_dict.items():
-      for role_name in roles.keys():
-        factories.AccessControlRoleFactory(
-            object_type=object_type,
-            name=role_name,
+      import_dicts = []
+      for object_type, roles in model_dict.items():
+        for role_name in roles.keys():
+          factories.AccessControlRoleFactory(
+              object_type=object_type,
+              name=role_name,
+          )
+
+        import_dicts.append(
+            self._generate_role_import_dict(roles, object_type)
         )
-
-      import_dicts.append(self._generate_role_import_dict(roles, object_type))
 
     response = self.import_data(*import_dicts)
     self._check_csv_response(response, {})
@@ -297,8 +310,9 @@ class TestACLImportExport(TestCase):
 
   def test_acl_revision_on_import(self):
     """Test creation of separate revision for ACL in import"""
-    role_name = factories.AccessControlRoleFactory(object_type="Market").name
-    emails = {factories.PersonFactory().email for _ in range(3)}
+    with factories.single_commit():
+      role_name = factories.AccessControlRoleFactory(object_type="Market").name
+      emails = {factories.PersonFactory().email for _ in range(3)}
 
     response = self.import_data(OrderedDict([
         ("object_type", "Market"),

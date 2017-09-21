@@ -93,4 +93,4 @@
   };
 
   RiskAssessmentsExtension.init_mappings();
-})(this.can.$, this.CMS, this.GGRC);
+})(window.can.$, window.CMS, window.GGRC);

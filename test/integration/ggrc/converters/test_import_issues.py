@@ -46,8 +46,10 @@ class TestImportIssues(TestCase):
 
   def test_audit_change(self):
     """Test audit changing"""
-    audit = factories.AuditFactory()
-    issue = factories.IssueFactory()
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      issue = factories.IssueFactory()
+
     response = self.import_data(OrderedDict([
         ("object_type", "Issue"),
         ("Code*", issue.slug),
@@ -69,8 +71,10 @@ class TestImportIssues(TestCase):
   @ddt.unpack
   def test_issue_deprecate_change(self, start_state, final_state, dep_count):
     """Test counter on changing state to deprecate"""
-    factories.AuditFactory()
-    issue = factories.IssueFactory(status=start_state)
+    with factories.single_commit():
+      factories.AuditFactory()
+      issue = factories.IssueFactory(status=start_state)
+
     response = self.import_data(OrderedDict([
         ("object_type", "Issue"),
         ("Code*", issue.slug),
@@ -105,16 +109,17 @@ class TestImportIssues(TestCase):
     # Import of data should be allowed if mandatory role provided
     # and can process situation when nonmandatory roles are absent
     # without any errors and warnings
-    mandatory_role = factories.AccessControlRoleFactory(
-        object_type="Market",
-        mandatory=True
-    ).name
-    factories.AccessControlRoleFactory(
-        object_type="Market",
-        mandatory=False
-    )
+    with factories.single_commit():
+      mandatory_role = factories.AccessControlRoleFactory(
+          object_type="Market",
+          mandatory=True
+      ).name
+      factories.AccessControlRoleFactory(
+          object_type="Market",
+          mandatory=False
+      )
+      email = factories.PersonFactory().email
 
-    email = factories.PersonFactory().email
     response_json = self.import_data(OrderedDict([
         ("object_type", "Market"),
         ("code", "market-1"),
@@ -129,16 +134,17 @@ class TestImportIssues(TestCase):
   def test_import_without_mandatory(self):
     """Test import of data without mandatory role"""
     # Data can't be imported if mandatory role is not provided
-    mandatory_role = factories.AccessControlRoleFactory(
-        object_type="Market",
-        mandatory=True
-    ).name
-    not_mandatory_role = factories.AccessControlRoleFactory(
-        object_type="Market",
-        mandatory=False
-    ).name
+    with factories.single_commit():
+      mandatory_role = factories.AccessControlRoleFactory(
+          object_type="Market",
+          mandatory=True
+      ).name
+      not_mandatory_role = factories.AccessControlRoleFactory(
+          object_type="Market",
+          mandatory=False
+      ).name
+      email = factories.PersonFactory().email
 
-    email = factories.PersonFactory().email
     response_json = self.import_data(OrderedDict([
         ("object_type", "Market"),
         ("code", "market-1"),
@@ -163,16 +169,17 @@ class TestImportIssues(TestCase):
 
   def test_import_empty_mandatory(self):
     """Test import of data with empty mandatory role"""
-    mandatory_role = factories.AccessControlRoleFactory(
-        object_type="Market",
-        mandatory=True
-    ).name
-    not_mandatory_role = factories.AccessControlRoleFactory(
-        object_type="Market",
-        mandatory=False
-    ).name
+    with factories.single_commit():
+      mandatory_role = factories.AccessControlRoleFactory(
+          object_type="Market",
+          mandatory=True
+      ).name
+      not_mandatory_role = factories.AccessControlRoleFactory(
+          object_type="Market",
+          mandatory=False
+      ).name
+      email = factories.PersonFactory().email
 
-    email = factories.PersonFactory().email
     response_json = self.import_data(OrderedDict([
         ("object_type", "Market"),
         ("code", "market-1"),

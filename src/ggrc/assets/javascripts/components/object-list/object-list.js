@@ -78,7 +78,7 @@
        */
       clearSelection: function () {
         this.attr('items').forEach(function (item) {
-          item.attr('isSelected', false);
+          item.removeAttr('isSelected', false);
         });
         this.attr('selectedItem.el', null);
         this.attr('selectedItem.data', null);

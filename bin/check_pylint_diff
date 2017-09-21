@@ -5,13 +5,12 @@
 set -o nounset
 set -o errexit
 
-ARG1=${1:-}
-TMP_REPO="/tmp/ggrc-core"
-SCRIPT=$(basename "$0")
-SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+declare -r TMP_REPO="/tmp/ggrc-core"
+declare -r SCRIPT=$(basename "$0")
+declare -r SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
-if [[ "$ARG1" == "-h" || "$ARG1" == "--help" ]]; then
-  echo "
+usage () {
+  cat <<EOF
 Usage: $SCRIPT [test_commit] [-h]
 
 This script will compare pylint error count from two different commits.
@@ -27,45 +26,78 @@ Given the commit tree:
 - Running '$SCRIPT' on C will check the diff between B and C
 - Running '$SCRIPT' on H will check the diff between G and H
 - Running '$SCRIPT F' on H will check the diff between F and H
-"
-  exit 0
-fi
+EOF
+}
 
-rm -rf $TMP_REPO
-cp -a /vagrant $TMP_REPO
-cd $TMP_REPO
-git clean -xdfq
-git reset --hard HEAD
+main () {
+  if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    usage
+  fi
 
-if [[ "$ARG1" != "" ]]; then
-  TEST_COMMIT=$ARG1
-else
-  TEST_COMMIT=$(git rev-parse HEAD)
-fi
+  local -r CURRENT_COMMIT=$(git rev-parse HEAD)
+  local OLD_COMMIT="${1:-}"
 
-CURRENT_COMMIT=$(git rev-parse HEAD)
-PARENT_1=$(git show --pretty=raw $TEST_COMMIT | grep parent | head -1 | grep -oE "[^ ]*$")
+  if [[ -z "${OLD_COMMIT}" ]]; then
+    OLD_COMMIT="$CURRENT_COMMIT^1"
+  fi
 
-echo "Comparing commits $TEST_COMMIT and $PARENT_1."
+  OLD_COMMIT=$(git rev-parse "$OLD_COMMIT")
 
-CHANGED_FILES=$(git diff --name-only $TEST_COMMIT $PARENT_1 | grep "\.py$" || true )
-if [[ "$CHANGED_FILES" == "" ]]; then
-  echo "No python files changed. Skipping flake checks"
-  exit 0
-fi
+  rm -rf "$TMP_REPO"
+  mkdir -p "$TMP_REPO"
+  cd "$TMP_REPO"
+  git clone /vagrant "$TMP_REPO"
 
-echo "Checking files:"
-echo "$CHANGED_FILES"
-echo ""
+  echo "Comparing commits $OLD_COMMIT and $CURRENT_COMMIT."
 
-# Run pylint on the old and new code, to compare the quality.
-# If pylint is run multiple times it will store the previous results and show
-# the change in quality with a non-negative number if code was improved or not
-# changed, and a negative number if more code issues have been introduced.
+  CHANGED_FILES=$(git diff --name-only $OLD_COMMIT $CURRENT_COMMIT | grep "\.py$" || true)
+  if [[ "$CHANGED_FILES" == "" ]]; then
+    echo "No python files changed. Skipping pylint checks"
+    exit 0
+  fi
+
+  echo "Checking files:"
+  echo "$CHANGED_FILES"
+  echo ""
+
+  # Run pylint on the old and new code, to compare the quality.
+  # If pylint is run multiple times it will store the previous results and show
+  # the change in quality with a non-negative number if code was improved or not
+  # changed, and a negative number if more code issues have been introduced.
+  echo "running pylint on old commit"
+  RESULT_1=$(run_pylint "$OLD_COMMIT" "$CHANGED_FILES")
+
+  echo "running pylint on current commit"
+  RESULT_2=$(run_pylint "$CURRENT_COMMIT" "$CHANGED_FILES")
+
+  echo "
+  -------------------------------------------------------------------------------
+  "
+  cat "$CURRENT_COMMIT.pylint"
+  echo "
+  -------------------------------------------------------------------------------
+  "
+  echo "Pylint results."
+  echo "Number of issues on old commit: $RESULT_1"
+  echo "Number of issues on current commit: $RESULT_2"
+  if [ "$RESULT_2" -le "$RESULT_1" ]; then
+    echo "Ok"
+    exit 0
+  else
+    echo "FAIL: pylint score got worse"
+    exit 1
+  fi
+}
 
 function run_pylint() {
-  
-  result=$(echo "$CHANGED_FILES" | xargs pylint 2> /dev/null | tail -n2 | \
+  COMMIT="$1"
+  CHANGED_FILES="$2"
+
+  git checkout -q "$COMMIT"
+  git clean -xdfq
+  git reset -q --hard HEAD
+
+  result=$(echo "$CHANGED_FILES" | xargs pylint 2> /dev/null | tee "$COMMIT.pylint" | tail -n2 | \
     grep -E " [^ ]+/10" -o | head -n1 | grep -E -e "[^\.]+" -o | head -n1 \
     || true )
 
@@ -76,34 +108,4 @@ function run_pylint() {
   fi
 }
 
-git checkout -q $PARENT_1
-git clean -xdfq
-git reset --hard HEAD
-echo "running pylint on parent commit"
-RESULT_1=$( run_pylint )
-
-git checkout -q $TEST_COMMIT
-git clean -xdfq
-git reset --hard HEAD
-echo "running pylint on test commit"
-RESULT_2=$( run_pylint )
-
-echo "
--------------------------------------------------------------------------------
-"
-echo "$CHANGED_FILES" | xargs pylint || true
-echo "
--------------------------------------------------------------------------------
-"
-
-echo "Pylint results."
-echo "Number of issues on parent commit: $RESULT_1"
-echo "Number of issues on the pull request: $RESULT_2"
-
-if [ "$RESULT_2" -le "$RESULT_1" ]; then
-  echo "Ok"
-  exit 0
-else
-  echo "FAIL: pylint score got worse"
-  exit 1
-fi
+main "$@"

@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Spinner from 'spin.js';
+import '../components/gca-controls/gca-controls';
+
 (function (can, $, GGRC, Permission) {
   'use strict';
 

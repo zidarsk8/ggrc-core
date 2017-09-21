@@ -8,9 +8,9 @@ from cached_property import cached_property
 
 from ggrc import db
 from ggrc import models
-from ggrc.automapper import AutomapperGenerator
 from ggrc.converters import errors
 from ggrc.converters.handlers.handlers import MappingColumnHandler
+from ggrc.snapshotter.rules import Types
 
 
 class SnapshotInstanceColumnHandler(MappingColumnHandler):
@@ -105,20 +105,25 @@ class SnapshotInstanceColumnHandler(MappingColumnHandler):
       elif self.unmap and mapping:
         db.session.delete(mapping)
     db.session.flush(relationships)
-    # it is safe to reuse this automapper since no other objects will be
-    # created while creating automappings and cache reuse yields significant
-    # performance boost
-    automapper = AutomapperGenerator(use_benchmark=False)
-    for relation in relationships:
-      automapper.generate_automappings(relation)
     self.dry_run = True
 
   def get_value(self):
     "return column value"
     if self.unmap or not self.mapping_object:
       return ""
-    human_readable_ids = [getattr(i, "slug", getattr(i, "email", None))
-                          for i in self.snapshoted_instances_query.all()]
+    if self.row_converter.obj.type == models.Audit.__name__ and \
+       self.mapping_object.__name__ in Types.all:
+      # Audit should have the same mappings as Assessment. Mapped objects
+      # will be loaded from snapshots.
+      mapped_snapshots = self.row_converter.block_converter.mapped_snapshots
+      snapshot_slugs = mapped_snapshots[self.row_converter.obj.id][
+          self.mapping_object.__name__
+      ]
+      human_readable_ids = sorted(list(snapshot_slugs))
+    else:
+      objects = self.snapshoted_instances_query.all()
+      human_readable_ids = [getattr(i, "slug", getattr(i, "email", None))
+                            for i in objects]
     return "\n".join(human_readable_ids)
 
   def is_valid_creation(self, to_append_ids):

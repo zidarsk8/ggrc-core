@@ -10,6 +10,7 @@ import os
 import tempfile
 import csv
 from StringIO import StringIO
+from mock import patch
 
 from sqlalchemy import exc
 from sqlalchemy import func
@@ -18,6 +19,8 @@ from flask.ext.testing import TestCase as BaseTestCase
 
 from ggrc import db
 from ggrc.app import app
+from ggrc.converters.import_helper import read_csv_file
+from ggrc.views.converters import check_import_file
 from ggrc.models import Revision
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
@@ -28,6 +31,11 @@ logging.disable(logging.CRITICAL)
 
 
 THIS_ABS_PATH = os.path.abspath(os.path.dirname(__file__))
+
+
+def read_imported_file(file_data):  # pylint: disable=unused-argument
+  csv_file = check_import_file()
+  return read_csv_file(csv_file)
 
 
 class SetEncoder(json.JSONEncoder):
@@ -136,6 +144,7 @@ class TestCase(BaseTestCase, object):
   def setUp(self):
     self.clear_data()
     self._custom_headers = {}
+    self.headers = {}
 
   def tearDown(self):  # pylint: disable=no-self-use
     db.session.remove()
@@ -219,6 +228,7 @@ class TestCase(BaseTestCase, object):
       return cls._import_file(os.path.basename(tmp.name), dry_run, person)
 
   @classmethod
+  @patch("ggrc.views.converters.get_gdrive_file", new=read_imported_file)
   def _import_file(cls, filename, dry_run=False, person=None):
     """Function that handle sending file to import_csv service"""
     data = {"file": (open(os.path.join(cls.CSV_DIR, filename)), filename)}
@@ -248,14 +258,21 @@ class TestCase(BaseTestCase, object):
     return post action response to export_csv service with data argument as
     sended data
     """
-    headers = {
-        'Content-Type': 'application/json',
-        "X-requested-by": "GGRC",
-        "X-export-view": "blocks",
+    if not hasattr(self, "headers") or not self.headers:
+      self.headers = {
+          'Content-Type': 'application/json',
+          "X-requested-by": "GGRC",
+          "X-export-view": "blocks",
+      }
+    if hasattr(self, "_custom_headers"):
+      self.headers.update(self._custom_headers)
+    request_body = {
+        "export_to": "csv",
+        "objects": data
     }
-    headers.update(self._custom_headers)
-    return self.client.post("/_service/export_csv", data=json.dumps(data),
-                            headers=headers)
+    return self.client.post("/_service/export_csv",
+                            data=json.dumps(request_body),
+                            headers=self.headers)
 
   def export_parsed_csv(self, data):
     """returns the dict of list of dict
@@ -347,12 +364,13 @@ class TestCase(BaseTestCase, object):
     )
     return revisions
 
-  def _create_snapshots(self, audit, objects):
+  @classmethod
+  def _create_snapshots(cls, audit, objects):
     """Create snapshots of latest object revisions for given objects."""
     # This commit is needed if we're using factories with single_commit, so
     # that the latest revisions will be fetched properly.
     db.session.commit()
-    revisions = self._get_latest_object_revisions(objects)
+    revisions = cls._get_latest_object_revisions(objects)
     snapshots = [
         factories.SnapshotFactory(
             child_id=revision.resource_id,

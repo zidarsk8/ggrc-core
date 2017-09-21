@@ -79,4 +79,4 @@
     }
   });
 
-})(this.CMS, this.GGRC, this.can, this.can.$);
+})(window.CMS, window.GGRC, window.can, window.can.$);

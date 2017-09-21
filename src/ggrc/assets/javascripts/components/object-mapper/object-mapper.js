@@ -13,7 +13,27 @@
     Regulation: 'Section',
     Product: 'System',
     Standard: 'Section',
-    Contract: 'Clause'
+    Contract: 'Clause',
+    Control: 'Objective',
+    System: 'Product',
+    Process: 'Risk',
+    AccessGroup: 'System',
+    Clause: 'Contract',
+    DataAsset: 'Policy',
+    Facility: 'Program',
+    Issue: 'Control',
+    Market: 'Program',
+    OrgGroup: 'Program',
+    Policy: 'DataAsset',
+    Program: 'Standard',
+    Project: 'Program',
+    Risk: 'Control',
+    TaskGroupTask: 'Control',
+    Threat: 'Risk',
+    Vendor: 'Program',
+    Audit: 'Product',
+    RiskAssessment: 'Program',
+    TaskGroup: 'Control'
   };
 
   var getDefaultType = function (type, object) {
@@ -69,9 +89,8 @@
 
     events: {
       '.create-control modal:success': function (el, ev, model) {
-        this.viewModel.attr('showResults', true);
         this.viewModel.attr('newEntries').push(model);
-        this.element.find('mapper-results').viewModel().showNewEntries();
+        this.mapObjects(this.viewModel.attr('newEntries'));
       },
       '.create-control modal:added': function (el, ev, model) {
         this.viewModel.attr('newEntries').push(model);
@@ -79,16 +98,20 @@
       '.create-control click': function () {
         // reset new entries
         this.viewModel.attr('newEntries', []);
+        this.element.trigger('hideModal');
       },
       '{window} modal:dismiss': function (el, ev, options) {
         var joinObjectId = this.viewModel.attr('join_object_id');
+        $('body').trigger('closeMapper');
 
         // mapper sets uniqueId for modal-ajax.
         // we can check using unique id which modal-ajax is closing
         if (options.uniqueId &&
           joinObjectId === options.uniqueId &&
           this.viewModel.attr('newEntries').length > 0) {
-          this.element.find('mapper-results').viewModel().showNewEntries();
+          this.mapObjects(this.viewModel.attr('newEntries'));
+        } else {
+          this.element.trigger('showModal');
         }
       },
       inserted: function () {
@@ -111,6 +134,7 @@
         self.viewModel.attr('submitCbs').fire();
       },
       closeModal: function () {
+        $('body').trigger('closeMapper');
         this.viewModel.attr('is_saving', false);
 
         // TODO: Find proper way to dismiss the modal
@@ -141,16 +165,6 @@
         this.closeModal();
       },
       '.modal-footer .btn-map click': function (el, ev) {
-        var type = this.viewModel.attr('type');
-        var object = this.viewModel.attr('object');
-        var instance = CMS.Models[object].findInCacheById(
-          this.viewModel.attr('join_object_id'));
-        var mapping;
-        var Model;
-        var data = {};
-        var defer = [];
-        var que = new RefreshQueue();
-
         ev.preventDefault();
         if (el.hasClass('disabled') ||
           this.viewModel.attr('is_saving')) {
@@ -162,11 +176,22 @@
           return this.deferredSave();
         }
         this.viewModel.attr('is_saving', true);
+        this.mapObjects(this.viewModel.attr('selected'));
+      },
+      mapObjects: function (objects) {
+        var type = this.viewModel.attr('type');
+        var object = this.viewModel.attr('object');
+        var instance = CMS.Models[object].findInCacheById(
+          this.viewModel.attr('join_object_id'));
+        var mapping;
+        var Model;
+        var data = {};
+        var defer = [];
+        var que = new RefreshQueue();
 
         que.enqueue(instance).trigger().done(function (inst) {
           data.context = instance.context || null;
-          this.viewModel.attr('selected').forEach(
-          function (destination) {
+          objects.forEach(function (destination) {
             var modelInstance;
             var isMapped;
             var isAllowed;

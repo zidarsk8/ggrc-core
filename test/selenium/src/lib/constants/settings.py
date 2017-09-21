@@ -5,7 +5,9 @@
 
 
 # size of the header in px
-SIZE_HEADER = 50
+SIZE_HEADER = 90
+SIZE_PANE_HEADER = 90
+SIZE_FOOTER = 40
 
 
 class Section(object):

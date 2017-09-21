@@ -19,6 +19,7 @@ class Common(object):
   MODAL_CONFIRM = ".modal.hide"
   MODAL_MAP = ".modal-selector"
   MODAL_FOOTER = " .modal-footer"
+  MODAL_FILTER = " .modal-filter"
   # info page (panel)
   INFO_WIDGET = ".info"
   # dropdown
@@ -47,6 +48,11 @@ class Common(object):
   # import / export pages
   CONTENT = ".content"
   OPTION = "option"
+  # panel locator
+  PANEL_CSS = (By.CSS_SELECTOR, ".pin-content.cms_controllers_info_pin")
+  OBJECT_AREA_CSS = (By.CSS_SELECTOR, ".object-area")
+  # alerts
+  ALERT_SUCCESS_CSS = (By.CSS_SELECTOR, ".content>.flash>.alert-success")
 
 
 class CommonAssessment(object):
@@ -202,14 +208,17 @@ class ExportPage(object):
   _EXPORT_PAGE = _CONTENT + " #csv_export"
   _EXPORT_PANEL = ".new-relevant-block"
   # general
-  EXPORT_PAGE = (By.CSS_SELECTOR, _EXPORT_PAGE)
-  EXPORT_PANEL = (By.CSS_SELECTOR, _EXPORT_PANEL)
+  EXPORT_PAGE_CSS = (By.CSS_SELECTOR, _EXPORT_PAGE)
+  EXPORT_PANEL_CSS = (By.CSS_SELECTOR, ".choose-object-wrap " + _EXPORT_PANEL)
   # labels
-  TITLE = (By.CSS_SELECTOR, Common.TITLE)
+  TITLE_LBL_CSS = (By.CSS_SELECTOR, Common.TITLE)
   # user input elements
-  BUTTON_ADD_OBJECT_TYPE = (By.CSS_SELECTOR, "#addAnotherObjectType")
-  BUTTON_EXPORT_OBJECTS = (By.CSS_SELECTOR, "#export-csv-button")
-  SPINNER_EXPORT_OBJECTS = (By.CSS_SELECTOR, ".spinner")
+  EXPORT_FORMAT_DD_CSS = (
+      By.CSS_SELECTOR, ".export-format")
+  ADD_OBJECT_TYPE_BTN_CSS = (
+      By.CSS_SELECTOR, "#addAnotherObjectType")
+  EXPORT_OBJECTS_BTN_CSS = (By.CSS_SELECTOR, "#export-csv-button")
+  EXPORT_OBJECTS_SPINNER_CSS = (By.CSS_SELECTOR, ".spinner")
 
 
 class ExtendedInfo(object):
@@ -228,9 +237,11 @@ class CommonModalUnifiedMapper(object):
   """Common locators for unified mapper modals."""
   # pylint: disable=invalid-name
   MODAL = Common.MODAL_MAP
+  MODAL_FILTER = Common.MODAL_FILTER
   FILTER_TOGGLE_CSS = (By.CSS_SELECTOR,
-                       '.object-controls__container collapse-panel-click-area')
-  FILTER_ADD_ATTRIBUTE = (By.CSS_SELECTOR, ".filter-container__footer button")
+                       MODAL_FILTER + " collapse-panel-click-area")
+  FILTER_ADD_ATTRIBUTE_BTN = (By.XPATH, "//button[text()='Add Attribute']")
+  FILTER_ROW_CSS = (By.CSS_SELECTOR, ".filter-container__attribute")
   FILTER_OPERATOR = (By.CSS_SELECTOR, ".filter-operator__content select")
   FILTER_ATTRIBUTE_NAME = (By.CSS_SELECTOR, ".filter-attribute__name select")
   FILTER_ATTRIBUTE_COMPARE = (
@@ -240,11 +251,6 @@ class CommonModalUnifiedMapper(object):
   OBJ_TYPE = (By.CSS_SELECTOR, MODAL + " .object-controls__type h6")
   # user input elements
   OBJ_TYPE_DROPDOWN = (By.CSS_SELECTOR, MODAL + " .input-block-level")
-  FILTER_VIA_EXPRESSION_TEXT_BOX = (By.CSS_SELECTOR, MODAL + " #mapper-filter")
-  FILTER_BY_STATE_DROPDOWN = (By.CSS_SELECTOR,
-                              MODAL + " .multiselect-dropdown__input")
-  FILTER_BY_STATE_DROPDOWN_OPTIONS = (By.CSS_SELECTOR,
-                                      MODAL + " .multiselect-dropdown__label")
   BUTTON_SEARCH = (By.CSS_SELECTOR, MODAL + " button[type='submit']")
   FOUND_OBJECTS_TITLES = (By.CSS_SELECTOR, MODAL + " .flex-box .title-attr")
   FOUND_OBJECTS_CHECKBOXES = (By.CSS_SELECTOR,
@@ -607,7 +613,7 @@ class ModalDeleteObject(ModalCommonConfirmAction):
 
 class ModalUpdateObject(ModalCommonConfirmAction):
   """Locators for Update object modals."""
-  PERMALINK_ALERT = (By.CSS_SELECTOR, '.content>.flash>.alert-success')
+  PERMALINK_ALERT = Common.ALERT_SUCCESS_CSS
 
 
 class ModalCloneAudit(ModalCommonConfirmAction):
@@ -628,9 +634,10 @@ class CommonWidgetInfo(object):
                          '//div[starts-with(./@class, "span")]//h6/..')
   HEADERS_AND_VALUES = (By.XPATH, _HEADERS_AND_VALUES)
   LCAS_HEADERS_AND_VALUES = None  # due to exist only for WidgetInfoAssessment
-  CAS_HEADERS_AND_VALUES = (By.XPATH, _INFO_WIDGET_XPATH + "//inline-edit/div")
-  CAS_CHECKBOXES = (By.XPATH, _INFO_WIDGET_XPATH + "//inline-edit//input["
-                                                   "@type='checkbox']")
+  CAS_HEADERS_AND_VALUES = (By.XPATH,
+                            _INFO_WIDGET_XPATH + "//inline-edit-control/div")
+  CAS_CHECKBOXES = (By.XPATH, _INFO_WIDGET_XPATH +
+                    "//inline-edit-control//input[""@type='checkbox']")
   # labels
   TITLE = (By.XPATH, _MAIN_HEADER_XPATH + "//h6")
   TITLE_ENTERED = (By.XPATH, _MAIN_HEADER_XPATH + "//h3")
@@ -702,7 +709,7 @@ class WidgetInfoProgram(WidgetInfoPanel):
   PRIVATE_PROGRAM = (By.CSS_SELECTOR,
                      '[data-test-id="title_private_ec758af9"] h6')
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
-  PERMALINK_ALERT = (By.CSS_SELECTOR, ".content>.flash>.alert-success")
+  PERMALINK_ALERT = Common.ALERT_SUCCESS_CSS
   ALERT_LINK_COPIED = (By.CSS_SELECTOR, ".alert.alert-success")
   MODAL_DELETE = (By.ID, '[id="ajax-lhn_modal-javascript:--"]')
   MODAL_DELETE_CLOSE = (By.CSS_SELECTOR, ".lhn_modal .grcicon-x-grey")
@@ -918,6 +925,8 @@ class TreeView(object):
   """Locators for Tree View components."""
   # common
   _WIDGET_NOT_HIDDEN_CSS = " .widget:not(.hidden) "
+  TREE_VIEW_CONTAINER_CSS = (
+      By.CSS_SELECTOR, _WIDGET_NOT_HIDDEN_CSS + " tree-widget-container>div")
   ITEMS = _WIDGET_NOT_HIDDEN_CSS + " .tree-item-element"
   HEADER = _WIDGET_NOT_HIDDEN_CSS + Common.TREE_HEADER
   ITEM_LOADING = (By.CSS_SELECTOR, " .tree-item-placeholder")
@@ -998,9 +1007,8 @@ class BaseWidgetGeneric(object):
       cls.DROPDOWN_STATES = (
           By.CSS_SELECTOR,
           str(_FILTER_DROPDOWN_ELEMENTS).format(cls._object_name))
-  FILTER_PANE_COUNTER = (
-      By.CSS_SELECTOR,
-      "section.widget:not(.hidden) .tree-view-pagination__count__title")
+  PAGINATION_CONTROLLERS = (
+      By.CSS_SELECTOR, "section.widget:not(.hidden) .tree-pagination.flex-box")
 
 
 class WidgetAudits(BaseWidgetGeneric):

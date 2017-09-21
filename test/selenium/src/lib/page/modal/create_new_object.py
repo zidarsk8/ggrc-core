@@ -28,7 +28,8 @@ class CreateNewObjectModal(modal_base.BaseModal):
   def save_and_close(self):
     """Create object and close Creation modal."""
     self.button_save_and_close.click()
-    selenium_utils.get_when_invisible(self._driver, self._locator_button_save)
+    selenium_utils.wait_until_not_present(
+        self._driver, self._locator_button_save)
 
 
 class ProgramsCreate(modal_base.ProgramsModal, CreateNewObjectModal):

@@ -1,0 +1,140 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="flex-box flex-col {{cssClasses}}">
+  <div class="flex-box flex-col header tree-header-content">
+    <div class="flex-box tree-filter">
+      <tree-filter-input class="flex-size-1"
+                         {register-filter}="@registerFilter"
+                         (submit)="onFilter"
+                         (openAdvanced)="openAdvancedFilter"
+                         (removeAdvanced)="removeAdvancedFilters"
+                         {show-advanced}="statusFilterVisible"
+                         {disabled}="advancedSearch.filter"
+      ></tree-filter-input>
+      {{#if statusFilterVisible}}
+        <tree-status-filter class="flex-size-1"
+                            {model-name}="modelName"
+                            {register-filter}="@registerFilter"
+                            (filter)="onFilter"
+                            {disabled}="advancedSearch.filter"
+        >
+          <multiselect-dropdown
+            {options}="filterStates"
+            placeholder="Filter by State"
+            plural="States"
+            {disabled}="advancedSearch.filter">
+          </multiselect-dropdown>
+          {{#if statusTooltipVisible}}
+            <i class="fa fa-question-circle" rel="tooltip"
+              title="The state represents the state of this object information within GGRC. It does not indicate the state of the underlying product or system."></i>
+          {{/if}}
+        </tree-status-filter>
+      {{/if}}
+      {{^if noResults}}
+      <tree-pagination {(paging)}="pageInfo"></tree-pagination>
+      {{/if}}
+    </div>
+
+    <div class="tree-action" style="display: flex; justify-content: flex-end;">
+      {{#if addItem}}
+        {{{renderLive addItem}}}
+      {{/if}}
+      {{#if show3bbs}}
+      <div class="details-wrap">
+        <a class="btn btn-3bbps dropdown-toggle" href="#" data-toggle="dropdown">
+          <span class="bubble"></span>
+          <span class="bubble"></span>
+          <span class="bubble"></span>
+        </a>
+        <ul class="dropdown-menu tree-action-list-items" role="menu">
+          {{^if_instance_of parent_instance 'Assessment'}}
+            {{^if isSnapshots}}
+              {{#is_allowed 'update' model.shortName context=parent_instance.context}}
+                <li>
+                  <a href="/import"
+                     target="_blank"
+                     class="section-import">
+                    <i class="fa fa-fw fa-cloud-upload"></i>
+                    Import {{model.model_plural}}
+                  </a>
+                </li>
+              {{/is_allowed}}
+            {{/if}}
+            {{#if showedItems.length}}
+              <li>
+                <a href="/export?model_type={{model.model_singular}}&relevant_type={{parent_instance.type}}&relevant_id={{parent_instance.id}}{{#if isSnapshots}}&isSnapshots=true{{/if}}"
+                   target="_blank"
+                   class="section-import">
+                  <i class="fa fa-fw fa-download"></i>
+                  Export {{model.model_plural}}
+                </a>
+              </li>
+            {{/if}}
+          {{/if_instance_of}}
+          {{#if showGenerateAssessments}}
+            <assessment-generator-button audit="parent_instance"></assessment-generator-button>
+          {{/if}}
+        </ul>
+      </div>
+      {{/if}}
+    </div>
+
+    <simple-modal {state}="advancedSearch" modal-title="'{{model.title_singular}} Advanced Search'" extra-css-class="advanced-search">
+      <div class="advanced-search__content">
+        <div class="simple-modal__body">
+          <advanced-search-filter-container
+            {(items)}="advancedSearch.filterItems"
+            {available-attributes}="columns.available"
+            {model-name}="modelName">
+          </advanced-search-filter-container>
+        </div>
+        <div class="advanced-search__mapping-header">
+          <h4>Filter by Mapping</h4>
+        </div>
+        <div class="simple-modal__body">
+          <advanced-search-mapping-container
+            {(items)}="advancedSearch.mappingItems"
+            {model-name}="modelName">
+          </advanced-search-mapping-container>
+        </div>
+      </div>
+      <div class="simple-modal__footer">
+        <div class="advanced-search__controls">
+          <button type="reset" class="btn btn-white" ($click)="resetAdvancedFilters()">Reset to Defaults</button>
+          <button type="submit" class="btn btn-lightBlue" ($click)="applyAdvancedFilters()">Apply</button>
+        </div>
+      </div>
+    </simple-modal>
+
+    <tree-header {selected-columns}="columns.selected"
+                 {available-columns}="columns.available"
+                 {mandatory}="columns.mandatory"
+                 {disable-configuration}="columns.disableConfiguration"
+                 {sorting-info}="sortingInfo"
+                 {model}="model"
+                 (sort)="onSort(%event)"
+                 (update-columns)="onUpdateColumns(%event)"
+    ></tree-header>
+  </div>
+
+  <tree-view {items}="showedItems"
+             {limit-depth-tree}="limitDepthTree"
+             {selected-columns}="columns.selected"
+             {mandatory}="columns.mandatory"
+             {disable-configuration}="columns.disableConfiguration"
+             {mapping}="options.mapping"
+             {loading}="loading"
+             {parent-instance}="parent_instance"
+             {model}="model"
+             {get-depth-filter}="@getDepthFilter"
+  ></tree-view>
+
+  <div class="tree-footer flex-box">
+    {{^if noResults}}
+      <tree-pagination {(paging)}="pageInfo"></tree-pagination>
+    {{/if}}
+  </div>
+</div>

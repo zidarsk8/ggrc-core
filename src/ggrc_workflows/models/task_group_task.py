@@ -10,6 +10,7 @@ from sqlalchemy import orm
 from sqlalchemy import schema
 
 from ggrc import db
+from ggrc.builder import simple_property
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
@@ -95,7 +96,9 @@ class TaskGroupTask(mixins.WithContact,
       'sort_index',
       'object_approval',
       'task_type',
-      'response_options'
+      'response_options',
+      reflection.Attribute('view_start_date', update=False, create=False),
+      reflection.Attribute('view_end_date', update=False, create=False),
   )
   _sanitize_html = []
   _aliases = {
@@ -144,6 +147,18 @@ class TaskGroupTask(mixins.WithContact,
         (TaskGroup.id == cls.task_group_id) &
         (predicate(TaskGroup.slug) | predicate(TaskGroup.title))
     ).exists()
+
+  def _get_view_date(self, date):
+    if date and self.task_group and self.task_group.workflow:
+      return self.task_group.workflow.calc_next_adjusted_date(date)
+
+  @simple_property
+  def view_start_date(self):
+    return self._get_view_date(self.start_date)
+
+  @simple_property
+  def view_end_date(self):
+    return self._get_view_date(self.end_date)
 
   @classmethod
   def eager_query(cls):

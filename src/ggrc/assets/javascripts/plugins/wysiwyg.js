@@ -2,6 +2,12 @@
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
+
+import 'wysihtml5/wysihtml5-0.4.0pre';
+import 'wysihtml5/bootstrap-wysihtml5-0.0.2';
+import '../bootstrap/wysihtml5.js';
+import wysihtml5ParserRules from 'wysihtml5/advanced';
+
 (function($) {
   $.fn.cms_wysihtml5 = function() {
     if ($(this).data('_wysihtml5_initialized')) {

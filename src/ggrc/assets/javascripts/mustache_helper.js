@@ -3,9 +3,12 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (namespace, $, can) {
+import Spinner from 'spin.js';
+
+(function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.
   var mustache_urls = {};
+  var Mustache = can.Mustache;
   $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
     if (/\.mustache$/.test(options.url)) {
       if (mustache_urls[options.url]) {
@@ -1089,7 +1092,7 @@ Mustache.registerHelper('system_role', function (role, options) {
   role = role.toLowerCase();
   // If there is no user, it's same as No Role
   var user_role = (GGRC.current_user ? GGRC.current_user.system_wide_role : 'no access').toLowerCase();
-      isValid = role === user_role;
+  var isValid = role === user_role;
 
   return options[isValid ? 'fn' : 'inverse'](options.contexts || this);
 });
@@ -1397,6 +1400,7 @@ Mustache.registerHelper("current_user_is_admin", function (options) {
 
 Mustache.registerHelper("owned_by_current_user", function (instance, options) {
   var current_user_id = GGRC.current_user.id;
+  var owners;
   instance = Mustache.resolve(instance);
   owners = instance.attr('owners');
   if (owners) {
@@ -2277,66 +2281,6 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
     }
   );
 
-/*
-  Used to get the string value for custom attributes
-*/
-  Mustache.registerHelper('get_custom_attr_value',
-    function (attr, instance, options) {
-      var value = '';
-      var definition;
-      var customAttrItem;
-      var getValue;
-      var typeValueMap = {
-        checkbox: ['No', 'Yes']
-      };
-
-      attr = Mustache.resolve(attr);
-      instance = Mustache.resolve(instance);
-      customAttrItem = Mustache.resolve(
-        (options.hash || {}).customAttrItem
-      );
-
-      can.each(GGRC.custom_attr_defs, function (item) {
-        if (item.definition_type === instance.class.table_singular &&
-          item.title === attr.attr_name) {
-          definition = item;
-        }
-      });
-
-      if (definition) {
-        getValue = function (item) {
-          if (!(instance instanceof CMS.Models.Assessment)) {
-            // reify all models with the exception of the Assessment,
-            // because it has a different logic of work with the CA
-            item = item.reify();
-          }
-          if (item.custom_attribute_id === definition.id) {
-            if (definition.attribute_type.startsWith('Map:')) {
-              value = options.fn(options.contexts.add({
-                object: item.attribute_object ?
-                  item.attribute_object.reify() : null
-              }));
-            } else if (typeValueMap[item.attributeType]) {
-              value = typeValueMap[item.attributeType][item.attribute_value] ||
-                'No';
-            } else {
-              value = (item.attributeType === 'date') ?
-                GGRC.Utils.formatDate(item.attribute_value, true) :
-                item.attribute_value;
-            }
-          }
-        };
-
-        if (!_.isUndefined(customAttrItem)) {
-          getValue(customAttrItem);
-        } else {
-          can.each(instance.custom_attribute_values, getValue);
-        }
-      }
-
-      return value || '';
-    });
-
   Mustache.registerHelper('pretty_role_name', function (name) {
     name = Mustache.resolve(name);
     var ROLE_LIST = {
@@ -2703,4 +2647,4 @@ Example:
           return options.fn(options.contexts.add({hasRole: hasRole}));
         }, hasRoleForContextDfd);
     });
-})(this, jQuery, can);
+})(jQuery, can);

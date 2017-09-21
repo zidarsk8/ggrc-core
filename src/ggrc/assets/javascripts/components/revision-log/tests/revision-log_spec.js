@@ -42,7 +42,7 @@ describe('GGRC.Components.revisionLog', function () {
       viewModel = GGRC.Components.getViewModel('revisionLog');
     });
 
-    it('displays a toaster error if fetching the data fails', function () {
+    xit('displays a toaster error if fetching the data fails', function () {
       var $fakeElement = {
         trigger: jasmine.createSpy()
       };
@@ -222,7 +222,7 @@ describe('GGRC.Components.revisionLog', function () {
     it('includes the author of the change(s) in the result', function () {
       var rev1 = {
         updated_at: '2016-01-24T10:05:42',
-        modified_by: 'User 7',
+        modified_by: 'User 6',
         content: {}
       };
       var rev2 = {
@@ -234,6 +234,43 @@ describe('GGRC.Components.revisionLog', function () {
       var result = viewModel._objectChangeDiff(rev1, rev2);
 
       expect(result.madeBy).toEqual('User 7');
+    });
+
+    it('includes the author\'s role of the change(s) in the result',
+      function () {
+        var rev1 = {
+          updated_at: '2016-01-24T10:05:42',
+          modified_by: 'User 6',
+          content: {}
+        };
+        var rev2 = {
+          updated_at: '2016-01-30T08:15:11',
+          modified_by: 'User 7',
+          content: {}
+        };
+
+        var result = viewModel._objectChangeDiff(rev1, rev2);
+        expect(result.role).toEqual('none');
+      });
+
+    it('dooes not include author\'s details ' +
+      'when person is not presented', function () {
+      var rev1 = {
+        updated_at: '2016-01-24T10:05:42',
+        modified_by: 'User 6',
+        content: {}
+      };
+      var rev2 = {
+        updated_at: '2016-01-30T08:15:11',
+        modified_by: null,
+        content: {}
+      };
+
+      var result = viewModel._objectChangeDiff(rev1, rev2);
+      expect(result.madeBy).toBeNull();
+      expect(viewModel._getRoleAtTime)
+        .toHaveBeenCalledWith(null, rev2.updated_at);
+      expect(result.role).toEqual('none');
     });
 
     describe('with model attributes definitions defined', function () {
@@ -583,9 +620,7 @@ describe('GGRC.Components.revisionLog', function () {
         id: 123,
         type: 'ObjectFoo'
       });
-      viewModel._getRoleAtTime = function () {
-        return 'none';
-      };
+      spyOn(viewModel, '_getRoleAtTime').and.returnValue('none');
     });
 
     afterAll(function () {
@@ -659,6 +694,39 @@ describe('GGRC.Components.revisionLog', function () {
         });
       }
     );
+
+    it('returns correct change information ' +
+      'when author of the change(s) is not presented', function () {
+      var revision = {
+        modified_by: null,
+        updated_at: new Date('2015-05-17T17:24:01'),
+        source: {
+          display_type: function () {
+            return 'Other';
+          },
+          display_name: function () {
+            return 'OtherObject';
+          }
+        },
+        destination_id: 123,
+        destination_type: 'ObjectFoo'
+      };
+
+      var result = viewModel._mappingChange(revision, [revision]);
+
+      expect(viewModel._getRoleAtTime)
+        .toHaveBeenCalledWith(null, revision.updated_at);
+      expect(result).toEqual({
+        madeBy: null,
+        role: 'none',
+        updatedAt: new Date('2015-05-17T17:24:01'),
+        changes: {
+          origVal: '—',
+          newVal: '',
+          fieldName: 'Mapping to Other: OtherObject'
+        }
+      });
+    });
   });
 
   describe('_computeRoleChanges method', function () {
@@ -956,5 +1024,9 @@ describe('GGRC.Components.revisionLog', function () {
           expect(viewModel
             ._getRoleAtTime(0, new Date(2016, 1, 2))).toEqual('none');
         });
+    it('returns "none" if user does not exist', function () {
+      expect(viewModel
+        ._getRoleAtTime(null, new Date(2016, 1, 2))).toEqual('none');
+    });
   });
 });

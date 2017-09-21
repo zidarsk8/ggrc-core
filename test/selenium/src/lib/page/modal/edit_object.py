@@ -5,6 +5,7 @@
 from lib import decorator
 from lib.constants import locator
 from lib.page.modal import base as modal_base, delete_object
+from lib.utils import selenium_utils
 
 
 class _EditModal(modal_base.BaseModal):
@@ -20,6 +21,10 @@ class _EditModal(modal_base.BaseModal):
   def save_and_close(self):
     """Edit object and close Edit modal."""
     self.button_save_and_close.click()
+    selenium_utils.wait_until_element_visible(
+        self._driver, locator.Common.ALERT_SUCCESS_CSS)
+    selenium_utils.wait_until_not_present(
+        self._driver, self._locator_button_save)
 
 
 class Assessments(modal_base.AsmtsModal, _EditModal):

@@ -4,5 +4,5 @@
 
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
-cd "${SCRIPTPATH}/../src/ggrc"
-webassets -m ggrc.assets watch
+cd "${SCRIPTPATH}/.."
+npm run watch

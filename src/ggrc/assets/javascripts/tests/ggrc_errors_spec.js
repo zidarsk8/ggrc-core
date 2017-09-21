@@ -5,7 +5,7 @@
 
 'use strict';
 
-describe('GGRC.Errors module', function () {
+xdescribe('GGRC.Errors module', function () {
   var notifier;
   var $fake;
   var _originalMessages;

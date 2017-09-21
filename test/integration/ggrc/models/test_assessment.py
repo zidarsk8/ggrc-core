@@ -680,14 +680,14 @@ class TestAssessmentGeneration(ggrc.TestCase):
       import_data.append(collections.OrderedDict([
           ("object_type", "Assessment"),
           ("Code", asmt.slug),
-          ("Url", url_str),
-          ("Evidence", evidences_str),
+          ("Evidence Url", url_str),
+          ("Evidence File", evidences_str),
       ]))
       update_data.append(collections.OrderedDict([
           ("object_type", "Assessment"),
           ("Code", asmt.slug),
-          ("Url", "" if num == test_asmt_num else url_str),
-          ("Evidence", "" if num == test_asmt_num else evidences_str),
+          ("Evidence Url", "" if num == test_asmt_num else url_str),
+          ("Evidence File", "" if num == test_asmt_num else evidences_str),
       ]))
 
     res = self.import_data(*import_data)

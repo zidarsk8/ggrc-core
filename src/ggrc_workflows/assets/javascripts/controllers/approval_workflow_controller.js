@@ -52,7 +52,7 @@ GGRC.register_modal_hook("approvalform", function($target, $trigger, option) {
   });
 });
 
-})(this.can, this.can.$, this.GGRC, this.CMS);
+})(window.can, window.can.$, window.GGRC, window.CMS);
 
 
 //Calendar authentication

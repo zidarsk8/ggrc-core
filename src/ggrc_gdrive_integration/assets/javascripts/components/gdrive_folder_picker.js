@@ -290,10 +290,9 @@
           viewModel.attr('folder_error', null);
         });
       },
-
       'a[data-toggle=gdrive-picker] click': function (el, ev) {
-        var dfd = GGRC.Controllers.GAPI.authorize(['https://www.googleapis.com/auth/drive']);
         var folder_id = el.data('folder-id');
+        var dfd;
 
         // Create and render a Picker object for searching images.
         function createPicker() {
@@ -349,7 +348,7 @@
             if (el.data('type') === 'folders') {
               model = CMS.Models.GDriveFolder;
             } else {
-              model = CMS.Mdoels.GDriveFile;
+              model = CMS.Models.GDriveFile;
             }
             files = model.models(data[DOCUMENTS]);
             el.trigger('picked', {
@@ -360,6 +359,7 @@
           }
         }
 
+        dfd = GGRC.Controllers.GAPI.reAuthorize(gapi.auth.getToken());
         dfd.fail(this.unsetCurrent.bind(this))
           .done(function () {
             gapi.load('picker', {
@@ -446,4 +446,4 @@
       }
     }
   });
-})(this.can, this.can.$);
+})(window.can, window.can.$);

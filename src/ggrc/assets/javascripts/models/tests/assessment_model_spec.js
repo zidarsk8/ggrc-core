@@ -154,4 +154,45 @@ describe('CMS.Models.Assessment', function () {
       expect(actual[0].attr()).toEqual({id: 5, email: 'john@doe.com'});
     });
   });
+
+  describe('model() method', function () {
+    it('does not update backup if backup was not created', function () {
+      spyOn(_, 'extend');
+      CMS.Models.Assessment.model({data: 'test'}, new CMS.Models.Assessment());
+      expect(_.extend).not.toHaveBeenCalled();
+    });
+
+    it('updates backup if backup was created', function () {
+      var model = new CMS.Models.Assessment();
+      model.backup();
+      CMS.Models.Assessment.model({data: 'test'}, model);
+      expect(model._backupStore().data).toBe('test');
+    });
+  });
+
+  describe('form_preload() method', function () {
+    it('returns deferred indicates that auditors have been found', function () {
+      var model = new CMS.Models.Assessment();
+      var findAuditorsCallbackDfd = 'findAuditorsCallbackDfd';
+      var findAuditorsDfd = function () {
+        return {
+          then: function () {
+            return findAuditorsCallbackDfd;
+          }
+        };
+      };
+      var result;
+      spyOn(model, 'before_create');
+      spyOn(model, 'mark_for_addition');
+
+      model.attr('audit', new can.Map({
+        findAuditors: findAuditorsDfd,
+        contact: new can.Map()
+      }));
+
+      result = model.form_preload(true);
+
+      expect(result).toBe(findAuditorsCallbackDfd);
+    });
+  });
 });
