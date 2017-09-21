@@ -1,0 +1,17 @@
+{
+    "env": {
+	"production": {
+	    "minified": true,
+	    "comments": false,
+	    "compact": true
+	}
+    },
+    "plugins": [
+      "transform-runtime",
+      "syntax-dynamic-import",
+      "transform-strict-mode"
+    ],
+    "presets": [["env", {
+	"debug": true
+    }]]
+}

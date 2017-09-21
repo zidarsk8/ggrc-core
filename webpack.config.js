@@ -83,7 +83,14 @@ module.exports = function (env, argv) {
       }, {
         test: /\.mustache/,
         loader: 'raw-loader'
-      }]
+      }, {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components|third_party)/,
+        loader: 'babel-loader',
+        query: {
+          cacheDirectory: true,
+        },
+      }],
     },
     devtool: isDevelopment(env) ? 'eval' : 'source-map',
     resolve: {
