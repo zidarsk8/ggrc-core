@@ -225,11 +225,12 @@ class DatetimeValue(object):
   This mixin should be used for filtering datetime fields values only.
   """
 
-  VALUE_ERROR_MSG = (u"Invalid datetime was typed into `{alias}` field, "
-                     u"please change it and try again!")
+  VALUE_ERROR_MSG = (u"Specified date format is invalid for search,"
+                     u"please use the following format for date:"
+                     u"mm/dd/yyyy, mm-dd-yyyy, mm/yyyy, mm-yyyy, yyyy")
 
-  def get_value_error_msg(self, alias):
-    return self.VALUE_ERROR_MSG.format(alias=alias)
+  def get_value_error_msg(self):
+    return self.VALUE_ERROR_MSG
 
   @staticmethod
   def get_filter_value(value, operation):
@@ -256,10 +257,8 @@ class DateValue(DatetimeValue):
   This mixin should be used for filtering date fields values only.
   """
 
-  VALUE_ERROR_MSG = (u"Invalid date was typed into `{alias}` field, "
-                     u"please change it and try again!")
-
   def get_filter_value(self, value, operation):
+
     results = super(DateValue, self).get_filter_value(value, operation)
     if not results:
       return
