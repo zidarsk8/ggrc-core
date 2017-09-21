@@ -348,7 +348,7 @@
             if (el.data('type') === 'folders') {
               model = CMS.Models.GDriveFolder;
             } else {
-              model = CMS.Mdoels.GDriveFile;
+              model = CMS.Models.GDriveFile;
             }
             files = model.models(data[DOCUMENTS]);
             el.trigger('picked', {
