@@ -396,6 +396,7 @@ tree-header {
 sub-tree-models {
   .sub-tree-models {
     display: none;
+    cursor: default;
     position: absolute;
     background-color: $white;
     top: 0;
@@ -427,11 +428,14 @@ sub-tree-models {
     }
 
     .sub-models_item {
-      width: 120px;
+      min-width: 140px;
       margin-bottom: 15px;
 
       input {
         margin-right: 5px;
+      }
+      label {
+        cursor: pointer;
       }
     }
 
