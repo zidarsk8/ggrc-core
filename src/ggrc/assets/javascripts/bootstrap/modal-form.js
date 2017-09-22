@@ -393,6 +393,12 @@
       }
 
       for (type in flash) {
+        // data prop is reserved for mustache template data and
+        // we don't expect to have ajax:flash of a "data" type
+        if ( type === 'data' ) {
+          continue;
+        }
+
         if (flash[type]) {
           if (_.isString(flash[type])) {
             flash[type] = [flash[type]];
@@ -408,30 +414,34 @@
             $html.addClass('alert-autohide');
           }
 
-          for (messageI in flash[type]) {
-            if (!flash[type].hasOwnProperty(messageI)) {
-              continue;
-            }
-            message = flash[type][messageI];
-            // Skip error codes. To force display use String(...) when
-            // triggering the flash.
-            if (_.isString(message)) {
-              addLink = message.indexOf('{reload_link}') > -1;
-              message = message.replace('{reload_link}', '');
-              $html.append($(textContainer).text(message));
-              if (addLink) {
-                $html.removeClass('alert-autohide');
-                $link = $(`<a href="javascript://" class="reload-link">
-                              Show results
-                           </a>`);
-                $link.on('click', function () {
-                  if (redirectLink) {
-                    $('html').addClass('no-js');
-                    window.location.href = redirectLink;
-                  }
-                  window.location.reload();
-                });
-                $html.append($link);
+          if ( _.isFunction(flash[type]) ) {
+            $html.append(flash[type](flash.data || {}));
+          } else {
+            for (messageI in flash[type]) {
+              if (!flash[type].hasOwnProperty(messageI)) {
+                continue;
+              }
+              message = flash[type][messageI];
+              // Skip error codes. To force display use String(...) when
+              // triggering the flash.
+              if (_.isString(message)) {
+                addLink = message.indexOf('{reload_link}') > -1;
+                message = message.replace('{reload_link}', '');
+                $html.append($(textContainer).text(message));
+                if (addLink) {
+                  $html.removeClass('alert-autohide');
+                  $link = $(`<a href="javascript://" class="reload-link">
+                                Show results
+                             </a>`);
+                  $link.on('click', function () {
+                    if (redirectLink) {
+                      $('html').addClass('no-js');
+                      window.location.href = redirectLink;
+                    }
+                    window.location.reload();
+                  });
+                  $html.append($link);
+                }
               }
             }
           }
