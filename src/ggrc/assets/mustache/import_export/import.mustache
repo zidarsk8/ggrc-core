@@ -21,15 +21,11 @@
         {{/if_equals}}
 
         <div class="csv-input">
+          <input type="file" accept=".csv"
+                 data-file-upload class="csv-upload" name="upload"
+                 style="display:none" />
           {{#states}}
-            <a id="import_btn"
-               href="javascript://"
-               {{#isDisabled}}disabled{{/isDisabled}}
-               class="btn btn-small state-{{state}} {{class}}"
-               data-toggle="gdrive-picker"
-               data-type="documents">
-              {{{text}}}
-            </a>
+            <button id="import_btn" {{#isDisabled}}disabled{{/isDisabled}} class="btn btn-small state-{{state}} {{class}}">{{{text}}}</button>
             {{^if_equals state "select"}}
               {{#showSpinner}}
                 <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2, "zIndex": 0}' 'display:inline-block; top: -3px; left: 30px;' }}></span>
