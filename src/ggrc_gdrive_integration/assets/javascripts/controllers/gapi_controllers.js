@@ -40,7 +40,7 @@
     canonical_instance: null,
     o2dfd: null,
     drivedfd: null,
-    gapidfd: new $.Deferred(),
+    gapidfd: new $.Deferred(), // DFD which is resolved upon gapi library loader is available
     reAuthorize: function (token) {
       var params = ['https://www.googleapis.com/auth/drive'];
       var dfd;
@@ -64,6 +64,7 @@
       if (window.oauth_dfd.state() !== 'pending') {
         window.oauth_dfd = new $.Deferred();
       }
+      // loading gapi client libraries
       can.each({
         drivedfd: 'drive',
         o2dfd: 'oauth2'
@@ -194,40 +195,35 @@
         this.constructor.canonical_instance = this;
       }
 
-      this.doGAuthWithScopes = _.debounce($.proxy(this.constructor,
-        'doGAuth', this.options.scopes, false), 500);
+      this.doGAuthWithScopes = _.debounce(this.constructor.doGAuth.bind(
+          this.constructor, this.options.scopes, false), 500);
     },
     authorize: function (newscopes, force) {
-      var dfd;
-      var oldDfd;
+      var dfd = window.oauth_dfd;
       var that = this;
-      var found = false;
+      var reAuthWithNewScopes = false;
 
       can.each(newscopes, function (ns) {
-        if (!~can.inArray(ns, that.options.scopes)) {
+        // if new scope not in the list of scopes
+        if (!_.includes(that.options.scopes, ns)) {
           that.options.scopes.push(ns);
-          found = true;
+          reAuthWithNewScopes = true;
         }
       });
 
-      if (force || (found ? window.oauth_dfd.state() !== 'pending'
-          : window.oauth_dfd.state() === 'rejected')) {
-        oldDfd = window.oauth_dfd;
-        dfd = new $.Deferred();
-        setTimeout(f = function () {
-          if (window.oauth_dfd === oldDfd) {
-            setTimeout(f, 500);
-          } else {
-            window.oauth_dfd.done(function () {
-              dfd.resolve.apply(dfd, arguments);
-            });
-          }
-        }, 500);
+      if (force || reAuthWithNewScopes) {
+        // rejecting old Promise as it eventually might be resolved which will
+        // cause the double execution of the code
+        window.oauth_dfd.reject();
+        // creating new Promise and running the Auth process again
+        dfd = window.oauth_dfd = new $.Deferred();
+        window.oauth_dfd.done(function () {
+          dfd.resolve.apply(dfd, arguments);
+        });
         this.doGAuthWithScopes();
-        return dfd;
-      } else {
-        return window.oauth_dfd;
       }
+
+      return dfd;
     },
     '{scopes} change': function (scopes, ev) {
       this.doGAuthWithScopes(); // debounce in case we push several scopes in sequence
