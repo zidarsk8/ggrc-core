@@ -65,6 +65,14 @@ class BaseRestService(object):
     return [self.set_obj_attrs(attrs=new_attrs, obj=new_obj) for
             new_attrs, new_obj in zip(list_new_attrs, list_new_objs)]
 
+  def update_obj(self, obj, **attrs):
+    """Update attributes values of existing object via REST API."""
+    obj.update_attrs(**attrs)
+    return self.get_items_from_resp(
+        self.client.update_object(
+            href=obj.href, **dict({k: v for k, v in obj.__dict__
+                                  .iteritems() if k != "href"}.items())))
+
   @staticmethod
   def get_items_from_resp(response):
     """Check response from server and get items {key: value} from it."""
@@ -210,14 +218,6 @@ class AssessmentsService(BaseRestService):
           src_obj=ObjectPersonsFactory().default(), dest_objs=objs,
           attrs={"AssigneeType": ",".join(assignees)})
     return objs
-
-  def update_obj(self, obj, **attrs):
-    """Update attributes values of existing Assessment via REST API"""
-    obj.update_attrs(**attrs)
-    return self.get_items_from_resp(
-        self.client.update_object(
-            href=obj.href, **dict({k: v for k, v in obj.__dict__
-                                  .iteritems() if k != "href"}.items())))
 
 
 class IssuesService(BaseRestService):

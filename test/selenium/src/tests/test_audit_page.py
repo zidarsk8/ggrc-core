@@ -9,17 +9,18 @@
 import pytest
 
 from lib import base
-from lib.constants.element import AssessmentStates
+from lib.constants.element import AssessmentStates, ObjectStates, objects
 from lib.entities import entities_factory
 from lib.service import webui_service
+from lib.factory import get_cls_rest_service
 
 
 class TestAuditPage(base.Test):
   """Tests for audit functionality."""
 
   @pytest.fixture(scope="function")
-  def create_and_clone_audit(
-      self, new_program_rest, new_control_rest,
+  def create_and_clone_audit_w_params_to_update(
+      self, request, new_program_rest, new_control_rest,
       map_new_program_rest_to_new_control_rest, new_audit_rest,
       new_assessment_rest, new_assessment_template_rest, new_issue_rest,
       selenium
@@ -34,6 +35,14 @@ class TestAuditPage(base.Test):
     - Issue mapped to Audit via REST API.
     """
     # pylint: disable=too-many-locals
+    if hasattr(request, "param") and request.param:
+      if isinstance(request.param, tuple):
+        fixture, params_to_update = request.param
+        # fixtures which are objects
+        if fixture in request.fixturenames and fixture.startswith("new_"):
+          fixture = locals().get(fixture)
+          (get_cls_rest_service(objects.get_plural(fixture.type))().
+           update_obj(obj=fixture, **params_to_update))
     expected_audit = entities_factory.AuditsFactory().clone(
         audit=new_audit_rest)[0]
     expected_asmt_tmpl = entities_factory.AssessmentTemplatesFactory().clone(
@@ -92,12 +101,12 @@ class TestAuditPage(base.Test):
     self.general_assert(
         [expected_asmt], actual_asmts, "updated_at")
 
+  @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "dynamic_object, dynamic_relationships",
       [("new_control_rest", "map_new_program_rest_to_new_control_rest"),
        ("new_objective_rest", "map_new_program_rest_to_new_objective_rest")],
       indirect=True)
-  @pytest.mark.smoke_tests
   def test_asmt_creation_with_mapping(
       self, new_program_rest, dynamic_object, dynamic_relationships,
       new_audit_rest, selenium
@@ -182,13 +191,17 @@ class TestAuditPage(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
-  def test_cloned_audit_contains_new_attrs(self, create_and_clone_audit):
+  def test_cloned_audit_contains_new_attrs(
+      self, create_and_clone_audit_w_params_to_update
+  ):
     """Check via UI that cloned Audit contains new predicted attributes.
     Preconditions:
-    - Execution and return of fixture 'create_and_clone_audit'.
+    - Execution and return of fixture
+    'create_and_clone_audit_w_params_to_update'.
     """
-    expected_audit = create_and_clone_audit["expected_audit"].repr_ui()
-    actual_audit = create_and_clone_audit["actual_audit"]
+    expected_audit = (
+        create_and_clone_audit_w_params_to_update["expected_audit"].repr_ui())
+    actual_audit = create_and_clone_audit_w_params_to_update["actual_audit"]
     # due to 'expected_audit.slug = None'
     self.general_assert(
         expected_audit, actual_audit, "slug")
@@ -196,14 +209,15 @@ class TestAuditPage(base.Test):
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
   def test_non_clonable_objs_donot_move_to_cloned_audit(
-      self, create_and_clone_audit, selenium
+      self, create_and_clone_audit_w_params_to_update, selenium
   ):
     """Check via UI that non clonable objects
     Assessment, Issue do not move to cloned Audit.
     Preconditions:
-    - Execution and return of fixture 'create_and_clone_audit'.
+    - Execution and return of fixture
+    'create_and_clone_audit_w_params_to_update'.
     """
-    actual_audit = create_and_clone_audit["actual_audit"]
+    actual_audit = create_and_clone_audit_w_params_to_update["actual_audit"]
     actual_asmts_tab_count = (webui_service.AssessmentsService(selenium).
                               get_count_objs_from_tab(src_obj=actual_audit))
     actual_asmts = (webui_service.AssessmentsService(selenium).
@@ -217,37 +231,61 @@ class TestAuditPage(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
+  @pytest.mark.parametrize(
+      "create_and_clone_audit_w_params_to_update",
+      [("new_assessment_template_rest", {"status": ObjectStates.DRAFT}),
+       ("new_assessment_template_rest", {"status": ObjectStates.DEPRECATED}),
+       ("new_assessment_template_rest", {"status": ObjectStates.ACTIVE})],
+      ids=["Using initial Assessment Template w' 'Draft' status",
+           "Using initial Assessment Template w' 'Deprecated' status",
+           "Using initial Assessment Template w' 'Active' status"],
+      indirect=True)
   def test_clonable_audit_related_objs_move_to_cloned_audit(
-      self, create_and_clone_audit, selenium
+      self, create_and_clone_audit_w_params_to_update, selenium
   ):
-    """Check via UI that clonable audit related object
-    Assessment Template move to cloned Audit.
+    """Check via UI that clonable audit related object Assessment Template
+    move to cloned Audit using all initial Assessment Templates's states.
     Preconditions:
-    -Execution and return of fixture 'create_and_clone_audit'.
+    -Execution and return of fixture
+    'create_and_clone_audit_w_params_to_update'.
+    Test parameters:
+    - 'create_and_clone_audit_w_params_to_update' which contains params to
+    update asmt tmpl status via REST API.
     """
-    actual_audit = create_and_clone_audit["actual_audit"]
+    actual_audit = create_and_clone_audit_w_params_to_update["actual_audit"]
     expected_asmt_tmpl = (
-        create_and_clone_audit["expected_assessment_template"].repr_ui())
+        create_and_clone_audit_w_params_to_update[
+            "expected_assessment_template"].repr_ui())
     actual_asmt_tmpls = (webui_service.AssessmentTemplatesService(selenium).
                          get_list_objs_from_tree_view(src_obj=actual_audit))
     # due to 'expected_asmt_tmpl.slug = None',
     #        'expected_asmt_tmpl.updated_at = {None: None}'
-    self.general_assert(
-        expected_asmt_tmpl, actual_asmt_tmpls, "slug", "updated_at")
+    actual_asmt_tmpls = [
+        actual_asmt_tmpl.update_attrs(slug=None, updated_at=None, status=None)
+        for actual_asmt_tmpl in actual_asmt_tmpls]
+    # due to issue GGRC-3423
+    if expected_asmt_tmpl.status != ObjectStates.DRAFT:
+      if expected_asmt_tmpl.status != actual_asmt_tmpls[0].status:
+        pytest.xfail(reason="GGRC-3423 Issue")
+      else:
+        pytest.fail(msg="GGRC-3423 Issue was fixed")
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
   def test_clonable_not_audit_related_objs_move_to_cloned_audit(
-      self, create_and_clone_audit, selenium
+      self, create_and_clone_audit_w_params_to_update, selenium
   ):
     """Check via UI that clonable not audit related objects
     Control, Program move to cloned Audit.
     Preconditions:
-    -Execution and return of fixture 'create_and_clone_audit'.
+    -Execution and return of fixture
+    'create_and_clone_audit_w_params_to_update'.
     """
-    actual_audit = create_and_clone_audit["actual_audit"]
-    expected_control = create_and_clone_audit["control"].repr_ui()
-    expected_program = create_and_clone_audit["program"].repr_ui()
+    actual_audit = create_and_clone_audit_w_params_to_update["actual_audit"]
+    expected_control = (
+        create_and_clone_audit_w_params_to_update["control"].repr_ui())
+    expected_program = (
+        create_and_clone_audit_w_params_to_update["program"].repr_ui())
     actual_controls = (webui_service.ControlsService(selenium).
                        get_list_objs_from_tree_view(src_obj=actual_audit))
     actual_programs = (webui_service.ProgramsService(selenium).

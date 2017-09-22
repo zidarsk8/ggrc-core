@@ -320,7 +320,8 @@ class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE,
       CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.LAST_UPDATED)
+      CommonModalSetVisibleFields.LAST_UPDATED,
+      CommonModalSetVisibleFields.STATE)
 
 
 class AssessmentModalSetVisibleFields(CommonModalSetVisibleFields):

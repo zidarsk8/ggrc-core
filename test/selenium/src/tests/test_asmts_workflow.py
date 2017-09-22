@@ -173,7 +173,7 @@ class TestAssessmentsWorkflow(base.Test):
     expected_asmt = dynamic_object_w_factory_params
     if expected_initial_state:
       (rest_service.AssessmentsService().
-       update_obj(expected_asmt, status=expected_initial_state))
+       update_obj(obj=expected_asmt, status=expected_initial_state))
     assessments_service = webui_service.AssessmentsService(selenium)
     getattr(assessments_service, action)(expected_asmt)
     actual_asmt = assessments_service.get_obj_from_info_page(expected_asmt)
@@ -183,8 +183,8 @@ class TestAssessmentsWorkflow(base.Test):
                                    verified=actual_asmt.verified).repr_ui(),
         actual_asmt, "updated_at")
 
-  @pytest.mark.parametrize("operator", [alias.EQUAL_OP, alias.CONTAINS_OP])
   @pytest.mark.smoke_tests
+  @pytest.mark.parametrize("operator", [alias.EQUAL_OP, alias.CONTAINS_OP])
   def test_asmts_gcas_filtering(
       self, new_program_rest, new_audit_rest, new_cas_for_assessments_rest,
       new_assessments_rest, selenium, operator
@@ -228,6 +228,7 @@ class TestAssessmentsWorkflow(base.Test):
         messages.AssertionMessages.format_err_msg_equal(expected_results,
                                                         actual_results))
 
+  @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
       "dynamic_object, dynamic_relationships",
       [("new_objective_rest", "map_new_program_rest_to_new_objective_rest"),

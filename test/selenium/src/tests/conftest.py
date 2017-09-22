@@ -97,16 +97,6 @@ def chrome_options(chrome_options, create_tmp_dir):
   return chrome_options
 
 
-@pytest.yield_fixture(scope="function")
-def dynamic_new_assessment_template(request):
-  """Dynamically create new Assessment Template under Audit object according
-  to fixturename. Fixturename is indirect parameter that get from
-  'request.param' and have to be string or boolean.
-  Return: lib.entities.entity.AssessmentTemplateEntity
-  """
-  yield _common_fixtures(request.param) if request.param else None
-
-
 @pytest.fixture(scope="function")
 def my_work_dashboard(selenium):
   """Open My Work Dashboard URL and
