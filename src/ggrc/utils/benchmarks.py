@@ -47,24 +47,6 @@ class BenchmarkContextManager(object):
     logger.debug("%.4f %s", end - self.start, self.message)
 
 
-class WithNop(object):
-  """Nop benchmark context manager.
-
-  This is a dummy context manager that can be used in place of default or debug
-  context managers, you can disable them without removing lines of code.
-  """
-  # pylint: disable=too-few-public-methods
-
-  def __init__(self, message, **kwargs):
-    pass
-
-  def __enter__(self):
-    pass
-
-  def __exit__(self, exc_type, exc_value, exc_trace):
-    pass
-
-
 class DebugBenchmark(object):
   """Debug benchmark context manager.
 

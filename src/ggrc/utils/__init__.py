@@ -242,7 +242,6 @@ class QueryCounter(object):
 
 
 benchmark = benchmarks.get_benchmark()
-with_nop = benchmarks.WithNop
 
 
 def convert_date_format(date, format_from, format_to):
