@@ -355,7 +355,8 @@
         {value: 'Primary Contacts', title: 'Primary Contacts'},
         {value: 'Secondary Contacts', title: 'Secondary Contacts'},
         {value: 'other', title: 'Others...'}
-      ]
+      ],
+      showCaptainAlert: false,
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     tree_view_options: {
@@ -486,6 +487,12 @@
      * @param {jQuery.Event} ev - the event that was triggered
      */
     defaultAssesorsChanged: function (context, $el, ev) {
+      var changedList = [
+        'Auditors', 'Principal Assignees', 'Secondary Assignees',
+        'Primary Contacts', 'Secondary Contacts'
+      ];
+      this.attr('showCaptainAlert',
+        changedList.indexOf(this.default_people.assessors) >= 0);
       this._updateDropdownEnabled('assessors');
     },
 

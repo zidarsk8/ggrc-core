@@ -291,11 +291,21 @@ describe('can.Model.AssessmentTemplate', function () {
     var context;
     var $element;
     var eventObj;
+    var greenList;
+    var redList;
 
     beforeEach(function () {
       context = {};
       $element = $('<div></div>');
       eventObj = $.Event();
+      instance.attr('showCaptainAlert', false);
+      greenList = [
+        'Auditors', 'Principal Assignees', 'Secondary Assignees',
+        'Primary Contacts', 'Secondary Contacts',
+      ];
+      redList = [
+        'Admin', 'Audit Lead', 'other',
+      ];
     });
 
     it('sets the assessorsListDisable flag if the corresponding ' +
@@ -319,6 +329,30 @@ describe('can.Model.AssessmentTemplate', function () {
         instance.defaultAssesorsChanged(context, $element, eventObj);
 
         expect(instance.attr('assessorsListDisable')).toBe(false);
+      }
+    );
+
+    it('showCaptainAlert value is "true" if default assessor ' +
+      'is one of changedList',
+      function () {
+        greenList.map(function (item) {
+          instance.attr('default_people.assessors', item);
+          instance.defaultAssesorsChanged(context, $element, eventObj);
+
+          expect(instance.attr('showCaptainAlert')).toBe(true);
+        });
+      }
+    );
+
+    it('showCaptainAlert value is "false" if default assessor ' +
+      'is NOT one of changedList',
+      function () {
+        redList.map(function (item) {
+          instance.attr('default_people.assessors', item);
+          instance.defaultAssesorsChanged(context, $element, eventObj);
+
+          expect(instance.attr('showCaptainAlert')).toBe(false);
+        });
       }
     );
   });
