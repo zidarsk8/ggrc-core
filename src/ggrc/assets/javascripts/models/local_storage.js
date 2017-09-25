@@ -165,6 +165,7 @@
           var def = new can.Deferred();
           var key = [this._shortName, id].join(':');
           var item = this.model({id: id});
+          var data;
 
           if (window.localStorage.getItem(key)) {
             window.localStorage.removeItem(key);
