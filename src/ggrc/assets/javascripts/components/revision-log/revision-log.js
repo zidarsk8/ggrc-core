@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './revision-log-data';
+
 (function (GGRC, can) {
   'use strict';
 
@@ -279,17 +281,29 @@
         var diff = {
           madeBy: null,
           updatedAt: null,
-          changes: []
+          changes: [],
+          role: null
         };
         var attrDefs = GGRC.model_attr_defs[rev2.resource_type];
+        var madeByPersonId = rev2.modified_by ? rev2.modified_by.id : null;
 
         diff.madeBy = rev2.modified_by;
         diff.updatedAt = rev2.updated_at;
-        diff.role = this._getRoleAtTime(rev2.modified_by.id, rev2.updated_at);
+        diff.role = this._getRoleAtTime(madeByPersonId, rev2.updated_at);
 
         can.each(rev2.content, function (value, fieldName) {
           var origVal = rev1.content[fieldName];
           var displayName;
+          var unifyValue = function (value) {
+            value = value || '—';
+            value = value.length ? value : '—';
+            if (_.isObject(value)) {
+              value = value.map(function (item) {
+                return item.display_name;
+              });
+            }
+            return value;
+          };
           if (attrDefs) {
             displayName = (_.find(attrDefs, function (attr) {
               return attr.attr_name === fieldName;
@@ -317,11 +331,15 @@
               }
             }
             if (origVal || value) {
-              diff.changes.push({
-                fieldName: displayName,
-                origVal: origVal || '—',
-                newVal: value || '—'
-              });
+              origVal = unifyValue(origVal);
+              value = unifyValue(value);
+              if (origVal !== value) {
+                diff.changes.push({
+                  fieldName: displayName,
+                  origVal: origVal,
+                  newVal: value
+                });
+              }
             }
           }
         }.bind(this));
@@ -429,6 +447,7 @@
         var origVal;
         var newVal;
         var previous;
+        var madeByPersonId;
 
         if (revision.destination_type === this.attr('instance.type') &&
           revision.destination_id === this.attr('instance.id')) {
@@ -457,11 +476,12 @@
         } else if (revision.action === 'deleted') {
           origVal = 'Created';
         }
+        madeByPersonId = revision.modified_by ? revision.modified_by.id : null;
+
         return {
           madeBy: revision.modified_by,
           updatedAt: revision.updated_at,
-          role: this._getRoleAtTime(
-            revision.modified_by.id, revision.updated_at),
+          role: this._getRoleAtTime(madeByPersonId, revision.updated_at),
           changes: {
             origVal: origVal,
             newVal: newVal,

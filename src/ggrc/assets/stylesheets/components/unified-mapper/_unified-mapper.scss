@@ -528,8 +528,22 @@ mapper-results-columns-configuration {
         padding: 0px;
       }
     }
+    .modal-header {
+      h2 {
+        display: inline;
+      }
+      .create-new-object {
+        float: right;
+        font-size: 12px;
+        margin-right: 30px;
+      }
+      .btn {
+        margin: 0px;
+      }
+    }
     .modal-body {
-      padding-bottom: 30px !important;
+      border-top: 1px solid #E0E0E0;
+      padding: 20px !important;
       select, input {
         margin: 0;
       }
@@ -540,23 +554,19 @@ mapper-results-columns-configuration {
       }
     }
     .modal-footer {
-      padding-top: 10px;
+      border-top: 1px solid #E0E0E0;
 
-      &.expanded{
-        border-top: 1px solid #E0E0E0;
-        padding-top: 24px;
-      }
-
-      collapsible-panel-body{
-        padding-top: 24px;
-        mapper-results {
-          margin-bottom: 24px;
-        }
+      .search-results {
+        margin-top: 20px;
       }
 
       .btn-map {
         margin-left: 10px;
         background-color: $blue;
+      }
+
+      .control-buttons {
+        margin-top: 20px;
       }
     }
   }
@@ -578,55 +588,44 @@ mapper-results-columns-configuration {
 }
 
 .object-controls {
-  @mixin controls-row {
+  @mixin controls-row ($distance:16px) {
     display: flex;
-    margin: 16px 0px;
     align-items: center;
-    >* {
-      margin-right: 16px;
+    > *:not(:last-child) {
+      margin-right: $distance;
     }
+  }
+  select {
+    background: $white;
   }
 
-  &__container {
-    select {
-      background: $white;
-    }
-  }
-  &__filters {
-    padding-bottom: 24px;
-  }
   &__mappings {
     padding-top: 24px;
-    border-top: 1px solid #E0E0E0;
   }
   &__mappings-header {
     margin-bottom: 24px;
   }
-  &__filter-string {
-    font-size: 12px;
-    color: #969696;
-    padding-left: 20px;
-    font-style: italic;
-    display: block;
-  }
   &__actions {
-    float: right;
-    button {
-      height: 24px;
-      padding: 0px 12px;
-      line-height: 12px;
+    margin-top: 24px;
+    &--right {
+      @include controls-row(8px);
+      float: right;
+    }
+    &--left {
+      @include controls-row(8px);
+      float: left;
     }
   }
   &__relevant {
-    margin-bottom: 16px;
+    @include controls-row(8px);
     h6 {
       display: inline;
     }
     span {
       font-size: 13px;
     }
-    >* {
-      margin-right: 8px;
+    &--list {
+      margin-bottom: 8px;
     }
   }
   &__template {
@@ -636,6 +635,10 @@ mapper-results-columns-configuration {
         width: 140px;
       }
     }
+  }
+  &__row {
+    @include controls-row(24px);
+    margin: 16px 0px;
   }
   &__type {
     @include controls-row;

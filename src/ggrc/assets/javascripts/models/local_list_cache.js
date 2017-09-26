@@ -74,5 +74,4 @@ can.Model.LocalStorage("CMS.Models.LocalListCache", {
     };
   }
 });
-
-})(this.can);
+})(window.can);

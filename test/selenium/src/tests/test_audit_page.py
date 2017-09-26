@@ -235,7 +235,6 @@ class TestAuditPage(base.Test):
     self.general_assert(
         expected_asmt_tmpl, actual_asmt_tmpls, "slug", "updated_at")
 
-  @pytest.mark.xfail(strict=True)
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
   def test_clonable_not_audit_related_objs_move_to_cloned_audit(
@@ -248,15 +247,14 @@ class TestAuditPage(base.Test):
     """
     actual_audit = create_and_clone_audit["actual_audit"]
     expected_control = create_and_clone_audit["control"].repr_ui()
-    # due to 'actual_program.custom_attributes = {None: None}'
-    expected_program = (create_and_clone_audit["program"].
-                        repr_ui().update_attrs(custom_attributes={None: None}))
+    expected_program = create_and_clone_audit["program"].repr_ui()
     actual_controls = (webui_service.ControlsService(selenium).
                        get_list_objs_from_tree_view(src_obj=actual_audit))
     actual_programs = (webui_service.ProgramsService(selenium).
                        get_list_objs_from_tree_view(src_obj=actual_audit))
-    # due to 'actual_control.custom_attributes = {None: None}'
-    self.general_assert(
-        [expected_control], actual_controls, "custom_attributes")
-    self.extended_assert([expected_program], actual_programs,
-                         "Issue in app GGRC-2381", "manager")
+    # due to 'actual_controls.custom_attributes = {None: None}'
+    self.general_assert([expected_control], actual_controls,
+                        "custom_attributes")
+    # due to 'actual_programs.custom_attributes = {None: None}'
+    self.general_assert([expected_program], actual_programs,
+                        "custom_attributes")

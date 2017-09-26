@@ -2,6 +2,12 @@
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
+import './mapper-results-item';
+import './mapper-results-items-header';
+import './mapper-results-columns-configuration';
+import '../object-selection/object-selection';
+import template from './templates/mapper-results.mustache';
+
 (function (can, GGRC, CMS, $) {
   'use strict';
 
@@ -10,10 +16,7 @@
 
   GGRC.Components('mapperResults', {
     tag: 'mapper-results',
-    template: can.view(
-      GGRC.mustache_path +
-      '/components/unified-mapper/mapper-results.mustache'
-    ),
+    template: template,
     viewModel: {
       define: {
         paging: {
@@ -37,6 +40,7 @@
       baseInstance: null,
       filterItems: [],
       mappingItems: [],
+      statusItem: {},
       selected: [],
       refreshItems: false,
       submitCbs: null,
@@ -50,7 +54,6 @@
       },
       searchOnly: false,
       useSnapshots: false,
-      newEntries: [],
       entries: [],
       relevantTo: [],
       objectGenerator: false,
@@ -65,41 +68,6 @@
       },
       destroy: function () {
         this.attr('submitCbs').remove(this.onSearch.bind(this));
-      },
-      showNewEntries: function () {
-        var self = this;
-        var sortKey = 'updated_at';
-        var sortDirection = 'desc';
-        var newEntries = this.attr('newEntries').map(function (value) {
-          return {
-            id: value.id,
-            type: value.type,
-            data: self.transformValue(value),
-            isSelected: true,
-            markedSelected: true
-          };
-        });
-
-        // select new entries
-        this.attr('selected').push.apply(this.attr('selected'), newEntries);
-
-        // clear filter
-        this.attr('filterItems', []);
-        this.attr('mappingItems', []);
-        this.attr('prevSelected', this.attr('selected').slice());
-
-        if (this.attr('sort.key') === sortKey &&
-          this.attr('sort.direction') === sortDirection) {
-          this.onSearch();
-        } else {
-          // sort by update date.
-          // this action triggers search
-          this.attr('sort.key', sortKey);
-          this.attr('sort.direction', sortDirection);
-        }
-
-        // set current page
-        this.attr('paging.current', 1);
       },
       setItems: function () {
         var self = this;
@@ -188,6 +156,7 @@
 
         // prepare QueryAPI data from advanced search
         var request = [];
+        var status;
         var filters = GGRC.query_parser.parse(
           GGRC.Utils.AdvancedSearch.buildFilter(this.attr('filterItems'),
           request));
@@ -195,6 +164,15 @@
           GGRC.Utils.AdvancedSearch.buildFilter(this.attr('mappingItems'),
           request));
         var advancedFilters = GGRC.query_parser.join_queries(filters, mappings);
+
+        // the edge case caused by stateless objects
+        if (this.attr('statusItem.value.items')) {
+          status = GGRC.query_parser.parse(
+            GGRC.Utils.AdvancedSearch.buildFilter([this.attr('statusItem')],
+            request));
+          advancedFilters = GGRC.query_parser
+            .join_queries(advancedFilters, status);
+        }
         result.request = request;
 
         // prepare pagination

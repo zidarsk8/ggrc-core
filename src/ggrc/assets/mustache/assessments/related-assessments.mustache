@@ -6,7 +6,7 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
                        {evidences}="evidences"
                        {urls}="urls"
                        (after-object-reused)="updateItems('evidences', 'urls')">
-    <related-objects {base-instance}="instance" related-items-type="Assessment" order-by="finished_date,created_at">
+    <related-objects {base-instance}="instance" related-items-type="Assessment" initial-order-by="finished_date,created_at">
         <div class="grid-data__toolbar flex-box">
             <tree-pagination {(paging)}="paging" class="grid-data__toolbar-item"></tree-pagination>
             {{#is_allowed 'update' baseInstance context='for'}}
@@ -17,16 +17,24 @@ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
         </div>
         <div class="grid-data-header flex-row flex-box">
             <div class="flex-size-3">
+              <sortable-column {(sort)}="orderBy" sort-field="title">
                 Assessment Title
+              </sortable-column>
             </div>
             <div class="grid-data-item-index">
+              <sortable-column {(sort)}="orderBy" sort-field="status">
                 Assessment State
+              </sortable-column>
             </div>
             <div class="grid-data-item-index">
+              <sortable-column {(sort)}="orderBy" sort-field="finished_date">
                 Assessment Finish Date
+              </sortable-column>
             </div>
             <div class="grid-data-item-index">
+              <sortable-column {(sort)}="orderBy" sort-field="created_at">
                 Assessment Create Date
+              </sortable-column>
             </div>
             <div class="flex-size-3">
                 Related Controls / Objectives

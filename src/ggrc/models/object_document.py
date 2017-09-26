@@ -146,12 +146,12 @@ PublicDocumentable = type(
     {
         "_aliases": {
             "document_url": {
-                "display_name": "Url",
+                "display_name": "Evidence URL",
                 "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
                 "description": "New line separated list of URLs.",
             },
             "document_evidence": {
-                "display_name": "Evidence",
+                "display_name": "Evidence File",
                 "type": reflection.AttributeInfo.Type.SPECIAL_MAPPING,
                 "description": (
                     "New line separated list of evidence links and "

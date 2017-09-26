@@ -40,10 +40,10 @@
         {{#each customAttributes}}
             <div class="mapped-object-info__item">
                 <h6>{{title}}</h6>
-                <local-custom-attributes-field-view
+		<custom-attributes-field-view
                         {type}="type"
                         {value}="value"
-                ></local-custom-attributes-field-view>
+		></custom-attributes-field-view>
             </div>
         {{/each}}
     {{/if}}

@@ -20,8 +20,12 @@ import factory
 
 from ggrc import db
 from ggrc import models
+
 from ggrc.access_control.role import AccessControlRole
 from ggrc.access_control.list import AccessControlList
+from ggrc.access_control.roleable import Roleable
+from ggrc.models.mixins import CustomAttributable
+
 from ggrc_risks import models as risk_models
 
 from integration.ggrc.models.model_factory import ModelFactory
@@ -50,6 +54,47 @@ def single_commit():
 
 class TitledFactory(ModelFactory):
   title = factory.LazyAttribute(lambda m: random_str(prefix='title '))
+
+
+class WithACLandCAFactory(ModelFactory):
+  """Factory class to create object with ACL and CA in one step"""
+  @classmethod
+  def _create(cls, target_class, *args, **kwargs):
+    """Create instance of model"""
+    acls = []
+    if "access_control_list_" in kwargs:
+      acls = kwargs.pop("access_control_list_")
+    cavs = []
+    if "custom_attribute_values_" in kwargs:
+      cavs = kwargs.pop("custom_attribute_values_")
+
+    instance = target_class(**kwargs)
+    db.session.add(instance)
+    db.session.flush()
+
+    if acls and isinstance(instance, Roleable):
+      for acl in acls:
+        db.session.add(models.AccessControlList(
+            object=instance,
+            ac_role_id=acl.get("ac_role_id"),
+            person_id=acl.get("person_id"),
+        ))
+    if cavs and isinstance(instance, CustomAttributable):
+      for cav in cavs:
+        db.session.add(models.CustomAttributeValue(
+            attributable=instance,
+            attribute_value=cav.get("attribute_value"),
+            attribute_object_id=cav.get("attribute_object_id"),
+            custom_attribute_id=cav.get("custom_attribute_id"),
+        ))
+
+    if isinstance(instance, models.CustomAttributeValue):
+      cls._log_event(instance.attributable)
+    if hasattr(instance, "log_json"):
+      cls._log_event(instance)
+    if getattr(db.session, "single_commit", True):
+      db.session.commit()
+    return instance
 
 
 class CustomAttributeDefinitionFactory(TitledFactory):
@@ -263,6 +308,10 @@ class EvidenceFactory(DocumentFactory):
   document_type = models.Document.ATTACHMENT
 
 
+class ReferenceUrlFactory(DocumentFactory):
+  document_type = models.Document.REFERENCE_URL
+
+
 class ObjectiveFactory(TitledFactory):
 
   class Meta:
@@ -330,12 +379,117 @@ class AccessControlRoleAdminFactory(AccessControlRoleFactory):
   name = "Admin"
 
 
+class AccessGroupFactory(TitledFactory):
+  """Access Group factory class"""
+
+  class Meta:
+    model = models.AccessGroup
+
+
+class ClauseFactory(TitledFactory):
+  """Clause factory class"""
+
+  class Meta:
+    model = models.Clause
+
+
+class DataAssetFactory(TitledFactory):
+  """DataAsset factory class"""
+
+  class Meta:
+    model = models.DataAsset
+
+
+class FacilityFactory(TitledFactory):
+  """Facility factory class"""
+
+  class Meta:
+    model = models.Facility
+
+
+class ProductFactory(TitledFactory):
+  """Product factory class"""
+
+  class Meta:
+    model = models.Product
+
+
+class SectionFactory(TitledFactory):
+  """Section factory class"""
+
+  class Meta:
+    model = models.Section
+
+
+class StandardFactory(TitledFactory):
+  """Standard factory class"""
+
+  class Meta:
+    model = models.Standard
+
+  description = factory.LazyAttribute(lambda _: random_str(length=100))
+
+
+class VendorFactory(TitledFactory):
+  """Vendor factory class"""
+
+  class Meta:
+    model = models.Vendor
+
+
 class RiskFactory(TitledFactory):
   """Risk factory class"""
 
   class Meta:
     model = risk_models.Risk
 
-  description = factory.LazyAttribute(
-      lambda _: random_str(prefix="Risk - ")
-  )
+  description = factory.LazyAttribute(lambda _: random_str(length=100))
+
+
+class ThreatFactory(TitledFactory):
+  """Threat factory class"""
+
+  class Meta:
+    model = risk_models.Threat
+
+
+def get_model_factory(model_name):
+  """Get object factory for provided model name"""
+  from integration.ggrc_workflows.models import factories as wf_factories
+  model_factories = {
+      "AccessControlRole": AccessControlRoleFactory,
+      "AccessControlList": AccessControlListFactory,
+      "AccessGroup": AccessGroupFactory,
+      "Assessment": AssessmentFactory,
+      "AssessmentTemplate": AssessmentTemplateFactory,
+      "Audit": AuditFactory,
+      "Clause": ClauseFactory,
+      "Contract": ContractFactory,
+      "Control": ControlFactory,
+      "TaskGroupFactory": wf_factories.TaskGroupFactory,
+      "TaskGroupObjectFactory": wf_factories.TaskGroupObjectFactory,
+      "TaskGroupTaskFactory": wf_factories.TaskGroupTaskFactory,
+      "CycleFactory": wf_factories.CycleFactory,
+      "CycleTaskGroupFactory": wf_factories.CycleTaskGroupFactory,
+      "CycleTaskFactory": wf_factories.CycleTaskFactory,
+      "CycleTaskEntryFactory": wf_factories.CycleTaskEntryFactory,
+      "DataAsset": DataAssetFactory,
+      "Facility": FacilityFactory,
+      "Issue": IssueFactory,
+      "Market": MarketFactory,
+      "Objective": ObjectiveFactory,
+      "OrgGroup": OrgGroupFactory,
+      "Person": PersonFactory,
+      "Policy": PolicyFactory,
+      "Process": ProcessFactory,
+      "Product": ProductFactory,
+      "Regulation": RegulationFactory,
+      "Section": SectionFactory,
+      "Standard": StandardFactory,
+      "System": SystemFactory,
+      "Vendor": VendorFactory,
+      "Risk": RiskFactory,
+      "Threat": ThreatFactory,
+      "Workflow": wf_factories.WorkflowFactory,
+  }
+  return model_factories[model_name]

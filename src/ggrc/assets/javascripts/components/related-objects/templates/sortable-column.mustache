@@ -1,0 +1,15 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+`}}
+
+<content></content>
+{{^if sort.field}}
+  <i class="fa fa-sort"></i>
+{{/if}}
+{{#isSorted}}
+  <i class="fa
+    {{#isSortedAsc}}fa-caret-up{{/isSortedAsc}}
+    {{^isSortedAsc}}fa-caret-down{{/isSortedAsc}}">
+  </i>
+{{/isSorted}}

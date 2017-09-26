@@ -2,6 +2,9 @@
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import template from './templates/mapper-results-item-attrs.mustache';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -10,10 +13,7 @@
 
   GGRC.Components('mapperResultsItemAttrs', {
     tag: 'mapper-results-item-attrs',
-    template: can.view(
-      GGRC.mustache_path +
-      '/components/unified-mapper/mapper-results-item-attrs.mustache'
-    ),
+    template: template,
     viewModel: {
       init: function () {
         var Model = CMS.Models[this.attr('modelType')];

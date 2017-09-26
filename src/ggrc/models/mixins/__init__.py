@@ -163,18 +163,15 @@ class ChangeTracked(object):
   _fulltext_attrs = [
       attributes.DatetimeFullTextAttr('created_at', 'created_at'),
       attributes.DatetimeFullTextAttr('updated_at', 'updated_at'),
-      attributes.FullTextAttr("modified_by", "modified_by", ["name", "email"]),
+      attributes.FullTextAttr(
+          "modified_by", "modified_by", ["name", "email", "user_name"]
+      ),
   ]
 
   _aliases = {
-      "updated_at": {
-          "display_name": "Last Updated",
-          "filter_only": True,
-      },
-      "created_at": {
-          "display_name": "Created Date",
-          "filter_only": True,
-      },
+      "updated_at": "Last Updated",
+      "created_at": "Created Date",
+      "modified_by": "Last Updated By",
   }
 
   @classmethod
@@ -310,7 +307,6 @@ class Hierarchical(object):
 
 class Timeboxed(object):
   """Mixin that defines `start_date` and `end_date` fields."""
-
   @declared_attr
   def start_date(cls):  # pylint: disable=no-self-argument
     return deferred(db.Column(db.Date), cls.__name__)
@@ -319,11 +315,11 @@ class Timeboxed(object):
   def end_date(cls):  # pylint: disable=no-self-argument
     return deferred(db.Column(db.Date), cls.__name__)
 
+  # pylint: disable=unused-argument,no-self-use
   @validates('start_date', 'end_date')
   def validate_date(self, key, value):
-    if isinstance(value, datetime.datetime):
-      value = value.date()
-    return value
+    return value.date() if isinstance(value, datetime.datetime) else value
+  # pylint: enable=unused-argument,no-self-use
 
   # REST properties
   _api_attrs = reflection.ApiAttributes('start_date', 'end_date')
@@ -627,7 +623,6 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
       except AttributeError:
         pass
     res["display_name"] = self.display_name
-
     return res
 
   def log_json(self):
@@ -794,7 +789,7 @@ class Slugged(Base):
     for o in session.new:
       if isinstance(o, Slugged) and (o.slug is None or o.slug == ''):
         o.slug = str(uuid1())
-        o._replace_slug = True
+        o._replace_slug = True  # pylint: disable=protected-access
 
   @classmethod
   def ensure_slug_after_flush_postexec(cls, session, flush_context):

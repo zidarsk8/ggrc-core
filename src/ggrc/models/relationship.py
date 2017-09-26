@@ -46,6 +46,13 @@ class Relationship(Base, db.Model):
       creator=lambda k, v: RelationshipAttr(attr_name=k, attr_value=v)
   )
 
+  def get_related_for(self, object_type):
+    """Return related object for sent type."""
+    if object_type == self.source_type:
+      return self.destination
+    if object_type == self.destination_type:
+      return self.source
+
   @property
   def source_attr(self):
     return '{0}_source'.format(self.source_type)

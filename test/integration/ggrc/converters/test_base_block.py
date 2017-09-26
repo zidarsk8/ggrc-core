@@ -34,27 +34,30 @@ class TestBaseBlock(TestCase):
   @data(0, 1, 2, 4, 8)
   def test_create_mapping_cache(self, count):
     """Test creation of mapping cache for export."""
-    regulations = [factories.RegulationFactory() for _ in range(count)]
-    markets = [factories.MarketFactory() for _ in range(count)]
-    controls = [factories.ControlFactory() for _ in range(count)]
 
-    expected_cache = defaultdict(lambda: defaultdict(list))
-    for i in range(count):
-      for j in range(i):
-        factories.RelationshipFactory(
-            source=regulations[j] if i % 2 == 0 else markets[i],
-            destination=regulations[j] if i % 2 == 1 else markets[i],
-        )
-        factories.RelationshipFactory(
-            source=regulations[j] if i % 2 == 0 else controls[i],
-            destination=regulations[j] if i % 2 == 1 else controls[i],
-        )
-        expected_cache[regulations[j].id]["Control"].append(
-            controls[i].slug
-        )
-        expected_cache[regulations[j].id]["Market"].append(
-            markets[i].slug
-        )
+    with factories.single_commit():
+      regulations = [factories.RegulationFactory() for _ in range(count)]
+      markets = [factories.MarketFactory() for _ in range(count)]
+      controls = [factories.ControlFactory() for _ in range(count)]
+
+      expected_cache = defaultdict(lambda: defaultdict(list))
+      for i in range(count):
+        for j in range(i):
+          factories.RelationshipFactory(
+              source=regulations[j] if i % 2 == 0 else markets[i],
+              destination=regulations[j] if i % 2 == 1 else markets[i],
+          )
+          factories.RelationshipFactory(
+              source=regulations[j] if i % 2 == 0 else controls[i],
+              destination=regulations[j] if i % 2 == 1 else controls[i],
+          )
+          expected_cache[regulations[j].id]["Control"].append(
+              controls[i].slug
+          )
+          expected_cache[regulations[j].id]["Market"].append(
+              markets[i].slug
+          )
+
     block = base_block.BlockConverter(mock.MagicMock())
     block.object_class = models.Regulation
     block.object_ids = [r.id for r in regulations]
@@ -70,24 +73,26 @@ class TestBaseBlock(TestCase):
   def test_get_identifier_mappings(self):
     """Test _get_identifier_mappings function."""
     count = 3
-    regulation = factories.RegulationFactory()
-    markets = [factories.MarketFactory() for _ in range(count)]
-    controls = [factories.ControlFactory() for _ in range(count)]
-    expected_id_map = {
-        "Market": {o.id: o.slug for o in markets},
-        "Control": {o.id: o.slug for o in controls},
-    }
 
-    relationships = []
-    for i in range(count):
-      relationships.append(factories.RelationshipFactory(
-          source=regulation if i % 2 == 0 else markets[i],
-          destination=regulation if i % 2 == 1 else markets[i],
-      ))
-      relationships.append(factories.RelationshipFactory(
-          source=regulation if i % 2 == 0 else controls[i],
-          destination=regulation if i % 2 == 1 else controls[i],
-      ))
+    with factories.single_commit():
+      regulation = factories.RegulationFactory()
+      markets = [factories.MarketFactory() for _ in range(count)]
+      controls = [factories.ControlFactory() for _ in range(count)]
+      expected_id_map = {
+          "Market": {o.id: o.slug for o in markets},
+          "Control": {o.id: o.slug for o in controls},
+      }
+
+      relationships = []
+      for i in range(count):
+        relationships.append(factories.RelationshipFactory(
+            source=regulation if i % 2 == 0 else markets[i],
+            destination=regulation if i % 2 == 1 else markets[i],
+        ))
+        relationships.append(factories.RelationshipFactory(
+            source=regulation if i % 2 == 0 else controls[i],
+            destination=regulation if i % 2 == 1 else controls[i],
+        ))
 
     block = base_block.BlockConverter(mock.MagicMock())
     block.object_class = models.Regulation

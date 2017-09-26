@@ -3,15 +3,43 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './tree-header-selector';
+import './tree-type-selector';
+import './sub-tree-expander';
+import './sub-tree-wrapper';
+import './sub-tree-item';
+import './sub-tree-models';
+import './tree-item-extra-info';
+import './tree-item-actions';
+import './tree-item-map';
+import './tree-view';
+import './tree-item';
+import './tree-header';
+import './tree-filter-input';
+import './tree-status-filter';
+import './tree-item-status-for-workflow';
+import './tree-no-results';
+import './tree-assignee-field';
+import './tree-people-list-field';
+import './tree-people-with-role-list-field';
+import '../advanced-search/advanced-search-filter-container';
+import '../advanced-search/advanced-search-mapping-container';
+import template from './templates/tree-widget-container.mustache';
+
 (function (can, GGRC) {
   'use strict';
 
-  var template = can.view(GGRC.mustache_path +
-    '/components/tree/tree-widget-container.mustache');
   var TreeViewUtils = GGRC.Utils.TreeView;
   var CurrentPageUtils = GGRC.Utils.CurrentPage;
+  var viewModel;
 
-  var viewModel = can.Map.extend({
+  if (!GGRC.tree_view) {
+    GGRC.tree_view = new can.Map();
+  }
+  GGRC.tree_view.attr('basic_model_list', []);
+  GGRC.tree_view.attr('sub_tree_for', {});
+
+  viewModel = can.Map.extend({
     define: {
       /**
        * Condition that adds into all request to server-side Query API
@@ -386,7 +414,7 @@
           parentInstance.on('change', callback);
         } else if (activeTabModel === instance.type) {
           _refresh(true);
-        } else if (isPerson(instance)) {
+        } else if (activeTabModel === 'Person' && isPerson(instance)) {
           parentInstance.refresh().then(function () {
             _refresh();
           });
@@ -418,6 +446,9 @@
               srcType === 'Document' || destType === 'Document') {
               return;
             }
+          } else if (instance instanceof CMS.Models.UserRole &&
+            activeTabModel === 'Audit') {
+            return;
           }
 
           _refresh();

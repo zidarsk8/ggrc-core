@@ -1,0 +1,52 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{! transcluded via renderLive in, for example, assets/mustache/sections/tier2_content.mustache }}
+{{#instance}}
+  <div class="pane-header {{#if snapshot}}snapshot{{/if}}" >
+    <div class="row-fluid wrap-row">
+      <div data-test-id="title_0ad9fbaf" class="span9">
+        <h6>{{modifyFieldTitle instance.type 'Title'}}</h6>
+        <h3>{{title}}</h3>
+        {{#if snapshot}}
+          <span class="state-value snapshot">{{instance.class.title_singular}} version as at {{date instance.updated_at}}</span>
+        {{/if}}
+        {{#if status}}
+          <span class="state-value {{addclass 'state-' status separator=''}}">{{un_camel_case status}}</span>
+        {{/if}}
+        {{#if snapshot.archived}}
+          <span class="state-value state-archived">Archived</span>
+        {{/if}}
+        {{#if type}}
+        <p>
+          {{type.title}}
+        </p>
+        {{/if}}
+      </div>
+      {{#if snapshot}}
+        {{! We need to use `using` to ensure that snapshot is actually
+            reified by the time is_allowed helper uses it }}
+      {{#using reified_snapshot=snapshot}}
+      {{#canUpdate}}
+        {{^isLatestRevision}}
+          {{^if instance.snapshot.archived}}
+          <div class="span12 snapshot">
+            <hr class="snapshot">
+            <p>
+              <revisions-comparer instance="instance"
+                                  left-revision-id="instance.snapshot.revision_id"
+                                  right-revisions="instance.snapshot.revisions">
+                  <a href="javascript://" can-click="compareIt">Get the latest version</a>
+              </revisions-comparer>
+            </p>
+          </div>
+          {{/if}}
+        {{/isLatestRevision}}
+      {{/canUpdate}}
+      {{/using}}
+      {{/if}}
+    </div>
+  </div>
+{{/instance}}

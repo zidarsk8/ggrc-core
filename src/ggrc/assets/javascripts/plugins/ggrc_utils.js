@@ -5,13 +5,7 @@
 
 (function ($, GGRC, moment, Permission, CMS) {
   'use strict';
-  var ROLE_TYPES = {
-    related_creators: 'creator',
-    related_verifiers: 'verifier',
-    related_assignees: 'assignee',
-    related_requesters: 'requester',
-    related_assessors: 'assessor'
-  };
+  var ROLE_TYPES = ['Assessor', 'Creator', 'Verifier'];
   /**
    * A module containing various utility functions.
    */
@@ -208,7 +202,6 @@
     export_request: function (request) {
       return $.ajax({
         type: 'POST',
-        dataType: 'text',
         headers: $.extend({
           'Content-Type': 'application/json',
           'X-export-view': 'blocks',
@@ -548,21 +541,21 @@
       return deferred;
     },
     getAssigneeType: function (instance) {
-      var user = GGRC.current_user;
+      var currentUser = GGRC.current_user;
       var userType = null;
 
-      if (!instance || !user) {
+      if (!instance || !currentUser) {
         return;
       }
-      _.each(ROLE_TYPES, function (type, mapping) {
-        var mappings = instance.get_mapping(mapping);
+      _.each(ROLE_TYPES, function (type) {
+        var users = instance.assignees.attr(type);
         var isMapping;
-        if (!mappings.length) {
+        if (!users.length) {
           return;
         }
 
-        isMapping = _.filter(mappings, function (mapping) {
-          return mapping.instance.id === user.id;
+        isMapping = _.filter(users, function (user) {
+          return user.id === currentUser.id;
         }).length;
 
         if (isMapping) {
@@ -841,5 +834,5 @@
       getParentUrl: getParentUrl
     };
   })();
-})(jQuery, window.GGRC = window.GGRC || {}, window.moment, window.Permission,
+})(jQuery, window.GGRC = window.GGRC || {}, moment, window.Permission,
   window.CMS = window.CMS || {});

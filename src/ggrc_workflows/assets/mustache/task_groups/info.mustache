@@ -44,11 +44,6 @@
           <div class="span9">
             <h6>Title</h6>
             <h3>{{title}}</h3>
-            {{#if type}}
-            <p>
-              {{type.title}}
-            </p>
-            {{/if}}
           </div>
         </div>
       </div>
@@ -56,36 +51,56 @@
     </div>
 
     {{#options}}
-    <div class="template-setup">
-      <div class="row-fluid wrap-row">
-        <div class="span8 task-list">
-          {{#with_mapping 'task_group_tasks' instance}}
-            <h3>Tasks (<span>{{task_group_tasks.length}}</span>)</h3>
-            <h4 class="inline-explanation">Define tasks</h4>
-            <tasks-sort-list mapping="task_group_tasks">
-              <ul class="tree-structure new-tree"
-                  {{sortable_if instance.lock_task_order '{ "items": "li:not(.tree-footer)", "handle": ".drag" }' inverse=true}}>
-                {{#each sorted}}
-                  {{>'/static/mustache/task_group_tasks/task_group_subtree.mustache'}}
-                {{/each}}
-                {{>'/static/mustache/task_group_tasks/task_group_subtree_footer.mustache'}}
-              </ul>
-            </tasks-sort-list>
-          {{/with_mapping}}
+    <div class="info-pane__section">
+        {{#with_mapping 'objects' instance}}
+        <div class="info-pane__section-title info-pane__section-title--underlined">
+            Objects (<span>{{objects.length}}</span>)
+            <span class="inline-explanation">Choose objects that tasks will apply to</span>
         </div>
-
-        <div class="span4">
-          {{#with_mapping 'objects' instance}}
-            <h3>Objects (<span>{{objects.length}}</span>)</h3>
-            <h4 class="inline-explanation">Choose objects that tasks will apply to</h4>
-            <ul class="tree-structure new-tree">
-              {{#each objects}}
+        <ul class="tree-structure new-tree">
+            {{#each objects}}
                 {{>'/static/mustache/base_objects/task_group_subtree.mustache'}}
-              {{/each}}
-              {{>'/static/mustache/base_objects/task_group_subtree_footer.mustache'}}
-            </ul>
-          {{/with_mapping}}
+            {{/each}}
+            {{>'/static/mustache/base_objects/task_group_subtree_footer.mustache'}}
+        </ul>
+        {{/with_mapping}}
+    </div>
+    <div class="info-pane__section">
+        {{#with_mapping 'task_group_tasks' instance}}
+        <div class="info-pane__section-title">
+            Tasks (<span>{{task_group_tasks.length}}</span>)
+            <span class="inline-explanation">Define tasks</span>
         </div>
+            <div class="task-list">
+
+          <tasks-sort-list mapping="task_group_tasks">
+            <div class="task_group_tasks__header">
+                <div class="task_group_tasks__header-item">
+                    Title
+                </div>
+                <div class="task_group_tasks__header-item">
+                    Assignee
+                </div>
+                <div class="task_group_tasks__header-item">
+                    Initial Setup
+                </div>
+                <div class="task_group_tasks__header-item">
+                    Next Cycle
+                </div>
+                <div class="task_group_tasks__header-item-edit">
+                </div>
+            </div>
+            <div class="task_group_tasks__list">
+              <ul class="tree-structure new-tree"
+                  {{sortable_if instance.lock_task_order '{ "items": "div.task_group_tasks__list-item", "handle": ".drag" }' inverse=true}}>
+                  {{#each sorted}}
+                      {{>'/static/mustache/task_group_tasks/task_group_subtree.mustache'}}
+                  {{/each}}
+                  {{>'/static/mustache/task_group_tasks/task_group_subtree_footer.mustache'}}
+              </ul>
+            </div>
+          </tasks-sort-list>
+        {{/with_mapping}}
       </div>
     </div>
     {{/options}}

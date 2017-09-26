@@ -108,10 +108,10 @@ describe('GGRC.Components.revisionsComparer', function () {
       method = Component.prototype.scope.getCAPanes;
       fakeHTML = $('<div>' +
                       '<div class="info">' +
-                        '<custom-attributes></custom-attributes>' +
+                        '<custom-attributes-wrap></custom-attributes-wrap>' +
                       '</div>' +
                       '<div class="info">' +
-                        '<custom-attributes></custom-attributes>' +
+                        '<custom-attributes-wrap></custom-attributes-wrap>' +
                       '</div>' +
                     '</div>');
     });

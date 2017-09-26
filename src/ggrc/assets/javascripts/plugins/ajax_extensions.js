@@ -122,11 +122,11 @@
     var message;
     var response;
 
-    if (!jqxhr.hasFailCallback || settings.flashOnFail ||
-      (!settings.flashOnFail && jqxhr.flashOnFail)) {
+    if (!jqxhr.hasFailCallback) {
       // TODO: Import produced 'canceled' ajax flash message that needed handling. Will refactor once better method works.
       if (settings.url.indexOf('import') === -1 || exception !== 'canceled') {
-        response = jqxhr.responseJSON;
+        response = jqxhr.responseJSON || JSON.parse(jqxhr.responseText);
+
         message = jqxhr.getResponseHeader('X-Flash-Error') ||
           GGRC.Errors.messages[jqxhr.status] ||
           (response && response.message) ||
@@ -140,4 +140,4 @@
       }
     }
   });
-})(this, jQuery, can);
+})(window, jQuery, can);

@@ -22,6 +22,7 @@
       editableMode: false,
       isLoading: false,
       validation: {mandatory: true, empty: true, valid: true},
+      roleConflicts: false,
 
       backUpPendings: [],
       saveChanges: function () {
@@ -107,7 +108,7 @@
             });
             var hasConflicts = !_.isEmpty(
                 _.intersection.apply(null, rolePeople));
-            this.instance.attr('roleConflicts', hasConflicts);
+            this.attr('roleConflicts', hasConflicts);
           }.bind(this));
         }
 
@@ -121,6 +122,7 @@
             roleBinding.list.bind('change', checkConflicts.bind(this));
           }.bind(this));
         }.bind(this));
+        checkConflicts.call(this);
       },
 
       /**

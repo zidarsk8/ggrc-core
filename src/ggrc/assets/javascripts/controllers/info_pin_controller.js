@@ -3,6 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import '../components/info-pin-buttons/info-pin-buttons';
+import '../components/questions-link/questions-link';
+import '../components/info-pane/info-pane-footer';
+import '../components/assessment/info-pane/info-pane';
+import '../components/folder-attachments-list/folder-attachments-list';
+import '../components/unmap-button/unmap-person-button';
+
 can.Control('CMS.Controllers.InfoPin', {
   defaults: {
     view: GGRC.mustache_path + '/base_objects/info.mustache'
@@ -154,9 +161,12 @@ can.Control('CMS.Controllers.InfoPin', {
     return infoPaneOpenDfd;
   },
   updateInstance: function (selector, instance) {
-    this.element.find(selector)
-      .viewModel()
-      .attr('instance', instance);
+    var vm = this.element.find(selector).viewModel();
+
+    vm.attr('instance', instance);
+    vm.attr('instance').dispatch({
+      type: 'update'
+    });
   },
   setLoadingIndicator: function (selector, isLoading) {
     this.element.toggleClass('loading');

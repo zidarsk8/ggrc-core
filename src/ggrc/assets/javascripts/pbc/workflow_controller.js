@@ -66,4 +66,4 @@
   $(function () {
     $(document.body).ggrc_controllers_pbc_workflows();
   });
-})(this.can, this.can.$, window.Permission);
+})(window.can, window.can.$, window.Permission);

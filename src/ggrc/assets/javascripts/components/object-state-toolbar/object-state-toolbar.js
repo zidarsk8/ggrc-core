@@ -66,6 +66,13 @@
         return this.attr('instance.status') === 'In Review';
       },
       changeState: function (newState, isUndo) {
+        if (this.attr('isDisabled')) {
+          if (this.attr('instance.hasValidationErrors')) {
+            this.attr('instance').dispatch('showInvalidField');
+          }
+          return;
+        }
+
         newState = newState || this.attr('updateState');
         this.dispatch({
           type: 'onStateChange',

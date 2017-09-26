@@ -49,12 +49,14 @@ class TestACLAttributeDefinitions(TestCase):
   @ddt.data(*models.all_models.all_models)
   def test_acl_definitions(self, model):
     """Test ACL column definitions."""
-    factory = factories.AccessControlRoleFactory
-    factories.AccessControlRoleFactory(
-        object_type="Control",
-        read=True
-    )
-    role_names = {factory(object_type=model.__name__).name for _ in range(2)}
+    with factories.single_commit():
+      factory = factories.AccessControlRoleFactory
+      factories.AccessControlRoleFactory(
+          object_type="Control",
+          read=True
+      )
+      role_names = {factory(object_type=model.__name__).name for _ in range(2)}
+
     expected_names = set()
     if issubclass(model, roleable.Roleable):
       expected_names = role_names
@@ -97,6 +99,9 @@ class TestCustomAttributesDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     expected_names = element_names.union(mapping_names).union(unmapping_names)
     self.assertEqual(expected_names, display_names)
@@ -146,6 +151,9 @@ class TestCustomAttributesDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     expected_names = element_names.union(mapping_names).union(unmapping_names)
     self.assertEqual(expected_names, display_names)
@@ -312,6 +320,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     expected_fields = {
         "mandatory": {
@@ -346,8 +357,11 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Auditors",
         "Archived",
         "Delete",
-        "Url",
-        "Evidence"
+        "Evidence URL",
+        "Evidence File",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     expected_fields = {
         "mandatory": {
@@ -370,14 +384,18 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Audit",
         "Object Under Assessment",
-        "Use Control Test Plan",
+        "Use Control Assessment Procedure",
         "Default Test Plan",
         "Default Assignee",
         "Default Verifier",
         "Custom Attributes",
         "Code",
         "Archived",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
         "Delete",
+        "State",
     }
     expected_fields = {
         "mandatory": {
@@ -405,7 +423,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Template",
         "Description",
-        "Test Plan",
+        "Assessment Procedure",
         "Notes",
         "Audit",
         "Archived",
@@ -414,8 +432,8 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Verifiers",
         "Assessment Type",
         "Reference URL",
-        "Evidence",
-        "Url",
+        "Evidence File",
+        "Evidence URL",
         "Code",
         "Effective Date",
         "Stop Date",
@@ -430,6 +448,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     expected_fields = {
         "mandatory": {
@@ -465,11 +486,14 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Last Deprecated Date",
         "State",
         "Review State",
-        "Url",
-        "Evidence",
+        "Evidence URL",
+        "Evidence File",
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     expected_fields = {
         "mandatory": {
@@ -505,6 +529,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self._test_single_object(models.Policy, names, self.COMMON_EXPECTED)
 
@@ -524,6 +551,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self._test_single_object(models.Clause, names, self.COMMON_EXPECTED)
 
@@ -542,6 +572,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self._test_single_object(models.Section, names, self.COMMON_EXPECTED)
 
@@ -550,7 +583,7 @@ class TestGetObjectColumnDefinitions(TestCase):
     names = {
         "Title",
         "Description",
-        "Test Plan",
+        "Assessment Procedure",
         "Notes",
         "Admin",
         "Reference URL",
@@ -567,12 +600,15 @@ class TestGetObjectColumnDefinitions(TestCase):
         "State",
         "Last Assessment Date",
         "Review State",
-        "Evidence",
+        "Evidence File",
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
         "Principal Assignees",
         "Secondary Assignees",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self._test_single_object(models.Control, names, self.COMMON_EXPECTED)
 
@@ -591,6 +627,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self._test_single_object(models.Objective, names, self.COMMON_EXPECTED)
 
@@ -601,6 +640,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Email",
         "Company",
         "Role",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     expected_fields = {
         "mandatory": {
@@ -629,6 +671,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self._test_single_object(models.System, names, self.COMMON_EXPECTED)
 
@@ -649,6 +694,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self._test_single_object(models.Process, names, self.COMMON_EXPECTED)
 
@@ -669,6 +717,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self._test_single_object(models.Product, names, self.COMMON_EXPECTED)
 
@@ -688,6 +739,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Title",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     expected_fields = {
         "mandatory": {
@@ -731,6 +785,9 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Delete",
         "Primary Contacts",
         "Secondary Contacts",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self._test_single_object(model, names, self.COMMON_EXPECTED)
 
@@ -760,6 +817,9 @@ class TestRiskAssessmentColumnDefinitions(TestCase):
         "Code",
         "Program",
         "Delete",
+        'Created Date',
+        'Last Updated',
+        'Last Updated By',
     }
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}

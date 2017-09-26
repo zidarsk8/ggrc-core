@@ -14,6 +14,11 @@
           {{peopleStr}}
       </tree-people-list-field>
   {{/case}}
+  {{#case 'modified_by'}}
+      <tree-people-list-field {source}="instance.modified_by">
+          {{peopleStr}}
+      </tree-people-list-field>
+  {{/case}}
   {{#case 'last_assessment_date'}}
     {{localize_date instance.last_assessment_date}}
   {{/case}}

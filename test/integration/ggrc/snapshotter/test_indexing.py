@@ -10,7 +10,6 @@ from sqlalchemy.sql.expression import tuple_
 from ggrc import db
 from ggrc import models
 from ggrc.models import all_models
-from ggrc.views import do_reindex
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.snapshotter.indexer import delete_records
 
@@ -173,7 +172,6 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
 
   def test_update_indexing(self):
     """Test that creating objects results in full index"""
-    custom_attribute_defs = self.create_custom_attribute_definitions()
 
     self._import_file("snapshotter_create.csv")
 
@@ -183,6 +181,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     objective = db.session.query(models.Objective).filter(
         models.Objective.title == "obj-1"
     ).one()
+    custom_attribute_defs = self.create_custom_attribute_definitions()
     custom_attribute_values = [
         {
             "custom_attribute": custom_attribute_defs["objective"],
@@ -339,7 +338,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     records = get_records(audit, snapshots)
     self.assertEqual(records.count(), 0)
 
-    do_reindex()
+    self.client.post("/admin/reindex")
 
     records = get_records(audit, snapshots)
 
@@ -383,7 +382,11 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
       old_content[field] = {"id": person.id}
       revision.content = old_content
       db.session.add(revision)
-    do_reindex()
+    person_id = person.id
+    snapshot_id = snapshot.id
+    self.client.post("/admin/reindex")
+    person = all_models.Person.query.get(person_id)
+    snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, role_name, {
         "{}-email".format(person.id): person.email,
         "{}-name".format(person.id): person.name,
@@ -414,7 +417,11 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
           child_type=control.type,
           revision=revision)
     db.session.expire_all()
-    do_reindex()
+    person_id = person.id
+    snapshot_id = snapshot.id
+    self.client.post("/admin/reindex")
+    person = all_models.Person.query.get(person_id)
+    snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, role_name, {
         "{}-email".format(person.id): person.email,
         "{}-name".format(person.id): person.name,
@@ -459,7 +466,9 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
           child_type=control.type,
           revision=revision)
     db.session.expire_all()
-    do_reindex()
+    snapshot_id = snapshot.id
+    self.client.post("/admin/reindex")
+    snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, cad_title, {"": search_value})
 
   def test_filter_by_checkbox_cad_no_cav(self):
@@ -486,7 +495,9 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
           child_type=control.type,
           revision=revision)
     db.session.expire_all()
-    do_reindex()
+    snapshot_id = snapshot.id
+    self.client.post("/admin/reindex")
+    snapshot = all_models.Snapshot.query.get(snapshot_id)
     self.assert_indexed_fields(snapshot, cad_title, {"": search_value})
 
   def test_index_deleted_acr(self):
@@ -514,7 +525,9 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     db.session.expire_all()
     db.session.delete(acr)
     db.session.commit()
-    do_reindex()
+    snapshot_id = snapshot.id
+    self.client.post("/admin/reindex")
+    snapshot = all_models.Snapshot.query.get(snapshot_id)
     all_found_records = dict(Record.query.filter(
         Record.key == snapshot.id,
         Record.type == snapshot.type,

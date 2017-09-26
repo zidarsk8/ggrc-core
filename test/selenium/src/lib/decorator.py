@@ -70,3 +70,16 @@ def lazy_property(fun):
       setattr(self, prop_name, fun(self))
     return getattr(self, prop_name)
   return lazy
+
+
+def track_time(fun):
+  """Time tracking decorator which defines how long 'fun' was executing."""
+  @wraps(fun)
+  def wrapper(*args, **kwargs):
+    start_time = time.time()
+    result = fun(*args, **kwargs)
+    elapsed_time = time.time() - start_time
+    print "Execution of '{0:s}' function took {1:.3f} s".format(
+        fun.func_name, elapsed_time)
+    return result
+  return wrapper

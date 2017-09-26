@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Copyright (C) 2017 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+HOST=${GGRC_DATABASE_HOST-"127.0.0.1"}
+DB_NAME="ggrcdevtest_apisearch"
+DUMP_NAME="api_search.sql"
+DUMP_PATH="${SCRIPTPATH}/../test/api_search/db_dump/${DUMP_NAME}"
+cd "${SCRIPTPATH}/../test"
+
+source "${SCRIPTPATH}/init_test_env"
+
+export GGRC_SETTINGS_MODULE="${GGRC_SETTINGS_MODULE} \
+  testing_api_search_db"
+
+if [[ ! -f "$DUMP_PATH" ]]; then
+  echo "File $DUMP_PATH wasn't found. New one will be created"
+  create_apisearch_dump
+fi
+
+db_reset -d "$DB_NAME" "$DUMP_PATH"
+
+echo -e "\nRunning api_search tests"
+nosetests api_search --logging-clear-handlers -v ${@:1}

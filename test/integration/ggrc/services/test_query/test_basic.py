@@ -151,6 +151,8 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
   @ddt.data(
       ("effective date", ">", "05-18-2015"),
       ("start_date", "=", "2017-06/12"),
+      ("start_date", "=", "2017-33-12"),
+      ("start_date", "=", "2017-06-33"),
   )
   @ddt.unpack
   def test_basic_query_incorrect_date_format(self, field, operation, date):
@@ -269,6 +271,9 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
         make_query_dict(limit=["10", 21]),
         "Program",
     )
+    self._sort_sublists(programs_10_21_str["values"])
+    self._sort_sublists(programs_10_str_21["values"])
+    self._sort_sublists(programs_10_21["values"])
 
     self.assertDictEqual(programs_10_21_str, programs_10_21)
     self.assertDictEqual(programs_10_str_21, programs_10_21)
@@ -351,6 +356,21 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     # the titles are sorted descending with desc=True
     self.assertListEqual(titles_desc, list(reversed(titles_asc)))
 
+  @classmethod
+  def _sort_sublists(cls, data_list):
+    """Sort lists contained in result list.
+
+    This function is meant to sort sublists in a list of results. Those
+    sublists can only be a list of stubs from given objects. So when testing
+    an order for a list, if sub elements such as related_sources, don't have
+    the same order they must not raise an exception.
+    """
+    for line in data_list:
+      for value in line.viewvalues():
+        if isinstance(value, list):
+          value.sort(key=lambda x: x["id"])
+    return data_list
+
   def test_order_by_several_fields(self):
     """Results get sorted by two fields at once."""
     regulations = self._get_first_result_set(
@@ -364,13 +384,14 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
         self._make_query_dict("Regulation"),
         "Regulation", "values",
     )
+    expected = sorted(sorted(regulations_unsorted,
+                             key=itemgetter("title")),
+                      key=itemgetter("notes"),
+                      reverse=True)
 
     self.assertListEqual(
-        regulations,
-        sorted(sorted(regulations_unsorted,
-                      key=itemgetter("title")),
-               key=itemgetter("notes"),
-               reverse=True),
+        self._sort_sublists(regulations),
+        self._sort_sublists(expected),
     )
 
   def test_order_by_related_titled(self):
@@ -393,11 +414,12 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     )
     program_id_title = {program["id"]: program["title"]
                         for program in programs}
+    expected = sorted(sorted(audits_unsorted, key=itemgetter("id")),
+                      key=lambda a: program_id_title[a["program"]["id"]])
 
     self.assertListEqual(
-        audits_title,
-        sorted(sorted(audits_unsorted, key=itemgetter("id")),
-               key=lambda a: program_id_title[a["program"]["id"]]),
+        self._sort_sublists(audits_title),
+        self._sort_sublists(expected)
     )
 
   def test_query_order_by_owners(self):
@@ -424,11 +446,12 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
         ]
         for policy in policies_unsorted
     }
+    expected = sorted(sorted(policies_unsorted, key=itemgetter("id")),
+                      key=lambda p: policy_id_owner[p["id"]])
 
     self.assertListEqual(
-        policies_owner,
-        sorted(sorted(policies_unsorted, key=itemgetter("id")),
-               key=lambda p: policy_id_owner[p["id"]]),
+        self._sort_sublists(policies_owner),
+        self._sort_sublists(expected),
     )
 
   def test_query_order_by_assignee(self):
@@ -455,10 +478,12 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
         for control in controls_unsorted
     }
 
+    expected = sorted(sorted(controls_unsorted, key=itemgetter("id")),
+                      key=lambda p: control_id_assignee[p["id"]])
+
     self.assertListEqual(
-        controls_by_assignee,
-        sorted(sorted(controls_unsorted, key=itemgetter("id")),
-               key=lambda p: control_id_assignee[p["id"]]),
+        self._sort_sublists(controls_by_assignee),
+        self._sort_sublists(expected),
     )
 
   def test_filter_control_by_frequency(self):
@@ -492,7 +517,10 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
       return options_map[freq["id"]]
 
     controls_ordered_2 = sorted(controls_unordered, key=sort_key)
-    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+    self.assertListEqual(
+        self._sort_sublists(controls_ordered_1),
+        self._sort_sublists(controls_ordered_2),
+    )
 
   def test_filter_control_by_kind(self):
     """Test correct filtering by kind/nature"""
@@ -525,7 +553,10 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
       return options_map[kind["id"]]
 
     controls_ordered_2 = sorted(controls_unordered, key=sort_key)
-    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+    self.assertListEqual(
+        self._sort_sublists(controls_ordered_1),
+        self._sort_sublists(controls_ordered_2),
+    )
 
   def test_filter_control_by_means(self):
     """Test correct filtering by means"""
@@ -558,7 +589,10 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
       return options_map[kind["id"]]
 
     controls_ordered_2 = sorted(controls_unordered, key=sort_key)
-    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+    self.assertListEqual(
+        self._sort_sublists(controls_ordered_1),
+        self._sort_sublists(controls_ordered_2),
+    )
 
   def test_filter_control_by_key_control(self):
     """Test correct filtering by SIGNIFICANCE field"""
@@ -585,7 +619,10 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
                                 key=lambda ctrl: (ctrl["key_control"] is None,
                                                   ctrl["key_control"]),
                                 reverse=True)
-    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+    self.assertListEqual(
+        self._sort_sublists(controls_ordered_1),
+        self._sort_sublists(controls_ordered_2),
+    )
 
   def test_filter_control_by_fraud_related(self):
     """Test correct filtering by fraud_related field"""
@@ -611,7 +648,10 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     )
     controls_ordered_2 = sorted(controls_unordered,
                                 key=lambda ctrl: ctrl["fraud_related"])
-    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+    self.assertListEqual(
+        self._sort_sublists(controls_ordered_1),
+        self._sort_sublists(controls_ordered_2),
+    )
 
   def test_filter_control_by_assertions(self):
     """Test correct filtering by assertions field"""
@@ -644,7 +684,10 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
       return (None, val["id"])
 
     controls_ordered_2 = sorted(controls_unordered, key=sort_key)
-    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+    self.assertListEqual(
+        self._sort_sublists(controls_ordered_1),
+        self._sort_sublists(controls_ordered_2),
+    )
 
   def test_filter_control_by_categories(self):
     """Test correct filtering by categories field"""
@@ -678,7 +721,10 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
       return (None, val["id"])
 
     controls_ordered_2 = sorted(controls_unordered, key=sort_key)
-    self.assertListEqual(controls_ordered_1, controls_ordered_2)
+    self.assertListEqual(
+        self._sort_sublists(controls_ordered_1),
+        self._sort_sublists(controls_ordered_2),
+    )
 
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
@@ -1096,7 +1142,7 @@ class TestQueryAssessmentByEvidenceURL(TestCase, WithQueryApi):
     assessments_by_evidence = self._get_first_result_set(
         self._make_query_dict(
             "Assessment",
-            expression=["Evidence", "~", "i.imgur.com"],
+            expression=["Evidence File", "~", "i.imgur.com"],
         ),
         "Assessment", "values",
     )

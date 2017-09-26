@@ -13,7 +13,7 @@
     viewModel: function () {
       return GGRC.VM.ObjectOperationsBaseVM.extend({
         object: 'MultitypeSearch',
-        type: 'Program',
+        type: 'Control',
         availableTypes: function () {
           var types = GGRC.Mappings.getMappingTypes(
             this.attr('object'),

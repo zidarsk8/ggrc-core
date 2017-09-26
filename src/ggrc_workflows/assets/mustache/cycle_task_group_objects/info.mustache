@@ -59,7 +59,8 @@
 
       <div class="tier-content">
         {{#if object.title}}
-          {{{render '/static/mustache/base_objects/general_info.mustache' instance=object}}}
+          {{{render '/static/mustache/base_objects/general-page-header.mustache' instance=object}}}
+          {{{render '/static/mustache/base_objects/object-review.mustache' instance=object}}}
         {{else}}
           <div class="row-fluid wrap-row">
             <div class="span6">

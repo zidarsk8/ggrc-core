@@ -88,7 +88,7 @@
           'Product', 'Project', 'System', 'Regulation', 'Policy', 'Contract',
           'Standard', 'Program', 'Issue', 'Control', 'Section', 'Clause',
           'Objective', 'Audit', 'Assessment', 'AssessmentTemplate',
-          'AccessGroup', 'Document', 'Risk', 'Threat'
+          'AccessGroup', 'Risk', 'Threat'
         ]
       },
       related_objects_as_source: Proxy(

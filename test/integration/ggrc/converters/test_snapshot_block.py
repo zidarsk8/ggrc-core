@@ -82,7 +82,7 @@ class TestSnapshotBlockConverter(TestCase):
         ('title', 'Title'),
         ('description', 'Description'),
         ('notes', 'Notes'),
-        ('test_plan', 'Test Plan'),
+        ('test_plan', 'Assessment Procedure'),
         ('start_date', 'Effective Date'),
         ('end_date', 'Last Deprecated Date'),
         ('status', 'State'),
@@ -95,7 +95,10 @@ class TestSnapshotBlockConverter(TestCase):
         ('means', 'Type/Means'),
         ('reference_url', 'Reference URL'),
         ('verify_frequency', 'Frequency'),
-        ('document_evidence', 'Evidence'),
+        ('document_evidence', 'Evidence File'),
+        ('updated_at', 'Last Updated'),
+        ('modified_by', 'Last Updated By'),
+        ('created_at', 'Created Date'),
     ]
     ac_roles = db.session.query(all_models.AccessControlRole.name).filter(
         all_models.AccessControlRole.object_type == "Control"

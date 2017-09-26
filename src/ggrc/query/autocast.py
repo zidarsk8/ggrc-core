@@ -113,8 +113,11 @@ def autocast(exp, target_class):
   extra_exp = None
   current_exp = None
   if extra_parser:
-    left_date, right_date = extra_parser.get_filter_value(
-        unicode(exp['right']), operation) or [None, None]
+    try:
+      left_date, right_date = extra_parser.get_filter_value(
+          unicode(exp['right']), operation) or [None, None]
+    except ValueError:
+      raise BadQueryException(extra_parser.get_value_error_msg(exp['left']))
     if not left_date and not right_date and not any_parser:
       raise BadQueryException(extra_parser.get_value_error_msg(exp['left']))
     if any(o in operation for o in ["~", "="]):

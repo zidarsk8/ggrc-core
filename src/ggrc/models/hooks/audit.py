@@ -18,7 +18,7 @@ def init_hook():
   # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(all_models.Audit)
   @signals.Restful.model_deleted.connect_via(all_models.Audit)
-  def handle_audit_permission_put(sender, obj, src, service=None):
+  def handle_audit_permission_put(sender, obj, src=None, service=None):
     """Make sure admins cannot delete/update archived audits"""
     # pylint: disable=unused-argument
     if obj.archived and not db.inspect(

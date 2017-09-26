@@ -38,17 +38,20 @@ describe('GGRC.Components.csvImportWidget', function () {
          *   @param {Number} [rowCounts.updated=0] - total rows to update
          *   @param {Number} [rowCounts.deleted=0] - total rows to delete
          *   @param {Number} [rowCounts.ignored=0] - total rows to ignore
+         * @param {Boolean} hasErrors - if true then add non empty array "block_errors"
+         *    to block, if false then add empty array
          *
          * @return {can.Map} - a new dummy import block info instance
          */
-        function makeImportBlock(objectType, rowCounts) {
+        function makeImportBlock(objectType, rowCounts, hasErrors) {
           var COUNT_FIELD_NAMES = ['created', 'updated', 'deleted', 'ignored'];
           var COUNT_ERR = 'Invalid row counts, the sum of created, updated, ' +
               'deleted, and ignored must equal the total row count.';
 
           var blockOptions = {
             name: objectType,
-            rows: rowCounts.totalRows || 0
+            rows: rowCounts.totalRows || 0,
+            block_errors: hasErrors ? new can.List({}) : new can.List()
           };
           var combinedCount = 0;
 
@@ -90,6 +93,21 @@ describe('GGRC.Components.csvImportWidget', function () {
           var importBlocks = [
             makeImportBlock('Assessment', {totalRows: 0}),
             makeImportBlock('Market', {totalRows: 0})
+          ];
+          fakeScope.attr('import', importBlocks);
+
+          result = isDisabled();
+
+          expect(result).toBe(true);
+        });
+
+        it('returns true if blocks has errors', function () {
+          var result;
+          var importBlocks = [
+            makeImportBlock('Assessment', {totalRows: 4, ignored: 4}, true),
+            makeImportBlock('Market', {totalRows: 0, ignored: 0}),
+            makeImportBlock(
+              'Contract', {totalRows: 3, created: 1, ignored: 2})
           ];
           fakeScope.attr('import', importBlocks);
 

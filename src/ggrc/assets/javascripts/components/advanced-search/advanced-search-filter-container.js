@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './advanced-search-filter-attribute';
+import './advanced-search-filter-group';
+import './advanced-search-filter-operator';
+import './advanced-search-filter-state';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -25,12 +30,27 @@
         type: '*',
         Value: can.List,
         get: function (items) {
-          if (items && !items.length &&
+          if (this.attr('defaultStatusFilter') && items && !items.length &&
           GGRC.Utils.State.hasFilter(this.attr('modelName'))) {
             items.push(GGRC.Utils.AdvancedSearch.create.state());
           }
           return items;
         }
+      },
+      /**
+       * Indicates whether status filter should be added by default.
+       * @type {boolean}
+       */
+      defaultStatusFilter: {
+        type: 'boolean',
+        value: true
+      },
+      /**
+       * Indicates whether 'Add' button should be displayed.
+       */
+      showAddButton: {
+        type: 'boolean',
+        value: true
       }
     },
     /**

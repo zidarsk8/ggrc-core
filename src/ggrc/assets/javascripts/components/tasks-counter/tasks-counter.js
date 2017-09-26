@@ -119,4 +119,4 @@
       '{CMS.Models.CycleTaskGroupObjectTask} created': 'onModelChange'
     }
   });
-})(window.can, window.GGRC, window.moment);
+})(window.can, window.GGRC, moment);

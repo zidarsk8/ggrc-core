@@ -99,7 +99,7 @@ class TestExportSnapshots(TestCase):
             "Significance": u"key" if control.key_control else u"non-key",
             "State": control.status,
             "Last Deprecated Date": "",
-            "Test Plan": control.test_plan,
+            "Assessment Procedure": control.test_plan,
             "Title": control.title,
             "Type/Means": control.means.display_name,
             # Custom attributes
@@ -110,7 +110,8 @@ class TestExportSnapshots(TestCase):
             "person": self._get_cav(control, "person"),
             # Special snapshot export fields
             "Audit": audit.slug,
-            "Evidence": u"\n".join(c.slug for c in control.document_evidence),
+            "Evidence File": u"\n".join(c.slug for c in\
+                                        control.document_evidence),
             "Reference URL": u"\n".join(c.slug for c in control.reference_url),
             "Assertions": u"\n".join(c.name for c in control.assertions),
             "Categories": u"\n".join(c.name for c in control.categories),
@@ -122,6 +123,9 @@ class TestExportSnapshots(TestCase):
             "Secondary Contacts": u"creator@example.com",
             "Principal Assignees": u"creator@example.com",
             "Secondary Assignees": u"creator@example.com",
+            'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Last Updated': control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Last Updated By': control.modified_by.email,
         }
         for snapshot, control in zip(snapshots, controls)
     }
@@ -210,7 +214,7 @@ class TestExportSnapshots(TestCase):
             "Significance": u"",
             "State": u"Draft",
             "Last Deprecated Date": u"",
-            "Test Plan": u"",
+            "Assessment Procedure": u"",
             "Title": control.title,
             "Type/Means": u"",
             # Special snapshot export fields
@@ -229,12 +233,15 @@ class TestExportSnapshots(TestCase):
             # Fields that are not included in snapshots - Known bugs.
             "Assertions": u"",
             "Categories": u"",
-            "Evidence": u"",
+            "Evidence File": u"",
             "Admin": u"",
             "Primary Contacts": u"",
             "Secondary Contacts": u"",
             "Principal Assignees": u"",
             "Secondary Assignees": u"",
+            'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Last Updated': control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Last Updated By': "",
         }
         for snapshot, control in zip(snapshots, controls)
     }
@@ -414,13 +421,16 @@ class TestExportSnapshots(TestCase):
           "State": u"Draft",
           "Last Assessment Date": u"",
           "Last Deprecated Date": u"",
-          "Test Plan": u"",
+          "Assessment Procedure": u"",
           "Title": control.title,
           "Type/Means": u"",
           "Audit": audit.slug,
           "Assertions": u"",
           "Categories": u"",
-          "Evidence": u"",
+          "Evidence File": u"",
+          'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
+          'Last Updated': control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+          'Last Updated By': "",
       }
       control_dicts[control.slug].update(**control_acr_people[control.slug])
 

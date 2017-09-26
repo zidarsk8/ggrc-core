@@ -3,14 +3,16 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<ul class="nav nav-tabs">
-  {{#each panels}}
-  <li {{#if active}}class="active"{{/if}}>
-    <a ($click)='setActive'
-      tabindex="{{@index}}">
-      {{titleText}}
-    </a>
-  </li>
-  {{/each}}
-</ul>
-<content></content>
+<div class="tab-container {{^if showTabs}}tab-container_hidden-tabs{{/if}}">
+  <ul class="nav nav-tabs">
+    {{#each panels}}
+    <li {{#if active}}class="active"{{/if}}>
+      <a ($click)='setActive'
+        tabindex="{{@index}}">
+        {{titleText}}
+      </a>
+    </li>
+    {{/each}}
+  </ul>
+  <content></content>
+</div>

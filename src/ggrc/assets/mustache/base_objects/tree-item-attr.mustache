@@ -52,6 +52,11 @@
           {{peopleStr}}
       </tree-people-list-field>
   {{/case}}
+  {{#case 'modified_by'}}
+      <tree-people-list-field {source}="instance.modified_by">
+          {{peopleStr}}
+      </tree-people-list-field>
+  {{/case}}
   {{#case 'created_at'}}
       {{localize_date instance.created_at}}
   {{/case}}

@@ -27,7 +27,7 @@
                         {is-edit-icon-denied}="isEditDenied"
                         {value}="instance.test_plan"
                         {instance}="instance">
-                            <div class="info-pane__section-title">Test Plan</div>
+                            <div class="info-pane__section-title">Assessment Procedure</div>
                     </assessment-inline-item>
                 </div>
             {{/if}}
@@ -67,7 +67,7 @@
                 </div>
                 <div class="assessment-controls info-pane__section">
                     <div class="assessment-note">
-                        <local-custom-attributes-status
+			<custom-attributes-status
                                 {form-saving}="formState.saving"
                                 {is-dirty}="formState.isDirty">
                                 <loading-status
@@ -76,7 +76,7 @@
                                     always-Show-Text="true"
                                     show-Spinner="true">
                                 </loading-status>
-                        </local-custom-attributes-status>
+			</custom-attributes-status>
                         <i class="fa fa-question-circle" rel="tooltip"
                            data-original-title="Respond to assessment here. Use comments on the right for free text responses."></i>
                     </div>
@@ -163,15 +163,16 @@
                         {evidence-amount}="evidences.length"
                         {^has-validation-errors}="instance.hasValidationErrors"
                         {fields}="formFields"
+                        {edit-mode}="editMode"
                         {^saving}="formState.saving"
                         {^form-saved-deferred}="formState.formSavedDeferred"
                         {^is-dirty}="formState.isDirty"
                         (validation-changed)="showRequiredInfoModal(%event)">
-                        <local-custom-attributes
+			<custom-attributes
                             {fields}="fields"
                             {edit-mode}="editMode"
                             (value-changed)="attributeChanged(%event)">
-                        </local-custom-attributes>
+			</custom-attributes>
                     </assessment-local-ca>
                     <!-- Modal Window to fix validation issues of CA fields -->
                     {{#if modal.state}}

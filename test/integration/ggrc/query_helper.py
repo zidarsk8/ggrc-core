@@ -26,6 +26,17 @@ class WithQueryApi(object):
       self.assertIsNot(result, None)
     return result
 
+  def _get_all_result_sets(self, data, *keys):
+    """Post data, get response, get values for provided models."""
+    response = self._post(data)
+    self.assert200(response)
+    resp_data = json.loads(response.data)
+
+    result = []
+    for obj in resp_data:
+      result.extend(obj for key in keys if obj.get(key))
+    return result
+
   @staticmethod
   def _make_query_dict_base(object_name, type_=None, filters=None,
                             limit=None, order_by=None):
@@ -62,6 +73,23 @@ class WithQueryApi(object):
       filters = None
 
     return cls._make_query_dict_base(object_name, filters=filters, *args,
+                                     **kwargs)
+
+  @classmethod
+  def _make_snapshot_query_dict(cls, child_type, expression=None, *args,
+                                **kwargs):
+    """Make a dict with query for Snapshots of child_type."""
+    child_type_filter = cls.make_filter_expression(("child_type", "=",
+                                                    child_type))
+    if expression:
+      snapshot_filter = cls.make_filter_expression(expression)
+      filters = {"expression": {"op": {"name": "AND"},
+                                "left": snapshot_filter,
+                                "right": child_type_filter}}
+    else:
+      filters = {"expression": child_type_filter}
+
+    return cls._make_query_dict_base("Snapshot", filters=filters, *args,
                                      **kwargs)
 
   def simple_query(self, model_name, expression=None, *args, **kwargs):

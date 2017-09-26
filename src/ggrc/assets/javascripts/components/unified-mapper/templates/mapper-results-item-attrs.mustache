@@ -1,0 +1,47 @@
+{{!
+  Copyright (C) 2017 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="flex-box flex-box-single">
+  {{#each selectedColumns}}
+    {{#add_to_current_scope thisColumn=this}}
+    <div class="attr">
+      {{#switch attr_type}}
+        {{#case 'custom'}}
+          <tree-item-custom-attribute {instance}="instance"
+                                      {values}="instance.custom_attribute_values"
+                                      {column}="thisColumn"
+          ></tree-item-custom-attribute>
+        {{/case}}
+
+        {{#case 'role'}}
+          <div class="roles">
+            {{#peopleWithRole instance attr_name}}
+              {{#each peopleIds}}
+                {{^if_less @index 1}},{{/if}}
+                <person-info
+                  person-id="{{.}}"
+                  editable="'false'"
+                ></person-info>
+              {{/each}}
+            {{/peopleWithRole}}
+          </div>
+        {{/case}}
+
+        {{#case 'default'}}
+          {{#instance}}
+            {{#if_equals attr_name 'title'}}
+              <span class="title-attr">
+                {{title}}
+              </span>
+            {{else}}
+              {{> attrTemplate}}
+            {{/if_equals}}
+          {{/instance}}
+        {{/case}}
+      {{/switch}}
+    </div>
+    {{/add_to_current_scope}}
+  {{/each}}
+</div>

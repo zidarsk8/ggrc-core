@@ -53,25 +53,29 @@
         attr_name: 'updated_at',
         order: 9
       }, {
+        attr_title: 'Last Updated By',
+        attr_name: 'modified_by',
+        order: 10
+      }, {
         attr_title: 'Conclusion: Design',
         attr_name: 'design',
-        order: 13
+        order: 14
       }, {
         attr_title: 'Conclusion: Operation',
         attr_name: 'operationally',
-        order: 14
+        order: 15
       }, {
         attr_title: 'Finished Date',
         attr_name: 'finished_date',
-        order: 11
+        order: 12
       }, {
         attr_title: 'Verified Date',
         attr_name: 'verified_date',
-        order: 10
+        order: 11
       }, {
         attr_title: 'Reference URL',
         attr_name: 'reference_url',
-        order: 12
+        order: 13
       }, {
         attr_title: 'Creators',
         attr_name: 'creators',
@@ -144,6 +148,14 @@
           }
         }
       );
+      this.validate(
+        '_gca_valid',
+        function () {
+          if (!this._gca_valid) {
+            return 'Missing required global custom attribute';
+          }
+        }
+      );
     },
     prepareAttributes: function (attrs) {
       return attrs[this.root_object] ? attrs[this.root_object] : attrs;
@@ -172,6 +184,7 @@
     model: function (attributes, oldModel) {
       var model;
       var id;
+      var backup;
       if (!attributes) {
         return;
       }
@@ -190,6 +203,14 @@
       model = oldModel && can.isFunction(oldModel.attr) ?
         oldModel.attr(attributes) :
           new this(attributes);
+
+      // Sometimes we are updating model partially and asynchronous
+      // for example when we load relationships.
+      // In this case we have to update backup to solve isDirty issues.
+      backup = model._backupStore();
+      if (backup) {
+        _.extend(backup, attributes);
+      }
 
       // This is a temporary solution
       if (attributes.documents) {
@@ -299,7 +320,7 @@
           markForAddition(this, currentUser, 'Creator');
         }
 
-        this.audit.findAuditors().then(function (list) {
+        return this.audit.findAuditors().then(function (list) {
           list.forEach(function (item) {
             var type = 'Verifier';
             if (item.person === auditLead) {
@@ -311,9 +332,9 @@
             markForAddition(self, item.person, type);
           });
         });
-      } else {
-        markForAddition(this, currentUser, 'Creator');
       }
+
+      markForAddition(this, currentUser, 'Creator');
 
       function markForAddition(instance, user, type) {
         instance.mark_for_addition('related_objects_as_destination', user, {

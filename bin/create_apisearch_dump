@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# Copyright (C) 2017 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+HOST=${GGRC_DATABASE_HOST-"127.0.0.1"}
+DB_NAME="ggrcdevtest_apisearch"
+DUMP_FILE="api_search.sql"
+DUMP_PATH_NAME="${SCRIPTPATH}/../test/api_search/db_dump/${DUMP_FILE}"
+cd "${SCRIPTPATH}/../test"
+
+source "${SCRIPTPATH}/init_test_env"
+
+export GGRC_SETTINGS_MODULE="${GGRC_SETTINGS_MODULE} \
+  testing_api_search_db"
+
+db_reset -d "$DB_NAME"
+
+echo "Fill database with test setup data"
+python -c "\
+from api_search.setup_environment import SetupEnvironment
+SetupEnvironment()
+"
+
+mysqldump -uroot -proot -h$HOST $DB_NAME > $DUMP_PATH_NAME

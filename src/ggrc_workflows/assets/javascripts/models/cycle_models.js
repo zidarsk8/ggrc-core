@@ -330,6 +330,11 @@
           attr_title: 'Task last updated',
           attr_name: 'updated_at',
           attr_sort_field: 'task last updated'
+        },
+        {
+          attr_title: 'Task last updated by',
+          attr_name: 'modified_by',
+          attr_sort_field: 'task last updated by'
         }
       ],
       display_attr_names: ['title', 'assignee', 'start_date', 'end_date'],
