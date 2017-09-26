@@ -57,42 +57,48 @@ export default can.Component.extend({
 
       scope.attr('waiting', true);
       if (workflow.unit !== null) {
-        workflow.refresh().then(function () {
-          workflow.attr('recurrences', true);
-          workflow.attr('status', 'Active');
-          return workflow.save();
-        }, restoreButton).then(function (workflow) {
-          if (moment(workflow.next_cycle_start_date)
-              .isSame(moment(), 'day')) {
-            return new CMS.Models.Cycle({
-              context: workflow.context.stub(),
-              workflow: {id: workflow.id, type: 'Workflow'},
-              autogenerate: true,
-            }).save();
-          }
-        }, restoreButton).then(function () {
-          var WorkflowExtension =
-            GGRC.extensions.find(function (extension) {
-              return extension.name === 'workflows';
-            });
+        workflow.refresh()
+          .then(function () {
+            workflow.attr('recurrences', true);
+            workflow.attr('status', 'Active');
+            return workflow.save();
+          })
+          .then(function (workflow) {
+            if (moment(workflow.next_cycle_start_date)
+                .isSame(moment(), 'day')) {
+              return new CMS.Models.Cycle({
+                context: workflow.context.stub(),
+                workflow: {id: workflow.id, type: 'Workflow'},
+                autogenerate: true,
+              }).save();
+            }
+          })
+          .then(function () {
+            var WorkflowExtension =
+              _.find(GGRC.extensions, function (extension) {
+                return extension.name === 'workflows';
+              });
 
-          return GGRC.Utils.CurrentPage
-            .initCounts([
-              WorkflowExtension.countsMap.activeCycles,
-            ],
-              workflow.type,
-              workflow.id);
-        }, restoreButton)
-        .then(function () {
-          return workflow.refresh_all('task_groups', 'task_group_tasks');
-        })
-        .then(restoreButton);
+            return GGRC.Utils.CurrentPage
+              .initCounts([
+                WorkflowExtension.countsMap.activeCycles,
+              ],
+                workflow.type,
+                workflow.id);
+          })
+          .then(function () {
+            return workflow.refresh_all('task_groups', 'task_group_tasks');
+          })
+          .always(restoreButton);
       } else {
-        workflowHelpers.generateCycle(workflow).then(function () {
-          return workflow.refresh();
-        }, restoreButton).then(function (workflow) {
-          return workflow.attr('status', 'Active').save();
-        }, restoreButton).then(restoreButton);
+        workflowHelpers.generateCycle(workflow)
+          .then(function () {
+            return workflow.refresh();
+          })
+          .then(function (workflow) {
+            return workflow.attr('status', 'Active').save();
+          })
+          .always(restoreButton);
       }
     },
   },
