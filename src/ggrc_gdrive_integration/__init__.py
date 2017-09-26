@@ -119,22 +119,33 @@ def get_credentials():
   return credentials
 
 
-def verify_credentials():
-  """Verify credentials to gdrive for the current user"""
+def verify_credentials(redirect_back_to="dashboard"):
+  """Verify credentials to gdrive for the current user
+
+  :param redirect_back_to: view function name to redirect back to after
+                           verifying credentials
+  :return: None, if valid credentials are present, or redirect to authorize fn
+  """
+  auth_redirect = flask.redirect(
+      flask.url_for('authorize_app', _external=True) +
+      "?redirect_back={}".format(redirect_back_to)
+  )
   if 'credentials' not in flask.session:
-    return flask.redirect(flask.url_for('authorize_app', _external=True))
+    return auth_redirect
   credentials = client.OAuth2Credentials.from_json(
       flask.session['credentials'])
   if credentials.access_token_expired:
-    return flask.redirect(flask.url_for('authorize_app', _external=True))
+    return auth_redirect
   return None
 
 
 @app.route("/authorize")
 def authorize_app():
   """Redirect to Google API auth page to authorize"""
+  redirect_back = flask.request.args.get("redirect_back")
   constructor_kwargs = {
-      'redirect_uri': flask.url_for('authorize_app', _external=True),
+      'redirect_uri': flask.url_for("authorize_app", _external=True) +
+      "?redirect_back={}".format(redirect_back),
       'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
       'token_uri': 'https://accounts.google.com/o/oauth2/token',
   }
@@ -151,4 +162,4 @@ def authorize_app():
     credentials = flow.step2_exchange(auth_code)
   # store credentials
   flask.session['credentials'] = credentials.to_json()
-  return flask.redirect(flask.url_for('export_view', _external=True))
+  return flask.redirect(flask.url_for(redirect_back, _external=True))
