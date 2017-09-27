@@ -10,7 +10,6 @@ import os
 import tempfile
 import csv
 from StringIO import StringIO
-from mock import patch
 
 from sqlalchemy import exc
 from sqlalchemy import func
@@ -19,8 +18,6 @@ from flask.ext.testing import TestCase as BaseTestCase
 
 from ggrc import db
 from ggrc.app import app
-from ggrc.converters.import_helper import read_csv_file
-from ggrc.views.converters import check_import_file
 from ggrc.models import Revision
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
@@ -31,11 +28,6 @@ logging.disable(logging.CRITICAL)
 
 
 THIS_ABS_PATH = os.path.abspath(os.path.dirname(__file__))
-
-
-def read_imported_file(file_data):  # pylint: disable=unused-argument
-  csv_file = check_import_file()
-  return read_csv_file(csv_file)
 
 
 class SetEncoder(json.JSONEncoder):
@@ -228,7 +220,6 @@ class TestCase(BaseTestCase, object):
       return cls._import_file(os.path.basename(tmp.name), dry_run, person)
 
   @classmethod
-  @patch("ggrc.views.converters.get_gdrive_file", new=read_imported_file)
   def _import_file(cls, filename, dry_run=False, person=None):
     """Function that handle sending file to import_csv service"""
     data = {"file": (open(os.path.join(cls.CSV_DIR, filename)), filename)}
