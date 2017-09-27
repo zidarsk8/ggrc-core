@@ -11,7 +11,10 @@ export default can.Component.extend({
   events: {
     click: function () {
       var workflow = GGRC.page_instance();
-      workflowHelpers.generateCycle(workflow);
+      workflowHelpers.generateCycle(workflow)
+        .then(function () {
+          return workflow.refresh_all('task_groups', 'task_group_tasks');
+        });
     },
   },
 });

@@ -82,7 +82,11 @@ export default can.Component.extend({
             ],
               workflow.type,
               workflow.id);
-        }, restoreButton).then(restoreButton);
+        }, restoreButton)
+        .then(function () {
+          return workflow.refresh_all('task_groups', 'task_group_tasks');
+        })
+        .then(restoreButton);
       } else {
         workflowHelpers.generateCycle(workflow).then(function () {
           return workflow.refresh();
