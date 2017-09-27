@@ -297,7 +297,9 @@ class BaseWebUiService(object):
 
   def filter_and_get_list_objs_from_tree_view(self, src_obj, filter_exp):
     """Filter by specified criteria and return list of objects from Tree
-    View."""
+    View.
+    """
+    # pylint: disable=invalid-name
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     objs_widget.filter.perform_query(filter_exp)
     return self.get_list_objs_from_tree_view(src_obj)
@@ -451,7 +453,7 @@ class AssessmentsService(BaseWebUiService):
     comments_descriptions = [comment_obj.description for comment_obj in
                              comment_objs]
     obj_info_panel = self.open_info_panel_of_obj_by_title(src_obj, obj)
-    return obj_info_panel.comments.add_comments(comments_descriptions)
+    return obj_info_panel.comments_panel.add_comments(comments_descriptions)
 
   def generate_objs_via_tree_view(self, src_obj, objs_under_asmt,
                                   asmt_tmpl_obj=None):
@@ -543,6 +545,7 @@ class AssessmentsService(BaseWebUiService):
     Tree View, fill data according to object attributes and create new object.
       - Return: [mapped_titles on create_modal]
     """
+    # pylint: disable=invalid-name
     modal_create = self._open_create_modal_and_fill_data(src_obj, obj)
     mapped_titles = modal_create.get_mapped_snapshots_titles()
     modal_create.save_and_close()
@@ -567,6 +570,7 @@ class AssessmentsService(BaseWebUiService):
     and map snapshots from objects_under_assessment attribute of passed object.
       - Return: list of str. Titles of mapped Snapshots from Modal Edit.
     """
+    # pylint: disable=invalid-name
     modal_edit = (self.open_info_page_of_obj(src_obj).open_info_3bbs().
                   select_edit())
     modal_edit.map_controls(objs_to_map)

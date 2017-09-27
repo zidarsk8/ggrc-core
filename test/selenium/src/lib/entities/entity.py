@@ -61,7 +61,7 @@ class Representation(object):
     ui_remap_items = {
         els.MANAGER: "manager", els.VERIFIED: "verified",
         els.STATUS: "status", els.LAST_UPDATED: "updated_at",
-        els.AUDIT_LEAD: "contact", els.CAS: "custom_attributes",
+        els.AUDIT_CAPTAIN: "contact", els.CAS: "custom_attributes",
         els.MAPPED_OBJECTS: "objects_under_assessment",
         els.ASSIGNEES: "assessor", els.ASSIGNEES_: "assessor",
         els.CREATORS: "creator", els.CREATORS_: "creator",

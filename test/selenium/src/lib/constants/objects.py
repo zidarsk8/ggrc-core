@@ -141,5 +141,5 @@ ALL_PLURAL = [k for k in globals().keys() if
 
 ALL_SINGULAR = _get_singular(ALL_PLURAL)
 
-ALL_OBJS = [getattr(sys.modules[__name__], obj) for obj in
-            sys.modules[__name__].ALL_PLURAL]
+ALL_OBJS = [obj for obj in [getattr(sys.modules[__name__], _obj) for _obj in
+            sys.modules[__name__].ALL_PLURAL] if isinstance(obj, str)]

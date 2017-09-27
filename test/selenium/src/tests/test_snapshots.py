@@ -12,13 +12,10 @@ import pytest
 from lib import base
 from lib.constants import messages, objects, element
 from lib.constants.element import AssessmentStates, ObjectStates
-from lib.entities import entities_factory
-from lib.factory import get_cls_webui_service, get_cls_rest_service
 from lib.constants.element import Lhn, MappingStatusAttrs
 from lib.entities import entities_factory, entity
 from lib.entities.entity import Representation
-from lib.factory import get_rest_service
-from lib.factory import get_ui_service
+from lib.factory import get_cls_webui_service, get_cls_rest_service
 from lib.page import dashboard
 from lib.service import webui_service
 from lib.utils import selenium_utils
@@ -109,8 +106,8 @@ class TestSnapshots(base.Test):
            "after deleting CAs for Controls"],
       indirect=["dynamic_create_audit_with_control"])
   def test_audit_contains_snapshotable_control(
-      self, dynamic_create_audit_with_control, expected_control, is_openable,
-      is_ggrc_1773, selenium
+      self, new_cas_for_controls_rest, dynamic_create_audit_with_control,
+      expected_control, is_openable, is_ggrc_1773, selenium
   ):
     """Test snapshotable Control and check via UI that:
     - Audit contains snapshotable Control after updating Control.
@@ -119,6 +116,7 @@ class TestSnapshots(base.Test):
     - "Audit contains snapshotable Control after deleting CAs of Control.
     Preconditions:
       Execution and return of dynamic fixtures used REST API:
+    - 'new_cas_for_controls_rest' *(due to Issue in app GGRC-2344)
     - 'create_audit_with_control_and_update_control'.
     - 'create_audit_with_control_and_delete_control'.
     - 'create_audit_with_control_with_cas_and_update_control_with_cas'.
@@ -174,8 +172,8 @@ class TestSnapshots(base.Test):
            "after deleting CAs for Controls"],
       indirect=["dynamic_create_audit_with_control"])
   def test_update_snapshotable_control_to_latest_ver(
-      self, dynamic_create_audit_with_control, control, expected_control,
-      is_openable, is_ggrc_1773, selenium
+      self, new_cas_for_controls_rest, dynamic_create_audit_with_control,
+      control, expected_control, is_openable, is_ggrc_1773, selenium
   ):
     """Test snapshotable Control and check via UI that:
     - Update snapshotable Control to latest ver after updating Control.
@@ -186,6 +184,7 @@ class TestSnapshots(base.Test):
     after deleting CAs of Control.
     Preconditions:
       Execution and return of dynamic fixtures used REST API:
+    - 'new_cas_for_controls_rest' *(due to Issue in app GGRC-2344)
     - 'create_audit_with_control_and_update_control'.
     - 'create_audit_with_control_and_delete_control'.
     - 'create_audit_with_control_with_cas_and_update_control_with_cas'.
@@ -446,7 +445,7 @@ class TestSnapshots(base.Test):
   @pytest.mark.parametrize(
       "dynamic_object",
       ["new_assessment_rest", "new_issue_rest"],
-      indirect=["dynamic_object"])
+      indirect=True)
   def test_mapping_of_assessments_and_issues_to_snapshots(
       self, create_audit_with_control_and_update_control, dynamic_object,
       selenium
@@ -635,7 +634,7 @@ class TestSnapshots(base.Test):
   @pytest.mark.parametrize(
       "dynamic_object",
       ["new_assessment_rest", "new_issue_rest"],
-      indirect=["dynamic_object"])
+      indirect=True)
   def test_asmts_and_issues_mapping_to_snapshotable_objs(
       self, create_audit_with_control_and_update_control, dynamic_object,
       selenium

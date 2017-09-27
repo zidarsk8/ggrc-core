@@ -113,18 +113,6 @@ class AdminWidgetCustomAttributes(object):
   ALL_CA_TYPES = (TEXT, RICH_TEXT, DATE, CHECKBOX, DROPDOWN, PERSON)
 
 
-class Common(object):
-  """Common elements' labels and properties for objects."""
-  TITLE = "Title"
-  DESCRIPTION = "Description"
-  CODE = "Code"
-  # fictional elements (need to convert UI attrs to Entities attrs)
-  CAS = "CAs"
-  MODIFIED_BY = "Modified by"
-  CREATED_AT = "Created at"
-  UPDATED_AT = "Updated at"
-
-
 class Base(object):
   """Base elements' labels and properties for objects."""
   WIDGET_INFO_HEADER_FORMAT = "{} Info"
@@ -132,6 +120,19 @@ class Base(object):
   STATE = "State"
   EFFECTIVE_DATE = "Effective Date"
   STOP_DATE = "Stop Date"
+
+
+class Common(object):
+  """Common elements' labels and properties for objects."""
+  TITLE = "Title"
+  DESCRIPTION = "Description"
+  CODE = "Code"
+  STATE = Base.STATE
+  # fictional elements (need to convert UI attrs to Entities attrs)
+  CAS = "CAs"
+  MODIFIED_BY = "Modified by"
+  CREATED_AT = "Created at"
+  UPDATED_AT = "Updated at"
 
 
 class CommonModalCreate(object):
@@ -164,7 +165,7 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   SECONDARY_CONTACTS = roles.SECONDARY_CONTACTS
   VERIFIED = "Verified"
   STATUS = "Status"
-  AUDIT_LEAD = "Audit Captain"
+  AUDIT_CAPTAIN = "Audit Captain"
   MANAGER = "Manager"
   MAPPED_OBJECTS = "Mapped Objects"
   REVIEW_STATE = "Review State"
@@ -192,7 +193,7 @@ class CommonAudit(Common):
   PLANNED_START_DATE = "Planned Start Date"
   PLANNED_END_DATE = "Planned End Date"
   PLANNED_REPORT_PERIOD = "Report Period"
-  AUDIT_LEAD = "Audit Captain"
+  AUDIT_CAPTAIN = "Audit Captain"
   AUDIT_FIRM = " Audit Firm"
   AUDITORS = "Auditors"
   ADD_AUDITOR = "+ Add Auditor"
@@ -298,7 +299,7 @@ class AuditInfoWidget(CommonAudit):
   """Elements' labels and properties for Audits Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonAudit.AUDIT)
   TITLE_UPPER = CommonAudit.TITLE.upper()
-  AUDIT_LEAD_UPPER = CommonAudit.AUDIT_LEAD.upper()
+  AUDIT_CAPTAIN_UPPER = CommonAudit.AUDIT_CAPTAIN.upper()
   CODE_UPPER = CommonAudit.CODE.upper()
 
 

@@ -6,7 +6,7 @@
 
 from selenium.webdriver.common.by import By
 
-from lib.constants import objects, url
+from lib.constants import objects
 
 
 class Common(object):
@@ -21,7 +21,10 @@ class Common(object):
   MODAL_FOOTER = " .modal-footer"
   MODAL_FILTER = " .modal-filter"
   # info page (panel)
-  INFO_WIDGET = ".info"
+  _INFO = "info"
+  INFO = "." + _INFO
+  _INFO_WIDGET = "info_widget"
+  INFO_WIDGET_ID = "#" + _INFO_WIDGET
   # dropdown
   DROPDOWN_MENU = ".dropdown-menu"
   # tree
@@ -44,7 +47,11 @@ class Common(object):
   HTML_LIST_CSS = (By.CSS_SELECTOR, 'ul')
   # xpath helper
   XPATH_NOT_HIDDEN = "[not(ancestor::section[contains(@class, 'hidden')])]"
-  INFO_WIDGET_XPATH = "//section[contains(@class,'info')]" + XPATH_NOT_HIDDEN
+  INFO_WIDGET_XPATH = (
+      "//section[contains(@class,'{}')]".format(_INFO) + XPATH_NOT_HIDDEN)
+  INFO_PAGE_XPATH = (
+      "//section[contains(@class,'{}')]".format(_INFO_WIDGET) +
+      XPATH_NOT_HIDDEN)
   # import / export pages
   CONTENT = ".content"
   OPTION = "option"
@@ -632,7 +639,7 @@ class CommonWidgetInfo(object):
   _MAIN_HEADER_XPATH = "//div[contains(@class,'pane-header')]" + _NOT_HIDDEN
   _HEADERS_AND_VALUES = (_INFO_WIDGET_XPATH +
                          '//div[starts-with(./@class, "span")]//h6/..')
-  WIDGET = Common.INFO_WIDGET
+  WIDGET = Common.INFO
   HEADERS_AND_VALUES = (By.XPATH, _HEADERS_AND_VALUES)
   LCAS_HEADERS_AND_VALUES = None  # due to exist only for WidgetInfoAssessment
   CAS_HEADERS_AND_VALUES = (By.XPATH,
@@ -644,7 +651,8 @@ class CommonWidgetInfo(object):
   TITLE_ENTERED = (By.XPATH, _MAIN_HEADER_XPATH + "//h3")
   STATE = (By.XPATH, _MAIN_HEADER_XPATH +
            "//*[contains(normalize-space(./@class), 'state-value state')]")
-  TXT_FOOTER_CSS = (By.CSS_SELECTOR, ".info-widget-footer em")
+  TXT_FOOTER_CSS = (By.CSS_SELECTOR,
+                    Common.INFO_WIDGET_ID + " .info-widget-footer em")
   TXT_MODIFIED_BY_CSS = (By.CSS_SELECTOR,
                          '[data-test-id="text_manager_7a906d2e"]')
   TXT_OBJECT_REVIEW = (
@@ -679,7 +687,7 @@ class WidgetSnapshotsInfoPanel(WidgetInfoPanel):
 class WidgetInfoProgram(WidgetInfoPanel):
   """Locators for Program Info widgets."""
   # pylint: disable=too-many-format-args
-  WIDGET = Common.INFO_WIDGET
+  WIDGET = Common.INFO
   TOGGLE_SHOW_ADVANCED = (
       By.CSS_SELECTOR, "{} .show-hidden-fields".format(WIDGET))
   TOGGLE_SHOW_ADVANCED_ACTIVATED = (
@@ -749,7 +757,7 @@ class WidgetInfoAudit(WidgetInfoPanel):
 class WidgetInfoAssessment(WidgetInfoPanel, CommonAssessment):
   """Locators for Assessment Info widgets."""
   # pylint: disable=invalid-name
-  WIDGET = Common.INFO_WIDGET
+  WIDGET = Common.INFO
   TOGGLE = ' [class*="fa-caret"]'
   # Base
   LCAS_HEADERS_AND_VALUES = (
@@ -985,7 +993,7 @@ class UnifiedMapperTreeView(TreeView):
 class BaseWidgetGeneric(object):
   """Locators for non Info and Admin widgets."""
   _object_name = None
-  widget_info = url.Widget.INFO
+  widget_info = Common.INFO_WIDGET_ID
 
   class __metaclass__(type):
     """For sharing parametrized class attributes we simply define how

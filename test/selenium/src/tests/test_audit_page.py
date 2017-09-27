@@ -9,11 +9,11 @@
 import pytest
 
 from lib import base
-from lib.constants.element import AssessmentStates, ObjectStates, objects
+from lib.constants.element import ObjectStates, objects
 from lib.entities import entities_factory
 from lib.entities.entity import Representation
-from lib.service import webui_service
 from lib.factory import get_cls_rest_service
+from lib.service import webui_service
 
 
 class TestAuditPage(base.Test):
@@ -133,11 +133,12 @@ class TestAuditPage(base.Test):
     assert expected_titles == actual_titles
     actual_asmt = asmts_ui_service.get_list_objs_from_info_panels(
         src_obj=new_audit_rest, objs=expected_asmt)
+    expected_asmt = expected_asmt.repr_ui()
     # 'expected_asmt': custom_attributes (None) *factory
     self.general_equal_assert(
         expected_asmt, actual_asmt, "custom_attributes", "status")
     self.xfail_equal_assert(
-        expected_asmt.repr_ui(), actual_asmt,
+        expected_asmt, actual_asmt,
         "Issue in app GGRC-3033, GGRC-3082", "status")
 
   @pytest.mark.smoke_tests
@@ -148,7 +149,7 @@ class TestAuditPage(base.Test):
       ids=["Assessments generation without Assessment Template",
            "Assessments generation based on Assessment Template without LCAs",
            "Assessments generation based on Assessment Template with LCAs"],
-      indirect=["dynamic_object"])
+      indirect=True)
   def test_asmts_generation(
       self, new_program_rest, new_controls_rest,
       map_new_program_rest_to_new_controls_rest, new_audit_rest,
@@ -255,12 +256,17 @@ class TestAuditPage(base.Test):
     # 'expected_asmt_tmpl': slug, updated_at (None) *factory
     # 'actual_asmt_tmpls': created_at, updated_at, custom_attributes,
     #                      modified_by (None)
+    is_expect_ggrc_3423 = (expected_asmt_tmpl.status != ObjectStates.DRAFT)
+    exclude_attrs = (
+        Representation.tree_view_attrs_to_exclude + ("slug", "modified_by"))
     self.general_equal_assert(
         expected_asmt_tmpl, actual_asmt_tmpls,
-        *Representation.tree_view_attrs_to_exclude + ("slug", "modified_by"))
-    self.xfail_equal_assert(
-        expected_asmt_tmpl, actual_asmt_tmpls,
-        "Issue in app GGRC-3423", "status")
+        *(exclude_attrs if not is_expect_ggrc_3423 else
+          exclude_attrs + ("status", )))
+    if is_expect_ggrc_3423:
+      self.xfail_equal_assert(
+          expected_asmt_tmpl, actual_asmt_tmpls,
+          "Issue in app GGRC-3423", "status")
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning

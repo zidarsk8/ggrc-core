@@ -13,8 +13,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote import webelement
 
 from lib import constants, exception, mixin
-from lib.constants import url, messages
-from lib.constants.element import MappingStatusAttrs
+from lib.constants import url, messages, objects, locator
+from lib.constants.element import MappingStatusAttrs, WidgetBar
 from lib.constants.locator import CommonDropdownMenu
 from lib.entities.entity import Entity
 from lib.utils import selenium_utils, help_utils
@@ -562,6 +562,23 @@ class Widget(AbstractPage):
     self.widget_name_from_url = widget_name.split("_")[0]
     self.mapped_obj_from_url = mapped_obj_singular
     self.mapped_obj_id_from_url = mapped_obj_id
+
+  @property
+  def is_info_page_not_panel(self):
+    """Check is the current page is Info Page and not Info Panel according to
+    checking existing of element by locator and URL's logic."""
+    is_info_page = False
+    if selenium_utils.is_element_exist(
+        self._driver, (By.XPATH, locator.Common.INFO_PAGE_XPATH)
+    ):
+      if ((self.widget_name_from_url == WidgetBar.INFO.lower()) or
+          ((objects.get_singular(self.source_obj_from_url) ==
+           self.mapped_obj_from_url) and
+          (self.source_obj_id_from_url == self.mapped_obj_id_from_url)) or
+          (self.widget_name_from_url == self.mapped_obj_from_url ==
+           self.mapped_obj_id_from_url == "")):
+        is_info_page = True
+    return is_info_page
 
 
 class TreeView(Component):

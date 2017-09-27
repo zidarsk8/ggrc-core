@@ -362,8 +362,19 @@ def map_new_control_rest_to_new_assessments_rest(request):
 
 @pytest.fixture(scope="function")
 def new_cas_for_assessments_rest(request):
-  """New global Custom Attributes for assessments created via REST API.
-  Teardown - remove created gCAs.
+  """Create new Global Custom Attributes for Assessments via REST API and
+  delete GCAs as teardown section.
+  """
+  cas = _common_fixtures(request.fixturename)
+  yield cas
+  from lib.service.rest_service import CustomAttributeDefinitionsService
+  CustomAttributeDefinitionsService().delete_objs(cas)
+
+
+@pytest.fixture(scope="function")
+def new_cas_for_controls_rest(request):
+  """Create new Global Custom Attributes for Controls via REST API and
+  delete GCAs as teardown section.
   """
   cas = _common_fixtures(request.fixturename)
   yield cas

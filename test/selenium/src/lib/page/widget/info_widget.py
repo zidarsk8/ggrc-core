@@ -14,60 +14,89 @@ from lib.utils import selenium_utils, string_utils
 
 
 class InfoWidget(base.Widget):
-  """Abstract class of common info for Info pages and Info panels."""
+  """Abstract class of common info for Info pages and Info panels.
+  For labels (headers) Will be used actual unicode elements from UI or pseudo
+  string elements from 'lib.element' module in upper case.
+  """
   # pylint: disable=too-many-instance-attributes
   _locators = locator.CommonWidgetInfo
   _elements = element.Common
   dropdown_settings_cls = widget_info.CommonInfoDropdownSettings
   locator_headers_and_values = None
-  all_headers_and_values = []
-  cas_headers_and_values = []
-  list_all_headers_text = []
-  list_all_values_text = []
 
   def __init__(self, driver):
+    self.child_cls_name = self.__class__.__name__.lower()
+    # empty lists of headers and values
+    self.list_all_headers_txt = []
+    self.list_all_values_txt = []
     super(InfoWidget, self).__init__(driver)
-    self.is_info_page_not_panel = (
-        self.widget_name_from_url == element.WidgetBar.INFO.lower())
-    self.cls_name = self.__class__.__name__.lower()
+    # check type and content of Info Widget
+    if not self.is_info_page_not_panel:
+      self.is_snapshotable_panel = (
+          self.child_cls_name in objects.ALL_SNAPSHOTABLE_OBJS)
+    # for Info Page
     if self.is_info_page_not_panel:
       self.info_page_footer = base.Label(
           self._driver, self._locators.TXT_FOOTER_CSS)
-      self.modified_by = self.info_page_footer.element.find_element(
-          *self._locators.TXT_MODIFIED_BY_CSS)
-      _created_at_text, _updated_at_text = (
+      self.modified_by = base.Element(
+          self.info_page_footer.element, self._locators.TXT_MODIFIED_BY_CSS)
+      _created_at_txt, _updated_at_txt = (
           self.info_page_footer.text.split(string_utils.WHITESPACE * 6))
-      self.created_at_text = (
-          re.sub("Created at", string_utils.BLANK, _created_at_text))
-      self.updated_at_text = (
-          _updated_at_text.splitlines()[1].replace("on ", string_utils.BLANK))
-      self.list_all_headers_text.extend(
-          [self._elements.CREATED_AT, self._elements.MODIFIED_BY,
-           self._elements.UPDATED_AT])
-      self.list_all_values_text.extend(
-          [self.created_at_text, self.modified_by.text, self.updated_at_text])
+      self.created_at_txt = (
+          re.sub("Created at", string_utils.BLANK, _created_at_txt))
+      self.updated_at_txt = (
+          _updated_at_txt.splitlines()[1].replace("on ", string_utils.BLANK))
+      self.list_all_headers_txt.extend(
+          [self._elements.CREATED_AT.upper(),
+           self._elements.MODIFIED_BY.upper(),
+           self._elements.UPDATED_AT.upper()])
+      self.list_all_values_txt.extend(
+          [self.created_at_txt, self.modified_by.text, self.updated_at_txt])
+    # for Info Panel
     else:
-      self.is_snapshotable = (
-          True if self.cls_name in objects.ALL_SNAPSHOTABLE_OBJS else False)
-      self.panel = InfoPanel(self._driver, self.is_snapshotable)
-    if self.cls_name in objects.ALL_OBJS_W_REVIEW_STATE:
-      self.object_review = base.Label(
+      self.panel = InfoPanel(self._driver, self.is_snapshotable_panel)
+    # for objects w/ Review State
+    if self.child_cls_name in objects.ALL_OBJS_W_REVIEW_STATE:
+      self.review_state_lbl = base.Label(
           self._driver, self._locators.TXT_OBJECT_REVIEW)
+      self.review_state_txt = self.get_review_state_txt()
+      self.list_all_headers_txt.extend([self.review_state_lbl.text])
+      self.list_all_values_txt.extend([self.review_state_txt])
+    # for all objects
+    # self.title_lbl: Issue in app GGRC-3451
+    self.title_lbl_txt = (
+        self._elements.TITLE.upper() if (
+            self.child_cls_name == objects.ASSESSMENTS and
+            self.is_info_page_not_panel) else
+        base.Label(self._driver, self._locators.TITLE).text)
+    self.title = base.Element(self._driver, self._locators.TITLE_ENTERED)
+    self.state_lbl_txt = self._elements.STATE.upper()
+    self.state_txt = self.get_state_txt()
+    self.cas_lbl_txt = self._elements.CAS.upper()
+    self.list_all_headers_txt.extend(
+        [self.title_lbl_txt, self.state_lbl_txt])
+    self.list_all_values_txt.extend(
+        [self.title.text, self.state_txt])
+    # for all objects excluding Assessments
+    if self.child_cls_name != objects.ASSESSMENTS:
+      self.code_lbl_txt, self.code_txt = (
+          self.get_header_and_value_txt_from_custom_scopes(
+              self._elements.CODE.upper()))
+      self.cas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes()
+      self.list_all_headers_txt.extend(
+          [self.code_lbl_txt, self.cas_lbl_txt])
+      self.list_all_values_txt.extend(
+          [self.code_txt, self.cas_scope_txt])
 
-  @property
-  def title(self):
-    return base.Label(self._driver, self._locators.TITLE)
+  def get_state_txt(self):
+    """Get object's state text from Info Widget."""
+    return objects.get_normal_form(
+        base.Label(self._driver, self._locators.STATE).text)
 
-  @property
-  def title_entered(self):
-    return base.Label(self._driver, self._locators.TITLE_ENTERED)
-
-  @property
-  def state(self):
-    return base.Label(self._driver, self._locators.STATE)
-
-  @property
-  def review_state(self):
+  def get_review_state_txt(self):
+    """Get object's review state text from Info Widget checking if exact UI
+    elements are existed.
+    """
     return (element.ReviewStates.REVIEWED if selenium_utils.is_element_exist(
         self._driver, self._locators.TXT_OBJECT_REVIEWED) else
         element.ReviewStates.UNREVIEWED)
@@ -79,8 +108,8 @@ class InfoWidget(base.Widget):
     base.Button(self._driver, self._locators.BUTTON_3BBS).click()
     return self.dropdown_settings_cls(self._driver)
 
-  def get_header_and_value_text_from_custom_scopes(self, header_text,
-                                                   custom_scopes_locator=None):
+  def get_header_and_value_txt_from_custom_scopes(self, header_text,
+                                                  custom_scopes_locator=None):
     """Get one header and one value elements text from custom scopes elements
     according to scopes locator and header text.
     Example:
@@ -165,7 +194,7 @@ class InfoWidget(base.Widget):
     """Get dict from object (text scope) which displayed on info page or
     info panel according to list of headers text and list of values text.
     """
-    return dict(zip(self.list_all_headers_text, self.list_all_values_text))
+    return dict(zip(self.list_all_headers_txt, self.list_all_values_txt))
 
 
 class InfoPanel(object):
@@ -266,22 +295,13 @@ class Audits(InfoWidget):
 
   def __init__(self, driver):
     super(Audits, self).__init__(driver)
-    self.audit_lead_text, self.audit_lead_entered_text = (
-        self.get_header_and_value_text_from_custom_scopes(
-            self._elements.AUDIT_LEAD.upper()))
-    self.code_text, self.code_entered_text = (
-        self.get_header_and_value_text_from_custom_scopes(
-            self._elements.CODE.upper()))
-    self.cas_text = self.get_headers_and_values_dict_from_cas_scopes()
-    # all obj scopes
-    self.list_all_headers_text.extend(
-        [self._elements.CAS.upper(), self.title.text,
-         self._elements.STATUS.upper(), self.audit_lead_text,
-         self.code_text])
-    self.list_all_values_text.extend(
-        [self.cas_text, self.title_entered.text,
-         objects.get_normal_form(self.state.text),
-         self.audit_lead_entered_text, self.code_entered_text])
+    self.audit_captain_lbl_txt, self.audit_captain_txt = (
+        self.get_header_and_value_txt_from_custom_scopes(
+            self._elements.AUDIT_CAPTAIN.upper()))
+    self.list_all_headers_txt.extend(
+        [self.audit_captain_lbl_txt])
+    self.list_all_values_txt.extend(
+        [self.audit_captain_txt])
 
 
 class Assessments(InfoWidget):
@@ -294,6 +314,7 @@ class Assessments(InfoWidget):
 
   def __init__(self, driver):
     super(Assessments, self).__init__(driver)
+    self.is_verified_lbl_txt = self._elements.VERIFIED.upper()
     self.is_verified = selenium_utils.is_element_exist(
         self._driver, self._locators.ICON_VERIFIED)
     self.workflow_container = tab_containers.AssessmentTabContainer(
@@ -301,27 +322,40 @@ class Assessments(InfoWidget):
         self._driver.find_element(*self._locators.ASMT_TAB_CONTAINER_CSS))
     self.workflow_container.switch_to_tab(
         element.AssessmentTabContainer.ASMT_TAB)
-    self.mapped_objects_titles_text = self._get_mapped_objs_titles()
-    self.lcas_text = self.get_headers_and_values_dict_from_cas_scopes(
+    self.mapped_objects_lbl_txt = self._elements.MAPPED_OBJECTS.upper()
+    self.mapped_objects_titles_txt = self._get_mapped_objs_titles_txt()
+    self.lcas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes(
         is_gcas_not_lcas=False)
-    self.creators_text, self.creators_entered_text = (
-        self.get_header_and_value_text_from_custom_scopes(
+    self.creators_lbl_txt, self.creators_txt = (
+        self.get_header_and_value_txt_from_custom_scopes(
             self._elements.CREATORS_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
-    self.assignees_text, self.assignees_entered_text = (
-        self.get_header_and_value_text_from_custom_scopes(
+    self.assignees_lbl_txt, self.assignees_txt = (
+        self.get_header_and_value_txt_from_custom_scopes(
             self._elements.ASSIGNEES_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
-    self.verifiers_text, self.verifiers_entered_text = (
-        self.get_header_and_value_text_from_custom_scopes(
+    self.verifiers_lbl_txt, self.verifiers_txt = (
+        self.get_header_and_value_txt_from_custom_scopes(
             self._elements.VERIFIERS_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
-    self.comments = base.CommentsPanel(
+    self.comments_panel = base.CommentsPanel(
         self._driver, self._locators.COMMENTS_CSS)
-    self.comments_scopes = self.comments.scopes
+    self.comments_lbl_txt = self.comments_panel.header_lbl.text
+    self.comments_scopes_txt = self.comments_panel.scopes
+    # todo: implement separate add lcas and gcas
+    # todo: implement separate add mapped ctrls and mapped other objs
+    self.list_all_headers_txt.extend(
+        [self.is_verified_lbl_txt, self.creators_lbl_txt,
+         self.assignees_lbl_txt, self.verifiers_lbl_txt,
+         self.mapped_objects_lbl_txt, self.comments_lbl_txt])
+    self.list_all_values_txt.extend(
+        [self.is_verified, self.creators_txt, self.assignees_txt,
+         self.verifiers_txt, self.mapped_objects_titles_txt,
+         self.comments_scopes_txt])
 
-  def _get_mapped_objs_titles(self):
-    """Return lists of str for mapped snapshots titles from current tab."""
+  def _get_mapped_objs_titles_txt(self):
+    """Return lists of str for mapped snapshots titles text from current tab.
+    """
     mapped_items = self._driver.find_elements(
         *self._locators.MAPPED_SNAPSHOTS_CSS)
     return [mapped_el.find_element(
@@ -334,30 +368,20 @@ class Assessments(InfoWidget):
     """
     self.workflow_container.switch_to_tab(
         element.AssessmentTabContainer.OTHER_ATTRS_TAB)
-    self.mapped_objects_titles_text += self._get_mapped_objs_titles()
-    cas_text = self.get_headers_and_values_dict_from_cas_scopes()
+    self.mapped_objects_titles_txt += self._get_mapped_objs_titles_txt()
+    cas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes()
     code_section = base.Label(self._driver, self._locators.CODE_CSS)
-    code_text = code_section.element.find_element(
+    code_lbl_txt = code_section.element.find_element(
         *self._locators.CODE_HEADER_CSS).text
-    code_entered_text = code_section.element.find_element(
+    code_txt = code_section.element.find_element(
         *self._locators.CODE_VALUE_CSS).text
     # todo: implement separate entities' model for asmts' lcas and gcas
-    cas_text.update(self.lcas_text)
-    self.list_all_headers_text.extend(
-        [self._elements.CAS.upper(), self._elements.TITLE,
-         self._elements.STATE.upper(),
-         self._elements.VERIFIED.upper(),
-         self.creators_text, self.assignees_text,
-         self.verifiers_text, self._elements.MAPPED_OBJECTS.upper(),
-         code_text, self.comments.header_lbl.text])
-    self.list_all_values_text.extend(
-        [cas_text, self.title_entered.text,
-         objects.get_normal_form(self.state.text),
-         self.is_verified,
-         self.creators_entered_text, self.assignees_entered_text,
-         self.verifiers_entered_text, self.mapped_objects_titles_text,
-         code_entered_text, self.comments_scopes])
-    return dict(zip(self.list_all_headers_text, self.list_all_values_text))
+    cas_scope_txt.update(self.lcas_scope_txt)
+    self.list_all_headers_txt.extend(
+        [self.cas_lbl_txt, code_lbl_txt])
+    self.list_all_values_txt.extend(
+        [cas_scope_txt, code_txt])
+    return dict(zip(self.list_all_headers_txt, self.list_all_values_txt))
 
   def click_complete(self):
     base.Button(self._driver, WidgetInfoAssessment.BUTTON_COMPLETE).click()
@@ -384,16 +408,6 @@ class Issues(InfoWidget):
 
   def __init__(self, driver):
     super(Issues, self).__init__(driver)
-    self.code_text, self.code_entered_text = (
-        self.get_header_and_value_text_from_custom_scopes(
-            self._elements.CODE.upper()))
-    # all obj scopes
-    self.list_all_headers_text.extend(
-        [self.title.text, self._elements.STATE.upper(),
-         self.code_text])
-    self.list_all_values_text.extend(
-        [self.title_entered.text, objects.get_normal_form(self.state.text),
-         self.code_entered_text])
 
 
 class Regulations(InfoWidget):
@@ -453,29 +467,18 @@ class Controls(InfoWidget):
 
   def __init__(self, driver):
     super(Controls, self).__init__(driver)
-    self.code_text, self.code_entered_text = (
-        self.get_header_and_value_text_from_custom_scopes(
-            self._elements.CODE.upper()))
     self.admin_text, self.admin_entered_text = (
-        self.get_header_and_value_text_from_custom_scopes(
+        self.get_header_and_value_txt_from_custom_scopes(
             self._elements.ADMIN.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
     self.primary_contact_text, self.primary_contact_entered_text = (
-        self.get_header_and_value_text_from_custom_scopes(
+        self.get_header_and_value_txt_from_custom_scopes(
             self._elements.PRIMARY_CONTACTS.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
-    self.cas_text = self.get_headers_and_values_dict_from_cas_scopes()
-    # scope
-    self.list_all_headers_text.extend(
-        [self._elements.CAS.upper(), self.title.text,
-         self._elements.STATE.upper(), self.admin_text,
-         self.primary_contact_text, self.code_text,
-         self.object_review.text])
-    self.list_all_values_text = (
-        [self.cas_text, self.title_entered.text,
-         objects.get_normal_form(self.state.text), self.admin_entered_text,
-         self.primary_contact_entered_text, self.code_entered_text,
-         self.review_state])
+    self.list_all_headers_txt.extend(
+        [self.admin_text, self.primary_contact_text])
+    self.list_all_values_txt.extend(
+        [self.admin_entered_text, self.primary_contact_entered_text])
 
 
 class Objectives(InfoWidget):
