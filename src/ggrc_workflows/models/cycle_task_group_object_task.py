@@ -50,7 +50,7 @@ class CycleTaskGroupObjectTask(mixins.WithContact,
   )
 
   @classmethod
-  def generate_slug_prefix_for(cls, obj):
+  def generate_slug_prefix(cls):
     return "CYCLETASK"
 
   # Note: this statuses are used in utils/query_helpers to filter out the tasks
