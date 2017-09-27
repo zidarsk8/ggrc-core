@@ -2222,7 +2222,7 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
    * The method only supports instance attributes categorized as "default",
    * and does not support (read: not work for) nested object references.
    *
-   * If the attribute does not exist, has a falsy value, or is not considered
+   * If the attribute does not exist or is not considered
    * to be a "default" attribute, an empty string is returned.
    *
    * If the attribute represents a date information, it is returned in the
