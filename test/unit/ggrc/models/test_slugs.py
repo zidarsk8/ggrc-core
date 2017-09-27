@@ -56,7 +56,7 @@ class TestSlugPrefix(unittest.TestCase):
   def test_slug_prefix(self, model):
     if model.__name__ not in self.EXPECTED_PREFIXES:
       # No slug prefix defined at all
-      self.assertIsNone(getattr(model, "generate_slug_prefixd", None))
+      self.assertIsNone(getattr(model, "generate_slug_prefix", None))
     else:
       self.assertEqual(model.generate_slug_prefix(),
                        self.EXPECTED_PREFIXES[model.__name__])
