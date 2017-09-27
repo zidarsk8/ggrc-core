@@ -47,6 +47,13 @@ directory
     ./bin/containers setup dev
     ```
 
+* Set up the necessary keys:
+
+    ```
+    mv docker-compose.override.yml{.example,}
+    vim docker-compose.override.yml # Add the keys from cloud console
+    ```
+
 To log into the container, run the following:
 
 ``` sh

@@ -10,6 +10,7 @@ src/app.yaml
 *.pyc
 src/instance
 .DS_Store
+docker-compose.override.yml
 
 # Deployment-specific settings
 extras/deploy/*/*
