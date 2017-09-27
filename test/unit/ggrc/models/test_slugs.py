@@ -60,3 +60,16 @@ class TestSlugPrefix(unittest.TestCase):
     else:
       self.assertEqual(model.generate_slug_prefix(),
                        self.EXPECTED_PREFIXES[model.__name__])
+
+  def test_prefix_uniqueness(self):
+    """Test slug prefix uniqueness for all models."""
+    all_prefixes = [
+        model.generate_slug_prefix()
+        for model in all_models.all_models
+        if hasattr(model, "generate_slug_prefix")
+    ]
+
+    self.assertEqual(
+        sorted(all_prefixes),
+        sorted(set(all_prefixes))
+    )
