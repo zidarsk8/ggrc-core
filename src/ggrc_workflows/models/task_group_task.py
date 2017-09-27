@@ -40,7 +40,7 @@ class TaskGroupTask(mixins.WithContact,
     return cls.TEXT
 
   @classmethod
-  def generate_slug_prefix_for(cls, obj):
+  def generate_slug_prefix(cls):
     return "TASK"
 
   task_group_id = db.Column(
