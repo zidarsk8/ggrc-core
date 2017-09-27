@@ -2,6 +2,9 @@
  * Copyright (C) 2017 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import '../utils/gdrive-picker-utils.js';
+
 (function (can, $) {
   'use strict';
 
@@ -293,6 +296,7 @@
       'a[data-toggle=gdrive-picker] click': function (el, ev) {
         var folder_id = el.data('folder-id');
         var dfd;
+        var picker;
 
         // Create and render a Picker object for searching images.
         function createPicker() {
@@ -301,7 +305,8 @@
             var view;
             var docsUploadView;
             var docsView;
-            var picker = new google.picker.PickerBuilder()
+
+            picker = new google.picker.PickerBuilder()
                   .setOAuthToken(gapi.auth.getToken().access_token)
                   .setDeveloperKey(GGRC.config.GAPI_KEY)
                   .setCallback(pickerCallback);
@@ -357,6 +362,7 @@
           } else if (data[ACTION] === CANCEL) {
             el.trigger('rejected');
           }
+          GGRC.Utils.GDrivePicker.ensurePickerDisposed(picker, data);
         }
 
         dfd = GGRC.Controllers.GAPI.reAuthorize(gapi.auth.getToken());
