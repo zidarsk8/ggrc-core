@@ -88,8 +88,10 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       }
   }
 
-  design = deferred(db.Column(db.String), "Assessment")
-  operationally = deferred(db.Column(db.String), "Assessment")
+  design = deferred(db.Column(db.String, nullable=False, default=""),
+                    "Assessment")
+  operationally = deferred(db.Column(db.String, nullable=False, default=""),
+                           "Assessment")
   audit_id = deferred(
       db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False),
       'Assessment')
@@ -245,7 +247,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
     return self.assignees_by_type.get("Verifier", [])
 
   def validate_conclusion(self, value):
-    return value if value in self.VALID_CONCLUSIONS else None
+    return value if value in self.VALID_CONCLUSIONS else ""
 
   @validates("operationally")
   def validate_opperationally(self, key, value):
