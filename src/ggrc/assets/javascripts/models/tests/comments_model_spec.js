@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-xdescribe('CMS.Models.Comment', function () {
+describe('CMS.Models.Comment', function () {
   'use strict';
 
   describe('updateDescription() method', function () {
@@ -12,17 +12,14 @@ xdescribe('CMS.Models.Comment', function () {
     var eventObj;
     var method;
     var $element;
-    var $fakeBody;
+    var trigger;
 
     beforeEach(function () {
       $element = $('<div />');
       comment = new CMS.Models.Comment();
       method = comment.updateDescription.bind(comment);
 
-      $fakeBody = {
-        trigger: jasmine.createSpy()
-      };
-      spyOn(window, '$').and.returnValue($fakeBody);
+      trigger = spyOn($.prototype, 'trigger');
 
       eventObj = $.Event('on-save');
       eventObj.oldVal = '';
@@ -47,7 +44,7 @@ xdescribe('CMS.Models.Comment', function () {
     it('displays a success notification on success', function () {
       method(comment, $element, eventObj);
       dfdSave.resolve();
-      expect($fakeBody.trigger).toHaveBeenCalledWith(
+      expect(trigger).toHaveBeenCalledWith(
         'ajax:flash', {success: 'Saved.'}
       );
     });
@@ -66,7 +63,7 @@ xdescribe('CMS.Models.Comment', function () {
     it('displays an error notification on failure', function () {
       method(comment, $element, eventObj);
       dfdSave.reject('Server error');
-      expect($fakeBody.trigger).toHaveBeenCalledWith(
+      expect(trigger).toHaveBeenCalledWith(
         'ajax:flash', {error: 'There was a problem with saving.'}
       );
     });

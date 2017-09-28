@@ -150,7 +150,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
     return None
 
   @classmethod
-  def generate_slug_prefix_for(cls, obj):
+  def generate_slug_prefix(cls):
     return "TEMPLATE"
 
   def _clone(self):

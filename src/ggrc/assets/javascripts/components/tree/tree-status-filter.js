@@ -73,14 +73,18 @@
     },
     loadTreeStates: function (modelName) {
       // Get the status list from local storage
-      var savedStateList = this.attr('displayPrefs')
+      var savedStates = this.attr('displayPrefs')
         .getTreeViewStates(modelName);
+      var actualStates = StateUtils.getStatesForModel(modelName);
+      var selectedStates = savedStates.filter(function (state) {
+        return actualStates.includes(state);
+      });
 
-      if (savedStateList.length === 0) {
-        savedStateList = StateUtils.getDefaultStatesForModel(modelName);
+      if (selectedStates.length === 0) {
+        selectedStates = StateUtils.getDefaultStatesForModel(modelName);
       }
 
-      this.attr('selectedStates', savedStateList);
+      this.attr('selectedStates', selectedStates);
     },
     saveTreeStates: function (selectedStates) {
       var stateToSave;

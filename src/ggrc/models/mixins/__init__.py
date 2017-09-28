@@ -762,7 +762,7 @@ class Slugged(Base):
   def generate_slug_for(cls, obj):
     """Generate unique Slug among the objects of the current class"""
     _id = getattr(obj, 'id', uuid1())
-    obj.slug = "{0}-{1}".format(cls.generate_slug_prefix_for(obj), _id)
+    obj.slug = "{0}-{1}".format(cls.generate_slug_prefix(), _id)
     # We need to make sure the generated slug is not already present in the
     # database. If it is, we increment the id until we find a slug that is
     # unique.
@@ -774,11 +774,11 @@ class Slugged(Base):
     while db.session.query(
             cls.query.filter(cls.slug == obj.slug).exists()).scalar():
       _id += INCREMENT
-      obj.slug = "{0}-{1}".format(cls.generate_slug_prefix_for(obj), _id)
+      obj.slug = "{0}-{1}".format(cls.generate_slug_prefix(), _id)
 
   @classmethod
-  def generate_slug_prefix_for(cls, obj):
-    return obj.__class__.__name__.upper()
+  def generate_slug_prefix(cls):
+    return cls.__name__.upper()
 
   @classmethod
   def ensure_slug_before_flush(cls, session, flush_context, instances):

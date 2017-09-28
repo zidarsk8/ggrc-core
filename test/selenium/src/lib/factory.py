@@ -30,9 +30,8 @@ def _factory(cls_name, parent_cls, search_nested_subclasses=False):
  """
   member_cls = None
   subcls_name = _filter_out_underscore(cls_name.lower())
-  members = _all_subclasses(parent_cls) \
-      if search_nested_subclasses \
-      else parent_cls.__subclasses__()
+  members = (_all_subclasses(parent_cls) if search_nested_subclasses else
+             parent_cls.__subclasses__())
   for member_cls in members:
     if member_cls.__name__.lower() == subcls_name:
       break
@@ -123,6 +122,15 @@ def get_cls_rest_service(object_name):
   return _factory(cls_name=cls_name, parent_cls=base_cls)
 
 
+def get_cls_webui_service(object_name):
+  """Get and return class of webui service."""
+  from lib.service import webui_service
+  cls_name = object_name + constants.cls_name.SERVICE
+  base_cls = webui_service.BaseWebUiService
+  return _factory(cls_name=cls_name, parent_cls=base_cls,
+                  search_nested_subclasses=True)
+
+
 def get_cls_create_obj(object_name):
   """Get and return class of create object."""
   from lib.page.modal import create_new_object
@@ -164,25 +172,3 @@ def get_locator_add_widget(widget_name):
   # todo: unittests
   return getattr(
       constants.locator.WidgetBarButtonAddDropdown, widget_name.upper())
-
-
-def get_ui_service(object_name):
-  """Get and return class of UI service according to name of object
-  Returns:
-    class of ui service by object_name
-  """
-  service_name = objects.get_plural(object_name, title=True)
-  from lib.service import webui_service
-  service_classname = service_name + constants.cls_name.SERVICE
-  return getattr(webui_service, service_classname)
-
-
-def get_rest_service(object_name):
-  """Get and return class of REST service according to name of object
-  Returns:
-    class of REST service by object_name
-  """
-  service_name = objects.get_plural(object_name, title=True)
-  from lib.service import rest_service
-  service_classname = service_name + constants.cls_name.SERVICE
-  return getattr(rest_service, service_classname)

@@ -1,8 +1,10 @@
 -# Copyright (C) 2017 Google Inc.
 -# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+-set user_role = current_user.system_wide_role.lower()
+
 .header-content
-  -if current_user.system_wide_role.lower() != 'no access'
+  -if user_role != 'no access'
     %button{ 'class': 'lhn-trigger lhn-no-init pull-left', 'href': 'javascript://'}
       %span.icon-bar
       %span.icon-bar
@@ -49,6 +51,13 @@
         %li{'class': 'user-email'}
           %span
             =current_user.email
+
+        -if user_role == 'administrator' or user_role == 'superuser'
+          %li
+            %a{ 'href': '/admin#people_list_widget', 'class': 'admin-btn' }
+              %i.fa.fa-tachometer
+              %span
+                Administration
 
         %li
           %a{ 'href': '/export', 'class': 'export-btn', 'target': '_blank' }

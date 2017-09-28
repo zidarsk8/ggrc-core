@@ -1,0 +1,7 @@
+cleandev:
+  environment:
+   - GGRC_DATABASE_HOST=db
+   - GGRC_DATABASE_URI=mysql+mysqldb://root:root@db/ggrcdev?charset=utf8
+   - GGRC_GAPI_KEY=<GAPI_KEY>
+   - GGRC_GAPI_CLIENT_ID=<GAPI_CLIENT_ID>
+   - GGRC_GAPI_CLIENT_SECRET=<GAPI_CLEINT_SECRET>

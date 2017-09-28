@@ -216,14 +216,17 @@
       return this.attr('scope') !== 'System';
     },
     permission_summary: function () {
-      if (this.name === 'ProgramOwner') {
-        return 'Admin';
-      }
-      if (this.name === 'ProgramEditor') {
-        return 'Can Edit';
-      }
-      if (this.name === 'ProgramReader') {
-        return 'View Only';
+      var RoleList = {
+        ProgramOwner: 'Program Manager',
+        ProgramEditor: 'Program Editor',
+        ProgramReader: 'Program Reader',
+        WorkflowOwner: 'Workflow Manager',
+        WorkflowMember: 'Workflow Member',
+        Mapped: 'No Role',
+        Owner: 'Manager',
+      };
+      if (RoleList[this.name]) {
+        return RoleList[this.name];
       }
       return this.name;
     }
