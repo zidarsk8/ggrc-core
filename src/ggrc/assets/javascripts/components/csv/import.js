@@ -19,6 +19,7 @@ export default GGRC.Components('csvImportWidget', {
     filename: "",
     isLoading: false,
     state: "select",
+    helpUrl: GGRC.config.external_import_help_url,
     states: function () {
       var state = this.attr("state") || "select",
           states = {
