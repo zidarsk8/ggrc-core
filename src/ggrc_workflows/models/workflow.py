@@ -6,7 +6,9 @@
 This contains the basic Workflow object and a mixin for determining the state
 of the Objects that are mapped to any cycle tasks.
 """
+import calendar
 import itertools
+import datetime
 from dateutil import relativedelta
 
 from sqlalchemy import and_
@@ -179,12 +181,20 @@ class Workflow(mixins.CustomAttributable, HasOwnContext, mixins.Timeboxed,
       days += ((setup_date.isoweekday() + days) > self.WORK_WEEK_LEN) * 2
       return setup_date + relativedelta.relativedelta(
           setup_date, weeks=weeks, days=days)
-    else:
-      calc_date = setup_date + relativedelta.relativedelta(
-          setup_date,
-          **{key: repeater}
-      )
-      return self.first_work_day(calc_date)
+    calc_date = setup_date + relativedelta.relativedelta(
+        setup_date,
+        **{key: repeater}
+    )
+    if self.unit == self.MONTH_UNIT:
+      # check if setup date is the last day of the month
+      # and if it is then calc_date should be the last day of hte month too
+      setup_day = calendar.monthrange(setup_date.year, setup_date.month)[1]
+      if setup_day == setup_date.day:
+        calc_date = datetime.date(
+            calc_date.year,
+            calc_date.month,
+            calendar.monthrange(calc_date.year, calc_date.month)[1])
+    return self.first_work_day(calc_date)
 
   @orm.validates('repeat_every')
   def validate_repeat_every(self, _, value):
