@@ -27,6 +27,8 @@ services:
      - "./provision/docker/mysql:/etc/mysql/conf.d"
     environment:
      - MYSQL_ROOT_PASSWORD=root
+    tmpfs:
+      - /var/lib/mysql/:rw,noexec,nosuid,size=1G
 
   selenium:
     build: 
