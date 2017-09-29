@@ -155,12 +155,9 @@
             </div>
           </div>
 
+          {{#if showLink}}
           {{#using cycle=instance.cycle}}
           {{#using workflow=cycle.workflow}}
-          {{#if_helpers '\
-            #is_dashboard' '\
-            or ^is_page_instance' workflow}}
-
               <div class="row-fluid wrap-row">
                 <div class="span12">
                   <h6>Part of the workflow</h6>
@@ -172,9 +169,9 @@
                   </p>
                 </div>
               </div>
-          {{/if_helpers}}
           {{/using}}
           {{/using}}
+          {{/if}}
 
           <div class="row-fluid wrap-row">
             <div class="span12">

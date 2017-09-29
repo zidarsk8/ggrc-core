@@ -6,6 +6,11 @@
 import template from './templates/cycle-task-group-object-task.mustache';
 
 var viewModel = can.Map.extend({
+  showLink: function () {
+    var pageInstance = GGRC.page_instance();
+
+    return pageInstance.type !== 'Workflow';
+  },
   instance: {},
 });
 
