@@ -9,7 +9,6 @@ from sqlalchemy.exc import IntegrityError
 
 def field_lookup(field_string):
   """Find relevant error field for UNIQUE violation in SQL error message."""
-  output_format = "{0}; {0}"
   bad_field = 'code'  # assumes this field as a default
   if field_string.startswith('uq_t_'):
     bad_field = 'title'
@@ -17,7 +16,7 @@ def field_lookup(field_string):
     bad_field = 'email'
   elif field_string.endswith('title'):
     bad_field = 'title'
-  return output_format.format(bad_field)
+  return bad_field
 
 
 def translate_message(exception):
@@ -33,8 +32,8 @@ def translate_message(exception):
     )
     matches = duplicate_entry_pattern.search(message)
     if matches:
-      return (u"The value {value} is already used for another {key} "
-              u"values must be unique."
+      return (u"The value {value} is already used for another {key}. "
+              u"{key} values must be unique."
               .format(value=matches.group(1),
                       key=field_lookup(matches.group(2))))
 
