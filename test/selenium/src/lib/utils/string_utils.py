@@ -9,30 +9,37 @@ from collections import defaultdict
 
 
 BLANK = ''
+STAR = "*"
+WHITESPACE = " "
 COMMA = ','  # comma is used as delimiter for multi-choice values
 LESS = '<'  # need exclude this character due to issue GGRC-527
 DOUBLE_QUOTES = '"'  # need exclude this character due to issue GGRC-931
 BACKSLASH = '\\'  # need exclude this character due to issue GGRC-931
 EXCLUDE = COMMA + LESS + DOUBLE_QUOTES + BACKSLASH
 SPECIAL = BLANK.join(_ for _ in string.punctuation if _ not in EXCLUDE)
+RANDOM_STR_LENGTH = 5
+RANDOM_UUID_LENGTH = 13
+RANDOM_STR_LISTS_COUNT = 3
 
 
-def random_string(size=5, chars=string.letters + string.digits + SPECIAL):
+def random_string(size=RANDOM_UUID_LENGTH,
+                  chars=string.letters + string.digits + SPECIAL):
   """Return string with corresponding size that filled by values from selected
- chars.
- """
-  return BLANK.join(random.choice(chars) for position in range(size))
+  chars.
+  """
+  return BLANK.join(random.choice(chars) for _ in range(size))
 
 
-def random_uuid(length=13):
+def random_uuid(length=RANDOM_UUID_LENGTH):
   """Return string with predefined length base on UUID."""
   return str(uuid.uuid4())[:length]
 
 
-def random_list_strings(list_len=3, item_size=5,
+def random_list_strings(list_len=RANDOM_STR_LISTS_COUNT,
+                        item_size=RANDOM_STR_LENGTH,
                         chars=string.letters + string.digits + SPECIAL):
   """Return list of random strings separated by comma."""
-  return COMMA.join(random_string(item_size, chars) for i in range(list_len))
+  return COMMA.join(random_string(item_size, chars) for _ in range(list_len))
 
 
 def get_bool_value_from_arg(arg):

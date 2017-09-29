@@ -9,10 +9,11 @@
 import pytest
 
 from lib import base
-from lib.constants.element import AssessmentStates, ObjectStates, objects
+from lib.constants.element import ObjectStates, objects
 from lib.entities import entities_factory
-from lib.service import webui_service
+from lib.entities.entity import Representation
 from lib.factory import get_cls_rest_service
+from lib.service import webui_service
 
 
 class TestAuditPage(base.Test):
@@ -68,18 +69,17 @@ class TestAuditPage(base.Test):
     """
     expected_asmt_tmpl = (entities_factory.AssessmentTemplatesFactory().
                           create().repr_ui())
-    (webui_service.AssessmentTemplatesService(selenium).
-     create_obj_via_tree_view(src_obj=new_audit_rest, obj=expected_asmt_tmpl))
+    asmt_tmpls_ui_service = webui_service.AssessmentTemplatesService(selenium)
+    asmt_tmpls_ui_service.create_obj_via_tree_view(
+        src_obj=new_audit_rest, obj=expected_asmt_tmpl)
     actual_asmt_tmpls_tab_count = (
-        webui_service.AssessmentTemplatesService(selenium).
-        get_count_objs_from_tab(src_obj=new_audit_rest))
+        asmt_tmpls_ui_service.get_count_objs_from_tab(src_obj=new_audit_rest))
     assert len([expected_asmt_tmpl]) == actual_asmt_tmpls_tab_count
-    actual_asmt_tmpls = (
-        webui_service.AssessmentTemplatesService(selenium).
-        get_list_objs_from_tree_view(src_obj=new_audit_rest))
-    # due to 'expected_asmt_tmpl.updated_at = None'
-    self.general_assert(
-        [expected_asmt_tmpl], actual_asmt_tmpls, "updated_at")
+    actual_asmt_tmpls = asmt_tmpls_ui_service.get_list_objs_from_tree_view(
+        src_obj=new_audit_rest)
+    # 'expected_asmt_tmpl': modified_by (None) *factory
+    self.general_equal_assert(
+        [expected_asmt_tmpl], actual_asmt_tmpls, "modified_by")
 
   @pytest.mark.smoke_tests
   def test_asmt_creation(self, new_program_rest, new_audit_rest, selenium):
@@ -90,16 +90,16 @@ class TestAuditPage(base.Test):
     """
     expected_asmt = (entities_factory.AssessmentsFactory().
                      create().repr_ui())
-    (webui_service.AssessmentsService(selenium).
-     create_obj_via_tree_view(src_obj=new_audit_rest, obj=expected_asmt))
-    actual_asmts_tab_count = (webui_service.AssessmentsService(selenium).
-                              get_count_objs_from_tab(src_obj=new_audit_rest))
+    asmts_ui_service = webui_service.AssessmentsService(selenium)
+    asmts_ui_service.create_obj_via_tree_view(
+        src_obj=new_audit_rest, obj=expected_asmt)
+    actual_asmts_tab_count = asmts_ui_service.get_count_objs_from_tab(
+        src_obj=new_audit_rest)
     assert len([expected_asmt]) == actual_asmts_tab_count
-    actual_asmts = (webui_service.AssessmentsService(selenium).
-                    get_list_objs_from_tree_view(src_obj=new_audit_rest))
-    # due to 'expected_asmt.updated_at = None'
-    self.general_assert(
-        [expected_asmt], actual_asmts, "updated_at")
+    actual_asmts = asmts_ui_service.get_list_objs_from_tree_view(
+        src_obj=new_audit_rest)
+    # 'expected_asmt': modified_by (None) *factory
+    self.general_equal_assert([expected_asmt], actual_asmts, "modified_by")
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -126,23 +126,20 @@ class TestAuditPage(base.Test):
         entities_factory.AssessmentsFactory().create(
             objects_under_assessment=[dynamic_object]))
     expected_titles = [dynamic_object.title]
-    assessments_service = webui_service.AssessmentsService(selenium)
+    asmts_ui_service = webui_service.AssessmentsService(selenium)
     actual_titles = (
-        assessments_service.create_obj_and_get_mapped_titles_from_modal(
+        asmts_ui_service.create_obj_and_get_mapped_titles_from_modal(
             src_obj=new_audit_rest, obj=expected_asmt))
-    actual_asmt = assessments_service.get_list_objs_from_info_panels(
-        src_obj=new_audit_rest, objs=[expected_asmt])[0]
-    # due to issue GGRC-3033
-    attrs_to_exclude = []
-    if actual_asmt.status == AssessmentStates.IN_PROGRESS:
-      attrs_to_exclude.append("status")
-    self.general_assert(
-        expected_asmt.repr_ui(), actual_asmt, *attrs_to_exclude)
     assert expected_titles == actual_titles
-    if "status" in attrs_to_exclude:
-      pytest.xfail(reason="GGRC-3033 Issue")
-    else:
-      pytest.fail(msg="GGRC-3033 Issue was fixed")
+    actual_asmt = asmts_ui_service.get_list_objs_from_info_panels(
+        src_obj=new_audit_rest, objs=expected_asmt)
+    expected_asmt = expected_asmt.repr_ui()
+    # 'expected_asmt': custom_attributes (None) *factory
+    self.general_equal_assert(
+        expected_asmt, actual_asmt, "custom_attributes", "status")
+    self.xfail_equal_assert(
+        expected_asmt, actual_asmt,
+        "Issue in app GGRC-3033, GGRC-3082", "status")
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -152,7 +149,7 @@ class TestAuditPage(base.Test):
       ids=["Assessments generation without Assessment Template",
            "Assessments generation based on Assessment Template without LCAs",
            "Assessments generation based on Assessment Template with LCAs"],
-      indirect=["dynamic_object"])
+      indirect=True)
   def test_asmts_generation(
       self, new_program_rest, new_controls_rest,
       map_new_program_rest_to_new_controls_rest, new_audit_rest,
@@ -172,22 +169,18 @@ class TestAuditPage(base.Test):
         asmt_tmpl=dynamic_object))
     expected_asmts = [
         expected_asmt.repr_ui() for expected_asmt in expected_asmts]
-    (webui_service.AssessmentsService(selenium).generate_objs_via_tree_view(
+    asmts_ui_service = webui_service.AssessmentsService(selenium)
+    asmts_ui_service.generate_objs_via_tree_view(
         src_obj=new_audit_rest, objs_under_asmt=new_controls_rest,
-        asmt_tmpl_obj=dynamic_object))
-    actual_asmts_tab_count = (webui_service.AssessmentsService(selenium).
-                              get_count_objs_from_tab(src_obj=new_audit_rest))
+        asmt_tmpl_obj=dynamic_object)
+    actual_asmts_tab_count = asmts_ui_service.get_count_objs_from_tab(
+        src_obj=new_audit_rest)
     assert len(expected_asmts) == actual_asmts_tab_count
-    actual_asmts = (webui_service.AssessmentsService(selenium).
-                    get_list_objs_from_info_panels(
-                        src_obj=new_audit_rest, objs=expected_asmts))
-    # due to 'expected_asmt.updated_at = None',
-    #        'expected_asmt.slug = None'
-    #        'expected_asmt.custom_attributes = {None: None}'
-    actual_asmts = [actual_asmt.update_attrs(
-        is_replace_attrs=False, custom_attributes={None: None})
-        for actual_asmt in actual_asmts]
-    self.general_assert(expected_asmts, actual_asmts, "updated_at", "slug")
+    actual_asmts = asmts_ui_service.get_list_objs_from_info_panels(
+        src_obj=new_audit_rest, objs=expected_asmts)
+    # 'expected_asmt': slug, custom_attributes (None) *factory
+    self.general_equal_assert(
+        expected_asmts, actual_asmts, "slug", "custom_attributes")
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
@@ -202,9 +195,9 @@ class TestAuditPage(base.Test):
     expected_audit = (
         create_and_clone_audit_w_params_to_update["expected_audit"].repr_ui())
     actual_audit = create_and_clone_audit_w_params_to_update["actual_audit"]
-    # due to 'expected_audit.slug = None'
-    self.general_assert(
-        expected_audit, actual_audit, "slug")
+    # 'expected_audit': created_at, updated_at, slug (None) *factory
+    self.general_equal_assert(
+        expected_audit, actual_audit, "created_at", "updated_at", "slug")
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
@@ -218,14 +211,16 @@ class TestAuditPage(base.Test):
     'create_and_clone_audit_w_params_to_update'.
     """
     actual_audit = create_and_clone_audit_w_params_to_update["actual_audit"]
-    actual_asmts_tab_count = (webui_service.AssessmentsService(selenium).
-                              get_count_objs_from_tab(src_obj=actual_audit))
-    actual_asmts = (webui_service.AssessmentsService(selenium).
-                    get_list_objs_from_tree_view(src_obj=actual_audit))
-    actual_issues_tab_count = (webui_service.IssuesService(selenium).
-                               get_count_objs_from_tab(src_obj=actual_audit))
-    actual_issues = (webui_service.IssuesService(selenium).
-                     get_list_objs_from_tree_view(src_obj=actual_audit))
+    asmts_ui_service = webui_service.AssessmentsService(selenium)
+    actual_asmts_tab_count = asmts_ui_service.get_count_objs_from_tab(
+        src_obj=actual_audit)
+    actual_asmts = asmts_ui_service.get_list_objs_from_tree_view(
+        src_obj=actual_audit)
+    issues_ui_service = webui_service.IssuesService(selenium)
+    actual_issues_tab_count = issues_ui_service.get_count_objs_from_tab(
+        src_obj=actual_audit)
+    actual_issues = issues_ui_service.get_list_objs_from_tree_view(
+        src_obj=actual_audit)
     assert actual_asmts_tab_count == actual_issues_tab_count == 0
     assert bool(actual_asmts) == bool(actual_issues) == 0
 
@@ -258,17 +253,20 @@ class TestAuditPage(base.Test):
             "expected_assessment_template"].repr_ui())
     actual_asmt_tmpls = (webui_service.AssessmentTemplatesService(selenium).
                          get_list_objs_from_tree_view(src_obj=actual_audit))
-    # due to 'expected_asmt_tmpl.slug = None',
-    #        'expected_asmt_tmpl.updated_at = {None: None}'
-    actual_asmt_tmpls = [
-        actual_asmt_tmpl.update_attrs(slug=None, updated_at=None, status=None)
-        for actual_asmt_tmpl in actual_asmt_tmpls]
-    # due to issue GGRC-3423
-    if expected_asmt_tmpl.status != ObjectStates.DRAFT:
-      if expected_asmt_tmpl.status != actual_asmt_tmpls[0].status:
-        pytest.xfail(reason="GGRC-3423 Issue")
-      else:
-        pytest.fail(msg="GGRC-3423 Issue was fixed")
+    # 'expected_asmt_tmpl': slug, updated_at (None) *factory
+    # 'actual_asmt_tmpls': created_at, updated_at, custom_attributes,
+    #                      modified_by (None)
+    is_expect_ggrc_3423 = (expected_asmt_tmpl.status != ObjectStates.DRAFT)
+    exclude_attrs = (
+        Representation.tree_view_attrs_to_exclude + ("slug", "modified_by"))
+    self.general_equal_assert(
+        expected_asmt_tmpl, actual_asmt_tmpls,
+        *(exclude_attrs if not is_expect_ggrc_3423 else
+          exclude_attrs + ("status", )))
+    if is_expect_ggrc_3423:
+      self.xfail_equal_assert(
+          expected_asmt_tmpl, actual_asmt_tmpls,
+          "Issue in app GGRC-3423", "status")
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
@@ -290,9 +288,11 @@ class TestAuditPage(base.Test):
                        get_list_objs_from_tree_view(src_obj=actual_audit))
     actual_programs = (webui_service.ProgramsService(selenium).
                        get_list_objs_from_tree_view(src_obj=actual_audit))
-    # due to 'actual_controls.custom_attributes = {None: None}'
-    self.general_assert([expected_control], actual_controls,
-                        "custom_attributes")
-    # due to 'actual_programs.custom_attributes = {None: None}'
-    self.general_assert([expected_program], actual_programs,
-                        "custom_attributes")
+    # 'actual_controls, actual_programs': created_at, updated_at,
+    #                                     custom_attributes (None)
+    self.general_equal_assert(
+        [expected_control], actual_controls,
+        *Representation.tree_view_attrs_to_exclude)
+    self.general_equal_assert(
+        [expected_program], actual_programs,
+        *Representation.tree_view_attrs_to_exclude)

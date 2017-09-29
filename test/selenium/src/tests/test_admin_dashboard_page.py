@@ -8,8 +8,8 @@
 
 import random
 
-import re
 import pytest
+import re
 
 from lib import base, constants
 from lib.constants import objects, messages
@@ -83,6 +83,4 @@ class TestAdminDashboardPage(base.Test):
     ca_tab = admin_dashboard.select_custom_attributes()
     ca_tab.add_custom_attribute(ca_obj=expected_ca)
     list_actual_ca = ca_tab.get_custom_attributes_list(ca_group=expected_ca)
-    assert expected_ca in list_actual_ca, (
-        messages.AssertionMessages.
-        format_err_msg_contains(expected_ca, list_actual_ca))
+    self.general_contain_assert(expected_ca, list_actual_ca)
