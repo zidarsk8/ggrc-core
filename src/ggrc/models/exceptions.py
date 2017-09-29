@@ -36,6 +36,17 @@ def translate_message(exception):
                 u"{key} values must be unique."
                 .format(value=matches.group(1),
                         key=field_lookup(matches.group(2))))
+    elif code == 1452:  # cannod set child row: a foreign key constraint fails
+      pattern = re.compile(
+          r"foreign key constraint fails \(`.+`.`(.+)`, CONSTRAINT `.+` "
+          r"FOREIGN KEY \(`.+`\) REFERENCES `(.+)` \(`.+`\)\)"
+      )
+      matches = pattern.search(message)
+      if matches:
+        from_, to = matches.groups()
+        return (u"This request will break a mandatory relationship "
+                u"from {from_} to {to}."
+                .format(from_=from_, to=to))
 
   return message
 

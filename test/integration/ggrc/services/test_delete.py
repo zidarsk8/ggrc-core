@@ -43,3 +43,6 @@ class TestDelete(TestCase, WithQueryApi):
     result = self.api.delete(audit)
 
     self.assert400(result)
+    self.assertEqual(result.json["message"],
+                     "This request will break a mandatory relationship from "
+                     "assessments to audits.")
