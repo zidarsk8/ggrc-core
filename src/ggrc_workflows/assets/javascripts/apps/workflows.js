@@ -303,7 +303,7 @@
           return CMS.Models.CycleTaskGroupObjectTask.findAll({
             contact_id: binding.instance.id,
             'cycle.is_current': true,
-            status__in: 'Assigned,InProgress,Finished,Declined'
+            status__in: 'Assigned,InProgress,Finished,Declined,Deprecated'
           });
         }, 'Cycle'),
         assigned_tasks_with_history: Search(function (binding) {
