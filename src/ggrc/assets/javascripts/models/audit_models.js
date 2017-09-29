@@ -82,7 +82,7 @@
       status: 'Planned'
     },
     statuses: ['Planned', 'In Progress', 'Manager Review',
-      'Ready for External Review', 'Completed'],
+      'Ready for External Review', 'Completed', 'Deprecated'],
     obj_nav_options: {
       show_all_tabs: false,
       force_show_list: ['In Scope Controls', 'Assessment Templates',

@@ -19,7 +19,7 @@ describe('Model states test', function () {
   });
   it('checks if Audit has expected statuses', function () {
     var expectedStatuses = ['Planned', 'In Progress', 'Manager Review',
-        'Ready for External Review', 'Completed'];
+        'Ready for External Review', 'Completed', 'Deprecated'];
     expect(CMS.Models.Audit.statuses).toEqual(expectedStatuses);
   });
   it('checks if Assessment has correct statuses', function () {
