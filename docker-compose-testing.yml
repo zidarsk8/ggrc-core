@@ -1,8 +1,9 @@
 version: "2"
 services:
   dev:
-    build: .
-    dockerfile: Dockerfile
+    build: 
+      context: .
+      dockerfile: Dockerfile
     volumes:
      - ".:/vagrant"
      - ".:/vagrant_bind"
@@ -26,8 +27,9 @@ services:
      - MYSQL_ROOT_PASSWORD=root
 
   selenium:
-    build: .
-    dockerfile: Dockerfile-selenium
+    build: 
+      context: .
+      dockerfile: Dockerfile-selenium
     volumes:
      - "./test/selenium:/selenium"
      - "/dev/shm:/dev/shm"

@@ -1,8 +1,9 @@
 version: "2"
 services:
   cleandev:
-    build: .
-    dockerfile: Dockerfile
+    build: 
+      context: .
+      dockerfile: Dockerfile
     ports:
      - "8000:8000"
      - "8080:8080"
