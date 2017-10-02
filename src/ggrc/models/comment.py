@@ -86,6 +86,10 @@ class Commentable(object):
   _aliases = {
       "recipients": "Recipients",
       "send_by_default": "Send by default",
+      "comments": {
+          "display_name": "Comments",
+          "description": 'DELIMITER=";;" double semi-colon separated values',
+      },
   }
   _fulltext_attrs = [
       MultipleSubpropertyFullTextAttr("comment", "comments", ["description"]),
