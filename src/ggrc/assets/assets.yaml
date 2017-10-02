@@ -312,7 +312,6 @@ dashboard-js-template-files:
   - vendors/autocomplete_result.mustache
   - base_objects/edit_object_link.mustache
   - programs/search_result.mustache
-  - import_export/export.mustache
   - import_export/export/attribute_selector.mustache
   - import_export/export/filter_query.mustache
   - mapper/relevant_filter.mustache

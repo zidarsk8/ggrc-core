@@ -264,7 +264,7 @@
     initWidgets();
   } else if (/^\/export/i.test(location)) {
     $('#csv_export').html(
-      can.view(GGRC.mustache_path + '/import_export/export.mustache', {}));
+      can.view.mustache('<csv-export filename="Export Objects"/>'));
 
     initWidgets();
   } else {
