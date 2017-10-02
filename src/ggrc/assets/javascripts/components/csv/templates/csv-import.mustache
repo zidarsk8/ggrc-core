@@ -1,0 +1,46 @@
+{{!
+  Copyright (C) 2017 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="info">
+  <div class="row-fluid wrap-row">
+    <div class="span8 import">
+      <p>
+        Here you are able to import all GGRC objects.
+        Please make sure you have your CSV file ready, or
+        download one of the predefined templates.
+      </p>
+      {{#if_equals state "import"}}
+        {{> /static/mustache/import_export/import_test_result.mustache}}
+      {{/if_equals}}
+
+      {{#if_equals state "success"}}
+        {{> /static/mustache/import_export/complete.mustache}}
+      {{/if_equals}}
+
+      <div class="csv-input">
+        <input type="file" accept=".csv"
+               data-file-upload class="csv-upload" name="upload"
+               style="display:none" />
+        {{#states}}
+          <button id="import_btn" {{#isDisabled}}disabled{{/isDisabled}} class="btn btn-small state-{{state}} {{class}}">{{{text}}}</button>
+          {{^if_equals state "select"}}
+            {{#showSpinner}}
+              <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2, "zIndex": 0}' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+            {{/showSpinner}}
+            {{^showSpinner}}
+              <button class="btn btn-small btn-gray state-reset">Cancel</button>
+            {{/showSpinner}}
+          {{/if}}
+        {{/states}}
+      </div>
+
+      {{> /static/mustache/import_export/faq.mustache}}
+    </div>
+    <div class="span4">
+      <csv-template></csv-template>
+    </div>
+  </div>
+  <div id="results-container"></div>
+</div>
