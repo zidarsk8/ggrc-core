@@ -6,6 +6,7 @@
 import './csv-template';
 import '../relevant_filters';
 import exportPanelTemplate from './templates/export-panel.mustache';
+import exportGroupTemplate from './templates/export-group.mustache';
 
 var url = can.route.deparam(window.location.search.substr(1));
 var filterModel = can.Map({
@@ -130,7 +131,7 @@ GGRC.Components('csvExport', {
 
 GGRC.Components('exportGroup', {
   tag: 'export-group',
-  template: '<content></content>',
+  template: exportGroupTemplate,
   viewModel: {
     index: 0,
     'export': '@'
