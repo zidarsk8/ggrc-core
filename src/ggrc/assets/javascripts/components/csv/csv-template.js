@@ -3,8 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-var template = can.view(GGRC.mustache_path +
-  '/import_export/create_template.mustache');
+import template from './templates/csv-template.mustache';
 
 can.Component.extend({
   tag: 'csv-template',

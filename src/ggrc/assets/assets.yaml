@@ -313,7 +313,6 @@ dashboard-js-template-files:
   - base_objects/edit_object_link.mustache
   - programs/search_result.mustache
   - import_export/import_export_buttons.mustache
-  - import_export/create_template.mustache
   - import_export/import_test_result.mustache
   - import_export/complete.mustache
   - import_export/faq.mustache
