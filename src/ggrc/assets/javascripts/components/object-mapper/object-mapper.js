@@ -28,7 +28,7 @@
     Program: 'Standard',
     Project: 'Program',
     Risk: 'Control',
-    TaskGroupTask: 'Control',
+    CycleTaskGroupObjectTask: 'Control',
     Threat: 'Risk',
     Vendor: 'Program',
     Audit: 'Product',
