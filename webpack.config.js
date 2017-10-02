@@ -38,9 +38,10 @@ module.exports = function (env) {
     entry: {
       vendor: 'entrypoints/vendor',
       styles: 'entrypoints/styles',
-      dashboard: ['entrypoints/dashboard']
-        .concat(enabledModules.map(name => `./src/${name}/assets/javascripts`))
-        .concat(['entrypoints/dashboard/bootstrap']),
+      dashboard: getEntryModules('dashboard'),
+      import: getEntryModules('import'),
+      export: getEntryModules('export'),
+      admin: getEntryModules('admin'),
       login: 'entrypoints/login',
     },
     output: {
@@ -205,4 +206,10 @@ module.exports = function (env) {
 
 function isModuleEnabled(name) {
   return enabledModules.indexOf(name) > -1;
+}
+
+function getEntryModules(entryName) {
+  return [`entrypoints/${entryName}`,
+    ...enabledModules.map(name => `./src/${name}/assets/javascripts`),
+  `entrypoints/${entryName}/bootstrap`]
 }
