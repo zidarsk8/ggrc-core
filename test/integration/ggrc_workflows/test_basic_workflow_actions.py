@@ -39,7 +39,10 @@ class TestWorkflowsCycleGeneration(TestCase):
   def tearDown(self):
     pass
 
-  def test_recurring_without_tgts_skip(self):
+  @ddt.data(
+      True, False
+  )
+  def test_recurring_without_tgts_skip(self, has_tg):
     """Test that Active Workflow without TGTs is skipped on cron job"""
     with freeze_time(dtm.date(2017, 9, 25)):
       with factories.single_commit():
@@ -58,6 +61,8 @@ class TestWorkflowsCycleGeneration(TestCase):
       self.assertEqual(active_wf.recurrences, True)
       self.assertEqual(len(active_wf.cycles), 0)
       TaskGroupTask.query.delete()
+      if not has_tg:
+        TaskGroup.query.delete()
       db.session.commit()
 
     with freeze_time(dtm.date(2017, 10, 25)):
