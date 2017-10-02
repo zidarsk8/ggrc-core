@@ -10,7 +10,7 @@
             ($change)="changePageSize(%element.value)">
       <option selected hidden>{{pageSize}}</option>
       {{#pageSizeSelect}}
-        <option value="{{.}}" >{{.}}</option>
+        <option {{#if_equals pageSize .}}selected{{/if_equals}} value="{{.}}" >{{.}}</option>
       {{/pageSizeSelect}}
     </select>
     {{/paging}}
