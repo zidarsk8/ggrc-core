@@ -263,7 +263,9 @@ class AssessmentRelatedObjects(DefaultHandler):
       sorted_data = []
       for comment in comments:
         data.append(comment.log_json())
-        sorted_data = sorted(data, key=lambda x: x["created_at"], reverse=True)
+        sorted_data = sorted(data,
+                             key=lambda x: (x["created_at"], x["id"]),
+                             reverse=True)
       _set_data(query, sorted_data)
 
   def set_document_result(self, assessment):
