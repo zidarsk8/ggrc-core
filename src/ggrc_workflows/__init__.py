@@ -19,6 +19,7 @@ from ggrc.services.registry import service
 from ggrc_workflows import models, notification
 from ggrc_workflows.models import relationship_helper
 from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
+from ggrc_workflows.notification import pusher
 from ggrc_workflows.converters import IMPORTABLE, EXPORTABLE
 from ggrc_workflows.converters.handlers import COLUMN_HANDLERS
 from ggrc_workflows.services.common import Signals
@@ -264,8 +265,11 @@ def build_cycle(workflow, cycle=None, current_user=None):
   """Build a cycle with it's child objects"""
 
   if not workflow.tasks:
-    logger.error("Start cycle procedure is failed on Workflow with slug == "
-                 "'{}' and id == '{}'".format(workflow.slug, workflow.id))
+    err_msg = ("Starting a cycle has failed on Workflow with slug == "
+               "'{}' and id == '{}'".format(workflow.slug, workflow.id))
+    logger.error(err_msg)
+    pusher.update_or_create_notifications(workflow, date.today(),
+                                          "cycle_start_failed")
     return
 
   # Determine the relevant Workflow
@@ -895,6 +899,7 @@ def start_recurring_cycles():
       notification.handle_cycle_created(cycle, False)
       notification.handle_workflow_modify(None, workflow)
     else:
+      # repeat_multiplier changes should be applied if WF's cycles were created
       db.session.add(workflow)
   log_event(db.session)
   db.session.commit()
