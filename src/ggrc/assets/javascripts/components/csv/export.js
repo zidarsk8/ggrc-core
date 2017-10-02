@@ -37,6 +37,7 @@ var exportModel = can.Map({
   filename: 'export_objects.csv',
   format: 'gdrive'
 });
+var exportGroup;
 
 GGRC.Components('csvExport', {
   tag: 'csv-export',
@@ -130,7 +131,7 @@ GGRC.Components('csvExport', {
   }
 });
 
-GGRC.Components('exportGroup', {
+exportGroup = GGRC.Components('exportGroup', {
   tag: 'export-group',
   template: exportGroupTemplate,
   viewModel: {
@@ -256,3 +257,5 @@ GGRC.Components('exportPanel', {
     }
   }
 });
+
+export {exportGroup};

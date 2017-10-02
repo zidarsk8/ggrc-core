@@ -9,7 +9,7 @@ import './csv-template';
 import '../show-more/show-more';
 import template from './templates/csv-import.mustache';
 
-GGRC.Components('csvImportWidget', {
+export default GGRC.Components('csvImportWidget', {
   tag: "csv-import",
   template: template,
   requestData: null,
