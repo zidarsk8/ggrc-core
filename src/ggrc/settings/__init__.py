@@ -31,6 +31,9 @@ try:
   VENDOR_CSS_PATH = manifest_data['vendor.css']
   VENDOR_JS_PATH = manifest_data['vendor.js']
   DASHBOARD_JS_PATH = manifest_data['dashboard.js']
+  IMPORT_JS_PATH = manifest_data['import.js']
+  EXPORT_JS_PATH = manifest_data['export.js']
+  ADMIN_JS_PATH = manifest_data['admin.js']
   LOGIN_JS_PATH = manifest_data['login.js']
 except (KeyError, IOError):
   raise RuntimeError("File '{}' with JS configuration should exist. "
