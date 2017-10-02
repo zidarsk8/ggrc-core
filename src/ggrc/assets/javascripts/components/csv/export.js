@@ -4,6 +4,8 @@
 */
 
 import './csv-template';
+import '../relevant_filters';
+import exportPanelTemplate from './templates/export-panel.mustache';
 
 var url = can.route.deparam(window.location.search.substr(1));
 var filterModel = can.Map({
@@ -181,7 +183,7 @@ GGRC.Components('exportGroup', {
 
 GGRC.Components('exportPanel', {
   tag: 'export-panel',
-  template: '<content></content>',
+  template: exportPanelTemplate,
   viewModel: {
     define: {
       first_panel: {
