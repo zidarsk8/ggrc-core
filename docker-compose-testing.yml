@@ -1,39 +1,47 @@
-dev:
-  build: .
-  dockerfile: Dockerfile
-  volumes:
-   - ".:/vagrant"
-   - ".:/vagrant_bind"
-  ports:
-   - "8001:8000"
-   - "8081:8080"
-   - "9877:9876"
-  environment:
-   - PYTHONDONTWRITEBYTECODE=true
-   - NODE_PATH=/vagrant-dev/node_modules/
-   - GGRC_DATABASE_URI=mysql+mysqldb://root:root@db/ggrcdev?charset=utf8
-   - GGRC_DATABASE_HOST=db
-  links:
-   - db
+version: "2"
+services:
+  dev:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        CHROME_DRIVER_VERSION: "2.32"
+    volumes:
+     - ".:/vagrant"
+     - ".:/vagrant_bind"
+    ports:
+     - "8001:8000"
+     - "8081:8080"
+     - "9877:9876"
+    environment:
+     - PYTHONDONTWRITEBYTECODE=true
+     - NODE_PATH=/vagrant-dev/node_modules/
+     - GGRC_DATABASE_URI=mysql+mysqldb://root:root@db/ggrcdev?charset=utf8
+     - GGRC_DATABASE_HOST=db
+    links:
+     - db
 
-db:
-  image: mysql:5.6
-  volumes:
-   - "./provision/docker/mysql:/etc/mysql/conf.d"
-  environment:
-   - MYSQL_ROOT_PASSWORD=root
+  db:
+    image: mysql:5.6
+    volumes:
+     - "./provision/docker/mysql:/etc/mysql/conf.d"
+    environment:
+     - MYSQL_ROOT_PASSWORD=root
+    tmpfs:
+      - /var/lib/mysql/:rw,noexec,nosuid,size=1G
 
-selenium:
-  build: .
-  dockerfile: Dockerfile-selenium
-  volumes:
-   - "./test/selenium:/selenium"
-   - "/dev/shm:/dev/shm"
-  links:
-   - dev
-  environment:
-   - "TZ=America/Los_Angeles"
-   - PYTHONDONTWRITEBYTECODE=true
-   - PYTHONPATH=/selenium/src
-   - SCREEN_WIDTH=1440
-   - SCREEN_HEIGHT=900
+  selenium:
+    build: 
+      context: .
+      dockerfile: Dockerfile-selenium
+    volumes:
+     - "./test/selenium:/selenium"
+     - "/dev/shm:/dev/shm"
+    links:
+     - dev
+    environment:
+     - "TZ=America/Los_Angeles"
+     - PYTHONDONTWRITEBYTECODE=true
+     - PYTHONPATH=/selenium/src
+     - SCREEN_WIDTH=1440
+     - SCREEN_HEIGHT=900
