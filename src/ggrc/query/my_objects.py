@@ -63,21 +63,6 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
     )
     return object_people_query
 
-  def _get_object_owners():
-    """Objects for which the user is an 'owner'."""
-    object_owners_query = db.session.query(
-        all_models.AccessControlList.object_id.label('id'),
-        all_models.AccessControlList.object_type.label('type'),
-        literal(None).label('context_id')
-    ).filter(
-        and_(
-            all_models.AccessControlList.person_id == contact_id,
-            all_models.AccessControlList.object_type.in_(model_names),
-            all_models.AccessControlRole.name == "Admin"
-        )
-    )
-    return object_owners_query
-
   def _get_object_mapped_ca():
     """Objects to which the user is mapped via a custom attribute."""
     ca_mapped_objects_query = db.session.query(
@@ -261,8 +246,7 @@ def get_myobjects_query(types=None, contact_id=None, is_creator=False):  # noqa
   if not is_creator:
     type_union_queries.append(_get_object_people())
 
-  type_union_queries.extend((_get_object_owners(),
-                            _get_object_mapped_ca(),
+  type_union_queries.extend((_get_object_mapped_ca(),
                             _get_objects_user_assigned(),
                             _get_context_relationships(),
                             _get_custom_roles(),))
