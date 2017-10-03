@@ -9,7 +9,8 @@ from requests import exceptions
 
 from lib import environment, factory
 from lib.constants import url, objects, messages
-from lib.entities.entities_factory import ObjectPersonsFactory, EntitiesFactory
+from lib.entities.entities_factory import (
+    ObjectPersonsFactory, EntitiesFactory, CustomAttributeDefinitionsFactory)
 from lib.entities.entity import Entity
 from lib.service.rest import client, query
 from lib.utils import help_utils
@@ -68,10 +69,10 @@ class BaseRestService(object):
   def update_obj(self, obj, **attrs):
     """Update attributes values of existing object via REST API."""
     obj.update_attrs(**attrs)
-    return self.get_items_from_resp(
+    return self.set_obj_attrs(obj=obj, attrs=self.get_items_from_resp(
         self.client.update_object(
             href=obj.href, **dict({k: v for k, v in obj.__dict__
-                                  .iteritems() if k != "href"}.items())))
+                                  .iteritems() if k != "href"}.items()))))
 
   @staticmethod
   def get_items_from_resp(response):
@@ -231,6 +232,13 @@ class CustomAttributeDefinitionsService(BaseRestService):
   def __init__(self):
     super(CustomAttributeDefinitionsService, self).__init__(
         url.CUSTOM_ATTRIBUTES)
+
+  def create_dashboard_gcas(self, obj_type, count=1):
+    """Create 'Dashboard' CAs via rest according to passed obj_type and count.
+    """
+    return [self.create_objs(1, CustomAttributeDefinitionsFactory().
+            create_dashboard_ca(obj_type.lower()).__dict__)[0]
+            for _ in xrange(count)]
 
 
 class RelationshipsService(HelpRestService):

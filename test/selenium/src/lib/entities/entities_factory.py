@@ -8,7 +8,8 @@
 import copy
 import random
 
-from lib.constants import element, objects, roles, url as const_url
+from lib.constants import (element, objects, roles, value_aliases,
+                           url as const_url)
 from lib.constants.element import AdminWidgetCustomAttributes
 from lib.entities.entity import (
     Entity, PersonEntity, CustomAttributeEntity, ProgramEntity, ControlEntity,
@@ -272,6 +273,19 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
       obj.multi_choice_options = random_list_strings()
     return Entity.update_objs_attrs_values_by_entered_data(
         obj_or_objs=obj, **arguments)
+
+  @classmethod
+  def create_dashboard_ca(cls, definition_type):
+    """Create and return CA entity with valid filled fields for
+    creating N'Dashboard'.
+    """
+    dashboard_ca = CustomAttributeEntity()
+    dashboard_ca.type = cls.obj_ca
+    dashboard_ca.attribute_type = AdminWidgetCustomAttributes.TEXT
+    dashboard_ca.title = cls.generate_string(value_aliases.DASHBOARD)
+    dashboard_ca.mandatory = False
+    dashboard_ca.definition_type = definition_type
+    return dashboard_ca
 
 
 class ProgramsFactory(EntitiesFactory):

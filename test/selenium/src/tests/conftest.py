@@ -97,6 +97,12 @@ def chrome_options(chrome_options, create_tmp_dir):
   return chrome_options
 
 
+@pytest.fixture(scope="session")
+def base_url(base_url):
+  """Add '/' if base_url not end by '/'."""
+  yield base_url if base_url[-1] == "/" else base_url + "/"
+
+
 @pytest.fixture(scope="function")
 def my_work_dashboard(selenium):
   """Open My Work Dashboard URL and

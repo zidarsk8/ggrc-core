@@ -552,6 +552,7 @@ class WidgetBar(object):
   ROLES = _Locator.get_widget("roles_list")
   RISK_ASSESSMENTS = _Locator.get_widget("risk_assessment")
   TASKS = _Locator.get_widget("task")
+  DASHBOARD_TAB = _Locator.get_widget("dashboard")
 
 
 class WidgetBarButtonAddDropdown(object):
@@ -1202,3 +1203,11 @@ class AssessmentRelatedTable(object):
   ROWS = (By.CSS_SELECTOR, ".grid-data-row")
   CELLS = (By.CSS_SELECTOR, "div")
   TAB_BUTTON = (By.CSS_SELECTOR, ".btn.btn-small")
+
+
+class DashboardWidget(object):
+  """Locators for DashboardWidget."""
+  _TAB_CONTAINER = ".dashboard-widget.info"
+  TAB_CONTAINER = (By.CSS_SELECTOR, _TAB_CONTAINER)
+  TAB_CONTROLLER = (By.CSS_SELECTOR, ".dashboard-list")
+  TAB_CONTENT = (By.CSS_SELECTOR, _TAB_CONTAINER + " iframe")
