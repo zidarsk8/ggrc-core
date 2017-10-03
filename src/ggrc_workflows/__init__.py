@@ -898,9 +898,6 @@ def start_recurring_cycles():
       db.session.add(cycle)
       notification.handle_cycle_created(cycle, False)
       notification.handle_workflow_modify(None, workflow)
-    else:
-      # repeat_multiplier changes should be applied if WF's cycles were created
-      db.session.add(workflow)
   log_event(db.session)
   db.session.commit()
 
