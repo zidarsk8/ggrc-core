@@ -99,6 +99,9 @@
     list_view_options: {
       find_params: {__sort: 'name,email'}
     },
+    sub_tree_view_options: {
+      default_filter: ['Program', 'Control', 'Risk', 'Assessment'],
+    },
     init: function () {
       var rEmail =
         /^[-!#$%&*+\\.\/0-9=?A-Z^_`{|}~]+@([-0-9A-Z]+\.)+([0-9A-Z]){2,4}$/i;

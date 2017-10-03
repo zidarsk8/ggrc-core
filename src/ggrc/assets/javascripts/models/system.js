@@ -109,6 +109,9 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
     url: '',
     status: 'Draft'
   },
+  sub_tree_view_options: {
+    default_filter: ['Product'],
+  },
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);
@@ -152,6 +155,9 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
     title: '',
     url: '',
     status: 'Draft'
+  },
+  sub_tree_view_options: {
+    default_filter: ['Risk'],
   },
   mixins: ['ca_update'],
   statuses: ['Draft', 'Deprecated', 'Active'],

@@ -47,6 +47,9 @@
       ],
       add_item_view: path + '/tree_add_item.mustache'
     },
+    sub_tree_view_options: {
+      default_filter: ['Program'],
+    },
     init: function () {
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank("title");

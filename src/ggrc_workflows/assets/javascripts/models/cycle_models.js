@@ -347,6 +347,9 @@
       mandatory_attr_name: ['title'],
       draw_children: true
     },
+    sub_tree_view_options: {
+      default_filter: ['Control'],
+    },
     init: function () {
       var that = this;
       this._super.apply(this, arguments);
