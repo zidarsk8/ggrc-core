@@ -38,7 +38,7 @@ describe('GGRC.Utils.TreeView module', function () {
         {id: 1, name: 'Role 1', object_type: 'Market'},
         {id: 7, name: 'Role 7', object_type: 'Policy'},
         {id: 3, name: 'Role 3', object_type: 'Audit'},
-        {id: 2, name: 'Role 2', object_type: 'Policy'}
+        {id: 2, name: 'Role 2', object_type: 'Policy'},
       ];
 
       origCustomAttrDefs = GGRC.custom_attr_defs;
@@ -75,6 +75,52 @@ describe('GGRC.Utils.TreeView module', function () {
         };
         expect(result).toContain(jasmine.objectContaining(expected));
       });
+    });
+  });
+
+  describe('getModelsForSubTier() method', function () {
+    var baseWidgetsByType;
+    var origFilter;
+
+    beforeAll(function () {
+      baseWidgetsByType = GGRC.tree_view.attr('base_widgets_by_type');
+      origFilter = CMS.Models.CycleTaskGroupObjectTask
+        .sub_tree_view_options.default_filter;
+
+      GGRC.tree_view.attr('base_widgets_by_type', {
+        CycleTaskGroupObjectTask: ['Audit', 'Program'],
+      });
+    });
+
+    afterAll(function () {
+      GGRC.tree_view.attr('base_widgets_by_type', baseWidgetsByType);
+      CMS.Models.CycleTaskGroupObjectTask
+        .sub_tree_view_options.default_filter = origFilter;
+    });
+
+    it('gets selected models from model\'s default_filter when available',
+    function () {
+      var result;
+
+      CMS.Models.CycleTaskGroupObjectTask
+        .sub_tree_view_options.default_filter = ['Audit'];
+
+      result = module.getModelsForSubTier('CycleTaskGroupObjectTask');
+      expect(result.available.length).toEqual(2);
+      expect(result.selected.length).toEqual(1);
+      expect(result.selected[0]).toEqual('Audit');
+    });
+
+    it('returns all available models as selected when ' +
+      'model\'s default_filter is not available', function () {
+      var result;
+
+      CMS.Models.CycleTaskGroupObjectTask
+        .sub_tree_view_options.default_filter = null;
+
+      result = module.getModelsForSubTier('CycleTaskGroupObjectTask');
+      expect(result.available.length).toEqual(2);
+      expect(result.selected.length).toEqual(2);
     });
   });
 });

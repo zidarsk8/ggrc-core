@@ -340,15 +340,36 @@
       return can.Deferred().resolve();
     }
 
-    function getModelsForSubTier(model) {
+    /**
+     * Get available and selected models for the Model sub tier
+     * @param {String} modelName - Model name.
+     * @return {Object} Sub tier filter configuration.
+     */
+    function getModelsForSubTier(modelName) {
+      var Model = CMS.Models[modelName];
+      var availableModels;
+      var selectedModels;
+
       // getMappableTypes can't be run at once,
       // cause GGRC.Mappings is not loaded yet
-      if (model === 'CycleTaskGroupObjectTask' &&
-      !orderedModelsForSubTier[model].length) {
-        orderedModelsForSubTier[model] =
+      if (modelName === 'CycleTaskGroupObjectTask' &&
+      !orderedModelsForSubTier[modelName].length) {
+        orderedModelsForSubTier[modelName] =
         GGRC.Utils.getMappableTypes('CycleTaskGroupObjectTask');
       }
-      return orderedModelsForSubTier[model] || [];
+
+      availableModels = orderedModelsForSubTier[modelName] || [];
+
+      if (Model.sub_tree_view_options.default_filter) {
+        selectedModels = Model.sub_tree_view_options.default_filter;
+      } else {
+        selectedModels = availableModels;
+      }
+
+      return {
+        available: availableModels,
+        selected: selectedModels,
+      };
     }
 
     /**

@@ -30,18 +30,19 @@
     selectedChildModels: [],
     initChildTreeDisplay: function () {
       var modelName = this.attr('instance').type;
-      var modelsList = TreeViewUtils.getModelsForSubTier(modelName);
-      var displayList = modelsList.map(function (model) {
+      var models = TreeViewUtils.getModelsForSubTier(modelName);
+
+      var displayList = models.available.map(function (model) {
         return {
           widgetName: GGRC.Utils.ObjectVersions
             .getWidgetConfig(model).widgetName,
           name: model,
-          display: true,
+          display: models.selected.indexOf(model) !== -1,
         };
       });
 
       this.attr('childModelsList', displayList);
-      this.attr('selectedChildModels', modelsList);
+      this.attr('selectedChildModels', models.selected);
     },
     setChildModels: function (selected) {
       this.attr('selectedChildModels', selected);
