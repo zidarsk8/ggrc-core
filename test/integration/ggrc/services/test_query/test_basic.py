@@ -20,6 +20,7 @@ from ggrc import db
 from ggrc import models
 from ggrc.models import CustomAttributeDefinition as CAD, all_models
 from ggrc.snapshotter.rules import Types
+from ggrc.fulltext.attributes import DateValue
 
 from integration.ggrc import TestCase, generator
 from integration.ggrc.query_helper import WithQueryApi
@@ -163,10 +164,7 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     response = self._post(data)
     self.assert400(response)
 
-    self.assertEqual(
-        ("Invalid date was typed into `{}` field, "
-         "please change it and try again!").format(field),
-        response.json['message'])
+    self.assertEqual(DateValue.VALUE_ERROR_MSG, response.json['message'])
 
   def test_basic_query_text_search(self):
     """Filter by fulltext search."""
@@ -1331,10 +1329,7 @@ class TestQueryWithCA(TestCase, WithQueryApi):
     )
     response = self._post(data)
     self.assert400(response)
-    self.assertEqual(
-        ("Invalid date was typed into `ca date` field, "
-         "please change it and try again!"),
-        response.json['message'])
+    self.assertEqual(DateValue.VALUE_ERROR_MSG, response.json['message'])
 
 
 @ddt.ddt

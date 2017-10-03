@@ -48,7 +48,7 @@ With the PR branch fetched, you need to merge it with the branch the PR
 was made against, usually - but not always - ``develop``, and test how
 the *merged* code performs.
 
-Whey you have everything set up, start the application and verify that
+When you have everything set up, start the application and verify that
 everything works as intended (see the :ref:`reviewing-and-merging-pull-requests`
 for details). If the pull request turns out to be good, you can merge it,
 provided that all the :ref:`merging-pull-requests` are met.
@@ -379,3 +379,20 @@ sure, just run them all.*
    ..  code:: bash
 
        mysql -u root -p ggrcdev < db_backup.sql
+       
+       
+       
+Notes for developers and reviewers
+----------------------------------
+
+- Read guidelines and go through all required steps during PR review
+- Make sure to check for regression before creating and merging PR
+- Be extra careful with changing existing unit-tests
+- Analize for performance degradation
+- Check if existing code can be improved
+
+  - Remove unused code
+  - Avoid optional code
+  - Avoid deeply nested code, etc
+
+

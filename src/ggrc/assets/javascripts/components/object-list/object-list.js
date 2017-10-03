@@ -54,6 +54,7 @@
       },
       spinnerCss: '@',
       isDisabled: false,
+      showMore: false,
       /**
        *
        * @param {can.Map} ctx - current item context

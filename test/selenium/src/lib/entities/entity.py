@@ -480,8 +480,8 @@ class Representation(object):
     ''*exclude_attrs' - tuple of excluding attributes names.
     """
     # pylint: disable=invalid-name
-    expected_objs = help_utils.convert_to_list(expected_objs)
-    actual_objs = help_utils.convert_to_list(actual_objs)
+    expected_objs = help_utils.convert_to_list(copy.deepcopy(expected_objs))
+    actual_objs = help_utils.convert_to_list(copy.deepcopy(actual_objs))
     expected_excluded_attrs = [
         dict([(attr, getattr(expected_obj, attr)) for attr in exclude_attrs])
         for expected_obj in expected_objs]
@@ -771,16 +771,19 @@ class AssessmentTemplateEntity(Entity):
   __hash__ = None
 
   attrs_names_to_compare = [
-      "custom_attributes", "slug", "title", "type", "updated_at"]
+      "custom_attributes", "slug", "title", "type", "updated_at", "status"]
   attrs_names_to_repr = Representation.core_attrs_names_to_repr + [
-      "audit", "template_object_type", "updated_at", "custom_attributes"]
+      "audit", "template_object_type", "updated_at", "custom_attributes",
+      "status"]
 
   def __init__(self, audit=None, default_people=None,
                template_object_type=None, updated_at=None,
                custom_attribute_definitions=None,
-               custom_attribute_values=None, custom_attributes=None):
+               custom_attribute_values=None, custom_attributes=None,
+               status=None):
     super(AssessmentTemplateEntity, self).__init__()
     # REST and UI
+    self.status = status  # state ("Active", "Draft", "Deprecated")
     self.default_people = default_people  # {"verifiers": *, "assessors": *}
     self.template_object_type = template_object_type  # objs under asmt
     self.updated_at = updated_at  # last updated datetime

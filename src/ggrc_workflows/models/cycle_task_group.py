@@ -43,7 +43,7 @@ class CycleTaskGroup(mixins.WithContact,
   _title_uniqueness = False
 
   @classmethod
-  def generate_slug_prefix_for(cls, obj):  # pylint: disable=unused-argument
+  def generate_slug_prefix(cls):  # pylint: disable=unused-argument
     return "CYCLEGROUP"
 
   cycle_id = db.Column(

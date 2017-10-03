@@ -38,6 +38,7 @@ from copy import deepcopy
 
 from ggrc.converters.handlers import assessment_template
 from ggrc.converters.handlers import boolean
+from ggrc.converters.handlers import comments
 from ggrc.converters.handlers import default_people
 from ggrc.converters.handlers import handlers
 from ggrc.converters.handlers import list_handlers
@@ -58,6 +59,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "assignee": handlers.UserColumnHandler,
     "audit": handlers.AuditColumnHandler,
     "categories": handlers.ControlCategoryColumnHandler,
+    "comments": comments.CommentColumnHandler,
     "company": handlers.TextColumnHandler,
     "contact": handlers.UserColumnHandler,
     "default_assessors": default_people.DefaultPersonColumnHandler,

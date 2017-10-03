@@ -513,7 +513,7 @@ class AssessmentTemplatesFactory(EntitiesFactory):
              slug=None, audit=None, default_people=None,
              template_object_type=None, updated_at=None,
              custom_attribute_definitions=None, custom_attribute_values=None,
-             custom_attributes=None):
+             custom_attributes=None, status=None):
     """Create Assessment Template object.
     Random values will be used for title and slug.
     Predictable values will be used for type, template_object_type and
@@ -528,7 +528,7 @@ class AssessmentTemplatesFactory(EntitiesFactory):
         template_object_type=template_object_type, updated_at=updated_at,
         custom_attribute_definitions=custom_attribute_definitions,
         custom_attribute_values=custom_attribute_values,
-        custom_attributes=custom_attributes)
+        custom_attributes=custom_attributes, status=status)
     return asmt_tmpl_entity
 
   @classmethod
@@ -542,6 +542,7 @@ class AssessmentTemplatesFactory(EntitiesFactory):
     random_asmt_tmpl.assessors = unicode(roles.AUDIT_LEAD)
     random_asmt_tmpl.slug = cls.generate_slug()
     random_asmt_tmpl.template_object_type = cls.obj_control.title()
+    random_asmt_tmpl.status = unicode(element.ObjectStates.DRAFT)
     random_asmt_tmpl.default_people = {"verifiers": unicode(roles.AUDITORS),
                                        "assessors": unicode(roles.AUDIT_LEAD)}
     return random_asmt_tmpl
