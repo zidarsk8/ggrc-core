@@ -31,61 +31,61 @@ module.exports = function (env, argv) {
       login: 'entrypoints/login',
     },
     output: {
-      filename: isProduction(env) ? '[name].[chunkhash].js' : '[name].js?[chunkhash]',
+      filename: isProduction(env) ? '[name].[chunkhash].js' : '[name].js',
       sourceMapFilename: '[file].map',
       path: path.join(__dirname, './src/ggrc/static/'),
-      publicPath: STATIC_FOLDER
+      publicPath: STATIC_FOLDER,
     },
     module: {
       rules: [{
         test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url?limit=10000&mimetype=application/font-woff'
+        loader: 'url?limit=10000&mimetype=application/font-woff',
       }, {
         test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url?limit=10000&mimetype=application/font-woff'
+        loader: 'url?limit=10000&mimetype=application/font-woff',
       }, {
         test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url?limit=10000&mimetype=application/octet-stream'
+        loader: 'url?limit=10000&mimetype=application/octet-stream',
       }, {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'file'
+        loader: 'file',
       }, {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url?limit=10000&mimetype=image/svg+xml'
+        loader: 'url?limit=10000&mimetype=image/svg+xml',
       }, {
         test: /\.css$/,
         use: extractSass.extract({
           fallback: 'style-loader',
           use: {
             loader: 'css-loader',
-            options: {url: false}
-          }
-        })
+            options: {url: false},
+          },
+        }),
       }, {
         test: /\.scss$/,
         use: extractSass.extract({
           use: [{
-            loader: 'css-loader'
+            loader: 'css-loader',
           }, {
-            loader: 'sass-loader'
+            loader: 'sass-loader',
           }],
-          fallback: 'style-loader'
-        })
+          fallback: 'style-loader',
+        }),
       }, {
         test: /wysihtml5-0\.4\.0pre\.js$/,
-        loader: 'exports-loader?wysihtml5'
+        loader: 'exports-loader?wysihtml5',
       }, {
         test: require.resolve('jquery'),
         use: [{
           loader: 'expose-loader',
-          options: 'jQuery'
+          options: 'jQuery',
         }, {
           loader: 'expose-loader',
-          options: '$'
-        }]
+          options: '$',
+        }],
       }, {
         test: /\.mustache/,
-        loader: 'raw-loader'
+        loader: 'raw-loader',
       }, {
         test: /\.js$/,
         exclude: /(node_modules|bower_components|third_party)/,
@@ -102,9 +102,9 @@ module.exports = function (env, argv) {
           return path.join(__dirname, dir);
         }),
       alias: {
-        'can': 'canjs/amd/can/',
-        'entrypoints': './src/ggrc/assets/javascripts/entrypoints'
-      }
+        can: 'canjs/amd/can/',
+        entrypoints: './src/ggrc/assets/javascripts/entrypoints',
+      },
     },
     plugins: [
       extractSass,
@@ -113,25 +113,25 @@ module.exports = function (env, argv) {
         jQuery: 'jquery',
         'window.jQuery': 'jquery',
         _: 'lodash',
-        moment: 'moment'
+        moment: 'moment',
       }),
       new webpack.DefinePlugin({
-        GGRC_SETTINGS_MODULE: JSON.stringify(process.env.GGRC_SETTINGS_MODULE)
+        GGRC_SETTINGS_MODULE: JSON.stringify(process.env.GGRC_SETTINGS_MODULE),
       }),
       new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor'
+        name: 'vendor',
       }),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new ManifestPlugin({
-        publicPath: STATIC_FOLDER
+        publicPath: STATIC_FOLDER,
       }),
       new WebpackShellPlugin({
-        onBuildEnd:['cp src/ggrc/static/manifest.json src/ggrc/manifest.json']
-      })
+        onBuildEnd: ['cp src/ggrc/static/manifest.json src/ggrc/manifest.json'],
+      }),
     ],
     stats: {
-      errorDetails: true
-    }
+      errorDetails: true,
+    },
   };
 
   if (isProduction(env)) {
@@ -140,11 +140,11 @@ module.exports = function (env, argv) {
       output: {
         comments: false,
         beautify: false,
-      }
+      },
     }));
 
     config.plugins.push(new CleanWebpackPlugin(['./src/ggrc/static/'], {
-      exclude: ['images', 'fonts', 'favicon.ico', 'dashboard-templates*']
+      exclude: ['images', 'fonts', 'favicon.ico', 'dashboard-templates*'],
     }));
   }
 
