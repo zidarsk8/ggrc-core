@@ -461,6 +461,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Created Date',
         'Last Updated',
         'Last Updated By',
+        "Comments",
     }
     expected_fields = {
         "mandatory": {
