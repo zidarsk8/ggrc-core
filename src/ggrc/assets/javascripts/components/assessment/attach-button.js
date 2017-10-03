@@ -29,6 +29,7 @@
           }
         }
       },
+      assessmentTypeObjects: [],
       canAttach: false,
       isFolderAttached: false,
       checksPassed: false,

@@ -3,6 +3,8 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
+
 (function (can, $, GGRC, CMS) {
   'use strict';
 
@@ -17,6 +19,7 @@
           }
         }
       },
+      assessmentTypeObjects: [],
       instance: {},
       deferred: '@',
       link_class: '@',
@@ -25,19 +28,123 @@
       confirmationCallback: '@',
       pickerActive: false,
       disabled: false,
+      sanitizeSlug: function (slug) {
+        return slug.toLowerCase().replace(/\W+/g, '-');
+      },
+      removeOldSuffix: function (fileName) {
+        var delPos = fileName.lastIndexOf('_ggrc_');
+        return delPos > 0 ? fileName.substring(0, delPos) : fileName;
+      },
+      addFileSuffix: function (fileName) {
+        var assesmentSlug =
+          this.sanitizeSlug(this.attr('instance').attr('slug'));
+        var suffixArr = ['ggrc', assesmentSlug];
+
+        suffixArr = suffixArr.concat(
+          this.attr('assessmentTypeObjects').map(function (obj) {
+            return this.sanitizeSlug(obj.attr('revision.content.slug'));
+          }.bind(this)).attr()
+        );
+
+        return fileName.replace(/^(.*)\.(\w+)$/,
+          function (match, name, fileExt) {
+            return this.removeOldSuffix(name) + '_' + suffixArr.join('_') +
+                    '.' + fileExt;
+          }.bind(this));
+      },
+      /*
+       * Adds suffixes to the filenames. MUST be called before RefreshQueue
+       */
+      addFilesSuffixes: function (files) {
+        var fileRenameBatch = gapi.client.newBatch();
+        var fileRenameDfd = can.Deferred();
+        var errors = [];
+        var failedFileIds = [];
+        var originalFileNames = {};
+
+        files.forEach(function (file) {
+          var req;
+          var fileName = file.attr('title') || file.attr('originalFilename') ||
+                         file.attr('name');
+
+          originalFileNames[file.id] = fileName;
+
+          file.attr('title', this.addFileSuffix(fileName));
+          file.attr('name', this.addFileSuffix(fileName));
+
+
+          // updating filenames on GDrive
+          req = gapi.client.request({
+            path: '/drive/v3/files/' + file.id,
+            method: 'PATCH',
+            params: {
+              alt: 'json',
+            },
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name: file.title,
+            }),
+          });
+
+          fileRenameBatch.add(req, {
+            id: file.id, // settings request id to file id to find the failed file later
+          });
+        }.bind(this));
+
+        // Batch promise always resolves even when some of requests failed
+        // so we manually parsing the response object to find errors
+        fileRenameBatch.then(function (res) {
+          can.each(res.result, function (result, fileId) {
+            if ( result.status !== 200 ) {
+              failedFileIds.push(fileId);
+              errors.push({
+                fileName: originalFileNames[fileId],
+              });
+              console.error(
+                'File '+originalFileNames[fileId]+' failed to be renamed.',
+                result.result.error
+              );
+            }
+          });
+
+          // removing failed files
+          files = files.filter(function (file) {
+            return failedFileIds.indexOf(file.id) === -1;
+          });
+
+          if ( files.length ) {
+            // if we have successfully renamed files, showing errors just for
+            // the failed ones
+            if ( errors.length ) {
+              GGRC.Errors.notifier('error', errorTpl, {
+                errors: errors,
+              });
+            }
+            fileRenameDfd.resolve(files);
+          } else {
+            fileRenameDfd.reject(new Error('Failed to rename uploaded files.'));
+          }
+        });
+
+        // return $.when(files, fileRenameBatch);
+        return fileRenameDfd;
+      },
       beforeCreateHandler: function (files) {
         var tempFiles = files.map(function (file) {
           return {
-            title: file.name,
+            title: this.addFileSuffix(file.name),
             link: file.url,
             created_at: new Date(),
             isDraft: true
           };
-        });
+        }.bind(this));
         this.dispatch({
           type: 'onBeforeAttach',
           items: tempFiles
         });
+        return files;
       },
       onClickHandler: function (scope, el, event) {
         var eventType = this.attr('click_event');
@@ -108,17 +215,25 @@
           if (data[ACTION] === PICKED) {
             files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
             scope.attr('pickerActive', false);
+
             that.beforeCreateHandler(files);
 
-            return new RefreshQueue().enqueue(files).trigger()
+            that.refreshFilesModel(files)
+              .then(that.addFilesSuffixes.bind(that))
               .then(function (files) {
-                var docDfds = that.handle_file_upload(files);
-                can.when.apply(can, docDfds).then(function () {
+                that.handle_file_upload(files).then(function (docs) {
                   // Trigger modal:success event on scope
-                  can.trigger(
-                    that, 'modal:success', {arr: can.makeArray(arguments)});
-                  el.trigger('modal:success', {arr: can.makeArray(arguments)});
+                  can.trigger(that, 'modal:success', {arr: docs});
+                  el.trigger('modal:success', {arr: docs});
                 });
+              })
+              .fail(function (error) {
+                that.dispatch({
+                  type: 'resetItems',
+                });
+                if ( error ) {
+                  GGRC.Errors.notifier('error', error && error.message);
+                }
               });
           } else if (data[ACTION] === CANCEL) {
             el.trigger('rejected');
@@ -129,6 +244,26 @@
         dfd.done(function () {
           gapi.load('picker', {callback: createPicker});
         });
+      },
+
+      copyFilesToParent: function (parentFolder, files) {
+        var mapped = can.map(files, function (file) {
+          if (
+            !_.includes(_.map(file.parents, 'id'), parentFolder.id)
+          ) {
+            return file.copyToParent(parentFolder);
+          }
+          return file;
+        });
+        return can.when.apply(can, mapped).then(function () {
+          return can.makeArray(arguments).map(function (file) {
+            return CMS.Models.GDriveFile.model(file);
+          });
+        });
+      },
+
+      refreshFilesModel: function (files) {
+        return new RefreshQueue().enqueue(files).trigger();
       },
 
       trigger_upload_parent: function (scope, el) {
@@ -190,31 +325,14 @@
             // always put them in a RefreshQueue before using their properties.
             // --BM 11/19/2013
             parentFolder.uploadFiles()
-              .then(function (files) {
-                that.beforeCreateHandler(files);
-                return new RefreshQueue().enqueue(files).trigger()
-                  .then(function (fs) {
-                    var mapped = can.map(fs, function (file) {
-                      if (
-                        !_.includes(_.map(file.parents, 'id'), parentFolder.id)
-                      ) {
-                        return file.copyToParent(parentFolder);
-                      }
-                      return file;
-                    });
-                    return can.when.apply(can, mapped);
-                  });
-              })
-              .done(function () {
-                var files = can.makeArray(arguments).map(function (file) {
-                  return CMS.Models.GDriveFile.model(file);
-                });
-                var dfdsDoc = that.handle_file_upload(files);
-
-                can.when.apply(can, dfdsDoc).then(function () {
-                  can.trigger(
-                    that, 'modal:success', {arr: can.makeArray(arguments)});
-                  el.trigger('modal:success', {arr: can.makeArray(arguments)});
+              .then(that.beforeCreateHandler.bind(that))
+              .then(that.refreshFilesModel.bind(that))
+              .then(that.copyFilesToParent.bind(that, parentFolder))
+              .then(that.addFilesSuffixes.bind(that))
+              .done(function (files) {
+                that.handle_file_upload(files).then(function (docs) {
+                  can.trigger(that, 'modal:success', {arr: docs});
+                  el.trigger('modal:success', {arr: docs});
                 });
               })
               .fail(function () {
@@ -225,6 +343,12 @@
 
                   can.trigger(that, 'modal:success');
                   el.trigger('modal:success');
+                } else if ( error ) {
+                  that.dispatch({
+                    type: 'resetItems'
+                  });
+
+                  GGRC.Errors.notifier('error', error && error.message);
                 }
               });
           });
@@ -233,7 +357,7 @@
       handle_file_upload: function (files) {
         var that = this;
 
-        return files.map(function (file) {
+        var dfdDocs = files.map(function (file) {
           return new CMS.Models.Document({
             context: that.instance.context || {id: null},
             title: file.title,
@@ -256,6 +380,10 @@
             return objectDoc;
           });
         });
+        // waiting for all docs promises
+        return can.when.apply(can, dfdDocs).then(function () {
+          return can.makeArray(arguments);
+        });
       }
     },
     events: {
@@ -268,6 +396,13 @@
         } else {
           instance.reify();
           instance.refresh();
+        }
+      },
+      '{viewModel} resetItems': function () {
+        var itemsUploadedCallback = this.viewModel.itemsUploadedCallback;
+
+        if (can.isFunction(itemsUploadedCallback)) {
+          itemsUploadedCallback();
         }
       }
     }
