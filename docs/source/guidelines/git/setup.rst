@@ -43,19 +43,6 @@ to prevent pushes to google/ggrc-core.
 
        git remote add upstream git@github.com:google/ggrc-core.git
 
-4. now make sure your develop branch is tracking the correct repo
-
-   ..  code-block:: bash
-
-       git checkout develop
-       git checkout -b develop upstream/develop
-
-5. to list your branches and their tracking branch run
-
-   ..  code-block:: bash
-
-       git branch -vv
-
 Extra:
 
 get a pull request from google/ggrc-core without adding other remotes to
