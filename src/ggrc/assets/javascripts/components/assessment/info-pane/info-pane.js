@@ -68,6 +68,12 @@ import {
             return verifiers;
           },
         },
+        showProcedureSection: {
+          get: function () {
+            return this.instance.attr('test_plan') ||
+              this.instance.attr('issue_tracker.issue_url');
+          },
+        },
         isSaving: {
           type: 'boolean',
           value: false,

@@ -17,6 +17,20 @@
   &__section {
     display: block;
     margin: 0 16px 16px 0;
+
+    &.info-pane__section-procedure {
+      display: flex;
+
+      .assessment-procedure {
+        flex: 9 9;
+      }
+
+      .issue-tracker-url {
+        display: flex;
+        flex: 2 2;
+        justify-content: flex-end;
+      }
+    }
   }
 
   &__section-content {

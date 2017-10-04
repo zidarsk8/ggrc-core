@@ -29,6 +29,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         hotlist_id: '',
         component_id: '',
         title: '',
+        issue_url: '',
       },
 
       assessment_type: 'Control',
@@ -102,6 +103,10 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         attr_title: 'Archived',
         attr_name: 'archived',
         order: 15,
+      }, {
+        attr_title: 'Buganizer',
+        attr_name: 'issue_url',
+        order: 16,
       }],
       display_attr_names: ['title', 'status', 'label', 'Assignees', 'Verifiers',
         'start_date', 'updated_at'],
