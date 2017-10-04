@@ -43,21 +43,14 @@ to prevent pushes to google/ggrc-core.
 
        git remote add upstream git@github.com:google/ggrc-core.git
 
-4. prevent pushing to upstream.
-
-   ..  code-block:: bash
-
-       git remote set-url --push upstream $(git remote get-url --push origin)
-       git fetch upstream
-
-5. now make sure your develop branch is tracking the correct repo
+4. now make sure your develop branch is tracking the correct repo
 
    ..  code-block:: bash
 
        git checkout develop
        git checkout -b develop upstream/develop
 
-6. to list your branches and their tracking branch run
+5. to list your branches and their tracking branch run
 
    ..  code-block:: bash
 
