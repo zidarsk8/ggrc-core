@@ -22,14 +22,13 @@ describe('can.mustache.helper.get_default_attr_value', function () {
     expect(result).toEqual('');
   });
 
-  it('returns an empty string if the attribute has a falsy value',
+  it('returns an empty string if the attribute is not considered as "default"',
     function () {
       var result;
-      instance.attr('foo', false);
-      result = helper('foo', instance);
+      instance.attr('is_not_default', true);
+      result = helper('is_not_default', instance);
       expect(result).toEqual('');
-    }
-  );
+    });
 
   describe('retrieving a "default" (non-date) attribute', function () {
     beforeEach(function () {
@@ -44,6 +43,20 @@ describe('can.mustache.helper.get_default_attr_value', function () {
 
       expect(instance.attr).toHaveBeenCalledWith('status');
       expect(result).toEqual('In progress');
+    });
+
+    it('returns "true" string when boolean attr value is true', function () {
+      var result;
+      instance.attr('archived', true);
+      result = helper('archived', instance);
+      expect(result).toEqual('true');
+    });
+
+    it('returns "false" string when boolean attr value is false', function () {
+      var result;
+      instance.attr('archived', false);
+      result = helper('archived', instance);
+      expect(result).toEqual('false');
     });
   });
 
