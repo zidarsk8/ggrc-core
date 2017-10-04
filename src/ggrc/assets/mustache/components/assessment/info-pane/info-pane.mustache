@@ -217,7 +217,25 @@
                     </assessment-people>
                 </div>
             </div>
-            <div class="assessment-comments info-pane__sidebar">
+            <div class="info-pane__sidebar">
+              <div class="ggrc-form">
+                <div class="ggrc-form-item">
+                  <div class="ggrc-form-item__row">
+                     <assessment-inline-item
+                         type="date"
+                         prop-name="start_date"
+                         with-read-more="true"
+                         {set-in-progress}="@setInProgressState"
+                         {on-state-change-dfd}="onStateChangeDfd"
+                         {is-edit-icon-denied}="isEditDenied"
+                         {value}="instance.start_date"
+                         {instance}="instance">
+                             <div class="info-pane__section-title">Due Date</div>
+                     </assessment-inline-item>
+                  </div>
+                </div>
+              </div>
+              <div class="assessment-comments">
                 <div class="info-pane__section-title">Responses/Comments</div>
                 {{#unless isEditDenied}}
                     <comment-add-form class="comment-add-form"
@@ -228,6 +246,7 @@
                     ></comment-add-form>
                 {{/unless}}
                 <assessment-mapped-comments {mapped-items}="comments"></assessment-mapped-comments>
+              </div>
             </div>
         </div>
          </tab-panel>

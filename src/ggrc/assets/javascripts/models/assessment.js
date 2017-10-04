@@ -35,70 +35,74 @@
       attr_list: [{
         attr_title: 'Title',
         attr_name: 'title',
-        order: 1
+        order: 1,
       }, {
         attr_title: 'Code',
         attr_name: 'slug',
-        order: 4
+        order: 4,
       }, {
         attr_title: 'State',
         attr_name: 'status',
-        order: 2
+        order: 2,
       }, {
         attr_title: 'Verified',
         attr_name: 'verified',
-        order: 3
+        order: 3,
       }, {
         attr_title: 'Last Updated',
         attr_name: 'updated_at',
-        order: 9
+        order: 10,
       }, {
         attr_title: 'Last Updated By',
         attr_name: 'modified_by',
-        order: 10
+        order: 11,
       }, {
         attr_title: 'Conclusion: Design',
         attr_name: 'design',
-        order: 14
+        order: 15,
       }, {
         attr_title: 'Conclusion: Operation',
         attr_name: 'operationally',
-        order: 15
+        order: 16,
       }, {
         attr_title: 'Finished Date',
         attr_name: 'finished_date',
-        order: 12
+        order: 13,
       }, {
         attr_title: 'Verified Date',
         attr_name: 'verified_date',
-        order: 11
+        order: 12,
       }, {
         attr_title: 'Reference URL',
         attr_name: 'reference_url',
-        order: 13
+        order: 14,
       }, {
         attr_title: 'Creators',
         attr_name: 'creators',
-        order: 5
+        order: 5,
       }, {
         attr_title: 'Assignees',
         attr_name: 'assignees',
-        order: 6
+        order: 6,
       }, {
         attr_title: 'Verifiers',
         attr_name: 'verifiers',
-        order: 7
+        order: 7,
+      }, {
+        attr_title: 'Due Date',
+        attr_name: 'start_date',
+        order: 8,
       }, {
         attr_title: 'Created Date',
         attr_name: 'created_at',
-        order: 8
+        order: 9,
       }, {
         attr_title: 'Archived',
         attr_name: 'archived',
-        order: 16,
+        order: 17,
       }],
       display_attr_names: ['title', 'status', 'assignees', 'verifiers',
-        'updated_at']
+      'start_date', 'updated_at'],
     },
     sub_tree_view_options: {
       default_filter: ['Control'],
