@@ -3,13 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Controllers.SummaryWidget', function () {
-  'use strict';
-  var Ctrl;
+import Ctrl from '../summary_widget_controller';
 
-  beforeAll(function () {
-    Ctrl = GGRC.Controllers.SummaryWidget;
-  });
+describe('SummaryWidgetController', function () {
+  'use strict';
 
   describe('"{CMS.Models.Assessment} updated" handler', function () {
     var method;
