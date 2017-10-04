@@ -127,8 +127,8 @@ import '../components/add-object-button/add-object-button';
       chartOptions.attr('isInitialized', true);
 
       that.setState(type, {total: 0, statuses: { }}, true);
-      that.getStatuses(type, that.options.instance.id).then(function (raw) {
-        var data = that.parseStatuses(type, raw[0][type]);
+      that.getStatuses(that.options.instance.id).then(function (raw) {
+        var data = that.parseStatuses(type, raw);
         var chart = that.drawChart(elementId, data);
 
         that.prepareLegend(type, chart, data);
@@ -238,25 +238,34 @@ import '../components/add-object-button/add-object-button';
       var statuses = CMS.Models[type].statuses;
       var groups = _.object(statuses, new Array(statuses.length).fill(0));
       var result;
-      data.values.forEach(function (item) {
-        if (item.verified) {
-          item.status = 'Verified';
+      data.forEach(function (item) {
+        if (item[1]) {
+          item[0] = 'Verified';
         }
-        groups[item.status]++;
+        groups[item[0]]++;
       });
       result = _.pairs(groups);
       return {
-        total: data.total,
+        total: data.length,
         statuses: result
       };
     },
-    getStatuses: function (type, auditId) {
-      var query = GGRC.Utils.QueryAPI.buildParam(
-        type,
-        {},
-        {id: auditId, type: 'Audit'},
-        ['status', 'verified']);
-      return GGRC.Utils.QueryAPI.makeRequest({data: [query]});
+    /**
+     * Get statuses of mapped Assessments
+     * @param {Number} auditId
+     * @return {Promise<Array>}
+     * @example
+     * Example of response:
+     * [
+     * ["In Review", 0],
+     * ["In Progress", 0],
+     * ["Completed", 1]
+     * ]
+     * where first value in array - title of status,
+     * and second - 0(not verified), 1(verified) assessment
+     */
+    getStatuses: function (auditId) {
+      return $.get('/api/audits/'+ auditId + '/summary');
     },
     loadChartLibrary: function (callback) {
       if (typeof google !== 'undefined' &&
