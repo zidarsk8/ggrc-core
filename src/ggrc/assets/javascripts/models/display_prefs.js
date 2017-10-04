@@ -214,9 +214,9 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   },
 
   setTreeViewStates: function (model_name, status_list) {
-    var hdr = this.getObject(path, TREE_VIEW_STATES), obj = {};
+    var hdr = this.getObject(TREE_VIEW_STATES), obj = {};
     if (!hdr) {
-      hdr = this.makeObject(path, TREE_VIEW_STATES);
+      hdr = this.makeObject(TREE_VIEW_STATES);
     }
     obj.status_list = status_list;
     hdr.attr(model_name, obj);
@@ -226,7 +226,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   },
 
   getTreeViewStates: function (model_name) {
-    var value = this.getObject(path, TREE_VIEW_STATES);
+    var value = this.getObject(TREE_VIEW_STATES);
 
     if (!value || !value[model_name]) {
       return [];
