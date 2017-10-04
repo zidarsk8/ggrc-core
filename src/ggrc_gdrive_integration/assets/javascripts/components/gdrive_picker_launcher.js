@@ -348,7 +348,7 @@ import '../utils/gdrive-picker-utils.js';
 
                   can.trigger(that, 'modal:success');
                   el.trigger('modal:success');
-                } else if ( error ) {
+                } else if ( error && error !== 'action canceled' ) {
                   that.dispatch({
                     type: 'resetItems'
                   });
