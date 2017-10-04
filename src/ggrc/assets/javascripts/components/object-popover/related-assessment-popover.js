@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import { convertValuesToFormFields } from '../../plugins/utils/ca-utils';
+
 (function (can) {
   'use strict';
 
@@ -40,9 +42,7 @@
           get: function () {
             var caValues =
               this.attr('selectedAssessment.data.custom_attribute_values');
-            return caValues ?
-              GGRC.Utils.CustomAttributes.convertValuesToFormFields(caValues) :
-              [];
+            return caValues ? convertValuesToFormFields(caValues) : [];
           }
         }
       }

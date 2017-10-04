@@ -3,10 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  getCustomAttributeType,
+  convertFromCaValue,
+} from '../../plugins/utils/ca-utils';
+
 (function (can, GGRC) {
   'use strict';
-
-  var CAUtils = GGRC.Utils.CustomAttributes;
 
   /**
    * Global Custom Attributes is a component representing custom attributes.
@@ -41,7 +44,7 @@
 
         can.each(this.attr('instance.custom_attribute_definitions'),
           function (cad) {
-            var type = CAUtils.getCustomAttributeType(cad.attribute_type);
+            var type = getCustomAttributeType(cad.attribute_type);
             var value;
             var options = cad.multi_choice_options &&
               typeof cad.multi_choice_options === 'string' ?
@@ -51,7 +54,7 @@
               function (val) {
                 val = val.isStub ? val : val.reify();
                 if (val.custom_attribute_id === cad.id) {
-                  value = CAUtils.convertFromCaValue(
+                  value = convertFromCaValue(
                     type,
                     val.attribute_value,
                     val.attribute_object

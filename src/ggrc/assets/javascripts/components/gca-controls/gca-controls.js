@@ -3,9 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  ensureGlobalCA,
+  getCustomAttributes,
+  CUSTOM_ATTRIBUTE_TYPE,
+  convertToFormViewField,
+  applyChangesToCustomAttributeValue,
+} from '../../plugins/utils/ca-utils';
+
 (function (can, GGRC) {
   'use strict';
-  var CAUtils = GGRC.Utils.CustomAttributes;
   var tpl = can.view(GGRC.mustache_path +
     '/components/gca-controls/gca-controls.mustache');
 
@@ -43,19 +50,19 @@
       },
       initGlobalAttributes: function () {
         var cavs;
-        CAUtils.ensureGlobalCA(this.attr('instance'));
-        cavs = CAUtils.getCustomAttributes(this.attr('instance'),
-          CAUtils.CUSTOM_ATTRIBUTE_TYPE.GLOBAL);
+        ensureGlobalCA(this.attr('instance'));
+        cavs = getCustomAttributes(this.attr('instance'),
+          CUSTOM_ATTRIBUTE_TYPE.GLOBAL);
 
         this.attr('items',
-          cavs.map(CAUtils.convertToFormViewField.bind(CAUtils))
+          cavs.map(convertToFormViewField)
         );
       },
       updateGlobalAttribute: function (event, field) {
         this.attr('modifiedFields').attr(field.id, event.value);
         field.attr('value', event.value);
 
-        CAUtils.applyChangesToCustomAttributeValue(
+        applyChangesToCustomAttributeValue(
           this.attr('instance.custom_attribute_values'),
           this.attr('modifiedFields')
         );

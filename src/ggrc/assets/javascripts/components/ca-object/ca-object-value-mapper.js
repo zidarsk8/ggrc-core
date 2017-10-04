@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  convertFromCaValue,
+  convertToCaValue,
+} from '../../plugins/utils/ca-utils';
+
 (function (_, can, GGRC) {
   'use strict';
 
@@ -40,7 +45,7 @@
         return type;
       },
       getValue: function () {
-        return GGRC.Utils.CustomAttributes.convertFromCaValue(
+        return convertFromCaValue(
           this.attr('type'),
           this.attr('value'),
           this.attr('valueObj')
@@ -48,7 +53,7 @@
       },
       setValue: function (value) {
         this.attr('value',
-          GGRC.Utils.CustomAttributes.convertToCaValue(
+          convertToCaValue(
             value,
             this.attr('type')
           )

@@ -4,6 +4,10 @@
  */
 
 import './mapped-control-related-objects';
+import {
+  prepareCustomAttributes,
+  convertToFormViewField,
+} from '../../../plugins/utils/ca-utils';
 
 (function (can, GGRC, _) {
   'use strict';
@@ -151,10 +155,10 @@ import './mapped-control-related-objects';
     },
     attributesToFormFields: function (snapshot) {
       var attributes;
-      attributes = GGRC.Utils.CustomAttributes.prepareCustomAttributes(
+      attributes = prepareCustomAttributes(
         snapshot.custom_attribute_definitions,
         snapshot.custom_attribute_values)
-        .map(GGRC.Utils.CustomAttributes.convertToFormViewField);
+        .map(convertToFormViewField);
       return attributes;
     }
   });

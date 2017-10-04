@@ -3,8 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {CA_DD_REQUIRED_DEPS} from '../../../plugins/utils/ca-utils';
+
 describe('check performValidation', function () {
-  var CA_DD_REQUIRED_DEPS = GGRC.Utils.CustomAttributes.CA_DD_REQUIRED_DEPS;
   var inputField;
   var dropdownField;
   var checkboxField;

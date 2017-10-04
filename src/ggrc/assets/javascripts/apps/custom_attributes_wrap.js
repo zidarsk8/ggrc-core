@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {getCustomAttributeType} from '../plugins/utils/ca-utils';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -47,7 +49,7 @@
                 helptext: cad.helptext,
                 multi_choice_options: cad.multi_choice_options
               },
-              type: GGRC.Utils.CustomAttributes.getCustomAttributeType(type)
+              type: getCustomAttributeType(type)
             });
           }.bind(this));
         return result;

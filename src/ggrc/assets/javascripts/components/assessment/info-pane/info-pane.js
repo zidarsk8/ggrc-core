@@ -15,12 +15,18 @@ import '../../inline/inline-form-control';
 import './inline-item';
 import './create-url';
 import '../../object-change-state/object-change-state';
+import {
+  getCustomAttributes,
+  CUSTOM_ATTRIBUTE_TYPE,
+  convertToFormViewField,
+  convertValuesToFormFields,
+  applyChangesToCustomAttributeValue,
+} from '../../../plugins/utils/ca-utils';
 
 (function (can, GGRC, CMS) {
   'use strict';
   var tpl = can.view(GGRC.mustache_path +
     '/components/assessment/info-pane/info-pane.mustache');
-  var CAUtils = GGRC.Utils.CustomAttributes;
 
   /**
    * Assessment Specific Info Pane View Component
@@ -341,23 +347,23 @@ import '../../object-change-state/object-change-state';
       },
       initializeFormFields: function () {
         var cavs =
-          CAUtils.getCustomAttributes(
+          getCustomAttributes(
             this.attr('instance'),
-            CAUtils.CUSTOM_ATTRIBUTE_TYPE.LOCAL
+            CUSTOM_ATTRIBUTE_TYPE.LOCAL
           );
         this.attr('formFields',
-          CAUtils.convertValuesToFormFields(cavs)
+          convertValuesToFormFields(cavs)
         );
       },
       initGlobalAttributes: function () {
         var cavs =
-          CAUtils.getCustomAttributes(
+          getCustomAttributes(
             this.attr('instance'),
-            CAUtils.CUSTOM_ATTRIBUTE_TYPE.GLOBAL
+            CUSTOM_ATTRIBUTE_TYPE.GLOBAL
           );
         this.attr('globalAttributes',
           cavs.map(function (cav) {
-            return CAUtils.convertToFormViewField(cav);
+            return convertToFormViewField(cav);
           })
         );
       },
@@ -405,7 +411,7 @@ import '../../object-change-state/object-change-state';
       saveGlobalAttributes: function (event) {
         var globalAttributes = event.globalAttributes;
         var caValues = this.attr('instance.custom_attribute_values');
-        CAUtils.applyChangesToCustomAttributeValue(caValues, globalAttributes);
+        applyChangesToCustomAttributeValue(caValues, globalAttributes);
 
         return this.attr('instance').save();
       },

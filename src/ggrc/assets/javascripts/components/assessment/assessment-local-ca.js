@@ -3,11 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  CA_DD_REQUIRED_DEPS,
+  applyChangesToCustomAttributeValue
+}
+  from '../../plugins/utils/ca-utils';
+
 (function (GGRC, can) {
   'use strict';
-
-  var CAUtils = GGRC.Utils.CustomAttributes;
-  var CA_DD_REQUIRED_DEPS = CAUtils.CA_DD_REQUIRED_DEPS;
 
   GGRC.Components('assessmentLocalCa', {
     tag: 'assessment-local-ca',
@@ -175,7 +178,7 @@
 
         this.attr('deferredSave').push(function () {
           var caValues = self.attr('instance.custom_attribute_values');
-          CAUtils.applyChangesToCustomAttributeValue(
+          applyChangesToCustomAttributeValue(
             caValues,
             new can.Map(changes));
 
