@@ -5,7 +5,7 @@
 
 import '../components/add-object-button/add-object-button';
 
-can.Control('GGRC.Controllers.SummaryWidget', {
+export default can.Control({
   defaults: {
     model: null,
     instance: null,
