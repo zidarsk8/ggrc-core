@@ -13,6 +13,9 @@
       "transform-strict-mode"
     ],
     "presets": [["env", {
-      "debug": true
+      "debug": true,
+      "targets": {
+        "browsers": ["last 2 versions"]
+      }
     }]]
 }
