@@ -73,6 +73,9 @@ def git_diff(upstream, branch, tag):
   """Get git diff --oneline between tag and latest upstream/branch."""
   subprocess.check_call(["git", "fetch", upstream, branch])
 
+  tag_string = "refs/tags/{tag}:refs/tags/{tag}".format(tag=tag)
+  subprocess.check_call(["git", "fetch", upstream, tag_string])
+
   log_target = "{tag}..{upstream}/{branch}".format(
       tag=tag,
       upstream=upstream,
