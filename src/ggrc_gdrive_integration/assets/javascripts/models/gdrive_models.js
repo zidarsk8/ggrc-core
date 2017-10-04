@@ -293,6 +293,7 @@ import '../utils/gdrive-picker-utils.js';
       var that = this;
       var dfd = new $.Deferred();
       var picker;
+      var GAPIController = GGRC.Controllers.GAPI;
 
       gapi.load('picker', {
         callback: createPicker
@@ -300,7 +301,7 @@ import '../utils/gdrive-picker-utils.js';
 
         // Create and render a Picker object for searching images.
       function createPicker() {
-        window.oauth_dfd.done(function (token, oauth_user) {
+        GAPIController.oauth_dfd.done(function (token, oauth_user) {
           var dialog;
 
           picker = new google.picker.PickerBuilder()

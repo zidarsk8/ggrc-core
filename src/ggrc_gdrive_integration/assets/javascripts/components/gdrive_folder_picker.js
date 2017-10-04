@@ -300,7 +300,7 @@ import '../utils/gdrive-picker-utils.js';
 
         // Create and render a Picker object for searching images.
         function createPicker() {
-          window.oauth_dfd.done(function (token, oauth_user) {
+          GGRC.Controllers.GAPI.oauth_dfd.done(function (token, oauth_user) {
             var dialog;
             var view;
             var docsUploadView;

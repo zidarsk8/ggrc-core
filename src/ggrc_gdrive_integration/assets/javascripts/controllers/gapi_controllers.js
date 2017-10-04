@@ -24,20 +24,21 @@
     '{$content} a.btn[data-toggle=gapi]:not(.disabled) click': function (el) {
       el.addClass('disabled');
       GGRC.Controllers.GAPI.doGAuth_step2(null, true);
-      window.oauth_dfd.always($.proxy(this.element, 'modal_form', 'hide'));
+      GGRC.Controllers.GAPI.oauth_dfd.always(
+        $.proxy(this.element, 'modal_form', 'hide')
+      );
     },
     ' hide': function () {
-      if (window.oauth_dfd.state() === 'pending') {
-        window.oauth_dfd.reject('User canceled operation');
+      if (GGRC.Controllers.GAPI.oauth_dfd.state() === 'pending') {
+        GGRC.Controllers.GAPI.oauth_dfd.reject('User canceled operation');
       }
       this.element && this.element.remove();
     }
   });
 
-  window.oauth_dfd = new $.Deferred();
-
   can.Control('GGRC.Controllers.GAPI', {
     canonical_instance: null,
+    oauth_dfd: new $.Deferred(),
     o2dfd: null,
     drivedfd: null,
     gapidfd: new $.Deferred(), // DFD which is resolved upon gapi library loader is available
@@ -61,8 +62,8 @@
       var $modal;
 
       this.drive = this.drive || new $.Deferred();
-      if (window.oauth_dfd.state() !== 'pending') {
-        window.oauth_dfd = new $.Deferred();
+      if (this.oauth_dfd.state() !== 'pending') {
+        this.oauth_dfd = new $.Deferred();
       }
       // loading gapi client libraries
       can.each({
@@ -118,11 +119,11 @@
             that.doGAuth(scopes, true);
             authdfd.reject('login required. Switching to non-immediate');
           } else {
-            window.oauth_dfd.reject();
+            this.oauth_dfd.reject();
             authdfd.reject('auth failed');
           }
-        });
-      });
+        }.bind(this));
+      }.bind(this));
 
       $.when(authdfd, this.o2dfd)
       .then(function (authresult) {
@@ -154,8 +155,8 @@
               ].join(' ')
             });
         }
-        window.oauth_dfd.resolve(authresult, o2result);
-      });
+        this.oauth_dfd.resolve(authresult, o2result);
+      }.bind(this));
     },
     gapi_request_with_auth: function (params) {
       var that = this;
@@ -199,7 +200,7 @@
           this.constructor, this.options.scopes, false), 500);
     },
     authorize: function (newscopes, force) {
-      var dfd = window.oauth_dfd;
+      var dfd = this.constructor.oauth_dfd;
       var that = this;
       var reAuthWithNewScopes = false;
 
@@ -214,10 +215,10 @@
       if (force || reAuthWithNewScopes) {
         // rejecting old Promise as it eventually might be resolved which will
         // cause the double execution of the code
-        window.oauth_dfd.reject();
+        this.constructor.oauth_dfd.reject();
         // creating new Promise and running the Auth process again
-        dfd = window.oauth_dfd = new $.Deferred();
-        window.oauth_dfd.done(function () {
+        dfd = this.constructor.oauth_dfd = new $.Deferred();
+        this.constructor.oauth_dfd.done(function () {
           dfd.resolve.apply(dfd, arguments);
         });
         this.doGAuthWithScopes();
