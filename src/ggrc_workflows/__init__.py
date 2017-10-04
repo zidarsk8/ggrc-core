@@ -265,9 +265,8 @@ def build_cycle(workflow, cycle=None, current_user=None):
   """Build a cycle with it's child objects"""
 
   if not workflow.tasks:
-    err_msg = ("Starting a cycle has failed on Workflow with slug == "
-               "'{}' and id == '{}'".format(workflow.slug, workflow.id))
-    logger.error(err_msg)
+    logger.error("Starting a cycle has failed on Workflow with "
+                 "slug == '%s' and id == '%s'", workflow.slug, workflow.id)
     pusher.update_or_create_notifications(workflow, date.today(),
                                           "cycle_start_failed")
     return
