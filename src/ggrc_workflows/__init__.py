@@ -378,16 +378,27 @@ def _update_parent_state(parent, child_statuses):
   )
 
 
-def update_cycle_task_object_task_parent_state(obj, for_delete=False):
+def update_cycle_task_object_task_parent_state(obj, is_put=False):
   """Update cycle task group status for sent cycle task"""
   if obj.cycle.workflow.kind == "Backlog":
     return
-  child_statuses = set(i[0] for i in db.session.query(
-      models.CycleTaskGroupObjectTask.status
-  ).filter(
-      models.CycleTaskGroupObjectTask.cycle_task_group_id ==
-      obj.cycle_task_group_id
-  ).distinct().with_for_update())
+  if is_put:
+    # On CycleTask status change via PUT request new status is not in DB yet,
+    # but old status is in DB. They should be swapped.
+    child_statuses = set(i[0] for i in db.session.query(
+        models.CycleTaskGroupObjectTask.status
+    ).filter(
+        models.CycleTaskGroupObjectTask.cycle_task_group_id ==
+        obj.cycle_task_group_id,
+        models.CycleTaskGroupObjectTask.id != obj.id
+    ).distinct().with_for_update()) | {obj.status}
+  else:
+    child_statuses = set(i[0] for i in db.session.query(
+        models.CycleTaskGroupObjectTask.status
+    ).filter(
+        models.CycleTaskGroupObjectTask.cycle_task_group_id ==
+        obj.cycle_task_group_id
+    ).distinct().with_for_update())
   _update_parent_state(
       obj.cycle_task_group,
       child_statuses
@@ -556,6 +567,7 @@ def handle_cycle_task_group_object_task_put(
         new_status=obj.status,
         old_status=inspect(obj).attrs.status.history.deleted.pop(),
     )
+    update_cycle_task_object_task_parent_state(obj, is_put=True)
 
   # Doing this regardless of status.history.has_changes() is important in order
   # to update objects that have been declined. It updates the os_last_updated
@@ -569,8 +581,6 @@ def handle_cycle_task_group_object_task_put(
 
 
 @signals.Restful.model_posted_after_commit.connect_via(
-    models.CycleTaskGroupObjectTask)
-@signals.Restful.model_put_after_commit.connect_via(
     models.CycleTaskGroupObjectTask)
 @signals.Restful.model_deleted_after_commit.connect_via(
     models.CycleTaskGroupObjectTask)
