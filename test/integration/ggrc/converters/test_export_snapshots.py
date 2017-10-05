@@ -104,6 +104,7 @@ class TestExportSnapshots(TestCase):
             "Type/Means": control.means.display_name,
             "Recipients": control.recipients,
             "Send by default": "yes",
+            "Comments": "",
             # Custom attributes
             "RT": self._get_cav(control, "RT"),
             "checkbox": self._get_cav(control, "checkbox"),
@@ -225,6 +226,7 @@ class TestExportSnapshots(TestCase):
             "Last Assessment Date": u"",
             "Recipients": "",
             "Send by default": u"yes",
+            "Comments": "",
 
             # Custom attributes
             "RT": u"",
@@ -423,6 +425,7 @@ class TestExportSnapshots(TestCase):
           "Review State": u"Unreviewed",
           "Recipients": "",
           "Send by default": u"yes",
+          "Comments": "",
           "Significance": u"",
           "State": u"Draft",
           "Last Assessment Date": u"",
