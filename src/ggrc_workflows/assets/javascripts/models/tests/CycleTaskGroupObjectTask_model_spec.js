@@ -76,4 +76,45 @@ describe('CMS.Models.CycleTaskGroupObjectTask', function () {
       }
     );
   });
+
+  describe('form_preload method', function () {
+    var instance;
+
+    beforeEach(function () {
+      instance = new CMS.Models.CycleTaskGroupObjectTask({
+        status: 'Assigned',
+        cycle: {
+          is_current: false,
+        },
+      });
+    });
+
+    it('populates the workflow and related objects ' +
+      'when creating new task from workflow page',
+    function () {
+      var cycles = [{
+        id: 'cycle id',
+        is_current: true}];
+
+      var workflow = new CMS.Models.Workflow({
+        id: 'workflow id',
+        context: {
+          id: 'context id',
+        },
+        cycles: cycles,
+      });
+
+      spyOn(workflow, 'refresh_all').and
+        .returnValue(can.Deferred().resolve(cycles));
+
+      instance.form_preload(true, {workflow: workflow});
+
+      expect(instance.attr('workflow.id')).toEqual('workflow id');
+      expect(instance.attr('workflow.type')).toEqual('Workflow');
+      expect(instance.attr('context.id')).toEqual('context id');
+      expect(instance.attr('context.type')).toEqual('Context');
+      expect(instance.attr('cycle.id')).toEqual('cycle id');
+      expect(instance.attr('cycle.type')).toEqual('Cycle');
+    });
+  });
 });

@@ -382,7 +382,7 @@
       }
       populateFromWorkflow(this, workflow);
     },
-    form_preload: function (newObjectForm) {
+    form_preload: function (newObjectForm, objectParams) {
       var form = this;
       var workflows;
       var _workflow;
@@ -393,33 +393,29 @@
         this.attr('start_date', new Date());
         this.attr('end_date', moment().add({month: 3}).toDate());
 
-        // using setTimeout to execute this after the modal is loaded
-        // so we can see when the workflow is already set and use that one
-        setTimeout(function () {
-          // if we are creating a task from the workflow page, the preset
-          // workflow should be that one
-          if (form.workflow !== undefined) {
-            populateFromWorkflow(form, form.workflow);
+        // if we are creating a task from the workflow page, the preset
+        // workflow should be that one
+        if (objectParams && objectParams.workflow !== undefined) {
+          populateFromWorkflow(form, objectParams.workflow);
+          return;
+        }
+
+        workflows = CMS.Models.Workflow.findAll({
+          kind: 'Backlog', status: 'Active', __sort: '-created_at'});
+        workflows.then(function (workflowList) {
+          if (!workflowList.length) {
+            $(document.body).trigger(
+              'ajax:flash',
+              {warning: 'No Backlog' +
+              ' workflows found!' +
+              ' Contact your administrator to enable this functionality.',
+              }
+            );
             return;
           }
-
-          workflows = CMS.Models.Workflow.findAll({
-            kind: 'Backlog', status: 'Active', __sort: '-created_at'});
-          workflows.then(function (workflowList) {
-            if (!workflowList.length) {
-              $(document.body).trigger(
-                'ajax:flash',
-                {warning: 'No Backlog' +
-                ' workflows found!' +
-                ' Contact your administrator to enable this functionality.'
-                }
-              );
-              return;
-            }
-            _workflow = workflowList[0];
-            populateFromWorkflow(form, _workflow);
-          });
-        }, 0);
+          _workflow = workflowList[0];
+          populateFromWorkflow(form, _workflow);
+        });
       } else {
         cycle = form.cycle.reify();
         if (!_.isUndefined(cycle.workflow)) {
