@@ -21,12 +21,17 @@ var helpers = {
     var customAttrItem;
     var getValue;
     var formatValueMap = {
-      Checkbox: function (value) {
-        return ['No', 'Yes'][value];
+      Checkbox: function (item) {
+        return ['No', 'Yes'][item.attribute_value];
       },
-      Date: function (value) {
-        return GGRC.Utils.formatDate(value, true);
-      }
+      Date: function (item) {
+        return GGRC.Utils.formatDate(item.attribute_value, true);
+      },
+      'Map:Person': function (item) {
+        return options.fn(options.contexts.add({
+          object: item.attribute_object ? item.attribute_object.reify() : null,
+        }));
+      },
     };
 
     attr = Mustache.resolve(attr);
@@ -50,14 +55,9 @@ var helpers = {
           item = item.reify();
         }
         if (item.custom_attribute_id === definition.id) {
-          if (definition.attribute_type.startsWith('Map:')) {
-            value = options.fn(options.contexts.add({
-              object: item.attribute_object ?
-                item.attribute_object.reify() : null
-            }));
-          } else if (formatValueMap[definition.attribute_type]) {
+          if (formatValueMap[definition.attribute_type]) {
             value =
-              formatValueMap[definition.attribute_type](item.attribute_value);
+              formatValueMap[definition.attribute_type](item);
           } else {
             value = item.attribute_value;
           }
