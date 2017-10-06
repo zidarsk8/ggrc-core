@@ -15,10 +15,9 @@ var helpers = {
   /*
     Used to get the string value for custom attributes
   */
-  get_custom_attr_value: function (attr, instance, options) {
+  get_custom_attr_value: function (attr, instance, customAttrItem, options) {
     var value = '';
     var definition;
-    var customAttrItem;
     var getValue;
     var formatValueMap = {
       Checkbox: function (item) {
@@ -36,9 +35,7 @@ var helpers = {
 
     attr = Mustache.resolve(attr);
     instance = Mustache.resolve(instance);
-    customAttrItem = Mustache.resolve(
-      (options.hash || {}).customAttrItem
-    );
+    customAttrItem = Mustache.resolve(customAttrItem);
 
     can.each(GGRC.custom_attr_defs, function (item) {
       if (item.definition_type === instance.class.table_singular &&
