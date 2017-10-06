@@ -13,18 +13,20 @@ def move_snapshots_to_asmnt(audit_id):
   """Move snapshots of Revision and Objective to Assessment"""
   # Run this query to prevent case when temp table wasn't removed
   # after last run
+  # Enable creation of temp tables
+  db.session.execute("SET AUTOCOMMIT = 1;")
+  # Disable the "Table already exists" warning
+  db.session.execute("SET sql_notes = 0;")
+  db.session.execute("DROP TABLE IF EXISTS temp_control_snapshots;")
+  # And then re-enable the warning again
+  db.session.execute("SET sql_notes = 1;")
   db.session.execute("""
-      SET sql_notes = 0;  -- Disable the "Table already exists" warning
-      DROP TABLE IF EXISTS temp_control_snapshots;
-      SET sql_notes = 1;  -- And then re-enable the warning again
-  """)
-
-  db.session.execute(sa.text("""
       CREATE TEMPORARY TABLE temp_control_snapshots (
         snapshot_id int(11),
         assessment_id int(11)
       );
-
+  """)
+  db.session.execute(sa.text("""
       INSERT INTO temp_control_snapshots(snapshot_id, assessment_id)
       SELECT snap_id, asmnt_id
       FROM (
@@ -94,18 +96,18 @@ def move_snapshots_to_asmnt(audit_id):
             r2.destination_type = 'Assessment' AND
             r2.source_id = tmp.mapped_id AND
             r2.source_type = 'Snapshot'
-          WHERE r1.id IS NULL AND r2.id IS NULL;
-
-          DROP TABLE IF EXISTS temp_control_snapshots;
+          WHERE r1.id IS NULL AND r2.id IS NULL
+          GROUP BY tcs.assessment_id, tmp.mapped_id;
       """)
+      db.session.execute("DROP TABLE IF EXISTS temp_control_snapshots;")
+      db.session.execute("SET AUTOCOMMIT = 0;")
+
       print "Snapshots were migrated successfully for " \
             "Audit id {}".format(audit_id)
       return
 
     elif user_input.lower() == "n":
-      query = """
-          DROP TABLE IF EXISTS temp_control_snapshots;
-      """
-      db.session.execute(query)
+      db.session.execute("DROP TABLE IF EXISTS temp_control_snapshots;")
+      db.session.execute("SET AUTOCOMMIT = 0;")
       print "Script execution was canceled"
       return
