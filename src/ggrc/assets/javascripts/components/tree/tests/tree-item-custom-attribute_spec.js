@@ -110,18 +110,6 @@ describe('helpers.get_custom_attr_value', function () {
     expect(customAttrItem.reify).toHaveBeenCalled();
   });
 
-  it('return "correctValue"', function () {
-    var item = getCustomAttrItem('correctValue', 3, 'richText');
-    spyOn(item, 'reify')
-      .and.returnValue(item);
-    fakeInstance.custom_attribute_values = [
-      item,
-    ];
-    actual = helper(fakeAttr, fakeInstance, undefined, fakeOptions);
-
-    expect(actual).toEqual('correctValue');
-  });
-
   it('return correct value if customAttrItem is not undefined',
     function () {
       setCustomAttrItem('correctValue');
