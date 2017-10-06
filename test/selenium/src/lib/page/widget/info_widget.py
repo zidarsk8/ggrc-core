@@ -25,11 +25,12 @@ class InfoWidget(base.Widget):
   locator_headers_and_values = None
 
   def __init__(self, driver):
+    super(InfoWidget, self).__init__(driver)
     self.child_cls_name = self.__class__.__name__.lower()
+    selenium_utils.wait_for_js_to_load(self._driver)
     # empty lists of headers and values
     self.list_all_headers_txt = []
     self.list_all_values_txt = []
-    super(InfoWidget, self).__init__(driver)
     # check type and content of Info Widget
     if not self.is_info_page_not_panel:
       self.is_snapshotable_panel = (
