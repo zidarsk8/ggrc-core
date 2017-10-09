@@ -4,6 +4,7 @@
  */
 
 import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
+import '../utils/gdrive-picker-utils.js';
 
 (function (can, $, GGRC, CMS) {
   'use strict';
@@ -164,17 +165,19 @@ import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
         // upload files without a parent folder (risk assesment)
         var that = this;
         var dfd;
+        var picker;
         var folderId = el.data('folder-id');
 
         // Create and render a Picker object for searching images.
         function createPicker() {
-          window.oauth_dfd
+          GGRC.Controllers.GAPI.oauth_dfd
             .done(function () {
               var dialog;
               var view;
               var docsView;
               var docsUploadView;
-              var picker = new google.picker.PickerBuilder()
+
+              picker = new google.picker.PickerBuilder()
                 .setOAuthToken(gapi.auth.getToken().access_token)
                 .setDeveloperKey(GGRC.config.GAPI_KEY)
                 .setMaxItems(10)
@@ -238,6 +241,8 @@ import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
           } else if (data[ACTION] === CANCEL) {
             el.trigger('rejected');
           }
+
+          GGRC.Utils.GDrivePicker.ensurePickerDisposed(picker, data);
         }
 
         dfd = GGRC.Controllers.GAPI.reAuthorize(gapi.auth.getToken());
@@ -343,7 +348,7 @@ import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
 
                   can.trigger(that, 'modal:success');
                   el.trigger('modal:success');
-                } else if ( error ) {
+                } else if ( error && error !== 'action canceled' ) {
                   that.dispatch({
                     type: 'resetItems'
                   });
