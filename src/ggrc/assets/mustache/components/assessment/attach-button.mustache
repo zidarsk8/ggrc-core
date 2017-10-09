@@ -9,7 +9,6 @@
       {{#if canAttach}}
         {{#if isFolderAttached}}
           <ggrc-gdrive-picker-launcher class="attachment-upload-control__button"
-				       {assessment-type-objects}="assessmentTypeObjects"
                                        instance="instance"
                                        click_event="trigger_upload_parent"
                                        {disabled}="isAttachActionDisabled"
@@ -19,7 +18,6 @@
           </ggrc-gdrive-picker-launcher>
         {{else}}
          <ggrc-gdrive-picker-launcher class="attachment-upload-control__button"
-				       {assessment-type-objects}="assessmentTypeObjects"
                                        instance="instance"
                                        click_event="trigger_upload"
                                        {disabled}="isAttachActionDisabled"
