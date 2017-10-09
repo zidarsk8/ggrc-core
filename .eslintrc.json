@@ -74,6 +74,7 @@
       "boolean": false
     }],
     "no-inline-comments": 0,
+    "no-invalid-this": 0,
     "no-negated-condition": 0,
     "no-unused-vars": [2, {
       "args": "none",
