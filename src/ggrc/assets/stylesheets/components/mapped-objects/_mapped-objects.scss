@@ -78,6 +78,7 @@
     width: 100%;
     padding: 0 8px 0 28px;
     box-sizing: border-box;
+    word-wrap: break-word;
   }
 
   .more-information-wrapper {
@@ -254,6 +255,7 @@ directly-mapped-objects {
       align-self: center;
       line-height: 50px;
       margin-bottom: 5px;
+      min-width: 0;
     }
 
     .modal-mapped-objects-item__unmap {
