@@ -641,6 +641,7 @@ class CommonWidgetInfo(object):
   _HEADERS_AND_VALUES = (_INFO_WIDGET_XPATH +
                          '//div[starts-with(./@class, "span")]//h6/..')
   WIDGET = Common.INFO
+  _FOOTER = Common.INFO_WIDGET_ID + " .info-widget-footer em"
   HEADERS_AND_VALUES = (By.XPATH, _HEADERS_AND_VALUES)
   LCAS_HEADERS_AND_VALUES = None  # due to exist only for WidgetInfoAssessment
   CAS_HEADERS_AND_VALUES = (By.XPATH,
@@ -652,10 +653,9 @@ class CommonWidgetInfo(object):
   TITLE_ENTERED = (By.XPATH, _MAIN_HEADER_XPATH + "//h3")
   STATE = (By.XPATH, _MAIN_HEADER_XPATH +
            "//*[contains(normalize-space(./@class), 'state-value state')]")
-  TXT_FOOTER_CSS = (By.CSS_SELECTOR,
-                    Common.INFO_WIDGET_ID + " .info-widget-footer em")
+  TXT_FOOTER_CSS = (By.CSS_SELECTOR, _FOOTER)
   TXT_MODIFIED_BY_CSS = (By.CSS_SELECTOR,
-                         '[data-test-id="text_manager_7a906d2e"]')
+                         _FOOTER + ' [data-test-id="text_manager_7a906d2e"]')
   TXT_OBJECT_REVIEW = (
       By.CSS_SELECTOR,
       '{} [data-test-id="title_review_0ad9fbaf"] h6'.format(WIDGET))

@@ -10,7 +10,7 @@ import pytest
 
 from lib import base
 from lib.constants import value_aliases as aliases
-from lib.constants.element import ObjectStates, objects
+from lib.constants.element import ObjectStates, AuditStates, objects
 from lib.entities import entities_factory
 from lib.service import webui_service, rest_service
 from lib.entities.entity import Representation
@@ -186,16 +186,31 @@ class TestAuditPage(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.cloning
+  @pytest.mark.parametrize(
+      "create_and_clone_audit_w_params_to_update",
+      [("new_audit_rest", {"status": AuditStates.PLANNED}),
+       ("new_audit_rest", {"status": AuditStates.IN_PROGRESS}),
+       ("new_audit_rest", {"status": AuditStates.MANAGER_REVIEW}),
+       ("new_audit_rest", {"status": AuditStates.READY_FOR_EXT_REVIEW}),
+       ("new_audit_rest", {"status": AuditStates.COMPLETED})],
+      ids=["Audit statuses: 'Planned' - 'Planned'",
+           "Audit statuses: 'In Progress' - 'Planned'",
+           "Audit statuses: 'Manager Review' - 'Planned'",
+           "Audit statuses: 'Ready for External Review' - 'Planned'",
+           "Audit statuses: 'Completed' - 'Planned'"],
+      indirect=True)
   def test_cloned_audit_contains_new_attrs(
       self, create_and_clone_audit_w_params_to_update
   ):
-    """Check via UI that cloned Audit contains new predicted attributes.
+    """Check via UI that cloned Audit contains new predicted attributes using
+    all initial Audit's states.
     Preconditions:
     - Execution and return of fixture
     'create_and_clone_audit_w_params_to_update'.
     """
     expected_audit = (
-        create_and_clone_audit_w_params_to_update["expected_audit"].repr_ui())
+        create_and_clone_audit_w_params_to_update["expected_audit"].
+        update_attrs(status=AuditStates.PLANNED).repr_ui())
     actual_audit = create_and_clone_audit_w_params_to_update["actual_audit"]
     # 'expected_audit': created_at, updated_at, slug (None) *factory
     self.general_equal_assert(
@@ -233,9 +248,9 @@ class TestAuditPage(base.Test):
       [("new_assessment_template_rest", {"status": ObjectStates.DRAFT}),
        ("new_assessment_template_rest", {"status": ObjectStates.DEPRECATED}),
        ("new_assessment_template_rest", {"status": ObjectStates.ACTIVE})],
-      ids=["Using initial Assessment Template w' 'Draft' status",
-           "Using initial Assessment Template w' 'Deprecated' status",
-           "Using initial Assessment Template w' 'Active' status"],
+      ids=["Assessment Template's statuses: 'Draft' - 'Draft'",
+           "Assessment Template's' statuses: 'Deprecated' - 'Deprecated'",
+           "Assessment Template's statuses: 'Active' - 'Active'"],
       indirect=True)
   def test_clonable_audit_related_objs_move_to_cloned_audit(
       self, create_and_clone_audit_w_params_to_update, selenium
@@ -320,14 +335,14 @@ class TestAuditPage(base.Test):
     control_rest_service.update_obj(
         obj=new_control_rest, custom_attributes=dict(
             zip([gca_def.id for gca_def in gca_defs], urls)))
-    expected_result = dict(zip(
+    expected_dashboards_items = dict(zip(
         [gca_def.title.replace(aliases.DASHBOARD + "_", "")
          for gca_def in gca_defs], urls[:3]))
-    control_ui_service = webui_service.ControlsService(selenium)
-    is_dashboard_tab_exist = (control_ui_service.
-                              is_dashboard_tab_exist(new_control_rest))
+    controls_ui_service = webui_service.ControlsService(selenium)
+    is_dashboard_tab_exist = (
+        controls_ui_service.is_dashboard_tab_exist(new_control_rest))
     assert is_dashboard_tab_exist
-    actual_result = (control_ui_service.
-                     get_items_from_dashboard_widget(new_control_rest))
-    assert expected_result == actual_result
+    actual_dashboards_items = (
+        controls_ui_service.get_items_from_dashboard_widget(new_control_rest))
+    assert expected_dashboards_items == actual_dashboards_items
     cads_rest_service.delete_objs(gca_defs)

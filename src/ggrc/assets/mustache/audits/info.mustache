@@ -169,14 +169,18 @@
                 {{#if_helpers '\
                   #if' instance.archived '\
                   or ^is_allowed' "update" instance context="for"}}
-                      <ggrc-gdrive-folder-picker
-                          readonly="true"
-                          instance="instance">
-                      </ggrc-gdrive-folder-picker>
+                    <folder-attachments-list title="Attachment"
+                      readonly="true"
+                      {instance}="instance"
+                      deny-no-folder="true"
+                      tooltip="You can upload up to 10 files in a single batch">
+                    </folder-attachments-list>
                 {{else}}
-                      <ggrc-gdrive-folder-picker
-                          instance="instance">
-                      </ggrc-gdrive-folder-picker>
+                  <folder-attachments-list title="Attachment"
+                    {instance}="instance"
+                    deny-no-folder="true"
+                    tooltip="You can upload up to 10 files in a single batch">
+                  </folder-attachments-list>
                 {{/if_helpers}}
             </div>
           </div>
