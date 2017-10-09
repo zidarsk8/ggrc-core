@@ -3,12 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#values}}
-  {{#get_custom_attr_value column instance .}}
-      {{! because the object can currently only be a
-      person there is no need to switch }}
-      <tree-people-list-field {source}="object">
-          {{peopleStr}}
-      </tree-people-list-field>
-  {{/get_custom_attr_value}}
-{{/values}}
+{{#get_custom_attr_value column instance}}
+    {{! because the object can currently only be a
+    person there is no need to switch }}
+    <tree-people-list-field {source}="object">
+        {{peopleStr}}
+    </tree-people-list-field>
+{{/get_custom_attr_value}}

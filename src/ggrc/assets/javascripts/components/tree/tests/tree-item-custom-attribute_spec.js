@@ -73,6 +73,9 @@ describe('helpers.get_custom_attr_value', function () {
 
     origValue = GGRC.custom_attr_defs;
     GGRC.custom_attr_defs = fakeCustomAttrDefs;
+    fakeInstance = new can.Map({
+      custom_attribute_values: [],
+    });
 
     getCustomAttrItem = function (attrValue, attrId, attrType) {
       return new can.Map({
@@ -84,6 +87,7 @@ describe('helpers.get_custom_attr_value', function () {
 
     setCustomAttrItem = function (attrValue, attrId, attrType) {
       customAttrItem = getCustomAttrItem(attrValue, attrId, attrType);
+      fakeInstance.attr('custom_attribute_values.0', customAttrItem);
 
       spyOn(customAttrItem, 'reify')
         .and.returnValue(customAttrItem);
@@ -95,7 +99,6 @@ describe('helpers.get_custom_attr_value', function () {
   });
 
   beforeEach(function () {
-    fakeInstance = {};
     fakeAttr = {};
     fakeOptions = {};
     fakeInstance.class = {table_singular: 'control'};
@@ -105,7 +108,7 @@ describe('helpers.get_custom_attr_value', function () {
 
   it('reify() is exec if instance is not an Assessment', function () {
     setCustomAttrItem();
-    helper(fakeAttr, fakeInstance, customAttrItem, fakeOptions);
+    helper(fakeAttr, fakeInstance, fakeOptions);
 
     expect(customAttrItem.reify).toHaveBeenCalled();
   });
@@ -114,7 +117,7 @@ describe('helpers.get_custom_attr_value', function () {
     function () {
       setCustomAttrItem('correctValue');
 
-      actual = helper(fakeAttr, fakeInstance, customAttrItem, fakeOptions);
+      actual = helper(fakeAttr, fakeInstance, fakeOptions);
 
       expect(actual).toEqual('correctValue');
     });
@@ -122,7 +125,7 @@ describe('helpers.get_custom_attr_value', function () {
   it('return an empty string if customAttrItem is undefined', function () {
     setCustomAttrItem();
 
-    actual = helper(fakeAttr, fakeInstance, customAttrItem, fakeOptions);
+    actual = helper(fakeAttr, fakeInstance, fakeOptions);
 
     expect(actual).toEqual('');
   });
@@ -133,7 +136,7 @@ describe('helpers.get_custom_attr_value', function () {
     it('returns empty string when CAD wasn\'t found', function () {
       setCustomAttrItem('10', 3, 'Checkbox');
 
-      actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
       expect(actual).toEqual('');
     });
@@ -143,7 +146,7 @@ describe('helpers.get_custom_attr_value', function () {
         attr.attr_name = 'CheckBox';
         setCustomAttrItem('1', 4, 'checkbox');
 
-        actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+        actual = helper(attr, fakeInstance, fakeOptions);
 
         expect(actual).toEqual('Yes');
       });
@@ -153,7 +156,7 @@ describe('helpers.get_custom_attr_value', function () {
         attr.attr_name = 'CheckBox';
         setCustomAttrItem(0, 4, 'checkbox');
 
-        actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+        actual = helper(attr, fakeInstance, fakeOptions);
 
         expect(actual).toEqual('No');
       });
@@ -163,7 +166,7 @@ describe('helpers.get_custom_attr_value', function () {
         attr.attr_name = 'CheckBox';
         setCustomAttrItem(undefined, 4, 'checkbox');
 
-        actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+        actual = helper(attr, fakeInstance, fakeOptions);
 
         expect(actual).toEqual('');
       });
@@ -176,7 +179,7 @@ describe('helpers.get_custom_attr_value', function () {
     it('returns empty string when CAD wasn\'t found', function () {
       setCustomAttrItem('10', 3, 'Date');
 
-      actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
       expect(actual).toEqual('');
     });
@@ -189,7 +192,7 @@ describe('helpers.get_custom_attr_value', function () {
       spyOn(GGRC.Utils, 'formatDate')
         .and.returnValue(expected);
 
-      actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
       expect(actual).toEqual(expected);
       expect(GGRC.Utils.formatDate)
@@ -205,7 +208,7 @@ describe('helpers.get_custom_attr_value', function () {
         spyOn(GGRC.Utils, 'formatDate')
           .and.returnValue(expected);
 
-        actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+        actual = helper(attr, fakeInstance, fakeOptions);
 
         expect(actual).toEqual(expected);
         expect(GGRC.Utils.formatDate)
@@ -220,7 +223,7 @@ describe('helpers.get_custom_attr_value', function () {
     it('returns empty string when CAD wasn\'t found', function () {
       setCustomAttrItem('10', 3, 'Dropdown');
 
-      actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
       expect(actual).toEqual('');
     });
@@ -229,7 +232,7 @@ describe('helpers.get_custom_attr_value', function () {
       attr.attr_name = 'Dropdown';
       setCustomAttrItem('10', 10, 'Dropdown');
 
-      actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
       expect(actual).toEqual('10');
     });
@@ -239,7 +242,7 @@ describe('helpers.get_custom_attr_value', function () {
         attr.attr_name = 'Dropdown';
         setCustomAttrItem(undefined, 10, 'Dropdown');
 
-        actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+        actual = helper(attr, fakeInstance, fakeOptions);
 
         expect(actual).toEqual('');
       });
@@ -252,7 +255,7 @@ describe('helpers.get_custom_attr_value', function () {
     it('returns empty string when CAD wasn\'t found', function () {
       setCustomAttrItem('10', 3, 'Text');
 
-      actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
       expect(actual).toEqual('');
     });
@@ -261,7 +264,7 @@ describe('helpers.get_custom_attr_value', function () {
       attr.attr_name = 'Text';
       setCustomAttrItem('10', 6, 'Text');
 
-      actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
       expect(actual).toEqual('10');
     });
@@ -271,7 +274,7 @@ describe('helpers.get_custom_attr_value', function () {
         attr.attr_name = 'Text';
         setCustomAttrItem(undefined, 6, 'Text');
 
-        actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+        actual = helper(attr, fakeInstance, fakeOptions);
 
         expect(actual).toEqual('');
       });
@@ -284,7 +287,7 @@ describe('helpers.get_custom_attr_value', function () {
     it('returns empty string when CAD wasn\'t found', function () {
       setCustomAttrItem('10', 3, 'Rich Text');
 
-      actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
       expect(actual).toEqual('');
     });
@@ -293,7 +296,7 @@ describe('helpers.get_custom_attr_value', function () {
       attr.attr_name = 'Rich Text';
       setCustomAttrItem('10', 7, 'Rich Text');
 
-      actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
       expect(actual).toEqual('10');
     });
@@ -303,7 +306,7 @@ describe('helpers.get_custom_attr_value', function () {
         attr.attr_name = 'Rich Text';
         setCustomAttrItem(undefined, 7, 'Rich Text');
 
-        actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+        actual = helper(attr, fakeInstance, fakeOptions);
 
         expect(actual).toEqual('');
       });
@@ -315,7 +318,7 @@ describe('helpers.get_custom_attr_value', function () {
     it('returns empty string when CAD wasn\'t found', function () {
       setCustomAttrItem(null, 3, 'Map:Person');
 
-      actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
       expect(actual).toEqual('');
     });
@@ -327,9 +330,12 @@ describe('helpers.get_custom_attr_value', function () {
 
       beforeEach(function () {
         setCustomAttrItem(undefined, 8, 'Map:Person');
-        customAttrItem.attribute_object = {
-          reify: jasmine.createSpy('reify').and.returnValue(actualObject),
-        };
+        customAttrItem.attr('attribute_object', {
+          reify: function () {},
+        });
+        spyOn(customAttrItem.attr('attribute_object'), 'reify')
+          .and.returnValue(actualObject);
+
         attr.attr_name = 'Persons';
         fakeOptions = {
           contexts: {
@@ -338,7 +344,7 @@ describe('helpers.get_custom_attr_value', function () {
           fn: jasmine.createSpy('fn').and.returnValue(expected),
         };
 
-        actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+        actual = helper(attr, fakeInstance, fakeOptions);
       });
 
       it('returns expected result', function () {
@@ -374,7 +380,7 @@ describe('helpers.get_custom_attr_value', function () {
           fn: jasmine.createSpy('fn').and.returnValue(expected),
         };
 
-        actual = helper(attr, fakeInstance, customAttrItem, fakeOptions);
+        actual = helper(attr, fakeInstance, fakeOptions);
       });
 
       it('returns expected result', function () {
