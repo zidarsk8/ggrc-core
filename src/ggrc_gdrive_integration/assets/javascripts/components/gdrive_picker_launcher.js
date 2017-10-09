@@ -3,6 +3,8 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../utils/gdrive-picker-utils.js';
+
 (function (can, $, GGRC, CMS) {
   'use strict';
 
@@ -57,17 +59,19 @@
         // upload files without a parent folder (risk assesment)
         var that = this;
         var dfd;
+        var picker;
         var folderId = el.data('folder-id');
 
         // Create and render a Picker object for searching images.
         function createPicker() {
-          window.oauth_dfd
+          GGRC.Controllers.GAPI.oauth_dfd
             .done(function () {
               var dialog;
               var view;
               var docsView;
               var docsUploadView;
-              var picker = new google.picker.PickerBuilder()
+
+              picker = new google.picker.PickerBuilder()
                 .setOAuthToken(gapi.auth.getToken().access_token)
                 .setDeveloperKey(GGRC.config.GAPI_KEY)
                 .setMaxItems(10)
@@ -123,6 +127,8 @@
           } else if (data[ACTION] === CANCEL) {
             el.trigger('rejected');
           }
+
+          GGRC.Utils.GDrivePicker.ensurePickerDisposed(picker, data);
         }
 
         dfd = GGRC.Controllers.GAPI.reAuthorize(gapi.auth.getToken());

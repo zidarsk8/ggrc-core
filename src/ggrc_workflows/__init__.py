@@ -5,6 +5,7 @@
 
 from datetime import datetime, date
 from flask import Blueprint
+from logging import getLogger
 from sqlalchemy import inspect, and_, orm
 
 from ggrc import db
@@ -18,6 +19,7 @@ from ggrc.services.registry import service
 from ggrc_workflows import models, notification
 from ggrc_workflows.models import relationship_helper
 from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
+from ggrc_workflows.notification import pusher
 from ggrc_workflows.converters import IMPORTABLE, EXPORTABLE
 from ggrc_workflows.converters.handlers import COLUMN_HANDLERS
 from ggrc_workflows.services.common import Signals
@@ -29,6 +31,10 @@ from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
 from ggrc_basic_permissions.contributed_roles import (
     RoleContributions, RoleDeclarations, DeclarativeRoleImplications
 )
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
 
 
 # Initialize Flask Blueprint for extension
@@ -257,6 +263,13 @@ def create_old_style_cycle(cycle, task_group, cycle_task_group, current_user):
 
 def build_cycle(workflow, cycle=None, current_user=None):
   """Build a cycle with it's child objects"""
+
+  if not workflow.tasks:
+    logger.error("Starting a cycle has failed on Workflow with "
+                 "slug == '%s' and id == '%s'", workflow.slug, workflow.id)
+    pusher.update_or_create_notifications(workflow, date.today(),
+                                          "cycle_start_failed")
+    return
 
   # Determine the relevant Workflow
   cycle = cycle or models.Cycle()
@@ -889,10 +902,11 @@ def start_recurring_cycles():
     # Follow same steps as in model_posted.connect_via(models.Cycle)
     while workflow.next_cycle_start_date <= date.today():
       cycle = build_cycle(workflow)
+      if not cycle:
+        break
       db.session.add(cycle)
       notification.handle_cycle_created(cycle, False)
       notification.handle_workflow_modify(None, workflow)
-    db.session.add(workflow)
   log_event(db.session)
   db.session.commit()
 

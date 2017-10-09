@@ -49,7 +49,7 @@ setup () {
   git submodule update --init
 
   docker-compose --file docker-compose-testing.yml --project-name ${PROJECT} \
-    build --build-arg CHROME_DRIVER_VERSION=2.32 ${MACHINE_ID}
+    build ${MACHINE_ID}
 
   docker-compose --file docker-compose-testing.yml \
     --project-name ${PROJECT} \
@@ -112,6 +112,7 @@ selenium_tests () {
   docker exec -id ${PROJECT}_dev_1 su -c "
     source /vagrant/bin/init_vagrant_env
     source /vagrant/bin/init_test_env
+    export DASHBOARD_INTEGRATION='on'
     launch_ggrc
   "
 

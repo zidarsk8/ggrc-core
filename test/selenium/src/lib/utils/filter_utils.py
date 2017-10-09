@@ -7,6 +7,7 @@ from dateutil import parser
 import string_utils
 from lib.constants import value_aliases as alias
 from lib.constants.element import AdminWidgetCustomAttributes
+from lib.entities.entity import Entity
 
 
 class FilterUtils(object):
@@ -67,8 +68,9 @@ class FilterUtils(object):
           else string_utils.get_list_of_all_cases(alias.NO_VAL))
     elif ca_type == AdminWidgetCustomAttributes.PERSON:
       from lib.service import rest_service
-      person = rest_service.ObjectsInfoService().get_obj_by_id(
-          *ca_val.split(":"))
+      person = rest_service.ObjectsInfoService().get_obj(
+          obj=Entity.convert_dict_to_obj_repr(
+              dict(zip(["type", "id"], ca_val.split(":")))))
       values_to_filter = [person.name, person.email]
     elif ca_type == AdminWidgetCustomAttributes.DATE:
       date_formats = ["%m/%d/%Y", "%m/%Y", "%Y-%m-%d", "%Y-%m", "%Y"]

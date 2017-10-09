@@ -113,15 +113,6 @@ class AdminWidgetCustomAttributes(object):
   ALL_CA_TYPES = (TEXT, RICH_TEXT, DATE, CHECKBOX, DROPDOWN, PERSON)
 
 
-class Common(object):
-  """Common elements' labels and properties for objects."""
-  TITLE = "Title"
-  DESCRIPTION = "Description"
-  CODE = "Code"
-  # fictional elements (need to convert UI attrs to Entities attrs)
-  CAS = "CAs"
-
-
 class Base(object):
   """Base elements' labels and properties for objects."""
   WIDGET_INFO_HEADER_FORMAT = "{} Info"
@@ -129,6 +120,19 @@ class Base(object):
   STATE = "State"
   EFFECTIVE_DATE = "Effective Date"
   STOP_DATE = "Stop Date"
+
+
+class Common(object):
+  """Common elements' labels and properties for objects."""
+  TITLE = "Title"
+  DESCRIPTION = "Description"
+  CODE = "Code"
+  STATE = Base.STATE
+  # fictional elements (need to convert UI attrs to Entities attrs)
+  CAS = "CAs"
+  MODIFIED_BY = "Modified by"
+  CREATED_AT = "Created at"
+  UPDATED_AT = "Updated at"
 
 
 class CommonModalCreate(object):
@@ -148,6 +152,7 @@ class CommonModalSetVisibleFields(Common):
   CODE = Common.CODE
   STATE = Base.STATE
   LAST_UPDATED = "Last Updated"
+  LAST_UPDATED_BY = LAST_UPDATED + " By"
   SET_FIELDS = "Set Fields"
 
 
@@ -156,11 +161,12 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
  visible fields for object as Tree View headers.
  """
   ADMIN = roles.ADMIN
+  PRIMARY_CONTACTS = roles.PRIMARY_CONTACTS
+  SECONDARY_CONTACTS = roles.SECONDARY_CONTACTS
   VERIFIED = "Verified"
   STATUS = "Status"
-  AUDIT_LEAD = "Audit Captain"
+  AUDIT_CAPTAIN = "Audit Captain"
   MANAGER = "Manager"
-  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
   MAPPED_OBJECTS = "Mapped Objects"
   REVIEW_STATE = "Review State"
   CREATORS = "Creators"
@@ -187,7 +193,7 @@ class CommonAudit(Common):
   PLANNED_START_DATE = "Planned Start Date"
   PLANNED_END_DATE = "Planned End Date"
   PLANNED_REPORT_PERIOD = "Report Period"
-  AUDIT_LEAD = "Audit Captain"
+  AUDIT_CAPTAIN = "Audit Captain"
   AUDIT_FIRM = " Audit Firm"
   AUDITORS = "Auditors"
   ADD_AUDITOR = "+ Add Auditor"
@@ -200,7 +206,7 @@ class CommonControl(Common):
   CONTROL = objects.get_normal_form(objects.get_singular(objects.CONTROLS))
   STATE = Base.STATE
   ADMIN = roles.ADMIN
-  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
+  PRIMARY_CONTACTS = roles.PRIMARY_CONTACTS
   CREATORS = "Creators"
   MAPPED_OBJECTS = "Mapped Objects"
 
@@ -210,7 +216,7 @@ class CommonObjective(Common):
   OBJECTIVE = objects.get_normal_form(objects.get_singular(objects.OBJECTIVES))
   STATE = Base.STATE
   ADMIN = roles.ADMIN
-  PRIMARY_CONTACT = roles.PRIMARY_CONTACT
+  PRIMARY_CONTACTS = roles.PRIMARY_CONTACTS
   CREATORS = "Creators"
   MAPPED_OBJECTS = "Mapped Objects"
 
@@ -241,6 +247,13 @@ class CommonIssue(Common):
   """Common elements' labels and properties for Issues objects."""
   ISSUE = objects.get_normal_form(objects.get_singular(objects.ISSUES))
   STATE = Base.STATE
+
+
+class ReviewStates(object):
+  """Objects' from 'ALL_OBJS_W_REVIEW_STATE' Review labels and properties."""
+  OBJECT_REVIEW = "Object Review"
+  REVIEWED = "Reviewed"
+  UNREVIEWED = "Unreviewed"
 
 
 class ObjectStates(object):
@@ -279,13 +292,14 @@ class IssueStates(ObjectStates):
 class ProgramInfoWidget(CommonProgram):
   """Elements' labels and properties for Programs Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonProgram.PROGRAM)
+  OBJECT_REVIEW_UPPER = ReviewStates.OBJECT_REVIEW.upper()
 
 
 class AuditInfoWidget(CommonAudit):
   """Elements' labels and properties for Audits Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonAudit.AUDIT)
   TITLE_UPPER = CommonAudit.TITLE.upper()
-  AUDIT_LEAD_UPPER = CommonAudit.AUDIT_LEAD.upper()
+  AUDIT_CAPTAIN_UPPER = CommonAudit.AUDIT_CAPTAIN.upper()
   CODE_UPPER = CommonAudit.CODE.upper()
 
 
@@ -294,12 +308,14 @@ class ControlInfoWidget(CommonControl):
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonControl.CONTROL)
   TITLE_UPPER = CommonControl.TITLE.upper()
   CODE_UPPER = CommonControl.CODE.upper()
+  OBJECT_REVIEW_UPPER = ReviewStates.OBJECT_REVIEW.upper()
 
 
 class AssessmentInfoWidget(CommonAssessment):
   """Elements' labels and properties for Assessments Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonAssessment.ASMT)
   TITLE_UPPER = CommonAssessment.TITLE.upper()
+  TITLE_EDITED_PART = "[EDITED]"
   CODE_UPPER = CommonAssessment.CODE.upper()
   COMMENTS_HEADER = "RESPONSES/COMMENTS"
 
@@ -308,6 +324,7 @@ class IssueInfoWidget(CommonIssue):
   """Elements' labels and properties for Issue Info widgets."""
   TITLE_UPPER = CommonIssue.TITLE.upper()
   CODE_UPPER = CommonIssue.CODE.upper()
+  OBJECT_REVIEW_UPPER = ReviewStates.OBJECT_REVIEW.upper()
 
 
 class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -320,7 +337,7 @@ class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE,
       CommonModalSetVisibleFields.CODE,
-      CommonModalSetVisibleFields.LAST_UPDATED,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY,
       CommonModalSetVisibleFields.STATE)
 
 
@@ -341,7 +358,7 @@ class AssessmentModalSetVisibleFields(CommonModalSetVisibleFields):
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.STATE,
       VERIFIED, CommonModalSetVisibleFields.CODE, CREATORS, ASSIGNEES,
-      CommonModalSetVisibleFields.LAST_UPDATED)
+      CommonModalSetVisibleFields.LAST_UPDATED_BY)
 
 
 class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -353,6 +370,8 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonControl.CONTROL)
   REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
   ADMIN = TransformationSetVisibleFields.ADMIN
+  PRIMARY_CONTACTS = TransformationSetVisibleFields.PRIMARY_CONTACTS
+  SECONDARY_CONTACTS = TransformationSetVisibleFields.SECONDARY_CONTACTS
   EFFECTIVE_DATE = Base.EFFECTIVE_DATE
   KIND_NATURE = "Kind/Nature"
   FRAUD_RELATED = "Fraud Related"
@@ -362,9 +381,10 @@ class ControlModalSetVisibleFields(CommonModalSetVisibleFields):
   ASSERTIONS = "Assertions"
   CATEGORIES = "Categories"
   DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE, ADMIN,
-      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
-      CommonModalSetVisibleFields.LAST_UPDATED, REVIEW_STATE)
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
+      CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, REVIEW_STATE,
+      PRIMARY_CONTACTS, ADMIN)
 
 
 class ObjectiveModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -380,7 +400,7 @@ class ObjectiveModalSetVisibleFields(CommonModalSetVisibleFields):
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, ADMIN,
       CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
-      CommonModalSetVisibleFields.LAST_UPDATED, REVIEW_STATE)
+      REVIEW_STATE)
 
 
 class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -394,8 +414,7 @@ class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
   REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, ADMIN,
-      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE,
-      CommonModalSetVisibleFields.LAST_UPDATED)
+      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE)
 
 
 class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -408,10 +427,13 @@ class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
   REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
   MANAGER = CommonProgram.MANAGER
   EFFECTIVE_DATE = Base.EFFECTIVE_DATE
+  PRIMARY_CONTACTS = TransformationSetVisibleFields.PRIMARY_CONTACTS
+  SECONDARY_CONTACTS = TransformationSetVisibleFields.SECONDARY_CONTACTS
   DEFAULT_SET_FIELDS = (
       CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
       CommonModalSetVisibleFields.STATE,
-      CommonModalSetVisibleFields.LAST_UPDATED, REVIEW_STATE, MANAGER)
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, REVIEW_STATE, MANAGER,
+      PRIMARY_CONTACTS)
 
 
 class MappingStatusAttrs(namedtuple('_MappingStatusAttrs',
@@ -436,6 +458,7 @@ class TransformationElements(TransformationSetVisibleFields, CommonAssessment):
   """All transformation elements' labels and properties witch are using to
   convert UI attributes to entities attributes.
   """
+  OBJECT_REVIEW = ReviewStates.OBJECT_REVIEW
 
 
 class AssessmentTabContainer(object):

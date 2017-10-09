@@ -67,7 +67,7 @@ class TestProgramPage(base.Test):
         modal.ui_effective_date.text
     ]
     actual_list_texts = [
-        program_info_page.title_entered().text,
+        program_info_page.title.text,
         program_info_page.description_entered.text,
         program_info_page.notes_entered.text,
         program_info_page.code_entered.text,
@@ -112,7 +112,7 @@ class TestProgramPage(base.Test):
         modal.ui_description.text, modal.ui_notes.text,
         modal.ref_url.values]
     actual_list_texts = [
-        updated_program_info_page.title_entered().text,
+        updated_program_info_page.title.text,
         updated_program_info_page.description_entered.text,
         updated_program_info_page.notes_entered.text,
         updated_program_info_page.ref_url.values]

@@ -43,26 +43,6 @@ to prevent pushes to google/ggrc-core.
 
        git remote add upstream git@github.com:google/ggrc-core.git
 
-4. prevent pushing to upstream.
-
-   ..  code-block:: bash
-
-       git remote set-url --push upstream $(git remote get-url --push origin)
-       git fetch upstream
-
-5. now make sure your develop branch is tracking the correct repo
-
-   ..  code-block:: bash
-
-       git checkout develop
-       git checkout -b develop upstream/develop
-
-6. to list your branches and their tracking branch run
-
-   ..  code-block:: bash
-
-       git branch -vv
-
 Extra:
 
 get a pull request from google/ggrc-core without adding other remotes to
@@ -72,7 +52,7 @@ make an alias (assuming upstream is pointing to google/ggrc-core.git)
 
 ..  code-block:: bash
 
-    git config alias.pr '!f() { git checkout develop; git branch -D pr-$1; git fetch upstream develop:pr-$1; git checkout pr-$1; git fetch upstream pull/$1/head; git merge FETCH_HEAD -m \"Automatic merge\"; }; f'
+    git config alias.pr '!f() { git fetch upstream dev; git checkout -B pr-$1 FETCH_HEAD; git fetch upstream pull/$1/head; git merge --no-ff FETCH_HEAD -m \"Automatic merge\"; }; f'
 
 fetch a given pull request
 

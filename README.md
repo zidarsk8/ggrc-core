@@ -54,6 +54,14 @@ directory
     vim docker-compose.override.yml # Add the keys from cloud console
     ```
 
+    Note: if the keys aren't set in with your override file, try restarting the 
+    container with 
+
+    ```
+    docker-compose stop
+    docker-compose up -d
+    ```
+
 To log into the container, run the following:
 
 ``` sh

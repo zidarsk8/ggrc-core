@@ -2,12 +2,7 @@
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
-<button class="btn btn-small btn-lightBlue" ($click)="showRelatedResponses" title="Show Related Assessments">Related Assessments</button>
-<simple-modal {instance}="instance" modal-title="modalTitle" {(state)}="state" extra-css-class="related-assessments">
-    <div class="simple-modal__body">
-      {{> '/static/mustache/assessments/related-assessments.mustache' }}
-    </div>
-</simple-modal>
+
 {{#unless instance.archived}}
   {{#is_allowed 'update' instance context='for'}}
       <custom-attributes-actions

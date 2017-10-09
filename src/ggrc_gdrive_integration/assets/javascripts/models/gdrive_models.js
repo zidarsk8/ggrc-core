@@ -3,6 +3,8 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../utils/gdrive-picker-utils.js';
+
 (function (can) {
   'use strict';
 
@@ -290,15 +292,19 @@
     uploadFiles: function () {
       var that = this;
       var dfd = new $.Deferred();
+      var picker;
+      var GAPIController = GGRC.Controllers.GAPI;
+
       gapi.load('picker', {
         callback: createPicker
       });
 
         // Create and render a Picker object for searching images.
       function createPicker() {
-        window.oauth_dfd.done(function (token, oauth_user) {
+        GAPIController.oauth_dfd.done(function (token, oauth_user) {
           var dialog;
-          var picker = new google.picker.PickerBuilder()
+
+          picker = new google.picker.PickerBuilder()
                   .addView(new google.picker.DocsUploadView().setParent(that.id))
                   .addView(google.picker.ViewId.DOCS)
                   .setOAuthToken(gapi.auth.getToken().access_token)
@@ -324,6 +330,7 @@
         } else if (action === google.picker.Action.CANCEL) {
           dfd.reject('action canceled');
         }
+        GGRC.Utils.GDrivePicker.ensurePickerDisposed(picker, data);
       }
       return dfd.promise();
     }

@@ -92,6 +92,10 @@
         attr_title: 'Created Date',
         attr_name: 'created_at',
         order: 8
+      }, {
+        attr_title: 'Archived',
+        attr_name: 'archived',
+        order: 16,
       }],
       display_attr_names: ['title', 'status', 'assignees', 'verifiers',
         'updated_at']
