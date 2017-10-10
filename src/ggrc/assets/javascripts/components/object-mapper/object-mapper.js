@@ -65,8 +65,9 @@
       );
 
       return GGRC.VM.ObjectOperationsBaseVM.extend({
-        join_object_id: resolvedConfig['join-object-id'] ||
-           (GGRC.page_instance() && GGRC.page_instance().id),
+        join_object_id: resolvedConfig.isNew ? null :
+          resolvedConfig['join-object-id'] ||
+          (GGRC.page_instance() && GGRC.page_instance().id),
         object: resolvedConfig.object,
         type: getDefaultType(resolvedConfig.type, resolvedConfig.object),
         config: config,

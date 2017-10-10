@@ -91,8 +91,8 @@ describe('GGRC.Controllers.ObjectMapper', function () {
         });
       });
 
-      it('extends generalConfig with "object", "type" and "relevantTo" if ' +
-      'data has is_new',
+      it(`extends generalConfig with "object", "type" "isNew" and "relevantTo"
+      'if data has is_new`,
       function (done) {
         var args;
         method(_.extend(fakeData, {
@@ -108,6 +108,7 @@ describe('GGRC.Controllers.ObjectMapper', function () {
               general: jasmine.objectContaining({
                 object: fakeData.join_object_type,
                 type: fakeData.join_option_type,
+                isNew: true,
                 relevantTo: jasmine.any(Array),
               }),
             })

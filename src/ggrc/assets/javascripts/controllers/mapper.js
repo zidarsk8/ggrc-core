@@ -98,6 +98,7 @@ import '../components/unified-mapper/mapper-results';
           _.extend(config.general, {
             object: data.join_object_type,
             type: data.join_option_type,
+            isNew: true,
             relevantTo: [{
               readOnly: true,
               type: data.snapshot_scope_type,
