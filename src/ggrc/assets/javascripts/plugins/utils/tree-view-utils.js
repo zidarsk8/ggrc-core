@@ -110,18 +110,20 @@
      * @param {String} modelType - Model type.
      * @param {Object} displayPrefs - Display preferences.
      * @param {Boolean} [includeRichText] - Need to include Rich Text in the configuration
+     * @param {String} modelName - Model name.
      * @return {Object} Table columns configuration.
      */
-    function getColumnsForModel(modelType, displayPrefs, includeRichText) {
+    function getColumnsForModel(modelType, displayPrefs, includeRichText,
+      modelName) {
       var Cacheable = can.Model.Cacheable;
       var Model = CMS.Models[modelType];
       var modelDefinition = Model().class.root_object;
-      var modelName = Model.model_singular;
       var mandatoryAttrNames =
         Model.tree_view_options.mandatory_attr_names ||
         Cacheable.tree_view_options.mandatory_attr_names;
       var savedAttrList = displayPrefs ?
-        displayPrefs.getTreeViewHeaders(modelName) : [];
+        displayPrefs.getTreeViewHeaders(modelName || Model.model_singular) :
+        [];
       var displayAttrNames =
         savedAttrList.length ? savedAttrList :
           (Model.tree_view_options.display_attr_names ||
@@ -232,9 +234,11 @@
      * @param {String} modelType - Model type.
      * @param {Array} columnNames - Array of column names.
      * @param {Object} displayPrefs - Display preferences.
+     * @param {String} modelName - Model name.
      * @return {Object} Table columns configuration.
      */
-    function setColumnsForModel(modelType, columnNames, displayPrefs) {
+    function setColumnsForModel(modelType, columnNames, displayPrefs,
+      modelName) {
       var availableColumns =
         getColumnsForModel(modelType, displayPrefs, true).available;
       var selectedColumns = [];
@@ -254,7 +258,7 @@
 
       if (displayPrefs) {
         displayPrefs.setTreeViewHeaders(
-          CMS.Models[modelType].model_singular,
+          modelName || CMS.Models[modelType].model_singular,
           selectedNames
         );
         displayPrefs.save();
@@ -361,6 +365,7 @@
      * @param {Number} filterInfo.filter -
      * @param {Object} filter -
      * @param {Object} request - Collection of QueryAPI sub-requests
+     * @param {Boolean} transforToSnapshot - Transform query to Snapshot
      * @return {Promise} Deferred Object
      */
     function loadFirstTierItems(modelName,
@@ -368,18 +373,21 @@
                                 filterInfo,
                                 filter,
                                 request) {
+      var modelConfig = GGRC.Utils.ObjectVersions
+        .getWidgetConfig(modelName);
+
       var params = QueryAPI.buildParam(
-        modelName,
+        modelConfig.responseType,
         filterInfo,
-        makeRelevantExpression(modelName, parent.type, parent.id),
+        makeRelevantExpression(modelConfig.name, parent.type, parent.id),
         null,
         filter
       );
       var requestedType;
       var requestData = request.slice() || can.List();
 
-      if (SnapshotUtils.isSnapshotScope(parent) &&
-        SnapshotUtils.isSnapshotModel(modelName)) {
+      if ((SnapshotUtils.isSnapshotScope(parent) &&
+        SnapshotUtils.isSnapshotModel(modelConfig.name))) {
         params = SnapshotUtils.transformQuery(params);
       }
 
@@ -390,7 +398,7 @@
           response = _.last(response)[requestedType];
 
           response.values = response.values.map(function (source) {
-            return _createInstance(source, modelName);
+            return _createInstance(source, modelConfig.responseType);
           });
 
           return response;
@@ -406,13 +414,13 @@
      * @return {Promise} - Items for sub tier.
      */
     function loadItemsForSubTier(models, type, id, filter) {
-      var loadedModels = [];
       var relevant = {
         type: type,
         id: id,
         operation: 'relevant'
       };
       var showMore = false;
+      var loadedModelObjects = [];
 
       return _buildSubTreeCountMap(models, relevant, filter)
         .then(function (result) {
@@ -421,26 +429,31 @@
           var mappedDfd;
           var resultDfd;
 
-          loadedModels = Object.keys(countMap);
+          loadedModelObjects = GGRC.Utils.ObjectVersions
+            .getWidgetConfigs(Object.keys(countMap));
           showMore = result.showMore;
 
-          dfds = loadedModels.map(function (model) {
-            var subTreeFields = getSubTreeFields(type, model);
+          dfds = loadedModelObjects.map(function (modelObject) {
+            var subTreeFields = getSubTreeFields(type, modelObject.name);
             var pageInfo = {
               filter: filter
             };
             var params;
 
-            if (countMap[model]) {
+            if (countMap[modelObject.name]) {
               pageInfo.current = 1;
-              pageInfo.pageSize = countMap[model];
+              pageInfo.pageSize = countMap[modelObject.name];
             }
 
             params = QueryAPI.buildParam(
-              model,
+              modelObject.responseType,
               pageInfo,
               relevant,
-              subTreeFields);
+              subTreeFields,
+              modelObject.additionalFilter ?
+                GGRC.query_parser.parse(modelObject.additionalFilter) :
+                null
+            );
 
             if (SnapshotUtils.isSnapshotRelated(
                 relevant.type,
@@ -468,18 +481,18 @@
           var notRelated = [];
           var response = can.makeArray(arguments);
 
-          loadedModels.forEach(function (modelName, index) {
+          loadedModelObjects.forEach(function (modelObject, index) {
             var values;
 
-            if (SnapshotUtils.isSnapshotModel(modelName) &&
+            if (SnapshotUtils.isSnapshotModel(modelObject.name) &&
               response[index].Snapshot) {
               values = response[index].Snapshot.values;
             } else {
-              values = response[index][modelName].values;
+              values = response[index][modelObject.name].values;
             }
 
             values.forEach(function (source) {
-              var instance = _createInstance(source, modelName);
+              var instance = _createInstance(source, modelObject.name);
 
               if (isDirectlyRelated(instance)) {
                 directlyRelated.push(instance);
@@ -552,6 +565,34 @@
      * @param {Array} models - Type of model.
      * @param {Object} relevant - Relevant description
      * @param {String} filter - Filter string.
+     * @return {Array} - List of queries
+     * @private
+     */
+    function _getQuerryObjectVersion(models, relevant, filter) {
+      var countQuery = [];
+      models.forEach(function (model) {
+        var widgetConfig = GGRC.Utils.ObjectVersions
+          .getWidgetConfig(model);
+        var name = widgetConfig.name;
+        var query = QueryAPI
+          .buildCountParams([name], relevant, filter);
+
+        if (widgetConfig.isObjectVersion) {
+          query = SnapshotUtils.transformQuery(query[0]);
+          countQuery.push(query);
+        } else {
+          countQuery.push(query[0]);
+        }
+      });
+
+      return countQuery;
+    }
+
+    /**
+     *
+     * @param {Array} models - Type of model.
+     * @param {Object} relevant - Relevant description
+     * @param {String} filter - Filter string.
      * @return {Promise} - Counts for limitation load items for sub tier
      * @private
      */
@@ -559,6 +600,7 @@
       var countQuery;
       var result;
       var countMap = {};
+      var objectVersionsUtils = GGRC.Utils.ObjectVersions;
 
       if (_isFullSubTree(relevant.type)) {
         models.forEach(function (model) {
@@ -569,15 +611,19 @@
           showMore: false
         });
       } else {
-        countQuery = QueryAPI.buildCountParams(models, relevant, filter)
-          .map(function (param) {
-            if (SnapshotUtils.isSnapshotRelated(
-                relevant.type,
-                param.object_name)) {
-              param = SnapshotUtils.transformQuery(param);
-            }
-            return param;
-          });
+        if (objectVersionsUtils.parentHasObjectVersions(relevant.type)) {
+          countQuery = _getQuerryObjectVersion(models, relevant, filter);
+        } else {
+          countQuery = QueryAPI.buildCountParams(models, relevant, filter)
+            .map(function (param) {
+              if (SnapshotUtils.isSnapshotRelated(
+                  relevant.type,
+                  param.object_name)) {
+                param = SnapshotUtils.transformQuery(param);
+              }
+              return param;
+            });
+        }
 
         result = QueryAPI.makeRequest({data: countQuery})
           .then(function (response) {

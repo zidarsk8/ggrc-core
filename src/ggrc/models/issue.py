@@ -3,6 +3,9 @@
 
 """Issue Model."""
 
+import itertools
+
+from ggrc import builder
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.deferred import deferred
@@ -33,7 +36,12 @@ class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
   VALID_STATES = BusinessObject.VALID_STATES + (FIXED, FIXED_AND_VERIFIED, )
 
   # REST properties
-  _api_attrs = reflection.ApiAttributes("audit")
+  _api_attrs = reflection.ApiAttributes(
+      reflection.Attribute("audit", create=False, update=False),
+      reflection.Attribute("allow_map_to_audit", create=False, update=False),
+      reflection.Attribute("allow_unmap_from_audit",
+                           create=False, update=False),
+  )
 
   _aliases = {
       "test_plan": {
@@ -44,8 +52,31 @@ class Issue(Roleable, HasObjectState, TestPlanned, CustomAttributable,
           "mandatory": False,
           "description": "Options are: \n{} ".format('\n'.join(VALID_STATES))
       },
+      "audit": None,
   }
 
   audit_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=False),
+      db.Column(db.Integer, db.ForeignKey('audits.id'), nullable=True),
       'Issue')
+
+  @builder.simple_property
+  def allow_map_to_audit(self):
+    """False if self.audit or self.audit_id is set, True otherwise."""
+    return self.audit_id is None and self.audit is None
+
+  @builder.simple_property
+  def allow_unmap_from_audit(self):
+    """False if Issue is mapped to any Assessment/Snapshot, True otherwise."""
+    from ggrc.models import all_models
+
+    restricting_types = {all_models.Assessment, all_models.Snapshot}
+    restricting_types = set(m.__name__.lower() for m in restricting_types)
+
+    # pylint: disable=not-an-iterable
+    restricting_srcs = (rel.source_type.lower() in restricting_types
+                        for rel in self.related_sources
+                        if rel not in db.session.deleted)
+    restricting_dsts = (rel.destination_type.lower() in restricting_types
+                        for rel in self.related_destinations
+                        if rel not in db.session.deleted)
+    return not any(itertools.chain(restricting_srcs, restricting_dsts))

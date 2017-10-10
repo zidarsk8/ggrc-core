@@ -120,8 +120,9 @@
                   parent_instance="instance"
                   instance="instance"
                   mapping="related_objects_as_source"
-                  from-binding="true"
+                  from-query-api="true"
                   {type}="instance.assessment_type"
+                  {new-instance}="instance.isNew"
                   deferred="true"
                   {^changes}="mappedObjectsChanges">
             <label class="ggrc-form-item__label">
@@ -143,12 +144,12 @@
                       </object-list-item-updater>
                     </div>
                     <div class="modal-mapped-objects-item__unmap">
-                      {{^is type 'Audit'}}
+                      {{^if_in type 'Audit, Issue'}}
                         <a href="javascript://" data-toggle="unmap">
                           <span class="result" {{data 'result'}}></span>
                           <i class="fa fa-trash"></i>
                         </a>
-                      {{/is}}
+                      {{/if_in}}
                     </div>
                   </div>
                 {{/each}}

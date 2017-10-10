@@ -44,10 +44,10 @@
             <a class="btn btn-link create-control"
                 href="javascript://"
                 data-toggle="modal-ajax-form"
-                data-unique-id="{{join_object_id}}"
                 data-modal-class="modal-wide"
                 data-object-singular="{{model.singular}}"
                 data-object-plural="{{model.plural}}"
+                data-unique-id="{{join_object_id}}"
                 data-join-object-id="{{join_object_id}}">
                 Create and map new object
             </a>
@@ -145,7 +145,7 @@
   <collapsible-panel {soft-mode}="true" {title-text}="'Search Results ({{*totalObjects}})'" {(expanded)}="showResults">
     <div class="search-results">
       <mapper-results
-        class="{{#useSnapshots}}snapshot-list{{/useSnapshots}}"
+        class="{{#if showAsSnapshots}}snapshot-list{{/if}}"
         base-instance="parentInstance"
         {(is-loading)}="is_loading"
         object="object"
