@@ -99,11 +99,11 @@ describe('GGRC.Components.datepicker', function () {
       it('create datepicker in specified format', function () {
         method();
         expect(element.datepicker('option', 'dateFormat'))
-          .toEqual(viewModel.PICKER_ISO_DATE);
+          .toEqual(GGRC.Date.PICKER_ISO_DATE);
         expect(element.datepicker('option', 'altField')[0])
           .toEqual(altField[0]);
         expect(element.datepicker('option', 'altFormat'))
-          .toEqual(viewModel.PICKER_DISPLAY_FMT);
+          .toEqual(GGRC.Date.PICKER_DISPLAY_FMT);
       });
       it('sets new datepicker to picker of viewModel', function () {
         method();
