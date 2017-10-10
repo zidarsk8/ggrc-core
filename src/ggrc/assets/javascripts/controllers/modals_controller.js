@@ -1095,7 +1095,6 @@ import '../components/access_control_list/access_control_list_roles_helper'
       var params;
       var type;
       var name;
-      var msg;
 
       if (instance.errors()) {
         instance.removeAttr('_suppress_errors');
@@ -1156,16 +1155,15 @@ import '../components/access_control_list/access_control_list_roles_helper'
 
             if (instanceId === undefined) { // new element
               if (obj.is_declining_review && obj.is_declining_review == '1') {
-                msg = 'Review declined';
-              } else if (name) {
-                msg = 'New ' + type + ' ' + name + ' added successfully.';
-              } else {
-                msg = 'New ' + type + ' added successfully.';
+                $(document.body).trigger('ajax:flash', {
+                  success: 'Review declined'
+                });
               }
             } else {
-              msg = name + ' modified successfully.';
+              $(document.body).trigger('ajax:flash', {
+                success: `${name} modified successfully.`
+              });
             }
-            $(document.body).trigger('ajax:flash', {success: msg});
             finish();
           }
         });
