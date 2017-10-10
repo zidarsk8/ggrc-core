@@ -450,7 +450,13 @@ class MappingColumnHandler(ColumnHandler):
                            mapped_type=obj.type,
                            object_type=current_obj.type)
       elif self.unmap and mapping:
-        db.session.delete(mapping)
+        if not (self.mapping_object.__name__ == "Audit" and
+                not getattr(current_obj, "allow_unmap_from_audit", True)):
+          db.session.delete(mapping)
+        else:
+          self.add_warning(errors.UNMAP_AUDIT_RESTRICTION,
+                           mapped_type=obj.type,
+                           object_type=current_obj.type)
     db.session.flush()
     self.dry_run = True
 
