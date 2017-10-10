@@ -298,10 +298,10 @@
           this.source(this.last_request, function (items) {
             try {
               listItems = context.attr('items');
+              context.attr('oldLen', listItems.length);
               listItems.push.apply(listItems, can.map(items, function (item) {
                 return item.item;
               }));
-              context.attr('oldLen', listItems.length);
             } catch (error) {
               // Really ugly way to hide canjs exception during scrolling.
               // Please note that it occurs in really rear cases.
