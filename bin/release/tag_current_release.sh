@@ -34,10 +34,11 @@ write_visible_message () {
 
 version_script () {
   declare -r SETTINGS_FILE="src/ggrc/settings/default.py"
+  declare -r TARGET_REF="FETCH_HEAD"
 
   cat <<EOF
 BUILD_NUMBER = ""
-$(grep "VERSION =" $SETTINGS_FILE)
+$(git grep -h "VERSION =" $TARGET_REF -- $SETTINGS_FILE)
 print VERSION
 EOF
 }
