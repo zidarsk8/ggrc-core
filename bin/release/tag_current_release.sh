@@ -32,6 +32,16 @@ write_visible_message () {
   echo '-----'
 }
 
+version_script () {
+  declare -r SETTINGS_FILE="src/ggrc/settings/default.py"
+
+  cat <<EOF
+BUILD_NUMBER = ""
+$(grep "VERSION =" $SETTINGS_FILE)
+print VERSION
+EOF
+}
+
 main () {
   if [[ "${1:-}" == "--help" ]]; then
     usage
@@ -40,7 +50,7 @@ main () {
 
   git fetch upstream master
 
-  v=$(python -c "BUILD_NUMBER='' ; $(grep 'VERSION =' src/ggrc/settings/default.py) ; print VERSION")
+  v=$(version_script | python -)
   git tag -s -m "$v" $v FETCH_HEAD
 
   write_visible_message "$(git rev-parse FETCH_HEAD) is tagged as $v"
