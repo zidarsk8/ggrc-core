@@ -143,10 +143,8 @@ class RecordBuilder(object):
     person_id, person_name, person_email = self.get_person_id_name_email(
         person
     )
-    subproperties["{}-name".format(person_id)] = person_name
-    subproperties["{}-user_name".format(person_id)] = \
-        person_email.split("@")[0]
     subproperties["{}-email".format(person_id)] = person_email
+    subproperties["{}-name".format(person_id)] = person_name
     return subproperties
 
   def build_list_sort_subprop(self, people):
@@ -158,8 +156,7 @@ class RecordBuilder(object):
     if not people:
       return {"__sort__": ""}
     _, _, emails = zip(*(self.get_person_id_name_email(p) for p in people))
-    sort_values = (email.split("@")[0] for email in emails)
-    content = ":".join(sorted(sort_values))
+    content = ":".join(sorted(emails))
     return {"__sort__": content}
 
   def get_custom_attribute_properties(self, definition, value):

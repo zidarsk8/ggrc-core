@@ -390,8 +390,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     self.assert_indexed_fields(snapshot, role_name, {
         "{}-email".format(person.id): person.email,
         "{}-name".format(person.id): person.name,
-        "{}-user_name".format(person.id): person.user_name,
-        "__sort__": person.user_name,
+        "__sort__": person.email,
     })
 
   def test_index_by_acr(self):
@@ -425,8 +424,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     self.assert_indexed_fields(snapshot, role_name, {
         "{}-email".format(person.id): person.email,
         "{}-name".format(person.id): person.name,
-        "{}-user_name".format(person.id): person.user_name,
-        "__sort__": person.user_name,
+        "__sort__": person.email,
     })
 
   @ddt.data(
