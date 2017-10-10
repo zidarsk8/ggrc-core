@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Module of classes inherited from AbstractTabContainer control."""
 from lib import base
-from lib.constants import element, locator, roles
+from lib.constants import element, locator, roles, value_aliases
 from lib.element.tables import (AssessmentRelatedAsmtsTable,
                                 AssessmentRelatedIssuesTable)
 from lib.utils import selenium_utils
@@ -26,10 +26,15 @@ class AssessmentTabContainer(base.AbstractTabContainer):
         self._elements.RELATED_ISSUES_TAB: AssessmentRelatedIssuesTable,
         self._elements.CHANGE_LOG_TAB: self._log_tab_validate}
 
-  def switch_to_tab(self, tab_name):
-    """Method for switch active tab to another one according to tab's name."""
-    if self._tab_controller.active_tab.text != tab_name:
-      self._tab_controller.active_tab = tab_name
+  def get_tab_object(self, tab_name):
+    """Switch to passed tab, then return object of this tab which declared in
+    "_tabs" method.
+    for example:
+    Page Object or any
+    """
+    self.tab_controller.active_tab = tab_name
+    return self.tabs[tab_name](
+        self._driver, self._get_active_tab_element())
 
   @staticmethod
   def _log_tab_validate(_driver, log_panel_element):
@@ -77,3 +82,33 @@ class AssessmentTabContainer(base.AbstractTabContainer):
     log_list = selenium_utils.get_when_all_visible(
         log_panel_element, tab_locators.LOG_LIST_CSS)
     return [check_log_item(el) for el in log_list]
+
+
+class DashboardWidget(base.AbstractTabContainer):
+  """Class of 'Dashboard' widget which contains one or few tabs."""
+
+  def _tabs(self):
+    """If dashboard controller exists set 'tab' items to actual tabs.
+    Else set 'tab' items to only one active item.
+      - Return: dict of tab members
+    """
+    if selenium_utils.is_element_exist(self._driver,
+                                       self._locators.TAB_CONTROLLER):
+      tabs = {tab_el.text: self._get_active_tab_element()
+              for tab_el in self.tab_controller.get_items()}
+    else:
+      tabs = {value_aliases.DEFAULT: self._get_active_tab_element()}
+    return tabs
+
+  def _get_locators(self):
+    """Return locators of DashboardContainer."""
+    return locator.DashboardWidget
+
+  def get_all_tab_names_and_urls(self):
+    """Return source urls of all Dashboard members."""
+    all_tabs_urls = {}
+    for tab_name, tab_el in self._tabs().iteritems():
+      if tab_name != value_aliases.DEFAULT:
+        self.tab_controller.active_tab = tab_name
+      all_tabs_urls[tab_name] = tab_el.get_property("src")
+    return all_tabs_urls

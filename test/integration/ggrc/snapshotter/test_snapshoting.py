@@ -497,7 +497,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     It is expected that all objects will be triplets.
     """
 
-    self._import_file("snapshotter_create.csv")
+    self._check_csv_response(self._import_file("snapshotter_create.csv"), {})
 
     # Verify that all objects got imported correctly.
     for _type in Types.all:
@@ -534,7 +534,7 @@ class TestSnapshoting(SnapshotterBaseTestCase):
 
   def test_snapshot_update_is_idempotent(self):
     """Test that nothing has changed if there's nothing to update"""
-    self._import_file("snapshotter_create.csv")
+    self._check_csv_response(self._import_file("snapshotter_create.csv"), {})
 
     program = db.session.query(models.Program).filter(
         models.Program.slug == "Prog-13211"

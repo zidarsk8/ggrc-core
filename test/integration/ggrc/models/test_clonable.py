@@ -361,7 +361,7 @@ class TestClonable(SnapshotterBaseTestCase):
   def test_audit_snapshot_scope_cloning(self):
     """Test that exact same copy of original audit scope is created."""
 
-    self._import_file("snapshotter_create.csv")
+    self._check_csv_response(self._import_file("snapshotter_create.csv"), {})
 
     program = db.session.query(models.Program).filter(
         models.Program.slug == "Prog-13211"
@@ -379,7 +379,7 @@ class TestClonable(SnapshotterBaseTestCase):
 
     self.assertEqual(snapshots.count(), len(Types.all) * 3)
 
-    self._import_file("snapshotter_update.csv")
+    self._check_csv_response(self._import_file("snapshotter_update.csv"), {})
 
     # We create another copy of this object to test that it will not be
     # snapshotted

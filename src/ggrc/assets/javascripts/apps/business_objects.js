@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import SummaryWidgetController from '../controllers/summary_widget_controller';
+
 (function (can, $) {
   var CoreExtension = {};
 
@@ -78,7 +80,7 @@
       if (summaryWidgetViews[objectTable]) {
         widgetList.add_widget(object.constructor.shortName, 'summary', {
           widget_id: 'summary',
-          content_controller: GGRC.Controllers.SummaryWidget,
+          content_controller: SummaryWidgetController,
           instance: object,
           widget_view: summaryWidgetViews[objectTable],
           order: 3

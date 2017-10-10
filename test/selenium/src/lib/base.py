@@ -13,11 +13,12 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote import webelement
 
 from lib import constants, exception, mixin
-from lib.constants import url, messages
-from lib.constants.element import MappingStatusAttrs
+from lib.constants import url, messages, objects
+from lib.constants.element import MappingStatusAttrs, WidgetBar
 from lib.constants.locator import CommonDropdownMenu
+from lib.decorator import lazy_property
 from lib.entities.entity import Entity
-from lib.utils import selenium_utils
+from lib.utils import selenium_utils, help_utils
 
 
 class InstanceRepresentation(object):
@@ -50,50 +51,68 @@ class Test(InstanceRepresentation):
   __metaclass__ = mixin.MetaTestDecorator
 
   @staticmethod
-  def extended_assert(expected_objs, actual_objs, issue_msg, *exclude_attrs):
-    """Perform extended assert for expected and actual objects according to
-    dictionary of attributes to exclude and providing issue's message.
-    Initially, based on original objects prepare expected and actual
-    collections to performing of extended comparison procedure ('split_objs'),
-    where:
-    'exp_objs_wo_ex_attrs', 'act_objs_wo_ex_attrs' - list objects w/o excluding
-    attributes;
-    'exp_ex_attrs', 'act_ex_attrs' - list dictionaries w/ excluding attributes
-    (items which contain attributes' names and values);
-    'issue_msg' - issue message for pytest xfail procedure;
-    'exclude_attrs' - list of excluding attributes names.
-    Finally, make pytest assert for objects, then xfail assert for attributes.
+  def general_equal_assert(expected_objs, actual_objs, *exclude_attrs):
+    """Perform general equal assert for deepcopy converted to list expected and
+    actual objects according to '*exclude_attrs' tuple of excluding attributes'
+    names (compare objects' collections w/ attributes' values set to None).
     """
-    split_objs = (
-        Test.general_assert(
-            expected_objs, actual_objs, *exclude_attrs))
-    assert (True if Entity.is_list_of_attrs_equal(
-        split_objs["exp_ex_attrs"], split_objs["act_ex_attrs"])
-        else pytest.xfail(reason=issue_msg))
+    expected_objs_wo_excluded_attrs, actual_objs_wo_excluded_attrs = (
+        Entity.extract_objs(help_utils.convert_to_list(expected_objs),
+                            help_utils.convert_to_list(actual_objs),
+                            *exclude_attrs))
+    assert (expected_objs_wo_excluded_attrs ==
+            actual_objs_wo_excluded_attrs), (
+        messages.AssertionMessages.format_err_msg_equal(
+            expected_objs_wo_excluded_attrs, actual_objs_wo_excluded_attrs))
 
   @staticmethod
-  def general_assert(expected_objs, actual_objs, *exclude_attrs):
-    """Perform extended assert for expected and actual objects according to
-    dictionary of attributes to exclude and providing issue's message.
-    Initially, based on original objects prepare expected and actual
-    collections to performing of extended comparison procedure ('split_objs'),
-    where:
-    'exp_objs_wo_ex_attrs', 'act_objs_wo_ex_attrs' - list objects w/o excluding
-    attributes;
-    'exp_ex_attrs', 'act_ex_attrs' - list dictionaries w/ excluding attributes
-    (items which contain attributes' names and values);
-    'issue_msg' - issue message for pytest xfail procedure;
-    'exclude_attrs' - list of excluding attributes names.
+  def general_contain_assert(expected_obj, actual_objs, *exclude_attrs):
+    """Perform general contain assert for deepcopy converted expected object
+    and actual objects according to '*exclude_attrs' tuple of excluding
+    attributes' names
+    (compare objects' collections w/ attributes' values set to None).
     """
-    # pylint: disable=invalid-name
-    split_objs = Entity.extract_excluding_attrs(
-        expected_objs, actual_objs, *exclude_attrs)
-    assert (split_objs["exp_objs_wo_ex_attrs"] ==
-            split_objs["act_objs_wo_ex_attrs"]), (
-        messages.AssertionMessages.format_err_msg_equal(
-            split_objs["exp_objs_wo_ex_attrs"],
-            split_objs["act_objs_wo_ex_attrs"]))
-    return split_objs
+    expected_obj_wo_excluded_attrs = Entity.extract_objs_wo_excluded_attrs(
+        help_utils.convert_to_list(expected_obj), *exclude_attrs)[0]
+    actual_objs_wo_excluded_attrs = Entity.extract_objs_wo_excluded_attrs(
+        help_utils.convert_to_list(actual_objs), *exclude_attrs)
+    assert (expected_obj_wo_excluded_attrs in
+            actual_objs_wo_excluded_attrs), (
+        messages.AssertionMessages.format_err_msg_contains(
+            expected_obj_wo_excluded_attrs, actual_objs_wo_excluded_attrs))
+
+  @staticmethod
+  def xfail_equal_assert(expected_objs, actual_objs, issue_msg,
+                         *exclude_attrs):
+    """Perform xfail equal assert based on deepcopy converted to list expected
+    and actual objects according to 'issue_msg' string and '*exclude_attrs'
+    tuple of excluding attributes' names (compare simple' collections based on
+    excluding attributes (attributes' names and values, if 'False' then rise
+    pytest's xfail, else pytest's fail.
+    """
+    expected_excluded_attrs, actual_excluded_attrs = (
+        Entity.extract_simple_collections(
+            help_utils.convert_to_list(expected_objs),
+            help_utils.convert_to_list(actual_objs), *exclude_attrs))
+    assert_msg = messages.AssertionMessages.format_err_msg_equal(
+        expected_excluded_attrs, actual_excluded_attrs)
+    is_list_excluded_attrs_equal = (
+        Entity.is_list_of_attrs_equal(
+            expected_excluded_attrs, actual_excluded_attrs))
+    Test.check_xfail_or_fail(
+        is_condition=is_list_excluded_attrs_equal, issue_msg=issue_msg,
+        assert_msg=assert_msg)
+
+  @staticmethod
+  def check_xfail_or_fail(is_condition, issue_msg, assert_msg):
+    """Check according to 'is_condition' if test test was xfailed or failed for
+    some reason which corresponds to 'issue_msg' and 'assert_msg' messages.
+    If 'is_condition' is False then xfail, if True then fail.
+    """
+    if not is_condition:
+      pytest.xfail(reason=issue_msg + assert_msg)
+    else:
+      pytest.fail(msg=issue_msg + " was fixed" + assert_msg)
 
 
 class TestUtil(InstanceRepresentation):
@@ -540,12 +559,27 @@ class Widget(AbstractPage):
     (source_obj_plural, source_obj_id, widget_name,
      mapped_obj_singular, mapped_obj_id) = matched_url_parts
     self.source_obj_from_url = source_obj_plural
-
     self.source_obj_id_from_url = source_obj_id
-    self.widget_name_from_url = (widget_name.split("_")[0] or
-                                 constants.element.WidgetBar.INFO)
+    self.widget_name_from_url = widget_name.split("_")[0]
     self.mapped_obj_from_url = mapped_obj_singular
     self.mapped_obj_id_from_url = mapped_obj_id
+
+  @property
+  def is_info_page_not_panel(self):
+    """Check is the current page is Info Page and not Info Panel according to
+    checking existing of element by locator and URL's logic."""
+    is_info_page = False
+    if selenium_utils.is_element_exist(
+        self._driver, (By.XPATH, constants.locator.Common.INFO_PAGE_XPATH)
+    ):
+      if ((self.widget_name_from_url == WidgetBar.INFO.lower()) or
+          ((objects.get_singular(self.source_obj_from_url) ==
+           self.mapped_obj_from_url) and
+          (self.source_obj_id_from_url == self.mapped_obj_id_from_url)) or
+          (self.widget_name_from_url == self.mapped_obj_from_url ==
+           self.mapped_obj_id_from_url == "")):
+        is_info_page = True
+    return is_info_page
 
 
 class TreeView(Component):
@@ -971,9 +1005,6 @@ class AbstractTabContainer(Component):
     super(AbstractTabContainer, self).__init__(driver)
     self.container_element = container_element
     self._locators = self._get_locators()
-    from lib.element.elements_list import TabController
-    self._tab_controller = TabController(
-        self._driver, self._locators.TAB_CONTROLLER)
     self.tabs = self._tabs()
 
   def _get_locators(self):
@@ -984,17 +1015,15 @@ class AbstractTabContainer(Component):
     """Return element of active tab"""
     return self.container_element.find_element(*self._locators.TAB_CONTENT)
 
-  def get_tab_object(self, tab_name):
-    """Switch to tab, then return object of this tab, for example:
-    Page Object or any
-    """
-    self._tab_controller.active_tab = tab_name
-    return self.tabs[tab_name](
-        self._driver, self._get_active_tab_element())
-
   def _tabs(self):
     """Abstract method. Should return dict. {'tab_name': tab_object, ...}"""
     raise NotImplementedError
+
+  @lazy_property
+  def tab_controller(self):
+    """Lazy property for dashboard controller."""
+    from lib.element.elements_list import TabController
+    return TabController(self._driver, self._locators.TAB_CONTROLLER)
 
 
 class AbstractTable(Component):

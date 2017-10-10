@@ -6,6 +6,7 @@ what is mappable to it.
 """
 
 from lib import base, factory
+from lib.base import Button
 from lib.constants import locator, element
 from lib.element import widget_bar
 from lib.page.widget import admin_widget
@@ -62,6 +63,17 @@ class _ObjectWidgetBar(_WidgetBar):
         self._driver,
         locator.WidgetBarButtonAddDropdown.ALL_MAPPABLE_WIDGETS_OBJS)
     return [add_el.text for add_el in add_elements]
+
+  def select_dashboard_tab(self):
+    """Select 'Dashboard' tab on Object Widget Bar."""
+    Button(self._driver, locator.WidgetBar.DASHBOARD_TAB).click()
+    return selenium_utils.get_when_visible(
+        self._driver, locator.DashboardWidget.TAB_CONTAINER)
+
+  def is_dashboard_tab_exist(self):
+    """Check is 'Dashboard' tab exist on Object Widget Bar."""
+    return selenium_utils.is_element_exist(
+        self._driver, locator.WidgetBar.DASHBOARD_TAB)
 
   def select_info(self):
     """Select Info widget/tab. Each object has different Info widget."""

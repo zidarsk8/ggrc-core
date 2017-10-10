@@ -50,6 +50,12 @@ NOT_YET_SNAPSHOTABLE = (RISK_ASSESSMENTS, PROJECTS)
 ALL_CA_OBJS = ALL_SNAPSHOTABLE_OBJS + NOT_YET_SNAPSHOTABLE + (
     WORKFLOWS, PROGRAMS, AUDITS, ISSUES, ASSESSMENTS, PEOPLE)
 
+ALL_OBJS_W_REVIEW_STATE = (
+    PROGRAMS, ISSUES, STANDARDS, REGULATIONS, SECTIONS, OBJECTIVES, CONTROLS,
+    PRODUCTS, SYSTEMS, PROCESSES, ACCESS_GROUPS, CLAUSES, CONTRACTS,
+    DATA_ASSETS, FACILITIES, MARKETS, ORG_GROUPS, POLICIES, PROJECTS, RISKS,
+    THREATS, VENDORS)
+
 
 def _get_singular(plurals):
   """
@@ -135,5 +141,5 @@ ALL_PLURAL = [k for k in globals().keys() if
 
 ALL_SINGULAR = _get_singular(ALL_PLURAL)
 
-ALL_OBJS = [getattr(sys.modules[__name__], obj) for obj in
-            sys.modules[__name__].ALL_PLURAL]
+ALL_OBJS = [obj for obj in [getattr(sys.modules[__name__], _obj) for _obj in
+            sys.modules[__name__].ALL_PLURAL] if isinstance(obj, str)]

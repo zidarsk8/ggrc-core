@@ -22,4 +22,4 @@ from api_search.setup_environment import SetupEnvironment
 SetupEnvironment()
 "
 
-mysqldump -uroot -proot -h$HOST $DB_NAME > $DUMP_PATH_NAME
+mysqldump -h$HOST $DB_NAME > $DUMP_PATH_NAME

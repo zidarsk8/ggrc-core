@@ -9,7 +9,8 @@ from requests import exceptions
 
 from lib import environment, factory
 from lib.constants import url, objects, messages
-from lib.entities.entities_factory import ObjectPersonsFactory, EntitiesFactory
+from lib.entities.entities_factory import (
+    ObjectPersonsFactory, EntitiesFactory, CustomAttributeDefinitionsFactory)
 from lib.entities.entity import Entity
 from lib.service.rest import client, query
 from lib.utils import help_utils
@@ -68,10 +69,10 @@ class BaseRestService(object):
   def update_obj(self, obj, **attrs):
     """Update attributes values of existing object via REST API."""
     obj.update_attrs(**attrs)
-    return self.get_items_from_resp(
+    return self.set_obj_attrs(obj=obj, attrs=self.get_items_from_resp(
         self.client.update_object(
             href=obj.href, **dict({k: v for k, v in obj.__dict__
-                                  .iteritems() if k != "href"}.items())))
+                                  .iteritems() if k != "href"}.items()))))
 
   @staticmethod
   def get_items_from_resp(response):
@@ -232,6 +233,13 @@ class CustomAttributeDefinitionsService(BaseRestService):
     super(CustomAttributeDefinitionsService, self).__init__(
         url.CUSTOM_ATTRIBUTES)
 
+  def create_dashboard_gcas(self, obj_type, count=1):
+    """Create 'Dashboard' CAs via rest according to passed obj_type and count.
+    """
+    return [self.create_objs(1, CustomAttributeDefinitionsFactory().
+            create_dashboard_ca(obj_type.lower()).__dict__)[0]
+            for _ in xrange(count)]
+
 
 class RelationshipsService(HelpRestService):
   """Service for creating relationships between entities."""
@@ -269,19 +277,34 @@ class ObjectsInfoService(HelpRestService):
     """Get and return snapshoted object according to 'origin_obj' and
     'paren_obj'.
     """
-    snapshoted_obj_item = (
+    snapshoted_obj_dict = (
         BaseRestService.get_items_from_resp(self.client.create_object(
             type=self.endpoint, object_name=EntitiesFactory.obj_snapshot,
             filters=query.Query.expression_get_snapshoted_obj(
                 obj_type=origin_obj.type, obj_id=origin_obj.id,
                 parent_type=paren_obj.type,
                 parent_id=paren_obj.id))).get("values")[0])
-    return Entity.convert_dict_to_obj_repr(snapshoted_obj_item)
+    return Entity.convert_dict_to_obj_repr(snapshoted_obj_dict)
 
-  def get_obj_by_id(self, obj_type, obj_id):
-    """Get and return object according to passed 'obj_type' and 'obj_id'"""
-    obj = (BaseRestService.get_items_from_resp(self.client.create_object(
-        type=self.endpoint, object_name=unicode(obj_type),
-        filters=query.Query.expression_get_obj_by_id(obj_id))).get(
+  def get_obj(self, obj):
+    """Get and return object according to 'obj.type' and 'obj.id'."""
+    obj_dict = (BaseRestService.get_items_from_resp(self.client.create_object(
+        type=self.endpoint, object_name=unicode(obj.type),
+        filters=query.Query.expression_get_obj_by_id(obj.id))).get(
         "values")[0])
-    return Entity.convert_dict_to_obj_repr(obj)
+    return Entity.convert_dict_to_obj_repr(obj_dict)
+
+  def get_comment_obj(self, paren_obj, comment_description):
+    """Get and return comment object according to 'paren_obj' type) and
+    comment_description 'paren_obj'. As default 'is_sort_by_created_at' and if
+    even comments have the same descriptions query return selection w/ latest
+    created datetime.
+    """
+    comment_obj_dict = (
+        BaseRestService.get_items_from_resp(self.client.create_object(
+            type=self.endpoint, object_name=EntitiesFactory.obj_comment,
+            filters=query.Query.expression_get_comment_by_desc(
+                parent_type=paren_obj.type, parent_id=paren_obj.id,
+                comment_desc=comment_description),
+            order_by=[{"name": "created_at", "desc": True}])).get("values")[0])
+    return Entity.convert_dict_to_obj_repr(comment_obj_dict)

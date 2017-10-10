@@ -49,7 +49,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
   def test_create_indexing(self):
     """Test that creating objects results in full index"""
 
-    self._import_file("snapshotter_create.csv")
+    self._check_csv_response(self._import_file("snapshotter_create.csv"), {})
 
     control = db.session.query(models.Control).filter(
         models.Control.slug == "control-3"
@@ -93,7 +93,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     # Add custom attribute values via factory doesn't create revisions, so
     # we modify all the objects via import, which saves the full object
     # state in revisions table (including custom attribute values).
-    self._import_file("snapshotter_update.csv")
+    self._check_csv_response(self._import_file("snapshotter_update.csv"), {})
 
     program = db.session.query(models.Program).filter(
         models.Program.slug == "Prog-13211"
@@ -173,7 +173,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
   def test_update_indexing(self):
     """Test that creating objects results in full index"""
 
-    self._import_file("snapshotter_create.csv")
+    self._check_csv_response(self._import_file("snapshotter_create.csv"), {})
 
     access_group = db.session.query(models.AccessGroup).filter(
         models.AccessGroup.title == "ag-2"
@@ -201,7 +201,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
     # Add custom attribute values via factory doesn't create revisions, so
     # we modify all the objects via import, which saves the full object
     # state in revisions table (including custom attribute values).
-    self._import_file("snapshotter_update.csv")
+    self._check_csv_response(self._import_file("snapshotter_update.csv"), {})
 
     program = db.session.query(models.Program).filter(
         models.Program.slug == "Prog-13211"
@@ -316,7 +316,7 @@ class TestSnapshotIndexing(SnapshotterBaseTestCase):
 
   def test_full_reindex(self):
     """Test full reindex of all snapshots"""
-    self._import_file("snapshotter_create.csv")
+    self._check_csv_response(self._import_file("snapshotter_create.csv"), {})
 
     program = db.session.query(models.Program).filter(
         models.Program.slug == "Prog-13211"

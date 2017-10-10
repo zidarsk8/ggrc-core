@@ -42,11 +42,12 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     """Set up test cases for all tests."""
     TestCase.clear_data()
     # This imported file could be simplified a bit to speed up testing.
-    cls._import_file("data_for_export_testing.csv")
+    cls.response = cls._import_file("data_for_export_testing.csv")
 
   def setUp(self):
     self.client.get("/login")
     self.generator = generator.ObjectGenerator()
+    self._check_csv_response(self.response, {})
 
   def test_basic_query_eq(self):
     """Filter by = operator."""
@@ -1346,7 +1347,7 @@ class TestQueryWithUnicode(TestCase, WithQueryApi):
     """Set up test cases for all tests."""
     TestCase.clear_data()
     cls._generate_cad()
-    cls._import_file("querying_with_unicode.csv")
+    cls.response = cls._import_file("querying_with_unicode.csv")
 
   @classmethod
   def _generate_cad(cls):
@@ -1377,6 +1378,7 @@ class TestQueryWithUnicode(TestCase, WithQueryApi):
 
   def setUp(self):
     self.client.get("/login")
+    self._check_csv_response(self.response, {})
 
   @ddt.data(
       ("title", u"программа A"),

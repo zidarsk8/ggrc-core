@@ -92,36 +92,50 @@
       attr_view: GGRC.mustache_path + '/audits/tree-item-attr.mustache',
       attr_list: [{
         attr_title: 'Title',
-        attr_name: 'title'
+        attr_name: 'title',
+        order: 1,
       }, {
         attr_title: 'Audit Captain',
         attr_name: 'audit_lead',
-        attr_sort_field: 'contact'
+        attr_sort_field: 'contact',
+        order: 2,
       }, {
         attr_title: 'Code',
-        attr_name: 'slug'
+        attr_name: 'slug',
+        order: 3,
       }, {
         attr_title: 'Status',
-        attr_name: 'status'
+        attr_name: 'status',
+        order: 4,
       }, {
         attr_title: 'Last Updated',
-        attr_name: 'updated_at'
+        attr_name: 'updated_at',
+        order: 5,
       }, {
         attr_title: 'Last Updated By',
-        attr_name: 'modified_by'
+        attr_name: 'modified_by',
+        order: 6,
       }, {
         attr_title: 'Planned Start Date',
-        attr_name: 'start_date'
+        attr_name: 'start_date',
+        order: 7,
       }, {
         attr_title: 'Planned End Date',
-        attr_name: 'end_date'
+        attr_name: 'end_date',
+        order: 8,
       }, {
         attr_title: 'Planned Report Period to',
         attr_name: 'report_period',
-        attr_sort_field: 'report_end_date'
+        attr_sort_field: 'report_end_date',
+        order: 9,
       }, {
         attr_title: 'Audit Firm',
-        attr_name: 'audit_firm'
+        attr_name: 'audit_firm',
+        order: 10,
+      }, {
+        attr_title: 'Archived',
+        attr_name: 'archived',
+        order: 11,
       }],
       draw_children: true
     },

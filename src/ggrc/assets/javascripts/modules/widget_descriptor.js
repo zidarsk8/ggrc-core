@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import SummaryWidgetController from '../controllers/summary_widget_controller';
+
 (function ($, CMS, GGRC) {
   // A widget descriptor has the minimum five properties:
   // widget_id:  the unique ID string for the widget
@@ -57,7 +59,7 @@
             return instance.constructor.title_singular + ' Summary';
           },
           widget_icon: 'pie-chart',
-          content_controller: GGRC.Controllers.SummaryWidget,
+          content_controller: SummaryWidgetController,
           content_controller_options: {
             instance: instance,
             model: instance.constructor,

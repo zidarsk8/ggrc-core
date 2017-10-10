@@ -4,6 +4,7 @@
 */
 
 import './widget_descriptor';
+import SummaryWidgetController from '../controllers/summary_widget_controller';
 
 (function ($, CMS, GGRC) {
   /*
@@ -52,7 +53,7 @@ import './widget_descriptor';
             options && options.instance || widget.instance,
             options && options.widget_view || widget.widget_view
           );
-        } else if (ctrl && ctrl === GGRC.Controllers.SummaryWidget) {
+        } else if (ctrl && ctrl === SummaryWidgetController) {
           descriptors[widgetId] = GGRC.WidgetDescriptor.make_summary_widget(
             options &&
             options.instance ||

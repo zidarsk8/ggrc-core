@@ -24,7 +24,7 @@ DEFAULT_USER_HREF = "/".join([API, PEOPLE, str(1)])
 
 
 class Widget(object):
-  """URL's parts for widgets."""
+  """URL's constants parts for widgets."""
   # pylint: disable=too-few-public-methods
   # admin dashboard page
   CUSTOM_ATTRIBUTES = "#custom_attribute_widget"
@@ -34,6 +34,7 @@ class Widget(object):
   # widgets
   INFO = "#info_widget"
   AUDITS = "#audit_widget"
+  SUMMARY = "#Summary_widget"  # audits
   ASSESSMENTS = "#assessment_widget"
   ASSESSMENT_TEMPLATES = "#assessment_template_widget"
   CONTROLS = "#control_widget"
@@ -43,5 +44,6 @@ class Widget(object):
 
 def get_widget_name_of_mapped_objs(obj_name):
   """Get and return widget name for mapped objects (URL's parts for widgets)
-  based on object name."""
+  based on object name.
+  """
   return "#" + get_singular(obj_name) + "_widget"
