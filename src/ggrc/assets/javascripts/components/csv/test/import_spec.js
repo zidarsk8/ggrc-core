@@ -3,14 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Component from '../import';
+
 describe('GGRC.Components.csvImportWidget', function () {
   'use strict';
-
-  var Component;  // the component under test
-
-  beforeAll(function () {
-    Component = GGRC.Components.get('csvImportWidget');
-  });
 
   describe('scope.states() method', function () {
     var method;  // the method under test
