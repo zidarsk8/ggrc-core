@@ -3,10 +3,12 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import BaseTreePeopleVM from '../view-models/tree-people-base-vm';
+
 (function (can, GGRC) {
   'use strict';
 
-  var viewModel = GGRC.VM.BaseTreePeopleField.extend({
+  var viewModel = BaseTreePeopleVM.extend({
     filter: '@',
     getSourceList: function () {
       var filter = this.attr('filter');
