@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -7,8 +7,8 @@ export default can.Map.extend({
   define: {
     stub: {
       type: 'boolean',
-      value: true
-    }
+      value: true,
+    },
   },
   source: null,
   people: [],
@@ -61,5 +61,5 @@ export default can.Map.extend({
     });
 
     return rq.trigger();
-  }
+  },
 });

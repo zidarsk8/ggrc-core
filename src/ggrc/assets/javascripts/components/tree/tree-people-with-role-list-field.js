@@ -1,17 +1,17 @@
-/*!
+/*
   Copyright (C) 2017 Google Inc., authors, and contributors <see AUTHORS file>
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 import BaseTreePeopleVM from '../view-models/tree-people-base-vm';
 
-var viewModel = BaseTreePeopleVM.extend({
+const viewModel = BaseTreePeopleVM.extend({
   role: null,
   getSourceList: function () {
-    var roleName = this.attr('role');
-    var instance = this.attr('source');
+    let roleName = this.attr('role');
+    let instance = this.attr('source');
     return GGRC.Utils.peopleWithRoleName(instance, roleName);
-  }
+  },
 });
 
 export default GGRC.Components('treePeopleWithRoleListField', {
@@ -21,6 +21,6 @@ export default GGRC.Components('treePeopleWithRoleListField', {
   events: {
     '{viewModel.source} change': function () {
       this.viewModel.refreshPeople();
-    }
-  }
+    },
+  },
 });
