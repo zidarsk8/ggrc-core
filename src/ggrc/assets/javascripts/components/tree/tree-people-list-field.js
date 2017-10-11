@@ -22,7 +22,7 @@
 
   GGRC.Components('treePeopleListField', {
     tag: 'tree-people-list-field',
-    template: '<content />',
+    template: '{{peopleStr}}',
     viewModel: viewModel,
     events: {
       '{viewModel.source} change': function () {

@@ -17,7 +17,7 @@
 
   GGRC.Components('treePeopleWithRoleListField', {
     tag: 'tree-people-with-role-list-field',
-    template: '<content />',
+    template: '{{peopleStr}}',
     viewModel: viewModel,
     events: {
       '{viewModel.source} change': function () {

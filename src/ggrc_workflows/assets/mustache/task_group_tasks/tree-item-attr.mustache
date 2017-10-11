@@ -5,9 +5,7 @@
 
 {{#switch attr_name}}
   {{#case 'assignee'}}
-      <tree-people-list-field {source}="instance.contact">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.contact"/>
   {{/case}}
   {{#case 'status'}}
     {{#using status=instance.status}}
