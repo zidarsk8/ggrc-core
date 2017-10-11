@@ -6,33 +6,31 @@
 //= require can.jquery-all
 //= require models/local_storage
 
-(function(can, $){
+var COLLAPSE = 'collapse';
+var LHN_SIZE = 'lhn_size';
+var OBJ_SIZE = 'obj_size';
+var SORTS = 'sorts';
+var HEIGHTS = 'heights';
+var COLUMNS = 'columns';
+var PBC_LISTS = 'pbc_lists';
+var GLOBAL = 'global';
+var LHN_STATE = 'lhn_state';
+var TOP_NAV = 'top_nav';
+var FILTER_WIDGET = 'filter_widget';
+var TREE_VIEW_HEADERS = 'tree_view_headers';
+var TREE_VIEW_STATES = 'tree_view_states';
+var TREE_VIEW = 'tree_view';
+var CHILD_TREE_DISPLAY_LIST = 'child_tree_display_list';
+var MODAL_STATE = 'modal_state';
+var path = window.location.pathname.replace(/\./g, '/');
 
-var COLLAPSE = "collapse",
-  LHN_SIZE = "lhn_size",
-  OBJ_SIZE = "obj_size",
-  SORTS = "sorts",
-  HEIGHTS = "heights",
-  COLUMNS = "columns",
-  PBC_LISTS = "pbc_lists",
-  GLOBAL = "global",
-  LHN_STATE = "lhn_state",
-  TOP_NAV = "top_nav",
-  FILTER_WIDGET = "filter_widget",
-  TREE_VIEW_HEADERS = "tree_view_headers",
-  TREE_VIEW_STATES = "tree_view_states",
-  TREE_VIEW = "tree_view",
-  CHILD_TREE_DISPLAY_LIST = "child_tree_display_list",
-  MODAL_STATE = "modal_state",
-  path = window.location.pathname.replace(/\./g, "/");
-
-can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
+can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
   autoupdate: true,
   version: 20150129, // Last updated to add 2 accessors
 
   findAll: function () {
     var that = this;
-    var objs_dfd = this._super.apply(this, arguments)
+    var objsDfd = this._super.apply(this, arguments)
     .then(function (objs) {
       var i;
       for (i = objs.length; i--;) {
@@ -43,25 +41,26 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
       }
       return objs;
     });
-    return objs_dfd;
+    return objsDfd;
   },
 
   findOne: function () {
     var that = this;
-    var obj_dfd = this._super.apply(this, arguments)
+    var objDfd = this._super.apply(this, arguments)
     .then(function (obj) {
-      var dfd, p;
+      var dfd;
+      var p;
       if (!obj.version || obj.version < that.version) {
         obj.destroy();
         dfd = new $.Deferred();
         p = dfd.promise();
         p.status = 404;
-        return dfd.reject(p, "error", "Object expired");
+        return dfd.reject(p, 'error', 'Object expired');
       } else {
         return obj;
       }
     });
-    return obj_dfd;
+    return objDfd;
   },
 
   create: function (opts) {
@@ -75,8 +74,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   },
 
   getSingleton: function () {
-    var deferred,
-        prefs;
+    var prefs;
     if (this.cache) {
       return $.when(this.cache);
     }
@@ -91,7 +89,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     });
     this.cache = prefs;
     return $.when(prefs);
-  }
+  },
 }, {
   init: function () {
     this.autoupdate = this.constructor.autoupdate;
@@ -113,67 +111,71 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
   getObject: function () {
     var args = can.makeArray(arguments);
-    args[0] === null && args.splice(0,1);
-    return can.getObject(args.join("."), this);
+    args[0] === null && args.splice(0, 1);
+    return can.getObject(args.join('.'), this);
   },
 
   // collapsed state
   // widgets on a page may be collapsed such that only the title bar is visible.
-  // if page_id === null, this is a global value
-  setCollapsed: function (page_id, widget_id, is_collapsed) {
-    this.makeObject(page_id === null ? page_id : path, COLLAPSE).attr(widget_id, is_collapsed);
+  // if pageId === null, this is a global value
+  setCollapsed: function (pageId, widgetId, isCollapsed) {
+    this.makeObject(pageId === null ? pageId : path, COLLAPSE)
+      .attr(widgetId, isCollapsed);
 
     this.autoupdate && this.save();
     return this;
   },
 
-  getCollapsed: function (page_id, widget_id) {
-    var collapsed = this.getObject(page_id === null ? page_id : path, COLLAPSE);
+  getCollapsed: function (pageId, widgetId) {
+    var collapsed = this.getObject(pageId === null ? pageId : path, COLLAPSE);
     if (!collapsed) {
-      collapsed = this.makeObject(page_id === null ? page_id : path, COLLAPSE).attr(this.makeObject(COLLAPSE, page_id).serialize());
+      collapsed = this.makeObject(pageId === null ? pageId : path, COLLAPSE)
+        .attr(this.makeObject(COLLAPSE, pageId).serialize());
     }
 
-    return widget_id ? collapsed.attr(widget_id) : collapsed;
+    return widgetId ? collapsed.attr(widgetId) : collapsed;
   },
 
-  setTopNavHidden: function (page_id, is_hidden) {
-    this.makeObject(page_id === null ? page_id : path, TOP_NAV).attr("is_hidden", !!is_hidden);
+  setTopNavHidden: function (pageId, isHidden) {
+    this.makeObject(pageId === null ? pageId : path, TOP_NAV)
+      .attr('is_hidden', !!isHidden);
 
     this.autoupdate && this.save();
     return this;
   },
 
-  getTopNavHidden: function (page_id) {
-    var value = this.getObject(page_id === null ? page_id : path, TOP_NAV);
+  getTopNavHidden: function (pageId) {
+    var value = this.getObject(pageId === null ? pageId : path, TOP_NAV);
 
-    if (typeof value === "undefined") {
-      this.setTopNavHidden("", false);
+    if (typeof value === 'undefined') {
+      this.setTopNavHidden('', false);
       return false;
     }
 
     return !!value.is_hidden;
   },
 
-  setTopNavWidgets: function (page_id, widget_list) {
-    this.makeObject(page_id === null ? page_id : path, TOP_NAV).attr("widget_list", widget_list);
+  setTopNavWidgets: function (pageId, widgetList) {
+    this.makeObject(pageId === null ? pageId : path, TOP_NAV)
+      .attr('widget_list', widgetList);
 
     this.autoupdate && this.save();
     return this;
   },
 
-  getTopNavWidgets: function (page_id) {
-    var value = this.getObject(page_id === null ? page_id : path, TOP_NAV);
+  getTopNavWidgets: function (pageId) {
+    var value = this.getObject(pageId === null ? pageId : path, TOP_NAV);
 
-    if (typeof value === "undefined") {
-      this.setTopNavWidgets(page_id, {});
-      return this.getTopNavWidgets(page_id);
+    if (typeof value === 'undefined') {
+      this.setTopNavWidgets(pageId, {});
+      return this.getTopNavWidgets(pageId);
     }
 
     return value.widget_list && value.widget_list.serialize() || {};
   },
 
-  setFilterHidden: function (is_hidden) {
-    this.makeObject(path, FILTER_WIDGET).attr("is_hidden", is_hidden);
+  setFilterHidden: function (isHidden) {
+    this.makeObject(path, FILTER_WIDGET).attr('is_hidden', isHidden);
 
     this.autoupdate && this.save();
     return this;
@@ -182,7 +184,7 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
   getFilterHidden: function () {
     var value = this.getObject(path, FILTER_WIDGET);
 
-    if (typeof value === "undefined") {
+    if (typeof value === 'undefined') {
       this.setFilterHidden(false);
       return false;
     }
@@ -190,123 +192,132 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     return value.is_hidden;
   },
 
-  setTreeViewHeaders: function (model_name, display_list) {
-    var hdr = this.getObject(path, TREE_VIEW_HEADERS), obj = {};
+  setTreeViewHeaders: function (modelName, displayList) {
+    var hdr = this.getObject(path, TREE_VIEW_HEADERS);
+    var obj = {};
     if (!hdr) {
       hdr = this.makeObject(path, TREE_VIEW_HEADERS);
     }
 
-    obj.display_list = display_list;
-    hdr.attr(model_name, obj);
+    obj.display_list = displayList;
+    hdr.attr(modelName, obj);
 
     this.autoupdate && this.save();
     return this;
   },
 
-  getTreeViewHeaders: function (model_name) {
+  getTreeViewHeaders: function (modelName) {
     var value = this.getObject(path, TREE_VIEW_HEADERS);
 
-    if (!value || !value[model_name]) {
+    if (!value || !value[modelName]) {
       return [];
     }
 
-    return value[model_name].display_list;
+    return value[modelName].display_list;
   },
 
-  setTreeViewStates: function (model_name, status_list) {
-    var hdr = this.getObject(TREE_VIEW_STATES), obj = {};
+  setTreeViewStates: function (modelName, statusList) {
+    var hdr = this.getObject(TREE_VIEW_STATES);
+    var obj = {};
     if (!hdr) {
       hdr = this.makeObject(TREE_VIEW_STATES);
     }
-    obj.status_list = status_list;
-    hdr.attr(model_name, obj);
+    obj.status_list = statusList;
+    hdr.attr(modelName, obj);
 
     this.autoupdate && this.save();
     return this;
   },
 
-  getTreeViewStates: function (model_name) {
+  getTreeViewStates: function (modelName) {
     var value = this.getObject(TREE_VIEW_STATES);
 
-    if (!value || !value[model_name]) {
+    if (!value || !value[modelName]) {
       return [];
     }
 
     // Avoid User bugs:
     // User may have wrong config in local storage
-    if (!GGRC.Utils.State.hasFilter(model_name)) {
+    if (!GGRC.Utils.State.hasFilter(modelName)) {
       return [];
     }
 
-    return value[model_name].status_list;
+    return value[modelName].status_list;
   },
 
-  setModalState: function (model_name, display_state) {
-    var path = null, modal_state = this.getObject(path, MODAL_STATE), obj = {};
+  setModalState: function (modelName, displayState) {
+    var path = null;
+    var modalState = this.getObject(path, MODAL_STATE);
+    var obj = {};
 
-    if (!modal_state) {
-      modal_state = this.makeObject(path, MODAL_STATE);
+    if (!modalState) {
+      modalState = this.makeObject(path, MODAL_STATE);
     }
 
-    obj.display_state = display_state;
-    modal_state.attr(model_name, obj);
+    obj.display_state = displayState;
+    modalState.attr(modelName, obj);
 
     this.autoupdate && this.save();
     return this;
   },
 
-  getModalState: function (model_name) {
-    var modal_state = this.getObject(null, MODAL_STATE);
+  getModalState: function (modelName) {
+    var modalState = this.getObject(null, MODAL_STATE);
 
-    if (!modal_state || !modal_state[model_name]) {
+    if (!modalState || !modalState[modelName]) {
       return null;
     }
 
-    return modal_state[model_name].display_state;
+    return modalState[modelName].display_state;
   },
 
-  setChildTreeDisplayList: function (model_name, display_list) {
-    var hdr = this.getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST), obj = {};
+  setChildTreeDisplayList: function (modelName, displayList) {
+    var hdr = this.getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
+    var obj = {};
     if (!hdr) {
       hdr = this.makeObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
     }
 
-    obj.display_list = display_list;
-    hdr.attr(model_name, obj);
+    obj.display_list = displayList;
+    hdr.attr(modelName, obj);
 
     this.autoupdate && this.save();
     return this;
   },
 
-  getChildTreeDisplayList: function (model_name) {
+  getChildTreeDisplayList: function (modelName) {
     var value = this.getObject(TREE_VIEW, CHILD_TREE_DISPLAY_LIST);
 
-    if (!value || !value[model_name]) {
-      return null; //in this case user should use default list an empty list, [], is different  than null
+    if (!value || !value[modelName]) {
+      return null; // in this case user should use default list an empty list, [], is different  than null
     }
 
-    return value[model_name].display_list;
+    return value[modelName].display_list;
   },
 
-  setLHNavSize: function (page_id, widget_id, size) {
-    this.makeObject(page_id === null ? page_id : path, LHN_SIZE).attr(widget_id, size);
+  setLHNavSize: function (pageId, widgetId, size) {
+    this.makeObject(pageId === null ? pageId : path, LHN_SIZE)
+      .attr(widgetId, size);
     this.autoupdate && this.save();
     return this;
   },
 
-  getLHNavSize: function (page_id, widget_id) {
-    var size = this.getObject(page_id === null ? page_id : path, LHN_SIZE);
+  getLHNavSize: function (pageId, widgetId) {
+    var size = this.getObject(pageId === null ? pageId : path, LHN_SIZE);
     if (!size) {
-      size = this.makeObject(page_id === null ? page_id : path, LHN_SIZE).attr(this.makeObject(LHN_SIZE, page_id).serialize());
+      size = this.makeObject(pageId === null ? pageId : path, LHN_SIZE)
+        .attr(this.makeObject(LHN_SIZE, pageId).serialize());
     }
 
-    return widget_id ? size.attr(widget_id) : size;
+    return widgetId ? size.attr(widgetId) : size;
   },
 
-  setGlobal: function (widget_id, attrs) {
-    var global = this.getObject(null, GLOBAL) && this.getObject(null, GLOBAL).attr(widget_id);
+  setGlobal: function (widgetId, attrs) {
+    var global = this.getObject(null, GLOBAL) &&
+      this.getObject(null, GLOBAL).attr(widgetId);
     if (!global) {
-      global = this.makeObject(null, GLOBAL).attr(widget_id, new can.Observe(attrs));
+      global = this.makeObject(null, GLOBAL)
+        .attr(widgetId, new can.Observe(attrs));
     } else {
       global.attr(attrs);
     }
@@ -314,31 +325,34 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     return this;
   },
 
-  getGlobal: function (widget_id) {
-    return this.getObject(null, GLOBAL) && this.getObject(null, GLOBAL).attr(widget_id);
+  getGlobal: function (widgetId) {
+    return this.getObject(null, GLOBAL) &&
+      this.getObject(null, GLOBAL).attr(widgetId);
   },
 
   // sorts = position of widgets in each column on a page
   // This is also use at page load to determine which widgets need to be
   // generated client-side.
-  getSorts: function (page_id, column_id) {
+  getSorts: function (pageId, columnId) {
     var sorts = this.getObject(path, SORTS);
     if (!sorts) {
-      sorts = this.makeObject(path, SORTS).attr(this.makeObject(SORTS, page_id).serialize());
+      sorts = this.makeObject(path, SORTS)
+        .attr(this.makeObject(SORTS, pageId).serialize());
       this.autoupdate && this.save();
     }
 
-    return column_id ? sorts.attr(column_id) : sorts;
+    return columnId ? sorts.attr(columnId) : sorts;
   },
 
-  setSorts: function (page_id, widget_id, sorts) {
-    if (typeof sorts === "undefined" && typeof widget_id === "object") {
-      sorts = widget_id;
-      widget_id = undefined;
-    }
-    var page_sorts = this.makeObject(path, SORTS);
+  setSorts: function (pageId, widgetId, sorts) {
+    var pageSorts = this.makeObject(path, SORTS);
 
-    page_sorts.attr(widget_id ? widget_id : sorts, widget_id ? sorts : undefined);
+    if (typeof sorts === 'undefined' && typeof widgetId === 'object') {
+      sorts = widgetId;
+      widgetId = undefined;
+    }
+
+    pageSorts.attr(widgetId ? widgetId : sorts, widgetId ? sorts : undefined);
 
     this.autoupdate && this.save();
     return this;
@@ -346,23 +360,24 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
   // heights : height of widgets to restore on page start.
   // Is set by jQuery-UI resize functions in ResizeWidgetsController
-  getWidgetHeights: function (page_id) {
+  getWidgetHeights: function (pageId) {
     var heights = this.getObject(path, HEIGHTS);
     if (!heights) {
-      heights = this.makeObject(path, HEIGHTS).attr(this.makeObject(HEIGHTS, page_id).serialize());
+      heights = this.makeObject(path, HEIGHTS)
+        .attr(this.makeObject(HEIGHTS, pageId).serialize());
       this.autoupdate && this.save();
     }
     return heights;
   },
 
-  getWidgetHeight: function (page_id, widget_id) {
-    return this.getWidgetHeights(page_id)[widget_id];
+  getWidgetHeight: function (pageId, widgetId) {
+    return this.getWidgetHeights(pageId)[widgetId];
   },
 
-  setWidgetHeight: function (page_id, widget_id, height) {
-    var page_heights = this.makeObject(path, HEIGHTS);
+  setWidgetHeight: function (pageId, widgetId, height) {
+    var pageHeights = this.makeObject(path, HEIGHTS);
 
-    page_heights.attr(widget_id, height);
+    pageHeights.attr(widgetId, height);
 
     this.autoupdate && this.save();
     return this;
@@ -370,22 +385,23 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
   // columns : the relative width of columns on each page.
   //  should add up to 12 since we're using row-fluid from Bootstrap
-  getColumnWidths: function (page_id, content_id) {
+  getColumnWidths: function (pageId, contentId) {
     var widths = this.getObject(path, COLUMNS);
     if (!widths) {
-      widths = this.makeObject(path, COLUMNS).attr(this.makeObject(COLUMNS, page_id).serialize());
+      widths = this.makeObject(path, COLUMNS)
+        .attr(this.makeObject(COLUMNS, pageId).serialize());
       this.autoupdate && this.save();
     }
-    return widths[content_id];
+    return widths[contentId];
   },
 
-  getColumnWidthsForSelector: function (page_id, sel) {
-    return this.getColumnWidths(page_id, $(sel).attr("id"));
+  getColumnWidthsForSelector: function (pageId, sel) {
+    return this.getColumnWidths(pageId, $(sel).attr('id'));
   },
 
-  setColumnWidths: function (page_id, widget_id, widths) {
+  setColumnWidths: function (pageId, widgetId, widths) {
     var csp = this.makeObject(path, COLUMNS);
-    csp.attr(widget_id, widths);
+    csp.attr(widgetId, widths);
     this.autoupdate && this.save();
     return this;
   },
@@ -396,41 +412,44 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     return this.save();
   },
 
-  setPageAsDefault: function (page_id) {
+  setPageAsDefault: function (pageId) {
     var that = this;
-    can.each([COLLAPSE, LHN_SIZE, OBJ_SIZE, SORTS, HEIGHTS, COLUMNS], function(key) {
-      that.makeObject(key).attr(page_id, new can.Observe(that.makeObject(path, key).serialize()));
-    });
+    can.each([COLLAPSE, LHN_SIZE, OBJ_SIZE, SORTS, HEIGHTS, COLUMNS],
+      function (key) {
+        that.makeObject(key)
+        .attr(pageId, new can.Observe(that.makeObject(path, key).serialize()));
+      });
     this.save();
     return this;
   },
 
-  getPbcListPrefs: function (pbc_id) {
-    return this.makeObject(PBC_LISTS, pbc_id);
+  getPbcListPrefs: function (pbcId) {
+    return this.makeObject(PBC_LISTS, pbcId);
   },
 
-  setPbcListPrefs: function (pbc_id, prefs) {
-    this.makeObject(PBC_LISTS).attr(pbc_id, prefs instanceof can.Observe ? prefs : new can.Observe(prefs));
+  setPbcListPrefs: function (pbcId, prefs) {
+    this.makeObject(PBC_LISTS)
+    .attr(pbcId, prefs instanceof can.Observe ? prefs : new can.Observe(prefs));
     this.autoupdate && this.save();
   },
 
-  getPbcResponseOpen: function (pbc_id, response_id) {
-    return this.makeObject(PBC_LISTS, pbc_id, "responses").attr(response_id);
+  getPbcResponseOpen: function (pbcId, responseId) {
+    return this.makeObject(PBC_LISTS, pbcId, 'responses').attr(responseId);
   },
 
-  getPbcRequestOpen: function (pbc_id, request_id) {
-    return this.makeObject(PBC_LISTS, pbc_id, "requests").attr(request_id);
+  getPbcRequestOpen: function (pbcId, requestId) {
+    return this.makeObject(PBC_LISTS, pbcId, 'requests').attr(requestId);
   },
 
-  setPbcResponseOpen: function (pbc_id, response_id, is_open) {
-    var prefs = this.makeObject(PBC_LISTS, pbc_id, "responses").attr(response_id, is_open);
+  setPbcResponseOpen: function (pbcId, responseId, isOpen) {
+    this.makeObject(PBC_LISTS, pbcId, 'responses').attr(responseId, isOpen);
 
     this.autoupdate && this.save();
     return this;
   },
 
-  setPbcRequestOpen: function (pbc_id, request_id, is_open) {
-    var prefs = this.makeObject(PBC_LISTS, pbc_id, "requests").attr(request_id, is_open);
+  setPbcRequestOpen: function (pbcId, requestId, isOpen) {
+    this.makeObject(PBC_LISTS, pbcId, 'requests').attr(requestId, isOpen);
 
     this.autoupdate && this.save();
     return this;
@@ -440,14 +459,15 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
     return this.makeObject(LHN_STATE);
   },
 
-  setLHNState: function (new_prefs, val) {
+  setLHNState: function (newPrefs, val) {
     var prefs = this.makeObject(LHN_STATE);
     can.each(
-      ["open_category", "panel_scroll", "category_scroll", "search_text", "my_work", "filter_params", "is_open", "is_pinned"]
+      ['open_category', 'panel_scroll', 'category_scroll', 'search_text',
+        'my_work', 'filter_params', 'is_open', 'is_pinned']
       , function (token) {
-        if (typeof new_prefs[token] !== "undefined") {
-          prefs.attr(token, new_prefs[token]);
-        } else if (new_prefs === token && typeof val !== "undefined") {
+        if (typeof newPrefs[token] !== 'undefined') {
+          prefs.attr(token, newPrefs[token]);
+        } else if (newPrefs === token && typeof val !== 'undefined') {
           prefs.attr(token, val);
         }
       }
@@ -455,20 +475,18 @@ can.Model.LocalStorage("CMS.Models.DisplayPrefs", {
 
     this.autoupdate && this.save();
     return this;
-  }
+  },
 
 });
 
-  if (typeof jasmine !== "undefined") {
-    CMS.Models.DisplayPrefs.exports = {
-      COLLAPSE: COLLAPSE,
-      SORTS: SORTS,
-      HEIGHTS: HEIGHTS,
-      COLUMNS: COLUMNS,
-      GLOBAL: GLOBAL,
-      PBC_LISTS: PBC_LISTS,
-      path: path
-    };
-  }
-
-})(window.can, window.can.$);
+if (typeof jasmine !== 'undefined') {
+  CMS.Models.DisplayPrefs.exports = {
+    COLLAPSE: COLLAPSE,
+    SORTS: SORTS,
+    HEIGHTS: HEIGHTS,
+    COLUMNS: COLUMNS,
+    GLOBAL: GLOBAL,
+    PBC_LISTS: PBC_LISTS,
+    path: path,
+  };
+}
