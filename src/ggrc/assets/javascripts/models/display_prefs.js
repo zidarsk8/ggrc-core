@@ -10,13 +10,7 @@ var COLLAPSE = 'collapse';
 var LHN_SIZE = 'lhn_size';
 var OBJ_SIZE = 'obj_size';
 var SORTS = 'sorts';
-var HEIGHTS = 'heights';
-var COLUMNS = 'columns';
-var PBC_LISTS = 'pbc_lists';
-var GLOBAL = 'global';
 var LHN_STATE = 'lhn_state';
-var TOP_NAV = 'top_nav';
-var FILTER_WIDGET = 'filter_widget';
 var TREE_VIEW_HEADERS = 'tree_view_headers';
 var TREE_VIEW_STATES = 'tree_view_states';
 var TREE_VIEW = 'tree_view';
@@ -134,62 +128,6 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
     }
 
     return widgetId ? collapsed.attr(widgetId) : collapsed;
-  },
-
-  setTopNavHidden: function (pageId, isHidden) {
-    this.makeObject(pageId === null ? pageId : path, TOP_NAV)
-      .attr('is_hidden', !!isHidden);
-
-    this.autoupdate && this.save();
-    return this;
-  },
-
-  getTopNavHidden: function (pageId) {
-    var value = this.getObject(pageId === null ? pageId : path, TOP_NAV);
-
-    if (typeof value === 'undefined') {
-      this.setTopNavHidden('', false);
-      return false;
-    }
-
-    return !!value.is_hidden;
-  },
-
-  setTopNavWidgets: function (pageId, widgetList) {
-    this.makeObject(pageId === null ? pageId : path, TOP_NAV)
-      .attr('widget_list', widgetList);
-
-    this.autoupdate && this.save();
-    return this;
-  },
-
-  getTopNavWidgets: function (pageId) {
-    var value = this.getObject(pageId === null ? pageId : path, TOP_NAV);
-
-    if (typeof value === 'undefined') {
-      this.setTopNavWidgets(pageId, {});
-      return this.getTopNavWidgets(pageId);
-    }
-
-    return value.widget_list && value.widget_list.serialize() || {};
-  },
-
-  setFilterHidden: function (isHidden) {
-    this.makeObject(path, FILTER_WIDGET).attr('is_hidden', isHidden);
-
-    this.autoupdate && this.save();
-    return this;
-  },
-
-  getFilterHidden: function () {
-    var value = this.getObject(path, FILTER_WIDGET);
-
-    if (typeof value === 'undefined') {
-      this.setFilterHidden(false);
-      return false;
-    }
-
-    return value.is_hidden;
   },
 
   setTreeViewHeaders: function (modelName, displayList) {
@@ -312,24 +250,6 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
     return widgetId ? size.attr(widgetId) : size;
   },
 
-  setGlobal: function (widgetId, attrs) {
-    var global = this.getObject(null, GLOBAL) &&
-      this.getObject(null, GLOBAL).attr(widgetId);
-    if (!global) {
-      global = this.makeObject(null, GLOBAL)
-        .attr(widgetId, new can.Observe(attrs));
-    } else {
-      global.attr(attrs);
-    }
-    this.autoupdate && this.save();
-    return this;
-  },
-
-  getGlobal: function (widgetId) {
-    return this.getObject(null, GLOBAL) &&
-      this.getObject(null, GLOBAL).attr(widgetId);
-  },
-
   // sorts = position of widgets in each column on a page
   // This is also use at page load to determine which widgets need to be
   // generated client-side.
@@ -358,54 +278,6 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
     return this;
   },
 
-  // heights : height of widgets to restore on page start.
-  // Is set by jQuery-UI resize functions in ResizeWidgetsController
-  getWidgetHeights: function (pageId) {
-    var heights = this.getObject(path, HEIGHTS);
-    if (!heights) {
-      heights = this.makeObject(path, HEIGHTS)
-        .attr(this.makeObject(HEIGHTS, pageId).serialize());
-      this.autoupdate && this.save();
-    }
-    return heights;
-  },
-
-  getWidgetHeight: function (pageId, widgetId) {
-    return this.getWidgetHeights(pageId)[widgetId];
-  },
-
-  setWidgetHeight: function (pageId, widgetId, height) {
-    var pageHeights = this.makeObject(path, HEIGHTS);
-
-    pageHeights.attr(widgetId, height);
-
-    this.autoupdate && this.save();
-    return this;
-  },
-
-  // columns : the relative width of columns on each page.
-  //  should add up to 12 since we're using row-fluid from Bootstrap
-  getColumnWidths: function (pageId, contentId) {
-    var widths = this.getObject(path, COLUMNS);
-    if (!widths) {
-      widths = this.makeObject(path, COLUMNS)
-        .attr(this.makeObject(COLUMNS, pageId).serialize());
-      this.autoupdate && this.save();
-    }
-    return widths[contentId];
-  },
-
-  getColumnWidthsForSelector: function (pageId, sel) {
-    return this.getColumnWidths(pageId, $(sel).attr('id'));
-  },
-
-  setColumnWidths: function (pageId, widgetId, widths) {
-    var csp = this.makeObject(path, COLUMNS);
-    csp.attr(widgetId, widths);
-    this.autoupdate && this.save();
-    return this;
-  },
-
   // reset function currently resets all layout for a page type (first element in URL path)
   resetPagePrefs: function () {
     this.removeAttr(path);
@@ -414,44 +286,12 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
 
   setPageAsDefault: function (pageId) {
     var that = this;
-    can.each([COLLAPSE, LHN_SIZE, OBJ_SIZE, SORTS, HEIGHTS, COLUMNS],
+    can.each([COLLAPSE, LHN_SIZE, OBJ_SIZE, SORTS],
       function (key) {
         that.makeObject(key)
         .attr(pageId, new can.Observe(that.makeObject(path, key).serialize()));
       });
     this.save();
-    return this;
-  },
-
-  getPbcListPrefs: function (pbcId) {
-    return this.makeObject(PBC_LISTS, pbcId);
-  },
-
-  setPbcListPrefs: function (pbcId, prefs) {
-    this.makeObject(PBC_LISTS)
-    .attr(pbcId, prefs instanceof can.Observe ? prefs : new can.Observe(prefs));
-    this.autoupdate && this.save();
-  },
-
-  getPbcResponseOpen: function (pbcId, responseId) {
-    return this.makeObject(PBC_LISTS, pbcId, 'responses').attr(responseId);
-  },
-
-  getPbcRequestOpen: function (pbcId, requestId) {
-    return this.makeObject(PBC_LISTS, pbcId, 'requests').attr(requestId);
-  },
-
-  setPbcResponseOpen: function (pbcId, responseId, isOpen) {
-    this.makeObject(PBC_LISTS, pbcId, 'responses').attr(responseId, isOpen);
-
-    this.autoupdate && this.save();
-    return this;
-  },
-
-  setPbcRequestOpen: function (pbcId, requestId, isOpen) {
-    this.makeObject(PBC_LISTS, pbcId, 'requests').attr(requestId, isOpen);
-
-    this.autoupdate && this.save();
     return this;
   },
 
@@ -483,10 +323,6 @@ if (typeof jasmine !== 'undefined') {
   CMS.Models.DisplayPrefs.exports = {
     COLLAPSE: COLLAPSE,
     SORTS: SORTS,
-    HEIGHTS: HEIGHTS,
-    COLUMNS: COLUMNS,
-    GLOBAL: GLOBAL,
-    PBC_LISTS: PBC_LISTS,
     path: path,
   };
 }
