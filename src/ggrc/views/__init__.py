@@ -153,6 +153,8 @@ def get_public_config():
       "snapshotable_objects": list(rules.Types.all),
       "snapshotable_ignored": list(rules.Types.ignore),
       "snapshotable_parents": list(rules.Types.parents),
+      "external_services": {"Person": getattr(settings,
+                                              "INTEGRATION_SERVICE_URL", "")},
   }
 
 

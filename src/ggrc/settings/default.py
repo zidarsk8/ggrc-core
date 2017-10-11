@@ -125,6 +125,12 @@ DEBUG_BENCHMARK = os.environ.get("GGRC_BENCHMARK")
 # GGRCQ integration
 GGRC_Q_INTEGRATION_URL = os.environ.get('GGRC_Q_INTEGRATION_URL', '')
 
+# Integration service
+INTEGRATION_SERVICE_URL = os.environ.get('INTEGRATION_SERVICE_URL')
+
+# Integration service mandatory header value
+URLFETCH_SERVICE_ID = os.environ.get('URLFETCH_SERVICE_ID')
+
 # Dashboard integration
 _DEFAULT_DASHBOARD_INTEGRATION_CONFIG = {
     "ca_name_regexp": r"^Dashboard_(.*)$",
