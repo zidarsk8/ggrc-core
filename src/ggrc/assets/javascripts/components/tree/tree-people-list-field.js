@@ -5,31 +5,27 @@
 
 import BaseTreePeopleVM from '../view-models/tree-people-base-vm';
 
-(function (can, GGRC) {
-  'use strict';
+var viewModel = BaseTreePeopleVM.extend({
+  filter: '@',
+  getSourceList: function () {
+    var filter = this.attr('filter');
+    var sourceString = 'source';
 
-  var viewModel = BaseTreePeopleVM.extend({
-    filter: '@',
-    getSourceList: function () {
-      var filter = this.attr('filter');
-      var sourceString = 'source';
-
-      if (filter) {
-        sourceString += '.' + filter;
-      }
-
-      return can.makeArray(this.attr(sourceString));
+    if (filter) {
+      sourceString += '.' + filter;
     }
-  });
 
-  GGRC.Components('treePeopleListField', {
-    tag: 'tree-people-list-field',
-    template: '{{peopleStr}}',
-    viewModel: viewModel,
-    events: {
-      '{viewModel.source} change': function () {
-        this.viewModel.refreshPeople();
-      }
+    return can.makeArray(this.attr(sourceString));
+  }
+});
+
+export default GGRC.Components('treePeopleListField', {
+  tag: 'tree-people-list-field',
+  template: '{{peopleStr}}',
+  viewModel: viewModel,
+  events: {
+    '{viewModel.source} change': function () {
+      this.viewModel.refreshPeople();
     }
-  });
-})(window.can, window.GGRC);
+  }
+});
