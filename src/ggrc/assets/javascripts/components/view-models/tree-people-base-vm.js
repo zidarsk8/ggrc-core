@@ -7,9 +7,16 @@
   'use strict';
 
   can.Map.extend('GGRC.VM.BaseTreePeopleField', {
+    define: {
+      stub: {
+        type: 'boolean',
+        value: true
+      }
+    },
     source: null,
     people: [],
     peopleStr: '',
+    stub: '@',
     init: function () {
       this.refreshPeople();
     },
@@ -18,34 +25,29 @@
         .then(function (data) {
           this.attr('people', data);
           this.attr('peopleStr', data.map(function (item) {
-            return item.displayName;
+            return item.email;
           }).join(', '));
         }.bind(this));
     },
     getPeopleList: function () {
       var sourceList = this.getSourceList();
-      var result;
       var deferred = can.Deferred();
 
       if (!sourceList.length) {
         return deferred.resolve([]);
       }
 
-      this.loadItems(sourceList)
-        .then(function (data) {
-          result = data.map(function (item) {
-            var displayName = item.email;
-            return {
-              name: item.name,
-              email: item.email,
-              displayName: displayName
-            };
+      if (this.attr('stub')) {
+        this.loadItems(sourceList)
+          .then(function (data) {
+            deferred.resolve(data);
+          })
+          .fail(function () {
+            deferred.resolve([]);
           });
-          deferred.resolve(result);
-        })
-        .fail(function () {
-          deferred.resolve([]);
-        });
+      } else {
+        deferred.resolve(sourceList);
+      }
 
       return deferred;
     },
