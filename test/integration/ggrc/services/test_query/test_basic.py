@@ -453,38 +453,6 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
         self._sort_sublists(expected),
     )
 
-  def test_query_order_by_assignee(self):
-    """Results get sorted by name or email assignee."""
-    controls_by_assignee = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              order_by=[{"name": "principal_assessor"},
-                                        {"name": "id"}]),
-        "Control", "values",
-    )
-    controls_unsorted = self._get_first_result_set(
-        self._make_query_dict("Control"),
-        "Control", "values",
-    )
-    people = self._get_first_result_set(
-        self._make_query_dict("Person"),
-        "Person", "values",
-    )
-    person_id_name = {person["id"]: (person["name"], person["email"])
-                      for person in people}
-    control_id_assignee = {
-        control["id"]: person_id_name[control["principal_assessor"]["id"]]
-        if control["principal_assessor"] else ""
-        for control in controls_unsorted
-    }
-
-    expected = sorted(sorted(controls_unsorted, key=itemgetter("id")),
-                      key=lambda p: control_id_assignee[p["id"]])
-
-    self.assertListEqual(
-        self._sort_sublists(controls_by_assignee),
-        self._sort_sublists(expected),
-    )
-
   def test_filter_control_by_frequency(self):
     """Test correct filtering by frequency"""
     controls = self._get_first_result_set(
