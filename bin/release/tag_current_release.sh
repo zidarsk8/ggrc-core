@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
@@ -32,6 +32,17 @@ write_visible_message () {
   echo '-----'
 }
 
+version_script () {
+  declare -r SETTINGS_FILE="src/ggrc/settings/default.py"
+  declare -r TARGET_REF="FETCH_HEAD"
+
+  cat <<EOF
+BUILD_NUMBER = ""
+$(git grep -h "VERSION =" $TARGET_REF -- $SETTINGS_FILE)
+print VERSION
+EOF
+}
+
 main () {
   if [[ "${1:-}" == "--help" ]]; then
     usage
@@ -40,7 +51,7 @@ main () {
 
   git fetch upstream master
 
-  v=$(python -c "BUILD_NUMBER='' ; $(grep 'VERSION =' src/ggrc/settings/default.py) ; print VERSION")
+  v=$(version_script | python -)
   git tag -s -m "$v" $v FETCH_HEAD
 
   write_visible_message "$(git rev-parse FETCH_HEAD) is tagged as $v"
