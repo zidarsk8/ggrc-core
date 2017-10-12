@@ -296,13 +296,18 @@ form.import {
 
   .export-panel__header {
     display: flex;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
   }
 
   .export-panel__title {
     font-weight: bold;
     text-transform: uppercase;
     margin-right: 10px;
+  }
+
+  .export-panel__checkbox {
+    line-height: 10px;
+    margin-right: 5px;
   }
 }
 

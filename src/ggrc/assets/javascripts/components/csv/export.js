@@ -190,6 +190,30 @@ exportPanel = GGRC.Components('exportPanel', {
           return Number(this.attr('panel_number')) === 0;
         },
       },
+      showAttributes: {
+        set: function (newValue, setValue) {
+          this.updateIsSelected(
+            this.attr('item.attributes'), newValue);
+
+          setValue(newValue);
+        },
+      },
+      showMappings: {
+        set: function (newValue, setValue) {
+          this.updateIsSelected(
+            this.attr('item.mappings'), newValue);
+
+          setValue(newValue);
+        },
+      },
+      showLocalAttributes: {
+        set: function (newValue, setValue) {
+          this.updateIsSelected(
+            this.attr('item.localAttributes'), newValue);
+
+          setValue(newValue);
+        },
+      },
     },
     exportable: GGRC.Bootstrap.exportable,
     snapshotable_objects: GGRC.config.snapshotable_objects,
@@ -248,14 +272,11 @@ exportPanel = GGRC.Components('exportPanel', {
       });
     },
     setSelected: function () {
-      this.updateIsSelected(
-        this.attr('item.attributes'), true);
-      this.updateIsSelected(
-        this.attr('item.mappings'), true);
+      this.attr('showMappings', true);
+      this.attr('showAttributes', true);
 
       if (this.useLocalAttribute()) {
-        this.updateIsSelected(
-          this.attr('item.localAttributes'), true);
+        this.attr('showLocalAttributes', true);
       }
     },
   },
