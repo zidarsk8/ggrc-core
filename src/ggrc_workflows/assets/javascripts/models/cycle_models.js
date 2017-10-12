@@ -22,8 +22,12 @@
 
   function populateFromWorkflow(form, workflow) {
     if (!workflow || typeof workflow === 'string') {
-      // We need to invalidate the form, so we remove workflow if it's not set
+      // We need to invalidate the form, so we remove workflow and dependencies
+      // if it's not set
       form.removeAttr('workflow');
+      form.removeAttr('context');
+      form.removeAttr('cycle');
+      form.removeAttr('cycle_task_group');
       return;
     }
     if (workflow.reify) {
@@ -57,7 +61,9 @@
       form.attr('workflow', {id: workflow.id, type: 'Workflow'});
       form.attr('context', {id: workflow.context.id, type: 'Context'});
       form.attr('cycle', {id: activeCycle.id, type: 'Cycle'});
-      form.cycle_task_group = activeCycle.cycle_task_groups[0].id;
+
+      //reset cycle task group after workflow updating
+      form.removeAttr('cycle_task_group');
     });
   }
 
@@ -347,6 +353,7 @@
       this.validateNonBlank('title');
       this.validateNonBlank('workflow');
       this.validateNonBlank('cycle');
+      this.validateNonBlank('cycle_task_group');
       this.validateContact(['_transient.contact', 'contact']);
       this.validateNonBlank('start_date');
       this.validateNonBlank('end_date');
@@ -367,13 +374,15 @@
       });
     },
     set_properties_from_workflow: function (workflow) {
-      // The form sometimes returns plaintext instead of object, return in that case
-      if (typeof workflow === 'string') {
+      // The form sometimes returns plaintext instead of object,
+      // return in that case
+      // If workflow is empty form should be invalidated
+      if (typeof workflow === 'string' && workflow !== '') {
         return;
       }
       populateFromWorkflow(this, workflow);
     },
-    form_preload: function (newObjectForm) {
+    form_preload: function (newObjectForm, objectParams) {
       var form = this;
       var workflows;
       var _workflow;
@@ -384,33 +393,29 @@
         this.attr('start_date', new Date());
         this.attr('end_date', moment().add({month: 3}).toDate());
 
-        // using setTimeout to execute this after the modal is loaded
-        // so we can see when the workflow is already set and use that one
-        setTimeout(function () {
-          // if we are creating a task from the workflow page, the preset
-          // workflow should be that one
-          if (form.workflow !== undefined) {
-            populateFromWorkflow(form, form.workflow);
+        // if we are creating a task from the workflow page, the preset
+        // workflow should be that one
+        if (objectParams && objectParams.workflow !== undefined) {
+          populateFromWorkflow(form, objectParams.workflow);
+          return;
+        }
+
+        workflows = CMS.Models.Workflow.findAll({
+          kind: 'Backlog', status: 'Active', __sort: '-created_at'});
+        workflows.then(function (workflowList) {
+          if (!workflowList.length) {
+            $(document.body).trigger(
+              'ajax:flash',
+              {warning: 'No Backlog' +
+              ' workflows found!' +
+              ' Contact your administrator to enable this functionality.',
+              }
+            );
             return;
           }
-
-          workflows = CMS.Models.Workflow.findAll({
-            kind: 'Backlog', status: 'Active', __sort: '-created_at'});
-          workflows.then(function (workflowList) {
-            if (!workflowList.length) {
-              $(document.body).trigger(
-                'ajax:flash',
-                {warning: 'No Backlog' +
-                ' workflows found!' +
-                ' Contact your administrator to enable this functionality.'
-                }
-              );
-              return;
-            }
-            _workflow = workflowList[0];
-            populateFromWorkflow(form, _workflow);
-          });
-        }, 0);
+          _workflow = workflowList[0];
+          populateFromWorkflow(form, _workflow);
+        });
       } else {
         cycle = form.cycle.reify();
         if (!_.isUndefined(cycle.workflow)) {
