@@ -28,10 +28,9 @@ COPY ./git_hooks/post-merge /home/vagrant/.git/hooks/post-merge
 WORKDIR /vagrant
 
 # Javascript dependencies
-COPY ./package.json ./bower.json /vagrant-dev/
+COPY ./package.json /vagrant-dev/
 RUN cd /vagrant-dev \
-  && npm install \
-  && node_modules/.bin/bower --allow-root install
+  && npm install --unsafe-perm
 
 # Python packages
 COPY ./Makefile /vagrant/

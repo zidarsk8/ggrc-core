@@ -58,7 +58,6 @@ setup () {
   echo "Provisioning ${PROJECT}_dev_1"
   docker exec -i ${PROJECT}_dev_1 su -c "
     source /vagrant/bin/init_vagrant_env
-    make bower_components > /dev/null
     ln -s /vagrant-dev/node_modules /vagrant/node_modules
     build_assets
     make appengine_packages

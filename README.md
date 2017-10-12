@@ -192,7 +192,6 @@ After that, you can make sure that both containers are running with `docker ps -
 To run the Selenium tests, you must login into your dev container, and run the server:
 ```
 docker exec -it ggrccore_dev_1 su vagrant
-make bower_components
 build_assets
 db_reset
 launch_ggrc
@@ -247,7 +246,6 @@ Because Docker provisioning is done with Dockerfile which can not modify content
 ```
 docker-compose up -d --force-recreate
 docker exec -it ggrccore_dev_1 su vagrant
-make bower_components
 ```
 
 
