@@ -12,15 +12,17 @@ const WebpackShellPlugin = require('webpack-shell-plugin');
 const _ = require('lodash');
 const path = require('path');
 const ENV = process.env;
+const isProd = ENV.NODE_ENV === 'production';
+const isDev = ENV.NODE_ENV === 'development';
 var BundleAnalyzerPlugin;
 
 const STATIC_FOLDER = '/static/';
 
 module.exports = function (env, argv) {
   const extractSass = new ExtractTextPlugin({
-    filename: isProduction(env) ? '[name].[chunkhash].css' : '[name].css',
+    filename: isProd ? '[name].[chunkhash].css' : '[name].css',
     allChunks: true,
-    // disable: isDevelopment(env)
+    // disable: isDev
   });
   const config = {
     entry: {
@@ -31,7 +33,7 @@ module.exports = function (env, argv) {
       login: 'entrypoints/login',
     },
     output: {
-      filename: isProduction(env) ? '[name].[chunkhash].js' : '[name].js',
+      filename: isProd ? '[name].[chunkhash].js' : '[name].js',
       sourceMapFilename: '[file].map',
       path: path.join(__dirname, './src/ggrc/static/'),
       publicPath: STATIC_FOLDER,
@@ -95,7 +97,7 @@ module.exports = function (env, argv) {
         },
       }],
     },
-    devtool: isDevelopment(env) ? 'cheap-module-eval-source-map' : 'source-map',
+    devtool: isDev ? 'cheap-module-eval-source-map' : 'source-map',
     resolve: {
       modules: ['node_modules', 'bower_components', 'third_party']
         .map(function (dir) {
@@ -134,7 +136,7 @@ module.exports = function (env, argv) {
     },
   };
 
-  if (isProduction(env)) {
+  if (isProd) {
     config.plugins.push(new UglifyJSPlugin({
       sourceMap: true,
       output: {
@@ -148,7 +150,7 @@ module.exports = function (env, argv) {
     }));
   }
 
-  if (isDubug(env)) {
+  if (env && env.debug) {
     BundleAnalyzerPlugin =
       require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
     config.plugins.push(new BundleAnalyzerPlugin({
@@ -159,18 +161,6 @@ module.exports = function (env, argv) {
 
   return config;
 };
-
-function isProduction(env) {
-  return env.production;
-}
-
-function isDevelopment(env) {
-  return env.development;
-}
-
-function isDubug(env) {
-  return env.debug;
-}
 
 function getExtraModules() {
   var modules = ENV.GGRC_SETTINGS_MODULE.split(' ');

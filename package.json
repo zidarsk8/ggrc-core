@@ -64,9 +64,9 @@
   },
   "scripts": {
     "test": "run_unittests",
-    "watch": "./node_modules/.bin/webpack --watch --profile --progress --env.development --env.BABEL_ENV=development",
-    "build": "./node_modules/.bin/webpack --profile --progress --env.production --env.BABEL_ENV=production",
-    "stats": "./node_modules/.bin/webpack --env.production --env.debug"
+    "watch": "export NODE_ENV=development && ./node_modules/.bin/webpack --watch --profile --progress",
+    "build": "export NODE_ENV=production && ./node_modules/.bin/webpack --profile --progress",
+    "stats": "export NODE_ENV=production && ./node_modules/.bin/webpack --env.debug"
   },
   "repository": {
     "type": "git",
