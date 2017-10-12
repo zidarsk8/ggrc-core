@@ -1,0 +1,30 @@
+{{!
+  Copyright (C) 2017 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="info">
+  <div class="choose-object-wrap">
+
+    <export-group panels="export.panels" {export}="export"></export-group>
+  </div>
+</div>
+<div class="export-group__actions-wrap">
+  <div class="export-format-wrap">
+    <h6>Export format</h6>
+    <select class="export-format" can-value="export.chosenFormat">
+      <option value="gdrive" label="Google Sheet"></option>
+      <option value="csv" label="CSV File"></option>
+    </select>
+  </div>
+  <div class="export-buttons-wrap">
+    <a href="#" id="addAnotherObjectType" class="addFilterRule btn btn-small btn-white">Add Object Type</a>
+    {{#unless export.loading}}
+      <button type="submit" id="export-csv-button" class="btn btn-green btn-small">
+        Export Objects
+      </button>
+    {{else}}
+      <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
+    {{/unless}}
+  </div>
+</div>

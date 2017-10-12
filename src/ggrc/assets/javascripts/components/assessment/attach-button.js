@@ -13,6 +13,7 @@
   GGRC.Components('attachButton', {
     tag: tag,
     template: template,
+    confirmationCallback: '@',
     viewModel: {
       define: {
         hasPermissions: {
@@ -38,24 +39,6 @@
       onBeforeCreate: function (event) {
         var items = event.items;
         this.dispatch({type: 'beforeCreate', items: items});
-      },
-      confirmationCallback: function () {
-        var confirmation = null;
-
-        if (this.attr('instance') instanceof CMS.Models.Assessment &&
-            this.attr('instance.status') !== 'In Progress') {
-          confirmation = can.Deferred();
-          GGRC.Controllers.Modals.confirm({
-            modal_title: 'Confirm moving Assessment to "In Progress"',
-            modal_description: 'You are about to move Assessment from "' +
-              this.instance.status +
-              '" to "In Progress" - are you sure about that?',
-            button_view: GGRC.mustache_path + '/modals/prompt_buttons.mustache'
-          }, confirmation.resolve, confirmation.reject);
-          return confirmation.promise();
-        }
-
-        return confirmation;
       },
       itemsUploadedCallback: function () {
         this.dispatch('refreshEvidences');

@@ -163,7 +163,8 @@ class TestAccessControlList(TestCase):
     ).all()
     assert len(res) > 0, \
         "Full text record index not created for {}".format(self.acr.name)
-    assert len([r for r in res if r.content == self.person.email]) == 1, \
+    # email is presented in __sort__ subproperty as well
+    assert len([r for r in res if r.content == self.person.email]) == 2, \
         "Person email not indexed {}".format(self.person.email)
     assert len([r for r in res if r.content == self.person.name]) == 1, \
         "Person name not indexed {}".format(self.person.name)

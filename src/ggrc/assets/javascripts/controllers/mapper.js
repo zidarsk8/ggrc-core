@@ -1,4 +1,4 @@
-/*!
+/*
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -25,7 +25,7 @@ import '../components/unified-mapper/mapper-results';
   can.Control.extend('GGRC.Controllers.ObjectMapper', {
     defaults: {
       component: GGRC.mustache_path +
-        '/modals/mapper/object-mapper-modal.mustache'
+        '/modals/mapper/object-mapper-modal.mustache',
     },
     launch: function ($trigger, options) {
       var href = $trigger ?
@@ -40,7 +40,7 @@ import '../components/unified-mapper/mapper-results';
 
       $target.modal_form({}, $trigger);
       this.newInstance($target[0], can.extend({
-        $trigger: $trigger
+        $trigger: $trigger,
       }, options));
 
       $target.on('modal:dismiss', function () {
@@ -65,7 +65,10 @@ import '../components/unified-mapper/mapper-results';
         return;
       }
 
-      if (!data.join_object_type) {
+      if (
+          _.isUndefined(data.join_object_type) ||
+          _.isNull(data.join_object_type)
+      ) {
         throw new Error(OBJECT_REQUIRED_MESSAGE);
       }
 
@@ -77,31 +80,43 @@ import '../components/unified-mapper/mapper-results';
         openForCommonObjects(data, isSearch);
       }
 
+      // each object type will be perceived as a snapshot, except types with
+      // special config
       function openForSnapshots(data) {
-        var config;
         var inScopeObject;
+        var config = getBaseConfig();
+        var special = [{
+          types: ['Issue'],
+          // set config like for common objects
+          config: getConfigForCommonObjects(data).general,
+        }];
+
+        _.extend(config.general, {useSnapshots: true});
+        _.extend(config.special, special);
 
         if (data.is_new) {
-          config = {
+          _.extend(config.general, {
             object: data.join_object_type,
             type: data.join_option_type,
             relevantTo: [{
               readOnly: true,
               type: data.snapshot_scope_type,
-              id: data.snapshot_scope_id
-            }]
-          };
+              id: data.snapshot_scope_id,
+            }],
+          });
           self.launch(btn, can.extend(config, data));
           return;
         }
 
-        if (!data.join_object_id) {
+        if (
+          _.isUndefined(data.join_object_id) ||
+          _.isNull(data.join_object_id)
+        ) {
           throw new Error(OBJECT_REQUIRED_MESSAGE);
         }
 
         inScopeObject =
           CMS.Models[data.join_object_type].store[data.join_object_id];
-
         inScopeObject.updateScopeObject().then(function () {
           var scopeObject = inScopeObject.attr('scopeObject');
 
@@ -113,7 +128,7 @@ import '../components/unified-mapper/mapper-results';
             return;
           }
 
-          config = {
+          _.extend(config.general, {
             object: data.join_object_type,
             'join-object-id': data.join_object_id,
             type: data.join_option_type,
@@ -121,43 +136,67 @@ import '../components/unified-mapper/mapper-results';
               readOnly: true,
               type: scopeObject.type,
               id: scopeObject.id,
-              title: scopeObject.title
-            }]
-          };
+              title: scopeObject.title,
+            }],
+          });
 
           self.launch(btn, can.extend(config, data));
         });
       }
 
       function openForCommonObjects(data, isSearch) {
-        var config = {
-          object: data.join_object_type,
-          type: data.join_option_type,
-          'join-object-id': data.join_object_id
-        };
+        var config = getConfigForCommonObjects(data);
+
         if (isSearch) {
           GGRC.Controllers.ObjectSearch.launch(btn, can.extend(config, data));
         } else {
           self.launch(btn, can.extend(config, data));
         }
       }
-    }
+
+      function getBaseConfig() {
+        return {
+          general: {
+            useSnapshots: false,
+            object: '',
+            type: '',
+            'join-object-id': null,
+            // if set then each mapped object will be relevant to
+            // relevantTo object (for example, snapshots relevant to Audit (at 08/2017))
+            relevantTo: null,
+          },
+          special: [],
+        };
+      }
+
+      function getConfigForCommonObjects(data) {
+        var base = getBaseConfig();
+
+        _.extend(base.general, {
+          object: data.join_object_type,
+          type: data.join_option_type,
+          'join-object-id': data.join_object_id,
+        });
+
+        return base;
+      }
+    },
   }, {
     init: function () {
       this.element.html(can.view(this.options.component, this.options));
-    }
+    },
   });
   GGRC.Controllers.ObjectMapper.extend('GGRC.Controllers.ObjectSearch', {
     defaults: {
       component: GGRC.mustache_path +
-        '/modals/mapper/object-search-modal.mustache'
-    }
+        '/modals/mapper/object-search-modal.mustache',
+    },
   }, {});
   GGRC.Controllers.ObjectMapper.extend('GGRC.Controllers.ObjectGenerator', {
     defaults: {
       component: GGRC.mustache_path +
-        '/modals/mapper/object-generator-modal.mustache'
-    }
+        '/modals/mapper/object-generator-modal.mustache',
+    },
   }, {});
 
   function openMapperByElement(ev, disableMapper) {

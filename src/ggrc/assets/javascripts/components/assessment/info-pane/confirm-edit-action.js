@@ -38,15 +38,14 @@ import '../../inline/base-inline-control-title';
           button_view: GGRC.mustache_path + '/modals/prompt_buttons.mustache'
         }, confirmation.resolve, confirmation.reject);
 
-        confirmation.then(function (data) {
+        return confirmation.then(function (data) {
           self.dispatch('setInProgress');
           self.openEditMode();
         });
       },
       confirmEdit: function () {
         if (!this.isInEditableState()) {
-          this.showConfirm();
-          return;
+          return this.showConfirm();
         }
 
         // send 'isLastOpenInline' when inline is opening without confirm

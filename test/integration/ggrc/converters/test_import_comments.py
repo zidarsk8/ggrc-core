@@ -16,19 +16,19 @@ class TestCommentsImport(TestCase):
   @classmethod
   def setUpClass(cls):
     TestCase.clear_data()
-    TestCase._import_file("import_comments.csv")
+    cls.response = TestCase._import_file("import_comments.csv")
 
   def setUp(self):
     """Log in before performing queries."""
+    self._check_csv_response(self.response, {})
     self.client.get("/login")
 
   @ddt.data(("Assessment 1", ["comment"]),
             ("Assessment 2", ["some comment"]),
             ("Assessment 3", ["<a href=\"goooge.com\">link</a>"]),
             ("Assessment 4", ["comment1", "comment2", "comment3"]),
-            ("Assessment 5", ["one;two", "three", ";four", "hello"]),
-            ("Assessment 6", ["a normal comment with {} characters"]),
-            ("Assessment 7", []))
+            ("Assessment 5", ["one;two", "three;", "four", "hello"]),
+            ("Assessment 6", ["a normal comment with {} characters"]))
   @ddt.unpack
   def test_assessment_comments(self, slug, expected_comments):
     """Test assessment comments import"""

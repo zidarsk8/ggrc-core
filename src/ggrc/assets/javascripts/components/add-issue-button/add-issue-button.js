@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -18,28 +18,22 @@
         prepareJSON: {
           get: function () {
             var instance = this.attr('relatedInstance');
-            var audit = instance.attr('audit');
             var json = {
-              audit: {title: audit.title, id: audit.id, type: audit.type},
-              context: {
-                type: audit.attr('context.type'),
-                id: audit.attr('context.id')
-              },
               assessment: {
                 title: instance.title,
                 id: instance.id,
                 type: instance.type,
                 title_singular: instance.class.title_singular,
-                table_singular: instance.class.table_singular
-              }
+                table_singular: instance.class.table_singular,
+              },
             };
 
             return JSON.stringify(json);
-          }
-        }
+          },
+        },
       },
       relatedInstance: {},
-      snapshots: []
+      snapshots: [],
     },
     events: {
       refreshIssueList: function (window, event, instance) {
@@ -57,7 +51,7 @@
         this.viewModel.attr('relatedInstance').dispatch('refreshInstance');
       },
       '{window} modal:added': 'refreshIssueList',
-      '{window} modal:success': 'refreshIssueList'
-    }
+      '{window} modal:success': 'refreshIssueList',
+    },
   });
 })(window.can, window.GGRC, window.CMS);

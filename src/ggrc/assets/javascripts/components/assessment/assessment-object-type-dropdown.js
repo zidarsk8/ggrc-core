@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -14,7 +14,7 @@
           get: function () {
             var self = this;
             var objectTypes = GGRC.Mappings
-              .getMappingTypes('AssessmentTemplate');
+              .getMappingTypes('AssessmentTemplate', [], ['Issue']);
             // remove ignored types and sort the rest
             _.each(objectTypes, function (objGroup) {
               objGroup.items = _.filter(objGroup.items, function (item) {
@@ -29,8 +29,8 @@
             });
 
             return objectTypes;
-          }
-        }
+          },
+        },
       },
       assessmentType: '',
       instance: {},
@@ -42,9 +42,9 @@
           CycleTaskGroupObjectTask: true,
           TaskGroup: true,
           TaskGroupTask: true,
-          Workflow: true
+          Workflow: true,
         });
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can);

@@ -14,12 +14,12 @@ class Common(object):
   TITLE = " .title"
   DESCRIPTION = " .description"
   # modal
-  MODAL_GENEATE = ".modal-selector"
   MODAL_CREATE = ".modal-wide"
   MODAL_CONFIRM = ".modal.hide"
-  MODAL_MAP = ".modal-selector"
+  MODAL_MAPPER = ".modal-selector"
   MODAL_FOOTER = " .modal-footer"
   MODAL_FILTER = " .modal-filter"
+  MODAL_HEADER = " .modal-header"
   # info page (panel)
   _INFO = "info"
   INFO = "." + _INFO
@@ -60,6 +60,8 @@ class Common(object):
   OBJECT_AREA_CSS = (By.CSS_SELECTOR, ".object-area")
   # alerts
   ALERT_SUCCESS_CSS = (By.CSS_SELECTOR, ".content>.flash>.alert-success")
+  # widgets
+  WIDGET_NOT_HIDDEN = "section.widget:not(.hidden) "
 
 
 class CommonAssessment(object):
@@ -243,7 +245,8 @@ class ExtendedInfo(object):
 class CommonModalUnifiedMapper(object):
   """Common locators for unified mapper modals."""
   # pylint: disable=invalid-name
-  MODAL = Common.MODAL_MAP
+  MODAL = Common.MODAL_MAPPER
+  MODAL_CSS = (By.CSS_SELECTOR, MODAL)
   MODAL_FILTER = Common.MODAL_FILTER
   FILTER_TOGGLE_CSS = (By.CSS_SELECTOR,
                        MODAL_FILTER + " collapse-panel-click-area")
@@ -266,23 +269,25 @@ class CommonModalUnifiedMapper(object):
                          " .btn-map")
   RESULT_TOGGLE_CSS = (By.CSS_SELECTOR, MODAL + Common.MODAL_FOOTER +
                        " collapse-panel-click-area")
+  CLOSE_BTN_CSS = (By.CSS_SELECTOR,
+                   MODAL + Common.MODAL_HEADER + " a.modal-dismiss")
 
 
 class ModalMapObjects(CommonModalUnifiedMapper):
   """Locators for map objects modals."""
-  MODAL = Common.MODAL_MAP
+  MODAL = Common.MODAL_MAPPER
   # user input elements
   BUTTON_CREATE_OBJ = (By.CSS_SELECTOR, MODAL + " .create-control")
 
 
 class ModalSearchObjects(CommonModalUnifiedMapper):
   """Locators for search objects modals."""
-  MODAL = Common.MODAL_MAP
+  MODAL = Common.MODAL_MAPPER
 
 
 class ModalGenerateAssessments(CommonModalUnifiedMapper):
   """Locators for generate Assessments modal."""
-  MODAL = Common.MODAL_GENEATE
+  MODAL = Common.MODAL_MAPPER
 
 
 class BaseModalCreateNew(object):
@@ -993,98 +998,22 @@ class UnifiedMapperTreeView(TreeView):
 
 class BaseWidgetGeneric(object):
   """Locators for non Info and Admin widgets."""
-  _object_name = None
-  widget_info = Common.INFO_WIDGET_ID
-
-  class __metaclass__(type):
-    """For sharing parametrized class attributes we simply define how
-    class should look like. Note that same functionality can be
-    implemented using properties though with more code."""
-    def __init__(cls, *args):
-      # pylint: disable=invalid-name
-      _WIDJET = "#{}_widget"
-      _FILTER_BUTTON = _WIDJET + " tree-filter-input .tree-filter__actions"
-      _FILTER_DROPDOWN = _WIDJET + " tree-status-filter"
-      _FILTER_DROPDOWN_ELEMENTS = (
-          _FILTER_DROPDOWN + " .multiselect-dropdown__element")
-      cls.TEXTFIELD_TO_FILTER = (
-          By.CSS_SELECTOR, str(_WIDJET + " .tree-filter__input")
-            .format(cls._object_name))
-      cls.BUTTON_FILTER = (
-          By.CSS_SELECTOR,
-          str(_FILTER_BUTTON + ' [type="submit"]').format(cls._object_name))
-      cls.BUTTON_HELP = (
-          By.CSS_SELECTOR,
-          str(_FILTER_BUTTON + " #page-help").format(cls._object_name))
-      cls.DROPDOWN = (
-          By.CSS_SELECTOR,
-          str(_FILTER_DROPDOWN + " .multiselect-dropdown__input-container")
-            .format(cls._object_name))
-      cls.DROPDOWN_STATES = (
-          By.CSS_SELECTOR,
-          str(_FILTER_DROPDOWN_ELEMENTS).format(cls._object_name))
+  # pylint: disable=invalid-name
+  _FILTER_BUTTON = (
+      Common.WIDGET_NOT_HIDDEN + "tree-filter-input .tree-filter__actions")
+  _FILTER_DROPDOWN = Common.WIDGET_NOT_HIDDEN + "tree-status-filter"
+  _FILTER_DROPDOWN_ELEMENTS = (
+      _FILTER_DROPDOWN + " .multiselect-dropdown__element")
+  TEXTFIELD_TO_FILTER = (
+      By.CSS_SELECTOR, Common.WIDGET_NOT_HIDDEN + ".tree-filter__input")
+  BUTTON_FILTER = (By.CSS_SELECTOR, _FILTER_BUTTON + ' [type="submit"]')
+  BUTTON_HELP = (By.CSS_SELECTOR, _FILTER_BUTTON + " #page-help")
+  DROPDOWN = (
+      By.CSS_SELECTOR,
+      _FILTER_DROPDOWN + " .multiselect-dropdown__input-container")
+  DROPDOWN_STATES = (By.CSS_SELECTOR, _FILTER_DROPDOWN_ELEMENTS)
   PAGINATION_CONTROLLERS = (
-      By.CSS_SELECTOR, "section.widget:not(.hidden) .tree-pagination.flex-box")
-
-
-class WidgetAudits(BaseWidgetGeneric):
-  """Locators for Audits generic widgets."""
-  _object_name = objects.get_singular(objects.AUDITS)
-
-
-class WidgetAssessments(BaseWidgetGeneric):
-  """Locators for Assessments generic widgets."""
-  _object_name = objects.get_singular(objects.ASSESSMENTS)
-
-
-class WidgetControls(BaseWidgetGeneric):
-  """Locators for Controls generic widgets."""
-  _object_name = objects.get_singular(objects.CONTROLS)
-
-
-class WidgetObjectives(BaseWidgetGeneric):
-  """Locators for Controls generic widgets."""
-  _object_name = objects.get_singular(objects.OBJECTIVES)
-
-
-class WidgetProducts(BaseWidgetGeneric):
-  """Locators for Products generic widgets."""
-  _object_name = objects.get_singular(objects.PRODUCTS)
-
-
-class WidgetProjects(BaseWidgetGeneric):
-  """Locators for Projects generic widgets."""
-  _object_name = objects.get_singular(objects.PROJECTS)
-
-
-class WidgetSystems(BaseWidgetGeneric):
-  """Locators for Systems generic widgets."""
-  _object_name = objects.get_singular(objects.SYSTEMS)
-
-
-class WidgetDataAssets(BaseWidgetGeneric):
-  """Locators for DataAssets generic widgets."""
-  _object_name = objects.get_singular(objects.PROJECTS)
-
-
-class WidgetProcesses(BaseWidgetGeneric):
-  """Locators for Processes generic widgets."""
-  _object_name = objects.get_singular(objects.PROCESSES)
-
-
-class WidgetIssues(BaseWidgetGeneric):
-  """Locators for Issues generic widgets"""
-  _object_name = objects.get_singular(objects.ISSUES)
-
-
-class WidgetPrograms(BaseWidgetGeneric):
-  """Locators for Programs generic widgets"""
-  _object_name = objects.get_singular(objects.PROGRAMS)
-
-
-class WidgetAssessmentTemplates(BaseWidgetGeneric):
-  """Locators for Assessment Templates generic widgets."""
-  _object_name = objects.get_singular(objects.ASSESSMENT_TEMPLATES)
+      By.CSS_SELECTOR, Common.WIDGET_NOT_HIDDEN + ".tree-pagination.flex-box")
 
 
 class AdminCustomAttributes(object):

@@ -141,11 +141,11 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'design',
       'operationally',
       MultipleSubpropertyFullTextAttr('related_assessors', 'assessors',
-                                      ['user_name', 'email', 'name']),
+                                      ['email', 'name']),
       MultipleSubpropertyFullTextAttr('related_creators', 'creators',
-                                      ['user_name', 'email', 'name']),
+                                      ['email', 'name']),
       MultipleSubpropertyFullTextAttr('related_verifiers', 'verifiers',
-                                      ['user_name', 'email', 'name']),
+                                      ['email', 'name']),
   ]
 
   @classmethod

@@ -9,7 +9,6 @@ from ggrc.converters import errors
 from ggrc.converters.handlers.handlers import ColumnHandler
 from ggrc.models import Comment
 from ggrc.models import Relationship
-from ggrc.models.comment import Commentable
 from ggrc.login import get_current_user_id
 
 
@@ -18,20 +17,23 @@ class CommentColumnHandler(ColumnHandler):
 
   COMMENTS_SEPARATOR = ";;"
 
+  @staticmethod
+  def split_comments(raw_value):
+    """Split comments"""
+    res = [comment.strip() for comment in
+           raw_value.rsplit(CommentColumnHandler.COMMENTS_SEPARATOR)
+           if comment.strip()]
+    return res
+
   def parse_item(self):
     """Parse a list of comments to be mapped.
 
-    Parse a semicolon separated list of comments
+    Parse a COMMENTS_SEPARATOR separated list of comments
 
     Returns:
-      list of commentst
+      list of comments
     """
-    if not isinstance(self.row_converter.obj, Commentable):
-      self.add_error(errors.UNSUPPORTED_OPERATION_ERROR,
-                     operation="Can't import comments for {}"
-                     .format(self.row_converter.obj.__class__.__name__))
-    comments = [comment for comment in
-                self.raw_value.split(self.COMMENTS_SEPARATOR) if comment]
+    comments = self.split_comments(self.raw_value)
     if self.raw_value and not comments:
       self.add_warning(errors.WRONG_VALUE,
                        column_name=self.display_name)

@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -15,6 +15,7 @@
       objectProp: '@',
       destination: {},
       source: {},
+      preventClick: false,
       unmapInstance: function () {
         var self = this;
         this.dispatch({type: 'beforeUnmap', item: this.attr('source')});
@@ -54,12 +55,16 @@
             return sources.indexOf(dest.id) > -1;
           })[0];
         return new CMS.Models[type](mapping || {});
-      }
+      },
     },
     events: {
       click: function () {
+        if (this.viewModel.attr('preventClick')) {
+          return;
+        }
+
         this.viewModel.unmapInstance();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window.CMS);
