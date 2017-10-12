@@ -812,9 +812,8 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
     with factories.single_commit():
       program = factories.ProgramFactory()
       person1 = factories.PersonFactory(name="Ann", email="email1@example.com")
-      person2 = factories.PersonFactory(name="Bob", email="email2@example.com")
-      control1 = factories.ControlFactory(principal_assessor=person2)
-      control2 = factories.ControlFactory(principal_assessor=person1)
+      control1 = factories.ControlFactory()
+      control2 = factories.ControlFactory()
       program_id = program.id
       control1_id = control1.id
       control2_id = control2.id
