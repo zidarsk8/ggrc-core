@@ -4,6 +4,7 @@
 """GDrive module"""
 
 import flask
+import httplib2
 
 from flask import Blueprint
 
@@ -116,7 +117,11 @@ def get_credentials():
   """
   credentials = client.OAuth2Credentials.from_json(
       flask.session['credentials'])
-  return credentials
+  http_auth = credentials.authorize(httplib2.Http())
+  if credentials.access_token_expired:
+    credentials.refresh(http_auth)
+    flask.session['credentials'] = credentials.to_json()
+  return credentials, http_auth
 
 
 def verify_credentials(redirect_back_to="dashboard"):

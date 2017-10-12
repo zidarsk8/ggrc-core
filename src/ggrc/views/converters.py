@@ -66,8 +66,7 @@ def parse_export_request():
 
 def create_gdrive_file(csv_string, filename):
   """Post text/csv data to a gdrive file"""
-  credentials = get_credentials()
-  http_auth = credentials.authorize(httplib2.Http())
+  credentials, http_auth = get_credentials()
   drive_service = discovery.build('drive', 'v3', http=http_auth)
   # make export to sheets
   file_metadata = {
@@ -149,9 +148,8 @@ def parse_import_request():
 
 def get_gdrive_file(file_data):
   """Get text/csv data from gdrive file"""
-  credentials = get_credentials()
+  credentials, http_auth = get_credentials()
   try:
-    http_auth = credentials.authorize(httplib2.Http())
     drive_service = discovery.build('drive', 'v3', http=http_auth)
     # check file type
     file_meta = drive_service.files().get(fileId=file_data['id']).execute()
