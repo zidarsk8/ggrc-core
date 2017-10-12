@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 
 def send_error_notification(message):
   try:
-    user_email = common.getAppEngineEmail()
+    user_email = common.get_app_engine_email()
     common.send_email(user_email, "Error in nightly cron job", message)
   except:  # pylint: disable=bare-except
     logger.exception("Failed on sending notification")
