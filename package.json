@@ -8,7 +8,6 @@
   },
   "dependencies": {
     "bootstrap": "https://github.com/twbs/bootstrap/archive/v2.0.4.tar.gz",
-    "bower": "^1.6.8",
     "clipboard": "^1.5.16",
     "components-jqueryui": "^1.12.1",
     "doctoc": "^0.11.0",

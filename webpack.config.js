@@ -83,7 +83,7 @@ module.exports = function (env, argv) {
         loader: 'raw-loader',
       }, {
         test: /\.js$/,
-        exclude: /(node_modules|bower_components|third_party)/,
+        exclude: /(node_modules|third_party)/,
         loader: 'babel-loader',
         query: {
           cacheDirectory: true,
@@ -92,7 +92,7 @@ module.exports = function (env, argv) {
     },
     devtool: isDev ? 'cheap-module-eval-source-map' : 'source-map',
     resolve: {
-      modules: ['node_modules', 'bower_components', 'third_party']
+      modules: ['node_modules', 'third_party']
         .map(function (dir) {
           return path.join(__dirname, dir);
         }),
