@@ -16,3 +16,6 @@
   -include 'base_objects/_page_header.haml'
 
 -block widget_area
+
+-block page_scripts
+  %script{ type:'text/javascript', src:'{{config.get("DASHBOARD_JS_PATH")}}' }

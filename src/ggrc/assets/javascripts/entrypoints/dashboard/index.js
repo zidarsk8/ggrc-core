@@ -171,5 +171,3 @@ import '../../components/issue/issue-unmap';
 import '../../bootstrap/modal-ajax';
 
 import '../../dashboard';
-
-import '../../../stylesheets/dashboard.scss';

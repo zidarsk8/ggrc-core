@@ -12,77 +12,82 @@ const WebpackShellPlugin = require('webpack-shell-plugin');
 const _ = require('lodash');
 const path = require('path');
 const ENV = process.env;
+const isProd = ENV.NODE_ENV === 'production';
+const isDev = ENV.NODE_ENV === 'development';
+var BundleAnalyzerPlugin;
 
 const STATIC_FOLDER = '/static/';
 
 module.exports = function (env, argv) {
   const extractSass = new ExtractTextPlugin({
-    filename: isProduction(env) ? '[name].[chunkhash].css' : '[name].css',
+    filename: isProd ? '[name].[chunkhash].css' : '[name].css',
     allChunks: true,
-    // disable: isDevelopment(env)
+    // disable: isDev
   });
   const config = {
     entry: {
       vendor: 'entrypoints/vendor',
+      styles: 'entrypoints/styles',
       dashboard: ['entrypoints/dashboard'].concat(getExtraModules())
-        .concat(['entrypoints/dashboard/bootstrap'])
+        .concat(['entrypoints/dashboard/bootstrap']),
+      login: 'entrypoints/login',
     },
     output: {
-      filename: isProduction(env) ? '[name].[chunkhash].js' : '[name].js?[chunkhash]',
+      filename: isProd ? '[name].[chunkhash].js' : '[name].js',
       sourceMapFilename: '[file].map',
       path: path.join(__dirname, './src/ggrc/static/'),
-      publicPath: STATIC_FOLDER
+      publicPath: STATIC_FOLDER,
     },
     module: {
       rules: [{
         test: /\.woff(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url?limit=10000&mimetype=application/font-woff'
+        loader: 'url?limit=10000&mimetype=application/font-woff',
       }, {
         test: /\.woff2(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url?limit=10000&mimetype=application/font-woff'
+        loader: 'url?limit=10000&mimetype=application/font-woff',
       }, {
         test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url?limit=10000&mimetype=application/octet-stream'
+        loader: 'url?limit=10000&mimetype=application/octet-stream',
       }, {
         test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'file'
+        loader: 'file',
       }, {
         test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url?limit=10000&mimetype=image/svg+xml'
+        loader: 'url?limit=10000&mimetype=image/svg+xml',
       }, {
         test: /\.css$/,
         use: extractSass.extract({
           fallback: 'style-loader',
           use: {
             loader: 'css-loader',
-            options: {url: false}
-          }
-        })
+            options: {url: false},
+          },
+        }),
       }, {
         test: /\.scss$/,
         use: extractSass.extract({
           use: [{
-            loader: 'css-loader'
+            loader: 'css-loader',
           }, {
-            loader: 'sass-loader'
+            loader: 'sass-loader',
           }],
-          fallback: 'style-loader'
-        })
+          fallback: 'style-loader',
+        }),
       }, {
         test: /wysihtml5-0\.4\.0pre\.js$/,
-        loader: 'exports-loader?wysihtml5'
+        loader: 'exports-loader?wysihtml5',
       }, {
         test: require.resolve('jquery'),
         use: [{
           loader: 'expose-loader',
-          options: 'jQuery'
+          options: 'jQuery',
         }, {
           loader: 'expose-loader',
-          options: '$'
-        }]
+          options: '$',
+        }],
       }, {
         test: /\.mustache/,
-        loader: 'raw-loader'
+        loader: 'raw-loader',
       }, {
         test: /\.js$/,
         exclude: /(node_modules|bower_components|third_party)/,
@@ -92,16 +97,16 @@ module.exports = function (env, argv) {
         },
       }],
     },
-    devtool: isDevelopment(env) ? 'cheap-module-eval-source-map' : 'source-map',
+    devtool: isDev ? 'cheap-module-eval-source-map' : 'source-map',
     resolve: {
       modules: ['node_modules', 'bower_components', 'third_party']
         .map(function (dir) {
           return path.join(__dirname, dir);
         }),
       alias: {
-        'can': 'canjs/amd/can/',
-        'entrypoints': './src/ggrc/assets/javascripts/entrypoints'
-      }
+        can: 'canjs/amd/can/',
+        entrypoints: './src/ggrc/assets/javascripts/entrypoints',
+      },
     },
     plugins: [
       extractSass,
@@ -110,51 +115,52 @@ module.exports = function (env, argv) {
         jQuery: 'jquery',
         'window.jQuery': 'jquery',
         _: 'lodash',
-        moment: 'moment'
+        moment: 'moment',
       }),
       new webpack.DefinePlugin({
-        GGRC_SETTINGS_MODULE: JSON.stringify(process.env.GGRC_SETTINGS_MODULE)
+        GGRC_SETTINGS_MODULE: JSON.stringify(process.env.GGRC_SETTINGS_MODULE),
       }),
       new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor'
+        name: 'vendor',
       }),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new ManifestPlugin({
-        publicPath: STATIC_FOLDER
+        publicPath: STATIC_FOLDER,
       }),
       new WebpackShellPlugin({
-        onBuildEnd:['cp src/ggrc/static/manifest.json src/ggrc/manifest.json']
-      })
+        onBuildEnd: ['cp src/ggrc/static/manifest.json src/ggrc/manifest.json'],
+      }),
     ],
     stats: {
-      errorDetails: true
-    }
+      errorDetails: true,
+    },
   };
 
-  if (isProduction(env)) {
+  if (isProd) {
     config.plugins.push(new UglifyJSPlugin({
       sourceMap: true,
       output: {
         comments: false,
         beautify: false,
-      }
+      },
     }));
 
     config.plugins.push(new CleanWebpackPlugin(['./src/ggrc/static/'], {
-      exclude: ['images', 'fonts', 'favicon.ico', 'dashboard-templates*']
+      exclude: ['images', 'fonts', 'favicon.ico', 'dashboard-templates*'],
+    }));
+  }
+
+  if (env && env.debug) {
+    BundleAnalyzerPlugin =
+      require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+    config.plugins.push(new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      generateStatsFile: true,
     }));
   }
 
   return config;
 };
-
-function isProduction(env) {
-  return env.production;
-}
-
-function isDevelopment(env) {
-  return env.development;
-}
 
 function getExtraModules() {
   var modules = ENV.GGRC_SETTINGS_MODULE.split(' ');

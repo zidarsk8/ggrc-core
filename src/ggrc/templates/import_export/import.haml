@@ -8,6 +8,9 @@
   GGRC.Bootstrap.importable = ={ import_definitions()|safe };
   GGRC.pageType = "IMPORT";
 
+-block page_scripts
+  %script{ type:'text/javascript', src:'{{config.get("DASHBOARD_JS_PATH")}}' }
+
 -block title
   Import
 
