@@ -151,7 +151,7 @@ bower_components : bower.json
 	$(BOWER_BIN_PATH) install --allow-root
 
 clean_bower_components :
-	rm -rf $(BOWER_PATH) $(STATIC_PATH)/fonts
+	rm -rf $(BOWER_PATH)
 
 deploy : appengine_packages bower_components src/ggrc/assets/assets.manifest src/app.yaml
 
