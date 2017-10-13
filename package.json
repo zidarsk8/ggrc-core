@@ -67,7 +67,7 @@
   "scripts": {
     "postinstall": "./node_modules/.bin/napa",
     "test": "run_unittests",
-    "watch": "export NODE_ENV=development && ./node_modules/.bin/webpack --watch --profile --progress",
+    "watch": "./node_modules/.bin/webpack --watch --profile --progress",
     "build": "export NODE_ENV=production && ./node_modules/.bin/webpack --profile --progress",
     "stats": "export NODE_ENV=production && ./node_modules/.bin/webpack --env.debug"
   },
