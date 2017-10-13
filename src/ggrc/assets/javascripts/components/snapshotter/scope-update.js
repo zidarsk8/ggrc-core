@@ -58,6 +58,7 @@
           .then(function () {
             this._updateVisibleContainer.bind(this)();
             this._showSuccessMsg();
+            instance.dispatch('snapshotScopeUpdated');
           }.bind(this));
       },
       _dismiss: _.identity,
