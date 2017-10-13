@@ -9,6 +9,7 @@ from collections import Iterable
 from sqlalchemy import event
 
 from ggrc import db
+from ggrc import settings
 from ggrc.extensions import get_extension_instance
 
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
@@ -56,7 +57,6 @@ class Indexer(object):
 
 def resolve_default_text_indexer():
   """Get indexer for settings fulltest db"""
-  from ggrc import settings
   db_scheme = settings.SQLALCHEMY_DATABASE_URI.split(':')[0].split('+')[0]
   return 'ggrc.fulltext.{db_scheme}.Indexer'.format(db_scheme=db_scheme)
 
@@ -68,9 +68,8 @@ def get_indexer():
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument
   """Collect all reindex models in session"""
-  import ggrc.fulltext
   from ggrc.fulltext.mixin import Indexed
-  ggrc_indexer = ggrc.fulltext.get_indexer()
+  ggrc_indexer = get_indexer()
   db.session.reindex_set = getattr(db.session, "reindex_set", set())
   getters = ggrc_indexer.indexer_rules.get(target.__class__.__name__) or []
   for getter in getters:
@@ -85,10 +84,9 @@ def _runner(mapper, content, target):  # pylint:disable=unused-argument
 
 def init_indexer():
   """Indexing initialization procedure"""
-  import ggrc.fulltext
   from ggrc.fulltext.mixin import Indexed
   from ggrc.models import all_models
-  ggrc_indexer = ggrc.fulltext.get_indexer()
+  ggrc_indexer = get_indexer()
 
   for model in all_models.all_models:
     for action in ACTIONS:
