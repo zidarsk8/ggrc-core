@@ -130,7 +130,9 @@ class TestWorkflowsCycleGeneration(TestCase):
   # pylint: disable=too-many-arguments
   @ddt.data(
       # (expected, setup_date, freeze_date, repeat_every, unit),
-      (dtm.date(2017, 3, 28), dtm.date(2017, 2, 28), dtm.date(2017, 4, 28), 1,
+      (dtm.date(2017, 3, 31), dtm.date(2017, 2, 28), dtm.date(2017, 4, 1), 1,
+       Workflow.MONTH_UNIT),
+      (dtm.date(2016, 3, 28), dtm.date(2016, 2, 28), dtm.date(2016, 4, 1), 1,
        Workflow.MONTH_UNIT),
       (dtm.date(2017, 2, 28), dtm.date(2017, 1, 31), dtm.date(2017, 3, 31), 1,
        Workflow.MONTH_UNIT),

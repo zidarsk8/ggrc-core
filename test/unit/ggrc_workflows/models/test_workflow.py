@@ -61,7 +61,7 @@ class TestWorkflowState(unittest.TestCase):
 
   @ddt.data(
       # (expected, setup_date, repeat_every, unit),
-      (date(2017, 3, 28), date(2017, 2, 28), 1, workflow.Workflow.MONTH_UNIT),
+      (date(2017, 3, 31), date(2017, 2, 28), 1, workflow.Workflow.MONTH_UNIT),
       (date(2017, 2, 28), date(2017, 1, 31), 1, workflow.Workflow.MONTH_UNIT),
       (date(2017, 4, 28), date(2017, 1, 31), 3, workflow.Workflow.MONTH_UNIT),
       (date(2017, 2, 28), date(2016, 2, 29), 12, workflow.Workflow.MONTH_UNIT),
