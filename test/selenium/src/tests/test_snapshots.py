@@ -36,6 +36,21 @@ class TestSnapshots(base.Test):
                     messages.AssertionMessages.format_err_msg_equal(
                         True, is_control_updateable_actual)))
 
+  @classmethod
+  def get_controls_and_general_assert(cls, controls_ui_service,
+                                      exp_controls, src_obj):
+    """Get Controls objects' count and objects from Tree View and perform count
+    and general assertion accordingly.
+    """
+    actual_controls_tab_count = (
+        controls_ui_service.get_count_objs_from_tab(src_obj=src_obj))
+    actual_controls = (
+        controls_ui_service.get_list_objs_from_tree_view(src_obj=src_obj))
+    assert len([exp_controls]) == actual_controls_tab_count
+    # 'actual_controls': created_at, updated_at, custom_attributes (None)
+    cls.general_equal_assert(exp_controls, actual_controls,
+                             *Representation.tree_view_attrs_to_exclude)
+
   @pytest.fixture(scope="function")
   def lhn_menu(self, selenium):
     """Open LHN menu and return LHN page objects model."""
@@ -384,7 +399,7 @@ class TestSnapshots(base.Test):
         if control_for_tree_view else None)
     expected_map_status = MappingStatusAttrs(
         expected_control_from_mapper.title, *expected_map_statuses)
-    controls_ui_service = webui_service.ControlsService(driver=selenium)
+    controls_ui_service = webui_service.ControlsService(selenium)
     actual_controls_from_mapper, actual_map_status = (
         controls_ui_service.get_list_objs_from_mapper(
             src_obj=source_obj, dest_objs=[expected_control_from_mapper]))
@@ -482,84 +497,65 @@ class TestSnapshots(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      "control_for_mapper, dynamic_objects, dynamic_relationships",
-      [pytest.mark.skip(
-          reason="todo: Redesign test according to business requirements")(
-          ("update_control_rest", "new_audit_rest", None)),
-       ("new_control_rest", "new_assessment_rest", None),
-       pytest.mark.skip(
-           reason="todo: Redesign test according to business requirements")(
-           ("new_control_rest", ["new_assessment_rest", "new_issue_rest"],
-            "map_new_assessment_rest_to_new_control_rest_snapshot"))],
+      "is_via_tw_map_btn_not_item, expected_snapshoted_control, "
+      "dynamic_objects, dynamic_relationships",
+      [(True, "new_control_rest", ["new_assessment_rest", "new_issue_rest"],
+        "map_new_assessment_rest_to_new_control_rest_snapshot"),
+       (True, "new_control_rest", "new_assessment_rest", None),
+       (False, "new_control_rest", ["new_assessment_rest", "new_issue_rest"],
+        "map_new_assessment_rest_to_new_control_rest_snapshot"),
+       (False, "new_control_rest", "new_assessment_rest", None)],
+      ids=["Via Tree View MAP btn (map snapshoted Control to Assessment)",
+           "Via Tree View MAP btn (map snapshoted Control to Issue using "
+           "Assessment with mapped snapshoted Control)",
+           "Via Tree View item (map snapshoted Control to Assessment)",
+           "Via Tree View item (map snapshoted Control to Issue using "
+           "Assessment with mapped snapshoted Control)"],
       indirect=["dynamic_objects", "dynamic_relationships"])
-  def test_mapping_of_objects_to_snapshots_via_map_btn(
-      self, create_audit_with_control_and_update_control, control_for_mapper,
-      dynamic_objects, dynamic_relationships, selenium
+  def test_mapping_of_objects_to_snapshots(
+      self, create_audit_with_control_and_update_control,
+      is_via_tw_map_btn_not_item, expected_snapshoted_control, dynamic_objects,
+      dynamic_relationships, selenium
   ):
     """Check mapping of objects to Control's snapshots via UI using Unified
-    Mapper functionality (map button):
-    - Audits: using auto-mapping in Program's scope;
+    Mapper functionality (Tree View's 'MAP' button and item):
     - Assessments: using Audit's scope;
     - Issues: using auto-mapping in Assessment's with mapped snapshoted object
               scope.
     """
     audit_with_one_control = create_audit_with_control_and_update_control
-    source_obj = dynamic_objects
-    expected_control = audit_with_one_control[control_for_mapper][0].repr_ui()
-    controls_ui_service = webui_service.ControlsService(selenium)
-    controls_ui_service.map_objs_via_tree_view(
-        src_obj=source_obj, dest_objs=[expected_control])
-    actual_controls_count_in_tab = (
-        controls_ui_service.get_count_objs_from_tab(src_obj=source_obj))
-    actual_controls = (
-        controls_ui_service.get_list_objs_from_tree_view(source_obj))
-    assert len([expected_control]) == actual_controls_count_in_tab
-    # 'actual_controls': created_at, updated_at, custom_attributes (None)
-    self.general_equal_assert(
-        [expected_control], actual_controls,
-        *Representation.tree_view_attrs_to_exclude)
-
-  @pytest.mark.smoke_tests
-  @pytest.mark.parametrize(
-      "control_for_mapper, dynamic_objects, dynamic_relationships",
-      [pytest.mark.skip(
-          reason="todo: Redesign test according to business requirements")(
-          ("update_control_rest", "new_audit_rest", None)),
-       ("new_control_rest", "new_assessment_rest", None),
-       pytest.mark.skip(
-           reason="todo: Redesign test according to business requirements")(
-           ("new_control_rest", ["new_assessment_rest", "new_issue_rest"],
-            "map_new_assessment_rest_to_new_control_rest_snapshot"))],
-      indirect=["dynamic_objects", "dynamic_relationships"])
-  def test_mapping_of_objects_to_snapshots_via_tree_view(
-      self, create_audit_with_control_and_update_control, control_for_mapper,
-      dynamic_objects, dynamic_relationships, selenium
-  ):
-    """Check mapping of objects to Control's snapshots via UI using Unified
-    Mapper functionality (Tree View element's dropdown):
-    - Audits: using auto-mapping in Program's scope;
-    - Assessments: using Audit's scope;
-    - Issues: using auto-mapping in Assessment's with mapped snapshoted object
-              scope.
-    """
-    audit_with_one_control = create_audit_with_control_and_update_control
-    expected_control = audit_with_one_control[control_for_mapper][0].repr_ui()
-    audit = audit_with_one_control["new_audit_rest"][0]
-    existing_obj = dynamic_objects
-    (get_cls_webui_service(objects.get_plural(existing_obj.type))(selenium).
-        map_objs_via_tree_view_item(
-        src_obj=audit, dest_objs=[expected_control]))
-    controls_ui_service = get_cls_webui_service(
-        objects.get_plural(expected_control.type))(selenium)
-    actual_controls_count = controls_ui_service.get_count_objs_from_tab(
-        src_obj=existing_obj)
-    actual_controls = (controls_ui_service.get_list_objs_from_tree_view(
-        src_obj=existing_obj))
-    assert len([expected_control]) == actual_controls_count
-    # 'actual_controls': created_at, updated_at, custom_attributes (None)
-    self.general_equal_assert(
-        [expected_control], actual_controls,
-        *Representation.tree_view_attrs_to_exclude)
+    is_issue_flow = (isinstance(dynamic_objects, dict) and
+                     dynamic_objects.get("new_issue_rest") is not None)
+    expected_control = (
+        audit_with_one_control[expected_snapshoted_control][0].repr_ui())
+    source_obj_for_map, destination_obj_for_map = (
+        (dynamic_objects.get("new_assessment_rest"),
+         dynamic_objects.get("new_issue_rest")) if is_issue_flow else
+        (dynamic_objects, expected_control))
+    obj_for_map = (destination_obj_for_map if is_via_tw_map_btn_not_item else
+                   source_obj_for_map)
+    objs_ui_service = (
+        get_cls_webui_service(objects.get_plural(obj_for_map.type))(selenium))
+    ui_action = ("map_objs_via_tree_view" if is_via_tw_map_btn_not_item else
+                 "map_objs_via_tree_view_item")
+    getattr(objs_ui_service, ui_action)(
+        src_obj=(source_obj_for_map if is_via_tw_map_btn_not_item else
+                 audit_with_one_control["new_audit_rest"][0]),
+        dest_objs=[destination_obj_for_map])
+    source_obj_for_controls = (dynamic_objects.get("new_issue_rest") if
+                               is_issue_flow else dynamic_objects)
+    # check snapshoted Controls
+    controls_ui_service = webui_service.ControlsService(
+        selenium, is_versions_widget=is_issue_flow)
+    self.get_controls_and_general_assert(
+        controls_ui_service, expected_control, source_obj_for_controls)
+    # check original Controls when Issue is source object
+    if is_issue_flow:
+      expected_control = (
+          audit_with_one_control["update_control_rest"][0].repr_ui())
+      controls_ui_service = webui_service.ControlsService(selenium)
+      self.get_controls_and_general_assert(
+          controls_ui_service, expected_control, source_obj_for_controls)
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
@@ -599,11 +595,10 @@ class TestSnapshots(base.Test):
          dynamic_objects) if dynamic_objects else
         audit_with_one_control["new_audit_rest"][0])
     expected_control = audit_with_one_control["new_control_rest"][0].repr_ui()
-    export_ui_service = webui_service.BaseWebUiService(
-        driver=selenium, obj_name=objects.get_plural(expected_control.type),
-        is_versions_widget=is_issue_flow)
-    export_ui_service.export_objs_via_tree_view(src_obj=dynamic_objects)
-    actual_controls = export_ui_service.get_list_objs_from_csv(
+    controls_ui_service = webui_service.ControlsService(
+        selenium, is_versions_widget=is_issue_flow)
+    controls_ui_service.export_objs_via_tree_view(src_obj=dynamic_objects)
+    actual_controls = controls_ui_service.get_list_objs_from_csv(
         path_to_export_dir=create_tmp_dir)
     # 'actual_controls': created_at, updated_at,
     #                    custom_attributes (GGRC-2344) (None)
@@ -679,8 +674,7 @@ class TestSnapshots(base.Test):
     existing_obj_name = objects.get_plural(existing_obj.type)
     (get_cls_webui_service(existing_obj_name)(selenium).
         map_objs_via_tree_view_item(src_obj=audit, dest_objs=[control]))
-    controls_ui_service = (
-        get_cls_webui_service(objects.get_plural(control.type))(selenium))
+    controls_ui_service = webui_service.ControlsService(selenium)
     (get_cls_rest_service(existing_obj_name)().
         update_obj(obj=existing_obj, status=dynamic_object_state))
     controls_ui_service.unmap_via_info_panel(existing_obj, control)
