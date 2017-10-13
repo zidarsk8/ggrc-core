@@ -120,9 +120,9 @@ def runner(mapper, content, target):  # pylint:disable=unused-argument
   """Collect all reindex models in session"""
   import ggrc.fulltext
   from ggrc.fulltext.mixin import Indexed
-  ggrc.indexer = ggrc.fulltext.get_indexer()
+  ggrc_indexer = ggrc.fulltext.get_indexer()
   db.session.reindex_set = getattr(db.session, "reindex_set", set())
-  getters = ggrc.indexer.indexer_rules.get(target.__class__.__name__) or []
+  getters = ggrc_indexer.indexer_rules.get(target.__class__.__name__) or []
   for getter in getters:
     to_index_list = getter(target)
     if not isinstance(to_index_list, Iterable):
@@ -138,7 +138,7 @@ def init_indexer():
   import ggrc.fulltext
   from ggrc.fulltext.mixin import Indexed
   from ggrc.models import all_models
-  ggrc.indexer = ggrc.fulltext.get_indexer()
+  ggrc_indexer = ggrc.fulltext.get_indexer()
 
   for model in all_models.all_models:
     for action in ACTIONS:
@@ -147,7 +147,7 @@ def init_indexer():
       continue
     for sub_model in model.mro():
       for rule in getattr(sub_model, "AUTO_REINDEX_RULES", []):
-        ggrc.indexer.indexer_rules[rule.model].append(rule.rule)
+        ggrc_indexer.indexer_rules[rule.model].append(rule.rule)
 
 
 def init_permissions_provider():
