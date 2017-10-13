@@ -102,7 +102,7 @@ def try_parse_ticket_ids(title):
     "ggrc-1234/1235: Do something" -> ["GGRC-1234", "GGRC-1235"]
 
   Special prefixes:
-    "QUICK-FIX", "DOCS"
+    "QUICK-FIX", "DOCS", "MERGE", "BACKMERGE"
 
   Returns:
     a list of string ticket ids.
@@ -111,7 +111,7 @@ def try_parse_ticket_ids(title):
   ticket = ticket.upper()
   ticket = ticket.rstrip(":")
 
-  if ticket in ("QUICK-FIX", "DOCS"):
+  if ticket in ("QUICK-FIX", "DOCS", "MERGE", "BACKMERGE"):
     return [ticket]
 
   ticket = ticket.replace("/", ",")
