@@ -4,7 +4,7 @@
 """Relationship creation/modification hooks."""
 
 from datetime import datetime
-
+import logging
 import itertools
 
 import sqlalchemy as sa
@@ -15,6 +15,9 @@ from ggrc.models import all_models
 from ggrc.models.comment import Commentable
 from ggrc.models.mixins import ChangeTracked
 from ggrc.models import exceptions
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _handle_del_audit_issue_mapping(audit, issue):
@@ -64,6 +67,11 @@ def handle_audit_issue_mapping(session, flush_context, instances):
     if isinstance(instance, all_models.Relationship):
       if not instance.destination:
         # TODO: fix Document imports to make this impossible
+        LOGGER.error(u"Relationship.destination is not filled in properly: "
+                     u"id=%r, source_id=%r, source_type=%r, "
+                     u"destination_id=%r, destination_type=%r.",
+                     instance.id, instance.source_id, instance.source_type,
+                     instance.destination_id, instance.destination_type)
         continue
       src, dst = order(instance.source, instance.destination)
       if is_audit_issue(src, dst):
