@@ -65,6 +65,14 @@ def handle_audit_issue_mapping(session, flush_context, instances):
 
   for instance in itertools.chain(session.new, session.dirty):
     if isinstance(instance, all_models.Relationship):
+      if not instance.source:
+        # TODO: fix actions to make this impossible
+        LOGGER.error(u"Relationship.source is not filled in properly: "
+                     u"id=%r, source_id=%r, source_type=%r, "
+                     u"destination_id=%r, destination_type=%r.",
+                     instance.id, instance.source_id, instance.source_type,
+                     instance.destination_id, instance.destination_type)
+        continue
       if not instance.destination:
         # TODO: fix Document imports to make this impossible
         LOGGER.error(u"Relationship.destination is not filled in properly: "
