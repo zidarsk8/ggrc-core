@@ -87,7 +87,8 @@
           <advanced-search-filter-container
             {(items)}="advancedSearch.filterItems"
             {available-attributes}="columns.available"
-            {model-name}="modelName">
+            {model-name}="modelName"
+            ($enter)="applyAdvancedFilters()">
           </advanced-search-filter-container>
         </div>
         <div class="advanced-search__mapping-header">
@@ -96,7 +97,8 @@
         <div class="simple-modal__body">
           <advanced-search-mapping-container
             {(items)}="advancedSearch.mappingItems"
-            {model-name}="modelName">
+            {model-name}="modelName"
+            ($enter)="applyAdvancedFilters()">
           </advanced-search-mapping-container>
         </div>
       </div>

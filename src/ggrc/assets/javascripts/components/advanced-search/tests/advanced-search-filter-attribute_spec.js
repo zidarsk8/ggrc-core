@@ -52,4 +52,18 @@ describe('GGRC.Components.advancedSearchFilterAttribute', function () {
       expect(viewModel.dispatch).toHaveBeenCalledWith('createGroup');
     });
   });
+
+  describe('setValue() method', function () {
+    it('updates "attribute value" from $element value', function () {
+      var $element;
+
+      viewModel.attr('attribute').value = 'old value';
+
+      $element = $('<input type="text"/>');
+      $element.val('new value');
+      viewModel.setValue($element);
+
+      expect(viewModel.attr('attribute').value).toBe('new value');
+    });
+  });
 });
