@@ -47,6 +47,18 @@ def _handle_new_audit_issue_mapping(audit, issue):
   issue.context = audit.context
 
 
+def _order(src, dst):
+  """Sort parameters by classname and id."""
+  return ((src, dst) if (src.type, src.id) < (dst.type, dst.id) else
+          (dst, src))
+
+
+def _is_audit_issue(src, dst):
+  """Return True if src.type == "Audit" and dst.type == "Issue"."""
+  return ((src.type, dst.type) ==
+          (all_models.Audit.__name__, all_models.Issue.__name__))
+
+
 def handle_audit_issue_mapping(session, flush_context, instances):
   """Check and process Audit-Issue mapping rules.
 
@@ -54,14 +66,6 @@ def handle_audit_issue_mapping(session, flush_context, instances):
   Audit-Issue Relationships.
   """
   # pylint: disable=unused-argument
-
-  def order(src, dst):
-    return ((src, dst) if (src.type, src.id) < (dst.type, dst.id) else
-            (dst, src))
-
-  def is_audit_issue(src, dst):
-    return ((src.type, dst.type) ==
-            (all_models.Audit.__name__, all_models.Issue.__name__))
 
   for instance in itertools.chain(session.new, session.dirty):
     if isinstance(instance, all_models.Relationship):
@@ -81,14 +85,14 @@ def handle_audit_issue_mapping(session, flush_context, instances):
                      instance.id, instance.source_id, instance.source_type,
                      instance.destination_id, instance.destination_type)
         continue
-      src, dst = order(instance.source, instance.destination)
-      if is_audit_issue(src, dst):
+      src, dst = _order(instance.source, instance.destination)
+      if _is_audit_issue(src, dst):
         _handle_new_audit_issue_mapping(audit=src, issue=dst)
 
   for instance in session.deleted:
     if isinstance(instance, all_models.Relationship):
-      src, dst = order(instance.source, instance.destination)
-      if is_audit_issue(src, dst):
+      src, dst = _order(instance.source, instance.destination)
+      if _is_audit_issue(src, dst):
         _handle_del_audit_issue_mapping(audit=src, issue=dst)
 
 
