@@ -3,7 +3,6 @@
 
 """Sets up Flask app."""
 
-from collections import Iterable
 
 import re
 from logging import getLogger
@@ -13,7 +12,6 @@ from flask import Flask
 from flask.ext.sqlalchemy import get_debug_queries
 from flask.ext.sqlalchemy import SQLAlchemy
 from tabulate import tabulate
-from sqlalchemy import event
 
 from ggrc import db
 from ggrc import extensions
@@ -113,43 +111,6 @@ def init_extension_blueprints(app_):
       app_.register_blueprint(extension_module.blueprint)
 
 
-ACTIONS = ['after_insert', 'after_delete', 'after_update']
-
-
-def runner(mapper, content, target):  # pylint:disable=unused-argument
-  """Collect all reindex models in session"""
-  import ggrc.fulltext
-  from ggrc.fulltext.mixin import Indexed
-  ggrc_indexer = ggrc.fulltext.get_indexer()
-  db.session.reindex_set = getattr(db.session, "reindex_set", set())
-  getters = ggrc_indexer.indexer_rules.get(target.__class__.__name__) or []
-  for getter in getters:
-    to_index_list = getter(target)
-    if not isinstance(to_index_list, Iterable):
-      to_index_list = [to_index_list]
-    for to_index in to_index_list:
-      db.session.reindex_set.add(to_index)
-  if isinstance(target, Indexed):
-    db.session.reindex_set.add(target)
-
-
-def init_indexer():
-  """Indexing initialization procedure"""
-  import ggrc.fulltext
-  from ggrc.fulltext.mixin import Indexed
-  from ggrc.models import all_models
-  ggrc_indexer = ggrc.fulltext.get_indexer()
-
-  for model in all_models.all_models:
-    for action in ACTIONS:
-      event.listen(model, action, runner)
-    if not issubclass(model, Indexed):
-      continue
-    for sub_model in model.mro():
-      for rule in getattr(sub_model, "AUTO_REINDEX_RULES", []):
-        ggrc_indexer.indexer_rules[rule.model].append(rule.rule)
-
-
 def init_permissions_provider():
   from ggrc.rbac import permissions
   permissions.get_permissions_provider()
@@ -159,8 +120,10 @@ def init_extra_listeners():
   """Initializes listeners for additional services"""
   from ggrc.automapper import register_automapping_listeners
   from ggrc.snapshotter.listeners import register_snapshot_listeners
+  from ggrc import fulltext
   register_automapping_listeners()
   register_snapshot_listeners()
+  fulltext.init_indexer()
 
 
 def _enable_debug_toolbar():
@@ -244,7 +207,6 @@ configure_jinja(app)
 init_services(app)
 init_views(app)
 init_extension_blueprints(app)
-init_indexer()
 init_permissions_provider()
 init_extra_listeners()
 notifications.register_notification_listeners()
