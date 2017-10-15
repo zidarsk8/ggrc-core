@@ -3,7 +3,7 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../utils/gdrive-picker-utils.js';
+import {ensurePickerDisposed} from '../utils/gdrive-picker-utils.js';
 import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
 
 (function (can, $, GGRC, CMS) {
@@ -270,7 +270,7 @@ import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
             el.trigger('rejected');
           }
 
-          GGRC.Utils.GDrivePicker.ensurePickerDisposed(picker, data);
+          ensurePickerDisposed(picker, data);
         }
 
         dfd = GGRC.Controllers.GAPI.reAuthorize(gapi.auth.getToken());

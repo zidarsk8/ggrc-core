@@ -3,7 +3,7 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../utils/gdrive-picker-utils.js';
+import {ensurePickerDisposed} from '../utils/gdrive-picker-utils.js';
 
 (function (can, $) {
   'use strict';
@@ -362,7 +362,7 @@ import '../utils/gdrive-picker-utils.js';
           } else if (data[ACTION] === CANCEL) {
             el.trigger('rejected');
           }
-          GGRC.Utils.GDrivePicker.ensurePickerDisposed(picker, data);
+          ensurePickerDisposed(picker, data);
         }
 
         dfd = GGRC.Controllers.GAPI.reAuthorize(gapi.auth.getToken());

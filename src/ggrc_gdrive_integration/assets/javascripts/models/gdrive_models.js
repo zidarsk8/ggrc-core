@@ -3,7 +3,7 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../utils/gdrive-picker-utils.js';
+import {ensurePickerDisposed} from '../utils/gdrive-picker-utils.js';
 
 (function (can) {
   'use strict';
@@ -333,7 +333,7 @@ import '../utils/gdrive-picker-utils.js';
         } else if (action === google.picker.Action.CANCEL) {
           dfd.reject('action canceled');
         }
-        GGRC.Utils.GDrivePicker.ensurePickerDisposed(picker, data);
+        ensurePickerDisposed(picker, data);
       }
       return dfd.promise();
     }
