@@ -120,10 +120,10 @@ def init_extra_listeners():
   """Initializes listeners for additional services"""
   from ggrc.automapper import register_automapping_listeners
   from ggrc.snapshotter.listeners import register_snapshot_listeners
-  from ggrc import fulltext
+  from ggrc.fulltext import listeners
   register_automapping_listeners()
   register_snapshot_listeners()
-  fulltext.register_fulltext_listeners()
+  listeners.register_fulltext_listeners()
 
 
 def _enable_debug_toolbar():
