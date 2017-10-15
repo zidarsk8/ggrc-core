@@ -3,7 +3,6 @@
 
 """Fulltext init indexer mudule"""
 
-from collections import defaultdict
 from collections import Iterable
 
 from sqlalchemy import event
@@ -13,46 +12,6 @@ from ggrc import settings
 from ggrc.extensions import get_extension_instance
 
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
-
-
-class Indexer(object):
-  """General class for indexer"""
-
-  def __init__(self, settings):
-    self.indexer_rules = defaultdict(list)
-    self.cache = defaultdict(dict)
-    self.builders = {}
-
-  def get_builder(self, obj_class):
-    """return recordbuilder for sent class
-
-    save it in builders dict arguments and cache it here
-    """
-    builder = self.builders.get(obj_class.__name__)
-    if builder is not None:
-      return builder
-    from ggrc.fulltext import recordbuilder
-    builder = recordbuilder.RecordBuilder(obj_class, self)
-    self.builders[obj_class.__name__] = builder
-    return builder
-
-  def fts_record_for(self, obj):
-    return self.get_builder(obj.__class__).as_record(obj)
-
-  def invalidate_cache(self):
-    self.cache = defaultdict(dict)
-
-  def create_record(self, record):
-    raise NotImplementedError()
-
-  def update_record(self, record):
-    raise NotImplementedError()
-
-  def delete_record(self, key):
-    raise NotImplementedError()
-
-  def search(self, terms):
-    raise NotImplementedError()
 
 
 def resolve_default_text_indexer():
