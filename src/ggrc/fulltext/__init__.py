@@ -8,21 +8,20 @@ from collections import Iterable
 from sqlalchemy import event
 
 from ggrc import db
-from ggrc import settings
 from ggrc.extensions import get_extension_instance
 
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
 
 
-def resolve_default_text_indexer():
-  """Get indexer for settings fulltest db"""
-  db_scheme = settings.SQLALCHEMY_DATABASE_URI.split(':')[0].split('+')[0]
-  return 'ggrc.fulltext.{db_scheme}.Indexer'.format(db_scheme=db_scheme)
-
-
 def get_indexer():
+  """Get mysql indexer.
+
+  This is a weird way of getting a MysqlIndexer "singleton". The indexer should
+  be moved its own module and used without a class, and then this function
+  should be removed.
+  """
   return get_extension_instance(
-      'FULLTEXT_INDEXER', resolve_default_text_indexer)
+      "FULLTEXT_INDEXER", "ggrc.fulltext.mysql.MysqlIndexer")
 
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument
