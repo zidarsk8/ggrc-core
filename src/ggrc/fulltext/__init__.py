@@ -41,7 +41,7 @@ def _runner(mapper, content, target):  # pylint:disable=unused-argument
     db.session.reindex_set.add(target)
 
 
-def init_indexer():
+def register_fulltext_listeners():
   """Indexing initialization procedure"""
   from ggrc.fulltext.mixin import Indexed
   from ggrc.models import all_models

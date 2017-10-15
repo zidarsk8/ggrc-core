@@ -123,7 +123,7 @@ def init_extra_listeners():
   from ggrc import fulltext
   register_automapping_listeners()
   register_snapshot_listeners()
-  fulltext.init_indexer()
+  fulltext.register_fulltext_listeners()
 
 
 def _enable_debug_toolbar():
