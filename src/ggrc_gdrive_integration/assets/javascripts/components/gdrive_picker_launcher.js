@@ -3,7 +3,10 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {ensurePickerDisposed} from '../utils/gdrive-picker-utils.js';
+import {
+  uploadFiles,
+  GDRIVE_PICKER_ERR_CANCEL,
+} from '../utils/gdrive-picker-utils.js';
 import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
 
 (function (can, $, GGRC, CMS) {
@@ -192,90 +195,34 @@ import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
       },
       trigger_upload: function (scope, el) {
         // upload files without a parent folder (risk assesment)
-        var that = this;
-        var dfd;
-        var picker;
-        var folderId = el.data('folder-id');
 
-        // Create and render a Picker object for searching images.
-        function createPicker() {
-          GGRC.Controllers.GAPI.oauth_dfd
-            .done(function () {
-              var dialog;
-              var view;
-              var docsView;
-              var docsUploadView;
+        uploadFiles({
+          parentId: el.data('folder-id'),
+          pickFolder: el.data('type') === 'folders',
+        }).then((files) => {
+          scope.attr('pickerActive', false);
+          this.beforeCreateHandler(files);
 
-              picker = new google.picker.PickerBuilder()
-                .setOAuthToken(gapi.auth.getToken().access_token)
-                .setDeveloperKey(GGRC.config.GAPI_KEY)
-                .setMaxItems(10)
-                .setCallback(pickerCallback);
-
-              if (el.data('type') === 'folders') {
-                view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-                  .setIncludeFolders(true)
-                  .setSelectFolderEnabled(true);
-                picker.addView(view);
-              } else {
-                docsUploadView = new google.picker.DocsUploadView()
-                  .setParent(folderId);
-                docsView = new google.picker.DocsView()
-                  .setParent(folderId);
-
-                picker.addView(docsUploadView)
-                  .addView(docsView)
-                  .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
-              }
-              picker = picker.build();
-              picker.setVisible(true);
-
-              dialog = GGRC.Utils.getPickerElement(picker);
-              if (dialog) {
-                dialog.style.zIndex = 4001; // our modals start with 2050
+          this.addFilesSuffixes({}, files)
+            .then(this.handle_file_upload.bind(this))
+            .then((docs) => {
+              // Trigger modal:success event on scope
+              can.trigger(this, 'modal:success', {arr: docs});
+              el.trigger('modal:success', {arr: docs});
+            })
+            .fail((error)=>{
+              this.dispatch({
+                type: 'resetItems',
+              });
+              if ( error ) {
+                GGRC.Errors.notifier('error', error && error.message);
               }
             });
-        }
-
-        function pickerCallback(data) {
-          var files;
-          var PICKED = google.picker.Action.PICKED;
-          var ACTION = google.picker.Response.ACTION;
-          var DOCUMENTS = google.picker.Response.DOCUMENTS;
-          var CANCEL = google.picker.Action.CANCEL;
-
-          if (data[ACTION] === PICKED) {
-            files = CMS.Models.GDriveFile.models(data[DOCUMENTS]);
-            scope.attr('pickerActive', false);
-            that.beforeCreateHandler(files);
-
-            that.refreshFilesModel(files)
-              .then(that.addFilesSuffixes.bind(that, {}))
-              .then(function (files) {
-                that.handle_file_upload(files).then(function (docs) {
-                  // Trigger modal:success event on scope
-                  can.trigger(that, 'modal:success', {arr: docs});
-                  el.trigger('modal:success', {arr: docs});
-                });
-              })
-              .fail(function (error) {
-                that.dispatch({
-                  type: 'resetItems',
-                });
-                if ( error ) {
-                  GGRC.Errors.notifier('error', error && error.message);
-                }
-              });
-          } else if (data[ACTION] === CANCEL) {
+        })
+        .fail((err)=>{
+          if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
             el.trigger('rejected');
           }
-
-          ensurePickerDisposed(picker, data);
-        }
-
-        dfd = GGRC.Controllers.GAPI.reAuthorize(gapi.auth.getToken());
-        dfd.done(function () {
-          gapi.load('picker', {callback: createPicker});
         });
       },
 
@@ -332,17 +279,7 @@ import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
             });
             parentFolder = parentFolder[0] || bindings[0].instance;
 
-            // NB: resources returned from uploadFiles() do not match the
-            // properties expected from getting files from GAPI --
-            // "name" <=> "title", "url" <=> "alternateLink". Of greater
-            // annoyance is the "url" field from the picker differs from the
-            // "alternateLink" field value from GAPI: the URL has a query
-            // parameter difference, "usp=drive_web" vs "usp=drivesdk". For
-            // consistency, when getting file references back from Picker,
-            // always put them in a RefreshQueue before using their properties.
-            // --BM 11/19/2013
             parentFolder.uploadFiles()
-              .then(that.refreshFilesModel.bind(that))
               .then(that.beforeCreateHandler.bind(that))
               .then(that.addFilesSuffixes.bind(that, {dest: parentFolder}))
               .then(function (files) {
@@ -359,7 +296,7 @@ import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
 
                   can.trigger(that, 'modal:success');
                   el.trigger('modal:success');
-                } else if ( error ) {
+                } else if ( error && error.type !== GDRIVE_PICKER_ERR_CANCEL ) {
                   that.dispatch({
                     type: 'resetItems'
                   });
@@ -397,7 +334,7 @@ import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
           });
         });
         // waiting for all docs promises
-        return can.when.apply(can, dfdDocs).then(function () {
+        return can.when(...dfdDocs).then(function () {
           return can.makeArray(arguments);
         });
       }

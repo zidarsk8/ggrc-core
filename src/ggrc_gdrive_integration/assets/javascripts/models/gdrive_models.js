@@ -3,7 +3,7 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {ensurePickerDisposed} from '../utils/gdrive-picker-utils.js';
+import {uploadFiles} from '../utils/gdrive-picker-utils.js';
 
 (function (can) {
   'use strict';
@@ -290,53 +290,10 @@ import {ensurePickerDisposed} from '../utils/gdrive-picker-utils.js';
       return CMS.Models.GDriveFolderPermission.findAll(this.serialize());
     },
     uploadFiles: function () {
-      var that = this;
-      var dfd = new $.Deferred();
-      var picker;
-      var GAPIController = GGRC.Controllers.GAPI;
-
-      gapi.load('picker', {
-        callback: createPicker
+      return uploadFiles({
+        parentId: this.id,
       });
-
-        // Create and render a Picker object for searching images.
-      function createPicker() {
-        GAPIController.oauth_dfd.done(function (token, oauth_user) {
-          var dialog;
-
-          picker = new google.picker.PickerBuilder()
-                  .addView(new google.picker.DocsUploadView().setParent(that.id))
-                  .addView(google.picker.ViewId.DOCS)
-                  .setOAuthToken(gapi.auth.getToken().access_token)
-                  .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-                  .setDeveloperKey(GGRC.config.GAPI_KEY)
-                  .setMaxItems(10)
-                  .setCallback(pickerCallback)
-                  .build();
-          console.warn('Next two errors are expected.');
-          picker.setVisible(true);
-          dialog = GGRC.Utils.getPickerElement(picker);
-          if (dialog) {
-            dialog.style.zIndex = 4001; // our modals start with 2050
-          }
-        });
-      }
-
-        // A simple callback implementation.
-      function pickerCallback(data) {
-        var action = data[google.picker.Response.ACTION];
-        if (action === google.picker.Action.PICKED) {
-          data[google.picker.Response.DOCUMENTS].forEach((file) => {
-            file.newUpload = file.uploadState === 'success';
-          });
-          dfd.resolve(CMS.Models.GDriveFile.models(data[google.picker.Response.DOCUMENTS]));
-        } else if (action === google.picker.Action.CANCEL) {
-          dfd.reject('action canceled');
-        }
-        ensurePickerDisposed(picker, data);
-      }
-      return dfd.promise();
-    }
+    },
   });
 
   /*
