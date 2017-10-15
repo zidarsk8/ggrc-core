@@ -9,13 +9,14 @@ from sqlalchemy import event
 
 from ggrc import db
 from ggrc import fulltext
+from ggrc.models import all_models
+from ggrc.fulltext.mixin import Indexed
 
 ACTIONS = ['after_insert', 'after_delete', 'after_update']
 
 
 def _runner(mapper, content, target):  # pylint:disable=unused-argument
   """Collect all reindex models in session"""
-  from ggrc.fulltext.mixin import Indexed
   ggrc_indexer = fulltext.get_indexer()
   db.session.reindex_set = getattr(db.session, "reindex_set", set())
   getters = ggrc_indexer.indexer_rules.get(target.__class__.__name__) or []
@@ -31,8 +32,6 @@ def _runner(mapper, content, target):  # pylint:disable=unused-argument
 
 def register_fulltext_listeners():
   """Indexing initialization procedure"""
-  from ggrc.fulltext.mixin import Indexed
-  from ggrc.models import all_models
   ggrc_indexer = fulltext.get_indexer()
 
   for model in all_models.all_models:
