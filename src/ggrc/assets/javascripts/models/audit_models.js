@@ -394,7 +394,7 @@ import '../components/audit/attach-folder-button'
       context: 'CMS.Models.Context.stub'
     },
     defaults: {
-      test_plan_procedure: false,
+      test_plan_procedure: true,
       template_object_type: 'Control',
       default_people: {
         assignees: 'Principal Assignees',
