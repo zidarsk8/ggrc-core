@@ -132,3 +132,18 @@ class PersonClient(JsonClient):
         '%s:search' % self._BASE_PATH,
         payload={'usernames': usernames})
     return response['persons']
+
+  def suggest_persons(self, prefix):
+    """Performs suggest persons request to integration server.
+
+    Args:
+      prefix: A prefix to lookup for in 'email', 'first name' and 'last name'
+      of person's info.
+
+    Returns:
+      A list of dicts representing a person.
+    """
+    response = self._post(
+        '%s:suggest' % self._BASE_PATH,
+        payload={'tokens': [prefix]})
+    return response['persons']
