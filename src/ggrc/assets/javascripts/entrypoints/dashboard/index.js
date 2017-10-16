@@ -62,7 +62,6 @@ import '../../components/spinner/spinner';
 import '../../components/collapsible-panel/collapsible-panel';
 import '../../components/read-more/read-more';
 import '../../components/assessment/custom-attributes';
-import '../../components/assessment/inline';
 import '../../components/assessment/info-pane/confirm-edit-action';
 import '../../components/comment/comment-add-form';
 import '../../components/comment/comment-input';
