@@ -18,7 +18,7 @@ Anathomy of a selector
 
 Selectors should be written across multiple lines
 
-..  code-block:: css
+..  code-block:: html
 
     [selector] {
         [property]: [value];
@@ -96,4 +96,3 @@ Every component should have it's own partial
 
 HTML
 ----
-
