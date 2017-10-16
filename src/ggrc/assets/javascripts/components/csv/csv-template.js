@@ -1,11 +1,11 @@
-/*!
+/*
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 import template from './templates/csv-template.mustache';
 
-can.Component.extend({
+GGRC.Components('csvTemplate', {
   tag: 'csv-template',
   template: template,
   scope: {
@@ -30,28 +30,27 @@ can.Component.extend({
       });
     },
     '.import-button click': function (el, ev) {
-      var data;
+      var objects;
       ev.preventDefault();
-      data = _.map(this.scope.attr('selected'), function (el) {
+
+      objects = _.map(this.scope.attr('selected'), function (el) {
         return {
           object_name: el.value,
           fields: 'all'
         };
       });
-      if (!data.length) {
+      if (!objects.length) {
         return;
       }
 
       GGRC.Utils.export_request({
-        data: data
+        data: {
+          objects: objects,
+          export_to: 'csv',
+        },
       }).then(function (data) {
         GGRC.Utils.download('import_template.csv', data);
-      })
-        .fail(function (data) {
-          $('body').trigger('ajax:flash', {
-            error: $(data.responseText.split('\n')[3]).text()
-          });
-        });
+      });
     },
     '.import-list a click': function (el, ev) {
       var index = el.data('index');
