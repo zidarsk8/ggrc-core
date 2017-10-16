@@ -84,6 +84,7 @@ import SummaryWidgetController from '../controllers/summary_widget_controller';
           instance: object,
           widget_view: summaryWidgetViews[objectTable],
           order: 3,
+          uncountable: true,
         });
       }
       if (GGRC.Utils.Dashboards.isDashboardEnabled(object)) {
@@ -93,6 +94,7 @@ import SummaryWidgetController from '../controllers/summary_widget_controller';
           instance: object,
           widget_view: path + '/base_objects/dashboard_widget.mustache',
           order: 6,
+          uncountable: true,
         });
       }
       infoWidgetViews = {
@@ -116,6 +118,7 @@ import SummaryWidgetController from '../controllers/summary_widget_controller';
         instance: object,
         widget_view: infoWidgetViews[objectTable],
         order: 5,
+        uncountable: true,
       });
       modelNames = can.Map.keys(baseWidgetsByType);
       modelNames.sort();

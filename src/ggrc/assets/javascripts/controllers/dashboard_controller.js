@@ -502,6 +502,7 @@
         spinner: this.options.spinners['#' + $widget.attr('id')],
         model: widgetOptions && widgetOptions.model,
         order: (widgetOptions || widget).order,
+        uncountable: (widgetOptions || widget).uncountable,
       });
 
       index = this.options.widget_list.length;

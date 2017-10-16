@@ -40,7 +40,8 @@ import SummaryWidgetController from '../controllers/summary_widget_controller';
             model: instance.constructor,
             widget_view: widgetView || defaultInfoWidgetView
           },
-          order: 5
+          order: 5,
+          uncountable: true,
         });
     },
     /*
@@ -65,7 +66,8 @@ import SummaryWidgetController from '../controllers/summary_widget_controller';
             model: instance.constructor,
             widget_view: widgetView || defaultView
           },
-          order: 3
+          order: 3,
+          uncountable: true,
         });
     },
     make_dashboard_widget: function (instance, widgetView) {
@@ -87,7 +89,8 @@ import SummaryWidgetController from '../controllers/summary_widget_controller';
             model: instance.constructor,
             widget_view: widgetView || defaultView
           },
-          order: 6
+          order: 6,
+          uncountable: true,
         });
     },
     /*
