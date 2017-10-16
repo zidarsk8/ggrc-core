@@ -101,8 +101,6 @@ dashboard-js-template-files:
   - base_templates/objects_tooltip.mustache
   - base_templates/attachment.mustache
   - base_templates/base.mustache
-  - base_templates/comment_list.mustache
-  - base_templates/comment_subtree.mustache
   - base_templates/dates_list.mustache
   - base_templates/description.mustache
   - base_templates/header.mustache
