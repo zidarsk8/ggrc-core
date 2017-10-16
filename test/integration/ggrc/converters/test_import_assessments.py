@@ -429,6 +429,35 @@ class TestAssessmentImport(TestCase):
     ).first()
     self.assertEqual([assignee_id], [i.id for i in assessment.assessors])
 
+  def test_update_import_verifiers(self):
+    """Test import does not delete verifiers if empty value imported"""
+    slug = "TestAssessment"
+    assessment = factories.AssessmentFactory(slug=slug)
+
+    name = "test_name"
+    email = "test@email.com"
+    verifier = factories.PersonFactory(name=name, email=email)
+    verifier_id = verifier.id
+
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", slug),
+        ("Verifiers", email),
+    ]))
+    assessment = models.Assessment.query.filter(
+        models.Assessment.slug == slug
+    ).first()
+    self.assertEqual([verifier_id], [i.id for i in assessment.verifiers])
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", slug),
+        ("Verifiers", ""),
+    ]))
+    assessment = models.Assessment.query.filter(
+        models.Assessment.slug == slug
+    ).first()
+    self.assertEqual([verifier_id], [i.id for i in assessment.verifiers])
+
   @ddt.data(
       (
           "Last Updated",
