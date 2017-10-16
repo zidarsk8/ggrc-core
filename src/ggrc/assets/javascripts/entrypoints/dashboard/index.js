@@ -103,7 +103,6 @@ import '../../components/dropdown/multiselect-dropdown';
 import '../../components/autocomplete/autocomplete';
 import '../../components/datepicker/datepicker';
 import '../../components/person/person';
-import '../../components/inline_edit/inline';
 import '../../components/unarchive_link';
 import '../../components/link_to_clipboard';
 import '../../components/relevant_filters';
