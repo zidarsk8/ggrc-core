@@ -12,4 +12,3 @@ Contents:
     object_manipulation
     automapping
     modals
-    mockups
