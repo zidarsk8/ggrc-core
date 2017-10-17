@@ -9,25 +9,32 @@ Create Date: 2017-10-05 11:45:32.172481
 # disable Invalid constant name pylint warning for mandatory Alembic variables.
 # pylint: disable=invalid-name
 
+import datetime
+
 from alembic import op
 
+import sqlalchemy as sa
+from sqlalchemy.sql import column
+from sqlalchemy.sql import table
 
 # revision identifiers, used by Alembic.
 revision = '251191c050d0'
 down_revision = '4131bd4a8a4d'
 
 
-CREATE_ASSIGNEE = (
-    """
-       INSERT INTO access_control_roles
-       (name, object_type, created_at, updated_at,
-        mandatory, non_editable, `delete`)
-       VALUES ('Task Assignees', '{object_type}', NOW(), NOW(),
-              1, 1, 0)
-    """
+ACR_TABLE = table(
+    'access_control_roles',
+    column('name', sa.String),
+    column('object_type', sa.String),
+    column('created_at', sa.DateTime),
+    column('updated_at', sa.DateTime),
+    column('mandatory', sa.Boolean),
+    column('non_editable', sa.Boolean),
+    column('delete', sa.Boolean),
 )
 
-INSERT_SQL = """
+
+INSERT_ACL_ENTRIES = """
 INSERT INTO access_control_list
     (person_id, object_id, ac_role_id, object_type, created_at, updated_at)
 SELECT t.contact_id, t.id, r.id, r.object_type, now(), now()
@@ -56,9 +63,27 @@ WHERE
 
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
-  op.execute(CREATE_ASSIGNEE.format(object_type="TaskGroupTask"))
-  op.execute(CREATE_ASSIGNEE.format(object_type="CycleTaskGroupObjectTask"))
-  op.execute(INSERT_SQL)
+  op.bulk_insert(
+      ACR_TABLE,
+      [{
+          'name': "Task Assignees",
+          'object_type': "TaskGroupTask",
+          'created_at': datetime.datetime.now(),
+          'updated_at': datetime.datetime.now(),
+          'mandatory': True,
+          'non_editable': True,
+          'delete': False,
+      }, {
+          'name': "Task Assignees",
+          'object_type': "CycleTaskGroupObjectTask",
+          'created_at': datetime.datetime.now(),
+          'updated_at': datetime.datetime.now(),
+          'mandatory': True,
+          'non_editable': True,
+          'delete': False,
+      }]
+  )
+  op.execute(INSERT_ACL_ENTRIES)
 
 
 def downgrade():
