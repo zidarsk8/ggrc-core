@@ -68,3 +68,11 @@ def init_hook():
         hasattr(obj.context, 'related_object') and getattr(
             obj.context.related_object, 'archived', False)):
       raise Forbidden()
+
+  @signals.Restful.model_deleted_after_commit.connect_via(all_models.Audit)
+  def handle_audit_deleted_after_commit(
+      sender, obj=None, service=None, event=None):
+    del sender, service, event # Unused
+    issue_obj = all_models.IssuetrackerIssue.get_issue('Audit', obj.id)
+    if issue_obj:
+      db.session.delete(issue_obj)

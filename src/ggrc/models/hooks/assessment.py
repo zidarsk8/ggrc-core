@@ -7,15 +7,23 @@
   We are applying assessment template properties and make
   new relationships and custom attributes
 """
+import collections
+import html2text
 import logging
-from itertools import izip
-from collections import defaultdict
+import time
 
+from itertools import izip
 
 from sqlalchemy import orm
 
+from google.appengine.api import urlfetch
+
 from ggrc import db
+<<<<<<< HEAD
 from ggrc.access_control.role import get_custom_roles_for
+=======
+from ggrc import access_control
+>>>>>>> Handle IssueTracker related information
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.models import Assessment
@@ -27,18 +35,34 @@ from ggrc.access_control import role
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
+_ISSUE_TRACKER_PARAMS = frozenset((
+    'status',
+    'title',
+))
+
+
 def init_hook():
-  """ Initialize hooks"""
-  # pylint: disable=unused-variable
+  """Initializes hooks."""
+
   @signals.Restful.collection_posted.connect_via(Assessment)
   def handle_assessment_post(sender, objects=None, sources=None):
-    # pylint: disable=unused-argument
-    """Apply custom attribute definitions and map people roles
-    when generating Assessmet with template"""
+    """Applies custom attribute definitions and maps people roles.
+
+    Applicable when generating Assessment with template.
+
+    Args:
+      sender: A class of Resource handling the POST request.
+      objects: A list of model instances created from the POSTed JSON.
+      sources: A list of original POSTed JSON dictionaries.
+    """
+    del sender  # Unused
+
+    logger.info('------> handle_assessment_post')
     db.session.flush()
     audit_ids = []
     template_ids = []
     snapshot_ids = []
+    issue_tracker_infos = []
 
     for src in sources:
       snapshot_ids.append(src.get('object', {}).get('id'))
@@ -49,7 +73,7 @@ def init_hook():
         s.id: s for s in Snapshot.query.options(
             orm.undefer_group('Snapshot_complete'),
             orm.Load(Snapshot).joinedload(
-                "revision"
+                'revision'
             ).undefer_group(
                 'Revision_complete'
             )
@@ -73,14 +97,15 @@ def init_hook():
     }
 
     for assessment, src in izip(objects, sources):
-      snapshot_dict = src.get("object") or {}
+      _create_issuetracker_issue(assessment, src.get('issue_tracker'))
+      snapshot_dict = src.get('object') or {}
       common.map_objects(assessment, snapshot_dict)
-      common.map_objects(assessment, src.get("audit"))
+      common.map_objects(assessment, src.get('audit'))
       snapshot = snapshot_cache.get(snapshot_dict.get('id'))
-      if not src.get("_generated") and not snapshot:
+      if not src.get('_generated') and not snapshot:
         continue
-      template = template_cache.get(src.get("template", {}).get("id"))
-      audit = audit_cache[src["audit"]["id"]]
+      template = template_cache.get(src.get('template', {}).get('id'))
+      audit = audit_cache[src['audit']['id']]
       relate_assignees(assessment, snapshot, template, audit)
       relate_ca(assessment, template)
       assessment.title = u'{} assessment for {}'.format(
@@ -98,8 +123,200 @@ def init_hook():
 
   @signals.Restful.model_put.connect_via(Assessment)
   def handle_assessment_put(sender, obj=None, src=None, service=None):
-    # pylint: disable=unused-argument
-    common.ensure_field_not_changed(obj, "audit")
+    # logger.info('------> handle_assessment_model_put: %s', (
+    #     sender, obj, src, service))
+    del sender, service  # Unused
+    # logger.info(
+    #     '---> [put] request status: %s, obj status: %s',
+    #     src.get('status'), obj.status)
+    common.ensure_field_not_changed(obj, 'audit')
+    issue_tracker_info = src.get('issue_tracker')
+    if issue_tracker_info:
+      _update_issuetracker_issue(obj, issue_tracker_info)
+
+  @signals.Restful.model_put_after_commit.connect_via(Assessment)
+  def handle_assessment_put_after_commit(
+      sender, obj=None, src=None, service=None, event=None, initial_state=None):
+    changed_attrs = set()
+    if initial_state is not None:
+      for k, v in initial_state._asdict().iteritems():
+        if v != getattr(obj, k, None):
+          changed_attrs.add(k)
+
+    logger.info('------> handle_assessment_put_after_commit: %s', (
+        sender, obj, src, service, event, initial_state))
+    logger.info('------> handle_assessment_put_after_commit CHANGED: %s', changed_attrs)
+
+    # try:
+    #   # form_data = urllib.urlencode(UrlPostHandler.form_fields)
+    #   headers = {'Content-Type': 'application/json'}
+    #   result = urlfetch.fetch(
+    #       url='https://integration-dot-ggrc-test.googleplex.com/',
+    #       # payload=form_data,
+    #       method=urlfetch.GET,
+    #       headers=headers)
+    #   self.response.write(result.content)
+    # except urlfetch.Error:
+    #   logger.error('Caught exception fetching url')
+
+    comment_id = _get_added_comment_id(src)
+    props_to_update = changed_attrs & _ISSUE_TRACKER_PARAMS
+
+    logger.info('------> comment_id: %s', comment_id)
+    logger.info('------> props_to_update: %s', props_to_update)
+
+    request_params = {}
+    if comment_id is not None:
+      comment_obj = all_models.Comment.query.filter(
+          all_models.Comment.id == comment_id
+      ).first()
+      if comment_obj is not None:
+        request_params['comment'] = html2text.HTML2Text().handle(
+            comment_obj.description).strip('\n')
+
+    logger.info('------> request_params: %s', request_params)
+
+  @signals.Restful.model_deleted_after_commit.connect_via(Assessment)
+  def handle_assessment_deleted_after_commit(
+      sender, obj=None, service=None, event=None):
+    del sender, service, event # Unused
+    issue_obj = all_models.IssuetrackerIssue.get_issue('Assessment', obj.id)
+    if issue_obj:
+      db.session.delete(issue_obj)
+
+
+def _create_issuetracker_issue(assessment, issue_tracker_info):
+  if not issue_tracker_info:
+    return
+
+  if issue_tracker_info.get('enabled'):
+    reported_email = None
+    assignee_email = None
+    reporter_id = get_current_user_id()
+    if reporter_id:
+      reporter = all_models.Person.query.filter(
+          all_models.Person.id == reporter_id).first()
+      if reporter is not None:
+        reported_email = reporter.email
+
+    cc_list = set()
+
+    assignees = assessment.assignees_by_type.get('Assessor')
+    if assignees:
+      logger.info('------> assignee.email: %s', [a.email for a in assignees])
+      for i, person in enumerate(sorted(assignees, key=lambda o: o.name)):
+        if i == 0:
+          assignee_email = person.email
+          continue
+        cc_list.add(person.email)
+
+    hotlist_id = issue_tracker_info.get('hotlist_ids')
+    issue_params = {
+        'component_id': issue_tracker_info['component_id'],
+        'hotlist_ids': [hotlist_id] if hotlist_id else [],
+        'title': assessment.title,
+        'type': issue_tracker_info['issue_type'],
+        'priority': issue_tracker_info['issue_priority'],
+        'severity': issue_tracker_info['issue_severity'],
+        'reporter': reported_email,
+        'assignee': assignee_email,
+        'verifier': '',
+        'ccs': list(cc_list),
+        'comment': '',
+    }
+
+    # TODO(anushovan): create issue here.
+    logger.info('------> CREATE ISSUE: %s', issue_params)
+
+    issue_id = int(time.time())
+    issue_url = 'http://issuetracker.me/b/%s' % issue_id
+  else:
+    issue_id = None
+    issue_url = None
+
+  issue_obj = all_models.IssuetrackerIssue.get_issue(
+      'Assessment', assessment.id)
+  issue_tracker_info = dict(
+      issue_tracker_info,
+      object_type='Assessment',
+      object_id=assessment.id,
+      issue_id=str(issue_id),
+      issue_url=issue_url,
+  )
+  if issue_obj is not None:
+    logger.info('------> update issue object')
+    issue_obj.update_from_dict(issue_tracker_info)
+  else:
+    logger.info('------> create issue object')
+    issue_obj = all_models.IssuetrackerIssue.create_from_dict(
+        issue_tracker_info)
+    db.session.add(issue_obj)
+
+
+def _update_issuetracker_issue(assessment, issue_tracker_info):
+  logger.info('------> _update_issuetracker_issue: %s', assessment.assignees_by_type)
+
+  assignees = assessment.assignees_by_type.get('Assessor')
+  if assignees:
+    logger.info('------> assignee.email: %s', [a.email for a in assignees])
+
+  # db.session.query(role.
+  # select l.person_id, p.name, p.email, l.ac_role_id, r.name from access_control_list l join access_control_roles r on r.id=l.ac_role_id join people p on p.id=l.person_id where l.object_type='Assessment' and l.object_id=3;
+  all_roles = collections.defaultdict(set)
+  ac_list = access_control.list.AccessControlList
+  ac_role = access_control.role.AccessControlRole
+  query = db.session.query(
+      ac_list.person_id,
+      ac_role.name,
+      all_models.Person.name,
+      all_models.Person.email
+  ).join(
+      ac_role,
+      ac_role.id == ac_list.ac_role_id
+  ).join(
+      all_models.Person,
+      all_models.Person.id == ac_list.person_id
+  ).filter(
+      ac_list.object_type == 'Assessment',
+      ac_list.object_id == assessment.id
+  )
+  for r in query.all():
+    logger.info('---> role: %s', r)
+    all_roles[r[1]].add((r[2], r[3]))
+  logger.info('---> all_roles: %s', all_roles)
+
+  roles_dict = role.get_custom_roles_for('Assessment')
+  logger.info('------> roles_dict: %s', roles_dict)
+
+  issue_obj = all_models.IssuetrackerIssue.get_issue(
+      'Assessment', assessment.id)
+  issue_tracker_info = dict(
+      issue_tracker_info,
+      object_type='Assessment',
+      object_id=assessment.id)
+  if issue_obj is not None:
+    logger.info('------> update issue object')
+    issue_obj.update_from_dict(issue_tracker_info)
+  else:
+    logger.info('------> create issue object')
+    issue_obj = all_models.IssuetrackerIssue.create_from_dict(
+        issue_tracker_info)
+    db.session.add(issue_obj)
+
+
+def _get_added_comment_id(src):
+  actions = src.get('actions') or {}
+  related = actions.get('add_related') or []
+
+  if not related:
+    return None
+
+  related_obj = related[0]
+
+  if related_obj.get('type') != 'Comment':
+    return None
+
+  return related_obj.get('id')
 
 
 def generate_assignee_relations(assessment,
@@ -164,7 +381,7 @@ def generate_role_object_dict(snapshot, audit):
   """
 
   acr_dict = role.get_custom_roles_for(snapshot.child_type)
-  acl_dict = defaultdict(list)
+  acl_dict = collections.defaultdict(list)
   # populated content should have access_control_list
   for acl in snapshot.revision.content["access_control_list"]:
     acl_dict[acr_dict[acl["ac_role_id"]]].append(acl["person_id"])

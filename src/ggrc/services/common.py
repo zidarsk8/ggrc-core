@@ -7,12 +7,13 @@ resources.
 """
 
 import datetime
+import collections
 import hashlib
 import itertools
 import json
 import time
+
 from logging import getLogger
-from collections import defaultdict
 from exceptions import TypeError
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
@@ -23,6 +24,7 @@ from flask.ext.sqlalchemy import Pagination
 import sqlalchemy.orm.exc
 from sqlalchemy import and_, or_
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import class_mapper
 from sqlalchemy.sql.expression import tuple_
 from werkzeug.exceptions import BadRequest, Forbidden
 
@@ -503,8 +505,8 @@ class ModelView(View):
     #   'contains_eager()' to the core query, because 'LIMIT 1' breaks up
     #   that JOIN result (e.g. Categorizable)
     try:
-      return self.get_collection(filter_by_contexts=False)\
-          .filter(self.model.id == id).one()
+      return self.get_collection(
+          filter_by_contexts=False).filter(self.model.id == id).one()
     except sqlalchemy.orm.exc.NoResultFound:
       return None
 
@@ -575,7 +577,7 @@ class Resource(ModelView):
   """View base class for Views handling.  Will typically be registered with an
   application following a collection style for routes. Collection `GET` and
   `POST` will have a route like `/resources` while collection member
-  resource routes will have routes likej `/resources/<pk:pk_type>`.
+  resource routes will have routes like `/resources/<pk:pk_type>`.
 
   To register a Resource subclass FooCollection with a Flask application:
 
@@ -718,11 +720,27 @@ class Resource(ModelView):
        and not permissions.has_conditions('update', self.model.__name__):
       raise Forbidden()
 
+  def dump_attrs(self, obj):
+    obj_cls = type(obj)
+    mapper = class_mapper(obj_cls)
+    rel_keys = {c.key for c in mapper.relationships}
+    attrs = tuple(
+        p.key
+        for p in mapper.iterate_properties
+        if p.key not in rel_keys)
+    # TODO(anushovan): consider caching class definitions.
+    attrs_cls = collections.namedtuple('Dumped%s' % obj_cls.__name__, attrs)
+    values = tuple(getattr(obj, k, None) for k in attrs)
+    return attrs_cls(*values)
+
   def put(self, id):
     with benchmark("Query for object"):
       obj = self.get_object(id)
     if obj is None:
       return self.not_found_response()
+
+    initial_state = self.dump_attrs(obj)
+
     src = self.request.json
     if self.request.mimetype != 'application/json':
       return current_app.make_response(
@@ -772,7 +790,8 @@ class Resource(ModelView):
       update_memcache_after_commit(self.request)
     with benchmark("Send PUT - after commit event"):
       signals.Restful.model_put_after_commit.send(
-          obj.__class__, obj=obj, src=src, service=self, event=event)
+          obj.__class__, obj=obj, src=src, service=self, event=event,
+          initial_state=initial_state)
       # Note: Some data is created in listeners for model_put_after_commit
       # (like updates to snapshots), so we need to commit the changes
       with benchmark("Get modified objects"):
@@ -1099,7 +1118,7 @@ class Resource(ModelView):
 
   def _gather_referenced_objects(self, data, accomulator=None):
     if accomulator is None:
-      accomulator = defaultdict(set)
+      accomulator = collections.defaultdict(set)
     if isinstance(data, list):
       for value in data:
         self._gather_referenced_objects(value, accomulator)

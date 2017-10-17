@@ -94,6 +94,8 @@ class Restful(object):
         :src: The original PUT JSON dictionary.
         :service: The instance of Resource handling the PUT request.
         :event: Instance of an Event (if change took place) or None otherwise
+        :initial_state: A named tuple of initial values of an object before
+          applying any change.
       """,)
   model_deleted = signals.signal(
       "Model DELETEd",

@@ -10,6 +10,7 @@ from ggrc import db
 from ggrc.builder import simple_property
 from ggrc.models import assessment
 from ggrc.models import audit
+from ggrc.models import issuetracker_issue
 from ggrc.models import mixins
 from ggrc.models import relationship
 from ggrc.models.exceptions import ValidationError
@@ -69,14 +70,13 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
 
   # REST properties
   _api_attrs = reflection.ApiAttributes(
-      "template_object_type",
-      "test_plan_procedure",
-      "procedure_description",
-      "default_people",
-      reflection.Attribute("archived", create=False, update=False),
-      reflection.Attribute("DEFAULT_PEOPLE_LABELS",
-                           create=False,
-                           update=False),
+      'template_object_type',
+      'test_plan_procedure',
+      'procedure_description',
+      'default_people',
+      reflection.Attribute('issue_tracker', create=False, update=False),
+      reflection.Attribute('archived', create=False, update=False),
+      reflection.Attribute('DEFAULT_PEOPLE_LABELS', create=False, update=False),
   )
 
   _fulltext_attrs = [
@@ -221,6 +221,12 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
       return getattr(self.context.related_object, 'archived', False)
     return False
 
+  @simple_property
+  def issue_tracker(self):
+    issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
+        'AssessmentTemplate', self.id)
+    return issue_obj.to_dict() if issue_obj is not None else {}
+
 
 def create_audit_relationship(audit_stub, obj):
   """Create audit to assessment template relationship"""
@@ -242,3 +248,13 @@ def handle_assessment_template(sender, obj=None, src=None, service=None):
   """
   if "audit" in src:
     create_audit_relationship(src["audit"], obj)
+
+
+@signals.Restful.model_deleted_after_commit.connect_via(AssessmentTemplate)
+def handle_assessment_template_deleted_after_commit(
+    sender, obj=None, service=None, event=None):
+  del sender, service, event # Unused
+  issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
+      'AssessmentTemplate', obj.id)
+  if issue_obj:
+    db.session.delete(issue_obj)

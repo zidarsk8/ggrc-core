@@ -148,7 +148,11 @@ class UpdateAttrHandler(object):
     )):
       cls._do_update_collection(obj, value, attr_name)
     else:
-      setattr(obj, attr_name, value)
+      try:
+        setattr(obj, attr_name, value)
+      except AttributeError as e:
+        logger.error('Unable to set attribute %s: %s', attr_name, e)
+        raise
 
   @classmethod
   def _do_update_collection(cls, obj, value, attr_name):

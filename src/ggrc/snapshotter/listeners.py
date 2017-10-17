@@ -11,15 +11,17 @@ from ggrc.snapshotter.datastructures import Stub
 from ggrc.snapshotter.rules import get_rules
 
 
-def create_all(sender, obj=None, src=None, service=None, event=None):  # noqa  # pylint: disable=unused-argument
-  """Create snapshots"""
+def create_all(sender, obj=None, src=None, service=None, event=None):  # noqa
+  """Creates snapshots."""
+  del service  # Unused
   # We use "operation" for non-standard operations (e.g. cloning)
   if not src.get("operation"):
     create_snapshots(obj, event)
 
 
-def upsert_all(sender, obj=None, src=None, service=None, event=None):  # noqa  # pylint: disable=unused-argument
-  """Update snapshots globally"""
+def upsert_all(sender, obj=None, src=None, service=None, event=None, initial_state=None):  # noqa
+  """Updates snapshots globally."""
+  del service, initial_state  # Unused
   snapshot_settings = src.get("snapshots")
   if snapshot_settings:
     if snapshot_settings["operation"] == "upsert":
@@ -31,7 +33,7 @@ def upsert_all(sender, obj=None, src=None, service=None, event=None):  # noqa  #
 
 
 def register_snapshot_listeners():
-  """Attach listeners to various models"""
+  """Attaches listeners to various models."""
 
   rules = get_rules()
 

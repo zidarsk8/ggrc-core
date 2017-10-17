@@ -19,7 +19,7 @@ class Assignable(object):
 
   @property
   def assignees(self):
-    """Property that returns assignees
+    """Returns assignees.
 
     Returns:
         A set of assignees.
@@ -33,13 +33,13 @@ class Assignable(object):
 
   @property
   def assignee_roles(self):
-    """Property that returns assignee roles
+    """Returns assignee roles.
 
     Returns:
-        Dictionary with assignee role name and id
+      A dictionary with assignee role name and id.
     """
     return {
         role_name: role_id
-        for role_id, role_name in get_custom_roles_for(self.type).items()
+        for role_id, role_name in get_custom_roles_for(self.type).iteritems()
         if role_name in self.ASSIGNEE_TYPES
     }

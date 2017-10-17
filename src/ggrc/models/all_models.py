@@ -43,6 +43,7 @@ from ggrc.models.event import Event
 from ggrc.models.facility import Facility
 from ggrc.models.help import Help
 from ggrc.models.issue import Issue
+from ggrc.models.issuetracker_issue import IssuetrackerIssue
 from ggrc.models.market import Market
 from ggrc.models.meeting import Meeting
 from ggrc.models.notification import Notification
@@ -127,6 +128,7 @@ all_models = [  # pylint: disable=invalid-name
     NotificationType,
     Notification,
     Issue,
+    IssuetrackerIssue,
     Snapshot,
     Maintenance,
 ]

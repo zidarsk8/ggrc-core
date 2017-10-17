@@ -2,11 +2,16 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """A module with Comment object creation hooks"""
+import logging
+
 from sqlalchemy import event
 
 from ggrc.login import get_current_user
 from ggrc.models.all_models import Comment, AccessControlList
 from ggrc.access_control import role
+from ggrc.services import signals
+
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 def init_hook():
@@ -25,3 +30,9 @@ def init_hook():
             object=target,
         )
         return
+
+  @signals.Restful.model_posted_after_commit.connect_via(Comment)
+  def handle_assessment_after_commit(
+      sender, obj=None, src=None, service=None, event=None):
+    logger.info('------> handle_comment_after_commit: %s', (
+        sender, obj, src, service, event))

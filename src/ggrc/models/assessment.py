@@ -2,6 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for Assessment object"""
+
+import logging
+
 from sqlalchemy import and_
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import remote
@@ -13,6 +16,7 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
 from ggrc.models.comment import Commentable
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+from ggrc.models import issuetracker_issue
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
@@ -129,6 +133,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'operationally',
       'audit',
       'assessment_type',
+      reflection.Attribute('issue_tracker', create=False, update=False),
       reflection.Attribute('archived', create=False, update=False),
       reflection.Attribute('object', create=False, update=False),
   )
@@ -202,6 +207,13 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       },
       "threshold": 1,
   }
+
+  @simple_property
+  def issue_tracker(self):
+    issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
+        'Assessment', self.id)
+    return issue_obj.to_dict(
+        include_issue=True) if issue_obj is not None else {}
 
   @simple_property
   def archived(self):
