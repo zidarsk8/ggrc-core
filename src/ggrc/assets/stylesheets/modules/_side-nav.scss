@@ -459,7 +459,7 @@ h4.search-title {
 
 .bar-v {
   @include transition(left, 0.8s);
-  background: $white url("/static/images/bgnds/drag-v.png") no-repeat 2px 50%;
+  background: $white url("../images/bgnds/drag-v.png") no-repeat 2px 50%;
   @include background-size(2px 30px);
   position: absolute;
   top: 0;
