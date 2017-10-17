@@ -12,6 +12,52 @@ var viewModel = can.Map.extend({
     return pageInstance.type !== 'Workflow';
   },
   instance: {},
+  initialState: 'Assigned',
+  cycle: {},
+  workflow: {},
+  init: function () {
+    this.loadCycle()
+      .then(this.loadWorkflow.bind(this));
+  },
+  loadCycle: function () {
+    var stubCycle = this.attr('instance.cycle').reify();
+    var dfdResult;
+
+    if (!_.isEmpty(stubCycle)) {
+      dfdResult = new RefreshQueue()
+        .enqueue(stubCycle)
+        .trigger()
+        .then(_.first)
+        .then(function (cycle) {
+          this.attr('cycle', cycle);
+          return cycle;
+        }.bind(this));
+    } else {
+      dfdResult = can.Deferred().reject();
+    }
+
+    return dfdResult;
+  },
+  loadWorkflow: function (cycle) {
+    var workflow = cycle.attr('workflow').reify();
+
+    return new RefreshQueue().enqueue(workflow)
+      .trigger()
+      .then(_.first)
+      .then(function (loadedWorkflow) {
+        this.attr('workflow', loadedWorkflow);
+      }.bind(this));
+  },
+  onStateChange: function (event) {
+    var instance = this.attr('instance');
+    var newStatus = event.state;
+
+    instance.refresh()
+      .then(function (refreshed) {
+        refreshed.attr('status', newStatus);
+        return refreshed.save();
+      });
+  },
 });
 
 export default GGRC.Components('cycleTaskGroupObjectTask', {

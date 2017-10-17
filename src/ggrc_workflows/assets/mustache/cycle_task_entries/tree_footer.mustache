@@ -3,10 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#using task=instance}} {{! just a more descriptive alias}}
-
-{{^if_equals task.status 'Verified'}}
-  {{#using cycle=task.cycle}}
+{{^if_equals instance.status 'Verified'}}
+  {{#if cycle}}
     {{#if cycle.is_current}}
     {{#is_allowed 'update' instance context='for'}}
       <li class="tree-footer tree-item-add inner-tree-footer non-stick">
@@ -22,16 +20,14 @@
           data-object-singular="CycleTaskEntry"
           data-object-plural="cycle_task_entries"
           data-object-params='{
-            "cycle_task_group_object_task": {{task.id}},
-            "cycle": {{task.cycle.id}},
-            "context": {{task.context.id}}
+            "cycle_task_group_object_task": {{instance.id}},
+            "cycle": {{cycle.id}},
+            "context": {{instance.context.id}}
           }'>
           Add Comment
         </a>
       </li>
     {{/is_allowed}}
     {{/if}}
-  {{/using}}
+  {{/if}}
 {{/if_equals}}
-
-{{/using}}

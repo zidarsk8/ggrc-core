@@ -156,8 +156,7 @@
           </div>
 
           {{#if showLink}}
-          {{#using cycle=instance.cycle}}
-          {{#using workflow=cycle.workflow}}
+            {{#if workflow}}
               <div class="row-fluid wrap-row">
                 <div class="span12">
                   <h6>Part of the workflow</h6>
@@ -169,8 +168,7 @@
                   </p>
                 </div>
               </div>
-          {{/using}}
-          {{/using}}
+            {{/if}}
           {{/if}}
 
           <div class="row-fluid wrap-row">
