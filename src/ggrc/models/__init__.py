@@ -123,20 +123,20 @@ def init_lazy_mixins():
 def init_session_monitor_cache():
   from sqlalchemy.orm.session import Session
   from sqlalchemy import event
-  from ggrc.services.common import get_cache
+  from ggrc.models.cache import Cache
 
   def update_cache_before_flush(session, flush_context, objects):
-    cache = get_cache(create=True)
+    cache = Cache.get_cache(create=True)
     if cache:
       cache.update_before_flush(session, flush_context)
 
   def update_cache_after_flush(session, flush_context):
-    cache = get_cache(create=False)
+    cache = Cache.get_cache(create=False)
     if cache:
       cache.update_after_flush(session, flush_context)
 
   def clear_cache(session):
-    cache = get_cache()
+    cache = Cache.get_cache()
     if cache:
       cache.clear()
 

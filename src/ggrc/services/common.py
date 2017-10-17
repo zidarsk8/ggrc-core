@@ -17,7 +17,7 @@ from exceptions import TypeError
 from wsgiref.handlers import format_date_time
 from urllib import urlencode
 
-from flask import url_for, request, current_app, g, has_request_context
+from flask import url_for, request, current_app, g
 from flask.views import View
 from flask.ext.sqlalchemy import Pagination
 import sqlalchemy.orm.exc
@@ -267,25 +267,9 @@ def inclusion_filter(obj):
                                      obj.id, obj.context_id)
 
 
-def get_cache(create=False):
-  """
-  Retrieves the cache from the Flask global object. The create arg
-  indicates if a new cache should be created if none exists. If we
-  are not in a request context, no cache is created (return None).
-  """
-  if has_request_context():
-    cache = getattr(g, 'cache', None)
-    if cache is None and create:
-      cache = g.cache = Cache()
-    return cache
-  else:
-    logger.warning("No request context - no cache created")
-    return None
-
-
 def get_modified_objects(session):
   session.flush()
-  cache = get_cache()
+  cache = Cache.get_cache()
   if cache:
     return cache.copy()
   else:
@@ -641,7 +625,7 @@ class Resource(ModelView):
           # When running integration tests, cache sometimes does not clear
           # correctly
           if getattr(settings, 'TESTING', False):
-            cache = get_cache()
+            cache = Cache.get_cache()
             if cache:
               cache.clear()
 

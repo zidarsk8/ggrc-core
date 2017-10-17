@@ -7,6 +7,7 @@ import itertools
 
 from flask import request
 
+from ggrc.models.cache import Cache
 from ggrc.models.event import Event
 from ggrc.models.revision import Revision
 from ggrc.login import get_current_user_id
@@ -20,8 +21,7 @@ def _revision_generator(user_id, action, objects):
 def _get_log_revisions(current_user_id, obj=None, force_obj=False):
   """Generate and return revisions for all cached objects."""
   revisions = []
-  from ggrc.services.common import get_cache
-  cache = get_cache()
+  cache = Cache.get_cache()
   if not cache:
     return revisions
   modified_objects = set(cache.dirty)

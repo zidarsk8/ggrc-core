@@ -19,7 +19,7 @@ from ggrc.models.issue import Issue
 from ggrc.models.relationship import Relationship
 from ggrc.models import exceptions
 from ggrc.rbac.permissions import is_allowed_update
-from ggrc.services.common import get_cache
+from ggrc.models.cache import Cache
 from ggrc.utils import benchmark
 
 
@@ -184,7 +184,7 @@ class AutomapperGenerator(object):
 
       self._set_audit_id_for_issues(automapping_id)
 
-      cache = get_cache(create=True)
+      cache = Cache.get_cache(create=True)
       if cache:
         # Add inserted relationships into new objects collection of the cache,
         # so that they will be logged within event and appropriate revisions

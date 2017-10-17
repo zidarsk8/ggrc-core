@@ -56,7 +56,7 @@ class TestGetRevisionsList(TestCase):
   @staticmethod
   @contextmanager
   def mock_get_cache(new, deleted, dirty):
-    with mock.patch.object(common, "get_cache") as mock_get_cache:
+    with mock.patch.object(models.cache.Cache, "get_cache") as mock_get_cache:
       cache_mock = mock_get_cache.return_value
       cache_mock.new = new
       cache_mock.deleted = deleted
