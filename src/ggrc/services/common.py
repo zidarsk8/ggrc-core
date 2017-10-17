@@ -1223,6 +1223,20 @@ class Resource(ModelView):
       wrap = isinstance(body, dict)
       if wrap:
         body = [body]
+
+      # auto generation of user with Creator role if external flag is set
+      if body and 'person' in body[0]:
+        person = body[0]['person']
+        if person.get('external'):
+          from ggrc.utils import user_generator
+          obj = user_generator.find_or_create_external_user(person['email'],
+                                                            person['name'])
+          if not obj:
+            return current_app.make_response(('application/json', 406,
+                                              [('Content-Type',
+                                                'text/plain')]))
+          return self.json_success_response([(201, self.object_for_json(obj))])
+
       res = []
       with benchmark("collection post > body loop: {}".format(len(body))):
         with benchmark("Build stub query cache"):
@@ -1296,7 +1310,8 @@ class Resource(ModelView):
   def as_json(cls, obj, **kwargs):
     return as_json(obj, **kwargs)
 
-  def get_properties_to_include(self, inclusions):
+  @staticmethod
+  def get_properties_to_include(inclusions):
     # FIXME This needs to be improved to deal with branching paths... if that's
     # desirable or needed.
     if inclusions is not None:
