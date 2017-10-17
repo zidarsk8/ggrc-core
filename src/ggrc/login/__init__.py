@@ -24,7 +24,7 @@ def get_login_module():
 
 
 def user_loader(user_id):
-  from .common import find_user_by_id
+  from ggrc.utils.user_generator import find_user_by_id
   return find_user_by_id(user_id)
 
 

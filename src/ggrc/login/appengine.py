@@ -24,6 +24,7 @@ from werkzeug import exceptions
 from ggrc.login import common
 from ggrc.models import all_models
 from ggrc import settings
+from ggrc.utils.user_generator import find_or_create_user_by_email
 
 
 def get_user():
@@ -31,7 +32,7 @@ def get_user():
   ae_user = users.get_current_user()
   email = ae_user.email()
   nickname = ae_user.nickname()
-  user = common.find_or_create_user_by_email(email, name=nickname)
+  user = find_or_create_user_by_email(email, name=nickname)
   return user
 
 
