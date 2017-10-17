@@ -30,11 +30,10 @@ import ggrc.builder.json
 import ggrc.models
 from ggrc import db, utils
 from ggrc.utils import as_json, benchmark
+from ggrc.utils.log_event import log_event
 from ggrc.fulltext import get_indexer
 from ggrc.login import get_current_user_id, get_current_user
 from ggrc.models.cache import Cache
-from ggrc.models.event import Event
-from ggrc.models.revision import Revision
 from ggrc.models.exceptions import ValidationError, translate_message
 from ggrc.rbac import permissions, context_query_filter
 from ggrc.services.attribute_query import AttributeQueryBuilder
@@ -304,96 +303,6 @@ def update_snapshot_index(session, cache):
                                       reindex_snapshots_ids,
                                       commit=False)
   reindex_snapshots(reindex_snapshots_ids)
-
-
-def _revision_generator(user_id, action, objects):
-  for obj in objects:
-    yield Revision(obj, user_id, action, obj.log_json())
-
-
-def _get_log_revisions(current_user_id, obj=None, force_obj=False):
-  """Generate and return revisions for all cached objects."""
-  revisions = []
-  cache = get_cache()
-  if not cache:
-    return revisions
-  modified_objects = set(cache.dirty)
-  new_objects = set(cache.new)
-  delete_objects = set(cache.deleted)
-  all_edited_objects = itertools.chain(cache.new, cache.dirty, cache.deleted)
-  for o in all_edited_objects:
-    if o.type == "ObjectFolder" and o.folderable:
-      modified_objects.add(o.folderable)
-    if o.type == "Relationship" and o.get_related_for("Document"):
-      documentable = o.get_related_for("Document")
-      document = o.get_related_for(documentable.type)
-      if o in new_objects and document not in documentable.documents:
-        documentable.documents.append(document)
-      if o in delete_objects and document in documentable.documents:
-        documentable.documents.remove(document)
-      if (
-              documentable not in new_objects and
-              documentable not in delete_objects):
-         modified_objects.add(documentable)
-
-  revisions.extend(_revision_generator(
-      current_user_id, "created", cache.new
-  ))
-  revisions.extend(_revision_generator(
-      current_user_id, "modified", modified_objects
-  ))
-  if force_obj and obj is not None and obj not in cache.dirty:
-    # If the ``obj`` has been updated, but only its custom attributes have
-    # been changed, then this object will not be added into
-    # ``cache.dirty set``. So that its revision will not be created.
-    # The ``force_obj`` flag solves the issue, but in a bit dirty way.
-    revision = Revision(obj, current_user_id, 'modified', obj.log_json())
-    revisions.append(revision)
-  revisions.extend(_revision_generator(
-      current_user_id, "deleted", cache.deleted
-  ))
-  return revisions
-
-
-def log_event(session, obj=None, current_user_id=None, flush=True,
-              force_obj=False):
-  """Logs an event on object `obj`.
-
-  Args:
-    session: Current SQLAlchemy session (db.session)
-    obj: object on which some operation took place
-    current_user_id: ID of the user performing operation
-    flush: If set to true, flush the session at the start
-    force_obj: Used in case of custom attribute changes to force revision write
-  Returns:
-    Uncommitted models.Event instance
-  """
-  event = None
-  if flush:
-    session.flush()
-  if current_user_id is None:
-    current_user_id = get_current_user_id()
-  revisions = _get_log_revisions(current_user_id, obj=obj, force_obj=force_obj)
-  if obj is None:
-    resource_id = 0
-    resource_type = None
-    action = 'BULK'
-    context_id = 0
-  else:
-    resource_id = obj.id
-    resource_type = str(obj.__class__.__name__)
-    action = request.method
-    context_id = obj.context_id
-  if revisions:
-    event = Event(
-        modified_by_id=current_user_id,
-        action=action,
-        resource_id=resource_id,
-        resource_type=resource_type,
-        context_id=context_id)
-    event.revisions = revisions
-    session.add(event)
-  return event
 
 
 def clear_permission_cache():

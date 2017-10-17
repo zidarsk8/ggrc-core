@@ -6,7 +6,7 @@
 
 from ggrc import db, settings
 from ggrc.models.person import Person
-from ggrc.services.common import log_event
+from ggrc.utils.log_event import log_event
 from ggrc_basic_permissions import basic_roles
 from ggrc_basic_permissions.models import UserRole
 
@@ -30,7 +30,7 @@ def find_user_by_email(email):
 
 
 def add_creator_role(user):
-  """Add createor role for sent user."""
+  """Add creator role for sent user."""
   user_creator_role = UserRole(
       person=user,
       role=basic_roles.creator(),
