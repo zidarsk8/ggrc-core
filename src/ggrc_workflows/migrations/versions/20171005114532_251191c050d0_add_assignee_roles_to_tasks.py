@@ -17,34 +17,18 @@ revision = '251191c050d0'
 down_revision = '4131bd4a8a4d'
 
 
-INSERT_TASK_ASSIGNEE = (
+CREATE_ASSIGNEE = (
     """
        INSERT INTO access_control_roles
        (name, object_type, created_at, updated_at,
         mandatory, non_editable, `delete`)
-       SELECT 'Task Assignees', 'TaskGroupTask', NOW(), NOW(),
+       SELECT 'Task Assignees', '{object_type}', NOW(), NOW(),
               1, 1, 0
        FROM access_control_roles
        WHERE NOT EXISTS(
           SELECT id FROM access_control_roles
-          WHERE name = 'Task Assignees' AND object_type = 'TaskGroupTask'
+          WHERE name = 'Task Assignees' AND object_type = '{object_type}'
        )
-       LIMIT 1;
-    """
-)
-
-INSERT_CYCLE_TASK_ASSIGNEE = (
-    """
-       INSERT INTO access_control_roles
-       (name, object_type, created_at, updated_at,
-        mandatory, non_editable, `delete`)
-       SELECT 'Task Assignees', 'CycleTaskGroupObjectTask', NOW(), NOW(),
-               1, 1, 0
-       FROM access_control_roles
-       WHERE NOT EXISTS(
-          SELECT id FROM access_control_roles
-          WHERE name = 'Task Assignees'
-            AND object_type = 'CycleTaskGroupObjectTask')
        LIMIT 1;
     """
 )
@@ -74,8 +58,8 @@ WHERE r.name = "Task Assignees"   AND (
 
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
-  op.execute(INSERT_TASK_ASSIGNEE)
-  op.execute(INSERT_CYCLE_TASK_ASSIGNEE)
+  op.execute(CREATE_ASSIGNEE.format(object_type="TaskGroupTask"))
+  op.execute(CREATE_ASSIGNEE.format(object_type="CycleTaskGroupObjectTask"))
   op.execute(INSERT_SQL)
 
 
