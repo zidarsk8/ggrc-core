@@ -29,7 +29,7 @@ CREATE_ASSIGNEE = (
           SELECT id FROM access_control_roles
           WHERE name = 'Task Assignees' AND object_type = '{object_type}'
        )
-       LIMIT 1;
+       LIMIT 1
     """
 )
 
@@ -48,11 +48,15 @@ where t.contact_id IS NOT NULL AND r.name = "Task Assignees";
 """
 
 DELETE_SQL = """
-DELETE a FROM access_control_list AS a
-JOIN access_control_roles AS r on r.id = a.ac_role_id
-WHERE r.name = "Task Assignees"   AND (
-      r.object_type = "TaskGroupTask" OR
-      r.object_type = "CycleTaskGroupObjectTask");
+DELETE acr, acl
+FROM access_control_roles AS acr
+INNER JOIN access_control_list AS acl
+WHERE
+    acl.ac_role_id = acr.id AND
+    acr.name = "Task Assignees" AND (
+        acr.object_type = "TaskGroupTask" OR
+        acr.object_type = "CycleTaskGroupObjectTask"
+    )
 """
 
 
