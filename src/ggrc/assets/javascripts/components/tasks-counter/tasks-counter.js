@@ -17,8 +17,7 @@
    */
   GGRC.Components('tasksCounter', {
     tag: baseCmpName,
-    template: can.view(GGRC.mustache_path +
-      '/components/tasks-counter/tasks-counter.mustache'),
+    template: `<div class="tasks-counter {{stateCss}}">{{tasksAmount}}</div>`,
     viewModel: {
       define: {
         tasksAmount: {
@@ -48,7 +47,7 @@
             this.loadTasks();
           }
         },
-        stateCssClass: {
+        stateCss: {
           get: function () {
             if (this.attr('tasksAmount') === 0) {
               return baseCmpName + '__empty-state';
