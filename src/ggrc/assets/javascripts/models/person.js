@@ -196,6 +196,11 @@
       this.name + '<span class="url-link">' + this.email + '</span>' :
         this.email;
     },
+    getWidgetCountForMyWorkPage: function () {
+      let url = `/api/people/${this.attr('id')}/my_work_counts`;
+
+      return can.get(url);
+    },
     getTasksCount: function () {
       let url = `/api/people/${this.attr('id')}/task_count`;
       return $.get(url)

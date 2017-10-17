@@ -159,6 +159,27 @@
       return widgetsCounts;
     }
 
+    function initWidgetCounts(widgets, type, id) {
+      let result;
+
+      if (isMyWork()) {
+        result = _initWidgetCountsForMyWorkPage();
+      } else {
+        result = _initWidgetCounts(widgets, type, id);
+      }
+
+      return result.then(counts => {
+        getCounts().attr(counts);
+      });
+    }
+
+    function _initWidgetCountsForMyWorkPage() {
+      let userId = GGRC.current_user.id;
+      let currentUser = CMS.Models.Person.store[userId];
+
+      return currentUser.getWidgetCountForMyWorkPage();
+    }
+
     /**
      * Update Page Counts
      * @param {Array|Object} widgets - list of widgets
@@ -166,7 +187,7 @@
      * @param {Number} id - ID of parent object
      * @return {can.Deferred} - resolved deferred object
      */
-    function initCounts(widgets, type, id) {
+    function _initWidgetCounts(widgets, type, id) {
       // Request params generation logic should be moved in
       // a separate place
       var widgetsObject = GGRC.Utils.ObjectVersions
@@ -212,7 +233,7 @@
           }
           countsMap[countsName] = info[name].total;
         });
-        getCounts().attr(countsMap);
+        return countsMap;
       });
     }
 
@@ -228,7 +249,7 @@
       widgets = GGRC.Utils.CurrentPage
         .getWidgetModels(pageInstance.constructor.shortName, location);
 
-      return initCounts(widgets, pageInstance.type, pageInstance.id);
+      return _initWidgetCounts(widgets, pageInstance.type, pageInstance.id);
     }
 
     return {
@@ -243,7 +264,7 @@
       getWidgetModels: getWidgetModels,
       getDefaultWidgets: getDefaultWidgets,
       getCounts: getCounts,
-      initCounts: initCounts,
+      initCounts: initWidgetCounts,
       refreshCounts: refreshCounts
     };
   })();
