@@ -52,9 +52,16 @@ module.exports = function (env) {
           fallback: 'style-loader',
           use: {
             loader: 'css-loader',
-            options: {url: false},
           },
         }),
+      }, {
+        test: /\.(png|jpe?g|gif)$/,
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 10000
+          }
+        }],
       }, {
         test: /\.scss$/,
         use: extractSass.extract({
@@ -138,7 +145,7 @@ module.exports = function (env) {
     }));
 
     config.plugins.push(new CleanWebpackPlugin(['./src/ggrc/static/'], {
-      exclude: ['images', 'favicon.ico', 'dashboard-templates*'],
+      exclude: ['dashboard-templates*'],
     }));
   }
 
