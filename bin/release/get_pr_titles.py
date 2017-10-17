@@ -102,7 +102,7 @@ def try_parse_ticket_ids(title):
     "ggrc-1234/1235: Do something" -> ["GGRC-1234", "GGRC-1235"]
 
   Special prefixes:
-    "QUICK-FIX", "DOCS"
+    "QUICK-FIX", "DOCS", "MERGE", "BACKMERGE"
 
   Returns:
     a list of string ticket ids.
@@ -111,7 +111,7 @@ def try_parse_ticket_ids(title):
   ticket = ticket.upper()
   ticket = ticket.rstrip(":")
 
-  if ticket in ("QUICK-FIX", "DOCS"):
+  if ticket in ("QUICK-FIX", "DOCS", "MERGE", "BACKMERGE"):
     return [ticket]
 
   ticket = ticket.replace("/", ",")
@@ -158,6 +158,16 @@ def print_unicode(line):
   print(line.encode("UTF-8"))
 
 
+def check_tickets(tickets):
+  """Splits ticket ids into valid and special/malformed."""
+  valid_ticket_re = re.compile(r"GGRC-\d+")
+
+  valid = (ticket for ticket in tickets if valid_ticket_re.match(ticket))
+  invalid = (ticket for ticket in tickets if not valid_ticket_re.match(ticket))
+
+  return valid, invalid
+
+
 def print_pr_details(pr_details):
   """Print PR list summary in table format.
 
@@ -199,9 +209,13 @@ def print_pr_details(pr_details):
 
   print_table(row_tuple, rows)
 
+  valid_tickets, invalid_tickets = check_tickets(assumed_tickets)
   print_unicode("")
   print_unicode("Assumed ticket ids")
-  print_unicode(u", ".join(assumed_tickets))
+  print_unicode(u", ".join(valid_tickets))
+  print_unicode("")
+  print_unicode("Malformed/special ticket ids")
+  print_unicode(u", ".join(invalid_tickets))
 
 
 def main():
