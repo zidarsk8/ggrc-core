@@ -124,6 +124,13 @@ tree-view {
 }
 
 tree-item {
+  tree-people-list-field {
+    div.people-list {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
   >.tree-item-wrapper {
     background-color: $white;
     cursor: pointer;
@@ -205,12 +212,7 @@ tree-item {
             margin-bottom: 0;
           }
         }
-        .with-comma::after {
-          content: ', ';
-        }
-        .with-comma:last-child::after {
-          content: '';
-        }
+
       }
     }
   }

@@ -21,6 +21,7 @@ import './tree-item-status-for-workflow';
 import './tree-no-results';
 import './tree-assignee-field';
 import './tree-people-list-field';
+import './get-owner-people-list';
 import './tree-people-with-role-list-field';
 import '../advanced-search/advanced-search-filter-container';
 import '../advanced-search/advanced-search-mapping-container';

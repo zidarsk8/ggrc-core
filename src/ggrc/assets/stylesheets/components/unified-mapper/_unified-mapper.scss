@@ -386,6 +386,17 @@ mapper-results-item-attrs {
   .attr {
     @include cell-styles();
 
+    tree-people-list-field {
+      div.people-list {
+        display: none;
+        &:nth-child(1) {
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+
     .title-attr {
       font-size: 14px;
     }
