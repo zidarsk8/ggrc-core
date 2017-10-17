@@ -31,6 +31,7 @@ ACR_TABLE = table(
     column('mandatory', sa.Boolean),
     column('non_editable', sa.Boolean),
     column('delete', sa.Boolean),
+    column('my_work', sa.Boolean),
 )
 
 
@@ -73,6 +74,7 @@ def upgrade():
           'mandatory': True,
           'non_editable': True,
           'delete': False,
+          'my_work': False,
       }, {
           'name': "Task Assignees",
           'object_type': "CycleTaskGroupObjectTask",
@@ -81,6 +83,7 @@ def upgrade():
           'mandatory': True,
           'non_editable': True,
           'delete': False,
+          'my_work': False,
       }]
   )
   op.execute(INSERT_ACL_ENTRIES)
