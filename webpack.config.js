@@ -63,6 +63,14 @@ module.exports = function (env) {
           }
         }],
       }, {
+        test: /\.ico$/,
+        use: [{
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]'
+          }
+        }],
+      }, {
         test: /\.scss$/,
         use: extractSass.extract({
           use: [{
