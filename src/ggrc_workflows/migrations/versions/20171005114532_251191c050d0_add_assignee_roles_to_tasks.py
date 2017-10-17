@@ -22,14 +22,8 @@ CREATE_ASSIGNEE = (
        INSERT INTO access_control_roles
        (name, object_type, created_at, updated_at,
         mandatory, non_editable, `delete`)
-       SELECT 'Task Assignees', '{object_type}', NOW(), NOW(),
-              1, 1, 0
-       FROM access_control_roles
-       WHERE NOT EXISTS(
-          SELECT id FROM access_control_roles
-          WHERE name = 'Task Assignees' AND object_type = '{object_type}'
-       )
-       LIMIT 1
+       VALUES ('Task Assignees', '{object_type}', NOW(), NOW(),
+              1, 1, 0)
     """
 )
 
