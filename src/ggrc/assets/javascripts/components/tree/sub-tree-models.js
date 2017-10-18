@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -13,7 +13,16 @@ import template from './templates/sub-tree-models.mustache';
       isActive: {
         type: Boolean,
         value: false
-      }
+      },
+      uniqueModelsList: {
+        get: function () {
+          return this.attr('modelsList').map(function (model) {
+            model.attr('inputId', 'stm-' +
+              (Date.now() * Math.random()).toFixed());
+            return model;
+          });
+        },
+      },
     },
     modelsList: null,
     title: null,
