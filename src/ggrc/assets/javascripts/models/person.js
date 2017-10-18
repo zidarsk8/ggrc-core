@@ -1,10 +1,7 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
-
-// require can.jquery-all
-// require models/cacheable
 
 (function (ns, can) {
   can.Model.Cacheable('CMS.Models.Person', {
@@ -198,13 +195,16 @@
     },
     getWidgetCountForMyWorkPage: function () {
       let url = `/api/people/${this.attr('id')}/my_work_counts`;
-
+      return can.get(url);
+    },
+    getWidgetCountForAllObjectPage: function () {
+      let url = `/api/people/${this.attr('id')}/my_work_counts`;
       return can.get(url);
     },
     getTasksCount: function () {
       let url = `/api/people/${this.attr('id')}/task_count`;
       return $.get(url)
         .fail(() => console.warn(`Request on '${url}' failed!`));
-    }
+    },
   });
 })(window, can);

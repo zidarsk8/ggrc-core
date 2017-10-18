@@ -25,6 +25,11 @@
     var QueryAPI = GGRC.Utils.QueryAPI;
     var SnapshotUtils = GGRC.Utils.Snapshots;
 
+    let CUSTOM_COUNTERS = {
+      MY_WORK: () => _getCurrentUser().getWidgetCountForMyWorkPage(),
+      ALL_OBJECTS: () => _getCurrentUser().getWidgetCountForAllObjectPage(),
+    };
+
     function initMappedInstances() {
       var currentPageInstance = GGRC.page_instance();
       var models = GGRC.Mappings.getMappingList(currentPageInstance.type);
@@ -166,8 +171,8 @@
     function initWidgetCounts(widgets, type, id) {
       let result;
 
-      if (isMyWork()) {
-        result = _initWidgetCountsForMyWorkPage();
+      if (CUSTOM_COUNTERS[getPageType()]) {
+        result = CUSTOM_COUNTERS[getPageType()]();
       } else {
         result = _initWidgetCounts(widgets, type, id);
       }
@@ -175,13 +180,6 @@
       return result.then(counts => {
         getCounts().attr(counts);
       });
-    }
-
-    function _initWidgetCountsForMyWorkPage() {
-      let userId = GGRC.current_user.id;
-      let currentUser = CMS.Models.Person.store[userId];
-
-      return currentUser.getWidgetCountForMyWorkPage();
     }
 
     /**
@@ -254,6 +252,12 @@
         .getWidgetModels(pageInstance.constructor.shortName, location);
 
       return _initWidgetCounts(widgets, pageInstance.type, pageInstance.id);
+    }
+
+    function _getCurrentUser() {
+      let userId = GGRC.current_user.id;
+
+      return  CMS.Models.Person.store[userId];
     }
 
     return {
