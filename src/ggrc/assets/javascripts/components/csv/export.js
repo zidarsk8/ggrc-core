@@ -1,4 +1,4 @@
-/*!
+/*
   Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -13,17 +13,18 @@ var url = can.route.deparam(window.location.search.substr(1));
 var filterModel = can.Map({
   model_name: 'Program',
   value: '',
-  filter: {}
+  filter: {},
 });
 var panelModel = can.Map({
-  selected: {},
   models: null,
   type: 'Program',
   filter: '',
   relevant: can.compute(function () {
     return new can.List();
   }),
-  columns: []
+  attributes: new can.List(),
+  localAttributes: new can.List(),
+  mappings: new can.List(),
 });
 var panelsModel = can.Map({
   items: new can.List()
@@ -38,6 +39,7 @@ var exportModel = can.Map({
   format: 'gdrive'
 });
 var exportGroup;
+var exportPanel;
 
 GGRC.Components('csvExport', {
   tag: 'csv-export',
@@ -67,6 +69,10 @@ GGRC.Components('csvExport', {
       return _.map(panels, function (panel, index) {
         var relevantFilter;
         var predicates;
+        var allItems = panel.attr('attributes')
+          .concat(panel.attr('mappings'))
+          .concat(panel.attr('localAttributes'));
+
         predicates = _.map(panel.attr('relevant'), function (el) {
           var id = el.model_name === '__previous__' ?
             index - 1 : el.filter.id;
@@ -82,12 +88,9 @@ GGRC.Components('csvExport', {
         });
         return {
           object_name: panel.type,
-          fields: _.compact(_.map(panel.columns(),
-            function (item, index) {
-              if (panel.selected[index]) {
-                return item.key;
-              }
-            })),
+          fields: allItems
+            .filter((item) => item.isSelected)
+            .map((item) => item.key),
           filters: GGRC.query_parser.join_queries(
             GGRC.query_parser.parse(relevantFilter || ''),
             GGRC.query_parser.parse(panel.filter || '')
@@ -147,7 +150,6 @@ exportGroup = GGRC.Components('exportGroup', {
     },
     addPanel: function (data) {
       var index = this.viewModel.attr('index') + 1;
-      var pm;
 
       data = data || {};
       if (!data.type) {
@@ -158,15 +160,8 @@ exportGroup = GGRC.Components('exportGroup', {
       }
 
       this.viewModel.attr('index', index);
-      pm = new panelModel(data);
-      pm.attr('columns', can.compute(function () {
-        var definitions = GGRC.model_attr_defs[pm.attr('type')];
-        return _.filter(definitions, function (el) {
-          return (!el.import_only) &&
-                 (el.display_name.indexOf('unmap:') === -1);
-        });
-      }));
-      return this.viewModel.attr('panels.items').push(pm);
+      return this.viewModel.attr('panels.items')
+        .push(new panelModel(data));
     },
     getIndex: function (el) {
       return Number($(el.closest('export-panel'))
@@ -184,7 +179,7 @@ exportGroup = GGRC.Components('exportGroup', {
   }
 });
 
-GGRC.Components('exportPanel', {
+exportPanel = GGRC.Components('exportPanel', {
   tag: 'export-panel',
   template: exportPanelTemplate,
   viewModel: {
@@ -193,8 +188,32 @@ GGRC.Components('exportPanel', {
         type: 'boolean',
         get: function () {
           return Number(this.attr('panel_number')) === 0;
-        }
-      }
+        },
+      },
+      showAttributes: {
+        set: function (newValue, setValue) {
+          this.updateIsSelected(
+            this.attr('item.attributes'), newValue);
+
+          setValue(newValue);
+        },
+      },
+      showMappings: {
+        set: function (newValue, setValue) {
+          this.updateIsSelected(
+            this.attr('item.mappings'), newValue);
+
+          setValue(newValue);
+        },
+      },
+      showLocalAttributes: {
+        set: function (newValue, setValue) {
+          this.updateIsSelected(
+            this.attr('item.localAttributes'), newValue);
+
+          setValue(newValue);
+        },
+      },
     },
     exportable: GGRC.Bootstrap.exportable,
     snapshotable_objects: GGRC.config.snapshotable_objects,
@@ -206,10 +225,60 @@ GGRC.Components('exportPanel', {
         this.attr('item.relevant').push(new filterModel({
           model_name: url.relevant_type,
           value: url.relevant_id,
-          filter: result
+          filter: result,
         }));
       }.bind(this));
-    }
+    },
+    getModelAttributeDefenitions: function (type) {
+      return GGRC.model_attr_defs[type];
+    },
+    useLocalAttribute: function () {
+      return this.attr('item.type') === 'Assessment';
+    },
+    filterModelAttributes: function (attr, predicate) {
+      return predicate &&
+        !attr.import_only &&
+        attr.display_name.indexOf('unmap:') === -1;
+    },
+    refreshItems: function () {
+      var currentPanel = this.attr('item');
+      var definitions = this
+        .getModelAttributeDefenitions(currentPanel.attr('type'));
+      var localAttributes;
+
+      var attributes = _.filter(definitions, function (el) {
+        return this.filterModelAttributes(el,
+          el.type !== 'mapping' && el.type !== 'object_custom');
+      }.bind(this));
+
+      var mappings = _.filter(definitions, function (el) {
+        return this.filterModelAttributes(el, el.type === 'mapping');
+      }.bind(this));
+
+      currentPanel.attr('attributes', attributes);
+      currentPanel.attr('mappings', mappings);
+
+      if (this.useLocalAttribute()) {
+        localAttributes = _.filter(definitions, function (el) {
+          return this.filterModelAttributes(el, el.type === 'object_custom');
+        }.bind(this));
+
+        currentPanel.attr('localAttributes', localAttributes);
+      }
+    },
+    updateIsSelected: function (items, isSelected) {
+      items.forEach(function (item) {
+        item.attr('isSelected', isSelected);
+      });
+    },
+    setSelected: function () {
+      this.attr('showMappings', true);
+      this.attr('showAttributes', true);
+
+      if (this.useLocalAttribute()) {
+        this.attr('showLocalAttributes', true);
+      }
+    },
   },
   events: {
     inserted: function () {
@@ -218,32 +287,31 @@ GGRC.Components('exportPanel', {
       if (!panelNumber && url.relevant_id && url.relevant_type) {
         this.viewModel.fetch_relevant_data(url.relevant_id, url.relevant_type);
       }
-      this.setSelected();
+      this.viewModel.refreshItems();
+      this.viewModel.setSelected();
     },
-    '[data-action=attribute_select_toggle] click': function (el, ev) {
-      var items = GGRC.model_attr_defs[this.viewModel.attr('item.type')];
-      var isMapping = el.data('type') === 'mappings';
+    '[data-action=select_toggle] click': function (el, ev) {
+      var type = el.data('type');
       var value = el.data('value');
+      var targetList;
 
-      _.each(items, function (item, index) {
-        if (isMapping && item.type === 'mapping') {
-          this.viewModel.attr('item.selected.' + index, value);
+      switch (type) {
+        case 'local_attributes': {
+          targetList = this.viewModel.attr('item.localAttributes');
+          break;
         }
-        if (!isMapping && item.type !== 'mapping') {
-          this.viewModel.attr('item.selected.' + index, value);
+        case 'attributes': {
+          targetList = this.viewModel.attr('item.attributes');
+          break;
         }
-      }.bind(this));
-    },
-    setSelected: function () {
-      var selected = _.reduce(this.viewModel.attr('item').columns(),
-        function (memo, data, index) {
-          memo[index] = true;
-          return memo;
-        }, {});
-      this.viewModel.attr('item.selected', selected);
+        default: {
+          targetList = this.viewModel.attr('item.mappings');
+        }
+      }
+
+      this.viewModel.updateIsSelected(targetList, value);
     },
     '{viewModel.item} type': function () {
-      this.viewModel.attr('item.selected', {});
       this.viewModel.attr('item.relevant', []);
       this.viewModel.attr('item.filter', '');
       this.viewModel.attr('item.snapshot_type', '');
@@ -253,9 +321,10 @@ GGRC.Components('exportPanel', {
         this.viewModel.attr('item.snapshot_type', 'Control');
       }
 
-      this.setSelected();
-    }
-  }
+      this.viewModel.refreshItems();
+      this.viewModel.setSelected();
+    },
+  },
 });
 
-export {exportGroup};
+export {exportGroup, exportPanel};
