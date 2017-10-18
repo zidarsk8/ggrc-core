@@ -322,7 +322,10 @@ def index():
 def dashboard():
   """The dashboard page
   """
-  return render_template("dashboard/index.haml")
+  return render_template(
+      "dashboard/index.haml",
+      page_type="MY_WORK",
+  )
 
 
 @app.route("/objectBrowser")
@@ -330,7 +333,10 @@ def dashboard():
 def object_browser():
   """The object Browser page
   """
-  return render_template("dashboard/index.haml")
+  return render_template(
+      "dashboard/index.haml",
+      page_type="ALL_OBJECTS",
+  )
 
 
 @app.route("/admin/reindex", methods=["POST"])
