@@ -52,29 +52,14 @@ def get_cycle_created_task_data(notification):
 
   force = cycle.workflow.notify_on_change
 
-  task_assignee = data_handlers.get_person_dict(cycle_task.contact)
+  task_assignees = cycle_task.get_persons_for_rolename("Task Assignees")
   task_group_assignee = data_handlers.get_person_dict(cycle_task_group.contact)
   workflow_owners = get_workflow_owners_dict(cycle.context_id)
   task = {
       cycle_task.id: get_cycle_task_dict(cycle_task)
   }
 
-  result = {}
-
-  assignee_data = {
-      task_assignee['email']: {
-          "user": task_assignee,
-          "force_notifications": {
-              notification.id: force
-          },
-          "cycle_data": {
-              cycle.id: {
-                  "my_tasks": deepcopy(task)
-              }
-          }
-      }
-  }
-  tg_assignee_data = {
+  result = {
       task_group_assignee['email']: {
           "user": task_group_assignee,
           "force_notifications": {
@@ -89,6 +74,21 @@ def get_cycle_created_task_data(notification):
           }
       }
   }
+  for task_assignee in task_assignees:
+    assignee_data = {
+        task_assignee.email: {
+            "user": data_handlers.get_person_dict(task_assignee),
+            "force_notifications": {
+                notification.id: force
+            },
+            "cycle_data": {
+                cycle.id: {
+                    "my_tasks": deepcopy(task)
+                }
+            }
+        }
+    }
+    result = merge_dicts(result, assignee_data)
   for workflow_owner in workflow_owners.itervalues():
     wf_owner_data = {
         workflow_owner['email']: {
@@ -104,7 +104,7 @@ def get_cycle_created_task_data(notification):
         }
     }
     result = merge_dicts(result, wf_owner_data)
-  return merge_dicts(result, assignee_data, tg_assignee_data)
+  return result
 
 
 def get_cycle_task_due(notification, tasks_cache=None, del_rels_cache=None):
@@ -132,7 +132,8 @@ def get_cycle_task_due(notification, tasks_cache=None, del_rels_cache=None):
         '%s for notification %s not found.',
         notification.object_type, notification.id)
     return {}
-  if not cycle_task.contact:
+  task_assignees = cycle_task.get_persons_for_rolename("Task Assignees")
+  if not task_assignees:
     logger.warning(
         'Contact for cycle task %s not found.',
         notification.object_id)
@@ -153,18 +154,22 @@ def get_cycle_task_due(notification, tasks_cache=None, del_rels_cache=None):
   task_info["workflow_cycle_url"] = cycle_task_workflow_cycle_url(
       cycle_task, filter_exp=url_filter_exp)
 
-  return {
-      cycle_task.contact.email: {
-          "user": data_handlers.get_person_dict(cycle_task.contact),
-          "today": date.today(),
-          "force_notifications": {
-              notification.id: force
-          },
-          due: {
-              cycle_task.id: task_info
-          }
-      }
-  }
+  result = {}
+  for person in task_assignees:
+    person_dict = {
+        person.email: {
+            "user": data_handlers.get_person_dict(person),
+            "today": date.today(),
+            "force_notifications": {
+                notification.id: force
+            },
+            due: {
+                cycle_task.id: task_info
+            }
+        }
+    }
+    result = merge_dicts(result, person_dict)
+  return result
 
 
 def get_cycle_task_overdue_data(
@@ -194,7 +199,8 @@ def get_cycle_task_overdue_data(
         '%s for notification %s not found.',
         notification.object_type, notification.id)
     return {}
-  if not cycle_task.contact:
+  assignees = cycle_task.get_persons_for_rolename("Task Assignees")
+  if not assignees:
     logger.warning(
         'Contact for cycle task %s not found.',
         notification.object_id)
@@ -214,18 +220,21 @@ def get_cycle_task_overdue_data(
   task_info['workflow'] = cycle_task.cycle.workflow
   task_info['workflow_cycle_url'] = cycle_task_workflow_cycle_url(
       cycle_task, filter_exp=url_filter_exp)
-
-  return {
-      cycle_task.contact.email: {
-          "user": data_handlers.get_person_dict(cycle_task.contact),
-          "force_notifications": {
-              notification.id: force
-          },
-          "task_overdue": {
-              cycle_task.id: task_info
-          }
-      }
-  }
+  result = {}
+  for person in assignees:
+    person_dict = {
+        person.email: {
+            "user": data_handlers.get_person_dict(person),
+            "force_notifications": {
+                notification.id: force
+            },
+            "task_overdue": {
+                cycle_task.id: task_info
+            }
+        }
+    }
+    result = merge_dicts(result, person_dict)
+  return result
 
 
 def get_all_cycle_tasks_completed_data(notification, cycle):
@@ -260,6 +269,7 @@ def get_cycle_created_data(notification, cycle):
 
   for user_role in cycle.workflow.context.user_roles:
     person = user_role.person
+    print person.email, "wfo"
     result[person.email] = {
         "user": data_handlers.get_person_dict(person),
         "force_notifications": {
@@ -288,24 +298,32 @@ def get_cycle_data(notification):
 
 def get_cycle_task_declined_data(notification):
   cycle_task = get_object(CycleTaskGroupObjectTask, notification.object_id)
-  if not cycle_task or not cycle_task.contact:
+  if cycle_task:
+    assignees = cycle_task.get_persons_for_rolename("Task Assignees")
+  else:
+    assignees = []
+  if not assignees:
     logger.warning(
         '%s for notification %s not found.',
         notification.object_type, notification.id)
     return {}
 
   force = cycle_task.cycle_task_group.cycle.workflow.notify_on_change
-  return {
-      cycle_task.contact.email: {
-          "user": data_handlers.get_person_dict(cycle_task.contact),
-          "force_notifications": {
-              notification.id: force
-          },
-          "task_declined": {
-              cycle_task.id: get_cycle_task_dict(cycle_task)
-          }
-      }
-  }
+  result = {}
+  for person in assignees:
+    person_dict = {
+        person.email: {
+            "user": data_handlers.get_person_dict(person),
+            "force_notifications": {
+                notification.id: force
+            },
+            "task_declined": {
+                cycle_task.id: get_cycle_task_dict(cycle_task)
+            }
+        }
+    }
+    result = merge_dicts(result, person_dict)
+  return result
 
 
 def cycle_tasks_cache(notifications):

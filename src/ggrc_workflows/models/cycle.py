@@ -5,16 +5,16 @@
 """
 
 import itertools
+from urlparse import urljoin
+
 from sqlalchemy import orm, inspect
 
 from ggrc import db
-from ggrc.models import mixins
-from ggrc.models import reflection
 from ggrc.fulltext import attributes as ft_attributes
 from ggrc.fulltext import mixin as ft_mixin
-from urlparse import urljoin
+from ggrc.models import mixins
+from ggrc.models import reflection
 from ggrc.utils import get_url_root
-
 from ggrc_workflows.models import mixins as wf_mixins
 
 
@@ -24,8 +24,7 @@ def _query_filtered_by_contact(person):
   if any([attrs["email"].history.has_changes(),
           attrs["name"].history.has_changes()]):
     return Cycle.query.filter(Cycle.contact_id == person.id)
-  else:
-    return []
+  return []
 
 
 class Cycle(mixins.WithContact,
@@ -113,18 +112,17 @@ class Cycle(mixins.WithContact,
           ["title"],
           False,
       ),
-      ft_attributes.MultipleSubpropertyFullTextAttr(
-          "task assignee",
-          lambda instance: [t.contact for t in
-                            instance.cycle_task_group_object_tasks],
-          ["email", "name"],
-          False
-      ),
       ft_attributes.DateMultipleSubpropertyFullTextAttr(
           "task due date",
           "cycle_task_group_object_tasks",
           ["end_date"],
           False
+      ),
+      ft_attributes.MultipleSubpropertyFullTextAttr(
+          "task assignees",
+          "_task_assignees",
+          ["name", "email"],
+          False,
       ),
       ft_attributes.DateFullTextAttr("due date", "next_due_date"),
       ft_attributes.MultipleSubpropertyFullTextAttr(
@@ -137,6 +135,15 @@ class Cycle(mixins.WithContact,
           False
       ),
   ]
+
+  @property
+  def _task_assignees(self):
+    """Property. Return the list of persons as assignee of related tasks."""
+    persons = {}
+    for task in self.cycle_task_group_object_tasks:
+      for person in task.get_persons_for_rolename("Task Assignees"):
+        persons[person.id] = person
+    return persons.values()
 
   AUTO_REINDEX_RULES = [
       ft_mixin.ReindexRule("CycleTaskGroup", lambda x: x.cycle),
@@ -183,13 +190,6 @@ class Cycle(mixins.WithContact,
             "title",
             "end_date",
             "next_due_date",
-        ),
-        orm.Load(cls).subqueryload("cycle_task_group_object_tasks").joinedload(
-            "contact"
-        ).load_only(
-            "email",
-            "name",
-            "id"
         ),
         orm.Load(cls).subqueryload("cycle_task_group_object_tasks").joinedload(
             "cycle_task_entries"
