@@ -4,7 +4,7 @@
 */
 
 ;(function (CMS, GGRC, can, $) {
-  can.Component.extend({
+  GGRC.Components('dashboardWidgets', {
     tag: "dashboard-widgets",
     template: "<content/>",
     scope: {
