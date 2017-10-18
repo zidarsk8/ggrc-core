@@ -429,7 +429,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Evidence File",
         "Evidence URL",
         "Code",
-        "Effective Date",
+        "Due Date",
         "Stop Date",
         "Verified Date",
         "Finished Date",

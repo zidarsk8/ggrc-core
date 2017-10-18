@@ -208,6 +208,9 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
           "view_only": True,
       },
       "test_plan": "Assessment Procedure",
+      # Currently we decided to have 'Due Date' alias for start_date,
+      # but it can be changed in future
+      "start_date": "Due Date",
   }
 
   AUTO_REINDEX_RULES = [
