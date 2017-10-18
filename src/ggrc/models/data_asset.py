@@ -4,6 +4,7 @@
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
+from ggrc.models.comment import Commentable
 from .mixins import (BusinessObject, LastDeprecatedTimeboxed,
                      CustomAttributable)
 from .object_document import PublicDocumentable
@@ -13,7 +14,7 @@ from .track_object_state import HasObjectState
 
 
 class DataAsset(Roleable, HasObjectState, PublicDocumentable,
-                CustomAttributable, Personable, Relatable,
+                CustomAttributable, Personable, Relatable, Commentable,
                 LastDeprecatedTimeboxed, BusinessObject, Indexed,
                 db.Model):
   __tablename__ = 'data_assets'

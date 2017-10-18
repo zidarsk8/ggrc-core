@@ -6,6 +6,7 @@ from sqlalchemy.orm import validates
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
+from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
                                 CustomAttributable)
@@ -26,7 +27,7 @@ from ggrc.models import reflection
 # (of course, if there is a nice way of overriding/customizing declared
 # attributes in subclasses, we might want to use that approach)
 class SystemOrProcess(track_object_state.HasObjectState,
-                      LastDeprecatedTimeboxed,
+                      Commentable, LastDeprecatedTimeboxed,
                       BusinessObject, db.Model):
   # Override model_inflector
   _table_plural = 'systems_or_processes'

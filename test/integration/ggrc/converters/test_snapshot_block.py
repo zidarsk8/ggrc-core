@@ -95,6 +95,8 @@ class TestSnapshotBlockConverter(TestCase):
         ('means', 'Type/Means'),
         ('reference_url', 'Reference URL'),
         ('verify_frequency', 'Frequency'),
+        ('recipients', 'Recipients'),
+        ('send_by_default', 'Send by default'),
         ('document_evidence', 'Evidence File'),
         ('updated_at', 'Last Updated'),
         ('modified_by', 'Last Updated By'),
@@ -106,7 +108,9 @@ class TestSnapshotBlockConverter(TestCase):
     expected_attrs += [
         ("__acl__:{}".format(role[0]), role[0]) for role in ac_roles
     ]
-    # last_assessment_date should be in the end according to current order
+    # last_assessment_date and comments should be in the end
+    # according to current order
+    expected_attrs.append(('comments', 'Comments'))
     expected_attrs.append(('last_assessment_date', 'Last Assessment Date'))
 
     self.assertEqual(

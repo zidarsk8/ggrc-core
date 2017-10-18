@@ -4,6 +4,7 @@
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
+from ggrc.models.comment import Commentable
 from ggrc.models.directive import Directive
 from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import Hierarchical
@@ -19,7 +20,7 @@ from ggrc.models.track_object_state import HasObjectState
 
 class Section(Roleable, HasObjectState, Hierarchical, db.Model,
               CustomAttributable, Personable, Relatable, Indexed,
-              PublicDocumentable, BusinessObject):
+              Commentable, PublicDocumentable, BusinessObject):
 
   __tablename__ = 'sections'
   _table_plural = 'sections'

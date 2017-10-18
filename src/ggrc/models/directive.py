@@ -6,6 +6,7 @@ from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
+from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (BusinessObject, LastDeprecatedTimeboxed,
                                 CustomAttributable)
@@ -27,7 +28,7 @@ from .track_object_state import HasObjectState
 # (of course, if there is a nice way of overriding/customizing declared
 # attributes in subclasses, we might want to use that approach)
 class Directive(HasObjectState, LastDeprecatedTimeboxed,
-                BusinessObject, db.Model):
+                Commentable, BusinessObject, db.Model):
   __tablename__ = 'directives'
 
   version = deferred(db.Column(db.String), 'Directive')

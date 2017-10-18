@@ -4,6 +4,7 @@
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
 from ggrc.fulltext.mixin import Indexed
+from ggrc.models.comment import Commentable
 from .mixins import (BusinessObject, LastDeprecatedTimeboxed,
                      CustomAttributable)
 from .object_document import PublicDocumentable
@@ -14,7 +15,7 @@ from .track_object_state import HasObjectState
 
 class Project(Roleable, HasObjectState, CustomAttributable, Personable,
               Relatable, LastDeprecatedTimeboxed, PublicDocumentable,
-              BusinessObject, Indexed, db.Model):
+              Commentable, BusinessObject, Indexed, db.Model):
   __tablename__ = 'projects'
   _aliases = {
       "document_url": None,
