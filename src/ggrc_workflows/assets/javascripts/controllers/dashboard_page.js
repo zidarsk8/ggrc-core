@@ -122,22 +122,26 @@
             else if (end_date.getTime() < first_end_date.getTime())
               first_end_date = end_date;
 
-            //Any task not verified is subject to overdue
-            if (data.status === 'Verified')
-              verified++;
-            else {
-              if (data.isOverdue) {
-                over_due++;
-                GGRC.Errors.notifier('error', 'Some tasks are overdue!');
-              }
-              else if (data.status === 'Finished')
+            if (data.isOverdue) {
+              over_due++;
+              GGRC.Errors.notifier('error', 'Some tasks are overdue!');
+            }
+            switch (data.status) {
+              case 'Verified':
+                verified++;
+                break;
+              case 'Finished':
                 finished++;
-              else if (data.status === 'InProgress')
+                break;
+              case 'InProgress':
                 in_progress++;
-              else if (data.status === 'Declined')
+                break;
+              case 'Declined':
                 declined++;
-              else
+                break;
+              case 'Assigned':
                 assigned++;
+                break;
             }
           }
           //Update Task_data object for workflow and Calculate %
