@@ -81,6 +81,10 @@
       return getPageType() === 'MY_WORK';
     }
 
+    function isAllObjects() {
+      return getPageType() === 'ALL_OBJECTS';
+    }
+
     function isAdmin() {
       return getPageType() === 'ADMIN';
     }
@@ -258,6 +262,7 @@
       getPageType: getPageType,
       isMyAssessments: isMyAssessments,
       isMyWork: isMyWork,
+      isAllObjects,
       isAdmin: isAdmin,
       isObjectContextPage: isObjectContextPage,
       getWidgetList: getWidgetList,
