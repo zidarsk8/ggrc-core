@@ -3,6 +3,8 @@
 
 # pylint: disable=redefined-outer-name
 
+"""Workflows module"""
+
 from datetime import datetime, date
 from flask import Blueprint
 from logging import getLogger
