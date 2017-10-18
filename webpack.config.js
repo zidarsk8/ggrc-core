@@ -40,6 +40,7 @@ module.exports = function (env) {
     module: {
       rules: [{
         test: /.(ttf|otf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
+        include: /node_modules/,
         use: [{
           loader: 'file-loader',
           options: {
@@ -56,10 +57,26 @@ module.exports = function (env) {
         }),
       }, {
         test: /\.(png|jpe?g|gif)$/,
+        exclude: /node_modules/,
+        include: [
+          path.resolve(__dirname, 'src', 'ggrc', 'assets', 'images'),
+          path.resolve(__dirname, 'third_party'),
+        ],
         use: [{
           loader: 'url-loader',
           options: {
             limit: 10000
+          }
+        }],
+      }, {
+        test: /\.svg$/,
+        include: [
+          path.resolve(__dirname, 'src', 'ggrc', 'assets', 'images'),
+        ],
+        use: [{
+          loader: 'file-loader',
+          options: {
+            name: 'images/[name].[ext]?[hash:8]'
           }
         }],
       }, {
