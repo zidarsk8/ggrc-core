@@ -26,8 +26,6 @@ from ggrc import access_control
 >>>>>>> Handle IssueTracker related information
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
-from ggrc.models import Assessment
-from ggrc.models import Snapshot
 from ggrc.models.hooks import common
 from ggrc.services import signals
 from ggrc.access_control import role
@@ -40,11 +38,12 @@ _ISSUE_TRACKER_PARAMS = frozenset((
     'title',
 ))
 
+_ASSESSMENT_MODEL_NAME = 'Assessment'
 
 def init_hook():
   """Initializes hooks."""
 
-  @signals.Restful.collection_posted.connect_via(Assessment)
+  @signals.Restful.collection_posted.connect_via(all_models.Assessment)
   def handle_assessment_post(sender, objects=None, sources=None):
     """Applies custom attribute definitions and maps people roles.
 
@@ -57,12 +56,11 @@ def init_hook():
     """
     del sender  # Unused
 
-    logger.info('------> handle_assessment_post')
+    logger.info('---> handle_assessment_post: %s', sources)
     db.session.flush()
     audit_ids = []
     template_ids = []
     snapshot_ids = []
-    issue_tracker_infos = []
 
     for src in sources:
       snapshot_ids.append(src.get('object', {}).get('id'))
@@ -70,15 +68,15 @@ def init_hook():
       template_ids.append(src.get('template', {}).get('id'))
 
     snapshot_cache = {
-        s.id: s for s in Snapshot.query.options(
+        s.id: s for s in all_models.Snapshot.query.options(
             orm.undefer_group('Snapshot_complete'),
-            orm.Load(Snapshot).joinedload(
+            orm.Load(all_models.Snapshot).joinedload(
                 'revision'
             ).undefer_group(
                 'Revision_complete'
             )
         ).filter(
-            Snapshot.id.in_(snapshot_ids)
+            all_models.Snapshot.id.in_(snapshot_ids)
         )
     }
     template_cache = {
@@ -97,7 +95,6 @@ def init_hook():
     }
 
     for assessment, src in izip(objects, sources):
-      _create_issuetracker_issue(assessment, src.get('issue_tracker'))
       snapshot_dict = src.get('object') or {}
       common.map_objects(assessment, snapshot_dict)
       common.map_objects(assessment, src.get('audit'))
@@ -121,7 +118,10 @@ def init_hook():
       if template.template_object_type:
         assessment.assessment_type = template.template_object_type
 
-  @signals.Restful.model_put.connect_via(Assessment)
+    for assessment, src in izip(objects, sources):
+      _create_issuetracker_issue(assessment, src.get('issue_tracker'))
+
+  @signals.Restful.model_put.connect_via(all_models.Assessment)
   def handle_assessment_put(sender, obj=None, src=None, service=None):
     # logger.info('------> handle_assessment_model_put: %s', (
     #     sender, obj, src, service))
@@ -134,7 +134,7 @@ def init_hook():
     if issue_tracker_info:
       _update_issuetracker_issue(obj, issue_tracker_info)
 
-  @signals.Restful.model_put_after_commit.connect_via(Assessment)
+  @signals.Restful.model_put_after_commit.connect_via(all_models.Assessment)
   def handle_assessment_put_after_commit(
       sender, obj=None, src=None, service=None, event=None, initial_state=None):
     changed_attrs = set()
@@ -145,7 +145,8 @@ def init_hook():
 
     logger.info('------> handle_assessment_put_after_commit: %s', (
         sender, obj, src, service, event, initial_state))
-    logger.info('------> handle_assessment_put_after_commit CHANGED: %s', changed_attrs)
+    logger.info(
+        '------> handle_assessment_put_after_commit CHANGED: %s', changed_attrs)
 
     # try:
     #   # form_data = urllib.urlencode(UrlPostHandler.form_fields)
@@ -176,22 +177,132 @@ def init_hook():
 
     logger.info('------> request_params: %s', request_params)
 
-  @signals.Restful.model_deleted_after_commit.connect_via(Assessment)
+  @signals.Restful.model_deleted_after_commit.connect_via(all_models.Assessment)
   def handle_assessment_deleted_after_commit(
       sender, obj=None, service=None, event=None):
     del sender, service, event # Unused
-    issue_obj = all_models.IssuetrackerIssue.get_issue('Assessment', obj.id)
+    issue_obj = all_models.IssuetrackerIssue.get_issue(
+        _ASSESSMENT_MODEL_NAME, obj.id)
     if issue_obj:
       db.session.delete(issue_obj)
+
+  @signals.Restful.collection_posted.connect_via(all_models.Relationship)
+  def handle_relation_post(sender, objects=None, sources=None):
+    del sender, sources  # Unused
+    logger.info('------> handle_relation_post')
+    assessment_ids = [
+        obj.destination_id
+        for obj in objects
+        if obj.destination_type == _ASSESSMENT_MODEL_NAME
+    ]
+    if not assessment_ids:
+      return
+
+    db.session.flush()
+
+    for assessment in all_models.Assessment.query.filter(
+        all_models.Assessment.id.in_(assessment_ids)).all():
+      _update_issue_emails(assessment)
+
+  @signals.Restful.model_put.connect_via(all_models.Relationship)
+  def handle_relation_put(sender, obj=None, src=None, service=None):
+    del sender, service, src  # Unused
+    logger.info('------> handle_relation_put')
+
+    if obj.destination_type != _ASSESSMENT_MODEL_NAME:
+      return
+
+    _update_issue_emails(all_models.Assessment.query.filter(
+        all_models.Assessment.id == obj.destination_id).first())
+
+  @signals.Restful.model_deleted_after_commit.connect_via(
+      all_models.Relationship)
+  def handle_relation_deleted_after_commit(
+      sender, obj=None, service=None, event=None):
+    del sender, service, event  # Unused
+    logger.info('------> handle_relation_deleted_after_commit')
+    if obj.destination_type != _ASSESSMENT_MODEL_NAME:
+      return
+
+    _update_issue_emails(all_models.Assessment.query.filter(
+        all_models.Assessment.id == obj.destination_id).first())
+
+def _update_issue_emails(assessment):
+  if assessment is None:
+    return
+
+  logger.info(
+      '--> UPDATE ISSUE EMAILS: assessment_id=%d (issue_id=%s)',
+      assessment.id, assessment.issue_tracker['issue_id'])
+
+  if not assessment.issue_tracker['issue_id']:
+    return
+
+  assignee_email, cc_list = _collect_issue_emails(assessment)
+  logger.info(
+      '    --> assignee=%s, cc_list=%s', assignee_email, cc_list)
+
+def _collect_issue_emails(assessment):
+  assignee_email = None
+  cc_list = set()
+
+  assignees = assessment.assessors
+  # logger.info('------> assignees: %s', assignees)
+  if assignees:
+    # logger.info('------> assignee.email: %s', [a.email for a in assignees])
+    for i, person in enumerate(sorted(assignees, key=lambda o: o.name)):
+      if i == 0:
+        assignee_email = person.email
+        continue
+      email = person.email
+      if email and email != assignee_email:
+        cc_list.add(email)
+
+  # db.session.query(role.
+  # select l.person_id, p.name, p.email, l.ac_role_id, r.name from access_control_list l join access_control_roles r on r.id=l.ac_role_id join people p on p.id=l.person_id where l.object_type='Assessment' and l.object_id=3;
+  ac_list = access_control.list.AccessControlList
+  ac_role = access_control.role.AccessControlRole
+  query = db.session.query(
+      ac_list.person_id,
+      ac_role.name,
+      all_models.Person.email
+  ).join(
+      ac_role,
+      ac_role.id == ac_list.ac_role_id
+  ).join(
+      all_models.Person,
+      all_models.Person.id == ac_list.person_id
+  ).filter(
+      ac_list.object_type == _ASSESSMENT_MODEL_NAME,
+      ac_list.object_id == assessment.id
+  )
+  for r in query.all():
+    # logger.info('---> role: %s', r)
+    email = r[2]
+    if email != assignee_email:
+      cc_list.add(email)
+  roles_dict = role.get_custom_roles_for(_ASSESSMENT_MODEL_NAME)
+  # logger.info('------> roles_dict: %s', roles_dict)
+
+  return assignee_email, list(cc_list)
 
 
 def _create_issuetracker_issue(assessment, issue_tracker_info):
   if not issue_tracker_info:
-    return
+    # return
+    issue_tracker_info = {
+        "enabled": True,
+        "component_id": "64445",
+        "hotlist_id": None,
+        "issue_type": "PROCESS",
+        "issue_priority": "P2",
+        "issue_severity": "S2",
+        # "issue_id": "1508276850",
+        # "issue_url": "http://issuetracker.me/b/1508276850",
+    }
 
   if issue_tracker_info.get('enabled'):
     reported_email = None
-    assignee_email = None
     reporter_id = get_current_user_id()
     if reporter_id:
       reporter = all_models.Person.query.filter(
@@ -199,16 +310,8 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       if reporter is not None:
         reported_email = reporter.email
 
-    cc_list = set()
 
-    assignees = assessment.assignees_by_type.get('Assessor')
-    if assignees:
-      logger.info('------> assignee.email: %s', [a.email for a in assignees])
-      for i, person in enumerate(sorted(assignees, key=lambda o: o.name)):
-        if i == 0:
-          assignee_email = person.email
-          continue
-        cc_list.add(person.email)
+    assignee_email, cc_list = _collect_issue_emails(assessment)
 
     hotlist_id = issue_tracker_info.get('hotlist_ids')
     issue_params = {
@@ -220,9 +323,15 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
         'severity': issue_tracker_info['issue_severity'],
         'reporter': reported_email,
         'assignee': assignee_email,
-        'verifier': '',
-        'ccs': list(cc_list),
-        'comment': '',
+        'verifier': assignee_email,
+        'ccs': cc_list,
+        'comment': (
+            'This bug was auto-generated to track a GGRC assessment '
+            '(a.k.a PBC Item). Use the following link to find the '
+            'assessment - (link to Assessment page '
+            'https://ggrc-test.googleplex.com/assessments/%d). '
+            'Following is the assessment Requirements/Test Plan from GGRC: '
+            '[Test Plan text]') % (assessment.id),
     }
 
     # TODO(anushovan): create issue here.
@@ -235,10 +344,10 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
     issue_url = None
 
   issue_obj = all_models.IssuetrackerIssue.get_issue(
-      'Assessment', assessment.id)
+      _ASSESSMENT_MODEL_NAME, assessment.id)
   issue_tracker_info = dict(
       issue_tracker_info,
-      object_type='Assessment',
+      object_type=_ASSESSMENT_MODEL_NAME,
       object_id=assessment.id,
       issue_id=str(issue_id),
       issue_url=issue_url,
@@ -254,45 +363,18 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
 
 
 def _update_issuetracker_issue(assessment, issue_tracker_info):
-  logger.info('------> _update_issuetracker_issue: %s', assessment.assignees_by_type)
+  logger.info(
+      '------> _update_issuetracker_issue: %s', assessment.assignees_by_type)
 
   assignees = assessment.assignees_by_type.get('Assessor')
   if assignees:
     logger.info('------> assignee.email: %s', [a.email for a in assignees])
 
-  # db.session.query(role.
-  # select l.person_id, p.name, p.email, l.ac_role_id, r.name from access_control_list l join access_control_roles r on r.id=l.ac_role_id join people p on p.id=l.person_id where l.object_type='Assessment' and l.object_id=3;
-  all_roles = collections.defaultdict(set)
-  ac_list = access_control.list.AccessControlList
-  ac_role = access_control.role.AccessControlRole
-  query = db.session.query(
-      ac_list.person_id,
-      ac_role.name,
-      all_models.Person.name,
-      all_models.Person.email
-  ).join(
-      ac_role,
-      ac_role.id == ac_list.ac_role_id
-  ).join(
-      all_models.Person,
-      all_models.Person.id == ac_list.person_id
-  ).filter(
-      ac_list.object_type == 'Assessment',
-      ac_list.object_id == assessment.id
-  )
-  for r in query.all():
-    logger.info('---> role: %s', r)
-    all_roles[r[1]].add((r[2], r[3]))
-  logger.info('---> all_roles: %s', all_roles)
-
-  roles_dict = role.get_custom_roles_for('Assessment')
-  logger.info('------> roles_dict: %s', roles_dict)
-
   issue_obj = all_models.IssuetrackerIssue.get_issue(
-      'Assessment', assessment.id)
+      _ASSESSMENT_MODEL_NAME, assessment.id)
   issue_tracker_info = dict(
       issue_tracker_info,
-      object_type='Assessment',
+      object_type=_ASSESSMENT_MODEL_NAME,
       object_id=assessment.id)
   if issue_obj is not None:
     logger.info('------> update issue object')

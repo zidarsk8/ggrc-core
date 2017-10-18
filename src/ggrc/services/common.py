@@ -708,16 +708,16 @@ class Resource(ModelView):
 
   def _check_put_permissions(self, obj, new_context):
     """Check context and resource permissions for PUT."""
-    if not permissions.is_allowed_update(
-        self.model.__name__, obj.id, obj.context_id)\
-       and not permissions.has_conditions('update', self.model.__name__):
+    if (not permissions.is_allowed_update(
+        self.model.__name__, obj.id, obj.context_id)
+       and not permissions.has_conditions('update', self.model.__name__)):
       raise Forbidden()
     if not permissions.is_allowed_update_for(obj):
       raise Forbidden()
-    if new_context != obj.context_id \
+    if (new_context != obj.context_id
        and not permissions.is_allowed_update(
-            self.model.__name__, obj.id, new_context)\
-       and not permissions.has_conditions('update', self.model.__name__):
+            self.model.__name__, obj.id, new_context)
+       and not permissions.has_conditions('update', self.model.__name__)):
       raise Forbidden()
 
   def dump_attrs(self, obj):
