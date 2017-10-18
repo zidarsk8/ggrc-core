@@ -28,12 +28,11 @@
 
 # PR Review checklist
 
-- [ ] The solution description matches the changes in the code.
-- [ ] There is no apparent way to improve the performance of the new code.
-- [ ] There is no apparent way to improve the design of the new code.
 - [ ] The changes fix the issue and don't cause any apparent regressions.
-- [ ] The pull request is opened against the correct base branch.
 - [ ] Labels and milestone are correctly set.
+- [ ] The solution description matches the changes in the code.
+- [ ] There is no apparent way to improve the performance & design of the new code.
+- [ ] The pull request is opened against the correct base branch.
 - [ ] Upon merging, the Jira ticket's fixversion is correctly set and the ticket is moved to "QA - In Progress".
 
 <!-- If your code is not finished yet can include a TODO check list
