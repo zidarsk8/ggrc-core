@@ -15,7 +15,7 @@
     margin-right: 0px;
   }
 
-  @each $bar_color in finish, verify, progress, pending, warning {
+  @each $bar_color in finish, verify, progress, pending, decline {
     .bar-#{$bar_color} {
       @extend %bar-#{$bar_color};
     }
