@@ -1214,6 +1214,7 @@ import '../components/access_control_list/access_control_list_roles_helper'
           this.options.instance.attr('custom_attribute_definitions', cad);
         }
         this.options.instance.refresh();
+        this.options.instance.dispatch('refreshMapping');
       }
     },
 
