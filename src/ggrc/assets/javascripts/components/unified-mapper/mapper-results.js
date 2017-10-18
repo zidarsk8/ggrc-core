@@ -1,4 +1,4 @@
-/*!
+/*
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -22,16 +22,16 @@ import template from './templates/mapper-results.mustache';
         paging: {
           value: function () {
             return new GGRC.VM.Pagination({pageSizeSelect: [5, 10, 15]});
-          }
-        }
+          },
+        },
       },
       columns: {
         selected: [],
-        available: []
+        available: [],
       },
       sort: {
         key: '',
-        direction: DEFAULT_SORT_DIRECTION
+        direction: DEFAULT_SORT_DIRECTION,
       },
       isLoading: false,
       items: [],
@@ -50,7 +50,7 @@ import template from './templates/mapper-results.mustache';
       relatedAssessments: {
         state: {},
         instance: null,
-        show: false
+        show: false,
       },
       searchOnly: false,
       useSnapshots: false,
@@ -115,12 +115,12 @@ import template from './templates/mapper-results.mustache';
         this.attr('refreshItems', true);
       },
       prepareRelevantQuery: function () {
-        var relevantList = this.attr('relevantTo');
+        var relevantList = this.attr('relevantTo') || [];
         var filters = relevantList.map(function (relevant) {
           return {
             type: relevant.type,
             operation: 'relevant',
-            id: relevant.id
+            id: relevant.id,
           };
         });
         return filters;
@@ -134,7 +134,7 @@ import template from './templates/mapper-results.mustache';
           .buildRelevantIdsQuery(this.attr('type'), {}, {
             type: this.attr('baseInstance.type'),
             id: this.attr('baseInstance.id'),
-            operation: 'relevant'
+            operation: 'relevant',
           }, filter);
       },
       prepareUnlockedFilter: function () {
@@ -292,7 +292,7 @@ import template from './templates/mapper-results.mustache';
                 return {
                   id: value.id,
                   type: value.type,
-                  data: self.transformValue(value)
+                  data: self.transformValue(value),
                 };
               });
             this.setSelectedItems(result);
@@ -316,6 +316,7 @@ import template from './templates/mapper-results.mustache';
       buildRelatedData: function (relatedData, type) {
         var deferredList = this.attr('deferredList');
         var ids;
+        var empty = {};
 
         if (!deferredList || !deferredList.length) {
           return relatedData;
@@ -336,7 +337,11 @@ import template from './templates/mapper-results.mustache';
             });
 
           if (!ids.length) {
-            return relatedData;
+            // return empty data
+            empty[type] = {
+              ids: [],
+            };
+            return empty;
           }
         }
 
@@ -358,7 +363,7 @@ import template from './templates/mapper-results.mustache';
             var result = values.map(function (item) {
               return {
                 id: item,
-                type: modelKey
+                type: modelKey,
               };
             });
             // Do not perform extra mapping validation in case object generation
@@ -381,7 +386,7 @@ import template from './templates/mapper-results.mustache';
       showRelatedAssessments: function (ev) {
         this.attr('relatedAssessments.instance', ev.instance);
         this.attr('relatedAssessments.state.open', true);
-      }
+      },
     },
     events: {
       '{viewModel} allSelected': function (scope, ev, allSelected) {
@@ -406,7 +411,7 @@ import template from './templates/mapper-results.mustache';
       },
       '{viewModel.sort} direction': function () {
         this.viewModel.setItemsDebounced();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window.CMS, window.jQuery);

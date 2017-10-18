@@ -164,7 +164,7 @@ class ChangeTracked(object):
       attributes.DatetimeFullTextAttr('created_at', 'created_at'),
       attributes.DatetimeFullTextAttr('updated_at', 'updated_at'),
       attributes.FullTextAttr(
-          "modified_by", "modified_by", ["name", "email", "user_name"]
+          "modified_by", "modified_by", ["email", "name"]
       ),
   ]
 
@@ -848,12 +848,12 @@ class WithContact(object):
       attributes.FullTextAttr(
           "contact",
           "contact",
-          ["name", "email"]
+          ["email", "name"]
       ),
       attributes.FullTextAttr(
           'secondary_contact',
           'secondary_contact',
-          ["name", "email"]),
+          ["email", "name"]),
   ]
 
   @classmethod

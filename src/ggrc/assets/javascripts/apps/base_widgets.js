@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -34,7 +34,7 @@
     'Standard',
     'System',
     'Threat',
-    'Vendor'
+    'Vendor',
   ];
   // NOTE: Widgets that have the order value are sorted by an increase values,
   // the rest of widgets are sorted alphabetically
@@ -48,25 +48,35 @@
     System: 70,
     Process: 80,
     Audit: 90,
-    Person: 100
+    Person: 100,
   };
   // Items allowed for mapping via snapshot.
   var snapshotWidgetsConfig = GGRC.config.snapshotable_objects || [];
+  var objectVersions = _.map(snapshotWidgetsConfig, function (obj) {
+    return obj + '_versions';
+  });
+
   // Items allowed for relationship mapping
   var excludeMappingConfig = [
     'AssessmentTemplate',
-    'Issue'
   ];
   // Extra Tree View Widgets require to be rendered on Audit View
   var auditInclusion = [
     'Assessment',
     'Person',
-    'Program'
+    'Program',
+    'Issue',
   ];
   var baseWidgetsByType;
 
   var filteredTypes = _.difference(allCoreTypes, excludeMappingConfig);
   // Audit is excluded and created a separate logic for it
+
+  var objectVersionWidgets = {};
+  snapshotWidgetsConfig.forEach(function (model) {
+    objectVersionWidgets[model + '_versions'] = [model];
+  });
+
   baseWidgetsByType = {
     AccessGroup: _.difference(filteredTypes, ['AccessGroup']),
     Audit: [].concat(snapshotWidgetsConfig, excludeMappingConfig,
@@ -75,11 +85,11 @@
     Contract: _.difference(filteredTypes,
       ['Contract', 'Policy', 'Regulation', 'Standard']),
     Control: filteredTypes,
-    Assessment: snapshotWidgetsConfig.concat('Audit').sort(),
+    Assessment: snapshotWidgetsConfig.concat(['Audit', 'Issue']).sort(),
     AssessmentTemplate: ['Audit'],
     DataAsset: filteredTypes,
     Facility: filteredTypes,
-    Issue: snapshotWidgetsConfig.concat('Audit').sort(),
+    Issue: objectVersions.concat(_.difference(filteredTypes, ['Person'])),
     Market: filteredTypes,
     Objective: filteredTypes,
     OrgGroup: filteredTypes,
@@ -98,8 +108,10 @@
     System: filteredTypes,
     Risk: filteredTypes,
     Threat: filteredTypes,
-    Vendor: filteredTypes
+    Vendor: filteredTypes,
   };
+
+  baseWidgetsByType = _.extend(baseWidgetsByType, objectVersionWidgets);
 
   GGRC.tree_view = GGRC.tree_view || new can.Map();
   GGRC.tree_view.attr('base_widgets_by_type', baseWidgetsByType);

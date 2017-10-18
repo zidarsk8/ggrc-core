@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -12,15 +12,15 @@
     define: {
       operation: {
         type: String,
-        value: 'AND'
+        value: 'AND',
       },
       depth: {
         type: Boolean,
-        value: false
+        value: false,
       },
       useLocalStorage: {
         type: Boolean,
-        value: true
+        value: true,
       },
       selectedStates: {
         type: '*',
@@ -31,13 +31,14 @@
 
           this.attr('options.filter',
             StateUtils.statusFilter(selected, '', this.attr('modelName')));
-        }
-      }
+        },
+      },
     },
     disabled: false,
     options: {},
     filters: null,
     filterStates: [],
+    widgetId: null,
     modelName: null,
     displayPrefs: null,
     init: function () {
@@ -45,10 +46,12 @@
       var filter = this.attr('filter');
       var operation = this.attr('operation');
       var depth = this.attr('depth');
+      var filterName = this.attr('widgetId') ||
+        this.attr('modelName');
       var filterStates = StateUtils.getStatesForModel(this.attr('modelName'))
         .map(function (state) {
           return {
-            value: state
+            value: state,
           };
         });
 
@@ -67,7 +70,7 @@
         CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
           this.attr('displayPrefs', displayPrefs);
 
-          this.loadTreeStates(this.attr('modelName'));
+          this.loadTreeStates(filterName);
         }.bind(this));
       }
     },
@@ -88,6 +91,8 @@
     },
     saveTreeStates: function (selectedStates) {
       var stateToSave;
+      var filterName = this.attr('widgetId') ||
+        this.attr('modelName');
 
       // in this case we save previous states
       if (!selectedStates) {
@@ -101,10 +106,9 @@
       this.attr('selectedStates', stateToSave);
 
       if (this.attr('useLocalStorage')) {
-        this.attr('displayPrefs').setTreeViewStates(this.attr('modelName'),
-          stateToSave);
+        this.attr('displayPrefs').setTreeViewStates(filterName, stateToSave);
       }
-    }
+    },
   });
 
   /**
@@ -126,7 +130,7 @@
         } else {
           this.viewModel.loadTreeStates(this.viewModel.attr('modelName'));
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

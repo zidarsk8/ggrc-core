@@ -19,8 +19,8 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
     content_selector: '.content',
     content_controller: null,
     content_controller_options: {},
-    content_controller_selector: null
-  }
+    content_controller_selector: null,
+  },
 }, {
   init: function () {
     if (!this.options.model && GGRC.page_model) {
@@ -44,8 +44,15 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
 
     if (this.options.widgetType && this.options.widgetType === 'treeview') {
       var counts = GGRC.Utils.CurrentPage.getCounts();
+
       var countsName = this.options.countsName ||
-        this.options.model.shortName;
+      this.options.model.shortName;
+    
+      if (this.options.objectVersion) {
+        countsName = GGRC.Utils.ObjectVersions
+          .getWidgetConfig(countsName, true)
+          .widgetId;
+      }
 
       this.options.widget_count.attr('count', '' + counts.attr(countsName));
 
@@ -150,5 +157,5 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
       if (that.content_controller && that.content_controller.display_path)
         return that.content_controller.display_path(path, refetch);
     });
-  }
+  },
 });

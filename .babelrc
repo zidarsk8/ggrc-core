@@ -1,0 +1,21 @@
+{
+    "env": {
+      "production": {
+          "minified": true,
+          "comments": false,
+          "compact": true
+      }
+    },
+    "plugins": [
+      "transform-runtime",
+      "syntax-dynamic-import",
+      "transform-object-rest-spread",
+      "transform-strict-mode"
+    ],
+    "presets": [["env", {
+      "debug": true,
+      "targets": {
+        "browsers": ["last 2 versions"]
+      }
+    }]]
+}

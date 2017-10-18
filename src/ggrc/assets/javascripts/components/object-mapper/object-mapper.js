@@ -1,9 +1,9 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, $) {
+(function (can, $, utils) {
   'use strict';
 
   var DEFAULT_OBJECT_MAP = {
@@ -33,7 +33,7 @@
     Vendor: 'Program',
     Audit: 'Product',
     RiskAssessment: 'Program',
-    TaskGroup: 'Control'
+    TaskGroup: 'Control',
   };
 
   var getDefaultType = function (type, object) {
@@ -54,13 +54,23 @@
     template: can.view(GGRC.mustache_path +
       '/components/object-mapper/object-mapper.mustache'),
     viewModel: function (attrs, parentViewModel) {
+      var config = {
+        general: parentViewModel.attr('general'),
+        special: parentViewModel.attr('special'),
+      };
+
+      var resolvedConfig = GGRC.VM.ObjectOperationsBaseVM.extractConfig(
+        config.general.type,
+        config
+      );
+
       return GGRC.VM.ObjectOperationsBaseVM.extend({
-        join_object_id: attrs.joinObjectId ||
-          (GGRC.page_instance() && GGRC.page_instance().id),
-        object: attrs.object,
-        type: getDefaultType(attrs.type, attrs.object),
-        relevantTo: parentViewModel.attr('relevantTo'),
-        useSnapshots: GGRC.Utils.Snapshots.isInScopeModel(attrs.object),
+        join_object_id: resolvedConfig['join-object-id'] ||
+           (GGRC.page_instance() && GGRC.page_instance().id),
+        object: resolvedConfig.object,
+        type: getDefaultType(resolvedConfig.type, resolvedConfig.object),
+        config: config,
+        useSnapshots: resolvedConfig.useSnapshots,
         isLoadingOrSaving: function () {
           return this.attr('is_saving') ||
           //  disable changing of object type while loading
@@ -71,24 +81,60 @@
         deferred_list: [],
         deferred: false,
         allowedToCreate: function () {
-          // Don't allow to create new instances for "In Scope" Objects
+          // Don't allow to create new instances for "In Scope" Objects that
+          // are snapshots
+          var snapUtils = utils.Snapshots;
           var isInScopeModel =
-            GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'));
-          return !isInScopeModel;
+            snapUtils.isInScopeModel(this.attr('object'));
+          var allow =
+            !isInScopeModel || (
+               isInScopeModel &&
+               !snapUtils.isSnapshotModel(this.attr('type'))
+            );
+          return allow;
+        },
+        showAsSnapshots: function () {
+          if (this.attr('freezedConfigTillSubmit.useSnapshots')) {
+            return true;
+          }
+          return false;
         },
         showWarning: function () {
-          // Never show warning for In Scope Objects
-          if (GGRC.Utils.Snapshots.isInScopeModel(this.attr('object'))) {
-            return false;
-          }
-          return GGRC.Utils.Snapshots.isSnapshotParent(this.attr('object')) ||
-            GGRC.Utils.Snapshots.isSnapshotParent(this.attr('type'));
-        }
+          var isInScopeSrc =
+            utils.Snapshots.isInScopeModel(this.attr('object'));
+          var isSnapshotParentSrc =
+            utils.Snapshots.isSnapshotParent(this.attr('object'));
+          var isSnapshotParentDst =
+            utils.Snapshots.isSnapshotParent(this.attr('type'));
+          var isSnapshotModelSrc =
+            utils.Snapshots.isSnapshotModel(this.attr('object'));
+          var isSnapshotModelDst =
+            utils.Snapshots.isSnapshotModel(this.attr('type'));
+
+          var result =
+            // Dont show message if source is inScope model, for example Assessment.
+            !isInScopeSrc &&
+            // Show message if source is snapshotParent and destination is snapshotable.
+            ((isSnapshotParentSrc && isSnapshotModelDst) ||
+            // Show message if destination is snapshotParent and source is snapshotable.
+            (isSnapshotParentDst && isSnapshotModelSrc));
+
+          return result;
+        },
+        updateFreezedConfigToLatest: function () {
+          this.attr('freezedConfigTillSubmit', this.attr('currConfig'));
+        },
+        onSubmit: function () {
+          this.updateFreezedConfigToLatest();
+          // calls base version
+          this._super.apply(this, arguments);
+        },
       });
     },
 
     events: {
       '.create-control modal:success': function (el, ev, model) {
+        this.viewModel.updateFreezedConfigToLatest();
         this.viewModel.attr('newEntries').push(model);
         this.mapObjects(this.viewModel.attr('newEntries'));
       },
@@ -125,7 +171,7 @@
             .map(function (item) {
               return {
                 id: item.id,
-                type: item.type
+                type: item.type,
               };
             });
           this.viewModel.attr('deferred_list', deferredToList);
@@ -157,7 +203,7 @@
                 return desination;
               }
             }
-          ))
+          )),
         };
 
         this.viewModel.attr('deferred_to').controller.element.trigger(
@@ -204,8 +250,8 @@
                 destination: {
                   href: '/api/snapshots/' + destination.id,
                   type: 'Snapshot',
-                  id: destination.id
-                }
+                  id: destination.id,
+                },
               });
 
               return defer.push(modelInstance.save());
@@ -222,7 +268,7 @@
             data[mapping.object_attr] = {
               href: instance.href,
               type: instance.type,
-              id: instance.id
+              id: instance.id,
             };
             data[mapping.option_attr] = destination;
             modelInstance = new Model(data);
@@ -262,7 +308,7 @@
               });
             });
         }.bind(this));
-      }
+      },
     },
 
     helpers: {
@@ -280,7 +326,7 @@
           return type.title_plural;
         }
         return 'Objects';
-      }
-    }
+      },
+    },
   });
-})(window.can, window.can.$);
+})(window.can, window.can.$, GGRC.Utils);

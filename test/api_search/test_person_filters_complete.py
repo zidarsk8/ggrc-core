@@ -238,7 +238,7 @@ class BasePersonQueryApiTest(SingleSetupQueryAPITest):
   """Base class for filter tests, containing test cases generation"""
   class Meta(object):
     """Metaclass defining base test parameters"""
-    subprops = ["name", "email", "user_name"]
+    subprops = ["email", "name"]
     operators = OPERATIONS.keys()
     order = [True, False]  # desc = True / asc = False
     property_case = [True, False]  # True ~ upper, False ~ lower

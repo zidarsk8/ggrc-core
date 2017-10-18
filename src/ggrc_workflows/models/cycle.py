@@ -98,7 +98,7 @@ class Cycle(mixins.WithContact,
       ft_attributes.MultipleSubpropertyFullTextAttr(
           "group assignee",
           lambda instance: [g.contact for g in instance.cycle_task_groups],
-          ["name", "email"],
+          ["email", "name"],
           False,
       ),
       ft_attributes.DateMultipleSubpropertyFullTextAttr(
@@ -117,7 +117,7 @@ class Cycle(mixins.WithContact,
           "task assignee",
           lambda instance: [t.contact for t in
                             instance.cycle_task_group_object_tasks],
-          ["name", "email"],
+          ["email", "name"],
           False
       ),
       ft_attributes.DateMultipleSubpropertyFullTextAttr(

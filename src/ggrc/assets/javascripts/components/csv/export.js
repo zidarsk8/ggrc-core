@@ -3,6 +3,12 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import './csv-template';
+import '../relevant_filters';
+import exportPanelTemplate from './templates/export-panel.mustache';
+import exportGroupTemplate from './templates/export-group.mustache';
+import csvExportTemplate from './templates/csv-export.mustache';
+
 var url = can.route.deparam(window.location.search.substr(1));
 var filterModel = can.Map({
   model_name: 'Program',
@@ -31,74 +37,11 @@ var exportModel = can.Map({
   filename: 'export_objects.csv',
   format: 'gdrive'
 });
-
-GGRC.Components('csvTemplate', {
-  tag: 'csv-template',
-  template: '<content></content>',
-  viewModel: {
-    url: '/_service/export_csv',
-    selected: [],
-    importable: GGRC.Bootstrap.importable
-  },
-  events: {
-    '#importSelect change': function (el, ev) {
-      var $items = el.find(':selected');
-      var selected = this.viewModel.attr('selected');
-
-      $items.each(function () {
-        var $item = $(this);
-        if (_.findWhere(selected, {value: $item.val()})) {
-          return;
-        }
-        return selected.push({
-          name: $item.attr('label'),
-          value: $item.val()
-        });
-      });
-    },
-    '.import-button click': function (el, ev) {
-      var objects;
-      ev.preventDefault();
-
-      objects = _.map(this.viewModel.attr('selected'), function (el) {
-        return {
-          object_name: el.value,
-          fields: 'all'
-        };
-      });
-      if (!objects.length) {
-        return;
-      }
-
-      GGRC.Utils.export_request({
-        data: {
-          objects: objects,
-          export_to: 'csv'
-        }
-      })
-      .done(function (data) {
-        GGRC.Utils.download('import_template.csv', data);
-      });
-    },
-    '.import-list a click': function (el, ev) {
-      var index = el.data('index');
-      var item = this.viewModel.attr('selected').splice(index, 1)[0];
-
-      ev.preventDefault();
-
-      this.element.find('#importSelect option:selected').each(function () {
-        var $item = $(this);
-        if ($item.val() === item.value) {
-          $item.prop('selected', false);
-        }
-      });
-    }
-  }
-});
+var exportGroup;
 
 GGRC.Components('csvExport', {
   tag: 'csv-export',
-  template: '<content></content>',
+  template: csvExportTemplate,
   viewModel: {
     isFilterActive: false,
     'export': new exportModel()
@@ -188,9 +131,9 @@ GGRC.Components('csvExport', {
   }
 });
 
-GGRC.Components('exportGroup', {
+exportGroup = GGRC.Components('exportGroup', {
   tag: 'export-group',
-  template: '<content></content>',
+  template: exportGroupTemplate,
   viewModel: {
     index: 0,
     'export': '@'
@@ -243,7 +186,7 @@ GGRC.Components('exportGroup', {
 
 GGRC.Components('exportPanel', {
   tag: 'export-panel',
-  template: '<content></content>',
+  template: exportPanelTemplate,
   viewModel: {
     define: {
       first_panel: {
@@ -314,3 +257,5 @@ GGRC.Components('exportPanel', {
     }
   }
 });
+
+export {exportGroup};

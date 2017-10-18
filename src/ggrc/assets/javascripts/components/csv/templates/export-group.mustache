@@ -1,0 +1,12 @@
+{{!
+  Copyright (C) 2017 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="relevant-filter-group">
+  {{#each panels.items}}
+    <div class="new-relevant-block">
+      <export-panel type="{{type}}" item="." panel_number="{{@index}}"></export-panel>
+    </div>
+  {{/each}}
+</div>

@@ -1,76 +1,79 @@
-/*!
+/* eslint no-invalid-this: 0 */
+/* !
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-//= require can.jquery-all
+// = require can.jquery-all
 
 // LocalStorage model, stubs AJAX requests to storage instead of going to the server.  Useful when a REST resource hasn't yet been implemented
 // Adapted from an example in the CanJS documentation.  http://canjs.us/recipes.html
 
-(function(can){
-
+(function (can) {
   // Base model to handle reading / writing to local storage
-  can.Model("can.Model.LocalStorage", {
-    makeFindOne : function( findOne ) {
-
-      if(typeof findOne === "function" && this !== can.Model.LocalStorage) {
+  can.Model('can.Model.LocalStorage', {
+    makeFindOne(findOne) {
+      if (typeof findOne === 'function' && this !== can.Model.LocalStorage) {
         return findOne;
       } else {
-        return function( params, success, error ) {
+        return function (params, success, error) {
+          var instance;
+          var def = new can.Deferred();
+          // Key to be used for local storage
+          var key = [this._shortName, params.id].join(':');
+          // Grab the current data, if any
+          var data = window.localStorage.getItem( key );
+
           params = params || {};
 
-            var def = new can.Deferred(),
-                // Key to be used for local storage
-                key = [this._shortName, params.id].join(":"),
-                // Grab the current data, if any
-                data = window.localStorage.getItem( key );
 
-            // Bind success and error callbacks to the deferred
-            def.then(success, error);
+          // Bind success and error callbacks to the deferred
+          def.then(success, error);
 
-            // If we had existing local storage data...
-            if ( data ) {
+          // If we had existing local storage data...
+          if ( data ) {
+            // Create our model instance
+            instance = this.store[params.id] || this.model( JSON.parse( data ));
 
-                // Create our model instance
-                var instance = this.store[params.id] || this.model( JSON.parse( data ));
+            // Resolve the deferred with our instance
+            def.resolve( instance );
 
-                // Resolve the deferred with our instance
-                def.resolve( instance );
-
-            // Otherwise hand off the deferred to the ajax request
-            } else {
-                def.reject({status : 404, responseText : "Object with id " + params.id + " was not found"});
-            }
-            return def;
+          // Otherwise hand off the deferred to the ajax request
+          } else {
+            def.reject({
+              status: 404,
+              responseText: 'Object with id ' + params.id + ' was not found',
+            });
+          }
+          return def;
         };
       }
-    }
-    , makeFindAll : function(findAll) {
-      if(typeof findAll === "function" && this !== can.Model.LocalStorage) {
+    },
+    makeFindAll: function (findAll) {
+      if (typeof findAll === 'function' && this !== can.Model.LocalStorage) {
         return findAll;
       } else {
-        return function(params, success, error) {
-          var def = new can.Deferred()
-          , key = [this._shortName, "ids"].join(":")
-          , data = window.localStorage.getItem( key )
-          , returns = new can.Model.List()
-          , that = this;
+        return function (params, success, error) {
+          var def = new can.Deferred();
+          var allData = window.localStorage.getItem(`${this._shortName}:ids`);
+          var returns = new can.Model.List();
+          var that = this;
           params = params || {};
 
-          if(data) {
-            can.each(JSON.parse(data), function(id) {
-              if(params.id == null || params.id === id) {
-                var k = [that._shortName, id].join(":")
-                , d = window.localStorage.getItem( k );
+          if (allData) {
+            can.each(JSON.parse(allData), function (id) {
+              var data;
+              var pkeys;
+              if (params.id == null || params.id === id) {
+                data = window.localStorage.getItem(`${that._shortName}:${id}`);
 
-                if(d) {
-                  d = that.store[id] || JSON.parse(d);
-                  var pkeys = Object.keys(params);
-                  if(pkeys.length < 1 || can.filter(pkeys, function(k) {
-                    return params[k] !== d[k];
+                if (data) {
+                  data = that.store[id] || JSON.parse(data);
+                  pkeys = Object.keys(params);
+                  if (pkeys.length < 1 || can.filter(pkeys, function (key) {
+                    return params[key] !== data[key];
                   }).length < 1) {
-                    returns.push(that.model(d));
+                    returns.push(that.model(data));
                   }
                 }
               }
@@ -81,31 +84,33 @@
           return def;
         };
       }
-    }
-    , makeCreate : function(create) {
-      if(typeof create === "function" && this !== can.Model.LocalStorage) {
+    },
+    makeCreate: function (create) {
+      if (typeof create === 'function' && this !== can.Model.LocalStorage) {
         return create;
       } else {
-        return function(params) {
-          var key = [this._shortName, "ids"].join(":")
-            , data = window.localStorage.getItem( key )
-            , newkey = 1
-            , def = new can.Deferred()
-            ;
+        return function (params) {
+          var item;
+          var key = [this._shortName, 'ids'].join(':');
+          var data = window.localStorage.getItem( key );
+          var newkey = 1;
+          var def = new can.Deferred();
 
-            //add to list
-          if(data) {
+
+          // add to list
+          if (data) {
             data = JSON.parse(data);
-            newkey = Math.max.apply(Math, data.concat([0])) + 1;
+            // newkey = Math.max.apply(Math, data.concat([0])) + 1;
+            newkey = Math.max(0, ...data) + 1;
             data.push(newkey);
           } else {
             data = [newkey];
           }
           window.localStorage.setItem(key, JSON.stringify(data));
 
-          //create new
-          key = [this._shortName, newkey].join(":");
-          var item = this.model(can.extend({id : newkey}, params));
+          // create new
+          key = [this._shortName, newkey].join(':');
+          item = this.model(can.extend({id: newkey}, params));
           window.localStorage.setItem(key, JSON.stringify(item.serialize()));
 
           def.resolve(item);
@@ -113,52 +118,60 @@
           return def;
         };
       }
-    }
-    , makeUpdate : function(update) {
-      if(typeof update === "function" && this !== can.Model.LocalStorage) {
+    },
+    makeUpdate: function (update) {
+      if (typeof update === 'function' && this !== can.Model.LocalStorage) {
         return update;
       } else {
-        return function(id, params) {
-          var key = [this._shortName, id].join(":")
-            , data = window.localStorage.getItem( key )
-            , def = new can.Deferred()
-            ;
+        return function (id, params) {
+          var item;
+          var key = [this._shortName, id].join(':');
+          var data = window.localStorage.getItem( key );
+          var def = new can.Deferred();
 
-          if(data) {
+          if (data) {
             data = JSON.parse(data);
-            params._removedKeys && can.each(params._removedKeys, function(key) {
-              if(!params[key]) {
-                delete data[key];
-              }
-            });
+
+            if (params._removedKeys) {
+              can.each(params._removedKeys, function (key) {
+                if (!params[key]) {
+                  delete data[key];
+                }
+              });
+            }
+
             delete params._removedKeys;
             can.extend(data, params);
-            var item = this.model({}).attr(data);
+            item = this.model({}).attr(data);
 
             window.localStorage.setItem(key, JSON.stringify(item.serialize()));
             def.resolve(item);
             this.updated && this.updated(item);
           } else {
-            def.reject({ status : 404, responseText : "The object with id " + id + " was not found."});
+            def.reject({
+              status: 404,
+              responseText: 'The object with id ' + id + ' was not found.',
+            });
           }
           return def;
         };
       }
-    }
-    , makeDestroy : function(destroy) {
-      if(typeof findAll === "function" && this !== can.Model.LocalStorage) {
+    },
+    makeDestroy: function (destroy) {
+      if (typeof findAll === 'function' && this !== can.Model.LocalStorage) {
         return findAll;
       } else {
-        return function(id) {
-          var def = new can.Deferred()
-          , key = [this._shortName, id].join(":")
-          , item = this.model({ id : id });
+        return function (id) {
+          var def = new can.Deferred();
+          var key = [this._shortName, id].join(':');
+          var item = this.model({id: id});
+          var data;
 
-          if(window.localStorage.getItem(key)) {
+          if (window.localStorage.getItem(key)) {
             window.localStorage.removeItem(key);
 
             // remove from list
-            key = [this._shortName, "ids"].join(":");
+            key = [this._shortName, 'ids'].join(':');
             data = window.localStorage.getItem( key );
 
             data = JSON.parse(data);
@@ -168,23 +181,24 @@
             def.resolve(item);
             this.destroyed && this.destroyed(item);
           } else {
-            def.reject({ status : 404, responseText : "Object with id " + id + " was not found"});
+            def.reject({
+              status: 404,
+              responseText: 'Object with id ' + id + ' was not found',
+            });
           }
           return def;
         };
       }
-    }
-    , clearAll : function() {
+    },
+    clearAll: function () {
       window.localStorage.clear();
-    }
+    },
   }, {
-    removeAttr : function(attr) {
+    removeAttr: function (attr) {
       this._super(attr);
       this._removedKeys || (this._data._removedKeys = this._removedKeys = []);
       this._removedKeys.push(attr);
       return this;
-    }
-
+    },
   });
-
 })(window.can);

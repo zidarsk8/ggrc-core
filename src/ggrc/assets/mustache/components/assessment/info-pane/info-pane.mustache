@@ -88,18 +88,32 @@
                             </div>
                             <object-list {items}="evidences" {empty-message}="noItemsText">
                                 <editable-document-object-list-item {document}="{.}">
-                                    <a ($click)="removeRelatedItem(document, 'evidences')">
-                                        <action-toolbar-control>
-                                            <i class="fa fa-trash"></i>
-                                        </action-toolbar-control>
-                                    </a>
+                                  <confirm-edit-action
+                                      (set-edit-mode)="removeRelatedItem(document, 'evidences')"
+                                      (set-in-progress)="setInProgressState()"
+                                      {is-edit-icon-denied}="isEditDenied"
+                                      {instance}="instance"
+                                      {on-state-change-dfd}="onStateChangeDfd">
+                                          <a ($click)="confirmEdit">
+                                              <action-toolbar-control>
+                                                  <i class="fa fa-trash"></i>
+                                              </action-toolbar-control>
+                                          </a>
+                                  </confirm-edit-action>
                                 </editable-document-object-list-item>
                             </object-list>
+                            <confirm-edit-action
+                                        (set-in-progress)="setInProgressState()"
+                                        {instance}="instance"
+                                        {on-state-change-dfd}="onStateChangeDfd"
+                                        {edit-mode}="editMode">
                             <attach-button
                                         (before-create)="addItems(%event, 'evidences')"
                                         (refresh-evidences)="updateItems('evidences')"
                                         {is-attach-action-disabled}="isUpdatingEvidences"
+                                        {confirmation-callback}="@confirmEdit"
                                         {instance}="instance"></attach-button>
+                            </confirm-edit-action>
                         </div>
                         <div>
                             <div class="info-pane__section-title">

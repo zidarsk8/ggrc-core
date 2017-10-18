@@ -69,6 +69,16 @@
           <input tabindex="2" class="input-block-level" name="audit.title" data-permission-type="update" data-lookup="Audit" data-template="/directives/autocomplete_result.mustache" placeholder="Choose Audit" type="text" null-if-empty="false" value="{{firstnonempty audit.title ''}}" disabled="disabled" />
         {{/using}}
       </div>
+      <div class="span6">
+        {{#instance.showCaptainAlert}}
+            <div class="width-80">
+              <div class="alert alert-nomargin">
+                <p>If default assignee can not be determined,
+                Audit Captain will become the assignee.</p>
+              </div>
+            </div>
+          {{/instance.showCaptainAlert}}
+      </div>
     </div>
 
     <br />
@@ -107,7 +117,6 @@
 
       <div class="span6">
         <div class="row-fluid choose-from-select">
-
           <div class="span6 bottom-spacing{{#validation_error instance.computed_errors 'default_people.assessors'}} field-failure{{/validation_error}}">
             <label>
               Default Assignees

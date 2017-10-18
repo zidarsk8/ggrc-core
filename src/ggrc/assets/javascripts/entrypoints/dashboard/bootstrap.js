@@ -259,13 +259,12 @@
     });
     initWidgets();
   } else if (/^\/import/i.test(location)) {
-    $('#csv_import').html(
-      can.view(GGRC.mustache_path + "/import_export/import.mustache", {}));
+    $('#csv_import').html(can.view.mustache('<csv-import/>'));
 
     initWidgets();
   } else if (/^\/export/i.test(location)) {
     $('#csv_export').html(
-      can.view(GGRC.mustache_path + '/import_export/export.mustache', {}));
+      can.view.mustache('<csv-export filename="Export Objects"/>'));
 
     initWidgets();
   } else {

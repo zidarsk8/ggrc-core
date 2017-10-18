@@ -587,7 +587,7 @@ class TreeView(Component):
   # pylint: disable=too-many-instance-attributes
   _locators = constants.locator.TreeView
 
-  def __init__(self, driver, obj_name=None):
+  def __init__(self, driver, obj_name=None, is_versions_widget=False):
     super(TreeView, self).__init__(driver)
     self._tree_view_headers = []
     self._tree_view_items = []
@@ -595,7 +595,8 @@ class TreeView(Component):
     self.locator_no_results_message = self._locators.NO_RESULTS_MESSAGE
     self.obj_name = obj_name
     if self.obj_name is not None:
-      self.widget_name = url.get_widget_name_of_mapped_objs(obj_name)
+      self.widget_name = url.get_widget_name_of_mapped_objs(
+          obj_name, is_versions_widget)
       from lib import factory
       self.fields_to_set = factory.get_fields_to_set(object_name=self.obj_name)
 
@@ -677,7 +678,7 @@ class UnifiedMapperTreeView(TreeView):
   _locators = constants.locator.UnifiedMapperTreeView
 
   def __init__(self, driver, obj_name):
-    super(UnifiedMapperTreeView, self).__init__(driver, obj_name=obj_name)
+    super(UnifiedMapperTreeView, self).__init__(driver, obj_name)
     self.locator_set_visible_fields = (By.CSS_SELECTOR,
                                        self._locators.BUTTON_SHOW_FIELDS)
     self.locator_no_results_message = (By.CSS_SELECTOR,

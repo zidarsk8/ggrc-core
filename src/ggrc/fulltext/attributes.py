@@ -172,10 +172,9 @@ class CustomRoleAttr(FullTextAttr):
       person_id = acl.person.id
       if not results.get(acl.ac_role.name, None):
         results[acl.ac_role.name] = {}
-      sorted_roles[ac_role].append(acl.person.user_name)
+      sorted_roles[ac_role].append(acl.person.email)
       results[ac_role]["{}-email".format(person_id)] = acl.person.email
       results[ac_role]["{}-name".format(person_id)] = acl.person.name
-      results[ac_role]["{}-user_name".format(person_id)] = acl.person.user_name
     for role in sorted_roles:
       results[role]["__sort__"] = u':'.join(sorted(sorted_roles[role]))
     return results

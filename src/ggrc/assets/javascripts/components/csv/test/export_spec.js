@@ -3,14 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {exportGroup as Component} from '../export';
+
 describe('GGRC.Components.exportGroup', function () {
   'use strict';
-
-  var Component;  // the component under test
-
-  beforeAll(function () {
-    Component = GGRC.Components.get('exportGroup');
-  });
 
   describe('events', function () {
     describe('inserted() method', function () {
