@@ -1,4 +1,3 @@
-bower_components/*
 third_party/*
 
 src/ggrc/static/**/*.js

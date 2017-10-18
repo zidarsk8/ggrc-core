@@ -23,9 +23,6 @@ APPENGINE_ENV_DIR=$(DEV_PREFIX)/opt/gae_virtualenv
 APPENGINE_REQUIREMENTS_TXT=$(PREFIX)/src/requirements.txt
 
 STATIC_PATH=$(PREFIX)/src/ggrc/static
-BOWER_PATH=$(PREFIX)/bower_components
-DEV_BOWER_PATH=$(DEV_PREFIX)/bower_components
-BOWER_BIN_PATH=/vagrant-dev/node_modules/bower/bin/bower
 NODE_MODULES_PATH=$(DEV_PREFIX)/node_modules
 GOLANG_PATH=/vagrant-dev/golang
 GOLANG_BIN=$(GOLANG_PATH)/go/bin/go
@@ -145,19 +142,11 @@ src/ggrc/assets/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/
 src/app.yaml : src/app.yaml.dist
 	bin/build_app_yaml src/app.yaml.dist src/app.yaml --from-env
 
-bower_components : bower.json
-	mkdir -p $(DEV_BOWER_PATH)
-	ln -sf $(DEV_BOWER_PATH) $(BOWER_PATH)
-	$(BOWER_BIN_PATH) install --allow-root
-
-clean_bower_components :
-	rm -rf $(BOWER_PATH)
-
-deploy : appengine_packages bower_components src/ggrc/assets/assets.manifest src/app.yaml
+deploy : appengine_packages src/ggrc/assets/assets.manifest src/app.yaml
 
 clean_deploy :
 	rm -f src/ggrc/assets/stylesheets/dashboard.css
 	rm -f src/ggrc/static/dashboard-*.* src/ggrc/assets/assets.manifest
 	rm -f src/app.yaml
 
-clean : clean_deploy clean_bower_components
+clean : clean_deploy
