@@ -25,21 +25,21 @@ class TestPersonResource(TestCase):
     self.client.get("/login")
 
   @ddt.data(
-    (True, [
-         ("task 1", "Finished", 3, True),
-         ("task 1", "Verified", 2, True),
-         ("task 2", "Declined", 2, True),
-         ("task 2", "Verified", 1, False),
-         ("task 2", "Finished", 2, True),
-         ("task 3", "Verified", 1, True),
-         ("task 2", "Verified", 0, False),
-    ]),
-    (False, [
-         ("task 1", "Finished", 2, True),
-         ("task 2", "Declined", 2, True),
-         ("task 2", "Finished", 1, False),
-         ("task 3", "Finished", 0, False),
-    ]),
+      (True, [
+          ("task 1", "Finished", 3, True),
+          ("task 1", "Verified", 2, True),
+          ("task 2", "Declined", 2, True),
+          ("task 2", "Verified", 1, False),
+          ("task 2", "Finished", 2, True),
+          ("task 3", "Verified", 1, True),
+          ("task 2", "Verified", 0, False),
+      ]),
+      (False, [
+          ("task 1", "Finished", 2, True),
+          ("task 2", "InProgress", 2, True),
+          ("task 2", "Finished", 1, False),
+          ("task 3", "Finished", 0, False),
+      ]),
   )
   @ddt.unpack
   def test_task_count(self, is_verification_needed, transitions):
@@ -155,9 +155,122 @@ class TestPersonResource(TestCase):
       )
 
       for task, status, count, overdue in transitions:
+        print task, status, count, overdue
         wf_generator.modify_object(tasks[task], data={"status": status})
         response = self.client.get("/api/people/{}/task_count".format(user_id))
         self.assertEqual(
             response.json,
             {"open_task_count": count, "has_overdue": overdue}
         )
+
+  def test_task_count_multiple_wfs(self):
+    """Test task count with both verified and non verified workflows.
+
+    This checks task counts with 4 tasks
+        2017, 8, 15  - verification needed
+        2017, 11, 18  - verification needed
+        2017, 8, 15  - No verification needed
+        2017, 11, 18  - No verification needed
+    """
+
+    wf_generator = WorkflowsGenerator()
+    user = all_models.Person.query.first()
+    user_id = user.id
+    workflow_template = {
+        "title": "verified workflow",
+        "owners": [create_stub(user)],
+        "is_verification_needed": True,
+        "task_groups": [{
+            "title": "one time task group",
+            "contact": create_stub(user),
+            "task_group_tasks": [{
+                "title": "task 1",
+                "description": "some task",
+                "contact": create_stub(user),
+                "start_date": date(2017, 5, 5),
+                "end_date": date(2017, 8, 15),
+            }, {
+                "title": "dummy task 5",
+                "description": "some task 4",
+                "contact": create_stub(user),
+                "start_date": date(2017, 6, 5),
+                "end_date": date(2017, 11, 18),
+            }],
+            "task_group_objects": []
+        }]
+    }
+
+    with freeze_time("2017-10-16 05:09:10"):
+      self.client.get("/login")
+      verified_workflow = workflow_template.copy()
+      verified_workflow["is_verification_needed"] = True
+      _, workflow = wf_generator.generate_workflow(verified_workflow)
+      _, cycle = wf_generator.generate_cycle(workflow)
+      verified_tasks = {
+          task.title: task
+          for task in cycle.cycle_task_group_object_tasks
+      }
+      _, workflow = wf_generator.activate_workflow(workflow)
+
+      non_verified_workflow = workflow_template.copy()
+      non_verified_workflow["is_verification_needed"] = False
+      _, workflow = wf_generator.generate_workflow(non_verified_workflow)
+      _, cycle = wf_generator.generate_cycle(workflow)
+      non_verified_tasks = {
+          task.title: task
+          for task in cycle.cycle_task_group_object_tasks
+      }
+      _, workflow = wf_generator.activate_workflow(workflow)
+
+    with freeze_time("2017-7-16 07:09:10"):
+      self.client.get("/login")
+      response = self.client.get("/api/people/{}/task_count".format(user_id))
+      self.assertEqual(
+          response.json,
+          {"open_task_count": 4, "has_overdue": False}
+      )
+
+    with freeze_time("2017-10-16 08:09:10"):
+      self.client.get("/login")
+      response = self.client.get("/api/people/{}/task_count".format(user_id))
+      self.assertEqual(
+          response.json,
+          {"open_task_count": 4, "has_overdue": True}
+      )
+
+      # transition 1, task that needs verification goes to finished state. This
+      # transition should not change anything
+      wf_generator.modify_object(
+          verified_tasks["task 1"],
+          data={"status": "Finished"}
+      )
+      response = self.client.get("/api/people/{}/task_count".format(user_id))
+      self.assertEqual(
+          response.json,
+          {"open_task_count": 4, "has_overdue": True}
+      )
+
+      # transition 2, task that needs verification goes to verified state. This
+      # transition should reduce task count.
+      wf_generator.modify_object(
+          verified_tasks["task 1"],
+          data={"status": "Verified"}
+      )
+      response = self.client.get("/api/people/{}/task_count".format(user_id))
+      self.assertEqual(
+          response.json,
+          {"open_task_count": 3, "has_overdue": True}
+      )
+
+      # transition 3, task that does not need verification goes into Finished
+      # state. This transition should reduce task count and remove all overdue
+      # tasks
+      wf_generator.modify_object(
+          non_verified_tasks["task 1"],
+          data={"status": "Finished"}
+      )
+      response = self.client.get("/api/people/{}/task_count".format(user_id))
+      self.assertEqual(
+          response.json,
+          {"open_task_count": 2, "has_overdue": False}
+      )
