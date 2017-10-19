@@ -1,14 +1,14 @@
 # Issue description
 
-*Explain the issue your changes solve.*
+*Explain the issue that the changes in the pull request solve.*
 
-# Steps to reproduce
+# Steps to test the changes
 
-*Include steps to reproduce the issue (if applicable).*
+*Include steps to test or reproduce (in case of a bugfix) the changes in the pull request. This section should help the reviewer verify your changes.*
 
 # Solution description
 
-*Briefly explain the solution or add a link to the technical design document (this will help the reviewer confirm the code does what you intend).*
+*Briefly explain the solution or add a link to the technical design document (this will help the reviewer confirm the code does what you intend). Feel free to also mention alternative approaches that didn't work out.*
 
 # Sanity checklist
 
