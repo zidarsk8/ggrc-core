@@ -3,10 +3,20 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if active}}
-<div class="tab-content">
-    <div class="tab-pane active">
-      <content></content>
+{{#if cacheContent}}
+  <lazy-render {trigger}="active">
+    <div class="tab-content {{cssClasses}}">
+      <div class="tab-pane active">
+        <content></content>
+      </div>
     </div>
-</div>
+  </lazy-render>
+{{else}}
+  {{#if active}}
+    <div class="tab-content">
+      <div class="tab-pane active">
+        <content></content>
+      </div>
+    </div>
+  {{/if}}
 {{/if}}
