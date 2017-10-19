@@ -139,14 +139,16 @@
         var that = this;
         var workflow = GGRC.page_instance();
         var datesAreValid = true;
+        var startDate = GGRC.Date.getDate(that.attr('start_date'));
+        var endDate = GGRC.Date.getDate(that.attr('end_date'));
 
         if (!(workflow instanceof CMS.Models.Workflow)) {
           return;
         }
 
         // Handle cases of a workflow with start and end dates
-        datesAreValid = that.start_date && that.end_date &&
-          that.start_date <= that.end_date;
+        datesAreValid = startDate && endDate &&
+          startDate <= endDate;
 
         if (!datesAreValid) {
           return 'Start and/or end date is invalid';

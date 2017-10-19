@@ -68,16 +68,7 @@
         this.picker.datepicker('setDate', null);
         this.attr('date', null);
       },
-
-      // Date formats for the actual selected value, and for the date as
-      // displayed to the user. The Moment.js library and the jQuery datepicker
-      // use different format notation, thus separate settings for each.
-      // IMPORTANT: The pair of settings for each "type" of value (i.e. actual
-      // value / display value) must be consistent across both libraries!
-      MOMENT_ISO_DATE: 'YYYY-MM-DD',
-      MOMENT_DISPLAY_FMT: 'MM/DD/YYYY',
-      PICKER_ISO_DATE: 'yy-mm-dd',
-      PICKER_DISPLAY_FMT: 'mm/dd/yy'
+      MOMENT_DISPLAY_FMT: GGRC.Date.MOMENT_DISPLAY_FMT,
     }),
 
     events: {
@@ -88,9 +79,9 @@
         var maxDate;
         var date;
         var options = {
-          dateFormat: viewModel.PICKER_ISO_DATE,
+          dateFormat: GGRC.Date.PICKER_ISO_DATE,
           altField: this.element.find('.datepicker__input'),
-          altFormat: viewModel.PICKER_DISPLAY_FMT,
+          altFormat: GGRC.Date.PICKER_DISPLAY_FMT,
           onSelect: this.viewModel.onSelect.bind(this.viewModel)
         };
 
@@ -125,15 +116,13 @@
        * @return {string|null} - date in ISO format or null if empty or invalid
        */
       getDate: function (date) {
-        var viewModel = this.viewModel;
-
         if (date instanceof Date) {
           // NOTE: Not using moment.utc(), because if a Date instance is given,
           // it is in the browser's local timezone, thus we need to take that
           // into account to not end up with a different date. Ideally this
           // should never happen, but that would require refactoring the way
           // Date objects are created throughout the app.
-          return moment(date).format(viewModel.MOMENT_ISO_DATE);
+          return moment(date).format(GGRC.Date.MOMENT_ISO_DATE);
         } else if (this.isValidDate(date)) {
           return date;
         }
@@ -142,8 +131,7 @@
       },
 
       isValidDate: function (date) {
-        var viewModel = this.viewModel;
-        return moment(date, viewModel.MOMENT_ISO_DATE, true).isValid();
+        return moment(date, GGRC.Date.MOMENT_ISO_DATE, true).isValid();
       },
 
       /**
@@ -179,7 +167,7 @@
           // into account to not end up with a different date. Ideally this
           // should never happen, but that would require refactoring the way
           // Date objects are created throughout the app.
-          date = moment(date).format(viewModel.MOMENT_ISO_DATE);
+          date = moment(date).format(GGRC.Date.MOMENT_ISO_DATE);
         }
         date = moment.utc(date);
 
@@ -205,9 +193,9 @@
 
         if (val) {
           val = val.trim();
-          valF = moment.utc(val, viewModel.MOMENT_DISPLAY_FMT, true);
+          valF = moment.utc(val, GGRC.Date.MOMENT_DISPLAY_FMT, true);
           valISO = valF.isValid() ?
-            valF.format(viewModel.MOMENT_ISO_DATE) :
+            valF.format(GGRC.Date.MOMENT_ISO_DATE) :
             null;
         }
         return valISO;
@@ -222,7 +210,7 @@
           if (currentDateObj < updated) {
             this.viewModel.attr(
               '_date',
-              moment.utc(updated).format(viewModel.MOMENT_DISPLAY_FMT));
+              moment.utc(updated).format(GGRC.Date.MOMENT_DISPLAY_FMT));
           }
         }
       },
