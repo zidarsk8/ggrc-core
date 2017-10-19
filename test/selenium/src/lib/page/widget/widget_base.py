@@ -18,20 +18,25 @@ class _Modal(base.Modal):
 
   def __init__(self, driver):
     super(_Modal, self).__init__(driver)
-    self.ui_attribute_title = base.TextInputField(
-        self._driver, self._locators.UI_ATTRIBUTE_TITLE)
-    self.button_submit = base.Button(
-        self._driver, self._locators.BUTTON_SAVE_AND_CLOSE)
+    self.modal_window = self._driver.find_element(*self._locators.MODAL_CSS)
+    self.attr_title_ui = base.TextInputField(
+        self.modal_window, self._locators.ATTR_TITLE_UI_CSS)
+    self.submit_btn = base.Button(
+        self.modal_window, self._locators.SAVE_AND_CLOSE_BTN_CSS)
 
   def enter_title(self, title):
-    self.ui_attribute_title.enter_text(title)
+    self.attr_title_ui.enter_text(title)
 
   @decorator.handle_alert
   def save_and_close(self):
     """
     Return: WidgetAdminCustomAttributes
     """
-    self.button_submit.click()
+    self.submit_btn.click()
+    selenium_utils.wait_until_not_present(
+        self._driver, self._locators.SAVE_AND_CLOSE_BTN_CSS)
+    selenium_utils.wait_until_not_present(
+        self._driver, self._locators.MODAL_CSS)
 
 
 class CustomAttributesItemContent(base.Component):
@@ -40,7 +45,7 @@ class CustomAttributesItemContent(base.Component):
 
   def __init__(self, driver, item_text):
     super(CustomAttributesItemContent, self).__init__(driver)
-    self.button_add = base.Button(driver, self._locators.ADD_BTN)
+    self.add_btn = base.Button(driver, self._locators.ADD_BTN_CSS)
     self.custom_attributes_list = []
     self._item_name = item_text
 
@@ -64,8 +69,9 @@ class CustomAttributesItemContent(base.Component):
     current opened content item.
     """
     for row in selenium_utils.get_when_all_visible(self._driver,
-                                                   self._locators.ROW):
-      attrs = [i.text for i in row.find_elements(*self._locators.CELL_IN_ROW)]
+                                                   self._locators.ROW_CSS):
+      attrs = [i.text for i in row.find_elements(
+          *self._locators.CELL_IN_ROW_CSS)]
       self.custom_attributes_list.append(
           CustomAttributeEntity(
               title=attrs[0],
@@ -81,12 +87,12 @@ class CustomAttributesItemContent(base.Component):
 
   def open_add_new_ca_modal(self):
     """Open Add Attribute modal and return Custom Attribute Modal."""
-    selenium_utils.wait_until_stops_moving(self.button_add.element)
-    selenium_utils.scroll_into_view(self._driver, self.button_add.element)
-    selenium_utils.get_when_clickable(self._driver, self._locators.ADD_BTN)
-    selenium_utils.get_when_invisible(
+    selenium_utils.wait_until_stops_moving(self.add_btn.element)
+    selenium_utils.scroll_into_view(self._driver, self.add_btn.element)
+    selenium_utils.get_when_clickable(self._driver, self._locators.ADD_BTN_CSS)
+    selenium_utils.wait_until_not_present(
         self._driver, self._locators.TREE_SPINNER_CSS)
-    self.button_add.click()
+    self.add_btn.click()
     return CustomAttributeModal(self._driver)
 
   def select_ca_member_by_num(self, num):
@@ -96,8 +102,9 @@ class CustomAttributesItemContent(base.Component):
     Return: lib.page.widget.widget_base.CustomAttributeModal
     """
     # check that the buttons are loaded
-    selenium_utils.get_when_clickable(self._driver, self._locators.EDIT_BTN)
-    elements = self._driver.find_elements(self._locators.EDIT_BTN)
+    selenium_utils.get_when_clickable(
+        self._driver, self._locators.EDIT_BTN_CSS)
+    elements = self._driver.find_elements(self._locators.EDIT_BTN_CSS)
     selenium_utils.scroll_into_view(self._driver, elements[num]).click()
     return CustomAttributeModal(self._driver)
 
@@ -107,46 +114,49 @@ class CustomAttributeModal(_Modal):
   # pylint: disable=too-many-instance-attributes
   def __init__(self, driver):
     super(CustomAttributeModal, self).__init__(driver)
-    self.attribute_title = base.Label(
-        self._driver, self._locators.ATTRIBUTE_TITLE)
-    self.inline_help = base.Label(self._driver, self._locators.INLINE_HELP)
-    self.attribute_type = base.Label(
-        self._driver, self._locators.ATTRIBUTE_TYPE)
-    self.placeholder = base.Label(self._driver, self._locators.PLACEHOLDER)
-    self.mandatory = base.Label(self._driver, self._locators.MANDATORY)
-    self.ui_inline_help = None
-    self.ui_placeholder = None
-    self.checkbox_mandatory = base.Checkbox(
-        self._driver, self._locators.CHECKBOX_MANDATORY)
-    self.attribute_type_selector = base.DropdownStatic(
-        self._driver, self._locators.ATTRIBUTE_TYPE_SELECTOR)
-    self.ui_possible_values = None
+    self.attr_title_lbl = base.Label(
+        self.modal_window, self._locators.ATTR_TITLE_LBL_CSS)
+    self.attr_type_lbl = base.Label(
+        self.modal_window, self._locators.ATTR_TYPE_CSS)
+    self.attr_type_selector_dd = base.DropdownStatic(
+        self.modal_window, self._locators.ATTR_TYPE_SELECTOR_DD_CSS)
+    self.mandatory_lbl = base.Label(
+        self.modal_window, self._locators.MANDATORY_LBL_CSS)
+    self.mandatory_cb = base.Checkbox(
+        self.modal_window, self._locators.MANDATORY_CB_CSS)
+    self.inline_help_lbl = base.Label(
+        self.modal_window, self._locators.INLINE_HELP_LBL_CSS)
+    self.inline_help_ui = None
+    self.placeholder_lbl = base.Label(
+        self.modal_window, self._locators.PLACEHOLDER_LBL_CSS)
+    self.placeholder_ui = None
+    self.possible_values_ui = None
 
   def enter_inline_help(self, inline_help):
     """Fill 'Inline help' field."""
-    self.ui_inline_help = base.TextInputField(
-        self._driver, self._locators.UI_INLINE_HELP)
-    self.ui_inline_help.enter_text(inline_help)
+    self.inline_help_ui = base.TextInputField(
+        self.modal_window, self._locators.INLINE_HELP_UI_CSS)
+    self.inline_help_ui.enter_text(inline_help)
 
   def enter_placeholder(self, placeholder):
     """Fill 'Placeholder' field."""
-    self.ui_placeholder = base.TextInputField(
-        self._driver, self._locators.UI_PLACEHOLDER)
-    self.ui_placeholder.enter_text(placeholder)
+    self.placeholder_ui = base.TextInputField(
+        self.modal_window, self._locators.PLACEHOLDER_UI_CSS)
+    self.placeholder_ui.enter_text(placeholder)
 
   def set_mandatory(self):
     """Check 'Mandatory' checkbox."""
-    self.checkbox_mandatory.click()
+    self.mandatory_cb.click()
 
   def select_type(self, ca_type):
     """Select CustomAttribute type from 'Attribute type' dropdown."""
-    self.attribute_type_selector.select(ca_type)
+    self.attr_type_selector_dd.select(ca_type)
 
   def enter_possible_values(self, values_string):
     """Fill 'Possible values' field for 'Dropdown' type of CustomAttribute."""
-    self.ui_possible_values = base.TextInputField(
-        self._driver, self._locators.UI_POSSIBLE_VALUES)
-    self.ui_possible_values.enter_text(values_string)
+    self.possible_values_ui = base.TextInputField(
+        self.modal_window, self._locators.POSSIBLE_VALUES_UI_CSS)
+    self.possible_values_ui.enter_text(values_string)
 
 
 class DynamicTreeToggle(base.Toggle):

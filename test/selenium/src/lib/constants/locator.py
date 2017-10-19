@@ -18,6 +18,7 @@ class Common(object):
   MODAL_CONFIRM = ".modal.hide"
   MODAL_MAPPER = ".modal-selector"
   MODAL_FOOTER = " .modal-footer"
+  MODAL_BODY = " .modal-body"
   MODAL_FILTER = " .modal-filter"
   MODAL_HEADER = " .modal-header"
   # info page (panel)
@@ -59,8 +60,6 @@ class Common(object):
   # panel locator
   PANEL_CSS = (By.CSS_SELECTOR, ".pin-content.cms_controllers_info_pin")
   OBJECT_AREA_CSS = (By.CSS_SELECTOR, ".object-area")
-  # alerts
-  ALERT_SUCCESS_CSS = (By.CSS_SELECTOR, ".content>.flash>.alert-success")
   # widgets
   WDG_NOT_HIDDEN = ".widget:not(.hidden) "
 
@@ -484,24 +483,33 @@ class ModalEditObject(BaseModalCreateNew):
 
 class ModalCustomAttribute(object):
   """Locators for generic custom attributes modal in Admin Dashboard."""
-  MODAL_TITLE = (By.CSS_SELECTOR, '.modal-header h2')
-  ATTRIBUTE_TITLE = (By.CSS_SELECTOR, '.modal-body div:nth-child(1)>label')
-  INLINE_HELP = (By.CSS_SELECTOR, '.modal-body div:nth-child(2)>label')
-  ATTRIBUTE_TYPE = (By.CSS_SELECTOR, '.modal-header h2')
-  PLACEHOLDER = (By.CSS_SELECTOR, '.modal-header h2')
-  MANDATORY = (By.CSS_SELECTOR, '.modal-header h2')
-  UI_ATTRIBUTE_TITLE = (By.CSS_SELECTOR, '.modal-body [name="title"]')
-  UI_INLINE_HELP = (By.CSS_SELECTOR, '.modal-body [name="helptext"]')
-  UI_PLACEHOLDER = (By.CSS_SELECTOR, '.modal-body [name="placeholder"]')
-  UI_POSSIBLE_VALUES = (
-      By.CSS_SELECTOR, '.modal-body [name="multi_choice_options"]')
-  CHECKBOX_MANDATORY = (By.CSS_SELECTOR, '.modal-body [type="checkbox"]')
-  BUTTON_ADD_ANOTHER = (
-      By.CSS_SELECTOR, '.confirm-buttons [data-toggle="modal-submit-addmore"]')
-  BUTTON_SAVE_AND_CLOSE = (
+  MODAL_CSS = (By.CSS_SELECTOR, Common.MODAL_CONFIRM)
+  MODAL_TITLE_LBL_CSS = (By.CSS_SELECTOR, Common.MODAL_HEADER + " h2")
+  ATTR_TITLE_UI_CSS = (By.CSS_SELECTOR, Common.MODAL_BODY + ' [name="title"]')
+  SAVE_AND_CLOSE_BTN_CSS = (
       By.CSS_SELECTOR,
-      '.modal-footer .confirm-buttons [data-toggle="modal-submit"]')
-  ATTRIBUTE_TYPE_SELECTOR = (By.CSS_SELECTOR, "dropdown select")
+      Common.MODAL_FOOTER + ' .confirm-buttons [data-toggle="modal-submit"]')
+  ATTR_TITLE_LBL_CSS = (
+      By.CSS_SELECTOR, Common.MODAL_BODY + " div:nth-child(1)>label")
+  ATTR_TYPE_CSS = (By.CSS_SELECTOR, Common.MODAL_HEADER + " h2")
+  ATTR_TYPE_SELECTOR_DD_CSS = (
+      By.CSS_SELECTOR, Common.MODAL_BODY + " dropdown select")
+  MANDATORY_LBL_CSS = (By.CSS_SELECTOR, Common.MODAL_BODY + " .span2 label")
+  MANDATORY_CB_CSS = (
+      By.CSS_SELECTOR, Common.MODAL_BODY + ' [type="checkbox"]')
+  INLINE_HELP_LBL_CSS = (
+      By.CSS_SELECTOR, Common.MODAL_BODY + " div:nth-child(2)>label")
+  INLINE_HELP_UI_CSS = (
+      By.CSS_SELECTOR, Common.MODAL_BODY + ' [name="helptext"]')
+  PLACEHOLDER_LBL_CSS = (By.CSS_SELECTOR, Common.MODAL_BODY + " .span6 label")
+  PLACEHOLDER_UI_CSS = (
+      By.CSS_SELECTOR, Common.MODAL_BODY + ' [name="placeholder"]')
+  POSSIBLE_VALUES_UI_CSS = (
+      By.CSS_SELECTOR, Common.MODAL_BODY + ' [name="multi_choice_options"]')
+  ADD_ANOTHER_BTN_CSS = (
+      By.CSS_SELECTOR,
+      Common.MODAL_FOOTER +
+      ' .confirm-buttons [data-toggle="modal-submit-addmore"]')
 
 
 class ModalSetVisibleFields(object):
@@ -627,7 +635,6 @@ class ModalDeleteObject(ModalCommonConfirmAction):
 
 class ModalUpdateObject(ModalCommonConfirmAction):
   """Locators for Update object modals."""
-  PERMALINK_ALERT = Common.ALERT_SUCCESS_CSS
 
 
 class ModalCloneAudit(ModalCommonConfirmAction):
@@ -731,7 +738,6 @@ class WidgetInfoProgram(WidgetInfoPanel):
   PRIVATE_PROGRAM = (By.CSS_SELECTOR,
                      '[data-test-id="title_private_ec758af9"] h6')
   ICON_LOCK = (By.CSS_SELECTOR, '[data-test-id="icon_private_ec758af9"]')
-  PERMALINK_ALERT = Common.ALERT_SUCCESS_CSS
   ALERT_LINK_COPIED = (By.CSS_SELECTOR, ".alert.alert-success")
   MODAL_DELETE = (By.ID, '[id="ajax-lhn_modal-javascript:--"]')
   MODAL_DELETE_CLOSE = (By.CSS_SELECTOR, ".lhn_modal .grcicon-x-grey")
@@ -1088,11 +1094,11 @@ class CustomAttributesItemContent(AdminCustomAttributes):
   CONTENT_OPEN = ".content-open .tier-2-info-content"
   TREE_STRUCTURE = (
       CONTENT_OPEN + " .tree-structure .cms_controllers_tree_view_node")
-  TITLES_ROW = (By.CSS_SELECTOR, CONTENT_OPEN + " thead tr")
-  ROW = (By.CSS_SELECTOR, TREE_STRUCTURE)
-  CELL_IN_ROW = (By.CSS_SELECTOR, "td")
-  EDIT_BTN = (By.CSS_SELECTOR, CONTENT_OPEN + " " + Common.TREE_LIST)
-  ADD_BTN = (By.CSS_SELECTOR, CONTENT_OPEN + " .add-item .btn")
+  TITLES_ROW_CSS = (By.CSS_SELECTOR, CONTENT_OPEN + " thead tr")
+  ROW_CSS = (By.CSS_SELECTOR, TREE_STRUCTURE)
+  CELL_IN_ROW_CSS = (By.CSS_SELECTOR, "td")
+  EDIT_BTN_CSS = (By.CSS_SELECTOR, CONTENT_OPEN + " " + Common.TREE_LIST)
+  ADD_BTN_CSS = (By.CSS_SELECTOR, CONTENT_OPEN + " .add-item .btn")
   TREE_SPINNER_CSS = (By.CSS_SELECTOR, Common.TREE_SPINER)
 
 
