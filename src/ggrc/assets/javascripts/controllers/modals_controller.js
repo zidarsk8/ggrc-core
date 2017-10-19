@@ -1153,15 +1153,11 @@ import '../components/access_control_list/access_control_list_roles_helper'
             type = obj.type ? can.spaceCamelCase(obj.type) : '';
             name = obj.title ? obj.title : '';
 
-            if (instanceId === undefined) { // new element
-              if (obj.is_declining_review && obj.is_declining_review == '1') {
-                $(document.body).trigger('ajax:flash', {
-                  success: 'Review declined'
-                });
-              }
-            } else {
+            if (instanceId === undefined &&
+              obj.is_declining_review &&
+              obj.is_declining_review == '1') { // new element
               $(document.body).trigger('ajax:flash', {
-                success: `${name} modified successfully.`
+                success: 'Review declined'
               });
             }
             finish();
