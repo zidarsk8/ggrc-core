@@ -3,6 +3,7 @@
 
 """Tests for /api/people endpoints."""
 
+import json
 from datetime import date
 
 import ddt
@@ -13,11 +14,12 @@ from ggrc.utils import create_stub
 
 from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
+from integration.ggrc.query_helper import WithQueryApi
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 
 
 @ddt.ddt
-class TestPersonResource(TestCase):
+class TestPersonResource(TestCase, WithQueryApi):
   """Tests for special people api endpoints."""
 
   def setUp(self):
@@ -281,3 +283,94 @@ class TestPersonResource(TestCase):
           response.json,
           {"open_task_count": 2, "has_overdue": False}
       )
+
+
+@ddt.ddt
+class TestPersonResourcePopulated(TestCase, WithQueryApi):
+  """Tests meant to be run on a populated database."""
+
+  MY_WORK_OBJECTS = [
+      # "Person",  this also exists but should be removed since it's not used.
+      "Issue",
+      "AccessGroup",
+      "Assessment",
+      "Audit",
+      "Clause",
+      "Contract",
+      "Control",
+      "DataAsset",
+      "Facility",
+      "Market",
+      "Objective",
+      "OrgGroup",
+      "Policy",
+      "Process",
+      "Product",
+      "Program",
+      "Project",
+      "Regulation",
+      "Risk",
+      "Section",
+      "Standard",
+      "System",
+      "Threat",
+      "Vendor",
+      "CycleTaskGroupObjectTask",
+  ]
+
+  def setUp(self):
+    self.client.get("/login")
+    pass
+
+  @ddt.data(*[
+      (user.id, user.email, user.name)
+      for user in all_models.Person.query
+  ])
+  @ddt.unpack
+  def test_my_work_counts(self, user_id, user_email, user_name):
+    """Compare my work counts with query API response for {} {}.
+
+    This test is meant to be run manually on a fully populated database.
+    """.format(user_id, user_email)
+    def get_query(user_id):
+      return [
+          {
+              "object_name": object_name,
+              "filters": {
+                  "expression": {
+                      "object_name": "Person",
+                      "op": {"name": "owned"},
+                      "ids": [user_id]
+                  },
+                  "keys": [],
+                  "order_by": {"keys": [], "order": "", "compare": None}
+              },
+              "type": "count"
+          }
+          for object_name in self.MY_WORK_OBJECTS
+      ]
+
+    user_headers = {
+        "X-ggrc-user": json.dumps({"name": user_name, "email": user_email})
+    }
+    self.client.get("/login", headers=user_headers)
+
+    query = get_query(user_id)
+    url = "/api/people/{}/my_work_count".format(user_id)
+    response = self._post(query)
+    counts = {
+        item.values()[0]["object_name"]: item.values()[0]["count"]
+        for item in response.json
+    }
+
+    response = self.client.get(url)
+    if response.status_code == 403:
+      # We skip inactive users that don't have access to view their counts
+      return
+
+    my_work_count = response.json
+
+    self.assertEqual(
+        (user_id, user_email, counts),
+        (user_id, user_email, my_work_count),
+    )

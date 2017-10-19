@@ -194,12 +194,12 @@
         this.email;
     },
     getWidgetCountForMyWorkPage: function () {
-      let url = `/api/people/${this.attr('id')}/my_work_counts`;
-      return can.get(url);
+      let url = `/api/people/${this.attr('id')}/my_work_count`;
+      return $.get(url);
     },
     getWidgetCountForAllObjectPage: function () {
-      let url = `/api/people/${this.attr('id')}/my_work_counts`;
-      return can.get(url);
+      let url = `/api/people/${this.attr('id')}/all_objects_count`;
+      return $.get(url);
     },
     getTasksCount: function () {
       let url = `/api/people/${this.attr('id')}/task_count`;
