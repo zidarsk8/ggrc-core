@@ -11,6 +11,7 @@ import collections
 import html2text
 import logging
 import time
+import urlparse
 
 from itertools import izip
 
@@ -19,11 +20,9 @@ from sqlalchemy import orm
 from google.appengine.api import urlfetch
 
 from ggrc import db
-<<<<<<< HEAD
 from ggrc.access_control.role import get_custom_roles_for
-=======
 from ggrc import access_control
->>>>>>> Handle IssueTracker related information
+from ggrc import utils
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.models.hooks import common
@@ -37,6 +36,16 @@ _ISSUE_TRACKER_PARAMS = frozenset((
     'status',
     'title',
 ))
+
+# mapping of model field name to API property name
+_ISSUE_TRACKER_UPDATE_FIELDS = (
+    ('title', 'title'),
+    ('status', 'status'),
+    ('issue_priority', 'priority'),
+    ('issue_severity', 'severity'),
+    ('component_id', 'component_id'),
+    ('assignee', 'assignee'),
+)
 
 _ASSESSMENT_MODEL_NAME = 'Assessment'
 
@@ -119,7 +128,7 @@ def init_hook():
         assessment.assessment_type = template.template_object_type
 
     for assessment, src in izip(objects, sources):
-      _create_issuetracker_issue(assessment, src.get('issue_tracker'))
+      _create_issuetracker_info(assessment, src.get('issue_tracker'))
 
   @signals.Restful.model_put.connect_via(all_models.Assessment)
   def handle_assessment_put(sender, obj=None, src=None, service=None):
@@ -132,7 +141,7 @@ def init_hook():
     common.ensure_field_not_changed(obj, 'audit')
     issue_tracker_info = src.get('issue_tracker')
     if issue_tracker_info:
-      _update_issuetracker_issue(obj, issue_tracker_info)
+      _update_issuetracker_info(obj, issue_tracker_info)
 
   @signals.Restful.model_put_after_commit.connect_via(all_models.Assessment)
   def handle_assessment_put_after_commit(
@@ -202,54 +211,25 @@ def init_hook():
 
     for assessment in all_models.Assessment.query.filter(
         all_models.Assessment.id.in_(assessment_ids)).all():
-      _update_issue_emails(assessment)
+      issue_obj = all_models.IssuetrackerIssue.get_issue(
+          _ASSESSMENT_MODEL_NAME, assessment.id)
+      if issue_obj is None or issue_obj.assignee is not None:
+        continue
 
-  @signals.Restful.model_put.connect_via(all_models.Relationship)
-  def handle_relation_put(sender, obj=None, src=None, service=None):
-    del sender, service, src  # Unused
-    logger.info('------> handle_relation_put')
+      assignee_email, cc_list = _collect_issue_emails(assessment)
+      issue_tracker_info = issue_obj.to_dict(include_issue=True)
+      issue_tracker_info['status'] = 'ASSIGNED'
+      issue_tracker_info['assignee'] = assignee_email
+      issue_tracker_info['cc_list'] = cc_list
+      _update_issuetracker_info(assessment, issue_tracker_info)
 
-    if obj.destination_type != _ASSESSMENT_MODEL_NAME:
-      return
-
-    _update_issue_emails(all_models.Assessment.query.filter(
-        all_models.Assessment.id == obj.destination_id).first())
-
-  @signals.Restful.model_deleted_after_commit.connect_via(
-      all_models.Relationship)
-  def handle_relation_deleted_after_commit(
-      sender, obj=None, service=None, event=None):
-    del sender, service, event  # Unused
-    logger.info('------> handle_relation_deleted_after_commit')
-    if obj.destination_type != _ASSESSMENT_MODEL_NAME:
-      return
-
-    _update_issue_emails(all_models.Assessment.query.filter(
-        all_models.Assessment.id == obj.destination_id).first())
-
-def _update_issue_emails(assessment):
-  if assessment is None:
-    return
-
-  logger.info(
-      '--> UPDATE ISSUE EMAILS: assessment_id=%d (issue_id=%s)',
-      assessment.id, assessment.issue_tracker['issue_id'])
-
-  if not assessment.issue_tracker['issue_id']:
-    return
-
-  assignee_email, cc_list = _collect_issue_emails(assessment)
-  logger.info(
-      '    --> assignee=%s, cc_list=%s', assignee_email, cc_list)
 
 def _collect_issue_emails(assessment):
   assignee_email = None
   cc_list = set()
 
   assignees = assessment.assessors
-  # logger.info('------> assignees: %s', assignees)
   if assignees:
-    # logger.info('------> assignee.email: %s', [a.email for a in assignees])
     for i, person in enumerate(sorted(assignees, key=lambda o: o.name)):
       if i == 0:
         assignee_email = person.email
@@ -258,7 +238,6 @@ def _collect_issue_emails(assessment):
       if email and email != assignee_email:
         cc_list.add(email)
 
-  # db.session.query(role.
   # select l.person_id, p.name, p.email, l.ac_role_id, r.name from access_control_list l join access_control_roles r on r.id=l.ac_role_id join people p on p.id=l.person_id where l.object_type='Assessment' and l.object_id=3;
   ac_list = access_control.list.AccessControlList
   ac_role = access_control.role.AccessControlRole
@@ -277,19 +256,54 @@ def _collect_issue_emails(assessment):
       ac_list.object_id == assessment.id
   )
   for r in query.all():
-    # logger.info('---> role: %s', r)
     email = r[2]
     if email != assignee_email:
       cc_list.add(email)
   roles_dict = role.get_custom_roles_for(_ASSESSMENT_MODEL_NAME)
-  # logger.info('------> roles_dict: %s', roles_dict)
 
   return assignee_email, list(cc_list)
 
 
 def _create_issuetracker_issue(assessment, issue_tracker_info):
+  reported_email = None
+  reporter_id = get_current_user_id()
+  if reporter_id:
+    reporter = all_models.Person.query.filter(
+        all_models.Person.id == reporter_id).first()
+    if reporter is not None:
+      reported_email = reporter.email
+
+  hotlist_id = issue_tracker_info.get('hotlist_id')
+  issue_params = {
+      'component_id': issue_tracker_info['component_id'],
+      'hotlist_ids': [hotlist_id] if hotlist_id else [],
+      'title': issue_tracker_info['title'],
+      'type': issue_tracker_info['issue_type'],
+      'priority': issue_tracker_info['issue_priority'],
+      'severity': issue_tracker_info['issue_severity'],
+      'reporter': reported_email,
+      'assignee': None,
+      'verifier': None,
+      'ccs': [],
+      'comment': (
+          'This bug was auto-generated to track a GGRC assessment '
+          '(a.k.a PBC Item). Use the following link to find the '
+          'assessment - %s.\n'
+          'Following is the assessment Requirements/Test Plan from GGRC:\n'
+          '[Test Plan text]'
+      ) % (urlparse.urljoin(
+          utils.get_url_root(), utils.view_url_for(assessment))),
+  }
+
+  # TODO(anushovan): create issue here.
+  logger.info('------> CREATE ISSUE: %s', issue_params)
+  return int(time.time())
+
+
+def _create_issuetracker_info(assessment, issue_tracker_info):
   if not issue_tracker_info:
     # return
+    # TODO(anushovan): remove this when development is done
     issue_tracker_info = {
         "enabled": True,
         "component_id": "64445",
@@ -301,43 +315,11 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
         # "issue_url": "http://issuetracker.me/b/1508276850",
     }
 
+  if not issue_tracker_info.get('title'):
+    issue_tracker_info['title'] = assessment.title
+
   if issue_tracker_info.get('enabled'):
-    reported_email = None
-    reporter_id = get_current_user_id()
-    if reporter_id:
-      reporter = all_models.Person.query.filter(
-          all_models.Person.id == reporter_id).first()
-      if reporter is not None:
-        reported_email = reporter.email
-
-
-    assignee_email, cc_list = _collect_issue_emails(assessment)
-
-    hotlist_id = issue_tracker_info.get('hotlist_ids')
-    issue_params = {
-        'component_id': issue_tracker_info['component_id'],
-        'hotlist_ids': [hotlist_id] if hotlist_id else [],
-        'title': assessment.title,
-        'type': issue_tracker_info['issue_type'],
-        'priority': issue_tracker_info['issue_priority'],
-        'severity': issue_tracker_info['issue_severity'],
-        'reporter': reported_email,
-        'assignee': assignee_email,
-        'verifier': assignee_email,
-        'ccs': cc_list,
-        'comment': (
-            'This bug was auto-generated to track a GGRC assessment '
-            '(a.k.a PBC Item). Use the following link to find the '
-            'assessment - (link to Assessment page '
-            'https://ggrc-test.googleplex.com/assessments/%d). '
-            'Following is the assessment Requirements/Test Plan from GGRC: '
-            '[Test Plan text]') % (assessment.id),
-    }
-
-    # TODO(anushovan): create issue here.
-    logger.info('------> CREATE ISSUE: %s', issue_params)
-
-    issue_id = int(time.time())
+    issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
     issue_url = 'http://issuetracker.me/b/%s' % issue_id
   else:
     issue_id = None
@@ -353,36 +335,58 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       issue_url=issue_url,
   )
   if issue_obj is not None:
-    logger.info('------> update issue object')
+    logger.info('------> [CREATE] update issue object')
     issue_obj.update_from_dict(issue_tracker_info)
   else:
-    logger.info('------> create issue object')
+    logger.info('------> [CREATE] create issue object')
     issue_obj = all_models.IssuetrackerIssue.create_from_dict(
         issue_tracker_info)
     db.session.add(issue_obj)
 
 
 def _update_issuetracker_issue(assessment, issue_tracker_info):
-  logger.info(
-      '------> _update_issuetracker_issue: %s', assessment.assignees_by_type)
+  issue_params = {}
+  current_info = assessment.issue_tracker
 
-  assignees = assessment.assignees_by_type.get('Assessor')
-  if assignees:
-    logger.info('------> assignee.email: %s', [a.email for a in assignees])
+  for name, api_name in _ISSUE_TRACKER_UPDATE_FIELDS:
+    value = issue_tracker_info.get(name)
+    if value != current_info.get(name):
+      issue_params[api_name] = value
 
-  issue_obj = all_models.IssuetrackerIssue.get_issue(
-      _ASSESSMENT_MODEL_NAME, assessment.id)
+  comment = issue_tracker_info.get('comment')
+  if comment:
+    issue_params['comment'] = comment
+
+  hotlist_id = issue_tracker_info.get('hotlist_id')
+  if hotlist_id != current_info.get('hotlist_id'):
+    issue_params['hotlist_ids'] = [hotlist_id] if hotlist_id else []
+
+  cc_list = issue_tracker_info.get('cc_list')
+  if cc_list is not None:
+    issue_params['ccs'] = cc_list
+
+  if issue_params:
+    # TODO(anushovan): update issue here.
+    logger.info('------> UPDATE ISSUE: %s', issue_params)
+
+
+def _update_issuetracker_info(assessment, issue_tracker_info):
+  if issue_tracker_info.get('enabled') and issue_tracker_info.get('issue_id'):
+    _update_issuetracker_issue(assessment, issue_tracker_info)
+
   issue_tracker_info = dict(
       issue_tracker_info,
       object_type=_ASSESSMENT_MODEL_NAME,
       object_id=assessment.id)
+
+  issue_obj = all_models.IssuetrackerIssue.get_issue(
+      _ASSESSMENT_MODEL_NAME, assessment.id)
   if issue_obj is not None:
-    logger.info('------> update issue object')
+    logger.info('------> [UPDATE] update issue object')
     issue_obj.update_from_dict(issue_tracker_info)
   else:
-    logger.info('------> create issue object')
-    issue_obj = all_models.IssuetrackerIssue.create_from_dict(
-        issue_tracker_info)
+    logger.info('------> [UPDATE] create issue object')
+    issue_obj = all_models.IssuetrackerIssue.create_from_dict()
     db.session.add(issue_obj)
 
 

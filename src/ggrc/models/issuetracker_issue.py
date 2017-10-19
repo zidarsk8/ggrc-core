@@ -17,17 +17,20 @@ class IssuetrackerIssue(Base, db.Model):
 
   enabled = db.Column(db.Boolean, nullable=False, default=False)
 
+  title = db.Column(db.String(255), nullable=False)
   component_id = db.Column(db.String(50), nullable=False)
   hotlist_id = db.Column(db.String(50), nullable=True)
   issue_type = db.Column(db.String(50), nullable=False)
   issue_priority = db.Column(db.String(50), nullable=False)
   issue_severity = db.Column(db.String(50), nullable=False)
+  assignee = db.Column(db.String(255), nullable=True)
+  cc_list = db.Column(db.Text, nullable=True)
 
   issue_id = db.Column(db.String(50), nullable=True)
-  issue_url = db.Column(db.String(50), nullable=True)
+  issue_url = db.Column(db.String(255), nullable=True)
 
   _MANDATORY_ATTRS = (
-      'object_type', 'object_id', 'component_id',
+      'object_type', 'object_id', 'component_id', 'title',
       'issue_type', 'issue_priority', 'issue_severity',
   )
 
@@ -50,18 +53,26 @@ class IssuetrackerIssue(Base, db.Model):
               ', '.join(missing_attrs)))
 
 
-  def to_dict(self, include_issue=False):
+  def to_dict(self, include_issue=False, include_private=None):
     res = {
         'enabled': self.enabled,
+        'title': self.title,
         'component_id': self.component_id,
         'hotlist_id': self.hotlist_id,
         'issue_type': self.issue_type,
         'issue_priority': self.issue_priority,
         'issue_severity': self.issue_severity,
     }
+
     if include_issue:
       res['issue_id'] = self.issue_id
       res['issue_url'] = self.issue_url
+
+    if include_private:
+      res['object_id'] = self.object_id
+      res['object_type'] = self.object_type
+      res['assignee'] = self.assignee
+      res['cc_list'] = self.cc_list.split(',') if self.cc_list else []
 
     return res
 
@@ -69,10 +80,16 @@ class IssuetrackerIssue(Base, db.Model):
   def create_from_dict(cls, info):
     logger.info('---> IssuetrackerIssue.create_from_dict: %s', info)
     cls._validate_info(info)
+
+    cc_list = info.get('cc_list')
+    if cc_list is not None:
+      cc_list = ','.join(cc_list)
+
     return cls(
         object_type=info['object_type'],
         object_id=info['object_id'],
         enabled=bool(info.get('enabled')),
+        title=info['title'],
         component_id=info['component_id'],
 
         hotlist_id=info.get('hotlist_id'),
@@ -80,6 +97,8 @@ class IssuetrackerIssue(Base, db.Model):
         issue_type=info['issue_type'],
         issue_priority=info['issue_priority'],
         issue_severity=info['issue_severity'],
+        assignee=info.get('assignee'),
+        cc_list=cc_list,
 
         issue_id=info.get('issue_id'),
         issue_url=info.get('issue_url'),
@@ -87,17 +106,32 @@ class IssuetrackerIssue(Base, db.Model):
 
   def update_from_dict(self, info):
     logger.info('---> IssuetrackerIssue.update_from_dict: %s', info)
-    self._validate_info(info)
+
+    cc_list = info.pop('cc_list', None)
+
+    info = dict(
+        self.to_dict(include_issue=True, include_private=True),
+        **info)
+
+    if cc_list is not None:
+      info['cc_list'] = cc_list
+
+    if info['cc_list'] is not None:
+      info['cc_list'] = ','.join(info['cc_list'])
+
     self.object_type = info['object_type']
     self.object_id = info['object_id']
     self.enabled = info['enabled']
+    self.title = info['title']
     self.component_id = info['component_id']
 
-    self.hotlist_id = info.get('hotlist_id')
+    self.hotlist_id = info['hotlist_id']
 
     self.issue_type = info['issue_type']
     self.issue_priority = info['issue_priority']
     self.issue_severity = info['issue_severity']
+    self.assignee = info['assignee']
+    self.cc_list = info['cc_list']
 
-    self.issue_id = info.get('issue_id')
-    self.issue_url = info.get('issue_url')
+    self.issue_id = info['issue_id']
+    self.issue_url = info['issue_url']
