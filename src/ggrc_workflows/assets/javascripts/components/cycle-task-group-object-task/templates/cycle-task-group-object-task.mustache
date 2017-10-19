@@ -4,11 +4,9 @@
 }}
 
 
-<section class="info{{#is_info_pin}} sticky-info-panel{{/is_info_pin}}">
+<section class="info sticky-info-panel">
 
-  {{#is_info_pin}}
-    <info-pin-buttons class="details-wrap" maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
-  {{/is_info_pin}}
+  <info-pin-buttons class="details-wrap" maximized="maximized" on-change-maximized-state="@onChangeMaximizedState" on-close="@onClose"></info-pin-buttons>
 
   <div class="info-pane-utility">
     {{#is_allowed 'update' instance context='for'}}
