@@ -79,10 +79,8 @@ MAX_INSTANCES = os.environ.get('MAX_INSTANCES', '3')
 
 exports = ['VERSION', 'MAX_INSTANCES']
 
-# Users with authorized domains will automatically get Creator role.
-# After parsing, AUTHORIZED_DOMAINS must be set of strings.
-AUTHORIZED_DOMAINS = {
-    d.strip() for d in os.environ.get('AUTHORIZED_DOMAINS', "").split(",")}
+# Users with authorized domain will automatically get Creator role.
+AUTHORIZED_DOMAIN = os.environ.get('AUTHORIZED_DOMAIN', "")
 
 JINJA2 = jinja2.Environment(loader=jinja2.PackageLoader('ggrc', 'templates'))
 EMAIL_DIGEST = JINJA2.get_template("notifications/email_digest.html")
