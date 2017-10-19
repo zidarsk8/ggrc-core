@@ -7,47 +7,7 @@ describe('GGRC.Components.TasksCounter', function () {
   'use strict';
 
   var viewModel;  // the viewModel under test
-  var DATE_TO_COMPARE = moment().format('YYYY-MM-DD');
-  var TASKS_OBJECT_TYPE = 'CycleTaskGroupObjectTask';
-  var testQuery = {
-    data: [{
-      object_name: TASKS_OBJECT_TYPE,
-      type: 'count',
-      filters: {
-        expression: {
-          object_name: 'Person',
-          op: {name: 'owned'},
-          ids: ['1']
-        },
-        keys: [],
-        order_by: {
-          keys: [],
-          order: '',
-          compare: null
-        }
-      }
-    }, {
-      object_name: TASKS_OBJECT_TYPE,
-      filters: {
-        expression: {
-          left: {
-            object_name: 'Person',
-            op: {name: 'owned'},
-            ids: ['1']
-          },
-          op: {name: 'AND'},
-          right: {
-            op: {name: '<'},
-            left: 'task due date',
-            right: DATE_TO_COMPARE
-          }
-        },
-        keys: [null]
-      },
-      type: 'count'
-    }
-    ]
-  };
+
   beforeEach(function () {
     viewModel = GGRC.Components.getViewModel('tasksCounter');
   });
@@ -68,22 +28,10 @@ describe('GGRC.Components.TasksCounter', function () {
       expect(viewModel.attr('hasOverdue')).toEqual(false);
     });
 
-    it('sets the "tasksType" to CycleTaskGroupObjectTask', function () {
-      expect(viewModel.attr('tasksType')).toEqual('CycleTaskGroupObjectTask');
-    });
-
-    describe('sets the "tasksType" to ' +
-      'CycleTaskGroupObjectTask and ', function () {
-      it('doens\'t allow to modify it', function () {
-        viewModel.attr('tasksType', 'someDifferent');
-        expect(viewModel.attr('tasksType')).toEqual('CycleTaskGroupObjectTask');
-      });
-    });
-
-    describe('computes "stateCssClass" attribute and sets to ', function () {
+    describe('computes "stateCss" attribute and sets to ', function () {
       it('"tasks-counter__empty-state", if tasksAmount is 0', function () {
         viewModel.attr('tasksAmount', 0);
-        expect(viewModel.attr('stateCssClass'))
+        expect(viewModel.attr('stateCss'))
           .toEqual('tasks-counter__empty-state');
       });
 
@@ -91,7 +39,7 @@ describe('GGRC.Components.TasksCounter', function () {
         ' if tasksAmount > 0 and hasOverdue is true', function () {
         viewModel.attr('tasksAmount', 1);
         viewModel.attr('hasOverdue', true);
-        expect(viewModel.attr('stateCssClass'))
+        expect(viewModel.attr('stateCss'))
           .toEqual('tasks-counter__overdue-state');
       });
 
@@ -99,7 +47,7 @@ describe('GGRC.Components.TasksCounter', function () {
         ' if tasksAmount > 0 and hasOverdue is false', function () {
         viewModel.attr('tasksAmount', 1);
         viewModel.attr('hasOverdue', false);
-        expect(viewModel.attr('stateCssClass'))
+        expect(viewModel.attr('stateCss'))
           .toEqual('');
       });
     });
@@ -113,44 +61,22 @@ describe('GGRC.Components.TasksCounter', function () {
       });
     });
 
-    describe('.getQuery() method should', function () {
-      it('return QueryAPI object', function () {
-        var query;
-        viewModel.attr('personId', 1);
-        query = viewModel.getQuery('CycleTaskGroupObjectTask');
-        expect(JSON.stringify(query)).toBe(JSON.stringify(testQuery));
-      });
-    });
-
     describe('.loadTasks() method should', function () {
-      it('trigger execution of getQuery and requestQuery methods', function () {
-        var results = {
-          total: 0,
-          overdue: 0
-        };
-        var resultsDfd = can.Deferred().resolve(results);
-        spyOn(viewModel, 'getQuery');
-        spyOn(viewModel, 'requestQuery').and.returnValue(resultsDfd);
-        viewModel.loadTasks();
-        expect(viewModel.getQuery).toHaveBeenCalled();
-        expect(viewModel.getQuery)
-          .toHaveBeenCalledWith(TASKS_OBJECT_TYPE);
-        expect(viewModel.requestQuery).toHaveBeenCalled();
+      beforeEach(() => {
+        spyOn(CMS.Models.Person, 'findInCacheById')
+          .and.callFake(() => {
+          return {
+            getTasksCount: () => can.Deferred().resolve({
+              open_task_count: 5,
+              has_overdue: true
+            })
+          };
+        });
       });
 
       it('update hasOverdue and tasksAmount properties', function () {
-        var results = {
-          total: 5,
-          overdue: 1
-        };
-        var resultsDfd = can.Deferred().resolve(results);
-        spyOn(viewModel, 'getQuery');
-        spyOn(viewModel, 'requestQuery').and.returnValue(resultsDfd);
         viewModel.loadTasks();
-        expect(viewModel.getQuery).toHaveBeenCalled();
-        expect(viewModel.getQuery)
-          .toHaveBeenCalledWith(TASKS_OBJECT_TYPE);
-        expect(viewModel.requestQuery).toHaveBeenCalled();
+        expect(CMS.Models.Person.findInCacheById).toHaveBeenCalled();
         expect(viewModel.attr('tasksAmount')).toBe(5);
         expect(viewModel.attr('hasOverdue')).toBe(true);
       });

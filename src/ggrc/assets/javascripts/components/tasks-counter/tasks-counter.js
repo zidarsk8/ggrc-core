@@ -45,8 +45,8 @@ export default GGRC.Components('tasksCounter', {
       }
     },
     loadTasks: function () {
-      let currentUser = CMS.Models.Person.store[this.attr('personId')];
-      return currentUser.getTasksCount()
+      let user = CMS.Models.Person.findInCacheById(this.attr('personId'));
+      return user.getTasksCount()
         .then(function (results) {
           this.attr('tasksAmount', results.open_task_count);
           this.attr('hasOverdue', results.has_overdue);
