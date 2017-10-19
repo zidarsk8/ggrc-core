@@ -24,6 +24,14 @@ class TestPersonResource(TestCase):
     super(TestPersonResource, self).setUp()
     self.client.get("/login")
 
+  def test_task_count_empty(self):
+    user = all_models.Person.query.first()
+    response = self.client.get("/api/people/{}/task_count".format(user.id))
+    self.assertEqual(
+        response.json,
+        {"open_task_count": 0, "has_overdue": False}
+    )
+
   @ddt.data(
       (True, [
           ("task 1", "Finished", 3, True),

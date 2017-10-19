@@ -81,6 +81,6 @@ class PersonResource(common.ExtendedResource):
       counts = dict(counts_query.fetchall())
       response_object = {
           "open_task_count": int(sum(counts.values())),
-          "has_overdue": bool(counts.get(1, [])),
+          "has_overdue": bool(counts.get(1, 0)),
       }
       return self.json_success_response(response_object, )
