@@ -5,6 +5,7 @@
 
 from datetime import date
 
+import ddt
 from freezegun import freeze_time
 
 from ggrc.models import all_models
@@ -15,6 +16,7 @@ from integration.ggrc.services import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 
 
+@ddt.ddt
 class TestPersonResource(TestCase):
   """Tests for special people api endpoints."""
 
@@ -22,7 +24,19 @@ class TestPersonResource(TestCase):
     super(TestPersonResource, self).setUp()
     self.client.get("/login")
 
-  def test_task_count(self):
+  @ddt.data(
+    (True, [
+         ("task 1", "Finished", 3, True),
+         ("task 1", "Verified", 2, True),
+         ("task 2", "Declined", 2, True),
+         ("task 2", "Verified", 1, False),
+         ("task 2", "Finished", 2, True),
+         ("task 3", "Verified", 1, True),
+         ("task 2", "Verified", 0, False),
+    ]),
+  )
+  @ddt.unpack
+  def test_task_count(self, is_verification_needed, transitions):
     """Test person task counts.
 
     This tests checks for correct task counts
@@ -46,6 +60,7 @@ class TestPersonResource(TestCase):
         "notify_on_change": True,
         "description": "some test workflow",
         "owners": [create_stub(user)],
+        "is_verification_needed": is_verification_needed,
         "task_groups": [{
             "title": "one time task group",
             "contact": create_stub(user),
@@ -133,23 +148,10 @@ class TestPersonResource(TestCase):
           {"open_task_count": 3, "has_overdue": True}
       )
 
-      wf_generator.modify_object(tasks["task 1"], data={"status": "Verified"})
-      response = self.client.get("/api/people/{}/task_count".format(user_id))
-      self.assertEqual(
-          response.json,
-          {"open_task_count": 2, "has_overdue": True}
-      )
-
-      wf_generator.modify_object(tasks["task 2"], data={"status": "Finished"})
-      response = self.client.get("/api/people/{}/task_count".format(user_id))
-      self.assertEqual(
-          response.json,
-          {"open_task_count": 2, "has_overdue": True}
-      )
-
-      wf_generator.modify_object(tasks["task 2"], data={"status": "Verified"})
-      response = self.client.get("/api/people/{}/task_count".format(user_id))
-      self.assertEqual(
-          response.json,
-          {"open_task_count": 1, "has_overdue": False}
-      )
+      for task, status, count, overdue in transitions:
+        wf_generator.modify_object(tasks[task], data={"status": status})
+        response = self.client.get("/api/people/{}/task_count".format(user_id))
+        self.assertEqual(
+            response.json,
+            {"open_task_count": count, "has_overdue": overdue}
+        )
