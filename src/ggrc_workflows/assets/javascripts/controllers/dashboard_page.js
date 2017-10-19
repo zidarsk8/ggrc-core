@@ -128,7 +128,7 @@
             else {
               if (data.isOverdue) {
                 over_due++;
-                $('dashboard-errors').control().scope.attr('error_msg', 'Some tasks are overdue!');
+                GGRC.Errors.notifier('error', 'Some tasks are overdue!');
               }
               else if (data.status === 'Finished')
                 finished++;
@@ -205,13 +205,4 @@
     }
 
   });
-
-  can.Component.extend({
-    tag: "dashboard-errors",
-    template: "<content/>",
-    scope: {
-      error_msg: '',
-    }
-  });
-
 })(window.CMS, window.GGRC, window.can, window.can.$);
