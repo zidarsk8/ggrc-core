@@ -212,7 +212,34 @@
               {{/with_mapping_count}}
 
               <ul class="add-task-comment">
-                {{>'/static/mustache/cycle_task_entries/tree_footer.mustache'}}
+                {{^if_equals instance.status 'Verified'}}
+                  {{#if cycle}}
+                    {{#if cycle.is_current}}
+                      {{#is_allowed 'update' instance context='for'}}
+                        <li class="tree-footer tree-item-add inner-tree-footer non-stick">
+                          <a
+                            href="javascript://"
+                            class="btn btn-darkBlue btn-mini section-create"
+                            data-object-singular-override="Comment"
+                            data-toggle="modal-ajax-form"
+                            data-modal-reset="reset"
+                            data-dirty="#regulations, #combo"
+                            data-route="regulations"
+                            data-modal-class="modal-wide"
+                            data-object-singular="CycleTaskEntry"
+                            data-object-plural="cycle_task_entries"
+                            data-object-params='{
+                              "cycle_task_group_object_task": {{instance.id}},
+                              "cycle": {{cycle.id}},
+                              "context": {{instance.context.id}}
+                            }'>
+                            Add Comment
+                          </a>
+                        </li>
+                      {{/is_allowed}}
+                    {{/if}}
+                  {{/if}}
+                {{/if_equals}}
               </ul>
             </div>
           </div>
