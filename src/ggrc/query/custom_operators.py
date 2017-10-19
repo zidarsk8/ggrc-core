@@ -14,14 +14,15 @@ from sqlalchemy.orm import load_only
 
 from ggrc import db
 from ggrc import models
-from ggrc.query import autocast
-from ggrc.query.exceptions import BadQueryException
+from ggrc.access_control.list import AccessControlList
 from ggrc.fulltext.mysql import MysqlRecordProperty as Record
 from ggrc.login import is_creator
 from ggrc.models import inflector
 from ggrc.models import relationship_helper
-from ggrc.snapshotter import rules
+from ggrc.query import autocast
 from ggrc.query import my_objects
+from ggrc.query.exceptions import BadQueryException
+from ggrc.snapshotter import rules
 from ggrc_basic_permissions import UserRole
 
 
@@ -151,6 +152,12 @@ def related_people(exp, object_class, target_class, query):
       object_class.__name__,
       exp['object_name'],
       exp['ids'],
+  ))
+
+  res.extend(db.session.query(AccessControlList.person_id).filter(
+      sqlalchemy.and_(
+          AccessControlList.object_id.in_(exp['ids']),
+          AccessControlList.object_type == exp['object_name'])
   ))
 
   if exp['object_name'] in ('Program', 'Audit'):
