@@ -18,6 +18,12 @@ SYSTEM_WIDE_READ_ROLES = {
     SystemWideRoles.READER,
 }
 
+SYSTEM_WIDE_UPDATE_ROLES = {
+    SystemWideRoles.SUPERUSER,
+    SystemWideRoles.ADMINISTRATOR,
+    SystemWideRoles.EDITOR,
+}
+
 
 def get_permissions_provider():
   return get_extension_instance(
@@ -52,6 +58,14 @@ def is_allowed_create_for(instance):
   instance.
   """
   return permissions_for(get_user()).is_allowed_create_for(instance)
+
+
+def has_system_wide_update():
+  """Check if user has system wide update access to all objects."""
+  user = login.get_current_user()
+  system_wide_role = getattr(user, "system_wide_role",
+                             SystemWideRoles.NO_ACCESS)
+  return system_wide_role in SYSTEM_WIDE_UPDATE_ROLES
 
 
 def has_system_wide_read():
