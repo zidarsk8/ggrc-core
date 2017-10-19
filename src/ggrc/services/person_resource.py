@@ -38,16 +38,38 @@ class PersonResource(common.ExtendedResource):
       counts_query = db.session.execute(
           """
           SELECT
-              ct.end_date < :today AS overdue,
-              count(ct.id) AS task_count
-          FROM cycle_task_group_object_tasks AS ct
-          JOIN cycles AS c ON
-              c.id = ct.cycle_id
-          WHERE
-              ct.status != "Verified" AND
-              ct.contact_id = :person_id AND
-              c.is_current = 1
-          GROUP BY overdue;
+              overdue,
+              sum(task_count)
+          FROM (
+              SELECT
+                  ct.end_date < :today AS overdue,
+                  count(ct.id) AS task_count
+              FROM cycle_task_group_object_tasks AS ct
+              JOIN cycles AS c ON
+                  c.id = ct.cycle_id
+              WHERE
+                  ct.status != "Verified" AND
+                  ct.contact_id = :person_id AND
+                  c.is_verification_needed = 1 AND
+                  c.is_current = 1
+              GROUP BY overdue
+
+              UNION ALL
+
+              SELECT
+                  ct.end_date < :today AS overdue,
+                  count(ct.id) AS task_count
+              FROM cycle_task_group_object_tasks AS ct
+              JOIN cycles AS c ON
+                  c.id = ct.cycle_id
+              WHERE
+                  ct.status != "Finished" AND
+                  ct.contact_id = :person_id AND
+                  c.is_verification_needed = 0 AND
+                  c.is_current = 1
+              GROUP BY overdue
+          ) as temp
+          GROUP BY overdue
           """,
           {
               # Using today instead of DATE(NOW()) for easier testing with
@@ -58,7 +80,7 @@ class PersonResource(common.ExtendedResource):
       )
       counts = dict(counts_query.fetchall())
       response_object = {
-          "open_task_count": sum(counts.values()),
+          "open_task_count": int(sum(counts.values())),
           "has_overdue": bool(counts.get(1, [])),
       }
       return self.json_success_response(response_object, )
