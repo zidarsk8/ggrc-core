@@ -23,8 +23,10 @@ class TestPersonResource(TestCase):
   def setUp(self):
     super(TestPersonResource, self).setUp()
     self.client.get("/login")
+    self.generator = WorkflowsGenerator()
 
   def test_task_count_empty(self):
+    """Test query count without any workflows and tasks."""
     user = all_models.Person.query.first()
     response = self.client.get("/api/people/{}/task_count".format(user.id))
     self.assertEqual(
@@ -63,8 +65,7 @@ class TestPersonResource(TestCase):
     between tests that make ddt cumbersome and the single test also improves
     integration test performance due to slow workflow setup stage.
     """
-
-    wf_generator = WorkflowsGenerator()
+    # pylint: disable=too-many-locals
 
     user = all_models.Person.query.first()
     dummy_user = factories.PersonFactory()
@@ -135,16 +136,16 @@ class TestPersonResource(TestCase):
     with freeze_time("2017-10-16 05:09:10"):
       self.client.get("/login")
       # Activate normal one time workflow
-      _, workflow = wf_generator.generate_workflow(one_time_workflow)
-      _, cycle = wf_generator.generate_cycle(workflow)
+      _, workflow = self.generator.generate_workflow(one_time_workflow)
+      _, cycle = self.generator.generate_cycle(workflow)
       tasks = {t.title: t for t in cycle.cycle_task_group_object_tasks}
-      _, workflow = wf_generator.activate_workflow(workflow)
+      _, workflow = self.generator.activate_workflow(workflow)
 
       # Activate and close the inactive workflow
-      _, workflow = wf_generator.generate_workflow(inactive_workflow)
-      _, cycle = wf_generator.generate_cycle(workflow)
-      _, workflow = wf_generator.activate_workflow(workflow)
-      wf_generator.modify_object(cycle, data={"is_current": False})
+      _, workflow = self.generator.generate_workflow(inactive_workflow)
+      _, cycle = self.generator.generate_cycle(workflow)
+      _, workflow = self.generator.activate_workflow(workflow)
+      self.generator.modify_object(cycle, data={"is_current": False})
 
     with freeze_time("2017-7-16 07:09:10"):
       self.client.get("/login")
@@ -163,8 +164,7 @@ class TestPersonResource(TestCase):
       )
 
       for task, status, count, overdue in transitions:
-        print task, status, count, overdue
-        wf_generator.modify_object(tasks[task], data={"status": status})
+        self.generator.modify_object(tasks[task], data={"status": status})
         response = self.client.get("/api/people/{}/task_count".format(user_id))
         self.assertEqual(
             response.json,
@@ -181,7 +181,6 @@ class TestPersonResource(TestCase):
         2017, 11, 18  - No verification needed
     """
 
-    wf_generator = WorkflowsGenerator()
     user = all_models.Person.query.first()
     user_id = user.id
     workflow_template = {
@@ -212,23 +211,23 @@ class TestPersonResource(TestCase):
       self.client.get("/login")
       verified_workflow = workflow_template.copy()
       verified_workflow["is_verification_needed"] = True
-      _, workflow = wf_generator.generate_workflow(verified_workflow)
-      _, cycle = wf_generator.generate_cycle(workflow)
+      _, workflow = self.generator.generate_workflow(verified_workflow)
+      _, cycle = self.generator.generate_cycle(workflow)
       verified_tasks = {
           task.title: task
           for task in cycle.cycle_task_group_object_tasks
       }
-      _, workflow = wf_generator.activate_workflow(workflow)
+      _, workflow = self.generator.activate_workflow(workflow)
 
       non_verified_workflow = workflow_template.copy()
       non_verified_workflow["is_verification_needed"] = False
-      _, workflow = wf_generator.generate_workflow(non_verified_workflow)
-      _, cycle = wf_generator.generate_cycle(workflow)
+      _, workflow = self.generator.generate_workflow(non_verified_workflow)
+      _, cycle = self.generator.generate_cycle(workflow)
       non_verified_tasks = {
           task.title: task
           for task in cycle.cycle_task_group_object_tasks
       }
-      _, workflow = wf_generator.activate_workflow(workflow)
+      _, workflow = self.generator.activate_workflow(workflow)
 
     with freeze_time("2017-7-16 07:09:10"):
       self.client.get("/login")
@@ -248,7 +247,7 @@ class TestPersonResource(TestCase):
 
       # transition 1, task that needs verification goes to finished state. This
       # transition should not change anything
-      wf_generator.modify_object(
+      self.generator.modify_object(
           verified_tasks["task 1"],
           data={"status": "Finished"}
       )
@@ -260,7 +259,7 @@ class TestPersonResource(TestCase):
 
       # transition 2, task that needs verification goes to verified state. This
       # transition should reduce task count.
-      wf_generator.modify_object(
+      self.generator.modify_object(
           verified_tasks["task 1"],
           data={"status": "Verified"}
       )
@@ -273,7 +272,7 @@ class TestPersonResource(TestCase):
       # transition 3, task that does not need verification goes into Finished
       # state. This transition should reduce task count and remove all overdue
       # tasks
-      wf_generator.modify_object(
+      self.generator.modify_object(
           non_verified_tasks["task 1"],
           data={"status": "Finished"}
       )

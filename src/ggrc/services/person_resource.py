@@ -32,6 +32,10 @@ class PersonResource(common.ExtendedResource):
     return command_map[command](*args, **kwargs)
 
   def _task_count(self, id):
+    """Return open task count and overdue flag for a given user."""
+    # id name is used as a kw argument and can't be changed here
+    # pylint: disable=invalid-name,redefined-builtin
+
     if id != get_current_user_id():
       raise Forbidden()
     with benchmark("Make response"):
