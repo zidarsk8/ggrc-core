@@ -34,6 +34,12 @@ class TestPersonResource(TestCase):
          ("task 3", "Verified", 1, True),
          ("task 2", "Verified", 0, False),
     ]),
+    (False, [
+         ("task 1", "Finished", 2, True),
+         ("task 2", "Declined", 2, True),
+         ("task 2", "Finished", 1, False),
+         ("task 3", "Finished", 0, False),
+    ]),
   )
   @ddt.unpack
   def test_task_count(self, is_verification_needed, transitions):
