@@ -1,4 +1,4 @@
-/*!
+/*
   Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -73,6 +73,7 @@ describe('CMS.Controllers.InnerNav', function () {
     var ctrlInst;  // fake controller instance
     var showHideTitles;
     var options;
+    var getPageTypeSpy;
 
     function createWidgets(titlesStatus) {
       var widgets = [
@@ -81,7 +82,7 @@ describe('CMS.Controllers.InnerNav', function () {
         {name: 'ccc', show_title: titlesStatus},
         {name: 'ddd', show_title: titlesStatus},
         {name: 'eee', show_title: titlesStatus},
-        {name: 'fff', show_title: titlesStatus}
+        {name: 'fff', show_title: titlesStatus},
       ];
       options.attr('widget_list', widgets);
       return widgets;
@@ -95,26 +96,54 @@ describe('CMS.Controllers.InnerNav', function () {
       options = new can.Map({
         widget_list: new can.Observe.List([]),
         dividedTabsMode: false,
-        priorityTabs: null
+        priorityTabs: null,
       });
 
       ctrlInst = {
         element: {
           children: jasmine.createSpy(),
-          width: jasmine.createSpy().and.returnValue(DISPLAY_WIDTH)
+          width: jasmine.createSpy().and.returnValue(DISPLAY_WIDTH),
         },
-        options: options
+        options: options,
       };
 
       spyOn(_, 'map')
         .and
         .returnValue([]);
 
+      getPageTypeSpy = spyOn(GGRC.Utils.CurrentPage, 'getPageType')
+        .and
+        .returnValue('Audit');
+
       showHideTitles = Ctrl.prototype.show_hide_titles.bind(ctrlInst);
     });
 
     afterEach(function () {
       Array.prototype.reduce.calls.reset();
+    });
+
+
+    it('always show titles if page instance is not AUDIT', function () {
+      var types = ['Assessment', 'Audit', 'Control', 'Program'];
+
+      setWidgetsWidth(2400);
+
+      types.forEach((type) => {
+        getPageTypeSpy.and.returnValue(type);
+
+        showHideTitles = Ctrl.prototype.show_hide_titles.bind(ctrlInst);
+
+        createWidgets(false);
+        showHideTitles();
+
+        if (type !== 'Audit') {
+          expect(_.every(options.attr('widget_list'), 'show_title'))
+            .toBeTruthy();
+        } else {
+          expect(_.every(options.attr('widget_list'), 'show_title'))
+            .toBeFalsy();
+        }
+      });
     });
 
     it('doesnt hide titles if the width is enough', function () {

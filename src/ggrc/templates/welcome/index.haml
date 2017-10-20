@@ -12,20 +12,10 @@
           -if messages
             -for category, message in messages
               %div{ 'class': "{{category}}" }
-                %a.close{'href': "#", 'data-dismiss': "alert" }
-                  x
                 %p
                   {{message|safe}}
-        -#FIXME: Flash messages
-        -#flash.each do |type, value|
-          -value = [value] unless value.is_a?(Array)
-          -value = value.map(:presence).compact
-          -if value.size > 0
-            %div{ 'class': type }
-              %a.close{'href': "#{}", :'data-dismiss': "alert"}
-                &times;
-              -value.each do |message|
-                %p=message
+                %a.close{'href': "#", 'data-dismiss': "alert" }
+                  %i.fa.fa-times
 
     .row-fluid
       .span12

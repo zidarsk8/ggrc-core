@@ -279,6 +279,12 @@
           this.options.attr('widget_list', new can.Observe.List([]));
         }
 
+        // trigger show_hide_title, because numbers of 
+        // widgets can be changed after updating of instance
+        instance.bind('snapshotScopeUpdated', () => {
+          this.show_hide_titles();
+        });
+
         this.options.attr('instance', instance);
         if (!(this.options.contexts instanceof can.Observe)) {
           this.options.attr('contexts', new can.Observe(this.options.contexts));
@@ -496,6 +502,7 @@
         spinner: this.options.spinners['#' + $widget.attr('id')],
         model: widgetOptions && widgetOptions.model,
         order: (widgetOptions || widget).order,
+        uncountable: (widgetOptions || widget).uncountable,
       });
 
       index = this.options.widget_list.length;
@@ -568,7 +575,9 @@
     '{window} resize': _.debounce(function (el, ev) {
       this.show_hide_titles();
     }, 100),
+
     show_hide_titles: function () {
+      var pageType = GGRC.Utils.CurrentPage.getPageType();
       var $el = this.element;
       var originalWidgets = this.options.widget_list;
       var dividedTabsMode = this.options.attr('dividedTabsMode');
@@ -607,7 +616,9 @@
         widget.attr('show_title', true);
       });
 
-      adjust(originalWidgets);
+      if (pageType === 'Audit') {
+        adjust(originalWidgets);
+      }
     },
     '.closed click': function (el, ev) {
       var $link = el.closest('a');
