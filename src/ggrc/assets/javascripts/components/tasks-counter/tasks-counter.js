@@ -45,7 +45,12 @@ export default GGRC.Components('tasksCounter', {
       }
     },
     loadTasks: function () {
-      let user = CMS.Models.Person.findInCacheById(this.attr('personId'));
+      let id = this.attr('personId');
+      let user = CMS.Models.Person.findInCacheById(id);
+
+      if (!user) {
+        user = new CMS.Models.Person({id});
+      }
       return user.getTasksCount()
         .then(function (results) {
           this.attr('tasksAmount', results.open_task_count);
