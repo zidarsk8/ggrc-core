@@ -6,6 +6,8 @@
 
   The following permission hooks make sure archived audits are not editable
 """
+import itertools
+
 from werkzeug.exceptions import Forbidden
 
 from ggrc import db
@@ -75,7 +77,7 @@ def init_hook():
   @signals.Restful.collection_posted.connect_via(all_models.Audit)
   def handle_audit_post(sender, objects=None, sources=None):
     del sender  # Unused
-    for obj, src in izip(objects, sources):
+    for obj, src in itertools.izip(objects, sources):
       issue_tracker_info = src.get('issue_tracker')
       if not issue_tracker_info:
         continue
