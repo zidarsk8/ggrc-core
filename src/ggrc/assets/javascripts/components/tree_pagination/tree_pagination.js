@@ -51,9 +51,6 @@
         input.val('');
         input.blur();
       },
-      changePageSize: function (size) {
-        this.paging.attr('pageSize', size);
-      },
       setLastPage: function () {
         this.paging.attr('current', this.paging.count);
       },
