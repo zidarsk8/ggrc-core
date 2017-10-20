@@ -32,10 +32,10 @@
           -if messages
             -for category, message in messages
               %div{ 'class': "{{category}}" }
-                %a.close{'href': "#", 'data-dismiss': "alert" }
-                  x
                 %p
                   {{message}}
+                %a.close{'href': "#", 'data-dismiss': "alert" }
+                  %i.fa.fa-times
       -block main
         .object-area.row-fluid.full-width
           .inner-content.widget-area

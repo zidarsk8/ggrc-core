@@ -402,34 +402,11 @@
 
           $html = $('<div></div>');
           $html.addClass('alert').addClass('alert-' + flashClass);
+          textContainer = '<span class="content"></span>';
 
-          switch (flashClass) {
-            case 'hint':
-              textContainer = '<h6></h6>';
-              $html.addClass('alert-autohide');
-              break;
-
-            case 'progress':
-              textContainer = '<h6></h6>';
-              $html.append(
-                can.view.mustache([
-                  '<spinner ',
-                  'toggle="true" ',
-                  'extra-css-class="alert_spinner-left"',
-                  '></spinner>'
-                ].join('')));
-              break;
-
-            default:
-              textContainer = '<span></span>';
-              $html.addClass('alert-autohide');
+          if (flashClass !== 'progress') {
+            $html.addClass('alert-autohide');
           }
-
-          $html.append(
-            '<a href="#" class="close" data-dismiss="alert">' +
-              '<i class="fa fa-times" aria-hidden="true"></i>' +
-            '</a>'
-          );
 
           for (messageI in flash[type]) {
             if (!flash[type].hasOwnProperty(messageI)) {
@@ -444,7 +421,9 @@
               $html.append($(textContainer).text(message));
               if (addLink) {
                 $html.removeClass('alert-autohide');
-                $link = $('<a href="javascript://">Show results</a>');
+                $link = $(`<a href="javascript://" class="reload-link">
+                              Show results
+                           </a>`);
                 $link.on('click', function () {
                   if (redirectLink) {
                     $('html').addClass('no-js');
@@ -456,6 +435,13 @@
               }
             }
           }
+
+          $html.append(
+            '<a href="#" class="close" data-dismiss="alert">' +
+              '<i class="fa fa-times" aria-hidden="true"></i>' +
+            '</a>'
+          );
+
           $flashHolder.append($html);
         }
       }
