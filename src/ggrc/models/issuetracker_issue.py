@@ -77,6 +77,24 @@ class IssuetrackerIssue(Base, db.Model):
     return res
 
   @classmethod
+  def create_or_update_from_dict(cls, object_type, object_id, info):
+    if not info:
+      raise ValueError('Issue tracker info cannot be empty.')
+
+    issue_obj = cls.get_issue(object_type, object_id)
+
+    info = dict(info, object_type=object_type, object_id=object_id)
+    if issue_obj is not None:
+      logger.info('------> [CREATE/UPDATE] update issue object')
+      issue_obj.update_from_dict(info)
+    else:
+      logger.info('------> [CREATE/UPDATE] create issue object')
+      issue_obj = cls.create_from_dict(info)
+      db.session.add(issue_obj)
+
+    return issue_obj
+
+  @classmethod
   def create_from_dict(cls, info):
     logger.info('---> IssuetrackerIssue.create_from_dict: %s', info)
     cls._validate_info(info)

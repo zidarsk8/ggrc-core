@@ -48,6 +48,7 @@ _ISSUE_TRACKER_UPDATE_FIELDS = (
 )
 
 _ASSESSMENT_MODEL_NAME = 'Assessment'
+_ASSESSMENT_TMPL_MODEL_NAME = 'AssessmentTemplate'
 
 def init_hook():
   """Initializes hooks."""
@@ -223,6 +224,34 @@ def init_hook():
       issue_tracker_info['cc_list'] = cc_list
       _update_issuetracker_info(assessment, issue_tracker_info)
 
+  @signals.Restful.collection_posted.connect_via(all_models.AssessmentTemplate)
+  def handle_assessment_tmpl_post(sender, objects=None, sources=None):
+    del sender  # Unused
+    for obj, src in izip(objects, sources):
+      issue_tracker_info = src.get('issue_tracker')
+      if not issue_tracker_info:
+        continue
+      all_models.IssuetrackerIssue.create_or_update_from_dict(
+          _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
+
+  @signals.Restful.model_put.connect_via(all_models.AssessmentTemplate)
+  def handle_assessment_tmpl_put(sender, obj=None, src=None, service=None):
+    del sender, service  # Unused
+    issue_tracker_info = src.get('issue_tracker')
+    if issue_tracker_info:
+      all_models.IssuetrackerIssue.create_or_update_from_dict(
+          _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
+
+  @signals.Restful.model_deleted_after_commit.connect_via(
+      all_models.AssessmentTemplate)
+  def handle_assessment_tmpl_deleted_after_commit(
+      sender, obj=None, service=None, event=None):
+    del sender, service, event  # Unused
+    issue_obj = all_models.IssuetrackerIssue.get_issue(
+        _ASSESSMENT_TMPL_MODEL_NAME, obj.id)
+    if issue_obj:
+      db.session.delete(issue_obj)
+
 
 def _collect_issue_emails(assessment):
   assignee_email = None
@@ -320,28 +349,11 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
 
   if issue_tracker_info.get('enabled'):
     issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
-    issue_url = 'http://issuetracker.me/b/%s' % issue_id
-  else:
-    issue_id = None
-    issue_url = None
+    issue_tracker_info['issue_id'] = issue_id
+    issue_tracker_info['issue_url'] = 'http://issuetracker.me/b/%s' % issue_id
 
-  issue_obj = all_models.IssuetrackerIssue.get_issue(
-      _ASSESSMENT_MODEL_NAME, assessment.id)
-  issue_tracker_info = dict(
-      issue_tracker_info,
-      object_type=_ASSESSMENT_MODEL_NAME,
-      object_id=assessment.id,
-      issue_id=str(issue_id),
-      issue_url=issue_url,
-  )
-  if issue_obj is not None:
-    logger.info('------> [CREATE] update issue object')
-    issue_obj.update_from_dict(issue_tracker_info)
-  else:
-    logger.info('------> [CREATE] create issue object')
-    issue_obj = all_models.IssuetrackerIssue.create_from_dict(
-        issue_tracker_info)
-    db.session.add(issue_obj)
+  all_models.IssuetrackerIssue.create_or_update_from_dict(
+      _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
 
 
 def _update_issuetracker_issue(assessment, issue_tracker_info):
@@ -374,20 +386,8 @@ def _update_issuetracker_info(assessment, issue_tracker_info):
   if issue_tracker_info.get('enabled') and issue_tracker_info.get('issue_id'):
     _update_issuetracker_issue(assessment, issue_tracker_info)
 
-  issue_tracker_info = dict(
-      issue_tracker_info,
-      object_type=_ASSESSMENT_MODEL_NAME,
-      object_id=assessment.id)
-
-  issue_obj = all_models.IssuetrackerIssue.get_issue(
-      _ASSESSMENT_MODEL_NAME, assessment.id)
-  if issue_obj is not None:
-    logger.info('------> [UPDATE] update issue object')
-    issue_obj.update_from_dict(issue_tracker_info)
-  else:
-    logger.info('------> [UPDATE] create issue object')
-    issue_obj = all_models.IssuetrackerIssue.create_from_dict()
-    db.session.add(issue_obj)
+  all_models.IssuetrackerIssue.create_or_update_from_dict(
+      _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
 
 
 def _get_added_comment_id(src):
