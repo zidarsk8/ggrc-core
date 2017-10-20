@@ -685,37 +685,60 @@ class TestSnapshots(base.Test):
     assert 0 == actual_controls_count
     assert [] == actual_controls
 
-  @pytest.mark.skip(
-      reason="todo: Redesign tests according to business requirements")
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      "dynamic_objects",
-      ["new_audit_rest", "new_assessment_rest", "new_issue_rest"],
+      "dynamic_objects, dynamic_relationships",
+      [("new_assessment_rest", None),
+       ("new_issue_rest", "map_new_audit_rest_to_new_issue_rest")],
+      ids=["All types of snapshotable objects and Issues to Assessment",
+           "All types of snapshotable objects, Issues, Programs, Projects and "
+           "Task Groups (*for mapper only) to standalone Issue"],
       indirect=True)
-  def test_availability_mapping_of_objects_to_snapshotable_objs(
+  def test_availability_mapping_of_objects_via_mapper_and_add_widget(
       self, create_audit_with_control_and_update_control, dynamic_objects,
-      selenium
+      dynamic_relationships, selenium
   ):
-    """Check availability mapping of objects to Control's snapshots via UI
+    """Check availability mapping of objects to Assessment and Issue via UI
     using Unified Mapper functionality and AddWidget button on Horizontal
     Nav Bar.
+
     Steps:
-      - Get list of available objects from HNB
-      - Get list of available objects from Unified Mapper
-      - Compare their with constant of snapshotable objects
+      - Get list of available objects from Unified Mapper;
+      - Get list of available objects from HNB;
+      - Compare their with constant of expected objects accordingly.
     """
+    is_issue_flow = (
+        dynamic_objects.type == entities_factory.EntitiesFactory.obj_issue)
+    expected_objs_names_from_mapper = (
+        objects.ALL_SNAPSHOTABLE_OBJS + (objects.ISSUES, ))
+    expected_objs_names_from_add_widget = expected_objs_names_from_mapper
+    if is_issue_flow:
+      expected_objs_names_from_add_widget = expected_objs_names_from_mapper + (
+          objects.PROGRAMS, objects.PROJECTS)
+      expected_objs_names_from_mapper = (
+          expected_objs_names_from_add_widget + (objects.TASK_GROUPS, ))
+    expected_objs_types_from_mapper = sorted(
+        objects.get_normal_form(obj_name)
+        for obj_name in expected_objs_names_from_mapper)
+    expected_objs_types_from_add_widget = sorted(
+        objects.get_normal_form(obj_name)
+        for obj_name in expected_objs_names_from_add_widget)
     mapped_audit = create_audit_with_control_and_update_control[
         'new_audit_rest'][0]
     obj_ui_service = get_cls_webui_service(
         objects.get_plural(dynamic_objects.type))(selenium)
-    objs_types_from_mapper = (
+    actual_objs_types_from_mapper = (
         obj_ui_service.get_objs_available_to_map_via_mapper(
             src_obj=mapped_audit))
-    objs_types_from_add_widget = (
+    actual_objs_types_from_add_widget = (
         obj_ui_service.get_objs_available_to_map_via_add_widget(
             src_obj=dynamic_objects))
-    expected_objs_types = sorted(
-        objects.get_normal_form(snap_obj)
-        for snap_obj in objects.ALL_SNAPSHOTABLE_OBJS)
-    assert (expected_objs_types == objs_types_from_mapper ==
-            objs_types_from_add_widget)
+    assert (expected_objs_types_from_mapper ==
+            actual_objs_types_from_mapper), (
+        messages.AssertionMessages.format_err_msg_equal(
+            expected_objs_types_from_mapper, actual_objs_types_from_mapper))
+    assert (expected_objs_types_from_add_widget ==
+            actual_objs_types_from_add_widget), (
+        messages.AssertionMessages.format_err_msg_equal(
+            expected_objs_types_from_add_widget,
+            actual_objs_types_from_add_widget))
