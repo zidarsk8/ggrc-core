@@ -101,41 +101,46 @@ def from_session(*models, **set_selectors):
   return decorator
 
 
-def handle_audit_issue_mapping(session, flush_context, instances):
-  """Check and process Audit-Issue mapping rules.
+@from_session(all_models.Relationship, new=True, dirty=True)
+def handle_new_audit_issue_mapping(instances):
+  """Check and process new Audit-Issue mapping rules.
 
-  Triggers rule processing functions for creation and deletion of
-  Audit-Issue Relationships.
+  Triggers rule processing functions for creation of Audit-Issue Relationships.
   """
   # pylint: disable=unused-argument
 
-  for instance in itertools.chain(session.new, session.dirty):
-    if isinstance(instance, all_models.Relationship):
-      if not instance.source:
-        # TODO: fix actions to make this impossible
-        LOGGER.error(u"Relationship.source is not filled in properly: "
-                     u"id=%r, source_id=%r, source_type=%r, "
-                     u"destination_id=%r, destination_type=%r.",
-                     instance.id, instance.source_id, instance.source_type,
-                     instance.destination_id, instance.destination_type)
-        continue
-      if not instance.destination:
-        # TODO: fix Document imports to make this impossible
-        LOGGER.error(u"Relationship.destination is not filled in properly: "
-                     u"id=%r, source_id=%r, source_type=%r, "
-                     u"destination_id=%r, destination_type=%r.",
-                     instance.id, instance.source_id, instance.source_type,
-                     instance.destination_id, instance.destination_type)
-        continue
-      src, dst = _order(instance.source, instance.destination)
-      if _is_audit_issue(src, dst):
-        _handle_new_audit_issue_mapping(audit=src, issue=dst)
+  for instance in instances:
+    if not instance.source:
+      # TODO: fix actions to make this impossible
+      LOGGER.error(u"Relationship.source is not filled in properly: "
+                   u"id=%r, source_id=%r, source_type=%r, "
+                   u"destination_id=%r, destination_type=%r.",
+                   instance.id, instance.source_id, instance.source_type,
+                   instance.destination_id, instance.destination_type)
+      continue
+    if not instance.destination:
+      # TODO: fix Document imports to make this impossible
+      LOGGER.error(u"Relationship.destination is not filled in properly: "
+                   u"id=%r, source_id=%r, source_type=%r, "
+                   u"destination_id=%r, destination_type=%r.",
+                   instance.id, instance.source_id, instance.source_type,
+                   instance.destination_id, instance.destination_type)
+      continue
+    src, dst = _order(instance.source, instance.destination)
+    if _is_audit_issue(src, dst):
+      _handle_new_audit_issue_mapping(audit=src, issue=dst)
 
-  for instance in session.deleted:
-    if isinstance(instance, all_models.Relationship):
-      src, dst = _order(instance.source, instance.destination)
-      if _is_audit_issue(src, dst):
-        _handle_del_audit_issue_mapping(audit=src, issue=dst)
+
+@from_session(all_models.Relationship, deleted=True)
+def handle_del_audit_issue_mapping(instances):
+  """Check and process deleted Audit-Issue mapping rules.
+
+  Triggers rule processing functions for deletion of Audit-Issue Relationships.
+  """
+  for instance in instances:
+    src, dst = _order(instance.source, instance.destination)
+    if _is_audit_issue(src, dst):
+      _handle_del_audit_issue_mapping(audit=src, issue=dst)
 
 
 def related_condition(obj, type_):
@@ -279,7 +284,9 @@ def init_hook():
         other.updated_at = datetime.now()
 
   sa.event.listen(sa.orm.session.Session, "before_flush",
-                  handle_audit_issue_mapping)
+                  handle_new_audit_issue_mapping)
+  sa.event.listen(sa.orm.session.Session, "before_flush",
+                  handle_del_audit_issue_mapping)
 
   @signals.Restful.model_deleted.connect_via(all_models.Relationship)
   def handle_cascade_delete(sender, obj, service):
