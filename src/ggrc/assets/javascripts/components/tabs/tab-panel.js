@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+const PRE_RENDER_DELAY = 3000;
+
 (function (can, GGRC) {
   'use strict';
 
@@ -22,6 +24,22 @@
         cacheContent: {
           type: 'boolean',
           value: false,
+        },
+        preRenderContent: {
+          type: 'boolean',
+          value: false,
+        },
+        isLazyRender: {
+          type: 'boolean',
+          get: function () {
+            return this.attr('cacheContent') || this.attr('preRenderContent');
+          },
+        },
+        lazyTrigger: {
+          type: 'boolean',
+          get: function () {
+            return this.attr('active') || this.attr('preRender');
+          },
         },
       },
       active: false,
@@ -60,11 +78,16 @@
        * On Components rendering finished add this viewModel to `panels` list
        */
       inserted: function () {
-        this.viewModel.addPanel();
+        let vm = this.viewModel;
+        vm.addPanel();
+
+        if (vm.attr('preRenderContent')) {
+          setTimeout(() => vm.attr('preRender', true), PRE_RENDER_DELAY);
+        }
       },
       removed: function () {
         this.viewModel.removePanel();
-      }
+      },
     }
   });
 })(window.can, window.GGRC);
