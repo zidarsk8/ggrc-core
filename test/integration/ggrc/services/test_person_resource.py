@@ -96,7 +96,7 @@ class TestPersonResource(TestCase):
                 "description": "some task 4",
                 "contact": create_stub(user),
                 "start_date": date(2017, 6, 5),
-                "end_date": date(2017, 11, 16),
+                "end_date": date(2017, 10, 16),
             }, {
                 "title": "dummy task 4",  # task should not counted
                 "description": "some task 4",
@@ -155,7 +155,7 @@ class TestPersonResource(TestCase):
           {"open_task_count": 3, "has_overdue": False}
       )
 
-    with freeze_time("2017-10-16 08:09:10"):
+    with freeze_time("2017-10-16 08:09:10"):  # same day as task 3 end date
       self.client.get("/login")
       response = self.client.get("/api/people/{}/task_count".format(user_id))
       self.assertEqual(
