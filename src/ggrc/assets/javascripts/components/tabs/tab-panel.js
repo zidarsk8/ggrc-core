@@ -12,6 +12,18 @@
       GGRC.mustache_path + '/components/tabs/tab-panel.mustache'
     ),
     viewModel: {
+      define: {
+        cssClasses: {
+          type: 'string',
+          get: function () {
+            return this.attr('active') ? '' : 'hidden';
+          },
+        },
+        cacheContent: {
+          type: 'boolean',
+          value: false,
+        },
+      },
       active: false,
       titleText: '@',
       panels: [],
