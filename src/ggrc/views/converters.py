@@ -215,7 +215,7 @@ def init_converter_views():
   def import_view():
     """Get import view"""
     if getattr(settings, "GAPI_CLIENT_ID", None):
-      authorize = verify_credentials(redirect_back_to="import_view")
+      authorize = verify_credentials()
       if authorize:
         return authorize
     return render_template("import_export/import.haml")
@@ -225,7 +225,7 @@ def init_converter_views():
   def export_view():
     """Get export view"""
     if getattr(settings, "GAPI_CLIENT_ID", None):
-      authorize = verify_credentials(redirect_back_to="export_view")
+      authorize = verify_credentials()
       if authorize:
         return authorize
     return render_template("import_export/export.haml")
