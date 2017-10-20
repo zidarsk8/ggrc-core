@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import template from './tab-panel.mustache';
+
 const PRE_RENDER_DELAY = 3000;
 
 (function (can, GGRC) {
@@ -10,9 +12,7 @@ const PRE_RENDER_DELAY = 3000;
 
   GGRC.Components('tabPanel', {
     tag: 'tab-panel',
-    template: can.view(
-      GGRC.mustache_path + '/components/tabs/tab-panel.mustache'
-    ),
+    template: template,
     viewModel: {
       define: {
         cssClasses: {

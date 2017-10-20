@@ -3,13 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import template from './tab-container.mustache';
+
 (function (can, GGRC) {
   'use strict';
 
   GGRC.Components('tabContainer', {
     tag: 'tab-container',
-    template: can.view(GGRC.mustache_path +
-      '/components/tabs/tab-container.mustache'),
+    template: template,
     viewModel: {
       define: {
         showTabs: {
