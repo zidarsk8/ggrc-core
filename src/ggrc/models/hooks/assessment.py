@@ -9,11 +9,10 @@
 """
 import collections
 import html2text
+import itertools
 import logging
 import time
 import urlparse
-
-from itertools import izip
 
 from sqlalchemy import orm
 
@@ -104,7 +103,7 @@ def init_hook():
         )
     }
 
-    for assessment, src in izip(objects, sources):
+    for assessment, src in itertools.izip(objects, sources):
       snapshot_dict = src.get('object') or {}
       common.map_objects(assessment, snapshot_dict)
       common.map_objects(assessment, src.get('audit'))
@@ -128,7 +127,7 @@ def init_hook():
       if template.template_object_type:
         assessment.assessment_type = template.template_object_type
 
-    for assessment, src in izip(objects, sources):
+    for assessment, src in itertools.izip(objects, sources):
       _create_issuetracker_info(assessment, src.get('issue_tracker'))
 
   @signals.Restful.model_put.connect_via(all_models.Assessment)
@@ -227,7 +226,7 @@ def init_hook():
   @signals.Restful.collection_posted.connect_via(all_models.AssessmentTemplate)
   def handle_assessment_tmpl_post(sender, objects=None, sources=None):
     del sender  # Unused
-    for obj, src in izip(objects, sources):
+    for obj, src in itertools.izip(objects, sources):
       issue_tracker_info = src.get('issue_tracker')
       if not issue_tracker_info:
         continue

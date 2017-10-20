@@ -13,24 +13,24 @@ class IssuetrackerIssue(Base, db.Model):
   __tablename__ = 'issuetracker_issues'
 
   object_id = db.Column(db.Integer, nullable=False)
-  object_type = db.Column(db.String, nullable=False)
+  object_type = db.Column(db.String(250), nullable=False)
 
   enabled = db.Column(db.Boolean, nullable=False, default=False)
 
-  title = db.Column(db.String(255), nullable=False)
+  title = db.Column(db.String(250), nullable=False)
   component_id = db.Column(db.String(50), nullable=False)
   hotlist_id = db.Column(db.String(50), nullable=True)
   issue_type = db.Column(db.String(50), nullable=False)
   issue_priority = db.Column(db.String(50), nullable=False)
   issue_severity = db.Column(db.String(50), nullable=False)
-  assignee = db.Column(db.String(255), nullable=True)
+  assignee = db.Column(db.String(250), nullable=True)
   cc_list = db.Column(db.Text, nullable=True)
 
   issue_id = db.Column(db.String(50), nullable=True)
-  issue_url = db.Column(db.String(255), nullable=True)
+  issue_url = db.Column(db.String(250), nullable=True)
 
   _MANDATORY_ATTRS = (
-      'object_type', 'object_id', 'component_id', 'title',
+      'object_type', 'object_id', 'component_id',
       'issue_type', 'issue_priority', 'issue_severity',
   )
 
@@ -107,7 +107,7 @@ class IssuetrackerIssue(Base, db.Model):
         object_type=info['object_type'],
         object_id=info['object_id'],
         enabled=bool(info.get('enabled')),
-        title=info['title'],
+        title=info.get('title'),
         component_id=info['component_id'],
 
         hotlist_id=info.get('hotlist_id'),
