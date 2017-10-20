@@ -15,7 +15,7 @@ export default GGRC.Components('tabPanel', {
       cssClasses: {
         type: 'string',
         get: function () {
-          return this.attr('active') ? '' : 'hidden';
+          return this.attr('active') ? 'active' : 'hidden';
         },
       },
       cacheContent: {

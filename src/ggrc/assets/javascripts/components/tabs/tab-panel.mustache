@@ -5,8 +5,8 @@
 
 {{#if isLazyRender}}
   <lazy-render {trigger}="lazyTrigger">
-    <div class="tab-content {{cssClasses}}">
-      <div class="tab-pane active">
+    <div class="tab-content">
+      <div class="tab-pane {{cssClasses}}">
         <content></content>
       </div>
     </div>
@@ -14,7 +14,7 @@
 {{else}}
   {{#if active}}
     <div class="tab-content">
-      <div class="tab-pane active">
+      <div class="tab-pane {{cssClasses}}">
         <content></content>
       </div>
     </div>
