@@ -3,8 +3,6 @@
 
 dashboard-js-template-files:
   - components/info-pane/info-pane-footer.mustache
-  - components/tabs/tab-container.mustache
-  - components/tabs/tab-panel.mustache
   - components/object-state-toolbar/object-state-toolbar.mustache
   - components/object-selection/object-selection-item.mustache
   - components/mapping-controls/mapping-type-selector.mustache

@@ -8,11 +8,11 @@ describe('GGRC.Components.tabPanel', function () {
 
   var viewModel;
 
-  describe('.addPanel() method', function () {
-    beforeEach(function () {
-      viewModel = GGRC.Components.getViewModel('tabPanel');
-    });
+  beforeEach(function () {
+    viewModel = GGRC.Components.getViewModel('tabPanel');
+  });
 
+  describe('.addPanel() method', function () {
     it('should add viewModel reference to the Panels List', function () {
       viewModel.addPanel();
       expect(viewModel.attr('panels').indexOf(viewModel) > -1).toBe(true);
@@ -27,10 +27,6 @@ describe('GGRC.Components.tabPanel', function () {
   });
 
   describe('removePanel() method', function () {
-    beforeEach(function () {
-      viewModel = GGRC.Components.getViewModel('tabPanel');
-    });
-
     it('should remove viewModel reference from the Panels List', function () {
       viewModel.addPanel();
       viewModel.removePanel();
@@ -44,6 +40,36 @@ describe('GGRC.Components.tabPanel', function () {
       // Call the second remove
       viewModel.removePanel();
       expect(viewModel.attr('panels').indexOf(viewModel) < 0).toBe(true);
+    });
+  });
+
+  describe('lazyTrigger property', () => {
+    it ('should be "true" for active tab', () => {
+      viewModel.attr('preRender', false);
+      viewModel.attr('active', true);
+
+      expect(viewModel.attr('lazyTrigger')).toBeTruthy();
+    });
+
+    it ('should be "true" for active tab', () => {
+      viewModel.attr('preRender', true);
+      viewModel.attr('active', true);
+
+      expect(viewModel.attr('lazyTrigger')).toBeTruthy();
+    });
+  });
+
+  describe('lazy render mode is active', () => {
+    it('if cache-content is true', () => {
+      viewModel.attr('cacheContent', true);
+
+      expect(viewModel.attr('isLazyRender')).toBeTruthy();
+    });
+
+    it('if preRenderContent is true', () => {
+      viewModel.attr('preRenderContent', true);
+
+      expect(viewModel.attr('isLazyRender')).toBeTruthy();
     });
   });
 });
