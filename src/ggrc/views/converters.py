@@ -9,8 +9,6 @@ including the import/export api endponts.
 
 from logging import getLogger
 
-import httplib2
-
 from apiclient import discovery
 from apiclient import http
 from apiclient.errors import HttpError
@@ -20,11 +18,11 @@ from flask import request
 from flask import json
 from flask import render_template
 from werkzeug.exceptions import (
-    BadRequest, NotFound, InternalServerError, Unauthorized
+    BadRequest, InternalServerError, Unauthorized
 )
 
 from ggrc import settings
-from ggrc_gdrive_integration import get_credentials
+from ggrc_gdrive_integration import get_http_auth
 from ggrc_gdrive_integration import verify_credentials
 from ggrc.app import app
 from ggrc.converters.base import Converter
@@ -66,7 +64,7 @@ def parse_export_request():
 
 def create_gdrive_file(csv_string, filename):
   """Post text/csv data to a gdrive file"""
-  credentials, http_auth = get_credentials()
+  http_auth = get_http_auth()
   drive_service = discovery.build('drive', 'v3', http=http_auth)
   # make export to sheets
   file_metadata = {
@@ -117,7 +115,7 @@ def handle_export_request():
       raise Unauthorized("{} Try to reload /export page".format(message))
     raise InternalServerError(message)
   except Exception as e:  # pylint: disable=broad-except
-    logger.exception("Export failed: {}".format(e.message))
+    logger.exception("Export failed: %s", e.message)
     raise InternalServerError("Export failed due to internal server error.")
 
 
@@ -148,7 +146,7 @@ def parse_import_request():
 
 def get_gdrive_file(file_data):
   """Get text/csv data from gdrive file"""
-  credentials, http_auth = get_credentials()
+  http_auth = get_http_auth()
   try:
     drive_service = discovery.build('drive', 'v3', http=http_auth)
     # check file type

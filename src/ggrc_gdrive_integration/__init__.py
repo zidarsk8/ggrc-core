@@ -3,9 +3,9 @@
 
 """GDrive module"""
 
-import flask
 import httplib2
 
+import flask
 from flask import Blueprint
 
 from ggrc import db             # noqa
@@ -106,14 +106,15 @@ class GDriveRoleContributions(RoleContributions):
 ROLE_CONTRIBUTIONS = GDriveRoleContributions()
 
 
-def get_credentials():
-  """Gets valid user credentials from storage.
+def get_http_auth():
+  """Get valid user credentials from storage and create an authorized
+  http from it.
 
   If nothing has been stored, or if the stored credentials are invalid,
   the OAuth2 flow is completed to obtain the new credentials.
 
   Returns:
-      Credentials, the obtained credential.
+      http instance authorized with the credentials
   """
   credentials = client.OAuth2Credentials.from_json(
       flask.session['credentials'])
