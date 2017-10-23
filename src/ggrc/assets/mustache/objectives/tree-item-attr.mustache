@@ -5,19 +5,13 @@
 
 {{#switch attr_name}}
   {{#case 'contact'}}
-      <tree-people-list-field {source}="instance.contact">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.contact"/>
   {{/case}}
   {{#case 'secondary_contact'}}
-      <tree-people-list-field {source}="instance.secondary_contact">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.secondary_contact"/>
   {{/case}}
   {{#case 'modified_by'}}
-      <tree-people-list-field {source}="instance.modified_by">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.modified_by"/>
   {{/case}}
   {{#case 'last_assessment_date'}}
     {{localize_date instance.last_assessment_date}}

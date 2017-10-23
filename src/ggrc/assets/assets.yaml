@@ -3,8 +3,6 @@
 
 dashboard-js-template-files:
   - components/info-pane/info-pane-footer.mustache
-  - components/tabs/tab-container.mustache
-  - components/tabs/tab-panel.mustache
   - components/object-state-toolbar/object-state-toolbar.mustache
   - components/object-selection/object-selection-item.mustache
   - components/mapping-controls/mapping-type-selector.mustache
@@ -165,7 +163,6 @@ dashboard-js-template-files:
   - components/spinner/spinner.mustache
   - components/rich_text/rich_text.mustache
   - components/datepicker/datepicker.mustache
-  - components/tasks-counter/tasks-counter.mustache
   - components/tree_pagination/tree_pagination.mustache
   - components/cycle-task-actions/cycle-task-actions.mustache
   - components/simple-modal/simple-modal.mustache
