@@ -10,6 +10,7 @@
 import collections
 import html2text
 import itertools
+import json
 import logging
 import time
 import urlparse
@@ -31,18 +32,16 @@ from ggrc.access_control import role
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
-_ISSUE_TRACKER_PARAMS = frozenset((
-    'status',
-    'title',
-))
-
 # mapping of model field name to API property name
 _ISSUE_TRACKER_UPDATE_FIELDS = (
     ('title', 'title'),
-    ('status', 'status'),
+    # ('status', 'status'),
     ('issue_priority', 'priority'),
     ('issue_severity', 'severity'),
     ('component_id', 'component_id'),
+
+    # just to track assessment's assignment at first time, tracking further
+    # updates is not required.
     ('assignee', 'assignee'),
 )
 
@@ -131,67 +130,39 @@ def init_hook():
       _create_issuetracker_info(assessment, src.get('issue_tracker'))
 
   @signals.Restful.model_put.connect_via(all_models.Assessment)
-  def handle_assessment_put(sender, obj=None, src=None, service=None):
-    # logger.info('------> handle_assessment_model_put: %s', (
-    #     sender, obj, src, service))
+  def handle_assessment_put(
+      sender, obj=None, src=None, service=None, initial_state=None):
     del sender, service  # Unused
-    # logger.info(
-    #     '---> [put] request status: %s, obj status: %s',
-    #     src.get('status'), obj.status)
+
     common.ensure_field_not_changed(obj, 'audit')
+
     issue_tracker_info = src.get('issue_tracker')
     if issue_tracker_info:
+      src['__stash']['_issue_tracker'] = dict(issue_tracker_info)
+      issue_tracker_info['component_id'] = '0000000'
+      issue_tracker_info['title'] = 'TTTTT'
+      issue_tracker_info['issue_priority'] = 'P6'
+      issue_tracker_info['issue_severity'] = 'S6'
       _update_issuetracker_info(obj, issue_tracker_info)
 
   @signals.Restful.model_put_after_commit.connect_via(all_models.Assessment)
   def handle_assessment_put_after_commit(
       sender, obj=None, src=None, service=None, event=None, initial_state=None):
-    changed_attrs = set()
-    if initial_state is not None:
-      for k, v in initial_state._asdict().iteritems():
-        if v != getattr(obj, k, None):
-          changed_attrs.add(k)
-
-    logger.info('------> handle_assessment_put_after_commit: %s', (
-        sender, obj, src, service, event, initial_state))
+    del sender, service, event  # Unused
     logger.info(
-        '------> handle_assessment_put_after_commit CHANGED: %s', changed_attrs)
+        '--> handle_assessment_put_after_commit: %s',
+        src['__stash'].get('_issue_tracker'))
 
-    # try:
-    #   # form_data = urllib.urlencode(UrlPostHandler.form_fields)
-    #   headers = {'Content-Type': 'application/json'}
-    #   result = urlfetch.fetch(
-    #       url='https://integration-dot-ggrc-test.googleplex.com/',
-    #       # payload=form_data,
-    #       method=urlfetch.GET,
-    #       headers=headers)
-    #   self.response.write(result.content)
-    # except urlfetch.Error:
-    #   logger.error('Caught exception fetching url')
+    issue_tracker_info = obj.issue_tracker
+    if issue_tracker_info.get('enabled') and issue_tracker_info.get('issue_id'):
+      _update_issuetracker_issue(obj, issue_tracker_info, initial_state, src)
 
-    comment_id = _get_added_comment_id(src)
-    props_to_update = changed_attrs & _ISSUE_TRACKER_PARAMS
-
-    logger.info('------> comment_id: %s', comment_id)
-    logger.info('------> props_to_update: %s', props_to_update)
-
-    request_params = {}
-    if comment_id is not None:
-      comment_obj = all_models.Comment.query.filter(
-          all_models.Comment.id == comment_id
-      ).first()
-      if comment_obj is not None:
-        request_params['comment'] = html2text.HTML2Text().handle(
-            comment_obj.description).strip('\n')
-
-    logger.info('------> request_params: %s', request_params)
-
-  @signals.Restful.model_deleted_after_commit.connect_via(all_models.Assessment)
-  def handle_assessment_deleted_after_commit(
-      sender, obj=None, service=None, event=None):
-    del sender, service, event # Unused
+  @signals.Restful.model_deleted.connect_via(all_models.Assessment)
+  def handle_assessment_deleted(sender, obj=None, service=None):
+    del sender, service  # Unused
     issue_obj = all_models.IssuetrackerIssue.get_issue(
         _ASSESSMENT_MODEL_NAME, obj.id)
+    # TODO(anushovan): update issue status here
     if issue_obj:
       db.session.delete(issue_obj)
 
@@ -234,7 +205,8 @@ def init_hook():
           _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
 
   @signals.Restful.model_put.connect_via(all_models.AssessmentTemplate)
-  def handle_assessment_tmpl_put(sender, obj=None, src=None, service=None):
+  def handle_assessment_tmpl_put(
+      sender, obj=None, src=None, service=None, initial_state=None):
     del sender, service  # Unused
     issue_tracker_info = src.get('issue_tracker')
     if issue_tracker_info:
@@ -325,7 +297,31 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
 
   # TODO(anushovan): create issue here.
   logger.info('------> CREATE ISSUE: %s', issue_params)
-  return int(time.time())
+  try:
+    # form_data = urllib.urlencode(UrlPostHandler.form_fields)
+    headers = {
+        'Content-Type': 'application/json',
+        'X-URLFetch-Service-Id': 'GOOGLEPLEX',
+    }
+    response = urlfetch.fetch(
+        url='https://integration-dot-ggrc-test.googleplex.com/api/issues',
+        method=urlfetch.POST,
+        payload=json.dumps(issue_params),
+        headers=headers,
+        follow_redirects=False,
+        deadline=30)
+    if response.status_code != 200:
+      raise Exception('HTTP Exception: %s', response.status_code)
+  except urlfetch.Error:
+    logger.error('Caught exception fetching url')
+
+  try:
+    response_data = json.loads(response.content)
+  except (TypeError, ValueError) as e:
+    raise ValueError('Unable to unmarshal JSON.')
+
+  return response_data['issueId']
+  # return int(time.time())
 
 
 def _create_issuetracker_info(assessment, issue_tracker_info):
@@ -355,23 +351,97 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
       _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
 
 
-def _update_issuetracker_issue(assessment, issue_tracker_info):
-  issue_params = {}
-  current_info = assessment.issue_tracker
+  # @signals.Restful.model_put.connect_via(all_models.Assessment)
+  # def handle_assessment_put(
+  #     sender, obj=None, src=None, service=None, event=None, initial_state=None):
+  #   changed_attrs = set()
+  #   if initial_state is not None:
+  #     for k, v in initial_state._asdict().iteritems():
+  #       if v != getattr(obj, k, None):
+  #         changed_attrs.add(k)
 
+  #   logger.info('------> handle_assessment_put_after_commit: %s', (
+  #       sender, obj, src, service, event, initial_state))
+  #   logger.info(
+  #       '------> handle_assessment_put_after_commit CHANGED: %s', changed_attrs)
+
+  #   # try:
+  #   #   # form_data = urllib.urlencode(UrlPostHandler.form_fields)
+  #   #   headers = {'Content-Type': 'application/json'}
+  #   #   result = urlfetch.fetch(
+  #   #       url='https://integration-dot-ggrc-test.googleplex.com/',
+  #   #       # payload=form_data,
+  #   #       method=urlfetch.GET,
+  #   #       headers=headers)
+  #   #   self.response.write(result.content)
+  #   # except urlfetch.Error:
+  #   #   logger.error('Caught exception fetching url')
+
+  #   comment_id = _get_added_comment_id(src)
+  #   props_to_update = changed_attrs & _ISSUE_TRACKER_PARAMS
+
+  #   logger.info('------> comment_id: %s', comment_id)
+  #   logger.info('------> props_to_update: %s', props_to_update)
+
+  #   request_params = {}
+  #   if comment_id is not None:
+  #     comment_obj = all_models.Comment.query.filter(
+  #         all_models.Comment.id == comment_id
+  #     ).first()
+  #     if comment_obj is not None:
+  #       request_params['comment'] = html2text.HTML2Text().handle(
+  #           comment_obj.description).strip('\n')
+
+  #   logger.info('------> request_params: %s', request_params)
+
+def _update_issuetracker_issue(
+    assessment, issue_tracker_info, initial_state, request):
+  logger.info(
+      '------> _update_issuetracker_issue: %s -> %s',
+      initial_state.status if initial_state else 'NONE',
+      assessment.status)
+
+  issue_params = {}
+  # Handle updates to basic issue tracker properties.
+  current_info = request['__stash'].get('_issue_tracker') or {}
+  logger.info(
+      '------> issue_tracker_info initial_state: %s',
+      current_info)
   for name, api_name in _ISSUE_TRACKER_UPDATE_FIELDS:
     value = issue_tracker_info.get(name)
     if value != current_info.get(name):
       issue_params[api_name] = value
 
-  comment = issue_tracker_info.get('comment')
-  if comment:
-    issue_params['comment'] = comment
+  comments = []
+  # Handle status update.
+  if initial_state.status != assessment.status:
+    verifiers = assessment.verifiers
+    if verifiers:
+      # TODO(anushovan): create comment for an assessment with a verifier
+      comments.append(
+          'Status update for assessment WITH verifier: %s -> %s' % (
+              initial_state.status, assessment.status))
+    else:
+      # TODO(anushovan): create comment for an assessment without a verifier
+      comments.append(
+          'Status update for assessment WITHOUT verifier: %s -> %s' % (
+              initial_state.status, assessment.status))
 
+  # Attach user comments if any.
+  comment_text = _get_added_comment_text(request)
+  if comment_text is not None:
+    comments.append(html2text.HTML2Text().handle(
+        comment_obj.description).strip('\n'))
+
+  if comments:
+    issue_params['comment'] = '\n\n'.join(comments)
+
+  # Handle hotlist ID update.
   hotlist_id = issue_tracker_info.get('hotlist_id')
   if hotlist_id != current_info.get('hotlist_id'):
     issue_params['hotlist_ids'] = [hotlist_id] if hotlist_id else []
 
+  # Handle cc_list ID update.
   cc_list = issue_tracker_info.get('cc_list')
   if cc_list is not None:
     issue_params['ccs'] = cc_list
@@ -379,17 +449,30 @@ def _update_issuetracker_issue(assessment, issue_tracker_info):
   if issue_params:
     # TODO(anushovan): update issue here.
     logger.info('------> UPDATE ISSUE: %s', issue_params)
+  else:
+    logger.info('------> DON\'T UPDATE ISSUE: %s', issue_params)
 
 
 def _update_issuetracker_info(assessment, issue_tracker_info):
-  if issue_tracker_info.get('enabled') and issue_tracker_info.get('issue_id'):
-    _update_issuetracker_issue(assessment, issue_tracker_info)
-
+  logger.info('------> _update_issuetracker_info: %s', issue_tracker_info)
   all_models.IssuetrackerIssue.create_or_update_from_dict(
       _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
 
 
+def _get_added_comment_text(src):
+  comment_id = _get_added_comment_id(src)
+  if comment_id is not None:
+    comment_obj = all_models.Comment.query.filter(
+        all_models.Comment.id == comment_id).first()
+    if comment_obj is not None:
+      return html2text.HTML2Text().handle(comment_obj.description).strip('\n')
+  return None
+
+
 def _get_added_comment_id(src):
+  if not src:
+    return None
+
   actions = src.get('actions') or {}
   related = actions.get('add_related') or []
 

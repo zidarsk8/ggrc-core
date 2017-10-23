@@ -637,13 +637,19 @@ class Builder(AttributeInfo):
 
   def publish_attr(
           self, obj, attr_name, inclusions, include, inclusion_filter):
+    if attr_name in getattr(obj.__class__, '_custom_publish', {}):
+      # The attribute has a custom publish logic.
+      return obj.__class__._custom_publish[attr_name](obj)
+
+    for base in obj.__class__.__bases__:
+      # Inspect all mixins for custom publish logic.
+      if attr_name in getattr(base, '_custom_publish', {}):
+        return base._custom_publish[attr_name](obj)
+
     class_attr = getattr(obj.__class__, attr_name)
     result = None
 
-    if attr_name in getattr(obj.__class__, "_custom_publish", {}):
-      # The attribute has a custom publish logic
-      result = obj.__class__._custom_publish[attr_name](obj)
-    elif isinstance(class_attr, AssociationProxy):
+    if isinstance(class_attr, AssociationProxy):
       if getattr(class_attr, 'publish_raw', False):
         published_attr = getattr(obj, attr_name)
         if hasattr(published_attr, "copy"):
@@ -653,8 +659,8 @@ class Builder(AttributeInfo):
       else:
         result = self.publish_association_proxy(
             obj, attr_name, class_attr, inclusions, include, inclusion_filter)
-    elif isinstance(class_attr, InstrumentedAttribute) and \
-            isinstance(class_attr.property, RelationshipProperty):
+    elif (isinstance(class_attr, InstrumentedAttribute) and
+          isinstance(class_attr.property, RelationshipProperty)):
       result = self.publish_relationship(
           obj, attr_name, class_attr, inclusions, include, inclusion_filter)
     elif class_attr.__class__.__name__ == 'property':

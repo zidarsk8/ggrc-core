@@ -56,7 +56,6 @@ class IssuetrackerIssue(Base, db.Model):
   def to_dict(self, include_issue=False, include_private=None):
     res = {
         'enabled': self.enabled,
-        'title': self.title,
         'component_id': self.component_id,
         'hotlist_id': self.hotlist_id,
         'issue_type': self.issue_type,
@@ -67,6 +66,7 @@ class IssuetrackerIssue(Base, db.Model):
     if include_issue:
       res['issue_id'] = self.issue_id
       res['issue_url'] = self.issue_url
+      res['title'] =  self.title
 
     if include_private:
       res['object_id'] = self.object_id

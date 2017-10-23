@@ -754,6 +754,13 @@ class Resource(ModelView):
     except KeyError:
       raise BadRequest('Required attribute "{0}" not found'.format(
           root_attribute))
+
+    # Adds storage for shared data which is needed across
+    # multiple handlers or/and listeners.
+    # TODO(anushovan): consider implementing a class to hold request
+    #   related info instead of extending input dictionary.
+    src['__stash'] = {}
+
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
