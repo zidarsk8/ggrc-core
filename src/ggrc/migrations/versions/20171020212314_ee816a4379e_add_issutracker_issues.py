@@ -39,6 +39,11 @@ def upgrade():
       sa.Column('issue_id', sa.String(50), nullable=True),
       sa.Column('issue_url', sa.String(250), nullable=True),
 
+      sa.Column('modified_by_id', sa.Integer()),
+      sa.Column('context_id', sa.Integer(), sa.ForeignKey('contexts.id')),
+      sa.Column('created_at', sa.DateTime()),
+      sa.Column('updated_at', sa.DateTime()),
+
       sa.UniqueConstraint(
           'object_type', 'object_id', name='uq_object_id_object_type'),
   )
