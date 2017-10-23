@@ -318,6 +318,35 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
       "CycleTaskGroupObjectTask",
   ]
 
+  ALL_OBJECT_COUNTS = [
+      "Issue",
+      "AccessGroup",
+      "Assessment",
+      "Audit",
+      "Clause",
+      "Contract",
+      "Control",
+      "DataAsset",
+      "Facility",
+      "Market",
+      "Objective",
+      "OrgGroup",
+      "Policy",
+      "Process",
+      "Product",
+      "Program",
+      "Project",
+      "Regulation",
+      "Risk",
+      "Section",
+      "Standard",
+      "System",
+      "Threat",
+      "Vendor",
+      "CycleTaskGroupObjectTask",
+      "Workflow",
+  ]
+
   def setUp(self):
     self.client.get("/login")
     pass
@@ -357,6 +386,55 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
 
     query = get_query(user_id)
     url = "/api/people/{}/my_work_count".format(user_id)
+    response = self._post(query)
+    counts = {
+        item.values()[0]["object_name"]: item.values()[0]["count"]
+        for item in response.json
+    }
+
+    response = self.client.get(url)
+    if response.status_code == 403:
+      # We skip inactive users that don't have access to view their counts
+      return
+
+    my_work_count = response.json
+
+    self.assertEqual(
+        (user_id, user_email, counts),
+        (user_id, user_email, my_work_count),
+    )
+
+  @ddt.data(*[
+      (user.id, user.email, user.name)
+      for user in all_models.Person.query
+  ])
+  @ddt.unpack
+  def test_all_object_counts(self, user_id, user_email, user_name):
+    """Compare my work counts with query API response for {} {}.
+
+    This test is meant to be run manually on a fully populated database.
+    """.format(user_id, user_email)
+    def get_query(user_id):
+      return [
+          {
+              "object_name": object_name,
+              "filters": {
+                  "expression": {},
+                  "keys": [],
+                  "order_by": {"keys": [], "order": "", "compare": None}
+              },
+              "type": "count"
+          }
+          for object_name in self.ALL_OBJECT_COUNTS
+      ]
+
+    user_headers = {
+        "X-ggrc-user": json.dumps({"name": user_name, "email": user_email})
+    }
+    self.client.get("/login", headers=user_headers)
+
+    query = get_query(user_id)
+    url = "/api/people/{}/all_objects_count".format(user_id)
     response = self._post(query)
     counts = {
         item.values()[0]["object_name"]: item.values()[0]["count"]

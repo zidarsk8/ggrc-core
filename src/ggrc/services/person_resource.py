@@ -7,13 +7,10 @@ import datetime
 import collections
 
 from werkzeug.exceptions import Forbidden
-from sqlalchemy import func
 
 from ggrc import db
 from ggrc import login
 from ggrc import models
-from ggrc.models import all_models
-from ggrc.rbac import permissions
 from ggrc.utils import benchmark
 from ggrc.services import common
 from ggrc.query import my_objects
@@ -49,6 +46,35 @@ class PersonResource(common.ExtendedResource):
       "Threat": 0,
       "Vendor": 0,
       "CycleTaskGroupObjectTask": 0,
+  }
+
+  ALL_OBJECTS = {
+      "Issue": 0,
+      "AccessGroup": 0,
+      "Assessment": 0,
+      "Audit": 0,
+      "Clause": 0,
+      "Contract": 0,
+      "Control": 0,
+      "DataAsset": 0,
+      "Facility": 0,
+      "Market": 0,
+      "Objective": 0,
+      "OrgGroup": 0,
+      "Policy": 0,
+      "Process": 0,
+      "Product": 0,
+      "Program": 0,
+      "Project": 0,
+      "Regulation": 0,
+      "Risk": 0,
+      "Section": 0,
+      "Standard": 0,
+      "System": 0,
+      "Threat": 0,
+      "Vendor": 0,
+      "CycleTaskGroupObjectTask": 0,
+      "Workflow": 0,
   }
 
   # method post is abstract and not used.
@@ -152,8 +178,8 @@ class PersonResource(common.ExtendedResource):
         permission_filter = builder.QueryHelper._get_type_query(model, "read")
         if permission_filter is not None:
           count = model.query.filter(
-            model.id.in_(ids),
-            permission_filter,
+              model.id.in_(ids),
+              permission_filter,
           ).count()
         else:
           count = len(ids)
@@ -167,30 +193,16 @@ class PersonResource(common.ExtendedResource):
     if id_ != user.id:
       raise Forbidden()
 
-    return self.json_success_response({
-        "Issue": 7,
-        "AccessGroup": 1,
-        "Assessment": 1582,
-        "Audit": 12,
-        "Clause": 3,
-        "Contract": 2,
-        "Control": 395,
-        "DataAsset": 0,
-        "Facility": 0,
-        "Market": 0,
-        "Objective": 1,
-        "OrgGroup": 0,
-        "Policy": 2,
-        "Process": 0,
-        "Product": 0,
-        "Program": 21,
-        "Project": 1,
-        "Regulation": 2,
-        "Risk": 2,
-        "Section": 3,
-        "Standard": 0,
-        "System": 0,
-        "Threat": 0,
-        "Vendor": 1,
-        "CycleTaskGroupObjectTask": 2,
-    }, )
+    with benchmark("Make response"):
+
+      response_object = self.ALL_OBJECTS.copy()
+      for model_type in response_object:
+        model = models.get_model(model_type)
+        permission_filter = builder.QueryHelper._get_type_query(model, "read")
+        if permission_filter is not None:
+          count = model.query.filter(permission_filter).count()
+        else:
+          count = model.query.count()
+        response_object[model_type] = count
+
+      return self.json_success_response(response_object, )
