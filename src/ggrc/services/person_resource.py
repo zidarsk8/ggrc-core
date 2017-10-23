@@ -20,6 +20,9 @@ from ggrc.query import builder
 class PersonResource(common.ExtendedResource):
   """Resource handler for people."""
 
+  # method post is abstract and not used.
+  # pylint: disable=abstract-method
+
   MY_WORK_OBJECTS = {
       "Issue": 0,
       "AccessGroup": 0,
@@ -76,9 +79,6 @@ class PersonResource(common.ExtendedResource):
       "CycleTaskGroupObjectTask": 0,
       "Workflow": 0,
   }
-
-  # method post is abstract and not used.
-  # pylint: disable=abstract-method
 
   def get(self, *args, **kwargs):
     # This is to extend the get request for additional data.
@@ -153,6 +153,7 @@ class PersonResource(common.ExtendedResource):
       return self.json_success_response(response_object, )
 
   def _my_work_count(self, **kwargs):
+    """Get object counts for my work page."""
     id_ = kwargs.get("id")
     if id_ != login.get_current_user_id():
       raise Forbidden()
@@ -175,6 +176,9 @@ class PersonResource(common.ExtendedResource):
       response_object = self.MY_WORK_OBJECTS.copy()
       for type_, ids in all_ids.items():
         model = models.get_model(type_)
+        # pylint: disable=protected-access
+        # We must move the type permissions query to a proper utility function
+        # but we will not do that for a patch release
         permission_filter = builder.QueryHelper._get_type_query(model, "read")
         if permission_filter is not None:
           count = model.query.filter(
@@ -188,6 +192,7 @@ class PersonResource(common.ExtendedResource):
       return self.json_success_response(response_object, )
 
   def _all_objects_count(self, **kwargs):
+    """Get object counts for all objects page."""
     id_ = kwargs.get("id")
     user = login.get_current_user()
     if id_ != user.id:
@@ -198,6 +203,9 @@ class PersonResource(common.ExtendedResource):
       response_object = self.ALL_OBJECTS.copy()
       for model_type in response_object:
         model = models.get_model(model_type)
+        # pylint: disable=protected-access
+        # We must move the type permissions query to a proper utility function
+        # but we will not do that for a patch release
         permission_filter = builder.QueryHelper._get_type_query(model, "read")
         if permission_filter is not None:
           count = model.query.filter(permission_filter).count()

@@ -349,7 +349,6 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
 
   def setUp(self):
     self.client.get("/login")
-    pass
 
   @ddt.data(*[
       (user.id, user.email, user.name)
@@ -357,10 +356,10 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
   ])
   @ddt.unpack
   def test_my_work_counts(self, user_id, user_email, user_name):
-    """Compare my work counts with query API response for {} {}.
+    """Compare my work counts with query API response.
 
     This test is meant to be run manually on a fully populated database.
-    """.format(user_id, user_email)
+    """
     def get_query(user_id):
       return [
           {
@@ -410,11 +409,11 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
   ])
   @ddt.unpack
   def test_all_object_counts(self, user_id, user_email, user_name):
-    """Compare my work counts with query API response for {} {}.
+    """Compare my work counts with query API response.
 
     This test is meant to be run manually on a fully populated database.
-    """.format(user_id, user_email)
-    def get_query(user_id):
+    """
+    def get_query():
       return [
           {
               "object_name": object_name,
@@ -433,7 +432,7 @@ class TestPersonResourcePopulated(TestCase, WithQueryApi):
     }
     self.client.get("/login", headers=user_headers)
 
-    query = get_query(user_id)
+    query = get_query()
     url = "/api/people/{}/all_objects_count".format(user_id)
     response = self._post(query)
     counts = {
