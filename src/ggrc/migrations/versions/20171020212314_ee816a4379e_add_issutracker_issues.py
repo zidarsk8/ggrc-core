@@ -27,7 +27,7 @@ def upgrade():
       sa.Column('object_id', sa.Integer(), nullable=False),
       sa.Column('object_type', sa.String(250), nullable=False),
       sa.Column('enabled', sa.Boolean, nullable=False, default=False),
-      sa.Column('title', sa.String(250), nullable=False),
+      sa.Column('title', sa.String(250), nullable=True),
       sa.Column('component_id', sa.String(50), nullable=False),
       sa.Column('hotlist_id', sa.String(50), nullable=True),
       sa.Column('issue_type', sa.String(50), nullable=False),
