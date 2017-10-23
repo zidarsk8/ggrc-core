@@ -106,6 +106,7 @@
 
       this.validateNonBlank('email');
       this.validateFormatOf('email', rEmail);
+      this.validateNonBlank('name');
     },
 
     /**
