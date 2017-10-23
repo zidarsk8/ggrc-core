@@ -26,9 +26,7 @@
       </tree-people-list-field>
   {{/case}}
   {{#case 'modified_by'}}
-      <tree-people-list-field {source}="instance.modified_by">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.modified_by"/>
   {{/case}}
   {{#case 'status'}}
     {{#using status=instance.status}}

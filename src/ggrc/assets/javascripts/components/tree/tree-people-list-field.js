@@ -1,33 +1,31 @@
-/*!
+/*
   Copyright (C) 2017 Google Inc., authors, and contributors <see AUTHORS file>
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-(function (can, GGRC) {
-  'use strict';
+import BaseTreePeopleVM from '../view-models/tree-people-base-vm';
 
-  var viewModel = GGRC.VM.BaseTreePeopleField.extend({
-    filter: '@',
-    getSourceList: function () {
-      var filter = this.attr('filter');
-      var sourceString = 'source';
+const viewModel = BaseTreePeopleVM.extend({
+  filter: '@',
+  getSourceList: function () {
+    let filter = this.attr('filter');
+    let sourceString = 'source';
 
-      if (filter) {
-        sourceString += '.' + filter;
-      }
-
-      return can.makeArray(this.attr(sourceString));
+    if (filter) {
+      sourceString += '.' + filter;
     }
-  });
 
-  GGRC.Components('treePeopleListField', {
-    tag: 'tree-people-list-field',
-    template: '<content />',
-    viewModel: viewModel,
-    events: {
-      '{viewModel.source} change': function () {
-        this.viewModel.refreshPeople();
-      }
-    }
-  });
-})(window.can, window.GGRC);
+    return can.makeArray(this.attr(sourceString));
+  },
+});
+
+export default GGRC.Components('treePeopleListField', {
+  tag: 'tree-people-list-field',
+  template: '{{peopleStr}}',
+  viewModel: viewModel,
+  events: {
+    '{viewModel.source} change': function () {
+      this.viewModel.refreshPeople();
+    },
+  },
+});
