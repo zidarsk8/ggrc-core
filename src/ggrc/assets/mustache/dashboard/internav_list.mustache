@@ -33,6 +33,7 @@
 {{#is_allowed 'update' instance}}
 {{#if widget_list.length}}
 {{^if instance.archived}}
+{{#isMenuVisible}}
 <li data-test-id="button_widget_add_2c925d94" class="hidden-widgets-list">
   <a href="{{urlPath}}#dropdown-widgets" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="{{addTabTitle}}"><i class="fa fa-plus-circle"></i> {{addTabTitle}}</a>
   <div class="dropdown-menu" role="menu">
@@ -110,6 +111,7 @@
     {{/widget_list}}
   </div>
 </li>
+{{/isMenuVisible}}
 {{/if}}
 {{/if}}
 {{/is_allowed}}

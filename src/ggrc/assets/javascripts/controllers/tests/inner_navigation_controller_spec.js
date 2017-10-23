@@ -6,14 +6,14 @@
 describe('CMS.Controllers.InnerNav', function () {
   'use strict';
 
-  var Ctrl;  // the controller under test
+  var Ctrl; // the controller under test
 
   beforeAll(function () {
     Ctrl = CMS.Controllers.InnerNav;
   });
 
   describe('sortWidgets() method', function () {
-    var ctrlInst;  // fake controller instance
+    var ctrlInst; // fake controller instance
     var sortWidgets;
     var options;
 
@@ -46,7 +46,8 @@ describe('CMS.Controllers.InnerNav', function () {
       expect(widgetOrder).toEqual(['ddd', 'bbb', 'eee', 'aaa', 'ccc']);
     });
 
-    it('places widgets with unknown "order" at the end and sort them in alphabetical order', function () {
+    it('places widgets with unknown "order" at' +
+      'the end and sort them in alphabetical order', function () {
       var widgetOrder;
       var widgets = [
         {internav_display: 'abc'},
@@ -70,10 +71,9 @@ describe('CMS.Controllers.InnerNav', function () {
 
   describe('show_hide_titles() method', function () {
     var DISPLAY_WIDTH = 1920;
-    var ctrlInst;  // fake controller instance
+    var ctrlInst; // fake controller instance
     var showHideTitles;
     var options;
-    var getPageTypeSpy;
 
     function createWidgets(titlesStatus) {
       var widgets = [
@@ -111,39 +111,15 @@ describe('CMS.Controllers.InnerNav', function () {
         .and
         .returnValue([]);
 
-      getPageTypeSpy = spyOn(GGRC.Utils.CurrentPage, 'getPageType')
+      spyOn(GGRC.Utils.CurrentPage, 'getPageType')
         .and
-        .returnValue('Audit');
+        .returnValue('Assessment');
 
       showHideTitles = Ctrl.prototype.show_hide_titles.bind(ctrlInst);
     });
 
     afterEach(function () {
       Array.prototype.reduce.calls.reset();
-    });
-
-
-    it('always show titles if page instance is not AUDIT', function () {
-      var types = ['Assessment', 'Audit', 'Control', 'Program'];
-
-      setWidgetsWidth(2400);
-
-      types.forEach((type) => {
-        getPageTypeSpy.and.returnValue(type);
-
-        showHideTitles = Ctrl.prototype.show_hide_titles.bind(ctrlInst);
-
-        createWidgets(false);
-        showHideTitles();
-
-        if (type !== 'Audit') {
-          expect(_.every(options.attr('widget_list'), 'show_title'))
-            .toBeTruthy();
-        } else {
-          expect(_.every(options.attr('widget_list'), 'show_title'))
-            .toBeFalsy();
-        }
-      });
     });
 
     it('doesnt hide titles if the width is enough', function () {
@@ -156,47 +132,14 @@ describe('CMS.Controllers.InnerNav', function () {
       expect(_.every(options.attr('widget_list'), 'show_title')).toBeTruthy();
     });
 
-    it('hides titles if the width isnt enough', function () {
+    it('doesnt hides titles if the width isnt enough', function () {
       createWidgets(true);
 
       setWidgetsWidth(2500);
 
       showHideTitles();
 
-      expect(_.every(options.widget_list, 'show_title', false)).toBeTruthy();
-    });
-
-    it('hides not priority titles if the width isnt enough', function () {
-      var widgetList;
-      createWidgets(true);
-
-      options.attr('dividedTabsMode', true);
-      options.attr('priorityTabs', 3);
-
-      setWidgetsWidth(2500, 1500);
-
-      showHideTitles();
-
-      widgetList = options.attr('widget_list');
-
-      expect(_.every(widgetList.slice(0, 3), 'show_title')).toBeTruthy();
-      expect(_.every(widgetList.slice(3), 'show_title', false)).toBeTruthy();
-    });
-
-    it('hides all titles if the width isnt enough', function () {
-      var widgetList;
-      createWidgets(true);
-
-      options.attr('dividedTabsMode', true);
-      options.attr('priorityTabs', 3);
-
-      setWidgetsWidth(3000, 2000);
-
-      showHideTitles();
-
-      widgetList = options.attr('widget_list');
-
-      expect(_.every(widgetList, 'show_title', false)).toBeTruthy();
+      expect(_.every(options.widget_list, 'show_title')).toBeTruthy();
     });
   });
 });
