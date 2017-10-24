@@ -186,7 +186,7 @@ class PersonResource(common.ExtendedResource):
               permission_filter,
           ).count()
         else:
-          count = len(ids)
+          count = model.query.filter(model.id.in_(ids)).count()
         response_object[type_] = count
 
       return self.json_success_response(response_object, )
