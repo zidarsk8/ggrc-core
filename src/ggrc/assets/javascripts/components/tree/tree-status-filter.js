@@ -25,12 +25,19 @@
       selectedStates: {
         type: '*',
         set: function (selected) {
-          this.attr('filterStates').forEach(function (item) {
+          let statuses = this.attr('filterStates');
+          let filter = '';
+
+          statuses.forEach(function (item) {
             item.attr('checked', (selected.indexOf(item.value) > -1));
           });
 
-          this.attr('options.filter',
-            StateUtils.statusFilter(selected, '', this.attr('modelName')));
+          if (statuses.length !== selected.length) {
+            filter = StateUtils.statusFilter(selected, '',
+              this.attr('modelName'));
+          }
+
+          this.attr('options.filter', filter);
         },
       },
     },
