@@ -368,6 +368,10 @@ def _send_request(url, method=urlfetch.GET, payload=None, headers=None):
     raise BadResponseError('Unable to parse JSON from response.')
 
 
+def _get_assessment_url(assessment):
+  return urlparse.urljoin(utils.get_url_root(), utils.view_url_for(assessment))
+
+
 def _create_issuetracker_issue(assessment, issue_tracker_info):
   reported_email = None
   reporter_id = get_current_user_id()
@@ -381,8 +385,7 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
   comment = [
       'This bug was auto-generated to track a GGRC assessment '
       '(a.k.a PBC Item). Use the following link to find the '
-      'assessment - %s.' % (urlparse.urljoin(
-          utils.get_url_root(), utils.view_url_for(assessment))),
+      'assessment - %s.' % _get_assessment_url(assessment),
   ]
   test_plan = assessment.test_plan
   if test_plan:
@@ -435,6 +438,34 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
       _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
 
 
+_STATUS_CHANGE_COMMENT_TMPL = (
+    'The status of this bug was automatically synced to reflect '
+    'current GGRC assessment status. Current status of related GGRC '
+    'Assessment is %s. Use the following to link to and get '
+    'information from the GGRC Assessment on why the status may have changed. '
+    'Link - %s'
+)
+
+_NO_VERIFIER_STATUSES = {
+    # (from_status, to_status): 'issue_tracker_status'
+    ('Not Started', 'In Progress'): 'ACCEPTED',
+    ('In Progress', 'Completed'): 'VERIFIED',
+    ('Completed', 'In Progress'): 'ACCEPTED',
+}
+
+_VERIFIER_STATUSES = {
+    # (from_status, to_status, verified): 'issue_tracker_status'
+    ('Not Started', 'In Progress', False): 'ACCEPTED',
+    ('In Progress', 'In Review', False): 'FIXED',
+    ('In Review', 'In Progress', False): 'ACCEPTED',
+
+    # 'Completed' here means Completed and Verified.
+    ('In Review', 'Completed', True): 'VERIFIED',
+    ('Completed', 'In Review', True): 'FIXED',
+    ('Completed', 'In Progress', True): 'ACCEPTED',
+}
+
+
 def _update_issuetracker_issue(
     assessment, issue_tracker_info, initial_assessment, request):
   logger.info(
@@ -457,16 +488,26 @@ def _update_issuetracker_issue(
   # Handle status update.
   if initial_assessment.status != assessment.status:
     verifiers = assessment.verifiers
+    status_text = assessment.status
     if verifiers:
-      # TODO(anushovan): create comment for an assessment with a verifier
-      comments.append(
-          'Status update for assessment WITH verifier: %s -> %s' % (
-              initial_assessment.status, assessment.status))
+      status = _VERIFIER_STATUSES.get(
+          (initial_assessment.status, assessment.status, assessment.verified))
+      # Corner case for custom status text.
+      if assessment.verified and assessment.status == 'Completed':
+        status_text = '%s and Verified' % status_text
     else:
-      # TODO(anushovan): create comment for an assessment without a verifier
+      status = _NO_VERIFIER_STATUSES.get(
+          (initial_assessment.status, assessment.status))
+
+    if status:
+      issue_params['status'] = status
+      comments.append(_STATUS_CHANGE_COMMENT_TMPL % (
+          status_text, _get_assessment_url(assessment)))
+    else:
+      # Default comment to track status update in issue tracker.
       comments.append(
-          'Status update for assessment WITHOUT verifier: %s -> %s' % (
-              assessment_initial_state.status, assessment.status))
+          'Assessment status has been updated: %s -> %s' % (
+              initial_assessment.status, status_text))
 
   # Attach user comments if any.
   comment_text = _get_added_comment_text(request)
