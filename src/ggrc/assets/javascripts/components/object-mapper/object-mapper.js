@@ -153,7 +153,7 @@
 
         // mapper sets uniqueId for modal-ajax.
         // we can check using unique id which modal-ajax is closing
-        if (options.uniqueId &&
+        if (options && options.uniqueId &&
           joinObjectId === options.uniqueId &&
           this.viewModel.attr('newEntries').length > 0) {
           this.mapObjects(this.viewModel.attr('newEntries'));
