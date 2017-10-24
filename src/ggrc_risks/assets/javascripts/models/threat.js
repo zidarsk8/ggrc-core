@@ -30,7 +30,8 @@
       object_controls: 'CMS.Models.ObjectControl.stubs',
       controls: 'CMS.Models.Control.stubs',
       object_sections: 'CMS.Models.ObjectSection.stubs',
-      sections: 'CMS.Models.get_stubs'
+      sections: 'CMS.Models.get_stubs',
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       add_item_view: GGRC.mustache_path +
