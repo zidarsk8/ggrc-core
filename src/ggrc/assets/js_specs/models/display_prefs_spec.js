@@ -67,78 +67,7 @@ describe("display prefs model", function() {
     });
   });
 
-  describe("top nav", function () {
-    afterEach(function() {
-      display_prefs.resetPagePrefs();
-      //display_prefs.removeAttr(exp.path);
-    });
-
-    describe("hiddenness", function () {
-      it("sets nav hidden", function() {
-        display_prefs.setTopNavHidden("this arg is ignored", true);
-        expect(
-          display_prefs.attr(exp.path).top_nav.is_hidden
-        ).toBe(true);
-      });
-
-      it("gets nav hidden", function () {
-        display_prefs.setTopNavHidden("this arg is ignored", true);
-
-        expect(display_prefs.getTopNavHidden()).toBe(true);
-      });
-
-      it("returns false by default", function () {
-        expect(display_prefs.getTopNavHidden()).toBe(false);
-      });
-    });
-
-    describe("widget list", function () {
-      it("sets widget list", function () {
-        display_prefs.setTopNavWidgets("this arg is ignored", {a:1, b: 2});
-
-        expect(
-          display_prefs.attr(exp.path).top_nav.widget_list.serialize()
-        ).toEqual({a: 1, b: 2});
-      });
-
-      it("gets widget list", function () {
-        display_prefs.setTopNavWidgets("this arg is ignored", {a: 1, b: 2});
-
-        expect(display_prefs.getTopNavWidgets()).toEqual({a: 1, b: 2});
-      });
-
-      it("returns {} by default", function () {
-        expect(display_prefs.getTopNavWidgets()).toEqual({});
-      });
-    });
-  });
-
-   describe("filter hiding", function () {
-     afterEach(function() {
-       display_prefs.resetPagePrefs();
-     });
-
-     it("sets filter hidden", function() {
-       display_prefs.setFilterHidden(true);
-
-       expect(
-         display_prefs.attr(exp.path).filter_widget.is_hidden
-       ).toBe(true);
-     });
-
-     it("gets filter hidden", function () {
-       display_prefs.setFilterHidden(true);
-
-       expect(display_prefs.getFilterHidden()).toBe(true);
-     });
-
-     it("returns false by default", function () {
-       expect(display_prefs.getFilterHidden()).toBe(false);
-     });
-   });
-
-
-  describe("#setCollapsed", function() {
+  describe("#setCollapsed", function () {
     afterEach(function() {
       display_prefs.removeAttr(exp.COLLAPSE);
       display_prefs.removeAttr(exp.path);
@@ -238,48 +167,26 @@ describe("display prefs model", function() {
 
   describe("#setSorts", setSpecs("setSorts", "SORTS", ["bar", "baz"], ["thud", "jeek"]));
 
-  describe("#getWidgetHeights", function() {});
-
-  describe("#getWidgetHeight", getSpecs("getWidgetHeight", "HEIGHTS", 100, 200));
-
-  describe("#setWidgetHeight", setSpecs("setWidgetHeight", "HEIGHTS", 100, 200));
-
-  describe("#getColumnWidths", getSpecs("getColumnWidths", "COLUMNS", [6, 6], [8, 4]));
-
-  describe("#getColumnWidthsForSelector", function() {
-    it("calls getColumnWidths with the ID of the supplied element", function() {
-      var $foo = affix("#foo");
-      var $bar = affix("#bar");
-
-      spyOn(display_prefs, "getColumnWidths");
-
-      display_prefs.getColumnWidthsForSelector("unit_test", $foo);
-      expect(display_prefs.getColumnWidths).toHaveBeenCalledWith("unit_test", "foo");
-    });
-  });
-
-  describe("#setColumnWidths", setSpecs("setColumnWidths", "COLUMNS", [6,6], [4,8]));
-
   describe("Set/Reset functions", function() {
 
     describe("#resetPagePrefs", function() {
 
       beforeEach(function() {
-        can.each([exp.COLUMNS, exp.HEIGHTS, exp.SORTS, exp.COLLAPSE], function(exp_token) {
+        can.each([exp.SORTS, exp.COLLAPSE], function(exp_token) {
           display_prefs.makeObject(exp_token, "unit_test").attr("foo", "bar"); //page type defaults
           display_prefs.makeObject(exp.path, exp_token).attr("foo", "baz"); //page custom settings
         });
       });
       afterEach(function() {
         display_prefs.removeAttr(exp.path);
-        can.each([exp.COLUMNS, exp.HEIGHTS, exp.SORTS, exp.COLLAPSE], function(exp_token) {
+        can.each([exp.SORTS, exp.COLLAPSE], function(exp_token) {
           display_prefs.removeAttr(exp_token);
         });
       });
 
       it("sets the page layout to the default for the page type", function() {
         display_prefs.resetPagePrefs();
-        can.each(["getSorts", "getCollapsed", "getWidgetHeight", "getColumnWidths"], function(func) {
+        can.each(["getSorts", "getCollapsed"], function(func) {
           expect(display_prefs[func]("unit_test", "foo")).toBe("bar");
         });
       });
@@ -288,31 +195,31 @@ describe("display prefs model", function() {
 
     describe("#setPageAsDefault", function() {
       beforeEach(function() {
-        can.each([exp.COLUMNS, exp.HEIGHTS, exp.SORTS, exp.COLLAPSE], function(exp_token) {
+        can.each([exp.SORTS, exp.COLLAPSE], function(exp_token) {
           display_prefs.makeObject(exp_token, "unit_test").attr("foo", "bar"); //page type defaults
           display_prefs.makeObject(exp.path, exp_token).attr("foo", "baz"); //page custom settings
         });
       });
       afterEach(function() {
         display_prefs.removeAttr(exp.path);
-        can.each([exp.COLUMNS, exp.HEIGHTS, exp.SORTS, exp.COLLAPSE], function(exp_token) {
+        can.each([exp.SORTS, exp.COLLAPSE], function(exp_token) {
           display_prefs.removeAttr(exp_token);
         });
       });
 
       it("sets the page layout to the default for the page type", function() {
         display_prefs.setPageAsDefault("unit_test");
-        can.each([exp.COLUMNS, exp.HEIGHTS, exp.SORTS, exp.COLLAPSE], function(exp_token) {
+        can.each([exp.SORTS, exp.COLLAPSE], function(exp_token) {
           expect(display_prefs.attr([exp_token, "unit_test", "foo"].join("."))).toBe("baz");
         })
       });
 
       it("keeps the page and the defaults separated", function() {
         display_prefs.setPageAsDefault("unit_test");
-        can.each(["setColumnWidths", "setCollapsed", "setWidgetHeight", "setSorts"], function(func) {
+        can.each(["setCollapsed", "setSorts"], function(func) {
           display_prefs[func]("unit_test", "foo", "quux");
         });
-        can.each([exp.COLUMNS, exp.HEIGHTS, exp.SORTS, exp.COLLAPSE], function(exp_token) {
+        can.each([exp.SORTS, exp.COLLAPSE], function(exp_token) {
           expect(display_prefs.attr([exp_token, "unit_test", "foo"].join("."))).toBe("baz");
         });
       });
