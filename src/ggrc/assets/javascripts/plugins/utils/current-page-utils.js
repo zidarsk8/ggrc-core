@@ -171,7 +171,9 @@
     function initWidgetCounts(widgets, type, id) {
       let result;
 
-      if (CUSTOM_COUNTERS[getPageType()]) {
+      // custom endpoint we use only in order to initialize counts for all tabs.
+      // In order to update counter for individual tab need to use Query API
+      if (widgets.length !== 1 && CUSTOM_COUNTERS[getPageType()]) {
         result = CUSTOM_COUNTERS[getPageType()]();
       } else {
         result = _initWidgetCounts(widgets, type, id);
