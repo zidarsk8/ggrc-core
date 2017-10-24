@@ -498,7 +498,10 @@ def _update_issuetracker_issue(
 
 
 def _update_issuetracker_info(assessment, issue_tracker_info):
-  logger.info('------> _update_issuetracker_info: %s', issue_tracker_info)
+  audit_issue_tracker_info = assessment.audit.issue_tracker or {}
+
+  if not bool(audit_issue_tracker_info.get('enabled')):
+    raise exceptions.BadRequest('Issue Tracker feature is disable for audit.')
 
   if not bool(issue_tracker_info.get('enabled')):
     issue_tracker_info = {

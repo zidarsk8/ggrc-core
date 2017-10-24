@@ -51,7 +51,6 @@ class IssuetrackerIssue(Base, db.Model):
           'Issue tracker info is missing mandatory attributes: %s' % (
               ', '.join(missing_attrs)))
 
-
   def to_dict(self, include_issue=False, include_private=None):
     res = {
         'enabled': self.enabled,
