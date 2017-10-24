@@ -690,9 +690,8 @@ class TestSnapshots(base.Test):
       "dynamic_objects, dynamic_relationships",
       [("new_assessment_rest", None),
        ("new_issue_rest", "map_new_audit_rest_to_new_issue_rest")],
-      ids=["All types of snapshotable objects and Issues to Assessment",
-           "All types of snapshotable objects, Issues, Programs, Projects and "
-           "Task Groups (*for mapper only) to standalone Issue"],
+      ids=["All Snapshotable objects, Issues to Assessment",
+           "All Snapshotable objects, Issues, Programs, Projects to Issue"],
       indirect=True)
   def test_availability_mapping_of_objects_via_mapper_and_add_widget(
       self, create_audit_with_control_and_update_control, dynamic_objects,
@@ -707,16 +706,12 @@ class TestSnapshots(base.Test):
       - Get list of available objects from HNB;
       - Compare their with constant of expected objects accordingly.
     """
-    is_issue_flow = (
-        dynamic_objects.type == entities_factory.EntitiesFactory.obj_issue)
     expected_objs_names_from_mapper = (
         objects.ALL_SNAPSHOTABLE_OBJS + (objects.ISSUES, ))
-    expected_objs_names_from_add_widget = expected_objs_names_from_mapper
-    if is_issue_flow:
-      expected_objs_names_from_add_widget = expected_objs_names_from_mapper + (
+    if dynamic_objects.type == entities_factory.EntitiesFactory.obj_issue:
+      expected_objs_names_from_mapper = expected_objs_names_from_mapper + (
           objects.PROGRAMS, objects.PROJECTS)
-      expected_objs_names_from_mapper = (
-          expected_objs_names_from_add_widget + (objects.TASK_GROUPS, ))
+    expected_objs_names_from_add_widget = expected_objs_names_from_mapper
     expected_objs_types_from_mapper = sorted(
         objects.get_normal_form(obj_name)
         for obj_name in expected_objs_names_from_mapper)
@@ -724,7 +719,7 @@ class TestSnapshots(base.Test):
         objects.get_normal_form(obj_name)
         for obj_name in expected_objs_names_from_add_widget)
     mapped_audit = create_audit_with_control_and_update_control[
-        'new_audit_rest'][0]
+        "new_audit_rest"][0]
     obj_ui_service = get_cls_webui_service(
         objects.get_plural(dynamic_objects.type))(selenium)
     actual_objs_types_from_mapper = (
