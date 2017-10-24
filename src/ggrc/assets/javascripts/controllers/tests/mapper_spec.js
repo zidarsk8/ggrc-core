@@ -28,7 +28,7 @@ describe('GGRC.Controllers.ObjectMapper', function () {
     });
 
     beforeEach(function () {
-      updateScopeObject = can.Deferred().resolve();
+      updateScopeObject = can.Deferred();
       scopeObject = new can.Map({
         id: 1,
       });
@@ -44,6 +44,7 @@ describe('GGRC.Controllers.ObjectMapper', function () {
         ],
       };
       fakeCtrlInst = {
+        isLoading: false,
         launch: jasmine.createSpy('launch'),
       };
       fakeData = {
@@ -54,11 +55,17 @@ describe('GGRC.Controllers.ObjectMapper', function () {
       };
       method = Ctrl.openMapper.bind(fakeCtrlInst);
       spyOn(GGRC.Errors, 'notifier');
-      $('body').trigger('closeMapper');
     });
 
     it('interrupts own work if disableMapper param is true', function () {
       method(fakeData, true);
+
+      expect(fakeCtrlInst.launch).not.toHaveBeenCalled();
+    });
+
+    it('interrupts own work if isLoading prop is true', function () {
+      fakeCtrlInst.isLoading = true;
+      method(fakeData, false);
 
       expect(fakeCtrlInst.launch).not.toHaveBeenCalled();
     });
@@ -78,7 +85,7 @@ describe('GGRC.Controllers.ObjectMapper', function () {
         var btn = {};
         method(fakeData, false, btn);
 
-        updateScopeObject.then(function () {
+        updateScopeObject.resolve().then(function () {
           expect(fakeCtrlInst.launch).toHaveBeenCalledWith(
             btn,
             jasmine.objectContaining({
@@ -102,7 +109,7 @@ describe('GGRC.Controllers.ObjectMapper', function () {
         args = fakeCtrlInst.launch.calls.argsFor(0);
 
         // so hard:(
-        updateScopeObject.then(function () {
+        updateScopeObject.resolve().then(function () {
           expect(args[1]).toEqual(
             jasmine.objectContaining({
               general: jasmine.objectContaining({
@@ -125,6 +132,19 @@ describe('GGRC.Controllers.ObjectMapper', function () {
         };
 
         expect(closure).toThrowError();
+      });
+
+      it('updates "isLoading" flag before and after updating scope object',
+      (done) => {
+        fakeCtrlInst.isLoading = false;
+
+        method(fakeData, false);
+        expect(fakeCtrlInst.isLoading).toBe(true);
+
+        updateScopeObject.resolve().then(() => {
+          expect(fakeCtrlInst.isLoading).toBe(false);
+          done();
+        });
       });
     });
 
@@ -161,15 +181,19 @@ describe('GGRC.Controllers.ObjectMapper', function () {
       });
 
       it('calls launch for ObjectMapper with passed btn and config if ' +
-      'data.toggle contains "unified-search" string', function () {
+      'data.toggle contains "unified-search" string', function (done) {
         var btn = {};
         fakeDataForCommon.toggle = '';
         method(fakeDataForCommon, false, btn);
 
-        expect(fakeCtrlInst.launch).toHaveBeenCalledWith(
-          btn,
-          jasmine.any(Object)
-        );
+        updateScopeObject.resolve().then(() => {
+          expect(fakeCtrlInst.launch).toHaveBeenCalledWith(
+            btn,
+            jasmine.any(Object)
+          );
+
+          done();
+        });
       });
     });
   });

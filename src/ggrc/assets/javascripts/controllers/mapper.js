@@ -20,8 +20,6 @@ import '../components/unified-mapper/mapper-results';
   var OBJECT_REQUIRED_MESSAGE = 'Required Data for In Scope Object is missing' +
     ' - Original Object is mandatory';
 
-  var isMapperOpen = false;
-
   can.Control.extend('GGRC.Controllers.ObjectMapper', {
     defaults: {
       component: GGRC.mustache_path +
@@ -57,11 +55,12 @@ import '../components/unified-mapper/mapper-results';
 
       return $target;
     },
+    isLoading: false,
     openMapper: function (data, disableMapper, btn) {
       var self = this;
       var isSearch = /unified-search/ig.test(data.toggle);
 
-      if (disableMapper || isMapperOpen) {
+      if (disableMapper || this.isLoading) {
         return;
       }
 
@@ -74,7 +73,6 @@ import '../components/unified-mapper/mapper-results';
 
       if (GGRC.Utils.Snapshots
           .isInScopeModel(data.join_object_type) && !isSearch) {
-        isMapperOpen = true;
         openForSnapshots(data);
       } else {
         openForCommonObjects(data, isSearch);
@@ -116,6 +114,7 @@ import '../components/unified-mapper/mapper-results';
           throw new Error(OBJECT_REQUIRED_MESSAGE);
         }
 
+        self.isLoading = true;
         inScopeObject =
           CMS.Models[data.join_object_type].store[data.join_object_id];
         inScopeObject.updateScopeObject().then(function () {
@@ -142,7 +141,8 @@ import '../components/unified-mapper/mapper-results';
           });
 
           self.launch(btn, can.extend(config, data));
-        });
+        })
+        .always(() => self.isLoading = false);
       }
 
       function openForCommonObjects(data, isSearch) {
@@ -219,16 +219,10 @@ import '../components/unified-mapper/mapper-results';
     GGRC.Controllers.ObjectMapper.openMapper(data, disableMapper, btn);
   }
   $('body').on('openMapper', function (el, ev, disableMapper) {
-    if (!isMapperOpen) {
-      openMapperByElement(ev, disableMapper);
-    }
+    openMapperByElement(ev, disableMapper);
   });
 
   $('body').on('click', selectors.join(', '), function (ev, disableMapper) {
     openMapperByElement(ev, disableMapper);
-  });
-
-  $('body').on('closeMapper', function () {
-    isMapperOpen = false;
   });
 })(window.can, window.can.$);
