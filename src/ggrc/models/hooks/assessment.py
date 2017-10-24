@@ -8,6 +8,7 @@
   new relationships and custom attributes
 """
 import collections
+import copy
 import html2text
 import itertools
 import json
@@ -16,6 +17,7 @@ import time
 import urlparse
 
 from sqlalchemy import orm
+from werkzeug import exceptions
 
 from google.appengine.api import urlfetch
 from google.appengine.api import urlfetch_errors
@@ -83,7 +85,7 @@ def init_hook():
   """Initializes hooks."""
 
   @signals.Restful.collection_posted.connect_via(all_models.Assessment)
-  def handle_assessment_post(sender, objects=None, sources=None):
+  def handle_assessment_post(sender, objects=None, sources=None, service=None):
     """Applies custom attribute definitions and maps people roles.
 
     Applicable when generating Assessment with template.
@@ -93,7 +95,7 @@ def init_hook():
       objects: A list of model instances created from the POSTed JSON.
       sources: A list of original POSTed JSON dictionaries.
     """
-    del sender  # Unused
+    del sender, service  # Unused
 
     logger.info('---> handle_assessment_post: %s', sources)
     db.session.flush()
@@ -133,6 +135,7 @@ def init_hook():
         )
     }
 
+    issue_tracker_templates = {}
     for assessment, src in itertools.izip(objects, sources):
       snapshot_dict = src.get('object') or {}
       common.map_objects(assessment, snapshot_dict)
@@ -150,6 +153,7 @@ def init_hook():
       )
       if not template:
         continue
+      issue_tracker_templates[assessment.id] = template.issue_tracker
       if template.test_plan_procedure:
         assessment.test_plan = snapshot.revision.content['test_plan']
       else:
@@ -158,7 +162,15 @@ def init_hook():
         assessment.assessment_type = template.template_object_type
 
     for assessment, src in itertools.izip(objects, sources):
-      _create_issuetracker_info(assessment, src.get('issue_tracker'))
+      logger.info(
+          '--> issue_tracker_templates: %s',
+          issue_tracker_templates.get(assessment.id))
+      info = src.get('issue_tracker') or issue_tracker_templates.get(
+          assessment.id)
+      logger.info(
+          '--> info: %s',
+          info)
+      _create_issuetracker_info(assessment, info)
 
   @signals.Restful.model_put.connect_via(all_models.Assessment)
   def handle_assessment_put(
@@ -169,20 +181,14 @@ def init_hook():
 
     issue_tracker_info = src.get('issue_tracker')
     if issue_tracker_info:
-      src['__stash']['_issue_tracker'] = dict(issue_tracker_info)
-      issue_tracker_info['component_id'] = '0000000'
-      issue_tracker_info['title'] = 'TTTTT'
-      issue_tracker_info['issue_priority'] = 'P6'
-      issue_tracker_info['issue_severity'] = 'S6'
+      # Preserve initial state of issue tracker info.
+      src['__stash']['issue_tracker'] = copy.deepcopy(obj.issue_tracker)
       _update_issuetracker_info(obj, issue_tracker_info)
 
   @signals.Restful.model_put_after_commit.connect_via(all_models.Assessment)
   def handle_assessment_put_after_commit(
       sender, obj=None, src=None, service=None, event=None, initial_state=None):
     del sender, service, event  # Unused
-    logger.info(
-        '--> handle_assessment_put_after_commit: %s',
-        src['__stash'].get('_issue_tracker'))
 
     issue_tracker_info = obj.issue_tracker
     if issue_tracker_info.get('enabled') and issue_tracker_info.get('issue_id'):
@@ -190,23 +196,38 @@ def init_hook():
         _update_issuetracker_issue(obj, issue_tracker_info, initial_state, src)
       except (HttpError, BadResponseError) as e:
         logging.error('Unable update Issue Tracker issue: %s', e)
-        # TODO(anushovan): consider rolling back change to issuetracker_issues
-        #   model here once logic supports sending updated data updated in
-        #   *_after_commit event handlers back to frontend.
+        # Dirty hack to rollback change to issuetracker_issues model.
+        # Reverted info doesn't get sent to frontend so page refresh is required
+        # but the hack at least allows to keep data in sync.
+        issue_tracker_info = src['__stash'].get('issue_tracker')
+        if issue_tracker_info:
+          _update_issuetracker_info(obj, issue_tracker_info)
 
   @signals.Restful.model_deleted.connect_via(all_models.Assessment)
   def handle_assessment_deleted(sender, obj=None, service=None):
     del sender, service  # Unused
+
     issue_obj = all_models.IssuetrackerIssue.get_issue(
         _ASSESSMENT_MODEL_NAME, obj.id)
-    # TODO(anushovan): update issue status here
+
     if issue_obj:
+      if issue_obj.issue_id:
+        issue_params = {
+            'status': 'OBSOLETE',
+            'comment': (
+                'Assessment has been deleted. Changes to this GGRC '
+                'Assessment will no longer be tracked within this bug.'
+            ),
+        }
+        _send_request(
+            '/api/issues/%s' % issue_obj.issue_id,
+            method=urlfetch.PUT, payload=issue_params)
       db.session.delete(issue_obj)
 
   @signals.Restful.collection_posted.connect_via(all_models.Relationship)
-  def handle_relation_post(sender, objects=None, sources=None):
-    del sender, sources  # Unused
-    logger.info('------> handle_relation_post')
+  def handle_relation_post(sender, objects=None, sources=None, service=None):
+    del sender, sources, service  # Unused
+
     assessment_ids = [
         obj.destination_id
         for obj in objects
@@ -275,7 +296,6 @@ def _collect_issue_emails(assessment):
       if email and email != assignee_email:
         cc_list.add(email)
 
-  # select l.person_id, p.name, p.email, l.ac_role_id, r.name from access_control_list l join access_control_roles r on r.id=l.ac_role_id join people p on p.id=l.person_id where l.object_type='Assessment' and l.object_id=3;
   ac_list = access_control.list.AccessControlList
   ac_role = access_control.role.AccessControlRole
   query = db.session.query(
@@ -328,6 +348,7 @@ def _send_http_request(url, method=urlfetch.GET, payload=None, headers=None):
 
 
 def _send_request(url, method=urlfetch.GET, payload=None, headers=None):
+  # TODO(anushovan): remove two following lines once development is done.
   logger.info('---> _send_request: %s, %s, %s', method, url, payload)
   return None if method != urlfetch.POST else {'issueId': int(time.time())}
 
@@ -357,6 +378,18 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       reported_email = reporter.email
 
   hotlist_id = issue_tracker_info.get('hotlist_id')
+  comment = [
+      'This bug was auto-generated to track a GGRC assessment '
+      '(a.k.a PBC Item). Use the following link to find the '
+      'assessment - %s.' % (urlparse.urljoin(
+          utils.get_url_root(), utils.view_url_for(assessment))),
+  ]
+  test_plan = assessment.test_plan
+  if test_plan:
+    comment.append(
+        'Following is the assessment Requirements/Test Plan from GGRC:',
+        html2text.HTML2Text().handle(test_plan).strip('\n'))
+
   issue_params = {
       'component_id': issue_tracker_info['component_id'],
       'hotlist_ids': [hotlist_id] if hotlist_id else [],
@@ -368,36 +401,18 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       'assignee': None,
       'verifier': None,
       'ccs': [],
-      'comment': (
-          'This bug was auto-generated to track a GGRC assessment '
-          '(a.k.a PBC Item). Use the following link to find the '
-          'assessment - %s.\n'
-          'Following is the assessment Requirements/Test Plan from GGRC:\n'
-          '[Test Plan text]'
-      ) % (urlparse.urljoin(
-          utils.get_url_root(), utils.view_url_for(assessment))),
+      'comment': '\n'.join(comment),
   }
 
-  logger.info('------> CREATE ISSUE: %s', issue_params)
   res = _send_request(
       '/api/issues', method=urlfetch.POST, payload=issue_params)
   return res['issueId']
 
 
 def _create_issuetracker_info(assessment, issue_tracker_info):
+  logger.info('--> _create_issuetracker_info: %s', issue_tracker_info)
   if not issue_tracker_info:
-    # return
-    # TODO(anushovan): remove this when development is done
-    issue_tracker_info = {
-        "enabled": True,
-        "component_id": "64445",
-        "hotlist_id": None,
-        "issue_type": "PROCESS",
-        "issue_priority": "P2",
-        "issue_severity": "S2",
-        # "issue_id": "1508276850",
-        # "issue_url": "http://issuetracker.me/b/1508276850",
-    }
+    return
 
   if not issue_tracker_info.get('title'):
     issue_tracker_info['title'] = assessment.title
@@ -407,7 +422,7 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
       issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
     except (HttpError, BadResponseError) as e:
       logging.error('Unable create Issue Tracker issue: %s', e)
-      return
+      raise exceptions.InternalServerError('Unable create Issue Tracker issue.')
 
     issue_tracker_info['issue_id'] = issue_id
     issue_tracker_info['issue_url'] = _ISSUE_URL_TMPL % issue_id
@@ -420,76 +435,33 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
       _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
 
 
-  # @signals.Restful.model_put.connect_via(all_models.Assessment)
-  # def handle_assessment_put(
-  #     sender, obj=None, src=None, service=None, event=None, initial_state=None):
-  #   changed_attrs = set()
-  #   if initial_state is not None:
-  #     for k, v in initial_state._asdict().iteritems():
-  #       if v != getattr(obj, k, None):
-  #         changed_attrs.add(k)
-
-  #   logger.info('------> handle_assessment_put_after_commit: %s', (
-  #       sender, obj, src, service, event, initial_state))
-  #   logger.info(
-  #       '------> handle_assessment_put_after_commit CHANGED: %s', changed_attrs)
-
-  #   # try:
-  #   #   # form_data = urllib.urlencode(UrlPostHandler.form_fields)
-  #   #   headers = {'Content-Type': 'application/json'}
-  #   #   result = urlfetch.fetch(
-  #   #       url='https://integration-dot-ggrc-test.googleplex.com/',
-  #   #       # payload=form_data,
-  #   #       method=urlfetch.GET,
-  #   #       headers=headers)
-  #   #   self.response.write(result.content)
-  #   # except urlfetch.Error:
-  #   #   logger.error('Caught exception fetching url')
-
-  #   comment_id = _get_added_comment_id(src)
-  #   props_to_update = changed_attrs & _ISSUE_TRACKER_PARAMS
-
-  #   logger.info('------> comment_id: %s', comment_id)
-  #   logger.info('------> props_to_update: %s', props_to_update)
-
-  #   request_params = {}
-  #   if comment_id is not None:
-  #     comment_obj = all_models.Comment.query.filter(
-  #         all_models.Comment.id == comment_id
-  #     ).first()
-  #     if comment_obj is not None:
-  #       request_params['comment'] = html2text.HTML2Text().handle(
-  #           comment_obj.description).strip('\n')
-
-  #   logger.info('------> request_params: %s', request_params)
-
 def _update_issuetracker_issue(
-    assessment, issue_tracker_info, assessment_initial_state, request):
+    assessment, issue_tracker_info, initial_assessment, request):
   logger.info(
       '------> _update_issuetracker_issue: %s -> %s',
-      assessment_initial_state.status if assessment_initial_state else 'NONE',
+      initial_assessment.status if initial_assessment else 'NONE',
       assessment.status)
 
   issue_params = {}
   # Handle updates to basic issue tracker properties.
-  current_info = request['__stash'].get('_issue_tracker') or {}
+  initial_info = request['__stash'].get('issue_tracker') or {}
   logger.info(
-      '------> issue_tracker_info assessment_initial_state: %s',
-      current_info)
+      '------> issue_tracker_info initial_assessment: %s',
+      initial_info)
   for name, api_name in _ISSUE_TRACKER_UPDATE_FIELDS:
     value = issue_tracker_info.get(name)
-    if value != current_info.get(name):
+    if value != initial_info.get(name):
       issue_params[api_name] = value
 
   comments = []
   # Handle status update.
-  if assessment_initial_state.status != assessment.status:
+  if initial_assessment.status != assessment.status:
     verifiers = assessment.verifiers
     if verifiers:
       # TODO(anushovan): create comment for an assessment with a verifier
       comments.append(
           'Status update for assessment WITH verifier: %s -> %s' % (
-              assessment_initial_state.status, assessment.status))
+              initial_assessment.status, assessment.status))
     else:
       # TODO(anushovan): create comment for an assessment without a verifier
       comments.append(
@@ -507,7 +479,7 @@ def _update_issuetracker_issue(
 
   # Handle hotlist ID update.
   hotlist_id = issue_tracker_info.get('hotlist_id')
-  if hotlist_id != current_info.get('hotlist_id'):
+  if hotlist_id != initial_info.get('hotlist_id'):
     issue_params['hotlist_ids'] = [hotlist_id] if hotlist_id else []
 
   # Handle cc_list ID update.
