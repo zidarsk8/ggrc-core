@@ -14,15 +14,14 @@ class IssuetrackerIssue(Base, db.Model):
 
   object_id = db.Column(db.Integer, nullable=False)
   object_type = db.Column(db.String(250), nullable=False)
-
   enabled = db.Column(db.Boolean, nullable=False, default=False)
 
-  title = db.Column(db.String(250), nullable=False)
-  component_id = db.Column(db.String(50), nullable=False)
+  title = db.Column(db.String(250), nullable=True)
+  component_id = db.Column(db.String(50), nullable=True)
   hotlist_id = db.Column(db.String(50), nullable=True)
-  issue_type = db.Column(db.String(50), nullable=False)
-  issue_priority = db.Column(db.String(50), nullable=False)
-  issue_severity = db.Column(db.String(50), nullable=False)
+  issue_type = db.Column(db.String(50), nullable=True)
+  issue_priority = db.Column(db.String(50), nullable=True)
+  issue_severity = db.Column(db.String(50), nullable=True)
   assignee = db.Column(db.String(250), nullable=True)
   cc_list = db.Column(db.Text, nullable=True)
 

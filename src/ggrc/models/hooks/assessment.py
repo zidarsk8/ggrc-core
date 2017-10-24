@@ -18,6 +18,7 @@ import urlparse
 from sqlalchemy import orm
 
 from google.appengine.api import urlfetch
+from google.appengine.api import urlfetch_errors
 
 from ggrc import db
 from ggrc.access_control.role import get_custom_roles_for
@@ -35,7 +36,6 @@ logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 # mapping of model field name to API property name
 _ISSUE_TRACKER_UPDATE_FIELDS = (
     ('title', 'title'),
-    # ('status', 'status'),
     ('issue_priority', 'priority'),
     ('issue_severity', 'severity'),
     ('component_id', 'component_id'),
@@ -47,6 +47,37 @@ _ISSUE_TRACKER_UPDATE_FIELDS = (
 
 _ASSESSMENT_MODEL_NAME = 'Assessment'
 _ASSESSMENT_TMPL_MODEL_NAME = 'AssessmentTemplate'
+
+# TODO(anushovan): move following constants to configuration.
+_DEFAULT_HEADERS = {
+    'X-URLFetch-Service-Id': 'GOOGLEPLEX'
+}
+_ENDPOINT = 'https://integration-dot-ggrc-test.googleplex.com'
+_ISSUE_URL_TMPL = 'http://issuetracker.me/b/%s'
+
+
+class Error(Exception):
+  """Module level error."""
+
+
+class HttpError(Error):
+  """Base HTTP error."""
+
+  def __init__(self, data, status=500):
+    """Instantiates error with give parameters.
+
+    Args:
+      data: A string or object describing an error.
+      status: An integer representing HTTP status.
+    """
+    super(HttpError, self).__init__('HTTP Error %s' % status)
+    self.data = data
+    self.status = status
+
+
+class BadResponseError(Error):
+  """Wrong formatted response error."""
+
 
 def init_hook():
   """Initializes hooks."""
@@ -155,7 +186,13 @@ def init_hook():
 
     issue_tracker_info = obj.issue_tracker
     if issue_tracker_info.get('enabled') and issue_tracker_info.get('issue_id'):
-      _update_issuetracker_issue(obj, issue_tracker_info, initial_state, src)
+      try:
+        _update_issuetracker_issue(obj, issue_tracker_info, initial_state, src)
+      except (HttpError, BadResponseError) as e:
+        logging.error('Unable update Issue Tracker issue: %s', e)
+        # TODO(anushovan): consider rolling back change to issuetracker_issues
+        #   model here once logic supports sending updated data updated in
+        #   *_after_commit event handlers back to frontend.
 
   @signals.Restful.model_deleted.connect_via(all_models.Assessment)
   def handle_assessment_deleted(sender, obj=None, service=None):
@@ -264,6 +301,52 @@ def _collect_issue_emails(assessment):
   return assignee_email, list(cc_list)
 
 
+def _send_http_request(url, method=urlfetch.GET, payload=None, headers=None):
+  if _DEFAULT_HEADERS:
+    headers.update(_DEFAULT_HEADERS)
+
+  url = urlparse.urljoin(_ENDPOINT, url)
+
+  try:
+    response = urlfetch.fetch(
+        url,
+        method=method,
+        payload=payload,
+        headers=headers,
+        follow_redirects=False,
+        deadline=30,
+    )
+    if response.status_code != 200:
+      logger.error(
+          'Unable to perform request to %s: %s %s',
+          url, response.status_code, response.content)
+      raise HttpError(response.content, status=response.status_code)
+    return response.content
+  except urlfetch_errors.Error as e:
+    logger.exception('Unable to perform urlfetch request: %s', e)
+    raise HttpError('Unable to perform a request')
+
+
+def _send_request(url, method=urlfetch.GET, payload=None, headers=None):
+  logger.info('---> _send_request: %s, %s, %s', method, url, payload)
+  return None if method != urlfetch.POST else {'issueId': int(time.time())}
+
+  headers = headers or {}
+  headers['Content-Type'] = 'application/json'
+
+  if payload is not None:
+    payload = json.dumps(payload)
+
+  data = _send_http_request(
+      url, method=method, payload=payload, headers=headers)
+
+  try:
+    return json.loads(data)
+  except (TypeError, ValueError) as e:
+    logging.error('Unable to parse JSON from response: %s', e)
+    raise BadResponseError('Unable to parse JSON from response.')
+
+
 def _create_issuetracker_issue(assessment, issue_tracker_info):
   reported_email = None
   reporter_id = get_current_user_id()
@@ -295,33 +378,10 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
           utils.get_url_root(), utils.view_url_for(assessment))),
   }
 
-  # TODO(anushovan): create issue here.
   logger.info('------> CREATE ISSUE: %s', issue_params)
-  try:
-    # form_data = urllib.urlencode(UrlPostHandler.form_fields)
-    headers = {
-        'Content-Type': 'application/json',
-        'X-URLFetch-Service-Id': 'GOOGLEPLEX',
-    }
-    response = urlfetch.fetch(
-        url='https://integration-dot-ggrc-test.googleplex.com/api/issues',
-        method=urlfetch.POST,
-        payload=json.dumps(issue_params),
-        headers=headers,
-        follow_redirects=False,
-        deadline=30)
-    if response.status_code != 200:
-      raise Exception('HTTP Exception: %s', response.status_code)
-  except urlfetch.Error:
-    logger.error('Caught exception fetching url')
-
-  try:
-    response_data = json.loads(response.content)
-  except (TypeError, ValueError) as e:
-    raise ValueError('Unable to unmarshal JSON.')
-
-  return response_data['issueId']
-  # return int(time.time())
+  res = _send_request(
+      '/api/issues', method=urlfetch.POST, payload=issue_params)
+  return res['issueId']
 
 
 def _create_issuetracker_info(assessment, issue_tracker_info):
@@ -343,9 +403,18 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
     issue_tracker_info['title'] = assessment.title
 
   if issue_tracker_info.get('enabled'):
-    issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
+    try:
+      issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
+    except (HttpError, BadResponseError) as e:
+      logging.error('Unable create Issue Tracker issue: %s', e)
+      return
+
     issue_tracker_info['issue_id'] = issue_id
-    issue_tracker_info['issue_url'] = 'http://issuetracker.me/b/%s' % issue_id
+    issue_tracker_info['issue_url'] = _ISSUE_URL_TMPL % issue_id
+  else:
+    issue_tracker_info = {
+        'enabled': False,
+    }
 
   all_models.IssuetrackerIssue.create_or_update_from_dict(
       _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
@@ -395,17 +464,17 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
   #   logger.info('------> request_params: %s', request_params)
 
 def _update_issuetracker_issue(
-    assessment, issue_tracker_info, initial_state, request):
+    assessment, issue_tracker_info, assessment_initial_state, request):
   logger.info(
       '------> _update_issuetracker_issue: %s -> %s',
-      initial_state.status if initial_state else 'NONE',
+      assessment_initial_state.status if assessment_initial_state else 'NONE',
       assessment.status)
 
   issue_params = {}
   # Handle updates to basic issue tracker properties.
   current_info = request['__stash'].get('_issue_tracker') or {}
   logger.info(
-      '------> issue_tracker_info initial_state: %s',
+      '------> issue_tracker_info assessment_initial_state: %s',
       current_info)
   for name, api_name in _ISSUE_TRACKER_UPDATE_FIELDS:
     value = issue_tracker_info.get(name)
@@ -414,18 +483,18 @@ def _update_issuetracker_issue(
 
   comments = []
   # Handle status update.
-  if initial_state.status != assessment.status:
+  if assessment_initial_state.status != assessment.status:
     verifiers = assessment.verifiers
     if verifiers:
       # TODO(anushovan): create comment for an assessment with a verifier
       comments.append(
           'Status update for assessment WITH verifier: %s -> %s' % (
-              initial_state.status, assessment.status))
+              assessment_initial_state.status, assessment.status))
     else:
       # TODO(anushovan): create comment for an assessment without a verifier
       comments.append(
           'Status update for assessment WITHOUT verifier: %s -> %s' % (
-              initial_state.status, assessment.status))
+              assessment_initial_state.status, assessment.status))
 
   # Attach user comments if any.
   comment_text = _get_added_comment_text(request)
@@ -449,12 +518,21 @@ def _update_issuetracker_issue(
   if issue_params:
     # TODO(anushovan): update issue here.
     logger.info('------> UPDATE ISSUE: %s', issue_params)
+    _send_request(
+        '/api/issues/%s' % issue_tracker_info['issue_id'],
+        method=urlfetch.PUT, payload=issue_params)
   else:
     logger.info('------> DON\'T UPDATE ISSUE: %s', issue_params)
 
 
 def _update_issuetracker_info(assessment, issue_tracker_info):
   logger.info('------> _update_issuetracker_info: %s', issue_tracker_info)
+
+  if not bool(issue_tracker_info.get('enabled')):
+    issue_tracker_info = {
+        'enabled': False,
+    }
+
   all_models.IssuetrackerIssue.create_or_update_from_dict(
       _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
 
