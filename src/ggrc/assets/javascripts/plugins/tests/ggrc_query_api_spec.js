@@ -305,11 +305,9 @@ describe('GGRC Utils Query API', function () {
     var relevant;
     var widgets;
     var refreshCounts;
-    var getCounts;
 
     beforeEach(function () {
       refreshCounts = GGRC.Utils.CurrentPage.refreshCounts;
-      getCounts = GGRC.Utils.CurrentPage.getCounts;
       widgets = ['Program', 'AccessGroup', 'Assessment', 'Audit'];
       relevant = {
         id: 1,
@@ -330,10 +328,9 @@ describe('GGRC Utils Query API', function () {
 
     it('should reinit counts', function (done) {
       refreshCounts()
-        .then(function () {
+        .then(function (counts) {
           var reqParams;
           var reqParamNames;
-          var counts = getCounts();
 
           expect(can.ajax.calls.count()).toEqual(1);
           reqParams = JSON.parse(can.ajax.calls.argsFor(0)[0].data);
