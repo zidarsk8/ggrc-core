@@ -90,7 +90,7 @@ GGRC.Components('csvExport', {
           object_name: panel.type,
           fields: allItems
             .filter((item) => item.isSelected)
-            .map((item) => item.key),
+            .map((item) => item.key).serialize(),
           filters: GGRC.query_parser.join_queries(
             GGRC.query_parser.parse(relevantFilter || ''),
             GGRC.query_parser.parse(panel.filter || '')
