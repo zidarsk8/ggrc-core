@@ -219,9 +219,14 @@ def init_hook():
                 'Assessment will no longer be tracked within this bug.'
             ),
         }
-        _send_request(
-            '/api/issues/%s' % issue_obj.issue_id,
-            method=urlfetch.PUT, payload=issue_params)
+        try:
+          _send_request(
+              '/api/issues/%s' % issue_obj.issue_id,
+              method=urlfetch.PUT, payload=issue_params)
+        except (HttpError, BadResponseError) as e:
+          logger.error('Unable to update Issue tracker: %s', e)
+          raise exceptions.InternalServerError(
+              'Unable update Issue Tracker issue.')
       db.session.delete(issue_obj)
 
   @signals.Restful.collection_posted.connect_via(all_models.Relationship)
@@ -250,6 +255,23 @@ def init_hook():
       issue_tracker_info['status'] = 'ASSIGNED'
       issue_tracker_info['assignee'] = assignee_email
       issue_tracker_info['cc_list'] = cc_list
+      issue_id = issue_tracker_info.get('issue_id')
+      if issue_id:
+        issue_params = {
+            'status': 'ASSIGNED',
+            'assignee': assignee_email,
+            'verifier': assignee_email,
+            'ccs': cc_list,
+        }
+        try:
+          _send_request(
+              '/api/issues/%s' % issue_id,
+              method=urlfetch.PUT, payload=issue_params)
+        except (HttpError, BadResponseError) as e:
+          logger.error('Unable to update Issue tracker: %s', e)
+          raise exceptions.InternalServerError(
+              'Unable update Issue Tracker issue.')
+
       _update_issuetracker_info(assessment, issue_tracker_info)
 
   @signals.Restful.collection_posted.connect_via(all_models.AssessmentTemplate)
