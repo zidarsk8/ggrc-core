@@ -25,6 +25,11 @@
     var QueryAPI = GGRC.Utils.QueryAPI;
     var SnapshotUtils = GGRC.Utils.Snapshots;
 
+    let CUSTOM_COUNTERS = {
+      MY_WORK: () => _getCurrentUser().getWidgetCountForMyWorkPage(),
+      ALL_OBJECTS: () => _getCurrentUser().getWidgetCountForAllObjectPage(),
+    };
+
     function initMappedInstances() {
       var currentPageInstance = GGRC.page_instance();
       var models = GGRC.Mappings.getMappingList(currentPageInstance.type);
@@ -79,6 +84,10 @@
 
     function isMyWork() {
       return getPageType() === 'MY_WORK';
+    }
+
+    function isAllObjects() {
+      return getPageType() === 'ALL_OBJECTS';
     }
 
     function isAdmin() {
@@ -159,6 +168,22 @@
       return widgetsCounts;
     }
 
+    function initWidgetCounts(widgets, type, id) {
+      let result;
+
+      // custom endpoint we use only in order to initialize counts for all tabs.
+      // In order to update counter for individual tab need to use Query API
+      if (widgets.length !== 1 && CUSTOM_COUNTERS[getPageType()]) {
+        result = CUSTOM_COUNTERS[getPageType()]();
+      } else {
+        result = _initWidgetCounts(widgets, type, id);
+      }
+
+      return result.then(counts => {
+        getCounts().attr(counts);
+      });
+    }
+
     /**
      * Update Page Counts
      * @param {Array|Object} widgets - list of widgets
@@ -166,7 +191,7 @@
      * @param {Number} id - ID of parent object
      * @return {can.Deferred} - resolved deferred object
      */
-    function initCounts(widgets, type, id) {
+    function _initWidgetCounts(widgets, type, id) {
       // Request params generation logic should be moved in
       // a separate place
       var widgetsObject = GGRC.Utils.ObjectVersions
@@ -212,7 +237,7 @@
           }
           countsMap[countsName] = info[name].total;
         });
-        getCounts().attr(countsMap);
+        return countsMap;
       });
     }
 
@@ -228,7 +253,13 @@
       widgets = GGRC.Utils.CurrentPage
         .getWidgetModels(pageInstance.constructor.shortName, location);
 
-      return initCounts(widgets, pageInstance.type, pageInstance.id);
+      return _initWidgetCounts(widgets, pageInstance.type, pageInstance.id);
+    }
+
+    function _getCurrentUser() {
+      let userId = GGRC.current_user.id;
+
+      return  CMS.Models.Person.store[userId];
     }
 
     return {
@@ -237,13 +268,14 @@
       getPageType: getPageType,
       isMyAssessments: isMyAssessments,
       isMyWork: isMyWork,
+      isAllObjects,
       isAdmin: isAdmin,
       isObjectContextPage: isObjectContextPage,
       getWidgetList: getWidgetList,
       getWidgetModels: getWidgetModels,
       getDefaultWidgets: getDefaultWidgets,
       getCounts: getCounts,
-      initCounts: initCounts,
+      initCounts: initWidgetCounts,
       refreshCounts: refreshCounts
     };
   })();

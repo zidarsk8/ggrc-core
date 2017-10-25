@@ -150,6 +150,8 @@ class TreeView(base.TreeView):
         object_name=obj_name)
     self.fields_to_set = factory.get_fields_to_set(object_name=obj_name)
     self.locator_set_visible_fields = self._locators.SHOW_FIELDS_BTN_CSS
+    selenium_utils.wait_until_not_present(
+        self._driver, locator.Common.SPINNER_CSS)
 
   def open_create(self):
     """Click to Create button on Tree View to open new object creation modal.
