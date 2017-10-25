@@ -4,6 +4,7 @@
 """
 Test Program Creator role
 """
+import ddt
 
 from integration.ggrc import TestCase
 from ggrc.models import get_model
@@ -14,6 +15,7 @@ from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc.models import factories
 
 
+@ddt.ddt
 class TestCreator(TestCase):
   """ TestCreator """
 
@@ -246,3 +248,27 @@ class TestCreator(TestCase):
     obj2_acl = obj_2.access_control_list[0]
     check(obj_2, 1)
     check(obj2_acl, 1)
+
+  @ddt.data("creator", "admin")
+  def test_count_type_in_accordion(self, glob_role):
+    """Return count of Persons in DB for side accordion."""
+    self.api.set_user(self.users[glob_role])
+    ocordion_api_person_count_link = (
+        "/search?"
+        "q=&types=Program%2CWorkflow_All%2C"
+        "Audit%2CAssessment%2CIssue%2CRegulation%2C"
+        "Policy%2CStandard%2CContract%2CClause%2CSection%2CControl%2C"
+        "Objective%2CPerson%2COrgGroup%2CVendor%2CAccessGroup%2CSystem%2C"
+        "Process%2CDataAsset%2CProduct%2CProject%2CFacility%2C"
+        "Market%2CRisk%2CThreat&counts_only=true&"
+        "extra_columns=Workflow_All%3DWorkflow%2C"
+        "Workflow_Active%3DWorkflow%2CWorkflow_Draft%3D"
+        "Workflow%2CWorkflow_Inactive%3DWorkflow&contact_id=1&"
+        "extra_params=Workflow%3Astatus%3DActive%3BWorkflow_Active"
+        "%3Astatus%3DActive%3BWorkflow_Inactive%3Astatus%3D"
+        "Inactive%3BWorkflow_Draft%3Astatus%3DDraft"
+    )
+    resp = self.api.client.get(ocordion_api_person_count_link)
+    self.assertIn("Person", resp.json["results"]["counts"])
+    self.assertEqual(all_models.Person.query.count(),
+                     resp.json["results"]["counts"]["Person"])
