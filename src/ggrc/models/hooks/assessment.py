@@ -43,8 +43,6 @@ if settings.URLFETCH_SERVICE_ID:
 _ENDPOINT = settings.INTEGRATION_SERVICE_URL
 _ISSUE_URL_TMPL = settings.ISSUE_TRACKER_BUG_URL_TMPL or 'http://issue/%s'
 
-_ISSUE_TRACKER_ENABLED = bool(_ENDPOINT)
-
 # mapping of model field name to API property name
 _ISSUE_TRACKER_UPDATE_FIELDS = (
     ('title', 'title'),
@@ -256,6 +254,9 @@ def init_hook():
   def handle_relation_post(sender, objects=None, sources=None, service=None):
     del sender, sources, service  # Unused
 
+    if not _is_issue_tracker_enabled():
+      return
+
     assessment_ids = [
         obj.destination_id
         for obj in objects
@@ -346,7 +347,7 @@ def init_hook():
 
 
 def _is_issue_tracker_enabled(audit=None):
-  if not _ISSUE_TRACKER_ENABLED:
+  if not bool(_ENDPOINT):
     return False
 
   if audit is not None:
@@ -429,8 +430,8 @@ def _send_http_request(url, method=urlfetch.GET, payload=None, headers=None):
 #   https://github.com/google/ggrc-core/pull/6584 is submitted.
 def _send_request(url, method=urlfetch.GET, payload=None, headers=None):
   # TODO(anushovan): remove two following lines once development is done.
-  logger.info('---> _send_request: %s, %s, %s', method, url, payload)
-  return None if method != urlfetch.POST else {'issueId': int(time.time())}
+  # logger.info('---> _send_request: %s, %s, %s', method, url, payload)
+  # return None if method != urlfetch.POST else {'issueId': int(time.time())}
 
   headers = headers or {}
   headers['Content-Type'] = 'application/json'
@@ -461,7 +462,6 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
     if reporter is not None:
       reported_email = reporter.email
 
-  hotlist_id = issue_tracker_info.get('hotlist_id')
   comment = [
       'This bug was auto-generated to track a GGRC assessment '
       '(a.k.a PBC Item). Use the following link to find the '
@@ -474,20 +474,38 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
         html2text.HTML2Text().handle(test_plan).strip('\n'),
     ])
 
+  component_id = issue_tracker_info['component_id']
+  hotlist_id = issue_tracker_info.get('hotlist_id')
+
+  # TODO(anushovan): remove data type casting once integration service
+  #   supports strings for following properties.
+  try:
+    component_id = int(component_id)
+  except (TypeError, ValueError):
+    raise exceptions.BadRequest('Component ID must be a number.')
+
+  try:
+    hotlist_id = [int(hotlist_id)] if hotlist_id else []
+  except (TypeError, ValueError):
+    raise exceptions.BadRequest('Hotlist ID must be a number.')
+
   issue_params = {
-      'component_id': issue_tracker_info['component_id'],
-      'hotlist_ids': [hotlist_id] if hotlist_id else [],
+      'component_id': component_id,
+      'hotlist_ids': hotlist_id,
       'title': issue_tracker_info['title'],
       'type': issue_tracker_info['issue_type'],
       'priority': issue_tracker_info['issue_priority'],
       'severity': issue_tracker_info['issue_severity'],
       'reporter': reported_email,
-      'assignee': None,
-      'verifier': None,
+      'assignee': '',
+      'verifier': '',
       'ccs': [],
       'comment': '\n'.join(comment),
   }
 
+  # TODO(anushovan): analyze error and fail back to
+  #   settings.ISSUE_TRACKER_DEFAULT_COMPONENT_ID or/and
+  #   settings.ISSUE_TRACKER_DEFAULT_HOTLIST_ID in case of access issue.
   res = _send_request(
       '/api/issues', method=urlfetch.POST, payload=issue_params)
   return res['issueId']

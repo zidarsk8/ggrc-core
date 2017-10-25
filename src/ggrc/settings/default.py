@@ -134,6 +134,14 @@ URLFETCH_SERVICE_ID = os.environ.get('URLFETCH_SERVICE_ID')
 # URL template for composing Issue Tracker ticker URL.
 ISSUE_TRACKER_BUG_URL_TMPL = os.environ.get('ISSUE_TRACKER_BUG_URL_TMPL')
 
+# Default component ID for Issue Tracker.
+ISSUE_TRACKER_DEFAULT_COMPONENT_ID = os.environ.get(
+    'ISSUE_TRACKER_DEFAULT_COMPONENT_ID')
+
+# Default hotlist ID for Issue Tracker.
+ISSUE_TRACKER_DEFAULT_HOTLIST_ID = os.environ.get(
+    'ISSUE_TRACKER_DEFAULT_HOTLIST_ID')
+
 # Dashboard integration
 _DEFAULT_DASHBOARD_INTEGRATION_CONFIG = {
     "ca_name_regexp": r"^Dashboard_(.*)$",
