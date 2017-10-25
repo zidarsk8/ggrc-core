@@ -50,6 +50,33 @@ _ISSUE_TRACKER_UPDATE_FIELDS = (
 _ASSESSMENT_MODEL_NAME = 'Assessment'
 _ASSESSMENT_TMPL_MODEL_NAME = 'AssessmentTemplate'
 
+_STATUS_CHANGE_COMMENT_TMPL = (
+    'The status of this bug was automatically synced to reflect '
+    'current GGRC assessment status. Current status of related GGRC '
+    'Assessment is %s. Use the following to link to and get '
+    'information from the GGRC Assessment on why the status may have changed. '
+    'Link - %s'
+)
+
+_NO_VERIFIER_STATUSES = {
+    # (from_status, to_status): 'issue_tracker_status'
+    ('Not Started', 'In Progress'): 'ACCEPTED',
+    ('In Progress', 'Completed'): 'VERIFIED',
+    ('Completed', 'In Progress'): 'ACCEPTED',
+}
+
+_VERIFIER_STATUSES = {
+    # (from_status, to_status, verified): 'issue_tracker_status'
+    ('Not Started', 'In Progress', False): 'ACCEPTED',
+    ('In Progress', 'In Review', False): 'FIXED',
+    ('In Review', 'In Progress', False): 'ACCEPTED',
+
+    # 'Completed' here means Completed and Verified.
+    ('In Review', 'Completed', True): 'VERIFIED',
+    ('Completed', 'In Review', True): 'FIXED',
+    ('Completed', 'In Progress', True): 'ACCEPTED',
+}
+
 # TODO(anushovan): move following constants to configuration.
 _DEFAULT_HEADERS = {
     'X-URLFetch-Service-Id': 'GOOGLEPLEX'
@@ -199,9 +226,9 @@ def init_hook():
         # Dirty hack to rollback change to issuetracker_issues model.
         # Reverted info doesn't get sent to frontend so page refresh is required
         # but the hack at least allows to keep data in sync.
-        issue_tracker_info = src['__stash'].get('issue_tracker')
-        if issue_tracker_info:
-          _update_issuetracker_info(obj, issue_tracker_info)
+        initial_issue_tracker_info = src['__stash'].get('issue_tracker')
+        if initial_issue_tracker_info:
+          _update_issuetracker_info(obj, initial_issue_tracker_info)
 
   @signals.Restful.model_deleted.connect_via(all_models.Assessment)
   def handle_assessment_deleted(sender, obj=None, service=None):
@@ -281,6 +308,8 @@ def init_hook():
       issue_tracker_info = src.get('issue_tracker')
       if not issue_tracker_info:
         continue
+      if bool(issue_tracker_info.get('enabled')):
+        _check_audit_constraint(obj.audit)
       all_models.IssuetrackerIssue.create_or_update_from_dict(
           _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
 
@@ -290,6 +319,8 @@ def init_hook():
     del sender, service  # Unused
     issue_tracker_info = src.get('issue_tracker')
     if issue_tracker_info:
+      if bool(issue_tracker_info.get('enabled')):
+        _check_audit_constraint(obj.audit)
       all_models.IssuetrackerIssue.create_or_update_from_dict(
           _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
 
@@ -302,6 +333,13 @@ def init_hook():
         _ASSESSMENT_TMPL_MODEL_NAME, obj.id)
     if issue_obj:
       db.session.delete(issue_obj)
+
+
+def _check_audit_constraint(audit):
+  audit_issue_tracker_info = audit.issue_tracker or {}
+
+  if not bool(audit_issue_tracker_info.get('enabled')):
+    raise exceptions.BadRequest('Issue Tracker feature is disable for audit.')
 
 
 def _collect_issue_emails(assessment):
@@ -343,6 +381,8 @@ def _collect_issue_emails(assessment):
   return assignee_email, list(cc_list)
 
 
+# TODO(anushovan): migrate to Client object once
+#   https://github.com/google/ggrc-core/pull/6584 is submitted.
 def _send_http_request(url, method=urlfetch.GET, payload=None, headers=None):
   if _DEFAULT_HEADERS:
     headers.update(_DEFAULT_HEADERS)
@@ -369,6 +409,8 @@ def _send_http_request(url, method=urlfetch.GET, payload=None, headers=None):
     raise HttpError('Unable to perform a request')
 
 
+# TODO(anushovan): migrate to Client object once
+#   https://github.com/google/ggrc-core/pull/6584 is submitted.
 def _send_request(url, method=urlfetch.GET, payload=None, headers=None):
   # TODO(anushovan): remove two following lines once development is done.
   logger.info('---> _send_request: %s, %s, %s', method, url, payload)
@@ -436,13 +478,13 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
 
 def _create_issuetracker_info(assessment, issue_tracker_info):
   logger.info('--> _create_issuetracker_info: %s', issue_tracker_info)
-  if not issue_tracker_info:
-    return
 
   if not issue_tracker_info.get('title'):
     issue_tracker_info['title'] = assessment.title
 
   if issue_tracker_info.get('enabled'):
+    _check_audit_constraint(assessment.audit)
+
     try:
       issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
     except (HttpError, BadResponseError) as e:
@@ -458,34 +500,6 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
 
   all_models.IssuetrackerIssue.create_or_update_from_dict(
       _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
-
-
-_STATUS_CHANGE_COMMENT_TMPL = (
-    'The status of this bug was automatically synced to reflect '
-    'current GGRC assessment status. Current status of related GGRC '
-    'Assessment is %s. Use the following to link to and get '
-    'information from the GGRC Assessment on why the status may have changed. '
-    'Link - %s'
-)
-
-_NO_VERIFIER_STATUSES = {
-    # (from_status, to_status): 'issue_tracker_status'
-    ('Not Started', 'In Progress'): 'ACCEPTED',
-    ('In Progress', 'Completed'): 'VERIFIED',
-    ('Completed', 'In Progress'): 'ACCEPTED',
-}
-
-_VERIFIER_STATUSES = {
-    # (from_status, to_status, verified): 'issue_tracker_status'
-    ('Not Started', 'In Progress', False): 'ACCEPTED',
-    ('In Progress', 'In Review', False): 'FIXED',
-    ('In Review', 'In Progress', False): 'ACCEPTED',
-
-    # 'Completed' here means Completed and Verified.
-    ('In Review', 'Completed', True): 'VERIFIED',
-    ('Completed', 'In Review', True): 'FIXED',
-    ('Completed', 'In Progress', True): 'ACCEPTED',
-}
 
 
 def _update_issuetracker_issue(
@@ -561,15 +575,12 @@ def _update_issuetracker_issue(
 
 
 def _update_issuetracker_info(assessment, issue_tracker_info):
-  audit_issue_tracker_info = assessment.audit.issue_tracker or {}
-
-  if not bool(audit_issue_tracker_info.get('enabled')):
-    raise exceptions.BadRequest('Issue Tracker feature is disable for audit.')
-
   if not bool(issue_tracker_info.get('enabled')):
     issue_tracker_info = {
         'enabled': False,
     }
+  else:
+    _check_audit_constraint(assessment.audit)
 
   all_models.IssuetrackerIssue.create_or_update_from_dict(
       _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
