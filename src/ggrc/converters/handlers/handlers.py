@@ -222,9 +222,10 @@ class UserColumnHandler(ColumnHandler):
     return list(users)
 
   def get_person(self, email):
+    from ggrc.utils import user_generator
     new_objects = self.row_converter.block_converter.converter.new_objects
     if email not in new_objects[Person]:
-      new_objects[Person][email] = Person.query.filter_by(email=email).first()
+      new_objects[Person][email] = user_generator.find_user(email)
     return new_objects[Person].get(email)
 
   def parse_item(self):
