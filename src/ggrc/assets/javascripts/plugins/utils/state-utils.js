@@ -37,8 +37,7 @@
       },
       {
         models: [
-          'Person', 'CycleTaskGroupObjectTask',
-          'AssessmentTemplate', 'Workflow',
+          'Person', 'CycleTaskGroupObjectTask', 'Workflow',
           'TaskGroup', 'Cycle'
         ],
         states: []
