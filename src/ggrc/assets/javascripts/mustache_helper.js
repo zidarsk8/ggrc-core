@@ -1813,19 +1813,6 @@ Mustache.registerHelper("ggrc_config_value", function (key, default_, options) {
   return can.getObject(key, [GGRC.config]) || default_;
 });
 
-Mustache.registerHelper("is_page_instance", function (instance, options) {
-  var instance = resolve_computed(instance)  // FIXME duplicate declaration
-    , page_instance = GGRC.page_instance()
-    ;
-
-  if (instance && instance.type === page_instance.type && instance.id === page_instance.id) {
-    return options.fn(options.contexts);
-  }
-  else{
-    return options.inverse(options.contexts);
-  }
-});
-
 Mustache.registerHelper("if_auditor", function (instance, options) {
   var audit, auditors_dfd, auditors
     , admin = Permission.is_allowed("__GGRC_ADMIN__")

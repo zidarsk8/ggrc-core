@@ -14,6 +14,7 @@ import '../mapped-objects/mapped-controls';
 import '../../inline/inline-form-control';
 import './inline-item';
 import './create-url';
+import '../../object-change-state/object-change-state';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -130,6 +131,7 @@ import './create-url';
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
+      initialState: 'Not Started',
       setUrlEditMode: function (value, type) {
         this.attr(type + 'EditMode', value);
       },

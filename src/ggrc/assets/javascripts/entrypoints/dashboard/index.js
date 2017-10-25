@@ -150,7 +150,6 @@ import '../../components/people/people-list-info';
 import '../../components/prev-next-buttons/prev-next-buttons';
 import '../../components/loading/loading-status';
 import '../../components/lazy-render/lazy-render';
-
 import '../../components/custom-attributes/custom-attributes-field-view';
 import '../../components/form/form-validation-text';
 

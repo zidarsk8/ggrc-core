@@ -23,3 +23,4 @@ import './components/workflow_deactivate';
 import './components/repeat-on-button-wrapper';
 import './components/repeat-on-button';
 import './components/repeat-on-summary';
+import './components/cycle-task-group-object-task/cycle-task-group-object-task';
