@@ -132,24 +132,6 @@ describe('GGRC.Components.treePagination', function () {
         expect(viewModel.paging.current).toEqual(2);
       });
   });
-  describe('changePageSize() method ', function () {
-    it('changes current to first page and page size', function () {
-      viewModel.paging.attr('current', 2);
-      expect(viewModel.paging.pageSize).toEqual(10);
-      viewModel.changePageSize(25);
-      expect(viewModel.paging.pageSize).toEqual(25);
-      expect(viewModel.paging.current).toEqual(1);
-    });
-    it('doesn\'t change current value if inProgress equal true',
-      function () {
-        viewModel.paging.attr('current', 2);
-        viewModel.paging.attr('disabled', true);
-        expect(viewModel.paging.pageSize).toEqual(10);
-        viewModel.changePageSize(25);
-        expect(viewModel.paging.pageSize).toEqual(10);
-        expect(viewModel.paging.current).toEqual(2);
-      });
-  });
   describe('setCurrentPage() method ', function () {
     var input;
     var event;

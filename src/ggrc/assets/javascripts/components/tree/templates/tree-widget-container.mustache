@@ -35,7 +35,7 @@
         </tree-status-filter>
       {{/if}}
       {{^if noResults}}
-      <tree-pagination {(paging)}="pageInfo"></tree-pagination>
+      <tree-pagination {paging}="pageInfo"></tree-pagination>
       {{/if}}
     </div>
 
@@ -135,7 +135,7 @@
 
   <div class="tree-footer flex-box">
     {{^if noResults}}
-      <tree-pagination {(paging)}="pageInfo"></tree-pagination>
+      <tree-pagination {paging}="pageInfo"></tree-pagination>
     {{/if}}
   </div>
 </div>
