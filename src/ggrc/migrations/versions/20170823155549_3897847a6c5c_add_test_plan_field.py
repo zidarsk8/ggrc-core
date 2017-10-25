@@ -16,7 +16,7 @@ from alembic import op
 from ggrc.migrations.utils.resolve_duplicates import rename_ca_title
 
 revision = '3897847a6c5c'
-down_revision = '5299857cfde0'
+down_revision = '2ad7783c176'
 
 table_models = {
     "directives": "directive",
