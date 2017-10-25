@@ -39,6 +39,8 @@ class PersonResource(common.ExtendedResource):
     if id != get_current_user_id():
       raise Forbidden()
     with benchmark("Make response"):
+      # query below ignores acr.read flag because this is done on a
+      # non_editable role that has read rights:
       counts_query = db.session.execute(
           """
           SELECT
@@ -51,11 +53,17 @@ class PersonResource(common.ExtendedResource):
               FROM cycle_task_group_object_tasks AS ct
               JOIN cycles AS c ON
                   c.id = ct.cycle_id
+              JOIN access_control_list AS acl
+                  ON acl.object_id = ct.id
+                  AND acl.object_type = "CycleTaskGroupObjectTask"
+              JOIN access_control_roles as acr
+                  ON acl.ac_role_id = acr.id
               WHERE
                   ct.status != "Verified" AND
-                  ct.contact_id = :person_id AND
                   c.is_verification_needed = 1 AND
-                  c.is_current = 1
+                  c.is_current = 1 AND
+                  acl.person_id = :person_id AND
+                  acr.name = "Task Assignees"
               GROUP BY overdue
 
               UNION ALL
@@ -66,11 +74,17 @@ class PersonResource(common.ExtendedResource):
               FROM cycle_task_group_object_tasks AS ct
               JOIN cycles AS c ON
                   c.id = ct.cycle_id
+              JOIN access_control_list AS acl
+                  ON acl.object_id = ct.id
+                  AND acl.object_type = "CycleTaskGroupObjectTask"
+              JOIN access_control_roles as acr
+                  ON acl.ac_role_id = acr.id
               WHERE
                   ct.status != "Finished" AND
-                  ct.contact_id = :person_id AND
                   c.is_verification_needed = 0 AND
-                  c.is_current = 1
+                  c.is_current = 1 AND
+                  acl.person_id = :person_id AND
+                  acr.name = "Task Assignees"
               GROUP BY overdue
           ) as temp
           GROUP BY overdue
