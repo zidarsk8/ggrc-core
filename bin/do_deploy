@@ -16,7 +16,7 @@ ACCOUNT="$2"
 KEY_FILE="$3"
 
 ENV_OVERRIDE_FILE=${ENV_OVERRIDE_FILE:-"override.sh"}
-VERSION="anushovan-dev"
+VERSION="1"
 
 
 write_visible_message () {
