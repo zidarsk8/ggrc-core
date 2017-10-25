@@ -100,6 +100,9 @@
       display_attr_names: ['title', 'status', 'assignees', 'verifiers',
         'updated_at']
     },
+    sub_tree_view_options: {
+      default_filter: ['Control'],
+    },
     info_pane_options: {
     },
     confirmEditModal: {

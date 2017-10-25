@@ -64,6 +64,9 @@
       ]),
       add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
     },
+    sub_tree_view_options: {
+      default_filter: ['Standard'],
+    },
     links_to: {
       System: {},
       Process: {},
@@ -150,6 +153,9 @@
       show_related_assessments: true,
       // draw_children: true,
       start_expanded: false
+    },
+    sub_tree_view_options: {
+      default_filter: ['Control'],
     },
     defaults: {
       status: 'Draft'

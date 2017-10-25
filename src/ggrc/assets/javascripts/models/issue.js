@@ -32,6 +32,9 @@
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       display_attr_names: ['title', 'Admin', 'status'],
     },
+    sub_tree_view_options: {
+      default_filter: ['Control', 'Control_versions'],
+    },
     info_pane_options: {
     },
     defaults: {

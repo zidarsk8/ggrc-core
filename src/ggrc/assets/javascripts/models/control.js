@@ -80,6 +80,9 @@
       show_related_assessments: true,
       draw_children: true
     },
+    sub_tree_view_options: {
+      default_filter: ['Objective'],
+    },
     info_pane_options: {
       evidence: {
         model: CMS.Models.Document,

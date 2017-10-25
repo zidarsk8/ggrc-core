@@ -34,6 +34,9 @@
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
       ])
     },
+    sub_tree_view_options: {
+      default_filter: ['Control'],
+    },
     defaults: {
       status: 'Draft'
     },

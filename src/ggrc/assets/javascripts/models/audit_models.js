@@ -139,6 +139,9 @@
       }],
       draw_children: true
     },
+    sub_tree_view_options: {
+      default_filter: ['Product'],
+    },
     init: function () {
       if (this._super) {
         this._super.apply(this, arguments);

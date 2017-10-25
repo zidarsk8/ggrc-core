@@ -39,6 +39,9 @@
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
       ])
     },
+    sub_tree_view_options: {
+      default_filter: ['Program'],
+    },
     links_to: {
       System: {},
       Process: {},
@@ -98,6 +101,9 @@
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
       ]),
       add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+    },
+    sub_tree_view_options: {
+      default_filter: ['Program'],
     },
     links_to: {
       System: {},
@@ -160,6 +166,9 @@
       add_item_view:
         GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
     },
+    sub_tree_view_options: {
+      default_filter: ['Program'],
+    },
     links_to: {
       System: {},
       Process: {},
@@ -220,6 +229,9 @@
       ]),
       add_item_view:
         GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+    },
+    sub_tree_view_options: {
+      default_filter: ['System'],
     },
     links_to: {
       System: {},
@@ -282,6 +294,9 @@
       add_item_view:
         GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
     },
+    sub_tree_view_options: {
+      default_filter: ['Policy'],
+    },
     links_to: {
       System: {},
       Process: {},
@@ -342,6 +357,9 @@
       add_item_view:
         GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
     },
+    sub_tree_view_options: {
+      default_filter: ['System'],
+    },
     links_to: {
       System: {},
       Process: {},
@@ -400,6 +418,9 @@
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
       ]),
       add_item_view: GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+    },
+    sub_tree_view_options: {
+      default_filter: ['Program'],
     },
     links_to: {
       System: {},
@@ -460,6 +481,9 @@
       ]),
       add_item_view:
         GGRC.mustache_path + '/base_objects/tree_add_item.mustache'
+    },
+    sub_tree_view_options: {
+      default_filter: ['Program'],
     },
     links_to: {
       System: {},
