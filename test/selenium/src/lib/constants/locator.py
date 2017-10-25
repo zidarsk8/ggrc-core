@@ -116,14 +116,17 @@ class Dashboard(object):
   """Locators for Dashboard page."""
   _GET_LIST = ".get-started__list"
   # get started (user input elements)
-  BUTTON_START_NEW_PROGRAM = (
+  START_NEW_PROGRAM_BTN_CSS = (
       By.CSS_SELECTOR, _GET_LIST + ' [data-object-singular="Program"]')
-  BUTTON_START_NEW_AUDIT = (
+  START_NEW_AUDIT_BTN_CSS = (
       By.CSS_SELECTOR, _GET_LIST + ' [data-object-singular="Audit"]')
-  BUTTON_START_NEW_WORKFLOW = (
+  START_NEW_WORKFLOW_BTN_CSS = (
       By.CSS_SELECTOR, _GET_LIST + ' [data-object-singular="Workflow"]')
-  BUTTON_CREATE_NEW_OBJECT = (By.CSS_SELECTOR, _GET_LIST + ' [href="#"]')
-  BUTTON_ALL_OBJECTS = (
+  CREATE_TASK_BTN_CSS = (
+      By.CSS_SELECTOR, _GET_LIST +
+      ' [data-object-singular="CycleTaskGroupObjectTask"]')
+  CREATE_OBJECT_BTN_CSS = (By.CSS_SELECTOR, _GET_LIST + ' [href="#"]')
+  ALL_OBJECTS_BTN_CSS = (
       By.CSS_SELECTOR, _GET_LIST + ' [href="/objectBrowser"]')
 
 
@@ -655,6 +658,8 @@ class CommonWidgetInfo(object):
                          '//div[starts-with(./@class, "span")]//h6/..')
   WIDGET = Common.INFO
   _FOOTER = Common.INFO_WIDGET_ID + " .info-widget-footer em"
+  INFO_PANEL_ELEM = (By.XPATH, Common.INFO_WIDGET_XPATH)
+  INFO_PAGE_ELEM = (By.XPATH, Common.INFO_PAGE_XPATH)
   HEADERS_AND_VALUES = (By.XPATH, _HEADERS_AND_VALUES)
   LCAS_HEADERS_AND_VALUES = None  # due to exist only for WidgetInfoAssessment
   CAS_HEADERS_AND_VALUES = (By.XPATH,

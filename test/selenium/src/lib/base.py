@@ -565,7 +565,7 @@ class Widget(AbstractPage):
     self.mapped_obj_id_from_url = mapped_obj_id
 
   @property
-  def is_info_page_not_panel(self):
+  def is_info_page(self):
     """Check is the current page is Info Page and not Info Panel according to
     checking existing of element by locator and URL's logic."""
     is_info_page = False
