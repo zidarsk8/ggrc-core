@@ -408,8 +408,7 @@ class SnapshotsWebUiService(BaseWebUiService):
     """
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     obj_info_panel = (
-        objs_widget.tree_view.select_member_by_title(title=obj.title).
-        panel.snapshotable)
+        objs_widget.tree_view.select_member_by_title(title=obj.title).panel)
     obj_info_panel.open_link_get_latest_ver().confirm_update()
     objs_widget.tree_view.wait_loading_after_actions()
     selenium_utils.get_when_invisible(
@@ -419,8 +418,7 @@ class SnapshotsWebUiService(BaseWebUiService):
     """Open generic widget of mapped objects, select snapshotable object from
     Tree View by title and check via Info panel that object is updateble.
     """
-    obj_info_panel = (self.open_info_panel_of_obj_by_title(src_obj, obj).
-                      panel.snapshotable)
+    obj_info_panel = (self.open_info_panel_of_obj_by_title(src_obj, obj).panel)
     return obj_info_panel.is_link_get_latest_ver_exist()
 
 
