@@ -131,6 +131,9 @@ INTEGRATION_SERVICE_URL = os.environ.get('INTEGRATION_SERVICE_URL')
 # Integration service mandatory header value
 URLFETCH_SERVICE_ID = os.environ.get('URLFETCH_SERVICE_ID')
 
+# URL template for composing Issue Tracker ticker URL.
+ISSUE_TRACKER_BUG_URL_TMPL = os.environ.get('ISSUE_TRACKER_BUG_URL_TMPL')
+
 # Dashboard integration
 _DEFAULT_DASHBOARD_INTEGRATION_CONFIG = {
     "ca_name_regexp": r"^Dashboard_(.*)$",

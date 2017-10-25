@@ -25,6 +25,7 @@ from google.appengine.api import urlfetch_errors
 from ggrc import db
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc import access_control
+from ggrc import settings
 from ggrc import utils
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
@@ -34,6 +35,15 @@ from ggrc.access_control import role
 
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
+
+_DEFAULT_HEADERS = {}
+if settings.URLFETCH_SERVICE_ID:
+  _DEFAULT_HEADERS['X-URLFetch-Service-Id'] = settings.URLFETCH_SERVICE_ID
+
+_ENDPOINT = settings.INTEGRATION_SERVICE_URL
+_ISSUE_URL_TMPL = settings.ISSUE_TRACKER_BUG_URL_TMPL or 'http://issue/%s'
+
+_ISSUE_TRACKER_ENABLED = bool(_ENDPOINT)
 
 # mapping of model field name to API property name
 _ISSUE_TRACKER_UPDATE_FIELDS = (
@@ -76,13 +86,6 @@ _VERIFIER_STATUSES = {
     ('Completed', 'In Review', True): 'FIXED',
     ('Completed', 'In Progress', True): 'ACCEPTED',
 }
-
-# TODO(anushovan): move following constants to configuration.
-_DEFAULT_HEADERS = {
-    'X-URLFetch-Service-Id': 'GOOGLEPLEX'
-}
-_ENDPOINT = 'https://integration-dot-ggrc-test.googleplex.com'
-_ISSUE_URL_TMPL = 'http://issuetracker.me/b/%s'
 
 
 class Error(Exception):
@@ -231,7 +234,7 @@ def init_hook():
         _ASSESSMENT_MODEL_NAME, obj.id)
 
     if issue_obj:
-      if issue_obj.issue_id:
+      if issue_obj.enabled and issue_obj.issue_id:
         issue_params = {
             'status': 'OBSOLETE',
             'comment': (
@@ -265,9 +268,13 @@ def init_hook():
 
     for assessment in all_models.Assessment.query.filter(
         all_models.Assessment.id.in_(assessment_ids)).all():
+      if not _is_issue_tracker_enabled(audit=assessment.audit):
+        continue
       issue_obj = all_models.IssuetrackerIssue.get_issue(
           _ASSESSMENT_MODEL_NAME, assessment.id)
-      if issue_obj is None or issue_obj.assignee is not None:
+      if (issue_obj is None or
+          not issue_obj.enabled or
+          issue_obj.assignee is not None):
         continue
 
       assignee_email, cc_list = _collect_issue_emails(assessment)
@@ -297,8 +304,9 @@ def init_hook():
   @signals.Restful.collection_posted.connect_via(all_models.AssessmentTemplate)
   def handle_assessment_tmpl_post(sender, objects=None, sources=None):
     del sender  # Unused
+
     for obj, src in itertools.izip(objects, sources):
-      if _is_enabled_in_audit(obj.audit):
+      if _is_issue_tracker_enabled(audit=obj.audit):
         issue_tracker_info = {
             'enabled': False,
         }
@@ -314,7 +322,8 @@ def init_hook():
   def handle_assessment_tmpl_put(
       sender, obj=None, src=None, service=None, initial_state=None):
     del sender, service  # Unused
-    if _is_enabled_in_audit(obj.audit):
+
+    if _is_issue_tracker_enabled(audit=obj.audit):
       issue_tracker_info = {
           'enabled': False,
       }
@@ -329,16 +338,24 @@ def init_hook():
   def handle_assessment_tmpl_deleted_after_commit(
       sender, obj=None, service=None, event=None):
     del sender, service, event  # Unused
+
     issue_obj = all_models.IssuetrackerIssue.get_issue(
         _ASSESSMENT_TMPL_MODEL_NAME, obj.id)
     if issue_obj:
       db.session.delete(issue_obj)
 
 
-def _is_enabled_in_audit(audit):
-  audit_issue_tracker_info = audit.issue_tracker or {}
+def _is_issue_tracker_enabled(audit=None):
+  if not _ISSUE_TRACKER_ENABLED:
+    return False
 
-  return bool(audit_issue_tracker_info.get('enabled'))
+  if audit is not None:
+    audit_issue_tracker_info = audit.issue_tracker or {}
+
+    if not bool(audit_issue_tracker_info.get('enabled')):
+      return False
+
+  return True
 
 
 def _collect_issue_emails(assessment):
@@ -481,7 +498,7 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
     issue_tracker_info['title'] = assessment.title
 
   if (issue_tracker_info.get('enabled') and
-      _is_enabled_in_audit(assessment.audit)):
+      _is_issue_tracker_enabled(audit=assessment.audit)):
 
     try:
       issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
@@ -562,7 +579,7 @@ def _update_issuetracker_issue(
 
 def _update_issuetracker_info(assessment, issue_tracker_info):
   if not (bool(issue_tracker_info.get('enabled')) and
-          _is_enabled_in_audit(assessment.audit)):
+          _is_issue_tracker_enabled(audit=assessment.audit)):
     issue_tracker_info = {
         'enabled': False,
     }
