@@ -12,6 +12,7 @@ from ggrc.models.associationproxy import association_proxy
 from ggrc.models import mixins
 from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
+from ggrc.models.mixins import TestPlanned
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models import reflection
@@ -20,10 +21,10 @@ from ggrc.models.track_object_state import HasObjectState
 
 
 class Risk(Roleable, HasObjectState, mixins.CustomAttributable, Relatable,
-           Personable, PublicDocumentable, Commentable,
+           Personable, PublicDocumentable, Commentable, TestPlanned,
            mixins.LastDeprecatedTimeboxed, mixins.BusinessObject,
            Indexed, db.Model):
-
+  """Basic Risk model."""
   __tablename__ = 'risks'
 
   # Overriding mixin to make mandatory
