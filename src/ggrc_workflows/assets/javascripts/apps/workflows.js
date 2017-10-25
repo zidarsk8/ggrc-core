@@ -660,9 +660,6 @@
   GGRC.register_hook(
       'Dashboard.Widgets', GGRC.mustache_path + '/dashboard/widgets');
 
-  GGRC.register_hook(
-      'Dashboard.Errors', GGRC.mustache_path + '/dashboard/info/errors');
-
   WorkflowExtension.init_mappings();
 
   draftOnUpdateMixin = can.Model.Mixin({

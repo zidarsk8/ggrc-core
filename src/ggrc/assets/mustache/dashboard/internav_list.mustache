@@ -4,41 +4,36 @@
 }}
 
 {{#widget_list}}
-  <li class="{{internav_icon}} {{widgetType}}">
-    {{#if_helpers '\
-      #if' has_count '\
-      and #if' count '\
-      or ^if' has_count '\
-      or #if' force_show '\
-      or #if' instance.constructor.obj_nav_options.show_all_tabs '\
-      or #in_array' internav_display instance.constructor.obj_nav_options.force_show_list}}
+<li class="{{internav_icon}} {{widgetType}}">
+  {{#displayWidgetTab . instance}}
 
-    <a href="{{urlPath}}{{ selector }}" rel="tooltip" data-placement="bottom" title="{{ internav_display }}">
-      <div class="oneline">
-        <i class="fa fa-{{ internav_icon }} color"></i>
-        {{#if show_title}}
-          {{internav_display}}
-          {{#has_count}}({{firstnonempty count 0}}){{/has_count}}
-        {{else}}
-          {{#has_count}}{{firstnonempty count 0}}{{/has_count}}
-        {{/if}}
-        {{^count}}{{#has_count}}
-          {{^instance.constructor.obj_nav_options.show_all_tabs}}
-            {{^in_array internav_display instance.constructor.obj_nav_options.force_show_list}}
-              <span class="closed"><i class="fa fa-times"></i></span>
-            {{/in_array}}
-          {{/instance.constructor.obj_nav_options.show_all_tabs}}
-        {{/has_count}}{{/count}}
-      </div>
-    </a>
-    {{/if_helpers}}
-  </li>
+  <a href="{{urlPath}}{{ selector }}" rel="tooltip" data-placement="bottom" title="{{ internav_display }}">
+    <div class="oneline">
+      <i class="fa fa-{{ internav_icon }} color"></i>
+      {{#if show_title}}
+        {{internav_display}}
+        {{#has_count}}({{firstnonempty count 0}}){{/has_count}}
+      {{else}}
+        {{#has_count}}{{firstnonempty count 0}}{{/has_count}}
+      {{/if}}
+      {{^count}}{{#has_count}}
+        {{^instance.constructor.obj_nav_options.show_all_tabs}}
+          {{^in_array internav_display instance.constructor.obj_nav_options.force_show_list}}
+            <span class="closed"><i class="fa fa-times"></i></span>
+          {{/in_array}}
+        {{/instance.constructor.obj_nav_options.show_all_tabs}}
+      {{/has_count}}{{/count}}
+    </div>
+  </a>
+  {{/displayWidgetTab}}
+</li>
 {{/widget_list}}
 
 
 {{#is_allowed 'update' instance}}
 {{#if widget_list.length}}
 {{^if instance.archived}}
+{{#isMenuVisible}}
 <li data-test-id="button_widget_add_2c925d94" class="hidden-widgets-list">
   <a href="{{urlPath}}#dropdown-widgets" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="{{addTabTitle}}"><i class="fa fa-plus-circle"></i> {{addTabTitle}}</a>
   <div class="dropdown-menu" role="menu">
@@ -116,6 +111,7 @@
     {{/widget_list}}
   </div>
 </li>
+{{/isMenuVisible}}
 {{/if}}
 {{/if}}
 {{/is_allowed}}

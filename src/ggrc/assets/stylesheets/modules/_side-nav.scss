@@ -36,13 +36,15 @@
     height: 34px;
     line-height: 34px;
     font-family: $fontTitle;
-    font-size: 16px;
-    color: darken($status-draft,10%);
+    font-size: 13px;
+    color: $lhnTabsText;
     text-align: center;
     width: 50%;
-    background: $lightGray;
+    background: $lhnTabsBg;
+
     &.active {
-      color: $deepOrange;
+      color: $black;
+      font-weight: 500;
       background: $white;
     }
   }
@@ -135,31 +137,6 @@ h4.search-title {
   }
 }
 
-.lhn-type {
-  @extend %clearfix;
-  @include transition(left, 0.8s);
-  min-width: 240px;
-  left: -246px;
-  &.active {
-    left: 0px;
-  }
-  a {
-    float: left;
-    height: 34px;
-    line-height: 34px;
-    font-family: $fontTitle;
-    font-size: 16px;
-    color: darken($status-draft,10%);
-    text-align: center;
-    width: 50%;
-    background: $lightGray;
-    &.active {
-      color: $deepOrange;
-      background: $white;
-    }
-  }
-}
-
 .lhs-nav {
   padding:10px 0 0 0;
   // Override bootstrap
@@ -185,28 +162,30 @@ h4.search-title {
       }
       a {
         font-size: 13px;
+        font-weight: 500;
         text-transform: uppercase;
-        font-weight: bold;
         display: block;
+        color: $lhnMenuHeader;
+
         .fa-caret-right {
-          @include opacity(0.25);
+          color: $lhnMenuHeader;
           margin: 4px 0 0 7px;
         }
+
         &:hover {
           text-decoration:none;
         }
         &.active {
+          font-weight: 700;
+          color: $black;
+
           .fa-caret-right {
-            @include opacity(1);
+            color: $black;
+
             &:before {
               content: $fa-var-caret-down;
             }
           }
-        }
-      }
-      &.programs {
-        a {
-          color: $programs;
         }
       }
       &.governance {
@@ -217,11 +196,6 @@ h4.search-title {
       &.business {
         a {
           color:$business;
-        }
-      }
-      &.entities {
-        a {
-          color:$entities;
         }
       }
       &.risk {
@@ -237,26 +211,6 @@ h4.search-title {
       &.controls {
         a {
           color: $controls;
-        }
-      }
-      &.workflow {
-        a {
-          color:$programs;
-        }
-        &.Active {
-          a {
-            color: $green;
-          }
-        }
-        &.Draft {
-          a {
-            color: darken(#f60,10%);
-          }
-        }
-        &.Inactive {
-          a {
-            color: #666;
-          }
         }
       }
     }
@@ -319,8 +273,10 @@ h4.search-title {
 
         }
         &:hover {
-          background: $lightGray;
+          color: $lhnLightBlue;
+          background: $lhnLightGray;
           text-decoration: none;
+          font-weight: bold;
         }
         .lhs-people {
           margin-right: 17px;
@@ -334,8 +290,7 @@ h4.search-title {
           text-transform: none;
           padding-left: 32px;
           background:#fff;
-          color:$link;
-          font-weight: bold;
+          color: $lhnLightBlue;
         }
       }
       &.filters {
@@ -395,10 +350,6 @@ h4.search-title {
             }
           }
         }
-        &:hover {
-          background: $white;
-          text-decoration: underline;
-        }
         &.list-toggle {
           [class^="fa fa-"] {
             display: none;
@@ -427,27 +378,18 @@ h4.search-title {
   }
   h2 {
     font-size: 13px;
-    font-weight: bold;
+    font-weight: 400;
     padding-left: 10px;
     text-transform: uppercase;
-    color: $darkText;
+    color: $lhnSectionHeader;
     line-height: 20px;
     margin-bottom: 5px;
     margin-top: 10px;
   }
-  &.recent {
-    ul.top-level {
-      a {
-        font-size:12px;
-        color:#333;
 
-        padding-left: 10px;
-        background: none;
-        &:hover {
-         background:#fff;
-         text-decoration:underline;
-        }
-      }
+  .recent {
+    [class^="fa fa-"] {
+      color: $lhnRecentlyViewed;
     }
   }
 }

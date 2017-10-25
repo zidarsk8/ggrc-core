@@ -1,0 +1,22 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#if isLazyRender}}
+  <lazy-render {trigger}="lazyTrigger">
+    <div class="tab-content">
+      <div class="tab-pane {{cssClasses}}">
+        <content></content>
+      </div>
+    </div>
+  </lazy-render>
+{{else}}
+  {{#if active}}
+    <div class="tab-content">
+      <div class="tab-pane {{cssClasses}}">
+        <content></content>
+      </div>
+    </div>
+  {{/if}}
+{{/if}}

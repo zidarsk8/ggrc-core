@@ -231,7 +231,10 @@
             </div>
         </div>
          </tab-panel>
-          <tab-panel {(panels)}="panels" title-text="Related Assessments">
+          <tab-panel {(panels)}="panels"
+                     {cache-content}="true"
+                     {pre-render-content}="true"
+                     title-text="Related Assessments">
                   {{> '/static/mustache/assessments/related-assessments.mustache' }}
           </tab-panel>
           <tab-panel {(panels)}="panels" title-text="Related Issues">

@@ -2676,4 +2676,28 @@ Example:
       return options.fn(options.contexts);
     }
   );
+  Mustache.registerHelper('displayWidgetTab',
+    function (widget, instance, options) {
+      var displayTab;
+      var inForceShowList;
+      widget = Mustache.resolve(widget);
+      instance = Mustache.resolve(instance);
+
+      inForceShowList = can.inArray(widget.attr('internav_display'),
+        instance.constructor.obj_nav_options.force_show_list) > -1;
+
+      displayTab = widget.attr('has_count') &&
+        widget.attr('count') ||
+        widget.attr('uncountable') ||
+        widget.attr('force_show') ||
+        instance.constructor.obj_nav_options.show_all_tabs ||
+        inForceShowList;
+
+      if (!displayTab) {
+        return options.inverse(options.contexts);
+      }
+
+      return options.fn(options.contexts);
+    }
+  );
 })(jQuery, can);

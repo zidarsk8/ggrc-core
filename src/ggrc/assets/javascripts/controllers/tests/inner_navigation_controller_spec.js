@@ -1,4 +1,4 @@
-/*!
+/*
   Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -6,14 +6,14 @@
 describe('CMS.Controllers.InnerNav', function () {
   'use strict';
 
-  var Ctrl;  // the controller under test
+  var Ctrl; // the controller under test
 
   beforeAll(function () {
     Ctrl = CMS.Controllers.InnerNav;
   });
 
   describe('sortWidgets() method', function () {
-    var ctrlInst;  // fake controller instance
+    var ctrlInst; // fake controller instance
     var sortWidgets;
     var options;
 
@@ -46,7 +46,8 @@ describe('CMS.Controllers.InnerNav', function () {
       expect(widgetOrder).toEqual(['ddd', 'bbb', 'eee', 'aaa', 'ccc']);
     });
 
-    it('places widgets with unknown "order" at the end and sort them in alphabetical order', function () {
+    it('places widgets with unknown "order" at' +
+      'the end and sort them in alphabetical order', function () {
       var widgetOrder;
       var widgets = [
         {internav_display: 'abc'},
@@ -70,7 +71,7 @@ describe('CMS.Controllers.InnerNav', function () {
 
   describe('show_hide_titles() method', function () {
     var DISPLAY_WIDTH = 1920;
-    var ctrlInst;  // fake controller instance
+    var ctrlInst; // fake controller instance
     var showHideTitles;
     var options;
 
@@ -81,7 +82,7 @@ describe('CMS.Controllers.InnerNav', function () {
         {name: 'ccc', show_title: titlesStatus},
         {name: 'ddd', show_title: titlesStatus},
         {name: 'eee', show_title: titlesStatus},
-        {name: 'fff', show_title: titlesStatus}
+        {name: 'fff', show_title: titlesStatus},
       ];
       options.attr('widget_list', widgets);
       return widgets;
@@ -95,20 +96,24 @@ describe('CMS.Controllers.InnerNav', function () {
       options = new can.Map({
         widget_list: new can.Observe.List([]),
         dividedTabsMode: false,
-        priorityTabs: null
+        priorityTabs: null,
       });
 
       ctrlInst = {
         element: {
           children: jasmine.createSpy(),
-          width: jasmine.createSpy().and.returnValue(DISPLAY_WIDTH)
+          width: jasmine.createSpy().and.returnValue(DISPLAY_WIDTH),
         },
-        options: options
+        options: options,
       };
 
       spyOn(_, 'map')
         .and
         .returnValue([]);
+
+      spyOn(GGRC.Utils.CurrentPage, 'getPageType')
+        .and
+        .returnValue('Assessment');
 
       showHideTitles = Ctrl.prototype.show_hide_titles.bind(ctrlInst);
     });
@@ -127,47 +132,14 @@ describe('CMS.Controllers.InnerNav', function () {
       expect(_.every(options.attr('widget_list'), 'show_title')).toBeTruthy();
     });
 
-    it('hides titles if the width isnt enough', function () {
+    it('doesnt hides titles if the width isnt enough', function () {
       createWidgets(true);
 
       setWidgetsWidth(2500);
 
       showHideTitles();
 
-      expect(_.every(options.widget_list, 'show_title', false)).toBeTruthy();
-    });
-
-    it('hides not priority titles if the width isnt enough', function () {
-      var widgetList;
-      createWidgets(true);
-
-      options.attr('dividedTabsMode', true);
-      options.attr('priorityTabs', 3);
-
-      setWidgetsWidth(2500, 1500);
-
-      showHideTitles();
-
-      widgetList = options.attr('widget_list');
-
-      expect(_.every(widgetList.slice(0, 3), 'show_title')).toBeTruthy();
-      expect(_.every(widgetList.slice(3), 'show_title', false)).toBeTruthy();
-    });
-
-    it('hides all titles if the width isnt enough', function () {
-      var widgetList;
-      createWidgets(true);
-
-      options.attr('dividedTabsMode', true);
-      options.attr('priorityTabs', 3);
-
-      setWidgetsWidth(3000, 2000);
-
-      showHideTitles();
-
-      widgetList = options.attr('widget_list');
-
-      expect(_.every(widgetList, 'show_title', false)).toBeTruthy();
+      expect(_.every(options.widget_list, 'show_title')).toBeTruthy();
     });
   });
 });

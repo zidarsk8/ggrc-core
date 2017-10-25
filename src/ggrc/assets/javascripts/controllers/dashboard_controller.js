@@ -496,6 +496,7 @@
         spinner: this.options.spinners['#' + $widget.attr('id')],
         model: widgetOptions && widgetOptions.model,
         order: (widgetOptions || widget).order,
+        uncountable: (widgetOptions || widget).uncountable,
       });
 
       index = this.options.widget_list.length;
@@ -529,6 +530,7 @@
         });
       }
       this.update_add_more_link();
+      this.show_hide_titles();
     },
 
     update_add_more_link: function () {
@@ -563,16 +565,14 @@
       } else {
         $hiddenWidgets.find('a').hide();
       }
-      this.show_hide_titles();
     },
-    '{window} resize': _.debounce(function (el, ev) {
-      this.show_hide_titles();
-    }, 100),
+
     show_hide_titles: function () {
-      var $el = this.element;
-      var originalWidgets = this.options.widget_list;
-      var dividedTabsMode = this.options.attr('dividedTabsMode');
-      var priorityTabs = this.options.attr('priorityTabs');
+      const pageType = GGRC.Utils.CurrentPage.getPageType();
+      const originalWidgets = this.options.widget_list;
+      const priorityTabsNum = this.options.attr('priorityTabs');
+      const priorityTabs = originalWidgets.slice(0, priorityTabsNum);
+      const notPriorityTabs = originalWidgets.slice(priorityTabsNum);
 
       function hideTitles(widgets) {
         widgets.forEach(function (widget) {
@@ -580,34 +580,18 @@
         });
       }
 
-      function adjust(widgets, isPriorityHide) {
-        var widths;
-
-        // see if too wide
-        widths = _.map($el.children(':visible'),
-          function (el) {
-            return $(el).outerWidth();
-          }).reduce(function (sum, current) {
-            return sum + current;
-          }, 0);
-
-        // adjust
-        if (widths > $el.width()) {
-          if (!isPriorityHide && dividedTabsMode && priorityTabs) {
-            hideTitles(widgets.slice(priorityTabs));
-            adjust(widgets.slice(0, priorityTabs), true);
-          } else {
-            hideTitles(widgets);
-          }
-        }
+      function showTitles(widgets) {
+        widgets.forEach(function (widget) {
+          widget.attr('show_title', true);
+        });
       }
 
-      // first expand all
-      originalWidgets.forEach(function (widget) {
-        widget.attr('show_title', true);
-      });
-
-      adjust(originalWidgets);
+      if (pageType === 'Audit') {
+        showTitles(priorityTabs);
+        hideTitles(notPriorityTabs);
+      } else {
+        showTitles(originalWidgets);
+      }
     },
     '.closed click': function (el, ev) {
       var $link = el.closest('a');
@@ -651,7 +635,6 @@
       } else {
         $hiddenArea.hide();
       }
-      this.show_hide_titles();
     },
   });
 })(window.can, window.can.$);
