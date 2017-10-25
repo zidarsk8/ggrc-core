@@ -58,7 +58,7 @@ a {
 .objective-selector {
   .search-icon {
     @include background-size(21px 16px);
-    background-image: image-url("magnifying-glass.png");
+    background-image: url("../images/magnifying-glass.png");
     background-repeat: no-repeat;
     background-position: right center;
     padding-right: 28px;
@@ -172,14 +172,14 @@ a {
   &.pending-ajax {
     box-shadow: none;
     cursor: default;
-    background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 6px;
+    background:$widgetHeaderBgnd url('../images/ajax-loader.gif') no-repeat 5px 6px;
     border: 1px solid $ajaxBtnDisabled;
     text-shadow: none;
     padding-left: 28px;
 
     &:active {
       box-shadow: none;
-      background:$widgetHeaderBgnd image-url('ajax-loader.gif') no-repeat 5px 5px;
+      background:$widgetHeaderBgnd url('../images/ajax-loader.gif') no-repeat 5px 5px;
       border: 1px solid $ajaxBtnDisabled;
     }
   }
@@ -279,7 +279,7 @@ select.input-block-level {
     background-color:#fff;
     border-top:1px solid #aaa;
     border-bottom:1px solid #aaa;
-    background-image: image-url("bgnds/drag-h.png");
+    background-image: url("../images/bgnds/drag-h.png");
     background-repeat:no-repeat;
     background-position:50% 1px;
     &:hover {
@@ -346,7 +346,7 @@ select.input-block-level {
 
 // AJAX loading gif
 input.disabled.pending-ajax{
-  background: $lightGray image-url("ajax-loader.gif") no-repeat right center;
+  background: $lightGray url("../images/ajax-loader.gif") no-repeat right center;
 }
 
 // Left dropdown positioning

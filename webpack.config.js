@@ -40,6 +40,7 @@ module.exports = function (env) {
     module: {
       rules: [{
         test: /.(ttf|otf|eot|svg|woff(2)?)(\?[a-z0-9]+)?$/,
+        include: /node_modules/,
         use: [{
           loader: 'file-loader',
           options: {
@@ -52,9 +53,40 @@ module.exports = function (env) {
           fallback: 'style-loader',
           use: {
             loader: 'css-loader',
-            options: {url: false},
           },
         }),
+      }, {
+        test: /\.(png|jpe?g|gif)$/,
+        exclude: /node_modules/,
+        include: [
+          path.resolve(__dirname, 'src', 'ggrc', 'assets', 'images'),
+          path.resolve(__dirname, 'third_party'),
+        ],
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 10000
+          }
+        }],
+      }, {
+        test: /\.svg$/,
+        include: [
+          path.resolve(__dirname, 'src', 'ggrc', 'assets', 'images'),
+        ],
+        use: [{
+          loader: 'file-loader',
+          options: {
+            name: 'images/[name].[ext]?[hash:8]'
+          }
+        }],
+      }, {
+        test: /\.ico$/,
+        use: [{
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]'
+          }
+        }],
       }, {
         test: /\.scss$/,
         use: extractSass.extract({
@@ -138,7 +170,7 @@ module.exports = function (env) {
     }));
 
     config.plugins.push(new CleanWebpackPlugin(['./src/ggrc/static/'], {
-      exclude: ['images', 'favicon.ico', 'dashboard-templates*'],
+      exclude: ['dashboard-templates*'],
     }));
   }
 

@@ -4,6 +4,8 @@
  */
 
 import '../tasks-counter/tasks-counter';
+import logo from '../../../images/ggrc-logo.svg';
+import oneColorLogo from '../../../images/ggrc-one-color.svg';
 
 (function (GGRC, can) {
   'use strict';
@@ -66,7 +68,13 @@ import '../tasks-counter/tasks-counter';
         get: function () {
           return colorsMap[this.attr('instance.type')] || '';
         }
-      }
+      },
+      logo: {
+        type: 'string',
+        get: function () {
+          return this.attr('headerStyle') ? oneColorLogo : logo;
+        },
+      },
     },
     showHideTitles: function (element) {
       var elWidth = element.width();
