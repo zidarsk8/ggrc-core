@@ -26,9 +26,8 @@
 
       <div class="ggrc-form-item">
         <div class="ggrc-form-item__multiple-row">
-          <label class="form-label required-label">
+          <label class="form-label ggrc-form-item__label">
             Assessment Type
-            <i class="fa fa-asterisk"></i>
           </label>
           <assessment-object-type-dropdown
             {instance}="instance"
@@ -154,11 +153,6 @@
                   </div>
                 {{/each}}
               {{/prune_context}}
-              {{^list.length}}
-                <span>
-                  <em>No mapped objects</em>
-                </span>
-              {{/list.length}}
             </div>
             <div class="objective-selector">
                <map-button-using-assessment-type
@@ -215,7 +209,7 @@
               {is-disabled}="isLoading"
               (createReferenceUrl)="markDocumentForAddition(%event.payload)"
               (removeReferenceUrl)="markDocumentForDeletion(%event.payload)">
-              <label>
+              <label class="ggrc-form-item__label">
                 Reference URL
                 <spinner {toggle}="isDisabled"></spinner>
               </label>
