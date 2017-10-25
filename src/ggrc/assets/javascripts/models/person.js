@@ -199,6 +199,11 @@
       return this.name ?
       this.name + '<span class="url-link">' + this.email + '</span>' :
         this.email;
+    },
+    getTasksCount: function () {
+      let url = `/api/people/${this.attr('id')}/task_count`;
+      return $.get(url)
+        .fail(() => console.warn(`Request on '${url}' failed!`));
     }
   });
 })(window, can);

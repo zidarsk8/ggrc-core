@@ -5,14 +5,10 @@
 
 {{#switch attr_name}}
   {{#case 'audit_lead'}}
-      <tree-people-list-field {source}="instance.contact">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.contact"/>
   {{/case}}
   {{#case 'modified_by'}}
-      <tree-people-list-field {source}="instance.modified_by">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.modified_by"/>
   {{/case}}
   {{#case 'report_period'}}
     {{#if instance.report_start_date}}

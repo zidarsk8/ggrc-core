@@ -5,14 +5,10 @@
 
 {{#switch attr_name}}
   {{#case 'contact'}}
-      <tree-people-list-field {source}="instance.contact">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.contact"/>
   {{/case}}
   {{#case 'secondary_contact'}}
-      <tree-people-list-field {source}="instance.secondary_contact">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.secondary_contact"/>
   {{/case}}
   {{#case 'network_zone'}}
     {{#using network_zone=instance.network_zone}}
@@ -38,24 +34,16 @@
   {{/case}}
 
   {{#case 'creators'}}
-      <tree-people-list-field {source}="instance.assignees" filter="Creator">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.assignees" filter="Creator" stub="false"/>
   {{/case}}
   {{#case 'assignees'}}
-      <tree-people-list-field {source}="instance.assignees" filter="Assessor">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.assignees" filter="Assessor" stub="false"/>
   {{/case}}
   {{#case 'verifiers'}}
-      <tree-people-list-field {source}="instance.assignees" filter="Verifier">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.assignees" filter="Verifier" stub="false"/>
   {{/case}}
   {{#case 'modified_by'}}
-      <tree-people-list-field {source}="instance.modified_by">
-          {{peopleStr}}
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.modified_by"/>
   {{/case}}
   {{#case 'created_at'}}
       {{localize_date instance.created_at}}

@@ -15,6 +15,7 @@ def contributed_services():
   from ggrc.services.relationship_resource import RelationshipResource
   from ggrc.services.audit_resource import AuditResource
   from ggrc.services.assessment_resource import AssessmentResource
+  from ggrc.services.person_resource import PersonResource
   from ggrc.access_control.role import AccessControlRole
 
   return [
@@ -51,7 +52,7 @@ def contributed_services():
       service('options', models.Option),
       service('org_groups', models.OrgGroup),
       service('vendors', models.Vendor),
-      service('people', models.Person),
+      service('people', models.Person, PersonResource),
       service('products', models.Product),
       service('projects', models.Project),
       service('programs', models.Program),
