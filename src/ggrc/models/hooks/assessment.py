@@ -124,7 +124,6 @@ def init_hook():
     """
     del sender, service  # Unused
 
-    logger.info('---> handle_assessment_post: %s', sources)
     db.session.flush()
     audit_ids = []
     template_ids = []
@@ -189,14 +188,8 @@ def init_hook():
         assessment.assessment_type = template.template_object_type
 
     for assessment, src in itertools.izip(objects, sources):
-      logger.info(
-          '--> issue_tracker_templates: %s',
-          issue_tracker_templates.get(assessment.id))
       info = src.get('issue_tracker') or issue_tracker_templates.get(
           assessment.id)
-      logger.info(
-          '--> info: %s',
-          info)
       _create_issuetracker_info(assessment, info)
 
   @signals.Restful.model_put.connect_via(all_models.Assessment)
@@ -222,7 +215,7 @@ def init_hook():
       try:
         _update_issuetracker_issue(obj, issue_tracker_info, initial_state, src)
       except (HttpError, BadResponseError) as e:
-        logging.error('Unable update Issue Tracker issue: %s', e)
+        logger.error('Unable update Issue Tracker issue: %s', e)
         # Dirty hack to rollback change to issuetracker_issues model.
         # Reverted info doesn't get sent to frontend so page refresh is required
         # but the hack at least allows to keep data in sync.
@@ -305,11 +298,15 @@ def init_hook():
   def handle_assessment_tmpl_post(sender, objects=None, sources=None):
     del sender  # Unused
     for obj, src in itertools.izip(objects, sources):
-      issue_tracker_info = src.get('issue_tracker')
+      if _is_enabled_in_audit(obj.audit):
+        issue_tracker_info = {
+            'enabled': False,
+        }
+      else:
+        issue_tracker_info = src.get('issue_tracker')
+
       if not issue_tracker_info:
         continue
-      if bool(issue_tracker_info.get('enabled')):
-        _check_audit_constraint(obj.audit)
       all_models.IssuetrackerIssue.create_or_update_from_dict(
           _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
 
@@ -317,10 +314,13 @@ def init_hook():
   def handle_assessment_tmpl_put(
       sender, obj=None, src=None, service=None, initial_state=None):
     del sender, service  # Unused
-    issue_tracker_info = src.get('issue_tracker')
+    if _is_enabled_in_audit(obj.audit):
+      issue_tracker_info = {
+          'enabled': False,
+      }
+    else:
+      issue_tracker_info = src.get('issue_tracker')
     if issue_tracker_info:
-      if bool(issue_tracker_info.get('enabled')):
-        _check_audit_constraint(obj.audit)
       all_models.IssuetrackerIssue.create_or_update_from_dict(
           _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
 
@@ -335,11 +335,10 @@ def init_hook():
       db.session.delete(issue_obj)
 
 
-def _check_audit_constraint(audit):
+def _is_enabled_in_audit(audit):
   audit_issue_tracker_info = audit.issue_tracker or {}
 
-  if not bool(audit_issue_tracker_info.get('enabled')):
-    raise exceptions.BadRequest('Issue Tracker feature is disable for audit.')
+  return bool(audit_issue_tracker_info.get('enabled'))
 
 
 def _collect_issue_emails(assessment):
@@ -405,7 +404,7 @@ def _send_http_request(url, method=urlfetch.GET, payload=None, headers=None):
       raise HttpError(response.content, status=response.status_code)
     return response.content
   except urlfetch_errors.Error as e:
-    logger.exception('Unable to perform urlfetch request: %s', e)
+    logger.error('Unable to perform urlfetch request: %s', e)
     raise HttpError('Unable to perform a request')
 
 
@@ -428,7 +427,7 @@ def _send_request(url, method=urlfetch.GET, payload=None, headers=None):
   try:
     return json.loads(data)
   except (TypeError, ValueError) as e:
-    logging.error('Unable to parse JSON from response: %s', e)
+    logger.error('Unable to parse JSON from response: %s', e)
     raise BadResponseError('Unable to parse JSON from response.')
 
 
@@ -453,9 +452,10 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
   ]
   test_plan = assessment.test_plan
   if test_plan:
-    comment.append(
+    comment.extend([
         'Following is the assessment Requirements/Test Plan from GGRC:',
-        html2text.HTML2Text().handle(test_plan).strip('\n'))
+        html2text.HTML2Text().handle(test_plan).strip('\n'),
+    ])
 
   issue_params = {
       'component_id': issue_tracker_info['component_id'],
@@ -477,18 +477,16 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
 
 
 def _create_issuetracker_info(assessment, issue_tracker_info):
-  logger.info('--> _create_issuetracker_info: %s', issue_tracker_info)
-
   if not issue_tracker_info.get('title'):
     issue_tracker_info['title'] = assessment.title
 
-  if issue_tracker_info.get('enabled'):
-    _check_audit_constraint(assessment.audit)
+  if (issue_tracker_info.get('enabled') and
+      _is_enabled_in_audit(assessment.audit)):
 
     try:
       issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
     except (HttpError, BadResponseError) as e:
-      logging.error('Unable create Issue Tracker issue: %s', e)
+      logger.error('Unable create Issue Tracker issue: %s', e)
       raise exceptions.InternalServerError('Unable create Issue Tracker issue.')
 
     issue_tracker_info['issue_id'] = issue_id
@@ -504,17 +502,9 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
 
 def _update_issuetracker_issue(
     assessment, issue_tracker_info, initial_assessment, request):
-  logger.info(
-      '------> _update_issuetracker_issue: %s -> %s',
-      initial_assessment.status if initial_assessment else 'NONE',
-      assessment.status)
-
   issue_params = {}
   # Handle updates to basic issue tracker properties.
   initial_info = request['__stash'].get('issue_tracker') or {}
-  logger.info(
-      '------> issue_tracker_info initial_assessment: %s',
-      initial_info)
   for name, api_name in _ISSUE_TRACKER_UPDATE_FIELDS:
     value = issue_tracker_info.get(name)
     if value != initial_info.get(name):
@@ -565,22 +555,17 @@ def _update_issuetracker_issue(
     issue_params['ccs'] = cc_list
 
   if issue_params:
-    # TODO(anushovan): update issue here.
-    logger.info('------> UPDATE ISSUE: %s', issue_params)
     _send_request(
         '/api/issues/%s' % issue_tracker_info['issue_id'],
         method=urlfetch.PUT, payload=issue_params)
-  else:
-    logger.info('------> DON\'T UPDATE ISSUE: %s', issue_params)
 
 
 def _update_issuetracker_info(assessment, issue_tracker_info):
-  if not bool(issue_tracker_info.get('enabled')):
+  if not (bool(issue_tracker_info.get('enabled')) and
+          _is_enabled_in_audit(assessment.audit)):
     issue_tracker_info = {
         'enabled': False,
     }
-  else:
-    _check_audit_constraint(assessment.audit)
 
   all_models.IssuetrackerIssue.create_or_update_from_dict(
       _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
