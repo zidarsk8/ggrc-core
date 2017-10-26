@@ -74,6 +74,10 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   __tablename__ = 'assessments'
   _title_uniqueness = False
 
+  REWORK_NEEDED = u"Rework Needed"
+  NOT_DONE_STATES = statusable.Statusable.NOT_DONE_STATES | {REWORK_NEEDED, }
+  VALID_STATES = tuple(NOT_DONE_STATES | statusable.Statusable.DONE_STATES)
+
   ASSIGNEE_TYPES = (u"Creator", u"Assessor", u"Verifier")
 
   REMINDERABLE_HANDLERS = {
@@ -213,6 +217,11 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       # Currently we decided to have 'Due Date' alias for start_date,
       # but it can be changed in future
       "start_date": "Due Date",
+      "status": {
+          "display_name": "State",
+          "mandatory": False,
+          "description": "Options are:\n{}".format('\n'.join(VALID_STATES))
+      },
   }
 
   AUTO_REINDEX_RULES = [
@@ -248,6 +257,20 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
 
   def validate_conclusion(self, value):
     return value if value in self.VALID_CONCLUSIONS else ""
+
+  @validates("status")
+  def validate_status(self, key, value):
+    value = super(Assessment, self).validate_status(key, value)
+    # pylint: disable=unused-argument
+    if self.status == value:
+      return value
+    if self.status == self.REWORK_NEEDED:
+      valid_states = [self.DONE_STATE, self.FINAL_STATE]
+      if value not in valid_states:
+        raise ValueError("Assessment in `Rework Needed` "
+                         "state can be only moved to: [{}]".format(
+                             ",".join(valid_states)))
+    return value
 
   @validates("operationally")
   def validate_opperationally(self, key, value):
