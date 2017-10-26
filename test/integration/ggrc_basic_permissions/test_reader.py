@@ -33,13 +33,11 @@ class TestReader(TestCase):
       self.users[name] = user
 
   def test_admin_page_access(self):
-    return
     for role, code in (("reader", 403), ("admin", 200)):
       self.api.set_user(self.users[role])
       self.assertEqual(self.api.client.get("/admin").status_code, code)
 
   def test_reader_can_crud(self):
-    return
     """ Test Basic create/read,update/delete operations """
     self.api.set_user(self.users["reader"])
     all_errors = []
@@ -95,7 +93,6 @@ class TestReader(TestCase):
     self.assertEqual(all_errors, [])
 
   def test_reader_search(self):
-    return
     """ Test if reader can see the correct object while using search api """
     self.api.set_user(self.users['admin'])
     self.api.post(all_models.Regulation, {
