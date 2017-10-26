@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """
-add_issutracker_issue
+Create issutracker_issues table
 
 Create Date: 2017-10-20 21:23:14.623483
 """

@@ -196,6 +196,7 @@ def init_hook():
   @signals.Restful.model_put.connect_via(all_models.Assessment)
   def handle_assessment_put(
       sender, obj=None, src=None, service=None, initial_state=None):
+    """Handles assessment update event."""
     del sender, service  # Unused
 
     common.ensure_field_not_changed(obj, 'audit')
@@ -209,6 +210,7 @@ def init_hook():
   @signals.Restful.model_put_after_commit.connect_via(all_models.Assessment)
   def handle_assessment_put_after_commit(
       sender, obj=None, src=None, service=None, event=None, initial_state=None):
+    """Handles assessment post update event."""
     del sender, service, event  # Unused
 
     issue_tracker_info = obj.issue_tracker
@@ -226,6 +228,7 @@ def init_hook():
 
   @signals.Restful.model_deleted.connect_via(all_models.Assessment)
   def handle_assessment_deleted(sender, obj=None, service=None):
+    """Handles assessment delete event."""
     del sender, service  # Unused
 
     issue_obj = all_models.IssuetrackerIssue.get_issue(
@@ -252,6 +255,7 @@ def init_hook():
 
   @signals.Restful.collection_posted.connect_via(all_models.Relationship)
   def handle_relation_post(sender, objects=None, sources=None, service=None):
+    """Handles create event to Relationships model."""
     del sender, sources, service  # Unused
 
     if not _is_issue_tracker_enabled():
@@ -304,6 +308,7 @@ def init_hook():
 
   @signals.Restful.collection_posted.connect_via(all_models.AssessmentTemplate)
   def handle_assessment_tmpl_post(sender, objects=None, sources=None):
+    """Handles create event to AssessmentTemplate model."""
     del sender  # Unused
 
     db.session.flush()
@@ -351,6 +356,7 @@ def init_hook():
   @signals.Restful.model_put.connect_via(all_models.AssessmentTemplate)
   def handle_assessment_tmpl_put(
       sender, obj=None, src=None, service=None, initial_state=None):
+    """Handles update event to AssessmentTemplate model."""
     del sender, service  # Unused
 
     if not _is_issue_tracker_enabled(audit=obj.audit):
@@ -367,6 +373,7 @@ def init_hook():
       all_models.AssessmentTemplate)
   def handle_assessment_tmpl_deleted_after_commit(
       sender, obj=None, service=None, event=None):
+    """Handles delete event to AssessmentTemplate model."""
     del sender, service, event  # Unused
 
     issue_obj = all_models.IssuetrackerIssue.get_issue(
@@ -376,6 +383,15 @@ def init_hook():
 
 
 def _is_issue_tracker_enabled(audit=None):
+  """Returns a boolean whether issue tracker integration feature is enabled.
+
+  Args:
+    audit: An optional instance of Audit model. If given function check if
+        issue tracker integration is enabled for given audit as well.
+
+  Returns:
+    A boolean, True if feature is enabled or False otherwise.
+  """
   if not bool(_ENDPOINT):
     return False
 
@@ -389,6 +405,14 @@ def _is_issue_tracker_enabled(audit=None):
 
 
 def _collect_issue_emails(assessment):
+  """Returns email related to given assessment.
+
+  Args:
+    assessment: An instance of Assessment model.
+
+  Returns:
+    A tuple of (assignee_email, [list of other email related to assessment])
+  """
   assignee_email = None
   cc_list = set()
 
@@ -430,6 +454,7 @@ def _collect_issue_emails(assessment):
 # TODO(anushovan): migrate to Client object once
 #   https://github.com/google/ggrc-core/pull/6584 is submitted.
 def _send_http_request(url, method=urlfetch.GET, payload=None, headers=None):
+  """Sends HTTP request with given parameters."""
   if _DEFAULT_HEADERS:
     headers.update(_DEFAULT_HEADERS)
 
@@ -458,10 +483,7 @@ def _send_http_request(url, method=urlfetch.GET, payload=None, headers=None):
 # TODO(anushovan): migrate to Client object once
 #   https://github.com/google/ggrc-core/pull/6584 is submitted.
 def _send_request(url, method=urlfetch.GET, payload=None, headers=None):
-  # TODO(anushovan): remove two following lines once development is done.
-  # logger.info('---> _send_request: %s, %s, %s', method, url, payload)
-  # return None if method != urlfetch.POST else {'issueId': int(time.time())}
-
+  """Prepares and sends request."""
   headers = headers or {}
   headers['Content-Type'] = 'application/json'
 
@@ -479,10 +501,12 @@ def _send_request(url, method=urlfetch.GET, payload=None, headers=None):
 
 
 def _get_assessment_url(assessment):
+  """Returns string URL for assessment view page."""
   return urlparse.urljoin(utils.get_url_root(), utils.view_url_for(assessment))
 
 
 def _create_issuetracker_issue(assessment, issue_tracker_info):
+  """Collects information and sends a request to create external issue."""
   reported_email = None
   reporter_id = get_current_user_id()
   if reporter_id:
@@ -541,6 +565,7 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
 
 
 def _create_issuetracker_info(assessment, issue_tracker_info):
+  """Creates an entry for IssueTracker model."""
   if not issue_tracker_info.get('title'):
     issue_tracker_info['title'] = assessment.title
 
@@ -566,6 +591,7 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
 
 def _update_issuetracker_issue(
     assessment, issue_tracker_info, initial_assessment, request):
+  """Collects information and sends a request to update external issue."""
   issue_params = {}
   # Handle updates to basic issue tracker properties.
   initial_info = request['__stash'].get('issue_tracker') or {}
@@ -625,6 +651,7 @@ def _update_issuetracker_issue(
 
 
 def _update_issuetracker_info(assessment, issue_tracker_info):
+  """Updates an entry for IssueTracker model."""
   if not (bool(issue_tracker_info.get('enabled')) and
           _is_issue_tracker_enabled(audit=assessment.audit)):
     issue_tracker_info = {
@@ -636,6 +663,7 @@ def _update_issuetracker_info(assessment, issue_tracker_info):
 
 
 def _get_added_comment_text(src):
+  """Returns comment text from given request."""
   comment_id = _get_added_comment_id(src)
   if comment_id is not None:
     comment_obj = all_models.Comment.query.filter(
@@ -646,6 +674,7 @@ def _get_added_comment_text(src):
 
 
 def _get_added_comment_id(src):
+  """Returns comment ID from given request."""
   if not src:
     return None
 

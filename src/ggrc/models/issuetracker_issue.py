@@ -1,10 +1,12 @@
+# Copyright (C) 2017 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+"""Module for IssueTracker object."""
 
 import logging
 
 from ggrc import db
 from ggrc.models.mixins import Base
-
-logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
 class IssuetrackerIssue(Base, db.Model):
@@ -34,12 +36,22 @@ class IssuetrackerIssue(Base, db.Model):
 
   @classmethod
   def get_issue(cls, object_type, object_id):
+    """Returns an issue object by given type and ID or None.
+
+    Args:
+      object_type: A string representing a model.
+      object_id: An integer identifier of model's instance.
+
+    Returns:
+      An instance of IssuetrackerIssue or None.
+    """
     return cls.query.filter(
         cls.object_type == object_type,
         cls.object_id == object_id).first()
 
   @classmethod
   def _validate_info(cls, info):
+    """Validates issue info to have all required properties."""
     missing_attrs = [
         attr
         for attr in cls._MANDATORY_ATTRS
@@ -50,7 +62,16 @@ class IssuetrackerIssue(Base, db.Model):
           'Issue tracker info is missing mandatory attributes: %s' % (
               ', '.join(missing_attrs)))
 
-  def to_dict(self, include_issue=False, include_private=None):
+  def to_dict(self, include_issue=False, include_private=False):
+    """Returns representation of object as a dict.
+
+    Args:
+      include_issue: A boolean whether to include issue related properties.
+      include_private: A boolean whether to include private properties.
+
+    Returns:
+      A dict representing an instance of IssuetrackerIssue.
+    """
     res = {
         'enabled': self.enabled,
         'component_id': self.component_id,
@@ -75,6 +96,16 @@ class IssuetrackerIssue(Base, db.Model):
 
   @classmethod
   def create_or_update_from_dict(cls, object_type, object_id, info):
+    """Creates or updates issue with given parameters.
+
+    Args:
+      object_type: A string representing a model.
+      object_id: An integer identifier of model's instance.
+      info: A dict with issue properties.
+
+    Returns:
+      An instance of IssuetrackerIssue.
+    """
     if not info:
       raise ValueError('Issue tracker info cannot be empty.')
 
@@ -82,10 +113,8 @@ class IssuetrackerIssue(Base, db.Model):
 
     info = dict(info, object_type=object_type, object_id=object_id)
     if issue_obj is not None:
-      logger.info('------> [CREATE/UPDATE] update issue object')
       issue_obj.update_from_dict(info)
     else:
-      logger.info('------> [CREATE/UPDATE] create issue object')
       issue_obj = cls.create_from_dict(info)
       db.session.add(issue_obj)
 
@@ -93,7 +122,14 @@ class IssuetrackerIssue(Base, db.Model):
 
   @classmethod
   def create_from_dict(cls, info):
-    logger.info('---> IssuetrackerIssue.create_from_dict: %s', info)
+    """Creates issue with given parameters.
+
+    Args:
+      info: A dict with issue properties.
+
+    Returns:
+      An instance of IssuetrackerIssue.
+    """
     cls._validate_info(info)
 
     cc_list = info.get('cc_list')
@@ -120,8 +156,14 @@ class IssuetrackerIssue(Base, db.Model):
     )
 
   def update_from_dict(self, info):
-    logger.info('---> IssuetrackerIssue.update_from_dict: %s', info)
+    """Updates issue with given parameters.
 
+    Args:
+      info: A dict with issue properties.
+
+    Returns:
+      An instance of IssuetrackerIssue.
+    """
     cc_list = info.pop('cc_list', None)
 
     info = dict(
