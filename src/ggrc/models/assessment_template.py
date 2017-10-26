@@ -248,13 +248,3 @@ def handle_assessment_template(sender, obj=None, src=None, service=None):
   """
   if "audit" in src:
     create_audit_relationship(src["audit"], obj)
-
-
-@signals.Restful.model_deleted_after_commit.connect_via(AssessmentTemplate)
-def handle_assessment_template_deleted_after_commit(
-    sender, obj=None, service=None, event=None):
-  del sender, service, event # Unused
-  issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
-      'AssessmentTemplate', obj.id)
-  if issue_obj:
-    db.session.delete(issue_obj)

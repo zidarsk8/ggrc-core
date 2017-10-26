@@ -306,8 +306,37 @@ def init_hook():
   def handle_assessment_tmpl_post(sender, objects=None, sources=None):
     del sender  # Unused
 
+    db.session.flush()
+    template_ids = {
+        obj.id for obj in objects
+    }
+
+    if not template_ids:
+      return
+
+    # TODO(anushovan): use joined query to fetch audits or even
+    #   issuetracker_issues with one query.
+    audit_map = {
+        r.destination_id: r.source_id
+        for r in all_models.Relationship.query.filter(
+            all_models.Relationship.source_type == 'Audit',
+            all_models.Relationship.destination_type == 'AssessmentTemplate',
+            all_models.Relationship.destination_id.in_(template_ids)).all()
+    }
+
+    if not audit_map:
+      return
+
+    audits = {
+        a.id: a
+        for a in all_models.Audit.query.filter(
+          all_models.Audit.id.in_(audit_map.values())).all()
+    }
+
     for obj, src in itertools.izip(objects, sources):
-      if _is_issue_tracker_enabled(audit=obj.audit):
+      audit_id = audit_map.get(obj.id)
+      if (not audit_id or audit_id not in audits or
+          not _is_issue_tracker_enabled(audit=audits[audit_id])):
         issue_tracker_info = {
             'enabled': False,
         }
@@ -324,7 +353,7 @@ def init_hook():
       sender, obj=None, src=None, service=None, initial_state=None):
     del sender, service  # Unused
 
-    if _is_issue_tracker_enabled(audit=obj.audit):
+    if not _is_issue_tracker_enabled(audit=obj.audit):
       issue_tracker_info = {
           'enabled': False,
       }
