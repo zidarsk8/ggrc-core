@@ -9,6 +9,7 @@ custom-attributes {
 }
 
 .fields-wrapper > show-more {
+  max-width: 100%;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -143,7 +144,7 @@ custom-attributes {
   }
 
   &__title-text {
-    display: inline-flex;
+    max-width: 100%;
     margin: 0;
     font-weight: normal;
     font-size: 11px;
