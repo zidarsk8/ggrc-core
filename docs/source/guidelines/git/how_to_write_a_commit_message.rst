@@ -196,8 +196,12 @@ Pull Request Titles
 -------------------
 
 For pull request titles we should use the same rules as for the subject
-line of a commit, but we need to prefix the issue id (or QUICK-FIX or
-DOCS if there is no issue id).
+line of a commit, but we need to prefix the title with one of:
+
+ - ISSUE ID when we have one or more issues 
+ - QUICK-FIX when there is no jira ticket for the codechange
+ - DOCS when for PRs that update only documentation and there is no jira ticket 
+ - BACKMERGE for merging release or master branches back into dev
 
 A pull request title must also reflect on what changes have been done.
 If the pull request title states that it contains test modifications, it
@@ -208,5 +212,8 @@ tests are implied with the code changes.
 Examples::
 
     CORE-9999 Fix performance issues on bulk operations
+    CORE-1111/1112/9900 Fix rbac issues for creators
     QUICK-FIX Break test cases into smaller parts
     DOCS Add section that explains client side mappings
+    BACKMERGE master into Release/xyz
+    BACKMERGE Relesase/xyz into dev
