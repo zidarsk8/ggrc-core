@@ -12,7 +12,7 @@
   =super()
   GGRC.page_object = { "person": ={ full_user_json()|safe } };
 
-  GGRC.pageType = "MY_WORK";
+  GGRC.pageType = '{{page_type}}';
 
   -# Since it is expensive (issues a DB query), only invoke user_task_count()
   -# once and use the resulting list. An auxiliary property is used to store

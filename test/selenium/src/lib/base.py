@@ -824,7 +824,7 @@ class CommentsPanel(Element):
       self.input_txt.enter_text(comment)
       self.add_btn.click()
       selenium_utils.get_when_invisible(
-          self._driver, self._locators.CB_SPINNER_CSS)
+          self._driver, constants.locator.Common.SPINNER_CSS)
     return self
 
 
