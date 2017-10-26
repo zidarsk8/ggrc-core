@@ -202,6 +202,7 @@ line of a commit, but we need to prefix the title with one of:
  - QUICK-FIX when there is no jira ticket for the codechange
  - DOCS when for PRs that update only documentation and there is no jira ticket 
  - BACKMERGE for merging release or master branches back into dev
+ - MERGE for dev branch to release and release to master
 
 A pull request title must also reflect on what changes have been done.
 If the pull request title states that it contains test modifications, it
@@ -216,4 +217,6 @@ Examples::
     QUICK-FIX Break test cases into smaller parts
     DOCS Add section that explains client side mappings
     BACKMERGE master into Release/xyz
-    BACKMERGE Relesase/xyz into dev
+    BACKMERGE Release/xyz into dev
+    MERGE dev into Release/xyz
+    MERGE Release/xyz into master
