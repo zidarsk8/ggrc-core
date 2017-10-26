@@ -61,7 +61,17 @@
      */
     createGroup: function () {
       this.dispatch('createGroup');
-    }
+    },
+    /**
+     * Sets attribute value from $element value
+     * Used to update value on pressing enter as $value binding works
+     * on focusout event
+     *
+     * @param {jQuery} $element the DOM element that triggered event
+     */
+    setValue: function ($element) {
+      this.attr('attribute.value', $element.val());
+    },
   });
 
   /**

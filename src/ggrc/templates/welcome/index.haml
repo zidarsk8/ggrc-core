@@ -30,3 +30,6 @@
           -if about_url
             %a.about-link{:href => "{{about_url}}", :target => "_blank"}
               {{about_text}}
+
+-block page_scripts
+  %script{ type:'text/javascript', src:'{{config.get("LOGIN_JS_PATH")}}' }

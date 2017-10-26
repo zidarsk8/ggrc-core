@@ -5,14 +5,11 @@
 
 """Test request import and updates."""
 
-import csv
 import datetime
+from collections import OrderedDict
+
 import ddt
 import freezegun
-
-from cStringIO import StringIO
-from collections import OrderedDict
-from itertools import izip
 
 from ggrc import db
 from ggrc import models
@@ -216,10 +213,11 @@ class TestAssessmentImport(TestCase):
 
   def test_mapping_control_through_snapshot(self):
     "Test for add mapping control on assessment"
-    audit = factories.AuditFactory()
-    assessment = factories.AssessmentFactory(audit=audit)
-    factories.RelationshipFactory(source=audit, destination=assessment)
-    control = factories.ControlFactory()
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      factories.RelationshipFactory(source=audit, destination=assessment)
+      control = factories.ControlFactory()
     revision = models.Revision.query.filter(
         models.Revision.resource_id == control.id,
         models.Revision.resource_type == control.__class__.__name__
@@ -292,9 +290,10 @@ class TestAssessmentImport(TestCase):
   def test_import_archived_assessment(self, is_archived, value, ignored,
                                       updated, row_errors):
     """Test archived assessment import procedure"""
-    audit = factories.AuditFactory(archived=is_archived)
-    assessment = factories.AssessmentFactory(audit=audit)
-    factories.RelationshipFactory(source=audit, destination=assessment)
+    with factories.single_commit():
+      audit = factories.AuditFactory(archived=is_archived)
+      assessment = factories.AssessmentFactory(audit=audit)
+      factories.RelationshipFactory(source=audit, destination=assessment)
     resp = self.import_data(OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", assessment.slug),
@@ -317,8 +316,9 @@ class TestAssessmentImport(TestCase):
 
   def test_create_new_assessment_with_mapped_control(self):
     "Test for creation assessment with mapped controls"
-    audit = factories.AuditFactory()
-    control = factories.ControlFactory()
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      control = factories.ControlFactory()
     revision = models.Revision.query.filter(
         models.Revision.resource_id == control.id,
         models.Revision.resource_type == control.__class__.__name__
@@ -355,11 +355,12 @@ class TestAssessmentImport(TestCase):
 
   def test_create_import_assignee(self):
     "Test for creation assessment with mapped assignees"
-    audit = factories.AuditFactory()
     name = "test_name"
     email = "test@email.com"
-    assignee_id = factories.PersonFactory(name=name, email=email).id
     slug = "TestAssessment"
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assignee_id = factories.PersonFactory(name=name, email=email).id
     self.import_data(OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", slug),
@@ -375,11 +376,12 @@ class TestAssessmentImport(TestCase):
 
   def test_create_import_creators(self):
     "Test for creation assessment with mapped creator"
-    audit = factories.AuditFactory()
     name = "test_name"
     email = "test@email.com"
-    creator_id = factories.PersonFactory(name=name, email=email).id
     slug = "TestAssessment"
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      creator_id = factories.PersonFactory(name=name, email=email).id
     self.import_data(OrderedDict([
         ("object_type", "Assessment"),
         ("Code*", slug),
@@ -396,10 +398,11 @@ class TestAssessmentImport(TestCase):
   def test_update_import_creators(self):
     "Test for creation assessment with mapped creator"
     slug = "TestAssessment"
-    assessment = factories.AssessmentFactory(slug=slug)
     name = "test_name"
     email = "test@email.com"
-    creator_id = factories.PersonFactory(name=name, email=email).id
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory(slug=slug)
+      creator_id = factories.PersonFactory(name=name, email=email).id
     self.assertNotEqual([creator_id], [i.id for i in assessment.creators])
     self.import_data(OrderedDict([
         ("object_type", "Assessment"),
@@ -414,10 +417,11 @@ class TestAssessmentImport(TestCase):
   def test_update_import_assignee(self):
     "Test for creation assessment with mapped creator"
     slug = "TestAssessment"
-    assessment = factories.AssessmentFactory(slug=slug)
     name = "test_name"
     email = "test@email.com"
-    assignee_id = factories.PersonFactory(name=name, email=email).id
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory(slug=slug)
+      assignee_id = factories.PersonFactory(name=name, email=email).id
     self.assertNotEqual([assignee_id], [i.id for i in assessment.assessors])
     self.import_data(OrderedDict([
         ("object_type", "Assessment"),
@@ -519,13 +523,7 @@ class TestAssessmentExport(TestCase):
             },
         },
     }]
-    response = self.export_csv(data)
-
-    keys, vals = response.data.strip().split("\n")[9:11]
-    keys = next(csv.reader(StringIO(keys), delimiter=","), [])
-    vals = next(csv.reader(StringIO(vals), delimiter=","), [])
-    instance_dict = dict(izip(keys, vals))
-
+    instance_dict = self.export_parsed_csv(data)[instance.type][0]
     self.assertEqual(value, instance_dict[column])
 
   def test_export_assesments_without_map_control(self):
@@ -550,30 +548,34 @@ class TestAssessmentExport(TestCase):
     self.assertColumnExportedValue("", assessment,
                                    "map:control versions")
 
-  def test_export_assesments_with_map_control(self):
-    """Test export assesment with related control instance
-
-    relation snapshot -> assessment
-    """
-    audit = factories.AuditFactory()
-    assessment = factories.AssessmentFactory(audit=audit)
-    factories.RelationshipFactory(source=audit, destination=assessment)
-    control = factories.ControlFactory()
+  @ddt.data(True, False)
+  def test_export_assesments_map_control(self, with_map):
+    """Test export assesment with and without related control instance"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      factories.RelationshipFactory(source=audit, destination=assessment)
+      control = factories.ControlFactory()
     revision = models.Revision.query.filter(
         models.Revision.resource_id == control.id,
         models.Revision.resource_type == control.__class__.__name__
     ).order_by(
         models.Revision.id.desc()
     ).first()
-    snapshot = factories.SnapshotFactory(
-        parent=audit,
-        child_id=control.id,
-        child_type=control.__class__.__name__,
-        revision_id=revision.id
-    )
-    db.session.commit()
-    factories.RelationshipFactory(source=snapshot, destination=assessment)
-    self.assertColumnExportedValue(control.slug, assessment,
+    with factories.single_commit():
+      snapshot = factories.SnapshotFactory(
+          parent=audit,
+          child_id=control.id,
+          child_type=control.__class__.__name__,
+          revision_id=revision.id
+      )
+      if with_map:
+        factories.RelationshipFactory(source=snapshot, destination=assessment)
+    if with_map:
+      val = control.slug
+    else:
+      val = ""
+    self.assertColumnExportedValue(val, assessment,
                                    "map:control versions")
 
   def test_export_assesments_with_map_control_mirror_relation(self):
@@ -581,10 +583,11 @@ class TestAssessmentExport(TestCase):
 
     relation assessment -> snapshot
     """
-    audit = factories.AuditFactory()
-    assessment = factories.AssessmentFactory(audit=audit)
-    factories.RelationshipFactory(source=audit, destination=assessment)
-    control = factories.ControlFactory()
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      factories.RelationshipFactory(source=audit, destination=assessment)
+      control = factories.ControlFactory()
     revision = models.Revision.query.filter(
         models.Revision.resource_id == control.id,
         models.Revision.resource_type == control.__class__.__name__

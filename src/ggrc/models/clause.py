@@ -6,7 +6,8 @@ from sqlalchemy import orm
 
 from ggrc import db
 from ggrc.access_control.roleable import Roleable
-from ggrc.models.mixins import CustomAttributable
+from ggrc.models.mixins import CustomAttributable, TestPlanned
+from ggrc.models.comment import Commentable
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Hierarchical
 from ggrc.models.mixins import LastDeprecatedTimeboxed
@@ -20,8 +21,9 @@ from ggrc.models import reflection
 
 
 class Clause(Roleable, HasObjectState, Hierarchical, CustomAttributable,
-             Personable, LastDeprecatedTimeboxed, Relatable,
-             PublicDocumentable, BusinessObject, Indexed, db.Model):
+             Personable, LastDeprecatedTimeboxed, Relatable, Commentable,
+             PublicDocumentable, TestPlanned, BusinessObject, Indexed,
+             db.Model):
 
   __tablename__ = 'clauses'
   _table_plural = 'clauses'

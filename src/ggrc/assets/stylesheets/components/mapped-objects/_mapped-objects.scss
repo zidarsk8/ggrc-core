@@ -37,6 +37,8 @@
 
 .mapped-objects__item {
   background: $white;
+  border-radius: 2px;
+  border: 1px solid #ccc;
   line-height: 24px;
   box-sizing: border-box;
   padding: 0 8px 0 4px;
@@ -78,6 +80,7 @@
     width: 100%;
     padding: 0 8px 0 28px;
     box-sizing: border-box;
+    word-wrap: break-word;
   }
 
   .more-information-wrapper {
@@ -194,7 +197,8 @@
 
     * {
       padding: 0;
-      margin: 0;
+      margin-top: 0;
+      margin-bottom: 0;
     }
   }
 }
@@ -243,7 +247,7 @@ directly-mapped-objects {
 
 .modal-mapped-objects {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 
   .modal-mapped-objects-item {
     display: flex;
@@ -254,6 +258,7 @@ directly-mapped-objects {
       align-self: center;
       line-height: 50px;
       margin-bottom: 5px;
+      min-width: 0;
     }
 
     .modal-mapped-objects-item__unmap {

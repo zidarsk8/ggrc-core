@@ -30,7 +30,8 @@
       object_controls: 'CMS.Models.ObjectControl.stubs',
       controls: 'CMS.Models.Control.stubs',
       object_sections: 'CMS.Models.ObjectSection.stubs',
-      sections: 'CMS.Models.get_stubs'
+      sections: 'CMS.Models.get_stubs',
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       add_item_view: GGRC.mustache_path +
@@ -40,6 +41,9 @@
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
       ])
+    },
+    sub_tree_view_options: {
+      default_filter: ['Risk'],
     },
     defaults: {
       status: 'Draft'

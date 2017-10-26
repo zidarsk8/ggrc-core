@@ -89,6 +89,10 @@
         'you to review newly created ${type} "${title}" before ${before}. ' +
         'Click <a href="${href}#workflows_widget">here</a> to perform a review.'
       );
+      var assigneeRole = _.find(GGRC.access_control_roles, {
+        object_type: 'TaskGroupTask',
+        name: 'Task Assignees',
+      });
 
       return aws_dfd.then(function (aws) {
         var ret;
@@ -135,7 +139,13 @@
                   end_date: that.end_date,
                   object_approval: true,
                   sort_index: (Number.MAX_SAFE_INTEGER / 2).toString(10),
-                  contact: that.contact,
+                  access_control_list: [{
+                    ac_role_id: assigneeRole.id,
+                    person: {
+                      id: that.contact.id,
+                      type: 'Person',
+                    },
+                  }],
                   context: wf.context,
                   task_type: "text",
                   title: reviewTemplate({
@@ -163,8 +173,15 @@
                 return tg.attr("contact", that.contact).save().then(function(tg) {
                   return $.when.apply($, can.map(tg.task_group_tasks.reify(), function(tgt) {
                     return tgt.refresh().then(function(tgt) {
+
                       return tgt.attr({
-                        'contact': that.contact,
+                        'access_control_list': [{
+                          ac_role_id: assigneeRole.id,
+                          person: {
+                            id: that.contact.id,
+                            type: 'Person',
+                          },
+                        }],
                         'end_date': that.end_date,
                         'start_date': moment().format('MM/DD/YYYY'),
                         'task_type': tgt.task_type || 'text'

@@ -223,6 +223,7 @@
       font-weight: normal;
       color: $subTitle;
       font-family: $fontTitle;
+      word-wrap: break-word;
 
       span {
         display: block;

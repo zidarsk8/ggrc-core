@@ -10,7 +10,6 @@ from sqlalchemy import func
 from sqlalchemy import literal
 from sqlalchemy import or_
 from sqlalchemy import union
-from sqlalchemy.sql import false
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import aliased
 from sqlalchemy.sql.expression import select
@@ -76,21 +75,15 @@ class MysqlIndexer(SqlIndexer):
           permission_type=permission_type,
           permission_model=permission_model
       )
-      if contexts is not None:
-        if resources:
-          resource_sql = and_(
-              MysqlRecordProperty.type == model_name,
-              MysqlRecordProperty.key.in_(resources))
-        else:
-          resource_sql = false()
-
-        type_query = or_(
-            and_(
-                MysqlRecordProperty.type == model_name,
-                context_query_filter(MysqlRecordProperty.context_id, contexts)
-            ),
-            resource_sql)
-        type_queries.append(type_query)
+      statement = and_(
+          MysqlRecordProperty.type == model_name,
+          context_query_filter(MysqlRecordProperty.context_id, contexts)
+      )
+      if resources:
+        statement = or_(and_(MysqlRecordProperty.type == model_name,
+                             MysqlRecordProperty.key.in_(resources)),
+                        statement)
+      type_queries.append(statement)
 
     return and_(
         MysqlRecordProperty.type.in_(model_names),

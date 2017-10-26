@@ -66,6 +66,21 @@ class TestCase(BaseTestCase, object):
 
   maxDiff = None
 
+  @staticmethod
+  def get_role_id_for_obj(obj, role_name):
+    """Return role id for ent instance and role_name."""
+    from ggrc.access_control import role as ac_role
+    for role_id, name in ac_role.get_custom_roles_for(obj.type).iteritems():
+      if name == role_name:
+        return role_id
+
+  def get_persons_for_role_name(self, obj, role_name):
+    """Generator. Return persons releated to sent instance and role_name."""
+    role_id = self.get_role_id_for_obj(obj, role_name)
+    for acl in obj.access_control_list:
+      if acl.ac_role_id == role_id:
+        yield acl.person
+
   @contextlib.contextmanager
   def custom_headers(self, headers=None):
     """Context manager that allowed to add some custom headers in request."""
@@ -134,6 +149,7 @@ class TestCase(BaseTestCase, object):
     db.session.commit()
 
   def setUp(self):
+    """Setup method."""
     self.clear_data()
     self._custom_headers = {}
     self.headers = {}
@@ -193,6 +209,14 @@ class TestCase(BaseTestCase, object):
                      "Expected response does not match received response:\n\n"
                      "EXPECTED:\n{}\n\nRECEIVED:\n{}".format(
                          expected_str, response_str))
+
+  def check_import_errors(self, response):
+    """Check if import response doesn't contain any errors"""
+    messages = ("block_errors", "row_errors")
+    for block in response:
+      for message in messages:
+        errors = block.get(message, [])
+        self.assertEqual(errors, [], str(errors))
 
   @classmethod
   def import_data(cls, *import_data, **kwargs):

@@ -25,5 +25,7 @@
     "user_overdue_task_count": GGRC.counters._task_counts[1]
   };
 
+-block page_scripts
+  %script{ type:'text/javascript', src:'{{config.get("DASHBOARD_JS_PATH")}}' }
 
 -block widget_area

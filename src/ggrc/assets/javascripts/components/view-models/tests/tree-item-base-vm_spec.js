@@ -15,7 +15,10 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
   describe('initChildTreeDisplay() method', function () {
     beforeEach(function () {
       spyOn(GGRC.Utils.TreeView, 'getModelsForSubTier')
-        .and.returnValue(['Foo', 'Bar', 'Baz']);
+        .and.returnValue({
+          available: ['Foo', 'Bar', 'Baz'],
+          selected: ['Foo'],
+        });
       spyOn(GGRC.Utils.ObjectVersions, 'getWidgetConfig')
         .and.callFake(function (model) {
           return {
@@ -34,8 +37,8 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
       modelsList = vm.attr('selectedChildModels').serialize();
       displayList = vm.attr('childModelsList').serialize();
 
-      expect(modelsList.length).toEqual(3);
-      expect(modelsList).toEqual(['Foo', 'Bar', 'Baz']);
+      expect(modelsList.length).toEqual(1);
+      expect(modelsList).toEqual(['Foo']);
 
       expect(displayList).toEqual([
         {
@@ -45,11 +48,11 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
         }, {
           name: 'Bar',
           widgetName: 'BarWidget',
-          display: true,
+          display: false,
         }, {
           name: 'Baz',
           widgetName: 'BazWidget',
-          display: true,
+          display: false,
         },
       ]);
     });
@@ -80,12 +83,12 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
 
     it('calls the select method woth the element from event', function () {
       var event = {
-        element: 'fakeElement'
+        element: 'fakeElement',
       };
       vm.onPreview(event);
 
       expect(vm.select).toHaveBeenCalledWith('fakeElement');
-    })
+    });
   });
 
   describe('select() method', function () {
@@ -93,7 +96,7 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
 
     beforeEach(function () {
       fakeElement = {
-        closest: jasmine.createSpy()
+        closest: jasmine.createSpy(),
       };
 
       spyOn(can, 'trigger');
@@ -114,6 +117,6 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
 
     describe('for Person instances', function () {
       //
-    })
+    });
   });
 });

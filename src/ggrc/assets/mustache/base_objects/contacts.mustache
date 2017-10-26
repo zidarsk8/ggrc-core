@@ -5,8 +5,8 @@
 
 {{#instance}}
 <div class="row-fluid wrap-row">
-  {{#if is_program}}
-    <div data-test-id="title_manager_7a906d2e" class="span6">
+  <div data-test-id="title_manager_7a906d2e">
+    {{#if is_program}}
       <h6>Manager</h6>
       <p class="oneline">
         {{#with_mapping 'authorizations' instance}}
@@ -27,11 +27,8 @@
           {{/if}}
         {{/with_mapping}}
       </p>
-    </div>
-  {{else}}
-    <div data-test-id="title_manager_7a906d2e">
-       <custom-roles {instance}="."></custom-roles>
-    </div>
-  {{/if}}
+    {{/if}}
+    <custom-roles {instance}="."></custom-roles>
+  </div>
 </div>
 {{/instance}}

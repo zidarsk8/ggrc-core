@@ -1095,7 +1095,6 @@ import '../components/access_control_list/access_control_list_roles_helper'
       var params;
       var type;
       var name;
-      var msg;
 
       if (instance.errors()) {
         instance.removeAttr('_suppress_errors');
@@ -1154,18 +1153,13 @@ import '../components/access_control_list/access_control_list_roles_helper'
             type = obj.type ? can.spaceCamelCase(obj.type) : '';
             name = obj.title ? obj.title : '';
 
-            if (instanceId === undefined) { // new element
-              if (obj.is_declining_review && obj.is_declining_review == '1') {
-                msg = 'Review declined';
-              } else if (name) {
-                msg = 'New ' + type + ' ' + name + ' added successfully.';
-              } else {
-                msg = 'New ' + type + ' added successfully.';
-              }
-            } else {
-              msg = name + ' modified successfully.';
+            if (instanceId === undefined &&
+              obj.is_declining_review &&
+              obj.is_declining_review == '1') { // new element
+              $(document.body).trigger('ajax:flash', {
+                success: 'Review declined'
+              });
             }
-            $(document.body).trigger('ajax:flash', {success: msg});
             finish();
           }
         });
@@ -1214,6 +1208,7 @@ import '../components/access_control_list/access_control_list_roles_helper'
           this.options.instance.attr('custom_attribute_definitions', cad);
         }
         this.options.instance.refresh();
+        this.options.instance.dispatch('refreshMapping');
       }
     },
 

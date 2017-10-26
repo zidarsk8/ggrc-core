@@ -72,6 +72,11 @@ class TestPersonResource(TestCase, WithQueryApi):
     user = all_models.Person.query.first()
     dummy_user = factories.PersonFactory()
     user_id = user.id
+    role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Task Assignees",
+        all_models.AccessControlRole.object_type == "TaskGroupTask",
+    ).one().id
+
     one_time_workflow = {
         "title": "Person resource test workflow",
         "notify_on_change": True,
@@ -84,31 +89,49 @@ class TestPersonResource(TestCase, WithQueryApi):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
-                "contact": create_stub(user),
+                "access_control_list": [{
+                    "person": create_stub(user),
+                    "ac_role_id": role_id,
+                }],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15),
             }, {
                 "title": "task 2",
                 "description": "some task 3",
-                "contact": create_stub(user),
+                "access_control_list": [{
+                    "person": create_stub(user),
+                    "ac_role_id": role_id,
+                }],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 9, 16),
             }, {
                 "title": "task 3",
                 "description": "some task 4",
-                "contact": create_stub(user),
+                "access_control_list": [{
+                    "person": create_stub(user),
+                    "ac_role_id": role_id,
+                }, {
+                    "person": create_stub(dummy_user),
+                    "ac_role_id": role_id,
+                }],
                 "start_date": date(2017, 6, 5),
                 "end_date": date(2017, 10, 16),
             }, {
                 "title": "dummy task 4",  # task should not counted
                 "description": "some task 4",
-                "contact": create_stub(dummy_user),
+                "access_control_list": [{
+                    "person": create_stub(dummy_user),
+                    "ac_role_id": role_id,
+                }],
                 "start_date": date(2017, 6, 5),
                 "end_date": date(2017, 11, 17),
             }, {
                 "title": "dummy task 5",  # task should not counted
                 "description": "some task 4",
-                "contact": create_stub(dummy_user),
+                "access_control_list": [{
+                    "person": create_stub(dummy_user),
+                    "ac_role_id": role_id,
+                }],
                 "start_date": date(2017, 6, 5),
                 "end_date": date(2017, 11, 18),
             }],
@@ -127,7 +150,10 @@ class TestPersonResource(TestCase, WithQueryApi):
             "task_group_tasks": [{
                 "title": "not counted existing task",
                 "description": "",
-                "contact": create_stub(user),
+                "access_control_list": [{
+                    "person": create_stub(user),
+                    "ac_role_id": role_id,
+                }],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15),
             }],
@@ -185,6 +211,10 @@ class TestPersonResource(TestCase, WithQueryApi):
 
     user = all_models.Person.query.first()
     user_id = user.id
+    role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Task Assignees",
+        all_models.AccessControlRole.object_type == "TaskGroupTask",
+    ).one().id
     workflow_template = {
         "title": "verified workflow",
         "owners": [create_stub(user)],
@@ -195,13 +225,19 @@ class TestPersonResource(TestCase, WithQueryApi):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
-                "contact": create_stub(user),
+                "access_control_list": [{
+                    "person": create_stub(user),
+                    "ac_role_id": role_id,
+                }],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15),
             }, {
                 "title": "dummy task 5",
                 "description": "some task 4",
-                "contact": create_stub(user),
+                "access_control_list": [{
+                    "person": create_stub(user),
+                    "ac_role_id": role_id,
+                }],
                 "start_date": date(2017, 6, 5),
                 "end_date": date(2017, 11, 18),
             }],

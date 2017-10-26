@@ -9,6 +9,7 @@ from datetime import date
 
 from ggrc import db
 from ggrc import builder
+from ggrc.access_control import role
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import TaskGroupObject
@@ -19,6 +20,7 @@ from integration.ggrc.models import factories
 
 
 class WorkflowsGenerator(Generator):
+  """Workflow instances generator class."""
 
   def generate_workflow(self, data=None):
     """ create a workflow with dict data
@@ -31,18 +33,19 @@ class WorkflowsGenerator(Generator):
 
     tgs = data.pop("task_groups", [])
 
-    wf = Workflow(title="wf " + factories.random_str())
-    obj_dict = self.obj_to_dict(wf, obj_name)
+    wf_instance = Workflow(title="wf " + factories.random_str())
+    obj_dict = self.obj_to_dict(wf_instance, obj_name)
     obj_dict[obj_name].update(data)
 
     response, workflow = self.generate(Workflow, obj_name, obj_dict)
 
-    for tg in tgs:
-      self.generate_task_group(workflow, tg)
+    for task_group in tgs:
+      self.generate_task_group(workflow, task_group)
 
     return response, workflow
 
   def generate_task_group(self, workflow=None, data=None):
+    """Generates task group over api."""
     if data is None:
       data = {}
     if not workflow:
@@ -55,13 +58,13 @@ class WorkflowsGenerator(Generator):
     obj_name = "task_group"
     workflow = self._session_add(workflow)
 
-    tg = TaskGroup(
+    task_group = TaskGroup(
         title="tg " + factories.random_str(),
         workflow_id=workflow.id,
         context_id=workflow.context.id,
         contact_id=1
     )
-    obj_dict = self.obj_to_dict(tg, obj_name)
+    obj_dict = self.obj_to_dict(task_group, obj_name)
     obj_dict[obj_name].update(data)
 
     response, task_group = self.generate(TaskGroup, obj_name, obj_dict)
@@ -74,6 +77,7 @@ class WorkflowsGenerator(Generator):
     return response, task_group
 
   def generate_task_group_task(self, task_group=None, data=None):
+    """Generate task group task over api."""
     if data is None:
       data = {}
     if not task_group:
@@ -83,21 +87,28 @@ class WorkflowsGenerator(Generator):
     default_start = self.random_date()
     default_end = self.random_date(default_start, date.today())
     obj_name = "task_group_task"
-
+    cycle_task_role_id = {
+        v: k for (k, v) in
+        role.get_custom_roles_for("TaskGroupTask").iteritems()
+    }['Task Assignees']
     tgt = TaskGroupTask(
         task_group_id=task_group.id,
         context_id=task_group.context.id,
         title="tgt " + factories.random_str(),
         start_date=default_start,
         end_date=default_end,
-        contact_id=1
     )
     obj_dict = self.obj_to_dict(tgt, obj_name)
+    if "access_control_list" not in data:
+      data["access_control_list"] = [{
+          "ac_role_id": cycle_task_role_id,
+          "person": {"id": 1},
+      }]
     obj_dict[obj_name].update(data)
-
     return self.generate(TaskGroupTask, obj_name, obj_dict)
 
   def generate_task_group_object(self, task_group=None, obj=None):
+    """Generate task group object."""
     if not task_group:
       _, task_group = self.generate_task_group()
     task_group = self._session_add(task_group)
@@ -116,6 +127,7 @@ class WorkflowsGenerator(Generator):
     return self.generate(TaskGroupObject, obj_name, obj_dict)
 
   def generate_cycle(self, workflow=None):
+    """Generate Cycle over api."""
     if not workflow:
       _, workflow = self.generate_workflow()
 
@@ -142,32 +154,35 @@ class WorkflowsGenerator(Generator):
     return self.generate(Cycle, obj_name, obj_dict)
 
   def activate_workflow(self, workflow):
+    """Activate workflow over api."""
     workflow = self._session_add(workflow)
     return self.modify_workflow(workflow, {
         "status": "Active",
         "recurrences": bool(workflow.repeat_every and workflow.unit)
     })
 
-  def modify_workflow(self, wf=None, data=None):
+  def modify_workflow(self, wf_instance=None, data=None):
+    """Modify workflow over api."""
     if data is None:
       data = {}
-    if not wf:
-      _, wf = self.generate_workflow()
-    wf = self._session_add(wf)
+    if not wf_instance:
+      _, wf_instance = self.generate_workflow()
+    wf_instance = self._session_add(wf_instance)
 
     obj_name = "workflow"
 
-    obj_dict = builder.json.publish(wf)
+    obj_dict = builder.json.publish(wf_instance)
     builder.json.publish_representation(obj_dict)
     obj_dict.update(data)
 
     default = {obj_name: obj_dict}
 
-    response, workflow = self.modify(wf, obj_name, default)
+    response, workflow = self.modify(wf_instance, obj_name, default)
 
     return response, workflow
 
   def modify_object(self, obj, data=None):
+    """Modify object over api."""
     if data is None:
       data = {}
     obj = self._session_add(obj)
@@ -184,7 +199,8 @@ class WorkflowsGenerator(Generator):
 
     return response, generated_object
 
-  def _session_add(self, obj):
+  @staticmethod
+  def _session_add(obj):
     """ Sometimes tests throw conflicting state present error."""
     try:
       db.session.add(obj)

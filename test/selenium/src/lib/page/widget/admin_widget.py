@@ -42,8 +42,7 @@ class Roles(Widget):
 
   def __init__(self, driver):
     super(Roles, self).__init__(driver)
-    self.roles_tree_view = base.AdminTreeView(
-        self._driver, widget_name=url.Widget.ROLES)
+    self.roles_tree_view = base.AdminTreeView(self._driver)
 
   def get_role_scopes_text_as_dict(self):
     """Get dictionary of labels that displayed in Tree View on Roles widget.
@@ -60,8 +59,7 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
 
   def __init__(self, driver):
     super(CustomAttributes, self).__init__(driver)
-    self.ca_tree_view = base.AdminTreeView(
-        self._driver, widget_name=url.Widget.CUSTOM_ATTRIBUTES)
+    self.ca_tree_view = base.AdminTreeView(self._driver)
 
   def expand_collapse_group(self, item_title, expand=True):
     """Expand/collapse 2-nd tier of Tree View item."""
@@ -83,20 +81,13 @@ class CustomAttributes(widget_base.WidgetAdminCustomAttributes):
     ca_item_content = self.expand_collapse_group(
         objects.get_normal_form(ca_obj.definition_type), expand=True)
     ca_item_content.add_new_custom_attribute(ca_obj)
-    self.check_success_ca_created_msg(ca_obj.title)
     self.expand_collapse_group(
         objects.get_normal_form(ca_obj.definition_type), expand=False)
 
-  def check_success_ca_created_msg(self, ca_title):
-    """Await for success message with given custom attribute title."""
-    text = ("New Custom Attribute Definition {} added successfully"
-            .format(ca_title))
-    selenium_utils.wait_for_element_text(
-        self._driver, self._locators.CA_ADDED_SUCCESS_ALERT, text)
-
   def get_custom_attributes_list(self, ca_group):
     """Collect custom attributes from expanded custom attribute group
-    Tree View."""
+    Tree View.
+    """
     ca_item_content = self.expand_collapse_group(
         objects.get_normal_form(ca_group.definition_type), expand=True)
     return ca_item_content.get_ca_list_from_group()

@@ -21,17 +21,17 @@ BASE_DIR = os.path.realpath(os.path.join(
 MODULE_DIR = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
 SETTINGS_DIR = os.path.join(BASE_DIR, 'ggrc', 'settings')
 THIRD_PARTY_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'third_party'))
-BOWER_DIR = os.path.realpath(os.path.join(BASE_DIR, '..', 'bower_components'))
 MANIFEST_CFG_PATH = os.path.join(BASE_DIR, 'ggrc', 'manifest.json')
 
 from ggrc.settings.default import *  # noqa
 
 try:
   manifest_data = json.load(open(MANIFEST_CFG_PATH))  # noqa # pylint: disable=invalid-name
-  DASHBOARD_CSS_PATH = manifest_data['dashboard.css']
-  DASHBOARD_JS_PATH = manifest_data['dashboard.js']
+  STYLES_CSS_PATH = manifest_data['styles.css']
   VENDOR_CSS_PATH = manifest_data['vendor.css']
   VENDOR_JS_PATH = manifest_data['vendor.js']
+  DASHBOARD_JS_PATH = manifest_data['dashboard.js']
+  LOGIN_JS_PATH = manifest_data['login.js']
 except (KeyError, IOError):
   raise RuntimeError("File '{}' with JS configuration should exist. "
                      "Next keys should be present there: "

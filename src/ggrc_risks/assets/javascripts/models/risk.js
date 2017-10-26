@@ -22,7 +22,8 @@
       context: 'CMS.Models.Context.stub',
       modified_by: 'CMS.Models.Person.stub',
       objects: 'CMS.Models.get_stubs',
-      risk_objects: 'CMS.Models.RiskObject.stubs'
+      risk_objects: 'CMS.Models.RiskObject.stubs',
+      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     tree_view_options: {
       add_item_view:
@@ -32,6 +33,9 @@
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
       ])
+    },
+    sub_tree_view_options: {
+      default_filter: ['Control'],
     },
     defaults: {
       status: 'Draft'

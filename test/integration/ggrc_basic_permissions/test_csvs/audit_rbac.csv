@@ -51,7 +51,7 @@ Person,Name,Email*,Company,Role,map:clause,map:contract,map:control,map:objectiv
 ,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,
-Assessment,Code*,Audit*,Title*,Description,Notes,Assessment Procedure,Assignees*,Creators*,Verifiers,Effective Date,Stop Date,State*,,Conclusion: Design,Conclusion: Operation,,,,Finished Date,Verified Date
+Assessment,Code*,Audit*,Title*,Description,Notes,Assessment Procedure,Assignees*,Creators*,Verifiers,Due Date,Stop Date,State*,,Conclusion: Design,Conclusion: Operation,,,,Finished Date,Verified Date
 ,PMRBACASSESSMENT-1,AUDIT-1,Program Manager Audit RBAC Test,,,,user@example.com,user@example.com,,,,In Progress,,,,,,,,
 ,PMRBACASSESSMENT-2,AUDIT-2,Program Manager Audit RBAC Test Archived,,,,user@example.com,user@example.com,,,,In Progress,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,

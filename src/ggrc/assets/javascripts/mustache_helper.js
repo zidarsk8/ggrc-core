@@ -1440,13 +1440,24 @@ Mustache.registerHelper("last_approved", function (instance, options) {
   return defer_render("span", {done: finish, fail: fail}, loader.refresh_instances());
 });
 
-Mustache.registerHelper("with_is_reviewer", function (review_task, options) {
-  review_task = Mustache.resolve(review_task);
-  var current_user_id = GGRC.current_user.id;
-  var is_reviewer = review_task &&
-      (current_user_id == review_task.contact.id ||
-      Permission.is_allowed("__GGRC_ADMIN__"));
-  return options.fn(options.contexts.add({is_reviewer: is_reviewer}));
+Mustache.registerHelper('with_is_reviewer', function (reviewTask, options) {
+  var assigneeRole = _.find(GGRC.access_control_roles, {
+    object_type: 'TaskGroupTask',
+    name: 'Task Assignees',
+  });
+  var currentUserId = GGRC.current_user.id;
+  var isReviewer;
+
+  reviewTask = Mustache.resolve(reviewTask);
+
+  isReviewer = reviewTask &&
+      (_.some(reviewTask.access_control_list, function (acl) {
+        return acl.ac_role_id === assigneeRole.id &&
+          acl.person &&
+          acl.person.id === currentUserId;
+      }) ||
+      Permission.is_allowed('__GGRC_ADMIN__'));
+  return options.fn(options.contexts.add({is_reviewer: isReviewer}));
 });
 
 Mustache.registerHelper("with_review_task", function (options) {
@@ -1800,19 +1811,6 @@ Mustache.registerHelper("ggrc_config_value", function (key, default_, options) {
   default_ = resolve_computed(default_);
   default_ = default_ || "";
   return can.getObject(key, [GGRC.config]) || default_;
-});
-
-Mustache.registerHelper("is_page_instance", function (instance, options) {
-  var instance = resolve_computed(instance)  // FIXME duplicate declaration
-    , page_instance = GGRC.page_instance()
-    ;
-
-  if (instance && instance.type === page_instance.type && instance.id === page_instance.id) {
-    return options.fn(options.contexts);
-  }
-  else{
-    return options.inverse(options.contexts);
-  }
 });
 
 Mustache.registerHelper("if_auditor", function (instance, options) {

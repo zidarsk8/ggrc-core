@@ -19,13 +19,6 @@ dashboard-js-template-files:
   - components/assessment/assessment-people.mustache
   - components/assessment/mapped-objects/mapped-comments.mustache
   - components/assessment/custom-attributes.mustache
-  - components/assessment/inline/inline.mustache
-  - components/assessment/inline/text.mustache
-  - components/assessment/inline/input.mustache
-  - components/assessment/inline/dropdown.mustache
-  - components/assessment/inline/date.mustache
-  - components/assessment/inline/person.mustache
-  - components/assessment/inline/checkbox.mustache
   - components/gca-controls/gca-controls.mustache
   - components/comment/comment-add-form.mustache
   - components/comment/comment-input.mustache
@@ -99,8 +92,6 @@ dashboard-js-template-files:
   - base_templates/objects_tooltip.mustache
   - base_templates/attachment.mustache
   - base_templates/base.mustache
-  - base_templates/comment_list.mustache
-  - base_templates/comment_subtree.mustache
   - base_templates/dates_list.mustache
   - base_templates/description.mustache
   - base_templates/header.mustache
@@ -141,13 +132,6 @@ dashboard-js-template-files:
   - issues/info.mustache
   - issues/remediation_plan.mustache
   - issues/tree_add_item.mustache
-  - components/inline_edit/inline.mustache
-  - components/inline_edit/text.mustache
-  - components/inline_edit/input.mustache
-  - components/inline_edit/checkbox.mustache
-  - components/inline_edit/dropdown.mustache
-  - components/inline_edit/person.mustache
-  - components/inline_edit/datepicker.mustache
   - components/autocomplete/autocomplete.mustache
   - components/object-mapper/object-mapper.mustache
   - components/object-generator/object-generator.mustache
@@ -329,3 +313,4 @@ dashboard-js-template-files:
   - components/inline/base-inline-control-title.mustache
   - components/assessment/info-pane/inline-item.mustache
   - components/loading/loading-status.mustache
+  - partials/modal-ajax-test-plan.mustache

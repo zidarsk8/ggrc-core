@@ -8,7 +8,7 @@ import template from './templates/tree-item-custom-attribute.mustache';
 var viewModel = can.Map.extend({
   instance: null,
   values: [],
-  column: {}
+  column: {},
 });
 
 var helpers = {
@@ -19,67 +19,69 @@ var helpers = {
     var value = '';
     var definition;
     var customAttrItem;
-    var getValue;
     var formatValueMap = {
-      Checkbox: function (value) {
-        return ['No', 'Yes'][value];
+      Checkbox: function (item) {
+        return ['No', 'Yes'][item.attr('attribute_value')];
       },
-      Date: function (value) {
-        return GGRC.Utils.formatDate(value, true);
-      }
+      Date: function (item) {
+        return GGRC.Utils.formatDate(item.attr('attribute_value'), true);
+      },
+      'Map:Person': function (item) {
+        var attr = item.attr('attribute_object');
+        return options.fn(options.contexts.add({
+          object: attr ?
+            attr.reify() :
+            null,
+        }));
+      },
     };
 
     attr = Mustache.resolve(attr);
     instance = Mustache.resolve(instance);
-    customAttrItem = Mustache.resolve(
-      (options.hash || {}).customAttrItem
-    );
 
-    can.each(GGRC.custom_attr_defs, function (item) {
-      if (item.definition_type === instance.class.table_singular &&
-        item.title === attr.attr_name) {
-        definition = item;
-      }
+    definition = _.find(GGRC.custom_attr_defs, function (item) {
+      return item.definition_type === instance.class.table_singular &&
+        item.title === attr.attr_name;
     });
 
     if (definition) {
-      getValue = function (item) {
-        if (!(instance instanceof CMS.Models.Assessment)) {
-          // reify all models with the exception of the Assessment,
-          // because it has a different logic of work with the CA
-          item = item.reify();
-        }
-        if (item.custom_attribute_id === definition.id) {
-          if (definition.attribute_type.startsWith('Map:')) {
-            value = options.fn(options.contexts.add({
-              object: item.attribute_object ?
-                item.attribute_object.reify() : null
-            }));
-          } else if (formatValueMap[definition.attribute_type]) {
-            value =
-              formatValueMap[definition.attribute_type](item.attribute_value);
-          } else {
-            value = item.attribute_value;
-          }
-        }
-      };
+      // reify all CA models (with the exception of the Assessment)
+      // to load custom_attribute_id, attribute_value and attribute_object
+      if (!(instance instanceof CMS.Models.Assessment)) {
+        _prepareCAVs();
+      }
 
-      if (!_.isUndefined(customAttrItem)) {
-        getValue(customAttrItem);
-      } else {
-        can.each(instance.custom_attribute_values, getValue);
+      customAttrItem = _.find(instance.attr('custom_attribute_values'),
+        function (cav) {
+          return cav.custom_attribute_id === definition.id;
+        });
+
+      if (customAttrItem) {
+        if (formatValueMap[definition.attribute_type]) {
+          value =
+            formatValueMap[definition.attribute_type](customAttrItem);
+        } else {
+          value = customAttrItem.attr('attribute_value');
+        }
       }
     }
 
+    function _prepareCAVs() {
+      _.forEach(instance.attr('custom_attribute_values'),
+        function (cav, index) {
+          instance.custom_attribute_values.attr(index, cav.reify());
+        });
+    }
+
     return value || '';
-  }
+  },
 };
 
 GGRC.Components('treeItemCustomAttribute', {
   tag: 'tree-item-custom-attribute',
   template: template,
   viewModel: viewModel,
-  helpers: helpers
+  helpers: helpers,
 });
 
 export default helpers;

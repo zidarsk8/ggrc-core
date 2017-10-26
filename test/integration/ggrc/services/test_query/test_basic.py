@@ -593,6 +593,31 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
         self._sort_sublists(controls_ordered_2),
     )
 
+  def test_query_related_people_for_program(self):
+    """Test correct querying of the related people to Program"""
+    program_id = all_models.Program.query.filter_by(
+        title="Cat ipsum 1").one().id
+    query_filter = {
+        "object_name": "Person",
+        "filters": {
+            "expression": {
+                "object_name": "Program",
+                "op": {
+                    "name": "related_people",
+                },
+                "ids": [program_id],
+            },
+        },
+    }
+    people = self._get_first_result_set(
+        query_filter,
+        "Person",
+    )
+    user_list = [p['email'] for p in people["values"]]
+    ref_list = [u'smotko@example.com', u'urbon.s@example.com',
+                u'zidar@example.com', u'sec.con@example.com']
+    self.assertItemsEqual(user_list, ref_list)
+
   def test_filter_control_by_key_control(self):
     """Test correct filtering by SIGNIFICANCE field"""
     controls = self._get_first_result_set(

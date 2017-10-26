@@ -289,6 +289,28 @@ form.import {
   }
 }
 
+.export-panel {
+  .export-panel__group {
+    margin-bottom: 20px;
+  }
+
+  .export-panel__header {
+    display: flex;
+    margin-bottom: 10px;
+  }
+
+  .export-panel__title {
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-right: 10px;
+  }
+
+  .export-panel__checkbox {
+    line-height: 10px;
+    margin-right: 5px;
+  }
+}
+
 .remove_filter_group {
   margin: 0 0 5px 10px;
 }

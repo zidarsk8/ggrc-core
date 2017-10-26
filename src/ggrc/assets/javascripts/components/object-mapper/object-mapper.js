@@ -65,8 +65,9 @@
       );
 
       return GGRC.VM.ObjectOperationsBaseVM.extend({
-        join_object_id: resolvedConfig['join-object-id'] ||
-           (GGRC.page_instance() && GGRC.page_instance().id),
+        join_object_id: resolvedConfig.isNew ? null :
+          resolvedConfig['join-object-id'] ||
+          (GGRC.page_instance() && GGRC.page_instance().id),
         object: resolvedConfig.object,
         type: getDefaultType(resolvedConfig.type, resolvedConfig.object),
         config: config,
@@ -148,11 +149,10 @@
       },
       '{window} modal:dismiss': function (el, ev, options) {
         var joinObjectId = this.viewModel.attr('join_object_id');
-        $('body').trigger('closeMapper');
 
         // mapper sets uniqueId for modal-ajax.
         // we can check using unique id which modal-ajax is closing
-        if (options.uniqueId &&
+        if (options && options.uniqueId &&
           joinObjectId === options.uniqueId &&
           this.viewModel.attr('newEntries').length > 0) {
           this.mapObjects(this.viewModel.attr('newEntries'));
@@ -180,7 +180,6 @@
         self.viewModel.attr('submitCbs').fire();
       },
       closeModal: function () {
-        $('body').trigger('closeMapper');
         this.viewModel.attr('is_saving', false);
 
         // TODO: Find proper way to dismiss the modal

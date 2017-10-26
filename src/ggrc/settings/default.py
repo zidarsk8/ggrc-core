@@ -23,7 +23,7 @@ exports = []
 
 # Deployment-specific variables
 COMPANY = "Company, Inc."
-COMPANY_LOGO = "/static/images/ggrc-logo.png"
+COMPANY_LOGO = "/static/images/ggrc-logo.svg"
 COMPANY_LOGO_TEXT = "Company GRC"
 COPYRIGHT = u"Confidential. Copyright \u00A9"  # \u00A9 is the (c) symbol
 
@@ -35,7 +35,7 @@ try:
 except (ImportError):
   pass
 
-VERSION = "0.10.33-Raspberry" + BUILD_NUMBER
+VERSION = "0.10.34-Raspberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(

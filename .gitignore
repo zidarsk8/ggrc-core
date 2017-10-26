@@ -22,9 +22,7 @@ site-cookbooks/ggrc/recipes/local.rb
 src/ggrc/settings/build_number.py
 
 # Asset-pipeline/cache related files
-src/ggrc/static*
-!src/ggrc/static/images*
-!src/ggrc/static/favicon.ico
+src/ggrc/static
 src/ggrc/assets/assets.manifest
 src/ggrc/manifest.json
 src/ggrc/assets/stylesheets/dashboard.css

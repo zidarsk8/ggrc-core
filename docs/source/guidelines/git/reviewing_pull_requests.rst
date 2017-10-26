@@ -133,6 +133,22 @@ reviewing, it is highly recommended that you also test a few other
 application features that might have been affected by the submitted code
 changes.
 
+.. _reviewing-a-hotfix-pr:
+
+Reviewing a hotfix PR
+~~~~~~~~~~~~~~~~~~~~~
+
+Hotfixes are all pull requests that go straight into master or release branch.
+Review of such branches needs to be done by at least 2 people from the
+freemasons committee. The changes allowed must be the minimum amount of changes
+to fix a given bug. Hotfix PRs are not allowed to contain any lint or style
+changes outside of the that needs to be changed in order to avoid any possible
+conflicts when doing a merge back into the develop branch.
+
+After merging a hotfix PR We must create a backemerge PR from master to release
+(if needed) and from release to dev branch. Developer who opens those PR must
+ensure they get merged as soon as possible, again to as many conflicts as
+possible.
 
 .. _reviewing-a-bugfix-pr:
 

@@ -62,7 +62,6 @@ import '../../components/spinner/spinner';
 import '../../components/collapsible-panel/collapsible-panel';
 import '../../components/read-more/read-more';
 import '../../components/assessment/custom-attributes';
-import '../../components/assessment/inline';
 import '../../components/assessment/info-pane/confirm-edit-action';
 import '../../components/comment/comment-add-form';
 import '../../components/comment/comment-input';
@@ -103,7 +102,6 @@ import '../../components/dropdown/multiselect-dropdown';
 import '../../components/autocomplete/autocomplete';
 import '../../components/datepicker/datepicker';
 import '../../components/person/person';
-import '../../components/inline_edit/inline';
 import '../../components/unarchive_link';
 import '../../components/link_to_clipboard';
 import '../../components/relevant_filters';
@@ -152,7 +150,6 @@ import '../../components/people/people-list-info';
 import '../../components/prev-next-buttons/prev-next-buttons';
 import '../../components/loading/loading-status';
 import '../../components/lazy-render/lazy-render';
-
 import '../../components/custom-attributes/custom-attributes-field-view';
 import '../../components/form/form-validation-text';
 
@@ -171,5 +168,3 @@ import '../../components/issue/issue-unmap';
 import '../../bootstrap/modal-ajax';
 
 import '../../dashboard';
-
-import '../../../stylesheets/dashboard.scss';

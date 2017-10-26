@@ -38,7 +38,7 @@ extensions = [
 
 extlinks = {
     'src': (
-        'https://github.com/google/ggrc-core/tree/develop/src/%s',
+        'https://github.com/google/ggrc-core/tree/dev/src/%s',
         'src/',
     ),
 }

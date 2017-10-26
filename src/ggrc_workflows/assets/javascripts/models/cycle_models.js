@@ -22,8 +22,12 @@
 
   function populateFromWorkflow(form, workflow) {
     if (!workflow || typeof workflow === 'string') {
-      // We need to invalidate the form, so we remove workflow if it's not set
+      // We need to invalidate the form, so we remove workflow and dependencies
+      // if it's not set
       form.removeAttr('workflow');
+      form.removeAttr('context');
+      form.removeAttr('cycle');
+      form.removeAttr('cycle_task_group');
       return;
     }
     if (workflow.reify) {
@@ -57,7 +61,9 @@
       form.attr('workflow', {id: workflow.id, type: 'Workflow'});
       form.attr('context', {id: workflow.context.id, type: 'Context'});
       form.attr('cycle', {id: activeCycle.id, type: 'Cycle'});
-      form.cycle_task_group = activeCycle.cycle_task_groups[0].id;
+
+      //reset cycle task group after workflow updating
+      form.removeAttr('cycle_task_group');
     });
   }
 
@@ -256,7 +262,7 @@
   can.Model.Cacheable('CMS.Models.CycleTaskGroupObjectTask', {
     root_object: 'cycle_task_group_object_task',
     root_collection: 'cycle_task_group_object_tasks',
-    mixins: ['timeboxed', 'isOverdue'],
+    mixins: ['timeboxed', 'isOverdue', 'accessControlList', 'ca_update'],
     category: 'workflow',
     findAll: 'GET /api/cycle_task_group_object_tasks',
     findOne: 'GET /api/cycle_task_group_object_tasks/{id}',
@@ -269,7 +275,6 @@
       task_group_task: 'CMS.Models.TaskGroupTask.stub',
       cycle_task_entries: 'CMS.Models.CycleTaskEntry.stubs',
       modified_by: 'CMS.Models.Person.stub',
-      contact: 'CMS.Models.Person.stub',
       context: 'CMS.Models.Context.stub',
       cycle: 'CMS.Models.Cycle.stub'
     },
@@ -312,11 +317,6 @@
           attr_sort_field: 'task state'
         },
         {
-          attr_title: 'Task assignee',
-          attr_name: 'assignee',
-          attr_sort_field: 'task assignee'
-        },
-        {
           attr_title: 'Task start date',
           attr_name: 'start_date',
           attr_sort_field: 'task start date'
@@ -337,19 +337,43 @@
           attr_sort_field: 'task last updated by'
         }
       ],
-      display_attr_names: ['title', 'assignee', 'start_date', 'end_date'],
+      display_attr_names: ['title', 
+                           'Task Assignees', 
+                           'start_date', 
+                           'end_date'],
       mandatory_attr_name: ['title'],
       draw_children: true
     },
+    sub_tree_view_options: {
+      default_filter: ['Control'],
+    },
     init: function () {
       var that = this;
+      var assigneeRole = _.find(GGRC.access_control_roles, {
+        object_type: 'CycleTaskGroupObjectTask',
+        name: 'Task Assignees',
+      });
       this._super.apply(this, arguments);
       this.validateNonBlank('title');
       this.validateNonBlank('workflow');
       this.validateNonBlank('cycle');
-      this.validateContact(['_transient.contact', 'contact']);
+      this.validateNonBlank('cycle_task_group');
       this.validateNonBlank('start_date');
       this.validateNonBlank('end_date');
+
+      // instance.attr('access_control_list')
+      //   .replace(...) doesn't raise change event
+      // that's why we subscribe on access_control_list.length
+      this.validate('access_control_list.length', function () {
+        var that = this;
+        var hasAssignee = assigneeRole && _.some(that.access_control_list, {
+          ac_role_id: assigneeRole.id,
+        });
+
+        if (!hasAssignee) {
+          return 'No valid contact selected for assignee';
+        }
+      });
 
       this.bind('updated', function (ev, instance) {
         if (instance instanceof that) {
@@ -367,13 +391,15 @@
       });
     },
     set_properties_from_workflow: function (workflow) {
-      // The form sometimes returns plaintext instead of object, return in that case
-      if (typeof workflow === 'string') {
+      // The form sometimes returns plaintext instead of object,
+      // return in that case
+      // If workflow is empty form should be invalidated
+      if (typeof workflow === 'string' && workflow !== '') {
         return;
       }
       populateFromWorkflow(this, workflow);
     },
-    form_preload: function (newObjectForm) {
+    form_preload: function (newObjectForm, objectParams) {
       var form = this;
       var workflows;
       var _workflow;
@@ -384,40 +410,33 @@
         this.attr('start_date', new Date());
         this.attr('end_date', moment().add({month: 3}).toDate());
 
-        // using setTimeout to execute this after the modal is loaded
-        // so we can see when the workflow is already set and use that one
-        setTimeout(function () {
-          // if we are creating a task from the workflow page, the preset
-          // workflow should be that one
-          if (form.workflow !== undefined) {
-            populateFromWorkflow(form, form.workflow);
+        // if we are creating a task from the workflow page, the preset
+        // workflow should be that one
+        if (objectParams && objectParams.workflow !== undefined) {
+          populateFromWorkflow(form, objectParams.workflow);
+          return;
+        }
+
+        workflows = CMS.Models.Workflow.findAll({
+          kind: 'Backlog', status: 'Active', __sort: '-created_at'});
+        workflows.then(function (workflowList) {
+          if (!workflowList.length) {
+            $(document.body).trigger(
+              'ajax:flash',
+              {warning: 'No Backlog' +
+              ' workflows found!' +
+              ' Contact your administrator to enable this functionality.',
+              }
+            );
             return;
           }
-
-          workflows = CMS.Models.Workflow.findAll({
-            kind: 'Backlog', status: 'Active', __sort: '-created_at'});
-          workflows.then(function (workflowList) {
-            if (!workflowList.length) {
-              $(document.body).trigger(
-                'ajax:flash',
-                {warning: 'No Backlog' +
-                ' workflows found!' +
-                ' Contact your administrator to enable this functionality.'
-                }
-              );
-              return;
-            }
-            _workflow = workflowList[0];
-            populateFromWorkflow(form, _workflow);
-          });
-        }, 0);
+          _workflow = workflowList[0];
+          populateFromWorkflow(form, _workflow);
+        });
       } else {
         cycle = form.cycle.reify();
         if (!_.isUndefined(cycle.workflow)) {
           form.attr('workflow', cycle.workflow.reify());
-        }
-        if (this.contact) {
-          this.attr('_transient.contact', this.contact);
         }
       }
     },

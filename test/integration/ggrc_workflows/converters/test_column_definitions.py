@@ -1,5 +1,6 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+"""Tests for Columns definitions."""
 
 from ggrc.converters.import_helper import get_object_column_definitions
 from ggrc.utils.rules import get_mapping_rules, get_unmapping_rules
@@ -9,6 +10,7 @@ from integration.ggrc import TestCase
 
 
 def get_mapping_names(class_name):
+  """Return set of mapping names for sent model name."""
   mapping_rules = get_mapping_rules().get(class_name)
   if mapping_rules is not None:
     pretty_mapping_rules = (title_from_camelcase(r) for r in mapping_rules)
@@ -19,6 +21,7 @@ def get_mapping_names(class_name):
 
 
 def get_unmapping_names(class_name):
+  """Return set of unmapping names for sent model name."""
   unmapping_rules = get_unmapping_rules().get(class_name)
   if unmapping_rules is not None:
     pretty_unmapping_rules = (title_from_camelcase(r) for r in unmapping_rules)
@@ -89,14 +92,14 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
     self.assertTrue(vals["Summary"]["mandatory"])
     self.assertTrue(vals["Assignee"]["mandatory"])
 
-  def test_task_group_task_definitions(self):
+  def test_task_definitions(self):
     """ test default headers for Task Group Task """
     definitions = get_object_column_definitions(wf_models.TaskGroupTask)
     display_names = {val["display_name"] for val in definitions.itervalues()}
     expected_names = {
         "Summary",
         "Task Type",
-        "Assignee",
+        "Task Assignees",
         "Task Description",
         "Start Date",
         "End Date",
@@ -110,7 +113,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}
     self.assertTrue(vals["Summary"]["mandatory"])
-    self.assertTrue(vals["Assignee"]["mandatory"])
+    self.assertTrue(vals["Task Assignees"]["mandatory"])
 
   def test_cycle_task_definitions(self):
     """ test default headers for Cycle Task Group Object Task """
@@ -126,7 +129,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Cycle",
         "Summary",
         "Task Type",
-        "Assignee",
+        "Task Assignees",
         "Task Details",
         "Start Date",
         "Due Date",
@@ -143,4 +146,4 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
     self.assertEqual(expected_names, display_names)
     vals = {val["display_name"]: val for val in definitions.itervalues()}
     self.assertTrue(vals["Summary"]["mandatory"])
-    self.assertTrue(vals["Assignee"]["mandatory"])
+    self.assertTrue(vals["Task Assignees"]["mandatory"])

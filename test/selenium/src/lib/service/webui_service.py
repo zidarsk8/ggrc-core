@@ -19,18 +19,16 @@ class BaseWebUiService(object):
   """Base class for business layer's services objects."""
   # pylint: disable=too-many-instance-attributes
   # pylint: disable=too-many-public-methods
-  def __init__(self, driver, obj_name, is_versions_widget=False):
+  def __init__(self, driver, obj_name):
     self.driver = driver
     self.obj_name = obj_name
-    self.is_versions_widget = is_versions_widget
     self.generic_widget_cls = factory.get_cls_widget(object_name=self.obj_name)
     self.info_widget_cls = factory.get_cls_widget(
         object_name=self.obj_name, is_info=True)
     self.entities_factory_cls = factory.get_cls_entity_factory(
         object_name=self.obj_name)
     self.url_mapped_objs = (
-        "{src_obj_url}" +
-        url.get_widget_name_of_mapped_objs(self.obj_name, is_versions_widget))
+        "{src_obj_url}" + url.get_widget_name_of_mapped_objs(self.obj_name))
     self.url_obj_info_page = "{obj_url}" + url.Widget.INFO
     self._unified_mapper = None
 
@@ -97,8 +95,7 @@ class BaseWebUiService(object):
     """
     generic_widget_url = self.url_mapped_objs.format(src_obj_url=src_obj.url)
     selenium_utils.open_url(self.driver, generic_widget_url)
-    return self.generic_widget_cls(
-        self.driver, self.obj_name, self.is_versions_widget)
+    return self.generic_widget_cls(self.driver, self.obj_name)
 
   def open_info_page_of_obj(self, obj):
     """Navigate to info page URL of object according to URL of object and
@@ -398,6 +395,13 @@ class BaseWebUiService(object):
 
 class SnapshotsWebUiService(BaseWebUiService):
   """Class for snapshots business layer's services objects."""
+  def __init__(self, driver, obj_name, is_versions_widget):
+    super(SnapshotsWebUiService, self).__init__(driver, obj_name)
+    self.is_versions_widget = is_versions_widget
+    if self.is_versions_widget:
+      self.url_mapped_objs = (
+          "{src_obj_url}" + url.get_widget_name_of_mapped_objs(
+              self.obj_name, self.is_versions_widget))
 
   def update_obj_ver_via_info_panel(self, src_obj, obj):
     """Open generic widget of mapped objects, select snapshotable object from
@@ -405,8 +409,7 @@ class SnapshotsWebUiService(BaseWebUiService):
     """
     objs_widget = self.open_widget_of_mapped_objs(src_obj)
     obj_info_panel = (
-        objs_widget.tree_view.select_member_by_title(title=obj.title).
-        panel.snapshotable)
+        objs_widget.tree_view.select_member_by_title(title=obj.title).panel)
     obj_info_panel.open_link_get_latest_ver().confirm_update()
     objs_widget.tree_view.wait_loading_after_actions()
     selenium_utils.get_when_invisible(
@@ -416,8 +419,7 @@ class SnapshotsWebUiService(BaseWebUiService):
     """Open generic widget of mapped objects, select snapshotable object from
     Tree View by title and check via Info panel that object is updateble.
     """
-    obj_info_panel = (self.open_info_panel_of_obj_by_title(src_obj, obj).
-                      panel.snapshotable)
+    obj_info_panel = (self.open_info_panel_of_obj_by_title(src_obj, obj).panel)
     return obj_info_panel.is_link_get_latest_ver_exist()
 
 
