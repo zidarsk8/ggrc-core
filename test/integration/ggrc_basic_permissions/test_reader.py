@@ -42,10 +42,10 @@ class TestReader(TestCase):
     self.api.set_user(self.users["reader"])
     all_errors = []
     base_models = set([
-        "Control", "Assessment", "DataAsset", "Contract",
+        "Control", "DataAsset", "Contract",
         "Policy", "Regulation", "Standard", "Document", "Facility",
         "Market", "Objective", "OrgGroup", "Vendor", "Product",
-        "Clause", "System", "Process", "Issue", "Project", "AccessGroup",
+        "Clause", "System", "Process", "Project", "AccessGroup",
     ])
     for model_singular in base_models:
       try:
@@ -102,15 +102,6 @@ class TestReader(TestCase):
     response = self.api.post(all_models.Policy, {
         "policy": {"title": "reader Policy", "context": None},
     })
-    obj_id = response.json.get("policy").get("id")
-    self.api.post(all_models.ObjectOwner, {"object_owner": {
-        "person": {
-            "id": self.users['reader'].id,
-            "type": "Person",
-        }, "ownable": {
-            "type": "Policy",
-            "id": obj_id,
-        }, "context": None}})
     response, _ = self.api.search("Regulation,Policy")
     entries = response.json["results"]["entries"]
     self.assertEqual(len(entries), 2)
