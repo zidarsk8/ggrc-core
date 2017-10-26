@@ -9,10 +9,14 @@ backends
 
 import json
 import re
+from functools import wraps
+from werkzeug.exceptions import Forbidden
+
 import flask_login
 from flask import request
 from flask import redirect
 from ggrc.extensions import get_extension_module_for
+from ggrc.rbac import SystemWideRoles
 
 
 def get_login_module():
@@ -84,8 +88,23 @@ def login_required(func):
     return func
 
 
+def admin_required(func):
+  """Adming required decorator
+
+    Raises Forbidden if the current user is not an admin"""
+  @wraps(func)
+  def admin_check(*args, **kwargs):
+    """Helper function that performs the admin check"""
+    user = get_current_user()
+    role = getattr(user, 'system_wide_role', None)
+    if role not in SystemWideRoles.admins:
+      raise Forbidden()
+    return func(*args, **kwargs)
+  return admin_check
+
+
 def is_creator():
   """Check if the current user has global role Creator."""
   current_user = get_current_user()
   return (hasattr(current_user, 'system_wide_role') and
-          current_user.system_wide_role == "Creator")
+          current_user.system_wide_role == SystemWideRoles.CREATOR)
