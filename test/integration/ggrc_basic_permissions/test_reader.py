@@ -5,9 +5,9 @@
 Test Reader role
 """
 
-from integration.ggrc import TestCase
 from ggrc.models import get_model
 from ggrc.models import all_models
+from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import Generator
 from integration.ggrc.generator import ObjectGenerator
@@ -88,8 +88,8 @@ class TestReader(TestCase):
                   model_singular))
           continue
       except:
-          all_errors.append("{} exception thrown".format(model_singular))
-          raise
+        all_errors.append("{} exception thrown".format(model_singular))
+        raise
     self.assertEqual(all_errors, [])
 
   def test_reader_search(self):
@@ -152,6 +152,7 @@ class TestReader(TestCase):
     self.assertEqual(num, 1)
 
   def test_creation_of_mappings(self):
+    """Check if reader can't create mappings"""
     self.generator.api.set_user(self.users["admin"])
     _, control = self.generator.generate(all_models.Control, "control", {
         "control": {"title": "Test Control", "context": None},
