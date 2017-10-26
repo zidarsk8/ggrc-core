@@ -160,8 +160,7 @@ The "decoupling" is two places:
 
 1. First, the resource-representation is constructed using the Builder
    class (``ggrc.builder.json``), the behavior of which is currently
-   defined from the model and the ``_api_attrs``, ``_publish_attrs`` and
-   ``_update_attrs`` attributes.
+   defined from the model and the ``_api_attrs`` attributes.
 2. Second, the interaction of resources and the database is defined by
    the Resource class (``ggrc.services.common.Resource``). The
    ``service(...)`` mappings in ``ggrc.services.__init__`` are defining
@@ -169,7 +168,7 @@ The "decoupling" is two places:
    the supplied model).
 
 Attributes to be included in the external representation of the model
-are declared via the ``_publish_attrs`` attribute of a Python model.
+are declared via the ``_api_attrs`` attribute of a Python model.
 Attributes not included in that list will not be included in external
 representations of the model.
 
