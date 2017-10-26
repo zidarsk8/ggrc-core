@@ -10,7 +10,6 @@ backends
 import json
 import re
 import flask_login
-from flask_login import login_url
 from flask import request
 from flask import redirect
 from ggrc.extensions import get_extension_module_for
@@ -50,7 +49,7 @@ def init_app(app):
     if (re.match(r'^(\/api|\/query|\/search)', request.path) or
        request.headers.get('X-Requested-By') == 'GGRC'):
       return json.dumps({'error': 'unauthorized'}), 401
-    return redirect(login_url('/login', request.url))
+    return redirect(flask_login.login_url('/login', request.url))
 
   app.route('/login')(login_module.login)
   app.route('/logout')(login_module.logout)
