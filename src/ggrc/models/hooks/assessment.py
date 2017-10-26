@@ -340,8 +340,8 @@ def init_hook():
 
     for obj, src in itertools.izip(objects, sources):
       audit_id = audit_map.get(obj.id)
-      if (not audit_id or audit_id not in audits or
-          not _is_issue_tracker_enabled(audit=audits[audit_id])):
+      audit = audits.get(audit_id) if audit_id else None
+      if not audit or not _is_issue_tracker_enabled(audit=audit):
         issue_tracker_info = {
             'enabled': False,
         }
@@ -359,7 +359,16 @@ def init_hook():
     """Handles update event to AssessmentTemplate model."""
     del sender, service  # Unused
 
-    if not _is_issue_tracker_enabled(audit=obj.audit):
+    audit = all_models.Audit.query.join(
+        all_models.Relationship,
+        all_models.Relationship.source_id == all_models.Audit.id,
+    ).filter(
+        all_models.Relationship.source_type == 'Audit',
+        all_models.Relationship.destination_type == 'AssessmentTemplate',
+        all_models.Relationship.destination_id == obj.id
+    ).first()
+
+    if not audit or not _is_issue_tracker_enabled(audit=audit):
       issue_tracker_info = {
           'enabled': False,
       }
