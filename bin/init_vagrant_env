@@ -1,5 +1,4 @@
 export DEV_PREFIX=/vagrant-dev
-export GGRC_EXTERNAL_HELP_URL='#set_GGRC_EXTERNAL_HELP_URL_env_var'
 
 echo "Initializing environment"
 cd /vagrant
