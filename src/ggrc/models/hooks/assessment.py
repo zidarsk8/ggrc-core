@@ -162,7 +162,6 @@ def init_hook():
         )
     }
 
-    issue_tracker_templates = {}
     for assessment, src in itertools.izip(objects, sources):
       snapshot_dict = src.get('object') or {}
       common.map_objects(assessment, snapshot_dict)
@@ -180,7 +179,6 @@ def init_hook():
       )
       if not template:
         continue
-      issue_tracker_templates[assessment.id] = template.issue_tracker
       if template.test_plan_procedure:
         assessment.test_plan = snapshot.revision.content['test_plan']
       else:
@@ -189,8 +187,20 @@ def init_hook():
         assessment.assessment_type = template.template_object_type
 
     for assessment, src in itertools.izip(objects, sources):
-      info = src.get('issue_tracker') or issue_tracker_templates.get(
-          assessment.id)
+      # Get issue tracker data from request.
+      info = src.get('issue_tracker') or {}
+
+      if not info:
+        # Check assessment template for issue tracker data.
+        template = template_cache.get(src.get('template', {}).get('id'))
+        if template:
+          info = template.issue_tracker
+
+      if not info:
+        # Check audit for issue tracker data.
+        audit = audit_cache[src['audit']['id']]
+        info = audit.issue_tracker
+
       _create_issuetracker_info(assessment, info)
 
   @signals.Restful.model_put.connect_via(all_models.Assessment)
