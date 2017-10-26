@@ -23,7 +23,7 @@ class TestBuilder(TestCase):
     setattr(ggrc.services, name, svc)
     return svc
 
-  def mock_class(self, name, bases=(), _publish_attrs=None):
+  def mock_class(self, name, bases=(), _publish_attrs=None, parents=()):
     cls = MagicMock()
     cls.__name__ = name
     mro = ()
@@ -32,10 +32,12 @@ class TestBuilder(TestCase):
     cls.__mro__ = (cls, ) + mro
     if _publish_attrs:
       cls._api_attrs = ggrc.models.reflection.ApiAttributes(*_publish_attrs)
+    cls.__bases__ = parents
     self.mock_builders.append(name)
     return cls
 
-  def mock_model(self, name, bases=(), _publish_attrs=None, **kwarg):
+  def mock_model(
+      self, name, bases=(), _publish_attrs=None, parents=(), **kwarg):
     model = MagicMock()
     model.__class__ = self.mock_class(name, bases, _publish_attrs)
     for k, v in kwarg.items():
@@ -75,6 +77,7 @@ class TestBuilder(TestCase):
         foo='bar',
         boo='far',
         _publish_attrs=['foo'],
+        __bases__=[],
     )
     json_obj = publish(model)
     self.assertDictContainsSubset(

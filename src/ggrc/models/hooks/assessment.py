@@ -198,8 +198,9 @@ def init_hook():
 
       if not info:
         # Check audit for issue tracker data.
-        audit = audit_cache[src['audit']['id']]
-        info = audit.issue_tracker
+        audit = audit_cache.get(src.get('audit', {}).get('id'))
+        if audit:
+          info = audit.issue_tracker
 
       _create_issuetracker_info(assessment, info)
 

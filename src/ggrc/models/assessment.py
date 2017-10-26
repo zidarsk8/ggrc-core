@@ -146,13 +146,15 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
 
   def audit_stub(assessment_obj):
     audit_id = assessment_obj.audit_id
+    if audit_id is None:
+      return None
     issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
         'Audit', audit_id)
     return {
         'type': 'Audit',
         'id': audit_id,
         'context_id': assessment_obj.context_id,
-        'href': u'/api/audits/%d' % (audit_id),
+        'href': u'/api/audits/%d' % audit_id,
         'issue_tracker': issue_obj.to_dict() if issue_obj is not None else {},
     }
 
