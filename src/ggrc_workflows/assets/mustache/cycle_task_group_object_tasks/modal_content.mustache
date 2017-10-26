@@ -74,7 +74,10 @@
       <br>
       <div class="{{#instance.computed_errors.cycle_task_group}}field-failure{{/instance.computed_errors.cycle_task_group}}">
         {{#using cycle_task_group=instance.cycle_task_group}}
-          <h6>Task Group <span class="required">*</span></h6>
+          <label class="form__label">
+            Task Group
+            <i class="fa fa-asterisk"></i>
+          </label>
           <input
             {{^if instance.cycle}} disabled {{/if}}
             class="input-block-level required"
@@ -92,6 +95,7 @@
         {{/using}}
       {{#instance.computed_errors.cycle_task_group}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.cycle_task_group}}
     </div>
+    <br>
   </div>
 
   <div class="row-fluid">
