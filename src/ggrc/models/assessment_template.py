@@ -223,6 +223,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
 
   @simple_property
   def issue_tracker(self):
+    """Returns representation of issue tracker related info as a dict."""
     issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
         'AssessmentTemplate', self.id)
     return issue_obj.to_dict() if issue_obj is not None else {}

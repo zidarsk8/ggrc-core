@@ -76,6 +76,7 @@ def init_hook():
 
   @signals.Restful.collection_posted.connect_via(all_models.Audit)
   def handle_audit_post(sender, objects=None, sources=None):
+    """Handles creating issue tracker related info."""
     del sender  # Unused
     for obj, src in itertools.izip(objects, sources):
       issue_tracker_info = src.get('issue_tracker')
@@ -86,6 +87,7 @@ def init_hook():
 
   @signals.Restful.model_put.connect_via(all_models.Audit)
   def handle_audit_put(sender, obj=None, src=None, service=None):
+    """Handles updating issue tracker related info."""
     del sender, service  # Unused
     issue_tracker_info = src.get('issue_tracker')
     if issue_tracker_info:
@@ -95,6 +97,7 @@ def init_hook():
   @signals.Restful.model_deleted_after_commit.connect_via(all_models.Audit)
   def handle_audit_deleted_after_commit(
       sender, obj=None, service=None, event=None):
+    """Handles deleting issue tracker related info."""
     del sender, service, event  # Unused
     issue_obj = all_models.IssuetrackerIssue.get_issue(
         _AUDIT_MODEL_NAME, obj.id)

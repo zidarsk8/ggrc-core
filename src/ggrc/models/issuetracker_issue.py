@@ -3,8 +3,6 @@
 
 """Module for IssueTracker object."""
 
-import logging
-
 from ggrc import db
 from ggrc.models.mixins import Base
 
@@ -84,7 +82,7 @@ class IssuetrackerIssue(Base, db.Model):
     if include_issue:
       res['issue_id'] = self.issue_id
       res['issue_url'] = self.issue_url
-      res['title'] =  self.title
+      res['title'] = self.title
 
     if include_private:
       res['object_id'] = self.object_id

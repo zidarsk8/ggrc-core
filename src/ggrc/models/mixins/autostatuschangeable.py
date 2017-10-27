@@ -60,8 +60,7 @@ class AutoStatusChangeable(object):
       A boolean representing if models attribute changed.
     """
     attr = getattr(inspect(obj).attrs, attr)
-    if (isinstance(attr.value, datetime.date) or
-       isinstance(attr.value, datetime.datetime)):
+    if isinstance(attr.value, (datetime.date, datetime.datetime)):
       return cls._date_has_changes(attr)
     return attr.history.has_changes()
 
@@ -254,9 +253,9 @@ class AutoStatusChangeable(object):
             "Document": cls.handle_first_class_edit,
             "Snapshot": cls.handle_first_class_edit,
         }
-        for k in handlers.keys():
-          if k in endpoints:
-            handlers[k](model, target_object, method=service.request.method)
+        for name, handler in handlers.iteritems():
+          if name in endpoints:
+            handler(model, target_object, method=service.request.method)
 
 
 # pylint: disable=fixme

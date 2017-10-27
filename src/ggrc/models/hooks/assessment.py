@@ -9,12 +9,11 @@
 """
 import collections
 import copy
-import html2text
 import itertools
 import json
 import logging
-import time
 import urlparse
+import html2text
 
 from sqlalchemy import orm
 from werkzeug import exceptions
@@ -205,8 +204,7 @@ def init_hook():
       _create_issuetracker_info(assessment, info)
 
   @signals.Restful.model_put.connect_via(all_models.Assessment)
-  def handle_assessment_put(
-      sender, obj=None, src=None, service=None, initial_state=None):
+  def handle_assessment_put(sender, obj=None, src=None, service=None):
     """Handles assessment update event."""
     del sender, service  # Unused
 
@@ -219,17 +217,17 @@ def init_hook():
       _update_issuetracker_info(obj, issue_tracker_info)
 
   @signals.Restful.model_put_after_commit.connect_via(all_models.Assessment)
-  def handle_assessment_put_after_commit(
-      sender, obj=None, src=None, service=None, event=None, initial_state=None):
+  def handle_assessment_put_after_commit(sender, obj=None, src=None, **kwargs):
     """Handles assessment post update event."""
-    del sender, service, event  # Unused
+    del sender  # Unused
 
+    initial_state = kwargs.pop('initial_state', None)
     issue_tracker_info = obj.issue_tracker
     if issue_tracker_info.get('enabled') and issue_tracker_info.get('issue_id'):
       try:
         _update_issuetracker_issue(obj, issue_tracker_info, initial_state, src)
-      except (HttpError, BadResponseError) as e:
-        logger.error('Unable update Issue Tracker issue: %s', e)
+      except (HttpError, BadResponseError) as error:
+        logger.error('Unable update Issue Tracker issue: %s', error)
         # Dirty hack to rollback change to issuetracker_issues model.
         # Reverted info doesn't get sent to frontend so page refresh is required
         # but the hack at least allows to keep data in sync.
@@ -258,8 +256,8 @@ def init_hook():
           _send_request(
               '/api/issues/%s' % issue_obj.issue_id,
               method=urlfetch.PUT, payload=issue_params)
-        except (HttpError, BadResponseError) as e:
-          logger.error('Unable to update Issue tracker: %s', e)
+        except (HttpError, BadResponseError) as error:
+          logger.error('Unable to update Issue tracker: %s', error)
           raise exceptions.InternalServerError(
               'Unable update Issue Tracker issue.')
       db.session.delete(issue_obj)
@@ -310,8 +308,8 @@ def init_hook():
           _send_request(
               '/api/issues/%s' % issue_id,
               method=urlfetch.PUT, payload=issue_params)
-        except (HttpError, BadResponseError) as e:
-          logger.error('Unable to update Issue tracker: %s', e)
+        except (HttpError, BadResponseError) as error:
+          logger.error('Unable to update Issue tracker: %s', error)
           raise exceptions.InternalServerError(
               'Unable update Issue Tracker issue.')
 
@@ -368,7 +366,7 @@ def init_hook():
   def handle_assessment_tmpl_put(
       sender, obj=None, src=None, service=None, initial_state=None):
     """Handles update event to AssessmentTemplate model."""
-    del sender, service  # Unused
+    del sender, service, initial_state  # Unused
 
     audit = all_models.Audit.query.join(
         all_models.Relationship,
@@ -462,11 +460,10 @@ def _collect_issue_emails(assessment):
       ac_list.object_type == _ASSESSMENT_MODEL_NAME,
       ac_list.object_id == assessment.id
   )
-  for r in query.all():
-    email = r[2]
+  for row in query.all():
+    email = row[2]
     if email != assignee_email:
       cc_list.add(email)
-  roles_dict = role.get_custom_roles_for(_ASSESSMENT_MODEL_NAME)
 
   return assignee_email, list(cc_list)
 
@@ -495,8 +492,8 @@ def _send_http_request(url, method=urlfetch.GET, payload=None, headers=None):
           url, response.status_code, response.content)
       raise HttpError(response.content, status=response.status_code)
     return response.content
-  except urlfetch_errors.Error as e:
-    logger.error('Unable to perform urlfetch request: %s', e)
+  except urlfetch_errors.Error as error:
+    logger.error('Unable to perform urlfetch request: %s', error)
     raise HttpError('Unable to perform a request')
 
 
@@ -515,8 +512,8 @@ def _send_request(url, method=urlfetch.GET, payload=None, headers=None):
 
   try:
     return json.loads(data)
-  except (TypeError, ValueError) as e:
-    logger.error('Unable to parse JSON from response: %s', e)
+  except (TypeError, ValueError) as error:
+    logger.error('Unable to parse JSON from response: %s', error)
     raise BadResponseError('Unable to parse JSON from response.')
 
 
@@ -594,8 +591,8 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
 
     try:
       issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
-    except (HttpError, BadResponseError) as e:
-      logger.error('Unable create Issue Tracker issue: %s', e)
+    except (HttpError, BadResponseError) as error:
+      logger.error('Unable create Issue Tracker issue: %s', error)
       raise exceptions.InternalServerError('Unable create Issue Tracker issue.')
 
     issue_tracker_info['issue_id'] = issue_id
@@ -648,8 +645,7 @@ def _update_issuetracker_issue(
   # Attach user comments if any.
   comment_text = _get_added_comment_text(request)
   if comment_text is not None:
-    comments.append(html2text.HTML2Text().handle(
-        comment_obj.description).strip('\n'))
+    comments.append(comment_text)
 
   if comments:
     issue_params['comment'] = '\n\n'.join(comments)

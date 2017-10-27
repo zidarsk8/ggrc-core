@@ -3,8 +3,6 @@
 
 """Module for Assessment object"""
 
-import logging
-
 from sqlalchemy import and_
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import remote
@@ -40,6 +38,22 @@ from ggrc.models import reflection
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.fulltext.mixin import Indexed
+
+
+def _build_audit_stub(assessment_obj):
+  """Returns a stub of audit model to which assessment is related to."""
+  audit_id = assessment_obj.audit_id
+  if audit_id is None:
+    return None
+  issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
+      'Audit', audit_id)
+  return {
+      'type': 'Audit',
+      'id': audit_id,
+      'context_id': assessment_obj.context_id,
+      'href': u'/api/audits/%d' % audit_id,
+      'issue_tracker': issue_obj.to_dict() if issue_obj is not None else {},
+  }
 
 
 class Assessment(Roleable, statusable.Statusable, AuditRelationship,
@@ -144,22 +158,8 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'operationally',
   ]
 
-  def audit_stub(assessment_obj):
-    audit_id = assessment_obj.audit_id
-    if audit_id is None:
-      return None
-    issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
-        'Audit', audit_id)
-    return {
-        'type': 'Audit',
-        'id': audit_id,
-        'context_id': assessment_obj.context_id,
-        'href': u'/api/audits/%d' % audit_id,
-        'issue_tracker': issue_obj.to_dict() if issue_obj is not None else {},
-    }
-
   _custom_publish = {
-      'audit': audit_stub,
+      'audit': _build_audit_stub,
   }
 
   @classmethod
@@ -228,6 +228,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
 
   @simple_property
   def issue_tracker(self):
+    """Returns representation of issue tracker related info as a dict."""
     issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
         'Assessment', self.id)
     return issue_obj.to_dict(
@@ -235,6 +236,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
 
   @simple_property
   def archived(self):
+    """Returns a boolean whether assessment is archived or not."""
     return self.audit.archived if self.audit else False
 
   def validate_conclusion(self, value):

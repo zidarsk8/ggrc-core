@@ -150,8 +150,8 @@ class UpdateAttrHandler(object):
     else:
       try:
         setattr(obj, attr_name, value)
-      except AttributeError as e:
-        logger.error('Unable to set attribute %s: %s', attr_name, e)
+      except AttributeError as error:
+        logger.error('Unable to set attribute %s: %s', attr_name, error)
         raise
 
   @classmethod
@@ -412,7 +412,7 @@ def build_stub_union_query(queries):
     type_queries[type_] = query
 
   queries_for_union = type_queries.values()
-  if len(queries_for_union) == 0:
+  if not queries_for_union:
     query = None
   elif len(queries_for_union) == 1:
     query = queries_for_union[0]
@@ -500,19 +500,19 @@ def reify_representation(resource, results, type_columns):
 def publish_representation(resource):
   queries = gather_queries(resource)
 
-  if len(queries) == 0:
+  if not queries:
     return resource
-  else:
-    results, type_columns, query = build_stub_union_query(queries)
-    rows = query.all()
-    for row in rows:
-      type_ = row[0]
-      for columns, matches in results[type_].items():
-        vals = tuple(row[type_columns[type_][c]] for c in columns)
-        if vals in matches:
-          matches[vals].append(row)
 
-    return reify_representation(resource, results, type_columns)
+  results, type_columns, query = build_stub_union_query(queries)
+  rows = query.all()
+  for row in rows:
+    type_ = row[0]
+    for columns, matches in results[type_].items():
+      vals = tuple(row[type_columns[type_][c]] for c in columns)
+      if vals in matches:
+        matches[vals].append(row)
+
+  return reify_representation(resource, results, type_columns)
 
 
 class Builder(AttributeInfo):
@@ -560,8 +560,8 @@ class Builder(AttributeInfo):
     if attr_value:
       return self.generate_link_object_for(
           attr_value, inclusions, include, inclusion_filter)
-    else:
-      return None
+
+    return None
 
   def publish_association_proxy(
           self, obj, attr_name, class_attr, inclusions, include,

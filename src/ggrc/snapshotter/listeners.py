@@ -13,15 +13,17 @@ from ggrc.snapshotter.rules import get_rules
 
 def create_all(sender, obj=None, src=None, service=None, event=None):  # noqa
   """Creates snapshots."""
-  del service  # Unused
+  del sender, service  # Unused
   # We use "operation" for non-standard operations (e.g. cloning)
   if not src.get("operation"):
     create_snapshots(obj, event)
 
 
-def upsert_all(sender, obj=None, src=None, service=None, event=None, initial_state=None):  # noqa
+def upsert_all(
+    sender, obj=None, src=None, service=None,
+    event=None, initial_state=None):  # noqa
   """Updates snapshots globally."""
-  del service, initial_state  # Unused
+  del sender, service, initial_state  # Unused
   snapshot_settings = src.get("snapshots")
   if snapshot_settings:
     if snapshot_settings["operation"] == "upsert":
@@ -38,8 +40,8 @@ def register_snapshot_listeners():
   rules = get_rules()
 
   # Initialize listening on parent objects
-  for type_ in rules.rules.keys():
-    model = getattr(models.all_models, type_)
+  for model_cls in rules.rules.iterkeys():
+    model = getattr(models.all_models, model_cls)
     signals.Restful.model_posted_after_commit.connect(
         create_all, model, weak=False)
     signals.Restful.model_put_after_commit.connect(
