@@ -125,7 +125,7 @@ function getStatesForModel(model) {
 function statusFilter(statuses, filterString, modelName) {
   var filter = modelName === 'Assessment' ?
     buildAssessmentFilter(statuses, buildStatusesFilterString) :
-    buildStatusesFilterString(statuses);
+    buildStatusesFilterString(statuses, modelName);
 
   filterString = filterString || '';
   if (filter !== '') {
@@ -156,20 +156,37 @@ function unlockedFilter() {
 function buildStatusFilter(statuses, builder, modelName) {
   var filter = modelName === 'Assessment' ?
     buildAssessmentFilter(statuses, builder) :
-    builder(statuses);
+    builder(statuses, modelName);
   return filter;
 }
 
 /**
  * Build statuses filter string
  * @param {Array} statuses - array of active statuses
+ * @param {String} modelName - model name
  * @return {String} statuses filter
  */
-function buildStatusesFilterString(statuses) {
+function buildStatusesFilterString(statuses, modelName) {
+  var fieldName = getStatusFieldName(modelName);
+
   return statuses.map(function (item) {
     // wrap in quotes
-    return '"Status"="' + item + '"';
+    return '"' + fieldName + '"="' + item + '"';
   }).join(' Or ');
+}
+
+/**
+* Return status field name for model
+* @param {String} modelName - model name
+* @return {String} status field name
+*/
+function getStatusFieldName(modelName) {
+  var modelToStateFieldMap = {
+    CycleTaskGroupObjectTask: 'Task State',
+  };
+  var fieldName = modelToStateFieldMap[modelName] || 'Status';
+
+  return fieldName;
 }
 
 /**
@@ -189,7 +206,7 @@ function buildAssessmentFilter(statuses, builder) {
 
   // do not update statuses
   if (verifiedIndex === -1 && completedIndex === -1) {
-    return builder(statuses);
+    return builder(statuses, 'Assessment');
   }
 
   if (verifiedIndex > -1 && completedIndex > -1) {
@@ -201,7 +218,7 @@ function buildAssessmentFilter(statuses, builder) {
     // remove it
     statuses.splice(verifiedIndex, 1);
 
-    return builder(statuses);
+    return builder(statuses, 'Assessment');
   }
 
   if (completedIndex > -1 && verifiedIndex === -1) {
@@ -212,7 +229,7 @@ function buildAssessmentFilter(statuses, builder) {
     statuses.push('Completed');
   }
 
-  filter = builder(statuses);
+  filter = builder(statuses, 'Assessment');
   return filter + ' AND verified=' + isVerified;
 }
 
@@ -235,5 +252,6 @@ export {
   unlockedFilter,
   getStatesForModel,
   getDefaultStatesForModel,
-  buildStatusFilter
+  buildStatusFilter,
+  getStatusFieldName,
 };
