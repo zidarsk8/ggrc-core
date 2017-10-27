@@ -29,7 +29,7 @@ let viewModel = can.Map.extend({
           item.attr('checked', (selected.indexOf(item.value) > -1));
         });
 
-        if (statuses.length !== selected.length) {
+        if (selected.length && statuses.length !== selected.length) {
           filter = StateUtils.statusFilter(selected, '',
             this.attr('modelName'));
         }
