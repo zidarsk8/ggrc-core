@@ -85,7 +85,7 @@ custom-attributes {
       max-width: 360px;
       &.inline-reverse {
         min-width: auto;
-        padding: 5px 8px 0 0;
+        padding: 3px 8px 0 0;
       }
     }
 
@@ -133,14 +133,9 @@ custom-attributes {
   }
 
   &__mandatory {
-    width: 18px;
-    height: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin-left: 3px;
     color: $icon-color-empty;
     font-size: 11px;
-    opacity: 1;
   }
 
   &__title-text {
