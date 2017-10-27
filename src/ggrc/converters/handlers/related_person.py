@@ -40,8 +40,13 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
     ).all()
     for relation in relations:
       values = relation.attrs["AssigneeType"].split(",")
-      filtered_values = [v for v in values if v != self._assignee_type]
-      relation.attrs["AssigneeType"] = ",".join(filtered_values)
+      filtered_values = [v for v in values if v != self._assignee_type and v]
+      if filtered_values:
+        relation.attrs["AssigneeType"] = ",".join(filtered_values)
+      else:
+        # if no assignee type remains - delete the relationship,
+        # relationship attr will be cascade deleted
+        db.session.delete(relation)
 
   def _create_relationship(self, person):
     relation = models.Relationship(
@@ -56,11 +61,14 @@ class RelatedPersonColumnHandler(handlers.UserColumnHandler):
   def _update_relationship_attr(self, relation, person):
     values = set(relation.attrs["AssigneeType"].split(","))
     values.add(self._assignee_type)
-    relation.attrs["AssigneeType"] = ",".join(values)
+    assignee_type = ",".join([value for value in values if value])
+    relation.attrs["AssigneeType"] = assignee_type
     db.session.flush()
 
   def insert_object(self):
-    self._remove_relationship_attr()
+    # only need to update persons if the imported value is not empty
+    if self.value:
+      self._remove_relationship_attr()
     for person in self.value:
       relation = models.Relationship.find_related(
           self.row_converter.obj, person)
