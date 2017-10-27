@@ -12,7 +12,8 @@
   {{/is_info_pin}}
     <div class="tier-content">
       {{> '/static/mustache/assessments/header.mustache' }}
-      <tab-container>
+      <tab-container
+        {instance}="instance">
           <tab-panel {(panels)}="panels" title-text="Assessment">
         <div class="assessment-info-pane info-pane__body">
             <div class="assessment-attributes info-pane__main-content info-pane__main-content-with-sidebar">
@@ -182,6 +183,7 @@
                         {^saving}="formState.saving"
                         {^form-saved-deferred}="formState.formSavedDeferred"
                         {^is-dirty}="formState.isDirty"
+                        (validation-error)="setLastErrorTab(tabIndex)"
                         (validation-changed)="showRequiredInfoModal(%event)">
 			<custom-attributes
                             {fields}="fields"

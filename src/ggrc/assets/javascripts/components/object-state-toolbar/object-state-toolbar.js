@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {SWITCH_TO_ERROR_PANEL, SHOW_INVALID_FIELD} from '../../events/eventTypes';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -68,7 +70,8 @@
       changeState: function (newState, isUndo) {
         if (this.attr('isDisabled')) {
           if (this.attr('instance.hasValidationErrors')) {
-            this.attr('instance').dispatch('showInvalidField');
+            this.attr('instance').dispatch(SWITCH_TO_ERROR_PANEL);
+            this.attr('instance').dispatch(SHOW_INVALID_FIELD);
           }
           return;
         }
