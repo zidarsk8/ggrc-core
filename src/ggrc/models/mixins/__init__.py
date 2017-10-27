@@ -140,6 +140,7 @@ class ChangeTracked(object):
         'Person',
         primaryjoin='{0}.modified_by_id == Person.id'.format(cls.__name__),
         foreign_keys='{0}.modified_by_id'.format(cls.__name__),
+        remote_side='Person.id',
         uselist=False,
     )
 
