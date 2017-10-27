@@ -4,6 +4,7 @@
  */
 
 import './sortable-column';
+import {REFRESH_RELATED} from '../../events/eventTypes';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -144,8 +145,13 @@ import './sortable-column';
       '{viewModel.baseInstance} refreshInstance': function () {
         this.viewModel.setRelatedItems();
       },
-      '{viewModel.baseInstance} refreshRelatedAssessments': function () {
-        this.viewModel.setRelatedItems();
+      [`{viewModel.baseInstance} ${REFRESH_RELATED.type}`]:
+        function (scope, event) {
+        let vm = this.viewModel;
+
+        if (vm.attr('relatedItemsType') === event.model) {
+          vm.setRelatedItems();
+        }
       },
       '{viewModel.orderBy} changed': function () {
         this.viewModel.setRelatedItems();

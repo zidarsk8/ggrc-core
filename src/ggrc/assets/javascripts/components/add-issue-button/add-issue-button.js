@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {REFRESH_RELATED} from '../../events/eventTypes';
+
 (function (can, GGRC, CMS) {
   'use strict';
   var CurrentPageUtils = GGRC.Utils.CurrentPage;
@@ -37,18 +39,21 @@
     },
     events: {
       refreshIssueList: function (window, event, instance) {
-        var pageInstance;
+        let model = 'Issue';
 
         if (instance instanceof CMS.Models.Issue) {
-          pageInstance = GGRC.page_instance();
+          let pageInstance = GGRC.page_instance();
           CurrentPageUtils.initCounts(
-            ['Issue'],
+            [model],
             pageInstance.type,
             pageInstance.id
           );
         }
 
-        this.viewModel.attr('relatedInstance').dispatch('refreshInstance');
+        this.viewModel.attr('relatedInstance').dispatch({
+          ...REFRESH_RELATED,
+          model,
+        });
       },
       '{window} modal:added': 'refreshIssueList',
       '{window} modal:success': 'refreshIssueList',
