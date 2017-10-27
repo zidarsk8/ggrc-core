@@ -3,7 +3,10 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../utils/gdrive-picker-utils.js';
+import {
+  uploadFiles,
+  GDRIVE_PICKER_ERR_CANCEL,
+} from '../utils/gdrive-picker-utils.js';
 
 (function (can, $) {
   'use strict';
@@ -294,84 +297,19 @@ import '../utils/gdrive-picker-utils.js';
         });
       },
       'a[data-toggle=gdrive-picker] click': function (el, ev) {
-        var folder_id = el.data('folder-id');
-        var dfd;
-        var picker;
-
-        // Create and render a Picker object for searching images.
-        function createPicker() {
-          GGRC.Controllers.GAPI.oauth_dfd.done(function (token, oauth_user) {
-            var dialog;
-            var view;
-            var docsUploadView;
-            var docsView;
-
-            picker = new google.picker.PickerBuilder()
-                  .setOAuthToken(gapi.auth.getToken().access_token)
-                  .setDeveloperKey(GGRC.config.GAPI_KEY)
-                  .setCallback(pickerCallback);
-
-            if (el.data('type') === 'folders') {
-              view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-                .setMimeTypes(['application/vnd.google-apps.folder'])
-                .setSelectFolderEnabled(true);
-              picker.setTitle('Select folder');
-              picker.addView(view);
-            } else {
-              docsUploadView = new google.picker.DocsUploadView()
-                .setParent(folder_id);
-              docsView = new google.picker.DocsView()
-                .setParent(folder_id);
-
-              picker.addView(docsUploadView)
-                .addView(docsView)
-                .enableFeature(google.picker.Feature.MULTISELECT_ENABLED);
-            }
-            picker = picker.build();
-            picker.setVisible(true);
-            // use undocumented fu to make the Picker be "modal"
-            // this is the "mask" displayed behind the dialog box div
-            $('div.picker-dialog-bg').css('zIndex', 4000);  // there are multiple divs of that sort
-            // and this is the dialog box modal div, which we must display on top of our modal, if any
-
-            dialog = GGRC.Utils.getPickerElement(picker);
-            if (dialog) {
-              dialog.style.zIndex = 4001; // our modals start with 2050
-            }
+        uploadFiles({
+          parentId: el.data('folder-id'),
+          pickFolder: el.data('type') === 'folders',
+        }).then((files, action) => {
+          el.trigger('picked', {
+            files,
           });
-        }
-
-        function pickerCallback(data) {
-          var files;
-          var model;
-          var PICKED = google.picker.Action.PICKED;
-          var ACTION = google.picker.Response.ACTION;
-          var DOCUMENTS = google.picker.Response.DOCUMENTS;
-          var CANCEL = google.picker.Action.CANCEL;
-
-          if (data[ACTION] === PICKED) {
-            if (el.data('type') === 'folders') {
-              model = CMS.Models.GDriveFolder;
-            } else {
-              model = CMS.Mdoels.GDriveFile;
-            }
-            files = model.models(data[DOCUMENTS]);
-            el.trigger('picked', {
-              files: files
-            });
-          } else if (data[ACTION] === CANCEL) {
+        })
+        .fail((err)=>{
+          if ( err && err.type === GDRIVE_PICKER_ERR_CANCEL ) {
             el.trigger('rejected');
           }
-          GGRC.Utils.GDrivePicker.ensurePickerDisposed(picker, data);
-        }
-
-        dfd = GGRC.Controllers.GAPI.reAuthorize(gapi.auth.getToken());
-        dfd.fail(this.unsetCurrent.bind(this))
-          .done(function () {
-            gapi.load('picker', {
-              callback: createPicker
-            });
-          });
+        });
       },
 
       /*
