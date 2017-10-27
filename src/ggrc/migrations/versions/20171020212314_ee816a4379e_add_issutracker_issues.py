@@ -49,6 +49,7 @@ def upgrade():
           'object_type', 'object_id', name='uq_object_id_object_type'),
   )
 
+
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   op.drop_table('issuetracker_issues')

@@ -36,8 +36,8 @@ class TestBuilder(TestCase):
     self.mock_builders.append(name)
     return cls
 
-  def mock_model(
-      self, name, bases=(), _publish_attrs=None, parents=(), **kwarg):
+  def mock_model(self, name, bases=(), _publish_attrs=None,
+                 parents=(), **kwarg):
     model = MagicMock()
     model.__class__ = self.mock_class(
         name, bases, _publish_attrs, parents=parents)

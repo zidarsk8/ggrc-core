@@ -76,7 +76,8 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
       'default_people',
       reflection.Attribute('issue_tracker', create=False, update=False),
       reflection.Attribute('archived', create=False, update=False),
-      reflection.Attribute('DEFAULT_PEOPLE_LABELS', create=False, update=False),
+      reflection.Attribute(
+          'DEFAULT_PEOPLE_LABELS', create=False, update=False),
   )
 
   _fulltext_attrs = [

@@ -108,6 +108,298 @@ class BadResponseError(Error):
   """Wrong formatted response error."""
 
 
+@signals.Restful.model_put.connect_via(all_models.Assessment)
+def handle_assessment_put(sender, obj=None, src=None, service=None):
+  """Handles assessment update event."""
+  del sender, service  # Unused
+
+  issue_tracker_info = src.get('issue_tracker')
+  if issue_tracker_info:
+    # Preserve initial state of issue tracker info.
+    src['__stash']['issue_tracker'] = copy.deepcopy(obj.issue_tracker)
+    _update_issuetracker_info(obj, issue_tracker_info)
+
+
+@signals.Restful.model_put_after_commit.connect_via(all_models.Assessment)
+def handle_assessment_put_after_commit(sender, obj=None, src=None, **kwargs):
+  """Handles assessment post update event."""
+  del sender  # Unused
+
+  initial_state = kwargs.pop('initial_state', None)
+  issue_tracker_info = obj.issue_tracker
+  if (issue_tracker_info.get('enabled') and
+          issue_tracker_info.get('issue_id')):
+    try:
+      _update_issuetracker_issue(obj, issue_tracker_info, initial_state, src)
+    except (HttpError, BadResponseError) as error:
+      logger.error('Unable update Issue Tracker issue: %s', error)
+      # Dirty hack to rollback change to issuetracker_issues model.
+      # Reverted info doesn't get sent to frontend so page refresh is
+      # required but the hack at least allows to keep data in sync.
+      initial_issue_tracker_info = src['__stash'].get('issue_tracker')
+      if initial_issue_tracker_info:
+        _update_issuetracker_info(obj, initial_issue_tracker_info)
+
+
+@signals.Restful.model_deleted.connect_via(all_models.Assessment)
+def handle_assessment_deleted(sender, obj=None, service=None):
+  """Handles assessment delete event."""
+  del sender, service  # Unused
+
+  issue_obj = all_models.IssuetrackerIssue.get_issue(
+      _ASSESSMENT_MODEL_NAME, obj.id)
+
+  if issue_obj:
+    if issue_obj.enabled and issue_obj.issue_id:
+      issue_params = {
+          'status': 'OBSOLETE',
+          'comment': (
+              'Assessment has been deleted. Changes to this GGRC '
+              'Assessment will no longer be tracked within this bug.'
+          ),
+      }
+      try:
+        _send_request(
+            '/api/issues/%s' % issue_obj.issue_id,
+            method=urlfetch.PUT, payload=issue_params)
+      except (HttpError, BadResponseError) as error:
+        logger.error('Unable to update Issue tracker: %s', error)
+        raise exceptions.InternalServerError(
+            'Unable update Issue Tracker issue.')
+    db.session.delete(issue_obj)
+
+
+@signals.Restful.collection_posted.connect_via(all_models.Relationship)
+def handle_relation_post(sender, objects=None, sources=None, service=None):
+  """Handles create event to Relationships model."""
+  del sender, sources, service  # Unused
+
+  if not _is_issue_tracker_enabled():
+    return
+
+  assessment_ids = [
+      obj.destination_id
+      for obj in objects
+      if obj.destination_type == _ASSESSMENT_MODEL_NAME
+  ]
+  if not assessment_ids:
+    return
+
+  db.session.flush()
+
+  for assessment in all_models.Assessment.query.filter(
+      all_models.Assessment.id.in_(assessment_ids)
+  ).all():
+    if not _is_issue_tracker_enabled(audit=assessment.audit):
+      continue
+    issue_obj = all_models.IssuetrackerIssue.get_issue(
+        _ASSESSMENT_MODEL_NAME, assessment.id)
+    if (issue_obj is None or
+            not issue_obj.enabled or
+            issue_obj.assignee is not None):
+      continue
+
+    assignee_email, cc_list = _collect_issue_emails(assessment)
+    issue_tracker_info = issue_obj.to_dict(include_issue=True)
+    issue_tracker_info['status'] = 'ASSIGNED'
+    issue_tracker_info['assignee'] = assignee_email
+    issue_tracker_info['cc_list'] = cc_list
+    issue_id = issue_tracker_info.get('issue_id')
+    if issue_id:
+      issue_params = {
+          'status': 'ASSIGNED',
+          'assignee': assignee_email,
+          'verifier': assignee_email,
+          'ccs': cc_list,
+      }
+      try:
+        _send_request(
+            '/api/issues/%s' % issue_id,
+            method=urlfetch.PUT, payload=issue_params)
+      except (HttpError, BadResponseError) as error:
+        logger.error('Unable to update Issue tracker: %s', error)
+        raise exceptions.InternalServerError(
+            'Unable update Issue Tracker issue.')
+
+    _update_issuetracker_info(assessment, issue_tracker_info)
+
+
+@signals.Restful.collection_posted.connect_via(all_models.AssessmentTemplate)
+def handle_assessment_tmpl_post(sender, objects=None, sources=None):
+  """Handles create event to AssessmentTemplate model."""
+  del sender  # Unused
+
+  db.session.flush()
+  template_ids = {
+      obj.id for obj in objects
+  }
+
+  if not template_ids:
+    return
+
+  # TODO(anushovan): use joined query to fetch audits or even
+  #   issuetracker_issues with one query.
+  audit_map = {
+      r.destination_id: r.source_id
+      for r in all_models.Relationship.query.filter(
+          all_models.Relationship.source_type == 'Audit',
+          all_models.Relationship.destination_type == 'AssessmentTemplate',
+          all_models.Relationship.destination_id.in_(template_ids)).all()
+  }
+
+  if not audit_map:
+    return
+
+  audits = {
+      a.id: a
+      for a in all_models.Audit.query.filter(
+          all_models.Audit.id.in_(audit_map.values())).all()
+  }
+
+  for obj, src in itertools.izip(objects, sources):
+    audit_id = audit_map.get(obj.id)
+    audit = audits.get(audit_id) if audit_id else None
+    if not audit or not _is_issue_tracker_enabled(audit=audit):
+      issue_tracker_info = {
+          'enabled': False,
+      }
+    else:
+      issue_tracker_info = src.get('issue_tracker')
+
+    if not issue_tracker_info:
+      continue
+    all_models.IssuetrackerIssue.create_or_update_from_dict(
+        _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
+
+
+@signals.Restful.model_put.connect_via(all_models.AssessmentTemplate)
+def handle_assessment_tmpl_put(sender, obj=None, src=None, service=None,
+                               initial_state=None):
+  """Handles update event to AssessmentTemplate model."""
+  del sender, service, initial_state  # Unused
+
+  audit = all_models.Audit.query.join(
+      all_models.Relationship,
+      all_models.Relationship.source_id == all_models.Audit.id,
+  ).filter(
+      all_models.Relationship.source_type == 'Audit',
+      all_models.Relationship.destination_type == 'AssessmentTemplate',
+      all_models.Relationship.destination_id == obj.id
+  ).first()
+
+  if not audit or not _is_issue_tracker_enabled(audit=audit):
+    issue_tracker_info = {
+        'enabled': False,
+    }
+  else:
+    issue_tracker_info = src.get('issue_tracker')
+  if issue_tracker_info:
+    all_models.IssuetrackerIssue.create_or_update_from_dict(
+        _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
+
+
+@signals.Restful.model_deleted_after_commit.connect_via(
+    all_models.AssessmentTemplate)
+def handle_assessment_tmpl_deleted_after_commit(sender, obj=None,
+                                                service=None, event=None):
+  """Handles delete event to AssessmentTemplate model."""
+  del sender, service, event  # Unused
+
+  issue_obj = all_models.IssuetrackerIssue.get_issue(
+      _ASSESSMENT_TMPL_MODEL_NAME, obj.id)
+  if issue_obj:
+    db.session.delete(issue_obj)
+
+
+def _load_snapshots(snapshot_ids):
+  """Returns snapshots for given IDs."""
+  return {
+      s.id: s for s in all_models.Snapshot.query.options(
+          orm.undefer_group('Snapshot_complete'),
+          orm.Load(all_models.Snapshot).joinedload(
+              'revision'
+          ).undefer_group(
+              'Revision_complete'
+          )
+      ).filter(
+          all_models.Snapshot.id.in_(snapshot_ids)
+      )
+  }
+
+
+def _load_templates(template_ids):
+  """Returns assessment templates for given IDs."""
+  return {
+      t.id: t for t in all_models.AssessmentTemplate.query.options(
+          orm.undefer_group('AssessmentTemplate_complete'),
+      ).filter(
+          all_models.AssessmentTemplate.id.in_(template_ids)
+      )
+  }
+
+
+def _load_audits(audit_ids):
+  """Returns audits for given IDs."""
+  return {
+      a.id: a for a in all_models.Audit.query.options(
+          orm.undefer_group('Audit_complete'),
+      ).filter(
+          all_models.Audit.id.in_(audit_ids)
+      )
+  }
+
+
+def _handle_assessment(assessment, src, snapshots, templates, audits):
+  """Handles auto calculated properties for Assessment model."""
+  snapshot_dict = src.get('object') or {}
+  common.map_objects(assessment, snapshot_dict)
+  common.map_objects(assessment, src.get('audit'))
+  snapshot = snapshots.get(snapshot_dict.get('id'))
+
+  if not src.get('_generated') and not snapshot:
+    return
+
+  template = templates.get(src.get('template', {}).get('id'))
+  audit = audits[src['audit']['id']]
+  relate_assignees(assessment, snapshot, template, audit)
+  relate_ca(assessment, template)
+  assessment.title = u'{} assessment for {}'.format(
+      snapshot.revision.content['title'],
+      audit.title,
+  )
+
+  if not template:
+    return
+
+  if template.test_plan_procedure:
+    assessment.test_plan = snapshot.revision.content['test_plan']
+  else:
+    assessment.test_plan = template.procedure_description
+  if template.template_object_type:
+    assessment.assessment_type = template.template_object_type
+
+
+def _handle_issue_tracker(assessment, src, snapshots, templates, audits):
+  """Handles issue tracker related data."""
+  del snapshots  # Unused
+  # Get issue tracker data from request.
+  info = src.get('issue_tracker') or {}
+
+  if not info:
+    # Check assessment template for issue tracker data.
+    template = templates.get(src.get('template', {}).get('id'))
+    if template:
+      info = template.issue_tracker
+
+  if not info:
+    # Check audit for issue tracker data.
+    audit = audits.get(src.get('audit', {}).get('id'))
+    if audit:
+      info = audit.issue_tracker
+
+  _create_issuetracker_info(assessment, info)
+
+
 def init_hook():
   """Initializes hooks."""
 
@@ -134,270 +426,21 @@ def init_hook():
       audit_ids.append(src.get('audit', {}).get('id'))
       template_ids.append(src.get('template', {}).get('id'))
 
-    snapshot_cache = {
-        s.id: s for s in all_models.Snapshot.query.options(
-            orm.undefer_group('Snapshot_complete'),
-            orm.Load(all_models.Snapshot).joinedload(
-                'revision'
-            ).undefer_group(
-                'Revision_complete'
-            )
-        ).filter(
-            all_models.Snapshot.id.in_(snapshot_ids)
-        )
-    }
-    template_cache = {
-        t.id: t for t in all_models.AssessmentTemplate.query.options(
-            orm.undefer_group('AssessmentTemplate_complete'),
-        ).filter(
-            all_models.AssessmentTemplate.id.in_(template_ids)
-        )
-    }
-    audit_cache = {
-        a.id: a for a in all_models.Audit.query.options(
-            orm.undefer_group('Audit_complete'),
-        ).filter(
-            all_models.Audit.id.in_(audit_ids)
-        )
-    }
+    snapshot_cache = _load_snapshots(snapshot_ids)
+    template_cache = _load_templates(template_ids)
+    audit_cache = _load_audits(audit_ids)
 
     for assessment, src in itertools.izip(objects, sources):
-      snapshot_dict = src.get('object') or {}
-      common.map_objects(assessment, snapshot_dict)
-      common.map_objects(assessment, src.get('audit'))
-      snapshot = snapshot_cache.get(snapshot_dict.get('id'))
-      if not src.get('_generated') and not snapshot:
-        continue
-      template = template_cache.get(src.get('template', {}).get('id'))
-      audit = audit_cache[src['audit']['id']]
-      relate_assignees(assessment, snapshot, template, audit)
-      relate_ca(assessment, template)
-      assessment.title = u'{} assessment for {}'.format(
-          snapshot.revision.content['title'],
-          audit.title,
-      )
-      if not template:
-        continue
-      if template.test_plan_procedure:
-        assessment.test_plan = snapshot.revision.content['test_plan']
-      else:
-        assessment.test_plan = template.procedure_description
-      if template.template_object_type:
-        assessment.assessment_type = template.template_object_type
-
-    for assessment, src in itertools.izip(objects, sources):
-      # Get issue tracker data from request.
-      info = src.get('issue_tracker') or {}
-
-      if not info:
-        # Check assessment template for issue tracker data.
-        template = template_cache.get(src.get('template', {}).get('id'))
-        if template:
-          info = template.issue_tracker
-
-      if not info:
-        # Check audit for issue tracker data.
-        audit = audit_cache.get(src.get('audit', {}).get('id'))
-        if audit:
-          info = audit.issue_tracker
-
-      _create_issuetracker_info(assessment, info)
+      _handle_assessment(
+          assessment, src, snapshot_cache, template_cache, audit_cache)
+      _handle_issue_tracker(
+          assessment, src, snapshot_cache, template_cache, audit_cache)
 
   @signals.Restful.model_put.connect_via(all_models.Assessment)
   def handle_assessment_put(sender, obj=None, src=None, service=None):
     """Handles assessment update event."""
-    del sender, service  # Unused
-
+    del sender, src, service  # Unused
     common.ensure_field_not_changed(obj, 'audit')
-
-    issue_tracker_info = src.get('issue_tracker')
-    if issue_tracker_info:
-      # Preserve initial state of issue tracker info.
-      src['__stash']['issue_tracker'] = copy.deepcopy(obj.issue_tracker)
-      _update_issuetracker_info(obj, issue_tracker_info)
-
-  @signals.Restful.model_put_after_commit.connect_via(all_models.Assessment)
-  def handle_assessment_put_after_commit(sender, obj=None, src=None, **kwargs):
-    """Handles assessment post update event."""
-    del sender  # Unused
-
-    initial_state = kwargs.pop('initial_state', None)
-    issue_tracker_info = obj.issue_tracker
-    if issue_tracker_info.get('enabled') and issue_tracker_info.get('issue_id'):
-      try:
-        _update_issuetracker_issue(obj, issue_tracker_info, initial_state, src)
-      except (HttpError, BadResponseError) as error:
-        logger.error('Unable update Issue Tracker issue: %s', error)
-        # Dirty hack to rollback change to issuetracker_issues model.
-        # Reverted info doesn't get sent to frontend so page refresh is required
-        # but the hack at least allows to keep data in sync.
-        initial_issue_tracker_info = src['__stash'].get('issue_tracker')
-        if initial_issue_tracker_info:
-          _update_issuetracker_info(obj, initial_issue_tracker_info)
-
-  @signals.Restful.model_deleted.connect_via(all_models.Assessment)
-  def handle_assessment_deleted(sender, obj=None, service=None):
-    """Handles assessment delete event."""
-    del sender, service  # Unused
-
-    issue_obj = all_models.IssuetrackerIssue.get_issue(
-        _ASSESSMENT_MODEL_NAME, obj.id)
-
-    if issue_obj:
-      if issue_obj.enabled and issue_obj.issue_id:
-        issue_params = {
-            'status': 'OBSOLETE',
-            'comment': (
-                'Assessment has been deleted. Changes to this GGRC '
-                'Assessment will no longer be tracked within this bug.'
-            ),
-        }
-        try:
-          _send_request(
-              '/api/issues/%s' % issue_obj.issue_id,
-              method=urlfetch.PUT, payload=issue_params)
-        except (HttpError, BadResponseError) as error:
-          logger.error('Unable to update Issue tracker: %s', error)
-          raise exceptions.InternalServerError(
-              'Unable update Issue Tracker issue.')
-      db.session.delete(issue_obj)
-
-  @signals.Restful.collection_posted.connect_via(all_models.Relationship)
-  def handle_relation_post(sender, objects=None, sources=None, service=None):
-    """Handles create event to Relationships model."""
-    del sender, sources, service  # Unused
-
-    if not _is_issue_tracker_enabled():
-      return
-
-    assessment_ids = [
-        obj.destination_id
-        for obj in objects
-        if obj.destination_type == _ASSESSMENT_MODEL_NAME
-    ]
-    if not assessment_ids:
-      return
-
-    db.session.flush()
-
-    for assessment in all_models.Assessment.query.filter(
-        all_models.Assessment.id.in_(assessment_ids)).all():
-      if not _is_issue_tracker_enabled(audit=assessment.audit):
-        continue
-      issue_obj = all_models.IssuetrackerIssue.get_issue(
-          _ASSESSMENT_MODEL_NAME, assessment.id)
-      if (issue_obj is None or
-          not issue_obj.enabled or
-          issue_obj.assignee is not None):
-        continue
-
-      assignee_email, cc_list = _collect_issue_emails(assessment)
-      issue_tracker_info = issue_obj.to_dict(include_issue=True)
-      issue_tracker_info['status'] = 'ASSIGNED'
-      issue_tracker_info['assignee'] = assignee_email
-      issue_tracker_info['cc_list'] = cc_list
-      issue_id = issue_tracker_info.get('issue_id')
-      if issue_id:
-        issue_params = {
-            'status': 'ASSIGNED',
-            'assignee': assignee_email,
-            'verifier': assignee_email,
-            'ccs': cc_list,
-        }
-        try:
-          _send_request(
-              '/api/issues/%s' % issue_id,
-              method=urlfetch.PUT, payload=issue_params)
-        except (HttpError, BadResponseError) as error:
-          logger.error('Unable to update Issue tracker: %s', error)
-          raise exceptions.InternalServerError(
-              'Unable update Issue Tracker issue.')
-
-      _update_issuetracker_info(assessment, issue_tracker_info)
-
-  @signals.Restful.collection_posted.connect_via(all_models.AssessmentTemplate)
-  def handle_assessment_tmpl_post(sender, objects=None, sources=None):
-    """Handles create event to AssessmentTemplate model."""
-    del sender  # Unused
-
-    db.session.flush()
-    template_ids = {
-        obj.id for obj in objects
-    }
-
-    if not template_ids:
-      return
-
-    # TODO(anushovan): use joined query to fetch audits or even
-    #   issuetracker_issues with one query.
-    audit_map = {
-        r.destination_id: r.source_id
-        for r in all_models.Relationship.query.filter(
-            all_models.Relationship.source_type == 'Audit',
-            all_models.Relationship.destination_type == 'AssessmentTemplate',
-            all_models.Relationship.destination_id.in_(template_ids)).all()
-    }
-
-    if not audit_map:
-      return
-
-    audits = {
-        a.id: a
-        for a in all_models.Audit.query.filter(
-          all_models.Audit.id.in_(audit_map.values())).all()
-    }
-
-    for obj, src in itertools.izip(objects, sources):
-      audit_id = audit_map.get(obj.id)
-      audit = audits.get(audit_id) if audit_id else None
-      if not audit or not _is_issue_tracker_enabled(audit=audit):
-        issue_tracker_info = {
-            'enabled': False,
-        }
-      else:
-        issue_tracker_info = src.get('issue_tracker')
-
-      if not issue_tracker_info:
-        continue
-      all_models.IssuetrackerIssue.create_or_update_from_dict(
-          _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
-
-  @signals.Restful.model_put.connect_via(all_models.AssessmentTemplate)
-  def handle_assessment_tmpl_put(
-      sender, obj=None, src=None, service=None, initial_state=None):
-    """Handles update event to AssessmentTemplate model."""
-    del sender, service, initial_state  # Unused
-
-    audit = all_models.Audit.query.join(
-        all_models.Relationship,
-        all_models.Relationship.source_id == all_models.Audit.id,
-    ).filter(
-        all_models.Relationship.source_type == 'Audit',
-        all_models.Relationship.destination_type == 'AssessmentTemplate',
-        all_models.Relationship.destination_id == obj.id
-    ).first()
-
-    if not audit or not _is_issue_tracker_enabled(audit=audit):
-      issue_tracker_info = {
-          'enabled': False,
-      }
-    else:
-      issue_tracker_info = src.get('issue_tracker')
-    if issue_tracker_info:
-      all_models.IssuetrackerIssue.create_or_update_from_dict(
-          _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
-
-  @signals.Restful.model_deleted_after_commit.connect_via(
-      all_models.AssessmentTemplate)
-  def handle_assessment_tmpl_deleted_after_commit(
-      sender, obj=None, service=None, event=None):
-    """Handles delete event to AssessmentTemplate model."""
-    del sender, service, event  # Unused
-
-    issue_obj = all_models.IssuetrackerIssue.get_issue(
-        _ASSESSMENT_TMPL_MODEL_NAME, obj.id)
-    if issue_obj:
-      db.session.delete(issue_obj)
 
 
 def _is_issue_tracker_enabled(audit=None):
@@ -587,13 +630,14 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
     issue_tracker_info['title'] = assessment.title
 
   if (issue_tracker_info.get('enabled') and
-      _is_issue_tracker_enabled(audit=assessment.audit)):
+          _is_issue_tracker_enabled(audit=assessment.audit)):
 
     try:
       issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
     except (HttpError, BadResponseError) as error:
       logger.error('Unable create Issue Tracker issue: %s', error)
-      raise exceptions.InternalServerError('Unable create Issue Tracker issue.')
+      raise exceptions.InternalServerError(
+          'Unable create Issue Tracker issue.')
 
     issue_tracker_info['issue_id'] = issue_id
     issue_tracker_info['issue_url'] = _ISSUE_URL_TMPL % issue_id
@@ -606,8 +650,34 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
       _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
 
 
-def _update_issuetracker_issue(
-    assessment, issue_tracker_info, initial_assessment, request):
+def _build_status_comment(assessment, initial_assessment):
+  """Returns status message if status gets changed or None otherwise."""
+  if initial_assessment.status == assessment.status:
+    return None
+
+  verifiers = assessment.verifiers
+  status_text = assessment.status
+  if verifiers:
+    status = _VERIFIER_STATUSES.get(
+        (initial_assessment.status, assessment.status, assessment.verified))
+    # Corner case for custom status text.
+    if assessment.verified and assessment.status == 'Completed':
+      status_text = '%s and Verified' % status_text
+  else:
+    status = _NO_VERIFIER_STATUSES.get(
+        (initial_assessment.status, assessment.status))
+
+  if status:
+    return status, _STATUS_CHANGE_COMMENT_TMPL % (
+        status_text, _get_assessment_url(assessment))
+  else:
+    # Default comment to track status update in issue tracker.
+    return None, 'Assessment status has been updated: %s -> %s' % (
+        initial_assessment.status, status_text)
+
+
+def _update_issuetracker_issue(assessment, issue_tracker_info,
+                               initial_assessment, request):
   """Collects information and sends a request to update external issue."""
   issue_params = {}
   # Handle updates to basic issue tracker properties.
@@ -618,29 +688,15 @@ def _update_issuetracker_issue(
       issue_params[api_name] = value
 
   comments = []
-  # Handle status update.
-  if initial_assessment.status != assessment.status:
-    verifiers = assessment.verifiers
-    status_text = assessment.status
-    if verifiers:
-      status = _VERIFIER_STATUSES.get(
-          (initial_assessment.status, assessment.status, assessment.verified))
-      # Corner case for custom status text.
-      if assessment.verified and assessment.status == 'Completed':
-        status_text = '%s and Verified' % status_text
-    else:
-      status = _NO_VERIFIER_STATUSES.get(
-          (initial_assessment.status, assessment.status))
 
-    if status:
-      issue_params['status'] = status
-      comments.append(_STATUS_CHANGE_COMMENT_TMPL % (
-          status_text, _get_assessment_url(assessment)))
-    else:
-      # Default comment to track status update in issue tracker.
-      comments.append(
-          'Assessment status has been updated: %s -> %s' % (
-              initial_assessment.status, status_text))
+  # Handle status update.
+  status_value, status_comment = _build_status_comment(
+      assessment, initial_assessment)
+  if status_value:
+    issue_params['status'] = status_value
+
+  if status_comment:
+    comments.append(status_comment)
 
   # Attach user comments if any.
   comment_text = _get_added_comment_text(request)
