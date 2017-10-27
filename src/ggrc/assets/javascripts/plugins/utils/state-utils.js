@@ -38,10 +38,18 @@ let statesModels = [
   },
   {
     models: [
-      'Person', 'CycleTaskGroupObjectTask', 'Workflow',
-      'TaskGroup', 'Cycle'
+      'Person', 'Workflow', 'TaskGroup', 'Cycle',
     ],
-    states: []
+    states: [],
+  },
+  {
+    models: [
+      'CycleTaskGroupObjectTask',
+    ],
+    states: [
+      'Assigned', 'InProgress', 'Finished',
+      'Declined', 'Deprecated', 'Verified',
+    ],
   },
   {
     models: ['Issue'],
