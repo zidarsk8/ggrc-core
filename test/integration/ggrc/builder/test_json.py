@@ -77,7 +77,6 @@ class TestBuilder(TestCase):
         foo='bar',
         boo='far',
         _publish_attrs=['foo'],
-        __bases__=[],
     )
     json_obj = publish(model)
     self.assertDictContainsSubset(
