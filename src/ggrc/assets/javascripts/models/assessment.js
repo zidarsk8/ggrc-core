@@ -53,57 +53,57 @@
         attr_name: 'slug',
         order: 5,
       }, {
-        attr_title: 'Last Updated',
-        attr_name: 'updated_at',
-        order: 10,
-      }, {
-        attr_title: 'Last Updated By',
-        attr_name: 'modified_by',
-        order: 11,
-      }, {
-        attr_title: 'Conclusion: Design',
-        attr_name: 'design',
-        order: 15,
-      }, {
-        attr_title: 'Conclusion: Operation',
-        attr_name: 'operationally',
-        order: 16,
-      }, {
-        attr_title: 'Finished Date',
-        attr_name: 'finished_date',
-        order: 13,
-      }, {
-        attr_title: 'Verified Date',
-        attr_name: 'verified_date',
-        order: 12,
-      }, {
-        attr_title: 'Reference URL',
-        attr_name: 'reference_url',
-        order: 14,
-      }, {
         attr_title: 'Creators',
         attr_name: 'creators',
-        order: 5,
+        order: 6,
       }, {
         attr_title: 'Assignees',
         attr_name: 'assignees',
-        order: 6,
+        order: 7,
       }, {
         attr_title: 'Verifiers',
         attr_name: 'verifiers',
-        order: 7,
+        order: 8,
       }, {
         attr_title: 'Due Date',
         attr_name: 'start_date',
-        order: 8,
+        order: 9,
       }, {
         attr_title: 'Created Date',
         attr_name: 'created_at',
-        order: 9,
+        order: 10,
+      }, {
+        attr_title: 'Last Updated',
+        attr_name: 'updated_at',
+        order: 11,
+      }, {
+        attr_title: 'Last Updated By',
+        attr_name: 'modified_by',
+        order: 12,
+      }, {
+        attr_title: 'Verified Date',
+        attr_name: 'verified_date',
+        order: 13,
+      }, {
+        attr_title: 'Finished Date',
+        attr_name: 'finished_date',
+        order: 14,
+      }, {
+        attr_title: 'Reference URL',
+        attr_name: 'reference_url',
+        order: 15,
+      }, {
+        attr_title: 'Conclusion: Design',
+        attr_name: 'design',
+        order: 16,
+      }, {
+        attr_title: 'Conclusion: Operation',
+        attr_name: 'operationally',
+        order: 17,
       }, {
         attr_title: 'Archived',
         attr_name: 'archived',
-        order: 17,
+        order: 18,
       }],
       display_attr_names: ['title', 'status', 'label', 'assignees', 'verifiers',
         'start_date', 'updated_at'],
