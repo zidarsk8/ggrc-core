@@ -1,5 +1,5 @@
-Guidelines
-==========
+Contributing
+============
 
 Contents:
 

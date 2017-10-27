@@ -1,3 +1,5 @@
+.. _advanced-query-api:
+
 Advanced Query API
 ==================
 
@@ -903,9 +905,9 @@ Response:
             }
         }
     ]
-        
+
 Notes:
-    
+
 - every block is evaluated one by one, so they should be transformed
   from the form bottom-first;
 - you can't reference the next blocks in the list;
