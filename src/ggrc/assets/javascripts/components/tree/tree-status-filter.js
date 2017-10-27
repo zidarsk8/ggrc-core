@@ -45,39 +45,6 @@ let viewModel = can.Map.extend({
   widgetId: null,
   modelName: null,
   displayPrefs: null,
-  init: function () {
-    var options = this.attr('options');
-    var filter = this.attr('filter');
-    var operation = this.attr('operation');
-    var depth = this.attr('depth');
-    var filterName = this.attr('widgetId') ||
-      this.attr('modelName');
-    var filterStates = StateUtils.getStatesForModel(this.attr('modelName'))
-      .map(function (state) {
-        return {
-          value: state,
-        };
-      });
-
-    options.attr('filter', filter);
-    options.attr('operation', operation);
-    options.attr('depth', depth);
-    options.attr('name', 'status');
-
-    if (this.registerFilter) {
-      this.registerFilter(options);
-    }
-
-    this.attr('filterStates', filterStates);
-
-    if (this.attr('useLocalStorage')) {
-      CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
-        this.attr('displayPrefs', displayPrefs);
-
-        this.loadTreeStates(filterName);
-      }.bind(this));
-    }
-  },
   loadTreeStates: function (modelName) {
     // Get the status list from local storage
     var savedStates = this.attr('displayPrefs')
@@ -123,6 +90,39 @@ export default GGRC.Components('treeStatusFilter', {
   template: '<content/>',
   viewModel: viewModel,
   events: {
+    inserted: function () {
+      var vm = this.viewModel;
+      var options = vm.attr('options');
+      var filter = vm.attr('filter');
+      var operation = vm.attr('operation');
+      var depth = vm.attr('depth');
+      var filterName = vm.attr('widgetId') || vm.attr('modelName');
+      var filterStates = StateUtils.getStatesForModel(vm.attr('modelName'))
+        .map(function (state) {
+          return {
+            value: state,
+          };
+        });
+
+      options.attr('filter', filter);
+      options.attr('operation', operation);
+      options.attr('depth', depth);
+      options.attr('name', 'status');
+
+      if (vm.registerFilter) {
+        vm.registerFilter(options);
+      }
+
+      vm.attr('filterStates', filterStates);
+
+      if (vm.attr('useLocalStorage')) {
+        CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
+          vm.attr('displayPrefs', displayPrefs);
+
+          vm.loadTreeStates(filterName);
+        });
+      }
+    },
     'multiselect-dropdown multiselect:closed': function (el, ev, selected) {
       ev.stopPropagation();
       this.viewModel.saveTreeStates(selected);
