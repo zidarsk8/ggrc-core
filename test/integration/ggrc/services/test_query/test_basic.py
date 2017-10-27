@@ -494,15 +494,21 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     )
     self.assertEqual(controls["count"], 4)
 
-  def test_order_control_by_frequency(self):
-    """Test correct ordering and by frequency"""
+  @ddt.data(
+      ("Frequency", "verify_frequency"),
+      ("kind/nature", "kind"),
+      ("type/means", "means"),
+  )
+  @ddt.unpack
+  def test_order_control_by_option(self, order_key, val_key):
+    """Test correct ordering and by option."""
     controls_unordered = self._get_first_result_set(
         self._make_query_dict("Control",),
         "Control", "values"
     )
     controls_ordered_1 = self._get_first_result_set(
         self._make_query_dict("Control",
-                              order_by=[{"name": "Frequency"},
+                              order_by=[{"name": order_key},
                                         {"name": "id"}]),
         "Control", "values"
     )
@@ -510,10 +516,10 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
 
     def sort_key(val):
       """sorting key getter function"""
-      freq = val["verify_frequency"]
-      if not freq:
+      option = val[val_key]
+      if not option:
         return None
-      return options_map[freq["id"]]
+      return options_map[option["id"]]
 
     controls_ordered_2 = sorted(controls_unordered, key=sort_key)
     self.assertListEqual(
@@ -529,33 +535,6 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
         "Control",
     )
     self.assertEqual(controls["count"], 3)
-
-  def test_order_control_by_kind(self):
-    """Test correct ordering and by kind/nature"""
-    controls_unordered = self._get_first_result_set(
-        self._make_query_dict("Control",),
-        "Control", "values"
-    )
-    controls_ordered_1 = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              order_by=[{"name": "kind/nature"},
-                                        {"name": "id"}]),
-        "Control", "values"
-    )
-    options_map = {o.id: o.title for o in models.Option.query}
-
-    def sort_key(val):
-      """sorting key getter function"""
-      kind = val["kind"]
-      if not kind:
-        return None
-      return options_map[kind["id"]]
-
-    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
-    self.assertListEqual(
-        self._sort_sublists(controls_ordered_1),
-        self._sort_sublists(controls_ordered_2),
-    )
 
   def test_filter_control_by_means(self):
     """Test correct filtering by means"""
@@ -686,8 +665,9 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
     )
     self.assertEqual(controls["count"], 3)
 
-  def test_order_control_by_assertions(self):
-    """Test correct ordering and by assertions"""
+  @ddt.data("assertions", "categories")
+  def test_order_control_by_category(self, key):
+    """Test correct ordering and by category."""
     controls_unordered = self._get_first_result_set(
         self._make_query_dict("Control",),
         "Control", "values"
@@ -695,16 +675,17 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
 
     controls_ordered_1 = self._get_first_result_set(
         self._make_query_dict("Control",
-                              order_by=[{"name": "assertions"},
+                              order_by=[{"name": key},
                                         {"name": "id"}]),
         "Control", "values"
     )
     categories = {c.id: c.name for c in models.CategoryBase.query}
 
     def sort_key(val):
-      ctrl_assertions = val.get("assertions")
-      if isinstance(ctrl_assertions, list) and ctrl_assertions:
-        return (categories.get(ctrl_assertions[0]["id"]), val["id"])
+      """sorting key getter function"""
+      ctrl = val.get(key)
+      if isinstance(ctrl, list) and ctrl:
+        return (categories.get(ctrl[0]["id"]), val["id"])
       return (None, val["id"])
 
     controls_ordered_2 = sorted(controls_unordered, key=sort_key)
@@ -722,33 +703,6 @@ class TestAdvancedQueryAPI(TestCase, WithQueryApi):
         "Control",
     )
     self.assertEqual(controls["count"], 3)
-
-  def test_order_control_by_categories(self):
-    """Test correct ordering and by categories"""
-    controls_unordered = self._get_first_result_set(
-        self._make_query_dict("Control",),
-        "Control", "values"
-    )
-
-    controls_ordered_1 = self._get_first_result_set(
-        self._make_query_dict("Control",
-                              order_by=[{"name": "categories"},
-                                        {"name": "id"}]),
-        "Control", "values"
-    )
-    categories = {c.id: c.name for c in models.CategoryBase.query}
-
-    def sort_key(val):
-      ctrl_categories = val.get("categories")
-      if isinstance(ctrl_categories, list) and ctrl_categories:
-        return (categories.get(ctrl_categories[0]["id"]), val["id"])
-      return (None, val["id"])
-
-    controls_ordered_2 = sorted(controls_unordered, key=sort_key)
-    self.assertListEqual(
-        self._sort_sublists(controls_ordered_1),
-        self._sort_sublists(controls_ordered_2),
-    )
 
   def test_query_count(self):
     """The value of "count" is same for "values" and "count" queries."""
@@ -1496,3 +1450,69 @@ class TestQueryWithUnicode(TestCase, WithQueryApi):
     keys = [(prog[self.CAD_TITLE2], prog[self.CAD_TITLE1])
             for prog in programs]
     self.assertEqual(keys, sorted(keys))
+
+
+@ddt.ddt
+class TestAssessmentFilteringByLabel(TestCase, WithQueryApi):
+  """Basic test for query api filtering assessment by label field."""
+
+  ASSESSMENT_LABELS = [
+      models.Assessment.Labels.AUDITOR_PULLS_EVIDENCE,
+      models.Assessment.Labels.FOLLOWUP,
+      models.Assessment.Labels.NEEDS_REWORK,
+      models.Assessment.Labels.NEEDS_DISCUSSION,
+  ]
+
+  def setUp(self):
+    super(TestAssessmentFilteringByLabel, self).setUp()
+    self.client.get("/login")
+    possible_labels = self.ASSESSMENT_LABELS + [None]
+    with factories.single_commit():
+      self.audit = factories.AuditFactory()
+      self.lables_assessment_dict = {
+          label: factories.AssessmentFactory(
+              audit=self.audit,
+              label=label
+          ).slug
+          for label in possible_labels
+      }
+
+  def assert_label_search(self, data, label=None):
+    """Assert assessment found by sent data and compare with sent label."""
+    resp_data = self._post(data).json
+    self.assertEqual(1, len(resp_data))
+    self.assertIn("Assessment", resp_data[0])
+    assessment_dicts = resp_data[0]["Assessment"]["values"]
+    self.assertEqual(1, len(assessment_dicts))
+    assessment_dict = assessment_dicts[0]
+    self.assertEqual(self.lables_assessment_dict[label],
+                     assessment_dict["slug"])
+    self.assertIn("label", assessment_dict)
+    self.assertEqual(label, assessment_dict["label"])
+
+  @ddt.data(*ASSESSMENT_LABELS)
+  def test_filter_by_label(self, label):
+    self.assert_label_search(
+        [{
+            "object_name": "Assessment",
+            "filters": {
+                "expression": {
+                    "left": "label",
+                    "op": {"name": "="},
+                    "right": label
+                }
+            }
+        }],
+        label)
+
+  def test_filter_by_empty_label(self):
+    self.assert_label_search([{
+        "object_name": "Assessment",
+        "filters": {
+            "expression": {
+                "left": "label",
+                "op": {"name": "is"},
+                "right": "empty"
+            }
+        }
+    }])
