@@ -25,6 +25,7 @@ import './tree-people-with-role-list-field';
 import '../advanced-search/advanced-search-filter-container';
 import '../advanced-search/advanced-search-mapping-container';
 import template from './templates/tree-widget-container.mustache';
+import StateUtils from '../../plugins/utils/state-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -112,13 +113,13 @@ import template from './templates/tree-widget-container.mustache';
       statusFilterVisible: {
         type: Boolean,
         get: function () {
-          return GGRC.Utils.State.hasFilter(this.attr('modelName'));
+          return StateUtils.hasFilter(this.attr('modelName'));
         },
       },
       statusTooltipVisible: {
         type: Boolean,
         get: function () {
-          return GGRC.Utils.State.hasFilterTooltip(this.attr('modelName'));
+          return StateUtils.hasFilterTooltip(this.attr('modelName'));
         },
       },
       cssClasses: {

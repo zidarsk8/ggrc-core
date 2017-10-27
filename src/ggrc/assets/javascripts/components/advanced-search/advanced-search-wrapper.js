@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import StateUtils from '../../plugins/utils/state-utils';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -12,7 +14,7 @@
       define: {
         hasStatusFilter: {
           get: function () {
-            return GGRC.Utils.State.hasFilter(this.attr('modelName'));
+            return StateUtils.hasFilter(this.attr('modelName'));
           }
         }
       },

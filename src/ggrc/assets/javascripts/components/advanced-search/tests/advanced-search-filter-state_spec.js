@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import StateUtils from '../../../plugins/utils/state-utils';
+
 describe('GGRC.Components.advancedSearchFilterState', function () {
   'use strict';
 
@@ -16,9 +18,9 @@ describe('GGRC.Components.advancedSearchFilterState', function () {
     it('initializes all "filterStates" checked if "stateModel" is empty',
     function () {
       var states = ['state1', 'state2', 'state3'];
-      spyOn(GGRC.Utils.State, 'getDefaultStatesForModel')
+      spyOn(StateUtils, 'getDefaultStatesForModel')
         .and.returnValue(states);
-      spyOn(GGRC.Utils.State, 'getStatesForModel')
+      spyOn(StateUtils, 'getStatesForModel')
         .and.returnValue(states);
       viewModel.attr('modelName', 'Section');
 

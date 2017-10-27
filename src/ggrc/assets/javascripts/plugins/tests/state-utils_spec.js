@@ -3,9 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-'use strict';
+import StateUtils from '../utils/state-utils';
 
-describe('GGRC.Utils.State', function () {
+describe('StateUtils', function () {
   describe('statusFilter() method', function () {
     it('statusFilter() should return filter with all statuses',
       function () {
@@ -13,8 +13,7 @@ describe('GGRC.Utils.State', function () {
           'Draft', 'Active', 'Deprecated'
         ];
 
-        var statesFilter = GGRC.Utils.State
-          .statusFilter(statuses, '');
+        var statesFilter = StateUtils.statusFilter(statuses, '');
 
         expect(statesFilter.indexOf('"Status"="Active"') > -1)
           .toBe(true);
@@ -31,8 +30,7 @@ describe('GGRC.Utils.State', function () {
           'Not Started', 'In Progress', 'In Review'
         ];
 
-        var statesFilter = GGRC.Utils.State
-          .statusFilter(statuses, '', 'Assessment');
+        var statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
 
         expect(statesFilter.indexOf('"Status"="Not Started"') > -1)
           .toBe(true);
@@ -51,8 +49,7 @@ describe('GGRC.Utils.State', function () {
           'In Review', 'Completed and Verified'
         ];
 
-        var statesFilter = GGRC.Utils.State
-          .statusFilter(statuses, '', 'Assessment');
+        var statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
 
         expect(statesFilter.indexOf('"Status"="In Review"') > -1)
           .toBe(true);
@@ -72,8 +69,7 @@ describe('GGRC.Utils.State', function () {
           'In Review', 'Completed (no verification)'
         ];
 
-        var statesFilter = GGRC.Utils.State
-          .statusFilter(statuses, '', 'Assessment');
+        var statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
 
         expect(statesFilter.indexOf('"Status"="In Review"') > -1)
           .toBe(true);
@@ -95,8 +91,7 @@ describe('GGRC.Utils.State', function () {
           'Completed and Verified'
         ];
 
-        var statesFilter = GGRC.Utils.State
-          .statusFilter(statuses, '', 'Assessment');
+        var statesFilter = StateUtils.statusFilter(statuses, '', 'Assessment');
 
         expect(statesFilter.indexOf('"Status"="In Progress"') > -1)
           .toBe(true);
@@ -123,8 +118,7 @@ describe('GGRC.Utils.State', function () {
       spyOn(GGRC.Utils.CurrentPage, 'isMyAssessments')
         .and.returnValue(true);
 
-      defaultStates = GGRC.Utils.State
-        .getDefaultStatesForModel('Assessment');
+      defaultStates = StateUtils.getDefaultStatesForModel('Assessment');
 
       expect(defaultStates.length).toEqual(2);
       expect(defaultStates[0]).toEqual('Not Started');
@@ -136,8 +130,7 @@ describe('GGRC.Utils.State', function () {
       spyOn(GGRC.Utils.CurrentPage, 'isMyAssessments')
         .and.returnValue(false);
 
-      defaultStates = GGRC.Utils.State
-        .getDefaultStatesForModel('Control');
+      defaultStates = StateUtils.getDefaultStatesForModel('Control');
 
       expect(defaultStates.length).toEqual(3);
       expect(defaultStates[0]).toEqual('Active');

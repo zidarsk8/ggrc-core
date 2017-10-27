@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import StateUtils from '../../plugins/utils/state-utils';
+
 (function (can, $) {
   CMS.Controllers.TreeLoader.extend('CMS.Controllers.TreeView', {
     // static properties
@@ -86,9 +88,7 @@
 
     init: function (el, opts) {
       var setAllowMapping;
-      var self = this;
-      var states = GGRC.Utils.State
-        .getStatesForModel(this.options.model.shortName);
+      var states = StateUtils.getStatesForModel(this.options.model.shortName);
 
       var filterStates = states.map(function (state) {
         return {value: state};
