@@ -27,7 +27,7 @@ class TestWithSimilarityScore(TestCase):
     self.client.get("/login")
 
   @staticmethod
-  def make_relationships(source, destinations):
+  def _make_relationships(source, destinations):
     for destination in destinations:
       factories.RelationshipFactory(
           source=source,
@@ -35,7 +35,7 @@ class TestWithSimilarityScore(TestCase):
       )
 
   @staticmethod
-  def get_object_snapshot(scope_parent, object_):
+  def _get_object_snapshot(scope_parent, object_):
     # pylint: disable=protected-access
     return db.session.query(models.Snapshot).filter(
         models.Snapshot.parent_type == scope_parent._inflector.table_singular,
@@ -44,15 +44,15 @@ class TestWithSimilarityScore(TestCase):
         models.Snapshot.child_id == object_.id
     ).one()
 
-  def make_scope_relationships(self, source, scope_parent, objects):
+  def _make_scope_relationships(self, source, scope_parent, objects):
     """Create relationships between object and snapshots of provided object"""
     snapshots = []
     for object_ in objects:
-      snapshot = self.get_object_snapshot(scope_parent, object_)
+      snapshot = self._get_object_snapshot(scope_parent, object_)
       snapshots += [snapshot]
-    self.make_relationships(source, snapshots)
+    self._make_relationships(source, snapshots)
 
-  def make_assessments(self, assessment_mappings, with_types=False):
+  def _make_assessments(self, assessment_mappings, with_types=False):
     """Create six assessments and map them to audit, control, objective.
 
     Each of the created assessments is mapped to its own subset of {audit,
@@ -77,9 +77,9 @@ class TestWithSimilarityScore(TestCase):
       mappings = all_mappings[mappings_bound:]
       ordinary_mappings = [x for x in mappings if x.type not in Types.all]
       snapshot_mappings = [x for x in mappings if x.type in Types.all]
-      self.make_relationships(assessment, [audit] + ordinary_mappings)
-      self.make_scope_relationships(assessment, audit,
-                                    snapshot_mappings)
+      self._make_relationships(assessment, [audit] + ordinary_mappings)
+      self._make_scope_relationships(assessment, audit,
+                                     snapshot_mappings)
       assessments.append(assessment)
 
     return assessments
@@ -104,17 +104,17 @@ class TestWithSimilarityScore(TestCase):
 
       risk_program_1 = factories.RiskFactory(title="Risk 1")
 
-    self.make_relationships(
+    self._make_relationships(
         program_1, [
             risk_program_1,
         ],
     )
-    self.make_relationships(
+    self._make_relationships(
         program_2, [
             risk_program_1,
         ],
     )
-    self.make_relationships(
+    self._make_relationships(
         program_3, [
             risk_program_1,
         ],
@@ -146,7 +146,7 @@ class TestWithSimilarityScore(TestCase):
         [audit_2, asmnt_types[1], risk_program_1],
         [audit_3, asmnt_types[2], risk_program_1],
     ]
-    assessments = self.make_assessments(assessment_mappings, with_types=True)
+    assessments = self._make_assessments(assessment_mappings, with_types=True)
 
     risk_asmnt_ids = {asmnt.id for asmnt in assessments
                       if asmnt.assessment_type == "Risk"}
@@ -207,21 +207,21 @@ class TestWithSimilarityScore(TestCase):
       objective_1_program_1 = factories.ObjectiveFactory(title="Objective 1")
       objective_2_program_1 = factories.ObjectiveFactory(title="Objective 2")
 
-    self.make_relationships(
+    self._make_relationships(
         program_1, [
             objective_1_program_1,
             objective_2_program_1,
         ],
     )
 
-    self.make_relationships(
+    self._make_relationships(
         program_2, [
             objective_1_program_1,
             objective_2_program_1,
         ],
     )
 
-    self.make_relationships(
+    self._make_relationships(
         program_3, [
             objective_1_program_1,
         ],
@@ -260,7 +260,7 @@ class TestWithSimilarityScore(TestCase):
         [audit_3, "Objective"],
     ]
 
-    assessments = self.make_assessments(assessment_mappings, with_types=True)
+    assessments = self._make_assessments(assessment_mappings, with_types=True)
 
     similar_objects = models.Assessment.get_similar_objects_query(
         id_=assessments[0].id,
