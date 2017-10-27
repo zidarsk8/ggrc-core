@@ -160,13 +160,8 @@ custom-attributes {
   }
 
   &__title-helper-text {
-    margin: 0 2px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    vertical-align: top;
+    margin-left: 8px;
     color: $icon-color-dark;
-    width: 28px;
-    text-align: center;
-    line-height: 28px;
   }
 }
