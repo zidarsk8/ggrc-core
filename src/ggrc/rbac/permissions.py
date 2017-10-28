@@ -11,20 +11,6 @@ from ggrc.extensions import get_extension_instance
 from ggrc.rbac import SystemWideRoles
 
 
-SYSTEM_WIDE_READ_ROLES = {
-    SystemWideRoles.SUPERUSER,
-    SystemWideRoles.ADMINISTRATOR,
-    SystemWideRoles.EDITOR,
-    SystemWideRoles.READER,
-}
-
-SYSTEM_WIDE_UPDATE_ROLES = {
-    SystemWideRoles.SUPERUSER,
-    SystemWideRoles.ADMINISTRATOR,
-    SystemWideRoles.EDITOR,
-}
-
-
 def get_permissions_provider():
   return get_extension_instance(
       'USER_PERMISSIONS_PROVIDER',
@@ -65,7 +51,7 @@ def has_system_wide_update():
   user = login.get_current_user()
   system_wide_role = getattr(user, "system_wide_role",
                              SystemWideRoles.NO_ACCESS)
-  return system_wide_role in SYSTEM_WIDE_UPDATE_ROLES
+  return system_wide_role in SystemWideRoles.update_roles
 
 
 def has_system_wide_read():
@@ -73,7 +59,7 @@ def has_system_wide_read():
   user = login.get_current_user()
   system_wide_role = getattr(user, "system_wide_role",
                              SystemWideRoles.NO_ACCESS)
-  return system_wide_role in SYSTEM_WIDE_READ_ROLES
+  return system_wide_role in SystemWideRoles.read_roles
 
 
 def is_allowed_read(resource_type, resource_id, context_id):
