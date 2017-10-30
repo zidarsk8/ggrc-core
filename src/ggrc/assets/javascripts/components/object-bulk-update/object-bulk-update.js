@@ -28,6 +28,7 @@ export default can.Component.extend({
       showTargetState: true,
       targetStates: targetStates,
       targetState: targetState,
+      callback: parentViewModel.attr('callback'),
     });
   },
   events: {
@@ -38,6 +39,16 @@ export default can.Component.extend({
     },
     '.btn-cancel click': function () {
       this.closeModal();
+    },
+    '.btn-update click': function () {
+      var callback = this.viewModel.callback;
+
+      callback(this, {
+        selected: this.viewModel.attr('selected'),
+        options: {
+          state: this.viewModel.attr('targetState'),
+        },
+      });
     },
   },
 });

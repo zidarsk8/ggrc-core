@@ -99,4 +99,27 @@ describe('GGRC.Components.objectBulkUpdate', function () {
       expect(context.closeModal).toHaveBeenCalled();
     });
   });
+
+  describe('.btn-update click event', function () {
+    var event;
+    var context;
+
+    beforeEach(function () {
+      context = {
+        viewModel: new can.Map(),
+      };
+      event = events['.btn-update click'].bind(context);
+    });
+
+    it('invokes update callback', function () {
+      context.viewModel.callback = jasmine.createSpy();
+      context.viewModel.attr('selected', [1]);
+      context.viewModel.attr('targetState', 'InProgress');
+
+      event();
+
+      expect(context.viewModel.callback)
+        .toHaveBeenCalled();
+    });
+  });
 });
