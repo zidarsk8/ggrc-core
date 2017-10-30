@@ -102,14 +102,14 @@ def _get_revisions(obj, created_at):
   old_rev = db.session.query(models.Revision) \
       .filter_by(resource_id=obj.id, resource_type=obj.type) \
       .filter(sa.and_(models.Revision.created_at < created_at,
-                   models.Revision.id < new_rev.id)) \
+                      models.Revision.id < new_rev.id)) \
       .order_by(models.Revision.id.desc()) \
       .first()
   if not old_rev:
     old_rev = db.session.query(models.Revision) \
         .filter_by(resource_id=obj.id, resource_type=obj.type) \
         .filter(sa.and_(models.Revision.created_at == created_at,
-                     models.Revision.id < new_rev.id)) \
+                        models.Revision.id < new_rev.id)) \
         .order_by(models.Revision.id) \
         .first()
   return new_rev, old_rev
@@ -422,7 +422,14 @@ def generate_comment_notification(obj, comment, person):
 
 
 def _get_comment_relation(comment):
-  """Get relationship objects for provided comment"""
+  """Get relationship objects for provided comment
+
+  Args:
+      comment: a Comment instance
+
+  Returns:
+      Relationship between comment object and any other
+  """
   return models.Relationship.query.filter(sa.or_(
       sa.and_(
           models.Relationship.source_type == "Comment",
@@ -436,13 +443,13 @@ def _get_comment_relation(comment):
 
 
 def _get_people_with_roles(comment_obj):
-  """Collect recipients with they roles
+  """Collect recipients with their roles
 
   Args:
-    comment_obj: Commentable object for which notification should be send
+      comment_obj: Commentable object for which notification should be send
 
   Returns:
-    Dict with Person instances and set of role names
+      Dict with Person instances and set of role names
   """
   assignees = defaultdict(set)
   for acl in comment_obj.access_control_list:
@@ -474,8 +481,9 @@ def get_comment_data(notif):
       issubclass(type(rel.source), Commentable) or
       issubclass(type(rel.destination), Commentable)
   ):
-    comment_obj = rel.source if rel.source_type != "Comment" \
-        else rel.destination
+    comment_obj = rel.source
+    if rel.source_type == "Comment":
+      comment_obj = rel.destination
   if not comment_obj:
     logger.warning('Comment object not found for notification %s', notif.id)
     return {}
