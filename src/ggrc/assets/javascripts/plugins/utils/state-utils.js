@@ -50,6 +50,10 @@ let statesModels = [
       'Assigned', 'InProgress', 'Finished',
       'Declined', 'Deprecated', 'Verified',
     ],
+    bulkStates: [
+      'InProgress', 'Finished',
+      'Declined', 'Deprecated', 'Verified',
+    ],
   },
   {
     models: ['Issue'],
@@ -113,6 +117,17 @@ function getStatesModelsPair(model) {
 function getStatesForModel(model) {
   var pair = getStatesModelsPair(model);
   return pair ? pair.states : [];
+}
+
+/**
+ * Get states for model that can be used
+ * as target in Bulk Update modal.
+ * @param {String} model - The model name
+ * @return {Array} array of strings
+ */
+function getBulkStatesForModel(model) {
+  var pair = getStatesModelsPair(model);
+  return pair && pair.bulkStates ? pair.bulkStates : [];
 }
 
 /**
@@ -251,6 +266,7 @@ export {
   statusFilter,
   unlockedFilter,
   getStatesForModel,
+  getBulkStatesForModel,
   getDefaultStatesForModel,
   buildStatusFilter,
   getStatusFieldName,
