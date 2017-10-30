@@ -26,6 +26,13 @@
       text-overflow: ellipsis;
       max-width: 160px;
       margin-right: 4px;
+
+      &--deletable {
+        font-size: 12px;
+        font-weight: bold;
+        margin-bottom: 0px;
+        max-width: 240px;
+      }
     }
 
     .people-group__title-content {
@@ -57,7 +64,7 @@
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
-      max-width: 220px;
+      max-width: 196px;
       margin-right: 5px;
     }
 
