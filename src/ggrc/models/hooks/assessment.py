@@ -42,6 +42,13 @@ if settings.URLFETCH_SERVICE_ID:
 _ENDPOINT = settings.INTEGRATION_SERVICE_URL
 _ISSUE_URL_TMPL = settings.ISSUE_TRACKER_BUG_URL_TMPL or 'http://issue/%s'
 
+if settings.ISSUE_TRACKER_ENABLED:
+  _ISSUE_TRACKER_ENABLED = True
+else:
+  _ISSUE_TRACKER_ENABLED = False
+  logger.debug('Issue Tracker integration is disabled.')
+
+
 # mapping of model field name to API property name
 _ISSUE_TRACKER_UPDATE_FIELDS = (
     ('title', 'title'),
@@ -453,6 +460,9 @@ def _is_issue_tracker_enabled(audit=None):
   Returns:
     A boolean, True if feature is enabled or False otherwise.
   """
+  if not _ISSUE_TRACKER_ENABLED:
+    return False
+
   if not bool(_ENDPOINT):
     return False
 
@@ -616,9 +626,6 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       'comment': '\n'.join(comment),
   }
 
-  # TODO(anushovan): analyze error and fail back to
-  #   settings.ISSUE_TRACKER_DEFAULT_COMPONENT_ID or/and
-  #   settings.ISSUE_TRACKER_DEFAULT_HOTLIST_ID in case of access issue.
   res = _send_request(
       '/api/issues', method=urlfetch.POST, payload=issue_params)
   return res['issueId']

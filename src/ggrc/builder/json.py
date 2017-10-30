@@ -639,17 +639,19 @@ class Builder(AttributeInfo):
     """Processes _custom_publish logic and returns value if any or None."""
     if attr_name in getattr(obj.__class__, '_custom_publish', {}):
       # The attribute has a custom publish logic.
-      return obj.__class__._custom_publish[attr_name](obj)
+      return True, obj.__class__._custom_publish[attr_name](obj)
 
     for base in obj.__class__.__bases__:
       # Inspect all mixins for custom publish logic.
       if attr_name in getattr(base, '_custom_publish', {}):
-        return base._custom_publish[attr_name](obj)
+        return True, base._custom_publish[attr_name](obj)
+
+    return False, None
 
   def publish_attr(
           self, obj, attr_name, inclusions, include, inclusion_filter):
-    value = self._process_custom_publish(obj, attr_name)
-    if value:
+    value_exists, value = self._process_custom_publish(obj, attr_name)
+    if value_exists:
       return value
 
     class_attr = getattr(obj.__class__, attr_name)

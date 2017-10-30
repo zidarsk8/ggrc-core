@@ -133,16 +133,11 @@ INTEGRATION_SERVICE_URL = os.environ.get('INTEGRATION_SERVICE_URL')
 # Integration service mandatory header value
 URLFETCH_SERVICE_ID = os.environ.get('URLFETCH_SERVICE_ID')
 
+# Flag defining whether integration with issue tracker is enabled or not.
+ISSUE_TRACKER_ENABLED = bool(os.environ.get('ISSUE_TRACKER_ENABLED'))
+
 # URL template for composing Issue Tracker ticker URL.
 ISSUE_TRACKER_BUG_URL_TMPL = os.environ.get('ISSUE_TRACKER_BUG_URL_TMPL')
-
-# Default component ID for Issue Tracker.
-ISSUE_TRACKER_DEFAULT_COMPONENT_ID = os.environ.get(
-    'ISSUE_TRACKER_DEFAULT_COMPONENT_ID')
-
-# Default hotlist ID for Issue Tracker.
-ISSUE_TRACKER_DEFAULT_HOTLIST_ID = os.environ.get(
-    'ISSUE_TRACKER_DEFAULT_HOTLIST_ID')
 
 # Dashboard integration
 _DEFAULT_DASHBOARD_INTEGRATION_CONFIG = {
