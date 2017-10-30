@@ -168,3 +168,20 @@ class PersonClientTest(unittest.TestCase):
                   'u2',
               ],
           })
+
+  def test_suggest(self):
+    """Test suggest persons request"""
+    with mock.patch.multiple(
+        self.testable_cls,
+        ENDPOINT='endpoint',
+        _post=mock.MagicMock(return_value={'persons': 'persons data'})
+    ):
+      testable_obj = self.testable_cls()
+      actual = testable_obj.suggest_persons("pit")
+
+      self.assertEqual(actual, 'persons data')
+      testable_obj._post.assert_called_once_with(
+          '/api/persons:suggest',
+          payload={
+              'tokens': ['pit'],
+          })
