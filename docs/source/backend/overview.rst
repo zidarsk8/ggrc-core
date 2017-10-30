@@ -325,14 +325,6 @@ Notifications
 Code relevant to sending notifications (e.g. email) is in :src:`ggrc/notifications`.
 
 
-Role-Based Access Control (RBAC)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-RBAC controls the ways in which a user is allowed to interact with GGRC.
-
-Base classes for defining, managing and checking permissions are in :src:`ggrc/rbac`.
-
-
 Cron
 ^^^^
 
