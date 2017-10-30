@@ -1,5 +1,5 @@
-Development
-===========
+Backend
+=======
 
 Contents:
 
@@ -11,4 +11,3 @@ Contents:
     advanced_query_api
     object_manipulation
     automapping
-    modals
