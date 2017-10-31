@@ -29,7 +29,7 @@
     create: 'POST /api/programs',
     update: 'PUT /api/programs/{id}',
     destroy: 'DELETE /api/programs/{id}',
-    mixins: ['unique_title', 'ca_update', 'timeboxed'],
+    mixins: ['unique_title', 'ca_update', 'timeboxed', 'accessControlList'],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
