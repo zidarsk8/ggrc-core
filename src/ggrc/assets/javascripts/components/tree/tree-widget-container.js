@@ -207,6 +207,12 @@ import StateUtils from '../../plugins/utils/state-utils';
           return !CurrentPageUtils.isMyAssessments();
         },
       },
+      disable3bbs: {
+        type: Boolean,
+        get: function () {
+          return this.attr('isSnapshots') && !this.attr('showedItems').length;
+        },
+      },
       noResults: {
         type: Boolean,
         get: function () {
