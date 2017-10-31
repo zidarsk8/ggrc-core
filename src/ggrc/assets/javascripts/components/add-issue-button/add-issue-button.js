@@ -4,6 +4,7 @@
  */
 
 import {REFRESH_RELATED} from '../../events/eventTypes';
+import template from './add-issue-button.mustache';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -11,10 +12,7 @@ import {REFRESH_RELATED} from '../../events/eventTypes';
 
   GGRC.Components('addIssueButton', {
     tag: 'add-issue-button',
-    template: can.view(
-      GGRC.mustache_path +
-      '/components/add-issue-button/add-issue-button.mustache'
-    ),
+    template,
     viewModel: {
       define: {
         prepareJSON: {
