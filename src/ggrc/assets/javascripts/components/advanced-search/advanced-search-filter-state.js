@@ -3,10 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import StateUtils from '../../plugins/utils/state-utils';
+
 (function (can, GGRC) {
   'use strict';
-
-  var StateUtils = GGRC.Utils.State;
 
   var template = can.view(GGRC.mustache_path +
     '/components/advanced-search/advanced-search-filter-state.mustache');

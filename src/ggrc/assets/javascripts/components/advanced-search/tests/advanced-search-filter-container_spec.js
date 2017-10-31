@@ -3,13 +3,15 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import StateUtils from '../../../plugins/utils/state-utils';
+
 describe('GGRC.Components.advancedSearchFilterContainer', function () {
   'use strict';
 
   var viewModel;
 
   beforeEach(function () {
-    spyOn(GGRC.Utils.State, 'getDefaultStatesForModel')
+    spyOn(StateUtils, 'getDefaultStatesForModel')
       .and.returnValue(['state']);
     viewModel = GGRC.Components.getViewModel('advancedSearchFilterContainer');
   });
@@ -18,7 +20,7 @@ describe('GGRC.Components.advancedSearchFilterContainer', function () {
     it('initializes "items" property with state filter if it is empty ' +
     'and model is not stateless', function () {
       var items;
-      spyOn(GGRC.Utils.State, 'hasFilter').and.returnValue(true);
+      spyOn(StateUtils, 'hasFilter').and.returnValue(true);
       viewModel.attr('items', []);
 
       items = viewModel.attr('items');
