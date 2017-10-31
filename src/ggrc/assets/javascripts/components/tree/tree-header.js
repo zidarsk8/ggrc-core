@@ -44,6 +44,7 @@ import {createSelectedColumnsMap} from '../../plugins/utils/tree-view-utils';
     availableColumns: [],
     disableConfiguration: null,
     mandatory: [],
+    orderBy: {},
     sortingInfo: null,
     /**
      * Dispatches the event with names of selected columns.
@@ -70,12 +71,14 @@ import {createSelectedColumnsMap} from '../../plugins/utils/tree-view-utils';
       columns[attr.attr_name] = !columns[attr.attr_name];
       this.columns.attr(columns);
     },
-    onOrderChange: function ($element) {
-      var field = $element.data('field');
+    onOrderChange() {
+      const field = this.attr('orderBy.field');
+      const sortDirection = this.attr('orderBy.direction');
 
       this.dispatch({
         type: 'sort',
-        field: field
+        field,
+        sortDirection,
       });
     },
     initializeColumns: function () {
@@ -109,23 +112,10 @@ import {createSelectedColumnsMap} from '../../plugins/utils/tree-view-utils';
       },
       '{viewModel} selectedColumns': function () {
         this.viewModel.initializeColumns();
-      }
+      },
+      '{viewModel.orderBy} change'() {
+        this.viewModel.onOrderChange();
+      },
     },
-    helpers: {
-      sortIcon: function (attr, sortBy, sortDirection) {
-        var iconClass = '';
-        attr = Mustache.resolve(attr);
-        sortBy = Mustache.resolve(sortBy);
-        sortDirection = Mustache.resolve(sortDirection);
-
-        if (!sortBy) {
-          iconClass = 'sort';
-        } else if (sortBy === attr) {
-          iconClass = 'sort-' + sortDirection;
-        }
-
-        return iconClass;
-      }
-    }
   });
 })(window.can, window.GGRC);
