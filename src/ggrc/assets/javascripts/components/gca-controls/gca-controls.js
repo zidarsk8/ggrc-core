@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -36,7 +36,7 @@ import {
               var hasError = !val.trim();
               var errorMessages = {
                 _any: can.Map.validationMessages.non_blank,
-                checkbox: can.Map.validationMessages.must_be_checked
+                checkbox: can.Map.validationMessages.must_be_checked,
               };
               var errorMessage = errorMessages[itm.type] || errorMessages._any;
 
@@ -68,16 +68,16 @@ import {
         );
 
         this.attr('modifiedFields', {}, true);
-      }
+      },
     },
     events: {
       '{viewModel.items} change': function () {
         this.viewModel.validateControls();
-      }
+      },
     },
     init: function () {
       this.viewModel.initGlobalAttributes();
       this.viewModel.validateControls();
-    }
+    },
   });
 })(window.can, window.GGRC);

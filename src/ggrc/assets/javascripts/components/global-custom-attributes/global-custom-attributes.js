@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -30,8 +30,8 @@ import {
               this.attr('instance.isRevision') ||
               this.attr('instance.archived') ||
               !Permission.is_allowed_for('update', this.attr('instance'));
-          }
-        }
+          },
+        },
       },
       instance: null,
       /**
@@ -70,7 +70,7 @@ import {
               helptext: cad.helptext,
               value: value,
               options: options,
-              type: type
+              type: type,
             });
           }.bind(this));
 
@@ -90,12 +90,12 @@ import {
         instance.save()
           .done(function () {
             $(document.body).trigger('ajax:flash', {
-              success: 'Saved'
+              success: 'Saved',
             });
           })
           .fail(function () {
             $(document.body).trigger('ajax:flash', {
-              error: 'There was a problem saving'
+              error: 'There was a problem saving',
             });
           })
           .always(function () {
@@ -115,7 +115,7 @@ import {
           }
         }
         return value;
-      }
+      },
     },
     init: function () {
       if (this.viewModel.instance.class.is_custom_attributable) {
@@ -129,7 +129,7 @@ import {
         if (isReady) {
           this.viewModel.initCustomAttributes();
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

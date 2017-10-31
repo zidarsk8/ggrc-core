@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -38,31 +38,31 @@ import {
       documentTypes: {
         evidences: CMS.Models.Document.EVIDENCE,
         urls: CMS.Models.Document.URL,
-        referenceUrls: CMS.Models.Document.REFERENCE_URL
+        referenceUrls: CMS.Models.Document.REFERENCE_URL,
       },
       define: {
         isSaving: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         isLoading: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         mappedSnapshots: {
-          Value: can.List
+          Value: can.List,
         },
         assessmentTypeNameSingular: {
           get: function () {
             var type = this.attr('instance.assessment_type');
             return CMS.Models[type].title_singular;
-          }
+          },
         },
         assessmentTypeNamePlural: {
           get: function () {
             var type = this.attr('instance.assessment_type');
             return CMS.Models[type].title_plural;
-          }
+          },
         },
         assessmentTypeObjects: {
           get: function () {
@@ -72,7 +72,7 @@ import {
                 return item.child_type === self
                   .attr('instance.assessment_type');
               });
-          }
+          },
         },
         relatedInformation: {
           get: function () {
@@ -82,19 +82,19 @@ import {
                 return item.child_type !== self
                   .attr('instance.assessment_type');
               });
-          }
+          },
         },
         comments: {
-          Value: can.List
+          Value: can.List,
         },
         urls: {
-          Value: can.List
+          Value: can.List,
         },
         referenceUrls: {
-          Value: can.List
+          Value: can.List,
         },
         evidences: {
-          Value: can.List
+          Value: can.List,
         },
         editMode: {
           type: 'boolean',
@@ -105,14 +105,14 @@ import {
           },
           set: function () {
             this.onStateChange({state: 'In Progress', undo: false});
-          }
+          },
         },
         isEditDenied: {
           get: function () {
             return !Permission
               .is_allowed_for('update', this.attr('instance')) ||
               this.attr('instance.archived');
-          }
+          },
         },
         instance: {},
         isInfoPaneSaving: {
@@ -126,11 +126,11 @@ import {
               this.attr('isUpdatingComments') ||
               this.attr('isUpdatingReferenceUrls') ||
               this.attr('isAssessmentSaving');
-          }
-        }
+          },
+        },
       },
       modal: {
-        open: false
+        open: false,
       },
       isUpdatingRelatedItems: false,
       isAssessmentSaving: false,
@@ -148,7 +148,7 @@ import {
         var relevantFilters = [{
           type: this.attr('instance.type'),
           id: this.attr('instance.id'),
-          operation: 'relevant'
+          operation: 'relevant',
         }];
         return GGRC.Utils.QueryAPI
           .buildParam(type,
@@ -259,8 +259,8 @@ import {
             expression: {
               left: 'document_type',
               op: {name: '='},
-              right: documentType
-            }
+              right: documentType,
+            },
           } :
           [];
       },
@@ -281,12 +281,12 @@ import {
         var self = this;
         var related = {
           id: event.item.attr('id'),
-          type: event.item.attr('type')
+          type: event.item.attr('type'),
         };
 
         // dispatching event on instance to pass to the auto-save-form
         this.attr('instance').dispatch({
-          type: 'afterCommentCreated'
+          type: 'afterCommentCreated',
         });
 
         this.attr('deferredSave').push(function () {
@@ -295,13 +295,13 @@ import {
         .done(function () {
           self.afterCreate({
             items: [event.item],
-            success: true
+            success: true,
           }, type);
         })
         .fail(function () {
           self.afterCreate({
             items: [event.item],
-            success: false
+            success: false,
           }, type);
         })
         .always(function (assessment) {
@@ -312,7 +312,7 @@ import {
         var self = this;
         var related = {
           id: item.attr('id'),
-          type: item.attr('type')
+          type: item.attr('type'),
         };
         var items = self.attr(type);
         var index = items.indexOf(item);
@@ -431,7 +431,7 @@ import {
           fields: errorsList,
           value: scope.attr('value'),
           title: scope.attr('title'),
-          type: scope.attr('type')
+          type: scope.attr('type'),
         };
         var title = 'Required ' +
           data.fields.map(function (field) {
@@ -442,11 +442,11 @@ import {
         this.attr('modal', {
           content: data,
           modalTitle: title,
-          state: {}
+          state: {},
         });
         can.batch.stop();
         this.attr('modal.state.open', true);
-      }
+      },
     },
     init: function () {
       this.viewModel.initializeFormFields();
@@ -472,7 +472,7 @@ import {
       },
       '{viewModel.instance} resolvePendingBindings': function () {
         this.viewModel.updateItems('referenceUrls');
-      }
+      },
     },
     helpers: {
       extraClass: function (type) {
@@ -482,7 +482,7 @@ import {
           default:
             return '';
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window.CMS);

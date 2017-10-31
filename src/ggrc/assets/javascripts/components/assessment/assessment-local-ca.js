@@ -1,11 +1,11 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 import {
   CA_DD_REQUIRED_DEPS,
-  applyChangesToCustomAttributeValue
+  applyChangesToCustomAttributeValue,
 }
   from '../../plugins/utils/ca-utils';
 
@@ -30,7 +30,7 @@ import {
               .filter(function (field) {
                 return !field.attr('validation.valid');
               }).length;
-          }
+          },
         },
         editMode: {
           type: 'boolean',
@@ -40,14 +40,14 @@ import {
               this.attr('highlightInvalidFields', false);
             }
             return newValue;
-          }
+          },
         },
         evidenceAmount: {
           type: 'number',
           set: function (newValue, setValue) {
             setValue(newValue);
             this.validateForm();
-          }
+          },
         },
         isEvidenceRequired: {
           get: function () {
@@ -63,8 +63,8 @@ import {
                     CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
               }).length;
             return optionsWithEvidence > this.attr('evidenceAmount');
-          }
-        }
+          },
+        },
       },
       validateForm: function () {
         var self = this;
@@ -86,7 +86,7 @@ import {
         var isMandatory = field.validation.mandatory;
         var errorsMap = field.errorsMap || {
           evidence: false,
-          comment: false
+          comment: false,
         };
 
         requiresEvidence =
@@ -114,8 +114,8 @@ import {
             validation: {
               show: isMandatory,
               valid: isMandatory ? !hasMissingValue && !!(value) : true,
-              hasMissingInfo: false
-            }
+              hasMissingInfo: false,
+            },
           });
         } else if (field.type === 'dropdown') {
           fieldValid = (value) ?
@@ -127,18 +127,18 @@ import {
               show: isMandatory || !!value,
               valid: fieldValid,
               hasMissingInfo: (hasMissingEvidence || hasMissingComment),
-              requiresAttachment: (requiresEvidence || requiresComment)
+              requiresAttachment: (requiresEvidence || requiresComment),
             },
             errorsMap: {
               evidence: hasMissingEvidence,
-              comment: hasMissingComment
-            }
+              comment: hasMissingComment,
+            },
           });
 
           if (!formInitCheck && (hasMissingEvidence || hasMissingComment)) {
             this.dispatch({
               type: 'validationChanged',
-              field: field
+              field: field,
             });
           }
         } else {
@@ -147,8 +147,8 @@ import {
             validation: {
               show: isMandatory,
               valid: isMandatory ? !hasMissingValue && !!(value) : true,
-              hasMissingInfo: false
-            }
+              hasMissingInfo: false,
+            },
           });
         }
       },
@@ -198,7 +198,7 @@ import {
         this.performValidation(e.field);
         this.attr('formSavedDeferred', can.Deferred());
         this.save(e.fieldId, e.value);
-      }
+      },
     },
     events: {
       inserted: function () {
@@ -232,9 +232,9 @@ import {
 
         this.viewModel.attr('highlightInvalidFields', true);
         $container.animate({
-          scrollTop: $(field).offset().top - $body.offset().top
+          scrollTop: $(field).offset().top - $body.offset().top,
         }, 500);
-      }
+      },
     },
     helpers: {
       isInvalidField: function (show, valid, highlightInvalidFields, options) {
@@ -246,7 +246,7 @@ import {
           return options.fn(options.context);
         }
         return options.inverse(options.context);
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can);

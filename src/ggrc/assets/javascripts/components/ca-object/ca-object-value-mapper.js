@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -19,7 +19,7 @@ import {
         value: null,
         type: null,
         options: [],
-        placeholder: 'Please enter the value...'
+        placeholder: 'Please enter the value...',
       },
       value: null,
       valueObj: null,
@@ -30,7 +30,7 @@ import {
           options: this.getOptions(),
           value: this.getValue(),
           type: this.getType(),
-          title: this.getTitle()
+          title: this.getTitle(),
         });
       },
       getOptions: function () {
@@ -58,7 +58,7 @@ import {
             this.attr('type')
           )
         );
-      }
+      },
     },
     events: {
       init: function () {
@@ -66,7 +66,7 @@ import {
       },
       '{scope.input} value': function (scope, ev, val) {
         this.scope.setValue(val);
-      }
-    }
+      },
+    },
   });
 })(window._, window.can, window.GGRC);
