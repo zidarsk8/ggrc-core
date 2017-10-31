@@ -7,7 +7,6 @@
 import operator
 import functools
 
-import flask
 import sqlalchemy
 from sqlalchemy.orm import aliased
 from sqlalchemy.orm import load_only
@@ -267,7 +266,6 @@ def similar(exp, object_class, target_class, query):
       id_=exp['ids'][0],
       types=[object_class.__name__],
   )
-  flask.g.similar_objects_query = similar_objects_query
   similar_objects_ids = [obj.id for obj in similar_objects_query]
   if similar_objects_ids:
     return object_class.id.in_(similar_objects_ids)

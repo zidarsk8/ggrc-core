@@ -10,7 +10,6 @@ This class is used to build SqlAlchemy queries and fetch the result ids.
 import collections
 import datetime
 
-import flask
 import sqlalchemy as sa
 
 from ggrc import db
@@ -294,11 +293,6 @@ class QueryHelper(object):
         total = len(ids)
       object_query["total"] = total
 
-    if hasattr(flask.g, "similar_objects_query"):
-      # delete similar_objects_query for the case when several queries are
-      # POSTed in one request, the first one filters by similarity and the
-      # second one doesn't but tries to sort by __similarity__
-      delattr(flask.g, "similar_objects_query")
     return ids
 
   @classmethod
@@ -358,10 +352,6 @@ class QueryHelper(object):
                 to sort) and "desc" (optional; do reverse sort if True);
       tgt_class: the snapshotted model if `model` is Snapshot else `model`.
 
-    If order_by["name"] == "__similarity__" (a special non-field value),
-    similarity weights returned by get_similar_objects_query are used for
-    sorting.
-
     If sorting by a relationship field is requested, the following sorting is
     applied:
     1. If the field is a relationship to a Titled model, sort by its title.
@@ -385,14 +375,6 @@ class QueryHelper(object):
                            required or [(aliased entity, relationship field)]
                            if joins required.
       """
-      def by_similarity():
-        """Join similar_objects subquery, order by weight from it."""
-        join_target = flask.g.similar_objects_query.subquery()
-        join_condition = model.id == join_target.c.id
-        joins = [(join_target, join_condition)]
-        order = join_target.c.weight
-        return joins, order
-
       def by_fulltext():
         """Join fulltext index table, order by indexed CA value."""
         alias = sa.orm.aliased(Record, name=u"fulltext_{}".format(self._count))
@@ -420,28 +402,20 @@ class QueryHelper(object):
       # transform clause["name"] into a model's field name
       key = clause["name"].lower()
 
-      if key == "__similarity__":
-        # special case
-        if hasattr(flask.g, "similar_objects_query"):
-          joins, order = by_similarity()
+      key, _ = tgt_class.attributes_map().get(key, (key, None))
+      if key in custom_operators.GETATTR_WHITELIST:
+        attr = getattr(model, key.encode('utf-8'), None)
+        if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
+            isinstance(attr.property,
+                        sa.orm.properties.RelationshipProperty)):
+          joins, order = by_foreign_key()
         else:
-          raise BadQueryException("Can't order by '__similarity__' when no "
-                                  "'similar' filter was applied.")
+          # a simple attribute
+          joins, order = None, attr
       else:
-        key, _ = tgt_class.attributes_map().get(key, (key, None))
-        if key in custom_operators.GETATTR_WHITELIST:
-          attr = getattr(model, key.encode('utf-8'), None)
-          if (isinstance(attr, sa.orm.attributes.InstrumentedAttribute) and
-              isinstance(attr.property,
-                         sa.orm.properties.RelationshipProperty)):
-            joins, order = by_foreign_key()
-          else:
-            # a simple attribute
-            joins, order = None, attr
-        else:
-          # Snapshot or non object attributes are treated as custom attributes
-          self._count += 1
-          joins, order = by_fulltext()
+        # Snapshot or non object attributes are treated as custom attributes
+        self._count += 1
+        joins, order = by_fulltext()
 
       if clause.get("desc", False):
         order = order.desc()
