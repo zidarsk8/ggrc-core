@@ -4,6 +4,7 @@
 */
 
 import BaseTreePeopleVM from '../view-models/tree-people-base-vm';
+import template from './templates/tree-people-list-field.mustache';
 
 const viewModel = BaseTreePeopleVM.extend({
   filter: '@',
@@ -19,9 +20,9 @@ const viewModel = BaseTreePeopleVM.extend({
   },
 });
 
-export default GGRC.Components('treePeopleListField', {
+GGRC.Components('treePeopleListField', {
   tag: 'tree-people-list-field',
-  template: '{{peopleStr}}',
+  template: template,
   viewModel: viewModel,
   events: {
     '{viewModel.source} change': function () {

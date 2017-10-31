@@ -13,38 +13,51 @@ export default can.Map.extend({
   source: null,
   people: [],
   peopleStr: '',
+  morePeopleStr: '',
+  peopleNum: 5,
   stub: '@',
   init: function () {
     this.refreshPeople();
   },
   refreshPeople: function () {
     this.getPeopleList()
-      .then(function (data) {
+      .then((data) => {
+        const peopleStr = data
+        .slice(0, this.peopleNum)
+        .map((item) => item.displayName)
+        .join('\n');
+
+        const morePeopleStr = data.length > this.peopleNum ?
+          `\n and ${data.length - this.peopleNum} more` : '';
+
         this.attr('people', data);
-        this.attr('peopleStr', data.map(function (item) {
-          return item.email;
-        }).join(', '));
-      }.bind(this));
+        this.attr('peopleStr', peopleStr);
+        this.attr('morePeopleStr', morePeopleStr);
+      });
   },
   getPeopleList: function () {
     var sourceList = this.getSourceList();
+    var result;
     var deferred = can.Deferred();
 
     if (!sourceList.length) {
       return deferred.resolve([]);
     }
-
-    if (this.attr('stub')) {
-      this.loadItems(sourceList)
-        .then(function (data) {
-          deferred.resolve(data);
-        })
-        .fail(function () {
-          deferred.resolve([]);
+    this.loadItems(sourceList)
+      .then(function (data) {
+        result = data.map(function (item) {
+          var displayName = item.email;
+          return {
+            name: item.name,
+            email: item.email,
+            displayName: displayName,
+          };
         });
-    } else {
-      deferred.resolve(sourceList);
-    }
+        deferred.resolve(result);
+      })
+      .fail(function () {
+        deferred.resolve([]);
+      });
 
     return deferred;
   },
