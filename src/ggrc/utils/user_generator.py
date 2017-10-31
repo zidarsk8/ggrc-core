@@ -4,6 +4,8 @@
 """Collection of utils for login and user generation.
 """
 
+from sqlalchemy import orm
+
 from ggrc import db, settings
 from ggrc.integrations import client
 from ggrc.login import get_current_user_id
@@ -15,7 +17,6 @@ from ggrc_basic_permissions.models import UserRole
 
 
 def _base_user_query():
-  from sqlalchemy import orm
   return Person.query.options(
       orm.undefer_group('Person_complete'))
 
@@ -86,8 +87,9 @@ def search_user(email):
   """
   service = client.PersonClient()
   if is_authorized_domain(email):
-    ldaps = service.search_persons([email.split("@")[0]])
-    if ldaps:
+    username = email.split("@")[0]
+    ldaps = service.search_persons([username])
+    if ldaps and ldaps[0]["username"] == username:
       return "%s %s" % (ldaps[0]["firstName"], ldaps[0]["lastName"])
   return None
 
@@ -97,3 +99,63 @@ def find_or_create_external_user(email, name):
   if settings.INTEGRATION_SERVICE_URL and search_user(email):
     return find_or_create_user_by_email(email, name)
   return None
+
+
+def find_user(email):
+  """Find or generate user.
+
+  If Integration Server is specified not found in DB user is generated
+  with Creator role.
+  """
+  if settings.INTEGRATION_SERVICE_URL:
+    name = search_user(email)
+    if not name:
+      return None
+    return find_or_create_user_by_email(email, name)
+  return find_user_by_email(email)
+
+
+def find_users(emails):
+  """Find or generate user.
+
+  If Integration Server is specified not found in DB user is generated
+  with Creator role.
+  """
+  if not settings.INTEGRATION_SERVICE_URL:
+    return Person.query.filter(Person.email.in_(emails)).options(
+        orm.undefer_group('Person_complete')).all()
+
+  # Verify emails
+  usernames = [email.split('@')[0] for email in emails
+               if is_authorized_domain(email)]
+
+  service = client.PersonClient()
+  ldaps = service.search_persons(usernames)
+
+  authorized_domain = getattr(settings, "AUTHORIZED_DOMAIN", "")
+  verified_emails = {'%s@%s' % (ldap['username'], authorized_domain)
+                     for ldap in ldaps}
+
+  # Find users in db
+  users = Person.query.filter(Person.email.in_(emails)).all()
+  found_emails = {user.email for user in users}
+
+  # Create new users
+  new_emails = verified_emails - found_emails
+  new_usernames = [email.split('@')[0] for email in new_emails]
+  new_users = [('%s@%s' % (ldap['username'], authorized_domain),
+                '%s %s' % (ldap['firstName'], ldap['lastName']))
+               for ldap in ldaps if ldap['username'] in new_usernames]
+
+  for email, name in new_users:
+    user = create_user(email,
+                       name=name,
+                       modified_by_id=get_current_user_id())
+    users.append(user)
+
+  # Grant Creator role to all users
+  for user in users:
+    if user.system_wide_role == SystemWideRoles.NO_ACCESS:
+      add_creator_role(user)
+
+  return users

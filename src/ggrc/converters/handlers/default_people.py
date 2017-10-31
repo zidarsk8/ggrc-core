@@ -52,7 +52,8 @@ class DefaultPersonColumnHandler(handlers.ColumnHandler):
         emails.append(email)
 
     if emails:
-      for person in Person.query.filter(Person.email.in_(emails)).all():
+      from ggrc.utils import user_generator
+      for person in user_generator.find_users(emails):
         people.append(person.id)
         emails.remove(person.email)
       if emails:

@@ -149,12 +149,16 @@ def get_config_json():
 
 def get_public_config():
   """Expose additional permissions-dependent config to client."""
+  if settings.INTEGRATION_SERVICE_URL:
+    external_service = "/people/suggest"
+  else:
+    external_service = None
   return {
       "external_help_url": getattr(settings, "EXTERNAL_HELP_URL", ""),
       "snapshotable_objects": list(rules.Types.all),
       "snapshotable_ignored": list(rules.Types.ignore),
       "snapshotable_parents": list(rules.Types.parents),
-      "external_services": {"Person": "/people/suggest"},
+      "external_services": {"Person": external_service},
   }
 
 
