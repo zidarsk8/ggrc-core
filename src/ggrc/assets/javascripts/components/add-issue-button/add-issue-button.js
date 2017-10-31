@@ -6,55 +6,52 @@
 import {REFRESH_RELATED} from '../../events/eventTypes';
 import template from './add-issue-button.mustache';
 
-(function (can, GGRC, CMS) {
-  'use strict';
-  var CurrentPageUtils = GGRC.Utils.CurrentPage;
+let CurrentPageUtils = GGRC.Utils.CurrentPage;
 
-  GGRC.Components('addIssueButton', {
-    tag: 'add-issue-button',
-    template,
-    viewModel: {
-      define: {
-        prepareJSON: {
-          get: function () {
-            var instance = this.attr('relatedInstance');
-            var json = {
-              assessment: {
-                title: instance.title,
-                id: instance.id,
-                type: instance.type,
-                title_singular: instance.class.title_singular,
-                table_singular: instance.class.table_singular,
-              },
-            };
+export default GGRC.Components('addIssueButton', {
+  tag: 'add-issue-button',
+  template,
+  viewModel: {
+    define: {
+      prepareJSON: {
+        get: function () {
+          var instance = this.attr('relatedInstance');
+          var json = {
+            assessment: {
+              title: instance.title,
+              id: instance.id,
+              type: instance.type,
+              title_singular: instance.class.title_singular,
+              table_singular: instance.class.table_singular,
+            },
+          };
 
-            return JSON.stringify(json);
-          },
+          return JSON.stringify(json);
         },
       },
-      relatedInstance: {},
-      snapshots: [],
     },
-    events: {
-      refreshIssueList: function (window, event, instance) {
-        let model = 'Issue';
+    relatedInstance: {},
+    snapshots: [],
+  },
+  events: {
+    refreshIssueList: function (window, event, instance) {
+      let model = 'Issue';
 
-        if (instance instanceof CMS.Models.Issue) {
-          let pageInstance = GGRC.page_instance();
-          CurrentPageUtils.initCounts(
-            [model],
-            pageInstance.type,
-            pageInstance.id
-          );
-        }
+      if (instance instanceof CMS.Models.Issue) {
+        let pageInstance = GGRC.page_instance();
+        CurrentPageUtils.initCounts(
+          [model],
+          pageInstance.type,
+          pageInstance.id
+        );
+      }
 
-        this.viewModel.attr('relatedInstance').dispatch({
-          ...REFRESH_RELATED,
-          model,
-        });
-      },
-      '{window} modal:added': 'refreshIssueList',
-      '{window} modal:success': 'refreshIssueList',
+      this.viewModel.attr('relatedInstance').dispatch({
+        ...REFRESH_RELATED,
+        model,
+      });
     },
-  });
-})(window.can, window.GGRC, window.CMS);
+    '{window} modal:added': 'refreshIssueList',
+    '{window} modal:success': 'refreshIssueList',
+  },
+});
