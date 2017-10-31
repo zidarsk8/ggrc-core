@@ -35,7 +35,7 @@ class ModelFactory(factory.Factory, object):
     return instance
 
   @classmethod
-  def _log_event(cls, instance):
+  def _log_event(cls, instance, action="POST"):
     indexer = get_indexer()
     db.session.flush()
     user = cls._get_user()
@@ -43,7 +43,7 @@ class ModelFactory(factory.Factory, object):
         instance, user.id, 'created', instance.log_json())
     event = models.Event(
         modified_by=user,
-        action="POST",
+        action=action,
         resource_id=instance.id,
         resource_type=instance.type,
         context=instance.context,
