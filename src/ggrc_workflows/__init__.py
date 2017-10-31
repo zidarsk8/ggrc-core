@@ -17,7 +17,7 @@ from ggrc.models.relationship import Relationship
 from ggrc.rbac.permissions import is_allowed_update
 from ggrc.access_control import role
 from ggrc.services import signals
-from ggrc.services.common import log_event
+from ggrc.utils.log_event import log_event
 from ggrc_workflows import models, notification
 from ggrc_workflows import services
 from ggrc_workflows.models import relationship_helper

@@ -1,6 +1,12 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
+import logging
+from flask import g, has_request_context
+
+logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
+
+
 class Cache:
   """
   Tracks modified objects in the session distinguished by
@@ -50,3 +56,19 @@ class Cache:
     copied_cache.dirty = dict(self.dirty)
     copied_cache.deleted = dict(self.deleted)
     return copied_cache
+
+  @staticmethod
+  def get_cache(create=False):
+    """
+    Retrieves the cache from the Flask global object. The create arg
+    indicates if a new cache should be created if none exists. If we
+    are not in a request context, no cache is created (return None).
+    """
+    if has_request_context():
+      cache = getattr(g, 'cache', None)
+      if cache is None and create:
+        cache = g.cache = Cache()
+      return cache
+    else:
+      logger.warning("No request context - no cache created")
+      return None
