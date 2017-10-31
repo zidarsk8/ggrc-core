@@ -6,11 +6,7 @@
 {{#each items}}
 <li {{data 'ui-autocomplete-item'}} class="ui-menu-item">
   <a
-    href="javascript://" class='show-extended' {{data 'model'}}
-    {{#if_match type 'Assessment|Request'}}
-      data-tooltip-view="/base_templates/assignable_extended_info.mustache"
-    {{/if}}
-  >
+    href="javascript://" class='show-extended' {{data 'model'}}>
     <i class="fa fa-{{class.table_singular}} color"></i>
     {{firstnonempty title name email}}
   </a>
