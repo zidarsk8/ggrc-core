@@ -4,6 +4,7 @@
  */
 
 import '../add-issue-button';
+import {REFRESH_RELATED} from '../../../events/eventTypes';
 
 describe('GGRC.Components.addIssueButton', function () {
   'use strict';
@@ -62,7 +63,10 @@ describe('GGRC.Components.addIssueButton', function () {
             fakePageInstance.id
           );
           expect(relatedInstance.dispatch)
-            .toHaveBeenCalledWith('refreshInstance');
+            .toHaveBeenCalledWith({
+              ...REFRESH_RELATED,
+              model: issueWidgetName,
+            });
         }
       );
     });
