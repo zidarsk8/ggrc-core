@@ -3,8 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import './external-data-autocomplete';
-
 /**
  * The component is used to integrate separate autocomplete component
  * with some old pards of code which are working with autocomplete plugin
