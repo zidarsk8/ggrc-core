@@ -220,6 +220,12 @@
                 </div>
             </div>
             <div class="info-pane__sidebar">
+              {{#if instance.label}}
+                <div class="info-pane__section">
+                  <div class="info-pane__section-title">Label</div>
+                  <p>{{instance.label}}</p>
+                </div>
+              {{/if}}
               <div class="ggrc-form">
                 <div class="ggrc-form-item">
                   <div class="ggrc-form-item__row">
