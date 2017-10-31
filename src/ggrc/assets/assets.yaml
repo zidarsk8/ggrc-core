@@ -39,7 +39,6 @@ dashboard-js-template-files:
   - components/show-related-assessments-button/show-related-assessments-button.mustache
   - components/view-object-buttons/view-object-buttons.mustache
   - components/add-object-button/add-object-button.mustache
-  - components/add-issue-button/add-issue-button.mustache
   - components/info-pin-buttons/info-pin-buttons.mustache
   - components/questions-link/questions-link.mustache
   - components/folder-attachments-list/folder-attachments-list.mustache

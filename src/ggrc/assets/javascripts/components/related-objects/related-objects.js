@@ -1,9 +1,10 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 import './sortable-column';
+import {REFRESH_RELATED} from '../../events/eventTypes';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -19,23 +20,23 @@ import './sortable-column';
           get: function () {
             return 'No Related ' + this.attr('relatedItemsType') + 's ' +
               'were found';
-          }
+          },
         },
         isLoading: {
           type: 'boolean',
-          value: false
+          value: false,
         },
         paging: {
           value: function () {
             return new GGRC.VM.Pagination({pageSizeSelect: [5, 10, 15]});
-          }
+          },
         },
         relatedObjects: {
-          Value: can.List
+          Value: can.List,
         },
         predefinedFilter: {
-          type: '*'
-        }
+          type: '*',
+        },
       },
       baseInstance: null,
       relatedItemsType: '@',
@@ -54,8 +55,8 @@ import './sortable-column';
             expression: {
               object_name: type,
               op: isAssessment ? {name: 'similar'} : {name: 'relevant'},
-              ids: [id]
-            }
+              ids: [id],
+            },
           };
         }
         return filters;
@@ -81,7 +82,7 @@ import './sortable-column';
           limit: this.attr('paging.limits'),
           object_name: relatedType,
           order_by: this.getSortingInfo(),
-          filters: filters
+          filters: filters,
         }];
         return params;
       },
@@ -97,7 +98,7 @@ import './sortable-column';
             var values = data[relatedType].values;
             var result = values.map(function (item) {
               return {
-                instance: CMS.Models[relatedType].model(item)
+                instance: CMS.Models[relatedType].model(item),
               };
             });
             // Update paging object
@@ -129,7 +130,7 @@ import './sortable-column';
       },
       setRelatedItems: function () {
         this.attr('relatedObjects').replace(this.loadRelatedItems());
-      }
+      },
     },
     init: function () {
       this.viewModel.setRelatedItems();
@@ -144,12 +145,17 @@ import './sortable-column';
       '{viewModel.baseInstance} refreshInstance': function () {
         this.viewModel.setRelatedItems();
       },
-      '{viewModel.baseInstance} refreshRelatedAssessments': function () {
-        this.viewModel.setRelatedItems();
+      [`{viewModel.baseInstance} ${REFRESH_RELATED.type}`]:
+        function (scope, event) {
+        let vm = this.viewModel;
+
+        if (vm.attr('relatedItemsType') === event.model) {
+          vm.setRelatedItems();
+        }
       },
       '{viewModel.orderBy} changed': function () {
         this.viewModel.setRelatedItems();
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window.CMS);
