@@ -16,7 +16,8 @@ export default GGRC.Components('csvImportWidget', {
   scope: {
     importUrl: "/_service/import_csv",
     import: null,
-    filename: "",
+    fileId: '',
+    fileName: '',
     isLoading: false,
     state: "select",
     helpUrl: GGRC.config.external_import_help_url,
@@ -178,7 +179,8 @@ export default GGRC.Components('csvImportWidget', {
     resetFile: function (element) {
       this.attr({
         state: "select",
-        filename: "",
+        fileId: '',
+        fileName: '',
         import: null
       });
       element.find(".csv-upload").val("");
@@ -186,22 +188,10 @@ export default GGRC.Components('csvImportWidget', {
     requestImport: function (file) {
       this.attr('state', 'analyzing');
       this.attr('isLoading', true);
-      this.attr('filename', file.name);
+      this.attr('fileId', file.id);
+      this.attr('fileName', file.name);
 
-      this.requestData = {
-        type: 'POST',
-        url: this.attr('importUrl'),
-        data: JSON.stringify({id: file.id}),
-        cache: false,
-        contentType: false,
-        processData: false,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-test-only': 'true',
-          'X-requested-by': 'GGRC'
-        }
-      };
-      $.ajax(this.requestData)
+      GGRC.Utils.import_request({data: {id: file.id}}, true)
         .then(this.prepareDataForCheck.bind(this))
         .then(function (checkObject) {
           this.beforeProcess(
@@ -227,9 +217,10 @@ export default GGRC.Components('csvImportWidget', {
     ".state-import click": function (el, ev) {
       ev.preventDefault();
       this.scope.attr("state", "importing");
-      this.scope.requestData.headers["X-test-only"] = "false";
 
-      $.ajax(this.scope.requestData)
+      GGRC.Utils.import_request({
+        data: {id: this.scope.attr('fileId')},
+      }, false)
       .done(function (data) {
         var result_count = data.reduce(function (prev, curr) {
               _.each(Object.keys(prev), function(key) {
@@ -253,14 +244,12 @@ export default GGRC.Components('csvImportWidget', {
       var that = this;
       var allowedTypes = ['text/csv', 'application/vnd.google-apps.document',
         'application/vnd.google-apps.spreadsheet'];
-      var dfd = GGRC.Controllers
-        .GAPI.authorize(['https://www.googleapis.com/auth/drive']);
 
-      dfd.done(function () {
-        gapi.load('picker', {
-          callback: createPicker
+      GGRC.Controllers.GAPI
+        .reAuthorize(gapi.auth.getToken())
+        .done(()=>{
+          gapi.load('picker', {callback: createPicker});
         });
-      });
 
       // Create and render a Picker object for searching images.
       function createPicker() {
