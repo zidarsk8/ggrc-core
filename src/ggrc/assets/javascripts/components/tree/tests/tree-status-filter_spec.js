@@ -4,7 +4,7 @@
 */
 
 import Component from '../tree-status-filter';
-import StateUtils from '../../../plugins/utils/state-utils';
+import * as StateUtils from '../../../plugins/utils/state-utils';
 
 const FILTER_STRING = 'Foo Bar Baz';
 

@@ -7,7 +7,7 @@ import './advanced-search-filter-attribute';
 import './advanced-search-filter-group';
 import './advanced-search-filter-operator';
 import './advanced-search-filter-state';
-import StateUtils from '../../plugins/utils/state-utils';
+import * as StateUtils from '../../plugins/utils/state-utils';
 
 (function (can, GGRC) {
   'use strict';
