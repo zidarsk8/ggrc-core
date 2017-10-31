@@ -7,6 +7,17 @@
   text-decoration: none;
 }
 
+.object-bulk-update {
+  .search-results {
+    margin-top: 20px;
+  }
+
+  .modal-footer.modal-footer--trailed {
+    border-top: none;
+    padding-top: 0;
+  }
+}
+
 .target-state {
   display: flex;
   flex-direction: column;
