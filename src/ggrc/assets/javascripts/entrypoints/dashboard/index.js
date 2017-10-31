@@ -117,7 +117,6 @@ import '../../components/lazy_open_close';
 import '../../components/revision-log/revision-log';
 import '../../components/quick_form/quick_add';
 import '../../components/quick_form/quick_update';
-import '../../components/access_control_list/access_control_list';
 import '../../components/modal_wrappers/assessment_template_form';
 import '../../components/modal_wrappers/checkboxes_to_list';
 import '../../components/reminder';
