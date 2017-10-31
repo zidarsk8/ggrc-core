@@ -7,6 +7,7 @@ describe('GGRC.Components.treeHeader', function () {
   'use strict';
 
   var vm;
+  var component;
 
   function generateColumns(names) {
     return names.map(function (name) {
@@ -18,6 +19,7 @@ describe('GGRC.Components.treeHeader', function () {
 
   beforeEach(function () {
     vm = GGRC.Components.getViewModel('treeHeader');
+    component = GGRC.Components.get('treeHeader');
   });
 
   describe('setColumns() method', function () {
@@ -66,6 +68,48 @@ describe('GGRC.Components.treeHeader', function () {
         col3: true,
         col4: false,
         col5: false
+      });
+    });
+  });
+
+  describe('onOrderChange() method', function () {
+    it('dipatches sort event with field and direction', function () {
+      const orderBy = {
+        field: 'field',
+        direction: 'asc',
+      };
+      spyOn(vm, 'dispatch');
+      vm.attr('orderBy', orderBy);
+      vm.onOrderChange();
+
+      expect(vm.dispatch).toHaveBeenCalledWith({
+        type: 'sort',
+        field: orderBy.field,
+        sortDirection: orderBy.direction,
+      });
+    });
+  });
+
+  describe('events', function () {
+    let events;
+
+    beforeEach(function () {
+      events = component.prototype.events;
+    });
+
+    describe('"{viewModel.orderBy} change"() event', function () {
+      let event;
+
+      beforeEach(function () {
+        event = events['{viewModel.orderBy} change'].bind({
+          viewModel: vm,
+        });
+      });
+
+      it('calls onOrderChange', function () {
+        spyOn(vm, 'onOrderChange');
+        event();
+        expect(vm.onOrderChange).toHaveBeenCalled();
       });
     });
   });
