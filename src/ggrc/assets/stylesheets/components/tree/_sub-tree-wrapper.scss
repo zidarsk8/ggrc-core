@@ -66,6 +66,11 @@ sub-tree-item {
 
   cycle-task-actions {
     width: 200px;
+
+    .item-actions.disabled {
+      pointer-events: none;
+      opacity: 0.25;
+    }
   }
 
   >.sub-item-content {
