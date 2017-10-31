@@ -272,7 +272,7 @@
   }, {
     init: function (options) {
       CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
-        var instance = GGRC.page_instance();
+        const instance = GGRC.page_instance();
         this.display_prefs = prefs;
         this.options = new can.Map(this.options);
         if (!this.options.widget_list) {
@@ -289,15 +289,17 @@
           this.route(window.location.hash);
         }.bind(this));
         can.view(this.options.internav_view, this.options, function (frag) {
-          var isAuditScope = instance.type === 'Audit';
-          var fn = function () {
+          const isAuditScope = instance.type === 'Audit';
+          const fn = function () {
             this.element.append(frag);
             if (isAuditScope) {
+              const priorityTabsNum = 4 +
+                GGRC.Utils.Dashboards.isDashboardEnabled(instance);
               this.element.addClass(this.options.instance.type.toLowerCase());
               this.options.attr('addTabTitle', 'Add Scope');
               this.options.attr('hideTabTitle', 'Show Audit Scope');
               this.options.attr('dividedTabsMode', true);
-              this.options.attr('priorityTabs', 4);
+              this.options.attr('priorityTabs', priorityTabsNum);
             }
             this.route(window.location.hash);
             delete this.delayed_display;
