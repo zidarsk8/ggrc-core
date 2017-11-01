@@ -1,13 +1,14 @@
 version: "2"
 services:
   cleandev:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     ports:
      - "8000:8000"
      - "8080:8080"
      - "9876:9876"
+     - "9222:9222"
     volumes:
      - ".:/vagrant"
     environment:

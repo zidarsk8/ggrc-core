@@ -670,6 +670,7 @@
       display_attr_names: ['title', 'owner', 'status'],
       mandatory_attr_names: ['title']
     },
+    sub_tree_view_options: {},
     obj_nav_options: {},
     list_view_options: {},
 

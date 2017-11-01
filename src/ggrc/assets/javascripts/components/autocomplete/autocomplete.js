@@ -18,7 +18,7 @@
       '/components/autocomplete/autocomplete.mustache'
     ),
 
-    scope: {
+    viewModel: {
       placeholder: '@',
       searchItemsType: '@',
       className: '@',
@@ -30,7 +30,7 @@
       define: {
         disable: {
           type: 'boolean',
-          'default': false
+          value: false,
         }
       }
     },
@@ -73,5 +73,5 @@
     }
   };
 
-  GGRC.Components('autocomplete', component, true);
+  GGRC.Components('autocomplete', component);
 })(window.GGRC, window.can);

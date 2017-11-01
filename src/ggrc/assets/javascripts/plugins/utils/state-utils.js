@@ -25,20 +25,19 @@
         models: ['Assessment'],
         states: [
           'Not Started', 'In Progress', 'In Review',
-          'Completed and Verified', 'Completed (no verification)'
+          'Completed and Verified', 'Completed (no verification)', 'Deprecated'
         ]
       },
       {
         models: ['Audit'],
         states: [
           'Planned', 'In Progress', 'Manager Review',
-          'Ready for External Review', 'Completed'
+          'Ready for External Review', 'Completed', 'Deprecated'
         ]
       },
       {
         models: [
-          'Person', 'CycleTaskGroupObjectTask',
-          'AssessmentTemplate', 'Workflow',
+          'Person', 'CycleTaskGroupObjectTask', 'Workflow',
           'TaskGroup', 'Cycle'
         ],
         states: []

@@ -72,7 +72,7 @@ if not settings.AUTOBUILD_ASSETS:
 environment.url = '/static'
 environment.directory = os.path.join(settings.MODULE_DIR, 'static')
 
-environment.load_path = [settings.THIRD_PARTY_DIR, settings.BOWER_DIR]
+environment.load_path = [settings.THIRD_PARTY_DIR]
 
 _per_module_load_suffixes = [
     'assets/javascripts',

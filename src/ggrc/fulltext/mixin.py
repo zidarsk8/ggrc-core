@@ -26,22 +26,6 @@ class Indexed(object):
 
   PROPERTY_TEMPLATE = u"{}"
 
-  def delete_record(self):
-    fulltext.get_indexer().delete_record(
-        self.id,
-        self.__class__.__name__,
-        False
-    )
-
-  def create_record(self):
-    indexer = fulltext.get_indexer()
-    indexer.create_record(indexer.fts_record_for(self), False)
-
-  def update_indexer(self):
-    """Update indexer for current instance"""
-    self.delete_record()
-    self.create_record()
-
   def get_reindex_pair(self):
     return (self.__class__.__name__, self.id)
 

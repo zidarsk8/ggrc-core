@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Info widgets."""
 # pylint: disable=useless-super-delegation
+# pylint: disable=attribute-defined-outside-init
 
 import re
 
@@ -10,7 +11,7 @@ from lib.constants import locator, objects, element, roles
 from lib.constants.locator import WidgetInfoAssessment
 from lib.element import widget_info, tab_containers
 from lib.page.modal import update_object
-from lib.utils import selenium_utils, string_utils
+from lib.utils import selenium_utils, string_utils, help_utils
 
 
 class InfoWidget(base.Widget):
@@ -27,86 +28,70 @@ class InfoWidget(base.Widget):
   def __init__(self, driver):
     super(InfoWidget, self).__init__(driver)
     self.child_cls_name = self.__class__.__name__.lower()
-    selenium_utils.wait_for_js_to_load(self._driver)
-    # empty lists of headers and values
     self.list_all_headers_txt = []
     self.list_all_values_txt = []
-    # check type and content of Info Widget
-    if not self.is_info_page_not_panel:
-      self.is_snapshotable_panel = (
-          self.child_cls_name in objects.ALL_SNAPSHOTABLE_OBJS)
+    self.info_widget_locator = (
+        self._locators.INFO_PAGE_ELEM if self.is_info_page else
+        self._locators.INFO_PANEL_ELEM)
+    self.info_widget_elem = selenium_utils.get_when_visible(
+        self._driver, self.info_widget_locator)
+    # common for all objects
+    self.title_lbl_txt = self.get_title_lbl_txt()
+    self.title = base.Element(
+        self.info_widget_elem, self._locators.TITLE_ENTERED)
+    self.state_lbl_txt = self._elements.STATE.upper()
+    self.state_txt = self.get_state_txt()
+    self._extend_list_all_scopes(
+        [self.title_lbl_txt, self.state_lbl_txt],
+        [self.title.text, self.state_txt])
+    self.info_3bbs_btn = selenium_utils.get_when_visible(
+        self.info_widget_elem, self._locators.BUTTON_3BBS)
     # for Info Page
-    if self.is_info_page_not_panel:
+    if self.is_info_page:
       self.info_page_footer = base.Label(
-          self._driver, self._locators.TXT_FOOTER_CSS)
-      self.modified_by = base.Element(
-          self.info_page_footer.element, self._locators.TXT_MODIFIED_BY_CSS)
+          self.info_widget_elem, self._locators.TXT_FOOTER_CSS)
+      self.modified_by = selenium_utils.get_when_visible(
+          self.info_widget_elem, self._locators.TXT_MODIFIED_BY_CSS)
       _created_at_txt, _updated_at_txt = (
           self.info_page_footer.text.split(string_utils.WHITESPACE * 6))
       self.created_at_txt = (
           re.sub("Created at", string_utils.BLANK, _created_at_txt))
       self.updated_at_txt = (
           _updated_at_txt.splitlines()[1].replace("on ", string_utils.BLANK))
-      self.list_all_headers_txt.extend(
+      self._extend_list_all_scopes(
           [self._elements.CREATED_AT.upper(),
            self._elements.MODIFIED_BY.upper(),
-           self._elements.UPDATED_AT.upper()])
-      self.list_all_values_txt.extend(
+           self._elements.UPDATED_AT.upper()],
           [self.created_at_txt, self.modified_by.text, self.updated_at_txt])
     # for Info Panel
     else:
-      self.panel = InfoPanel(self._driver, self.is_snapshotable_panel)
-    # for objects w/ Review State
-    if self.child_cls_name in objects.ALL_OBJS_W_REVIEW_STATE:
-      self.review_state_lbl = base.Label(
-          self._driver, self._locators.TXT_OBJECT_REVIEW)
-      self.review_state_txt = self.get_review_state_txt()
-      self.list_all_headers_txt.extend([self.review_state_lbl.text])
-      self.list_all_values_txt.extend([self.review_state_txt])
-    # for all objects
-    # self.title_lbl: Issue in app GGRC-3451
-    self.title_lbl_txt = (
-        self._elements.TITLE.upper() if (
-            self.child_cls_name == objects.ASSESSMENTS and
-            self.is_info_page_not_panel) else
-        base.Label(self._driver, self._locators.TITLE).text)
-    self.title = base.Element(self._driver, self._locators.TITLE_ENTERED)
-    self.state_lbl_txt = self._elements.STATE.upper()
-    self.state_txt = self.get_state_txt()
-    self.cas_lbl_txt = self._elements.CAS.upper()
-    self.list_all_headers_txt.extend(
-        [self.title_lbl_txt, self.state_lbl_txt])
-    self.list_all_values_txt.extend(
-        [self.title.text, self.state_txt])
-    # for all objects excluding Assessments
-    if self.child_cls_name != objects.ASSESSMENTS:
-      self.code_lbl_txt, self.code_txt = (
-          self.get_header_and_value_txt_from_custom_scopes(
-              self._elements.CODE.upper()))
-      self.cas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes()
-      self.list_all_headers_txt.extend(
-          [self.code_lbl_txt, self.cas_lbl_txt])
-      self.list_all_values_txt.extend(
-          [self.code_txt, self.cas_scope_txt])
+      self.panel = (
+          SnapshotableInfoPanel(self._driver, self.info_widget_elem)
+          if self.child_cls_name in objects.ALL_SNAPSHOTABLE_OBJS else
+          InfoPanel(self._driver, self.info_widget_elem))
+
+  def get_title_lbl_txt(self):
+    """Get title's label text from Info Widget."""
+    return base.Label(self.info_widget_elem, self._locators.TITLE).text
 
   def get_state_txt(self):
     """Get object's state text from Info Widget."""
     return objects.get_normal_form(
-        base.Label(self._driver, self._locators.STATE).text)
+        base.Label(self.info_widget_elem, self._locators.STATE).text)
 
   def get_review_state_txt(self):
     """Get object's review state text from Info Widget checking if exact UI
     elements are existed.
     """
     return (element.ReviewStates.REVIEWED if selenium_utils.is_element_exist(
-        self._driver, self._locators.TXT_OBJECT_REVIEWED) else
+        self.info_widget_elem, self._locators.TXT_OBJECT_REVIEWED) else
         element.ReviewStates.UNREVIEWED)
 
   def open_info_3bbs(self):
     """Click to 3BBS button on Info page or Info panel to open info 3BBS modal.
     Return: lib.element.widget_info."obj_name"DropdownSettings
     """
-    base.Button(self._driver, self._locators.BUTTON_3BBS).click()
+    self.info_3bbs_btn.click()
     return self.dropdown_settings_cls(self._driver)
 
   def get_header_and_value_txt_from_custom_scopes(self, header_text,
@@ -120,10 +105,10 @@ class InfoWidget(base.Widget):
     # pylint: disable=invalid-name
     selenium_utils.wait_for_js_to_load(self._driver)
     if custom_scopes_locator:
-      self.all_headers_and_values = self._driver.find_elements(
+      self.all_headers_and_values = self.info_widget_elem.find_elements(
           *custom_scopes_locator)
     if not custom_scopes_locator and self._locators.HEADERS_AND_VALUES:
-      self.all_headers_and_values = self._driver.find_elements(
+      self.all_headers_and_values = self.info_widget_elem.find_elements(
           *self._locators.HEADERS_AND_VALUES)
     header_and_value = (
         next((scope.text.splitlines() + [None]
@@ -146,8 +131,8 @@ class InfoWidget(base.Widget):
     selenium_utils.wait_for_js_to_load(self._driver)
     cas_locator = (self._locators.CAS_HEADERS_AND_VALUES if is_gcas_not_lcas
                    else self._locators.LCAS_HEADERS_AND_VALUES)
-    self.cas_headers_and_values = self._driver.find_elements(*cas_locator)
-
+    self.cas_headers_and_values = (
+        self.info_widget_elem.find_elements(*cas_locator))
     dict_cas_scopes = {}
     if len(self.cas_headers_and_values) >= 1:
       list_text_cas_scopes = []
@@ -197,43 +182,74 @@ class InfoWidget(base.Widget):
     """
     return dict(zip(self.list_all_headers_txt, self.list_all_values_txt))
 
+  def _extend_list_all_scopes(self, headers, values):
+    """Extend 'list all scopes' by headers' text and values' text."""
+    self.list_all_headers_txt.extend(help_utils.convert_to_list(headers))
+    self.list_all_values_txt.extend(help_utils.convert_to_list(values))
+
+  def extend_list_all_scopes_by_code(self):
+    """Set attributes related to 'code' and extend 'list all scopes'
+    accordingly.
+    """
+    self.code_lbl_txt, self.code_txt = (
+        self.get_header_and_value_txt_from_custom_scopes(
+            self._elements.CODE.upper()))
+    self._extend_list_all_scopes(self.code_lbl_txt, self.code_txt)
+
+  def extend_list_all_scopes_by_cas(self):
+    """Set attributes related to 'global custom attributes' and extend
+    'list all scopes' accordingly.
+    """
+    self.cas_lbl_txt = self._elements.CAS.upper()
+    self.cas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes()
+    self._extend_list_all_scopes(self.cas_lbl_txt, self.cas_scope_txt)
+
+  def extend_list_all_scopes_by_review_state(self):
+    """Set attributes related to 'review state' and extend
+    'list all scopes' accordingly.
+    """
+    # pylint: disable=invalid-name
+    self.review_state_lbl = base.Label(
+        self.info_widget_elem, self._locators.TXT_OBJECT_REVIEW)
+    self.review_state_txt = self.get_review_state_txt()
+    self._extend_list_all_scopes(
+        self.review_state_lbl.text, self.review_state_txt)
+
 
 class InfoPanel(object):
   """Class for Info Panels."""
   _locators = locator.WidgetInfoPanel
 
-  def __init__(self, driver, is_snapshotable):
+  def __init__(self, driver, info_widget_elem):
     self._driver = driver
-    if is_snapshotable:
-      self.snapshotable = SnapshotableInfoPanel(self._driver)
+    self.info_widget_elem = info_widget_elem
 
   def button_maximize_minimize(self):
     """Button (toggle) maximize and minimize for Info Panels."""
-    return base.Toggle(self._driver, self._locators.BUTTON_MAXIMIZE_MINIMIZE,
-                       locator.Common.NORMAL)
+    return base.Toggle(
+        self.info_widget_elem, self._locators.BUTTON_MAXIMIZE_MINIMIZE,
+        locator.Common.NORMAL)
 
   def button_close(self):
     """Button close for Info Panels."""
-    return self._driver.find_element(*self._locators.BUTTON_CLOSE)
+    return self.info_widget_elem.find_element(*self._locators.BUTTON_CLOSE)
 
 
-class SnapshotableInfoPanel(object):
+class SnapshotableInfoPanel(InfoPanel):
   """Class for Info Panels of snapshotable objects."""
   # pylint: disable=too-few-public-methods
   _locators = locator.WidgetSnapshotsInfoPanel
   dropdown_settings_cls = widget_info.Snapshots
   locator_link_get_latest_ver = _locators.LINK_GET_LAST_VER
 
-  def __init__(self, driver):
-    self._driver = driver
-
   def snapshot_obj_version(self):
     """Label of snapshot version"""
-    return base.Label(self._driver, self._locators.SNAPSHOT_OBJ_VER)
+    return base.Label(self.info_widget_elem, self._locators.SNAPSHOT_OBJ_VER)
 
   def open_link_get_latest_ver(self):
     """Click on link get latest version under Info panel."""
-    base.Button(self._driver, self.locator_link_get_latest_ver).click()
+    base.Button(self.info_widget_elem,
+                self.locator_link_get_latest_ver).click()
     return update_object.CompareUpdateObjectModal(self._driver)
 
   def is_link_get_latest_ver_exist(self):
@@ -242,7 +258,7 @@ class SnapshotableInfoPanel(object):
             False if link get latest version is not exist.
     """
     return selenium_utils.is_element_exist(
-        self._driver, self.locator_link_get_latest_ver)
+        self.info_widget_elem, self.locator_link_get_latest_ver)
 
 
 class Programs(InfoWidget):
@@ -253,30 +269,33 @@ class Programs(InfoWidget):
 
   def __init__(self, driver):
     super(Programs, self).__init__(driver)
-    # same for info_page or info_panel or is_under_audit
+    # todo redesign 'Programs' cls init and related methods and tests
     self.show_advanced = base.Toggle(
-        self._driver, self._locators.TOGGLE_SHOW_ADVANCED)
+        self.info_widget_elem, self._locators.TOGGLE_SHOW_ADVANCED)
     self.show_advanced.toggle()
     self.object_review = base.Label(
-        self._driver, self._locators.TXT_OBJECT_REVIEW)
+        self.info_widget_elem, self._locators.TXT_OBJECT_REVIEW)
     self.submit_for_review = base.Label(
-        self._driver, self._locators.LINK_SUBMIT_FOR_REVIEW)
-    self.description = base.Label(self._driver, self._locators.DESCRIPTION)
+        self.info_widget_elem, self._locators.LINK_SUBMIT_FOR_REVIEW)
+    self.description = base.Label(
+        self.info_widget_elem, self._locators.DESCRIPTION)
     self.description_entered = base.Label(
-        self._driver, self._locators.DESCRIPTION_ENTERED)
-    self.notes = base.Label(self._driver, self._locators.NOTES)
-    self.notes_entered = base.Label(self._driver, self._locators.NOTES_ENTERED)
-    self.manager = base.Label(self._driver, self._locators.MANAGER)
+        self.info_widget_elem, self._locators.DESCRIPTION_ENTERED)
+    self.notes = base.Label(self.info_widget_elem, self._locators.NOTES)
+    self.notes_entered = base.Label(
+        self.info_widget_elem, self._locators.NOTES_ENTERED)
+    self.manager = base.Label(self.info_widget_elem, self._locators.MANAGER)
     self.manager_entered = base.Label(
-        self._driver, self._locators.MANAGER_ENTERED)
+        self.info_widget_elem, self._locators.MANAGER_ENTERED)
     self.ref_url = base.MultiInputField(
-        self._driver, self._locators.REF_URL_CSS)
-    self.code = base.Label(self._driver, self._locators.CODE)
-    self.code_entered = base.Label(self._driver, self._locators.CODE_ENTERED)
+        self.info_widget_elem, self._locators.REF_URL_CSS)
+    self.code = base.Label(self.info_widget_elem, self._locators.CODE)
+    self.code_entered = base.Label(
+        self.info_widget_elem, self._locators.CODE_ENTERED)
     self.effective_date = base.Label(
-        self._driver, self._locators.EFFECTIVE_DATE)
+        self.info_widget_elem, self._locators.EFFECTIVE_DATE)
     self.effective_date_entered = base.Label(
-        self._driver, self._locators.EFFECTIVE_DATE_ENTERED)
+        self.info_widget_elem, self._locators.EFFECTIVE_DATE_ENTERED)
 
 
 class Workflows(InfoWidget):
@@ -285,6 +304,8 @@ class Workflows(InfoWidget):
 
   def __init__(self, driver):
     super(Workflows, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
 
 
 class Audits(InfoWidget):
@@ -296,13 +317,13 @@ class Audits(InfoWidget):
 
   def __init__(self, driver):
     super(Audits, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
     self.audit_captain_lbl_txt, self.audit_captain_txt = (
         self.get_header_and_value_txt_from_custom_scopes(
             self._elements.AUDIT_CAPTAIN.upper()))
-    self.list_all_headers_txt.extend(
-        [self.audit_captain_lbl_txt])
-    self.list_all_values_txt.extend(
-        [self.audit_captain_txt])
+    self._extend_list_all_scopes(
+        self.audit_captain_lbl_txt, self.audit_captain_txt)
 
 
 class Assessments(InfoWidget):
@@ -315,12 +336,14 @@ class Assessments(InfoWidget):
 
   def __init__(self, driver):
     super(Assessments, self).__init__(driver)
+    self.title_lbl = self.get_title_lbl_txt()
     self.is_verified_lbl_txt = self._elements.VERIFIED.upper()
     self.is_verified = selenium_utils.is_element_exist(
-        self._driver, self._locators.ICON_VERIFIED)
+        self.info_widget_elem, self._locators.ICON_VERIFIED)
     self.workflow_container = tab_containers.AssessmentTabContainer(
         self._driver,
-        self._driver.find_element(*self._locators.ASMT_TAB_CONTAINER_CSS))
+        self.info_widget_elem.find_element(
+            *self._locators.ASMT_TAB_CONTAINER_CSS))
     self.workflow_container.tab_controller.active_tab = (
         element.AssessmentTabContainer.ASMT_TAB)
     self.mapped_objects_lbl_txt = self._elements.MAPPED_OBJECTS.upper()
@@ -340,24 +363,29 @@ class Assessments(InfoWidget):
             self._elements.VERIFIERS_.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
     self.comments_panel = base.CommentsPanel(
-        self._driver, self._locators.COMMENTS_CSS)
+        self.info_widget_elem, self._locators.COMMENTS_CSS)
     self.comments_lbl_txt = self.comments_panel.header_lbl.text
     self.comments_scopes_txt = self.comments_panel.scopes
     # todo: implement separate add lcas and gcas
     # todo: implement separate add mapped ctrls and mapped other objs
-    self.list_all_headers_txt.extend(
+    self._extend_list_all_scopes(
         [self.is_verified_lbl_txt, self.creators_lbl_txt,
          self.assignees_lbl_txt, self.verifiers_lbl_txt,
-         self.mapped_objects_lbl_txt, self.comments_lbl_txt])
-    self.list_all_values_txt.extend(
+         self.mapped_objects_lbl_txt, self.comments_lbl_txt],
         [self.is_verified, self.creators_txt, self.assignees_txt,
          self.verifiers_txt, self.mapped_objects_titles_txt,
          self.comments_scopes_txt])
 
+  def get_title_lbl_txt(self):
+    """Get title's label element from Assessment's Info Widget."""
+    #  Issue in app GGRC-3451
+    return (self._elements.TITLE.upper() if self.is_info_page else
+            super(Assessments, self).get_title_lbl_txt())
+
   def _get_mapped_objs_titles_txt(self):
     """Return lists of str for mapped snapshots titles text from current tab.
     """
-    mapped_items = self._driver.find_elements(
+    mapped_items = self.info_widget_elem.find_elements(
         *self._locators.MAPPED_SNAPSHOTS_CSS)
     return [mapped_el.find_element(
             *self._locators.MAPPED_SNAPSHOT_TITLE_CSS).text
@@ -370,28 +398,45 @@ class Assessments(InfoWidget):
     self.workflow_container.tab_controller.active_tab = (
         element.AssessmentTabContainer.OTHER_ATTRS_TAB)
     self.mapped_objects_titles_txt += self._get_mapped_objs_titles_txt()
-    cas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes()
-    code_section = base.Label(self._driver, self._locators.CODE_CSS)
-    code_lbl_txt = code_section.element.find_element(
-        *self._locators.CODE_HEADER_CSS).text
-    code_txt = code_section.element.find_element(
-        *self._locators.CODE_VALUE_CSS).text
-    # todo: implement separate entities' model for asmts' lcas and gcas
-    cas_scope_txt.update(self.lcas_scope_txt)
-    self.list_all_headers_txt.extend(
-        [self.cas_lbl_txt, code_lbl_txt])
-    self.list_all_values_txt.extend(
-        [cas_scope_txt, code_txt])
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
     return dict(zip(self.list_all_headers_txt, self.list_all_values_txt))
 
+  def extend_list_all_scopes_by_code(self):
+    """Set attributes related to 'code' and extend 'list all scopes'
+    accordingly.
+    """
+    code_elem = base.Label(self.info_widget_elem, self._locators.CODE_CSS)
+    self.code_lbl_txt = code_elem.element.find_element(
+        *self._locators.CODE_HEADER_CSS).text
+    self.code_txt = code_elem.element.find_element(
+        *self._locators.CODE_VALUE_CSS).text
+    self._extend_list_all_scopes(self.code_lbl_txt, self.code_txt)
+
+  def extend_list_all_scopes_by_cas(self):
+    """Set attributes related to 'local and global custom attributes' and
+    extend 'list all scopes' accordingly.
+    """
+    # todo: implement separate entities' model for lcas and gcas
+    self.cas_lbl_txt = self._elements.CAS.upper()
+    self.cas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes()
+    self.cas_scope_txt.update(self.lcas_scope_txt)
+    self._extend_list_all_scopes(self.cas_lbl_txt, self.cas_scope_txt)
+
   def click_complete(self):
-    base.Button(self._driver, WidgetInfoAssessment.BUTTON_COMPLETE).click()
+    """Click on 'Complete' button."""
+    base.Button(self.info_widget_elem,
+                WidgetInfoAssessment.BUTTON_COMPLETE).click()
 
   def click_verify(self):
-    base.Button(self._driver, WidgetInfoAssessment.BUTTON_VERIFY).click()
+    """Click on 'Verify' button."""
+    base.Button(self.info_widget_elem,
+                WidgetInfoAssessment.BUTTON_VERIFY).click()
 
   def click_reject(self):
-    base.Button(self._driver, WidgetInfoAssessment.BUTTON_REJECT).click()
+    """Click on 'Reject' button."""
+    base.Button(self.info_widget_elem,
+                WidgetInfoAssessment.BUTTON_REJECT).click()
 
 
 class AssessmentTemplates(InfoWidget):
@@ -400,6 +445,7 @@ class AssessmentTemplates(InfoWidget):
 
   def __init__(self, driver):
     super(AssessmentTemplates, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
 
 
 class Issues(InfoWidget):
@@ -409,6 +455,9 @@ class Issues(InfoWidget):
 
   def __init__(self, driver):
     super(Issues, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Regulations(InfoWidget):
@@ -417,6 +466,9 @@ class Regulations(InfoWidget):
 
   def __init__(self, driver):
     super(Regulations, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Policies(InfoWidget):
@@ -425,6 +477,9 @@ class Policies(InfoWidget):
 
   def __init__(self, driver):
     super(Policies, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Standards(InfoWidget):
@@ -433,6 +488,9 @@ class Standards(InfoWidget):
 
   def __init__(self, driver):
     super(Standards, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Contracts(InfoWidget):
@@ -441,6 +499,9 @@ class Contracts(InfoWidget):
 
   def __init__(self, driver):
     super(Contracts, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Clauses(InfoWidget):
@@ -449,6 +510,9 @@ class Clauses(InfoWidget):
 
   def __init__(self, driver):
     super(Clauses, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Sections(InfoWidget):
@@ -457,6 +521,9 @@ class Sections(InfoWidget):
 
   def __init__(self, driver):
     super(Sections, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Controls(InfoWidget):
@@ -468,6 +535,9 @@ class Controls(InfoWidget):
 
   def __init__(self, driver):
     super(Controls, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
     self.admin_text, self.admin_entered_text = (
         self.get_header_and_value_txt_from_custom_scopes(
             self._elements.ADMIN.upper(),
@@ -476,9 +546,8 @@ class Controls(InfoWidget):
         self.get_header_and_value_txt_from_custom_scopes(
             self._elements.PRIMARY_CONTACTS.upper(),
             self._locators.PEOPLE_HEADERS_AND_VALUES))
-    self.list_all_headers_txt.extend(
-        [self.admin_text, self.primary_contact_text])
-    self.list_all_values_txt.extend(
+    self._extend_list_all_scopes(
+        [self.admin_text, self.primary_contact_text],
         [self.admin_entered_text, self.primary_contact_entered_text])
 
 
@@ -488,12 +557,9 @@ class Objectives(InfoWidget):
 
   def __init__(self, driver):
     super(Objectives, self).__init__(driver)
-
-
-class People(base.Widget):
-  """Model for People object Info pages and Info panels."""
-  # pylint: disable=too-few-public-methods
-  _locators = locator.WidgetInfoPeople
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class OrgGroups(InfoWidget):
@@ -503,6 +569,9 @@ class OrgGroups(InfoWidget):
 
   def __init__(self, driver):
     super(OrgGroups, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Vendors(InfoWidget):
@@ -511,6 +580,9 @@ class Vendors(InfoWidget):
 
   def __init__(self, driver):
     super(Vendors, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class AccessGroup(InfoWidget):
@@ -519,6 +591,9 @@ class AccessGroup(InfoWidget):
 
   def __init__(self, driver):
     super(AccessGroup, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Systems(InfoWidget):
@@ -528,6 +603,9 @@ class Systems(InfoWidget):
 
   def __init__(self, driver):
     super(Systems, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Processes(InfoWidget):
@@ -537,6 +615,9 @@ class Processes(InfoWidget):
 
   def __init__(self, driver):
     super(Processes, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class DataAssets(InfoWidget):
@@ -546,6 +627,9 @@ class DataAssets(InfoWidget):
 
   def __init__(self, driver):
     super(DataAssets, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Products(InfoWidget):
@@ -555,6 +639,9 @@ class Products(InfoWidget):
 
   def __init__(self, driver):
     super(Products, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Projects(InfoWidget):
@@ -564,6 +651,9 @@ class Projects(InfoWidget):
 
   def __init__(self, driver):
     super(Projects, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Facilities(InfoWidget):
@@ -572,6 +662,9 @@ class Facilities(InfoWidget):
 
   def __init__(self, driver):
     super(Facilities, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Markets(InfoWidget):
@@ -580,6 +673,9 @@ class Markets(InfoWidget):
 
   def __init__(self, driver):
     super(Markets, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Risks(InfoWidget):
@@ -588,6 +684,9 @@ class Risks(InfoWidget):
 
   def __init__(self, driver):
     super(Risks, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
 class Threats(InfoWidget):
@@ -596,21 +695,32 @@ class Threats(InfoWidget):
 
   def __init__(self, driver):
     super(Threats, self).__init__(driver)
+    self.extend_list_all_scopes_by_code()
+    self.extend_list_all_scopes_by_cas()
+    self.extend_list_all_scopes_by_review_state()
 
 
-class Dashboard(InfoWidget):
+class People(base.Widget):
+  """Model for People object Info pages and Info panels."""
+  # pylint: disable=too-few-public-methods
+  _locators = locator.WidgetInfoPeople
+
+
+class Dashboard(base.Widget):
   """Model for Dashboard object Info pages and Info panels."""
   _locators = locator.Dashboard
 
   def __init__(self, driver):
     super(Dashboard, self).__init__(driver)
-    self.button_start_new_program = base.Button(
-        self._driver, self._locators.BUTTON_START_NEW_PROGRAM)
-    self.button_start_new_audit = base.Button(
-        self._driver, self._locators.BUTTON_START_NEW_AUDIT)
-    self.button_start_new_workflow = base.Button(
-        self._driver, self._locators.BUTTON_START_NEW_WORKFLOW)
-    self.button_create_new_object = base.Button(
-        self._driver, self._locators.BUTTON_CREATE_NEW_OBJECT)
-    self.button_all_objects = base.Button(
-        self._driver, self._locators.BUTTON_ALL_OBJECTS)
+    self.start_new_program_btn = base.Button(
+        self._driver, self._locators.START_NEW_PROGRAM_BTN_CSS)
+    self.start_new_audit_btn = base.Button(
+        self._driver, self._locators.START_NEW_AUDIT_BTN_CSS)
+    self.start_new_workflow_btn = base.Button(
+        self._driver, self._locators.START_NEW_WORKFLOW_BTN_CSS)
+    self.create_task_btn = base.Button(
+        self._driver, self._locators.CREATE_TASK_BTN_CSS)
+    self.create_object_btn = base.Button(
+        self._driver, self._locators.CREATE_OBJECT_BTN_CSS)
+    self.all_objects_btn = base.Button(
+        self._driver, self._locators.ALL_OBJECTS_BTN_CSS)

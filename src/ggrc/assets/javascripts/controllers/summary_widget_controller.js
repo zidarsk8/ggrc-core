@@ -16,9 +16,10 @@ export default can.Control({
     colorsMap: {
       Completed: '#405f77',
       Verified: '#009925',
+      Deprecated: '#d50f25',
       'In Progress': '#3369e8',
       'Not Started': '#9e9e9e',
-      'In Review': '#ff9100'
+      'In Review': '#ff9100',
     },
     chartOptions: {
       pieSliceText: 'value-and-percentage',

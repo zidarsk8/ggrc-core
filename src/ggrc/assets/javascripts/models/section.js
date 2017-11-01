@@ -43,6 +43,9 @@ can.Model.Cacheable('CMS.Models.Section', {
     ]),
     add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache'
   },
+  sub_tree_view_options: {
+    default_filter: ['Objective'],
+  },
   defaults: {
     status: 'Draft'
   },
@@ -91,6 +94,9 @@ can.Model.Cacheable('CMS.Models.Clause', {
       {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
     ]),
     add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache'
+  },
+  sub_tree_view_options: {
+    default_filter: ['Contract'],
   },
   defaults: {
     status: 'Draft'

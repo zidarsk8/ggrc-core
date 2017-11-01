@@ -1,7 +1,7 @@
 ,,,,,,,,,,,,,,,,,,,,,
 Object Type,,,,,,,,,,,,,,,,,,,,,
-program,Title,Description,Notes,Manager,Reference URL,,Code,Effective Date,Last Deprecated Date,State,map:policy,map:contract,map:  regulation,map: control,,map: objective,,,,,
-,Cat ipsum 1,Climb leg rub face on everything give attitude nap all day for under the bed. Chase mice attack feet,,smotko@example.com,http://www.google.com,,prog-1,5/9/2015,11/1/2015,Draft,"policy-1
+program,Title,Description,Notes,Manager,Reference URL,Primary Contacts,Code,Effective Date,Last Deprecated Date,State,map:policy,map:contract,map:  regulation,map: control,,map: objective,,,,,
+,Cat ipsum 1,Climb leg rub face on everything give attitude nap all day for under the bed. Chase mice attack feet,,smotko@example.com,http://www.google.com,sec.con@example.com,prog-1,5/9/2015,11/1/2015,Draft,"policy-1
 policy-2
 policy-3
 policy-4
@@ -221,7 +221,7 @@ Urbon.S@example.com",au-12,,,,,,,,,,
 Urbon.S@example.com",au-13,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,
 Object Type,,,,,,,,,,,,,,,,,,,,,
-assessment,Title,Description,Notes,Assessment Procedure,Audit,,,,,Code,Effective Date,Stop Date,State,Conclusion: Design,Conclusion: Operation,,,,,,
+assessment,Title,Description,Notes,Assessment Procedure,Audit,,,,,Code,Due Date,Stop Date,State,Conclusion: Design,Conclusion: Operation,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,,
 Object Type,,,,,,,,,,,,,,,,,,,,,

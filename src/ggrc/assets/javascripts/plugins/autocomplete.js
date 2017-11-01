@@ -298,10 +298,10 @@
           this.source(this.last_request, function (items) {
             try {
               listItems = context.attr('items');
+              context.attr('oldLen', listItems.length);
               listItems.push.apply(listItems, can.map(items, function (item) {
                 return item.item;
               }));
-              context.attr('oldLen', listItems.length);
             } catch (error) {
               // Really ugly way to hide canjs exception during scrolling.
               // Please note that it occurs in really rear cases.
@@ -361,7 +361,51 @@
     }
   });
 
+  $.widget('ggrc.query_autocomplete', $.ggrc.autocomplete, {
+    options: {
+      source_for_refreshable_objects: function (request) {
+        var queryField = this.element.attr('data-query-field') || 'title';
+        var queryRelevantType = this.element.attr('data-query-relevant-type');
+        var queryRelevantId = this.element.attr('data-query-relevant-id');
+        var dfd = can.Deferred();
+        var objName = this.options.searchtypes[0];
+        var relevant;
+        var filter = {expression: {
+          left: queryField,
+          op: {name: '~'},
+          right: request.term,
+        }};
+        var query;
+
+        if (queryRelevantType && queryRelevantId) {
+          relevant = {
+            type: queryRelevantType,
+            id: queryRelevantId,
+          };
+        }
+
+        query = GGRC.Utils.QueryAPI.buildRelevantIdsQuery(objName, {},
+           relevant, filter);
+
+        GGRC.Utils.QueryAPI
+         .makeRequest({data: [query]})
+         .done(function (responseArr) {
+           var ids = responseArr[0][objName].ids;
+           var model = CMS.Models[objName];
+
+           var res = can.map(ids, function (id) {
+             return CMS.Models.get_instance(model.shortName, id);
+           });
+           dfd.resolve(res);
+         });
+
+        return dfd;
+      },
+    },
+  });
+
   $.widget.bridge('ggrc_mapping_autocomplete', $.ggrc.mapping_autocomplete);
+  $.widget.bridge('ggrc_query_autocomplete', $.ggrc.query_autocomplete);
 
   /**
    * Convert an input element to an autocomplete field.
@@ -386,9 +430,14 @@
     } else {
       el = $(el);
     }
-    el.filter("[name][name!='']")
+    el.filter("[name][name!='']:not([data-query])")
       .ggrc_autocomplete({
         controller: ctl
+      });
+
+    el.filter('[data-query]')
+      .ggrc_query_autocomplete({
+        controller: ctl,
       });
   };
 })(jQuery);

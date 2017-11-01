@@ -3,29 +3,135 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<div class="row-fluid wrap-row">
+<div class="export-panel row-fluid wrap-row">
   <div class="span12">
-    <h6>
-      Select attributes to show in grid
-    </h6>
-    Attributes:
-    <a data-action="attribute_select_toggle" data-value="true" data-type="attributes" href="javascript://">Select All</a> /
-    <a data-action="attribute_select_toggle" data-value="false" data-type="attributes" href="javascript://">None</a>
-    <br>
-    Mappings:
-    <a data-action="attribute_select_toggle" data-value="true" data-type="mappings" href="javascript://">Select All</a> /
-    <a data-action="attribute_select_toggle" data-value="false" data-type="mappings" href="javascript://">None</a>
-    <div class="attribute-wrap">
-      <ul class="attr-list">
-        {{#each columns}}
-        <li>
-          <label>
-            <input can-value="selected.{{@index}}" type="checkbox" name="{{key}}" checked>
-            {{display_name}}
-          </label>
-        </li>
-        {{/each}}
-      </ul>
+
+    <div class="export-panel__group">
+      <div class="export-panel__header">
+        <div class="export-panel__checkbox">
+          <input can-value="showAttributes" type="checkbox" checked/>
+        </div>
+        <div class="export-panel__title">
+          Attributes
+        </div>
+        {{#if showAttributes}}
+          <div>
+             <a data-action="select_toggle"
+                data-type="attributes"
+                data-value="true"
+                href="javascript://">
+                  Select All
+              </a>
+              /
+              <a data-action="select_toggle"
+                data-value="false"
+                data-type="attributes"
+                href="javascript://">
+                  None
+              </a>
+          </div>
+        {{/if}}
+      </div>
+      {{#if showAttributes}}
+        <div class="attribute-wrap">
+          <ul class="attr-list">
+            {{#each attributes}}
+            <li>
+              <label>
+                <input can-value="isSelected" type="checkbox" name="{{key}}" checked>
+                {{display_name}}
+              </label>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+      {{/if}}
     </div>
+
+    <div class="export-panel__group">
+      <div class="export-panel__header">
+        <div class="export-panel__checkbox">
+          <input can-value="showMappings" type="checkbox" checked/>
+        </div>
+        <div class="export-panel__title">
+          Mappings
+        </div>
+        {{#if showMappings}}
+          <div>
+            <a data-action="select_toggle"
+              data-type="mappings"
+              data-value="true"
+              href="javascript://">
+                Select All
+            </a>
+            /
+            <a data-action="select_toggle"
+              data-value="false"
+              data-type="mappings"
+              href="javascript://">
+                None
+            </a>
+          </div>
+        {{/if}}
+      </div>
+      {{#if showMappings}}
+        <div class="attribute-wrap">
+          <ul class="attr-list">
+            {{#each mappings}}
+            <li>
+              <label>
+                <input can-value="isSelected" type="checkbox" name="{{key}}" checked>
+                {{display_name}}
+              </label>
+            </li>
+            {{/each}}
+          </ul>
+        </div>
+      {{/if}}
+    </div>
+
+    {{#is type 'Assessment'}}
+      <div class="export-panel__group">
+        <div class="export-panel__header">
+          <div class="export-panel__checkbox">
+            <input can-value="showLocalAttributes" type="checkbox" checked/>
+          </div>
+          <div class="export-panel__title">
+            Assessment Specific Custom Attributes
+          </div>
+          {{#if showLocalAttributes}}
+            <div>
+              <a data-action="select_toggle"
+                data-type="local_attributes"
+                data-value="true"
+                href="javascript://">
+                  Select All
+              </a>
+              /
+              <a data-action="select_toggle"
+                data-value="false"
+                data-type="local_attributes"
+                href="javascript://">
+                  None
+              </a>
+            </div>
+          {{/if}}
+        </div>
+        {{#if showLocalAttributes}}
+          <div class="attribute-wrap">
+            <ul class="attr-list">
+              {{#each localAttributes}}
+              <li>
+                <label>
+                  <input can-value="isSelected" type="checkbox" name="{{key}}" checked>
+                  {{display_name}}
+                </label>
+              </li>
+              {{/each}}
+            </ul>
+          </div>
+        {{/if}}
+      </div>
+    {{/is}}
   </div>
 </div>

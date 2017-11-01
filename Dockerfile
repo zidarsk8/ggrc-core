@@ -1,11 +1,13 @@
 FROM phusion/baseimage
 
 RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
+  && curl -sL https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - && sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list' \
   && apt-get update \
   && apt-get install -y \
     curl \
     fabric \
     git-core \
+    google-chrome-stable \
     libfontconfig \
     make \
     mysql-client \
@@ -28,10 +30,9 @@ COPY ./git_hooks/post-merge /home/vagrant/.git/hooks/post-merge
 WORKDIR /vagrant
 
 # Javascript dependencies
-COPY ./package.json ./bower.json /vagrant-dev/
+COPY ./package.json /vagrant-dev/
 RUN cd /vagrant-dev \
-  && npm install \
-  && node_modules/.bin/bower --allow-root install
+  && npm install --unsafe-perm
 
 # Python packages
 COPY ./Makefile /vagrant/

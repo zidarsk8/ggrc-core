@@ -132,6 +132,7 @@ class ControlFactory(TitledFactory):
     model = models.Control
 
   directive = factory.LazyAttribute(lambda m: RegulationFactory())
+  recipients = ""
 
 
 class IssueFactory(TitledFactory):

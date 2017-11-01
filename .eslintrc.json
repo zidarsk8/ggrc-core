@@ -68,7 +68,8 @@
     }],
     "max-len": [1, 80, 2, {
       "ignoreComments": true,
-      "ignoreUrls": true
+      "ignoreUrls": true,
+      "ignorePattern": "^import (.+ from )?'.+';$"
     }],
     "quotes": [1, "single", {
       "avoidEscape": true

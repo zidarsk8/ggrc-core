@@ -3,12 +3,40 @@
 
 """SQL routines for full-text indexing."""
 
+from collections import defaultdict
+
 from ggrc import db
-from ggrc.fulltext import Indexer
 
 
-class SqlIndexer(Indexer):
+class SqlIndexer(object):
   """SqlIndexer class."""
+
+  def __init__(self, settings):
+    self.indexer_rules = defaultdict(list)
+    self.cache = defaultdict(dict)
+    self.builders = {}
+
+  def get_builder(self, obj_class):
+    """return recordbuilder for sent class
+
+    save it in builders dict arguments and cache it here
+    """
+    builder = self.builders.get(obj_class.__name__)
+    if builder is not None:
+      return builder
+    from ggrc.fulltext import recordbuilder
+    builder = recordbuilder.RecordBuilder(obj_class, self)
+    self.builders[obj_class.__name__] = builder
+    return builder
+
+  def fts_record_for(self, obj):
+    return self.get_builder(obj.__class__).as_record(obj)
+
+  def invalidate_cache(self):
+    self.cache = defaultdict(dict)
+
+  def search(self, terms):
+    raise NotImplementedError()
 
   def records_generator(self, record):
     """Record generator method."""

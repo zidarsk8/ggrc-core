@@ -34,7 +34,7 @@ class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
 
   VALID_STATES = (
       u'Planned', u'In Progress', u'Manager Review',
-      u'Ready for External Review', u'Completed'
+      u'Ready for External Review', u'Completed', u'Deprecated'
   )
 
   CLONEABLE_CHILDREN = {"AssessmentTemplate"}

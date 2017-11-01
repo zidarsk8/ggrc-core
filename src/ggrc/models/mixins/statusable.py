@@ -3,7 +3,10 @@
 
 """A mixin for objects with statuses"""
 
+from sqlalchemy.ext.declarative import declared_attr
+
 from ggrc import db
+from ggrc.models.deferred import deferred
 
 
 class Statusable(object):
@@ -17,16 +20,23 @@ class Statusable(object):
   DONE_STATE = u"In Review"
   VERIFIED_STATE = u"Verified"
   FINAL_STATE = u"Completed"
-  END_STATES = {VERIFIED_STATE, FINAL_STATE}
+  DEPRECATED = u"Deprecated"
+  END_STATES = {VERIFIED_STATE, FINAL_STATE, DEPRECATED}
 
   NOT_DONE_STATES = {START_STATE, PROGRESS_STATE}
   DONE_STATES = {DONE_STATE} | END_STATES
   VALID_STATES = tuple(NOT_DONE_STATES | DONE_STATES)
 
-  status = db.Column(
-      db.Enum(*VALID_STATES),
-      nullable=False,
-      default=START_STATE)
+  @declared_attr
+  def status(cls):  # pylint: disable=no-self-argument
+    return deferred(
+        db.Column(
+            db.Enum(*cls.VALID_STATES),
+            nullable=False,
+            default=cls.default_status()
+        ),
+        cls.__name__
+    )
 
   _aliases = {
       "status": {
@@ -38,4 +48,4 @@ class Statusable(object):
 
   @classmethod
   def default_status(cls):
-    return "Not Started"
+    return cls.START_STATE

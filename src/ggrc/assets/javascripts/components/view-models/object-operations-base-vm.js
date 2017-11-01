@@ -126,7 +126,7 @@
       var types = GGRC.Mappings.getMappingTypes(
         this.attr('object'),
         [],
-        GGRC.Utils.Snapshots.inScopeModels);
+        GGRC.Utils.Snapshots.inScopeModels.concat('TaskGroup'));
       return types;
     },
     object: '',

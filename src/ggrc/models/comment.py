@@ -66,7 +66,7 @@ class Commentable(object):
       # given data - this is intended.
       return ",".join(value)
     elif not value:
-      return None
+      return value
     else:
       raise ValueError(value,
                        'Value should be either empty ' +
@@ -100,6 +100,12 @@ class Commentable(object):
     return super(Commentable, cls).indexed_query().options(
         orm.Load(cls).subqueryload("comments").load_only("id", "description")
     )
+
+  @classmethod
+  def eager_query(cls):
+    """Eager Query"""
+    query = super(Commentable, cls).eager_query()
+    return query.options(orm.subqueryload('comments'))
 
   @declared_attr
   def comments(cls):  # pylint: disable=no-self-argument

@@ -24,8 +24,7 @@ def _query_filtered_by_contact(person):
   if any([attrs["email"].history.has_changes(),
           attrs["name"].history.has_changes()]):
     return CycleTaskGroup.query.filter(CycleTaskGroup.contact_id == person.id)
-  else:
-    return []
+  return []
 
 
 class CycleTaskGroup(mixins.WithContact,
@@ -84,9 +83,8 @@ class CycleTaskGroup(mixins.WithContact,
           "task title", 'cycle_task_group_tasks', ["title"], False
       ),
       attributes.MultipleSubpropertyFullTextAttr(
-          "task assignee",
-          lambda instance: [t.contact for t in
-                            instance.cycle_task_group_tasks],
+          "task assignees",
+          "_task_assignees",
           ["email", "name"],
           False
       ),
@@ -112,6 +110,15 @@ class CycleTaskGroup(mixins.WithContact,
           False
       ),
   ]
+
+  @property
+  def _task_assignees(self):
+    """Property. Return the list of persons as assignee of related tasks."""
+    persons = {}
+    for task in self.cycle_task_group_tasks:
+      for person in task.get_persons_for_rolename("Task Assignees"):
+        persons[person.id] = person
+    return persons.values()
 
   AUTO_REINDEX_RULES = [
       index_mixin.ReindexRule(
@@ -158,13 +165,6 @@ class CycleTaskGroup(mixins.WithContact,
             "id",
             "title",
             "next_due_date"
-        ),
-        orm.Load(cls).subqueryload("cycle_task_group_tasks").joinedload(
-            "contact"
-        ).load_only(
-            "email",
-            "name",
-            "id"
         ),
         orm.Load(cls).subqueryload("cycle_task_group_tasks").joinedload(
             "cycle_task_entries"
