@@ -26,12 +26,6 @@ class WithSimilarityScore(object):
 
   # pylint: disable=too-few-public-methods
 
-  # example of similarity_options:
-  # similarity_options = {
-  #     "relevant_types": {"Audit": {"weight": 5}, type: {"weight": w}},
-  #     "threshold": 10,
-  # }
-
   @classmethod
   def get_similar_objects_query(cls, id_, types="all", relevant_types=None,
                                 threshold=1):

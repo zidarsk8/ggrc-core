@@ -240,14 +240,6 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       ReindexRule("RelationshipAttr", reindex_by_relationship_attr)
   ]
 
-  similarity_options = {
-      "relevant_types": {
-          "Objective": {"weight": 2},
-          "Control": {"weight": 2},
-      },
-      "threshold": 1,
-  }
-
   @simple_property
   def archived(self):
     return self.audit.archived if self.audit else False
