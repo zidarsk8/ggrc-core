@@ -217,6 +217,12 @@ class QueryHelper(object):
     Prepare query to filter models based on the available contexts and
     resources for the given type of object.
     """
+    if permission_type == "read" and permissions.has_system_wide_read():
+      return None
+
+    if permission_type == "update" and permissions.has_system_wide_update():
+      return None
+
     contexts, resources = permissions.get_context_resource(
         model_name=model.__name__, permission_type=permission_type
     )
@@ -348,8 +354,8 @@ class QueryHelper(object):
     Args:
       model: the model instances of which are requested in query;
       query: a query to get objects from the db;
-      order_by: a list of dicts with keys "name" (the name of the field by which
-                to sort) and "desc" (optional; do reverse sort if True);
+      order_by: a list of dicts with keys "name" (the name of the field by
+                which to sort) and "desc" (optional; do reverse sort if True);
       tgt_class: the snapshotted model if `model` is Snapshot else `model`.
 
     If sorting by a relationship field is requested, the following sorting is
