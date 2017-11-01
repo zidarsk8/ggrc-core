@@ -1,4 +1,4 @@
-/*!
+/*
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -223,6 +223,27 @@ import {confirm} from '../plugins/utils/modals';
   can.Model.Mixin('mapping-limit-issue', {
     getAllowedMappings: _.partial(getAllowedMappings, ['Program', 'Project', 'TaskGroup'])
   }, {});
+
+  can.Model.Mixin('issueTrackerIntegratable', {
+    issue_tracker_enable_options: [
+      {value: true, title: 'On'},
+      {value: false, title: 'Off'},
+    ],
+    issue_tracker_priorities: ['P0', 'P1', 'P2', 'P3', 'P4'],
+    issue_tracker_severities: ['S0', 'S1', 'S2', 'S3', 'S4'],
+  }, {
+    'after:init': function () {
+      if (!this.issue_tracker) {
+        this.issue_tracker = new can.Map({});
+      }
+
+      this.issue_tracker.issue_id = '';
+      this.issue_tracker.issue_type = 'PROCESS';
+      this.issue_tracker.issue_priority = 'P0';
+      this.issue_tracker.issue_severity = 'S0';
+    },
+  });
+
   /**
    * A mixin to use for objects that can have their status automatically
    * changed when they are edited.

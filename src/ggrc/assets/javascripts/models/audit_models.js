@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -62,7 +62,8 @@
       'unique_title',
       'ca_update',
       'timeboxed',
-      'mapping-limit'
+      'mapping-limit',
+      'issueTrackerIntegratable',
     ],
     is_custom_attributable: true,
     is_clonable: true,
@@ -79,7 +80,12 @@
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     defaults: {
-      status: 'Planned'
+      status: 'Planned',
+      issue_tracker: {
+        hotlist_id: '',
+        component_id: '',
+        enabled: false,
+      },
     },
     statuses: ['Planned', 'In Progress', 'Manager Review',
       'Ready for External Review', 'Completed', 'Deprecated'],
@@ -148,6 +154,17 @@
       }
       this.validatePresenceOf('program');
       this.validateNonBlank('title');
+
+      this.validate(
+        'issue_tracker.component_id',
+        function () {
+          if (this.attr('issue_tracker.enabled') &&
+            !this.attr('issue_tracker.component_id')) {
+            return 'Enter Component ID';
+          }
+        }
+      );
+
       this.validateContact(['_transient.contact', 'contact'], {
         message: 'Audit captain cannot be empty'
       });
