@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -19,11 +19,18 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     mixins: [
       'ownable', 'unique_title',
       'autoStatusChangeable', 'timeboxed', 'mapping-limit',
-      'inScopeObjects', 'accessControlList', 'refetchHash'
+      'inScopeObjects', 'accessControlList', 'refetchHash',
+      'issueTrackerIntegratable',
     ],
     is_custom_attributable: true,
     isRoleable: true,
     defaults: {
+      issue_tracker: {
+        hotlist_id: '',
+        component_id: '',
+        title: '',
+      },
+
       assessment_type: 'Control',
       status: 'Not Started',
       send_by_default: true,  // notifications when a comment is added
@@ -119,6 +126,27 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       this.validatePresenceOf('audit');
       this.validateNonBlank('title');
 
+
+      this.validate(
+        'issue_tracker.title',
+        function () {
+          if (this.attr('can_use_issue_tracker') &&
+            this.attr('issue_tracker.enabled') &&
+            !this.attr('issue_tracker.title')) {
+            return 'Enter Issue Title';
+          }
+        }
+      );
+      this.validate(
+        'issue_tracker.component_id',
+        function () {
+          if (this.attr('can_use_issue_tracker') &&
+            this.attr('issue_tracker.enabled') &&
+            !this.attr('issue_tracker.component_id')) {
+            return 'Enter Component ID';
+          }
+        }
+      );
       this.validate(
         '_gca_valid',
         function () {
@@ -244,6 +272,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         GGRC.current_user.id, GGRC.current_user);
       var auditLead;
       var self = this;
+      let issueTracker;
 
       if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
         if (pageInstance.type === 'Audit') {
@@ -267,6 +296,17 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         } else {
           markForAddition(this, auditLead, 'Assignees');
           markForAddition(this, currentUser, 'Creators');
+        }
+
+        issueTracker = this.audit.issue_tracker;
+
+        if (issueTracker) {
+          this.attr('can_use_issue_tracker', issueTracker.enabled);
+
+          if (issueTracker.enabled && this.isNew()) {
+            // turn ON issue tracker when CREATE new instance
+            this.attr('issue_tracker.enabled', true);
+          }
         }
 
         return this.audit.findAuditors().then(function (list) {

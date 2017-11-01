@@ -188,7 +188,7 @@ import {confirm} from '../plugins/utils/modals';
     updateScopeObject: function () {
       var objType = 'Audit';
       var queryType = 'values';
-      var queryFields = ['id', 'type', 'title', 'context'];
+      var queryFields = ['id', 'type', 'title', 'context', 'issue_tracker'];
       var query = GGRC.Utils.QueryAPI
         .buildParam(objType, {
           current: 1,
@@ -204,6 +204,10 @@ import {confirm} from '../plugins/utils/modals';
           var audit = valueArr[objType][queryType][0];
           this.attr('scopeObject', audit);
           this.attr('audit', audit);
+          if (audit.issue_tracker) {
+            this.attr('can_use_issue_tracker',
+              audit.issue_tracker.enabled);
+          }
         }.bind(this));
     }
   });

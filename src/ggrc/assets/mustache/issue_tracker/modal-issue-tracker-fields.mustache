@@ -72,5 +72,20 @@
         name="instance.issue_tracker.issue_severity">
       </dropdown>
     </div>
+
+    {{#if_instance_of instance "Assessment"}}
+      <div class="ggrc-form-item__multiple-row {{#instance.computed_errors.issue_tracker.title}}field-failure{{/instance.computed_errors.issue_tracker.title}}">
+        <label class="form-label required-label ggrc-form-item__label">
+          Issue Title
+          <i class="fa fa-asterisk"></i>
+        </label>
+        <input data-id="code_txtbx"
+          class="input-block-level"
+          placeholder="Enter Issue Title"
+          type="text"
+          {($value)}="instance.issue_tracker.title"
+        />
+      </div>
+    {{/if}}
   </div>
 {{/if}}

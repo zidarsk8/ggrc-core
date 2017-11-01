@@ -92,11 +92,15 @@ import Spinner from 'spin.js';
   $.fn.widget_showhide = showhide('.info', '.hidden-fields-area');
   $.fn.widget_showhide_custom = showhide('.info', '.hidden-fields-area-custom');
   $.fn.widget_showhide_mapped = showhide('.custom-attr-wrap', '.hidden-fields-area');
+  $.fn.issue_tracker_modal_showhide = showhide('.modal',
+    '.hidden-issue-tracker-fields-area');
 
   $('body').on('click', '.expand-link a', $.fn.modal_showhide);
   $('body').on('click', '.info-expand a', $.fn.widget_showhide);
   $('body').on('click', '.info-expand-custom a', $.fn.widget_showhide_custom);
   $('body').on('click', '.info-expand-mapped a', $.fn.widget_showhide_mapped);
+  $('body').on('click',
+    '.expand-issue-tracker-link a', $.fn.issue_tracker_modal_showhide);
 
   // Show/hide tree leaf content
   $('body').on('click', '.tree-structure .oneline, .tree-structure .description, .tree-structure .view-more', oneline);

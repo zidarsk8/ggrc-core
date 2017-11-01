@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-var tag = 'issue-tracker-switcher';
+const tag = 'issue-tracker-switcher';
 
 export default GGRC.Components('issueTrackerSwitcher', {
   tag: tag,
@@ -22,6 +22,15 @@ export default GGRC.Components('issueTrackerSwitcher', {
           setValue(boolValue);
         },
       },
+      defaultTitle: {
+        set: function (newValue, setValue) {
+          if (newValue && this.attr('canUpdateDefaultTitle')) {
+            this.setDefaultIssueTitle(newValue);
+          }
+
+          setValue(newValue);
+        },
+      },
       isParent: {
         get: function () {
           return !this.attr('parent');
@@ -29,13 +38,15 @@ export default GGRC.Components('issueTrackerSwitcher', {
       },
       isFirstTimeTurnOn: {
         get: function () {
-          // 'issue_tracker' has already created if hotlist filled;
-          return !!this.attr('instance.issue_tracker.hotlist_id');
+          // 'issue_tracker' has already created if component_id is filled;
+          return !!this.attr('instance.issue_tracker.component_id');
         },
       },
     },
     instance: {},
     parent: null,
+    canUpdateDefaultTitle: false,
+    setIssueTitle: false,
     convertToBool: function (value) {
       if (typeof value === 'boolean') {
         return value;
@@ -59,6 +70,13 @@ export default GGRC.Components('issueTrackerSwitcher', {
         this.setDeaultsFromParent('issue_severity');
         this.setDeaultsFromParent('component_id');
         this.setDeaultsFromParent('hotlist_id');
+
+        if (this.attr('setIssueTitle')) {
+          // can override issue title in case when user creates new instance
+          // instance turns on issue tracker integration first time
+          this.attr('canUpdateDefaultTitle', true);
+          this.setDefaultIssueTitle();
+        }
       }
     },
     setDeaultsFromParent: function (propName) {
@@ -67,6 +85,20 @@ export default GGRC.Components('issueTrackerSwitcher', {
 
       issueTracker.attr(propName,
         issueTracker.attr(propName) || parentIssueTracker.attr(propName));
+    },
+    setDefaultIssueTitle: function (value) {
+      let title = this.attr('instance.title')
+      let issueTracker = this.attr('instance.issue_tracker');
+
+      if (value) {
+        issueTracker.attr('title', value);
+        return;
+      }
+
+      // set from instance title
+      if (title && !issueTracker.attr('title')) {
+        issueTracker.attr('title', title);
+      }
     },
   },
 });
