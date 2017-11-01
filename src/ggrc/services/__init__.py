@@ -90,14 +90,14 @@ def init_extra_services(app):
   """Add extra service url rules."""
   from ggrc.login import login_required
 
-  from .search import search
+  from ggrc.services.search import search
   app.add_url_rule(
       '/search', 'search', login_required(search))
 
-  from .suggest import suggest
+  from ggrc.services.suggest import suggest
   app.add_url_rule('/people/suggest', 'suggest', login_required(suggest))
 
-  from .description import ServiceDescription
+  from ggrc.services.description import ServiceDescription
   app.add_url_rule(
       '/api', view_func=ServiceDescription.as_view('ServiceDescription'))
 
