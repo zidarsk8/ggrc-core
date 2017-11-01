@@ -206,7 +206,7 @@ python /selenium/src/run_selenium.py
 
 You should also feel free to check how the `./bin/jenkins/run_selenium` script works.
 
-_NOTE: that the "ggrccore" part of the name is due to the repository parent folder name. if you have your repo in a different folder, change the first part accordingly._
+_NOTE: that the "ggrccore" part of the name is due to the repository parent folder name. If you have your repo in a different folder, change the first part accordingly._
 
 
 ## Quickstart Breakdown
@@ -252,7 +252,7 @@ docker exec -it ggrccore_dev_1 su vagrant
 ### Compiling JavaScript and Sass Templates
 
 Since GGRC uses Webpack to bundle JavaScript and Sass Templates, the sources need to be compiled.
-This has been automated via a script available in $PATH in the virtual
+This has been automated via a script available in `$PATH in the virtual
 machine:
 
 ```sh
@@ -378,7 +378,7 @@ command *should* be an update Python virtualenv containing the Python packages
 required by the application as well as any new development package
 requirements.
 
-To Manually update the requirements, you can log in to docker container and run
+To manually update the requirements, you can log in to docker container and run
 
 ```sh
 pip install -r src/requirements-dev.txt
