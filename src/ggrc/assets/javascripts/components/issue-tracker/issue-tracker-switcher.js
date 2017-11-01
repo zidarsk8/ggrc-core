@@ -54,6 +54,17 @@ export default GGRC.Components('issueTrackerSwitcher', {
 
       return !(!value || value === 'false');
     },
+    inlineDropdownValueChange: function (args) {
+      let dropdownValue = this.convertToBool(args.value);
+      args.value = dropdownValue;
+      args.type = 'issueTrackerSwitcherChanged';
+
+      if (dropdownValue) {
+        this.setDefaults();
+      }
+
+      this.dispatch(args);
+    },
     setDefaults: function () {
       let issueTracker = this.attr('instance.issue_tracker');
 

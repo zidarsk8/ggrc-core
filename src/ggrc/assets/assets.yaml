@@ -283,3 +283,4 @@ dashboard-js-template-files:
   - partials/modal-ajax-test-plan.mustache
   - issue_tracker/modal-issue-tracker-fields.mustache
   - issue_tracker/info-issue-tracker-fields.mustache
+  - components/assessment/info-pane/info-pane-issue-tracker-fields.mustache
