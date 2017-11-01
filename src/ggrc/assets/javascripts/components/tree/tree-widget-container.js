@@ -32,6 +32,9 @@ import {REFRESH_RELATED} from '../../events/eventTypes';
 (function (can, GGRC) {
   'use strict';
 
+  const DEFAULT_SORT_KEY = 'updated_at';
+  const DEFAULT_SORT_DIRECTION = 'desc';
+
   var TreeViewUtils = GGRC.Utils.TreeView;
   var CurrentPageUtils = GGRC.Utils.CurrentPage;
   var viewModel;
@@ -337,6 +340,13 @@ import {REFRESH_RELATED} from '../../events/eventTypes';
       this.attr('columns.selected', columns.selected);
       this.attr('columns.mandatory', columns.mandatory);
       this.attr('columns.disableConfiguration', columns.disableConfiguration);
+    },
+    setSortingConfiguration: function () {
+      var sortingInfo = TreeViewUtils
+        .getSortingForModel(this.attr('modelName'));
+
+      this.attr('sortingInfo.sortBy', sortingInfo.key);
+      this.attr('sortingInfo.sortDirection', sortingInfo.direction);
     },
     onUpdateColumns: function (event) {
       var selectedColumns = event.columns;
@@ -695,6 +705,7 @@ import {REFRESH_RELATED} from '../../events/eventTypes';
         }
 
         viewModel.setColumnsConfiguration();
+        viewModel.setSortingConfiguration();
       });
     },
     events: {

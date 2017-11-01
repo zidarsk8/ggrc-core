@@ -8,8 +8,10 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
   var vm;
   var CurrentPageUtils;
+  var Component;
 
   beforeEach(function () {
+    Component = GGRC.Components.get('treeWidgetContainer');
     vm = GGRC.Components.getViewModel('treeWidgetContainer');
     CurrentPageUtils = GGRC.Utils.CurrentPage;
   });
@@ -693,5 +695,52 @@ describe('GGRC.Components.treeWidgetContainer', function () {
         expect(vm.attr('loading')).toBeFalsy();
         expect(vm.loadItems).not.toHaveBeenCalled();
       });
+  });
+
+  describe('setSortingConfiguration() method', () => {
+    beforeEach(() => {
+      vm.attr('model', {
+        shortName: 'shortModelName',
+      });
+    });
+
+    it('sets up default sorting configuration', () => {
+      vm.attr('sortingInfo', {});
+      spyOn(GGRC.Utils.TreeView, 'getSortingForModel')
+        .and.returnValue({
+          key: 'key',
+          direction: 'direction',
+        });
+
+      vm.setSortingConfiguration();
+
+      expect(vm.attr('sortingInfo.sortBy')).toEqual('key');
+      expect(vm.attr('sortingInfo.sortDirection')).toEqual('direction');
+    });
+  });
+
+  describe('init() method', () => {
+    let method;
+
+    beforeEach(() => {
+      vm.attr('model', {
+        shortName: 'shortModelName',
+      });
+      method = Component.prototype.init.bind({viewModel: vm});
+      spyOn(vm, 'setSortingConfiguration');
+      spyOn(vm, 'setColumnsConfiguration');
+      spyOn(CMS.Models.DisplayPrefs, 'getSingleton')
+        .and.returnValue(can.Deferred().resolve());
+    });
+
+    it('sets up columns configuration', () => {
+      method();
+      expect(vm.setColumnsConfiguration).toHaveBeenCalled();
+    });
+
+    it('sets up sorting configuration', () => {
+      method();
+      expect(vm.setSortingConfiguration).toHaveBeenCalled();
+    });
   });
 });

@@ -78,6 +78,29 @@ describe('GGRC.Utils.TreeView module', function () {
     });
   });
 
+  describe('getSortingForModel() method', function () {
+    var noDefaultSortingModels = [
+      'Cycle',
+      'TaskGroup',
+      'TaskGroupTask',
+      'CycleTaskGroupObjectTask',
+    ];
+
+    it('returns default sorting configuration', function () {
+      let result = module.getSortingForModel('Audit');
+
+      expect(result).toEqual({key: 'updated_at', direction: 'desc'});
+    });
+
+    it('returns empty sorting configuration', function () {
+      noDefaultSortingModels.forEach((model) => {
+        let result = module.getSortingForModel(model);
+
+        expect(result).toEqual({key: null, direction: null});
+      });
+    });
+  });
+
   describe('getModelsForSubTier() method', function () {
     var baseWidgetsByType;
     var origFilter;

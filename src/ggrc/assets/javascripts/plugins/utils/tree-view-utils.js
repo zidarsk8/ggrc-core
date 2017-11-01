@@ -54,6 +54,15 @@
       'Assessment'
     ]);
 
+    const DEFAULT_SORT_KEY = 'updated_at';
+    const DEFAULT_SORT_DIRECTION = 'desc';
+    const NO_DEFAULT_SORTING_LIST = Object.freeze([
+      'Cycle',
+      'TaskGroup',
+      'TaskGroupTask',
+      'CycleTaskGroupObjectTask',
+    ]);
+
     var treeViewExcess = {
       AssessmentTemplate: ['os_state']
     };
@@ -293,6 +302,26 @@
         });
 
       return columns;
+    }
+
+    /**
+     * Get sorting configuration for Model type
+     * @param {String} modelType - Model type.
+     * @return {Object} sorting configuration.
+     */
+    function getSortingForModel(modelType) {
+      let key = DEFAULT_SORT_KEY;
+      let direction = DEFAULT_SORT_DIRECTION;
+
+      if (NO_DEFAULT_SORTING_LIST.indexOf(modelType) != -1) {
+        key = null;
+        direction = null;
+      }
+
+      return {
+        key,
+        direction,
+      };
     }
 
     function displayTreeSubpath(el, path, attemptCounter) {
@@ -714,6 +743,7 @@
     return {
       getColumnsForModel: getColumnsForModel,
       setColumnsForModel: setColumnsForModel,
+      getSortingForModel: getSortingForModel,
       displayTreeSubpath: displayTreeSubpath,
       getModelsForSubTier: getModelsForSubTier,
       loadFirstTierItems: loadFirstTierItems,

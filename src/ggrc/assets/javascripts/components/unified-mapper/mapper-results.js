@@ -12,8 +12,7 @@ import * as StateUtils from '../../plugins/utils/state-utils';
 (function (can, GGRC, CMS, $) {
   'use strict';
 
-  var DEFAULT_PAGE_SIZE = 5;
-  var DEFAULT_SORT_DIRECTION = 'asc';
+  const DEFAULT_PAGE_SIZE = 5;
 
   GGRC.Components('mapperResults', {
     tag: 'mapper-results',
@@ -31,8 +30,8 @@ import * as StateUtils from '../../plugins/utils/state-utils';
         available: [],
       },
       sort: {
-        key: '',
-        direction: DEFAULT_SORT_DIRECTION,
+        key: null,
+        direction: null,
       },
       isLoading: false,
       items: [],
@@ -94,6 +93,14 @@ import * as StateUtils from '../../plugins/utils/state-utils';
         this.attr('columns.selected', columns.selected);
         this.attr('disableColumnsConfiguration', columns.disableConfiguration);
       },
+      setSortingConfiguration: function () {
+        let sortingInfo = GGRC.Utils.TreeView.getSortingForModel(
+          this.getDisplayModel().model_singular
+        );
+
+        this.attr('sort.key', sortingInfo.key);
+        this.attr('sort.direction', sortingInfo.direction);
+      },
       setRelatedAssessments: function () {
         var Model = this.getDisplayModel();
         if (this.attr('useSnapshots')) {
@@ -106,8 +113,7 @@ import * as StateUtils from '../../plugins/utils/state-utils';
       resetSearchParams: function () {
         this.attr('paging.current', 1);
         this.attr('paging.pageSize', DEFAULT_PAGE_SIZE);
-        this.attr('sort.key', '');
-        this.attr('sort.direction', DEFAULT_SORT_DIRECTION);
+        this.setSortingConfiguration();
       },
       onSearch: function (resetParams) {
         if (resetParams) {
