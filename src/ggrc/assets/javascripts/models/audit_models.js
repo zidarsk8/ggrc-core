@@ -374,7 +374,8 @@
     mixins: [
       'mapping-limit',
       'inScopeObjects',
-      'refetchHash'
+      'refetchHash',
+      'issueTrackerIntegratable',
     ],
     findOne: 'GET /api/assessment_templates/{id}',
     findAll: 'GET /api/assessment_templates',
@@ -383,7 +384,6 @@
     create: 'POST /api/assessment_templates',
     is_custom_attributable: false,
     attributes: {
-      audit: 'CMS.Models.Audit.stub',
       context: 'CMS.Models.Context.stub'
     },
     defaults: {
@@ -409,6 +409,10 @@
         {value: 'other', title: 'Others...'}
       ],
       showCaptainAlert: false,
+      issue_tracker: {
+        hotlist_id: '',
+        component_id: '',
+      },
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     tree_view_options: {
@@ -437,7 +441,17 @@
           return this.attr('default_people.verifiers') === 'other';
         }
       );
-    }
+      this.validate(
+        'issue_tracker.component_id',
+        function () {
+          if (this.attr('issue_tracker.audit_enabled') &&
+            this.attr('issue_tracker.enabled') &&
+            !this.attr('issue_tracker.component_id')) {
+            return 'Enter Component ID';
+          }
+        }
+      );
+    },
   }, {
     /**
      * An event handler when the add/edit form is about to be displayed.
@@ -452,6 +466,7 @@
      *
      */
     form_preload: function (isNewObject) {
+      const pageInstance = GGRC.page_instance();
       if (!this.custom_attribute_definitions) {
         this.attr('custom_attribute_definitions', new can.List());
       }
@@ -459,6 +474,25 @@
 
       this._updateDropdownEnabled('assignees');
       this._updateDropdownEnabled('verifiers');
+
+      if (pageInstance && pageInstance.type === 'Audit' && !this.audit) {
+        this.audit = {
+          id: pageInstance.id,
+          title: pageInstance.title,
+          type: pageInstance.type,
+          context: pageInstance.context,
+          issue_tracker: pageInstance.issue_tracker,
+        };
+      }
+
+      if (this.audit && this.audit.issue_tracker) {
+        this.attr('can_use_issue_tracker', this.audit.issue_tracker.enabled);
+
+        if (this.attr('can_use_issue_tracker') && this.isNew()) {
+          // turn ON issue tracker when CREATE new instance
+          this.attr('issue_tracker.enabled', true);
+        }
+      }
     },
 
     /**

@@ -107,6 +107,29 @@
             </div>
           </div>
 
+          {{#if instance.can_use_issue_tracker}}
+            <div class="row-fluid wrap-row">
+              <div class="expanded-area">
+                <div class="info-expand">
+                  <a class="show-hidden-fields info-show-hide active" href="javascript://">
+                    <span class="out">
+                      <i class="fa fa-caret-right"></i>
+                      SHOW
+                    </span>
+                    <span class="in">
+                      <i class="fa fa-caret-down"></i>
+                      HIDE
+                    </span>
+                    BUGANIZER INFO
+                  </a>
+                </div>
+                <div class="hidden-fields-area">
+                  {{>'/static/mustache/issue_tracker/info-issue-tracker-fields.mustache'}}
+                </div>
+              </div>
+            </div>
+          {{/if}}
+
         </tab-panel>
         <tab-panel {(panels)}="panels" title-text="Change Log">
             <revision-log {instance}="instance"></revision-log>
