@@ -126,4 +126,4 @@
       getDashboards: getDashboards
     };
   })();
-})(window.GGRC, window.GGRC.Utils.Snapshots);
+})(window.GGRC);

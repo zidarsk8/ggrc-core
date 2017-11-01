@@ -4,6 +4,10 @@
  */
 
 import * as TreeViewUtils from './tree-view-utils';
+import {
+  isSnapshotRelated,
+  transformQuery
+} from './snapshot-utils';
 
 (function (GGRC) {
   'use strict';
@@ -25,7 +29,6 @@ import * as TreeViewUtils from './tree-view-utils';
     var widgetsCounts = new can.Map({});
 
     var QueryAPI = GGRC.Utils.QueryAPI;
-    var SnapshotUtils = GGRC.Utils.Snapshots;
 
     let CUSTOM_COUNTERS = {
       MY_WORK: () => _getCurrentUser().getWidgetCountForMyWorkPage(),
@@ -49,8 +52,8 @@ import * as TreeViewUtils from './tree-view-utils';
             id: currentPageInstance.id,
             operation: 'relevant'
           });
-        if (SnapshotUtils.isSnapshotRelated(currentPageInstance.type, model)) {
-          query = SnapshotUtils.transformQuery(query);
+        if (isSnapshotRelated(currentPageInstance.type, model)) {
+          query = transformQuery(query);
         }
         reqParams.push(queryAPI.batchRequests(query));
       });
@@ -204,7 +207,7 @@ import * as TreeViewUtils from './tree-view-utils';
         var expression = TreeViewUtils
           .makeRelevantExpression(widgetObject.name, type, id);
 
-        if (SnapshotUtils.isSnapshotRelated(type, widgetObject.name)) {
+        if (isSnapshotRelated(type, widgetObject.name)) {
           param = QueryAPI.buildParam('Snapshot', {}, expression, null,
             GGRC.query_parser.parse('child_type = ' + widgetObject.name));
         } else {
@@ -234,7 +237,7 @@ import * as TreeViewUtils from './tree-view-utils';
           var name = widget.responseType;
           var countsName = widget.countsName || widget.name;
 
-          if (SnapshotUtils.isSnapshotRelated(type, name)) {
+          if (isSnapshotRelated(type, name)) {
             name = 'Snapshot';
           }
           countsMap[countsName] = info[name].total;

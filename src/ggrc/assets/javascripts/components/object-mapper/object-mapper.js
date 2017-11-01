@@ -3,7 +3,13 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (can, $, utils) {
+import {
+  isInScopeModel,
+  isSnapshotModel,
+  isSnapshotParent,
+} from '../../plugins/utils/snapshot-utils';
+
+(function (can, $) {
   'use strict';
 
   var DEFAULT_OBJECT_MAP = {
@@ -84,15 +90,10 @@
         allowedToCreate: function () {
           // Don't allow to create new instances for "In Scope" Objects that
           // are snapshots
-          var snapUtils = utils.Snapshots;
-          var isInScopeModel =
-            snapUtils.isInScopeModel(this.attr('object'));
-          var allow =
-            !isInScopeModel || (
-               isInScopeModel &&
-               !snapUtils.isSnapshotModel(this.attr('type'))
-            );
-          return allow;
+          var isInScopeSrc = isInScopeModel(this.attr('object'));
+
+          return !isInScopeSrc ||
+            (isInScopeSrc && !isSnapshotModel(this.attr('type')));
         },
         showAsSnapshots: function () {
           if (this.attr('freezedConfigTillSubmit.useSnapshots')) {
@@ -101,16 +102,11 @@
           return false;
         },
         showWarning: function () {
-          var isInScopeSrc =
-            utils.Snapshots.isInScopeModel(this.attr('object'));
-          var isSnapshotParentSrc =
-            utils.Snapshots.isSnapshotParent(this.attr('object'));
-          var isSnapshotParentDst =
-            utils.Snapshots.isSnapshotParent(this.attr('type'));
-          var isSnapshotModelSrc =
-            utils.Snapshots.isSnapshotModel(this.attr('object'));
-          var isSnapshotModelDst =
-            utils.Snapshots.isSnapshotModel(this.attr('type'));
+          var isInScopeSrc = isInScopeModel(this.attr('object'));
+          var isSnapshotParentSrc = isSnapshotParent(this.attr('object'));
+          var isSnapshotParentDst = isSnapshotParent(this.attr('type'));
+          var isSnapshotModelSrc = isSnapshotModel(this.attr('object'));
+          var isSnapshotModelDst = isSnapshotModel(this.attr('type'));
 
           var result =
             // Dont show message if source is inScope model, for example Assessment.
@@ -328,4 +324,4 @@
       },
     },
   });
-})(window.can, window.can.$, GGRC.Utils);
+})(window.can, window.can.$);

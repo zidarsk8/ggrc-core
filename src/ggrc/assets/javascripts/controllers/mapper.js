@@ -9,6 +9,9 @@ import '../components/object-mapper/object-mapper';
 import '../components/object-generator/object-generator';
 import '../components/object-search/object-search';
 import '../components/unified-mapper/mapper-results';
+import {
+  isInScopeModel,
+} from '../plugins/utils/snapshot-utils';
 
 (function (can, $) {
   var selectors = ['unified-mapper', 'unified-search']
@@ -71,8 +74,7 @@ import '../components/unified-mapper/mapper-results';
         throw new Error(OBJECT_REQUIRED_MESSAGE);
       }
 
-      if (GGRC.Utils.Snapshots
-          .isInScopeModel(data.join_object_type) && !isSearch) {
+      if (isInScopeModel(data.join_object_type) && !isSearch) {
         openForSnapshots(data);
       } else {
         openForCommonObjects(data, isSearch);

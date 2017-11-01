@@ -9,6 +9,10 @@ import '../object-selection/object-selection';
 import template from './templates/mapper-results.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
+import {
+  transformQuery,
+  toObject,
+} from '../../plugins/utils/snapshot-utils';
 
 const DEFAULT_PAGE_SIZE = 5;
 
@@ -204,7 +208,7 @@ export default GGRC.Components('mapperResults', {
         advancedFilters);
       if (this.attr('useSnapshots')) {
         // Transform Base Query to Snapshot
-        query = GGRC.Utils.Snapshots.transformQuery(query);
+        query = transformQuery(query);
       }
       // Add Permission check
       query.permissions = (modelName === 'Person') ||
@@ -219,7 +223,7 @@ export default GGRC.Components('mapperResults', {
       if (relatedQuery) {
         if (this.attr('useSnapshots')) {
           // Transform Related Query to Snapshot
-          relatedQuery = GGRC.Utils.Snapshots.transformQuery(relatedQuery);
+          relatedQuery = transformQuery(relatedQuery);
         }
         // we need it to find result in response from backend
         result.relatedQueryIndex = request.push(relatedQuery) - 1;
@@ -270,7 +274,7 @@ export default GGRC.Components('mapperResults', {
       var Model = this.getDisplayModel();
       if (this.attr('useSnapshots')) {
         value.snapshotObject =
-          GGRC.Utils.Snapshots.toObject(value);
+          toObject(value);
         value.revision.content =
           Model.model(value.revision.content);
         return value;

@@ -4,6 +4,9 @@
  */
 
 import template from './templates/tree-item-actions.mustache';
+import {
+  isSnapshot,
+} from '../../plugins/utils/snapshot-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -36,7 +39,7 @@ import template from './templates/tree-item-actions.mustache';
       isSnapshot: {
         type: 'boolean',
         get: function () {
-          return GGRC.Utils.Snapshots.isSnapshot(this.attr('instance'));
+          return isSnapshot(this.attr('instance'));
         }
       },
       isAllowedToEdit: {

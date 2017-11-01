@@ -8,6 +8,10 @@ import {
   prepareCustomAttributes,
   convertToFormViewField,
 } from '../../../plugins/utils/ca-utils';
+import {
+  toObject,
+  transformQuery,
+} from '../../../plugins/utils/snapshot-utils';
 
 (function (can, GGRC, _) {
   'use strict';
@@ -109,7 +113,7 @@ import {
         .map(function (query) {
           var resultingQuery = GGRC.Utils.QueryAPI
             .buildParam(query.objName, {}, relevant, query.fields);
-          return GGRC.Utils.Snapshots.transformQuery(resultingQuery);
+          return transformQuery(resultingQuery);
         });
       return params;
     },
@@ -123,7 +127,7 @@ import {
         var type = this.attr('queries')[i].type;
         this.attr(type).replace(item.Snapshot.values
           .map(function (item) {
-            return GGRC.Utils.Snapshots.toObject(item);
+            return toObject(item);
           }));
       }.bind(this));
     },
@@ -179,7 +183,7 @@ import {
             item.attr('revision.content'));
           this.viewModel.attr('customAttributes', attributes);
           this.viewModel.attr('snapshot',
-            GGRC.Utils.Snapshots.toObject(item));
+            toObject(item));
           this.viewModel.attr('state.open', true);
         }
       },

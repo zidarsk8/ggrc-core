@@ -27,6 +27,10 @@ import '../advanced-search/advanced-search-filter-container';
 import '../advanced-search/advanced-search-mapping-container';
 import template from './templates/tree-widget-container.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
+import {
+  isSnapshotModel,
+  isSnapshotScope,
+} from '../../plugins/utils/snapshot-utils';
 import {REFRESH_RELATED} from '../../events/eventTypes';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 
@@ -181,12 +185,11 @@ viewModel = can.Map.extend({
     isSnapshots: {
       type: Boolean,
       get: function () {
-        var Snapshots = GGRC.Utils.Snapshots;
         var parentInstance = this.attr('parent_instance');
         var model = this.attr('model');
 
-        return (Snapshots.isSnapshotScope(parentInstance) &&
-          Snapshots.isSnapshotModel(model.model_singular)) ||
+        return (isSnapshotScope(parentInstance) &&
+          isSnapshotModel(model.model_singular)) ||
           this.attr('options.objectVersion');
       },
     },

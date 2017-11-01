@@ -4,6 +4,7 @@
  */
 
 import * as TreeViewUtils from '../utils/tree-view-utils';
+import * as SnapshotUtils from '../utils/snapshot-utils';
 
 describe('GGRC Utils CurrentPage', function () {
   var pageType;
@@ -279,7 +280,7 @@ describe('GGRC Utils CurrentPage', function () {
           id: id,
           operation: 'owned'
         });
-      spyOn(GGRC.Utils.Snapshots, 'isSnapshotRelated')
+      spyOn(SnapshotUtils, 'isSnapshotRelated')
         .and.callFake(function (type, widgetType) {
           return widgetType === 'Control';
         });
@@ -401,12 +402,12 @@ describe('GGRC Utils CurrentPage', function () {
           };
         });
 
-      spyOn(GGRC.Utils.Snapshots, 'isSnapshotRelated')
+      spyOn(SnapshotUtils, 'isSnapshotRelated')
         .and.callFake(function (parent, child) {
           return child === 'Control';
         });
 
-      spyOn(GGRC.Utils.Snapshots, 'transformQuery')
+      spyOn(SnapshotUtils, 'transformQuery')
         .and.callFake(function (query) {
           return query;
         });

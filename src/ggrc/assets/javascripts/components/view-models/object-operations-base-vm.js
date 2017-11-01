@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  getInScopeModels,
+} from '../../plugins/utils/snapshot-utils';
+
 (function (can, $) {
   'use strict';
   /**
@@ -126,7 +130,7 @@
       var types = GGRC.Mappings.getMappingTypes(
         this.attr('object'),
         [],
-        GGRC.Utils.Snapshots.inScopeModels.concat('TaskGroup'));
+        getInScopeModels().concat('TaskGroup'));
       return types;
     },
     object: '',

@@ -4,6 +4,7 @@
 */
 
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
+import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 
 describe('GGRC.Components.mapperResults', function () {
   'use strict';
@@ -396,7 +397,7 @@ describe('GGRC.Components.mapperResults', function () {
     it('transform query to snapshot if useSnapshots is true', function () {
       var result;
       viewModel.attr('useSnapshots', true);
-      spyOn(GGRC.Utils.Snapshots, 'transformQuery')
+      spyOn(SnapshotUtils, 'transformQuery')
         .and.returnValue({mockData: 'snapshot'});
       result = viewModel.getQuery();
       expect(result.request[0]).toEqual(jasmine.objectContaining({
@@ -571,7 +572,7 @@ describe('GGRC.Components.mapperResults', function () {
             content: 'transformedValue'
           }
         };
-        spyOn(GGRC.Utils.Snapshots, 'toObject')
+        spyOn(SnapshotUtils, 'toObject')
           .and.returnValue('snapshot');
         viewModel.attr('useSnapshots', true);
         result = viewModel.transformValue(value);
