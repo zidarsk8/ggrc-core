@@ -3,6 +3,7 @@
 
 """Tests for collection post service."""
 
+import datetime
 import json
 
 from ggrc import db
@@ -216,3 +217,34 @@ class TestCollectionPost(TestCase):
     relationships = models.Relationship.eager_query().all()
     self.assertEqual(len(relationships), 3)  # This should be 2
     rel1 = relationships[0]
+
+  def test_post_person_modified_by(self):
+    """Test Person POST on modified_by issue.
+
+    Creates new Person and check modified_by fileds of new Person and Admin"""
+    self.client.get("/login")
+    admin = models.Person.query.filter_by(email="user@example.com").first()
+    old_update_at = datetime.datetime(2017, 10, 11, 12, 13, 14)
+    admin.modified_by = None
+    admin.updated_at = old_update_at
+    db.session.commit()
+
+    data = json.dumps([{
+        "person": {
+            "name": "test",
+            "email": "test@example.com",
+            "context": None,
+        },
+    }])
+    response = self.client.post(
+        '/api/people',
+        content_type='application/json',
+        data=data,
+        headers=self.get_headers(),
+    )
+    self.assert200(response)
+    admin = models.Person.query.filter_by(email="user@example.com").first()
+    new_user = models.Person.query.filter_by(email="test@example.com").first()
+    self.assertEqual(admin.updated_at, old_update_at)
+    self.assertIsNone(admin.modified_by)
+    self.assertEqual(new_user.modified_by_id, admin.id)
