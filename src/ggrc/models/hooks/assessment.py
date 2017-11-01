@@ -10,7 +10,6 @@
 import collections
 import copy
 import itertools
-import json
 import logging
 import urlparse
 import html2text
@@ -18,14 +17,13 @@ import html2text
 from sqlalchemy import orm
 from werkzeug import exceptions
 
-from google.appengine.api import urlfetch
-from google.appengine.api import urlfetch_errors
-
 from ggrc import db
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc import access_control
 from ggrc import settings
 from ggrc import utils
+from ggrc.integrations import issues
+from ggrc.integrations import integrations_errors
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
 from ggrc.models.hooks import common
@@ -35,19 +33,14 @@ from ggrc.access_control import role
 logger = logging.getLogger(__name__)  # pylint: disable=invalid-name
 
 
-_DEFAULT_HEADERS = {}
-if settings.URLFETCH_SERVICE_ID:
-  _DEFAULT_HEADERS['X-URLFetch-Service-Id'] = settings.URLFETCH_SERVICE_ID
-
-_ENDPOINT = settings.INTEGRATION_SERVICE_URL
 _ISSUE_URL_TMPL = settings.ISSUE_TRACKER_BUG_URL_TMPL or 'http://issue/%s'
 
-if settings.ISSUE_TRACKER_ENABLED:
-  _ISSUE_TRACKER_ENABLED = True
-else:
-  _ISSUE_TRACKER_ENABLED = False
+_ISSUE_TRACKER_ENABLED = bool(settings.ISSUE_TRACKER_ENABLED)
+if not _ISSUE_TRACKER_ENABLED:
   logger.debug('Issue Tracker integration is disabled.')
 
+_ASSESSMENT_MODEL_NAME = 'Assessment'
+_ASSESSMENT_TMPL_MODEL_NAME = 'AssessmentTemplate'
 
 # mapping of model field name to API property name
 _ISSUE_TRACKER_UPDATE_FIELDS = (
@@ -60,9 +53,6 @@ _ISSUE_TRACKER_UPDATE_FIELDS = (
     # updates is not required.
     ('assignee', 'assignee'),
 )
-
-_ASSESSMENT_MODEL_NAME = 'Assessment'
-_ASSESSMENT_TMPL_MODEL_NAME = 'AssessmentTemplate'
 
 _STATUS_CHANGE_COMMENT_TMPL = (
     'The status of this bug was automatically synced to reflect '
@@ -92,29 +82,6 @@ _VERIFIER_STATUSES = {
 }
 
 
-class Error(Exception):
-  """Module level error."""
-
-
-class HttpError(Error):
-  """Base HTTP error."""
-
-  def __init__(self, data, status=500):
-    """Instantiates error with give parameters.
-
-    Args:
-      data: A string or object describing an error.
-      status: An integer representing HTTP status.
-    """
-    super(HttpError, self).__init__('HTTP Error %s' % status)
-    self.data = data
-    self.status = status
-
-
-class BadResponseError(Error):
-  """Wrong formatted response error."""
-
-
 @signals.Restful.model_put.connect_via(all_models.Assessment)
 def handle_assessment_put(sender, obj=None, src=None, service=None):
   """Handles assessment update event."""
@@ -138,7 +105,7 @@ def handle_assessment_put_after_commit(sender, obj=None, src=None, **kwargs):
           issue_tracker_info.get('issue_id')):
     try:
       _update_issuetracker_issue(obj, issue_tracker_info, initial_state, src)
-    except (HttpError, BadResponseError) as error:
+    except integrations_errors.Error as error:
       logger.error('Unable update Issue Tracker issue: %s', error)
       # Dirty hack to rollback change to issuetracker_issues model.
       # Reverted info doesn't get sent to frontend so page refresh is
@@ -166,10 +133,8 @@ def handle_assessment_deleted(sender, obj=None, service=None):
           ),
       }
       try:
-        _send_request(
-            '/api/issues/%s' % issue_obj.issue_id,
-            method=urlfetch.PUT, payload=issue_params)
-      except (HttpError, BadResponseError) as error:
+        issues.Client().update_issue(issue_obj.issue_id, issue_params)
+      except integrations_errors.Error as error:
         logger.error('Unable to update Issue tracker: %s', error)
         raise exceptions.InternalServerError(
             'Unable update Issue Tracker issue.')
@@ -220,10 +185,8 @@ def handle_relation_post(sender, objects=None, sources=None, service=None):
           'ccs': cc_list,
       }
       try:
-        _send_request(
-            '/api/issues/%s' % issue_id,
-            method=urlfetch.PUT, payload=issue_params)
-      except (HttpError, BadResponseError) as error:
+        issues.Client().update_issue(issue_id, issue_params)
+      except integrations_errors.Error as error:
         logger.error('Unable to update Issue tracker: %s', error)
         raise exceptions.InternalServerError(
             'Unable update Issue Tracker issue.')
@@ -463,9 +426,6 @@ def _is_issue_tracker_enabled(audit=None):
   if not _ISSUE_TRACKER_ENABLED:
     return False
 
-  if not bool(_ENDPOINT):
-    return False
-
   if audit is not None:
     audit_issue_tracker_info = audit.issue_tracker or {}
 
@@ -519,55 +479,6 @@ def _collect_issue_emails(assessment):
       cc_list.add(email)
 
   return assignee_email, list(cc_list)
-
-
-# TODO(anushovan): migrate to Client object once
-#   https://github.com/google/ggrc-core/pull/6584 is submitted.
-def _send_http_request(url, method=urlfetch.GET, payload=None, headers=None):
-  """Sends HTTP request with given parameters."""
-  if _DEFAULT_HEADERS:
-    headers.update(_DEFAULT_HEADERS)
-
-  url = urlparse.urljoin(_ENDPOINT, url)
-
-  try:
-    response = urlfetch.fetch(
-        url,
-        method=method,
-        payload=payload,
-        headers=headers,
-        follow_redirects=False,
-        deadline=30,
-    )
-    if response.status_code != 200:
-      logger.error(
-          'Unable to perform request to %s: %s %s',
-          url, response.status_code, response.content)
-      raise HttpError(response.content, status=response.status_code)
-    return response.content
-  except urlfetch_errors.Error as error:
-    logger.error('Unable to perform urlfetch request: %s', error)
-    raise HttpError('Unable to perform a request')
-
-
-# TODO(anushovan): migrate to Client object once
-#   https://github.com/google/ggrc-core/pull/6584 is submitted.
-def _send_request(url, method=urlfetch.GET, payload=None, headers=None):
-  """Prepares and sends request."""
-  headers = headers or {}
-  headers['Content-Type'] = 'application/json'
-
-  if payload is not None:
-    payload = json.dumps(payload)
-
-  data = _send_http_request(
-      url, method=method, payload=payload, headers=headers)
-
-  try:
-    return json.loads(data)
-  except (TypeError, ValueError) as error:
-    logger.error('Unable to parse JSON from response: %s', error)
-    raise BadResponseError('Unable to parse JSON from response.')
 
 
 def _get_assessment_url(assessment):
@@ -625,9 +536,7 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
       'ccs': [],
       'comment': '\n'.join(comment),
   }
-
-  res = _send_request(
-      '/api/issues', method=urlfetch.POST, payload=issue_params)
+  res = issues.Client().create_issue(issue_params)
   return res['issueId']
 
 
@@ -641,7 +550,7 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
 
     try:
       issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
-    except (HttpError, BadResponseError) as error:
+    except integrations_errors.Error as error:
       logger.error('Unable create Issue Tracker issue: %s', error)
       raise exceptions.InternalServerError(
           'Unable create Issue Tracker issue.')
@@ -660,7 +569,7 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
 def _build_status_comment(assessment, initial_assessment):
   """Returns status message if status gets changed or None otherwise."""
   if initial_assessment.status == assessment.status:
-    return None
+    return None, None
 
   verifiers = assessment.verifiers
   status_text = assessment.status
@@ -724,9 +633,7 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,
     issue_params['ccs'] = cc_list
 
   if issue_params:
-    _send_request(
-        '/api/issues/%s' % issue_tracker_info['issue_id'],
-        method=urlfetch.PUT, payload=issue_params)
+    issues.Client().update_issue(issue_tracker_info['issue_id'], issue_params)
 
 
 def _update_issuetracker_info(assessment, issue_tracker_info):
