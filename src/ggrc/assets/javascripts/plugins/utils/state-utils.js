@@ -21,7 +21,7 @@ let statesModels = [
   {
     models: ['Assessment'],
     states: [
-      'Not Started', 'In Progress', 'In Review',
+      'Not Started', 'In Progress', 'In Review', 'Rework Needed',
       'Completed and Verified', 'Completed (no verification)', 'Deprecated'
     ]
   },

@@ -30,9 +30,10 @@ describe('GGRC.Components.confirmEditAction', function () {
   });
 
   describe('isInEditableState() method', function () {
-    it('returns true if instance state is "In Progress" or "Not Started"',
+    it('returns true if instance state is ' +
+    '"In Progress", "Not Started" or "Rework Needed"',
     function functionName() {
-      ['In Progress', 'Not Started'].forEach(function (state) {
+      ['In Progress', 'Not Started', 'Rework Needed'].forEach(function (state) {
         viewModel.attr('instance.status', state);
 
         expect(viewModel.isInEditableState()).toBe(true);

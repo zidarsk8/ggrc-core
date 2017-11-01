@@ -774,6 +774,9 @@ p {
   &.state-deprecated {
     background: $status-declined;
   }
+  &.state-reworkneeded {
+    background: $status-reworkneeded;
+  }
 }
 .state-value-dot {
   position: relative;
@@ -847,6 +850,13 @@ p {
 
     &:before {
       background: $status-declined;
+    }
+  }
+  &.state-reworkneeded {
+    color: $status-reworkneeded;
+
+    &:before {
+      background: $status-reworkneeded;
     }
   }
 }
