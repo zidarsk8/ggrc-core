@@ -107,6 +107,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         attr_title: 'Buganizer',
         attr_name: 'issue_url',
         order: 16,
+        deny: !GGRC.ISSUE_TRACKER_ENABLED,
       }],
       display_attr_names: ['title', 'status', 'label', 'Assignees', 'Verifiers',
         'start_date', 'updated_at'],

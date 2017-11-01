@@ -107,7 +107,7 @@
             </div>
           </div>
 
-          {{#if instance.can_use_issue_tracker}}
+          {{#displayAssessmentIssueTracker instance.can_use_issue_tracker true}}
             <div class="row-fluid wrap-row">
               <div class="expanded-area">
                 <div class="info-expand">
@@ -128,7 +128,7 @@
                 </div>
               </div>
             </div>
-          {{/if}}
+          {{/displayAssessmentIssueTracker}}
 
         </tab-panel>
         <tab-panel {(panels)}="panels" title-text="Change Log">

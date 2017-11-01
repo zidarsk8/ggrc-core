@@ -242,30 +242,32 @@
 
     {{#with_current_user_as 'current_user'}}<input type="hidden" name="modified_by_id" value="{{current_user.id}}">{{/with_current_user_as}}
 
-    <div class="expanded-area">
-      <div class="expand-link">
-        <a class="show-hidden-fields info-show-hide active" href="javascript://">
-          <span class="out">
-            <i class="fa fa-caret-right"></i>
-            SHOW
-          </span>
-          <span class="in">
-            <i class="fa fa-caret-down"></i>
-            HIDE
-          </span>
-          BUGANIZER INFO
-        </a>
-      </div>
-      <div class="hidden-fields-area">
-        <div class="ggrc-form">
-          <issue-tracker-switcher
-            {instance}="instance"
-            {(is-integration-enabled)}="instance.issue_tracker.enabled">
-              {{>'/static/mustache/issue_tracker/modal-issue-tracker-fields.mustache'}}
-          </issue-tracker-switcher>
+    {{#displayAssessmentIssueTracker instance.can_use_issue_tracker}}
+      <div class="expanded-area">
+        <div class="expand-link">
+          <a class="show-hidden-fields info-show-hide active" href="javascript://">
+            <span class="out">
+              <i class="fa fa-caret-right"></i>
+              SHOW
+            </span>
+            <span class="in">
+              <i class="fa fa-caret-down"></i>
+              HIDE
+            </span>
+            BUGANIZER INFO
+          </a>
+        </div>
+        <div class="hidden-fields-area">
+          <div class="ggrc-form">
+            <issue-tracker-switcher
+              {instance}="instance"
+              {(is-integration-enabled)}="instance.issue_tracker.enabled">
+                {{>'/static/mustache/issue_tracker/modal-issue-tracker-fields.mustache'}}
+            </issue-tracker-switcher>
+          </div>
         </div>
       </div>
-    </div>
+    {{/displayAssessmentIssueTracker}}
   </form>
 {{/instance}}
 </div>

@@ -35,11 +35,13 @@
                         </div>
                     {{/if}}
                     {{#if instance.issue_tracker.issue_url}}
-                        <div class="issue-tracker-url">
-                            <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
-                                Buganizer Link
-                            </a>
-                        </div>
+                        {{#displayAssessmentIssueTracker instance.can_use_issue_tracker}}
+                            <div class="issue-tracker-url">
+                                <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
+                                    Buganizer Link
+                                </a>
+                            </div>
+                        {{/displayAssessmentIssueTracker}}
                     {{/if}}
                 </div>
             {{/if}}
@@ -512,7 +514,7 @@
                         </div>
                     </div>
                 </div>
-                {{#if instance.can_use_issue_tracker}}
+                {{#displayAssessmentIssueTracker instance.can_use_issue_tracker true}}
                     <div class="expanded-area">
                         <div class="info-expand">
                             <a class="show-hidden-fields info-show-hide active" href="javascript://">
@@ -531,7 +533,7 @@
                             {{>'/static/mustache/components/assessment/info-pane/info-pane-issue-tracker-fields.mustache'}}
                         </div>
                     </div>
-                {{/if}}
+                {{/displayAssessmentIssueTracker}}
             </div>
             </div>
           </tab-panel>

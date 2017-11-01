@@ -300,7 +300,7 @@
       </div><!-- custom-attr-wrap end -->
     </div>
 
-    {{#if instance.can_use_issue_tracker}}
+    {{#displayAssessmentIssueTracker instance.can_use_issue_tracker true}}
       <div class="row-fluid">
         <div class="expanded-area">
           <div class="expand-link">
@@ -328,7 +328,7 @@
           </div>
         </div>
       </div>
-    {{/if}}
+    {{/displayAssessmentIssueTracker}}
  </form>
  </wrapper-assessment-template>
 </div>
