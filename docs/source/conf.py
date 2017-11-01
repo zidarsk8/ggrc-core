@@ -34,6 +34,7 @@ from ggrc import settings
 # ones.
 extensions = [
     'sphinx.ext.extlinks',
+    'sphinx.ext.graphviz',
 ]
 
 extlinks = {
