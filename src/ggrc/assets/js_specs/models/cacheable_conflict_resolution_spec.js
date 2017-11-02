@@ -1,4 +1,4 @@
-/*!
+/*
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -10,7 +10,7 @@ describe('can.Model.Cacheable conflict resolution', function () {
 
   beforeAll(function () {
     can.Model.Cacheable.extend('CMS.Models.DummyModel', {
-      update: 'PUT /api/dummy_models/{id}'
+      update: 'PUT /api/dummy_models/{id}',
     }, {});
   });
 
@@ -62,7 +62,7 @@ describe('can.Model.Cacheable conflict resolution', function () {
           done();
         }, function () {
         expect($.fn.trigger).toHaveBeenCalledWith('ajax:flash', {
-          warning: [jasmine.any(String)]
+          warning: [jasmine.any(String)],
         });
         done();
       });
