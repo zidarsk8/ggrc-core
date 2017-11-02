@@ -15,6 +15,8 @@ import '../../inline/inline-form-control';
 import './inline-item';
 import './create-url';
 import '../../object-change-state/object-change-state';
+import '../../related-objects/related-assessments';
+import '../../related-objects/related-issues';
 import {
   getCustomAttributes,
   CUSTOM_ATTRIBUTE_TYPE,

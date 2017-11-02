@@ -5,6 +5,7 @@
 import './mapper-results-item';
 import './mapper-results-items-header';
 import './mapper-results-columns-configuration';
+import '../related-objects/related-assessments';
 import '../object-selection/object-selection';
 import template from './templates/mapper-results.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
