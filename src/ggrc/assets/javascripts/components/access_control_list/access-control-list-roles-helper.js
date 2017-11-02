@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../custom-roles/custom-roles-modal';
 import template from './access-control-list-roles-helper.mustache';
 
 export default GGRC.Components('accessControlListRolesHelper', {

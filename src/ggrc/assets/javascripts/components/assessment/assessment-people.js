@@ -4,6 +4,7 @@
  */
 
 import {ROLES_CONFLICT} from '../../events/eventTypes';
+import '../custom-roles/custom-roles-modal';
 
 (function (can, GGRC) {
   'use strict';
