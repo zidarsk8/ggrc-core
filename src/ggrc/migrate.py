@@ -128,9 +128,9 @@ def upgradeall(config=None, row_id=None):
   except sqlalchemy.exc.ProgrammingError as e:
     if not re.search(r"""\(1146, "Table '.+' doesn't exist"\)$""", e.message):
       if mig_row:
-        mig_row.log = mig_row.log + '\n' + e.message
-      else:
-        raise
+        mig_row.log = e.message
+        sess.commit()
+      raise
 
   try:
     for module_name in all_extensions():
@@ -138,21 +138,19 @@ def upgradeall(config=None, row_id=None):
       config = make_extension_config(module_name)
       command.upgrade(config, 'head')
 
-    if mig_row:
-      version_num = [row[0] for row in db.engine.execute(
-          "select version_num from ggrc_alembic_version")][0]
-      mig_row.down_version_num = down_version_num
-      mig_row.version_num = version_num
-      mig_row.is_migration_complete = True
-
   except Exception as e:
     if mig_row:
       mig_row.log = e.message
       sess.commit()
     raise
 
-  # Unset db flag after running migrations successfully
-  if db_row:
+  if mig_row:
+    version_num = [row[0] for row in db.engine.execute(
+        "select version_num from ggrc_alembic_version")][0]
+    mig_row.down_version_num = down_version_num
+    mig_row.version_num = version_num
+    mig_row.is_migration_complete = True
+    # Turn off maintenance mode after running migrations successfully
     db_row.under_maintenance = False
     sess.commit()
 
