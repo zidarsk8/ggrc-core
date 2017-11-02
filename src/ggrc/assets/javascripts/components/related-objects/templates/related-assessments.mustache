@@ -6,11 +6,13 @@
 <related-objects {base-instance}="instance" related-items-type="Assessment" initial-order-by="finished_date,created_at">
   <div class="grid-data__toolbar flex-box">
     <tree-pagination {paging}="paging" class="grid-data__toolbar-item"></tree-pagination>
-    {{#is_allowed 'update' baseInstance context='for'}}
-      {{#unless instance.archived}}
-        <button class="btn btn-small btn-green grid-data__toolbar-item" ($click)="reuseSelected()" {{^hasSelected}}disabled{{/hasSelected}}>Reuse</button>
-      {{/unless}}
-    {{/is_allowed}}
+    {{#if needReuse}}
+      {{#is_allowed 'update' baseInstance context='for'}}
+        {{#unless instance.archived}}
+          <button class="btn btn-small btn-green grid-data__toolbar-item" ($click)="reuseSelected()" {{^hasSelected}}disabled{{/hasSelected}}>Reuse</button>
+        {{/unless}}
+      {{/is_allowed}}
+    {{/if}}
   </div>
   <div class="grid-data-header flex-row flex-box">
     <div class="flex-size-3">
@@ -94,14 +96,20 @@
             <div class="flex-size-3">
               <related-evidences-and-urls {parent-instance}="instance"
                                           {^is-loading}="loadingState.evidencesAndUrlsLoading">
-                <object-list items="documents" show-more="true">
-                  <reusable-objects-item {instance}="{.}"
-                                         {is-saving}="isSaving"
-                                         {base-instance-documents}="baseInstanceDocuments"
-                                         {(selected-list)}="documentList">
-                    <document-object-list-item {instance}="instance"></document-object-list-item>
-                  </reusable-objects-item>
-                </object-list>
+                {{#if needReuse}}
+                  <object-list items="documents" show-more="true">
+                    <reusable-objects-item {instance}="{.}"
+                                           {is-saving}="isSaving"
+                                           {base-instance-documents}="baseInstanceDocuments"
+                                           {(selected-list)}="documentList">
+                      <document-object-list-item {instance}="instance"></document-object-list-item>
+                    </reusable-objects-item>
+                  </object-list>
+                {{else}}
+                  <object-list items="documents">
+                    <document-object-list-item {instance}="{.}"></document-object-list-item>
+                  </object-list>
+                {{/if}}
               </related-evidences-and-urls>
             </div>
             <div class="grid-data__action-column">

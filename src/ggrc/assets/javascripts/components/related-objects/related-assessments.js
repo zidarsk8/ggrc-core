@@ -32,6 +32,10 @@ import template from './templates/related-assessments.mustache';
           get: function () {
             return this.attr('documentList.length');
           }
+        },
+        needReuse: {
+          type: 'boolean',
+          value: true,
         }
       },
       evidences: [],
@@ -39,6 +43,7 @@ import template from './templates/related-assessments.mustache';
       baseInstance: {},
       documentList: [],
       isSaving: false,
+      needReuse: '@',
       baseInstanceDocuments: [],
       getMapObjects: function (source, list) {
         return list
