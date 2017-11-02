@@ -3,12 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import template from './access-control-list-roles-helper.mustache';
+
 (function (GGRC) {
   'use strict';
 
   GGRC.Components('accessControlListRolesHelper', {
     tag: 'access-control-list-roles-helper',
-
+    template,
     viewModel: {
       instance: {},
       isNewInstance: false,
