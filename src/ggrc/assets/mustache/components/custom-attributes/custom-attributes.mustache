@@ -8,13 +8,12 @@
     <div class="field-wrapper flex-size-1 {{extraClass type}} {{#isInvalidField validation.show validation.valid highlightInvalidFields}}invalid-field{{/isInvalidField}}">
       <form-validation-icon {validation}="validation"></form-validation-icon>
       <div class="field__title form-field__title">
-        <label class="field__title-text {{extraClass type}}" for="form-field-{{id}}">{{title}}</label>
-	{{#if validation.mandatory}}
-	  <i class="fa fa-asterisk field__mandatory"></i>
-	{{/if}}
-        {{#if helptext}}
-          <i class="fa fa-question-circle field__title-helper-text" rel="tooltip" title="{{helptext}}"></i>
-        {{/if}}
+        <label class="field__title-text {{extraClass type}}" for="form-field-{{id}}">
+          {{title}}
+          {{#if validation.mandatory}}
+            <i class="fa fa-asterisk field__mandatory"></i>
+          {{/if}}
+        </label>
       </div>
       {{#if editMode}}
         <custom-attributes-field
