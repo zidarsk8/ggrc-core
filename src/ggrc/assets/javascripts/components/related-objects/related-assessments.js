@@ -40,7 +40,7 @@ import template from './templates/related-assessments.mustache';
       },
       evidences: [],
       urls: [],
-      baseInstance: {},
+      instance: {},
       documentList: [],
       isSaving: false,
       needReuse: '@',
@@ -60,7 +60,7 @@ import template from './templates/related-assessments.mustache';
       reuseSelected: function () {
         var reusedObjectList =
           this.getMapObjects(
-            this.attr('baseInstance'),
+            this.attr('instance'),
             this.attr('documentList'));
         this.attr('isSaving', true);
 
@@ -71,7 +71,7 @@ import template from './templates/related-assessments.mustache';
         this.attr('documentList').replace([]);
         this.attr('isSaving', false);
         this.dispatch('afterObjectReused');
-        this.attr('baseInstance').dispatch('refreshInstance');
+        this.attr('instance').dispatch('refreshInstance');
       }
     }
   });

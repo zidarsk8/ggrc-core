@@ -61,7 +61,9 @@
                 state="relatedAssessments.state"
                 extra-css-class="related-assessments">
     <div class="simple-modal__body">
-      {{> '/static/mustache/assessments/related-assessments-without-reuse.mustache' }}
+      <related-assessments {instance}="instance"
+                           {need-reuse}="false">
+      </related-assessments>
     </div>
   </simple-modal>
 {{/relatedAssessments.show}}
