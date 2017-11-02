@@ -5,17 +5,16 @@
 
 import {ROLES_CONFLICT} from '../../events/eventTypes';
 import '../custom-roles/custom-roles-modal';
+import template from './templates/assessment-people.mustache';
 
 (function (can, GGRC) {
   'use strict';
 
-  var tpl = can.view(GGRC.mustache_path +
-    '/components/assessment/assessment-people.mustache');
   var tag = 'assessment-people';
 
   can.Component.extend({
-    tag: tag,
-    template: tpl,
+    tag,
+    template,
     viewModel: {
       define: {
         emptyMessage: {
