@@ -177,7 +177,7 @@ class PersonClientTest(unittest.TestCase):
         _post=mock.MagicMock(return_value={'persons': 'persons data'})
     ):
       testable_obj = self.testable_cls()
-      actual = testable_obj.suggest_persons("pit")
+      actual = testable_obj.suggest_persons(["pit"])
 
       self.assertEqual(actual, 'persons data')
       testable_obj._post.assert_called_once_with(
