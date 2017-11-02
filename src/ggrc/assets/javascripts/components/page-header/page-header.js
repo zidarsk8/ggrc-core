@@ -75,6 +75,10 @@ import oneColorLogo from '../../../images/ggrc-one-color.svg';
           return this.attr('headerStyle') ? oneColorLogo : logo;
         },
       },
+      helpUrl: {
+        type: 'string',
+        value: GGRC.config.external_help_url,
+      },
     },
     showHideTitles: function (element) {
       var elWidth = element.width();
