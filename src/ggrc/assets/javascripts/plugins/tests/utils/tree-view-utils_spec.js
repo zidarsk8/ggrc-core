@@ -3,16 +3,15 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.Utils.TreeView module', function () {
+import * as module from '../../../plugins/utils/tree-view-utils';
+
+describe('TreeViewUtils module', function () {
   'use strict';
 
   var method;
-  var module;
   var origPageType;
 
   beforeAll(function () {
-    module = GGRC.Utils.TreeView;
-
     origPageType = GGRC.pageType;
     GGRC.pageType = 'MY_WORK';
   });

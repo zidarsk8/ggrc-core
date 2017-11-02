@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
+
 describe('GGRC.Components.treeWidgetContainer', function () {
   'use strict';
 
@@ -264,7 +266,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     });
 
     it('', function (done) {
-      spyOn(GGRC.Utils.TreeView, 'loadFirstTierItems')
+      spyOn(TreeViewUtils, 'loadFirstTierItems')
         .and.returnValue(can.Deferred().resolve({
           total: 100,
           values: []
@@ -706,7 +708,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
     it('sets up default sorting configuration', () => {
       vm.attr('sortingInfo', {});
-      spyOn(GGRC.Utils.TreeView, 'getSortingForModel')
+      spyOn(TreeViewUtils, 'getSortingForModel')
         .and.returnValue({
           key: 'key',
           direction: 'direction',

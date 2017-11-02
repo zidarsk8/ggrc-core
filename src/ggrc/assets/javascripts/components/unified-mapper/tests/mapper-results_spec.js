@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
+
 describe('GGRC.Components.mapperResults', function () {
   'use strict';
 
@@ -107,7 +109,7 @@ describe('GGRC.Components.mapperResults', function () {
         selected: 'mock2',
         disableConfiguration: 'mock3'
       };
-      spyOn(GGRC.Utils.TreeView, 'getColumnsForModel')
+      spyOn(TreeViewUtils, 'getColumnsForModel')
         .and.returnValue(mockColumns);
       spyOn(viewModel, 'getDisplayModel')
         .and.returnValue({
@@ -137,7 +139,7 @@ describe('GGRC.Components.mapperResults', function () {
   describe('setSortingConfiguration() method', () => {
     beforeEach(function () {
       viewModel.attr('columns', {});
-      spyOn(GGRC.Utils.TreeView, 'getSortingForModel')
+      spyOn(TreeViewUtils, 'getSortingForModel')
         .and.returnValue(
         {
           key: 'key',

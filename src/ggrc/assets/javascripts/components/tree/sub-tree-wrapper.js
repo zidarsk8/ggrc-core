@@ -4,11 +4,11 @@
  */
 
 import template from './templates/sub-tree-wrapper.mustache';
+import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 
 (function (can, GGRC) {
   'use strict';
 
-  var TreeViewUtils = GGRC.Utils.TreeView;
   var CurrentPage = GGRC.Utils.CurrentPage;
 
   var viewModel = can.Map.extend({

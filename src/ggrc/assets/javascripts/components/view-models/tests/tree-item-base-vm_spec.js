@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
+
 describe('GGRC.VM.BaseTreeItemVM', function () {
   'use strict';
 
@@ -14,7 +16,7 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
 
   describe('initChildTreeDisplay() method', function () {
     beforeEach(function () {
-      spyOn(GGRC.Utils.TreeView, 'getModelsForSubTier')
+      spyOn(TreeViewUtils, 'getModelsForSubTier')
         .and.returnValue({
           available: ['Foo', 'Bar', 'Baz'],
           selected: ['Foo'],

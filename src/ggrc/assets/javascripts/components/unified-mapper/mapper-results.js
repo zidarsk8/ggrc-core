@@ -8,6 +8,7 @@ import './mapper-results-columns-configuration';
 import '../object-selection/object-selection';
 import template from './templates/mapper-results.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
+import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 
 (function (can, GGRC, CMS, $) {
   'use strict';
@@ -85,7 +86,7 @@ import * as StateUtils from '../../plugins/utils/state-utils';
       },
       setColumnsConfiguration: function () {
         var columns =
-          GGRC.Utils.TreeView.getColumnsForModel(
+          TreeViewUtils.getColumnsForModel(
             this.getDisplayModel().model_singular,
             this.attr('displayPrefs')
           );
@@ -94,7 +95,7 @@ import * as StateUtils from '../../plugins/utils/state-utils';
         this.attr('disableColumnsConfiguration', columns.disableConfiguration);
       },
       setSortingConfiguration: function () {
-        let sortingInfo = GGRC.Utils.TreeView.getSortingForModel(
+        let sortingInfo = TreeViewUtils.getSortingForModel(
           this.getDisplayModel().model_singular
         );
 

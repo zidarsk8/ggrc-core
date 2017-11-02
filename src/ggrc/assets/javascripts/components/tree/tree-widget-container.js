@@ -28,14 +28,11 @@ import '../advanced-search/advanced-search-mapping-container';
 import template from './templates/tree-widget-container.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {REFRESH_RELATED} from '../../events/eventTypes';
+import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 
 (function (can, GGRC) {
   'use strict';
 
-  const DEFAULT_SORT_KEY = 'updated_at';
-  const DEFAULT_SORT_DIRECTION = 'desc';
-
-  var TreeViewUtils = GGRC.Utils.TreeView;
   var CurrentPageUtils = GGRC.Utils.CurrentPage;
   var viewModel;
 
