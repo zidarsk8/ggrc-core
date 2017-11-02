@@ -1,9 +1,13 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 import './mapped-control-related-objects';
+import {
+  prepareCustomAttributes,
+  convertToFormViewField,
+} from '../../../plugins/utils/ca-utils';
 
 (function (can, GGRC, _) {
   'use strict';
@@ -18,12 +22,12 @@ import './mapped-control-related-objects';
    */
   var defaultResponseArr = [{
     Snapshot: {
-      values: []
-    }
+      values: [],
+    },
   }, {
     Snapshot: {
-      values: []
-    }
+      values: [],
+    },
   }];
   /**
    * ViewModel for Assessment Mapped Controls Popover.
@@ -42,14 +46,14 @@ import './mapped-control-related-objects';
           {
             type: 'objectives',
             objName: 'Objective',
-            fields: ['child_type', 'revision', 'parent']
+            fields: ['child_type', 'revision', 'parent'],
           },
           {
             type: 'regulations',
             objName: 'Regulation',
-            fields: ['child_type', 'revision', 'parent']
-          }
-        ]
+            fields: ['child_type', 'revision', 'parent'],
+          },
+        ],
       },
       /**
        * Attribute to indicate loading state
@@ -57,30 +61,30 @@ import './mapped-control-related-objects';
        */
       isLoading: {
         type: 'boolean',
-        value: false
+        value: false,
       },
       objectives: {
-        value: []
+        value: [],
       },
       regulations: {
-        value: []
+        value: [],
       },
       customAttributes: {
-        value: []
+        value: [],
       },
       state: {
-        value: {}
+        value: {},
       },
       mappedItems: {
         set: function (newArr) {
           return newArr.map(function (item) {
             return {
               isSelected: false,
-              instance: item
+              instance: item,
             };
           });
-        }
-      }
+        },
+      },
     },
     titleText: '@',
     mapping: '@',
@@ -99,7 +103,7 @@ import './mapped-control-related-objects';
       var relevant = {
         type: 'Snapshot',
         id: id,
-        operation: 'relevant'
+        operation: 'relevant',
       };
       params.data = this.attr('queries')
         .map(function (query) {
@@ -141,7 +145,7 @@ import './mapped-control-related-objects';
         .fail(function () {
           $(document.body).trigger('ajax:flash',
             {
-              error: 'Failed to fetch related objects.'
+              error: 'Failed to fetch related objects.',
             });
           this.setItems(defaultResponseArr);
         }.bind(this))
@@ -151,12 +155,12 @@ import './mapped-control-related-objects';
     },
     attributesToFormFields: function (snapshot) {
       var attributes;
-      attributes = GGRC.Utils.CustomAttributes.prepareCustomAttributes(
+      attributes = prepareCustomAttributes(
         snapshot.custom_attribute_definitions,
         snapshot.custom_attribute_values)
-        .map(GGRC.Utils.CustomAttributes.convertToFormViewField);
+        .map(convertToFormViewField);
       return attributes;
-    }
+    },
   });
   /**
    * Assessment specific mapped controls view component
@@ -178,7 +182,7 @@ import './mapped-control-related-objects';
             GGRC.Utils.Snapshots.toObject(item));
           this.viewModel.attr('state.open', true);
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC, window._);

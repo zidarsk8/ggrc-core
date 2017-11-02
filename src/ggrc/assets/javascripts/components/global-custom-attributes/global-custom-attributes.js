@@ -1,12 +1,15 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  getCustomAttributeType,
+  convertFromCaValue,
+} from '../../plugins/utils/ca-utils';
+
 (function (can, GGRC) {
   'use strict';
-
-  var CAUtils = GGRC.Utils.CustomAttributes;
 
   /**
    * Global Custom Attributes is a component representing custom attributes.
@@ -27,8 +30,8 @@
               this.attr('instance.isRevision') ||
               this.attr('instance.archived') ||
               !Permission.is_allowed_for('update', this.attr('instance'));
-          }
-        }
+          },
+        },
       },
       instance: null,
       /**
@@ -41,7 +44,7 @@
 
         can.each(this.attr('instance.custom_attribute_definitions'),
           function (cad) {
-            var type = CAUtils.getCustomAttributeType(cad.attribute_type);
+            var type = getCustomAttributeType(cad.attribute_type);
             var value;
             var options = cad.multi_choice_options &&
               typeof cad.multi_choice_options === 'string' ?
@@ -51,7 +54,7 @@
               function (val) {
                 val = val.isStub ? val : val.reify();
                 if (val.custom_attribute_id === cad.id) {
-                  value = CAUtils.convertFromCaValue(
+                  value = convertFromCaValue(
                     type,
                     val.attribute_value,
                     val.attribute_object
@@ -67,7 +70,7 @@
               helptext: cad.helptext,
               value: value,
               options: options,
-              type: type
+              type: type,
             });
           }.bind(this));
 
@@ -87,12 +90,12 @@
         instance.save()
           .done(function () {
             $(document.body).trigger('ajax:flash', {
-              success: 'Saved'
+              success: 'Saved',
             });
           })
           .fail(function () {
             $(document.body).trigger('ajax:flash', {
-              error: 'There was a problem saving'
+              error: 'There was a problem saving',
             });
           })
           .always(function () {
@@ -112,7 +115,7 @@
           }
         }
         return value;
-      }
+      },
     },
     init: function () {
       if (this.viewModel.instance.class.is_custom_attributable) {
@@ -126,7 +129,7 @@
         if (isReady) {
           this.viewModel.initCustomAttributes();
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

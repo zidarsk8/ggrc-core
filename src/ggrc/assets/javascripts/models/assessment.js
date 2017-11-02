@@ -2,6 +2,9 @@
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
+
 (function (can, GGRC, CMS) {
   'use strict';
 
@@ -192,8 +195,7 @@
       }
 
       attributes.custom_attribute_values =
-        GGRC.Utils.CustomAttributes
-          .prepareCustomAttributes(definitions, values);
+        prepareCustomAttributes(definitions, values);
       return attributes;
     },
     model: function (attributes, oldModel) {

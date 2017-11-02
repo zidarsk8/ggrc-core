@@ -26,7 +26,7 @@ import './tree-people-with-role-list-field';
 import '../advanced-search/advanced-search-filter-container';
 import '../advanced-search/advanced-search-mapping-container';
 import template from './templates/tree-widget-container.mustache';
-import StateUtils from '../../plugins/utils/state-utils';
+import * as StateUtils from '../../plugins/utils/state-utils';
 import {REFRESH_RELATED} from '../../events/eventTypes';
 
 (function (can, GGRC) {

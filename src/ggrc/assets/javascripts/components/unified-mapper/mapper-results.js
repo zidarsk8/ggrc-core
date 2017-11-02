@@ -7,7 +7,7 @@ import './mapper-results-items-header';
 import './mapper-results-columns-configuration';
 import '../object-selection/object-selection';
 import template from './templates/mapper-results.mustache';
-import StateUtils from '../../plugins/utils/state-utils';
+import * as StateUtils from '../../plugins/utils/state-utils';
 
 (function (can, GGRC, CMS, $) {
   'use strict';

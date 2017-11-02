@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import StateUtils from '../utils/state-utils';
+import * as StateUtils from '../utils/state-utils';
 
 describe('StateUtils', function () {
   describe('statusFilter() method', function () {

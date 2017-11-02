@@ -215,7 +215,7 @@ function getDefaultStatesForModel(model) {
     getStatesForModel(model);
 }
 
-export default {
+export {
   hasState,
   hasFilter,
   hasFilterTooltip,
