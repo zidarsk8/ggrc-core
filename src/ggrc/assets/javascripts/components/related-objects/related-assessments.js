@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import template from './templates/related-assessments.mustache';
+
 (function (can, GGRC, CMS) {
   'use strict';
 
@@ -18,6 +20,7 @@
 
   GGRC.Components('relatedAssessments', {
     tag: 'related-assessments',
+    template,
     viewModel: {
       define: {
         baseInstanceDocuments: {
