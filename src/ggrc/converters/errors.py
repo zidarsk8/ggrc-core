@@ -138,3 +138,7 @@ VALIDATION_ERROR = (u"Line {line}: Field '{column_name}' validation failed "
 SINGLE_AUDIT_RESTRICTION = (u"Line {line}: You can not map {mapped_type} to "
                             u"{object_type}, because this {object_type} is "
                             u"already mapped to an {mapped_type}")
+
+UNMAP_AUDIT_RESTRICTION = (u"Line {line}: You can not unmap {mapped_type} "
+                           u"from {object_type} because this {object_type} is "
+                           u"mapped to an {mapped_type}-scope object.")

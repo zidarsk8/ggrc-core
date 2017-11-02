@@ -87,6 +87,9 @@
       background: linear-gradient(to bottom, transparent, white 70%);
     }
   }
+  .inline__header {
+    width: 100%;
+  }
 
   .pane-header {
     display: flex;
@@ -100,13 +103,14 @@
 
     .pane-header__title {
       padding-right: 24px;
-      flex: 7 7;
+      max-width: calc(100% - 520px);
+      flex: 1;
 
       .pane-header__title-name {
+        max-width: calc(100% - 160px);
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
-        max-width: 600px;
         margin-right: 8px;
       }
 
@@ -128,7 +132,6 @@
     .pane-header__toolbar {
       display: flex;
       flex-direction: row-reverse;
-      flex: 3 3;
 
       .form-status {
         line-height: 28px;
@@ -139,7 +142,7 @@
       }
 
       .pane-header__toolbar-item {
-        margin-top: 20px;
+        margin-top: 30px;
 
         /* override "sticky-info-panel" margin */
         .details-wrap {

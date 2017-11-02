@@ -160,8 +160,19 @@
       'Check the form for any highlighted fields.'
     };
 
-    function notifier(type, message) {
+    /**
+     * Shows flash notification
+     * @param  {String} type    type of notification. error|warning
+     * @param  {String} message Plain text message or mustache template if data is passed
+     * @param  {Object} data data to populate mustache template
+     */
+    function notifier(type, message, data) {
       var props = {};
+
+      if ( message && data ) {
+        message = can.mustache(message);
+        props.data = data;
+      }
 
       type = type || 'warning';
       props[type] = message || GGRC.Errors.messages.default;

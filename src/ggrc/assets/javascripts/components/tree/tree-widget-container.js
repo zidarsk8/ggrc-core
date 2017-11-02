@@ -21,10 +21,13 @@ import './tree-item-status-for-workflow';
 import './tree-no-results';
 import './tree-assignee-field';
 import './tree-people-list-field';
+import './get-owner-people-list';
 import './tree-people-with-role-list-field';
 import '../advanced-search/advanced-search-filter-container';
 import '../advanced-search/advanced-search-mapping-container';
 import template from './templates/tree-widget-container.mustache';
+import * as StateUtils from '../../plugins/utils/state-utils';
+import {REFRESH_RELATED} from '../../events/eventTypes';
 
 (function (can, GGRC) {
   'use strict';
@@ -112,13 +115,13 @@ import template from './templates/tree-widget-container.mustache';
       statusFilterVisible: {
         type: Boolean,
         get: function () {
-          return GGRC.Utils.State.hasFilter(this.attr('modelName'));
+          return StateUtils.hasFilter(this.attr('modelName'));
         },
       },
       statusTooltipVisible: {
         type: Boolean,
         get: function () {
-          return GGRC.Utils.State.hasFilterTooltip(this.attr('modelName'));
+          return StateUtils.hasFilterTooltip(this.attr('modelName'));
         },
       },
       cssClasses: {
@@ -204,6 +207,12 @@ import template from './templates/tree-widget-container.mustache';
         type: Boolean,
         get: function () {
           return !CurrentPageUtils.isMyAssessments();
+        },
+      },
+      disable3bbs: {
+        type: Boolean,
+        get: function () {
+          return this.attr('isSnapshots') && !this.attr('showedItems').length;
         },
       },
       noResults: {
@@ -762,7 +771,10 @@ import template from './templates/tree-widget-container.mustache';
             pinControl
               .updateInstance(componentSelector, newInstance);
             newInstance.dispatch('refreshRelatedDocuments');
-            newInstance.dispatch('refreshRelatedAssessments');
+            newInstance.dispatch({
+                ...REFRESH_RELATED,
+              model: 'Assessment',
+            });
 
             this.viewModel.updateActiveItemIndicator(relativeIndex);
           }.bind(this))

@@ -6,24 +6,16 @@
 {{#switch attr_name}}
   {{#case 'owner'}}
     {{#with_mapping 'program_authorizations' instance}}
-      {{#each program_authorizations}}
-          {{#using role=instance.role}}
-            {{#if_equals role.name 'ProgramOwner'}}
-                {{#using contact=instance.person}}
-                  <span class="need-comma">{{contact.email}}</span>
-                {{/using}}
-            {{/if_equals}}
-          {{/using}}
-      {{/each}}
+      <get-owner-people-list data="program_authorizations" role="'ProgramOwner'">
+        <tree-people-list-field {source}="allOwners"/>
+      </get-owner-people-list>
     {{/with_mapping}}
   {{/case}}
   {{#case 'contact'}}
-      <tree-people-list-field {source}="instance.contact">
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.contact"/>
   {{/case}}
   {{#case 'secondary_contact'}}
-      <tree-people-list-field {source}="instance.secondary_contact">
-      </tree-people-list-field>
+      <tree-people-list-field {source}="instance.secondary_contact"/>
   {{/case}}
   {{#case 'modified_by'}}
       <tree-people-list-field {source}="instance.modified_by"/>

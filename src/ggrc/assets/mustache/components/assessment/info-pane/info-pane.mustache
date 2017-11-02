@@ -108,6 +108,7 @@
                                         {on-state-change-dfd}="onStateChangeDfd"
                                         {edit-mode}="editMode">
                             <attach-button
+					{assessment-type-objects}="assessmentTypeObjects"
                                         (before-create)="addItems(%event, 'evidences')"
                                         (refresh-evidences)="updateItems('evidences')"
                                         {is-attach-action-disabled}="isUpdatingEvidences"
@@ -195,6 +196,7 @@
                                     {instance}="instance"
                                     {is-disabled}="isUpdatingEvidences">
                           <ca-object-modal-content {instance}="instance"
+						   {assessment-type-objects}="assessmentTypeObjects"
                                                    {content}="modal.content"
                                                    {state}="state"
                                                    {evidences}="evidences"
@@ -218,6 +220,12 @@
                 </div>
             </div>
             <div class="info-pane__sidebar">
+              {{#if instance.label}}
+                <div class="info-pane__section">
+                  <div class="info-pane__section-title">Label</div>
+                  <p>{{instance.label}}</p>
+                </div>
+              {{/if}}
               <div class="ggrc-form">
                 <div class="ggrc-form-item">
                   <div class="ggrc-form-item__row">
@@ -256,7 +264,10 @@
                      title-text="Related Assessments">
                   {{> '/static/mustache/assessments/related-assessments.mustache' }}
           </tab-panel>
-          <tab-panel {(panels)}="panels" title-text="Related Issues">
+          <tab-panel {(panels)}="panels"
+                     {cache-content}="true"
+                     {pre-render-content}="true"
+                     title-text="Related Issues">
               <related-issues {base-instance}="instance"
                                     {all-related-snapshots}="mappedSnapshots"></related-issues>
           </tab-panel>

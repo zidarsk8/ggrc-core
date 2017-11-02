@@ -433,6 +433,35 @@ class TestAssessmentImport(TestCase):
     ).first()
     self.assertEqual([assignee_id], [i.id for i in assessment.assessors])
 
+  def test_update_import_verifiers(self):
+    """Test import does not delete verifiers if empty value imported"""
+    slug = "TestAssessment"
+    assessment = factories.AssessmentFactory(slug=slug)
+
+    name = "test_name"
+    email = "test@email.com"
+    verifier = factories.PersonFactory(name=name, email=email)
+    verifier_id = verifier.id
+
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", slug),
+        ("Verifiers", email),
+    ]))
+    assessment = models.Assessment.query.filter(
+        models.Assessment.slug == slug
+    ).first()
+    self.assertEqual([verifier_id], [i.id for i in assessment.verifiers])
+    self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", slug),
+        ("Verifiers", ""),
+    ]))
+    assessment = models.Assessment.query.filter(
+        models.Assessment.slug == slug
+    ).first()
+    self.assertEqual([verifier_id], [i.id for i in assessment.verifiers])
+
   @ddt.data(
       (
           "Last Updated",
@@ -680,3 +709,30 @@ class TestAssessmentExport(TestCase):
     resp = self.export_parsed_csv(data)["Assessment"]
     self.assertEqual(1, len(resp))
     self.assertEqual(slug, resp[0]["Code*"])
+
+  ASSESSMENT_LABELS = [
+      models.Assessment.Labels.AUDITOR_PULLS_EVIDENCE,
+      models.Assessment.Labels.FOLLOWUP,
+      models.Assessment.Labels.NEEDS_REWORK,
+      models.Assessment.Labels.NEEDS_DISCUSSION,
+      None
+  ]
+
+  @ddt.data(*ASSESSMENT_LABELS)
+  def test_export_by_label(self, label):
+    "Test Export Assessment by label"
+    with factories.single_commit():
+      results = {l: factories.AssessmentFactory(label=l).slug
+                 for l in self.ASSESSMENT_LABELS}
+    if label is None:
+      exp = {"left": "label", "op": {"name": "is"}, "right": "empty"}
+    else:
+      exp = {"left": "label", "op": {"name": "="}, "right": label}
+
+    data = [{"object_name": "Assessment",
+             "fields": "all",
+             "filters": {"expression": exp}}]
+
+    resp = self.export_parsed_csv(data)["Assessment"]
+    self.assertEqual(1, len(resp))
+    self.assertEqual(results[label], resp[0]["Code*"])

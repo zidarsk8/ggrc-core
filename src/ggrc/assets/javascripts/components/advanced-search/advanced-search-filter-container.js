@@ -7,6 +7,7 @@ import './advanced-search-filter-attribute';
 import './advanced-search-filter-group';
 import './advanced-search-filter-operator';
 import './advanced-search-filter-state';
+import * as StateUtils from '../../plugins/utils/state-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -31,7 +32,7 @@ import './advanced-search-filter-state';
         Value: can.List,
         get: function (items) {
           if (this.attr('defaultStatusFilter') && items && !items.length &&
-          GGRC.Utils.State.hasFilter(this.attr('modelName'))) {
+            StateUtils.hasFilter(this.attr('modelName'))) {
             items.push(GGRC.Utils.AdvancedSearch.create.state());
           }
           return items;

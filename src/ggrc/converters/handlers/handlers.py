@@ -222,9 +222,10 @@ class UserColumnHandler(ColumnHandler):
     return list(users)
 
   def get_person(self, email):
+    from ggrc.utils import user_generator
     new_objects = self.row_converter.block_converter.converter.new_objects
     if email not in new_objects[Person]:
-      new_objects[Person][email] = Person.query.filter_by(email=email).first()
+      new_objects[Person][email] = user_generator.find_user(email)
     return new_objects[Person].get(email)
 
   def parse_item(self):
@@ -450,7 +451,13 @@ class MappingColumnHandler(ColumnHandler):
                            mapped_type=obj.type,
                            object_type=current_obj.type)
       elif self.unmap and mapping:
-        db.session.delete(mapping)
+        if not (self.mapping_object.__name__ == "Audit" and
+                not getattr(current_obj, "allow_unmap_from_audit", True)):
+          db.session.delete(mapping)
+        else:
+          self.add_warning(errors.UNMAP_AUDIT_RESTRICTION,
+                           mapped_type=obj.type,
+                           object_type=current_obj.type)
     db.session.flush()
     self.dry_run = True
 

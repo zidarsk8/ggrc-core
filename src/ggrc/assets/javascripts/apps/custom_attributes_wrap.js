@@ -1,7 +1,9 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import {getCustomAttributeType} from '../plugins/utils/ca-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -45,13 +47,13 @@
                 label: cad.label,
                 placeholder: cad.placeholder,
                 helptext: cad.helptext,
-                multi_choice_options: cad.multi_choice_options
+                multi_choice_options: cad.multi_choice_options,
               },
-              type: GGRC.Utils.CustomAttributes.getCustomAttributeType(type)
+              type: getCustomAttributeType(type),
             });
           }.bind(this));
         return result;
-      }
+      },
     },
     init: function () {
       if (this.scope.instance.class.is_custom_attributable) {
@@ -62,7 +64,7 @@
     events: {
       '{scope.instance} isReadyForRender': function (sc, ev, isReady) {
         this.scope.setItems(isReady);
-      }
-    }
+      },
+    },
   });
 })(window.can, window.GGRC);

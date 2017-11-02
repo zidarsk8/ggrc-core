@@ -32,7 +32,7 @@
                   {group-id}="groupId"
                   {instance}="instance"
                   {people}="people">
-                  <label class="people-group__title form-label required-label">
+                  <label class="people-group__title people-group__title--deletable form-label required-label">
                     {{title}}
                     {{#if required}}
                       <i class="fa fa-asterisk"></i>
@@ -44,11 +44,20 @@
                     <spinner {toggle}="isUpdating"></spinner>
                   {{else}}
                     {{#if canEdit}}
+                      {{^if_config_exist 'external_services.Person'}}
                       <autocomplete
                           search-items-type="Person"
                           (item-selected)="addPerson(%event.selectedItem, @groupId)"
                           placeholder="Add person">
                       </autocomplete>
+                      {{else}}
+                      <external-data-autocomplete
+                        {type}="'Person'"
+                        {placeholder}="'Add person'"
+                        {min-length}="2"
+                        (item-selected)="addPerson(%event.selectedItem, @groupId)">
+                      </external-data-autocomplete>
+                      {{/if_config_exist}}
                     {{/if}}
                   {{/if}}
                 </div>

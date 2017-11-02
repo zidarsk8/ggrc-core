@@ -2,7 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for Assessment object"""
-
 from sqlalchemy import and_
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import remote
@@ -24,6 +23,7 @@ from ggrc.models.mixins import Timeboxed
 from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import reminderable
 from ggrc.models.mixins import statusable
+from ggrc.models.mixins import labeled
 from ggrc.models.mixins.assignable import Assignable
 from ggrc.models.mixins.autostatuschangeable import AutoStatusChangeable
 from ggrc.models.mixins.validate_on_complete import ValidateOnComplete
@@ -63,7 +63,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
                  Personable, reminderable.Reminderable, Timeboxed, Relatable,
                  WithSimilarityScore, FinishedDate, VerifiedDate,
                  ValidateOnComplete, Notifiable, WithAction, BusinessObject,
-                 Indexed, db.Model):
+                 labeled.Labeled, Indexed, db.Model):
   """Class representing Assessment.
 
   Assessment is an object representing an individual assessment performed on
@@ -79,6 +79,18 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   VALID_STATES = tuple(NOT_DONE_STATES | statusable.Statusable.DONE_STATES)
 
   ASSIGNEE_TYPES = (u"Creator", u"Assessor", u"Verifier")
+
+  class Labels(object):  # pylint: disable=too-few-public-methods
+    """Choices for label enum."""
+    AUDITOR_PULLS_EVIDENCE = u'Auditor pulls evidence'
+    FOLLOWUP = u'Followup'
+    NEEDS_REWORK = u'Needs Rework'
+    NEEDS_DISCUSSION = u'Needs Discussion'
+
+  POSSIBLE_LABELS = [Labels.AUDITOR_PULLS_EVIDENCE,
+                     Labels.FOLLOWUP,
+                     Labels.NEEDS_REWORK,
+                     Labels.NEEDS_DISCUSSION]
 
   REMINDERABLE_HANDLERS = {
       "statusToPerson": {

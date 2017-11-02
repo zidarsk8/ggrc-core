@@ -682,6 +682,12 @@ class CommonWidgetInfo(object):
       By.CSS_SELECTOR, "{} .object-approved".format(WIDGET))
   LINK_SUBMIT_FOR_REVIEW = (By.CSS_SELECTOR,
                             "{} .non-transparent".format(WIDGET))
+  # people section
+  _PEOPLE_ITEM = ".editable-people-group"
+  PEOPLE_HEADERS_AND_VALUES_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM)
+  PEOPLE_HEADER_CSS = (
+      By.CSS_SELECTOR, _PEOPLE_ITEM + " editable-people-group-header")
+  PEOPLE_VALUE_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM + " object-list")
   # user input elements
   BUTTON_3BBS = (By.XPATH, _INFO_WIDGET_XPATH + "//*[@data-toggle='dropdown']")
 
@@ -808,7 +814,7 @@ class WidgetInfoAssessment(WidgetInfoPanel, CommonAssessment):
   _PNL_STATE = ".pane-header__toolbar"
   BUTTON_COMPLETE = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-darkBlue")
   BUTTON_VERIFY = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-green")
-  BUTTON_REJECT = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-red")
+  BUTTON_NEEDS_REWORK = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-red")
   ICON_VERIFIED = (By.CSS_SELECTOR, "i.verified-icon")
 
   class TabContainer(object):

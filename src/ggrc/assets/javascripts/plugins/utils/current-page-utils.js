@@ -259,7 +259,7 @@
     function _getCurrentUser() {
       let userId = GGRC.current_user.id;
 
-      return  CMS.Models.Person.store[userId];
+      return  CMS.Models.Person.findInCacheById(userId);
     }
 
     return {

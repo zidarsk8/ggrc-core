@@ -1,7 +1,12 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import {
+  convertFromCaValue,
+  convertToCaValue,
+} from '../../plugins/utils/ca-utils';
 
 (function (_, can, GGRC) {
   'use strict';
@@ -14,7 +19,7 @@
         value: null,
         type: null,
         options: [],
-        placeholder: 'Please enter the value...'
+        placeholder: 'Please enter the value...',
       },
       value: null,
       valueObj: null,
@@ -25,7 +30,7 @@
           options: this.getOptions(),
           value: this.getValue(),
           type: this.getType(),
-          title: this.getTitle()
+          title: this.getTitle(),
         });
       },
       getOptions: function () {
@@ -40,7 +45,7 @@
         return type;
       },
       getValue: function () {
-        return GGRC.Utils.CustomAttributes.convertFromCaValue(
+        return convertFromCaValue(
           this.attr('type'),
           this.attr('value'),
           this.attr('valueObj')
@@ -48,12 +53,12 @@
       },
       setValue: function (value) {
         this.attr('value',
-          GGRC.Utils.CustomAttributes.convertToCaValue(
+          convertToCaValue(
             value,
             this.attr('type')
           )
         );
-      }
+      },
     },
     events: {
       init: function () {
@@ -61,7 +66,7 @@
       },
       '{scope.input} value': function (scope, ev, val) {
         this.scope.setValue(val);
-      }
-    }
+      },
+    },
   });
 })(window._, window.can, window.GGRC);

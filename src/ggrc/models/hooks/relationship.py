@@ -4,7 +4,8 @@
 """Relationship creation/modification hooks."""
 
 from datetime import datetime
-
+import functools
+import logging
 import itertools
 
 import sqlalchemy as sa
@@ -15,6 +16,9 @@ from ggrc.models import all_models
 from ggrc.models.comment import Commentable
 from ggrc.models.mixins import ChangeTracked
 from ggrc.models import exceptions
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def _handle_del_audit_issue_mapping(audit, issue):
@@ -44,36 +48,99 @@ def _handle_new_audit_issue_mapping(audit, issue):
   issue.context = audit.context
 
 
-def handle_audit_issue_mapping(session, flush_context, instances):
-  """Check and process Audit-Issue mapping rules.
+def _order(src, dst):
+  """Sort parameters by classname and id."""
+  return ((src, dst) if (src.type, src.id) < (dst.type, dst.id) else
+          (dst, src))
 
-  Triggers rule processing functions for creation and deletion of
-  Audit-Issue Relationships.
+
+def _is_audit_issue(src, dst):
+  """Return True if src.type == "Audit" and dst.type == "Issue"."""
+  return ((src.type, dst.type) ==
+          (all_models.Audit.__name__, all_models.Issue.__name__))
+
+
+def from_session(*models, **set_selectors):
+  """Wrap session listener to run only for required models.
+
+  Args:
+    models: list of model classes, only instances of the provided types will
+      be passed to the decorated function;
+    set_selectors: allowed keys are "new", "dirty", "deleted", allowed values
+      are bool, if you pass {"new": True} the matching objects from session.new
+      will be passed to the decorated function.
+  """
+
+  new = set_selectors.get("new", False)
+  dirty = set_selectors.get("dirty", False)
+  deleted = set_selectors.get("deleted", False)
+
+  def decorator(function):
+    """Decorate function as inner."""
+    @functools.wraps(function)
+    def inner(session, flush_context, instances):
+      """Call function with iterator of only needed items from session.
+
+      flush_context and instances are ignored in the common case.
+      """
+      # pylint: disable=unused-argument
+      sets = []
+      if new:
+        sets.append(session.new)
+      if dirty:
+        sets.append(session.dirty)
+      if deleted:
+        sets.append(session.deleted)
+
+      items = (o for o in itertools.chain(*sets) if isinstance(o, models))
+
+      return function(items)
+
+    return inner
+
+  return decorator
+
+
+@from_session(all_models.Relationship, new=True, dirty=True)
+def handle_new_audit_issue_mapping(instances):
+  """Check and process new Audit-Issue mapping rules.
+
+  Triggers rule processing functions for creation of Audit-Issue Relationships.
   """
   # pylint: disable=unused-argument
 
-  def order(src, dst):
-    return ((src, dst) if (src.type, src.id) < (dst.type, dst.id) else
-            (dst, src))
+  for instance in instances:
+    if not instance.source:
+      # TODO: fix actions to make this impossible
+      LOGGER.error(u"Relationship.source is not filled in properly: "
+                   u"id=%r, source_id=%r, source_type=%r, "
+                   u"destination_id=%r, destination_type=%r.",
+                   instance.id, instance.source_id, instance.source_type,
+                   instance.destination_id, instance.destination_type)
+      continue
+    if not instance.destination:
+      # TODO: fix Document imports to make this impossible
+      LOGGER.error(u"Relationship.destination is not filled in properly: "
+                   u"id=%r, source_id=%r, source_type=%r, "
+                   u"destination_id=%r, destination_type=%r.",
+                   instance.id, instance.source_id, instance.source_type,
+                   instance.destination_id, instance.destination_type)
+      continue
+    src, dst = _order(instance.source, instance.destination)
+    if _is_audit_issue(src, dst):
+      _handle_new_audit_issue_mapping(audit=src, issue=dst)
 
-  def is_audit_issue(src, dst):
-    return ((src.type, dst.type) ==
-            (all_models.Audit.__name__, all_models.Issue.__name__))
 
-  for instance in itertools.chain(session.new, session.dirty):
-    if isinstance(instance, all_models.Relationship):
-      if not instance.destination:
-        # TODO: fix Document imports to make this impossible
-        continue
-      src, dst = order(instance.source, instance.destination)
-      if is_audit_issue(src, dst):
-        _handle_new_audit_issue_mapping(audit=src, issue=dst)
+@from_session(all_models.Relationship, deleted=True)
+def handle_del_audit_issue_mapping(instances):
+  """Check and process deleted Audit-Issue mapping rules.
 
-  for instance in session.deleted:
-    if isinstance(instance, all_models.Relationship):
-      src, dst = order(instance.source, instance.destination)
-      if is_audit_issue(src, dst):
-        _handle_del_audit_issue_mapping(audit=src, issue=dst)
+  Triggers rule processing functions for deletion of Audit-Issue Relationships.
+  """
+  for instance in instances:
+    src, dst = _order(instance.source, instance.destination)
+    if _is_audit_issue(src, dst):
+      _handle_del_audit_issue_mapping(audit=src, issue=dst)
 
 
 def related_condition(obj, type_):
@@ -217,7 +284,9 @@ def init_hook():
         other.updated_at = datetime.now()
 
   sa.event.listen(sa.orm.session.Session, "before_flush",
-                  handle_audit_issue_mapping)
+                  handle_new_audit_issue_mapping)
+  sa.event.listen(sa.orm.session.Session, "before_flush",
+                  handle_del_audit_issue_mapping)
 
   @signals.Restful.model_deleted.connect_via(all_models.Relationship)
   def handle_cascade_delete(sender, obj, service):

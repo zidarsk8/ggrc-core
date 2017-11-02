@@ -39,6 +39,18 @@
             </dropdown>
           </assessment-object-type-dropdown>
         </div>
+        <div class="ggrc-form-item__multiple-row">
+          <label class="form-label ggrc-form-item__label">
+            Label
+          </label>
+          <select can-value="label">
+            <option value="" selected="selected">---</option>
+            <option value="Needs Discussion">Needs Discussion</option>
+            <option value="Needs Rework">Needs Rework</option>
+            <option value="Followup">Followup</option>
+            <option value="Auditor pulls evidence">Auditor pulls evidence</option>
+          </select>
+        </div>
       </div>
       <div class="ggrc-form-item">
         <div class="ggrc-form-item__row {{#instance.computed_errors.title}}field-failure{{/instance.computed_errors.title}}">

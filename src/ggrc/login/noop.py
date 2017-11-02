@@ -13,6 +13,7 @@ from flask import url_for, redirect, request, session, g, flash
 default_user_name = 'Example User'
 default_user_email = 'user@example.com'
 
+
 def get_user():
   if 'X-ggrc-user' in request.headers:
     json_user = json.loads(request.headers['X-ggrc-user'])
@@ -24,17 +25,19 @@ def get_user():
     email = default_user_email
     name = default_user_name
     permissions = None
-  from ggrc.login.common import find_or_create_user_by_email
+  from ggrc.utils.user_generator import find_or_create_user_by_email
   user = find_or_create_user_by_email(
-    email=email,
-    name=name)
+      email=email,
+      name=name)
   permissions = session['permissions'] if 'permissions' in session else None
   setattr(g, '_request_permissions', permissions)
   return user
 
+
 def before_request(*args, **kwargs):
   permissions = session['permissions'] if 'permissions' in session else None
   setattr(g, '_request_permissions', permissions)
+
 
 def login():
   from ggrc.login.common import get_next_url
@@ -43,8 +46,10 @@ def login():
     flask_login.login_user(user)
     return redirect(get_next_url(request, default_url=url_for('dashboard')))
   else:
-    flash(u'You do not have access. Please contact your administrator.', 'alert alert-info')
+    flash(u'You do not have access. Please contact your administrator.',
+          'alert alert-info')
     return redirect('/')
+
 
 def logout():
   from ggrc.login.common import get_next_url

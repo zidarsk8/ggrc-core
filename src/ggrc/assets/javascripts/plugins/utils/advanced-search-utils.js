@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as StateUtils from './state-utils';
+
 (function (GGRC, can, _) {
   'use strict';
 
@@ -126,7 +128,7 @@
      * @return {string} - Valid QueryAPI filter string.
      */
     function stateToFilter(state) {
-      return '(' + GGRC.Utils.State.buildStatusFilter(
+      return '(' + StateUtils.buildStatusFilter(
         state.items,
         richOperators[state.operator],
         state.modelName) + ')';
