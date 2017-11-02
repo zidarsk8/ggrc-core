@@ -90,7 +90,7 @@ import '../../components/form/form-validation-icon';
 import '../../components/ca-object/ca-object-value-mapper';
 import '../../components/ca-object/ca-object-modal-content';
 import '../../components/related-objects/related-objects';
-import '../../components/reusable-objects/reusable-objects-list';
+import '../../components/related-objects/related-assessments';
 import '../../components/reusable-objects/reusable-objects-item';
 import '../../components/simple-modal/simple-modal';
 import '../../components/simple-popover/simple-popover';

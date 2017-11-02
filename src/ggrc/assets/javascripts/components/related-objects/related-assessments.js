@@ -16,8 +16,8 @@
     }
   };
 
-  GGRC.Components('reusableObjectsList', {
-    tag: 'reusable-objects-list',
+  GGRC.Components('relatedAssessments', {
+    tag: 'related-assessments',
     viewModel: {
       define: {
         baseInstanceDocuments: {
