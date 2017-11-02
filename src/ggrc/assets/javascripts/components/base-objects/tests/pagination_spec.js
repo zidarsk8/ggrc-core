@@ -69,6 +69,15 @@ describe('GGRC.VM.Pagination', function () {
       result = paginationViewModel.attr('current');
       expect(result).toEqual(1);
     });
+    it('does not update current page when pageSize does not changed',
+    function () {
+      var result;
+      paginationViewModel.attr('count', 3);
+      paginationViewModel.attr('current', 2);
+      paginationViewModel.attr('pageSize', 5); // set the same pageSize value
+      result = paginationViewModel.attr('current');
+      expect(result).toEqual(2);
+    });
   });
   describe('limits property', function () {
     beforeEach(function () {

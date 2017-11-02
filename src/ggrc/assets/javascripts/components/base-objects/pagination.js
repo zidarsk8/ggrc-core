@@ -28,12 +28,12 @@
         type: 'number',
         value: 5,
         set: function (newValue) {
-          if (!this.attr('disabled')) {
+          if (!this.attr('disabled') && newValue != this.pageSize) {
             this.attr('current', 1);
             return newValue;
           }
           return this.pageSize;
-        }
+        },
       },
       pageSizeSelect: {
         value: [5, 10, 15]
