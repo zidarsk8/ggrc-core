@@ -21,10 +21,10 @@ class TestSuggest(TestCase):
     super(TestSuggest, self).setUp()
     self.api = Api()
 
-  @ddt.data(('', ''),
-            ('  ', ''),
-            (' prefix ', 'prefix'),
-            ('prefix', 'prefix'))
+  @ddt.data((' prefix ', ['prefix']),
+            ('prefix', ['prefix']),
+            ('Jhon Snow', ['Jhon', 'Snow']),
+            ('  Jhon   Snow  ', ['Jhon', 'Snow']))
   @ddt.unpack
   @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
   @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
@@ -60,5 +60,21 @@ class TestSuggest(TestCase):
       # pylint: disable=protected-access
       PersonClient._post.assert_called_once_with(
           '/api/persons:suggest',
-          payload={'tokens': [expected], }
+          payload={'tokens': expected, }
       )
+
+  @ddt.data('', '  ')
+  @mock.patch('ggrc.settings.INTEGRATION_SERVICE_URL', new='endpoint')
+  @mock.patch('ggrc.settings.AUTHORIZED_DOMAIN', new='example.com')
+  def test_empty_prefix(self, prefix):
+    """Test suggest for empty prefix."""
+    query = '/people/suggest?prefix={}'.format(prefix)
+    with mock.patch.multiple(
+        PersonClient,
+        _post=mock.MagicMock(return_value={'persons': []})
+    ):
+      response = self.api.client.get(query)
+      self.assert200(response)
+      self.assertEqual(response.json, [])
+      # pylint: disable=protected-access
+      PersonClient._post.assert_not_called()

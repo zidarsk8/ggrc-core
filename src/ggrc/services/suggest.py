@@ -17,10 +17,12 @@ def suggest():
   if not settings.INTEGRATION_SERVICE_URL:
     return make_suggest_result([])
 
-  prefix = request.args.get("prefix", "").strip()
-  person_client = client.PersonClient()
-  entries = person_client.suggest_persons(prefix)
-  return make_suggest_result(entries)
+  tokens = request.args.get("prefix", "").split()
+  if tokens:
+    person_client = client.PersonClient()
+    entries = person_client.suggest_persons(tokens)
+    return make_suggest_result(entries)
+  return make_suggest_result([])
 
 
 def make_suggest_result(entries):
