@@ -12,15 +12,15 @@ describe('GGRC.Components.autocomplete', function () {
     Component = GGRC.Components.get('autocomplete');
   });
 
-  describe('defining default scope values', function () {
-    var scope;
+  describe('defining default viewModel values', function () {
+    var viewModel;
 
     beforeAll(function () {
-      scope = Component.prototype.scope;
+      viewModel = Component.prototype.viewModel;
     });
 
     it('sets the automappingOff flag to true', function () {
-      expect(scope().automappingOff).toBe(true);
+      expect(viewModel.automappingOff).toBe(true);
     });
   });
 
