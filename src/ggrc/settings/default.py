@@ -82,6 +82,8 @@ exports = ['VERSION', 'MAX_INSTANCES']
 # Users with authorized domain will automatically get Creator role.
 AUTHORIZED_DOMAIN = os.environ.get('AUTHORIZED_DOMAIN', "")
 
+ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN', '')
+
 JINJA2 = jinja2.Environment(loader=jinja2.PackageLoader('ggrc', 'templates'))
 EMAIL_DIGEST = JINJA2.get_template("notifications/email_digest.html")
 EMAIL_DAILY = JINJA2.get_template("notifications/view_daily_digest.html")
