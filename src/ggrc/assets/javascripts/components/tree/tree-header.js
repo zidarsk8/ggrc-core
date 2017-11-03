@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../sortable-column/sortable-column';
 import template from './templates/tree-header.mustache';
 import {createSelectedColumnsMap} from '../../plugins/utils/tree-view-utils';
 

@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import './sortable-column';
+import '../sortable-column/sortable-column';
 import {REFRESH_RELATED} from '../../events/eventTypes';
 
 (function (can, GGRC, CMS) {
