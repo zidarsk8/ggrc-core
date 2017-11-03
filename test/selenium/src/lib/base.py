@@ -1006,7 +1006,7 @@ class AbstractTabContainer(Component):
 
   def _get_active_tab_element(self):
     """Return element of active tab"""
-    return self.container_element.find_element(*self._locators.TAB_CONTENT)
+    return self.container_element.find_element(*self._locators.TAB_CONTENT_CSS)
 
   def _tabs(self):
     """Abstract method. Should return dict. {'tab_name': tab_object, ...}"""
@@ -1016,7 +1016,7 @@ class AbstractTabContainer(Component):
   def tab_controller(self):
     """Lazy property for dashboard controller."""
     from lib.element.elements_list import TabController
-    return TabController(self._driver, self._locators.TAB_CONTROLLER)
+    return TabController(self._driver, self._locators.TAB_CONTROLLER_CSS)
 
 
 class AbstractTable(Component):

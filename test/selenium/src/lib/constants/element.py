@@ -459,13 +459,28 @@ class TransformationElements(TransformationSetVisibleFields, CommonAssessment):
   OBJECT_REVIEW = ReviewStates.OBJECT_REVIEW
 
 
-class AssessmentTabContainer(object):
-  """Elements' labels for Assessment Tab Container"""
-  ASMT_TAB = "Assessment"
+class TabContainer(object):
+  """Elements' labels for Common Tab Container."""
+  OBJ_TAB = None
+  CHANGE_LOG_TAB = "Change Log"
+
+
+class AuditTabContainer(TabContainer):
+  """Elements' labels for Audit Tab Container."""
+  OBJ_TAB = "Audit"
+
+
+class AssessmentTabContainer(TabContainer):
+  """Elements' labels for Assessment Tab Container."""
+  OBJ_TAB = "Assessment"
   RELATED_ASMTS_TAB = "Related Assessments"
   RELATED_ISSUES_TAB = "Related Issues"
   OTHER_ATTRS_TAB = "Other Attributes"
-  CHANGE_LOG_TAB = "Change Log"
+
+
+class ControlTabContainer(TabContainer):
+  """Elements' labels for Control Tab Container."""
+  OBJ_TAB = "Control"
 
 
 class AsmtAttrsTab(object):
