@@ -197,7 +197,8 @@ def _all_rules():
       "Assessment": {"Issue"} | {
           StaticSnapshotMappingRule(type_) for type_ in snapshots
       },
-      "Issue": {"Assessment", "Audit"} | {
+      "Issue": {"Assessment", "Audit", "CycleTaskGroupObjectTask", "Issue",
+                "Person", "Program", "Project", "RiskAssessment"} | {
           IssueMappingRule(type_) for type_ in snapshots
       },
   })
