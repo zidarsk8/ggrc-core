@@ -1,29 +1,29 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Component from '../tree-header';
+
 describe('GGRC.Components.treeHeader', function () {
   'use strict';
 
-  var vm;
-  var component;
+  let vm;
 
   function generateColumns(names) {
     return names.map(function (name) {
       return {
-        attr_name: name
-      }
+        attr_name: name,
+      };
     });
   }
 
   beforeEach(function () {
-    vm = GGRC.Components.getViewModel('treeHeader');
-    component = GGRC.Components.get('treeHeader');
+    vm = new (can.Map.extend(Component.prototype.viewModel));
   });
 
   describe('setColumns() method', function () {
-    var method;
+    let method;
     beforeEach(function () {
       method = vm.setColumns.bind(vm);
     });
@@ -35,7 +35,7 @@ describe('GGRC.Components.treeHeader', function () {
         col3: true,
         col4: true,
         col5: false,
-        col6: true
+        col6: true,
       });
 
       spyOn(vm, 'dispatch');
@@ -44,20 +44,20 @@ describe('GGRC.Components.treeHeader', function () {
 
       expect(vm.dispatch).toHaveBeenCalledWith({
         type: 'updateColumns',
-        columns: ['col1', 'col3', 'col4', 'col6']
+        columns: ['col1', 'col3', 'col4', 'col6'],
       });
     });
   });
 
   describe('initializeColumns() method', function () {
-    var method;
+    let method;
     beforeEach(function () {
       method = vm.initializeColumns.bind(vm);
     });
 
     it('dispatches "updateColumns" event with selected columns', function () {
       vm.attr('availableColumns',
-        generateColumns(['col1', 'col2', 'col3', 'col4','col5']));
+        generateColumns(['col1', 'col2', 'col3', 'col4', 'col5']));
       vm.attr('selectedColumns', generateColumns(['col1', 'col3']));
 
       method();
@@ -67,7 +67,7 @@ describe('GGRC.Components.treeHeader', function () {
         col2: false,
         col3: true,
         col4: false,
-        col5: false
+        col5: false,
       });
     });
   });
@@ -94,7 +94,7 @@ describe('GGRC.Components.treeHeader', function () {
     let events;
 
     beforeEach(function () {
-      events = component.prototype.events;
+      events = Component.prototype.events;
     });
 
     describe('"{viewModel.orderBy} change"() event', function () {
