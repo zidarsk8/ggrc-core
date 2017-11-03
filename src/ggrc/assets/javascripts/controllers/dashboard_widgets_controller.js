@@ -49,7 +49,9 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
       var counts = getCounts();
 
       var countsName = this.options.countsName ||
-      this.options.model.shortName;
+        (this.options.content_controller_options &&
+          this.options.content_controller_options.countsName) ||
+        this.options.model.shortName;
 
       if (this.options.objectVersion) {
         countsName = GGRC.Utils.ObjectVersions
