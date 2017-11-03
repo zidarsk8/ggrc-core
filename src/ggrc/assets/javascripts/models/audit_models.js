@@ -82,8 +82,10 @@
     defaults: {
       status: 'Planned',
       issue_tracker: {
-        hotlist_id: '',
-        component_id: '',
+        hotlist_id: '766459',
+        component_id: '188208',
+        issue_severity: 'S2',
+        issue_priority: 'P2',
         enabled: false,
       },
     },
