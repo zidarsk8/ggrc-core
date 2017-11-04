@@ -5,19 +5,25 @@
 
 import '../controls-toolbar/controls-toolbar';
 import '../assessment-local-ca';
-import '../../custom-attributes/custom-attributes';
-import '../../custom-attributes/custom-attributes-field';
-import '../../custom-attributes/custom-attributes-status';
+import '../assessment-custom-attributes';
+import '../assessment-people';
+import '../assessment-object-type-dropdown';
 import '../mapped-objects/mapped-related-information';
 import '../mapped-objects/mapped-comments';
 import '../mapped-objects/mapped-controls';
+import '../../ca-object/ca-object-modal-content';
+import '../../comment/comment-add-form';
+import '../../custom-attributes/custom-attributes';
+import '../../custom-attributes/custom-attributes-field';
+import '../../custom-attributes/custom-attributes-status';
+import '../../prev-next-buttons/prev-next-buttons';
 import '../../inline/inline-form-control';
-import './inline-item';
-import './create-url';
 import '../../object-change-state/object-change-state';
 import '../../related-objects/related-assessments';
 import '../../related-objects/related-issues';
 import '../../tabs/tab-container';
+import './inline-item';
+import './create-url';
 import {
   getCustomAttributes,
   CUSTOM_ATTRIBUTE_TYPE,

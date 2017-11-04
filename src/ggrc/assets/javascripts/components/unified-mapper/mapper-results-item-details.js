@@ -6,7 +6,6 @@
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/deletable-people-group';
-
 import template from './templates/mapper-results-item-details.mustache';
 
 (function (can, GGRC, CMS) {

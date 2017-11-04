@@ -4,6 +4,7 @@
 */
 
 import '../components/add-object-button/add-object-button';
+import '../components/assessment_generator';
 import {
   getCounts,
 } from '../plugins/utils/current-page-utils';

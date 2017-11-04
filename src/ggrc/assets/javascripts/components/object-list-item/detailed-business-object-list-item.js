@@ -9,6 +9,8 @@ import '../people/deletable-people-group';
 import {
   getParentUrl,
 } from '../../plugins/utils/snapshot-utils';
+import '../custom-attributes/custom-attributes-field-view';
+import '../related-objects/related-people-access-control';
 
 (function (can, GGRC) {
   'use strict';
