@@ -844,42 +844,35 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
   db.session.flush()
   # get the personal context for this logged in user
   user = get_current_user()
-  personal_context = _get_or_create_personal_context(user)
-  context = obj.build_object_context(
-      context=personal_context,
-      name='{object_type} Context {timestamp}'.format(
-          object_type=service.model.__name__,
-          timestamp=datetime.now()),
-      description='',
-  )
-  context.modified_by = get_current_user()
-
-  db.session.add(obj)
-  db.session.flush()
-  db.session.add(context)
-  db.session.flush()
-  obj.contexts.append(context)
+  personal_context = user.get_or_create_object_context(context=1)
+  context = obj.get_or_create_object_context(personal_context)
   obj.context = context
 
-  # add a user_roles mapping assigning the user creating the workflow
-  # the WorkflowOwner role in the workflow's context.
-  workflow_owner_role = _find_role('WorkflowOwner')
-  user_role = UserRole(
-      person=user,
-      role=workflow_owner_role,
-      context=context,
-      modified_by=get_current_user(),
-  )
-  db.session.add(models.WorkflowPerson(
-      person=user,
-      workflow=obj,
-      context=context,
-      modified_by=get_current_user(),
-  ))
-  # pass along a temporary attribute for logging the events.
-  user_role._display_related_title = obj.title
-  db.session.add(user_role)
+  db.session.add(personal_context)
+  db.session.add(context)
+  db.session.add(obj)
   db.session.flush()
+
+  if not obj.workflow_people:
+    # add a user_roles mapping assigning the user creating the workflow
+    # the WorkflowOwner role in the workflow's context.
+    workflow_owner_role = _find_role('WorkflowOwner')
+    user_role = UserRole(
+        person=user,
+        role=workflow_owner_role,
+        context=context,
+        modified_by=get_current_user(),
+    )
+    db.session.add(models.WorkflowPerson(
+        person=user,
+        workflow=obj,
+        context=context,
+        modified_by=get_current_user(),
+    ))
+    # pass along a temporary attribute for logging the events.
+    user_role._display_related_title = obj.title
+    db.session.add(user_role)
+    db.session.flush()
 
   # Create the context implication for Workflow roles to default context
   db.session.add(ContextImplication(
