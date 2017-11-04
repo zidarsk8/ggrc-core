@@ -39,9 +39,9 @@ import template from './folder-attachments-list.mustache';
           }
         }
       },
-      title: '@',
-      tooltip: '@',
+      title: null,
       subLabel: '@',
+      tooltip: null,
       instance: null,
       currentFolder: null,
       folderError: null,

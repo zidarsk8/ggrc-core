@@ -54,14 +54,14 @@
                 {{#if_helpers '\
                   #if' instance.archived '\
                   or ^is_allowed' "update" instance context="for"}}
-                    <folder-attachments-list title="Attachment"
+                    <folder-attachments-list {title}="'Attachment'"
                       readonly="true"
                       {instance}="instance"
                       deny-no-folder="true"
                       tooltip="You can upload up to 10 files in a single batch">
                     </folder-attachments-list>
                 {{else}}
-                  <folder-attachments-list title="Attachment"
+                  <folder-attachments-list {title}="'Attachment'"
                     {instance}="instance"
                     deny-no-folder="true"
                     tooltip="You can upload up to 10 files in a single batch">
