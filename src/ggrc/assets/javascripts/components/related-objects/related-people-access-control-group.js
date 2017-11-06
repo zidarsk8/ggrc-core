@@ -18,6 +18,7 @@ import {
           get: function () {
             var instance = this.attr('instance');
             var canEdit = !isSnapshot(instance) &&
+              !instance.attr('archived') &&
               !this.attr('updatableGroupId') &&
               (this.attr('isNewInstance') ||
                 Permission.is_allowed_for('update', instance));
