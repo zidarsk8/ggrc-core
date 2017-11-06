@@ -6,7 +6,8 @@
 import re
 
 from lib import base
-from lib.constants import locator, objects, element, roles, regex, messages
+from lib.constants import (
+    locator, objects, element, roles, regex, messages, cls_name)
 from lib.constants.locator import WidgetInfoAssessment
 from lib.element import widget_info, tab_containers
 from lib.page.modal import update_object
@@ -27,7 +28,7 @@ class InfoWidget(base.Widget):
 
   def __init__(self, driver):
     super(InfoWidget, self).__init__(driver)
-    self.child_cls_name = self.__class__.__name__.lower()
+    self.child_cls_name = self.__class__.__name__
     self.list_all_headers_txt = []
     self.list_all_values_txt = []
     self.info_widget_locator = (
@@ -35,11 +36,6 @@ class InfoWidget(base.Widget):
         self._locators.INFO_PANEL_ELEM)
     self.info_widget_elem = selenium_utils.get_when_visible(
         self._driver, self.info_widget_locator)
-    self.tab_container_elem = self.info_widget_elem.find_element(
-        *self._locators.TAB_CONTAINER_CSS)
-    self.tab_container = self._get_tab_container()
-    self.tab_container.tab_controller.active_tab = (
-        self.tab_container._elements.OBJ_TAB)
     # common for all objects
     self.title_lbl_txt = self.get_title_lbl_txt()
     self.title = base.Element(
@@ -71,9 +67,17 @@ class InfoWidget(base.Widget):
     # for Info Panel
     else:
       self.panel = (
-          SnapshotableInfoPanel(self._driver, self.info_widget_elem)
-          if self.child_cls_name in objects.ALL_SNAPSHOTABLE_OBJS else
+          SnapshotedInfoPanel(self._driver, self.info_widget_elem)
+          if (self.child_cls_name.lower() in objects.ALL_SNAPSHOTABLE_OBJS and
+              self.is_snapshoted_panel) else
           InfoPanel(self._driver, self.info_widget_elem))
+    # for tab controller
+    if not self.is_snapshoted_panel:
+      self.tab_container_elem = self.info_widget_elem.find_element(
+          *self._locators.TAB_CONTAINER_CSS)
+      self.tab_container = self._get_tab_container()
+      self.tab_container.tab_controller.active_tab = (
+          self.tab_container._elements.OBJ_TAB)
     # for overridable methods
     self._extend_list_all_scopes_by_code()
     self._extend_list_all_scopes_by_cas()
@@ -113,19 +117,14 @@ class InfoWidget(base.Widget):
     # pylint: disable=not-an-iterable
     # pylint: disable=invalid-name
     selenium_utils.wait_for_js_to_load(self._driver)
-    if custom_scopes_locator:
-      all_headers_and_values = self.info_widget_elem.find_elements(
-          *custom_scopes_locator)
-    if not custom_scopes_locator and self._locators.HEADERS_AND_VALUES:
-      all_headers_and_values = self.info_widget_elem.find_elements(
-          *self._locators.HEADERS_AND_VALUES)
-    header_and_value = (
-        next((scope.text.splitlines() + [None]
-              if len(scope.text.splitlines()) == 1
-              else scope.text.splitlines()[:2]
-              for scope in all_headers_and_values
-              if header_text in scope.text), [None, None]))
-    return header_and_value
+    all_headers_and_values = self.info_widget_elem.find_elements(
+        *custom_scopes_locator if custom_scopes_locator else
+        self._locators.HEADERS_AND_VALUES)
+    return next((scope.text.splitlines() + [None]
+                 if len(scope.text.splitlines()) == 1
+                 else scope.text.splitlines()[:2]
+                 for scope in all_headers_and_values
+                 if header_text in scope.text), [None, None])
 
   def get_header_and_value_txt_from_people_scopes(self, header_text):
     """Get with controlling header and value text from people's scopes elements
@@ -273,9 +272,10 @@ class InfoWidget(base.Widget):
         self.review_state_lbl.text, self.review_state_txt)
 
   def _get_tab_container(self):
-    """Get Tab Container abstractly."""
-    # pylint: disable=no-self-use
-    return
+    """Get Tab Controller and return it."""
+    return getattr(tab_containers,
+                   self.child_cls_name + cls_name.TAB_CONTAINER)(
+        self._driver, self.tab_container_elem)
 
 
 class InfoPanel(object):
@@ -297,8 +297,8 @@ class InfoPanel(object):
     return self.info_widget_elem.find_element(*self._locators.BUTTON_CLOSE)
 
 
-class SnapshotableInfoPanel(InfoPanel):
-  """Class for Info Panels of snapshotable objects."""
+class SnapshotedInfoPanel(InfoPanel):
+  """Class for Info Panels of shapshoted objects."""
   # pylint: disable=too-few-public-methods
   _locators = locator.WidgetSnapshotsInfoPanel
   dropdown_settings_cls = widget_info.Snapshots
@@ -388,11 +388,6 @@ class Audits(InfoWidget):
     self._extend_list_all_scopes(
         self.audit_captain_lbl_txt, self.audit_captain_txt)
 
-  def _get_tab_container(self):
-    """Get Tab Controller and return it."""
-    return tab_containers.AuditTabContainer(
-        self._driver, self.tab_container_elem)
-
   def _extend_list_all_scopes_by_review_state(self):
     """Extend attributes related to 'review state' abstractly.
     """
@@ -439,11 +434,6 @@ class Assessments(InfoWidget):
         [self.is_verified, self.creators_txt, self.assignees_txt,
          self.verifiers_txt, self.mapped_objects_titles_txt,
          self.comments_scopes_txt])
-
-  def _get_tab_container(self):
-    """Get Tab Controller and return it."""
-    return tab_containers.AssessmentTabContainer(
-        self._driver, self.tab_container_elem)
 
   def get_title_lbl_txt(self):
     """Get title's label element from Assessment's Info Widget."""
@@ -624,11 +614,6 @@ class Controls(InfoWidget):
     self._extend_list_all_scopes(
         [self.admin_text, self.primary_contact_text],
         [self.admin_entered_text, self.primary_contact_entered_text])
-
-  def _get_tab_container(self):
-    """Get Tab Controller and return it."""
-    return tab_containers.ControlTabContainer(
-        self._driver, self.tab_container_elem)
 
 
 class Objectives(InfoWidget):

@@ -581,6 +581,15 @@ class Widget(AbstractPage):
         is_info_page = True
     return is_info_page
 
+  @property
+  def is_snapshoted_panel(self):
+    """Check is the current page is Info Panel of snapshoted object."""
+    return (not self.is_info_page and
+            (self.source_obj_from_url in (objects.AUDITS, objects.ASSESSMENTS,
+                                          objects.ISSUES)) and
+            (objects.get_plural(self.widget_name_from_url.lower())
+             in objects.ALL_SNAPSHOTABLE_OBJS))
+
 
 class TreeView(Component):
   """Common class for representing Tree View list with several objects."""

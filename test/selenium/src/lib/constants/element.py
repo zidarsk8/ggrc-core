@@ -483,6 +483,26 @@ class ControlTabContainer(TabContainer):
   OBJ_TAB = "Control"
 
 
+class OrgGroupTabContainer(TabContainer):
+  """Elements' labels for OrgGroup Tab Container."""
+  OBJ_TAB = "OrgGroup"
+
+
+class ProgramTabContainer(TabContainer):
+  """Elements' labels for Program Tab Container."""
+  OBJ_TAB = "Program"
+
+
+class RiskTabContainer(TabContainer):
+  """Elements' labels for Risk Tab Container."""
+  OBJ_TAB = "Risk"
+
+
+class IssueTabContainer(TabContainer):
+  """Elements' labels for Issue Tab Container."""
+  OBJ_TAB = "Issue"
+
+
 class AsmtAttrsTab(object):
   """Common elements' labels of Assessment Attributes Tab on Assessment Info
   Widget."""

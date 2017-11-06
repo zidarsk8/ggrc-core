@@ -77,13 +77,13 @@ class TabContainer(base.AbstractTabContainer):
     return [check_log_item(el) for el in log_list]
 
 
-class AuditTabContainer(TabContainer):
-  """Class of TabContainer for Assessment Info Widget."""
+class AuditsTabContainer(TabContainer):
+  """Class of TabContainer for Audits."""
   _elements = element.AuditTabContainer
 
 
-class AssessmentTabContainer(TabContainer):
-  """Class of TabContainer for Assessment Info Widget."""
+class AssessmentsTabContainer(TabContainer):
+  """Class of TabContainer for Assessments."""
   _elements = element.AssessmentTabContainer
 
   def _tabs(self):
@@ -95,9 +95,29 @@ class AssessmentTabContainer(TabContainer):
         self._elements.CHANGE_LOG_TAB: self._log_tab_validate}
 
 
-class ControlTabContainer(TabContainer):
-  """Class of TabContainer for Control Info Widget."""
+class ControlsTabContainer(TabContainer):
+  """Class of TabContainer for Controls."""
   _elements = element.ControlTabContainer
+
+
+class OrgGroupsTabContainer(TabContainer):
+  """Class of TabContainer for OrgGroups."""
+  _elements = element.OrgGroupTabContainer
+
+
+class ProgramsTabContainer(TabContainer):
+  """Class of TabContainer for Programs."""
+  _elements = element.ProgramTabContainer
+
+
+class RisksTabContainer(TabContainer):
+  """Class of TabContainer for Risks."""
+  _elements = element.RiskTabContainer
+
+
+class IssuesTabContainer(TabContainer):
+  """Class of TabContainer for Issues."""
+  _elements = element.IssueTabContainer
 
 
 class DashboardWidget(base.AbstractTabContainer):
