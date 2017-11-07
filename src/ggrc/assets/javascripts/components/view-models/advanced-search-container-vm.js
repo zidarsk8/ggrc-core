@@ -8,7 +8,7 @@
  * Contains logic used in container components.
  * @constructor
  */
-export default can.Map.extend('GGRC.VM.AdvancedSearchContainer', {
+export default can.Map.extend({
   /**
    * Contains Advanced Search Items.
    * @type {can.List}
