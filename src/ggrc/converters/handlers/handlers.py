@@ -459,7 +459,6 @@ class MappingColumnHandler(ColumnHandler):
           self.add_warning(errors.UNMAP_AUDIT_RESTRICTION,
                            mapped_type=obj.type,
                            object_type=current_obj.type)
-    db.session.flush()
     self.dry_run = True
 
   def get_value(self):
