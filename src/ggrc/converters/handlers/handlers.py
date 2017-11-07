@@ -432,7 +432,7 @@ class MappingColumnHandler(ColumnHandler):
 
   def insert_object(self):
     """ Create a new mapping object """
-    if self.dry_run or not self.value:
+    if self.dry_run or not self.value or self.row_converter.ignore:
       return
     current_obj = self.row_converter.obj
     relationships = []
