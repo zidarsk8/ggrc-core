@@ -5,9 +5,7 @@
 
 import ModalsController from './modals_controller';
 
-(function(can, $) {
-
-ModalsController("GGRC.Controllers.Delete", {
+export default ModalsController("GGRC.Controllers.Delete", {
     defaults: {
         skip_refresh: true
     }
@@ -54,5 +52,3 @@ ModalsController("GGRC.Controllers.Delete", {
   }
 
 });
-
-})(window.can, window.can.$);

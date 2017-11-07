@@ -5,9 +5,7 @@
 
 import ModalsController from './modals_controller';
 
-(function(can, $) {
-
-ModalsController("GGRC.Controllers.Unmap", {
+export default ModalsController("GGRC.Controllers.Unmap", {
     defaults: {
         skip_refresh: true
     }
@@ -21,5 +19,3 @@ ModalsController("GGRC.Controllers.Unmap", {
   }
 
 });
-
-})(window.can, window.can.$);

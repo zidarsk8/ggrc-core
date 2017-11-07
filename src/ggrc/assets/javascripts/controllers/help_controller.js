@@ -5,9 +5,7 @@
 
 import ModalsController from './modals_controller';
 
-(function(can, $) {
-
-ModalsController("GGRC.Controllers.Help", {
+export default ModalsController("GGRC.Controllers.Help", {
   defaults : {
     content_view : GGRC.mustache_path + "/help/help_modal_content.mustache"
     , header_view : GGRC.mustache_path + "/help/help_modal_header.mustache"
@@ -40,5 +38,3 @@ ModalsController("GGRC.Controllers.Help", {
     return {slug : this.options.slug};
   }
 });
-
-})(window.can, window.can.$);
