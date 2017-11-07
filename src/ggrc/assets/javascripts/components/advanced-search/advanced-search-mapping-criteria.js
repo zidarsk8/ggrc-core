@@ -4,6 +4,7 @@
  */
 
 import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
+import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -30,7 +31,7 @@ import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
         set: function (criteria) {
           if (!criteria.filter) {
             criteria.attr('filter',
-              GGRC.Utils.AdvancedSearch.create.attribute());
+              AdvancedSearch.create.attribute());
           }
           return criteria;
         }
@@ -159,7 +160,7 @@ import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
      */
     addRelevant: function () {
       this.attr('criteria.mappedTo',
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria());
+        AdvancedSearch.create.mappingCriteria());
     },
     /**
      * Removes the child Mapping Criteria.
@@ -172,10 +173,10 @@ import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
      */
     relevantToGroup: function () {
       this.attr('criteria.mappedTo',
-        GGRC.Utils.AdvancedSearch.create.group([
+        AdvancedSearch.create.group([
           this.attr('criteria.mappedTo'),
-          GGRC.Utils.AdvancedSearch.create.operator('AND'),
-          GGRC.Utils.AdvancedSearch.create.mappingCriteria()
+          AdvancedSearch.create.operator('AND'),
+          AdvancedSearch.create.mappingCriteria()
         ]));
     }
   });

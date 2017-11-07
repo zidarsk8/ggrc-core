@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -25,8 +27,8 @@
      */
     addFilterCriterion: function () {
       var items = this.attr('items');
-      items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
-      items.push(GGRC.Utils.AdvancedSearch.create.attribute());
+      items.push(AdvancedSearch.create.operator('AND'));
+      items.push(AdvancedSearch.create.attribute());
     }
   });
 

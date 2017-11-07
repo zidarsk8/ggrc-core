@@ -5,6 +5,7 @@
 
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
+import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -23,7 +24,7 @@ import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
       modelDisplayName: null,
       filterItems: [],
       mappingItems: [],
-      statusItem: GGRC.Utils.AdvancedSearch.create.state(),
+      statusItem: AdvancedSearch.create.state(),
       relevantTo: [],
       availableAttributes: function () {
         var available = getColumnsForModel(
@@ -36,16 +37,16 @@ import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
       addFilterAttribute: function () {
         var items = this.attr('filterItems');
         if (items.length) {
-          items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
+          items.push(AdvancedSearch.create.operator('AND'));
         }
-        items.push(GGRC.Utils.AdvancedSearch.create.attribute());
+        items.push(AdvancedSearch.create.attribute());
       },
       addMappingFilter: function () {
         var items = this.attr('mappingItems');
         if (items.length) {
-          items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
+          items.push(AdvancedSearch.create.operator('AND'));
         }
-        items.push(GGRC.Utils.AdvancedSearch.create.mappingCriteria());
+        items.push(AdvancedSearch.create.mappingCriteria());
       },
       resetFilters: function () {
         this.attr('filterItems', []);

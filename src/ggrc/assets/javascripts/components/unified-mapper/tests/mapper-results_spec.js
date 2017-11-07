@@ -5,6 +5,7 @@
 
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 
 describe('GGRC.Components.mapperResults', function () {
   'use strict';
@@ -332,26 +333,26 @@ describe('GGRC.Components.mapperResults', function () {
 
       spyOn(GGRC.Utils.QueryAPI, 'buildParam')
         .and.returnValue({});
-      spyOn(GGRC.Utils.AdvancedSearch, 'buildFilter');
+      spyOn(AdvancedSearch, 'buildFilter');
       spyOn(GGRC.query_parser, 'parse');
       spyOn(GGRC.query_parser, 'join_queries');
     });
 
     it('builds advanced filters', function () {
       viewModel.getQuery('values', true);
-      expect(GGRC.Utils.AdvancedSearch.buildFilter.calls.argsFor(0)[0].attr())
+      expect(AdvancedSearch.buildFilter.calls.argsFor(0)[0].attr())
         .toEqual(mockFilterItems);
     });
 
     it('builds advanced mappings', function () {
       viewModel.getQuery('values', true);
-      expect(GGRC.Utils.AdvancedSearch.buildFilter.calls.argsFor(1)[0].attr())
+      expect(AdvancedSearch.buildFilter.calls.argsFor(1)[0].attr())
         .toEqual(mockMappingItems);
     });
 
     it('builds advanced status', function () {
       viewModel.getQuery('values', true);
-      expect(GGRC.Utils.AdvancedSearch.buildFilter.calls.argsFor(2)[0][0])
+      expect(AdvancedSearch.buildFilter.calls.argsFor(2)[0][0])
         .toEqual(mockStatusItem);
     });
 
@@ -359,7 +360,7 @@ describe('GGRC.Components.mapperResults', function () {
     function () {
       viewModel.attr('statusItem', {});
       viewModel.getQuery('values', true);
-      expect(GGRC.Utils.AdvancedSearch.buildFilter.calls.count()).toBe(2);
+      expect(AdvancedSearch.buildFilter.calls.count()).toBe(2);
     });
 
     it('adds paging to query if addPaging is true', function () {

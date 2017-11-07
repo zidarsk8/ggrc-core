@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+
 describe('GGRC.Components.advancedSearchMappingGroup', function () {
   'use strict';
 
@@ -16,7 +18,7 @@ describe('GGRC.Components.advancedSearchMappingGroup', function () {
     it('adds operator and criteria', function () {
       var items;
       viewModel.attr('items',
-        [GGRC.Utils.AdvancedSearch.create.mappingCriteria()]);
+        [AdvancedSearch.create.mappingCriteria()]);
       viewModel.addMappingCriteria();
 
       items = viewModel.attr('items');

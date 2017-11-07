@@ -13,6 +13,7 @@ import {
   transformQuery,
   toObject,
 } from '../../plugins/utils/snapshot-utils';
+import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 
 const DEFAULT_PAGE_SIZE = 5;
 
@@ -167,17 +168,17 @@ export default GGRC.Components('mapperResults', {
       var request = [];
       var status;
       var filters = GGRC.query_parser.parse(
-        GGRC.Utils.AdvancedSearch.buildFilter(this.attr('filterItems'),
+        AdvancedSearch.buildFilter(this.attr('filterItems'),
         request));
       var mappings = GGRC.query_parser.parse(
-        GGRC.Utils.AdvancedSearch.buildFilter(this.attr('mappingItems'),
+        AdvancedSearch.buildFilter(this.attr('mappingItems'),
         request));
       var advancedFilters = GGRC.query_parser.join_queries(filters, mappings);
 
       // the edge case caused by stateless objects
       if (this.attr('statusItem.value.items')) {
         status = GGRC.query_parser.parse(
-          GGRC.Utils.AdvancedSearch.buildFilter([this.attr('statusItem')],
+          AdvancedSearch.buildFilter([this.attr('statusItem')],
           request));
         advancedFilters = GGRC.query_parser
           .join_queries(advancedFilters, status);
