@@ -29,9 +29,8 @@ import '../components/gca-controls/gca-controls';
 import '../components/datepicker/datepicker';
 import '../components/external-data-autocomplete/inline-autocomplete-wrapper';
 
-
-
-export default can.Control('GGRC.Controllers.Modals', {
+export default can.Control({
+  pluginName: 'ggrc_controllers_modals',
   BUTTON_VIEW_DONE: GGRC.mustache_path + '/modals/done_buttons.mustache',
   BUTTON_VIEW_CLOSE: GGRC.mustache_path + '/modals/close_buttons.mustache',
   BUTTON_VIEW_SAVE_CANCEL:
