@@ -757,12 +757,6 @@ class Resource(ModelView):
       raise BadRequest('Required attribute "{0}" not found'.format(
           root_attribute))
 
-    # Adds storage for shared data which is needed across
-    # multiple handlers or/and listeners.
-    # TODO(anushovan): consider implementing a class to hold request
-    #   related info instead of extending input dictionary.
-    src['__stash'] = {}
-
     with benchmark("Deserialize object"):
       self.json_update(obj, src)
     obj.modified_by_id = get_current_user_id()
@@ -787,6 +781,10 @@ class Resource(ModelView):
     with benchmark("Update memcache before commit for collection PUT"):
       update_memcache_before_commit(
           self.request, modified_objects, CACHE_EXPIRY_COLLECTION)
+    with benchmark("Send PUT - before commit event"):
+      signals.Restful.model_put_before_commit.send(
+          obj.__class__, obj=obj, src=src, service=self, event=event,
+          initial_state=initial_state)
     with benchmark("Commit"):
       db.session.commit()
     with benchmark("Query for object"):

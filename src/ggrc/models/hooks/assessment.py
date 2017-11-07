@@ -8,7 +8,7 @@
   new relationships and custom attributes
 """
 import collections
-import copy
+import datetime
 import itertools
 import logging
 import urlparse
@@ -37,7 +37,7 @@ _ISSUE_URL_TMPL = settings.ISSUE_TRACKER_BUG_URL_TMPL or 'http://issue/%s'
 
 _ISSUE_TRACKER_ENABLED = bool(settings.ISSUE_TRACKER_ENABLED)
 if not _ISSUE_TRACKER_ENABLED:
-  logger.debug('Issue Tracker integration is disabled.')
+  logger.debug('IssueTracker integration is disabled.')
 
 _ASSESSMENT_MODEL_NAME = 'Assessment'
 _ASSESSMENT_TMPL_MODEL_NAME = 'AssessmentTemplate'
@@ -48,10 +48,6 @@ _ISSUE_TRACKER_UPDATE_FIELDS = (
     ('issue_priority', 'priority'),
     ('issue_severity', 'severity'),
     ('component_id', 'component_id'),
-
-    # just to track assessment's assignment at first time, tracking further
-    # updates is not required.
-    ('assignee', 'assignee'),
 )
 
 _STATUS_CHANGE_COMMENT_TMPL = (
@@ -82,37 +78,48 @@ _VERIFIER_STATUSES = {
 }
 
 
-@signals.Restful.model_put.connect_via(all_models.Assessment)
-def handle_assessment_put(sender, obj=None, src=None, service=None):
+@signals.Restful.model_put_before_commit.connect_via(all_models.Assessment)
+def handle_assessment_put_before_commit(sender, obj=None, src=None, **kwargs):
   """Handles assessment update event."""
-  del sender, service  # Unused
-
-  issue_tracker_info = src.get('issue_tracker')
-  if issue_tracker_info:
-    # Preserve initial state of issue tracker info.
-    src['__stash']['issue_tracker'] = copy.deepcopy(obj.issue_tracker)
-    _update_issuetracker_info(obj, issue_tracker_info)
-
-
-@signals.Restful.model_put_after_commit.connect_via(all_models.Assessment)
-def handle_assessment_put_after_commit(sender, obj=None, src=None, **kwargs):
-  """Handles assessment post update event."""
   del sender  # Unused
 
-  initial_state = kwargs.pop('initial_state', None)
   issue_tracker_info = obj.issue_tracker
-  if (issue_tracker_info.get('enabled') and
-          issue_tracker_info.get('issue_id')):
+  issue_tracker_info.update(src.get('issue_tracker') or {})
+
+  issue_id = issue_tracker_info.get('issue_id')
+  if (issue_tracker_info.get('enabled') and issue_id):
+    initial_state = kwargs.pop('initial_state', None)
+
+    issue_obj = all_models.IssuetrackerIssue.get_issue(
+        _ASSESSMENT_MODEL_NAME, obj.id)
+    if issue_obj and issue_obj.assignee is None:
+      # This might only happen if updating issue failed during
+      # creating of relationships. Here we need re-try to collect related
+      # persons and update issue accordingly.
+      assignee_email, cc_list = _collect_issue_emails(obj)
+      issue_params = {
+          'status': 'ASSIGNED',
+          'assignee': assignee_email,
+          'verifier': assignee_email,
+          'ccs': cc_list,
+      }
+    else:
+      issue_params = None
+
     try:
-      _update_issuetracker_issue(obj, issue_tracker_info, initial_state, src)
+      _update_issuetracker_issue(
+          obj, issue_tracker_info, initial_state, src,
+          issue_params=issue_params)
     except integrations_errors.Error as error:
-      logger.error('Unable update Issue Tracker issue: %s', error)
-      # Dirty hack to rollback change to issuetracker_issues model.
-      # Reverted info doesn't get sent to frontend so page refresh is
-      # required but the hack at least allows to keep data in sync.
-      initial_issue_tracker_info = src['__stash'].get('issue_tracker')
-      if initial_issue_tracker_info:
-        _update_issuetracker_info(obj, initial_issue_tracker_info)
+      logger.error(
+          'Unable update IssueTracker issue ID=%s '
+          'while updating assessment ID=%d: %s', issue_id, obj.id, error)
+      issue_tracker_info['enabled'] = False
+      issue_tracker_info['last_warning'] = 'Unable update IssueTracker issue.'
+  else:
+    issue_tracker_info['enabled'] = False
+
+  _update_issuetracker_info(obj, issue_tracker_info)
 
 
 @signals.Restful.model_deleted.connect_via(all_models.Assessment)
@@ -135,9 +142,10 @@ def handle_assessment_deleted(sender, obj=None, service=None):
       try:
         issues.Client().update_issue(issue_obj.issue_id, issue_params)
       except integrations_errors.Error as error:
-        logger.error('Unable to update Issue tracker: %s', error)
-        raise exceptions.InternalServerError(
-            'Unable update Issue Tracker issue.')
+        logger.error(
+            'Unable to update IssueTracker issue ID=%s while '
+            'deleting assessment ID=%d: %s',
+            issue_obj.issue_id, obj.id, error)
     db.session.delete(issue_obj)
 
 
@@ -171,27 +179,8 @@ def handle_relation_post(sender, objects=None, sources=None, service=None):
             issue_obj.assignee is not None):
       continue
 
-    assignee_email, cc_list = _collect_issue_emails(assessment)
-    issue_tracker_info = issue_obj.to_dict(include_issue=True)
-    issue_tracker_info['status'] = 'ASSIGNED'
-    issue_tracker_info['assignee'] = assignee_email
-    issue_tracker_info['cc_list'] = cc_list
-    issue_id = issue_tracker_info.get('issue_id')
-    if issue_id:
-      issue_params = {
-          'status': 'ASSIGNED',
-          'assignee': assignee_email,
-          'verifier': assignee_email,
-          'ccs': cc_list,
-      }
-      try:
-        issues.Client().update_issue(issue_id, issue_params)
-      except integrations_errors.Error as error:
-        logger.error('Unable to update Issue tracker: %s', error)
-        raise exceptions.InternalServerError(
-            'Unable update Issue Tracker issue.')
-
-    _update_issuetracker_info(assessment, issue_tracker_info)
+    _update_issuetracker_info(
+        assessment, _assign_issuetracker_issue(issue_obj, assessment))
 
 
 @signals.Restful.collection_posted.connect_via(all_models.AssessmentTemplate)
@@ -551,12 +540,18 @@ def _create_issuetracker_info(assessment, issue_tracker_info):
     try:
       issue_id = _create_issuetracker_issue(assessment, issue_tracker_info)
     except integrations_errors.Error as error:
-      logger.error('Unable create Issue Tracker issue: %s', error)
-      raise exceptions.InternalServerError(
-          'Unable create Issue Tracker issue.')
+      logger.error(
+          'Unable create IssueTracker issue '
+          'while creating assessment ID=%d: %s', assessment.id, error)
+      issue_tracker_info['enabled'] = False
+      issue_tracker_info['last_warning'] = 'Unable create IssueTracker issue.'
+      issue_tracker_info['last_warning_at'] = datetime.datetime.now()
+    else:
+      issue_tracker_info['last_warning'] = None
+      issue_tracker_info['last_warning_at'] = None
 
-    issue_tracker_info['issue_id'] = issue_id
-    issue_tracker_info['issue_url'] = _ISSUE_URL_TMPL % issue_id
+      issue_tracker_info['issue_id'] = issue_id
+      issue_tracker_info['issue_url'] = _ISSUE_URL_TMPL % issue_id
   else:
     issue_tracker_info = {
         'enabled': False,
@@ -592,12 +587,47 @@ def _build_status_comment(assessment, initial_assessment):
         initial_assessment.status, status_text)
 
 
+def _assign_issuetracker_issue(issue_obj, assessment):
+  assignee_email, cc_list = _collect_issue_emails(assessment)
+  issue_tracker_info = issue_obj.to_dict(include_issue=True)
+  issue_id = issue_tracker_info.get('issue_id')
+
+  if not issue_id:
+    issue_tracker_info['enabled'] = False
+    return issue_tracker_info
+
+  issue_params = {
+      'status': 'ASSIGNED',
+      'assignee': assignee_email,
+      'verifier': assignee_email,
+      'ccs': cc_list,
+  }
+
+  try:
+    issues.Client().update_issue(issue_id, issue_params)
+  except integrations_errors.Error as error:
+    logger.error(
+        'Unable to update IssueTracker issue ID=%s '
+        'while creating relationship for assessment ID=%d: %s',
+        issue_id, assessment.id, error)
+    issue_tracker_info['enabled'] = False
+    issue_tracker_info['last_warning'] = (
+        'Unable to update IssueTracker issue '
+        'while creating relationship.')
+  else:
+    issue_tracker_info['status'] = 'ASSIGNED'
+    issue_tracker_info['assignee'] = assignee_email
+    issue_tracker_info['cc_list'] = cc_list
+
+  return issue_tracker_info
+
+
 def _update_issuetracker_issue(assessment, issue_tracker_info,
-                               initial_assessment, request):
+                               initial_assessment, request, issue_params=None):
   """Collects information and sends a request to update external issue."""
-  issue_params = {}
+  issue_params = issue_params or {}
   # Handle updates to basic issue tracker properties.
-  initial_info = request['__stash'].get('issue_tracker') or {}
+  initial_info = assessment.issue_tracker
   for name, api_name in _ISSUE_TRACKER_UPDATE_FIELDS:
     value = issue_tracker_info.get(name)
     if value != initial_info.get(name):
@@ -638,11 +668,15 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,
 
 def _update_issuetracker_info(assessment, issue_tracker_info):
   """Updates an entry for IssueTracker model."""
-  if not (bool(issue_tracker_info.get('enabled')) and
-          _is_issue_tracker_enabled(audit=assessment.audit)):
-    issue_tracker_info = {
-        'enabled': False,
-    }
+  if not _is_issue_tracker_enabled(audit=assessment.audit):
+    issue_tracker_info['enabled'] = False
+
+  if issue_tracker_info.get('last_warning'):
+    if not issue_tracker_info.get('last_warning_at'):
+      issue_tracker_info['last_warning_at'] = datetime.datetime.now()
+  else:
+    issue_tracker_info['last_warning'] = None
+    issue_tracker_info['last_warning_at'] = None
 
   all_models.IssuetrackerIssue.create_or_update_from_dict(
       _ASSESSMENT_MODEL_NAME, assessment.id, issue_tracker_info)
