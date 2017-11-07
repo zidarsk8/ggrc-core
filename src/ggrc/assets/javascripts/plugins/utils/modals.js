@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import ModalsController from '../../controllers/modals_controller';
+
 /**
  * Utils methods for showing standart modals
  */
@@ -13,7 +15,7 @@ GGRC.Utils.Modals = (function () {
    * warning popup, then are called a success callback else - a fail callback.
    *
    * For showing the popup, by default, are used a
-   * GGRC.Controllers.Modals.confirm method which controls user actions.
+   * ModalsController.confirm method which controls user actions.
    *
    * Also the user can set own controller by setting controller field in
    * extra param.
@@ -24,7 +26,7 @@ GGRC.Utils.Modals = (function () {
    * logic for confirmation you should explore _setupWarning method and use
    * own templates appropriate to its logic.
    * Be careful with confirmOperationName field - remember that standart
-   * GGRC.Controllers.Modals.confirm uses confirmOperationName='confirm'
+   * ModalsController.confirm uses confirmOperationName='confirm'
    * If you sets another value (for example, 'delete'), confirm button will
    * not be able to call success callback. If you want to set it then change
    * a controller with help extra param
@@ -66,7 +68,7 @@ GGRC.Utils.Modals = (function () {
 
     extra = extra || {};
 
-    confirmController = extra.controller || GGRC.Controllers.Modals.confirm;
+    confirmController = extra.controller || ModalsController.confirm;
     confirm = confirmController(confirmOptions, success, fail);
 
     _setupWarning(confirm, confirmOptions);

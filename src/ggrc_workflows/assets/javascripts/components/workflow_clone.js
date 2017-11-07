@@ -1,7 +1,9 @@
-  /*!
+/*!
   Copyright (C) 2017 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
+
+import ModalsController from '../../../../ggrc/assets/javascripts/controllers/modals_controller';
 
 (function (GGRC, can) {
   'use strict';
@@ -21,7 +23,7 @@
           instance: new CMS.ModelHelpers.CloneWorkflow({ source_workflow: this.scope.workflow }),
           content_view: GGRC.mustache_path + "/workflows/clone_modal_content.mustache",
           custom_save_button_text: "Proceed",
-          button_view: GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL
+          button_view: ModalsController.BUTTON_VIEW_SAVE_CANCEL
         });
       }
     }

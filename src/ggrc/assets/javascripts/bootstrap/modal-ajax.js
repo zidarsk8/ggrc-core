@@ -4,6 +4,7 @@
 */
 
 import Spinner from 'spin.js';
+import ModalsController from '../controllers/modals_controller';
 
 (function (can, $, GGRC, Permission) {
   'use strict';
@@ -180,7 +181,7 @@ import Spinner from 'spin.js';
         .ggrc_controllers_modals({
           new_object_form: !$trigger.attr('data-object-id'),
           object_params: objectParams,
-          button_view: GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL_DELETE,
+          button_view: ModalsController.BUTTON_VIEW_SAVE_CANCEL_DELETE,
           model: model,
           oldData: {
             status: instance && instance.status // status before changing

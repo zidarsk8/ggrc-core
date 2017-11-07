@@ -4,6 +4,7 @@
 */
 
 import '../../inline/base-inline-control-title';
+import ModalsController from '../../../controllers/modals_controller';
 
 (function (can) {
   'use strict';
@@ -30,7 +31,7 @@ import '../../inline/base-inline-control-title';
       showConfirm: function () {
         var self = this;
         var confirmation = can.Deferred();
-        GGRC.Controllers.Modals.confirm({
+        ModalsController.confirm({
           modal_title: 'Confirm moving Assessment to "In Progress"',
           modal_description: 'You are about to move Assessment from "' +
             this.instance.status +

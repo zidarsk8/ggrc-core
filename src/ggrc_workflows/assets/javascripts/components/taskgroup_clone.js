@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import ModalsController from '../../../../ggrc/assets/javascripts/controllers/modals_controller';
+
 (function (GGRC, can) {
   'use strict';
 
@@ -21,7 +23,7 @@
           instance: new CMS.ModelHelpers.CloneTaskGroup({ source_task_group: this.scope.taskGroup }),
           content_view: GGRC.mustache_path + "/task_groups/clone_modal_content.mustache",
           custom_save_button_text: "Proceed",
-          button_view: GGRC.Controllers.Modals.BUTTON_VIEW_SAVE_CANCEL
+          button_view: ModalsController.BUTTON_VIEW_SAVE_CANCEL
         });
       }
     }

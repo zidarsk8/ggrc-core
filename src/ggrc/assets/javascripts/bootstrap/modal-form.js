@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import ModalsController from '../controllers/modals_controller';
+
 (function ($) {
   'use strict';
 
@@ -189,7 +191,7 @@
         }
         if (this.is_form_dirty() || changedInstance || hasPending) {
           // Confirm that the user wants to lose the data prior to hiding
-          GGRC.Controllers.Modals.confirm({
+          ModalsController.confirm({
             modal_title: 'Discard Changes',
             modal_description: 'Are you sure that you want' +
             ' to discard your changes?',

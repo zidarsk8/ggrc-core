@@ -3,6 +3,8 @@
    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import ModalsController from '../../../controllers/modals_controller';
+
 describe('GGRC.Components.confirmEditAction', function () {
   var viewModel;
 
@@ -55,7 +57,7 @@ describe('GGRC.Components.confirmEditAction', function () {
 
     beforeEach(function () {
       dfd = new can.Deferred();
-      spyOn(GGRC.Controllers.Modals, 'confirm');
+      spyOn(ModalsController, 'confirm');
       spyOn(can, 'Deferred').and.returnValue(dfd);
       spyOn(viewModel, 'dispatch');
       spyOn(viewModel, 'openEditMode');
@@ -74,7 +76,7 @@ describe('GGRC.Components.confirmEditAction', function () {
 
       viewModel.showConfirm();
 
-      expect(GGRC.Controllers.Modals.confirm).toHaveBeenCalledWith({
+      expect(ModalsController.confirm).toHaveBeenCalledWith({
         modal_title: 'Confirm moving Assessment to "In Progress"',
         modal_description: 'You are about to move Assessment from "' +
           'In Review' +

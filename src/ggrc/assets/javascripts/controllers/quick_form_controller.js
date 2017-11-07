@@ -2,8 +2,11 @@
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import ModalsController from './modals_controller';
+
 (function (can, $, GGRC) {
-  GGRC.Controllers.Modals('GGRC.Controllers.QuickForm', {
+  ModalsController('GGRC.Controllers.QuickForm', {
     defaults: {
       model: null,
       instance: null

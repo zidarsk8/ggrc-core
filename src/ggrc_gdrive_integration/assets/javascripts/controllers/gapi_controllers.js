@@ -3,8 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import ModalsController from '../../../../ggrc/assets/javascripts/controllers/modals_controller';
+
 (function (CMS, GGRC, can, $) {
-  GGRC.Controllers.Modals('GGRC.Controllers.GAPIModal', {
+  ModalsController('GGRC.Controllers.GAPIModal', {
     defaults: {
       skip_refresh: true,
       content_view: GGRC.mustache_path + '/gdrive/auth_button.mustache'

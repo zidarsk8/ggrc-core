@@ -3,9 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import ModalsController from './modals_controller';
+
 (function(can, $) {
 
-GGRC.Controllers.Modals("GGRC.Controllers.Unmap", {
+ModalsController("GGRC.Controllers.Unmap", {
     defaults: {
         skip_refresh: true
     }

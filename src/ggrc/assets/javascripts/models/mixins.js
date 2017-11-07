@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import ModalsController from '../controllers/modals_controller';
+
 (function (can, GGRC) {
   can.Construct.extend('can.Model.Mixin', {
     extend: function (fullName, klass, proto) {
@@ -259,7 +261,7 @@
       if (_.includes(IGNORED_STATES, this.status)) {
         confirmation.resolve();
       } else {
-        GGRC.Controllers.Modals.confirm({
+        ModalsController.confirm({
           modal_description: DESCRIPTION,
           modal_title: TITLE,
           button_view: GGRC.mustache_path + '/gdrive/confirm_buttons.mustache'
