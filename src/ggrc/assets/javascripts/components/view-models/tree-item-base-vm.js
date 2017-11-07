@@ -8,7 +8,7 @@ import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
 
-export default can.Map.extend('GGRC.VM.BaseTreeItemVM', {
+export default can.Map.extend({
   define: {
     expanded: {
       type: Boolean,
