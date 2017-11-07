@@ -440,8 +440,7 @@ class MappingColumnHandler(ColumnHandler):
     rel_map = {r.destination: r for r in current_obj.related_destinations}
     rel_map.update({r.source: r for r in current_obj.related_sources})
     for obj in self.value:
-      if current_obj.id:
-        mapping = rel_map.get(obj)
+      mapping = rel_map.get(obj)
       if not self.unmap and not mapping:
         if not (self.mapping_object.__name__ == "Audit" and
                 not getattr(current_obj, "allow_map_to_audit", True)):
