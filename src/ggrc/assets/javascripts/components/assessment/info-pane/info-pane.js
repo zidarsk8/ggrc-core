@@ -11,6 +11,7 @@ import '../assessment-object-type-dropdown';
 import '../mapped-objects/mapped-related-information';
 import '../mapped-objects/mapped-comments';
 import '../mapped-objects/mapped-controls';
+import '../../assessment/map-button-using-assessment-type';
 import '../../ca-object/ca-object-modal-content';
 import '../../comment/comment-add-form';
 import '../../custom-attributes/custom-attributes';

@@ -9,6 +9,26 @@ import '../components/assessment/assessment-object-type-dropdown';
 import '../components/assessment_attributes';
 import '../components/textarea-array/textarea-array';
 import '../components/object-list-item/object-list-item-updater';
+import '../components/related-objects/related-documents';
+import '../components/related-objects/related-reference-urls';
+import '../components/spinner/spinner';
+import '../components/object-list/object-list';
+import '../components/object-list-item/document-object-list-item';
+import '../components/action-toolbar-control/action-toolbar-control';
+import '../components/effective-dates/effective-dates';
+import '../components/dropdown/dropdown';
+import '../components/modal_wrappers/assessment_template_form';
+import '../components/autocomplete/autocomplete';
+import '../components/external-data-autocomplete/external-data-autocomplete';
+import '../components/person/person';
+import '../components/rich_text/rich_text';
+import '../components/modal_wrappers/checkboxes_to_list';
+import '../components/modal-connector';
+import '../components/assessment/map-button-using-assessment-type';
+import '../components/gca-controls/gca-controls';
+import '../components/datepicker/datepicker';
+import '../components/external-data-autocomplete/inline-autocomplete-wrapper';
+
 
 (function (can, $) {
   can.Control('GGRC.Controllers.Modals', {
