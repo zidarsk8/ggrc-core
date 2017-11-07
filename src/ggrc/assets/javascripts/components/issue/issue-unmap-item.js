@@ -4,6 +4,8 @@
 */
 
 import template from './issue-unmap-item.mustache';
+import Pagination from '../base-objects/pagination';
+
 const queryApi = GGRC.Utils.QueryAPI;
 
 export default GGRC.Components('issueUnmapItem', {
@@ -13,7 +15,7 @@ export default GGRC.Components('issueUnmapItem', {
     define: {
       paging: {
         value() {
-          return new GGRC.VM.Pagination({pageSizeSelect: [5, 10, 15]});
+          return new Pagination({pageSizeSelect: [5, 10, 15]});
         },
       },
       relationship: {

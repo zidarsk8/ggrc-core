@@ -15,6 +15,7 @@ import {
   toObject,
 } from '../../plugins/utils/snapshot-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
+import Pagination from '../base-objects/pagination';
 
 const DEFAULT_PAGE_SIZE = 5;
 
@@ -25,7 +26,7 @@ export default GGRC.Components('mapperResults', {
     define: {
       paging: {
         value: function () {
-          return new GGRC.VM.Pagination({pageSizeSelect: [5, 10, 15]});
+          return new Pagination({pageSizeSelect: [5, 10, 15]});
         },
       },
     },

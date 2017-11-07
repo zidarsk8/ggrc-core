@@ -5,9 +5,9 @@
 
 /**
  * A component that unifies pagination API
- * Usage: new GGRC.VM.Pagination()
+ * Usage: new Pagination()
  */
-export default can.Map.extend('GGRC.VM.Pagination', {
+export default can.Map.extend({
   define: {
     current: {
       type: 'number',

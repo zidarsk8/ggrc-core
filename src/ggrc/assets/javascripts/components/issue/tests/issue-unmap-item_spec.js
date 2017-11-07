@@ -58,7 +58,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
   });
 
   describe('paging value', ()=> {
-    it('returns GGRC.VM.Pagination object with [5, 10, 15] pagination', ()=> {
+    it('returns Pagination object with [5, 10, 15] pagination', ()=> {
       let pagination = viewModel.attr('paging');
       expect(pagination.attr('pageSizeSelect').serialize())
         .toEqual([5, 10, 15]);
