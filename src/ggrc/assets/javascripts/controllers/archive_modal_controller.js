@@ -1,14 +1,14 @@
-/*!
-  Copyright (C) 2017 Google Inc.
-  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
-*/
+/*
+ Copyright (C) 2017 Google Inc.
+ Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+ */
 
 import ModalsController from './modals_controller';
 
 export default ModalsController('GGRC.Controllers.ToggleArchive', {
   defaults: {
-    skip_refresh: false
-  }
+    skip_refresh: false,
+  },
 }, {
   init: function () {
     this._super();
@@ -46,5 +46,5 @@ export default ModalsController('GGRC.Controllers.ToggleArchive', {
       .fail(function (xhr, status) {
         $(document.body).trigger('ajax:flash', {error: xhr.responseText});
       }), el.add(cancelButton).add(modalBackdrop));
-  }
+  },
 });
