@@ -147,7 +147,7 @@ def all_mapping_entries():
   return ret
 
 
-class Cache:
+class Cache:  # pylint: disable=no-self-use
   name = None
   supported_resources = {}
 

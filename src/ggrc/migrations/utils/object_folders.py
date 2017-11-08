@@ -14,6 +14,8 @@ where folder != "" and not exists (
     where folderable_id = t.id and folderable_type="{model}"
 );
 """
+
+
 UPDATE_SQL = """UPDATE {table} AS wf
 LEFT JOIN (
     SELECT folderable_id, folder_id AS folder
@@ -24,6 +26,7 @@ LEFT JOIN (
     WHERE folderable_type = "{model}" group by 1
 ) as T on T.folderable_id = wf.id
 SET wf.folder = COALESCE(T.folder, "");"""
+
 
 HAVE_TABLE = ('SELECT EXISTS ('
               'SELECT 1 FROM information_schema.tables '

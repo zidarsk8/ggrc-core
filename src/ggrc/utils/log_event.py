@@ -38,10 +38,9 @@ def _get_log_revisions(current_user_id, obj=None, force_obj=False):
         documentable.documents.append(document)
       if rel in delete_objects and document in documentable.documents:
         documentable.documents.remove(document)
-      if (
-              documentable not in new_objects and
+      if (documentable not in new_objects and
               documentable not in delete_objects):
-         modified_objects.add(documentable)
+        modified_objects.add(documentable)
 
   revisions.extend(_revision_generator(
       current_user_id, "created", cache.new

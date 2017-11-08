@@ -36,8 +36,6 @@ Document.__bases__ = (Fileable, ) + Document.__bases__
 Document.late_init_fileable()
 Meeting.__bases__ = (Eventable, ) + Meeting.__bases__
 Meeting.late_init_eventable()
-# TODO: now the Gdrive module is dependant on the Workflows module. it used to
-# be the other way around but none of them are actually okay
 
 
 # Initialize views
