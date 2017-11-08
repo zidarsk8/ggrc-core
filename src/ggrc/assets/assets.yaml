@@ -135,7 +135,6 @@ dashboard-js-template-files:
   - components/object-mapper/object-mapper.mustache
   - components/object-generator/object-generator.mustache
   - components/object-search/object-search.mustache
-  - components/access_control_list/access_control_list.mustache
   - components/assessment_templates/assessment_templates.mustache
   - components/dropdown/dropdown.mustache
   - components/dropdown/multiselect_dropdown.mustache
