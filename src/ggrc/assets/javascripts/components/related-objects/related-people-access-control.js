@@ -146,25 +146,37 @@ export default GGRC.Components('relatedPeopleAccessControl', {
         required: role.mandatory
       };
     },
-    getFilteredRoels: function () {
-      var instance = this.attr('instance');
-      var includeRoles = this.attr('includeRoles');
-      var excludeRoles = this.attr('excludeRoles');
-      var roles;
+    filterByIncludeExclude: function (includeRoles, excludeRoles) {
+      const instance = this.attr('instance');
+      return GGRC.access_control_roles.filter((item) =>
+        item.object_type === instance.class.model_singular &&
+          _.indexOf(includeRoles, item.name) > -1 &&
+          _.indexOf(excludeRoles, item.name) === -1);
+    },
+    filterByInclude: function (includeRoles) {
+      const instance = this.attr('instance');
+      return GGRC.access_control_roles.filter((item) =>
+        item.object_type === instance.class.model_singular &&
+          _.indexOf(includeRoles, item.name) > -1);
+    },
+    filterByExclude: function (excludeRoles) {
+      const instance = this.attr('instance');
+      return GGRC.access_control_roles.filter((item) =>
+        item.object_type === instance.class.model_singular &&
+          _.indexOf(excludeRoles, item.name) === -1);
+    },
+    getFilteredRoles: function () {
+      const instance = this.attr('instance');
+      const includeRoles = this.attr('includeRoles');
+      const excludeRoles = this.attr('excludeRoles');
+      let roles;
 
       if (includeRoles.length && excludeRoles.length) {
-        roles = GGRC.access_control_roles.filter((item) =>
-          item.object_type === instance.class.model_singular &&
-            _.indexOf(includeRoles, item.name) > -1 &&
-            _.indexOf(excludeRoles, item.name) === -1);
+        roles = this.filterByIncludeExclude(includeRoles, excludeRoles);
       } else if (includeRoles.length) {
-        roles = GGRC.access_control_roles.filter((item) =>
-          item.object_type === instance.class.model_singular &&
-          _.indexOf(includeRoles, item.name) > -1);
+        roles = this.filterByInclude(includeRoles);
       } else if (excludeRoles.length) {
-        roles = GGRC.access_control_roles.filter((item) =>
-          item.object_type === instance.class.model_singular &&
-          _.indexOf(excludeRoles, item.name) === -1);
+        roles = this.filterByExclude(excludeRoles);
       } else {
         roles = GGRC.access_control_roles.filter((item) =>
           item.object_type === instance.class.model_singular);
@@ -209,7 +221,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       roleAssignments = _.groupBy(instance
         .attr('access_control_list'), 'ac_role_id');
 
-      roles = this.getFilteredRoels();
+      roles = this.getFilteredRoles();
 
       groups = _.map(roles, function (role) {
         return this.buildGroups(role, roleAssignments);

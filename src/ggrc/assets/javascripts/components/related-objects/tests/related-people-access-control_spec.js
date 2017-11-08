@@ -25,8 +25,9 @@ describe('GGRC.relatedPeopleAccessControl', function () {
     delete GGRC.access_control_roles;
   });
 
-  describe('"getFilteredRoels" method', function () {
+  describe('"getFilteredRoles" method', function () {
     var instance;
+    var getFilteredRolesMethod;
 
     beforeAll(function () {
       instance = {
@@ -40,10 +41,12 @@ describe('GGRC.relatedPeopleAccessControl', function () {
       viewModel.attr('instance', instance);
       viewModel.attr('includeRoles', []);
       viewModel.attr('excludeRoles', []);
+
+      getFilteredRolesMethod = viewModel.getFilteredRoles.bind(viewModel);
     });
 
     it('should return all roles related to instance type', function () {
-      var roles = viewModel.getFilteredRoels();
+      var roles = getFilteredRolesMethod();
       expect(roles.length).toBe(5);
     });
 
@@ -52,7 +55,7 @@ describe('GGRC.relatedPeopleAccessControl', function () {
       var include = ['Admin', 'Secondary Contacts', 'Principal Assignees'];
 
       viewModel.attr('includeRoles', include);
-      roles = viewModel.getFilteredRoels();
+      roles = getFilteredRolesMethod();
 
       expect(roles.length).toBe(3);
       expect(roles[2].name).toEqual('Principal Assignees');
@@ -64,7 +67,7 @@ describe('GGRC.relatedPeopleAccessControl', function () {
         var exclude = ['Admin', 'Secondary Contacts', 'Principal Assignees'];
 
         viewModel.attr('excludeRoles', exclude);
-        roles = viewModel.getFilteredRoels();
+        roles = getFilteredRolesMethod();
 
         expect(roles.length).toBe(2);
         expect(roles[1].name).toEqual('Secondary Assignees');
@@ -79,7 +82,7 @@ describe('GGRC.relatedPeopleAccessControl', function () {
 
         viewModel.attr('includeRoles', include);
         viewModel.attr('excludeRoles', exclude);
-        roles = viewModel.getFilteredRoels();
+        roles = getFilteredRolesMethod();
 
         expect(roles.length).toBe(1);
         expect(roles[0].name).toEqual('Secondary Contacts');
