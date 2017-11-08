@@ -17,14 +17,17 @@ import {BUTTON_VIEW_SAVE_CANCEL} from '../../../../ggrc/assets/javascripts/plugi
 
         $target = $('<div class="modal hide"></div>').uniqueId();
         $target.modal_form({}, el);
-        $target.ggrc_controllers_modals({
-          modal_title: "Clone Task Group",
-          model: CMS.ModelHelpers.CloneTaskGroup,
-          instance: new CMS.ModelHelpers.CloneTaskGroup({ source_task_group: this.scope.taskGroup }),
-          content_view: GGRC.mustache_path + "/task_groups/clone_modal_content.mustache",
-          custom_save_button_text: "Proceed",
-          button_view: BUTTON_VIEW_SAVE_CANCEL
-        });
+        import(/* webpackChunkName: "modalsCtrls" */'../../../../ggrc/assets/javascripts/controllers/modals')
+          .then(() => {
+            $target.ggrc_controllers_modals({
+              modal_title: "Clone Task Group",
+              model: CMS.ModelHelpers.CloneTaskGroup,
+              instance: new CMS.ModelHelpers.CloneTaskGroup({source_task_group: this.scope.taskGroup}),
+              content_view: GGRC.mustache_path + "/task_groups/clone_modal_content.mustache",
+              custom_save_button_text: "Proceed",
+              button_view: BUTTON_VIEW_SAVE_CANCEL
+            });
+          });
       }
     }
   });

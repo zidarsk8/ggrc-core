@@ -17,14 +17,17 @@ import {BUTTON_VIEW_SAVE_CANCEL} from '../../../../ggrc/assets/javascripts/plugi
 
         $target = $('<div class="modal hide"></div>').uniqueId();
         $target.modal_form({}, el);
-        $target.ggrc_controllers_modals({
-          modal_title: "Clone Workflow",
-          model: CMS.ModelHelpers.CloneWorkflow,
-          instance: new CMS.ModelHelpers.CloneWorkflow({ source_workflow: this.scope.workflow }),
-          content_view: GGRC.mustache_path + "/workflows/clone_modal_content.mustache",
-          custom_save_button_text: "Proceed",
-          button_view: BUTTON_VIEW_SAVE_CANCEL
-        });
+        import(/* webpackChunkName: "modalsCtrls" */'../../../../ggrc/assets/javascripts/controllers/modals')
+          .then(() => {
+            $target.ggrc_controllers_modals({
+              modal_title: "Clone Workflow",
+              model: CMS.ModelHelpers.CloneWorkflow,
+              instance: new CMS.ModelHelpers.CloneWorkflow({source_workflow: this.scope.workflow}),
+              content_view: GGRC.mustache_path + "/workflows/clone_modal_content.mustache",
+              custom_save_button_text: "Proceed",
+              button_view: BUTTON_VIEW_SAVE_CANCEL
+            });
+          });
       }
     }
   });

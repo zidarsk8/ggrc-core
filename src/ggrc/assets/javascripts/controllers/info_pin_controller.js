@@ -86,24 +86,27 @@ can.Control('CMS.Controllers.InfoPin', {
     var instance = opts.attr('instance');
     var parentInstance = opts.attr('parent_instance');
     var self = this;
-    this.element.html(can.view(view, {
-      instance: instance,
-      isSnapshot: !!instance.snapshot || instance.isRevision,
-      parentInstance: parentInstance,
-      model: instance.class,
-      confirmEdit: confirmEdit,
-      is_info_pin: true,
-      options: options,
-      result: options.result,
-      page_instance: GGRC.page_instance(),
-      maximized: maximizedState,
-      onChangeMaximizedState: function () {
-        return self.changeMaximizedState.bind(self);
-      },
-      onClose: function () {
-        return self.close.bind(self);
-      }
-    }));
+    import(/* webpackChunkName: "modalsCtrls" */'./modals')
+      .then(() => {
+        this.element.html(can.view(view, {
+          instance: instance,
+          isSnapshot: !!instance.snapshot || instance.isRevision,
+          parentInstance: parentInstance,
+          model: instance.class,
+          confirmEdit: confirmEdit,
+          is_info_pin: true,
+          options: options,
+          result: options.result,
+          page_instance: GGRC.page_instance(),
+          maximized: maximizedState,
+          onChangeMaximizedState: function () {
+            return self.changeMaximizedState.bind(self);
+          },
+          onClose: function () {
+            return self.close.bind(self);
+          }
+        }));
+      });
   },
   prepareView: function (opts, el, maximizedState, setHtml) {
     var instance = opts.attr('instance');

@@ -626,8 +626,10 @@ import {
 
           option = $target.data('modal-help') ?
             'toggle' : $.extend({}, $target.data(), $this.data());
-
-          launchFn.apply($target, [$target, $this, option]);
+          import(/* webpackChunkName: "modalsCtrls" */'../controllers/modals')
+            .then(() => {
+              launchFn.apply($target, [$target, $this, option]);
+            });
         });
     });
   };
