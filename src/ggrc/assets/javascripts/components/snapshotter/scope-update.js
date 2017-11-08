@@ -3,7 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {confirm} from '../../plugins/utils/modals';
+import {
+  confirm,
+  BUTTON_VIEW_OK_CLOSE,
+} from '../../plugins/utils/modals';
 import {
   isSnapshotModel,
 } from '../../plugins/utils/snapshot-utils';
@@ -27,7 +30,7 @@ import {
             'Do you want to update all objects of this Audit' +
             ' to the latest version?',
           modal_confirm: 'Update',
-          button_view: ModalsController.BUTTON_VIEW_OK_CLOSE,
+          button_view: BUTTON_VIEW_OK_CLOSE,
           skip_refresh: true
         },
           this._success.bind(this),

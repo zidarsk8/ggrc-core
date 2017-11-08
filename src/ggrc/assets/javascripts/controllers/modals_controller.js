@@ -28,18 +28,10 @@ import '../components/assessment/map-button-using-assessment-type';
 import '../components/gca-controls/gca-controls';
 import '../components/datepicker/datepicker';
 import '../components/external-data-autocomplete/inline-autocomplete-wrapper';
+import {BUTTON_VIEW_DONE} from '../plugins/utils/modals'
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',
-  BUTTON_VIEW_DONE: GGRC.mustache_path + '/modals/done_buttons.mustache',
-  BUTTON_VIEW_CLOSE: GGRC.mustache_path + '/modals/close_buttons.mustache',
-  BUTTON_VIEW_SAVE_CANCEL:
-  GGRC.mustache_path + '/modals/save_cancel_buttons.mustache',
-  BUTTON_VIEW_SAVE_CANCEL_DELETE:
-  GGRC.mustache_path + '/modals/save_cancel_delete_buttons.mustache',
-  BUTTON_VIEW_OK_CLOSE:
-  GGRC.mustache_path + '/modals/confirm_cancel_buttons.mustache',
-
   defaults: {
     preload_view: GGRC.mustache_path + '/dashboard/modal_preload.mustache',
     content_view: GGRC.mustache_path + '/help/help_modal_content.mustache',
@@ -61,7 +53,7 @@ export default can.Control({
   },
 
   init: function () {
-    this.defaults.button_view = this.BUTTON_VIEW_DONE;
+    this.defaults.button_view = BUTTON_VIEW_DONE;
   },
 }, {
   init: function () {

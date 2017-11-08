@@ -4,6 +4,7 @@
 */
 
 import ModalsController from '../../../../ggrc/assets/javascripts/controllers/modals_controller';
+import {BUTTON_VIEW_SAVE_CANCEL} from '../../../../ggrc/assets/javascripts/plugins/utils/modals';
 
 ;(function(can, $, GGRC, CMS) {
 
@@ -15,7 +16,7 @@ ModalsController("GGRC.Controllers.ApprovalWorkflow", {
     modal_title: "Submit for review",
     custom_save_button_text: "Submit",
     content_view: GGRC.mustache_path + "/wf_objects/approval_modal_content.mustache",
-    button_view : ModalsController.BUTTON_VIEW_SAVE_CANCEL,
+    button_view : BUTTON_VIEW_SAVE_CANCEL,
     afterFetch: function () {
       this.attr("instance", new CMS.ModelHelpers.ApprovalWorkflow({
         original_object : this.attr('instance')
@@ -24,7 +25,7 @@ ModalsController("GGRC.Controllers.ApprovalWorkflow", {
   }
 }, {
   init : function() {
-    this.options.button_view = ModalsController.BUTTON_VIEW_SAVE_CANCEL;
+    this.options.button_view = BUTTON_VIEW_SAVE_CANCEL;
     this._super.apply(this, arguments);
   },
   "input[null-if-empty] change" : function(el, ev) {

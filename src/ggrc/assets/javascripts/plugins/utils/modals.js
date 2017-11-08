@@ -7,6 +7,14 @@
  * Utils methods for showing standart modals
  */
 
+const path = GGRC.mustache_path || '/static/mustache';
+const BUTTON_VIEW_DONE = `${path}/modals/done_buttons.mustache`;
+const BUTTON_VIEW_CLOSE = `${path}/modals/close_buttons.mustache`;
+const BUTTON_VIEW_SAVE_CANCEL = `${path}/modals/save_cancel_buttons.mustache`;
+const BUTTON_VIEW_SAVE_CANCEL_DELETE =
+  `${path}/modals/save_cancel_delete_buttons.mustache`;
+const BUTTON_VIEW_OK_CLOSE = `${path}/modals/confirm_cancel_buttons.mustache`;
+
 /**
  * Shows a warning popup within given options. If a user confirms
  * warning popup, then are called a success callback else - a fail callback.
@@ -142,4 +150,9 @@ function _setupWarning(confirm, settings) {
 export {
   warning,
   confirm,
+  BUTTON_VIEW_DONE,
+  BUTTON_VIEW_CLOSE,
+  BUTTON_VIEW_SAVE_CANCEL,
+  BUTTON_VIEW_SAVE_CANCEL_DELETE,
+  BUTTON_VIEW_OK_CLOSE,
 };

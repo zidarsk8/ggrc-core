@@ -3,7 +3,6 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import ModalsController from '../../../controllers/modals_controller';
 import * as ModalsUtils from '../../../plugins/utils/modals';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
@@ -66,7 +65,7 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
         expect(ModalsUtils.confirm.calls.argsFor(0)).toEqual([
           jasmine.objectContaining({
             instance: updaterViewModel.instance,
-            button_view: ModalsController.BUTTON_VIEW_OK_CLOSE,
+            button_view: ModalsUtils.BUTTON_VIEW_OK_CLOSE,
             skip_refresh: true
           }),
           jasmine.any(Function),
