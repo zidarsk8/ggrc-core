@@ -5,7 +5,8 @@
 
 import ModalsController from './modals_controller';
 
-export default ModalsController('GGRC.Controllers.QuickForm', {
+export default ModalsController({
+  pluginName: 'ggrc_controllers_quick_form',
   defaults: {
     model: null,
     instance: null,

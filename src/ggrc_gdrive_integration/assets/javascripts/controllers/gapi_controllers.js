@@ -6,7 +6,8 @@
 import ModalsController from '../../../../ggrc/assets/javascripts/controllers/modals_controller';
 
 (function (CMS, GGRC, can, $) {
-  ModalsController('GGRC.Controllers.GAPIModal', {
+  ModalsController({
+    pluginName: 'ggrc_controllers_gapi_modal',
     defaults: {
       skip_refresh: true,
       content_view: GGRC.mustache_path + '/gdrive/auth_button.mustache'

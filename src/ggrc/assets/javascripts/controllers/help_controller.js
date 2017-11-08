@@ -5,7 +5,8 @@
 
 import ModalsController from './modals_controller';
 
-export default ModalsController('GGRC.Controllers.Help', {
+export default ModalsController({
+  pluginName: 'ggrc_controllers_help',
   defaults: {
     content_view: GGRC.mustache_path + '/help/help_modal_content.mustache',
     header_view: GGRC.mustache_path + '/help/help_modal_header.mustache',

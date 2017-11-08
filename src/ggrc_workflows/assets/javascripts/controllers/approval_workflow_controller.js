@@ -8,7 +8,8 @@ import {BUTTON_VIEW_SAVE_CANCEL} from '../../../../ggrc/assets/javascripts/plugi
 
 ;(function(can, $, GGRC, CMS) {
 
-ModalsController("GGRC.Controllers.ApprovalWorkflow", {
+ModalsController({
+  pluginName: 'ggrc_controllers_approval_workflow',
   defaults : {
     original_object : null,
     new_object_form: true,

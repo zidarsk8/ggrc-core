@@ -5,7 +5,8 @@
 
 import ModalsController from './modals_controller';
 
-export default ModalsController('GGRC.Controllers.ToggleArchive', {
+export default ModalsController({
+  pluginName: 'ggrc_controllers_toggle_archive',
   defaults: {
     skip_refresh: false,
   },

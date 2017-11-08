@@ -5,7 +5,8 @@
 
 import ModalsController from './modals_controller';
 
-export default ModalsController('GGRC.Controllers.Delete', {
+export default ModalsController({
+  pluginName: 'ggrc_controllers_delete',
   defaults: {
     skip_refresh: true,
   },
