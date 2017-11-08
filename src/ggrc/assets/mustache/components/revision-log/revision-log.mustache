@@ -23,15 +23,15 @@
                 <p class="instruction">New value</p>
               </div>
             {{#changes}}
-              <div class="clearfix">
+              <div class="clearfix {{#if isRole}}role-row{{/if}}">
                 <div class="third-col">
                   {{fieldName}}
                 </div>
                 <div class="third-col">
-                  <revision-log-data {data}="origVal"></revision-log-data>
+                  <revision-log-data {is-loading}="isLoading" {data}="origVal"></revision-log-data>
                 </div>
                 <div class="third-col">
-                  <revision-log-data {data}="newVal"></revision-log-data>
+                  <revision-log-data {is-loading}="isLoading" {data}="newVal"></revision-log-data>
                 </div>
               </div>
             {{/changes}}
