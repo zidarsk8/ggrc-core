@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {warning} from './modals';
+
 /**
  * Utils methods shared between GGRC controllers (GGRC.Controllers)
  */
@@ -24,7 +26,7 @@ GGRC.Utils.Controllers = (function () {
       return;
     }
 
-    GGRC.Utils.Modals.warning({
+    warning({
       objectShortInfo: [instance.type, instance.title].join(' '),
       operation: operation
     }, success);

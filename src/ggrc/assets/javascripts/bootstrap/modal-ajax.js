@@ -5,6 +5,7 @@
 
 import Spinner from 'spin.js';
 import ModalsController from '../controllers/modals_controller';
+import {warning} from '../plugins/utils/modals';
 
 (function (can, $, GGRC, Permission) {
   'use strict';
@@ -53,7 +54,7 @@ import ModalsController from '../controllers/modals_controller';
       if (GGRC.Utils.Controllers.hasWarningType(instance)) {
         modalSettings = _.extend(
           modalSettings,
-          GGRC.Utils.Modals.warning.settings,
+          warning.settings,
           {
             objectShortInfo: [instance.type, instance.title].join(' '),
             confirmOperationName: 'delete',
@@ -62,7 +63,7 @@ import ModalsController from '../controllers/modals_controller';
         );
       }
 
-      GGRC.Utils.Modals.warning(
+      warning(
         modalSettings,
         _.constant({}),
         _.constant({}), {
