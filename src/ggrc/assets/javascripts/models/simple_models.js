@@ -29,7 +29,13 @@
     create: 'POST /api/programs',
     update: 'PUT /api/programs/{id}',
     destroy: 'DELETE /api/programs/{id}',
-    mixins: ['unique_title', 'ca_update', 'timeboxed', 'accessControlList'],
+    mixins: [
+      'unique_title',
+      'ca_update',
+      'timeboxed',
+      'accessControlList',
+      'base-notifications',
+    ],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
@@ -123,7 +129,13 @@
     create: 'POST /api/objectives',
     update: 'PUT /api/objectives/{id}',
     destroy: 'DELETE /api/objectives/{id}',
-    mixins: ['ownable', 'unique_title', 'ca_update', 'accessControlList'],
+    mixins: [
+      'ownable',
+      'unique_title',
+      'ca_update',
+      'accessControlList',
+      'base-notifications',
+    ],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
