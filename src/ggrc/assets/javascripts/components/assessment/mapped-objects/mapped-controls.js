@@ -46,12 +46,12 @@ import {
           {
             type: 'objectives',
             objName: 'Objective',
-            fields: ['child_type', 'revision', 'parent'],
+            fields: ['child_id', 'child_type', 'revision', 'parent'],
           },
           {
             type: 'regulations',
             objName: 'Regulation',
-            fields: ['child_type', 'revision', 'parent'],
+            fields: ['child_id', 'child_type', 'revision', 'parent'],
           },
         ],
       },
