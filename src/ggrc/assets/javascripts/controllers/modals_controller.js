@@ -63,36 +63,6 @@ export default can.Control({
   init: function () {
     this.defaults.button_view = this.BUTTON_VIEW_DONE;
   },
-
-  confirm: function (options, success, dismiss) {
-    var $target = $('<div class="modal hide ' +
-                    options.extraCssClass +
-                    '"></div>');
-    return $target
-      .modal({backdrop: 'static'})
-      .ggrc_controllers_modals(can.extend({
-        new_object_form: false,
-        button_view: GGRC.mustache_path + '/modals/confirm_buttons.mustache',
-        modal_confirm: 'Confirm',
-        modal_description: 'description',
-        modal_title: 'Confirm',
-        content_view: GGRC.mustache_path + '/modals/confirm.mustache'
-      }, options))
-      .on('click', 'a.btn[data-toggle=confirm]', function (e) {
-        var params = $(e.target).closest('.modal').find('form')
-          .serializeArray();
-        $target.modal('hide').remove();
-        if (success) {
-          success(params, $(e.target).data('option'));
-        }
-      })
-      .on('click.modal-form.close', '[data-dismiss="modal"]', function () {
-        $target.modal('hide').remove();
-        if (dismiss) {
-          dismiss();
-        }
-      });
-  }
 }, {
   init: function () {
     var currentUser;

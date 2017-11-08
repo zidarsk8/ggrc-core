@@ -4,7 +4,7 @@
 */
 
 import '../../inline/base-inline-control-title';
-import ModalsController from '../../../controllers/modals_controller';
+import {confirm} from '../../../plugins/utils/modals';
 
 (function (can) {
   'use strict';
@@ -31,7 +31,7 @@ import ModalsController from '../../../controllers/modals_controller';
       showConfirm: function () {
         var self = this;
         var confirmation = can.Deferred();
-        ModalsController.confirm({
+        confirm({
           modal_title: 'Confirm moving Assessment to "In Progress"',
           modal_description: 'You are about to move Assessment from "' +
             this.instance.status +

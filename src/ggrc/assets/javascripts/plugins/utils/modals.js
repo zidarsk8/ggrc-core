@@ -3,8 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import ModalsController from '../../controllers/modals_controller';
-
 /**
  * Utils methods for showing standart modals
  */
@@ -14,7 +12,7 @@ import ModalsController from '../../controllers/modals_controller';
  * warning popup, then are called a success callback else - a fail callback.
  *
  * For showing the popup, by default, are used a
- * ModalsController.confirm method which controls user actions.
+ * confirm method which controls user actions.
  *
  * Also the user can set own controller by setting controller field in
  * extra param.
@@ -25,7 +23,7 @@ import ModalsController from '../../controllers/modals_controller';
  * logic for confirmation you should explore _setupWarning method and use
  * own templates appropriate to its logic.
  * Be careful with confirmOperationName field - remember that standart
- * ModalsController.confirm uses confirmOperationName='confirm'
+ * confirm uses confirmOperationName='confirm'
  * If you sets another value (for example, 'delete'), confirm button will
  * not be able to call success callback. If you want to set it then change
  * a controller with help extra param
@@ -63,15 +61,45 @@ import ModalsController from '../../controllers/modals_controller';
 function warning(options, success, fail, extra) {
   var confirmOptions = _.extend({}, warning.settings, options);
   var confirmController;
-  var confirm;
+  var confirmResult;
 
   extra = extra || {};
 
-  confirmController = extra.controller || ModalsController.confirm;
-  confirm = confirmController(confirmOptions, success, fail);
+  confirmController = extra.controller || confirm;
+  confirmResult = confirmController(confirmOptions, success, fail);
 
-  _setupWarning(confirm, confirmOptions);
-  return confirm;
+  _setupWarning(confirmResult, confirmOptions);
+  return confirmResult;
+}
+
+function confirm (options, success, dismiss) {
+  var $target = $('<div class="modal hide ' +
+    options.extraCssClass +
+    '"></div>');
+  return $target
+    .modal({backdrop: 'static'})
+    .ggrc_controllers_modals(can.extend({
+      new_object_form: false,
+      button_view: GGRC.mustache_path + '/modals/confirm_buttons.mustache',
+      modal_confirm: 'Confirm',
+      modal_description: 'description',
+      modal_title: 'Confirm',
+      content_view: GGRC.mustache_path + '/modals/confirm.mustache'
+    }, options))
+    .on('click', 'a.btn[data-toggle=confirm]', function (e) {
+      var params = $(e.target).closest('.modal').find('form')
+        .serializeArray();
+      $target.modal('hide').remove();
+      if (success) {
+        success(params, $(e.target).data('option'));
+      }
+    })
+    .on('click.modal-form.close', '[data-dismiss="modal"]', function () {
+      $target.modal('hide').remove();
+      if (dismiss) {
+        dismiss();
+      }
+    });
 }
 
 // default static const settings
@@ -113,4 +141,5 @@ function _setupWarning(confirm, settings) {
 
 export {
   warning,
+  confirm,
 };

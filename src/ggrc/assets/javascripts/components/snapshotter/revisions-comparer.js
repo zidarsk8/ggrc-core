@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import ModalsController from '../../controllers/modals_controller';
+import {confirm} from '../../plugins/utils/modals';
 
 (function (can, $) {
   'use strict';
@@ -23,7 +23,7 @@ import ModalsController from '../../controllers/modals_controller';
         var revisionsLength = rightRevisions.length;
         var newRevisionID;
         newRevisionID = rightRevisions[revisionsLength - 1].id;
-        ModalsController.confirm({
+        confirm({
           modal_title: 'Compare with the latest version',
           modal_description: 'Loading...',
           header_view: GGRC.mustache_path +

@@ -10,7 +10,7 @@ import '../components/assessment/info-pane/info-pane';
 import '../components/folder-attachments-list/folder-attachments-list';
 import '../components/unmap-button/unmap-person-button';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
-import ModalsController from './modals_controller';
+import {confirm} from '../plugins/utils/modals';
 
 can.Control('CMS.Controllers.InfoPin', {
   defaults: {
@@ -217,7 +217,7 @@ can.Control('CMS.Controllers.InfoPin', {
   confirmEdit: function (instance, modalDetails) {
     var confirmDfd = $.Deferred();
     var renderer = can.view.mustache(modalDetails.description);
-    ModalsController.confirm({
+    confirm({
       modal_description: renderer(instance).textContent,
       modal_confirm: modalDetails.button,
       modal_title: modalDetails.title,

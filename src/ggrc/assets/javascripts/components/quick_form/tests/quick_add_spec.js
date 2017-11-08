@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import ModalsController from '../../../controllers/modals_controller';
+import * as ModalsUtils from '../../../plugins/utils/modals';
 
 describe('GGRC.Components.quickAdd', function () {
   'use strict';
@@ -52,28 +52,28 @@ describe('GGRC.Components.quickAdd', function () {
     });
 
     it('calls confirm panel if verify_event is true', function () {
-      spyOn(ModalsController, 'confirm');
+      spyOn(ModalsUtils, 'confirm');
       handler.call({
         viewModel: scope,
         element: element
       });
-      expect(ModalsController.confirm)
+      expect(ModalsUtils.confirm)
         .toHaveBeenCalledWith(expectedParam,
           verifyDfd.resolve, verifyDfd.reject);
     });
     it('does not call confirm panel if verify_event is false', function () {
-      spyOn(ModalsController, 'confirm');
+      spyOn(ModalsUtils, 'confirm');
       element.context.attributes.verify_event = false;
       handler.call({
         viewModel: scope,
         element: element
       });
-      expect(ModalsController.confirm)
+      expect(ModalsUtils.confirm)
         .not.toHaveBeenCalled();
     });
     it('sets scope.disabled to false after closing confirm panel',
       function () {
-        spyOn(ModalsController, 'confirm')
+        spyOn(ModalsUtils, 'confirm')
           .and.returnValue(verifyDfd.reject());
         handler.call({
           viewModel: scope,

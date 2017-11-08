@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import ModalsController from '../../controllers/modals_controller';
+import {confirm} from '../../plugins/utils/modals';
 
 (function (can, $) {
   'use strict';
@@ -26,7 +26,7 @@ import ModalsController from '../../controllers/modals_controller';
         var instance = this.instance;
         this.attr('includeObjects', {});
 
-        ModalsController.confirm({
+        confirm({
           instance: scope,
           modal_title: scope.attr('modalTitle'),
           modal_description: scope.attr('modalDescription'),

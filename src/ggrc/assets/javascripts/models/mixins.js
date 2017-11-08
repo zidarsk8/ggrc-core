@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import ModalsController from '../controllers/modals_controller';
+import {confirm} from '../plugins/utils/modals';
 
 (function (can, GGRC) {
   can.Construct.extend('can.Model.Mixin', {
@@ -261,7 +261,7 @@ import ModalsController from '../controllers/modals_controller';
       if (_.includes(IGNORED_STATES, this.status)) {
         confirmation.resolve();
       } else {
-        ModalsController.confirm({
+        confirm({
           modal_description: DESCRIPTION,
           modal_title: TITLE,
           button_view: GGRC.mustache_path + '/gdrive/confirm_buttons.mustache'

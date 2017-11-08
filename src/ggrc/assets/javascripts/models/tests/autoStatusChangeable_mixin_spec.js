@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import ModalsController from '../../controllers/modals_controller';
+import * as ModalsUtils from '../../plugins/utils/modals';
 
 describe('CMS.Models.Mixins.autoStatusChangeable', function () {
   'use strict';
@@ -25,7 +25,7 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
       });
       method = Mixin.prototype.confirmBeginEdit.bind(instance);
 
-      spyOn(ModalsController, 'confirm');
+      spyOn(ModalsUtils, 'confirm');
     });
 
     it('displays a confirmation dialog with correct texts', function () {
@@ -40,7 +40,7 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
 
       method();
 
-      spy = ModalsController.confirm;
+      spy = ModalsUtils.confirm;
       expect(spy).toHaveBeenCalled();
 
       callArgs = spy.calls.first().args;
@@ -66,7 +66,7 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
 
       promise = method();
 
-      spy = ModalsController.confirm;
+      spy = ModalsUtils.confirm;
       expect(spy).toHaveBeenCalled();
 
       callArgs = spy.calls.first().args;
@@ -90,7 +90,7 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
 
       promise = method();
 
-      spy = ModalsController.confirm;
+      spy = ModalsUtils.confirm;
       expect(spy).toHaveBeenCalled();
 
       callArgs = spy.calls.first().args;
@@ -108,7 +108,7 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
       'opening the modal',
       function () {
         var promise;
-        var spy = ModalsController.confirm;
+        var spy = ModalsUtils.confirm;
 
         instance.attr('status', 'In Progress');
         promise = method();
@@ -122,7 +122,7 @@ describe('CMS.Models.Mixins.autoStatusChangeable', function () {
       'opening the modal',
       function () {
         var promise;
-        var spy = ModalsController.confirm;
+        var spy = ModalsUtils.confirm;
 
         instance.attr('status', 'Not Started');
         promise = method();

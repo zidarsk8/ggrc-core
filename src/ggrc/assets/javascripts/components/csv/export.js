@@ -8,7 +8,7 @@ import '../relevant_filters';
 import exportPanelTemplate from './templates/export-panel.mustache';
 import exportGroupTemplate from './templates/export-group.mustache';
 import csvExportTemplate from './templates/csv-export.mustache';
-import ModalsController from '../../controllers/modals_controller';
+import {confirm} from '../../plugins/utils/modals';
 
 var url = can.route.deparam(window.location.search.substr(1));
 var filterModel = can.Map({
@@ -113,7 +113,7 @@ GGRC.Components('csvExport', {
         if (this.viewModel.attr('export.chosenFormat') === 'gdrive') {
           link = 'https://docs.google.com/spreadsheets/d/' + data.id;
 
-          ModalsController.confirm({
+          confirm({
             modal_title: 'Export Completed',
             modal_description: 'File is exported successfully. ' +
             'You can view the file here: ' +

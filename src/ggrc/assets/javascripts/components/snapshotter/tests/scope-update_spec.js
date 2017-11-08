@@ -4,6 +4,7 @@
 */
 
 import ModalsController from '../../../controllers/modals_controller';
+import * as ModalsUtils from '../../../plugins/utils/modals';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
 describe('GGRC.Components.SnapshotScopeUpdater', function () {
@@ -49,20 +50,20 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
 
     beforeEach(function () {
       method = updaterViewModel.upsertIt.bind(updaterViewModel);
-      spyOn(ModalsController, 'confirm').and.callThrough();
+      spyOn(ModalsUtils, 'confirm').and.callThrough();
     });
 
     describe('calls confirm method', function () {
       it('one time', function () {
         method(updaterViewModel);
 
-        expect(ModalsController.confirm).toHaveBeenCalled();
+        expect(ModalsUtils.confirm).toHaveBeenCalled();
       });
 
       it('with given params', function () {
         method(updaterViewModel);
 
-        expect(ModalsController.confirm.calls.argsFor(0)).toEqual([
+        expect(ModalsUtils.confirm.calls.argsFor(0)).toEqual([
           jasmine.objectContaining({
             instance: updaterViewModel.instance,
             button_view: ModalsController.BUTTON_VIEW_OK_CLOSE,

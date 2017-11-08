@@ -3,14 +3,14 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import ModalsController from '../../../../ggrc/assets/javascripts/controllers/modals_controller';
+import {confirm} from '../../../../ggrc/assets/javascripts/plugins/utils/modals';
 
 export default {
   generateCycle: function (workflow) {
     var dfd = new $.Deferred();
     var cycle;
 
-    ModalsController.confirm({
+    confirm({
       modal_title: 'Confirm',
       modal_confirm: 'Proceed',
       skip_refresh: true,

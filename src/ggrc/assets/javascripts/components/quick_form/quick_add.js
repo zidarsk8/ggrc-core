@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import ModalsController from '../../controllers/modals_controller';
+import {confirm} from '../../plugins/utils/modals';
 
 (function (can, $) {
   'use strict';
@@ -107,7 +107,7 @@ import ModalsController from '../../controllers/modals_controller';
         }
 
         if (scope.attr("verify_event")) {
-          ModalsController.confirm({
+          confirm({
             modal_description: scope.attr("modal_description"),
             modal_confirm: scope.attr("modal_button"),
             modal_title: scope.attr("modal_title"),

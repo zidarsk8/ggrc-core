@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import ModalsController from '../../controllers/modals_controller';
+import {confirm} from '../../plugins/utils/modals';
 import {
   isSnapshotModel,
 } from '../../plugins/utils/snapshot-utils';
@@ -20,7 +20,7 @@ import {
     viewModel: {
       instance: null,
       upsertIt: function (scope, el, ev) {
-        ModalsController.confirm({
+        confirm({
           instance: scope.instance,
           modal_title: 'Update to latest version',
           modal_description:
