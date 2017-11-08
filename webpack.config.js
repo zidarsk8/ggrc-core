@@ -32,7 +32,8 @@ module.exports = function (env) {
       login: 'entrypoints/login',
     },
     output: {
-      filename: isProd ? '[name].[chunkhash].js' : '[name].js',
+      filename: isProd ? '[name].[chunkhash].js' : '[name].js?[hash]',
+      chunkFilename: isProd ? 'chunk.[name].[chunkhash].js' :'chunk.[name].js?[hash]',
       sourceMapFilename: '[file].map',
       path: path.join(__dirname, './src/ggrc/static/'),
       publicPath: STATIC_FOLDER,
