@@ -144,7 +144,6 @@ def upgrade():
         non_editable="1",
         internal="1" if assignee_role in MAPPED_ROLES else "0",
     )
-
   # Enable creation of temp tables
   op.execute("SET AUTOCOMMIT = 1;")
   op.execute("""
@@ -159,6 +158,12 @@ def upgrade():
           updated_at datetime
       );
   """)
+  # Add index to temp table to speed up migration process
+  op.create_index(
+      'fk_temp_assigned_objects',
+      'temp_assigned_objects',
+      ['assignable_id', 'assignable_type'],
+      unique=False)
   # Migrate existing assignees to access_control_list
   connection.execute(
       text("""
@@ -245,12 +250,12 @@ def upgrade():
       FROM relationships r
       JOIN temp_assigned_objects tao ON
         tao.assignable_id = r.destination_id AND
-        tao.assignable_type = r.destination_type AND
-        r.source_type != 'Person'
+        tao.assignable_type = r.destination_type
       JOIN access_control_list acl ON
         acl.object_type = tao.assignable_type AND
         acl.object_id = tao.assignable_id AND
-        acl.person_id = tao.person_id;
+        acl.person_id = tao.person_id
+      WHERE r.source_type != 'Person';
   """)
   op.execute("""
       INSERT INTO temp_mapped_objects(
@@ -273,12 +278,12 @@ def upgrade():
       FROM relationships r
       JOIN temp_assigned_objects tao ON
         tao.assignable_id = r.source_id AND
-        tao.assignable_type = r.source_type AND
-        r.destination_type != 'Person'
+        tao.assignable_type = r.source_type
       JOIN access_control_list acl ON
         acl.object_type = tao.assignable_type AND
         acl.object_id = tao.assignable_id AND
         acl.person_id = tao.person_id
+      WHERE r.destination_type != 'Person';
   """)
   op.execute("""
       INSERT INTO access_control_list(
