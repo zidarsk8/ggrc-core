@@ -3,8 +3,6 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import './related-people-access-control-group';
-
 export default GGRC.Components('relatedPeopleAccessControl', {
   tag: 'related-people-access-control',
   viewModel: {

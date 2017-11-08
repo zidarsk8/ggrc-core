@@ -172,10 +172,6 @@ import '../../components/external-data-autocomplete/inline-autocomplete-wrapper'
 // people
 import '../../components/custom-roles/custom-roles';
 import '../../components/custom-roles/custom-roles-modal';
-import '../../components/related-objects/related-people-access-control';
-import '../../components/related-objects/related-people-access-control-group';
-import '../../components/people/deletable-people-group';
-import '../../components/people/editable-people-group';
 import '../../components/assessment/people/lhn-popup-people';
 
 // This modal should be loaded here as it requires some components
