@@ -1161,3 +1161,26 @@ class TestAssessmentGeneration(TestAssessmentBase):
       self.assertEqual(assessment.assessment_type, exp_type)
     else:
       self.assertEqual(response.status_code, 400)
+
+  def test_changing_text_fields_should_not_change_status(self):
+    """Test Assessment does not change status if 'design', 'operationally',
+    'notes' posted as empty strings
+    """
+    test_state = "START_STATE"
+    response = self.assessment_post()
+    self.assertEqual(response.status_code, 201)
+    asmt = all_models.Assessment.query.one()
+    self.assertEqual(asmt.status,
+                     getattr(all_models.Assessment, test_state))
+    response = self.assessment_post(
+        extra_data={
+            "id": asmt.id,
+            "design": "",
+            "operationally": "",
+            "notes": ""
+        }
+    )
+    self.assertEqual(response.status_code, 201)
+    assessment = self.refresh_object(asmt)
+    self.assertEqual(assessment.status,
+                     getattr(all_models.Assessment, test_state))
