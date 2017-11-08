@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
+
 describe('GGRC.Components.mapperResults', function () {
   'use strict';
 
@@ -107,7 +109,7 @@ describe('GGRC.Components.mapperResults', function () {
         selected: 'mock2',
         disableConfiguration: 'mock3'
       };
-      spyOn(GGRC.Utils.TreeView, 'getColumnsForModel')
+      spyOn(TreeViewUtils, 'getColumnsForModel')
         .and.returnValue(mockColumns);
       spyOn(viewModel, 'getDisplayModel')
         .and.returnValue({
@@ -131,6 +133,36 @@ describe('GGRC.Components.mapperResults', function () {
       viewModel.attr('disableColumnsConfiguration', 'configuration');
       viewModel.setColumnsConfiguration();
       expect(viewModel.attr('disableColumnsConfiguration')).toEqual('mock3');
+    });
+  });
+
+  describe('setSortingConfiguration() method', () => {
+    beforeEach(function () {
+      viewModel.attr('columns', {});
+      spyOn(TreeViewUtils, 'getSortingForModel')
+        .and.returnValue(
+        {
+          key: 'key',
+          direction: 'direction',
+        });
+      spyOn(viewModel, 'getDisplayModel')
+        .and.returnValue({
+          model_singular: '',
+        });
+    });
+
+    it('updates sort key', () => {
+      viewModel.attr('sort.key', null);
+      viewModel.setSortingConfiguration();
+
+      expect(viewModel.attr('sort.key')).toEqual('key');
+    });
+
+    it('updates sort direction', () => {
+      viewModel.attr('sort.direction', null);
+      viewModel.setSortingConfiguration();
+
+      expect(viewModel.attr('sort.direction')).toEqual('direction');
     });
   });
 
@@ -163,11 +195,14 @@ describe('GGRC.Components.mapperResults', function () {
 
   describe('resetSearchParams() method', function () {
     var DEFAULT_PAGE_SIZE = 5;
-    var DEFAULT_SORT_DIRECTION = 'asc';
 
     beforeEach(function () {
       viewModel.attr('paging', {});
       viewModel.attr('sort', {});
+      spyOn(viewModel, 'getDisplayModel')
+        .and.returnValue({
+          model_singular: '',
+        });
     });
 
     it('sets 1 to current of paging', function () {
@@ -182,16 +217,11 @@ describe('GGRC.Components.mapperResults', function () {
       expect(viewModel.attr('paging.pageSize')).toEqual(DEFAULT_PAGE_SIZE);
     });
 
-    it('sets empty string to key of sort', function () {
-      viewModel.attr('sort.key', 'mockKey');
-      viewModel.resetSearchParams();
-      expect(viewModel.attr('sort.key')).toEqual('');
-    });
+    it('sets default sorting', () => {
+      spyOn(viewModel, 'setSortingConfiguration');
 
-    it('sets default sort direction to direction of sort', function () {
-      viewModel.attr('sort.direction', 'across:)');
       viewModel.resetSearchParams();
-      expect(viewModel.attr('sort.direction')).toEqual(DEFAULT_SORT_DIRECTION);
+      expect(viewModel.setSortingConfiguration).toHaveBeenCalled();
     });
   });
 

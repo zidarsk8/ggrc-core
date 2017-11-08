@@ -4,6 +4,7 @@
  */
 
 import * as StateUtils from '../../plugins/utils/state-utils';
+import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 
 (function (can, $) {
   CMS.Controllers.TreeLoader.extend('CMS.Controllers.TreeView', {
@@ -278,7 +279,7 @@ import * as StateUtils from '../../plugins/utils/state-utils';
 
     display_path: function (path, refetch) {
       return this.display(refetch).then(this._ifNotRemoved(function () {
-        return GGRC.Utils.TreeView.displayTreeSubpath(this.element, path);
+        return TreeViewUtils.displayTreeSubpath(this.element, path);
       }.bind(this)));
     },
 

@@ -4,6 +4,7 @@
  */
 
 import * as StateUtils from '../../plugins/utils/state-utils';
+import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -25,7 +26,7 @@ import * as StateUtils from '../../plugins/utils/state-utils';
       statusItem: GGRC.Utils.AdvancedSearch.create.state(),
       relevantTo: [],
       availableAttributes: function () {
-        var available = GGRC.Utils.TreeView.getColumnsForModel(
+        var available = getColumnsForModel(
           this.attr('modelName'),
           null,
           true

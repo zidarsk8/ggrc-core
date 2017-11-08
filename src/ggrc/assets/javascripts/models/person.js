@@ -82,16 +82,19 @@
       add_item_view: GGRC.mustache_path + '/people/tree_add_item.mustache',
       attr_list: [{
         attr_title: 'Name',
-        attr_name: 'title'
+        attr_name: 'title',
       }, {
         attr_title: 'Email',
-        attr_name: 'email'
+        attr_name: 'email',
       }, {
         attr_title: 'Authorizations',
-        attr_name: 'authorizations'
+        attr_name: 'authorizations',
+      }, {
+        attr_title: 'Last Updated',
+        attr_name: 'updated_at',
       }],
-      display_attr_names: ['title', 'email', 'authorizations'],
-      disable_columns_configuration: true
+      display_attr_names: ['title', 'email', 'authorizations', 'updated_at'],
+      disable_columns_configuration: true,
     },
     list_view_options: {
       find_params: {__sort: 'name,email'}

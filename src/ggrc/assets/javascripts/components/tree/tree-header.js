@@ -4,6 +4,7 @@
  */
 
 import template from './templates/tree-header.mustache';
+import {createSelectedColumnsMap} from '../../plugins/utils/tree-view-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -83,8 +84,7 @@ import template from './templates/tree-header.mustache';
       var columns;
 
       if (selectedColumns.length && availableColumns.length) {
-        columns = GGRC.Utils.TreeView
-          .createSelectedColumnsMap(availableColumns, selectedColumns);
+        columns = createSelectedColumnsMap(availableColumns, selectedColumns);
 
         this.attr('columns', columns);
       }

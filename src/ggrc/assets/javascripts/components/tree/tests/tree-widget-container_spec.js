@@ -3,13 +3,17 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
+
 describe('GGRC.Components.treeWidgetContainer', function () {
   'use strict';
 
   var vm;
   var CurrentPageUtils;
+  var Component;
 
   beforeEach(function () {
+    Component = GGRC.Components.get('treeWidgetContainer');
     vm = GGRC.Components.getViewModel('treeWidgetContainer');
     CurrentPageUtils = GGRC.Utils.CurrentPage;
   });
@@ -262,7 +266,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     });
 
     it('', function (done) {
-      spyOn(GGRC.Utils.TreeView, 'loadFirstTierItems')
+      spyOn(TreeViewUtils, 'loadFirstTierItems')
         .and.returnValue(can.Deferred().resolve({
           total: 100,
           values: []
@@ -693,5 +697,52 @@ describe('GGRC.Components.treeWidgetContainer', function () {
         expect(vm.attr('loading')).toBeFalsy();
         expect(vm.loadItems).not.toHaveBeenCalled();
       });
+  });
+
+  describe('setSortingConfiguration() method', () => {
+    beforeEach(() => {
+      vm.attr('model', {
+        shortName: 'shortModelName',
+      });
+    });
+
+    it('sets up default sorting configuration', () => {
+      vm.attr('sortingInfo', {});
+      spyOn(TreeViewUtils, 'getSortingForModel')
+        .and.returnValue({
+          key: 'key',
+          direction: 'direction',
+        });
+
+      vm.setSortingConfiguration();
+
+      expect(vm.attr('sortingInfo.sortBy')).toEqual('key');
+      expect(vm.attr('sortingInfo.sortDirection')).toEqual('direction');
+    });
+  });
+
+  describe('init() method', () => {
+    let method;
+
+    beforeEach(() => {
+      vm.attr('model', {
+        shortName: 'shortModelName',
+      });
+      method = Component.prototype.init.bind({viewModel: vm});
+      spyOn(vm, 'setSortingConfiguration');
+      spyOn(vm, 'setColumnsConfiguration');
+      spyOn(CMS.Models.DisplayPrefs, 'getSingleton')
+        .and.returnValue(can.Deferred().resolve());
+    });
+
+    it('sets up columns configuration', () => {
+      method();
+      expect(vm.setColumnsConfiguration).toHaveBeenCalled();
+    });
+
+    it('sets up sorting configuration', () => {
+      method();
+      expect(vm.setSortingConfiguration).toHaveBeenCalled();
+    });
   });
 });

@@ -9,6 +9,7 @@ import '../components/info-pane/info-pane-footer';
 import '../components/assessment/info-pane/info-pane';
 import '../components/folder-attachments-list/folder-attachments-list';
 import '../components/unmap-button/unmap-person-button';
+import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
 
 can.Control('CMS.Controllers.InfoPin', {
   defaults: {
@@ -133,7 +134,7 @@ can.Control('CMS.Controllers.InfoPin', {
 
     opts.attr('options.isDirectlyRelated',
       !isSubtreeItem ||
-      GGRC.Utils.TreeView.isDirectlyRelated(instance));
+      TreeViewUtils.isDirectlyRelated(instance));
 
     this.prepareView(opts, el, maximizedState, true);
     // Load trees inside info pin

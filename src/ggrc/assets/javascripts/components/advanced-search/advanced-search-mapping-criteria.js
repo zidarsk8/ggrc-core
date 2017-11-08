@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
+
 (function (can, GGRC, CMS) {
   'use strict';
 
@@ -96,7 +98,7 @@
      * @return {can.List} - List of available attributes.
      */
     availableAttributes: function () {
-      var available = GGRC.Utils.TreeView.getColumnsForModel(
+      var available = getColumnsForModel(
         this.attr('criteria.objectName'),
         null,
         true

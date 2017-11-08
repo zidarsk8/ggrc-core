@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
+
 (function (can, $) {
   function _firstElementChild(el) {
     var i;
@@ -283,7 +285,7 @@
 
     display_path: function (path) {
       return this.display().then(this._ifNotRemoved(function () {
-        return GGRC.Utils.TreeView.displayTreeSubpath(this.element, path);
+        return TreeViewUtils.displayTreeSubpath(this.element, path);
       }.bind(this)));
     },
 

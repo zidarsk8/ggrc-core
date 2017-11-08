@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as TreeViewUtils from '../utils/tree-view-utils';
+
 describe('GGRC Utils CurrentPage', function () {
   var pageType;
   beforeEach(function () {
@@ -271,7 +273,7 @@ describe('GGRC Utils CurrentPage', function () {
       method = GGRC.Utils.CurrentPage.initCounts;
       getCounts = GGRC.Utils.CurrentPage.getCounts;
 
-      spyOn(GGRC.Utils.TreeView, 'makeRelevantExpression')
+      spyOn(TreeViewUtils, 'makeRelevantExpression')
         .and.returnValue({
           type: 'Assessment',
           id: id,

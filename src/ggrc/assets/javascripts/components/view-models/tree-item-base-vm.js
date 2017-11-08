@@ -3,10 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
+
 (function (can, GGRC) {
   'use strict';
-
-  var TreeViewUtils = GGRC.Utils.TreeView;
 
   can.Map.extend('GGRC.VM.BaseTreeItemVM', {
     define: {

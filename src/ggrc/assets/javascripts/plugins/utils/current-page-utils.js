@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as TreeViewUtils from './tree-view-utils';
+
 (function (GGRC) {
   'use strict';
 
@@ -199,7 +201,7 @@
 
       var params = widgetsObject.map(function (widgetObject) {
         var param;
-        var expression = GGRC.Utils.TreeView
+        var expression = TreeViewUtils
           .makeRelevantExpression(widgetObject.name, type, id);
 
         if (SnapshotUtils.isSnapshotRelated(type, widgetObject.name)) {

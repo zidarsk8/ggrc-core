@@ -147,7 +147,8 @@
         },
         {attr_title: 'Reference URL', attr_name: 'reference_url'}
       ]),
-      display_attr_names: ['title', 'owner', 'status', 'last_assessment_date'],
+      display_attr_names: ['title', 'owner', 'status', 'last_assessment_date',
+        'updated_at'],
       add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
       create_link: true,
       show_related_assessments: true,

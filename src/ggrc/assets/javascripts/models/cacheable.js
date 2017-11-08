@@ -667,7 +667,7 @@
       packaged_datetime: makeDateSerializer('datetime', 'dateTime')
     },
     tree_view_options: {
-      display_attr_names: ['title', 'owner', 'status'],
+      display_attr_names: ['title', 'owner', 'status', 'updated_at'],
       mandatory_attr_names: ['title']
     },
     sub_tree_view_options: {},
