@@ -16,6 +16,21 @@ export default GGRC.Components('issueUnmapItem', {
           return new GGRC.VM.Pagination({pageSizeSelect: [5, 10, 15]});
         },
       },
+      relationship: {
+        get() {
+          const sourceIds = _.union(
+            _.pluck(this.attr('issueInstance.related_sources'), 'id'),
+            _.pluck(this.attr('issueInstance.related_destinations'), 'id'));
+          const destinationIds = _.union(
+            _.pluck(this.attr('target.related_sources'), 'id'),
+            _.pluck(this.attr('target.related_destinations'), 'id'));
+
+          let relId = _.intersection(sourceIds, destinationIds);
+          let relationship = CMS.Models.Relationship.findInCacheById(relId);
+
+          return relationship;
+        },
+      },
     },
     issueInstance: {},
     target: {},
@@ -106,16 +121,8 @@ export default GGRC.Components('issueUnmapItem', {
       window.open(url, '_blank');
     },
     unmap() {
-      const sourceIds = _.union(
-        _.pluck(this.attr('issueInstance.related_sources'), 'id'),
-        _.pluck(this.attr('issueInstance.related_destinations'), 'id'));
-      const destinationIds = _.union(
-        _.pluck(this.attr('target.related_sources'), 'id'),
-        _.pluck(this.attr('target.related_destinations'), 'id'));
-
-      let relId = _.intersection(sourceIds, destinationIds);
-      let relationship = CMS.Models.Relationship.findInCacheById(relId);
-      let currentObject = GGRC.page_instance();
+      const currentObject = GGRC.page_instance();
+      const relationship = this.attr('relationship');
 
       this.attr('isLoading', true);
 

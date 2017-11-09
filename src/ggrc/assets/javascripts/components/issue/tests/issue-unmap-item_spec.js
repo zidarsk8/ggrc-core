@@ -12,6 +12,51 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
     events = component.prototype.events;
   });
 
+  describe('relationship get() method', ()=> {
+    beforeEach(()=> {
+      viewModel.attr('issueInstance', {});
+      viewModel.attr('target', {});
+      spyOn(CMS.Models.Relationship, 'findInCacheById').and
+        .callFake((ids)=> ids[0]);
+    });
+
+    it('retruns relationship issue->target direction', ()=> {
+      viewModel.attr('issueInstance.related_sources', [
+        {id: 111},
+        {id: 222},
+      ]);
+      viewModel.attr('target.related_destinations', [
+        {id: 333},
+        {id: 111},
+      ]);
+
+      let relationship = viewModel.attr('relationship');
+
+      expect(CMS.Models.Relationship.findInCacheById)
+        .toHaveBeenCalledWith([111]);
+
+      expect(relationship).toBe(111);
+    });
+
+    it('retruns relationship target->issue direction', ()=> {
+      viewModel.attr('issueInstance.related_destinations', [
+        {id: 111},
+        {id: 222},
+      ]);
+      viewModel.attr('target.related_sources', [
+        {id: 333},
+        {id: 111},
+      ]);
+
+      let relationship = viewModel.attr('relationship');
+
+      expect(CMS.Models.Relationship.findInCacheById)
+        .toHaveBeenCalledWith([111]);
+
+      expect(relationship).toBe(111);
+    });
+  });
+
   describe('paging value', ()=> {
     it('returns GGRC.VM.Pagination object with [5, 10, 15] pagination', ()=> {
       let pagination = viewModel.attr('paging');
