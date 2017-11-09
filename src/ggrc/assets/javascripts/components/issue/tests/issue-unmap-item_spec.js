@@ -4,39 +4,38 @@
 */
 import component from '../issue-unmap-item';
 
-describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
-  var viewModel;
-  var events;
-  beforeEach(function () {
+describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
+  let viewModel;
+  let events;
+  beforeEach(()=> {
     viewModel = new (can.Map.extend(component.prototype.viewModel));
     events = component.prototype.events;
   });
 
-  describe('paging value', function () {
-    it('returns GGRC.VM.Pagination object with [5, 10, 15] pagination',
-    function () {
-      var pagination = viewModel.attr('paging');
+  describe('paging value', ()=> {
+    it('returns GGRC.VM.Pagination object with [5, 10, 15] pagination', ()=> {
+      let pagination = viewModel.attr('paging');
       expect(pagination.attr('pageSizeSelect').serialize())
         .toEqual([5, 10, 15]);
     });
   });
 
-  describe('buildQuery() method', function () {
-    it('sets object_name to passed type', function () {
-      var type = 'Type';
-      var query = viewModel.buildQuery(type);
+  describe('buildQuery() method', ()=> {
+    it('sets object_name to passed type', ()=> {
+      let type = 'Type';
+      let query = viewModel.buildQuery(type);
       expect(query.object_name).toBe(type);
     });
 
-    it('sets limit to [0, 5]', function () {
-      var query = viewModel.buildQuery('Type');
+    it('sets limit to [0, 5]', ()=> {
+      let query = viewModel.buildQuery('Type');
       expect(query.limit).toEqual([0, 5]);
     });
 
-    describe('configures filters.expression namely', function () {
-      it('sets assessment.id from viewModel.target.id', function () {
-        var query;
-        var id = 1234567;
+    describe('configures filters.expression namely', ()=> {
+      it('sets assessment.id from viewModel.target.id', ()=> {
+        let query;
+        let id = 1234567;
 
         viewModel.attr('target.id', id);
         query = viewModel.buildQuery('Type');
@@ -44,9 +43,9 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
         expect(query.filters.expression.assessment.id).toBe(id);
       });
 
-      it('sets issue.id from viewModel.issueInstance.id', function () {
-        var query;
-        var id = 1234567;
+      it('sets issue.id from viewModel.issueInstance.id', ()=> {
+        let query;
+        let id = 1234567;
 
         viewModel.attr('issueInstance.id', id);
         query = viewModel.buildQuery('Type');
@@ -54,23 +53,23 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
         expect(query.filters.expression.issue.id).toBe(id);
       });
 
-      it('sets op.name to "cascade_unmappable" string', function () {
-        var operationName = 'cascade_unmappable';
-        var query = viewModel.buildQuery('Type');
+      it('sets op.name to "cascade_unmappable" string', ()=> {
+        let operationName = 'cascade_unmappable';
+        let query = viewModel.buildQuery('Type');
         expect(query.filters.expression.op.name).toBe(operationName);
       });
     });
   });
 
-  describe('processRelatedSnapshots() method', function () {
-    beforeEach(function () {
+  describe('processRelatedSnapshots() method', ()=> {
+    beforeEach(()=> {
       spyOn(viewModel, 'loadRelatedObjects')
         .and.returnValue(can.Deferred().resolve());
       spyOn(viewModel, 'showModal');
       spyOn(viewModel, 'unmap');
     });
 
-    it('shows modal if there are items to unmap', function () {
+    it('shows modal if there are items to unmap', ()=> {
       viewModel.attr('total', 2);
 
       viewModel.processRelatedSnapshots();
@@ -79,7 +78,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       expect(viewModel.unmap).not.toHaveBeenCalled();
     });
 
-    it('unmaps issue if there are no related items', function () {
+    it('unmaps issue if there are no related items', ()=> {
       viewModel.attr('total', 0);
 
       viewModel.processRelatedSnapshots();
@@ -89,11 +88,11 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
     });
   });
 
-  describe('loadRelatedObjects() method', function () {
-    var reqDeferred;
-    var response;
+  describe('loadRelatedObjects() method', ()=> {
+    let reqDeferred;
+    let response;
 
-    beforeEach(function () {
+    beforeEach(()=> {
       response = [{
         Snapshot: {
           values: [{}, {}],
@@ -110,7 +109,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       spyOn($.prototype, 'trigger');
     });
 
-    it('should change "isLoading" flag in case of success', function () {
+    it('should change "isLoading" flag in case of success', ()=> {
       viewModel.attr('isLoading', false);
 
       viewModel.loadRelatedObjects();
@@ -120,7 +119,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       expect(viewModel.attr('isLoading')).toBeFalsy();
     });
 
-    it('should change "isLoading" flag in case of error', function () {
+    it('should change "isLoading" flag in case of error', ()=> {
       viewModel.attr('isLoading', false);
 
       viewModel.loadRelatedObjects();
@@ -130,7 +129,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       expect(viewModel.attr('isLoading')).toBeFalsy();
     });
 
-    it('should load snapshots correctly', function () {
+    it('should load snapshots correctly', ()=> {
       viewModel.loadRelatedObjects();
       reqDeferred.resolve(response);
 
@@ -139,7 +138,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       expect(viewModel.attr('paging.total')).toBe(10);
     });
 
-    it('should handle server errors correctly', function () {
+    it('should handle server errors correctly', ()=> {
       viewModel.loadRelatedObjects();
       reqDeferred.reject();
 
@@ -149,8 +148,8 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
     });
   });
 
-  describe('showModal() method', function () {
-    it('updates singular title', function () {
+  describe('showModal() method', ()=> {
+    it('updates singular title', ()=> {
       viewModel.attr('total', 1);
 
       viewModel.showModal();
@@ -158,7 +157,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       expect(viewModel.attr('modalTitle')).toBe('Unmapping (1 object)');
     });
 
-    it('updates plural title', function () {
+    it('updates plural title', ()=> {
       viewModel.attr('total', 5);
 
       viewModel.showModal();
@@ -166,7 +165,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       expect(viewModel.attr('modalTitle')).toBe('Unmapping (5 objects)');
     });
 
-    it('changes modal state', function () {
+    it('changes modal state', ()=> {
       viewModel.attr('modalState.open', false);
 
       viewModel.showModal();
@@ -175,13 +174,13 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
     });
   });
 
-  describe('openObject() method', function () {
-    var relatedObject;
-    var originalModels;
-    var getParam;
-    var ARGS;
+  describe('openObject() method', ()=> {
+    let relatedObject;
+    let originalModels;
+    let getParam;
+    let ARGS;
 
-    beforeAll(function () {
+    beforeAll(()=> {
       getParam = function (spy, index) {
         return spy.calls.argsFor(0)[index];
       };
@@ -192,11 +191,11 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       originalModels = CMS.Models;
     });
 
-    afterAll(function () {
+    afterAll(()=> {
       CMS.Models = originalModels;
     });
 
-    beforeEach(function () {
+    beforeEach(()=> {
       relatedObject = {
         id: 123,
         type: 'Type',
@@ -210,26 +209,26 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       spyOn(window, 'open');
     });
 
-    it('calls window.open with second "_blank" param', function () {
-      var secondParam;
+    it('calls window.open with second "_blank" param', ()=> {
+      let secondParam;
       viewModel.openObject(relatedObject);
       secondParam = getParam(window.open, ARGS.SECOND);
       expect(secondParam).toBe('_blank');
     });
 
-    describe('sets url as a first param where', function () {
-      var buildUrl;
+    describe('sets url as a first param where', ()=> {
+      let buildUrl;
 
-      beforeAll(function () {
+      beforeAll(()=> {
         buildUrl = function (type, id) {
           return '/' + type + '/' + id;
         };
       });
 
-      it('url consists of root_collection from appopriate model and id ' +
-      'based on passed related object', function () {
-        var rootCollectionType = CMS.Models[relatedObject.type].root_collection;
-        var expectedUrl;
+      it(`url consists of root_collection from appopriate model and id 
+        based on passed related object`, ()=> {
+        let rootCollectionType = CMS.Models[relatedObject.type].root_collection;
+        let expectedUrl;
 
         viewModel.openObject(relatedObject);
         expectedUrl = buildUrl(rootCollectionType, relatedObject.id);
@@ -237,13 +236,12 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
         expect(getParam(window.open, ARGS.FIRST)).toBe(expectedUrl);
       });
 
-      it('url consists of type and id from relatet object\'s child_type ' +
-      'and child_id props if a type of related object equals to "Snapshot"',
-      function () {
-        var relatedObjectType = 'Snapshot';
-        var rootCollectionType = CMS.Models[relatedObject.type].root_collection;
-        var oldRelatedObjectType = relatedObject.type;
-        var expectedUrl;
+      it(`url consists of type and id from relatet object's child_type and 
+        child_id props if a type of related object equals to "Snapshot"`, ()=> {
+        let relatedObjectType = 'Snapshot';
+        let rootCollectionType = CMS.Models[relatedObject.type].root_collection;
+        let oldRelatedObjectType = relatedObject.type;
+        let expectedUrl;
 
         _.extend(relatedObject, {
           type: relatedObjectType,
@@ -261,21 +259,21 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
     });
   });
 
-  describe('unmap() method', function () {
-    var refreshDfd;
-    var unmapDfd;
-    var pageInstance;
+  describe('unmap() method', ()=> {
+    let refreshDfd;
+    let unmapDfd;
+    let pageInstance;
 
-    beforeEach(function () {
-      var relationship;
+    beforeEach(()=> {
+      let relationship;
       pageInstance = new can.Map({viewLink: 'temp url'});
       unmapDfd = can.Deferred();
       refreshDfd = can.Deferred();
       relationship = {
-        refresh: function () {
+        refresh: ()=> {
           return refreshDfd;
         },
-        unmap: function () {
+        unmap: ()=> {
           return unmapDfd;
         },
       };
@@ -287,7 +285,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       spyOn(GGRC, 'navigate');
     });
 
-    it('should change "isLoading" flag in case of success', function () {
+    it('should change "isLoading" flag in case of success', ()=> {
       viewModel.attr('isLoading', false);
 
       viewModel.unmap();
@@ -298,7 +296,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       expect(viewModel.attr('isLoading')).toBeFalsy();
     });
 
-    it('should change "isLoading" flag in case of error', function () {
+    it('should change "isLoading" flag in case of error', ()=> {
       viewModel.attr('isLoading', false);
 
       viewModel.unmap();
@@ -308,7 +306,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       expect(viewModel.attr('isLoading')).toBeFalsy();
     });
 
-    it('should unmap issue correctly', function () {
+    it('should unmap issue correctly', ()=> {
       viewModel.attr('issueInstance', {});
       viewModel.attr('issueInstance.related_sources', [
         {id: 1}, {id: 2}, {id: 3}]);
@@ -322,7 +320,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       expect(viewModel.attr('showRelatedSnapshots')).toBeFalsy();
     });
 
-    it('should unmap from issue correctly', function () {
+    it('should unmap from issue correctly', ()=> {
       viewModel.attr('issueInstance', pageInstance);
       viewModel.attr('issueInstance.related_sources', [
         {id: 1}, {id: 2}, {id: 3}]);
@@ -336,7 +334,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       expect(GGRC.navigate).toHaveBeenCalledWith('temp url');
     });
 
-    it('should handle server errors correctly', function () {
+    it('should handle server errors correctly', ()=> {
       viewModel.unmap();
       refreshDfd.reject();
 
@@ -346,24 +344,24 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
     });
   });
 
-  describe('"click" event', function () {
-    var handler;
-    var event;
-    beforeEach(function () {
+  describe('"click" event', ()=> {
+    let handler;
+    let event;
+    beforeEach(()=> {
       handler = events.click.bind({viewModel: viewModel});
       event = jasmine.createSpyObj(['preventDefault']);
       spyOn(viewModel, 'processRelatedSnapshots');
       spyOn(viewModel, 'dispatch');
     });
 
-    it('prevents default action of the event', function () {
+    it('prevents default action of the event', ()=> {
       handler(null, event);
 
       expect(event.preventDefault).toHaveBeenCalled();
     });
 
-    it('calls processRelatedSnapshots() if target is assessment and ' +
-    'not allowed to unmap issue from audit', function () {
+    it(`calls processRelatedSnapshots() if target is assessment and 
+      not allowed to unmap issue from audit`, ()=> {
       viewModel.attr('target.type', 'Assessment');
       viewModel.attr('issueInstance.allow_unmap_from_audit', false);
 
@@ -373,7 +371,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
       expect(viewModel.dispatch).not.toHaveBeenCalled();
     });
 
-    it('dispatches "unmapIssue" event if target', function () {
+    it('dispatches "unmapIssue" event if target', ()=> {
       viewModel.attr('target.type', 'Control');
       viewModel.attr('issueInstance.allow_unmap_from_audit', true);
 
@@ -384,14 +382,14 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
     });
   });
 
-  describe('"{viewModel.paging} current" event', function () {
-    var handler;
-    beforeEach(function () {
+  describe('"{viewModel.paging} current" event', ()=> {
+    let handler;
+    beforeEach(()=> {
       handler = events['{viewModel.paging} current']
         .bind({viewModel: viewModel});
     });
 
-    it('call loadRelatedObjects() method', function () {
+    it('call loadRelatedObjects() method', ()=> {
       spyOn(viewModel, 'loadRelatedObjects');
 
       handler();
@@ -400,14 +398,14 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', function () {
     });
   });
 
-  describe('"{viewModel.paging} pageSize" event', function () {
-    var handler;
-    beforeEach(function () {
+  describe('"{viewModel.paging} pageSize" event', ()=> {
+    let handler;
+    beforeEach(()=> {
       handler = events['{viewModel.paging} pageSize']
         .bind({viewModel: viewModel});
     });
 
-    it('call loadRelatedObjects() method', function () {
+    it('call loadRelatedObjects() method', ()=> {
       spyOn(viewModel, 'loadRelatedObjects');
 
       handler();
