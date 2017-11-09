@@ -2126,7 +2126,8 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
         finished_date: 1,
         start_date: 1,
         updated_at: 1,
-        verified_date: 1
+        verified_date: 1,
+        last_deprecated_date: 1,
       });
 
       // attribute names considered "default" and not representing a date

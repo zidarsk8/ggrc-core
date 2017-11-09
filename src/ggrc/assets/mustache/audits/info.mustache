@@ -134,6 +134,16 @@
                   {{/if}}
                 </div>
               </div>
+              <div class="row-fluid wrap-row">
+                <div class="span4">
+                  <h6>Last Deprecated Date</h6>
+                  {{#if instance.last_deprecated_date}}
+                    {{localize_date instance.last_deprecated_date}}
+                  {{else}}
+                    <span class="empty-message">None</span>
+                  {{/if}}
+                </div>
+              </div>
 
               {{#displayAssessmentIssueTracker instance.can_use_issue_tracker}}
                 <info-issue-tracker-fields {instance}="instance">
