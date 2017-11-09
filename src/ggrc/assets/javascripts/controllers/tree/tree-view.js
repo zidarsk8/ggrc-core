@@ -277,6 +277,23 @@ import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
       return this.find_all_deferred;
     },
 
+    /*
+     * Removes items from the list by ids
+     * @param  {can.List}      list             list of items
+     * @param  {Array{Number}} removedItemsIds  array of item ids
+     */
+    removeFromList: function (list, removedItemsIds) {
+      // Since list items have slightly different format,
+      // we are lookig for instance property in possible places
+      let itemsToKeep = list.filter((item) => {
+        let inst = item && item.options && item.options.attr('instance') ||
+          item.attr('instance');
+
+        return !_.includes(removedItemsIds, inst.attr('id'));
+      });
+      list.replace(itemsToKeep);
+    },
+
     display_path: function (path, refetch) {
       return this.display(refetch).then(this._ifNotRemoved(function () {
         return TreeViewUtils.displayTreeSubpath(this.element, path);
@@ -477,6 +494,25 @@ import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
       var node = el.control();
       node.draw_node();
       node.select();
+    },
+
+    '{original_list} remove': function (list, ev, removedItems, index) {
+      var removedItemsIds = removedItems.map((remItem) => {
+        return remItem.attr('id');
+      });
+
+      this.removeFromList(this.options.list, removedItemsIds);
+      this.removeFromList(this.options.filteredList, removedItemsIds);
+
+      // NB: since row element are not rendered with mustache and binded element
+      // not always reflected in the filteredList ( for newly created items )
+      // we are just removeing the items from the lists and removing the DOM
+      // elements by ids
+      removedItemsIds.forEach((id) => {
+        this.element
+          .find(`.cms_controllers_tree_view_node[data-object-id="${id}"]`)
+          .remove();
+      });
     },
 
     '{original_list} add': function (list, ev, newVals, index) {
