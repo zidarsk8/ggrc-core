@@ -501,7 +501,8 @@ import '../components/access_control_list/access_control_list_roles_helper'
 
     serialize_form: function () {
       var $form = this.options.$content.find('form');
-      var $elements = $form.find(':input:not(isolate-form *)');
+      var $elements = $form
+        .find(':input:not(isolate-form *):not([data-no-serialization])');
 
       can.each($elements.toArray(), this.proxy('set_value_from_element'));
     },
