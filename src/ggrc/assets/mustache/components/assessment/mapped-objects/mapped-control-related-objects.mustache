@@ -27,9 +27,9 @@
       </div>
 
       <div class="mapped-object-info__attributes">
-          {{#using instance=. editMode=false}}
-              {{>'/static/mustache/custom_attributes/info.mustache'}}
-          {{/using}}
+        {{#add_to_current_scope instance=this editMode=false}}
+          {{>'/static/mustache/custom_attributes/info.mustache'}}
+        {{/add_to_current_scope}}
       </div>
     </div>
   </object-list>
