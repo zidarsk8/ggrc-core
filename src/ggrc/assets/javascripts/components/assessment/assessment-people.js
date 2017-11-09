@@ -20,7 +20,7 @@
           value: '',
         },
       },
-      roleConflicts: false,
+      rolesConflict: false,
       infoPaneMode: true,
       withDetails: false,
       instance: {},
@@ -28,8 +28,8 @@
       orderOfRoles: ['Creators', 'Assignees', 'Verifiers'],
     },
     events: {
-      '{instance} roleConflicts': function (ev, args) {
-        this.viewModel.attr('roleConflicts', args.roleConflicts);
+      '{instance} rolesConflict': function (ev, args) {
+        this.viewModel.attr('rolesConflict', args.rolesConflict);
       },
     },
   });

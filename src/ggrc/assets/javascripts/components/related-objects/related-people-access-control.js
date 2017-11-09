@@ -64,8 +64,8 @@ export default GGRC.Components('relatedPeopleAccessControl', {
 
       this.attr('hasConflicts', hasConflict);
       this.attr('instance').dispatch({
-        type: 'roleConflicts',
-        roleConflicts: hasConflict,
+        type: 'rolesConflict',
+        rolesConflict: hasConflict,
       });
     },
     isGroupsHasConflict: function (groups, conflictRoles) {
