@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as SnapshotUtils from '../../../../plugins/utils/snapshot-utils';
+
 describe('GGRC.Component.assessmentMappedControl', function () {
   'use strict';
 
@@ -84,7 +86,7 @@ describe('GGRC.Component.assessmentMappedControl', function () {
     var pendingRequest;
     beforeEach(function () {
       pendingRequest = $.Deferred();
-      spyOn(GGRC.Utils.Snapshots, 'toObject');
+      spyOn(SnapshotUtils, 'toObject');
       spyOn(viewModel, 'setItems');
       spyOn(viewModel, 'getParams')
         .and.returnValue(params);
@@ -153,7 +155,7 @@ describe('GGRC.Component.assessmentMappedControl', function () {
       id: 1
     };
     beforeEach(function () {
-      spyOn(GGRC.Utils.Snapshots, 'toObject')
+      spyOn(SnapshotUtils, 'toObject')
         .and.returnValue(dummyObject);
     });
 

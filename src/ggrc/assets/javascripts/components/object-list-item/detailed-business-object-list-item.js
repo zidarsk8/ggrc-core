@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  getParentUrl,
+} from '../../plugins/utils/snapshot-utils';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -36,7 +40,7 @@
         objectLink: {
           get: function () {
             return this.attr('isSnapshot') ?
-              GGRC.Utils.Snapshots.getParentUrl(this.attr('instance')) :
+              getParentUrl(this.attr('instance')) :
               this.attr('itemData.viewLink');
           }
         },

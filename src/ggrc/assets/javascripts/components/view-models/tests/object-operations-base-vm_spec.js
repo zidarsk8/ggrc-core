@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+
 describe('GGRC.VM.ObjectOperationsBaseVM', function () {
   'use strict';
 
@@ -13,13 +15,9 @@ describe('GGRC.VM.ObjectOperationsBaseVM', function () {
   });
 
   describe('availableTypes() method', function () {
-    var originalInScopeModels;
     beforeAll(function () {
-      originalInScopeModels = GGRC.Utils.Snapshots.inScopeModels;
-      GGRC.Utils.Snapshots.inScopeModels = ['test1', 'test2'];
-    });
-    afterAll(function () {
-      GGRC.Utils.Snapshots.inScopeModels = originalInScopeModels;
+      spyOn(SnapshotUtils, 'getInScopeModels')
+        .and.returnValue(['test1', 'test2']);
     });
 
     it('correctly calls getMappingTypes', function () {

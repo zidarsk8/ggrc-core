@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+
 describe('GGRC.Components.objectMapper', function () {
   'use strict';
 
@@ -67,7 +69,7 @@ describe('GGRC.Components.objectMapper', function () {
 
       it('do not use Snapshots if not an in-scope model', function () {
         var result;
-        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
+        spyOn(SnapshotUtils, 'isInScopeModel')
           .and.returnValue(false);
         result = Component.prototype.viewModel({}, parentViewModel)();
         expect(result.attr('useSnapshots')).toEqual(false);
@@ -527,8 +529,7 @@ describe('GGRC.Components.objectMapper', function () {
     it('returns true if it is not an in-scope model',
       function () {
         var result;
-        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-          .and.returnValue(false);
+        spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(false);
         result = viewModel.allowedToCreate();
         expect(result).toEqual(true);
       });
@@ -537,8 +538,7 @@ describe('GGRC.Components.objectMapper', function () {
     'snapshotable',
       function () {
         var result;
-        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-          .and.returnValue(true);
+        spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
         result = viewModel.allowedToCreate();
         expect(result).toEqual(true);
       });
@@ -548,8 +548,7 @@ describe('GGRC.Components.objectMapper', function () {
       function () {
         var result;
         viewModel.attr('type', 'Control');
-        spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-          .and.returnValue(true);
+        spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
         result = viewModel.allowedToCreate();
         expect(result).toEqual(false);
       });
@@ -568,8 +567,7 @@ describe('GGRC.Components.objectMapper', function () {
 
     it('returns false if is an in-scope model', function () {
       var result;
-      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-        .and.returnValue(true);
+      spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(true);
       result = viewModel.showWarning();
       expect(result).toEqual(false);
     });
@@ -577,8 +575,7 @@ describe('GGRC.Components.objectMapper', function () {
     it('returns true if source object is a Snapshot parent and mapped type ' +
     'is snapshotable', function () {
       var result;
-      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-        .and.returnValue(false);
+      spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(false);
       viewModel.attr('object', 'Audit');
       viewModel.attr('type', 'Control');
       result = viewModel.showWarning();
@@ -588,12 +585,10 @@ describe('GGRC.Components.objectMapper', function () {
     it('returns true if mapped object is both a ' +
       'Snapshot parent and snapshotable', function () {
       var result;
-      spyOn(GGRC.Utils.Snapshots, 'isInScopeModel')
-        .and.returnValue(false);
-      spyOn(GGRC.Utils.Snapshots, 'isSnapshotParent')
-        .and.callFake(function (v) {
-          return v === 'o';
-        });
+      spyOn(SnapshotUtils, 'isInScopeModel').and.returnValue(false);
+      spyOn(SnapshotUtils, 'isSnapshotParent').and.callFake(function (v) {
+        return v === 'o';
+      });
       viewModel.attr('object', 'o');
       viewModel.attr('type', 'Control');
       result = viewModel.showWarning();

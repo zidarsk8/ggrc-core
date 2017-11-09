@@ -5,6 +5,9 @@
 
 import '../people/deletable-people-group';
 import '../people/editable-people-group';
+import {
+  isSnapshot,
+} from '../../plugins/utils/snapshot-utils';
 
 (function (can, _, GGRC, Permission) {
   'use strict';
@@ -16,8 +19,7 @@ import '../people/editable-people-group';
         canEdit: {
           get: function () {
             var instance = this.attr('instance');
-            var isSnapshot = GGRC.Utils.Snapshots.isSnapshot(instance);
-            var canEdit = !isSnapshot &&
+            var canEdit = !isSnapshot(instance) &&
               !this.attr('updatableGroupId') &&
               (this.attr('isNewInstance') ||
                 Permission.is_allowed_for('update', instance));

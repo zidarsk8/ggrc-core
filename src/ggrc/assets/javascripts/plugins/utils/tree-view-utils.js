@@ -3,6 +3,15 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  isSnapshot,
+  isSnapshotModel,
+  isSnapshotRelated,
+  isSnapshotScope,
+  toObject,
+  transformQuery,
+} from './snapshot-utils';
+
 /**
 * TreeView-specific utils.
 */
@@ -14,7 +23,6 @@ var orderedModelsForSubTier = {};
 
 var QueryAPI = GGRC.Utils.QueryAPI;
 var CurrentPage = GGRC.Utils.CurrentPage;
-var SnapshotUtils = GGRC.Utils.Snapshots;
 
 var SUB_TREE_ELEMENTS_LIMIT = 20;
 var SUB_TREE_FIELDS = Object.freeze([
@@ -433,9 +441,8 @@ function loadFirstTierItems(modelName,
   var requestedType;
   var requestData = request.slice() || can.List();
 
-  if ((SnapshotUtils.isSnapshotScope(parent) &&
-    SnapshotUtils.isSnapshotModel(modelConfig.name))) {
-    params = SnapshotUtils.transformQuery(params);
+  if ((isSnapshotScope(parent) && isSnapshotModel(modelConfig.name))) {
+    params = transformQuery(params);
   }
 
   requestedType = params.object_name;
@@ -502,10 +509,8 @@ function loadItemsForSubTier(models, type, id, filter) {
             null
         );
 
-        if (SnapshotUtils.isSnapshotRelated(
-            relevant.type,
-            params.object_name)) {
-          params = SnapshotUtils.transformQuery(params);
+        if (isSnapshotRelated(relevant.type, params.object_name)) {
+          params = transformQuery(params);
         }
 
         return QueryAPI.batchRequests(params);
@@ -531,7 +536,7 @@ function loadItemsForSubTier(models, type, id, filter) {
       loadedModelObjects.forEach(function (modelObject, index) {
         var values;
 
-        if (SnapshotUtils.isSnapshotModel(modelObject.name) &&
+        if (isSnapshotModel(modelObject.name) &&
           response[index].Snapshot) {
           values = response[index].Snapshot.values;
         } else {
@@ -596,7 +601,7 @@ function isDirectlyRelated(instance) {
     CurrentPage.getPageType() !== 'Workflow';
   var relates = CurrentPage.related.attr(instance.type);
   var result = true;
-  var instanceId = SnapshotUtils.isSnapshot(instance) ?
+  var instanceId = isSnapshot(instance) ?
     instance.snapshot.id :
     instance.id;
 
@@ -625,7 +630,7 @@ function _getQuerryObjectVersion(models, relevant, filter) {
       .buildCountParams([name], relevant, filter);
 
     if (widgetConfig.isObjectVersion) {
-      query = SnapshotUtils.transformQuery(query[0]);
+      query = transformQuery(query[0]);
       countQuery.push(query);
     } else {
       countQuery.push(query[0]);
@@ -663,10 +668,10 @@ function _buildSubTreeCountMap(models, relevant, filter) {
     } else {
       countQuery = QueryAPI.buildCountParams(models, relevant, filter)
         .map(function (param) {
-          if (SnapshotUtils.isSnapshotRelated(
+          if (isSnapshotRelated(
               relevant.type,
               param.object_name)) {
-            param = SnapshotUtils.transformQuery(param);
+            param = transformQuery(param);
           }
           return param;
         });
@@ -719,7 +724,7 @@ function _createInstance(source, modelName) {
   var instance;
 
   if (source.type === 'Snapshot') {
-    instance = SnapshotUtils.toObject(source);
+    instance = toObject(source);
   } else {
     instance = CMS.Models[modelName].model(source);
   }

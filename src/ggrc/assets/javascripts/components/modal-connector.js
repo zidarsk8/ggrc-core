@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  toObject,
+  isSnapshotType,
+} from '../plugins/utils/snapshot-utils';
+
 (function (can, $) {
   /*
    Below this line we're defining a can.Component, which is in this file
@@ -348,7 +353,7 @@
       },
       addListItem: function (item) {
         var snapshotObject;
-        if (GGRC.Utils.Snapshots.isSnapshotType(item) &&
+        if (isSnapshotType(item) &&
           item.snapshotObject) {
           snapshotObject = item.snapshotObject;
           item.attr('title', snapshotObject.title);
@@ -385,7 +390,7 @@
 
             snapshots = response[2].Snapshot.values;
             snapshots.forEach(function (snapshot) {
-              var object = GGRC.Utils.Snapshots.toObject(snapshot);
+              var object = toObject(snapshot);
 
               snapshot.class = object.class;
               snapshot.snapshot_object_class = 'snapshot-object';

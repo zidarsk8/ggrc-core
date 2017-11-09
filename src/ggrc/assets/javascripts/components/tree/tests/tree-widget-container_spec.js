@@ -4,6 +4,7 @@
  */
 
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
+import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 
 describe('GGRC.Components.treeWidgetContainer', function () {
   'use strict';
@@ -147,8 +148,8 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     var isSnapshotModel;
 
     beforeEach(function () {
-      isSnapshotScope = spyOn(GGRC.Utils.Snapshots, 'isSnapshotScope');
-      isSnapshotModel = spyOn(GGRC.Utils.Snapshots, 'isSnapshotModel');
+      isSnapshotScope = spyOn(SnapshotUtils, 'isSnapshotScope');
+      isSnapshotModel = spyOn(SnapshotUtils, 'isSnapshotModel');
     });
 
     describe('if parent_instance is a snapshot scope and ' +

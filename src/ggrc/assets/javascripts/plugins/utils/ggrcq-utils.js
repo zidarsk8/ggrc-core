@@ -3,7 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function (GGRC, Snapshots) {
+import {
+  isSnapshot,
+} from './snapshot-utils';
+
+(function (GGRC) {
   'use strict';
 
   /**
@@ -45,7 +49,7 @@
      * @return {String} Url to questions
      */
     function getQuestionsUrl(instance) {
-      var id = Snapshots.isSnapshot(instance) && instance.snapshot ?
+      var id = isSnapshot(instance) && instance.snapshot ?
           instance.snapshot.child_id :
           instance.id;
       return GGRC.Utils.GGRCQ.getUrl(id, instance.class.title_singular);
@@ -57,4 +61,4 @@
       getQuestionsUrl: getQuestionsUrl
     };
   })();
-})(window.GGRC, window.GGRC.Utils.Snapshots);
+})(window.GGRC);

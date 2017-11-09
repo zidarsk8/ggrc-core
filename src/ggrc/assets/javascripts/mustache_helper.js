@@ -4,6 +4,10 @@
 */
 
 import Spinner from 'spin.js';
+import {
+  isInScopeModel,
+  isSnapshotParent,
+} from './plugins/utils/snapshot-utils';
 
 (function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.
@@ -2523,13 +2527,12 @@ Example:
   );
 
   Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
-    var isInScopeModel;
+    var isInScope;
     modelName = can.isFunction(modelName) ? modelName() : modelName;
-    isInScopeModel = GGRC.Utils.Snapshots.isInScopeModel(modelName);
+    isInScope = isInScopeModel(modelName);
     // Temporary Modification to remove possibility to unmap Audit
-    isInScopeModel =
-      isInScopeModel || GGRC.Utils.Snapshots.isSnapshotParent(modelName);
-    return isInScopeModel ? options.inverse(this) : options.fn(this);
+    isInScope = isInScope || isSnapshotParent(modelName);
+    return isInScope ? options.inverse(this) : options.fn(this);
   });
 
   /**
