@@ -118,8 +118,6 @@ dashboard-js-template-files:
   - assessments/modal_content_additional_fields.mustache
   - assessments/tree_add_item.mustache
   - assessments/info.mustache
-  - assessments/related-assessments.mustache
-  - assessments/related-assessments-without-reuse.mustache
   - assessments/header.mustache
   - assessments/dates_list.mustache
   - assessment_templates/attribute_field.mustache
