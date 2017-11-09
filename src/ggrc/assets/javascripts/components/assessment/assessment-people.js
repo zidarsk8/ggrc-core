@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ROLES_CONFLICT} from '../../events/eventTypes';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -28,7 +30,7 @@
       orderOfRoles: ['Creators', 'Assignees', 'Verifiers'],
     },
     events: {
-      '{instance} rolesConflict': function (ev, args) {
+      [`{instance} ${ROLES_CONFLICT.type}`]: function (ev, args) {
         this.viewModel.attr('rolesConflict', args.rolesConflict);
       },
     },

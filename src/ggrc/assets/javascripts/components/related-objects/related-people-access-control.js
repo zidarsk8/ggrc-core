@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {SAVE_CUSTOM_ROLE, ROLES_CONFLICT} from '../../events/eventTypes';
+
 export default GGRC.Components('relatedPeopleAccessControl', {
   tag: 'related-people-access-control',
   viewModel: {
@@ -24,7 +26,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
         this.checkConflicts(args.roleTitle);
       }
       this.dispatch({
-        type: 'saveCustomRole',
+        ...SAVE_CUSTOM_ROLE,
         groupId: args.roleId,
       });
     },
@@ -64,7 +66,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
 
       this.attr('hasConflicts', hasConflict);
       this.attr('instance').dispatch({
-        type: 'rolesConflict',
+        ...ROLES_CONFLICT,
         rolesConflict: hasConflict,
       });
     },

@@ -14,6 +14,30 @@ const REFRESH_RELATED = {
   type: 'refreshRelated',
 };
 
+/**
+ *
+ * @event saveCustomRole
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} groupId - Role ID.
+ */
+const SAVE_CUSTOM_ROLE = {
+  type: 'saveCustomRole',
+};
+
+/**
+ *
+ * @event rolesConflict
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} groupId - Role ID.
+ */
+const ROLES_CONFLICT = {
+  type: 'rolesConflict',
+};
+
 export {
   REFRESH_RELATED,
+  SAVE_CUSTOM_ROLE,
+  ROLES_CONFLICT,
 };
