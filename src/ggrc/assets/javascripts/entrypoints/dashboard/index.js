@@ -147,12 +147,6 @@ import '../../components/people/people-list-info';
 import '../../components/prev-next-buttons/prev-next-buttons';
 import '../../components/loading/loading-status';
 import '../../components/lazy-render/lazy-render';
-
-// people
-import '../../components/related-objects/related-people-access-control';
-import '../../components/custom-roles/custom-roles';
-import '../../components/custom-roles/custom-roles-modal';
-
 import '../../components/custom-attributes/custom-attributes-field-view';
 import '../../components/form/form-validation-text';
 
@@ -169,10 +163,8 @@ import '../../components/issue/issue-unmap';
 import '../../components/external-data-autocomplete/external-data-autocomplete';
 import '../../components/external-data-autocomplete/inline-autocomplete-wrapper';
 
-// people
 import '../../components/custom-roles/custom-roles';
 import '../../components/custom-roles/custom-roles-modal';
-import '../../components/assessment/people/lhn-popup-people';
 
 // This modal should be loaded here as it requires some components
 import '../../bootstrap/modal-ajax';
