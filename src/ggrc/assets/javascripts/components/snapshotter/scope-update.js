@@ -6,6 +6,9 @@
 import {
   isSnapshotModel,
 } from '../../plugins/utils/snapshot-utils';
+import {
+  refreshCounts,
+} from '../../plugins/utils/current-page-utils';
 
 (function (GGRC, can, $) {
   'use strict';
@@ -31,7 +34,7 @@ import {
         );
       },
       _refreshContainers: function () {
-        return GGRC.Utils.CurrentPage.refreshCounts()
+        return refreshCounts()
           .then(function () {
           // tell each container with snapshots that it should refresh own data
             $('tree-widget-container')

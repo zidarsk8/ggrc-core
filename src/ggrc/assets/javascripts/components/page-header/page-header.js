@@ -7,6 +7,9 @@ import '../assessment/people/lhn-popup-people';
 import '../tasks-counter/tasks-counter';
 import logo from '../../../images/ggrc-logo.svg';
 import oneColorLogo from '../../../images/ggrc-one-color.svg';
+import {
+  isMyAssessments,
+} from '../../plugins/utils/current-page-utils';
 
 (function (GGRC, can) {
   'use strict';
@@ -42,8 +45,8 @@ import oneColorLogo from '../../../images/ggrc-one-color.svg';
       isMyAssessments: {
         type: Boolean,
         get: function () {
-          return GGRC.Utils.CurrentPage.isMyAssessments();
-        }
+          return isMyAssessments();
+        },
       },
       showTitles: {
         type: Boolean,

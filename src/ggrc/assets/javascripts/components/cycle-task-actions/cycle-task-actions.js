@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  getPageType,
+} from '../../plugins/utils/current-page-utils';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -34,7 +38,7 @@
       },
       isShowActionButtons: {
         get: function () {
-          var pageType = GGRC.Utils.CurrentPage.getPageType();
+          var pageType = getPageType();
           var allowChangeState = this.attr('instance.allow_change_state');
 
           if (pageType === 'Workflow') {

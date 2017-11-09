@@ -5,10 +5,12 @@
 
 import * as TreeViewUtils from '../utils/tree-view-utils';
 import * as SnapshotUtils from '../utils/snapshot-utils';
+import * as CurrentPageUtils from '../utils/current-page-utils';
 
 describe('GGRC Utils CurrentPage', function () {
   var pageType;
-  beforeEach(function () {
+
+  beforeAll(() => {
     pageType = GGRC.pageType;
   });
 
@@ -17,10 +19,10 @@ describe('GGRC Utils CurrentPage', function () {
   });
 
   beforeEach(function () {
-    var instance = {
+    let instance = new CMS.Models.Audit({
       id: 1,
-      type: 'Audit'
-    };
+      type: 'Audit',
+    });
 
     spyOn(GGRC, 'page_instance')
       .and.returnValue(instance);
@@ -31,7 +33,7 @@ describe('GGRC Utils CurrentPage', function () {
     var method;
 
     beforeEach(function () {
-      method = GGRC.Utils.CurrentPage.getPageType;
+      method = CurrentPageUtils.getPageType;
     });
 
     it('returns pageType value if it defined', function () {
@@ -48,7 +50,7 @@ describe('GGRC Utils CurrentPage', function () {
     var method;
 
     beforeEach(function () {
-      method = GGRC.Utils.CurrentPage.isMyAssessments;
+      method = CurrentPageUtils.isMyAssessments;
     });
 
     it('returns True for GGRC.pageType = MY_ASSESSMENTS', function () {
@@ -70,7 +72,7 @@ describe('GGRC Utils CurrentPage', function () {
     var method;
 
     beforeEach(function () {
-      method = GGRC.Utils.CurrentPage.isMyWork;
+      method = CurrentPageUtils.isMyWork;
     });
 
     it('returns True for GGRC.pageType = MY_WORK', function () {
@@ -92,7 +94,7 @@ describe('GGRC Utils CurrentPage', function () {
     var method;
 
     beforeEach(function () {
-      method = GGRC.Utils.CurrentPage.isAdmin;
+      method = CurrentPageUtils.isAdmin;
     });
 
     it('returns True for GGRC.pageType = ADMIN', function () {
@@ -114,7 +116,7 @@ describe('GGRC Utils CurrentPage', function () {
     var method;
 
     beforeEach(function () {
-      method = GGRC.Utils.CurrentPage.isObjectContextPage;
+      method = CurrentPageUtils.isObjectContextPage;
     });
 
     it('returns True if pageType not defined', function () {
@@ -137,7 +139,7 @@ describe('GGRC Utils CurrentPage', function () {
           Assessment: {},
           objective: {}
         });
-      method = GGRC.Utils.CurrentPage.getWidgetList;
+      method = CurrentPageUtils.getWidgetList;
     });
 
     it('returns an empty object when model is not provided', function () {
@@ -166,7 +168,7 @@ describe('GGRC Utils CurrentPage', function () {
     var method;
 
     beforeEach(function () {
-      method = GGRC.Utils.CurrentPage.getDefaultWidgets;
+      method = CurrentPageUtils.getDefaultWidgets;
     });
 
     it('should return "Info" widget for non-object browser path', function () {
@@ -227,7 +229,7 @@ describe('GGRC Utils CurrentPage', function () {
             }
           }
         });
-      method = GGRC.Utils.CurrentPage.getWidgetModels;
+      method = CurrentPageUtils.getWidgetModels;
     });
 
     it('returns an empty array when model is not provided', function () {
@@ -271,8 +273,8 @@ describe('GGRC Utils CurrentPage', function () {
 
     beforeEach(function () {
       queryDfd = can.Deferred();
-      method = GGRC.Utils.CurrentPage.initCounts;
-      getCounts = GGRC.Utils.CurrentPage.getCounts;
+      method = CurrentPageUtils.initCounts;
+      getCounts = CurrentPageUtils.getCounts;
 
       spyOn(TreeViewUtils, 'makeRelevantExpression')
         .and.returnValue({
@@ -418,7 +420,7 @@ describe('GGRC Utils CurrentPage', function () {
           requestDfds.push(requestDfd);
           return requestDfd;
         });
-      method = GGRC.Utils.CurrentPage.initMappedInstances;
+      method = CurrentPageUtils.initMappedInstances;
     });
 
     it('should init mappings for snapshotable objects',
@@ -469,5 +471,73 @@ describe('GGRC Utils CurrentPage', function () {
           });
         });
       });
+  });
+
+  describe('refreshCounts() method', function () {
+    var widgets;
+    var refreshCounts;
+
+    beforeEach(function () {
+      refreshCounts = CurrentPageUtils.refreshCounts;
+
+      widgets =
+        {
+          Program: {
+            content_controller_options: {
+              model: {
+                shortName: 'Program',
+              },
+            },
+          },
+        Assessment: {
+          content_controller_options: {
+            model: {
+              shortName: 'Assessment',
+            },
+          },
+        },
+        Audit: {
+          content_controller_options: {
+            model: {
+              shortName: 'Audit',
+            },
+          },
+        },
+      };
+
+      spyOn(GGRC.WidgetList, 'get_widget_list_for')
+        .and.returnValue(widgets);
+
+      spyOn(can, 'ajax')
+        .and.returnValues(
+        can.Deferred().resolve(
+          [
+            {Program: {count: 0, total: 0}, selfLink: null},
+            {Assessment: {count: 0, total: 0}, selfLink: null},
+            {Audit: {count: 3, total: 4}, selfLink: null},
+          ]));
+    });
+
+    it('should reinit counts', function (done) {
+      refreshCounts()
+        .then(function (counts) {
+          var reqParams;
+          var reqParamNames;
+
+          expect(can.ajax.calls.count()).toEqual(1);
+          reqParams = JSON.parse(can.ajax.calls.argsFor(0)[0].data);
+          reqParamNames = _.map(reqParams,
+          function (param) {
+            return param.object_name;
+          });
+          expect(reqParams.length).toEqual(3);
+          expect(reqParamNames).toContain('Program');
+          expect(reqParamNames).toContain('Assessment');
+          expect(reqParamNames).toContain('Audit');
+          expect(counts.Audit).toEqual(4);
+          expect(counts.Program).toEqual(0);
+          done();
+        });
+    });
   });
 });

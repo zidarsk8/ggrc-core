@@ -3,6 +3,11 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {
+  isAdmin,
+  getPageType,
+} from '../plugins/utils/current-page-utils';
+
 (function (can, $) {
   can.Control('CMS.Controllers.Dashboard', {
     defaults: {
@@ -194,7 +199,7 @@
       control = new descriptor
         .controller($element, descriptor.controller_options);
 
-      if (GGRC.Utils.CurrentPage.isAdmin()) {
+      if (isAdmin()) {
         control.prepare();
       }
 
@@ -570,7 +575,7 @@
     },
 
     show_hide_titles: function () {
-      const pageType = GGRC.Utils.CurrentPage.getPageType();
+      const pageType = getPageType();
       const originalWidgets = this.options.widget_list;
       const priorityTabsNum = this.options.attr('priorityTabs');
       const priorityTabs = originalWidgets.slice(0, priorityTabsNum);

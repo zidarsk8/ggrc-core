@@ -11,6 +11,14 @@ import {
   toObject,
   transformQuery,
 } from './snapshot-utils';
+import {
+  related,
+  initMappedInstances,
+  isObjectContextPage,
+  getPageType,
+} from './current-page-utils';
+import './query-api-utils';
+
 
 /**
 * TreeView-specific utils.
@@ -22,7 +30,6 @@ var allTypes = Object.keys(baseWidgets.attr());
 var orderedModelsForSubTier = {};
 
 var QueryAPI = GGRC.Utils.QueryAPI;
-var CurrentPage = GGRC.Utils.CurrentPage;
 
 var SUB_TREE_ELEMENTS_LIMIT = 20;
 var SUB_TREE_FIELDS = Object.freeze([
@@ -518,8 +525,8 @@ function loadItemsForSubTier(models, type, id, filter) {
 
       resultDfd = can.when.apply(can, dfds).promise();
 
-      if (!CurrentPage.related.initialized) {
-        mappedDfd = CurrentPage.initMappedInstances();
+      if (!related.initialized) {
+        mappedDfd = initMappedInstances();
 
         return can.when(mappedDfd, dfds).then(function () {
           return resultDfd;
@@ -597,9 +604,9 @@ function makeRelevantExpression(requestedType,
  * @return {Boolean} Is associated with the current context.
  */
 function isDirectlyRelated(instance) {
-  var needToSplit = CurrentPage.isObjectContextPage() &&
-    CurrentPage.getPageType() !== 'Workflow';
-  var relates = CurrentPage.related.attr(instance.type);
+  var needToSplit = isObjectContextPage() &&
+    getPageType() !== 'Workflow';
+  var relates = related.attr(instance.type);
   var result = true;
   var instanceId = isSnapshot(instance) ?
     instance.snapshot.id :

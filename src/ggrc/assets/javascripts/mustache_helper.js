@@ -8,6 +8,9 @@ import {
   isInScopeModel,
   isSnapshotParent,
 } from './plugins/utils/snapshot-utils';
+import {
+  isMyAssessments,
+} from './plugins/utils/current-page-utils';
 
 (function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.
@@ -1361,7 +1364,7 @@ function get_observe_context(scope) {
   });
 
   Mustache.registerHelper('isMyAssessments', function (options) {
-    return GGRC.Utils.CurrentPage.isMyAssessments() ?
+    return isMyAssessments() ?
       options.fn(options.contexts) :
       options.inverse(options.contexts);
   });

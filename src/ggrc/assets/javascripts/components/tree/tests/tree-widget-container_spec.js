@@ -5,19 +5,18 @@
 
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 
 describe('GGRC.Components.treeWidgetContainer', function () {
   'use strict';
 
   var vm;
-  var CurrentPageUtils;
   var Component;
 
   beforeEach(function () {
     Component = GGRC.Components.get('treeWidgetContainer');
     vm = GGRC.Components.getViewModel('treeWidgetContainer');
-    CurrentPageUtils = GGRC.Utils.CurrentPage;
   });
 
   describe('optionsData get() method', function () {

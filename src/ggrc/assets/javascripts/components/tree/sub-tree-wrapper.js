@@ -5,11 +5,13 @@
 
 import template from './templates/sub-tree-wrapper.mustache';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
+import {
+  isObjectContextPage,
+  getPageType,
+} from '../../plugins/utils/current-page-utils';
 
 (function (can, GGRC) {
   'use strict';
-
-  var CurrentPage = GGRC.Utils.CurrentPage;
 
   var viewModel = can.Map.extend({
     define: {
@@ -42,10 +44,10 @@ import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
       needToSplit: {
         type: Boolean,
         get: function () {
-          return CurrentPage.isObjectContextPage() &&
-            CurrentPage.getPageType() !== 'Workflow' &&
+          return isObjectContextPage() &&
+            getPageType() !== 'Workflow' &&
             this.attr('notDirectlyItems').length;
-        }
+        },
       },
       notResult: {
         type: Boolean,

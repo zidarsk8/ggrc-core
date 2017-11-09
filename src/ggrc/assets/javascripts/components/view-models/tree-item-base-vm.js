@@ -4,6 +4,9 @@
  */
 
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
+import {
+  getPageType,
+} from '../../plugins/utils/current-page-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -72,7 +75,7 @@ import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
           break;
         case 'Cycle':
         case 'CycleTaskGroup':
-          if (GGRC.Utils.CurrentPage.getPageType() === 'Workflow') {
+          if (getPageType() === 'Workflow') {
             this.attr('expanded', !this.attr('expanded'));
             return;
           }

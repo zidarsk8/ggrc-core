@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+
 describe('GGRC.Components.SnapshotScopeUpdater', function () {
   'use strict';
 
@@ -79,14 +81,14 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
     beforeEach(function () {
       method = updaterViewModel._refreshContainers.bind(updaterViewModel);
       refreshDfd = new $.Deferred().resolve();
-      spyOn(GGRC.Utils.CurrentPage, 'refreshCounts').and.returnValue(refreshDfd);
+      spyOn(CurrentPageUtils, 'refreshCounts').and.returnValue(refreshDfd);
     });
 
     it('refreshes all page counters', function (done) {
       var result = method();
       result.then(
         function () {
-          expect(GGRC.Utils.CurrentPage.refreshCounts).toHaveBeenCalled();
+          expect(CurrentPageUtils.refreshCounts).toHaveBeenCalled();
           done();
         }
       );

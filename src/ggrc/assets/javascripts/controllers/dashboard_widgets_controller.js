@@ -4,6 +4,9 @@
 */
 
 import './filterable_controller';
+import {
+  getCounts,
+} from '../plugins/utils/current-page-utils';
 
 CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
   defaults: {
@@ -43,11 +46,11 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
       .attr('id', this.options.widget_id + '_widget');
 
     if (this.options.widgetType && this.options.widgetType === 'treeview') {
-      var counts = GGRC.Utils.CurrentPage.getCounts();
+      var counts = getCounts();
 
       var countsName = this.options.countsName ||
       this.options.model.shortName;
-    
+
       if (this.options.objectVersion) {
         countsName = GGRC.Utils.ObjectVersions
           .getWidgetConfig(countsName, true)

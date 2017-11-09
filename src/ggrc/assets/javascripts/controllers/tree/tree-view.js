@@ -5,6 +5,9 @@
 
 import * as StateUtils from '../../plugins/utils/state-utils';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
+import {
+  getCounts,
+} from '../../plugins/utils/current-page-utils';
 
 (function (can, $) {
   CMS.Controllers.TreeLoader.extend('CMS.Controllers.TreeView', {
@@ -218,7 +221,7 @@ import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
       var countsName = options.countsName || options.model.shortName;
 
       if (this.options.parent_instance && this.options.mapping) {
-        counts = GGRC.Utils.CurrentPage.getCounts();
+        counts = getCounts();
 
         if (self.element) {
           can.trigger(self.element, 'updateCount',

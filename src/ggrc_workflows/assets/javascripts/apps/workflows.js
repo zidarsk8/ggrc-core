@@ -3,6 +3,10 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  initCounts,
+} from '../../../../ggrc/assets/javascripts/plugins/utils/current-page-utils';
+
 (function ($, CMS, GGRC) {
   var WorkflowExtension = {};
   var _workflowObjectTypes = Array.prototype.concat.call(
@@ -580,8 +584,7 @@
     newWidgetDescriptors.history = historyWidgetDescriptor;
     newWidgetDescriptors.current = currentWidgetDescriptor;
 
-    GGRC.Utils.CurrentPage
-      .initCounts([
+    initCounts([
         WorkflowExtension.countsMap.history,
         WorkflowExtension.countsMap.activeCycles,
         WorkflowExtension.countsMap.person,

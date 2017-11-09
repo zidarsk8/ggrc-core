@@ -3,6 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+ import {
+   getWidgetList,
+   getDefaultWidgets,
+   getWidgetModels,
+   getPageType,
+   initCounts,
+ } from '../../plugins/utils/current-page-utils';
+
 (function ($, can, CMS, GGRC) {
   var $area = $('.area').first();
   var defaults;
@@ -14,7 +22,6 @@
   var modelName;
   var widgetList;
   var widgetModels;
-  var pageUtils = GGRC.Utils.CurrentPage;
 
   var sortByNameEmail = function (list) {
     return new list.constructor(can.makeArray(list).sort(function (a, b) {
@@ -227,12 +234,12 @@
 
     initWidgets();
 
-    widgetList = pageUtils.getWidgetList(modelName, location);
-    defaults = pageUtils.getDefaultWidgets(widgetList, location);
-    widgetModels = pageUtils.getWidgetModels(modelName, location);
+    widgetList = getWidgetList(modelName, location);
+    defaults = getDefaultWidgets(widgetList, location);
+    widgetModels = getWidgetModels(modelName, location);
 
-    if (!isAssessmentsView && pageUtils.getPageType() !== 'Workflow') {
-      pageUtils.initCounts(widgetModels, instance.type, instance.id);
+    if (!isAssessmentsView && getPageType() !== 'Workflow') {
+      initCounts(widgetModels, instance.type, instance.id);
     }
 
     $area.cms_controllers_page_object(can.extend({

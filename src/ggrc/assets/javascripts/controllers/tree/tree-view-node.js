@@ -7,6 +7,11 @@ import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
   isSnapshot,
 } from '../../plugins/utils/snapshot-utils';
+import {
+  related,
+  isObjectContextPage,
+  getPageType,
+} from '../../plugins/utils/current-page-utils';
 
 (function (can, $) {
   function _firstElementChild(el) {
@@ -97,8 +102,7 @@ import {
 
     markNotRelatedItem: function () {
       var instance = this.options.instance;
-      var relatedInstances = GGRC.Utils.CurrentPage.related
-        .attr(instance.type);
+      var relatedInstances = related.attr(instance.type);
       var instanceId = isSnapshot(instance) ?
                         instance.snapshot.child_id :
                         instance.id;
@@ -256,7 +260,6 @@ import {
       var oldEl = this.element;
       var oldData;
       var firstchild;
-      var pageUtils = GGRC.Utils.CurrentPage;
 
       if (!this.element) {
         return;
@@ -274,8 +277,8 @@ import {
         .data(oldData);
 
       if (this.options.is_subtree &&
-        pageUtils.isObjectContextPage() &&
-        pageUtils.getPageType() !== 'Workflow') {
+        isObjectContextPage() &&
+        getPageType() !== 'Workflow') {
         this.markNotRelatedItem();
       }
       this.on();
