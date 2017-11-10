@@ -5,6 +5,7 @@
 
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 
 describe('GGRC.Components.treeWidgetContainer', function () {
   'use strict';
@@ -455,11 +456,11 @@ describe('GGRC.Components.treeWidgetContainer', function () {
   describe('openAdvancedFilter() method', function () {
     it('copies applied filter and mapping items', function () {
       var appliedFilterItems = new can.List([
-        GGRC.Utils.AdvancedSearch.create.attribute()
+        AdvancedSearch.create.attribute()
       ]);
       var appliedMappingItems = new can.List([
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria({
-          filter: GGRC.Utils.AdvancedSearch.create.attribute()
+        AdvancedSearch.create.mappingCriteria({
+          filter: AdvancedSearch.create.attribute()
         })
       ]);
       vm.attr('advancedSearch.appliedFilterItems', appliedFilterItems);
@@ -486,11 +487,11 @@ describe('GGRC.Components.treeWidgetContainer', function () {
 
   describe('applyAdvancedFilters() method', function () {
     var filterItems = new can.List([
-      GGRC.Utils.AdvancedSearch.create.attribute()
+      AdvancedSearch.create.attribute()
     ]);
     var mappingItems = new can.List([
-      GGRC.Utils.AdvancedSearch.create.mappingCriteria({
-        filter: GGRC.Utils.AdvancedSearch.create.attribute()
+      AdvancedSearch.create.mappingCriteria({
+        filter: AdvancedSearch.create.attribute()
       })
     ]);
     beforeEach(function () {
@@ -499,7 +500,7 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       vm.attr('advancedSearch.appliedFilterItems', can.List());
       vm.attr('advancedSearch.appliedMappingItems', can.List());
       spyOn(vm, 'onFilter');
-      spyOn(GGRC.Utils.AdvancedSearch, 'buildFilter')
+      spyOn(AdvancedSearch, 'buildFilter')
         .and.callFake(function (items, request) {
           request.push({name: 'item'});
         });

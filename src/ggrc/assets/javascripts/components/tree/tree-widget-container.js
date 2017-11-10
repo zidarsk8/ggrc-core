@@ -33,6 +33,7 @@ import {
 } from '../../plugins/utils/snapshot-utils';
 import {REFRESH_RELATED} from '../../events/eventTypes';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
+import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 
 var CurrentPageUtils = GGRC.Utils.CurrentPage;
 var viewModel;
@@ -602,9 +603,9 @@ viewModel = can.Map.extend({
 
     advancedFilters = GGRC.query_parser.join_queries(
       GGRC.query_parser
-        .parse(GGRC.Utils.AdvancedSearch.buildFilter(filters, request)),
+        .parse(AdvancedSearch.buildFilter(filters, request)),
       GGRC.query_parser
-        .parse(GGRC.Utils.AdvancedSearch.buildFilter(mappings, request))
+        .parse(AdvancedSearch.buildFilter(mappings, request))
     );
     this.attr('advancedSearch.request', request);
 

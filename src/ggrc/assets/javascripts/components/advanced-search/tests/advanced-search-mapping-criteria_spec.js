@@ -4,6 +4,7 @@
 */
 
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
+import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
 
 describe('GGRC.Components.advancedSearchMappingCriteria', function () {
   'use strict';
@@ -81,7 +82,7 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
     function () {
       var relevant;
       viewModel.attr('criteria.mappedTo',
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria()
+        AdvancedSearch.create.mappingCriteria()
       );
 
       viewModel.relevantToGroup();
