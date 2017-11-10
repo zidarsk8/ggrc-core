@@ -8,6 +8,10 @@
   <related-people-access-control
     class="width-100"
     (save-custom-role)="save(%event)"
+    {conflict-roles}="conflictRoles"
+    {order-of-roles}="orderOfRoles"
+    {include-roles}="includeRoles"
+    {exclude-roles}="excludeRoles"
     {updatable-group-id}="updatableGroupId"
     {info-pane-mode}="infoPaneMode"
     {is-new-instance}="isNewInstance"

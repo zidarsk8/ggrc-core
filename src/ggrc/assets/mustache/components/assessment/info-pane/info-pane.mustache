@@ -210,6 +210,7 @@
                     <!-- End of Modal Window -->
                     <assessment-controls-toolbar class="assessment-controls-toolbar"
                         {instance}="instance"
+                        {verifiers}="verifiers"
                         {form-state}="formState"
                         (on-state-change)="onStateChange(%event)"
                     ></assessment-controls-toolbar>
@@ -280,7 +281,8 @@
                      class="assessment-attributes-panel"
                      (update-active-tab)="initGlobalAttributes">
               <div class="assessment-attributes-panel">
-                <custom-roles {instance}="instance"></custom-roles>
+                <custom-roles {exclude-roles}="assessmentMainRoles" {instance}="instance">
+                </custom-roles>
                 <assessment-custom-attributes (on-update-attributes)="saveGlobalAttributes(%event)"
                                                   {items}="globalAttributes"
                                                   {is-edit-denied}="isEditDenied"

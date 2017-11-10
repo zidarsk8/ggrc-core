@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../related-objects/related-people-mapping';
+import {ROLES_CONFLICT} from '../../events/eventTypes';
 
 (function (can, GGRC) {
   'use strict';
@@ -22,10 +22,17 @@ import '../related-objects/related-people-mapping';
           value: '',
         },
       },
-      roleConflicts: false,
+      rolesConflict: false,
       infoPaneMode: true,
       withDetails: false,
       instance: {},
+      conflictRoles: ['Assignees', 'Verifiers'],
+      orderOfRoles: ['Creators', 'Assignees', 'Verifiers'],
+    },
+    events: {
+      [`{instance} ${ROLES_CONFLICT.type}`]: function (ev, args) {
+        this.viewModel.attr('rolesConflict', args.rolesConflict);
+      },
     },
   });
 })(window.can, window.GGRC);

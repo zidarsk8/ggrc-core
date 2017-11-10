@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../assessment/people/lhn-popup-people';
 import '../tasks-counter/tasks-counter';
 import logo from '../../../images/ggrc-logo.svg';
 import oneColorLogo from '../../../images/ggrc-one-color.svg';

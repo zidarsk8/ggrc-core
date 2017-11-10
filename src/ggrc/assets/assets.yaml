@@ -96,13 +96,11 @@ dashboard-js-template-files:
   - base_templates/header.mustache
   - base_templates/mapped_objects.mustache
   - base_templates/notes.mustache
-  - base_templates/people_list.mustache
-  - base_templates/people_group.mustache
   - base_templates/request_type.mustache
   - base_templates/test.mustache
   - base_templates/urls.mustache
   - base_templates/mapping_tree_view.mustache
-  - base_templates/assignable_extended_info.mustache
+  - assessments/assignable_extended_info.mustache
   - mixins/assignable.mustache
   - clauses/modal_content.mustache
   - contracts/modal_content.mustache

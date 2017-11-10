@@ -3,8 +3,6 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import '../people/deletable-people-group';
-import '../people/editable-people-group';
 import {
   isSnapshot,
 } from '../../plugins/utils/snapshot-utils';
@@ -65,7 +63,8 @@ import {
           this.dispatch({
             type: 'updateRoles',
             people: this.attr('people'),
-            roleId: this.attr('groupId')
+            roleId: this.attr('groupId'),
+            roleTitle: this.attr('title'),
           });
         }
       },
