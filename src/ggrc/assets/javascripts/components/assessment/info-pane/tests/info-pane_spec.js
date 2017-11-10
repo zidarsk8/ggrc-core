@@ -13,7 +13,7 @@ describe('GGRC.Components.assessmentInfoPane', function () {
 
   describe('editMode attribute', function () {
     const editableStatuses = ['Not Started', 'In Progress', 'Rework Needed'];
-    const nonEditableStates = ['In Review', 'Completed'];
+    const nonEditableStates = ['In Review', 'Completed', 'Deprecated'];
     const allStatuses = editableStatuses.concat(nonEditableStates);
 
     describe('get() method', function () {
