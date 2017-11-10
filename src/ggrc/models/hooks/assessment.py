@@ -15,7 +15,6 @@ import urlparse
 import html2text
 
 from sqlalchemy import orm
-from werkzeug import exceptions
 
 from ggrc import db
 from ggrc.access_control.role import get_custom_roles_for
@@ -26,6 +25,7 @@ from ggrc.integrations import issues
 from ggrc.integrations import integrations_errors
 from ggrc.login import get_current_user_id
 from ggrc.models import all_models
+from ggrc.models import exceptions
 from ggrc.models.hooks import common
 from ggrc.services import signals
 from ggrc.access_control import role
@@ -505,12 +505,12 @@ def _create_issuetracker_issue(assessment, issue_tracker_info):
   try:
     component_id = int(component_id)
   except (TypeError, ValueError):
-    raise exceptions.BadRequest('Component ID must be a number.')
+    raise exceptions.ValidationError('Component ID must be a number.')
 
   try:
     hotlist_id = [int(hotlist_id)] if hotlist_id else []
   except (TypeError, ValueError):
-    raise exceptions.BadRequest('Hotlist ID must be a number.')
+    raise exceptions.ValidationError('Hotlist ID must be a number.')
 
   issue_params = {
       'component_id': component_id,
