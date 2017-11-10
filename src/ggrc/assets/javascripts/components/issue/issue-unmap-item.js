@@ -145,12 +145,28 @@ export default GGRC.Components('issueUnmapItem', {
          this.attr('isLoading', false);
        });
     },
+    showNoRelationhipError() {
+      const issueTitle = this.attr('issueInstance.title');
+      const targetTitle = this.attr('target.title');
+      const targetType = this.attr('target').class.title_singular;
+
+      GGRC.Errors.notifier('error',
+        `Unmapping cannot be performed. 
+        Please unmap Issue (${issueTitle}) 
+        from ${targetType} version (${targetTitle}), 
+        then mapping with original object will be automatically reverted.`);
+    },
   },
   events: {
     click(el, ev) {
       ev.preventDefault();
-      if (this.viewModel.attr('target.type') === 'Assessment' &&
+      if (!this.viewModel.attr('relationship')) {
+        // if there is no relationship it mean that user try to unmap
+        // original object from Issue automapped to snapshot via assessment
+        this.viewModel.showNoRelationhipError();
+      } else if (this.viewModel.attr('target.type') === 'Assessment' &&
         !this.viewModel.attr('issueInstance.allow_unmap_from_audit')) {
+        // In this case we should show modal with related objects.
         this.viewModel.processRelatedSnapshots();
       } else {
         this.viewModel.dispatch('unmapIssue');

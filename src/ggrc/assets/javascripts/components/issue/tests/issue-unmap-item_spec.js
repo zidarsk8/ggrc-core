@@ -389,14 +389,46 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
     });
   });
 
+  describe('showNoRelationhipError() method', ()=> {
+    const issueTitle = 'TEST_ISSUE_TITLE';
+    const targetType = 'TEST_TARGET_TYPE';
+    const targetTitle = 'TEST_TARGET_TITLE';
+
+    beforeEach(()=> {
+      viewModel.attr('issueInstance', {
+        title: issueTitle,
+      });
+      viewModel.attr('target', {
+        title: targetTitle,
+        'class': {
+          title_singular: targetType,
+        },
+      });
+      spyOn(GGRC.Errors, 'notifier');
+    });
+
+    it('shows correct message', ()=> {
+      viewModel.showNoRelationhipError();
+
+      expect(GGRC.Errors.notifier).toHaveBeenCalledWith('error',
+        `Unmapping cannot be performed. 
+        Please unmap Issue (${issueTitle}) 
+        from ${targetType} version (${targetTitle}), 
+        then mapping with original object will be automatically reverted.`);
+    });
+  });
+
   describe('"click" event', ()=> {
     let handler;
     let event;
+    let relationshipStub;
     beforeEach(()=> {
       handler = events.click.bind({viewModel: viewModel});
       event = jasmine.createSpyObj(['preventDefault']);
       spyOn(viewModel, 'processRelatedSnapshots');
+      spyOn(viewModel, 'showNoRelationhipError');
       spyOn(viewModel, 'dispatch');
+      relationshipStub = spyOn(CMS.Models.Relationship, 'findInCacheById');
     });
 
     it('prevents default action of the event', ()=> {
@@ -405,8 +437,17 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
       expect(event.preventDefault).toHaveBeenCalled();
     });
 
+    it('shows error if there is no relationship', ()=> {
+      relationshipStub.and.returnValue(null);
+
+      handler(null, event);
+
+      expect(viewModel.showNoRelationhipError).toHaveBeenCalled();
+    });
+
     it(`calls processRelatedSnapshots() if target is assessment and 
       not allowed to unmap issue from audit`, ()=> {
+      relationshipStub.and.returnValue({test: 'true'});
       viewModel.attr('target.type', 'Assessment');
       viewModel.attr('issueInstance.allow_unmap_from_audit', false);
 
@@ -417,6 +458,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
     });
 
     it('dispatches "unmapIssue" event if target', ()=> {
+      relationshipStub.and.returnValue({test: 'true'});
       viewModel.attr('target.type', 'Control');
       viewModel.attr('issueInstance.allow_unmap_from_audit', true);
 
