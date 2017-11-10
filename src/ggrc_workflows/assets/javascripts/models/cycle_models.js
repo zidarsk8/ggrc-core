@@ -340,6 +340,7 @@
         }
       ],
       display_attr_names: ['title',
+                           'status',
                            'Task Assignees',
                            'start_date',
                            'end_date'],
