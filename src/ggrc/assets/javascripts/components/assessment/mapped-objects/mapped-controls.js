@@ -11,6 +11,10 @@ import {
   convertToFormViewField,
 } from '../../../plugins/utils/ca-utils';
 import {
+  buildParam,
+  makeRequest,
+} from '../../../plugins/utils/query-api-utils';
+import {
   toObject,
   transformQuery,
 } from '../../../plugins/utils/snapshot-utils';
@@ -113,8 +117,8 @@ import {
       };
       params.data = this.attr('queries')
         .map(function (query) {
-          var resultingQuery = GGRC.Utils.QueryAPI
-            .buildParam(query.objName, {}, relevant, query.fields);
+          var resultingQuery =
+            buildParam(query.objName, {}, relevant, query.fields);
           return transformQuery(resultingQuery);
         });
       return params;
@@ -145,8 +149,7 @@ import {
 
       this.attr('isLoading', true);
 
-      GGRC.Utils.QueryAPI
-        .makeRequest(params)
+      makeRequest(params)
         .done(this.setItems.bind(this))
         .fail(function () {
           $(document.body).trigger('ajax:flash',

@@ -7,6 +7,10 @@ import {
   toObject,
   isSnapshotType,
 } from '../plugins/utils/snapshot-utils';
+import {
+  buildParams,
+  makeRequest,
+} from '../plugins/utils/query-api-utils';
 
 (function (can, $) {
   /*
@@ -366,7 +370,7 @@ import {
         this.viewModel.list.push(item);
       },
       buildQuery: function (type) {
-        return GGRC.Utils.QueryAPI.buildParams(
+        return buildParams(
           type,
           {},
           {
@@ -382,8 +386,7 @@ import {
         var issueQuery = this.buildQuery('Issue')[0];
         var snapshotQuery = this.buildQuery('Snapshot')[0];
 
-        GGRC.Utils.QueryAPI
-          .makeRequest({data: [auditQuery, issueQuery, snapshotQuery]})
+        makeRequest({data: [auditQuery, issueQuery, snapshotQuery]})
           .then(function (response) {
             var snapshots;
             var list;

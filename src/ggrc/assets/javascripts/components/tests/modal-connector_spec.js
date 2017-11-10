@@ -4,6 +4,7 @@
 */
 
 import * as SnapshotUtils from '../../plugins/utils/snapshot-utils';
+import * as QueryAPI from '../../plugins/utils/query-api-utils';
 
 describe('GGRC.Components.modalConnector', function () {
   'use strict';
@@ -386,7 +387,7 @@ describe('GGRC.Components.modalConnector', function () {
     beforeEach(function () {
       makeRequestDfd = can.Deferred();
       makeRequest = spyOn(
-        GGRC.Utils.QueryAPI, 'makeRequest'
+        QueryAPI, 'makeRequest'
       ).and.returnValue(makeRequestDfd);
       eventScope = {
         viewModel: {},

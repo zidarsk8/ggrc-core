@@ -3,6 +3,10 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {
+  buildParam,
+} from './query-api-utils';
+
 /**
  * Util methods for work with Snapshots.
  */
@@ -253,8 +257,7 @@ function getSnapshotItemQuery(instance, childId, childType) {
       },
     },
   };
-  var query = GGRC.Utils.QueryAPI
-    .buildParam('Snapshot', {}, relevantFilters, [], filters);
+  var query = buildParam('Snapshot', {}, relevantFilters, [], filters);
   return {data: [query]};
 }
 

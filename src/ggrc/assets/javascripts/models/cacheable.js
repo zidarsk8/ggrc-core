@@ -8,6 +8,9 @@ import {
   toObjects,
   setAttrs,
 } from '../plugins/utils/snapshot-utils';
+import {
+  makeRequest,
+} from '../plugins/utils/query-api-utils';
 
 (function (can, GGRC, CMS) {
   var _oldAttr;
@@ -499,7 +502,7 @@ import {
       var deferred = can.Deferred();
       var self = this;
 
-      GGRC.Utils.QueryAPI.makeRequest(request)
+      makeRequest(request)
         .then(function (sourceData) {
           var values = [];
           var listDfd = can.Deferred();
@@ -537,7 +540,7 @@ import {
     queryAll: function (request) {
       var deferred = can.Deferred();
 
-      GGRC.Utils.QueryAPI.makeRequest(request)
+      makeRequest(request)
         .then(function (sourceData) {
           var values = [];
 

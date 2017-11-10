@@ -3,6 +3,11 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  buildParam,
+  batchRequests,
+} from '../../plugins/utils/query-api-utils';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -23,7 +28,7 @@
     loadTasks: function () {
       var id = this.attr('instanceId');
       var type = this.attr('instanceType');
-      var params = GGRC.Utils.QueryAPI.buildParam(
+      var params = buildParam(
         REQUIRED_TYPE,
         {},
         {
@@ -33,7 +38,7 @@
         },
         REQUIRED_FIELDS);
 
-      return GGRC.Utils.QueryAPI.batchRequests(params)
+      return batchRequests(params)
         .then(function (response) {
           var tasks = [];
 

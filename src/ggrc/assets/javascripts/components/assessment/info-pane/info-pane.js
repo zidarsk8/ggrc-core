@@ -28,6 +28,10 @@ import '../../tabs/tab-container';
 import './inline-item';
 import './create-url';
 import {
+  buildParam,
+  batchRequests,
+} from '../../../plugins/utils/query-api-utils';
+import {
   getCustomAttributes,
   CUSTOM_ATTRIBUTE_TYPE,
   convertToFormViewField,
@@ -187,8 +191,7 @@ import {
           id: this.attr('instance.id'),
           operation: 'relevant',
         }];
-        return GGRC.Utils.QueryAPI
-          .buildParam(type,
+        return buildParam(type,
             sortObj || {},
             relevantFilters,
             [],
@@ -212,8 +215,8 @@ import {
         var dfd = can.Deferred();
         type = type || '';
         this.attr('isUpdating' + can.capitalize(type), true);
-        GGRC.Utils.QueryAPI
-          .batchRequests(query)
+
+        batchRequests(query)
           .done(function (response) {
             var type = Object.keys(response)[0];
             var values = response[type].values;

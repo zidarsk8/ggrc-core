@@ -4,11 +4,13 @@
 */
 
 import '../dropdown/dropdown';
+import {
+  buildParam,
+  makeRequest,
+} from '../../plugins/utils/query-api-utils';
 
 (function (can, GGRC) {
   'use strict';
-
-  var QueryAPI = GGRC.Utils.QueryAPI;
 
   GGRC.Components('assessmentTemplates', {
     tag: 'assessment-templates',
@@ -90,12 +92,12 @@ import '../dropdown/dropdown';
     init: function () {
       var viewModel = this.viewModel;
       var instance = viewModel.attr('instance');
-      var param = QueryAPI.buildParam('AssessmentTemplate', {}, {
+      var param = buildParam('AssessmentTemplate', {}, {
         type: instance.type,
-        id: instance.id
+        id: instance.id,
       }, ['id', 'type', 'title', 'template_object_type']);
 
-      QueryAPI.makeRequest({data: [param]}).then(function (response) {
+      makeRequest({data: [param]}).then(function (response) {
         var values = response[0].AssessmentTemplate.values;
 
         viewModel.attr('responses', values);

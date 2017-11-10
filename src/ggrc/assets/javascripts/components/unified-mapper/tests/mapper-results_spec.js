@@ -6,6 +6,7 @@
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 import Pagination from '../../base-objects/pagination';
 
 describe('GGRC.Components.mapperResults', function () {
@@ -283,7 +284,7 @@ describe('GGRC.Components.mapperResults', function () {
         type: 'mockType',
         id: 123
       });
-      spyOn(GGRC.Utils.QueryAPI, 'buildRelevantIdsQuery')
+      spyOn(QueryAPI, 'buildRelevantIdsQuery')
         .and.returnValue('mockQuery');
       result = viewModel.prepareRelatedQuery();
       expect(result).toEqual('mockQuery');
@@ -332,7 +333,7 @@ describe('GGRC.Components.mapperResults', function () {
       spyOn(viewModel, 'prepareRelatedQuery')
         .and.returnValue({mockData: 'related'});
 
-      spyOn(GGRC.Utils.QueryAPI, 'buildParam')
+      spyOn(QueryAPI, 'buildParam')
         .and.returnValue({});
       spyOn(AdvancedSearch, 'buildFilter');
       spyOn(GGRC.query_parser, 'parse');
@@ -367,7 +368,7 @@ describe('GGRC.Components.mapperResults', function () {
     it('adds paging to query if addPaging is true', function () {
       viewModel.removeAttr('sort.key');
       viewModel.getQuery('values', true);
-      expect(GGRC.Utils.QueryAPI.buildParam.calls.argsFor(0)[1])
+      expect(QueryAPI.buildParam.calls.argsFor(0)[1])
         .toEqual({
           current: 'mock1',
           pageSize: 'mock2'
@@ -376,7 +377,7 @@ describe('GGRC.Components.mapperResults', function () {
 
     it('adds paging with sort to query if sort.key is defined', function () {
       viewModel.getQuery('values', true);
-      expect(GGRC.Utils.QueryAPI.buildParam.calls.argsFor(0)[1])
+      expect(QueryAPI.buildParam.calls.argsFor(0)[1])
         .toEqual({
           current: 'mock1',
           pageSize: 'mock2',
@@ -638,7 +639,7 @@ describe('GGRC.Components.mapperResults', function () {
       spyOn(viewModel, 'setSelectedItems');
       spyOn(viewModel, 'setDisabledItems');
       dfdRequest = $.Deferred();
-      spyOn(GGRC.Utils.QueryAPI, 'makeRequest')
+      spyOn(QueryAPI, 'makeRequest')
         .and.returnValue(dfdRequest.promise());
     });
 
@@ -722,7 +723,7 @@ describe('GGRC.Components.mapperResults', function () {
     beforeEach(function () {
       viewModel.attr({});
       dfdRequest = can.Deferred();
-      spyOn(GGRC.Utils.QueryAPI, 'makeRequest')
+      spyOn(QueryAPI, 'makeRequest')
         .and.returnValue(dfdRequest.promise());
       spyOn(viewModel, 'getModelKey')
         .and.returnValue('program');
