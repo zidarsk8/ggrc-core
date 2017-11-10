@@ -39,33 +39,23 @@ have Docker up and running. Here are the steps:
 **NOTE for Windows/OSX users:** Make sure `docker` is up and running by following the [windows guide](https://docs.docker.com/engine/installation/windows/#using-docker-from-windows-command-prompt-cmd-exe) / [osx guide](https://docs.docker.com/engine/installation/mac/#from-your-shell).
 
 * clone the repo
-* cd to the project
-directory
-* Run the following:
-
-    ```
-    ./bin/containers setup dev
-    ```
-
+* cd to the project directory
 * Set up the necessary keys:
 
-    ```
-    mv docker-compose.override.yml{.example,}
-    vim docker-compose.override.yml # Add the keys from cloud console
-    ```
+``` sh
+mv docker-compose.override.yml{.example,}
+vim docker-compose.override.yml # Add the keys from cloud console
+```
+* Run the following:
 
-    Note: if the keys aren't set in with your override file, try restarting the 
-    container with 
-
-    ```
-    docker-compose stop
-    docker-compose up -d
-    ```
+``` sh
+./bin/containers setup dev
+```
 
 To log into the container, run the following:
 
 ``` sh
-    docker exec -it ggrccore_cleandev_1 su
+./bin/containers connect
 ```
 
 If you see download errors during the `docker-compose up -d` stage, or if any subsequent
