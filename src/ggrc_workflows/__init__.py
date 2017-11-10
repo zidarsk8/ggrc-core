@@ -837,21 +837,13 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
         id=source_workflow_id
     ).first()
     source_workflow.copy(obj)
-    db.session.add(obj)
-    db.session.flush()
     obj.title = source_workflow.title + ' (copy ' + str(obj.id) + ')'
 
-  db.session.flush()
   # get the personal context for this logged in user
   user = get_current_user()
   personal_context = user.get_or_create_object_context(context=1)
   context = obj.get_or_create_object_context(personal_context)
   obj.context = context
-
-  db.session.add(personal_context)
-  db.session.add(context)
-  db.session.add(obj)
-  db.session.flush()
 
   if not obj.workflow_people:
     # add a user_roles mapping assigning the user creating the workflow
@@ -863,25 +855,23 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
         context=context,
         modified_by=get_current_user(),
     )
-    db.session.add(models.WorkflowPerson(
+    models.WorkflowPerson(
         person=user,
         workflow=obj,
         context=context,
         modified_by=get_current_user(),
-    ))
+    )
     # pass along a temporary attribute for logging the events.
     user_role._display_related_title = obj.title
-    db.session.add(user_role)
-    db.session.flush()
 
   # Create the context implication for Workflow roles to default context
-  db.session.add(ContextImplication(
+  ContextImplication(
       source_context=context,
       context=None,
       source_context_scope='Workflow',
       context_scope=None,
       modified_by=get_current_user(),
-  ))
+  )
 
   if not src.get('private'):
     # Add role implication - all users can read a public workflow
@@ -900,17 +890,17 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
       for authorization in source_workflow.context.user_roles:
         # Current user has already been added as workflow owner
         if authorization.person != user:
-          db.session.add(UserRole(
+          UserRole(
               person=authorization.person,
               role=workflow_member_role,
               context=context,
-              modified_by=user))
+              modified_by=user)
       for person in source_workflow.people:
         if person != user:
-          db.session.add(models.WorkflowPerson(
+          models.WorkflowPerson(
               person=person,
               workflow=obj,
-              context=context))
+              context=context)
 
 
 def add_public_workflow_context_implication(context, check_exists=False):
