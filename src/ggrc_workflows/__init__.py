@@ -6,6 +6,7 @@
 """Workflows module"""
 
 import collections
+import itertools
 from datetime import datetime, date
 from logging import getLogger
 from flask import Blueprint
@@ -390,7 +391,7 @@ def _update_parent_state(parent, child_statuses):
   parent.status = new_status
 
 
-def update_cycle_task_object_task_parent_state(objs, is_put=False):
+def update_cycle_task_object_task_parent_state(objs):
   """Update cycle task group status for sent cycle task"""
   objs = [o for o in objs or [] if o.cycle.workflow.kind != "Backlog"]
   if not objs:
@@ -398,15 +399,18 @@ def update_cycle_task_object_task_parent_state(objs, is_put=False):
   groups_dict = {i.cycle_task_group_id: i.cycle_task_group for i in objs}
   group_status_dict = collections.defaultdict(set)
   # load all tasks that are in the same groups there are tasks that be updated
+  task_ids = [t.id for t in db.session.deleted
+              if isinstance(t, models.CycleTaskGroupObjectTask)]
+  for task in itertools.chain(db.session.dirty, db.session.new):
+    if not isinstance(task, models.CycleTaskGroupObjectTask):
+      continue
+    group_status_dict[task.cycle_task_group].add(task.status)
+    if task.id:
+      task_ids.append(task.id)
   query = models.CycleTaskGroupObjectTask.query.filter(
       models.CycleTaskGroupObjectTask.cycle_task_group_id.in_(groups_dict)
   )
-  if is_put:
-    # require to fix problem for tasks that should be deleted
-    task_ids = []
-    for task in objs:
-      group_status_dict[task.cycle_task_group].add(task.status)
-      task_ids.append(task.id)
+  if task_ids:
     query = query.filter(models.CycleTaskGroupObjectTask.id.notin_(task_ids))
   query = query.distinct().with_for_update()
   for group_id, status in query.values("cycle_task_group_id", "status"):
@@ -496,7 +500,7 @@ def ensure_assignee_is_workflow_member(workflow, assignee, assignee_id=None):
 
 def start_end_date_validator(tgt):
   if tgt.start_date > tgt.end_date:
-      raise ValueError('End date can not be behind Start date')
+    raise ValueError('End date can not be behind Start date')
 
   if max(tgt.start_date.isoweekday(),
          tgt.end_date.isoweekday()) > all_models.Workflow.WORK_WEEK_LEN:
@@ -598,7 +602,6 @@ def handle_cycle_task_group_object_task_put(
   if any([inspect(obj).attrs.start_date.history.has_changes(),
           inspect(obj).attrs.end_date.history.has_changes()]):
     update_cycle_dates(obj.cycle)
-
   if inspect(obj).attrs.status.history.has_changes():
     # TODO: check why update_cycle_object_parent_state destroys object history
     # when accepting the only task in a cycle. The listener below is a
@@ -613,7 +616,7 @@ def handle_cycle_task_group_object_task_put(
             )
         ]
     )
-    update_cycle_task_object_task_parent_state([obj], is_put=True)
+    update_cycle_task_object_task_parent_state([obj])
 
   # Doing this regardless of status.history.has_changes() is important in order
   # to update objects that have been declined. It updates the os_last_updated
