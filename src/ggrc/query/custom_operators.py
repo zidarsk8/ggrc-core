@@ -355,6 +355,20 @@ def or_operation(exp, object_class, target_class, query):
       build_expression(exp["right"], object_class, target_class, query))
 
 
+@validate("left", "right")
+def in_operation(exp, object_class, target_class, query):
+  """Operator generate sqlalchemy for in operation"""
+  if not exp["right"]:
+    return sqlalchemy.sql.false()
+  return object_class.id.in_(
+      db.session.query(Record.key).filter(
+          Record.type == object_class.__name__,
+          Record.property == exp["left"],
+          Record.content.in_(exp["right"])
+      )
+  )
+
+
 @validate("issue", "assessment")
 def cascade_unmappable(exp, object_class, target_class, query):
   """Special operator to get the effect of cascade unmap of Issue from Asmt."""
@@ -476,6 +490,7 @@ GE_OPERATOR = validate("left", "right")(build_op_shortcut(operator.ge))
 OPS = {
     "AND": and_operation,
     "OR": or_operation,
+    "IN": in_operation,
     "=": EQ_OPERATOR,
     "!=": reverse(EQ_OPERATOR),
     "~": like,
