@@ -537,5 +537,33 @@ jQuery(function ($) {
   });
 });
 
+function openMapperByElement(ev, disableMapper) {
+  var btn = $(ev.currentTarget);
+  var data = {};
+
+  can.each(btn.data(), function (val, key) {
+    data[can.camelCaseToUnderscore(key)] = val;
+  });
+
+  if (data.tooltip) {
+    data.tooltip.hide();
+  }
+
+  if (!data.clickable) {
+    ev.preventDefault();
+  }
+
+  GGRC.Controllers.ObjectMapper.openMapper(data, disableMapper, btn);
+}
+
+$body.on('openMapper', (el, ev, disableMapper) => {
+  openMapperByElement(ev, disableMapper);
+});
+
+$body.on('click', ['unified-mapper', 'unified-search']
+  .map(val => '[data-toggle="' + val + '"]').join(', '), (ev, disable) => {
+  openMapperByElement(ev, disable);
+});
+
 jQuery(window).on('load', resize_areas);
 jQuery(window).on('resize', resize_areas);

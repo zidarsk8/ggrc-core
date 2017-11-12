@@ -14,10 +14,6 @@ import {
   isInScopeModel,
 } from '../plugins/utils/snapshot-utils';
 
-var selectors = ['unified-mapper', 'unified-search']
-  .map(function (val) {
-    return '[data-toggle="' + val + '"]';
-  });
 var DATA_CORRUPTION_MESSAGE = 'Some Data is corrupted! ' +
             'Missing Scope Object';
 var OBJECT_REQUIRED_MESSAGE = 'Required Data for In Scope Object is missing' +
@@ -207,29 +203,3 @@ GGRC.Controllers.ObjectMapper.extend('GGRC.Controllers.ObjectBulkUpdate', {
         '/modals/mapper/object-bulk-update-modal.mustache',
     },
   }, {});
-
-function openMapperByElement(ev, disableMapper) {
-  var btn = $(ev.currentTarget);
-  var data = {};
-
-  can.each(btn.data(), function (val, key) {
-    data[can.camelCaseToUnderscore(key)] = val;
-  });
-
-  if (data.tooltip) {
-    data.tooltip.hide();
-  }
-
-  if (!data.clickable) {
-    ev.preventDefault();
-  }
-
-  GGRC.Controllers.ObjectMapper.openMapper(data, disableMapper, btn);
-}
-$('body').on('openMapper', function (el, ev, disableMapper) {
-  openMapperByElement(ev, disableMapper);
-});
-
-$('body').on('click', selectors.join(', '), function (ev, disableMapper) {
-  openMapperByElement(ev, disableMapper);
-});
