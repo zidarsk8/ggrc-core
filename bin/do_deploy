@@ -60,5 +60,8 @@ yes | gcloud app deploy src/app.yaml --version="$VERSION"
 
 if [[ ! "${APPENGINE_INSTANCE}" == *"google.com:"* ]]
 then
+  write_visible_message <<EOF
+Running migrations with: '$VERSION' '$APPENGINE_INSTANCE' '$ACCESS_TOKEN'
+EOF
   python ./bin/trigger_migrations.py $VERSION $APPENGINE_INSTANCE $ACCESS_TOKEN
 fi
