@@ -4,7 +4,7 @@
 */
 
 import Spinner from 'spin.js';
-import {ObjectMapper} from './controllers/mapper';
+import {ObjectMapper} from './controllers/mapper/mapper';
 
 var $body = $('body');
 

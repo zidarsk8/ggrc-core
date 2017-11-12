@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {ObjectMapper} from '../../controllers/mapper';
+import {ObjectMapper} from '../../controllers/mapper/mapper';
 
 (function (GGRC, can) {
   'use strict';

@@ -3,16 +3,19 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import '../components/view-models/object-operations-base-vm';
-import '../components/advanced-search/advanced-search-wrapper';
-import '../components/object-bulk-update/object-bulk-update';
-import '../components/object-mapper/object-mapper';
-import '../components/object-generator/object-generator';
-import '../components/object-search/object-search';
-import '../components/unified-mapper/mapper-results';
+import '../../components/view-models/object-operations-base-vm';
+import '../../components/advanced-search/advanced-search-wrapper';
+import '../../components/object-bulk-update/object-bulk-update';
+import '../../components/object-mapper/object-mapper';
+import '../../components/object-generator/object-generator';
+import '../../components/object-search/object-search';
+import '../../components/unified-mapper/mapper-results';
 import {
   isInScopeModel,
-} from '../plugins/utils/snapshot-utils';
+} from '../../plugins/utils/snapshot-utils';
+import objectGeneratorTemplate from './object-generator-modal.mustache';
+import objectMapperTemplate from './object-mapper-modal.mustache';
+import objectSearchTemplate from './object-search-modal.mustache';
 
 const DATA_CORRUPTION_MESSAGE = 'Some Data is corrupted! ' +
             'Missing Scope Object';
@@ -21,8 +24,7 @@ const OBJECT_REQUIRED_MESSAGE = 'Required Data for In Scope Object is missing' +
 
 let ObjectMapper = can.Control.extend({
   defaults: {
-    component: GGRC.mustache_path +
-      '/modals/mapper/object-mapper-modal.mustache',
+    component: objectMapperTemplate,
   },
   launch: function ($trigger, options) {
     var href = $trigger ?
@@ -182,21 +184,19 @@ let ObjectMapper = can.Control.extend({
   },
 }, {
   init: function () {
-    this.element.html(can.view(this.options.component, this.options));
+    this.element.html(can.view.mustache(this.options.component)(this.options));
   },
 });
 
 let ObjectSearch = ObjectMapper.extend({
   defaults: {
-    component: GGRC.mustache_path +
-      '/modals/mapper/object-search-modal.mustache',
+    component: objectSearchTemplate,
   },
 }, {});
 
 let ObjectGenerator = ObjectMapper.extend({
   defaults: {
-    component: GGRC.mustache_path +
-      '/modals/mapper/object-generator-modal.mustache',
+    component: objectGeneratorTemplate,
   },
 }, {});
 GGRC.Controllers.ObjectMapper.extend('GGRC.Controllers.ObjectBulkUpdate', {
