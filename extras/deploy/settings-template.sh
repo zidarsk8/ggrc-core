@@ -30,8 +30,11 @@ DASHBOARD_INTEGRATION=""
 ALLOWED_QUERYAPI_APP_IDS=""
 APPENGINE_EMAIL=""
 AUTHORIZED_DOMAIN=""
-DATABASE_URI="mysql+mysqldb://root@/${DB_NAME}?unix_socket=/cloudsql/${DB_INSTANCE_CONNECTION_NAME}&charset=utf8"
-SCALING=$(printf "basic_scaling:\\n  max_instances: ${MAX_INSTANCES}\\n  idle_timeout: 10m\\n")
+ACCESS_TOKEN=""
+
+## generated values:
+
 # example for manual scaling:
 # SCALING=$(printf "manual_scaling:\\n  instances: ${MAX_INSTANCES}\\n")
-ACCESS_TOKEN=""
+SCALING=$(printf "basic_scaling:\\n  max_instances: ${MAX_INSTANCES}\\n  idle_timeout: 10m\\n")
+DATABASE_URI="mysql+mysqldb://root@/${DB_NAME}?unix_socket=/cloudsql/${DB_INSTANCE_CONNECTION_NAME}&charset=utf8"
