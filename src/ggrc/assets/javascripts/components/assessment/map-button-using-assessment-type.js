@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {ObjectMapper} from '../../controllers/mapper';
+
 (function (GGRC, can) {
   'use strict';
 
@@ -21,7 +23,7 @@
           deferred_to: this.attr('deferredTo')
         };
 
-        GGRC.Controllers.ObjectMapper.openMapper(data);
+        ObjectMapper.openMapper(data);
       },
       onClick: function (el, ev) {
         el.data('type', this.attr('instance.assessment_type'));

@@ -47,7 +47,6 @@ import '../../controllers/modals';
 import '../../controllers/info_pin_controller';
 import '../../controllers/automapper_controller';
 import '../../controllers/dashboard_controller';
-import '../../controllers/mapper';
 
 // Modules and Apps
 import '../../modules/widget_list';

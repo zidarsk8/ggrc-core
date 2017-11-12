@@ -3,6 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {ObjectGenerator} from '../controllers/mapper';
+
 (function (_, can, $, GGRC, CMS) {
   'use strict';
 
@@ -18,7 +20,7 @@
       'a click': function (el, ev) {
         var instance = this.scope.attr('audit') || GGRC.page_instance();
         this._results = null;
-        GGRC.Controllers.ObjectGenerator.launch(el, {
+        ObjectGenerator.launch(el, {
           object: 'Audit',
           type: 'Control',
           'join-object-id': instance.id,

@@ -14,12 +14,12 @@ import {
   isInScopeModel,
 } from '../plugins/utils/snapshot-utils';
 
-var DATA_CORRUPTION_MESSAGE = 'Some Data is corrupted! ' +
+const DATA_CORRUPTION_MESSAGE = 'Some Data is corrupted! ' +
             'Missing Scope Object';
-var OBJECT_REQUIRED_MESSAGE = 'Required Data for In Scope Object is missing' +
+const OBJECT_REQUIRED_MESSAGE = 'Required Data for In Scope Object is missing' +
   ' - Original Object is mandatory';
 
-can.Control.extend('GGRC.Controllers.ObjectMapper', {
+let ObjectMapper = can.Control.extend({
   defaults: {
     component: GGRC.mustache_path +
       '/modals/mapper/object-mapper-modal.mustache',
@@ -147,7 +147,7 @@ can.Control.extend('GGRC.Controllers.ObjectMapper', {
       var config = getConfigForCommonObjects(data);
 
       if (isSearch) {
-        GGRC.Controllers.ObjectSearch.launch(btn, can.extend(config, data));
+        ObjectSearch.launch(btn, can.extend(config, data));
       } else {
         self.launch(btn, can.extend(config, data));
       }
@@ -185,13 +185,15 @@ can.Control.extend('GGRC.Controllers.ObjectMapper', {
     this.element.html(can.view(this.options.component, this.options));
   },
 });
-GGRC.Controllers.ObjectMapper.extend('GGRC.Controllers.ObjectSearch', {
+
+let ObjectSearch = ObjectMapper.extend({
   defaults: {
     component: GGRC.mustache_path +
       '/modals/mapper/object-search-modal.mustache',
   },
 }, {});
-GGRC.Controllers.ObjectMapper.extend('GGRC.Controllers.ObjectGenerator', {
+
+let ObjectGenerator = ObjectMapper.extend({
   defaults: {
     component: GGRC.mustache_path +
       '/modals/mapper/object-generator-modal.mustache',
@@ -203,3 +205,9 @@ GGRC.Controllers.ObjectMapper.extend('GGRC.Controllers.ObjectBulkUpdate', {
         '/modals/mapper/object-bulk-update-modal.mustache',
     },
   }, {});
+
+export {
+  ObjectMapper,
+  ObjectGenerator,
+  ObjectSearch,
+}

@@ -4,6 +4,7 @@
 */
 
 import Spinner from 'spin.js';
+import {ObjectMapper} from './controllers/mapper';
 
 var $body = $('body');
 
@@ -553,7 +554,7 @@ function openMapperByElement(ev, disableMapper) {
     ev.preventDefault();
   }
 
-  GGRC.Controllers.ObjectMapper.openMapper(data, disableMapper, btn);
+  ObjectMapper.openMapper(data, disableMapper, btn);
 }
 
 $body.on('openMapper', (el, ev, disableMapper) => {
