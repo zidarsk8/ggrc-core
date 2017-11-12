@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
+
 (function (can, $) {
   'use strict';
 
@@ -11,7 +13,7 @@
     template: can.view(GGRC.mustache_path +
       '/components/object-search/object-search.mustache'),
     viewModel: function () {
-      return GGRC.VM.ObjectOperationsBaseVM.extend({
+      return ObjectOperationsBaseVM.extend({
         object: 'MultitypeSearch',
         type: 'Control',
         availableTypes: function () {

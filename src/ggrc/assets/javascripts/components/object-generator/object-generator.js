@@ -4,6 +4,7 @@
  */
 
 import '../assessment_templates/assessment_templates';
+import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 
 (function (can, $) {
   'use strict';
@@ -17,7 +18,7 @@ import '../assessment_templates/assessment_templates';
     template: can.view(GGRC.mustache_path +
       '/components/object-generator/object-generator.mustache'),
     viewModel: function (attrs, parentViewModel) {
-      return GGRC.VM.ObjectOperationsBaseVM.extend({
+      return ObjectOperationsBaseVM.extend({
         object: attrs.object,
         join_object_id: attrs.joinObjectId,
         type: attrs.type,

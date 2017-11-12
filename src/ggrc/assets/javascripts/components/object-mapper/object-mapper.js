@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import {
   isInScopeModel,
   isSnapshotModel,
@@ -68,12 +69,12 @@ import {
         special: parentViewModel.attr('special'),
       };
 
-      var resolvedConfig = GGRC.VM.ObjectOperationsBaseVM.extractConfig(
+      var resolvedConfig = ObjectOperationsBaseVM.extractConfig(
         config.general.type,
         config
       );
 
-      return GGRC.VM.ObjectOperationsBaseVM.extend({
+      return ObjectOperationsBaseVM.extend({
         join_object_id: resolvedConfig.isNew ? null :
           resolvedConfig['join-object-id'] ||
           (GGRC.page_instance() && GGRC.page_instance().id),
