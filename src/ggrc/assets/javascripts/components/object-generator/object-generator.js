@@ -4,6 +4,13 @@
  */
 
 import '../assessment_templates/assessment_templates';
+import '../../components/advanced-search/advanced-search-filter-container';
+import '../../components/advanced-search/advanced-search-filter-state';
+import '../../components/advanced-search/advanced-search-mapping-container';
+import '../../components/advanced-search/advanced-search-wrapper';
+import '../../components/collapsible-panel/collapsible-panel';
+import '../../components/unified-mapper/mapper-results';
+import '../../components/mapping-controls/mapping-type-selector';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 
 (function (can, $) {

@@ -3,12 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import '../../components/advanced-search/advanced-search-wrapper';
 import '../../components/object-bulk-update/object-bulk-update';
 import '../../components/object-mapper/object-mapper';
 import '../../components/object-generator/object-generator';
 import '../../components/object-search/object-search';
-import '../../components/unified-mapper/mapper-results';
 import {
   isInScopeModel,
 } from '../../plugins/utils/snapshot-utils';
