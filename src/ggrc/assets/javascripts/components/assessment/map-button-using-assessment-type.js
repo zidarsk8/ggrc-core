@@ -3,8 +3,6 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {ObjectMapper} from '../../controllers/mapper/mapper';
-
 (function (GGRC, can) {
   'use strict';
 
@@ -23,12 +21,18 @@ import {ObjectMapper} from '../../controllers/mapper/mapper';
           deferred_to: this.attr('deferredTo')
         };
 
-        ObjectMapper.openMapper(data);
+        import(/*webpackChunkName: "mapper"*/ '../../controllers/mapper/mapper')
+          .then(mapper => {
+            mapper.ObjectMapper.openMapper(data);
+          });
       },
       onClick: function (el, ev) {
         el.data('type', this.attr('instance.assessment_type'));
         el.data('deferred_to', this.attr('deferredTo'));
-        can.trigger(el, 'openMapper', ev);
+        import(/*webpackChunkName: "mapper"*/ '../../controllers/mapper/mapper')
+          .then(() => {
+            can.trigger(el, 'openMapper', ev);
+          });
       }
     },
     events: {

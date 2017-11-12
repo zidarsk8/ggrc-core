@@ -4,7 +4,6 @@
 */
 
 import Spinner from 'spin.js';
-import {ObjectMapper} from './controllers/mapper/mapper';
 
 var $body = $('body');
 
@@ -554,7 +553,9 @@ function openMapperByElement(ev, disableMapper) {
     ev.preventDefault();
   }
 
-  ObjectMapper.openMapper(data, disableMapper, btn);
+  import(/*webpackChunkName: "mapper"*/ './controllers/mapper/mapper').then(mapper => {
+    mapper.ObjectMapper.openMapper(data, disableMapper, btn);
+  });
 }
 
 $body.on('openMapper', (el, ev, disableMapper) => {
