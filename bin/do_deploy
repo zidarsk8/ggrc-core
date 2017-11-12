@@ -15,7 +15,6 @@ SETTINGS_FILE="$1"
 ACCOUNT="$2"
 KEY_FILE="$3"
 
-ENV_OVERRIDE_FILE=${ENV_OVERRIDE_FILE:-"override.sh"}
 VERSION="1"
 
 
@@ -39,7 +38,6 @@ deploy_appengine "$SETTINGS_FILE"
 cat /vagrant/src/app.yaml
 
 source "$SETTINGS_FILE"
-source "$ENV_OVERRIDE_FILE"
 export GGRC_SETTINGS_MODULE="$SETTINGS_MODULE"
 
 write_visible_message 'Setting project into config'
