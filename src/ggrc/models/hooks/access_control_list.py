@@ -16,7 +16,14 @@ from ggrc.models.relationship import Stub, RelationshipsCache
 
 
 def collect_snapshot_ids(related_objects):
-  """Collect snapshot ids related to base assigned object"""
+  """Collect snapshot ids related to base assigned object
+
+  Args:
+    related_objects: Dict of base objects with set of related Stubs
+
+  Returns:
+    Dict of related ids and base Stub
+  """
   snapshot_ids = {}
   for base_stub, related_stubs in related_objects.items():
     for related_stub in related_stubs:
