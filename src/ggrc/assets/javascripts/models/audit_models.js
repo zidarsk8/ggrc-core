@@ -158,7 +158,7 @@
       this.validateNonBlank('title');
 
       this.validate(
-        'issue_tracker.component_id',
+        'issue_tracker_component_id',
         function () {
           if (this.attr('issue_tracker.enabled') &&
             !this.attr('issue_tracker.component_id')) {
@@ -444,7 +444,7 @@
         }
       );
       this.validate(
-        'issue_tracker.component_id',
+        'issue_tracker_component_id',
         function () {
           if (this.attr('issue_tracker.audit_enabled') &&
             this.attr('issue_tracker.enabled') &&

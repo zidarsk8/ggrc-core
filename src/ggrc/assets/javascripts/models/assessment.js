@@ -134,7 +134,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
 
 
       this.validate(
-        'issue_tracker.title',
+        'issue_tracker_title',
         function () {
           if (this.attr('can_use_issue_tracker') &&
             this.attr('issue_tracker.enabled') &&
@@ -144,7 +144,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         }
       );
       this.validate(
-        'issue_tracker.component_id',
+        'issue_tracker_component_id',
         function () {
           if (this.attr('can_use_issue_tracker') &&
             this.attr('issue_tracker.enabled') &&
