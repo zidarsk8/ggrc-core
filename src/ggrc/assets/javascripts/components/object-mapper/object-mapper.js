@@ -8,6 +8,9 @@ import {
   isSnapshotModel,
   isSnapshotParent,
 } from '../../plugins/utils/snapshot-utils';
+import {
+  refreshCounts,
+} from '../../plugins/utils/current-page-utils';
 
 (function (can, $) {
   'use strict';
@@ -284,7 +287,7 @@ import {
                 instance.dispatch('refreshMapping');
               }
               // This Method should be modified to event
-              GGRC.Utils.CurrentPage.refreshCounts();
+              refreshCounts();
 
               _.each($('sub-tree-wrapper'), function (wrapper) {
                 var vm = $(wrapper).viewModel();

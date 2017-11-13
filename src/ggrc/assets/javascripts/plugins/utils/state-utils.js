@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  isMyAssessments,
+} from './current-page-utils';
+
 /**
  * Utils for state.
  */
@@ -210,7 +214,7 @@ function buildAssessmentFilter(statuses, builder) {
  * @return {Array} List of default states for model
  */
 function getDefaultStatesForModel(model) {
-  return GGRC.Utils.CurrentPage.isMyAssessments() ?
+  return isMyAssessments() ?
     ['Not Started', 'In Progress'] :
     getStatesForModel(model);
 }

@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as CurrentPageUtils from '../utils/current-page-utils';
+
 describe('GGRC Utils Query API', function () {
   describe('buildParams() method', function () {
     var relevant;
@@ -299,54 +301,5 @@ describe('GGRC Utils Query API', function () {
         expect(expression.op.name).toEqual('relevant');
       }
     );
-  });
-
-  describe('refreshCounts() method', function () {
-    var relevant;
-    var widgets;
-    var refreshCounts;
-
-    beforeEach(function () {
-      refreshCounts = GGRC.Utils.CurrentPage.refreshCounts;
-      widgets = ['Program', 'AccessGroup', 'Assessment', 'Audit'];
-      relevant = {
-        id: 1,
-        type: 'Program'
-      };
-
-      spyOn(GGRC.Utils.CurrentPage, 'getWidgetModels')
-        .and.returnValue(widgets);
-      spyOn(GGRC, 'page_instance')
-        .and.returnValue(relevant);
-
-      spyOn(can, 'ajax')
-        .and.returnValues(
-        can.Deferred().resolve(
-          [{Program: {count: 3, total: 4}, selfLink: null},
-          {AccessGroup: {count: 0, total: 0}, selfLink: null}]));
-    });
-
-    it('should reinit counts', function (done) {
-      refreshCounts()
-        .then(function (counts) {
-          var reqParams;
-          var reqParamNames;
-
-          expect(can.ajax.calls.count()).toEqual(1);
-          reqParams = JSON.parse(can.ajax.calls.argsFor(0)[0].data);
-          reqParamNames = _.map(reqParams,
-          function (param) {
-            return param.object_name;
-          });
-          expect(reqParams.length).toEqual(4);
-          expect(reqParamNames).toContain('Program');
-          expect(reqParamNames).toContain('AccessGroup');
-          expect(reqParamNames).toContain('Assessment');
-          expect(reqParamNames).toContain('Audit');
-          expect(counts.Program).toEqual(4);
-          expect(counts.AccessGroup).toEqual(0);
-          done();
-        });
-    });
   });
 });

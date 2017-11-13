@@ -4,6 +4,7 @@
 */
 
 import * as StateUtils from '../utils/state-utils';
+import * as CurrentPageUtils from '../utils/current-page-utils';
 
 describe('StateUtils', function () {
   describe('statusFilter() method', function () {
@@ -115,7 +116,7 @@ describe('StateUtils', function () {
     it('get default states for "MyAssessments" page', function () {
       var defaultStates;
 
-      spyOn(GGRC.Utils.CurrentPage, 'isMyAssessments')
+      spyOn(CurrentPageUtils, 'isMyAssessments')
         .and.returnValue(true);
 
       defaultStates = StateUtils.getDefaultStatesForModel('Assessment');
@@ -127,7 +128,7 @@ describe('StateUtils', function () {
     it('get default states for "Control" type', function () {
       var defaultStates;
 
-      spyOn(GGRC.Utils.CurrentPage, 'isMyAssessments')
+      spyOn(CurrentPageUtils, 'isMyAssessments')
         .and.returnValue(false);
 
       defaultStates = StateUtils.getDefaultStatesForModel('Control');

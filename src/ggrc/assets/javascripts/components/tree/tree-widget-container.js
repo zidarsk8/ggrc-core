@@ -33,9 +33,13 @@ import {
 } from '../../plugins/utils/snapshot-utils';
 import {REFRESH_RELATED} from '../../events/eventTypes';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
+import {
+  isMyAssessments,
+  getCounts,
+  initCounts,
+} from '../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 
-var CurrentPageUtils = GGRC.Utils.CurrentPage;
 var viewModel;
 
 if (!GGRC.tree_view) {
@@ -135,7 +139,7 @@ viewModel = can.Map.extend({
           classes.push('loading');
         }
 
-        if (CurrentPageUtils.isMyAssessments()) {
+        if (isMyAssessments()) {
           classes.push('my-assessments');
         }
 
@@ -207,7 +211,7 @@ viewModel = can.Map.extend({
     show3bbs: {
       type: Boolean,
       get: function () {
-        return !CurrentPageUtils.isMyAssessments();
+        return !isMyAssessments();
       },
     },
     disable3bbs: {
@@ -300,13 +304,12 @@ viewModel = can.Map.extend({
 
         if (!this._getFilterByName('custom') &&
           !this._getFilterByName('status') &&
-          total !== CurrentPageUtils.getCounts().attr(countsName)) {
-          CurrentPageUtils.getCounts().attr(countsName, total);
+          total !== getCounts().attr(countsName)) {
+          getCounts().attr(countsName, total);
         }
 
         if (this._getFilterByName('status')) {
-          CurrentPageUtils
-            .initCounts([widget], parent.type, parent.id);
+          initCounts([widget], parent.type, parent.id);
         }
       }.bind(this));
   },
@@ -394,7 +397,7 @@ viewModel = can.Map.extend({
   },
   initCount: function () {
     var $el = this.attr('$el');
-    var counts = CurrentPageUtils.getCounts();
+    var counts = getCounts();
     var countsName = this.attr('options').countsName ||
       this.attr('optionsData.widgetId');
 
@@ -443,7 +446,7 @@ viewModel = can.Map.extend({
     var modelName = this.attr('optionsData').widgetId;
     var loaded = this.attr('loaded');
     var total = this.attr('pageInfo.total');
-    var counts = _.get(CurrentPageUtils.getCounts(), modelName);
+    var counts = _.get(getCounts(), modelName);
 
     if ((modelName === 'Issue') && !_.isNull(loaded) && (total !== counts)) {
       this.loadItems();
