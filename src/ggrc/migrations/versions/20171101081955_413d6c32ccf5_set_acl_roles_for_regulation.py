@@ -57,7 +57,7 @@ def upgrade():
       )
       SELECT control_acl.person_id, control_acl.ac_role_id,
         tmp.mapped_id, 'Snapshot', now(), now(),
-        max(control_acl.context_id), max(control_acl.parent_id)
+        NULL, control_acl.parent_id
       FROM
       (
         SELECT r.source_id AS control_snap_id,
@@ -89,7 +89,8 @@ def upgrade():
       WHERE acr.name IN (
         'Creators Mapped', 'Assignees Mapped', 'Verifier Mapped'
       ) AND self_acl.id IS NULL
-      GROUP BY control_acl.person_id, control_acl.ac_role_id, tmp.mapped_id;
+      GROUP BY control_acl.person_id, control_acl.ac_role_id, tmp.mapped_id,
+        control_acl.parent_id;
   """)
 
   op.execute("DROP TABLE IF EXISTS temp_control_snapshots;")
