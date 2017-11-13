@@ -430,7 +430,9 @@ def handle_relationship_delete(relationship):
       assign_obj, other = other, assign_obj
     parent_ids = {acl.id for acl in assign_obj.access_control_list}
     db.session.query(all_models.AccessControlList).filter(
-        all_models.AccessControlList.parent_id.in_(parent_ids)
+        all_models.AccessControlList.parent_id.in_(parent_ids),
+        all_models.AccessControlList.object_type == other.type,
+        all_models.AccessControlList.object_id == other.id,
     ).delete(synchronize_session='fetch')
 
 
