@@ -342,7 +342,7 @@ def create_related_roles(base_objects, related_objects=None):
     related_objects = related(base_objects.keys(), RelationshipsCache())
 
   acl_row = namedtuple(
-      "acl_row", "person_id object_id object_type ac_role_id"
+      "acl_row", "person_id object_id object_type ac_role_id parent_id"
   )
   acl_parent = namedtuple("acl_parent", "context parent")
   acl_data = {}
@@ -365,6 +365,7 @@ def create_related_roles(base_objects, related_objects=None):
             related_stub.id,
             related_stub.type,
             mapped_acr_id,
+            acl.id,
         )] = acl_parent(acl.context, acl)
 
   # Find existing acl instances in db
@@ -372,33 +373,52 @@ def create_related_roles(base_objects, related_objects=None):
       all_models.AccessControlList.person_id,
       all_models.AccessControlList.object_id,
       all_models.AccessControlList.object_type,
-      all_models.AccessControlList.ac_role_id
+      all_models.AccessControlList.ac_role_id,
+      all_models.AccessControlList.parent_id,
   ).filter(
       sa.tuple_(
           all_models.AccessControlList.person_id,
           all_models.AccessControlList.object_id,
           all_models.AccessControlList.object_type,
-          all_models.AccessControlList.ac_role_id
+          all_models.AccessControlList.ac_role_id,
+          all_models.AccessControlList.parent_id,
       ).in_(acl_data.keys())
   ).all())
   # Find existing acl instances in session
-  existing_acls.update({
-      (a.person_id, a.object_id, a.object_type, a.ac_role_id)
+  session_acls = {
+      (
+          a.person_id,
+          a.object_id,
+          a.object_type,
+          a.ac_role_id,
+          a.parent.id if a.parent else a.parent_id,
+      ):
+      (a.person_id, a.object_id, a.object_type, a.ac_role_id, a.parent)
       for a in db.session.new if isinstance(a, all_models.AccessControlList)
-  })
+  }
+  existing_acls.update(session_acls.keys())
 
   current_user_id = login.get_current_user_id()
   # Create new acl instance only if it absent in db and session
   for acl in set(acl_data.keys()) - existing_acls:
-    db.session.add(all_models.AccessControlList(
-        person_id=acl.person_id,
-        ac_role_id=acl.ac_role_id,
-        object_id=acl.object_id,
-        object_type=acl.object_type,
-        context=acl_data[acl].context,
-        modified_by_id=current_user_id,
-        parent=acl_data[acl].parent,
-    ))
+    # In some cases parent_id will be None, but parent object is not empty.
+    # that's why we should additionally compare parent objects
+    if (
+        acl.person_id,
+        acl.object_id,
+        acl.object_type,
+        acl.ac_role_id,
+        acl_data[acl].parent
+    ) not in session_acls.values():
+      db.session.add(all_models.AccessControlList(
+          person_id=acl.person_id,
+          ac_role_id=acl.ac_role_id,
+          object_id=acl.object_id,
+          object_type=acl.object_type,
+          context=acl_data[acl].context,
+          modified_by_id=current_user_id,
+          parent=acl_data[acl].parent,
+      ))
 
 
 def handle_relationship_delete(relationship):
