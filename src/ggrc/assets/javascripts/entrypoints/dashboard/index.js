@@ -6,10 +6,6 @@
 import '../commons';
 
 // Controllers
-import '../../controllers/tree/tree-loader';
-import '../../controllers/tree/tree-view';
-import '../../controllers/tree/tree-view-node';
-import '../../controllers/tree/list_view_controller';
 import '../../controllers/dashboard_widgets_controller';
 import '../../controllers/info_widget_controller';
 import '../../controllers/dashboard_widget_controller';
@@ -18,7 +14,6 @@ import '../../controllers/automapper_controller';
 import '../../controllers/dashboard_controller';
 
 // Modules and Apps
-import '../../modules/widget_list';
 import '../../pbc/workflow_controller';
 import '../../apps/business_objects';
 
@@ -52,17 +47,11 @@ import '../../components/unmap-button/unmap-button';
 import '../../components/related-objects/related-documents';
 import '../../components/related-objects/related-reference-urls';
 import '../../components/inline/inline';
-import '../../components/csv/export';
-import '../../components/csv/import';
-import '../../components/people/people-list-info';
 import '../../components/global-custom-attributes/global-custom-attributes';
 import '../../components/issue/issue-unmap-dropdown-item';
 import '../../components/external-data-autocomplete/external-data-autocomplete';
 
 import '../../components/custom-roles/custom-roles';
 import '../../components/custom-roles/custom-roles-modal';
-
-// This modal should be loaded here as it requires some components
-import '../../bootstrap/modal-ajax';
 
 import '../../common-handlers';
