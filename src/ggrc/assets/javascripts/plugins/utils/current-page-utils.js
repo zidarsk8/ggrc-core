@@ -265,6 +265,15 @@ function _getCurrentUser() {
   return CMS.Models.Person.findInCacheById(userId);
 }
 
+function initWidgets() {
+  // Ensure each extension has had a chance to initialize widgets
+  can.each(GGRC.extensions, function (extension) {
+    if (extension.init_widgets) {
+      extension.init_widgets();
+    }
+  });
+}
+
 export {
   relatedToCurrentInstance as related,
   initMappedInstances,
@@ -280,4 +289,5 @@ export {
   getCounts,
   initWidgetCounts as initCounts,
   refreshCounts,
+  initWidgets,
 };
