@@ -16,7 +16,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = 'ee816a4379e'
-down_revision = '356f329cda52'
+down_revision = '33d043d8ba29'
 
 
 def upgrade():
@@ -39,9 +39,6 @@ def upgrade():
 
       sa.Column('issue_id', sa.String(50), nullable=True),
       sa.Column('issue_url', sa.String(250), nullable=True),
-
-      sa.Column('last_warning', sa.Text, nullable=True),
-      sa.Column('last_warning_at', sa.DateTime(), nullable=True),
 
       sa.Column('modified_by_id', sa.Integer()),
       sa.Column('context_id', sa.Integer(), sa.ForeignKey('contexts.id')),

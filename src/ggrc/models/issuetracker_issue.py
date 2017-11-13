@@ -28,9 +28,6 @@ class IssuetrackerIssue(Base, db.Model):
   issue_id = db.Column(db.String(50), nullable=True)
   issue_url = db.Column(db.String(250), nullable=True)
 
-  last_warning = db.Column(db.Text, nullable=True)
-  last_warning_at = db.Column(db.DateTime, nullable=True)
-
   _MANDATORY_ATTRS = (
       'object_type', 'object_id',
   )
@@ -80,8 +77,6 @@ class IssuetrackerIssue(Base, db.Model):
         'issue_type': self.issue_type,
         'issue_priority': self.issue_priority,
         'issue_severity': self.issue_severity,
-        'last_warning': self.last_warning,
-        'last_warning_at': self.last_warning_at,
     }
 
     if include_issue:
@@ -156,9 +151,6 @@ class IssuetrackerIssue(Base, db.Model):
 
         issue_id=info.get('issue_id'),
         issue_url=info.get('issue_url'),
-
-        last_warning=info.get('last_warning'),
-        last_warning_at=info.get('last_warning_at'),
     )
 
   def update_from_dict(self, info):
@@ -198,6 +190,3 @@ class IssuetrackerIssue(Base, db.Model):
 
     self.issue_id = info['issue_id']
     self.issue_url = info['issue_url']
-
-    self.last_warning = info['last_warning']
-    self.last_warning_at = info['last_warning_at']
