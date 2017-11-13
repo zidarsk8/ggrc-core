@@ -133,21 +133,21 @@
     </assessment-inline-item>
   </div>
   <div class="ggrc-form-item__multiple-row">
-    <!-- use "inline-edit-control" to save styles... -->
-    <inline-edit-control>
-      <div class="inline">
-        <base-inline-control-title
-          class="inline__header"
-          is-edit-icon-denied="true">
-            <div class="ggrc-form__title">Issue Title</div>
-        </base-inline-control-title>
-        {{#if instance.issue_tracker.title}}
-          <span>{{instance.issue_tracker.title}}</span>
-        {{else}}
-          <span class="empty-message">None</span>
-        {{/if}}
-      </div>
-    </inline-edit-control>
+    <assessment-inline-item
+      type="input"
+      prop-name="issue_tracker.title"
+      mandatory="true"
+      with-read-more="true"
+      {set-in-progress}="@setInProgressState"
+      {on-state-change-dfd}="onStateChangeDfd"
+      {is-edit-icon-denied}="isEditDenied"
+      {value}="instance.issue_tracker.title"
+      {instance}="instance">
+        <div class="ggrc-form__title form-label required-label">
+          Issue Title
+          <i class="fa fa-asterisk"></i>
+        </div>
+    </assessment-inline-item>
   </div>
 </div>
 {{/if}}
