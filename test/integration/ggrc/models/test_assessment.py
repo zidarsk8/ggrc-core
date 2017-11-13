@@ -418,6 +418,67 @@ class TestAssessment(TestAssessmentBase):
     )
     self.assertEqual(snap_acls.count(), 0)
 
+  def test_mapped_roles_saving(self):
+    """Test that removing roles for one assessment will not touch second"""
+    with factories.single_commit():
+      person = factories.PersonFactory()
+      person_email = person.email
+      audit = factories.AuditFactory()
+      assessments = [
+          factories.AssessmentFactory(audit=audit) for _ in range(2)
+      ]
+      snapshot = self._create_snapshots(audit, [factories.ControlFactory()])[0]
+      snapshot_id = snapshot.id
+      snap_rels = []
+      for assessment in assessments:
+        for ac_role_id in self.assignee_roles.values():
+          factories.AccessControlListFactory(
+              ac_role_id=ac_role_id,
+              person=person,
+              object=assessment
+          )
+        factories.RelationshipFactory(source=audit, destination=assessment)
+        snap_rels.append(factories.RelationshipFactory(
+            source=assessment, destination=snapshot
+        ))
+
+    response = self.api.delete(snap_rels[0])
+    self.assertEqual(response.status_code, 200)
+
+    snapshot = all_models.Snapshot.query.get(snapshot_id)
+    for ac_role in self.assignee_roles.keys():
+      self.assert_mapped_role(
+          "{} Mapped".format(ac_role), person_email, snapshot
+      )
+
+  def test_audit_roles_saving(self):
+    """Test that snapshot unmapping will not affect audit"""
+    with factories.single_commit():
+      person = factories.PersonFactory()
+      person_email = person.email
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(audit=audit)
+      snapshot = self._create_snapshots(audit, [factories.ControlFactory()])[0]
+      for ac_role_id in self.assignee_roles.values():
+        factories.AccessControlListFactory(
+            ac_role_id=ac_role_id,
+            person=person,
+            object=assessment
+        )
+      factories.RelationshipFactory(source=audit, destination=assessment)
+      snap_rel = factories.RelationshipFactory(
+          source=assessment, destination=snapshot
+      )
+
+    response = self.api.delete(snap_rel)
+    self.assertEqual(response.status_code, 200)
+
+    db.session.add(audit)
+    for ac_role in self.assignee_roles.keys():
+      self.assert_mapped_role(
+          "{} Mapped".format(ac_role), person_email, audit
+      )
+
 
 @base.with_memcache
 class TestAssessmentUpdates(ggrc.TestCase):
