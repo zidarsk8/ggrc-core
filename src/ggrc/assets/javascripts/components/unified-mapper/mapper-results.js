@@ -50,6 +50,7 @@ export default GGRC.Components('mapperResults', {
     submitCbs: null,
     displayPrefs: null,
     disableColumnsConfiguration: false,
+    applyOwnedFilter: false,
     objectsPlural: false,
     relatedAssessments: {
       state: {},
@@ -152,6 +153,18 @@ export default GGRC.Components('mapperResults', {
       var filterString = StateUtils.unlockedFilter();
       return GGRC.query_parser.parse(filterString);
     },
+    prepareOwnedFilter: function () {
+      var userId = GGRC.current_user.id;
+      return {
+        expression: {
+          object_name: 'Person',
+          op: {
+            name: 'owned',
+          },
+          ids: [userId],
+        },
+      };
+    },
     shouldApplyUnlockedFilter: function (modelName) {
       return modelName === 'Audit' && !this.attr('searchOnly');
     },
@@ -199,6 +212,12 @@ export default GGRC.Components('mapperResults', {
         advancedFilters = GGRC.query_parser.join_queries(
           advancedFilters,
           this.prepareUnlockedFilter());
+      }
+
+      if (this.attr('applyOwnedFilter')) {
+        advancedFilters = GGRC.query_parser.join_queries(
+          advancedFilters,
+          this.prepareOwnedFilter());
       }
 
       // prepare and add main query to request
