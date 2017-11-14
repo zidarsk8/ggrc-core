@@ -103,8 +103,6 @@ import '../../components/external-data-autocomplete/external-data-autocomplete';
 import '../../components/custom-roles/custom-roles';
 import '../../components/custom-roles/custom-roles-modal';
 
-import '../../components/issue-tracker/issue-tracker-switcher';
-
 // This modal should be loaded here as it requires some components
 import '../../bootstrap/modal-ajax';
 

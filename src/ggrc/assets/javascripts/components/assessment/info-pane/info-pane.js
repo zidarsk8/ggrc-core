@@ -22,6 +22,7 @@ import '../../inline/inline-form-control';
 import '../../object-change-state/object-change-state';
 import '../../related-objects/related-assessments';
 import '../../related-objects/related-issues';
+import '../../issue-tracker/issue-tracker-switcher';
 import '../../tabs/tab-container';
 import './inline-item';
 import './create-url';
