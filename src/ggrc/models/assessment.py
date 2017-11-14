@@ -230,7 +230,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
 
   def __init__(self, *args, **kwargs):
     super(Assessment, self).__init__(*args, **kwargs)
-    self._warnings = collections.defaultdict(dict)
+    self._warnings = collections.defaultdict(list)
 
   @orm.reconstructor
   def init_on_load(self):
@@ -246,9 +246,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
         'Assessment', self.id)
     res = issue_obj.to_dict(
         include_issue=True) if issue_obj is not None else {}
-    warnings = self._warnings['issue_tracker']
-    if warnings:
-      res['_warnings'] = warnings
+    res['_warnings'] = self._warnings['issue_tracker']
 
     return res
 

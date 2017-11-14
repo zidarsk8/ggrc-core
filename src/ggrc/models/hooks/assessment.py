@@ -61,23 +61,64 @@ _COMMENT_TMPL = (
     'GGRC Assessment. Link - %s'
 )
 
+_ARCHIVED_TMPL = (
+    'Assessment has been archived. Changes to this GGRC Assessment will '
+    'not be tracked within this bug until Assessment is unlocked.'
+)
+
+_UNARCHIVED_TMPL = (
+    'Assessment has been unarchived. Changes to this GGRC Assessment will '
+    'be tracked within this bug.'
+)
+
 _NO_VERIFIER_STATUSES = {
     # (from_status, to_status): 'issue_tracker_status'
-    ('Not Started', 'In Progress'): 'ACCEPTED',
     ('In Progress', 'Completed'): 'VERIFIED',
-    ('Completed', 'In Progress'): 'ACCEPTED',
+    ('Not Started', 'Completed'): 'VERIFIED',
+    ('Completed', 'In Progress'): 'ASSIGNED',
+    ('Completed', 'Not Started'): 'ASSIGNED',
 }
 
 _VERIFIER_STATUSES = {
     # (from_status, to_status, verified): 'issue_tracker_status'
-    ('Not Started', 'In Progress', False): 'ACCEPTED',
-    ('In Progress', 'In Review', False): 'FIXED',
-    ('In Review', 'In Progress', False): 'ACCEPTED',
+    # When verified is True 'Completed' means 'Completed and Verified'.
 
-    # 'Completed' here means Completed and Verified.
-    ('In Review', 'Completed', True): 'VERIFIED',
+    # State: FIXED
+    ('Not Started', 'In Review', False): 'FIXED',
+    ('In Progress', 'In Review', False): 'FIXED',
+    ('Rework Needed', 'In Review', False): 'FIXED',
     ('Completed', 'In Review', True): 'FIXED',
-    ('Completed', 'In Progress', True): 'ACCEPTED',
+    ('Deprecated', 'In Review', False): 'FIXED',
+
+    # State: ASSIGNED
+    ('In Review', 'In Progress', False): 'ASSIGNED',
+    ('Completed', 'In Progress', True): 'ASSIGNED',
+    ('Deprecated', 'In Progress', False): 'ASSIGNED',
+
+    # State: ASSIGNED
+    ('In Review', 'Rework Needed', False): 'ASSIGNED',
+    ('Completed', 'Rework Needed', True): 'ASSIGNED',
+    ('Deprecated', 'Rework Needed', False): 'ASSIGNED',
+
+    # State: FIXED (Verified)
+    ('Not Started', 'Completed', True): 'VERIFIED',
+    ('In Progress', 'Completed', True): 'VERIFIED',
+    ('In Review', 'Completed', True): 'VERIFIED',
+    ('Rework Needed', 'Completed', True): 'VERIFIED',
+    ('Deprecated', 'Completed', True): 'VERIFIED',
+
+    # State: ASSIGNED
+    ('In Review', 'Not Started', False): 'ASSIGNED',
+    ('Rework Needed', 'Not Started', False): 'ASSIGNED',
+    ('Completed', 'Not Started', True): 'ASSIGNED',
+    ('Deprecated', 'Not Started', False): 'ASSIGNED',
+
+    # State: WON'T FIX (OBSOLETE)
+    ('Not Started', 'Deprecated', False): 'OBSOLETE',
+    ('In Progress', 'Deprecated', False): 'OBSOLETE',
+    ('In Review', 'Deprecated', False): 'OBSOLETE',
+    ('Rework Needed', 'Deprecated', False): 'OBSOLETE',
+    ('Completed', 'Deprecated', True): 'OBSOLETE',
 }
 
 
@@ -89,12 +130,17 @@ def handle_assessment_put_before_commit(sender, obj=None, src=None, **kwargs):
   issue_tracker_info = obj.issue_tracker
   issue_tracker_info.update(src.get('issue_tracker') or {})
 
-  _validate_issue_tracker_info(issue_tracker_info)
+  if issue_tracker_info.get('enabled'):
 
-  issue_id = issue_tracker_info.get('issue_id')
-  if (issue_tracker_info.get('enabled') and issue_id):
+    issue_id = issue_tracker_info.get('issue_id')
+
+    if not issue_id:
+      # If assessment initially was created with disabled IssueTracker.
+      _create_issuetracker_info(obj, issue_tracker_info)
+      return
+
+    _validate_issue_tracker_info(issue_tracker_info)
     initial_state = kwargs.pop('initial_state', None)
-
     _, issue_tracker_info['cc_list'] = _collect_issue_emails(obj)
 
     try:
@@ -227,6 +273,33 @@ def handle_assessment_tmpl_deleted_after_commit(sender, obj=None,
       _ASSESSMENT_TMPL_MODEL_NAME, obj.id)
   if issue_obj:
     db.session.delete(issue_obj)
+
+
+@signals.Restful.model_put_after_commit.connect_via(all_models.Audit)
+def handle_audit_put_after_commit(sender, obj=None, **kwargs):
+  """Handles updating issue tracker related info."""
+  del sender  # Unused
+
+  initial_state = kwargs.get('initial_state')
+  if not initial_state:
+    logger.debug(
+        'Initial state of an Audit is not provided, '
+        'skipping IssueTracker update.')
+    return
+
+  if (obj.archived == initial_state.archived or
+          not obj.issue_tracker.get('enabled', False)):
+    return
+
+  start_update_issue_job(
+      obj.id,
+      _ARCHIVED_TMPL if obj.archived else _UNARCHIVED_TMPL)
+
+
+def start_update_issue_job(audit_id, message):
+  """Creates background job for handling IssueTracker issue update."""
+  from ggrc import views
+  views.start_update_audit_issues(audit_id, message)
 
 
 def _load_snapshots(snapshot_ids):
@@ -454,6 +527,9 @@ def _collect_issue_emails(assessment):
       if emails:
         assignee_email = list(sorted(emails))[0]
         emails.remove(assignee_email)
+    elif role_name == 'Verifiers':
+      # skip verifiers from falling into CC list.
+      continue
 
     cc_list.update(emails)
 
@@ -575,9 +651,7 @@ def _build_status_comment(assessment, initial_assessment):
     return status, _STATUS_CHANGE_COMMENT_TMPL % (
         status_text, _get_assessment_url(assessment))
   else:
-    # Default comment to track status update in issue tracker.
-    return None, 'Assessment status has been updated: %s -> %s' % (
-        initial_assessment.status, status_text)
+    return None, None
 
 
 def _update_issuetracker_issue(assessment, issue_tracker_info,
