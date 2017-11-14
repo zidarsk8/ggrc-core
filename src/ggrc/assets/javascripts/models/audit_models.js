@@ -449,7 +449,7 @@
       this.validate(
         'issue_tracker_component_id',
         function () {
-          if (this.attr('issue_tracker.audit_enabled') &&
+          if (this.attr('can_use_issue_tracker') &&
             this.attr('issue_tracker.enabled') &&
             !this.attr('issue_tracker.component_id')) {
             return 'Enter Component ID';
