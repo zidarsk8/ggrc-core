@@ -530,7 +530,8 @@
                             </a>
                         </div>
                         <div class="hidden-fields-area">
-                            {{>'/static/mustache/components/assessment/info-pane/info-pane-issue-tracker-fields.mustache'}}
+                            <info-pane-issue-tracker-fields {instance}="instance">
+                            </info-pane-issue-tracker-fields>
                         </div>
                     </div>
                 {{/displayAssessmentIssueTracker}}

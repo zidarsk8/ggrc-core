@@ -23,6 +23,7 @@ import '../../object-change-state/object-change-state';
 import '../../related-objects/related-assessments';
 import '../../related-objects/related-issues';
 import '../../issue-tracker/issue-tracker-switcher';
+import './info-pane-issue-tracker-fields';
 import '../../tabs/tab-container';
 import './inline-item';
 import './create-url';
