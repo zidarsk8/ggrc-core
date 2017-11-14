@@ -48,6 +48,56 @@ gcloud config set project "$APPENGINE_INSTANCE"
 write_visible_message 'Authenticating'
 gcloud auth activate-service-account "$ACCOUNT" --key-file="$KEY_FILE"
 
+version_script () {
+  declare -r SETTINGS_FILE="src/ggrc/settings/default.py"
+  declare -r TARGET_REF="FETCH_HEAD"
+
+  cat <<EOF
+BUILD_NUMBER = ""
+$(git grep -h "VERSION =" $TARGET_REF -- $SETTINGS_FILE)
+print VERSION
+EOF
+}
+
+if [[ "$VERSION" == "use ggrc version and hash" ]]
+then
+  GGRC_VERSION=$(version_script | python -)
+  GGRC_HASH="$(git rev-parse FETCH_HEAD)"
+  VERSION="$GGRC_VERSION-$GGRC_HASH"
+  # The following expression extracts a valid version name.
+  # According to gcloud:
+  # argument --version/-v: May only contain lowercase letters, digits, and
+  #   hyphens. Must begin and end with a letter or digit. Must not exceed 63
+  #   characters.
+  #
+  #  tr '[:upper:]' '[:lower:]' - change all characters to lower case
+  #  sed 's/[^a-z0-9]/-/g'      - replace all non supported characters to
+  #                               hyphens. We do this because of version number
+  #                               that contains dots or spaces.
+  #  sed 's/^[^a-z0-9]*//'      - make sure version starts with a letter or
+  #                               digit
+  #  sed 's/[^a-z0-9]*$//'      - make sure version ends with a letter or digit
+  #  cut -c 1-40                - trim line length to max 63 characters
+  #
+  # Note: this will due to the hash number, this will always produce a valid
+  # version string.
+  #
+  # Note: we trim the version string to 40 characters instead of 63 because
+  # the subdomain section can not exceed 63 characters but the actual URL is
+  # composed from <version-number>-dot-<instance-name>.appspot.com. Even this
+  # 30 character limit will not be good if we have a long instance name.
+  # The Only thing that goes wrong in such a case is Migrations FAIL. The
+  # deployment and the app is still accessible on the default URL
+  # <instance-name>.appspot.com.
+  VERSION=$(echo "$VERSION" | \
+    tr '[:upper:]' '[:lower:]' | \
+    sed 's/[^a-z0-9]/-/g' | \
+    sed 's/^[^a-z0-9]*//' | \
+    sed 's/[^a-z0-9]*$//' | \
+    cut -c 1-30 \
+  )
+fi
+
 write_visible_message "Deploying src/app.yaml into version $VERSION"
 
 if [[ ! "${APPENGINE_INSTANCE}" == *"google.com:"* ]]
