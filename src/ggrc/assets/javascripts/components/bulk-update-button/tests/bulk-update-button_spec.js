@@ -20,10 +20,10 @@ describe('GGRC.Components.bulkUpdateButton', function () {
     var event;
     beforeAll(function () {
       event = events['a click'].bind(events);
-      spyOn(GGRC.Controllers.ObjectBulkUpdate, 'launch');
+      spyOn(viewModel, 'openBulkUpdateModal');
     });
 
-    it('should launch ObjectBulkUpdate modal', function () {
+    it('should open ObjectBulkUpdate modal', function () {
       var type = 'some model';
       var element = {};
       viewModel.attr('model', {
@@ -32,12 +32,7 @@ describe('GGRC.Components.bulkUpdateButton', function () {
 
       event(element);
 
-      expect(GGRC.Controllers.ObjectBulkUpdate.launch)
-        .toHaveBeenCalledWith(element, {
-          type: type,
-          object: type,
-          callback: jasmine.any(Function),
-        });
+      expect(viewModel.openBulkUpdateModal).toHaveBeenCalledWith(type);
     });
   });
 

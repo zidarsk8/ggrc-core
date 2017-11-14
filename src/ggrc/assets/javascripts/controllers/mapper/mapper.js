@@ -13,13 +13,14 @@ import {
 import objectGeneratorTemplate from './object-generator-modal.mustache';
 import objectMapperTemplate from './object-mapper-modal.mustache';
 import objectSearchTemplate from './object-search-modal.mustache';
+import objectBulkUpdateTemplate from './object-bulk-update-modal.mustache';
 
 const DATA_CORRUPTION_MESSAGE = 'Some Data is corrupted! ' +
             'Missing Scope Object';
 const OBJECT_REQUIRED_MESSAGE = 'Required Data for In Scope Object is missing' +
   ' - Original Object is mandatory';
 
-let ObjectMapper = can.Control.extend({
+const ObjectMapper = can.Control.extend({
   defaults: {
     component: objectMapperTemplate,
   },
@@ -185,21 +186,21 @@ let ObjectMapper = can.Control.extend({
   },
 });
 
-let ObjectSearch = ObjectMapper.extend({
+const ObjectSearch = ObjectMapper.extend({
   defaults: {
     component: objectSearchTemplate,
   },
 }, {});
 
-let ObjectGenerator = ObjectMapper.extend({
+const ObjectGenerator = ObjectMapper.extend({
   defaults: {
     component: objectGeneratorTemplate,
   },
 }, {});
-GGRC.Controllers.ObjectMapper.extend('GGRC.Controllers.ObjectBulkUpdate', {
+
+const ObjectBulkUpdate = ObjectMapper.extend({
     defaults: {
-      component: GGRC.mustache_path +
-        '/modals/mapper/object-bulk-update-modal.mustache',
+      component: objectBulkUpdateTemplate,
     },
   }, {});
 
@@ -207,4 +208,5 @@ export {
   ObjectMapper,
   ObjectGenerator,
   ObjectSearch,
-}
+  ObjectBulkUpdate,
+};
