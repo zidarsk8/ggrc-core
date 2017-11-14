@@ -3,8 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../../components/advanced-search/advanced-search-filter-container';
+import '../../components/advanced-search/advanced-search-filter-state';
+import '../../components/advanced-search/advanced-search-wrapper';
+import '../../components/unified-mapper/mapper-results';
+import '../../components/collapsible-panel/collapsible-panel';
 import './bulk-update-target-state';
 import {getBulkStatesForModel} from '../../plugins/utils/state-utils';
+import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
 import template from
   '../../../mustache/components/object-bulk-update/object-bulk-update.mustache';
 
@@ -16,7 +22,7 @@ export default can.Component.extend({
     var targetStates = getBulkStatesForModel(type);
     var targetState = targetStates.length ? targetStates[0] : null;
 
-    return GGRC.VM.ObjectOperationsBaseVM.extend({
+    return ObjectOperationsBaseVM.extend({
       type: attrs.type,
       object: attrs.object,
       availableTypes: function () {
