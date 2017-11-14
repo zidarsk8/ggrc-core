@@ -150,7 +150,7 @@ class Comment(Roleable, Relatable, Described, Notifiable,
   """Basic comment model."""
   __tablename__ = "comments"
 
-  assignee_type = db.Column(db.String)
+  assignee_type = db.Column(db.String, nullable=False, default=u"")
   revision_id = deferred(db.Column(
       db.Integer,
       db.ForeignKey('revisions.id', ondelete='SET NULL'),
