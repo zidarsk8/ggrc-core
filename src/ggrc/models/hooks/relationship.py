@@ -15,7 +15,7 @@ from sqlalchemy.orm import Session
 from ggrc import login, db
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc.models.mixins.assignable import Assignable
-from ggrc.models.relationship import Stub, RelationshipsCache
+from ggrc.models.relationship import Stub
 from ggrc.services import signals
 from ggrc.models import all_models
 from ggrc.models.comment import Commentable
@@ -283,11 +283,76 @@ def related(base_objects, rel_cache):
   return {o: rel_cache.cache[o] for o in base_objects if o in rel_cache.cache}
 
 
+def related_regulation_snaps(snapshot_ids):
+  """Collect all snapshots of Objective and Regulations mapped to
+  snapshot of Control
+
+  Args:
+    snapshot_ids(list): Ids of snapshots of controls.
+
+  Returns:
+    Query with ids of control snapshot and mapped one.
+  """
+  related_snapshots = sa.union_all(
+      db.session.query(
+          all_models.Relationship.destination_id.label("base_snap_id"),
+          all_models.Relationship.source_id.label("rel_snap_id"),
+          all_models.Snapshot.child_type.label("child_type")
+      ).join(
+          all_models.Snapshot,
+          sa.and_(
+              all_models.Relationship.source_id == all_models.Snapshot.id,
+              all_models.Relationship.source_type == "Snapshot",
+              all_models.Relationship.destination_type == "Snapshot",
+          )
+      ),
+      db.session.query(
+          all_models.Relationship.source_id,
+          all_models.Relationship.destination_id,
+          all_models.Snapshot.child_type
+      ).join(
+          all_models.Snapshot,
+          sa.and_(
+              all_models.Relationship.destination_id == all_models.Snapshot.id,
+              all_models.Relationship.source_type == "Snapshot",
+              all_models.Relationship.destination_type == "Snapshot",
+          )
+      )
+  ).alias("related_snapshots")
+
+  return db.session.query(
+      related_snapshots.c.base_snap_id,
+      related_snapshots.c.rel_snap_id,
+  ).join(
+      all_models.Snapshot,
+      related_snapshots.c.base_snap_id == all_models.Snapshot.id,
+  ).filter(
+      all_models.Snapshot.child_type == "Control",
+      related_snapshots.c.base_snap_id.in_(snapshot_ids),
+      related_snapshots.c.child_type.in_(["Objective", "Regulation"]),
+  )
+
+
+def add_related_snapshots(snapshot_ids, related_objects):
+  """Get Stubs of Objective and Regulations snapshots mapped to
+  snapshot of Control
+
+  Args:
+    snapshot_ids(dict): Ids of control snapshots with Stub of assigned object.
+    related_objects(dict): Dict of base assigned objects with Stubs of related.
+  """
+  related_regulations = related_regulation_snaps(snapshot_ids.keys())
+  for base_snap, related_snap in related_regulations:
+    rel_snap_stub = Stub("Snapshot", related_snap)
+    related_objects[snapshot_ids[base_snap]].add(rel_snap_stub)
+
+
 def handle_relationship_creation(session, flush_context):
   """Create relations for mapped objects."""
   # pylint: disable=unused-argument
   base_objects = defaultdict(set)
   related_objects = defaultdict(set)
+  snapshot_ids = {}
   for obj in session.new:
     if isinstance(obj, all_models.Relationship) and (
         issubclass(type(obj.source), Assignable) or
@@ -305,7 +370,13 @@ def handle_relationship_creation(session, flush_context):
           base_objects[assign_stub].add(acl)
           related_objects[assign_stub].add(other_stub)
 
-  create_related_roles(base_objects, related_objects)
+          if other.type == "Snapshot":
+            snapshot_ids[other.id] = assign_stub
+
+  if base_objects:
+    if snapshot_ids:
+      add_related_snapshots(snapshot_ids, related_objects)
+    create_related_roles(base_objects, related_objects)
 
 
 def get_mapped_role(object_type, acr_name, mapped_obj_type):
@@ -328,18 +399,15 @@ def get_mapped_role(object_type, acr_name, mapped_obj_type):
   return obj_roles.get("{}{} Mapped".format(acr_name, doc_part))
 
 
-def create_related_roles(base_objects, related_objects=None):
+def create_related_roles(base_objects, related_objects):
   """Create mapped roles for related objects
 
   Args:
     base_objects(defaultdict(dict)): Objects which have Assignee role
     related_objects(defaultdict(set)): Objects related to assigned
   """
-  if not base_objects:
+  if not base_objects or not related_objects:
     return
-
-  if not related_objects:
-    related_objects = related(base_objects.keys(), RelationshipsCache())
 
   acl_row = namedtuple(
       "acl_row", "person_id object_id object_type ac_role_id parent_id"
