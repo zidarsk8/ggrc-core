@@ -160,26 +160,26 @@ function getColumnsForModel(modelType, displayPrefs, includeRichText,
   var modelRoles;
   var roleAttrs;
 
-      attrs = can.makeArray(
-        Model.tree_view_options.mapper_attr_list ||
-        Model.tree_view_options.attr_list ||
-        Cacheable.attr_list
-      ).filter(function (attr) {
-        return !attr.deny;
-      }).map(function (attr) {
-        attr = _.assign({}, attr);
-        if (!attr.attr_sort_field) {
-          attr.attr_sort_field = attr.attr_name;
-        }
-        return attr;
-      }).sort(function (a, b) {
-        if (a.order && !b.order) {
-          return -1;
-        } else if (!a.order && b.order) {
-          return 1;
-        }
-        return a.order - b.order;
-      });
+  attrs = can.makeArray(
+    Model.tree_view_options.mapper_attr_list ||
+    Model.tree_view_options.attr_list ||
+    Cacheable.attr_list
+  ).filter(function (attr) {
+    return !attr.deny;
+  }).map(function (attr) {
+    attr = _.assign({}, attr);
+    if (!attr.attr_sort_field) {
+      attr.attr_sort_field = attr.attr_name;
+    }
+    return attr;
+  }).sort(function (a, b) {
+    if (a.order && !b.order) {
+      return -1;
+    } else if (!a.order && b.order) {
+      return 1;
+    }
+    return a.order - b.order;
+  });
 
   // skip attrs which unused in current model name tree
   attrs = skipUnusable(modelName, attrs);

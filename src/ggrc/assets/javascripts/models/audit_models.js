@@ -4,6 +4,9 @@
  */
 
 (function (can, CMS) {
+  const AUDIT_HOTLIST_ID = '766459';
+  const AUDIT_COMPONENT_ID = '188208';
+
   function update_program_authorizations(programs, person) {
     return can.when(
       programs[0],
@@ -82,8 +85,8 @@
     defaults: {
       status: 'Planned',
       issue_tracker: {
-        hotlist_id: '766459',
-        component_id: '188208',
+        hotlist_id: AUDIT_HOTLIST_ID,
+        component_id: AUDIT_COMPONENT_ID,
         issue_severity: 'S2',
         issue_priority: 'P2',
         enabled: false,
