@@ -368,17 +368,8 @@ viewModel = can.Map.extend({
     this.attr('columns.selected', columns.selected);
   },
   onSort: function (event) {
-    var field = event.field;
-    var sortingInfo = this.attr('sortingInfo');
-    var order;
-
-    if (field !== sortingInfo.sortBy) {
-      sortingInfo.attr('sortBy', field);
-      sortingInfo.attr('sortDirection', 'desc');
-    } else {
-      order = sortingInfo.sortDirection === 'asc' ? 'desc' : 'asc';
-      sortingInfo.attr('sortDirection', order);
-    }
+    this.attr('sortingInfo.sortBy', event.field);
+    this.attr('sortingInfo.sortDirection', event.sortDirection);
 
     this.attr('pageInfo.current', 1);
     this.loadItems();
