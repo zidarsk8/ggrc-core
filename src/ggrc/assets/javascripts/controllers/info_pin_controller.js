@@ -9,6 +9,7 @@ import '../components/info-pane/info-pane-footer';
 import '../components/assessment/info-pane/info-pane';
 import '../components/folder-attachments-list/folder-attachments-list';
 import '../components/unmap-button/unmap-person-button';
+import '../components/issue-tracker/info-issue-tracker-fields';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
 import {confirm} from '../plugins/utils/modals';
 

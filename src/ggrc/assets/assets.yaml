@@ -281,5 +281,4 @@ dashboard-js-template-files:
   - components/assessment/info-pane/inline-item.mustache
   - components/loading/loading-status.mustache
   - partials/modal-ajax-test-plan.mustache
-  - issue_tracker/info-issue-tracker-fields.mustache
   - components/assessment/info-pane/info-pane-issue-tracker-fields.mustache
