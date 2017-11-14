@@ -312,7 +312,8 @@
               {instance}="instance"
               {(is-integration-enabled)}="instance.issue_tracker.enabled"
               {parent}="instance.audit">
-                {{>'/static/mustache/issue_tracker/modal-issue-tracker-fields.mustache'}}
+                <modal-issue-tracker-fields {instance}="instance">
+                </modal-issue-tracker-fields>
             </issue-tracker-switcher>
           </div>
         </div>
