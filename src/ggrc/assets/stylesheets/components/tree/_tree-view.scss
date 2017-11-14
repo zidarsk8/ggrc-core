@@ -181,7 +181,7 @@ tree-item {
 
     .flex-box.selectable-attrs {
       flex-wrap: wrap;
-      min-width: 0; 
+      min-width: 0;
     }
 
     .attr-cell {
@@ -213,6 +213,12 @@ tree-item {
           }
         }
 
+      }
+    }
+
+    cycle-task-actions {
+      .item-actions.disabled {
+        @include disabled();
       }
     }
   }
