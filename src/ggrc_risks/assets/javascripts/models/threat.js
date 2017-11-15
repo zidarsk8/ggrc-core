@@ -15,7 +15,7 @@
     create: 'POST /api/threats',
     update: 'PUT /api/threats/{id}',
     destroy: 'DELETE /api/threats/{id}',
-    mixins: ['unique_title', 'ca_update'],
+    mixins: ['unique_title', 'ca_update', 'accessControlList'],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {

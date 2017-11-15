@@ -17,6 +17,7 @@
       'timeboxed',
       'mapping-limit-issue',
       'inScopeObjects',
+      'accessControlList',
     ],
     is_custom_attributable: true,
     isRoleable: true,
