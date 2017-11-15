@@ -18,11 +18,11 @@ export default can.Component.extend({
           mapper.ObjectBulkUpdate.launch(el, {
             object: type,
             type: type,
-            callback: this.updateObjects.bind(this),
+            callback: this.updateObjects.bind(this, el),
           });
         });
     },
-    updateObjects: function (context, args) {
+    updateObjects: function (el, context, args) {
       var model = this.attr('model');
       var nameSingular = model.name_singular;
       var progressMessage =
@@ -39,7 +39,7 @@ export default can.Component.extend({
           GGRC.Errors.notifier('info', message);
 
           if (updatedCount > 0) {
-            can.trigger($('tree-widget-container'), 'refreshTree');
+            can.trigger(el.closest('tree-widget-container'), 'refreshTree');
           }
         }.bind(this));
     },

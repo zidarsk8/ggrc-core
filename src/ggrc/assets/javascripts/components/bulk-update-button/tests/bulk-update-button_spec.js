@@ -41,8 +41,13 @@ describe('GGRC.Components.bulkUpdateButton', function () {
     var context;
     var args;
     var resMessage;
+    let el;
+    const parentEl = {};
 
     beforeEach(function () {
+      el = {
+        closest: jasmine.createSpy().and.returnValue(parentEl),
+      };
       context = {
         closeModal: jasmine.createSpy(),
       };
@@ -65,7 +70,7 @@ describe('GGRC.Components.bulkUpdateButton', function () {
       spyOn(viewModel, 'getResultNotification')
         .and.returnValue(resMessage);
 
-      viewModel.updateObjects(context, args);
+      viewModel.updateObjects(el, context, args);
     });
 
     it('closes ObjectBulkUpdate modal', function () {
@@ -90,14 +95,16 @@ describe('GGRC.Components.bulkUpdateButton', function () {
     it('triggers TreeView refresh when some items updated', function () {
       updateDfd.resolve([{status: 'updated'}]);
 
+      expect(el.closest).toHaveBeenCalled();
       expect(can.trigger)
-        .toHaveBeenCalledWith(jasmine.any(Object), 'refreshTree');
+        .toHaveBeenCalledWith(parentEl, 'refreshTree');
     });
 
     it('does not trigger TreeView refresh when no item was updated',
       function () {
         updateDfd.resolve([]);
 
+        expect(el.closest).not.toHaveBeenCalled();
         expect(can.trigger)
           .not.toHaveBeenCalled();
       });
