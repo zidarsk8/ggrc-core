@@ -6,6 +6,8 @@
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/deletable-people-group';
+import '../autocomplete/autocomplete';
+import '../external-data-autocomplete/external-data-autocomplete';
 
 (function (can, GGRC) {
   'use strict';
