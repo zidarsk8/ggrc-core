@@ -6,22 +6,24 @@
 from sqlalchemy import orm
 
 from ggrc import db
+from ggrc.builder import simple_property
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import (
     Timeboxed, WithContact, CustomAttributable, BusinessObject
 )
 
-from ggrc.models.object_document import PublicDocumentable
-from ggrc.models.mixins import clonable
-from ggrc.models.relationship import Relatable
-from ggrc.models.object_person import Personable
-from ggrc.models.context import HasOwnContext
-from ggrc.models.reflection import AttributeInfo
+from ggrc.fulltext.mixin import Indexed
+from ggrc.models import issuetracker_issue
 from ggrc.models import reflection
+from ggrc.models.context import HasOwnContext
+from ggrc.models.mixins import clonable
+from ggrc.models.object_document import PublicDocumentable
+from ggrc.models.object_person import Personable
 from ggrc.models.program import Program
 from ggrc.models.person import Person
+from ggrc.models.reflection import AttributeInfo
+from ggrc.models.relationship import Relatable
 from ggrc.models.snapshot import Snapshotable
-from ggrc.fulltext.mixin import Indexed
 
 
 class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
@@ -66,6 +68,7 @@ class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
       'program',
       'object_type',
       'archived',
+      reflection.Attribute('issue_tracker', create=False, update=False),
       reflection.Attribute('audit_objects', create=False, update=False),
   )
 
@@ -124,6 +127,13 @@ class Audit(Snapshotable, clonable.Clonable, PublicDocumentable,
           "description": "Options are:\n{}".format('\n'.join(VALID_STATES))
       }
   }
+
+  @simple_property
+  def issue_tracker(self):
+    """Returns representation of issue tracker related info as a dict."""
+    issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
+        'Audit', self.id)
+    return issue_obj.to_dict() if issue_obj is not None else {}
 
   def _clone(self, source_object):
     """Clone audit and all relevant attributes.

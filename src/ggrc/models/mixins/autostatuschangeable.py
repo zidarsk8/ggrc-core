@@ -60,8 +60,7 @@ class AutoStatusChangeable(object):
       A boolean representing if models attribute changed.
     """
     attr = getattr(inspect(obj).attrs, attr)
-    if (isinstance(attr.value, datetime.date) or
-       isinstance(attr.value, datetime.datetime)):
+    if isinstance(attr.value, (datetime.date, datetime.datetime)):
       return cls._date_has_changes(attr)
     return attr.history.has_changes()
 
@@ -82,7 +81,7 @@ class AutoStatusChangeable(object):
 
   @classmethod
   def init(cls, model):
-    """Initialisation method to run after models have been initialized.
+    """Initialization method to run after models have been initialized.
 
     Args:
       model: (db.Model class) Class on which to run set_handlers method.
@@ -103,7 +102,7 @@ class AutoStatusChangeable(object):
 
   @classmethod
   def handle_first_class_edit(cls, model, obj, method=None):
-    """Handles first class edit
+    """Handles first class edit.
 
     Performs check whether object received first class edit (ordinary edit)
     that should transition object to PROGRESS_STATE from either: START_STATE
@@ -114,10 +113,9 @@ class AutoStatusChangeable(object):
       model: (db.Model class) Class from which to read FIRST_CLASS_EDIT
         property.
       obj: (db.Model instance) Object on which to perform operations.
-      method: (string) HTTP method used that triggered signal
+      method: (string) HTTP method used that triggered signal.
     """
-
-    # pylint: disable=unused-argument,protected-access
+    del method  # Unused
 
     if obj.status in model.FIRST_CLASS_EDIT:
       obj._need_status_reset = True
@@ -128,8 +126,7 @@ class AutoStatusChangeable(object):
 
     Is registered to listen for 'before_flush' events on a later stage.
     """
-
-    # pylint: disable=unused-argument
+    del flush_context, instances  # Unused
 
     for obj in session.identity_map.values():
       if (isinstance(obj, AutoStatusChangeable) and
@@ -141,17 +138,17 @@ class AutoStatusChangeable(object):
   def _has_custom_attr_changes(obj):
     """Check if an object had any of its custom attribute values changed.
 
-    Initially setting a custom attribue's value to a falsy value, i.e. when
+    Initially setting a custom attribute's value to false, i.e. when
     there was no old value deleted, is *not* considered a change.
 
     If given None or if the object does not have any custom attributes, False
     is returned.
 
     Args:
-      obj: (db.Model instance) An object to check
+      obj: (db.Model instance) An object to check.
 
     Returns:
-      True or False depending whether any of the obejct's custom attribute
+      True or False depending whether any of the object's custom attribute
       values have been modified.
     """
     if not getattr(obj, "custom_attribute_values", None):
@@ -236,7 +233,7 @@ class AutoStatusChangeable(object):
     def handle_relationship(sender, obj=None, src=None, service=None):
       """Handle creation of relationships that can change object status.
 
-      Adding or removing assigable persons (Assignees, Creators, Verifiers,
+      Adding or removing assignable persons (Assignees, Creators, Verifiers,
       etc.) moves object back to PROGRESS_STATE.
 
       Adding evidence moves object back to to PROGRESS_STATE.
@@ -256,9 +253,9 @@ class AutoStatusChangeable(object):
             "Document": cls.handle_first_class_edit,
             "Snapshot": cls.handle_first_class_edit,
         }
-        for k in handlers.keys():
-          if k in endpoints:
-            handlers[k](model, target_object, method=service.request.method)
+        for name, handler in handlers.iteritems():
+          if name in endpoints:
+            handler(model, target_object, method=service.request.method)
 
 
 # pylint: disable=fixme

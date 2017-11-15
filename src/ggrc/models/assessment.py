@@ -2,6 +2,9 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for Assessment object"""
+
+import collections
+
 from sqlalchemy import and_
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import remote
@@ -13,6 +16,7 @@ from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
 from ggrc.models.comment import Commentable
 from ggrc.models.custom_attribute_definition import CustomAttributeDefinition
+from ggrc.models import issuetracker_issue
 from ggrc.models.mixins.audit_relationship import AuditRelationship
 from ggrc.models.mixins import BusinessObject
 from ggrc.models.mixins import CustomAttributable
@@ -36,6 +40,22 @@ from ggrc.models import reflection
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 from ggrc.fulltext.mixin import Indexed
+
+
+def _build_audit_stub(assessment_obj):
+  """Returns a stub of audit model to which assessment is related to."""
+  audit_id = assessment_obj.audit_id
+  if audit_id is None:
+    return None
+  issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
+      'Audit', audit_id)
+  return {
+      'type': 'Audit',
+      'id': audit_id,
+      'context_id': assessment_obj.context_id,
+      'href': u'/api/audits/%d' % audit_id,
+      'issue_tracker': issue_obj.to_dict() if issue_obj is not None else {},
+  }
 
 
 class Assessment(Roleable, statusable.Statusable, AuditRelationship,
@@ -129,6 +149,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'operationally',
       'audit',
       'assessment_type',
+      reflection.Attribute('issue_tracker', create=False, update=False),
       reflection.Attribute('archived', create=False, update=False),
       reflection.Attribute('object', create=False, update=False),
   )
@@ -138,6 +159,10 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'design',
       'operationally',
   ]
+
+  _custom_publish = {
+      'audit': _build_audit_stub,
+  }
 
   @classmethod
   def indexed_query(cls):
@@ -203,8 +228,31 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       "threshold": 1,
   }
 
+  def __init__(self, *args, **kwargs):
+    super(Assessment, self).__init__(*args, **kwargs)
+    self._warnings = collections.defaultdict(list)
+
+  @orm.reconstructor
+  def init_on_load(self):
+      self._warnings = collections.defaultdict(list)
+
+  def add_warning(self, domain, msg):
+    self._warnings[domain].append(msg)
+
+  @simple_property
+  def issue_tracker(self):
+    """Returns representation of issue tracker related info as a dict."""
+    issue_obj = issuetracker_issue.IssuetrackerIssue.get_issue(
+        'Assessment', self.id)
+    res = issue_obj.to_dict(
+        include_issue=True) if issue_obj is not None else {}
+    res['_warnings'] = self._warnings['issue_tracker']
+
+    return res
+
   @simple_property
   def archived(self):
+    """Returns a boolean whether assessment is archived or not."""
     return self.audit.archived if self.audit else False
 
   def validate_conclusion(self, value):
