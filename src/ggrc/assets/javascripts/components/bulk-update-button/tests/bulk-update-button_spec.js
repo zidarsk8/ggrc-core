@@ -13,13 +13,12 @@ describe('GGRC.Components.bulkUpdateButton', function () {
   beforeAll(function () {
     viewModel = new (can.Map.extend(Component.prototype.viewModel));
     events = Component.prototype.events;
-    events.viewModel = viewModel;
   });
 
   describe('button click event', function () {
     var event;
     beforeAll(function () {
-      event = events['a click'].bind(events);
+      event = events['a click'].bind({viewModel});
       spyOn(viewModel, 'openBulkUpdateModal');
     });
 
@@ -32,11 +31,12 @@ describe('GGRC.Components.bulkUpdateButton', function () {
 
       event(element);
 
-      expect(viewModel.openBulkUpdateModal).toHaveBeenCalledWith(type);
+      expect(viewModel.openBulkUpdateModal)
+        .toHaveBeenCalledWith(jasmine.any(Object), type);
     });
   });
 
-  describe('updateObjects callback', function () {
+  describe('updateObjects method', function () {
     var updateDfd;
     var context;
     var args;
@@ -56,17 +56,16 @@ describe('GGRC.Components.bulkUpdateButton', function () {
       });
       resMessage = 'items updated';
       updateDfd = can.Deferred();
-      event = events.updateObjects.bind(events);
 
       spyOn(can, 'trigger');
       spyOn(GGRC.Errors, 'notifier');
       spyOn(updateService, 'update')
         .and.returnValue(updateDfd);
 
-      spyOn(events, 'getResultNotification')
+      spyOn(viewModel, 'getResultNotification')
         .and.returnValue(resMessage);
 
-      event(context, args);
+      viewModel.updateObjects(context, args);
     });
 
     it('closes ObjectBulkUpdate modal', function () {
@@ -82,7 +81,7 @@ describe('GGRC.Components.bulkUpdateButton', function () {
     it('shows notification about bulk update result', function () {
       updateDfd.resolve([{status: 'updated'}]);
 
-      expect(events.getResultNotification)
+      expect(viewModel.getResultNotification)
         .toHaveBeenCalledWith(viewModel.attr('model'), 1);
       expect(GGRC.Errors.notifier)
        .toHaveBeenCalledWith('info', resMessage);
@@ -106,34 +105,29 @@ describe('GGRC.Components.bulkUpdateButton', function () {
     it('does not show notification when update failed', function () {
       updateDfd.reject();
 
-      expect(events.getResultNotification)
+      expect(viewModel.getResultNotification)
         .not.toHaveBeenCalled();
       expect(GGRC.Errors.notifier)
         .not.toHaveBeenCalledWith('info', jasmine.any(String));
     });
   });
 
-  describe('getResultNotification event', function () {
+  describe('getResultNotification method', function () {
     var model = {
       name_singular: 'Task',
       name_plural: 'Tasks',
     };
-    var event;
-
-    beforeAll(function () {
-      event = events.getResultNotification;
-    });
 
     it('returns correct message when no objects were updated', function () {
       var expected = 'No tasks were updated.';
-      var actual = event(model, 0);
+      var actual = viewModel.getResultNotification(model, 0);
 
       expect(actual).toEqual(expected);
     });
 
     it('returns correct message when 1 object was updated', function () {
       var expected = '1 task was updated successfully.';
-      var actual = event(model, 1);
+      var actual = viewModel.getResultNotification(model, 1);
 
       expect(actual).toEqual(expected);
     });
@@ -141,7 +135,7 @@ describe('GGRC.Components.bulkUpdateButton', function () {
     it('returns correct message when multiple objects were updated',
       function () {
         var expected = '4 tasks were updated successfully.';
-        var actual = event(model, 4);
+        var actual = viewModel.getResultNotification(model, 4);
 
         expect(actual).toEqual(expected);
       });

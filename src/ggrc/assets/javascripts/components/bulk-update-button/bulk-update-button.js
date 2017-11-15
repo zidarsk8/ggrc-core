@@ -12,7 +12,7 @@ export default can.Component.extend({
   template: template,
   viewModel: {
     model: null,
-    openBulkUpdateModal: function (type) {
+    openBulkUpdateModal: function (el, type) {
       import(/*webpackChunkName: "mapper"*/ '../../controllers/mapper/mapper')
         .then(mapper => {
           mapper.ObjectBulkUpdate.launch(el, {
@@ -22,16 +22,8 @@ export default can.Component.extend({
           });
         });
     },
-  },
-  events: {
-    'a click': function (el) {
-      var model = this.viewModel.attr('model');
-      var type = model.model_singular;
-
-      this.viewModel.openBulkUpdateModal(type);
-    },
     updateObjects: function (context, args) {
-      var model = this.viewModel.attr('model');
+      var model = this.attr('model');
       var nameSingular = model.name_singular;
       var progressMessage =
         `${nameSingular} update is in progress. This may take several minutes.`;
@@ -64,6 +56,14 @@ export default can.Component.extend({
         `${nameSingularLowerCase} was ` :
         `${namePluralLowerCase} were `) +
         'updated successfully.';
+    },
+  },
+  events: {
+    'a click': function (el) {
+      var model = this.viewModel.attr('model');
+      var type = model.model_singular;
+
+      this.viewModel.openBulkUpdateModal(el, type);
     },
   },
 });
