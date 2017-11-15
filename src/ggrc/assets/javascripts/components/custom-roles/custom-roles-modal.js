@@ -6,23 +6,18 @@
 import '../related-objects/related-people-access-control';
 import '../related-objects/related-people-access-control-group';
 import '../people/deletable-people-group';
+import '../autocomplete/autocomplete';
+import '../external-data-autocomplete/external-data-autocomplete';
+import template from './templates/custom-roles-modal.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
-  var tag = 'custom-roles-modal';
-  var tpl = can.view(GGRC.mustache_path +
-    '/components/custom-roles/custom-roles-modal.mustache');
-
-  GGRC.Components('customRolesModal', {
-    tag: tag,
-    template: tpl,
-    viewModel: {
-      instance: {},
-      updatableGroupId: null,
-      isNewInstance: false,
-      conflictRoles: [],
-      orderOfRoles: [],
-    },
-  });
-})(window.can, window.GGRC);
+export default can.Component.extend({
+  tag: 'custom-roles-modal',
+  template,
+  viewModel: {
+    instance: {},
+    updatableGroupId: null,
+    isNewInstance: false,
+    conflictRoles: [],
+    orderOfRoles: [],
+  },
+});
