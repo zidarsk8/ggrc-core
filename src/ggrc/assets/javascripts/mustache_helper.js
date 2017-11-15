@@ -2353,10 +2353,11 @@ Mustache.registerHelper("add_to_current_scope", function (options) {
     if (arguments.length !== 3) {
       throw new Error(
         'Invalid number of arguments (' +
-        (arguments.length - 1) +  // do not count the auto-provided options arg
+        (arguments.length - 1) + // do not count the auto-provided options arg
         '), expected 2.');
     }
 
+    modelName = Mustache.resolve(modelName);
     model = CMS.Models[modelName];
 
     if (typeof model === 'undefined') {
