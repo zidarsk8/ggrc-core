@@ -275,7 +275,6 @@ dashboard-js-template-files:
   - components/people/people-list-info.mustache
   - components/people/editable-people-group-header.mustache
   - components/custom-roles/custom-roles.mustache
-  - components/custom-roles/custom-roles-modal.mustache
   - components/inline/inline.mustache
   - components/inline/readonly-inline-content.mustache
   - components/inline/simple-readonly-text.mustache
