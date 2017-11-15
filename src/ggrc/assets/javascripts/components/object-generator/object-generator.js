@@ -39,17 +39,18 @@ import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
           //  disable changing of object type while loading
           //  to prevent errors while speedily selecting different types
           this.attr('is_loading');
-        }
+        },
       });
     },
 
     events: {
       inserted: function () {
-        var self = this;
         this.viewModel.attr('selected').replace([]);
         this.viewModel.attr('entries').replace([]);
 
-        self.viewModel.attr('submitCbs').fire();
+        // show loading indicator before actual
+        // Assessment Template is loading
+        this.viewModel.attr('is_loading', true);
       },
       closeModal: function () {
         this.viewModel.attr('is_saving', false);

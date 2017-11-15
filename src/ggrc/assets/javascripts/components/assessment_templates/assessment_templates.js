@@ -102,6 +102,7 @@ import {
 
         viewModel.attr('responses', values);
         viewModel._selectInitialTemplate(viewModel.templates());
+        viewModel.dispatch('assessmentTemplateLoaded');
       });
     }
   });
