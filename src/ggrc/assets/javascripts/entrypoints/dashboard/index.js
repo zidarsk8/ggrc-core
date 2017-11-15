@@ -28,12 +28,6 @@ import '../../generated/ggrc_filter_query_parser';
 // Models
 import '../../models';
 
-// ViewModels
-import '../../components/view-models/advanced-search-container-vm';
-import '../../components/view-models/tree-item-base-vm';
-import '../../components/view-models/tree-people-base-vm';
-import '../../components/base-objects/pagination';
-
 // Controllers
 import '../../controllers/tree/tree-loader';
 import '../../controllers/tree/tree-view';

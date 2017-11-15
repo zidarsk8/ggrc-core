@@ -41,6 +41,7 @@ import {
   initCounts,
 } from '../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
+import Pagination from '../base-objects/pagination';
 
 var viewModel;
 
@@ -236,7 +237,7 @@ viewModel = can.Map.extend({
     },
     pageInfo: {
       value: function () {
-        return new GGRC.VM.Pagination({
+        return new Pagination({
           pageSizeSelect: [10, 25, 50],
           pageSize: 10});
       },

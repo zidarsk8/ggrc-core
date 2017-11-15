@@ -6,6 +6,7 @@
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import Pagination from '../../base-objects/pagination';
 
 describe('GGRC.Components.mapperResults', function () {
   'use strict';
@@ -22,7 +23,7 @@ describe('GGRC.Components.mapperResults', function () {
     });
     viewModel.attr('submitCbs', $.Callbacks());
     viewModel.attr('paging',
-      new GGRC.VM.Pagination({pageSizeSelect: [5, 10, 15]}));
+      new Pagination({pageSizeSelect: [5, 10, 15]}));
     Component.prototype.viewModel.init = init;
     viewModel.init = init;
   });
