@@ -1,9 +1,10 @@
-/*!
+/*
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 import {confirm} from '../plugins/utils/modals';
+import {isSnapshot} from '../plugins/utils/snapshot-utils';
 
 (function (can, GGRC) {
   can.Construct.extend('can.Model.Mixin', {
@@ -169,7 +170,20 @@ import {confirm} from '../plugins/utils/modals';
       if (!this.access_control_list) {
         this.attr('access_control_list', []);
       }
-    }
+    },
+    'before:refresh': function () {
+      // no need to rewrite access_control_list for snapshots
+      if (isSnapshot(this)) {
+        return;
+      }
+
+      // access_control_list should be set from response.
+      // if access_control_list is not empty CanJS try to merge
+      // lists from instance and response. Outcome: wrong date in ACL
+      if (this.attr('access_control_list.length') > 0) {
+        this.attr('access_control_list', []);
+      }
+    },
   });
 
   can.Model.Mixin('ca_update', {}, {
