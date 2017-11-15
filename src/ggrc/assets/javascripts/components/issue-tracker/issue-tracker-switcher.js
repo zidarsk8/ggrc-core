@@ -36,12 +36,6 @@ export default GGRC.Components('issueTrackerSwitcher', {
           return !this.attr('parent');
         },
       },
-      isFirstTimeTurnOn: {
-        get: function () {
-          // 'issue_tracker' has already created if component_id is filled;
-          return !!this.attr('instance.issue_tracker.component_id');
-        },
-      },
     },
     instance: {},
     parent: null,
@@ -66,21 +60,12 @@ export default GGRC.Components('issueTrackerSwitcher', {
       this.dispatch(args);
     },
     setDefaults: function () {
-      let issueTracker = this.attr('instance.issue_tracker');
-
-      issueTracker.attr('issue_type',
-        issueTracker.attr('issue_type') || 'PROCESS');
-
-      if (this.attr('isParent') || this.attr('isFirstTimeTurnOn')) {
-        issueTracker.attr('issue_priority',
-          issueTracker.attr('issue_priority') || 'P0');
-        issueTracker.attr('issue_severity',
-          issueTracker.attr('issue_severity') || 'S0');
-      } else {
+      if (!this.attr('isParent') && this.attr('instance').wasEnabled()) {
         this.setDeaultsFromParent('issue_priority');
         this.setDeaultsFromParent('issue_severity');
         this.setDeaultsFromParent('component_id');
         this.setDeaultsFromParent('hotlist_id');
+        this.setDeaultsFromParent('issue_type');
 
         if (this.attr('setIssueTitle')) {
           // can override issue title in case when user creates new instance
@@ -98,7 +83,7 @@ export default GGRC.Components('issueTrackerSwitcher', {
         issueTracker.attr(propName) || parentIssueTracker.attr(propName));
     },
     setDefaultIssueTitle: function (value) {
-      let title = this.attr('instance.title')
+      let title = this.attr('instance.title');
       let issueTracker = this.attr('instance.issue_tracker');
 
       if (value) {

@@ -4,8 +4,13 @@
  */
 
 (function (can, CMS) {
-  const AUDIT_HOTLIST_ID = '766459';
-  const AUDIT_COMPONENT_ID = '188208';
+  const AUDIT_ISSUE_TRACKER = {
+    hotlist_id: '766459',
+    component_id: '188208',
+    issue_severity: 'S2',
+    issue_priority: 'P2',
+    issue_type: 'PROCESS',
+  };
 
   function update_program_authorizations(programs, person) {
     return can.when(
@@ -84,13 +89,6 @@
     },
     defaults: {
       status: 'Planned',
-      issue_tracker: {
-        hotlist_id: AUDIT_HOTLIST_ID,
-        component_id: AUDIT_COMPONENT_ID,
-        issue_severity: 'S2',
-        issue_priority: 'P2',
-        enabled: false,
-      },
     },
     statuses: ['Planned', 'In Progress', 'Manager Review',
       'Ready for External Review', 'Completed', 'Deprecated'],
@@ -312,6 +310,8 @@
         });
       }
 
+      this.initIssueTrackerObject(AUDIT_ISSUE_TRACKER);
+
       return dfd;
     },
   });
@@ -414,10 +414,6 @@
         {value: 'other', title: 'Others...'}
       ],
       showCaptainAlert: false,
-      issue_tracker: {
-        hotlist_id: '',
-        component_id: '',
-      },
     },
     statuses: ['Draft', 'Deprecated', 'Active'],
     tree_view_options: {
@@ -490,14 +486,7 @@
         };
       }
 
-      if (this.audit && this.audit.issue_tracker) {
-        this.attr('can_use_issue_tracker', this.audit.issue_tracker.enabled);
-
-        if (this.attr('can_use_issue_tracker') && this.isNew()) {
-          // turn ON issue tracker when CREATE new instance
-          this.attr('issue_tracker.enabled', true);
-        }
-      }
+      this.initCanUseIssueTracker(this.audit.issue_tracker);
     },
 
     /**

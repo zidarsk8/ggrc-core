@@ -25,13 +25,6 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     is_custom_attributable: true,
     isRoleable: true,
     defaults: {
-      issue_tracker: {
-        hotlist_id: '',
-        component_id: '',
-        title: '',
-        issue_url: '',
-      },
-
       assessment_type: 'Control',
       status: 'Not Started',
       send_by_default: true,  // notifications when a comment is added
@@ -278,7 +271,6 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         GGRC.current_user.id, GGRC.current_user);
       var auditLead;
       var self = this;
-      let issueTracker;
 
       if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
         if (pageInstance.type === 'Audit') {
@@ -304,16 +296,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
           markForAddition(this, currentUser, 'Creators');
         }
 
-        issueTracker = this.audit.issue_tracker;
-
-        if (issueTracker) {
-          this.attr('can_use_issue_tracker', issueTracker.enabled);
-
-          if (issueTracker.enabled && this.isNew()) {
-            // turn ON issue tracker when CREATE new instance
-            this.attr('issue_tracker.enabled', true);
-          }
-        }
+        this.initCanUseIssueTracker(this.audit.issue_tracker);
 
         return this.audit.findAuditors().then(function (list) {
           list.forEach(function (item) {

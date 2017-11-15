@@ -241,10 +241,43 @@ import {confirm} from '../plugins/utils/modals';
         this.issue_tracker = new can.Map({});
       }
 
-      this.issue_tracker.issue_id = '';
-      this.issue_tracker.issue_type = 'PROCESS';
-      this.issue_tracker.issue_priority = 'P0';
-      this.issue_tracker.issue_severity = 'S0';
+      this.initIssueTrackerObject();
+    },
+    initIssueTrackerObject: function (defaultValues) {
+      let issueTracker;
+
+      if (!GGRC.ISSUE_TRACKER_ENABLED) {
+        return;
+      }
+
+      issueTracker = this.attr('issue_tracker');
+
+      if (!issueTracker || this.wasEnabled()) {
+        if (!defaultValues) {
+          defaultValues = {};
+        }
+
+        if (!this.attr('issue_tracker.enabled')) {
+          // convert to boolean
+          defaultValues.enabled = !!this.issue_tracker.enabled;
+        }
+
+        this.attr('issue_tracker', defaultValues);
+      }
+    },
+    initCanUseIssueTracker: function (parentIssueTracker) {
+      if (parentIssueTracker && GGRC.ISSUE_TRACKER_ENABLED) {
+        this.attr('can_use_issue_tracker', parentIssueTracker.enabled);
+
+        if (parentIssueTracker.enabled && this.isNew()) {
+          // turn ON issue tracker when CREATE new instance
+          this.attr('issue_tracker.enabled', true);
+        }
+      }
+    },
+    wasEnabled: function () {
+      // 'issue_tracker' has already created if component_id is filled;
+      return !this.issue_tracker.component_id;
     },
   });
 
