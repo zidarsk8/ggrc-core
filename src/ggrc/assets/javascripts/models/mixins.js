@@ -279,6 +279,13 @@ import {confirm} from '../plugins/utils/modals';
       // 'issue_tracker' has already created if component_id is filled;
       return !this.issue_tracker.component_id;
     },
+    'before:refresh': function () {
+      // clear warnings because CanJS save prev value of warning after merge
+      // current instance and response
+      if (this.issue_tracker && this.issue_tracker._warnings) {
+        this.issue_tracker._warnings = [];
+      }
+    },
   });
 
   /**
