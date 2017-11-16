@@ -23,33 +23,21 @@ def upgrade():
   op.drop_column('risk_objects', 'secondary_contact_id')
 
   op.drop_column('risks', 'url')
-  op.drop_column('risks', 'secondary_contact_id')
   op.drop_column('risks', 'reference_url')
-  op.drop_column('risks', 'contact_id')
 
   op.drop_column('threats', 'url')
-  op.drop_column('threats', 'secondary_contact_id')
   op.drop_column('threats', 'reference_url')
-  op.drop_column('threats', 'contact_id')
 
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
-  op.add_column('threats', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('threats', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('threats', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('threats', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('risks', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('risks', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('risks', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('risks', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 

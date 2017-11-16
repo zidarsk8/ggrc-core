@@ -26,244 +26,140 @@ def upgrade():
   op.drop_table('object_documents')
   op.drop_table('relationship_attrs')
 
-  op.drop_constraint(
-      'access_groups_ibfk_1', 'access_groups', type_='foreignkey')
-  op.drop_constraint(
-      'access_groups_ibfk_3', 'access_groups', type_='foreignkey')
   op.drop_column('access_groups', 'url')
-  op.drop_column('access_groups', 'secondary_contact_id')
   op.drop_column('access_groups', 'reference_url')
-  op.drop_column('access_groups', 'contact_id')
 
-  op.drop_constraint('assessments_ibfk_1', 'assessments', type_='foreignkey')
-  op.drop_constraint('assessments_ibfk_3', 'assessments', type_='foreignkey')
   op.drop_column('assessments', 'url')
-  op.drop_column('assessments', 'secondary_contact_id')
   op.drop_column('assessments', 'reference_url')
-  op.drop_column('assessments', 'contact_id')
 
   op.drop_column('audits', 'url')
   op.drop_column('audits', 'reference_url')
 
-  op.drop_constraint('clauses_ibfk_1', 'clauses', type_='foreignkey')
-  op.drop_constraint('clauses_ibfk_4', 'clauses', type_='foreignkey')
   op.drop_column('clauses', 'url')
-  op.drop_column('clauses', 'secondary_contact_id')
   op.drop_column('clauses', 'reference_url')
-  op.drop_column('clauses', 'contact_id')
 
   op.drop_column('controls', 'url')
-  op.drop_column('controls', 'secondary_contact_id')
   op.drop_column('controls', 'reference_url')
-  op.drop_column('controls', 'contact_id')
 
   op.drop_column('data_assets', 'url')
-  op.drop_column('data_assets', 'secondary_contact_id')
   op.drop_column('data_assets', 'reference_url')
-  op.drop_column('data_assets', 'contact_id')
 
   op.drop_column('directives', 'url')
-  op.drop_column('directives', 'secondary_contact_id')
   op.drop_column('directives', 'reference_url')
-  op.drop_column('directives', 'contact_id')
 
   op.drop_column('facilities', 'url')
-  op.drop_column('facilities', 'secondary_contact_id')
   op.drop_column('facilities', 'reference_url')
-  op.drop_column('facilities', 'contact_id')
 
-  op.drop_constraint('issues_ibfk_1', 'issues', type_='foreignkey')
-  op.drop_constraint('issues_ibfk_3', 'issues', type_='foreignkey')
   op.drop_column('issues', 'url')
-  op.drop_column('issues', 'secondary_contact_id')
   op.drop_column('issues', 'reference_url')
-  op.drop_column('issues', 'contact_id')
 
   op.drop_column('markets', 'url')
-  op.drop_column('markets', 'secondary_contact_id')
   op.drop_column('markets', 'reference_url')
-  op.drop_column('markets', 'contact_id')
 
   op.drop_column('objectives', 'url')
-  op.drop_column('objectives', 'secondary_contact_id')
   op.drop_column('objectives', 'reference_url')
-  op.drop_column('objectives', 'contact_id')
 
   op.drop_column('org_groups', 'url')
-  op.drop_column('org_groups', 'secondary_contact_id')
   op.drop_column('org_groups', 'reference_url')
-  op.drop_column('org_groups', 'contact_id')
 
   op.drop_column('products', 'url')
-  op.drop_column('products', 'secondary_contact_id')
   op.drop_column('products', 'reference_url')
-  op.drop_column('products', 'contact_id')
 
   op.drop_column('programs', 'url')
-  op.drop_column('programs', 'secondary_contact_id')
   op.drop_column('programs', 'reference_url')
-  op.drop_column('programs', 'contact_id')
 
   op.drop_column('projects', 'url')
-  op.drop_column('projects', 'secondary_contact_id')
   op.drop_column('projects', 'reference_url')
-  op.drop_column('projects', 'contact_id')
 
   op.drop_column('sections', 'end_date')
   op.drop_column('sections', 'url')
-  op.drop_column('sections', 'secondary_contact_id')
-  op.drop_column('sections', 'contact_id')
   op.drop_column('sections', 'reference_url')
   op.drop_column('sections', 'start_date')
 
   op.drop_column('systems', 'url')
-  op.drop_column('systems', 'secondary_contact_id')
   op.drop_column('systems', 'reference_url')
-  op.drop_column('systems', 'contact_id')
 
   op.drop_column('vendors', 'url')
-  op.drop_column('vendors', 'secondary_contact_id')
   op.drop_column('vendors', 'reference_url')
-  op.drop_column('vendors', 'contact_id')
 
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   # pylint: disable=R0915
-  op.add_column('vendors', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('vendors', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('vendors', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('vendors', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('systems', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('systems', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('systems', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('systems', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
   op.add_column('sections', sa.Column('start_date', sa.DATE(), nullable=True))
   op.add_column('sections', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('sections', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
-  op.add_column('sections', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('sections', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
   op.add_column('sections', sa.Column('end_date', sa.DATE(), nullable=True))
 
-  op.add_column('projects', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('projects', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('projects', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('projects', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('programs', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('programs', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('programs', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('programs', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('products', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('products', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('products', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('products', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('org_groups', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('org_groups', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('org_groups', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('org_groups', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('objectives', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('objectives', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('objectives', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('objectives', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('markets', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('markets', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('markets', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('markets', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('issues', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('issues', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('issues', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('issues', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('facilities', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('facilities', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('facilities', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('facilities', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('directives', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('directives', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('directives', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('directives', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('data_assets', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('data_assets', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('data_assets', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('data_assets', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('controls', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('controls', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('controls', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('controls', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('clauses', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('clauses', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('clauses', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('clauses', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
@@ -272,22 +168,13 @@ def downgrade():
   op.add_column('audits', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('assessments', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('assessments', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('assessments', sa.Column('secondary_contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('assessments', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
-  op.add_column('access_groups', sa.Column('contact_id', mysql.INTEGER(
-      display_width=11), autoincrement=False, nullable=True))
   op.add_column('access_groups', sa.Column('reference_url', mysql.VARCHAR(
       length=250), nullable=True))
-  op.add_column('access_groups', sa.Column(
-      'secondary_contact_id', mysql.INTEGER(
-          display_width=11), autoincrement=False, nullable=True))
   op.add_column('access_groups', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
 
