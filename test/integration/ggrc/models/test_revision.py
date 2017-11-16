@@ -133,6 +133,7 @@ class TestRevisions(TestCase):
   @ddt.data(True, False)
   def test_revision_after_del_cad(self, is_add_cav):
     """Test creating new revision after deleting CAD.
+
     In case of deleting CAD, new revision must be created for object,
     which had this CAD.
     """
@@ -147,7 +148,8 @@ class TestRevisions(TestCase):
         factories.CustomAttributeValueFactory(
             custom_attribute=cad,
             attributable=control,
-            attribute_value="text")
+            attribute_value="text",
+        )
 
       revision_id = ggrc.models.Revision.query.filter(
           ggrc.models.Revision.resource_id == control.id,
