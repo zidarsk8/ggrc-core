@@ -4,6 +4,7 @@
 */
 
 import Component from '../assessment_templates';
+import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 
 describe('assessmentTemplates', ()=> {
   let viewModel;
@@ -100,5 +101,70 @@ describe('assessmentTemplates', ()=> {
         expect(viewModel.attr('assessmentTemplate')).toEqual('single');
       }
     );
+  });
+
+  describe('init() method', ()=> {
+    const reqParam = {};
+    let makeRequestDfd;
+    let method;
+
+    beforeAll(()=> {
+      method = Component.prototype.init.bind({
+        viewModel,
+      });
+    });
+
+    beforeEach(()=> {
+      makeRequestDfd = can.Deferred();
+      viewModel.attr('instance', {
+        id: 1,
+        type: 'AssessmentTemplate',
+      });
+
+      spyOn(QueryAPI, 'buildParam')
+        .and.returnValue(reqParam);
+      spyOn(QueryAPI, 'makeRequest')
+        .and.returnValue(makeRequestDfd);
+      spyOn(viewModel, '_selectInitialTemplate');
+    });
+
+    it('makse relevant call', ()=> {
+      method();
+
+      expect(QueryAPI.buildParam)
+        .toHaveBeenCalled();
+      expect(QueryAPI.makeRequest)
+        .toHaveBeenCalledWith({data: [reqParam]});
+    });
+
+    it('sets initial Assessment Template', ()=> {
+      spyOn(viewModel, 'dispatch');
+
+      method();
+
+      makeRequestDfd.resolve([{
+        AssessmentTemplate: {
+          values: [],
+        },
+      }]);
+
+      expect(viewModel._selectInitialTemplate)
+        .toHaveBeenCalled();
+    });
+
+    it('dispatches "assessmentTemplateLoaded" event', ()=> {
+      spyOn(viewModel, 'dispatch');
+
+      method();
+
+      makeRequestDfd.resolve([{
+        AssessmentTemplate: {
+          values: [],
+        },
+      }]);
+
+      expect(viewModel.dispatch)
+        .toHaveBeenCalledWith('assessmentTemplateLoaded');
+    });
   });
 });
