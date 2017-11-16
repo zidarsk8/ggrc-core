@@ -431,7 +431,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Evidence URL",
         "Code",
         "Due Date",
-        "Stop Date",
+        "Last Deprecated Date",
         "Verified Date",
         "Finished Date",
         "State",

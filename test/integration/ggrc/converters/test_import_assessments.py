@@ -522,6 +522,24 @@ class TestAssessmentImport(TestCase):
     self.assertEqual(before_update,
                      self.export_parsed_csv(data)["Assessment"][0][field])
 
+  def test_import_last_deprecated_date(self):
+    """Last Deprecated Date on assessment should be non editable."""
+    with factories.single_commit():
+      with freezegun.freeze_time("2017-01-01"):
+        assessment = factories.AssessmentFactory(status="Deprecated")
+
+    resp = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("code", assessment.slug),
+        ("Last Deprecated Date", "02/02/2017"),
+    ]))
+
+    result = models.Assessment.query.get(assessment.id)
+
+    self.assertEqual(1, len(resp))
+    self.assertEqual(1, resp[0]["updated"])
+    self.assertEqual(result.end_date, datetime.date(2017, 1, 1))
+
 
 @ddt.ddt
 class TestAssessmentExport(TestCase):

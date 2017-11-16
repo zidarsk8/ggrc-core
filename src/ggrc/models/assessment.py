@@ -23,7 +23,7 @@ from ggrc.models.mixins import CustomAttributable
 from ggrc.models.mixins import FinishedDate
 from ggrc.models.mixins import Notifiable
 from ggrc.models.mixins import TestPlanned
-from ggrc.models.mixins import Timeboxed
+from ggrc.models.mixins import LastDeprecatedTimeboxed
 from ggrc.models.mixins import VerifiedDate
 from ggrc.models.mixins import reminderable
 from ggrc.models.mixins import statusable
@@ -61,10 +61,10 @@ def _build_audit_stub(assessment_obj):
 class Assessment(Roleable, statusable.Statusable, AuditRelationship,
                  AutoStatusChangeable, Assignable, HasObjectState, TestPlanned,
                  CustomAttributable, PublicDocumentable, Commentable,
-                 Personable, reminderable.Reminderable, Timeboxed, Relatable,
-                 WithSimilarityScore, FinishedDate, VerifiedDate,
-                 ValidateOnComplete, Notifiable, WithAction, BusinessObject,
-                 labeled.Labeled, Indexed, db.Model):
+                 Personable, reminderable.Reminderable, Relatable,
+                 LastDeprecatedTimeboxed, WithSimilarityScore, FinishedDate,
+                 VerifiedDate, ValidateOnComplete, Notifiable, WithAction,
+                 BusinessObject, labeled.Labeled, Indexed, db.Model):
   """Class representing Assessment.
 
   Assessment is an object representing an individual assessment performed on
