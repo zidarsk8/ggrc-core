@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../simple-popover/simple-popover';
 import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 

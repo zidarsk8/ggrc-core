@@ -4,7 +4,7 @@
 */
 
 import '../../plugins/utils/controllers';
-import '../../plugins/utils/modals';
+import {warning} from '../../plugins/utils/modals';
 import './csv-template';
 import '../show-more/show-more';
 import template from './templates/csv-import.mustache';
@@ -141,7 +141,7 @@ export default GGRC.Components('csvImportWidget', {
       if (needWarning) {
         operation = this.getOperationNameFromCheckObj(check);
 
-        GGRC.Utils.Modals.warning(
+        warning(
           {
             objectShortInfo: 'imported object(s)',
             modal_description:

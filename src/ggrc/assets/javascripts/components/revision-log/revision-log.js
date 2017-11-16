@@ -4,6 +4,7 @@
  */
 
 import './revision-log-data';
+import '../paginate';
 
 (function (GGRC, can) {
   'use strict';

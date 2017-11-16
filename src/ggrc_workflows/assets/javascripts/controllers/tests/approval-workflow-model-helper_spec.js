@@ -3,13 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('CMS.ModelHelpers.ApprovalWorkflow', function () {
-  var Model;
+import {ApprovalWorkflow as Model} from '../approval-workflow-modal';
 
-  beforeAll(function () {
-    Model = CMS.ModelHelpers.ApprovalWorkflow;
-  });
-
+describe('ApprovalWorkflow', function () {
   describe('save() method', function () {
     var method;
     var originalObject;
@@ -56,7 +52,7 @@ describe('CMS.ModelHelpers.ApprovalWorkflow', function () {
         refresh: jasmine.createSpy(),
       };
 
-      instance = new CMS.ModelHelpers.ApprovalWorkflow({
+      instance = new Model({
         original_object: originalObject,
         contact: currentUser,
       });

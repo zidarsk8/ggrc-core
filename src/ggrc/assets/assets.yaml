@@ -76,7 +76,6 @@ dashboard-js-template-files:
   - base_objects/mapper-item-description.mustache
   - base_objects/dashboard_widget.mustache
   - base_templates/attachment.mustache
-  - base_templates/dates_list.mustache
   - base_templates/description.mustache
   - base_templates/mapped_objects.mustache
   - base_templates/notes.mustache

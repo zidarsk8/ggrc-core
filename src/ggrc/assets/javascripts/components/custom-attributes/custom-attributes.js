@@ -4,6 +4,8 @@
  */
 
 import '../form/form-validation-icon';
+import '../form/form-validation-text';
+import '../custom-attributes/custom-attributes-field-view';
 
 (function (can, GGRC, $) {
   'use strict';

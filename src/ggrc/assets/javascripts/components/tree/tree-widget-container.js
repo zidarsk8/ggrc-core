@@ -27,6 +27,7 @@ import '../advanced-search/advanced-search-filter-container';
 import '../advanced-search/advanced-search-mapping-container';
 import '../bulk-update-button/bulk-update-button';
 import '../dropdown/multiselect-dropdown';
+import '../assessment_generator';
 import template from './templates/tree-widget-container.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {

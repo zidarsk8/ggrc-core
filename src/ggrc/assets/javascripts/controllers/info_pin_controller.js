@@ -10,6 +10,7 @@ import '../components/assessment/info-pane/info-pane';
 import '../components/folder-attachments-list/folder-attachments-list';
 import '../components/unmap-button/unmap-person-button';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
+import {confirm} from '../plugins/utils/modals';
 
 can.Control('CMS.Controllers.InfoPin', {
   defaults: {
@@ -85,24 +86,27 @@ can.Control('CMS.Controllers.InfoPin', {
     var instance = opts.attr('instance');
     var parentInstance = opts.attr('parent_instance');
     var self = this;
-    this.element.html(can.view(view, {
-      instance: instance,
-      isSnapshot: !!instance.snapshot || instance.isRevision,
-      parentInstance: parentInstance,
-      model: instance.class,
-      confirmEdit: confirmEdit,
-      is_info_pin: true,
-      options: options,
-      result: options.result,
-      page_instance: GGRC.page_instance(),
-      maximized: maximizedState,
-      onChangeMaximizedState: function () {
-        return self.changeMaximizedState.bind(self);
-      },
-      onClose: function () {
-        return self.close.bind(self);
-      }
-    }));
+    import(/* webpackChunkName: "modalsCtrls" */'./modals')
+      .then(() => {
+        this.element.html(can.view(view, {
+          instance: instance,
+          isSnapshot: !!instance.snapshot || instance.isRevision,
+          parentInstance: parentInstance,
+          model: instance.class,
+          confirmEdit: confirmEdit,
+          is_info_pin: true,
+          options: options,
+          result: options.result,
+          page_instance: GGRC.page_instance(),
+          maximized: maximizedState,
+          onChangeMaximizedState: function () {
+            return self.changeMaximizedState.bind(self);
+          },
+          onClose: function () {
+            return self.close.bind(self);
+          }
+        }));
+      });
   },
   prepareView: function (opts, el, maximizedState, setHtml) {
     var instance = opts.attr('instance');
@@ -216,7 +220,7 @@ can.Control('CMS.Controllers.InfoPin', {
   confirmEdit: function (instance, modalDetails) {
     var confirmDfd = $.Deferred();
     var renderer = can.view.mustache(modalDetails.description);
-    GGRC.Controllers.Modals.confirm({
+    confirm({
       modal_description: renderer(instance).textContent,
       modal_confirm: modalDetails.button,
       modal_title: modalDetails.title,
