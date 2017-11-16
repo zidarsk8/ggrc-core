@@ -195,10 +195,15 @@ class StatusColumnHandler(ColumnHandler):
   def parse_item(self):
     value = self.raw_value.lower()
     status = self.state_mappings.get(value)
-    if status is None:
-      self.add_warning(
-          errors.WRONG_VALUE_DEFAULT, column_name=self.display_name)
+    if status is not None:
+      return status
+    if self.row_converter.obj.status:
+      status = self.row_converter.obj.status
+      error_tmpl = errors.WRONG_VALUE_CURRENT
+    else:
       status = self.row_converter.object_class.default_status()
+      error_tmpl = errors.WRONG_VALUE_DEFAULT
+    self.add_warning(error_tmpl, column_name=self.display_name)
     return status
 
 

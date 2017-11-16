@@ -59,6 +59,9 @@ WRONG_VALUE = (u"Line {line}: Field '{column_name}' contains invalid data. The"
 WRONG_VALUE_DEFAULT = (u"Line {line}: Field '{column_name}' contains invalid"
                        u" data. The default value will be used.")
 
+WRONG_VALUE_CURRENT = (u"Line {line}: Field '{column_name}' contains invalid"
+                       u" data. The current value will be used.")
+
 WRONG_VALUE_ERROR = (u"Line {line}: Field '{column_name}' contains invalid "
                      u"data. The line will be ignored.")
 
