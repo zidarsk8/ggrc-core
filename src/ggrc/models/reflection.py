@@ -57,8 +57,6 @@ ATTRIBUTE_ORDER = (
     "means",
     "network_zone",
     "operationally",
-    "principal_assessor",
-    "secondary_assessor",
     "secondary_contact",
     "assessment_type",
     "reference_url",
