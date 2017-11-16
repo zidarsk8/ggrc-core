@@ -31,7 +31,7 @@ ALLOWED_QUERYAPI_APP_IDS=""
 APPENGINE_EMAIL=""
 AUTHORIZED_DOMAIN=""
 ACCESS_TOKEN=""
-VERSION="autoincrement" # fixed number or "autoinecrement" - can be omitted
+VERSION="AUTO" # valid version string or "AUTO" - can be omitted
 
 ## generated values:
 

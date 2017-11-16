@@ -59,7 +59,7 @@ print VERSION
 EOF
 }
 
-if [[ "$VERSION" == "use ggrc version and hash" ]]
+if [[ "$VERSION" == "AUTO" ]]
 then
   GGRC_VERSION=$(version_script | python -)
   GGRC_HASH="$(git rev-parse FETCH_HEAD)"
