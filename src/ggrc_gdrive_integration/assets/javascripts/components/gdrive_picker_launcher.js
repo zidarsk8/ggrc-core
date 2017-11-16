@@ -60,76 +60,80 @@ import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
           this.removeOldSuffix(fileName) + '_' + suffixArr.join('_');
       },
       /**
-       * Copys or renames files adding new suffixes to the file names
-       * @param  {Object} [opts={}] Options object.
-       * @param  {Array}  files     Array of files models
-       * @return {Promise}          Promise which resolves to array of new files
+       * Creates a file edit request
+       * @param  {Objects} file       file object
+       * @return {Object}             gapi.client.request object
        */
-      addFilesSuffixes: function (opts = {}, files) {
-        var fileRenameBatch = gapi.client.newBatch();
-        var fileRenameDfd = can.Deferred();
-        var errors = [];
-        var originalFileNames = {};
-        var newParentId = opts.dest && opts.dest.id;
+      createEditRequest: function (file) {
+        var requestBody = {};
 
-        files.forEach((file) => {
-          var req;
-          var requestBody = {};
+        requestBody.name = file.attr('name');
 
-          // TODO: maybe pick the one format (the one that comes after refresh)?
-          var originalFileName = file.attr('title') ||
-            file.attr('originalFilename') || file.attr('name');
-
-          var newFileName = this.addFileSuffix(originalFileName);
-
-          var parents = (file.parents && file.parents.attr()) || [];
-          var existsInParent = Boolean(
-            parents.find((parent) => parent.id === newParentId)
-          );
-
-          // We change the file if it's a new upload
-          // or file with the same name already exists in the directory
-          var changeExistingFile = file.newUpload ||
-            (existsInParent && originalFileName === newFileName);
-
-          var reqPath = changeExistingFile ? `/drive/v3/files/${file.id}`
-            : `/drive/v3/files/${file.id}/copy`;
-          var reqMethod = changeExistingFile ? 'PATCH' : 'POST';
-
-          file.attr('title', newFileName);
-          file.attr('name', newFileName);
-          originalFileNames[file.id] = originalFileName;
-
-          requestBody.name = newFileName;
-
-          // If there're no such file in the destination directory
-          // we'll move or copy it there
-          if ( newParentId && !existsInParent ) {
-            requestBody.parents = [newParentId];
-          }
-
-          // updating filenames on GDrive
-          req = gapi.client.request({
-            path: reqPath,
-            method: reqMethod,
-            params: {
-              alt: 'json',
-            },
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(requestBody),
-          });
-
-          fileRenameBatch.add(req, {
-            id: file.id, // settings request id to file id to find the failed file later
-          });
+        // updating filenames on GDrive
+        return gapi.client.request({
+          path: `/drive/v3/files/${file.id}`,
+          method: 'PATCH',
+          params: {
+            alt: 'json',
+          },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
         });
+      },
+      /**
+       * Creates a file copy request
+       * @param  {Object} file        file object
+       * @param  {String} newParentId id of the destination folder
+       * @return {Object}             gapi.client.request object
+       */
+      createCopyRequest: function (file, newParentId) {
+        var requestBody = {
+          parents: [newParentId || 'root'],
+        };
 
-        // Batch promise always resolves even when some of requests failed
-        // so we manually parsing the response object to find errors
+        requestBody.name = file.attr('name');
+
+        // updating filenames on GDrive
+        return gapi.client.request({
+          path: `/drive/v3/files/${file.id}/copy`,
+          method: 'POST',
+          params: {
+            alt: 'json',
+          },
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
+      },
+      /**
+       * This function creates a batch request from the
+       * array of requests with extra data
+       * @param  {Array} requestsBatch Array of objects with gapi.client.request and extra options
+       * @param  {Object} originalFileNames Object with original files names. key - fileId, values - original file name
+       * @return {Promise} Promise which resolves to array of renamed file objects
+       */
+      runRenameBatch: function (requestsBatch, originalFileNames) {
+        var fileRenameBatch = gapi.client.newBatch();
+        var resultFiles = new can.Deferred();
+
+        if ( !requestsBatch.length ) {
+          return resultFiles.resolve([]);
+        } else {
+          requestsBatch.forEach((reqData) => {
+            fileRenameBatch.add(reqData.req, reqData.options);
+          });
+        }
+
+        // Batch promise always resolves ( except when the batch is empty )
+        // even when some of requests failed so we manually parsing the
+        // response object to find errors
         fileRenameBatch.then((batchRes) => {
           var newFiles = [];
+          var errors = [];
+
           can.each(batchRes.result, function (response, fileId) {
             if ( response.status === 200 ) {
               newFiles.push(response.result);
@@ -153,14 +157,87 @@ import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
               });
             }
 
-            this.refreshFilesModel(CMS.Models.GDriveFile.models(newFiles))
-              .then(fileRenameDfd.resolve, fileRenameDfd.reject);
+            resultFiles.resolve(newFiles);
           } else {
-            fileRenameDfd.reject(new Error(
+            resultFiles.reject(new Error(
                 `Failed to attach uploaded files.
                 An error occurred while adding suffixes.`));
           }
         });
+
+        return resultFiles;
+      },
+      /**
+       * Copys or renames files adding new suffixes to the file names
+       * @param  {Object} [opts={}] Options object.
+       * @param  {Array}  files     Array of files models
+       * @return {Promise}          Promise which resolves to array of new files
+       */
+      addFilesSuffixes: function (opts = {}, files) {
+        var fileRenameDfd = can.Deferred();
+        var requestsBatch = [];
+        var originalFileNames = {};
+        var newParentId = opts.dest && opts.dest.id;
+        var untouchedFiles = [];
+
+        files.forEach((file) => {
+          var req;
+
+          // TODO: maybe pick the one format (the one that comes after refresh)?
+          var originalFileName = file.attr('title') ||
+            file.attr('originalFilename') || file.attr('name');
+
+          var newFileName = this.addFileSuffix(originalFileName);
+
+          var parents = (file.parents && file.parents.attr()) || [];
+
+          var originalFileExistsInDest = Boolean(
+            parents.find((parent) =>
+              (parent.id === newParentId) || (!newParentId && parent.isRoot))
+          );
+          var newFileExistsInDest = originalFileExistsInDest &&
+            ( newFileName === originalFileName );
+
+          var sharedFile = file.attr('userPermission.role') !== 'owner';
+
+          file.attr('title', newFileName);
+          file.attr('name', newFileName);
+          originalFileNames[file.id] = originalFileName;
+
+
+          // We change the file if it's a new upload (New files are uploaded
+          // to the audit folder or GDrive root folder)
+          if ( file.newUpload ) {
+            req = this.createEditRequest(file, newParentId);
+
+          // ...and copy file if it's a shared one or
+          // there's no file with the same name in the folder
+          } else if ( sharedFile || !newFileExistsInDest ) {
+            req = this.createCopyRequest(file, newParentId);
+          // file with the targeted name already exists in the destination directory -
+          // just using it ( it can happen when user picks the just attached file again )
+          } else {
+            untouchedFiles.push(file);
+          }
+
+          // updating filenames on GDrive
+          if ( req ) {
+            requestsBatch.push({
+              req,
+              options: {
+                id: file.id, // settings request id to file id to find the failed file later
+              },
+            });
+          }
+        });
+
+        this.runRenameBatch(requestsBatch, originalFileNames)
+          .then((files) => {
+            files = files.concat(untouchedFiles);
+            this.refreshFilesModel(CMS.Models.GDriveFile.models(files))
+              .then(fileRenameDfd.resolve, fileRenameDfd.reject);
+          })
+          .fail(fileRenameDfd.reject);
 
         return fileRenameDfd;
       },
