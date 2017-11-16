@@ -247,4 +247,66 @@ describe('GGRC.Components.revisionsComparer', function () {
         });
       });
   });
+
+  describe('"loadACLPeople" method', () => {
+    let Person;
+    let method;
+    let instance;
+
+    beforeEach(() => {
+      Person = CMS.Models.Person;
+      method = Component.prototype.scope.loadACLPeople;
+      instance = new can.Map({
+        access_control_list: [{
+          person: {
+            id: 1,
+            type: 'Person',
+          },
+        }, {
+          person: {
+            id: 2,
+            type: 'Person',
+          },
+        }],
+      });
+
+      spyOn(RefreshQueue.prototype, 'enqueue').and.callThrough();
+      spyOn(RefreshQueue.prototype, 'trigger');
+    });
+
+    it('does ajax call for all people no one is in cache', () => {
+      spyOn(Person, 'findInCacheById');
+
+      method(instance);
+
+      expect(RefreshQueue.prototype.enqueue.calls.count()).toEqual(2);
+      expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
+    });
+
+    it('does ajax call for remain people when some people are in cache', () => {
+      spyOn(Person, 'findInCacheById').and.callFake((id) => {
+        return id === 1 ? {email: 'example@email.com'} : null;
+      });
+
+      method(instance);
+
+      expect(RefreshQueue.prototype.enqueue.calls.count()).toEqual(1);
+      expect(RefreshQueue.prototype.trigger).toHaveBeenCalled();
+    });
+
+    it('does not ajax call when all people are in cache', () => {
+      let dfd = new can.Deferred();
+      spyOn(Person, 'findInCacheById').and.callFake(() => {
+        return {email: 'example@email.com'};
+      });
+      spyOn(can, 'Deferred').and.returnValue(dfd);
+      spyOn(dfd, 'resolve');
+
+      method(instance);
+
+      expect(RefreshQueue.prototype.enqueue.calls.any()).toEqual(false);
+      expect(RefreshQueue.prototype.trigger.calls.any()).toEqual(false);
+      expect(dfd.resolve).toHaveBeenCalled();
+    });
+  });
 });

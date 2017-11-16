@@ -43,19 +43,48 @@ import {confirm} from '../../plugins/utils/modals';
                   that.isContainsAttachments(that.instance) ?
                   that.getAttachmentsDfds(revisions) :
                   [];
-                fragLeft.appendChild(fragRight);
 
-                target.find('.modal-body').html(fragLeft);
-                that.highlightDifference(target);
+                // people should be preloaded before highlighting differences
+                // to avoid breaking UI markup as highlightDifference
+                // sets block's height
+                that.loadACLPeople(revisions[1].instance)
+                  .then(() => {
+                    fragLeft.appendChild(fragRight);
+                    target.find('.modal-body').html(fragLeft);
 
-                if (attachmentsDfds.length) {
-                  $.when.apply($, attachmentsDfds).then(function () {
                     that.highlightDifference(target);
+                  })
+                  .then(() => {
+                    if (attachmentsDfds.length) {
+                      $.when(...attachmentsDfds).then(() => {
+                        that.highlightDifference(target);
+                      });
+                    }
                   });
-                }
               });
-          }
+          },
         }, this.updateRevision.bind(this));
+      },
+      /**
+       * Loads to cache people from access control list
+       *
+       * @param {Object} instance - revision
+       * @return {Promise}
+       */
+      loadACLPeople: function (instance) {
+        let refreshQueue = new RefreshQueue();
+
+        instance.attr('access_control_list').forEach((acl) => {
+          let person = CMS.Models.Person.findInCacheById(acl.person.id) || {};
+          if (!person.email) {
+            refreshQueue.enqueue(acl.person);
+          }
+        });
+
+        if (refreshQueue.objects.length) {
+          return refreshQueue.trigger();
+        }
+        return can.Deferred().resolve();
       },
       buildAttachmentsDfd: function (instance, bindingName) {
         var dfd = new can.Deferred();
