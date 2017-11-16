@@ -17,19 +17,33 @@
           <tab-panel {(panels)}="panels" title-text="Assessment">
         <div class="assessment-info-pane info-pane__body">
             <div class="assessment-attributes info-pane__main-content info-pane__main-content-with-sidebar">
-            {{#if instance.test_plan}}
-               <div class="info-pane__section">
-                    <assessment-inline-item
-                        type="text"
-                        prop-name="test_plan"
-                        with-read-more="true"
-                        {set-in-progress}="@setInProgressState"
-                        {on-state-change-dfd}="onStateChangeDfd"
-                        {is-edit-icon-denied}="isEditDenied"
-                        {value}="instance.test_plan"
-                        {instance}="instance">
-                            <div class="info-pane__section-title">Assessment Procedure</div>
-                    </assessment-inline-item>
+            {{#if showProcedureSection}}
+                <div class="info-pane__section info-pane__section-procedure">
+                    {{#if instance.test_plan}}
+                        <div class="assessment-procedure">
+                            <assessment-inline-item
+                                type="text"
+                                prop-name="test_plan"
+                                with-read-more="true"
+                                class="width-100"
+                                {set-in-progress}="@setInProgressState"
+                                {on-state-change-dfd}="onStateChangeDfd"
+                                {is-edit-icon-denied}="isEditDenied"
+                                {value}="instance.test_plan"
+                                {instance}="instance">
+                                    <div class="info-pane__section-title">Assessment Procedure</div>
+                            </assessment-inline-item>
+                        </div>
+                    {{/if}}
+                    {{#if instance.issue_tracker.issue_url}}
+                        {{#displayAssessmentIssueTracker instance.can_use_issue_tracker}}
+                            <div class="issue-tracker-url">
+                                <a href="{{instance.issue_tracker.issue_url}}" target="_blank">
+                                    Buganizer Link
+                                </a>
+                            </div>
+                        {{/displayAssessmentIssueTracker}}
+                    {{/if}}
                 </div>
             {{/if}}
                 <div class="info-pane__section">
@@ -502,6 +516,27 @@
                         </div>
                     </div>
                 </div>
+                {{#displayAssessmentIssueTracker instance.can_use_issue_tracker true}}
+                    <div class="expanded-area">
+                        <div class="info-expand">
+                            <a class="show-hidden-fields info-show-hide active" href="javascript://">
+                                <span class="out">
+                                    <i class="fa fa-caret-right"></i>
+                                    SHOW
+                                </span>
+                                <span class="in">
+                                    <i class="fa fa-caret-down"></i>
+                                    HIDE
+                                </span>
+                                BUGANIZER INFO
+                            </a>
+                        </div>
+                        <div class="hidden-fields-area">
+                            <info-pane-issue-tracker-fields {instance}="instance">
+                            </info-pane-issue-tracker-fields>
+                        </div>
+                    </div>
+                {{/displayAssessmentIssueTracker}}
             </div>
             </div>
           </tab-panel>

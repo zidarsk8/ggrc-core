@@ -24,7 +24,8 @@
       dropdownNoValue: false,
       withReadMore: false,
       isEditIconDenied: false,
-      onStateChangeDfd: can.Deferred().resolve()
+      onStateChangeDfd: can.Deferred().resolve(),
+      mandatory: false,
     }
   });
 })(window.can);

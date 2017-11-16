@@ -290,6 +290,35 @@
         </div>
       </div>
 
+      {{#displayAssessmentIssueTracker instance.can_use_issue_tracker true}}
+        <div class="additional-fields">
+          <div class="expand-issue-tracker-link">
+            <a class="show-hidden-fields info-show-hide active" href="javascript://">
+              <span class="out">
+                <i class="fa fa-caret-right"></i>
+                SHOW
+              </span>
+              <span class="in">
+                <i class="fa fa-caret-down"></i>
+                HIDE
+              </span>
+              BUGANIZER INFO
+            </a>
+          </div>
+          <div class="hidden-issue-tracker-fields-area">
+            <issue-tracker-switcher
+              set-issue-title="true"
+              {default-title}="instance.title"
+              {instance}="instance"
+              {(is-integration-enabled)}="instance.issue_tracker.enabled"
+              {parent}="instance.audit">
+                <modal-issue-tracker-fields {instance}="instance">
+                </modal-issue-tracker-fields>
+            </issue-tracker-switcher>
+          </div>
+        </div>
+      {{/displayAssessmentIssueTracker}}
+
     </form>
     {{/instance}}
   </div>

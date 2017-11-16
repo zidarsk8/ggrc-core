@@ -1,4 +1,4 @@
-/*!
+/*
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -188,7 +188,7 @@ import {confirm} from '../plugins/utils/modals';
     updateScopeObject: function () {
       var objType = 'Audit';
       var queryType = 'values';
-      var queryFields = ['id', 'type', 'title', 'context'];
+      var queryFields = ['id', 'type', 'title', 'context', 'issue_tracker'];
       var query = GGRC.Utils.QueryAPI
         .buildParam(objType, {
           current: 1,
@@ -204,6 +204,10 @@ import {confirm} from '../plugins/utils/modals';
           var audit = valueArr[objType][queryType][0];
           this.attr('scopeObject', audit);
           this.attr('audit', audit);
+          if (audit.issue_tracker) {
+            this.attr('can_use_issue_tracker',
+              audit.issue_tracker.enabled);
+          }
         }.bind(this));
     }
   });
@@ -223,6 +227,67 @@ import {confirm} from '../plugins/utils/modals';
   can.Model.Mixin('mapping-limit-issue', {
     getAllowedMappings: _.partial(getAllowedMappings, ['Program', 'Project', 'TaskGroup'])
   }, {});
+
+  can.Model.Mixin('issueTrackerIntegratable', {
+    issue_tracker_enable_options: [
+      {value: true, title: 'On'},
+      {value: false, title: 'Off'},
+    ],
+    issue_tracker_priorities: ['P0', 'P1', 'P2', 'P3', 'P4'],
+    issue_tracker_severities: ['S0', 'S1', 'S2', 'S3', 'S4'],
+  }, {
+    'after:init': function () {
+      if (!this.issue_tracker) {
+        this.issue_tracker = new can.Map({});
+      }
+
+      this.initIssueTrackerObject();
+    },
+    initIssueTrackerObject: function (defaultValues) {
+      let issueTracker;
+
+      if (!GGRC.ISSUE_TRACKER_ENABLED) {
+        return;
+      }
+
+      issueTracker = this.attr('issue_tracker');
+
+      if (!issueTracker || this.wasEnabled()) {
+        if (!defaultValues) {
+          defaultValues = {};
+        }
+
+        if (!this.attr('issue_tracker.enabled')) {
+          // convert to boolean
+          defaultValues.enabled = !!this.issue_tracker.enabled;
+        }
+
+        this.attr('issue_tracker', defaultValues);
+      }
+    },
+    initCanUseIssueTracker: function (parentIssueTracker) {
+      if (parentIssueTracker && GGRC.ISSUE_TRACKER_ENABLED) {
+        this.attr('can_use_issue_tracker', parentIssueTracker.enabled);
+
+        if (parentIssueTracker.enabled && this.isNew()) {
+          // turn ON issue tracker when CREATE new instance
+          this.attr('issue_tracker.enabled', true);
+        }
+      }
+    },
+    wasEnabled: function () {
+      // 'issue_tracker' has already created if component_id is filled;
+      return !this.issue_tracker.component_id;
+    },
+    'before:refresh': function () {
+      // clear warnings because CanJS save prev value of warning after merge
+      // current instance and response
+      if (this.issue_tracker && this.issue_tracker._warnings) {
+        this.issue_tracker._warnings = [];
+      }
+    },
+  });
+
   /**
    * A mixin to use for objects that can have their status automatically
    * changed when they are edited.

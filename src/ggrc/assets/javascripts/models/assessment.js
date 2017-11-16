@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -19,7 +19,8 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     mixins: [
       'ownable', 'unique_title',
       'autoStatusChangeable', 'timeboxed', 'mapping-limit',
-      'inScopeObjects', 'accessControlList', 'refetchHash'
+      'inScopeObjects', 'accessControlList', 'refetchHash',
+      'issueTrackerIntegratable',
     ],
     is_custom_attributable: true,
     isRoleable: true,
@@ -95,6 +96,11 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         attr_title: 'Archived',
         attr_name: 'archived',
         order: 15,
+      }, {
+        attr_title: 'Buganizer',
+        attr_name: 'issue_url',
+        order: 16,
+        deny: !GGRC.ISSUE_TRACKER_ENABLED,
       }],
       display_attr_names: ['title', 'status', 'label', 'Assignees', 'Verifiers',
         'start_date', 'updated_at'],
@@ -119,6 +125,27 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       this.validatePresenceOf('audit');
       this.validateNonBlank('title');
 
+
+      this.validate(
+        'issue_tracker_title',
+        function () {
+          if (this.attr('can_use_issue_tracker') &&
+            this.attr('issue_tracker.enabled') &&
+            !this.attr('issue_tracker.title')) {
+            return 'Enter Issue Title';
+          }
+        }
+      );
+      this.validate(
+        'issue_tracker_component_id',
+        function () {
+          if (this.attr('can_use_issue_tracker') &&
+            this.attr('issue_tracker.enabled') &&
+            !this.attr('issue_tracker.component_id')) {
+            return 'Enter Component ID';
+          }
+        }
+      );
       this.validate(
         '_gca_valid',
         function () {
@@ -204,6 +231,27 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       }
       this.bind('refreshInstance', this.refresh.bind(this));
     },
+    _checkIssueTrackerWarnings: function () {
+      let warnings;
+      let warningMessage;
+
+      if (!this.issue_tracker) {
+        return;
+      }
+
+      warnings = this.issue_tracker._warnings;
+
+      if (warnings && warnings.length) {
+        warningMessage = warnings.join('; ');
+        $(document.body).trigger('ajax:flash', {warning: warningMessage});
+      }
+    },
+    after_update: function () {
+      this._checkIssueTrackerWarnings();
+    },
+    after_create: function () {
+      this._checkIssueTrackerWarnings();
+    },
     before_create: function () {
       if (!this.audit) {
         throw new Error('Cannot save assessment, audit not set.');
@@ -268,6 +316,8 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
           markForAddition(this, auditLead, 'Assignees');
           markForAddition(this, currentUser, 'Creators');
         }
+
+        this.initCanUseIssueTracker(this.audit.issue_tracker);
 
         return this.audit.findAuditors().then(function (list) {
           list.forEach(function (item) {

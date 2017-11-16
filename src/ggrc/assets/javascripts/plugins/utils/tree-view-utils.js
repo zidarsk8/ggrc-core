@@ -164,7 +164,9 @@ function getColumnsForModel(modelType, displayPrefs, includeRichText,
     Model.tree_view_options.mapper_attr_list ||
     Model.tree_view_options.attr_list ||
     Cacheable.attr_list
-  ).map(function (attr) {
+  ).filter(function (attr) {
+    return !attr.deny;
+  }).map(function (attr) {
     attr = _.assign({}, attr);
     if (!attr.attr_sort_field) {
       attr.attr_sort_field = attr.attr_name;

@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../components/issue-tracker/modal-issue-tracker-fields';
+import '../components/issue-tracker/issue-tracker-switcher';
 import '../components/access_control_list/access-control-list-roles-helper'
 import '../components/assessment/assessment-people';
 import '../components/assessment/assessment-object-type-dropdown';

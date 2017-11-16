@@ -22,6 +22,8 @@ import '../../inline/inline-form-control';
 import '../../object-change-state/object-change-state';
 import '../../related-objects/related-assessments';
 import '../../related-objects/related-issues';
+import '../../issue-tracker/issue-tracker-switcher';
+import './info-pane-issue-tracker-fields';
 import '../../tabs/tab-container';
 import './inline-item';
 import './create-url';
@@ -66,6 +68,12 @@ import {
               .map((item) => item.person);
 
             return verifiers;
+          },
+        },
+        showProcedureSection: {
+          get: function () {
+            return this.instance.attr('test_plan') ||
+              this.instance.attr('issue_tracker.issue_url');
           },
         },
         isSaving: {

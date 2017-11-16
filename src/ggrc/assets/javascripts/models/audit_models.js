@@ -1,9 +1,17 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 (function (can, CMS) {
+  const AUDIT_ISSUE_TRACKER = {
+    hotlist_id: '766459',
+    component_id: '188208',
+    issue_severity: 'S2',
+    issue_priority: 'P2',
+    issue_type: 'PROCESS',
+  };
+
   function update_program_authorizations(programs, person) {
     return can.when(
       programs[0],
@@ -62,7 +70,8 @@
       'unique_title',
       'ca_update',
       'timeboxed',
-      'mapping-limit'
+      'mapping-limit',
+      'issueTrackerIntegratable',
     ],
     is_custom_attributable: true,
     is_clonable: true,
@@ -79,7 +88,7 @@
       custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs'
     },
     defaults: {
-      status: 'Planned'
+      status: 'Planned',
     },
     statuses: ['Planned', 'In Progress', 'Manager Review',
       'Ready for External Review', 'Completed', 'Deprecated'],
@@ -148,6 +157,17 @@
       }
       this.validatePresenceOf('program');
       this.validateNonBlank('title');
+
+      this.validate(
+        'issue_tracker_component_id',
+        function () {
+          if (this.attr('issue_tracker.enabled') &&
+            !this.attr('issue_tracker.component_id')) {
+            return 'Enter Component ID';
+          }
+        }
+      );
+
       this.validateContact(['_transient.contact', 'contact'], {
         message: 'Audit captain cannot be empty'
       });
@@ -290,6 +310,8 @@
         });
       }
 
+      this.initIssueTrackerObject(AUDIT_ISSUE_TRACKER);
+
       return dfd;
     },
   });
@@ -357,7 +379,8 @@
     mixins: [
       'mapping-limit',
       'inScopeObjects',
-      'refetchHash'
+      'refetchHash',
+      'issueTrackerIntegratable',
     ],
     findOne: 'GET /api/assessment_templates/{id}',
     findAll: 'GET /api/assessment_templates',
@@ -366,7 +389,6 @@
     create: 'POST /api/assessment_templates',
     is_custom_attributable: false,
     attributes: {
-      audit: 'CMS.Models.Audit.stub',
       context: 'CMS.Models.Context.stub'
     },
     defaults: {
@@ -420,7 +442,17 @@
           return this.attr('default_people.verifiers') === 'other';
         }
       );
-    }
+      this.validate(
+        'issue_tracker_component_id',
+        function () {
+          if (this.attr('can_use_issue_tracker') &&
+            this.attr('issue_tracker.enabled') &&
+            !this.attr('issue_tracker.component_id')) {
+            return 'Enter Component ID';
+          }
+        }
+      );
+    },
   }, {
     /**
      * An event handler when the add/edit form is about to be displayed.
@@ -435,6 +467,7 @@
      *
      */
     form_preload: function (isNewObject) {
+      const pageInstance = GGRC.page_instance();
       if (!this.custom_attribute_definitions) {
         this.attr('custom_attribute_definitions', new can.List());
       }
@@ -442,6 +475,18 @@
 
       this._updateDropdownEnabled('assignees');
       this._updateDropdownEnabled('verifiers');
+
+      if (pageInstance && pageInstance.type === 'Audit' && !this.audit) {
+        this.audit = {
+          id: pageInstance.id,
+          title: pageInstance.title,
+          type: pageInstance.type,
+          context: pageInstance.context,
+          issue_tracker: pageInstance.issue_tracker,
+        };
+      }
+
+      this.initCanUseIssueTracker(this.audit.issue_tracker);
     },
 
     /**

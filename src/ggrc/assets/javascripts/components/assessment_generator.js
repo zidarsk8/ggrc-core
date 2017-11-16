@@ -105,6 +105,7 @@
         }.bind(this));
       },
       generateModel: function (object, template, type) {
+        let assessmentModel;
         var title = 'Generated Assessment for ' + this.scope.audit.title;
         var data = {
           _generated: true,
@@ -127,7 +128,12 @@
             type: 'AssessmentTemplate'
           };
         }
-        return new CMS.Models.Assessment(data).save();
+        assessmentModel = new CMS.Models.Assessment(data);
+
+        // force remove issue_tracker field
+        delete assessmentModel.issue_tracker;
+
+        return assessmentModel.save();
       },
       notify: function () {
         var success;

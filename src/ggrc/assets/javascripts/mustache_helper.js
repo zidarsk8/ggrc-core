@@ -2626,4 +2626,28 @@ Example:
       return options.fn(options.contexts);
     }
   );
+
+  Mustache.registerHelper('displayAssessmentIssueTracker',
+    function (canUseIssueTracker, checkParentIntegration, options) {
+      const enabled = GGRC.ISSUE_TRACKER_ENABLED;
+      canUseIssueTracker = Mustache.resolve(canUseIssueTracker);
+
+      if (!options) {
+        options = checkParentIntegration;
+        checkParentIntegration = false;
+      } else {
+        checkParentIntegration = Mustache.resolve(checkParentIntegration);
+      }
+
+      if (!checkParentIntegration) {
+        return enabled ?
+          options.fn(options.contexts) :
+          options.inverse(options.contexts);
+      }
+
+      return canUseIssueTracker && enabled ?
+        options.fn(options.contexts) :
+        options.inverse(options.contexts);
+    }
+  );
 })(jQuery, can);
