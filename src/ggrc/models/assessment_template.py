@@ -36,6 +36,8 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
 
   PER_OBJECT_CUSTOM_ATTRIBUTABLE = True
 
+  RELATED_TYPE = 'assessment'
+
   # the type of the object under assessment
   template_object_type = db.Column(db.String, nullable=True)
 
