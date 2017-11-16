@@ -37,6 +37,11 @@ try:
 except ImportError:
   pass
 
+# NOTE: This version name is used for GAE deployments along with the current
+# commit hash. The version and hash are trimmed to 30 characters (see do_deploy
+# for more info) and if the version name were to exceed 30 characters, all
+# deployments would go to the same GAE app version. Please take that into
+# consideration when modifying this string.
 VERSION = "0.10.36-Raspberry" + BUILD_NUMBER
 
 # Migration owner
