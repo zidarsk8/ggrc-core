@@ -8,7 +8,7 @@
   <content></content>
 
   {{#unless editableMode}}
-    <object-list ({items})="readonlyPeople" {empty-message}="emptyListMessage">
+    <object-list ({items})="showPeople" {empty-message}="emptyListMessage">
       <person-list-item class="people-group__readonly-person"
         person="{.}"
         {with-details}="withDetails">
