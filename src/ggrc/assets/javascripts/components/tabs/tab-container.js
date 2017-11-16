@@ -10,6 +10,7 @@ export default GGRC.Components('tabContainer', {
   tag: 'tab-container',
   template: template,
   viewModel: {
+    lastErrorTab: null,
     define: {
       showTabs: {
         type: 'boolean',
@@ -32,7 +33,6 @@ export default GGRC.Components('tabContainer', {
     setActive: function (scope, el, ev) {
       ev.preventDefault();
       this.setActivePanel(scope.attr('tabIndex'));
-      this.dispatch('tabChanged');
     },
     /**
      * Update Panels List setting all panels except selected to inactive state
@@ -40,6 +40,9 @@ export default GGRC.Components('tabContainer', {
      */
     setActivePanel: function (tabIndex) {
       this.attr('selectedTabIndex', tabIndex);
+      if (this.instance) {
+        this.attr('instance.selectedTabIndex', tabIndex);
+      }
       this.attr('panels').forEach(function (panel) {
         var isActive = (panel.attr('tabIndex') === tabIndex);
         panel.attr('active', isActive);
@@ -57,7 +60,10 @@ export default GGRC.Components('tabContainer', {
         tabIndex = panels[0].attr('tabIndex');
       }
       this.setActivePanel(tabIndex);
-    }
+    },
+    setLastErrorTab: function (tabIndex) {
+      this.attr('lastErrorTab', tabIndex);
+    },
   },
   events: {
     /**
@@ -71,6 +77,12 @@ export default GGRC.Components('tabContainer', {
      */
     '{viewModel.panels} panelRemoved': function () {
       this.viewModel.setDefaultActivePanel();
-    }
+    },
+    /**
+     * Activate lastErrorTab.
+     */
+    '{viewModel.instance} switchToErrorPanel': function () {
+      this.viewModel.setActivePanel(this.viewModel.lastErrorTab);
+    },
   }
 });
