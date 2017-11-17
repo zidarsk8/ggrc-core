@@ -16,7 +16,19 @@
           }
         },
       },
+      activatedOrForceRender: {
+        get: function () {
+          return this.attr('forceClearContent') ? false :
+            this.attr('activated');
+        },
+      },
     },
+    /**
+     * This flag shuld be switch on and back off to trigger re-render of content
+     * see tab-panel.js for example.
+     * @type {Boolean}
+     */
+    forceClearContent: false,
     activated: false,
   });
 
@@ -25,7 +37,7 @@
    */
   GGRC.Components('lazyRender', {
     tag: 'lazy-render',
-    template: '{{#if activated}}<content/>{{/if}}',
+    template: '{{#if activatedOrForceRender}}<content/>{{/if}}',
     viewModel: viewModel,
   });
 })(window.can, window.GGRC);
