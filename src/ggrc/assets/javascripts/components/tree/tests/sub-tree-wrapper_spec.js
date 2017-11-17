@@ -63,9 +63,9 @@ describe('GGRC.Components.subTreeWrapper', function () {
       vm.attr('childModels', ['a', 'b', 'c']);
       spyOn(TreeViewUtils, 'loadItemsForSubTier').and
         .returnValue(can.Deferred().resolve({
-          directlyItems: [1, 2, 3],
-          notDirectlyItems: [4, 5, 6, 7],
-          showMore: false
+          directlyItems: [{id: 1}, {id: 2}, {id: 3}],
+          notDirectlyItems: [{id: 4}, {id: 5}, {id: 6}, {id: 7}],
+          showMore: false,
         }));
 
       method().then(function () {

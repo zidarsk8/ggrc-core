@@ -63,6 +63,16 @@ const VALIDATION_ERROR = {
   type: 'validationError',
 };
 
+/**
+ *
+ * @event destinationUnmapped
+ * @type {object}
+ * @property {string} type - Event name.
+ */
+const DESTINATION_UNMAPPED = {
+  type: 'destinationUnmapped',
+};
+
 export {
   REFRESH_RELATED,
   SAVE_CUSTOM_ROLE,
@@ -70,4 +80,5 @@ export {
   SWITCH_TO_ERROR_PANEL,
   SHOW_INVALID_FIELD,
   VALIDATION_ERROR,
+  DESTINATION_UNMAPPED,
 };
