@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 from ggrc import login, db
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc.models.mixins.assignable import Assignable
+from ggrc.models.hooks import assessment
 from ggrc.models.relationship import Stub
 from ggrc.services import signals
 from ggrc.models import all_models
@@ -504,7 +505,28 @@ def handle_relationship_delete(relationship):
     ).delete(synchronize_session='fetch')
 
 
-def init_hook():
+def copy_snapshot_test_plan(objects, sources):
+  """Append snapshot test plan into assessment test plan"""
+  for obj, src in zip(objects, sources):
+    if (obj.source_type == "Assessment" and
+        obj.destination_type == "Snapshot") or (
+        obj.source_type == "Snapshot" and
+        obj.destination_type == "Assessment"
+    ):
+      asmnt, snapshot = obj.source, obj.destination
+      if asmnt.type != "Assessment":
+        asmnt, snapshot = snapshot, asmnt
+
+      # Test plan of snapshotted object should be copied to
+      # Assessment test plan in case of proper snapshot type
+      # and if copyAssessmentProcedure flag was sent, it should
+      # be set to True
+      if asmnt.assessment_type == snapshot.child_type and \
+         src.get("copyAssessmentProcedure", True):
+        assessment.copy_snapshot_plan(asmnt, snapshot)
+
+
+def init_hook():  # noqa
   """Initialize Relationship-related hooks."""
   # pylint: disable=unused-variable
   sa.event.listen(Session, "after_flush", handle_relationship_creation)
@@ -553,3 +575,9 @@ def init_hook():
         asmnt, issue = issue, asmnt
 
       unmap_issue_cascade(asmnt, issue)
+
+  @signals.Restful.collection_posted.connect_via(all_models.Relationship)
+  def handle_asmnt_plan(sender, objects=None, sources=None, **kwargs):
+    """Handle assessment test plan"""
+    # pylint: disable=unused-argument
+    copy_snapshot_test_plan(objects, sources)
