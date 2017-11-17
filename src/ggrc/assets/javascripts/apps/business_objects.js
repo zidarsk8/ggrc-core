@@ -4,6 +4,7 @@
 */
 
 import SummaryWidgetController from '../controllers/summary_widget_controller';
+import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 
 (function (can, $) {
   var CoreExtension = {};
@@ -87,7 +88,7 @@ import SummaryWidgetController from '../controllers/summary_widget_controller';
           uncountable: true,
         });
       }
-      if (GGRC.Utils.Dashboards.isDashboardEnabled(object)) {
+      if (isDashboardEnabled(object)) {
         widgetList.add_widget(object.constructor.shortName, 'dashboard', {
           widget_id: 'dashboard',
           content_controller: GGRC.Controllers.DashboardWidget,
