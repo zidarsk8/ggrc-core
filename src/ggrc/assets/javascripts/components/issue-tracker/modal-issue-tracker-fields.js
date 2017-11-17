@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../dropdown/dropdown';
 import template from './templates/modal-issue-tracker-fields.mustache';
 
 const tag = 'modal-issue-tracker-fields';

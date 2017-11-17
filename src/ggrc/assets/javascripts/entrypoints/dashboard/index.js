@@ -61,7 +61,6 @@ import '../../components/related-objects/related-objects';
 import '../../components/simple-modal/simple-modal';
 import '../../components/show-more/show-more';
 import '../../components/show-related-assessments-button/show-related-assessments-button';
-import '../../components/dropdown/dropdown';
 import '../../components/autocomplete/autocomplete';
 import '../../components/person/person';
 import '../../components/unarchive_link';

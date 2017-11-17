@@ -5,6 +5,7 @@
 
 import template from './templates/cycle-task-group-object-task.mustache';
 import '../../../../../ggrc/assets/javascripts/components/object-change-state/object-change-state';
+import '../../../../../ggrc/assets/javascripts/components/dropdown/dropdown';
 
 var viewModel = can.Map.extend({
   showLink: function () {
