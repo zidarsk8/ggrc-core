@@ -5,6 +5,9 @@
 
 import SummaryWidgetController from '../controllers/summary_widget_controller';
 import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
+import {
+  getWidgetConfig,
+} from '../plugins/utils/object-versions-utils';
 
 (function (can, $) {
   var CoreExtension = {};
@@ -127,8 +130,7 @@ import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
       can.each(modelNames, function (name) {
         var w_list;
         var child_model_list = [];
-        var objectVersionUtils = GGRC.Utils.ObjectVersions;
-        var widgetConfig = objectVersionUtils.getWidgetConfig(name);
+        var widgetConfig = getWidgetConfig(name);
         name = widgetConfig.name;
         GGRC.tree_view.basic_model_list.push({
           model_name: name,
@@ -141,7 +143,7 @@ import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
         can.each(w_list, function (item) {
           var childConfig;
           if (possibleModelType.indexOf(item) !== -1) {
-            childConfig = objectVersionUtils.getWidgetConfig(name);
+            childConfig = getWidgetConfig(name);
             child_model_list.push({
               model_name: childConfig.name,
               display_name: childConfig.widgetName,
@@ -757,8 +759,7 @@ import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
       }
 
       can.each(farModels, function (model_name) {
-        var widgetConfig = GGRC.Utils.ObjectVersions
-          .getWidgetConfig(model_name);
+        var widgetConfig = getWidgetConfig(model_name);
         model_name = widgetConfig.name;
 
         if ((overriddenModels.all && overriddenModels.all.hasOwnProperty(model_name) && !overriddenModels[model_name]) || (overriddenModels[object.constructor.shortName] && overriddenModels[object.constructor.shortName].hasOwnProperty(model_name) && !overriddenModels[object.constructor.shortName][model_name]))

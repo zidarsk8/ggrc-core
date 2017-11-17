@@ -14,6 +14,10 @@ import {
   isSnapshotRelated,
   transformQuery,
 } from './snapshot-utils';
+import {
+  isObjectVersion,
+  getWidgetConfigs,
+} from './object-versions-utils';
 
 /**
  * Util methods for work with Current Page.
@@ -140,15 +144,11 @@ function getWidgetModels(modelName, path) {
   var defaults = getDefaultWidgets(widgetList, path);
 
   return defaults.map(function (widgetName) {
-    var isObjectVersion = GGRC.Utils.ObjectVersions
-      .isObjectVersion(widgetName);
-
-    if (isObjectVersion) {
+    if (isObjectVersion(widgetName)) {
       return widgetName;
     }
 
-    return widgetList[widgetName]
-      .content_controller_options.model.shortName;
+    return widgetList[widgetName].content_controller_options.model.shortName;
   });
 }
 
@@ -199,8 +199,7 @@ function initWidgetCounts(widgets, type, id) {
 function _initWidgetCounts(widgets, type, id) {
   // Request params generation logic should be moved in
   // a separate place
-  var widgetsObject = GGRC.Utils.ObjectVersions
-    .getWidgetConfigs(can.makeArray(widgets));
+  var widgetsObject = getWidgetConfigs(can.makeArray(widgets));
 
   var params = widgetsObject.map(function (widgetObject) {
     var param;

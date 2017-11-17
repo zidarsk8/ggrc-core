@@ -24,7 +24,11 @@ import {
   batchRequests,
   buildCountParams,
 } from './query-api-utils';
-
+import {
+  parentHasObjectVersions,
+  getWidgetConfigs,
+  getWidgetConfig,
+} from './object-versions-utils';
 
 /**
 * TreeView-specific utils.
@@ -442,8 +446,7 @@ function loadFirstTierItems(modelName,
                             filterInfo,
                             filter,
                             request) {
-  var modelConfig = GGRC.Utils.ObjectVersions
-    .getWidgetConfig(modelName);
+  var modelConfig = getWidgetConfig(modelName);
 
   var params = buildParam(
     modelConfig.responseType,
@@ -497,8 +500,7 @@ function loadItemsForSubTier(models, type, id, filter) {
       var mappedDfd;
       var resultDfd;
 
-      loadedModelObjects = GGRC.Utils.ObjectVersions
-        .getWidgetConfigs(Object.keys(countMap));
+      loadedModelObjects = getWidgetConfigs(Object.keys(countMap));
       showMore = result.showMore;
 
       dfds = loadedModelObjects.map(function (modelObject) {
@@ -637,8 +639,7 @@ function isDirectlyRelated(instance) {
 function _getQuerryObjectVersion(models, relevant, filter) {
   var countQuery = [];
   models.forEach(function (model) {
-    var widgetConfig = GGRC.Utils.ObjectVersions
-      .getWidgetConfig(model);
+    var widgetConfig = getWidgetConfig(model);
     var name = widgetConfig.name;
     var query = buildCountParams([name], relevant, filter);
 
@@ -665,7 +666,6 @@ function _buildSubTreeCountMap(models, relevant, filter) {
   var countQuery;
   var result;
   var countMap = {};
-  var objectVersionsUtils = GGRC.Utils.ObjectVersions;
 
   if (_isFullSubTree(relevant.type)) {
     models.forEach(function (model) {
@@ -676,7 +676,7 @@ function _buildSubTreeCountMap(models, relevant, filter) {
       showMore: false,
     });
   } else {
-    if (objectVersionsUtils.parentHasObjectVersions(relevant.type)) {
+    if (parentHasObjectVersions(relevant.type)) {
       countQuery = _getQuerryObjectVersion(models, relevant, filter);
     } else {
       countQuery = buildCountParams(models, relevant, filter)

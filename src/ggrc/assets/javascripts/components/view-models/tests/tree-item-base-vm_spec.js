@@ -5,6 +5,7 @@
 
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import * as ObjectVersions from '../../../plugins/utils/object-versions-utils';
 import BaseTreeItemVM from '../tree-item-base-vm';
 
 describe('GGRC.VM.BaseTreeItemVM', function () {
@@ -23,7 +24,7 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
           available: ['Foo', 'Bar', 'Baz'],
           selected: ['Foo'],
         });
-      spyOn(GGRC.Utils.ObjectVersions, 'getWidgetConfig')
+      spyOn(ObjectVersions, 'getWidgetConfig')
         .and.callFake(function (model) {
           return {
             widgetName: model + 'Widget',

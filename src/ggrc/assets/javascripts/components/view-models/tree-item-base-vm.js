@@ -7,6 +7,9 @@ import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
+import {
+  getWidgetConfig,
+} from '../../plugins/utils/object-versions-utils';
 
 export default can.Map.extend({
   define: {
@@ -34,8 +37,7 @@ export default can.Map.extend({
 
     var displayList = models.available.map(function (model) {
       return {
-        widgetName: GGRC.Utils.ObjectVersions
-          .getWidgetConfig(model).widgetName,
+        widgetName: getWidgetConfig(model).widgetName,
         name: model,
         display: models.selected.indexOf(model) !== -1,
       };

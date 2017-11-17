@@ -7,6 +7,7 @@ import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
 import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import * as ObjectVersions from '../../../plugins/utils/object-versions-utils';
 
 describe('GGRC.Components.treeWidgetContainer', function () {
   'use strict';
@@ -53,13 +54,11 @@ describe('GGRC.Components.treeWidgetContainer', function () {
         });
       });
 
-      it('returns result of GGRC.Utils.ObjectVersions.getWidgetConfig with ' +
+      it('returns result of ObjectVersions.getWidgetConfig with ' +
       'passed params', function () {
         var expectedResult = {};
-        var getWidgetConfig = spyOn(
-          GGRC.Utils.ObjectVersions,
-          'getWidgetConfig'
-        ).and.returnValue(expectedResult);
+        var getWidgetConfig = spyOn(ObjectVersions, 'getWidgetConfig')
+          .and.returnValue(expectedResult);
         var result = vm.attr('optionsData');
 
         expect(result).toBe(expectedResult);

@@ -7,6 +7,9 @@ import './filterable_controller';
 import {
   getCounts,
 } from '../plugins/utils/current-page-utils';
+import {
+  getWidgetConfig,
+} from '../plugins/utils/object-versions-utils';
 
 CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
   defaults: {
@@ -52,8 +55,7 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
       this.options.model.shortName;
 
       if (this.options.objectVersion) {
-        countsName = GGRC.Utils.ObjectVersions
-          .getWidgetConfig(countsName, true)
+        countsName = getWidgetConfig(countsName, true)
           .widgetId;
       }
 
