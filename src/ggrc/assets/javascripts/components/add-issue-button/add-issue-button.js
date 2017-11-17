@@ -24,10 +24,6 @@ export default GGRC.Components('addIssueButton', {
               title_singular: instance.class.title_singular,
               table_singular: instance.class.table_singular,
             },
-            context: {
-              type: 'Context',
-              id: instance.attr('context.id'),
-            },
           };
 
           return JSON.stringify(json);
