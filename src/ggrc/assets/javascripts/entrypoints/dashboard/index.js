@@ -10,7 +10,7 @@ import '../../plugins/persistent_notifier';
 import '../../ggrc_base';
 import '../../apps/base_widgets';
 import '../../application';
-import '../../plugins/utils';
+import '../../plugins/ggrc_utils';
 import '../../plugins/datepicker';
 import '../../plugins/can_control';
 import '../../plugins/autocomplete';
