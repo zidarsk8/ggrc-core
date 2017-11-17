@@ -2,6 +2,12 @@
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
+
+import {
+  buildRelevantIdsQuery,
+  makeRequest,
+} from './utils/query-api-utils';
+
 (function ($) {
   'use strict';
   var MAX_RESULTS = 20;
@@ -384,11 +390,9 @@
           };
         }
 
-        query = GGRC.Utils.QueryAPI.buildRelevantIdsQuery(objName, {},
-           relevant, filter);
+        query = buildRelevantIdsQuery(objName, {}, relevant, filter);
 
-        GGRC.Utils.QueryAPI
-         .makeRequest({data: [query]})
+        makeRequest({data: [query]})
          .done(function (responseArr) {
            var ids = responseArr[0][objName].ids;
            var model = CMS.Models[objName];

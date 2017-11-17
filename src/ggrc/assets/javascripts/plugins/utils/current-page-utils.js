@@ -5,10 +5,15 @@
 
 import * as TreeViewUtils from './tree-view-utils';
 import {
+  buildRelevantIdsQuery,
+  batchRequests,
+  buildParam,
+  makeRequest,
+} from './query-api-utils';
+import {
   isSnapshotRelated,
   transformQuery,
 } from './snapshot-utils';
-import './query-api-utils';
 
 /**
  * Util methods for work with Current Page.
@@ -25,8 +30,6 @@ var relatedToCurrentInstance = new can.Map({
 
 var widgetsCounts = new can.Map({});
 
-var QueryAPI = GGRC.Utils.QueryAPI;
-
 let CUSTOM_COUNTERS = {
   MY_WORK: () => _getCurrentUser().getWidgetCountForMyWorkPage(),
   ALL_OBJECTS: () => _getCurrentUser().getWidgetCountForAllObjectPage(),
@@ -41,7 +44,7 @@ function initMappedInstances() {
   models = can.makeArray(models);
 
   models.forEach(function (model) {
-    var query = QueryAPI.buildRelevantIdsQuery(
+    var query = buildRelevantIdsQuery(
       model,
       {},
       {
@@ -52,7 +55,7 @@ function initMappedInstances() {
     if (isSnapshotRelated(currentPageInstance.type, model)) {
       query = transformQuery(query);
     }
-    reqParams.push(QueryAPI.batchRequests(query));
+    reqParams.push(batchRequests(query));
   });
 
   return can.when.apply(can, reqParams)
@@ -205,10 +208,10 @@ function _initWidgetCounts(widgets, type, id) {
       .makeRelevantExpression(widgetObject.name, type, id);
 
     if (isSnapshotRelated(type, widgetObject.name)) {
-      param = QueryAPI.buildParam('Snapshot', {}, expression, null,
+      param = buildParam('Snapshot', {}, expression, null,
         GGRC.query_parser.parse('child_type = ' + widgetObject.name));
     } else {
-      param = QueryAPI.buildParam(widgetObject.responseType,
+      param = buildParam(widgetObject.responseType,
         {}, expression, null,
         widgetObject.additionalFilter ?
           GGRC.query_parser.parse(widgetObject.additionalFilter) :
@@ -225,7 +228,7 @@ function _initWidgetCounts(widgets, type, id) {
     return can.Deferred().resolve();
   }
 
-  return QueryAPI.makeRequest({
+  return makeRequest({
     data: params,
   }).then(function (data) {
     var countsMap = {};

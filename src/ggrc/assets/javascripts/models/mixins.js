@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {
+  buildParam,
+  batchRequests,
+} from '../plugins/utils/query-api-utils';
 import {confirm} from '../plugins/utils/modals';
 import {isSnapshot} from '../plugins/utils/snapshot-utils';
 
@@ -203,8 +207,8 @@ import {isSnapshot} from '../plugins/utils/snapshot-utils';
       var objType = 'Audit';
       var queryType = 'values';
       var queryFields = ['id', 'type', 'title', 'context', 'issue_tracker'];
-      var query = GGRC.Utils.QueryAPI
-        .buildParam(objType, {
+      var query =
+        buildParam(objType, {
           current: 1,
           pageSize: 1
         }, {
@@ -212,8 +216,7 @@ import {isSnapshot} from '../plugins/utils/snapshot-utils';
           operation: 'relevant',
           id: this.attr('id')
         }, queryFields);
-      return GGRC.Utils.QueryAPI
-        .batchRequests(query)
+      return batchRequests(query)
         .done(function (valueArr) {
           var audit = valueArr[objType][queryType][0];
           this.attr('scopeObject', audit);

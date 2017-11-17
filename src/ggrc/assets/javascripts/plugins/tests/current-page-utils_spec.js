@@ -6,6 +6,7 @@
 import * as TreeViewUtils from '../utils/tree-view-utils';
 import * as SnapshotUtils from '../utils/snapshot-utils';
 import * as CurrentPageUtils from '../utils/current-page-utils';
+import * as QueryAPI from '../utils/query-api-utils';
 
 describe('GGRC Utils CurrentPage', function () {
   var pageType;
@@ -286,7 +287,7 @@ describe('GGRC Utils CurrentPage', function () {
         .and.callFake(function (type, widgetType) {
           return widgetType === 'Control';
         });
-      spyOn(GGRC.Utils.QueryAPI, 'buildParam')
+      spyOn(QueryAPI, 'buildParam')
         .and.callFake(function (objName) {
           return {
             objectName: objName
@@ -296,14 +297,14 @@ describe('GGRC Utils CurrentPage', function () {
       spyOn(GGRC.query_parser, 'parse')
         .and.returnValue({});
 
-      spyOn(GGRC.Utils.QueryAPI, 'makeRequest')
+      spyOn(QueryAPI, 'makeRequest')
         .and.returnValue(queryDfd);
     });
 
     it('should not make request when no widget was provided', function () {
       method([], 'Control', 1);
 
-      expect(GGRC.Utils.QueryAPI.makeRequest)
+      expect(QueryAPI.makeRequest)
         .not.toHaveBeenCalled();
     });
 
@@ -312,7 +313,7 @@ describe('GGRC Utils CurrentPage', function () {
 
       method(['Control'], 'Assessment', 1);
 
-      expect(GGRC.Utils.QueryAPI.makeRequest)
+      expect(QueryAPI.makeRequest)
         .toHaveBeenCalledWith({
           data: [
             {
@@ -338,7 +339,7 @@ describe('GGRC Utils CurrentPage', function () {
 
       method(['Assessment'], 'Control', 1);
 
-      expect(GGRC.Utils.QueryAPI.makeRequest)
+      expect(QueryAPI.makeRequest)
         .toHaveBeenCalledWith({
           data: [
             {
@@ -367,7 +368,7 @@ describe('GGRC Utils CurrentPage', function () {
         countsName: 'ActiveCycle'
       }], 'Control', 1);
 
-      expect(GGRC.Utils.QueryAPI.makeRequest)
+      expect(QueryAPI.makeRequest)
         .toHaveBeenCalledWith({
           data: [
             {
@@ -396,7 +397,7 @@ describe('GGRC Utils CurrentPage', function () {
     beforeEach(function () {
       var requestDfd;
 
-      spyOn(GGRC.Utils.QueryAPI, 'buildRelevantIdsQuery')
+      spyOn(QueryAPI, 'buildRelevantIdsQuery')
         .and.callFake(function (objName, page, relevant, additionalFilter) {
           return {
             model: objName,
@@ -414,7 +415,7 @@ describe('GGRC Utils CurrentPage', function () {
           return query;
         });
 
-      spyOn(GGRC.Utils.QueryAPI, 'batchRequests')
+      spyOn(QueryAPI, 'batchRequests')
         .and.callFake(function () {
           requestDfd = can.Deferred();
           requestDfds.push(requestDfd);

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as QueryAPI from '../utils/query-api-utils';
 import * as CurrentPageUtils from '../utils/current-page-utils';
 
 describe('GGRC Utils Query API', function () {
@@ -21,7 +22,7 @@ describe('GGRC Utils Query API', function () {
         count: 6
       };
 
-      method = GGRC.Utils.QueryAPI.buildParams;
+      method = QueryAPI.buildParams;
     });
 
     describe('Assessment related to Audit', function () {
@@ -216,7 +217,7 @@ describe('GGRC Utils Query API', function () {
   });
 
   describe('batchRequests() method', function () {
-    var batchRequests = GGRC.Utils.QueryAPI.batchRequests;
+    var batchRequests = QueryAPI.batchRequests;
 
     beforeEach(function () {
       spyOn(can, 'ajax')
@@ -256,7 +257,6 @@ describe('GGRC Utils Query API', function () {
   });
 
   describe('buildCountParams() method', function () {
-    var queryAPI = GGRC.Utils.QueryAPI;
     var relevant = {
       type: 'Audit',
       id: '555',
@@ -265,7 +265,7 @@ describe('GGRC Utils Query API', function () {
 
     it('empty arguments. buildCountParams should return empty array',
       function () {
-        var queries = queryAPI.buildCountParams();
+        var queries = QueryAPI.buildCountParams();
         expect(Array.isArray(queries)).toBe(true);
         expect(queries.length).toEqual(0);
       }
@@ -275,7 +275,7 @@ describe('GGRC Utils Query API', function () {
       function () {
         var types = ['Assessment', 'Control'];
 
-        var queries = queryAPI.buildCountParams(types);
+        var queries = QueryAPI.buildCountParams(types);
         var query = queries[0];
 
         expect(queries.length).toEqual(types.length);
@@ -289,7 +289,7 @@ describe('GGRC Utils Query API', function () {
       function () {
         var types = ['Assessment', 'Control'];
 
-        var queries = queryAPI.buildCountParams(types, relevant);
+        var queries = QueryAPI.buildCountParams(types, relevant);
         var query = queries[0];
         var expression = query.filters.expression;
 

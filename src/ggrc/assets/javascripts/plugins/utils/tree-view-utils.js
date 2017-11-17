@@ -18,7 +18,12 @@ import {
   getPageType,
   isMyWork,
 } from './current-page-utils';
-import './query-api-utils';
+import {
+  buildParam,
+  makeRequest,
+  batchRequests,
+  buildCountParams,
+} from './query-api-utils';
 
 
 /**
@@ -30,7 +35,6 @@ var defaultOrderTypes = GGRC.tree_view.attr('defaultOrderTypes');
 var allTypes = Object.keys(baseWidgets.attr());
 var orderedModelsForSubTier = {};
 
-var QueryAPI = GGRC.Utils.QueryAPI;
 
 var SUB_TREE_ELEMENTS_LIMIT = 20;
 var SUB_TREE_FIELDS = Object.freeze([
@@ -441,7 +445,7 @@ function loadFirstTierItems(modelName,
   var modelConfig = GGRC.Utils.ObjectVersions
     .getWidgetConfig(modelName);
 
-  var params = QueryAPI.buildParam(
+  var params = buildParam(
     modelConfig.responseType,
     filterInfo,
     makeRelevantExpression(modelConfig.name, parent.type, parent.id),
@@ -457,7 +461,7 @@ function loadFirstTierItems(modelName,
 
   requestedType = params.object_name;
   requestData.push(params);
-  return QueryAPI.makeRequest({data: requestData.attr()})
+  return makeRequest({data: requestData.attr()})
     .then(function (response) {
       response = _.last(response)[requestedType];
 
@@ -509,7 +513,7 @@ function loadItemsForSubTier(models, type, id, filter) {
           pageInfo.pageSize = countMap[modelObject.name];
         }
 
-        params = QueryAPI.buildParam(
+        params = buildParam(
           modelObject.responseType,
           pageInfo,
           relevant,
@@ -523,7 +527,7 @@ function loadItemsForSubTier(models, type, id, filter) {
           params = transformQuery(params);
         }
 
-        return QueryAPI.batchRequests(params);
+        return batchRequests(params);
       });
 
       resultDfd = can.when.apply(can, dfds).promise();
@@ -636,8 +640,7 @@ function _getQuerryObjectVersion(models, relevant, filter) {
     var widgetConfig = GGRC.Utils.ObjectVersions
       .getWidgetConfig(model);
     var name = widgetConfig.name;
-    var query = QueryAPI
-      .buildCountParams([name], relevant, filter);
+    var query = buildCountParams([name], relevant, filter);
 
     if (widgetConfig.isObjectVersion) {
       query = transformQuery(query[0]);
@@ -676,7 +679,7 @@ function _buildSubTreeCountMap(models, relevant, filter) {
     if (objectVersionsUtils.parentHasObjectVersions(relevant.type)) {
       countQuery = _getQuerryObjectVersion(models, relevant, filter);
     } else {
-      countQuery = QueryAPI.buildCountParams(models, relevant, filter)
+      countQuery = buildCountParams(models, relevant, filter)
         .map(function (param) {
           if (isSnapshotRelated(
               relevant.type,
@@ -687,7 +690,7 @@ function _buildSubTreeCountMap(models, relevant, filter) {
         });
     }
 
-    result = QueryAPI.makeRequest({data: countQuery})
+    result = makeRequest({data: countQuery})
       .then(function (response) {
         var total = 0;
         var showMore = models.some(function (model, index) {

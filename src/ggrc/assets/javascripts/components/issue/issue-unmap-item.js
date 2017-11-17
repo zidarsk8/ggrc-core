@@ -6,8 +6,10 @@
 import '../object-list-item/business-object-list-item';
 import template from './issue-unmap-item.mustache';
 import Pagination from '../base-objects/pagination';
-
-const queryApi = GGRC.Utils.QueryAPI;
+import {
+  buildParam,
+  makeRequest,
+} from '../../plugins/utils/query-api-utils';
 
 export default GGRC.Components('issueUnmapItem', {
   tag: 'issue-unmap-item',
@@ -61,7 +63,7 @@ export default GGRC.Components('issueUnmapItem', {
       });
     },
     buildQuery(type) {
-      return GGRC.Utils.QueryAPI.buildParam(
+      return buildParam(
         type,
         this.attr('paging'),
         null,
@@ -80,7 +82,7 @@ export default GGRC.Components('issueUnmapItem', {
       const auditsQuery = this.buildQuery('Audit');
 
       this.attr('isLoading', true);
-      return queryApi.makeRequest({data: [snapshotsQuery, auditsQuery]})
+      return makeRequest({data: [snapshotsQuery, auditsQuery]})
         .done((resp)=> {
           const snapshots = resp[0].Snapshot;
           const audits = resp[1].Audit;

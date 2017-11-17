@@ -17,6 +17,11 @@ import {
   transformQuery,
   toObject,
 } from '../../plugins/utils/snapshot-utils';
+import {
+  buildRelevantIdsQuery,
+  buildParam,
+  makeRequest,
+} from '../../plugins/utils/query-api-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
 
@@ -146,8 +151,7 @@ export default GGRC.Components('mapperResults', {
         return null;
       }
 
-      return GGRC.Utils.QueryAPI
-        .buildRelevantIdsQuery(this.attr('type'), {}, {
+      return buildRelevantIdsQuery(this.attr('type'), {}, {
           type: this.attr('baseInstance.type'),
           id: this.attr('baseInstance.id'),
           operation: 'relevant',
@@ -225,7 +229,7 @@ export default GGRC.Components('mapperResults', {
       }
 
       // prepare and add main query to request
-      query = GGRC.Utils.QueryAPI.buildParam(
+      query = buildParam(
         modelName,
         paging,
         this.prepareRelevantQuery(),
@@ -312,8 +316,8 @@ export default GGRC.Components('mapperResults', {
       var dfd = can.Deferred();
       var query = this.getQuery('values', true);
       this.attr('isLoading', true);
-      GGRC.Utils.QueryAPI
-        .makeRequest({data: query.request})
+
+      makeRequest({data: query.request})
         .done(function (responseArr) {
           var data = responseArr[query.queryIndex];
           var relatedData = this.buildRelatedData(
@@ -388,8 +392,7 @@ export default GGRC.Components('mapperResults', {
       var queryType = 'ids';
       var query = this.getQuery(queryType, false);
 
-      GGRC.Utils.QueryAPI
-        .makeRequest({data: query.request})
+      makeRequest({data: query.request})
         .done(function (responseArr) {
           var data = responseArr[query.queryIndex];
           var relatedData = responseArr[query.relatedQueryIndex];

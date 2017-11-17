@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 import component from '../issue-unmap-item';
+import * as QueryAPI from '../../../plugins/utils/query-api-utils';
 
 describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
   let viewModel;
@@ -150,7 +151,7 @@ describe('GGRC.Components.IssueUnmapRelatedSnapshots', ()=> {
       }}];
       reqDeferred = can.Deferred();
       spyOn(viewModel, 'buildQuery').and.returnValue(['query']);
-      spyOn(GGRC.Utils.QueryAPI, 'makeRequest').and.returnValue(reqDeferred);
+      spyOn(QueryAPI, 'makeRequest').and.returnValue(reqDeferred);
       spyOn($.prototype, 'trigger');
     });
 

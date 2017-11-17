@@ -5,6 +5,9 @@
 
 import '../sortable-column/sortable-column';
 import {REFRESH_RELATED} from '../../events/eventTypes';
+import {
+  makeRequest,
+} from '../../plugins/utils/query-api-utils';
 import Pagination from '../base-objects/pagination';
 
 (function (can, GGRC, CMS) {
@@ -91,8 +94,8 @@ import Pagination from '../base-objects/pagination';
         var dfd = can.Deferred();
         var params = this.getParams();
         this.attr('isLoading', true);
-        GGRC.Utils.QueryAPI
-          .makeRequest(params)
+
+        makeRequest(params)
           .done(function (responseArr) {
             var relatedType = this.attr('relatedItemsType');
             var data = responseArr[0];

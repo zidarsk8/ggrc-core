@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+ import {
+   buildParam,
+   batchRequests,
+ } from '../../plugins/utils/query-api-utils';
 import '../object-list/object-list';
 
 (function (can, GGRC) {
@@ -127,8 +131,7 @@ import '../object-list/object-list';
         }];
         var filters = this.getSnapshotQueryFilters();
 
-        return GGRC.Utils.QueryAPI
-          .buildParam('Snapshot', {}, relevantFilters, [], filters);
+        return buildParam('Snapshot', {}, relevantFilters, [], filters);
       },
       getObjectQuery: function () {
         var relevantFilters = [{
@@ -138,14 +141,13 @@ import '../object-list/object-list';
         }];
         var type = this.attr('relatedTypes');
 
-        return GGRC.Utils.QueryAPI
-          .buildParam(type, {}, relevantFilters, [], []);
+        return buildParam(type, {}, relevantFilters, [], []);
       },
       requestQuery: function (query) {
         var dfd = can.Deferred();
         this.attr('isLoading', true);
-        GGRC.Utils.QueryAPI
-          .batchRequests(query)
+
+        batchRequests(query)
           .done(function (response) {
             var type = Object.keys(response)[0];
             var values = response[type].values;

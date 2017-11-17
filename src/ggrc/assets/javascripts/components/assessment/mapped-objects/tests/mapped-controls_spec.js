@@ -4,6 +4,7 @@
  */
 
 import * as SnapshotUtils from '../../../../plugins/utils/snapshot-utils';
+import * as QueryAPI from '../../../../plugins/utils/query-api-utils';
 
 describe('GGRC.Component.assessmentMappedControl', function () {
   'use strict';
@@ -90,7 +91,7 @@ describe('GGRC.Component.assessmentMappedControl', function () {
       spyOn(viewModel, 'setItems');
       spyOn(viewModel, 'getParams')
         .and.returnValue(params);
-      spyOn(GGRC.Utils.QueryAPI, 'makeRequest')
+      spyOn(QueryAPI, 'makeRequest')
         .and.returnValue(pendingRequest);
     });
 
