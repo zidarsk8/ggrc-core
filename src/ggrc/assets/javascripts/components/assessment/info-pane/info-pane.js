@@ -38,6 +38,7 @@ import {
   convertValuesToFormFields,
   applyChangesToCustomAttributeValue,
 } from '../../../plugins/utils/ca-utils';
+import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -408,7 +409,7 @@ import {
         );
       },
       initializeDeferredSave: function () {
-        this.attr('deferredSave', new GGRC.Utils.DeferredTransaction(
+        this.attr('deferredSave', new DeferredTransaction(
           function (resolve, reject) {
             this.attr('instance').save().done(resolve).fail(reject);
           }.bind(this), 1000, true));
