@@ -123,7 +123,7 @@
     create: 'POST /api/objectives',
     update: 'PUT /api/objectives/{id}',
     destroy: 'DELETE /api/objectives/{id}',
-    mixins: ['ownable', 'unique_title', 'ca_update'],
+    mixins: ['ownable', 'unique_title', 'ca_update', 'accessControlList'],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
