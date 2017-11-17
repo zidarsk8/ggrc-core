@@ -5,6 +5,7 @@
 
 import '../../plugins/utils/controllers';
 import {warning} from '../../plugins/utils/modals';
+import {hasWarningType} from '../../plugins/utils/controllers';
 import './csv-template';
 import '../show-more/show-more';
 import template from './templates/csv-import.mustache';
@@ -126,7 +127,7 @@ export default GGRC.Components('csvImportWidget', {
     },
     needWarning: function (checkObj, data) {
       var hasWarningTypes = _.every(data, function (item) {
-        return GGRC.Utils.Controllers.hasWarningType({type: item.name});
+        return hasWarningType({type: item.name});
       });
       return hasWarningTypes &&
         (

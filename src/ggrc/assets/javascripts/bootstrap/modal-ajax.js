@@ -8,6 +8,10 @@ import {
   warning,
   BUTTON_VIEW_SAVE_CANCEL_DELETE,
 } from '../plugins/utils/modals';
+import {
+  hasWarningType,
+  shouldApplyPreconditions,
+} from '../plugins/utils/controllers';
 
 (function (can, $, GGRC, Permission) {
   'use strict';
@@ -53,7 +57,7 @@ import {
           GGRC.mustache_path + '/base_objects/confirm_delete.mustache'
       };
 
-      if (GGRC.Utils.Controllers.hasWarningType(instance)) {
+      if (hasWarningType(instance)) {
         modalSettings = _.extend(
           modalSettings,
           warning.settings,
@@ -190,7 +194,7 @@ import {
             status: instance && instance.status // status before changing
           },
           applyPreconditions:
-            GGRC.Utils.Controllers.shouldApplyPreconditions(instance),
+            shouldApplyPreconditions(instance),
           current_user: GGRC.current_user,
           instance: instance,
           modal_title: objectParams.modal_title || modalTitle,
