@@ -484,12 +484,6 @@ class TestAssessmentImport(TestCase):
           "Created Date",
           lambda: datetime.date.today() - datetime.timedelta(7),
       ),
-      # NOTE: skiped error on import every object setup as modified rather
-      # if object isn't changed
-      # (
-      #     "Last Updated By",
-      #     lambda: factories.PersonFactory(email="new_user@email.com").email,
-      # ),
   )
   @ddt.unpack
   def test_update_non_changeable_field(self, field, value_creator):
@@ -521,6 +515,37 @@ class TestAssessmentImport(TestCase):
                                     (field, value)]))
     self.assertEqual(before_update,
                      self.export_parsed_csv(data)["Assessment"][0][field])
+
+  @ddt.data(
+      ("Last Updated By", "new_user@email.com"),
+  )
+  @ddt.unpack
+  def test_exportable_only_updated_by(self, field, value):
+    """Test exportable only "Last Updated By" field"""
+    slug = "TestAssessment"
+    with factories.single_commit():
+      factories.AssessmentFactory(
+          slug=slug,
+          modified_by=factories.PersonFactory(email="modifier@email.com"),
+      )
+    data = [{
+        "object_name": "Assessment",
+        "fields": "all",
+        "filters": {
+            "expression": {
+                "left": "code",
+                "op": {"name": "="},
+                "right": slug
+            },
+        }
+    }]
+    before_update = self.export_parsed_csv(data)["Assessment"][0][field]
+    self.assertEqual(before_update, "modifier@email.com")
+    self.import_data(OrderedDict([("object_type", "Assessment"),
+                                  ("Code*", slug),
+                                  (field, value)]))
+    after_update = self.export_parsed_csv(data)["Assessment"][0][field]
+    self.assertEqual(after_update, "user@example.com")
 
   def test_import_last_deprecated_date(self):
     """Last Deprecated Date on assessment should be non editable."""
