@@ -86,10 +86,11 @@ export function uploadFiles(opts = {}) {
     if (data[ACTION] === PICKED) {
       // adding a newUpload flag so we can later distinguish newly
       // uploaded files from the picked ones.
-      // we cannot rely on the uploadState prop later on because a call to
-      // the RefreshQueue will overwrite it.
+      // isNew is not reliable later as we have a similar method on
+      // the model and it will be overwritten when we create Models
+      // from file objects
       data[DOCUMENTS].forEach((file) => {
-        file.newUpload = file.uploadState === 'success';
+        file.newUpload = file.isNew;
       });
 
       files = model.models(data[DOCUMENTS]);
