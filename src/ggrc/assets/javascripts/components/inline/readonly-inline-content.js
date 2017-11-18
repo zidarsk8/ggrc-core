@@ -4,6 +4,7 @@
 */
 
 import '../form/fields/dropdown-form-field';
+import '../object-list-item/person-list-item';
 
 (function (can, GGRC) {
   'use strict';

@@ -4,6 +4,7 @@
  */
 
 import '../../custom-attributes/custom-attributes-actions';
+import '../../object-state-toolbar/object-state-toolbar';
 
 (function (can, GGRC) {
   'use strict';

@@ -8,6 +8,8 @@ import '../assessment-local-ca';
 import '../assessment-custom-attributes';
 import '../assessment-people';
 import '../assessment-object-type-dropdown';
+import '../attach-button';
+import '../info-pane-save-status';
 import '../mapped-objects/mapped-related-information';
 import '../../comment/comment-add-form';
 import '../../comment/mapped-comments';
@@ -24,10 +26,14 @@ import '../../object-change-state/object-change-state';
 import '../../related-objects/related-assessments';
 import '../../related-objects/related-issues';
 import '../../issue-tracker/issue-tracker-switcher';
+import '../../object-list-item/editable-document-object-list-item';
+import '../../object-state-toolbar/object-state-toolbar';
+import '../../loading/loading-status';
 import './info-pane-issue-tracker-fields';
 import '../../tabs/tab-container';
 import './inline-item';
 import './create-url';
+import './confirm-edit-action';
 import {
   buildParam,
   batchRequests,
