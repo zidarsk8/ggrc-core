@@ -99,10 +99,10 @@ class RestClient(object):
         json_tmpl_name=type_name, **kwargs)
     if not self.is_api:
       body = body[type_name]
-    return json.dumps([body])
+    return json.dumps([body]).encode("string-escape")
 
   @staticmethod
   def update_body(body, **kwargs):
     """Update body of HTTP request based on JSON representation."""
     return json.dumps(TemplateProvider.update_template_as_dict(
-        json_tmpl_name=body, **kwargs))
+        json_data_str=body, **kwargs)).encode("string-escape")
