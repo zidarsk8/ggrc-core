@@ -53,7 +53,7 @@ import template from './templates/tree-item.mustache';
     selectedColumns: [],
     mandatory: [],
     disableConfiguration: null,
-    itemSelector: '.tree-item-content'
+    itemSelector: '.tree-item-content',
   });
 
   /**
@@ -69,6 +69,7 @@ import template from './templates/tree-item.mustache';
         var instance = viewModel.attr('instance');
         var resultDfd;
 
+        viewModel.attr('$el', this.element.find('.tree-item-wrapper'));
         if (instance instanceof CMS.Models.Person) {
           resultDfd = viewModel.makeResult(instance).then(function (result) {
             viewModel.attr('result', result);

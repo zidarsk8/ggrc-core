@@ -40,6 +40,7 @@ import {
   isMyAssessments,
   getCounts,
   initCounts,
+  initMappedInstances,
 } from '../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
@@ -515,6 +516,9 @@ viewModel = can.Map.extend({
         if (!self.attr('$el').closest('.cms_controllers_info_pin').length) {
           $('.cms_controllers_info_pin').control().unsetInstance();
         }
+      } else {
+        // reinit mapped instances (subTree uses mapped instances)
+        initMappedInstances();
       }
     }
 

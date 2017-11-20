@@ -28,6 +28,7 @@ export default can.Map.extend({
    * List of models for show in sub-level for current item.
    */
   selectedChildModels: [],
+  $el: null,
   initChildTreeDisplay: function () {
     var modelName = this.attr('instance').type;
     var models = TreeViewUtils.getModelsForSubTier(modelName);
@@ -80,6 +81,18 @@ export default can.Map.extend({
     }
 
     this.select($element);
+  },
+  collapseAndHighlightItem: function () {
+    const animationDuration = 2000;
+    let el = this.attr('$el');
+    this.attr('expanded', false);
+
+    el.addClass('tree-item-refresh-animation')
+      .delay(animationDuration)
+      .queue((next) => {
+        el.removeClass('tree-item-refresh-animation');
+        next();
+      });
   },
   select: function ($element) {
     var instance = this.attr('instance');

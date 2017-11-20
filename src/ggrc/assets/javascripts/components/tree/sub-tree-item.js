@@ -59,7 +59,7 @@ import template from './templates/sub-tree-item.mustache';
       }
     },
     itemSelector: '.sub-item-content',
-    extraCss: '@'
+    extraCss: '@',
   });
 
   GGRC.Components('subTreeItem', {
@@ -71,6 +71,7 @@ import template from './templates/sub-tree-item.mustache';
         var viewModel = this.viewModel;
         var instance = viewModel.attr('instance');
         var resultDfd;
+        viewModel.attr('$el', this.element);
 
         if (instance instanceof CMS.Models.Person) {
           resultDfd = viewModel.makeResult(instance).then(function (result) {

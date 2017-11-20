@@ -1,8 +1,9 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {DESTINATION_UNMAPPED} from '../../events/eventTypes';
 import template from './templates/sub-tree-wrapper.mustache';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
@@ -113,6 +114,7 @@ import {
     directlyItems: [],
     notDirectlyItems: [],
     _loader: null,
+    _collapseAfterUnmapCallBack: null,
     expandNotDirectlyRelated: function () {
       var isExpanded = this.attr('notDirectlyExpanded');
       this.attr('notDirectlyExpanded', !isExpanded);
@@ -150,11 +152,36 @@ import {
           if (!result.directlyItems.length && !result.notDirectlyItems.length) {
             this.attr('notResult', true);
           }
+
+          // bind 'destinationUnmapped' event
+          this.attr('directlyItems').forEach((item) => {
+            if (item) {
+              item.bind(DESTINATION_UNMAPPED.type,
+                this.attr('_collapseAfterUnmapCallBack'));
+            }
+          });
         }.bind(this));
     },
     makeResult: function (instance) {
       return this.attr('_loader').getResultFromMapping(instance);
-    }
+    },
+    collapseAfterUnmap: function () {
+      // unbind 'destinationUnmapped' event
+      this.attr('directlyItems').forEach((item) => {
+        if (item) {
+          item.unbind(DESTINATION_UNMAPPED.type,
+            this.attr('_collapseAfterUnmapCallBack'));
+        }
+      });
+
+      this.attr('dataIsReady', false);
+      this.attr('isOpen', false);
+      this.dispatch('collapseSubtree');
+    },
+    init: function () {
+      this.attr('_collapseAfterUnmapCallBack',
+        this.collapseAfterUnmap.bind(this));
+    },
   });
 
   /**
