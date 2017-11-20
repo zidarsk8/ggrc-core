@@ -368,9 +368,10 @@ class Workflows(InfoWidget):
     super(Workflows, self).__init__(driver)
 
   def _extend_list_all_scopes_by_review_state(self):
-    """Extend attributes related to 'review state' abstractly.
+    """Method overriding without action due to Workflows don't have
+    'review states'.
     """
-    return
+    pass
 
 
 class Audits(InfoWidget):
@@ -389,9 +390,10 @@ class Audits(InfoWidget):
         self.audit_captain_lbl_txt, self.audit_captain_txt)
 
   def _extend_list_all_scopes_by_review_state(self):
-    """Extend attributes related to 'review state' abstractly.
+    """Method overriding without action due to Audits don't have
+    'review states'.
     """
-    return
+    pass
 
 
 class Assessments(InfoWidget):
@@ -462,36 +464,35 @@ class Assessments(InfoWidget):
     return dict(zip(self.list_all_headers_txt, self.list_all_values_txt))
 
   def _extend_list_all_scopes_by_code(self):
-    """Extend attributes related to 'code' and extend 'list all scopes'
-    accordingly or abstractly.
+    """Extend attributes related to 'code' and extend 'list all scopes' if
+    'Other Attributes' tab opened.
     """
-    if self.is_other_attrs_tab:
+    if (self.tab_container.tab_controller.active_tab.text ==
+            element.AssessmentTabContainer.OTHER_ATTRS_TAB):
       code_elem = base.Label(self.info_widget_elem, self._locators.CODE_CSS)
       self.code_lbl_txt = code_elem.element.find_element(
           *self._locators.CODE_HEADER_CSS).text
       self.code_txt = code_elem.element.find_element(
           *self._locators.CODE_VALUE_CSS).text
       self._extend_list_all_scopes(self.code_lbl_txt, self.code_txt)
-    else:
-      return
 
   def _extend_list_all_scopes_by_cas(self):
     """Extend attributes related to 'local and global custom attributes' and
-    extend 'list all scopes' accordingly or abstractly.
+    extend 'list all scopes' if 'Other Attributes' tab opened.
     """
     # todo: implement separate entities' model for lcas and gcas
-    if self.is_other_attrs_tab:
+    if (self.tab_container.tab_controller.active_tab.text ==
+            element.AssessmentTabContainer.OTHER_ATTRS_TAB):
       self.cas_lbl_txt = self._elements.CAS.upper()
       self.cas_scope_txt = self.get_headers_and_values_dict_from_cas_scopes()
       self.cas_scope_txt.update(self.lcas_scope_txt)
       self._extend_list_all_scopes(self.cas_lbl_txt, self.cas_scope_txt)
-    else:
-      return
 
   def _extend_list_all_scopes_by_review_state(self):
-    """Extend attributes related to 'review state' abstractly.
+    """Method overriding without action due to Assessments don't have
+    'review states'.
     """
-    return
+    pass
 
   def click_complete(self):
     """Click on 'Complete' button."""
@@ -508,12 +509,6 @@ class Assessments(InfoWidget):
     base.Button(self.info_widget_elem,
                 WidgetInfoAssessment.BUTTON_NEEDS_REWORK).click()
 
-  @property
-  def is_other_attrs_tab(self):
-    """Return boolean value if 'Other Attributes' is active."""
-    return (self.tab_container.tab_controller.active_tab.text ==
-            element.AssessmentTabContainer.OTHER_ATTRS_TAB)
-
 
 class AssessmentTemplates(InfoWidget):
   """Model for Assessment Template object Info pages and Info panels."""
@@ -523,20 +518,22 @@ class AssessmentTemplates(InfoWidget):
     super(AssessmentTemplates, self).__init__(driver)
 
   def _extend_list_all_scopes_by_code(self):
-    """Extend attributes related to 'code' abstractly.
+    """Method overriding without action due to Assessment Templates don't have
+    'code'.
     """
-    return
+    pass
 
   def _extend_list_all_scopes_by_cas(self):
-    """Extend attributes related to 'local and global custom attributes'
-    abstractly.
+    """Method overriding without action due to Assessment Templates don't have
+    'global custom attributes'.
     """
-    return
+    pass
 
   def _extend_list_all_scopes_by_review_state(self):
-    """Extend attributes related to 'review state' abstractly.
+    """Method overriding without action due to Assessment Templates don't have
+    'review states'.
     """
-    return
+    pass
 
 
 class Issues(InfoWidget):
