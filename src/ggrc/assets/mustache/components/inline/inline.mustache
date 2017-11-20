@@ -22,8 +22,9 @@
             ></dropdown-form-field>
           {{/case}}
           {{#case 'input'}}
-            <text-form-field {value}="value"
-              class="inline__content-input"
+            <text-form-field
+              {value}="value"
+              class="inline__content-input inline-input-form-field"
               {placeholder}="placeholder"
               (value-changed)="fieldValueChanged(%event)"
             ></text-form-field>
@@ -52,6 +53,14 @@
               class="inline__content-input"
               (value-changed)="fieldValueChanged(%event)"
             ></person-form-field>
+          {{/case}}
+          {{#case 'number'}}
+            <numberbox-form-field
+              class="inline__content-input inline-input-form-field"
+              {placeholder}="placeholder"
+              {value}="value"
+              (value-changed)="fieldValueChanged(%event)"
+            ></numberbox-form-field>
           {{/case}}
         {{/switch}}
 

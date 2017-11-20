@@ -12,6 +12,10 @@
     {{> '/static/mustache/components/inline/simple-readonly-text.mustache'}}
   {{/case}}
 
+  {{#case 'number'}}
+    {{> '/static/mustache/components/inline/simple-readonly-text.mustache'}}
+  {{/case}}
+
   {{#case 'dropdown'}}
     <dropdown-form-field
       class="disabled-dropdown"

@@ -5,11 +5,13 @@
 
 {{#switch type}}
   {{#case 'input'}}
-    <text-form-field {value}="value"
-		     {field-id}="id"
-		     {placeholder}="placeholder"
-		     {disabled}="disabled"
-		     (value-changed)="fieldValueChanged(%event)"
+    <text-form-field
+        class="inline-input-form-field"
+        {value}="value"
+        {field-id}="id"
+        {placeholder}="placeholder"
+        {disabled}="disabled"
+        (value-changed)="fieldValueChanged(%event)"
     ></text-form-field>
   {{/case}}
   {{#case 'text'}}
