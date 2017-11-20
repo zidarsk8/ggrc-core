@@ -15,9 +15,7 @@ from lib.entities.entity import (
     Entity, PersonEntity, CustomAttributeEntity, ProgramEntity, ControlEntity,
     ObjectiveEntity, AuditEntity, AssessmentTemplateEntity, AssessmentEntity,
     IssueEntity, CommentEntity)
-from lib.utils import string_utils
-from lib.utils.string_utils import (random_list_strings, random_string,
-                                    random_uuid)
+from lib.utils.string_utils import StringMethods
 
 
 class EntitiesFactory(object):
@@ -40,21 +38,20 @@ class EntitiesFactory(object):
   def generate_string(cls, first_part):
     """Generate string in unicode format according object type and random data.
     """
-    special_chars = string_utils.SPECIAL
     return unicode("{first_part}_{uuid}_{rand_str}".format(
-        first_part=first_part, uuid=random_uuid(),
-        rand_str=random_string(size=len(special_chars), chars=special_chars)))
+        first_part=first_part, uuid=StringMethods.random_uuid(),
+        rand_str=StringMethods.random_string()))
 
   @classmethod
   def generate_slug(cls):
     """Generate slug in unicode format according str part and random data."""
-    return unicode("{slug}".format(slug=random_uuid()))
+    return unicode("{slug}".format(slug=StringMethods.random_uuid()))
 
   @classmethod
   def generate_email(cls, domain=const_url.DEFAULT_EMAIL_DOMAIN):
     """Generate email in unicode format according to domain."""
     return unicode("{mail_name}@{domain}".format(
-        mail_name=random_uuid(), domain=domain))
+        mail_name=StringMethods.random_uuid(), domain=domain))
 
 
 class ObjectPersonsFactory(EntitiesFactory):
@@ -239,7 +236,7 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
         AdminWidgetCustomAttributes.ALL_CA_TYPES))
     random_ca.title = cls.generate_string(random_ca.attribute_type)
     if random_ca.attribute_type == AdminWidgetCustomAttributes.DROPDOWN:
-      random_ca.multi_choice_options = random_list_strings()
+      random_ca.multi_choice_options = StringMethods.random_list_strings()
     random_ca.definition_type = unicode(objects.get_singular(
         random.choice(objects.ALL_CA_OBJS)))
     random_ca.mandatory = False
@@ -274,7 +271,7 @@ class CustomAttributeDefinitionsFactory(EntitiesFactory):
     if (arguments.get("attribute_type") ==
             AdminWidgetCustomAttributes.DROPDOWN and not
             obj.multi_choice_options):
-      obj.multi_choice_options = random_list_strings()
+      obj.multi_choice_options = StringMethods.random_list_strings()
     return Entity.update_objs_attrs_values_by_entered_data(
         obj_or_objs=obj, **arguments)
 

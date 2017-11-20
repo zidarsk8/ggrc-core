@@ -5,11 +5,12 @@
 # pylint: disable=too-few-public-methods
 
 import copy
-
 from datetime import datetime
+
 from dateutil import parser, tz
 
-from lib.utils import help_utils, string_utils
+from lib.utils import help_utils
+from lib.utils.string_utils import StringMethods
 
 
 class Representation(object):
@@ -31,7 +32,7 @@ class Representation(object):
     """
     all_entities_cls = (help_utils.convert_to_list(entity) if entity
                         else list(Entity.all_entities_classes()))
-    all_entities_attrs_names = string_utils.convert_list_elements_to_list(
+    all_entities_attrs_names = StringMethods.convert_list_elements_to_list(
         [entity_cls().__dict__.keys() for entity_cls in all_entities_cls])
     return list(set(all_entities_attrs_names))
 
@@ -77,7 +78,7 @@ class Representation(object):
     }
     result_remap_items.update(ui_remap_items)
     result_remap_items.update(csv_remap_items)
-    return string_utils.dict_keys_to_upper_case(result_remap_items)
+    return StringMethods.dict_keys_to_upper_case(result_remap_items)
 
   @staticmethod
   def convert_objs_repr_to_dict(obj_or_objs):
@@ -230,7 +231,7 @@ class Representation(object):
             (isinstance(cas_def, list) and
              all(isinstance(_def, dict)
                  for _def in cas_def)) else {None: None})
-        cas = string_utils.merge_dicts_by_same_key(cas_def_dict, cas_val_dict)
+        cas = StringMethods.merge_dicts_by_same_key(cas_def_dict, cas_val_dict)
         setattr(obj, "custom_attributes", cas)
       return obj
     return help_utils.execute_method_according_to_plurality(
@@ -321,7 +322,7 @@ class Representation(object):
               obj.assignees[obj_attr_name.capitalize()] = (
                   [ObjectPersonsFactory().default().__dict__])
           if is_replace_values_of_dicts and isinstance(_obj_attr_value, dict):
-            obj_attr_value = string_utils.exchange_dicts_items(
+            obj_attr_value = StringMethods.exchange_dicts_items(
                 transform_dict=_obj_attr_value,
                 dicts=help_utils.convert_to_list(
                     getattr(obj, obj_attr_name)),
@@ -397,7 +398,7 @@ class Representation(object):
   def compare_cas(self_cas, other_cas):
     """Compare entities' 'custom_attributes' attributes."""
     if isinstance(self_cas and other_cas, dict):
-      return string_utils.is_subset_of_dicts(self_cas, other_cas)
+      return StringMethods.is_subset_of_dicts(self_cas, other_cas)
     else:
       Representation.attrs_values_types_error(
           self_attr=self_cas, other_attr=other_cas,
@@ -421,7 +422,7 @@ class Representation(object):
     """
     # pylint: disable=no-else-return
     if help_utils.is_multiple_objs(
-        string_utils.convert_list_elements_to_list(
+        StringMethods.convert_list_elements_to_list(
             [self_comments, other_comments]), (dict, type(None))):
       if self_comments and other_comments:
         is_comments_equal_list = []
@@ -556,10 +557,10 @@ class Representation(object):
     '**attrs' - items of attributes' names and values.
     """
     list_objs = help_utils.convert_to_list(objs)
-    matched_objs = [obj for obj in list_objs
-                    if isinstance(obj, Entity.all_entities_classes()) and
-                    string_utils.is_subset_of_dicts(dict(**attrs),
-                                                    obj.__dict__)]
+    matched_objs = [
+        obj for obj in list_objs
+        if isinstance(obj, Entity.all_entities_classes()) and
+        StringMethods.is_subset_of_dicts(dict(**attrs), obj.__dict__)]
     return (help_utils.get_single_obj(matched_objs)
             if not help_utils.is_multiple_objs(matched_objs) else matched_objs)
 
