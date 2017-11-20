@@ -1,11 +1,18 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc., authors, and contributors
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  ensureGlobalCA,
+  getCustomAttributes,
+  CUSTOM_ATTRIBUTE_TYPE,
+  convertToFormViewField,
+  applyChangesToCustomAttributeValue,
+} from '../../plugins/utils/ca-utils';
+
 (function (can, GGRC) {
   'use strict';
-  var CAUtils = GGRC.Utils.CustomAttributes;
   var tpl = can.view(GGRC.mustache_path +
     '/components/gca-controls/gca-controls.mustache');
 
@@ -29,7 +36,7 @@
               var hasError = !val.trim();
               var errorMessages = {
                 _any: can.Map.validationMessages.non_blank,
-                checkbox: can.Map.validationMessages.must_be_checked
+                checkbox: can.Map.validationMessages.must_be_checked,
               };
               var errorMessage = errorMessages[itm.type] || errorMessages._any;
 
@@ -43,34 +50,34 @@
       },
       initGlobalAttributes: function () {
         var cavs;
-        CAUtils.ensureGlobalCA(this.attr('instance'));
-        cavs = CAUtils.getCustomAttributes(this.attr('instance'),
-          CAUtils.CUSTOM_ATTRIBUTE_TYPE.GLOBAL);
+        ensureGlobalCA(this.attr('instance'));
+        cavs = getCustomAttributes(this.attr('instance'),
+          CUSTOM_ATTRIBUTE_TYPE.GLOBAL);
 
         this.attr('items',
-          cavs.map(CAUtils.convertToFormViewField.bind(CAUtils))
+          cavs.map(convertToFormViewField)
         );
       },
       updateGlobalAttribute: function (event, field) {
         this.attr('modifiedFields').attr(field.id, event.value);
         field.attr('value', event.value);
 
-        CAUtils.applyChangesToCustomAttributeValue(
+        applyChangesToCustomAttributeValue(
           this.attr('instance.custom_attribute_values'),
           this.attr('modifiedFields')
         );
 
         this.attr('modifiedFields', {}, true);
-      }
+      },
     },
     events: {
       '{viewModel.items} change': function () {
         this.viewModel.validateControls();
-      }
+      },
     },
     init: function () {
       this.viewModel.initGlobalAttributes();
       this.viewModel.validateControls();
-    }
+    },
   });
 })(window.can, window.GGRC);

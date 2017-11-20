@@ -33,7 +33,7 @@ from ggrc.services.common import get_modified_objects
 from ggrc.services.common import update_snapshot_index
 from ggrc.services.common import update_memcache_after_commit
 from ggrc.services.common import update_memcache_before_commit
-from ggrc.services.common import log_event
+from ggrc.utils.log_event import log_event
 from ggrc.services import signals
 from ggrc_workflows.models.cycle_task_group_object_task import \
     CycleTaskGroupObjectTask

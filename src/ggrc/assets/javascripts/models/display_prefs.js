@@ -3,8 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-//= require can.jquery-all
-//= require models/local_storage
+import * as StateUtils from '../plugins/utils/state-utils';
 
 var COLLAPSE = 'collapse';
 var LHN_SIZE = 'lhn_size';
@@ -176,7 +175,7 @@ can.Model.LocalStorage('CMS.Models.DisplayPrefs', {
 
     // Avoid User bugs:
     // User may have wrong config in local storage
-    if (!GGRC.Utils.State.hasFilter(modelName)) {
+    if (!StateUtils.hasFilter(modelName)) {
       return [];
     }
 

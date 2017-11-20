@@ -1813,6 +1813,15 @@ Mustache.registerHelper("ggrc_config_value", function (key, default_, options) {
   return can.getObject(key, [GGRC.config]) || default_;
 });
 
+Mustache.registerHelper('if_config_exist', function (key, options) {
+  key = resolve_computed(key);
+  let configValue = can.getObject(key, [GGRC.config]);
+
+  return configValue ?
+    options.fn(options.contexts) :
+    options.inverse(options.contexts);
+});
+
 Mustache.registerHelper("if_auditor", function (instance, options) {
   var audit, auditors_dfd, auditors
     , admin = Permission.is_allowed("__GGRC_ADMIN__")
@@ -2246,6 +2255,7 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
       var NON_DATE_ATTRS = Object.freeze({
         kind: 1,
         title: 1,
+        label: 1,
         reference_url: 1,
         request_type: 1,
         slug: 1,

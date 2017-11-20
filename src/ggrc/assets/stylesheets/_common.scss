@@ -70,6 +70,7 @@ a {
 
 .tooltip {
   // The bootstrap default is incorrect with modals as of bootstrap 2.0.x
+  white-space: pre-line;
   z-index: zIndex(tooltip) !important;
   word-wrap: break-word;
 }
@@ -773,6 +774,9 @@ p {
   &.state-deprecated {
     background: $status-declined;
   }
+  &.state-reworkneeded {
+    background: $status-reworkneeded;
+  }
 }
 .state-value-dot {
   position: relative;
@@ -846,6 +850,13 @@ p {
 
     &:before {
       background: $status-declined;
+    }
+  }
+  &.state-reworkneeded {
+    color: $status-reworkneeded;
+
+    &:before {
+      background: $status-reworkneeded;
     }
   }
 }

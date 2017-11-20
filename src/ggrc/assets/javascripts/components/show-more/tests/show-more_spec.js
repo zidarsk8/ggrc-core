@@ -69,9 +69,10 @@ describe('showMore', function () {
       var result;
 
       viewModel.attr('shouldShowAllItems', false);
+      viewModel.attr('limit', 1);
       result = viewModel.attr('showAllButtonText');
 
-      expect(result).toBe('Show more (2)');
+      expect(result).toBe('Show more (1)');
     });
   });
 

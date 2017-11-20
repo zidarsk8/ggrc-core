@@ -6,15 +6,9 @@
 {{#switch attr_name}}
   {{#case 'owner'}}
     {{#with_mapping 'authorizations' instance}}
-      {{#each authorizations}}
-        <span>
-          {{#using role=instance.role}}
-            {{#if_equals role.name 'WorkflowOwner'}}
-                <tree-people-list-field {source}="instance.person"/>
-            {{/if_equals}}
-          {{/using}}
-        </span>
-      {{/each}}
+      <get-owner-people-list data="authorizations" role="'WorkflowOwner'">
+        <tree-people-list-field {source}="allOwners"/>
+      </get-owner-people-list>
     {{/with_mapping}}
   {{/case}}
   {{#case 'modified_by'}}

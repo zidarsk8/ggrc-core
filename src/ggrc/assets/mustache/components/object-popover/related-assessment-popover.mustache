@@ -13,10 +13,12 @@
                     <div class="field-wrapper flex-size-1 {{extraClass type}}">
                         <form-validation-icon {validation}="validation"></form-validation-icon>
                         <div class="field__title form-field__title">
-                            <label class="field__title-text {{extraClass type}}" for="form-field-{{id}}">{{title}}</label>
-                            {{#if helptext}}
-                                <i class="fa fa-question-circle field__title-helper-text" rel="tooltip" title="{{helptext}}"></i>
-                            {{/if}}
+                            <label class="field__title-text {{extraClass type}}" for="form-field-{{id}}">
+                              {{title}}
+                              {{#if helptext}}
+                                  <i class="fa fa-question-circle field__title-helper-text" rel="tooltip" title="{{helptext}}"></i>
+                              {{/if}}
+                            </label>
                         </div>
 			<custom-attributes-field-view
                                 {type}="type"

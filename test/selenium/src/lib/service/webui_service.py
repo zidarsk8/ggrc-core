@@ -70,14 +70,16 @@ class BaseWebUiService(object):
                   all(isinstance(comment, dict) for comment in val)):
             # extract datetime from u'(Creator) 08/20/2017 07:30:45 AM +03:00'
             scope[key] = [
-                {k: (parser.parse(re.sub(regex.TEXT_WITHIN_PARENTHESES,
+                {k: (parser.parse(re.sub(regex.TEXT_W_PARENTHESES,
                                          string_utils.BLANK, v)
                                   ).astimezone(tz=tz.tzutc())
                      if k == "created_at" else v)
                  for k, v in comment.iteritems()} for comment in val]
           # convert multiple values to list of strings and split if need it
-          if key in ["owners", "assessor", "creator", "verifier"]:
-            # split multiple values if need 'Ex1, Ex2 F' to ['Ex1', 'Ex2 F']
+          if (key in ["owners", "assessor", "creator", "verifier"] and
+             not isinstance(val, list)):
+            # split Tree View values if need 'Ex1, Ex2 F' to ['Ex1', 'Ex2 F']
+            # Info Widget values will be represent by internal methods
             scope[key] = val.split(", ")
           # convert 'slug' from CSV for snapshoted objects u'*23eb72ac-4d9d'
           if (key == "slug" and
@@ -561,8 +563,9 @@ class AssessmentsService(BaseWebUiService):
 
   def reject_assessment(self, obj):
     """Navigate to info page of object according to URL of object then find and
-    click 'Reject' button then return info page of object in new state"""
-    self.open_info_page_of_obj(obj).click_reject()
+    click 'Needs Rework' button then return info page of object in new state.
+    """
+    self.open_info_page_of_obj(obj).click_needs_rework()
     return self.info_widget_cls(self.driver)
 
   def create_obj_and_get_mapped_titles_from_modal(self, src_obj, obj):

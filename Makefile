@@ -132,10 +132,7 @@ misspell :
 
 ## Deployment!
 
-src/ggrc/assets/stylesheets/dashboard.css : src/ggrc/assets/stylesheets/*.scss
-	bin/build_assets -p
-
-src/ggrc/assets/assets.manifest : src/ggrc/assets/stylesheets/dashboard.css src/ggrc/assets
+src/ggrc/assets/assets.manifest : src/ggrc/assets
 	source "bin/init_env"; \
 		GGRC_SETTINGS_MODULE="$(SETTINGS_MODULE)" bin/build_assets
 

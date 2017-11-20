@@ -1,13 +1,16 @@
-/*!
+/*
  Copyright (C) 2017 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  CA_DD_REQUIRED_DEPS,
+  applyChangesToCustomAttributeValue,
+}
+  from '../../plugins/utils/ca-utils';
+
 (function (GGRC, can) {
   'use strict';
-
-  var CAUtils = GGRC.Utils.CustomAttributes;
-  var CA_DD_REQUIRED_DEPS = CAUtils.CA_DD_REQUIRED_DEPS;
 
   GGRC.Components('assessmentLocalCa', {
     tag: 'assessment-local-ca',
@@ -27,7 +30,7 @@
               .filter(function (field) {
                 return !field.attr('validation.valid');
               }).length;
-          }
+          },
         },
         editMode: {
           type: 'boolean',
@@ -37,14 +40,14 @@
               this.attr('highlightInvalidFields', false);
             }
             return newValue;
-          }
+          },
         },
         evidenceAmount: {
           type: 'number',
           set: function (newValue, setValue) {
             setValue(newValue);
             this.validateForm();
-          }
+          },
         },
         isEvidenceRequired: {
           get: function () {
@@ -60,8 +63,8 @@
                     CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
               }).length;
             return optionsWithEvidence > this.attr('evidenceAmount');
-          }
-        }
+          },
+        },
       },
       validateForm: function () {
         var self = this;
@@ -83,7 +86,7 @@
         var isMandatory = field.validation.mandatory;
         var errorsMap = field.errorsMap || {
           evidence: false,
-          comment: false
+          comment: false,
         };
 
         requiresEvidence =
@@ -111,8 +114,8 @@
             validation: {
               show: isMandatory,
               valid: isMandatory ? !hasMissingValue && !!(value) : true,
-              hasMissingInfo: false
-            }
+              hasMissingInfo: false,
+            },
           });
         } else if (field.type === 'dropdown') {
           fieldValid = (value) ?
@@ -124,18 +127,18 @@
               show: isMandatory || !!value,
               valid: fieldValid,
               hasMissingInfo: (hasMissingEvidence || hasMissingComment),
-              requiresAttachment: (requiresEvidence || requiresComment)
+              requiresAttachment: (requiresEvidence || requiresComment),
             },
             errorsMap: {
               evidence: hasMissingEvidence,
-              comment: hasMissingComment
-            }
+              comment: hasMissingComment,
+            },
           });
 
           if (!formInitCheck && (hasMissingEvidence || hasMissingComment)) {
             this.dispatch({
               type: 'validationChanged',
-              field: field
+              field: field,
             });
           }
         } else {
@@ -144,8 +147,8 @@
             validation: {
               show: isMandatory,
               valid: isMandatory ? !hasMissingValue && !!(value) : true,
-              hasMissingInfo: false
-            }
+              hasMissingInfo: false,
+            },
           });
         }
       },
@@ -175,7 +178,7 @@
 
         this.attr('deferredSave').push(function () {
           var caValues = self.attr('instance.custom_attribute_values');
-          CAUtils.applyChangesToCustomAttributeValue(
+          applyChangesToCustomAttributeValue(
             caValues,
             new can.Map(changes));
 
@@ -195,7 +198,7 @@
         this.performValidation(e.field);
         this.attr('formSavedDeferred', can.Deferred());
         this.save(e.fieldId, e.value);
-      }
+      },
     },
     events: {
       inserted: function () {
@@ -229,9 +232,9 @@
 
         this.viewModel.attr('highlightInvalidFields', true);
         $container.animate({
-          scrollTop: $(field).offset().top - $body.offset().top
+          scrollTop: $(field).offset().top - $body.offset().top,
         }, 500);
-      }
+      },
     },
     helpers: {
       isInvalidField: function (show, valid, highlightInvalidFields, options) {
@@ -243,7 +246,7 @@
           return options.fn(options.context);
         }
         return options.inverse(options.context);
-      }
-    }
+      },
+    },
   });
 })(window.GGRC, window.can);

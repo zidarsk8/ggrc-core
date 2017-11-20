@@ -9,6 +9,7 @@ custom-attributes {
 }
 
 .fields-wrapper > show-more {
+  max-width: 100%;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
@@ -84,7 +85,7 @@ custom-attributes {
       max-width: 360px;
       &.inline-reverse {
         min-width: auto;
-        padding: 5px 8px 0 0;
+        padding: 3px 8px 0 0;
       }
     }
 
@@ -132,18 +133,13 @@ custom-attributes {
   }
 
   &__mandatory {
-    width: 18px;
-    height: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    margin-left: 3px;
     color: $icon-color-empty;
     font-size: 11px;
-    opacity: 1;
   }
 
   &__title-text {
-    display: inline-flex;
+    max-width: 100%;
     margin: 0;
     font-weight: normal;
     font-size: 11px;
@@ -159,13 +155,8 @@ custom-attributes {
   }
 
   &__title-helper-text {
-    margin: 0 2px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    vertical-align: top;
+    margin-left: 8px;
     color: $icon-color-dark;
-    width: 28px;
-    text-align: center;
-    line-height: 28px;
   }
 }

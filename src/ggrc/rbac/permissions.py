@@ -11,14 +11,6 @@ from ggrc.extensions import get_extension_instance
 from ggrc.rbac import SystemWideRoles
 
 
-SYSTEM_WIDE_READ_ROLES = {
-    SystemWideRoles.SUPERUSER,
-    SystemWideRoles.ADMINISTRATOR,
-    SystemWideRoles.EDITOR,
-    SystemWideRoles.READER,
-}
-
-
 def get_permissions_provider():
   return get_extension_instance(
       'USER_PERMISSIONS_PROVIDER',
@@ -54,19 +46,27 @@ def is_allowed_create_for(instance):
   return permissions_for(get_user()).is_allowed_create_for(instance)
 
 
-def _system_wide_read():
+def has_system_wide_update():
+  """Check if user has system wide update access to all objects."""
+  user = login.get_current_user()
+  system_wide_role = getattr(user, "system_wide_role",
+                             SystemWideRoles.NO_ACCESS)
+  return system_wide_role in SystemWideRoles.update_roles
+
+
+def has_system_wide_read():
   """Check if user has system wide read access to all objects."""
   user = login.get_current_user()
   system_wide_role = getattr(user, "system_wide_role",
                              SystemWideRoles.NO_ACCESS)
-  return system_wide_role in SYSTEM_WIDE_READ_ROLES
+  return system_wide_role in SystemWideRoles.read_roles
 
 
 def is_allowed_read(resource_type, resource_id, context_id):
   """Whether or not the user is allowed to read a resource of the specified
   type in the context.
   """
-  if _system_wide_read():
+  if has_system_wide_read():
     return True
   return permissions_for(get_user()).is_allowed_read(
       resource_type, resource_id, context_id)
@@ -76,7 +76,7 @@ def is_allowed_read_for(instance):
   """Whether or not the user is allowed to read this particular resource
   instance.
   """
-  if _system_wide_read():
+  if has_system_wide_read():
     return True
   return permissions_for(get_user()).is_allowed_read_for(instance)
 

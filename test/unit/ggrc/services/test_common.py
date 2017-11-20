@@ -13,6 +13,7 @@ from ddt import ddt, data, unpack
 # pylint: disable=unused-import
 from ggrc import models  # NOQA
 from ggrc.services import common
+from ggrc.utils import log_event
 
 
 @ddt
@@ -55,7 +56,7 @@ class TestGetRevisionsList(TestCase):
   @staticmethod
   @contextmanager
   def mock_get_cache(new, deleted, dirty):
-    with mock.patch.object(common, "get_cache") as mock_get_cache:
+    with mock.patch.object(models.cache.Cache, "get_cache") as mock_get_cache:
       cache_mock = mock_get_cache.return_value
       cache_mock.new = new
       cache_mock.deleted = deleted
@@ -65,7 +66,7 @@ class TestGetRevisionsList(TestCase):
 
   def get_log_revisions(self, obj=None):
     # pylint: disable=protected-access
-    return common._get_log_revisions(self.FAKE_USER_ID, obj, bool(obj))
+    return log_event._get_log_revisions(self.FAKE_USER_ID, obj, bool(obj))
 
   # pylint: disable=too-many-arguments
   @staticmethod

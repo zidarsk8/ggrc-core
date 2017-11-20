@@ -11,10 +11,12 @@ Contents:
 ..  toctree::
     :maxdepth: 2
 
-    guidelines/index
-    development/index
-    support/index
     api/index
+    backend/index
+    frontend/index
+    support/index
+    contributing/index
+
 
 
 Indices and tables
@@ -23,4 +25,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

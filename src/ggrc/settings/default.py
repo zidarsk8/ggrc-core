@@ -35,7 +35,7 @@ try:
 except (ImportError):
   pass
 
-VERSION = "0.10.34-Raspberry" + BUILD_NUMBER
+VERSION = "0.10.35-Raspberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -79,10 +79,8 @@ MAX_INSTANCES = os.environ.get('MAX_INSTANCES', '3')
 
 exports = ['VERSION', 'MAX_INSTANCES']
 
-# Users with authorized domains will automatically get Creator role.
-# After parsing, AUTHORIZED_DOMAINS must be set of strings.
-AUTHORIZED_DOMAINS = {
-    d.strip() for d in os.environ.get('AUTHORIZED_DOMAINS', "").split(",")}
+# Users with authorized domain will automatically get Creator role.
+AUTHORIZED_DOMAIN = os.environ.get('AUTHORIZED_DOMAIN', "")
 
 JINJA2 = jinja2.Environment(loader=jinja2.PackageLoader('ggrc', 'templates'))
 EMAIL_DIGEST = JINJA2.get_template("notifications/email_digest.html")
@@ -124,6 +122,12 @@ DEBUG_BENCHMARK = os.environ.get("GGRC_BENCHMARK")
 
 # GGRCQ integration
 GGRC_Q_INTEGRATION_URL = os.environ.get('GGRC_Q_INTEGRATION_URL', '')
+
+# Integration service
+INTEGRATION_SERVICE_URL = os.environ.get('INTEGRATION_SERVICE_URL')
+
+# Integration service mandatory header value
+URLFETCH_SERVICE_ID = os.environ.get('URLFETCH_SERVICE_ID')
 
 # Dashboard integration
 _DEFAULT_DASHBOARD_INTEGRATION_CONFIG = {

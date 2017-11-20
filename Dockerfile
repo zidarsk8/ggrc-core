@@ -8,6 +8,7 @@ RUN curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     fabric \
     git-core \
     google-chrome-stable \
+    graphviz \
     libfontconfig \
     make \
     mysql-client \

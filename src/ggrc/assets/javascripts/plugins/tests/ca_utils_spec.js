@@ -5,12 +5,9 @@
 
 'use strict';
 
-describe('GGRC utils isEmptyCustomAttribute() method', function () {
-  var isEmptyCA;
+import { isEmptyCustomAttribute as isEmptyCA } from '../../plugins/utils/ca-utils';
 
-  beforeAll(function () {
-    isEmptyCA = GGRC.Utils.CustomAttributes.isEmptyCustomAttribute;
-  });
+describe('GGRC utils isEmptyCustomAttribute() method', function () {
 
   describe('check undefined value', function () {
     it('returns true for undefined', function () {

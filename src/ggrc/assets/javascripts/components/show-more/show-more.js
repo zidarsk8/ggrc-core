@@ -59,10 +59,11 @@
         showAllButtonText: {
           get: function () {
             var items = this.attr('items');
+            var limit = this.attr('limit');
             var shouldShowAllItems = this.attr('shouldShowAllItems');
 
             return !shouldShowAllItems ?
-              'Show more (' + items.length + ')' :
+              'Show more (' + (items.length - limit) + ')' :
               'Show less';
           }
         }
