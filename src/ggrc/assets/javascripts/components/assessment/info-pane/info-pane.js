@@ -43,6 +43,7 @@ import {
   'use strict';
   var tpl = can.view(GGRC.mustache_path +
     '/components/assessment/info-pane/info-pane.mustache');
+  const editableStatuses = ['Not Started', 'In Progress', 'Rework Needed'];
 
   /**
    * Assessment Specific Info Pane View Component
@@ -138,9 +139,10 @@ import {
         editMode: {
           type: 'boolean',
           get: function () {
-            return this.attr('instance.status') !== 'Completed' &&
-              this.attr('instance.status') !== 'In Review' &&
-              !this.attr('instance.archived');
+            let status = this.attr('instance.status');
+
+            return !this.attr('instance.archived') &&
+              editableStatuses.includes(status);
           },
           set: function () {
             this.onStateChange({state: 'In Progress', undo: false});
