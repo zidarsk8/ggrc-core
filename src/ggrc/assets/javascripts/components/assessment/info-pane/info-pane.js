@@ -33,6 +33,7 @@ import '../../tabs/tab-container';
 import './inline-item';
 import './create-url';
 import './confirm-edit-action';
+import '../../multi-select-label/multi-select-label';
 import {
   buildParam,
   batchRequests,
