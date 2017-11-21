@@ -19,11 +19,11 @@ var objectStateToWarningMap = {
 };
 var viewModel;
 
-define('GGRC.Components.bulkUpdateTargetState', function () {
+describe('GGRC.Components.bulkUpdateTargetState', function () {
   beforeAll(function () {
     viewModel = new (can.Map.extend(Component.prototype.viewModel));
   });
-  define('warningMessage property', function () {
+  describe('warningMessage property', function () {
     it('should return appropriate warnings for objects', function () {
       var objectStatesMap = {
         CycleTaskGroupObjectTask: ['Assigned', 'InProgress', 'Finished',

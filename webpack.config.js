@@ -161,13 +161,6 @@ module.exports = function (env) {
         IS_PERMISSIONS_ENABLED: JSON.stringify(isModuleEnabled('ggrc_basic_permissions')),
         IS_GDRIVE_ENABLED: JSON.stringify(isModuleEnabled('ggrc_gdrive_integration')),
       }),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'common',
-        chunks: ['dashboard', 'import', 'export', 'admin'],
-      }),
-      new webpack.optimize.CommonsChunkPlugin({
-        name: 'vendor',
-      }),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new ManifestPlugin({
         publicPath: STATIC_FOLDER,
@@ -193,6 +186,19 @@ module.exports = function (env) {
       }),
       new CleanWebpackPlugin(['./src/ggrc/static/'], {
         exclude: ['dashboard-templates*'],
+      }),
+    ];
+  }
+
+  if (!env || (env && !env.test)) {
+    config.plugins = [
+      ...config.plugins,
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'common',
+        chunks: ['dashboard', 'import', 'export', 'admin'],
+      }),
+      new webpack.optimize.CommonsChunkPlugin({
+        name: 'vendor',
       }),
     ];
   }
