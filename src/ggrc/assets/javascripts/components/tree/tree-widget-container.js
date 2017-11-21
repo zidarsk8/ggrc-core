@@ -50,12 +50,6 @@ import Pagination from '../base-objects/pagination';
 
 var viewModel;
 
-if (!GGRC.tree_view) {
-  GGRC.tree_view = new can.Map();
-}
-GGRC.tree_view.attr('basic_model_list', []);
-GGRC.tree_view.attr('sub_tree_for', {});
-
 viewModel = can.Map.extend({
   define: {
     /**
