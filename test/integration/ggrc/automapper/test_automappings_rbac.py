@@ -3,12 +3,14 @@
 
 """Test automappings"""
 
+import ddt
 
 from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc import api_helper
 
 
+@ddt.ddt
 class TestAutomappings(TestCase):
   """Test automappings"""
 
@@ -22,14 +24,19 @@ class TestAutomappings(TestCase):
         object_type="Issue",
     ).one()
 
-  def test_issue_audit_creator(self):
-    """Test automapping issue to audit for a creator.
+  @ddt.data(
+      "user@example.com",
+      "Creator_and_ProgramManager@example.com",
+      "Creator_and_Auditor@example.com",
+  )
+  def test_issue_audit_creator(self, user_email):
+    """Test automapping issue to audit for {}.
 
     This test should check if the issue is automapped to an audit when a
     creator raises an issue on an assessment that belongs to the given audit.
     """
-    creator = all_models.Person.query.filter_by(name="creator").first()
-    self.api.set_user(creator)
+    user = all_models.Person.query.filter_by(email=user_email).one()
+    self.api.set_user(user)
     assessment = all_models.Assessment.query.first()
     response = self.api.post(all_models.Issue, data=[{
         "issue": {
@@ -37,8 +44,8 @@ class TestAutomappings(TestCase):
             "access_control_list": [{
                 "ac_role_id": self.issue_admin_role.id,
                 "person": {
-                    "type": creator.type,
-                    "id": creator.id
+                    "type": user.type,
+                    "id": user.id
                 }
             }],
             "assessment": {
