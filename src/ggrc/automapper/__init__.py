@@ -139,7 +139,10 @@ class AutomapperGenerator(object):
 
   @staticmethod
   def _can_map_to(obj, parent_relationship):
-    return is_allowed_update(obj.type, obj.id, parent_relationship.context)
+    context_id = None
+    if parent_relationship.context:
+      context_id = parent_relationship.context.id
+    return is_allowed_update(obj.type, obj.id, context_id)
 
   def _flush(self, parent_relationship):
     """Manually INSERT generated automappings."""
