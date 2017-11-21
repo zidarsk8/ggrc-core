@@ -6,7 +6,6 @@
 .ggrc-form {
 
   &__title {
-    display: -webkit-box;
     font-size: 11px;
     text-transform: uppercase;
     font-weight: bold;
@@ -16,9 +15,7 @@
     position: relative;
     overflow: hidden;
     text-overflow: ellipsis;
-    word-wrap: break-word;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
   }
 
   &.ggrc-form-multiple-columns {
