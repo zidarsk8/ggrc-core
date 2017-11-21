@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../object-list-item/business-object-list-item';
+import '../read-more/read-more';
+
 (function (can, GGRC) {
   'use strict';
 

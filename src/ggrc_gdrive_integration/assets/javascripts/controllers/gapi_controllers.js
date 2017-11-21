@@ -4,38 +4,6 @@
 */
 
 (function (CMS, GGRC, can, $) {
-  GGRC.Controllers.Modals('GGRC.Controllers.GAPIModal', {
-    defaults: {
-      skip_refresh: true,
-      content_view: GGRC.mustache_path + '/gdrive/auth_button.mustache'
-    },
-    init: function () {
-      this._super.apply(this, arguments);
-      this.defaults.button_view = can.view.mustache('');
-    }
-  }, {
-    init: function () {
-      this._super();
-      this.element.trigger('shown');
-    },
-    '{scopes} change': function () {
-      this.element.trigger('shown');
-    },
-    '{$content} a.btn[data-toggle=gapi]:not(.disabled) click': function (el) {
-      el.addClass('disabled');
-      GGRC.Controllers.GAPI.doGAuth_step2(null, true);
-      GGRC.Controllers.GAPI.oauth_dfd.always(
-        $.proxy(this.element, 'modal_form', 'hide')
-      );
-    },
-    ' hide': function () {
-      if (GGRC.Controllers.GAPI.oauth_dfd.state() === 'pending') {
-        GGRC.Controllers.GAPI.oauth_dfd.reject('User canceled operation');
-      }
-      this.element && this.element.remove();
-    }
-  });
-
   can.Control('GGRC.Controllers.GAPI', {
     canonical_instance: null,
     oauth_dfd: new $.Deferred(),

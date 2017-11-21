@@ -16,9 +16,9 @@
 - [ ] I have applied the correct milestone and labels.
 - [ ] My changes fix the issue described in the description (and do nothing else). 🤞
 - [ ] My changes are covered by tests.
-- [ ] My changes follow our [performance guidelines](https://github.com/google/ggrc-core/blob/dev/docs/source/guidelines/performance.rst).
-- [ ] My changes follow our [js](https://github.com/google/ggrc-core/blob/dev/docs/source/guidelines/javascript.rst) and/or [python](https://github.com/google/ggrc-core/blob/dev/docs/source/guidelines/python.rst) guidelines.
-- [ ] My commits follow our [commit guidelines](https://github.com/google/ggrc-core/blob/dev/docs/source/guidelines/git/how_to_write_a_commit_message.rst).
+- [ ] My changes follow our [performance guidelines](https://github.com/google/ggrc-core/blob/dev/docs/source/contributing/performance.rst).
+- [ ] My changes follow our [js](https://github.com/google/ggrc-core/blob/dev/docs/source/contributing/javascript.rst) and/or [python](https://github.com/google/ggrc-core/blob/dev/docs/source/contributing/python.rst) guidelines.
+- [ ] My commits follow our [commit guidelines](https://github.com/google/ggrc-core/blob/dev/docs/source/contributing/git/how_to_write_a_commit_message.rst).
 
 <!-- If your PR includes a migration include the additional checklist items
 # Migration checklist
@@ -39,4 +39,13 @@
 # TODO
 
 - [ ] First item on the TODO
+-->
+
+<!-- If your PR depends on other tickets or PRs, you can list them here
+# Dependencies
+
+This PR is `on hold` until the dependencies are merged:
+
+- [ ] GGRC-1234
+- [ ] #1234
 -->

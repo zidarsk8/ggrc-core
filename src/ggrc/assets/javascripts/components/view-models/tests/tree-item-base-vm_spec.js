@@ -3,23 +3,28 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
+import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
+import * as ObjectVersions from '../../../plugins/utils/object-versions-utils';
+import BaseTreeItemVM from '../tree-item-base-vm';
+
 describe('GGRC.VM.BaseTreeItemVM', function () {
   'use strict';
 
   var vm;
 
   beforeEach(function () {
-    vm = new GGRC.VM.BaseTreeItemVM();
+    vm = new BaseTreeItemVM();
   });
 
   describe('initChildTreeDisplay() method', function () {
     beforeEach(function () {
-      spyOn(GGRC.Utils.TreeView, 'getModelsForSubTier')
+      spyOn(TreeViewUtils, 'getModelsForSubTier')
         .and.returnValue({
           available: ['Foo', 'Bar', 'Baz'],
           selected: ['Foo'],
         });
-      spyOn(GGRC.Utils.ObjectVersions, 'getWidgetConfig')
+      spyOn(ObjectVersions, 'getWidgetConfig')
         .and.callFake(function (model) {
           return {
             widgetName: model + 'Widget',
@@ -122,7 +127,7 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
 
       describe('toggle "expanded" option if page is "Workflow"', ()=> {
         beforeEach(()=> {
-          spyOn(GGRC.Utils.CurrentPage, 'getPageType')
+          spyOn(CurrentPageUtils, 'getPageType')
             .and.returnValue('Workflow');
         });
         it('when option was false', ()=> {
@@ -143,7 +148,7 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
       });
 
       it('call select() if page is not Workflow', ()=> {
-        spyOn(GGRC.Utils.CurrentPage, 'getPageType')
+        spyOn(CurrentPageUtils, 'getPageType')
           .and.returnValue('AnotherType');
         vm.attr('result', true);
 
@@ -162,7 +167,7 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
 
       describe('toggle "expanded" option if page is "Workflow"', ()=> {
         beforeEach(()=> {
-          spyOn(GGRC.Utils.CurrentPage, 'getPageType')
+          spyOn(CurrentPageUtils, 'getPageType')
             .and.returnValue('Workflow');
         });
 
@@ -184,7 +189,7 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
       });
 
       it('call select() if page is not Workflow', ()=> {
-        spyOn(GGRC.Utils.CurrentPage, 'getPageType')
+        spyOn(CurrentPageUtils, 'getPageType')
           .and.returnValue('AnotherType');
         vm.attr('result', true);
 

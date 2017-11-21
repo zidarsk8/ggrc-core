@@ -384,7 +384,7 @@ class ModalCreateNewControl(BaseModalCreateNew):
     """Locators for Create new Control modals visible when creating from LHN.
     """
     @staticmethod
-    def get_assessor_row(first_id, second_id):
+    def get_assignee_row(first_id, second_id):
       return (
           By.CSS_SELECTOR,
           '.modal-body div>form>div>div:nth-child({})>div:nth-child({}) '
@@ -476,7 +476,7 @@ class ModalCreateNewAsmt(BaseModalCreateNew, CommonAssessment):
 class ModalCreateNewAsmtTmpl(BaseModalCreateNew):
   """Locators for Create new Assessment Template modals."""
   ASSIGNEE_DROPDOWN = (
-      By.CSS_SELECTOR, 'select[can-value="instance.default_people.assessors"]')
+      By.CSS_SELECTOR, 'select[can-value="instance.default_people.assignees"]')
 
 
 class ModalEditObject(BaseModalCreateNew):
@@ -690,6 +690,8 @@ class CommonWidgetInfo(object):
   PEOPLE_VALUE_CSS = (By.CSS_SELECTOR, _PEOPLE_ITEM + " object-list")
   # user input elements
   BUTTON_3BBS = (By.XPATH, _INFO_WIDGET_XPATH + "//*[@data-toggle='dropdown']")
+  # controllers
+  TAB_CONTAINER_CSS = (By.CSS_SELECTOR, "tab-container")
 
 
 class WidgetInfoPanel(CommonWidgetInfo):
@@ -809,7 +811,6 @@ class WidgetInfoAssessment(WidgetInfoPanel, CommonAssessment):
       [_ASMT_PANEL, "related-objects[related-items-type='Assessment']"]))
   RELATED_ISSUES_CSS = (By.CSS_SELECTOR, " ".join(
       [_ASMT_PANEL, "related-objects[related-items-type='Issue']"]))
-  ASMT_TAB_CONTAINER_CSS = (By.CSS_SELECTOR, "tab-container")
   # state section
   _PNL_STATE = ".pane-header__toolbar"
   BUTTON_COMPLETE = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-darkBlue")
@@ -817,9 +818,10 @@ class WidgetInfoAssessment(WidgetInfoPanel, CommonAssessment):
   BUTTON_NEEDS_REWORK = (By.CSS_SELECTOR, _PNL_STATE + " button.btn-red")
   ICON_VERIFIED = (By.CSS_SELECTOR, "i.verified-icon")
 
-  class TabContainer(object):
-    TAB_CONTROLLER = (By.CSS_SELECTOR, "ul.nav.nav-tabs")
-    TAB_CONTENT = (By.CSS_SELECTOR, '.tab-pane.active')
+
+class TabContainer(object):
+  TAB_CONTROLLER_CSS = (By.CSS_SELECTOR, "ul.nav.nav-tabs")
+  TAB_CONTENT_CSS = (By.CSS_SELECTOR, '.tab-pane.active')
 
 
 class WidgetInfoAssessmentTemplate(WidgetInfoPanel):
@@ -1165,6 +1167,6 @@ class AssessmentRelatedTable(object):
 class DashboardWidget(object):
   """Locators for DashboardWidget."""
   _TAB_CONTAINER = ".dashboard-widget.info"
-  TAB_CONTAINER = (By.CSS_SELECTOR, _TAB_CONTAINER)
-  TAB_CONTROLLER = (By.CSS_SELECTOR, ".dashboard-list")
-  TAB_CONTENT = (By.CSS_SELECTOR, _TAB_CONTAINER + " iframe")
+  TAB_CONTAINER_CSS = (By.CSS_SELECTOR, _TAB_CONTAINER)
+  TAB_CONTROLLER_CSS = (By.CSS_SELECTOR, ".dashboard-list")
+  TAB_CONTENT_CSS = (By.CSS_SELECTOR, _TAB_CONTAINER + " iframe")

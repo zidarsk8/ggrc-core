@@ -3,6 +3,16 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
+import {
+  isSnapshot,
+} from '../../plugins/utils/snapshot-utils';
+import {
+  related,
+  isObjectContextPage,
+  getPageType,
+} from '../../plugins/utils/current-page-utils';
+
 (function (can, $) {
   function _firstElementChild(el) {
     var i;
@@ -92,9 +102,8 @@
 
     markNotRelatedItem: function () {
       var instance = this.options.instance;
-      var relatedInstances = GGRC.Utils.CurrentPage.related
-        .attr(instance.type);
-      var instanceId = GGRC.Utils.Snapshots.isSnapshot(instance) ?
+      var relatedInstances = related.attr(instance.type);
+      var instanceId = isSnapshot(instance) ?
                         instance.snapshot.child_id :
                         instance.id;
       if (!relatedInstances || relatedInstances &&
@@ -153,12 +162,11 @@
         GGRC.mustache_path + '/base_objects/tree_placeholder.mustache',
         this.options,
         this._ifNotRemoved(function (frag) {
-          var snapshots = GGRC.Utils.Snapshots;
           var model = CMS.Models[this.options.instance.type];
           this.replace_element(frag);
           this._draw_node_deferred.resolve();
           this.options.expanded = false;
-          if (snapshots.isSnapshot(this.options.instance)) {
+          if (isSnapshot(this.options.instance)) {
             model.removeFromCacheById(this.options.instance.id);
           }
           delete this._expand_deferred;
@@ -252,7 +260,6 @@
       var oldEl = this.element;
       var oldData;
       var firstchild;
-      var pageUtils = GGRC.Utils.CurrentPage;
 
       if (!this.element) {
         return;
@@ -270,8 +277,8 @@
         .data(oldData);
 
       if (this.options.is_subtree &&
-        pageUtils.isObjectContextPage() &&
-        pageUtils.getPageType() !== 'Workflow') {
+        isObjectContextPage() &&
+        getPageType() !== 'Workflow') {
         this.markNotRelatedItem();
       }
       this.on();
@@ -283,7 +290,7 @@
 
     display_path: function (path) {
       return this.display().then(this._ifNotRemoved(function () {
-        return GGRC.Utils.TreeView.displayTreeSubpath(this.element, path);
+        return TreeViewUtils.displayTreeSubpath(this.element, path);
       }.bind(this)));
     },
 

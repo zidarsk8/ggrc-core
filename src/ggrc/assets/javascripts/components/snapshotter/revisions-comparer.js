@@ -2,6 +2,9 @@
  Copyright (C) 2016 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
+
+import {confirm} from '../../plugins/utils/modals';
+
 (function (can, $) {
   'use strict';
 
@@ -20,7 +23,7 @@
         var revisionsLength = rightRevisions.length;
         var newRevisionID;
         newRevisionID = rightRevisions[revisionsLength - 1].id;
-        GGRC.Controllers.Modals.confirm({
+        confirm({
           modal_title: 'Compare with the latest version',
           modal_description: 'Loading...',
           header_view: GGRC.mustache_path +

@@ -99,7 +99,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
   create: 'POST /api/systems',
   update: 'PUT /api/systems/{id}',
   destroy: 'DELETE /api/systems/{id}',
-  mixins: ['ca_update'],
+  mixins: ['ca_update', 'accessControlList'],
   cache: can.getObject('cache', CMS.Models.SystemOrProcess, true),
   is_custom_attributable: true,
   isRoleable: true,
@@ -159,7 +159,7 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
   sub_tree_view_options: {
     default_filter: ['Risk'],
   },
-  mixins: ['ca_update'],
+  mixins: ['ca_update', 'accessControlList'],
   statuses: ['Draft', 'Deprecated', 'Active'],
   init: function () {
     can.extend(this.attributes, CMS.Models.SystemOrProcess.attributes);

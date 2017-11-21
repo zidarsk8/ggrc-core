@@ -11,7 +11,7 @@ from lib.constants import objects, url, path, messages, element, regex
 from lib.element.tab_containers import DashboardWidget
 from lib.entities.entity import Entity
 from lib.page import dashboard
-from lib.page.widget.info_widget import SnapshotableInfoPanel
+from lib.page.widget.info_widget import SnapshotedInfoPanel
 from lib.utils import selenium_utils, file_utils, string_utils
 
 
@@ -76,7 +76,7 @@ class BaseWebUiService(object):
                      if k == "created_at" else v)
                  for k, v in comment.iteritems()} for comment in val]
           # convert multiple values to list of strings and split if need it
-          if (key in ["owners", "assessor", "creator", "verifier"] and
+          if (key in ["owners", "assignee", "creator", "verifier"] and
              not isinstance(val, list)):
             # split Tree View values if need 'Ex1, Ex2 F' to ['Ex1', 'Ex2 F']
             # Info Widget values will be represent by internal methods
@@ -415,7 +415,7 @@ class SnapshotsWebUiService(BaseWebUiService):
     obj_info_panel.open_link_get_latest_ver().confirm_update()
     objs_widget.tree_view.wait_loading_after_actions()
     selenium_utils.get_when_invisible(
-        self.driver, SnapshotableInfoPanel.locator_link_get_latest_ver)
+        self.driver, SnapshotedInfoPanel.locator_link_get_latest_ver)
 
   def is_obj_updateble_via_info_panel(self, src_obj, obj):
     """Open generic widget of mapped objects, select snapshotable object from
@@ -463,7 +463,7 @@ class AssessmentTemplatesService(BaseWebUiService):
     Tree View, fill data according to object attributes and create new object.
     """
     (self._open_create_modal_and_fill_data(src_obj, obj).
-     select_assignee(obj.assessors).save_and_close())
+     select_assignee(obj.assignees).save_and_close())
 
 
 class AssessmentsService(BaseWebUiService):
@@ -513,7 +513,7 @@ class AssessmentsService(BaseWebUiService):
     And return result of validation of all items.
     """
     asmt_page = self.open_info_page_of_obj(obj)
-    return asmt_page.workflow_container.get_tab_object(
+    return asmt_page.tab_container.get_tab_object(
         element.AssessmentTabContainer.CHANGE_LOG_TAB)
 
   def get_related_asmts_titles(self, obj):
@@ -521,7 +521,7 @@ class AssessmentsService(BaseWebUiService):
     Info Page. And return list of related Assessments Titles.
     """
     asmt_page = self.open_info_page_of_obj(obj=obj)
-    related_asmts_tab = asmt_page.workflow_container.get_tab_object(
+    related_asmts_tab = asmt_page.tab_container.get_tab_object(
         element.AssessmentTabContainer.RELATED_ASMTS_TAB)
     return related_asmts_tab.get_related_titles()
 
@@ -530,7 +530,7 @@ class AssessmentsService(BaseWebUiService):
     Info Page. And return list of related Issues Titles.
     """
     asmt_page = self.open_info_page_of_obj(obj=obj)
-    related_issues_tab = asmt_page.workflow_container.get_tab_object(
+    related_issues_tab = asmt_page.tab_container.get_tab_object(
         element.AssessmentTabContainer.RELATED_ISSUES_TAB)
     return [issue[element.RelatedIssuesTab.TITLE.upper()]
             for issue in related_issues_tab.get_items()]
@@ -540,7 +540,7 @@ class AssessmentsService(BaseWebUiService):
     Assessment Info Page and raise Issue.
     """
     asmt_page = self.open_info_page_of_obj(obj=src_obj)
-    related_issues_tab = asmt_page.workflow_container.get_tab_object(
+    related_issues_tab = asmt_page.tab_container.get_tab_object(
         element.AssessmentTabContainer.RELATED_ISSUES_TAB)
     related_issues_tab.raise_issue(issue_entity=issue_obj)
 

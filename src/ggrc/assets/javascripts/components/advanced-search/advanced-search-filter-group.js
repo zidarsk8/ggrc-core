@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
+import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -14,7 +17,7 @@
    * Contains logic used in Filter Group component
    * @constructor
    */
-  var viewModel = GGRC.VM.AdvancedSearchContainer.extend({
+  var viewModel = AdvancedSearchContainer.extend({
     /**
      * Contains available attributes for specific model.
      * @type {can.List}
@@ -25,8 +28,8 @@
      */
     addFilterCriterion: function () {
       var items = this.attr('items');
-      items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
-      items.push(GGRC.Utils.AdvancedSearch.create.attribute());
+      items.push(AdvancedSearch.create.operator('AND'));
+      items.push(AdvancedSearch.create.attribute());
     }
   });
 

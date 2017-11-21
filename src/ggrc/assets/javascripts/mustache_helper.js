@@ -4,6 +4,13 @@
 */
 
 import Spinner from 'spin.js';
+import {
+  isInScopeModel,
+  isSnapshotParent,
+} from './plugins/utils/snapshot-utils';
+import {
+  isMyAssessments,
+} from './plugins/utils/current-page-utils';
 
 (function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.
@@ -105,74 +112,6 @@ Mustache.registerHelper("addclass", function (prefix, compute, options) {
     compute.bind('change', callback);
     callback(null, resolve_computed(compute));
   };
-});
-
-/**
-  Add a live bound attribute to an element, avoiding buggy CanJS attribute interpolations.
-  Usage:
-  {{#withattr attrname attrvalue attrname attrvalue...}}<element/>{{/withattr}} to apply to the child element
-  {{{withattr attrname attrvalue attrname attrvalue...}}} to apply to the parent element a la XSLT <xsl:attribute>. Note the triple braces!
-  attrvalue can take mustache tokens, but they should be backslash escaped.
-*/
-Mustache.registerHelper("withattr", function () {
-  var args = can.makeArray(arguments).slice(0, arguments.length - 1)
-  , options = arguments[arguments.length - 1]
-  , attribs = []
-  , that = this.___st4ck ? this[this.length-1] : this
-  , data = can.extend({}, that)
-  , hash = quickHash(args.join("-"), quickHash(that._cid)).toString(36)
-  , attr_count = 0;
-
-  var hook = can.view.hook(function (el, parent, view_id) {
-    var content = options.fn(that);
-
-    if (content) {
-      var frag = can.view.frag(content, parent);
-      var $newel = $(frag.querySelector("*"));
-      var newel = $newel[0];
-
-      el.parentNode ? el.parentNode.replaceChild(newel, el) : $(parent).append($newel);
-      el = newel;
-    } else {
-      //we are inside the element we want to add attrs to.
-      var p = el.parentNode;
-      p.removeChild(el);
-      el = p;
-    }
-
-    function sub_all(el, ev, newVal, oldVal) {
-      var $el = $(el);
-      can.each(attribs, function (attrib) {
-        $el.attr(attrib.name, $("<div>").html(can.view.render(attrib.value, data)).html());
-      });
-    }
-
-    for (var i = 0; i < args.length - 1; i += 2) {
-      var attr_name = args[i];
-      var attr_tmpl = args[i + 1];
-      //set up bindings where appropriate
-      attr_tmpl = attr_tmpl.replace(/\{[^\}]*\}/g, function (match, offset, string) {
-        var token = match.substring(1, match.length - 1);
-        if (typeof data[token] === "function") {
-          data[token].bind && data[token].bind("change." + hash, $.proxy(sub_all, that, el));
-          data[token] = data[token].call(that);
-        }
-
-        that.bind && that.bind(token + "." + hash, $.proxy(sub_all, that, el));
-
-        return "{" + match + "}";
-      });
-      can.view.mustache("withattr_" + hash + "_" + (++attr_count), attr_tmpl);
-      attribs.push({name : attr_name, value : "withattr_" + hash + "_" + attr_count });
-    }
-
-    sub_all(el);
-
-  });
-
-  return "<div"
-  + hook
-  + " data-replace='true'/>";
 });
 
 Mustache.registerHelper("if_equals", function (val1, val2, options) {
@@ -549,27 +488,6 @@ can.each(["with_page_object_as", "with_current_user_as"], function (fname) {
       return options.inverse(options.contexts);
     }
   });
-});
-
-Mustache.registerHelper("iterate", function () {
-  var i = 0, j = 0
-  , args = can.makeArray(arguments).slice(0, arguments.length - 1)
-  , options = arguments[arguments.length - 1]
-  , step = options.hash && options.hash.step || 1
-  , ctx = {}
-  , ret = [];
-
-  options.hash && options.hash.listen && Mustache.resolve(options.hash.listen);
-
-  for (; i < args.length; i += step) {
-    ctx.iterator = typeof args[i] === "string" ? new String(args[i]) : args[i];
-    for (j = 0; j < step; j++) {
-      ctx["iterator_" + j] = typeof args[i + j] === "string" ? new String(args[i + j]) : args[i + j];
-    }
-    ret.push(options.fn(options.contexts.add(ctx)));
-  }
-
-  return ret.join("");
 });
 
 // Iterate over a string by spliting it by a separator
@@ -1357,7 +1275,7 @@ function get_observe_context(scope) {
   });
 
   Mustache.registerHelper('isMyAssessments', function (options) {
-    return GGRC.Utils.CurrentPage.isMyAssessments() ?
+    return isMyAssessments() ?
       options.fn(options.contexts) :
       options.inverse(options.contexts);
   });
@@ -2346,10 +2264,11 @@ Mustache.registerHelper("add_to_current_scope", function (options) {
     if (arguments.length !== 3) {
       throw new Error(
         'Invalid number of arguments (' +
-        (arguments.length - 1) +  // do not count the auto-provided options arg
+        (arguments.length - 1) + // do not count the auto-provided options arg
         '), expected 2.');
     }
 
+    modelName = Mustache.resolve(modelName);
     model = CMS.Models[modelName];
 
     if (typeof model === 'undefined') {
@@ -2523,13 +2442,12 @@ Example:
   );
 
   Mustache.registerHelper('isNotInScopeModel', function (modelName, options) {
-    var isInScopeModel;
+    var isInScope;
     modelName = can.isFunction(modelName) ? modelName() : modelName;
-    isInScopeModel = GGRC.Utils.Snapshots.isInScopeModel(modelName);
+    isInScope = isInScopeModel(modelName);
     // Temporary Modification to remove possibility to unmap Audit
-    isInScopeModel =
-      isInScopeModel || GGRC.Utils.Snapshots.isSnapshotParent(modelName);
-    return isInScopeModel ? options.inverse(this) : options.fn(this);
+    isInScope = isInScope || isSnapshotParent(modelName);
+    return isInScope ? options.inverse(this) : options.fn(this);
   });
 
   /**
@@ -2706,6 +2624,30 @@ Example:
       }
 
       return options.fn(options.contexts);
+    }
+  );
+
+  Mustache.registerHelper('displayAssessmentIssueTracker',
+    function (canUseIssueTracker, checkParentIntegration, options) {
+      const enabled = GGRC.ISSUE_TRACKER_ENABLED;
+      canUseIssueTracker = Mustache.resolve(canUseIssueTracker);
+
+      if (!options) {
+        options = checkParentIntegration;
+        checkParentIntegration = false;
+      } else {
+        checkParentIntegration = Mustache.resolve(checkParentIntegration);
+      }
+
+      if (!checkParentIntegration) {
+        return enabled ?
+          options.fn(options.contexts) :
+          options.inverse(options.contexts);
+      }
+
+      return canUseIssueTracker && enabled ?
+        options.fn(options.contexts) :
+        options.inverse(options.contexts);
     }
   );
 })(jQuery, can);

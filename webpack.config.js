@@ -16,6 +16,17 @@ const isProd = ENV.NODE_ENV === 'production';
 var BundleAnalyzerPlugin;
 
 const STATIC_FOLDER = '/static/';
+const enabledModules = _.compact(_.map(ENV.GGRC_SETTINGS_MODULE.split(' '), function (module) {
+  var name;
+  if (/^ggrc/.test(module)) {
+    name = module.split('.')[0];
+  }
+
+  if (!name) {
+    return '';
+  }
+  return name;
+}));
 
 module.exports = function (env) {
   const extractSass = new ExtractTextPlugin({
@@ -27,12 +38,14 @@ module.exports = function (env) {
     entry: {
       vendor: 'entrypoints/vendor',
       styles: 'entrypoints/styles',
-      dashboard: ['entrypoints/dashboard'].concat(getExtraModules())
+      dashboard: ['entrypoints/dashboard']
+        .concat(enabledModules.map(name => `./src/${name}/assets/javascripts`))
         .concat(['entrypoints/dashboard/bootstrap']),
       login: 'entrypoints/login',
     },
     output: {
-      filename: isProd ? '[name].[chunkhash].js' : '[name].js',
+      filename: isProd ? '[name].[chunkhash].js' : '[name].js?[hash]',
+      chunkFilename: isProd ? 'chunk.[name].[chunkhash].js' :'chunk.[name].js?[hash]',
       sourceMapFilename: '[file].map',
       path: path.join(__dirname, './src/ggrc/static/'),
       publicPath: STATIC_FOLDER,
@@ -142,7 +155,11 @@ module.exports = function (env) {
         moment: 'moment',
       }),
       new webpack.DefinePlugin({
-        GGRC_SETTINGS_MODULE: JSON.stringify(process.env.GGRC_SETTINGS_MODULE),
+        IS_RISKS_ENABLED: JSON.stringify(isModuleEnabled('ggrc_risks')),
+        IS_WORKFLOWS_ENABLED: JSON.stringify(isModuleEnabled('ggrc_workflows')),
+        IS_RISK_ASSESSMENTS_ENABLED: JSON.stringify(isModuleEnabled('ggrc_risk_assessments')),
+        IS_PERMISSIONS_ENABLED: JSON.stringify(isModuleEnabled('ggrc_basic_permissions')),
+        IS_GDRIVE_ENABLED: JSON.stringify(isModuleEnabled('ggrc_gdrive_integration')),
       }),
       new webpack.optimize.CommonsChunkPlugin({
         name: 'vendor',
@@ -186,18 +203,6 @@ module.exports = function (env) {
   return config;
 };
 
-function getExtraModules() {
-  var modules = ENV.GGRC_SETTINGS_MODULE.split(' ');
-
-  return _.compact(_.map(modules, function (module) {
-    var name;
-    if (/^ggrc/.test(module)) {
-      name = module.split('.')[0];
-    }
-
-    if (!name) {
-      return '';
-    }
-    return './src/' + name + '/assets/javascripts';
-  }));
+function isModuleEnabled(name) {
+  return enabledModules.indexOf(name) > -1;
 }

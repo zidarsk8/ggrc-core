@@ -68,11 +68,8 @@ class BaseRestService(object):
 
   def update_obj(self, obj, **attrs):
     """Update attributes values of existing object via REST API."""
-    obj.update_attrs(**attrs)
     return self.set_obj_attrs(obj=obj, attrs=self.get_items_from_resp(
-        self.client.update_object(
-            href=obj.href, **dict({k: v for k, v in obj.__dict__
-                                  .iteritems() if k != "href"}.items()))))
+        self.client.update_object(href=obj.href, **attrs)))
 
   @staticmethod
   def get_items_from_resp(response):
@@ -205,20 +202,6 @@ class AssessmentsService(BaseRestService):
   """Service for working with Assessments entities."""
   def __init__(self):
     super(AssessmentsService, self).__init__(url.ASSESSMENTS)
-
-  def create_objs(self, count, factory_params=None, **attrs_for_template):
-    """Create new Assessments and make default relationships of Persons:
-    'Creator', 'Assessor' to them via REST API and return list of created
-    objects with filtered attributes.
-    """
-    objs = BaseRestService(self.endpoint).create_objs(
-        count, factory_params, **attrs_for_template)
-    assignees = [assignee for obj in objs for assignee in obj.assignees]
-    if assignees:
-      RelationshipsService().map_objs(
-          src_obj=ObjectPersonsFactory().default(), dest_objs=objs,
-          attrs={"AssigneeType": ",".join(assignees)})
-    return objs
 
 
 class IssuesService(BaseRestService):

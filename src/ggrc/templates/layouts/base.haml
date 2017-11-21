@@ -41,6 +41,10 @@
       :javascript
         GGRC.DASHBOARD_INTEGRATION={{config.get("DASHBOARD_INTEGRATION") | safe}};
 
+    -if config.get("ISSUE_TRACKER_ENABLED")
+      :javascript
+        GGRC.ISSUE_TRACKER_ENABLED=true;
+
     -assets "dashboard-js-templates"
       %script{ type:'text/javascript', src:"={ASSET_URL|with_static_subdomain}" }
     -endassets

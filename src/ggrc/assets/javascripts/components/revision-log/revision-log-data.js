@@ -5,6 +5,7 @@
 
 var viewModel = can.Map.extend({
   data: null,
+  isLoading: false,
   define: {
     isObject: {
       type: 'boolean',

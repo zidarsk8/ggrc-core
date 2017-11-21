@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
+import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -14,7 +17,7 @@
    * Contains logic used in Mapping Group component.
    * @constructor
    */
-  var viewModel = GGRC.VM.AdvancedSearchContainer.extend({
+  var viewModel = AdvancedSearchContainer.extend({
     /**
      * Contains specific model name.
      * @type {string}
@@ -33,8 +36,8 @@
      */
     addMappingCriteria: function () {
       var items = this.attr('items');
-      items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
-      items.push(GGRC.Utils.AdvancedSearch.create.mappingCriteria());
+      items.push(AdvancedSearch.create.operator('AND'));
+      items.push(AdvancedSearch.create.mappingCriteria());
     }
   });
 

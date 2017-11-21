@@ -8,6 +8,7 @@ import {
   applyChangesToCustomAttributeValue,
 }
   from '../../plugins/utils/ca-utils';
+import {VALIDATION_ERROR} from '../../events/eventTypes';
 
 (function (GGRC, can) {
   'use strict';
@@ -72,6 +73,9 @@ import {
           .each(function (field) {
             self.performValidation(field, true);
           });
+        if (this.attr('instance.hasValidationErrors')) {
+          this.dispatch(VALIDATION_ERROR);
+        }
       },
       performValidation: function (field, formInitCheck) {
         var fieldValid;

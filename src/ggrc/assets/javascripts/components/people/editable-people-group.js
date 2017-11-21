@@ -5,10 +5,13 @@
 
 import './people-group-modal';
 import './editable-people-group-header';
+import '../autocomplete/autocomplete';
+import '../external-data-autocomplete/external-data-autocomplete';
+import peopleGroupVM from '../view-models/people-group-vm';
 
 const SHOW_MODAL_LIMIT = 4;
 
-var viewModel = GGRC.VM.DeletablePeopleGroup.extend({
+var viewModel = peopleGroupVM.extend({
   title: '@',
   canEdit: {},
   showPeopleGroupModal: false,

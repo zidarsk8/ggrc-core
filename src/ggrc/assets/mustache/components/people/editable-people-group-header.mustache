@@ -15,10 +15,10 @@
       ({{peopleCount}})
     </div>
   </div>
+  {{#if required}}
+    <i class="fa fa-asterisk"></i>
+  {{/if}}
   {{#if canEdit}}
-    {{#if required}}
-      <i class="fa fa-asterisk"></i>
-    {{/if}}
     {{#unless editableMode}}
       <div class="action-toolbar__controls">
         <action-toolbar-control>

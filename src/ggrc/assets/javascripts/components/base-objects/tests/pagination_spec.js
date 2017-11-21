@@ -3,14 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-describe('GGRC.VM.Pagination', function () {
+import Pagination from '../pagination';
+
+describe('Pagination', function () {
   'use strict';
 
   var paginationViewModel;
 
   describe('current property', function () {
     beforeEach(function () {
-      paginationViewModel = new GGRC.VM.Pagination();
+      paginationViewModel = new Pagination();
     });
     it('returns 1 when was not set previously', function () {
       var result;
@@ -41,7 +43,7 @@ describe('GGRC.VM.Pagination', function () {
   });
   describe('pageSize property', function () {
     beforeEach(function () {
-      paginationViewModel = new GGRC.VM.Pagination();
+      paginationViewModel = new Pagination();
     });
     it('returns default value when was not updated', function () {
       var result;
@@ -69,10 +71,19 @@ describe('GGRC.VM.Pagination', function () {
       result = paginationViewModel.attr('current');
       expect(result).toEqual(1);
     });
+    it('does not update current page when pageSize does not changed',
+    function () {
+      var result;
+      paginationViewModel.attr('count', 3);
+      paginationViewModel.attr('current', 2);
+      paginationViewModel.attr('pageSize', 5); // set the same pageSize value
+      result = paginationViewModel.attr('current');
+      expect(result).toEqual(2);
+    });
   });
   describe('limits property', function () {
     beforeEach(function () {
-      paginationViewModel = new GGRC.VM.Pagination();
+      paginationViewModel = new Pagination();
     });
     it('returns info about items range for current page', function () {
       var result;
@@ -94,7 +105,7 @@ describe('GGRC.VM.Pagination', function () {
   });
   describe('total property', function () {
     beforeEach(function () {
-      paginationViewModel = new GGRC.VM.Pagination();
+      paginationViewModel = new Pagination();
     });
     it('returns undefined when was not initialized previously', function () {
       var result;
