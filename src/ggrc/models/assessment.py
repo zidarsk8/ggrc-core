@@ -77,7 +77,8 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
 
   REWORK_NEEDED = u"Rework Needed"
   NOT_DONE_STATES = statusable.Statusable.NOT_DONE_STATES | {REWORK_NEEDED, }
-  VALID_STATES = tuple(NOT_DONE_STATES | statusable.Statusable.DONE_STATES)
+  VALID_STATES = tuple(NOT_DONE_STATES | statusable.Statusable.DONE_STATES |
+                       statusable.Statusable.INACTIVE_STATES)
 
   class Labels(object):  # pylint: disable=too-few-public-methods
     """Choices for label enum."""
@@ -248,7 +249,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
 
   @orm.reconstructor
   def init_on_load(self):
-      self._warnings = collections.defaultdict(list)
+    self._warnings = collections.defaultdict(list)
 
   def add_warning(self, domain, msg):
     self._warnings[domain].append(msg)
