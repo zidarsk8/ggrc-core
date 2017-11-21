@@ -43,6 +43,9 @@ import {
   initMappedInstances,
 } from '../../plugins/utils/current-page-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
+import {
+  getWidgetConfig,
+} from '../../plugins/utils/object-versions-utils';
 import Pagination from '../base-objects/pagination';
 
 var viewModel;
@@ -119,8 +122,7 @@ viewModel = can.Map.extend({
           };
         }
 
-        return GGRC.Utils.ObjectVersions
-          .getWidgetConfig(modelName, true);
+        return getWidgetConfig(modelName, true);
       },
     },
     statusFilterVisible: {

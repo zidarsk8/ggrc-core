@@ -31,6 +31,11 @@ import '../components/gca-controls/gca-controls';
 import '../components/datepicker/datepicker';
 import '../components/external-data-autocomplete/inline-autocomplete-wrapper';
 import {BUTTON_VIEW_DONE} from '../plugins/utils/modals'
+import {
+  checkPreconditions,
+  becameDeprecated,
+} from '../plugins/utils/controllers';
+
 
 export default can.Control({
   pluginName: 'ggrc_controllers_modals',
@@ -715,14 +720,14 @@ export default can.Control({
     }
 
     if (applyPreconditions) {
-      GGRC.Utils.Controllers.checkPreconditions({
+      checkPreconditions({
         instance: instance,
         operation: 'deprecation',
         // functions that will be called as an extra conditions (return true
         // or false). If all conditions are passed then are showed a
         // message else - called success handler.
         extraConditions: [
-          GGRC.Utils.Controllers.becameDeprecated.bind(
+          becameDeprecated.bind(
             null,
             instance,
             oldData.status

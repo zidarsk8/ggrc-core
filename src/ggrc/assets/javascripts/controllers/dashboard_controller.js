@@ -7,6 +7,8 @@ import {
   isAdmin,
   getPageType,
 } from '../plugins/utils/current-page-utils';
+import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
+import {isObjectVersion} from '../plugins/utils/object-versions-utils';
 
 (function (can, $) {
   can.Control('CMS.Controllers.Dashboard', {
@@ -299,7 +301,7 @@ import {
             this.element.append(frag);
             if (isAuditScope) {
               const priorityTabsNum = 4 +
-                GGRC.Utils.Dashboards.isDashboardEnabled(instance);
+                isDashboardEnabled(instance);
               this.element.addClass(this.options.instance.type.toLowerCase());
               this.options.attr('addTabTitle', 'Add Scope');
               this.options.attr('hideTabTitle', 'Show Audit Scope');
@@ -463,9 +465,7 @@ import {
       var widgetName;
 
       function getWidgetType(widgetId) {
-        var isObjectVersion = GGRC.Utils.ObjectVersions
-          .isObjectVersion(widgetId);
-        return isObjectVersion ? 'version' : '';
+        return isObjectVersion(widgetId) ? 'version' : '';
       }
 
       if (this.delayed_display) {
