@@ -6,7 +6,7 @@
 
 from ggrc.models import all_models
 from integration.ggrc import TestCase
-from integration.ggrc import generator
+from integration.ggrc import api_helper
 
 
 class TestAutomappings(TestCase):
@@ -14,32 +14,28 @@ class TestAutomappings(TestCase):
 
   def setUp(self):
     super(TestAutomappings, self).setUp()
-    self.gen = generator.ObjectGenerator()
-    self.api = self.gen.api
+    self.api = api_helper.Api()
+    # Using import for the setup for forward-compatibility with Assessment ACL
+    self.import_file("issue_automapping_setup.csv")
+    self.issue_admin_role = all_models.AccessControlRole.query.filter_by(
+        name="Admin",
+        object_type="Issue",
+    ).one()
 
-  def test_issue_audit_crator(self):
+  def test_issue_audit_creator(self):
     """Test automapping issue to audit for a creator.
 
     This test should check if the issue is automapped to an audit when a
     creator raises an issue on an assessment that belongs to the given audit.
     """
-    # Using import for the setup for easier setting of all correct permissions
-    # and users.
-    self.import_file("issue_automapping_setup.csv")
     creator = all_models.Person.query.filter_by(name="creator").first()
-    issue_admin_role = all_models.AccessControlRole.query.filter(
-        all_models.AccessControlRole.name == "Admin",
-        all_models.AccessControlRole.object_type == "Issue",
-    ).one()
     self.api.set_user(creator)
     assessment = all_models.Assessment.query.first()
     response = self.api.post(all_models.Issue, data=[{
         "issue": {
             "status": "Draft",
-            "custom_attribute_definitions": [],
-            "custom_attributes":{},
             "access_control_list": [{
-                "ac_role_id": issue_admin_role.id,
+                "ac_role_id": self.issue_admin_role.id,
                 "person": {
                     "type": creator.type,
                     "id": creator.id
@@ -54,10 +50,6 @@ class TestAutomappings(TestCase):
                 # "table_singular": "assessment"
             },
             "title": "aa",
-            "description": "",
-            "test_plan": "",
-            "notes": "",
-            "slug": "",
             "context": None,
             # Setting the context would make the test match the front-end
             # change that was reverted in 577afd6686
