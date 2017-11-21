@@ -257,6 +257,23 @@ tree-item {
       }
     }
   }
+
+  .labels {
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .with-comma {
+      white-space: nowrap;
+
+      &:after {
+        content: ',';
+      }
+
+      &:last-child:after {
+        content: '';
+      }
+    }
+  }
 }
 
 tree-filter-input {
