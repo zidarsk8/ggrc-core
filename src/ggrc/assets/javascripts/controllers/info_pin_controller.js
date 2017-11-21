@@ -52,25 +52,6 @@ can.Control('CMS.Controllers.InfoPin', {
     }
     return options;
   },
-  loadChildTrees: function () {
-    var childTreeDfds = [];
-    var that = this;
-    var $el;
-    var childTreeControl;
-
-    this.element.find('.' + CMS.Controllers.TreeView._fullName)
-      .each(function (_, el) {
-        $el = $(el);
-
-        //  Ensure this targets only direct child trees, not sub-tree trees
-        if ($el.closest('.' + that.constructor._fullName).is(that.element)) {
-          childTreeControl = $el.control();
-          if (childTreeControl) {
-            childTreeDfds.push(childTreeControl.display());
-          }
-        }
-      });
-  },
   getPinHeight: function (maximizedState) {
     if (maximizedState) {
       return Math.floor($(window).height() * 3 / 4);
@@ -149,8 +130,6 @@ can.Control('CMS.Controllers.InfoPin', {
       TreeViewUtils.isDirectlyRelated(instance));
 
     this.prepareView(opts, el, maximizedState, true);
-    // Load trees inside info pin
-    this.loadChildTrees();
 
     if (instance.info_pane_preload) {
       instance.info_pane_preload();
