@@ -18,7 +18,7 @@
       <tab-container>
         <tab-panel {(panels)}="panels" title-text="{{instance.type}}">
           <div class="info-pane__body">
-            <div class="info-pane__main-content {{^if snapshot}}info-pane__main-content-with-sidebar{{/if}}">
+            <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
               {{>'/static/mustache/base_objects/object-review.mustache'}}
               {{>'/static/mustache/base_objects/description.mustache'}}
               {{>'/static/mustache/issues/remediation_plan.mustache'}}
@@ -77,7 +77,7 @@
               </div><!-- custom-attr-wrap end -->
               {{>'/static/mustache/custom_attributes/info.mustache'}}
             </div>
-            {{^if snapshot}}
+            {{^if isSnapshot}}
             <div class="info-pane__sidebar">
               <comment-data-provider {instance}="instance" class="flex-box flex-col">
                 <div class="info-pane__section-title">Responses/Comments</div>
@@ -96,7 +96,7 @@
             {{/if}}
           </div>
         </tab-panel>
-        {{^if instance.snapshot}}
+        {{^if isSnapshot}}
           <tab-panel {(panels)}="panels" title-text="Change Log">
               <revision-log {instance}="instance"></revision-log>
           </tab-panel>
