@@ -46,6 +46,9 @@
     margin: 0;
     padding: 0;
     position: relative;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
     &--underlined {
       border-bottom: 1px solid $lightGray;
