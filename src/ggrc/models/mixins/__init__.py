@@ -231,7 +231,8 @@ class Described(object):
 
   @declared_attr
   def description(cls):  # pylint: disable=no-self-argument
-    return deferred(db.Column(db.Text), cls.__name__)
+    return deferred(db.Column(db.Text, nullable=False, default=u""),
+                    cls.__name__)
 
   # REST properties
   _api_attrs = reflection.ApiAttributes('description')
@@ -251,7 +252,8 @@ class Noted(object):
 
   @declared_attr
   def notes(cls):  # pylint: disable=no-self-argument
-    return deferred(db.Column(db.Text), cls.__name__)
+    return deferred(db.Column(db.Text, nullable=False, default=u""),
+                    cls.__name__)
 
   # REST properties
   _api_attrs = reflection.ApiAttributes('notes')
@@ -906,7 +908,8 @@ class TestPlanned(object):
 
   @declared_attr
   def test_plan(cls):  # pylint: disable=no-self-argument
-    return deferred(db.Column(db.Text), cls.__name__)
+    return deferred(db.Column(db.Text, nullable=False, default=u""),
+                    cls.__name__)
 
   # REST properties
   _api_attrs = reflection.ApiAttributes('test_plan')

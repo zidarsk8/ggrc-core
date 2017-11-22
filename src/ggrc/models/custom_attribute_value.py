@@ -49,7 +49,7 @@ class CustomAttributeValue(Base, Indexed, db.Model):
   )
   attributable_id = db.Column(db.Integer)
   attributable_type = db.Column(db.String)
-  attribute_value = db.Column(db.String)
+  attribute_value = db.Column(db.String, nullable=False, default=u"")
 
   # When the attibute is of a mapping type this will hold the id of the mapped
   # object while attribute_value will hold the type name.

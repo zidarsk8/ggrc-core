@@ -64,8 +64,8 @@ class TestCommentableImport(TestCase):
     model_cls = inflector.get_model(model_name)
     if issubclass(model_cls, AuditRelationship):
       import_data.append(("Map:Audit", audit))
-    if issubclass(model_cls, Described) and \
-       "description" not in model_cls._aliases:
+    if (issubclass(model_cls, Described) and
+       "description" not in model_cls._aliases) or model_name == "Risk":
       import_data.append(("description", "{}-Description".format(model_name)))
     response = self.import_data(OrderedDict(import_data))
     self._check_csv_response(response, {})
