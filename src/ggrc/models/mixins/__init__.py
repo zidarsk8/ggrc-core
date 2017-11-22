@@ -921,6 +921,25 @@ class TestPlanned(object):
     )
 
 
+class Folderable(object):
+  """Mixin adding the ability to attach folders to an object"""
+
+  @declared_attr
+  def folder(cls):
+    return deferred(db.Column(db.Text, nullable=False, default=""),
+                    cls.__name__)
+
+  @classmethod
+  def indexed_query(cls):
+    return super(Folderable, cls).indexed_query().options(
+        orm.Load(cls).load_only("folder"),
+    )
+
+  _api_attrs = reflection.ApiAttributes('folder')
+  _fulltext_attrs = ['folder']
+  _aliases = {"folder": "Folder"}
+
+
 __all__ = [
     "Base",
     "BusinessObject",
@@ -940,4 +959,5 @@ __all__ = [
     "Titled",
     "VerifiedDate",
     "WithContact",
+    "Folderable",
 ]
