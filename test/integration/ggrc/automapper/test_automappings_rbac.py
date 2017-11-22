@@ -28,6 +28,8 @@ class TestAutomappings(TestCase):
       "user@example.com",
       "Creator_and_ProgramManager@example.com",
       "Creator_and_Auditor@example.com",
+      "Reader_and_ProgramManager@example.com",
+      "Reader_and_Auditor@example.com",
   )
   def test_issue_audit_creator(self, user_email):
     """Test automapping issue to audit for {}.
