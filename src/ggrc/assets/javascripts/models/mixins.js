@@ -453,4 +453,9 @@ import {isSnapshot} from '../plugins/utils/snapshot-utils';
               '&refetch'].join('');
     }
   });
+
+  can.Model.Mixin('base-notifications', {
+    send_by_default: true,
+    recipients: 'Admin,Primary Contacts,Secondary Contacts',
+  });
 })(window.can, window.GGRC);

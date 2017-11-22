@@ -10,6 +10,9 @@ import '../components/assessment/info-pane/info-pane';
 import '../components/folder-attachments-list/folder-attachments-list';
 import '../components/unmap-button/unmap-person-button';
 import '../components/issue-tracker/info-issue-tracker-fields';
+import '../components/comment/comment-data-provider';
+import '../components/comment/comment-add-form';
+import '../components/comment/mapped-comments';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
 import {confirm} from '../plugins/utils/modals';
 

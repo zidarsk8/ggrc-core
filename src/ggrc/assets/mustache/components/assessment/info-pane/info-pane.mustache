@@ -263,14 +263,16 @@
               <div class="assessment-comments">
                 <div class="info-pane__section-title">Responses/Comments</div>
                 {{#unless isEditDenied}}
-                    <comment-add-form class="comment-add-form"
-                                    {instance}="instance"
-                                    {is-saving}="isUpdatingComments"
-                                    (after-create)="addRelatedItem(%event, 'comments')"
-                                    (before-create)="addItems(%event, 'comments')"
-                    ></comment-add-form>
+                    <comment-add-form
+                        class="comment-add-form"
+                        {instance}="instance"
+                        {is-saving}="isUpdatingComments"
+                        (after-create)="addRelatedItem(%event, 'comments')"
+                        (before-create)="addItems(%event, 'comments')"
+                        {notifications-info}="'Notify Assignees and Verifiers'">
+                    </comment-add-form>
                 {{/unless}}
-                <assessment-mapped-comments {mapped-items}="comments"></assessment-mapped-comments>
+                <mapped-comments {mapped-items}="comments"></mapped-comments>
               </div>
             </div>
         </div>

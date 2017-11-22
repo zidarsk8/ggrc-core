@@ -567,11 +567,9 @@
      * @return {String} assignees types separated by commas
      */
     getAssigneeType: function (instance) {
-      const assigneeRoles = ['Assignees', 'Creators', 'Verifiers'];
       let currentUser = GGRC.current_user;
       let roles = GGRC.access_control_roles
-        .filter((item) => item.object_type === instance.type &&
-          assigneeRoles.indexOf(item.name) > -1);
+        .filter((item) => item.object_type === instance.type);
       let userType = null;
 
       if (!instance || !currentUser) {

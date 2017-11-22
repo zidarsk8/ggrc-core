@@ -27,7 +27,7 @@ can.Model.Cacheable('CMS.Models.SystemOrProcess', {
       return CMS.Models.System.model(params);
     }
   },
-  mixins: ['unique_title', 'timeboxed'],
+  mixins: ['unique_title', 'timeboxed', 'base-notifications'],
   attributes: {
     context: 'CMS.Models.Context.stub',
     modified_by: 'CMS.Models.Person.stub',

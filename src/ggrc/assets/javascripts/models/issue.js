@@ -18,6 +18,7 @@
       'mapping-limit-issue',
       'inScopeObjects',
       'accessControlList',
+      'base-notifications',
     ],
     is_custom_attributable: true,
     isRoleable: true,
