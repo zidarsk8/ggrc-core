@@ -342,6 +342,7 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
         cls.FINISHED: (cls.IN_PROGRESS, cls.DECLINED),
         cls.VERIFIED: (cls.FINISHED, ),
         cls.DECLINED: (cls.FINISHED, ),
+        cls.ASSIGNED: (),
     }
     uniq_states = set([item['state'] for item in src])
     if len(list(uniq_states)) != 1:
