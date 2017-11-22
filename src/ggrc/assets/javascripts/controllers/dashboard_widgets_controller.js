@@ -126,9 +126,6 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
   },
   display: function (refetch) {
     var that = this;
-    var tracker_stop = GGRC.Tracker.start(
-      'DashboardWidget', 'display', this.options.model.shortName
-    );
 
     this._display_deferred = this.prepare().then(function () {
       var dfd;
@@ -148,7 +145,7 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
       }
 
       return dfd;
-    }).done(tracker_stop);
+    });
 
     return this._display_deferred;
   },

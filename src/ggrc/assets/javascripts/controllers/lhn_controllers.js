@@ -627,12 +627,11 @@ can.Control('CMS.Controllers.LHN_Search', {
   on_show_list: function (el, ev) {
     var $list = $(el).closest(this.get_lists())
         , model_name = this.get_list_model($list)
-        , tracker_stop = GGRC.Tracker.start('LHN_show_list', model_name)
         , that = this
         ;
 
     setTimeout(function () {
-      that.refresh_visible_lists().done(tracker_stop);
+      that.refresh_visible_lists();
     }, 20);
   },
   '{observer} value': function (el, ev, newval) {
@@ -653,7 +652,6 @@ can.Control('CMS.Controllers.LHN_Search', {
         , results_list = this.options.results_lists[model_name]
         , refresh_queue
         , new_visible_list
-        , tracker_stop = GGRC.Tracker.start('LHN', 'show_more', model_name)
         ;
 
     if (visible_list.length >= results_list.length)
@@ -673,7 +671,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       visible_list.attr('is_loading', false);
         // visible_list.replace(new_visible_list);
       delete that._show_more_pending;
-    }).done(tracker_stop);
+    });
     visible_list.attr('is_loading', true);
   },
 
@@ -930,12 +928,7 @@ can.Control('CMS.Controllers.LHN_Search', {
     }
   },
   run_search: function (term, extra_params) {
-    var self = this
-        , tracker_stop = GGRC.Tracker.start(
-          'LHN_run_search',
-          extra_params && extra_params.contact_id ? 'MyWork' : 'Normal')
-        , filter_list = [];
-
+    var filter_list = [];
 
     if (term !== this.current_term || extra_params !== this.current_params) {
         // Clear current result lists
@@ -975,7 +968,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       return $.when(
             this.refresh_counts(),
             this.refresh_visible_lists()
-          ).done(tracker_stop);
+          );
     }
   },
   get_lists: function () {
