@@ -145,6 +145,7 @@ class AutomapperGenerator(object):
 
   @staticmethod
   def _can_map_to(obj, parent_relationship):
+    """True if the current user can edit obj in parent_relationship.context."""
     context_id = None
     if parent_relationship.context:
       context_id = parent_relationship.context.id
