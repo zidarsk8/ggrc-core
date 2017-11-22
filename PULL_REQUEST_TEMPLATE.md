@@ -1,3 +1,12 @@
+<!-- If your PR depends on other tickets or PRs, you can list them here
+# Dependencies
+
+This PR is `on hold` until the dependencies are merged:
+
+- [ ] GGRC-1234
+- [ ] #1234
+-->
+
 # Issue description
 
 *Explain the issue that the changes in the pull request solve.*
@@ -39,13 +48,4 @@
 # TODO
 
 - [ ] First item on the TODO
--->
-
-<!-- If your PR depends on other tickets or PRs, you can list them here
-# Dependencies
-
-This PR is `on hold` until the dependencies are merged:
-
-- [ ] GGRC-1234
-- [ ] #1234
 -->
