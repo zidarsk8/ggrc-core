@@ -68,6 +68,7 @@ permissions = {
         "ControlAssertion",
         "Control",
         "Comment",
+        "Issue",
         "DataAsset",
         "AccessGroup",
         "Directive",

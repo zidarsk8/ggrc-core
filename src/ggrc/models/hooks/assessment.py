@@ -56,7 +56,7 @@ _STATUS_CHANGE_COMMENT_TMPL = (
 )
 
 _COMMENT_TMPL = (
-    'A new comment is added to the Assessment: %s. '
+    'A new comment is added by %s to the Assessment: %s. '
     'Use the following to link to get more information from the '
     'GGRC Assessment. Link - %s'
 )
@@ -71,14 +71,43 @@ _UNARCHIVED_TMPL = (
     'be tracked within this bug.'
 )
 
-_NO_VERIFIER_STATUSES = {
-    # (from_status, to_status): 'issue_tracker_status'
-    ('In Progress', 'Completed'): 'VERIFIED',
-    ('Not Started', 'Completed'): 'VERIFIED',
-    ('Completed', 'In Progress'): 'ASSIGNED',
-    ('Completed', 'Not Started'): 'ASSIGNED',
+_ENABLED_TMPL = (
+    'Changes to this GGRC Assessment will be tracked within this bug.'
+)
+
+_DISABLED_TMPL = (
+    'Changes to this GGRC Assessment will no longer be '
+    'tracked within this bug.'
+)
+
+# Status values maps from GGRC to IssueTracker.
+_STATUSES = {
+    'Not Started': 'ASSIGNED',
+    'In Progress': 'ASSIGNED',
+    'In Review': 'FIXED',
+    'Rework Needed': 'ASSIGNED',
+    'Completed': 'VERIFIED',
+    'Deprecated': 'OBSOLETE',
 }
 
+# Status transitions map for assessment without verifier.
+_NO_VERIFIER_STATUSES = {
+    # (from_status, to_status): 'issue_tracker_status'
+    ('Not Started', 'Completed'): 'VERIFIED',
+    ('In Progress', 'Completed'): 'VERIFIED',
+
+    ('Completed', 'In Progress'): 'ASSIGNED',
+    ('Deprecated', 'In Progress'): 'ASSIGNED',
+
+    ('Completed', 'Not Started'): 'ASSIGNED',
+    ('Deprecated', 'Not Started'): 'ASSIGNED',
+
+    ('Not Started', 'Deprecated'): 'OBSOLETE',
+    ('In Progress', 'Deprecated'): 'OBSOLETE',
+    ('Completed', 'Deprecated'): 'OBSOLETE',
+}
+
+# Status transitions map for assessment with verifier.
 _VERIFIER_STATUSES = {
     # (from_status, to_status, verified): 'issue_tracker_status'
     # When verified is True 'Completed' means 'Completed and Verified'.
@@ -127,8 +156,17 @@ def handle_assessment_put_before_commit(sender, obj=None, src=None, **kwargs):
   """Handles assessment update event."""
   del sender  # Unused
 
-  issue_tracker_info = obj.issue_tracker
-  issue_tracker_info.update(src.get('issue_tracker') or {})
+  if not _is_issue_tracker_enabled(audit=obj.audit):
+    # Skip updating issue and info if feature is disabled on Audit level.
+    return
+
+  issue_obj = all_models.IssuetrackerIssue.get_issue(
+      _ASSESSMENT_MODEL_NAME, obj.id)
+
+  initial_info = issue_obj.to_dict(
+      include_issue=True,
+      include_private=True) if issue_obj is not None else {}
+  issue_tracker_info = dict(initial_info, **(src.get('issue_tracker') or {}))
 
   if issue_tracker_info.get('enabled'):
 
@@ -139,24 +177,25 @@ def handle_assessment_put_before_commit(sender, obj=None, src=None, **kwargs):
       _create_issuetracker_info(obj, issue_tracker_info)
       return
 
-    _validate_issue_tracker_info(issue_tracker_info)
-    initial_state = kwargs.pop('initial_state', None)
     _, issue_tracker_info['cc_list'] = _collect_issue_emails(obj)
 
-    try:
-      _update_issuetracker_issue(obj, issue_tracker_info, initial_state, src)
-    except integrations_errors.Error as error:
-      logger.error(
-          'Unable to update IssueTracker issue ID=%s '
-          'while updating assessment ID=%d: %s', issue_id, obj.id, error)
-      issue_tracker_info = {
-          'enabled': False,
-      }
-      obj.add_warning('issue_tracker', 'Unable to update IssueTracker issue.')
   else:
     issue_tracker_info = {
         'enabled': False,
     }
+
+  initial_assessment = kwargs.pop('initial_state', None)
+  try:
+    _update_issuetracker_issue(
+        obj, issue_tracker_info, initial_assessment, initial_info, src)
+  except integrations_errors.Error as error:
+    logger.error(
+        'Unable to update IssueTracker issue ID=%s '
+        'while updating assessment ID=%d: %s', issue_id, obj.id, error)
+    issue_tracker_info = {
+        'enabled': False,
+    }
+    obj.add_warning('issue_tracker', 'Unable to update IssueTracker issue.')
 
   _update_issuetracker_info(obj, issue_tracker_info)
 
@@ -170,7 +209,9 @@ def handle_assessment_deleted(sender, obj=None, service=None):
       _ASSESSMENT_MODEL_NAME, obj.id)
 
   if issue_obj:
-    if issue_obj.enabled and issue_obj.issue_id:
+    if (issue_obj.enabled and
+            issue_obj.issue_id and
+            _is_issue_tracker_enabled(audit=obj.audit)):
       issue_params = {
           'status': 'OBSOLETE',
           'comment': (
@@ -650,52 +691,114 @@ def _build_status_comment(assessment, initial_assessment):
   if status:
     return status, _STATUS_CHANGE_COMMENT_TMPL % (
         status_text, _get_assessment_url(assessment))
-  else:
-    return None, None
+
+  return None, None
+
+
+def _handle_basic_props(issue_tracker_info, initial_info):
+  """Handles updates to basic issue tracker properties."""
+  issue_params = {}
+  for name, api_name in _ISSUE_TRACKER_UPDATE_FIELDS:
+    if name not in issue_tracker_info:
+      continue
+    value = issue_tracker_info[name]
+    if value != initial_info.get(name):
+      issue_params[api_name] = value
+  return issue_params
+
+
+def _fill_current_value(issue_params, assessment, initial_info):
+  """Fills unchanged props with current values."""
+  current_issue_params = {}
+  for name, api_name in _ISSUE_TRACKER_UPDATE_FIELDS:
+    current_issue_params[api_name] = initial_info.get(name)
+  issue_params = dict(current_issue_params, **issue_params)
+
+  if 'status' not in issue_params:
+    # Resend status on any change.
+    status_value = _STATUSES.get(assessment.status)
+    if status_value:
+      issue_params['status'] = status_value
+
+  if 'hotlist_ids' not in issue_params:
+    # Resend hotlists on any change.
+    current_hotlist_id = initial_info.get('hotlist_id')
+    issue_params['hotlist_ids'] = [current_hotlist_id] if (
+        current_hotlist_id) else []
+
+  if 'ccs' not in issue_params:
+    current_cc_list = initial_info.get('cc_list')
+    if current_cc_list:
+      issue_params['ccs'] = current_cc_list
+
+  return issue_params
+
+
+def _build_cc_list(issue_tracker_info, initial_info):
+  """Returns a list of email to update issue with."""
+  cc_list = issue_tracker_info.get('cc_list')
+
+  if cc_list is not None:
+    current_cc_list = initial_info.get('cc_list')
+    current_cc_list = set(current_cc_list) if (
+        current_cc_list is not None) else set()
+    updated_cc_list = set(cc_list)
+    if updated_cc_list - current_cc_list:
+      return list(updated_cc_list | current_cc_list)
+
+  return None
 
 
 def _update_issuetracker_issue(assessment, issue_tracker_info,
-                               initial_assessment, request):
+                               initial_assessment, initial_info, request):
   """Collects information and sends a request to update external issue."""
-  issue_params = {}
-  # Handle updates to basic issue tracker properties.
-  initial_info = assessment.issue_tracker
-  for name, api_name in _ISSUE_TRACKER_UPDATE_FIELDS:
-    value = issue_tracker_info.get(name)
-    if value != initial_info.get(name):
-      issue_params[api_name] = value
 
   comments = []
+
+  # Handle switching of 'enabled' property.
+  initially_enabled = initial_info.get('enabled', False)
+  enabled = issue_tracker_info.get('enabled', False)
+  if initially_enabled != enabled:
+    # Add comment about toggling feature and process further.
+    comments.append(_ENABLED_TMPL if enabled else _DISABLED_TMPL)
+  elif not enabled:
+    # If feature remains in the same status which is 'disabled'.
+    return
+
+  _validate_issue_tracker_info(issue_tracker_info)
+
+  issue_params = _handle_basic_props(issue_tracker_info, initial_info)
 
   # Handle status update.
   status_value, status_comment = _build_status_comment(
       assessment, initial_assessment)
   if status_value:
     issue_params['status'] = status_value
-
-  if status_comment:
     comments.append(status_comment)
 
   # Attach user comments if any.
-  comment_text = _get_added_comment_text(request)
+  comment_text, comment_author = _get_added_comment_text(request)
   if comment_text is not None:
     comments.append(
-        _COMMENT_TMPL % (comment_text, _get_assessment_url(assessment)))
+        _COMMENT_TMPL % (
+            comment_author, comment_text, _get_assessment_url(assessment)))
 
   if comments:
     issue_params['comment'] = '\n\n'.join(comments)
 
   # Handle hotlist ID update.
   hotlist_id = issue_tracker_info.get('hotlist_id')
-  if hotlist_id != initial_info.get('hotlist_id'):
+  if hotlist_id is not None and hotlist_id != initial_info.get('hotlist_id'):
     issue_params['hotlist_ids'] = [hotlist_id] if hotlist_id else []
 
   # Handle cc_list update.
-  cc_list = issue_tracker_info.get('cc_list')
+  cc_list = _build_cc_list(issue_tracker_info, initial_info)
   if cc_list is not None:
     issue_params['ccs'] = cc_list
 
   if issue_params:
+    # Resend all properties upon any change.
+    issue_params = _fill_current_value(issue_params, assessment, initial_info)
     issues.Client().update_issue(issue_tracker_info['issue_id'], issue_params)
 
 
@@ -712,11 +815,22 @@ def _get_added_comment_text(src):
   """Returns comment text from given request."""
   comment_id = _get_added_comment_id(src)
   if comment_id is not None:
-    comment_obj = all_models.Comment.query.filter(
-        all_models.Comment.id == comment_id).first()
-    if comment_obj is not None:
-      return html2text.HTML2Text().handle(comment_obj.description).strip('\n')
-  return None
+    comment_row = db.session.query(
+        all_models.Comment.description,
+        all_models.Person.email,
+        all_models.Person.name
+    ).outerjoin(
+        all_models.Person,
+        all_models.Person.id == all_models.Comment.modified_by_id,
+    ).filter(
+        all_models.Comment.id == comment_id
+    ).first()
+    if comment_row is not None:
+      desc, creator_email, creator_name = comment_row
+      if not creator_name:
+        creator_name = creator_email
+      return html2text.HTML2Text().handle(desc).strip('\n'), creator_name
+  return None, None
 
 
 def _get_added_comment_id(src):

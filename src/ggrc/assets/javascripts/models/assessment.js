@@ -81,25 +81,29 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         attr_name: 'finished_date',
         order: 11,
       }, {
+        attr_title: 'Last Deprecated Date',
+        attr_name: 'end_date',
+        order: 12,
+      }, {
         attr_title: 'Reference URL',
         attr_name: 'reference_url',
-        order: 12,
+        order: 13,
       }, {
         attr_title: 'Conclusion: Design',
         attr_name: 'design',
-        order: 13,
+        order: 14,
       }, {
         attr_title: 'Conclusion: Operation',
         attr_name: 'operationally',
-        order: 14,
+        order: 15,
       }, {
         attr_title: 'Archived',
         attr_name: 'archived',
-        order: 15,
+        order: 16,
       }, {
         attr_title: 'Buganizer',
         attr_name: 'issue_url',
-        order: 16,
+        order: 17,
         deny: !GGRC.ISSUE_TRACKER_ENABLED,
       }],
       display_attr_names: ['title', 'status', 'label', 'Assignees', 'Verifiers',

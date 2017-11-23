@@ -55,11 +55,14 @@
       if (usePopup) {
         $modal = $('.ggrc_controllers_gapi_modal');
         if (!$modal.length) {
-          $('<div class="modal hide">').modal_form()
-            .appendTo(document.body).ggrc_controllers_gapi_modal({
-            scopes: scopes,
-            modal_title: 'Please log in to Google API',
-            new_object_form: true
+          import(/* webpackChunkName: "modalsCtrls" */'../../../../ggrc/assets/javascripts/controllers/modals')
+            .then(() => {
+              $('<div class="modal hide">').modal_form()
+                .appendTo(document.body).ggrc_controllers_gapi_modal({
+                scopes: scopes,
+                modal_title: 'Please log in to Google API',
+                new_object_form: true
+              });
           });
         } else {
           $modal.modal_form('show');

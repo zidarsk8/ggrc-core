@@ -5,6 +5,7 @@
 updates via import"""
 
 # pylint: disable=invalid-name
+import datetime
 from collections import OrderedDict
 
 from os.path import join
@@ -680,6 +681,12 @@ class TestCycleTaskStatusUpdate(BaseTestCycleTaskImportUpdate):
       "cycle_status": all_models.Cycle.VERIFIED,
       "workflow_status": all_models.Workflow.INACTIVE,
   }
+  ASSIGNED_STRUCTURE = {
+      "task_statuses": [all_models.CycleTaskGroupObjectTask.ASSIGNED] * 3,
+      "group_status": all_models.CycleTaskGroup.IN_PROGRESS,
+      "cycle_status": all_models.Cycle.IN_PROGRESS,
+      "workflow_status": all_models.Workflow.ACTIVE
+  }
   IN_PROGRESS_STRUCTURE = {
       "task_statuses": [all_models.CycleTaskGroupObjectTask.IN_PROGRESS] * 3,
       "group_status": all_models.CycleTaskGroup.IN_PROGRESS,
@@ -771,6 +778,60 @@ class TestCycleTaskStatusUpdate(BaseTestCycleTaskImportUpdate):
     self.assertEqual(len(CycleTaskGroupObjectTask.query.all()), task_count)
     self.assertEqual(cycle_status, group.cycle.status)
     self.assertEqual(workflow_status, group.cycle.workflow.status)
+
+  @ddt.data(ASSIGNED_STRUCTURE,
+            IN_PROGRESS_STRUCTURE,
+            DECLINED_STRUCTURE)
+  def test_update_to_verified(self, start_structure):
+    """Update task status to verified from {0[task_statuses]}"""
+    self._update_structure(start_structure)
+    start_statuses = self._get_start_tasks_statuses(start_structure)
+    self.assertEqual(start_statuses, [t.status for t in self.tasks])
+    self.assertEqual([None] * len(self.tasks),
+                     [t.finished_date for t in self.tasks])
+    self.assertEqual([None] * len(self.tasks),
+                     [t.verified_date for t in self.tasks])
+    task_statuses = self.VERIFIED_STRUCTURE["task_statuses"]
+    response = self.import_data(*self.build_import_data(task_statuses))
+    self._check_csv_response(response, {})
+    self.tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id.in_(self.task_ids)
+    ).all()
+    self.assertEqual(task_statuses + start_statuses[len(task_statuses):],
+                     [t.status for t in self.tasks])
+    self.assertNotEqual([None] * len(self.tasks),
+                        [t.finished_date for t in self.tasks])
+    self.assertNotEqual([None] * len(self.tasks),
+                        [t.verified_date for t in self.tasks])
+
+  def test_update_finished_to_verified(self):
+    """Update task status from finished from verified"""
+    now = datetime.datetime.now().replace(microsecond=0)
+    finished_date = now - datetime.timedelta(1)
+    start_statuses = self._get_start_tasks_statuses(self.FINISHED_STRUCTURE)
+    with ggrc_factories.single_commit():
+      for task in self.tasks:
+        task.finished_date = finished_date
+    self._update_structure(self.FINISHED_STRUCTURE)
+    self.tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id.in_(self.task_ids)
+    ).all()
+    self.assertEqual([finished_date] * len(self.tasks),
+                     [t.finished_date for t in self.tasks])
+    self.assertEqual([None] * len(self.tasks),
+                     [t.verified_date for t in self.tasks])
+    task_statuses = self.VERIFIED_STRUCTURE["task_statuses"]
+    response = self.import_data(*self.build_import_data(task_statuses))
+    self._check_csv_response(response, {})
+    self.tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id.in_(self.task_ids)
+    ).all()
+    self.assertEqual(task_statuses + start_statuses[len(task_statuses):],
+                     [t.status for t in self.tasks])
+    self.assertEqual([finished_date] * len(self.tasks),
+                     [t.finished_date for t in self.tasks])
+    self.assertNotEqual([None] * len(self.tasks),
+                        [t.verified_date for t in self.tasks])
 
   def __build_error_resp(self, key, error_tmpl, exception_statuses):
     """Return expected response dict based on sent arguments."""
