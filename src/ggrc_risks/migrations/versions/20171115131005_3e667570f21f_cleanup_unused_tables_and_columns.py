@@ -15,13 +15,11 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '3e667570f21f'
-down_revision = '1be0dd01f559'
+down_revision = '564e4bcf092'
 
 
 def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
-  op.drop_column('risk_objects', 'secondary_contact_id')
-
   op.drop_column('risks', 'url')
   op.drop_column('risks', 'reference_url')
 
@@ -40,7 +38,3 @@ def downgrade():
       length=250), nullable=True))
   op.add_column('risks', sa.Column('url', mysql.VARCHAR(
       length=250), nullable=True))
-
-  op.add_column('risk_objects', sa.Column(
-      'secondary_contact_id', mysql.INTEGER(
-          display_width=11), autoincrement=False, nullable=True))
