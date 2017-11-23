@@ -5,6 +5,7 @@
 
 import './infinite-scroll-controller';
 import RecentlyViewedObject from '../models/recently_viewed_object';
+import tracker from '../tracker';
 
 can.Control('CMS.Controllers.LHN', {
   defaults: {}
@@ -629,9 +630,10 @@ can.Control('CMS.Controllers.LHN_Search', {
         , model_name = this.get_list_model($list)
         , that = this
         ;
+    let stopFn = tracker.start('LHN', 'show_list', model_name);
 
     setTimeout(function () {
-      that.refresh_visible_lists();
+      that.refresh_visible_lists().done(stopFn);
     }, 20);
   },
   '{observer} value': function (el, ev, newval) {
@@ -653,6 +655,7 @@ can.Control('CMS.Controllers.LHN_Search', {
         , refresh_queue
         , new_visible_list
         ;
+    let stopFn = tracker.start('LHN', 'show_more', model_name);
 
     if (visible_list.length >= results_list.length)
       return;
@@ -671,7 +674,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       visible_list.attr('is_loading', false);
         // visible_list.replace(new_visible_list);
       delete that._show_more_pending;
-    });
+    }).done(stopFn);
     visible_list.attr('is_loading', true);
   },
 
@@ -928,7 +931,9 @@ can.Control('CMS.Controllers.LHN_Search', {
     }
   },
   run_search: function (term, extra_params) {
-    var filter_list = [];
+    let filter_list = [];
+    let stopFn = tracker.start('LHN', 'run_search',
+      extra_params && extra_params.contact_id ? 'MyWork' : 'Normal');
 
     if (term !== this.current_term || extra_params !== this.current_params) {
         // Clear current result lists
@@ -968,7 +973,7 @@ can.Control('CMS.Controllers.LHN_Search', {
       return $.when(
             this.refresh_counts(),
             this.refresh_visible_lists()
-          );
+          ).done(stopFn);
     }
   },
   get_lists: function () {

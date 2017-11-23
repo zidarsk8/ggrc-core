@@ -164,7 +164,7 @@
      * Shows flash notification
      * @param  {String} type    type of notification. error|warning
      * @param  {String} message Plain text message or mustache template if data is passed
-     * @param  {Object} data data to populate mustache template
+     * @param  {Object} [data] data to populate mustache template
      */
     function notifier(type, message, data) {
       var props = {};
@@ -190,6 +190,10 @@
         notifier(type, message);
       };
     }
+
+    window.addEventListener('error', event => {
+      notifier('error', event.message);
+    });
 
     return {
       messages: messages,

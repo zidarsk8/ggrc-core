@@ -11,7 +11,6 @@ import {
 import {
   makeRequest,
 } from '../plugins/utils/query-api-utils';
-
 import resolveConflict from './cacheable_conflict_resolution.js';
 
 (function (can, GGRC, CMS) {
