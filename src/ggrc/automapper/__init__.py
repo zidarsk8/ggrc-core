@@ -74,9 +74,15 @@ class AutomapperGenerator(object):
           break
         src, dst = entry = self.queue.pop()
 
-        if not (self._can_map_to(src, relationship) and
-                self._can_map_to(dst, relationship)):
-          continue
+        if {src.type, dst.type} != {"Audit", "Issue"}:
+          # Auditor doesn't have edit (+map) permission on the Audit,
+          # but the Auditor should be allowed to Raise an Issue.
+          # Since Issue-Assessment-Audit is the only rule that
+          # triggers Issue to Audit mapping, we should skip the
+          # permission check for it
+          if not (self._can_map_to(src, relationship) and
+                  self._can_map_to(dst, relationship)):
+            continue
 
         created = self._ensure_relationship(src, dst)
         self.processed.add(entry)
@@ -96,7 +102,17 @@ class AutomapperGenerator(object):
 
   @staticmethod
   def _can_map_to(obj, parent_relationship):
-    return is_allowed_update(obj.type, obj.id, parent_relationship.context)
+    """True if the current user can edit obj in parent_relationship.context."""
+    context_id = None
+    if parent_relationship.context:
+      context_id = parent_relationship.context.id
+    elif parent_relationship.context_id:
+      logger.warning("context is unset but context_id is set on a "
+                     "relationship %r: context=%r, context_id=%r",
+                     parent_relationship, parent_relationship.context,
+                     parent_relationship.context_id)
+      context_id = parent_relationship.context_id
+    return is_allowed_update(obj.type, obj.id, context_id)
 
   def _flush(self, parent_relationship):
     """Manually INSERT generated automappings."""
