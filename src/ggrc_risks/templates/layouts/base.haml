@@ -18,6 +18,9 @@
       %link{ rel:'stylesheet', type:'text/css', href:"={ASSET_URL|with_static_subdomain}" }
     -endassets
 
+    -if config.get("GOOGLE_ANALYTICS_ID")
+      %script{ type:'text/javascript', async:'async', src:"//www.google-analytics.com/analytics.js" }
+
     %script
       GGRC = window.GGRC || {};
       -block extra_javascript

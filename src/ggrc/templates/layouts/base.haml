@@ -19,6 +19,9 @@
 
     %link{ 'href': '={ url_for("static", filename="favicon.ico") }', 'rel':'icon', 'type':'image/x-icon' }
 
+    -if config.get("GOOGLE_ANALYTICS_ID")
+      %script{ type:'text/javascript', async:'async', src:"//www.google-analytics.com/analytics.js" }
+
   %body
     %div{ 'class': 'page-loader'}
       %div{ 'class': 'page-loader__wrapper'}
