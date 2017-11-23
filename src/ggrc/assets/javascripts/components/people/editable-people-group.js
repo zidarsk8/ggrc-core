@@ -15,6 +15,7 @@ var viewModel = peopleGroupVM.extend({
   title: '@',
   canEdit: {},
   showPeopleGroupModal: false,
+  updatableGroupId: null,
   define: {
     editableMode: {
       set: function (newValue, setValue) {
@@ -26,16 +27,33 @@ var viewModel = peopleGroupVM.extend({
     showSeeMoreLink: {
       get: function () {
         return !this.attr('editableMode') &&
+          !this.attr('isReadonly') &&
           this.attr('people.length') > SHOW_MODAL_LIMIT;
       },
     },
-    readonlyPeople: {
+    /**
+     * Contains people list which is displayed when editableMode is off
+     * @type {can.List}
+     */
+    showPeople: {
       get: function () {
-        if (this.attr('showPeopleGroupModal')) {
+        if (this.attr('showPeopleGroupModal') && !this.attr('isReadonly')) {
           return this.attr('people').attr().slice(0, SHOW_MODAL_LIMIT);
         }
 
         return this.attr('people').attr();
+      },
+    },
+    /**
+     * Indicates whether people group is readonly
+     * canEdit becomes false while people group is saving
+     * (updatableGroupId is not null in this case)
+     * @type {boolean}
+     */
+    isReadonly: {
+      type: 'boolean',
+      get() {
+        return !(this.attr('canEdit') || this.attr('updatableGroupId'));
       },
     },
   },
