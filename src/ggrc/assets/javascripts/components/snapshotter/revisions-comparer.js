@@ -43,19 +43,48 @@ import {confirm} from '../../plugins/utils/modals';
                   that.isContainsAttachments(that.instance) ?
                   that.getAttachmentsDfds(revisions) :
                   [];
-                fragLeft.appendChild(fragRight);
 
-                target.find('.modal-body').html(fragLeft);
-                that.highlightDifference(target);
+                // people should be preloaded before highlighting differences
+                // to avoid breaking UI markup as highlightDifference
+                // sets block's height
+                that.loadACLPeople(revisions[1].instance)
+                  .then(() => {
+                    fragLeft.appendChild(fragRight);
+                    target.find('.modal-body').html(fragLeft);
 
-                if (attachmentsDfds.length) {
-                  $.when.apply($, attachmentsDfds).then(function () {
                     that.highlightDifference(target);
+                  })
+                  .then(() => {
+                    if (attachmentsDfds.length) {
+                      $.when(...attachmentsDfds).then(() => {
+                        that.highlightDifference(target);
+                      });
+                    }
                   });
-                }
               });
-          }
+          },
         }, this.updateRevision.bind(this));
+      },
+      /**
+       * Loads to cache people from access control list
+       *
+       * @param {Object} instance - revision
+       * @return {Promise}
+       */
+      loadACLPeople: function (instance) {
+        let refreshQueue = new RefreshQueue();
+
+        instance.attr('access_control_list').forEach((acl) => {
+          let person = CMS.Models.Person.findInCacheById(acl.person.id) || {};
+          if (!person.email) {
+            refreshQueue.enqueue(acl.person);
+          }
+        });
+
+        if (refreshQueue.objects.length) {
+          return refreshQueue.trigger();
+        }
+        return can.Deferred().resolve();
       },
       buildAttachmentsDfd: function (instance, bindingName) {
         var dfd = new can.Deferred();
@@ -432,7 +461,7 @@ import {confirm} from '../../plugins/utils/modals';
 
         $roleBlocksOld.each(function (i) {
           var $blockOld = $roleBlocksOld.eq(i);
-          var $blockNew = $roleBlocksNew.eq(i);  // the block count is the same
+          var $blockNew = $roleBlocksNew.eq(i); // the block count is the same
           compareRoleBlocks($blockOld, $blockNew);
           equalizeHeights($blockOld, $blockNew);
         });
@@ -508,13 +537,16 @@ import {confirm} from '../../plugins/utils/modals';
          * @param {jQuery} $block2 - the second block element
          */
         function equalizeHeights($block, $block2) {
-          var height = $block.outerHeight();
-          var height2 = $block2.outerHeight();
+          var height;
+          var height2;
 
           $block.css('max-width', 'none');
           $block2.css('max-width', 'none');
           $block.css('margin-right', '0');
           $block2.css('margin-right', '0');
+
+          height = $block.outerHeight();
+          height2 = $block2.outerHeight();
 
           if (height > height2) {
             $block2.outerHeight(height);
@@ -522,7 +554,7 @@ import {confirm} from '../../plugins/utils/modals';
             $block.outerHeight(height2);
           }
         }
-      }
-    }
+      },
+    },
   });
 })(window.can, window.can.$);

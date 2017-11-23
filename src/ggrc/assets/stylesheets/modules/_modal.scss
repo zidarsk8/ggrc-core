@@ -741,9 +741,8 @@
          width: 100%;
          max-width: 100%;
          position: relative;
-         left: -15px;
-         padding-left: 15px;
-         padding-right: 15px;
+         padding-left: 5px;
+         padding-right: 5px;
          background-color: $pastelRed;
          &.inline-edit__content,
          &.inline-edit__title{
@@ -798,6 +797,12 @@
      }
      .info-widget-footer{
        display: none;
+     }
+
+     .people-group {
+       .editable-people-group {
+         margin-right: 15px;
+       }
      }
    }
  }
