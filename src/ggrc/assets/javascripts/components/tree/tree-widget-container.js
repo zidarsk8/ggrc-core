@@ -373,8 +373,11 @@ viewModel = can.Map.extend({
     this.closeInfoPane();
   },
   onFilter: function () {
+    const stopFn = tracker.start(this.attr('modelName'),
+      tracker.USER_JOURNEY_KEYS.LOADING,
+      tracker.USER_ACTIONS.MULTISELECT_FILTER);
     this.attr('pageInfo.current', 1);
-    this.loadItems();
+    this.loadItems().then(stopFn);
     this.closeInfoPane();
   },
   getDepthFilter: function () {

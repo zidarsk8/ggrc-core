@@ -9,6 +9,7 @@ import {
 }
   from '../../plugins/utils/ca-utils';
 import {VALIDATION_ERROR} from '../../events/eventTypes';
+import tracker from '../../tracker';
 
 (function (GGRC, can) {
   'use strict';
@@ -174,9 +175,13 @@ import {VALIDATION_ERROR} from '../../events/eventTypes';
           });
       },
       save: function (fieldId, fieldValue) {
-        var self = this;
-        var changes = {};
-        changes[fieldId] = fieldValue;
+        const self = this;
+        const changes = {
+          [fieldId]: fieldValue,
+        };
+        const stopFn = tracker.start(this.attr('instance.type'),
+          tracker.USER_JOURNEY_KEYS.NAVIGATION,
+          tracker.USER_ACTIONS.ASSESSMENT.EDIT_LCA);
 
         this.attr('isDirty', true);
 
@@ -188,13 +193,12 @@ import {VALIDATION_ERROR} from '../../events/eventTypes';
 
           self.attr('saving', true);
         })
-        .done(function () {
-          self.attr('formSavedDeferred').resolve();
-        })
+        .done(() => this.attr('formSavedDeferred').resolve())
         // todo: error handling
-        .always(function () {
-          self.attr('saving', false);
-          self.attr('isDirty', false);
+        .always(() => {
+          this.attr('saving', false);
+          this.attr('isDirty', false);
+          stopFn();
         });
       },
       attributeChanged: function (e) {
