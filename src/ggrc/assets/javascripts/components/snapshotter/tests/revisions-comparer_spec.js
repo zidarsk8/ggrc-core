@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as caUtils from '../../../plugins/utils/ca-utils';
+
 describe('GGRC.Components.revisionsComparer', function () {
   'use strict';
 
@@ -95,28 +97,6 @@ describe('GGRC.Components.revisionsComparer', function () {
     });
 
     it('returns all info panes under the given element', function () {
-      var result = method(fakeHTML);
-      expect(result.length).toBe(2);
-    });
-  });
-
-  describe('getCAPanes() method', function () {
-    var fakeHTML;
-    var method;  // the method under test
-
-    beforeEach(function () {
-      method = Component.prototype.scope.getCAPanes;
-      fakeHTML = $('<div>' +
-                      '<div class="info">' +
-                        '<custom-attributes-wrap></custom-attributes-wrap>' +
-                      '</div>' +
-                      '<div class="info">' +
-                        '<custom-attributes-wrap></custom-attributes-wrap>' +
-                      '</div>' +
-                    '</div>');
-    });
-
-    it('returns all panes with custom attributes', function () {
       var result = method(fakeHTML);
       expect(result.length).toBe(2);
     });
@@ -307,6 +287,258 @@ describe('GGRC.Components.revisionsComparer', function () {
       expect(RefreshQueue.prototype.enqueue.calls.any()).toEqual(false);
       expect(RefreshQueue.prototype.trigger.calls.any()).toEqual(false);
       expect(dfd.resolve).toHaveBeenCalled();
+    });
+  });
+
+  describe('"highlightCustomAttributes" method', () => {
+    const titleSelector = '.info-pane__section-title';
+    const valueSelector = '.inline__content';
+    const highlightSelector = '.diff-highlighted';
+    const attributeSelector = '.ggrc-form-item';
+
+    let method;
+    let revisions;
+
+    beforeEach(() => {
+      method = Component.prototype.scope.highlightCustomAttributes
+        .bind(Component.prototype.scope);
+
+      spyOn(Component.prototype.scope, 'equalizeHeights');
+    });
+
+    it('prepares custom attributes', () => {
+      revisions = [
+        {
+          instance: new can.Map({
+            // custom_attribute_definitions: [],
+            // custom_attributes: [],
+          }),
+        }, {
+          instance: new can.Map({
+            // custom_attribute_definitions: [],
+            // custom_attributes: [],
+          }),
+        },
+      ];
+      let $target = $('<div/>');
+
+      spyOn(caUtils, 'prepareCustomAttributes').and.returnValue([]);
+
+      method($target, revisions);
+      expect(caUtils.prepareCustomAttributes.calls.count()).toEqual(2);
+    });
+
+    describe('when the same attributes', () => {
+      let $target;
+
+      beforeEach(() => {
+        let ca0s = [{
+          custom_attribute_id: 1,
+          def: {
+            title: 'title',
+          },
+          attribute_value: 'value',
+        }];
+
+        let ca1s = [{
+          custom_attribute_id: 1,
+          def: {
+            title: 'changed title',
+          },
+          attribute_value: 'changed value',
+        }];
+
+        let index = 0;
+        spyOn(caUtils, 'prepareCustomAttributes').and
+          .callFake((defs, values) => {
+          if (index === 0) {
+            index++;
+            return ca0s;
+          }
+          return ca1s;
+        });
+
+        $target = $(`<div>
+                    <section class="info">
+                      <global-custom-attributes>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title"></div>
+                          <div class="inline__content"></div>
+                        </div>
+                      </global-custom-attributes>
+                    </section>
+                    <section class="info">
+                      <global-custom-attributes>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title"></div>
+                          <div class="inline__content"></div>
+                        </div>
+                      </global-custom-attributes>
+                    </section>
+                  </div>`);
+      });
+
+      it('highlights changed titles', () => {
+        method($target, revisions);
+
+        expect($target.find(`${titleSelector}${highlightSelector}`).length)
+          .toEqual(2);
+      });
+
+      it('highlights changed values', () => {
+        method($target, revisions);
+
+        expect($target.find(`${valueSelector}${highlightSelector}`).length)
+          .toEqual(2);
+      });
+
+      it('equlizes blocks heights', () => {
+        method($target, revisions);
+        expect(Component.prototype.scope.equalizeHeights).toHaveBeenCalled();
+      });
+    });
+
+    describe('when attribute was removed', () => {
+      let $target;
+
+      beforeEach(() => {
+        let ca0s = [{
+          custom_attribute_id: 1,
+          def: {
+            title: 'title',
+          },
+          attribute_value: 'value',
+        }, {
+          custom_attribute_id: 2,
+          def: {
+            title: 'ca2 title',
+          },
+          attribute_value: 'ca2 value',
+        }];
+
+        let ca1s = [{
+          custom_attribute_id: 2,
+          def: {
+            title: 'ca2 title',
+          },
+          attribute_value: 'ca2 value',
+        }];
+
+        let index = 0;
+        spyOn(caUtils, 'prepareCustomAttributes').and
+          .callFake((defs, values) => {
+          if (index === 0) {
+            index++;
+            return ca0s;
+          }
+          return ca1s;
+        });
+
+        $target = $(`<div>
+                    <section class="info">
+                      <global-custom-attributes>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title">title</div>
+                          <div class="inline__content">value</div>
+                        </div>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title">ca2 title</div>
+                          <div class="inline__content">ca2 value</div>
+                        </div>
+                      </global-custom-attributes>
+                    </section>
+
+                    <section class="info">
+                      <global-custom-attributes>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title">ca2 title</div>
+                          <div class="inline__content">ca2 value</div>
+                        </div>
+                      </global-custom-attributes>
+                    </section>
+                  </div>`);
+      });
+
+      it('adds empty html block to the right panel', () => {
+        method($target, revisions);
+        expect($target.find(attributeSelector).length).toEqual(4);
+      });
+
+      it('highlights removed attribute title', () => {
+        method($target, revisions);
+        expect($target.find(`${titleSelector}${highlightSelector}`).length)
+          .toEqual(1);
+      });
+
+      it('highlights removed attribute value', () => {
+        method($target, revisions);
+        expect($target.find(`${valueSelector}${highlightSelector}`).length)
+          .toEqual(1);
+      });
+
+      it('equlizes blocks heights', () => {
+        method($target, revisions);
+        expect(Component.prototype.scope.equalizeHeights.calls.count())
+          .toEqual(2);
+      });
+    });
+
+    describe('when attribute was added', () => {
+      let $target;
+
+      beforeEach(() => {
+        let ca0s = [];
+
+        let ca1s = [{
+          custom_attribute_id: 1,
+          def: {
+            title: 'changed title',
+          },
+          attribute_value: 'changed value',
+        }];
+
+        let index = 0;
+        spyOn(caUtils, 'prepareCustomAttributes').and
+          .callFake((defs, values) => {
+          if (index === 0) {
+            index++;
+            return ca0s;
+          }
+          return ca1s;
+        });
+
+        $target = $(`<div>
+                    <section class="info">
+                      <global-custom-attributes>
+                      </global-custom-attributes>
+                    </section>
+                    <section class="info">
+                      <global-custom-attributes>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title"></div>
+                          <div class="inline__content"></div>
+                        </div>
+                      </global-custom-attributes>
+                    </section>
+                  </div>`);
+      });
+
+      it('does not add empty html block to the left panel', () => {
+        method($target, revisions);
+        expect($target.find(attributeSelector).length).toEqual(1);
+      });
+
+      it('highlights new attribute title', () => {
+        method($target, revisions);
+        expect($target.find(`${titleSelector}${highlightSelector}`).length)
+          .toEqual(1);
+      });
+
+      it('highlights new attribute value', () => {
+        method($target, revisions);
+        expect($target.find(`${valueSelector}${highlightSelector}`).length)
+          .toEqual(1);
+      });
     });
   });
 });

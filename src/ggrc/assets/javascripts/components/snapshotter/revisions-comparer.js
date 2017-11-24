@@ -4,6 +4,7 @@
  */
 
 import {confirm} from '../../plugins/utils/modals';
+import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
 
 (function (can, $) {
   'use strict';
@@ -53,6 +54,7 @@ import {confirm} from '../../plugins/utils/modals';
                     target.find('.modal-body').html(fragLeft);
 
                     that.highlightDifference(target);
+                    that.highlightCustomAttributes(target, revisions);
                   })
                   .then(() => {
                     if (attachmentsDfds.length) {
@@ -221,31 +223,11 @@ import {confirm} from '../../plugins/utils/modals';
       },
 
       /**
-       * Get Custom Attribute panes from modal
-       * @param {Object} $target - jQuery object
-       * @return {Object} - jQuery object
-       */
-      getCAPanes: function ($target) {
-        return $target.find('.info custom-attributes-wrap');
-      },
-
-      /**
-       * Get Custom Attributes from infopanes
-       * @param {Object} CAPanes - jQuery object of CA panes
-       * @param {Number} index - index of CA pane
-       * @return {Object} - jQuery object
-       */
-      getCAs: function (CAPanes, index) {
-        return $(CAPanes[index]).find('[data-custom-attribute] inline-edit');
-      },
-
-      /**
        * Highlight difference
        * @param {Object} $target - jQuery object
        */
       highlightDifference: function ($target) {
         this.highlightAttributes($target);
-        this.highlightCustomAttributes($target);
         this.highlightCustomRoles($target);
       },
 
@@ -337,108 +319,125 @@ import {confirm} from '../../plugins/utils/modals';
       },
 
       /**
-       * Highlight difference in custom attributes
+       * Highlights difference in custom attributes
        *
        * @param {jQuery} $target - the root DOM element containing the
        *   revision diff comparison
+       * @param {can.List} revisions - revisions for comparing
        */
-      highlightCustomAttributes: function ($target) {
-        var titleSelector = '.inline-edit__title';
-        var valueSelector = '.inline-edit__content';
-        var highlightClass = 'diff-highlighted';
-        var caSelector = '[data-custom-attribute]';
-        var caWrapperSelector = '.span6';
-        var cas = this.getCAPanes($target);
-        var ca0s = this.getCAs(cas, 0);
-        var ca1s = this.getCAs(cas, 1);
-        compareCA(ca0s, ca1s);
-        compareCA(ca1s, ca0s);
+      highlightCustomAttributes($target, revisions) {
+        const titleSelector = '.info-pane__section-title';
+        const valueSelector = '.inline__content';
+        const highlightClass = 'diff-highlighted';
+
+        let that = this;
+        let $caPanes = $target.find('.info global-custom-attributes');
+        let $oldCAs = $caPanes.eq(0).find('.ggrc-form-item');
+        let $newCAs = $caPanes.eq(1).find('.ggrc-form-item');
+
+        let oldCAs = getCAs(revisions[0]);
+        let newCAs = getCAs(revisions[1]);
+
+        compareCAs($oldCAs, $newCAs, oldCAs, newCAs);
 
         /**
-         * Compare two lists of custom attributes
-         * @param {Object} caFirst - jQuery object
-         * @param {Object} caLast - jQuery object
+         * Prepares instance's custom attributes
+         * @param {Object} revision - revision
+         * @return {can.List} custom attributes list
          */
-        function compareCA(caFirst, caLast) {
-          var prevIndex = -1;
-          caFirst.each(function (i, caOld) {
-            var $sameCA = [];
-            var $caOld = $(caOld);
-            var caOldScope = $caOld.viewModel();
-            caLast.each(function (j, caNew) {
-              var $caNew = $(caNew);
-              var caNewScope = $caNew.viewModel();
-              if (caNewScope.caId === caOldScope.caId) {
-                $sameCA = $caNew;
-                prevIndex = j;
-              }
-            });
-            if ($sameCA.length) {
-              highlightProperty('titleText', $sameCA, $caOld, titleSelector);
-              highlightProperty('value', $sameCA, $caOld, valueSelector);
-              equalCAHeight($caOld, $sameCA);
+        function getCAs(revision) {
+          let instance = revision.instance;
+          return prepareCustomAttributes(
+            instance.attr('custom_attribute_definitions'),
+            instance.attr('custom_attributes'));
+        }
+
+        /**
+         * Compares two lists of custom attributes
+         * @param {Object} $ca0s - list of jQuery objects for custom attributes
+         * @param {Object} $ca1s - list of jQuery objects for custom attributes
+         * @param {can.List} ca0s - list of custom attributes
+         * @param {can.List} ca1s - list of custom attributes
+         */
+        function compareCAs($ca0s, $ca1s, ca0s, ca1s) {
+          let i = 0;
+          let j = 0;
+          while (i < ca0s.length || j < ca1s.length) {
+            let ca0 = ca0s[i] || {};
+            let ca1 = ca1s[j] || {};
+            let $ca0 = $ca0s.eq(i);
+            let $ca1 = $ca1s.eq(j);
+
+            if (ca0.custom_attribute_id === ca1.custom_attribute_id) {
+              // same attribute
+              highlightTitle($ca0, ca0, $ca1, ca1);
+              highlightValue($ca0, ca0, $ca1, ca1);
+              that.equalizeHeights($ca0, $ca1);
+              i++;
+              j++;
+            } else if (i < ca0s.length) {
+              // attribute removed
+              $ca1 = fillEmptyCA($ca1); // add empty block to the right panel
+              highlightTitle($ca0, ca0);
+              highlightValue($ca0, ca0);
+              that.equalizeHeights($ca0, $ca1);
+              i++;
             } else {
-              fillEmptyCA(caLast, $caOld, prevIndex);
-            }
-          });
-        }
-
-        /**
-         * Highlight specific property in custom attributes
-         * @param {String} name - Property name
-         * @param {Object} $caFirst - jQuery object
-         * @param {Object} $caLast - jQuery object
-         * @param {String} selector - child selector to add class
-         */
-        function highlightProperty(name, $caFirst, $caLast, selector) {
-          var caFirstScope = $caFirst.viewModel();
-          var caLastScope = $caLast.viewModel();
-          var firstProp = caFirstScope[name].id || caFirstScope[name];
-          var lastProp = caLastScope[name].id || caLastScope[name];
-          if (firstProp !== lastProp) {
-            if (caFirstScope[name]) {
-              $caFirst.find(selector).addClass(highlightClass);
-            }
-            if (caLastScope[name]) {
-              $caLast.find(selector).addClass(highlightClass);
+              // attribute added
+              highlightTitle($ca1, ca1);
+              highlightValue($ca1, ca1);
+              j++;
             }
           }
         }
 
         /**
-         * Set max height between two custom attributes
-         * @param {Object} $caFirst - jQuery object
-         * @param {Object} $caLast - jQuery object
+         * Highlights title in custom attributes
+         * @param {Object} $ca0 - JQuery object
+         * @param {Object} ca0 - custom attribute object
+         * @param {Object} $ca1 - jQuery object
+         * @param {Object} ca1 - custom attribute object
          */
-        function equalCAHeight($caFirst, $caLast) {
-          var caFirstHeight = $caFirst.closest(caSelector).outerHeight();
-          var caLastHeight = $caLast.closest(caSelector).outerHeight();
-          if (caFirstHeight > caLastHeight) {
-            $caLast.closest(caSelector).outerHeight(caFirstHeight);
-          } else if (caFirstHeight < caLastHeight) {
-            $caFirst.closest(caSelector).outerHeight(caLastHeight);
+        function highlightTitle($ca0, ca0, $ca1, ca1) {
+          let title0 = ca0.def.title;
+          let title1 = ca1 ? ca1.def.title : null;
+          if (title0 !== title1) {
+            $ca0.find(titleSelector).addClass(highlightClass);
+
+            if ($ca1) {
+              $ca1.find(titleSelector).addClass(highlightClass);
+            }
           }
         }
 
         /**
-         * Fill empty space when CA is not existing
-         * @param {Object} caList - List of CA
-         * @param {Object} $ca - jQuery object Current attribute
-         * @param {Number} index - Index of previous the same attribute
+         * Highlights value in custom attributes
+         * @param {Object} $ca0 - JQuery object
+         * @param {Object} ca0 - custom attribute object
+         * @param {Object} $ca1 - jQuery object
+         * @param {Object} ca1 - custom attribute object
          */
-        function fillEmptyCA(caList, $ca, index) {
-          var caOldHeight;
-          caOldHeight = $ca
-                          .closest(caWrapperSelector)
-                          .outerHeight(true);
-          if (index === -1) {
-            $(caList.context).css('padding-top', '+=' + caOldHeight);
-          } else {
-            $(caList[index])
-                    .closest(caWrapperSelector)
-                    .css('margin-bottom', '+=' + caOldHeight);
+        function highlightValue($ca0, ca0, $ca1, ca1) {
+          let value0 = ca0.attribute_value;
+          let value1 = ca1 ? ca1.attribute_value : null;
+          if (value0 !== value1) {
+            $ca0.find(valueSelector).addClass(highlightClass);
+
+            if ($ca1) {
+              $ca1.find(valueSelector).addClass(highlightClass);
+            }
           }
-          $ca.closest(caSelector).addClass(highlightClass);
+        }
+
+        /**
+         * Fills empty space when CA is not existing
+         * @param {Object} $ca - jQuery object of previous the same attribute
+         * @return {Object} new empty jQuery object
+         */
+        function fillEmptyCA($ca) {
+          let $empty = $('<div class="ggrc-form-item" style="width:100%"/>');
+          $empty.insertBefore($ca);
+          return $empty;
         }
       },
 
@@ -459,11 +458,11 @@ import {confirm} from '../../plugins/utils/modals';
         var $roleBlocksNew = $rolesPanes.eq(1)
           .find('related-people-access-control-group');
 
-        $roleBlocksOld.each(function (i) {
+        $roleBlocksOld.each((i) => {
           var $blockOld = $roleBlocksOld.eq(i);
           var $blockNew = $roleBlocksNew.eq(i); // the block count is the same
           compareRoleBlocks($blockOld, $blockNew);
-          equalizeHeights($blockOld, $blockNew);
+          this.equalizeHeights($blockOld, $blockNew);
         });
 
         /**
@@ -529,30 +528,29 @@ import {confirm} from '../../plugins/utils/modals';
             }
           });
         }
+      },
+      /**
+       * Adjust the heights of two DOM elements to the higher one's height.
+       *
+       * @param {jQuery} $block - the first block element
+       * @param {jQuery} $block2 - the second block element
+       */
+      equalizeHeights($block, $block2) {
+        var height;
+        var height2;
 
-        /**
-         * Adjust the heights of two DOM elements to the higher one's height.
-         *
-         * @param {jQuery} $block - the first block element
-         * @param {jQuery} $block2 - the second block element
-         */
-        function equalizeHeights($block, $block2) {
-          var height;
-          var height2;
+        $block.css('max-width', 'none');
+        $block2.css('max-width', 'none');
+        $block.css('margin-right', '0');
+        $block2.css('margin-right', '0');
 
-          $block.css('max-width', 'none');
-          $block2.css('max-width', 'none');
-          $block.css('margin-right', '0');
-          $block2.css('margin-right', '0');
+        height = $block.outerHeight();
+        height2 = $block2.outerHeight();
 
-          height = $block.outerHeight();
-          height2 = $block2.outerHeight();
-
-          if (height > height2) {
-            $block2.outerHeight(height);
-          } else if (height < height2) {
-            $block.outerHeight(height2);
-          }
+        if (height > height2) {
+          $block2.outerHeight(height);
+        } else if (height < height2) {
+          $block.outerHeight(height2);
         }
       },
     },
