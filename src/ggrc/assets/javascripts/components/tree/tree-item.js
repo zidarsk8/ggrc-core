@@ -77,13 +77,7 @@ import template from './templates/tree-item.mustache';
 
           viewModel.attr('resultDfd', resultDfd);
         }
-
-        viewModel.initChildTreeDisplay();
       },
-      ' childModelsChange': function (el, ev, selectedModels) {
-        ev.stopPropagation();
-        this.viewModel.setChildModels(selectedModels);
-      }
     }
   });
 })(window.can, window.GGRC);
