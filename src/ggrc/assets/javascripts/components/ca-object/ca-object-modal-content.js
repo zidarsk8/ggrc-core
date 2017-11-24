@@ -5,6 +5,8 @@
 
 import '../comment/comment-input';
 import '../comment/comment-add-button';
+import '../object-list-item/editable-document-object-list-item';
+import '../assessment/attach-button';
 
 (function (can, GGRC) {
   'use strict';

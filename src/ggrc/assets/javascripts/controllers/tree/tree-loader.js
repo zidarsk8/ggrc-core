@@ -8,12 +8,6 @@ import {
 } from '../../plugins/utils/snapshot-utils';
 
 (function (can, $) {
-  if (!GGRC.tree_view) {
-    GGRC.tree_view = new can.Map();
-  }
-  GGRC.tree_view.attr('basic_model_list', []);
-  GGRC.tree_view.attr('sub_tree_for', {});
-
   can.Map.extend('CMS.Models.TreeViewOptions', {
     defaults: {
       instance: undefined,

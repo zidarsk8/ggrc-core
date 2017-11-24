@@ -3,35 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../../permission';
-import '../../bootstrap/modal-form';
-import '../../plugins/lodash_helpers';
-import '../../plugins/persistent_notifier';
-import '../../ggrc_base';
-import '../../apps/base_widgets';
-import '../../application';
-import '../../plugins/ggrc_utils';
-import '../../plugins/datepicker';
-import '../../plugins/can_control';
-import '../../plugins/autocomplete';
-import '../../plugins/ajax_extensions';
-import '../../plugins/canjs_extensions';
-import '../../plugins/component_registry';
-import '../../plugins/openclose';
-import '../../plugins/tooltip';
-import '../../plugins/popover';
-import '../../plugins/popover_template';
-import '../../mustache_helper';
-import '../../generated/ggrc_filter_query_parser';
-
-// Models
-import '../../models';
+import '../commons';
 
 // Controllers
-import '../../controllers/tree/tree-loader';
-import '../../controllers/tree/tree-view';
-import '../../controllers/tree/tree-view-node';
-import '../../controllers/tree/list_view_controller';
 import '../../controllers/dashboard_widgets_controller';
 import '../../controllers/info_widget_controller';
 import '../../controllers/dashboard_widget_controller';
@@ -40,30 +14,17 @@ import '../../controllers/automapper_controller';
 import '../../controllers/dashboard_controller';
 
 // Modules and Apps
-import '../../modules/widget_list';
 import '../../pbc/workflow_controller';
-import '../../apps/quick_search';
 import '../../apps/business_objects';
-import '../../apps/custom_attributes_wrap';
 
 // Components
 import '../../components/spinner/spinner';
-import '../../components/collapsible-panel/collapsible-panel';
 import '../../components/read-more/read-more';
-import '../../components/assessment/info-pane/confirm-edit-action';
-import '../../components/object-list-item/person-list-item';
-import '../../components/object-list-item/document-object-list-item';
-import '../../components/object-list-item/editable-document-object-list-item';
-import '../../components/object-state-toolbar/object-state-toolbar';
 import '../../components/object-list/object-list';
-import '../../components/ca-object/ca-object-modal-content';
-import '../../components/related-objects/related-objects';
 import '../../components/simple-modal/simple-modal';
 import '../../components/show-more/show-more';
-import '../../components/show-related-assessments-button/show-related-assessments-button';
 import '../../components/autocomplete/autocomplete';
 import '../../components/person/person';
-import '../../components/unarchive_link';
 import '../../components/link_to_clipboard';
 import '../../components/mapped_tree_view';
 import '../../components/reusable_objects';
@@ -81,19 +42,11 @@ import '../../components/tree/tree-widget-container';
 import '../../components/snapshotter/revisions-comparer';
 import '../../components/snapshotter/scope-update';
 import '../../components/page-header/page-header';
-import '../../components/action-toolbar/action-toolbar';
 import '../../components/action-toolbar-control/action-toolbar-control';
 import '../../components/unmap-button/unmap-button';
 import '../../components/related-objects/related-documents';
 import '../../components/related-objects/related-reference-urls';
-import '../../components/assessment/attach-button';
-import '../../components/assessment/info-pane-save-status';
 import '../../components/inline/inline';
-import '../../components/csv/export';
-import '../../components/csv/import';
-import '../../components/people/people-list-info';
-import '../../components/loading/loading-status';
-import '../../components/lazy-render/lazy-render';
 import '../../components/global-custom-attributes/global-custom-attributes';
 import '../../components/issue/issue-unmap-dropdown-item';
 import '../../components/external-data-autocomplete/external-data-autocomplete';
@@ -101,7 +54,4 @@ import '../../components/external-data-autocomplete/external-data-autocomplete';
 import '../../components/custom-roles/custom-roles';
 import '../../components/custom-roles/custom-roles-modal';
 
-// This modal should be loaded here as it requires some components
-import '../../bootstrap/modal-ajax';
-
-import '../../dashboard';
+import '../../common-handlers';

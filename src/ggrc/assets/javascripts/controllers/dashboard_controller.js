@@ -35,7 +35,6 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
         this.hide_widget_area();
         this.init_default_widgets();
         this.init_widget_area();
-        this.init_info_pin();
       }.bind(this));
     },
 
@@ -110,11 +109,6 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
             dashboard_controller: this,
           });
       }
-    },
-
-    init_info_pin: function () {
-      this.info_pin = new CMS.Controllers
-        .InfoPin(this.element.find('.pin-content'));
     },
 
     '.nav-logout click': function (el, ev) {
@@ -244,6 +238,20 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
     init: function () {
       this.options.model = this.options.instance.constructor;
       this._super();
+      this.init_info_pin();
+    },
+
+    init_info_pin: function () {
+      this.info_pin = new CMS.Controllers
+        .InfoPin(this.element.find('.pin-content'));
+    },
+
+    hideInfoPin () {
+      const infopinCtr = this.info_pin.element.control();
+
+      if (infopinCtr) {
+        infopinCtr.hideInstance();
+      }
     },
 
     init_page_title: function () {
@@ -389,10 +397,9 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
         this.options.contexts.attr('active_widget').selector;
       var widget = $(panel);
       var dashboardCtr = this.options.dashboard_controller;
-      var infopinCtr = dashboardCtr.info_pin.element.control();
 
-      if (infopinCtr) {
-        infopinCtr.hideInstance();
+      if (dashboardCtr.hideInfoPin) {
+        dashboardCtr.hideInfoPin();
       }
 
       if (widget.length) {
