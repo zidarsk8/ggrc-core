@@ -128,7 +128,6 @@ dashboard-js-template-files:
   - components/simple-modal/simple-modal.mustache
   - components/simple-popover/simple-popover.mustache
   - components/page-header/page-header.mustache
-  - components/form/fields/text-form-field.mustache
   - components/form/fields/rich-text-form-field.mustache
   - components/form/fields/checkbox-form-field.mustache
   - components/form/fields/dropdown-form-field.mustache
