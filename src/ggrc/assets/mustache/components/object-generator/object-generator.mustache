@@ -27,7 +27,8 @@
             <assessment-templates
               instance="parentInstance"
               type="type"
-              assessment-template="assessmentTemplate">
+              assessment-template="assessmentTemplate"
+              (assessment-template-loaded)="onSubmit()">
             </assessment-templates>
           </div>
           <div class="object-controls__type">
