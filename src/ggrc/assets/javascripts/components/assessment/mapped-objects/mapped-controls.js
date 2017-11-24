@@ -103,6 +103,7 @@ import {
     selectedItem: {},
     snapshot: {},
     assessmentType: '@',
+    withoutDetails: false,
     /**
      * Generate params required for Query API
      * @param {Number} id - Id of Control's Snapshot
@@ -184,7 +185,9 @@ import {
         var item = this.viewModel.attr('selectedItem.data');
         var attributes;
         if (item) {
-          this.viewModel.loadItems();
+          if (!this.viewModel.attr('withoutDetails')) {
+            this.viewModel.loadItems();
+          }
           attributes = this.viewModel.attributesToFormFields(
             item.attr('revision.content'));
           this.viewModel.attr('customAttributes', attributes);

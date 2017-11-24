@@ -10,7 +10,6 @@ import '../assessment-people';
 import '../assessment-object-type-dropdown';
 import '../attach-button';
 import '../info-pane-save-status';
-import '../mapped-objects/mapped-related-information';
 import '../../comment/comment-add-form';
 import '../../comment/mapped-comments';
 import '../mapped-objects/mapped-controls';
