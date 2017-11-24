@@ -6,6 +6,7 @@
 from sqlalchemy import orm
 
 from ggrc import db
+from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
 from ggrc.models.deferred import deferred
 from ggrc.models import mixins
@@ -32,6 +33,7 @@ class Audit(Snapshotable,
             Personable,
             HasOwnContext,
             Relatable,
+            Roleable,
             WithLastDeprecatedDate,
             mixins.Timeboxed,
             mixins.WithContact,
