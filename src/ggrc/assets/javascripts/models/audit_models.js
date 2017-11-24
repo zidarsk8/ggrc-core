@@ -70,6 +70,7 @@ import Permission from '../permission';
     destroy: 'DELETE /api/audits/{id}',
     create: 'POST /api/audits',
     mixins: [
+      'accessControlList',
       'contactable',
       'unique_title',
       'ca_update',
@@ -79,6 +80,7 @@ import Permission from '../permission';
     ],
     is_custom_attributable: true,
     is_clonable: true,
+    isRoleable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
       program: 'CMS.Models.Program.stub',
