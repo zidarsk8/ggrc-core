@@ -3,6 +3,8 @@
 
 """File action utitlities for GDrive module"""
 
+from StringIO import StringIO
+
 from apiclient import discovery
 from apiclient import http
 from apiclient.errors import HttpError
@@ -45,7 +47,7 @@ def get_gdrive_file(file_data):
     else:
       file_data = drive_service.files().export_media(
           fileId=file_data['id'], mimeType='text/csv').execute()
-    csv_data = read_csv_file(file_data.splitlines())
+    csv_data = read_csv_file(StringIO(file_data))
   except AttributeError:
     # when file_data has no splitlines() method
     raise BadRequest("Wrong file format.")
