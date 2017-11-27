@@ -4,32 +4,31 @@
 */
 
 import * as caUtils from '../../../plugins/utils/ca-utils';
+import Component from '../revisions-comparer';
 
 describe('GGRC.Components.revisionsComparer', function () {
-  'use strict';
+  let viewModel;
 
-  var Component;  // the component under test
-
-  beforeAll(function () {
-    Component = GGRC.Components.get('RevisionsComparer');
+  beforeEach(function () {
+    viewModel = new (can.Map.extend(Component.prototype.viewModel));
   });
 
   describe('prepareInstances() method', function () {
     var fakeData;
-    var method;  // the method under test
+    var method; // the method under test
 
     beforeEach(function () {
-      method = Component.prototype.scope.prepareInstances;
+      method = viewModel.prepareInstances;
       fakeData = [
         {
           id: 1,
           content: new can.Map({id: 1}),
-          resource_type: 'Control'
+          resource_type: 'Control',
         }, {
           id: 2,
           content: new can.Map({id: 1}),
-          resource_type: 'Control'
-        }
+          resource_type: 'Control',
+        },
       ];
     });
 
@@ -61,7 +60,7 @@ describe('GGRC.Components.revisionsComparer', function () {
       fakeData.forEach(function (item, i) {
         var acl = new can.List([
           {ac_role_id: i * 10, person_id: i * 10},
-          {ac_role_id: i * 10, person_id: i * 10}
+          {ac_role_id: i * 10, person_id: i * 10},
         ]);
         item.content.attr('access_control_list', acl);
       });
@@ -80,48 +79,25 @@ describe('GGRC.Components.revisionsComparer', function () {
     });
   });
 
-  describe('getInfopanes() method', function () {
-    var fakeHTML;
-    var method;  // the method under test
-
-    beforeEach(function () {
-      method = Component.prototype.scope.getInfopanes;
-      fakeHTML = $('<div>' +
-                      '<div class="info">' +
-                        '<div class="tier-content"></div>' +
-                      '</div>' +
-                      '<div class="info">' +
-                        '<div class="tier-content"></div>' +
-                      '</div>' +
-                    '</div>');
-    });
-
-    it('returns all info panes under the given element', function () {
-      var result = method(fakeHTML);
-      expect(result.length).toBe(2);
-    });
-  });
-
   describe('getAttachmentsDfds() method', function () {
     var method;
     var revisions;
 
     beforeEach(function () {
-      var prepareInstancesMethod = Component.prototype.scope.prepareInstances;
+      var prepareInstancesMethod = viewModel.prepareInstances;
       var fakeData = [
         {
           id: 1,
           content: new can.Map({id: 1}),
-          resource_type: 'Control'
+          resource_type: 'Control',
         }, {
           id: 2,
           content: new can.Map({id: 1}),
-          resource_type: 'Control'
-        }
+          resource_type: 'Control',
+        },
       ];
 
-      method = Component.prototype.scope.getAttachmentsDfds
-        .bind(Component.prototype.scope);
+      method = viewModel.getAttachmentsDfds.bind(viewModel);
       revisions = new can.List(prepareInstancesMethod(fakeData));
     });
 
@@ -151,7 +127,7 @@ describe('GGRC.Components.revisionsComparer', function () {
     var Revision;
 
     beforeEach(function () {
-      method = Component.prototype.scope.getRevisions;
+      method = viewModel.getRevisions;
       Revision = CMS.Models.Revision;
     });
 
@@ -235,7 +211,7 @@ describe('GGRC.Components.revisionsComparer', function () {
 
     beforeEach(() => {
       Person = CMS.Models.Person;
-      method = Component.prototype.scope.loadACLPeople;
+      method = viewModel.loadACLPeople;
       instance = new can.Map({
         access_control_list: [{
           person: {
@@ -300,24 +276,16 @@ describe('GGRC.Components.revisionsComparer', function () {
     let revisions;
 
     beforeEach(() => {
-      method = Component.prototype.scope.highlightCustomAttributes
-        .bind(Component.prototype.scope);
-
-      spyOn(Component.prototype.scope, 'equalizeHeights');
+      method = viewModel.highlightCustomAttributes.bind(viewModel);
+      spyOn(viewModel, 'equalizeHeights');
     });
 
     it('prepares custom attributes', () => {
       revisions = [
         {
-          instance: new can.Map({
-            // custom_attribute_definitions: [],
-            // custom_attributes: [],
-          }),
+          instance: new can.Map(),
         }, {
-          instance: new can.Map({
-            // custom_attribute_definitions: [],
-            // custom_attributes: [],
-          }),
+          instance: new can.Map(),
         },
       ];
       let $target = $('<div/>');
@@ -394,7 +362,7 @@ describe('GGRC.Components.revisionsComparer', function () {
 
       it('equlizes blocks heights', () => {
         method($target, revisions);
-        expect(Component.prototype.scope.equalizeHeights).toHaveBeenCalled();
+        expect(viewModel.equalizeHeights).toHaveBeenCalled();
       });
     });
 
@@ -478,8 +446,7 @@ describe('GGRC.Components.revisionsComparer', function () {
 
       it('equlizes blocks heights', () => {
         method($target, revisions);
-        expect(Component.prototype.scope.equalizeHeights.calls.count())
-          .toEqual(2);
+        expect(viewModel.equalizeHeights.calls.count()).toEqual(2);
       });
     });
 
