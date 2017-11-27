@@ -1,4 +1,4 @@
-/*!
+/*
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -8,6 +8,7 @@ import '../components/assessment_generator';
 import {
   getCounts,
 } from '../plugins/utils/current-page-utils';
+import router from '../router';
 
 export default can.Control({
   defaults: {
@@ -158,6 +159,17 @@ export default can.Control({
     chart = new google.visualization.PieChart(
       document.getElementById(elementId));
     this.options.chart = chart;
+
+    google.visualization.events.addListener(chart, 'select', () => {
+      let selectedItem = chart.getSelection()[0];
+      if (selectedItem) {
+        let topping = data.getValue(selectedItem.row, 0);
+        router.attr({
+          widget: 'assessment_widget',
+          state: [topping],
+        });
+      }
+    });
 
     chart.draw(data, options);
     setTimeout(function () {
