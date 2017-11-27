@@ -15,28 +15,6 @@ let viewModel = can.Map.extend({
       type: Boolean,
       value: false,
     },
-    useLocalStorage: {
-      type: Boolean,
-      value: true,
-    },
-    selectedStates: {
-      type: '*',
-      set(selected) {
-        let statuses = this.attr('filterStates');
-        let filter = '';
-
-        statuses.forEach((item) => {
-          item.attr('checked', (selected.indexOf(item.value) > -1));
-        });
-
-        if (selected.length && statuses.length !== selected.length) {
-          filter = StateUtils.statusFilter(selected, '',
-            this.attr('modelName'));
-        }
-
-        this.attr('options.filter', filter);
-      },
-    },
   },
   disabled: false,
   options: {},
@@ -45,47 +23,47 @@ let viewModel = can.Map.extend({
   widgetId: null,
   modelName: null,
   displayPrefs: null,
-  loadTreeStates(modelName) {
+  initializeFilter(states) {
+    let statuses = this.attr('filterStates');
+    statuses.forEach((item) => {
+      item.attr('checked', (states.indexOf(item.value) > -1));
+    });
+    this.setFilter(states);
+  },
+  loadDefaultStates(modelName) {
     // Get the status list from local storage
-    let savedStates = this.attr('displayPrefs')
-      .getTreeViewStates(modelName);
-    let actualStates = StateUtils.getStatesForModel(modelName);
-    let selectedStates = savedStates.filter((state) => {
-      return actualStates.includes(state);
+    let savedStates = this.attr('displayPrefs').getTreeViewStates(modelName);
+    let allStates = StateUtils.getStatesForModel(modelName);
+    let defaultStates = savedStates.filter((state) => {
+      return allStates.includes(state);
     });
 
-    if (selectedStates.length === 0) {
-      selectedStates = StateUtils.getDefaultStatesForModel(modelName);
+    if (defaultStates.length === 0) {
+      defaultStates = StateUtils.getDefaultStatesForModel(modelName);
     }
 
-    this.attr('selectedStates', selectedStates);
+    return defaultStates;
   },
   saveTreeStates(selectedStates) {
-    let stateToSave;
-    let filterName = this.attr('widgetId') ||
-      this.attr('modelName');
+    this.setFilter(selectedStates);
 
-    // in this case we save previous states
-    if (!selectedStates) {
-      return;
+    let filterName = this.attr('widgetId') || this.attr('modelName');
+    this.attr('displayPrefs').setTreeViewStates(filterName, selectedStates);
+  },
+  setFilter(selected) {
+    let statuses = this.attr('filterStates');
+    let filter = '';
+
+    if (selected.length && statuses.length !== selected.length) {
+      filter = StateUtils.statusFilter(selected, '', this.attr('modelName'));
     }
 
-    stateToSave = selectedStates.map((state) => state.value);
-
-    this.attr('selectedStates', stateToSave);
-
-    if (this.attr('useLocalStorage')) {
-      this.attr('displayPrefs').setTreeViewStates(filterName, stateToSave);
-    }
+    this.attr('options.filter', filter);
   },
 });
 
-/**
- *
- */
-export default GGRC.Components('treeStatusFilter', {
+export default can.Component.extend({
   tag: 'tree-status-filter',
-  template: '<content/>',
   viewModel: viewModel,
   events: {
     inserted() {
@@ -113,17 +91,18 @@ export default GGRC.Components('treeStatusFilter', {
 
       vm.attr('filterStates', filterStates);
 
-      if (vm.attr('useLocalStorage')) {
-        CMS.Models.DisplayPrefs.getSingleton().then((displayPrefs) => {
-          vm.attr('displayPrefs', displayPrefs);
+      CMS.Models.DisplayPrefs.getSingleton().then((displayPrefs) => {
+        vm.attr('displayPrefs', displayPrefs);
 
-          vm.loadTreeStates(filterName);
-        });
-      }
+        let defaultStates = vm.loadDefaultStates(filterName);
+        vm.initializeFilter(defaultStates);
+      });
     },
     'multiselect-dropdown multiselect:closed'(el, ev, selected) {
       ev.stopPropagation();
-      this.viewModel.saveTreeStates(selected);
+      let selectedStates = selected.map((state) => state.value);
+
+      this.viewModel.saveTreeStates(selectedStates);
       this.viewModel.dispatch('filter');
     },
     '{viewModel} disabled'() {
