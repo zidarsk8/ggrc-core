@@ -637,8 +637,15 @@ class AuditColumnHandler(MappingColumnHandler):
     audit = self.value[0]
 
     if isinstance(audit, Audit):
-      if not self.row_converter.is_new and \
-              audit.slug != self.row_converter.obj.audit.slug:
+      old_slug = None
+      if (hasattr(self.row_converter.obj, "audit") and
+         self.row_converter.obj.audit):
+        old_slug = self.row_converter.obj.audit.slug
+      else:
+        rel_audits = self.row_converter.obj.related_objects(_types="Audit")
+        if rel_audits:
+          old_slug = rel_audits.pop().slug
+      if not self.row_converter.is_new and audit.slug != old_slug:
         self.add_warning(errors.UNMODIFIABLE_COLUMN,
                          column_name=self.display_name)
         self.value = []
