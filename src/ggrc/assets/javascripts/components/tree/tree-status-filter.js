@@ -4,6 +4,7 @@
  */
 
 import * as StateUtils from '../../plugins/utils/state-utils';
+import router from '../../router';
 
 let viewModel = can.Map.extend({
   define: {
@@ -33,8 +34,11 @@ let viewModel = can.Map.extend({
   loadDefaultStates(modelName) {
     // Get the status list from local storage
     let savedStates = this.attr('displayPrefs').getTreeViewStates(modelName);
+    // Get the status list from query string
+    let queryStates = router.attr('state');
+
     let allStates = StateUtils.getStatesForModel(modelName);
-    let defaultStates = savedStates.filter((state) => {
+    let defaultStates = (queryStates || savedStates).filter((state) => {
       return allStates.includes(state);
     });
 
@@ -56,6 +60,9 @@ let viewModel = can.Map.extend({
 
     if (selected.length && statuses.length !== selected.length) {
       filter = StateUtils.statusFilter(selected, '', this.attr('modelName'));
+      router.attr('state', selected);
+    } else {
+      router.removeAttr('state');
     }
 
     this.attr('options.filter', filter);
@@ -96,6 +103,9 @@ export default can.Component.extend({
 
         let defaultStates = vm.loadDefaultStates(filterName);
         vm.initializeFilter(defaultStates);
+
+        // Start listening route events only after full initialization.
+        vm.attr('router', router);
       });
     },
     'multiselect-dropdown multiselect:closed'(el, ev, selected) {
@@ -103,7 +113,6 @@ export default can.Component.extend({
       let selectedStates = selected.map((state) => state.value);
 
       this.viewModel.saveTreeStates(selectedStates);
-      this.viewModel.dispatch('filter');
     },
     '{viewModel} disabled'() {
       if (this.viewModel.attr('disabled')) {
@@ -111,6 +120,13 @@ export default can.Component.extend({
       } else {
         this.viewModel.loadTreeStates(this.viewModel.attr('modelName'));
       }
+    },
+    '{viewModel.router} state'(router, event, newValue) {
+      let states = newValue ||
+        this.viewModel.attr('filterStates').map((state) => state.value);
+
+      this.viewModel.initializeFilter(states);
+      this.viewModel.dispatch('filter');
     },
   },
 });

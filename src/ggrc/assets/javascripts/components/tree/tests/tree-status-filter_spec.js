@@ -5,6 +5,7 @@
 
 import Component from '../tree-status-filter';
 import * as StateUtils from '../../../plugins/utils/state-utils';
+import router from '../../../router';
 
 
 describe('treeStatusFilter', () => {
@@ -41,6 +42,35 @@ describe('treeStatusFilter', () => {
       viewModel.setFilter(['A']);
 
       expect(viewModel.attr('options.filter')).toEqual(FILTER_STRING);
+    });
+
+    it('write states to query string property', () => {
+      let statuses = ['A'];
+
+      viewModel.setFilter(statuses);
+
+      let result = router.attr('state').attr();
+      expect(result).toEqual(statuses);
+    });
+
+    it('clear query string property when there are no states', () => {
+      let statuses = [];
+      router.attr('state', ['A']);
+
+      viewModel.setFilter(statuses);
+
+      let result = router.attr('state');
+      expect(result).toBeUndefined();
+    });
+
+    it('clear query string property when selected all states', () => {
+      let statuses = ['A', 'B', 'C'];
+      router.attr('state', ['A']);
+
+      viewModel.setFilter(statuses);
+
+      let result = router.attr('state');
+      expect(result).toBeUndefined();
     });
   });
 
@@ -103,6 +133,80 @@ describe('treeStatusFilter', () => {
 
         expect(viewModel.attr('displayPrefs').setTreeViewStates)
           .toHaveBeenCalledWith('testName', filters);
+      });
+    });
+  });
+
+  describe('loadDefaultStates() method', () => {
+    let savedFilters;
+    beforeEach(() => {
+      savedFilters = new can.List(['c', 'd']);
+      spyOn(savedFilters, 'filter').and.returnValue(['c']);
+
+      viewModel.attr('displayPrefs', {
+        getTreeViewStates: jasmine.createSpy().and.returnValue(savedFilters),
+      });
+    });
+
+    it('use filter set from query if it is presented', () => {
+      let queryFilters = new can.List(['a', 'b']);
+      spyOn(queryFilters, 'filter').and.returnValue(['a']);
+      router.attr('state', queryFilters);
+
+      viewModel.loadDefaultStates();
+
+      expect(queryFilters.filter).toHaveBeenCalled();
+    });
+
+    it('use saved filters if set from query is not presented', () => {
+      router.removeAttr('state');
+
+      viewModel.loadDefaultStates();
+
+      expect(savedFilters.filter).toHaveBeenCalled();
+    });
+  });
+
+  describe('"{viewModel.router} state" event handler', () => {
+    let handler;
+    beforeEach(() => {
+      handler = Component.prototype.events['{viewModel.router} state'].bind({
+        viewModel,
+      });
+      spyOn(viewModel, 'initializeFilter');
+      spyOn(viewModel, 'dispatch');
+      viewModel.attr('filterStates', [
+        {value: 'A'},
+        {value: 'B'},
+      ]);
+    });
+
+    describe('when new value was added', () => {
+      beforeEach(() => {
+        handler(null, null, ['A']);
+      });
+
+      it('initializes states', () => {
+        expect(viewModel.initializeFilter).toHaveBeenCalledWith(['A']);
+      });
+
+      it('dispatches "filter" event', () => {
+        expect(viewModel.dispatch).toHaveBeenCalledWith('filter');
+      });
+    });
+
+    describe('when value was removed', () => {
+      beforeEach(() => {
+        handler(null, null, null);
+      });
+
+      it('initializes states', () => {
+        expect(viewModel.initializeFilter.calls.argsFor(0)[0].attr())
+          .toEqual(['A', 'B']);
+      });
+
+      it('dispatches "filter" event', () => {
+        expect(viewModel.dispatch).toHaveBeenCalledWith('filter');
       });
     });
   });
