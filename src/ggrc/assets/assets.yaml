@@ -14,7 +14,6 @@ dashboard-js-template-files:
   - components/assessment/info-pane/info-pane.mustache
   - components/assessment/controls-toolbar/controls-toolbar.mustache
   - components/assessment/mapped-objects/mapped-control-related-objects.mustache
-  - components/assessment/mapped-objects/mapped-controls.mustache
   - components/assessment/custom-attributes.mustache
   - components/gca-controls/gca-controls.mustache
   - components/comment/comment-add-form.mustache
