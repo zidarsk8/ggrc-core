@@ -43,7 +43,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       people.forEach(function (person) {
         listWithoutRole.push({
           ac_role_id: roleId,
-          person: {id: person.id, type: 'Person'}
+          person: {id: person.id, type: 'Person'},
         });
       });
 
@@ -134,7 +134,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
         group.map(function (groupItem) {
           return {
             id: groupItem.person.id,
-            type: 'Person'
+            type: 'Person',
           };
         }) :
         [];
@@ -143,7 +143,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
         title: title,
         groupId: groupId,
         people: people,
-        required: role.mandatory
+        required: role.mandatory,
       };
     },
     filterByIncludeExclude: function (includeRoles, excludeRoles) {
@@ -243,20 +243,19 @@ export default GGRC.Components('relatedPeopleAccessControl', {
       }
 
       return groups;
-    }
+    },
   },
   events: {
     refreshGroups: function () {
       this.viewModel.attr('groups',
         this.viewModel.getRoleList());
     },
-    inserted: function () {
+    setupGroups() {
       this.refreshGroups();
       this.viewModel.checkConflicts();
     },
-    '{viewModel.instance.access_control_list} change':
-    function () {
-      this.refreshGroups();
-    }
-  }
+    inserted: 'setupGroups',
+    '{viewModel.instance} update': 'setupGroups',
+    '{viewModel.instance.access_control_list} change': 'refreshGroups',
+  },
 });

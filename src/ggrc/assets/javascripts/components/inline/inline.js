@@ -10,6 +10,7 @@ import '../form/fields/dropdown-form-field';
 import '../form/fields/person-form-field';
 import '../form/fields/rich-text-form-field';
 import '../form/fields/text-form-field';
+import '../form/fields/numberbox-form-field';
 
 
 (function (can, GGRC) {
