@@ -21,11 +21,11 @@ let viewModel = can.Map.extend({
     },
     selectedStates: {
       type: '*',
-      set: function (selected) {
+      set(selected) {
         let statuses = this.attr('filterStates');
         let filter = '';
 
-        statuses.forEach(function (item) {
+        statuses.forEach((item) => {
           item.attr('checked', (selected.indexOf(item.value) > -1));
         });
 
@@ -45,12 +45,12 @@ let viewModel = can.Map.extend({
   widgetId: null,
   modelName: null,
   displayPrefs: null,
-  loadTreeStates: function (modelName) {
+  loadTreeStates(modelName) {
     // Get the status list from local storage
-    var savedStates = this.attr('displayPrefs')
+    let savedStates = this.attr('displayPrefs')
       .getTreeViewStates(modelName);
-    var actualStates = StateUtils.getStatesForModel(modelName);
-    var selectedStates = savedStates.filter(function (state) {
+    let actualStates = StateUtils.getStatesForModel(modelName);
+    let selectedStates = savedStates.filter((state) => {
       return actualStates.includes(state);
     });
 
@@ -60,9 +60,9 @@ let viewModel = can.Map.extend({
 
     this.attr('selectedStates', selectedStates);
   },
-  saveTreeStates: function (selectedStates) {
-    var stateToSave;
-    var filterName = this.attr('widgetId') ||
+  saveTreeStates(selectedStates) {
+    let stateToSave;
+    let filterName = this.attr('widgetId') ||
       this.attr('modelName');
 
     // in this case we save previous states
@@ -70,9 +70,7 @@ let viewModel = can.Map.extend({
       return;
     }
 
-    stateToSave = selectedStates.map(function (state) {
-      return state.value;
-    });
+    stateToSave = selectedStates.map((state) => state.value);
 
     this.attr('selectedStates', stateToSave);
 
@@ -90,15 +88,15 @@ export default GGRC.Components('treeStatusFilter', {
   template: '<content/>',
   viewModel: viewModel,
   events: {
-    inserted: function () {
-      var vm = this.viewModel;
-      var options = vm.attr('options');
-      var filter = vm.attr('filter');
-      var operation = vm.attr('operation');
-      var depth = vm.attr('depth');
-      var filterName = vm.attr('widgetId') || vm.attr('modelName');
-      var filterStates = StateUtils.getStatesForModel(vm.attr('modelName'))
-        .map(function (state) {
+    inserted() {
+      let vm = this.viewModel;
+      let options = vm.attr('options');
+      let filter = vm.attr('filter');
+      let operation = vm.attr('operation');
+      let depth = vm.attr('depth');
+      let filterName = vm.attr('widgetId') || vm.attr('modelName');
+      let filterStates = StateUtils.getStatesForModel(vm.attr('modelName'))
+        .map((state) => {
           return {
             value: state,
           };
@@ -116,19 +114,19 @@ export default GGRC.Components('treeStatusFilter', {
       vm.attr('filterStates', filterStates);
 
       if (vm.attr('useLocalStorage')) {
-        CMS.Models.DisplayPrefs.getSingleton().then(function (displayPrefs) {
+        CMS.Models.DisplayPrefs.getSingleton().then((displayPrefs) => {
           vm.attr('displayPrefs', displayPrefs);
 
           vm.loadTreeStates(filterName);
         });
       }
     },
-    'multiselect-dropdown multiselect:closed': function (el, ev, selected) {
+    'multiselect-dropdown multiselect:closed'(el, ev, selected) {
       ev.stopPropagation();
       this.viewModel.saveTreeStates(selected);
       this.viewModel.dispatch('filter');
     },
-    '{viewModel} disabled': function () {
+    '{viewModel} disabled'() {
       if (this.viewModel.attr('disabled')) {
         this.viewModel.attr('selectedStates', []);
       } else {
