@@ -36,6 +36,9 @@
         Workflow_Draft: {status: 'Draft'}
       }
     },
+    defaults: {
+      task_group_title: 'Task Group 1',
+    },
     obj_nav_options: {
       show_all_tabs: true,
     },
@@ -54,6 +57,7 @@
     init: function() {
       this._super && this._super.apply(this, arguments);
       this.validateNonBlank("title");
+
       this.bind("destroyed", function(ev, inst) {
         if(inst instanceof CMS.Models.Workflow) {
           can.each(inst.cycles, function(cycle) {
