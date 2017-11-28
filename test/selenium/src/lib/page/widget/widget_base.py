@@ -9,7 +9,7 @@ from lib import base, decorator, environment
 from lib.constants import locator, url, objects
 from lib.entities.entity import CustomAttributeEntity
 from lib.utils import selenium_utils
-from lib.utils.string_utils import get_bool_value_from_arg
+from lib.utils.string_utils import StringMethods
 
 
 class _Modal(base.Modal):
@@ -77,7 +77,7 @@ class CustomAttributesItemContent(base.Component):
               title=attrs[0],
               type=objects.get_singular(objects.CUSTOM_ATTRIBUTES),
               attribute_type=attrs[1],
-              mandatory=get_bool_value_from_arg(attrs[2]),
+              mandatory=StringMethods.get_bool_value_from_arg(attrs[2]),
               definition_type=self._item_name))
 
   def get_ca_list_from_group(self):
