@@ -7,7 +7,6 @@ import './related-objects';
 import './related-audits';
 import './related-assessment-list';
 import './related-assessment-item';
-import './related-controls-objectives';
 import './related-evidences-and-urls';
 import '../sortable-column/sortable-column';
 import '../object-list/object-list';
@@ -60,6 +59,18 @@ export default GGRC.Components('relatedAssessments', {
           return this.attr('instance.assessment_type') ||
                  this.attr('instance.type');
         },
+      },
+      mappedSnapshots: {
+        type: 'boolean',
+        value: true
+      },
+      relatedObjectsFilter: {
+        get: function () {
+          return {
+            only: [this.attr('relatedObjectType')],
+            exclude: [],
+          };
+        }
       },
       relatedObjectsTitle: {
         get: function () {

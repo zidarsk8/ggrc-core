@@ -73,15 +73,13 @@
               {{localize_date instance.created_at}}
             </div>
             <div class="flex-size-3">
-              <related-controls-objectives {related-object-type}="relatedObjectType" {parent-instance}="instance">
-                <mapped-objects
-                  {mapped-snapshots}="mappedSnapshots"
-                  {filter}="filter"
-                  {parent-instance}="parentInstance"
-                  {^is-loading}="loadingState.controlsLoading">
-                  <business-object-list-item {instance}="instance"></business-object-list-item>
-                </mapped-objects>
-              </related-controls-objectives>
+	      <mapped-objects
+		{mapped-snapshots}="mappedSnapshots"
+		{filter}="relatedObjectsFilter"
+		{parent-instance}="instance"
+		{^is-loading}="loadingState.controlsLoading">
+		<business-object-list-item {instance}="instance"></business-object-list-item>
+	      </mapped-objects>
             </div>
             <div class="flex-size-3">
               <related-audits {parent-instance}="instance">
