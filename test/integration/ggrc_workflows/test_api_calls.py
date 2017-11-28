@@ -870,6 +870,39 @@ class TestStatusApiPatch(TestCase):
     self.assertEqual(self.DEPRECATED, self.cycle.status)
     self.assertEqual(all_models.Workflow.ACTIVE, self.workflow.status)
 
+  @ddt.data({"to_state": FINISHED, "success": True},
+            {"to_state": IN_PROGRESS, "success": False},
+            {"to_state": ASSIGNED, "success": False},
+            {"to_state": VERIFIED, "success": False})
+  @ddt.unpack
+  def test_move_from_declined(self, to_state, success):
+    """Test status propagation over update declined tasks to {to_state}."""
+    self.assertEqual([self.ASSIGNED] * len(self.tasks),
+                     [t.status for t in self.tasks])
+    start_state = self.DECLINED
+    start_statuses = [start_state] * len(self.tasks)
+    with factories.single_commit():
+      for idx, status in enumerate(start_statuses):
+        self.tasks[idx].status = status
+      self.group.status = self.IN_PROGRESS
+      self.cycle.status = self.IN_PROGRESS
+      self.workflow.status = all_models.Workflow.ACTIVE
+    self.assertEqual(start_statuses, [t.status for t in self.tasks])
+    # all tasks in progress state
+    to_states = [to_state] * len(self.tasks)
+    self._update_ct_via_patch(to_states)
+    self.refresh_set_up_instances()
+    if success:
+      task_state = group_state = cycle_state = to_state
+    else:
+      task_state = start_state
+      group_state = cycle_state = self.IN_PROGRESS
+    self.assertEqual([task_state] * len(self.tasks),
+                     [t.status for t in self.tasks])
+    self.assertEqual(group_state, self.group.status)
+    self.assertEqual(cycle_state, self.cycle.status)
+    self.assertEqual(all_models.Workflow.ACTIVE, self.workflow.status)
+
   def test_update_tasks_from_2_cycles(self):
     """Test bulk update few cycles at the same time."""
     with factories.single_commit():
