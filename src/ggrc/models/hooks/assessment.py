@@ -38,6 +38,12 @@ if not _ISSUE_TRACKER_ENABLED:
 
 _ASSESSMENT_MODEL_NAME = 'Assessment'
 _ASSESSMENT_TMPL_MODEL_NAME = 'AssessmentTemplate'
+_AUDIT_MODEL_NAME = 'Audit'
+
+_SUPPORTED_MODEL_NAMES = {
+    _ASSESSMENT_TMPL_MODEL_NAME,
+    _AUDIT_MODEL_NAME,
+}
 
 # mapping of model field name to API property name
 _ISSUE_TRACKER_UPDATE_FIELDS = (
@@ -152,8 +158,8 @@ _VERIFIER_STATUSES = {
 
 
 @signals.Restful.model_put_before_commit.connect_via(all_models.Assessment)
-def handle_assessment_put_before_commit(sender, obj=None, src=None, **kwargs):
-  """Handles assessment update event."""
+def handle_issuetracker(sender, obj=None, src=None, **kwargs):
+  """Handles IssueTracker information during assessment update event."""
   del sender  # Unused
 
   if not _is_issue_tracker_enabled(audit=obj.audit):
@@ -234,6 +240,9 @@ def handle_assessment_tmpl_post(sender, objects=None, sources=None):
   """Handles create event to AssessmentTemplate model."""
   del sender  # Unused
 
+  for src in sources:
+    _validate_issue_tracker_info(src.get('issue_tracker') or {})
+
   db.session.flush()
   template_ids = {
       obj.id for obj in objects
@@ -283,6 +292,9 @@ def handle_assessment_tmpl_put(sender, obj=None, src=None, service=None,
   """Handles update event to AssessmentTemplate model."""
   del sender, service, initial_state  # Unused
 
+  issue_tracker_info = src.get('issue_tracker') or {}
+  _validate_issue_tracker_info(issue_tracker_info)
+
   audit = all_models.Audit.query.join(
       all_models.Relationship,
       all_models.Relationship.source_id == all_models.Audit.id,
@@ -296,24 +308,50 @@ def handle_assessment_tmpl_put(sender, obj=None, src=None, service=None,
     issue_tracker_info = {
         'enabled': False,
     }
-  else:
-    issue_tracker_info = src.get('issue_tracker')
+
   if issue_tracker_info:
     all_models.IssuetrackerIssue.create_or_update_from_dict(
         _ASSESSMENT_TMPL_MODEL_NAME, obj.id, issue_tracker_info)
 
 
+@signals.Restful.model_deleted_after_commit.connect_via(all_models.Audit)
 @signals.Restful.model_deleted_after_commit.connect_via(
     all_models.AssessmentTemplate)
-def handle_assessment_tmpl_deleted_after_commit(sender, obj=None,
-                                                service=None, event=None):
-  """Handles delete event to AssessmentTemplate model."""
+def handle_deleted_after_commit(sender, obj=None, service=None, event=None):
+  """Handles IssueTracker information during delete event."""
   del sender, service, event  # Unused
 
-  issue_obj = all_models.IssuetrackerIssue.get_issue(
-      _ASSESSMENT_TMPL_MODEL_NAME, obj.id)
+  model_name = obj.__class__.__name__
+  if model_name not in _SUPPORTED_MODEL_NAMES:
+    return
+
+  issue_obj = all_models.IssuetrackerIssue.get_issue(model_name, obj.id)
   if issue_obj:
     db.session.delete(issue_obj)
+
+
+@signals.Restful.collection_posted.connect_via(all_models.Audit)
+def handle_audit_post(sender, objects=None, sources=None):
+  """Handles creating issue tracker related info."""
+  del sender  # Unused
+  for obj, src in itertools.izip(objects, sources):
+    issue_tracker_info = src.get('issue_tracker')
+    if not issue_tracker_info:
+      continue
+    _validate_issue_tracker_info(issue_tracker_info)
+    all_models.IssuetrackerIssue.create_or_update_from_dict(
+        _AUDIT_MODEL_NAME, obj.id, issue_tracker_info)
+
+
+@signals.Restful.model_put.connect_via(all_models.Audit)
+def handle_audit_put(sender, obj=None, src=None, service=None):
+  """Handles updating issue tracker related info."""
+  del sender, service  # Unused
+  issue_tracker_info = src.get('issue_tracker')
+  if issue_tracker_info:
+    _validate_issue_tracker_info(issue_tracker_info)
+    all_models.IssuetrackerIssue.create_or_update_from_dict(
+        _AUDIT_MODEL_NAME, obj.id, issue_tracker_info)
 
 
 @signals.Restful.model_put_after_commit.connect_via(all_models.Audit)
@@ -433,6 +471,23 @@ def _handle_issue_tracker(assessment, src, snapshots, templates, audits):
 
 
 def _validate_issue_tracker_info(info):
+  """Validates that component ID and hotlist ID are integers."""
+  component_id = info.get('component_id')
+  if component_id:
+    try:
+      int(component_id)
+    except (TypeError, ValueError):
+      raise exceptions.ValidationError('Component ID must be a number.')
+
+  hotlist_id = info.get('hotlist_id')
+  if hotlist_id:
+    try:
+      int(hotlist_id)
+    except (TypeError, ValueError):
+      raise exceptions.ValidationError('Hotlist ID must be a number.')
+
+
+def _normalize_issue_tracker_info(info):
   """Insures that component ID and hotlist ID are integers."""
   # TODO(anushovan): remove data type casting once integration service
   #   supports strings for following properties.
@@ -454,6 +509,7 @@ def _validate_issue_tracker_info(info):
 def init_hook():
   """Initializes hooks."""
 
+  # pylint: disable=unused-variable
   @signals.Restful.collection_posted.connect_via(all_models.Assessment)
   def handle_assessment_post(sender, objects=None, sources=None, service=None):
     """Applies custom attribute definitions and maps people roles.
@@ -487,6 +543,7 @@ def init_hook():
       _handle_issue_tracker(
           assessment, src, snapshot_cache, template_cache, audit_cache)
 
+  # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(all_models.Assessment)
   def handle_assessment_put(sender, obj=None, src=None, service=None):
     """Handles assessment update event."""
@@ -584,7 +641,7 @@ def _get_assessment_url(assessment):
 
 def _create_issuetracker_issue(assessment, issue_tracker_info):
   """Collects information and sends a request to create external issue."""
-  _validate_issue_tracker_info(issue_tracker_info)
+  _normalize_issue_tracker_info(issue_tracker_info)
   reported_email = None
   reporter_id = get_current_user_id()
   if reporter_id:
@@ -765,7 +822,7 @@ def _update_issuetracker_issue(assessment, issue_tracker_info,
     # If feature remains in the same status which is 'disabled'.
     return
 
-  _validate_issue_tracker_info(issue_tracker_info)
+  _normalize_issue_tracker_info(issue_tracker_info)
 
   issue_params = _handle_basic_props(issue_tracker_info, initial_info)
 
