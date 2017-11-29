@@ -56,33 +56,30 @@ def check_cycle_tasks(row_converter):  # noqa
         start_date="Actual Finish Date",
         end_date="Actual Verified Date",
     )
-  if obj.cycle.is_current:
-    if obj.status not in ('Finished', 'Verified'):
-      if obj.finished_date:
-        row_converter.add_error(
-            errors.INVALID_STATUS_DATE_CORRELATION,
-            date="Actual Finish Date",
-            status="not Finished",
-        )
-      if obj.verified_date:
-        row_converter.add_error(
-            errors.INVALID_STATUS_DATE_CORRELATION,
-            date="Actual Verified Date",
-            status="not Verified",
-        )
-    elif obj.status == 'Finished' and obj.verified_date:
+  if obj.status not in (obj.FINISHED, obj.VERIFIED):
+    if obj.finished_date:
+      row_converter.add_error(
+          errors.INVALID_STATUS_DATE_CORRELATION,
+          date="Actual Finish Date",
+          status="not Finished",
+      )
+    if obj.verified_date:
       row_converter.add_error(
           errors.INVALID_STATUS_DATE_CORRELATION,
           date="Actual Verified Date",
           status="not Verified",
       )
-  else:
-    if obj.verified_date:
-      if not obj.finished_date:
-        row_converter.add_error(
-            errors.MISSING_VALUE_ERROR,
-            column_name="Actual Finish Date",
-        )
+  if obj.status == obj.FINISHED and obj.verified_date:
+    row_converter.add_error(
+        errors.INVALID_STATUS_DATE_CORRELATION,
+        date="Actual Verified Date",
+        status="not Verified",
+    )
+  if obj.verified_date and not obj.finished_date:
+    row_converter.add_error(
+        errors.MISSING_VALUE_ERROR,
+        column_name="Actual Finish Date",
+    )
 
 
 def check_workflows(row_converter):
