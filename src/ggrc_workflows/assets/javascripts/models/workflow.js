@@ -10,7 +10,7 @@
     root_object: "workflow",
     root_collection: "workflows",
     category: "workflow",
-    mixins: ['ca_update', 'timeboxed'],
+    mixins: ['ca_update', 'timeboxed', 'accessControlList'],
     findAll: "GET /api/workflows",
     findOne: "GET /api/workflows/{id}",
     create: "POST /api/workflows",
