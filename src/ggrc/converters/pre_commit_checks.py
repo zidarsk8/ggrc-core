@@ -75,11 +75,6 @@ def check_cycle_tasks(row_converter):  # noqa
         date="Actual Verified Date",
         status="not Verified",
     )
-  if obj.verified_date and not obj.finished_date:
-    row_converter.add_error(
-        errors.MISSING_VALUE_ERROR,
-        column_name="Actual Finish Date",
-    )
 
 
 def check_workflows(row_converter):
