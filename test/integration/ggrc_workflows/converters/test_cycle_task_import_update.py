@@ -80,6 +80,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     db.session.execute('ALTER TABLE cycle_task_group_object_tasks '
                        'AUTO_INCREMENT = 1')
 
+
   def test_cycle_task_correct(self):
     """Test cycle task update via import with correct data"""
     self._generate_cycle_tasks()
@@ -97,15 +98,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
       self._check_csv_response(response, self.expected_warnings)
       self._cmp_tasks(self.expected_cycle_task_correct)
 
-  def test_cycle_task_create_error(self):
-    """Test cycle task update via import with data which is the reason of
-    errors about new cycle task creation."""
-    self._generate_cycle_tasks()
-    with freeze_time(self.ftime_active):
-      response = self.import_file("cycle_task_create_error.csv")
-      self._check_csv_response(response, self.expected_create_error)
-      self._cmp_tasks(self.expected_cycle_task_correct)
-
   def test_cycle_task_date_error(self):
     """Test cycle task update via import with data which is the reason of
     errors about incorrect dates in csv file."""
@@ -113,7 +105,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     with freeze_time(self.ftime_active):
       response = self.import_file("cycle_task_date_error.csv")
       self._check_csv_response(response, self.expected_date_error)
-      self._cmp_tasks(self.expected_cycle_task_date_error)
+      self._cmp_tasks(self.expected_cycle_task_correct)
 
   def test_cycle_task_permission_error(self):
     """Test cycle task update via import with non-admin user which is the
@@ -139,7 +131,11 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
         continue
       exp_task = expected_ctasks[ctask.slug]
       for attr, val in exp_task.iteritems():
-        self.assertEqual(str(getattr(ctask, attr, None)), val)
+        self.assertEqual(
+            str(getattr(ctask, attr, None)),
+            val,
+            "attr {} value for {} not expected".format(attr, ctask.slug)
+        )
 
   # pylint: disable=too-many-arguments
   def _activate_workflow(self, ftime, workflow, task_group, task_group_tasks,
@@ -441,8 +437,8 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 self.task_group_tasks_historical[0]["description"] + " one",
             "start_date": "2014-04-01",
             "end_date": "2014-04-06",
-            "finished_date": "2014-05-01 00:00:00",
-            "verified_date": "2014-06-06 00:00:00",
+            "finished_date": "None",
+            "verified_date": "None",
             "status": "Assigned"
         },
         "CYCLETASK-7": {
@@ -451,7 +447,7 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 self.task_group_tasks_historical[1]["description"] + " two",
             "start_date": "2014-04-07",
             "end_date": "2014-04-12",
-            "finished_date": "2014-05-07 00:00:00",
+            "finished_date": "None",
             "verified_date": "None",
             "status": "Declined"
         },
@@ -461,8 +457,8 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 self.task_group_tasks_historical[2]["description"] + " three",
             "start_date": "2014-04-13",
             "end_date": "2014-04-18",
-            "finished_date": "2014-05-13 00:00:00",
-            "verified_date": "2014-06-18 00:00:00",
+            "finished_date": "None",
+            "verified_date": "None",
             "status": "InProgress"
         },
         "CYCLETASK-9": {
@@ -517,11 +513,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                     status="not Finished",
                 ),
                 errors.INVALID_STATUS_DATE_CORRELATION.format(
-                    line=5,
-                    date="Actual Verified Date",
-                    status="not Verified",
-                ),
-                errors.INVALID_STATUS_DATE_CORRELATION.format(
                     line=6,
                     date="Actual Verified Date",
                     status="not Verified",
@@ -535,15 +526,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                     line=8,
                     start_date="Start Date",
                     end_date="End Date",
-                ),
-                errors.MISSING_VALUE_ERROR.format(
-                    line=9,
-                    column_name="Actual Finish Date",
-                ),
-                errors.INVALID_START_END_DATES.format(
-                    line=10,
-                    start_date="Actual Finish Date",
-                    end_date="Actual Verified Date",
                 ),
             },
         }
