@@ -80,7 +80,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     db.session.execute('ALTER TABLE cycle_task_group_object_tasks '
                        'AUTO_INCREMENT = 1')
 
-
   def test_cycle_task_correct(self):
     """Test cycle task update via import with correct data"""
     self._generate_cycle_tasks()
@@ -96,15 +95,6 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
     with freeze_time(self.ftime_active):
       response = self.import_file("cycle_task_warnings.csv")
       self._check_csv_response(response, self.expected_warnings)
-      self._cmp_tasks(self.expected_cycle_task_correct)
-
-  def test_cycle_task_date_error(self):
-    """Test cycle task update via import with data which is the reason of
-    errors about incorrect dates in csv file."""
-    self._generate_cycle_tasks()
-    with freeze_time(self.ftime_active):
-      response = self.import_file("cycle_task_date_error.csv")
-      self._check_csv_response(response, self.expected_date_error)
       self._cmp_tasks(self.expected_cycle_task_correct)
 
   def test_cycle_task_permission_error(self):
@@ -922,15 +912,24 @@ class TestCycleTaskStatusUpdate(BaseTestCycleTaskImportUpdate):
                      [t.verified_date for t in self.tasks])
     self.assertTrue(self.tasks[0].cycle.is_current)
 
-  def __build_error_resp(self, key, error_tmpl, exception_statuses):
+  @staticmethod
+  def __build_error_tmpl(error_tmpl, **context):
+    """Create simple temaplte from base error tmpl."""
+    if "line" not in context:
+      context["line"] = "{}"
+    return error_tmpl.format(**context)
+
+  def __build_status_error_resp(self, key, error_tmpl, exception_statuses):
     """Return expected response dict based on sent arguments."""
-    expected_messages = {self.ALIAS: {key: set()}}
-    for idx, status in enumerate(exception_statuses):
-      error_msg = error_tmpl.format(line=(3 + idx),
-                                    column_name="State",
-                                    message="Invalid state '{}'")
-      expected_messages[self.ALIAS][key].add(error_msg.format(status))
-    return expected_messages
+    error_tmpl = self.__build_error_tmpl(error_tmpl,
+                                         column_name="State",
+                                         message="Invalid state '{}'")
+    return {
+        self.ALIAS: {
+            key: {error_tmpl.format(3 + idx, status)
+                  for idx, status in enumerate(exception_statuses)},
+        }
+    }
 
   def __assert_error_message(self,
                              sending_data,
@@ -961,9 +960,9 @@ class TestCycleTaskStatusUpdate(BaseTestCycleTaskImportUpdate):
   def test_validation_error(self, exception_statuses):
     """Validation cycle task status update to {0} if no verification needed."""
     self._update_structure({"cycle_is_verification_needed": False})
-    error_msgs = self.__build_error_resp("row_errors",
-                                         errors.VALIDATION_ERROR,
-                                         exception_statuses)
+    error_msgs = self.__build_status_error_resp("row_errors",
+                                                errors.VALIDATION_ERROR,
+                                                exception_statuses)
     send_data = self.build_import_data(exception_statuses)
     self.__assert_error_message(send_data, error_msgs)
 
@@ -985,10 +984,53 @@ class TestCycleTaskStatusUpdate(BaseTestCycleTaskImportUpdate):
                                       start_structure=None):
     """Validation cycle task status update to {exception_statuses}."""
     self._update_structure(start_structure)
-    warn_msgs = self.__build_error_resp("row_warnings",
-                                        errors.WRONG_VALUE_CURRENT,
-                                        exception_statuses)
+    warn_msgs = self.__build_status_error_resp("row_warnings",
+                                               errors.WRONG_VALUE_CURRENT,
+                                               exception_statuses)
     send_data = self.build_import_data(exception_statuses)
     self.__assert_error_message(send_data,
                                 warn_msgs,
                                 start_structure=start_structure)
+
+  @ddt.data(
+      ("Actual Finish Date", "Actual Verified Date"),
+      ("Start Date", "Due Date"),
+  )
+  def test_for_date_compare_error(self, columns):
+    """Validate task import data where {0[0]} bigger than {0[1]}."""
+    self._update_structure(self.VERIFIED_STRUCTURE)
+    today = datetime.date.today()
+    dates = (today, today - datetime.timedelta(7))
+    error_tmpl = self.__build_error_tmpl(errors.INVALID_START_END_DATES,
+                                         start_date=columns[0],
+                                         end_date=columns[1])
+    # line format
+    error_resp = {self.ALIAS: {"row_errors": {error_tmpl.format(3)}}}
+    data_to_import = OrderedDict([("object_type", self.ALIAS),
+                                  ("Code*", self.tasks[0].slug)])
+    for column, date in zip(columns, dates):
+      data_to_import[column] = date
+    response = self.import_data(data_to_import)
+    self._check_csv_response(response, error_resp)
+
+  @ddt.data(
+      ("Actual Finish Date", "not Finished"),
+      ("Actual Verified Date", "not Verified"),
+  )
+  @ddt.unpack
+  def test_for_date_state_error(self, column, status):
+    """Validate task {0} not allowed for in {0} tasks."""
+    self._update_structure(self.IN_PROGRESS_STRUCTURE)
+    today = datetime.date.today()
+    error_tmpl = self.__build_error_tmpl(
+        errors.INVALID_STATUS_DATE_CORRELATION,
+        date=column,
+        status=status,
+    )
+    # line format
+    error_resp = {self.ALIAS: {"row_errors": {error_tmpl.format(3)}}}
+    data_to_import = OrderedDict([("object_type", self.ALIAS),
+                                  ("Code*", self.tasks[0].slug),
+                                  (column, today)])
+    response = self.import_data(data_to_import)
+    self._check_csv_response(response, error_resp)
