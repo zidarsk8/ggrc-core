@@ -4,12 +4,14 @@
 }}
 <object-list {(selected-item)}="selectedItem" {items}="mappedItems">
     <business-object-list-item {instance}="instance">
-        <div class="description">
-            {{{itemData.description}}}
-        </div>
-        <div class="more-information-wrapper">
-            <button class="btn btn-link more-information-button">More Information</button>
-        </div>
+        {{^if withoutDetails}}
+            <div class="description">
+                {{{itemData.description}}}
+            </div>
+            <div class="more-information-wrapper">
+                <button class="btn btn-link more-information-button">More Information</button>
+            </div>
+        {{/if}}
     </business-object-list-item>
 </object-list>
 <simple-modal
@@ -35,6 +37,7 @@
     <div class="simple-modal__body mapped-controls-info__body {{#if isLoading}}loading{{/if}}">
         <spinner {toggle}="isLoading" class="spinner-wrapper active"
                  extra-css-class="grid-spinner"></spinner>
+        {{^if withoutDetails}}
         <collapsible-panel title-text="{{assessmentType}} Info"
                            expanded="true">
             <detailed-business-object-list-item {instance}="instance"
@@ -42,17 +45,25 @@
                                                 class="mapped-object-info">
             </detailed-business-object-list-item>
         </collapsible-panel>
-        {{#is assessmentType 'Control'}}
-            <assessment-mapped-control-related-objects class="mapped-controls-info__related-objects"
-                                                    title-text="Show Related Regulations ({{regulations.length}})"
-                                                    type="Regulation"
-                                                    {items}="regulations">
-            </assessment-mapped-control-related-objects>
-            <assessment-mapped-control-related-objects class="mapped-controls-info__related-objects"
-                                                    title-text="Show Related Objectives ({{objectives.length}})"
-                                                    type="Objective"
-                                                    {items}="objectives">
-            </assessment-mapped-control-related-objects>
-        {{/is}}
+        {{else}}
+            <detailed-business-object-list-item {instance}="instance"
+                    {custom-attributes}="customAttributes"
+                    class="mapped-object-info">
+            </detailed-business-object-list-item>
+        {{/if}}
+        {{^if withoutDetails}}
+            {{#is assessmentType 'Control'}}
+                <assessment-mapped-control-related-objects class="mapped-controls-info__related-objects"
+                                                        title-text="Show Related Regulations ({{regulations.length}})"
+                                                        type="Regulation"
+                                                        {items}="regulations">
+                </assessment-mapped-control-related-objects>
+                <assessment-mapped-control-related-objects class="mapped-controls-info__related-objects"
+                                                        title-text="Show Related Objectives ({{objectives.length}})"
+                                                        type="Objective"
+                                                        {items}="objectives">
+                </assessment-mapped-control-related-objects>
+            {{/is}}
+        {{/if}}
     </div>
 </simple-modal>
