@@ -112,7 +112,7 @@ INVALID_ATTRIBUTE_WARNING = (u"Line {line}: Object does not contain attribute "
 CREATE_INSTANCE_ERROR = (u"Line {line}: New instance creation is denied. "
                          u"The line will be ignored.")
 
-INVALID_STATUS_DATE_CORRELATION = (u"Line {line}: Cannot change {date} for "
+INVALID_STATUS_DATE_CORRELATION = (u"Line {line}: {date} should be empty for "
                                    u"task which status is {status}. "
                                    u"The line will be ignored.")
 
