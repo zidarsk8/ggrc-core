@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../sort/sort-by';
 import template from './templates/tree-view.mustache';
 
 (function (can, GGRC) {
