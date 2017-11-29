@@ -47,7 +47,7 @@ def check_cycle_tasks(row_converter):  # noqa
     row_converter.add_error(
         errors.INVALID_START_END_DATES,
         start_date="Start Date",
-        end_date="End Date",
+        end_date="Due Date",
     )
   if (obj.finished_date and obj.verified_date and
           obj.finished_date > obj.verified_date):
