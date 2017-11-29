@@ -5,66 +5,62 @@
 
 import template from './templates/sub-tree-models.mustache';
 
-(function (can, GGRC) {
-  'use strict';
+var viewModel = can.Map.extend({
+  define: {
+    isActive: {
+      type: Boolean,
+      value: false
+    },
+    uniqueModelsList: {
+      get: function () {
+        return this.attr('modelsList').map(function (model) {
+          model.attr('inputId', 'stm-' +
+            (Date.now() * Math.random()).toFixed());
+          return model;
+        });
+      },
+    },
+  },
+  modelsList: null,
+  title: null,
+  $el: null,
+  activate: function () {
+    this.attr('isActive', true);
+  },
+  setDisplayModels: function (ev) {
+    var selectedModels = this.attr('modelsList').filter(function (item) {
+      return item.display;
+    }).map(function (item) {
+      return item.name;
+    });
+    can.trigger(this.attr('$el'), 'childModelsChange', [selectedModels]);
+    this.attr('isActive', false);
+    ev.stopPropagation();
+  },
+  selectAll: function (ev) {
+    ev.stopPropagation();
+    this.attr('modelsList').forEach(function (item) {
+      item.attr('display', true);
+    });
+  },
+  selectNone: function (ev) {
+    ev.stopPropagation();
+    this.attr('modelsList').forEach(function (item) {
+      item.attr('display', false);
+    });
+  }
+});
 
-  var viewModel = can.Map.extend({
-    define: {
-      isActive: {
-        type: Boolean,
-        value: false
-      },
-      uniqueModelsList: {
-        get: function () {
-          return this.attr('modelsList').map(function (model) {
-            model.attr('inputId', 'stm-' +
-              (Date.now() * Math.random()).toFixed());
-            return model;
-          });
-        },
-      },
+GGRC.Components('subTreeModels', {
+  tag: 'sub-tree-models',
+  template: template,
+  viewModel: viewModel,
+  events: {
+    inserted: function () {
+      this.viewModel.attr('$el', this.element);
     },
-    modelsList: null,
-    title: null,
-    $el: null,
-    activate: function () {
-      this.attr('isActive', true);
-    },
-    setDisplayModels: function (ev) {
-      var selectedModels = this.attr('modelsList').filter(function (item) {
-        return item.display;
-      }).map(function (item) {
-        return item.name;
-      });
-      can.trigger(this.attr('$el'), 'childModelsChange', [selectedModels]);
-      this.attr('isActive', false);
-      ev.stopPropagation();
-    },
-    selectAll: function (ev) {
-      ev.stopPropagation();
-      this.attr('modelsList').forEach(function (item) {
-        item.attr('display', true);
-      });
-    },
-    selectNone: function (ev) {
-      ev.stopPropagation();
-      this.attr('modelsList').forEach(function (item) {
-        item.attr('display', false);
-      });
+    '.sub-tree-models mouseleave': function () {
+      this.viewModel.attr('isActive', false);
     }
-  });
-
-  GGRC.Components('subTreeModels', {
-    tag: 'sub-tree-models',
-    template: template,
-    viewModel: viewModel,
-    events: {
-      inserted: function () {
-        this.viewModel.attr('$el', this.element);
-      },
-      '.sub-tree-models mouseleave': function () {
-        this.viewModel.attr('isActive', false);
-      }
-    }
-  });
-})(window.can, window.GGRC);
+  }
+});
