@@ -549,35 +549,39 @@ Mustache.registerHelper("option_select", function (object, attr_name, role, opti
 });
 
 Mustache.registerHelper("category_select", function (object, attr_name, category_type, options) {
-  var selected_options = object[attr_name] || [] //object.attr(attr_name) || []
-    , selected_ids = can.map(selected_options, function (selected_option) {
-        return selected_option.id;
-      })
-    , options_dfd = CMS.Models[category_type].findAll()
-    , tab_index = options.hash && options.hash.tabindex
-    , tag_prefix = 'select class="span12" multiple="multiple"'
-    ;
+  const selected_options = object[attr_name] || [];
+  const selected_ids = can.map(selected_options, function (selected_option) {
+    return selected_option.id;
+  });
+  const options_dfd = CMS.Models[category_type].findAll();
+  let tab_index = options.hash && options.hash.tabindex;
+  const tag_prefix = 'select class="span12" multiple="multiple"';
 
-  tab_index = typeof tab_index !== 'undefined' ? ' tabindex="' + tab_index + '"' : '';
+  tab_index = typeof tab_index !== 'undefined' ?
+    ` tabindex="${tab_index}"` :
+    '';
+
   function get_select_html(options) {
+    const selectOpenTag = `
+      <select class="span12" multiple="multiple"
+        model="${category_type}"
+        name="${attr_name}"
+        ${tab_index}
+      >`;
+    const selectCloseTag = '</select>';
+    const optionTags = can.map(options, function (option) {
+      return `
+        <option value="${option.id}"
+          ${selected_ids.indexOf(option.id) > -1 ? ' selected=selected' : ''}
+        >${option.name}</option>`;
+    }).join('\n');
+
     return [
-        '<select class="span12" multiple="multiple"'
-      ,   ' model="' + category_type + '"'
-      ,   ' name="' + attr_name + '"'
-      ,   tab_index
-      , '>'
-      , can.map(options, function (option) {
-          return [
-            '<option value="', option.id, '"'
-          ,   selected_ids.indexOf(option.id) > -1 ? ' selected=selected' : ''
-          , '>'
-          ,   option.name
-          , '</option>'
-          ].join('');
-        }).join('\n')
-      , '</select>'
+      selectOpenTag,
+      optionTags,
+      selectCloseTag
     ].join('');
-  }
+  };
 
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
