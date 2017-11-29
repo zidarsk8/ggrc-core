@@ -9,7 +9,7 @@ var viewModel = can.Map.extend({
   define: {
     isActive: {
       type: Boolean,
-      value: false
+      value: false,
     },
     uniqueModelsList: {
       get: function () {
@@ -48,7 +48,7 @@ var viewModel = can.Map.extend({
     this.attr('modelsList').forEach(function (item) {
       item.attr('display', false);
     });
-  }
+  },
 });
 
 GGRC.Components('subTreeModels', {
@@ -61,6 +61,6 @@ GGRC.Components('subTreeModels', {
     },
     '.sub-tree-models mouseleave': function () {
       this.viewModel.attr('isActive', false);
-    }
-  }
+    },
+  },
 });
