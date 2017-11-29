@@ -783,7 +783,7 @@ class TestCycleTaskStatusUpdate(BaseTestCycleTaskImportUpdate):
             IN_PROGRESS_STRUCTURE,
             DECLINED_STRUCTURE)
   def test_update_to_verified(self, start_structure):
-    """Update task status to verified from {0[task_statuses]}"""
+    """Update task status to verified from {0[task_statuses]} and back"""
     self._update_structure(start_structure)
     start_statuses = self._get_start_tasks_statuses(start_structure)
     self.assertEqual(start_statuses, [t.status for t in self.tasks])
@@ -799,13 +799,66 @@ class TestCycleTaskStatusUpdate(BaseTestCycleTaskImportUpdate):
     ).all()
     self.assertEqual(task_statuses + start_statuses[len(task_statuses):],
                      [t.status for t in self.tasks])
-    self.assertNotEqual([None] * len(self.tasks),
-                        [t.finished_date for t in self.tasks])
-    self.assertNotEqual([None] * len(self.tasks),
-                        [t.verified_date for t in self.tasks])
+    finished_dates = [t.finished_date for t in self.tasks]
+    self.assertNotEqual([None] * len(self.tasks), finished_dates)
+    verified_dates = [t.verified_date for t in self.tasks]
+    self.assertNotEqual([None] * len(self.tasks), verified_dates)
+    self.assertFalse(self.tasks[0].cycle.is_current)
+    # wrong rollback  case (try to import from verified to finished)
+    response = self.import_data(*self.build_import_data(start_statuses))
+    line_error_tmpl_1 = errors.INVALID_STATUS_DATE_CORRELATION.format(
+        date="Actual Verified Date",
+        status="not Verified",
+        line="{}"
+    )
+    line_error_tmpl_2 = errors.INVALID_STATUS_DATE_CORRELATION.format(
+        date="Actual Finish Date",
+        status="not Finished",
+        line="{}"
+    )
+    verfied_date_errors = {line_error_tmpl_1.format(i + 3)
+                           for i in xrange(len(self.tasks))}
+    finished_date_errors = {line_error_tmpl_2.format(i + 3)
+                            for i in xrange(len(self.tasks))}
+    self._check_csv_response(
+        response,
+        {
+            "Cycle Task": {
+                "row_errors": verfied_date_errors | finished_date_errors
+            }
+        }
+    )
+    self.tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id.in_(self.task_ids)
+    ).all()
+    # nothing change
+    self.assertEqual(task_statuses + start_statuses[len(task_statuses):],
+                     [t.status for t in self.tasks])
+    self.assertEqual(finished_dates, [t.finished_date for t in self.tasks])
+    self.assertEqual(verified_dates, [t.verified_date for t in self.tasks])
+    self.assertFalse(self.tasks[0].cycle.is_current)
+    # correct rollback
+    rollback_data = self.build_import_data(start_statuses)
+    # setup verified dates as empty
+    for line in rollback_data:
+      line["Actual Verified Date"] = "--"
+      line["Actual Finish Date"] = "--"
+    response = self.import_data(*rollback_data)
+    self._check_csv_response(response, {})
+    self.tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id.in_(self.task_ids)
+    ).all()
+    # assert correct rollback
+    self.assertEqual(start_statuses, [t.status for t in self.tasks])
+    self.assertEqual([None] * len(self.tasks),
+                     [t.finished_date for t in self.tasks])
+    self.assertEqual([None] * len(self.tasks),
+                     [t.verified_date for t in self.tasks])
+    self.assertTrue(self.tasks[0].cycle.is_current)
 
-  def test_update_finished_to_verified(self):
-    """Update task status from finished from verified"""
+  @ddt.data(1, 2, 3)
+  def test_update_finished_to_verified(self, number_of_tasks):
+    """Update {0} tasks status from finished from verified and back"""
     now = datetime.datetime.now().replace(microsecond=0)
     finished_date = now - datetime.timedelta(1)
     start_statuses = self._get_start_tasks_statuses(self.FINISHED_STRUCTURE)
@@ -820,7 +873,9 @@ class TestCycleTaskStatusUpdate(BaseTestCycleTaskImportUpdate):
                      [t.finished_date for t in self.tasks])
     self.assertEqual([None] * len(self.tasks),
                      [t.verified_date for t in self.tasks])
-    task_statuses = self.VERIFIED_STRUCTURE["task_statuses"]
+    task_statuses = [
+        all_models.CycleTaskGroupObjectTask.VERIFIED
+    ] * number_of_tasks
     response = self.import_data(*self.build_import_data(task_statuses))
     self._check_csv_response(response, {})
     self.tasks = CycleTaskGroupObjectTask.query.filter(
@@ -830,8 +885,60 @@ class TestCycleTaskStatusUpdate(BaseTestCycleTaskImportUpdate):
                      [t.status for t in self.tasks])
     self.assertEqual([finished_date] * len(self.tasks),
                      [t.finished_date for t in self.tasks])
-    self.assertNotEqual([None] * len(self.tasks),
-                        [t.verified_date for t in self.tasks])
+    verified_dates = [t.verified_date for t in self.tasks][:number_of_tasks]
+    self.assertNotEqual([None] * number_of_tasks, verified_dates)
+    verified_dates += [t.verified_date for t in self.tasks][number_of_tasks:]
+    self.assertEqual(
+        [None] * (len(self.tasks) - number_of_tasks),
+        [t.verified_date for t in self.tasks][number_of_tasks:])
+    self.assertEqual(len(self.tasks) != number_of_tasks,
+                     self.tasks[0].cycle.is_current)
+    # wrong rollback  case (try to import from verified to finished)
+    response = self.import_data(*self.build_import_data(start_statuses))
+    line_error_tmpl = errors.INVALID_STATUS_DATE_CORRELATION.format(
+        date="Actual Verified Date",
+        status="not Verified",
+        line="{}"
+    )
+    self._check_csv_response(
+        response,
+        {
+            "Cycle Task": {
+                "row_errors": {line_error_tmpl.format(idx + 3)
+                               for idx in xrange(number_of_tasks)}
+            }
+        }
+    )
+    self.tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id.in_(self.task_ids)
+    ).all()
+    # nothing change
+    self.assertEqual(task_statuses + start_statuses[len(task_statuses):],
+                     [t.status for t in self.tasks])
+    self.assertEqual([finished_date] * len(self.tasks),
+                     [t.finished_date for t in self.tasks])
+    self.assertEqual(len(self.tasks) != number_of_tasks,
+                     self.tasks[0].cycle.is_current)
+    self.assertEqual(
+        verified_dates,
+        [t.verified_date for t in self.tasks])
+    # correct rollback
+    rollback_data = self.build_import_data(start_statuses)
+    # setup verified dates as empty
+    for line in rollback_data:
+      line["Actual Verified Date"] = "--"
+    response = self.import_data(*rollback_data)
+    self._check_csv_response(response, {})
+    self.tasks = CycleTaskGroupObjectTask.query.filter(
+        CycleTaskGroupObjectTask.id.in_(self.task_ids)
+    ).all()
+    # assert correct rollback
+    self.assertEqual(start_statuses, [t.status for t in self.tasks])
+    self.assertEqual([finished_date] * len(self.tasks),
+                     [t.finished_date for t in self.tasks])
+    self.assertEqual([None] * len(self.tasks),
+                     [t.verified_date for t in self.tasks])
+    self.assertTrue(self.tasks[0].cycle.is_current)
 
   def __build_error_resp(self, key, error_tmpl, exception_statuses):
     """Return expected response dict based on sent arguments."""
