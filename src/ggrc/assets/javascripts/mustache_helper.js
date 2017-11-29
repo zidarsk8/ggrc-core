@@ -562,6 +562,7 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
     '';
 
   function get_select_html(options) {
+    const sortedOptions = _.sortBy(options, 'name');
     const selectOpenTag = `
       <select class="span12" multiple="multiple"
         model="${category_type}"
@@ -569,7 +570,7 @@ Mustache.registerHelper("category_select", function (object, attr_name, category
         ${tab_index}
       >`;
     const selectCloseTag = '</select>';
-    const optionTags = can.map(options, function (option) {
+    const optionTags = can.map(sortedOptions, function (option) {
       return `
         <option value="${option.id}"
           ${selected_ids.indexOf(option.id) > -1 ? ' selected=selected' : ''}
