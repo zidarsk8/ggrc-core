@@ -353,10 +353,13 @@
                          {{/unless}}
                         </div>
                     </div>
-                    <assessment-mapped-related-information class="mapped-objects__list info-pane__section-content"
-                            {instance}="instance"
-                            {mapped-items}="relatedInformation"
-                            title-text="Related Information"></assessment-mapped-related-information>
+                    <assessment-mapped-controls
+                        class="mapped-objects__list info-pane__section-content"
+                        without-details="true"
+                        {instance}="instance"
+                        {mapped-items}="relatedInformation"
+                        {assessment-type}="instance.assessment_type">
+                    </assessment-mapped-controls>
                 </div>
                 <div class="ggrc-form ggrc-form-multiple-columns">
                 <div class="ggrc-form-item">

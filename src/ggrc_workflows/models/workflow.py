@@ -298,13 +298,11 @@ class Workflow(mixins.CustomAttributable,
       },
       "workflow_owner": {
           "display_name": "Manager",
-          "type": reflection.AttributeInfo.Type.USER_ROLE,
           "mandatory": True,
           "filter_by": "_filter_by_workflow_owner",
       },
       "workflow_member": {
           "display_name": "Member",
-          "type": reflection.AttributeInfo.Type.USER_ROLE,
           "filter_by": "_filter_by_workflow_member",
       },
       "status": None,
