@@ -5,6 +5,8 @@
 
 from ggrc import db
 from ggrc import models
+from ggrc.access_control.list import AccessControlList
+from ggrc.access_control.role import AccessControlRole
 from ggrc.snapshotter.rules import Types
 
 from integration.ggrc import generator
@@ -12,9 +14,6 @@ from integration.ggrc.models import factories
 from integration.ggrc_basic_permissions.models \
     import factories as rbac_factories
 from integration.ggrc.snapshotter import SnapshotterBaseTestCase
-
-from ggrc_basic_permissions.models import Role
-from ggrc_basic_permissions.models import UserRole
 
 
 class TestClonable(SnapshotterBaseTestCase):
@@ -275,7 +274,7 @@ class TestClonable(SnapshotterBaseTestCase):
 
   def test_audit_clone_auditors(self):
     """Test that auditors get cloned correctly"""
-    auditor_role = Role.query.filter_by(name="Auditor").first()
+    auditor_role = AccessControlRole.query.filter_by(name="Auditors").first()
 
     audit = factories.AuditFactory()
     audit_context = factories.ContextFactory()
@@ -293,15 +292,17 @@ class TestClonable(SnapshotterBaseTestCase):
       auditors += [person]
 
     for auditor in auditors:
-      rbac_factories.UserRoleFactory(
-          context=audit_context,
-          role=auditor_role,
-          person=auditor)
+      factories.AccessControlListFactory(
+          ac_role=auditor_role,
+          object=audit,
+          person=auditor
+      )
 
     self.assertEqual(
-        UserRole.query.filter_by(
-            role=auditor_role,
-            context=audit.context).count(), 3, "Auditors not present")
+        AccessControlList.query.filter_by(
+            ac_role_id=auditor_role.id,
+            object_type="Audit",
+            object_id=audit.id).count(), 3, "Auditors not present")
 
     self.clone_object(audit)
 
@@ -309,29 +310,31 @@ class TestClonable(SnapshotterBaseTestCase):
         models.Audit.title.like("%copy%")).first()
 
     self.assertEqual(
-        UserRole.query.filter_by(
-            role=auditor_role,
-            context=audit_copy.context
-        ).count(), 3, "Auditors not present on copy")
+        AccessControlList.query.filter_by(
+            ac_role_id=auditor_role.id,
+            object_type="Audit",
+            object_id=audit_copy.id).count(), 3, "Auditors not present on copy")
 
     # Verify that contexts are different for original and copy audit
     another_user_4 = factories.PersonFactory(email="user4@example.com")
-    rbac_factories.UserRoleFactory(
-        context=audit_context,
-        role=auditor_role,
-        person=another_user_4)
+
+    factories.AccessControlListFactory(
+        ac_role=auditor_role,
+        object=audit,
+        person=another_user_4
+    )
 
     self.assertEqual(
-        UserRole.query.filter_by(
-            role=auditor_role,
-            context=audit.context
-        ).count(), 4, "Auditors not present")
+        AccessControlList.query.filter_by(
+            ac_role_id=auditor_role.id,
+            object_type="Audit",
+            object_id=audit.id).count(), 4, "Auditors not present")
 
     self.assertEqual(
-        UserRole.query.filter_by(
-            role=auditor_role,
-            context=audit_copy.context
-        ).count(), 3, "Auditors not present on copy")
+        AccessControlList.query.filter_by(
+            ac_role_id=auditor_role.id,
+            object_type="Audit",
+            object_id=audit_copy.id).count(), 3, "Auditors not present on copy")
 
   def test_audit_clone_custom_attributes(self):
     """Test if custom attributes were copied correctly"""
