@@ -3,10 +3,12 @@
 
 """ Unit tests for the Assessment object """
 
+import ddt
+
 from sqlalchemy.orm import attributes
 
 from ggrc import db
-from ggrc.models import Assessment
+from ggrc.models import Assessment, comment
 from ggrc.models import mixins
 from ggrc.models import object_document
 from ggrc.models import object_person
@@ -17,6 +19,7 @@ from ggrc.models.mixins import assignable
 from unit.ggrc.models import test_mixins_base
 
 
+@ddt.ddt
 class TestAssessmentMixins(test_mixins_base.TestMixinsBase):
   """ Tests inclusion of correct mixins and their attributes """
 
@@ -58,3 +61,12 @@ class TestAssessmentMixins(test_mixins_base.TestMixinsBase):
         ('test_plan', attributes.InstrumentedAttribute),                 # TestPlanned    # noqa
         ('title', attributes.InstrumentedAttribute),                     # Titled         # noqa
     ]
+
+  @ddt.data("", ",", ",,", None)
+  def test_empty_recipients(self, recipients):
+    """Test validation of empty recipients: '{}'"""
+    validator = comment.Commentable.validate_recipients
+    self.assertEqual(
+        validator(Assessment(), "recipients", recipients),
+        ""
+    )
