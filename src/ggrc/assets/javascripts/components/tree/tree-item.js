@@ -5,7 +5,7 @@
 
 import '../cycle-task-actions/cycle-task-actions';
 import './tree-item-custom-attribute';
-import BaseTreeItemVM from '../view-models/tree-item-base-vm';
+import BaseTreeItemVM from './tree-item-base-vm';
 import template from './templates/tree-item.mustache';
 
 (function (can, GGRC) {

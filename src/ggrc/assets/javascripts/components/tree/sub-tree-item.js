@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import BaseTreeItemVM from '../view-models/tree-item-base-vm';
+import BaseTreeItemVM from './tree-item-base-vm';
 import template from './templates/sub-tree-item.mustache';
 
 (function (can, GGRC) {
