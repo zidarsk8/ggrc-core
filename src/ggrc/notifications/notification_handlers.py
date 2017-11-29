@@ -186,7 +186,7 @@ def handle_assignable_modified(obj):  # noqa: ignore=C901
   # The transition from "ready to review" to "in progress" happens when an
   # object is declined, so this is used as a triger for declined notifications.
   if (old_state == Statusable.DONE_STATE and
-     new_state == Statusable.PROGRESS_STATE):
+          new_state == Statusable.PROGRESS_STATE):
     _add_assignable_declined_notif(obj)
 
   transitions_map = {
@@ -328,10 +328,16 @@ def _recipients_changed(history):
   return sorted(old_val.split(",")) != sorted(new_val.split(","))
 
 
-def handle_assignable_created(obj):
-  name = "{}_open".format(obj._inflector.table_singular)
-  notif_type = models.NotificationType.query.filter_by(name=name).first()
-  _add_notification(obj, notif_type)
+def handle_assignable_created(objects):
+  names = {"{}_open".format(obj._inflector.table_singular) for obj in objects}
+  notif_types = models.NotificationType.query.filter(
+      models.NotificationType.name.in_(names)
+  )
+  notif_types_map = {notif.name: notif for notif in notif_types}
+  for obj in objects:
+    notif_name = "{}_open".format(obj._inflector.table_singular)
+    notif_type = notif_types_map[notif_name]
+    _add_notification(obj, notif_type)
 
 
 def handle_assignable_deleted(obj):
@@ -418,8 +424,7 @@ def register_handlers():  # noqa: C901
 
   @signals.Restful.collection_posted.connect_via(models.Assessment)
   def assignable_created_listener(sender, objects=None, **kwargs):
-    for obj in objects:
-      handle_assignable_created(obj)
+    handle_assignable_created(objects)
 
   @signals.Restful.model_put.connect_via(models.Assessment)
   def assessment_send_reminder(sender, obj=None, src=None, service=None):
