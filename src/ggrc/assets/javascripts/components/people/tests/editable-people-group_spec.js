@@ -121,7 +121,6 @@ describe('GGRC.Components.editablePeopleGroup', function () {
     });
 
     it('should return full list when showPeopleGroupModal is false', () => {
-      debugger;
       viewModel.attr('canEdit', true);
       viewModel.attr('showPeopleGroupModal', false);
 

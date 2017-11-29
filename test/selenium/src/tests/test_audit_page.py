@@ -12,10 +12,10 @@ from lib import base
 from lib.constants import value_aliases as aliases
 from lib.constants.element import ObjectStates, AuditStates, objects
 from lib.entities import entities_factory
-from lib.service import webui_service, rest_service
 from lib.entities.entity import Representation
 from lib.factory import get_cls_rest_service
-from lib.utils.string_utils import random_string
+from lib.service import webui_service, rest_service
+from lib.utils.string_utils import StringMethods
 
 
 class TestAuditPage(base.Test):
@@ -327,7 +327,7 @@ class TestAuditPage(base.Test):
       - Check only GCAs filled with right values displayed on the tab.
     """
     urls = ["https://gmail.by/", "https://www.google.com/",
-            base_url, random_string(), "ftp://something.com/"]
+            base_url, StringMethods.random_string(), "ftp://something.com/"]
     cads_rest_service = rest_service.CustomAttributeDefinitionsService()
     gca_defs = (cads_rest_service.create_dashboard_gcas(
         new_control_rest.type, count=len(urls)))

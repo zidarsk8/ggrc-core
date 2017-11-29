@@ -25,6 +25,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     is_custom_attributable: true,
     isRoleable: true,
     defaults: {
+      _copyAssessmentProcedure: true,
       assessment_type: 'Control',
       status: 'Not Started',
       send_by_default: true,  // notifications when a comment is added
@@ -255,6 +256,16 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     },
     after_create: function () {
       this._checkIssueTrackerWarnings();
+    },
+    before_save: function () {
+      var mappedObjectsChanges = this.attr('mappedObjectsChanges');
+      if ( mappedObjectsChanges ) {
+        mappedObjectsChanges.forEach((mo)=>{
+          mo.extra = {
+            copyAssessmentProcedure: this.attr('_copyAssessmentProcedure'),
+          };
+        });
+      }
     },
     before_create: function () {
       if (!this.audit) {
