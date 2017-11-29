@@ -166,3 +166,65 @@ class TestRevisions(TestCase):
     ).order_by(ggrc.models.Revision.id.desc()).first().id
 
     self.assertGreater(last_revision_id, revision_id)
+
+  @ddt.data(True, False)
+  def test_change_modified_by(self, is_add_cav):
+    """Test checked correct changing of modified_by_id field.
+
+    User 1 create control, user 2 delete CAD. After the deleting CAD
+    test checking that modified_by field contains user 2.
+    """
+    with factories.single_commit():
+      control = factories.ControlFactory()
+      cad = factories.CustomAttributeDefinitionFactory(
+          title="test_cad",
+          definition_type="control",
+          attribute_type="Text",
+      )
+      control_id = control.id
+      if is_add_cav:
+        factories.CustomAttributeValueFactory(
+            custom_attribute=cad,
+            attributable=control,
+            attribute_value="test")
+
+    user = self.gen.generate_person(
+        data={"name": "test_admin"}, user_role="Administrator")[1]
+    self.api_helper.set_user(user)
+    self.client.get("/login")
+
+    control_revisions = ggrc.models.Revision.query.filter(
+        ggrc.models.Revision.resource_id == control_id,
+        ggrc.models.Revision.resource_type == "Control",
+    ).order_by(ggrc.models.Revision.id.desc()).all()
+    ids_before_del = set(revision.id for revision in control_revisions)
+
+    cad = ggrc.models.CustomAttributeDefinition.query.filter_by(
+        title="test_cad").first()
+    resp_delete = self.api_helper.delete(cad)
+    self.assert200(resp_delete)
+    cad = ggrc.models.CustomAttributeDefinition.query.filter_by(
+        title="test_cad").first()
+    self.assertIsNone(cad)
+
+    control_revisions_after = ggrc.models.Revision.query.filter(
+        ggrc.models.Revision.resource_id == control_id,
+        ggrc.models.Revision.resource_type == "Control",
+    ).order_by(ggrc.models.Revision.id.desc()).all()
+    ids_after_del = set(revision.id for revision
+                        in control_revisions_after)
+
+    difference_revision_id = ids_after_del.difference(ids_before_del)
+
+    last_revision = ggrc.models.Revision.query.filter(
+        ggrc.models.Revision.resource_id == control_id,
+        ggrc.models.Revision.resource_type == "Control",
+    ).order_by(ggrc.models.Revision.id.desc()).first()
+
+    self.assertSetEqual(difference_revision_id, {last_revision.id})
+
+    expected_id = ggrc.models.Person.query.filter_by(
+        name="test_admin").first().id
+
+    self.assertEquals(last_revision.content["modified_by_id"], expected_id)
+    self.assertEquals(last_revision.content["modified_by"]["id"], expected_id)
