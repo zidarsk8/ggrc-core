@@ -45,7 +45,7 @@ class SnapshotterBaseTestCase(TestCase):
     return obj
 
   def create_audit(self, program, title=None):
-    self.create_object(models.Audit, {
+    return self.create_object(models.Audit, {
         "title": "Snapshotable audit" if title is None else title,
         "program": {"id": program.id},
         "status": "Planned",
