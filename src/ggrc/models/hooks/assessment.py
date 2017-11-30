@@ -365,7 +365,7 @@ def _load_audits(audit_ids):
   }
 
 
-def _handle_assessment(assessment, src, templates, audits):
+def _handle_assessment(assessment, src):
   """Handles auto calculated properties for Assessment model."""
   snapshot_dict = src.get('object') or {}
   common.map_objects(assessment, snapshot_dict)
@@ -375,8 +375,11 @@ def _handle_assessment(assessment, src, templates, audits):
   if not src.get('_generated') and not snapshot:
     return
 
-  template = templates.get(src.get('template', {}).get('id'))
-  audit = audits[src['audit']['id']]
+  template = utils.referenced_objects.get(
+      "AssessmentTemplate",
+      src.get('template', {}).get('id'),
+  )
+  audit = utils.referenced_objects.get("Audit", src['audit']['id'])
   relate_assignees(assessment, snapshot, template, audit)
   relate_ca(assessment, template)
   assessment.title = u'{} assessment for {}'.format(
@@ -396,20 +399,28 @@ def _handle_assessment(assessment, src, templates, audits):
     assessment.assessment_type = template.template_object_type
 
 
-def _handle_issue_tracker(assessment, src, templates, audits):
+def _handle_issue_tracker(assessment, src):
   """Handles issue tracker related data."""
   # Get issue tracker data from request.
   info = src.get('issue_tracker') or {}
 
   if not info:
     # Check assessment template for issue tracker data.
-    template = templates.get(src.get('template', {}).get('id'))
+    template = utils.referenced_objects.get(
+        "AssessmentTemplate",
+        src.get('template', {}).get('id'),
+    )
     if template:
       info = template.issue_tracker
 
   if not info:
     # Check audit for issue tracker data.
-    audit = audits.get(src.get('audit', {}).get('id'))
+    # Note audit_id is not set correctly when creating and editing audits via
+    # import.
+    audit = utils.referenced_objects.get(
+        "Audit",
+        src.get('audit', {}).get('id'),
+    )
     if audit:
       info = audit.issue_tracker
 
@@ -463,10 +474,8 @@ def init_hook():
     audit_cache = _load_audits(audit_ids)
 
     for assessment, src in itertools.izip(objects, sources):
-      _handle_assessment(
-          assessment, src, template_cache, audit_cache)
-      _handle_issue_tracker(
-          assessment, src, template_cache, audit_cache)
+      _handle_assessment(assessment, src)
+      _handle_issue_tracker(assessment, src)
 
   @signals.Restful.model_put.connect_via(all_models.Assessment)
   def handle_assessment_put(sender, obj=None, src=None, service=None):
