@@ -771,8 +771,7 @@
        .pane-header h3{
          float: none;
        }
-       .tier-content,
-       custom-attributes{
+       .tier-content{
          display: block;
          .row-fluid{
            margin-bottom: 0;
@@ -813,6 +812,22 @@
          margin-right: 15px;
        }
      }
+   }
+
+   global-custom-attributes {
+    &.ggrc-form .ggrc-form-item {
+      width: 100%;
+    }
+
+    &.ggrc-form.ggrc-form-multiple-columns .ggrc-form-item__multiple-row {
+      display: block;
+      width: 100%;
+      max-width: none;
+    }
+
+    inline-edit-control .inline__header {
+      min-height: auto;
+    }
    }
  }
 }
