@@ -37,7 +37,6 @@ class Audit(Snapshotable,
             Roleable,
             WithLastDeprecatedDate,
             mixins.Timeboxed,
-            mixins.WithContact,
             mixins.BusinessObject,
             mixins.Folderable,
             Indexed,
@@ -114,20 +113,10 @@ class Audit(Snapshotable,
           "filter_by": "_filter_by_program",
           "mandatory": True,
       },
-      "user_role:Auditor": {
-          "display_name": "Auditors",
-          "type": AttributeInfo.Type.USER_ROLE,
-          "filter_by": "_filter_by_auditor",
-      },
       "start_date": "Planned Start Date",
       "end_date": "Planned End Date",
       "report_start_date": "Planned Report Period from",
       "report_end_date": "Planned Report Period to",
-      "contact": {
-          "display_name": "Audit Captain",
-          "mandatory": True,
-      },
-      "secondary_contact": None,
       "notes": None,
       "reference_url": None,
       "archived": {
@@ -167,8 +156,7 @@ class Audit(Snapshotable,
         "program": source_object.program,
         "status": source_object.VALID_STATES[0],
         "report_start_date": source_object.report_start_date,
-        "report_end_date": source_object.report_end_date,
-        "contact": source_object.contact
+        "report_end_date": source_object.report_end_date
     }
 
     self.update_attrs(data)

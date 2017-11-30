@@ -198,7 +198,6 @@ class AuditFactory(TitledFactory):
     model = models.Audit
 
   status = "Planned"
-  contact = factory.LazyAttribute(lambda _: PersonFactory())
   program = factory.LazyAttribute(lambda _: ProgramFactory())
   context = factory.LazyAttribute(lambda _: ContextFactory())
 
