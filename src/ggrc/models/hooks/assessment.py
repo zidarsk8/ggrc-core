@@ -108,14 +108,14 @@ def init_hook():
     del sender, service  # Unused
 
     db.session.flush()
-    audit_ids = []
-    template_ids = []
-    snapshot_ids = []
+    audit_ids = set()
+    template_ids = set()
+    snapshot_ids = set()
 
     for src in sources:
-      snapshot_ids.append(src.get('object', {}).get('id'))
-      audit_ids.append(src.get('audit', {}).get('id'))
-      template_ids.append(src.get('template', {}).get('id'))
+      snapshot_ids.add(src.get('object', {}).get('id'))
+      audit_ids.add(src.get('audit', {}).get('id'))
+      template_ids.add(src.get('template', {}).get('id'))
 
     snapshot_cache = _load_snapshots(snapshot_ids)
     template_cache = _load_templates(template_ids)
