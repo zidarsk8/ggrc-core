@@ -540,6 +540,24 @@ class TestAssessmentImport(TestCase):
     self.assertEqual(1, resp[0]["updated"])
     self.assertEqual(result.end_date, datetime.date(2017, 1, 1))
 
+  @ddt.data(*models.Assessment.VALID_STATES)
+  def test_import_set_up_deprecated(self, start_state):
+    """Update assessment from {0} to Deprecated."""
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory(status=start_state)
+    resp = self.import_data(
+        OrderedDict([
+            ("object_type", "Assessment"),
+            ("code", assessment.slug),
+            ("State", models.Assessment.DEPRECATED),
+        ]))
+    self.assertEqual(1, len(resp))
+
+    self.assertEqual(1, resp[0]["updated"])
+    self.assertEqual(
+        models.Assessment.query.get(assessment.id).status,
+        models.Assessment.DEPRECATED)
+
 
 @ddt.ddt
 class TestAssessmentExport(TestCase):
