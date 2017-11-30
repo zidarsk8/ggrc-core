@@ -1147,16 +1147,14 @@ class Resource(ModelView):
             obj.id: obj for obj in class_.query.filter(class_.id.in_(ids))
         }
 
-  def collection_post_loop(self, body, res, no_result, running_async):
+  def collection_post_loop(self, body, res, no_result):
     """Handle all posted objects.
 
     Args:
       body: list of dictionaries containing json object representations.
       res: List that will get responses appended to it.
       no_result: Flag for suppressing results.
-      running_async: Flag for async jobs.
     """
-    del running_async  # Unused
 
     with benchmark("Generate objects"):
       objects = []
@@ -1270,7 +1268,7 @@ class Resource(ModelView):
         with benchmark("Build stub query cache"):
           self._build_request_stub_cache(body)
         try:
-          self.collection_post_loop(body, res, no_result, running_async)
+          self.collection_post_loop(body, res, no_result)
         except (IntegrityError, ValidationError, ValueError) as error:
           res.append(self._make_error_from_exception(error))
           db.session.rollback()
