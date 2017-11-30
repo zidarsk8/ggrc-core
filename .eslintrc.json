@@ -41,9 +41,13 @@
   },
 
   "rules": {
+    "eqeqeq": 2,
     "comma-dangle": [
       1, "always-multiline"
     ],
+    "indent": [2, 2, {
+      "SwitchCase": 1
+    }],
     "id-length": [1, {
       "min": 2,
       "max": 25,
