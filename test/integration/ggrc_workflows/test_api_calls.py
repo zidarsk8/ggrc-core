@@ -19,10 +19,19 @@ from ggrc.fulltext import mysql
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc import generator
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.models import factories
 from integration.ggrc_workflows import generator as wf_generator
 from integration.ggrc_workflows import WorkflowTestCase
 from integration.ggrc_workflows.models import factories as wf_factories
+
+
+WF_ROLES = {
+    role.name: role.id
+    for role in all_models.AccessControlRole.eager_query().filter(
+        all_models.AccessControlRole.object_type == "Workflow"
+    ).all()
+}
 
 
 @ddt.ddt  # pylint: disable=too-many-public-methods
@@ -33,9 +42,55 @@ class TestWorkflowsApiPost(TestCase):
     super(TestWorkflowsApiPost, self).setUp()
     self.api = Api()
     self.generator = wf_generator.WorkflowsGenerator()
+    with factories.single_commit():
+      self.people_ids = [factories.PersonFactory().id for _ in xrange(6)]
 
   def tearDown(self):
     pass
+
+  def test_post_workflow_with_acl_people(self):  # noqa pylint: disable=invalid-name
+    """Test PUT workflow with ACL."""
+    data = self.get_workflow_dict()
+    exp_res = {
+        1: WF_ROLES['Admin'],
+        self.people_ids[0]: WF_ROLES['Admin'],
+        self.people_ids[1]: WF_ROLES['Workflow Member'],
+        self.people_ids[2]: WF_ROLES['Workflow Member'],
+        self.people_ids[3]: WF_ROLES['Workflow Member']
+    }
+    data['workflow']['access_control_list'] = acl_helper.get_acl_list(exp_res)
+    response = self.api.post(all_models.Workflow, data)
+    self.assertEqual(response.status_code, 201)
+    workflow = all_models.Workflow.eager_query().one()
+    act_res = {acl.person_id: acl.ac_role_id
+               for acl in workflow.access_control_list}
+    self.assertDictEqual(exp_res, act_res)
+
+  def test_update_workflow_acl_people(self):
+    """Test PUT workflow with updated ACL."""
+    data = self.get_workflow_dict()
+    init_map = {
+        1: WF_ROLES['Admin'],
+        self.people_ids[0]: WF_ROLES['Workflow Member'],
+    }
+    data['workflow']['access_control_list'] = acl_helper.get_acl_list(init_map)
+    response = self.api.post(all_models.Workflow, data)
+    self.assertEqual(response.status_code, 201)
+    exp_res = {
+        self.people_ids[0]: WF_ROLES['Admin'],
+        self.people_ids[1]: WF_ROLES['Admin'],
+        self.people_ids[2]: WF_ROLES['Workflow Member'],
+        self.people_ids[3]: WF_ROLES['Workflow Member'],
+        self.people_ids[4]: WF_ROLES['Workflow Member']
+    }
+    workflow = all_models.Workflow.eager_query().one()
+    put_params = {'access_control_list': acl_helper.get_acl_list(exp_res)}
+    response = self.api.put(workflow, put_params)
+    self.assert200(response)
+    workflow = all_models.Workflow.eager_query().one()
+    act_res = {acl.person_id: acl.ac_role_id
+               for acl in workflow.access_control_list}
+    self.assertDictEqual(exp_res, act_res)
 
   def test_send_invalid_data(self):
     """Test send invalid data on Workflow post."""
