@@ -333,8 +333,8 @@ export default can.Component.extend({
        * Compares two lists of custom attributes
        * @param {Object} $ca0s - list of jQuery objects for custom attributes
        * @param {Object} $ca1s - list of jQuery objects for custom attributes
-       * @param {can.List} ca0s - list of custom attributes
-       * @param {can.List} ca1s - list of custom attributes
+       * @param {can.List} ca0s - list of custom attributes (should be sorted by id)
+       * @param {can.List} ca1s - list of custom attributes (should be sorted by id)
        */
       function compareCAs($ca0s, $ca1s, ca0s, ca1s) {
         let i = 0;
@@ -349,22 +349,23 @@ export default can.Component.extend({
             // same attribute
             highlightTitle($ca0, ca0, $ca1, ca1);
             highlightValue($ca0, ca0, $ca1, ca1);
-            that.equalizeHeights($ca0, $ca1);
             i++;
             j++;
-          } else if (i < ca0s.length) {
+          } else if (ca0.custom_attribute_id < ca1.custom_attribute_id ||
+            !ca1.custom_attribute_id) {
             // attribute removed
             $ca1 = fillEmptyCA($ca1); // add empty block to the right panel
             highlightTitle($ca0, ca0);
             highlightValue($ca0, ca0);
-            that.equalizeHeights($ca0, $ca1);
             i++;
           } else {
             // attribute added
+            $ca0 = fillEmptyCA($ca0); // add empty block to the left panel
             highlightTitle($ca1, ca1);
             highlightValue($ca1, ca1);
             j++;
           }
+          that.equalizeHeights($ca0, $ca1);
         }
       }
 
@@ -377,7 +378,7 @@ export default can.Component.extend({
        */
       function highlightTitle($ca0, ca0, $ca1, ca1) {
         let title0 = ca0.def.title;
-        let title1 = ca1 ? ca1.def.title : null;
+        let title1 = ca1 && ca1.def ? ca1.def.title : null;
         if (title0 !== title1) {
           $ca0.find(titleSelector).addClass(highlightClass);
 
@@ -396,8 +397,10 @@ export default can.Component.extend({
        */
       function highlightValue($ca0, ca0, $ca1, ca1) {
         let value0 = ca0.attribute_value;
+        let objectId0 = ca0.attribute_object_id; // for Person attr type
         let value1 = ca1 ? ca1.attribute_value : null;
-        if (value0 !== value1) {
+        let objectId1 = ca1 ? ca1.attribute_object_id : null;
+        if (value0 !== value1 || objectId0 !== objectId1) {
           $ca0.find(valueSelector).addClass(highlightClass);
 
           if ($ca1) {
@@ -412,7 +415,7 @@ export default can.Component.extend({
        * @return {Object} new empty jQuery object
        */
       function fillEmptyCA($ca) {
-        let $empty = $('<div class="ggrc-form-item" style="width:100%"/>');
+        let $empty = $('<div class="ggrc-form-item"/>');
         $empty.insertBefore($ca);
         return $empty;
       }

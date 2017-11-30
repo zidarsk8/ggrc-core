@@ -296,7 +296,7 @@ describe('GGRC.Components.revisionsComparer', function () {
       expect(caUtils.prepareCustomAttributes.calls.count()).toEqual(2);
     });
 
-    describe('when the same attributes', () => {
+    describe('when attribute was updated', () => {
       let $target;
 
       beforeEach(() => {
@@ -306,6 +306,13 @@ describe('GGRC.Components.revisionsComparer', function () {
             title: 'title',
           },
           attribute_value: 'value',
+        }, {
+          custom_attribute_id: 2,
+          def: {
+            title: 'person attr',
+          },
+          attribute_value: 'Person',
+          attribute_object_id: 3,
         }];
 
         let ca1s = [{
@@ -314,6 +321,13 @@ describe('GGRC.Components.revisionsComparer', function () {
             title: 'changed title',
           },
           attribute_value: 'changed value',
+        }, {
+          custom_attribute_id: 2,
+          def: {
+            title: 'person attr',
+          },
+          attribute_value: 'Person',
+          attribute_object_id: 4,
         }];
 
         let index = 0;
@@ -333,10 +347,18 @@ describe('GGRC.Components.revisionsComparer', function () {
                           <div class="info-pane__section-title"></div>
                           <div class="inline__content"></div>
                         </div>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title"></div>
+                          <div class="inline__content"></div>
+                        </div>
                       </global-custom-attributes>
                     </section>
                     <section class="info">
                       <global-custom-attributes>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title"></div>
+                          <div class="inline__content"></div>
+                        </div>
                         <div class="ggrc-form-item">
                           <div class="info-pane__section-title"></div>
                           <div class="inline__content"></div>
@@ -357,12 +379,12 @@ describe('GGRC.Components.revisionsComparer', function () {
         method($target, revisions);
 
         expect($target.find(`${valueSelector}${highlightSelector}`).length)
-          .toEqual(2);
+          .toEqual(4);
       });
 
       it('equlizes blocks heights', () => {
         method($target, revisions);
-        expect(viewModel.equalizeHeights).toHaveBeenCalled();
+        expect(viewModel.equalizeHeights.calls.count()).toEqual(2);
       });
     });
 
@@ -428,8 +450,10 @@ describe('GGRC.Components.revisionsComparer', function () {
       });
 
       it('adds empty html block to the right panel', () => {
+        let emptyBlockSelector =
+          `global-custom-attributes:last ${attributeSelector}:first:empty`;
         method($target, revisions);
-        expect($target.find(attributeSelector).length).toEqual(4);
+        expect($target.find(emptyBlockSelector).length).toEqual(1);
       });
 
       it('highlights removed attribute title', () => {
@@ -450,18 +474,106 @@ describe('GGRC.Components.revisionsComparer', function () {
       });
     });
 
+    describe('when all attributes were removed', () => {
+      let $target;
+
+      beforeEach(() => {
+        let ca0s = [{
+          custom_attribute_id: 1,
+          def: {
+            title: 'ca1 title',
+          },
+          attribute_value: 'ca1 value',
+        }, {
+          custom_attribute_id: 2,
+          def: {
+            title: 'ca2 title',
+          },
+          attribute_value: 'ca2 value',
+        }];
+
+        let ca1s = [];
+
+        let index = 0;
+        spyOn(caUtils, 'prepareCustomAttributes').and
+          .callFake((defs, values) => {
+          if (index === 0) {
+            index++;
+            return ca0s;
+          }
+          return ca1s;
+        });
+
+        $target = $(`<div>
+                    <section class="info">
+                      <global-custom-attributes>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title">title</div>
+                          <div class="inline__content">value</div>
+                        </div>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title">ca2 title</div>
+                          <div class="inline__content">ca2 value</div>
+                        </div>
+                      </global-custom-attributes>
+                    </section>
+
+                    <section class="info">
+                      <global-custom-attributes>
+                      </global-custom-attributes>
+                    </section>
+                  </div>`);
+      });
+
+      it('adds empty html blocks to the right panel', () => {
+        let emptyBlockSelector =
+          `global-custom-attributes:last ${attributeSelector}:empty`;
+        method($target, revisions);
+        expect($target.find(emptyBlockSelector).length).toEqual(0);
+      });
+
+      it('highlights removed attributes title', () => {
+        method($target, revisions);
+        expect($target.find(`${titleSelector}${highlightSelector}`).length)
+          .toEqual(2);
+      });
+
+      it('highlights removed attributes value', () => {
+        method($target, revisions);
+        expect($target.find(`${valueSelector}${highlightSelector}`).length)
+          .toEqual(2);
+      });
+
+      it('equlizes blocks heights', () => {
+        method($target, revisions);
+        expect(viewModel.equalizeHeights.calls.count()).toEqual(2);
+      });
+    });
+
     describe('when attribute was added', () => {
       let $target;
 
       beforeEach(() => {
-        let ca0s = [];
+        let ca0s = [{
+          custom_attribute_id: 2,
+          def: {
+            title: 'title',
+          },
+          attribute_value: 'value',
+        }];
 
         let ca1s = [{
           custom_attribute_id: 1,
           def: {
-            title: 'changed title',
+            title: 'new attribute title',
           },
-          attribute_value: 'changed value',
+          attribute_value: 'new attribute value',
+        }, {
+          custom_attribute_id: 2,
+          def: {
+            title: 'title',
+          },
+          attribute_value: 'value',
         }];
 
         let index = 0;
@@ -477,12 +589,20 @@ describe('GGRC.Components.revisionsComparer', function () {
         $target = $(`<div>
                     <section class="info">
                       <global-custom-attributes>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title">title</div>
+                          <div class="inline__content"></div>
+                        </div>
                       </global-custom-attributes>
                     </section>
                     <section class="info">
                       <global-custom-attributes>
                         <div class="ggrc-form-item">
-                          <div class="info-pane__section-title"></div>
+                          <div class="info-pane__section-title">new title</div>
+                          <div class="inline__content"></div>
+                        </div>
+                        <div class="ggrc-form-item">
+                          <div class="info-pane__section-title">title</div>
                           <div class="inline__content"></div>
                         </div>
                       </global-custom-attributes>
@@ -490,9 +610,11 @@ describe('GGRC.Components.revisionsComparer', function () {
                   </div>`);
       });
 
-      it('does not add empty html block to the left panel', () => {
+      it('adds empty html block to the left panel', () => {
+        let emptyBlockSelector =
+          `global-custom-attributes:first ${attributeSelector}:first:empty`;
         method($target, revisions);
-        expect($target.find(attributeSelector).length).toEqual(1);
+        expect($target.find(emptyBlockSelector).length).toEqual(1);
       });
 
       it('highlights new attribute title', () => {
@@ -505,6 +627,11 @@ describe('GGRC.Components.revisionsComparer', function () {
         method($target, revisions);
         expect($target.find(`${valueSelector}${highlightSelector}`).length)
           .toEqual(1);
+      });
+
+      it('equlizes blocks heights', () => {
+        method($target, revisions);
+        expect(viewModel.equalizeHeights.calls.count()).toEqual(2);
       });
     });
   });
