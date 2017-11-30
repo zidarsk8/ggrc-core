@@ -28,7 +28,7 @@ class TestTotalReindex(TestCase):
   INDEX_QUERY_LIMIT = {
       'Assessment': 11,
       'AssessmentTemplate': 5,
-      'Audit': 6,
+      'Audit': 7,
       'Comment': 4,
       'Contract': 9,
       'Control': 19,

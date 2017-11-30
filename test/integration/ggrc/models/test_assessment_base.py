@@ -1,7 +1,8 @@
 # Copyright (C) 2017 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-"""Integration tests for Assessment"""
+"""Test assessment base class used by test_assessment and
+   test_assessment_generation modules"""
 
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc.models import all_models
