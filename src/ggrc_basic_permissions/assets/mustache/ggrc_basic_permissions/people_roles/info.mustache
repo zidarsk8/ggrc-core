@@ -38,7 +38,7 @@
           <clipboard-link title="Get permalink" notify="true" text="{{get_permalink_for_object instance}}" />
         </li>
         {{^if_instance_of parentInstance 'Audit'}}
-          {{#with_program_roles_as "roles" result}}
+          {{#with_program_roles_as result}}
             {{#if result.mappings.length}}
               {{#is_allowed_all 'delete' result.mappings}}
                 <li>
@@ -94,7 +94,7 @@
           <div class="span6">
             <h6>Authorizations</h6>
             <p>
-              {{#with_program_roles_as "roles" result}}
+              {{#with_program_roles_as result}}
                 {{#if_equals roles.0.role.permission_summary 'Mapped'}}
                   No Role
                 {{else}}
