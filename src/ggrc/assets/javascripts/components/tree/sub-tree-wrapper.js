@@ -162,9 +162,6 @@ import {
           });
         }.bind(this));
     },
-    makeResult: function (instance) {
-      return this.attr('_loader').getResultFromMapping(instance);
-    },
     collapseAfterUnmap: function () {
       // unbind 'destinationUnmapped' event
       this.attr('directlyItems').forEach((item) => {
@@ -191,13 +188,5 @@ import {
     tag: 'sub-tree-wrapper',
     template: template,
     viewModel: viewModel,
-    events: {
-      inserted: function () {
-        var parent = this.viewModel.attr('parent');
-
-        this.viewModel.attr('_loader',
-          new GGRC.ListLoaders.TreeBaseLoader(null, parent));
-      }
-    }
   });
 })(window.can, window.GGRC);

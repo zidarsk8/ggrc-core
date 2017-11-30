@@ -39,7 +39,7 @@
         </li>
         {{^if_instance_of parentInstance 'Audit'}}
           {{#with_program_roles_as "roles" result}}
-            {{#if result.mappings}}
+            {{#if result.mappings.length}}
               {{#is_allowed_all 'delete' result.mappings}}
                 <li>
                     <unmap-person-button {source}="instance" {destination}="parentInstance" class="unmap-link">
