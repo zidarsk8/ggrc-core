@@ -412,9 +412,8 @@ def _handle_assessment(assessment, src, snapshots, templates, audits):
     assessment.assessment_type = template.template_object_type
 
 
-def _handle_issue_tracker(assessment, src, snapshots, templates, audits):
+def _handle_issue_tracker(assessment, src, templates, audits):
   """Handles issue tracker related data."""
-  del snapshots  # Unused
   # Get issue tracker data from request.
   info = src.get('issue_tracker') or {}
 
@@ -486,7 +485,7 @@ def init_hook():
       _handle_assessment(
           assessment, src, snapshot_cache, template_cache, audit_cache)
       _handle_issue_tracker(
-          assessment, src, snapshot_cache, template_cache, audit_cache)
+          assessment, src, template_cache, audit_cache)
 
   @signals.Restful.model_put.connect_via(all_models.Assessment)
   def handle_assessment_put(sender, obj=None, src=None, service=None):
