@@ -18,6 +18,7 @@ from sqlalchemy.ext import hybrid
 
 from ggrc import builder
 from ggrc import db
+from ggrc.access_control import roleable
 from ggrc.fulltext import get_indexer
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
@@ -31,7 +32,8 @@ from ggrc_workflows.models import cycle_task_group
 from ggrc_workflows.services import google_holidays
 
 
-class Workflow(mixins.CustomAttributable,
+class Workflow(roleable.Roleable,
+               mixins.CustomAttributable,
                HasOwnContext,
                mixins.Timeboxed,
                mixins.Described,
