@@ -186,7 +186,6 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'test_plan',
       'title',
       'start_date',
-      'end_date'
   }
 
   _aliases = {
