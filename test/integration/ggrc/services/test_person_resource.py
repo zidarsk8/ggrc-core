@@ -12,6 +12,7 @@ from freezegun import freeze_time
 from ggrc.models import all_models
 from ggrc.utils import create_stub
 
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.models import factories
 from integration.ggrc.services import TestCase
 from integration.ggrc.query_helper import WithQueryApi
@@ -89,49 +90,38 @@ class TestPersonResource(TestCase, WithQueryApi):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
-                "access_control_list": [{
-                    "person": create_stub(user),
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, user.id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15),
             }, {
                 "title": "task 2",
                 "description": "some task 3",
-                "access_control_list": [{
-                    "person": create_stub(user),
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, user.id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 9, 16),
             }, {
                 "title": "task 3",
                 "description": "some task 4",
-                "access_control_list": [{
-                    "person": create_stub(user),
-                    "ac_role_id": role_id,
-                }, {
-                    "person": create_stub(dummy_user),
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, user.id),
+                    acl_helper.get_acl_json(role_id, dummy_user.id)
+                ],
                 "start_date": date(2017, 6, 5),
                 "end_date": date(2017, 10, 16),
             }, {
                 "title": "dummy task 4",  # task should not counted
                 "description": "some task 4",
-                "access_control_list": [{
-                    "person": create_stub(dummy_user),
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, dummy_user.id)],
                 "start_date": date(2017, 6, 5),
                 "end_date": date(2017, 11, 17),
             }, {
                 "title": "dummy task 5",  # task should not counted
                 "description": "some task 4",
-                "access_control_list": [{
-                    "person": create_stub(dummy_user),
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, dummy_user.id)],
                 "start_date": date(2017, 6, 5),
                 "end_date": date(2017, 11, 18),
             }],
@@ -150,10 +140,8 @@ class TestPersonResource(TestCase, WithQueryApi):
             "task_group_tasks": [{
                 "title": "not counted existing task",
                 "description": "",
-                "access_control_list": [{
-                    "person": create_stub(user),
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, user.id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15),
             }],
@@ -225,19 +213,15 @@ class TestPersonResource(TestCase, WithQueryApi):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
-                "access_control_list": [{
-                    "person": create_stub(user),
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, user.id)],
                 "start_date": date(2017, 5, 5),
                 "end_date": date(2017, 8, 15),
             }, {
                 "title": "dummy task 5",
                 "description": "some task 4",
-                "access_control_list": [{
-                    "person": create_stub(user),
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, user.id)],
                 "start_date": date(2017, 6, 5),
                 "end_date": date(2017, 11, 18),
             }],

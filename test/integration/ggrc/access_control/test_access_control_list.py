@@ -6,20 +6,10 @@
 from ggrc.fulltext import mysql
 from ggrc.models import all_models
 from integration.ggrc import TestCase
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.models import factories
 from integration.ggrc.models.factories import random_str
 from integration.ggrc.api_helper import Api
-
-
-def _acl_json(role_id, person_id):
-  """Helper function for setting acl json"""
-  return {
-      "ac_role_id": role_id,
-      "person": {
-          "type": "Person",
-          "id": person_id
-      }
-  }
 
 
 def _acl_asserts(acl, id_, person_id):
@@ -68,7 +58,7 @@ class TestAccessControlList(TestCase):
             "type": "Control",
             "context": None,
             "access_control_list": [
-                _acl_json(id_, person_id)
+                acl_helper.get_acl_json(id_, person_id)
             ]
         },
     }
@@ -129,7 +119,8 @@ class TestAccessControlList(TestCase):
     assert response.status_code == 200, \
         "Failed to fetch created control {}".format(response.status)
     control = response.json['control']
-    control['access_control_list'].append(_acl_json(id_2, person_id))
+    control['access_control_list'].append(
+        acl_helper.get_acl_json(id_2, person_id))
     response = self.api.put(self.control, {"control": control})
     assert response.status_code == 200, \
         "PUTing control failed {}".format(response.status)

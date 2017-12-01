@@ -8,6 +8,7 @@ import ddt
 from ggrc import models
 from ggrc.access_control.role import get_custom_roles_for
 from integration.ggrc import generator
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.models import factories
 from integration.ggrc.models import test_assessment
 
@@ -61,12 +62,10 @@ class TestMixinAutoStatusChangeableBase(test_assessment.TestAssessmentBase):
         for acr_id, acr_name in get_custom_roles_for(obj.type).items()
     }
     self.api.modify_object(obj, {
-        "access_control_list": [{
-            "ac_role_id": ac_roles[role],
-            "person": {
-                "id": person.id
-            },
-        } for role in new_roles]
+        "access_control_list": [
+            acl_helper.get_acl_json(ac_roles[role], person.id)
+            for role in new_roles
+        ]
     })
 
   def delete_assignee(self, obj, email):

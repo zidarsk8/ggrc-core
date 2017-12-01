@@ -20,6 +20,7 @@ from ggrc.notifications import common
 
 from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 
@@ -90,46 +91,36 @@ class TestTaskDueNotifications(TestCase):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
                 "start_date": date(2017, 5, 15),
                 "end_date": date(2017, 6, 11),
             }, {
                 "title": "task 2",
                 "description": "some task 2",
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
                 "start_date": date(2017, 5, 8),
                 "end_date": date(2017, 6, 12),
             }, {
                 "title": "task 3",
                 "description": "some task 3",
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
                 "start_date": date(2017, 5, 31),
                 "end_date": date(2017, 6, 13),
             }, {
                 "title": "task 4",
                 "description": "some task 4",
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
                 "start_date": date(2017, 6, 2),
                 "end_date": date(2017, 6, 14),
             }, {
                 "title": "task 5",
                 "description": "some task 5",
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
                 "start_date": date(2017, 6, 8),
                 "end_date": date(2017, 6, 15),
             }],

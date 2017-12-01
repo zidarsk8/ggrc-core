@@ -12,6 +12,7 @@ from ggrc.models import all_models
 from ggrc.notifications import common
 from ggrc_workflows.models import Cycle, CycleTaskGroupObjectTask
 from integration.ggrc import TestCase
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc_workflows.generator import WorkflowsGenerator
@@ -305,19 +306,15 @@ class TestOneTimeWfEndDateChange(TestCase):
                 "description": "some task",
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
             }, {
                 "title": "task 2",
                 "description": "some task 2",
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
             }],
             "task_group_objects": self.random_objects
         }]

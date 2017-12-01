@@ -17,6 +17,7 @@ from ggrc.notifications import common
 from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroupObjectTask
 from integration.ggrc import TestCase
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc_workflows.generator import WorkflowsGenerator
@@ -293,10 +294,8 @@ class TestCycleTaskStatusChange(TestCase):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "single task in a wf",
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }],
@@ -314,19 +313,15 @@ class TestCycleTaskStatusChange(TestCase):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "two taks in wf with different objects",
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }, {
                 "title": "task 2",
                 "description": "two taks in wf with different objects",
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }],

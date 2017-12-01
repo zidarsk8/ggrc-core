@@ -7,6 +7,7 @@ Test Assignable RBAC
 
 from ggrc.models import all_models
 from integration.ggrc import TestCase
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import Generator
 from integration.ggrc.generator import ObjectGenerator
@@ -60,13 +61,7 @@ class TestReader(TestCase):
         all_models.AccessControlRole.name == "Creators",
     ).first()
     return self.api.put(asmnt, {
-        "access_control_list": [{
-            "ac_role_id": acr.id,
-            "person": {
-                "id": user.id
-            },
-            "type": "AccessControlList",
-        }]
+        "access_control_list": [acl_helper.get_acl_json(acr.id, user.id)]
     })
 
   def test_basic_with_no_assignee(self):

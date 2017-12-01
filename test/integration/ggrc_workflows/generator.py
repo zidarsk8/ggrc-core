@@ -15,6 +15,7 @@ from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import TaskGroupObject
 from ggrc_workflows.models import TaskGroupTask
 from ggrc_workflows.models import Workflow
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.generator import Generator
 from integration.ggrc.models import factories
 
@@ -100,10 +101,8 @@ class WorkflowsGenerator(Generator):
     )
     obj_dict = self.obj_to_dict(tgt, obj_name)
     if "access_control_list" not in data:
-      data["access_control_list"] = [{
-          "ac_role_id": cycle_task_role_id,
-          "person": {"id": 1},
-      }]
+      data["access_control_list"] = [
+          acl_helper.get_acl_json(cycle_task_role_id, 1)]
     obj_dict[obj_name].update(data)
     return self.generate(TaskGroupTask, obj_name, obj_dict)
 

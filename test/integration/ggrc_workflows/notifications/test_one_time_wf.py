@@ -12,6 +12,7 @@ from ggrc.models import Person
 from ggrc.models import all_models
 from ggrc_workflows.models import Cycle
 from integration.ggrc import TestCase
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc_workflows.generator import WorkflowsGenerator
@@ -148,19 +149,17 @@ class TestOneTimeWorkflowNotification(TestCase):
             "task_group_tasks": [{
                 "title": "task 1",
                 "description": "some task",
-                "access_control_list": [{
-                    "person": {"id": self.random_people[0].id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.random_people[0].id)
+                ],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }, {
                 "title": "task 2",
                 "description": "some task",
-                "access_control_list": [{
-                    "person": {"id": self.random_people[1].id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.random_people[1].id)
+                ],
                 "start_date": date(2015, 5, 4),
                 "end_date": date(2015, 5, 7),
             }],
@@ -171,19 +170,17 @@ class TestOneTimeWorkflowNotification(TestCase):
             "task_group_tasks": [{
                 "title": "task 1 in tg 2",
                 "description": "some task",
-                "access_control_list": [{
-                    "person": {"id": self.random_people[0].id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.random_people[0].id)
+                ],
                 "start_date": date(2015, 5, 8),  # friday
                 "end_date": date(2015, 5, 12),
             }, {
                 "title": "task 2 in tg 2",
                 "description": "some task",
-                "access_control_list": [{
-                    "person": {"id": self.random_people[2].id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.random_people[2].id)
+                ],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }],
@@ -204,19 +201,17 @@ class TestOneTimeWorkflowNotification(TestCase):
             "task_group_tasks": [{
                 "title": u"task 1 \u2062 WITH AN UMBRELLA ELLA ELLA. \u2062",
                 "description": "some task. ",
-                "access_control_list": [{
-                    "person": {"id": user},
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, user)
+                ],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }, {
                 "title": "task 2",
                 "description": "some task",
-                "access_control_list": [{
-                    "person": {"id": user},
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, user)
+                ],
                 "start_date": date(2015, 5, 4),
                 "end_date": date(2015, 5, 7),
             }],
@@ -227,19 +222,17 @@ class TestOneTimeWorkflowNotification(TestCase):
             "task_group_tasks": [{
                 "title": u"task 1 \u2062 WITH AN UMBRELLA ELLA ELLA. \u2062",
                 "description": "some task",
-                "access_control_list": [{
-                    "person": {"id": user},
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, user)
+                ],
                 "start_date": date(2015, 5, 8),  # friday
                 "end_date": date(2015, 5, 12),
             }, {
                 "title": "task 2 in tg 2",
                 "description": "some task",
-                "access_control_list": [{
-                    "person": {"id": user},
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, user)
+                ],
                 "start_date": date(2015, 5, 1),  # friday
                 "end_date": date(2015, 5, 5),
             }],
