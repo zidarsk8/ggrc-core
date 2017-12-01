@@ -384,6 +384,9 @@ def _handle_issue_tracker(assessment, src):
 
   if not info:
     # Check assessment template for issue tracker data.
+    # Templates are only set on POST requests with assessment generator. That
+    # is why we don't need an additional way of fetching the correct template
+    # on PUT requests
     template = utils.referenced_objects.get(
         "AssessmentTemplate",
         src.get('template', {}).get('id'),
@@ -395,10 +398,15 @@ def _handle_issue_tracker(assessment, src):
     # Check audit for issue tracker data.
     # Note audit_id is not set correctly when creating and editing audits via
     # import.
+
+    # Referenced objects are only available on POST requests. Since this
+    # function also handles assessment PUT requests we also have
+    # assessment.audit which is automatically populated when assessment is
+    # fetched at the start of PUT request.
     audit = utils.referenced_objects.get(
         "Audit",
         src.get('audit', {}).get('id'),
-    )
+    ) or assessment.audit
     if audit:
       info = audit.issue_tracker
 
