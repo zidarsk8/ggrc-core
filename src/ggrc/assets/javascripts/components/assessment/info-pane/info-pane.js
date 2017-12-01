@@ -241,9 +241,6 @@ import tracker from '../../../tracker';
             if (this.attr('isUpdatingRelatedItems')) {
               this.attr('isUpdatingRelatedItems', false);
             }
-            tracker.stop(this.attr('instance.type'),
-              tracker.USER_JOURNEY_KEYS.NAVIGATION,
-              tracker.USER_ACTIONS.OPEN_INFO_PANE);
           }.bind(this));
         return dfd;
       },
@@ -394,6 +391,10 @@ import tracker from '../../../tracker';
             this.attr('evidences').replace(data['Document:EVIDENCE']);
             this.attr('urls').replace(data['Document:URL']);
             this.attr('referenceUrls').replace(data['Document:REFERENCE_URL']);
+
+            tracker.stop(this.attr('instance.type'),
+              tracker.USER_JOURNEY_KEYS.NAVIGATION,
+              tracker.USER_ACTIONS.OPEN_INFO_PANE);
           });
       },
       initializeFormFields: function () {
