@@ -12,7 +12,6 @@ from ggrc import db
 from ggrc.models import AccessControlList
 from ggrc.models import AccessControlRole
 from ggrc.models import Assessment
-from ggrc.models import Audit
 from ggrc.models import Control
 from ggrc.models import Person
 from ggrc_workflows.models import TaskGroup

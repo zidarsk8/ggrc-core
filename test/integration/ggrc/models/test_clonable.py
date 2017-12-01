@@ -11,8 +11,6 @@ from ggrc.snapshotter.rules import Types
 
 from integration.ggrc import generator
 from integration.ggrc.models import factories
-from integration.ggrc_basic_permissions.models \
-    import factories as rbac_factories
 from integration.ggrc.snapshotter import SnapshotterBaseTestCase
 
 
@@ -313,7 +311,8 @@ class TestClonable(SnapshotterBaseTestCase):
         AccessControlList.query.filter_by(
             ac_role_id=auditor_role.id,
             object_type="Audit",
-            object_id=audit_copy.id).count(), 3, "Auditors not present on copy")
+            object_id=audit_copy.id
+        ).count(), 3, "Auditors not present on copy")
 
     # Verify that contexts are different for original and copy audit
     another_user_4 = factories.PersonFactory(email="user4@example.com")
@@ -334,7 +333,8 @@ class TestClonable(SnapshotterBaseTestCase):
         AccessControlList.query.filter_by(
             ac_role_id=auditor_role.id,
             object_type="Audit",
-            object_id=audit_copy.id).count(), 3, "Auditors not present on copy")
+            object_id=audit_copy.id
+        ).count(), 3, "Auditors not present on copy")
 
   def test_audit_clone_custom_attributes(self):
     """Test if custom attributes were copied correctly"""

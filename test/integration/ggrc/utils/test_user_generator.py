@@ -14,7 +14,6 @@ from ggrc.models import Assessment
 from ggrc.models import AssessmentTemplate
 from ggrc.models import Audit
 from ggrc.models import Person
-from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
 
 from integration.ggrc.services import TestCase

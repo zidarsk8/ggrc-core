@@ -189,8 +189,10 @@ def generate_role_object_dict(snapshot, audit):
 
   acr_dict = access_control.role.get_custom_roles_for(snapshot.child_type)
   audit_acr = access_control.role.get_custom_roles_for("Audit")
-  auditors_role = next(id_ for id_, val in audit_acr.iteritems() if val == "Auditors")
-  leads_role = next(id_ for id_, val in audit_acr.iteritems() if val == "Audit Captains")
+  auditors_role = next(id_ for id_, val in audit_acr.iteritems()
+                       if val == "Auditors")
+  leads_role = next(id_ for id_, val in audit_acr.iteritems()
+                    if val == "Audit Captains")
 
   acl_dict = collections.defaultdict(list)
   # populated content should have access_control_list

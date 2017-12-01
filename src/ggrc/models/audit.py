@@ -22,7 +22,6 @@ from ggrc.models.mixins import WithLastDeprecatedDate
 from ggrc.models.object_person import Personable
 from ggrc.models.program import Program
 from ggrc.models.person import Person
-from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
 from ggrc.models.snapshot import Snapshotable
 
