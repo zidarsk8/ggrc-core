@@ -25,6 +25,17 @@
           (value-changed)="fieldValueChanged(%event, %context)"
 	  class="form-field__content {{extraClass type}}"
         ></custom-attributes-field>
+        {{#if validation.hasMissingInfo}}
+          <div class="form-field__validation-hint-placeholder">
+              <button class="btn btn-small btn-link btn-link-nopadding" ($click)="showRequiredInfoModal(%event, %context)">Add required info</button>
+          </div>
+        {{/if}}
+        {{#isInvalidField validation.show validation.valid highlightInvalidFields}}
+          <form-validation-text
+            {validation}="validation"
+            {type}="type">
+          </form-validation-text>
+        {{/isInvalidField}}
       {{else}}
         <custom-attributes-field-view
           {type}="type"
@@ -32,17 +43,6 @@
           class="form-field__content {{extraClass type}}"
         ></custom-attributes-field-view>
       {{/if}}
-      {{#if validation.hasMissingInfo}}
-        <div class="form-field__validation-hint-placeholder">
-            <button class="btn btn-small btn-link btn-link-nopadding" ($click)="showRequiredInfoModal(%event, %context)">Add required info</button>
-        </div>
-      {{/if}}
-      {{#isInvalidField validation.show validation.valid highlightInvalidFields}}
-        <form-validation-text
-          {validation}="validation"
-          {type}="type">
-        </form-validation-text>
-      {{/isInvalidField}}
     </div>
   {{/each}}
 </div>
