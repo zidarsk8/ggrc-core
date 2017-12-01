@@ -305,11 +305,9 @@ describe('can.Model.Cacheable', function () {
       // we want to see how our observable list gets items over time, so spy on the push method
       spyOn(list, 'push').and.callThrough();
       spyOn(can, 'ajax').and.returnValue($.when(dummy_models));
-      var st = 4; // preload Date.now() because it's called once before we even get to modelizing
+      var st = 3; // preload Date.now() because it's called once before we even get to modelizing
       spyOn(Date, 'now').and.callFake(function () {
-        // Date.now() is called once at the start of modelizeMS (internal function in findAll)
-        //  once in an unknown location
-        //  and once per item.
+        // Date.now() is called once per item.
         if ((++st % 5) === 0)
           st += 100; // after three, push the time ahead 100ms to force a new call to modelizeMS
         return st;

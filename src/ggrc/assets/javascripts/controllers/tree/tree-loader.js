@@ -84,8 +84,6 @@ import {
 
     display: function (refetch) {
       var that = this;
-      var trackerStop = GGRC.Tracker.start(
-        'TreeView', 'display', this.options.model.shortName);
       var loader = this.fetch_list.bind(this);
 
       if (refetch) {
@@ -110,8 +108,7 @@ import {
           }
           return $.when.apply($, dfds);
         }))
-        .then(that._ifNotRemoved(that.proxy('draw_list')))
-        .done(trackerStop);
+        .then(that._ifNotRemoved(that.proxy('draw_list')));
 
       return this._display_deferred;
     },

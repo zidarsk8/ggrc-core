@@ -24,6 +24,7 @@ import {
 } from '../../plugins/utils/query-api-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
+import tracker from '../../tracker';
 
 const DEFAULT_PAGE_SIZE = 5;
 
@@ -84,17 +85,21 @@ export default GGRC.Components('mapperResults', {
       this.attr('submitCbs').remove(this.onSearch.bind(this));
     },
     setItems: function () {
-      var self = this;
+      const stopFn = tracker.start(this.attr('type'),
+        tracker.USER_JOURNEY_KEYS.NAVIGATION,
+        tracker.USER_ACTIONS.ADVANCED_SEARCH_FILTER);
+
       this.attr('items').replace([]);
-      return self.load()
-        .then(function (items) {
-          self.attr('items', items);
-          self.attr('entries', items.map(function (item) {
+      return this.load()
+        .then(items => {
+          this.attr('items', items);
+          this.attr('entries', items.map(function (item) {
             return item.data;
           }));
-          self.setColumnsConfiguration();
-          self.setRelatedAssessments();
-          self.attr('isBeforeLoad', false);
+          this.setColumnsConfiguration();
+          this.setRelatedAssessments();
+          this.attr('isBeforeLoad', false);
+          stopFn();
         });
     },
     setColumnsConfiguration: function () {

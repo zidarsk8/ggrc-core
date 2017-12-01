@@ -160,6 +160,8 @@ module.exports = function (env) {
         IS_RISK_ASSESSMENTS_ENABLED: JSON.stringify(isModuleEnabled('ggrc_risk_assessments')),
         IS_PERMISSIONS_ENABLED: JSON.stringify(isModuleEnabled('ggrc_basic_permissions')),
         IS_GDRIVE_ENABLED: JSON.stringify(isModuleEnabled('ggrc_gdrive_integration')),
+        GOOGLE_ANALYTICS_ID: JSON.stringify(ENV.GOOGLE_ANALYTICS_ID),
+        DEV_MODE: JSON.stringify(!isProd),
       }),
       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
       new ManifestPlugin({

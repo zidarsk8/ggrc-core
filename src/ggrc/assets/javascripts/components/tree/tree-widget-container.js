@@ -47,6 +47,7 @@ import {
   getWidgetConfig,
 } from '../../plugins/utils/object-versions-utils';
 import Pagination from '../base-objects/pagination';
+import tracker from '../../tracker';
 
 var viewModel;
 
@@ -321,15 +322,11 @@ viewModel = can.Map.extend({
       }.bind(this));
   },
   display: function (needToRefresh) {
-    var that = this;
-    var loadedItems;
+    let loadedItems;
 
     if (!this.attr('loaded') || needToRefresh) {
-      loadedItems = this
-      .loadItems()
-      .then(function () {
-        that.setRefreshFlag(false); // refreshed
-      });
+      loadedItems = this.loadItems()
+        .then(() => this.setRefreshFlag(false)); // refreshed
 
       this.attr('loaded', loadedItems);
     }
@@ -376,8 +373,11 @@ viewModel = can.Map.extend({
     this.closeInfoPane();
   },
   onFilter: function () {
+    const stopFn = tracker.start(this.attr('modelName'),
+      tracker.USER_JOURNEY_KEYS.LOADING,
+      tracker.USER_ACTIONS.MULTISELECT_FILTER);
     this.attr('pageInfo.current', 1);
-    this.loadItems();
+    this.loadItems().then(stopFn);
     this.closeInfoPane();
   },
   getDepthFilter: function () {

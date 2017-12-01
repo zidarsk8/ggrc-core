@@ -45,6 +45,7 @@ import {
   applyChangesToCustomAttributeValue,
 } from '../../../plugins/utils/ca-utils';
 import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
+import tracker from '../../../tracker';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -240,6 +241,9 @@ import DeferredTransaction from '../../../plugins/utils/deferred-transaction-uti
             if (this.attr('isUpdatingRelatedItems')) {
               this.attr('isUpdatingRelatedItems', false);
             }
+            tracker.stop(this.attr('instance.type'),
+              tracker.USER_JOURNEY_KEYS.NAVIGATION,
+              tracker.USER_ACTIONS.OPEN_INFO_PANE);
           }.bind(this));
         return dfd;
       },
@@ -428,6 +432,9 @@ import DeferredTransaction from '../../../plugins/utils/deferred-transaction-uti
         var instance = this.attr('instance');
         var self = this;
         var previousStatus = instance.attr('previousStatus') || 'In Progress';
+        let stopFn = tracker.start(instance.type,
+          tracker.USER_JOURNEY_KEYS.NAVIGATION,
+          tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
         this.attr('onStateChangeDfd', can.Deferred());
 
         if (isUndo) {
@@ -453,6 +460,7 @@ import DeferredTransaction from '../../../plugins/utils/deferred-transaction-uti
                 instance.attr('isPending', false);
                 self.initializeFormFields();
                 self.attr('onStateChangeDfd').resolve();
+                stopFn();
               });
             });
           });
