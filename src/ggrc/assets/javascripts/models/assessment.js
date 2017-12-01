@@ -17,7 +17,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     destroy: 'DELETE /api/assessments/{id}',
     create: 'POST /api/assessments',
     mixins: [
-      'ownable', 'unique_title',
+      'ownable', 'unique_title', 'ca_update',
       'autoStatusChangeable', 'timeboxed', 'mapping-limit',
       'inScopeObjects', 'accessControlList', 'refetchHash',
       'issueTrackerIntegratable',
@@ -413,8 +413,5 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       this._pending_refresh.fn();
       return dfd;
     },
-    info_pane_preload: function () {
-      this.refresh();
-    }
   });
 })(window.can, window.GGRC, window.CMS);
