@@ -5,7 +5,8 @@
 
 import '../sortable-column/sortable-column';
 import template from './templates/tree-header.mustache';
-import {createSelectedColumnsMap} from '../../plugins/utils/tree-view-utils';
+import {createSelectedColumnsMap, getSortingForModel}
+  from '../../plugins/utils/tree-view-utils';
 
 export default GGRC.Components('treeHeader', {
   tag: 'tree-header',
@@ -98,7 +99,18 @@ export default GGRC.Components('treeHeader', {
 
       return modelName === 'CycleTaskGroupObjectTask' || modelName === 'Cycle';
     },
+    initializeOrder() {
+      let sortingInfo;
+      if (!this.attr('model')) {
+        return;
+      }
+
+      sortingInfo = getSortingForModel(this.attr('model').shortName);
+      this.attr('orderBy.field', sortingInfo.key);
+      this.attr('orderBy.direction', sortingInfo.direction);
+    },
     init: function () {
+      this.initializeOrder();
       this.initializeColumns();
     },
   },
