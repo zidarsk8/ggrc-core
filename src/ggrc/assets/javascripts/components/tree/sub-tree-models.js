@@ -97,13 +97,20 @@ var viewModel = can.Map.extend({
   },
 });
 
-GGRC.Components('subTreeModels', {
+var events = {
+  '.sub-tree-models mouseleave': function () {
+    this.viewModel.attr('isActive', false);
+  },
+};
+
+can.Component.extend({
   tag: 'sub-tree-models',
   template: template,
   viewModel: viewModel,
-  events: {
-    '.sub-tree-models mouseleave': function () {
-      this.viewModel.attr('isActive', false);
-    },
-  },
+  events: events,
 });
+
+export {
+  viewModel,
+  events,
+};
