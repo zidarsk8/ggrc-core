@@ -387,16 +387,14 @@ import tracker from '../../../tracker';
       updateRelatedItems: function () {
         this.attr('isUpdatingRelatedItems', true);
 
-        this.attr('mappedSnapshots')
-          .replace(this.loadSnapshots());
-        this.attr('comments')
-          .replace(this.loadComments());
-        this.attr('evidences')
-          .replace(this.loadEvidences());
-        this.attr('urls')
-          .replace(this.loadUrls());
-        this.attr('referenceUrls')
-          .replace(this.loadReferenceUrls());
+        this.attr('instance').getRelatedObjects()
+          .then(data => {
+            this.attr('mappedSnapshots').replace(data.Snapshot);
+            this.attr('comments').replace(data.Comment);
+            this.attr('evidences').replace(data['Document:EVIDENCE']);
+            this.attr('urls').replace(data['Document:URL']);
+            this.attr('referenceUrls').replace(data['Document:REFERENCE_URL']);
+          });
       },
       initializeFormFields: function () {
         var cavs =

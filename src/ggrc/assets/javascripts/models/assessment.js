@@ -413,5 +413,8 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       this._pending_refresh.fn();
       return dfd;
     },
+    getRelatedObjects () {
+      return $.get(`/api/assessments/${this.attr('id')}/related_objects`);
+    },
   });
 })(window.can, window.GGRC, window.CMS);
