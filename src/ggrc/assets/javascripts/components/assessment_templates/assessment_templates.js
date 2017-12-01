@@ -1,4 +1,4 @@
-/* !
+/*
     Copyright (C) 2017 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
@@ -10,6 +10,8 @@ import {
 } from '../../plugins/utils/query-api-utils';
 import template from
   '../../../mustache/components/assessment_templates/assessment_templates.mustache'; // eslint-disable-line
+import tracker from '../../tracker';
+
 export default can.Component.extend({
   tag: 'assessment-templates',
   template,
@@ -74,6 +76,9 @@ export default can.Component.extend({
       }
       if (!this.attr('assessmentTemplate')) {
         this.attr('assessmentTemplate', initialTemplate);
+        tracker.stop(tracker.FOCUS_AREAS.ASSESSMENT,
+          tracker.USER_JOURNEY_KEYS.LOADING,
+          tracker.USER_ACTIONS.ASSESSMENT.OPEN_ASMT_GEN_MODAL);
       }
     },
   },

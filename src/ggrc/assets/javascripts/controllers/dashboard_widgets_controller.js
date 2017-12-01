@@ -10,6 +10,7 @@ import {
 import {
   getWidgetConfig,
 } from '../plugins/utils/object-versions-utils';
+import tracker from '../tracker';
 
 CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
   defaults: {
@@ -125,10 +126,9 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
     }
   },
   display: function (refetch) {
-    var that = this;
-    var tracker_stop = GGRC.Tracker.start(
-      'DashboardWidget', 'display', this.options.model.shortName
-    );
+    const that = this;
+    const stopFn = tracker.start(
+      'DashboardWidget', 'display', this.options.model.shortName);
 
     this._display_deferred = this.prepare().then(function () {
       var dfd;
@@ -148,7 +148,7 @@ CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
       }
 
       return dfd;
-    }).done(tracker_stop);
+    }).then(stopFn);
 
     return this._display_deferred;
   },

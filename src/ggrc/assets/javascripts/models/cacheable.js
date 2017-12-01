@@ -11,7 +11,6 @@ import {
 import {
   makeRequest,
 } from '../plugins/utils/query-api-utils';
-
 import resolveConflict from './cacheable_conflict_resolution.js';
 
 (function (can, GGRC, CMS) {
@@ -189,7 +188,6 @@ import resolveConflict from './cacheable_conflict_resolution.js';
         var deferred = can.Deferred();
         var sourceDeferred = finder.call(this, params);
         var self = this;
-        var tracker_stop = GGRC.Tracker.start('modelize', self.shortName);
 
         deferred.then(success, error);
         sourceDeferred.then(function (sourceData) {
@@ -209,7 +207,7 @@ import resolveConflict from './cacheable_conflict_resolution.js';
           deferred.reject.apply(deferred, arguments);
         });
 
-        return deferred.done(tracker_stop);
+        return deferred;
       };
     },
 
