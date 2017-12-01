@@ -45,7 +45,13 @@ def job_runner(name):
 
 
 def nightly_cron_endpoint():
-  return job_runner("CONTRIBUTED_CRON_JOBS")
+  """Endpoint running nightly jobs from all modules"""
+  return job_runner("NIGHTLY_CRON_JOBS")
+
+
+def hourly_issue_tracker_sync_endpoint():
+  """Endpoint running hourly jobs from all modules"""
+  return job_runner("HOURLY_CRON_JOBS")
 
 
 def half_hour_cron_endpoint():
@@ -55,13 +61,16 @@ def half_hour_cron_endpoint():
 def init_cron_views(app):
   """Init cron views."""
   app.add_url_rule(
-      "/nightly_cron_endpoint",
-      "nightly_cron_endpoint",
-      view_func=nightly_cron_endpoint
+      "/nightly_cron_endpoint", "nightly_cron_endpoint",
+      view_func=nightly_cron_endpoint)
+
+  app.add_url_rule(
+      "/hourly_issue_tracker_sync_endpoint",
+      "hourly_issue_tracker_sync_endpoint",
+      view_func=half_hour_cron_endpoint
   )
 
   app.add_url_rule(
-      "/half_hour_cron_endpoint",
-      "half_hour_cron_endpoint",
+      "/half_hour_cron_endpoint", "half_hour_cron_endpoint",
       view_func=half_hour_cron_endpoint
   )
