@@ -3,12 +3,13 @@
 
 """Import GGRC model hooks."""
 
+from ggrc.models.hooks import access_control_list
 from ggrc.models.hooks import assessment
 from ggrc.models.hooks import audit
 from ggrc.models.hooks import comment
 from ggrc.models.hooks import issue
+from ggrc.models.hooks import issue_tracker
 from ggrc.models.hooks import relationship
-from ggrc.models.hooks import access_control_list
 
 
 ALL_HOOKS = [
@@ -18,6 +19,10 @@ ALL_HOOKS = [
     issue,
     relationship,
     access_control_list,
+
+    # Keep IssueTracker at the end of list to make sure that all other hooks
+    # are already executed and all data is final.
+    issue_tracker,
 ]
 
 
