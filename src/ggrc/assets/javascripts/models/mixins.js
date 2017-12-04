@@ -219,7 +219,7 @@ import {isSnapshot} from '../plugins/utils/snapshot-utils';
       return batchRequests(query)
         .done(function (valueArr) {
           var audit = valueArr[objType][queryType][0];
-          this.attr('scopeObject', audit);
+
           this.attr('audit', audit);
           if (audit && audit.issue_tracker) {
             this.attr('can_use_issue_tracker',

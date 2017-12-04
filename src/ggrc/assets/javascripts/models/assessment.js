@@ -311,8 +311,6 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
         if (pageInstance.type === 'Audit') {
           this.attr('audit', pageInstance);
-        } else if (this.scopeObject) {
-          this.audit = this.scopeObject;
         }
       }
 
