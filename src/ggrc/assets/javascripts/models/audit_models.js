@@ -381,6 +381,7 @@ import '../components/audit/attach-folder-button'
     mixins: [
       'mapping-limit',
       'inScopeObjects',
+      'inScopeObjectsPreload',
       'refetchHash',
       'issueTrackerIntegratable',
     ],

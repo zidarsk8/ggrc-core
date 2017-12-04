@@ -412,7 +412,21 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       return dfd;
     },
     getRelatedObjects () {
-      return $.get(`/api/assessments/${this.attr('id')}/related_objects`);
+      return $.get(`/api/assessments/${this.attr('id')}/related_objects`)
+        .then((response) => {
+          let auditTitle = response.Audit.title;
+
+          if (this.attr('audit')) {
+            this.attr('audit.title', auditTitle);
+
+            if (this.attr('audit.issue_tracker')) {
+              this.attr('can_use_issue_tracker',
+                this.attr('audit.issue_tracker.enabled'));
+            }
+          }
+
+          return response;
+        });
     },
   });
 })(window.can, window.GGRC, window.CMS);

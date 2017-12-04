@@ -199,10 +199,15 @@ import {isSnapshot} from '../plugins/utils/snapshot-utils';
     }
   });
 
-  can.Model.Mixin('inScopeObjects', {}, {
+  can.Model.Mixin('inScopeObjectsPreload', {}, {
     'after:info_pane_preload': function () {
-      return this.updateScopeObject();
+      if (this.updateScopeObject) {
+        this.updateScopeObject();
+      }
     },
+  });
+
+  can.Model.Mixin('inScopeObjects', {}, {
     updateScopeObject: function () {
       var objType = 'Audit';
       var queryType = 'values';
