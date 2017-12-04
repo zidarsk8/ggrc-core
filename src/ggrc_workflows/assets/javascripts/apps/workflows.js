@@ -58,7 +58,6 @@ import {
       countsName: currentWidgetCountsName,
       additionalFilter: currentWidgetFilter
     },
-    person: 'Person',
     taskGroup: 'TaskGroup'
   };
 
@@ -475,7 +474,7 @@ import {
   WorkflowExtension.init_widgets_for_workflow_page = function () {
     var newWidgetDescriptors = {};
     var newDefaultWidgets = [
-      'info', 'person', 'task_group', 'current', 'history'
+      'info', 'task_group', 'current', 'history'
     ];
     var historyWidgetDescriptor;
     var currentWidgetDescriptor;
@@ -506,21 +505,6 @@ import {
           content_controller: GGRC.Controllers.InfoWidget,
           content_controller_options: {
             widget_view: GGRC.mustache_path + '/workflows/info.mustache'
-          }
-        },
-        person: {
-          widget_id: 'person',
-          widget_name: 'People',
-          widget_icon: 'person',
-          widgetType: 'treeview',
-          treeViewDepth: 3,
-          model: CMS.Models.Person,
-          content_controller_options: {
-            parent_instance: object,
-            model: CMS.Models.Person,
-            mapping: 'mapped_and_or_authorized_people',
-            add_item_view:
-              GGRC.mustache_path + '/wf_people/tree_add_item.mustache'
           }
         },
         task_group: {
@@ -587,7 +571,6 @@ import {
     initCounts([
         WorkflowExtension.countsMap.history,
         WorkflowExtension.countsMap.activeCycles,
-        WorkflowExtension.countsMap.person,
         WorkflowExtension.countsMap.taskGroup
       ],
         object.type,
@@ -597,16 +580,6 @@ import {
       'ggrc_workflows',
       {Workflow: newWidgetDescriptors}
     );
-
-    // Setup extra refresh required due to automatic creation of permissions
-    // on creation of WorkflowPerson
-    CMS.Models.WorkflowPerson.bind('created', function (ev, instance) {
-      if (instance instanceof CMS.Models.WorkflowPerson) {
-        if (instance.context) {
-          instance.context.reify().refresh();
-        }
-      }
-    });
   };
 
   WorkflowExtension.init_widgets_for_person_page = function () {
