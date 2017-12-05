@@ -132,12 +132,7 @@ import {
         ),
         context: Direct(
           'Context', 'related_object', 'context'),
-        authorization_contexts: Multi(['context']),
         authorizations: Cross('context', 'user_roles'),
-        authorized_people: Cross(
-          'authorization_contexts', 'authorized_people'),
-        mapped_and_or_authorized_people: Multi([
-          'people', 'authorized_people']),
         roles: Cross('authorizations', 'role'),
 
         // This is a dummy mapping that ensures the WorkflowOwner role is loaded
