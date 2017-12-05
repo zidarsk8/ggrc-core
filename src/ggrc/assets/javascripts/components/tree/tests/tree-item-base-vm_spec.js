@@ -17,52 +17,6 @@ describe('GGRC.VM.BaseTreeItemVM', function () {
     vm = new BaseTreeItemVM();
   });
 
-  describe('initChildTreeDisplay() method', function () {
-    beforeEach(function () {
-      spyOn(TreeViewUtils, 'getModelsForSubTier')
-        .and.returnValue({
-          available: ['Foo', 'Bar', 'Baz'],
-          selected: ['Foo'],
-        });
-      spyOn(ObjectVersions, 'getWidgetConfig')
-        .and.callFake(function (model) {
-          return {
-            widgetName: model + 'Widget',
-          };
-        });
-
-      vm.attr('instance', {type: 'Type'});
-    });
-
-    it('initialised child models list', function () {
-      var modelsList;
-      var displayList;
-      vm.initChildTreeDisplay();
-
-      modelsList = vm.attr('selectedChildModels').serialize();
-      displayList = vm.attr('childModelsList').serialize();
-
-      expect(modelsList.length).toEqual(1);
-      expect(modelsList).toEqual(['Foo']);
-
-      expect(displayList).toEqual([
-        {
-          name: 'Foo',
-          widgetName: 'FooWidget',
-          display: true,
-        }, {
-          name: 'Bar',
-          widgetName: 'BarWidget',
-          display: false,
-        }, {
-          name: 'Baz',
-          widgetName: 'BazWidget',
-          display: false,
-        },
-      ]);
-    });
-  });
-
   describe('onExpand() method', function () {
     it('converts expanded property to the opposite value', function () {
       vm.attr('expanded', true);

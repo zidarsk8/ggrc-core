@@ -4,7 +4,6 @@
  */
 
 import './tree-header-selector';
-import './tree-type-selector';
 import './sub-tree-expander';
 import './sub-tree-wrapper';
 import './sub-tree-item';
@@ -48,6 +47,7 @@ import {
 } from '../../plugins/utils/object-versions-utils';
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
+import router from '../../router';
 
 var viewModel;
 
@@ -324,7 +324,7 @@ viewModel = can.Map.extend({
   display: function (needToRefresh) {
     let loadedItems;
 
-    if (!this.attr('loaded') || needToRefresh) {
+    if (!this.attr('loaded') || needToRefresh || router.attr('refetch')) {
       loadedItems = this.loadItems()
         .then(() => this.setRefreshFlag(false)); // refreshed
 

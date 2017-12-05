@@ -10,6 +10,7 @@ import {
   isObjectContextPage,
   getPageType,
 } from '../../plugins/utils/current-page-utils';
+import childModelsMap from './child-models-map';
 
 (function (can, GGRC) {
   'use strict';
@@ -71,6 +72,9 @@ import {
           var isReady = this.attr('dataIsReady');
 
           if (!isReady && newValue) {
+            if (!this.attr('childModels')) {
+              this.initializeChildModels();
+            }
             this.loadItems().then(function () {
               setValue(newValue);
             });
@@ -115,6 +119,18 @@ import {
     notDirectlyItems: [],
     _loader: null,
     _collapseAfterUnmapCallBack: null,
+    initializeChildModels: function () {
+      var parentModel = this.attr('parentModel');
+      var savedModels = childModelsMap.getModels(parentModel);
+      var defaultModels = TreeViewUtils.getModelsForSubTier(parentModel);
+
+      this.attr('childModels', savedModels || defaultModels.selected);
+
+      childModelsMap.attr('container').bind(parentModel, function (ev) {
+        this.attr('childModels',
+          childModelsMap.getModels(parentModel) || defaultModels.selected);
+      }.bind(this));
+    },
     expandNotDirectlyRelated: function () {
       var isExpanded = this.attr('notDirectlyExpanded');
       this.attr('notDirectlyExpanded', !isExpanded);
