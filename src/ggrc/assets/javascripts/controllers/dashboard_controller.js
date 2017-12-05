@@ -10,6 +10,8 @@ import {
 import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 import {isObjectVersion} from '../plugins/utils/object-versions-utils';
 
+import router, {buildUrl} from '../router';
+
 (function (can, $) {
   can.Control('CMS.Controllers.Dashboard', {
     defaults: {
@@ -299,10 +301,10 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
           this.options.attr('contexts', new can.Observe(this.options.contexts));
         }
 
-        // FIXME: Initialize from `*_widget` hash when hash has no `#!`
-        can.bind.call(window, 'hashchange', function () {
-          this.route(window.location.hash);
-        }.bind(this));
+        router.bind('widget', (ev, newVal)=>{
+          this.route(newVal);
+        });
+
         can.view(this.options.internav_view, this.options, function (frag) {
           const isAuditScope = instance.type === 'Audit';
           const fn = function () {
@@ -316,7 +318,7 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
               this.options.attr('dividedTabsMode', true);
               this.options.attr('priorityTabs', priorityTabsNum);
             }
-            this.route(window.location.hash);
+            this.route(router.attr('widget'));
             delete this.delayed_display;
           }.bind(this);
 
@@ -331,50 +333,28 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
     },
 
     route: function (path) {
-      var refetchMatches;
-      var refetch = false;
-      if (path.substr(0, 2) === '#!') {
-        path = path.substr(2);
-      } else if (path.substr(0, 1) === '#') {
-        path = path.substr(1);
-      }
-      refetchMatches = path.match(/&refetch|^refetch$/);
-
-      if (refetchMatches && refetchMatches.length === 1) {
-        path = path.replace(refetchMatches[0], '');
-        refetch = true;
-      }
-
-      window.location.hash = path;
-
-      this.display_path(path.length ? path : 'Summary_widget', refetch);
-    },
-
-    display_path: function (path, refetch) {
-      var step = path.split('/')[0];
-      var rest = path.substr(step.length + 1);
       var widgetList = this.options.widget_list;
-
-      // Find and make active the widget specified by `step`
-      var widget = this.find_widget_by_target('#' + step);
+      var widget = this.find_widget_by_target('#' + path);
       if (!widget && widgetList.length) {
         // Target was not found, but we can select the first widget in the list
-        widget = widgetList[0];
+        let widgetId = widgetList[0].internav_id + '_widget';
+        router.attr('widget', widgetId);
+        return;
       }
       if (widget) {
         this.set_active_widget(widget);
-        return this.display_widget_path(rest, refetch || widget.forceRefetch);
+        return this.display_widget(widget.forceRefetch);
       }
       return new $.Deferred().resolve();
     },
 
-    display_widget_path: function (path, refetch) {
+    display_widget: function (refetch) {
       var activeWidgetSelector = this.options.contexts.active_widget.selector;
       var $activeWidget = $(activeWidgetSelector);
       var widgetController = $activeWidget.control();
 
-      if (widgetController && widgetController.display_path) {
-        return widgetController.display_path(path, refetch);
+      if (widgetController && widgetController.display) {
+        return widgetController.display(refetch);
       }
       return new $.Deferred().resolve();
     },
@@ -388,14 +368,12 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
         widget.attr('force_show', true);
         this.update_add_more_link();
         this.options.contexts.attr('active_widget', widget);
-        this.show_active_widget();
+        this.show_active_widget(widget);
       }
     },
 
-    show_active_widget: function (selector) {
-      var panel = selector ||
-        this.options.contexts.attr('active_widget').selector;
-      var widget = $(panel);
+    show_active_widget: function (widgetModel) {
+      var widget = $(widgetModel.selector);
       var dashboardCtr = this.options.dashboard_controller;
 
       if (dashboardCtr.hideInfoPin) {
@@ -407,7 +385,8 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
         widget.siblings().addClass('hidden').trigger('widget_hidden');
         widget.removeClass('hidden').trigger('widget_shown');
         this.element.find('li').removeClass('active');
-        $('[href$="' + panel + '"]').closest('li').addClass('active');
+        this.element.find('[href$="' + widgetModel.internav_href + '"]')
+          .closest('li').addClass('active');
       }
     },
 
@@ -506,6 +485,8 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
         internav_icon: icon,
         widgetType: getWidgetType(widgetOptions.widget_id),
         internav_display: title,
+        internav_id: widgetOptions.widget_id,
+        internav_href: buildUrl({widget: widgetOptions.widget_id + '_widget'}),
         forceRefetch: widgetOptions && widgetOptions.forceRefetch,
         spinner: this.options.spinners['#' + $widget.attr('id')],
         model: widgetOptions && widgetOptions.model,
@@ -608,9 +589,8 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
       }
     },
     '.closed click': function (el, ev) {
-      var $link = el.closest('a');
-      var widget = this.widget_by_selector('#' + $link.attr('href')
-                                                      .split('#')[1]);
+      let widgetSelector = el.data('widget');
+      var widget = this.widget_by_selector(widgetSelector);
       var widgets = this.options.widget_list;
 
       widget.attr('force_show', false);
