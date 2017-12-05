@@ -77,7 +77,7 @@ describe('childModelsMap object', () => {
       });
     });
 
-    it('sets newChilds to container by parentType', () => {
+    it('sets newModels to container by parentType', () => {
       let type = 'Program';
 
       childModelsMap.setModels(type, 'new_child_models_for_' + type);
@@ -87,14 +87,14 @@ describe('childModelsMap object', () => {
         .toEqual(expectedResult);
     });
 
-    it('calls displayPrefs.etChildTreeDisplayList() ' +
-    ' with parentType and newChilds as parameters', () => {
+    it('calls displayPrefs.setChildTreeDisplayList() ' +
+    ' with parentType and newModels as parameters', () => {
       let type = 'Program';
-      let newChilds = 'childs_for_Program';
-      childModelsMap.setModels(type, newChilds);
+      let newModels = 'childs_for_Program';
+      childModelsMap.setModels(type, newModels);
 
       expect(childModelsMap.displayPrefs.setChildTreeDisplayList)
-        .toHaveBeenCalledWith(type, newChilds);
+        .toHaveBeenCalledWith(type, newModels);
     });
   });
 });
