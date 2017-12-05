@@ -5,6 +5,46 @@
 
 import {CA_DD_REQUIRED_DEPS} from '../../../plugins/utils/ca-utils';
 
+describe('assessmentLocalCa component', () => {
+  let vm;
+
+  beforeEach(() => {
+    vm = GGRC.Components.getViewModel('assessmentLocalCa');
+  });
+
+  describe('canEdit getter', () => {
+    var spy;
+
+    beforeEach(() => {
+      spy = spyOn(Permission, 'is_allowed_for');
+      vm.attr('instance', {});
+    });
+
+    it('returns false if it is not editMode', () => {
+      vm.attr('editMode', false);
+      expect(vm.attr('canEdit')).toBe(false);
+    });
+
+    describe('if it is in editMode', () => {
+      beforeEach(() => {
+        vm.attr('editMode', true);
+      });
+
+      it('returns false if it is not allowed for update', () => {
+        spy.and.returnValue(false);
+        expect(vm.attr('canEdit')).toBe(false);
+        expect(spy).toHaveBeenCalledWith('update', vm.attr('instance'));
+      });
+
+      it('returns true if it is allowed for update', () => {
+        spy.and.returnValue(true);
+        expect(vm.attr('canEdit')).toBe(true);
+        expect(spy).toHaveBeenCalledWith('update', vm.attr('instance'));
+      });
+    });
+  });
+});
+
 describe('check performValidation', function () {
   var inputField;
   var dropdownField;

@@ -44,6 +44,14 @@ import tracker from '../../tracker';
             return newValue;
           },
         },
+        canEdit: {
+          type: 'boolean',
+          value: false,
+          get: function () {
+            return this.attr('editMode') &&
+              Permission.is_allowed_for('update', this.attr('instance'));
+          },
+        },
         evidenceAmount: {
           type: 'number',
           set: function (newValue, setValue) {
