@@ -56,7 +56,6 @@ can.Model.Cacheable("CMS.Models.Directive", {
       programs: 'CMS.Models.Program.stubs',
       sections: 'CMS.Models.get_stubs',
       controls: 'CMS.Models.Control.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     }
   , defaults : {
   }

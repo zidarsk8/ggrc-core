@@ -46,7 +46,6 @@ import Permission from '../permission';
       people: 'CMS.Models.Person.stubs',
       audit_firm: 'CMS.Models.OrgGroup.stub',
       audit_objects: 'CMS.Models.AuditObject.stubs',
-      custom_attribute_values: 'CMS.Models.CustomAttributeValue.stubs',
     },
     defaults: {
       status: 'Planned',
