@@ -16,50 +16,6 @@ import Permission from '../permission';
     issue_type: 'PROCESS',
   };
 
-  function update_program_authorizations(programs, person) {
-    return can.when(
-      programs[0],
-      programs[0].get_binding('program_authorized_people').refresh_instances(),
-      programs[0].get_binding('program_authorizations').refresh_instances(),
-      CMS.Models.Role.findAll({
-        name: 'ProgramReader'
-      }),
-      CMS.Models.Role.findAll({
-        name: 'ProgramEditor'
-      })
-    ).then(function (program, peopleBindings, authBindings,
-                     reader_roles, editor_roles) {
-      // ignore readers.  Give users an editor role
-      var readerAuthorizations = [];
-      var deleteDfds;
-      var editorAuthorizedPeople = can.map(authBindings, function (ab) {
-        if (~can.inArray(ab.instance.role.reify(), reader_roles)) {
-          readerAuthorizations.push(ab.instance);
-        } else {
-          return ab.instance.person.reify();
-        }
-      });
-
-      if (Permission.is_allowed('create', 'UserRole', program.context.id) &&
-        !~can.inArray(person.reify(), editorAuthorizedPeople)) {
-        deleteDfds = can.map(readerAuthorizations, function (ra) {
-          if (ra.person.reify() === person.reify()) {
-            return ra.refresh().then(function () {
-              return ra.destroy();
-            });
-          }
-        });
-        return $.when.apply($, deleteDfds).then(function () {
-          return new CMS.Models.UserRole({
-            person: person,
-            role: editor_roles[0].stub(),
-            context: program.context
-          }).save();
-        });
-      }
-    }).then(Permission.refresh());
-  }
-
   can.Model.Cacheable('CMS.Models.Audit', {
     root_object: 'audit',
     root_collection: 'audits',
@@ -218,15 +174,6 @@ import Permission from '../permission';
         }.bind(this));
       }
       return _super.apply(this, args);
-    },
-    after_save: function () {
-      var dfd;
-
-      dfd = $.when(
-        new RefreshQueue().enqueue(this.program.reify()).trigger(),
-        this.contact
-      ).then(update_program_authorizations);
-      GGRC.delay_leaving_page_until(dfd);
     },
     findRoles: function (roleName) {
       const auditRole = GGRC.access_control_roles.find((role) => {
