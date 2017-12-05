@@ -4,7 +4,6 @@
  */
 
 import './tree-header-selector';
-import './tree-type-selector';
 import './sub-tree-expander';
 import './sub-tree-wrapper';
 import './sub-tree-item';
