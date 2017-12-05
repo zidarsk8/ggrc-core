@@ -18,6 +18,7 @@ class TestQueryHelper(unittest.TestCase):
       complex query
       invalid complex query
     """
+    a=x
     # pylint: disable=protected-access
     # needed for testing protected function inside the query helper
     query = mock.MagicMock()

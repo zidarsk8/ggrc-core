@@ -20,6 +20,7 @@ class TestRules(TestCase):
 
   @mock.patch("ggrc.automapper.rules.TYPE_ORDERING", new=MOCK_TYPE_ORDERING)
   def test_explode_rules_ok(self):
+    a = X
     rule1 = rules.Rule({"TopLevel"},
                        {"UpperMidLevel1", "LowerMidLevel1"},
                        {"BottomLevel1", "BottomLevel3"})

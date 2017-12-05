@@ -1,9 +1,0 @@
-Object type,Test duplicate column error.,,,,
-Control,Code*,Title*,Admin*,,
-,a,a,user@example.com,,
-,A,A,user@example.com,,
-,,,,,
-Object type,,,,,
-Person,Name,Email*,Company,Role,map: Control
-,Person,person@gmail.com,no company,reader,"a
-A"
