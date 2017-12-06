@@ -1202,8 +1202,7 @@ Mustache.registerHelper("visibility_delay", function (delay, options) {
   };
 });
 
-Mustache.registerHelper("with_program_roles_as", function (
-      var_name, result, options) {
+Mustache.registerHelper("with_program_roles_as", function (result, options) {
   var dfd = $.when()
     , frame = new can.Observe()
     , user_roles = []
