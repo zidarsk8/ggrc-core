@@ -456,11 +456,11 @@ import tracker from '../../../tracker';
             return instance.save();
           })
           .then(() => {
-            instance.attr('isPending', false);
             this.initializeFormFields();
             this.attr('onStateChangeDfd').resolve();
             stopFn();
-          });
+          })
+          .always(() => instance.attr('isPending', false));
       },
       saveGlobalAttributes: function (event) {
         var globalAttributes = event.globalAttributes;
