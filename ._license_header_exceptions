@@ -98,7 +98,6 @@
 < src/ggrc/assets/javascripts/components/form/fields/tests/dropdown-form-field_spec.js
 < src/ggrc/assets/javascripts/components/form/fields/tests/person-form-field_spec.js
 < src/ggrc/assets/javascripts/components/form/fields/tests/rich-text-form-field_spec.js
-< src/ggrc/assets/javascripts/components/form/fields/tests/text-form-field_spec.js
 < src/ggrc/assets/javascripts/components/snapshotter/revisions-comparer.js
 < src/ggrc/assets/mustache/components/object-list-item/detailed-business-object-list-item.mustache
 < src/ggrc/assets/mustache/components/tree_pagination/tree_pagination.mustache
