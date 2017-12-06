@@ -10,14 +10,7 @@
     height: 100%;
   }
   .page-loader {
+    background-color: $contentBgnd;
     display: block;
-  }
-
-  #lhn,
-  .header,
-  .header-content,
-  .footer,
-  .content {
-    display: none;
   }
 }

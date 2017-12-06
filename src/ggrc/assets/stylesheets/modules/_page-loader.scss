@@ -7,7 +7,8 @@
   display: none;
   width: 100%;
   height: 100%;
-  position: relative;
+  z-index: 9999;
+  position: fixed;
 
   &__wrapper {
     margin: -50px 0 0 -150px;
