@@ -6,10 +6,10 @@
 import {CA_DD_REQUIRED_DEPS} from '../../../plugins/utils/ca-utils';
 
 describe('assessmentLocalCa component', () => {
-  let vm;
+  let viewModel;
 
   beforeEach(() => {
-    vm = GGRC.Components.getViewModel('assessmentLocalCa');
+    viewModel = GGRC.Components.getViewModel('assessmentLocalCa');
   });
 
   describe('canEdit getter', () => {
@@ -17,29 +17,29 @@ describe('assessmentLocalCa component', () => {
 
     beforeEach(() => {
       spy = spyOn(Permission, 'is_allowed_for');
-      vm.attr('instance', {});
+      viewModel.attr('instance', {});
     });
 
     it('returns false if it is not editMode', () => {
-      vm.attr('editMode', false);
-      expect(vm.attr('canEdit')).toBe(false);
+      viewModel.attr('editMode', false);
+      expect(viewModel.attr('canEdit')).toBe(false);
     });
 
     describe('if it is in editMode', () => {
       beforeEach(() => {
-        vm.attr('editMode', true);
+        viewModel.attr('editMode', true);
       });
 
       it('returns false if it is not allowed for update', () => {
         spy.and.returnValue(false);
-        expect(vm.attr('canEdit')).toBe(false);
-        expect(spy).toHaveBeenCalledWith('update', vm.attr('instance'));
+        expect(viewModel.attr('canEdit')).toBe(false);
+        expect(spy).toHaveBeenCalledWith('update', viewModel.attr('instance'));
       });
 
       it('returns true if it is allowed for update', () => {
         spy.and.returnValue(true);
-        expect(vm.attr('canEdit')).toBe(true);
-        expect(spy).toHaveBeenCalledWith('update', vm.attr('instance'));
+        expect(viewModel.attr('canEdit')).toBe(true);
+        expect(spy).toHaveBeenCalledWith('update', viewModel.attr('instance'));
       });
     });
   });
@@ -48,12 +48,9 @@ describe('assessmentLocalCa component', () => {
     var inputField;
     var dropdownField;
     var checkboxField;
-
-    var viewModel;
     var performValidation;
 
     beforeEach(function () {
-      viewModel = GGRC.Components.getViewModel('assessmentLocalCa');
       viewModel.attr('evidenceAmount', 0);
       performValidation = viewModel.performValidation.bind(viewModel);
 
