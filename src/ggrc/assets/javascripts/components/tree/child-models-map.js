@@ -18,11 +18,11 @@ const childModelsMap = can.Map.extend({
     }
     return this.attr('container.' + parentType);
   },
-  setModels: function (parentType, newChilds) {
-    this.attr('container').attr(parentType, newChilds);
+  setModels: function (parentType, newModels) {
+    this.attr('container').attr(parentType, newModels);
 
     this.attr('displayPrefs').setChildTreeDisplayList(parentType,
-      newChilds);
+      newModels);
   },
 });
 
