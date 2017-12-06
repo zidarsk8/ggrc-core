@@ -59,8 +59,8 @@ describe('assessmentLocalCa component', () => {
         validationConfig: null,
         preconditions_failed: null,
         validation: {
-          mandatory: false
-        }
+          mandatory: false,
+        },
       });
 
       dropdownField = new can.Map({
@@ -69,16 +69,16 @@ describe('assessmentLocalCa component', () => {
           'nothing required': CA_DD_REQUIRED_DEPS.NONE,
           'comment required': CA_DD_REQUIRED_DEPS.COMMENT,
           'evidence required': CA_DD_REQUIRED_DEPS.EVIDENCE,
-          'com+ev required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE
+          'com+ev required': CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE,
         },
         preconditions_failed: [],
         validation: {
-          mandatory: false
+          mandatory: false,
         },
         errorsMap: {
           comment: false,
-          evidence: false
-        }
+          evidence: false,
+        },
       });
 
       checkboxField = new can.Map({
@@ -86,8 +86,8 @@ describe('assessmentLocalCa component', () => {
         validationConfig: null,
         preconditions_failed: null,
         validation: {
-          mandatory: false
-        }
+          mandatory: false,
+        },
       });
     });
 
@@ -111,7 +111,7 @@ describe('assessmentLocalCa component', () => {
         show: false,
         valid: true,
         hasMissingInfo: false,
-        mandatory: false
+        mandatory: false,
       });
 
       performValidation(checkboxField);
@@ -120,7 +120,7 @@ describe('assessmentLocalCa component', () => {
         show: false,
         valid: true,
         hasMissingInfo: false,
-        mandatory: false
+        mandatory: false,
       });
     });
 
@@ -134,7 +134,7 @@ describe('assessmentLocalCa component', () => {
         mandatory: true,
         show: true,
         valid: false,
-        hasMissingInfo: false
+        hasMissingInfo: false,
       });
 
       checkboxField.attr('value', 0);
@@ -143,7 +143,7 @@ describe('assessmentLocalCa component', () => {
         mandatory: true,
         show: true,
         valid: false,
-        hasMissingInfo: false
+        hasMissingInfo: false,
       });
 
       checkboxField.attr('value', 1);
@@ -152,7 +152,7 @@ describe('assessmentLocalCa component', () => {
         mandatory: true,
         show: true,
         valid: true,
-        hasMissingInfo: false
+        hasMissingInfo: false,
       });
 
       checkboxField.attr('value', '1');
@@ -161,7 +161,7 @@ describe('assessmentLocalCa component', () => {
         mandatory: true,
         show: true,
         valid: true,
-        hasMissingInfo: false
+        hasMissingInfo: false,
       });
     });
 
@@ -174,7 +174,7 @@ describe('assessmentLocalCa component', () => {
         mandatory: false,
         show: false,
         valid: true,
-        hasMissingInfo: false
+        hasMissingInfo: false,
       });
 
       inputField.attr('value', 'some input');
@@ -183,7 +183,7 @@ describe('assessmentLocalCa component', () => {
         mandatory: false,
         show: false,
         valid: true,
-        hasMissingInfo: false
+        hasMissingInfo: false,
       });
     });
 
@@ -198,7 +198,7 @@ describe('assessmentLocalCa component', () => {
         mandatory: true,
         show: true,
         valid: false,
-        hasMissingInfo: false
+        hasMissingInfo: false,
       });
 
       inputField.attr('value', 'some input');
@@ -207,7 +207,7 @@ describe('assessmentLocalCa component', () => {
         mandatory: true,
         show: true,
         valid: true,
-        hasMissingInfo: false
+        hasMissingInfo: false,
       });
     });
 
@@ -222,11 +222,11 @@ describe('assessmentLocalCa component', () => {
         show: false,
         valid: true,
         hasMissingInfo: false,
-        requiresAttachment: false
+        requiresAttachment: false,
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: false
+        evidence: false,
       });
     });
 
@@ -240,11 +240,11 @@ describe('assessmentLocalCa component', () => {
         show: true,
         valid: true,
         hasMissingInfo: false,
-        requiresAttachment: false
+        requiresAttachment: false,
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: false
+        evidence: false,
       });
     });
 
@@ -261,11 +261,11 @@ describe('assessmentLocalCa component', () => {
         show: true,
         valid: false,
         hasMissingInfo: true,
-        requiresAttachment: true
+        requiresAttachment: true,
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
-        evidence: false
+        evidence: false,
       });
     });
 
@@ -281,11 +281,11 @@ describe('assessmentLocalCa component', () => {
         show: true,
         valid: true,
         hasMissingInfo: false,
-        requiresAttachment: true
+        requiresAttachment: true,
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: false
+        evidence: false,
       });
     });
 
@@ -303,11 +303,11 @@ describe('assessmentLocalCa component', () => {
         show: true,
         valid: false,
         hasMissingInfo: true,
-        requiresAttachment: true
+        requiresAttachment: true,
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: true
+        evidence: true,
       });
     });
 
@@ -324,11 +324,11 @@ describe('assessmentLocalCa component', () => {
         show: true,
         valid: true,
         hasMissingInfo: false,
-        requiresAttachment: true
+        requiresAttachment: true,
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: false
+        evidence: false,
       });
     });
 
@@ -347,11 +347,11 @@ describe('assessmentLocalCa component', () => {
         show: true,
         valid: false,
         hasMissingInfo: true,
-        requiresAttachment: true
+        requiresAttachment: true,
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
-        evidence: true
+        evidence: true,
       });
     });
 
@@ -368,11 +368,11 @@ describe('assessmentLocalCa component', () => {
         show: true,
         valid: false,
         hasMissingInfo: true,
-        requiresAttachment: true
+        requiresAttachment: true,
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: true
+        evidence: true,
       });
     });
 
@@ -391,11 +391,11 @@ describe('assessmentLocalCa component', () => {
         show: true,
         valid: false,
         hasMissingInfo: true,
-        requiresAttachment: true
+        requiresAttachment: true,
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: true,
-        evidence: false
+        evidence: false,
       });
     });
 
@@ -412,11 +412,11 @@ describe('assessmentLocalCa component', () => {
         show: true,
         valid: true,
         hasMissingInfo: false,
-        requiresAttachment: true
+        requiresAttachment: true,
       });
       expect(dropdownField.attr().errorsMap).toEqual({
         comment: false,
-        evidence: false
+        evidence: false,
       });
     });
   });
