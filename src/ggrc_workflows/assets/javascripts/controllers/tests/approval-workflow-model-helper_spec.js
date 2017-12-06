@@ -14,12 +14,18 @@ describe('ApprovalWorkflow', function () {
     var userOldValue;
     var currentUser;
     var assigneeRole;
+    var wfAdminRole;
 
     beforeAll(function () {
       assigneeRole = {
         object_type: 'TaskGroupTask',
         name: 'Task Assignees',
         id: -10,
+      };
+      wfAdminRole = {
+        object_type: 'Workflow',
+        name: 'Admin',
+        id: -12,
       };
       currentUser = new can.Map({
         email: 'test@example.com',
@@ -28,7 +34,7 @@ describe('ApprovalWorkflow', function () {
       });
 
       acrOldValues = GGRC.access_control_roles;
-      GGRC.access_control_roles = [assigneeRole];
+      GGRC.access_control_roles = [assigneeRole, wfAdminRole];
 
       userOldValue = GGRC.current_user;
       GGRC.current_user = currentUser;
@@ -102,6 +108,13 @@ describe('ApprovalWorkflow', function () {
 
       it('creates an appropriate Workflow', function () {
         expect(CMS.Models.Workflow).toHaveBeenCalledWith({
+          access_control_list: [{
+            ac_role_id: wfAdminRole.id,
+            person: {
+              id: currentUser.id,
+              type: 'Person',
+            },
+          }],
           unit: null,
           status: 'Active',
           title: jasmine.any(String),
