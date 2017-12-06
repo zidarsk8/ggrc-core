@@ -449,7 +449,7 @@ import tracker from '../../../tracker';
         }
         instance.attr('isPending', true);
 
-        this.attr('formState.formSavedDeferred')
+        return this.attr('formState.formSavedDeferred')
           .then(() => {
             instance.attr('status', isUndo ? previousStatus : newStatus);
 

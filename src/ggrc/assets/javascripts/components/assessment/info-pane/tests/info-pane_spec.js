@@ -3,12 +3,16 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import tracker from '../../../../tracker';
+
 describe('GGRC.Components.assessmentInfoPane', function () {
   let vm;
 
   beforeEach(function () {
     vm = GGRC.Components.getViewModel('assessmentInfoPane');
-    vm.attr('instance', {});
+    vm.attr('instance', {
+      save: () => can.Deferred().resolve(),
+    });
   });
 
   describe('editMode attribute', function () {
@@ -35,6 +39,69 @@ describe('GGRC.Components.assessmentInfoPane', function () {
               .toBe(editableStatuses.includes(status));
           });
         });
+      });
+    });
+  });
+
+  describe('onStateChange() method', () => {
+    let method;
+    beforeEach(() => {
+      method = vm.onStateChange.bind(vm);
+      spyOn(tracker, 'start').and.returnValue(() => {});
+      spyOn(vm, 'initializeFormFields').and.returnValue(() => {});
+    });
+
+    it('returns status back on undo action', (done) => {
+      vm.attr('instance.previousStatus', 'FooBar');
+      vm.attr('formState.formSavedDeferred', can.Deferred().resolve());
+
+      method({
+        undo: true,
+        status: 'newStatus',
+      }).then(() => {
+        expect(vm.attr('instance.status')).toBe('FooBar');
+        expect(vm.attr('isPending')).toBeFalsy();
+        done();
+      });
+    });
+
+    it('resets isPending flag in case success the status changing', (done) => {
+      vm.attr('formState.formSavedDeferred', can.Deferred().resolve());
+
+      method({
+        status: 'FooBar',
+      }).then(() => {
+        expect(vm.attr('isPending')).toBeFalsy();
+        done();
+      });
+    });
+
+    it('resets isPending flag in case unsuccessful the status changing',
+      (done) => {
+        vm.attr('formState.formSavedDeferred', can.Deferred().reject());
+
+        method({
+          status: 'FooBar',
+        }).fail(() => {
+          expect(vm.attr('isPending')).toBeFalsy();
+          done();
+        });
+      });
+
+    it('resets status after conflict', (done) => {
+      vm.attr('instance.status', 'Baz');
+      vm.attr('formState.formSavedDeferred', can.Deferred().reject({}, {
+        status: 409,
+        remoteObject: {
+          status: 'Foo',
+        },
+      }));
+
+      method({
+        status: 'Bar',
+      }).fail(() => {
+        expect(vm.attr('instance.status')).toBe('Foo');
+        done();
       });
     });
   });
