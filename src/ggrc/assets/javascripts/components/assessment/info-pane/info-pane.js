@@ -434,6 +434,12 @@ import tracker from '../../../tracker';
         let stopFn = tracker.start(instance.type,
           tracker.USER_JOURNEY_KEYS.NAVIGATION,
           tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
+        const resetStatusOnConflict = (object, xhr) => {
+          if (xhr && xhr.status === 409 && xhr.remoteObject) {
+            instance.attr('status', xhr.remoteObject.status);
+          }
+        };
+
         this.attr('onStateChangeDfd', can.Deferred());
 
         if (isUndo) {
@@ -460,7 +466,8 @@ import tracker from '../../../tracker';
             this.attr('onStateChangeDfd').resolve();
             stopFn();
           })
-          .always(() => instance.attr('isPending', false));
+          .always(() => instance.attr('isPending', false))
+          .fail(resetStatusOnConflict);
       },
       saveGlobalAttributes: function (event) {
         var globalAttributes = event.globalAttributes;
