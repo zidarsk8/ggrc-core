@@ -662,6 +662,12 @@
     .repeat-summary {
       margin: 16px 0 10px 0;
     }
+
+    .people-group {
+      flex-basis: 250px;
+      margin-right: 30px;
+      max-width: 250px;
+    }
   }
   .modal-footer {
     @include box-shadow(none);
@@ -801,6 +807,8 @@
      }
 
      .people-group {
+       flex-basis: 200px;
+
        .editable-people-group {
          margin-right: 15px;
        }
