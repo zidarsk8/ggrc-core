@@ -334,7 +334,9 @@ import router, {buildUrl} from '../router';
 
     route: function (path) {
       var widgetList = this.options.widget_list;
-      var widget = this.find_widget_by_target('#' + path);
+
+      // Find and make active the widget specified by `path`
+      var widget = this.widget_by_selector('#' + path);
       if (!widget && widgetList.length) {
         // Target was not found, but we can select the first widget in the list
         let widgetId = widgetList[0].internav_id + '_widget';
@@ -390,20 +392,9 @@ import router, {buildUrl} from '../router';
       }
     },
 
-    find_widget_by_target: function (target) {
-      var i;
-      var widget;
-      for (i = 0; i < this.options.widget_list.length; i++) {
-        widget = this.options.widget_list[i];
-        if (widget.selector === target) {
-          return widget;
-        }
-      }
-    },
-
     widget_by_selector: function (selector) {
-      return $.map(this.options.widget_list, function (widget) {
-        return widget.selector === selector ? widget : undefined;
+      return this.options.widget_list.filter((widget) => {
+        return widget.selector === selector;
       })[0] || undefined;
     },
 
