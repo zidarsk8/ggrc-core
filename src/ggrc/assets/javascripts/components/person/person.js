@@ -4,6 +4,7 @@
 */
 
 import RefreshQueue from '../../models/refresh_queue';
+import template from './person.mustache';
 
 /**
  * A component that renders a single Person item, fetching the object from the
@@ -16,10 +17,7 @@ import RefreshQueue from '../../models/refresh_queue';
   var component = {
     tag: 'person-info',
 
-    template: can.view(
-      GGRC.mustache_path +
-      '/components/person/person.mustache'
-    ),
+    template: template,
 
     scope: {
       personObj: null,

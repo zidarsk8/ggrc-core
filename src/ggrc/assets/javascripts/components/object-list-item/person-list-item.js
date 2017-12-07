@@ -4,19 +4,18 @@
  */
 
 import RefreshQueue from '../../models/refresh_queue';
+import template from './person-list-item.mustache';
 
 (function (can, GGRC, CMS) {
   'use strict';
 
-  var tpl = can.view(GGRC.mustache_path +
-    '/components/object-list-item/person-list-item.mustache');
   var tag = 'person-list-item';
   /**
    * Person List Item Component
    */
   GGRC.Components('personListItem', {
     tag: tag,
-    template: tpl,
+    template: template,
     viewModel: {
       define: {
         personId: {
