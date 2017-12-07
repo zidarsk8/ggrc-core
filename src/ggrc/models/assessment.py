@@ -186,7 +186,6 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'test_plan',
       'title',
       'start_date',
-      'end_date'
   }
 
   _aliases = {
@@ -265,7 +264,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
     if self.status == value:
       return value
     if self.status == self.REWORK_NEEDED:
-      valid_states = [self.DONE_STATE, self.FINAL_STATE]
+      valid_states = [self.DONE_STATE, self.FINAL_STATE, self.DEPRECATED]
       if value not in valid_states:
         raise ValueError("Assessment in `Rework Needed` "
                          "state can be only moved to: [{}]".format(
