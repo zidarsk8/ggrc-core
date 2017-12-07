@@ -5,6 +5,7 @@
 
 import * as caUtils from '../../../plugins/utils/ca-utils';
 import Component from '../revisions-comparer';
+import RefreshQueue from '../../../models/refresh_queue';
 
 describe('GGRC.Components.revisionsComparer', function () {
   let viewModel;

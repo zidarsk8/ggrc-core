@@ -4,6 +4,7 @@
  */
 
 import '../components/audit/attach-folder-button'
+import RefreshQueue from './refresh_queue';
 
 (function (can, CMS) {
   const AUDIT_ISSUE_TRACKER = {

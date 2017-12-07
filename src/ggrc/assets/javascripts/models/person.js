@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import RefreshQueue from './refresh_queue';
+
 (function (ns, can) {
   can.Model.Cacheable('CMS.Models.Person', {
     root_object: 'person',

@@ -11,6 +11,7 @@ import {
 import {
   isMyAssessments,
 } from './plugins/utils/current-page-utils';
+import RefreshQueue from './models/refresh_queue';
 
 (function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.

@@ -140,7 +140,7 @@ const RefreshQueueManager = can.Construct({
   }
 });
 
-can.Construct('RefreshQueue', {
+const RefreshQueue = can.Construct({
   refresh_queue_manager: new RefreshQueueManager(),
   refresh_all: function (instance, props, force) {
     var dfd = new can.Deferred();
@@ -269,3 +269,5 @@ can.Construct('RefreshQueue', {
     return this.deferred;
   }
 });
+
+export default RefreshQueue;

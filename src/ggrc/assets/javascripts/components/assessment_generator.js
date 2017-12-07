@@ -4,6 +4,7 @@
 */
 
 import tracker from '../tracker';
+import RefreshQueue from '../models/refresh_queue';
 
 (function (_, can, $, GGRC, CMS) {
   'use strict';

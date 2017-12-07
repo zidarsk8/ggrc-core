@@ -24,7 +24,6 @@
     "Mustache": false,
     "MutationObserver": false,
     "Permission": false,
-    "RefreshQueue": false,
     "Spinner": false,
     "Stickyfill": false,
     "Clipboard": false,
