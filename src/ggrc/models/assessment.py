@@ -80,18 +80,6 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   VALID_STATES = tuple(NOT_DONE_STATES | statusable.Statusable.DONE_STATES |
                        statusable.Statusable.INACTIVE_STATES)
 
-  class Labels(object):  # pylint: disable=too-few-public-methods
-    """Choices for label enum."""
-    AUDITOR_PULLS_EVIDENCE = u'Auditor pulls evidence'
-    FOLLOWUP = u'Followup'
-    NEEDS_REWORK = u'Needs Rework'
-    NEEDS_DISCUSSION = u'Needs Discussion'
-
-  POSSIBLE_LABELS = [Labels.AUDITOR_PULLS_EVIDENCE,
-                     Labels.FOLLOWUP,
-                     Labels.NEEDS_REWORK,
-                     Labels.NEEDS_DISCUSSION]
-
   REMINDERABLE_HANDLERS = {
       "statusToPerson": {
           "handler":
