@@ -64,7 +64,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
                  Personable, reminderable.Reminderable, Relatable,
                  LastDeprecatedTimeboxed, WithSimilarityScore, FinishedDate,
                  VerifiedDate, ValidateOnComplete, Notifiable, WithAction,
-                 BusinessObject, labeled.Labeled, Indexed, db.Model):
+                 labeled.Labeled, BusinessObject, Indexed, db.Model):
   """Class representing Assessment.
 
   Assessment is an object representing an individual assessment performed on
