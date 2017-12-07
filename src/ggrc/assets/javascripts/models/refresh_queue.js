@@ -63,7 +63,7 @@ const ModelRefreshQueue = can.Construct({}, {
   }
 });
 
-can.Construct('RefreshQueueManager', {
+const RefreshQueueManager = can.Construct({
   model_bases: {
     // This won't work until Relatable/Documentable/etc mixins can handle
     // queries with multiple `type` values.

@@ -25,7 +25,6 @@
     "MutationObserver": false,
     "Permission": false,
     "RefreshQueue": false,
-    "RefreshQueueManager": false,
     "Spinner": false,
     "Stickyfill": false,
     "Clipboard": false,
