@@ -11,7 +11,7 @@ from ggrc.models.hooks import custom_attribute_definition
 from ggrc.models.hooks import issue
 from ggrc.models.hooks import issue_tracker
 from ggrc.models.hooks import relationship
-
+from ggrc.models.hooks.acl import audit_roles
 
 ALL_HOOKS = [
     assessment,
@@ -21,6 +21,7 @@ ALL_HOOKS = [
     relationship,
     access_control_list,
     custom_attribute_definition,
+    audit_roles,
 
     # Keep IssueTracker at the end of list to make sure that all other hooks
     # are already executed and all data is final.
