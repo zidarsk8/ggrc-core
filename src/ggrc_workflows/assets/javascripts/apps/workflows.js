@@ -102,7 +102,6 @@ import {
       Workflow: {
         _canonical: {
           task_groups: 'TaskGroup',
-          people: 'Person',
           context: 'Context'
         },
         task_groups: Direct(
@@ -123,12 +122,6 @@ import {
         ),
         current_all_tasks: Cross(
           'current_task_groups', 'cycle_task_group_tasks'
-        ),
-
-        people: Proxy(
-          'Person',
-          'person', 'WorkflowPerson',
-          'workflow', 'workflow_people'
         ),
         context: Direct(
           'Context', 'related_object', 'context'),
@@ -285,16 +278,6 @@ import {
           'cycle_task_entries',
           'cycle_task_group_object_task'),
         workflow: Cross('cycle', 'workflow')
-      },
-
-      People: {
-        _canonical: {
-          workflows: 'Workflow'
-        },
-        workflows: Proxy(
-          'Workflow', 'workflow', 'WorkflowPerson', 'person', 'workflow_people'
-        )
-
       },
       Person: {
         assigned_tasks: Search(function (binding) {

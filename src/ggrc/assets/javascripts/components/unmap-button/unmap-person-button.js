@@ -32,20 +32,10 @@
         var sources;
         var destinations;
         var mapping;
-        var isWorkflow = destinationType === 'Workflow';
 
-        if (isWorkflow) {
-          sources = [this.attr('source')];
-          destinations = this.attr('destination.workflow_people');
-          destinations = destinations.map(function (workflowPerson) {
-            return workflowPerson.reify();
-          });
-          mappingType = 'WorkflowPerson';
-        } else {
-          sources = this.attr('source.object_people');
-          destinations = this.attr('destination.object_people');
-          mappingType = 'ObjectPerson';
-        }
+        sources = this.attr('source.object_people');
+        destinations = this.attr('destination.object_people');
+        mappingType = 'ObjectPerson';
 
         sources = sources
           .map(function (item) {
