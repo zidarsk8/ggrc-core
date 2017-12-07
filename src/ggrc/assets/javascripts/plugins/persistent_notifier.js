@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-export default can.Construct('PersistentNotifier', {
+export default can.Construct({
   defaults: {
     one_time_cbs: true,
     while_queue_has_elements: function () {},
