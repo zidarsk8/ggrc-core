@@ -15,12 +15,12 @@ def _get_captain_and_auditor_roles():
   """Cache captain and auditor roles"""
   if getattr(flask.g, "acl_captain_editor_cache", None) is not None:
     return flask.g.acl_captain_editor_cache
-  program_editor = db.session.query(all_models.Role).filter(
-      all_models.Role.name == "ProgramEditor").first()
-  audit_captain = db.session.query(all_models.AccessControlRole).filter(
-      all_models.AccessControlRole.name == "Audit Captains").first()
-  flask.g.acl_captain_editor_cache = (program_editor, audit_captain)
-  return (program_editor, audit_captain)
+  program_editor_id = db.session.query(all_models.Role).filter(
+      all_models.Role.name == "ProgramEditor").first().id
+  audit_captain_id = db.session.query(all_models.AccessControlRole).filter(
+      all_models.AccessControlRole.name == "Audit Captains").first().id
+  flask.g.acl_captain_editor_cache = (program_editor_id, audit_captain_id)
+  return (program_editor_id, audit_captain_id)
 
 
 def handle_acl_creation(session, _):
@@ -28,8 +28,8 @@ def handle_acl_creation(session, _):
   for obj in session.new:
     if not isinstance(obj, all_models.AccessControlList):
       continue
-    program_editor, audit_captain = _get_captain_and_auditor_roles()
-    if obj.ac_role_id != audit_captain.id:
+    program_editor_id, audit_captain_id = _get_captain_and_auditor_roles()
+    if obj.ac_role_id != audit_captain_id:
       continue
     audit = obj.object
     program = audit.program
@@ -37,7 +37,7 @@ def handle_acl_creation(session, _):
                if ur.person_id == obj.person_id):
       db.session.add(
           all_models.UserRole(
-              role=program_editor,
+              role_id=program_editor_id,
               context=program.context,
               person_id=obj.person_id
           )
