@@ -9,7 +9,7 @@
  *  trigger() -> Deferred
  */
 
-can.Construct('ModelRefreshQueue', {}, {
+const ModelRefreshQueue = can.Construct({}, {
   init: function (model) {
     this.model = model;
     this.ids = [];

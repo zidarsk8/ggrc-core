@@ -23,7 +23,6 @@
     "moment": false,
     "Mustache": false,
     "MutationObserver": false,
-    "ModelRefreshQueue": false,
     "Permission": false,
     "RefreshQueue": false,
     "RefreshQueueManager": false,
