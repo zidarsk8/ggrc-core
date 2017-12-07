@@ -430,11 +430,16 @@ import tracker from '../../../tracker';
         var isUndo = event.undo;
         var newStatus = event.state;
         var instance = this.attr('instance');
-        var self = this;
         var previousStatus = instance.attr('previousStatus') || 'In Progress';
         let stopFn = tracker.start(instance.type,
           tracker.USER_JOURNEY_KEYS.NAVIGATION,
           tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
+        const resetStatusOnConflict = (object, xhr) => {
+          if (xhr && xhr.status === 409 && xhr.remoteObject) {
+            instance.attr('status', xhr.remoteObject.status);
+          }
+        };
+
         this.attr('onStateChangeDfd', can.Deferred());
 
         if (isUndo) {
@@ -444,26 +449,25 @@ import tracker from '../../../tracker';
         }
         instance.attr('isPending', true);
 
-        this.attr('formState.formSavedDeferred')
-          .then(function () {
-            instance.refresh().then(function () {
-              instance.attr('status', isUndo ? previousStatus : newStatus);
+        return this.attr('formState.formSavedDeferred')
+          .then(() => {
+            instance.attr('status', isUndo ? previousStatus : newStatus);
 
-              if (instance.attr('status') === 'In Review' && !isUndo) {
-                $(document.body).trigger('ajax:flash',
-                  {hint: 'The assessment is complete. ' +
-                  'The verifier may revert it if further input is needed.'});
-              }
+            if (instance.attr('status') === 'In Review' && !isUndo) {
+              $(document.body).trigger('ajax:flash',
+                {hint: 'The assessment is complete. ' +
+                'The verifier may revert it if further input is needed.'});
+            }
 
-              return instance.save()
-              .then(function () {
-                instance.attr('isPending', false);
-                self.initializeFormFields();
-                self.attr('onStateChangeDfd').resolve();
-                stopFn();
-              });
-            });
-          });
+            return instance.save();
+          })
+          .then(() => {
+            this.initializeFormFields();
+            this.attr('onStateChangeDfd').resolve();
+            stopFn();
+          })
+          .always(() => instance.attr('isPending', false))
+          .fail(resetStatusOnConflict);
       },
       saveGlobalAttributes: function (event) {
         var globalAttributes = event.globalAttributes;
