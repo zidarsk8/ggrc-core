@@ -32,6 +32,7 @@ WORKDIR /vagrant
 
 # Javascript dependencies
 COPY ./package.json /vagrant-dev/
+COPY ./package-lock.json /vagrant-dev/
 RUN cd /vagrant-dev \
   && npm install --unsafe-perm
 
