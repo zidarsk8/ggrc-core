@@ -237,9 +237,7 @@
       var taskGroup = this.task_group.reify();
       if (taskGroup.selfLink) {
         workflow = taskGroup.workflow.reify();
-        return workflow.refresh().then(function (workflow) {
-          return workflow.context.reify().refresh();
-        });
+        return workflow.refresh();
       }
     }
   });
