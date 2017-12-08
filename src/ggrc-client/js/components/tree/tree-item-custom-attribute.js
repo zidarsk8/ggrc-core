@@ -5,15 +5,21 @@
 
 import template from './templates/tree-item-custom-attribute.mustache';
 
+import {CONTROL_TYPE} from '../../plugins/utils/control-utils';
+
 const formatValueMap = {
-  'Checkbox'(item) {
-    return ['No', 'Yes'][item.attr('attribute_value')];
+  [CONTROL_TYPE.CHECKBOX](caObject) {
+    return caObject.value ? 'Yes' : 'No';
   },
-  'Date'(item) {
-    return GGRC.Utils.formatDate(item.attr('attribute_value'), true);
+  [CONTROL_TYPE.DATE](caObject) {
+    const date = caObject.value === ''
+      ? null
+      : caObject.value;
+
+    return GGRC.Utils.formatDate(date, true);
   },
-  'Map:Person'(item, options) {
-    let attr = item.attr('attribute_object');
+  [CONTROL_TYPE.PERSON](caObject, options) {
+    const attr = caObject.attributeObject;
     return options.fn(options.contexts.add({
       object: attr ?
         attr.reify() :
@@ -22,57 +28,36 @@ const formatValueMap = {
   },
 };
 
-const defaultValueMap = {
-  Checkbox: 'No',
-};
-
-const _prepareCAVs = (instance) => {
-  instance.attr('custom_attribute_values').forEach((cav, index) => {
-    instance.custom_attribute_values.attr(index, cav.reify());
-  });
-};
-
-const getCustomAttrValue = (attr, instance, options) => {
-  let value = '';
-
-  attr = Mustache.resolve(attr);
+/*
+  Used to get the string value for custom attributes
+*/
+const getCustomAttrValue = (instance, customAttributeId, options) => {
+  let caObject;
+  let hasHandler = false;
+  let customAttrValue = null;
   instance = Mustache.resolve(instance);
+  customAttributeId = Mustache.resolve(customAttributeId);
+  caObject = instance.customAttr(customAttributeId);
 
-  let definition = GGRC.custom_attr_defs.find((item) => {
-    return item.definition_type === instance.class.table_singular &&
-      item.title === attr.attr_name;
-  });
-
-  if (definition) {
-    // reify all CA models (with the exception of the Assessment)
-    // to load custom_attribute_id, attribute_value and attribute_object
-    if (!(instance instanceof CMS.Models.Assessment)) {
-      _prepareCAVs(instance);
-    }
-
-    let customAttrItem = _.find(instance.attr('custom_attribute_values'),
-      (cav) => {
-        return cav.custom_attribute_id === definition.id;
-      });
-
-    if (customAttrItem) {
-      value = (formatValueMap[definition.attribute_type] ?
-        formatValueMap[definition.attribute_type](customAttrItem, options) :
-        customAttrItem.attr('attribute_value'));
-    }
-
-    // populate with default value if needed
-    value = value || defaultValueMap[definition.attribute_type];
+  if (caObject) {
+    hasHandler = _.has(formatValueMap, caObject.attributeType);
+    customAttrValue = caObject.value;
   }
 
-  return value || '';
-};
+  if (hasHandler) {
+    const handler = formatValueMap[caObject.attributeType];
 
+    customAttrValue = (caObject.attributeType === CONTROL_TYPE.PERSON)
+      ? handler(caObject, options)
+      : handler(caObject);
+  }
+
+  return customAttrValue || '';
+};
 
 export const viewModel = can.Map.extend({
   instance: null,
-  values: [],
-  column: {},
+  customAttributeId: null,
 });
 
 export const helpers = {
@@ -81,7 +66,7 @@ export const helpers = {
 
 export default can.Component.extend({
   tag: 'tree-item-custom-attribute',
-  template: template,
-  viewModel: viewModel,
-  helpers: helpers,
+  template,
+  viewModel,
+  helpers,
 });
