@@ -129,10 +129,6 @@ import Permission from '../../permission';
       },
     },
     init: function () {
-      if (this.viewModel.instance.class.is_custom_attributable) {
-        this.viewModel.instance.setup_custom_attributes();
-      }
-
       this.viewModel.initCustomAttributes();
     },
     events: {
