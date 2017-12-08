@@ -48,9 +48,12 @@ import Pagination from '../base-objects/pagination';
       initialOrderBy: '@',
       selectedItem: {},
       objectSelectorEl: '.grid-data__action-column button',
-      getFilters: function (id, type, isAssessment) {
+      getFilters: function (id, type) {
         var predefinedFilter = this.attr('predefinedFilter');
         var filters;
+
+        var hasSimilar = _.includes(['Assessment', 'Control', 'Objective'],
+          this.attr('baseInstance.type'));
 
         if (predefinedFilter) {
           filters = predefinedFilter;
@@ -58,7 +61,7 @@ import Pagination from '../base-objects/pagination';
           filters = {
             expression: {
               object_name: type,
-              op: isAssessment ? {name: 'similar'} : {name: 'relevant'},
+              op: hasSimilar ? {name: 'similar'} : {name: 'relevant'},
               ids: [id],
             },
           };
@@ -69,7 +72,6 @@ import Pagination from '../base-objects/pagination';
         var id;
         var type;
         var relatedType = this.attr('relatedItemsType');
-        var isAssessment = this.attr('baseInstance.type') === 'Assessment';
         var isSnapshot = !!this.attr('baseInstance.snapshot');
         var filters;
         var params = {};
@@ -81,7 +83,7 @@ import Pagination from '../base-objects/pagination';
           id = this.attr('baseInstance.id');
           type = this.attr('baseInstance.type');
         }
-        filters = this.getFilters(id, type, isAssessment);
+        filters = this.getFilters(id, type);
         params.data = [{
           limit: this.attr('paging.limits'),
           object_name: relatedType,

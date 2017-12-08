@@ -36,7 +36,7 @@
       </sortable-column>
     </div>
     <div class="flex-size-3">
-      Related Controls / Objectives
+      {{relatedObjectsTitle}}
     </div>
     <div class="flex-size-3">
       Audit Title
@@ -73,15 +73,13 @@
               {{localize_date instance.created_at}}
             </div>
             <div class="flex-size-3">
-              <related-controls-objectives {parent-instance}="instance">
-                <mapped-objects
-                  {mapped-snapshots}="mappedSnapshots"
-                  {filter}="filter"
-                  {parent-instance}="parentInstance"
-                  {^is-loading}="loadingState.controlsLoading">
-                  <business-object-list-item {instance}="instance"></business-object-list-item>
-                </mapped-objects>
-              </related-controls-objectives>
+	      <mapped-objects
+		{mapped-snapshots}="mappedSnapshots"
+		{filter}="relatedObjectsFilter"
+		{parent-instance}="instance"
+		{^is-loading}="loadingState.controlsLoading">
+		<business-object-list-item {instance}="instance"></business-object-list-item>
+	      </mapped-objects>
             </div>
             <div class="flex-size-3">
               <related-audits {parent-instance}="instance">
