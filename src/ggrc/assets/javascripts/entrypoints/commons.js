@@ -4,7 +4,6 @@
 */
 
 import '../tracker';
-import '../permission';
 import '../bootstrap/modal-ajax';
 import '../bootstrap/modal-form';
 import '../plugins/lodash_helpers';

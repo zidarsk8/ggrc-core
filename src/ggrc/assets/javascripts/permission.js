@@ -49,8 +49,7 @@ var _CONDITIONS_MAP = {
 };
 var permissions_compute = can.compute(GGRC.permissions);
 
-can.Construct('Permission', {
-
+const Permission = can.Construct({
   _admin_permission_for_context: function (context_id) {
     return new Permission(
     ADMIN_PERMISSION.action, ADMIN_PERMISSION.resource_type, context_id);
@@ -229,3 +228,5 @@ can.Construct('Permission', {
 });
 
 ADMIN_PERMISSION = new Permission('__GGRC_ADMIN__', '__GGRC_ALL__', 0);
+
+export default Permission;

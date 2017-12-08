@@ -12,8 +12,9 @@ import {
   hasWarningType,
   shouldApplyPreconditions,
 } from '../plugins/utils/controllers';
+import Permission from '../permission';
 
-(function (can, $, GGRC, Permission) {
+(function (can, $, GGRC) {
   'use strict';
 
   var originalModalShow = $.fn.modal.Constructor.prototype.show;
@@ -651,4 +652,4 @@ import {
       }
     );
   });
-})(window.can, window.can.$, window.GGRC, window.Permission);
+})(window.can, window.can.$, window.GGRC);

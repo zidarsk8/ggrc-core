@@ -4,6 +4,7 @@
 */
 
 import RefreshQueue from '../../../ggrc/assets/javascripts/models/refresh_queue';
+import Permission from '../../../ggrc/assets/javascripts/permission';
 
 (function (can, $) {
   var Mustache = can.Mustache;
