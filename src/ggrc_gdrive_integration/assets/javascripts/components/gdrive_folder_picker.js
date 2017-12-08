@@ -31,7 +31,14 @@ import {
         hideLabel: {
           type: 'boolean',
           value: false
-        }
+        },
+        showAssignFolder: {
+          type: 'boolean',
+          get() {
+            return !this.attr('readonly') &&
+              !this.attr('_folder_change_pending');
+          },
+        },
       },
       _folder_change_pending: false,
       no_detach: '@',
