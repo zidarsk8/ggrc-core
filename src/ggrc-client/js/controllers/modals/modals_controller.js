@@ -645,7 +645,9 @@ export default can.Control({
       value = value || [];
       cur.splice.apply(cur, [0, cur.length].concat(value));
     } else if (name[0] === 'custom_attributes') {
-      instance.custom_attributes.attr(name[1], value[name[1]]);
+      const caId = Number(name[1]);
+      const caValue = value[name[1]];
+      instance.customAttr(caId, caValue);
     } else if (name[0] !== 'people') {
       instance.attr(name[0], value);
     }
