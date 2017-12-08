@@ -73,6 +73,7 @@
 < ._license_header_exceptions
 < node_modules
 < package.json
+< package-lock.json
 < provision/docker/01_start_mysql.sh
 < provision/docker/inventory
 < provision/docker/my.cnf
