@@ -76,21 +76,6 @@ import RefreshQueue from '../../../ggrc/assets/javascripts/models/refresh_queue'
     };
   });
 
-  Mustache.registerHelper('workflow_owner',
-    function (instance, modal_title, options) {
-      var loader;
-      if (Mustache.resolve(modal_title).indexOf('New ') === 0) {
-        return GGRC.current_user.email;
-      }
-      loader = Mustache.resolve(instance).get_binding('authorizations');
-      return $.map(loader.list, function (binding) {
-        if (binding.instance.role &&
-            binding.instance.role.reify().attr('name') === 'WorkflowOwner') {
-          return binding.instance.person.reify().attr('email');
-        }
-      }).join(', ');
-    });
-
   Mustache.registerHelper('if_cycle_assignee_privileges',
     function (instance, options) {
       var workflow_dfd;
