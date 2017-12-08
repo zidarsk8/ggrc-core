@@ -16,7 +16,6 @@ dashboard-js-template-files:
   - cycle_task_groups/info.mustache
   - cycle_task_groups/autocomplete_result.mustache
   - cycle_task_groups/extended_info.mustache
-  - cycle_task_group_objects/info.mustache
   - cycle_task_group_object_tasks/info.mustache
   - cycle_task_group_object_tasks/tree-item-attr.mustache
   - cycle_task_group_object_tasks/modal_content.mustache
