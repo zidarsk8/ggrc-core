@@ -57,7 +57,7 @@ export default GGRC.Components('inlineAutocompleteWrapper', {
      */
     setCustomAttribute(item, cadId) {
       let instance = this.attr('instance');
-      instance._custom_attribute_map(cadId, item);
+      instance.customAttr(cadId, item && item.id);
       this.updateTextValue(item);
     },
     /**
