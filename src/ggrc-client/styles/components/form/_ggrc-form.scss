@@ -18,6 +18,13 @@
     white-space: nowrap;
   }
 
+  [role="alert"] {
+    margin-top: 4px;
+    font-size: 75%;
+    font-weight: bold;
+    color: #e53935;
+  }
+
   &.ggrc-form-multiple-columns {
     display: flex;
     flex-wrap: wrap;
