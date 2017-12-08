@@ -29,6 +29,11 @@ def check_tasks(row_converter):
     )
 
 
+DENY_FINISHED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
+                                    "'Declined' / 'Deprecated'>")
+DENY_VERIFIED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
+                                    "'Declined' / 'Deprecated' / 'Finished'>")
+
 def check_cycle_tasks(row_converter):  # noqa
   """Checker for CycleTaskGroupObjectTask model objects.
 
@@ -61,19 +66,19 @@ def check_cycle_tasks(row_converter):  # noqa
       row_converter.add_error(
           errors.INVALID_STATUS_DATE_CORRELATION,
           date="Actual Finish Date",
-          status="not Finished",
+          deny_states=DENY_FINISHED_DATES_STATUSES_STR,
       )
     if obj.verified_date:
       row_converter.add_error(
           errors.INVALID_STATUS_DATE_CORRELATION,
           date="Actual Verified Date",
-          status="not Verified",
+          deny_states=DENY_VERIFIED_DATES_STATUSES_STR,
       )
   if obj.status == obj.FINISHED and obj.verified_date:
     row_converter.add_error(
         errors.INVALID_STATUS_DATE_CORRELATION,
         date="Actual Verified Date",
-        status="not Verified",
+        deny_states=DENY_VERIFIED_DATES_STATUSES_STR,
     )
 
 

@@ -18,6 +18,12 @@ from integration.ggrc_workflows.models import factories
 from integration.ggrc.models import factories as ggrc_factories
 
 
+DENY_FINISHED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
+                                    "'Declined' / 'Deprecated'>")
+DENY_VERIFIED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
+                                    "'Declined' / 'Deprecated' / 'Finished'>")
+
+
 @ddt.ddt
 class TestCycleTaskStatusUpdate(ggrc_test.TestCase):
   """Test cases for update status on import cycle tasks"""
@@ -197,12 +203,12 @@ class TestCycleTaskStatusUpdate(ggrc_test.TestCase):
     response = self.import_data(*self.build_import_data(start_statuses))
     line_error_tmpl_1 = errors.INVALID_STATUS_DATE_CORRELATION.format(
         date="Actual Verified Date",
-        status="not Verified",
+        deny_states=DENY_VERIFIED_DATES_STATUSES_STR,
         line="{}"
     )
     line_error_tmpl_2 = errors.INVALID_STATUS_DATE_CORRELATION.format(
         date="Actual Finish Date",
-        status="not Finished",
+        deny_states=DENY_FINISHED_DATES_STATUSES_STR,
         line="{}"
     )
     verfied_date_errors = {line_error_tmpl_1.format(i + 3)
@@ -286,7 +292,7 @@ class TestCycleTaskStatusUpdate(ggrc_test.TestCase):
     response = self.import_data(*self.build_import_data(start_statuses))
     line_error_tmpl = errors.INVALID_STATUS_DATE_CORRELATION.format(
         date="Actual Verified Date",
-        status="not Verified",
+        deny_states=DENY_VERIFIED_DATES_STATUSES_STR,
         line="{}"
     )
     self._check_csv_response(
@@ -431,18 +437,18 @@ class TestCycleTaskStatusUpdate(ggrc_test.TestCase):
     self._check_csv_response(response, error_resp)
 
   @ddt.data(
-      ("Actual Finish Date", "not Finished"),
-      ("Actual Verified Date", "not Verified"),
+      ("Actual Finish Date", DENY_FINISHED_DATES_STATUSES_STR),
+      ("Actual Verified Date", DENY_VERIFIED_DATES_STATUSES_STR),
   )
   @ddt.unpack
-  def test_for_date_state_error(self, column, status):
+  def test_for_date_state_error(self, column, deny_states):
     """Validate task {0} not allowed for in {0} tasks."""
     self._update_structure(self.IN_PROGRESS_STRUCTURE)
     today = datetime.date.today()
     error_tmpl = self.__build_error_tmpl(
         errors.INVALID_STATUS_DATE_CORRELATION,
         date=column,
-        status=status,
+        deny_states=deny_states,
     )
     # line format
     error_resp = {self.ALIAS: {"row_errors": {error_tmpl.format(3)}}}

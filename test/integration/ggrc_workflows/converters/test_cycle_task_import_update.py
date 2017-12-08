@@ -25,6 +25,12 @@ from integration.ggrc.generator import ObjectGenerator
 from integration.ggrc_workflows.generator import WorkflowsGenerator
 
 
+DENY_FINISHED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
+                                    "'Declined' / 'Deprecated'>")
+DENY_VERIFIED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
+                                    "'Declined' / 'Deprecated' / 'Finished'>")
+
+
 class BaseTestCycleTaskImportUpdate(TestCase):
 
   @staticmethod
@@ -497,12 +503,12 @@ class TestCycleTaskImportUpdate(BaseTestCycleTaskImportUpdate):
                 errors.INVALID_STATUS_DATE_CORRELATION.format(
                     line=4,
                     date="Actual Finish Date",
-                    status="not Finished",
+                    deny_states=DENY_FINISHED_DATES_STATUSES_STR,
                 ),
                 errors.INVALID_STATUS_DATE_CORRELATION.format(
                     line=6,
                     date="Actual Verified Date",
-                    status="not Verified",
+                    deny_states=DENY_VERIFIED_DATES_STATUSES_STR,
                 ),
                 errors.INVALID_START_END_DATES.format(
                     line=7,
