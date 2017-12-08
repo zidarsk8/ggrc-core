@@ -137,20 +137,6 @@ export default can.Control({
     }.bind(this));
   },
 
-  setupCustomAttributes(instance) {
-    let setup;
-    if (!instance) {
-      return;
-    }
-
-    setup = instance.setup_custom_attributes;
-
-    if (setup && !(instance instanceof CMS.Models.Assessment)) {
-      instance.removeAttr('custom_attributes');
-      instance.setup_custom_attributes();
-    }
-  },
-
   apply_object_params: function () {
     if (!this.options.object_params) {
       return;
@@ -345,11 +331,9 @@ export default can.Control({
       }
     });
 
-    return dfd.done(() => {
-      this.reset_form(() => {
-        this.setupCustomAttributes(instance);
-      });
-    });
+    return dfd.done(function () {
+      this.reset_form();
+    }.bind(that));
   },
 
   reset_form: function (setFieldsCb) {
@@ -1192,7 +1176,6 @@ export default can.Control({
         });
         instance.attr('custom_attribute_definitions', cad);
       }
-      this.setupCustomAttributes(instance);
       instance.refresh();
       instance.dispatch(REFRESH_MAPPING);
     }
