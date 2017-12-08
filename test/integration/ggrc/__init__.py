@@ -135,6 +135,7 @@ class TestCase(BaseTestCase, object):
         "attribute_templates",
         "object_templates",
         "access_control_roles",
+        "mock_table",
     )
     tables = set(db.metadata.tables).difference(ignore_tables)
     for _ in range(len(tables)):
