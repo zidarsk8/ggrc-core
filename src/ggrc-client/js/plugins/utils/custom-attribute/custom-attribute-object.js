@@ -57,16 +57,7 @@ export default class CustomAttributeObject {
     caDefinition,
     caValue = new can.Map()
   ) {
-    /**
-     * Instance of some object.
-     * @private
-     */
     this._instance = instance;
-
-    /**
-     * The custom attribute definition owned by instance.
-     * @private
-     */
     this._caDefinition = caDefinition;
 
     this._setupCaValue(caValue);
@@ -220,17 +211,7 @@ export default class CustomAttributeObject {
   validate() {
     const validator = this.validator;
     validator.validate();
-    this.__validationState = validator.validationState;
-  }
-
-  /**
-   * Updates validationState.
-   * @private
-   * @param {(Object|can.Map)} state - The object with fields for update.
-   */
-  set __validationState(state) {
-    // use attr method
-    this._validationState.attr(state);
+    this._validationState.attr(validator.validationState);
   }
 
   /**
@@ -341,15 +322,12 @@ export default class CustomAttributeObject {
     };
     const validator = new StateValidator(injected);
 
-    /**
-     * The custom attribute validator.
-     * @private
-     */
     this._validator = validator;
-
-    /**
-     * The custom attribute validation state.
-     * @private
+    /*
+     * We use this property due to mustache is rerender
+     * itself when we use in code attr method. In this case,
+     * after each validation, if this property is changed with help
+     * attr method then mustache will update itself.
      */
     this._validationState = new can.Map(validator.validationState);
   }
