@@ -4,9 +4,8 @@
  */
 
 import {
-  getCustomAttributeType,
-  convertFromCaValue,
-} from '../../plugins/utils/ca-utils';
+  CUSTOM_ATTRIBUTE_TYPE,
+} from '../../plugins/utils/custom-attribute/custom-attribute-config';
 import Permission from '../../permission';
 
 (function (can, GGRC) {
@@ -51,53 +50,20 @@ import Permission from '../../permission';
         return instance.class.isProposable;
       },
       initCustomAttributes: function () {
-        let result = [];
-
-        can.each(this.attr('instance.custom_attribute_definitions'),
-          function (cad) {
-            let type = getCustomAttributeType(cad.attribute_type);
-            let value;
-            let options = cad.multi_choice_options &&
-              typeof cad.multi_choice_options === 'string' ?
-                cad.multi_choice_options.split(',') : [];
-
-            can.each(this.attr('instance.custom_attribute_values'),
-              function (val) {
-                val = val.isStub ? val : val.reify();
-                if (val.custom_attribute_id === cad.id) {
-                  value = convertFromCaValue(
-                    type,
-                    val.attribute_value,
-                    val.attribute_object
-                  );
-                }
-              });
-
-            result.push({
-              id: cad.id,
-              title: cad.title,
-              label: cad.label,
-              placeholder: cad.placeholder,
-              helptext: cad.helptext,
-              value: value,
-              options: options,
-              type: type,
-              mandatory: cad.mandatory,
-            });
-          }.bind(this));
-
+        const instance = this.attr('instance');
+        const result = instance
+          .customAttr({
+            type: CUSTOM_ATTRIBUTE_TYPE.GLOBAL,
+          });
         this.attr('items', result);
       },
       saveCustomAttributes: function (event, field) {
-        let id = field.id;
-        let type = field.type;
-        let value = event.value;
-        let instance = this.attr('instance');
+        const caId = field.customAttributeId;
+        const value = event.value;
+        const instance = this.attr('instance');
 
         this.attr('isSaving', true);
-
-        instance.attr('custom_attributes.' + id, this.getValue(type, value));
-
+        instance.customAttr(caId, value);
         instance.save()
           .done(function () {
             $(document.body).trigger('ajax:flash', {
@@ -112,20 +78,6 @@ import Permission from '../../permission';
           .always(function () {
             this.attr('isSaving', false);
           }.bind(this));
-      },
-      getValue: function (type, value) {
-        if (type === 'checkbox') {
-          return value ? 1 : 0;
-        }
-        if (type === 'person') {
-          return value ? ('Person:' + value) : 'Person:None';
-        }
-        if (type === 'dropdown') {
-          if (value && value === '') {
-            return undefined;
-          }
-        }
-        return value;
       },
     },
     init: function () {
