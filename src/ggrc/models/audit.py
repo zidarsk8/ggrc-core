@@ -175,11 +175,10 @@ class Audit(Snapshotable,
       if acl.parent_id:
         continue
       data = {
-          "person_id": acl.person_id,
-          "ac_role_id": acl.ac_role_id,
-          "object_id": self.id,
-          "object_type": "Audit",
-          "context_id": acl.context_id,
+          "person": acl.person,
+          "ac_role": acl.ac_role,
+          "object": self,
+          "context": acl.context,
       }
       new_acl = AccessControlList(**data)
       db.session.add(new_acl)
