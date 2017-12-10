@@ -24,6 +24,7 @@ from ggrc_workflows import models, notification
 from ggrc_workflows import services
 from ggrc_workflows.models import relationship_helper
 from ggrc_workflows.models import WORKFLOW_OBJECT_TYPES
+from ggrc_workflows.models import hooks
 from ggrc_workflows.notification import pusher
 from ggrc_workflows.converters import IMPORTABLE, EXPORTABLE
 from ggrc_workflows.converters.handlers import COLUMN_HANDLERS
@@ -60,6 +61,11 @@ for type_ in WORKFLOW_OBJECT_TYPES:
       models.workflow.WorkflowState,
   ) + model.__bases__
   model.late_init_task_groupable()
+
+
+def init_hooks():
+  """Initialize Workflow related SQLAlchemy hooks."""
+  hooks.init_hooks()
 
 
 def get_public_config(current_user):  # noqa
