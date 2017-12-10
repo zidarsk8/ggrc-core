@@ -5,6 +5,7 @@
 
 import datetime
 import unittest
+from collections import defaultdict
 
 import ddt
 import freezegun
@@ -39,6 +40,109 @@ class TestWorkflowsApiPost(TestCase):
 
   def tearDown(self):
     pass
+
+  def _create_propagation_acl_test_data(self):  # noqa pylint: disable=invalid-name
+    """Create objects for Workflow ACL propagation test."""
+    with freezegun.freeze_time("2017-08-9"):
+      with factories.single_commit():
+        workflow = wf_factories.WorkflowFactory(
+            title='wf1',
+            unit=all_models.Workflow.WEEK_UNIT,
+            is_verification_needed=True,
+            repeat_every=1)
+        wf_factories.TaskGroupTaskFactory(
+            title='tgt1',
+            task_group=wf_factories.TaskGroupFactory(
+                title='tg1',
+                context=factories.ContextFactory(),
+                workflow=workflow
+            ),
+            # One cycle should be created
+            start_date=datetime.date(2017, 8, 3),
+            end_date=datetime.date(2017, 8, 7)
+        )
+      self.generator.activate_workflow(workflow)
+      cycle = all_models.Cycle.query.one()
+      cycle_task = all_models.CycleTaskGroupObjectTask.query.one()
+      wf_factories.CycleTaskEntryFactory(
+          cycle=cycle,
+          cycle_task_group_object_task=cycle_task,
+          description="Cycle task comment",
+      )
+      workflow = all_models.Workflow.query.one()
+      acl_map = {
+          self.people_ids[0]: WF_ROLES['Admin'],
+          self.people_ids[1]: WF_ROLES['Workflow Member'],
+          self.people_ids[2]: WF_ROLES['Workflow Member'],
+      }
+      put_params = {'access_control_list': acl_helper.get_acl_list(acl_map)}
+      response = self.api.put(workflow, put_params)
+      self.assert200(response)
+
+  def _check_propagated_acl(self, roles_count):
+    """Check Workflow propagated ACL records.
+
+    Args:
+        roles_count: roles' count created in test
+    """
+    related_objects = (
+        (all_models.TaskGroup.query.one().id, all_models.TaskGroup.__name__),
+        (all_models.TaskGroupTask.query.one().id,
+         all_models.TaskGroupTask.__name__),
+        (all_models.Cycle.query.one().id, all_models.Cycle.__name__),
+        (all_models.CycleTaskGroup.query.one().id,
+         all_models.CycleTaskGroup.__name__),
+        (all_models.CycleTaskGroupObjectTask.query.one().id,
+         all_models.CycleTaskGroupObjectTask.__name__),
+        (all_models.CycleTaskEntry.query.one().id,
+         all_models.CycleTaskEntry.__name__)
+    )
+    related_count = len(related_objects)
+
+    all_acl = [acl for acl in all_models.AccessControlList.eager_query().all()]
+    self.assertEqual(len(all_acl), roles_count + roles_count * related_count)
+
+    workflow = all_models.Workflow.query.one()
+    parent_acl, related_acl = [], []
+    for acl in all_acl:
+      if (not acl.parent_id and acl.object_id == workflow.id and
+              acl.object_type == workflow.type):
+        parent_acl.append(acl)
+      else:
+        related_acl.append(acl)
+
+    result = defaultdict(set)
+    for p_acl in parent_acl:
+      for r_acl in related_acl:
+        if (r_acl.ac_role.name == '{} Mapped'.format(p_acl.ac_role.name) and
+                r_acl.parent_id == p_acl.id and
+                r_acl.person_id == p_acl.person_id):
+          result[p_acl.id].add((r_acl.object_id, r_acl.object_type))
+    self.assertEqual(roles_count, len(result))
+
+    for related_pairs in result.values():
+      self.assertEqual(related_count, len(related_pairs))
+      self.assertItemsEqual(related_objects, related_pairs)
+
+  def test_assign_workflow_acl_people_and_propagate(self):  # noqa pylint: disable=invalid-name
+    """Test propagation Workflow ACL roles on Workflow's update ACL records."""
+    self._create_propagation_acl_test_data()
+    self._check_propagated_acl(3)
+
+  def test_unassign_workflow_acl_people_and_propagate(self):  # noqa pylint: disable=invalid-name
+    """Test propagation Workflow ACL roles on person unassigned."""
+    self._create_propagation_acl_test_data()
+    with freezegun.freeze_time("2017-08-9"):
+      workflow = all_models.Workflow.query.one()
+      acl_map = {
+          self.people_ids[0]: WF_ROLES['Admin'],
+          self.people_ids[1]: WF_ROLES['Workflow Member'],
+      }
+      put_params = {'access_control_list': acl_helper.get_acl_list(acl_map)}
+      response = self.api.put(workflow, put_params)
+      self.assert200(response)
+
+    self._check_propagated_acl(2)
 
   def test_post_workflow_with_acl_people(self):  # noqa pylint: disable=invalid-name
     """Test PUT workflow with ACL."""
