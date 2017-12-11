@@ -15,7 +15,6 @@ export default can.Map.extend({
   source: null,
   people: [],
   peopleStr: '',
-  morePeopleStr: '',
   peopleNum: 5,
   stub: '@',
   init: function () {
@@ -24,22 +23,20 @@ export default can.Map.extend({
   refreshPeople: function () {
     this.getPeopleList()
       .then((data) => {
-        const peopleStr = data
-        .slice(0, this.peopleNum)
-        .map((item) => item.displayName)
-        .join('\n');
+        let peopleStr = data
+          .slice(0, this.peopleNum)
+          .map((item) => item.email)
+          .join('\n');
 
-        const morePeopleStr = data.length > this.peopleNum ?
+        peopleStr += data.length > this.peopleNum ?
           `\n and ${data.length - this.peopleNum} more` : '';
 
         this.attr('people', data);
         this.attr('peopleStr', peopleStr);
-        this.attr('morePeopleStr', morePeopleStr);
       });
   },
   getPeopleList: function () {
     var sourceList = this.getSourceList();
-    var result;
     var deferred = can.Deferred();
 
     if (!sourceList.length) {
@@ -47,15 +44,7 @@ export default can.Map.extend({
     }
     this.loadItems(sourceList)
       .then(function (data) {
-        result = data.map(function (item) {
-          var displayName = item.email;
-          return {
-            name: item.name,
-            email: item.email,
-            displayName: displayName,
-          };
-        });
-        deferred.resolve(result);
+        deferred.resolve(data);
       })
       .fail(function () {
         deferred.resolve([]);
