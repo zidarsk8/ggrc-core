@@ -12,6 +12,7 @@ import {
   makeRequest,
 } from '../plugins/utils/query-api-utils';
 import resolveConflict from './cacheable_conflict_resolution.js';
+import PersistentNotifier from '../plugins/persistent_notifier';
 
 (function (can, GGRC, CMS) {
   var _oldAttr;

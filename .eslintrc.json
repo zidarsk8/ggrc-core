@@ -25,7 +25,6 @@
     "MutationObserver": false,
     "ModelRefreshQueue": false,
     "Permission": false,
-    "PersistentNotifier": false,
     "RefreshQueue": false,
     "RefreshQueueManager": false,
     "Spinner": false,

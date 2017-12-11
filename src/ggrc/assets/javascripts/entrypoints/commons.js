@@ -8,7 +8,6 @@ import '../permission';
 import '../bootstrap/modal-ajax';
 import '../bootstrap/modal-form';
 import '../plugins/lodash_helpers';
-import '../plugins/persistent_notifier';
 import '../ggrc_base';
 import '../apps/base_widgets';
 import '../application';
