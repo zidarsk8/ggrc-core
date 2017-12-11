@@ -8,14 +8,14 @@ import ddt
 from ggrc import models
 from ggrc.access_control.role import get_custom_roles_for
 
-from integration.ggrc import TestCase
 from integration.ggrc import api_helper
 from integration.ggrc import generator
 from integration.ggrc.models import factories
+from integration.ggrc.models.test_assessment import TestAssessmentBase
 
 
 @ddt.ddt
-class TestMixinAutoStatusChangeable(TestCase):
+class TestMixinAutoStatusChangeable(TestAssessmentBase):
 
   """Test case for AutoStatusChangeable mixin"""
 
@@ -351,3 +351,34 @@ class TestMixinAutoStatusChangeable(TestCase):
     self.assertEqual(assessment.status,
                      models.Assessment.DONE_STATE)
     return assessment
+
+  def test_asmt_with_mandatory_lca_to_deprecated_state(self):
+    """Test new Assessment with not filled mandatory LCA could be Deprecated"""
+    # pylint: disable=attribute-defined-outside-init
+    with factories.single_commit():
+      self.audit = factories.AuditFactory()
+      self.control = factories.ControlFactory(test_plan="Control Test Plan")
+      self.snapshot = self._create_snapshots(self.audit, [self.control])[0]
+
+      template = factories.AssessmentTemplateFactory(
+          test_plan_procedure=False,
+          procedure_description="Assessment Template Test Plan"
+      )
+      custom_attribute_definition = {
+          "definition_type": "assessment_template",
+          "definition_id": template.id,
+          "title": "test checkbox",
+          "attribute_type": "Checkbox",
+          "multi_choice_options": "test checkbox label",
+          "mandatory": True,
+      }
+      factories.CustomAttributeDefinitionFactory(**custom_attribute_definition)
+
+    response = self.assessment_post(template)
+
+    self.assertEqual(response.json["assessment"]["status"],
+                     models.Assessment.START_STATE)
+    asmt = models.Assessment.query.get(response.json["assessment"]["id"])
+    asmt = self.change_status(asmt, models.Assessment.DEPRECATED)
+    asmt = self.refresh_object(asmt)
+    self.assertEqual(asmt.status, models.Assessment.DEPRECATED)
