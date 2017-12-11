@@ -34,6 +34,7 @@ DENY_FINISHED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
 DENY_VERIFIED_DATES_STATUSES_STR = ("<'Assigned' / 'In Progress' / "
                                     "'Declined' / 'Deprecated' / 'Finished'>")
 
+
 def check_cycle_tasks(row_converter):  # noqa
   """Checker for CycleTaskGroupObjectTask model objects.
 
