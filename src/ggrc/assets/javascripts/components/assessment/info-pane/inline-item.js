@@ -26,6 +26,7 @@ import template from './inline-item.mustache';
       isEditIconDenied: false,
       onStateChangeDfd: can.Deferred().resolve(),
       mandatory: false,
+      isConfirmationNeeded: true,
     }
   });
 })(window.can);
