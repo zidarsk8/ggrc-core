@@ -118,6 +118,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
           "display_name": "Archived",
           "mandatory": False,
           "ignore_on_update": True,
+          "view_only": True,
       },
       "template_custom_attributes": {
           "display_name": "Custom Attributes",

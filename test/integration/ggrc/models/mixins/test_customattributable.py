@@ -11,6 +11,7 @@ from ggrc import models
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
 from integration.ggrc import api_helper
+from integration.ggrc.generator import ObjectGenerator
 
 
 class TestCustomAttributableMixin(TestCase):
@@ -90,6 +91,28 @@ class TestCustomAttributableMixin(TestCase):
 
     prog = prog.__class__.query.get(prog.id)
     self.assertEqual(prog.custom_attribute_values[0].attribute_value, "129")
+
+  def test_validate_text_ca_value(self):
+    """Test validator for Text CA value."""
+    generator = ObjectGenerator()
+    prog = factories.ProgramFactory()
+    cad1 = factories.CustomAttributeDefinitionFactory(
+        definition_type="program",
+        definition_id=prog.id,
+        attribute_type="Text",
+        title="CA 1",
+    )
+    val1 = factories.CustomAttributeValueFactory(
+        attributable=prog,
+        attribute_value=" http://www.some.url",
+        custom_attribute=cad1,
+    )
+    prog.custom_attribute_values = [val1]
+    generator.api.modify_object(prog, {})
+
+    prog = prog.__class__.query.get(prog.id)
+    self.assertEqual(prog.custom_attribute_values[0].attribute_value,
+                     "http://www.some.url")
 
   def test_ca_setattr(self):
     """Test setting custom attribute values with setattr."""

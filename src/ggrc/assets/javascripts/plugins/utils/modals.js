@@ -118,6 +118,8 @@ function confirm (options, success, dismiss) {
           }
         });
     });
+
+    return $target;
 }
 
 // default static const settings

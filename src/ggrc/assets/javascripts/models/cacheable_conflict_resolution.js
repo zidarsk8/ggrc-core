@@ -52,6 +52,7 @@ export default function resolveConflict(xhr, obj) {
       $(document.body).trigger('ajax:flash', {
         warning: GGRC.Errors.messages[409],
       });
+      xhr.remoteObject = remoteAttrs;
       return new $.Deferred().reject(xhr, 409, 'CONFLICT');
     }
     return obj.save();

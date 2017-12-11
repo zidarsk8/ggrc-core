@@ -11,6 +11,7 @@ import {
 import {
   isMyAssessments,
 } from './plugins/utils/current-page-utils';
+import RefreshQueue from './models/refresh_queue';
 
 (function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.
@@ -1202,8 +1203,7 @@ Mustache.registerHelper("visibility_delay", function (delay, options) {
   };
 });
 
-Mustache.registerHelper("with_program_roles_as", function (
-      var_name, result, options) {
+Mustache.registerHelper("with_program_roles_as", function (result, options) {
   var dfd = $.when()
     , frame = new can.Observe()
     , user_roles = []

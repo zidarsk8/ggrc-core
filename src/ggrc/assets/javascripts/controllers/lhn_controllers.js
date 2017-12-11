@@ -6,6 +6,7 @@
 import './infinite-scroll-controller';
 import RecentlyViewedObject from '../models/recently_viewed_object';
 import tracker from '../tracker';
+import RefreshQueue from '../models/refresh_queue';
 
 can.Control('CMS.Controllers.LHN', {
   defaults: {}

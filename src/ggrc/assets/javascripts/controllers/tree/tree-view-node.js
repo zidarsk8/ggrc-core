@@ -99,6 +99,10 @@ import {
           this.draw_node(true);
         }
       },
+    ' updateCount'(el, ev, count, updateCount) {
+      // prevents updating counts for widget after openning tree-view-node
+      ev.stopPropagation();
+    },
 
     markNotRelatedItem: function () {
       var instance = this.options.instance;

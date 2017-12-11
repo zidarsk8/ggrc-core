@@ -6,49 +6,11 @@
 
   The following permission hooks make sure archived audits are not editable
 """
-import itertools
-
 from werkzeug.exceptions import Forbidden
 
 from ggrc import db
 from ggrc.models import all_models
 from ggrc.services import signals
-
-
-_AUDIT_MODEL_NAME = 'Audit'
-
-
-@signals.Restful.collection_posted.connect_via(all_models.Audit)
-def handle_audit_post(sender, objects=None, sources=None):
-  """Handles creating issue tracker related info."""
-  del sender  # Unused
-  for obj, src in itertools.izip(objects, sources):
-    issue_tracker_info = src.get('issue_tracker')
-    if not issue_tracker_info:
-      continue
-    all_models.IssuetrackerIssue.create_or_update_from_dict(
-        _AUDIT_MODEL_NAME, obj.id, issue_tracker_info)
-
-
-@signals.Restful.model_put.connect_via(all_models.Audit)
-def handle_audit_put(sender, obj=None, src=None, service=None):
-  """Handles updating issue tracker related info."""
-  del sender, service  # Unused
-  issue_tracker_info = src.get('issue_tracker')
-  if issue_tracker_info:
-    all_models.IssuetrackerIssue.create_or_update_from_dict(
-        _AUDIT_MODEL_NAME, obj.id, issue_tracker_info)
-
-
-@signals.Restful.model_deleted_after_commit.connect_via(all_models.Audit)
-def handle_audit_deleted_after_commit(sender, obj=None, service=None,
-                                      event=None):
-  """Handles deleting issue tracker related info."""
-  del sender, service, event  # Unused
-  issue_obj = all_models.IssuetrackerIssue.get_issue(
-      _AUDIT_MODEL_NAME, obj.id)
-  if issue_obj:
-    db.session.delete(issue_obj)
 
 
 def init_hook():

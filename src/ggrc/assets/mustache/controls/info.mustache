@@ -28,13 +28,22 @@
 
               <div class="row-fluid wrap-row">
                 <div class="span6">
-                  <folder-attachments-list title="Attachment"
-                                          {readonly}="isSnapshot"
-                                          {(is-revision-folder-loaded)}="instance.isRevisionFolderLoaded"
-                                          instance="instance"
-                                          deny-no-folder="true"
+                  {{#if_helpers '\
+                    #if' isSnapshot '\
+                    or ^is_allowed' "update" instance context="for"}}
+                      <folder-attachments-list title="Attachment"
+                                            {readonly}="true"
+                                            {(is-revision-folder-loaded)}="instance.isRevisionFolderLoaded"
+                                            {instance}="instance">
+                      </folder-attachments-list>
+                  {{else}}
+                    <folder-attachments-list title="Attachment"
+                                          {readonly}="false"
+                                          {instance}="instance"
+                                          {deny-no-folder}="true"
                                           tooltip="You can upload up to 10 files in a single batch">
                     </folder-attachments-list>
+                  {{/if_helpers}}
                 </div>
               </div>
 

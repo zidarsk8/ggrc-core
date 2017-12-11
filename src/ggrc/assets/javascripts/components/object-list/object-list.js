@@ -4,6 +4,7 @@
  */
 
 import '../show-more/show-more';
+import '../spinner/spinner';
 
 (function (can, GGRC) {
   'use strict';

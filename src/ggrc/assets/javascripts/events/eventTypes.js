@@ -73,6 +73,16 @@ const DESTINATION_UNMAPPED = {
   type: 'destinationUnmapped',
 };
 
+/**
+ * Refreshes cached Related Assessments tab
+ * @event refreshRelatedAssessments
+ * @type {object}
+ * @property {string} type - Event name.
+ */
+const REFRESH_TAB_CONTENT = {
+  type: 'refreshTabContent',
+};
+
 export {
   REFRESH_RELATED,
   SAVE_CUSTOM_ROLE,
@@ -81,4 +91,5 @@ export {
   SHOW_INVALID_FIELD,
   VALIDATION_ERROR,
   DESTINATION_UNMAPPED,
+  REFRESH_TAB_CONTENT,
 };

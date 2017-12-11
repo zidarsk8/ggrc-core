@@ -5,6 +5,7 @@
 
 import './revision-log-data';
 import '../paginate';
+import RefreshQueue from '../../models/refresh_queue';
 
 (function (GGRC, can) {
   'use strict';
