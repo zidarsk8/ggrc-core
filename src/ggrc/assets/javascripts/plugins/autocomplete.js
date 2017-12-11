@@ -7,6 +7,7 @@ import {
   buildRelevantIdsQuery,
   makeRequest,
 } from './utils/query-api-utils';
+import RefreshQueue from '../models/refresh_queue';
 
 (function ($) {
   'use strict';

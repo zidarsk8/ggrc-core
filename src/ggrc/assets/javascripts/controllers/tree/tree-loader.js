@@ -6,6 +6,7 @@
 import {
   isSnapshot,
 } from '../../plugins/utils/snapshot-utils';
+import RefreshQueue from '../../models/refresh_queue';
 
 (function (can, $) {
   can.Map.extend('CMS.Models.TreeViewOptions', {

@@ -5,6 +5,7 @@
 
 import {confirm} from '../../plugins/utils/modals';
 import {prepareCustomAttributes} from '../../plugins/utils/ca-utils';
+import RefreshQueue from '../../models/refresh_queue';
 
 export default can.Component.extend({
   tag: 'revisions-comparer',

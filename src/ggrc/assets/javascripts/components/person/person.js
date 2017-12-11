@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import RefreshQueue from '../../models/refresh_queue';
+
 /**
  * A component that renders a single Person item, fetching the object from the
  * server if necessary.
