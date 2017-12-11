@@ -9,6 +9,7 @@ from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.models.comment import Commentable
+from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.audit_object import Auditable
@@ -148,6 +149,7 @@ class Control(WithLastAssessmentDate,
               Auditable,
               mixins.TestPlanned,
               Commentable,
+              WithSimilarityScore,
               mixins.BusinessObject,
               Indexed,
               mixins.Folderable,

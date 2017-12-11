@@ -46,6 +46,7 @@ import {
 } from '../../../plugins/utils/ca-utils';
 import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
 import tracker from '../../../tracker';
+import {REFRESH_TAB_CONTENT} from '../../../events/eventTypes';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -536,6 +537,16 @@ import tracker from '../../../tracker';
       },
       '{viewModel.instance} modelAfterSave': function () {
         this.viewModel.attr('isAssessmentSaving', false);
+      },
+      '{viewModel.instance} assessment_type'() {
+        const onSave = () => {
+          this.viewModel.instance.dispatch({
+            ...REFRESH_TAB_CONTENT,
+            tabId: 'tab-related-assessments',
+          });
+          this.viewModel.instance.unbind('updated', onSave);
+        };
+        this.viewModel.instance.bind('updated', onSave);
       },
       '{viewModel} instance': function () {
         this.viewModel.initializeFormFields();
