@@ -10,6 +10,7 @@ import {
 } from '../plugins/utils/current-page-utils';
 import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 import {isObjectVersion} from '../plugins/utils/object-versions-utils';
+import '../components/add-tab-button/add-tab-button';
 
 import router, {buildUrl} from '../router';
 
