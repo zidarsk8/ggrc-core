@@ -5,14 +5,8 @@
 import ddt
 from ggrc import db
 from ggrc.models import all_models
-from ggrc.models.mixins import Identifiable
-from ggrc.access_control import roleable
 from integration.ggrc import TestCase
 from integration.ggrc.models import factories
-
-
-class MockObject(roleable.Roleable, Identifiable, db.Model):
-  __tablename__ = "mock_table"
 
 
 @ddt.ddt
@@ -37,7 +31,9 @@ class TestAccessControlRoleable(TestCase):
   def test_with_dict(self, acl_list):
     """Test access_control_list setter with a basic dict object
     This is the format the frontend uses"""
-    obj = MockObject(access_control_list=acl_list(self))
+    obj = all_models.Control(
+        title="New Control",
+        access_control_list=acl_list(self))
     assert obj.access_control_list is not None
     acl = obj.access_control_list[0]
     assert acl is not None
