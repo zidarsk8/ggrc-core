@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../comment/comment-input';
+import '../comment/comment-add-button';
+
 (function (can, GGRC) {
   'use strict';
 

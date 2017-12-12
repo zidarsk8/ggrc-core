@@ -6,6 +6,8 @@
 import './advanced-search-mapping-group';
 import './advanced-search-mapping-criteria';
 import './advanced-search-filter-operator';
+import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
+import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -18,7 +20,7 @@ import './advanced-search-filter-operator';
    * Contains logic used in Mapping Container component
    * @constructor
    */
-  var viewModel = GGRC.VM.AdvancedSearchContainer.extend({
+  var viewModel = AdvancedSearchContainer.extend({
     /**
      * Contains specific model name.
      * @type {string}
@@ -34,9 +36,9 @@ import './advanced-search-filter-operator';
     addMappingCriteria: function () {
       var items = this.attr('items');
       if (items.length) {
-        items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
+        items.push(AdvancedSearch.create.operator('AND'));
       }
-      items.push(GGRC.Utils.AdvancedSearch.create.mappingCriteria());
+      items.push(AdvancedSearch.create.mappingCriteria());
     },
     /**
      * Transforms Mapping Criteria to Mapping Group.
@@ -45,10 +47,10 @@ import './advanced-search-filter-operator';
     createGroup: function (criteria) {
       var items = this.attr('items');
       var index = items.indexOf(criteria);
-      items.attr(index, GGRC.Utils.AdvancedSearch.create.group([
+      items.attr(index, AdvancedSearch.create.group([
         criteria,
-        GGRC.Utils.AdvancedSearch.create.operator('AND'),
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria()
+        AdvancedSearch.create.operator('AND'),
+        AdvancedSearch.create.mappingCriteria()
       ]));
     },
     /**

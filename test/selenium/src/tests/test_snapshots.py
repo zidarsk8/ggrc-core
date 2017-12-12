@@ -290,7 +290,7 @@ class TestSnapshots(base.Test):
         src_obj=audit)
     # 'actual_controls': created_at, updated_at, custom_attributes (None)
     self.general_equal_assert(
-        expected_controls, actual_controls,
+        sorted(expected_controls), sorted(actual_controls),
         *Representation.tree_view_attrs_to_exclude)
 
   @pytest.mark.smoke_tests

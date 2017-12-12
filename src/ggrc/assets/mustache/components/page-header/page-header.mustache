@@ -52,7 +52,7 @@
     <a href="/dashboard#task_widget">
       <div class="oneline">
         {{#if showTitles}}My Tasks{{/if}}
-        <tasks-counter {person-id}="current_user.id"
+        <tasks-counter {person}="current_user"
         ></tasks-counter>
       </div></a>
   </li>
@@ -111,7 +111,7 @@
         </li>
       {{/current_user_is_admin}}
       <li>
-        <a id="page-help" href="{{GGRC.config.external_help_url}}" target="_blank">
+        <a id="page-help" href="{{helpUrl}}" target="_blank">
           <i class="fa fa-question-circle"></i>
           Help
         </a>

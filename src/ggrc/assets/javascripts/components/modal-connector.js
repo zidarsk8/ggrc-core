@@ -3,6 +3,15 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  toObject,
+  isSnapshotType,
+} from '../plugins/utils/snapshot-utils';
+import {
+  buildParams,
+  makeRequest,
+} from '../plugins/utils/query-api-utils';
+
 (function (can, $) {
   /*
    Below this line we're defining a can.Component, which is in this file
@@ -348,7 +357,7 @@
       },
       addListItem: function (item) {
         var snapshotObject;
-        if (GGRC.Utils.Snapshots.isSnapshotType(item) &&
+        if (isSnapshotType(item) &&
           item.snapshotObject) {
           snapshotObject = item.snapshotObject;
           item.attr('title', snapshotObject.title);
@@ -361,7 +370,7 @@
         this.viewModel.list.push(item);
       },
       buildQuery: function (type) {
-        return GGRC.Utils.QueryAPI.buildParams(
+        return buildParams(
           type,
           {},
           {
@@ -377,15 +386,14 @@
         var issueQuery = this.buildQuery('Issue')[0];
         var snapshotQuery = this.buildQuery('Snapshot')[0];
 
-        GGRC.Utils.QueryAPI
-          .makeRequest({data: [auditQuery, issueQuery, snapshotQuery]})
+        makeRequest({data: [auditQuery, issueQuery, snapshotQuery]})
           .then(function (response) {
             var snapshots;
             var list;
 
             snapshots = response[2].Snapshot.values;
             snapshots.forEach(function (snapshot) {
-              var object = GGRC.Utils.Snapshots.toObject(snapshot);
+              var object = toObject(snapshot);
 
               snapshot.class = object.class;
               snapshot.snapshot_object_class = 'snapshot-object';

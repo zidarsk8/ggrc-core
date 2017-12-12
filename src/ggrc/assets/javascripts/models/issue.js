@@ -17,6 +17,7 @@
       'timeboxed',
       'mapping-limit-issue',
       'inScopeObjects',
+      'accessControlList',
     ],
     is_custom_attributable: true,
     isRoleable: true,
@@ -30,7 +31,7 @@
         {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
-      display_attr_names: ['title', 'Admin', 'status'],
+      display_attr_names: ['title', 'Admin', 'status', 'updated_at'],
     },
     sub_tree_view_options: {
       default_filter: ['Control', 'Control_versions'],

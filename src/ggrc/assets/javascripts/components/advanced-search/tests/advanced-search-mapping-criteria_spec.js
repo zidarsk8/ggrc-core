@@ -3,6 +3,9 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
+import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+
 describe('GGRC.Components.advancedSearchMappingCriteria', function () {
   'use strict';
 
@@ -79,7 +82,7 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
     function () {
       var relevant;
       viewModel.attr('criteria.mappedTo',
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria()
+        AdvancedSearch.create.mappingCriteria()
       );
 
       viewModel.relevantToGroup();
@@ -172,13 +175,13 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
   describe('availableAttributes() method', function () {
     it('returns available attributes', function () {
       var attributes = ['attr1', 'attr2'];
-      spyOn(GGRC.Utils.TreeView, 'getColumnsForModel').and.returnValue({
+      spyOn(TreeViewUtils, 'getColumnsForModel').and.returnValue({
         available: attributes
       });
       viewModel.attr('criteria.objectName', 'test');
 
       expect(viewModel.availableAttributes()).toBe(attributes);
-      expect(GGRC.Utils.TreeView.getColumnsForModel).toHaveBeenCalledWith(
+      expect(TreeViewUtils.getColumnsForModel).toHaveBeenCalledWith(
         'test',
         null,
         true

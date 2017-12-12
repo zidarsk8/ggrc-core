@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../simple-popover/simple-popover';
+import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
+import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
+
 (function (can, GGRC, CMS) {
   'use strict';
 
@@ -28,7 +32,7 @@
         set: function (criteria) {
           if (!criteria.filter) {
             criteria.attr('filter',
-              GGRC.Utils.AdvancedSearch.create.attribute());
+              AdvancedSearch.create.attribute());
           }
           return criteria;
         }
@@ -96,7 +100,7 @@
      * @return {can.List} - List of available attributes.
      */
     availableAttributes: function () {
-      var available = GGRC.Utils.TreeView.getColumnsForModel(
+      var available = getColumnsForModel(
         this.attr('criteria.objectName'),
         null,
         true
@@ -157,7 +161,7 @@
      */
     addRelevant: function () {
       this.attr('criteria.mappedTo',
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria());
+        AdvancedSearch.create.mappingCriteria());
     },
     /**
      * Removes the child Mapping Criteria.
@@ -170,10 +174,10 @@
      */
     relevantToGroup: function () {
       this.attr('criteria.mappedTo',
-        GGRC.Utils.AdvancedSearch.create.group([
+        AdvancedSearch.create.group([
           this.attr('criteria.mappedTo'),
-          GGRC.Utils.AdvancedSearch.create.operator('AND'),
-          GGRC.Utils.AdvancedSearch.create.mappingCriteria()
+          AdvancedSearch.create.operator('AND'),
+          AdvancedSearch.create.mappingCriteria()
         ]));
     }
   });

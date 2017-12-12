@@ -156,15 +156,6 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
   fraud_related = deferred(db.Column(db.Boolean), 'Control')
   key_control = deferred(db.Column(db.Boolean), 'Control')
   active = deferred(db.Column(db.Boolean), 'Control')
-  principal_assessor_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('people.id')), 'Control')
-  secondary_assessor_id = deferred(
-      db.Column(db.Integer, db.ForeignKey('people.id')), 'Control')
-
-  principal_assessor = db.relationship(
-      'Person', uselist=False, foreign_keys='Control.principal_assessor_id')
-  secondary_assessor = db.relationship(
-      'Person', uselist=False, foreign_keys='Control.secondary_assessor_id')
 
   kind = db.relationship(
       'Option',
@@ -182,13 +173,6 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
                   'Option.role == "verify_frequency")',
       uselist=False)
 
-  @staticmethod
-  def _extra_table_args(_):
-    return (
-        db.Index('ix_controls_principal_assessor', 'principal_assessor_id'),
-        db.Index('ix_controls_secondary_assessor', 'secondary_assessor_id'),
-    )
-
   # REST properties
   _api_attrs = reflection.ApiAttributes(
       'active',
@@ -201,8 +185,6 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
       'means',
       'verify_frequency',
       'version',
-      'principal_assessor',
-      'secondary_assessor',
   )
 
   _fulltext_attrs = [
@@ -222,14 +204,6 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
       'means',
       'verify_frequency',
       'version',
-      attributes.FullTextAttr(
-          "principal_assessor",
-          "principal_assessor",
-          ["email", "name"]),
-      attributes.FullTextAttr(
-          'secondary_assessor',
-          'secondary_assessor',
-          ["email", "name"]),
   ]
 
   _sanitize_html = [
@@ -247,16 +221,6 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
             "directive"
         ).undefer_group(
             "Directive_complete"
-        ),
-        orm.Load(cls).joinedload(
-            "principal_assessor"
-        ).undefer_group(
-            "Person_complete"
-        ),
-        orm.Load(cls).joinedload(
-            "secondary_assessor"
-        ).undefer_group(
-            "Person_complete"
         ),
         orm.Load(cls).joinedload(
             'kind',
@@ -301,8 +265,6 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
     query = super(Control, cls).eager_query()
     return cls.eager_inclusions(query, Control._include_links).options(
         orm.joinedload('directive'),
-        orm.joinedload('principal_assessor'),
-        orm.joinedload('secondary_assessor'),
         orm.joinedload('kind'),
         orm.joinedload('means'),
         orm.joinedload('verify_frequency'),

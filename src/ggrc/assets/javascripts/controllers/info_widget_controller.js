@@ -40,10 +40,13 @@
         error_msg: '',
         error: true,
       });
-      can.view(this.get_widget_view(this.element),
-        this.options.context, function (frag) {
-          this.element.html(frag);
-        }.bind(this));
+      import(/* webpackChunkName: "modalsCtrls" */'./modals')
+        .then(() => {
+          can.view(this.get_widget_view(this.element),
+            this.options.context, function (frag) {
+              this.element.html(frag);
+            }.bind(this));
+        });
     },
 
     get_widget_view: function (el) {

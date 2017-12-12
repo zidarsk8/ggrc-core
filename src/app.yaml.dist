@@ -33,6 +33,18 @@ handlers:
 #    login: admin
 #    secure: always
 
+  - url: /_ah/queue/deferred
+    script: google.appengine.ext.deferred.deferred.application
+
+  - url: /maintenance/index
+    script: ggrc.maintenance.maintenance_app.wsgi_app
+    login: required
+    secure: always
+
+  - url: /maintenance/.*
+    script: ggrc.maintenance.maintenance_app.wsgi_app
+    secure: always
+
   - url: /.*
     script: ggrc.app.app.wsgi_app
     secure: always
@@ -45,6 +57,7 @@ libraries:
 
 builtins:
 - remote_api: on
+- deferred: on
 
 # Don't upload some files
 #  - note the first 9 items are defaults, see:
@@ -90,10 +103,14 @@ env_variables:
   GGRC_ABOUT_URL: "{ABOUT_URL}"
   GGRC_ABOUT_TEXT: "{ABOUT_TEXT}"
   GGRC_EXTERNAL_HELP_URL: "{EXTERNAL_HELP_URL}"
+  GGRC_EXTERNAL_IMPORT_HELP_URL: "{EXTERNAL_IMPORT_HELP_URL}"
   MAX_INSTANCES: "{MAX_INSTANCES}"
   AUTHORIZED_DOMAIN: "{AUTHORIZED_DOMAIN}"
   GGRC_Q_INTEGRATION_URL: "{GGRC_Q_INTEGRATION_URL}"
   INTEGRATION_SERVICE_URL: "{INTEGRATION_SERVICE_URL}"
   URLFETCH_SERVICE_ID: "{URLFETCH_SERVICE_ID}"
+  ISSUE_TRACKER_ENABLED: "{ISSUE_TRACKER_ENABLED}"
+  ISSUE_TRACKER_BUG_URL_TMPL: "{ISSUE_TRACKER_BUG_URL_TMPL}"
   DASHBOARD_INTEGRATION: "{DASHBOARD_INTEGRATION}"
   ALLOWED_QUERYAPI_APP_IDS: "{ALLOWED_QUERYAPI_APP_IDS}"
+  ACCESS_TOKEN: "{ACCESS_TOKEN}"

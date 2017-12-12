@@ -4,6 +4,10 @@
 */
 
 import '../components/add-object-button/add-object-button';
+import '../components/assessment_generator';
+import {
+  getCounts,
+} from '../plugins/utils/current-page-utils';
 
 export default can.Control({
   defaults: {
@@ -114,12 +118,10 @@ export default can.Control({
   },
   reloadChart: function (type, elementId) {
     var that = this;
-    var query = GGRC.Utils.CurrentPage;
     var chartOptions = this.options.context.charts[type];
     // Note that chart will be refreshed only if counts were changed.
     // State changes are not checked.
-    var countsChanged = query.getCounts().attr(type) !==
-                        chartOptions.attr('total');
+    var countsChanged = getCounts().attr(type) !== chartOptions.attr('total');
     if (chartOptions.attr('isInitialized') && !countsChanged &&
     !this.options.forceRefresh) {
       return;

@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import './related-objects';
 import '../add-issue-button/add-issue-button';
 
 (function (can, GGRC) {

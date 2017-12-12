@@ -51,9 +51,9 @@ Person,Name,Email*,Company,Role,map:clause,map:contract,map:control,map:objectiv
 ,,,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,
-Assessment,Code*,Audit*,Title*,Description,Notes,Assessment Procedure,Assignees*,Creators*,Verifiers,Due Date,Stop Date,State*,,Conclusion: Design,Conclusion: Operation,,,,Finished Date,Verified Date
-,PMRBACASSESSMENT-1,AUDIT-1,Program Manager Audit RBAC Test,,,,user@example.com,user@example.com,,,,In Progress,,,,,,,,
-,PMRBACASSESSMENT-2,AUDIT-2,Program Manager Audit RBAC Test Archived,,,,user@example.com,user@example.com,,,,In Progress,,,,,,,,
+Assessment,Code*,Audit*,Title*,Description,Notes,Assessment Procedure,Assignees*,Creators*,Verifiers,Due Date,State*,,Conclusion: Design,Conclusion: Operation,,,,Finished Date,Verified Date
+,PMRBACASSESSMENT-1,AUDIT-1,Program Manager Audit RBAC Test,,,,user@example.com,user@example.com,,,In Progress,,,,,,,,
+,PMRBACASSESSMENT-2,AUDIT-2,Program Manager Audit RBAC Test Archived,,,,user@example.com,user@example.com,,,In Progress,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,,
 Object type,"Must be unique. Can be left empty for autogeneration. If updating or deleting, code is required",,,,,,,,,,,,,,,,,,,
 Clause,Code*,Title*,Text of Clause,Notes,Admin*,Effective Date,Last Deprecated Date,State,,,,,,,,,,,,

@@ -581,6 +581,15 @@ class Widget(AbstractPage):
         is_info_page = True
     return is_info_page
 
+  @property
+  def is_snapshoted_panel(self):
+    """Check is the current page is Info Panel of snapshoted object."""
+    return (not self.is_info_page and
+            (self.source_obj_from_url in (objects.AUDITS, objects.ASSESSMENTS,
+                                          objects.ISSUES)) and
+            (objects.get_plural(self.widget_name_from_url.lower())
+             in objects.ALL_SNAPSHOTABLE_OBJS))
+
 
 class TreeView(Component):
   """Common class for representing Tree View list with several objects."""
@@ -1006,7 +1015,7 @@ class AbstractTabContainer(Component):
 
   def _get_active_tab_element(self):
     """Return element of active tab"""
-    return self.container_element.find_element(*self._locators.TAB_CONTENT)
+    return self.container_element.find_element(*self._locators.TAB_CONTENT_CSS)
 
   def _tabs(self):
     """Abstract method. Should return dict. {'tab_name': tab_object, ...}"""
@@ -1016,7 +1025,7 @@ class AbstractTabContainer(Component):
   def tab_controller(self):
     """Lazy property for dashboard controller."""
     from lib.element.elements_list import TabController
-    return TabController(self._driver, self._locators.TAB_CONTROLLER)
+    return TabController(self._driver, self._locators.TAB_CONTROLLER_CSS)
 
 
 class AbstractTable(Component):

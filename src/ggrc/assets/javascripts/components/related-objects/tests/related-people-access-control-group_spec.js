@@ -3,12 +3,14 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+ import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+ import Component from '../related-people-access-control-group';
+
  describe('GGRC.Components.relatedPeopleAccessControlGroup', () => {
    let vm;
-   let SnapshotUtils = GGRC.Utils.Snapshots;
 
    beforeEach(() => {
-     vm = GGRC.Components.getViewModel('relatedPeopleAccessControlGroup');
+     vm = new (can.Map.extend(Component.prototype.viewModel));
      vm.attr('instance', {});
    });
 

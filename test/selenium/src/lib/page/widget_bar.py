@@ -68,7 +68,7 @@ class _ObjectWidgetBar(_WidgetBar):
     """Select 'Dashboard' tab on Object Widget Bar."""
     Button(self._driver, locator.WidgetBar.DASHBOARD_TAB).click()
     return selenium_utils.get_when_visible(
-        self._driver, locator.DashboardWidget.TAB_CONTAINER)
+        self._driver, locator.DashboardWidget.TAB_CONTAINER_CSS)
 
   def is_dashboard_tab_exist(self):
     """Check is 'Dashboard' tab exist on Object Widget Bar."""

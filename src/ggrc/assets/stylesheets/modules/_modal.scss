@@ -678,6 +678,10 @@
     }
     .confirm-buttons {
       text-align: right;
+
+      &__objects-count {
+        margin-right: 20px;
+      }
     }
   }
   .actions {
@@ -718,7 +722,7 @@
      .info{
        border: 1px solid $warmGray;
        padding: 20px 15px;
-       width: 50%;
+       width: calc(50% - 30px);
        box-shadow: none;
        &:first-child{
          border-right: none;
@@ -749,6 +753,8 @@
          }
        }
        & ~ .info{
+         width: calc(50% - 30px);
+
          .diff-highlighted{
            background-color: $pastelGreen;
          }
@@ -818,6 +824,7 @@
   }
 }
 
+.expand-issue-tracker-link,
 .expand-link {
   padding: 0 0 12px 0;
 

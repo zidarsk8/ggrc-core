@@ -19,17 +19,25 @@ CUSTOM_URL_ROOT=""
 ABOUT_URL="#"
 ABOUT_TEXT="About GGRC"
 EXTERNAL_HELP_URL="#set_GGRC_EXTERNAL_HELP_URL_env_var"
+EXTERNAL_IMPORT_HELP_URL="#set_GGRC_EXTERNAL_IMPORT_HELP_URL_env_var"
 INSTANCE_CLASS="B4"
 MAX_INSTANCES="4"
 STATIC_SERVING=""
 GGRC_Q_INTEGRATION_URL=""
 INTEGRATION_SERVICE_URL=""
 URLFETCH_SERVICE_ID=""
+ISSUE_TRACKER_ENABLED=""
+ISSUE_TRACKER_BUG_URL_TMPL=""
 DASHBOARD_INTEGRATION=""
 ALLOWED_QUERYAPI_APP_IDS=""
 APPENGINE_EMAIL=""
 AUTHORIZED_DOMAIN=""
-DATABASE_URI="mysql+mysqldb://root@/${DB_NAME}?unix_socket=/cloudsql/${DB_INSTANCE_CONNECTION_NAME}&charset=utf8"
-SCALING=$(printf "basic_scaling:\\n  max_instances: ${MAX_INSTANCES}\\n  idle_timeout: 10m\\n")
+ACCESS_TOKEN=""
+VERSION="AUTO" # valid version string or "AUTO" - can be omitted
+
+## generated values:
+
 # example for manual scaling:
 # SCALING=$(printf "manual_scaling:\\n  instances: ${MAX_INSTANCES}\\n")
+SCALING=$(printf "basic_scaling:\\n  max_instances: ${MAX_INSTANCES}\\n  idle_timeout: 10m\\n")
+DATABASE_URI="mysql+mysqldb://root@/${DB_NAME}?unix_socket=/cloudsql/${DB_INSTANCE_CONNECTION_NAME}&charset=utf8"

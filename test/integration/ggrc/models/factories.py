@@ -239,7 +239,7 @@ class AssessmentTemplateFactory(TitledFactory):
   test_plan_procedure = False
   procedure_description = factory.LazyAttribute(
       lambda _: random_str(length=100))
-  default_people = {"assessors": "Admin",
+  default_people = {"assignees": "Admin",
                     "verifiers": "Admin"}
 
 
@@ -262,16 +262,6 @@ class RelationshipFactory(ModelFactory):
     model = models.Relationship
   source = None
   destination = None
-
-
-class RelationshipAttrFactory(ModelFactory):
-
-  class Meta:
-    model = models.RelationshipAttr
-
-  relationship_id = None
-  attr_name = None
-  attr_value = None
 
 
 class PersonFactory(ModelFactory):

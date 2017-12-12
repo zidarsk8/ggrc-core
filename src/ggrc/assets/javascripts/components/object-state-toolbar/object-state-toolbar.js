@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {SWITCH_TO_ERROR_PANEL, SHOW_INVALID_FIELD} from '../../events/eventTypes';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -14,7 +16,7 @@
   function checkIsCurrentUserVerifier(verifiers) {
     return verifiers
       .filter(function (verifier) {
-        return verifier.email === GGRC.current_user.email;
+        return verifier.id === GGRC.current_user.id;
       }).length;
   }
   /**
@@ -65,10 +67,14 @@
       isInReview: function () {
         return this.attr('instance.status') === 'In Review';
       },
+      hasPreviousState: function () {
+        return !!this.attr('instance.previousStatus');
+      },
       changeState: function (newState, isUndo) {
         if (this.attr('isDisabled')) {
           if (this.attr('instance.hasValidationErrors')) {
-            this.attr('instance').dispatch('showInvalidField');
+            this.attr('instance').dispatch(SWITCH_TO_ERROR_PANEL);
+            this.attr('instance').dispatch(SHOW_INVALID_FIELD);
           }
           return;
         }

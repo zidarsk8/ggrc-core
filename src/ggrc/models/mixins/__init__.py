@@ -594,8 +594,6 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
   case.
   """
   _people_log_mappings = [
-      "principal_assessor_id",
-      "secondary_assessor_id",
       "contact_id",
       "secondary_contact_id",
       "modified_by_id",

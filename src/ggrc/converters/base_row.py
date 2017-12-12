@@ -28,14 +28,15 @@ class RowConverter(object):
     self.is_new = True
     self.is_delete = False
     self.is_deprecated = False
+    self.do_not_expunge = False
     self.ignore = False
     self.index = options.get("index", -1)
     self.row = options.get("row", [])
     self.attrs = collections.OrderedDict()
     self.objects = collections.OrderedDict()
     self.id_key = ""
-    offset = 3  # 2 header rows and 1 for 0 based index
-    self.line = self.index + self.block_converter.offset + offset
+    self.line = self.index + self.block_converter.offset +\
+        self.block_converter.BLOCK_OFFSET
     self.headers = options.get("headers", [])
 
   def add_error(self, template, **kwargs):
@@ -129,6 +130,14 @@ class RowConverter(object):
   def set_ignore(self, ignore=True):
     self.ignore = ignore
 
+  def set_do_not_expunge(self, do_not_expunge=True):
+    """Mark an ignored object not to be expunged from a session
+
+    We may not expunge objects with duplicate slugs, because they represent
+    the same object.
+    """
+    self.do_not_expunge = do_not_expunge
+
   def get_or_generate_object(self, attr_name):
     """Fetch an existing object if possible or create and return a new one.
 
@@ -163,7 +172,7 @@ class RowConverter(object):
       self.add_error(errors.PERMISSION_ERROR)
     return obj
 
-  def setup_secondary_objects(self, slugs_dict):
+  def setup_secondary_objects(self):
     """Import secondary objects.
 
     This function creates and stores all secondary object such as relationships

@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+
 describe('GGRC.Components.advancedSearchFilterGroup', function () {
   'use strict';
 
@@ -15,7 +17,7 @@ describe('GGRC.Components.advancedSearchFilterGroup', function () {
   describe('addFilterCriterion() method', function () {
     it('adds operator and attribute', function () {
       var items;
-      viewModel.attr('items', [GGRC.Utils.AdvancedSearch.create.attribute()]);
+      viewModel.attr('items', [AdvancedSearch.create.attribute()]);
       viewModel.addFilterCriterion();
 
       items = viewModel.attr('items');

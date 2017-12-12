@@ -43,6 +43,7 @@ CUSTOM_URL_ROOT = os.environ.get("GGRC_CUSTOM_URL_ROOT")
 ABOUT_URL = os.environ.get("GGRC_ABOUT_URL")
 ABOUT_TEXT = os.environ.get("GGRC_ABOUT_TEXT")
 EXTERNAL_HELP_URL = os.environ.get("GGRC_EXTERNAL_HELP_URL")
+EXTERNAL_IMPORT_HELP_URL = os.environ.get("GGRC_EXTERNAL_IMPORT_HELP_URL")
 
 if len(SETTINGS_MODULE.strip()) == 0:
   raise RuntimeError("Specify your settings using the `GGRC_SETTINGS_MODULE` "

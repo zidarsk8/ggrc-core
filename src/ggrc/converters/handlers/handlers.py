@@ -195,10 +195,15 @@ class StatusColumnHandler(ColumnHandler):
   def parse_item(self):
     value = self.raw_value.lower()
     status = self.state_mappings.get(value)
-    if status is None:
-      self.add_warning(
-          errors.WRONG_VALUE_DEFAULT, column_name=self.display_name)
+    if status is not None:
+      return status
+    if self.row_converter.obj.status:
+      status = self.row_converter.obj.status
+      error_tmpl = errors.WRONG_VALUE_CURRENT
+    else:
       status = self.row_converter.object_class.default_status()
+      error_tmpl = errors.WRONG_VALUE_DEFAULT
+    self.add_warning(error_tmpl, column_name=self.display_name)
     return status
 
 
@@ -319,6 +324,31 @@ class DateColumnHandler(ColumnHandler):
           errors.UNMODIFIABLE_COLUMN,
           column_name=self.display_name,
       )
+
+
+class NullableDateColumnHandler(DateColumnHandler):
+  """Nullable date column handler."""
+
+  DEFAULT_EMPTY_VALUE = "--"
+  EMPTY_VALUE_LIST = ["--", "---"]
+
+  def parse_item(self):
+    """Datetime column can be nullable."""
+    value = self.raw_value.strip()
+    if value not in self.EMPTY_VALUE_LIST:
+      return super(NullableDateColumnHandler, self).parse_item()
+    if self.mandatory:
+      self.add_error(
+          errors.MISSING_COLUMN,
+          s="",
+          column_names=self.display_name)
+    else:
+      self.set_empty = True
+
+  def get_value(self):
+    if getattr(self.row_converter.obj, self.key):
+      return super(NullableDateColumnHandler, self).get_value()
+    return self.DEFAULT_EMPTY_VALUE
 
 
 class EmailColumnHandler(ColumnHandler):

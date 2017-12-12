@@ -3,11 +3,21 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../../object-list-item/business-object-list-item';
+import '../../object-list-item/detailed-business-object-list-item';
 import './mapped-control-related-objects';
 import {
   prepareCustomAttributes,
   convertToFormViewField,
 } from '../../../plugins/utils/ca-utils';
+import {
+  buildParam,
+  makeRequest,
+} from '../../../plugins/utils/query-api-utils';
+import {
+  toObject,
+  transformQuery,
+} from '../../../plugins/utils/snapshot-utils';
 
 (function (can, GGRC, _) {
   'use strict';
@@ -46,12 +56,12 @@ import {
           {
             type: 'objectives',
             objName: 'Objective',
-            fields: ['child_type', 'revision', 'parent'],
+            fields: ['child_id', 'child_type', 'revision', 'parent'],
           },
           {
             type: 'regulations',
             objName: 'Regulation',
-            fields: ['child_type', 'revision', 'parent'],
+            fields: ['child_id', 'child_type', 'revision', 'parent'],
           },
         ],
       },
@@ -107,9 +117,9 @@ import {
       };
       params.data = this.attr('queries')
         .map(function (query) {
-          var resultingQuery = GGRC.Utils.QueryAPI
-            .buildParam(query.objName, {}, relevant, query.fields);
-          return GGRC.Utils.Snapshots.transformQuery(resultingQuery);
+          var resultingQuery =
+            buildParam(query.objName, {}, relevant, query.fields);
+          return transformQuery(resultingQuery);
         });
       return params;
     },
@@ -123,7 +133,7 @@ import {
         var type = this.attr('queries')[i].type;
         this.attr(type).replace(item.Snapshot.values
           .map(function (item) {
-            return GGRC.Utils.Snapshots.toObject(item);
+            return toObject(item);
           }));
       }.bind(this));
     },
@@ -139,8 +149,7 @@ import {
 
       this.attr('isLoading', true);
 
-      GGRC.Utils.QueryAPI
-        .makeRequest(params)
+      makeRequest(params)
         .done(this.setItems.bind(this))
         .fail(function () {
           $(document.body).trigger('ajax:flash',
@@ -179,7 +188,7 @@ import {
             item.attr('revision.content'));
           this.viewModel.attr('customAttributes', attributes);
           this.viewModel.attr('snapshot',
-            GGRC.Utils.Snapshots.toObject(item));
+            toObject(item));
           this.viewModel.attr('state.open', true);
         }
       },

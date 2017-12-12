@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+
 describe('GGRC.Components.advancedSearchMappingContainer', function () {
   'use strict';
 
@@ -27,7 +29,7 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
     it('adds operator and criteria if list is not empty', function () {
       var items;
       viewModel.attr('items',
-        [GGRC.Utils.AdvancedSearch.create.mappingCriteria()]);
+        [AdvancedSearch.create.mappingCriteria()]);
       viewModel.addMappingCriteria();
 
       items = viewModel.attr('items');
@@ -43,9 +45,9 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
     function () {
       var viewItems;
       viewModel.attr('items', new can.List([
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria({field: 'first'}),
-        GGRC.Utils.AdvancedSearch.create.operator(),
-        GGRC.Utils.AdvancedSearch.create.mappingCriteria({field: 'second'})
+        AdvancedSearch.create.mappingCriteria({field: 'first'}),
+        AdvancedSearch.create.operator(),
+        AdvancedSearch.create.mappingCriteria({field: 'second'})
       ]));
       viewItems = viewModel.attr('items');
 

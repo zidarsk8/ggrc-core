@@ -3,11 +3,14 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-{{#if isObject}}
-    {{#each data}}
-        <div>{{.}}</div>
-    {{/each}}
+{{#if isLoading}}
+    <spinner toggle="isLoading"></spinner>
 {{else}}
-    <div>{{data}}</div>
+    {{#if isObject}}
+        {{#each data}}
+            <div>{{.}}</div>
+        {{/each}}
+    {{else}}
+        <div>{{data}}</div>
+    {{/if}}
 {{/if}}
-

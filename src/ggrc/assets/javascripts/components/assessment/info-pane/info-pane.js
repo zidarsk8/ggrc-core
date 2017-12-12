@@ -5,16 +5,32 @@
 
 import '../controls-toolbar/controls-toolbar';
 import '../assessment-local-ca';
-import '../../custom-attributes/custom-attributes';
-import '../../custom-attributes/custom-attributes-field';
-import '../../custom-attributes/custom-attributes-status';
+import '../assessment-custom-attributes';
+import '../assessment-people';
+import '../assessment-object-type-dropdown';
 import '../mapped-objects/mapped-related-information';
 import '../mapped-objects/mapped-comments';
 import '../mapped-objects/mapped-controls';
+import '../../assessment/map-button-using-assessment-type';
+import '../../ca-object/ca-object-modal-content';
+import '../../comment/comment-add-form';
+import '../../custom-attributes/custom-attributes';
+import '../../custom-attributes/custom-attributes-field';
+import '../../custom-attributes/custom-attributes-status';
+import '../../prev-next-buttons/prev-next-buttons';
 import '../../inline/inline-form-control';
+import '../../object-change-state/object-change-state';
+import '../../related-objects/related-assessments';
+import '../../related-objects/related-issues';
+import '../../issue-tracker/issue-tracker-switcher';
+import './info-pane-issue-tracker-fields';
+import '../../tabs/tab-container';
 import './inline-item';
 import './create-url';
-import '../../object-change-state/object-change-state';
+import {
+  buildParam,
+  batchRequests,
+} from '../../../plugins/utils/query-api-utils';
 import {
   getCustomAttributes,
   CUSTOM_ATTRIBUTE_TYPE,
@@ -22,11 +38,13 @@ import {
   convertValuesToFormFields,
   applyChangesToCustomAttributeValue,
 } from '../../../plugins/utils/ca-utils';
+import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
 
 (function (can, GGRC, CMS) {
   'use strict';
   var tpl = can.view(GGRC.mustache_path +
     '/components/assessment/info-pane/info-pane.mustache');
+  const editableStatuses = ['Not Started', 'In Progress', 'Rework Needed'];
 
   /**
    * Assessment Specific Info Pane View Component
@@ -41,6 +59,29 @@ import {
         referenceUrls: CMS.Models.Document.REFERENCE_URL,
       },
       define: {
+        verifiers: {
+          get: function () {
+            let acl = this.attr('instance.access_control_list');
+            let verifierRoleId = this.attr('_verifierRoleId');
+            let verifiers;
+
+            if (!verifierRoleId) {
+              return [];
+            }
+
+            verifiers = acl
+              .filter((item) => item.ac_role_id == verifierRoleId)
+              .map((item) => item.person);
+
+            return verifiers;
+          },
+        },
+        showProcedureSection: {
+          get: function () {
+            return this.instance.attr('test_plan') ||
+              this.instance.attr('issue_tracker.issue_url');
+          },
+        },
         isSaving: {
           type: 'boolean',
           value: false,
@@ -99,9 +140,10 @@ import {
         editMode: {
           type: 'boolean',
           get: function () {
-            return this.attr('instance.status') !== 'Completed' &&
-              this.attr('instance.status') !== 'In Review' &&
-              !this.attr('instance.archived');
+            let status = this.attr('instance.status');
+
+            return !this.attr('instance.archived') &&
+              editableStatuses.includes(status);
           },
           set: function () {
             this.onStateChange({state: 'In Progress', undo: false});
@@ -132,12 +174,14 @@ import {
       modal: {
         open: false,
       },
+      _verifierRoleId: undefined,
       isUpdatingRelatedItems: false,
       isAssessmentSaving: false,
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
       initialState: 'Not Started',
+      assessmentMainRoles: ['Creators', 'Assignees', 'Verifiers'],
       setUrlEditMode: function (value, type) {
         this.attr(type + 'EditMode', value);
       },
@@ -150,8 +194,7 @@ import {
           id: this.attr('instance.id'),
           operation: 'relevant',
         }];
-        return GGRC.Utils.QueryAPI
-          .buildParam(type,
+        return buildParam(type,
             sortObj || {},
             relevantFilters,
             [],
@@ -175,8 +218,8 @@ import {
         var dfd = can.Deferred();
         type = type || '';
         this.attr('isUpdating' + can.capitalize(type), true);
-        GGRC.Utils.QueryAPI
-          .batchRequests(query)
+
+        batchRequests(query)
           .done(function (response) {
             var type = Object.keys(response)[0];
             var values = response[type].values;
@@ -368,7 +411,7 @@ import {
         );
       },
       initializeDeferredSave: function () {
-        this.attr('deferredSave', new GGRC.Utils.DeferredTransaction(
+        this.attr('deferredSave', new DeferredTransaction(
           function (resolve, reject) {
             this.attr('instance').save().done(resolve).fail(reject);
           }.bind(this), 1000, true));
@@ -447,12 +490,23 @@ import {
         can.batch.stop();
         this.attr('modal.state.open', true);
       },
+      setVerifierRoleId: function () {
+        let verifierRoleIds = GGRC.access_control_roles
+          .filter((item) => item.object_type === 'Assessment' &&
+            item.name === 'Verifiers')
+          .map((item) => item.id);
+
+        let verifierRoleId = _.head(verifierRoleIds);
+        this.attr('_verifierRoleId', verifierRoleId);
+      },
     },
     init: function () {
       this.viewModel.initializeFormFields();
       this.viewModel.initGlobalAttributes();
       this.viewModel.updateRelatedItems();
       this.viewModel.initializeDeferredSave();
+
+      this.viewModel.setVerifierRoleId();
     },
     events: {
       '{viewModel.instance} refreshMapping': function () {

@@ -3,6 +3,13 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import {
+  isAdmin,
+  getPageType,
+} from '../plugins/utils/current-page-utils';
+import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
+import {isObjectVersion} from '../plugins/utils/object-versions-utils';
+
 (function (can, $) {
   can.Control('CMS.Controllers.Dashboard', {
     defaults: {
@@ -194,7 +201,7 @@
       control = new descriptor
         .controller($element, descriptor.controller_options);
 
-      if (GGRC.Utils.CurrentPage.isAdmin()) {
+      if (isAdmin()) {
         control.prepare();
       }
 
@@ -294,7 +301,7 @@
             this.element.append(frag);
             if (isAuditScope) {
               const priorityTabsNum = 4 +
-                GGRC.Utils.Dashboards.isDashboardEnabled(instance);
+                isDashboardEnabled(instance);
               this.element.addClass(this.options.instance.type.toLowerCase());
               this.options.attr('addTabTitle', 'Add Scope');
               this.options.attr('hideTabTitle', 'Show Audit Scope');
@@ -458,9 +465,7 @@
       var widgetName;
 
       function getWidgetType(widgetId) {
-        var isObjectVersion = GGRC.Utils.ObjectVersions
-          .isObjectVersion(widgetId);
-        return isObjectVersion ? 'version' : '';
+        return isObjectVersion(widgetId) ? 'version' : '';
       }
 
       if (this.delayed_display) {
@@ -570,7 +575,7 @@
     },
 
     show_hide_titles: function () {
-      const pageType = GGRC.Utils.CurrentPage.getPageType();
+      const pageType = getPageType();
       const originalWidgets = this.options.widget_list;
       const priorityTabsNum = this.options.attr('priorityTabs');
       const priorityTabs = originalWidgets.slice(0, priorityTabsNum);

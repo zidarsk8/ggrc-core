@@ -45,7 +45,7 @@
               <option value="" {{#if_equals "" cav.attribute_value}}selected="true"{{/if_equals}}>---</option>
               {{#iterate_string cad.multi_choice_options ','}}
                 <option {{#if_equals iterator cav.attribute_value}}selected="true"{{/if_equals}}>{{iterator}}</option>
-              {{/iterate}}
+              {{/iterate_string}}
             </select>
           {{/case}}
           {{#case 'Checkbox'}}

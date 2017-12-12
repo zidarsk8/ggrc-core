@@ -17,7 +17,7 @@
             <div class="span12">
               <div class="import-wrap import-analyze">
                 <h4>
-                  {{filename}}
+                  {{fileName}}
                   {{#if isLoading}}
                     <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2 }' 'display:inline-block; top: -3px; left: 30px;' }}></span>
                   {{/if}}
@@ -69,11 +69,15 @@
       {{/if_equals}}
 
       <div class="csv-input">
-        <input type="file" accept=".csv"
-               data-file-upload class="csv-upload" name="upload"
-               style="display:none" />
         {{#states}}
-          <button id="import_btn" {{#isDisabled}}disabled{{/isDisabled}} class="btn btn-small state-{{state}} {{class}}">{{{text}}}</button>
+          <button id="import_btn"
+             href="javascript://"
+             {{#isDisabled}}disabled{{/isDisabled}}
+             class="btn btn-small state-{{state}} {{class}}"
+             data-toggle="gdrive-picker"
+             data-type="documents">
+            {{{text}}}
+          </button>
           {{^if_equals state "select"}}
             {{#showSpinner}}
               <span {{attach_spinner '{ "radius": 4, "length": 4, "width": 2, "zIndex": 0}' 'display:inline-block; top: -3px; left: 30px;' }}></span>
@@ -92,7 +96,7 @@
           <li>You can <strong>map</strong> objects via import. Simply add <strong>map:control</strong> column and use object codes in the column to map objects. You can <strong>unmap</strong> objects in the same way</li>
           <li>You can <strong>delete</strong> objects in a similar way. Add <strong>delete</strong> column in line 5 and put <em>yes</em> in rows for objects you want to delete</li>
           <li>If objects already exist, fields <strong>you leave empty</strong> will be ignored. (Object's attributes will not be replaced with empty info)</li>
-          <li>For extensive import help, refer to <a href="#">Import Help/FAQ</a> section below</li>
+          <li>For extensive import help, refer to <a href="{{helpUrl}}">Import Help/FAQ</a> section below</li>
         </ul>
       </div>
     </div>

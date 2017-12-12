@@ -7,7 +7,9 @@ import './advanced-search-filter-attribute';
 import './advanced-search-filter-group';
 import './advanced-search-filter-operator';
 import './advanced-search-filter-state';
+import AdvancedSearchContainer from '../view-models/advanced-search-container-vm';
 import * as StateUtils from '../../plugins/utils/state-utils';
+import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 
 (function (can, GGRC) {
   'use strict';
@@ -20,7 +22,7 @@ import * as StateUtils from '../../plugins/utils/state-utils';
    * Contains logic used in Filter Container component
    * @constructor
    */
-  var viewModel = GGRC.VM.AdvancedSearchContainer.extend({
+  var viewModel = AdvancedSearchContainer.extend({
     define: {
       /**
        * Contains Filter Attributes, Groups and Operators.
@@ -33,7 +35,7 @@ import * as StateUtils from '../../plugins/utils/state-utils';
         get: function (items) {
           if (this.attr('defaultStatusFilter') && items && !items.length &&
             StateUtils.hasFilter(this.attr('modelName'))) {
-            items.push(GGRC.Utils.AdvancedSearch.create.state());
+            items.push(AdvancedSearch.create.state());
           }
           return items;
         }
@@ -73,9 +75,9 @@ import * as StateUtils from '../../plugins/utils/state-utils';
     addFilterCriterion: function () {
       var items = this.attr('items');
       if (items.length) {
-        items.push(GGRC.Utils.AdvancedSearch.create.operator('AND'));
+        items.push(AdvancedSearch.create.operator('AND'));
       }
-      items.push(GGRC.Utils.AdvancedSearch.create.attribute());
+      items.push(AdvancedSearch.create.attribute());
     },
     /**
      * Transforms Filter Attribute to Filter Group.
@@ -84,10 +86,10 @@ import * as StateUtils from '../../plugins/utils/state-utils';
     createGroup: function (attribute) {
       var items = this.attr('items');
       var index = items.indexOf(attribute);
-      items.attr(index, GGRC.Utils.AdvancedSearch.create.group([
+      items.attr(index, AdvancedSearch.create.group([
         attribute,
-        GGRC.Utils.AdvancedSearch.create.operator('AND'),
-        GGRC.Utils.AdvancedSearch.create.attribute()
+        AdvancedSearch.create.operator('AND'),
+        AdvancedSearch.create.attribute()
       ]));
     }
   });

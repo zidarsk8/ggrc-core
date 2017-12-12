@@ -29,7 +29,7 @@
     create: 'POST /api/programs',
     update: 'PUT /api/programs/{id}',
     destroy: 'DELETE /api/programs/{id}',
-    mixins: ['unique_title', 'ca_update', 'timeboxed'],
+    mixins: ['unique_title', 'ca_update', 'timeboxed', 'accessControlList'],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
@@ -123,7 +123,7 @@
     create: 'POST /api/objectives',
     update: 'PUT /api/objectives/{id}',
     destroy: 'DELETE /api/objectives/{id}',
-    mixins: ['ownable', 'unique_title', 'ca_update'],
+    mixins: ['ownable', 'unique_title', 'ca_update', 'accessControlList'],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
@@ -147,7 +147,8 @@
         },
         {attr_title: 'Reference URL', attr_name: 'reference_url'}
       ]),
-      display_attr_names: ['title', 'owner', 'status', 'last_assessment_date'],
+      display_attr_names: ['title', 'owner', 'status', 'last_assessment_date',
+        'updated_at'],
       add_item_view: GGRC.mustache_path + '/snapshots/tree_add_item.mustache',
       create_link: true,
       show_related_assessments: true,

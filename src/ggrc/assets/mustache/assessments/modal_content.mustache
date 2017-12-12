@@ -10,10 +10,7 @@
 
       {{^if new_object_form}}
         {{#if_in instance.status "Not Started,Completed,Verified,In Review"}}
-          {{#if_helpers '\
-            #if' instance.isDirty '\
-            or #if' mappedObjectsChanges.length '\
-            or #if' referenceUrlChanged}}
+          {{#if_helpers '#if' instance.isDirty 'or #if' mappedObjectsChanges.length 'or #if' referenceUrlChanged}}
           <div class="ggrc-form-item">
             <div class="alert warning width-100">
               <i class="fa fa-exclamation-triangle red"></i>
@@ -104,20 +101,20 @@
             </div>
             <div class="ggrc-form-item__checkbox-item">
               <label class="input--inline">
-                    <input tabindex="5" type="checkbox" can-value="values.Creator">
-                    Notify creator(s)
+                    <input tabindex="5" type="checkbox" can-value="values.Creators">
+                    Notify creators
                 </label>
             </div>
             <div class="ggrc-form-item__checkbox-item">
               <label class="input--inline">
-                    <input tabindex="6" type="checkbox" can-value="values.Assessor">
-                    Notify assignee(s)
+                    <input tabindex="6" type="checkbox" can-value="values.Assignees">
+                    Notify assignees
               </label>
             </div>
             <div class="ggrc-form-item__checkbox-item">
               <label class="input--inline">
-                    <input tabindex="7" type="checkbox" can-value="values.Verifier">
-                    Notify verifier(s)
+                    <input tabindex="7" type="checkbox" can-value="values.Verifiers">
+                    Notify verifiers
                 </label>
             </div>
           </checkbox-to-list>
@@ -292,6 +289,35 @@
           {{>'/static/mustache/assessments/modal_content_additional_fields.mustache'}}
         </div>
       </div>
+
+      {{#displayAssessmentIssueTracker instance.can_use_issue_tracker true}}
+        <div class="additional-fields">
+          <div class="expand-issue-tracker-link">
+            <a class="show-hidden-fields info-show-hide active" href="javascript://">
+              <span class="out">
+                <i class="fa fa-caret-right"></i>
+                SHOW
+              </span>
+              <span class="in">
+                <i class="fa fa-caret-down"></i>
+                HIDE
+              </span>
+              BUGANIZER INFO
+            </a>
+          </div>
+          <div class="hidden-issue-tracker-fields-area">
+            <issue-tracker-switcher
+              set-issue-title="true"
+              {default-title}="instance.title"
+              {instance}="instance"
+              {(is-integration-enabled)}="instance.issue_tracker.enabled"
+              {parent}="instance.audit">
+                <modal-issue-tracker-fields {instance}="instance">
+                </modal-issue-tracker-fields>
+            </issue-tracker-switcher>
+          </div>
+        </div>
+      {{/displayAssessmentIssueTracker}}
 
     </form>
     {{/instance}}
