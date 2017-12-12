@@ -40,10 +40,8 @@ import {
 } from '../../../plugins/utils/query-api-utils';
 import {
   getCustomAttributes,
-  CUSTOM_ATTRIBUTE_TYPE,
-  convertToFormViewField,
+  CUSTOM_ATTRIBUTE_TYPE as CA_UTILS_CA_TYPE,
   convertValuesToFormFields,
-  applyChangesToCustomAttributeValue,
 } from '../../../plugins/utils/ca-utils';
 import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
 import tracker from '../../../tracker';
@@ -53,6 +51,7 @@ import {REFRESH_TAB_CONTENT,
 } from '../../../events/eventTypes';
 import Permission from '../../../permission';
 import template from './info-pane.mustache';
+import {CUSTOM_ATTRIBUTE_TYPE} from '../../../plugins/utils/custom-attribute/custom-attribute-config';
 
 (function (can, GGRC, CMS) {
   'use strict';
@@ -403,26 +402,20 @@ import template from './info-pane.mustache';
           });
       },
       initializeFormFields: function () {
-        let cavs =
-          getCustomAttributes(
-            this.attr('instance'),
-            CUSTOM_ATTRIBUTE_TYPE.LOCAL
-          );
+        const cavs =
+        getCustomAttributes(
+          this.attr('instance'),
+          CA_UTILS_CA_TYPE.LOCAL
+        );
         this.attr('formFields',
           convertValuesToFormFields(cavs)
         );
       },
       initGlobalAttributes: function () {
-        let cavs =
-          getCustomAttributes(
-            this.attr('instance'),
-            CUSTOM_ATTRIBUTE_TYPE.GLOBAL
-          );
-        this.attr('globalAttributes',
-          cavs.map(function (cav) {
-            return convertToFormViewField(cav);
-          })
-        );
+        const instance = this.attr('instance');
+        const caObjects = instance
+          .customAttr({type: CUSTOM_ATTRIBUTE_TYPE.GLOBAL});
+        this.attr('globalAttributes', caObjects);
       },
       initializeDeferredSave: function () {
         this.attr('deferredSave', new DeferredTransaction(
@@ -468,11 +461,14 @@ import template from './info-pane.mustache';
           .fail(resetStatusOnConflict);
       },
       saveGlobalAttributes: function (event) {
-        let globalAttributes = event.globalAttributes;
-        let caValues = this.attr('instance.custom_attribute_values');
-        applyChangesToCustomAttributeValue(caValues, globalAttributes);
+        const instance = this.attr('instance');
+        const globalAttributes = event.globalAttributes;
 
-        return this.attr('instance').save();
+        globalAttributes.each((value, caId) => {
+          instance.customAttr(caId, value);
+        });
+
+        return instance.save();
       },
       showRequiredInfoModal: function (e, field) {
         let scope = field || e.field;
