@@ -281,7 +281,8 @@ def related(base_objects, rel_cache):
   if stubs:
     rel_cache.populate_cache(stubs)
 
-  return {o: rel_cache.cache[o] for o in base_objects if o in rel_cache.cache}
+  return {o: (rel_cache.cache[o] if o in rel_cache.cache else set())
+          for o in base_objects}
 
 
 def related_regulation_snaps(snapshot_ids):
