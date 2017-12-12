@@ -6,51 +6,91 @@
 {{#if_helpers '\
   ^is_empty' counts '\
   or #is_admin_page' }}
-{{#widget_list}}
-<li class="{{internav_icon}} {{widgetType}}">
-  {{#displayWidgetTab . instance}}
-
-  <a href="{{urlPath}}{{ internav_href }}" rel="tooltip" data-placement="bottom" title="{{ internav_display }}">
-    <div class="oneline">
-      <i class="fa fa-{{ internav_icon }} color"></i>
+<div class="tabs priority">
+  <ul class="internav {{#if_equals instance.type 'Audit'}}audit{{/if_equals}}">
+    {{#widget_list}}
       {{#if show_title}}
-        {{internav_display}}
-        {{#has_count}}({{firstnonempty count 0}}){{/has_count}}
-      {{else}}
-        {{#has_count}}{{firstnonempty count 0}}{{/has_count}}
+      <li class="{{internav_icon}} {{widgetType}} {{#if_equals contexts.active_widget.selector selector}}active{{/if_equals}}">
+        {{#displayWidgetTab . instance}}
+
+        <a href="{{urlPath}}{{ internav_href }}" rel="tooltip" data-placement="bottom" title="{{ internav_display }}">
+          <div class="oneline">
+            <i class="fa fa-{{ internav_icon }} color"></i>
+              {{internav_display}}
+              {{#has_count}}({{firstnonempty count 0}}){{/has_count}}
+            {{^count}}{{#has_count}}
+              {{^instance.constructor.obj_nav_options.show_all_tabs}}
+                {{^in_array internav_display instance.constructor.obj_nav_options.force_show_list}}
+                  <span class="closed" data-widget="{{selector}}"><i class="fa fa-times"></i></span>
+                {{/in_array}}
+              {{/instance.constructor.obj_nav_options.show_all_tabs}}
+            {{/has_count}}{{/count}}
+          </div>
+        </a>
+        {{/displayWidgetTab}}
+      </li>
       {{/if}}
-      {{^count}}{{#has_count}}
-        {{^instance.constructor.obj_nav_options.show_all_tabs}}
-          {{^in_array internav_display instance.constructor.obj_nav_options.force_show_list}}
-            <span class="closed" data-widget="{{selector}}"><i class="fa fa-times"></i></span>
-          {{/in_array}}
-        {{/instance.constructor.obj_nav_options.show_all_tabs}}
-      {{/has_count}}{{/count}}
-    </div>
-  </a>
-  {{/displayWidgetTab}}
-</li>
-{{/widget_list}}
+    {{/widget_list}}
 
 
-{{#isMenuVisible}}
-  {{#hasHiddenWidgets}}
-    <add-tab-button
-      {instance}="instance"
-      {widget-list}="widget_list"
-      {url-path}="urlPath"
-      {add-tab-title}="addTabTitle"></add-tab-button>
-  {{/hasHiddenWidgets}}
-{{/isMenuVisible}}
+    {{^if_equals instance.type 'Audit'}}
+      {{#hasHiddenWidgets}}
+        <add-tab-button
+          {instance}="instance"
+          {widget-list}="widget_list"
+          {url-path}="urlPath"
+          {add-tab-title}="addTabTitle"></add-tab-button>
+      {{/hasHiddenWidgets}}
+    {{/if_equals}}
 
+  </ul>
+</div>
 {{{render_hooks 'ObjectNav.Actions'}}}
 
-{{#if dividedTabsMode}}
-  <li class="not-priority-hide {{#if isMenuVisible}}visible{{/if}}">
-      <i class="fa fa-angle-{{#if isMenuVisible}}right{{else}}left{{/if}}"></i>
-      {{^if isMenuVisible}}
-      <a href="javascript://">{{hideTabTitle}}</a>
-      {{/if}}
-  </li>
-{{/if}}
+{{#if_equals instance.type 'Audit'}}
+<div class="tabs not-priority">
+  {{#if dividedTabsMode}}
+    <div class="not-priority-hide {{#if isMenuVisible}}visible{{/if}}">
+        <i class="fa fa-angle-{{#if isMenuVisible}}right{{else}}left{{/if}}"></i>
+        {{^if isMenuVisible}}
+        <a href="javascript://">{{hideTabTitle}}</a>
+        {{/if}}
+    </div>
+  {{/if}}
+
+  {{#isMenuVisible}}
+    <ul class="internav">
+      {{#widget_list}}
+        {{^if show_title}}
+        <li class="{{internav_icon}} {{widgetType}} {{#if_equals contexts.active_widget.selector selector}}active{{/if_equals}}">
+          {{#displayWidgetTab . instance}}
+          <a href="{{urlPath}}{{ internav_href }}" rel="tooltip" data-placement="bottom" title="{{ internav_display }}">
+            <div class="oneline">
+              <i class="fa fa-{{ internav_icon }} color"></i>
+                {{#has_count}}{{firstnonempty count 0}}{{/has_count}}
+              {{^count}}{{#has_count}}
+                {{^instance.constructor.obj_nav_options.show_all_tabs}}
+                  {{^in_array internav_display instance.constructor.obj_nav_options.force_show_list}}
+                    <span class="closed" data-widget="{{selector}}"><i class="fa fa-times"></i></span>
+                  {{/in_array}}
+                {{/instance.constructor.obj_nav_options.show_all_tabs}}
+              {{/has_count}}{{/count}}
+            </div>
+          </a>
+          {{/displayWidgetTab}}
+        </li>
+        {{/if}}
+      {{/widget_list}}
+
+      {{#hasHiddenWidgets}}
+        <add-tab-button
+          {instance}="instance"
+          {widget-list}="widget_list"
+          {url-path}="urlPath"
+          {add-tab-title}="addTabTitle"></add-tab-button>
+      {{/hasHiddenWidgets}}
+    </ul>
+  {{/isMenuVisible}}
+</div>
+{{/if_equals}}
 {{/if_helpers}}

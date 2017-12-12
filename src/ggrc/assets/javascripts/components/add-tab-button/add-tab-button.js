@@ -40,10 +40,8 @@ GGRC.Components('addTabButton', {
       return options.inverse(options.contexts);
     },
     shouldCreateObject(instance, modelShortName, options) {
-      const programModel = CMS.Models.Program;
-
       if (modelShortName() === 'Audit' &&
-        instance() instanceof programModel) {
+        instance().type === 'Program') {
         return options.fn(options.contexts);
       }
 

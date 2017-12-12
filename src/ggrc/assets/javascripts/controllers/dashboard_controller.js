@@ -391,9 +391,6 @@ import router, {buildUrl} from '../router';
         dashboardCtr.show_widget_area();
         widget.siblings().addClass('hidden').trigger('widget_hidden');
         widget.removeClass('hidden').trigger('widget_shown');
-        this.element.find('li').removeClass('active');
-        this.element.find('[href$="' + widgetModel.internav_href + '"]')
-          .closest('li').addClass('active');
       }
     },
 
