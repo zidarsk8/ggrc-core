@@ -125,21 +125,6 @@ import {
         ),
         context: Direct(
           'Context', 'related_object', 'context'),
-        authorizations: Cross('context', 'user_roles'),
-        roles: Cross('authorizations', 'role'),
-
-        // This is a dummy mapping that ensures the WorkflowOwner role is loaded
-        //  before we do the custom filter for owner_authorizations.
-        authorizations_and_roles: Multi(['authorizations', 'roles']),
-        owner_authorizations: CustomFilter(
-          'authorizations_and_roles',
-          function (binding) {
-            return binding.instance instanceof CMS.Models.UserRole &&
-                binding.instance.attr('role') &&
-                binding.instance.role.reify().attr('name') === 'WorkflowOwner';
-          }
-        ),
-        owners: Cross('owner_authorizations', 'person'),
         orphaned_objects: Multi([
           'cycles',
           'task_groups',

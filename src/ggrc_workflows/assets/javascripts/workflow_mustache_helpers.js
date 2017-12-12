@@ -76,53 +76,6 @@ import RefreshQueue from '../../../ggrc/assets/javascripts/models/refresh_queue'
     };
   });
 
-  Mustache.registerHelper('if_task_group_assignee_privileges',
-    function (instance, options) {
-      var workflow_dfd;
-      var current_user = GGRC.current_user;
-      var admin = Permission.is_allowed('__GGRC_ADMIN__');
-
-      if (!options) {
-        options = instance;
-        instance = options.context;
-      }
-      instance = Mustache.resolve(instance);
-
-      // short-circuit if admin.
-      if (admin) {
-        return options.fn(options.contexts);
-      }
-      if (instance.workflow.id in CMS.Models.Workflow.cache) {
-        workflow_dfd = new $.Deferred().resolve(instance.workflow.reify());
-      } else {
-        workflow_dfd = instance.workflow.reify().refresh();
-      }
-      workflow_dfd = workflow_dfd.then(function (workflow) {
-        return $.when(
-          workflow.get_binding('authorizations').refresh_instances(),
-          workflow.get_binding('owner_authorizations').refresh_instances()
-        );
-      });
-
-      return Mustache.defer_render('span',
-        function (authorizations, owner_auths) {
-          var owner_auth_ids = can.map(owner_auths, function (auth) {
-            return auth.instance.person && auth.instance.person.id;
-          });
-          var all_auth_ids = can.map(authorizations, function (auth) {
-            return auth.instance.person && auth.instance.person.id;
-          });
-          var task_group_contact_id = instance.contact && instance.contact.id;
-
-          if (~can.inArray(current_user.id, owner_auth_ids) ||
-              ~can.inArray(current_user.id, all_auth_ids) &&
-             (current_user.id === task_group_contact_id)) {
-            return options.fn(options.contexts);
-          }
-          return options.inverse(options.contexts);
-        }, workflow_dfd);
-    });
-
   /*
    if_recurring_workflow mustache helper
 

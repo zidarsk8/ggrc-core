@@ -4,7 +4,6 @@
 }}
 
 {{#is_allowed 'create' 'TaskGroupTask' context=instance.context}}
-{{#if_task_group_assignee_privileges instance}}
 {{^if_equals parent_instance.status 'Inactive'}}
 <div class="tree-item-add">
   <a
@@ -22,5 +21,4 @@
   </a>
 </div>
 {{/if_equals}}
-{{/if}}
 {{/is_allowed}}
