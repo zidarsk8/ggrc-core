@@ -29,31 +29,17 @@ mapper-results {
     padding: 9px 16px 7px;
   }
 
-  .list-pagination {
-    display: block;
+  .tree-pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
 
-    .tree-pagination {
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-
-      .dropdown-toggle {
-        font-size: 12px;
-      }
-
-      .dropdown-toggle,
-      ::-webkit-input-placeholder {
-        color: $gray;
-      }
+    ::-webkit-input-placeholder {
+      color: $gray;
     }
 
-    .clearfix {
-      display: none;
-    }
-
-    .pagination {
-      float: none;
-      height: auto;
+    .pagination-dropdown {
+      margin: 0;
     }
   }
 
