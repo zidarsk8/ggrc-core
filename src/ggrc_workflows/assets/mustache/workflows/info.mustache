@@ -132,12 +132,9 @@
           </div>
         </div>
 
+        {{>'/static/mustache/controls/contacts.mustache'}}
+
         <div class="row-fluid wrap-row">
-          <div class="span6">
-            <div class="rtf-block">
-              {{{render '/static/mustache/workflows/contacts.mustache' instance=instance stacked=true}}}
-            </div>
-          </div>
           <div class="span6">
             <h6>
               Repeat Workflow
@@ -147,28 +144,28 @@
                                  hide-repeat-off="false">
               </repeat-on-summary>
             <p>
+          </div>
+          <div class="span6">
             {{#instance.recurrences}}
               <h6>Next cycle start date</h6>
               {{date instance.next_cycle_start_date}}
             {{/instance.recurrences}}
           </div>
         </div>
-        <div class="row-fluid">
+        <div class="row-fluid wrap-row">
           <div class="span6">
-            <ggrc-gdrive-folder-picker {{^is_allowed 'update' instance}}readonly="true"{{/is_allowed}} instance="instance" placeholder="If selected, all workflow attachments go here." />
-          </div>
-            <div class="span6">
-              <label>
-                Need Verification for tasks?
-              </label>
-              <input type="checkbox" name="is_verification_needed"
+            <h6>Need Verification for tasks?</h6>
+            <input type="checkbox" name="is_verification_needed"
                 {{#if instance.is_verification_needed}}checked="checked"{{/if}}
                 disabled tabindex="-1">
               Show Verify button next to tasks
-            </div>
+          </div>
         </div>
-        <div class="row-fluid">
-          <div class="span12">
+        <div class="row-fluid wrap-row">
+          <div class="span6">
+            <ggrc-gdrive-folder-picker {{^is_allowed 'update' instance}}readonly="true"{{/is_allowed}} instance="instance" placeholder="If selected, all workflow attachments go here." />
+          </div>
+          <div class="span6">
             <h6>Code</h6>
             <div class="tree-description">
               {{{instance.slug}}}
