@@ -6,9 +6,7 @@
 {{#switch attr_name}}
   {{#case 'owner'}}
     {{#with_mapping 'authorizations' instance}}
-      <get-owner-people-list data="authorizations" role="'WorkflowOwner'">
-        <tree-people-list-field {source}="allOwners"/>
-      </get-owner-people-list>
+      <get-owner-people-list data="authorizations" role="'WorkflowOwner'"/>
     {{/with_mapping}}
   {{/case}}
   {{#case 'modified_by'}}

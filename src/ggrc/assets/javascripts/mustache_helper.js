@@ -2486,57 +2486,6 @@ Example:
     }
   );
 
-  /**
-   * Determine the list of people IDs that have `roleName` granted on
-   * `instance` and render the corresponding Mustache block.
-   *
-   * The list of people IDs is exposed to the helper's block context via
-   * the 'peopleIds' Array.
-   *
-   * Example usage:
-   *
-   *   {{#peopleWithRole modelInstance customRoleName}}
-   *     {{#peopleIds}}
-   *       <p>User ID {{.}} has role {{customRoleName}} granted
-   *          on {{modelInstance.type}} with ID {{modelInstance.id}}</p>
-   *     {{/peopleIds}}
-   *   {{/peopleWithRole}}
-   *
-   * @param {CMS.Models.Cacheable} instance - a model instance
-   * @param {String} roleName - the name of the custom role
-   * @param {Object} options - a CanJS options object passed to every helper
-   *
-   * @return {String} - a rendered template block from inside the helper
-   */
-  Mustache.registerHelper(
-    'peopleWithRole',
-    function (instance, roleName, options) {
-      var peopleIds;
-
-      if (arguments.length < 3) {
-        console.warn('Arguments missing for peopleWithRole helper.');
-        return options.fn({peopleIds: []});
-      }
-
-      instance = Mustache.resolve(instance);
-      roleName = Mustache.resolve(roleName);
-
-      if (!instance || !roleName) {
-        return options.fn({peopleIds: []});
-      }
-
-      peopleIds = GGRC.Utils.peopleWithRoleName(instance, roleName)
-        .map(function (person) {
-          return person.id;
-        });
-
-      if (peopleIds.length > 0) {
-        return options.fn({peopleIds: peopleIds});
-      }
-      return options.inverse({peopleIds: []});
-    }
-  );
-
   Mustache.registerHelper('modifyFieldTitle', function (type, field, options) {
     var titlesMap = {
       Cycle: 'Cycle ',
