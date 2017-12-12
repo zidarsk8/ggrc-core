@@ -9,6 +9,9 @@ import {
   getCounts,
 } from '../plugins/utils/current-page-utils';
 import router from '../router';
+import {
+  getDefaultStatesForModel,
+} from '../plugins/utils/state-utils';
 
 export default can.Control({
   defaults: {
@@ -19,8 +22,8 @@ export default can.Control({
     isShown: false,
     forceRefresh: false,
     colorsMap: {
-      Completed: '#405f77',
-      Verified: '#009925',
+      'Completed and Verified': '#405f77',
+      'Completed (no verification)': '#009925',
       Deprecated: '#fbc02d',
       'In Progress': '#3369e8',
       'Not Started': '#9e9e9e',
@@ -122,7 +125,9 @@ export default can.Control({
     let chartOptions = this.options.context.charts[type];
     // Note that chart will be refreshed only if counts were changed.
     // State changes are not checked.
-    let countsChanged = getCounts().attr(type) !== chartOptions.attr('total');
+    let countsChanged =
+      getCounts().attr(type) !== chartOptions.attr('total.assessments');
+
     if (chartOptions.attr('isInitialized') && !countsChanged &&
     !this.options.forceRefresh) {
       return;
@@ -144,10 +149,8 @@ export default can.Control({
     let that = this;
     let options = this.getChartOptions(raw);
     let data = new google.visualization.DataTable();
-    let statuses = raw.statuses.map(function (item) {
-      return item.map(function (status) {
-        return that.prepareTitle(status);
-      });
+    let statuses = raw.statuses.map(function (state) {
+      return [state.name, state.assessments];
     });
     this.options.chartOptions = options;
     this.options.data = data;
@@ -178,28 +181,20 @@ export default can.Control({
 
     return chart;
   },
-  prepareTitle: function (status) {
-    if (status === 'Verified') {
-      return 'Completed and Verified';
-    }
-    if (status === 'Completed') {
-      return 'Completed (no verification)';
-    }
-    return status;
-  },
   prepareLegend: function (type, chart, data) {
     let legendData = [];
     let that = this;
     let chartOptions = this.options.context.charts[type];
     let colorsMap = this.options.colorsMap;
 
-    data.statuses.forEach(function (statusData, rowIndex) {
+    data.statuses.forEach(function (status, rowIndex) {
       legendData.push({
-        title: that.prepareTitle(statusData[0]),
-        count: statusData[1],
-        percent: (statusData[1] / data.total * 100).toFixed(1),
+        title: status.name,
+        count: status.assessments,
+        percent: (status.assessments / data.total.assessments * 100).toFixed(1),
+        documents: status.documents,
         rowIndex: rowIndex,
-        color: colorsMap[statusData[0]],
+        color: colorsMap[status.name],
       });
     });
 
@@ -223,7 +218,7 @@ export default can.Control({
     let options = _.assign({}, this.options.chartOptions);
     let colorMaps = this.options.colorsMap;
     options.colors = raw.statuses.map(function (e) {
-      return colorMaps[e[0]];
+      return colorMaps[e.name];
     });
 
     return options;
@@ -240,29 +235,46 @@ export default can.Control({
   },
   setState: function (type, data, isLoading) {
     let chartOptions = this.options.context.charts[type];
-    chartOptions.attr('total', data.total);
-    chartOptions.attr('any', data.total > 0);
-    chartOptions.attr('none', isLoading || data.total === 0);
+    chartOptions.attr('total', data.total.assessments);
+    chartOptions.attr('totalDocuments', data.total.documents);
+    chartOptions.attr('any', data.total.assessments > 0);
+    chartOptions.attr('none', isLoading || data.total.assessments === 0);
     chartOptions.attr('isLoading', isLoading);
     chartOptions.attr('isLoaded', !isLoading);
     if (isLoading) {
       chartOptions.attr('legend', []);
     }
   },
-  parseStatuses: function (type, data) {
-    let statuses = CMS.Models[type].statuses;
-    let groups = _.object(statuses, new Array(statuses.length).fill(0));
-    let result;
-    data.forEach(function (item) {
-      if (item[1]) {
-        item[0] = 'Verified';
-      }
-      groups[item[0]]++;
+  parseStatuses: function (type, raw) {
+    let statuses = getDefaultStatesForModel(type).map((status) => {
+      return {
+        name: status,
+        assessments: 0,
+        documents: 0,
+      };
     });
-    result = _.pairs(groups);
+
+    raw.statuses.forEach((item) => {
+      let statusName;
+      let statusObj;
+
+      if (item.name === 'Completed') {
+        statusName = item.verified ?
+          'Completed and Verified' : 'Completed (no verification)';
+      } else {
+        statusName = item.name;
+      }
+
+      statusObj = statuses.find((el) => {
+        return el.name === statusName;
+      });
+      statusObj.assessments = item.assessments;
+      statusObj.documents = item.documents;
+    });
+
     return {
-      total: data.length,
-      statuses: result,
+      statuses: statuses,
+      total: raw.total,
     };
   },
   /**
