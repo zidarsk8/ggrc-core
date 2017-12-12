@@ -6,19 +6,12 @@
 import RefreshQueue from '../../models/refresh_queue';
 import template from './templates/tree-people-list-field.mustache';
 
+const TOOLTIP_PEOPLE_LIMIT = 5;
+
 const viewModel = can.Map.extend({
-  define: {
-    stub: {
-      type: 'boolean',
-      value: true,
-    },
-  },
-  filter: '@',
   source: null,
   people: [],
   peopleStr: '',
-  peopleNum: 5,
-  stub: '@',
   init: function () {
     this.refreshPeople();
   },
@@ -26,20 +19,21 @@ const viewModel = can.Map.extend({
     this.getPeopleList()
       .then((data) => {
         let peopleStr = data
-          .slice(0, this.peopleNum)
+          .slice(0, TOOLTIP_PEOPLE_LIMIT)
           .map((item) => item.email)
           .join('\n');
 
-        peopleStr += data.length > this.peopleNum ?
-          `\n and ${data.length - this.peopleNum} more` : '';
+        peopleStr += data.length > TOOLTIP_PEOPLE_LIMIT ?
+          `\n and ${data.length - TOOLTIP_PEOPLE_LIMIT} more` : '';
 
         this.attr('people', data);
         this.attr('peopleStr', peopleStr);
       });
   },
   getPeopleList: function () {
-    var sourceList = this.getSourceList();
-    var deferred = can.Deferred();
+    let source = this.attr('source');
+    let sourceList = can.isArray(source) ? source : can.makeArray(source);
+    let deferred = can.Deferred();
 
     if (!sourceList.length) {
       return deferred.resolve([]);
@@ -62,16 +56,6 @@ const viewModel = can.Map.extend({
     });
 
     return rq.trigger();
-  },
-  getSourceList: function () {
-    let filter = this.attr('filter');
-    let sourceString = 'source';
-
-    if (filter) {
-      sourceString += '.' + filter;
-    }
-
-    return can.makeArray(this.attr(sourceString));
   },
 });
 
