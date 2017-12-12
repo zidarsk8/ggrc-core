@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
+{{#if_helpers '\
+  ^is_empty' counts '\
+  or #is_admin_page' }}
 {{#widget_list}}
 <li class="{{internav_icon}} {{widgetType}}">
   {{#displayWidgetTab . instance}}
@@ -31,23 +34,18 @@
 
 
 {{#is_allowed 'update' instance}}
-{{#if widget_list.length}}
 {{^if instance.archived}}
 {{#isMenuVisible}}
 <li data-test-id="button_widget_add_2c925d94" class="hidden-widgets-list">
+  {{#hasHiddenWidgets}}
   <a href="{{urlPath}}#dropdown-widgets" class="dropdown-toggle" data-toggle="dropdown" rel="tooltip" data-placement="bottom" title="{{addTabTitle}}"><i class="fa fa-plus-circle"></i> {{addTabTitle}}</a>
+  {{/hasHiddenWidgets}}
   <div class="dropdown-menu" role="menu">
     {{#widget_list}}
       <div class="inner-nav-item">
         {{#isNotObjectVersion internav_display}}
           {{#isNotProhibitedMap instance.type model.shortName }}
-          {{^if_helpers '\
-            #if' has_count '\
-            and #if' count '\
-            or ^if' has_count '\
-            or #if' force_show '\
-            or #if' instance.constructor.obj_nav_options.show_all_tabs '\
-            or #in_array' internav_display instance.constructor.obj_nav_options.force_show_list}}
+          {{#placeInAddTab}}
 
             {{#if_helpers '\
               #if_instance_of' instance 'Program' '\
@@ -104,7 +102,7 @@
               </a>
             {{/if_helpers}}
 
-          {{/if_helpers}}
+          {{/placeInAddTab}}
           {{/isNotProhibitedMap}}
         {{/isNotObjectVersion}}
       </div>
@@ -112,7 +110,6 @@
   </div>
 </li>
 {{/isMenuVisible}}
-{{/if}}
 {{/if}}
 {{/is_allowed}}
 
@@ -126,3 +123,4 @@
       {{/if}}
   </li>
 {{/if}}
+{{/if_helpers}}

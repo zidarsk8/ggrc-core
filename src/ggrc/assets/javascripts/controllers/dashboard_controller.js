@@ -6,6 +6,7 @@
 import {
   isAdmin,
   getPageType,
+  getCounts,
 } from '../plugins/utils/current-page-utils';
 import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 import {isObjectVersion} from '../plugins/utils/object-versions-utils';
@@ -285,6 +286,8 @@ import router, {buildUrl} from '../router';
       hideTabTitle: 'Hide',
       dividedTabsMode: false,
       priorityTabs: null,
+      counts: null,
+      hasHiddenWidgets: false,
     },
   }, {
     init: function (options) {
@@ -295,7 +298,7 @@ import router, {buildUrl} from '../router';
         if (!this.options.widget_list) {
           this.options.attr('widget_list', new can.Observe.List([]));
         }
-
+        this.options.attr('counts', getCounts());
         this.options.attr('instance', instance);
         if (!(this.options.contexts instanceof can.Observe)) {
           this.options.attr('contexts', new can.Observe(this.options.contexts));
@@ -318,6 +321,7 @@ import router, {buildUrl} from '../router';
               this.options.attr('dividedTabsMode', true);
               this.options.attr('priorityTabs', priorityTabsNum);
             }
+            this.show_hide_titles();
             this.route(router.attr('widget'));
             delete this.delayed_display;
           }.bind(this);
@@ -468,6 +472,7 @@ import router, {buildUrl} from '../router';
           selector: '#' + $widget.attr('id'),
           count: count,
           has_count: count != null,
+          placeInAddTab: false,
         });
       }
       existingIndex = this.options.widget_list.indexOf(widget);
@@ -516,12 +521,10 @@ import router, {buildUrl} from '../router';
         });
       }
       this.update_add_more_link();
-      this.show_hide_titles();
     },
 
     update_add_more_link: function () {
       var hasHiddenWidgets = false;
-      var $hiddenWidgets = $('.hidden-widgets-list:not(.top-space)');
       var instance = this.options.instance || {};
       var model = instance.constructor;
       var showAllTabs = false;
@@ -535,22 +538,20 @@ import router, {buildUrl} from '../router';
       }
 
       // Update has hidden widget attr
-      $.map(this.options.widget_list, function (widget) {
+      this.options.widget_list.forEach((widget) => {
         var forceShowList = model.obj_nav_options.force_show_list;
         var forceShow = false;
+        widget.attr('placeInAddTab', false);
         if (forceShowList) {
           forceShow = forceShowList.indexOf(widget.internav_display) > -1;
         }
         if (widget.has_count && widget.count === 0 &&
-            !widget.force_show && !showAllTabs && !forceShow) {
+        !widget.force_show && !showAllTabs && !forceShow) {
+          widget.attr('placeInAddTab', true);
           hasHiddenWidgets = true;
         }
       });
-      if (hasHiddenWidgets) {
-        $hiddenWidgets.find('a').show();
-      } else {
-        $hiddenWidgets.find('a').hide();
-      }
+      this.options.attr('hasHiddenWidgets', hasHiddenWidgets);
     },
 
     show_hide_titles: function () {
@@ -586,6 +587,7 @@ import router, {buildUrl} from '../router';
 
       widget.attr('force_show', false);
       this.route(widgets[0].selector); // Switch to the first widget
+      this.update_add_more_link();
       return false; // Prevent the url change back to the widget we are hiding
     },
 
@@ -620,6 +622,9 @@ import router, {buildUrl} from '../router';
       } else {
         $hiddenArea.hide();
       }
+    },
+    '{counts} change': function () {
+      this.update_add_more_link();
     },
   });
 })(window.can, window.can.$);
