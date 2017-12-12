@@ -30,6 +30,9 @@
       </span>
     {{/using}}
   {{/case}}
+  {{#case 'type'}}
+    <tree-field {source}="instance.kind"/>
+  {{/case}}
 
   {{#case 'modified_by'}}
       <tree-field {source}="instance.modified_by" {field}="'email'"/>
