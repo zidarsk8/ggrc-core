@@ -102,7 +102,23 @@ def encoded_dict(in_dict):
 
 
 def merge_dict(destination, source, path=None):
-  """merges source into destination"""
+  """Merge source into destination.
+
+  This function prevent creation of duplicates during merging as
+  any subdict in destination related to unique key (user_email,
+  notification_id, ParentObjInfo, ...). Merging duplicated value will
+  be ignored.
+
+  Args:
+      destination: Dict in which we want to merge data. It can contain only
+          dicts or simple types as values.
+      source: Dict that should be merged. It can contain only
+          dicts or simple types as values.
+      path: List with keys to any node of source (only for internal usage).
+
+  Returns:
+      Dict with data combination from destination and source.
+  """
   if path is None:
     path = []
   for key in source:
