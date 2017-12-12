@@ -13,7 +13,6 @@ export default GGRC.Components('relatedPeopleAccessControl', {
     groups: [],
     updatableGroupId: null,
     isNewInstance: false,
-    includeRoles: [],
     excludeRoles: [],
     conflictRoles: [],
     orderOfRoles: [],
@@ -134,6 +133,8 @@ export default GGRC.Components('relatedPeopleAccessControl', {
         group.map(function (groupItem) {
           return {
             id: groupItem.person.id,
+            email: groupItem.person_email,
+            name: groupItem.person_name,
             type: 'Person',
           };
         }) :

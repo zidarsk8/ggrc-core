@@ -382,6 +382,7 @@ import RefreshQueue from './refresh_queue';
     mixins: [
       'mapping-limit',
       'inScopeObjects',
+      'inScopeObjectsPreload',
       'refetchHash',
       'issueTrackerIntegratable',
     ],
