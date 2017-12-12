@@ -19,8 +19,8 @@ const viewModel = can.Map.extend({
   },
 });
 
-GGRC.Components('getOwnerPeopleList', {
+export default can.Component.extend('getOwnerPeopleList', {
   tag: 'get-owner-people-list',
-  template: '<content/>',
-  viewModel: viewModel,
+  template: '<tree-people-list-field {source}="allOwners"/>',
+  viewModel,
 });
