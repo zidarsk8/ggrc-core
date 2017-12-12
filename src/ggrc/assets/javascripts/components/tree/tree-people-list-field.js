@@ -34,17 +34,25 @@ const viewModel = can.Map.extend({
     let source = this.attr('source');
     let sourceList = can.isArray(source) ? source : can.makeArray(source);
     let deferred = can.Deferred();
+    let emailsReadyList;
 
     if (!sourceList.length) {
       return deferred.resolve([]);
     }
-    this.loadItems(sourceList)
-      .then(function (data) {
-        deferred.resolve(data);
-      })
-      .fail(function () {
-        deferred.resolve([]);
-      });
+
+    emailsReadyList = sourceList.filter((people) => people.email);
+
+    if (emailsReadyList.length === sourceList.length) {
+      deferred.resolve(sourceList);
+    } else {
+      this.loadItems(sourceList)
+        .then(function (data) {
+          deferred.resolve(data);
+        })
+        .fail(function () {
+          deferred.resolve([]);
+        });
+    }
 
     return deferred;
   },
