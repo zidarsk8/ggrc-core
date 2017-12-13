@@ -57,7 +57,7 @@ const viewModel = can.Map.extend({
     return deferred;
   },
   loadItems: function (items) {
-    var rq = new RefreshQueue();
+    const rq = new RefreshQueue();
 
     can.each(items, function (item) {
       rq.enqueue(CMS.Models.Person.model(item));
@@ -67,10 +67,10 @@ const viewModel = can.Map.extend({
   },
 });
 
-GGRC.Components('treePeopleListField', {
+export default can.Component.extend({
   tag: 'tree-people-list-field',
-  template: template,
-  viewModel: viewModel,
+  template,
+  viewModel,
   events: {
     '{viewModel} source': function () {
       this.viewModel.refreshPeople();
