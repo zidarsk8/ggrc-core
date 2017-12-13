@@ -38,12 +38,24 @@ let ApprovalWorkflow = can.Observe({
       object_type: 'TaskGroupTask',
       name: 'Task Assignees',
     });
+    var wfAdminRole = _.find(GGRC.access_control_roles, {
+      object_type: 'Workflow',
+      name: 'Admin',
+    });
 
     return aws_dfd.then(function (aws) {
       var ret;
+      var user = GGRC.current_user;
       if (aws.length < 1) {
         ret = $.when(
           new CMS.Models.Workflow({
+            access_control_list: [{
+              ac_role_id: wfAdminRole.id,
+              person: {
+                id: user.id,
+                type: 'Person',
+              },
+            }],
             unit: null,
             status: 'Active',
             title: reviewTemplate({
@@ -53,8 +65,8 @@ let ApprovalWorkflow = can.Observe({
             object_approval: true,
             notify_on_change: true,
             notify_custom_message: notifyTemplate({
-              name: GGRC.current_user.name,
-              email: GGRC.current_user.email,
+              name: user.name,
+              email: user.email,
               type: that.original_object.constructor.model_singular,
               title: that.original_object.title,
               before: moment(that.end_date).format('MM/DD/YYYY'),

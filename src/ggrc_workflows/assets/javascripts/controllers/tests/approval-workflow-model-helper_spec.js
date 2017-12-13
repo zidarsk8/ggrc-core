@@ -5,21 +5,27 @@
 
 import {ApprovalWorkflow as Model} from '../approval-workflow-modal';
 
-describe('ApprovalWorkflow', function () {
-  describe('save() method', function () {
-    var method;
-    var originalObject;
-    var awsDfd;
-    var acrOldValues;
-    var userOldValue;
-    var currentUser;
-    var assigneeRole;
+describe('ApprovalWorkflow', ()=> {
+  describe('save() method', ()=> {
+    let method;
+    let originalObject;
+    let awsDfd;
+    let acrOldValues;
+    let userOldValue;
+    let currentUser;
+    let assigneeRole;
+    let wfAdminRole;
 
-    beforeAll(function () {
+    beforeAll(()=> {
       assigneeRole = {
         object_type: 'TaskGroupTask',
         name: 'Task Assignees',
         id: -10,
+      };
+      wfAdminRole = {
+        object_type: 'Workflow',
+        name: 'Admin',
+        id: -12,
       };
       currentUser = new can.Map({
         email: 'test@example.com',
@@ -28,20 +34,20 @@ describe('ApprovalWorkflow', function () {
       });
 
       acrOldValues = GGRC.access_control_roles;
-      GGRC.access_control_roles = [assigneeRole];
+      GGRC.access_control_roles = [assigneeRole, wfAdminRole];
 
       userOldValue = GGRC.current_user;
       GGRC.current_user = currentUser;
     });
 
-    afterAll(function () {
+    afterAll(()=> {
       GGRC.access_control_roles = acrOldValues;
       GGRC.current_user = userOldValue;
     });
 
-    beforeEach(function () {
-      var awBinding;
-      var instance;
+    beforeEach(()=> {
+      let awBinding;
+      let instance;
 
       awsDfd = new can.Deferred();
       awBinding = {
@@ -61,14 +67,14 @@ describe('ApprovalWorkflow', function () {
       method = Model.prototype.save.bind(instance);
     });
 
-    describe('no approval Workflow', function () {
-      var saveWfDfd;
-      var saveTgDfd;
-      var saveTgtDfd;
-      var saveTgoDfd;
-      var saveCycleDfd;
+    describe('no approval Workflow', ()=> {
+      let saveWfDfd;
+      let saveTgDfd;
+      let saveTgtDfd;
+      let saveTgoDfd;
+      let saveCycleDfd;
 
-      beforeEach(function () {
+      beforeEach(()=> {
         saveWfDfd = new can.Deferred();
         saveTgDfd = new can.Deferred();
         saveTgtDfd = new can.Deferred();
@@ -100,8 +106,15 @@ describe('ApprovalWorkflow', function () {
         awsDfd.resolve([]);
       });
 
-      it('creates an appropriate Workflow', function () {
+      it('creates an appropriate Workflow', ()=> {
         expect(CMS.Models.Workflow).toHaveBeenCalledWith({
+          access_control_list: [{
+            ac_role_id: wfAdminRole.id,
+            person: {
+              id: currentUser.id,
+              type: 'Person',
+            },
+          }],
           unit: null,
           status: 'Active',
           title: jasmine.any(String),
@@ -112,8 +125,8 @@ describe('ApprovalWorkflow', function () {
         });
       });
 
-      it('creates an appropriate TaskGroup', function () {
-        var wf = {};
+      it('creates an appropriate TaskGroup', ()=> {
+        const wf = {};
 
         saveWfDfd.resolve(wf);
 
@@ -125,9 +138,9 @@ describe('ApprovalWorkflow', function () {
         });
       });
 
-      it('creates an appropriate TaskGroupTask', function () {
-        var wf = {};
-        var tg = {};
+      it('creates an appropriate TaskGroupTask', ()=> {
+        const wf = {};
+        const tg = {};
 
         saveWfDfd.resolve(wf);
         saveTgDfd.resolve(tg);
@@ -151,9 +164,9 @@ describe('ApprovalWorkflow', function () {
         });
       });
 
-      it('creates an appropriate TaskGroupObject', function () {
-        var tg = {};
-        var wf = new can.Map({
+      it('creates an appropriate TaskGroupObject', ()=> {
+        const tg = {};
+        const wf = new can.Map({
           context: {},
         });
 
@@ -167,9 +180,9 @@ describe('ApprovalWorkflow', function () {
         });
       });
 
-      it('creates an appropriate Cycle', function () {
-        var tg = {};
-        var wf = {
+      it('creates an appropriate Cycle', ()=> {
+        const tg = {};
+        const wf = {
           context: {},
         };
 
@@ -185,9 +198,9 @@ describe('ApprovalWorkflow', function () {
         });
       });
 
-      it('reloads original object', function () {
-        var tg = {};
-        var wf = {
+      it('reloads original object', ()=> {
+        const tg = {};
+        const wf = {
           context: {},
         };
 
@@ -201,17 +214,17 @@ describe('ApprovalWorkflow', function () {
       });
     });
 
-    describe('couple of approval Workflows', function () {
-      var aws;
-      var tgt;
-      var tg;
-      var saveTgDfd;
-      var saveTgtDfd;
-      var refreshTgtDfd;
-      var saveCycleDfd;
-      var awInstance;
+    describe('couple of approval Workflows', ()=> {
+      let aws;
+      let tgt;
+      let tg;
+      let saveTgDfd;
+      let saveTgtDfd;
+      let refreshTgtDfd;
+      let saveCycleDfd;
+      let awInstance;
 
-      beforeEach(function () {
+      beforeEach(()=> {
         saveTgDfd = can.Deferred();
         saveTgtDfd = can.Deferred();
         refreshTgtDfd = can.Deferred();
@@ -260,22 +273,22 @@ describe('ApprovalWorkflow', function () {
         awsDfd.resolve(aws);
       });
 
-      it('refreshes first Approval WF and TGs only', function () {
+      it('refreshes first Approval WF and TGs only', ()=> {
         expect(aws[0].instance.refresh).toHaveBeenCalled();
         expect(aws[0].instance.task_groups.reify).toHaveBeenCalled();
         expect(tg.refresh).toHaveBeenCalled();
         expect(aws[1].instance.refresh).not.toHaveBeenCalled();
       });
 
-      it('updates contact for TGs', function () {
+      it('updates contact for TGs', ()=> {
         expect(tg.attr('contact')).toEqual(currentUser);
       });
 
-      it('updates TGs contact', function () {
+      it('updates TGs contact', ()=> {
         expect(tg.attr('contact')).toEqual(currentUser);
       });
 
-      it('updates TGTs ACL', function () {
+      it('updates TGTs ACL', ()=> {
         saveTgDfd.resolve(tg);
         refreshTgtDfd.resolve(tgt);
 
@@ -287,7 +300,7 @@ describe('ApprovalWorkflow', function () {
           .toEqual('Person');
       });
 
-      it('creates an appropriate Cycle', function () {
+      it('creates an appropriate Cycle', ()=> {
         saveTgDfd.resolve(tg);
         refreshTgtDfd.resolve(tgt);
         saveTgtDfd.resolve();
@@ -299,7 +312,7 @@ describe('ApprovalWorkflow', function () {
         });
       });
 
-      it('reloads original object', function () {
+      it('reloads original object', ()=> {
         saveTgDfd.resolve(tg);
         refreshTgtDfd.resolve(tgt);
         saveTgtDfd.resolve();
