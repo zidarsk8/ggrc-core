@@ -7,6 +7,7 @@ import Component from '../read-more';
 
 describe('GGRC.Component.ReadMore', () => {
   let vm;
+
   beforeEach(() => {
     vm = new (can.Map.extend(Component.prototype.viewModel));
   });
@@ -47,57 +48,6 @@ describe('GGRC.Component.ReadMore', () => {
         vm.attr('maxLinesNumber', i);
         expect(vm.attr('cssClass')).toEqual('ellipsis-truncation-' + i);
       }
-    });
-  });
-  describe('isOverflowing(element) method', () => {
-    let element;
-
-    describe('if component is not expanded', () => {
-      it('sets true to overflowing' +
-      ' if scrollHeight of element greater then clientHeight', () => {
-        vm.attr('expanded', false);
-        element = {
-          scrollHeight: 100,
-          clientHeight: 50,
-        };
-        vm.isOverflowing(element);
-        expect(vm.attr('overflowing')).toBe(true);
-      });
-      it('sets false to overflowing if scrollHeight' +
-      ' of element less or equal then clientHeight', () => {
-        vm.attr('expanded', false);
-        element = {
-          scrollHeight: 100,
-          clientHeight: 101,
-        };
-        vm.isOverflowing(element);
-        expect(vm.attr('overflowing')).toBe(false);
-      });
-    });
-
-    describe('if component is expanded', () => {
-      it('sets true to overflowing if clientHeight of element' +
-      ' greater or equal then minimal allowed height', () => {
-        vm.attr('expanded', true);
-        vm.attr('lineHeight', 20);
-        vm.attr('maxLinesNumber', 5);
-        element = {
-          clientHeight: 100,
-        };
-        vm.isOverflowing(element);
-        expect(vm.attr('overflowing')).toBe(true);
-      });
-      it('sets false to overflowing if clientHeight of element' +
-      ' less then minimal allowed height', () => {
-        vm.attr('expanded', true);
-        vm.attr('lineHeight', 20);
-        vm.attr('maxLinesNumber', 5);
-        element = {
-          clientHeight: 80,
-        };
-        vm.isOverflowing(element);
-        expect(vm.attr('overflowing')).toBe(false);
-      });
     });
   });
 });

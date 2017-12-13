@@ -29,7 +29,6 @@ const viewModel = {
   },
   expanded: false,
   overflowing: false,
-  lineHeight: null,
   btnText() {
     return this.attr('expanded') ? readLess : readMore;
   },
@@ -37,29 +36,30 @@ const viewModel = {
     ev.stopPropagation();
     this.attr('expanded', !this.attr('expanded'));
   },
-  checkOverflowing(el) {
-    const $element = $(el).find('.read-more__body');
-    const element = $element[0];
+  updateOverflowing(el) {
+    let truncatedHeight;
+    let extendedHeight;
+    const readMore = $(el);
+    const linesNumber = this.attr('maxLinesNumber');
 
-    this.attr('lineHeight',
-      parseInt($element.css('line-height'), 10));
+    // have to use opacity:0 when we use visibility:hidden line clamp
+    // is not working properly
+    const clonedReadMoreWrap = readMore.find('div.read-more')
+      .clone()
+      .css({position: 'absolute', opacity: 0});
 
-    if (element) {
-      this.isOverflowing(element);
+    const clonedReadMoreBody = clonedReadMoreWrap.find('div.read-more__body');
+    clonedReadMoreWrap.appendTo(readMore);
+
+    if (!clonedReadMoreBody.hasClass(`ellipsis-truncation-${linesNumber}`)) {
+      clonedReadMoreBody.addClass(`ellipsis-truncation-${linesNumber}`);
     }
-  },
-  isOverflowing(element) {
-    let result;
-    const clientHeight = element.clientHeight;
-    const scrollHeight = element.scrollHeight;
 
-    if (!this.attr('expanded')) {
-      result = scrollHeight > clientHeight;
-    } else {
-      result = clientHeight >=
-        (this.attr('lineHeight') * this.attr('maxLinesNumber'));
-    }
-    this.attr('overflowing', result);
+    truncatedHeight = clonedReadMoreBody.height();
+    clonedReadMoreBody.removeClass(`ellipsis-truncation-${linesNumber}`);
+    extendedHeight = clonedReadMoreBody.height();
+    clonedReadMoreWrap.remove();
+    this.attr('overflowing', extendedHeight > truncatedHeight);
   },
 };
 
@@ -67,9 +67,21 @@ export default can.Component.extend({
   tag: 'read-more',
   template,
   viewModel,
+  init() {
+    const observedElement = $(arguments[0]).children()[0];
+    const observer = new MutationObserver((mutations) => {
+      if (mutations.find((mutation) => mutation.type === 'childList')) {
+        this.viewModel.updateOverflowing(arguments[0]);
+      }
+    });
+    observer.observe(observedElement, {childList: true, subtree: true});
+  },
   events: {
-    '{element} mouseover'() {
-      this.viewModel.checkOverflowing(this.element);
+    inserted() {
+      this.viewModel.updateOverflowing(this.element);
+    },
+    '{window} resize'() {
+      this.viewModel.updateOverflowing(this.element);
     },
   },
 });
