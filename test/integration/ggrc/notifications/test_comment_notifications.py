@@ -139,6 +139,7 @@ class TestCommentNotification(TestCase):
     _, notif_data = common.get_daily_notifications()
 
     assignee_notifs = notif_data.get("user@example.com", {})
+    common.sort_comments(assignee_notifs)
     comment_notifs = assignee_notifs.get("comment_created", {})
     self.assertEqual(len(comment_notifs), 3)  # for 3 different Assessments
 
