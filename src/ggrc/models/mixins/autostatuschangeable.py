@@ -7,13 +7,13 @@ import datetime
 
 from sqlalchemy import event
 from sqlalchemy import inspect
-from sqlalchemy.orm.session import Session
+from sqlalchemy.orm import session
 
 from ggrc.models import document
+from ggrc.models import mixins
+from ggrc.models.mixins import statusable
 from ggrc.models import relationship
 
-from ggrc.models.mixins import CustomAttributable
-from ggrc.models.mixins.statusable import Statusable
 from ggrc.services import signals
 
 
@@ -34,8 +34,8 @@ class AutoStatusChangeable(object):
 
   FIRST_CLASS_EDIT_MAPPING = {
       'MONITOR_STATES': {
-          Statusable.DONE_STATE,
-          Statusable.FINAL_STATE
+          statusable.Statusable.DONE_STATE,
+          statusable.Statusable.FINAL_STATE
       },
       'TRACKED_ATTRIBUTES': {
           'title',
@@ -55,36 +55,51 @@ class AutoStatusChangeable(object):
       'Document': {
           'key': lambda x: x.document_type,
           'mappings': {
-              document.Document.REFERENCE_URL: {Statusable.DONE_STATE,
-                                                Statusable.FINAL_STATE},
-              document.Document.ATTACHMENT: {Statusable.DONE_STATE,
-                                             Statusable.FINAL_STATE,
-                                             Statusable.START_STATE},
-              document.Document.URL: {Statusable.DONE_STATE,
-                                      Statusable.FINAL_STATE,
-                                      Statusable.START_STATE},
+              document.Document.REFERENCE_URL: {
+                  statusable.Statusable.DONE_STATE,
+                  statusable.Statusable.FINAL_STATE
+              },
+              document.Document.ATTACHMENT: {
+                  statusable.Statusable.DONE_STATE,
+                  statusable.Statusable.FINAL_STATE,
+                  statusable.Statusable.START_STATE
+              },
+              document.Document.URL: {
+                  statusable.Statusable.DONE_STATE,
+                  statusable.Statusable.FINAL_STATE,
+                  statusable.Statusable.START_STATE
+              },
           },
       },
       'Snapshot': {
           'key': lambda _: 'ALL',
           'mappings': {
-              'ALL': {Statusable.DONE_STATE,
-                      Statusable.FINAL_STATE},
+              'ALL': {
+                  statusable.Statusable.DONE_STATE,
+                  statusable.Statusable.FINAL_STATE
+              },
           },
       },
       'Comment': {
           'key': lambda _: 'ALL',
           'mappings': {
-              'ALL': {Statusable.START_STATE},
+              'ALL': {
+                  statusable.Statusable.START_STATE
+              },
           },
       },
   }
 
   CUSTOM_ATTRS_STATUS_MAPPING = {
-      'GCA': {Statusable.DONE_STATE, Statusable.FINAL_STATE},
-      'LCA': {Statusable.DONE_STATE,
-              Statusable.FINAL_STATE,
-              Statusable.START_STATE},
+      'GCA': {
+          statusable.Statusable.DONE_STATE,
+          statusable.Statusable.FINAL_STATE
+      },
+      'LCA': {
+          statusable.Statusable.DONE_STATE,
+          statusable.Statusable.FINAL_STATE,
+          statusable.Statusable.START_STATE
+      },
   }
 
   _need_status_reset = False
@@ -180,7 +195,7 @@ class AutoStatusChangeable(object):
       obj (db.Model): Object on which we will perform manipulation.
     """
     # pylint: disable=protected-access
-    if not isinstance(obj, CustomAttributable):
+    if not isinstance(obj, mixins.CustomAttributable):
       return
     monitor_states = []
     local_ca = []
@@ -318,5 +333,5 @@ class AutoStatusChangeable(object):
 # pylint: disable=fixme
 # TODO: find a way to listen for updates only for classes that use
 # AutoStatusChangeable, not for every flush event for every session
-event.listen(Session, 'before_flush',
+event.listen(session.Session, 'before_flush',
              AutoStatusChangeable.adjust_status_before_flush)

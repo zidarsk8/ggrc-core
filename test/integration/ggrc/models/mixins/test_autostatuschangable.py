@@ -9,10 +9,10 @@ from ggrc import models
 from ggrc.access_control.role import get_custom_roles_for
 from integration.ggrc import generator
 from integration.ggrc.models import factories
-from integration.ggrc.models.test_assessment import TestAssessmentBase
+from integration.ggrc.models import test_assessment
 
 
-class TestMixinAutoStatusChangeableBase(TestAssessmentBase):
+class TestMixinAutoStatusChangeableBase(test_assessment.TestAssessmentBase):
   """Base Test case for AutoStatusChangeable mixin"""
 
   def setUp(self):
@@ -418,8 +418,10 @@ class TestDocuments(TestMixinAutoStatusChangeableBase):
         'title': 'google.com',
         'link': 'google.com',
     }
-    response = self.api.put(assessment, {'actions': {
-        'add_related': [related_document]}
+    response = self.api.put(assessment, {
+        'actions': {
+            'add_related': [related_document]
+        }
     })
     assessment = self.refresh_object(assessment)
     self.assert200(response)
@@ -450,12 +452,14 @@ class TestDocuments(TestMixinAutoStatusChangeableBase):
                                            link='google.com')
       factories.RelationshipFactory(destination=assessment, source=document)
 
-    response = self.api.put(assessment, {'actions': {'remove_related': [
-        {
-            'id': document.id,
-            'type': 'Document',
+    response = self.api.put(assessment, {
+        'actions': {
+            'remove_related': [{
+                'id': document.id,
+                'type': 'Document',
+            }]
         }
-    ]}})
+    })
     assessment = self.refresh_object(assessment)
     self.assert200(response)
     self.assertEqual(expected_status, assessment.status)
@@ -690,14 +694,16 @@ class TestOther(TestMixinAutoStatusChangeableBase):
   def test_add_comment_status_check(self, from_status, expected_status):
     """Move Assessment from '{0}' to '{1}' when comment is added."""
     assessment = factories.AssessmentFactory(status=from_status)
-    response = self.api.put(assessment, {'actions': {'add_related': [
-        {
-            'id': None,
-            'type': 'Comment',
-            'description': 'comment',
-            'custom_attribute_definition_id': None,
+    response = self.api.put(assessment, {
+        'actions': {
+            'add_related': [{
+                'id': None,
+                'type': 'Comment',
+                'description': 'comment',
+                'custom_attribute_definition_id': None,
+            }]
         }
-    ]}})
+    })
     assessment = self.refresh_object(assessment)
     self.assert200(response)
     self.assertEqual(expected_status, assessment.status)
