@@ -5,6 +5,7 @@
 
 import '../object-list-item/business-object-list-item';
 import '../read-more/read-more';
+import RefreshQueue from '../../models/refresh_queue';
 
 (function (can, GGRC) {
   'use strict';

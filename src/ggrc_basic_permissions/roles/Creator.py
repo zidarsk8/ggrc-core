@@ -10,7 +10,6 @@ owner_base = [
     "Categorization",
     "Category",
     "ControlCategory",
-    "ObjectPerson",
     "Option",
     {
         "type": "BackgroundTask",

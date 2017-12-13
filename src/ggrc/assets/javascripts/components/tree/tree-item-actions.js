@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../lazy-render/lazy-render';
+import '../show-related-assessments-button/show-related-assessments-button';
 import template from './templates/tree-item-actions.mustache';
 import {
   isSnapshot,

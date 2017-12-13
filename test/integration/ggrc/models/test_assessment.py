@@ -2,6 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration tests for Assessment"""
+# pylint: disable=too-many-lines
 
 import collections
 import datetime
@@ -514,6 +515,7 @@ class TestAssessment(TestAssessmentBase):
         self.assert_mapped_role(role, person_email, snapshot)
 
 
+@ddt.ddt
 @base.with_memcache
 class TestAssessmentUpdates(ggrc.TestCase):
   """ Test various actions on Assessment updates """
@@ -594,6 +596,63 @@ class TestAssessmentUpdates(ggrc.TestCase):
         new_state,
         content.json['assessments_collection']['assessments'][0]['status']
     )
+
+  @ddt.data(
+      (None, "Control", "Plan - {}", "Plan - 0<br>Plan - 1<br>Plan - 2"),
+      ("", "Control", "Plan - {}",
+       "Plan - 0<br>Plan - 1<br>Plan - 2"),
+      ("Asmnt plan", "Control", "Plan - {}",
+       "Asmnt plan<br>Plan - 0<br>Plan - 1<br>Plan - 2"),
+      ("Asmnt plan", "Market", "Plan - {}", "Asmnt plan"),
+      (None, "Control", None, ""),
+      ("", "Control", None, ""),
+      ("Asmnt plan", "Control", None, "Asmnt plan"),
+      (None, "Control", "", ""),
+      ("", "Control", "", ""),
+      ("Asmnt plan", "Control", "", "Asmnt plan"),
+  )
+  @ddt.unpack
+  def test_assessment_proc_on_map(self, asmnt_plan, asmnt_type, test_plan,
+                                  expected_plan):
+    """Test if Snapshot test_plan added to Assessment after mapping"""
+    # pylint: disable=too-many-locals
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(
+          audit=audit, assessment_type=asmnt_type, test_plan=asmnt_plan
+      )
+      factories.RelationshipFactory(source=audit, destination=assessment)
+      controls = [
+          factories.ControlFactory(
+              test_plan=test_plan.format(i) if test_plan else test_plan
+          )
+          for i in range(3)
+      ]
+    snapshots = self._create_snapshots(audit, controls)
+
+    relation = [{
+        "relationship": {
+            "context": {
+                "context_id": None,
+                "id": assessment.context_id,
+                "type": "Context"
+            },
+            "destination": {
+                "id": snapshot.id,
+                "type": "Snapshot"
+            },
+            "source": {
+                "id": assessment.id,
+                "type": "Assessment"
+            }
+        }
+    } for snapshot in snapshots]
+
+    response = self.api.post(all_models.Relationship, relation)
+    self.assertEqual(response.status_code, 200)
+
+    asmnt = all_models.Assessment.query.get(assessment.id)
+    self.assertEqual(asmnt.test_plan, expected_plan)
 
 
 @ddt.ddt
@@ -721,8 +780,10 @@ class TestAssessmentGeneration(TestAssessmentBase):
         test_plan_procedure=True
     )
     response = self.assessment_post(template)
-    self.assertEqual(response.json["assessment"]["test_plan"],
-                     test_plan)
+    self.assertEqual(
+        response.json["assessment"]["test_plan"],
+        "<br>".join([template.procedure_description, test_plan])
+    )
 
   def test_ca_order(self):
     """Test LCA/GCA order in Assessment"""
@@ -1161,3 +1222,33 @@ class TestAssessmentGeneration(TestAssessmentBase):
       self.assertEqual(assessment.assessment_type, exp_type)
     else:
       self.assertEqual(response.status_code, 400)
+
+  def test_changing_text_fields_should_not_change_status(self):
+    """Test Assessment does not change status if 'design', 'operationally',
+    'notes' posted as empty strings
+    """
+    test_state = "START_STATE"
+    response = self.assessment_post()
+    self.assertEqual(response.status_code, 201)
+    asmt = all_models.Assessment.query.one()
+    self.assertEqual(asmt.status,
+                     getattr(all_models.Assessment, test_state))
+    response = self.assessment_post(
+        extra_data={
+            "id": asmt.id,
+            "design": "",
+            "operationally": "",
+            "notes": ""
+        }
+    )
+    self.assertEqual(response.status_code, 201)
+    assessment = self.refresh_object(asmt)
+    self.assertEqual(assessment.status,
+                     getattr(all_models.Assessment, test_state))
+
+  def test_generated_test_plan(self):
+    """Check if generated Assessment inherit test plan of Snapshot"""
+    test_plan = self.control.test_plan
+    response = self.assessment_post()
+    self.assertEqual(response.status_code, 201)
+    self.assertEqual(response.json["assessment"]["test_plan"], test_plan)

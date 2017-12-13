@@ -487,44 +487,6 @@
       roles.unshift('none');
       return _.max(roles, Array.prototype.indexOf.bind(roleOrder));
     },
-
-    /**
-     * Compute a list of people IDs that have `roleName` granted on `instance`.
-
-     * @param {CMS.Models.Cacheable} instance - a model instance
-     * @param {String} roleName - the name of the custom role
-     *
-     * @return {Array} - list of people
-     */
-    peopleWithRoleName: function (instance, roleName) {
-      var modelRoles;
-      var peopleIds;
-      var roleId;
-
-      // get role ID by roleName
-      modelRoles = _.filter(
-        GGRC.access_control_roles,
-        {object_type: instance.class.model_singular, name: roleName});
-
-      if (modelRoles.length === 0) {
-        console.warn('peopleWithRole: role not found for instance type');
-        return [];
-      } else if (modelRoles.length > 1) {
-        console.warn('peopleWithRole: found more than a single role');
-        // We do not exit, as we have a reasonable fallback - picking
-        // the first match.
-      }
-
-      roleId = modelRoles[0].id;
-
-      peopleIds = _
-          .chain(instance.access_control_list)
-          .filter({ac_role_id: roleId})
-          .map('person')
-          .value();
-
-      return peopleIds;
-    },
     hasRoleForContext: function (userId, contextId, roleName) {
       var deferred = $.Deferred();
       var contextRoles;
@@ -567,11 +529,9 @@
      * @return {String} assignees types separated by commas
      */
     getAssigneeType: function (instance) {
-      const assigneeRoles = ['Assignees', 'Creators', 'Verifiers'];
       let currentUser = GGRC.current_user;
       let roles = GGRC.access_control_roles
-        .filter((item) => item.object_type === instance.type &&
-          assigneeRoles.indexOf(item.name) > -1);
+        .filter((item) => item.object_type === instance.type);
       let userType = null;
 
       if (!instance || !currentUser) {

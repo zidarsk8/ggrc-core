@@ -19,6 +19,12 @@
       width: 100%;
     }
 
+    .people-group__title-content {
+      display: flex;
+      font-weight: bold;
+      margin-bottom: 0px;
+    }
+
     .people-group__title {
       text-transform: uppercase;
       overflow: hidden;
@@ -26,6 +32,7 @@
       text-overflow: ellipsis;
       max-width: 160px;
       margin-right: 4px;
+      font-size: 11px;
 
       &--deletable {
         font-size: 12px;
@@ -33,13 +40,6 @@
         margin-bottom: 0px;
         max-width: 240px;
       }
-    }
-
-    .people-group__title-content {
-      display: flex;
-      font-size: 12px;
-      font-weight: bold;
-      margin-bottom: 0px;
     }
 
     .people-group__title-spinner {
@@ -83,6 +83,7 @@
 
     .editable-people-group__label {
       line-height: 28px;
+      font-size: 11px;
     }
 
     .editable-people-group__unmap {

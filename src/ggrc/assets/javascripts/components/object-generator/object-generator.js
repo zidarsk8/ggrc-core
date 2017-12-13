@@ -12,6 +12,7 @@ import '../../components/collapsible-panel/collapsible-panel';
 import '../../components/unified-mapper/mapper-results';
 import '../../components/mapping-controls/mapping-type-selector';
 import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
+import template from './object-generator.mustache';
 
 (function (can, $) {
   'use strict';
@@ -22,8 +23,7 @@ import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
    */
   GGRC.Components('objectGenerator', {
     tag: 'object-generator',
-    template: can.view(GGRC.mustache_path +
-      '/components/object-generator/object-generator.mustache'),
+    template: template,
     viewModel: function (attrs, parentViewModel) {
       return ObjectOperationsBaseVM.extend({
         object: attrs.object,
@@ -39,17 +39,18 @@ import ObjectOperationsBaseVM from '../view-models/object-operations-base-vm';
           //  disable changing of object type while loading
           //  to prevent errors while speedily selecting different types
           this.attr('is_loading');
-        }
+        },
       });
     },
 
     events: {
       inserted: function () {
-        var self = this;
         this.viewModel.attr('selected').replace([]);
         this.viewModel.attr('entries').replace([]);
 
-        self.viewModel.attr('submitCbs').fire();
+        // show loading indicator before actual
+        // Assessment Template is loading
+        this.viewModel.attr('is_loading', true);
       },
       closeModal: function () {
         this.viewModel.attr('is_saving', false);

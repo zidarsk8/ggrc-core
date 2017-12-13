@@ -25,25 +25,27 @@
       <label class="ggrc-form-item__label">
         Hotlist ID
       </label>
-      <input data-id="code_txtbx"
-        class="input-block-level"
+      <numberbox
+        attr-data-id="code_txtbx"
+        additional-class="input-block-level"
         placeholder="Enter Hotlist ID"
-        type="text"
-        {($value)}="instance.issue_tracker.hotlist_id"/>
+        {(value)}="instance.issue_tracker.hotlist_id">
+      </numberbox>
     </div>
     <div class="ggrc-form-item__multiple-row {{#instance.computed_errors.issue_tracker_component_id}}field-failure{{/instance.computed_errors.issue_tracker_component_id}}">
       <label class="form-label required-label ggrc-form-item__label">
         Component ID
         <i class="fa fa-asterisk"></i>
       </label>
-      <input data-id="code_txtbx"
-        class="input-block-level"
+      <numberbox
+        attr-data-id="code_txtbx"
+        additional-class="input-block-level"
         placeholder="Enter Component ID"
-        type="text"
-        {($value)}="instance.issue_tracker.component_id"/>
-        {{#instance.computed_errors.issue_tracker_component_id}}
-          <label class="help-inline warning">{{this}}</label>
-        {{/instance.computed_errors.issue_tracker_component_id}}
+        {(value)}="instance.issue_tracker.component_id">
+      </numberbox>
+      {{#instance.computed_errors.issue_tracker_component_id}}
+        <label class="help-inline warning">{{this}}</label>
+      {{/instance.computed_errors.issue_tracker_component_id}}
     </div>
     <div class="ggrc-form-item__multiple-row">
       <label class="ggrc-form-item__label">

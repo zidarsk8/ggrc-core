@@ -77,7 +77,8 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
 
   REWORK_NEEDED = u"Rework Needed"
   NOT_DONE_STATES = statusable.Statusable.NOT_DONE_STATES | {REWORK_NEEDED, }
-  VALID_STATES = tuple(NOT_DONE_STATES | statusable.Statusable.DONE_STATES)
+  VALID_STATES = tuple(NOT_DONE_STATES | statusable.Statusable.DONE_STATES |
+                       statusable.Statusable.INACTIVE_STATES)
 
   class Labels(object):  # pylint: disable=too-few-public-methods
     """Choices for label enum."""
@@ -151,6 +152,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'assessment_type',
       reflection.Attribute('issue_tracker', create=False, update=False),
       reflection.Attribute('archived', create=False, update=False),
+      reflection.Attribute('folder', create=False, update=False),
       reflection.Attribute('object', create=False, update=False),
   )
 
@@ -158,6 +160,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
       'archived',
       'design',
       'operationally',
+      'folder',
   ]
 
   _custom_publish = {
@@ -165,8 +168,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   }
 
   @classmethod
-  def indexed_query(cls):
-    query = super(Assessment, cls).indexed_query()
+  def _populate_query(cls, query):
     return query.options(
         orm.Load(cls).undefer_group(
             "Assessment_complete",
@@ -177,6 +179,19 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
             "Audit_complete",
         ),
     )
+
+  @classmethod
+  def eager_query(cls):
+    return cls._populate_query(super(Assessment, cls).eager_query())
+
+  @classmethod
+  def indexed_query(cls):
+    return cls._populate_query(super(Assessment, cls).indexed_query())
+
+  def log_json(self):
+    out_json = super(Assessment, self).log_json()
+    out_json["folder"] = self.folder
+    return out_json
 
   _tracked_attrs = {
       'description',
@@ -233,7 +248,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
 
   @orm.reconstructor
   def init_on_load(self):
-      self._warnings = collections.defaultdict(list)
+    self._warnings = collections.defaultdict(list)
 
   def add_warning(self, domain, msg):
     self._warnings[domain].append(msg)
@@ -253,6 +268,10 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   def archived(self):
     """Returns a boolean whether assessment is archived or not."""
     return self.audit.archived if self.audit else False
+
+  @simple_property
+  def folder(self):
+    return self.audit.folder if self.audit else ""
 
   def validate_conclusion(self, value):
     return value if value in self.VALID_CONCLUSIONS else ""

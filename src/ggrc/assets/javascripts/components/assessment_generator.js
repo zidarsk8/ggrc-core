@@ -3,6 +3,9 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import tracker from '../tracker';
+import RefreshQueue from '../models/refresh_queue';
+
 (function (_, can, $, GGRC, CMS) {
   'use strict';
 
@@ -18,6 +21,10 @@
       'a click': function (el, ev) {
         var instance = this.scope.attr('audit') || GGRC.page_instance();
         this._results = null;
+        tracker.start(tracker.FOCUS_AREAS.ASSESSMENT,
+          tracker.USER_JOURNEY_KEYS.LOADING,
+          tracker.USER_ACTIONS.ASSESSMENT.OPEN_ASMT_GEN_MODAL);
+
         import(/*webpackChunkName: "mapper"*/ '../controllers/mapper/mapper').then(mapper => {
           mapper.ObjectGenerator.launch(el, {
             object: 'Audit',

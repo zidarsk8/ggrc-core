@@ -45,7 +45,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
   test_plan_procedure = db.Column(db.Boolean, nullable=False, default=False)
 
   # procedure description
-  procedure_description = db.Column(db.Text, nullable=True)
+  procedure_description = db.Column(db.Text, nullable=False, default=u"")
 
   # the people that should be assigned by default to each assessment created
   # within the releated audit
@@ -118,6 +118,7 @@ class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
           "display_name": "Archived",
           "mandatory": False,
           "ignore_on_update": True,
+          "view_only": True,
       },
       "template_custom_attributes": {
           "display_name": "Custom Attributes",

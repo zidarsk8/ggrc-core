@@ -8,8 +8,10 @@ import '../assessment-local-ca';
 import '../assessment-custom-attributes';
 import '../assessment-people';
 import '../assessment-object-type-dropdown';
-import '../mapped-objects/mapped-related-information';
-import '../mapped-objects/mapped-comments';
+import '../attach-button';
+import '../info-pane-save-status';
+import '../../comment/comment-add-form';
+import '../../comment/mapped-comments';
 import '../mapped-objects/mapped-controls';
 import '../../assessment/map-button-using-assessment-type';
 import '../../ca-object/ca-object-modal-content';
@@ -23,10 +25,14 @@ import '../../object-change-state/object-change-state';
 import '../../related-objects/related-assessments';
 import '../../related-objects/related-issues';
 import '../../issue-tracker/issue-tracker-switcher';
+import '../../object-list-item/editable-document-object-list-item';
+import '../../object-state-toolbar/object-state-toolbar';
+import '../../loading/loading-status';
 import './info-pane-issue-tracker-fields';
 import '../../tabs/tab-container';
 import './inline-item';
 import './create-url';
+import './confirm-edit-action';
 import {
   buildParam,
   batchRequests,
@@ -39,11 +45,12 @@ import {
   applyChangesToCustomAttributeValue,
 } from '../../../plugins/utils/ca-utils';
 import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
+import tracker from '../../../tracker';
+import {REFRESH_TAB_CONTENT} from '../../../events/eventTypes';
+import template from './info-pane.mustache';
 
 (function (can, GGRC, CMS) {
   'use strict';
-  var tpl = can.view(GGRC.mustache_path +
-    '/components/assessment/info-pane/info-pane.mustache');
   const editableStatuses = ['Not Started', 'In Progress', 'Rework Needed'];
 
   /**
@@ -51,7 +58,7 @@ import DeferredTransaction from '../../../plugins/utils/deferred-transaction-uti
    */
   GGRC.Components('assessmentInfoPane', {
     tag: 'assessment-info-pane',
-    template: tpl,
+    template: template,
     viewModel: {
       documentTypes: {
         evidences: CMS.Models.Document.EVIDENCE,
@@ -231,9 +238,9 @@ import DeferredTransaction from '../../../plugins/utils/deferred-transaction-uti
           .always(function () {
             this.attr('isUpdating' + can.capitalize(type), false);
 
-            if (this.attr('isUpdatingRelatedItems')) {
-              this.attr('isUpdatingRelatedItems', false);
-            }
+            tracker.stop(this.attr('instance.type'),
+              tracker.USER_JOURNEY_KEYS.NAVIGATION,
+              tracker.USER_ACTIONS.OPEN_INFO_PANE);
           }.bind(this));
         return dfd;
       },
@@ -377,16 +384,20 @@ import DeferredTransaction from '../../../plugins/utils/deferred-transaction-uti
       updateRelatedItems: function () {
         this.attr('isUpdatingRelatedItems', true);
 
-        this.attr('mappedSnapshots')
-          .replace(this.loadSnapshots());
-        this.attr('comments')
-          .replace(this.loadComments());
-        this.attr('evidences')
-          .replace(this.loadEvidences());
-        this.attr('urls')
-          .replace(this.loadUrls());
-        this.attr('referenceUrls')
-          .replace(this.loadReferenceUrls());
+        this.attr('instance').getRelatedObjects()
+          .then((data) => {
+            this.attr('mappedSnapshots').replace(data.Snapshot);
+            this.attr('comments').replace(data.Comment);
+            this.attr('evidences').replace(data['Document:EVIDENCE']);
+            this.attr('urls').replace(data['Document:URL']);
+            this.attr('referenceUrls').replace(data['Document:REFERENCE_URL']);
+
+            this.attr('isUpdatingRelatedItems', false);
+
+            tracker.stop(this.attr('instance.type'),
+              tracker.USER_JOURNEY_KEYS.NAVIGATION,
+              tracker.USER_ACTIONS.OPEN_INFO_PANE);
+          });
       },
       initializeFormFields: function () {
         var cavs =
@@ -420,8 +431,16 @@ import DeferredTransaction from '../../../plugins/utils/deferred-transaction-uti
         var isUndo = event.undo;
         var newStatus = event.state;
         var instance = this.attr('instance');
-        var self = this;
         var previousStatus = instance.attr('previousStatus') || 'In Progress';
+        let stopFn = tracker.start(instance.type,
+          tracker.USER_JOURNEY_KEYS.NAVIGATION,
+          tracker.USER_ACTIONS.ASSESSMENT.CHANGE_STATUS);
+        const resetStatusOnConflict = (object, xhr) => {
+          if (xhr && xhr.status === 409 && xhr.remoteObject) {
+            instance.attr('status', xhr.remoteObject.status);
+          }
+        };
+
         this.attr('onStateChangeDfd', can.Deferred());
 
         if (isUndo) {
@@ -431,25 +450,25 @@ import DeferredTransaction from '../../../plugins/utils/deferred-transaction-uti
         }
         instance.attr('isPending', true);
 
-        this.attr('formState.formSavedDeferred')
-          .then(function () {
-            instance.refresh().then(function () {
-              instance.attr('status', isUndo ? previousStatus : newStatus);
+        return this.attr('formState.formSavedDeferred')
+          .then(() => {
+            instance.attr('status', isUndo ? previousStatus : newStatus);
 
-              if (instance.attr('status') === 'In Review' && !isUndo) {
-                $(document.body).trigger('ajax:flash',
-                  {hint: 'The assessment is complete. ' +
-                  'The verifier may revert it if further input is needed.'});
-              }
+            if (instance.attr('status') === 'In Review' && !isUndo) {
+              $(document.body).trigger('ajax:flash',
+                {hint: 'The assessment is complete. ' +
+                'The verifier may revert it if further input is needed.'});
+            }
 
-              return instance.save()
-              .then(function () {
-                instance.attr('isPending', false);
-                self.initializeFormFields();
-                self.attr('onStateChangeDfd').resolve();
-              });
-            });
-          });
+            return instance.save();
+          })
+          .then(() => {
+            this.initializeFormFields();
+            this.attr('onStateChangeDfd').resolve();
+            stopFn();
+          })
+          .always(() => instance.attr('isPending', false))
+          .fail(resetStatusOnConflict);
       },
       saveGlobalAttributes: function (event) {
         var globalAttributes = event.globalAttributes;
@@ -518,6 +537,16 @@ import DeferredTransaction from '../../../plugins/utils/deferred-transaction-uti
       },
       '{viewModel.instance} modelAfterSave': function () {
         this.viewModel.attr('isAssessmentSaving', false);
+      },
+      '{viewModel.instance} assessment_type'() {
+        const onSave = () => {
+          this.viewModel.instance.dispatch({
+            ...REFRESH_TAB_CONTENT,
+            tabId: 'tab-related-assessments',
+          });
+          this.viewModel.instance.unbind('updated', onSave);
+        };
+        this.viewModel.instance.bind('updated', onSave);
       },
       '{viewModel} instance': function () {
         this.viewModel.initializeFormFields();

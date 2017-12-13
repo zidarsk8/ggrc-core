@@ -11,6 +11,9 @@ import {
 import {
   makeRequest,
 } from '../plugins/utils/query-api-utils';
+import resolveConflict from './cacheable_conflict_resolution.js';
+import PersistentNotifier from '../plugins/persistent_notifier';
+import RefreshQueue from './refresh_queue';
 
 (function (can, GGRC, CMS) {
   var _oldAttr;
@@ -187,7 +190,6 @@ import {
         var deferred = can.Deferred();
         var sourceDeferred = finder.call(this, params);
         var self = this;
-        var tracker_stop = GGRC.Tracker.start('modelize', self.shortName);
 
         deferred.then(success, error);
         sourceDeferred.then(function (sourceData) {
@@ -207,7 +209,7 @@ import {
           deferred.reject.apply(deferred, arguments);
         });
 
-        return deferred.done(tracker_stop);
+        return deferred;
       };
     },
 
@@ -309,17 +311,10 @@ import {
           this.resolve_deferred_bindings.bind(this),
           function (xhr) {
             if (xhr.status === 409) {
-              xhr.warningId = setTimeout(function () {
-                GGRC.Errors.notifier('warning',
-                  'There was a conflict while saving.' +
-                  ' Your changes have not been saved yet.' +
-                  ' Please check any fields you were editing' +
-                  ' and try saving again');
-              });
-              // TODO: we should show modal window here
+              return resolveConflict(xhr, this.findInCacheById(id));
             }
             return xhr;
-          }
+          }.bind(this)
         );
         delete ret.hasFailCallback;
         return ret;
@@ -1090,7 +1085,7 @@ import {
       }
       /* Serialize only meaningful properties */
       Object.keys(this._data).forEach(function (name) {
-        if (name.startsWith('_')) {
+        if (name.startsWith && name.startsWith('_')) {
           return;
         }
         val = this[name];

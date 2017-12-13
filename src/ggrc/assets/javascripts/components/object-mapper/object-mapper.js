@@ -20,6 +20,7 @@ import {
 import {
   refreshCounts,
 } from '../../plugins/utils/current-page-utils';
+import RefreshQueue from '../../models/refresh_queue';
 
 (function (can, $) {
   'use strict';

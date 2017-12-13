@@ -3,6 +3,8 @@
 
 """Test Access Control List"""
 
+import ddt
+
 from ggrc import db
 from ggrc.access_control.role import get_custom_roles_for
 from ggrc.models import all_models
@@ -41,6 +43,7 @@ class TestRBAC(TestCase):
       )
 
 
+@ddt.ddt
 class TestAccessControlRBAC(TestRBAC):
   """TestAccessControlRBAC tests if users get correct permissions on objects
      from the access control table"""
@@ -51,25 +54,24 @@ class TestAccessControlRBAC(TestRBAC):
     self.set_up_people()
     self.set_up_acl_object()
 
-  def test_acl_object_cru(self):
-    """Test if readers/creators can CRUD an object with all permissions"""
+  @ddt.data("Creator", "Reader", "Editor")
+  def test_acl_object_cru(self, name):
+    """Test if {0} can CRUD an object with all permissions"""
     control_id = self.control.id
-    # role_id = self.all_acr.id
-    for name in ("Creator", "Reader", "Editor"):
-      person = self.people.get(name)
-      role_id = self.all_acr.id
-      db.session.add(person)
-      self.api.set_user(person)
-      response = self.api.get(all_models.Control, control_id)
-      assert response.status_code == 200, \
-          "{} cannot GET object from acl. Received {}".format(
-              name, response.status)
-      acl = response.json["control"]["access_control_list"]
-      assert len(response.json["control"]["access_control_list"]) == 3, \
-          "ACL in control does not include all people {}".format(acl)
+    person = self.people.get(name)
+    role_id = self.all_acr.id
+    db.session.add(person)
+    self.api.set_user(person)
+    response = self.api.get(all_models.Control, control_id)
+    assert response.status_code == 200, \
+        "{} cannot GET object from acl. Received {}".format(
+            name, response.status)
+    acl = response.json["control"]["access_control_list"]
+    assert len(response.json["control"]["access_control_list"]) == 3, \
+        "ACL in control does not include all people {}".format(acl)
 
-      assert acl[0].get("ac_role_id", None) == role_id, \
-          "ACL list does not include role id {}".format(acl)
+    assert acl[0].get("ac_role_id", None) == role_id, \
+        "ACL list does not include role id {}".format(acl)
 
 
 class TestAssigneeRBAC(TestRBAC):

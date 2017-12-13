@@ -5,6 +5,8 @@
 
 import './revision-log-data';
 import '../paginate';
+import RefreshQueue from '../../models/refresh_queue';
+import template from './revision-log.mustache';
 
 (function (GGRC, can) {
   'use strict';
@@ -36,10 +38,7 @@ import '../paginate';
    */
   GGRC.Components('revisionLog', {
     tag: 'revision-log',
-    template: can.view(
-      GGRC.mustache_path +
-      '/components/revision-log/revision-log.mustache'
-    ),
+    template,
     viewModel: {
       _LIST_FIELDS: _LIST_FIELDS,
       _DATE_FIELDS: _DATE_FIELDS,

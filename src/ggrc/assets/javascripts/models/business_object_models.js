@@ -13,8 +13,13 @@
     create: 'POST /api/org_groups',
     update: 'PUT /api/org_groups/{id}',
     destroy: 'DELETE /api/org_groups/{id}',
-    mixins: ['unique_title', 'ca_update',
-              'timeboxed', 'accessControlList'],
+    mixins: [
+      'unique_title',
+      'ca_update',
+      'timeboxed',
+      'accessControlList',
+      'base-notifications',
+    ],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
@@ -77,8 +82,13 @@
     create: 'POST /api/projects',
     update: 'PUT /api/projects/{id}',
     destroy: 'DELETE /api/projects/{id}',
-    mixins:
-      ['unique_title', 'ca_update', 'timeboxed', 'accessControlList'],
+    mixins: [
+      'unique_title',
+      'ca_update',
+      'timeboxed',
+      'accessControlList',
+      'base-notifications',
+    ],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
@@ -129,7 +139,7 @@
 
         this.validateNonBlank('title');
       }
-    }, {});
+  }, {});
 
   can.Model.Cacheable('CMS.Models.Facility', {
     root_object: 'facility',
@@ -140,8 +150,13 @@
     create: 'POST /api/facilities',
     update: 'PUT /api/facilities/{id}',
     destroy: 'DELETE /api/facilities/{id}',
-    mixins:
-      ['unique_title', 'ca_update', 'timeboxed', 'accessControlList'],
+    mixins: [
+      'unique_title',
+      'ca_update',
+      'timeboxed',
+      'accessControlList',
+      'base-notifications',
+    ],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
@@ -204,7 +219,13 @@
     create: 'POST /api/products',
     update: 'PUT /api/products/{id}',
     destroy: 'DELETE /api/products/{id}',
-    mixins: ['unique_title', 'ca_update', 'timeboxed', 'accessControlList'],
+    mixins: [
+      'unique_title',
+      'ca_update',
+      'timeboxed',
+      'accessControlList',
+      'base-notifications',
+    ],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
@@ -269,7 +290,13 @@
     create: 'POST /api/data_assets',
     update: 'PUT /api/data_assets/{id}',
     destroy: 'DELETE /api/data_assets/{id}',
-    mixins: ['unique_title', 'ca_update', 'timeboxed', 'accessControlList'],
+    mixins: [
+      'unique_title',
+      'ca_update',
+      'timeboxed',
+      'accessControlList',
+      'base-notifications',
+    ],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
@@ -332,7 +359,12 @@
     create: 'POST /api/access_groups',
     update: 'PUT /api/access_groups/{id}',
     destroy: 'DELETE /api/access_groups/{id}',
-    mixins: ['unique_title', 'ca_update', 'accessControlList'],
+    mixins: [
+      'unique_title',
+      'ca_update',
+      'accessControlList',
+      'base-notifications',
+    ],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
@@ -395,7 +427,13 @@
     create: 'POST /api/markets',
     update: 'PUT /api/markets/{id}',
     destroy: 'DELETE /api/markets/{id}',
-    mixins: ['unique_title', 'ca_update', 'timeboxed', 'accessControlList'],
+    mixins: [
+      'unique_title',
+      'ca_update',
+      'timeboxed',
+      'accessControlList',
+      'base-notifications',
+    ],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {
@@ -457,7 +495,13 @@
     create: 'POST /api/vendors',
     update: 'PUT /api/vendors/{id}',
     destroy: 'DELETE /api/vendors/{id}',
-    mixins: ['unique_title', 'ca_update', 'timeboxed', 'accessControlList'],
+    mixins: [
+      'unique_title',
+      'ca_update',
+      'timeboxed',
+      'accessControlList',
+      'base-notifications',
+    ],
     is_custom_attributable: true,
     isRoleable: true,
     attributes: {

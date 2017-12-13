@@ -4,6 +4,7 @@
  */
 
 import '../dropdown/dropdown';
+import '../numberbox/numberbox';
 import template from './templates/modal-issue-tracker-fields.mustache';
 
 const tag = 'modal-issue-tracker-fields';
