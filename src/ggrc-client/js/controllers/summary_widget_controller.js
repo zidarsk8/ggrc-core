@@ -76,7 +76,7 @@ export default can.Control({
       },
     });
     frag = can.view(this.get_widget_view(this.element),
-                    this.options.context);
+      this.options.context);
     this.widget_shown();
     this.element.html(frag);
     return 0;
@@ -100,8 +100,8 @@ export default can.Control({
       .closest('[data-widget-view]')
       .attr('data-widget-view');
     return (widgetView && widgetView.length > 0) ?
-        GGRC.mustache_path + widgetView :
-        this.options.widget_view;
+      GGRC.mustache_path + widgetView :
+      this.options.widget_view;
   },
   widget_shown: function (event) {
     this.options.isShown = true;
@@ -146,7 +146,6 @@ export default can.Control({
   },
   drawChart: function (elementId, raw) {
     let chart;
-    let that = this;
     let options = this.getChartOptions(raw);
     let data = new google.visualization.DataTable();
     let statuses = raw.statuses.map(function (state) {
@@ -183,7 +182,6 @@ export default can.Control({
   },
   prepareLegend: function (type, chart, data) {
     let legendData = [];
-    let that = this;
     let chartOptions = this.options.context.charts[type];
     let colorsMap = this.options.colorsMap;
 
