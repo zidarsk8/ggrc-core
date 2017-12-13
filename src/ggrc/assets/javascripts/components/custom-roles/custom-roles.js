@@ -23,6 +23,7 @@ import template from './custom-roles.mustache';
       excludeRoles: [],
       conflictRoles: [],
       orderOfRoles: [],
+      isReadonly: false,
       save: function (args) {
         var self = this;
         this.attr('updatableGroupId', args.groupId);
