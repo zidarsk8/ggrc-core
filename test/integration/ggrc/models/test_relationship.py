@@ -8,6 +8,7 @@ import json
 import ddt
 
 from ggrc.models import all_models
+from ggrc.models.exceptions import ValidationError
 
 from integration.ggrc import TestCase
 from integration.ggrc import api_helper
@@ -84,3 +85,23 @@ class TestRelationship(TestCase):
     self.assertEqual(count + 2, len(revisions))
     url_list = revisions[0].content.get("reference_url") or []
     self.assertEqual(url_list, [])
+
+  def test_relationship_disallowed_type(self):
+    """Validation fails when source-destination types pair disallowed."""
+    audit = factories.AuditFactory()
+    snapshottable = factories.ControlFactory()
+
+    ctrl_revision = all_models.Revision.query.filter(
+        all_models.Revision.resource_id == snapshottable.id,
+        all_models.Revision.resource_type == snapshottable.type,
+    ).first()
+    snapshot = factories.SnapshotFactory(
+        parent=audit,
+        revision_id=ctrl_revision.id,
+        child_type=snapshottable.type,
+        child_id=snapshottable.id,
+    )
+    with self.assertRaises(ValidationError):
+      factories.RelationshipFactory(source=snapshottable, destination=snapshot)
+    with self.assertRaises(ValidationError):
+      factories.RelationshipFactory(source=snapshot, destination=snapshottable)
