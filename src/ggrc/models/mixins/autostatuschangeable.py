@@ -223,7 +223,16 @@ class AutoStatusChangeable(object):
     """
     for value in custom_attributes:
       for attr_name in ('attribute_value', 'attribute_object_id'):
-        if inspect(value).attrs.get(attr_name).history.has_changes():
+        attr_history = inspect(value).attrs.get(attr_name).history
+
+        # Our frontend generates CAVs with attribute_value='' for each missing
+        # CAV object in custom_attribute_values. And transition
+        # from CAV is None to CAV.attribute_value == '' shouldn't trigger
+        # status change, since both mean that the CAV is not filled in.
+        # That why we need additional check: 'any(added) or deleted'
+
+        added, _, deleted = attr_history
+        if attr_history.has_changes() and (any(added) or deleted):
           return True
     return False
 

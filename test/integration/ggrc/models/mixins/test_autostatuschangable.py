@@ -547,6 +547,77 @@ class TestCustomAttributes(TestMixinAutoStatusChangeableBase):
     self.assertEqual(from_status, assessment.status)
 
   @ddt.data(
+      (models.Assessment.DONE_STATE, ''),
+      (models.Assessment.DONE_STATE, None),
+      (models.Assessment.FINAL_STATE, ''),
+      (models.Assessment.FINAL_STATE, None),
+      (models.Assessment.PROGRESS_STATE, ''),
+      (models.Assessment.PROGRESS_STATE, None),
+      (models.Assessment.REWORK_NEEDED, ''),
+      (models.Assessment.REWORK_NEEDED, None),
+  )
+  @ddt.unpack
+  def test_global_ca_update_empty_value_not_change_status(self, from_status,
+                                                          value):
+    """Assessment in '{0}' NOT changed when adding GCA with '{1}' value
+
+    Our frontend generates CAVs with attribute_value='' for each missing
+    CAV object in custom_attribute_values. And transition from CAV is None to
+    CAV.attribute_value == '' shouldn't trigger status change, since both mean
+    that the CAV is not filled in.
+    """
+    with factories.single_commit():
+      ca_factory = factories.CustomAttributeDefinitionFactory
+      gca = ca_factory(definition_type='assessment',
+                       title='rich_test_gca',
+                       attribute_type='Rich Text'
+                       )
+      assessment = factories.AssessmentFactory(status=from_status)
+    self.api.modify_object(assessment, {
+        'custom_attribute_values': [{
+            'custom_attribute_id': gca.id,
+            'attribute_value': value,
+        }],
+    })
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(from_status, assessment.status)
+
+  @ddt.data(
+      (models.Assessment.DONE_STATE, ''),
+      (models.Assessment.DONE_STATE, None),
+      (models.Assessment.FINAL_STATE, ''),
+      (models.Assessment.FINAL_STATE, None),
+      (models.Assessment.PROGRESS_STATE, ''),
+      (models.Assessment.PROGRESS_STATE, None),
+      (models.Assessment.REWORK_NEEDED, ''),
+      (models.Assessment.REWORK_NEEDED, None),
+  )
+  @ddt.unpack
+  def test_gca_update_empty_value_and_status_not_change_status(self,
+                                                               from_status,
+                                                               value):
+    """Assessment in '{0}' NOT changed when add GCA with '{1}' value + status
+
+    Same as above + update status in the same PUT
+    """
+    with factories.single_commit():
+      ca_factory = factories.CustomAttributeDefinitionFactory
+      gca = ca_factory(definition_type='assessment',
+                       title='rich_test_gca',
+                       attribute_type='Rich Text'
+                       )
+      assessment = factories.AssessmentFactory()
+    self.api.modify_object(assessment, {
+        'custom_attribute_values': [{
+            'custom_attribute_id': gca.id,
+            'attribute_value': value,
+        }],
+        'status': from_status
+    })
+    assessment = self.refresh_object(assessment)
+    self.assertEqual(from_status, assessment.status)
+
+  @ddt.data(
       (models.Assessment.DONE_STATE, models.Assessment.PROGRESS_STATE),
       (models.Assessment.FINAL_STATE, models.Assessment.PROGRESS_STATE),
       (models.Assessment.START_STATE, models.Assessment.START_STATE),
