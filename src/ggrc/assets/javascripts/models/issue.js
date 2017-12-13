@@ -17,6 +17,7 @@
       'timeboxed',
       'mapping-limit-issue',
       'inScopeObjects',
+      'inScopeObjectsPreload',
       'accessControlList',
       'base-notifications',
     ],

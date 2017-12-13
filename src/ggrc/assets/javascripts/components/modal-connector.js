@@ -381,12 +381,11 @@ import {
         );
       },
       getMappedObjects: function () {
-        var dfd = can.Deferred();
         var auditQuery = this.buildQuery('Audit')[0];
         var issueQuery = this.buildQuery('Issue')[0];
         var snapshotQuery = this.buildQuery('Snapshot')[0];
 
-        makeRequest({data: [auditQuery, issueQuery, snapshotQuery]})
+        return makeRequest({data: [auditQuery, issueQuery, snapshotQuery]})
           .then(function (response) {
             var snapshots;
             var list;
@@ -406,11 +405,9 @@ import {
               .concat(response[1].Issue.values)
               .concat(snapshots);
 
-            dfd.resolve(list);
+            return list;
           }
         );
-
-        return dfd;
       },
     },
     helpers: {

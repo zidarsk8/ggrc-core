@@ -238,9 +238,6 @@ import template from './info-pane.mustache';
           .always(function () {
             this.attr('isUpdating' + can.capitalize(type), false);
 
-            if (this.attr('isUpdatingRelatedItems')) {
-              this.attr('isUpdatingRelatedItems', false);
-            }
             tracker.stop(this.attr('instance.type'),
               tracker.USER_JOURNEY_KEYS.NAVIGATION,
               tracker.USER_ACTIONS.OPEN_INFO_PANE);
@@ -387,16 +384,20 @@ import template from './info-pane.mustache';
       updateRelatedItems: function () {
         this.attr('isUpdatingRelatedItems', true);
 
-        this.attr('mappedSnapshots')
-          .replace(this.loadSnapshots());
-        this.attr('comments')
-          .replace(this.loadComments());
-        this.attr('evidences')
-          .replace(this.loadEvidences());
-        this.attr('urls')
-          .replace(this.loadUrls());
-        this.attr('referenceUrls')
-          .replace(this.loadReferenceUrls());
+        this.attr('instance').getRelatedObjects()
+          .then((data) => {
+            this.attr('mappedSnapshots').replace(data.Snapshot);
+            this.attr('comments').replace(data.Comment);
+            this.attr('evidences').replace(data['Document:EVIDENCE']);
+            this.attr('urls').replace(data['Document:URL']);
+            this.attr('referenceUrls').replace(data['Document:REFERENCE_URL']);
+
+            this.attr('isUpdatingRelatedItems', false);
+
+            tracker.stop(this.attr('instance.type'),
+              tracker.USER_JOURNEY_KEYS.NAVIGATION,
+              tracker.USER_ACTIONS.OPEN_INFO_PANE);
+          });
       },
       initializeFormFields: function () {
         var cavs =

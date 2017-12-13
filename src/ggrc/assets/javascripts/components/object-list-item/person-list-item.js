@@ -36,6 +36,8 @@ import template from './person-list-item.mustache';
             actualPerson = CMS.Models.Person.store[newVal.id] || {};
             if (actualPerson.email) {
               setVal(actualPerson);
+            } else if (newVal.email) {
+              setVal(newVal);
             } else {
               actualPerson = new CMS.Models.Person({id: newVal.id});
               new RefreshQueue()
