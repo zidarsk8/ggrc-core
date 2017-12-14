@@ -17,11 +17,12 @@ export default can.Control({
     internav_view: '/static/mustache/dashboard/internav_list.mustache',
     pin_view: '.pin-content',
     widget_list: null,
+    priorityTabs: null,
+    notPriorityTabs: null,
     spinners: {},
     contexts: null,
     instance: null,
     isMenuVisible: true,
-    priorityTabs: null,
     counts: null,
     hasHiddenWidgets: false,
   },
@@ -48,11 +49,9 @@ export default can.Control({
         const isAuditScope = instance.type === 'Audit';
         this.element.append(frag);
         if (isAuditScope) {
-          const priorityTabsNum = 4 + isDashboardEnabled(instance);
           this.element.addClass(this.options.instance.type.toLowerCase());
-          this.options.attr('priorityTabs', priorityTabsNum);
         }
-        this.show_hide_titles();
+        this.setTabsPriority();
         this.route(router.attr('widget'));
       });
 
@@ -269,31 +268,17 @@ export default can.Control({
     });
     this.options.attr('hasHiddenWidgets', hasHiddenWidgets);
   },
-
-  show_hide_titles: function () {
-    const pageType = getPageType();
-    const originalWidgets = this.options.widget_list;
-    const priorityTabsNum = this.options.attr('priorityTabs');
-    const priorityTabs = originalWidgets.slice(0, priorityTabsNum);
-    const notPriorityTabs = originalWidgets.slice(priorityTabsNum);
-
-    function hideTitles(widgets) {
-      widgets.forEach(function (widget) {
-        widget.attr('show_title', false);
-      });
-    }
-
-    function showTitles(widgets) {
-      widgets.forEach(function (widget) {
-        widget.attr('show_title', true);
-      });
-    }
+  setTabsPriority: function () {
+    let pageType = getPageType();
+    let widgets = this.options.attr('widget_list');
+    let instance = this.options.attr('instance');
 
     if (pageType === 'Audit') {
-      showTitles(priorityTabs);
-      hideTitles(notPriorityTabs);
+      let priorityTabsNum = 4 + isDashboardEnabled(instance);
+      this.options.attr('priorityTabs', widgets.slice(0, priorityTabsNum));
+      this.options.attr('notPriorityTabs', widgets.slice(priorityTabsNum));
     } else {
-      showTitles(originalWidgets);
+      this.options.attr('priorityTabs', widgets);
     }
   },
   '.closed click': function (el, ev) {
