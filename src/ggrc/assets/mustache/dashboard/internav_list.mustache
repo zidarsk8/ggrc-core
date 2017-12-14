@@ -39,7 +39,7 @@
           {instance}="instance"
           {widget-list}="widget_list"
           {url-path}="urlPath"
-          {add-tab-title}="addTabTitle"></add-tab-button>
+          {add-tab-title}="'Add Tab'"></add-tab-button>
       {{/hasHiddenWidgets}}
     {{/if_equals}}
 
@@ -49,14 +49,12 @@
 
 {{#if_equals instance.type 'Audit'}}
 <div class="tabs not-priority">
-  {{#if dividedTabsMode}}
-    <div class="not-priority-hide {{#if isMenuVisible}}visible{{/if}}">
-        <i class="fa fa-angle-{{#if isMenuVisible}}right{{else}}left{{/if}}"></i>
-        {{^if isMenuVisible}}
-        <a href="javascript://">{{hideTabTitle}}</a>
-        {{/if}}
-    </div>
-  {{/if}}
+  <div class="not-priority-hide {{#if isMenuVisible}}visible{{/if}}">
+      <i class="fa fa-angle-{{#if isMenuVisible}}right{{else}}left{{/if}}"></i>
+      {{^if isMenuVisible}}
+        <a href="javascript://">Show Audit Scope</a>
+      {{/if}}
+  </div>
 
   {{#isMenuVisible}}
     <ul class="internav">
@@ -87,7 +85,7 @@
           {instance}="instance"
           {widget-list}="widget_list"
           {url-path}="urlPath"
-          {add-tab-title}="addTabTitle"></add-tab-button>
+          {add-tab-title}="'Add Scope'"></add-tab-button>
       {{/hasHiddenWidgets}}
     </ul>
   {{/isMenuVisible}}

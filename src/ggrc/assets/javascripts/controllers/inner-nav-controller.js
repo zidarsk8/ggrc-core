@@ -21,9 +21,6 @@ export default can.Control({
     contexts: null,
     instance: null,
     isMenuVisible: true,
-    addTabTitle: 'Add Tab',
-    hideTabTitle: 'Hide',
-    dividedTabsMode: false,
     priorityTabs: null,
     counts: null,
     hasHiddenWidgets: false,
@@ -55,9 +52,6 @@ export default can.Control({
             const priorityTabsNum = 4 +
               isDashboardEnabled(instance);
             this.element.addClass(this.options.instance.type.toLowerCase());
-            this.options.attr('addTabTitle', 'Add Scope');
-            this.options.attr('hideTabTitle', 'Show Audit Scope');
-            this.options.attr('dividedTabsMode', true);
             this.options.attr('priorityTabs', priorityTabsNum);
           }
           this.show_hide_titles();
@@ -348,16 +342,7 @@ export default can.Control({
     }
   },
   '.not-priority-hide click': function (el) {
-    var count = this.options.attr('priorityTabs') + 1;
-    var hiddenAreaSelector = 'li:nth-child(n+' + count + '):not(:last-child)';
-    var $hiddenArea = this.element.find(hiddenAreaSelector);
-
     this.options.attr('isMenuVisible', !this.options.isMenuVisible);
-    if (this.options.isMenuVisible) {
-      $hiddenArea.show();
-    } else {
-      $hiddenArea.hide();
-    }
   },
   '{counts} change': function () {
     this.update_add_more_link();

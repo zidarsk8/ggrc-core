@@ -92,7 +92,6 @@ describe('CMS.Controllers.InnerNav', function () {
     beforeEach(function () {
       options = new can.Map({
         widget_list: new can.Observe.List([]),
-        dividedTabsMode: false,
         priorityTabs: null,
       });
 
