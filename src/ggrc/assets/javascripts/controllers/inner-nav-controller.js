@@ -44,26 +44,17 @@ export default can.Control({
         this.route(newVal);
       });
 
-      can.view(this.options.internav_view, this.options, function (frag) {
+      can.view(this.options.internav_view, this.options, (frag) => {
         const isAuditScope = instance.type === 'Audit';
-        const fn = function () {
-          this.element.append(frag);
-          if (isAuditScope) {
-            const priorityTabsNum = 4 +
-              isDashboardEnabled(instance);
-            this.element.addClass(this.options.instance.type.toLowerCase());
-            this.options.attr('priorityTabs', priorityTabsNum);
-          }
-          this.show_hide_titles();
-          this.route(router.attr('widget'));
-          delete this.delayed_display;
-        }.bind(this);
-
-        this.delayed_display = {
-          fn: fn,
-          timeout: setTimeout(fn, 50),
-        };
-      }.bind(this));
+        this.element.append(frag);
+        if (isAuditScope) {
+          const priorityTabsNum = 4 + isDashboardEnabled(instance);
+          this.element.addClass(this.options.instance.type.toLowerCase());
+          this.options.attr('priorityTabs', priorityTabsNum);
+        }
+        this.show_hide_titles();
+        this.route(router.attr('widget'));
+      });
 
       this.on();
     }.bind(this));
@@ -177,11 +168,6 @@ export default can.Control({
 
     function getWidgetType(widgetId) {
       return isObjectVersion(widgetId) ? 'version' : '';
-    }
-
-    if (this.delayed_display) {
-      clearTimeout(this.delayed_display.timeout);
-      this.delayed_display.timeout = setTimeout(this.delayed_display.fn, 50);
     }
 
     // If the metadata is unrendered, find it via options
