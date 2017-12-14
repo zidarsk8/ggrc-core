@@ -134,7 +134,9 @@ class Relationship(Base, db.Model):
             .format(self.type, self.source_type, self.destination_type)
         )
 
+
 class Relatable(object):
+  """Mixin adding Relationship functionality to an object"""
 
   @declared_attr
   def related_sources(cls):  # pylint: disable=no-self-argument

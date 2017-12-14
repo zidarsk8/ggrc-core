@@ -18,6 +18,7 @@ from integration.ggrc.models import factories
 @ddt.ddt
 class TestRelationship(TestCase):
   """Integration test suite for Relationship."""
+  # pylint: disable=invalid-name
 
   def setUp(self):
     """Create a Person, an Assessment, prepare a Relationship json."""
