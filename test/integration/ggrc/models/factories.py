@@ -263,6 +263,12 @@ class RelationshipFactory(ModelFactory):
   source = None
   destination = None
 
+  @classmethod
+  def randomize(cls, *args):
+    """Create a relationship with randomly shuffled source and destination."""
+    obj1, obj2 = random.sample(args, 2)
+    return cls(source=obj1, destination=obj2)
+
 
 class PersonFactory(ModelFactory):
 
