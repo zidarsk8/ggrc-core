@@ -404,9 +404,8 @@ def start_update_issue_job(audit_id, message):
   views.start_update_audit_issues(audit_id, message)
 
 
-def handle_assessment_create(assessment, src, snapshots, templates, audits):
+def handle_assessment_create(assessment, src, templates, audits):
   """Handles issue tracker related data."""
-  del snapshots  # Unused
   # Get issue tracker data from request.
   info = src.get('issue_tracker') or {}
 
