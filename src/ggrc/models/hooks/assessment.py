@@ -22,22 +22,6 @@ from ggrc.services import signals
 from ggrc.utils import referenced_objects
 
 
-def _load_snapshots(snapshot_ids):
-  """Returns snapshots for given IDs."""
-  return {
-      s.id: s for s in all_models.Snapshot.query.options(
-          orm.undefer_group('Snapshot_complete'),
-          orm.Load(all_models.Snapshot).joinedload(
-              'revision'
-          ).undefer_group(
-              'Revision_complete'
-          )
-      ).filter(
-          all_models.Snapshot.id.in_(snapshot_ids)
-      )
-  }
-
-
 def _load_templates(template_ids):
   """Returns assessment templates for given IDs."""
   return {
@@ -111,14 +95,11 @@ def init_hook():
     db.session.flush()
     audit_ids = set()
     template_ids = set()
-    snapshot_ids = set()
 
     for src in sources:
-      snapshot_ids.add(src.get('object', {}).get('id'))
       audit_ids.add(src.get('audit', {}).get('id'))
       template_ids.add(src.get('template', {}).get('id'))
 
-    snapshot_cache = _load_snapshots(snapshot_ids)
     template_cache = _load_templates(template_ids)
     audit_cache = _load_audits(audit_ids)
 
