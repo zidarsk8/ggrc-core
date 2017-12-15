@@ -10,6 +10,7 @@ import {
 } from './plugins/utils/snapshot-utils';
 import {
   isMyAssessments,
+  isAdmin,
 } from './plugins/utils/current-page-utils';
 import RefreshQueue from './models/refresh_queue';
 
@@ -274,6 +275,14 @@ Mustache.registerHelper("firstnonempty", function () {
     if (v != null && !!v.toString().trim().replace(/&nbsp;|\s|<br *\/?>/g, "")) return v.toString();
   }
   return "";
+});
+
+Mustache.registerHelper('is_empty', (data, options) => {
+  data = resolve_computed(data);
+  const result = can.isEmptyObject(
+    can.isPlainObject(data) ? data : data.attr()
+  );
+  return options[result ? 'fn' : 'inverse'](options.contexts);
 });
 
 Mustache.registerHelper("pack", function () {
@@ -1276,6 +1285,12 @@ function get_observe_context(scope) {
 
   Mustache.registerHelper('isMyAssessments', function (options) {
     return isMyAssessments() ?
+      options.fn(options.contexts) :
+      options.inverse(options.contexts);
+  });
+
+  Mustache.registerHelper('is_admin_page', (options) => {
+    return isAdmin() ?
       options.fn(options.contexts) :
       options.inverse(options.contexts);
   });
@@ -2524,33 +2539,6 @@ Example:
         }, hasRoleForContextDfd);
     });
 
-  Mustache.registerHelper('isNotObjectVersion',
-    function (widgetName, options) {
-      widgetName = Mustache.resolve(widgetName);
-      if (widgetName.indexOf('Versions') > -1) {
-        return options.inverse(options.contexts);
-      }
-
-      return options.fn(options.contexts);
-    }
-  );
-  Mustache.registerHelper('isNotProhibitedMap',
-    function (fromModel, toModel, options) {
-      var prohibitedMapList = {
-        Issue: ['Assessment', 'Audit']
-      };
-
-      fromModel = Mustache.resolve(fromModel);
-      toModel = Mustache.resolve(toModel);
-
-      if (prohibitedMapList[fromModel]
-        && prohibitedMapList[fromModel].includes(toModel)) {
-        return options.inverse(options.contexts);
-      }
-
-      return options.fn(options.contexts);
-    }
-  );
   Mustache.registerHelper('displayWidgetTab',
     function (widget, instance, options) {
       var displayTab;

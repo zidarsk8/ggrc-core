@@ -164,7 +164,7 @@ class TestWithSimilarityScore(TestCase):
         expected_ids = set()
 
       self.assertSetEqual(
-          {obj.id for obj in similar_objects},
+          {obj[0] for obj in similar_objects},
           expected_ids,
       )
 
@@ -271,7 +271,7 @@ class TestWithSimilarityScore(TestCase):
     expected_ids = {assessments[1].id}
 
     self.assertSetEqual(
-        {obj.id for obj in similar_objects},
+        {obj[0] for obj in similar_objects},
         expected_ids,
     )
     self.assertNotIn(assessments[2].id, similar_objects)
@@ -563,3 +563,165 @@ class TestWithSimilarityScore(TestCase):
         if id_expected
     ]
     self.assertListEqual(response.json[0]["Assessment"]["ids"], expected_ids)
+
+  @ddt.data(
+      (("Control", "Control"), ("Control", "Control"), True),
+      (("Control", "Objective"), ("Control", "Control"), False),
+      (("Objective", "Control"), ("Control", "Control"), False),
+      (("Objective", "Objective"), ("Control", "Control"), False),
+      (("Objective", "Objective"), ("Objective", "Control"), False),
+      (("Objective", "Objective"), ("Objective", "Objective"), True),
+  )
+  @ddt.unpack
+  def test_asmnt_mapped_similar(self, obj_types, asmnt_types, similar):
+    """Test similar assessments for assessments linked through mapped objs."""
+    with factories.single_commit():
+      obj1 = get_model_factory(obj_types[0])()
+      obj2 = get_model_factory(obj_types[1])()
+      factories.RelationshipFactory(source=obj1, destination=obj2)
+
+      audit = factories.AuditFactory()
+      assessment1 = factories.AssessmentFactory(
+          audit=audit, assessment_type=asmnt_types[0]
+      )
+      assessment2 = factories.AssessmentFactory(
+          audit=audit, assessment_type=asmnt_types[1]
+      )
+      snapshots = self._create_snapshots(audit, [obj1, obj2])
+
+      factories.RelationshipFactory(source=audit, destination=assessment1)
+      factories.RelationshipFactory(source=audit, destination=assessment2)
+      factories.RelationshipFactory(source=audit, destination=snapshots[0])
+      factories.RelationshipFactory(source=audit, destination=snapshots[1])
+      factories.RelationshipFactory(
+          source=snapshots[0], destination=assessment1
+      )
+      factories.RelationshipFactory(
+          source=snapshots[1], destination=assessment2
+      )
+
+    expected_ids = [assessment2.id] if similar else []
+    # Check related assessments for first assessment
+    query = [{
+        "object_name": "Assessment",
+        "type": "ids",
+        "filters": {
+            "expression": {
+                "op": {"name": "similar"},
+                "object_name": "Assessment",
+                "ids": [assessment1.id],
+            },
+        },
+    }]
+    response = self.client.post(
+        "/query",
+        data=json.dumps(query),
+        headers={"Content-Type": "application/json"},
+    )
+    self.assertStatus(response, 200)
+    self.assertListEqual(response.json[0]["Assessment"]["ids"], expected_ids)
+
+  @ddt.data(
+      (("Control", "Control"), ("Control", "Control"), (True, True)),
+      (("Control", "Control"), ("Control", "Objective"), (True, False)),
+      (("Control", "Control"), ("Objective", "Objective"), (False, False)),
+      (("Control", "Objective"), ("Objective", "Objective"), (False, False)),
+      (("Control", "Objective"), ("Control", "Objective"), (True, False)),
+      (("Objective", "Objective"), ("Control", "Objective"), (False, True)),
+  )
+  @ddt.unpack
+  def test_obj_mapped_similar(self, obj_types, asmnt_types, similar):
+    """Test similar assessments for mapped objects of same type."""
+    with factories.single_commit():
+      obj1 = get_model_factory(obj_types[0])()
+      obj2 = get_model_factory(obj_types[1])()
+      factories.RelationshipFactory(source=obj1, destination=obj2)
+
+      audit = factories.AuditFactory()
+      assessment1 = factories.AssessmentFactory(
+          audit=audit, assessment_type=asmnt_types[0]
+      )
+      assessment2 = factories.AssessmentFactory(
+          audit=audit, assessment_type=asmnt_types[1]
+      )
+      assessment_ids = [assessment1.id, assessment2.id]
+      snapshots = self._create_snapshots(audit, [obj1, obj2])
+
+      factories.RelationshipFactory(source=audit, destination=assessment1)
+      factories.RelationshipFactory(source=audit, destination=assessment2)
+      factories.RelationshipFactory(source=audit, destination=snapshots[0])
+      factories.RelationshipFactory(source=audit, destination=snapshots[1])
+      factories.RelationshipFactory(
+          source=snapshots[0], destination=assessment1
+      )
+      factories.RelationshipFactory(
+          source=snapshots[1], destination=assessment2
+      )
+
+    # Check related assessments for first object
+    query = [{
+        "object_name": "Assessment",
+        "type": "ids",
+        "filters": {
+            "expression": {
+                "op": {"name": "similar"},
+                "object_name": obj_types[0],
+                "ids": [obj1.id],
+            },
+        },
+    }]
+    response = self.client.post(
+        "/query",
+        data=json.dumps(query),
+        headers={"Content-Type": "application/json"},
+    )
+    self.assertStatus(response, 200)
+
+    expected_ids = [
+        assessment_ids[num]
+        for num, _ in enumerate(assessment_ids) if similar[num]
+    ]
+    self.assertListEqual(response.json[0]["Assessment"]["ids"], expected_ids)
+
+  @ddt.data(
+      ("Control", "Control", True),
+      ("Control", "Objective", False),
+      ("Risk", "Risk", True),
+  )
+  @ddt.unpack
+  def test_issue_obj_similar(self, obj_type, asmnt_type, similar):
+    """Test similar assessments for mapped objects of same type."""
+    with factories.single_commit():
+      obj = get_model_factory(obj_type)()
+      audit = factories.AuditFactory()
+      assessment = factories.AssessmentFactory(
+          audit=audit, assessment_type=asmnt_type
+      )
+      snapshot = self._create_snapshots(audit, [obj])[0]
+
+      issue = factories.IssueFactory()
+      factories.RelationshipFactory(source=audit, destination=assessment)
+      factories.RelationshipFactory(source=audit, destination=snapshot)
+      factories.RelationshipFactory(source=snapshot, destination=assessment)
+      factories.RelationshipFactory(source=obj, destination=issue)
+
+    expected_ids = [issue.id] if similar else []
+
+    query = [{
+        "object_name": "Issue",
+        "type": "ids",
+        "filters": {
+            "expression": {
+                "op": {"name": "similar"},
+                "object_name": "Assessment",
+                "ids": [assessment.id],
+            },
+        },
+    }]
+    response = self.client.post(
+        "/query",
+        data=json.dumps(query),
+        headers={"Content-Type": "application/json"},
+    )
+    self.assertStatus(response, 200)
+    self.assertListEqual(response.json[0]["Issue"]["ids"], expected_ids)
