@@ -25,6 +25,7 @@ export default can.Control({
     isMenuVisible: true,
     counts: null,
     hasHiddenWidgets: false,
+    showAddTabButton: true,
   },
 }, {
   init: function (options) {
@@ -40,6 +41,8 @@ export default can.Control({
       if (!(this.options.contexts instanceof can.Observe)) {
         this.options.attr('contexts', new can.Observe(this.options.contexts));
       }
+      this.options.attr('showAddTabButton',
+        !['Audit', 'Person'].includes(getPageType()));
 
       router.bind('widget', (ev, newVal)=>{
         this.route(newVal);

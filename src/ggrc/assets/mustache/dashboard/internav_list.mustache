@@ -31,7 +31,7 @@
     {{/priorityTabs}}
 
 
-    {{^if_equals instance.type 'Audit'}}
+    {{#if showAddTabButton}}
       {{#hasHiddenWidgets}}
         <add-tab-button
           {instance}="instance"
@@ -39,7 +39,7 @@
           {url-path}="urlPath"
           {add-tab-title}="'Add Tab'"></add-tab-button>
       {{/hasHiddenWidgets}}
-    {{/if_equals}}
+    {{/if}}
 
   </ul>
 </div>
