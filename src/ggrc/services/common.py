@@ -1226,7 +1226,6 @@ class Resource(ModelView):
         return current_app.make_response((
             'Content-Type must be application/json', 415, []))
 
-      running_async = False
       if 'X-GGRC-BackgroundTask' in request.headers:
         if 'X-Appengine-Taskname' not in request.headers:
           task = create_task(request.method, request.full_path,
@@ -1240,7 +1239,6 @@ class Resource(ModelView):
           task_id = int(self.request.headers.get('x-task-id'))
           task = BackgroundTask.query.get(task_id)
           body = json.loads(task.parameters)
-          running_async = True
         task.start()
         no_result = True
       else:
