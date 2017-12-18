@@ -99,7 +99,11 @@ import Permission from '../../permission';
           this.dispatch(VALIDATION_ERROR);
         }
       },
-      performValidation: function ({field, formInit = false}) {
+      performValidation: function ({
+        field,
+        formInit = false,
+        triggerAttachmentModals = false,
+      }) {
         var fieldValid;
         var hasMissingEvidence;
         var hasMissingComment;
@@ -161,7 +165,8 @@ import Permission from '../../permission';
             },
           });
 
-          if (!formInit && (hasMissingEvidence || hasMissingComment)) {
+          if (triggerAttachmentModals &&
+              (hasMissingEvidence || hasMissingComment)) {
             this.dispatch({
               type: 'validationChanged',
               field: field,
@@ -224,7 +229,7 @@ import Permission from '../../permission';
       },
       attributeChanged: function (e) {
         e.field.attr('value', e.value);
-        this.performValidation({field: e.field});
+        this.performValidation({field: e.field, triggerAttachmentModals: true});
         this.attr('formSavedDeferred', can.Deferred());
         this.save(e.fieldId, e.value);
       },
