@@ -5,16 +5,17 @@
 
 import * as StateUtils from '../../../plugins/utils/state-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import Component from '../advanced-search-filter-container';
 
 describe('GGRC.Components.advancedSearchFilterContainer', function () {
   'use strict';
 
   var viewModel;
 
-  beforeEach(function () {
+  beforeEach(() => {
     spyOn(StateUtils, 'getDefaultStatesForModel')
       .and.returnValue(['state']);
-    viewModel = GGRC.Components.getViewModel('advancedSearchFilterContainer');
+    viewModel = new Component.prototype.viewModel();
   });
 
   describe('items get() method', function () {
@@ -65,7 +66,7 @@ describe('GGRC.Components.advancedSearchFilterContainer', function () {
       viewModel.attr('items', new can.List([
         AdvancedSearch.create.attribute({field: 'first'}),
         AdvancedSearch.create.operator(),
-        AdvancedSearch.create.attribute({field: 'second'})
+        AdvancedSearch.create.attribute({field: 'second'}),
       ]));
       viewItems = viewModel.attr('items');
 
