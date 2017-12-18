@@ -77,17 +77,17 @@ import Permission from '../../permission';
           },
         },
       },
-      validateForm: function () {
+      validateForm: function (formInit = false) {
         var self = this;
         this.attr('fields')
           .each(function (field) {
-            self.performValidation(field, true);
+            self.performValidation({field, formInit});
           });
         if (this.attr('instance.hasValidationErrors')) {
           this.dispatch(VALIDATION_ERROR);
         }
       },
-      performValidation: function (field, formInitCheck) {
+      performValidation: function ({field, formInit = false}) {
         var fieldValid;
         var hasMissingEvidence;
         var hasMissingComment;
@@ -114,7 +114,7 @@ import Permission from '../../permission';
         hasMissingEvidence = requiresEvidence &&
           !!this.attr('isEvidenceRequired');
 
-        hasMissingComment = formInitCheck ?
+        hasMissingComment = formInit ?
           requiresComment && !!errorsMap.comment : requiresComment;
 
         if (field.type === 'checkbox') {
@@ -149,7 +149,7 @@ import Permission from '../../permission';
             },
           });
 
-          if (!formInitCheck && (hasMissingEvidence || hasMissingComment)) {
+          if (!formInit && (hasMissingEvidence || hasMissingComment)) {
             this.dispatch({
               type: 'validationChanged',
               field: field,
@@ -212,14 +212,14 @@ import Permission from '../../permission';
       },
       attributeChanged: function (e) {
         e.field.attr('value', e.value);
-        this.performValidation(e.field);
+        this.performValidation({field: e.field});
         this.attr('formSavedDeferred', can.Deferred());
         this.save(e.fieldId, e.value);
       },
     },
     events: {
       inserted: function () {
-        this.viewModel.validateForm();
+        this.viewModel.validateForm(true);
       },
       '{viewModel.instance} update': function () {
         this.viewModel.validateForm();
