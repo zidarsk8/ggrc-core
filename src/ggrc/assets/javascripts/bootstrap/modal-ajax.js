@@ -160,9 +160,7 @@ import {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
 
-      objectParams = objectParams ?
-        JSON.parse(objectParams.replace(/\\n/g, '\n')) :
-        {};
+      objectParams = objectParams ? JSON.parse(objectParams) : {};
 
       modalTitle =
         (instance ? 'Edit ' : 'New ') +
