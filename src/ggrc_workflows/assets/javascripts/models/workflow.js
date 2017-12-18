@@ -83,6 +83,7 @@
   }, {
     save: function () {
       var taskGroupTitle = this.task_group_title;
+      var isNew = this.isNew();
       var redirectLink;
       var taskGroup;
       var dfd;
@@ -91,7 +92,7 @@
       dfd.then(function (instance) {
         redirectLink = instance.viewLink + '#task_group_widget';
         instance.attr('_redirect', redirectLink);
-        if (!taskGroupTitle) {
+        if (!taskGroupTitle || !isNew) {
           return instance;
         }
         taskGroup = new CMS.Models.TaskGroup({
