@@ -19,7 +19,7 @@ export default can.Component.extend({
     },
     modelName: null,
     modelDisplayName: null,
-    filterItems: [],
+    filterItems: [AdvancedSearch.create.attribute()],
     mappingItems: [],
     statusItem: AdvancedSearch.create.state(),
     relevantTo: [],
@@ -46,7 +46,7 @@ export default can.Component.extend({
       items.push(AdvancedSearch.create.mappingCriteria());
     },
     resetFilters: function () {
-      this.attr('filterItems', []);
+      this.attr('filterItems', [AdvancedSearch.create.attribute()]);
       this.attr('mappingItems', []);
       this.attr('statusItem.value', {});
     },
