@@ -21,7 +21,7 @@
       <tree-field {source}="instance.modified_by" {field}="'email'"/>
   {{/case}}
   {{#case 'kind'}}
-    <tree-field {source}="instance.kind"/>
+    <tree-field {source}="instance.kind" {show-tooltip}="false"/>
   {{/case}}
   {{#case 'fraud_related'}}
     {{#if_equals instance.fraud_related "0"}}
@@ -40,10 +40,10 @@
     {{/if}}
   {{/case}}
   {{#case 'means'}}
-    <tree-field {source}="instance.means"/>
+    <tree-field {source}="instance.means" {show-tooltip}="false"/>
   {{/case}}
   {{#case 'frequency'}}
-    <tree-field {source}="instance.verify_frequency"/>
+    <tree-field {source}="instance.verify_frequency" {show-tooltip}="false"/>
   {{/case}}
   {{#case 'assertions'}}
     {{#if instance.snapshot}}

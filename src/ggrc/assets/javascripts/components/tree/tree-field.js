@@ -13,6 +13,7 @@ const viewModel = can.Map.extend({
   source: null,
   items: [],
   resultStr: '',
+  showTooltip: true,
   init: function () {
     this.refreshItems();
   },
@@ -20,16 +21,18 @@ const viewModel = can.Map.extend({
     this.getItems()
       .then((data) => {
         let items = data.map((item) => item[this.attr('field')]);
-
-        let resultStr = items
-          .slice(0, TOOLTIP_ITEMS_LIMIT)
-          .join('\n');
-
-        resultStr += items.length > TOOLTIP_ITEMS_LIMIT ?
-          `\n and ${items.length - TOOLTIP_ITEMS_LIMIT} more` : '';
-
         this.attr('items', items);
-        this.attr('resultStr', resultStr);
+
+        if (this.attr('showTooltip')) {
+          let resultStr = items
+            .slice(0, TOOLTIP_ITEMS_LIMIT)
+            .join('\n');
+
+          resultStr += items.length > TOOLTIP_ITEMS_LIMIT ?
+            `\n and ${items.length - TOOLTIP_ITEMS_LIMIT} more` : '';
+
+          this.attr('resultStr', resultStr);
+        }
       });
   },
   getItems: function () {
