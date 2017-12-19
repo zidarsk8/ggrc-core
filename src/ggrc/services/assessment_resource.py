@@ -56,9 +56,16 @@ class AssessmentResource(common.ExtendedResource):
     This function is just a bit optimized way of returning
     assessment.audit.title
     """
-    title = db.session.query(models.Audit.title).filter_by(
-        id=assessment.audit_id).scalar()
-    return {"title": title}
+    audit = db.session.query(
+        models.Audit.title,
+        models.Audit.description,
+    ).filter_by(id=assessment.audit_id).first()
+    return {
+        "id": assessment.audit_id,
+        "type": "Audit",
+        "title": audit.title,
+        "description": audit.description,
+    }
 
   @staticmethod
   def _filter_rels(relationships, type_):
