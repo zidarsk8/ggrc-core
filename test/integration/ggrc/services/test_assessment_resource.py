@@ -42,3 +42,30 @@ class TestAssessmentResource(TestCase):
         for issue in related_objects["Issue"]
     }
     self.assertEqual(related_issue_titles, expected_titles)
+
+  def test_object_fields(self):
+    """Test that objects contain mandatory fields.
+
+    Front-end relies on audits and issues containing id, type, title, and
+    description. This tests ensures that those fields are returned in the
+    related_objects response.
+    """
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      factories.IssueFactory()  # unrelated issue
+      for _ in range(2):
+        issue = factories.IssueFactory()
+        factories.RelationshipFactory.randomize(assessment, issue)
+
+    related_objects = self._get_related_objects(assessment)
+
+    expected_keys = {"id", "type", "title", "description"}
+    self.assertLessEqual(
+        expected_keys,
+        set(related_objects["Audit"].keys())
+    )
+    for issue in related_objects["Issue"]:
+      self.assertLessEqual(
+          expected_keys,
+          set(issue.keys())
+      )
