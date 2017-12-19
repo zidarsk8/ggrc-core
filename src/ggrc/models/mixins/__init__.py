@@ -674,7 +674,9 @@ class Base(ChangeTracked, ContextRBAC, Identifiable):
 
     This method lists only first-class attributes.
     """
-    res = {}
+    res = {
+        "type": self.type,
+    }
 
     for column in self.__table__.columns:
       try:
