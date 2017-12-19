@@ -125,7 +125,7 @@ CMS.Models.SystemOrProcess('CMS.Models.System', {
           '/base_objects/tree_add_item.mustache')
       });
     this.validateNonBlank('title');
-  } // don't rebind the ObjectDocument/ObjectPerson events.
+  },
 }, {
   init: function () {
     this._super && this._super.apply(this, arguments);
@@ -167,7 +167,7 @@ CMS.Models.SystemOrProcess('CMS.Models.Process', {
     this.tree_view_options = $.extend({},
       CMS.Models.SystemOrProcess.tree_view_options);
     this.validateNonBlank('title');
-  } // don't rebind the ObjectDocument/ObjectPerson events.
+  },
 }, {
   init: function () {
     this._super && this._super.apply(this, arguments);
