@@ -5,10 +5,10 @@
 
 {{#switch attr_name}}
   {{#case 'contact'}}
-      <tree-people-list-field {source}="instance.contact"/>
+      <tree-field {source}="instance.contact" {field}="'email'"/>
   {{/case}}
   {{#case 'secondary_contact'}}
-      <tree-people-list-field {source}="instance.secondary_contact"/>
+      <tree-field {source}="instance.secondary_contact" {field}="'email'"/>
   {{/case}}
   {{#case 'network_zone'}}
     {{#using network_zone=instance.network_zone}}
@@ -34,7 +34,7 @@
   {{/case}}
 
   {{#case 'modified_by'}}
-      <tree-people-list-field {source}="instance.modified_by"/>
+      <tree-field {source}="instance.modified_by" {field}="'email'"/>
   {{/case}}
   {{#case 'created_at'}}
       {{localize_date instance.created_at}}

@@ -21,6 +21,6 @@ const viewModel = can.Map.extend({
 
 export default can.Component.extend('getOwnerPeopleList', {
   tag: 'get-owner-people-list',
-  template: '<tree-people-list-field {source}="allOwners"/>',
+  template: '<tree-field {source}="allOwners" {field}="\'email\'"/>',
   viewModel,
 });
