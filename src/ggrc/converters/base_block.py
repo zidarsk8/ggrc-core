@@ -366,16 +366,6 @@ class BlockConverter(object):
       headers.append([description, display_name])
     return [list(header) for header in zip(*headers)]
 
-  def generate_csv_body(self):
-    """ Generate 2D array populated with object values """
-    return [r.to_array(self.fields) for r in self.row_converters]
-
-  def to_array(self):
-    """Return tuple of csv_header and csv_body."""
-    csv_header = self.generate_csv_header()
-    csv_body = self.generate_csv_body()
-    return csv_header, csv_body
-
   def get_header_names(self):
     """ Get all posible user column names for current object """
     header_names = {
@@ -439,14 +429,26 @@ class BlockConverter(object):
       return
     self.row_converters = []
     objects = self.object_class.eager_query().filter(
-        self.object_class.id.in_(self.object_ids)).all()
+        self.object_class.id.in_(self.object_ids))
     for i, obj in enumerate(objects):
       row = RowConverter(self, self.object_class, obj=obj,
                          headers=self.headers, index=i)
-      self.row_converters.append(row)
+      yield row
+
+  def row_data_to_array(self):
+    """Get row data from all row converters while exporting.
+    """
+    if self.ignore:
+      return
+    csv_body = []
+    csv_header = self.generate_csv_header()
+    for row_converter in self.row_converters_from_ids():
+      row_converter.handle_obj_row_data()
+      csv_body.append(row_converter.to_array(self.fields))
+    return csv_header, csv_body
 
   def handle_row_data(self, field_list=None):
-    """Call handle row data on all row converters.
+    """Handle row data for all row converters on import.
 
     Note: When field_list is set, we are handling priority columns and we
     don't have all the data needed for checking mandatory and duplicate values.
