@@ -27,6 +27,7 @@ def make_error_response(err, err_code, force_json=False):
 
 
 def register_handlers(app):
+  """Register all custom error handlers"""
   # pylint: disable=unused-variable; we use bad_request in the decorator
   @app.errorhandler(400)
   def bad_request(err):
