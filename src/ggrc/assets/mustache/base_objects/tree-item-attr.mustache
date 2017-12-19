@@ -11,9 +11,7 @@
       <tree-field {source}="instance.secondary_contact" {field}="'email'"/>
   {{/case}}
   {{#case 'network_zone'}}
-    {{#using network_zone=instance.network_zone}}
-      {{network_zone.title}}
-    {{/using}}
+    <tree-field {source}="instance.network_zone"/>
   {{/case}}
   {{#case 'design'}}
     {{#using design=instance.design}}
