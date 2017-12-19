@@ -386,8 +386,8 @@ mapper-results-item-attrs {
   .attr {
     @include cell-styles();
 
-    tree-people-list-field {
-      div.people-list {
+    tree-field {
+      div.tree-field__item {
         display: none;
         &:nth-child(1) {
           display: block;

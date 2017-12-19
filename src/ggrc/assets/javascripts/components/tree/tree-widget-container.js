@@ -19,6 +19,7 @@ import './tree-status-filter';
 import './tree-item-status-for-workflow';
 import './tree-no-results';
 import './tree-assignee-field';
+import './tree-field';
 import './tree-people-list-field';
 import './get-owner-people-list';
 import './tree-people-with-role-list-field';

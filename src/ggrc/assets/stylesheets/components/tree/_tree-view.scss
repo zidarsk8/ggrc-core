@@ -126,8 +126,8 @@ tree-view {
 }
 
 tree-item {
-  tree-people-list-field {
-    div.people-list {
+  tree-field {
+    .tree-field__item {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
