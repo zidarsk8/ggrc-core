@@ -25,24 +25,4 @@
     destroy: "DELETE /api/task_group_objects/{id}"
   }, {
   });
-
-  can.Model.Join("CMS.Models.WorkflowPerson", {
-    root_object: "workflow_person",
-    root_collection: "workflow_people",
-    join_keys: {
-      workflow: CMS.Models.Workflow,
-      person: CMS.Models.Person,
-    },
-    attributes: {
-      context: "CMS.Models.Context.stub",
-      modified_by: "CMS.Models.Person.stub",
-      workflow: "CMS.Models.Workflow.stub",
-      person: "CMS.Models.Person.stub",
-    },
-    findAll: "GET /api/workflow_people",
-    create: "POST /api/workflow_people",
-    destroy: "DELETE /api/workflow_people/{id}",
-  }, {
-  });
-
 })(window.can);

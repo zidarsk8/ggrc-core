@@ -19,8 +19,6 @@
     is_custom_attributable: true,
 
     attributes: {
-      people: "CMS.Models.Person.stubs",
-      workflow_people: "CMS.Models.WorkflowPerson.stubs",
       task_groups: "CMS.Models.TaskGroup.stubs",
       cycles: "CMS.Models.Cycle.stubs",
       //workflow_task_groups: "CMS.Models.WorkflowTaskGroup.stubs"
