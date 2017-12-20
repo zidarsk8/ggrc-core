@@ -3,8 +3,12 @@
 
 """Module for IssueTracker object."""
 
+import sqlalchemy as sa
+from sqlalchemy.ext.declarative import declared_attr
+
 from ggrc import db
 from ggrc.models.mixins import Base
+from ggrc.models import utils
 
 
 class IssuetrackerIssue(Base, db.Model):
@@ -27,6 +31,9 @@ class IssuetrackerIssue(Base, db.Model):
 
   issue_id = db.Column(db.String(50), nullable=True)
   issue_url = db.Column(db.String(250), nullable=True)
+
+  object = utils.PolymorphicRelationship("object_id", "object_type",
+                                         "{}_issue_tracked")
 
   _MANDATORY_ATTRS = (
       'object_type', 'object_id',
@@ -93,12 +100,11 @@ class IssuetrackerIssue(Base, db.Model):
     return res
 
   @classmethod
-  def create_or_update_from_dict(cls, object_type, object_id, info):
+  def create_or_update_from_dict(cls, obj, info):
     """Creates or updates issue with given parameters.
 
     Args:
-      object_type: A string representing a model.
-      object_id: An integer identifier of model's instance.
+      obj: An object which is an IssueTracked instance.
       info: A dict with issue properties.
 
     Returns:
@@ -107,9 +113,9 @@ class IssuetrackerIssue(Base, db.Model):
     if not info:
       raise ValueError('Issue tracker info cannot be empty.')
 
-    issue_obj = cls.get_issue(object_type, object_id)
+    issue_obj = cls.get_issue(obj.type, obj.id)
 
-    info = dict(info, object_type=object_type, object_id=object_id)
+    info = dict(info, object=obj)
     if issue_obj is not None:
       issue_obj.update_from_dict(info)
     else:
@@ -135,8 +141,7 @@ class IssuetrackerIssue(Base, db.Model):
       cc_list = ','.join(cc_list)
 
     return cls(
-        object_type=info['object_type'],
-        object_id=info['object_id'],
+        object=info['object'],
 
         enabled=bool(info.get('enabled')),
         title=info.get('title'),
@@ -190,3 +195,28 @@ class IssuetrackerIssue(Base, db.Model):
 
     self.issue_id = info['issue_id']
     self.issue_url = info['issue_url']
+
+
+class IssueTracked(object):
+  """IssueTracked mixin.
+
+  Defines a backref in IssueTrackerIssue model named ModelName_issue_tracked.
+  """
+  # pylint: disable=too-few-public-methods
+
+  @declared_attr
+  def issuetracker_issue(cls):  # pylint: disable=no-self-argument
+    """Relationship with the corresponding issue for cls."""
+
+    def join_function():
+      """Object and Notification join function."""
+      object_id = sa.orm.foreign(IssuetrackerIssue.object_id)
+      object_type = sa.orm.foreign(IssuetrackerIssue.object_type)
+      return sa.and_(object_type == cls.__name__,
+                     object_id == cls.id)
+
+    return sa.orm.relationship(
+        IssuetrackerIssue,
+        primaryjoin=join_function,
+        backref="{}_issue_tracked".format(cls.__name__),
+    )
