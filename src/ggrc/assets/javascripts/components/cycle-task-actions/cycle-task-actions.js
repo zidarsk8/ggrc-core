@@ -65,27 +65,13 @@ import template from './cycle-task-actions.mustache';
     },
     changeStatus: function (ctx, el, ev) {
       var status = el.data('value');
-      var openclose = el.data('openclose');
       var instance = this.attr('instance');
       var oldValue = {
         status: instance.attr('status')
       };
-      var expanded;
 
       ev.stopPropagation();
       this.attr('oldValues').unshift(oldValue);
-
-      if (openclose) {
-        if (openclose === 'open') {
-          expanded = true;
-        } else if (openclose === 'close') {
-          expanded = false;
-        }
-        this.dispatch({
-          type: 'expand',
-          state: expanded
-        });
-      }
 
       this.setStatus(status);
     },
