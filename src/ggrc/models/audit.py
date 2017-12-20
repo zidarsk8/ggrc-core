@@ -16,6 +16,7 @@ from ggrc.models import reflection
 from ggrc.models.context import HasOwnContext
 from ggrc.models.mixins import clonable
 from ggrc.models.object_document import PublicDocumentable
+from ggrc.models.mixins import WithLastDeprecatedDate
 from ggrc.models.object_person import Personable
 from ggrc.models.program import Program
 from ggrc.models.person import Person
@@ -31,6 +32,7 @@ class Audit(Snapshotable,
             Personable,
             HasOwnContext,
             Relatable,
+            WithLastDeprecatedDate,
             mixins.Timeboxed,
             mixins.WithContact,
             mixins.BusinessObject,
@@ -158,6 +160,7 @@ class Audit(Snapshotable,
         "audit_firm": source_object.audit_firm,
         "start_date": source_object.start_date,
         "end_date": source_object.end_date,
+        "last_deprecated_date": source_object.last_deprecated_date,
         "program": source_object.program,
         "status": source_object.VALID_STATES[0],
         "report_start_date": source_object.report_start_date,
