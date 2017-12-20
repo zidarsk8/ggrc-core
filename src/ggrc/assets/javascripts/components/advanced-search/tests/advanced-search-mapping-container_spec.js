@@ -4,14 +4,15 @@
 */
 
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import Component from '../advanced-search-mapping-container';
 
 describe('GGRC.Components.advancedSearchMappingContainer', function () {
   'use strict';
 
   var viewModel;
 
-  beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('advancedSearchMappingContainer');
+  beforeEach(() => {
+    viewModel = new Component.prototype.viewModel();
   });
 
   describe('addMappingCriteria() method', function () {
@@ -47,7 +48,7 @@ describe('GGRC.Components.advancedSearchMappingContainer', function () {
       viewModel.attr('items', new can.List([
         AdvancedSearch.create.mappingCriteria({field: 'first'}),
         AdvancedSearch.create.operator(),
-        AdvancedSearch.create.mappingCriteria({field: 'second'})
+        AdvancedSearch.create.mappingCriteria({field: 'second'}),
       ]));
       viewItems = viewModel.attr('items');
 

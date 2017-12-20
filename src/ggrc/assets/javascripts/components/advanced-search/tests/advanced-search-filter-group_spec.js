@@ -4,14 +4,15 @@
 */
 
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import Component from '../advanced-search-filter-group';
 
 describe('GGRC.Components.advancedSearchFilterGroup', function () {
   'use strict';
 
   var viewModel;
 
-  beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('advancedSearchFilterGroup');
+  beforeEach(() => {
+    viewModel = Component.prototype.viewModel();
   });
 
   describe('addFilterCriterion() method', function () {
