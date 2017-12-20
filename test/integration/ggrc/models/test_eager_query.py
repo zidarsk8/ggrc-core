@@ -25,7 +25,7 @@ class TestAllModels(TestCase):
       if eager:
         try:
           self.assertEqual(
-              eager[-1], mixins.Identifiable,
+              eager[-1], mixins.base.Identifiable,
               "Model {}, has wrong mixin order. The last mixin with "
               "eager_query is '{}' instead of 'Identifiable'.".format(
                   model.__name__, eager[-1].__name__),

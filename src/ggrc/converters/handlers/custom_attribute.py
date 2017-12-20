@@ -42,7 +42,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
 
     cav = self._get_or_create_ca()
     cav.attribute_value = self.value
-    if isinstance(cav.attribute_value, models.mixins.Identifiable):
+    if isinstance(cav.attribute_value, models.mixins.base.Identifiable):
       obj = cav.attribute_value
       cav.attribute_value = obj.__class__.__name__
       cav.attribute_object_id = obj.id
