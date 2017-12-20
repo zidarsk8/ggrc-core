@@ -357,6 +357,7 @@ import {
       },
       addListItem: function (item) {
         var snapshotObject;
+
         if (isSnapshotType(item) &&
           item.snapshotObject) {
           snapshotObject = item.snapshotObject;
@@ -365,6 +366,10 @@ import {
           item.attr('class', snapshotObject.class);
           item.attr('snapshot_object_class', 'snapshot-object');
           item.attr('viewLink', snapshotObject.originalLink);
+        } else if (!isSnapshotType(item) && item.reify) {
+          // add full item object from cache
+          // if it isn't snapshot
+          item = item.reify();
         }
 
         this.viewModel.list.push(item);
