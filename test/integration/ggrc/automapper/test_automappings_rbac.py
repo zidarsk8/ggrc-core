@@ -8,6 +8,7 @@ import ddt
 from ggrc.models import all_models
 from integration.ggrc import TestCase
 from integration.ggrc import api_helper
+from integration.ggrc.access_control import acl_helper
 
 
 @ddt.ddt
@@ -43,13 +44,8 @@ class TestAutomappings(TestCase):
     response = self.api.post(all_models.Issue, data=[{
         "issue": {
             "status": "Draft",
-            "access_control_list": [{
-                "ac_role_id": self.issue_admin_role.id,
-                "person": {
-                    "type": user.type,
-                    "id": user.id
-                }
-            }],
+            "access_control_list": [
+                acl_helper.get_acl_json(self.issue_admin_role.id, user.id)],
             "assessment": {
                 "type": assessment.type,
                 "id": assessment.id,

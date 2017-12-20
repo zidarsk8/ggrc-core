@@ -23,6 +23,7 @@ from ggrc_workflows.models import CycleTaskGroupObjectTask, Workflow
 
 from integration.ggrc import TestCase
 from integration.ggrc_workflows.generator import WorkflowsGenerator
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc.api_helper import Api
 from integration.ggrc.generator import ObjectGenerator
 
@@ -289,19 +290,15 @@ class TestTaskOverdueNotificationsUsingAPI(TestTaskOverdueNotifications):
                 "description": "some task",
                 "start_date": date(2017, 5, 5),  # Friday
                 "end_date": date(2017, 5, 15),
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
             }, {
                 "title": "task 2",
                 "description": "some task 2",
                 "start_date": date(2017, 5, 5),  # Friday
                 "end_date": date(2017, 5, 16),
-                "access_control_list": [{
-                    "person": {"id": self.user.id, },
-                    "ac_role_id": role_id,
-                }],
+                "access_control_list": [
+                    acl_helper.get_acl_json(role_id, self.user.id)],
             }],
             "task_group_objects": self.random_objects
         }]
