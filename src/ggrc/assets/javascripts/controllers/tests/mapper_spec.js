@@ -39,7 +39,7 @@ describe('ObjectMapper', function () {
             updateScopeObject: jasmine.createSpy('updateScopeObject')
               .and
               .returnValue(updateScopeObject),
-            scopeObject: scopeObject,
+            audit: scopeObject,
           }),
         ],
       };

@@ -99,6 +99,10 @@ import {
           this.draw_node(true);
         }
       },
+    ' updateCount'(el, ev, count, updateCount) {
+      // prevents updating counts for widget after openning tree-view-node
+      ev.stopPropagation();
+    },
 
     markNotRelatedItem: function () {
       var instance = this.options.instance;
@@ -288,12 +292,6 @@ import {
       return this.trigger_expand();
     },
 
-    display_path: function (path) {
-      return this.display().then(this._ifNotRemoved(function () {
-        return TreeViewUtils.displayTreeSubpath(this.element, path);
-      }.bind(this)));
-    },
-
     display_subtrees: function () {
       var childTreeDfds = [];
       var that = this;
@@ -374,8 +372,9 @@ import {
      * @param {Boolean} maximizeInfoPane - Info pane maximized state
      */
     select: function (maximizeInfoPane) {
-      var $tree = this.element;
-      var treeHasMaximizedClass = $tree.hasClass('maximized-info-pane');
+      const $tree = this.element;
+      const treeHasMaximizedClass = $tree.hasClass('maximized-info-pane');
+      let control;
       if (typeof maximizeInfoPane === 'undefined') {
         if (treeHasMaximizedClass) {
           maximizeInfoPane = true;
@@ -406,8 +405,11 @@ import {
       }
 
       this.update_hash_fragment();
-      $('.pin-content').control()
-        .setInstance(this.options, $tree, maximizeInfoPane);
+
+      control = $('.pin-content').control();
+      if (control) {
+        control.setInstance(this.options, $tree, maximizeInfoPane);
+      }
     },
 
     'input,select click': function (el, ev) {

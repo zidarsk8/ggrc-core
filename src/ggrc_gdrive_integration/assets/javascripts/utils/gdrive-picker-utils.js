@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import RefreshQueue from '../../../../ggrc/assets/javascripts/models/refresh_queue';
+
 export const GDRIVE_PICKER_ERR_CANCEL = 'GDRIVE_PICKER_ERR_CANCEL';
 
 /**
@@ -23,7 +25,8 @@ export function uploadFiles(opts = {}) {
     .reAuthorize(gapi.auth.getToken())
     .done(()=>{
       gapi.load('picker', {callback: createPicker});
-    });
+    })
+    .fail(dfd.reject);
 
     // Create and render a Picker object for searching images.
   function createPicker() {

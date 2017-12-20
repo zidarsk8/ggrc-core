@@ -5,6 +5,7 @@
 
 """Test Assessment Template import."""
 
+from collections import OrderedDict
 from ggrc import models
 from ggrc.converters import errors
 from integration.ggrc import TestCase
@@ -39,6 +40,18 @@ class TestAssessmentTemplatesImport(TestCase):
         template.default_people["verifiers"],
         [people["user3@a.com"], people["user1@a.com"]],
     )
+
+  def test_modify_over_import(self):
+    """Test import modifies Assessment Template and does not fail."""
+    self.import_file("assessment_template_no_warnings.csv")
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment_Template"),
+        ("Code*", "T-1"),
+        ("Audit*", "Audit"),
+        ("Title", "Title"),
+        ("Object Under Assessment", 'Control'),
+    ]))
+    self._check_csv_response(response, {})
 
   def test_invalid_import(self):
     """Test invalid import."""

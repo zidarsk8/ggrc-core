@@ -35,7 +35,7 @@ class CycleTaskResource(common.Resource):
       signal_context.append(context_element)
     ggrc_workflows.Signals.status_change.send(self.model,
                                               objs=signal_context)
-    ggrc_workflows.update_cycle_task_object_task_parent_state(updated_objects)
+    ggrc_workflows.update_cycle_task_tree(updated_objects)
 
   @staticmethod
   def log_event():

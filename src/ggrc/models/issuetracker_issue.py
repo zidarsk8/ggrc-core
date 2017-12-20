@@ -23,7 +23,7 @@ class IssuetrackerIssue(Base, db.Model):
   issue_priority = db.Column(db.String(50), nullable=True)
   issue_severity = db.Column(db.String(50), nullable=True)
   assignee = db.Column(db.String(250), nullable=True)
-  cc_list = db.Column(db.Text, nullable=True)
+  cc_list = db.Column(db.Text, nullable=False, default="")
 
   issue_id = db.Column(db.String(50), nullable=True)
   issue_url = db.Column(db.String(250), nullable=True)

@@ -6,7 +6,6 @@
 .ggrc-form {
 
   &__title {
-    display: -webkit-box;
     font-size: 11px;
     text-transform: uppercase;
     font-weight: bold;
@@ -16,9 +15,7 @@
     position: relative;
     overflow: hidden;
     text-overflow: ellipsis;
-    word-wrap: break-word;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
+    white-space: nowrap;
   }
 
   &.ggrc-form-multiple-columns {
@@ -96,6 +93,15 @@
       }
     }
 
+    .ggrc-form-item__checkbox-item {
+      label {
+        font-size: 14px;
+        white-space: nowrap;
+        font-weight: normal;
+        text-transform: none;
+      }
+    }
+
     .ggrc-from-item__checkbox-list {
       justify-content: flex-start;
       display: flex;
@@ -105,13 +111,6 @@
         flex-basis: 350px;
         max-width: 350px;
         margin-right: 30px;
-
-        label {
-          font-size: 14px;
-          white-space: nowrap;
-          font-weight: normal;
-          text-transform: none;
-        }
       }
     }
 
@@ -120,6 +119,12 @@
       font-size: 12px;
       font-weight: bold;
       margin-bottom: 5px;
+    }
+
+    &__label-text {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     &__text {
@@ -132,5 +137,9 @@
       margin-bottom: 8px;
       line-height: 10px;
     }
+  }
+
+  .ggrc-form-item_m-b-0 {
+    margin-bottom: 0;
   }
 }

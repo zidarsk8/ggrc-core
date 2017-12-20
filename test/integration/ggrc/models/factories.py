@@ -396,6 +396,13 @@ class FacilityFactory(TitledFactory):
     model = models.Facility
 
 
+class ObjectPersonFactory(ModelFactory):
+  """ObjectPerson factory class"""
+
+  class Meta:
+    model = models.ObjectPerson
+
+
 class ProductFactory(TitledFactory):
   """Product factory class"""
 

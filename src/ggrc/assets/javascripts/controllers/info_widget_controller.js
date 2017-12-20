@@ -3,6 +3,10 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import '../components/comment/comment-data-provider';
+import '../components/comment/comment-add-form';
+import '../components/comment/mapped-comments';
+
 (function (_, can, GGRC, CMS) {
   can.Control('GGRC.Controllers.InfoWidget', {
     defaults: {

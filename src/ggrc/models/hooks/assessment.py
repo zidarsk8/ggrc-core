@@ -79,12 +79,13 @@ def _handle_assessment(assessment, src, snapshots, templates, audits):
   )
 
   if not template:
+    # Assessment test plan should inherit test plan of snapshot
+    assessment.test_plan = snapshot.revision.content.get("test_plan")
     return
 
+  assessment.test_plan = template.procedure_description
   if template.test_plan_procedure:
-    assessment.test_plan = snapshot.revision.content['test_plan']
-  else:
-    assessment.test_plan = template.procedure_description
+    copy_snapshot_plan(assessment, snapshot)
   if template.template_object_type:
     assessment.assessment_type = template.template_object_type
 
@@ -277,3 +278,12 @@ def relate_ca(assessment, template):
         placeholder=definition.placeholder,
     )
     db.session.add(cad)
+
+
+def copy_snapshot_plan(assessment, snapshot):
+  """Copy test plan of Snapshot into Assessment"""
+  if assessment.test_plan and snapshot.revision.content["test_plan"]:
+    assessment.test_plan += "<br>"
+    assessment.test_plan += snapshot.revision.content["test_plan"]
+  elif snapshot.revision.content["test_plan"]:
+    assessment.test_plan = snapshot.revision.content["test_plan"]

@@ -16,8 +16,8 @@ from lib.entities import entities_factory, entity
 from lib.entities.entities_factory import CustomAttributeDefinitionsFactory
 from lib.entities.entity import Representation
 from lib.service import rest_service, webui_service
-from lib.utils import string_utils
 from lib.utils.filter_utils import FilterUtils
+from lib.utils.string_utils import StringMethods
 
 
 class TestAssessmentsWorkflow(base.Test):
@@ -255,9 +255,9 @@ class TestAssessmentsWorkflow(base.Test):
             [{act_res["filter"]: [act_obj.title for act_obj in act_res["objs"]]
               } for act_res in actual_results]) +
         messages.AssertionMessages.format_err_msg_equal(
-            string_utils.convert_list_elements_to_list(
+            StringMethods.convert_list_elements_to_list(
                 [exp_res["objs"] for exp_res in expected_results]),
-            string_utils.convert_list_elements_to_list(
+            StringMethods.convert_list_elements_to_list(
                 [act_res["objs"] for act_res in actual_results])))
 
   @pytest.mark.smoke_tests

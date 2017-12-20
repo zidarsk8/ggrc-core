@@ -4,6 +4,7 @@
 */
 
 import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+import RefreshQueue from '../../../models/refresh_queue';
 
 describe('GGRC.Components.objectMapper', function () {
   'use strict';
@@ -425,14 +426,10 @@ describe('GGRC.Components.objectMapper', function () {
         deferredSave: jasmine.createSpy().and.returnValue('deferredSave'),
         mapObjects: events.mapObjects,
       };
-      spyOn(window, 'RefreshQueue')
+      spyOn(RefreshQueue.prototype, 'enqueue')
         .and.returnValue({
-          enqueue: function () {
-            return {
-              trigger: jasmine.createSpy()
-                .and.returnValue(can.Deferred().resolve()),
-            };
-          },
+          trigger: jasmine.createSpy()
+            .and.returnValue(can.Deferred().resolve()),
         });
       spyOn($.prototype, 'trigger');
     });

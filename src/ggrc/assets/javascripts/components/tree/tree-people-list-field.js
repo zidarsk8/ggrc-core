@@ -25,7 +25,7 @@ GGRC.Components('treePeopleListField', {
   template: template,
   viewModel: viewModel,
   events: {
-    '{viewModel.source} change': function () {
+    '{viewModel} source': function () {
       this.viewModel.refreshPeople();
     },
   },

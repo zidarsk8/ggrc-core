@@ -116,7 +116,7 @@ const ObjectMapper = can.Control.extend({
       inScopeObject =
         CMS.Models[data.join_object_type].store[data.join_object_id];
       inScopeObject.updateScopeObject().then(function () {
-        var scopeObject = inScopeObject.attr('scopeObject');
+        var scopeObject = inScopeObject.attr('audit');
 
         if (!scopeObject.id) {
           GGRC.Errors.notifier('error', DATA_CORRUPTION_MESSAGE);

@@ -6,6 +6,7 @@
 import {
   getPageType,
 } from '../../plugins/utils/current-page-utils';
+import tracker from '../../tracker';
 
 export default can.Map.extend({
   define: {
@@ -72,6 +73,12 @@ export default can.Map.extend({
   select: function ($element) {
     var instance = this.attr('instance');
     var itemSelector = this.attr('itemSelector');
+
+    if (instance.type === 'Assessment') {
+      tracker.start(instance.type,
+        tracker.USER_JOURNEY_KEYS.NAVIGATION,
+        tracker.USER_ACTIONS.OPEN_INFO_PANE);
+    }
 
     $element = $element.closest(itemSelector);
 

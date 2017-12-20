@@ -10,7 +10,9 @@ import {
 } from './plugins/utils/snapshot-utils';
 import {
   isMyAssessments,
+  isAdmin,
 } from './plugins/utils/current-page-utils';
+import RefreshQueue from './models/refresh_queue';
 
 (function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.
@@ -273,6 +275,14 @@ Mustache.registerHelper("firstnonempty", function () {
     if (v != null && !!v.toString().trim().replace(/&nbsp;|\s|<br *\/?>/g, "")) return v.toString();
   }
   return "";
+});
+
+Mustache.registerHelper('is_empty', (data, options) => {
+  data = resolve_computed(data);
+  const result = can.isEmptyObject(
+    can.isPlainObject(data) ? data : data.attr()
+  );
+  return options[result ? 'fn' : 'inverse'](options.contexts);
 });
 
 Mustache.registerHelper("pack", function () {
@@ -1202,8 +1212,7 @@ Mustache.registerHelper("visibility_delay", function (delay, options) {
   };
 });
 
-Mustache.registerHelper("with_program_roles_as", function (
-      var_name, result, options) {
+Mustache.registerHelper("with_program_roles_as", function (result, options) {
   var dfd = $.when()
     , frame = new can.Observe()
     , user_roles = []
@@ -1276,6 +1285,12 @@ function get_observe_context(scope) {
 
   Mustache.registerHelper('isMyAssessments', function (options) {
     return isMyAssessments() ?
+      options.fn(options.contexts) :
+      options.inverse(options.contexts);
+  });
+
+  Mustache.registerHelper('is_admin_page', (options) => {
+    return isAdmin() ?
       options.fn(options.contexts) :
       options.inverse(options.contexts);
   });
@@ -2486,57 +2501,6 @@ Example:
     }
   );
 
-  /**
-   * Determine the list of people IDs that have `roleName` granted on
-   * `instance` and render the corresponding Mustache block.
-   *
-   * The list of people IDs is exposed to the helper's block context via
-   * the 'peopleIds' Array.
-   *
-   * Example usage:
-   *
-   *   {{#peopleWithRole modelInstance customRoleName}}
-   *     {{#peopleIds}}
-   *       <p>User ID {{.}} has role {{customRoleName}} granted
-   *          on {{modelInstance.type}} with ID {{modelInstance.id}}</p>
-   *     {{/peopleIds}}
-   *   {{/peopleWithRole}}
-   *
-   * @param {CMS.Models.Cacheable} instance - a model instance
-   * @param {String} roleName - the name of the custom role
-   * @param {Object} options - a CanJS options object passed to every helper
-   *
-   * @return {String} - a rendered template block from inside the helper
-   */
-  Mustache.registerHelper(
-    'peopleWithRole',
-    function (instance, roleName, options) {
-      var peopleIds;
-
-      if (arguments.length < 3) {
-        console.warn('Arguments missing for peopleWithRole helper.');
-        return options.fn({peopleIds: []});
-      }
-
-      instance = Mustache.resolve(instance);
-      roleName = Mustache.resolve(roleName);
-
-      if (!instance || !roleName) {
-        return options.fn({peopleIds: []});
-      }
-
-      peopleIds = GGRC.Utils.peopleWithRoleName(instance, roleName)
-        .map(function (person) {
-          return person.id;
-        });
-
-      if (peopleIds.length > 0) {
-        return options.fn({peopleIds: peopleIds});
-      }
-      return options.inverse({peopleIds: []});
-    }
-  );
-
   Mustache.registerHelper('modifyFieldTitle', function (type, field, options) {
     var titlesMap = {
       Cycle: 'Cycle ',
@@ -2575,33 +2539,6 @@ Example:
         }, hasRoleForContextDfd);
     });
 
-  Mustache.registerHelper('isNotObjectVersion',
-    function (widgetName, options) {
-      widgetName = Mustache.resolve(widgetName);
-      if (widgetName.indexOf('Versions') > -1) {
-        return options.inverse(options.contexts);
-      }
-
-      return options.fn(options.contexts);
-    }
-  );
-  Mustache.registerHelper('isNotProhibitedMap',
-    function (fromModel, toModel, options) {
-      var prohibitedMapList = {
-        Issue: ['Assessment', 'Audit']
-      };
-
-      fromModel = Mustache.resolve(fromModel);
-      toModel = Mustache.resolve(toModel);
-
-      if (prohibitedMapList[fromModel]
-        && prohibitedMapList[fromModel].includes(toModel)) {
-        return options.inverse(options.contexts);
-      }
-
-      return options.fn(options.contexts);
-    }
-  );
   Mustache.registerHelper('displayWidgetTab',
     function (widget, instance, options) {
       var displayTab;

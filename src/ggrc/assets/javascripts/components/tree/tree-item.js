@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../lazy-render/lazy-render';
 import '../cycle-task-actions/cycle-task-actions';
 import './tree-item-custom-attribute';
 import BaseTreeItemVM from './tree-item-base-vm';

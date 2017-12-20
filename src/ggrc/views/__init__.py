@@ -373,8 +373,8 @@ def index():
   """The initial entry point of the app
   """
   if not settings.PRODUCTION:
-    flash(u"""<b>WARNING</b> - This is not the production instance
-              of the GGRC application.<br><br>
+    flash(u"""This is not the production instance
+              of the GGRC application.<br>
               Company confidential, sensitive or personally identifiable
               information <b>*MUST NOT*</b> be entered or stored here.
               For any questions, please contact your administrator.""",

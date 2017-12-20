@@ -54,11 +54,13 @@ class InfoWidget(base.Widget):
       self.modified_by = selenium_utils.get_when_visible(
           self.info_widget_elem, self._locators.TXT_MODIFIED_BY_CSS)
       _created_at_txt, _updated_at_txt = (
-          self.info_page_footer.text.split(string_utils.WHITESPACE * 6))
+          self.info_page_footer.text.split(
+              string_utils.Symbols.WHITESPACE * 6))
       self.created_at_txt = (
-          re.sub("Created at", string_utils.BLANK, _created_at_txt))
+          re.sub("Created at", string_utils.Symbols.BLANK, _created_at_txt))
       self.updated_at_txt = (
-          _updated_at_txt.splitlines()[1].replace("on ", string_utils.BLANK))
+          _updated_at_txt.splitlines()[1].replace(
+              "on ", string_utils.Symbols.BLANK))
       self._extend_list_all_scopes(
           [self._elements.CREATED_AT.upper(),
            self._elements.MODIFIED_BY.upper(),

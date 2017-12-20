@@ -9,16 +9,13 @@ from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.models.comment import Commentable
+from ggrc.models.mixins.with_similarity_score import WithSimilarityScore
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.access_control.roleable import Roleable
 from ggrc.models.audit_object import Auditable
 from ggrc.models.categorization import Categorizable
 from ggrc.models.category import CategoryBase
-from ggrc.models.mixins import BusinessObject
-from ggrc.models.mixins import CustomAttributable
-from ggrc.models.mixins import Hierarchical
-from ggrc.models.mixins import TestPlanned
-from ggrc.models.mixins import LastDeprecatedTimeboxed
+from ggrc.models import mixins
 from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
 from ggrc.models.deferred import deferred
 from ggrc.models.object_person import Personable
@@ -138,11 +135,25 @@ class AssertionCategorized(Categorizable):
     )
 
 
-class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
-              CustomAttributable, Personable, ControlCategorized,
-              PublicDocumentable, AssertionCategorized, Hierarchical,
-              LastDeprecatedTimeboxed, Auditable, TestPlanned,
-              Commentable, BusinessObject, Indexed, db.Model):
+class Control(WithLastAssessmentDate,
+              HasObjectState,
+              Roleable,
+              Relatable,
+              mixins.CustomAttributable,
+              Personable,
+              ControlCategorized,
+              PublicDocumentable,
+              AssertionCategorized,
+              mixins.Hierarchical,
+              mixins.LastDeprecatedTimeboxed,
+              Auditable,
+              mixins.TestPlanned,
+              Commentable,
+              WithSimilarityScore,
+              mixins.BusinessObject,
+              Indexed,
+              mixins.Folderable,
+              db.Model):
   __tablename__ = 'controls'
 
   company_control = deferred(db.Column(db.Boolean), 'Control')
@@ -151,7 +162,8 @@ class Control(WithLastAssessmentDate, HasObjectState, Roleable, Relatable,
   kind_id = deferred(db.Column(db.Integer), 'Control')
   means_id = deferred(db.Column(db.Integer), 'Control')
   version = deferred(db.Column(db.String), 'Control')
-  documentation_description = deferred(db.Column(db.Text), 'Control')
+  documentation_description = deferred(db.Column(db.Text, nullable=False,
+                                                 default=u""), 'Control')
   verify_frequency_id = deferred(db.Column(db.Integer), 'Control')
   fraud_related = deferred(db.Column(db.Boolean), 'Control')
   key_control = deferred(db.Column(db.Boolean), 'Control')

@@ -189,9 +189,6 @@
         this.constructor.oauth_dfd.reject();
         // creating new Promise and running the Auth process again
         dfd = this.constructor.oauth_dfd = new $.Deferred();
-        this.constructor.oauth_dfd.done(function () {
-          dfd.resolve.apply(dfd, arguments);
-        });
         this.doGAuthWithScopes();
       }
 

@@ -3,6 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../components/audit/attach-folder-button'
+import RefreshQueue from './refresh_queue';
+
 (function (can, CMS) {
   const AUDIT_ISSUE_TRACKER = {
     hotlist_id: '766459',
@@ -379,6 +382,7 @@
     mixins: [
       'mapping-limit',
       'inScopeObjects',
+      'inScopeObjectsPreload',
       'refetchHash',
       'issueTrackerIntegratable',
     ],
@@ -392,7 +396,7 @@
       context: 'CMS.Models.Context.stub'
     },
     defaults: {
-      test_plan_procedure: false,
+      test_plan_procedure: true,
       template_object_type: 'Control',
       default_people: {
         assignees: 'Principal Assignees',

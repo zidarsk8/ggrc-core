@@ -17,7 +17,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     destroy: 'DELETE /api/assessments/{id}',
     create: 'POST /api/assessments',
     mixins: [
-      'ownable', 'unique_title',
+      'ownable', 'unique_title', 'ca_update',
       'autoStatusChangeable', 'timeboxed', 'mapping-limit',
       'inScopeObjects', 'accessControlList', 'refetchHash',
       'issueTrackerIntegratable',
@@ -25,6 +25,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     is_custom_attributable: true,
     isRoleable: true,
     defaults: {
+      _copyAssessmentProcedure: true,
       assessment_type: 'Control',
       status: 'Not Started',
       send_by_default: true,  // notifications when a comment is added
@@ -256,6 +257,16 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     after_create: function () {
       this._checkIssueTrackerWarnings();
     },
+    before_save: function () {
+      var mappedObjectsChanges = this.attr('mappedObjectsChanges');
+      if ( mappedObjectsChanges ) {
+        mappedObjectsChanges.forEach((mo)=>{
+          mo.extra = {
+            copyAssessmentProcedure: this.attr('_copyAssessmentProcedure'),
+          };
+        });
+      }
+    },
     before_create: function () {
       if (!this.audit) {
         throw new Error('Cannot save assessment, audit not set.');
@@ -300,8 +311,6 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       if (pageInstance && (!this.audit || !this.audit.id || !this.audit.type)) {
         if (pageInstance.type === 'Audit') {
           this.attr('audit', pageInstance);
-        } else if (this.scopeObject) {
-          this.audit = this.scopeObject;
         }
       }
 
@@ -402,8 +411,22 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
       this._pending_refresh.fn();
       return dfd;
     },
-    info_pane_preload: function () {
-      this.refresh();
-    }
+    getRelatedObjects () {
+      return $.get(`/api/assessments/${this.attr('id')}/related_objects`)
+        .then((response) => {
+          let auditTitle = response.Audit.title;
+
+          if (this.attr('audit')) {
+            this.attr('audit.title', auditTitle);
+
+            if (this.attr('audit.issue_tracker')) {
+              this.attr('can_use_issue_tracker',
+                this.attr('audit.issue_tracker.enabled'));
+            }
+          }
+
+          return response;
+        });
+    },
   });
 })(window.can, window.GGRC, window.CMS);
