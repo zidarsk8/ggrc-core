@@ -220,6 +220,22 @@ class Revision(Base, db.Model):
     return {"labels": [{"id": None,
                         "name": label}]} if label else {"labels": []}
 
+  def _document_evidence_hack(self):
+    """Update display_name on evideces
+
+    Evidences have display names from links and titles, and until now they used
+    slug property to calculate the display name. This hack is here since we
+    must support older revisions with bad data, and to avoid using slug
+    differently than everywhere else in the app.
+
+    Returns:
+      dict with updated display name if the current revision is for evidence.
+    """
+    document_evidence = self._content.get("document_evidence", {})
+    for evidence in document_evidence:
+      evidence[u"display_name"] = u"{link} {title}".format(**evidence)
+    return {u"document_evidence": document_evidence}
+
   @builder.simple_property
   def content(self):
     """Property. Contains the revision content dict.
@@ -231,6 +247,7 @@ class Revision(Base, db.Model):
     populated_content.update(self.populate_reference_url())
     populated_content.update(self.populate_folder())
     populated_content.update(self.populate_labels())
+    populated_content.update(self._document_evidence_hack())
     return populated_content
 
   @content.setter
