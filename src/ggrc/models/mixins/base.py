@@ -1,3 +1,54 @@
+# Copyright (C) 2017 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+"""Mixins to add common attributes and relationships. Note, all model classes
+must also inherit from ``db.Model``. For example:
+color
+color
+  ..
+
+     class Market(BusinessObject, db.Model):
+       __tablename__ = 'markets'
+
+"""
+
+# pylint: disable=no-self-argument
+# All declared_attr properties that are class level as per sqlalchemy
+# documentatio, are reported as false positives by pylint.
+
+from logging import getLogger
+
+from sqlalchemy import orm
+from sqlalchemy.ext.declarative import declared_attr
+
+from ggrc import builder
+from ggrc import db
+from ggrc.models import reflection
+from ggrc.models.inflector import ModelInflectorDescriptor
+from ggrc.models.reflection import AttributeInfo
+from ggrc.utils import create_stub
+from ggrc.fulltext import attributes
+
+
+# pylint: disable=invalid-name
+logger = getLogger(__name__)
+
+
+def is_attr_of_type(object_, attr_name, mapped_class):
+  """Check if relationship property points to mapped_class"""
+  cls = object_.__class__
+
+  if isinstance(attr_name, basestring):
+    if hasattr(cls, attr_name):
+      cls_attr = getattr(cls, attr_name)
+      if (hasattr(cls_attr, "property") and
+          isinstance(cls_attr.property,
+                     orm.properties.RelationshipProperty) and
+              cls_attr.property.mapper.class_ == mapped_class):
+        return True
+  return False
+
+
 class Identifiable(object):
 
   """A model with an ``id`` property that is the primary key."""
@@ -55,8 +106,6 @@ class Identifiable(object):
     if len(table_dict) > 0:
       table_args.append(table_dict)
     return tuple(table_args,)
-
-
 
 
 class ContextRBAC(object):

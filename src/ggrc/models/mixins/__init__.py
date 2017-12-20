@@ -27,15 +27,12 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import validates
 from sqlalchemy.orm.session import Session
 
-from ggrc import builder
 from ggrc import db
 from ggrc.models import reflection
 from ggrc.models.deferred import deferred
-from ggrc.models.inflector import ModelInflectorDescriptor
-from ggrc.models.reflection import AttributeInfo
 from ggrc.models.mixins.customattributable import CustomAttributable
 from ggrc.models.mixins.notifiable import Notifiable
-from ggrc.utils import create_stub
+from ggrc.models.mixins.base import Base
 from ggrc.fulltext import attributes
 
 
@@ -446,21 +443,6 @@ class VerifiedDate(object):
     return value
 
 
-def is_attr_of_type(object_, attr_name, mapped_class):
-  """Check if relationship property points to mapped_class"""
-  cls = object_.__class__
-
-  if isinstance(attr_name, basestring):
-    if hasattr(cls, attr_name):
-      cls_attr = getattr(cls, attr_name)
-      if (hasattr(cls_attr, "property") and
-          isinstance(cls_attr.property,
-                     orm.properties.RelationshipProperty) and
-         cls_attr.property.mapper.class_ == mapped_class):
-        return True
-  return False
-
-
 class Slugged(Base):
 
   """Several classes make use of the common mixins and additional are
@@ -687,13 +669,10 @@ class Folderable(object):
 __all__ = [
     "Base",
     "BusinessObject",
-    "ChangeTracked",
-    "ContextRBAC",
     "CustomAttributable",
     "Described",
     "FinishedDate",
     "Hierarchical",
-    "Identifiable",
     "Noted",
     "Notifiable",
     "Slugged",
