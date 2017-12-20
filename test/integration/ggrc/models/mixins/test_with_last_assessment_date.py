@@ -46,8 +46,8 @@ class TestWithLastAssessmentDate(TestCase, WithQueryApi):
                    .filter_by(child_type="Control").all())
     o_snapshots = (db.session.query(all_models.Snapshot)
                    .filter_by(child_type="Objective").all())
-    c_id_to_snap_id = {s.child_id: s.id for s in c_snapshots}
-    o_id_to_snap_id = {s.child_id: s.id for s in o_snapshots}
+    c_id_to_snap = {s.child_id: s for s in c_snapshots}
+    o_id_to_snap = {s.child_id: s for s in o_snapshots}
 
     assessments = [factories.AssessmentFactory() for _ in range(3)]
     self.assessment_ids = [a.id for a in assessments]
@@ -64,18 +64,18 @@ class TestWithLastAssessmentDate(TestCase, WithQueryApi):
     # Assessment is not completed.
 
     self._create_relationships(
-        (c_id_to_snap_id[self.control_ids[0]], assessments[0]),
-        (c_id_to_snap_id[self.control_ids[0]], assessments[1]),
-        (c_id_to_snap_id[self.control_ids[0]], assessments[2]),
-        (c_id_to_snap_id[self.control_ids[1]], assessments[1]),
-        (c_id_to_snap_id[self.control_ids[1]], assessments[2]),
-        (c_id_to_snap_id[self.control_ids[2]], assessments[2]),
-        (o_id_to_snap_id[self.objective_ids[2]], assessments[0]),
-        (o_id_to_snap_id[self.objective_ids[2]], assessments[1]),
-        (o_id_to_snap_id[self.objective_ids[2]], assessments[2]),
-        (o_id_to_snap_id[self.objective_ids[1]], assessments[0]),
-        (o_id_to_snap_id[self.objective_ids[1]], assessments[1]),
-        (o_id_to_snap_id[self.objective_ids[0]], assessments[0]),
+        (c_id_to_snap[self.control_ids[0]], assessments[0]),
+        (c_id_to_snap[self.control_ids[0]], assessments[1]),
+        (c_id_to_snap[self.control_ids[0]], assessments[2]),
+        (c_id_to_snap[self.control_ids[1]], assessments[1]),
+        (c_id_to_snap[self.control_ids[1]], assessments[2]),
+        (c_id_to_snap[self.control_ids[2]], assessments[2]),
+        (o_id_to_snap[self.objective_ids[2]], assessments[0]),
+        (o_id_to_snap[self.objective_ids[2]], assessments[1]),
+        (o_id_to_snap[self.objective_ids[2]], assessments[2]),
+        (o_id_to_snap[self.objective_ids[1]], assessments[0]),
+        (o_id_to_snap[self.objective_ids[1]], assessments[1]),
+        (o_id_to_snap[self.objective_ids[0]], assessments[0]),
     )
 
     self.finished_dates = [datetime.datetime(2017, 2, 20, 13, 40, 0),
@@ -112,10 +112,9 @@ class TestWithLastAssessmentDate(TestCase, WithQueryApi):
   @staticmethod
   def _create_relationships(*assessment_rels):
     """Create mappings for pairs of Snapshot and Assessment passed by id."""
-    for snapshot_id, assessment in assessment_rels:
+    for snapshot, assessment in assessment_rels:
       factories.RelationshipFactory(source=assessment,
-                                    destination_type="Snapshot",
-                                    destination_id=snapshot_id)
+                                    destination=snapshot)
 
   def test_last_asmt_date_values(self):
     """Last Assessment Date contains correct value for original object."""
