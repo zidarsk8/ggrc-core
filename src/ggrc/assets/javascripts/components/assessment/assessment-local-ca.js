@@ -77,11 +77,11 @@ import Permission from '../../permission';
           },
         },
       },
-      validateForm: function (formInit = false) {
+      validateForm: function () {
         var self = this;
         this.attr('fields')
           .each(function (field) {
-            self.performValidation({field, formInit});
+            self.performValidation({field});
           });
         if (this.attr('instance.hasValidationErrors')) {
           this.dispatch(VALIDATION_ERROR);
@@ -89,7 +89,6 @@ import Permission from '../../permission';
       },
       performValidation: function ({
         field,
-        formInit = false,
         triggerAttachmentModals = false,
       }) {
         var fieldValid;
@@ -118,8 +117,7 @@ import Permission from '../../permission';
         hasMissingEvidence = requiresEvidence &&
           !!this.attr('isEvidenceRequired');
 
-        hasMissingComment = formInit ?
-          requiresComment && !!errorsMap.comment : requiresComment;
+        hasMissingComment = requiresComment && !!errorsMap.comment;
 
         if (field.type === 'checkbox') {
           if (value === '1') {
@@ -223,12 +221,6 @@ import Permission from '../../permission';
       },
     },
     events: {
-      inserted: function () {
-        this.viewModel.validateForm(true);
-      },
-      '{viewModel.instance} update': function () {
-        this.viewModel.validateForm();
-      },
       '{viewModel.instance} afterCommentCreated': function () {
         this.viewModel.validateForm();
       },
