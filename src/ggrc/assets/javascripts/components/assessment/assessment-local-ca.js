@@ -213,8 +213,21 @@ import Permission from '../../permission';
           stopFn();
         });
       },
+      fieldRequiresComment: function (field) {
+        let fieldValidationConf = field.validationConfig[field.value];
+          return fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
+            fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+      },
       attributeChanged: function (e) {
         e.field.attr('value', e.value);
+
+        // Removes "link" with the comment for DD field and
+        // makes it require a new one
+        if ( e.field.attr('type') === 'dropdown' &&
+            this.fieldRequiresComment(e.field) ) {
+          e.field.attr('errorsMap.comment', true);
+        }
+
         this.performValidation({field: e.field, triggerAttachmentModals: true});
         this.attr('formSavedDeferred', can.Deferred());
         this.save(e.fieldId, e.value);
