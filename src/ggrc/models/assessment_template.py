@@ -7,6 +7,7 @@
 from sqlalchemy.orm import validates
 
 from ggrc import db
+from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
 from ggrc.models import assessment
 from ggrc.models import audit
@@ -22,7 +23,7 @@ from ggrc.fulltext.mixin import Indexed
 
 
 class AssessmentTemplate(assessment.AuditRelationship, relationship.Relatable,
-                         mixins.Titled, mixins.CustomAttributable,
+                         mixins.Titled, mixins.CustomAttributable, Roleable,
                          mixins.Slugged, mixins.Stateful, Indexed, db.Model):
   """A class representing the assessment template entity.
 

@@ -17,6 +17,7 @@ from sqlalchemy.sql.expression import tuple_
 
 from ggrc import builder
 from ggrc import db
+from ggrc.access_control.roleable import Roleable
 from ggrc.utils import benchmark
 from ggrc.login import get_current_user_id
 from ggrc.models import mixins
@@ -27,8 +28,8 @@ from ggrc.models.deferred import deferred
 from ggrc.models.mixins.with_last_assessment_date import WithLastAssessmentDate
 
 
-class Snapshot(relationship.Relatable, WithLastAssessmentDate, mixins.Base,
-               db.Model):
+class Snapshot(Roleable, relationship.Relatable, WithLastAssessmentDate,
+               mixins.Base, db.Model):
   """Snapshot object that holds a join of parent object, revision, child object
   and parent object's context.
 
