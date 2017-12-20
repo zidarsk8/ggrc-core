@@ -106,7 +106,7 @@ describe('assessmentLocalCa component', () => {
       viewModel.attr('fields', [checkboxField]);
       dropdownField.attr('value', null);
 
-      performValidation(checkboxField);
+      performValidation({field: checkboxField});
 
       expect(checkboxField.attr().validation).toEqual({
         show: false,
@@ -115,7 +115,7 @@ describe('assessmentLocalCa component', () => {
         mandatory: false,
       });
 
-      performValidation(checkboxField);
+      performValidation({field: checkboxField});
 
       expect(checkboxField.attr().validation).toEqual({
         show: false,
@@ -130,7 +130,7 @@ describe('assessmentLocalCa component', () => {
       checkboxField.attr('value', null);
       checkboxField.attr('validation.mandatory', true);
 
-      performValidation(checkboxField);
+      performValidation({field: checkboxField});
       expect(checkboxField.attr().validation).toEqual({
         mandatory: true,
         show: true,
@@ -139,7 +139,7 @@ describe('assessmentLocalCa component', () => {
       });
 
       checkboxField.attr('value', 0);
-      performValidation(checkboxField);
+      performValidation({field: checkboxField});
       expect(checkboxField.attr().validation).toEqual({
         mandatory: true,
         show: true,
@@ -148,7 +148,7 @@ describe('assessmentLocalCa component', () => {
       });
 
       checkboxField.attr('value', 1);
-      performValidation(checkboxField);
+      performValidation({field: checkboxField});
       expect(checkboxField.attr().validation).toEqual({
         mandatory: true,
         show: true,
@@ -157,7 +157,7 @@ describe('assessmentLocalCa component', () => {
       });
 
       checkboxField.attr('value', '1');
-      performValidation(checkboxField);
+      performValidation({field: checkboxField});
       expect(checkboxField.attr().validation).toEqual({
         mandatory: true,
         show: true,
@@ -170,7 +170,7 @@ describe('assessmentLocalCa component', () => {
       viewModel.attr('fields', [inputField]);
       inputField.attr('value', '');
 
-      performValidation(inputField);
+      performValidation({field: inputField});
       expect(inputField.attr().validation).toEqual({
         mandatory: false,
         show: false,
@@ -179,7 +179,7 @@ describe('assessmentLocalCa component', () => {
       });
 
       inputField.attr('value', 'some input');
-      performValidation(inputField);
+      performValidation({field: inputField});
       expect(inputField.attr().validation).toEqual({
         mandatory: false,
         show: false,
@@ -194,7 +194,7 @@ describe('assessmentLocalCa component', () => {
 
       inputField.attr('validation.mandatory', true);
 
-      performValidation(inputField);
+      performValidation({field: inputField});
       expect(inputField.attr().validation).toEqual({
         mandatory: true,
         show: true,
@@ -203,7 +203,7 @@ describe('assessmentLocalCa component', () => {
       });
 
       inputField.attr('value', 'some input');
-      performValidation(inputField);
+      performValidation({field: inputField});
       expect(inputField.attr().validation).toEqual({
         mandatory: true,
         show: true,
@@ -217,7 +217,7 @@ describe('assessmentLocalCa component', () => {
       viewModel.attr('fields', [dropdownField]);
       dropdownField.attr('value', '');
 
-      performValidation(dropdownField);
+      performValidation({field: dropdownField});
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
         show: false,
@@ -235,7 +235,7 @@ describe('assessmentLocalCa component', () => {
       viewModel.attr('fields', [dropdownField]);
       dropdownField.attr('value', 'nothing required');
 
-      performValidation(dropdownField);
+      performValidation({field: dropdownField});
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
         show: true,
@@ -255,7 +255,7 @@ describe('assessmentLocalCa component', () => {
       dropdownField.attr('value', 'comment required');
 
       dropdownField.attr('errorsMap.comment', true);
-      performValidation(dropdownField, true);
+      performValidation({field: dropdownField});
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -275,7 +275,7 @@ describe('assessmentLocalCa component', () => {
       viewModel.attr('fields', [dropdownField]);
       dropdownField.attr('value', 'comment required');
 
-      performValidation(dropdownField, true);
+      performValidation({field: dropdownField});
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -296,7 +296,7 @@ describe('assessmentLocalCa component', () => {
       dropdownField.attr('value', 'evidence required');
 
       dropdownField.attr('errorsMap.evidence', true);
-      performValidation(dropdownField);
+      performValidation({field: dropdownField});
 
       expect(viewModel.attr('evidenceAmount')).toBe(0);
       expect(dropdownField.attr().validation).toEqual({
@@ -318,7 +318,7 @@ describe('assessmentLocalCa component', () => {
       viewModel.attr('evidenceAmount', 1);
       dropdownField.attr('value', 'evidence required');
 
-      performValidation(dropdownField, true);
+      performValidation({field: dropdownField});
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -341,7 +341,7 @@ describe('assessmentLocalCa component', () => {
       dropdownField.attr('errorsMap.comment', true);
       dropdownField.attr('errorsMap.evidence', true);
 
-      performValidation(dropdownField, true);
+      performValidation({field: dropdownField});
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -362,7 +362,7 @@ describe('assessmentLocalCa component', () => {
       dropdownField.attr('value', 'com+ev required');
 
       dropdownField.attr('errorsMap.evidence', true);
-      performValidation(dropdownField, true);
+      performValidation({field: dropdownField});
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -385,7 +385,7 @@ describe('assessmentLocalCa component', () => {
       dropdownField.attr('value', 'com+ev required');
       dropdownField.attr('errorsMap.comment', true);
 
-      performValidation(dropdownField);
+      performValidation({field: dropdownField});
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
@@ -406,7 +406,7 @@ describe('assessmentLocalCa component', () => {
       viewModel.attr('evidenceAmount', 1);
 
       dropdownField.attr('value', 'com+ev required');
-      performValidation(dropdownField, true);
+      performValidation({field: dropdownField});
 
       expect(dropdownField.attr().validation).toEqual({
         mandatory: false,
