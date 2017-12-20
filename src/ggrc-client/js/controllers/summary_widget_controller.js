@@ -276,18 +276,42 @@ export default can.Control({
     };
   },
   /**
-   * Get statuses of mapped Assessments
+   * Get count of Assessments and mapped documents with breakdown by status
    * @param {Number} auditId
    * @return {Promise<Array>}
    * @example
    * Example of response:
-   * [
-   * ["In Review", 0],
-   * ["In Progress", 0],
-   * ["Completed", 1]
-   * ]
-   * where first value in array - title of status,
-   * and second - 0(not verified), 1(verified) assessment
+   * {
+   *  statuses: [
+   *    {
+   *      "name": "Not Started",
+   *      "verified": 0,
+   *      "assessments": X,
+   *      "documents": Y
+   *    },
+   *    {"name": "In Progress", ...},
+   *    {"name": "In Review", ...},
+   *    {
+   *      "name": "Completed",
+   *      "verified": 1,
+   *      ...
+   *    },
+   *    {
+   *      "name": "Completed",
+   *      "verified": 0,
+   *      ...
+   *    },
+   *    {"name": "Deprecated", ...},
+   *    {"name": "Rework Needed", ...}
+   *  ],
+   *  total: {
+   *    assessments: N,
+   *    documents: L
+   *  }
+   * }
+   * X - number of assessments with this status;
+   * Y - number of documents attached to assessments with this status;
+   * N, L - total count of assessments, documents accordingly in this audit.
    */
   getStatuses: function (auditId) {
     return $.get('/api/audits/'+ auditId + '/summary');
