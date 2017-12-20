@@ -135,6 +135,7 @@
 < test/appengine/__init__.py
 < test/integration/ggrc_basic_permissions/test_user_role_column_handler.py
 < test/integration/ggrc_gdrive_integration/__init__.py
+< test/integration/ggrc/test_csvs/not_a_csv.txt
 < test/integration/ggrc/utils/__init__.py
 < test/selenium/capabilities.json
 < test/selenium/.gitignore
