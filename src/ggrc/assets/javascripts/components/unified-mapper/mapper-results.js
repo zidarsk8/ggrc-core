@@ -26,7 +26,7 @@ import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
 
-const DEFAULT_PAGE_SIZE = 5;
+const DEFAULT_PAGE_SIZE = 10;
 
 export default GGRC.Components('mapperResults', {
   tag: 'mapper-results',
@@ -35,7 +35,7 @@ export default GGRC.Components('mapperResults', {
     define: {
       paging: {
         value: function () {
-          return new Pagination({pageSizeSelect: [5, 10, 15]});
+          return new Pagination({pageSizeSelect: [10, 25, 50]});
         },
       },
     },

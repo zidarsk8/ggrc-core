@@ -198,7 +198,7 @@ describe('GGRC.Components.mapperResults', function () {
   });
 
   describe('resetSearchParams() method', function () {
-    var DEFAULT_PAGE_SIZE = 5;
+    const DEFAULT_PAGE_SIZE = 10;
 
     beforeEach(function () {
       viewModel.attr('paging', {});

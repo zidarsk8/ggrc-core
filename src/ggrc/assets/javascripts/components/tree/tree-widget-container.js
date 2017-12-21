@@ -19,7 +19,7 @@ import './tree-status-filter';
 import './tree-item-status-for-workflow';
 import './tree-no-results';
 import './tree-assignee-field';
-import './tree-people-list-field';
+import './tree-field';
 import './get-owner-people-list';
 import './tree-people-with-role-list-field';
 import '../advanced-search/advanced-search-filter-container';
@@ -48,6 +48,7 @@ import {
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
 import router from '../../router';
+import Permission from '../../permission';
 
 var viewModel;
 

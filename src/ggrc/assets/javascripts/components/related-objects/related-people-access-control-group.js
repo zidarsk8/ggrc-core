@@ -6,6 +6,7 @@
 import {
   isSnapshot,
 } from '../../plugins/utils/snapshot-utils';
+import Permission from '../../permission';
 
 export default can.Component.extend({
   tag: 'related-people-access-control-group',

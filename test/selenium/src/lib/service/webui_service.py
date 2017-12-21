@@ -99,7 +99,8 @@ class BaseWebUiService(object):
     source object and return generic widget class of mapped objects.
     """
     generic_widget_url = self.url_mapped_objs.format(src_obj_url=src_obj.url)
-    selenium_utils.open_url(self.driver, generic_widget_url)
+    # todo fix freezing when navigate through tabs by URLs and using driver.get
+    selenium_utils.open_url(self.driver, generic_widget_url, is_via_js=True)
     return self.generic_widget_cls(self.driver, self.obj_name)
 
   def open_info_page_of_obj(self, obj):

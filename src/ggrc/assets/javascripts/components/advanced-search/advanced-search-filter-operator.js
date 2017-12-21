@@ -5,31 +5,27 @@
 
 import template from './advanced-search-filter-operator.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
+/**
+ * Filter Operator view model.
+ * Contains logic used in Filter Operator component
+ * @constructor
+ */
+var viewModel = can.Map.extend({
   /**
-   * Filter Operator view model.
-   * Contains logic used in Filter Operator component
-   * @constructor
+   * Contains operation name.
+   * @type {string}
+   * @example
+   * AND
+   * OR
    */
-  var viewModel = can.Map.extend({
-    /**
-     * Contains operation name.
-     * @type {string}
-     * @example
-     * AND
-     * OR
-     */
-    operator: ''
-  });
+  operator: '',
+});
 
-  /**
-   * Filter Operator is a component representing operation connecting Advanced Search items.
-   */
-  GGRC.Components('advancedSearchFilterOperator', {
-    tag: 'advanced-search-filter-operator',
-    template: template,
-    viewModel: viewModel
-  });
-})(window.can, window.GGRC);
+/**
+ * Filter Operator is a component representing operation connecting Advanced Search items.
+ */
+export default can.Component.extend({
+  tag: 'advanced-search-filter-operator',
+  template: template,
+  viewModel: viewModel,
+});

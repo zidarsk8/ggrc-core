@@ -3,8 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
- import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
- import Component from '../related-people-access-control-group';
+import * as SnapshotUtils from '../../../plugins/utils/snapshot-utils';
+import Component from '../related-people-access-control-group';
+import Permission from '../../../permission';
 
  describe('GGRC.Components.relatedPeopleAccessControlGroup', () => {
    let vm;

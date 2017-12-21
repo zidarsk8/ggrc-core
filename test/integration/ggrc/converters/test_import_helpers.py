@@ -361,6 +361,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         'Last Updated',
         'Last Updated By',
         'Folder',
+        'Last Deprecated Date'
     }
     expected_fields = {
         "mandatory": {

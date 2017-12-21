@@ -23,6 +23,6 @@ const viewModel = can.Map.extend({
 
 export default can.Component.extend('treePeopleWithRoleListField', {
   tag: 'tree-people-with-role-list-field',
-  template: '<tree-people-list-field {source}="peopleList"/>',
+  template: '<tree-field {source}="peopleList" {field}="\'email\'"/>',
   viewModel,
 });
