@@ -4,45 +4,50 @@
 */
 
 import RefreshQueue from '../../models/refresh_queue';
-import template from './templates/tree-people-list-field.mustache';
+import template from './templates/tree-field.mustache';
 
-const TOOLTIP_PEOPLE_LIMIT = 5;
+const TOOLTIP_ITEMS_LIMIT = 5;
 
 const viewModel = can.Map.extend({
+  field: 'title',
   source: null,
-  people: [],
-  peopleStr: '',
+  items: [],
+  resultStr: '',
+  showTooltip: true,
   init: function () {
-    this.refreshPeople();
+    this.refreshItems();
   },
-  refreshPeople: function () {
-    this.getPeopleList()
+  refreshItems: function () {
+    this.getItems()
       .then((data) => {
-        let peopleStr = data
-          .slice(0, TOOLTIP_PEOPLE_LIMIT)
-          .map((item) => item.email)
-          .join('\n');
+        let items = data.map((item) => item[this.attr('field')]);
+        this.attr('items', items);
 
-        peopleStr += data.length > TOOLTIP_PEOPLE_LIMIT ?
-          `\n and ${data.length - TOOLTIP_PEOPLE_LIMIT} more` : '';
+        if (this.attr('showTooltip')) {
+          let resultStr = items
+            .slice(0, TOOLTIP_ITEMS_LIMIT)
+            .join('\n');
 
-        this.attr('people', data);
-        this.attr('peopleStr', peopleStr);
+          resultStr += items.length > TOOLTIP_ITEMS_LIMIT ?
+            `\n and ${items.length - TOOLTIP_ITEMS_LIMIT} more` : '';
+
+          this.attr('resultStr', resultStr);
+        }
       });
   },
-  getPeopleList: function () {
+  getItems: function () {
     let source = this.attr('source');
     let sourceList = can.isArray(source) ? source : can.makeArray(source);
     let deferred = can.Deferred();
-    let emailsReadyList;
+    let readyItemsList;
 
     if (!sourceList.length) {
       return deferred.resolve([]);
     }
 
-    emailsReadyList = sourceList.filter((people) => people.email);
+    readyItemsList = sourceList.filter((item) => item[this.attr('field')]);
 
-    if (emailsReadyList.length === sourceList.length) {
+    if (readyItemsList.length === sourceList.length) {
       deferred.resolve(sourceList);
     } else {
       this.loadItems(sourceList)
@@ -60,7 +65,7 @@ const viewModel = can.Map.extend({
     const rq = new RefreshQueue();
 
     can.each(items, function (item) {
-      rq.enqueue(CMS.Models.Person.model(item));
+      rq.enqueue(CMS.Models[item.type].model(item));
     });
 
     return rq.trigger();
@@ -68,12 +73,12 @@ const viewModel = can.Map.extend({
 });
 
 export default can.Component.extend({
-  tag: 'tree-people-list-field',
+  tag: 'tree-field',
   template,
   viewModel,
   events: {
     '{viewModel} source': function () {
-      this.viewModel.refreshPeople();
+      this.viewModel.refreshItems();
     },
   },
 });
