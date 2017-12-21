@@ -35,10 +35,6 @@ class IssuetrackerIssue(Base, db.Model):
   object = utils.PolymorphicRelationship("object_id", "object_type",
                                          "{}_issue_tracked")
 
-  _MANDATORY_ATTRS = (
-      'object_type', 'object_id',
-  )
-
   @classmethod
   def get_issue(cls, object_type, object_id):
     """Returns an issue object by given type and ID or None.
@@ -53,19 +49,6 @@ class IssuetrackerIssue(Base, db.Model):
     return cls.query.filter(
         cls.object_type == object_type,
         cls.object_id == object_id).first()
-
-  @classmethod
-  def _validate_info(cls, info):
-    """Validates issue info to have all required properties."""
-    missing_attrs = [
-        attr
-        for attr in cls._MANDATORY_ATTRS
-        if attr not in info
-    ]
-    if missing_attrs:
-      raise ValueError(
-          'Issue tracker info is missing mandatory attributes: %s' % (
-              ', '.join(missing_attrs)))
 
   def to_dict(self, include_issue=False, include_private=False):
     """Returns representation of object as a dict.
@@ -134,7 +117,6 @@ class IssuetrackerIssue(Base, db.Model):
     Returns:
       An instance of IssuetrackerIssue.
     """
-    cls._validate_info(info)
 
     cc_list = info.get('cc_list')
     if cc_list is not None:
