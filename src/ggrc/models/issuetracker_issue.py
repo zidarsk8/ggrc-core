@@ -32,8 +32,8 @@ class IssuetrackerIssue(Base, db.Model):
   issue_id = db.Column(db.String(50), nullable=True)
   issue_url = db.Column(db.String(250), nullable=True)
 
-  object = utils.PolymorphicRelationship("object_id", "object_type",
-                                         "{}_issue_tracked")
+  issue_tracked_obj = utils.PolymorphicRelationship("object_id", "object_type",
+                                                    "{}_issue_tracked")
 
   @classmethod
   def get_issue(cls, object_type, object_id):
@@ -98,7 +98,7 @@ class IssuetrackerIssue(Base, db.Model):
 
     issue_obj = cls.get_issue(obj.type, obj.id)
 
-    info = dict(info, object=obj)
+    info = dict(info, issue_tracked_obj=obj)
     if issue_obj is not None:
       issue_obj.update_from_dict(info)
     else:
@@ -123,7 +123,7 @@ class IssuetrackerIssue(Base, db.Model):
       cc_list = ','.join(cc_list)
 
     return cls(
-        object=info['object'],
+        issue_tracked_obj=info['issue_tracked_obj'],
 
         enabled=bool(info.get('enabled')),
         title=info.get('title'),
