@@ -8,6 +8,7 @@ import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 import {
   getCounts,
 } from '../../plugins/utils/current-page-utils';
+import Permission from '../../permission';
 
 (function (can, $) {
   CMS.Controllers.TreeLoader.extend('CMS.Controllers.TreeView', {

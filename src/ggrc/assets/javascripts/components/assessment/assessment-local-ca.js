@@ -10,6 +10,7 @@ import {
   from '../../plugins/utils/ca-utils';
 import {VALIDATION_ERROR} from '../../events/eventTypes';
 import tracker from '../../tracker';
+import Permission from '../../permission';
 
 (function (GGRC, can) {
   'use strict';

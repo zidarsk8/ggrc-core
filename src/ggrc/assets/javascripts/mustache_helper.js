@@ -13,6 +13,7 @@ import {
   isAdmin,
 } from './plugins/utils/current-page-utils';
 import RefreshQueue from './models/refresh_queue';
+import Permission from './permission';
 
 (function ($, can) {
 // Chrome likes to cache AJAX requests for Mustaches.

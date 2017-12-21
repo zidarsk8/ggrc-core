@@ -3,7 +3,9 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-(function ($, GGRC, moment, Permission, CMS) {
+import Permission from '../permission';
+
+(function ($, GGRC, moment, CMS) {
   'use strict';
 
   /**
@@ -554,5 +556,5 @@
       return userType;
     },
   };
-})(jQuery, window.GGRC = window.GGRC || {}, moment, window.Permission,
+})(jQuery, window.GGRC = window.GGRC || {}, moment,
   window.CMS = window.CMS || {});

@@ -48,6 +48,7 @@ import {
 import Pagination from '../base-objects/pagination';
 import tracker from '../../tracker';
 import router from '../../router';
+import Permission from '../../permission';
 
 var viewModel;
 

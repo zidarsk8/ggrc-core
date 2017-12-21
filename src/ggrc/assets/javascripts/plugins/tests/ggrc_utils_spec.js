@@ -3,6 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import Permission from '../../permission';
+
 'use strict';
 
 describe('GGRC utils allowed_to_map() method', function () {
