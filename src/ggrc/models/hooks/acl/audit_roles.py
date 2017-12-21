@@ -31,8 +31,8 @@ def _get_cache(expr, name):
 def _get_program_editor_role():
   """Cache captain and auditor roles"""
   return _get_cache(lambda: db.session.query(all_models.Role).options(
-      load_only("id")).filter(
-      all_models.Role.name == "ProgramEditor").first().id,
+      load_only("id", "name")).filter(
+      all_models.Role.name == "ProgramEditor").first(),
       "acl_program_editor")
 
 
@@ -138,11 +138,12 @@ class AuditRolesHandler(object):
     program = audit.program
     if not any(ur for ur in program.context.user_roles
                if ur.person_id == acl.person_id):
-      program_editor_id = _get_program_editor_role()
+      program_editor = _get_program_editor_role()
       db.session.add(
           all_models.UserRole(
-              role_id=program_editor_id,
+              role=program_editor,
               context=program.context,
+              person=acl.person,
               person_id=acl.person_id
           )
       )
