@@ -134,13 +134,14 @@
                   {{/if}}
                 </div>
               </div>
-              {{>'/static/mustache/custom_attributes/info.mustache'}}
+
               {{#displayAssessmentIssueTracker instance.can_use_issue_tracker}}
                 <info-issue-tracker-fields {instance}="instance">
                 </info-issue-tracker-fields>
               {{/displayAssessmentIssueTracker}}
             </div><!-- hidden-fields-area end -->
           </div><!-- custom-attr-wrap end -->
+          {{>'/static/mustache/custom_attributes/info.mustache'}}
         </tab-panel>
         <tab-panel {(panels)}="panels" title-text="Change Log">
             <revision-log {instance}="instance"></revision-log>
