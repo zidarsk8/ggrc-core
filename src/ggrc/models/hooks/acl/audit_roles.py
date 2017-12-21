@@ -108,6 +108,9 @@ class AuditRolesHandler(object):
     related_stubs = related([audit_stub], relationship_cache)
 
     for stub in related_stubs[audit_stub]:
+      if stub.type not in ("Assessment", "AssessmentTemplate", "Issue",
+                           "Comment", "Document"):
+        continue
       acl_cache.add(stub, acl, acl.person, role_map[stub.type])
 
     # Add Audit Captains Mapped to all realted comments and documents
@@ -190,6 +193,15 @@ class AuditRolesHandler(object):
         assessment, other = first, second
         access_control_list = assessment.access_control_list
     else:
+      return
+
+    if not isinstance(other, (all_models.Assessment,
+                              all_models.AssessmentTemplate,
+                              all_models.Audit,
+                              all_models.Issue,
+                              all_models.Snapshot,
+                              all_models.Document,
+                              all_models.Comment)):
       return
 
     audit_roles = _get_acl_audit_roles()
