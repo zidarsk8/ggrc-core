@@ -329,13 +329,12 @@ def _recipients_changed(history):
 
 
 def handle_assignable_created(objects):
-  names = {"{}_open".format(obj._inflector.table_singular) for obj in objects}
+  names = ["{}_open".format(obj._inflector.table_singular) for obj in objects]
   notif_types = models.NotificationType.query.filter(
-      models.NotificationType.name.in_(names)
+      models.NotificationType.name.in_(set(names))
   )
   notif_types_map = {notif.name: notif for notif in notif_types}
-  for obj in objects:
-    notif_name = "{}_open".format(obj._inflector.table_singular)
+  for obj, notif_name in zip(objects, names):
     notif_type = notif_types_map[notif_name]
     _add_notification(obj, notif_type)
 
