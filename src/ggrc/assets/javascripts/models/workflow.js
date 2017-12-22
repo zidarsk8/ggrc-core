@@ -51,6 +51,7 @@
       ],
       display_attr_names: ['title', 'status', 'updated_at', 'Admin',
         'Workflow Member'],
+      adminRoleName: 'Admin',
     },
 
     init: function() {

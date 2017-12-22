@@ -4,6 +4,7 @@
 */
 
 import RefreshQueue from '../models/refresh_queue';
+import '../components/inline/people-with-role-inline-field';
 
 ;(function (CMS, GGRC, can, $) {
   GGRC.Components('dashboardWidgets', {
