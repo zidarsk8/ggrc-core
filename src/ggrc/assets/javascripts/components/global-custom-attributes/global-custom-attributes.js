@@ -84,7 +84,6 @@ import Permission from '../../permission';
         var instance = this.attr('instance');
 
         this.attr('isSaving', true);
-        instance.attr('isReadyForRender', false);
 
         instance.attr('custom_attributes.' + id, this.getValue(type, value));
 
@@ -126,10 +125,8 @@ import Permission from '../../permission';
       this.viewModel.initCustomAttributes();
     },
     events: {
-      '{viewModel.instance} isReadyForRender': function (sc, ev, isReady) {
-        if (isReady) {
+      '{viewModel.instance} readyForRender': function () {
           this.viewModel.initCustomAttributes();
-        }
       },
     },
   });
