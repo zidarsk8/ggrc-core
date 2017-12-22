@@ -371,6 +371,11 @@ mapper-results-item-attrs {
   .attr {
     @include cell-styles();
 
+    white-space: normal;
+    height: 33px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
     tree-field {
       div.tree-field__item {
         display: none;
