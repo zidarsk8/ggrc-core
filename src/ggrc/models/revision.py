@@ -212,6 +212,14 @@ class Revision(Base, db.Model):
     folders = self._content.get("folders") or [{"id": ""}]
     return {"folder": folders[0]["id"]}
 
+  def populate_labels(self):
+    """Add labels info for older revisions."""
+    if "label" not in self._content:
+      return {}
+    label = self._content["label"]
+    return {"labels": [{"id": None,
+                        "name": label}]} if label else {"labels": []}
+
   @builder.simple_property
   def content(self):
     """Property. Contains the revision content dict.
@@ -222,6 +230,7 @@ class Revision(Base, db.Model):
     populated_content.update(self.populate_acl())
     populated_content.update(self.populate_reference_url())
     populated_content.update(self.populate_folder())
+    populated_content.update(self.populate_labels())
     return populated_content
 
   @content.setter

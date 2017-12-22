@@ -160,3 +160,20 @@ class TestCheckPopulatedContent(unittest.TestCase):
                     return_value={}):
       self.assertEqual(revision.populate_reference_url()["reference_url"],
                        expected)
+
+  @ddt.data([{"label": "label"}, [{"id": None, "name": "label"}]],
+            [{"label": ""}, []],
+            [{"label": None}, []])
+  @ddt.unpack
+  def test_populated_content_labels(self, content, expected):
+    """Test populated content for old revision with label."""
+    obj = mock.Mock()
+    obj.id = self.object_id
+    obj.__class__.__name__ = self.object_type
+
+    revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
+
+    with mock.patch("ggrc.access_control.role.get_custom_roles_for",
+                    return_value={},):
+      self.assertEqual(revision.populate_labels()["labels"],
+                       expected)
