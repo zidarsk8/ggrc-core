@@ -204,8 +204,6 @@ class ObjectCaColumnHandler(CustomAttributeColumHandler):
     This is a hack to get set_value on this handler called after all other
     values have already been set.
     """
-    if self.dry_run:
-      return
     self.value = self.parse_item()
     super(ObjectCaColumnHandler, self).set_obj_attr()
 
