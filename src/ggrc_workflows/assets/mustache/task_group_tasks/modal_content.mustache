@@ -80,10 +80,8 @@
                   </label>
                   <datepicker date="instance.start_date"
                               required="true"
-                              {{#is workflow.unit 'day'}}
-                                no-weekends="true"
-                                deny-input="true"
-                              {{/is}}></datepicker>
+                              no-weekends="true"
+                              deny-input="true"></datepicker>
               </label>
               <label class="smaller">
                   <label class="form__label">
@@ -93,10 +91,8 @@
                   <datepicker set-min-date="instance.start_date"
                               date="instance.end_date"
                               required="true"
-                              {{#is workflow.unit 'day'}}
-                                no-weekends="true"
-                                deny-input="true"
-                              {{/is}}></datepicker>
+                              no-weekends="true"
+                              deny-input="true"></datepicker>
               </label>
           </div>
       {{/using}}
