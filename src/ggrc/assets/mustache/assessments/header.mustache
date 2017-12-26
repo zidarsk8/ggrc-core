@@ -126,16 +126,26 @@ Copyright (C) 2017 Google Inc.
                     {{#is_allowed 'update' instance context='for'}}
                     <li>
                       {{^if_equals instance.status 'Rework Needed'}}
-                      {{#if_equals instance.status 'Deprecated'}}
-                        {{! Set default state }}
-                        <object-change-state
-                          {to-state}="initialState"
-                          (on-state-change)="onStateChange(%event)"
-                        >
-                          <a href="#">
-                            <i class="fa fa-reply"></i> Restore
-                          </a>
-                        </object-change-state>
+                        {{#if_equals instance.status 'Deprecated'}}
+                          {{! Set default state }}
+                          <object-change-state
+                            {to-state}="initialState"
+                            (on-state-change)="onStateChange(%event)"
+                          >
+                            <a href="#">
+                              <i class="fa fa-reply"></i> Restore
+                            </a>
+                          </object-change-state>
+                        {{else}}
+                          <object-change-state
+                            to-state="Deprecated"
+                            (on-state-change)="onStateChange(%event)"
+                          >
+                            <a href="#">
+                              <i class="fa fa-times-circle"></i> Deprecate
+                            </a>
+                          </object-change-state>
+                        {{/if_equals}}
                       {{else}}
                         <object-change-state
                           to-state="Deprecated"
@@ -145,7 +155,6 @@ Copyright (C) 2017 Google Inc.
                             <i class="fa fa-times-circle"></i> Deprecate
                           </a>
                         </object-change-state>
-                      {{/if_equals}}
                       {{/if_equals}}
                     </li>
                     {{/is_allowed}}

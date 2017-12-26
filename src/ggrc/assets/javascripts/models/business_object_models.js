@@ -244,9 +244,9 @@
     tree_view_options: {
       attr_view: GGRC.mustache_path + '/base_objects/tree-item-attr.mustache',
       attr_list: can.Model.Cacheable.attr_list.concat([
-        {attr_title: 'Kind/Type', attr_name: 'type'},
+        {attr_title: 'Kind/Type', attr_name: 'type', attr_sort_field: 'kind'},
         {attr_title: 'Reference URL', attr_name: 'reference_url'},
-        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'}
+        {attr_title: 'Last Deprecated Date', attr_name: 'end_date'},
       ]),
       add_item_view:
         GGRC.mustache_path + '/base_objects/tree_add_item.mustache'

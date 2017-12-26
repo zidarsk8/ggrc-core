@@ -4,7 +4,7 @@
  */
 
 import '../tree/tree-item-custom-attribute';
-import '../tree/tree-people-list-field';
+import '../tree/tree-field';
 import template from './templates/mapper-results-item-attrs.mustache';
 
 (function (can, GGRC) {

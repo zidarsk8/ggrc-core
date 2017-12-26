@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Integration test for custom attributable mixin"""
-
+import collections
 import ddt
 
 from ggrc import db
@@ -310,3 +310,58 @@ class TestCreateRevisionAfterDeleteCAD(TestCase):
     snapshot = models.Snapshot.query.filter().first()
 
     self.assertEqual(snapshot.is_latest_revision, False)
+
+
+class TestCADUpdate(TestCase):
+  """Test cases for updating model inherited custom attributable mixin."""
+  def setUp(self):
+    """Set up test cases."""
+    super(TestCADUpdate, self).setUp()
+    self.client.get("/login")
+    self.api = api_helper.Api()
+
+  def test_lcads_removing(self):
+    """Test removing of LCADs from AssessmentTemplate"""
+    with factories.single_commit():
+      template = factories.AssessmentTemplateFactory()
+      for i in range(2):
+        factories.CustomAttributeDefinitionFactory(
+            title="test CA def {}".format(i),
+            definition_type=template._inflector.table_singular,
+            definition_id=template.id,
+            attribute_type="Text"
+        )
+
+    response = self.api.put(template, {"custom_attribute_definitions": []})
+    self.assert200(response)
+
+    cads_query = models.CustomAttributeDefinition.query.filter_by(
+        definition_type=template._inflector.table_singular,
+        definition_id=template.id,
+    )
+    self.assertEqual(cads_query.count(), 0)
+
+  def test_lcads_import_update(self):
+    """Test saving of LCADs for Assessment Template after import"""
+    cads_count = 2
+    with factories.single_commit():
+      template = factories.AssessmentTemplateFactory()
+      for i in range(cads_count):
+        factories.CustomAttributeDefinitionFactory(
+            title="test CA def {}".format(i),
+            definition_type=template._inflector.table_singular,
+            definition_id=template.id,
+            attribute_type="Text"
+        )
+    response = self.import_data(collections.OrderedDict([
+        ("object_type", "Assessment_Template"),
+        ("Code*", template.slug),
+        ("Title", "New title"),
+    ]))
+    self._check_csv_response(response, {})
+
+    cads_query = models.CustomAttributeDefinition.query.filter_by(
+        definition_type=template._inflector.table_singular,
+        definition_id=template.id,
+    )
+    self.assertEqual(cads_query.count(), cads_count)
