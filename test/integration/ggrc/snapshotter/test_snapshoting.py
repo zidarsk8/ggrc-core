@@ -23,8 +23,10 @@ class TestSnapshoting(SnapshotterBaseTestCase):
   def test_snapshot_create(self):
     """Test simple snapshot creation with a simple change"""
 
-    auditors = [factories.PersonFactory().id for _ in range(3)]
-    audit_captains = [factories.PersonFactory().id for _ in range(4)]
+    people = {
+        "Auditors": [factories.PersonFactory().id for _ in range(3)],
+        "Audit Captains": [factories.PersonFactory().id for _ in range(4)]
+    }
     ac_roles = db.session.query(
         models.AccessControlRole.id,
         models.AccessControlRole.name).all()
@@ -56,12 +58,12 @@ class TestSnapshoting(SnapshotterBaseTestCase):
             {"ac_role_id": ac_roles["Auditors"], "person": {
                 "id": auditor,
                 "type": "Person"
-            }} for auditor in auditors
+            }} for auditor in people["Auditors"]
         ] + [
             {"ac_role_id": ac_roles["Audit Captains"], "person": {
                 "id": captain,
                 "type": "Person"
-            }} for captain in audit_captains
+            }} for captain in people["Audit Captains"]
         ]
     })
 
@@ -109,25 +111,24 @@ class TestSnapshoting(SnapshotterBaseTestCase):
     )
     self.assertEqual(relationship.count(), 1)
 
-    relationship_revision = db.session.query(
+    self.assertEqual(db.session.query(
         models.Revision.resource_type,
         models.Revision.resource_id,
         models.Revision._content,
     ).filter(
         models.Revision.resource_type == "Relationship",
         models.Revision.resource_id == relationship.first().id,
-    )
-    self.assertEqual(relationship_revision.count(), 1)
+    ).count(), 1)
 
-    acl_count = db.session.query(models.AccessControlList.id).filter(
+    self.assertEqual(db.session.query(models.AccessControlList.id).filter(
         models.AccessControlList.object_id == snapshot_obj.id,
         models.AccessControlList.object_type == "Snapshot",
         models.AccessControlList.ac_role_id.in_([
             ac_roles["Auditors Snapshot Mapped"],
             ac_roles["Audit Captains Mapped"]]),
-        models.AccessControlList.person_id.in_(auditors + audit_captains)
-    ).count()
-    self.assertEqual(acl_count, 7)
+        models.AccessControlList.person_id.in_(
+            people["Auditors"] + people["Audit Captains"])
+    ).count(), 7)
 
   def test_snapshot_update(self):
     """Test snapshot update with a simple change"""
