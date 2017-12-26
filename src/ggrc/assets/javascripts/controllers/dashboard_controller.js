@@ -9,263 +9,260 @@ import {
   isAdmin,
 } from '../plugins/utils/current-page-utils';
 
-(function (can, $) {
-  can.Control('CMS.Controllers.Dashboard', {
-    defaults: {
-      widget_descriptors: null,
-    },
-  }, {
-    init: function (el, options) {
-      CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
-        this.display_prefs = prefs;
+can.Control('CMS.Controllers.Dashboard', {
+  defaults: {
+    widget_descriptors: null,
+  },
+}, {
+  init: function (el, options) {
+    CMS.Models.DisplayPrefs.getSingleton().then(function (prefs) {
+      this.display_prefs = prefs;
 
-        this.init_tree_view_settings();
-        this.init_page_title();
-        this.init_page_help();
-        this.init_page_header();
-        this.init_widget_descriptors();
-        if (!this.inner_nav_controller) {
-          this.init_inner_nav();
-        }
-        this.update_inner_nav();
-
-        // Before initializing widgets, hide the container to not show
-        // loading state of multiple widgets before reducing to one.
-        this.hide_widget_area();
-        this.init_default_widgets();
-        this.init_widget_area();
-      }.bind(this));
-    },
-
-    init_tree_view_settings: function () {
-      var validModels;
-      var savedChildTreeDisplayList;
-      if (GGRC.pageType && GGRC.pageType === 'ADMIN') { // Admin dashboard
-        return;
-      }
-
-      validModels = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
-    // only change the display list
-      can.each(validModels, function (mName) {
-        savedChildTreeDisplayList = this.display_prefs
-          .getChildTreeDisplayList(mName);
-        if (savedChildTreeDisplayList !== null) {
-          GGRC.tree_view.sub_tree_for.attr(mName + '.display_list',
-            savedChildTreeDisplayList);
-        }
-      }.bind(this));
-    },
-
-    init_page_title: function () {
-      var pageTitle = null;
-      if (typeof (this.options.page_title) === 'function') {
-        pageTitle = this.options.page_title(this);
-      } else if (this.options.page_title) {
-        pageTitle = this.options.page_title;
-      }
-      if (pageTitle) {
-        $('head > title').text(pageTitle);
-      }
-    },
-
-    init_page_help: function () {
-      var pageHelp = null;
-      if (typeof (this.options.page_help) === 'function') {
-        pageHelp = this.options.page_help(this);
-      } else if (this.options.page_help) {
-        pageHelp = this.options.page_help;
-      }
-      if (pageHelp) {
-        this.element.find('#page-help').attr('data-help-slug', pageHelp);
-      }
-    },
-
-    init_page_header: function () {
-      var $pageHeader = this.element.find('#page-header');
-
-      if (this.options.header_view && $pageHeader.length) {
-        $pageHeader.html(can.view(this.options.header_view));
-      }
-    },
-
-    init_widget_area: function () {
+      this.init_tree_view_settings();
+      this.init_page_title();
+      this.init_page_help();
+      this.init_page_header();
+      this.init_widget_descriptors();
       if (!this.inner_nav_controller) {
-        //  If there is no inner-nav, then ensure widgets are shown
-        //  FIXME: This is a workaround because widgets and widget-areas are
-        //    hidden, assuming InnerNav controller will show() them
-        this.get_active_widget_containers()
-          .show()
-          .find('.widget').show()
-          .find('> section.content').show();
+        this.init_inner_nav();
       }
-    },
+      this.update_inner_nav();
 
-    init_inner_nav: function () {
-      var $internav = this.element.find('.internav');
-      if ($internav.length) {
-        this.inner_nav_controller = new InnerNav(
-          this.element.find('.internav'), {
-            dashboard_controller: this,
-          });
+      // Before initializing widgets, hide the container to not show
+      // loading state of multiple widgets before reducing to one.
+      this.hide_widget_area();
+      this.init_default_widgets();
+      this.init_widget_area();
+    }.bind(this));
+  },
+
+  init_tree_view_settings: function () {
+    var validModels;
+    var savedChildTreeDisplayList;
+    if (GGRC.pageType && GGRC.pageType === 'ADMIN') { // Admin dashboard
+      return;
+    }
+
+    validModels = can.Map.keys(GGRC.tree_view.base_widgets_by_type);
+  // only change the display list
+    can.each(validModels, function (mName) {
+      savedChildTreeDisplayList = this.display_prefs
+        .getChildTreeDisplayList(mName);
+      if (savedChildTreeDisplayList !== null) {
+        GGRC.tree_view.sub_tree_for.attr(mName + '.display_list',
+          savedChildTreeDisplayList);
       }
-    },
+    }.bind(this));
+  },
 
-    '.nav-logout click': function (el, ev) {
-      can.Model.LocalStorage.clearAll();
-    },
+  init_page_title: function () {
+    var pageTitle = null;
+    if (typeof (this.options.page_title) === 'function') {
+      pageTitle = this.options.page_title(this);
+    } else if (this.options.page_title) {
+      pageTitle = this.options.page_title;
+    }
+    if (pageTitle) {
+      $('head > title').text(pageTitle);
+    }
+  },
 
-    init_widget_descriptors: function () {
-      this.options.widget_descriptors = this.options.widget_descriptors || {};
-    },
+  init_page_help: function () {
+    var pageHelp = null;
+    if (typeof (this.options.page_help) === 'function') {
+      pageHelp = this.options.page_help(this);
+    } else if (this.options.page_help) {
+      pageHelp = this.options.page_help;
+    }
+    if (pageHelp) {
+      this.element.find('#page-help').attr('data-help-slug', pageHelp);
+    }
+  },
 
-    init_default_widgets: function () {
-      can.each(this.options.default_widgets, function (name) {
-        var descriptor = this.options.widget_descriptors[name];
-        this.add_dashboard_widget_from_descriptor(descriptor);
-      }.bind(this));
-    },
+  init_page_header: function () {
+    var $pageHeader = this.element.find('#page-header');
 
-    hide_widget_area: function () {
-      this.get_active_widget_containers().addClass('hidden');
-    },
-    show_widget_area: function () {
-      this.get_active_widget_containers().removeClass('hidden');
-    },
-    ' widgets_updated': 'update_inner_nav',
-    ' updateCount': function (el, ev, count, updateCount) {
-      if (_.isBoolean(updateCount) && !updateCount) {
-        return;
-      }
-      this.inner_nav_controller
-        .update_widget_count($(ev.target), count, updateCount);
-    },
-    update_inner_nav: function (el, ev, data) {
-      if (this.inner_nav_controller) {
-        if (data) {
-          this.inner_nav_controller
-            .update_widget(data.widget || data, data.index);
-        } else {
-          this.inner_nav_controller.update_widget_list(
-            this.get_active_widget_elements());
-        }
-        this.inner_nav_controller.sortWidgets();
-      }
-    },
+    if (this.options.header_view && $pageHeader.length) {
+      $pageHeader.html(can.view(this.options.header_view));
+    }
+  },
 
-    get_active_widget_containers: function () {
-      return this.element.find('.widget-area');
-    },
+  init_widget_area: function () {
+    if (!this.inner_nav_controller) {
+      //  If there is no inner-nav, then ensure widgets are shown
+      //  FIXME: This is a workaround because widgets and widget-areas are
+      //    hidden, assuming InnerNav controller will show() them
+      this.get_active_widget_containers()
+        .show()
+        .find('.widget').show()
+        .find('> section.content').show();
+    }
+  },
 
-    get_active_widget_elements: function () {
-      return this.element.find("section.widget[id]:not([id=''])").toArray();
-    },
+  init_inner_nav: function () {
+    var $internav = this.element.find('.internav');
+    if ($internav.length) {
+      this.inner_nav_controller = new InnerNav(
+        this.element.find('.internav'), {
+          dashboard_controller: this,
+        });
+    }
+  },
 
-    add_widget_from_descriptor: function () {
-      var descriptor = {};
-      var that = this;
-      var $element;
-      var control;
-      var $container;
-      var $lastWidget;
+  '.nav-logout click': function (el, ev) {
+    can.Model.LocalStorage.clearAll();
+  },
 
-      // Construct the final descriptor from one or more arguments
-      can.each(arguments, function (nameOrDescriptor) {
-        if (typeof (nameOrDescriptor) === 'string') {
-          nameOrDescriptor =
-            that.options.widget_descriptors[nameOrDescriptor];
-        }
-        $.extend(descriptor, nameOrDescriptor || {});
-      });
+  init_widget_descriptors: function () {
+    this.options.widget_descriptors = this.options.widget_descriptors || {};
+  },
 
-      // Create widget in container?
-      // return this.options.widget_container[0].add_widget(descriptor);
-
-      if ($('#' + descriptor.controller_options.widget_id + '_widget').length > 0) {
-        return;
-      }
-
-      // FIXME: This should be in some Widget superclass
-      if (descriptor.controller_options.widget_guard &&
-          !descriptor.controller_options.widget_guard()) {
-        return;
-      }
-
-      $element = $("<section class='widget'>");
-      control = new descriptor
-        .controller($element, descriptor.controller_options);
-
-      if (isAdmin()) {
-        control.prepare();
-      }
-
-      // FIXME: Abstraction violation: Sortable/DashboardWidget/ResizableWidget
-      //   controllers should maybe handle this?
-      $container = this.get_active_widget_containers().eq(0);
-      $lastWidget = $container.find('section.widget').last();
-
-      if ($lastWidget.length > 0) {
-        $lastWidget.after($element);
-      } else {
-        $container.append($element);
-      }
-
-      $element
-        .trigger('widgets_updated', $element);
-
-      return control;
-    },
-
-    add_dashboard_widget_from_descriptor: function (descriptor) {
-      return this.add_widget_from_descriptor({
-        controller: DashboardWidgets,
-        controller_options: $.extend(descriptor, {dashboard_controller: this}),
-      });
-    },
-
-    add_dashboard_widget_from_name: function (name) {
+  init_default_widgets: function () {
+    can.each(this.options.default_widgets, function (name) {
       var descriptor = this.options.widget_descriptors[name];
-      if (!descriptor) {
-        console.debug('Unknown descriptor: ', name);
+      this.add_dashboard_widget_from_descriptor(descriptor);
+    }.bind(this));
+  },
+
+  hide_widget_area: function () {
+    this.get_active_widget_containers().addClass('hidden');
+  },
+  show_widget_area: function () {
+    this.get_active_widget_containers().removeClass('hidden');
+  },
+  ' widgets_updated': 'update_inner_nav',
+  ' updateCount': function (el, ev, count, updateCount) {
+    if (_.isBoolean(updateCount) && !updateCount) {
+      return;
+    }
+    this.inner_nav_controller
+      .update_widget_count($(ev.target), count, updateCount);
+  },
+  update_inner_nav: function (el, ev, data) {
+    if (this.inner_nav_controller) {
+      if (data) {
+        this.inner_nav_controller
+          .update_widget(data.widget || data, data.index);
       } else {
-        return this.add_dashboard_widget_from_descriptor(descriptor);
+        this.inner_nav_controller.update_widget_list(
+          this.get_active_widget_elements());
       }
-    },
+      this.inner_nav_controller.sortWidgets();
+    }
+  },
 
-  });
+  get_active_widget_containers: function () {
+    return this.element.find('.widget-area');
+  },
 
-  CMS.Controllers.Dashboard('CMS.Controllers.PageObject', {}, {
-    init: function () {
-      this.options.model = this.options.instance.constructor;
-      this._super();
-      this.init_info_pin();
-    },
+  get_active_widget_elements: function () {
+    return this.element.find("section.widget[id]:not([id=''])").toArray();
+  },
 
-    init_info_pin: function () {
-      this.info_pin = new CMS.Controllers
-        .InfoPin(this.element.find('.pin-content'));
-    },
+  add_widget_from_descriptor: function () {
+    var descriptor = {};
+    var that = this;
+    var $element;
+    var control;
+    var $container;
+    var $lastWidget;
 
-    hideInfoPin () {
-      const infopinCtr = this.info_pin.element.control();
-
-      if (infopinCtr) {
-        infopinCtr.hideInstance();
+    // Construct the final descriptor from one or more arguments
+    can.each(arguments, function (nameOrDescriptor) {
+      if (typeof (nameOrDescriptor) === 'string') {
+        nameOrDescriptor =
+          that.options.widget_descriptors[nameOrDescriptor];
       }
-    },
+      $.extend(descriptor, nameOrDescriptor || {});
+    });
 
-    init_page_title: function () {
-      // Reset title when page object is modified
-      var that = this;
-      var thatSuper = this._super;
+    // Create widget in container?
+    // return this.options.widget_container[0].add_widget(descriptor);
 
-      this.options.instance.bind('change', function () {
-        thatSuper.apply(that);
-      });
-      this._super();
-    },
+    if ($('#' + descriptor.controller_options.widget_id + '_widget').length > 0) {
+      return;
+    }
 
-    init_widget_descriptors: function () {
-      this.options.widget_descriptors = this.options.widget_descriptors || {};
-    },
-  });
-})(window.can, window.can.$);
+    // FIXME: This should be in some Widget superclass
+    if (descriptor.controller_options.widget_guard &&
+        !descriptor.controller_options.widget_guard()) {
+      return;
+    }
+
+    $element = $("<section class='widget'>");
+    control = new descriptor
+      .controller($element, descriptor.controller_options);
+
+    if (isAdmin()) {
+      control.prepare();
+    }
+
+    // FIXME: Abstraction violation: Sortable/DashboardWidget/ResizableWidget
+    //   controllers should maybe handle this?
+    $container = this.get_active_widget_containers().eq(0);
+    $lastWidget = $container.find('section.widget').last();
+
+    if ($lastWidget.length > 0) {
+      $lastWidget.after($element);
+    } else {
+      $container.append($element);
+    }
+
+    $element
+      .trigger('widgets_updated', $element);
+
+    return control;
+  },
+
+  add_dashboard_widget_from_descriptor: function (descriptor) {
+    return this.add_widget_from_descriptor({
+      controller: DashboardWidgets,
+      controller_options: $.extend(descriptor, {dashboard_controller: this}),
+    });
+  },
+
+  add_dashboard_widget_from_name: function (name) {
+    var descriptor = this.options.widget_descriptors[name];
+    if (!descriptor) {
+      console.debug('Unknown descriptor: ', name);
+    } else {
+      return this.add_dashboard_widget_from_descriptor(descriptor);
+    }
+  },
+});
+
+CMS.Controllers.Dashboard('CMS.Controllers.PageObject', {}, {
+  init: function () {
+    this.options.model = this.options.instance.constructor;
+    this._super();
+    this.init_info_pin();
+  },
+
+  init_info_pin: function () {
+    this.info_pin = new CMS.Controllers
+      .InfoPin(this.element.find('.pin-content'));
+  },
+
+  hideInfoPin () {
+    const infopinCtr = this.info_pin.element.control();
+
+    if (infopinCtr) {
+      infopinCtr.hideInstance();
+    }
+  },
+
+  init_page_title: function () {
+    // Reset title when page object is modified
+    var that = this;
+    var thatSuper = this._super;
+
+    this.options.instance.bind('change', function () {
+      thatSuper.apply(that);
+    });
+    this._super();
+  },
+
+  init_widget_descriptors: function () {
+    this.options.widget_descriptors = this.options.widget_descriptors || {};
+  },
+});
