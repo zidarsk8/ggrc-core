@@ -12,7 +12,7 @@ import {isObjectVersion} from '../plugins/utils/object-versions-utils';
 import router, {buildUrl} from '../router';
 import '../components/add-tab-button/add-tab-button';
 
-export default can.Control('CMS.Controllers.InnerNav', {
+export default can.Control({
   defaults: {
     internav_view: '/static/mustache/dashboard/internav_list.mustache',
     pin_view: '.pin-content',

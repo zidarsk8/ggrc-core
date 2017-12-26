@@ -4,7 +4,7 @@
 */
 
 import DashboardWidgets from './dashboard_widgets_controller';
-import './inner-nav-controller';
+import InnerNav from './inner-nav-controller';
 import {
   isAdmin,
 } from '../plugins/utils/current-page-utils';
@@ -103,7 +103,7 @@ import {
     init_inner_nav: function () {
       var $internav = this.element.find('.internav');
       if ($internav.length) {
-        this.inner_nav_controller = new CMS.Controllers.InnerNav(
+        this.inner_nav_controller = new InnerNav(
           this.element.find('.internav'), {
             dashboard_controller: this,
           });
