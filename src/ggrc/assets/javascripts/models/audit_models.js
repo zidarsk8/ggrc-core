@@ -320,50 +320,6 @@ import Permission from '../permission';
     },
   });
 
-  can.Model.Cacheable('CMS.Models.Meeting', {
-    root_collection: 'meetings',
-    root_object: 'meeting',
-    findAll: 'GET /api/meetings',
-    create: 'POST /api/meetings',
-    update: 'PUT /api/meetings/{id}',
-    destroy: 'DELETE /api/meetings/{id}',
-    attributes: {
-      context: 'CMS.Models.Context.stub',
-      people: 'CMS.Models.Person.stubs',
-      object_people: 'CMS.Models.ObjectPerson.stubs',
-      start_at: 'datetime',
-      end_at: 'datetime'
-    },
-    defaults: {},
-    init: function () {
-      if (this._super) {
-        this._super.apply(this, arguments);
-      }
-      this.validateNonBlank('title');
-      this.validateNonBlank('start_at');
-      this.validateNonBlank('end_at');
-    }
-  }, {
-    init: function () {
-      if (this._super) {
-        this._super.apply(this, arguments);
-      }
-      this.each(function (value, name) {
-        if (value === null) {
-          this.removeAttr(name);
-        }
-      }.bind(this));
-      this.bind('change', function () {
-        if (typeof this.response !== 'undefined' && !this._preloaded_people) {
-          this._preloaded_people = true;
-          _.map(this.response.reify().people, function (person) {
-            this.mark_for_addition('people', person);
-          }.bind(this));
-        }
-      }.bind(this));
-    }
-  });
-
   /**
    * A model describing a template for the newly created Assessment objects.
    *

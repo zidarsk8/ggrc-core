@@ -2,7 +2,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 dashboard-js-template-files:
-  - meetings/gcal_info.mustache
   - gdrive/auth_button.mustache
   - gdrive/gapi_errors.mustache
   - gdrive/gdrive_folder.mustache
