@@ -12,7 +12,8 @@ import {
 } from '../plugins/utils/object-versions-utils';
 import tracker from '../tracker';
 
-Filterable('CMS.Controllers.DashboardWidgets', {
+export default Filterable({
+  pluginName: 'dashboard_widgets',
   defaults: {
     model: null,
     widget_id: '',

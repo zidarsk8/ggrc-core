@@ -3,6 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
+import DashboardWidgets from './dashboard_widgets_controller';
 import {
   isAdmin,
   getPageType,
@@ -222,7 +223,7 @@ import router, {buildUrl} from '../router';
 
     add_dashboard_widget_from_descriptor: function (descriptor) {
       return this.add_widget_from_descriptor({
-        controller: CMS.Controllers.DashboardWidgets,
+        controller: DashboardWidgets,
         controller_options: $.extend(descriptor, {dashboard_controller: this}),
       });
     },
