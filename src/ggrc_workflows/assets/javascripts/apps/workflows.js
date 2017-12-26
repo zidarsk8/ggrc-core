@@ -6,6 +6,7 @@
 import {
   initCounts,
 } from '../../../../ggrc/assets/javascripts/plugins/utils/current-page-utils';
+import InfoWidget from '../../../../ggrc/assets/javascripts/controllers/info_widget_controller';
 
 (function ($, CMS, GGRC) {
   var WorkflowExtension = {};
@@ -503,7 +504,7 @@ import {
       newWidgetDescriptors,
       {
         info: {
-          content_controller: GGRC.Controllers.InfoWidget,
+          content_controller: InfoWidget,
           content_controller_options: {
             widget_view: GGRC.mustache_path + '/workflows/info.mustache'
           }

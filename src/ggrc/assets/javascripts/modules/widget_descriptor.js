@@ -5,6 +5,7 @@
 
 import SummaryWidgetController from '../controllers/summary_widget_controller';
 import DashboardWidget from '../controllers/dashboard_widget_controller';
+import InfoWidget from '../controllers/info_widget_controller';
 import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
 
 (function ($, CMS, GGRC) {
@@ -36,7 +37,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
             return instance.constructor.title_singular + ' Info';
           },
           widget_icon: 'info-circle',
-          content_controller: GGRC.Controllers.InfoWidget,
+          content_controller: InfoWidget,
           content_controller_options: {
             instance: instance,
             model: instance.constructor,

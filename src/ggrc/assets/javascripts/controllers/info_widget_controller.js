@@ -7,7 +7,8 @@ import '../components/comment/comment-data-provider';
 import '../components/comment/comment-add-form';
 import '../components/comment/mapped-comments';
 
-can.Control('GGRC.Controllers.InfoWidget', {
+export default can.Control({
+  pluginName: 'ggrc_controllers_info_widget',
   defaults: {
     model: null,
     instance: null,
