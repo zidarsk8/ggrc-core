@@ -13,7 +13,6 @@ from ggrc import settings       # noqa
 from ggrc.app import app        # noqa
 from ggrc.models import Document
 from ggrc.services.registry import service
-from ggrc_basic_permissions.contributed_roles import RoleContributions
 import ggrc_gdrive_integration.models as models
 from ggrc_gdrive_integration.models.object_file import Fileable
 
@@ -36,47 +35,6 @@ Document.late_init_fileable()
 contributed_services = [
     service('object_files', models.ObjectFile),
 ]
-
-
-class GDriveRoleContributions(RoleContributions):
-  contributions = {
-      'Auditor': {
-          'read': [],
-      },
-      'ProgramAuditEditor': {
-          'read': [],
-          'create': [],
-          'update': [],
-          'delete': [],
-      },
-      'ProgramAuditOwner': {
-          'read': [],
-          'create': [],
-          'update': [],
-          'delete': [],
-      },
-      'ProgramAuditReader': {
-          'read': [],
-          'create': [],
-          'delete': [],
-      },
-      'ProgramOwner': {
-          'read': [],
-          'create': [],
-          'update': [],
-          'delete': [],
-      },
-      'Editor': {
-          'read': [],
-          'create': [],
-          'update': [],
-          'delete': [],
-      },
-
-  }
-
-
-ROLE_CONTRIBUTIONS = GDriveRoleContributions()
 
 
 def get_http_auth():
