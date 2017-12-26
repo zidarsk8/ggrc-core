@@ -6,12 +6,9 @@
 import '../commons';
 
 // Controllers
-import '../../controllers/dashboard_widgets_controller';
 import '../../controllers/info_widget_controller';
-import '../../controllers/dashboard_widget_controller';
 import '../../controllers/info_pin_controller';
 import '../../controllers/automapper_controller';
-import '../../controllers/dashboard_controller';
 
 // Modules and Apps
 import '../../pbc/workflow_controller';

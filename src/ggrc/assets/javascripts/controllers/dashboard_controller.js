@@ -9,7 +9,8 @@ import {
   isAdmin,
 } from '../plugins/utils/current-page-utils';
 
-can.Control('CMS.Controllers.Dashboard', {
+const Dashboard = can.Control({
+  pluginName: 'cms_controllers_dashboard',
   defaults: {
     widget_descriptors: null,
   },
@@ -231,7 +232,9 @@ can.Control('CMS.Controllers.Dashboard', {
   },
 });
 
-CMS.Controllers.Dashboard('CMS.Controllers.PageObject', {}, {
+Dashboard({
+  pluginName: 'cms_controllers_page_object',
+}, {
   init: function () {
     this.options.model = this.options.instance.constructor;
     this._super();
