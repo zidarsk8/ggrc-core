@@ -41,24 +41,24 @@ contributed_services = [
 class GDriveRoleContributions(RoleContributions):
   contributions = {
       'Auditor': {
-          'read': ['ObjectFile'],
+          'read': [],
       },
       'ProgramAuditEditor': {
-          'read': ['ObjectFile'],
-          'create': ['ObjectFile'],
-          'update': ['ObjectFile'],
-          'delete': ['ObjectFile'],
+          'read': [],
+          'create': [],
+          'update': [],
+          'delete': [],
       },
       'ProgramAuditOwner': {
-          'read': ['ObjectFile'],
-          'create': ['ObjectFile'],
-          'update': ['ObjectFile'],
-          'delete': ['ObjectFile'],
+          'read': [],
+          'create': [],
+          'update': [],
+          'delete': [],
       },
       'ProgramAuditReader': {
-          'read': ['ObjectFile'],
-          'create': ['ObjectFile'],
-          'delete': ['ObjectFile'],
+          'read': [],
+          'create': [],
+          'delete': [],
       },
       'ProgramOwner': {
           'read': [],
@@ -67,10 +67,10 @@ class GDriveRoleContributions(RoleContributions):
           'delete': [],
       },
       'Editor': {
-          'read': ['ObjectFile'],
-          'create': ['ObjectFile'],
-          'update': ['ObjectFile'],
-          'delete': ['ObjectFile'],
+          'read': [],
+          'create': [],
+          'update': [],
+          'delete': [],
       },
 
   }
