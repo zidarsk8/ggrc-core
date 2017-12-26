@@ -5,7 +5,7 @@
 
 import Spinner from 'spin.js';
 
-export default can.Control("CMS.Controllers.Filterable", {
+export default can.Control({
     defaults : {
       filterable_items_selector : "[data-model]"
       , spinner_while_filtering : false
