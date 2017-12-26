@@ -20,25 +20,23 @@ class TestSortComments(unittest.TestCase):
     asmt5_info = (5, "Assessment", "Asmt 5", "www.5.com")
 
     data = {
-        "email@foo.com": {
-            "comment_created": {
-                asmt5_info: {
-                    12: {
-                        "description": "ABCD...",
-                        "created_at": datetime(2017, 5, 31, 8, 15, 0)
-                    },
-                    19: {
-                        "description": "All tasks can be closed",
-                        "created_at": datetime(2017, 10, 16, 0, 30, 0)
-                    },
-                    10: {
-                        "description": "Comment One",
-                        "created_at": datetime(2017, 5, 29, 16, 20, 0)
-                    },
-                    15: {
-                        "description": "I am confused",
-                        "created_at": datetime(2017, 8, 15, 11, 13, 0)
-                    }
+        "comment_created": {
+            asmt5_info: {
+                12: {
+                    "description": "ABCD...",
+                    "created_at": datetime(2017, 5, 31, 8, 15, 0)
+                },
+                19: {
+                    "description": "All tasks can be closed",
+                    "created_at": datetime(2017, 10, 16, 0, 30, 0)
+                },
+                10: {
+                    "description": "Comment One",
+                    "created_at": datetime(2017, 5, 29, 16, 20, 0)
+                },
+                15: {
+                    "description": "I am confused",
+                    "created_at": datetime(2017, 8, 15, 11, 13, 0)
                 }
             }
         }
@@ -46,7 +44,7 @@ class TestSortComments(unittest.TestCase):
 
     sort_comments(data)
 
-    comment_data = data["email@foo.com"]["comment_created"].values()[0]
+    comment_data = data["comment_created"].values()[0]
     self.assertIsInstance(comment_data, list)
 
     descriptions = [c["description"] for c in comment_data]
