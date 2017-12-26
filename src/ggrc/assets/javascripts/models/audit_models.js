@@ -167,7 +167,7 @@ import Permission from '../permission';
         function () {
           if (this.attr('issue_tracker.enabled') &&
             !this.attr('issue_tracker.component_id')) {
-            return 'Enter Component ID';
+            return 'cannot be blank';
           }
         }
       );
@@ -453,7 +453,7 @@ import Permission from '../permission';
           if (this.attr('can_use_issue_tracker') &&
             this.attr('issue_tracker.enabled') &&
             !this.attr('issue_tracker.component_id')) {
-            return 'Enter Component ID';
+            return 'cannot be blank';
           }
         }
       );

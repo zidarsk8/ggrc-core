@@ -137,7 +137,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
           if (this.attr('can_use_issue_tracker') &&
             this.attr('issue_tracker.enabled') &&
             !this.attr('issue_tracker.title')) {
-            return 'Enter Issue Title';
+            return 'cannot be blank';
           }
         }
       );
@@ -147,7 +147,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
           if (this.attr('can_use_issue_tracker') &&
             this.attr('issue_tracker.enabled') &&
             !this.attr('issue_tracker.component_id')) {
-            return 'Enter Component ID';
+            return 'cannot be blank';
           }
         }
       );
