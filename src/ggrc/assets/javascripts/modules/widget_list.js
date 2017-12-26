@@ -5,6 +5,7 @@
 
 import './widget_descriptor';
 import SummaryWidgetController from '../controllers/summary_widget_controller';
+import DashboardWidget from '../controllers/dashboard_widget_controller';
 
 (function ($, CMS, GGRC) {
   /*
@@ -62,7 +63,7 @@ import SummaryWidgetController from '../controllers/summary_widget_controller';
             options.widget_view ||
             widget.widget_view
           );
-        } else if (ctrl && ctrl === GGRC.Controllers.DashboardWidget) {
+        } else if (ctrl && ctrl === DashboardWidget) {
           descriptors[widgetId] = GGRC.WidgetDescriptor.make_dashboard_widget(
             options &&
             options.instance ||

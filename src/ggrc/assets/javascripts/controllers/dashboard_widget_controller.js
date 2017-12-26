@@ -5,7 +5,7 @@
 
 import {getDashboards} from '../plugins/utils/dashboards-utils';
 
-export default can.Control('GGRC.Controllers.DashboardWidget', {
+export default can.Control({
   defaults: {
     model: null,
     instance: null,

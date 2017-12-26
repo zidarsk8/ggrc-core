@@ -4,6 +4,7 @@
 */
 
 import SummaryWidgetController from '../controllers/summary_widget_controller';
+import DashboardWidget from '../controllers/dashboard_widget_controller';
 import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
 
 (function ($, CMS, GGRC) {
@@ -84,7 +85,7 @@ import {getWidgetConfig} from '../plugins/utils/object-versions-utils';
             return instance.constructor.title_singular + ' Dashboard';
           },
           widget_icon: 'tachometer',
-          content_controller: GGRC.Controllers.DashboardWidget,
+          content_controller: DashboardWidget,
           content_controller_options: {
             instance: instance,
             model: instance.constructor,

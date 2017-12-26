@@ -4,6 +4,7 @@
 */
 
 import SummaryWidgetController from '../controllers/summary_widget_controller';
+import DashboardWidget from '../controllers/dashboard_widget_controller';
 import {isDashboardEnabled} from '../plugins/utils/dashboards-utils';
 import {
   getWidgetConfig,
@@ -94,7 +95,7 @@ import {
       if (isDashboardEnabled(object)) {
         widgetList.add_widget(object.constructor.shortName, 'dashboard', {
           widget_id: 'dashboard',
-          content_controller: GGRC.Controllers.DashboardWidget,
+          content_controller: DashboardWidget,
           instance: object,
           widget_view: path + '/base_objects/dashboard_widget.mustache',
           order: 6,
