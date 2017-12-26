@@ -5,6 +5,7 @@
 
 import DashboardWidgets from './dashboard_widgets_controller';
 import InnerNav from './inner-nav-controller';
+import InfoPin from './info_pin_controller';
 import {
   isAdmin,
 } from '../plugins/utils/current-page-utils';
@@ -242,8 +243,7 @@ Dashboard({
   },
 
   init_info_pin: function () {
-    this.info_pin = new CMS.Controllers
-      .InfoPin(this.element.find('.pin-content'));
+    this.info_pin = new InfoPin(this.element.find('.pin-content'));
   },
 
   hideInfoPin () {
