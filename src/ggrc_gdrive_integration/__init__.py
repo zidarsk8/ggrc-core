@@ -11,8 +11,6 @@ from flask import Blueprint
 from ggrc import db             # noqa
 from ggrc import settings       # noqa
 from ggrc.app import app        # noqa
-from ggrc.services.registry import service
-import ggrc_gdrive_integration.models as models
 
 from oauth2client import client
 
@@ -24,11 +22,6 @@ blueprint = Blueprint(
     static_folder='static',
     static_url_path='/static/ggrc_gdrive_integration',
 )
-
-
-contributed_services = [
-    service('object_files', models.ObjectFile),
-]
 
 
 def get_http_auth():

@@ -76,9 +76,6 @@ def all_cache_entries():
       resource('roles', 'Role'),
       resource('user_roles', 'UserRole'),
 
-      # ggrc_gdrive_integration models
-      resource('object_files', 'ObjectFile'),
-
       # ggrc_risk_assessments models
       resource('templates', 'Template'),
       resource('risk_assessments', 'RiskAssessment'),
@@ -115,7 +112,6 @@ def all_mapping_entries():
       mapping('UserRole', 'context'),
       mapping('UserRole', 'person'),
       mapping('UserRole', 'role'),
-      mapping('ObjectFile', 'fileable', True),
       mapping('Notification', 'recipients'),
       mapping('Notification', 'notification_object'),
       # ggrc_workflows mappings:
