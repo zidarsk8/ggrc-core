@@ -41,7 +41,6 @@ def all_cache_entries():
       resource('facilities', 'Facility'),
       resource('helps', 'Help'),
       resource('markets', 'Market'),
-      resource('meetings', 'Meeting'),
       resource('object_people', 'ObjectPerson'),
       resource('objectives', 'Objective'),
       resource('options', 'Option'),
@@ -79,7 +78,6 @@ def all_cache_entries():
 
       # ggrc_gdrive_integration models
       resource('object_files', 'ObjectFile'),
-      resource('object_events', 'ObjectEvent'),
 
       # ggrc_risk_assessments models
       resource('templates', 'Template'),
@@ -117,7 +115,6 @@ def all_mapping_entries():
       mapping('UserRole', 'context'),
       mapping('UserRole', 'person'),
       mapping('UserRole', 'role'),
-      mapping('ObjectEvent', 'eventable', True),
       mapping('ObjectFile', 'fileable', True),
       mapping('Notification', 'recipients'),
       mapping('Notification', 'notification_object'),

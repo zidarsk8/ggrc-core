@@ -20,12 +20,10 @@ permissions = {
         "Audit",
         "Snapshot",
         "AuditObject",
-        "Meeting",
         "ObjectControl",
         "ObjectPerson",
         "Relationship",
         "Document",
-        "Meeting",
         "Context",
     ],
     "create": [
@@ -36,12 +34,10 @@ permissions = {
         "Audit",
         "Snapshot",
         "AuditObject",
-        "Meeting",
         "ObjectControl",
         "ObjectPerson",
         "Relationship",
         "Document",
-        "Meeting",
     ],
     "view_object_page": [
         "__GGRC_ALL__"
@@ -61,12 +57,10 @@ permissions = {
         },
         "Snapshot",
         "AuditObject",
-        "Meeting",
         "ObjectControl",
         "ObjectPerson",
         "Relationship",
         "Document",
-        "Meeting",
     ],
     "delete": [
         "UserRole",
@@ -77,7 +71,6 @@ permissions = {
         "ObjectPerson",
         "Relationship",
         "Document",
-        "Meeting"
         "AuditObject",
         {
             "type": "Audit",

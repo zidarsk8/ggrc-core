@@ -19,22 +19,7 @@ from ggrc.models import all_models
 from ggrc.models.hooks import common
 from ggrc.models.hooks import issue_tracker
 from ggrc.services import signals
-
-
-def _load_snapshots(snapshot_ids):
-  """Returns snapshots for given IDs."""
-  return {
-      s.id: s for s in all_models.Snapshot.query.options(
-          orm.undefer_group('Snapshot_complete'),
-          orm.Load(all_models.Snapshot).joinedload(
-              'revision'
-          ).undefer_group(
-              'Revision_complete'
-          )
-      ).filter(
-          all_models.Snapshot.id.in_(snapshot_ids)
-      )
-  }
+from ggrc.utils import referenced_objects
 
 
 def _load_templates(template_ids):
@@ -59,12 +44,12 @@ def _load_audits(audit_ids):
   }
 
 
-def _handle_assessment(assessment, src, snapshots, templates, audits):
+def _handle_assessment(assessment, src, templates, audits):
   """Handles auto calculated properties for Assessment model."""
   snapshot_dict = src.get('object') or {}
   common.map_objects(assessment, snapshot_dict)
   common.map_objects(assessment, src.get('audit'))
-  snapshot = snapshots.get(snapshot_dict.get('id'))
+  snapshot = referenced_objects.get("Snapshot", snapshot_dict.get('id'))
 
   if not src.get('_generated') and not snapshot:
     return
@@ -108,22 +93,18 @@ def init_hook():
     del sender, service  # Unused
 
     db.session.flush()
-    audit_ids = []
-    template_ids = []
-    snapshot_ids = []
+    audit_ids = set()
+    template_ids = set()
 
     for src in sources:
-      snapshot_ids.append(src.get('object', {}).get('id'))
-      audit_ids.append(src.get('audit', {}).get('id'))
-      template_ids.append(src.get('template', {}).get('id'))
+      audit_ids.add(src.get('audit', {}).get('id'))
+      template_ids.add(src.get('template', {}).get('id'))
 
-    snapshot_cache = _load_snapshots(snapshot_ids)
     template_cache = _load_templates(template_ids)
     audit_cache = _load_audits(audit_ids)
 
     for assessment, src in itertools.izip(objects, sources):
-      _handle_assessment(
-          assessment, src, snapshot_cache, template_cache, audit_cache)
+      _handle_assessment(assessment, src, template_cache, audit_cache)
 
     # Flush roles objects for generated assessments.
     db.session.flush()
@@ -133,7 +114,7 @@ def init_hook():
       # would avoid querying same data (such as snapshots, audits and
       # templates) twice.
       issue_tracker.handle_assessment_create(
-          assessment, src, snapshot_cache, template_cache, audit_cache)
+          assessment, src, template_cache, audit_cache)
 
   # pylint: disable=unused-variable
   @signals.Restful.model_put.connect_via(all_models.Assessment)

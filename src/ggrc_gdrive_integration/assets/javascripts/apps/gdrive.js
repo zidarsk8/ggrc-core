@@ -14,12 +14,6 @@
       },
       revisions: new GGRC.ListLoaders.DirectListLoader("GDriveFileRevision", "id")
     },
-    Meeting: {
-      _canonical: {
-        events: "GCalEvent"
-      },
-      events: new GGRC.ListLoaders.ProxyListLoader("ObjectEvent", "eventable", "event", "object_events", "GCalEvent")
-    },
     GDriveFolder: {
       _mixins: ["revisionable"],
       _canonical: {
@@ -60,12 +54,6 @@
   GGRC.register_hook('Audit.storage_folder_picker',
     GGRC.mustache_path + '/audits/gdrive_folder_picker.mustache');
 
-  $.extend(true, CMS.Models.Meeting.attributes, {
-    object_events: 'CMS.Models.ObjectEvent.stubs',
-    events: 'CMS.Models.GCalEvent.stubs'
-  });
-  GGRC.register_hook('Meeting.tree_view_info',
-    GGRC.mustache_path + '/meetings/gcal_info.mustache');
   GGRC.register_hook('Role.option_detail', GGRC.mustache_path +
     '/roles/gdrive_option_detail.mustache');
 

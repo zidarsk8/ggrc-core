@@ -8,6 +8,7 @@
 from datetime import datetime
 
 import ddt
+from freezegun import freeze_time
 from mock import patch
 from sqlalchemy import and_
 
@@ -138,6 +139,7 @@ class TestCommentNotification(TestCase):
     _, notif_data = common.get_daily_notifications()
 
     assignee_notifs = notif_data.get("user@example.com", {})
+    common.sort_comments(assignee_notifs)
     comment_notifs = assignee_notifs.get("comment_created", {})
     self.assertEqual(len(comment_notifs), 3)  # for 3 different Assessments
 
@@ -218,3 +220,30 @@ class TestCommentNotification(TestCase):
     notifications = self._get_notifications(notif_type="comment_created").all()
     self.assertEqual(len(notifications), 0,
                      "Found a comment notification that was not sent.")
+
+  def test_old_comments(self):
+    """Test if notifications will be sent for mix of old and new comments"""
+    cur_user = all_models.Person.query.filter_by(
+        email="user@example.com"
+    ).first()
+    assigee_role_id = {
+        v: k for k, v in get_custom_roles_for("Assessment").items()
+    }["Assignees"]
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      factories.AccessControlListFactory(
+          ac_role_id=assigee_role_id, person=cur_user, object=assessment
+      )
+    with freeze_time("2015-04-01 17:13:10"):
+      self.generator.generate_comment(
+          assessment, "", "some comment1", send_notification="true"
+      )
+    self.generator.generate_comment(
+        assessment, "", "some comment2", send_notification="true"
+    )
+    response = self.client.get("/_notifications/show_pending")
+    for comment in ["some comment1", "some comment2"]:
+      self.assertIn(
+          comment, response.data,
+          "Information about comment '{}' absent in report".format(comment)
+      )

@@ -338,7 +338,6 @@ viewModel = can.Map.extend({
     var columns = TreeViewUtils.getColumnsForModel(
       this.attr('model').model_singular,
       this.attr('displayPrefs'),
-      true,
       this.attr('optionsData').widgetId
     );
 

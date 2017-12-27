@@ -353,24 +353,6 @@ import RefreshQueue from './refresh_queue';
     }
   }, {});
 
-  can.Model.Join('CMS.Models.ObjectDocument', {
-    root_object: 'object_document',
-    root_collection: 'object_documents',
-    findAll: 'GET /api/object_documents',
-    create: 'POST /api/object_documents',
-    destroy: 'DELETE /api/object_documents/{id}',
-    join_keys: {
-      documentable: can.Model.Cacheable,
-      document: CMS.Models.Document
-    },
-    attributes: {
-      context: 'CMS.Models.Context.stub',
-      modified_by: 'CMS.Models.Person.stub',
-      document: 'CMS.Models.Document.stub',
-      documentable: 'CMS.Models.get_stub'
-    }
-  }, {});
-
   can.Model.Join('CMS.Models.MultitypeSearchJoin', {
     join_keys: {}
   }, {});

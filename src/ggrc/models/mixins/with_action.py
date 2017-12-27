@@ -142,7 +142,15 @@ class WithAction(object):
       try:
         return ntuple(**_action)
       except TypeError:
-        raise ValidationError("Missed action parameters")
+        # According to documentation _fields is not private property
+        # but public, '_' added to prevent conflicts with tuple field names
+        # pylint: disable=protected-access
+        missing_fields = set(ntuple._fields) - set(_action)
+        raise ValidationError(
+            "Fields {} are missing for action: {!r}".format(
+                ", ".join(missing_fields), _action
+            )
+        )
 
     # pylint: disable=unused-argument,no-self-use
     def _create(self, parent, action):

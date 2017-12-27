@@ -4,7 +4,6 @@
 */
 
 import './models/gdrive_models';
-import './models/gcal_models';
 import './controllers/gapi_controllers';
 import './apps/gdrive';
 import './components/gdrive_picker_launcher';

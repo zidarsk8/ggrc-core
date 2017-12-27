@@ -533,6 +533,27 @@ class TestCommentWithActionMixin(TestCase):
     self.assertEqual(comment.description, "comment")
     self.assertEqual(comment.custom_attribute_definition_id, ca_def.id)
 
+  def test_wrong_comment(self):
+    """Test add custom attribute comment action without description."""
+    with factories.single_commit():
+      assessment = factories.AssessmentFactory()
+      ca_def = factories.CustomAttributeDefinitionFactory(
+          title="def1",
+          definition_type="assessment",
+          attribute_type="Dropdown",
+          multi_choice_options="no,yes",
+      )
+    data = {
+        u"id": None,
+        u"type": u"Comment",
+        u"custom_attribute_definition_id": int(ca_def.id),
+    }
+    response = self.api.put(assessment, {"actions": {"add_related": [data]}})
+    self.assert400(response)
+
+    err = u"Fields {} are missing for action: {!r}".format("description", data)
+    self.assertEqual(response.json.get("message"), err)
+
   def test_wrong_add_comment(self):
     """Test wrong add comment action."""
     assessment = factories.AssessmentFactory()
