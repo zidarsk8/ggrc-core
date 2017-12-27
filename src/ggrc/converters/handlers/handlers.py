@@ -868,6 +868,22 @@ class DocumentsColumnHandler(ColumnHandler):
     self.dry_run = True
 
 
+class LabelsHandler(ColumnHandler):
+  """ Handler for labels """
+
+  def parse_item(self):
+    if self.raw_value is None:
+      return
+    names = set(l.strip() for l in self.raw_value.split(',') if l.strip())
+    return [{'id': None, 'name': name} for name in names]
+
+  def set_obj_attr(self):
+    self.row_converter.obj.labels = self.value
+
+  def get_value(self):
+    return ','.join(label.name for label in self.row_converter.obj.labels)
+
+
 class ExportOnlyColumnHandler(ColumnHandler):
 
   def __init__(self, *args, **kwargs):

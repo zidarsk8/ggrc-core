@@ -64,7 +64,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
                  Personable, reminderable.Reminderable, Relatable,
                  LastDeprecatedTimeboxed, WithSimilarityScore, FinishedDate,
                  VerifiedDate, ValidateOnComplete, Notifiable, WithAction,
-                 BusinessObject, labeled.Labeled, Indexed, db.Model):
+                 labeled.Labeled, BusinessObject, Indexed, db.Model):
   """Class representing Assessment.
 
   Assessment is an object representing an individual assessment performed on
@@ -79,18 +79,6 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   NOT_DONE_STATES = statusable.Statusable.NOT_DONE_STATES | {REWORK_NEEDED, }
   VALID_STATES = tuple(NOT_DONE_STATES | statusable.Statusable.DONE_STATES |
                        statusable.Statusable.INACTIVE_STATES)
-
-  class Labels(object):  # pylint: disable=too-few-public-methods
-    """Choices for label enum."""
-    AUDITOR_PULLS_EVIDENCE = u'Auditor pulls evidence'
-    FOLLOWUP = u'Followup'
-    NEEDS_REWORK = u'Needs Rework'
-    NEEDS_DISCUSSION = u'Needs Discussion'
-
-  POSSIBLE_LABELS = [Labels.AUDITOR_PULLS_EVIDENCE,
-                     Labels.FOLLOWUP,
-                     Labels.NEEDS_REWORK,
-                     Labels.NEEDS_DISCUSSION]
 
   REMINDERABLE_HANDLERS = {
       "statusToPerson": {

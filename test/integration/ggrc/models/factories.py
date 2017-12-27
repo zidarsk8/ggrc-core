@@ -449,6 +449,23 @@ class ThreatFactory(TitledFactory):
     model = risk_models.Threat
 
 
+class LabelFactory(ModelFactory):
+  """Label factory class"""
+
+  class Meta:
+    model = models.Label
+
+  name = factory.LazyAttribute(lambda m: random_str(prefix='name'))
+  object_type = factory.LazyAttribute('Assessment')
+
+
+class ObjectLabelFactory(ModelFactory):
+  """ObjectLabel factory class"""
+
+  class Meta:
+    model = models.ObjectLabel
+
+
 def get_model_factory(model_name):
   """Get object factory for provided model name"""
   from integration.ggrc_workflows.models import factories as wf_factories
@@ -472,6 +489,8 @@ def get_model_factory(model_name):
       "DataAsset": DataAssetFactory,
       "Facility": FacilityFactory,
       "Issue": IssueFactory,
+      "Label": LabelFactory,
+      "ObjectLabel": ObjectLabelFactory,
       "Market": MarketFactory,
       "Objective": ObjectiveFactory,
       "OrgGroup": OrgGroupFactory,
