@@ -37,17 +37,14 @@
             </dropdown>
           </assessment-object-type-dropdown>
         </div>
-        <div class="ggrc-form-item__multiple-row">
+        <div class="ggrc-form-item__multiple-row multi-select-label-container">
           <label class="form-label ggrc-form-item__label">
             Label
           </label>
-          <select can-value="label">
-            <option value="" selected="selected">---</option>
-            <option value="Needs Discussion">Needs Discussion</option>
-            <option value="Needs Rework">Needs Rework</option>
-            <option value="Followup">Followup</option>
-            <option value="Auditor pulls evidence">Auditor pulls evidence</option>
-          </select>
+          <multi-select-label only-edit-mode="true"
+                              {instance}="instance"
+                              {labels}="instance.labels">
+          </multi-select-label>
         </div>
       </div>
       <div class="ggrc-form-item">

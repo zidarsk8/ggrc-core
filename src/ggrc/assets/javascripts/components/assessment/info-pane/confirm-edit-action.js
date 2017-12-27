@@ -16,6 +16,7 @@ import {confirm} from '../../../plugins/utils/modals';
       setInProgress: null,
       editMode: false,
       isEditIconDenied: false,
+      isConfirmationNeeded: true,
       onStateChangeDfd: can.Deferred().resolve(),
       openEditMode: function (el) {
         this.attr('onStateChangeDfd').then(function () {
@@ -45,7 +46,7 @@ import {confirm} from '../../../plugins/utils/modals';
         });
       },
       confirmEdit: function () {
-        if (!this.isInEditableState()) {
+        if (this.attr('isConfirmationNeeded') && !this.isInEditableState()) {
           return this.showConfirm();
         }
 

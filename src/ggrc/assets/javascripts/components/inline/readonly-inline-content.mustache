@@ -49,4 +49,9 @@
       <span class="empty-message">No person</span>
     {{/if}}
   {{/case}}
+  {{#case 'multi-select-label'}}
+    <multi-select-label {labels}="value"
+        {edit-mode}="false">
+    </multi-select-label>
+  {{/case}}
 {{/switch}}

@@ -31,6 +31,7 @@ import '../components/assessment/map-button-using-assessment-type';
 import '../components/gca-controls/gca-controls';
 import '../components/datepicker/datepicker';
 import '../components/external-data-autocomplete/inline-autocomplete-wrapper';
+import '../components/multi-select-label/multi-select-label';
 import {BUTTON_VIEW_DONE} from '../plugins/utils/modals'
 import {
   checkPreconditions,

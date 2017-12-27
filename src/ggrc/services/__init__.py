@@ -66,7 +66,8 @@ def contributed_services():
       service('notification_configs', models.NotificationConfig),
       service('issues', models.Issue),
       service('snapshots', models.Snapshot),
-      service('access_control_roles', AccessControlRole)
+      service('access_control_roles', AccessControlRole),
+      service('labels', models.Label),
   ]
 
 
