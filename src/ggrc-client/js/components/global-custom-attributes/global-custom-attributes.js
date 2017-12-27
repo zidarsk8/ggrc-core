@@ -19,6 +19,7 @@ import Permission from '../../permission';
     tag: 'global-custom-attributes',
     template: '<content/>',
     viewModel: {
+      isAttributesDisabled: false,
       define: {
         /**
          * Indicates whether custome attributes can be edited.
@@ -30,6 +31,7 @@ import Permission from '../../permission';
             return this.attr('instance.snapshot') ||
               this.attr('instance.isRevision') ||
               this.attr('instance.archived') ||
+              this.attr('isAttributesDisabled') ||
               this.isReadOnlyForInstance(this.attr('instance')) ||
               !Permission.is_allowed_for('update', this.attr('instance'));
           },

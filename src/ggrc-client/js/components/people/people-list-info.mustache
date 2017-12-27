@@ -104,8 +104,8 @@
           </div>
         </div>
       </div>
-      {{#using instance}}
-      {{>'/static/mustache/custom_attributes/info.mustache'}}
+      {{#using instance isAttributesDisabled}}
+          {{>'/static/mustache/custom_attributes/info.mustache'}}
       {{/using}}
     </div>
   </div>

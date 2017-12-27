@@ -12,6 +12,19 @@ import template from './people-list-info.mustache';
     instance: null,
     isOpen: false,
     isHidden: false,
+    isRefreshed: false,
+    isAttributesDisabled: false,
+    refreshInstance() {
+      if (this.attr('isRefreshed')) {
+        return;
+      }
+
+      this.attr('isAttributesDisabled', true);
+      this.attr('instance').refresh().then(() => {
+        this.attr('isAttributesDisabled', false);
+      });
+      this.attr('isRefreshed', true);
+    },
   });
 
   GGRC.Components('peopleListInfo', {
@@ -25,6 +38,7 @@ import template from './people-list-info.mustache';
         }
         this.viewModel.attr('isHidden', arguments[2]);
         this.viewModel.attr('isOpen', true);
+        this.viewModel.refreshInstance();
       },
     },
   });
