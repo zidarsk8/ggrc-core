@@ -192,6 +192,10 @@ class AuditRolesHandler(object):
       else:
         assessment, other = first, second
         access_control_list = assessment.access_control_list
+    elif (isinstance(first, (all_models.Comment, all_models.Document)) and
+          isinstance(second, all_models.Issue)):
+      access_control_list = second.access_control_list
+      other = first
     else:
       return
 
@@ -211,6 +215,7 @@ class AuditRolesHandler(object):
             all_models.AssessmentTemplate: audit_roles["Auditors Mapped"],
             all_models.Document: audit_roles["Auditors Document Mapped"],
             all_models.Issue: audit_roles["Auditors Issue Mapped"],
+            all_models.Comment: audit_roles["Auditors Mapped"],
         })
     role_map = {
         audit_roles["Auditors"]: auditors_mapped_dict,
@@ -219,6 +224,7 @@ class AuditRolesHandler(object):
         audit_roles["Audit Captains Mapped"]: defaultdict(
             lambda: audit_roles["Audit Captains Mapped"]),
         audit_roles["Auditors Assessment Mapped"]: auditors_mapped_dict,
+        audit_roles["Auditors Issue Mapped"]: auditors_mapped_dict,
     }
     for acl in access_control_list:
       ac_role_id = _get_acr_id(acl)
