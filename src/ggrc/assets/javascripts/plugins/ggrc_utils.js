@@ -96,6 +96,11 @@ import Permission from '../permission';
     },
     formatDate: function (date, hideTime) {
       var currentTimezone = moment.tz.guess();
+      var formats = [
+        'YYYY-MM-DD',
+        'YYYY-MM-DDTHH:mm:ss',
+        'YYYY-MM-DDTHH:mm:ss.SSSSSS',
+      ];
       var inst;
 
       if (date === undefined || date === null) {
@@ -104,7 +109,7 @@ import Permission from '../permission';
 
       if (typeof date === 'string') {
         // string dates are assumed to be in ISO format
-        return moment.utc(date, 'YYYY-MM-DD', true).format('MM/DD/YYYY');
+        return moment.utc(date, formats, true).format('MM/DD/YYYY');
       }
 
       inst = moment(new Date(date.isComputed ? date() : date));
