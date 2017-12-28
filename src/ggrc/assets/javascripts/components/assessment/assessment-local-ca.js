@@ -57,7 +57,19 @@ import Permission from '../../permission';
           type: 'number',
           set: function (newValue, setValue) {
             setValue(newValue);
-            this.validateForm();
+            if (this.attr('relatedItemsLoaded')) {
+              this.validateForm();
+            }
+          },
+        },
+        relatedItemsLoaded: {
+          value: false,
+          type: 'boolean',
+          set(newValue, setValue) {
+            setValue(newValue);
+            if (newValue) {
+              this.validateForm();
+            }
           },
         },
         isEvidenceRequired: {
@@ -77,17 +89,20 @@ import Permission from '../../permission';
           },
         },
       },
-      validateForm: function () {
+      validateForm: function (triggerAttachmentModals = false) {
         var self = this;
         this.attr('fields')
           .each(function (field) {
-            self.performValidation(field, true);
+            self.performValidation({field, triggerAttachmentModals});
           });
         if (this.attr('instance.hasValidationErrors')) {
           this.dispatch(VALIDATION_ERROR);
         }
       },
-      performValidation: function (field, formInitCheck) {
+      performValidation: function ({
+        field,
+        triggerAttachmentModals = false,
+      }) {
         var fieldValid;
         var hasMissingEvidence;
         var hasMissingComment;
@@ -114,8 +129,7 @@ import Permission from '../../permission';
         hasMissingEvidence = requiresEvidence &&
           !!this.attr('isEvidenceRequired');
 
-        hasMissingComment = formInitCheck ?
-          requiresComment && !!errorsMap.comment : requiresComment;
+        hasMissingComment = requiresComment && !!errorsMap.comment;
 
         if (field.type === 'checkbox') {
           if (value === '1') {
@@ -149,7 +163,8 @@ import Permission from '../../permission';
             },
           });
 
-          if (!formInitCheck && (hasMissingEvidence || hasMissingComment)) {
+          if (triggerAttachmentModals &&
+              (hasMissingEvidence || hasMissingComment)) {
             this.dispatch({
               type: 'validationChanged',
               field: field,
@@ -210,20 +225,27 @@ import Permission from '../../permission';
           stopFn();
         });
       },
+      fieldRequiresComment: function (field) {
+        let fieldValidationConf = field.validationConfig[field.value];
+          return fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
+            fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+      },
       attributeChanged: function (e) {
         e.field.attr('value', e.value);
-        this.performValidation(e.field);
+
+        // Removes "link" with the comment for DD field and
+        // makes it require a new one
+        if ( e.field.attr('type') === 'dropdown' &&
+            this.fieldRequiresComment(e.field) ) {
+          e.field.attr('errorsMap.comment', true);
+        }
+
+        this.validateForm(true);
         this.attr('formSavedDeferred', can.Deferred());
         this.save(e.fieldId, e.value);
       },
     },
     events: {
-      inserted: function () {
-        this.viewModel.validateForm();
-      },
-      '{viewModel.instance} update': function () {
-        this.viewModel.validateForm();
-      },
       '{viewModel.instance} afterCommentCreated': function () {
         this.viewModel.validateForm();
       },
