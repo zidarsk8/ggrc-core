@@ -179,11 +179,10 @@ migrations once again by running:
 
 .. code-block:: bash
 
-    git pr <pr_number>
     db_reset
 
 This is needed because migration chain can be out of date if another
-migration PR was merged after the last commit on the current PR has 
+migration PR was merged after the last commit on the current PR has
 been pushed.
 
 Pull requests that modify the database (marked with the ``migration``
@@ -196,7 +195,25 @@ others regular checks, namely the following:
    ``develop`` branch,
 -  Migrations work on a populated database (using the data from the
    ``grc-dev`` instance).
+-  Database state after downgrade is the same as before the upgrade.
+   Before applying a migration do:
 
+   .. code-block:: bash
+
+       alembic <module_name> revision --autogenerate
+
+   It will generate a new migration file with all the differences
+   between the actual database state and the models' definitions.
+   Afterwards do the upgrade and downgrade to the previous state
+   and do autogenerate again:
+
+   .. code-block:: bash
+
+       alembic <module_name> upgrade <new_revision>
+       alembic <module_name> downgrade <old_revision>
+       alembic <module_name> revision --autogenerate
+
+   Compare the two generated files, they should be identical.
 
 .. _acceptance-criteria:
 
@@ -316,27 +333,10 @@ sure, just run them all.*
    If you don't yet have the ``<pr_origin>`` defined, you need to add it
    (`instructions <https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes#Adding-Remote-Repositories>`_).
 
-3. Start your local development environment (Vagrant or Docker). No need
+3. Start your local development environment (Docker). No need
    if you already have it running.
 
-   **If using Vagrant**
-
-   ..  code:: bash
-
-       vagrant up
-
-       # run the following if there were any changes in the provisioning files,
-       # requirements, requirements-dev, requirements-selenium, or npm
-       requirements...
-       vagrant provision
-
-       vagrant ssh
-
-   **If using Docker**
-
-   ..  code:: bash
-
-       # TODO: write Docker commands
+   Refer to "Quick Start" paragraph of the README
 
 4. (optional) Run the database migration
 
