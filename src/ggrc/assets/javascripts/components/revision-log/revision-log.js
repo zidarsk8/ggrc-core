@@ -516,6 +516,11 @@ import template from './revision-log.mustache';
                 return value.attribute_value;
               }
               return obj.name || obj.email || value.attribute_value;
+            case 'Date':
+              if (!value.attribute_value) {
+                return value.attribute_value;
+              }
+              return GGRC.Utils.formatDate(value.attribute_value, true);
             default:
               return value.attribute_value;
           }
