@@ -624,6 +624,32 @@ class TestAssessmentImport(TestCase):
         models.Assessment.query.get(assessment.id).status,
         models.Assessment.DEPRECATED)
 
+  def test_asmnt_cads_update_completed(self):
+    """Test update of assessment without cads."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      asmnt = factories.AssessmentFactory(audit=audit)
+      factories.CustomAttributeDefinitionFactory(
+          title="CAD",
+          definition_type="assessment",
+          definition_id=asmnt.id,
+          attribute_type="Text",
+          mandatory=True,
+      )
+    data = OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmnt.slug),
+        ("Audit", audit.slug),
+        ("Assignees", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Test title"),
+        ("State", "Completed"),
+        ("CAD", "Some value"),
+    ])
+    for dry_run in [True, False]:
+      response = self.import_data(data, dry_run=dry_run)
+      self._check_csv_response(response, {})
+
 
 @ddt.ddt
 class TestAssessmentExport(TestCase):
