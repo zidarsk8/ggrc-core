@@ -41,6 +41,45 @@ class TestWorkflowsApiPost(TestCase):
   def tearDown(self):
     pass
 
+  def test_propagate_acl_for_new_related_object(self):  # noqa pylint: disable=invalid-name
+    """Test Workflow ACL propagation for new related objects."""
+    data = self.get_workflow_dict()
+    acl_map = {
+        self.people_ids[0]: WF_ROLES['Admin'],
+        self.people_ids[1]: WF_ROLES['Workflow Member'],
+    }
+    data["workflow"]["access_control_list"] = acl_helper.get_acl_list(acl_map)
+    data["workflow"]["unit"] = "week"
+    data["workflow"]["repeat_every"] = 1
+    response = self.api.post(all_models.Workflow, data)
+    self.assertEqual(response.status_code, 201)
+
+    data = self.get_task_group_dict(response.json["workflow"])
+    data["task_group"]["contact"]["id"] = self.people_ids[2]
+    data["task_group"]["contact"]["href"] = "/api/people/{}".format(
+        self.people_ids[2])
+    response = self.api.post(all_models.TaskGroup, data)
+    self.assertEqual(response.status_code, 201)
+
+    task_group = all_models.TaskGroup.eager_query().one()
+    data = self.get_task_dict(task_group)
+    data["task_group_task"]["start_date"] = "2018-01-04"
+    data["task_group_task"]["end_date"] = "2018-01-05"
+    response = self.api.post(all_models.TaskGroupTask, data)
+    self.assertEqual(response.status_code, 201)
+
+    workflow = all_models.Workflow.query.one()
+    with freezegun.freeze_time("2018-01-05"):  # Generate 1 cycle
+      self.generator.activate_workflow(workflow)
+
+    cycle_task = all_models.CycleTaskGroupObjectTask.query.one()
+    cycle = all_models.Cycle.query.one()
+    data = self.get_comment_dict(cycle_task, cycle)
+    response = self.api.post(all_models.CycleTaskEntry, data)
+    self.assertEqual(response.status_code, 201)
+
+    self._check_propagated_acl(3)
+
   @ddt.data('Admin', 'Workflow Member')
   def test_task_group_assignee_has_workflow_role(self, role_name):  # noqa pylint: disable=invalid-name
     """Test TaskGroup assignee already has Workflow role."""
@@ -369,6 +408,60 @@ class TestWorkflowsApiPost(TestCase):
             "modal_title": "Create Task Group",
             "title": "Create_task_group",
             "description": "",
+        }
+    }
+
+  @staticmethod
+  def get_task_dict(task_group):
+    return {
+        "task_group_task": {
+            "start_date": "2017-12-25",
+            "end_date": "2017-12-31",
+            "custom_attributes": {},
+            "contact": {
+                "id": 1,
+                "href": "/api/people/1",
+                "type": "Person"
+            },
+            "task_group": {
+                "id": task_group.id,
+                "href": "/api/task_groups/{}".format(task_group.id),
+                "type": "TaskGroup"
+            },
+            "context": {
+                "id": task_group.context_id,
+                "href": "/api/contexts/{}".format(task_group.context_id),
+                "type": "Context"
+            },
+            "title": "Create_task",
+            "task_type": "text",
+            "description": ""
+        }
+    }
+
+  @staticmethod
+  def get_comment_dict(cycle_task, cycle):
+    return {
+        "cycle_task_entry": {
+            "custom_attributes": {},
+            "cycle_task_group_object_task": {
+                "id": cycle_task.id,
+                "href": "/api/cycle_task_group_object_tasks/{}".format(
+                    cycle_task.id),
+                "type": "CycleTaskGroupObjectTask"
+            },
+            "cycle": {
+                "id": cycle.id,
+                "href": "/api/cycles/{}".format(cycle.id),
+                "type": "Cycle"
+            },
+            "context": {
+                "id": cycle.context_id,
+                "href": "/api/contexts/{}".format(cycle.context_id),
+                "type": "Context"
+            },
+            "is_declining_review": "",
+            "description": "CT comment"
         }
     }
 
