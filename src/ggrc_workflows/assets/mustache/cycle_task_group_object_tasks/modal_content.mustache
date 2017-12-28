@@ -169,7 +169,8 @@
             set-max-date="instance.end_date"
             date="instance.start_date"
             required="true"
-            />
+            no-weekends="true"
+            deny-input="true" />
             {{#instance.computed_errors.start_date}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.start_date}}
           </div>
         </div>
@@ -182,7 +183,8 @@
             set-min-date="instance.start_date"
             date="instance.end_date"
             required="true"
-            />
+            no-weekends="true"
+            deny-input="true" />
             {{#instance.computed_errors.end_date}}<label class="help-inline warning">{{this}}</label>{{/instance.computed_errors.end_date}}
           </div>
         </div>
