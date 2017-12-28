@@ -44,7 +44,7 @@ ATTRIBUTE_ORDER = (
     "finished_date",
     "verified_date",
     "status",
-    "label",
+    "labels",
     'os_state',
     "assertions",
     "categories",

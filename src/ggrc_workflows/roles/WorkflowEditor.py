@@ -20,7 +20,6 @@ permissions = {
         "UserRole",
         "Context",
         "Document",
-        "ObjectFile",
     ],
     "create": [
         "Workflow",
@@ -35,7 +34,6 @@ permissions = {
         "CycleTaskEntry",
         "UserRole",
         "Document",
-        "ObjectFile",
     ],
     "update": [
         "Workflow",
@@ -50,7 +48,6 @@ permissions = {
         "CycleTaskEntry",
         "UserRole",
         "Document",
-        "ObjectFile",
     ],
     "delete": [
         "Workflow",
@@ -64,7 +61,6 @@ permissions = {
         "CycleTaskEntry",
         "UserRole",
         "Document",
-        "ObjectFile",
     ],
     "view_object_page": [
         "Workflow",

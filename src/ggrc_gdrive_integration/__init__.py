@@ -11,11 +11,6 @@ from flask import Blueprint
 from ggrc import db             # noqa
 from ggrc import settings       # noqa
 from ggrc.app import app        # noqa
-from ggrc.models import Document
-from ggrc.services.registry import service
-from ggrc_basic_permissions.contributed_roles import RoleContributions
-import ggrc_gdrive_integration.models as models
-from ggrc_gdrive_integration.models.object_file import Fileable
 
 from oauth2client import client
 
@@ -27,56 +22,6 @@ blueprint = Blueprint(
     static_folder='static',
     static_url_path='/static/ggrc_gdrive_integration',
 )
-
-
-Document.__bases__ = (Fileable, ) + Document.__bases__
-Document.late_init_fileable()
-
-
-contributed_services = [
-    service('object_files', models.ObjectFile),
-]
-
-
-class GDriveRoleContributions(RoleContributions):
-  contributions = {
-      'Auditor': {
-          'read': ['ObjectFile'],
-      },
-      'ProgramAuditEditor': {
-          'read': ['ObjectFile'],
-          'create': ['ObjectFile'],
-          'update': ['ObjectFile'],
-          'delete': ['ObjectFile'],
-      },
-      'ProgramAuditOwner': {
-          'read': ['ObjectFile'],
-          'create': ['ObjectFile'],
-          'update': ['ObjectFile'],
-          'delete': ['ObjectFile'],
-      },
-      'ProgramAuditReader': {
-          'read': ['ObjectFile'],
-          'create': ['ObjectFile'],
-          'delete': ['ObjectFile'],
-      },
-      'ProgramOwner': {
-          'read': [],
-          'create': [],
-          'update': [],
-          'delete': [],
-      },
-      'Editor': {
-          'read': ['ObjectFile'],
-          'create': ['ObjectFile'],
-          'update': ['ObjectFile'],
-          'delete': ['ObjectFile'],
-      },
-
-  }
-
-
-ROLE_CONTRIBUTIONS = GDriveRoleContributions()
 
 
 def get_http_auth():

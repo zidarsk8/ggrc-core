@@ -57,6 +57,15 @@
       </span>
     {{/if}}
   {{/case}}
+  {{#case 'label'}}
+    <div class="labels">
+      {{#instance}}
+        {{#each labels}}
+          <span class="with-comma">{{name}}</span>
+        {{/each}}
+      {{/instance}}
+    </div>
+  {{/case}}
 
   {{#default}}
       {{#if_helpers '\
