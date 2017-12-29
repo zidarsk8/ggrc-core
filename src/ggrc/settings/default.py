@@ -24,6 +24,7 @@ USER_PERMISSIONS_PROVIDER = \
 EXTENSIONS = [
     'ggrc_basic_permissions',
     'ggrc_gdrive_integration',
+    'ggrc_risk_assessments',
 ]
 exports = [
     "GAPI_KEY",
@@ -179,3 +180,9 @@ GAPI_CLIENT_ID = os.environ.get('GGRC_GAPI_CLIENT_ID', "")
 # Admin group gets writer access to all
 GAPI_ADMIN_GROUP = os.environ.get('GGRC_GAPI_ADMIN_GROUP', "")
 GAPI_CLIENT_SECRET = os.environ.get('GGRC_GAPI_CLIENT_SECRET', "")
+
+# ggrc_risk_assessment specific module settings
+RISK_ASSESSMENT_URL = os.environ.get(
+    'GGRC_RISK_ASSESSMENT_URL',
+    'http://localhost:8080'
+)
