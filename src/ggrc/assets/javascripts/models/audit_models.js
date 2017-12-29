@@ -66,11 +66,6 @@ import Permission from '../permission';
         attr_name: 'title',
         order: 1,
       }, {
-        attr_title: 'Audit Captain',
-        attr_name: 'audit_lead',
-        attr_sort_field: 'contact',
-        order: 2,
-      }, {
         attr_title: 'Code',
         attr_name: 'slug',
         order: 3,
