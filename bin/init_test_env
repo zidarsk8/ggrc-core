@@ -3,7 +3,6 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 export GGRC_SETTINGS_MODULE="testing \
-  ggrc_basic_permissions.settings.development \
   ggrc_risk_assessments.settings.development \
   ggrc_risks.settings.development \
   ggrc_workflows.settings.development \

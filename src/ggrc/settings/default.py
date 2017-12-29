@@ -19,8 +19,9 @@ AUTOBUILD_ASSETS = False
 ENABLE_JASMINE = False
 DEBUG_ASSETS = False
 FULLTEXT_INDEXER = None
-USER_PERMISSIONS_PROVIDER = None
-EXTENSIONS = []
+USER_PERMISSIONS_PROVIDER = \
+    'ggrc_basic_permissions.CompletePermissionsProvider'
+EXTENSIONS = ['ggrc_basic_permissions']
 exports = []  # pylint: disable=invalid-name
 
 # Deployment-specific variables
@@ -160,3 +161,6 @@ ALLOWED_QUERYAPI_APP_IDS = os.environ.get(
     "ALLOWED_QUERYAPI_APP_IDS",
     "",
 ).split()
+
+BOOTSTRAP_ADMIN_USERS = \
+    os.environ.get('GGRC_BOOTSTRAP_ADMIN_USERS', '').split(' ')
