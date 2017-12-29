@@ -14,7 +14,6 @@ fi
 export DEV_PREFIX="$(cd ${DEV_PREFIX}; pwd -P)"
 
 export GGRC_SETTINGS_MODULE="development \
-  ggrc_risks.settings.development \
   ggrc_workflows.settings.development"
 
 export GGRC_BOOTSTRAP_ADMIN_USERS="user@example.com"

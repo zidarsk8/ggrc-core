@@ -25,6 +25,7 @@ EXTENSIONS = [
     'ggrc_basic_permissions',
     'ggrc_gdrive_integration',
     'ggrc_risk_assessments',
+    'ggrc_risks',
 ]
 exports = [
     "GAPI_KEY",
