@@ -55,8 +55,10 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     """
     self.definition = self.get_ca_definition()
     if self.definition is None:
-      self.add_warning(errors.INVALID_ATTRIBUTE_WARNING,
-                       column_name=self.display_name)
+      # In dry run mode CADs is not created for new objects.
+      if not self.dry_run:
+        self.add_warning(errors.INVALID_ATTRIBUTE_WARNING,
+                         column_name=self.display_name)
       return None
     type_ = self.definition.attribute_type.split(":")[0]
     value_handler = self._type_handlers[type_]
