@@ -69,6 +69,10 @@ class Labeled(object):
     if values is None:
       return
 
+    for value in values:
+      if 'name' in value:
+        value['name'] = value['name'].strip()
+
     if values:
       new_ids = {value['id'] for value in values if value['id']}
       new_names = {value['name'] for value in values if 'name' in value}

@@ -4,6 +4,7 @@
 */
 
 import RefreshQueue from '../../../../ggrc/assets/javascripts/models/refresh_queue';
+import {getClosestWeekday} from '../utils/date-util';
 
 (function (can) {
   var _mustachePath;
@@ -366,11 +367,16 @@ import RefreshQueue from '../../../../ggrc/assets/javascripts/models/refresh_que
       var workflows;
       var _workflow;
       var cycle;
+      let startDate;
+      let endDate;
 
       if (newObjectForm) {
         // prepopulate dates with default ones
-        this.attr('start_date', new Date());
-        this.attr('end_date', moment().add({month: 3}).toDate());
+        startDate = getClosestWeekday(new Date());
+        endDate = getClosestWeekday(moment().add({month: 3}).toDate());
+
+        this.attr('start_date', startDate);
+        this.attr('end_date', endDate);
 
         // if we are creating a task from the workflow page, the preset
         // workflow should be that one

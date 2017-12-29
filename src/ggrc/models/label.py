@@ -4,6 +4,7 @@
 """ Model for labels association table."""
 
 from sqlalchemy import orm
+from sqlalchemy.orm import validates
 
 from ggrc import db
 from ggrc.models import mixins
@@ -18,6 +19,12 @@ class Label(mixins.Base, db.Model, Indexed):
       'name',
       'object_type',
   ]
+
+  @validates('name')
+  def validate_name(self, key, value):
+    """Validates and cleans name that has leading/trailing spaces"""
+    # pylint: disable=unused-argument,no-self-use
+    return value if value is None else value.strip()
 
   name = db.Column(db.String, nullable=False)
   object_type = db.Column(db.String)

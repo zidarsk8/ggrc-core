@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+ import {getClosestWeekday} from '../utils/date-util';
+
 (function (can, GGRC) {
   'use strict';
 
@@ -183,12 +185,15 @@
   }, {
     init: function () {
       // default start and end date
-      var startDate = this.attr('start_date') || new Date();
-      var endDate = this.attr('end_date') ||
+      let startDate = this.attr('start_date') || new Date();
+      let endDate = this.attr('end_date') ||
         new Date(moment().add(7, 'days').format());
       if (this._super) {
         this._super.apply(this, arguments);
       }
+
+      startDate = getClosestWeekday(startDate);
+      endDate = getClosestWeekday(endDate);
       // Add base values to this property
       this.attr('response_options', []);
       this.attr('start_date', startDate);
@@ -229,7 +234,6 @@
         }, this);
       });
     },
-
     _refresh_workflow_people: function () {
       //  TaskGroupTask assignment may add mappings and role assignments in
       //  the backend, so ensure these changes are reflected.
