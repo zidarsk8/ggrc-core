@@ -99,7 +99,7 @@ def _migrate_auditors(connection):
   JOIN roles AS r ON ur.role_id = r.id
   JOIN contexts as c on ur.context_id = c.id
   JOIN access_control_roles as acr on acr.name = 'Auditors'
-  WHERE r.name = 'Auditor';
+  WHERE r.name = 'Auditor' AND c.related_object_id is not NULL;
   """))
   # 2. Migrate Audit context objects using context_id
   # snapshots, assessments, documents, issues, assessment templates, snapshots
