@@ -20,12 +20,13 @@ from ggrc.models.hooks.relationship import related
 
 def _get_cache(expr, name):
   """Simple cache function"""
-  cached = getattr(flask.g, name, None)
-  if cached is not None:
-    return cached
-  val = expr()
-  setattr(flask.g, name, val)
-  return val
+  try:
+    result = getattr(flask.g, name)
+  except AttributeError:
+    # not cached yet
+    result = expr()
+    setattr(flask.g, name, result)
+  return result
 
 
 def _get_program_editor_role():
