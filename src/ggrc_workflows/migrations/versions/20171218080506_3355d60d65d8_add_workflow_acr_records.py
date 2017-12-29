@@ -16,7 +16,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '3355d60d65d8'
-down_revision = '6a7dbb10dfa'
+down_revision = '14b87f599ede'
 
 
 ACR_TABLE = sa.sql.table(
