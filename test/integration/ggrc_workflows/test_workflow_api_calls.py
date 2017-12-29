@@ -41,6 +41,21 @@ class TestWorkflowsApiPost(TestCase):
   def tearDown(self):
     pass
 
+  def test_related_acl_removed_on_workflow_delete(self):  # noqa pylint: disable=invalid-name
+    """Test related ACL records removed on Workflow delete"""
+    self._create_propagation_acl_test_data()
+    acl_count = all_models.AccessControlList.query.count()
+    self.assertNotEqual(acl_count, 0)
+
+    admin = all_models.Person.query.get(1)
+    self.api.set_user(admin)
+    workflow = all_models.Workflow.query.one()
+    response = self.api.delete(workflow)
+    self.assert200(response)
+
+    acl_count = all_models.AccessControlList.query.count()
+    self.assertEqual(acl_count, 0)
+
   def test_propagate_acl_for_new_related_object(self):  # noqa pylint: disable=invalid-name
     """Test Workflow ACL propagation for new related objects."""
     data = self.get_workflow_dict()
