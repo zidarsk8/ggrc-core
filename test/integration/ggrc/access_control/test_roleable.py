@@ -44,6 +44,15 @@ class TestAccessControlRoleable(TestCase):
 
   def test_with_dict_objs_multiple(self):
     """Test access_control_list setter without ids"""
+
+    def acl_query():
+      return db.session.query(
+          all_models.AccessControlList.person_id,
+          all_models.AccessControlList.ac_role_id
+      ).filter(
+          all_models.AccessControlList.object_id == obj.id,
+          all_models.AccessControlList.object_type == "Control"
+      ).all()
     person_1 = all_models.Person(name="Frodo", email="frodo@baggins.com")
     person_2 = all_models.Person(name="Bilbo", email="bilbo@baggins.com")
     person_3 = factories.PersonFactory(name="Merry", email="merry@buck.com")
@@ -60,11 +69,12 @@ class TestAccessControlRoleable(TestCase):
     self.assertEqual(len(obj.access_control_list), 2)
     self.assertEqual(obj.access_control_list[0].person, person_1)
     self.assertEqual(obj.access_control_list[1].person, person_2)
-    num_acls = all_models.AccessControlList.query.filter(
-        all_models.AccessControlList.object_id == obj.id,
-        all_models.AccessControlList.object_type == "Control"
-    ).count()
-    self.assertEqual(num_acls, 2)
+
+    acls = acl_query()
+    self.assertItemsEqual([
+        (person_1.id, self.role.id),
+        (person_2.id, role.id)
+    ], acls)
 
     obj.access_control_list = [{
         "person": {
@@ -79,8 +89,8 @@ class TestAccessControlRoleable(TestCase):
     }]
     db.session.commit()
 
-    num_acls = all_models.AccessControlList.query.filter(
-        all_models.AccessControlList.object_id == obj.id,
-        all_models.AccessControlList.object_type == "Control"
-    ).count()
-    self.assertEqual(num_acls, 2)
+    acls = acl_query()
+    self.assertItemsEqual([
+        (person_2.id, role.id),
+        (person_3.id, role.id)
+    ], acls)
