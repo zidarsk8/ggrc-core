@@ -108,14 +108,22 @@ def _migrate_auditors(connection):
                "Auditors"),
       AC_TABLE("Assessment", "assessments", "Auditors Assessment Mapped",
                "Auditors"),
-      AC_TABLE("Document", "documents", "Auditors Document Mapped",
-               "Auditors"),
-      AC_TABLE("Comment", "comments", "Auditors Mapped",
-               "Auditors"),
       AC_TABLE("Issue", "issues", "Auditors Issue Mapped",
                "Auditors"),
       AC_TABLE("AssessmentTemplate", "assessment_templates", "Auditors Mapped",
                "Auditors"),
+  ], connection)
+
+  # 3. Migrate Second level objects:
+  _insert_acl_from_second_level([
+      AC_TABLE("Document", "Assessment", "Auditors Document Mapped",
+               "Auditors Assessment Mapped"),
+      AC_TABLE("Comment", "Assessment", "Auditors Mapped",
+               "Auditors Assessment Mapped"),
+      AC_TABLE("Document", "Issue", "Auditors Document Mapped",
+               "Auditors Issue Mapped"),
+      AC_TABLE("Comment", "Issue", "Auditors Mapped",
+               "Auditors Issue Mapped")
   ], connection)
 
 
@@ -140,14 +148,22 @@ def _migrate_captains(connection):
                "Audit Captains"),
       AC_TABLE("Assessment", "assessments", "Audit Captains Mapped",
                "Audit Captains"),
-      AC_TABLE("Document", "documents", "Audit Captains Mapped",
-               "Audit Captains"),
-      AC_TABLE("Comment", "comments", "Audit Captains Mapped",
-               "Audit Captains"),
       AC_TABLE("Issue", "issues", "Audit Captains Mapped",
                "Audit Captains"),
       AC_TABLE("AssessmentTemplate", "assessment_templates",
                "Audit Captains Mapped", "Audit Captains"),
+  ], connection)
+
+  # 3. Migrate Second level objects:
+  _insert_acl_from_second_level([
+      AC_TABLE("Document", "Assessment", "Audit Captains Mapped",
+               "Audit Captains Mapped"),
+      AC_TABLE("Comment", "Assessment", "Audit Captains Mapped",
+               "Audit Captains Mapped"),
+      AC_TABLE("Document", "Issue", "Audit Captains Mapped",
+               "Audit Captains Mapped"),
+      AC_TABLE("Comment", "Issue", "Audit Captains Mapped",
+               "Audit Captains Mapped")
   ], connection)
 
 
@@ -166,6 +182,47 @@ def _insert_acl_from_mapped(tables, connection):
     JOIN access_control_roles AS acr ON acl.ac_role_id = acr.id
     JOIN access_control_roles AS nacr ON nacr.name = '{role}'
     WHERE acr.name = '{parent_role}';
+    """.format(**table._asdict())))
+
+
+def _insert_acl_from_second_level(tables, connection):
+  """Add acls for second level objects (Documents & Comments)"""
+  for table in tables:
+
+    # Mapped through source:
+    connection.execute(
+        text("""
+    INSERT INTO access_control_list(
+        person_id, ac_role_id, object_id, object_type,
+        created_at, updated_at, context_id, parent_id)
+    SELECT acl.person_id, acrn.id, r.destination_id, r.destination_type,
+           acl.created_at, acl.updated_at, acl.context_id, acl.id
+    FROM access_control_list AS acl
+    JOIN access_control_roles AS acr ON acr.id = acl.ac_role_id
+    JOIN access_control_roles AS acrn ON acrn.name = '{role}'
+    JOIN relationships AS r on r.source_id = acl.object_id
+     AND r.source_type = acl.object_type
+    WHERE acl.object_type = '{table}'
+      AND acr.name = '{parent_role}'
+      AND (r.destination_type = '{type}');
+    """.format(**table._asdict())))
+
+    # Mapped through destination:
+    connection.execute(
+        text("""
+    INSERT INTO access_control_list(
+        person_id, ac_role_id, object_id, object_type,
+        created_at, updated_at, context_id, parent_id)
+    SELECT acl.person_id, acrn.id, r.source_id, r.source_type,
+           acl.created_at, acl.updated_at, acl.context_id, acl.id
+    FROM access_control_list AS acl
+    JOIN access_control_roles AS acr ON acr.id = acl.ac_role_id
+    JOIN access_control_roles AS acrn ON acrn.name = '{role}'
+    JOIN relationships AS r on r.destination_id = acl.object_id
+     AND r.destination_type = acl.object_type
+    WHERE acl.object_type = '{table}'
+      AND acr.name = '{parent_role}'
+      AND (r.source_type = '{type}');
     """.format(**table._asdict())))
 
 
