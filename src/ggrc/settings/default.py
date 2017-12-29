@@ -21,8 +21,15 @@ DEBUG_ASSETS = False
 FULLTEXT_INDEXER = None
 USER_PERMISSIONS_PROVIDER = \
     'ggrc_basic_permissions.CompletePermissionsProvider'
-EXTENSIONS = ['ggrc_basic_permissions']
-exports = []  # pylint: disable=invalid-name
+EXTENSIONS = [
+    'ggrc_basic_permissions',
+    'ggrc_gdrive_integration',
+]
+exports = [
+    "GAPI_KEY",
+    "GAPI_CLIENT_ID",
+    "GAPI_ADMIN_GROUP"
+]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
 COMPANY = "Company, Inc."
@@ -162,5 +169,13 @@ ALLOWED_QUERYAPI_APP_IDS = os.environ.get(
     "",
 ).split()
 
+# ggrc_basic_permissions specific module settings
 BOOTSTRAP_ADMIN_USERS = \
     os.environ.get('GGRC_BOOTSTRAP_ADMIN_USERS', '').split(' ')
+
+# ggrc_gdrive_integration specific module settings
+GAPI_KEY = os.environ.get('GGRC_GAPI_KEY', "")
+GAPI_CLIENT_ID = os.environ.get('GGRC_GAPI_CLIENT_ID', "")
+# Admin group gets writer access to all
+GAPI_ADMIN_GROUP = os.environ.get('GGRC_GAPI_ADMIN_GROUP', "")
+GAPI_CLIENT_SECRET = os.environ.get('GGRC_GAPI_CLIENT_SECRET', "")
