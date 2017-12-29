@@ -22,25 +22,27 @@ def get_acl_payload(snapshots):
           "Audit Captains Mapped"))
   )
   ac_roles = {name: id_ for id_, name in ac_roles}
-  for parent_role, child_role in (
-      ("Auditors", "Auditors Snapshot Mapped"),
-      ("Audit Captains", "Audit Captains Mapped")
-  ):
-    parent_roles = db.session.query(
-        all_models.AccessControlList.id,
-        all_models.AccessControlList.person_id
-    ).filter(
-        all_models.AccessControlList.ac_role_id == ac_roles[parent_role],
-        tuple_(all_models.AccessControlList.object_id,
-               all_models.AccessControlList.object_type).in_(parents)
-    )
-    for parent_id, person_id in parent_roles:
-      for snapshot in snapshots:
-        acl_payload.append({
-            "object_id": snapshot.id,
-            "object_type": "Snapshot",
-            "ac_role_id": ac_roles[child_role],
-            "parent_id": parent_id,
-            "person_id": person_id
-        })
+  parent_roles = db.session.query(
+      all_models.AccessControlList.id,
+      all_models.AccessControlList.person_id,
+      all_models.AccessControlList.ac_role_id
+  ).filter(
+      all_models.AccessControlList.ac_role_id.in_(
+          (ac_roles["Auditors"], ac_roles["Audit Captains"])),
+      tuple_(all_models.AccessControlList.object_id,
+             all_models.AccessControlList.object_type).in_(parents)
+  )
+  child_roles = {
+      ac_roles["Auditors"]: ac_roles["Auditors Snapshot Mapped"],
+      ac_roles["Audit Captains"]: ac_roles["Audit Captains Mapped"]
+  }
+  for parent_id, person_id, ac_role_id in parent_roles:
+    for snapshot in snapshots:
+      acl_payload.append({
+          "object_id": snapshot.id,
+          "object_type": "Snapshot",
+          "ac_role_id": child_roles[ac_role_id],
+          "parent_id": parent_id,
+          "person_id": person_id
+      })
   return acl_payload
