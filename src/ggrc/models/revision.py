@@ -228,8 +228,13 @@ class Revision(Base, db.Model):
     must support older revisions with bad data, and to avoid using slug
     differently than everywhere else in the app.
 
+    This function only modifies existing evidence entries on any given object.
+    If an object does not have and document evidences then an empty dict is
+    returned.
+
     Returns:
-      dict with updated display name if the current revision is for evidence.
+      dict with updated display name for each of the evidence entries if there
+      are any.
     """
     document_evidence = self._content.get("document_evidence", {})
     for evidence in document_evidence:
