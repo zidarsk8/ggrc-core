@@ -233,7 +233,10 @@ class Revision(Base, db.Model):
     """
     document_evidence = self._content.get("document_evidence", {})
     for evidence in document_evidence:
-      evidence[u"display_name"] = u"{link} {title}".format(**evidence)
+      evidence[u"display_name"] = u"{link} {title}".format(
+          link=evidence.get("link"),
+          title=evidence.get("title"),
+      )
     return {u"document_evidence": document_evidence}
 
   @builder.simple_property
