@@ -345,7 +345,7 @@ class TestGetObjectColumnDefinitions(TestCase):
         "Code",
         "Title",
         "Description",
-        "Audit Captain",
+        "Audit Captains",
         "Status",
         "Planned Start Date",
         "Planned End Date",
@@ -368,7 +368,7 @@ class TestGetObjectColumnDefinitions(TestCase):
             "Title",
             "Program",
             "Status",
-            "Audit Captain",
+            "Audit Captains",
         },
         "unique": {
             "Title",

@@ -48,7 +48,7 @@ class TestIssueMapping(TestCase):
   def setup_users(self):
     """Creates two creator users"""
     self.users = {}
-    for user_name in ('auditor', 'auditlead'):
+    for user_name in ('auditor', 'programeditor'):
       user = factories.PersonFactory()
       rbac_factories.UserRoleFactory(
           role=self.roles['creator'],
@@ -92,7 +92,6 @@ class TestIssueMapping(TestCase):
   def create_audit(self, archived=False):
     """Create an audit object and fix the it's context"""
     audit = factories.AuditFactory(
-        contact=self.users['auditlead'],
         archived=archived
     )
 
@@ -104,7 +103,7 @@ class TestIssueMapping(TestCase):
     rbac_factories.UserRoleFactory(
         context=audit.program.context,
         role=self.roles['program_editor'],
-        person=self.users['auditlead'])
+        person=self.users['programeditor'])
 
     return audit
 
@@ -119,9 +118,9 @@ class TestIssueMapping(TestCase):
   @data(
       # user_name, is_archived
       ('auditor', True),
-      ('auditlead', True),
+      ('programeditor', True),
       ('auditor', False),
-      ('auditlead', False),
+      ('programeditor', False),
   )
   @unpack
   def test_mapping_to_issue(self, user_name, is_archived):

@@ -2,18 +2,18 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Roleable model"""
-
 from sqlalchemy import and_
 from sqlalchemy import orm
 from sqlalchemy.orm import remote
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
+from ggrc import db
 from ggrc.access_control.list import AccessControlList
 from ggrc.access_control import role
 from ggrc.fulltext.attributes import CustomRoleAttr
 from ggrc.models import reflection
-from ggrc import db
+from ggrc.utils.referenced_objects import get
 
 
 class Roleable(object):
@@ -53,12 +53,20 @@ class Roleable(object):
     """
     if values is None:
       return
+
     new_values = {
-        (value['ac_role_id'], value['person']['id'])
+        (get("AccessControlRole", value['ac_role_id']),
+         get("Person", value['person']['id']))
         for value in values
+        if value.get('ac_role_id') is not None
+    } | {
+        (value['ac_role'], value['person'])
+        for value in values
+        if value.get('ac_role') is not None and
+        value.get('person') is not None
     }
     old_values = {
-        (acl.ac_role_id, acl.person_id)
+        (acl.ac_role, acl.person)
         for acl in self.access_control_list
     }
     self._remove_values(old_values - new_values)
@@ -66,21 +74,19 @@ class Roleable(object):
 
   def _add_values(self, values):
     """Attach new custom role values to current object."""
-    for ac_role_id, person_id in values:
+    for ac_role, person in values:
       AccessControlList(
           object=self,
-          person_id=person_id,
-          ac_role_id=ac_role_id
+          person=person,
+          ac_role=ac_role
       )
 
   def _remove_values(self, values):
     """Remove custom role values from current object."""
-    values_map = {
-        (acl.ac_role_id, acl.person_id): acl
-        for acl in self.access_control_list
-    }
+    val_map = {(acl.ac_role, acl.person): acl
+               for acl in self.access_control_list}
     for value in values:
-      self._access_control_list.remove(values_map[value])
+      self._access_control_list.remove(val_map[value])
 
   @classmethod
   def eager_query(cls):
@@ -115,7 +121,7 @@ class Roleable(object):
   def get_persons_for_rolename(self, role_name):
     """Return list of persons that are valid for send role_name."""
     for role_id, name in role.get_custom_roles_for(self.type).iteritems():
-      if not name == role_name:
+      if name != role_name:
         continue
       return [i.person for i in self.access_control_list
               if i.ac_role_id == role_id]
@@ -124,8 +130,8 @@ class Roleable(object):
   def get_person_ids_for_rolename(self, role_name):
     """Return list of persons that are valid for send role_name."""
     for role_id, name in role.get_custom_roles_for(self.type).iteritems():
-      if not name == role_name:
+      if name != role_name:
         continue
-      return [i.person_id for i in self.access_control_list
-              if i.ac_role_id == role_id]
+      return [i.person.id for i in self.access_control_list
+              if i.ac_role.id == role_id]
     return []
