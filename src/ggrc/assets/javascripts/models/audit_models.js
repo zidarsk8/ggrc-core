@@ -90,20 +90,24 @@ import Permission from '../permission';
         attr_name: 'end_date',
         order: 8,
       }, {
+        attr_title: 'Last Deprecated Date',
+        attr_name: 'last_deprecated_date',
+        order: 9,
+      }, {
         attr_title: 'Planned Report Period to',
         attr_name: 'report_period',
         attr_sort_field: 'report_end_date',
-        order: 9,
+        order: 10,
       }, {
         attr_title: 'Audit Firm',
         attr_name: 'audit_firm',
-        order: 10,
+        order: 11,
       }, {
         attr_title: 'Archived',
         attr_name: 'archived',
-        order: 11,
+        order: 12,
       }],
-      draw_children: true
+      draw_children: true,
     },
     sub_tree_view_options: {
       default_filter: ['Product'],
