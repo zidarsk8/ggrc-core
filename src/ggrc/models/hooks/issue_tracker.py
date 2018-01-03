@@ -121,7 +121,8 @@ _VERIFIER_STATUSES = {
 
     # State: ASSIGNED
     ('In Review', 'In Progress', False): 'ASSIGNED',
-    ('Completed', 'In Progress', True): 'ASSIGNED',
+    # if gets from Completed and Verified to In Progress, can not be verified
+    ('Completed', 'In Progress', False): 'ASSIGNED',
     ('Deprecated', 'In Progress', False): 'ASSIGNED',
 
     # State: ASSIGNED
