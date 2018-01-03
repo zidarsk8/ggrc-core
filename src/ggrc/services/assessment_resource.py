@@ -32,11 +32,6 @@ class AssessmentResource(common.ExtendedResource):
     return command_map[command](*args, **kwargs)
 
   @staticmethod
-  def _get_relationships_data(relationships):
-    """Return serialized all relationships needed for assessment page."""
-    return [rel.log_json() for rel in relationships]
-
-  @staticmethod
   def _get_relationships(assessment):
     """Get all relationships for the current assessment."""
     relationships = models.Relationship.eager_query().filter(
@@ -172,29 +167,6 @@ class AssessmentResource(common.ExtendedResource):
       ).all()
     return [comment.log_json() for comment in comments]
 
-  def _get_people_data(self, relationships):
-    """Get assessment people data.
-
-    This function returns data for people related to the assessment without
-    ACL roles. The data does not include the relationships since those are
-    sent in a different block.
-    """
-    relationship_ids = self._filter_rels(relationships, "Person")
-    if not relationship_ids:
-      return []
-    with benchmark("Get assessment snapshot relationships"):
-      people = models.Person.query.options(
-          orm.undefer_group("Person_complete"),
-          orm.joinedload('language'),
-          orm.subqueryload('object_people'),
-          orm.subqueryload('_custom_attribute_values').undefer_group(
-              'CustomAttributeValue_complete'
-          )
-      ).filter(
-          models.Person.id.in_(relationship_ids)
-      ).all()
-    return [person.log_json() for person in people]
-
   def _get_related_data(self, assessment):
     """Get assessment related data.
 
@@ -207,12 +179,10 @@ class AssessmentResource(common.ExtendedResource):
     attachments_key = "Document:{}".format(models.Document.ATTACHMENT)
     ref_urls_key = "Document:{}".format(models.Document.REFERENCE_URL)
     data = {
-        "Relationship": self._get_relationships_data(relationships),
         "Audit": self._get_audit_data(assessment),
         "Snapshot": self._get_snapshot_data(assessment, relationships),
         "Comment": self._get_comment_data(relationships),
         "Issue": self._get_issue_data(relationships),
-        "Person": self._get_people_data(relationships),
         urls_key: urls,
         ref_urls_key: ref_urls,
         attachments_key: attachments,
