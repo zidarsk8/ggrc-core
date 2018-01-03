@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {BUTTON_VIEW_SAVE_CANCEL} from '../../../../ggrc/assets/javascripts/plugins/utils/modals';
+import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 
 let CloneTaskGroup = can.Model.Cacheable({
   defaults: {
@@ -37,7 +37,7 @@ can.Component.extend({
 
       $target = $('<div class="modal hide"></div>').uniqueId();
       $target.modal_form({}, el);
-      import(/* webpackChunkName: "modalsCtrls" */'../../../../ggrc/assets/javascripts/controllers/modals')
+      import(/* webpackChunkName: "modalsCtrls" */'../../controllers/modals')
         .then(() => {
           $target.ggrc_controllers_modals({
             modal_title: "Clone Task Group",

@@ -5,8 +5,8 @@
 
 import {
   initCounts,
-} from '../../../../ggrc/assets/javascripts/plugins/utils/current-page-utils';
-import InfoWidget from '../../../../ggrc/assets/javascripts/controllers/info_widget_controller';
+} from '../plugins/utils/current-page-utils';
+import InfoWidget from '../controllers/info_widget_controller';
 
 (function ($, CMS, GGRC) {
   var WorkflowExtension = {};

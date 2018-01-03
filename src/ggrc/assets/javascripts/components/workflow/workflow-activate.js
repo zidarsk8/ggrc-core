@@ -6,7 +6,7 @@
 import workflowHelpers from './workflow-helpers';
 import {
   initCounts,
-} from '../../../../ggrc/assets/javascripts/plugins/utils/current-page-utils';
+} from '../../plugins/utils/current-page-utils';
 
 export default can.Component.extend({
   tag: 'workflow-activate',

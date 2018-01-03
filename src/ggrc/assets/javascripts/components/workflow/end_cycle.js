@@ -5,7 +5,7 @@
 
 import {
   initCounts,
-} from '../../../../ggrc/assets/javascripts/plugins/utils/current-page-utils';
+} from '../../plugins/utils/current-page-utils';
 
 /**
  * A component that wraps a button for ending a Workflow cycle, and

@@ -3,8 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import RefreshQueue from '../../../../ggrc/assets/javascripts/models/refresh_queue';
-import {getClosestWeekday} from '../utils/date-util';
+import RefreshQueue from './refresh_queue';
+import {getClosestWeekday} from '../plugins/utils/date-util';
 
 (function (can) {
   var _mustachePath;

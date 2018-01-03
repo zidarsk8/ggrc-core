@@ -3,7 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
- import {getClosestWeekday} from '../utils/date-util';
+ import {getClosestWeekday} from '../plugins/utils/date-util';
 
 (function (can, GGRC) {
   'use strict';

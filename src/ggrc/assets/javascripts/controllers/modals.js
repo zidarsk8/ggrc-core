@@ -10,7 +10,4 @@ import './delete_modal_controller';
 import './unmap_modal_controller';
 import './quick_form_controller';
 import './gapi-modal';
-
-if (IS_WORKFLOWS_ENABLED) {
-  require('../../../../ggrc_workflows/assets/javascripts/controllers/approval-workflow-modal');
-}
+import './approval-workflow-modal';

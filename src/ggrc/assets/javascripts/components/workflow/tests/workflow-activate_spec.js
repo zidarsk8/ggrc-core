@@ -5,7 +5,7 @@
 
 import component from '../workflow-activate';
 import helpers from '../workflow-helpers';
-import * as CurrentPageUtils from '../../../../../ggrc/assets/javascripts/plugins/utils/current-page-utils';
+import * as CurrentPageUtils from '../../../plugins/utils/current-page-utils';
 
 describe('GGRC.WorkflowActivate', function () {
   var scope;

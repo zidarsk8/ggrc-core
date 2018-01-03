@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {confirm} from '../../../../ggrc/assets/javascripts/plugins/utils/modals';
+import {confirm} from '../../plugins/utils/modals';
 
 export default {
   generateCycle: function (workflow) {

@@ -3,8 +3,8 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import ModalsController from '../../../../ggrc/assets/javascripts/controllers/modals_controller';
-import {BUTTON_VIEW_SAVE_CANCEL} from '../../../../ggrc/assets/javascripts/plugins/utils/modals';
+import ModalsController from './modals_controller';
+import {BUTTON_VIEW_SAVE_CANCEL} from '../plugins/utils/modals';
 
 let ApprovalWorkflowErrors = function () {
   var errors = null;

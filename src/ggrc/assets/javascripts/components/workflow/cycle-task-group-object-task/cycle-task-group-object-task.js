@@ -4,9 +4,9 @@
 */
 
 import template from './templates/cycle-task-group-object-task.mustache';
-import '../../../../../ggrc/assets/javascripts/components/object-change-state/object-change-state';
-import '../../../../../ggrc/assets/javascripts/components/dropdown/dropdown';
-import RefreshQueue from '../../../../../ggrc/assets/javascripts/models/refresh_queue';
+import '../../object-change-state/object-change-state';
+import '../../dropdown/dropdown';
+import RefreshQueue from '../../../models/refresh_queue';
 
 var viewModel = can.Map.extend({
   showLink: function () {

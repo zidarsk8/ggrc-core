@@ -55,7 +55,7 @@
       if (usePopup) {
         $modal = $('.ggrc_controllers_gapi_modal');
         if (!$modal.length) {
-          import(/* webpackChunkName: "modalsCtrls" */'../../../../ggrc/assets/javascripts/controllers/modals')
+          import(/* webpackChunkName: "modalsCtrls" */'./modals')
             .then(() => {
               $('<div class="modal hide">').modal_form()
                 .appendTo(document.body).ggrc_controllers_gapi_modal({
