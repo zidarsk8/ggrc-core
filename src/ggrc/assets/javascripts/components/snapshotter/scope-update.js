@@ -5,7 +5,7 @@
 
 import {
   confirm,
-  BUTTON_VIEW_OK_CLOSE,
+  BUTTON_VIEW_CONFIRM_CANCEL,
 } from '../../plugins/utils/modals';
 import {
   isSnapshotModel,
@@ -30,7 +30,7 @@ import {
             'Do you want to update all objects of this Audit' +
             ' to the latest version?',
           modal_confirm: 'Update',
-          button_view: BUTTON_VIEW_OK_CLOSE,
+          button_view: BUTTON_VIEW_CONFIRM_CANCEL,
           skip_refresh: true
         },
           this._success.bind(this),

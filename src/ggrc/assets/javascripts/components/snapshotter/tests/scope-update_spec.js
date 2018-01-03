@@ -65,7 +65,7 @@ describe('GGRC.Components.SnapshotScopeUpdater', function () {
         expect(ModalsUtils.confirm.calls.argsFor(0)).toEqual([
           jasmine.objectContaining({
             instance: updaterViewModel.instance,
-            button_view: ModalsUtils.BUTTON_VIEW_OK_CLOSE,
+            button_view: ModalsUtils.BUTTON_VIEW_CONFIRM_CANCEL,
             skip_refresh: true
           }),
           jasmine.any(Function),
