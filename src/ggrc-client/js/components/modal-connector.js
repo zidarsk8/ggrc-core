@@ -7,10 +7,6 @@ import {
   toObject,
   isSnapshotType,
 } from '../plugins/utils/snapshot-utils';
-import {
-  buildParams,
-  makeRequest,
-} from '../plugins/utils/query-api-utils';
 
 (function (can, $) {
   /*
@@ -30,7 +26,7 @@ import {
     template: '<isolate-form><content/></isolate-form>',
     viewModel: {
       define: {
-        fromQueryApi: {
+        customRelatedLoader: {
           type: Boolean,
           value: false,
         },
@@ -54,14 +50,15 @@ import {
         let that = this;
         let key;
         let sourceMappingSource;
-        this.viewModel.attr('controller', this);
-        if (!this.viewModel.instance) {
-          this.viewModel.attr('deferred', true);
-        } else if (this.viewModel.instance.reify) {
-          this.viewModel.attr('instance', this.viewModel.instance.reify());
+        let vm = this.viewModel;
+        vm.attr('controller', this);
+        if (!vm.instance) {
+          vm.attr('deferred', true);
+        } else if (vm.instance.reify) {
+          vm.attr('instance', vm.instance.reify());
         }
 
-        this.viewModel.default_mappings.forEach(function (defaultMapping) {
+        vm.default_mappings.forEach(function (defaultMapping) {
           let model;
           let objectToAdd;
           if (defaultMapping.id && defaultMapping.type) {
@@ -73,46 +70,37 @@ import {
           }
         });
 
-        if (!this.viewModel.source_mapping) {
-          this.viewModel.attr('source_mapping', this.viewModel.mapping);
+        if (!vm.source_mapping) {
+          vm.attr('source_mapping', vm.mapping);
         }
-        if (!this.viewModel.source_mapping_source) {
-          this.viewModel.source_mapping_source = 'instance';
+        if (!vm.source_mapping_source) {
+          vm.source_mapping_source = 'instance';
         }
 
-        sourceMappingSource =
-          this.viewModel[this.viewModel.source_mapping_source];
+        sourceMappingSource = vm[vm.source_mapping_source];
 
         if (sourceMappingSource) {
-          if (this.viewModel.attr('fromQueryApi')) {
-            if (!this.viewModel.attr('newInstance')) {
-              this.getMappedObjects().then(function (list) {
-                this.setListItems(list);
-              }.bind(this));
-            }
-          } else {
-            sourceMappingSource.get_binding(this.viewModel.source_mapping)
+          if (!vm.attr('customRelatedLoader')) {
+            instance.get_binding(vm.source_mapping)
               .refresh_instances()
               .then(function (list) {
                 this.setListItems(list);
               }.bind(this));
           }
-          // this.viewModel.instance.attr("_transient." + this.viewModel.mapping, this.viewModel.list);
+          // vm.instance.attr("_transient." + vm.mapping, vm.list);
         } else {
-          key = this.viewModel.instance_attr + '_' +
-            (this.viewModel.mapping || this.viewModel.source_mapping);
-          if (!this.viewModel.parent_instance._transient[key]) {
-            this.viewModel.attr('list', []);
-            this.viewModel.parent_instance.attr('_transient.' + key,
-              this.viewModel.list);
+          key = vm.instance_attr + '_' +
+            (vm.mapping || vm.source_mapping);
+          if (!vm.parent_instance._transient[key]) {
+            vm.attr('list', []);
+            vm.parent_instance.attr('_transient.' + key, vm.list);
           } else {
-            this.viewModel.attr('list',
-              this.viewModel.parent_instance._transient[key]);
+            vm.attr('list', vm.parent_instance._transient[key]);
           }
         }
 
-        this.options.parent_instance = this.viewModel.parent_instance;
-        this.options.instance = this.viewModel.instance;
+        this.options.parent_instance = vm.parent_instance;
+        this.options.instance = vm.instance;
         this.on();
       },
       destroy: function () {
@@ -373,46 +361,6 @@ import {
         }
 
         this.viewModel.list.push(item);
-      },
-      buildQuery: function (type) {
-        return buildParams(
-          type,
-          {},
-          {
-            type: this.viewModel.attr('instance.type'),
-            operation: 'relevant',
-            id: this.viewModel.attr('instance.id'),
-          }
-        );
-      },
-      getMappedObjects: function () {
-        let auditQuery = this.buildQuery('Audit')[0];
-        let issueQuery = this.buildQuery('Issue')[0];
-        let snapshotQuery = this.buildQuery('Snapshot')[0];
-
-        return makeRequest({data: [auditQuery, issueQuery, snapshotQuery]})
-          .then(function (response) {
-            let snapshots;
-            let list;
-
-            snapshots = response[2].Snapshot.values;
-            snapshots.forEach(function (snapshot) {
-              let object = toObject(snapshot);
-
-              snapshot.class = object.class;
-              snapshot.snapshot_object_class = 'snapshot-object';
-              snapshot.title = object.title;
-              snapshot.description = object.description;
-              snapshot.viewLink = object.originalLink;
-            });
-
-            list = response[0].Audit.values
-              .concat(response[1].Issue.values)
-              .concat(snapshots);
-
-            return list;
-          }
-        );
       },
     },
     helpers: {

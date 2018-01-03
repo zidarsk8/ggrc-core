@@ -32,6 +32,10 @@ import {
           type: 'boolean',
           value: true,
         },
+        customLoader: {
+          type: 'boolean',
+          value: false,
+        },
       },
       getDocumentsQuery: function () {
         let relevantFilters = [{
@@ -56,32 +60,34 @@ import {
         return query;
       },
       loadDocuments: function () {
-        let promise;
-        let self = this;
-        let query = this.getDocumentsQuery();
+        const query = this.getDocumentsQuery();
 
         this.attr('isLoading', true);
-        promise = batchRequests(query).then(
-          function (response) {
-            let documents = response.Document.values;
-            self.attr('documents').replace(documents);
-            self.attr('isLoading', false);
-          }
-        );
-        return promise;
+
+        return batchRequests(query).then((response) => {
+          const documents = response.Document.values;
+          this.attr('documents').replace(documents);
+          this.attr('isLoading', false);
+        });
       },
       setDocuments: function () {
-        let instance = this.attr('instance');
-        let documentType = this.attr('documentType');
-        let isSnapshot = this.attr('isSnapshot');
+        let instance;
+        let documentType;
         let documentPath;
         let documents;
 
+        // don't load documents if they are comes from outside
+        if (this.attr('customLoader')) {
+          return;
+        }
         // load documents for non-snapshots objects
-        if (!isSnapshot) {
+        if (!this.attr('isSnapshot')) {
           this.loadDocuments();
           return;
         }
+
+        instance = this.attr('instance');
+        documentType = this.attr('documentType');
 
         if (documentType) {
           documentPath = DOCUMENT_TYPES_MAP[documentType];
