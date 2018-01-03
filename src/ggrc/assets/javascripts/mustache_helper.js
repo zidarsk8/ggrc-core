@@ -1126,7 +1126,8 @@ Mustache.registerHelper("json_escape", function (obj, options) {
 function localizeDate(date, options, tmpl, allowNonISO) {
   var formats = [
     'YYYY-MM-DD',
-    'YYYY-MM-DDTHH:mm:ss'
+    'YYYY-MM-DDTHH:mm:ss',
+    'YYYY-MM-DDTHH:mm:ss.SSSSSS',
   ];
   if (allowNonISO) {
     formats.push('MM/DD/YYYY', 'MM/DD/YYYY hh:mm:ss A');
