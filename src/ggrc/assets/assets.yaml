@@ -187,7 +187,7 @@ dashboard-js-template-files:
   - snapshots/tree_add_item.mustache
   - components/inline/simple-readonly-text.mustache
   - partials/modal-ajax-test-plan.mustache
-  # dashboard-js-template-files:
+  # ggrc_basic_permissions
   - people_roles/authorizations_by_person_list.mustache
   - people_roles/authorizations_by_person_tree_add_item.mustache
   - people_roles/authorizations_modal_actions.mustache
@@ -196,3 +196,12 @@ dashboard-js-template-files:
   - people_roles/object_detail.mustache
   - people_roles/option_column.mustache
   - people_roles/info.mustache
+  # ggrc_gdrive_integration
+  - gdrive/auth_button.mustache
+  - gdrive/gapi_errors.mustache
+  - gdrive/gdrive_folder.mustache
+  - gdrive/gdrive_file.mustache
+  - gdrive/confirm_buttons.mustache
+  - roles/gdrive_option_detail.mustache
+  - audits/gdrive_folder_picker.mustache
+  - workflows/gdrive_folder_picker.mustache

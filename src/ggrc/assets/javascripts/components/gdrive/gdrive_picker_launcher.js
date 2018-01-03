@@ -6,9 +6,9 @@
 import {
   uploadFiles,
   GDRIVE_PICKER_ERR_CANCEL,
-} from '../utils/gdrive-picker-utils.js';
+} from '../../plugins/utils/gdrive-picker-utils.js';
 import errorTpl from './templates/gdrive_picker_launcher_upload_error.mustache';
-import RefreshQueue from '../../../../ggrc/assets/javascripts/models/refresh_queue';
+import RefreshQueue from '../../models/refresh_queue';
 
 (function (can, $, GGRC, CMS) {
   'use strict';

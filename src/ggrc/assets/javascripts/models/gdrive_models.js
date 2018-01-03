@@ -3,7 +3,7 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import {uploadFiles} from '../utils/gdrive-picker-utils.js';
+import {uploadFiles} from '../plugins/utils/gdrive-picker-utils';
 
 (function (can) {
   'use strict';

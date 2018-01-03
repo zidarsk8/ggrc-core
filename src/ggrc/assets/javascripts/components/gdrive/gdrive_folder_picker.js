@@ -3,11 +3,11 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../../../../ggrc/assets/javascripts/components/action-toolbar/action-toolbar';
+import '../action-toolbar/action-toolbar';
 import {
   uploadFiles,
   GDRIVE_PICKER_ERR_CANCEL,
-} from '../utils/gdrive-picker-utils.js';
+} from '../../plugins/utils/gdrive-picker-utils';
 
 (function (can, $) {
   'use strict';
