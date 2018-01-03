@@ -49,5 +49,5 @@ import './section';
 import './system';
 import './join_models';
 import './gdrive_models';
-
+import './risk_assessment';
 
