@@ -335,38 +335,6 @@ import RefreshQueue from '../models/refresh_queue';
   });
 
   $.widget.bridge('ggrc_autocomplete', $.ggrc.autocomplete);
-  $.widget('ggrc.mapping_autocomplete', $.ggrc.autocomplete, {
-    options: {
-      source_for_refreshable_objects: function (request) {
-        var mapping = this.options.controller.options;
-
-        if (mapping.scope) {
-          mapping = mapping.scope.source_mapping;
-        }
-
-        return $.when(can.map(mapping || [], function (binding) {
-          return binding.instance;
-        }));
-      },
-      apply_filter: function (objects, request) {
-        return can.map(objects, function (object) {
-          if (
-            !request.term ||
-            object.title && _.includes(object.title, request.term)
-          ) {
-            return object;
-          }
-          return undefined;
-        });
-      }
-    },
-    _setup_menu_context: function (items) {
-      return $.extend(this._super(items), {
-        mapping: _.isUndefined(this.options.mapping) ?
-                this.element.data('mapping') : this.options.mapping
-      });
-    }
-  });
 
   $.widget('ggrc.query_autocomplete', $.ggrc.autocomplete, {
     options: {
@@ -409,7 +377,6 @@ import RefreshQueue from '../models/refresh_queue';
     },
   });
 
-  $.widget.bridge('ggrc_mapping_autocomplete', $.ggrc.mapping_autocomplete);
   $.widget.bridge('ggrc_query_autocomplete', $.ggrc.query_autocomplete);
 
   /**

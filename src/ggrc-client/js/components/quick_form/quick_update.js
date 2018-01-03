@@ -97,12 +97,5 @@
         }.bind(this));
       },
     },
-    helpers: {
-      mapping_autocomplete : function(options) {
-        return function(el) {
-          $(el).ggrc_mapping_autocomplete({ controller : options.contexts.attr("controller") });
-        };
-      },
-    },
   });
 })(window.can, window.can.$);
