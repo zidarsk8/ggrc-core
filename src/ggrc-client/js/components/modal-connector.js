@@ -35,7 +35,6 @@ import {
       instance: null,
       instance_attr: '@',
       source_mapping: '@',
-      source_mapping_source: '@',
       default_mappings: [], // expects array of objects
       mapping: '@',
       deferred: '@',
@@ -49,7 +48,7 @@ import {
       init: function () {
         let that = this;
         let key;
-        let sourceMappingSource;
+        let instance;
         let vm = this.viewModel;
         vm.attr('controller', this);
         if (!vm.instance) {
@@ -73,13 +72,10 @@ import {
         if (!vm.source_mapping) {
           vm.attr('source_mapping', vm.mapping);
         }
-        if (!vm.source_mapping_source) {
-          vm.source_mapping_source = 'instance';
-        }
 
-        sourceMappingSource = vm[vm.source_mapping_source];
+        instance = vm.attr('instance');
 
-        if (sourceMappingSource) {
+        if (instance) {
           if (!vm.attr('customRelatedLoader')) {
             instance.get_binding(vm.source_mapping)
               .refresh_instances()
@@ -87,10 +83,8 @@ import {
                 this.setListItems(list);
               }.bind(this));
           }
-          // vm.instance.attr("_transient." + vm.mapping, vm.list);
         } else {
-          key = vm.instance_attr + '_' +
-            (vm.mapping || vm.source_mapping);
+          key = vm.instance_attr + '_' + (vm.mapping || vm.source_mapping);
           if (!vm.parent_instance._transient[key]) {
             vm.attr('list', []);
             vm.parent_instance.attr('_transient.' + key, vm.list);
