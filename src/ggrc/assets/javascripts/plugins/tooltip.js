@@ -12,6 +12,36 @@
 
 
   /**
+   * Checks if element is a child of another element
+   * @param  {Element}  el               element
+   * @param  {Element}  possibleParentEl possible parent element
+   * @return {Boolean}                  is element is a child of possibleParentEl
+   */
+  function isChildOf(el, possibleParentEl) {
+    let parent = el.parentElement;
+    while (parent) {
+      if ( parent === possibleParentEl ) {
+        return true;
+      }
+      parent = parent.parentElement;
+    }
+    return false;
+  }
+
+  /**
+   * Checks if element is overlaped by other element
+   * @param  {Element}  el DOM element
+   * @return {Boolean}  is element visible
+   */
+  function isElementVisible(el) {
+    const bRect = el.getBoundingClientRect();
+    const centerX = Math.round(bRect.x + bRect.width / 2);
+    const centerY = Math.round(bRect.y + bRect.height / 2);
+    const topEl = document.elementFromPoint(centerX, centerY);
+    return el === topEl || isChildOf(topEl, el);
+  }
+
+  /**
    * This class watches the tooltip associated
    * with the element and removes it if the elements is
    * removed from the DOM
@@ -22,7 +52,7 @@
       let $tooltipEl = $(tooltipEl);
       this.iv = setInterval(() => {
         // if removed from the DOM
-        if ( !$el.closest('html').length ) {
+        if (!$el.closest('html').length || !isElementVisible($el[0]) ) {
           $tooltipEl.remove();
           this.stopWatch();
         }
