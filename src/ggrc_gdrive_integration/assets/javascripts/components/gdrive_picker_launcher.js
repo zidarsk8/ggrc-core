@@ -257,6 +257,17 @@ import RefreshQueue from '../../../../ggrc/assets/javascripts/models/refresh_que
         });
         return files;
       },
+      onKeyup(element, event) {
+        const ESCAPE_KEY_CODE = 27;
+        const escapeKeyWasPressed = event.keyCode === ESCAPE_KEY_CODE;
+
+        if (escapeKeyWasPressed) {
+          const $element = $(element);
+          event.stopPropagation();
+          // unset focus for attach button
+          $element.blur();
+        }
+      },
       onClickHandler: function (scope, el, event) {
         var eventType = this.attr('click_event');
         var handler = this[eventType] || function () {};

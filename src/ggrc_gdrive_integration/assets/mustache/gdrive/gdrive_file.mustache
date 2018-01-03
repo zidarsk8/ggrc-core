@@ -3,4 +3,4 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<button class="{{link_class}} btn btn-small btn-white" {{#isInactive}}disabled{{/isInactive}} ($click)="onClickHandler"><content></content></button>
+<button class="{{link_class}} btn btn-small btn-white" {{#isInactive}}disabled{{/isInactive}} ($click)="onClickHandler" ($keyup)="onKeyup(%element, %event)"><content></content></button>
