@@ -3,40 +3,40 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-import '../apps/custom_attributes_wrap';
-import '../components/issue-tracker/modal-issue-tracker-fields';
-import '../components/issue-tracker/issue-tracker-switcher';
-import '../components/access_control_list/access-control-list-roles-helper'
-import '../components/assessment/assessment-people';
-import '../components/assessment/assessment-object-type-dropdown';
-import '../components/assessment_attributes';
-import '../components/textarea-array/textarea-array';
-import '../components/object-list-item/object-list-item-updater';
-import '../components/related-objects/related-documents';
-import '../components/related-objects/related-reference-urls';
-import '../components/spinner/spinner';
-import '../components/object-list/object-list';
-import '../components/object-list-item/document-object-list-item';
-import '../components/action-toolbar-control/action-toolbar-control';
-import '../components/effective-dates/effective-dates';
-import '../components/dropdown/dropdown';
-import '../components/modal_wrappers/assessment_template_form';
-import '../components/autocomplete/autocomplete';
-import '../components/external-data-autocomplete/external-data-autocomplete';
-import '../components/person/person';
-import '../components/rich_text/rich_text';
-import '../components/modal_wrappers/checkboxes_to_list';
-import '../components/modal-connector';
-import '../components/assessment/map-button-using-assessment-type';
-import '../components/gca-controls/gca-controls';
-import '../components/datepicker/datepicker';
-import '../components/external-data-autocomplete/inline-autocomplete-wrapper';
-import '../components/multi-select-label/multi-select-label';
-import {BUTTON_VIEW_DONE} from '../plugins/utils/modals'
+import '../../apps/custom_attributes_wrap';
+import '../../components/issue-tracker/modal-issue-tracker-fields';
+import '../../components/issue-tracker/issue-tracker-switcher';
+import '../../components/access_control_list/access-control-list-roles-helper'
+import '../../components/assessment/assessment-people';
+import '../../components/assessment/assessment-object-type-dropdown';
+import '../../components/assessment_attributes';
+import '../../components/textarea-array/textarea-array';
+import '../../components/object-list-item/object-list-item-updater';
+import '../../components/related-objects/related-documents';
+import '../../components/related-objects/related-reference-urls';
+import '../../components/spinner/spinner';
+import '../../components/object-list/object-list';
+import '../../components/object-list-item/document-object-list-item';
+import '../../components/action-toolbar-control/action-toolbar-control';
+import '../../components/effective-dates/effective-dates';
+import '../../components/dropdown/dropdown';
+import '../../components/modal_wrappers/assessment_template_form';
+import '../../components/autocomplete/autocomplete';
+import '../../components/external-data-autocomplete/external-data-autocomplete';
+import '../../components/person/person';
+import '../../components/rich_text/rich_text';
+import '../../components/modal_wrappers/checkboxes_to_list';
+import '../../components/modal-connector';
+import '../../components/assessment/map-button-using-assessment-type';
+import '../../components/gca-controls/gca-controls';
+import '../../components/datepicker/datepicker';
+import '../../components/external-data-autocomplete/inline-autocomplete-wrapper';
+import '../../components/multi-select-label/multi-select-label';
+import {BUTTON_VIEW_DONE} from '../../plugins/utils/modals'
 import {
   checkPreconditions,
   becameDeprecated,
-} from '../plugins/utils/controllers';
+} from '../../plugins/utils/controllers';
 
 
 export default can.Control({
@@ -440,7 +440,7 @@ export default can.Control({
     }
     this.element.find('.wysihtml5').each(function () {
       var element = this;
-      import(/* webpackChunkName: "wysiwyg" */'../plugins/wysiwyg').then(function () {
+      import(/* webpackChunkName: "wysiwyg" */'../../plugins/wysiwyg').then(function () {
         $(element).cms_wysihtml5();
       });
     });

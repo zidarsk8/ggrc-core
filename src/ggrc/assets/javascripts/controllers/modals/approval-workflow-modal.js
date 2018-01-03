@@ -4,7 +4,7 @@
 */
 
 import ModalsController from './modals_controller';
-import {BUTTON_VIEW_SAVE_CANCEL} from '../plugins/utils/modals';
+import {BUTTON_VIEW_SAVE_CANCEL} from '../../plugins/utils/modals';
 
 let ApprovalWorkflowErrors = function () {
   var errors = null;

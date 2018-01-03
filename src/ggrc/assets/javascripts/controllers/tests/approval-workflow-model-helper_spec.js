@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import {ApprovalWorkflow as Model} from '../approval-workflow-modal';
+import {ApprovalWorkflow as Model} from '../modals/approval-workflow-modal';
 
 describe('ApprovalWorkflow', function () {
   describe('save() method', function () {
