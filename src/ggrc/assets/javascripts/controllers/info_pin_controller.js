@@ -39,7 +39,7 @@ export default can.Control({
 
     if (instance instanceof CMS.Models.Person) {
       view = GGRC.mustache_path +
-        '/ggrc_basic_permissions/people_roles/info.mustache';
+        '/people_roles/info.mustache';
     } else if (view in GGRC.Templates) {
       view = GGRC.mustache_path + '/' + view + '.mustache';
     } else {

@@ -425,27 +425,20 @@
       objectQuery = {id: data.person_id};
     }
 
-    baseModalView =
-        '/ggrc_basic_permissions/people_roles/base_modal.mustache';
+    baseModalView = '/people_roles/base_modal.mustache';
 
     return {
       base_modal_view: GGRC.mustache_path + baseModalView,
       option_column_view:
-        GGRC.mustache_path +
-        '/ggrc_basic_permissions/people_roles/option_column.mustache',
+        GGRC.mustache_path + '/people_roles/option_column.mustache',
       option_detail_view:
-        GGRC.mustache_path +
-        '/ggrc_basic_permissions/people_roles/option_detail.mustache',
+        GGRC.mustache_path + '/people_roles/option_detail.mustache',
       active_column_view:
-        GGRC.mustache_path +
-        '/ggrc_basic_permissions/people_roles/active_column.mustache',
-
+        GGRC.mustache_path + '/people_roles/active_column.mustache',
       object_column_view:
-        GGRC.mustache_path +
-        '/ggrc_basic_permissions/people_roles/object_column.mustache',
+        GGRC.mustache_path + '/people_roles/object_column.mustache',
       object_detail_view:
-        GGRC.mustache_path +
-        '/ggrc_basic_permissions/people_roles/object_detail.mustache',
+        GGRC.mustache_path + '/people_roles/object_detail.mustache',
 
       new_object_title: 'Person',
       modal_title: data.modal_title || 'User Role Assignments',

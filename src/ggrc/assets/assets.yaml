@@ -187,3 +187,12 @@ dashboard-js-template-files:
   - snapshots/tree_add_item.mustache
   - components/inline/simple-readonly-text.mustache
   - partials/modal-ajax-test-plan.mustache
+  # dashboard-js-template-files:
+  - people_roles/authorizations_by_person_list.mustache
+  - people_roles/authorizations_by_person_tree_add_item.mustache
+  - people_roles/authorizations_modal_actions.mustache
+  - people_roles/base_modal.mustache
+  - people_roles/object_column.mustache
+  - people_roles/object_detail.mustache
+  - people_roles/option_column.mustache
+  - people_roles/info.mustache
