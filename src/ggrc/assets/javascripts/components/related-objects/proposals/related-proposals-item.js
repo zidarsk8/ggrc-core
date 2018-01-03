@@ -3,6 +3,7 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import '../../proposal/review-proposal';
 import '../../proposal/apply-decline-proposal';
 import '../../diff/instance-fields-diff';
 import '../../diff/instance-acl-diff';

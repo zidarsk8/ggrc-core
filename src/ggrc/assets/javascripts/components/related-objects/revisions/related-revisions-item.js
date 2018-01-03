@@ -3,6 +3,10 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import {
+  getInstanceView,
+} from '../../../plugins/utils/object-history-utils';
+
 import '../../diff/instance-fields-diff';
 import '../../diff/instance-acl-diff';
 import '../../diff/instance-gca-diff';
@@ -24,7 +28,7 @@ export default can.Component.extend({
           }
 
           // revision-comparer expects view path
-          newValue.attr('view', this.getInstanceView(newValue));
+          newValue.attr('view', getInstanceView(newValue));
           setValue(newValue);
         },
       },
@@ -49,16 +53,5 @@ export default can.Component.extend({
     },
     modifiedBy: {},
     lastRevision: {},
-    getInstanceView(instance) {
-      let view;
-      let typeInfo;
-      if (instance.view) {
-        return instance.view;
-      }
-
-      typeInfo = `${instance.class.table_plural}/info`;
-      view = `${GGRC.mustache_path}/${typeInfo}.mustache`;
-      return view;
-    },
   },
 });
