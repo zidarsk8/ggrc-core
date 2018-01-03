@@ -14,3 +14,6 @@ import '../components/gdrive/gdrive_folder_picker';
 
 // ggrc_risk_assessments
 import '../apps/risk_assessments';
+
+// ggrc_risks
+import '../apps/risks';

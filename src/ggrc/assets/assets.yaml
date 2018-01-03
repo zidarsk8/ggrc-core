@@ -213,3 +213,8 @@ dashboard-js-template-files:
   - risk_assessments/tree_add_item.mustache
   - risk_assessments/info.mustache
   - risk_assessments/modal_content.mustache
+  # ggrc_risks
+  - dashboard/lhn_risks.mustache
+  - risks/modal_content.mustache
+  - risks/info.mustache
+  - threats/modal_content.mustache
