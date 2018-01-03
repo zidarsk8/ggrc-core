@@ -133,24 +133,6 @@ export default can.Control({
       _.sortByAll(this.options.widget_list, ['order', 'internav_display']));
   },
 
-  update_widget_list: function (widgetElements) {
-    var widgetList = this.options.widget_list.slice(0);
-    var that = this;
-
-    can.each(widgetElements, function (widgetElement, index) {
-      widgetList.splice(
-        can.inArray(
-          that.update_widget(widgetElement, index)
-          , widgetList)
-        , 1);
-    });
-
-    can.each(widgetList, function (widget) {
-      that.options.widget_list
-        .splice(can.inArray(widget, that.options.widget_list), 1);
-    });
-  },
-
   update_widget: function (widgetElement, index) {
     var $widget = $(widgetElement);
     var widget = this.widget_by_selector('#' + $widget.attr('id'));
