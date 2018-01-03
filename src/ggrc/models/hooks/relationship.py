@@ -20,7 +20,7 @@ from ggrc.models.relationship import Stub
 from ggrc.services import signals
 from ggrc.models import all_models
 from ggrc.models.comment import Commentable
-from ggrc.models.mixins import ChangeTracked
+from ggrc.models.mixins.base import ChangeTracked
 from ggrc.models import exceptions
 
 
