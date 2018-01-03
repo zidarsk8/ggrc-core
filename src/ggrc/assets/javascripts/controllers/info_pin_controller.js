@@ -21,7 +21,8 @@ import '../components/sort/sort-by';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
 import {confirm} from '../plugins/utils/modals';
 
-can.Control('CMS.Controllers.InfoPin', {
+export default can.Control({
+  pluginName: 'cms_controllers_info_pin',
   defaults: {
     view: GGRC.mustache_path + '/base_objects/info.mustache'
   }
