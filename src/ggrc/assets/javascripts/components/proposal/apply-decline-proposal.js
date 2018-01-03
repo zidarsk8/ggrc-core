@@ -26,16 +26,11 @@ export default can.Component.extend({
         },
       },
     },
+    $el: null,
     proposal: {},
     instance: {},
     isLoading: false,
-    title: '',
-    description: '',
     actionComment: '',
-    isApplyAction: false,
-    modalState: {
-      open: false,
-    },
     getModalDescriptionText(isDecline) {
       const date = GGRC.Utils.formatDate(this.attr('proposal.created_at'));
       const email = this.attr('proposal.proposed_by.email');
@@ -45,19 +40,8 @@ export default can.Component.extend({
     },
     closeModal() {
       this.attr('actionComment', '');
-      this.attr('modalState.open', false);
-    },
-    declineProposal() {
-      this.attr('title', 'Decline confirmation');
-      this.attr('description', this.getModalDescriptionText(true));
-      this.attr('isApplyAction', false);
-      this.attr('modalState.open', true);
-    },
-    applyProposal() {
-      this.attr('title', 'Apply confirmation');
-      this.attr('description', this.getModalDescriptionText(false));
-      this.attr('isApplyAction', true);
-      this.attr('modalState.open', true);
+      this.attr('$el')
+        .closest('.modal').find('.modal-dismiss').trigger('click');
     },
     confirm(isApply) {
       this.attr('isLoading', true);
@@ -85,8 +69,7 @@ export default can.Component.extend({
       proposalModel.save().then(
         () => {
           this.attr('isLoading', false);
-          this.attr('modalState.open', false);
-          this.attr('actionComment', '');
+          this.closeModal();
 
           if (isApply) {
             this.refreshPage();
@@ -105,6 +88,11 @@ export default can.Component.extend({
           tabId: 'tab-related-proposals',
         });
       });
+    },
+  },
+  events: {
+    inserted() {
+      this.viewModel.attr('$el', this.element);
     },
   },
 });

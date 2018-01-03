@@ -17,11 +17,24 @@ export default can.Component.extend({
   tag,
   template,
   viewModel: {
+    define: {
+      buttonView: {
+        get() {
+          return `${GGRC.mustache_path}/modals/review_proposal.mustache`;
+        },
+      },
+      canReview: {
+        get() {
+          return this.attr('proposal.status') !== 'applied';
+        },
+      },
+    },
     leftRevisionId: null,
     rightRevision: null,
     proposal: {},
     instance: {},
     isLoading: false,
+    modalTitle: 'Review: Compare to Current',
     prepareComparerConfig() {
       const instance = this.attr('instance');
       const leftRevisionId = this.attr('leftRevisionId');
@@ -34,6 +47,8 @@ export default can.Component.extend({
       instance.attr('view', getInstanceView(instance));
 
       if (leftRevisionId && rightRevision) {
+        this.attr('isLoading', false);
+
         // revisions are already ready
         this.openRevisionComparer();
         return;
@@ -72,6 +87,7 @@ export default can.Component.extend({
 
       this.attr('rightRevision', rightRevision);
       this.attr('isLoading', false);
+      this.openRevisionComparer();
     },
     applyFields(instance, modifiedFields) {
       const fieldNames = can.Map.keys(modifiedFields);
@@ -113,6 +129,18 @@ export default can.Component.extend({
 
       instance.custom_attribute_values = modifiedValues;
       instance.custom_attributes = modifiedValues;
+    },
+    openRevisionComparer() {
+      const el = this.attr('$el');
+      const revisionsComparer = el.find('revisions-comparer');
+      if (revisionsComparer && revisionsComparer.viewModel) {
+        revisionsComparer.viewModel().compareIt();
+      }
+    },
+  },
+  events: {
+    inserted() {
+      this.viewModel.attr('$el', this.element);
     },
   },
 });
