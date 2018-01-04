@@ -342,8 +342,6 @@ export default can.Control({
   },
 
   reset_form: function (setFieldsCb) {
-    var $textArea = $('#program_description');
-    var editorData = $textArea.data('wysihtml5');
     var preloadDfd;
 
     // If the modal is closed early, the element no longer exists
@@ -367,12 +365,6 @@ export default can.Control({
           this.options.instance.backup();
         }.bind(this))
       }
-    }
-
-    // The rich text editor's content is not a "normal" form field, thus
-    // it needs to be reset manually (if it exists)
-    if (editorData && editorData.editor) {
-      editorData.editor.clear();
     }
   },
 

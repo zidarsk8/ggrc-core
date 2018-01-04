@@ -14,7 +14,6 @@ from ggrc.models import Assessment
 from ggrc.models import AssessmentTemplate
 from ggrc.models import Audit
 from ggrc.models import Person
-from ggrc_basic_permissions.models import Role
 from ggrc_basic_permissions.models import UserRole
 
 from integration.ggrc.services import TestCase
@@ -131,16 +130,15 @@ class TestUserGenerator(TestCase):
           ("Auditors", "cbabbage@example.com"),
           ("Title", "Title"),
           ("Status", "Planned"),
-          ("Audit Captain", "aturing@example.com")
+          ("Audit Captains", "aturing@example.com")
       ]))
       audit = Audit.query.filter(Audit.slug == audit_slug).first()
-      self.assertEqual("aturing@example.com", audit.contact.email)
-      auditor = Person.query.filter(
-          Person.email == "cbabbage@example.com").first()
-      role = Role.query.filter(Role.name == "Auditor").first()
-      user_role = UserRole.query.filter_by(person_id=auditor.id,
-                                           role_id=role.id).first()
-      self.assertIsNotNone(user_role)
+      auditors = [acl.person.email for acl in audit.access_control_list
+                  if acl.ac_role.name == "Auditors"]
+      captains = [acl.person.email for acl in audit.access_control_list
+                  if acl.ac_role.name == "Audit Captains"]
+      self.assertItemsEqual(["cbabbage@example.com"], auditors)
+      self.assertItemsEqual(["aturing@example.com"], captains)
 
       assessment_slug = "Assessment1"
       self.import_data(OrderedDict([

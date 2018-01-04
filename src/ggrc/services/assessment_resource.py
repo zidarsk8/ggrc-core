@@ -32,11 +32,6 @@ class AssessmentResource(common.ExtendedResource):
     return command_map[command](*args, **kwargs)
 
   @staticmethod
-  def _get_relationships_data(relationships):
-    """Return serialized all relationships needed for assessment page."""
-    return [rel.log_json() for rel in relationships]
-
-  @staticmethod
   def _get_relationships(assessment):
     """Get all relationships for the current assessment."""
     relationships = models.Relationship.eager_query().filter(
@@ -56,9 +51,16 @@ class AssessmentResource(common.ExtendedResource):
     This function is just a bit optimized way of returning
     assessment.audit.title
     """
-    title = db.session.query(models.Audit.title).filter_by(
-        id=assessment.audit_id).scalar()
-    return {"title": title}
+    audit = db.session.query(
+        models.Audit.title,
+        models.Audit.description,
+    ).filter_by(id=assessment.audit_id).first()
+    return {
+        "id": assessment.audit_id,
+        "type": "Audit",
+        "title": audit.title,
+        "description": audit.description,
+    }
 
   @staticmethod
   def _filter_rels(relationships, type_):
@@ -84,6 +86,8 @@ class AssessmentResource(common.ExtendedResource):
         assessment.
     """
     relationship_ids = self._filter_rels(relationships, "Snapshot")
+    if not relationship_ids:
+      return []
     with benchmark("Get assessment snapshot relationships"):
       snapshots = models.Snapshot.query.options(
           orm.undefer_group("Snapshot_complete"),
@@ -124,6 +128,8 @@ class AssessmentResource(common.ExtendedResource):
       data for related urls, reference urls, and attachments.
     """
     relationship_ids = self._filter_rels(relationships, "Document")
+    if not relationship_ids:
+      return [], [], []
     with benchmark("Get assessment snapshot relationships"):
       documents = models.Document.eager_query().filter(
           models.Document.id.in_(relationship_ids)
@@ -136,9 +142,22 @@ class AssessmentResource(common.ExtendedResource):
                    if doc.document_type == doc.ATTACHMENT]
     return urls, ref_urls, attachments
 
+  def _get_issue_data(self, relationships):
+    """Get related issue data."""
+    relationship_ids = self._filter_rels(relationships, "Issue")
+    if not relationship_ids:
+      return []
+    with benchmark("Get related issue data"):
+      issues = models.Issue.eager_query().filter(
+          models.Issue.id.in_(relationship_ids)
+      ).all()
+    return [issue.log_json() for issue in issues]
+
   def _get_comment_data(self, relationships):
     """Get assessment comment data."""
     relationship_ids = self._filter_rels(relationships, "Comment")
+    if not relationship_ids:
+      return []
     with benchmark("Get assessment comment data"):
       comments = models.Comment.eager_query().filter(
           models.Comment.id.in_(relationship_ids)
@@ -147,27 +166,6 @@ class AssessmentResource(common.ExtendedResource):
           models.Comment.id.desc(),
       ).all()
     return [comment.log_json() for comment in comments]
-
-  def _get_people_data(self, relationships):
-    """Get assessment people data.
-
-    This function returns data for people related to the assessment without
-    ACL roles. The data does not include the relationships since those are
-    sent in a different block.
-    """
-    relationship_ids = self._filter_rels(relationships, "Person")
-    with benchmark("Get assessment snapshot relationships"):
-      people = models.Person.query.options(
-          orm.undefer_group("Person_complete"),
-          orm.joinedload('language'),
-          orm.subqueryload('object_people'),
-          orm.subqueryload('_custom_attribute_values').undefer_group(
-              'CustomAttributeValue_complete'
-          )
-      ).filter(
-          models.Person.id.in_(relationship_ids)
-      ).all()
-    return [person.log_json() for person in people]
 
   def _get_related_data(self, assessment):
     """Get assessment related data.
@@ -181,11 +179,10 @@ class AssessmentResource(common.ExtendedResource):
     attachments_key = "Document:{}".format(models.Document.ATTACHMENT)
     ref_urls_key = "Document:{}".format(models.Document.REFERENCE_URL)
     data = {
-        "Relationship": self._get_relationships_data(relationships),
         "Audit": self._get_audit_data(assessment),
         "Snapshot": self._get_snapshot_data(assessment, relationships),
         "Comment": self._get_comment_data(relationships),
-        "Person": self._get_people_data(relationships),
+        "Issue": self._get_issue_data(relationships),
         urls_key: urls,
         ref_urls_key: ref_urls,
         attachments_key: attachments,

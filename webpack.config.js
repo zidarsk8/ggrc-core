@@ -15,17 +15,13 @@ const ENV = process.env;
 const isProd = ENV.NODE_ENV === 'production';
 
 const STATIC_FOLDER = '/static/';
-const enabledModules = _.compact(_.map(ENV.GGRC_SETTINGS_MODULE.split(' '), function (module) {
-  var name;
-  if (/^ggrc/.test(module)) {
-    name = module.split('.')[0];
-  }
-
-  if (!name) {
-    return '';
-  }
-  return name;
-}));
+const enabledModules = [
+  'ggrc_basic_permissions',
+  'ggrc_gdrive_integration',
+  'ggrc_risk_assessments',
+  'ggrc_risks',
+  'ggrc_workflows',
+];
 
 module.exports = function (env) {
   const extractSass = new ExtractTextPlugin({

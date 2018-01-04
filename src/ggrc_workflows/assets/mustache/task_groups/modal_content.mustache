@@ -52,17 +52,17 @@
 
   <div class="row-fluid">
     <div class="span8 hidable">
-      <label for="program_description">
+      <label for="task_group_description">
         Details
         <i class="fa fa-question-circle" rel="tooltip" title="Description goes here"></i>
         <a href="javascript://" class="field-hide" tabindex="-1">hide</a>
       </label>
       <div class="wysiwyg-area">
-        <textarea id="program_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3">{{instance.description}}</textarea>
+        <textarea id="task_group_description" class="span12 double wysihtml5" name="description" placeholder="Enter Description" tabindex="3">{{instance.description}}</textarea>
       </div>
     </div>
     <div class="span4">
-      {{#if_helpers '^if' instance.id 'and ^if' object_params.workflow}}
+      {{#if_helpers '\\n ^if' instance.id '\\n and ^if' object_params.workflow}}
         {{#using workflow=instance.workflow}}
         <label>
           Workflow

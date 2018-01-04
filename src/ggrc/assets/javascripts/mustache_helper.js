@@ -549,35 +549,40 @@ Mustache.registerHelper("option_select", function (object, attr_name, role, opti
 });
 
 Mustache.registerHelper("category_select", function (object, attr_name, category_type, options) {
-  var selected_options = object[attr_name] || [] //object.attr(attr_name) || []
-    , selected_ids = can.map(selected_options, function (selected_option) {
-        return selected_option.id;
-      })
-    , options_dfd = CMS.Models[category_type].findAll()
-    , tab_index = options.hash && options.hash.tabindex
-    , tag_prefix = 'select class="span12" multiple="multiple"'
-    ;
+  const selected_options = object[attr_name] || [];
+  const selected_ids = can.map(selected_options, function (selected_option) {
+    return selected_option.id;
+  });
+  const options_dfd = CMS.Models[category_type].findAll();
+  let tab_index = options.hash && options.hash.tabindex;
+  const tag_prefix = 'select class="span12" multiple="multiple"';
 
-  tab_index = typeof tab_index !== 'undefined' ? ' tabindex="' + tab_index + '"' : '';
+  tab_index = typeof tab_index !== 'undefined' ?
+    ` tabindex="${tab_index}"` :
+    '';
+
   function get_select_html(options) {
+    const sortedOptions = _.sortBy(options, 'name');
+    const selectOpenTag = `
+      <select class="span12" multiple="multiple"
+        model="${category_type}"
+        name="${attr_name}"
+        ${tab_index}
+      >`;
+    const selectCloseTag = '</select>';
+    const optionTags = can.map(sortedOptions, function (option) {
+      return `
+        <option value="${option.id}"
+          ${selected_ids.indexOf(option.id) > -1 ? ' selected=selected' : ''}
+        >${option.name}</option>`;
+    }).join('\n');
+
     return [
-        '<select class="span12" multiple="multiple"'
-      ,   ' model="' + category_type + '"'
-      ,   ' name="' + attr_name + '"'
-      ,   tab_index
-      , '>'
-      , can.map(options, function (option) {
-          return [
-            '<option value="', option.id, '"'
-          ,   selected_ids.indexOf(option.id) > -1 ? ' selected=selected' : ''
-          , '>'
-          ,   option.name
-          , '</option>'
-          ].join('');
-        }).join('\n')
-      , '</select>'
+      selectOpenTag,
+      optionTags,
+      selectCloseTag
     ].join('');
-  }
+  };
 
   return defer_render(tag_prefix, get_select_html, options_dfd);
 });
@@ -1121,7 +1126,8 @@ Mustache.registerHelper("json_escape", function (obj, options) {
 function localizeDate(date, options, tmpl, allowNonISO) {
   var formats = [
     'YYYY-MM-DD',
-    'YYYY-MM-DDTHH:mm:ss'
+    'YYYY-MM-DDTHH:mm:ss',
+    'YYYY-MM-DDTHH:mm:ss.SSSSSS',
   ];
   if (allowNonISO) {
     formats.push('MM/DD/YYYY', 'MM/DD/YYYY hh:mm:ss A');
@@ -1674,33 +1680,6 @@ Mustache.registerHelper("if_in", function (needle, haystack, options) {
   return options[found ? "fn" : "inverse"](options.contexts);
 });
 
-Mustache.registerHelper("with_auditors", function (instance, options) {
-  var auditors, auditors_dfd
-    , decoy
-    ;
-
-  instance = resolve_computed(instance);
-  if (options.hash && options.hash.decoy) {
-    decoy = Mustache.resolve(options.hash.decoy);
-    decoy.attr();
-  }
-
-  if (!instance)
-    return "";
-
-  auditors_dfd = Mustache.resolve(instance).findAuditors().done(function (aud) {
-    auditors = aud;
-  });
-  return defer_render("span", function () {
-    if (auditors && auditors.attr("length") > 0) {
-      return options.fn(options.contexts.add({"auditors": auditors}));
-    }
-    else{
-      return options.inverse(options.contexts);
-    }
-  }, auditors_dfd);
-});
-
 Mustache.registerHelper("if_instance_of", function (inst, cls, options) {
   var result;
   cls = resolve_computed(cls);
@@ -1754,41 +1733,6 @@ Mustache.registerHelper('if_config_exist', function (key, options) {
   return configValue ?
     options.fn(options.contexts) :
     options.inverse(options.contexts);
-});
-
-Mustache.registerHelper("if_auditor", function (instance, options) {
-  var audit, auditors_dfd, auditors
-    , admin = Permission.is_allowed("__GGRC_ADMIN__")
-    , editor = GGRC.current_user.system_wide_role === "Editor"
-    , include_admin = !options.hash || options.hash.include_admin !== false;
-
-  instance = Mustache.resolve(instance);
-  instance = !instance ? instance : instance.reify();
-
-  if (!instance) {
-    return '';
-  }
-
-  audit = instance;
-
-  if (!audit) {
-    return '';  // take no action until audit is available
-  }
-
-  audit = audit instanceof CMS.Models.Audit ? audit : audit.reify();
-  auditors = audit.findAuditors(true); // immediate-mode findAuditors
-
-  if ((include_admin && (admin|| editor)) ||
-      can.map(
-          auditors,
-          function (auditor) {
-            if (auditor.person.id === GGRC.current_user.id) {
-              return auditor;
-            }
-        }).length) {
-    return options.fn(options.contexts);
-  }
-  return options.inverse(options.contexts);
 });
 
 Mustache.registerHelper("switch", function (value, options) {
@@ -2182,7 +2126,8 @@ Mustache.registerHelper('get_url_value', function (attr_name, instance) {
         finished_date: 1,
         start_date: 1,
         updated_at: 1,
-        verified_date: 1
+        verified_date: 1,
+        last_deprecated_date: 1,
       });
 
       // attribute names considered "default" and not representing a date

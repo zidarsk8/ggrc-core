@@ -6,7 +6,7 @@
 import unittest
 
 from ggrc.models.all_models import all_models
-from ggrc.models.mixins import Identifiable
+from ggrc.models.mixins.base import Identifiable
 
 
 class TestTableArgs(unittest.TestCase):
