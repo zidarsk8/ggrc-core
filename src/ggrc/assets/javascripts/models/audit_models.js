@@ -16,50 +16,6 @@ import Permission from '../permission';
     issue_type: 'PROCESS',
   };
 
-  function update_program_authorizations(programs, person) {
-    return can.when(
-      programs[0],
-      programs[0].get_binding('program_authorized_people').refresh_instances(),
-      programs[0].get_binding('program_authorizations').refresh_instances(),
-      CMS.Models.Role.findAll({
-        name: 'ProgramReader'
-      }),
-      CMS.Models.Role.findAll({
-        name: 'ProgramEditor'
-      })
-    ).then(function (program, peopleBindings, authBindings,
-                     reader_roles, editor_roles) {
-      // ignore readers.  Give users an editor role
-      var readerAuthorizations = [];
-      var deleteDfds;
-      var editorAuthorizedPeople = can.map(authBindings, function (ab) {
-        if (~can.inArray(ab.instance.role.reify(), reader_roles)) {
-          readerAuthorizations.push(ab.instance);
-        } else {
-          return ab.instance.person.reify();
-        }
-      });
-
-      if (Permission.is_allowed('create', 'UserRole', program.context.id) &&
-        !~can.inArray(person.reify(), editorAuthorizedPeople)) {
-        deleteDfds = can.map(readerAuthorizations, function (ra) {
-          if (ra.person.reify() === person.reify()) {
-            return ra.refresh().then(function () {
-              return ra.destroy();
-            });
-          }
-        });
-        return $.when.apply($, deleteDfds).then(function () {
-          return new CMS.Models.UserRole({
-            person: person,
-            role: editor_roles[0].stub(),
-            context: program.context
-          }).save();
-        });
-      }
-    }).then(Permission.refresh());
-  }
-
   can.Model.Cacheable('CMS.Models.Audit', {
     root_object: 'audit',
     root_collection: 'audits',
@@ -70,7 +26,7 @@ import Permission from '../permission';
     destroy: 'DELETE /api/audits/{id}',
     create: 'POST /api/audits',
     mixins: [
-      'contactable',
+      'accessControlList',
       'unique_title',
       'ca_update',
       'timeboxed',
@@ -79,6 +35,7 @@ import Permission from '../permission';
     ],
     is_custom_attributable: true,
     is_clonable: true,
+    isRoleable: true,
     attributes: {
       context: 'CMS.Models.Context.stub',
       program: 'CMS.Models.Program.stub',
@@ -108,11 +65,6 @@ import Permission from '../permission';
         attr_name: 'title',
         order: 1,
       }, {
-        attr_title: 'Audit Captain',
-        attr_name: 'audit_lead',
-        attr_sort_field: 'contact',
-        order: 2,
-      }, {
         attr_title: 'Code',
         attr_name: 'slug',
         order: 3,
@@ -137,20 +89,24 @@ import Permission from '../permission';
         attr_name: 'end_date',
         order: 8,
       }, {
+        attr_title: 'Last Deprecated Date',
+        attr_name: 'last_deprecated_date',
+        order: 9,
+      }, {
         attr_title: 'Planned Report Period to',
         attr_name: 'report_period',
         attr_sort_field: 'report_end_date',
-        order: 9,
+        order: 10,
       }, {
         attr_title: 'Audit Firm',
         attr_name: 'audit_firm',
-        order: 10,
+        order: 11,
       }, {
         attr_title: 'Archived',
         attr_name: 'archived',
-        order: 11,
+        order: 12,
       }],
-      draw_children: true
+      draw_children: true,
     },
     sub_tree_view_options: {
       default_filter: ['Product'],
@@ -167,14 +123,11 @@ import Permission from '../permission';
         function () {
           if (this.attr('issue_tracker.enabled') &&
             !this.attr('issue_tracker.component_id')) {
-            return 'Enter Component ID';
+            return 'cannot be blank';
           }
         }
       );
 
-      this.validateContact(['_transient.contact', 'contact'], {
-        message: 'Audit captain cannot be empty'
-      });
       this.validate(['_transient.audit_firm', 'audit_firm'],
         function () {
           var auditFirm = this.attr('audit_firm');
@@ -217,106 +170,16 @@ import Permission from '../permission';
       }
       return _super.apply(this, args);
     },
-    after_save: function () {
-      var dfd;
-
-      dfd = $.when(
-        new RefreshQueue().enqueue(this.program.reify()).trigger(),
-        this.contact
-      ).then(update_program_authorizations);
-      GGRC.delay_leaving_page_until(dfd);
-    },
-    findAuditors: function (returnList) {
-      // If returnList is true, use findAuditors in the
-      //  classical way, where the exact state of the list
-      //  isn't needed immediately (as in a Mustache helper);
-      //  if false, return a deferred that resolves to the list
-      //  when the list is fully ready, for cases like permission
-      //  checks for other modules.
-      var loader = this.get_binding('authorizations');
-      var auditorsList = new can.List();
-      var dfds = [];
-
-      if (returnList) {
-        $.map(loader.list, function (binding) {
-          // FIXME: This works for now, but is sad.
-          var role;
-          if (!binding.instance.selfLink) {
-            return;
-          }
-          role = binding.instance.role.reify();
-
-          function checkRole() {
-            if (role.attr('name') === 'Auditor') {
-              auditorsList.push({
-                person: binding.instance.person.reify(),
-                binding: binding.instance
-              });
-            }
-          }
-
-          if (role.selfLink) {
-            checkRole();
-          } else {
-            role.refresh().then(checkRole);
-          }
-        });
-        return auditorsList;
-      }
-      return loader.refresh_instances().then(function () {
-        $.map(loader.list, function (binding) {
-          // FIXME: This works for now, but is sad.
-          dfds.push(new $.Deferred(function (dfd) {
-            if (!binding.instance.selfLink) {
-              binding.instance.refresh().then(function () {
-                dfd.resolve(binding.instance);
-              });
-            } else {
-              dfd.resolve(binding.instance);
-            }
-          }).then(function (instance) {
-            var role = instance.role.reify();
-
-            function checkRole() {
-              if (role.attr('name') === 'Auditor') {
-                auditorsList.push({
-                  person: instance.person.reify(),
-                  binding: instance
-                });
-              }
-            }
-
-            if (role.selfLink) {
-              checkRole();
-            } else {
-              return role.refresh().then(checkRole);
-            }
-          }));
-        });
-        return $.when.apply($, dfds).then(function () {
-          return auditorsList;
-        });
+    findRoles: function (roleName) {
+      const auditRole = GGRC.access_control_roles.find((role) => {
+        return role.name === roleName && role.object_type === 'Audit';
       });
+      return new can.List(this.access_control_list.filter((item) => {
+        return item.ac_role_id === auditRole.id;
+      }));
     },
     form_preload() {
-      let dfd;
-      let contact = this.attr('contact');
-
-      if (contact && !contact.email) {
-        contact = contact.reify();
-
-        dfd = contact.email ?
-          can.Deferred().resolve(contact) :
-          contact.refresh();
-
-        dfd.then((refreshed)=> {
-          this.attr('contact.email', refreshed.email);
-        });
-      }
-
       this.initIssueTrackerObject(AUDIT_ISSUE_TRACKER);
-
-      return dfd;
     },
   });
 
@@ -409,7 +272,7 @@ import Permission from '../permission';
           if (this.attr('can_use_issue_tracker') &&
             this.attr('issue_tracker.enabled') &&
             !this.attr('issue_tracker.component_id')) {
-            return 'Enter Component ID';
+            return 'cannot be blank';
           }
         }
       );

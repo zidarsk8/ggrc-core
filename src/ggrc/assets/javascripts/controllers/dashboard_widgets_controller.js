@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import './filterable_controller';
+import Filterable from './filterable_controller';
 import {
   getCounts,
 } from '../plugins/utils/current-page-utils';
@@ -12,7 +12,8 @@ import {
 } from '../plugins/utils/object-versions-utils';
 import tracker from '../tracker';
 
-CMS.Controllers.Filterable('CMS.Controllers.DashboardWidgets', {
+export default Filterable({
+  pluginName: 'dashboard_widgets',
   defaults: {
     model: null,
     widget_id: '',

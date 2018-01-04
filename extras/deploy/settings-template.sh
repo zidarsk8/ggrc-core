@@ -2,7 +2,7 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 APPENGINE_INSTANCE=some-project
-SETTINGS_MODULE="app_engine ggrc_basic_permissions.settings.development ggrc_risks.settings.development ggrc_risk_assessments.settings.development ggrc_workflows.settings.development ggrc_gdrive_integration.settings.development"
+SETTINGS_MODULE="app_engine"
 DB_NAME="database_name"
 DB_INSTANCE_CONNECTION_NAME="database:connection:string"
 SECRET_KEY="Something-secret"

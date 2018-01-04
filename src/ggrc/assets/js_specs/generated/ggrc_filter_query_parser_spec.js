@@ -102,43 +102,44 @@ describe('GGRC.query_parser', function () {
       });
     });
 
-    it('parses \'=\' queries', function () {
-      var simpleQueries = [
-        'a=b',
-        'hello=world',
-        ' with = spaces',
-        'but= not_all_spaces  '
+    it('parses queries', () => {
+      const operators = [
+        '=',
+        '!=',
+        '<',
+        '<=',
+        '>',
+        '>=',
+        '~',
+        '!~',
       ];
 
-      can.each(simpleQueries, function (queryStr) {
-        var query = queryStr.split('=');
-        expect(GGRC.query_parser.parse(queryStr)).toEqual({
-          expression: {
-            left: query[0].trim(),
-            op: {name: '=', evaluate: jasmine.any(Function)},
-            right: query[1].trim(),
-            evaluate: jasmine.any(Function)
-          },
-          order_by: {keys: [], order: '', compare: null},
-          keys: [query[0].trim()],
-          evaluate: jasmine.any(Function)
+      can.each(operators, (op) => {
+        let simpleQueries = [
+          `a${op}b`,
+          ` with ${op} spaces`,
+          `but${op} not_all_spaces  `,
+          `"last updated"${op} 01/03/2018  `,
+          `"last updated"${op} "with spaces"  `,
+        ];
+
+        can.each(simpleQueries, function (queryStr) {
+          var query = queryStr.split(op);
+          expect(GGRC.query_parser.parse(queryStr)).toEqual({
+            expression: {
+              left: query[0].trim().replace(/"/g, ''),
+              op: {name: op, evaluate: jasmine.any(Function)},
+              right: query[1].trim().replace(/"/g, ''),
+              evaluate: jasmine.any(Function),
+            },
+            order_by: {keys: [], order: '', compare: null},
+            keys: [query[0].trim().replace(/"/g, '')],
+            evaluate: jasmine.any(Function),
+          });
         });
       });
     });
 
-    it('parses \'~\' queries', function () {
-      expect(GGRC.query_parser.parse('5words ~ just')).toEqual({
-        expression: {
-          left: '5words',
-          op: {name: '~', evaluate: jasmine.any(Function)},
-          right: 'just',
-          evaluate: jasmine.any(Function)
-        },
-        order_by: {keys: [], order: '', compare: null},
-        keys: ['5words'],
-        evaluate: jasmine.any(Function)
-      });
-    });
     it('parses \'is\' queries', function () {
       expect(GGRC.query_parser.parse('5words is empty')).toEqual({
         expression: {

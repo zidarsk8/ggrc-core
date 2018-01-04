@@ -28,9 +28,6 @@
 
     var mappings = {
       Program: {
-        _canonical: {
-          risk_assessments: 'RiskAssessment'
-        },
         risk_assessments: Direct('RiskAssessment',
           'program', 'risk_assessments')
       },

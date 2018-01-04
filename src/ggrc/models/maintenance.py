@@ -4,7 +4,7 @@
 """Models for maintenance."""
 
 from ggrc import db
-from ggrc.models.mixins import Identifiable
+from ggrc.models.mixins.base import Identifiable
 
 
 class Maintenance(Identifiable, db.Model):

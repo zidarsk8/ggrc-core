@@ -5,6 +5,8 @@
 
 import './widget_descriptor';
 import SummaryWidgetController from '../controllers/summary_widget_controller';
+import DashboardWidget from '../controllers/dashboard_widget_controller';
+import InfoWidget from '../controllers/info_widget_controller';
 
 (function ($, CMS, GGRC) {
   /*
@@ -48,7 +50,7 @@ import SummaryWidgetController from '../controllers/summary_widget_controller';
         var ctrl = widget.content_controller;
         var options = widget.content_controller_options;
 
-        if (ctrl && ctrl === GGRC.Controllers.InfoWidget) {
+        if (ctrl && ctrl === InfoWidget) {
           descriptors[widgetId] = GGRC.WidgetDescriptor.make_info_widget(
             options && options.instance || widget.instance,
             options && options.widget_view || widget.widget_view
@@ -62,7 +64,7 @@ import SummaryWidgetController from '../controllers/summary_widget_controller';
             options.widget_view ||
             widget.widget_view
           );
-        } else if (ctrl && ctrl === GGRC.Controllers.DashboardWidget) {
+        } else if (ctrl && ctrl === DashboardWidget) {
           descriptors[widgetId] = GGRC.WidgetDescriptor.make_dashboard_widget(
             options &&
             options.instance ||

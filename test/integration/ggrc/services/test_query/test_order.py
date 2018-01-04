@@ -12,7 +12,6 @@ from ggrc import db
 from ggrc.models import AccessControlList
 from ggrc.models import AccessControlRole
 from ggrc.models import Assessment
-from ggrc.models import Audit
 from ggrc.models import Control
 from ggrc.models import Person
 from ggrc_workflows.models import TaskGroup
@@ -47,13 +46,6 @@ class TestOrder(TestCase, WithQueryApi):
                                 order_by=[{"name": order_by, "desc": True}])
     titles = [obj['title'] for obj in objects]
     self.assertEqual(titles, list(reversed(sorted_titles)))
-
-  def test_audit_captain(self):
-    """Audit Captain ordering"""
-    sorted_titles = [title for title, in db.session.query(Audit.title)
-                     .filter(Person.id == Audit.contact_id)
-                     .order_by(Person.email)]
-    self._check_ordering("Audit", sorted_titles, "Audit Captain")
 
   @ddt.data("Assignees", "Creators", "Verifiers")
   def test_assessment_roles(self, role):

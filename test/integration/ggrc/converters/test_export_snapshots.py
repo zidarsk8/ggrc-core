@@ -87,7 +87,7 @@ class TestExportSnapshots(TestCase):
     control_dicts = {
         control.slug: {
             # normal fields
-            "Code": "*" + control.slug,
+            "Code": u"*" + control.slug,
             "Revision Date": unicode(snapshot.revision.created_at),
             "Description": control.description,
             "Effective Date": control.start_date.strftime("%m/%d/%Y"),
@@ -98,13 +98,13 @@ class TestExportSnapshots(TestCase):
             "Review State": control.os_state,
             "Significance": u"key" if control.key_control else u"non-key",
             "State": control.status,
-            "Last Deprecated Date": "",
+            "Last Deprecated Date": u"",
             "Assessment Procedure": control.test_plan,
             "Title": control.title,
             "Type/Means": control.means.display_name,
             "Recipients": control.recipients,
-            "Send by default": "yes",
-            "Comments": "",
+            "Send by default": u"yes",
+            "Comments": u"",
             # Custom attributes
             "RT": self._get_cav(control, "RT"),
             "checkbox": self._get_cav(control, "checkbox"),
@@ -113,12 +113,12 @@ class TestExportSnapshots(TestCase):
             "person": self._get_cav(control, "person"),
             # Special snapshot export fields
             "Audit": audit.slug,
-            "Evidence File": u"\n".join(c.slug for c in\
+            "Evidence File": u"\n".join(c.slug for c in
                                         control.document_evidence),
             "Reference URL": u"\n".join(c.slug for c in control.reference_url),
             "Assertions": u"\n".join(c.name for c in control.assertions),
             "Categories": u"\n".join(c.name for c in control.categories),
-            "Folder": "",
+            "Folder": u"",
             # Computed attributes
             "Last Assessment Date": u"",
             "Admin": u"admin@example.com\ncreator@example.com\n"

@@ -35,3 +35,7 @@ For the backend part:
   smaller function at the expense of other functions needed to do the same work
   but possibly multiple times may not be good. Any optimizations done must
   affect the entire app performance in a positive way overall.
+- Avoid using object ids for mappings and use the ORM mapper instead. If we use
+  ids, we have to rely on flushes inside of a single request and then we have
+  workarounds for imports and bulk operations. Avoiding use of direct ids
+  allows simpler code where multiple db operations can be joined together.

@@ -4,15 +4,10 @@
 */
 
 import * as CurrentPageUtils from '../../plugins/utils/current-page-utils';
+import Ctrl from '../inner-nav-controller';
 
 describe('CMS.Controllers.InnerNav', function () {
   'use strict';
-
-  var Ctrl; // the controller under test
-
-  beforeAll(function () {
-    Ctrl = CMS.Controllers.InnerNav;
-  });
 
   describe('sortWidgets() method', function () {
     var ctrlInst; // fake controller instance
