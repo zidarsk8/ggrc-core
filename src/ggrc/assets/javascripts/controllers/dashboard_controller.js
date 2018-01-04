@@ -28,7 +28,6 @@ const Dashboard = can.Control({
       if (!this.inner_nav_controller) {
         this.init_inner_nav();
       }
-      this.update_inner_nav();
 
       // Before initializing widgets, hide the container to not show
       // loading state of multiple widgets before reducing to one.
@@ -145,9 +144,6 @@ const Dashboard = can.Control({
       if (data) {
         this.inner_nav_controller
           .update_widget(data.widget || data, data.index);
-      } else {
-        this.inner_nav_controller.update_widget_list(
-          this.get_active_widget_elements());
       }
       this.inner_nav_controller.sortWidgets();
     }
@@ -155,10 +151,6 @@ const Dashboard = can.Control({
 
   get_active_widget_containers: function () {
     return this.element.find('.widget-area');
-  },
-
-  get_active_widget_elements: function () {
-    return this.element.find("section.widget[id]:not([id=''])").toArray();
   },
 
   add_widget_from_descriptor: function () {
