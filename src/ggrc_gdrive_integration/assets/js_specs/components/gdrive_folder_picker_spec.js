@@ -110,6 +110,44 @@ describe('GGRC.Components.gDriveFolderPicker', function () {
       });
     });
 
+    describe('a[data-toggle=gdrive-picker] keyup', function () {
+      let method;
+      let that;
+
+      beforeEach(function () {
+        that = {};
+        method = events['a[data-toggle=gdrive-picker] keyup'].bind(that);
+      });
+
+      describe('if escape key was clicked', function () {
+        let event;
+        let element;
+
+        beforeEach(function () {
+          const ESCAPE_KEY_CODE = 27;
+          event = {
+            keyCode: ESCAPE_KEY_CODE,
+            stopPropagation: jasmine.createSpy('stopPropagation'),
+          };
+          element = $('<div></div>');
+        });
+
+        it('calls stopPropagation for passed event', function () {
+          method(element, event);
+          expect(event.stopPropagation).toHaveBeenCalled();
+        });
+
+        it('unsets focus for element', function (done) {
+          const blur = function () {
+            done();
+            element.off('blur', blur);
+          };
+          element.on('blur', blur);
+          method(element, event);
+        });
+      });
+    });
+
     describe('".entry-attachment picked" handler', function () {
       var method;
       var that;

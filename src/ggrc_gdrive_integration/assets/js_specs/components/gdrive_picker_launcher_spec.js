@@ -58,6 +58,36 @@ describe('GGRC.Components.gDrivePickerLauncher', function () {
     });
   });
 
+  describe('onKeyup() method', function () {
+    describe('if escape key was clicked', function () {
+      let event;
+      let element;
+
+      beforeEach(function () {
+        const ESCAPE_KEY_CODE = 27;
+        event = {
+          keyCode: ESCAPE_KEY_CODE,
+          stopPropagation: jasmine.createSpy('stopPropagation'),
+        };
+        element = $('<div></div>');
+      });
+
+      it('calls stopPropagation for passed event', function () {
+        viewModel.onKeyup(element, event);
+        expect(event.stopPropagation).toHaveBeenCalled();
+      });
+
+      it('unsets focus for element', function (done) {
+        const blur = function () {
+          done();
+          element.off('blur', blur);
+        };
+        element.on('blur', blur);
+        viewModel.onKeyup(element, event);
+      });
+    });
+  });
+
   describe('events', function () {
     describe('"{viewModel} modal:success" handler', function () {
       var method;
