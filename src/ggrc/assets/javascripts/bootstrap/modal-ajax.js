@@ -12,8 +12,9 @@ import {
   hasWarningType,
   shouldApplyPreconditions,
 } from '../plugins/utils/controllers';
+import Permission from '../permission';
 
-(function (can, $, GGRC, Permission) {
+(function (can, $, GGRC) {
   'use strict';
 
   var originalModalShow = $.fn.modal.Constructor.prototype.show;
@@ -160,9 +161,7 @@ import {
         instance = model.findInCacheById($trigger.attr('data-object-id'));
       }
 
-      objectParams = objectParams ?
-        JSON.parse(objectParams.replace(/\\n/g, '\n')) :
-        {};
+      objectParams = objectParams ? JSON.parse(objectParams) : {};
 
       modalTitle =
         (instance ? 'Edit ' : 'New ') +
@@ -651,4 +650,4 @@ import {
       }
     );
   });
-})(window.can, window.can.$, window.GGRC, window.Permission);
+})(window.can, window.can.$, window.GGRC);

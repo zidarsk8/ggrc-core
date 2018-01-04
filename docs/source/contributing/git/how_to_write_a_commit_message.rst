@@ -229,8 +229,9 @@ tests are implied with the code changes.
 
 Examples::
 
-    CORE-9999 Fix performance issues on bulk operations
-    CORE-1111/1112/9900 Fix rbac issues for creators
+    GGRC-9999 Fix performance issues on bulk operations
+    GGRC-1111/1112/9900 Fix rbac issues for creators
+    GGRC-1111,GGRC-1112 Fix rbac issues for editors
     QUICK-FIX Break test cases into smaller parts
     DOCS Add section that explains client side mappings
     BACKMERGE master into Release/xyz

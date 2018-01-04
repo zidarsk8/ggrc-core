@@ -7,57 +7,53 @@ import * as StateUtils from '../../plugins/utils/state-utils';
 import {getColumnsForModel} from '../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../plugins/utils/advanced-search-utils';
 
-(function (can, GGRC) {
-  'use strict';
-
-  GGRC.Components('advancedSearchWrapper', {
-    tag: 'advanced-search-wrapper',
-    viewModel: can.Map.extend({
-      define: {
-        hasStatusFilter: {
-          get: function () {
-            return StateUtils.hasFilter(this.attr('modelName'));
-          }
-        }
+export default can.Component.extend({
+  tag: 'advanced-search-wrapper',
+  viewModel: can.Map.extend({
+    define: {
+      hasStatusFilter: {
+        get: function () {
+          return StateUtils.hasFilter(this.attr('modelName'));
+        },
       },
-      modelName: null,
-      modelDisplayName: null,
-      filterItems: [],
-      mappingItems: [],
-      statusItem: AdvancedSearch.create.state(),
-      relevantTo: [],
-      availableAttributes: function () {
-        var available = getColumnsForModel(
-          this.attr('modelName'),
-          null,
-          true
-        ).available;
-        return available;
-      },
-      addFilterAttribute: function () {
-        var items = this.attr('filterItems');
-        if (items.length) {
-          items.push(AdvancedSearch.create.operator('AND'));
-        }
-        items.push(AdvancedSearch.create.attribute());
-      },
-      addMappingFilter: function () {
-        var items = this.attr('mappingItems');
-        if (items.length) {
-          items.push(AdvancedSearch.create.operator('AND'));
-        }
-        items.push(AdvancedSearch.create.mappingCriteria());
-      },
-      resetFilters: function () {
-        this.attr('filterItems', []);
-        this.attr('mappingItems', []);
-        this.attr('statusItem.value', {});
+    },
+    modelName: null,
+    modelDisplayName: null,
+    filterItems: [AdvancedSearch.create.attribute()],
+    mappingItems: [],
+    statusItem: AdvancedSearch.create.state(),
+    relevantTo: [],
+    availableAttributes: function () {
+      var available = getColumnsForModel(
+        this.attr('modelName'),
+        null,
+        true
+      ).available;
+      return available;
+    },
+    addFilterAttribute: function () {
+      var items = this.attr('filterItems');
+      if (items.length) {
+        items.push(AdvancedSearch.create.operator('AND'));
       }
-    }),
-    events: {
-      '{viewModel} modelName': function () {
-        this.viewModel.resetFilters();
+      items.push(AdvancedSearch.create.attribute());
+    },
+    addMappingFilter: function () {
+      var items = this.attr('mappingItems');
+      if (items.length) {
+        items.push(AdvancedSearch.create.operator('AND'));
       }
-    }
-  });
-})(window.can, window.GGRC);
+      items.push(AdvancedSearch.create.mappingCriteria());
+    },
+    resetFilters: function () {
+      this.attr('filterItems', [AdvancedSearch.create.attribute()]);
+      this.attr('mappingItems', []);
+      this.attr('statusItem.value', {});
+    },
+  }),
+  events: {
+    '{viewModel} modelName': function () {
+      this.viewModel.resetFilters();
+    },
+  },
+});

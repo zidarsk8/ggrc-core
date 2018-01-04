@@ -34,7 +34,15 @@ function peopleWithRoleName(instance, roleName) {
 
   peopleIds = instance.attr('access_control_list')
     .filter((item) => item.ac_role_id === roleId)
-    .map((item) => item.person);
+    .map((aclItem) => {
+      return {
+        id: aclItem.person.id,
+        type: aclItem.person.type,
+        href: aclItem.person.href,
+        name: aclItem.person_name,
+        email: aclItem.person_email,
+      };
+    });
 
   return peopleIds;
 }

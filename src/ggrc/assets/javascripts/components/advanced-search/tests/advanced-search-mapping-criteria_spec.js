@@ -5,14 +5,15 @@
 
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
 import * as AdvancedSearch from '../../../plugins/utils/advanced-search-utils';
+import Component from '../advanced-search-mapping-criteria';
 
 describe('GGRC.Components.advancedSearchMappingCriteria', function () {
   'use strict';
 
   var viewModel;
 
-  beforeEach(function () {
-    viewModel = GGRC.Components.getViewModel('advancedSearchMappingCriteria');
+  beforeEach(() => {
+    viewModel = new Component.prototype.viewModel();
   });
 
   describe('criteria set() method', function () {
@@ -27,8 +28,8 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
     function () {
       viewModel.attr('criteria', new can.Map({
         filter: {
-          type: 'test'
-        }
+          type: 'test',
+        },
       }));
 
       expect(viewModel.attr('criteria.filter').type).toBe('test');
@@ -58,7 +59,7 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
   describe('removeRelevant() method', function () {
     it('removes mapping criteria', function () {
       viewModel.attr('criteria', new can.Map({
-        mappedTo: {}
+        mappedTo: {},
       }));
 
       viewModel.removeRelevant();
@@ -103,27 +104,27 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
         type2: {},
         type3: {},
         type4: {},
-        type5: {}
+        type5: {},
       });
       cmsModels = CMS.Models;
       CMS.Models = {
         type1: {
           model_singular: '3',
-          title_singular: '3'
+          title_singular: '3',
         },
         type2: {
           model_singular: '1',
-          title_singular: '1'
+          title_singular: '1',
         },
         type3: {
           model_singular: '2',
-          title_singular: null
+          title_singular: null,
         },
         type4: null,
         type5: {
           model_singular: null,
-          title_singular: '4'
-        }
+          title_singular: '4',
+        },
       };
     });
     afterEach(function () {
@@ -145,12 +146,12 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
       expect(result).toEqual([
         {
           model_singular: '1',
-          title_singular: '1'
+          title_singular: '1',
         },
         {
           model_singular: '3',
-          title_singular: '3'
-        }
+          title_singular: '3',
+        },
       ]);
     });
 
@@ -176,7 +177,7 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
     it('returns available attributes', function () {
       var attributes = ['attr1', 'attr2'];
       spyOn(TreeViewUtils, 'getColumnsForModel').and.returnValue({
-        available: attributes
+        available: attributes,
       });
       viewModel.attr('criteria.objectName', 'test');
 

@@ -6,6 +6,7 @@
 import {
   buildParam,
 } from './query-api-utils';
+import Permission from '../../permission';
 
 /**
  * Util methods for work with Snapshots.

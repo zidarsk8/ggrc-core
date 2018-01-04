@@ -126,8 +126,8 @@ tree-view {
 }
 
 tree-item {
-  tree-people-list-field {
-    div.people-list {
+  tree-field {
+    .tree-field__item {
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -254,6 +254,23 @@ tree-item {
         &:after {
           content: none;
         }
+      }
+    }
+  }
+
+  .labels {
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .with-comma {
+      white-space: nowrap;
+
+      &:after {
+        content: ',';
+      }
+
+      &:last-child:after {
+        content: '';
       }
     }
   }

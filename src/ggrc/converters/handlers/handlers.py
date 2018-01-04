@@ -5,6 +5,7 @@
 import re
 from logging import getLogger
 from datetime import date
+from datetime import datetime
 from dateutil.parser import parse
 
 from sqlalchemy import and_
@@ -282,8 +283,12 @@ class SlugColumnHandler(ColumnHandler):
 
 
 class DateColumnHandler(ColumnHandler):
-
+  """Handler for fields that contains date."""
   def parse_item(self):
+    if self.view_only:
+      self._check_errors_non_importable_objects(self.get_value().strip(),
+                                                self.raw_value.strip())
+      return
     value = self.raw_value.strip()
     if value and not re.match(r"[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}|"
                               r"[0-9]{1,2}/[0-9]{1,2}/[0-9]{4}",
@@ -305,6 +310,29 @@ class DateColumnHandler(ColumnHandler):
         return parsed_value
     except:
       self.add_error(errors.WRONG_VALUE_ERROR, column_name=self.display_name)
+
+  def _check_errors_non_importable_objects(self, object_date, import_date):
+    """Check whether a warning should be ejected"""
+    if not import_date:
+      return
+
+    if object_date:
+      try:
+        import_date = datetime.strptime(import_date, "%Y-%m-%d")
+      except ValueError:
+        try:
+          import_date = datetime.strptime(import_date, "%m/%d/%Y")
+        except ValueError:
+          self.add_warning(errors.EXPORT_ONLY_WARNING,
+                           column_name=self.display_name)
+          return
+
+      object_date = datetime.strptime(object_date, '%m/%d/%Y')
+
+      if object_date == import_date:
+        return
+    self.add_warning(errors.EXPORT_ONLY_WARNING,
+                     column_name=self.display_name)
 
   def get_value(self):
     value = getattr(self.row_converter.obj, self.key)
@@ -838,6 +866,22 @@ class DocumentsColumnHandler(ColumnHandler):
       return
     self.row_converter.obj.documents = self.value
     self.dry_run = True
+
+
+class LabelsHandler(ColumnHandler):
+  """ Handler for labels """
+
+  def parse_item(self):
+    if self.raw_value is None:
+      return
+    names = set(l.strip() for l in self.raw_value.split(',') if l.strip())
+    return [{'id': None, 'name': name} for name in names]
+
+  def set_obj_attr(self):
+    self.row_converter.obj.labels = self.value
+
+  def get_value(self):
+    return ','.join(label.name for label in self.row_converter.obj.labels)
 
 
 class ExportOnlyColumnHandler(ColumnHandler):

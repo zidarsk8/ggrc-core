@@ -62,7 +62,7 @@ def parse_export_request():
 def handle_export_request():
   """Export request handler"""
   try:
-    with benchmark("handle export request"):
+    with benchmark("handle export request data"):
       data = parse_export_request()
       objects = data.get("objects")
       export_to = data.get("export_to")

@@ -97,10 +97,8 @@ class RowConverter(object):
         self.objects[attr_name] = item
 
   def handle_row_data(self, field_list=None):
-    if self.from_ids:
-      self.handle_obj_row_data()
-    else:
-      self.handle_csv_row_data(field_list)
+    """Handle row data on import"""
+    self.handle_csv_row_data(field_list)
 
   def check_mandatory_fields(self):
     """Check if the new object contains all mandatory columns."""

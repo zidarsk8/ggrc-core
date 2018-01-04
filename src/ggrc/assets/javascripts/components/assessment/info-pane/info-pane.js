@@ -33,6 +33,7 @@ import '../../tabs/tab-container';
 import './inline-item';
 import './create-url';
 import './confirm-edit-action';
+import '../../multi-select-label/multi-select-label';
 import {
   buildParam,
   batchRequests,
@@ -47,6 +48,7 @@ import {
 import DeferredTransaction from '../../../plugins/utils/deferred-transaction-utils';
 import tracker from '../../../tracker';
 import {REFRESH_TAB_CONTENT} from '../../../events/eventTypes';
+import Permission from '../../../permission';
 import template from './info-pane.mustache';
 
 (function (can, GGRC, CMS) {

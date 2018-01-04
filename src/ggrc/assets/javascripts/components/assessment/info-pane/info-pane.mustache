@@ -237,14 +237,8 @@
                 </div>
             </div>
             <div class="info-pane__sidebar">
-              {{#if instance.label}}
-                <div class="info-pane__section">
-                  <div class="info-pane__section-title">Label</div>
-                  <p>{{instance.label}}</p>
-                </div>
-              {{/if}}
               <div class="ggrc-form">
-                <div class="ggrc-form-item">
+                <div class="ggrc-form-item due-date__column">
                   <div class="ggrc-form-item__row">
                      <assessment-inline-item
                          type="date"
@@ -257,6 +251,20 @@
                          {instance}="instance">
                              <div class="info-pane__section-title">Due Date</div>
                      </assessment-inline-item>
+                  </div>
+                </div>
+                <div class="ggrc-form-item labels__column">
+                  <div class="ggrc-form-item__row">
+                    <assessment-inline-item
+                        type="multi-select-label"
+                        prop-name="labels"
+                        is-confirmation-needed="false"
+                        {on-state-change-dfd}="onStateChangeDfd"
+                        {is-edit-icon-denied}="isEditDenied"
+                        {value}="instance.labels"
+                        {instance}="instance">
+                            <div class="info-pane__section-title">Label</div>
+                    </assessment-inline-item>
                   </div>
                 </div>
               </div>

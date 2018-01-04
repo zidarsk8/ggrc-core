@@ -154,6 +154,15 @@ function _setupWarning(confirm, settings) {
     } else {
       confirmButton.addClass(toggleClasses);
     }
+  })
+  .on('keyup', (e) => {
+    //handle pressing enter
+    if (e.keyCode === 13) {
+      let confirmButton = confirm.find(buttonSelector);
+      if (!confirmButton.attr('disabled')) {
+        confirmButton.trigger('click');
+      }
+    }
   });
 }
 

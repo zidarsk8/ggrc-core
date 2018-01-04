@@ -85,6 +85,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "operationally": handlers.ConclusionColumnHandler,
     "program": handlers.ProgramColumnHandler,
     "recipients": list_handlers.ValueListHandler,
+    "labels": handlers.LabelsHandler,
     "reference_url": document.ReferenceUrlHandler,
     "report_end_date": handlers.DateColumnHandler,
     "last_assessment_date": handlers.DateColumnHandler,
@@ -105,6 +106,7 @@ _DEFAULT_COLUMN_HANDLERS_DICT = {
     "updated_at": handlers.ExportOnlyDateColumnHandler,
     "created_at": handlers.ExportOnlyDateColumnHandler,
     "modified_by": handlers.DirecPersonMappingColumnHandler,
+    "last_deprecated_date": handlers.DateColumnHandler,
 
     # Mapping column handlers
     "__mapping__:person": handlers.PersonMappingColumnHandler,

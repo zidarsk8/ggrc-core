@@ -353,6 +353,55 @@ class Timeboxed(object):
     )
 
 
+class WithLastDeprecatedDate(object):
+  """Mixin that defines `last_deprecated_date` field."""
+
+  # pylint: disable=method-hidden ; pylint thinks that last_deprecated_date
+  # is overwritten in validate_status
+  @declared_attr
+  def last_deprecated_date(cls):  # pylint: disable=no-self-argument
+    return deferred(db.Column(db.Date), cls.__name__)
+
+  # pylint: disable=unused-argument,no-self-use
+  @validates('last_deprecated_date')
+  def validate_date(self, key, value):
+    return value.date() if isinstance(value, datetime.datetime) else value
+  # pylint: enable=unused-argument,no-self-use
+
+  _api_attrs = reflection.ApiAttributes(
+      reflection.Attribute('last_deprecated_date', create=False, update=False),
+  )
+
+  _aliases = {
+      "last_deprecated_date": {
+          "display_name": "Last Deprecated Date",
+          "view_only": True,
+      },
+  }
+
+  _fulltext_attrs = [
+      attributes.DateFullTextAttr('last_deprecated_date',
+                                  'last_deprecated_date'),
+  ]
+
+  @classmethod
+  def indexed_query(cls):
+    return super(WithLastDeprecatedDate, cls).indexed_query().options(
+        orm.Load(cls).load_only("last_deprecated_date"),
+    )
+
+  AUTO_SETUP_STATUS = "Deprecated"
+
+  @validates('status')
+  def validate_status(self, key, value):
+    """Autosetup current date as last_deprecated_date
+      if 'Deprecated' status will setup."""
+    # pylint: disable=unused-argument; key is unused but passed in by ORM
+    if value != self.status and value == self.AUTO_SETUP_STATUS:
+      self.last_deprecated_date = datetime.datetime.now()
+    return value
+
+
 class LastDeprecatedTimeboxed(Timeboxed):
   """Mixin that redefines `end_date`'s alias."""
   _aliases = {

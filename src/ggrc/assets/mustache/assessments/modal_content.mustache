@@ -9,7 +9,7 @@
     <form action="javascript://">
 
       {{^if new_object_form}}
-        {{#if_in instance.status "Not Started,Completed,Verified,In Review"}}
+  {{#if_in instance.status "Completed,Verified,In Review"}}
           {{#if_helpers '#if' instance.isDirty 'or #if' mappedObjectsChanges.length 'or #if' referenceUrlChanged}}
           <div class="ggrc-form-item">
             <div class="alert warning width-100">
@@ -37,17 +37,14 @@
             </dropdown>
           </assessment-object-type-dropdown>
         </div>
-        <div class="ggrc-form-item__multiple-row">
+        <div class="ggrc-form-item__multiple-row multi-select-label-container">
           <label class="form-label ggrc-form-item__label">
             Label
           </label>
-          <select can-value="label">
-            <option value="" selected="selected">---</option>
-            <option value="Needs Discussion">Needs Discussion</option>
-            <option value="Needs Rework">Needs Rework</option>
-            <option value="Followup">Followup</option>
-            <option value="Auditor pulls evidence">Auditor pulls evidence</option>
-          </select>
+          <multi-select-label only-edit-mode="true"
+                              {instance}="instance"
+                              {labels}="instance.labels">
+          </multi-select-label>
         </div>
       </div>
       <div class="ggrc-form-item">

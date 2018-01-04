@@ -4,6 +4,7 @@
 */
 
 import {CA_DD_REQUIRED_DEPS} from '../../../plugins/utils/ca-utils';
+import Permission from '../../../permission';
 
 describe('assessmentLocalCa component', () => {
   let viewModel;

@@ -62,6 +62,12 @@
               (value-changed)="fieldValueChanged(%event)"
             ></numberbox-form-field>
           {{/case}}
+          {{#case 'multi-select-label'}}
+            <multi-select-label {labels}="value"
+                {edit-mode}="true"
+                (value-changed)="fieldValueChanged(%event)">
+            </multi-select-label>
+          {{/case}}
         {{/switch}}
 
         <ul class="inline__controls">
@@ -84,7 +90,7 @@
     <div class="inline__content-wrapper">
         <readonly-inline-content class="inline__content {{#if editMode}}inline--hidden{{/if}}"
           {with-read-more}="withReadMore"
-          {value}="context.value">
+          {value}="value">
         </readonly-inline-content>
     </div>
   {{/if}}
