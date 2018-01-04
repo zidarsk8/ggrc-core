@@ -398,9 +398,12 @@ class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonIssue.ISSUE)
   ADMIN = TransformationSetVisibleFields.ADMIN
   REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
+  PRIMARY_CONTACTS = TransformationSetVisibleFields.PRIMARY_CONTACTS
   DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE, ADMIN,
-      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE)
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
+      CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, REVIEW_STATE,
+      PRIMARY_CONTACTS, ADMIN)
 
 
 class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
