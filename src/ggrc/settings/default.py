@@ -31,7 +31,9 @@ EXTENSIONS = [
 exports = [
     "GAPI_KEY",
     "GAPI_CLIENT_ID",
-    "GAPI_ADMIN_GROUP"
+    "GAPI_ADMIN_GROUP",
+    "VERSION",
+    "MAX_INSTANCES",
 ]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
@@ -94,8 +96,6 @@ APPENGINE_EMAIL = os.environ.get('APPENGINE_EMAIL', '')
 CALENDAR_MECHANISM = False
 
 MAX_INSTANCES = os.environ.get('MAX_INSTANCES', '3')
-
-exports = ['VERSION', 'MAX_INSTANCES']  # pylint: disable=invalid-name
 
 # Users with authorized domain will automatically get Creator role.
 AUTHORIZED_DOMAIN = os.environ.get('AUTHORIZED_DOMAIN', "")
