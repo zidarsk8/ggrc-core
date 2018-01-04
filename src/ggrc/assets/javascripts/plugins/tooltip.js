@@ -56,7 +56,7 @@
           $tooltipEl.remove();
           this.stopWatch();
         }
-      }, 200);
+      }, 50);
     }
 
     stopWatch() {
