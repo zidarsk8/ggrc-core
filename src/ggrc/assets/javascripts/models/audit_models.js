@@ -27,7 +27,6 @@ import Permission from '../permission';
     create: 'POST /api/audits',
     mixins: [
       'accessControlList',
-      'contactable',
       'unique_title',
       'ca_update',
       'timeboxed',
@@ -180,24 +179,7 @@ import Permission from '../permission';
       }));
     },
     form_preload() {
-      let dfd;
-      let contact = this.attr('contact');
-
-      if (contact && !contact.email) {
-        contact = contact.reify();
-
-        dfd = contact.email ?
-          can.Deferred().resolve(contact) :
-          contact.refresh();
-
-        dfd.then((refreshed)=> {
-          this.attr('contact.email', refreshed.email);
-        });
-      }
-
       this.initIssueTrackerObject(AUDIT_ISSUE_TRACKER);
-
-      return dfd;
     },
   });
 
