@@ -21,3 +21,5 @@ import '../../components/related-objects/related-reference-urls';
 import '../../components/people/people-list-info';
 
 import '../../common-handlers';
+
+import '../modules';

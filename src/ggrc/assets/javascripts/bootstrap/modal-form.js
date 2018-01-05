@@ -27,7 +27,8 @@ import {confirm} from '../plugins/utils/modals';
   $.extend(ModalForm.prototype, {
 
     init: function () {
-      this.$element
+      const $element = this.$element;
+      $element
         .on('preload', function () {
           this.is_form_dirty(true);
           this.control = this.$element.control();
@@ -48,7 +49,15 @@ import {confirm} from '../plugins/utils/modals';
           $(this).trigger('shown'); // this will reposition the modal stack
         })
         .on('delete-object', $.proxy(this.delete_object, this))
-        .draggable({handle: '.modal-header', cancel: '.btn'});
+        .draggable({
+          handle: '.modal-header',
+          cancel: '.btn',
+          stop() {
+            // jquery UI unsets focus from modal
+            // we fix it
+            $element.focus();
+          },
+        });
     },
 
     doNothing: function (e) {

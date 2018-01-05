@@ -207,6 +207,14 @@ class StatusColumnHandler(ColumnHandler):
     self.add_warning(error_tmpl, column_name=self.display_name)
     return status
 
+  def set_obj_attr(self):
+    "Set attribute value to object"
+    obj = self.row_converter.obj
+    self.row_converter.old_values["status"] = obj.status
+    obj.skip_validation = True
+    super(StatusColumnHandler, self).set_obj_attr()
+    obj.skip_validation = False
+
 
 class UserColumnHandler(ColumnHandler):
   """Handler for a single user fields.

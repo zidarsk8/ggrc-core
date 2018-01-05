@@ -9,19 +9,11 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const WebpackShellPlugin = require('webpack-shell-plugin');
-const _ = require('lodash');
 const path = require('path');
 const ENV = process.env;
 const isProd = ENV.NODE_ENV === 'production';
 
 const STATIC_FOLDER = '/static/';
-const enabledModules = [
-  'ggrc_basic_permissions',
-  'ggrc_gdrive_integration',
-  'ggrc_risk_assessments',
-  'ggrc_risks',
-  'ggrc_workflows',
-];
 
 module.exports = function (env) {
   const extractSass = new ExtractTextPlugin({
@@ -151,11 +143,6 @@ module.exports = function (env) {
         moment: 'moment',
       }),
       new webpack.DefinePlugin({
-        IS_RISKS_ENABLED: JSON.stringify(isModuleEnabled('ggrc_risks')),
-        IS_WORKFLOWS_ENABLED: JSON.stringify(isModuleEnabled('ggrc_workflows')),
-        IS_RISK_ASSESSMENTS_ENABLED: JSON.stringify(isModuleEnabled('ggrc_risk_assessments')),
-        IS_PERMISSIONS_ENABLED: JSON.stringify(isModuleEnabled('ggrc_basic_permissions')),
-        IS_GDRIVE_ENABLED: JSON.stringify(isModuleEnabled('ggrc_gdrive_integration')),
         GOOGLE_ANALYTICS_ID: JSON.stringify(ENV.GOOGLE_ANALYTICS_ID),
         DEV_MODE: JSON.stringify(!isProd),
       }),
@@ -216,12 +203,6 @@ module.exports = function (env) {
   return config;
 };
 
-function isModuleEnabled(name) {
-  return enabledModules.indexOf(name) > -1;
-}
-
 function getEntryModules(entryName) {
-  return [`entrypoints/${entryName}`,
-    ...enabledModules.map(name => `./src/${name}/assets/javascripts`),
-  `entrypoints/${entryName}/bootstrap`]
+  return [`entrypoints/${entryName}`, `entrypoints/${entryName}/bootstrap`];
 }

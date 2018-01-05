@@ -31,7 +31,9 @@ EXTENSIONS = [
 exports = [
     "GAPI_KEY",
     "GAPI_CLIENT_ID",
-    "GAPI_ADMIN_GROUP"
+    "GAPI_ADMIN_GROUP",
+    "VERSION",
+    "MAX_INSTANCES",
 ]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
@@ -53,7 +55,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.0.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.1.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -94,8 +96,6 @@ APPENGINE_EMAIL = os.environ.get('APPENGINE_EMAIL', '')
 CALENDAR_MECHANISM = False
 
 MAX_INSTANCES = os.environ.get('MAX_INSTANCES', '3')
-
-exports = ['VERSION', 'MAX_INSTANCES']  # pylint: disable=invalid-name
 
 # Users with authorized domain will automatically get Creator role.
 AUTHORIZED_DOMAIN = os.environ.get('AUTHORIZED_DOMAIN', "")

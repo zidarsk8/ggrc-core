@@ -4,6 +4,7 @@
 */
 
 import * as CurrentPageUtils from '../../plugins/utils/current-page-utils';
+import * as DashboardUtils from '../../plugins/utils/dashboards-utils';
 import Ctrl from '../inner-nav-controller';
 
 describe('CMS.Controllers.InnerNav', function () {
@@ -66,77 +67,59 @@ describe('CMS.Controllers.InnerNav', function () {
     });
   });
 
-  describe('show_hide_titles() method', function () {
-    var DISPLAY_WIDTH = 1920;
-    var ctrlInst; // fake controller instance
-    var showHideTitles;
-    var options;
+  describe('"setTabsPriority" method', () => {
+    let method;
+    let options;
 
-    function createWidgets(titlesStatus) {
-      var widgets = [
-        {name: 'aaa', show_title: titlesStatus},
-        {name: 'bbb', show_title: titlesStatus},
-        {name: 'ccc', show_title: titlesStatus},
-        {name: 'ddd', show_title: titlesStatus},
-        {name: 'eee', show_title: titlesStatus},
-        {name: 'fff', show_title: titlesStatus},
-      ];
-      options.attr('widget_list', widgets);
-      return widgets;
-    }
-
-    function setWidgetsWidth(first, second) {
-      spyOn(Array.prototype, 'reduce').and.returnValues(first, second);
-    }
-
-    beforeEach(function () {
+    beforeEach(() => {
       options = new can.Map({
-        widget_list: new can.Observe.List([]),
-        dividedTabsMode: false,
+        widget_list: new can.Observe.List([
+          {name: 'aaa'},
+          {name: 'bbb'},
+          {name: 'ccc'},
+          {name: 'ddd'},
+          {name: 'eee'},
+          {name: 'fff'},
+        ]),
         priorityTabs: null,
+        notPriorityTabs: null,
       });
 
-      ctrlInst = {
-        element: {
-          children: jasmine.createSpy(),
-          width: jasmine.createSpy().and.returnValue(DISPLAY_WIDTH),
-        },
+      let ctrl = {
         options: options,
       };
 
-      spyOn(_, 'map')
-        .and
-        .returnValue([]);
-
-      spyOn(CurrentPageUtils, 'getPageType')
-        .and
-        .returnValue('Assessment');
-
-      showHideTitles = Ctrl.prototype.show_hide_titles.bind(ctrlInst);
+      method = Ctrl.prototype.setTabsPriority.bind(ctrl);
     });
 
-    afterEach(function () {
-      Array.prototype.reduce.calls.reset();
+    it('sets first 4 tabs as priority for audit', () => {
+      spyOn(CurrentPageUtils, 'getPageType').and.returnValue('Audit');
+      spyOn(DashboardUtils, 'isDashboardEnabled').and.returnValue(false);
+
+      method();
+
+      expect(options.priorityTabs.length).toEqual(4);
+      expect(options.notPriorityTabs.length).toEqual(2);
     });
 
-    it('doesnt hide titles if the width is enough', function () {
-      createWidgets(false);
+    it('sets first 5 tabs as priority for audit when dashboard is enabled',
+      () => {
+        spyOn(CurrentPageUtils, 'getPageType').and.returnValue('Audit');
+        spyOn(DashboardUtils, 'isDashboardEnabled').and.returnValue(true);
 
-      setWidgetsWidth(1500);
+        method();
 
-      showHideTitles();
+        expect(options.priorityTabs.length).toEqual(5);
+        expect(options.notPriorityTabs.length).toEqual(1);
+      });
 
-      expect(_.every(options.attr('widget_list'), 'show_title')).toBeTruthy();
-    });
+    it('sets all tabs as priority for all objects except audit', () => {
+      spyOn(CurrentPageUtils, 'getPageType').and.returnValue('any type');
 
-    it('doesnt hides titles if the width isnt enough', function () {
-      createWidgets(true);
+      method();
 
-      setWidgetsWidth(2500);
-
-      showHideTitles();
-
-      expect(_.every(options.widget_list, 'show_title')).toBeTruthy();
+      expect(options.priorityTabs.length).toEqual(6);
+      expect(options.notPriorityTabs).toEqual(null);
     });
   });
 });
