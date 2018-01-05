@@ -249,49 +249,7 @@ OR
 
 
 OP
-  = _* op:'=' _*
-    {
-      return {
-        name: op,
-      };
-    }
-  / _* op:'!=' _*
-    {
-      return {
-        name: op,
-      };
-    }
-  / _* op:'<=' _*
-    {
-      return {
-        name: op,
-      };
-    }
-  / _* op:'<' _*
-    {
-      return {
-        name: op,
-      };
-    }
-  / _* op:'>=' _*
-    {
-      return {
-        name: op,
-      };
-    }
-  / _* op:'>' _*
-    {
-      return {
-        name: op,
-      };
-    }
-  / _* op:'~' _*
-    {
-      return {
-        name: op,
-      };
-    }
-  / _* op:'!~' _*
+  = _* op:('=' / '!=' / '<=' / '<' / '>=' / '>' / '~' / '!~') _*
     {
       return {
         name: op,
