@@ -12,6 +12,10 @@ from ggrc.app import app
 
 from oauth2client import client
 
+_GOOGLE_AUTH_URI = "https://accounts.google.com/o/oauth2/auth"
+_GOOGLE_TOKEN_URI = "https://accounts.google.com/o/oauth2/token"
+_GOOGLE_API_GDRIVE_SCOPE = "https://www.googleapis.com/auth/drive"
+
 
 def get_http_auth():
   """Get valid user credentials from storage and create an authorized
@@ -49,23 +53,20 @@ def verify_credentials():
 @app.route("/authorize")
 def authorize_app():
   """Redirect to Google API auth page to authorize"""
-  redirect_back = flask.request.url
-  constructor_kwargs = {
-      'redirect_uri': flask.url_for("authorize_app", _external=True),
-      'auth_uri': 'https://accounts.google.com/o/oauth2/auth',
-      'token_uri': 'https://accounts.google.com/o/oauth2/token',
-  }
   flow = client.OAuth2WebServerFlow(
       settings.GAPI_CLIENT_ID,
       settings.GAPI_CLIENT_SECRET,
-      scope='https://www.googleapis.com/auth/drive',
-      **constructor_kwargs)
+      scope=_GOOGLE_API_GDRIVE_SCOPE,
+      redirect_uri=flask.url_for("authorize_app", _external=True),
+      auth_uri=_GOOGLE_AUTH_URI,
+      token_uri=_GOOGLE_TOKEN_URI,
+  )
   if 'code' not in flask.request.args:
-    auth_uri = flow.step1_get_authorize_url(state=redirect_back)
+    # `state` is where we want to redirect once the auth is done
+    auth_uri = flow.step1_get_authorize_url(state=flask.request.url)
     return flask.redirect(auth_uri)
-  else:
-    auth_code = flask.request.args.get('code')
-    credentials = flow.step2_exchange(auth_code)
-  # store credentials
+
+  auth_code = flask.request.args["code"]
+  credentials = flow.step2_exchange(auth_code)
   flask.session['credentials'] = credentials.to_json()
   return flask.redirect(flask.request.args['state'])
