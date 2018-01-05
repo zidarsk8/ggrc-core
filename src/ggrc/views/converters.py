@@ -20,8 +20,8 @@ from werkzeug.exceptions import (
 )
 
 from ggrc import settings
-from ggrc_gdrive_integration import verify_credentials
-from ggrc_gdrive_integration import file_actions as fa
+from ggrc.gdrive import verify_credentials
+from ggrc.gdrive import file_actions as fa
 from ggrc.app import app
 from ggrc.converters.base import Converter
 from ggrc.converters.import_helper import generate_csv_string

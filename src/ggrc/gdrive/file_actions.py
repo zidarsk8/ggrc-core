@@ -14,7 +14,7 @@ from werkzeug.exceptions import (
 )
 
 from ggrc.converters.import_helper import read_csv_file
-from ggrc_gdrive_integration import get_http_auth
+from ggrc.gdrive import get_http_auth
 
 
 def create_gdrive_file(csv_string, filename):
