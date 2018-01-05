@@ -137,7 +137,7 @@ describe('treeStatusFilter', () => {
     });
   });
 
-  describe('loadDefaultStates() method', () => {
+  describe('getDefaultStates() method', () => {
     let savedFilters;
     beforeEach(() => {
       savedFilters = new can.List(['c', 'd']);
@@ -153,7 +153,7 @@ describe('treeStatusFilter', () => {
       spyOn(queryFilters, 'filter').and.returnValue(['a']);
       router.attr('state', queryFilters);
 
-      viewModel.loadDefaultStates();
+      viewModel.getDefaultStates();
 
       expect(queryFilters.filter).toHaveBeenCalled();
     });
@@ -161,7 +161,7 @@ describe('treeStatusFilter', () => {
     it('use saved filters if set from query is not presented', () => {
       router.removeAttr('state');
 
-      viewModel.loadDefaultStates();
+      viewModel.getDefaultStates();
 
       expect(savedFilters.filter).toHaveBeenCalled();
     });
@@ -181,33 +181,80 @@ describe('treeStatusFilter', () => {
       ]);
     });
 
-    describe('when new value was added', () => {
+    describe('when component is not disabled', () => {
       beforeEach(() => {
-        handler(null, null, ['A']);
+        viewModel.attr('disabled', false);
       });
 
-      it('initializes states', () => {
-        expect(viewModel.initializeFilter).toHaveBeenCalledWith(['A']);
+      describe('and new value was added', () => {
+        beforeEach(() => {
+          handler(null, null, ['A']);
+        });
+        it('initializes states', () => {
+          expect(viewModel.initializeFilter).toHaveBeenCalledWith(['A']);
+        });
+        it('dispatches "filter" event', () => {
+          expect(viewModel.dispatch).toHaveBeenCalledWith('filter');
+        });
       });
 
-      it('dispatches "filter" event', () => {
-        expect(viewModel.dispatch).toHaveBeenCalledWith('filter');
+      describe('and value was removed', () => {
+        beforeEach(() => {
+          handler(null, null, null);
+        });
+        it('initializes states', () => {
+          expect(viewModel.initializeFilter.calls.argsFor(0)[0].attr())
+            .toEqual(['A', 'B']);
+        });
+        it('dispatches "filter" event', () => {
+          expect(viewModel.dispatch).toHaveBeenCalledWith('filter');
+        });
       });
     });
 
-    describe('when value was removed', () => {
+    describe('when component is disabled', () => {
       beforeEach(() => {
-        handler(null, null, null);
+        viewModel.attr('disabled', true);
+        handler();
       });
 
-      it('initializes states', () => {
-        expect(viewModel.initializeFilter.calls.argsFor(0)[0].attr())
-          .toEqual(['A', 'B']);
+      it('does not initialize states', () => {
+        expect(viewModel.initializeFilter).not.toHaveBeenCalled();
       });
 
-      it('dispatches "filter" event', () => {
-        expect(viewModel.dispatch).toHaveBeenCalledWith('filter');
+      it('does not dispatch an event', () => {
+        expect(viewModel.dispatch).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('"{viewModel} disabled" event handler', () => {
+    let handler;
+    let defaultFilters;
+    beforeEach(() => {
+      handler = Component.prototype.events['{viewModel} disabled'].bind({
+        viewModel,
+      });
+      defaultFilters = ['A', 'B'];
+      spyOn(viewModel, 'initializeFilter');
+      spyOn(viewModel, 'getDefaultStates').and.returnValue(defaultFilters);
+    });
+
+    it('initializes empty filter if component is disabled', () => {
+      viewModel.attr('disabled', true);
+
+      handler();
+
+      expect(viewModel.initializeFilter).toHaveBeenCalledWith([]);
+    });
+
+    it('initializes default filter if component is not disabled', () => {
+      viewModel.attr('disabled', false);
+
+      handler();
+
+      expect(viewModel.getDefaultStates).toHaveBeenCalled();
+      expect(viewModel.initializeFilter).toHaveBeenCalledWith(defaultFilters);
     });
   });
 });
