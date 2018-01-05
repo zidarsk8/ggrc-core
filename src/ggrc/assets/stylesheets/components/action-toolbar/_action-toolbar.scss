@@ -3,16 +3,24 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-.action-toolbar {
-  position: relative;
-  display: flex;
-  min-width: 0;
-
+@mixin action-toolbar-controls {
   &:hover {
     .action-toolbar__controls {
       display: flex;
     }
   }
+}
+
+.action-toolbar-container {
+  @include action-toolbar-controls;
+}
+
+.action-toolbar {
+  position: relative;
+  display: flex;
+  min-width: 0;
+
+  @include action-toolbar-controls;
 
   &__controls {
     display: none;
