@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Ctrl from '../archive_modal_controller';
+import Ctrl from '../modals/archive_modal_controller';
 
 describe('ToggleArchive modal', function () {
   'use strict';
