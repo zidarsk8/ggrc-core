@@ -715,4 +715,46 @@ describe('GGRC.Components.treeWidgetContainer', function () {
       expect(vm.setSortingConfiguration).toHaveBeenCalled();
     });
   });
+
+  describe('getDepthFilter() method', function () {
+    it('returns an empty string if depth is not set for filter', function () {
+      let result;
+      spyOn(vm, 'attr')
+        .and.returnValue([{
+          filter: '"task assignees" = "user@example.com"',
+          operation: 'AND',
+          name: 'custom',
+        }, {
+          filter: '"state" = "Assigned"',
+          operation: 'AND',
+          name: 'custom',
+        }]);
+
+      result = vm.getDepthFilter();
+
+      expect(result).toBe('');
+    });
+
+    it('returns filter that applied for depth', function () {
+      let result;
+      spyOn(vm, 'attr')
+        .and.returnValue([{
+          filter: '"task assignees" = "user@example.com"',
+          operation: 'AND',
+          name: 'custom',
+          depth: true,
+          filterDeepLimit: 2,
+        }, {
+          filter: '"state" = "Assigned"',
+          operation: 'AND',
+          name: 'custom',
+          depth: true,
+          filterDeepLimit: 1,
+        }]);
+
+      result = vm.getDepthFilter(1);
+
+      expect(result).toBe('"task assignees" = "user@example.com"');
+    });
+  });
 });

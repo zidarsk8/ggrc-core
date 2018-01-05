@@ -29,7 +29,11 @@ import template from './templates/tree-filter-input.mustache';
       isExpression: {
         type: 'boolean',
         value: false
-      }
+      },
+      filterDeepLimit: {
+        type: 'number',
+        value: 0,
+      },
     },
     disabled: false,
     showAdvanced: false,
@@ -40,10 +44,12 @@ import template from './templates/tree-filter-input.mustache';
       var filter = this.attr('filter');
       var operation = this.attr('operation');
       var depth = this.attr('depth');
+      var filterDeepLimit = this.attr('filterDeepLimit');
 
       options.attr('filter', filter);
       options.attr('operation', operation);
       options.attr('depth', depth);
+      options.attr('filterDeepLimit', filterDeepLimit);
       options.attr('name', 'custom');
 
       if (this.registerFilter) {

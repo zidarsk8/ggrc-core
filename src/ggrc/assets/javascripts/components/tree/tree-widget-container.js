@@ -375,12 +375,14 @@ viewModel = can.Map.extend({
     this.loadItems().then(stopFn);
     this.closeInfoPane();
   },
-  getDepthFilter: function () {
+  getDepthFilter: function (deepLevel) {
     var filters = can.makeArray(this.attr('filters'));
 
     return filters.filter(function (options) {
-      return options.filter && options.depth;
-    }).reduce(this._concatFilters, '');
+      return options.filter &&
+        options.depth &&
+        options.filterDeepLimit > deepLevel;
+    }).reduce(this._combineFilters, '');
   },
   setRefreshFlag: function (refresh) {
     this.attr('refreshLoaded', refresh);
@@ -423,6 +425,25 @@ viewModel = can.Map.extend({
         operation);
     } else if (options.filter) {
       filter = GGRC.query_parser.parse(options.filter);
+    }
+
+    return filter;
+  },
+  /**
+   * Concatenation active filters into one string.
+   *
+   * @param {String} filter - Filter string
+   * @param {Object} options - Filter parameters
+   * @return {string} - Result of concatenation filters.
+   * @private
+   */
+  _combineFilters(filter, options) {
+    var operation = options.operation || 'AND';
+
+    if (filter) {
+      filter += ' ' + operation + ' ' + options.filter;
+    } else if (options.filter) {
+      filter = options.filter;
     }
 
     return filter;
