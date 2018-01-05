@@ -51,5 +51,5 @@ def translate_message(exception):
   return message
 
 
-class ValidationError(Exception):
+class ValidationError(ValueError):
   pass

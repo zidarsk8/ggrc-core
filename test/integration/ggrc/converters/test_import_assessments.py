@@ -167,6 +167,47 @@ class TestAssessmentImport(TestCase):
     self.assertEqual({u'evidence title 1'},
                      {i.title for i in asmt1.document_evidence})
 
+  @ddt.data(
+      (True, True),
+      (False, False),
+  )
+  @ddt.unpack
+  def test_error_ca_import_states(self, dry_run, has_error):
+    """Test changing state of Assessment with unfilled mandatory CA"""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      asmnt = factories.AssessmentFactory(audit=audit)
+      factories.CustomAttributeDefinitionFactory(
+          title="def1",
+          definition_type="assessment",
+          definition_id=asmnt.id,
+          attribute_type="Date",
+          mandatory=True,
+      )
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmnt.slug),
+        ("Audit", audit.slug),
+        ("Assignees", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Test title"),
+        ("State", "Completed"),
+    ]), dry_run=dry_run)
+    expected_errors = {
+        "Assessment": {
+            "row_errors": {
+                errors.VALIDATION_ERROR.format(
+                    line=3,
+                    column_name="State",
+                    message="CA-introduced completion preconditions are not "
+                            "satisfied. Check preconditions_failed of items "
+                            "of self.custom_attribute_values"
+                )
+            }
+        }
+    }
+    self._check_csv_response(response, expected_errors if has_error else {})
+
   def test_assessment_warnings_errors(self):
     """ Test full assessment import with warnings and errors
 
@@ -582,6 +623,32 @@ class TestAssessmentImport(TestCase):
     self.assertEqual(
         models.Assessment.query.get(assessment.id).status,
         models.Assessment.DEPRECATED)
+
+  def test_asmnt_cads_update_completed(self):
+    """Test update of assessment without cads."""
+    with factories.single_commit():
+      audit = factories.AuditFactory()
+      asmnt = factories.AssessmentFactory(audit=audit)
+      factories.CustomAttributeDefinitionFactory(
+          title="CAD",
+          definition_type="assessment",
+          definition_id=asmnt.id,
+          attribute_type="Text",
+          mandatory=True,
+      )
+    data = OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", asmnt.slug),
+        ("Audit", audit.slug),
+        ("Assignees", "user@example.com"),
+        ("Creators", "user@example.com"),
+        ("Title", "Test title"),
+        ("State", "Completed"),
+        ("CAD", "Some value"),
+    ])
+    for dry_run in [True, False]:
+      response = self.import_data(data, dry_run=dry_run)
+      self._check_csv_response(response, {})
 
 
 @ddt.ddt
