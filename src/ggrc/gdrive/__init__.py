@@ -6,22 +6,12 @@
 import httplib2
 
 import flask
-from flask import Blueprint
 
 from ggrc import db             # noqa
 from ggrc import settings       # noqa
 from ggrc.app import app        # noqa
 
 from oauth2client import client
-
-
-blueprint = Blueprint(
-    'gdrive',
-    __name__,
-    template_folder='templates',
-    static_folder='static',
-    static_url_path='/static/ggrc_gdrive_integration',
-)
 
 
 def get_http_auth():
