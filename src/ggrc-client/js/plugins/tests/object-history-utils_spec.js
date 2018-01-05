@@ -6,7 +6,7 @@
 import {
   buildRoleACL,
   buildModifiedListField,
-} from '../../plugins/utils/object-history-utils';
+} from '../utils/object-history-utils';
 
 describe('"buildModifiedACL" method', () => {
   it('should not add duplicates', () => {

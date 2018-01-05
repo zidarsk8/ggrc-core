@@ -5,8 +5,8 @@
 
 import '../assessment/people/lhn-popup-people';
 import '../tasks-counter/tasks-counter';
-import logo from '../../../../../ggrc-client/images/ggrc-logo.svg';
-import oneColorLogo from '../../../../../ggrc-client/images/ggrc-one-color.svg';
+import logo from '../../../images/ggrc-logo.svg';
+import oneColorLogo from '../../../images/ggrc-one-color.svg';
 import {
   isMyAssessments,
 } from '../../plugins/utils/current-page-utils';
