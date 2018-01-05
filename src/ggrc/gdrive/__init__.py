@@ -7,9 +7,8 @@ import httplib2
 
 import flask
 
-from ggrc import db             # noqa
-from ggrc import settings       # noqa
-from ggrc.app import app        # noqa
+from ggrc import settings
+from ggrc.app import app
 
 from oauth2client import client
 
