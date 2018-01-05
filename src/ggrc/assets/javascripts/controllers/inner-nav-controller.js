@@ -17,16 +17,15 @@ export default can.Control({
     internav_view: '/static/mustache/dashboard/internav_list.mustache',
     pin_view: '.pin-content',
     widget_list: null,
+    priorityTabs: null,
+    notPriorityTabs: null,
     spinners: {},
     contexts: null,
     instance: null,
     isMenuVisible: true,
-    addTabTitle: 'Add Tab',
-    hideTabTitle: 'Hide',
-    dividedTabsMode: false,
-    priorityTabs: null,
     counts: null,
     hasHiddenWidgets: false,
+    showAddTabButton: true,
   },
 }, {
   init: function (options) {
@@ -42,34 +41,22 @@ export default can.Control({
       if (!(this.options.contexts instanceof can.Observe)) {
         this.options.attr('contexts', new can.Observe(this.options.contexts));
       }
+      this.options.attr('showAddTabButton',
+        !['Audit', 'Person'].includes(getPageType()));
 
       router.bind('widget', (ev, newVal)=>{
         this.route(newVal);
       });
 
-      can.view(this.options.internav_view, this.options, function (frag) {
+      can.view(this.options.internav_view, this.options, (frag) => {
         const isAuditScope = instance.type === 'Audit';
-        const fn = function () {
-          this.element.append(frag);
-          if (isAuditScope) {
-            const priorityTabsNum = 4 +
-              isDashboardEnabled(instance);
-            this.element.addClass(this.options.instance.type.toLowerCase());
-            this.options.attr('addTabTitle', 'Add Scope');
-            this.options.attr('hideTabTitle', 'Show Audit Scope');
-            this.options.attr('dividedTabsMode', true);
-            this.options.attr('priorityTabs', priorityTabsNum);
-          }
-          this.show_hide_titles();
-          this.route(router.attr('widget'));
-          delete this.delayed_display;
-        }.bind(this);
-
-        this.delayed_display = {
-          fn: fn,
-          timeout: setTimeout(fn, 50),
-        };
-      }.bind(this));
+        this.element.append(frag);
+        if (isAuditScope) {
+          this.element.addClass(this.options.instance.type.toLowerCase());
+        }
+        this.setTabsPriority();
+        this.route(router.attr('widget'));
+      });
 
       this.on();
     }.bind(this));
@@ -149,24 +136,6 @@ export default can.Control({
       _.sortByAll(this.options.widget_list, ['order', 'internav_display']));
   },
 
-  update_widget_list: function (widgetElements) {
-    var widgetList = this.options.widget_list.slice(0);
-    var that = this;
-
-    can.each(widgetElements, function (widgetElement, index) {
-      widgetList.splice(
-        can.inArray(
-          that.update_widget(widgetElement, index)
-          , widgetList)
-        , 1);
-    });
-
-    can.each(widgetList, function (widget) {
-      that.options.widget_list
-        .splice(can.inArray(widget, that.options.widget_list), 1);
-    });
-  },
-
   update_widget: function (widgetElement, index) {
     var $widget = $(widgetElement);
     var widget = this.widget_by_selector('#' + $widget.attr('id'));
@@ -183,11 +152,6 @@ export default can.Control({
 
     function getWidgetType(widgetId) {
       return isObjectVersion(widgetId) ? 'version' : '';
-    }
-
-    if (this.delayed_display) {
-      clearTimeout(this.delayed_display.timeout);
-      this.delayed_display.timeout = setTimeout(this.delayed_display.fn, 50);
     }
 
     // If the metadata is unrendered, find it via options
@@ -289,31 +253,17 @@ export default can.Control({
     });
     this.options.attr('hasHiddenWidgets', hasHiddenWidgets);
   },
-
-  show_hide_titles: function () {
-    const pageType = getPageType();
-    const originalWidgets = this.options.widget_list;
-    const priorityTabsNum = this.options.attr('priorityTabs');
-    const priorityTabs = originalWidgets.slice(0, priorityTabsNum);
-    const notPriorityTabs = originalWidgets.slice(priorityTabsNum);
-
-    function hideTitles(widgets) {
-      widgets.forEach(function (widget) {
-        widget.attr('show_title', false);
-      });
-    }
-
-    function showTitles(widgets) {
-      widgets.forEach(function (widget) {
-        widget.attr('show_title', true);
-      });
-    }
+  setTabsPriority: function () {
+    let pageType = getPageType();
+    let widgets = this.options.attr('widget_list');
+    let instance = this.options.attr('instance');
 
     if (pageType === 'Audit') {
-      showTitles(priorityTabs);
-      hideTitles(notPriorityTabs);
+      let priorityTabsNum = 4 + isDashboardEnabled(instance);
+      this.options.attr('priorityTabs', widgets.slice(0, priorityTabsNum));
+      this.options.attr('notPriorityTabs', widgets.slice(priorityTabsNum));
     } else {
-      showTitles(originalWidgets);
+      this.options.attr('priorityTabs', widgets);
     }
   },
   '.closed click': function (el, ev) {
@@ -348,16 +298,7 @@ export default can.Control({
     }
   },
   '.not-priority-hide click': function (el) {
-    var count = this.options.attr('priorityTabs') + 1;
-    var hiddenAreaSelector = 'li:nth-child(n+' + count + '):not(:last-child)';
-    var $hiddenArea = this.element.find(hiddenAreaSelector);
-
     this.options.attr('isMenuVisible', !this.options.isMenuVisible);
-    if (this.options.isMenuVisible) {
-      $hiddenArea.show();
-    } else {
-      $hiddenArea.hide();
-    }
   },
   '{counts} change': function () {
     this.update_add_more_link();

@@ -353,6 +353,7 @@ export default GGRC.Components('mapperResults', {
         })
         .always(function () {
           this.attr('isLoading', false);
+          this.dispatch('loaded');
         }.bind(this));
       return dfd;
     },

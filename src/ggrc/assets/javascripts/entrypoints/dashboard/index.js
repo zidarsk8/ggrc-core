@@ -51,3 +51,5 @@ import '../../components/custom-roles/custom-roles';
 import '../../components/custom-roles/custom-roles-modal';
 
 import '../../common-handlers';
+
+import '../modules';
