@@ -186,5 +186,5 @@ def create_related_roles(context):
               object_type=rel_model.__name__,
               object_id=rel_id,
               parent=p_acl,
-              modified_by=login.get_current_user(),
+              modified_by_id=login.get_current_user_id(),
           ))

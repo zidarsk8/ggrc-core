@@ -99,17 +99,23 @@ class TestWorkflowsApiPost(TestCase):
     response = self.api.post(all_models.TaskGroup, data)
     self.assertEqual(response.status_code, 201)
 
+    workflow = all_models.Workflow.query.one()
     task_group = all_models.TaskGroup.query.one()
 
-    exst_acl = all_models.AccessControlList.eager_query().filter(
+    actual_acl = all_models.AccessControlList.eager_query().filter(
         all_models.AccessControlList.person_id == task_group.contact_id,
     ).all()
-    workflow = all_models.Workflow.query.one()
-    self.assertEqual(len(exst_acl), 1)
-    self.assertEqual(exst_acl[0].object_type, workflow.type)
-    self.assertEqual(exst_acl[0].object_id, workflow.id)
-    self.assertEqual(exst_acl[0].ac_role.name, role_name)
-    self.assertFalse(exst_acl[0].parent_id)
+    self.assertEqual(len(actual_acl), 2)
+
+    expected = {
+        role_name: (workflow.type, workflow.id),
+        "{} Mapped".format(role_name): (task_group.type, task_group.id)
+    }
+    actual = {
+        acl.ac_role.name: (acl.object_type, acl.object_id)
+        for acl in actual_acl
+    }
+    self.assertDictEqual(expected, actual)
 
   def test_task_group_assignee_gets_workflow_member(self):  # noqa pylint: disable=invalid-name
     """Test TaskGroup assignee gets WorkflowMember role."""
