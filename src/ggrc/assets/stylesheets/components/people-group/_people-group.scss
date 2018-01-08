@@ -80,6 +80,7 @@
 
   .editable-people-group {
     margin-bottom: 20px;
+    @include action-toolbar-controls;
 
     .editable-people-group__label {
       line-height: 28px;
