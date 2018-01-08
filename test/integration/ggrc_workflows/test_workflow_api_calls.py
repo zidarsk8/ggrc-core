@@ -41,6 +41,72 @@ class TestWorkflowsApiPost(TestCase):
   def tearDown(self):
     pass
 
+  @ddt.data('Admin', 'Workflow Member')
+  def test_task_group_assignee_has_workflow_role(self, role_name):  # noqa pylint: disable=invalid-name
+    """Test TaskGroup assignee already has Workflow role."""
+    data = self.get_workflow_dict()
+    init_acl = {
+        self.people_ids[0]: WF_ROLES['Admin'],
+        self.people_ids[1]: WF_ROLES[role_name],
+    }
+    data['workflow']['access_control_list'] = acl_helper.get_acl_list(init_acl)
+    response = self.api.post(all_models.Workflow, data)
+    self.assertEqual(response.status_code, 201)
+
+    data = self.get_task_group_dict(response.json["workflow"])
+    data["task_group"]["contact"]["id"] = self.people_ids[1]
+    data["task_group"]["contact"]["href"] = "/api/people/{}".format(
+        self.people_ids[1])
+    response = self.api.post(all_models.TaskGroup, data)
+    self.assertEqual(response.status_code, 201)
+
+    task_group = all_models.TaskGroup.query.one()
+
+    exst_acl = all_models.AccessControlList.eager_query().filter(
+        all_models.AccessControlList.person_id == task_group.contact_id,
+    ).all()
+    workflow = all_models.Workflow.query.one()
+    self.assertEqual(len(exst_acl), 1)
+    self.assertEqual(exst_acl[0].object_type, workflow.type)
+    self.assertEqual(exst_acl[0].object_id, workflow.id)
+    self.assertEqual(exst_acl[0].ac_role.name, role_name)
+    self.assertFalse(exst_acl[0].parent_id)
+
+  def test_task_group_assignee_gets_workflow_member(self):  # noqa pylint: disable=invalid-name
+    """Test TaskGroup assignee gets WorkflowMember role."""
+    data = self.get_workflow_dict()
+    init_acl = {
+        self.people_ids[0]: WF_ROLES['Admin'],
+        self.people_ids[1]: WF_ROLES['Workflow Member'],
+    }
+    data['workflow']['access_control_list'] = acl_helper.get_acl_list(init_acl)
+    response = self.api.post(all_models.Workflow, data)
+    self.assertEqual(response.status_code, 201)
+
+    data = self.get_task_group_dict(response.json["workflow"])
+    data["task_group"]["contact"]["id"] = self.people_ids[2]
+    data["task_group"]["contact"]["href"] = "/api/people/{}".format(
+        self.people_ids[2])
+    response = self.api.post(all_models.TaskGroup, data)
+    self.assertEqual(response.status_code, 201)
+
+    workflow = all_models.Workflow.query.one()
+    task_group = all_models.TaskGroup.query.one()
+
+    parent_acl = all_models.AccessControlList.eager_query().filter(
+        all_models.AccessControlList.person_id == task_group.contact_id,
+        all_models.AccessControlList.object_type == workflow.type,
+        all_models.AccessControlList.object_id == workflow.id
+    ).one()
+    tg_acl = all_models.AccessControlList.eager_query().filter(
+        all_models.AccessControlList.person_id == task_group.contact_id,
+        all_models.AccessControlList.object_type == task_group.type,
+        all_models.AccessControlList.object_id == task_group.id
+    ).one()
+    self.assertEqual(parent_acl.ac_role.name, "Workflow Member")
+    self.assertEqual(tg_acl.parent_id, parent_acl.id)
+    self.assertEqual(tg_acl.ac_role.name, "Workflow Member Mapped")
+
   def _create_propagation_acl_test_data(self):  # noqa pylint: disable=invalid-name
     """Create objects for Workflow ACL propagation test."""
     with freezegun.freeze_time("2017-08-9"):
