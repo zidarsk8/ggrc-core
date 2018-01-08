@@ -1,5 +1,5 @@
 /* !
-    Copyright (C) 2017 Google Inc.
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -7,14 +7,14 @@ import Component from '../issue-tracker-switcher';
 
 describe('GGRC.Components.issueTrackerSwitcher', () => {
   let viewModel;
-  
+
   beforeAll(() => {
     viewModel = new (can.Map.extend(Component.prototype.viewModel));
   });
 
   describe('"convertToBool" method', () => {
     let convertToBoolMethod;
-    
+
     beforeAll(() => {
       convertToBoolMethod = viewModel.convertToBool;
     });
@@ -54,7 +54,7 @@ describe('GGRC.Components.issueTrackerSwitcher', () => {
     let setDefaultIssueTitle;
     let instance;
     let issueTracker;
-    
+
     beforeEach(() => {
       instance = {
         issue_tracker: {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Google Inc.
+ * Copyright (C) 2018 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -27,10 +27,10 @@ describe("GDrive integration models", function() {
        // Error: spyOn could not find an object to spy upon for request()
        //       at Object.<anonymous> (/vagrant/src/ggrc_gdrive_integration/assets/js_specs/models/gdrive_models_spec.js:24:19)
        //       Chrome 39.0.2171 (Linux): Executed 129 of 146 (1 FAILED) (0.228 secs / 0.182 secs)
-              
+
     /*
     describe("::findAll", function() {
-      
+
 
       it("calls the root when parentfolderid is not supplied", function() {
         var returned;
