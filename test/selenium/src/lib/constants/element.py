@@ -129,8 +129,8 @@ class Common(object):
   STATE = Base.STATE
   # fictional elements (need to convert UI attrs to Entities attrs)
   CAS = "CAs"
-  MODIFIED_BY = "Modified by"
-  CREATED_AT = "Created at"
+  MODIFIED_BY = "Last updated by"
+  CREATED_AT = "Created date"
   UPDATED_AT = "Updated at"
 
 
