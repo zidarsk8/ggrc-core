@@ -9,6 +9,7 @@ from sqlalchemy import or_
 from ggrc import db
 from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
+from ggrc.access_control import role
 from ggrc.models.associationproxy import association_proxy
 from ggrc.models.mixins import (
     Titled, Slugged, Described, Timeboxed, WithContact
@@ -81,6 +82,23 @@ class TaskGroup(
       },
   }
 
+  def ensure_assignee_is_workflow_member(self):  # pylint: disable=invalid-name
+    """Add Workflow Member role to user without role in scope of Workflow."""
+    people_with_role_ids = (
+        self.workflow.get_person_ids_for_rolename("Admin") +
+        self.workflow.get_person_ids_for_rolename("Workflow Member"))
+    if self.contact.id in people_with_role_ids:
+      return
+    wf_member_role_id = next(
+        ind for ind, name in role.get_custom_roles_for("Workflow").iteritems()
+        if name == "Workflow Member")
+    all_models.AccessControlList(
+        person=self.contact,
+        ac_role_id=wf_member_role_id,
+        object=self.workflow,
+        modified_by=get_current_user(),
+    )
+
   def copy(self, _other=None, **kwargs):
     columns = [
         'title', 'description', 'workflow', 'sort_index', 'modified_by',
@@ -93,6 +111,8 @@ class TaskGroup(
       kwargs["contact"] = get_current_user()
 
     target = self.copy_into(_other, columns, **kwargs)
+
+    target.ensure_assignee_is_workflow_member()
 
     if kwargs.get('clone_objects', False):
       self.copy_objects(target, **kwargs)

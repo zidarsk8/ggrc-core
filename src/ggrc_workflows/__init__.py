@@ -459,29 +459,6 @@ def update_cycle_task_group_parent_state(objs):
     Signals.status_change.send(models.Cycle, objs=updated_cycles)
 
 
-def ensure_tg_assignee_is_workflow_member(workflow, assignee):
-  """Add Workflow Member role to user without role in scope of Worklfow.
-
-  Args:
-      workflow: Workflow instance
-      assignee: TaskGroup assignee person
-  """
-  people_with_role_ids = (
-      workflow.get_person_ids_for_rolename("Admin") +
-      workflow.get_person_ids_for_rolename("Workflow Member"))
-  if assignee.id in people_with_role_ids:
-    return
-  wf_member_role_id = next(
-      ind for ind, name in role.get_custom_roles_for("Workflow").iteritems()
-      if name == "Workflow Member")
-  all_models.AccessControlList(
-      person=assignee,
-      ac_role_id=wf_member_role_id,
-      object=workflow,
-      modified_by=get_current_user(),
-  )
-
-
 # TODO: remove in scope of GGRC-3925
 def ensure_assignee_is_workflow_member(workflow, assignee, assignee_id=None):
   """Checks what role assignee has in the context of
@@ -592,7 +569,7 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa py
   # TODO: remove in scope of GGRC-3925
   ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
 
-  ensure_tg_assignee_is_workflow_member(obj.workflow, obj.contact)
+  obj.ensure_assignee_is_workflow_member()
   calculate_new_next_cycle_start_date(obj.workflow)
 
 
@@ -610,7 +587,7 @@ def handle_task_group_put(sender, obj=None, src=None, service=None):  # noqa pyl
     # TODO: remove in scope of GGRC-3925
     ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
 
-    ensure_tg_assignee_is_workflow_member(obj.workflow, obj.contact)
+    obj.ensure_assignee_is_workflow_member()
   calculate_new_next_cycle_start_date(obj.workflow)
 
 
