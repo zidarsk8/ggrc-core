@@ -860,7 +860,7 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
     source_workflow = models.Workflow.query.filter_by(
         id=source_workflow_id
     ).first()
-    source_workflow.copy(obj)
+    source_workflow.copy(obj, clone_people=src.get('clone_people', False))
     obj.title = source_workflow.title + ' (copy ' + str(obj.id) + ')'
 
   # get the personal context for this logged in user
