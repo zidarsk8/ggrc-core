@@ -3,13 +3,13 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import Component from '../tree-field';
+import viewModel from '../aggregate-field-vm';
 
-describe('tree-field component', () => {
+describe('aggregate field viewModel', () => {
   let vm;
 
-  beforeEach(() => {
-    vm = getComponentVM(Component);
+  beforeEach(()=> {
+    vm = new viewModel();
   });
 
   describe('refreshItems() method', () => {
