@@ -184,8 +184,7 @@ describe('GGRC.Components.advancedSearchMappingCriteria', function () {
       expect(viewModel.availableAttributes()).toBe(attributes);
       expect(TreeViewUtils.getColumnsForModel).toHaveBeenCalledWith(
         'test',
-        null,
-        true
+        null
       );
     });
   });

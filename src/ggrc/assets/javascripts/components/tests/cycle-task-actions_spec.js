@@ -23,7 +23,6 @@ describe('GGRC.Components.subTreeWrapper', function () {
 
     beforeEach(function () {
       spyOn(vm, 'setStatus');
-      spyOn(vm, 'dispatch');
 
       vm.attr('oldValues', []);
       vm.attr('instance', {
@@ -42,7 +41,6 @@ describe('GGRC.Components.subTreeWrapper', function () {
 
       expect(vm.attr('oldValues').length).toEqual(1);
       expect(vm.attr('oldValues')[0].status).toEqual('InProgress');
-      expect(vm.dispatch).not.toHaveBeenCalled();
       expect(vm.setStatus).toHaveBeenCalledWith('Verified');
     });
 
@@ -56,7 +54,6 @@ describe('GGRC.Components.subTreeWrapper', function () {
 
         expect(vm.attr('oldValues').length).toEqual(1);
         expect(vm.attr('oldValues')[0].status).toEqual('InProgress');
-        expect(vm.dispatch).toHaveBeenCalled();
         expect(vm.setStatus).toHaveBeenCalledWith('Verified');
       });
   });

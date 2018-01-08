@@ -585,9 +585,12 @@ class TestSnapshots(base.Test):
     expected_control = audit_with_one_control["new_control_rest"][0].repr_ui()
     controls_ui_service = webui_service.ControlsService(
         selenium, is_versions_widget=is_issue_flow)
-    controls_ui_service.export_objs_via_tree_view(src_obj=dynamic_objects)
+    exported_file_name = (
+        controls_ui_service.
+        export_objs_via_tree_view_and_get_file_name(src_obj=dynamic_objects))
     actual_controls = controls_ui_service.get_list_objs_from_csv(
-        path_to_export_dir=create_tmp_dir)
+        path_to_export_dir=create_tmp_dir,
+        exported_file_name=exported_file_name)
     # 'actual_controls': created_at, updated_at,
     #                    custom_attributes (GGRC-2344) (None)
     self.general_equal_assert(
@@ -596,37 +599,47 @@ class TestSnapshots(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      "dynamic_objects, expected_state",
-      [("new_assessment_rest", element.AssessmentStates.NOT_STARTED),
-       pytest.mark.xfail(reason="Issue GGRC-1407", strict=True)(
-          ("new_issue_rest", element.IssueStates.DRAFT))],
-      indirect=["dynamic_objects"])
+      "dynamic_objects, dynamic_relationships, expected_state",
+      [("new_assessment_rest", None, element.AssessmentStates.NOT_STARTED),
+       (["new_assessment_rest", "new_issue_rest"],
+        "map_new_assessment_rest_to_new_control_rest_snapshot",
+        element.IssueStates.DRAFT)],
+      ids=["Mapping snapshot of Control to Assessment",
+           "Mapping Assessment with mapped snapshot of Control to Issue"],
+      indirect=["dynamic_objects", "dynamic_relationships"])
   def test_asmt_and_issue_mapped_to_origin_control(
       self, create_audit_with_control_and_update_control,
-      dynamic_objects, expected_state, selenium
+      dynamic_objects, dynamic_relationships, expected_state, selenium
   ):
     """
-    Check Assessment or Issue was mapped to origin control after mapping
-    snapshot of control to Assessment or Issue.
-    Test parameters:
-      - check Assessment
-      - check Issue
+    Check Assessment, Issue was mapped to origin Control after mapping:
+    - snapshot of Control to Assessment;
+    - Assessment with mapped snapshot of Control to Issue.
     """
+    is_issue_flow = (isinstance(dynamic_objects, dict) and
+                     dynamic_objects.get("new_issue_rest") is not None)
     origin_control = create_audit_with_control_and_update_control[
         "update_control_rest"][0]
     snapshoted_control = create_audit_with_control_and_update_control[
         "new_control_rest"][0]
     expected_obj = (
-        dynamic_objects.repr_ui().update_attrs(status=expected_state))
-    (webui_service.ControlsService(selenium).map_objs_via_tree_view(
-        src_obj=expected_obj, dest_objs=[snapshoted_control]))
+        dynamic_objects.get("new_issue_rest") if is_issue_flow
+        else dynamic_objects).repr_ui().update_attrs(status=expected_state)
+    ui_mapping_service, src_obj, dest_objs = (
+        (webui_service.IssuesService(selenium),
+         dynamic_objects.get("new_assessment_rest"),
+         [dynamic_objects.get("new_issue_rest")]) if is_issue_flow else
+        (webui_service.ControlsService(selenium), expected_obj,
+         [snapshoted_control]))
+    ui_mapping_service.map_objs_via_tree_view(
+        src_obj=src_obj, dest_objs=dest_objs)
     actual_objs = (get_cls_webui_service(
         objects.get_plural(expected_obj.type))(selenium).
         get_list_objs_from_tree_view(src_obj=origin_control))
     # 'actual_controls': created_at, updated_at, custom_attributes (None)
     exclude_attrs = Representation.tree_view_attrs_to_exclude
-    if dynamic_objects.type == entities_factory.EntitiesFactory.obj_issue:
-      exclude_attrs = exclude_attrs + ("objects_under_assessment", )
+    if is_issue_flow:
+      exclude_attrs += ("objects_under_assessment", )
     self.general_equal_assert([expected_obj], actual_objs, *exclude_attrs)
 
   @pytest.mark.smoke_tests

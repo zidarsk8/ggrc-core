@@ -47,16 +47,36 @@
   {{/case}}
   {{#case 'assertions'}}
     {{#if instance.snapshot}}
-      <tree-field {source}="instance.assertions" {field}="'display_name'"/>
+      <sort-by {items}="instance.assertions" property-name="display_name">
+        {{#sortedItems}}
+          <tree-field {source}="sortedItems" {field}="'display_name'"/>
+        {{/sortedItems}}
+      </sort-by>
     {{else}}
-      <tree-field {source}="instance.assertions" {field}="'name'"/>
+      {{#using items=instance.assertions}}
+        <sort-by {items}="items" property-name="name">
+          {{#sortedItems}}
+            <tree-field {source}="sortedItems" {field}="'name'"/>
+          {{/sortedItems}}
+        </sort-by>
+      {{/using}}
     {{/if}}
   {{/case}}
   {{#case 'categories'}}
     {{#if instance.snapshot}}
-      <tree-field {source}="instance.categories" {field}="'display_name'"/>
+      <sort-by {items}="instance.categories" property-name="display_name">
+        {{#sortedItems}}
+          <tree-field {source}="sortedItems" {field}="'display_name'"/>
+        {{/sortedItems}}
+      </sort-by>
     {{else}}
-      <tree-field {source}="instance.categories" {field}="'name'"/>
+      {{#using items=instance.categories}}
+        <sort-by {items}="items" property-name="name">
+          {{#sortedItems}}
+            <tree-field {source}="sortedItems" {field}="'name'"/>
+          {{/sortedItems}}
+        </sort-by>
+      {{/using}}
     {{/if}}
   {{/case}}
   {{#case 'last_assessment_date'}}

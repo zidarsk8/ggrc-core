@@ -16,7 +16,7 @@
       {{>'/static/mustache/base_objects/general-page-header.mustache'}}
 
       <tab-container>
-        <tab-panel {(panels)}="panels" title-text="{{instance.type}}">
+        <tab-panel {(panels)}="panels" title-text="Attributes">
           <div class="info-pane__body">
             <div class="info-pane__main-content {{^if isSnapshot}}info-pane__main-content-with-sidebar{{/if}}">
               {{>'/static/mustache/base_objects/object-review.mustache'}}
@@ -174,16 +174,20 @@
                         #if' instance.snapshot '\
                         or #if' instance.isRevision}}
                           <ul>
-                            {{#assertions}}
-                              <li>{{display_name}}</li>
-                            {{/assertions}}
+                            <sort-by {items}="assertions" property-name="display_name">
+                              {{#sortedItems}}
+                                <li>{{display_name}}</li>
+                              {{/sortedItems}}
+                            </sort-by>
                           </ul>
                         {{else}}
                           {{#using items=assertions}}
                             <ul>
-                              {{#items}}
-                                <li>{{display_name}}</li>
-                              {{/items}}
+                              <sort-by {items}="items" property-name="name">
+                                {{#sortedItems}}
+                                  <li>{{name}}</li>
+                                {{/sortedItems}}
+                              </sort-by>
                             </ul>
                           {{/using}}
                         {{/if_helpers}}
@@ -198,16 +202,20 @@
                         #if' instance.snapshot '\
                         or #if' instance.isRevision}}
                           <ul>
-                            {{#categories}}
-                              <li>{{display_name}}</li>
-                            {{/categories}}
+                            <sort-by {items}="categories" property-name="display_name">
+                              {{#sortedItems}}
+                                <li>{{display_name}}</li>
+                              {{/sortedItems}}
+                            </sort-by>
                           </ul>
                         {{else}}
                           {{#using items=categories}}
                             <ul>
-                              {{#items}}
-                                <li>{{display_name}}</li>
-                              {{/items}}
+                              <sort-by {items}="items" property-name="name">
+                                {{#sortedItems}}
+                                  <li>{{name}}</li>
+                                {{/sortedItems}}
+                              </sort-by>
                             </ul>
                           {{/using}}
                         {{/if_helpers}}

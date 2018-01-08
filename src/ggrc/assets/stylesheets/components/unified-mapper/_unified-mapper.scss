@@ -231,22 +231,10 @@ mapper-results {
           white-space: normal;
           word-break: break-all;
           overflow: hidden;
-          display: -webkit-box;
-          -webkit-box-orient: vertical;
-        }
-
-        &.title {
-          .attr-value {
-            -webkit-line-clamp: 1;
-          }
-        }
-
-        &.notes .attr-value {
-          -webkit-line-clamp: 3;
         }
 
         &.description .attr-value {
-          -webkit-line-clamp: 6;
+          line-height: 18px;
         }
       }
     }
@@ -371,6 +359,11 @@ mapper-results-item-attrs {
   .attr {
     @include cell-styles();
 
+    white-space: normal;
+    height: 33px;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
     tree-field {
       div.tree-field__item {
         display: none;

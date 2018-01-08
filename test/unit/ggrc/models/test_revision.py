@@ -177,3 +177,43 @@ class TestCheckPopulatedContent(unittest.TestCase):
                     return_value={},):
       self.assertEqual(revision.populate_labels()["labels"],
                        expected)
+
+  @ddt.data(
+      ({}, {}),
+      ({"document_evidence": []}, {"document_evidence": []}),
+      (
+          {"document_evidence": [
+              {"link": u"aa", "title": u"bb", "display_name": u"bb"},
+          ]},
+          {"document_evidence": [
+              {"link": u"aa", "title": u"bb", "display_name": u"aa bb"},
+          ]}
+      ),
+      (
+          {"document_evidence": [
+              {"link": u"aa", "title": u"bb", "display_name": u"bb"},
+              {"link": u"aa\u5555", "title": u"", "display_name": u""},
+          ]},
+          {"document_evidence": [
+              {"link": u"aa", "title": u"bb", "display_name": u"aa bb"},
+              {"link": u"aa\u5555", "title": u"", "display_name": u"aa\u5555"},
+          ]}
+      ),
+  )
+  @ddt.unpack
+  def test_populated_content_evidence(self, content, expected_evidence):
+    """Test display names for document evidence in revision content.
+
+    The display name should contain link and title, like we used to have in
+    slugs.
+    """
+    obj = mock.Mock()
+    obj.id = self.object_id
+    obj.__class__.__name__ = self.object_type
+
+    revision = all_models.Revision(obj, mock.Mock(), mock.Mock(), content)
+
+    self.assertEqual(
+        revision._document_evidence_hack(),
+        expected_evidence,
+    )

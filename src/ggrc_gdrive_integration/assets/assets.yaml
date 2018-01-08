@@ -2,14 +2,3 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 dashboard-js-template-files:
-  - responses/gdrive_upload_evidence.mustache
-  - responses/gdrive_evidence_tree.mustache
-  - meetings/gcal_info.mustache
-  - gdrive/auth_button.mustache
-  - gdrive/gapi_errors.mustache
-  - gdrive/gdrive_folder.mustache
-  - gdrive/gdrive_file.mustache
-  - gdrive/confirm_buttons.mustache
-  - roles/gdrive_option_detail.mustache
-  - audits/gdrive_folder_picker.mustache
-  - workflows/gdrive_folder_picker.mustache

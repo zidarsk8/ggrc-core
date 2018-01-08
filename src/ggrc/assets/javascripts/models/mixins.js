@@ -192,7 +192,7 @@ import {isSnapshot} from '../plugins/utils/snapshot-utils';
 
   can.Model.Mixin('ca_update', {}, {
     after_save: function () {
-      this.attr('isReadyForRender', true);
+      this.dispatch('readyForRender');
     },
     info_pane_preload: function () {
       this.refresh();

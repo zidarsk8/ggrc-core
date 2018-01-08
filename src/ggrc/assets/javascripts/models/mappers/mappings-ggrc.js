@@ -456,9 +456,6 @@ import RefreshQueue from '../refresh_queue';
       urls: TypeFilter('related_objects', 'Document'),
       documents_and_urls: Multi(['documents', 'urls'])
     },
-    Meeting: {
-      _mixins: ['personable']
-    },
     MultitypeSearch: {
       _mixins: ['directive_object'],
       _canonical: {

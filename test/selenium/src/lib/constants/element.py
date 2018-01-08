@@ -129,8 +129,8 @@ class Common(object):
   STATE = Base.STATE
   # fictional elements (need to convert UI attrs to Entities attrs)
   CAS = "CAs"
-  MODIFIED_BY = "Modified by"
-  CREATED_AT = "Created at"
+  MODIFIED_BY = "Last updated by"
+  CREATED_AT = "Created date"
   UPDATED_AT = "Updated at"
 
 
@@ -164,7 +164,7 @@ class TransformationSetVisibleFields(CommonModalSetVisibleFields):
   SECONDARY_CONTACTS = roles.SECONDARY_CONTACTS
   VERIFIED = "Verified"
   STATUS = "Status"
-  AUDIT_CAPTAIN = "Audit Captain"
+  AUDIT_CAPTAINS = "Audit Captains"
   MANAGER = "Manager"
   MAPPED_OBJECTS = "Mapped Objects"
   REVIEW_STATE = "Review State"
@@ -192,7 +192,7 @@ class CommonAudit(Common):
   PLANNED_START_DATE = "Planned Start Date"
   PLANNED_END_DATE = "Planned End Date"
   PLANNED_REPORT_PERIOD = "Report Period"
-  AUDIT_CAPTAIN = "Audit Captain"
+  AUDIT_CAPTAINS = "Audit Captains"
   AUDIT_FIRM = " Audit Firm"
   AUDITORS = "Auditors"
   ADD_AUDITOR = "+ Add Auditor"
@@ -289,39 +289,28 @@ class IssueStates(ObjectStates):
 class ProgramInfoWidget(CommonProgram):
   """Elements' labels and properties for Programs Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonProgram.PROGRAM)
-  OBJECT_REVIEW_UPPER = ReviewStates.OBJECT_REVIEW.upper()
 
 
 class AuditInfoWidget(CommonAudit):
   """Elements' labels and properties for Audits Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonAudit.AUDIT)
-  TITLE_UPPER = CommonAudit.TITLE.upper()
-  AUDIT_CAPTAIN_UPPER = CommonAudit.AUDIT_CAPTAIN.upper()
-  CODE_UPPER = CommonAudit.CODE.upper()
 
 
 class ControlInfoWidget(CommonControl):
   """Elements' labels and properties for Controls Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonControl.CONTROL)
-  TITLE_UPPER = CommonControl.TITLE.upper()
-  CODE_UPPER = CommonControl.CODE.upper()
-  OBJECT_REVIEW_UPPER = ReviewStates.OBJECT_REVIEW.upper()
 
 
 class AssessmentInfoWidget(CommonAssessment):
   """Elements' labels and properties for Assessments Info widgets."""
   WIDGET_HEADER = Base.WIDGET_INFO_HEADER_FORMAT.format(CommonAssessment.ASMT)
-  TITLE_UPPER = CommonAssessment.TITLE.upper()
   TITLE_EDITED_PART = "[EDITED]"
-  CODE_UPPER = CommonAssessment.CODE.upper()
   COMMENTS_HEADER = "RESPONSES/COMMENTS"
 
 
 class IssueInfoWidget(CommonIssue):
   """Elements' labels and properties for Issue Info widgets."""
   TITLE_UPPER = CommonIssue.TITLE.upper()
-  CODE_UPPER = CommonIssue.CODE.upper()
-  OBJECT_REVIEW_UPPER = ReviewStates.OBJECT_REVIEW.upper()
 
 
 class AssessmentTemplateModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -409,9 +398,12 @@ class IssueModalSetVisibleFields(CommonModalSetVisibleFields):
       CommonIssue.ISSUE)
   ADMIN = TransformationSetVisibleFields.ADMIN
   REVIEW_STATE = TransformationSetVisibleFields.REVIEW_STATE
+  PRIMARY_CONTACTS = TransformationSetVisibleFields.PRIMARY_CONTACTS
   DEFAULT_SET_FIELDS = (
-      CommonModalSetVisibleFields.TITLE, ADMIN,
-      CommonModalSetVisibleFields.CODE, CommonModalSetVisibleFields.STATE)
+      CommonModalSetVisibleFields.TITLE, CommonModalSetVisibleFields.CODE,
+      CommonModalSetVisibleFields.STATE,
+      CommonModalSetVisibleFields.LAST_UPDATED_BY, REVIEW_STATE,
+      PRIMARY_CONTACTS, ADMIN)
 
 
 class ProgramModalSetVisibleFields(CommonModalSetVisibleFields):
@@ -460,13 +452,12 @@ class TransformationElements(TransformationSetVisibleFields, CommonAssessment):
 
 class TabContainer(object):
   """Elements' labels for Common Tab Container."""
-  OBJ_TAB = None
+  OBJ_TAB = "Attributes"
   CHANGE_LOG_TAB = "Change Log"
 
 
 class AuditTabContainer(TabContainer):
   """Elements' labels for Audit Tab Container."""
-  OBJ_TAB = "Audit"
 
 
 class AssessmentTabContainer(TabContainer):
@@ -479,27 +470,110 @@ class AssessmentTabContainer(TabContainer):
 
 class ControlTabContainer(TabContainer):
   """Elements' labels for Control Tab Container."""
-  OBJ_TAB = "Control"
 
 
 class OrgGroupTabContainer(TabContainer):
   """Elements' labels for OrgGroup Tab Container."""
-  OBJ_TAB = "OrgGroup"
 
 
 class ProgramTabContainer(TabContainer):
   """Elements' labels for Program Tab Container."""
-  OBJ_TAB = "Program"
 
 
 class RiskTabContainer(TabContainer):
   """Elements' labels for Risk Tab Container."""
-  OBJ_TAB = "Risk"
 
 
 class IssueTabContainer(TabContainer):
   """Elements' labels for Issue Tab Container."""
-  OBJ_TAB = "Issue"
+
+
+class StandardTabContainer(TabContainer):
+  """Elements' labels for Standard Tab Container."""
+
+
+class RegulationTabContainer(TabContainer):
+  """Elements' labels for Regulation Tab Container."""
+
+
+class SectionTabContainer(TabContainer):
+  """Elements' labels for Section Tab Container."""
+
+
+class ObjectiveTabContainer(TabContainer):
+  """Elements' labels for Objective Tab Container."""
+
+
+class ProductTabContainer(TabContainer):
+  """Elements' labels for Product Tab Container."""
+
+
+class SystemTabContainer(TabContainer):
+  """Elements' labels for System Tab Container."""
+
+
+class ProcessTabContainer(TabContainer):
+  """Elements' labels for Process Tab Container."""
+
+
+class AccessGroupTabContainer(TabContainer):
+  """Elements' labels for Access Group Tab Container."""
+
+
+class ClauseTabContainer(TabContainer):
+  """Elements' labels for Clause Tab Container."""
+
+
+class ContractTabContainer(TabContainer):
+  """Elements' labels for Contract Tab Container."""
+
+
+class DataAssetTabContainer(TabContainer):
+  """Elements' labels for Data Asset Tab Container."""
+
+
+class FacilityTabContainer(TabContainer):
+  """Elements' labels for Facility Tab Container."""
+
+
+class MarketTabContainer(TabContainer):
+  """Elements' labels for Market Tab Container."""
+
+
+class PolicyTabContainer(TabContainer):
+  """Elements' labels for Policy Tab Container."""
+
+
+class ProjectTabContainer(TabContainer):
+  """Elements' labels for Project Tab Container."""
+
+
+class ThreatTabContainer(TabContainer):
+  """Elements' labels for Threat Tab Container."""
+
+
+class VendorTabContainer(TabContainer):
+  """Elements' labels for Vendor Tab Container."""
+
+
+class RiskAssessmentTabContainer(TabContainer):
+  """Elements' labels for Risk Assessment Tab Container."""
+
+
+class WorkflowTabContainer(TabContainer):
+  """Elements' labels for Workflow Tab Container."""
+
+
+class CycleTaskTabContainer(TabContainer):
+  """Elements' labels for Cycle Task Tab Container."""
+
+
+class PersonTabContainer(TabContainer):
+  """Elements' labels for Person Tab Container."""
+
+
+class AssessmentTemplateTabContainer(TabContainer):
+  """Elements' labels for Assessment Template Tab Container."""
 
 
 class AsmtAttrsTab(object):

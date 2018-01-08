@@ -157,6 +157,12 @@ const ObjectOperationsBaseVM = can.Map.extend({
   onSubmit: function () {
     this.attr('submitCbs').fire();
   },
+  onLoaded(element) {
+    // set focus on the top modal window
+    $('.modal:visible')
+      .last()
+      .focus();
+  },
   prepareConfig: function (config) {
     this.update(config);
   },

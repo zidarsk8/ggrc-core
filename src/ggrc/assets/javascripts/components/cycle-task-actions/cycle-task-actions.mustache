@@ -17,7 +17,6 @@
           {{#if_equals instance.status 'Assigned'}}
             <button class="btn btn-mini btn-lightBlue"
                     ($click)="changeStatus"
-                    data-openclose="open"
                     data-value="InProgress">Start</button>
           {{/if_equals}}
           {{#if_equals instance.status 'InProgress'}}
@@ -43,7 +42,6 @@
                       data-value="Declined">Decline</button>
               <button class="btn btn-mini btn-green"
                       ($click)="changeStatus"
-                      data-openclose="close"
                       data-value="Verified">Verify</button>
             {{/if}}
           {{/if_equals}}

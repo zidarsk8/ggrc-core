@@ -27,6 +27,7 @@ import '../advanced-search/advanced-search-mapping-container';
 import '../bulk-update-button/bulk-update-button';
 import '../dropdown/multiselect-dropdown';
 import '../assessment_generator';
+import '../three-dots-menu/three-dots-menu';
 import template from './templates/tree-widget-container.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import {
@@ -223,12 +224,6 @@ viewModel = can.Map.extend({
         return !isMyAssessments();
       },
     },
-    disable3bbs: {
-      type: Boolean,
-      get: function () {
-        return this.attr('isSnapshots') && !this.attr('showedItems').length;
-      },
-    },
     noResults: {
       type: Boolean,
       get: function () {
@@ -338,7 +333,6 @@ viewModel = can.Map.extend({
     var columns = TreeViewUtils.getColumnsForModel(
       this.attr('model').model_singular,
       this.attr('displayPrefs'),
-      true,
       this.attr('optionsData').widgetId
     );
 

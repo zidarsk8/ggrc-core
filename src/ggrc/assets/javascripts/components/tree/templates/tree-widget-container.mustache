@@ -44,13 +44,7 @@
         {{{renderLive addItem}}}
       {{/if}}
       {{#if show3bbs}}
-      <div class="details-wrap">
-        <a class="btn {{#if disable3bbs}}disabled{{/if}} btn-3bbps dropdown-toggle" href="#" data-toggle="dropdown">
-          <span class="bubble"></span>
-          <span class="bubble"></span>
-          <span class="bubble"></span>
-        </a>
-        <ul class="dropdown-menu tree-action-list-items" role="menu">
+        <three-dots-menu>
           {{^if isSnapshots}}
             {{#is_allowed 'update' model.shortName context=parent_instance.context}}
               <li>
@@ -82,8 +76,7 @@
               </bulk-update-button>
             </li>
           {{/if}}
-        </ul>
-      </div>
+        </three-dots-menu>
       {{/if}}
     </div>
 

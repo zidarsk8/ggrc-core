@@ -62,7 +62,7 @@ import {getCustomAttributeType} from '../plugins/utils/ca-utils';
       this.scope.setItems(true);
     },
     events: {
-      '{scope.instance} isReadyForRender': function (sc, ev, isReady) {
+      '{scope.instance} readyForRender': function (sc, ev, isReady) {
         this.scope.setItems(isReady);
       },
     },

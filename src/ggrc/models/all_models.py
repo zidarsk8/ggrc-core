@@ -45,7 +45,6 @@ from ggrc.models.help import Help
 from ggrc.models.issue import Issue
 from ggrc.models.issuetracker_issue import IssuetrackerIssue
 from ggrc.models.market import Market
-from ggrc.models.meeting import Meeting
 from ggrc.models.notification import Notification
 from ggrc.models.notification import NotificationConfig
 from ggrc.models.notification import NotificationType
@@ -108,7 +107,6 @@ all_models = [  # pylint: disable=invalid-name
     Help,
     Label,
     Market,
-    Meeting,
     Objective,
     ObjectLabel,
     ObjectPerson,

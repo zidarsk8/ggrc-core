@@ -531,7 +531,11 @@ import Permission from '../permission';
         $el.focus();
       }, 1);
     }
-
+    // This is a hack to stop propagation for
+    // modals when we dismiss modal
+    $(document).on('keyup.dismiss.modal', (e) => {
+      e.stopPropagation();
+    });
     originalModalShow.apply(this, arguments);
   };
 
@@ -550,6 +554,7 @@ import Permission from '../permission';
       this.$cloneEl = null;
       this.$element.off('.clone');
     }
+
     originalModalHide.apply(this, arguments);
 
     animated =
@@ -563,6 +568,13 @@ import Permission from '../permission';
     lastModal.css({height: '', overflow: '', top: '', 'margin-top': ''});
     if (lastModal.length) {
       arrangeTopModal(lastModal);
+
+      // The app has several types of modals. After
+      // closing several of them there are situations when focus is lost
+      // (is set to body) and events (for example, press the escape key) don't
+      // work correctly (open modals is closing in the wrong order). Thus
+      // we should set focus on the top modal to all events spread from it.
+      lastModal.focus();
     }
     arrangeBackgroundModals(modals, lastModal);
     // mark that we've hidden one

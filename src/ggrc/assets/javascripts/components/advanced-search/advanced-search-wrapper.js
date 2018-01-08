@@ -26,8 +26,7 @@ export default can.Component.extend({
     availableAttributes: function () {
       var available = getColumnsForModel(
         this.attr('modelName'),
-        null,
-        true
+        null
       ).available;
       return available;
     },

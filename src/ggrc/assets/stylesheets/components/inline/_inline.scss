@@ -5,6 +5,8 @@
 
 inline-edit-control {
   .inline {
+    @include action-toolbar-controls;
+    
     .inline__header {
       display: flex;
       align-items: center;

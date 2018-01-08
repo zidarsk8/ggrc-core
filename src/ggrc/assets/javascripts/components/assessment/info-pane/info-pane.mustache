@@ -46,7 +46,7 @@
                     {{/if}}
                 </div>
             {{/if}}
-                <div class="info-pane__section">
+                <div class="info-pane__section action-toolbar-container">
                     <div class="info-pane__section-title">
                         <div class="action-toolbar">
                             <div class="action-toolbar__content-item">
@@ -82,7 +82,7 @@
                 </div>
                 <div class="assessment-controls info-pane__section">
                     <div class="assessment-note">
-			<custom-attributes-status
+                      <custom-attributes-status
                                 {form-saving}="formState.saving"
                                 {is-dirty}="formState.isDirty">
                                 <loading-status
@@ -91,7 +91,7 @@
                                     always-Show-Text="true"
                                     show-Spinner="true">
                                 </loading-status>
-			</custom-attributes-status>
+                      </custom-attributes-status>
                         <i class="fa fa-question-circle" rel="tooltip"
                            data-original-title="Respond to assessment here. Use comments on the right for free text responses."></i>
                     </div>
@@ -193,17 +193,18 @@
                         {evidence-amount}="evidences.length"
                         {^has-validation-errors}="instance.hasValidationErrors"
                         {fields}="formFields"
+                        {related-items-loaded}="relatedItemsLoaded"
                         {edit-mode}="editMode"
                         {^saving}="formState.saving"
                         {^form-saved-deferred}="formState.formSavedDeferred"
                         {^is-dirty}="formState.isDirty"
                         (validation-error)="setLastErrorTab(tabIndex)"
                         (validation-changed)="showRequiredInfoModal(%event)">
-			<custom-attributes
+                      <custom-attributes
                             {fields}="fields"
                             {edit-mode}="editMode"
                             (value-changed)="attributeChanged(%event)">
-			</custom-attributes>
+                      </custom-attributes>
                     </assessment-local-ca>
                     <!-- Modal Window to fix validation issues of CA fields -->
                     {{#if modal.state}}
@@ -212,7 +213,7 @@
                                     {instance}="instance"
                                     {is-disabled}="isUpdatingEvidences">
                           <ca-object-modal-content {instance}="instance"
-						   {assessment-type-objects}="assessmentTypeObjects"
+                                                   {assessment-type-objects}="assessmentTypeObjects"
                                                    {content}="modal.content"
                                                    {state}="state"
                                                    {evidences}="evidences"
@@ -338,7 +339,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="info-pane__section">
+                <div class="info-pane__section action-toolbar-container">
                     <div class="info-pane__section-title">
                        <div class="action-toolbar">
                           <div class="action-toolbar__content-item">Related Information</div>

@@ -514,6 +514,9 @@ class BlockConverter(object):
     for row_converter in self.row_converters:
       row_converter.setup_secondary_objects()
 
+    for row_converter in self.row_converters:
+      self._check_secondary_object(row_converter)
+
     if not self.converter.dry_run:
       for row_converter in self.row_converters:
         try:
@@ -716,8 +719,24 @@ class BlockConverter(object):
     to be ignored if there are any errors detected.
 
     Args:
-      row_converter: Row converter for the row we want to check
+        row_converter: Row converter for the row we want to check.
     """
     checker = pre_commit_checks.CHECKS.get(type(row_converter.obj).__name__)
+    if checker and callable(checker):
+      checker(row_converter)
+
+  @staticmethod
+  def _check_secondary_object(row_converter):
+    """Check secondary object if it has any pre commit checks.
+
+    The check functions can mutate the row_converter object and mark it
+    to be ignored if there are any errors detected.
+
+    Args:
+        row_converter: Row converter for the row we want to check.
+    """
+    checker = pre_commit_checks.SECONDARY_CHECKS.get(
+        type(row_converter.obj).__name__
+    )
     if checker and callable(checker):
       checker(row_converter)

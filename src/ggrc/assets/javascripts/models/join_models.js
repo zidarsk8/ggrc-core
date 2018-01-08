@@ -333,44 +333,6 @@ import RefreshQueue from './refresh_queue';
 
   }, {});
 
-  can.Model.Join('CMS.Models.ObjectOwner', {
-    root_object: 'object_owner',
-    root_collection: 'object_owners',
-    findOne: 'GET /api/object_owners/{id}',
-    findAll: 'GET /api/object_owners',
-    create: 'POST /api/object_owners',
-    update: 'PUT /api/object_owners/{id}',
-    destroy: 'DELETE /api/object_owners/{id}',
-    join_keys: {
-      ownable: can.Model.Cacheable,
-      person: CMS.Models.Person
-    },
-    attributes: {
-      context: 'CMS.Models.Context.stub',
-      modified_by: 'CMS.Models.Person.stub',
-      person: 'CMS.Models.Person.stub',
-      ownable: 'CMS.Models.get_stub'
-    }
-  }, {});
-
-  can.Model.Join('CMS.Models.ObjectDocument', {
-    root_object: 'object_document',
-    root_collection: 'object_documents',
-    findAll: 'GET /api/object_documents',
-    create: 'POST /api/object_documents',
-    destroy: 'DELETE /api/object_documents/{id}',
-    join_keys: {
-      documentable: can.Model.Cacheable,
-      document: CMS.Models.Document
-    },
-    attributes: {
-      context: 'CMS.Models.Context.stub',
-      modified_by: 'CMS.Models.Person.stub',
-      document: 'CMS.Models.Document.stub',
-      documentable: 'CMS.Models.get_stub'
-    }
-  }, {});
-
   can.Model.Join('CMS.Models.MultitypeSearchJoin', {
     join_keys: {}
   }, {});

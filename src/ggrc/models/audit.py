@@ -6,6 +6,8 @@
 from sqlalchemy import orm
 
 from ggrc import db
+from ggrc.access_control.list import AccessControlList
+from ggrc.access_control.roleable import Roleable
 from ggrc.builder import simple_property
 from ggrc.models.deferred import deferred
 from ggrc.models import mixins
@@ -20,7 +22,6 @@ from ggrc.models.mixins import WithLastDeprecatedDate
 from ggrc.models.object_person import Personable
 from ggrc.models.program import Program
 from ggrc.models.person import Person
-from ggrc.models.reflection import AttributeInfo
 from ggrc.models.relationship import Relatable
 from ggrc.models.snapshot import Snapshotable
 
@@ -32,9 +33,9 @@ class Audit(Snapshotable,
             Personable,
             HasOwnContext,
             Relatable,
+            Roleable,
             WithLastDeprecatedDate,
             mixins.Timeboxed,
-            mixins.WithContact,
             mixins.BusinessObject,
             mixins.Folderable,
             Indexed,
@@ -111,20 +112,10 @@ class Audit(Snapshotable,
           "filter_by": "_filter_by_program",
           "mandatory": True,
       },
-      "user_role:Auditor": {
-          "display_name": "Auditors",
-          "type": AttributeInfo.Type.USER_ROLE,
-          "filter_by": "_filter_by_auditor",
-      },
       "start_date": "Planned Start Date",
       "end_date": "Planned End Date",
       "report_start_date": "Planned Report Period from",
       "report_end_date": "Planned Report Period to",
-      "contact": {
-          "display_name": "Audit Captain",
-          "mandatory": True,
-      },
-      "secondary_contact": None,
       "notes": None,
       "reference_url": None,
       "archived": {
@@ -164,37 +155,33 @@ class Audit(Snapshotable,
         "program": source_object.program,
         "status": source_object.VALID_STATES[0],
         "report_start_date": source_object.report_start_date,
-        "report_end_date": source_object.report_end_date,
-        "contact": source_object.contact
+        "report_end_date": source_object.report_end_date
     }
 
     self.update_attrs(data)
     db.session.flush()
 
     create_audit_context(self)
-    self._clone_auditors(source_object)
+    self.clone_acls(source_object)
     self.clone_custom_attribute_values(source_object)
 
-  def _clone_auditors(self, audit):
-    """Clone auditors of specified audit.
+  def clone_acls(self, audit):
+    """Clone acl roles like auditors and audit captains
 
     Args:
       audit: Audit instance
     """
-    from ggrc_basic_permissions.models import Role, UserRole
-
-    role = Role.query.filter_by(name="Auditor").first()
-    auditors = [ur.person for ur in UserRole.query.filter_by(
-        role=role, context=audit.context).all()]
-
-    for auditor in auditors:
-      user_role = UserRole(
-          context=self.context,
-          person=auditor,
-          role=role
-      )
-      db.session.add(user_role)
-    db.session.flush()
+    for acl in audit.access_control_list:
+      if acl.parent_id:
+        continue
+      data = {
+          "person": acl.person,
+          "ac_role": acl.ac_role,
+          "object": self,
+          "context": acl.context,
+      }
+      new_acl = AccessControlList(**data)
+      db.session.add(new_acl)
 
   def clone(self, source_id, mapped_objects=None):
     """Clone audit with specified whitelisted children.

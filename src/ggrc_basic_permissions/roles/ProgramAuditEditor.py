@@ -15,12 +15,10 @@ permissions = {
         "Audit",
         "Snapshot",
         "AuditObject",
-        "Meeting",
         "ObjectControl",
         "ObjectPerson",
         "Relationship",
         "Document",
-        "Meeting",
         "UserRole",
         "Context",
     ],
@@ -30,12 +28,10 @@ permissions = {
         "Assessment",
         "AssessmentTemplate",
         "Issue",
-        "Meeting",
         "ObjectControl",
         "ObjectPerson",
         "Relationship",
         "Document",
-        "Meeting",
         "AuditObject"
     ],
     "view_object_page": [
@@ -55,12 +51,10 @@ permissions = {
         "Issue",
         "Snapshot",
         "AuditObject",
-        "Meeting",
         "ObjectControl",
         "ObjectPerson",
         "Relationship",
         "Document",
-        "Meeting"
     ],
     "delete": [
         "AssessmentTemplate",
@@ -68,7 +62,6 @@ permissions = {
         "ObjectPerson",
         "Relationship",
         "Document",
-        "Meeting",
         {
             "type": "Audit",
             "terms": {

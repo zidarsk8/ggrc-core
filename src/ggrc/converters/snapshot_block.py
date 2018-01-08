@@ -246,15 +246,15 @@ class SnapshotBlockConverter(object):
 
   def get_value_string(self, value):
     """Get string representation of a given value."""
+    if isinstance(value, dict) and "display_name" in value:
+      return value["display_name"]
     if isinstance(value, dict) and "type" in value and "id" in value:
       return self._stub_cache.get(value["type"], {}).get(value["id"], u"")
-    elif isinstance(value, dict) and "display_name" in value:
-      return value["display_name"]
-    elif isinstance(value, list):
+    if isinstance(value, list):
       return u"\n".join(self.get_value_string(val) for val in value)
-    elif isinstance(value, bool):
+    if isinstance(value, bool):
       return self.BOOLEAN_ALIASES.get(value, u"")
-    elif isinstance(value, basestring):
+    if isinstance(value, basestring):
       return value
     return u""
 
