@@ -257,6 +257,7 @@ export default GGRC.Components('relatedPeopleAccessControl', {
     },
     inserted: 'setupGroups',
     '{viewModel.instance} update': 'setupGroups',
+    '{viewModel} instance': 'refreshGroups',
     '{viewModel.instance.access_control_list} change': 'refreshGroups',
   },
 });
