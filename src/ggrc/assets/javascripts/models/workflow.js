@@ -91,7 +91,7 @@
       dfd.then(function (instance) {
         redirectLink = instance.viewLink + '#task_group_widget';
         instance.attr('_redirect', redirectLink);
-        if (!taskGroupTitle || !isNew) {
+        if (!taskGroupTitle || !isNew || instance.clone) {
           return instance;
         }
         taskGroup = new CMS.Models.TaskGroup({
