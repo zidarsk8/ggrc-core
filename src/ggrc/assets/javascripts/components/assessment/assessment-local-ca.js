@@ -8,7 +8,7 @@ import {
   applyChangesToCustomAttributeValue,
 }
   from '../../plugins/utils/ca-utils';
-import {VALIDATION_ERROR} from '../../events/eventTypes';
+import {VALIDATION_ERROR, RELATED_ITEMS_LOADED} from '../../events/eventTypes';
 import tracker from '../../tracker';
 import Permission from '../../permission';
 
@@ -233,6 +233,9 @@ import Permission from '../../permission';
         this.viewModel.validateForm();
       },
       '{viewModel.instance} afterCommentCreated': function () {
+        this.viewModel.validateForm();
+      },
+      [`{viewModel.instance} ${RELATED_ITEMS_LOADED.type}`]: function () {
         this.viewModel.validateForm();
       },
       '{viewModel.instance} showInvalidField': function (ev) {
