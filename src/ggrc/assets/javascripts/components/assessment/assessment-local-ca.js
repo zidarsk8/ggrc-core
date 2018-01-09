@@ -89,11 +89,11 @@ import Permission from '../../permission';
           },
         },
       },
-      validateForm: function (triggerAttachmentModals = false) {
+      validateForm: function () {
         var self = this;
         this.attr('fields')
           .each(function (field) {
-            self.performValidation({field, triggerAttachmentModals});
+            self.performValidation({field});
           });
         if (this.attr('instance.hasValidationErrors')) {
           this.dispatch(VALIDATION_ERROR);
@@ -240,7 +240,7 @@ import Permission from '../../permission';
           e.field.attr('errorsMap.comment', true);
         }
 
-        this.validateForm(true);
+        this.performValidation({field: e.field, triggerAttachmentModals: true});
         this.attr('formSavedDeferred', can.Deferred());
         this.save(e.fieldId, e.value);
       },
