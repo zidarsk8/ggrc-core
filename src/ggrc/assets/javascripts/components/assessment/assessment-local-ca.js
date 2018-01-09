@@ -57,19 +57,7 @@ import Permission from '../../permission';
           type: 'number',
           set: function (newValue, setValue) {
             setValue(newValue);
-            if (this.attr('relatedItemsLoaded')) {
-              this.validateForm();
-            }
-          },
-        },
-        relatedItemsLoaded: {
-          value: false,
-          type: 'boolean',
-          set(newValue, setValue) {
-            setValue(newValue);
-            if (newValue) {
-              this.validateForm();
-            }
+            this.validateForm();
           },
         },
         isEvidenceRequired: {
