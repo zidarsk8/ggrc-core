@@ -46,10 +46,6 @@ import Permission from '../../permission';
         },
         evidenceAmount: {
           type: 'number',
-          set: function (newValue, setValue) {
-            setValue(newValue);
-            this.validateForm();
-          },
         },
         isEvidenceRequired: {
           get: function () {
@@ -233,6 +229,9 @@ import Permission from '../../permission';
       },
     },
     events: {
+      '{viewModel} evidenceAmount': function () {
+        this.viewModel.validateForm();
+      },
       '{viewModel.instance} afterCommentCreated': function () {
         this.viewModel.validateForm();
       },
