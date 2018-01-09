@@ -54,8 +54,7 @@ class TestACLAttributeDefinitions(TestCase):
       role_names = {factory(object_type=model.__name__).name for _ in range(2)}
 
     expected_names = set()
-    # TODO: remove 'and' expression part when working on Workflow import
-    if issubclass(model, roleable.Roleable) and model.__name__ != 'Workflow':
+    if issubclass(model, roleable.Roleable):
       expected_names = role_names
 
     definitions = get_object_column_definitions(model)

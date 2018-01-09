@@ -419,9 +419,7 @@ class AttributeInfo(object):
         definition.update(value)
       definitions[key] = definition
 
-    # TODO: remove conditional expression when working on Workflow import
-    if not object_class.__name__ == 'Workflow':
-      definitions.update(cls.get_acl_definitions(object_class))
+    definitions.update(cls.get_acl_definitions(object_class))
 
     if object_class.__name__ not in EXCLUDE_CUSTOM_ATTRIBUTES:
       definitions.update(cls.get_custom_attr_definitions(

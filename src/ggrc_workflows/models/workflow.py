@@ -298,27 +298,10 @@ class Workflow(roleable.Roleable,
           "display_name": "Force real-time email updates",
           "mandatory": False,
       },
-      "workflow_owner": {
-          "display_name": "Manager",
-          "mandatory": True,
-          "filter_by": "_filter_by_workflow_owner",
-      },
-      "workflow_member": {
-          "display_name": "Member",
-          "filter_by": "_filter_by_workflow_member",
-      },
       "status": None,
       "start_date": None,
       "end_date": None,
   }
-
-  @classmethod
-  def _filter_by_workflow_owner(cls, predicate):
-    return cls._filter_by_role("WorkflowOwner", predicate)
-
-  @classmethod
-  def _filter_by_workflow_member(cls, predicate):
-    return cls._filter_by_role("WorkflowMember", predicate)
 
   def copy(self, _other=None, **kwargs):
     """Create a partial copy of the current workflow.
