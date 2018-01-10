@@ -4,8 +4,19 @@
 */
 
 import {failAll} from '../spec_helpers';
+import CustomAttributeObject from '../../js/plugins/utils/custom-attribute/custom-attribute-object';
 
 describe('can.Model.Cacheable', function () {
+  let origGcaDefs;
+
+  beforeEach(function () {
+    origGcaDefs = GGRC.custom_attr_defs;
+  });
+
+  afterEach(function () {
+    GGRC.custom_attr_defs = origGcaDefs;
+  });
+
   beforeAll(function () {
     can.Model.Mixin('dummyable');
     spyOn(CMS.Models.Mixins.dummyable, 'add_to');
@@ -426,6 +437,148 @@ describe('can.Model.Cacheable', function () {
       expect(obj.custom_attributes[1]).toEqual('DummyModel:1');
       obj._custom_attribute_map(1, '');
       expect(obj.custom_attributes[1]).toEqual('Person:None');
+    });
+  });
+
+  describe('::customAttr', () => {
+    let instance;
+
+    beforeEach(function () {
+      instance = new CMS.Models.DummyModel();
+    });
+
+    describe('when the instance is not custom attributable', () => {
+      beforeEach(function () {
+        spyOn(instance, 'isCustomAttributable').and.returnValue(false);
+      });
+
+      it('throws Error', function () {
+        expect(instance.customAttr.bind(instance)).toThrow();
+      });
+    });
+
+    describe('when count of arguments is 0', () => {
+      it('returns all custom attriubtes', function () {
+        const customAttrs = new can.List([]);
+        let result;
+        spyOn(instance, '_getAllCustomAttr').and.returnValue(customAttrs);
+        result = instance.customAttr();
+        expect(result).toBe(customAttrs);
+      });
+    });
+
+    describe('when count of arguments is 1', () => {
+      it('returns certain custom attribute object by ca id', function () {
+        const caId = 12345;
+        const caObject = new CustomAttributeObject(
+          new can.Map(),
+          new can.Map()
+        );
+        const getCA = spyOn(instance, '_getCustomAttr')
+          .and.returnValue(caObject);
+        let result;
+        result = instance.customAttr(caId);
+        expect(result).toBe(caObject);
+        expect(getCA).toHaveBeenCalledWith(caId);
+      });
+    });
+
+    describe('when count of arguments is 2', () => {
+      it('returns certain custom attribute object by ca id', function () {
+        const caId = 12345;
+        const value = 'Value 1';
+        const setCA = spyOn(instance, '_setCustomAttr');
+        instance.customAttr(caId, value);
+        expect(setCA).toHaveBeenCalledWith(caId, value);
+      });
+    });
+  });
+
+  describe('::_getAllCustomAttr', () => {
+    it('returns all custom attributes', function () {
+      const caDefs = [{id: 1}, {id: 2}, {id: 3}];
+      const instance = new CMS.Models.DummyModel({
+        custom_attribute_definitions: caDefs,
+      });
+      const caObjects = instance._getAllCustomAttr();
+      caObjects.forEach((caObject, index) => {
+        expect(caObject.customAttributeId).toEqual(caDefs[index].id);
+      });
+    });
+  });
+
+  describe('::_getCustomAttr', () => {
+    it('returns certain custom attribute object by custom attribute id',
+      function () {
+        const caId = 2;
+        const caDefs = [{id: 1}, {id: caId}, {id: 3}];
+        const instance = new CMS.Models.DummyModel({
+          custom_attribute_definitions: caDefs,
+        });
+        const caObject = instance._getCustomAttr(caId);
+        expect(caObject.customAttributeId).toBe(caId);
+      });
+  });
+
+  describe('::_setCustomAttr', () => {
+    it('writes some value for certain caObject', function () {
+      const caId = 2;
+      const expectedValue = 'Some value';
+      const caDefs = [
+        {
+          id: 1,
+        }, {
+          id: caId,
+          value: 'Abcdefg',
+        }, {
+          id: 3,
+        }];
+      const instance = new CMS.Models.DummyModel({
+        custom_attribute_definitions: caDefs,
+      });
+      instance._setCustomAttr(caId, expectedValue);
+      expect(instance.customAttr(caId).value).toBe(expectedValue);
+    });
+
+    it('converts string ca id to number', function () {
+      const caId = '2';
+      const expectedValue = 'Some value';
+      const caDefs = [
+        {
+          id: 1,
+        }, {
+          id: Number(caId),
+          value: 'Abcdefg',
+        }, {
+          id: 3,
+        }];
+      const instance = new CMS.Models.DummyModel({
+        custom_attribute_definitions: caDefs,
+      });
+      let value;
+      instance._setCustomAttr(caId, expectedValue);
+      value = instance.customAttr(Number(caId)).value;
+      expect(value).toBe(expectedValue);
+    });
+  });
+
+  describe('::isCustomAttributable', () => {
+    let instance;
+
+    beforeEach(function () {
+      instance = new CMS.Models.DummyModel();
+    });
+
+    it('returns true if the instance is custom attributable', function () {
+      const result = instance.isCustomAttributable();
+      expect(result).toBe(true);
+    });
+
+    it('returns false if the instance is not custom attributable', function () {
+      let result;
+      instance.attr('class').is_custom_attributable = false;
+      result = instance.isCustomAttributable();
+      expect(result).toBe(false);
     });
   });
 });

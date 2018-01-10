@@ -15,7 +15,6 @@ describe('CustomAttributeAccess module', () => {
 
   beforeEach(function () {
     origCaAttrDefs = GGRC.custom_attr_defs;
-    GGRC.custom_attr_defs = [];
     instance = new can.Map();
     caAccess = new CustomAttributeAccess(instance);
   });
