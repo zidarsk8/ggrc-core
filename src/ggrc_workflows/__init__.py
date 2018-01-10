@@ -10,7 +10,7 @@ import itertools
 from datetime import datetime, date
 from logging import getLogger
 from flask import Blueprint
-from sqlalchemy import inspect, and_, orm
+from sqlalchemy import inspect, orm
 
 from ggrc import db
 from ggrc.login import get_current_user
@@ -843,40 +843,26 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
   # get the personal context for this logged in user
   user = get_current_user()
   personal_context = user.get_or_create_object_context(context=1)
-  context = obj.get_or_create_object_context(personal_context)
-  obj.context = context
-
-  if not obj.workflow_people:
-    # add a user_roles mapping assigning the user creating the workflow
-    # the WorkflowOwner role in the workflow's context.
-    workflow_owner_role = _find_role('WorkflowOwner')
-    user_role = UserRole(
-        person=user,
-        role=workflow_owner_role,
-        context=context,
-        modified_by=get_current_user(),
-    )
-    models.WorkflowPerson(
-        person=user,
-        workflow=obj,
-        context=context,
-        modified_by=get_current_user(),
-    )
-    # pass along a temporary attribute for logging the events.
-    user_role._display_related_title = obj.title
+  workflow_context = obj.get_or_create_object_context(personal_context)
+  obj.context = workflow_context
 
   # Create the context implication for Workflow roles to default context
   ContextImplication(
-      source_context=context,
+      source_context=workflow_context,
       context=None,
       source_context_scope='Workflow',
       context_scope=None,
       modified_by=get_current_user(),
   )
 
-  if not src.get('private'):
-    # Add role implication - all users can read a public workflow
-    add_public_workflow_context_implication(context)
+  # Add role implication - all users can read a public workflow
+  ContextImplication(
+      source_context=None,
+      context=workflow_context,
+      source_context_scope=None,
+      context_scope='Workflow',
+      modified_by=get_current_user(),
+  )
 
   if src.get('clone'):
     source_workflow.copy_task_groups(
@@ -885,37 +871,6 @@ def handle_workflow_post(sender, obj=None, src=None, service=None):
         clone_tasks=src.get('clone_tasks', False),
         clone_objects=src.get('clone_objects', False)
     )
-
-    if src.get('clone_people'):
-      workflow_member_role = _find_role('WorkflowMember')
-      for authorization in source_workflow.context.user_roles:
-        # Current user has already been added as workflow owner
-        if authorization.person != user:
-          UserRole(
-              person=authorization.person,
-              role=workflow_member_role,
-              context=context,
-              modified_by=user)
-      for person in source_workflow.people:
-        if person != user:
-          models.WorkflowPerson(
-              person=person,
-              workflow=obj,
-              context=context)
-
-
-def add_public_workflow_context_implication(context, check_exists=False):
-  if check_exists and db.session.query(ContextImplication).filter(
-      and_(ContextImplication.context_id == context.id,
-           ContextImplication.source_context_id == None)).count() > 0:  # noqa
-    return
-  db.session.add(ContextImplication(
-      source_context=None,
-      context=context,
-      source_context_scope=None,
-      context_scope='Workflow',
-      modified_by=get_current_user(),
-  ))
 
 
 def init_extra_views(app):
