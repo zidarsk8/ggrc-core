@@ -22,6 +22,10 @@ const formatValueMap = {
   },
 };
 
+const defaultValueMap = {
+  Checkbox: 'No',
+};
+
 const _prepareCAVs = (instance) => {
   instance.attr('custom_attribute_values').forEach((cav, index) => {
     instance.custom_attribute_values.attr(index, cav.reify());
@@ -55,6 +59,8 @@ const getCustomAttrValue = (attr, instance, options) => {
       value = formatValueMap[definition.attribute_type] ?
         formatValueMap[definition.attribute_type](customAttrItem, options) :
         customAttrItem.attr('attribute_value');
+    } else {
+      value = value || defaultValueMap[definition.attribute_type];
     }
   }
 

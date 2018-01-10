@@ -164,6 +164,15 @@ describe('helpers.getCustomAttrValue', () => {
 
       expect(actual).toEqual('');
     });
+
+    it('returns "No" for CA of type checkbox if there are no CA values', () => {
+      attr.attr_name = 'CheckBox';
+      fakeInstance.attr('custom_attribute_values', []);
+
+      actual = helper(attr, fakeInstance, fakeOptions);
+
+      expect(actual).toEqual('No');
+    });
   });
 
   describe('for CA of Date type', () => {
