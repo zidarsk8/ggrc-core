@@ -456,46 +456,6 @@ def update_cycle_task_group_parent_state(objs):
     Signals.status_change.send(models.Cycle, objs=updated_cycles)
 
 
-# TODO: remove in scope of GGRC-3925
-def ensure_assignee_is_workflow_member(workflow, assignee, assignee_id=None):
-  """Checks what role assignee has in the context of
-  a workflow. If he has none he gets the Workflow Member role."""
-  if not assignee and not assignee_id:
-    return
-  if assignee_id is None:
-    assignee_id = assignee.id
-  if assignee and assignee_id != assignee.id:
-    raise ValueError("Conflict value assignee and assignee_id")
-  if any(assignee_id == wp.person_id for wp in workflow.workflow_people):
-    return
-
-  # Check if assignee is mapped to the Workflow
-  workflow_people = models.WorkflowPerson.query.filter(
-      models.WorkflowPerson.workflow_id == workflow.id,
-      models.WorkflowPerson.person_id == assignee_id).count()
-  if not workflow_people:
-    models.WorkflowPerson(
-        person=assignee,
-        person_id=assignee_id,
-        workflow=workflow,
-        context=workflow.context
-    )
-
-  # Check if assignee has a role assignment
-  user_roles = UserRole.query.filter(
-      UserRole.context_id == workflow.context_id,
-      UserRole.person_id == assignee_id).count()
-  if not user_roles:
-    workflow_member_role = _find_role('WorkflowMember')
-    UserRole(
-        person=assignee,
-        person_id=assignee_id,
-        role=workflow_member_role,
-        context=workflow.context,
-        modified_by=get_current_user(),
-    )
-
-
 def start_end_date_validator(tgt):
   if tgt.start_date > tgt.end_date:
     raise ValueError('End date can not be behind Start date')
@@ -528,12 +488,6 @@ def calculate_new_next_cycle_start_date(workflow):
 @signals.Restful.model_posted.connect_via(models.TaskGroupTask)
 def handle_task_group_task_put_post(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   start_end_date_validator(obj)
-  # TODO: remove in scope of GGRC-3925
-  if inspect(obj).attrs._access_control_list.history.has_changes():
-    for person_id in obj.get_person_ids_for_rolename("Task Assignees"):
-      ensure_assignee_is_workflow_member(obj.task_group.workflow,
-                                         None,
-                                         person_id)
 
   # If relative days were change we must update workflow next cycle start date
   if inspect(obj).attrs.start_date.history.has_changes():
@@ -563,9 +517,6 @@ def handle_task_group_post(sender, obj=None, src=None, service=None):  # noqa py
     )
     obj.title = source_task_group.title + ' (copy ' + str(obj.id) + ')'
 
-  # TODO: remove in scope of GGRC-3925
-  ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
-
   obj.ensure_assignee_is_workflow_member()
   calculate_new_next_cycle_start_date(obj.workflow)
 
@@ -581,9 +532,6 @@ def handle_task_group_delete(sender, obj=None, src=None, service=None):  # noqa 
 @signals.Restful.model_put.connect_via(models.TaskGroup)
 def handle_task_group_put(sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
   if inspect(obj).attrs.contact.history.has_changes():
-    # TODO: remove in scope of GGRC-3925
-    ensure_assignee_is_workflow_member(obj.workflow, obj.contact)
-
     obj.ensure_assignee_is_workflow_member()
   calculate_new_next_cycle_start_date(obj.workflow)
 
@@ -591,11 +539,6 @@ def handle_task_group_put(sender, obj=None, src=None, service=None):  # noqa pyl
 @signals.Restful.model_put.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_put(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
-  # TODO: remove in scope of GGRC-3925
-  if inspect(obj).attrs._access_control_list.history.has_changes():
-    for person_id in obj.get_person_ids_for_rolename("Task Assignees"):
-      ensure_assignee_is_workflow_member(obj.cycle.workflow, None, person_id)
-
   if inspect(obj).attrs.status.history.has_changes():
     # TODO: check why update_cycle_object_parent_state destroys object history
     # when accepting the only task in a cycle. The listener below is a
@@ -640,11 +583,6 @@ def handle_cycle_object_status(
 @signals.Restful.model_posted.connect_via(models.CycleTaskGroupObjectTask)
 def handle_cycle_task_group_object_task_post(
         sender, obj=None, src=None, service=None):  # noqa pylint: disable=unused-argument
-  # TODO: remove in scope of GGRC-3925
-  if obj.cycle.workflow.kind != "Backlog":
-    for person_id in obj.get_person_ids_for_rolename("Task Assignees"):
-      ensure_assignee_is_workflow_member(obj.cycle.workflow, None, person_id)
-
   Signals.status_change.send(
       obj.__class__,
       objs=[
