@@ -33,7 +33,7 @@ from ggrc_workflows.roles import (
     WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader,
     WorkflowEditor
 )
-from ggrc_basic_permissions.models import Role, UserRole, ContextImplication
+from ggrc_basic_permissions.models import Role, ContextImplication
 from ggrc_basic_permissions.contributed_roles import (
     RoleContributions, RoleDeclarations, DeclarativeRoleImplications
 )
@@ -728,19 +728,6 @@ def _find_role(role_name):
       Role instance.
   """
   return db.session.query(Role).filter(Role.name == role_name).first()
-
-
-# noqa pylint: disable=unused-argument
-@signals.Restful.model_posted.connect_via(models.WorkflowPerson)
-def handle_workflow_person_post(sender, obj=None, src=None, service=None):
-  # add a user_roles mapping assigning the user creating the workflow
-  # the WorkflowOwner role in the workflow's context.
-  UserRole(
-      person=obj.person,
-      role=_find_role('WorkflowMember'),
-      context=obj.context,
-      modified_by=get_current_user(),
-  )
 
 
 def _validate_post_workflow_fields(workflow):
