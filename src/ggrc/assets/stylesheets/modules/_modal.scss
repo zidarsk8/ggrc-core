@@ -11,6 +11,8 @@
   display: none;
   .modal & {
     display: block;
+    position: relative;
+    z-index: 10;
     float: right;
     color: $warmGray;
     font-size: 12px;
