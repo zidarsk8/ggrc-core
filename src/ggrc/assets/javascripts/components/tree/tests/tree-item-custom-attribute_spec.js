@@ -3,24 +3,22 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import helpers from './../tree-item-custom-attribute';
+import {helpers} from './../tree-item-custom-attribute';
 
-describe('helpers.get_custom_attr_value', function () {
-  'use strict';
+describe('helpers.getCustomAttrValue', () => {
+  let helper;
+  let fakeAttr;
+  let fakeInstance;
+  let fakeOptions;
+  let fakeCustomAttrDefs;
+  let origValue;
+  let setCustomAttrItem;
+  let getCustomAttrItem;
+  let actual;
+  let customAttrItem;
 
-  var helper;
-  var fakeAttr;
-  var fakeInstance;
-  var fakeOptions;
-  var fakeCustomAttrDefs;
-  var origValue;
-  var setCustomAttrItem;
-  var getCustomAttrItem;
-  var actual;
-  var customAttrItem;
-
-  beforeAll(function () {
-    helper = helpers.get_custom_attr_value;
+  beforeAll(() => {
+    helper = helpers.getCustomAttrValue;
 
     fakeCustomAttrDefs = [{
       definition_type: 'control',
@@ -77,7 +75,7 @@ describe('helpers.get_custom_attr_value', function () {
       custom_attribute_values: [],
     });
 
-    getCustomAttrItem = function (attrValue, attrId, attrType) {
+    getCustomAttrItem = (attrValue, attrId, attrType) => {
       return new can.Map({
         attribute_value: attrValue,
         custom_attribute_id: attrId || 3,
@@ -85,7 +83,7 @@ describe('helpers.get_custom_attr_value', function () {
       });
     };
 
-    setCustomAttrItem = function (attrValue, attrId, attrType) {
+    setCustomAttrItem = (attrValue, attrId, attrType) => {
       customAttrItem = getCustomAttrItem(attrValue, attrId, attrType);
       fakeInstance.attr('custom_attribute_values.0', customAttrItem);
 
@@ -94,11 +92,11 @@ describe('helpers.get_custom_attr_value', function () {
     };
   });
 
-  afterAll(function () {
+  afterAll(() => {
     GGRC.custom_attr_defs = origValue;
   });
 
-  beforeEach(function () {
+  beforeEach(() => {
     fakeAttr = {};
     fakeOptions = {};
     fakeInstance.class = {table_singular: 'control'};
@@ -106,23 +104,22 @@ describe('helpers.get_custom_attr_value', function () {
     fakeAttr.attr_name = 'Type';
   });
 
-  it('reify() is exec if instance is not an Assessment', function () {
+  it('reify() is exec if instance is not an Assessment', () => {
     setCustomAttrItem();
     helper(fakeAttr, fakeInstance, fakeOptions);
 
     expect(customAttrItem.reify).toHaveBeenCalled();
   });
 
-  it('return correct value if customAttrItem is not undefined',
-    function () {
-      setCustomAttrItem('correctValue');
+  it('return correct value if customAttrItem is not undefined', () => {
+    setCustomAttrItem('correctValue');
 
-      actual = helper(fakeAttr, fakeInstance, fakeOptions);
+    actual = helper(fakeAttr, fakeInstance, fakeOptions);
 
-      expect(actual).toEqual('correctValue');
-    });
+    expect(actual).toEqual('correctValue');
+  });
 
-  it('return an empty string if customAttrItem is undefined', function () {
+  it('return an empty string if customAttrItem is undefined', () => {
     setCustomAttrItem();
 
     actual = helper(fakeAttr, fakeInstance, fakeOptions);
@@ -130,10 +127,10 @@ describe('helpers.get_custom_attr_value', function () {
     expect(actual).toEqual('');
   });
 
-  describe('for CA of Checkbox type', function () {
-    var attr = {};
+  describe('for CA of Checkbox type', () => {
+    const attr = {};
 
-    it('returns empty string when CAD wasn\'t found', function () {
+    it('returns empty string when CAD wasn\'t found', () => {
       setCustomAttrItem('10', 3, 'Checkbox');
 
       actual = helper(attr, fakeInstance, fakeOptions);
@@ -141,42 +138,39 @@ describe('helpers.get_custom_attr_value', function () {
       expect(actual).toEqual('');
     });
 
-    it('returns "Yes" for CA of type checkbox with value "1"',
-      function () {
-        attr.attr_name = 'CheckBox';
-        setCustomAttrItem('1', 4, 'checkbox');
+    it('returns "Yes" for CA of type checkbox with value "1"', () => {
+      attr.attr_name = 'CheckBox';
+      setCustomAttrItem('1', 4, 'checkbox');
 
-        actual = helper(attr, fakeInstance, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
-        expect(actual).toEqual('Yes');
-      });
+      expect(actual).toEqual('Yes');
+    });
 
-    it('returns "No" for CA of type checkbox with value "0"',
-      function () {
-        attr.attr_name = 'CheckBox';
-        setCustomAttrItem(0, 4, 'checkbox');
+    it('returns "No" for CA of type checkbox with value "0"', () => {
+      attr.attr_name = 'CheckBox';
+      setCustomAttrItem(0, 4, 'checkbox');
 
-        actual = helper(attr, fakeInstance, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
-        expect(actual).toEqual('No');
-      });
+      expect(actual).toEqual('No');
+    });
 
-    it('returns empty string for CA of type checkbox without value',
-      function () {
-        attr.attr_name = 'CheckBox';
-        setCustomAttrItem(undefined, 4, 'checkbox');
+    it('returns empty string for CA of type checkbox without value', () => {
+      attr.attr_name = 'CheckBox';
+      setCustomAttrItem(undefined, 4, 'checkbox');
 
-        actual = helper(attr, fakeInstance, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
-        expect(actual).toEqual('');
-      });
+      expect(actual).toEqual('');
+    });
   });
 
-  describe('for CA of Date type', function () {
-    var attr = {
+  describe('for CA of Date type', () => {
+    const attr = {
     };
 
-    it('returns empty string when CAD wasn\'t found', function () {
+    it('returns empty string when CAD wasn\'t found', () => {
       setCustomAttrItem('10', 3, 'Date');
 
       actual = helper(attr, fakeInstance, fakeOptions);
@@ -184,9 +178,9 @@ describe('helpers.get_custom_attr_value', function () {
       expect(actual).toEqual('');
     });
 
-    it('returns formatted date when CAD was found', function () {
-      var expected = 'expected date';
-      var attrValue = '2017-09-30';
+    it('returns formatted date when CAD was found', () => {
+      const expected = 'expected date';
+      const attrValue = '2017-09-30';
       attr.attr_name = 'Date';
       setCustomAttrItem(attrValue, 9, 'Date');
       spyOn(GGRC.Utils, 'formatDate')
@@ -199,10 +193,9 @@ describe('helpers.get_custom_attr_value', function () {
         .toHaveBeenCalledWith(attrValue, true);
     });
 
-    it('tries to format date for existing CAD and undefined value',
-      function () {
-        var expected = 'expected date';
-        var attrValue = undefined;
+    it('tries to format date for existing CAD and undefined value', () => {
+        const expected = 'expected date';
+        const attrValue = undefined;
         attr.attr_name = 'Date';
         setCustomAttrItem(attrValue, 9, 'Date');
         spyOn(GGRC.Utils, 'formatDate')
@@ -216,11 +209,11 @@ describe('helpers.get_custom_attr_value', function () {
       });
   });
 
-  describe('for CA of Dropdown type', function () {
-    var attr = {
+  describe('for CA of Dropdown type', () => {
+    const attr = {
     };
 
-    it('returns empty string when CAD wasn\'t found', function () {
+    it('returns empty string when CAD wasn\'t found', () => {
       setCustomAttrItem('10', 3, 'Dropdown');
 
       actual = helper(attr, fakeInstance, fakeOptions);
@@ -228,7 +221,7 @@ describe('helpers.get_custom_attr_value', function () {
       expect(actual).toEqual('');
     });
 
-    it('returns attribute value when CAD was found', function () {
+    it('returns attribute value when CAD was found', () => {
       attr.attr_name = 'Dropdown';
       setCustomAttrItem('10', 10, 'Dropdown');
 
@@ -237,22 +230,21 @@ describe('helpers.get_custom_attr_value', function () {
       expect(actual).toEqual('10');
     });
 
-    it('returns empty string for existing CAD and undefined value',
-      function () {
-        attr.attr_name = 'Dropdown';
-        setCustomAttrItem(undefined, 10, 'Dropdown');
+    it('returns empty string for existing CAD and undefined value', () => {
+      attr.attr_name = 'Dropdown';
+      setCustomAttrItem(undefined, 10, 'Dropdown');
 
-        actual = helper(attr, fakeInstance, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
-        expect(actual).toEqual('');
-      });
+      expect(actual).toEqual('');
+    });
   });
 
-  describe('for CA of Text type', function () {
-    var attr = {
+  describe('for CA of Text type', () => {
+    const attr = {
     };
 
-    it('returns empty string when CAD wasn\'t found', function () {
+    it('returns empty string when CAD wasn\'t found', () => {
       setCustomAttrItem('10', 3, 'Text');
 
       actual = helper(attr, fakeInstance, fakeOptions);
@@ -260,7 +252,7 @@ describe('helpers.get_custom_attr_value', function () {
       expect(actual).toEqual('');
     });
 
-    it('returns attribute value when CAD was found', function () {
+    it('returns attribute value when CAD was found', () => {
       attr.attr_name = 'Text';
       setCustomAttrItem('10', 6, 'Text');
 
@@ -269,22 +261,21 @@ describe('helpers.get_custom_attr_value', function () {
       expect(actual).toEqual('10');
     });
 
-    it('returns empty string for existing CAD and undefined value',
-      function () {
-        attr.attr_name = 'Text';
-        setCustomAttrItem(undefined, 6, 'Text');
+    it('returns empty string for existing CAD and undefined value', () => {
+      attr.attr_name = 'Text';
+      setCustomAttrItem(undefined, 6, 'Text');
 
-        actual = helper(attr, fakeInstance, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
-        expect(actual).toEqual('');
-      });
+      expect(actual).toEqual('');
+    });
   });
 
-  describe('for CA of Rich Text type', function () {
-    var attr = {
+  describe('for CA of Rich Text type', () => {
+    const attr = {
     };
 
-    it('returns empty string when CAD wasn\'t found', function () {
+    it('returns empty string when CAD wasn\'t found', () => {
       setCustomAttrItem('10', 3, 'Rich Text');
 
       actual = helper(attr, fakeInstance, fakeOptions);
@@ -292,7 +283,7 @@ describe('helpers.get_custom_attr_value', function () {
       expect(actual).toEqual('');
     });
 
-    it('returns attribute value when CAD was found', function () {
+    it('returns attribute value when CAD was found', () => {
       attr.attr_name = 'Rich Text';
       setCustomAttrItem('10', 7, 'Rich Text');
 
@@ -301,21 +292,20 @@ describe('helpers.get_custom_attr_value', function () {
       expect(actual).toEqual('10');
     });
 
-    it('returns empty string for existing CAD and undefined value',
-      function () {
-        attr.attr_name = 'Rich Text';
-        setCustomAttrItem(undefined, 7, 'Rich Text');
+    it('returns empty string for existing CAD and undefined value', () => {
+      attr.attr_name = 'Rich Text';
+      setCustomAttrItem(undefined, 7, 'Rich Text');
 
-        actual = helper(attr, fakeInstance, fakeOptions);
+      actual = helper(attr, fakeInstance, fakeOptions);
 
-        expect(actual).toEqual('');
-      });
+      expect(actual).toEqual('');
+    });
   });
 
-  describe('for CA of Map:Person type', function () {
-    var attr = {};
+  describe('for CA of Map:Person type', () => {
+    const attr = {};
 
-    it('returns empty string when CAD wasn\'t found', function () {
+    it('returns empty string when CAD wasn\'t found', () => {
       setCustomAttrItem(null, 3, 'Map:Person');
 
       actual = helper(attr, fakeInstance, fakeOptions);
@@ -323,15 +313,15 @@ describe('helpers.get_custom_attr_value', function () {
       expect(actual).toEqual('');
     });
 
-    describe('when object was provided in attribute', function () {
-      var expected = 'expected persons';
-      var addItemResult = 'added item';
-      var actualObject = {};
+    describe('when object was provided in attribute', () => {
+      const expected = 'expected persons';
+      const addItemResult = 'added item';
+      const actualObject = {};
 
-      beforeEach(function () {
+      beforeEach(() => {
         setCustomAttrItem(undefined, 8, 'Map:Person');
         customAttrItem.attr('attribute_object', {
-          reify: function () {},
+          reify: () => {},
         });
         spyOn(customAttrItem.attr('attribute_object'), 'reify')
           .and.returnValue(actualObject);
@@ -347,30 +337,30 @@ describe('helpers.get_custom_attr_value', function () {
         actual = helper(attr, fakeInstance, fakeOptions);
       });
 
-      it('returns expected result', function () {
+      it('returns expected result', () => {
         expect(actual).toEqual(expected);
       });
 
-      it('reify object attribute', function () {
+      it('reify object attribute', () => {
         expect(customAttrItem.attribute_object.reify)
           .toHaveBeenCalled();
       });
 
-      it('adds object to contexts list', function () {
+      it('adds object to contexts list', () => {
         expect(fakeOptions.contexts.add)
           .toHaveBeenCalledWith({object: actualObject});
       });
 
-      it('makes mustache fn-call', function () {
+      it('makes mustache fn-call', () => {
         expect(fakeOptions.fn).toHaveBeenCalled();
       });
     });
 
-    describe('when object wasn\'t provided in attribute', function () {
-      var expected = 'expected persons';
-      var addItemResult = 'added item';
+    describe('when object wasn\'t provided in attribute', () => {
+      const expected = 'expected persons';
+      const addItemResult = 'added item';
 
-      beforeEach(function () {
+      beforeEach(() => {
         attr.attr_name = 'Persons';
         setCustomAttrItem(undefined, 8, 'Map:Person');
         fakeOptions = {
@@ -383,15 +373,15 @@ describe('helpers.get_custom_attr_value', function () {
         actual = helper(attr, fakeInstance, fakeOptions);
       });
 
-      it('returns expected result', function () {
+      it('returns expected result', () => {
         expect(actual).toEqual(expected);
       });
 
-      it('adds object to contexts list', function () {
+      it('adds object to contexts list', () => {
         expect(fakeOptions.contexts.add).toHaveBeenCalledWith({object: null});
       });
 
-      it('makes mustache fn-call', function () {
+      it('makes mustache fn-call', () => {
         expect(fakeOptions.fn).toHaveBeenCalled();
       });
     });
