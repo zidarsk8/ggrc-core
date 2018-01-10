@@ -263,12 +263,9 @@ def build_cycle(workflow, cycle=None, current_user=None):
   # Determine the relevant Workflow
   cycle = cycle or models.Cycle()
 
-  # Use WorkflowOwner role when this is called via the cron job.
+  # Use Admin role when this is called via the cron job.
   if not current_user:
-    for user_role in workflow.context.user_roles:
-      if user_role.role.name == "WorkflowOwner":
-        current_user = user_role.person
-        break
+    current_user = workflow.get_persons_for_rolename("Admin")[0]
   # Populate the top-level Cycle object
   cycle.workflow = workflow
   cycle.is_current = True
