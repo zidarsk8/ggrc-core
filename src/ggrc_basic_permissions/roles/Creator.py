@@ -67,6 +67,11 @@ permissions = {
         "ControlAssertion",
         "Control",
         "Comment",
+        {
+            "type": "Assessment",
+            "condition": "is_auditor",
+            "terms": {},
+        },
         "Issue",
         "DataAsset",
         "AccessGroup",
