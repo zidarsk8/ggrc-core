@@ -93,7 +93,6 @@ def all_cache_entries():
       resource('task_group_objects', 'TaskGroupObject'),
       resource('task_group_tasks', 'TaskGroupTask'),
       resource('task_groups', 'TaskGroup'),
-      resource('workflow_people', 'WorkflowPerson'),
       resource('workflows', 'Workflow'),
   ]
 
@@ -119,9 +118,6 @@ def all_mapping_entries():
       mapping('TaskGroupObject', 'task_group'),
       mapping('TaskGroupTask', 'task_group'),
       mapping('TaskGroup', 'workflow'),
-      mapping('WorkflowPerson', 'context'),
-      mapping('WorkflowPerson', 'person'),
-      mapping('WorkflowPerson', 'workflow'),
       mapping('Cycle', 'workflow'),
       mapping('Cycle', 'cycle_task_groups'),
       mapping('CycleTaskGroup', 'cycle'),

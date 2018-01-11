@@ -24,7 +24,6 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.login import get_current_user
 from ggrc.models import mixins
 from ggrc.models import reflection
-from ggrc.models.associationproxy import association_proxy
 from ggrc.models.context import HasOwnContext
 from ggrc.models.deferred import deferred
 from ggrc_workflows.models import cycle
@@ -67,11 +66,6 @@ class Workflow(roleable.Roleable,
       db.Column(db.Boolean, default=False, nullable=False), 'Workflow')
 
   recurrences = db.Column(db.Boolean, default=False, nullable=False)
-
-  workflow_people = db.relationship(
-      'WorkflowPerson', backref='workflow', cascade='all, delete-orphan')
-  people = association_proxy(
-      'workflow_people', 'person', 'WorkflowPerson')
 
   task_groups = db.relationship(
       'TaskGroup', backref='workflow', cascade='all, delete-orphan')
@@ -256,8 +250,6 @@ class Workflow(roleable.Roleable,
   ]
 
   _api_attrs = reflection.ApiAttributes(
-      'workflow_people',
-      reflection.Attribute('people', create=False, update=False),
       'task_groups',
       'notify_on_change',
       'notify_custom_message',
@@ -365,7 +357,6 @@ class Workflow(roleable.Roleable,
         ).undefer_group(
             'TaskGroupTask_complete'
         ),
-        orm.subqueryload('workflow_people'),
     )
 
   @classmethod

@@ -177,19 +177,6 @@ def related_people(exp, object_class, target_class, query):
             model.id.in_(exp['ids']),
         ))
     )
-  if "Workflow" in (object_class.__name__, exp['object_name']):
-    try:
-      from ggrc_workflows.models import (relationship_helper as
-                                         wf_relationship_handler)
-    except ImportError:
-      # ggrc_workflows module is not enabled
-      return sqlalchemy.sql.false()
-    else:
-      res.extend(wf_relationship_handler.workflow_person(
-          object_class.__name__,
-          exp['object_name'],
-          exp['ids'],
-      ))
   if res:
     return object_class.id.in_([obj[0] for obj in res])
   return sqlalchemy.sql.false()
