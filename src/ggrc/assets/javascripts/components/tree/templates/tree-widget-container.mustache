@@ -13,6 +13,8 @@
                          (removeAdvanced)="removeAdvancedFilters"
                          {show-advanced}="statusFilterVisible"
                          {disabled}="advancedSearch.filter"
+                         {depth}="options.depth"
+                         {filter-deep-limit}="options.filterDeepLimit"
       ></tree-filter-input>
       {{#if statusFilterVisible}}
         <tree-status-filter class="flex-size-1"
