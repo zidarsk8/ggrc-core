@@ -476,7 +476,5 @@ import Permission from '../permission';
         }
       });
     },
-
-    ignore_ca_errors: true,
   });
 })(window.can, window.CMS);

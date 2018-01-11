@@ -31,7 +31,6 @@ describe('GGRC.Components.UnarchiveLink', function () {
         display_name: function () {
           return displayName;
         },
-        setup_custom_attributes: jasmine.createSpy(),
       });
 
       scope = new can.Map({

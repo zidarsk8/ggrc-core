@@ -413,33 +413,6 @@ describe('can.Model.Cacheable', function () {
     });
   });
 
-  describe('::_custom_attribute_map', function () {
-    it('sets a custom attribute mapping', function () {
-      let obj = CMS.Models.DummyModel();
-      let target = CMS.Models.DummyModel();
-
-      obj.custom_attribute_definitions = [{
-        id: 1,
-        attribute_type: 'Map:DummyModel',
-      }];
-      obj.custom_attributes = can.Map();
-
-      target.stub = function () {
-        return {
-          type: 'DummyModel',
-          id: 1,
-        };
-      };
-
-      obj._custom_attribute_map(1, target);
-      expect(obj.custom_attributes[1]).toEqual('DummyModel:1');
-      obj._custom_attribute_map(1, 'garbage');
-      expect(obj.custom_attributes[1]).toEqual('DummyModel:1');
-      obj._custom_attribute_map(1, '');
-      expect(obj.custom_attributes[1]).toEqual('Person:None');
-    });
-  });
-
   describe('::customAttr', () => {
     let instance;
 
