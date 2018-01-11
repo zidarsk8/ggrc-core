@@ -482,7 +482,6 @@ def contributed_object_views():
 
   return [
       object_view(models.Document),
-      object_view(models.BackgroundTask),
       object_view(models.Program),
       object_view(models.Audit),
       object_view(models.Contract),
