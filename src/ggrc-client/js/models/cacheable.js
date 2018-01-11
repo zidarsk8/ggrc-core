@@ -4,6 +4,8 @@
 */
 // Disabling some minor eslint rules until major refactoring
 /* eslint-disable no-console, id-length */
+
+import CustomAttributeAccess from '../plugins/utils/custom-attribute/custom-attribute-access';
 import {
   isSnapshot,
   toObjects,
@@ -350,6 +352,15 @@ import RefreshQueue from './refresh_queue';
           GGRC.custom_attributable_types = [];
         }
         GGRC.custom_attributable_types.push(can.extend({}, this));
+
+        this.validate(
+          '_gca_valid',
+          function () {
+            if (!this._gca_valid) {
+              return 'Missing required global custom attribute';
+            }
+          }
+        );
       }
 
       // register this type as Roleable if applicable
@@ -846,6 +857,10 @@ import RefreshQueue from './refresh_queue';
       if (!this._pending_joins) {
         this.attr('_pending_joins', []);
       }
+
+      if (this.isCustomAttributable()) {
+        this._customAttributeAccess = new CustomAttributeAccess(this);
+      }
     },
     load_custom_attribute_definitions: function () {
       let definitions;
@@ -949,6 +964,64 @@ import RefreshQueue from './refresh_queue';
       } else {
         this.custom_attributes.attr(attrId, 'Person:None');
       }
+    },
+    /*
+     * 1 version:
+     * Returns all custom attribute objects owned by instance.
+     * @variation 1
+     * @return {CustomAttributeObject[]} - The array contained custom attribute
+     *  objects.
+     *
+     * 2 version:
+     * Returns custom attribute object with certain custom attribute id.
+     * @variation 2
+     * @param {number} caId(2) - Custom attribute id.
+     * @return {CustomAttributeObject|undefined} - Found custom attribute object
+     *  otherwise - undefined if it wasn't found.
+     *
+     * 3 version:
+     * Returns filtered array with help options object.
+     * @param {object} options -
+     * @param {CUSTOM_ATTRIBUTE_TYPE} options.type - Filters array by custom
+     *  attribute type.
+     * @return {CustomAttributeObject[]} - Filtered custom attriubte object
+     *  list.
+     *
+     * 4 version:
+     * Sets value for certain custom attribute object.
+     * @param {number|string} caId(4) - Custom attribute id.
+     * @param {number|string|boolean} - Value for custom attribute object.
+     */
+    customAttr(...args) {
+      if (!this.isCustomAttributable()) {
+        throw Error('This type has not ability to set custom attribute value');
+      }
+
+      switch (args.length) {
+        case 0: {
+          return this._getAllCustomAttr();
+        }
+        case 1: {
+          return this._getCustomAttr(args[0]);
+        }
+        case 2: {
+          this._setCustomAttr(...args);
+          break;
+        }
+      }
+    },
+    _getAllCustomAttr() {
+      return this._customAttributeAccess.read();
+    },
+    _getCustomAttr(arg) {
+      return this._customAttributeAccess.read(arg);
+    },
+    _setCustomAttr(caId, value) {
+      const change = {caId: Number(caId), value};
+      this._customAttributeAccess.write(change);
+    },
+    isCustomAttributable() {
+      return this.attr('class').is_custom_attributable;
     },
     computed_errors: function () {
       let errors = this.errors();
