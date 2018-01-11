@@ -3,15 +3,6 @@
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
-.datepicker__wrapper {
-  position: relative;
-  .fa-calendar {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-  }
-}
-
 .datepicker__calendar {
   position: absolute;
   z-index: zIndex(ui-autocomplete);
@@ -36,6 +27,13 @@
 
 .datepicker__input-wrapper {
   position: relative;
+
+  .fa-calendar {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+  }
+
   .datepicker__remove-value {
     cursor: pointer;
     position: absolute;
