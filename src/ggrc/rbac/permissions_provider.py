@@ -152,6 +152,11 @@ def has_changed_condition(instance, property_name, prevent_if=None, **_):
       property_name, False).has_changes()
 
 
+def is_auditor(instance, **_):
+  """Check if user has auditor role on the audit field of the instance"""
+  return any(acl for acl in instance.audit.access_control_list
+             if acl.ac_role.name == "Auditors" and acl.person == current_user)
+
 """
 All functions with a signature
 
@@ -165,7 +170,8 @@ _CONDITIONS_MAP = {
     'relationship': relationship_condition,
     'forbid': forbid_condition,
     'has_not_changed': has_not_changed_condition,
-    'has_changed': has_changed_condition
+    'has_changed': has_changed_condition,
+    'is_auditor': is_auditor
 }
 
 

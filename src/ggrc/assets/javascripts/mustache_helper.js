@@ -2518,4 +2518,21 @@ Example:
         options.inverse(options.contexts);
     }
   );
+  Mustache.registerHelper('is_auditor', function (options) {
+    const auditor = GGRC.access_control_roles.find(
+        (role) => role.name == 'Auditors');
+    const audit = GGRC.page_instance();
+    if (audit.type != 'Audit') {
+      console.warn('is_auditor called on non audit page');
+      return options.inverse(options.contexts);
+    }
+    const isAuditor = audit.access_control_list.filter(
+        (acl) => acl.ac_role_id == auditor.id &&
+                 acl.person_id == GGRC.current_user.id).length;
+
+    if (isAuditor) {
+      return options.fn(options.contexts);
+    }
+    return options.inverse(options.contexts);
+  });
 })(jQuery, can);
