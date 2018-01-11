@@ -4,14 +4,14 @@
 */
 
 import * as TreeViewUtils from '../../../plugins/utils/tree-view-utils';
+import Component from '../mapper-results-columns-configuration';
 
 describe('GGRC.Components.mapperResultsColumnsConfiguration', function () {
   'use strict';
-  var viewModel;
+  let viewModel;
 
   beforeAll(function () {
-    viewModel = GGRC.Components
-      .getViewModel('mapperResultsColumnsConfiguration');
+    viewModel = getComponentVM(Component);
   });
 
   describe('set() of viewModel.selectedColumns', function () {
@@ -49,7 +49,7 @@ describe('GGRC.Components.mapperResultsColumnsConfiguration', function () {
   });
 
   describe('init() method', function () {
-    var displayPrefs = 'displayPrefs';
+    const displayPrefs = 'displayPrefs';
 
     beforeEach(function () {
       spyOn(viewModel, 'initializeColumns');
@@ -71,7 +71,7 @@ describe('GGRC.Components.mapperResultsColumnsConfiguration', function () {
 
   describe('getModel() method', function () {
     it('returns the current model type constructor', function () {
-      var result;
+      let result;
       viewModel.attr('modelType', 'Program');
       result = viewModel.getModel();
       expect(result).toEqual(CMS.Models.Program);
@@ -79,8 +79,8 @@ describe('GGRC.Components.mapperResultsColumnsConfiguration', function () {
   });
 
   describe('initializeColumns() method', function () {
-    var selectedColumns;
-    var availableColumns;
+    let selectedColumns;
+    let availableColumns;
 
     beforeAll(function () {
       selectedColumns = new can.makeArray([
@@ -98,7 +98,7 @@ describe('GGRC.Components.mapperResultsColumnsConfiguration', function () {
     });
 
     it('updates viewModel.columns', function () {
-      var columns;
+      let columns;
       viewModel.initializeColumns();
       columns = viewModel.attr('columns');
 
@@ -129,7 +129,7 @@ describe('GGRC.Components.mapperResultsColumnsConfiguration', function () {
   });
 
   describe('stopPropagation() method', function () {
-    var event;
+    let event;
 
     beforeEach(function () {
       event = {
