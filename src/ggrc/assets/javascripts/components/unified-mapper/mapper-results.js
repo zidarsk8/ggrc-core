@@ -9,7 +9,6 @@ import '../related-objects/related-assessments';
 import '../object-list/object-list';
 import '../object-selection/object-selection';
 import '../tree_pagination/tree_pagination';
-import '../simple-modal/simple-modal';
 import template from './templates/mapper-results.mustache';
 import * as StateUtils from '../../plugins/utils/state-utils';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
