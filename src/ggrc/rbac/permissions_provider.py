@@ -171,7 +171,7 @@ _CONDITIONS_MAP = {
     'forbid': forbid_condition,
     'has_not_changed': has_not_changed_condition,
     'has_changed': has_changed_condition,
-    'is_auditor': is_auditor
+    'is_auditor': is_auditor,
 }
 
 
