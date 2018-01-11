@@ -23,7 +23,7 @@ GGRC.query_parser = {
   join_queries: function(left, right, op_key) {
     var expression = null,
         op = {},
-        keys = jQuery.unique(left.keys.concat(right.keys));
+        keys = new Set(left.keys.concat(right.keys));
     if (!left.expression.op){
       return right;
     }
@@ -42,7 +42,7 @@ GGRC.query_parser = {
     }
     return {
       expression: expression,
-      keys: keys,
+      keys: Array.from(keys),
       order_by: right.order_by,
     }
   },
@@ -92,11 +92,11 @@ GGRC.query_parser = {
               };
             },
         peg$c1 = function(or_exp, order_by) {
-              var keys = jQuery.unique(or_exp.keys.sort());
+              var keys = new Set(or_exp.keys.sort());
               delete or_exp.keys;
               return {
                 expression: or_exp,
-                keys: keys,
+                keys: Array.from(keys),
                 order_by: order_by,
               };
             },

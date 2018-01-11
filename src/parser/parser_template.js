@@ -23,7 +23,7 @@ GGRC.query_parser = {
   join_queries: function(left, right, op_key) {
     var expression = null,
         op = {},
-        keys = jQuery.unique(left.keys.concat(right.keys));
+        keys = new Set(left.keys.concat(right.keys));
     if (!left.expression.op){
       return right;
     }
@@ -42,7 +42,7 @@ GGRC.query_parser = {
     }
     return {
       expression: expression,
-      keys: keys,
+      keys: Array.from(keys),
       order_by: right.order_by,
     }
   },

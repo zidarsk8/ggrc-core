@@ -15,11 +15,11 @@ start
     }
   / _* or_exp:or_exp order_by:order_by _*
     {
-      var keys = jQuery.unique(or_exp.keys.sort());
+      var keys = new Set(or_exp.keys.sort());
       delete or_exp.keys;
       return {
         expression: or_exp,
-        keys: keys,
+        keys: Array.from(keys),
         order_by: order_by,
       };
     }
