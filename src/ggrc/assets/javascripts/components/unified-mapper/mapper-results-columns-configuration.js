@@ -4,6 +4,7 @@
  */
 
 import '../tree/tree-header-selector';
+import '../tree/tree-visible-column-checkbox';
 import tmpl from './templates/mapper-results-columns-configuration.mustache';
 import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
 
@@ -47,31 +48,17 @@ import * as TreeViewUtils from '../../plugins/utils/tree-view-utils';
         var selectedColumns = this.attr('selectedColumns');
         var availableColumns = this.attr('availableColumns');
         var columns = TreeViewUtils
-          .createSelectedColumnsMap(availableColumns, selectedColumns);
+          .getVisibleColumnsConfig(availableColumns, selectedColumns);
 
         this.attr('columns', columns);
       },
-      onSelect: function (attr) {
-        var columns = this.columns;
-        var value = {};
-        value[attr.attr_name] = !columns[attr.attr_name];
-        this.columns.attr(value);
-      },
-      isSelected: function (attr) {
-        var columns = this.attr('columns');
-        return columns[attr.attr_name];
-      },
       setColumns: function () {
-        var selectedNames = [];
-        var columns;
+        const selectedNames = this.attr('columns')
+          .attr()
+          .filter((item) => item.selected)
+          .map((item) => item.name);
 
-        can.each(this.attr('columns'), function (v, k) {
-          if (v) {
-            selectedNames.push(k);
-          }
-        });
-
-        columns =
+        const columns =
           TreeViewUtils.setColumnsForModel(
             this.getModel().model_singular,
             selectedNames,

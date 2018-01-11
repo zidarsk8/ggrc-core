@@ -101,56 +101,21 @@ describe('GGRC.Components.mapperResultsColumnsConfiguration', function () {
       var columns;
       viewModel.initializeColumns();
       columns = viewModel.attr('columns');
-      expect(columns).toEqual(jasmine.objectContaining({
-        title: true,
-        date: false
-      }));
-    });
-  });
 
-  describe('onSelect() method', function () {
-    beforeEach(function () {
-      viewModel.attr('columns', new can.Map({
-        title: true,
-        date: false
-      }));
-    });
-
-    it('changes column.attr()', function () {
-      viewModel.onSelect({attr_name: 'date'});
-      expect(viewModel.attr('columns'))
-        .toEqual(jasmine.objectContaining({
-          title: true,
-          date: true
-        }));
-    });
-  });
-
-  describe('isSelected() method', function () {
-    beforeEach(function () {
-      viewModel.attr('columns', new can.Map({
-        title: true,
-        date: false
-      }));
-    });
-
-    it('returns true if column is selected', function () {
-      var result = viewModel.isSelected({attr_name: 'title'});
-      expect(result).toEqual(true);
-    });
-
-    it('returns false if column is not selected', function () {
-      var result = viewModel.isSelected({attr_name: 'date'});
-      expect(result).toEqual(false);
+      expect(columns.length).toBe(2);
+      expect(columns[0].name).toEqual('title');
+      expect(columns[0].selected).toBeTruthy();
+      expect(columns[1].name).toEqual('date');
+      expect(columns[1].selected).toBeFalsy();
     });
   });
 
   describe('setColumns() method', function () {
     beforeEach(function () {
-      viewModel.attr('columns', new can.Map({
-        title: true,
-        date: false
-      }));
+      viewModel.attr('columns', [
+        {name: 'title', selected: true},
+        {name: 'date', selected: false},
+      ]);
       spyOn(TreeViewUtils, 'setColumnsForModel')
         .and.returnValue({
           selected: 'selectedColumns'

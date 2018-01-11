@@ -3,8 +3,8 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<a href="#" class="dropdown-toggle tview-dropdown-toggle"
-   data-toggle="dropdown">
+<a href="#" class="dropdown-toggle tview-dropdown-toggle" 
+  data-toggle="dropdown" ($click)="initializeColumns()">
   <i class="fa fa-fw fa-bars"></i>
 </a>
 <div class="dropdown-menu dropdown-menu-form" can-click="stopPropagation">
@@ -14,20 +14,12 @@
     </button>
     <h5>Set visible fields for {{getModel.title_singular}}</h5>
     <ul class="attr-list">
-      {{#each availableColumns}}
+      {{#columns}}
         <li class="{{#mandatory}}disabled{{/mandatory}}">
-          <label class="checkbox-inline"
-                 title="{{attr_title}}">
-            <input type="checkbox"
-                   {{#mandatory}}disabled{{/mandatory}}
-                   can-change="onSelect"
-                   {{#isSelected}}checked{{/isSelected}}
-                   class="notify-wrap attr-checkbox
-                   {{#mandatory}}mandatory{{/mandatory}}">
-            {{attr_title}}
-          </label>
+          <tree-visible-column-checkbox {column}=".">
+          </tree-visible-column-checkbox>
         </li>
-      {{/each}}
+      {{/columns}}
     </ul>
     <button type="button"
             class="btn btn-small btn-lightBlue set-tree-attrs"
