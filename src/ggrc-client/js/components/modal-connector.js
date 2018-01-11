@@ -153,53 +153,6 @@ import {
       },
       '{parent_instance} updated': 'deferred_update',
       '{parent_instance} created': 'deferred_update',
-
-      // this works like autocomplete_select on all modal forms and
-      // descendant class objects.
-      autocomplete_select: function (el, event, ui) {
-        let mapping;
-        let extraAttrs;
-        if (!this.element) {
-          return;
-        }
-        extraAttrs = can.reduce(
-          this.element.find('input:not([data-mapping], [data-lookup])').get(),
-          function (attrs, el) {
-            attrs[$(el).attr('name')] = $(el).val();
-            return attrs;
-          }, {});
-        if (this.viewModel.attr('deferred')) {
-          this.viewModel.changes.push({
-            what: ui.item,
-            how: 'add',
-            extra: extraAttrs,
-          });
-          this.viewModel.parent_instance.attr('_changes',
-            this.viewModel.changes);
-        } else {
-          mapping = this.viewModel.mapping ||
-            GGRC.Mappings.get_canonical_mapping_name(
-              this.viewModel.instance.constructor.shortName,
-              ui.item.constructor.shortName);
-          this.viewModel.instance
-            .mark_for_addition(mapping, ui.item, extraAttrs);
-        }
-        function doesExist(arr, owner) {
-          if (!arr || !arr.length) {
-            return false;
-          }
-          return !!~can.inArray(owner.id, $.map(arr, function (item) {
-            return item.id;
-          }));
-        }
-
-        // If it's owners and user isn't pre-added
-        if (!(~['owners'].indexOf(this.viewModel.mapping) &&
-          doesExist(this.viewModel.list, ui.item))) {
-          this.addListItem(ui.item);
-        }
-        this.viewModel.attr('show_new_object_form', false);
-      },
       '[data-toggle=unmap] click': function (el, ev) {
         ev.stopPropagation();
 
