@@ -481,6 +481,7 @@ def contributed_object_views():
   """Contributed object views"""
 
   return [
+      object_view(models.Document),
       object_view(models.BackgroundTask),
       object_view(models.Program),
       object_view(models.Audit),
