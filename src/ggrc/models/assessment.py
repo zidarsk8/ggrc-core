@@ -153,7 +153,7 @@ class Assessment(Roleable, statusable.Statusable, AuditRelationship,
   ]
 
   AUTO_REINDEX_RULES = [
-      mixin.ReindexRule("Audit", lambda x: x.assessments),
+      mixin.ReindexRule("Audit", lambda x: x.assessments, ["archived"]),
   ]
 
   _custom_publish = {
