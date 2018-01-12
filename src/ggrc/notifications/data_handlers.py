@@ -83,7 +83,7 @@ def _get_updated_roles(new_list, old_list, roles):
     old_dict[role_id].add(person_id)
 
   diff_roles = set(new_dict.keys()) ^ set(old_dict.keys())
-  role_set = {roles[role_id] for role_id in diff_roles}
+  role_set = {roles[role_id] for role_id in diff_roles if role_id in roles}
 
   common_roles = set(new_dict.keys()) & set(old_dict.keys())
   for role_id in common_roles:
