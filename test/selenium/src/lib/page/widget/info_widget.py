@@ -57,7 +57,8 @@ class InfoWidget(base.Widget):
           self.info_page_footer.text.split(
               string_utils.Symbols.WHITESPACE * 6))
       self.created_at_txt = (
-          re.sub("Created at", string_utils.Symbols.BLANK, _created_at_txt))
+          re.sub(element.Common.CREATED_AT, string_utils.Symbols.BLANK,
+                 _created_at_txt))
       self.updated_at_txt = (
           _updated_at_txt.splitlines()[1].replace(
               "on ", string_utils.Symbols.BLANK))
@@ -386,8 +387,8 @@ class Audits(InfoWidget):
   def __init__(self, driver):
     super(Audits, self).__init__(driver)
     self.audit_captain_lbl_txt, self.audit_captain_txt = (
-        self.get_header_and_value_txt_from_custom_scopes(
-            self._elements.AUDIT_CAPTAIN.upper()))
+        self.get_header_and_value_txt_from_people_scopes(
+            self._elements.AUDIT_CAPTAINS.upper()))
     self._extend_list_all_scopes(
         self.audit_captain_lbl_txt, self.audit_captain_txt)
 

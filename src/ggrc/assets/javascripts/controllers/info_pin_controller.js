@@ -17,10 +17,12 @@ import '../components/object-list-item/document-object-list-item';
 import '../components/object-list-item/editable-document-object-list-item';
 import '../components/show-related-assessments-button/show-related-assessments-button';
 import '../components/unarchive_link';
+import '../components/sort/sort-by';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';
 import {confirm} from '../plugins/utils/modals';
 
-can.Control('CMS.Controllers.InfoPin', {
+export default can.Control({
+  pluginName: 'cms_controllers_info_pin',
   defaults: {
     view: GGRC.mustache_path + '/base_objects/info.mustache'
   }
@@ -28,12 +30,16 @@ can.Control('CMS.Controllers.InfoPin', {
   init: function (el, options) {
     this.element.height(0);
   },
+  isPinVisible() {
+    const height = this.element.height();
+    return height > 0;
+  },
   findView: function (instance) {
     var view = instance.class.table_plural + '/info';
 
     if (instance instanceof CMS.Models.Person) {
       view = GGRC.mustache_path +
-        '/ggrc_basic_permissions/people_roles/info.mustache';
+        '/people_roles/info.mustache';
     } else if (view in GGRC.Templates) {
       view = GGRC.mustache_path + '/' + view + '.mustache';
     } else {
@@ -242,6 +248,39 @@ can.Control('CMS.Controllers.InfoPin', {
 
     this.unsetInstance();
   },
+  /**
+   * Checks if there are modals on top of the info pane.
+   * @return {boolean} - true if there are modals on top of the info pane else
+   *  false.
+   */
+  existModals() {
+    return (
+      $('.modal:visible').length > 0 ||
+      $('[role=dialog]:visible').length > 0
+    );
+  },
+  /**
+   * Checks if $target is an element wherein shouldn't be closed the info pane
+   * with help the escape key.
+   * @param {jQuery} $target - an jQuery element.
+   * @return {boolean} - true if the escape key shouldn't be processed
+   *  otherwise false.
+   */
+  isEscapeKeyException($target) {
+    const insideInfoPane = $target.closest('.pin-content').length > 0;
+    const excludeForEscapeKey = ['button', '[role=button]', '.btn', 'input',
+      'textarea'];
+    const isExcludingControl = _.any(excludeForEscapeKey, (typeName) =>
+      $target.is(typeName)
+    );
+    return (
+      insideInfoPane &&
+      (
+        isExcludingControl ||
+        $target.attr('contentEditable') === 'true'
+      )
+    );
+  },
   ' scroll': function (el, ev) {
     var header = this.element.find('.pane-header');
     var isFixed = el.scrollTop() > 0;
@@ -255,5 +294,22 @@ can.Control('CMS.Controllers.InfoPin', {
       return HEADER_PADDING - offset;
     });
     header.toggleClass('pane-header__fixed', isFixed);
-  }
+  },
+  '{window} keyup'(el, event) {
+    const ESCAPE_KEY_CODE = 27;
+    const $target = $(event.target);
+    const escapeKeyWasPressed = event.keyCode === ESCAPE_KEY_CODE;
+
+    const close = (
+      escapeKeyWasPressed &&
+      this.isPinVisible() &&
+      !this.existModals() &&
+      !this.isEscapeKeyException($target)
+    );
+
+    if (close) {
+      this.close();
+      event.stopPropagation();
+    }
+  },
 });

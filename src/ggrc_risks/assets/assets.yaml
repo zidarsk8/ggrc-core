@@ -2,7 +2,3 @@
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 dashboard-js-template-files:
-  - dashboard/lhn_risks.mustache
-  - risks/modal_content.mustache
-  - risks/info.mustache
-  - threats/modal_content.mustache

@@ -97,8 +97,7 @@ var viewModel = can.Map.extend({
   availableAttributes: function () {
     var available = getColumnsForModel(
       this.attr('criteria.objectName'),
-      null,
-      true
+      null
     ).available;
     return available;
   },

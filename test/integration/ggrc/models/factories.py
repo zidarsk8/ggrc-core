@@ -198,7 +198,6 @@ class AuditFactory(TitledFactory):
     model = models.Audit
 
   status = "Planned"
-  contact = factory.LazyAttribute(lambda _: PersonFactory())
   program = factory.LazyAttribute(lambda _: ProgramFactory())
   context = factory.LazyAttribute(lambda _: ContextFactory())
 
@@ -262,6 +261,12 @@ class RelationshipFactory(ModelFactory):
     model = models.Relationship
   source = None
   destination = None
+
+  @classmethod
+  def randomize(cls, *args):
+    """Create a relationship with randomly shuffled source and destination."""
+    obj1, obj2 = random.sample(args, 2)
+    return cls(source=obj1, destination=obj2)
 
 
 class PersonFactory(ModelFactory):

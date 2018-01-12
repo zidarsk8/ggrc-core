@@ -1,0 +1,29 @@
+{{!
+    Copyright (C) 2017 Google Inc.
+    Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+
+  {{#switch error.code}}
+    {{#case 404}}The {{type}} was not found in Drive, or you do not have access to read it.{{/case}}
+    {{#case 403}}You were not permitted to access Drive.{{/case}}
+    {{#case 401}}You are not logged in to Drive.{{/case}}
+    {{#case 500}}Google Drive encountered an internal error.{{/case}}
+    {{#case 400}}Google API didn't understand the request from GGRC{{/case}}
+    {{#default}}No error code was returned or the error was not recognized{{/default}}
+  {{/switch}}
+
+  <div class="info info-expand">
+    <a href="javascript://">
+      <span class="out">
+        More
+      </span>
+      <span class="in">
+        Hide
+      </span>
+       Error Info
+    </a>
+    <div class="error-container hidden-fields-area in">
+      {{error.message}} <strong>(Code {{error.code}})</strong>
+    </div>
+  </div>

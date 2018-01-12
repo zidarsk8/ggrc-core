@@ -42,7 +42,7 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
 
     cav = self._get_or_create_ca()
     cav.attribute_value = self.value
-    if isinstance(cav.attribute_value, models.mixins.Identifiable):
+    if isinstance(cav.attribute_value, models.mixins.base.Identifiable):
       obj = cav.attribute_value
       cav.attribute_value = obj.__class__.__name__
       cav.attribute_object_id = obj.id
@@ -55,8 +55,10 @@ class CustomAttributeColumHandler(handlers.TextColumnHandler):
     """
     self.definition = self.get_ca_definition()
     if self.definition is None:
-      self.add_warning(errors.INVALID_ATTRIBUTE_WARNING,
-                       column_name=self.display_name)
+      # In dry run mode CADs is not created for new objects.
+      if not self.dry_run:
+        self.add_warning(errors.INVALID_ATTRIBUTE_WARNING,
+                         column_name=self.display_name)
       return None
     type_ = self.definition.attribute_type.split(":")[0]
     value_handler = self._type_handlers[type_]
@@ -204,8 +206,6 @@ class ObjectCaColumnHandler(CustomAttributeColumHandler):
     This is a hack to get set_value on this handler called after all other
     values have already been set.
     """
-    if self.dry_run:
-      return
     self.value = self.parse_item()
     super(ObjectCaColumnHandler, self).set_obj_attr()
 

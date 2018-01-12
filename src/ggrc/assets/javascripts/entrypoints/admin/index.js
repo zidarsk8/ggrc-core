@@ -10,9 +10,6 @@ import '../../controllers/tree/tree-loader';
 import '../../controllers/tree/tree-view';
 import '../../controllers/tree/tree-view-node';
 import '../../controllers/tree/list_view_controller';
-import '../../controllers/dashboard_widgets_controller';
-import '../../controllers/dashboard_widget_controller';
-import '../../controllers/dashboard_controller';
 
 // Modules and Apps
 import '../../modules/widget_descriptor';
@@ -24,3 +21,5 @@ import '../../components/related-objects/related-reference-urls';
 import '../../components/people/people-list-info';
 
 import '../../common-handlers';
+
+import '../modules';

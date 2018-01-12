@@ -89,7 +89,7 @@
     AssessmentTemplate: ['Audit'],
     DataAsset: filteredTypes,
     Facility: filteredTypes,
-    Issue: objectVersions.concat(_.difference(filteredTypes, ['Person'])),
+    Issue: objectVersions.concat(filteredTypes),
     Market: filteredTypes,
     Objective: filteredTypes,
     OrgGroup: filteredTypes,

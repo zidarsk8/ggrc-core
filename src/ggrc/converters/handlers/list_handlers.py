@@ -6,7 +6,7 @@
 from ggrc.converters.handlers import handlers
 
 
-class ValueListHandler(handlers.StatusColumnHandler):
+class ValueListHandler(handlers.ColumnHandler):
   """Handler for cells where the content represents a list of values.
 
   This column handler will take a comma or new line separated values and turn

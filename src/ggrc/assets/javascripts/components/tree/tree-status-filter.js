@@ -31,7 +31,8 @@ let viewModel = can.Map.extend({
     });
     this.setFilter(states);
   },
-  loadDefaultStates(modelName) {
+  getDefaultStates() {
+    let modelName = this.attr('widgetId') || this.attr('modelName');
     // Get the status list from local storage
     let savedStates = this.attr('displayPrefs').getTreeViewStates(modelName);
     // Get the status list from query string
@@ -79,7 +80,7 @@ export default can.Component.extend({
       let filter = vm.attr('filter');
       let operation = vm.attr('operation');
       let depth = vm.attr('depth');
-      let filterName = vm.attr('widgetId') || vm.attr('modelName');
+
       let filterStates = StateUtils.getStatesForModel(vm.attr('modelName'))
         .map((state) => {
           return {
@@ -101,7 +102,7 @@ export default can.Component.extend({
       CMS.Models.DisplayPrefs.getSingleton().then((displayPrefs) => {
         vm.attr('displayPrefs', displayPrefs);
 
-        let defaultStates = vm.loadDefaultStates(filterName);
+        let defaultStates = vm.getDefaultStates();
         vm.initializeFilter(defaultStates);
 
         // Start listening route events only after full initialization.
@@ -116,17 +117,20 @@ export default can.Component.extend({
     },
     '{viewModel} disabled'() {
       if (this.viewModel.attr('disabled')) {
-        this.viewModel.attr('selectedStates', []);
+        this.viewModel.initializeFilter([]);
       } else {
-        this.viewModel.loadTreeStates(this.viewModel.attr('modelName'));
+        let defaultStates = this.viewModel.getDefaultStates();
+        this.viewModel.initializeFilter(defaultStates);
       }
     },
     '{viewModel.router} state'(router, event, newValue) {
-      let states = newValue ||
+      if (!this.viewModel.attr('disabled')) {
+        let states = newValue ||
         this.viewModel.attr('filterStates').map((state) => state.value);
 
-      this.viewModel.initializeFilter(states);
-      this.viewModel.dispatch('filter');
+        this.viewModel.initializeFilter(states);
+        this.viewModel.dispatch('filter');
+      }
     },
   },
 });

@@ -108,7 +108,6 @@
 < src/ggrc/assets/stylesheets/components/related-objects/_related-reference-urls.scss
 < src/ggrc/assets/vendor/bootstrap-sass
 < src/ggrc/converters/handlers/related_person.py
-< src/ggrc_gdrive_integration/assets/javascripts/components/templates/gdrive_picker_launcher_upload_error.mustache
 < src/ggrc_gdrive_integration/migrations/README
 < src/ggrc/integrations/__init__.py
 < src/ggrc/maintenance_views/__init__.py
@@ -124,7 +123,6 @@
 < src/ggrc/templates/maintenance/maintenance.html
 < src/ggrc/templates/maintenance/trigger.html
 < src/ggrc/utils/error_handlers.py
-< src/ggrc_workflows/assets/assets.js
 < src/ggrc_workflows/migrations/__init__.py
 < src/ggrc_workflows/migrations/utils/__init__.py
 < src/ggrc_workflows/migrations/utils/task_group_task_date_calculator/__init__.py

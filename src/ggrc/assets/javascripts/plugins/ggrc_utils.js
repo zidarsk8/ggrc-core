@@ -96,6 +96,11 @@ import Permission from '../permission';
     },
     formatDate: function (date, hideTime) {
       var currentTimezone = moment.tz.guess();
+      var formats = [
+        'YYYY-MM-DD',
+        'YYYY-MM-DDTHH:mm:ss',
+        'YYYY-MM-DDTHH:mm:ss.SSSSSS',
+      ];
       var inst;
 
       if (date === undefined || date === null) {
@@ -104,7 +109,7 @@ import Permission from '../permission';
 
       if (typeof date === 'string') {
         // string dates are assumed to be in ISO format
-        return moment.utc(date, 'YYYY-MM-DD', true).format('MM/DD/YYYY');
+        return moment.utc(date, formats, true).format('MM/DD/YYYY');
       }
 
       inst = moment(new Date(date.isComputed ? date() : date));
@@ -112,6 +117,9 @@ import Permission from '../permission';
         return inst.format('MM/DD/YYYY');
       }
       return inst.tz(currentTimezone).format('MM/DD/YYYY hh:mm:ss A Z');
+    },
+    fileSafeCurrentDate() {
+      return moment().format('YYYY-MM-DD_HH-mm-ss');
     },
     getPickerElement: function (picker) {
       return _.find(_.values(picker), function (val) {
@@ -122,7 +130,7 @@ import Permission from '../permission';
       });
     },
     download: function (filename, text) {
-      var TMP_FILENAME = 'export_objects.csv';
+      var TMP_FILENAME = filename || 'export_objects.csv';
 
       // a helper for opening the "Save File" dialog to save downloaded data
       function promptSaveFile() {

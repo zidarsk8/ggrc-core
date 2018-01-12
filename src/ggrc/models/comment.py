@@ -68,7 +68,7 @@ class Commentable(object):
       # given data - this is intended.
       return ",".join(value)
     elif not value:
-      return value
+      return ""
     else:
       raise ValueError(value,
                        'Value should be either empty ' +

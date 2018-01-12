@@ -13,7 +13,6 @@ import {
   isMyAssessments,
   isMyWork,
 } from '../../plugins/utils/current-page-utils';
-
 import {RouterConfig} from '../../router';
 import routes from './routes';
 

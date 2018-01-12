@@ -142,12 +142,10 @@ function skipUnusable(modelName, attrList) {
  * Get available and selected columns for Model type
  * @param {String} modelType - Model type.
  * @param {Object} displayPrefs - Display preferences.
- * @param {Boolean} [includeRichText] - Need to include Rich Text in the configuration
  * @param {String} modelName - Model name.
  * @return {Object} Table columns configuration.
  */
-function getColumnsForModel(modelType, displayPrefs, includeRichText,
-  modelName) {
+function getColumnsForModel(modelType, displayPrefs, modelName) {
   var Cacheable = can.Model.Cacheable;
   var Model = CMS.Models[modelType];
   var modelDefinition = Model().class.root_object;
@@ -201,10 +199,6 @@ function getColumnsForModel(modelType, displayPrefs, includeRichText,
     GGRC.custom_attr_defs
       .filter(function (def) {
         var include = def.definition_type === modelDefinition;
-
-        if (!includeRichText) {
-          include = include && def.attribute_type !== 'Rich Text';
-        }
 
         return include;
       }).map(function (def) {
@@ -275,7 +269,7 @@ function getColumnsForModel(modelType, displayPrefs, includeRichText,
 function setColumnsForModel(modelType, columnNames, displayPrefs,
   modelName) {
   var availableColumns =
-    getColumnsForModel(modelType, displayPrefs, true).available;
+    getColumnsForModel(modelType, displayPrefs).available;
   var selectedColumns = [];
   var selectedNames = [];
 

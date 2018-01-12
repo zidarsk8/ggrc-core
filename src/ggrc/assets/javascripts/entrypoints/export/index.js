@@ -12,3 +12,5 @@ import '../../components/object-list/object-list';
 import '../../components/tree_pagination/tree_pagination';
 
 import '../../common-handlers';
+
+import '../modules';

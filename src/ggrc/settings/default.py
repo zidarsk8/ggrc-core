@@ -19,9 +19,22 @@ AUTOBUILD_ASSETS = False
 ENABLE_JASMINE = False
 DEBUG_ASSETS = False
 FULLTEXT_INDEXER = None
-USER_PERMISSIONS_PROVIDER = None
-EXTENSIONS = []
-exports = []  # pylint: disable=invalid-name
+USER_PERMISSIONS_PROVIDER = \
+    'ggrc_basic_permissions.CompletePermissionsProvider'
+EXTENSIONS = [
+    'ggrc_basic_permissions',
+    'ggrc_gdrive_integration',
+    'ggrc_risk_assessments',
+    'ggrc_risks',
+    'ggrc_workflows',
+]
+exports = [
+    "GAPI_KEY",
+    "GAPI_CLIENT_ID",
+    "GAPI_ADMIN_GROUP",
+    "VERSION",
+    "MAX_INSTANCES",
+]  # pylint: disable=invalid-name
 
 # Deployment-specific variables
 COMPANY = "Company, Inc."
@@ -42,7 +55,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.0.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.1.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(
@@ -83,8 +96,6 @@ APPENGINE_EMAIL = os.environ.get('APPENGINE_EMAIL', '')
 CALENDAR_MECHANISM = False
 
 MAX_INSTANCES = os.environ.get('MAX_INSTANCES', '3')
-
-exports = ['VERSION', 'MAX_INSTANCES']  # pylint: disable=invalid-name
 
 # Users with authorized domain will automatically get Creator role.
 AUTHORIZED_DOMAIN = os.environ.get('AUTHORIZED_DOMAIN', "")
@@ -160,3 +171,20 @@ ALLOWED_QUERYAPI_APP_IDS = os.environ.get(
     "ALLOWED_QUERYAPI_APP_IDS",
     "",
 ).split()
+
+# ggrc_basic_permissions specific module settings
+BOOTSTRAP_ADMIN_USERS = \
+    os.environ.get('GGRC_BOOTSTRAP_ADMIN_USERS', '').split(' ')
+
+# ggrc_gdrive_integration specific module settings
+GAPI_KEY = os.environ.get('GGRC_GAPI_KEY', "")
+GAPI_CLIENT_ID = os.environ.get('GGRC_GAPI_CLIENT_ID', "")
+# Admin group gets writer access to all
+GAPI_ADMIN_GROUP = os.environ.get('GGRC_GAPI_ADMIN_GROUP', "")
+GAPI_CLIENT_SECRET = os.environ.get('GGRC_GAPI_CLIENT_SECRET', "")
+
+# ggrc_risk_assessment specific module settings
+RISK_ASSESSMENT_URL = os.environ.get(
+    'GGRC_RISK_ASSESSMENT_URL',
+    'http://localhost:8080'
+)

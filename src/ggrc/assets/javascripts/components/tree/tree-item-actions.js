@@ -17,7 +17,7 @@ import {
   'use strict';
 
   var forbiddenEditList = ['Cycle', 'CycleTaskGroup'];
-  var forbiddenMapList = ['Workflow'];
+  var forbiddenMapList = ['Workflow', 'RiskAssessment'];
 
   var viewModel = can.Map.extend({
     define: {

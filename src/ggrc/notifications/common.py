@@ -154,8 +154,6 @@ def get_notification_data(notifications):
   # Remove notifications for objects without a contact (such as task groups)
   aggregate_data.pop("", None)
 
-  sort_comments(aggregate_data)
-
   return aggregate_data
 
 
@@ -171,14 +169,13 @@ def sort_comments(notif_data):
   Returns:
     None
   """
-  for user_notifs in notif_data.itervalues():
-    comment_notifs = user_notifs.get("comment_created", {})
+  comment_notifs = notif_data.get("comment_created", {})
 
-    for parent_obj_info, comments in comment_notifs.iteritems():
-      comments_as_list = sorted(
-          comments.itervalues(), key=itemgetter("created_at"), reverse=True)
-      # modifying a value for a given existing key is fine...
-      comment_notifs[parent_obj_info] = comments_as_list
+  for parent_obj_info, comments in comment_notifs.iteritems():
+    comments_as_list = sorted(
+        comments.itervalues(), key=itemgetter("created_at"), reverse=True)
+    # modifying a value for a given existing key is fine...
+    comment_notifs[parent_obj_info] = comments_as_list
 
 
 def get_pending_notifications():
@@ -406,6 +403,9 @@ def modify_data(data):
       if "my_tasks" in cycle:
         data["cycle_started_tasks"].update(cycle["my_tasks"])
 
+  # Move comment notifications for same object into list and sort by
+  # created_at field
+  sort_comments(data)
   data["DATE_FORMAT"] = DATE_FORMAT_US
 
   return data

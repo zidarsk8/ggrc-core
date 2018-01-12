@@ -35,7 +35,7 @@ class TestLabeledMixin(WithQueryApi, TestCase):
 
   @ddt.data(([], []),
             (["label"], ["label"]),
-            (["one", "two"], ["one", "two"]))
+            (["one", "two", "two "], ["one", "two"]))
   @ddt.unpack
   def test_add_labels(self, names, expected_names):
     """Test labels adding."""
@@ -57,7 +57,7 @@ class TestLabeledMixin(WithQueryApi, TestCase):
     res_names = self._get_label_names(response, 'assessment')
     self.assertEqual(res_names, ['Test Label'])
 
-  def test_lables_update(self):
+  def test_labels_update(self):
     """Test labels table updating."""
     response = self.api.put(self.assessment,
                             {"labels": self._get_labels_dict(["one", "two"])})
@@ -171,7 +171,7 @@ class TestLabeledMixin(WithQueryApi, TestCase):
         'fields': ['labels']
     }]
     query = self.export_parsed_csv(search_request)['Assessment']
-    self.assertEqual(query[0]['Labels'], label_name)
+    self.assertEqual(query[0]['Labels'], label_name.strip())
 
   @ddt.data(
       factories.random_str(prefix='label '),
