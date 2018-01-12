@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 
@@ -34,7 +34,7 @@ def upgrade():
 
   for role_id, permissions_json in roles:
     permissions = json.loads(permissions_json)
-    if(permissions is None): 
+    if(permissions is None):
       continue
 
     for ptype in ["read", "create", "delete", "update"]:
@@ -56,7 +56,7 @@ def downgrade():
 
   for role_id, permissions_json in roles:
     permissions = json.loads(permissions_json)
-    if(permissions is None): 
+    if(permissions is None):
       continue
 
     for ptype in ["read", "create", "delete", "update"]:

@@ -1,5 +1,5 @@
-/*!
-    Copyright (C) 2017 Google Inc.
+/*
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -52,7 +52,7 @@
       if (force || this.displayState !== 'show') {
         if (this.displayState !== 'show') {
           this.$element.trigger($.Event('show'));
-        } else { 
+        } else {
           //fix the opacity value as it currently stands to prevent show-hide-show after loading.
           this.tip().css({opacity : window.getComputedStyle(this.tip()[0]).opacity});
         }
