@@ -24,6 +24,7 @@ import RefreshQueue from '../../models/refresh_queue';
           }
         }
       },
+      tooltip: null,
       assessmentTypeObjects: [],
       instance: {},
       deferred: '@',

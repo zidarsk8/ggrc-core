@@ -42,12 +42,13 @@
 
     {{#unless readonly}}
         {{#is_allowed 'update' instance context='for'}}
-            <span class="attachments-list-action" rel="tooltip" data-original-title="{{tooltip}}">
+            <span class="attachments-list-action">
                 {{#if currentFolder}}
                     <ggrc-gdrive-picker-launcher
                             instance="instance"
                             {items-uploaded-callback}="@loadDocuments"
-                            click_event="trigger_upload_parent">
+                            click_event="trigger_upload_parent"
+                            {tooltip}=tooltip>
                         Attach
                     </ggrc-gdrive-picker-launcher>
                 {{else}}
@@ -55,7 +56,8 @@
                         <ggrc-gdrive-picker-launcher
                                 instance="instance"
                                 {items-uploaded-callback}="@loadDocuments"
-                                click_event="trigger_upload">
+                                click_event="trigger_upload"
+                                {tooltip}=tooltip>
                                 Attach
                         </ggrc-gdrive-picker-launcher>
                     {{/if}}
