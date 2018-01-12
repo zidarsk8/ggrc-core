@@ -1,0 +1,45 @@
+/*
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+*/
+
+import {
+  toObject,
+} from '../../plugins/utils/snapshot-utils';
+
+export default can.Component.extend({
+  tag: 'assessment-modal',
+  viewModel: {
+    instance: null,
+    isNewInstance: false,
+    referenceUrls: [],
+    mappedObjects: [],
+    loadData() {
+      return this.attr('instance').getRelatedObjects()
+        .then((data) => {
+          let snapshots = data.Snapshot.map((snapshot) => {
+            let object = toObject(snapshot);
+
+            snapshot.class = object.class;
+            snapshot.snapshot_object_class = 'snapshot-object';
+            snapshot.title = object.title;
+            snapshot.description = object.description;
+            snapshot.viewLink = object.originalLink;
+
+            return snapshot;
+          });
+
+          this.attr('referenceUrls', data['Document:REFERENCE_URL']);
+          this.attr('mappedObjects', [data.Audit, ...data.Issue, ...snapshots]);
+        });
+    },
+  },
+  events: {
+    inserted() {
+      let vm = this.viewModel;
+      if (!vm.attr('isNewInstance')) {
+        vm.loadData();
+      }
+    },
+  },
+});

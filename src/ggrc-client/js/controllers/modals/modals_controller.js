@@ -27,6 +27,7 @@ import '../../components/person/person';
 import '../../components/rich_text/rich_text';
 import '../../components/modal_wrappers/checkboxes_to_list';
 import '../../components/modal-connector';
+import '../../components/modal_wrappers/assessment-modal';
 import '../../components/assessment/map-button-using-assessment-type';
 import '../../components/gca-controls/gca-controls';
 import '../../components/datepicker/datepicker';
