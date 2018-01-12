@@ -287,7 +287,7 @@ class TestCycleTaskStatusChange(TestCase):
         "title": "one time test workflow",
         "notify_on_change": True,
         "description": "some test workflow",
-        "owners": [person_dict(self.user.id)],
+        # admin will be current user with id == 1
         "task_groups": [{
             "title": "single task group",
             "contact": person_dict(self.user.id),
@@ -306,7 +306,7 @@ class TestCycleTaskStatusChange(TestCase):
         "title": "one time test workflow",
         "notify_on_change": True,
         "description": "some test workflow",
-        "owners": [person_dict(self.user.id)],
+        # admin will be current user with id == 1
         "task_groups": [{
             "title": "one time task group",
             "contact": person_dict(self.user.id),

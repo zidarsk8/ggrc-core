@@ -74,13 +74,7 @@ class TestTaskDueNotifications(TestCase):
         "notify_on_change": True,
         "description": "some test workflow",
         "is_verification_needed": False,
-        "owners": [
-            {
-                "href": "/api/people/{}".format(self.user.id),
-                "id": self.user.id,
-                "type": "Person",
-            },
-        ],
+        # admin will be current user with id == 1
         "task_groups": [{
             "title": "one time task group",
             "contact": {

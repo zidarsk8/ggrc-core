@@ -74,7 +74,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
-      # one email to owner and one to assigne
+      # one email to admin and one to assigne
       self.assertEqual(mock_mail.call_count, 2)
 
     with freeze_time("2015-05-04 03:21:34"):  # one day before due date
@@ -89,7 +89,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
-      # one email to owner and one to assigne
+      # one email to admin and one to assigne
       self.assertEqual(mock_mail.call_count, 3)
 
     with freeze_time("2015-05-05 03:21:34"):  # due date
@@ -130,7 +130,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
-      # one email to owner and one to assigne
+      # one email to admin and one to assigne
       self.assertEqual(mock_mail.call_count, 2)
 
     with freeze_time("2015-05-03 03:21:34"):
@@ -188,7 +188,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
-      # one email to owner and one to assignee
+      # one email to admin and one to assignee
       self.assertEqual(mock_mail.call_count, 2)
 
     with freeze_time("2015-05-03 03:21:34"):
@@ -233,7 +233,7 @@ class TestOneTimeWfEndDateChange(TestCase):
       _, notif_data = common.get_daily_notifications()
       self.assertEqual(notif_data, {})
 
-      # one email to owner and one to assigne
+      # one email to admin and one to assigne
       self.assertEqual(mock_mail.call_count, 2)
 
     with freeze_time("2015-05-03 03:21:34"):
@@ -297,7 +297,7 @@ class TestOneTimeWfEndDateChange(TestCase):
         "title": "one time test workflow",
         "notify_on_change": True,
         "description": "some test workflow",
-        "owners": [person_dict(self.user.id)],
+        # admin will be current user with id == 1
         "task_groups": [{
             "title": "one time task group",
             "contact": person_dict(self.user.id),

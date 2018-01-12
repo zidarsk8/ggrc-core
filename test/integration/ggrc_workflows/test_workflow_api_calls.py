@@ -444,7 +444,6 @@ class TestWorkflowsApiPost(TestCase):
             "task_group_title": "Task Group 1",
             "notify_custom_message": "",
             "is_verification_needed": True,
-            "owners": None,
             "context": None,
         }
     }

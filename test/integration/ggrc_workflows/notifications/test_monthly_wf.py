@@ -109,7 +109,7 @@ class TestMonthlyWorkflowNotification(TestCase):
         "title": "test monthly wf notifications",
         "notify_on_change": True,
         "description": "some test workflow",
-        "owners": [person_dict(self.person_2.id)],
+        # admin will be current user with id == 1
         "unit": "month",
         "recurrences": True,
         "repeat_every": 1,

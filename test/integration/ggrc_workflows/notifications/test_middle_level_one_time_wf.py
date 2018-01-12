@@ -59,7 +59,7 @@ class TestOneTimeWorkflowNotification(TestCase):
     # setup
     with freeze_time("2015-04-07 03:21:34"):
       wf_response, wf = self.wf_generator.generate_workflow(data={
-          "owners": None,  # owner will be the current user
+          # admin will be the current user
           "notify_on_change": True,  # force real time updates
           "title": "One-time WF",
           "notify_custom_message": textwrap.dedent("""\
@@ -102,7 +102,7 @@ class TestOneTimeWorkflowNotification(TestCase):
     self.one_time_workflow_1 = {
         "title": "one time test workflow",
         "description": "some test workflow",
-        "owners": [person_dict(self.random_people[3].id)],
+        # admin will be current user with id == 1
         "task_groups": [{
             "title": "one time task group",
             "task_group_tasks": [{
@@ -139,8 +139,8 @@ class TestOneTimeWorkflowNotification(TestCase):
     }
 
   def create_users(self):
-    _, self.owner1 = self.object_generator.generate_person(
-        # data={"name": "User1 Owner1", "email": "user1.owner1@gmail.com"},
+    _, self.admin1 = self.object_generator.generate_person(
+        # data={"name": "User1 Admin1", "email": "user1.admin1@gmail.com"},
         user_role="Administrator")
     _, self.tgassignee1 = self.object_generator.generate_person(
         # data={"name": "User2 TGassignee1",

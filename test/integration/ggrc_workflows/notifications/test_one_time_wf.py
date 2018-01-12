@@ -48,22 +48,23 @@ class TestOneTimeWorkflowNotification(TestCase):
   def test_one_time_wf_activate(self):
     def get_person(person_id):
       return db.session.query(Person).filter(Person.id == person_id).one()
-
     with freeze_time("2015-04-10"):
       _, wf = self.wf_generator.generate_workflow(self.one_time_workflow_1)
 
       _, cycle = self.wf_generator.generate_cycle(wf)
       self.wf_generator.activate_workflow(wf)
 
-      person_1 = get_person(self.random_people[0].id)
+      person_2 = get_person(self.random_people[2].id)
 
     with freeze_time("2015-04-11"):
       _, notif_data = common.get_daily_notifications()
-      self.assertIn(person_1.email, notif_data)
-      self.assertIn("cycle_started", notif_data[person_1.email])
-      self.assertIn(cycle.id, notif_data[person_1.email]["cycle_started"])
+      self.assertIn(person_2.email, notif_data)
+      self.assertIn("cycle_started", notif_data[person_2.email])
+      self.assertIn(cycle.id, notif_data[person_2.email]["cycle_started"])
       self.assertIn("my_tasks",
-                    notif_data[person_1.email]["cycle_data"][cycle.id])
+                    notif_data[person_2.email]["cycle_data"][cycle.id])
+
+      person_1 = get_person(self.random_people[0].id)
 
     with freeze_time("2015-05-03"):  # two days befor due date
       _, notif_data = common.get_daily_notifications()
@@ -142,7 +143,7 @@ class TestOneTimeWorkflowNotification(TestCase):
         "title": "one time test workflow",
         "description": "some test workflow",
         "notify_on_change": True,
-        "owners": [person_dict(self.random_people[3].id)],
+        # admin will be current user with id == 1
         "task_groups": [{
             "title": "one time task group",
             "contact": person_dict(self.random_people[2].id),
@@ -194,7 +195,7 @@ class TestOneTimeWorkflowNotification(TestCase):
         "title": "one time test workflow",
         "notify_on_change": True,
         "description": "some test workflow",
-        "owners": [person_dict(user)],
+        # admin will be current user with id == 1
         "task_groups": [{
             "title": "one time task group",
             "contact": person_dict(user),
