@@ -11,6 +11,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
   can.Model.Cacheable('CMS.Models.Assessment', {
     root_object: 'assessment',
     root_collection: 'assessments',
+    category: 'governance',
     findOne: 'GET /api/assessments/{id}',
     findAll: 'GET /api/assessments',
     update: 'PUT /api/assessments/{id}',

@@ -5,17 +5,6 @@
 
 (function (can, GGRC, CMS) {
   'use strict';
-
-   // using this function for sorting will group model types by categories
-  function sortByCategory(a, b) {
-    if (a.category < b.category) {
-      return -1;
-    } else if (a.category > b.category) {
-      return 1;
-    }
-    return 0;
-  }
-
   /**
    * A "mixin" denoting a model type that can be assigned custom roles.
    *
@@ -31,7 +20,7 @@
     findAll: function () {
       // We do not query the backend, this implementation is used to diplay
       // a list of objects in the Custom Roles widget.
-      var types = GGRC.roleableTypes.sort(sortByCategory);
+      var types = _.sortByOrder(GGRC.roleableTypes, 'category', false);
 
       var instances = can.map(types, function (type, i) {
         var withId = can.extend(type, {id: i});
