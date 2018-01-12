@@ -17,7 +17,8 @@ import template from './object-tasks.mustache';
     'title',
     'status',
     'next_due_date',
-    'end_date'
+    'end_date',
+    'is_verification_needed',
   ]);
 
   var viewModel = can.Map.extend({
