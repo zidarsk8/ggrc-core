@@ -150,7 +150,11 @@ class Proposal(mixins.person_relation_factory("applied_by"),
 
   @staticmethod
   def _extra_table_args(_):
-    return (db.Index("fk_instance", "instance_id", "instance_type"), )
+    return (db.Index("fk_instance", "instance_id", "instance_type"),
+            db.Index("ix_decline_datetime", "decline_datetime"),
+            db.Index("ix_apply_datetime", "apply_datetime"),
+            db.Index("ix_proposed_notified_datetime",
+                     "proposed_notified_datetime"))
 
 
 class Proposalable(object):

@@ -58,11 +58,21 @@ def upgrade():
                   'proposals',
                   ['updated_at'],
                   unique=False)
+  op.create_index('ix_decline_datetime',
+                  'proposals',
+                  ['decline_datetime'],
+                  unique=False)
+  op.create_index('ix_apply_datetime',
+                  'proposals',
+                  ['apply_datetime'],
+                  unique=False)
 
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   op.drop_index('ix_proposal_updated_at', table_name='proposals')
   op.drop_index('fk_proposal_contexts', table_name='proposals')
+  op.drop_index('ix_decline_datetime', table_name='proposals')
+  op.drop_index('ix_apply_datetime', table_name='proposals')
   op.drop_index('fk_instance', table_name='proposals')
   op.drop_table('proposals')

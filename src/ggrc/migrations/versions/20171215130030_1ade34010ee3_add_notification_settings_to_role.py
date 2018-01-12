@@ -26,9 +26,14 @@ def upgrade():
   op.add_column('proposals', sa.Column('proposed_notified_datetime',
                                        sa.DateTime(),
                                        nullable=True))
+  op.create_index('ix_proposed_notified_datetime',
+                  'proposals',
+                  ['proposed_notified_datetime'],
+                  unique=False)
 
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
   op.drop_column('access_control_roles', 'notify_about_proposal')
+  op.drop_index('ix_apply_datetime', table_name='proposals')
   op.drop_column('proposals', 'proposed_notified_datetime')
