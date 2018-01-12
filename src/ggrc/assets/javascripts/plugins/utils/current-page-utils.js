@@ -140,16 +140,15 @@ function getWidgetList(modelName, path) {
 }
 
 function getWidgetModels(modelName, path) {
-  var widgetList = getWidgetList(modelName, path);
-  var defaults = getDefaultWidgets(widgetList, path);
+  const widgetList = getWidgetList(modelName, path);
+  const defaults = getDefaultWidgets(widgetList, path);
 
-  return defaults.map(function (widgetName) {
-    if (isObjectVersion(widgetName)) {
-      return widgetName;
-    }
-
-    return widgetList[widgetName].content_controller_options.model.shortName;
-  });
+  return defaults
+    .filter((name) => widgetList[name].widgetType === 'treeview')
+    .map((widgetName) => {
+      return isObjectVersion(widgetName) ? widgetName :
+        widgetList[widgetName].content_controller_options.model.shortName;
+    });
 }
 
 function getDefaultWidgets(widgetList, path) {
