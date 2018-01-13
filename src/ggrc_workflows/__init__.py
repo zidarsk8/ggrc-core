@@ -33,7 +33,7 @@ from ggrc_workflows.roles import (
     WorkflowOwner, WorkflowMember, BasicWorkflowReader, WorkflowBasicReader,
     WorkflowEditor
 )
-from ggrc_basic_permissions.models import Role, ContextImplication
+from ggrc_basic_permissions.models import ContextImplication
 from ggrc_basic_permissions.contributed_roles import (
     RoleContributions, RoleDeclarations, DeclarativeRoleImplications
 )
@@ -701,35 +701,6 @@ def handle_cycle_task_status_change(sender, objs=None):
       obj.instance.verified_date = None
 
 
-def _get_or_create_personal_context(user):
-  """Get or create personal context.
-
-  Args:
-      user: User instance.
-  Returns:
-      Personal context instance.
-  """
-  personal_context = user.get_or_create_object_context(
-      context=1,
-      name='Personal Context for {0}'.format(user.id),
-      description='',
-  )
-  personal_context.modified_by = get_current_user()
-  db.session.add(personal_context)
-  return personal_context
-
-
-def _find_role(role_name):
-  """Find role by its name.
-
-  Args:
-      role_name: User role name.
-  Returns:
-      Role instance.
-  """
-  return db.session.query(Role).filter(Role.name == role_name).first()
-
-
 def _validate_post_workflow_fields(workflow):
   """Validates Workflow's 'repeat_every' and 'unit' fields dependency.
 
@@ -854,6 +825,7 @@ class WorkflowRoleDeclarations(RoleDeclarations):
 
   def roles(self):
     return {
+        # TODO: remove owner and member roles on Worklow ACl cleanup migration
         'WorkflowOwner': WorkflowOwner,
         'WorkflowEditor': WorkflowEditor,
         'WorkflowMember': WorkflowMember,
@@ -873,8 +845,6 @@ class WorkflowRoleImplications(DeclarativeRoleImplications):
           'Creator': ['WorkflowBasicReader'],
       },
       ('Workflow', None): {
-          'WorkflowOwner': ['WorkflowBasicReader'],
-          'WorkflowMember': ['WorkflowBasicReader'],
           'WorkflowEditor': ['WorkflowBasicReader'],
       },
   }
