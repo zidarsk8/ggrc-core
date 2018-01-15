@@ -167,7 +167,6 @@ describe('AdvancedSearch', function () {
               op: {name: '~'},
               right: 'B',
             },
-            keys: ['title'],
             order_by: {
               keys: [],
               order: '',
@@ -192,7 +191,6 @@ describe('AdvancedSearch', function () {
                 ids: ['0'],
               },
             },
-            keys: ['title'],
             order_by: {
               keys: [],
               order: '',
@@ -209,7 +207,6 @@ describe('AdvancedSearch', function () {
               op: {name: '~'},
               right: 'D',
             },
-            keys: ['title'],
             order_by: {
               keys: [],
               order: '',
@@ -226,7 +223,6 @@ describe('AdvancedSearch', function () {
               op: {name: '~'},
               right: 'E',
             },
-            keys: ['title'],
             order_by: {
               keys: [],
               order: '',
@@ -259,7 +255,6 @@ describe('AdvancedSearch', function () {
                 },
               },
             },
-            keys: ['title'],
             order_by: {
               keys: [],
               order: '',

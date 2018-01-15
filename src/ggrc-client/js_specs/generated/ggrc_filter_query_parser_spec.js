@@ -23,7 +23,6 @@ describe('GGRC.query_parser', function () {
     it('parses an empty query', function () {
       let emptyResult = {
         expression: {},
-        keys: [],
         order_by: {keys: [], order: '', compare: null},
       };
 
@@ -53,7 +52,6 @@ describe('GGRC.query_parser', function () {
             op: {name: 'exclude_text_search'},
           },
           order_by: {keys: [], order: '', compare: null},
-          keys: [],
         });
       });
     });
@@ -81,7 +79,6 @@ describe('GGRC.query_parser', function () {
             op: {name: 'text_search'},
           },
           order_by: {keys: [], order: '', compare: null},
-          keys: [],
         });
       });
     });
@@ -116,7 +113,6 @@ describe('GGRC.query_parser', function () {
               right: query[1].trim().replace(/"/g, ''),
             },
             order_by: {keys: [], order: '', compare: null},
-            keys: [query[0].trim().replace(/"/g, '')],
           });
         });
       });
@@ -130,7 +126,6 @@ describe('GGRC.query_parser', function () {
           right: 'empty',
         },
         order_by: {keys: [], order: '', compare: null},
-        keys: ['5words'],
       });
     });
     it('works with order by statement', function () {
@@ -147,7 +142,6 @@ describe('GGRC.query_parser', function () {
             order: 'desc',
             compare: jasmine.any(Function),
           },
-          keys: ['5words'],
         });
     });
 
@@ -170,7 +164,6 @@ describe('GGRC.query_parser', function () {
               right: {left: 'n', op: {name: '='}, right: '5'},
             },
             order_by: {keys: [], order: '', compare: null},
-            keys: ['n'],
           });
       });
     });
@@ -194,7 +187,6 @@ describe('GGRC.query_parser', function () {
               right: {left: 'n', op: {name: '='}, right: '5'},
             },
             order_by: {keys: [], order: '', compare: null},
-            keys: ['n'],
           });
       });
     });
@@ -208,7 +200,6 @@ describe('GGRC.query_parser', function () {
             ids: ['1', '2', '3', '4'],
           },
           order_by: {keys: [], order: '', compare: null},
-          keys: [],
         });
 
       expect(GGRC.query_parser.parse('#SomeClass,1,2,3,4# or #A,1# and #B,2#'))
@@ -235,7 +226,6 @@ describe('GGRC.query_parser', function () {
             },
           },
           order_by: {keys: [], order: '', compare: null},
-          keys: [],
         });
 
       expect(GGRC.query_parser.parse('#SomeClass,1,2,3,4# or #A,1#'))
@@ -254,7 +244,6 @@ describe('GGRC.query_parser', function () {
             },
           },
           order_by: {keys: [], order: '', compare: null},
-          keys: [],
         });
     });
 
@@ -272,7 +261,6 @@ describe('GGRC.query_parser', function () {
             right: {left: 'bacon ipsum', op: {name: '!~'}, right: 'bacon'},
           },
           order_by: {keys: [], order: '', compare: null},
-          keys: ['bacon ipsum', 'n'],
         });
 
       expect(GGRC.query_parser
@@ -288,7 +276,6 @@ describe('GGRC.query_parser', function () {
             right: {left: 'bacon ipsum', op: {name: '!~'}, right: 'bacon'},
           },
           order_by: {keys: [], order: '', compare: null},
-          keys: ['bacon ipsum', 'n'],
         });
 
       expect(GGRC.query_parser
@@ -304,7 +291,6 @@ describe('GGRC.query_parser', function () {
             },
           },
           order_by: {keys: [], order: '', compare: null},
-          keys: ['bacon ipsum', 'n'],
         });
 
       expect(GGRC.query_parser
@@ -316,7 +302,6 @@ describe('GGRC.query_parser', function () {
             right: {left: 'bacon ipsum', op: {name: '!~'}, right: 'bacon'},
           },
           order_by: {keys: [], order: '', compare: null},
-          keys: ['bacon ipsum'],
         });
 
       expect(GGRC.query_parser
@@ -328,7 +313,6 @@ describe('GGRC.query_parser', function () {
             right: {text: 'bacon ipsum', op: {name: 'text_search'}},
           },
           order_by: {keys: [], order: '', compare: null},
-          keys: ['hello'],
         });
     });
 

@@ -22,8 +22,7 @@ GGRC.query_parser = {
   },
   join_queries: function(left, right, op_key) {
     var expression = null,
-        op = {},
-        keys = new Set(left.keys.concat(right.keys));
+        op = {};
     if (!left.expression.op){
       return right;
     }
@@ -42,7 +41,6 @@ GGRC.query_parser = {
     }
     return {
       expression: expression,
-      keys: Array.from(keys),
       order_by: right.order_by,
     }
   },
@@ -87,23 +85,18 @@ GGRC.query_parser = {
         peg$c0 = function(only_order_by) {
               return {
                 expression: {},
-                keys: [],
                 order_by: only_order_by,
               };
             },
         peg$c1 = function(or_exp, order_by) {
-              var keys = new Set(or_exp.keys.sort());
-              delete or_exp.keys;
               return {
                 expression: or_exp,
-                keys: Array.from(keys),
                 order_by: order_by,
               };
             },
         peg$c2 = function() {
               return {
                 expression: {},
-                keys: [],
                 order_by: {
                   keys: [],
                   order: '',
@@ -165,25 +158,17 @@ GGRC.query_parser = {
               return 'asc';
             },
         peg$c22 = function(left, op, right) {
-              var keys = left.keys.concat(right.keys);
-              delete right.keys;
-              delete left.keys;
               return {
                 left: left,
                 op: op,
                 right: right,
-                keys: keys,
               };
             },
         peg$c23 = function(left, op, right) {
-              var keys = left.keys.concat(right.keys);
-              delete right.keys;
-              delete left.keys;
               return {
                 left:left,
                 op: op,
                 right: right,
-                keys: keys,
               };
             },
         peg$c24 = function(left, op, right) {
@@ -192,7 +177,6 @@ GGRC.query_parser = {
                 left: lleft,
                 op: op,
                 right: right,
-                keys: [lleft],
               };
             },
         peg$c25 = "#",
@@ -202,7 +186,6 @@ GGRC.query_parser = {
                 object_name: relevant[0],
                 op: {name: "relevant"},
                 ids: relevant.slice(1),
-                keys: [],
               };
             },
         peg$c28 = "~",
@@ -211,7 +194,6 @@ GGRC.query_parser = {
               return {
                 text: characters.join("").trim(),
                 op: {name:'text_search'},
-                keys: [],
               };
             },
         peg$c31 = "!~",
@@ -220,7 +202,6 @@ GGRC.query_parser = {
               return {
                 text: characters.join("").trim(),
                 op: {name: 'exclude_text_search'},
-                keys: [],
               };
             },
         peg$c34 = function(or_exp) {

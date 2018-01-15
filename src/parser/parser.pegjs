@@ -9,17 +9,13 @@ start
     {
       return {
         expression: {},
-        keys: [],
         order_by: only_order_by,
       };
     }
   / _* or_exp:or_exp order_by:order_by _*
     {
-      var keys = new Set(or_exp.keys.sort());
-      delete or_exp.keys;
       return {
         expression: or_exp,
-        keys: Array.from(keys),
         order_by: order_by,
       };
     }
@@ -27,7 +23,6 @@ start
     {
       return {
         expression: {},
-        keys: [],
         order_by: {
           keys: [],
           order: '',
@@ -103,14 +98,10 @@ order
 or_exp
   = left:and_exp op:OR right:or_exp
     {
-      var keys = left.keys.concat(right.keys);
-      delete right.keys;
-      delete left.keys;
       return {
         left: left,
         op: op,
         right: right,
-        keys: keys,
       };
     }
   / and_exp
@@ -119,14 +110,10 @@ or_exp
 and_exp
   = left:simple_exp op:AND right:and_exp
     {
-      var keys = left.keys.concat(right.keys);
-      delete right.keys;
-      delete left.keys;
       return {
         left:left,
         op: op,
         right: right,
-        keys: keys,
       };
     }
   / simple_exp
@@ -140,7 +127,6 @@ simple_exp
         left: lleft,
         op: op,
         right: right,
-        keys: [lleft],
       };
     }
   / relevant_exp
@@ -154,7 +140,6 @@ relevant_exp
         object_name: relevant[0],
         op: {name: "relevant"},
         ids: relevant.slice(1),
-        keys: [],
       };
     }
 
@@ -164,7 +149,6 @@ text_exp
       return {
         text: characters.join("").trim(),
         op: {name:'text_search'},
-        keys: [],
       };
     }
   / _* "!~" characters:.*
@@ -172,7 +156,6 @@ text_exp
       return {
         text: characters.join("").trim(),
         op: {name: 'exclude_text_search'},
-        keys: [],
       };
     }
 

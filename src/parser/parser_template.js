@@ -22,8 +22,7 @@ GGRC.query_parser = {
   },
   join_queries: function(left, right, op_key) {
     var expression = null,
-        op = {},
-        keys = new Set(left.keys.concat(right.keys));
+        op = {};
     if (!left.expression.op){
       return right;
     }
@@ -42,7 +41,6 @@ GGRC.query_parser = {
     }
     return {
       expression: expression,
-      keys: Array.from(keys),
       order_by: right.order_by,
     }
   },
