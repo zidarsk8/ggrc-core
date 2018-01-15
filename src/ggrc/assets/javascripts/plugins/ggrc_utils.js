@@ -103,7 +103,7 @@ import Permission from '../permission';
       ];
       var inst;
 
-      if (date === undefined || date === null) {
+      if ( !date ) {
         return '';
       }
 
