@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2017 Google Inc.
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -17,7 +17,6 @@ import '../../apps/business_objects';
 import '../../components/spinner/spinner';
 import '../../components/read-more/read-more';
 import '../../components/object-list/object-list';
-import '../../components/simple-modal/simple-modal';
 import '../../components/show-more/show-more';
 import '../../components/autocomplete/autocomplete';
 import '../../components/person/person';

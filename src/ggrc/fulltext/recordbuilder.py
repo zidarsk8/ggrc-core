@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for full text index record builder."""
@@ -123,12 +123,18 @@ class RecordBuilder(object):
       ac_person_id = ac_list.person_id
     if ac_role_id not in self.indexer.cache['ac_role_map']:
       ac_role = db.session.query(all_models.AccessControlRole).get(ac_role_id)
-      ac_role_name = ac_role.name if ac_role else None
-      self.indexer.cache['ac_role_map'][ac_role_id] = ac_role_name
-      if ac_role_name is None:
-        # index only existed role, if it have already been
-        # removed than nothing to index.
-        LOGGER.error("Trying to index not existing ACR with id %s", ac_role_id)
+      # Internal roles should not be indexed
+      if ac_role and ac_role.internal:
+        self.indexer.cache['ac_role_map'][ac_role_id] = None
+      else:
+        ac_role_name = ac_role.name if ac_role else None
+        self.indexer.cache['ac_role_map'][ac_role_id] = ac_role_name
+        if ac_role_name is None:
+          # index only existed role, if it have already been
+          # removed than nothing to index.
+          LOGGER.error(
+              "Trying to index not existing ACR with id %s", ac_role_id
+          )
     ac_role_name = self.indexer.cache['ac_role_map'][ac_role_id]
     if ac_role_name:
       ac_role_name = ac_role_name.lower()

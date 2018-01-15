@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2017 Google Inc.
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -118,6 +118,7 @@ import childModelsMap from './child-models-map';
     directlyItems: [],
     notDirectlyItems: [],
     _loader: null,
+    deepLevel: 0,
     _collapseAfterUnmapCallBack: null,
     initializeChildModels: function () {
       var parentModel = this.attr('parentModel');
@@ -143,7 +144,8 @@ import childModelsMap from './child-models-map';
     loadItems: function (models) {
       var parentType = this.attr('parentModel');
       var parentId = this.attr('parentId');
-      var filter = this.getDepthFilter();
+      var deepLevel = this.attr('deepLevel');
+      var filter = this.getDepthFilter(deepLevel);
 
       models = models || this.attr('childModels') || [];
       models = can.makeArray(models);
@@ -204,5 +206,11 @@ import childModelsMap from './child-models-map';
     tag: 'sub-tree-wrapper',
     template: template,
     viewModel: viewModel,
+    events: {
+      inserted() {
+        let parents = this.element.parents('sub-tree-wrapper');
+        this.viewModel.attr('deepLevel', parents.length);
+      }
+    },
   });
 })(window.can, window.GGRC);

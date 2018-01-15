@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2017 Google Inc., authors, and contributors
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -186,7 +186,6 @@ import template from './info-pane.mustache';
       _verifierRoleId: undefined,
       isUpdatingRelatedItems: false,
       isAssessmentSaving: false,
-      relatedItemsLoaded: false,
       onStateChangeDfd: {},
       formState: {},
       noItemsText: '',
@@ -396,7 +395,6 @@ import template from './info-pane.mustache';
             this.attr('referenceUrls').replace(data['Document:REFERENCE_URL']);
 
             this.attr('isUpdatingRelatedItems', false);
-            this.attr('relatedItemsLoaded', true);
 
             tracker.stop(this.attr('instance.type'),
               tracker.USER_JOURNEY_KEYS.NAVIGATION,

@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Generic handlers for imports and exports."""
 
@@ -239,7 +239,15 @@ class UserColumnHandler(ColumnHandler):
     from ggrc.utils import user_generator
     new_objects = self.row_converter.block_converter.converter.new_objects
     if email not in new_objects[Person]:
-      new_objects[Person][email] = user_generator.find_user(email)
+      try:
+        new_objects[Person][email] = user_generator.find_user(email)
+      except ValueError as ex:
+        self.add_error(
+            errors.VALIDATION_ERROR,
+            column_name=self.display_name,
+            message=ex.message
+        )
+        return None
     return new_objects[Person].get(email)
 
   def parse_item(self):

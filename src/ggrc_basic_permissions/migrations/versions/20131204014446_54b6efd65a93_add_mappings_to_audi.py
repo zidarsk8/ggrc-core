@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 
@@ -51,6 +51,6 @@ def upgrade():
 
 def downgrade():
   permissions = get_auditor_permissions()
-  for resource_type in mapping_types: 
+  for resource_type in mapping_types:
     permissions['read'].remove(resource_type)
   update_auditor_permissions(permissions)

@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 
@@ -26,7 +26,7 @@ def upgrade():
   res = conn.execute(query)
   while res.rowcount > 0:
     res = conn.execute(query)
-  
+
   op.create_unique_constraint('unique_role_context_person', 'user_roles', ['role_id', 'context_id', 'person_id'])
 
 
