@@ -5,68 +5,21 @@
 
 
 start
-  = _* only_order_by:only_order_by _*
-    {
-      return {
-        expression: {},
-        order_by: only_order_by,
-      };
-    }
-  / _* or_exp:or_exp order_by:order_by _*
+  = _* or_exp:or_exp _*
     {
       return {
         expression: or_exp,
-        order_by: order_by,
       };
     }
   / _*
     {
       return {
         expression: {},
-        order_by: {
-          keys: [],
-          order: '',
-          compare: null
-        },
       };
     }
   / .*
     {
       return false;
-    }
-
-order_by
-  = ' ' only_order_by:only_order_by
-    {
-      return only_order_by;
-    }
-  / _*
-    {
-      return {
-        keys: [],
-        order: '',
-        compare: null
-      };
-    }
-
-only_order_by
-  = _* 'order by'i _+ word_list:word_list order:order
-    {
-      return {
-        keys: word_list,
-        order: order,
-        compare: function(val1, val2){
-          for (var i=0 ; i < word_list.length; i++){
-            var key = word_list[i];
-            if (val1[key] !== val2[key]){
-              var a = parseFloat(val1[key]) || val1[key],
-                  b = parseFloat(val2[key]) || val2[key];
-              return (a < b) ^ (order !== 'asc')
-            }
-          }
-          return false;
-        }
-      };
     }
 
 word_list
@@ -79,21 +32,6 @@ word_list
     {
       return [word];
     }
-
-order
-  = _+ 'desc'i _*
-    {
-      return 'desc';
-    }
-  / _+ 'asc'i _*
-    {
-      return 'asc';
-    }
-  / _*
-    {
-      return 'asc';
-    }
-
 
 or_exp
   = left:and_exp op:OR right:or_exp

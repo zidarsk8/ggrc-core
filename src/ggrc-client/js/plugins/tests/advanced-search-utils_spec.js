@@ -167,11 +167,6 @@ describe('AdvancedSearch', function () {
               op: {name: '~'},
               right: 'B',
             },
-            order_by: {
-              keys: [],
-              order: '',
-              compare: null,
-            },
           },
         },
         {
@@ -191,11 +186,6 @@ describe('AdvancedSearch', function () {
                 ids: ['0'],
               },
             },
-            order_by: {
-              keys: [],
-              order: '',
-              compare: null,
-            },
           },
         },
         {
@@ -207,11 +197,6 @@ describe('AdvancedSearch', function () {
               op: {name: '~'},
               right: 'D',
             },
-            order_by: {
-              keys: [],
-              order: '',
-              compare: null,
-            },
           },
         },
         {
@@ -222,11 +207,6 @@ describe('AdvancedSearch', function () {
               left: 'title',
               op: {name: '~'},
               right: 'E',
-            },
-            order_by: {
-              keys: [],
-              order: '',
-              compare: null,
             },
           },
         },
@@ -254,11 +234,6 @@ describe('AdvancedSearch', function () {
                   ids: ['3'],
                 },
               },
-            },
-            order_by: {
-              keys: [],
-              order: '',
-              compare: null,
             },
           },
         },
