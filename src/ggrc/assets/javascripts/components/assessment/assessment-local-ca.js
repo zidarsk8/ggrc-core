@@ -71,7 +71,7 @@ import Permission from '../../permission';
         let hasValidationErrors = false;
         this.attr('fields')
           .each((field) => {
-            this.performValidation({field, triggerAttachmentModals});
+            this.performValidation(field);
             if ( !field.validation.valid ) {
               hasValidationErrors = true;
             }
@@ -93,10 +93,7 @@ import Permission from '../../permission';
           this.dispatch(VALIDATION_ERROR);
         }
       },
-      performValidation: function ({
-        field,
-        triggerAttachmentModals = false,
-      }) {
+      performValidation: function (field) {
         var fieldValid;
         var hasMissingEvidence;
         var hasMissingComment;
