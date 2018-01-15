@@ -10,6 +10,7 @@ Create Date: 2018-01-15 13:02:12.663009
 # pylint: disable=invalid-name
 
 from alembic import op
+import sqlalchemy as sa
 from sqlalchemy.dialects import mysql
 
 # revision identifiers, used by Alembic.
@@ -35,10 +36,22 @@ def upgrade():
   op.alter_column('documents', 'title',
                   existing_type=mysql.VARCHAR(length=250),
                   nullable=False)
+  op.drop_column('documents', 'kind_id')
+  op.drop_column('documents', 'year_id')
+  op.drop_column('documents', 'language_id')
 
 
 def downgrade():
   """Downgrade database schema and/or data back to the previous revision."""
+  op.add_column('documents',
+                sa.Column('language_id', mysql.INTEGER(display_width=11),
+                          autoincrement=False, nullable=True))
+  op.add_column('documents',
+                sa.Column('year_id', mysql.INTEGER(display_width=11),
+                          autoincrement=False, nullable=True))
+  op.add_column('documents',
+                sa.Column('kind_id', mysql.INTEGER(display_width=11),
+                          autoincrement=False, nullable=True))
   op.alter_column('documents', 'title',
                   existing_type=mysql.VARCHAR(length=250),
                   nullable=True)
