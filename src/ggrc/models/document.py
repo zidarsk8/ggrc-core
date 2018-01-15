@@ -24,7 +24,7 @@ class Document(Roleable, Relatable, Base, mixins.Titled, Indexed, db.Model):
 
   _title_uniqueness = False
 
-  link = deferred(db.Column(db.String), 'Document')
+  link = deferred(db.Column(db.String, nullable=False), 'Document')
   description = deferred(db.Column(db.Text, nullable=False, default=u""),
                          'Document')
 
