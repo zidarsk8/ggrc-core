@@ -29,14 +29,14 @@ describe('GGRC.Components.treeHeader', function () {
     });
 
     it('dispatches "updateColumns" event with selected columns', function () {
-      vm.attr('columns', {
-        col1: true,
-        col2: false,
-        col3: true,
-        col4: true,
-        col5: false,
-        col6: true,
-      });
+      vm.attr('columns', [
+        {name: 'col1', selected: true},
+        {name: 'col2', selected: false},
+        {name: 'col3', selected: true},
+        {name: 'col4', selected: true},
+        {name: 'col5', selected: false},
+        {name: 'col6', selected: true},
+      ]);
 
       spyOn(vm, 'dispatch');
 
@@ -56,19 +56,25 @@ describe('GGRC.Components.treeHeader', function () {
     });
 
     it('dispatches "updateColumns" event with selected columns', function () {
+      const expectedColumns = [
+        {name: 'col1', selected: true},
+        {name: 'col2', selected: false},
+        {name: 'col3', selected: true},
+        {name: 'col4', selected: false},
+        {name: 'col5', selected: false},
+      ];
+
       vm.attr('availableColumns',
         generateColumns(['col1', 'col2', 'col3', 'col4', 'col5']));
       vm.attr('selectedColumns', generateColumns(['col1', 'col3']));
 
       method();
 
-      expect(vm.attr('columns').serialize()).toEqual({
-        col1: true,
-        col2: false,
-        col3: true,
-        col4: false,
-        col5: false,
-      });
+      expect(vm.attr('columns').length).toBe(expectedColumns.length);
+      for (let i = 0; i < expectedColumns.length; i++) {
+        expect(vm.attr('columns')[i].selected)
+          .toBe(expectedColumns[i].selected);
+      }
     });
   });
 

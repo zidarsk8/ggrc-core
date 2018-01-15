@@ -7,7 +7,7 @@
   <tree-header-selector class="tree-header-selector">
     {{^if disableConfiguration}}
     <a href="#" class="dropdown-toggle tview-dropdown-toggle visible-columns-icon"
-       data-toggle="dropdown">
+      data-toggle="dropdown" ($click)="initializeColumns()">
       <i class="fa fa-fw fa-bars"></i>
     </a>
     <div class="dropdown-menu dropdown-menu-form visible-columns-list">
@@ -15,20 +15,12 @@
       <h5>Set visible fields for {{modelName}}</h5>
 
       <ul class="attr-list">
-        {{#availableColumns}}
+        {{#columns}}
           <li class="{{#if mandatory}}disabled{{/if}}">
-            <label class="checkbox-inline" title="{{attr_title}}">
-              <input type="checkbox"
-                     {{#if display_status}}checked="checked"{{/if}}
-                     {{#if mandatory}}disabled{{/if}}
-                     ($change)="onChange"
-                     value="{{attr_name}}"
-                     class="notify-wrap attr-checkbox {{#if mandatory}}mandatory{{/if}}"
-              >
-              {{attr_title}}
-            </label>
+            <tree-visible-column-checkbox {column}=".">
+            </tree-visible-column-checkbox>
           </li>
-        {{/availableColumns}}
+        {{/columns}}
       </ul>
       <a class="btn btn-small btn-lightBlue set-tree-attrs" href="javascript://" ($click)="setColumns">Set fields</a>
     </div>
