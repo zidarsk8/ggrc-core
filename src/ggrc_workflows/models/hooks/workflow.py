@@ -1,10 +1,11 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """SQLAlchemy hooks for Workflow model."""
 
 from collections import defaultdict
 import sqlalchemy as sa
+from sqlalchemy.sql.expression import or_, and_
 
 from ggrc import db
 from ggrc import login
@@ -20,10 +21,10 @@ RELATED_MODELS = (all_models.TaskGroup, all_models.TaskGroupTask,
 
 def init_hook():
   """Initialize hook handler responsible for ACL record creation."""
-  sa.event.listen(sa.orm.session.Session, "after_flush", handle_acl_creation)
+  sa.event.listen(sa.orm.session.Session, "after_flush", handle_acl_changes)
 
 
-def handle_acl_creation(session, flush_context):
+def handle_acl_changes(session, flush_context):
   """ACL creation hook handler."""
   # pylint: disable=unused-argument
   context = defaultdict(lambda: {
@@ -40,6 +41,36 @@ def handle_acl_creation(session, flush_context):
           workflow.access_control_list)
   _init_context(wf_new_acl, context)
   create_related_roles(context)
+
+  related_to_del = defaultdict(set)
+  for obj in session.deleted:
+    if isinstance(obj, RELATED_MODELS):
+      related_to_del[obj.type].add(obj.id)
+  remove_related_acl(related_to_del)
+
+
+def remove_related_acl(related_to_del):
+  """Remove related ACL records on related object delete.
+
+  Args:
+      related_to_del: mapping related object type to set of ids to delete
+          {
+            related_object_type_name1: set(related_id1, ...),
+            related_object_type_name2: set(related_id1, ...)
+            ...
+          }
+  """
+  if not related_to_del:
+    return
+
+  qfilter = []
+  for rtype, ids in related_to_del.iteritems():
+    qfilter.append(and_(
+        all_models.AccessControlList.object_type == rtype,
+        all_models.AccessControlList.object_id.in_(ids)))
+
+  db.session.query(all_models.AccessControlList).filter(or_(*qfilter)).delete(
+      synchronize_session='fetch')
 
 
 def _get_workflow(related_obj):

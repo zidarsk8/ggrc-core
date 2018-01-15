@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests Workflow related API calls."""
@@ -40,6 +40,51 @@ class TestWorkflowsApiPost(TestCase):
 
   def tearDown(self):
     pass
+
+  def _delete_and_check_related_acl(self, related_model, exp_acl_count,
+                                    is_deleted):
+    """Delete related model and check remaining ACL count.
+
+    Args:
+        related_model: related model class
+        exp_acl_count: expected related ACL count after delete operation
+        is_deleted: is related object already deleted
+    """
+    if is_deleted:
+      related_count = related_model.query.count()
+      self.assertEqual(related_count, 0)
+    else:
+      related = related_model.query.one()
+      response = self.api.delete(related)
+      self.assert200(response)
+
+    related_acl_count = all_models.AccessControlList.query.filter(
+        all_models.AccessControlList.object_type == related_model.__name__
+    ).count()
+    self.assertEqual(related_acl_count, 0)
+
+    all_acl_count = all_models.AccessControlList.query.count()
+    self.assertEqual(all_acl_count, exp_acl_count)
+
+  def test_related_acl_removed_on_related_obj_delete(self):  # noqa pylint: disable=invalid-name
+    """Test related ACL records removed on related object delete"""
+    self._create_propagation_acl_test_data()
+    acl_count = all_models.AccessControlList.query.count()
+    self.assertNotEqual(acl_count, 0)
+
+    admin = all_models.Person.query.get(1)
+    self.api.set_user(admin)
+
+    related_models = (
+        (all_models.CycleTaskEntry, 18, False),
+        (all_models.TaskGroup, 12, False),
+        (all_models.TaskGroupTask, 12, True),
+        (all_models.Cycle, 3, False),
+        (all_models.CycleTaskGroup, 3, True),
+        (all_models.CycleTaskGroupObjectTask, 3, True),
+    )
+    for related_model, acl_count, is_deleted in related_models:
+      self._delete_and_check_related_acl(related_model, acl_count, is_deleted)
 
   def test_related_acl_removed_on_workflow_delete(self):  # noqa pylint: disable=invalid-name
     """Test related ACL records removed on Workflow delete"""
