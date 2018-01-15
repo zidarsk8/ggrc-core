@@ -7,6 +7,8 @@ produce specific resource state representations for GGRC models as well as
 update/create GGRC model instances from resource state representations.
 """
 
+# pylint: disable=invalid-name
+
 
 class simple_property(property):
   pass

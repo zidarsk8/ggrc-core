@@ -1,34 +1,41 @@
+# Copyright (C) 2018 Google Inc.
+# Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+
+"""This module contains test about sending emails for proposals."""
 import ddt
 import mock
 
 from ggrc.models import all_models
+from ggrc.utils import proposal as proposal_utils
+
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
-from ggrc.utils import proposal as proposal_utils
 
 
 @ddt.ddt
-class TestProposalApi(TestCase):
+class TestProposalEmail(TestCase):
+  """Test case about email sending and email presenting for proposals."""
 
   def setUp(self):
-    super(TestProposalApi, self).setUp()
+    super(TestProposalEmail, self).setUp()
     self.api = Api()
     self.client.get("/login")
 
   @ddt.data(True, False)
-  def test_presentation_proposal_notifications(self, is_admin):
+  def test_email_presentation(self, is_admin):
     """Test presentation of proposal digest email if is_admin is {0}."""
     person = factories.PersonFactory()
     self.api.set_user(person=person)
     with mock.patch("ggrc.rbac.permissions.is_admin", return_value=is_admin):
-       resp = self.client.get("/_notifications/show_proposal_digest")
+      resp = self.client.get("/_notifications/show_proposal_digest")
     if is_admin:
       self.assert200(resp)
     else:
       self.assert403(resp)
 
   def test_email_sending(self):
+    """Test sending emails about proposals."""
     with factories.single_commit():
       control = factories.ControlFactory()
       person_1 = factories.PersonFactory()  # has 1 role

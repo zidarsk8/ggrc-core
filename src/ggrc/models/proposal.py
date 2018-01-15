@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Defines a Revision model for storing snapshots."""
@@ -19,6 +19,8 @@ from ggrc.utils.revisions_diff import builder
 from ggrc import settings
 from ggrc.models import comment
 
+# pylint: disable=too-few-public-methods
+
 
 class JsonPolymorphicRelationship(utils.PolymorphicRelationship):
 
@@ -35,11 +37,15 @@ class FullInstanceContentFased(utils.FasadeProperty):
 
   FIELD_NAME = "content"
 
-  def prepare(self, src):
-    src = super(FullInstanceContentFased, self).prepare(src)
+  def prepare(self, data):
+    data = super(FullInstanceContentFased, self).prepare(data)
     return builder.prepare(
-        referenced_objects.get(src["instance"]["type"], src["instance"]["id"]),
-        src["full_instance_content"])
+        referenced_objects.get(data["instance"]["type"],
+                               data["instance"]["id"]),
+        data["full_instance_content"])
+
+
+# pylint: enable=too-few-public-methods
 
 
 class Proposal(mixins.person_relation_factory("applied_by"),
@@ -57,6 +63,7 @@ class Proposal(mixins.person_relation_factory("applied_by"),
 
   __tablename__ = 'proposals'
 
+  # pylint: disable=too-few-public-methods
   class NotificationContext(object):
     DIGEST_TITLE = "Proposal Digest"
     DIGEST_TMPL = settings.JINJA2.get_template(
@@ -84,6 +91,7 @@ class Proposal(mixins.person_relation_factory("applied_by"),
                                "has been applied.</p>")
     DECLINED_WITHOUT_COMMENT = ("<p>Proposal created by {user} "
                                 "has been declined.</p>")
+  # pylint: enable=too-few-public-methods
 
   def build_comment_text(self, reason, text, proposed_by):
     if reason == self.STATES.PROPOSED:
@@ -157,8 +165,7 @@ class Proposal(mixins.person_relation_factory("applied_by"),
                      "proposed_notified_datetime"))
 
 
-class Proposalable(object):
-
+class Proposalable(object):  # pylint: disable=too-few-public-methods
   @sa.ext.declarative.declared_attr
   def proposals(cls):  # pylint: disable=no-self-argument
 
@@ -186,6 +193,7 @@ def get_propsal_acr_dict():
 
 
 def permissions_for_proposal_setter(proposal, proposal_roles):
+  """Append required proposal roles ACL to proposal."""
   parents = {a.parent for a in proposal.access_control_list}
   for acl in proposal.instance.access_control_list:
     if acl in parents:

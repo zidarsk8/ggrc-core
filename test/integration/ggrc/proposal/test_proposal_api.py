@@ -1,13 +1,16 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
-""" """
-import ddt
+"""Test for proposal api."""
+
 import collections
 import json
 
-from ggrc.models import all_models
+import ddt
+
 from ggrc import utils
+from ggrc.models import all_models
+
 from integration.ggrc import TestCase
 from integration.ggrc.api_helper import Api
 from integration.ggrc.models import factories
@@ -15,6 +18,7 @@ from integration.ggrc.models import factories
 
 @ddt.ddt
 class TestProposalApi(TestCase):
+  """Test case for proposal api."""
 
   def setUp(self):
     super(TestProposalApi, self).setUp()
@@ -22,6 +26,7 @@ class TestProposalApi(TestCase):
     self.client.get("/login")
 
   def test_simple_get_proposal(self):
+    """Test simple get proposal."""
     with factories.single_commit():
       control = factories.ControlFactory()
       proposal = factories.ProposalFactory(instance=control,
@@ -40,6 +45,7 @@ class TestProposalApi(TestCase):
     self.assertEqual("agenda content", data["agenda"])
 
   def test_simple_create_proposal(self):
+    """Test simple create proposal."""
     new_title = "2"
     control = factories.ControlFactory(title="1")
     control_id = control.id
@@ -65,6 +71,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_simple_apply_status(self):
+    """Test simple apply status."""
     with factories.single_commit():
       control = factories.ControlFactory(title="1")
       proposal = factories.ProposalFactory(
@@ -102,6 +109,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_simple_decline_status(self):
+    """Test simple decline status."""
     with factories.single_commit():
       control = factories.ControlFactory(title="1")
       proposal = factories.ProposalFactory(
@@ -138,6 +146,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_proposal_for_acl(self):
+    """Test simple add acl proposal."""
     with factories.single_commit():
       control = factories.ControlFactory(title="1")
       role = factories.AccessControlRoleFactory(name="role")
@@ -178,6 +187,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_proposal_delete_acl(self):
+    """Test simple delete acl proposal."""
     with factories.single_commit():
       control = factories.ControlFactory(title="1")
       role = factories.AccessControlRoleFactory(name="role")
@@ -230,6 +240,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_apply_acl(self):
+    """Test simple apply acl proposal."""
     with factories.single_commit():
       control = factories.ControlFactory(title="1")
       role_1 = factories.AccessControlRoleFactory(
@@ -329,6 +340,7 @@ class TestProposalApi(TestCase):
                      result_dict[role_5_id])
 
   def test_change_cad(self):
+    """Test create proposal with change CAVs."""
     with factories.single_commit():
       control = factories.ControlFactory(title="1")
       cad = factories.CustomAttributeDefinitionFactory(
@@ -366,6 +378,7 @@ class TestProposalApi(TestCase):
 
   @ddt.data(True, False)
   def test_apply_cad(self, remove_cav):
+    """Test apply proposal with change CAVs."""
     with factories.single_commit():
       control = factories.ControlFactory(title="1")
       cad = factories.CustomAttributeDefinitionFactory(
@@ -403,6 +416,7 @@ class TestProposalApi(TestCase):
 
   @ddt.data(True, False)
   def test_apply_mapping_cad(self, remove_cav):
+    """Test apply mapping CAVs proposal."""
     with factories.single_commit():
       control = factories.ControlFactory(title="1")
       cad = factories.CustomAttributeDefinitionFactory(
@@ -443,6 +457,7 @@ class TestProposalApi(TestCase):
       self.assertIsNone(cav.attribute_object_id)
 
   def test_change_cad_oldstile(self):
+    """Test create CAVs proposal in old style."""
     with factories.single_commit():
       control = factories.ControlFactory(title="1")
       cad = factories.CustomAttributeDefinitionFactory(
@@ -478,6 +493,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_change_mapping(self):
+    """Test create mapping proposal."""
     setuped_kind, update_kind = all_models.Option.query.filter(
         all_models.Option.role == "control_kind"
     )[:2]
@@ -508,6 +524,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_apply_mapping(self):
+    """Test apply mapping proposal."""
     setuped_kind, update_kind = all_models.Option.query.filter(
         all_models.Option.role == "control_kind"
     )[:2]
@@ -558,6 +575,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_change_mapping_to_empty(self):
+    """Test create empty mapping proposal."""
     setuped_kind = all_models.Option.query.filter(
         all_models.Option.role == "control_kind"
     ).first()
@@ -585,6 +603,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_apply_empty_mapping(self):
+    """Test apply empty mapping proposal."""
     setuped_kind = all_models.Option.query.filter(
         all_models.Option.role == "control_kind"
     ).first()
@@ -626,6 +645,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_change_mapping_list(self):
+    """Test create mapping list proposal."""
     with factories.single_commit():
       cat = factories.ControlCategoryFactory()
       control = factories.ControlFactory(title="1")
@@ -658,6 +678,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_change_empty_mapping_list(self):
+    """Test create mapping list proposal to empty."""
     with factories.single_commit():
       category = factories.ControlCategoryFactory()
       control = factories.ControlFactory(categories=[category])
@@ -691,6 +712,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_apply_empty_mapping_list(self):
+    """Test apply mapping list proposal to empty."""
     with factories.single_commit():
       category = factories.ControlCategoryFactory()
       control = factories.ControlFactory()
@@ -739,6 +761,7 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
 
   def test_apply_mapping_list(self):
+    """Test apply mapping list proposal."""
     with factories.single_commit():
       category = factories.ControlCategoryFactory()
       control = factories.ControlFactory()
@@ -787,142 +810,3 @@ class TestProposalApi(TestCase):
     self.assertEqual(1, len(control.comments))
     comment = control.comments[0]
     self.assertEqual(proposal, comment.initiator_instance)
-
-  TMPLS = all_models.Proposal.CommentTemplatesTextBuilder
-
-  @ddt.data({"agenda": "",
-             "comment": TMPLS.PROPOSED_WITHOUT_AGENDA},
-            {"agenda": "tmp",
-             "comment": TMPLS.PROPOSED_WITH_AGENDA.format(text="tmp")},
-            {"agenda": "bla",
-             "comment": TMPLS.PROPOSED_WITH_AGENDA.format(text="bla")},
-            {"agenda": "<p>bla</p>",
-             "comment": TMPLS.PROPOSED_WITH_AGENDA.format(text="bla")})
-  @ddt.unpack
-  def test_create_proposal_different_agenda(self, agenda, comment):
-    """Test case create proposal with agenda {agenda}."""
-    control = factories.ControlFactory(title="1")
-    new_title = "2"
-    control_id = control.id
-    control.title = new_title
-    self.assertEqual(0, len(control.comments))
-    resp = self.api.post(
-        all_models.Proposal,
-        {"proposal": {
-            "instance": {
-                "id": control.id,
-                "type": control.type,
-            },
-            # "content": {"123": 123},
-            "full_instance_content": control.log_json(),
-            "agenda": agenda,
-            "context": None,
-        }})
-    self.assertEqual(201, resp.status_code)
-    control = all_models.Control.query.get(control_id)
-    self.assertEqual(1, len(control.comments))
-    self.assertEqual(comment, control.comments[0].description)
-
-  @ddt.data({"agenda": "",
-             "comment_agenda": "",
-             "status": all_models.Proposal.STATES.APPLIED,
-             "tmpl": TMPLS.APPLIED_WITHOUT_COMMENT},
-            {"agenda": "tmp",
-             "comment_agenda": "tmp",
-             "status": all_models.Proposal.STATES.APPLIED,
-             "tmpl": TMPLS.APPLIED_WITH_COMMENT},
-            {"agenda": "<p>tmp</p>",
-             "comment_agenda": "tmp",
-             "status": all_models.Proposal.STATES.APPLIED,
-             "tmpl": TMPLS.APPLIED_WITH_COMMENT},
-            {"agenda": "<p>     </p>",
-             "comment_agenda": "",
-             "status": all_models.Proposal.STATES.APPLIED,
-             "tmpl": TMPLS.APPLIED_WITHOUT_COMMENT},
-            {"agenda": "bla",
-             "comment_agenda": "bla",
-             "status": all_models.Proposal.STATES.APPLIED,
-             "tmpl": TMPLS.APPLIED_WITH_COMMENT},
-            {"agenda": "tmp",
-             "comment_agenda": "tmp",
-             "status": all_models.Proposal.STATES.DECLINED,
-             "tmpl": TMPLS.DECLINED_WITH_COMMENT},
-            {"agenda": " <p>tmp</p>      ",
-             "comment_agenda": "tmp",
-             "status": all_models.Proposal.STATES.DECLINED,
-             "tmpl": TMPLS.DECLINED_WITH_COMMENT},
-            {"agenda": "BLa",
-             "comment_agenda": "BLa",
-             "status": all_models.Proposal.STATES.DECLINED,
-             "tmpl": TMPLS.DECLINED_WITH_COMMENT},
-            {"agenda": "",
-             "comment_agenda": "",
-             "status": all_models.Proposal.STATES.DECLINED,
-             "tmpl": TMPLS.DECLINED_WITHOUT_COMMENT})
-  @ddt.unpack
-  def test_apply_proposal_comment(self, agenda, comment_agenda, status, tmpl):
-    """Test comment proposal status move to {status} with agenda {agenda}."""
-    test_email = "foo@example.com"
-    with factories.single_commit():
-      control = factories.ControlFactory()
-      proposer = factories.PersonFactory(email=test_email)
-    with factories.single_commit():
-      proposal = factories.ProposalFactory(
-          instance=control,
-          content={"field": "a"},
-          agenda="agenda content",
-          proposed_by=proposer)
-    control_id = control.id
-    if status == all_models.Proposal.STATES.APPLIED:
-      resp = self.api.put(
-          proposal, {"proposal": {"status": status, "apply_reason": agenda}})
-    else:
-      resp = self.api.put(
-          proposal, {"proposal": {"status": status, "decline_reason": agenda}})
-    self.assertEqual(200, resp.status_code)
-    control = all_models.Control.query.get(control_id)
-    self.assertEqual(1, len(control.comments))
-    comment = tmpl.format(user=test_email, text=comment_agenda)
-    self.assertEqual(comment, control.comments[0].description)
-
-  @ddt.data(
-      {"read": 1, "update": 0},
-      {"read": 0, "update": 1},
-      {"read": 1, "update": 1},
-      {"read": 0, "update": 0},
-  )
-  @ddt.unpack
-  def test_proposal_acl_poulation(self, read, update):
-    """Test proposal perms with read {read} and update {update}."""
-    with factories.single_commit():
-      control = factories.ControlFactory(title="1")
-      role = factories.AccessControlRoleFactory(object_type=control.type,
-                                                name="role",
-                                                read=read,
-                                                update=update)
-      proposal = factories.ProposalFactory(instance=control,
-                                           content={"field": "a"},
-                                           agenda="agenda content")
-      person = factories.PersonFactory()
-    self.assertFalse(proposal.access_control_list)
-    role_id = role.id
-    control_id = control.id
-    proposal_id = proposal.id
-    control_content = control.log_json()
-    control_content["access_control_list"] = [
-        {"ac_role_id": role_id,
-            "person": {"type": "Person", "id": person.id}}
-    ]
-    resp = self.api.put(control, {"control": control_content})
-    self.assertEqual(200, resp.status_code)
-    control = all_models.Control.query.get(control_id)
-    proposal = all_models.Proposal.query.get(proposal_id)
-    self.assertEqual(int(read or update), len(proposal.access_control_list))
-    expected_roles = []
-    if update:
-      expected_roles.append(all_models.Proposal.ACRoles.EDITOR)
-    elif read:
-      expected_roles.append(all_models.Proposal.ACRoles.READER)
-    self.assertEqual(
-        sorted(expected_roles),
-        sorted([a.ac_role.name for a in proposal.access_control_list]))
