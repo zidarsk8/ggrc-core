@@ -5,6 +5,7 @@
 
 import './comment-input';
 import './comment-add-button';
+import Permission from '../../permission';
 import template from './comment-add-form.mustache';
 
 const tag = 'comment-add-form';
@@ -17,6 +18,14 @@ export default can.Component.extend({
   tag: tag,
   template: template,
   viewModel: {
+    define: {
+      isAllowedToAddComment: {
+        get() {
+          return Permission
+            .is_allowed_for('update', this.attr('instance'));
+        },
+      },
+    },
     instance: {},
     sendNotifications: true,
     isSaving: false,
