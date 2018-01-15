@@ -75,6 +75,14 @@ import Permission from '../../permission';
             if ( !field.validation.valid ) {
               hasValidationErrors = true;
             }
+            if ( triggerField === field &&
+                 triggerAttachmentModals &&
+                 field.validation.hasMissingInfo ) {
+              this.dispatch({
+                type: 'validationChanged',
+                field,
+              });
+            }
           });
 
         if ( this.attr('instance') ) {
@@ -148,14 +156,6 @@ import Permission from '../../permission';
               comment: hasMissingComment,
             },
           });
-
-          if (triggerAttachmentModals &&
-              (hasMissingEvidence || hasMissingComment)) {
-            this.dispatch({
-              type: 'validationChanged',
-              field: field,
-            });
-          }
         } else {
           // validation for all other fields
           field.attr({
