@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Data handlers for notifications for objects in ggrc module.
@@ -83,7 +83,7 @@ def _get_updated_roles(new_list, old_list, roles):
     old_dict[role_id].add(person_id)
 
   diff_roles = set(new_dict.keys()) ^ set(old_dict.keys())
-  role_set = {roles[role_id] for role_id in diff_roles}
+  role_set = {roles[role_id] for role_id in diff_roles if role_id in roles}
 
   common_roles = set(new_dict.keys()) & set(old_dict.keys())
   for role_id in common_roles:

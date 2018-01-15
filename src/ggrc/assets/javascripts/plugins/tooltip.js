@@ -1,5 +1,5 @@
-/*!
-    Copyright (C) 2017 Google Inc.
+/*
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -35,10 +35,8 @@
    */
   function isElementVisible(el) {
     const bRect = el.getBoundingClientRect();
-    const centerX = Math.round(bRect.x + bRect.width / 2);
-    const centerY = Math.round(bRect.y + bRect.height / 2);
-    const topEl = document.elementFromPoint(centerX, centerY);
-    return el === topEl || isChildOf(topEl, el);
+    const topEl = document.elementFromPoint(bRect.x, bRect.y);
+    return topEl && (el === topEl || isChildOf(topEl, el));
   }
 
   /**

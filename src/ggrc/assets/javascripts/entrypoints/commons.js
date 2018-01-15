@@ -1,5 +1,5 @@
-/*!
-    Copyright (C) 2017 Google Inc.
+/*
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -21,6 +21,7 @@ import '../plugins/openclose';
 import '../plugins/tooltip';
 import '../plugins/popover';
 import '../plugins/popover_template';
+import '../components/simple-modal/simple-modal';
 import '../mustache_helper';
 import '../generated/ggrc_filter_query_parser';
 

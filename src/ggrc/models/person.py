@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 import re
@@ -118,8 +118,8 @@ class Person(CustomAttributable, CustomAttributeMapable, HasOwnContext,
   @validates('email')
   def validate_email(self, key, email):
     if not Person.is_valid_email(email):
-      message = "Must provide a valid email address"
-      raise ValidationError(message)
+      message = "Email address '{}' is invalid. Valid email must be provided"
+      raise ValidationError(message.format(email))
     return email
 
   @staticmethod

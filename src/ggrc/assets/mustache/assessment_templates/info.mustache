@@ -1,5 +1,5 @@
 {{!
-  Copyright (C) 2017 Google Inc.
+  Copyright (C) 2018 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -21,7 +21,7 @@
             <h3>{{title}}</h3>
 
             {{#if status}}
-              <span class="state-value {{addclass 'state-' status separator=''}}">{{un_camel_case status}}</span>
+              <span class="state-value {{addclass 'state' status}}">{{un_camel_case status}}</span>
             {{/if}}
           </div>
         </div>
@@ -139,15 +139,5 @@
     </div><!-- tier-content end -->
   </section>
 
-  <div class="info-widget-footer">
-    <p>
-      <small>
-        <em>
-          Created at {{date created_at}}
-          &nbsp;&nbsp;&nbsp;&nbsp;
-          Modified by {{#using person=modified_by}}{{>'/static/mustache/people/popover.mustache'}}{{/using}} on {{date updated_at}}
-        </em>
-      </small>
-    </p>
-  </div>
+  <info-pane-footer {created-at}="instance.created_at" {modified-at}="instance.updated_at" {modified-by}="instance.modified_by"></info-pane-footer>
 {{/instance}}

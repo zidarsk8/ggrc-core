@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2017 Google Inc.
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -7,7 +7,7 @@
  * The component is used to integrate separate autocomplete component
  * with some old pards of code which are working with autocomplete plugin
  * and controllers.
- * 
+ *
  * Generally it emulates autocomplete_select handlers from several controllers.
  */
 export default GGRC.Components('inlineAutocompleteWrapper', {

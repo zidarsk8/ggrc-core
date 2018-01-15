@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc., authors, and contributors <see AUTHORS file>
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Assessments Workflow smoke tests."""
 # pylint: disable=no-self-use

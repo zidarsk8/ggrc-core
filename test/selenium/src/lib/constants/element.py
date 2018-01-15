@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Elements' labels and properties for objects."""
 # pylint: disable=too-few-public-methods
@@ -129,8 +129,8 @@ class Common(object):
   STATE = Base.STATE
   # fictional elements (need to convert UI attrs to Entities attrs)
   CAS = "CAs"
-  MODIFIED_BY = "Modified by"
-  CREATED_AT = "Created at"
+  MODIFIED_BY = "Last updated by"
+  CREATED_AT = "Created date"
   UPDATED_AT = "Updated at"
 
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """List of all error and warning messages for imports."""
@@ -137,7 +137,7 @@ ARCHIVED_IMPORT_ERROR = (u"Line {line}: Importing archived instance is "
 
 VALIDATION_ERROR = (u"Line {line}: Field '{column_name}' validation failed "
                     u"with the following reason: {message}."
-                    u"The line will be ignored.")
+                    u" The line will be ignored.")
 
 SINGLE_AUDIT_RESTRICTION = (u"Line {line}: You can not map {mapped_type} to "
                             u"{object_type}, because this {object_type} is "

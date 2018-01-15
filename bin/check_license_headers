@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 set -o nounset
@@ -9,7 +9,7 @@ SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 
 cd "${SCRIPTPATH}/../"
 
-git grep "Copyright (C) 2017 Google Inc." . | \
+git grep "Copyright (C) 2018 Google Inc." . | \
   grep -o "^[^:]*" | \
   grep -v "^third_party" | \
   grep -v ".csv$" | \

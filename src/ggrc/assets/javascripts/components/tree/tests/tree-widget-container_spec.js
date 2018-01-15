@@ -1,5 +1,5 @@
-/*!
- Copyright (C) 2017 Google Inc.
+/*
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -713,6 +713,48 @@ describe('GGRC.Components.treeWidgetContainer', function () {
     it('sets up sorting configuration', () => {
       method();
       expect(vm.setSortingConfiguration).toHaveBeenCalled();
+    });
+  });
+
+  describe('getDepthFilter() method', function () {
+    it('returns an empty string if depth is not set for filter', function () {
+      let result;
+      spyOn(vm, 'attr')
+        .and.returnValue([{
+          filter: '"task assignees" = "user@example.com"',
+          operation: 'AND',
+          name: 'custom',
+        }, {
+          filter: '"state" = "Assigned"',
+          operation: 'AND',
+          name: 'custom',
+        }]);
+
+      result = vm.getDepthFilter();
+
+      expect(result).toBe('');
+    });
+
+    it('returns filter that applied for depth', function () {
+      let result;
+      spyOn(vm, 'attr')
+        .and.returnValue([{
+          filter: '"task assignees" = "user@example.com"',
+          operation: 'AND',
+          name: 'custom',
+          depth: true,
+          filterDeepLimit: 2,
+        }, {
+          filter: '"state" = "Assigned"',
+          operation: 'AND',
+          name: 'custom',
+          depth: true,
+          filterDeepLimit: 1,
+        }]);
+
+      result = vm.getDepthFilter(1);
+
+      expect(result).toBe('"task assignees" = "user@example.com"');
     });
   });
 });

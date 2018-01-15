@@ -1,5 +1,5 @@
-/*!
- Copyright (C) 2017 Google Inc.
+/*
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -39,9 +39,9 @@ import template from './folder-attachments-list.mustache';
           }
         }
       },
-      title: '@',
-      tooltip: '@',
+      title: null,
       subLabel: '@',
+      tooltip: null,
       instance: null,
       currentFolder: null,
       folderError: null,

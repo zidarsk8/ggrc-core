@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Info widgets."""
 # pylint: disable=useless-super-delegation
@@ -57,7 +57,8 @@ class InfoWidget(base.Widget):
           self.info_page_footer.text.split(
               string_utils.Symbols.WHITESPACE * 6))
       self.created_at_txt = (
-          re.sub("Created at", string_utils.Symbols.BLANK, _created_at_txt))
+          re.sub(element.Common.CREATED_AT, string_utils.Symbols.BLANK,
+                 _created_at_txt))
       self.updated_at_txt = (
           _updated_at_txt.splitlines()[1].replace(
               "on ", string_utils.Symbols.BLANK))

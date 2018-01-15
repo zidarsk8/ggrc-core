@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2017 Google Inc.
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -31,17 +31,17 @@
                   {{#if_helpers '\
                     #if' isSnapshot '\
                     or ^is_allowed' "update" instance context="for"}}
-                      <folder-attachments-list title="Attachment"
+                      <folder-attachments-list {title}="'Attachment'"
                                             {readonly}="true"
                                             {(is-revision-folder-loaded)}="instance.isRevisionFolderLoaded"
                                             {instance}="instance">
                       </folder-attachments-list>
                   {{else}}
-                    <folder-attachments-list title="Attachment"
+                    <folder-attachments-list {title}="'Attachment'"
                                           {readonly}="false"
                                           {instance}="instance"
                                           {deny-no-folder}="true"
-                                          tooltip="You can upload up to 10 files in a single batch">
+                                          {tooltip}="'A new copy of the file will be stored at the destination Control folder if exists or main gDrive folder of user.''">
                     </folder-attachments-list>
                   {{/if_helpers}}
                 </div>

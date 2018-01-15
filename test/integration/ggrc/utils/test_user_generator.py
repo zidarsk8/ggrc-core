@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Tests for user generator"""
@@ -213,3 +213,39 @@ class TestUserGenerator(TestCase):
           {"Assessment Template": {
               "row_warnings": {errors.UNKNOWN_USER_WARNING.format(
                   line=3, email="cbabbage@example.com")}}})
+
+  @mock.patch("ggrc.settings.INTEGRATION_SERVICE_URL", new="endpoint")
+  @mock.patch("ggrc.utils.user_generator.search_user", return_value="user")
+  def test_invalid_email_import(self, _):
+    """Test import of invalid email."""
+    wrong_email = "some wrong email"
+    audit = factories.AuditFactory()
+
+    response = self.import_data(OrderedDict([
+        ("object_type", "Assessment"),
+        ("Code*", "Test Assessment"),
+        ("Audit*", audit.slug),
+        ("Assignees*", wrong_email),
+        ("Title", "Some title"),
+    ]))
+    expected_errors = {
+        "Assessment": {
+            "row_errors": {
+                errors.VALIDATION_ERROR.format(
+                    line=3,
+                    column_name="Assignees",
+                    message="Email address '{}' is invalid."
+                            " Valid email must be provided".format(wrong_email)
+                )
+            },
+            "row_warnings": {
+                errors.UNKNOWN_USER_WARNING.format(
+                    line=3, email=wrong_email
+                ),
+                errors.OWNER_MISSING.format(
+                    line=3, column_name="Assignees"
+                ),
+            }
+        }
+    }
+    self._check_csv_response(response, expected_errors)
