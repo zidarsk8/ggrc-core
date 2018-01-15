@@ -86,4 +86,56 @@ describe('instance-fields-diff component', () => {
       expect(diff[0].currentVal[0]).toEqual(viewModel.attr('emptyValue'));
     });
   });
+
+  describe('"specificDislayValues" function', () => {
+    let method;
+
+    beforeAll(() => {
+      method = viewModel.specificDislayValues;
+    });
+
+    it('should return "Yes" value for "fraud_related" key', () => {
+      const expectedResult = 'Yes';
+      const key = 'fraud_related';
+
+      let result = method('1', key);
+      expect(result).toEqual(expectedResult);
+
+      result = method(true, key);
+      expect(result).toEqual(expectedResult);
+    });
+
+    it('should return "No" value for "fraud_related" key', () => {
+      const expectedResult = 'No';
+      const key = 'fraud_related';
+
+      let result = method('0', key);
+      expect(result).toEqual(expectedResult);
+
+      result = method(false, key);
+      expect(result).toEqual(expectedResult);
+    });
+
+    it('should return "Key" value for "key_control" key', () => {
+      const expectedResult = 'Key';
+      const key = 'key_control';
+
+      let result = method('1', key);
+      expect(result).toEqual(expectedResult);
+
+      result = method(true, key);
+      expect(result).toEqual(expectedResult);
+    });
+
+    it('should return "Non-Key" value for "key_control" key', () => {
+      const expectedResult = 'Non-Key';
+      const key = 'key_control';
+
+      let result = method('0', key);
+      expect(result).toEqual(expectedResult);
+
+      result = method(false, key);
+      expect(result).toEqual(expectedResult);
+    });
+  });
 });

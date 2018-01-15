@@ -21,8 +21,8 @@ const viewModel = DiffBaseVM.extend({
 
       const diffObject = {
         attrName: this.getAttrDisplayName(key),
-        modifiedVal: this.getValueOrEmpty(modifiedVal),
-        currentVal: this.getValueOrEmpty(currentVal),
+        modifiedVal: this.getValueOrEmpty(modifiedVal, key),
+        currentVal: this.getValueOrEmpty(currentVal, key),
       };
 
       return diffObject;
@@ -30,11 +30,23 @@ const viewModel = DiffBaseVM.extend({
 
     this.attr('diff', diff);
   },
-  getValueOrEmpty(value) {
+  getValueOrEmpty(value, key) {
     const emptyValue = this.attr('emptyValue');
     return value === null || value === undefined || value === '' ?
       [emptyValue] :
-      [value];
+      [this.specificDislayValues(value, key)];
+  },
+  specificDislayValues(value, key) {
+    switch (key) {
+      case 'fraud_related':
+        return !value || value === '0' ? 'No' : 'Yes';
+      case 'key_control': {
+        return !value || value === '0' ? 'Non-Key' : 'Key';
+      }
+      default: {
+        return value;
+      }
+    }
   },
 });
 
