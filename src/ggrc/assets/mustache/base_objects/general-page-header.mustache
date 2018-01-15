@@ -36,6 +36,8 @@
             reified by the time is_allowed helper uses it }}
       {{#using reified_snapshot=snapshot}}
       {{#canUpdate}}
+
+      {{^if instance.originalObjectDeleted}}
         {{^isLatestRevision}}
           {{^if instance.snapshot.archived}}
           <div class="span12 snapshot">
@@ -59,6 +61,8 @@
           </div>
           {{/if}}
         {{/isLatestRevision}}
+      {{/if}}
+
       {{/canUpdate}}
       {{/using}}
       {{/if}}
