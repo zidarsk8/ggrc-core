@@ -76,19 +76,17 @@ describe('assessment-template-clone component', () => {
         $target.remove();
       });
 
-      it('calls closeModal handler if originalTitle is ' +
-      '"Define Assessment template"', () => {
+      it('calls closeModal handler if modal is in cloner', () => {
         spy.and.returnValue({
           options: {
-            originalTitle: 'Define Assessment template',
+            inCloner: true,
           },
         });
         handler({}, ev);
         expect(that.closeModal).toHaveBeenCalled();
       });
 
-      it('does not call closeModal handler if originalTitle is nothing ' +
-      '"Define Assessment template"', () => {
+      it('does not call closeModal handler if modal is not in cloner', () => {
         spy.and.returnValue({
           options: {},
         });
