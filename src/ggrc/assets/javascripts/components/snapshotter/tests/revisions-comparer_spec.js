@@ -19,7 +19,7 @@ describe('GGRC.Components.revisionsComparer', function () {
     var method; // the method under test
 
     beforeEach(function () {
-      method = viewModel.prepareInstances;
+      method = viewModel.prepareInstances.bind(viewModel);
       fakeData = [
         {
           id: 1,
@@ -85,7 +85,8 @@ describe('GGRC.Components.revisionsComparer', function () {
     var revisions;
 
     beforeEach(function () {
-      var prepareInstancesMethod = viewModel.prepareInstances;
+      var prepareInstancesMethod = viewModel.prepareInstances
+        .bind(viewModel);
       var fakeData = [
         {
           id: 1,
