@@ -64,7 +64,10 @@ import Permission from '../../permission';
           },
         },
       },
-      validateForm: function (triggerAttachmentModals = false) {
+      validateForm: function ({
+        triggerField = null,
+        triggerAttachmentModals = false,
+      } = {}) {
         let hasValidationErrors = false;
         this.attr('fields')
           .each((field) => {
@@ -223,7 +226,10 @@ import Permission from '../../permission';
           e.field.attr('errorsMap.comment', true);
         }
 
-        this.performValidation({field: e.field, triggerAttachmentModals: true});
+        this.validateForm({
+          triggerAttachmentModals: true,
+          triggerField: e.field,
+        });
         this.attr('formSavedDeferred', can.Deferred());
         this.save(e.fieldId, e.value);
       },
