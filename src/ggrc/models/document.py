@@ -16,14 +16,15 @@ from ggrc.models.relationship import Relatable
 from ggrc.models.utils import validate_option
 from ggrc.models import exceptions
 from ggrc.models import reflection
+from ggrc.models import mixins
 
 
-class Document(Roleable, Relatable, Base, Indexed, db.Model):
+class Document(Roleable, Relatable, Base, mixins.Titled, Indexed, db.Model):
   """Audit model."""
   __tablename__ = 'documents'
 
-  # TODO: inherit from Titled mixin (note: title is nullable here)
-  title = deferred(db.Column(db.String), 'Document')
+  _title_uniqueness = False
+
   link = deferred(db.Column(db.String), 'Document')
   description = deferred(db.Column(db.Text, nullable=False, default=u""),
                          'Document')
