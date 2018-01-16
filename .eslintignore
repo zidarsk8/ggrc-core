@@ -1,6 +1,5 @@
-third_party/*
-
 src/ggrc/static/**/*.js
-src/ggrc/assets/stylesheets/*.js
-src/ggrc/assets/javascripts/generated/*.js
+src/ggrc-client/vendor/*
+src/ggrc-client/styles/*.js
+src/ggrc-client/js/generated/*.js
 src/parser/parser_template.js

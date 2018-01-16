@@ -3,7 +3,7 @@
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import '../../javascripts/models/recently_viewed_object';
+import '../../js/models/recently_viewed_object';
 
 describe("can.Model.RecentlyViewedObjects", function() {
 

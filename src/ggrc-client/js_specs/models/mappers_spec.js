@@ -3,7 +3,7 @@
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
-import RefreshQueue from '../../javascripts/models/refresh_queue';
+import RefreshQueue from '../../js/models/refresh_queue';
 
 describe("mappers", function() {
 
