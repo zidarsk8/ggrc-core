@@ -1,6 +1,17 @@
 {{!
-    Copyright (C) 2017 Google Inc.
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
-<button class="{{link_class}} btn btn-small btn-white" {{#isInactive}}disabled{{/isInactive}} ($click)="onClickHandler" ($keyup)="onKeyup(%element, %event)"><content></content></button>
+<button
+  class="{{link_class}} btn btn-small btn-white"
+  {{#isInactive}}disabled{{/isInactive}}
+  {{#if tooltip}}
+    rel="tooltip"
+    data-placement="bottom"
+    data-original-title="{{tooltip}}"
+  {{/if}}
+  ($click)="onClickHandler"
+  ($keyup)="onKeyup(%element, %event)">
+  <content></content>
+</button>

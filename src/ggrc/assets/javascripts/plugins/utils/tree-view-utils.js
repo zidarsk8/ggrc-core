@@ -1,5 +1,5 @@
-/* !
- Copyright (C) 2017 Google Inc.
+/*
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -300,26 +300,27 @@ function setColumnsForModel(modelType, columnNames, displayPrefs,
 }
 
 /**
- * Returns map where key is name of field
- * and value True if column selected and False or not.
+ * Returns array of columns configs.
+ * Each config contains 'name', 'title', 'mandatory', 'selected' properties
  * @param {Array} available - Full list of available columns.
  * @param {Array} selected - List of selected columns.
- * @return {Array} Map with selected columns.
+ * @return {Array} Array of columns configs.
  */
-function createSelectedColumnsMap(available, selected) {
-  var selectedColumns = can.makeArray(selected);
-  var availableColumns = can.makeArray(available);
-  var columns = new can.Map();
+function getVisibleColumnsConfig(available, selected) {
+  const selectedColumns = can.makeArray(selected);
+  const availableColumns = can.makeArray(available);
+  const columns = [];
 
-  availableColumns
-    .forEach(function (attr) {
-      var value = {};
-      value[attr.attr_name] = selectedColumns
-        .some(function (selectedAttr) {
-          return selectedAttr.attr_name === attr.attr_name;
-        });
-      columns.attr(value);
-    });
+  availableColumns.forEach(function (attr) {
+    const isSelected = selectedColumns
+      .some((selectedAttr) => selectedAttr.attr_name === attr.attr_name);
+    columns.push(new can.Map({
+      title: attr.attr_title,
+      name: attr.attr_name,
+      mandatory: attr.mandatory,
+      selected: isSelected,
+    }));
+  });
 
   return columns;
 }
@@ -715,6 +716,6 @@ export {
   loadFirstTierItems,
   loadItemsForSubTier,
   makeRelevantExpression,
-  createSelectedColumnsMap,
+  getVisibleColumnsConfig,
   isDirectlyRelated,
 };

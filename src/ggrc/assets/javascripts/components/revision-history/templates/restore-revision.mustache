@@ -1,0 +1,14 @@
+{{!
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="ggrc-form revision-history">
+  <div class="revision-history__restore-button">
+    <a class="btn btn-small btn-green preventdoubleclick {{#if loading}}disabled{{/if}}"
+      ($click)="restore(%element)">
+      Restore Version
+    </a>
+    <spinner class="revision-history__spinner" toggle="loading"></spinner>
+  </div>
+</div>

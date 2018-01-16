@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """A module with configuration of the Reader role's permissions."""
@@ -64,6 +64,7 @@ permissions = {
         "SystemSystem",
         "Person",
         "Program",
+        "Proposal",
         "Revision",
         "Role",
         "UserRole",
@@ -105,6 +106,7 @@ permissions = {
         "PopulationSample",
         "Product",
         "Project",
+        "Proposal",
         {
             "type": "Relationship",
             "terms": {

@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Locators for all elements."""
 # pylint: disable=too-few-public-methods
@@ -1147,7 +1147,7 @@ class CommentsPanel(object):
 class CommentItem(object):
   """Locators for single item in comments' panel."""
   AUTHOR_CSS = (By.CSS_SELECTOR, ".person-holder")
-  DATETIME_CSS = (By.CSS_SELECTOR, ".comment-object-item__author_info")
+  DATETIME_CSS = (By.CSS_SELECTOR, ".comment-object-item__header-author-info")
   CONTENT_CSS = (By.CSS_SELECTOR, ".comment-object-item__text")
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Google Inc.
+ * Copyright (C) 2018 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -552,6 +552,8 @@ import InfoWidget from '../controllers/info_widget_controller';
       model: CMS.Models.Cycle,
       forceRefetch: true,
       content_controller_options: {
+        depth: true,
+        filterDeepLimit: 2,
         draw_children: true,
         parent_instance: object,
         model: CMS.Models.Cycle,
@@ -570,6 +572,8 @@ import InfoWidget from '../controllers/info_widget_controller';
       model: CMS.Models.Cycle,
       forceRefetch: true,
       content_controller_options: {
+        depth: true,
+        filterDeepLimit: 2,
         draw_children: true,
         parent_instance: object,
         model: CMS.Models.Cycle,

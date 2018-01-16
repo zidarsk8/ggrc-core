@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 scope = "System"
@@ -48,6 +48,7 @@ permissions = {
         "Process",
         "Person",
         "Program",
+        "Proposal",
         "Revision",
         "Role",
         "Context",
@@ -102,6 +103,7 @@ permissions = {
         "System",
         "Process",
         "Program",
+        "Proposal",
         "Role",
         "UserRole",
         "Context",
@@ -158,6 +160,7 @@ permissions = {
         "PopulationSample",
         "Product",
         "Project",
+        "Proposal",
         "Relationship",
         "Section",
         "Clause",

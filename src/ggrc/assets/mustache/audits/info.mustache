@@ -1,5 +1,5 @@
 {{!
-    Copyright (C) 2017 Google Inc.
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 }}
 
@@ -19,7 +19,7 @@
             <div class="span9">
               <h6>Title</h6>
               <h3>{{title}}</h3>
-              <span class="state-value {{addclass 'state-' status separator=''}}">{{status}}</span>
+              <span class="state-value {{addclass 'state' status}}">{{status}}</span>
                 {{#if instance.archived}}
                     <span class="state-value state-archived">Archived</span>
                 {{/if}}
@@ -54,17 +54,17 @@
                 {{#if_helpers '\
                   #if' instance.archived '\
                   or ^is_allowed' "update" instance context="for"}}
-                    <folder-attachments-list title="Attachment"
+                    <folder-attachments-list {title}="'Attachment'"
                       readonly="true"
                       {instance}="instance"
                       deny-no-folder="true"
-                      tooltip="You can upload up to 10 files in a single batch">
+                      {tooltip}="'A new copy of the file will be stored at the destination Audit folder if exists or main gDrive folder of user.''">
                     </folder-attachments-list>
                 {{else}}
-                  <folder-attachments-list title="Attachment"
+                  <folder-attachments-list {title}="'Attachment'"
                     {instance}="instance"
                     deny-no-folder="true"
-                    tooltip="You can upload up to 10 files in a single batch">
+                    {tooltip}="'A new copy of the file will be stored at the destination Audit folder if exists or main gDrive folder of user.''">
                   </folder-attachments-list>
                 {{/if_helpers}}
             </div>

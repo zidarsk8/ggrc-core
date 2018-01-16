@@ -1,11 +1,16 @@
 /*
-    Copyright (C) 2017 Google Inc.
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
 import '../components/comment/comment-data-provider';
 import '../components/comment/comment-add-form';
 import '../components/comment/mapped-comments';
+import '../components/proposal/create-proposal-button';
+import '../components/related-objects/proposals/related-proposals';
+import '../components/related-objects/proposals/related-proposals-item';
+import '../components/related-objects/revisions/related-revisions';
+import '../components/revision-history/restore-revision';
 
 export default can.Control({
   pluginName: 'ggrc_controllers_info_widget',

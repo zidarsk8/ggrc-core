@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module defines application settings."""
@@ -55,7 +55,7 @@ except ImportError:
 # for more info) and if the version name were to exceed 30 characters, all
 # deployments would go to the same GAE app version. Please take that into
 # consideration when modifying this string.
-VERSION = "1.1.0-Strawberry" + BUILD_NUMBER
+VERSION = "1.2.0-Strawberry" + BUILD_NUMBER
 
 # Migration owner
 MIGRATOR = os.environ.get(

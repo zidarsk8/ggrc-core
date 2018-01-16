@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 """Constants for roles."""
 
@@ -52,4 +52,4 @@ ISSUE_PRIMARY_CONTACT_ID = 17
 ASMT_CREATOR_ID = 76
 ASMT_ASSIGNEE_ID = 72
 ASMT_VERIFIER_ID = 73
-AUDIT_CAPTAIN_ID = 80
+AUDIT_CAPTAIN_ID = 82

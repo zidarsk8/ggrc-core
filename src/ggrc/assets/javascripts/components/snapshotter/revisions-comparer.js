@@ -1,4 +1,4 @@
-/*!
+/*
  Copyright (C) 2016 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
@@ -13,25 +13,36 @@ export default can.Component.extend({
   viewModel: {
     instance: null,
     leftRevisionId: null,
-    rightRevisions: [],
+    rightRevision: null,
+    proposal: null,
+    buttonView: null,
+    modalConfirm: null,
+    modalTitle: null,
+    displayDescriptions: false,
+    leftRevisionDescription: '',
+    rightRevisionDescription: '',
     compareIt: function () {
-      var view = this.attr('instance.view');
-      var that = this;
-      var currentRevisionID = this.attr('leftRevisionId');
-      var rightRevisions = this.attr('rightRevisions');
-      var revisionsLength = rightRevisions.length;
-      var newRevisionID = rightRevisions[revisionsLength - 1].id;
+      const view = this.attr('instance.view');
+      const that = this;
+      const currentRevisionID = this.attr('leftRevisionId');
+      const rightRevision = this.attr('rightRevision');
+      const newRevisionID = rightRevision.id;
+      const displayDescriptions = that.attr('displayDescriptions');
       confirm({
-        modal_title: 'Compare with the latest version',
+        modal_title: this.attr('modalTitle'),
         modal_description: 'Loading...',
         header_view: GGRC.mustache_path +
                       '/modals/modal_compare_header.mustache',
-        modal_confirm: 'Update',
+        modal_confirm: this.attr('modalConfirm'),
         skip_refresh: true,
         extraCssClass: 'compare-modal',
-        button_view: GGRC.mustache_path +
-                      '/modals/prompt_buttons.mustache',
+        button_view: this.attr('buttonView'),
+        instance: this.attr('instance'),
+        rightRevision: rightRevision,
+        displayDescriptions: displayDescriptions,
+        proposal: this.attr('proposal'),
         afterFetch: function (target) {
+          let confirmSelf = this;
           that.getRevisions(currentRevisionID, newRevisionID)
             .then(function (data) {
               var revisions = that.prepareInstances(data);
@@ -41,6 +52,19 @@ export default can.Component.extend({
                 that.isContainsAttachments(that.instance) ?
                 that.getAttachmentsDfds(revisions) :
                 [];
+
+              if (displayDescriptions) {
+                confirmSelf.attr('leftRevisionData', {
+                  updatedAt: data[0].updated_at,
+                  modifiedBy: data[0].modified_by,
+                  description: that.attr('leftRevisionDescription'),
+                });
+                confirmSelf.attr('rightRevisionData', {
+                  updatedAt: data[1].updated_at,
+                  modifiedBy: data[1].modified_by,
+                  description: that.attr('rightRevisionDescription'),
+                });
+              }
 
               // people should be preloaded before highlighting differences
               // to avoid breaking UI markup as highlightDifference
@@ -149,13 +173,21 @@ export default can.Component.extend({
       }
 
       return result.then(function (revisions) {
-        return new can.List(_.sortBy(revisions, 'id'));
+        // set correct order of revisions
+        const isNeedReverse = revisions[0].id !== currentRevisionID;
+        if (isNeedReverse) {
+          revisions = revisions.reverse();
+        }
+        return new can.List(revisions);
       });
     },
     prepareInstances: function (data) {
-      return data.map(function (value) {
-        var content = value.content;
-        var model = CMS.Models[value.resource_type];
+      return data.map((value, index) => {
+        let content = value.content;
+        let revision = {};
+        const proposalContent = this.attr('rightRevision.content');
+        const model = CMS.Models[value.resource_type];
+
         content.attr('isRevision', true);
         content.attr('type', value.resource_type);
         content.attr('isRevisionFolderLoaded', false);
@@ -167,7 +199,27 @@ export default can.Component.extend({
           });
         }
 
-        return {instance: new model(content), isSnapshot: true};
+        if (!this.attr('proposal')) {
+          return {instance: new model(content), isSnapshot: true};
+        }
+
+        revision.isSnapshot = true;
+        revision.instance = new model(content);
+        revision.instance.isRevision = true;
+
+        // set proposal content for second revision
+        if (index === 1) {
+          // new model method overrides modified fields
+          can.Map.keys(proposalContent).forEach((key) => {
+            if (Array.isArray(proposalContent[key])) {
+              revision.instance.attr(key).replace(proposalContent[key]);
+            } else {
+              revision.instance.attr(key, proposalContent[key]);
+            }
+          });
+        }
+
+        return revision;
       });
     },
     updateRevision: function () {

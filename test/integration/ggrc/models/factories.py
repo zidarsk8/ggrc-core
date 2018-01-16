@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Factories for ggrc models.
@@ -471,6 +471,15 @@ class ObjectLabelFactory(ModelFactory):
     model = models.ObjectLabel
 
 
+class ProposalFactory(ModelFactory):
+
+  class Meta:
+    model = models.Proposal
+
+  proposed_by = factory.LazyAttribute(lambda _: PersonFactory())
+  content = None
+
+
 def get_model_factory(model_name):
   """Get object factory for provided model name"""
   from integration.ggrc_workflows.models import factories as wf_factories
@@ -511,5 +520,6 @@ def get_model_factory(model_name):
       "Risk": RiskFactory,
       "Threat": ThreatFactory,
       "Workflow": wf_factories.WorkflowFactory,
+      "Proposal": ProposalFactory,
   }
   return model_factories[model_name]

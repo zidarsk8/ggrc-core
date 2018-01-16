@@ -1,5 +1,5 @@
-/* !
-  Copyright (C) 2017 Google Inc.
+/*
+  Copyright (C) 2018 Google Inc.
   Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -17,6 +17,7 @@ export default can.Component.extend({
           var instance = this.attr('instance');
           var canEdit = !isSnapshot(instance) &&
             !instance.attr('archived') &&
+            !this.attr('readOnly') &&
             !this.attr('updatableGroupId') &&
             (this.attr('isNewInstance') ||
               Permission.is_allowed_for('update', instance));
@@ -42,6 +43,7 @@ export default can.Component.extend({
     backUpPeople: [],
     autoUpdate: false,
     updatableGroupId: null,
+    readOnly: false,
 
     changeEditableGroup: function (args) {
       if (args.editableMode) {

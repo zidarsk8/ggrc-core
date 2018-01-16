@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Google Inc.
+ * Copyright (C) 2018 Google Inc.
  * Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -746,6 +746,9 @@ p {
     margin-top: 2px;
     padding-top: 2px;
   }
+  &.state-proposed {
+    background: $status-proposed;
+  }
   &.state-notstarted,
   &.state-draft,
   &.state-assigned,
@@ -753,29 +756,34 @@ p {
   &.state-archived {
     background: $status-draft;
   }
-  &.state-inprogress {
+  &.state-inprogress,
+  &.state-active {
     background: $status-inprogress;
   }
   &.state-inreview,
   &.state-managerreview {
     background: $status-inreview;
   }
-  &.state-active,
   &.state-verified,
-  &.state-readyforexternalreview {
+  &.state-readyforexternalreview,
+  &.state-fixedandverified {
     background: $status-verified;
   }
-  &.state-inactive,
   &.state-finished,
-  &.state-completed {
+  &.state-completed,
+  &.state-fixed {
     background: $status-completed;
+    &.verified {
+      background: $status-verified;
+    }
   }
   &.state-declined,
-  &.state-deprecated {
+  &.state-reworkneeded {
     background: $status-declined;
   }
-  &.state-reworkneeded {
-    background: $status-reworkneeded;
+  &.state-inactive,
+  &.state-deprecated {
+    background: $status-deprecated;
   }
 }
 .state-value-dot {
@@ -811,7 +819,8 @@ p {
       background: $status-draft;
     }
   }
-  &.state-inprogress {
+  &.state-inprogress,
+  &.state-active {
     color: $status-inprogress;
 
     &:before {
@@ -826,37 +835,45 @@ p {
       background: $status-inreview;
     }
   }
-  &.state-active,
   &.state-verified,
-  &.state-readyforexternalreview {
+  &.state-readyforexternalreview,
+  &.state-fixedandverified {
     color: $status-verified;
 
     &:before {
       background: $status-verified;
     }
   }
-  &.state-inactive,
   &.state-finished,
-  &.state-completed {
+  &.state-completed,
+  &.state-fixed {
     color: $status-completed;
 
     &:before {
       background: $status-completed;
     }
+    &.verified {
+      color: $status-verified;
+
+      &:before {
+        background: $status-verified;
+      }
+    }
   }
   &.state-declined,
-  &.state-deprecated {
+  &.state-reworkneeded {
     color: $status-declined;
 
     &:before {
       background: $status-declined;
     }
   }
-  &.state-reworkneeded {
-    color: $status-reworkneeded;
+  &.state-inactive,
+  &.state-deprecated {
+    color: $status-deprecated;
 
     &:before {
-      background: $status-reworkneeded;
+      background: $status-deprecated;
     }
   }
 }

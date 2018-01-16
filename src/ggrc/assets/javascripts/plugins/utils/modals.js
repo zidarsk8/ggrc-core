@@ -1,5 +1,5 @@
-/*!
- Copyright (C) 2017 Google Inc.
+/*
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -19,7 +19,7 @@ const CONTENT_VIEW_WARNING =
 const BUTTON_VIEW_CONFIRM = `${path}/modals/confirm_button.mustache`;
 const BUTTON_VIEW_CONFIRM_CANCEL = `${path}/modals/confirm_buttons.mustache`;
 const CONTENT_VIEW_CONFIRM = `${path}/modals/confirm.mustache`;
-
+const BUTTON_CREATE_PROPOSAL = `${path}/modals/create_proposal.mustache`;
 
 /**
  * Shows a warning popup within given options. If a user confirms
@@ -174,4 +174,5 @@ export {
   BUTTON_VIEW_SAVE_CANCEL,
   BUTTON_VIEW_SAVE_CANCEL_DELETE,
   BUTTON_VIEW_OK_CLOSE,
+  BUTTON_CREATE_PROPOSAL,
 };

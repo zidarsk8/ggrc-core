@@ -1,5 +1,5 @@
-/*!
-    Copyright (C) 2017 Google Inc.
+/*
+    Copyright (C) 2018 Google Inc.
     Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 */
 
@@ -16,6 +16,13 @@ import '../components/comment/mapped-comments';
 import '../components/object-list-item/document-object-list-item';
 import '../components/object-list-item/editable-document-object-list-item';
 import '../components/show-related-assessments-button/show-related-assessments-button';
+import '../components/proposal/create-proposal-button';
+import '../components/related-objects/proposals/related-proposals';
+import '../components/related-objects/proposals/related-proposals-item';
+import '../components/related-objects/revisions/related-revisions';
+import '../components/snapshotter/revisions-comparer';
+import '../components/snapshotter/snapshot-comparer-config';
+import '../components/revision-history/restore-revision';
 import '../components/unarchive_link';
 import '../components/sort/sort-by';
 import * as TreeViewUtils from '../plugins/utils/tree-view-utils';

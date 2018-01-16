@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """This module contains custom operators for query helper"""
@@ -159,7 +159,7 @@ def related_people(exp, object_class, target_class, query):
           AccessControlList.object_type == exp['object_name'])
   ))
 
-  if exp['object_name'] in ('Program', 'Audit'):
+  if exp['object_name'] == 'Program':
     res.extend(
         db.session.query(UserRole.person_id).join(model, sqlalchemy.and_(
             UserRole.context_id == model.context_id,

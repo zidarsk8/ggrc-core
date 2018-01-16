@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2017 Google Inc.
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
@@ -11,6 +11,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
   can.Model.Cacheable('CMS.Models.Assessment', {
     root_object: 'assessment',
     root_collection: 'assessments',
+    category: 'governance',
     findOne: 'GET /api/assessments/{id}',
     findAll: 'GET /api/assessments',
     update: 'PUT /api/assessments/{id}',

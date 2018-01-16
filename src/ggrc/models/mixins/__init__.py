@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Mixins to add common attributes and relationships. Note, all model classes
@@ -664,6 +664,59 @@ class Folderable(object):
   _api_attrs = reflection.ApiAttributes('folder')
   _fulltext_attrs = ['folder']
   _aliases = {"folder": "Folder"}
+
+
+def person_relation_factory(relation_name, fulltext_attr=None, api_attr=None):
+  """Factory that will generate person  """
+
+  def field_declaration(cls):  # pylint: disable=no-self-argument
+    return deferred(db.Column(db.Integer,
+                              db.ForeignKey('people.id'),
+                              nullable=True),
+                    cls.__name__)
+
+  def attr_declaration(cls):
+    return db.relationship(
+        'Person',
+        primaryjoin='{0}.{1}_id == Person.id'.format(cls.__name__,
+                                                     relation_name),
+        foreign_keys='{0}.{1}_id'.format(cls.__name__,
+                                         relation_name),
+        remote_side='Person.id',
+        uselist=False,
+    )
+
+  gen_fulltext_attr = (
+      fulltext_attr or attributes.FullTextAttr(relation_name,
+                                               relation_name,
+                                               ["email", "name"]))
+  api_attr = api_attr or reflection.Attribute(relation_name)
+
+  class DecoratedClass(object):
+
+      @classmethod
+      def indexed_query(cls):
+        return super(DecoratedClass, cls).indexed_query().options(
+            orm.Load(cls).joinedload(
+                relation_name
+            ).load_only(
+                "name", "email", "id"
+            ),
+        )
+
+      _api_attrs = reflection.ApiAttributes(api_attr)
+      fulltext_attr = [gen_fulltext_attr]
+
+
+
+
+  return type(
+      "{}_mixin".format(relation_name),
+      (DecoratedClass, ),
+      {
+          "{}_id".format(relation_name): declared_attr(field_declaration),
+          relation_name: declared_attr(attr_declaration),
+      })
 
 
 __all__ = [

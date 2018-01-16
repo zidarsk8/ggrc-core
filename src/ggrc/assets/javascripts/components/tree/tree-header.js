@@ -1,11 +1,12 @@
 /*
- Copyright (C) 2017 Google Inc.
+ Copyright (C) 2018 Google Inc.
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
 import '../sortable-column/sortable-column';
+import './tree-visible-column-checkbox';
 import template from './templates/tree-header.mustache';
-import {createSelectedColumnsMap, getSortingForModel}
+import {getVisibleColumnsConfig, getSortingForModel}
   from '../../plugins/utils/tree-view-utils';
 
 export default GGRC.Components('treeHeader', {
@@ -54,24 +55,15 @@ export default GGRC.Components('treeHeader', {
      * @fires updateColumns
      */
     setColumns: function () {
-      let selectedNames = [];
-
-      can.each(this.attr('columns'), function (v, k) {
-        if (v) {
-          selectedNames.push(k);
-        }
-      });
+      const selectedNames = this.attr('columns')
+        .attr()
+        .filter((item) => item.selected)
+        .map((item) => item.name);
 
       this.dispatch({
         type: 'updateColumns',
         columns: selectedNames,
       });
-    },
-    onChange: function (attr) {
-      let columns = this.attr('columns').serialize();
-
-      columns[attr.attr_name] = !columns[attr.attr_name];
-      this.columns.attr(columns);
     },
     onOrderChange() {
       const field = this.attr('orderBy.field');
@@ -89,7 +81,7 @@ export default GGRC.Components('treeHeader', {
       let columns;
 
       if (selectedColumns.length && availableColumns.length) {
-        columns = createSelectedColumnsMap(availableColumns, selectedColumns);
+        columns = getVisibleColumnsConfig(availableColumns, selectedColumns);
 
         this.attr('columns', columns);
       }

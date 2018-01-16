@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 from collections import namedtuple
@@ -171,7 +171,7 @@ _CONDITIONS_MAP = {
     'forbid': forbid_condition,
     'has_not_changed': has_not_changed_condition,
     'has_changed': has_changed_condition,
-    'is_auditor': is_auditor
+    'is_auditor': is_auditor,
 }
 
 

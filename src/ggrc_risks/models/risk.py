@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Module for risk model."""
@@ -16,6 +16,7 @@ from ggrc.models.mixins import TestPlanned
 from ggrc.models.object_document import PublicDocumentable
 from ggrc.models.object_person import Personable
 from ggrc.models import reflection
+from ggrc.models import proposal
 from ggrc.models.relationship import Relatable
 from ggrc.models.track_object_state import HasObjectState
 
@@ -23,7 +24,7 @@ from ggrc.models.track_object_state import HasObjectState
 class Risk(Roleable, HasObjectState, mixins.CustomAttributable, Relatable,
            Personable, PublicDocumentable, Commentable, TestPlanned,
            mixins.LastDeprecatedTimeboxed, mixins.BusinessObject,
-           Indexed, db.Model):
+           Indexed, proposal.Proposalable, db.Model):
   """Basic Risk model."""
   __tablename__ = 'risks'
 

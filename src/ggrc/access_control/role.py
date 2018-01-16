@@ -1,4 +1,4 @@
-# Copyright (C) 2017 Google Inc.
+# Copyright (C) 2018 Google Inc.
 # Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
 
 """Access Control Role model"""
@@ -40,6 +40,7 @@ class AccessControlRole(Indexed, attributevalidator.AttributeValidator,
   internal = db.Column(db.Boolean, nullable=False, default=False)
   default_to_current_user = db.Column(
       db.Boolean, nullable=False, default=False)
+  notify_about_proposal = db.Column(db.Boolean, nullable=False, default=False)
 
   access_control_list = db.relationship(
       'AccessControlList', backref='ac_role', cascade='all, delete-orphan')
