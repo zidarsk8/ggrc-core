@@ -4,7 +4,7 @@
 }}
 
 
-{{#is_allowed 'create' 'TaskGroupObject' context=instance.context}}
+{{#is_allowed 'update' instance context='for'}}
 {{^if_equals parent_instance.status 'Inactive'}}
 <div class="tree-item-add">
   <a
