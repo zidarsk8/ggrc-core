@@ -204,7 +204,9 @@ import {confirm} from '../plugins/utils/modals';
             modal_title: 'Discard Changes',
             modal_description: 'Are you sure that you want' +
             ' to discard your changes?',
-            modal_confirm: 'Discard',
+            modal_confirm: 'Continue Editing',
+            button_view: GGRC.mustache_path +
+              '/modals/discard_buttons.mustache',
             skip_refresh: true
           }, function () {
             can.trigger(instance, 'modal:dismiss');
