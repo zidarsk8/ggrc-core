@@ -83,6 +83,37 @@ const REFRESH_TAB_CONTENT = {
   type: 'refreshTabContent',
 };
 
+/**
+ * Refreshes diff of proposals
+ * @event refreshProposalDiff
+ * @type {object}
+ * @property {string} type - Event name.
+ */
+const REFRESH_PROPOSAL_DIFF = {
+  type: 'refreshProposalDiff',
+};
+
+/**
+ * Navigate to info-pane's tab
+ * @event navigateToTab
+ * @type {object}
+ * @property {string} type - Event name.
+ * @property {string} tabId - id of tab.
+ */
+const NAVIGATE_TO_TAB = {
+  type: 'navigateToTab',
+};
+
+/**
+ * Refreshes comments of instance
+ * @event refreshProposalDiff
+ * @type {object}
+ * @property {string} type - Event name.
+ */
+const REFRESH_COMMENTS = {
+  type: 'refreshComments',
+};
+
 export {
   REFRESH_RELATED,
   SAVE_CUSTOM_ROLE,
@@ -92,4 +123,7 @@ export {
   VALIDATION_ERROR,
   DESTINATION_UNMAPPED,
   REFRESH_TAB_CONTENT,
+  NAVIGATE_TO_TAB,
+  REFRESH_PROPOSAL_DIFF,
+  REFRESH_COMMENTS,
 };

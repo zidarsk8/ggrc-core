@@ -1,0 +1,52 @@
+{{!
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+{{#baseInstance}}
+  <related-objects
+    class="object-history"
+    initial-order-by="status,created_at"
+    {predefined-filter}="predefinedFilter"
+    {base-instance}="baseInstance"
+    {(related-objects)}="proposals"
+    related-items-type="Proposal">
+
+    <div class="grid-data__toolbar flex-box">
+      <tree-pagination {paging}="paging" class="grid-data__toolbar-item"></tree-pagination>
+    </div>
+    <div class="object-history__header flex-row flex-box">
+      <div class="flex-size-1">
+        Proposal
+      </div>
+      <div class="flex-size-1">
+        Attribute
+      </div>
+      <div class="flex-size-1">
+        Current Value
+      </div>
+      <div class="flex-size-1">
+        Proposed Value
+      </div>
+      <div class="flex-size-1">
+        Comment
+      </div>
+      <div class="flex-size-1">
+      </div>
+    </div>
+    {{#if isLoading}}
+      <div class="object-history__spinner">
+        <spinner toggle="isLoading"></spinner>
+      </div>
+    {{/if}}
+    <div class="object-history__body {{#isLoading}}loading{{/isLoading}}">
+      <object-list {items}="relatedObjects" {is-loading}="isLoading" spinner-css="grid-spinner">
+        <related-proposals-item
+          class="object-history__row flex-box"
+          {instance}="baseInstance"
+          {proposal}="instance">
+        </related-proposals-item>
+      </object-list>
+    </div>
+  </related-objects>
+{{/baseInstance}}

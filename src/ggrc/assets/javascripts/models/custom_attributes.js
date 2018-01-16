@@ -4,20 +4,6 @@
 */
 
 (function (can, GGRC, CMS) {
-  /* function sortCustomAttributables
-   *
-   * Groups custom attributes by category.
-   *
-   */
-  function sortCustomAttributables(a, b) {
-    if (a.category < b.category) {
-      return 1;
-    } else if (a.category > b.category) {
-      return -1;
-    }
-    return 0;
-  }
-
   /* class CustomAttributable
    *
    * CustomAttributable does not query the backend, it is used to display a
@@ -28,8 +14,9 @@
    */
   can.Model.Cacheable('CMS.Models.CustomAttributable', {
     findAll: function () {
-      var types;
-      types = GGRC.custom_attributable_types.sort(sortCustomAttributables);
+      var types = _.sortByOrder(GGRC.custom_attributable_types,
+        'category', false);
+
       return can.when(can.map(types, function (type, i) {
         return new CMS.Models.CustomAttributable(can.extend(type, {
           id: i
