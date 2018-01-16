@@ -21,11 +21,11 @@ export default can.Control({
     colorsMap: {
       Completed: '#405f77',
       Verified: '#009925',
-      Deprecated: '#d50f25',
+      Deprecated: '#fbc02d',
       'In Progress': '#3369e8',
       'Not Started': '#9e9e9e',
-      'In Review': '#ff9100',
-      'Rework Needed': '#e53935',
+      'In Review': '#f57c00',
+      'Rework Needed': '#d50f25',
     },
     chartOptions: {
       pieSliceText: 'value-and-percentage',

@@ -1,0 +1,47 @@
+{{!
+  Copyright (C) 2018 Google Inc.
+  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
+}}
+
+<div class="flex-size-1">
+  <div class="object-history__state">
+    <div class="state-value state-{{proposal.status}}"
+      rel="tooltip"
+      data-original-title="{{stateTooltip}}"
+      data-placement="bottom">
+        {{proposal.status}}
+    </div>
+  </div>
+  <div class="object-history__author-info">
+    Proposed by {{proposal.proposed_by.email}}
+    <span class="object-history__date">
+      {{date proposal.created_at}}
+    </span>
+  </div>
+</div>
+<div class="flex-size-3">
+
+  <instance-fields-diff {current-instance}="instance" {modified-fields}="proposal.content.fields">
+  </instance-fields-diff>
+
+  <instance-mapping-fields-diff {current-instance}="instance" {modified-fields}="proposal.content.mapping_fields">
+  </instance-mapping-fields-diff>
+
+  <instance-list-fields-diff {current-instance}="instance" {modified-fields}="proposal.content.mapping_list_fields">
+  </instance-list-fields-diff>
+
+  <instance-acl-diff {current-instance}="instance" {modified-acl}="proposal.content.access_control_list">
+  </instance-acl-diff>
+
+  <instance-gca-diff {current-instance}="instance" {modified-attributes}="proposal.content.custom_attribute_values">
+  </instance-gca-diff>
+
+</div>
+<div class="flex-size-1 object-history__attr">
+  {{{proposal.agenda}}}
+</div>
+<div class="flex-size-1">
+  {{#is_allowed 'update' instance}}
+    <review-proposal {instance}="instance" {proposal}="proposal"></review-proposal>
+  {{/is_allowed}}
+</div>

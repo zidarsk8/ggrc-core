@@ -159,56 +159,6 @@
   background: $red !important;
 }
 
-// state label placeholder colors
-%state-draft {
-  color: $status-draft;
-}
-%state-inactive {
-  color: $status-draft;
-}
-%state-declined {
-  color: $yellow;
-}
-%state-planned {
-  color: $status-draft;
-}
-%state-inprogress {
-  color: $orange;
-}
-%state-overdue {
-  background: $red;
-}
-%state-active {
-  color: $orange;
-}
-%state-verified {
-  color: $lightGreen;
-}
-%state-accepted {
-  color: $lightGreen;
-}
-%state-pending {
-  color: $status-draft;
-}
-%state-finished {
- color: $lightBlue;
-}
-%state-requested {
-  color: $orange;
-}
-%state-responded {
-  color: $lightBlue;
-}
-%state-amended_request {
-  color: $purpleRed;
-}
-%state-updated_response {
-  color: $lightBlue;
-}
-%state-assigned {
-  color: $status-draft;
-}
-
 // flat buttons color
 %btn-primary {
   @include btnBgnd($blue);
