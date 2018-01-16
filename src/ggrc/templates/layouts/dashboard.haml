@@ -18,7 +18,7 @@
 
 -block body
   %header.header.main
-  .area{ 'class': '={ model_display_class }' }
+  .area.flex-box.flex-col{ 'class': '={ model_display_class } ' }
     #page-header
       -block header
 
@@ -27,7 +27,7 @@
         .object-nav
           %div.nav{ 'class': "internav" }
 
-    %section.content
+    %section.content.flex-size-1
       .flash
         -with messages = get_flashed_messages(with_categories=True)
           -if messages
