@@ -363,6 +363,8 @@ def compute_values(affected_objects, all_relationships, snapshot_map):
     aggregate_function = get_aggregate_function(attr)
     for obj in objects:
       source_id, value = aggregate_function(aggregate_values, rel_map[obj])
+      if source_id is None:
+        continue
 
       computed_values[attr][obj] = {
           "source_type": aggregate_type,
