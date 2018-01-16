@@ -26,7 +26,7 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     is_custom_attributable: true,
     isRoleable: true,
     defaults: {
-      _copyAssessmentProcedure: true,
+      test_plan_procedure: true,
       assessment_type: 'Control',
       status: 'Not Started',
       send_by_default: true,  // notifications when a comment is added
