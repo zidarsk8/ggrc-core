@@ -50,6 +50,10 @@ class TestAuditRBAC(TestCase):
 
     self.people = all_models.Person.eager_query().all()
 
+    self.auditor_role = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Auditors"
+    ).one()
+
     self.program = db.session.query(all_models.Program).filter(
         all_models.Program.slug == "PMRBACPROGRAM-1"
     ).one()
@@ -70,6 +74,13 @@ class TestAuditRBAC(TestCase):
 
   def create_audit(self):
     """Create default audit for audit snapshot RBAC tests"""
+    people = {person.email: person for person in self.people}
+    auditor_emails = [
+        "readerauditor@test.com",
+        "creatorauditor@test.com",
+        "editorauditor@test.com",
+        "adminauditor@test.com",
+    ]
     _, audit = self.objgen.generate_object(all_models.Audit, {
         "title": "Snapshotable audit",
         "program": {"id": self.program.id},
@@ -77,47 +88,20 @@ class TestAuditRBAC(TestCase):
         "snapshots": {
             "operation": "create",
         },
+        "access_control_list": [{
+            "ac_role_id": self.auditor_role.id,
+            "person": {
+                "id": people[person].id,
+                "type": "Person"
+            }
+        } for person in auditor_emails],
         "context": {
             "type": "Context",
             "id": self.program.context_id,
             "href": "/api/contexts/{}".format(self.program.context_id)
         }
     })
-    self.add_auditors(audit)
     return audit
-
-  def add_auditors(self, audit):
-    """Add auditors to audits via POST user_role call"""
-    auditor_emails = [
-        "readerauditor@test.com",
-        "creatorauditor@test.com",
-        "editorauditor@test.com",
-        "adminauditor@test.com",
-    ]
-    program_reader_emails = [
-        "creatorauditor@test.com",
-    ]
-    auditor_role = db.session.query(all_models.Role).filter(
-        all_models.Role.name == "Auditor"
-    ).one()
-    program_reader_role = db.session.query(all_models.Role).filter(
-        all_models.Role.name == "ProgramReader"
-    ).one()
-
-    program = db.session.query(all_models.Program).filter(
-        all_models.Program.slug == "PMRBACPROGRAM-1"
-    ).one()
-
-    user_roles = [
-        (auditor_emails, auditor_role, audit.context),
-        (program_reader_emails, program_reader_role, program.context)
-    ]
-
-    for emails, role, context in user_roles:
-      for email in emails:
-        auditor = all_models.Person.query.filter(
-            all_models.Person.email == email).one()
-        self.objgen.generate_user_role(auditor, role, context)
 
   def update_audit(self):
     """Update default audit"""

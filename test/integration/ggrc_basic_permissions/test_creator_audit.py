@@ -23,7 +23,6 @@ class TestCreatorAudit(TestCase):
     self.api = Api()
     self.object_generator = ObjectGenerator()
     self.init_users()
-    self.init_roles()
     self.init_test_cases()
     self.objects = {}
 
@@ -41,7 +40,7 @@ class TestCreatorAudit(TestCase):
                 "mapped_Issue": {
                     "get": 200,
                     "put": 200,
-                    "delete": 200
+                    "delete": 403
                 },
                 "unrelated_Issue": {
                     "get": 403,
@@ -52,7 +51,7 @@ class TestCreatorAudit(TestCase):
                 "mapped_Assessment": {
                     "get": 200,
                     "put": 200,
-                    "delete": 200
+                    "delete": 403
                 },
                 "unrelated_Assessment": {
                     "get": 403,
@@ -63,13 +62,6 @@ class TestCreatorAudit(TestCase):
             }
         },
     }
-
-  def init_roles(self):
-    """Create a delete request for the given object."""
-    response = self.api.get_query(all_models.Role, "")
-    self.roles = {}
-    for role in response.json.get("roles_collection").get("roles"):
-      self.roles[role.get("name")] = role
 
   def init_users(self):
     """Create users used by test cases."""
@@ -82,6 +74,9 @@ class TestCreatorAudit(TestCase):
     _, user = self.object_generator.generate_person(
         data={"name": "editor"}, user_role="Editor")
     self.people["editor"] = user
+    self.auditor_role_id = all_models.AccessControlRole.query.filter(
+        all_models.AccessControlRole.name == "Auditors"
+    ).one().id
 
   def delete(self, obj):
     """Create a delete request for the given object.
@@ -149,7 +144,6 @@ class TestCreatorAudit(TestCase):
         "context_id": dummy_audit.context.id,
         "id": dummy_audit.id,
     }
-    test_case = self.test_cases[test_case_name]
     editor = self.people.get('editor')
     self.api.set_user(editor)
     random_title = factories.random_str()
@@ -159,12 +153,20 @@ class TestCreatorAudit(TestCase):
     self.assertEqual(response.status_code, 201)
     program_id = response.json.get("program").get("id")
     self.objects["program"] = all_models.Program.query.get(program_id)
+
     response = self.api.post(all_models.Audit, {
         "audit": {
             "title": random_title + " audit",
             'program': {'id': program_id},
             "status": "Planned",
-            "context": None
+            "context": None,
+            "access_control_list": [{
+                "ac_role_id": self.auditor_role_id,
+                "person": {
+                    "id": self.people.get(test_case_name).id,
+                    "type": "Person"
+                }
+            }]
         }
     })
     self.assertEqual(response.status_code, 201)
@@ -209,27 +211,6 @@ class TestCreatorAudit(TestCase):
           all_models.Assessment.query.get(assessment_id)
 
     self.assertEqual(self.map(self.objects["mapped_Issue"]), 201)
-    self.assertEqual(self.map(self.objects["mapped_Assessment"]), 201)
-
-    # Add roles to mapped users:
-    if "audit_role" in test_case:
-      person = self.people.get(test_case_name)
-      role = self.roles[test_case["audit_role"]]
-      response = self.api.post(all_models.UserRole, {"user_role": {
-          "person": {
-              "id": person.id,
-              "type": "Person",
-              "href": "/api/people/{}".format(person.id),
-          }, "role": {
-              "type": "Role",
-              "href": "/api/roles/{}".format(role["id"]),
-              "id": role["id"],
-          }, "context": {
-              "type": "Context",
-              "id": context.get("id"),
-              "href": "/api/contexts/{}".format(context.get("id"))
-          }}})
-      self.assertEqual(response.status_code, 201)
 
   def test_creator_audit_roles(self):
     """ Test creator role with all audit scoped roles """
