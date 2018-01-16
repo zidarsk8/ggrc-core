@@ -1,25 +1,24 @@
-,,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,
 Object type,"Must be unique.  Can be left empty for autogeneration.  If updating or deleting, code is required",Mandatory field,,,"Accepted values are:
 One time
 Weekly
 Monthly
 Quarterly
-Annually",,,,,,,,,,,,,,,,,,,
-Workflow,code*,title*,description,manager,frequency,force real-time email updates,custom email message,member,Need Verification,,,,,,,,,,,,,,,
-,wf-1,wf-1,test,user1@ggrc.com,One time,no,this is super custom,user2@ggrc.com,False,,,,,,,,,,,,,,,
-,wf-2,wf-2,test,user1@ggrc.com,Weekly,yes,this is super custom,user2@ggrc.com,False,,,,,,,,,,,,,,,
-,wf-3,wf-3,test,user1@ggrc.com,Monthly,no,this is super custom,user2@ggrc.com,False,,,,,,,,,,,,,,,
-,wf-4,wf-4,test,user1@ggrc.com,Quarterly,yes,this is super custom,user2@ggrc.com,False,,,,,,,,,,,,,,,
-,wf-5,wf-5,test,user1@ggrc.com,Annually,no,this is super custom,user2@ggrc.com,False,,,,,,,,,,,,,,,
-,wf-6,wf-6,test,user1@ggrc.com,Monthly,yes,this is super custom,user2@ggrc.com,False,,,,,,,,,,,,,,,
-,wf-7,wf-7,test,user1@ggrc.com,Monthly,no,this is super custom,user2@ggrc.com,False,,,,,,,,,,,,,,,
-,wf-8,wf-8,test,user1@ggrc.com,Monthly,yes,this is super custom,user2@ggrc.com,False,,,,,,,,,,,,,,,
-,wf-9,wf-9,test,user1@ggrc.com,Monthly,no,not so custom,user2@ggrc.com,False,,,,,,,,,,,,,,,
-,wf-10,wf-10,test,user1@ggrc.com,Monthly,yes,,user2@ggrc.com,False,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,
-Object Type,,,,,,,,,,,,,,,,,,,,,,,,
-person,Name,Email,Company,role,,,,,,,,,,,,,,,,,,,,
-,First User,user1@ggrc.com,google,reader,,,,,,,,,,,,,,,,,,,,
-,Second User,user2@ggrc.com,google,reader,,,,,,,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,,,,,,,
+Annually",,,,
+Workflow,code*,title*,description,admin,frequency,force real-time email updates,custom email message,workflow member,Need Verification
+,wf-1,wf-1,test,user1@ggrc.com,One time,no,this is super custom,user2@ggrc.com,False
+,wf-2,wf-2,test,user1@ggrc.com,Weekly,yes,this is super custom,user2@ggrc.com,False
+,wf-3,wf-3,test,user1@ggrc.com,Monthly,no,this is super custom,user2@ggrc.com,False
+,wf-4,wf-4,test,user1@ggrc.com,Quarterly,yes,this is super custom,user2@ggrc.com,False
+,wf-5,wf-5,test,user1@ggrc.com,Annually,no,this is super custom,user2@ggrc.com,False
+,wf-6,wf-6,test,user1@ggrc.com,Monthly,yes,this is super custom,user2@ggrc.com,False
+,wf-7,wf-7,test,user1@ggrc.com,Monthly,no,this is super custom,user2@ggrc.com,False
+,wf-8,wf-8,test,user1@ggrc.com,Monthly,yes,this is super custom,user2@ggrc.com,False
+,wf-9,wf-9,test,user1@ggrc.com,Monthly,no,not so custom,user2@ggrc.com,False
+,wf-10,wf-10,test,user1@ggrc.com,Monthly,yes,,user2@ggrc.com,False
+,,,,,,,,,
+,,,,,,,,,
+Object Type,,,,,,,,,
+person,Name,Email,Company,role,,,,,
+,First User,user1@ggrc.com,google,reader,,,,,
+,Second User,user2@ggrc.com,google,reader,,,,,

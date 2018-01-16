@@ -36,6 +36,13 @@ class WorkflowsGenerator(Generator):
 
     wf_instance = Workflow(title="wf " + factories.random_str())
     obj_dict = self.obj_to_dict(wf_instance, obj_name)
+    wf_admin_role_id = {
+        n: i
+        for (i, n) in role.get_custom_roles_for(Workflow.__name__).iteritems()
+    }['Admin']
+    if "access_control_list" not in data:
+      data["access_control_list"] = [
+          acl_helper.get_acl_json(wf_admin_role_id, 1)]
     obj_dict[obj_name].update(data)
 
     response, workflow = self.generate(Workflow, obj_name, obj_dict)
