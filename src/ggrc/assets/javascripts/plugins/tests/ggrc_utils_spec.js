@@ -251,3 +251,15 @@ describe('GGRC utils getAssigneeType() method', function () {
     expect(userType).toEqual(expectedString);
   });
 });
+
+describe('GGRC utils formatDate() method', function () {
+  let formatDate = GGRC.Utils.formatDate;
+
+  it('should return empty string for false values', function () {
+    expect(formatDate(null)).toEqual('');
+    expect(formatDate(undefined)).toEqual('');
+    expect(formatDate('')).toEqual('');
+    expect(formatDate(false)).toEqual('');
+    expect(formatDate(0)).toEqual('');
+  });
+});
