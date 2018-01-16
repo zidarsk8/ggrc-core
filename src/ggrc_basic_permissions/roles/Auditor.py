@@ -7,33 +7,9 @@ description = """
   program being audited.
   """
 permissions = {
-    "read": [
-        "Audit",
-        "Assessment",
-        "Issue",
-        "Snapshot",
-        "ObjectPerson",
-        "Relationship",
-        "Document",
-        "UserRole",
-        "Comment",
-        "Context",
-    ],
-    "create": [
-        "Assessment",
-        "Issue",
-        "Comment",
-    ],
-    "view_object_page": [
-        "__GGRC_ALL__"
-    ],
-    "update": [
-        "Assessment",
-        "Snapshot",  # Needed for mapping snapshots to Assessments/Issues
-        "Issue",
-    ],
-    "delete": [
-        "Assessment",
-        "Issue"
-    ],
+    "read": [],
+    "create": [],
+    "view_object_page": [],
+    "update": [],
+    "delete": [],
 }

@@ -13,11 +13,11 @@ const BUTTON_VIEW_CLOSE = `${path}/modals/close_buttons.mustache`;
 const BUTTON_VIEW_SAVE_CANCEL = `${path}/modals/save_cancel_buttons.mustache`;
 const BUTTON_VIEW_SAVE_CANCEL_DELETE =
   `${path}/modals/save_cancel_delete_buttons.mustache`;
-const BUTTON_VIEW_OK_CLOSE = `${path}/modals/confirm_cancel_buttons.mustache`;
+const BUTTON_VIEW_CONFIRM_CANCEL =
+  `${path}/modals/confirm_cancel_buttons.mustache`;
 const CONTENT_VIEW_WARNING =
   `${path}/base_objects/confirm_warning.mustache`;
 const BUTTON_VIEW_CONFIRM = `${path}/modals/confirm_button.mustache`;
-const BUTTON_VIEW_CONFIRM_CANCEL = `${path}/modals/confirm_buttons.mustache`;
 const CONTENT_VIEW_CONFIRM = `${path}/modals/confirm.mustache`;
 const BUTTON_CREATE_PROPOSAL = `${path}/modals/create_proposal.mustache`;
 
@@ -173,6 +173,6 @@ export {
   BUTTON_VIEW_CLOSE,
   BUTTON_VIEW_SAVE_CANCEL,
   BUTTON_VIEW_SAVE_CANCEL_DELETE,
-  BUTTON_VIEW_OK_CLOSE,
+  BUTTON_VIEW_CONFIRM_CANCEL,
   BUTTON_CREATE_PROPOSAL,
 };

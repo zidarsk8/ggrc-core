@@ -107,10 +107,10 @@ dashboard-js-template-files:
   - modals/close_buttons.mustache
   - modals/confirm.mustache
   - modals/prompt_buttons.mustache
-  - modals/confirm_buttons.mustache
   - modals/confirm_cancel_buttons.mustache
   - modals/confirm_button.mustache
   - modals/delete_cancel_buttons.mustache
+  - modals/discard_buttons.mustache
   - modals/done_buttons.mustache
   - modals/modal_header.mustache
   - modals/modal_compare_header.mustache
