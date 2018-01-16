@@ -173,7 +173,7 @@ def get_people_ids_based_on_role(assignee_role,
                                  template_settings,
                                  acl_dict):
   """Get people_ids base on role and template settings."""
-  if assignee_role not in template_settings:
+  if not template_settings.get(assignee_role):
     return []
   template_role = template_settings[assignee_role]
   if isinstance(template_role, list):
@@ -202,9 +202,11 @@ def generate_role_object_dict(snapshot, audit):
   acl_dict["Audit Lead"].extend([acl.person_id
                                 for acl in audit.access_control_list
                                 if acl.ac_role_id == leads_role])
-  acl_dict["Auditors"].extend([acl.person_id
-                               for acl in audit.access_control_list
-                               if acl.ac_role_id == auditors_role])
+  auditors = [
+      acl.person_id for acl in audit.access_control_list
+      if acl.ac_role_id == auditors_role
+  ]
+  acl_dict["Auditors"].extend(auditors or acl_dict["Audit Lead"])
   return acl_dict
 
 
