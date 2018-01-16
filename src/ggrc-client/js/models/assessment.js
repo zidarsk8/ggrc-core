@@ -262,16 +262,6 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
     after_create: function () {
       this._checkIssueTrackerWarnings();
     },
-    before_save: function () {
-      let mappedObjectsChanges = this.attr('mappedObjectsChanges');
-      if ( mappedObjectsChanges ) {
-        mappedObjectsChanges.forEach((mo)=>{
-          mo.extra = {
-            copyAssessmentProcedure: this.attr('_copyAssessmentProcedure'),
-          };
-        });
-      }
-    },
     before_create: function () {
       if (!this.audit) {
         throw new Error('Cannot save assessment, audit not set.');
