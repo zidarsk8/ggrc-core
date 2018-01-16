@@ -48,9 +48,9 @@ class TestWorkflowPeopleImport(TestCase):
           self.user_emails[idx] for idx in import_data['members'])
       self.wf_import_params['workflow member'] = import_members
     if import_data['admins']:
-      import_owners = '\n'.join(
+      import_admins = '\n'.join(
           self.user_emails[idx] for idx in import_data['admins'])
-      self.wf_import_params['admin'] = import_owners
+      self.wf_import_params['admin'] = import_admins
     response = self.import_data(self.wf_import_params)
     self.assertEqual(response[0][expected_resp_action], 1)
     if expected_resp_action != 'ignored':

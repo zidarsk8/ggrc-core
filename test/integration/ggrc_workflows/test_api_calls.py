@@ -307,7 +307,7 @@ class TestStatusApiPatch(TestCase):
       ) = self._create_cycle_structure()
     self.group_id = self.group.id
     # Emulate that current user is assignee for all test CycleTasks.
-    all_models.CycleTaskGroupObjectTask.current_user_wfo_or_assignee = (
+    all_models.CycleTaskGroupObjectTask.current_user_wfa_or_assignee = (
         MagicMock(return_value=True))
 
   def _update_ct_via_patch(self, new_states):
@@ -381,7 +381,7 @@ class TestStatusApiPatch(TestCase):
   def test_ct_status_bulk_update_without_permissions(self):  # noqa pylint: disable=invalid-name
     """Check CycleTasks' state update without permissions via PATCH."""
     # Emulate that current user is not assignee for all test CycleTasks.
-    all_models.CycleTaskGroupObjectTask.current_user_wfo_or_assignee = (
+    all_models.CycleTaskGroupObjectTask.current_user_wfa_or_assignee = (
         MagicMock(return_value=False))
     self.assertItemsEqual(
         self._get_exp_response({0: 'skipped', 1: 'skipped', 2: 'skipped'}),

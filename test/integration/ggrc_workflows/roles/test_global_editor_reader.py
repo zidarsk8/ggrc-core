@@ -9,8 +9,8 @@ import ddt as ddt
 
 from appengine.base import with_memcache
 from ggrc.models import all_models
+from ggrc.access_control import role
 from ggrc_workflows.models import Workflow
-from ggrc_workflows.models import WorkflowPerson
 from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import TaskGroupObject
 from ggrc_workflows.models import TaskGroupTask
@@ -18,8 +18,8 @@ from ggrc_workflows.models import Cycle
 from ggrc_workflows.models import CycleTaskGroup
 from ggrc_workflows.models import CycleTaskGroupObjectTask
 
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc_workflows.roles import WorkflowRolesTestCase
-from integration.ggrc_basic_permissions.models import factories as bp_factories
 
 
 @with_memcache
@@ -77,10 +77,6 @@ class GlobalEditorReaderGetTest(WorkflowRolesTestCase):
         TaskGroupTask, self.first_task_group_task.id)
     self.assert200_helper(task_group_task_res)
 
-    workflow_person_res = self.api.get(
-        WorkflowPerson, self.first_workflow_person.id)
-    self.assert200_helper(workflow_person_res)
-
   def _get_active_workflow_objects(self, user):
     """ Helper method that runs tests for active workflow
     Args:
@@ -104,10 +100,6 @@ class GlobalEditorReaderGetTest(WorkflowRolesTestCase):
     task_group_task_res = self.api.get(
         TaskGroupTask, self.first_task_group_task.id)
     self.assert200_helper(task_group_task_res)
-
-    workflow_person_res = self.api.get(
-        WorkflowPerson, self.first_workflow_person.id)
-    self.assert200_helper(workflow_person_res)
 
     cycle_obj = self.session.query(Cycle)\
         .filter(Cycle.workflow_id == self.workflow_obj.id)\
@@ -134,28 +126,35 @@ class GlobalEditorReaderGetTest(WorkflowRolesTestCase):
         CycleTaskGroupObjectTask, cycle_object_obj.id)
     self.assert200_helper(cycle_object_res)
 
-  @ddt.data(("reader", "WorkflowMember", False),
-            ("creator", "WorkflowMember", False),
-            ("editor", "WorkflowMember", False),
-            ("admin2", "WorkflowMember", True),
-            ("reader", "WorkflowOwner", True),
-            ("creator", "WorkflowOwner", True),
-            ("editor", "WorkflowOwner", True),
-            ("admin2", "WorkflowOwner", True))
+  @ddt.data(("reader", "Workflow Member", False),
+            ("creator", "Workflow Member", False),
+            ("editor", "Workflow Member", False),
+            ("admin2", "Workflow Member", True),
+            ("reader", "Admin", True),
+            ("creator", "Admin", True),
+            ("editor", "Admin", True),
+            ("admin2", "Admin", True))
   @ddt.unpack
-  def test_assigned_task_delete(self, user_role, workflow_role, can_delete):
+  def test_assigned_task_delete(self, user_role, ac_role, can_delete):
     """ Test possibility to delete of assigned cycle task"""
     user = self.users[user_role]
-    self.api.set_user(user)
 
     workflow_obj = self.activate_workflow_with_cycle(self.workflow_obj)[1]
-    wf_role_obj = all_models.Role.query.filter_by(name=workflow_role).one()
     cycle_task = workflow_obj.cycles[0].cycle_task_group_object_tasks[0]
-    bp_factories.UserRoleFactory(
-        person=user,
-        role=wf_role_obj,
-        context=self.workflow_obj.context)
 
+    role_map = {
+        name: ind
+        for (ind, name) in
+        role.get_custom_roles_for(all_models.Workflow.__name__).iteritems()
+    }
+    put_params = {'access_control_list': [
+        acl_helper.get_acl_json(role_map[ac_role], user.id),
+        acl_helper.get_acl_json(role_map["Admin"], self.users["admin"].id),
+    ]}
+    response = self.api.put(workflow_obj, put_params)
+    self.assert200(response)
+
+    self.api.set_user(user)
     res = self.api.delete(cycle_task)
 
     if can_delete:

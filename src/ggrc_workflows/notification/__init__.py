@@ -88,8 +88,6 @@ All notifications handle the following structure:
                   "custom_message": ""
                   "title": ""
                   "workflow_url": "",
-                  "workflow_owners":
-                      { workflow_owner.id: workflow_owner_info, ...},
                   "start_date": MM/DD/YYYY
                   "start_date_statement": "starts in X day[s]" or
                                           "started today|X day[s] ago"
@@ -102,8 +100,6 @@ All notifications handle the following structure:
                   "custom_message": ""
                   "title": ""
                   "workflow_url": "",
-                  "workflow_owners":
-                      { workflow_owner.id: workflow_owner_info, ...},
                   "start_date": MM/DD/YYYY
                   "start_date_statement": "starts in X day[s]" or
                                           "started today|X day[s] ago"
@@ -131,8 +127,6 @@ All notifications handle the following structure:
                   "custom_message": "",
                   "cycle_title": "",
                   "cycle_url": "",
-                  "workflow_owners":
-                      { workflow_owner.id: workflow_owner_info, ...}
               }
               , ...
           }
@@ -149,7 +143,7 @@ All notifications handle the following structure:
           "due_today":
               { cycle_task.id: { task_info }, ...}
 
-          "all_tasks_completed": # only workflow owner gets this
+          "all_tasks_completed": # only workflow admin gets this
               { workflow.id: { workflow_info }, ... }
       }
   }

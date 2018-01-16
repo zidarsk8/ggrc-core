@@ -47,7 +47,7 @@ class TestCycleStartFailed(TestCase):
   @patch("ggrc.notifications.common.send_email")
   def test_start_failed(self, mock_mail):
 
-    wf_owner = "user@example.com"
+    wf_admin = "user@example.com"
 
     with freeze_time("2015-02-01 13:39:20"):
       _, wf = self.wf_generator.generate_workflow(self.quarterly_wf)
@@ -58,24 +58,24 @@ class TestCycleStartFailed(TestCase):
 
     with freeze_time("2015-01-01 13:39:20"):
       _, notif_data = common.get_daily_notifications()
-      self.assertNotIn(wf_owner, notif_data)
+      self.assertNotIn(wf_admin, notif_data)
 
     with freeze_time("2015-01-29 13:39:20"):
       _, notif_data = common.get_daily_notifications()
-      self.assertIn(wf_owner, notif_data)
-      self.assertIn("cycle_starts_in", notif_data[wf_owner])
+      self.assertIn(wf_admin, notif_data)
+      self.assertIn("cycle_starts_in", notif_data[wf_admin])
 
     with freeze_time("2015-03-05 13:39:20"):
       _, notif_data = common.get_daily_notifications()
-      self.assertIn(wf_owner, notif_data)
-      self.assertNotIn("cycle_started", notif_data[wf_owner])
-      self.assertIn(wf_owner, notif_data)
-      self.assertIn("cycle_start_failed", notif_data[wf_owner])
+      self.assertIn(wf_admin, notif_data)
+      self.assertNotIn("cycle_started", notif_data[wf_admin])
+      self.assertIn(wf_admin, notif_data)
+      self.assertIn("cycle_start_failed", notif_data[wf_admin])
 
       common.send_daily_digest_notifications()
 
       _, notif_data = common.get_daily_notifications()
-      self.assertNotIn(wf_owner, notif_data)
+      self.assertNotIn(wf_admin, notif_data)
 
   # TODO: investigate why next_cycle_start date remains the same after
   # start_recurring_cycles
@@ -165,7 +165,7 @@ class TestCycleStartFailed(TestCase):
         "title": "quarterly wf forced notifications",
         "notify_on_change": True,
         "description": "",
-        "owners": [person_dict(self.user.id)],
+        # admin will be current user with id == 1
         "unit": "month",
         "repeat_every": 3,
         "task_groups": [{
@@ -183,7 +183,7 @@ class TestCycleStartFailed(TestCase):
         "title": "monthly",
         "notify_on_change": True,
         "description": "",
-        "owners": [person_dict(self.user.id)],
+        # admin will be current user with id == 1
         "unit": "month",
         "repeat_every": 1,
         "task_groups": [{

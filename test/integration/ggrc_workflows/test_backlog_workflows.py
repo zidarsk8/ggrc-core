@@ -58,7 +58,7 @@ class TestBacklogWorkflow(TestCase):
     backlog_cycle_task_group = backlog_cycle.cycle_task_groups[0]
 
     # Check that backlog workflow has no workflow people
-    self.assertEqual(len(backlog_workflow.people), 0)
+    self.assertFalse(backlog_workflow.access_control_list)
     # create a cycle task with creator and put it in backlog workflow
     _, creator = self.object_generator.generate_person(user_role="Creator")
     self.api.set_user(creator)

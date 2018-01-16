@@ -5,10 +5,12 @@
 from datetime import date
 
 from ggrc import db
+from ggrc.access_control import role
 from ggrc_workflows.models import TaskGroup
 from ggrc_workflows.models import TaskGroupTask
 from ggrc_workflows.models import TaskGroupObject
-from ggrc_workflows.models import WorkflowPerson
+from ggrc_workflows.models import Workflow
+from integration.ggrc.access_control import acl_helper
 from integration.ggrc_workflows import WorkflowTestCase
 
 
@@ -36,8 +38,6 @@ class WorkflowRolesTestCase(WorkflowTestCase):
         self.first_task_group.id)[0]
     self.first_task_group_object = self.get_task_group_objects(
         self.first_task_group.id)[0]
-    self.first_workflow_person = self.get_workflow_persons(
-        self.workflow_obj.id)[0]
 
   def init_users(self):
     """Initializes users needed by the test"""
@@ -49,18 +49,24 @@ class WorkflowRolesTestCase(WorkflowTestCase):
         ("admin", "Administrator"),
         ("admin2", "Administrator")
     ]
-    for (name, role) in users:
+    for (name, user_role) in users:
       _, user = self.object_generator.generate_person(
-          data={"name": name}, user_role=role)
+          data={"name": name}, user_role=user_role)
       self.users[name] = user
 
   def init_workflow(self):
     """Creates a workflow which is owned by an user with Admin role"""
 
+    admin_role_id = {
+        n: i
+        for (i, n) in role.get_custom_roles_for(Workflow.__name__).iteritems()
+    }['Admin']
+
     initial_workflow_data = {
         "title": "test workflow",
         "description": "test workflow",
-        "owners": [self.person_dict(self.users['admin'].id)],
+        "access_control_list": [
+            acl_helper.get_acl_json(admin_role_id, self.users['admin'].id)],
         "status": "Draft",
         "task_groups": [{
             "title": "task group 1",
@@ -130,19 +136,6 @@ class WorkflowRolesTestCase(WorkflowTestCase):
         .all()
 
     return task_group_objects
-
-  def get_workflow_persons(self, workflow_id):
-    """ Gets al the task group objects in a task group.
-    Args:
-        taks_group_id: Integer.
-    Returns:
-        List of TaskGroupObject model instances
-    """
-    workflow_persons = self.session.query(WorkflowPerson)\
-        .filter(WorkflowPerson.workflow_id == workflow_id)\
-        .all()
-
-    return workflow_persons
 
   def person_dict(self, person_id):
     """
