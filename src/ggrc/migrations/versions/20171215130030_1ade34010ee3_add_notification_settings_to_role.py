@@ -22,7 +22,8 @@ def upgrade():
   """Upgrade database schema and/or data, creating a new revision."""
   op.add_column('access_control_roles', sa.Column('notify_about_proposal',
                                                   sa.Boolean(),
-                                                  nullable=False))
+                                                  nullable=False,
+                                                  server_default="0"))
   op.add_column('proposals', sa.Column('proposed_notified_datetime',
                                        sa.DateTime(),
                                        nullable=True))
