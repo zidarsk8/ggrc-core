@@ -5,77 +5,83 @@
 
 import template from './read-more.mustache';
 
-(function (can, GGRC) {
-  'use strict';
-
-  var tag = 'read-more';
-  var readMore = 'Read More';
-  var readLess = 'Read Less';
-  var classPrefix = 'ellipsis-truncation-';
-  /**
-   * Assessment specific read more view component
-   */
-  GGRC.Components('readMore', {
-    tag: tag,
-    template: template,
-    viewModel: {
-      define: {
-        text: {
-          type: 'string',
-          value: ''
-        },
-        maxLinesNumber: {
-          type: 'number',
-          value: 5
-        },
-        cssClass: {
-          type: 'string',
-          value: '',
-          get: function () {
-            return this.attr('expanded') ? '' :
-              classPrefix + this.attr('maxLinesNumber');
-          }
-        }
-      },
-      expanded: false,
-      overflowing: false,
-      lineHeight: null,
-      btnText: function () {
-        return this.attr('expanded') ? readLess : readMore;
-      },
-      toggle: function (ev) {
-        ev.stopPropagation();
-        this.attr('expanded', !this.attr('expanded'));
-      },
-      isOverflowing: function (element) {
-        var result;
-        var clientHeight = element.clientHeight;
-        var scrollHeight = element.scrollHeight;
-
-        if (!this.attr('expanded')) {
-          result = scrollHeight > clientHeight;
-        } else {
-          result = clientHeight >=
-            (this.attr('lineHeight') * this.attr('maxLinesNumber'));
-        }
-        this.attr('overflowing', result);
-      },
-      checkOverflowing: function (el) {
-        var $element = $(el).find('.read-more__body');
-        var element = $element[0];
-
-        this.attr('lineHeight',
-          parseInt($element.css('line-height'), 10));
-
-        if (element) {
-          this.isOverflowing(element);
-        }
-      }
+const readMore = 'Read More';
+const readLess = 'Read Less';
+const classPrefix = 'ellipsis-truncation-';
+const viewModel = {
+  define: {
+    text: {
+      type: 'string',
+      value: '',
     },
-    events: {
-      '{element} mouseover': function () {
-        this.viewModel.checkOverflowing(this.element);
-      }
+    maxLinesNumber: {
+      type: 'number',
+      value: 5,
+    },
+    cssClass: {
+      type: 'string',
+      value: '',
+      get() {
+        return this.attr('expanded') ? '' :
+          classPrefix + this.attr('maxLinesNumber');
+      },
+    },
+  },
+  expanded: false,
+  overflowing: false,
+  btnText() {
+    return this.attr('expanded') ? readLess : readMore;
+  },
+  toggle(ev) {
+    ev.stopPropagation();
+    this.attr('expanded', !this.attr('expanded'));
+  },
+  updateOverflowing(el) {
+    let truncatedHeight;
+    let extendedHeight;
+    const readMore = $(el);
+    const linesNumber = this.attr('maxLinesNumber');
+
+    // have to use opacity:0 when we use visibility:hidden line clamp
+    // is not working properly
+    const clonedReadMoreWrap = readMore.find('div.read-more')
+      .clone()
+      .css({position: 'absolute', opacity: 0});
+
+    const clonedReadMoreBody = clonedReadMoreWrap.find('div.read-more__body');
+    clonedReadMoreWrap.appendTo(readMore);
+
+    if (!clonedReadMoreBody.hasClass(`ellipsis-truncation-${linesNumber}`)) {
+      clonedReadMoreBody.addClass(`ellipsis-truncation-${linesNumber}`);
     }
-  });
-})(window.can, window.GGRC);
+
+    truncatedHeight = clonedReadMoreBody.height();
+    clonedReadMoreBody.removeClass(`ellipsis-truncation-${linesNumber}`);
+    extendedHeight = clonedReadMoreBody.height();
+    clonedReadMoreWrap.remove();
+    this.attr('overflowing', extendedHeight > truncatedHeight);
+  },
+};
+
+export default can.Component.extend({
+  tag: 'read-more',
+  template,
+  viewModel,
+  init() {
+    const observedElement = $(arguments[0]).children()[0];
+    const observer = new MutationObserver((mutations) => {
+      if (mutations.find((mutation) => mutation.type === 'childList')) {
+        this.viewModel.updateOverflowing(arguments[0]);
+      }
+    });
+    observer.observe(observedElement, {childList: true, subtree: true});
+  },
+  events: {
+    inserted() {
+      this.viewModel.updateOverflowing(this.element);
+    },
+    '{window} resize'() {
+      this.viewModel.updateOverflowing(this.element);
+    },
+  },
+});
