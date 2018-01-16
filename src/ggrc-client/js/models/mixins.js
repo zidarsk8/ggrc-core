@@ -191,6 +191,18 @@ import {REFRESH_PROPOSAL_DIFF} from '../events/eventTypes';
     },
   });
 
+  can.Model.Mixin('assertions_categories', {
+    'before:refresh': function () {
+      if (this.attr('categories') && !isSnapshot(this)) {
+        this.attr('categories').replace([]);
+      }
+
+      if (this.attr('assertions') && !isSnapshot(this)) {
+        this.attr('assertions').replace([]);
+      }
+    },
+  });
+
   can.Model.Mixin('ca_update', {}, {
     after_save: function () {
       this.dispatch('readyForRender');

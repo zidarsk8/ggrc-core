@@ -21,6 +21,7 @@
       'accessControlList',
       'base-notifications',
       'proposable',
+      'assertions_categories',
     ],
     is_custom_attributable: true,
     isRoleable: true,
