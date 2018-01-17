@@ -477,9 +477,11 @@ describe('GGRC Utils CurrentPage', function () {
   describe('refreshCounts() method', function () {
     var widgets;
     var refreshCounts;
+    let countsMap;
 
     beforeEach(function () {
       refreshCounts = CurrentPageUtils.refreshCounts;
+      countsMap = CurrentPageUtils.getCounts();
 
       widgets =
         {
@@ -535,8 +537,8 @@ describe('GGRC Utils CurrentPage', function () {
           expect(reqParamNames).toContain('Program');
           expect(reqParamNames).toContain('Assessment');
           expect(reqParamNames).toContain('Audit');
-          expect(counts.Audit).toEqual(4);
-          expect(counts.Program).toEqual(0);
+          expect(countsMap.attr('Audit')).toEqual(4);
+          expect(countsMap.attr('Program')).toEqual(0);
           done();
         });
     });

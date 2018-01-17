@@ -256,7 +256,7 @@ function refreshCounts() {
 
   widgets = getWidgetModels(pageInstance.constructor.shortName, location);
 
-  return _initWidgetCounts(widgets, pageInstance.type, pageInstance.id);
+  return initWidgetCounts(widgets, pageInstance.type, pageInstance.id);
 }
 
 function _getCurrentUser() {
