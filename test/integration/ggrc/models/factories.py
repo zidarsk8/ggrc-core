@@ -141,6 +141,15 @@ class IssueFactory(TitledFactory):
     model = models.Issue
 
 
+class IssueTrackerIssueFactory(TitledFactory):
+
+  class Meta:
+    model = models.IssuetrackerIssue
+
+  issue_tracked_obj = factory.LazyAttribute(lambda m: AssessmentFactory())
+  issue_id = factory.LazyAttribute(lambda _: random_str(length=5))
+
+
 class AssessmentFactory(TitledFactory):
 
   class Meta:
@@ -503,6 +512,7 @@ def get_model_factory(model_name):
       "DataAsset": DataAssetFactory,
       "Facility": FacilityFactory,
       "Issue": IssueFactory,
+      "IssueTrackerIssue": IssueTrackerIssueFactory,
       "Label": LabelFactory,
       "ObjectLabel": ObjectLabelFactory,
       "Market": MarketFactory,
