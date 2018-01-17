@@ -107,6 +107,10 @@ import {prepareCustomAttributes} from '../plugins/utils/ca-utils';
         attr_name: 'issue_url',
         order: 17,
         deny: !GGRC.ISSUE_TRACKER_ENABLED,
+      }, {
+        attr_title: 'Last Comment',
+        attr_name: 'last_comment',
+        order: 18,
       }],
       display_attr_names: ['title', 'status', 'label', 'Assignees', 'Verifiers',
         'start_date', 'updated_at'],
