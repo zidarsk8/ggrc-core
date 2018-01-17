@@ -23,7 +23,6 @@ USER_PERMISSIONS_PROVIDER = \
     'ggrc_basic_permissions.CompletePermissionsProvider'
 EXTENSIONS = [
     'ggrc_basic_permissions',
-    'ggrc_gdrive_integration',
     'ggrc_risk_assessments',
     'ggrc_risks',
     'ggrc_workflows',
