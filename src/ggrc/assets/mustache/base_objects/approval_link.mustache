@@ -41,10 +41,10 @@
                 class="undoable btn btn-mini btn-red change-task-status {{instance._disabled}} {{#if instance.snapshot}}disabled{{else}}{{#if instance.isRevision}}disabled{{/if}}{{/if}}"
                 data-toggle="modal-ajax-form"
                 data-object-singular="CycleTaskEntry"
-                data-object-params='{\
-                  "cycle" : {{review_task.cycle.id}}, \
-                  "cycle_task_group_object_task" : {{review_task.id}}, \
-                  "is_declining_review" : 1, \
+                data-object-params='{
+                  "cycle" : {{review_task.cycle.id}}, 
+                  "cycle_task_group_object_task" : {{review_task.id}}, 
+                  "is_declining_review" : 1, 
                   "context": {{firstnonempty review_task.context.id "null"}} }'
                 data-object-plural="cycle_task_entries"
                 data-object-id=""
