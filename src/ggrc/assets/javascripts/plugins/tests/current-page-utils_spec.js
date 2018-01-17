@@ -202,6 +202,7 @@ describe('GGRC Utils CurrentPage', function () {
       spyOn(GGRC.WidgetList, 'get_widget_list_for')
         .and.returnValue({
           control: {
+            widgetType: 'treeview',
             content_controller_options: {
               model: {
                 shortName: 'Control'
@@ -209,6 +210,7 @@ describe('GGRC Utils CurrentPage', function () {
             }
           },
           Assessment: {
+            widgetType: 'treeview',
             content_controller_options: {
               model: {
                 shortName: 'Assessment'
@@ -216,6 +218,7 @@ describe('GGRC Utils CurrentPage', function () {
             }
           },
           objective: {
+            widgetType: 'treeview',
             content_controller_options: {
               model: {
                 shortName: 'Objective'
@@ -252,7 +255,7 @@ describe('GGRC Utils CurrentPage', function () {
         expect(result).toContain('Assessment');
         expect(result).toContain('Control');
         expect(result).toContain('Objective');
-        expect(result).toContain('Info');
+        expect(result.length).toEqual(3);
       });
 
     it('returns non-info models for object browser view',
@@ -486,6 +489,7 @@ describe('GGRC Utils CurrentPage', function () {
       widgets =
         {
           Program: {
+            widgetType: 'treeview',
             content_controller_options: {
               model: {
                 shortName: 'Program',
@@ -493,6 +497,7 @@ describe('GGRC Utils CurrentPage', function () {
             },
           },
         Assessment: {
+          widgetType: 'treeview',
           content_controller_options: {
             model: {
               shortName: 'Assessment',
@@ -500,6 +505,7 @@ describe('GGRC Utils CurrentPage', function () {
           },
         },
         Audit: {
+          widgetType: 'treeview',
           content_controller_options: {
             model: {
               shortName: 'Audit',
