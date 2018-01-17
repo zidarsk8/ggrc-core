@@ -41,7 +41,8 @@ import Permission from '../../permission';
       scroll_page_count: 1, // pages above and below viewport
       is_subtree: false,
       subTreeElementsLimit: 20,
-      limitDeepOfTree: 2
+      limitDeepOfTree: 2,
+      disable_lazy_loading: true,
     },
     do_not_propagate: [
       'header_view',
