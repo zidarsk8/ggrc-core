@@ -61,15 +61,13 @@
 {{#if_instance_of instance 'Cycle'}}
 <div class="flex-box item-actions">
   <div class="request-control">
-      {{^if_equals instance.workflow.kind "Backlog"}}
-        <cycle-end-cycle cycle="instance">
-          {{#is_allowed 'update' instance.workflow.reify}}
-            {{#if instance.is_current}}
-              <button class="btn btn-white btn-small end-cycle">End Cycle</button>
-            {{/if}}
-          {{/is_allowed}}
-        </cycle-end-cycle>
-      {{/if_equals}}
+     <cycle-end-cycle cycle="instance">
+       {{#is_allowed 'update' instance.workflow.reify}}
+         {{#if instance.is_current}}
+           <button class="btn btn-white btn-small end-cycle">End Cycle</button>
+         {{/if}}
+       {{/is_allowed}}
+     </cycle-end-cycle>
   </div>
 </div>
 {{/if_instance_of}}
