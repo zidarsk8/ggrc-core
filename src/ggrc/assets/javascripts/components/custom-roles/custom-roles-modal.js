@@ -19,5 +19,6 @@ export default can.Component.extend({
     isNewInstance: false,
     conflictRoles: [],
     orderOfRoles: [],
+    isProposal: false,
   },
 });
