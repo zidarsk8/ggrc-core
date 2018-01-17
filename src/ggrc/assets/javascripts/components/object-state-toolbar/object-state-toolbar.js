@@ -41,19 +41,6 @@ import template from './object-state-toolbar.mustache';
             return this.attr('verifiers').length;
           }
         },
-        hasErrors: {
-          get: function () {
-            return this.attr('instance.preconditions_failed') ||
-              this.attr('instance.hasValidationErrors');
-          }
-        },
-        isDisabled: {
-          get: function () {
-            return !!this.attr('instance._disabled') ||
-              this.attr('hasErrors') ||
-              this.attr('instance.isPending');
-          }
-        }
       },
       verifiers: [],
       instance: {},
@@ -70,11 +57,9 @@ import template from './object-state-toolbar.mustache';
         return !!this.attr('instance.previousStatus');
       },
       changeState: function (newState, isUndo) {
-        if (this.attr('isDisabled')) {
-          if (this.attr('instance.hasValidationErrors')) {
-            this.attr('instance').dispatch(SWITCH_TO_ERROR_PANEL);
-            this.attr('instance').dispatch(SHOW_INVALID_FIELD);
-          }
+        if (this.attr('instance._hasValidationErrors')) {
+          this.attr('instance').dispatch(SWITCH_TO_ERROR_PANEL);
+          this.attr('instance').dispatch(SHOW_INVALID_FIELD);
           return;
         }
 

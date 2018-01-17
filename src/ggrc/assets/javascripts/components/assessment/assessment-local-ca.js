@@ -8,7 +8,7 @@ import {
   applyChangesToCustomAttributeValue,
 }
   from '../../plugins/utils/ca-utils';
-import {VALIDATION_ERROR} from '../../events/eventTypes';
+import {VALIDATION_ERROR, RELATED_ITEMS_LOADED} from '../../events/eventTypes';
 import tracker from '../../tracker';
 import Permission from '../../permission';
 
@@ -26,15 +26,6 @@ import Permission from '../../permission';
       highlightInvalidFields: false,
 
       define: {
-        hasValidationErrors: {
-          type: 'boolean',
-          get: function () {
-            return this.attr('fields')
-              .filter(function (field) {
-                return !field.attr('validation.valid');
-              }).length;
-          },
-        },
         editMode: {
           type: 'boolean',
           value: false,
@@ -55,10 +46,6 @@ import Permission from '../../permission';
         },
         evidenceAmount: {
           type: 'number',
-          set: function (newValue, setValue) {
-            setValue(newValue);
-            this.validateForm();
-          },
         },
         isEvidenceRequired: {
           get: function () {
@@ -77,17 +64,36 @@ import Permission from '../../permission';
           },
         },
       },
-      validateForm: function () {
-        var self = this;
+      validateForm: function ({
+        triggerField = null,
+        triggerAttachmentModals = false,
+      } = {}) {
+        let hasValidationErrors = false;
         this.attr('fields')
-          .each(function (field) {
-            self.performValidation(field, true);
+          .each((field) => {
+            this.performValidation(field);
+            if ( !field.validation.valid ) {
+              hasValidationErrors = true;
+            }
+            if ( triggerField === field &&
+                 triggerAttachmentModals &&
+                 field.validation.hasMissingInfo ) {
+              this.dispatch({
+                type: 'validationChanged',
+                field,
+              });
+            }
           });
-        if (this.attr('instance.hasValidationErrors')) {
+
+        if ( this.attr('instance') ) {
+          this.attr('instance._hasValidationErrors', hasValidationErrors);
+        }
+
+        if ( hasValidationErrors ) {
           this.dispatch(VALIDATION_ERROR);
         }
       },
-      performValidation: function (field, formInitCheck) {
+      performValidation: function (field) {
         var fieldValid;
         var hasMissingEvidence;
         var hasMissingComment;
@@ -114,8 +120,7 @@ import Permission from '../../permission';
         hasMissingEvidence = requiresEvidence &&
           !!this.attr('isEvidenceRequired');
 
-        hasMissingComment = formInitCheck ?
-          requiresComment && !!errorsMap.comment : requiresComment;
+        hasMissingComment = requiresComment && !!errorsMap.comment;
 
         if (field.type === 'checkbox') {
           if (value === '1') {
@@ -148,13 +153,6 @@ import Permission from '../../permission';
               comment: hasMissingComment,
             },
           });
-
-          if (!formInitCheck && (hasMissingEvidence || hasMissingComment)) {
-            this.dispatch({
-              type: 'validationChanged',
-              field: field,
-            });
-          }
         } else {
           // validation for all other fields
           field.attr({
@@ -210,21 +208,37 @@ import Permission from '../../permission';
           stopFn();
         });
       },
+      fieldRequiresComment: function (field) {
+        let fieldValidationConf = field.validationConfig[field.value];
+          return fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT ||
+            fieldValidationConf === CA_DD_REQUIRED_DEPS.COMMENT_AND_EVIDENCE;
+      },
       attributeChanged: function (e) {
         e.field.attr('value', e.value);
-        this.performValidation(e.field);
+
+        // Removes "link" with the comment for DD field and
+        // makes it require a new one
+        if ( e.field.attr('type') === 'dropdown' &&
+            this.fieldRequiresComment(e.field) ) {
+          e.field.attr('errorsMap.comment', true);
+        }
+
+        this.validateForm({
+          triggerAttachmentModals: true,
+          triggerField: e.field,
+        });
         this.attr('formSavedDeferred', can.Deferred());
         this.save(e.fieldId, e.value);
       },
     },
     events: {
-      inserted: function () {
-        this.viewModel.validateForm();
-      },
-      '{viewModel.instance} update': function () {
+      '{viewModel} evidenceAmount': function () {
         this.viewModel.validateForm();
       },
       '{viewModel.instance} afterCommentCreated': function () {
+        this.viewModel.validateForm();
+      },
+      [`{viewModel.instance} ${RELATED_ITEMS_LOADED.type}`]: function () {
         this.viewModel.validateForm();
       },
       '{viewModel.instance} showInvalidField': function (ev) {

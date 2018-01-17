@@ -385,23 +385,6 @@ import {getClosestWeekday} from '../plugins/utils/date-util';
           populateFromWorkflow(form, objectParams.workflow);
           return;
         }
-
-        workflows = CMS.Models.Workflow.findAll({
-          kind: 'Backlog', status: 'Active', __sort: '-created_at'});
-        workflows.then(function (workflowList) {
-          if (!workflowList.length) {
-            $(document.body).trigger(
-              'ajax:flash',
-              {warning: 'No Backlog' +
-              ' workflows found!' +
-              ' Contact your administrator to enable this functionality.',
-              }
-            );
-            return;
-          }
-          _workflow = workflowList[0];
-          populateFromWorkflow(form, _workflow);
-        });
       } else {
         cycle = form.cycle.reify();
         if (!_.isUndefined(cycle.workflow)) {

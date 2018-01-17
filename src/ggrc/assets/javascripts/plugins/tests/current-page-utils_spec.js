@@ -202,6 +202,7 @@ describe('GGRC Utils CurrentPage', function () {
       spyOn(GGRC.WidgetList, 'get_widget_list_for')
         .and.returnValue({
           control: {
+            widgetType: 'treeview',
             content_controller_options: {
               model: {
                 shortName: 'Control'
@@ -209,6 +210,7 @@ describe('GGRC Utils CurrentPage', function () {
             }
           },
           Assessment: {
+            widgetType: 'treeview',
             content_controller_options: {
               model: {
                 shortName: 'Assessment'
@@ -216,6 +218,7 @@ describe('GGRC Utils CurrentPage', function () {
             }
           },
           objective: {
+            widgetType: 'treeview',
             content_controller_options: {
               model: {
                 shortName: 'Objective'
@@ -252,7 +255,7 @@ describe('GGRC Utils CurrentPage', function () {
         expect(result).toContain('Assessment');
         expect(result).toContain('Control');
         expect(result).toContain('Objective');
-        expect(result).toContain('Info');
+        expect(result.length).toEqual(3);
       });
 
     it('returns non-info models for object browser view',
@@ -297,15 +300,16 @@ describe('GGRC Utils CurrentPage', function () {
       spyOn(GGRC.query_parser, 'parse')
         .and.returnValue({});
 
-      spyOn(QueryAPI, 'makeRequest')
+      spyOn(QueryAPI, 'batchRequests');
+
+      spyOn($.when, 'apply')
         .and.returnValue(queryDfd);
     });
 
     it('should not make request when no widget was provided', function () {
       method([], 'Control', 1);
 
-      expect(QueryAPI.makeRequest)
-        .not.toHaveBeenCalled();
+      expect(QueryAPI.batchRequests).not.toHaveBeenCalled();
     });
 
     it('should init counts for snapshotable objects', function () {
@@ -313,21 +317,17 @@ describe('GGRC Utils CurrentPage', function () {
 
       method(['Control'], 'Assessment', 1);
 
-      expect(QueryAPI.makeRequest)
+      expect(QueryAPI.batchRequests)
         .toHaveBeenCalledWith({
-          data: [
-            {
-              type: 'count',
-              objectName: 'Snapshot'
-            }
-          ]
+          type: 'count',
+          objectName: 'Snapshot',
         });
 
-      queryDfd.resolve([{
+      queryDfd.resolve({
         Snapshot: {
           total: 10
         }
-      }]);
+      });
 
       result = getCounts();
 
@@ -339,21 +339,18 @@ describe('GGRC Utils CurrentPage', function () {
 
       method(['Assessment'], 'Control', 1);
 
-      expect(QueryAPI.makeRequest)
+      expect(QueryAPI.batchRequests)
         .toHaveBeenCalledWith({
-          data: [
-            {
-              type: 'count',
-              objectName: 'Assessment'
-            }
-          ]
-        });
+          type: 'count',
+          objectName: 'Assessment'
+        }
+        );
 
-      queryDfd.resolve([{
+      queryDfd.resolve({
         Assessment: {
           total: 10
         }
-      }]);
+      });
 
       result = getCounts();
 
@@ -368,21 +365,17 @@ describe('GGRC Utils CurrentPage', function () {
         countsName: 'ActiveCycle'
       }], 'Control', 1);
 
-      expect(QueryAPI.makeRequest)
+      expect(QueryAPI.batchRequests)
         .toHaveBeenCalledWith({
-          data: [
-            {
-              type: 'count',
-              objectName: 'Cycle'
-            }
-          ]
+          type: 'count',
+          objectName: 'Cycle'
         });
 
-      queryDfd.resolve([{
+      queryDfd.resolve({
         Cycle: {
           total: 10
         }
-      }]);
+      });
 
       result = getCounts();
 
@@ -477,13 +470,16 @@ describe('GGRC Utils CurrentPage', function () {
   describe('refreshCounts() method', function () {
     var widgets;
     var refreshCounts;
+    let countsMap;
 
     beforeEach(function () {
       refreshCounts = CurrentPageUtils.refreshCounts;
+      countsMap = CurrentPageUtils.getCounts();
 
       widgets =
         {
           Program: {
+            widgetType: 'treeview',
             content_controller_options: {
               model: {
                 shortName: 'Program',
@@ -491,6 +487,7 @@ describe('GGRC Utils CurrentPage', function () {
             },
           },
         Assessment: {
+          widgetType: 'treeview',
           content_controller_options: {
             model: {
               shortName: 'Assessment',
@@ -498,6 +495,7 @@ describe('GGRC Utils CurrentPage', function () {
           },
         },
         Audit: {
+          widgetType: 'treeview',
           content_controller_options: {
             model: {
               shortName: 'Audit',
@@ -535,8 +533,8 @@ describe('GGRC Utils CurrentPage', function () {
           expect(reqParamNames).toContain('Program');
           expect(reqParamNames).toContain('Assessment');
           expect(reqParamNames).toContain('Audit');
-          expect(counts.Audit).toEqual(4);
-          expect(counts.Program).toEqual(0);
+          expect(countsMap.attr('Audit')).toEqual(4);
+          expect(countsMap.attr('Program')).toEqual(0);
           done();
         });
     });
