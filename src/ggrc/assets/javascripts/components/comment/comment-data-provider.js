@@ -6,7 +6,7 @@
 import * as QueryAPI from '../../plugins/utils/query-api-utils';
 import {REFRESH_COMMENTS} from '../../events/eventTypes';
 
-export default GGRC.Components('commentDataProvider', {
+export default can.Component.extend('commentDataProvider', {
   tag: 'comment-data-provider',
   viewModel: {
     instance: null,
