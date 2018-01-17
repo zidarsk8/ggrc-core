@@ -8,7 +8,7 @@ import mock
 
 import ddt
 
-from ggrc_gdrive_integration import file_actions
+from ggrc.gdrive import file_actions
 
 
 @ddt.ddt
@@ -22,8 +22,8 @@ class TestGetGDRiveFile(unittest.TestCase):
       {"id": "123123", "mimeType": "text/csv"},
       {"id": "123123"},
   )
-  @mock.patch("ggrc_gdrive_integration.file_actions.get_http_auth")
-  @mock.patch("ggrc_gdrive_integration.file_actions.discovery")
+  @mock.patch("ggrc.gdrive.file_actions.get_http_auth")
+  @mock.patch("ggrc.gdrive.file_actions.discovery")
   def test_getter_csv(self, file_data, disco_mock, auth_mock):
     """Test getter csv data over GDrive."""
     disco_files = disco_mock.build.return_value.files.return_value

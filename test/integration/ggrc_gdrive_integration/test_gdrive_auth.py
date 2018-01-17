@@ -8,7 +8,7 @@ import mock
 import flask
 
 from integration.ggrc import TestCase
-import ggrc_gdrive_integration as gi
+import ggrc.gdrive as gi
 
 
 class TestAuthorizationFlow(TestCase):
@@ -22,7 +22,7 @@ class TestAuthorizationFlow(TestCase):
     redirect = gi.authorize_app()
     assert "state=" + urllib.quote_plus(line) in redirect.location
 
-    with mock.patch("ggrc_gdrive_integration.client.OAuth2WebServerFlow") as mocked_flow:
+    with mock.patch("ggrc.gdrive.client.OAuth2WebServerFlow") as mocked_flow:
       # after the first step:
       code = "1234567890"
       flask.request.args = {"code": code}

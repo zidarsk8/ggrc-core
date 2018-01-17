@@ -256,7 +256,7 @@ class TestCase(BaseTestCase, object):
       return cls._import_file(os.path.basename(tmp.name), dry_run, person)
 
   @classmethod
-  @patch("ggrc_gdrive_integration.file_actions.get_gdrive_file",
+  @patch("ggrc.gdrive.file_actions.get_gdrive_file",
          new=read_imported_file)
   def _import_file(cls, filename, dry_run=False, person=None):
     """Function that handle sending file to import_csv service"""
