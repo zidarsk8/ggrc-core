@@ -30,6 +30,14 @@ def upgrade():
       DROP TABLE IF EXISTS ggrc_gdrive_integration_alembic_version
   """)
 
+  # The following duplicates a part of a gdrive-related migration,
+  # since a bunch of old migrations in ggrc refer to meetings table.
+  # This part is relevant only for db_reset (new databases), so we
+  # shouldn't recreate this table in downgrade.
+  op.execute("""
+      DROP TABLE IF EXISTS meetings
+  """)
+
 
 def downgrade():
   """Restore alembic table for gdrive migrations with latest correct content.
