@@ -36,9 +36,8 @@ def handle_acl_changes(session, flush_context):
             obj.object_type == all_models.Workflow.__name__):
       wf_new_acl[obj.object_id].add(obj)
     elif isinstance(obj, RELATED_MODELS):
-      workflow = _get_workflow(obj)
-      context[workflow.id][obj.__class__][obj.id].update(
-          workflow.access_control_list)
+      context[obj.workflow.id][obj.__class__][obj.id].update(
+          obj.workflow.access_control_list)
   _init_context(wf_new_acl, context)
   create_related_roles(context)
 
@@ -71,25 +70,6 @@ def remove_related_acl(related_to_del):
 
   db.session.query(all_models.AccessControlList).filter(or_(*qfilter)).delete(
       synchronize_session='fetch')
-
-
-def _get_workflow(related_obj):
-  """Get workflow from given related object.
-
-  Args:
-      related_obj: Workflow's related object
-
-  Returns:
-      Workflow instance which contains related_obj.
-  """
-  if isinstance(related_obj, (all_models.TaskGroup, all_models.Cycle)):
-    return related_obj.workflow
-  elif isinstance(related_obj, all_models.TaskGroupTask):
-    return related_obj.task_group.workflow
-  elif isinstance(related_obj, (all_models.CycleTaskGroupObjectTask,
-                  all_models.CycleTaskGroup, all_models.CycleTaskEntry)):
-    return related_obj.cycle.workflow
-  return None
 
 
 def _add_children_to_context(child_model, foreign_key, parent_wf_map,
