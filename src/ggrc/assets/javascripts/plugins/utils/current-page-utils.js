@@ -8,7 +8,6 @@ import {
   buildRelevantIdsQuery,
   batchRequests,
   buildParam,
-  makeRequest,
 } from './query-api-utils';
 import {
   isSnapshotRelated,
@@ -218,7 +217,7 @@ function _initWidgetCounts(widgets, type, id) {
     }
 
     param.type = 'count';
-    return param;
+    return batchRequests(param);
   });
 
   // Perform requests only if params are defined
@@ -226,9 +225,7 @@ function _initWidgetCounts(widgets, type, id) {
     return can.Deferred().resolve();
   }
 
-  return makeRequest({
-    data: params,
-  }).then(function (data) {
+  return $.when(...params).then((...data) => {
     var countsMap = {};
     data.forEach(function (info, i) {
       var widget = widgetsObject[i];

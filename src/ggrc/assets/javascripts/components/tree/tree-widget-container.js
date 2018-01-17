@@ -277,7 +277,7 @@ viewModel = can.Map.extend({
   refreshLoaded: true,
   canOpenInfoPin: true,
   loadItems: function () {
-    var optionsData = this.attr('optionsData');
+    var {widgetId} = this.attr('optionsData');
     var pageInfo = this.attr('pageInfo');
     var sortingInfo = this.attr('sortingInfo');
     var parent = this.attr('parent_instance');
@@ -293,13 +293,15 @@ viewModel = can.Map.extend({
     pageInfo.attr('disabled', true);
     this.attr('loading', true);
 
+    if (!!this._getFilterByName('status')) {
+      initCounts([widgetId], parent.type, parent.id);
+    }
+
     return TreeViewUtils
-      .loadFirstTierItems(optionsData.widgetId, parent, page, filter,
-        request)
-      .then(function (data) {
-        var total = data.total;
-        var widget = optionsData.widgetId;
-        var countsName = this.attr('options').countsName || widget;
+      .loadFirstTierItems(widgetId, parent, page, filter, request)
+      .then((data) => {
+        const total = data.total;
+        const countsName = this.attr('options').countsName || widgetId;
 
         this.attr('showedItems', data.values);
         this.attr('pageInfo.total', total);
@@ -311,11 +313,7 @@ viewModel = can.Map.extend({
           total !== getCounts().attr(countsName)) {
           getCounts().attr(countsName, total);
         }
-
-        if (this._getFilterByName('status')) {
-          initCounts([widget], parent.type, parent.id);
-        }
-      }.bind(this));
+      });
   },
   display: function (needToRefresh) {
     let loadedItems;

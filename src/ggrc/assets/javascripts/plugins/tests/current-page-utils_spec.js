@@ -300,15 +300,16 @@ describe('GGRC Utils CurrentPage', function () {
       spyOn(GGRC.query_parser, 'parse')
         .and.returnValue({});
 
-      spyOn(QueryAPI, 'makeRequest')
+      spyOn(QueryAPI, 'batchRequests');
+
+      spyOn($.when, 'apply')
         .and.returnValue(queryDfd);
     });
 
     it('should not make request when no widget was provided', function () {
       method([], 'Control', 1);
 
-      expect(QueryAPI.makeRequest)
-        .not.toHaveBeenCalled();
+      expect(QueryAPI.batchRequests).not.toHaveBeenCalled();
     });
 
     it('should init counts for snapshotable objects', function () {
@@ -316,21 +317,17 @@ describe('GGRC Utils CurrentPage', function () {
 
       method(['Control'], 'Assessment', 1);
 
-      expect(QueryAPI.makeRequest)
+      expect(QueryAPI.batchRequests)
         .toHaveBeenCalledWith({
-          data: [
-            {
-              type: 'count',
-              objectName: 'Snapshot'
-            }
-          ]
+          type: 'count',
+          objectName: 'Snapshot',
         });
 
-      queryDfd.resolve([{
+      queryDfd.resolve({
         Snapshot: {
           total: 10
         }
-      }]);
+      });
 
       result = getCounts();
 
@@ -342,21 +339,18 @@ describe('GGRC Utils CurrentPage', function () {
 
       method(['Assessment'], 'Control', 1);
 
-      expect(QueryAPI.makeRequest)
+      expect(QueryAPI.batchRequests)
         .toHaveBeenCalledWith({
-          data: [
-            {
-              type: 'count',
-              objectName: 'Assessment'
-            }
-          ]
-        });
+          type: 'count',
+          objectName: 'Assessment'
+        }
+        );
 
-      queryDfd.resolve([{
+      queryDfd.resolve({
         Assessment: {
           total: 10
         }
-      }]);
+      });
 
       result = getCounts();
 
@@ -371,21 +365,17 @@ describe('GGRC Utils CurrentPage', function () {
         countsName: 'ActiveCycle'
       }], 'Control', 1);
 
-      expect(QueryAPI.makeRequest)
+      expect(QueryAPI.batchRequests)
         .toHaveBeenCalledWith({
-          data: [
-            {
-              type: 'count',
-              objectName: 'Cycle'
-            }
-          ]
+          type: 'count',
+          objectName: 'Cycle'
         });
 
-      queryDfd.resolve([{
+      queryDfd.resolve({
         Cycle: {
           total: 10
         }
-      }]);
+      });
 
       result = getCounts();
 
