@@ -401,7 +401,8 @@ import Permission from '../permission';
         oneWay: Object.freeze({
           // mapping audit to issue is not allowed,
           // but unmap can be possible
-          'issue audit': !(options && options.isIssueUnmap)
+          'issue audit': !(options && options.isIssueUnmap),
+          'issue person': true,
         }),
         // NOTE: the names in every type pair must be sorted alphabetically!
         twoWay: Object.freeze({
@@ -410,8 +411,8 @@ import Permission from '../permission';
           'assessmenttemplate cacheable': true,
           'cacheable person': true,
           'person risk': true,
-          'person threat': true
-        })
+          'person threat': true,
+        }),
       });
 
       if (target instanceof can.Model) {

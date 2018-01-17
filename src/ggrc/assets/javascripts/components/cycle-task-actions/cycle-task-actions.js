@@ -41,28 +41,16 @@ import template from './cycle-task-actions.mustache';
           var allowChangeState = this.attr('instance.allow_change_state');
 
           if (pageType === 'Workflow') {
-            return !this.isBacklog() &&
-              this.attr('cycle').reify().attr('is_current');
+            return this.attr('cycle').reify().attr('is_current');
           }
 
           return allowChangeState;
-        }
-      }
+        },
+      },
     },
     instance: null,
     disabled: false,
     oldValues: [],
-    isBacklog: function () {
-      var result = false;
-      var cycle;
-
-      if (this.attr('instance') instanceof CMS.Models.CycleTaskGroup) {
-        cycle = this.attr('instance').cycle.reify();
-        result = cycle.workflow.reify().kind === 'Backlog';
-      }
-
-      return result;
-    },
     changeStatus: function (ctx, el, ev) {
       var status = el.data('value');
       var instance = this.attr('instance');

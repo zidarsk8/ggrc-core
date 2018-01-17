@@ -3,6 +3,8 @@
  Licensed under http://www.apache.org/licenses/LICENSE-2.0 <see LICENSE file>
  */
 
+import Component from '../comment-input';
+
 describe('GGRC.Component.CommentInput', function () {
   'use strict';
 
@@ -16,7 +18,7 @@ describe('GGRC.Component.CommentInput', function () {
     var scope;
 
     beforeEach(function () {
-      scope = GGRC.Components.getViewModel('commentInput');
+      scope = getComponentVM(Component);
     });
 
     it('should update: value and isEmpty. length is > 0 ', function () {

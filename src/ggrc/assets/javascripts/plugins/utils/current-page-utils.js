@@ -8,7 +8,6 @@ import {
   buildRelevantIdsQuery,
   batchRequests,
   buildParam,
-  makeRequest,
 } from './query-api-utils';
 import {
   isSnapshotRelated,
@@ -140,16 +139,15 @@ function getWidgetList(modelName, path) {
 }
 
 function getWidgetModels(modelName, path) {
-  var widgetList = getWidgetList(modelName, path);
-  var defaults = getDefaultWidgets(widgetList, path);
+  const widgetList = getWidgetList(modelName, path);
+  const defaults = getDefaultWidgets(widgetList, path);
 
-  return defaults.map(function (widgetName) {
-    if (isObjectVersion(widgetName)) {
-      return widgetName;
-    }
-
-    return widgetList[widgetName].content_controller_options.model.shortName;
-  });
+  return defaults
+    .filter((name) => widgetList[name].widgetType === 'treeview')
+    .map((widgetName) => {
+      return isObjectVersion(widgetName) ? widgetName :
+        widgetList[widgetName].content_controller_options.model.shortName;
+    });
 }
 
 function getDefaultWidgets(widgetList, path) {
@@ -219,7 +217,7 @@ function _initWidgetCounts(widgets, type, id) {
     }
 
     param.type = 'count';
-    return param;
+    return batchRequests(param);
   });
 
   // Perform requests only if params are defined
@@ -227,9 +225,7 @@ function _initWidgetCounts(widgets, type, id) {
     return can.Deferred().resolve();
   }
 
-  return makeRequest({
-    data: params,
-  }).then(function (data) {
+  return $.when(...params).then((...data) => {
     var countsMap = {};
     data.forEach(function (info, i) {
       var widget = widgetsObject[i];
@@ -256,7 +252,7 @@ function refreshCounts() {
 
   widgets = getWidgetModels(pageInstance.constructor.shortName, location);
 
-  return _initWidgetCounts(widgets, pageInstance.type, pageInstance.id);
+  return initWidgetCounts(widgets, pageInstance.type, pageInstance.id);
 }
 
 function _getCurrentUser() {

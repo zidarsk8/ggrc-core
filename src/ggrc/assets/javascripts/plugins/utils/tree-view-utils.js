@@ -417,8 +417,8 @@ function loadFirstTierItems(modelName,
 
   requestedType = params.object_name;
   requestData.push(params);
-  return makeRequest({data: requestData.attr()})
-    .then(function (response) {
+  return $.when(...requestData.attr().map((el) => batchRequests(el)))
+    .then((...response) => {
       response = _.last(response)[requestedType];
 
       response.values = response.values.map(function (source) {
