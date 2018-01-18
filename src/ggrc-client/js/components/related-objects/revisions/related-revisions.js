@@ -71,11 +71,14 @@ export default can.Component.extend({
     inserted() {
       this.viewModel.loadRevisions();
     },
-    '{viewModel.paging} current': function () {
+    '{viewModel.paging} current'() {
       this.viewModel.setVisibleRevisions();
     },
-    '{viewModel.paging} pageSize': function () {
+    '{viewModel.paging} pageSize'() {
       this.viewModel.setVisibleRevisions();
+    },
+    '{viewModel.instance} modelAfterSave'() {
+      this.viewModel.loadRevisions();
     },
   },
 });
