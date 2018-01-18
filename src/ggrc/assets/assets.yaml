@@ -190,9 +190,6 @@ dashboard-js-template-files:
   - modals/restore_revision.mustache
   - modals/review_proposal.mustache
   # ggrc_basic_permissions
-  - people_roles/authorizations_by_person_list.mustache
-  - people_roles/authorizations_by_person_tree_add_item.mustache
-  - people_roles/authorizations_modal_actions.mustache
   - people_roles/base_modal.mustache
   - people_roles/object_column.mustache
   - people_roles/object_detail.mustache
