@@ -165,8 +165,6 @@ class Control(WithLastAssessmentDate,
   kind_id = deferred(db.Column(db.Integer), 'Control')
   means_id = deferred(db.Column(db.Integer), 'Control')
   version = deferred(db.Column(db.String), 'Control')
-  documentation_description = deferred(db.Column(db.Text, nullable=False,
-                                                 default=u""), 'Control')
   verify_frequency_id = deferred(db.Column(db.Integer), 'Control')
   fraud_related = deferred(db.Column(db.Boolean), 'Control')
   key_control = deferred(db.Column(db.Boolean), 'Control')
@@ -193,7 +191,6 @@ class Control(WithLastAssessmentDate,
       'active',
       'company_control',
       'directive',
-      'documentation_description',
       'fraud_related',
       'key_control',
       'kind',
@@ -206,7 +203,6 @@ class Control(WithLastAssessmentDate,
       'active',
       'company_control',
       'directive',
-      'documentation_description',
       attributes.BooleanFullTextAttr(
           'fraud_related',
           'fraud_related',
@@ -222,7 +218,6 @@ class Control(WithLastAssessmentDate,
   ]
 
   _sanitize_html = [
-      'documentation_description',
       'version',
   ]
 
