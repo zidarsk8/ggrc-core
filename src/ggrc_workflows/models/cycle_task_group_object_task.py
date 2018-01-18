@@ -198,6 +198,11 @@ class CycleTaskGroupObjectTask(roleable.Roleable,
       "start_date": "Start Date",
   }
 
+  @property
+  def workflow(self):
+    """Property which returns parent workflow object."""
+    return self.cycle.workflow
+
   @builder.simple_property
   def related_objects(self):
     """Compute and return a list of all the objects related to this cycle task.

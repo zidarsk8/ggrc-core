@@ -42,6 +42,11 @@ class CycleTaskEntry(Relatable, Described, Base, mixin.Indexed, db.Model):
       'is_declining_review'
   )
 
+  @property
+  def workflow(self):
+    """Property which returns parent workflow object."""
+    return self.cycle.workflow
+
   @hybrid_property
   def is_declining_review(self):
     return self._is_declining_review
