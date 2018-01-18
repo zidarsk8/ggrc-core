@@ -13,24 +13,20 @@ from ggrc.fulltext.mixin import Indexed
 from ggrc.models.deferred import deferred
 from ggrc.models.mixins import Base
 from ggrc.models.relationship import Relatable
-from ggrc.models.utils import validate_option
 from ggrc.models import exceptions
 from ggrc.models import reflection
+from ggrc.models import mixins
 
 
-class Document(Roleable, Relatable, Base, Indexed, db.Model):
+class Document(Roleable, Relatable, Base, mixins.Titled, Indexed, db.Model):
   """Audit model."""
   __tablename__ = 'documents'
 
-  # TODO: inherit from Titled mixin (note: title is nullable here)
-  title = deferred(db.Column(db.String), 'Document')
-  link = deferred(db.Column(db.String), 'Document')
+  _title_uniqueness = False
+
+  link = deferred(db.Column(db.String, nullable=False), 'Document')
   description = deferred(db.Column(db.Text, nullable=False, default=u""),
                          'Document')
-  kind_id = db.Column(db.Integer, db.ForeignKey('options.id'), nullable=True)
-  year_id = db.Column(db.Integer, db.ForeignKey('options.id'), nullable=True)
-  language_id = db.Column(db.Integer, db.ForeignKey('options.id'),
-                          nullable=True)
 
   URL = "URL"
   ATTACHMENT = "EVIDENCE"
@@ -40,28 +36,6 @@ class Document(Roleable, Relatable, Base, Indexed, db.Model):
                                      default=URL,
                                      nullable=False),
                            'Document')
-
-  kind = db.relationship(
-      'Option',
-      primaryjoin='and_(foreign(Document.kind_id) == Option.id, '
-      'Option.role == "reference_type")',
-      uselist=False,
-      lazy="joined",
-  )
-  year = db.relationship(
-      'Option',
-      primaryjoin='and_(foreign(Document.year_id) == Option.id, '
-      'Option.role == "document_year")',
-      uselist=False,
-      lazy="joined",
-  )
-  language = db.relationship(
-      'Option',
-      primaryjoin='and_(foreign(Document.language_id) == Option.id, '
-      'Option.role == "language")',
-      uselist=False,
-      lazy="joined",
-  )
 
   _fulltext_attrs = [
       'title',
@@ -74,9 +48,6 @@ class Document(Roleable, Relatable, Base, Indexed, db.Model):
       'title',
       'link',
       'description',
-      'kind',
-      'year',
-      'language',
       "document_type",
   )
 
@@ -90,17 +61,6 @@ class Document(Roleable, Relatable, Base, Indexed, db.Model):
       'link': "Link",
       'description': "description",
   }
-
-  @orm.validates('kind', 'year', 'language')
-  def validate_document_options(self, key, option):
-    """Returns correct option, otherwise rises an error"""
-    if key == 'year':
-      desired_role = 'document_year'
-    elif key == 'kind':
-      desired_role = 'reference_type'
-    else:
-      desired_role = key
-    return validate_option(self.__class__.__name__, key, option, desired_role)
 
   @orm.validates('document_type')
   def validate_document_type(self, key, document_type):
@@ -126,14 +86,6 @@ class Document(Roleable, Relatable, Base, Indexed, db.Model):
         orm.Load(cls).undefer_group(
             "Document_complete",
         ),
-    )
-
-  @classmethod
-  def eager_query(cls):
-    return super(Document, cls).eager_query().options(
-        orm.joinedload('kind'),
-        orm.joinedload('year'),
-        orm.joinedload('language'),
     )
 
   @hybrid_property

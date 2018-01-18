@@ -64,6 +64,7 @@ class TestReader(TestCase):
                 "title": model_singular,
                 "context": None,
                 "reference_url": "ref",
+                "link": "https://example.com",  # ignored except for Document
                 "contact": {
                     "type": "Person",
                     "id": self.users["reader"].id,
