@@ -60,6 +60,31 @@ owner_update = owner_base + [
 permissions = {
     "read": owner_read,
     "create": [
+        {
+            "type": "TaskGroup",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
+        {
+            "type": "TaskGroupTask",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
+        {
+            "type": "Cycle",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
+        {
+            "type": "CycleTaskEntry",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
+        {
+            "type": "TaskGroupObject",
+            "condition": "is_workflow_admin",
+            "terms": {},
+        },
         "Categorization",
         "Category",
         "ControlCategory",
