@@ -122,6 +122,9 @@ def upgrade():
       UNION
       SELECT "CycleTaskEntry", id, context_id
       FROM cycle_task_entries
+      UNION
+      SELECT "TaskGroupObject", id, context_id
+      FROM task_group_objects
       """)
   related_acl_data = []
   for related in rows:

@@ -13,10 +13,15 @@ from ggrc.models import all_models
 from ggrc.access_control.role import get_custom_roles_for
 
 
-RELATED_MODELS = (all_models.TaskGroup, all_models.TaskGroupTask,
-                  all_models.Cycle, all_models.CycleTaskGroup,
-                  all_models.CycleTaskGroupObjectTask,
-                  all_models.CycleTaskEntry)
+RELATED_MODELS = (
+    all_models.TaskGroup,
+    all_models.TaskGroupTask,
+    all_models.TaskGroupObject,
+    all_models.Cycle,
+    all_models.CycleTaskGroup,
+    all_models.CycleTaskGroupObjectTask,
+    all_models.CycleTaskEntry,
+)
 
 
 def init_hook():
