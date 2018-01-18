@@ -55,13 +55,13 @@ export default can.Component.extend({
 
               if (displayDescriptions) {
                 confirmSelf.attr('leftRevisionData', {
-                  updatedAt: data[0].updated_at,
-                  modifiedBy: data[0].modified_by,
+                  date: data[0].updated_at,
+                  author: data[0].modified_by,
                   description: that.attr('leftRevisionDescription'),
                 });
                 confirmSelf.attr('rightRevisionData', {
-                  updatedAt: data[1].updated_at,
-                  modifiedBy: data[1].modified_by,
+                  date: data[1].updated_at,
+                  author: data[1].modified_by,
                   description: that.attr('rightRevisionDescription'),
                 });
               }
