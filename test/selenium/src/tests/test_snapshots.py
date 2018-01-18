@@ -103,15 +103,16 @@ class TestSnapshots(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      ("dynamic_create_audit_with_control", "expected_control", "is_openable"),
+      ("dynamic_create_audit_with_control", "expected_control", "is_openable",
+       "is_updateable"),
       [("create_audit_with_control_and_update_control",
-        "new_control_rest", True),
+        "new_control_rest", True, True),
        ("create_audit_with_control_and_delete_control",
-        "new_control_rest", False),
+        "new_control_rest", False, False),
        ("create_audit_with_control_with_cas_and_update_control_with_cas",
-        "new_control_with_cas_rest", True),
+        "new_control_with_cas_rest", True, True),
        ("create_audit_with_control_with_cas_and_delete_cas_for_controls",
-        "new_control_with_cas_rest", True)],
+        "new_control_with_cas_rest", True, True)],
       ids=["Audit contains snapshotable Control after updating Control",
            "Audit contains snapshotable Control after deleting Control",
            "Audit contains snapshotable Control "
@@ -121,7 +122,7 @@ class TestSnapshots(base.Test):
       indirect=["dynamic_create_audit_with_control"])
   def test_audit_contains_snapshotable_control(
       self, new_cas_for_controls_rest, dynamic_create_audit_with_control,
-      expected_control, is_openable, selenium
+      expected_control, is_openable, is_updateable, selenium
   ):
     """Test snapshotable Control and check via UI that:
     - Audit contains snapshotable Control after updating Control.
@@ -150,7 +151,7 @@ class TestSnapshots(base.Test):
         src_obj=audit, obj=expected_control)
     actual_control = controls_ui_service.get_list_objs_from_info_panels(
         src_obj=audit, objs=expected_control)
-    assert is_control_updateable is True
+    assert is_control_updateable is is_updateable
     assert is_control_openable is is_openable
     # 'actual_control': created_at, updated_at, modified_by (None)
     self.general_equal_assert(
@@ -162,18 +163,14 @@ class TestSnapshots(base.Test):
 
   @pytest.mark.smoke_tests
   @pytest.mark.parametrize(
-      ("dynamic_create_audit_with_control", "control", "expected_control",
-       "is_openable"),
+      ("dynamic_create_audit_with_control", "control", "expected_control"),
       [("create_audit_with_control_and_update_control",
-        "new_control_rest", "update_control_rest", True),
-       ("create_audit_with_control_and_delete_control",
-        "new_control_rest", "new_control_rest", False),
+        "new_control_rest", "update_control_rest"),
        ("create_audit_with_control_with_cas_and_update_control_with_cas",
-        "new_control_with_cas_rest", "update_control_with_cas_rest", True),
+        "new_control_with_cas_rest", "update_control_with_cas_rest"),
        ("create_audit_with_control_with_cas_and_delete_cas_for_controls",
-        "new_control_with_cas_rest", "new_control_with_cas_rest", True)],
+        "new_control_with_cas_rest", "new_control_with_cas_rest")],
       ids=["Update snapshotable Control to latest ver after updating Control",
-           "Update snapshotable Control to latest ver after deleting Control",
            "Update snapshotable Control to latest ver "
            "after updating Control with CAs",
            "Update snapshotable Control to latest ver "
@@ -181,11 +178,10 @@ class TestSnapshots(base.Test):
       indirect=["dynamic_create_audit_with_control"])
   def test_update_snapshotable_control_to_latest_ver(
       self, new_cas_for_controls_rest, dynamic_create_audit_with_control,
-      control, expected_control, is_openable, selenium
+      control, expected_control, selenium
   ):
     """Test snapshotable Control and check via UI that:
     - Update snapshotable Control to latest ver after updating Control.
-    - Update snapshotable Control to latest ver after deleting Control.
     - Update snapshotable Control to latest ver
     after updating Control with CAs.
     - Update snapshotable Control to latest ver
@@ -194,7 +190,6 @@ class TestSnapshots(base.Test):
       Execution and return of dynamic fixtures used REST API:
     - 'new_cas_for_controls_rest' *(due to Issue in app GGRC-2344)
     - 'create_audit_with_control_and_update_control'.
-    - 'create_audit_with_control_and_delete_control'.
     - 'create_audit_with_control_with_cas_and_update_control_with_cas'.
     - 'create_audit_with_control_with_cas_and_delete_cas_for_controls'.
     """
@@ -216,7 +211,7 @@ class TestSnapshots(base.Test):
     actual_control = controls_ui_service.get_list_objs_from_info_panels(
         src_obj=audit, objs=expected_control)
     assert is_control_updateable is False
-    assert is_control_openable is is_openable
+    assert is_control_openable is True
     # 'actual_control': created_at, updated_at, modified_by (None)
     self.general_equal_assert(
         expected_control, actual_control,
