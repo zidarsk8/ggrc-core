@@ -157,6 +157,12 @@ def is_auditor(instance, **_):
   return any(acl for acl in instance.audit.access_control_list
              if acl.ac_role.name == "Auditors" and acl.person == current_user)
 
+
+def is_workflow_admin(instance, **_):
+  """Check if current user has Admin role in scope of parent Workflow object"""
+  return any(acl for acl in instance.workflow.access_control_list
+             if acl.ac_role.name == "Admin" and acl.person == current_user)
+
 """
 All functions with a signature
 
@@ -172,6 +178,7 @@ _CONDITIONS_MAP = {
     'has_not_changed': has_not_changed_condition,
     'has_changed': has_changed_condition,
     'is_auditor': is_auditor,
+    'is_workflow_admin': is_workflow_admin,
 }
 
 
