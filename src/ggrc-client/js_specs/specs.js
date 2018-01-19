@@ -6,9 +6,10 @@
 import 'jasmine-fixture/dist/jasmine-fixture';
 import './spec_setup';
 import './spec_helpers';
-import '../../static/dashboard-templates';
-import '../javascripts/entrypoints/vendor';
-import '../javascripts/entrypoints/dashboard';
+import '../../ggrc/static/dashboard-templates';
+import '../js/entrypoints/vendor';
+import '../js/entrypoints/dashboard';
 
-var testsContext = require.context('../../..', true, /_spec\.js$/);
+let testsContext = require.context('../', true, /_spec\.js$/);
+
 testsContext.keys().forEach(testsContext);
