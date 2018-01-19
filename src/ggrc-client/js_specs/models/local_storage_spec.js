@@ -5,9 +5,10 @@
 
 //= require models/local_storage
 
+import {waitsFor} from '../spec_helpers';
 
 describe("can.Model.LocalStorage", function() {
-  
+
   //run-once setup
   beforeAll(function() {
     can.Model.LocalStorage("SpecModel");
