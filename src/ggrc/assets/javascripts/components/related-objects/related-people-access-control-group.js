@@ -21,6 +21,7 @@ export default can.Component.extend({
             !this.attr('readOnly') &&
             !this.attr('updatableGroupId') &&
             (this.attr('isNewInstance') ||
+              this.attr('isProposal') ||
               Permission.is_allowed_for('update', instance));
 
           return canEdit;
@@ -45,6 +46,7 @@ export default can.Component.extend({
     autoUpdate: false,
     updatableGroupId: null,
     readOnly: false,
+    isProposal: false,
 
     changeEditableGroup: function (args) {
       if (args.editableMode) {
