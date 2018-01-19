@@ -7,7 +7,6 @@
 {{#if allow_mapping_or_creating}}
   {{#if model.root_object}}
     {{^if_equals model.shortName 'Assessment'}}
-    {{^if_equals model.shortName 'Issue'}}
       <a
         class="btn btn-mini action-button map-button"
         href="javascript://"
@@ -20,7 +19,6 @@
         data-original-title="Map {{firstnonempty title_singular model.title_singular 'Object'}} to this {{firstnonempty parent_instance.class.title_singular 'Object'}}">
         Map
       </a>
-    {{/if_equals}}
     {{/if_equals}}
   {{#if null}}
   <span class="section-expander">
