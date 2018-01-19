@@ -32,6 +32,14 @@ owner_read = owner_base + [
         },
         "condition": "relationship",
     },
+    {
+        "type": "Proposal",
+        "condition": "is_allowed_based_on",
+        "terms": {
+            "property_name": "instance",
+            "action": "read",
+        }
+    },
     "Role",
     "UserRole",
     "Context",
@@ -54,6 +62,14 @@ owner_update = owner_base + [
             "value": "$current_user"
         },
         "condition": "is"
+    },
+    {
+        "type": "Proposal",
+        "condition": "is_allowed_based_on",
+        "terms": {
+            "property_name": "instance",
+            "action": "update",
+        }
     },
 ]
 
@@ -91,6 +107,14 @@ permissions = {
         "Vendor",
         "PopulationSample",
         "Product",
+        {
+            "type": "Proposal",
+            "condition": "is_allowed_based_on",
+            "terms": {
+                "property_name": "instance",
+                "action": "read",
+            }
+        },
         "Project",
         {
             "type": "Relationship",
