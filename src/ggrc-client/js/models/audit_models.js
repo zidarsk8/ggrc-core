@@ -325,12 +325,6 @@ import Permission from '../permission';
       return this._super.apply(this, arguments);
     },
 
-    after_save: function () {
-      if (this.audit) {
-        this.audit.reify().refresh();
-      }
-    },
-
     /**
      * Event handler when an assignee is picked in an autocomplete form field.
      * It adds the picked assignee's ID to the assignees list.
