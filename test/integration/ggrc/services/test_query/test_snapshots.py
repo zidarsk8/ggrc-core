@@ -663,7 +663,7 @@ class TestSnapshotIndexing(TestCase, WithQueryApi):
                          [control_ids[1], control_ids[0]])
 
   @data(
-      ("updated_at", ("updated_at", "Last Updated", "last updated")),
+      ("updated_at", ("updated_at", "Last Updated Date", "last updated date")),
       ("created_at", ("updated_at", "Created Date", "Created Date")),
   )
   @unpack

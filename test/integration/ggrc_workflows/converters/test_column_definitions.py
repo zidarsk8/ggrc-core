@@ -59,7 +59,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Delete",
         "Need Verification",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
         'Folder',
     }
@@ -85,7 +85,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Objects",
         "Delete",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     self.assertEqual(expected_names, display_names)
@@ -108,7 +108,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "Code",
         "Delete",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     self.assertEqual(expected_names, display_names)
@@ -140,7 +140,7 @@ class TestWorkflowObjectColumnDefinitions(TestCase):
         "State",
         "Delete",
         'Created Date',
-        'Last Updated',
+        'Last Updated Date',
         'Last Updated By',
     }
     expected_names = element_names.union(mapping_names).union(unmapping_names)

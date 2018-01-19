@@ -128,7 +128,8 @@ class TestExportSnapshots(TestCase):
             "Principal Assignees": u"creator@example.com",
             "Secondary Assignees": u"creator@example.com",
             'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            'Last Updated': control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Last Updated Date':
+                control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
             'Last Updated By': control.modified_by.email,
         }
         for snapshot, control in zip(snapshots, controls)
@@ -247,7 +248,8 @@ class TestExportSnapshots(TestCase):
             "Principal Assignees": u"",
             "Secondary Assignees": u"",
             'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-            'Last Updated': control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+            'Last Updated Date':
+                control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
             'Last Updated By': "",
             "Folder": u"",
         }
@@ -440,7 +442,8 @@ class TestExportSnapshots(TestCase):
           "Categories": u"",
           "Evidence File": u"",
           'Created Date': control.created_at.strftime("%Y-%m-%dT%H:%M:%S"),
-          'Last Updated': control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
+          'Last Updated Date':
+              control.updated_at.strftime("%Y-%m-%dT%H:%M:%S"),
           'Last Updated By': "",
           "Folder": u"",
       }
