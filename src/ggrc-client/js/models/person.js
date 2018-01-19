@@ -92,7 +92,7 @@ import RefreshQueue from './refresh_queue';
         attr_title: 'Authorizations',
         attr_name: 'authorizations',
       }, {
-        attr_title: 'Last Updated',
+        attr_title: 'Last Updated Date',
         attr_name: 'updated_at',
       }],
       display_attr_names: ['title', 'email', 'authorizations', 'updated_at'],

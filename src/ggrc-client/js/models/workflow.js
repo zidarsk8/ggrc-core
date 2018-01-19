@@ -46,7 +46,7 @@
         {attr_title: 'Manager', attr_name: 'owner', attr_sort_field: ''},
         {attr_title: 'Code', attr_name: 'slug'},
         {attr_title: 'State', attr_name: 'status'},
-        {attr_title: 'Last Updated', attr_name: 'updated_at'},
+        {attr_title: 'Last Updated Date', attr_name: 'updated_at'},
         {attr_title: 'Last Updated By', attr_name: 'modified_by'}
       ]
     },

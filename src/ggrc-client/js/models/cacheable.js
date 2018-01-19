@@ -139,7 +139,7 @@ import RefreshQueue from './refresh_queue';
         order: 40
       },
       {
-        attr_title: 'Last Updated',
+        attr_title: 'Last Updated Date',
         attr_name: 'updated_at',
         order: 70
       },
